@@ -1,0 +1,6 @@
+.block {
+  padding: 25px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  margin: 10px;
+  border-radius: 3px;
+}
