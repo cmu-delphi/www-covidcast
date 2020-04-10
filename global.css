@@ -37,3 +37,9 @@
 .state:hover {
   fill: red;
 }
+
+.line {
+  fill: none;
+  stroke: red;
+  stroke-width: 2px;
+}
