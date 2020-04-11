@@ -12,17 +12,21 @@ export const sensors = readable([
 export const currentSensor = writable("optum");
 
 export const levels = readable([
-  "ZIP-5 Area",
-  "County",
-  "Metropolitan Statistical Area",
   "State",
+  "Hospital Referral Region",
+  "Metropolitan Statistical Area",
+  "County",
+  "ZIP-5 Area"
 ]);
 export const geojsons = readable(
   new Map([
-    ["ZIP-5 Area", ""],
-    ["County", "./gz_2010_us_050_00_5m.json"],
-    ["Metropolitan Statistical Area", ""],
     ["State", "./gz_2010_us_040_00_5m.json"],
+    ["Hospital Referral Region", "./hospital_referral_region.geojson"],
+    ["Metropolitan Statistical Area", "./tl_2019_us_metdiv.geojson"],
+    ["County", "./gz_2010_us_050_00_5m.json"],
+    ["ZIP-5 Area", ""],
+    
+
   ])
 );
 export const currentLevel = writable("State");
