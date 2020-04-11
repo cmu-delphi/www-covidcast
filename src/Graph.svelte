@@ -94,5 +94,5 @@
   <b>{$selected}</b>
 </p>
 <div bind:clientWidth={w}>
-  <div id="map" bind:this={el} />
+  <div bind:this={el} />
 </div>

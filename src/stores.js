@@ -19,7 +19,8 @@ export const levels = readable([
 ]);
 export const currentLevel = writable("zip");
 
-export const currentWeek = writable(10);
+// EpiWeek in form YYYYWW
+export const currentWeek = writable(202014);
 
 export const data = writable({});
 export const selected = writable("");

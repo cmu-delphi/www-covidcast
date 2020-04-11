@@ -6,4 +6,4 @@
   current week selected is
   <b>{$currentWeek}</b>
 </p>
-<input type="range" min="0" max="10" bind:value={$currentWeek} />
+<input type="range" min="202010" max="202014" bind:value={$currentWeek} />

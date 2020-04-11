@@ -1,8 +1,8 @@
 <script>
   import Options from "./Options.svelte";
   import Time from "./Time.svelte";
-  import Map from "./Map.svelte";
-  // import MapBox from "./MapBox.svelte";
+  // import Map from "./Map.svelte";
+  import MapBox from "./MapBox.svelte";
   import Graph from "./Graph.svelte";
   import { data } from "./stores.js";
 
@@ -29,8 +29,8 @@
 <div class="pure-g">
   <div class="pure-u-2-3">
     <div class="block">
-      <Map />
-      <!-- <MapBox /> -->
+      <!-- <Map /> -->
+      <MapBox lat={35} lon={-84} zoom={3.5} />
     </div>
   </div>
   <div class="pure-u-1-3">
