@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import { selected, currentSensor, currentLevel } from "./stores.js";
+  import { selectedRegion, currentSensor, currentLevel } from "./stores.js";
   import * as d3 from "d3";
 
   let el;
@@ -91,7 +91,7 @@
   at level
   <b>{$currentLevel}</b>
   for
-  <b>{$selected}</b>
+  <b>{$selectedRegion}</b>
 </p>
 <div bind:clientWidth={w}>
   <div bind:this={el} />

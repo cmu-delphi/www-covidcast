@@ -1,6 +1,6 @@
 <script>
   import { onMount, setContext } from "svelte";
-  import { selected } from "./stores.js";
+  import { selectedRegion, geojsons, currentLevel } from "./stores.js";
   import mapboxgl from "mapbox-gl";
   import * as d3 from "d3";
 
@@ -14,6 +14,18 @@
 
   let container;
   let map;
+
+  currentLevel.subscribe(_ => drawMap());
+
+  function drawMap() {
+    if (map) {
+      d3.json($geojsons.get($currentLevel)).then(data => {
+        data.features.forEach(d => (d.properties.val = Math.random()));
+        console.log(data);
+        map.getSource("map").setData(data);
+      });
+    }
+  }
 
   onMount(() => {
     const link = document.createElement("link");
@@ -29,19 +41,22 @@
       });
 
       map.on("load", function() {
-        d3.json("./gz_2010_us_050_00_5m.json").then(d => {
-          console.log(d);
-          map.addSource("counties", {
+        d3.json($geojsons.get($currentLevel)).then(data => {
+          data.features.forEach(d => (d.properties.val = Math.random()));
+          map.addSource("map", {
             type: "geojson",
-            data: d
+            data: data
           });
           map.addLayer({
-            id: "counties-level",
-            source: "counties",
+            id: "map",
+            source: "map",
             type: "fill",
             layout: {},
             paint: {
-              "fill-color": "#627BC1",
+              "fill-color": {
+                property: "val",
+                stops: [[0, "#fff"], [1, "#f00"]]
+              },
               "fill-opacity": [
                 "case",
                 ["boolean", ["feature-state", "hover"], false],
@@ -50,8 +65,8 @@
               ]
             }
           });
-          map.on("click", "counties-level", function(e) {
-            selected.set(e.features[0].properties.NAME);
+          map.on("click", "map", function(e) {
+            selectedRegion.set(e.features[0].properties.NAME);
             new mapboxgl.Popup()
               .setLngLat(e.lngLat)
               .setHTML(e.features[0].properties.NAME)
