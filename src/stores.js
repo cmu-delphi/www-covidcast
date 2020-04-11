@@ -1,4 +1,5 @@
-import { writable, readable } from "svelte/store";
+import { writable, readable, derived } from "svelte/store";
+import * as d3 from "d3";
 
 export const sensors = readable([
   "Optum Hospitalizations",
@@ -32,6 +33,16 @@ export const currentLevel = writable("State");
 // EpiWeek in form YYYYWW
 export const currentWeek = writable(202014);
 
-export const data = writable({});
-
 export const selectedRegion = writable("");
+
+export const sampleData = readable([], function start(set) {
+  let parseTime = d3.timeParse("%Y-%m-%d");
+  d3.csv("./fb-surveys.csv").then((d) =>
+    set(
+      d.map((s) => ({
+        date: parseTime(s.Date),
+        value: s.PercentCLI,
+      }))
+    )
+  );
+});

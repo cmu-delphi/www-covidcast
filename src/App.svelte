@@ -4,7 +4,6 @@
   // import Map from "./Map.svelte";
   import MapBox from "./MapBox.svelte";
   import Graph from "./Graph.svelte";
-  import { data } from "./stores.js";
 
   // fetch(
   //   "https://delphi.midas.cs.cmu.edu/epidata/api.php?source=fluview&regions=nat&epiweeks=201501"
