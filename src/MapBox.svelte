@@ -2,6 +2,7 @@
   import { onMount, setContext } from "svelte";
   import { selected } from "./stores.js";
   import mapboxgl from "mapbox-gl";
+  import * as d3 from "d3";
 
   // https://docs.mapbox.com/help/glossary/access-token/
   mapboxgl.accessToken =
@@ -28,53 +29,35 @@
       });
 
       map.on("load", function() {
-        map.addSource("counties", {
-          type: "geojson",
-          data: "./gz_2010_us_050_00_5m.json"
+        d3.json("./gz_2010_us_050_00_5m.json").then(d => {
+          console.log(d);
+          map.addSource("counties", {
+            type: "geojson",
+            data: d
+          });
+          map.addLayer({
+            id: "counties-level",
+            source: "counties",
+            type: "fill",
+            layout: {},
+            paint: {
+              "fill-color": "#627BC1",
+              "fill-opacity": [
+                "case",
+                ["boolean", ["feature-state", "hover"], false],
+                1,
+                0.5
+              ]
+            }
+          });
+          map.on("click", "counties-level", function(e) {
+            selected.set(e.features[0].properties.NAME);
+            new mapboxgl.Popup()
+              .setLngLat(e.lngLat)
+              .setHTML(e.features[0].properties.NAME)
+              .addTo(map);
+          });
         });
-        console.log(map.getSource("counties"));
-        map.addLayer({
-          id: "counties-level",
-          source: "counties",
-          // "source-layer": "state_county_population_2014_cen",
-          type: "line"
-          // filter: ["==", "isState", true],
-          //   paint: {
-          //     "fill-color": [
-          //       "interpolate",
-          //       ["linear"],
-          //       ["get", "population"],
-          //       0,
-          //       "#F2F12D",
-          //       500000,
-          //       "#EED322",
-          //       750000,
-          //       "#E6B71E",
-          //       1000000,
-          //       "#DA9C20",
-          //       2500000,
-          //       "#CA8323",
-          //       5000000,
-          //       "#B86B25",
-          //       7500000,
-          //       "#A25626",
-          //       10000000,
-          //       "#8B4225",
-          //       25000000,
-          //       "#723122"
-          //     ],
-          //     "fill-opacity": 0.75
-          //   }
-          // },
-          // "waterway-label"
-        });
-      });
-      map.on("click", "counties-level", function(e) {
-        selected.set(e.features[0].properties.NAME);
-        new mapboxgl.Popup()
-          .setLngLat(e.lngLat)
-          .setHTML(e.features[0].properties.NAME)
-          .addTo(map);
       });
     };
 
