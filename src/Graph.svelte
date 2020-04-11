@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import { selected } from "./stores.js";
+  import { selected, currentSensor, currentLevel } from "./stores.js";
   import * as d3 from "d3";
 
   let el;
@@ -8,12 +8,10 @@
   $: w, drawGraph();
   onMount(_ => drawGraph());
   function drawGraph() {
-    // set the dimensions and margins of the graph
     var margin = { top: 10, right: 30, bottom: 30, left: 60 },
       width = w - margin.left - margin.right,
       height = w - margin.top - margin.bottom;
 
-    // append the svg object to the body of the page
     d3.select(el).html("");
     var svg = d3
       .select(el)
@@ -23,28 +21,24 @@
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    //Read the data
-    d3.csv("./timeseries.csv", d3.autoValue).then(data => {
-      // Add X axis --> it is a date format
+    d3.csv("./timeseries.csv").then(data => {
       var parseTime = d3.timeParse("%Y-%m-%d");
 
-      console.log(data);
       data.forEach(d => (d.date = parseTime(d.date)));
       data.sort((a, b) => a.date - b.date);
       var x = d3
         .scaleTime()
         .domain(d3.extent(data, d => d.date))
         .range([0, width]);
-      svg
-        .append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x));
-
-      // Add Y axis
       var y = d3
         .scaleLinear()
         .domain([0, d3.max(data, d => d.value)])
         .range([height, 0]);
+
+      svg
+        .append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x));
       svg.append("g").call(d3.axisLeft(y));
 
       let line = d3
@@ -91,7 +85,14 @@
 </script>
 
 <p>cool line graph with options</p>
-<p>currently hovering on {$selected}</p>
+<p>
+  currently viewing sensor
+  <b>{$currentSensor}</b>
+  at level
+  <b>{$currentLevel}</b>
+  for
+  <b>{$selected}</b>
+</p>
 <div bind:clientWidth={w}>
   <div id="map" bind:this={el} />
 </div>

@@ -1,5 +1,14 @@
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0px;
+}
+
 .block {
-  padding: 25px;
+  padding: 10px;
   border: 2px solid rgba(0, 0, 0, 0.2);
   margin: 10px;
   border-radius: 3px;
@@ -42,4 +51,28 @@
   fill: none;
   stroke: red;
   stroke-width: 2px;
+}
+
+.inline {
+  display: inline-flex;
+}
+
+.sensor-button {
+  height: 30px;
+  margin-left: 20px;
+  font-size: 15px;
+}
+
+.center {
+  align-items: center;
+}
+
+.options-group {
+  margin-top: 10px;
+  align-items: center;
+  display: inline-flex;
+}
+
+.pure-button-group {
+  margin-left: 10px;
 }
