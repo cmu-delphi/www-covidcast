@@ -14,9 +14,9 @@
 
 <div class="header">
   <div>
-    <h1 class="title">Delphi COVID-19 Forecasting and Surveillance</h1>
+    <h1 class="title">COVID-19 Delphi Dashboard</h1>
     <h2 class="subtitle">
-      Data soures used by the Carnegie Mellon Delphi team for forecasting
+      Data sources used by the Carnegie Mellon Delphi team for monitoring and forecasting
       COVID-19 cases
     </h2>
   </div>
