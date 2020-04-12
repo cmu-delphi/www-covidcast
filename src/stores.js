@@ -10,7 +10,7 @@ export const sensors = readable([
   "Crowdcast",
   "Kinsa Temperatures",
 ]);
-export const currentSensor = writable("optum");
+export const currentSensor = writable("Optum Hospitalizations");
 
 export const levels = readable([
   // "ZIP-5 Area",
