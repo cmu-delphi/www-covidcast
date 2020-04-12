@@ -40,6 +40,9 @@ export const currentLevel = writable("State");
 // EpiWeek in form YYYYWW
 export const currentWeek = writable(202014);
 
+// EpiWeek in form YYYYMMDD
+export const currentDate = writable(20200314);
+
 export const selectedRegion = writable("");
 
 export const sampleData = readable([], function start(set) {

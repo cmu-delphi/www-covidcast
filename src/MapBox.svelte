@@ -29,15 +29,18 @@
   function initializeMap() {
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "https://unpkg.com/mapbox-gl/dist/mapbox-gl.css";
+    link.href = "./css/mapbox-gl.css";
 
     link.onload = () => {
       map = new mapboxgl.Map({
         container,
-        style: "mapbox://styles/mapbox/streets-v9",
+        style: "./map_styles/basic_v9.json",
         center: [lon, lat],
         zoom
       });
+
+      // Time filtering snippet once we get data
+      // map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], hour]);
 
       map.on("load", function() {
         $levels.forEach(name => {
