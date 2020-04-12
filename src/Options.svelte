@@ -15,9 +15,7 @@
       <label for="sensor">Select sensor:</label>
       <select id="sensor" bind:value={$currentSensor}>
         {#each $sensors as sensor}
-          <option value={sensor}>
-            {sensor}
-          </option>
+          <option value={sensor}>{sensor}</option>
         {/each}
       </select>
     </div>
@@ -26,15 +24,12 @@
       <label for="level">Select level:</label>
       <select id="level" bind:value={$currentLevel}>
         {#each $levels as level}
-          <option value={level}>
-            {level}
-          </option>
+          <option value={level}>{level}</option>
         {/each}
       </select>
     </div>
   </div>
 </form>
-
 
 <!-- keeping this button-based implementation in case the dropdown implementation above is not what we want -->
 <div class="options-group">

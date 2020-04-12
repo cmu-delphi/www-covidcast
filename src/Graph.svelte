@@ -1,11 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import {
-    selectedRegion,
-    currentSensor,
-    currentLevel,
-    sampleData
-  } from "./stores.js";
+  import { selectedRegion, currentSensor, currentLevel, sampleData } from "./stores.js";
   import * as d3 from "d3";
 
   // to get the value for sampleData, use $sampleData.
