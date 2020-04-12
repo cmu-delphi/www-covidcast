@@ -35,7 +35,7 @@
     link.onload = () => {
       map = new mapboxgl.Map({
         container,
-        style: "mapbox://styles/mapbox/streets-v9",
+        style: "./map_styles/basic_v9.json",
         center: [lon, lat],
         zoom
       });
