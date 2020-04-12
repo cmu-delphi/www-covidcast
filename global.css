@@ -3,15 +3,26 @@ h2,
 h3,
 h4,
 h5,
-h6 {
+h6,
+p {
   margin: 0px;
 }
 
+html,
+body {
+  height: 100%;
+  font-family: "Open Sans", sans-serif;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.7);
+  font-style: italic;
+  font-weight: 300;
+}
+
 .block {
-  padding: 10px;
-  border: 2px solid rgba(0, 0, 0, 0.2);
-  margin: 10px;
-  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .background {
@@ -75,4 +86,15 @@ h6 {
 
 .pure-button-group {
   margin-left: 10px;
+}
+
+.header {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: calc(100% - 40px);
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
