@@ -32,7 +32,8 @@
 </form>
 
 <!-- keeping this button-based implementation in case the dropdown implementation above is not what we want -->
-<div class="options-group">
+
+<!-- <div class="options-group">
   <h6>Select sensor:</h6>
   <div class="pure-button-group">
     {#each $sensors as sensor}
@@ -55,4 +56,4 @@
       </button>
     {/each}
   </div>
-</div>
+</div> -->

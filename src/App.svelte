@@ -12,7 +12,21 @@
   //   .then(d => console.log(d));
 </script>
 
-<h1>Delphi COVID-19 Forecasting and Surveillance</h1>
+<div class="header">
+  <div>
+    <h1 class="title">Delphi COVID-19 Forecasting and Surveillance</h1>
+    <h2 class="subtitle">
+      Data soures used by the Carnegie Mellon Delphi team for forecasting
+      COVID-19 cases
+    </h2>
+  </div>
+  <div>
+    <img
+      src="./cmu.png"
+      width="400px"
+      alt="carnegie mellon university letter heading" />
+  </div>
+</div>
 <div class="pure-g">
   <div class="pure-u-1 pure-u-md-2-3">
     <div class="block">

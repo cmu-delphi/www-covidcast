@@ -1,4 +1,4 @@
-import { writable, readable, derived } from "svelte/store";
+import { writable, readable } from "svelte/store";
 import * as d3 from "d3";
 
 export const sensors = readable([
@@ -15,19 +15,26 @@ export const currentSensor = writable("Optum Hospitalizations");
 export const levels = readable([
   // "ZIP-5 Area",
   "County",
-  "Metropolitan Statistical Area",
-  "Hospital Reporting Region",
   "State",
+  // "Metropolitan Statistical Area",
+  // "Hospital Reporting Region",
 ]);
-export const geojsons = readable(
-  new Map([
-    // ["ZIP-5 Area", "./zip.json"],
-    ["County", "./gz_2010_us_050_00_5m.json"],
-    ["State", "./gz_2010_us_040_00_5m.json"],
-    ["Metropolitan Statistical Area", "./msa.json"],
-    ["Hospital Reporting Region", "./hrr.json"],
-  ])
-);
+// This loads all the GeoJSON's for each granularity and sets them in a map that the MapBox component reads as layers.
+export const geojsons = readable(new Map(), function start(set) {
+  Promise.all([
+    d3.json("./gz_2010_us_050_00_5m.json"),
+    d3.json("./gz_2010_us_040_00_5m.json"),
+    // d3.json("./msa.json"),
+    // d3.json("./hrr.json"),
+  ]).then(([a, b, c, d]) => {
+    let m = new Map();
+    m.set("County", a);
+    m.set("State", b);
+    // m.set("Metropolitan Statistical Area", c);
+    // m.set("Hospital Reporting Region", d);
+    set(m);
+  });
+});
 export const currentLevel = writable("State");
 
 // EpiWeek in form YYYYWW

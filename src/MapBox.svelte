@@ -1,6 +1,6 @@
 <script>
   import { onMount, setContext } from "svelte";
-  import { selectedRegion, geojsons, currentLevel } from "./stores.js";
+  import { levels, selectedRegion, geojsons, currentLevel } from "./stores.js";
   import mapboxgl from "mapbox-gl";
   import * as d3 from "d3";
 
@@ -15,19 +15,18 @@
   let container;
   let map;
 
-  currentLevel.subscribe(_ => drawMap());
-
-  function drawMap() {
-    if (map) {
-      d3.json($geojsons.get($currentLevel)).then(data => {
-        data.features.forEach(d => (d.properties.val = Math.random()));
-        console.log(data);
-        map.getSource("map").setData(data);
-      });
-    }
+  // If the map has been initizlied and the currentLevel changed, update the map.
+  currentLevel.subscribe(_ => updateMap());
+  function updateMap() {
+    if (!map) return;
+    $levels.forEach(l => map.setLayoutProperty(l, "visibility", "none"));
+    map.setLayoutProperty($currentLevel, "visibility", "visible");
   }
 
-  onMount(() => {
+  // If map isn't initialized and geojsons have been loaded, draw layers.
+  $: if (!map && $geojsons.size !== 0) initializeMap();
+
+  function initializeMap() {
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href = "https://unpkg.com/mapbox-gl/dist/mapbox-gl.css";
@@ -41,17 +40,18 @@
       });
 
       map.on("load", function() {
-        d3.json($geojsons.get($currentLevel)).then(data => {
+        $levels.forEach(name => {
+          let data = $geojsons.get(name);
           data.features.forEach(d => (d.properties.val = Math.random()));
-          map.addSource("map", {
+          map.addSource(name, {
             type: "geojson",
             data: data
           });
           map.addLayer({
-            id: "map",
-            source: "map",
+            id: name,
+            source: name,
             type: "fill",
-            layout: {},
+            layout: { visibility: "none" },
             paint: {
               "fill-color": {
                 property: "val",
@@ -65,13 +65,16 @@
               ]
             }
           });
-          map.on("click", "map", function(e) {
+          map.on("click", name, function(e) {
             selectedRegion.set(e.features[0].properties.NAME);
             new mapboxgl.Popup()
               .setLngLat(e.lngLat)
               .setHTML(e.features[0].properties.NAME)
               .addTo(map);
           });
+
+          // Set all layers to not visible and currentLevel visible.
+          updateMap();
         });
       });
     };
@@ -82,7 +85,7 @@
       map.remove();
       link.parentNode.removeChild(link);
     };
-  });
+  }
 </script>
 
 <style>
