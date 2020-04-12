@@ -1,6 +1,6 @@
 <script>
   import { onMount, setContext } from "svelte";
-  import { selectedRegion, geojsons, currentLevel } from "./stores.js";
+  import { selectedRegion, geojsons, currentLevel, currentWeek, currentDate} from "./stores.js";
   import mapboxgl from "mapbox-gl";
   import * as d3 from "d3";
 
@@ -39,6 +39,9 @@
         center: [lon, lat],
         zoom
       });
+      
+      // Time filtering snippet once we get data
+      // map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], hour]);
 
       map.on("load", function() {
         d3.json($geojsons.get($currentLevel)).then(data => {
