@@ -10,7 +10,6 @@ export const sensors = readable([
   "Crowdcast",
   "Kinsa Temperatures",
 ]);
-export const currentSensor = writable("Optum Hospitalizations");
 
 export const levels = readable([
   // "ZIP-5 Area",
@@ -35,11 +34,11 @@ export const geojsons = readable(new Map(), function start(set) {
     set(m);
   });
 });
-export const currentLevel = writable("State");
 
+export const currentSensor = writable("Optum Hospitalizations");
+export const currentLevel = writable("State");
 // EpiWeek in form YYYYWW
 export const currentWeek = writable(202014);
-
 // EpiWeek in form YYYYMMDD
 export const currentDate = writable(20200314);
 
