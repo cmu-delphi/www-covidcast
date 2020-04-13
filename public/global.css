@@ -8,6 +8,23 @@ p {
   margin: 0px;
 }
 
+.cmu-red {
+  color: #b00 ;
+}
+ 
+.cmu-steel-grey {
+  color: #e0e0e0;
+}
+
+.cmu-iron-gray {
+  color: #666;
+}
+
+.cmu-black {
+  color: 000000 ;
+}
+
+
 html,
 body {
   height: 100%;
