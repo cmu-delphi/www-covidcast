@@ -29,7 +29,7 @@
   function initializeMap() {
     map = new mapboxgl.Map({
       container,
-      style: "mapbox://styles/mapbox/streets-v9",
+      style: "./map_styles/mapbox_streets_v11_original.json",
       center: [LON, LAT],
       zoom: ZOOM
     });
