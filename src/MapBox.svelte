@@ -28,11 +28,19 @@
 
   function initializeMap() {
     map = new mapboxgl.Map({
+      attributionControl: false,
       container,
-      style: "mapbox://styles/mapbox/streets-v9",
+      style: "./map_styles/mapbox_albers_usa_style.json",
       center: [LON, LAT],
-      zoom: ZOOM
-    });
+      zoom: ZOOM,
+      // maxBounds: new mapboxgl.LngLatBounds([-171.791110603, 18.91619], [-66.96466, 71.3577635769]),  // geo coords bounds of US (including Alaska, Hawaii)
+    })
+      .addControl(
+        new mapboxgl.AttributionControl({
+          compact: true,
+        }),
+      )
+      .addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
 
     console.log(map);
 
@@ -46,7 +54,7 @@
         data.features.forEach(d => (d.properties.val = Math.random()));
         map.addSource(name, {
           type: "geojson",
-          data: data
+          data: data,
         });
         map.addLayer({
           id: name,
@@ -56,15 +64,10 @@
           paint: {
             "fill-color": {
               property: "val",
-              stops: [[0, "#fff"], [1, "#f00"]]
+              stops: [[0, "#fff"], [1, "#f00"]],
             },
-            "fill-opacity": [
-              "case",
-              ["boolean", ["feature-state", "hover"], false],
-              1,
-              0.5
-            ]
-          }
+            "fill-opacity": ["case", ["boolean", ["feature-state", "hover"], false], 1, 0.5],
+          },
         });
         map.on("click", name, function(e) {
           selectedRegion.set(e.features[0].properties.NAME);

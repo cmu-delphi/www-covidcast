@@ -24,7 +24,7 @@ export const geojsons = readable(new Map(), function start(set) {
     d3.json("./gz_2010_us_050_00_5m.json"),
     d3.json("./gz_2010_us_040_00_5m.json"),
     d3.json("./tl_2019_us_metdiv.json"),
-    d3.json("./hospital_referral_region.json"),
+    d3.json("./albers_usa_hospital_referral_region.json"),
   ]).then(([a, b, c, d]) => {
     let m = new Map();
     m.set("County", a);
