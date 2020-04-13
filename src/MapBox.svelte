@@ -34,6 +34,8 @@
       zoom: ZOOM
     });
 
+    console.log(map);
+
     // Time filtering snippet once we get data
     // map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], hour]);
     // We can also update the data: map.getSource('trace').setData(data);
