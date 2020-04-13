@@ -16,22 +16,22 @@ export const levels = readable([
   // "ZIP-5 Area",
   "County",
   "State",
-  // "Metropolitan Statistical Area",
-  // "Hospital Reporting Region",
+  "Metropolitan Statistical Area",
+  "Hospital Reporting Region",
 ]);
-// This loads all the GeoJSON's for each granularity and sets them in a map that the MapBox component reads as layers.
+// This loads all the GeoJSON's for each granularity that the MapBox component reads as layers.
 export const geojsons = readable(new Map(), function start(set) {
   Promise.all([
     d3.json("./gz_2010_us_050_00_5m.json"),
     d3.json("./gz_2010_us_040_00_5m.json"),
-    // d3.json("./msa.json"),
-    // d3.json("./hrr.json"),
+    d3.json("./tl_2019_us_metdiv.json"),
+    d3.json("./hospital_referral_region.json"),
   ]).then(([a, b, c, d]) => {
     let m = new Map();
     m.set("County", a);
     m.set("State", b);
-    // m.set("Metropolitan Statistical Area", c);
-    // m.set("Hospital Reporting Region", d);
+    m.set("Metropolitan Statistical Area", c);
+    m.set("Hospital Reporting Region", d);
     set(m);
   });
 });
