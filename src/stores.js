@@ -24,7 +24,7 @@ export const geojsons = readable(new Map(), function start(set) {
     d3.json("./albers_usa_gz_2010_us_050_00_5m.json"),
     d3.json("./albers_usa_gz_2010_us_040_00_5m.json"),
     d3.json("./albers_usa_tl_2019_us_metdiv.json"),
-    d3.json("./albers_usa_hospital_referral_region.json"),
+    d3.json("./albers_usa_hospital_referral_region_v2.json"),
   ]).then(([a, b, c, d]) => {
     let m = new Map();
     m.set("County", a);
@@ -51,7 +51,7 @@ export const sampleData = readable([], function start(set) {
       d.map((s) => ({
         date: parseTime(s.Date),
         value: s.PercentCLI,
-      }))
-    )
+      })),
+    ),
   );
 });
