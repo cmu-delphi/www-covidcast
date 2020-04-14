@@ -32,8 +32,9 @@
       container,
       style: "./map_styles/mapbox_albers_usa_style.json",
       center: [LON, LAT],
-      zoom: ZOOM
-      // maxBounds: new mapboxgl.LngLatBounds([-171.791110603, 18.91619], [-66.96466, 71.3577635769]),  // geo coords bounds of US (including Alaska, Hawaii)
+      zoom: ZOOM,
+      minZoom: ZOOM,
+      maxBounds: new mapboxgl.LngLatBounds([-23.25, -14.54], [21.8, 13.4]) // geo coords bounds of US (including Alaska, Hawaii)
     })
       .addControl(
         new mapboxgl.AttributionControl({
@@ -79,7 +80,7 @@
           selectedRegion.set(e.features[0].properties.NAME);
           new mapboxgl.Popup()
             .setLngLat(e.lngLat)
-            .setHTML(e.features[0].properties.NAME)
+            .setHTML(e.features[0].properties.NAME + " " + map.getBounds())
             .addTo(map);
         });
       });
