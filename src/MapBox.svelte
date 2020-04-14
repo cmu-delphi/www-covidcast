@@ -5,12 +5,12 @@
   import * as d3 from "d3";
 
   // https://docs.mapbox.com/help/glossary/access-token/
-  mapboxgl.accessToken =
-    "pk.eyJ1IjoiYW5kcmV3a3V6bmV0c292IiwiYSI6ImNrOHYwYmEwdzA3bWgzbnE1aGR5d2p1OXcifQ.sSs1i6cqPbX1UOSLsDHD6A";
+  // mapboxgl.accessToken =
+  //   "pk.eyJ1IjoiYW5kcmV3a3V6bmV0c292IiwiYSI6ImNrOHYwYmEwdzA3bWgzbnE1aGR5d2p1OXcifQ.sSs1i6cqPbX1UOSLsDHD6A";
 
-  const LAT = 37;
-  const LON = -95;
-  const ZOOM = 3.5;
+  const LAT = 1.07;
+  const LON = 0.25;
+  const ZOOM = 3.9;
 
   let container;
   let map;
@@ -32,17 +32,18 @@
       container,
       style: "./map_styles/mapbox_albers_usa_style.json",
       center: [LON, LAT],
-      zoom: ZOOM,
+      zoom: ZOOM
       // maxBounds: new mapboxgl.LngLatBounds([-171.791110603, 18.91619], [-66.96466, 71.3577635769]),  // geo coords bounds of US (including Alaska, Hawaii)
     })
       .addControl(
         new mapboxgl.AttributionControl({
-          compact: true,
-        }),
+          compact: true
+        })
       )
-      .addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
-
-    console.log(map);
+      .addControl(
+        new mapboxgl.NavigationControl({ showCompass: false }),
+        "top-right"
+      );
 
     // Time filtering snippet once we get data
     // map.setFilter('collisions', ['==', ['number', ['get', 'Hour']], hour]);
@@ -54,7 +55,7 @@
         data.features.forEach(d => (d.properties.val = Math.random()));
         map.addSource(name, {
           type: "geojson",
-          data: data,
+          data: data
         });
         map.addLayer({
           id: name,
@@ -64,10 +65,15 @@
           paint: {
             "fill-color": {
               property: "val",
-              stops: [[0, "#fff"], [1, "#f00"]],
+              stops: [[0, "#fff"], [1, "#f00"]]
             },
-            "fill-opacity": ["case", ["boolean", ["feature-state", "hover"], false], 1, 0.5],
-          },
+            "fill-opacity": [
+              "case",
+              ["boolean", ["feature-state", "hover"], false],
+              1,
+              0.5
+            ]
+          }
         });
         map.on("click", name, function(e) {
           selectedRegion.set(e.features[0].properties.NAME);
@@ -77,6 +83,18 @@
             .addTo(map);
         });
       });
+      map.addLayer(
+        {
+          id: "state-outline",
+          source: "State",
+          type: "fill",
+          paint: {
+            "fill-color": "#f9f9f9",
+            "fill-outline-color": "#e3e3e3"
+          }
+        },
+        "County"
+      );
       // Set all layers to not visible and currentLevel visible.
       updateMap();
     });

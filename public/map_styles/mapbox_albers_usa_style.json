@@ -12,100 +12,21 @@
         "mapbox:groups": {},
         "mapbox:uiParadigm": "layers"
     },
-    "center": [-1.9392753230472408, -1.4351091963094262],
+    "center": [
+        -1.9392753230472408,
+        -1.4351091963094262
+    ],
     "zoom": 4.035119632783768,
     "bearing": 0,
     "pitch": 0,
-    "sources": {
-        "composite": {
-            "url": "mapbox://lobenichou.albersusa-points,lobenichou.albersusa",
-            "type": "vector"
-        }
-    },
-    "sprite": "mapbox://sprites/andrewkuznetsov/ck8yuia8j00wy1ipn0zeavyxk/ck2u8j60r58fu0sgyxrigm3cu",
-    "glyphs": "mapbox://fonts/andrewkuznetsov/{fontstack}/{range}.pbf",
+    "sources": {},
     "layers": [
         {
             "id": "background",
             "type": "background",
-            "paint": {"background-color": "hsl(213, 0%, 97%)"}
-        },
-        {
-            "id": "counties",
-            "type": "fill",
-            "source": "composite",
-            "source-layer": "albersusa",
-            "filter": ["match", ["get", "type"], ["county"], true, false],
-            "layout": {},
             "paint": {
-                "fill-color": [
-                    "to-color",
-                    [
-                        "concat",
-                        "hsl(",
-                        ["*", ["%", ["id"], 100], 5],
-                        ", 40%, 80%)"
-                    ]
-                ]
-            }
-        },
-        {
-            "id": "county-boundaries",
-            "type": "line",
-            "source": "composite",
-            "source-layer": "albersusa",
-            "filter": ["match", ["get", "type"], ["county"], true, false],
-            "layout": {},
-            "paint": {"line-color": "hsl(0, 0%, 55%)", "line-width": 0.5}
-        },
-        {
-            "id": "state-boundaries",
-            "type": "line",
-            "source": "composite",
-            "source-layer": "albersusa",
-            "filter": ["match", ["get", "type"], ["state"], true, false],
-            "layout": {},
-            "paint": {"line-color": "hsl(0, 0%, 34%)"}
-        },
-        {
-            "id": "county-points",
-            "type": "symbol",
-            "source": "composite",
-            "source-layer": "albersusa-points",
-            "filter": ["match", ["get", "type"], ["county"], true, false],
-            "layout": {
-                "text-field": ["to-string", ["get", "county_fips"]],
-                "text-font": ["Overpass Mono Bold", "Arial Unicode MS Regular"]
-            },
-            "paint": {
-                "text-color": "hsl(0, 0%, 100%)",
-                "text-halo-color": "hsl(0, 0%, 6%)",
-                "text-halo-width": 1,
-                "text-opacity": ["step", ["zoom"], 0, 6, 1]
-            }
-        },
-        {
-            "id": "state-points",
-            "type": "symbol",
-            "source": "composite",
-            "source-layer": "albersusa-points",
-            "filter": ["match", ["get", "type"], ["state"], true, false],
-            "layout": {
-                "text-field": ["to-string", ["get", "state_abbrev"]],
-                "text-font": ["Overpass Mono Bold", "Arial Unicode MS Regular"]
-            },
-            "paint": {
-                "text-color": "hsl(0, 0%, 0%)",
-                "text-opacity": ["step", ["zoom"], 1, 6, 0],
-                "text-halo-color": "hsl(0, 0%, 100%)",
-                "text-halo-width": 1
+                "background-color": "#ffffff"
             }
         }
-    ],
-    "created": "2020-04-13T19:03:52.558Z",
-    "id": "ck8yuia8j00wy1ipn0zeavyxk",
-    "modified": "2020-04-13T19:03:52.558Z",
-    "owner": "andrewkuznetsov",
-    "visibility": "private",
-    "draft": false
+    ]
 }
