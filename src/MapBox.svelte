@@ -1,12 +1,16 @@
 <script>
   import { onMount, setContext } from "svelte";
-  import { levels, selectedRegion, geojsons, currentLevel } from "./stores.js";
+  import {
+    levels,
+    selectedRegion,
+    geojsons,
+    currentLevel,
+    currentSensor,
+    currentData,
+    data
+  } from "./stores.js";
   import mapboxgl from "mapbox-gl";
   import * as d3 from "d3";
-
-  // https://docs.mapbox.com/help/glossary/access-token/
-  // mapboxgl.accessToken =
-  //   "pk.eyJ1IjoiYW5kcmV3a3V6bmV0c292IiwiYSI6ImNrOHYwYmEwdzA3bWgzbnE1aGR5d2p1OXcifQ.sSs1i6cqPbX1UOSLsDHD6A";
 
   const LAT = 1.07;
   const LON = 0.25;
@@ -14,12 +18,19 @@
 
   let container;
   let map;
+  let points = [];
+  currentData.subscribe(d => console.log(d));
+  // data.subscribe(d =>
+  //   d[$currentSensor] ? console.log(d[$currentSensor][$currentLevel]) : ""
+  // );
 
   // If the map has been initizlied and the currentLevel changed, update the map.
   currentLevel.subscribe(_ => updateMap());
   function updateMap() {
     if (!map) return;
-    $levels.forEach(l => map.setLayoutProperty(l, "visibility", "none"));
+    Object.keys($levels).forEach(l =>
+      map.setLayoutProperty(l, "visibility", "none")
+    );
     map.setLayoutProperty($currentLevel, "visibility", "visible");
   }
 
@@ -30,7 +41,7 @@
     map = new mapboxgl.Map({
       attributionControl: false,
       container,
-      style: "./map_styles/mapbox_albers_usa_style.json",
+      style: "./maps/mapbox_albers_usa_style.json",
       center: [LON, LAT],
       zoom: ZOOM,
       minZoom: ZOOM,
@@ -51,7 +62,7 @@
     // We can also update the data: map.getSource('trace').setData(data);
 
     map.on("load", function() {
-      $levels.forEach(name => {
+      Object.keys($levels).forEach(name => {
         let data = $geojsons.get(name);
         data.features.forEach(d => (d.properties.val = Math.random()));
         map.addSource(name, {
@@ -78,23 +89,36 @@
         });
         map.on("click", name, function(e) {
           selectedRegion.set(e.features[0].properties.NAME);
+          console.log(e.features[0].properties);
           new mapboxgl.Popup()
             .setLngLat(e.lngLat)
-            .setHTML(e.features[0].properties.NAME + " " + map.getBounds())
+            .setHTML(e.features[0].properties.NAME)
             .addTo(map);
         });
       });
       map.addLayer(
         {
+          id: "county-outline",
+          source: "county",
+          type: "fill",
+          paint: {
+            "fill-color": "#f9f9f9",
+            "fill-outline-color": "#e0e0e0"
+          }
+        },
+        "county"
+      );
+      map.addLayer(
+        {
           id: "state-outline",
-          source: "State",
+          source: "state",
           type: "fill",
           paint: {
             "fill-color": "#f9f9f9",
             "fill-outline-color": "#e3e3e3"
           }
         },
-        "County"
+        "county-outline"
       );
       // Set all layers to not visible and currentLevel visible.
       updateMap();

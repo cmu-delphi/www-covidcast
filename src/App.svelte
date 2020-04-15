@@ -1,8 +1,43 @@
 <script>
+  import { onMount } from "svelte";
   import Options from "./Options.svelte";
   import Time from "./Time.svelte";
   import MapBox from "./MapBox.svelte";
   import Graph from "./Graph.svelte";
+
+  import { data, sensors } from "./stores.js";
+
+  const ENDPOINT = "https://delphi.cmu.edu/epidata/api.php?source=covid_alert";
+
+  // Fetch data for each sensor and granularity
+  // This is terrible code I apologize - it writes a query for each sensor/map level pair, and writes it to the data store.
+  onMount(_ => {
+    let queries = [];
+    let entries = [];
+    $sensors.forEach(s => {
+      // TODO: update to do different times.
+      s.levels.forEach(l => {
+        let query =
+          ENDPOINT +
+          "&name=" +
+          s.id +
+          "&geo_type=" +
+          l +
+          "&dates=20200412" +
+          "&geo_id=*";
+        queries.push(fetch(query).then(d => d.json()));
+        entries.push([s.id, l]);
+      });
+    });
+    Promise.all(queries).then(d => {
+      let dat = {};
+      entries.forEach((ent, i) => {
+        dat[ent[0]] ? "" : (dat[ent[0]] = {});
+        dat[ent[0]][ent[1]] = d[i].epidata;
+      });
+      data.set(dat);
+    });
+  });
 </script>
 
 <div class="brands pure-g">

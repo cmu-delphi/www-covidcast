@@ -16,7 +16,7 @@
         <label for="sensor">Select sensor:</label>
         <select id="sensor" bind:value={$currentSensor}>
           {#each $sensors as sensor}
-            <option value={sensor}>{sensor}</option>
+            <option value={sensor.id}>{sensor.name}</option>
           {/each}
         </select>
       </div>
@@ -24,8 +24,8 @@
       <div class="pure-u-1 pure-u-md-1-2">
         <label for="level">Select level:</label>
         <select id="level" bind:value={$currentLevel}>
-          {#each $levels as level}
-            <option value={level}>{level}</option>
+          {#each $sensors.find(d => d.id === $currentSensor).levels as level}
+            <option value={level}>{$levels[level]}</option>
           {/each}
         </select>
       </div>
