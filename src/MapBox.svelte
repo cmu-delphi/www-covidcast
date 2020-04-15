@@ -20,14 +20,12 @@
   let map;
   let points = [];
   currentData.subscribe(d => console.log(d));
-  // data.subscribe(d =>
-  //   d[$currentSensor] ? console.log(d[$currentSensor][$currentLevel]) : ""
-  // );
 
   // If the map has been initizlied and the currentLevel changed, update the map.
   currentLevel.subscribe(_ => updateMap());
   function updateMap() {
     if (!map) return;
+    console.log(map.getSource($currentLevel));
     Object.keys($levels).forEach(l =>
       map.setLayoutProperty(l, "visibility", "none")
     );
@@ -75,10 +73,12 @@
           type: "fill",
           layout: { visibility: "none" },
           paint: {
-            "fill-color": {
-              property: "val",
-              stops: [[0, "#fff"], [1, "#f00"]]
-            },
+            // "fill-color": {
+            //   property: "val",
+            //   stops: [[0, "#fff"], [1, "#f00"]]
+            // },
+            "fill-color": "#f9f9f9",
+            "fill-outline-color": "#CB2F4A",
             "fill-opacity": [
               "case",
               ["boolean", ["feature-state", "hover"], false],
@@ -120,6 +120,7 @@
         },
         "county-outline"
       );
+
       // Set all layers to not visible and currentLevel visible.
       updateMap();
     });
