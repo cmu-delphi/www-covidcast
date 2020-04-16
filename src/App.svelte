@@ -8,9 +8,10 @@
   import { data, sensors } from "./stores.js";
 
   const ENDPOINT = "https://delphi.cmu.edu/epidata/api.php?source=covidcast";
+  const ENDPOINT_META =
+    "https://delphi.cmu.edu/epidata/api.php?source=covidcast_meta";
 
   // Fetch data for each sensor and granularity
-  // This is terrible code I apologize - it writes a query for each sensor/map level pair, and writes it to the data store.
   onMount(_ => {
     let queries = [];
     let entries = [];
@@ -29,8 +30,10 @@
         entries.push([s.id, l]);
       });
     });
+    queries.push(fetch(ENDPOINT_META).then(d => d.json()));
+    let dat = {};
     Promise.all(queries).then(d => {
-      let dat = {};
+      let metadata = d[d.length - 1];
       entries.forEach((ent, i) => {
         dat[ent[0]] ? "" : (dat[ent[0]] = {});
         dat[ent[0]][ent[1]] = d[i].epidata;

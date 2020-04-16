@@ -1,6 +1,9 @@
 import { writable, readable, derived } from "svelte/store";
 import * as d3 from "d3";
 
+let parseTime = d3.timeParse("%Y%m%d");
+let formatTime = d3.timeFormat("%Y-%m-%d");
+
 // Manually curated list of sensors with metadata.
 // Selected so that we know we are able to display them.
 // Check https://delphi.cmu.edu/epidata/api.php?source=covid_alert_meta
@@ -55,19 +58,24 @@ export const geojsons = readable(new Map(), function start(set) {
 //It's an array of objects for each sensor.
 // Each sensor object has an array for a granularity for all the entries.
 export const data = writable();
+export const dates = writable();
 export const currentSensor = writable("google-survey-cli");
 export const currentLevel = writable("county");
-// All the data points for the current sensor and level.
-export const currentData = derived(
-  [data, currentSensor, currentLevel],
-  ([$a, $b, $c]) => {
-    return $a ? $a[$b][$c] : [];
-  }
-);
-
 // EpiWeek in form YYYYWW
 export const currentWeek = writable(202014);
 // EpiWeek in form YYYYMMDD
-export const currentDate = writable(20200314);
+export const currentDate = writable(20200412);
+
+// Data points for the current sensor, level, and day.
+export const currentData = derived(
+  [data, currentSensor, currentLevel, currentDate],
+  ([$data, $sensor, $level, $date]) => {
+    let dt = formatTime(parseTime($date));
+    if ($data) return $data[$sensor][$level].filter((d) => d.date === dt);
+    else return [];
+  }
+);
+// Data points for the current sensor, level, and geographic region.
+// export const regionData = derived();
 
 export const selectedRegion = writable("");
