@@ -122,7 +122,7 @@
           paint: {
             "fill-color": {
               property: "val",
-              stops: [[0, "#224477"], [0.2, "#c41230"]]
+              stops: [[0.03, "#224477"], [0.2, "#c41230"]]
             },
             "fill-outline-color": "#CB2F4A"
           }
