@@ -128,7 +128,7 @@
           }
         });
         map.on("click", name, function(e) {
-          selectedRegion.set(e.features[0].properties.NAME);
+          selectedRegion.set(e.features[0].properties.GEO_ID);
           console.log(e.features[0].properties);
           new mapboxgl.Popup()
             .setLngLat(e.lngLat)
