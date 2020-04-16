@@ -20,8 +20,10 @@
       s.levels.forEach(l => {
         let query =
           ENDPOINT +
-          "&name=" +
+          "&data_source=" +
           s.id +
+          "&signal=" +
+          s.signal +
           "&geo_type=" +
           l +
           "&dates=20100101-20300101" +
@@ -33,6 +35,7 @@
     queries.push(fetch(ENDPOINT_META).then(d => d.json()));
     let dat = {};
     Promise.all(queries).then(d => {
+      console.log(d);
       let metadata = d[d.length - 1];
       entries.forEach((ent, i) => {
         dat[ent[0]] ? "" : (dat[ent[0]] = {});
