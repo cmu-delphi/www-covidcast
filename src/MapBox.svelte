@@ -41,7 +41,7 @@
       let mappedVals = new Map();
       let geoIds = new Set(
         $currentData.map(d => {
-          mappedVals.set(d.geo_id.slice(-5), d.scaled);
+          mappedVals.set(d.geo_id.slice(-5), d.value);
           return d.geo_id.slice(-5);
         })
       );
@@ -122,7 +122,7 @@
           paint: {
             "fill-color": {
               property: "val",
-              stops: [[-3, "#224477"], [3, "#c41230"]]
+              stops: [[0, "#224477"], [0.2, "#c41230"]]
             },
             "fill-outline-color": "#CB2F4A"
           }

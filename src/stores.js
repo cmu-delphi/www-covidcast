@@ -11,17 +11,20 @@ let formatTime = d3.timeFormat("%Y-%m-%d");
 export const sensors = readable([
   {
     name: "Facebook Surveys",
-    id: "fb_survey-cli",
+    id: "fb_survey",
+    signal: "cli",
     levels: ["county", "msa", "hrr"],
   },
   {
     name: "Google Surveys",
-    id: "google-survey-cli",
+    id: "google-survey",
+    signal: "cli",
     levels: ["county"],
   },
   {
     name: "Google Health Trends",
-    id: "ght-smoothed_search",
+    id: "ght",
+    signal: "smoothed_search",
     levels: ["hrr", "msa"],
   },
   // "Optum Hospitalizations",
@@ -59,7 +62,7 @@ export const geojsons = readable(new Map(), function start(set) {
 // Each sensor object has an array for a granularity for all the entries.
 export const data = writable();
 export const dates = writable();
-export const currentSensor = writable("google-survey-cli");
+export const currentSensor = writable("google-survey");
 export const currentLevel = writable("county");
 // EpiWeek in form YYYYWW
 export const currentWeek = writable(202014);
