@@ -25,11 +25,22 @@
   currentLevel.subscribe(_ => updateMap());
   function updateMap() {
     if (!map) return;
-    console.log(map.getSource($currentLevel));
     Object.keys($levels).forEach(l =>
       map.setLayoutProperty(l, "visibility", "none")
     );
     map.setLayoutProperty($currentLevel, "visibility", "visible");
+
+    let currData = $currentData.filter(d => d.date === "2020-04-11");
+    let geoIds = currData.map(d => d.geo_id);
+    let data = $geojsons.get($currentLevel);
+    data.features.forEach(d => {
+      if (geoIds.includes(d.properties.GEO_ID.slice(-5))) {
+        d.properties.val = 1;
+      } else {
+        d.properties.val = 0;
+      }
+    });
+    map.getSource($currentLevel).setData(data);
   }
 
   // If map isn't initialized and geojsons have been loaded, draw layers.
@@ -62,7 +73,6 @@
     map.on("load", function() {
       Object.keys($levels).forEach(name => {
         let data = $geojsons.get(name);
-        data.features.forEach(d => (d.properties.val = Math.random()));
         map.addSource(name, {
           type: "geojson",
           data: data
@@ -73,18 +83,18 @@
           type: "fill",
           layout: { visibility: "none" },
           paint: {
-            // "fill-color": {
-            //   property: "val",
-            //   stops: [[0, "#fff"], [1, "#f00"]]
-            // },
-            "fill-color": "#f9f9f9",
-            "fill-outline-color": "#CB2F4A",
-            "fill-opacity": [
-              "case",
-              ["boolean", ["feature-state", "hover"], false],
-              1,
-              0.5
-            ]
+            "fill-color": {
+              property: "val",
+              stops: [[0, "#f9f9f9"], [1, "#c41230"]]
+            },
+            // "fill-color": "#f9f9f9",
+            "fill-outline-color": "#CB2F4A"
+            // "fill-opacity": [
+            //   "case",
+            //   ["boolean", ["feature-state", "hover"], false],
+            //   1,
+            //   0.5
+            // ]
           }
         });
         map.on("click", name, function(e) {
