@@ -16,6 +16,8 @@
   onMount(_ => drawGraph());
 
   function drawGraph() {
+    // var test = getData();
+    console.log('draw graph');
 
     // size chart
     var margin = {top: 20, right: 20, bottom: 70, left: 40},
@@ -36,8 +38,10 @@
                   .attr('width', width + margin.left + margin.right)
                   .attr('height', height + margin.top + margin.bottom)
                   .append('g')
-                  .attr('transform', 'translate(' + margin.left + margin.top + ')');
-
+                  .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+    console.log(margin.left);
+    console.log(margin.top);
+    console.log(margin.left + margin.top);
     // construct the x and y domain from the data
     // x.domain(data.map(function(d) { return d.date; }));
     // y.domain([0, d3.max(data, function(d) { return  d.value; })]);
@@ -113,6 +117,7 @@
     let re = new RegExp('US[0-9]+');
     let geo = re.exec(id);
     let graphData = data[geo];
+    console.log(graphData);
     // todo: finish parsing data
     // if(geo) {}
     // console.log(currentSensor);
