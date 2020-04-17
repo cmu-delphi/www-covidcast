@@ -13,7 +13,7 @@ export const sensors = readable([
     name: "Facebook Surveys",
     id: "fb_survey",
     signal: "cli",
-    levels: ["county", "msa", "hrr"],
+    levels: ["county"],
   },
   {
     name: "Google Surveys",
@@ -22,22 +22,30 @@ export const sensors = readable([
     levels: ["county"],
   },
   {
-    name: "Google Health Trends",
-    id: "ght",
-    signal: "smoothed_search",
-    levels: ["hrr", "msa"],
+    name: "Quidel Flu Tests",
+    id: "quidel",
+    signal: "negativeratio",
+    levels: ["county"],
   },
+  // {
+  //   name: "Google Health Trends",
+  //   id: "ght",
+  //   signal: "smoothed_search",
+  //   levels: ["county"],
+  // },
   // "Optum Hospitalizations",
   // "Quidel Flu Tests",
   // "Crowdcast",
   // "Kinsa Temperatures",
 ]);
 
+export const times = writable(null);
+
 export const levels = readable({
   county: "County",
   state: "State",
-  msa: "Metropolitan Statistical Area",
-  hrr: "Hospital Reporting Region",
+  // msa: "Metropolitan Statistical Area",
+  // hrr: "Hospital Reporting Region",
 });
 
 // This loads all the GeoJSON's for each granularity that the MapBox component reads as layers.
@@ -45,14 +53,14 @@ export const geojsons = readable(new Map(), function start(set) {
   Promise.all([
     d3.json("./maps/albers_usa_gz_2010_us_050_00_5m.json"),
     d3.json("./maps/albers_usa_gz_2010_us_040_00_5m.json"),
-    d3.json("./maps/albers_usa_tl_2019_us_metdiv.json"),
-    d3.json("./maps/albers_usa_hospital_referral_region_v2.json"),
+    // d3.json("./maps/albers_usa_tl_2019_us_metdiv.json"),
+    // d3.json("./maps/albers_usa_hospital_referral_region_v2.json"),
   ]).then(([a, b, c, d]) => {
     let m = new Map();
     m.set("county", a);
     m.set("state", b);
-    m.set("msa", c);
-    m.set("hrr", d);
+    // m.set("msa", c);
+    // m.set("hrr", d);
     set(m);
   });
 });

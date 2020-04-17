@@ -41,7 +41,7 @@
       let mappedVals = new Map();
       let geoIds = new Set(
         $currentData.map(d => {
-          mappedVals.set(d.geo_id.slice(-5), d.value);
+          mappedVals.set(d.geo_id.slice(-5), d.direction);
           return d.geo_id.slice(-5);
         })
       );
@@ -122,9 +122,9 @@
           paint: {
             "fill-color": {
               property: "val",
-              stops: [[0.03, "#224477"], [0.2, "#c41230"]]
+              stops: [[-1, "#224477"], [0, "#fff"], [1, "#c41230"]]
             },
-            "fill-outline-color": "#CB2F4A"
+            "fill-outline-color": "black"
           }
         });
         map.on("click", name, function(e) {

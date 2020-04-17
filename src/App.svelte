@@ -5,7 +5,7 @@
   import MapBox from "./MapBox.svelte";
   import Graph from "./Graph.svelte";
 
-  import { data, sensors } from "./stores.js";
+  import { data, sensors, times } from "./stores.js";
 
   const ENDPOINT = "https://delphi.cmu.edu/epidata/api.php?source=covidcast";
   const ENDPOINT_META =
@@ -13,36 +13,49 @@
 
   // Fetch data for each sensor and granularity
   onMount(_ => {
-    let queries = [];
-    let entries = [];
-    $sensors.forEach(s => {
-      // TODO: update to do different times.
-      s.levels.forEach(l => {
-        let query =
-          ENDPOINT +
-          "&data_source=" +
-          s.id +
-          "&signal=" +
-          s.signal +
-          "&geo_type=" +
-          l +
-          "&dates=20100101-20300101" +
-          "&geo_id=*";
-        queries.push(fetch(query).then(d => d.json()));
-        entries.push([s.id, l]);
+    fetch(ENDPOINT_META)
+      .then(d => d.json())
+      .then(meta => {
+        console.log(meta);
+        let queries = [];
+        let entries = [];
+        let timeMap = new Map();
+        $sensors.forEach(sens => {
+          let date = meta.epidata.find(d => d.source === sens.id);
+          let minDate = date.min_date.split("-").join("");
+          let maxDate = date.max_date.split("-").join("");
+          timeMap.set(sens.id, [minDate, maxDate]);
+          sens.levels.forEach(l => {
+            let query =
+              ENDPOINT +
+              "&data_source=" +
+              sens.id +
+              "&signal=" +
+              sens.signal +
+              "&geo_type=" +
+              l +
+              "&dates=" +
+              minDate +
+              "-" +
+              maxDate +
+              "&geo_id=*";
+            queries.push(fetch(query).then(d => d.json()));
+            entries.push([sens.id, l]);
+          });
+        });
+        queries.push();
+        let dat = {};
+        Promise.all(queries).then(d => {
+          console.log(d);
+          let metadata = d[d.length - 1];
+          entries.forEach((ent, i) => {
+            dat[ent[0]] ? "" : (dat[ent[0]] = {});
+            dat[ent[0]][ent[1]] = d[i].epidata;
+          });
+          times.set(timeMap);
+          data.set(dat);
+        });
       });
-    });
-    queries.push(fetch(ENDPOINT_META).then(d => d.json()));
-    let dat = {};
-    Promise.all(queries).then(d => {
-      console.log(d);
-      let metadata = d[d.length - 1];
-      entries.forEach((ent, i) => {
-        dat[ent[0]] ? "" : (dat[ent[0]] = {});
-        dat[ent[0]][ent[1]] = d[i].epidata;
-      });
-      data.set(dat);
-    });
   });
 </script>
 
