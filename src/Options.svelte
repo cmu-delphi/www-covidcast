@@ -1,5 +1,9 @@
 <script>
-  import { sensors, currentSensor, levels, currentLevel } from './stores.js';
+  import { data, sensors, currentSensor, levels, currentLevel } from './stores.js';
+
+  currentSensor.subscribe(sens =>
+    data ? '' : $data[sens][$currentLevel] ? '' : currentLevel.set($sensors.find(d => d.id === sens).levels[0]),
+  );
 </script>
 
 <style>
