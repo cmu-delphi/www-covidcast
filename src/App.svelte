@@ -59,7 +59,7 @@
   });
 </script>
 
-<div class="brands pure-g">
+<!-- <div class="brands pure-g">
   <a href="cmu.edu">
     <img
       src="./cmu.png"
@@ -81,15 +81,15 @@
       </li>
     </ul>
   </div>
-</div>
+</div> -->
 
-<div class="header">
+<!-- <div class="header">
   <h1 class="title">COVID-19 Delphi Dashboard</h1>
   <h2 class="subtitle">
     Data sources used by the Carnegie Mellon Delphi team for monitoring and
     forecasting COVID-19 cases
   </h2>
-</div>
+</!-->
 
 <div class="pure-g">
   <div class="pure-u-1 pure-u-md-2-3">
