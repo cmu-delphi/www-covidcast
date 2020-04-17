@@ -99,6 +99,7 @@
     border-radius: 1rem;
     padding: 5px 10px;
     box-sizing: border-box;
+    width: 500px;
 
     transition: all 0.1s ease-in;
   }

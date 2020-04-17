@@ -6,11 +6,13 @@
   let formatTime = d3.timeFormat('%B %d, %Y');
 
   let prettyDate = '';
-  $: prettyDate = formatTime(parseTime($currentDate));
+  $: prettyDate = formatTime(parseTime(val));
 
+  let val = $currentDate;
   let min = 0;
   let max = 1;
 
+  currentDate.subscribe(d => (val = d));
   times.subscribe(t => (t ? update($currentSensor, t) : ''));
   currentSensor.subscribe(s => ($times ? update(s, $times) : ''));
 
@@ -21,7 +23,20 @@
   }
 </script>
 
+<style>
+  #time_slider {
+    width: 350px;
+  }
+</style>
+
 <div class="time">
-  <input id="time_slider" type="range" {min} {max} bind:value={$currentDate} class="slider" />
+  <input
+    id="time_slider"
+    type="range"
+    {min}
+    {max}
+    on:mouseup={_ => currentDate.set(val)}
+    class="slider"
+    bind:value={val} />
   <p>{prettyDate}</p>
 </div>

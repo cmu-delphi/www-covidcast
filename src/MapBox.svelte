@@ -4,7 +4,7 @@
 
   const LAT = -1.2;
   const LON = -0.5;
-  const ZOOM = 4.4; // should be set to 4.4 as default
+  const ZOOM = 4.3; // should be set to 4.4 as default
 
   let container;
   let map;
@@ -22,31 +22,35 @@
 
   function updateMap() {
     if (!mounted) return;
+    console.log('update?', $currentLevel);
     Object.keys($levels).forEach(l => map.setLayoutProperty(l, 'visibility', 'none'));
     map.setLayoutProperty($currentLevel, 'visibility', 'visible');
 
     // TODO: Can currently only draw for county.
-    if ($currentLevel === 'county') {
-      let mappedVals = new Map();
-      let geoIds = new Set(
-        $currentData.map(d => {
-          mappedVals.set(d.geo_id.slice(-5), d.direction);
-          return d.geo_id.slice(-5);
-        }),
-      );
+    let mappedVals = new Map();
+    let geoIds = new Set(
+      $currentData.map(d => {
+        mappedVals.set(d.geo_id, d.direction);
+        return d.geo_id;
+      }),
+    );
 
-      let dat = $geojsons.get($currentLevel);
-      dat.features.forEach(d => {
-        let id = d.properties.GEO_ID.slice(-5);
-        if (geoIds.has(id)) {
-          d.properties.val = mappedVals.get(id);
-        } else {
-          d.properties.val = -100;
-        }
-      });
+    let dat = $geojsons.get($currentLevel);
+    dat.features.forEach(d => {
+      let id;
+      if ($currentLevel === 'county') {
+        id = d.properties.GEO_ID.slice(-5);
+      } else if ($currentLevel === 'msa') {
+        id = d.properties.CBSAFP;
+      }
+      if (geoIds.has(id)) {
+        d.properties.val = mappedVals.get(id);
+      } else {
+        d.properties.val = -100;
+      }
+    });
 
-      map.getSource($currentLevel).setData(dat);
-    }
+    map.getSource($currentLevel).setData(dat);
   }
 
   function initializeMap() {
@@ -56,7 +60,7 @@
       style: './maps/mapbox_albers_usa_style.json',
       center: [LON, LAT],
       zoom: ZOOM,
-      // minZoom: ZOOM,
+      minZoom: ZOOM,
       // maxBounds: new mapboxgl.LngLatBounds([-23.25, -14.54], [21.8, 13.4])
     })
       .addControl(
@@ -95,6 +99,7 @@
       });
       Object.keys($levels).forEach(name => {
         let data = $geojsons.get(name);
+        console.log(data);
         map.addSource(name, {
           type: 'geojson',
           data: data,

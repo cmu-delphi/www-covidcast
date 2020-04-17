@@ -13,7 +13,7 @@ export const sensors = readable([
     name: 'Facebook Surveys',
     id: 'fb_survey',
     signal: 'cli',
-    levels: ['county'],
+    levels: ['county', 'msa'],
   },
   {
     name: 'Google Surveys',
@@ -25,14 +25,14 @@ export const sensors = readable([
     name: 'Quidel Flu Tests',
     id: 'quidel',
     signal: 'negativeratio',
-    levels: ['county'],
+    levels: ['county', 'msa'],
   },
-  // {
-  //   name: "Google Health Trends",
-  //   id: "ght",
-  //   signal: "smoothed_search",
-  //   levels: ["county"],
-  // },
+  {
+    name: 'Google Health Trends',
+    id: 'ght',
+    signal: 'smoothedsearch',
+    levels: ['msa'],
+  },
   // "Optum Hospitalizations",
   // "Quidel Flu Tests",
   // "Crowdcast",
@@ -44,7 +44,7 @@ export const times = writable(null);
 export const levels = readable({
   county: 'County',
   state: 'State',
-  // msa: "Metropolitan Statistical Area",
+  msa: 'Metropolitan Statistical Area',
   // hrr: "Hospital Reporting Region",
 });
 
@@ -53,13 +53,13 @@ export const geojsons = readable(new Map(), function start(set) {
   Promise.all([
     d3.json('./maps/albers_usa_gz_2010_us_050_00_5m.json'),
     d3.json('./maps/albers_usa_gz_2010_us_040_00_5m.json'),
-    // d3.json("./maps/albers_usa_tl_2019_us_metdiv.json"),
+    d3.json('./maps/albers_usa_tl_2019_us_metdiv.json'),
     // d3.json("./maps/albers_usa_hospital_referral_region_v2.json"),
   ]).then(([a, b, c, d]) => {
     let m = new Map();
     m.set('county', a);
     m.set('state', b);
-    // m.set("msa", c);
+    m.set('msa', c);
     // m.set("hrr", d);
     set(m);
   });
@@ -79,11 +79,14 @@ export const currentDate = writable(20200412);
 
 // Data points for the current sensor, level, and day.
 export const currentData = derived(
-  [data, currentSensor, currentLevel, currentDate],
-  ([$data, $sensor, $level, $date]) => {
+  [data, sensors, currentSensor, currentLevel, currentDate],
+  ([$data, $sensors, $sensor, $level, $date]) => {
     let dt = formatTime(parseTime($date));
-    if ($data) return $data[$sensor][$level].filter((d) => d.date === dt);
-    else return [];
+    if ($data) {
+      let currDat = $data[$sensor][$level];
+      let level = currDat ? $level : $sensors.find((d) => d.id === $sensor).levels[0];
+      return $data[$sensor][level].filter((d) => d.date === dt);
+    } else return [];
   },
 );
 // Data points for the current sensor, level, and geographic region.
