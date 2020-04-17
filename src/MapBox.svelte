@@ -127,13 +127,74 @@
       updateMap();
     });
   }
+
+  function zoomBack() {
+    map.easeTo({
+      center: [LON, LAT],
+      zoom: ZOOM,
+    });
+  }
 </script>
 
 <style>
-  div {
+  .map-container {
     width: 100vw;
     height: 100vh;
+    position: relative;
+  }
+
+  .state-buttons-holder {
+    position: absolute;
+    top: 81px;
+    right: 9px;
+    z-index: 100;
+  }
+
+  .state-buttons-holder button:focus {
+    outline: none;
+  }
+
+  .state-buttons-holder .pg-button {
+    font-size: 23px;
+    position: relative;
+    width: 29px;
+    height: 29px;
+    color: #3a3a3a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+    padding: 0;
+    box-sizing: content-box;
+    background-color: white;
+    border: 1px solid #d5d5d5;
+    border-radius: 4px;
+    text-align: center;
+    font-family: 'FranklinITCProBold', Helvetica, Arial, sans-serif;
+    line-height: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    user-select: none;
+    transition-delay: 0s;
+    transition-duration: 0.15s;
+    transition-property: background-color;
+    transition-timing-function: ease-in-out;
+  }
+
+  .state-buttons-holder .pg-button:hover {
+    background-color: rgb(213, 213, 213);
+  }
+
+  .state-buttons-holder .pg-button img {
+    width: 90%;
+    /* height: 100%; */
   }
 </style>
 
-<div bind:this={container} />
+<div bind:this={container} class="map-container">
+  <div class="state-buttons-holder">
+    <button data-state="us48" id="bounds-button" class="pg-button bounds-button" on:click={zoomBack}>
+      <img src="./assets/imgs/us48.png" alt="" />
+    </button>
+  </div>
+</div>
