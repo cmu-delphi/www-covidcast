@@ -7,7 +7,7 @@
 
   import { data, sensors, times } from './stores.js';
 
-  const ENDPOINT = 'https://delphi.cmu.edu/epidata/api.php?source=covidcast';
+  const ENDPOINT = 'https://delphi.cmu.edu/epidata/api.php?source=covidcast&time_type=day';
   const ENDPOINT_META = 'https://delphi.cmu.edu/epidata/api.php?source=covidcast_meta';
 
   // Fetch data for each sensor and granularity
@@ -21,8 +21,8 @@
         let timeMap = new Map();
         $sensors.forEach(sens => {
           let date = meta.epidata.find(d => d.source === sens.id);
-          let minDate = date.min_date.split('-').join('');
-          let maxDate = date.max_date.split('-').join('');
+          let minDate = date.min_time;
+          let maxDate = date.max_time;
           timeMap.set(sens.id, [minDate, maxDate]);
           sens.levels.forEach(l => {
             let query =
@@ -33,11 +33,11 @@
               sens.signal +
               '&geo_type=' +
               l +
-              '&dates=' +
+              '&time_values=' +
               minDate +
               '-' +
               maxDate +
-              '&geo_id=*';
+              '&geo_value=*';
             queries.push(fetch(query).then(d => d.json()));
             entries.push([sens.id, l]);
           });

@@ -22,16 +22,16 @@
 
   function updateMap() {
     if (!mounted) return;
-    console.log('update?', $currentLevel);
     Object.keys($levels).forEach(l => map.setLayoutProperty(l, 'visibility', 'none'));
     map.setLayoutProperty($currentLevel, 'visibility', 'visible');
 
     // TODO: Can currently only draw for county.
+    console.log($currentData);
     let mappedVals = new Map();
     let geoIds = new Set(
       $currentData.map(d => {
-        mappedVals.set(d.geo_id, d.direction);
-        return d.geo_id;
+        mappedVals.set(d.geo_value, d.direction);
+        return d.geo_value;
       }),
     );
 
