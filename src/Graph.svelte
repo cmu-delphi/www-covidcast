@@ -19,18 +19,23 @@
   const barChart = 'Bar_Chart';
   const lineGraph = 'Line_Graph';
   const charts = [barChart, lineGraph];
-  let userCharts = [];
+  var userCharts = [];
+  var currentChart = 0;
 
   function drawGraph() {
     console.log('draw graph');
-    let chart = new Chart(barChart, {});
+    let chart = new Chart();
     chart.draw();
     userCharts.push(chart);
   }
 
   function updateGraph() {
     console.log('update');
-    if(userCharts.length > 0) {userCharts[0].draw();}
+    if(userCharts != undefined) {
+      var test = userCharts[currentChart].isChart(this);
+      console.log(test);
+      userCharts[currentChart].isChart(this) ? userCharts[currentChart].draw() : userCharts[currentChart] = new Chart(getData());
+    }
   }
 
   // parse data
@@ -38,21 +43,68 @@
     console.log('get data');
     let data = $currentData;
     let region = $selectedRegion;
-    console.log(data['0']);
-    console.log(region);
+    console.log('first element' + data['0']);
+    console.log('region: ' + region);
 
     // search for the ID
-    let id = $selectedRegion.GEO_ID;
     let re = new RegExp('US[0-9]+');
-    let geo = re.exec(id);
-    let graphData = data[geo];
-    console.log(graphData);
+    let geo = region.match(re);
+    // let graphData = data[geo];
+    // console.log('region data: ' + geo);
+    // console.log(graphData);
+    // let gData = null;
+    // for(var i in data) {
+    //   console.log(i);
+    //   if(i.geo_id == geo) { gData = i; }
+    //   break;
+    // }
+    // let gData = $(data).filter(function(k, v) {
+    //   return v.geo_id == geo;
+    // });
+    // console.log('filter: ' + gData);
+
     // todo: finish parsing data
+    var graphDat  {
+        "county1" : {
+          "03-30-2020" : 20,
+          "03-31-2020" : 22,
+          "04-01-2020" : 28,
+          "04-02-2020" : 33,
+          "04-03-2020" : 45,
+          "04-04-2020" : 47,
+          "04-05-2020" : 49,
+          "04-06-2020" : 50,
+          "04-07-2020" : 51,
+          "04-08-2020" : 52,
+          "04-09-2020" : 51,
+          "04-10-2020" : 53,
+          "04-11-2020" : 52,
+          "04-12-2020" : 52,
+          "04-13-2020" : 53
+        },
+        "county2" : {
+          "03-30-2020" : 68,
+          "03-31-2020" : 69,
+          "04-01-2020" : 69,
+          "04-02-2020" : 70,
+          "04-03-2020" : 72,
+          "04-04-2020" : 74,
+          "04-05-2020" : 76,
+          "04-06-2020" : 78,
+          "04-07-2020" : 80,
+          "04-08-2020" : 83,
+          "04-09-2020" : 86,
+          "04-10-2020" : 89,
+          "04-11-2020" : 92,
+          "04-12-2020" : 96,
+          "04-13-2020" : 101
+        }
+      }
     // if(geo) {}
     // console.log(currentSensor);
     // console.log(currentLevel);
 
-    return graphData, barChart;
+    return barChart, graphData;
   }
 
   class Chart {
@@ -60,6 +112,8 @@
     constructor(chartType, data) {
       console.log("chart constructor: " + chartType);
       var chart;
+      this.x = null;
+      this.y = null;
       switch (chartType) {
           case 'Bar_Chart':
               console.log("bar chart");
@@ -86,13 +140,20 @@
 
     isChart(chart) {
       var result = null;
-      chart.chartType in charts ? result = true : result = false;
+      try {
+        chart.chartType in charts ? result = true : result = false;
+      } catch (e) {
+        e.name == 'ReferenceError' ? result = false : console.log(e.stackTrace);
+      }
       return result;
     }
 
     verifyDataFormat(){};
 
     draw(){
+      // if there is an existing chart, remove it and redraw
+      d3.select(el).selectAll('*').remove();
+
       // size chart
       var margin = {top: 20, right: 20, bottom: 70, left: 40},
         width = w - margin.left - margin.right,
@@ -102,9 +163,9 @@
       var parseDate = d3.timeParse('%Y-%m-%d');
 
       // set ranges
-      var x = d3.scaleBand()
+      this.x = d3.scaleBand()
                   .rangeRound([0, width]);
-      var y = d3.scaleLinear()
+      this.y = d3.scaleLinear()
                   .range([height, 0]);
 
       // attach graphic
@@ -117,10 +178,12 @@
       // draw axes
       svg.append('g')
           .attr('transform', 'translate(0,' + height + ')')
-          .call(d3.axisBottom(x));
+          .call(d3.axisBottom(this.x));
       svg.append('g')
-          .call(d3.axisLeft(y));
+          .call(d3.axisLeft(this.y));
     }
+
+    updateChart(){};
   }
 
   class BarChart extends Chart {
@@ -135,49 +198,28 @@
       }
 
       draw() {
-        console.log('bar chart draw');
-        // size chart
-        var margin = {top: 20, right: 20, bottom: 70, left: 40},
-          width = w - margin.left - margin.right,
-          height = .75*w - margin.top - margin.bottom;
-
-        // parse the date time
-        var parseDate = d3.timeParse('%Y-%m-%d');
-
-        // set ranges
-        var x = d3.scaleBand()
-                    .rangeRound([0, width]);
-        var y = d3.scaleLinear()
-                    .range([height, 0]);
-
-        // attach graphic
-        var svg = d3.select(el).append('svg')
-                      .attr('width', width + margin.left + margin.right)
-                      .attr('height', height + margin.top + margin.bottom)
-                      .append('g')
-                      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
+        super.draw();
 
         // construct the x and y domain from the data
-        x.domain(this.getData().map(function(d) { return d.date; }));
-        y.domain([0, d3.max(this.getData(), function(d) { return  d.value; })]);
+        this.x.domain(this.getData().map(function(d) { return d.date; }));
+        this.y.domain([0, d3.max(this.getData(), function(d) { return  d.value; })]);
 
         // fill in the bar chart according to the data
         svg.selectAll('bar')
-          .data(data)
+          .data(this.data)
           .enter().append('rect')
           .attr('class', 'bar')
-          .attr('x', function(d) { return x(d.date); })
-          .attr('width', x.bandwidth())
-          .attr('y', function (d) { return y(d.value); })
-          .attr('height', function (d) { return height - y(d.value); });
+          .attr('x', function(d) { return this.x(d.date); })
+          .attr('width', this.x.bandwidth())
+          .attr('y', function (d) { return this.y(d.value); })
+          .attr('height', function (d) { return height - this.y(d.value); });
 
         // draw axes
-        svg.append('g')
-            .attr('transform', 'translate(0,' + height + ')')
-            .call(d3.axisBottom(x));
-        svg.append('g')
-            .call(d3.axisLeft(y));
+        // svg.append('g')
+        //     .attr('transform', 'translate(0,' + height + ')')
+        //     .call(d3.axisBottom(x));
+        // svg.append('g')
+        //     .call(d3.axisLeft(y));
       }
   }
 
