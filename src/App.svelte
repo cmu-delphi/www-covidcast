@@ -65,13 +65,34 @@
     left: 2vh;
     z-index: 1000;
     max-width: 400px;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.7);
     border-radius: 1rem;
     padding: 10px 15px;
     box-sizing: border-box;
 
+    transition: all 0.1s ease-in;
+
     /* background-color: black; */
     /* border: 1px solid black; */
+  }
+
+  .graph-container {
+    position: fixed;
+    bottom: 2vh;
+    right: 2vh;
+    z-index: 1001;
+    max-width: 400px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 1rem;
+    padding: 10px 15px;
+    box-sizing: border-box;
+
+    transition: all 0.1s ease-in;
+  }
+
+  .options-container:hover,
+  .graph-container:hover {
+    background-color: rgba(255, 255, 255, 0.9);
   }
 </style>
 
@@ -79,6 +100,10 @@
 
 <div class="options-container">
   <Options />
+</div>
+
+<div class="graph-container ">
+  <Graph />
 </div>
 
 <!-- 

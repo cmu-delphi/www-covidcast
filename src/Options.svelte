@@ -72,6 +72,7 @@
 
   .buttons-group .button:focus,
   .buttons-group .button:active {
+    box-shadow: none !important;
     outline: none;
   }
 </style>

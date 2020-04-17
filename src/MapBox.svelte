@@ -2,7 +2,7 @@
   import mapboxgl from 'mapbox-gl';
   import { levels, selectedRegion, geojsons, currentLevel, currentSensor, currentData, data } from './stores.js';
 
-  const LAT = 0;
+  const LAT = -1.2;
   const LON = 0;
   const ZOOM = 4.5; // should be set to 4.4 as default
 
