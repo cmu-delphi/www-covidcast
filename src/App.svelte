@@ -60,7 +60,7 @@
 
 <style>
   .options-container {
-    position: fixed;
+    position: absolute;
     top: 2vh;
     left: 2vh;
     z-index: 1000;
@@ -77,7 +77,7 @@
   }
 
   .graph-container {
-    position: fixed;
+    position: absolute;
     bottom: 2vh;
     right: 2vh;
     z-index: 1001;
@@ -91,7 +91,7 @@
   }
 
   .time-container {
-    position: fixed;
+    position: absolute;
     bottom: 4vh;
     left: calc(2vh + 400px);
     z-index: 1002;
@@ -125,7 +125,7 @@
   <Graph />
 </div>
 
-<!-- 
+<!--
 <div class="pure-g">
   <div class="pure-u-1 pure-u-md-2-3">
     <div class="block">

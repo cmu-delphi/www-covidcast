@@ -61,6 +61,7 @@
       center: [LON, LAT],
       zoom: ZOOM,
       minZoom: ZOOM,
+
       // maxBounds: new mapboxgl.LngLatBounds([-23.25, -14.54], [21.8, 13.4])
     })
       .addControl(
@@ -127,6 +128,10 @@
             .addTo(map);
         });
       });
+
+      //Disable touch zoom, it makes gesture scrolling difficult
+      map.scrollZoom.disable();
+
       // Set all layers to not visible and currentLevel visible.
       mounted = true;
       updateMap();
