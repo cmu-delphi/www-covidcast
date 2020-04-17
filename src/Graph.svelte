@@ -27,12 +27,6 @@
     let chart = new Chart();
     chart.draw();
     userCharts.push(chart);
-
-    // test code
-    // var button = new HTMLButtonElement();
-    // button.onclick = updateGraph;
-    // button.attributes('click!');
-    // document.getElementById(el).append(button);
   }
 
   function updateGraph() {
@@ -40,12 +34,12 @@
     if(userCharts != undefined) {
       var test = userCharts[currentChart].isChart(this);
       console.log(test);
-      userCharts[currentChart].isChart(this) ? userCharts[currentChart].draw() : userCharts[currentChart] = new Chart(getData());
+      userCharts[currentChart].isChart(this) ? userCharts[currentChart].draw() : userCharts[currentChart] = new Chart(fetchData());
     }
   }
 
   // parse data
-  function getData() {
+  function fetchData() {
     console.log('get data');
     let data = $currentData;
     let region = $selectedRegion;
@@ -106,11 +100,13 @@
                       "04-13-2020" : 101
                     }
                   }
+    // todo: determine chart type based on data
+    var chartType = barChart;
     // if(geo) {}
     // console.log(currentSensor);
     // console.log(currentLevel);
 
-    return barChart, graphData;
+    return chartType, graphData;
   }
 
   class Chart {
@@ -149,7 +145,9 @@
       try {
         chart.chartType in charts ? result = true : result = false;
       } catch (e) {
-        e.name == 'ReferenceError' ? result = false : console.log(e.stackTrace);
+        if(e.name == 'ReferenceError') {
+          result = false;
+        }
       }
       return result;
     }
@@ -166,7 +164,7 @@
         height = .75*w - margin.top - margin.bottom;
 
       // parse the date time
-      var parseDate = d3.timeParse('%Y-%m-%d');
+      var parseDate = d3.timeParse('%m-%d-%Y');
 
       // set ranges
       this.x = d3.scaleBand()
