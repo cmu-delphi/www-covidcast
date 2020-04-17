@@ -3,8 +3,8 @@
   import { levels, selectedRegion, geojsons, currentLevel, currentSensor, currentData, data } from './stores.js';
 
   const LAT = -1.2;
-  const LON = 0;
-  const ZOOM = 4.5; // should be set to 4.4 as default
+  const LON = -0.5;
+  const ZOOM = 4.4; // should be set to 4.4 as default
 
   let container;
   let map;

@@ -22,6 +22,6 @@
 </script>
 
 <div class="time">
-  <input id="time_slider" type="range" {min} {max} bind:value={$currentDate} />
+  <input id="time_slider" type="range" {min} {max} bind:value={$currentDate} class="slider" />
   <p>{prettyDate}</p>
 </div>

@@ -90,7 +90,21 @@
     transition: all 0.1s ease-in;
   }
 
+  .time-container {
+    position: fixed;
+    bottom: 4vh;
+    left: calc(2vh + 400px);
+    z-index: 1002;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 1rem;
+    padding: 5px 10px;
+    box-sizing: border-box;
+
+    transition: all 0.1s ease-in;
+  }
+
   .options-container:hover,
+  .time-container:hover,
   .graph-container:hover {
     background-color: rgba(255, 255, 255, 0.9);
   }
@@ -100,6 +114,10 @@
 
 <div class="options-container">
   <Options />
+</div>
+
+<div class="time-container ">
+  <Time />
 </div>
 
 <div class="graph-container ">

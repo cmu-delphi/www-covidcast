@@ -65,7 +65,7 @@
   }
 
   .buttons-group .button.selected {
-    background-color: #3ec46d;
+    background-color: var(--red-alpha);
     border-color: transparent;
     color: #fff;
   }
