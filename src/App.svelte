@@ -20,7 +20,7 @@
         let entries = [];
         let timeMap = new Map();
         $sensors.forEach(sens => {
-          let date = meta.epidata.find(d => d.source === sens.id);
+          let date = meta.epidata.find(d => d.data_source === sens.id);
           let minDate = date.min_time;
           let maxDate = date.max_time;
           timeMap.set(sens.id, [minDate, maxDate]);
