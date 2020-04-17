@@ -1,15 +1,14 @@
 <script>
-  import { onMount } from "svelte";
-  import Options from "./Options.svelte";
-  import Time from "./Time.svelte";
-  import MapBox from "./MapBox.svelte";
-  import Graph from "./Graph.svelte";
+  import { onMount } from 'svelte';
+  import Options from './Options.svelte';
+  import Time from './Time.svelte';
+  import MapBox from './MapBox.svelte';
+  import Graph from './Graph.svelte';
 
-  import { data, sensors, times } from "./stores.js";
+  import { data, sensors, times } from './stores.js';
 
-  const ENDPOINT = "https://delphi.cmu.edu/epidata/api.php?source=covidcast";
-  const ENDPOINT_META =
-    "https://delphi.cmu.edu/epidata/api.php?source=covidcast_meta";
+  const ENDPOINT = 'https://delphi.cmu.edu/epidata/api.php?source=covidcast';
+  const ENDPOINT_META = 'https://delphi.cmu.edu/epidata/api.php?source=covidcast_meta';
 
   // Fetch data for each sensor and granularity
   onMount(_ => {
@@ -22,23 +21,23 @@
         let timeMap = new Map();
         $sensors.forEach(sens => {
           let date = meta.epidata.find(d => d.source === sens.id);
-          let minDate = date.min_date.split("-").join("");
-          let maxDate = date.max_date.split("-").join("");
+          let minDate = date.min_date.split('-').join('');
+          let maxDate = date.max_date.split('-').join('');
           timeMap.set(sens.id, [minDate, maxDate]);
           sens.levels.forEach(l => {
             let query =
               ENDPOINT +
-              "&data_source=" +
+              '&data_source=' +
               sens.id +
-              "&signal=" +
+              '&signal=' +
               sens.signal +
-              "&geo_type=" +
+              '&geo_type=' +
               l +
-              "&dates=" +
+              '&dates=' +
               minDate +
-              "-" +
+              '-' +
               maxDate +
-              "&geo_id=*";
+              '&geo_id=*';
             queries.push(fetch(query).then(d => d.json()));
             entries.push([sens.id, l]);
           });
@@ -49,7 +48,7 @@
           console.log(d);
           let metadata = d[d.length - 1];
           entries.forEach((ent, i) => {
-            dat[ent[0]] ? "" : (dat[ent[0]] = {});
+            dat[ent[0]] ? '' : (dat[ent[0]] = {});
             dat[ent[0]][ent[1]] = d[i].epidata;
           });
           times.set(timeMap);
@@ -59,38 +58,30 @@
   });
 </script>
 
-<!-- <div class="brands pure-g">
-  <a href="cmu.edu">
-    <img
-      src="./cmu.png"
-      width="300px"
-      alt="carnegie mellon university letter heading" />
-  </a>
-  <div class="pure-menu pure-menu-horizontal pure-u-1 pure-u-md-1-3">
-    <ul class="pure-menu-list pure-u-1 pure-u-md-2-3">
-      <li class="pure-menu-item">
-        <a href="https://delphi.midas.cs.cmu.edu/" class="pure-menu-link">
-          Delphi Research
-        </a>
-      </li>
-      <li class="pure-menu-item">
-        <a href="#" class="pure-menu-link">Partners</a>
-      </li>
-      <li class="pure-menu-item">
-        <a href="#" class="pure-menu-link">Privacy</a>
-      </li>
-    </ul>
-  </div>
-</div> -->
+<style>
+  .options-container {
+    position: fixed;
+    top: 2vh;
+    left: 2vh;
+    z-index: 1000;
+    max-width: 400px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 1rem;
+    padding: 10px 15px;
+    box-sizing: border-box;
 
-<!-- <div class="header">
-  <h1 class="title">COVID-19 Delphi Dashboard</h1>
-  <h2 class="subtitle">
-    Data sources used by the Carnegie Mellon Delphi team for monitoring and
-    forecasting COVID-19 cases
-  </h2>
-</!-->
+    /* background-color: black; */
+    /* border: 1px solid black; */
+  }
+</style>
 
+<MapBox />
+
+<div class="options-container">
+  <Options />
+</div>
+
+<!-- 
 <div class="pure-g">
   <div class="pure-u-1 pure-u-md-2-3">
     <div class="block">
@@ -114,4 +105,4 @@
       <Graph />
     </div>
   </div>
-</div>
+</div> -->
