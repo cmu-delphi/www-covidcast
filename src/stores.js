@@ -1,9 +1,6 @@
 import { writable, readable, derived } from 'svelte/store';
 import * as d3 from 'd3';
 
-let parseTime = d3.timeParse('%Y%m%d');
-let formatTime = d3.timeFormat('%Y-%m-%d');
-
 // Manually curated list of sensors with metadata.
 // Selected so that we know we are able to display them.
 // Check https://delphi.cmu.edu/epidata/api.php?source=covid_alert_meta
@@ -81,11 +78,10 @@ export const currentDate = writable(20200412);
 export const currentData = derived(
   [data, sensors, currentSensor, currentLevel, currentDate],
   ([$data, $sensors, $sensor, $level, $date]) => {
-    let dt = formatTime(parseTime($date));
     if ($data) {
       let currDat = $data[$sensor][$level];
       let level = currDat ? $level : $sensors.find((d) => d.id === $sensor).levels[0];
-      return $data[$sensor][level].filter((d) => d.date === dt);
+      return $data[$sensor][level].filter((d) => d.time_value === $date);
     } else return [];
   },
 );
