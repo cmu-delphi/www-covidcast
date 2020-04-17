@@ -19,3 +19,8 @@ To deploy an update run
 `npm run deploy`
 
 ### Project Structure
+
+## Figma Mock-up
+https://www.figma.com/file/CkdJq5qlvpQNhUsaihBsFE/Delphi-Covid-Forecasting?node-id=0%3A1
+
+The most current mock is 'Design 3'

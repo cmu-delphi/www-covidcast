@@ -1,7 +1,7 @@
 <script>
-  import { onMount } from "svelte";
-  import { selectedRegion, currentSensor, currentLevel, currentData } from "./stores.js";
-  import * as d3 from "d3";
+  import { onMount } from 'svelte';
+  import { selectedRegion, currentSensor, currentLevel, currentData } from './stores.js';
+  import * as d3 from 'd3';
 
   // to get the value for sampleData, use $sampleData.
   // It is currently in the form of {date: , value: }
