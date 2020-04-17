@@ -196,3 +196,7 @@ body {
   background: var(--red-alpha);
   cursor: pointer;
 }
+
+#vizbox {
+position: relative;
+}
