@@ -1,7 +1,9 @@
 import App from './App.svelte'
 
+const hostElement = document.querySelector("#vizbox") || document.body;
+
 const app = new App({
-  target: document.body,
+  target: hostElement,
 })
 
 export default app
