@@ -85,6 +85,20 @@ export const currentData = derived(
     } else return [];
   },
 );
+
+// sample data to test line graph
+export const sampleData = readable([], function start(set) {
+  let parseTime = d3.timeParse("%Y-%m-%d");
+  d3.csv("./sampleData.csv").then((d) =>
+    set(
+      d.map((s) => ({
+        date: parseTime(s.Date),
+        value: s.Incidence,
+        county: s.County
+      }))
+    )
+  );
+});
 // Data points for the current sensor, level, and geographic region.
 // export const regionData = derived();
 
