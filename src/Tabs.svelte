@@ -66,13 +66,13 @@
 
   .buttons-group-side .button:first-child {
     border-left-color: #dbdbdb;
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
+    /* border-top-left-radius: 4px; */
+    /* border-bottom-left-radius: 4px; */
   }
 
   .buttons-group-side .button:last-child {
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
+    /* border-top-right-radius: 4px; */
+    /* border-bottom-right-radius: 4px; */
   }
 
   .buttons-group-side .button.selected {
