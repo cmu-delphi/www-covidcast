@@ -101,6 +101,7 @@
       fetch(q)
         .then(d => d.json())
         .then(d => {
+          console.log(q, d);
           currentData.set(d.epidata);
           regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
         });
@@ -136,8 +137,11 @@
   }
 
   currentSensor.subscribe(s => {
-    updateRegionSliceCache(s, $currentLevel, $currentDate);
-    updateTimeSliceCache(s, $currentLevel, $currentRegion);
+    let currSens = $sensors.find(d => d.id === s);
+    let l = currSens.levels[0];
+    if (!currSens.levels.includes($currentLevel)) currentLevel.set(l);
+    updateRegionSliceCache(s, l, $currentDate);
+    updateTimeSliceCache(s, l, $currentRegion);
   });
   currentLevel.subscribe(l => {
     updateRegionSliceCache($currentSensor, l, $currentDate);
