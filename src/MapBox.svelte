@@ -79,23 +79,36 @@
 
     map.getSource($currentLevel).setData(dat);
 
-    map.getStyle().layers.length > 5 ? map.removeLayer(map.getStyle().layers[5].id) : '';
-    map.addLayer(
-      {
-        id: $currentLevel,
-        source: $currentLevel,
-        type: 'fill',
-        filter: ['!=', 'val', -100],
-        paint: {
-          'fill-outline-color': '#616161',
-          'fill-color': {
+    Object.keys($levels).forEach(name => {
+      if (name === $currentLevel) {
+        if (map.getLayer(name)) {
+          map.setPaintProperty(name, 'fill-color', {
             property: 'val',
             stops: stops,
-          },
-        },
-      },
-      'city-point-unclustered',
-    );
+          });
+          map.setLayoutProperty(name, 'visibility', 'visible');
+        } else {
+          map.addLayer(
+            {
+              id: $currentLevel,
+              source: $currentLevel,
+              type: 'fill',
+              filter: ['!=', 'val', -100],
+              paint: {
+                'fill-outline-color': '#616161',
+                'fill-color': {
+                  property: 'val',
+                  stops: stops,
+                },
+              },
+            },
+            'city-point-unclustered',
+          );
+        }
+      } else {
+        map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none');
+      }
+    });
 
     map.on('click', $currentLevel, function(e) {
       currentRegion.set(e.features[0].properties.id);
@@ -137,7 +150,7 @@
         data: $geojsons.get('city'),
         cluster: true,
         clusterMaxZoom: 14, // Max zoom to cluster points on
-        clusterRadius: 1000, // Radius of each cluster when clustering points (defaults to 50),
+        clusterRadius: 100, // Radius of each cluster when clustering points (defaults to 50),
         clusterProperties: {
           largest: [
             [
