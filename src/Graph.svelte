@@ -7,6 +7,8 @@
   // It is currently in the form of {date: , value: }
 
   regionData.subscribe(d => console.log(d));
+  // regionData.subscribe(_ => updateGraph());
+  regionData.subscribe(d => updateGraph(d));
 
   let el;
   let w;
@@ -20,7 +22,8 @@
   // $: w, drawGraph();
 
   // This subscribes to sample data to redraw the graph every time the data changes.
-  currentRegion.subscribe(_ => updateGraph());
+  // todo: fix current region subscription
+  // currentRegion.subscribe(_ => updateGraph());
   onMount(_ => drawGraph());
 
   // local variables for permissible graph types
@@ -31,97 +34,47 @@
   var currentChart = 0;
 
   function drawGraph() {
-    console.log('draw graph');
     let chart = new Chart();
     chart.draw();
     userCharts.push(chart);
   }
 
-  function updateGraph() {
+  function updateGraph(data) {
     console.log('update');
     if (userCharts != undefined) {
-      var test = userCharts[currentChart].isChart(this);
-      console.log(test);
-      var dataResults = parseData();
-      var graphType = dataResults[0];
-      var graphData = dataResults[1];
       if (userCharts[currentChart].isChart()) {
         userCharts[currentChart].draw();
       } else {
+        console.log('parse data');
+        var dataResults = parseData(data);
+        var graphType = dataResults[0];
+        var graphData = dataResults[1];
         userCharts[currentChart] = new Chart(graphType, graphData);
+        console.log('debug: ' + userCharts[currentChart].isChart());
         userCharts[currentChart].draw();
       }
     }
   }
 
   // parse data
-  function parseData() {
-    // console.log('get data');
-    let data = $currentData;
-    let region = $currentRegion;
-    // console.log('first element' + data['0']);
-    // console.log('region: ' + region);
+  function parseData(clickedData) {
+    let data = clickedData;
+    // let region = $currentRegion;
 
     // search for the ID
-    let re = new RegExp('US[0-9]+');
-    let geo = region.match(re);
-    // let graphData = data[geo];
+    // let re = new RegExp('US[0-9]+');
+    // let geo = region.match(re);
     // console.log('region data: ' + geo);
-    // console.log(graphData);
-    // let gData = null;
-    // for(var i in data) {
-    //   console.log(i);
-    //   if(i.geo_id == geo) { gData = i; }
-    //   break;
-    // }
-    // let gData = $(data).filter(function(k, v) {
-    //   return v.geo_id == geo;
-    // });
-    // console.log('filter: ' + gData);
+    console.log('data: ' + data);
+    for(var i=0; i<data.length; i++) {
+      console.log(data[i].time_value);
+    }
 
     // todo: finish parsing data
 
     // todo: determine chart type based on data
     var cType = lineGraph;
-    console.log(cType);
-
-    var graphData = {
-      county1: {
-        '03-30-2020': 20,
-        '03-31-2020': 22,
-        '04-01-2020': 28,
-        '04-02-2020': 33,
-        '04-03-2020': 45,
-        '04-04-2020': 47,
-        '04-05-2020': 49,
-        '04-06-2020': 50,
-        '04-07-2020': 51,
-        '04-08-2020': 52,
-        '04-09-2020': 51,
-        '04-10-2020': 53,
-        '04-11-2020': 52,
-        '04-12-2020': 52,
-        '04-13-2020': 53,
-      },
-      county2: {
-        '03-30-2020': 68,
-        '03-31-2020': 69,
-        '04-01-2020': 69,
-        '04-02-2020': 70,
-        '04-03-2020': 72,
-        '04-04-2020': 74,
-        '04-05-2020': 76,
-        '04-06-2020': 78,
-        '04-07-2020': 80,
-        '04-08-2020': 83,
-        '04-09-2020': 86,
-        '04-10-2020': 89,
-        '04-11-2020': 92,
-        '04-12-2020': 96,
-        '04-13-2020': 101,
-      },
-    };
-    return [cType, graphData];
+    return [cType, data];
   }
 
   class Chart {
@@ -132,14 +85,13 @@
       this.y = null;
       switch (chartType) {
         case 'Bar_Chart':
-          console.log('bar chart');
           chart = new BarChart();
           chart.setData(data);
           break;
         case 'Line_Graph':
-          console.log('line graph');
           chart = new LineGraph();
           chart.setData(data);
+          console.log('debug: ' + chart.getData());
           break;
         default:
           TypeError('Chart type not a valid type.');
@@ -148,11 +100,13 @@
     }
 
     setData(data) {
-      console.log('data set: ' + data);
-      this.verifyDataFormat(data);
-      this.data === null
-        ? (this.data = data)
-        : new Error('Cannot set data. Data already set. Use update method to change values.');
+      console.log('set data')
+      // this.verifyDataFormat(data);
+      // if(this.data === null) {
+        this.data = data;
+      // } else {
+      //   new Error('Cannot set data. Data already set. Use update method to change values.');
+      // }
     }
 
     getData() {
@@ -185,7 +139,7 @@
         height = 0.75 * w - margin.top - margin.bottom;
 
       // parse the date time
-      var parseDate = d3.timeParse('%m-%d-%Y');
+      var parseDate = d3.timeParse('%Y%m%d');
 
       // set ranges
       this.x = d3.scaleBand().rangeRound([0, width]);
@@ -214,7 +168,6 @@
   class BarChart extends Chart {
     // verify that the supplied data is an array of integers for a single data source
     verifyDataFormat(data) {
-      console.log('bar chart');
       super.verifyDataFormat();
       !Number.isInteger(Object.values(data))
         ? TypeError('Provided data is of the wrong type. Only integers accepted.')
@@ -226,7 +179,6 @@
     }
 
     draw() {
-      console.log('draw bar chart');
       super.draw();
 
       // construct the x and y domain from the data
@@ -271,18 +223,20 @@
 
   class LineGraph extends Chart {
     draw() {
-      console.log('draw line graph');
       // if there is an existing chart, remove it and redraw
       d3.select(el)
         .selectAll('*')
         .remove();
 
       // line graph
-      sampleData.subscribe(_ => {
-        let data = $sampleData;
-        var margin = { top: 10, right: 30, bottom: 30, left: 60 },
+      // sampleData.subscribe(_ => {
+      //   let data = $sampleData;
+        let myData = this.getData();
+        console.log('my data: ' + myData);
+        // size chart
+        var margin = { top: 20, right: 20, bottom: 70, left: 40 },
           width = w - margin.left - margin.right,
-          height = w - margin.top - margin.bottom;
+          height = 0.75 * w - margin.top - margin.bottom;
 
         d3.select(el).html('');
         var svg = d3
@@ -295,11 +249,11 @@
 
         var x = d3
           .scaleTime()
-          .domain(d3.extent(data, d => d.date))
+          .domain(d3.extent(myData, d => d.time_value))
           .range([0, width]);
         var y = d3
           .scaleLinear()
-          .domain([0, d3.max(data, d => +d.value)])
+          .domain([0, 0.25])
           .range([height, 0]);
 
         svg
@@ -310,7 +264,7 @@
 
         let line = d3
           .line()
-          .x(d => x(d.date))
+          .x(d => x(d.time_value))
           .y(d => y(+d.value));
 
         svg
@@ -318,20 +272,20 @@
           // .attr("class", "line")
           .attr('fill', 'none')
           .attr('stroke', 'red')
-          .attr('d', line(data));
+          .attr('d', line(myData));
 
         // label lines by county
-        data.forEach(function(d) {
-          //   var color = counties.indexOf(d.county);
-          if (d.date.getTime() == currentDate.getTime()) {
-            svg
-              .append('text')
-              .attr('transform', 'translate(' + (width + 3) + ',' + y(d.value) + ')')
-              .style('font-size', '10px')
-              .text(d.county);
-          }
-        });
-      });
+        // data.forEach(function(d) {
+        //   //   var color = counties.indexOf(d.county);
+        //   if (d.date.getTime() == currentDate.getTime()) {
+        //     svg
+        //       .append('text')
+        //       .attr('transform', 'translate(' + (width + 3) + ',' + y(d.value) + ')')
+        //       .style('font-size', '10px')
+        //       .text(d.county);
+        //   }
+        // });
+      // });
     }
   }
 
@@ -343,11 +297,10 @@
 <p>
   currently viewing sensor
   <b>{$currentSensor}</b>
-  at level
+  at the
   <b>{$currentLevel}</b>
-  for
+  level
   <!-- <b>{$selectedRegion}</b> -->
-  <button onclick={_ => callMyFunction()} value="Update" />
 </p>
 
 <!-- bind:this sets the variable el to the HTML div you can then select using d3 as above-->
