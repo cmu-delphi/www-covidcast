@@ -22,7 +22,7 @@
     currentDate.set(max);
   }
 
-  currentDataReadyOnMay.subscribe(d => console.log('map set:', d));
+  // currentDataReadyOnMay.subscribe(d => console.log('map set:', d));
 </script>
 
 <style>
