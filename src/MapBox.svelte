@@ -7,6 +7,7 @@
     currentLevel,
     currentSensor,
     currentData,
+    currentRange,
     data,
     signalType,
   } from './stores.js';
@@ -40,10 +41,13 @@
         let dat = d[$signalType];
         minMax[0] = dat < minMax[0] ? dat : minMax[0];
         minMax[1] = dat > minMax[1] ? dat : minMax[1];
-        mappedVals.set(d.geo_value, d[$signalType]);
+        if (dat) {
+          mappedVals.set(d.geo_value, d[$signalType]);
+        }
         return d.geo_value;
       }),
     );
+    currentRange.set(minMax);
 
     let dat = $geojsons.get($currentLevel);
     dat.features.forEach(d => {
@@ -53,7 +57,7 @@
       } else if ($currentLevel === 'msa') {
         id = d.properties.CBSAFP;
       }
-      if (geoIds.has(id)) {
+      if (geoIds.has(id) && mappedVals.get(id)) {
         d.properties.val = mappedVals.get(id);
       } else {
         d.properties.val = -100;
@@ -71,7 +75,6 @@
       id: $currentLevel,
       source: $currentLevel,
       type: 'fill',
-      // layout: { visibility: 'none' },
       filter: ['!=', 'val', -100],
       paint: {
         'fill-outline-color': 'black',
@@ -100,15 +103,12 @@
       center: [LON, LAT],
       zoom: ZOOM,
       minZoom: ZOOM,
-
-      // maxBounds: new mapboxgl.LngLatBounds([-23.25, -14.54], [21.8, 13.4])
     })
-      .addControl(
-        new mapboxgl.AttributionControl({
-          compact: true,
-        }),
-      )
+      .addControl(new mapboxgl.AttributionControl({ compact: true }))
       .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+
+    //Disable touch zoom, it makes gesture scrolling difficult
+    map.scrollZoom.disable();
 
     map.on('load', function() {
       map.addSource('county-outline', {
@@ -137,39 +137,21 @@
           'fill-outline-color': '#bcbcbc',
         },
       });
+
       Object.keys($levels).forEach(name => {
         let data = $geojsons.get(name);
         map.addSource(name, {
           type: 'geojson',
           data: data,
         });
-        // map.addLayer({
-        //   id: name,
-        //   source: name,
-        //   type: 'fill',
-        //   layout: { visibility: 'none' },
-        //   filter: ['!=', 'val', -100],
-        //   paint: {
-        //     'fill-outline-color': 'black',
-        //   },
-        // });
       });
 
-      //Disable touch zoom, it makes gesture scrolling difficult
-      map.scrollZoom.disable();
-
-      // Set all layers to not visible and currentLevel visible.
       mounted = true;
       updateMap();
     });
   }
 
-  function zoomBack() {
-    map.easeTo({
-      center: [LON, LAT],
-      zoom: ZOOM,
-    });
-  }
+  function zoomBack() {}
 </script>
 
 <style>
@@ -229,7 +211,11 @@
 
 <div bind:this={container} class="map-container">
   <div class="state-buttons-holder">
-    <button data-state="us48" id="bounds-button" class="pg-button bounds-button" on:click={zoomBack}>
+    <button
+      data-state="us48"
+      id="bounds-button"
+      class="pg-button bounds-button"
+      on:click={_ => map.easeTo({ center: [LON, LAT], zoom: ZOOM })}>
       <img src="./assets/imgs/us48.png" alt="" />
     </button>
   </div>
