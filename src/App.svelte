@@ -80,15 +80,18 @@
 
   function updateRegionSliceCache(sensor, level, date) {
     if (!$mounted) return;
-    let currSens = $sensors.find(d => d.id === sensor);
-    let l = currSens.levels[0];
-    if (!currSens.levels.includes($currentLevel)) level = l;
-    let dateRange = $times.get(sensor);
-    date = $currentDate;
-    if (date > dateRange[1]) {
-      date = dateRange[1];
-    }
+    // if (sensor === $currentSensor && level === $currentLevel && date === $currentDate) return;
+    console.log('update region slice');
+    // let currSens = $sensors.find(d => d.id === sensor);
+    // let l = currSens.levels[0];
+    // if (!currSens.levels.includes($currentLevel)) level = l;
+    // let dateRange = $times.get(sensor);
+    // date = $currentDate;
+    // if (date > dateRange[1]) {
+    //   date = dateRange[1];
+    // }
     let cacheEntry = $regionSliceCache.get(sensor + level + date);
+    console.log(cacheEntry);
     if (!cacheEntry) {
       let q =
         ENDPOINT +
@@ -104,20 +107,23 @@
       fetch(q)
         .then(d => d.json())
         .then(d => {
+          console.log(q, d);
           currentData.set(d.epidata);
           regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
-          currentDate.set(date);
-          currentLevel.set(level);
+          // currentDate.set(date);
+          // currentLevel.set(level);
         });
     } else currentData.set(cacheEntry);
   }
 
   function updateTimeSliceCache(sensor, level, region) {
     if (!$mounted) return;
+    // if (sensor === $currentSensor && level === $currentLevel && region === $currentRegion) return;
     if (!region) {
-      currentData.set([]);
+      regionData.set([]);
       return;
     }
+    console.log('update timeseries');
     let cacheEntry = $timeSliceCache.get(sensor + level + region);
     if (!cacheEntry) {
       let q =
@@ -141,13 +147,16 @@
   }
 
   currentSensor.subscribe(s => {
+    // Have to somehow update the currentDate.
     if (!$mounted) return;
-    updateRegionSliceCache(s, $currentLevel, $currentDate);
-    updateTimeSliceCache(s, $currentLevel, $currentRegion);
+    currentDate.set($times.get(s)[1]);
+    // updateRegionSliceCache(s, $currentLevel, $currentDate);
+    // updateTimeSliceCache(s, $currentLevel, $currentRegion);
   });
   currentLevel.subscribe(l => {
     updateRegionSliceCache($currentSensor, l, $currentDate);
-    updateTimeSliceCache($currentSensor, l, $currentRegion);
+    // updateTimeSliceCache($currentSensor, l, '');
+    // currentRegion.set('');
   });
   currentDate.subscribe(d => {
     updateRegionSliceCache($currentSensor, $currentLevel, d);
