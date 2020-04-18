@@ -76,7 +76,8 @@
     }
 
     map.getSource($currentLevel).setData(dat);
-    map.getStyle().layers.find(d => d.id === $currentLevel) ? map.removeLayer($currentLevel) : '';
+
+    map.getStyle().layers.length > 3 ? map.removeLayer(map.getStyle().layers[3].id) : '';
     map.addLayer(
       {
         id: $currentLevel,
