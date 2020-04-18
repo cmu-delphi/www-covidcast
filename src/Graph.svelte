@@ -8,6 +8,7 @@
     sampleData,
     regionData,
     currentSensorName,
+    currentLevelName,
   } from './stores.js';
   import * as d3 from 'd3';
 
@@ -303,10 +304,10 @@
 
 <p>COVIDCAST Data</p>
 <p>
-  currently viewing sensor
+  Currently viewing sensor
   <b>{$currentSensorName}</b>
   at the
-  <b>{$currentLevel}</b>
+  <b>{$currentLevelName}</b>
   level
   <!-- <b>{$selectedRegion}</b> -->
 </p>
