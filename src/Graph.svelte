@@ -7,6 +7,7 @@
     currentData,
     sampleData,
     regionData,
+    regionDataStats,
     currentSensorName,
     currentLevelName,
   } from './stores.js';
@@ -18,6 +19,7 @@
   let parseTime = d3.timeParse('%Y%m%d');
 
   regionData.subscribe(d => updateGraph(d));
+  regionDataStats.subscribe(d => console.log(d));
 
   let el;
   let w;
