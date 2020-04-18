@@ -46,17 +46,33 @@
     padding: 0px;
   }
 
-  .dec {
+  .color.dec {
     background-color: #224477;
   }
 
-  .const {
+  .color.const {
     background-color: #fff;
   }
 
-  .inc {
+  .color.inc {
     background-color: #c41230;
   }
+
+  .direction-indicators {
+    margin-right: 6px;
+  }
+
+  /* .direction-indicators.inc {
+    color: #c41230;
+  }
+
+  .direction-indicators.const {
+    color: #fff;
+  }
+
+  .direction-indicators.dec {
+    color: #224477;
+  } */
 
   .legend-bar {
     background: linear-gradient(to top, #fff, #c41230);
@@ -71,14 +87,17 @@
   {#if $signalType === 'direction'}
     <p>
       <span class="color inc" />
+      <span class="direction-indicators inc">&#8599;</span>
       Increasing
     </p>
     <p>
       <span class="color const" />
+      <span class="direction-indicators const">&#8594;</span>
       Steady
     </p>
     <p>
       <span class="color dec" />
+      <span class="direction-indicators dec">&#8600;</span>
       Decreasing
     </p>
   {:else}
