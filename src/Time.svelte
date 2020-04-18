@@ -81,6 +81,10 @@
     opacity: 1;
   }
 
+  .slider::-moz-focus-outer {
+    border: 0;
+  }
+
   .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
