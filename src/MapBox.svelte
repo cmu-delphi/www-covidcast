@@ -76,21 +76,23 @@
     }
 
     map.getSource($currentLevel).setData(dat);
-
-    map.getStyle().layers.length > 3 ? map.removeLayer(map.getStyle().layers[3].id) : '';
-    map.addLayer({
-      id: $currentLevel,
-      source: $currentLevel,
-      type: 'fill',
-      filter: ['!=', 'val', -100],
-      paint: {
-        'fill-outline-color': '#616161',
-        'fill-color': {
-          property: 'val',
-          stops: stops,
+    map.getStyle().layers.find(d => d.id === $currentLevel) ? map.removeLayer($currentLevel) : '';
+    map.addLayer(
+      {
+        id: $currentLevel,
+        source: $currentLevel,
+        type: 'fill',
+        filter: ['!=', 'val', -100],
+        paint: {
+          'fill-outline-color': '#616161',
+          'fill-color': {
+            property: 'val',
+            stops: stops,
+          },
         },
       },
-    });
+      'city-point-cluster',
+    );
 
     map.on('click', $currentLevel, function(e) {
       currentRegion.set(e.features[0].properties.id);
@@ -126,6 +128,24 @@
         type: 'geojson',
         data: $geojsons.get('state'),
       });
+      map.addSource('city-point', {
+        type: 'geojson',
+        data: $geojsons.get('city'),
+        cluster: true,
+        clusterMaxZoom: 14, // Max zoom to cluster points on
+        clusterRadius: 50, // Radius of each cluster when clustering points (defaults to 50),
+        clusterProperties: {
+          largest: [
+            [
+              'case',
+              ['<', ['get', 'rank', ['accumulated']], ['get', 'rank', ['get', 'largest']]],
+              ['accumulated'],
+              ['properties'],
+            ],
+            ['properties'],
+          ],
+        },
+      });
       map.addLayer({
         id: 'county-outline',
         source: 'county-outline',
@@ -133,6 +153,7 @@
         paint: {
           'fill-color': '#e4dac4',
           'fill-outline-color': '#e0e0e0',
+          'fill-opacity': 0.4,
         },
       });
       map.addLayer({
@@ -142,6 +163,36 @@
         paint: {
           'fill-color': 'rgba(0, 0, 0, 0)',
           'fill-outline-color': '#bcbcbc',
+        },
+      });
+      map.addLayer({
+        id: 'city-point-cluster',
+        source: 'city-point',
+        type: 'symbol',
+        filter: ['has', 'point_count'],
+        layout: {
+          'text-field': ['get', 'city', ['get', 'largest']],
+          'text-font': ['Open Sans Regular'],
+          'text-size': 12,
+        },
+        paint: {
+          'text-halo-color': '#ffffff',
+          'text-halo-width': 2,
+        },
+      });
+      map.addLayer({
+        id: 'city-point-unclustered',
+        source: 'city-point',
+        type: 'symbol',
+        filter: ['!', ['has', 'point_count']],
+        layout: {
+          'text-field': ['get', 'city'],
+          'text-font': ['Open Sans Regular'],
+          'text-size': 12,
+        },
+        paint: {
+          'text-halo-color': '#ffffff',
+          'text-halo-width': 2,
         },
       });
 
