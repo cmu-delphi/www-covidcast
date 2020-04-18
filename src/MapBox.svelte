@@ -52,14 +52,16 @@
       }),
     );
     currentRange.set(minMax);
+    console.log(geoIds, mappedVals);
 
     let dat = $geojsons.get($currentLevel);
+    console.log(dat.features);
     dat.features.forEach(d => {
       let id;
       if ($currentLevel === 'county') {
         id = d.properties.GEO_ID.slice(-5);
       } else if ($currentLevel === 'msa') {
-        id = d.properties.CBSAFP;
+        id = d.properties.cbsafp;
       } else if ($currentLevel === 'state') {
         id = d.properties.POSTAL;
       }
@@ -78,23 +80,40 @@
 
     map.getSource($currentLevel).setData(dat);
 
-    map.getStyle().layers.length > 3 ? map.removeLayer(map.getStyle().layers[3].id) : '';
-    map.addLayer({
-      id: $currentLevel,
-      source: $currentLevel,
-      type: 'fill',
-      filter: ['!=', 'val', -100],
-      paint: {
-        'fill-outline-color': '#616161',
-        'fill-color': {
-          property: 'val',
-          stops: stops,
-        },
-      },
+    Object.keys($levels).forEach(name => {
+      if (name === $currentLevel) {
+        if (map.getLayer(name)) {
+          map.setPaintProperty(name, 'fill-color', {
+            property: 'val',
+            stops: stops,
+          });
+          map.setLayoutProperty(name, 'visibility', 'visible');
+        } else {
+          map.addLayer(
+            {
+              id: $currentLevel,
+              source: $currentLevel,
+              type: 'fill',
+              filter: ['!=', 'val', -100],
+              paint: {
+                'fill-outline-color': '#616161',
+                'fill-color': {
+                  property: 'val',
+                  stops: stops,
+                },
+              },
+            },
+            'city-point-unclustered',
+          );
+        }
+      } else {
+        map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none');
+      }
     });
 
     map.on('click', $currentLevel, function(e) {
       currentRegion.set(e.features[0].properties.id);
+      console.log(e.features[0].properties);
       new mapboxgl.Popup()
         .setLngLat(e.lngLat)
         .setHTML('<p>' + e.features[0].properties.NAME + '</p>')
@@ -127,6 +146,24 @@
         type: 'geojson',
         data: $geojsons.get('state'),
       });
+      map.addSource('city-point', {
+        type: 'geojson',
+        data: $geojsons.get('city'),
+        cluster: true,
+        clusterMaxZoom: 14, // Max zoom to cluster points on
+        clusterRadius: 100, // Radius of each cluster when clustering points (defaults to 50),
+        clusterProperties: {
+          largest: [
+            [
+              'case',
+              ['<', ['get', 'rank', ['accumulated']], ['get', 'rank', ['get', 'largest']]],
+              ['accumulated'],
+              ['properties'],
+            ],
+            ['properties'],
+          ],
+        },
+      });
       map.addLayer({
         id: 'county-outline',
         source: 'county-outline',
@@ -134,6 +171,7 @@
         paint: {
           'fill-color': '#e4dac4',
           'fill-outline-color': '#e0e0e0',
+          'fill-opacity': 0.4,
         },
       });
       map.addLayer({
@@ -143,6 +181,36 @@
         paint: {
           'fill-color': 'rgba(0, 0, 0, 0)',
           'fill-outline-color': '#bcbcbc',
+        },
+      });
+      map.addLayer({
+        id: 'city-point-unclustered',
+        source: 'city-point',
+        type: 'symbol',
+        filter: ['!', ['has', 'point_count']],
+        layout: {
+          'text-field': ['get', 'city'],
+          'text-font': ['Open Sans Regular'],
+          'text-size': 12,
+        },
+        paint: {
+          'text-halo-color': '#ffffff',
+          'text-halo-width': 2,
+        },
+      });
+      map.addLayer({
+        id: 'city-point-clustered',
+        source: 'city-point',
+        type: 'symbol',
+        filter: ['has', 'point_count'],
+        layout: {
+          'text-field': ['get', 'city', ['get', 'largest']],
+          'text-font': ['Open Sans Regular'],
+          'text-size': 12,
+        },
+        paint: {
+          'text-halo-color': '#ffffff',
+          'text-halo-width': 2,
         },
       });
 
