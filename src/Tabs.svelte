@@ -89,7 +89,7 @@
 
 <div class="options">
   <div class="option">
-    <div class="buttons-group-title">Data Source</div>
+    <!-- <div class="buttons-group-title">Data Source</div> -->
     <div class="buttons-group-side">
       {#each $sensors as sensor}
         <button

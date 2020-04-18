@@ -182,7 +182,7 @@
     <br />
 
     <div class="option">
-      <div class="buttons-group-title">Geographic Level</div>
+      <!-- <div class="buttons-group-title">Geographic Level</div> -->
       <div class="buttons-group">
         {#each $sensors.find(d => d.id === $currentSensor).levels as level}
           <button class="button {$currentLevel === level ? 'selected' : null}" on:click={() => currentLevel.set(level)}>
@@ -203,7 +203,7 @@
           Direction
         </button>
         <button class="button {$signalType === 'value' ? 'selected' : null}" on:click={() => signalType.set('value')}>
-          Value
+          Intensity
         </button>
       </div>
     </div>

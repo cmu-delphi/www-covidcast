@@ -15,8 +15,8 @@
   // to get the value for sampleData, use $sampleData.
   // It is currently in the form of {date: , value: }
 
-  regionData.subscribe(d => console.log(d));
-  // regionData.subscribe(_ => updateGraph());
+  let parseTime = d3.timeParse('%Y%m%d');
+
   regionData.subscribe(d => updateGraph(d));
 
   let el;
@@ -49,17 +49,16 @@
   }
 
   function updateGraph(data) {
-    console.log('update');
     if (userCharts != undefined) {
       if (userCharts[currentChart].isChart()) {
         userCharts[currentChart].draw();
       } else {
-        console.log('parse data');
+        // console.log('parse data');
         var dataResults = parseData(data);
         var graphType = dataResults[0];
         var graphData = dataResults[1];
         userCharts[currentChart] = new Chart(graphType, graphData);
-        console.log('debug: ' + userCharts[currentChart].isChart());
+        // console.log('debug: ' + userCharts[currentChart].isChart());
         userCharts[currentChart].draw();
       }
     }
@@ -74,10 +73,10 @@
     // let re = new RegExp('US[0-9]+');
     // let geo = region.match(re);
     // console.log('region data: ' + geo);
-    console.log('data: ' + data);
-    for (var i = 0; i < data.length; i++) {
-      console.log(data[i].time_value);
-    }
+    // console.log('data: ' + data);
+    // for (var i = 0; i < data.length; i++) {
+    //   console.log(data[i].time_value);
+    // }
 
     // todo: finish parsing data
 
@@ -100,7 +99,7 @@
         case 'Line_Graph':
           chart = new LineGraph();
           chart.setData(data);
-          console.log('debug: ' + chart.getData());
+          // console.log('debug: ' + chart.getData());
           break;
         default:
           TypeError('Chart type not a valid type.');
@@ -109,7 +108,7 @@
     }
 
     setData(data) {
-      console.log('set data');
+      // console.log('set data');
       // this.verifyDataFormat(data);
       // if(this.data === null) {
       this.data = data;
@@ -167,7 +166,7 @@
       svg
         .append('g')
         .attr('transform', 'translate(0,' + height + ')')
-        .call(d3.axisBottom(this.x));
+        .call(d3.axisBottom(this.x).tickFormat('%m %d'));
       svg.append('g').call(d3.axisLeft(this.y));
     }
 
@@ -241,7 +240,7 @@
       // sampleData.subscribe(_ => {
       //   let data = $sampleData;
       let myData = this.getData();
-      console.log('my data: ' + myData);
+      // console.log('my data: ' + myData);
       // size chart
       var margin = { top: 20, right: 20, bottom: 70, left: 40 },
         width = w - margin.left - margin.right,
@@ -258,7 +257,7 @@
 
       var x = d3
         .scaleTime()
-        .domain(d3.extent(myData, d => d.time_value))
+        .domain(d3.extent(myData, d => parseTime(d.time_value)))
         .range([0, width]);
       var y = d3
         .scaleLinear()
@@ -267,13 +266,22 @@
 
       svg
         .append('g')
+        .attr('class', 'axis')
         .attr('transform', 'translate(0,' + height + ')')
-        .call(d3.axisBottom(x));
-      svg.append('g').call(d3.axisLeft(y));
+        .call(
+          d3
+            .axisBottom(x)
+            .tickFormat(d3.timeFormat('%b %d'))
+            .ticks(d3.timeDay.every(1)),
+        );
+      svg
+        .append('g')
+        .attr('class', 'axis')
+        .call(d3.axisLeft(y).ticks(5));
 
       let line = d3
         .line()
-        .x(d => x(d.time_value))
+        .x(d => x(parseTime(d.time_value)))
         .y(d => y(+d.value));
 
       svg
@@ -302,15 +310,21 @@
   function displayName() {}
 </script>
 
-<p>COVIDCAST Data</p>
-<p>
+<style>
+  .graph-title {
+    text-align: center;
+    margin: 0px;
+  }
+</style>
+
+<h5 class="graph-title">Intensity Data Over Time</h5>
+<!-- <p>
   Currently viewing sensor
   <b>{$currentSensorName}</b>
   at the
   <b>{$currentLevelName}</b>
   level
   <!-- <b>{$selectedRegion}</b> -->
-</p>
 
 <!-- bind:this sets the variable el to the HTML div you can then select using d3 as above-->
 <div bind:clientWidth={w}>
