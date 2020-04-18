@@ -5,8 +5,8 @@
 <style>
   .legend {
     font-size: 0.8rem;
-    border-radius: 8px;
-    padding: 10px 15px;
+    /* border-radius: 8px; */
+    padding: 10px 10px;
     box-sizing: border-box;
     background-color: rgba(255, 255, 255, 0.7);
     transition: all 0.1s ease-in;
@@ -38,6 +38,7 @@
     justify-content: flex-start;
     color: rgba(0, 0, 0, 0.7);
     margin: 5px 0px;
+    padding: 0px;
   }
 
   .legend-bar {
