@@ -10,6 +10,7 @@
 
 <style>
   .options {
+    font-size: 0.8rem;
     width: 100%;
     position: relative;
   }
@@ -20,7 +21,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 5px;
+    /* border-radius: 5px; */
     cursor: pointer;
     background-color: transparent;
 
@@ -54,7 +55,7 @@
     margin-bottom: 5px;
 
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1em;
   }
 
   .buttons-group {
@@ -66,8 +67,7 @@
   .buttons-group .button {
     width: 100%;
     margin: 0;
-    font-size: 0.95rem;
-    line-height: 1rem;
+    font-size: 1em;
     background-color: #fff;
     border-style: solid;
     border-color: #dbdbdb;
@@ -95,8 +95,7 @@
     /* width: 50%; */
     flex-grow: 1;
     margin: 0;
-    font-size: 0.95rem;
-    line-height: 1rem;
+    font-size: 1em;
     background-color: #fff;
     border-style: solid;
     border-color: #dbdbdb;
@@ -115,24 +114,24 @@
 
   .buttons-group .button:first-child {
     border-top-color: #dbdbdb;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
+    /* border-top-left-radius: 4px; */
+    /* border-top-right-radius: 4px; */
   }
 
   .buttons-group .button:last-child {
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
+    /* border-bottom-left-radius: 4px; */
+    /* border-bottom-right-radius: 4px; */
   }
 
   .buttons-group-side .button:first-child {
     border-left-color: #dbdbdb;
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
+    /* border-top-left-radius: 4px; */
+    /* border-bottom-left-radius: 4px; */
   }
 
   .buttons-group-side .button:last-child {
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
+    /* border-top-right-radius: 4px; */
+    /* border-bottom-right-radius: 4px; */
   }
 
   .buttons-group .button.selected,

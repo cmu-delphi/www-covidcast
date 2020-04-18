@@ -56,6 +56,7 @@ export const geojsons = readable(new Map(), function start(set) {
 });
 
 export const times = writable(null);
+export const regionDataStats = writable(null);
 export const dates = writable();
 
 export const mounted = writable(0);
@@ -84,3 +85,29 @@ export const timeSliceCache = writable(new Map());
 export const data = writable([]);
 export const regionData = writable([]);
 export const currentData = writable([]);
+export const metaStats = writable(null);
+
+// regionDataStats[0] is hopefully going to give you the min/max. for example:
+/**
+ * {
+      "data_source": "google-survey",
+      "signal": "cli",
+      "time_type": "day",
+      "geo_type": "county",
+      "min_time": 20200411,
+      "max_time": 20200416,
+      "num_locations": 599,
+      "min_value": 0.026455026455026,
+      "max_value": 0.31923076923077
+    },
+ */
+// export const regionDataStats = derived(
+//   [data, sensors, currentSensor, currentLevel, currentRegion, metaStats],
+//   ([$data, $sensors, $sensor, $level, $region, $metaStats]) => {
+//     if ($data && $region && $metaStats) {
+//       let currDat = $data[$sensor][$level];
+//       let level = currDat ? $level : $sensors.find((d) => d.id === $sensor).levels[0];
+//       return $metaStats.filter((item) => item.data_source === $sensor && item.geo_type === $level);
+//     } else return [];
+//   },
+// );
