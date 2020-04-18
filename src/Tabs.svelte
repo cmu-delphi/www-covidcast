@@ -17,6 +17,7 @@
     width: 100%;
     position: relative;
   }
+
   .option {
     width: 100%;
     display: flex;

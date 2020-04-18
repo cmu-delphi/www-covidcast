@@ -68,7 +68,12 @@ export const geojsons = readable(new Map(), function start(set) {
 export const data = writable();
 export const dates = writable();
 export const currentSensor = writable('google-survey');
+export const currentSensorName = derived(
+  [sensors, currentSensor],
+  ([$sensors, $currentSensor]) => $sensors.filter((item) => item.id === $currentSensor)[0].name,
+);
 export const currentLevel = writable('county');
+export const currentLevelName = derived([levels, currentLevel], ([$levels, $currentLevel]) => $levels[$currentLevel]);
 // Options are 'direction' and 'value'
 export const signalType = writable('direction');
 // EpiWeek in form YYYYWW
