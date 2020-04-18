@@ -9,6 +9,7 @@
     regionDataStats,
     currentSensorName,
     currentLevelName,
+    currentDataReadyOnMay,
   } from './stores.js';
   import * as d3 from 'd3';
 
@@ -34,6 +35,7 @@
 
   regionData.subscribe(d => updateGraph(d));
   regionDataStats.subscribe(d => setChartRange(d));
+  currentDataReadyOnMay.subscribe(d => setFocus());
   // regionDataStats.subscribe(d => console.log(d));
 
   function drawGraph() {
@@ -209,44 +211,6 @@
 
     draw() {
       super.draw();
-
-      // construct the x and y domain from the data
-      this.x.domain(
-        this.getData().map(function(d) {
-          return d.time_value;
-        }),
-      );
-      this.y.domain([
-        0,
-        d3.max(this.getData(), function(d) {
-          return d.value;
-        }),
-      ]);
-
-      // fill in the bar chart according to the data
-      svg
-        .selectAll('bar')
-        .data(this.data)
-        .enter()
-        .append('rect')
-        .attr('class', 'bar')
-        .attr('x', function(d) {
-          return this.x(d.time_value);
-        })
-        .attr('width', this.x.bandwidth())
-        .attr('y', function(d) {
-          return this.y(d.value);
-        })
-        .attr('height', function(d) {
-          return height - this.y(d.value);
-        });
-
-      // draw axes
-      // svg.append('g')
-      //     .attr('transform', 'translate(0,' + height + ')')
-      //     .call(d3.axisBottom(x));
-      // svg.append('g')
-      //     .call(d3.axisLeft(y));
     }
   }
 
@@ -259,6 +223,7 @@
 
       // line graph
       let myData = this.getData();
+      console.log('length: ' + myData);
 
       // size chart
       var margin = { top: 20, right: 20, bottom: 70, left: 40 },
@@ -274,13 +239,19 @@
         .append('g')
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-      var formatTime = d3.timeFormat('%m/%d');
+
       var parseTime = d3.timeParse('%Y%m%d');
-      var k = d3.keys(myData);
-      var times = k.map(i => parseTime(myData[k[i]]['time_value']));
-      var timestamps = times.map(stamp => formatTime(stamp));
-      console.log('format time: ' + timestamps);
-      console.log('range: ' + this.min + ' ' + this.max);
+      // var k = d3.keys(myData);
+      // var times = k.map(i => parseTime(myData[k[i]]['time_value']));
+      // console.log(times);
+      // var max = Math.max(times);
+      // console.log('max: ' + max);
+      // var twoWeeks = 60*60*24*1000*7*2;
+      // times = times.filter(i => ((max-i)/twoWeeks) > 1);
+      // console.log('result: ' + times);
+      // var timestamps = times.map(stamp => formatTime(stamp));
+      // console.log('format time: ' + timestamps);
+      // console.log('range: ' + this.min + ' ' + this.max);
       var x = d3
         .scaleTime()
         .domain(d3.extent(myData, d => parseTime(d.time_value)))
@@ -298,7 +269,7 @@
           d3
             .axisBottom(x)
             .tickFormat(d3.timeFormat('%m/%d'))
-            .ticks(d3.timeWeek.every(1)),
+            .ticks(d3.timeDay.every(3)),
         );
       svg
         .append('g')
@@ -317,7 +288,6 @@
 
       svg
         .append('path')
-        // .attr("class", "line")
         .attr('fill', 'none')
         .attr('stroke', 'red')
         .attr('stroke-width', 3)
@@ -372,8 +342,9 @@
     }
   }
 
-  // todo: display user friendly names on graph
-  function displayName() {}
+  function setFocus() {
+
+  }
 </script>
 
 <style>
@@ -383,7 +354,7 @@
   }
 </style>
 
-<h5 class="graph-title">Intensity Data Over Time</h5>
+<h4 class="graph-title">Intensity Data Over Time</h4>
 <p>
   Currently viewing sensor
   <b>{$currentSensorName}</b>
