@@ -1,48 +1,43 @@
 import { writable, readable, derived } from 'svelte/store';
 import * as d3 from 'd3';
 
+const ENDPOINT = 'https://delphi.cmu.edu/epidata/api.php?source=covidcast&time_type=day';
+
 // Manually curated list of sensors with metadata.
 // Selected so that we know we are able to display them.
-// Check https://delphi.cmu.edu/epidata/api.php?source=covid_alert_meta
+// Check https://delphi.cmu.edu/epidata/api.php?source=covidcast_meta
 // For updated sensors/API and update this accordingly.
 export const sensors = readable([
   {
-    name: 'Facebook Surveys',
+    name: 'Surveys (Facebook)',
     id: 'fb_survey',
     signal: 'cli',
     levels: ['county', 'msa'],
   },
   {
-    name: 'Google Surveys',
+    name: 'Surveys (Google)',
     id: 'google-survey',
     signal: 'cli',
-    levels: ['county'],
+    levels: ['county', 'state'],
   },
   {
-    name: 'Quidel Flu Tests',
+    name: 'Lab Tests (Quidel)',
     id: 'quidel',
-    signal: 'negativeratio',
+    signal: 'negativeprop',
     levels: ['county', 'msa'],
   },
   {
-    name: 'Google Health Trends',
+    name: 'Search Trends (Google)',
     id: 'ght',
     signal: 'smoothedsearch',
     levels: ['msa'],
   },
-  // "Optum Hospitalizations",
-  // "Quidel Flu Tests",
-  // "Crowdcast",
-  // "Kinsa Temperatures",
 ]);
-
-export const times = writable(null);
 
 export const levels = readable({
   county: 'County',
   state: 'State',
   msa: 'Metropolitan Statistical Area',
-  // hrr: "Hospital Reporting Region",
 });
 
 // This loads all the GeoJSON's for each granularity that the MapBox component reads as layers.
@@ -51,71 +46,68 @@ export const geojsons = readable(new Map(), function start(set) {
     d3.json('./maps/albers_usa_gz_2010_us_050_00_5m.json'),
     d3.json('./maps/albers_usa_gz_2010_us_040_00_5m.json'),
     d3.json('./maps/albers_usa_tl_2019_us_metdiv.json'),
-    // d3.json("./maps/albers_usa_hospital_referral_region_v2.json"),
   ]).then(([a, b, c, d]) => {
     let m = new Map();
     m.set('county', a);
     m.set('state', b);
     m.set('msa', c);
-    // m.set("hrr", d);
     set(m);
   });
 });
 
-// TODO: document this structure.
-//It's an array of objects for each sensor.
-// Each sensor object has an array for a granularity for all the entries.
-export const data = writable();
+export const times = writable(null);
+export const regionDataStats = writable(null);
 export const dates = writable();
+
+export const mounted = writable(0);
+export const metaData = writable({});
 export const currentSensor = writable('google-survey');
 export const currentSensorName = derived(
   [sensors, currentSensor],
   ([$sensors, $currentSensor]) => $sensors.filter((item) => item.id === $currentSensor)[0].name,
 );
+// 'county', 'state', or 'msa'
 export const currentLevel = writable('county');
 export const currentLevelName = derived([levels, currentLevel], ([$levels, $currentLevel]) => $levels[$currentLevel]);
-// Options are 'direction' and 'value'
+// Options are 'direction' and 'value'.
 export const signalType = writable('direction');
-// EpiWeek in form YYYYWW
-export const currentWeek = writable(202014);
-// EpiWeek in form YYYYMMDD
+// EpiWeek in form YYYYMMDD.
 export const currentDate = writable(20200412);
+// Range of time for the map slider.
 export const currentRange = writable([0, 1]);
+// Region GEO_ID for filtering the line chart.
 export const currentRegion = writable('');
+export const currentDataReadyOnMay = writable(false);
 
-// Data points for the current sensor, level, and day.
-export const currentData = derived(
-  [data, sensors, currentSensor, currentLevel, currentDate],
-  ([$data, $sensors, $sensor, $level, $date]) => {
-    if ($data) {
-      let currDat = $data[$sensor][$level];
-      let level = currDat ? $level : $sensors.find((d) => d.id === $sensor).levels[0];
-      return $data[$sensor][level].filter((d) => d.time_value === $date);
-    } else return [];
-  },
-);
-// Data points for the current sensor, level, and day.
-export const regionData = derived(
-  [data, sensors, currentSensor, currentLevel, currentRegion],
-  ([$data, $sensors, $sensor, $level, $region]) => {
-    if ($data && $region) {
-      let currDat = $data[$sensor][$level];
-      let level = currDat ? $level : $sensors.find((d) => d.id === $sensor).levels[0];
-      return $data[$sensor][level].filter((d) => d.geo_value === $region);
-    } else return [];
-  },
-);
+export const regionSliceCache = writable(new Map());
+export const timeSliceCache = writable(new Map());
 
-// sample data to test line graph
-export const sampleData = readable([], function start(set) {
-  let parseTime = d3.timeParse('%Y-%m-%d');
-  d3.csv('./sampleData.csv').then((d) =>
-    set(
-      d.map((s) => ({
-        date: parseTime(s.Date),
-        value: s.Incidence,
-        county: s.County,
-      })),
-    ),
-  );
-});
+export const data = writable([]);
+export const regionData = writable([]);
+export const currentData = writable([]);
+export const metaStats = writable(null);
+
+// regionDataStats[0] is hopefully going to give you the min/max. for example:
+/**
+ * {
+      "data_source": "google-survey",
+      "signal": "cli",
+      "time_type": "day",
+      "geo_type": "county",
+      "min_time": 20200411,
+      "max_time": 20200416,
+      "num_locations": 599,
+      "min_value": 0.026455026455026,
+      "max_value": 0.31923076923077
+    },
+ */
+// export const regionDataStats = derived(
+//   [data, sensors, currentSensor, currentLevel, currentRegion, metaStats],
+//   ([$data, $sensors, $sensor, $level, $region, $metaStats]) => {
+//     if ($data && $region && $metaStats) {
+//       let currDat = $data[$sensor][$level];
+//       let level = currDat ? $level : $sensors.find((d) => d.id === $sensor).levels[0];
+//       return $metaStats.filter((item) => item.data_source === $sensor && item.geo_type === $level);
+//     } else return [];
+//   },
+// );

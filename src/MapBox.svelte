@@ -8,8 +8,8 @@
     currentSensor,
     currentData,
     currentRange,
-    data,
     signalType,
+    currentDataReadyOnMay,
   } from './stores.js';
 
   const LAT = -1.2;
@@ -26,8 +26,9 @@
   $: if (!map && $geojsons.size !== 0 && $currentData.length !== 0) initializeMap();
 
   // Update the map when sensor or level changes.
-  currentLevel.subscribe(_ => updateMap());
-  currentSensor.subscribe(_ => updateMap());
+  // currentLevel.subscribe(_ => updateMap());
+  // currentSensor.subscribe(_ => updateMap());
+  // rData.subscribe(_ => updateMap());
   currentData.subscribe(_ => updateMap());
   signalType.subscribe(_ => updateMap());
 
@@ -78,7 +79,7 @@
       type: 'fill',
       filter: ['!=', 'val', -100],
       paint: {
-        'fill-outline-color': 'black',
+        'fill-outline-color': '#616161',
         'fill-color': {
           property: 'val',
           stops: stops,
@@ -88,11 +89,13 @@
 
     map.on('click', $currentLevel, function(e) {
       currentRegion.set(e.features[0].properties.id);
+      console.log(e.features[0].properties);
       new mapboxgl.Popup()
         .setLngLat(e.lngLat)
-        .setHTML(e.features[0].properties.NAME + '<br />' + e.features[0].properties.val)
+        .setHTML(e.features[0].properties.NAME)
         .addTo(map);
     });
+    currentDataReadyOnMay.set(true);
   }
 
   function initializeMap() {
@@ -124,7 +127,7 @@
         source: 'county-outline',
         type: 'fill',
         paint: {
-          'fill-color': '#f9f9f9',
+          'fill-color': '#e4dac4',
           'fill-outline-color': '#e0e0e0',
         },
       });

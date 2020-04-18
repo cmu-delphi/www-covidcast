@@ -1,19 +1,16 @@
 <script>
-  import { data, sensors, currentSensor, levels, currentLevel, signalType } from './stores.js';
+  import { sensors, currentSensor, levels, currentLevel, signalType, currentDataReadyOnMay } from './stores.js';
 
   let hide = false;
 
   function toggleHide() {
     hide = !hide;
   }
-
-  currentSensor.subscribe(sens =>
-    data ? '' : $data[sens][$currentLevel] ? '' : currentLevel.set($sensors.find(d => d.id === sens).levels[0]),
-  );
 </script>
 
 <style>
   .options {
+    font-size: 0.8rem;
     width: 100%;
     position: relative;
   }
@@ -32,8 +29,8 @@
     margin-right: 15px;
 
     font-weight: 600;
-    font-size: 1.1rem;
-    line-height: 1.1rem;
+    font-size: 1em;
+    line-height: 1em;
   }
 
   .buttons-group-side {
@@ -45,8 +42,8 @@
 
   .buttons-group-side .button {
     margin: 0;
-    font-size: 0.95rem;
-    line-height: 1rem;
+    font-size: 1em;
+    line-height: 1em;
     background-color: #fff;
     border-style: solid;
     border-color: #dbdbdb;
@@ -65,13 +62,13 @@
 
   .buttons-group-side .button:first-child {
     border-left-color: #dbdbdb;
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
+    /* border-top-left-radius: 4px; */
+    /* border-bottom-left-radius: 4px; */
   }
 
   .buttons-group-side .button:last-child {
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
+    /* border-top-right-radius: 4px; */
+    /* border-bottom-right-radius: 4px; */
   }
 
   .buttons-group-side .button.selected {
@@ -89,12 +86,15 @@
 
 <div class="options">
   <div class="option">
-    <div class="buttons-group-title">Data Source</div>
+    <!-- <div class="buttons-group-title">Data Source</div> -->
     <div class="buttons-group-side">
       {#each $sensors as sensor}
         <button
           class="button {$currentSensor === sensor.id ? 'selected' : null}"
-          on:click={() => currentSensor.set(sensor.id)}>
+          on:click={() => {
+            currentDataReadyOnMay.set(false);
+            currentSensor.set(sensor.id);
+          }}>
           {sensor.name}
         </button>
       {/each}

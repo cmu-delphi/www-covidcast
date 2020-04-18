@@ -4,14 +4,15 @@
 
 <style>
   .legend {
-    border-radius: 8px;
-    padding: 10px 15px;
+    font-size: 0.8rem;
+    /* border-radius: 8px; */
+    padding: 10px 10px;
     box-sizing: border-box;
     background-color: rgba(255, 255, 255, 0.7);
     transition: all 0.1s ease-in;
   }
 
-  .legend:focus {
+  .legend:hover {
     background-color: rgba(255, 255, 255, 0.9);
   }
 
@@ -24,8 +25,8 @@
 
   .color {
     width: 20px;
-    height: 20px;
-    border-radius: 50%;
+    height: 80px;
+    /* border-radius: 50%; */
     margin-right: 10px;
     display: inline-block;
     border: 1px solid #dbdbdb;
@@ -36,10 +37,12 @@
     align-items: center;
     justify-content: flex-start;
     color: rgba(0, 0, 0, 0.7);
+    margin: 5px 0px;
+    padding: 0px;
   }
 
   .legend-bar {
-    background: linear-gradient(to bottom, #fff, #c41230);
+    background: linear-gradient(to top, #fff, #c41230);
     width: 20px;
     height: 300px;
   }
@@ -58,20 +61,20 @@
 <div class="legend {$signalType === 'value' ? 'value' : null}">
   {#if $signalType === 'direction'}
     <p>
-      <span class="color dec" />
-      Decreasing
+      <span class="color inc" />
+      Increasing
     </p>
     <p>
       <span class="color const" />
       Constant
     </p>
     <p>
-      <span class="color inc" />
-      Increasing
+      <span class="color dec" />
+      Decreasing
     </p>
   {:else}
-    <p>None</p>
-    <p class="legend-bar" />
     <p>High</p>
+    <p class="legend-bar" />
+    <p>None</p>
   {/if}
 </div>

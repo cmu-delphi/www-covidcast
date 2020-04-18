@@ -5,19 +5,17 @@
     currentSensor,
     currentLevel,
     currentData,
-    sampleData,
     regionData,
+    regionDataStats,
     currentSensorName,
     currentLevelName,
   } from './stores.js';
   import * as d3 from 'd3';
 
-  // to get the value for sampleData, use $sampleData.
-  // It is currently in the form of {date: , value: }
+  let parseTime = d3.timeParse('%Y%m%d');
 
-  regionData.subscribe(d => console.log(d));
-  // regionData.subscribe(_ => updateGraph());
   regionData.subscribe(d => updateGraph(d));
+  regionDataStats.subscribe(d => console.log(d));
 
   let el;
   let w;
@@ -67,7 +65,7 @@
     // let geo = region.match(re);
     // console.log('region data: ' + geo);
     // console.log('data: ' + data);
-    // for(var i=0; i<data.length; i++) {
+    // for (var i = 0; i < data.length; i++) {
     //   console.log(data[i].time_value);
     // }
 
@@ -169,7 +167,7 @@
       svg
         .append('g')
         .attr('transform', 'translate(0,' + height + ')')
-        .call(d3.axisBottom(this.x));
+        .call(d3.axisBottom(this.x).tickFormat('%m %d'));
       svg.append('g').call(d3.axisLeft(this.y));
     }
 
@@ -276,7 +274,7 @@
       console.log('format time: ' + timestamps);
       var x = d3
         .scaleTime()
-        .domain(d3.extent(myData, d => d.time_value))
+        .domain(d3.extent(myData, d => parseTime(d.time_value)))
         .range([0, width]);
       var y = d3
         .scaleLinear()
@@ -285,13 +283,22 @@
 
       svg
         .append('g')
+        .attr('class', 'axis')
         .attr('transform', 'translate(0,' + height + ')')
-        .call(d3.axisBottom(x));
-      svg.append('g').call(d3.axisLeft(y));
+        .call(
+          d3
+            .axisBottom(x)
+            .tickFormat(d3.timeFormat('%b %d'))
+            .ticks(d3.timeDay.every(1)),
+        );
+      svg
+        .append('g')
+        .attr('class', 'axis')
+        .call(d3.axisLeft(y).ticks(5));
 
       let line = d3
         .line()
-        .x(d => x(d.time_value))
+        .x(d => x(parseTime(d.time_value)))
         .y(d => y(+d.value));
 
       svg
@@ -299,6 +306,7 @@
         // .attr("class", "line")
         .attr('fill', 'none')
         .attr('stroke', 'red')
+        .attr('stroke-width', 3)
         .attr('d', line(myData));
 
       // label lines by src
@@ -319,15 +327,21 @@
   function displayName() {}
 </script>
 
-<p>COVIDCAST Data</p>
-<p>
+<style>
+  .graph-title {
+    text-align: center;
+    margin: 0px;
+  }
+</style>
+
+<h5 class="graph-title">Intensity Data Over Time</h5>
+  <p>
   Currently viewing sensor
   <b>{$currentSensorName}</b>
   at the
   <b>{$currentLevelName}</b>
   level
   <!-- <b>{$selectedRegion}</b> -->
-</p>
 
 <!-- bind:this sets the variable el to the HTML div you can then select using d3 as above-->
 <div bind:clientWidth={w}>
