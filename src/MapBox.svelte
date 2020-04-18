@@ -35,6 +35,7 @@
   function updateMap() {
     if (!mounted) return;
     console.log($currentData);
+    console.log('draw map', $currentLevel);
 
     let minMax = [999999999, -1];
     let mappedVals = new Map();
@@ -75,7 +76,8 @@
     }
 
     map.getSource($currentLevel).setData(dat);
-    map.getStyle().layers.find(d => d.id === $currentLevel) ? map.removeLayer($currentLevel) : '';
+
+    map.getStyle().layers.length > 3 ? map.removeLayer(map.getStyle().layers[3].id) : '';
     map.addLayer({
       id: $currentLevel,
       source: $currentLevel,
@@ -94,7 +96,7 @@
       currentRegion.set(e.features[0].properties.id);
       new mapboxgl.Popup()
         .setLngLat(e.lngLat)
-        .setHTML(e.features[0].properties.NAME)
+        .setHTML('<p>' + e.features[0].properties.NAME + '</p>')
         .addTo(map);
     });
     currentDataReadyOnMay.set(true);
