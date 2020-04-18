@@ -51,14 +51,16 @@
       }),
     );
     currentRange.set(minMax);
+    console.log(geoIds, mappedVals);
 
     let dat = $geojsons.get($currentLevel);
+    console.log(dat.features);
     dat.features.forEach(d => {
       let id;
       if ($currentLevel === 'county') {
         id = d.properties.GEO_ID.slice(-5);
       } else if ($currentLevel === 'msa') {
-        id = d.properties.CBSAFP;
+        id = d.properties.cbsafp;
       } else if ($currentLevel === 'state') {
         id = d.properties.POSTAL;
       }
@@ -97,6 +99,7 @@
 
     map.on('click', $currentLevel, function(e) {
       currentRegion.set(e.features[0].properties.id);
+      console.log(e.features[0].properties);
       new mapboxgl.Popup()
         .setLngLat(e.lngLat)
         .setHTML('<p>' + e.features[0].properties.NAME + '</p>')
