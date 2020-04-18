@@ -1,15 +1,11 @@
 <script>
-  import { data, sensors, currentSensor, levels, currentLevel, signalType, currentDataReadyOnMay } from './stores.js';
+  import { sensors, currentSensor, levels, currentLevel, signalType, currentDataReadyOnMay } from './stores.js';
 
   let hide = false;
 
   function toggleHide() {
     hide = !hide;
   }
-
-  currentSensor.subscribe(sens =>
-    data ? '' : $data[sens][$currentLevel] ? '' : currentLevel.set($sensors.find(d => d.id === sens).levels[0]),
-  );
 </script>
 
 <style>

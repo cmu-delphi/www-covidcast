@@ -5,16 +5,12 @@
     currentSensor,
     currentLevel,
     currentData,
-    sampleData,
     regionData,
     regionDataStats,
     currentSensorName,
     currentLevelName,
   } from './stores.js';
   import * as d3 from 'd3';
-
-  // to get the value for sampleData, use $sampleData.
-  // It is currently in the form of {date: , value: }
 
   let parseTime = d3.timeParse('%Y%m%d');
 
@@ -239,8 +235,6 @@
         .remove();
 
       // line graph
-      // sampleData.subscribe(_ => {
-      //   let data = $sampleData;
       let myData = this.getData();
       // console.log('my data: ' + myData);
       // size chart
@@ -291,6 +285,7 @@
         // .attr("class", "line")
         .attr('fill', 'none')
         .attr('stroke', 'red')
+        .attr('stroke-width', 3)
         .attr('d', line(myData));
 
       // label lines by county
