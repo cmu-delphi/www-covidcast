@@ -14,10 +14,6 @@
 
   let parseTime = d3.timeParse('%Y%m%d');
 
-  regionData.subscribe(d => updateGraph(d));
-  regionDataStats.subscribe(d => setChartRange(d));
-  // regionDataStats.subscribe(d => console.log(d));
-
   let el;
   let w;
 
@@ -33,8 +29,12 @@
   const barChart = 'Bar_Chart';
   const lineGraph = 'Line_Graph';
   const charts = [barChart, lineGraph];
-  var userCharts = [];
-  var currentChart = 0;
+  let userCharts = [];
+  let currentChart = 0;
+
+  regionData.subscribe(d => updateGraph(d));
+  regionDataStats.subscribe(d => setChartRange(d));
+  // regionDataStats.subscribe(d => console.log(d));
 
   function drawGraph() {
     let chart = new Chart();
@@ -43,15 +43,17 @@
   }
 
   function updateGraph(data) {
-    if (userCharts != undefined) {
-      if (userCharts[currentChart].isChart()) {
-        userCharts[currentChart].draw();
-      } else {
-        var dataResults = parseData(data);
-        var graphType = dataResults[0];
-        var graphData = dataResults[1];
-        userCharts[currentChart] = new Chart(graphType, graphData);
-        userCharts[currentChart].draw();
+    if (data.length !== 0) {
+      if (userCharts != undefined) {
+        if (userCharts[currentChart].isChart()) {
+          userCharts[currentChart].draw();
+        } else {
+          var dataResults = parseData(data);
+          var graphType = dataResults[0];
+          var graphData = dataResults[1];
+          userCharts[currentChart] = new Chart(graphType, graphData);
+          userCharts[currentChart].draw();
+        }
       }
     }
   }
@@ -77,13 +79,19 @@
     return [cType, data];
   }
 
-  function setChartRange() {
-    // let stats = $regionDataStats;
-    // console.log('stats: ' + stats);
-    // let min = dataStats.min_value;
-    // let max = dataStats.max_value;
-    if(userCharts[currentChart] != undefined) {
-      userCharts[currentChart].setRange(stats.min_value, stats.max_value);
+  function setChartRange(data) {
+    if (data) {
+      console.log(data);
+      let { min_value, max_value } = data;
+      console.log(min_value, max_value);
+      // let stats = $regionDataStats;
+      // console.log('stats: ' + stats);
+      // let min = dataStats.min_value;
+      // let max = dataStats.max_value;
+      console.log(currentChart);
+      if (userCharts[currentChart] !== undefined) {
+        userCharts[currentChart].setRange(min_value, max_value);
+      }
     }
   }
 
@@ -176,9 +184,7 @@
       this.min = min;
       this.max = max;
     }
-    updateAxes() {
-
-    }
+    updateAxes() {}
   }
 
   class BarChart extends Chart {
@@ -290,7 +296,12 @@
       svg
         .append('g')
         .attr('class', 'axis')
-        .call(d3.axisLeft(y).ticks(1).tickValues([0,95]));
+        .call(
+          d3
+            .axisLeft(y)
+            .ticks(1)
+            .tickValues([0, 95]),
+        );
 
       let line = d3
         .line()
@@ -309,16 +320,16 @@
       svg
         .append('text')
         .attr('transform', 'rotate(-90)')
-        .attr('y', 0-margin.left)
-        .attr('x', 0-(height/2))
+        .attr('y', 0 - margin.left)
+        .attr('x', 0 - height / 2)
         .attr('dy', '1em')
         .style('text-anchor', 'middle')
         .text('Intensity');
       svg
         .append('text')
         .attr('transform', 'rotate(-90)')
-        .attr('y', 0-margin.left)
-        .attr('x', 0-(0.25*height))
+        .attr('y', 0 - margin.left)
+        .attr('x', 0 - 0.25 * height)
         .attr('dy', '4em')
         .attr('font-size', 9)
         .style('text-anchor', 'right')
@@ -326,8 +337,8 @@
       svg
         .append('text')
         .attr('transform', 'rotate(-90)')
-        .attr('y', 0-margin.left)
-        .attr('x', 0-(0.9*height))
+        .attr('y', 0 - margin.left)
+        .attr('x', 0 - 0.9 * height)
         .attr('dy', '4em')
         .attr('font-size', 9)
         .style('text-anchor', 'left')
@@ -336,7 +347,7 @@
       // label the x-axis
       svg
         .append('text')
-        .attr('transform', 'translate(' + (width/2) + ', ' + (height + margin.top + 20) + ')')
+        .attr('transform', 'translate(' + width / 2 + ', ' + (height + margin.top + 20) + ')')
         .style('text-anchor', 'middle')
         .text('Date');
 
@@ -366,7 +377,7 @@
 </style>
 
 <h5 class="graph-title">Intensity Data Over Time</h5>
-  <p>
+<p>
   Currently viewing sensor
   <b>{$currentSensorName}</b>
   at the
@@ -374,7 +385,8 @@
   level
   <!-- <b>{$selectedRegion}</b> -->
 
-<!-- bind:this sets the variable el to the HTML div you can then select using d3 as above-->
+  <!-- bind:this sets the variable el to the HTML div you can then select using d3 as above-->
+</p>
 <div bind:clientWidth={w}>
   <div bind:this={el} />
 </div>
