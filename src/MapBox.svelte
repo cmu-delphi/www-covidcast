@@ -34,6 +34,7 @@
 
   function updateMap() {
     if (!mounted) return;
+    console.log($currentData);
 
     let minMax = [999999999, -1];
     let mappedVals = new Map();
@@ -42,10 +43,10 @@
         let dat = d[$signalType];
         minMax[0] = dat < minMax[0] ? dat : minMax[0];
         minMax[1] = dat > minMax[1] ? dat : minMax[1];
-        if (dat) {
-          mappedVals.set(d.geo_value, d[$signalType]);
+        if (dat !== null) {
+          mappedVals.set(d.geo_value.toUpperCase(), d[$signalType]);
         }
-        return d.geo_value;
+        return d.geo_value.toUpperCase();
       }),
     );
     currentRange.set(minMax);
@@ -57,9 +58,11 @@
         id = d.properties.GEO_ID.slice(-5);
       } else if ($currentLevel === 'msa') {
         id = d.properties.CBSAFP;
+      } else if ($currentLevel === 'state') {
+        id = d.properties.POSTAL;
       }
       d.properties.id = id;
-      if (geoIds.has(id) && mappedVals.get(id)) {
+      if (geoIds.has(id) && mappedVals.get(id) !== null) {
         d.properties.val = mappedVals.get(id);
       } else {
         d.properties.val = -100;
