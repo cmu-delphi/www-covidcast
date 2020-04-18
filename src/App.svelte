@@ -75,12 +75,16 @@
     }).catch(err => {
       error = err;
       currentDataReadyOnMay.set(true);
-      console.log(err);
     });
   }
 
   function updateRegionSliceCache(sensor, level, date) {
     if (!$mounted) return;
+    let dateRange = $times.get(sensor);
+    if (date > dateRange[1]) {
+      date = dateRange[1];
+      currentDate.set(date);
+    }
     let cacheEntry = $regionSliceCache.get(sensor + level + date);
     if (!cacheEntry) {
       let q =
@@ -105,6 +109,10 @@
 
   function updateTimeSliceCache(sensor, level, region) {
     if (!$mounted) return;
+    if (!$currentRegion) {
+      currentData.set([]);
+      return;
+    }
     let cacheEntry = $timeSliceCache.get(sensor + level + region);
     if (!cacheEntry) {
       let q =

@@ -89,7 +89,6 @@
 
     map.on('click', $currentLevel, function(e) {
       currentRegion.set(e.features[0].properties.id);
-      console.log(e.features[0].properties);
       new mapboxgl.Popup()
         .setLngLat(e.lngLat)
         .setHTML(e.features[0].properties.NAME)
