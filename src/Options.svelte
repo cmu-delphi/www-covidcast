@@ -67,13 +67,6 @@
     flex-direction: column;
   }
 
-  .buttons-group-side {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
   .buttons-group .button {
     width: 100%;
     margin: 0;
@@ -173,7 +166,7 @@
     </div>
     <br />
 
-    <div class="option">
+    <!-- <div class="option">
       <div class="buttons-group-title">Data Source</div>
       <div class="buttons-group">
         {#each $sensors as sensor}
@@ -184,7 +177,7 @@
           </button>
         {/each}
       </div>
-    </div>
+    </div> -->
 
     <br />
 
