@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import Options from './Options.svelte';
+  import Tabs from './Tabs.svelte';
   import Time from './Time.svelte';
   import MapBox from './MapBox.svelte';
   import Graph from './Graph.svelte';
@@ -107,14 +108,36 @@
 <style>
   .options-container {
     position: absolute;
-    top: 2vh;
-    left: 2vh;
+    top: 10px;
+    left: 10px;
     z-index: 1000;
-    max-width: 400px;
+    width: 250px;
     background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 1rem;
-    padding: 10px 15px;
+    border-radius: 8px;
+    padding: 10px 10px;
     box-sizing: border-box;
+
+    transition: all 0.1s ease-in;
+
+    /* background-color: black; */
+    /* border: 1px solid black; */
+  }
+
+  .tabs-container {
+    position: absolute;
+    top: 10px;
+    left: 50px;
+    right: 50px;
+    z-index: 1000;
+    /* max-width: 750px; */
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    padding: 10px 10px;
+    box-sizing: border-box;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     transition: all 0.1s ease-in;
 
@@ -209,6 +232,10 @@
 
 <div class="options-container">
   <Options />
+</div>
+
+<div class="tabs-container">
+  <Tabs />
 </div>
 
 <div class="time-container">

@@ -58,7 +58,7 @@
     margin-bottom: 5px;
 
     font-weight: 600;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 
   .buttons-group {
@@ -68,11 +68,43 @@
   }
 
   .buttons-group .button {
-    width: 220px;
-    font-size: 1rem;
+    width: 100%;
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1rem;
     background-color: #fff;
+    border-style: solid;
     border-color: #dbdbdb;
     border-top-color: transparent;
+    border-width: 1px;
+    color: #363636;
+    cursor: pointer;
+    justify-content: center;
+    padding-bottom: calc(0.5em - 1px);
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: calc(0.5em - 1px);
+    text-align: center;
+    /* white-space: nowrap; */
+  }
+
+  .buttons-group-side {
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+  }
+
+  .buttons-group-side .button {
+    /* width: 50%; */
+    flex-grow: 1;
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1rem;
+    background-color: #fff;
+    border-style: solid;
+    border-color: #dbdbdb;
+    border-left-color: transparent;
     border-width: 1px;
     color: #363636;
     cursor: pointer;
@@ -91,24 +123,33 @@
     border-top-right-radius: 4px;
   }
 
-  .buttons-group .button:first-child {
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-  }
-
   .buttons-group .button:last-child {
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
   }
 
-  .buttons-group .button.selected {
+  .buttons-group-side .button:first-child {
+    border-left-color: #dbdbdb;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+
+  .buttons-group-side .button:last-child {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+
+  .buttons-group .button.selected,
+  .buttons-group-side .button.selected {
     background-color: var(--red-alpha);
     border-color: transparent;
     color: #fff;
   }
 
   .buttons-group .button:focus,
-  .buttons-group .button:active {
+  .buttons-group .button:active,
+  .buttons-group-side .button:focus,
+  .buttons-group-side .button:active {
     box-shadow: none !important;
     outline: none;
   }
@@ -123,8 +164,9 @@
     <div class="toggle-button float" on:click={toggleHide}>
       <img class="toggle-button-icon" src="./assets/imgs/layers_clear-24px.svg" alt="" />
     </div>
+    <br />
 
-    <div class="option">
+    <!-- <div class="option">
       <div class="buttons-group-title">Data Source</div>
       <div class="buttons-group">
         {#each $sensors as sensor}
@@ -135,9 +177,8 @@
           </button>
         {/each}
       </div>
-    </div>
+    </div> -->
 
-    <br />
     <br />
 
     <div class="option">
