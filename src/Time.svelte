@@ -5,21 +5,44 @@
   let parseTime = d3.timeParse('%Y%m%d');
   let formatTime = d3.timeFormat('%B %d, %Y');
 
-  let prettyDate = '';
-  $: prettyDate = formatTime(parseTime(val));
-
   let val = $currentDate;
-  let min = 0;
-  let max = 1;
+  let min = $currentDate;
+  let max = $currentDate;
 
-  currentDate.subscribe(d => (val = d));
+  let rectifiedVal = parseTime(val).getTime();
+  let rectifiedMin = parseTime(min).getTime();
+  let rectifiedMax = parseTime(max).getTime();
+
+  let prettyDate = '';
+  $: prettyDate = formatTime(new Date(rectifiedVal));
+
+  currentDate.subscribe(d => {
+    val = d;
+    rectifiedVal = parseTime(val).getTime();
+  });
   times.subscribe(t => (t ? update($currentSensor, t) : ''));
   currentSensor.subscribe(s => ($times ? update(s, $times) : ''));
 
   function update(s, t) {
     min = t.get(s)[0];
     max = t.get(s)[1];
+    rectifiedMin = parseTime(min).getTime();
+    rectifiedMax = parseTime(max).getTime();
     currentDate.set(max);
+    console.log(min, max);
+  }
+
+  function calculateValFromRectified(rectified) {
+    let tempDate = new Date(rectified);
+    let year = tempDate.getFullYear();
+    let month = ('0' + (tempDate.getMonth() + 1)).slice(-2);
+    let date = ('0' + tempDate.getDate()).slice(-2);
+    return year + month + date;
+  }
+
+  function sliderOnMouseUp() {
+    currentDataReadyOnMay.set(false);
+    currentDate.set(calculateValFromRectified(rectifiedVal));
   }
 
   // currentDataReadyOnMay.subscribe(d => console.log('map set:', d));
@@ -40,9 +63,9 @@
   }
 
   .slider {
-    flex-grow: 1;
+    /* flex-grow: 1; */
     -webkit-appearance: none;
-    /* width: 320px; */
+    width: 320px;
     height: 6px;
     padding: 0;
     border-radius: 5px !important;
@@ -122,14 +145,12 @@
   <input
     id="time_slider"
     type="range"
-    {min}
-    {max}
-    on:mouseup={_ => {
-      currentDataReadyOnMay.set(false);
-      currentDate.set(val);
-    }}
+    min={rectifiedMin}
+    max={rectifiedMax}
+    step={86400000}
+    on:mouseup={sliderOnMouseUp}
     class="slider"
-    bind:value={val} />
+    bind:value={rectifiedVal} />
   <p>{prettyDate}</p>
   {#if $currentDataReadyOnMay === false}
     <div class="loader-container">
