@@ -14,6 +14,7 @@
 
 <style>
   .options {
+    font-size: 0.8rem;
     width: 100%;
     position: relative;
   }
@@ -58,7 +59,7 @@
     margin-bottom: 5px;
 
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1em;
   }
 
   .buttons-group {
@@ -70,8 +71,7 @@
   .buttons-group .button {
     width: 100%;
     margin: 0;
-    font-size: 0.95rem;
-    line-height: 1rem;
+    font-size: 1em;
     background-color: #fff;
     border-style: solid;
     border-color: #dbdbdb;
@@ -99,8 +99,7 @@
     /* width: 50%; */
     flex-grow: 1;
     margin: 0;
-    font-size: 0.95rem;
-    line-height: 1rem;
+    font-size: 1em;
     background-color: #fff;
     border-style: solid;
     border-color: #dbdbdb;

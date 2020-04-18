@@ -14,6 +14,7 @@
 
 <style>
   .options {
+    font-size: 0.8rem;
     width: 100%;
     position: relative;
   }
@@ -32,8 +33,8 @@
     margin-right: 15px;
 
     font-weight: 600;
-    font-size: 1.1rem;
-    line-height: 1.1rem;
+    font-size: 1em;
+    line-height: 1em;
   }
 
   .buttons-group-side {
@@ -45,8 +46,8 @@
 
   .buttons-group-side .button {
     margin: 0;
-    font-size: 0.95rem;
-    line-height: 1rem;
+    font-size: 1em;
+    line-height: 1em;
     background-color: #fff;
     border-style: solid;
     border-color: #dbdbdb;

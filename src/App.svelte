@@ -113,7 +113,7 @@
     left: 10px;
     z-index: 1000;
     width: 250px;
-    /* background-color: rgba(255, 255, 255, 0.7); */
+    background-color: rgba(255, 255, 255, 0.7);
     border-radius: 8px;
     padding: 10px 10px;
     box-sizing: border-box;
@@ -191,11 +191,15 @@
     transition: all 0.1s ease-in;
   }
 
+  .options-container:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+
   /* .options-container:hover,
   .time-container:hover,
   .graph-container:hover {
     background-color: rgba(255, 255, 255, 0.9);
-  } */
+  }  */
 </style>
 
 <MapBox />
