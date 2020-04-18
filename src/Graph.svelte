@@ -14,16 +14,8 @@
 
   let parseTime = d3.timeParse('%Y%m%d');
 
-  regionData.subscribe(d => updateGraph(d));
-  regionDataStats.subscribe(d => console.log(d));
-
   let el;
   let w;
-
-  // test data - global variables for line graph
-  var counties = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'];
-  var currentDate = new Date(2020, 3, 14);
-  var test = 0;
 
   // the $ syntax just says, if w is changed, run drawGraph() - e.g. redraw the graph when the window is resized.
   // $: w, drawGraph();
@@ -37,8 +29,12 @@
   const barChart = 'Bar_Chart';
   const lineGraph = 'Line_Graph';
   const charts = [barChart, lineGraph];
-  var userCharts = [];
-  var currentChart = 0;
+  let userCharts = [];
+  let currentChart = 0;
+
+  regionData.subscribe(d => updateGraph(d));
+  regionDataStats.subscribe(d => setChartRange(d));
+  // regionDataStats.subscribe(d => console.log(d));
 
   function drawGraph() {
     let chart = new Chart();
@@ -47,17 +43,18 @@
   }
 
   function updateGraph(data) {
-    if (userCharts != undefined) {
-      if (userCharts[currentChart].isChart()) {
-        userCharts[currentChart].draw();
-      } else {
-        // console.log('parse data');
-        var dataResults = parseData(data);
-        var graphType = dataResults[0];
-        var graphData = dataResults[1];
-        userCharts[currentChart] = new Chart(graphType, graphData);
-        // console.log('debug: ' + userCharts[currentChart].isChart());
-        userCharts[currentChart].draw();
+    if (data.length !== 0) {
+      if (userCharts != undefined) {
+        if (userCharts[currentChart].isChart()) {
+          userCharts[currentChart].draw();
+        } else {
+          var dataResults = parseData(data);
+          var graphType = dataResults[0];
+          var graphData = dataResults[1];
+          var range = dataResults[2];
+          userCharts[currentChart] = new Chart(graphType, graphData, range);
+          userCharts[currentChart].draw();
+        }
       }
     }
   }
@@ -79,12 +76,29 @@
     // todo: finish parsing data
 
     // todo: determine chart type based on data
+    var dataRange = userCharts[currentChart].getRange();
     var cType = lineGraph;
-    return [cType, data];
+    return [cType, data, dataRange];
+  }
+
+  function setChartRange(data) {
+    if (data) {
+      console.log(data);
+      let { min_value, max_value } = data;
+      console.log(min_value, max_value);
+      // let stats = $regionDataStats;
+      // console.log('stats: ' + stats);
+      // let min = dataStats.min_value;
+      // let max = dataStats.max_value;
+      console.log(currentChart);
+      if (userCharts[currentChart] !== undefined) {
+        userCharts[currentChart].setRange(min_value, max_value);
+      }
+    }
   }
 
   class Chart {
-    constructor(chartType, data) {
+    constructor(chartType, data, dataRange) {
       var chart;
       this.chartType = chartType;
       this.x = null;
@@ -97,7 +111,7 @@
         case 'Line_Graph':
           chart = new LineGraph();
           chart.setData(data);
-          // console.log('debug: ' + chart.getData());
+          chart.setRange(dataRange[0], dataRange[1]);
           break;
         default:
           TypeError('Chart type not a valid type.');
@@ -106,7 +120,6 @@
     }
 
     setData(data) {
-      // console.log('set data');
       // this.verifyDataFormat(data);
       // if(this.data === null) {
       this.data = data;
@@ -169,6 +182,16 @@
     }
 
     updateChart() {}
+
+    setRange(min, max) {
+      console.log('setting: ' + min + ' ' + max);
+      console.log(min[0]);
+      this.min = min;
+      this.max = max;
+    }
+
+    getRange() { return [this.min, this.max] };
+    updateAxes() {}
   }
 
   class BarChart extends Chart {
@@ -190,7 +213,7 @@
       // construct the x and y domain from the data
       this.x.domain(
         this.getData().map(function(d) {
-          return d.date;
+          return d.time_value;
         }),
       );
       this.y.domain([
@@ -208,7 +231,7 @@
         .append('rect')
         .attr('class', 'bar')
         .attr('x', function(d) {
-          return this.x(d.date);
+          return this.x(d.time_value);
         })
         .attr('width', this.x.bandwidth())
         .attr('y', function(d) {
@@ -236,7 +259,7 @@
 
       // line graph
       let myData = this.getData();
-      // console.log('my data: ' + myData);
+
       // size chart
       var margin = { top: 20, right: 20, bottom: 70, left: 40 },
         width = w - margin.left - margin.right,
@@ -251,13 +274,20 @@
         .append('g')
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
+      var formatTime = d3.timeFormat('%m/%d');
+      var parseTime = d3.timeParse('%Y%m%d');
+      var k = d3.keys(myData);
+      var times = k.map(i => parseTime(myData[k[i]]['time_value']));
+      var timestamps = times.map(stamp => formatTime(stamp));
+      console.log('format time: ' + timestamps);
+      console.log('range: ' + this.min + ' ' + this.max);
       var x = d3
         .scaleTime()
         .domain(d3.extent(myData, d => parseTime(d.time_value)))
         .range([0, width]);
       var y = d3
         .scaleLinear()
-        .domain([0, 0.25])
+        .domain([this.min, this.max])
         .range([height, 0]);
 
       svg
@@ -267,13 +297,18 @@
         .call(
           d3
             .axisBottom(x)
-            .tickFormat(d3.timeFormat('%b %d'))
-            .ticks(d3.timeDay.every(1)),
+            .tickFormat(d3.timeFormat('%m/%d'))
+            .ticks(d3.timeWeek.every(1)),
         );
       svg
         .append('g')
         .attr('class', 'axis')
-        .call(d3.axisLeft(y).ticks(5));
+        .call(
+          d3
+            .axisLeft(y)
+            .ticks(1)
+            .tickValues([0, 95]),
+        );
 
       let line = d3
         .line()
@@ -288,7 +323,42 @@
         .attr('stroke-width', 3)
         .attr('d', line(myData));
 
-      // label lines by county
+      // label the y-axis
+      svg
+        .append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 0 - margin.left)
+        .attr('x', 0 - height / 2)
+        .attr('dy', '1em')
+        .style('text-anchor', 'middle')
+        .text('Intensity');
+      svg
+        .append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 0 - margin.left)
+        .attr('x', 0 - 0.25 * height)
+        .attr('dy', '4em')
+        .attr('font-size', 9)
+        .style('text-anchor', 'right')
+        .text('More');
+      svg
+        .append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 0 - margin.left)
+        .attr('x', 0 - 0.9 * height)
+        .attr('dy', '4em')
+        .attr('font-size', 9)
+        .style('text-anchor', 'left')
+        .text('Less');
+
+      // label the x-axis
+      svg
+        .append('text')
+        .attr('transform', 'translate(' + width / 2 + ', ' + (height + margin.top + 20) + ')')
+        .style('text-anchor', 'middle')
+        .text('Date');
+
+      // label lines by src
       // data.forEach(function(d) {
       //   //   var color = counties.indexOf(d.county);
       //   if (d.date.getTime() == currentDate.getTime()) {
@@ -298,7 +368,6 @@
       //       .style('font-size', '10px')
       //       .text(d.county);
       //   }
-      // });
       // });
     }
   }
@@ -315,7 +384,7 @@
 </style>
 
 <h5 class="graph-title">Intensity Data Over Time</h5>
-<!-- <p>
+<p>
   Currently viewing sensor
   <b>{$currentSensorName}</b>
   at the
@@ -323,7 +392,8 @@
   level
   <!-- <b>{$selectedRegion}</b> -->
 
-<!-- bind:this sets the variable el to the HTML div you can then select using d3 as above-->
+  <!-- bind:this sets the variable el to the HTML div you can then select using d3 as above-->
+</p>
 <div bind:clientWidth={w}>
   <div bind:this={el} />
 </div>
