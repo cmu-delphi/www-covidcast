@@ -10,6 +10,7 @@
     currentRange,
     data,
     signalType,
+    currentTimeDataReadyOnMay,
   } from './stores.js';
 
   const LAT = -1.2;
@@ -93,6 +94,7 @@
         .setHTML(e.features[0].properties.NAME + '<br />' + e.features[0].properties.val)
         .addTo(map);
     });
+    currentTimeDataReadyOnMay.set(true);
   }
 
   function initializeMap() {
