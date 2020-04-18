@@ -179,11 +179,11 @@
 
   .time-container {
     position: absolute;
-    bottom: 4vh;
-    left: calc(2vh + 400px);
+    bottom: 40px;
+    left: 20px;
     z-index: 1002;
     background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 1rem;
+    border-radius: 8px;
     padding: 5px 10px;
     box-sizing: border-box;
     width: 500px;
