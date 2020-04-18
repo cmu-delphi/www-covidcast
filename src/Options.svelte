@@ -68,7 +68,8 @@
     width: 100%;
     margin: 0;
     font-size: 1em;
-    background-color: #fff;
+    font-weight: 400;
+    background-color: rgb(222, 222, 222);
     border-style: solid;
     border-color: #dbdbdb;
     border-top-color: transparent;
@@ -82,6 +83,8 @@
     padding-top: calc(0.5em - 1px);
     text-align: center;
     /* white-space: nowrap; */
+
+    transition: all 0.1s ease-in;
   }
 
   .buttons-group-side {
@@ -96,7 +99,8 @@
     flex-grow: 1;
     margin: 0;
     font-size: 1em;
-    background-color: #fff;
+    font-weight: 400;
+    background-color: rgb(222, 222, 222);
     border-style: solid;
     border-color: #dbdbdb;
     border-left-color: transparent;
@@ -110,6 +114,8 @@
     padding-top: calc(0.5em - 1px);
     text-align: center;
     /* white-space: nowrap; */
+
+    transition: all 0.1s ease-in;
   }
 
   .buttons-group .button:first-child {
@@ -136,9 +142,10 @@
 
   .buttons-group .button.selected,
   .buttons-group-side .button.selected {
-    background-color: var(--red-alpha);
-    border-color: transparent;
-    color: #fff;
+    background-color: #fff;
+    /* border-color: transparent; */
+    color: #000;
+    font-weight: 600;
   }
 
   .buttons-group .button:focus,
@@ -160,20 +167,6 @@
       <img class="toggle-button-icon" src="./assets/imgs/layers_clear-24px.svg" alt="" />
     </div>
     <br />
-
-    <!-- <div class="option">
-      <div class="buttons-group-title">Data Source</div>
-      <div class="buttons-group">
-        {#each $sensors as sensor}
-          <button
-            class="button {$currentSensor === sensor.id ? 'selected' : null}"
-            on:click={() => currentSensor.set(sensor.id)}>
-            {sensor.name}
-          </button>
-        {/each}
-      </div>
-    </div> -->
-
     <br />
 
     <div class="option">
@@ -192,14 +185,15 @@
     <div class="option">
       <!-- <div class="buttons-group-title">Signal Type</div> -->
       <div class="buttons-group-side">
+        <button class="button {$signalType === 'value' ? 'selected' : null}" on:click={() => signalType.set('value')}>
+          Intensity
+        </button>
         <button
           class="button {$signalType === 'direction' ? 'selected' : null}"
           on:click={() => signalType.set('direction')}>
           Direction
         </button>
-        <button class="button {$signalType === 'value' ? 'selected' : null}" on:click={() => signalType.set('value')}>
-          Intensity
-        </button>
+
       </div>
     </div>
   {/if}

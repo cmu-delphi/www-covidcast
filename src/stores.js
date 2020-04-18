@@ -43,12 +43,14 @@ export const geojsons = readable(new Map(), function start(set) {
   Promise.all([
     d3.json('./maps/albers_usa_gz_2010_us_050_00_5m.json'),
     d3.json('./maps/albers_usa_gz_2010_us_040_00_5m.json'),
-    d3.json('./maps/albers_usa_tl_2019_us_metdiv.json'),
+    d3.json('./maps/msa-albers.json'),
+    d3.json('./maps/city_data/cities-reprojected.json'),
   ]).then(([a, b, c, d]) => {
     let m = new Map();
     m.set('county', a);
     m.set('state', b);
     m.set('msa', c);
+    m.set('city', d);
     set(m);
   });
 });
@@ -62,7 +64,7 @@ export const currentSensor = writable('google-survey');
 // 'county', 'state', or 'msa'
 export const currentLevel = writable('county');
 // Options are 'direction' and 'value'.
-export const signalType = writable('direction');
+export const signalType = writable('value');
 // EpiWeek in form YYYYMMDD.
 export const currentDate = writable(20200412);
 // Range of time for the map slider.

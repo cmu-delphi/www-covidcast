@@ -43,8 +43,9 @@
   .buttons-group-side .button {
     margin: 0;
     font-size: 1em;
+    font-weight: 400;
     line-height: 1em;
-    background-color: #fff;
+    background-color: rgb(222, 222, 222);
     border-style: solid;
     border-color: #dbdbdb;
     border-left-color: transparent;
@@ -58,6 +59,8 @@
     padding-top: calc(0.5em - 1px);
     text-align: center;
     /* white-space: nowrap; */
+
+    transition: all 0.1s ease-in;
   }
 
   .buttons-group-side .button:first-child {
@@ -72,9 +75,10 @@
   }
 
   .buttons-group-side .button.selected {
-    background-color: var(--red-alpha);
-    border-color: transparent;
-    color: #fff;
+    background-color: #fff;
+    /* border-color: transparent; */
+    color: #000;
+    font-weight: 600;
   }
 
   .buttons-group-side .button:focus,
