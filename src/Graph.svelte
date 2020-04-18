@@ -1,6 +1,14 @@
 <script>
   import { onMount } from 'svelte';
-  import { currentRegion, currentSensor, currentLevel, currentData, sampleData, regionData } from './stores.js';
+  import {
+    currentRegion,
+    currentSensor,
+    currentLevel,
+    currentData,
+    sampleData,
+    regionData,
+    currentSensorName,
+  } from './stores.js';
   import * as d3 from 'd3';
 
   // to get the value for sampleData, use $sampleData.
@@ -66,7 +74,7 @@
     // let geo = region.match(re);
     // console.log('region data: ' + geo);
     console.log('data: ' + data);
-    for(var i=0; i<data.length; i++) {
+    for (var i = 0; i < data.length; i++) {
       console.log(data[i].time_value);
     }
 
@@ -100,10 +108,10 @@
     }
 
     setData(data) {
-      console.log('set data')
+      console.log('set data');
       // this.verifyDataFormat(data);
       // if(this.data === null) {
-        this.data = data;
+      this.data = data;
       // } else {
       //   new Error('Cannot set data. Data already set. Use update method to change values.');
       // }
@@ -231,60 +239,60 @@
       // line graph
       // sampleData.subscribe(_ => {
       //   let data = $sampleData;
-        let myData = this.getData();
-        console.log('my data: ' + myData);
-        // size chart
-        var margin = { top: 20, right: 20, bottom: 70, left: 40 },
-          width = w - margin.left - margin.right,
-          height = 0.75 * w - margin.top - margin.bottom;
+      let myData = this.getData();
+      console.log('my data: ' + myData);
+      // size chart
+      var margin = { top: 20, right: 20, bottom: 70, left: 40 },
+        width = w - margin.left - margin.right,
+        height = 0.75 * w - margin.top - margin.bottom;
 
-        d3.select(el).html('');
-        var svg = d3
-          .select(el)
-          .append('svg')
-          .attr('width', width + margin.left + margin.right)
-          .attr('height', height + margin.top + margin.bottom)
-          .append('g')
-          .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+      d3.select(el).html('');
+      var svg = d3
+        .select(el)
+        .append('svg')
+        .attr('width', width + margin.left + margin.right)
+        .attr('height', height + margin.top + margin.bottom)
+        .append('g')
+        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-        var x = d3
-          .scaleTime()
-          .domain(d3.extent(myData, d => d.time_value))
-          .range([0, width]);
-        var y = d3
-          .scaleLinear()
-          .domain([0, 0.25])
-          .range([height, 0]);
+      var x = d3
+        .scaleTime()
+        .domain(d3.extent(myData, d => d.time_value))
+        .range([0, width]);
+      var y = d3
+        .scaleLinear()
+        .domain([0, 0.25])
+        .range([height, 0]);
 
-        svg
-          .append('g')
-          .attr('transform', 'translate(0,' + height + ')')
-          .call(d3.axisBottom(x));
-        svg.append('g').call(d3.axisLeft(y));
+      svg
+        .append('g')
+        .attr('transform', 'translate(0,' + height + ')')
+        .call(d3.axisBottom(x));
+      svg.append('g').call(d3.axisLeft(y));
 
-        let line = d3
-          .line()
-          .x(d => x(d.time_value))
-          .y(d => y(+d.value));
+      let line = d3
+        .line()
+        .x(d => x(d.time_value))
+        .y(d => y(+d.value));
 
-        svg
-          .append('path')
-          // .attr("class", "line")
-          .attr('fill', 'none')
-          .attr('stroke', 'red')
-          .attr('d', line(myData));
+      svg
+        .append('path')
+        // .attr("class", "line")
+        .attr('fill', 'none')
+        .attr('stroke', 'red')
+        .attr('d', line(myData));
 
-        // label lines by county
-        // data.forEach(function(d) {
-        //   //   var color = counties.indexOf(d.county);
-        //   if (d.date.getTime() == currentDate.getTime()) {
-        //     svg
-        //       .append('text')
-        //       .attr('transform', 'translate(' + (width + 3) + ',' + y(d.value) + ')')
-        //       .style('font-size', '10px')
-        //       .text(d.county);
-        //   }
-        // });
+      // label lines by county
+      // data.forEach(function(d) {
+      //   //   var color = counties.indexOf(d.county);
+      //   if (d.date.getTime() == currentDate.getTime()) {
+      //     svg
+      //       .append('text')
+      //       .attr('transform', 'translate(' + (width + 3) + ',' + y(d.value) + ')')
+      //       .style('font-size', '10px')
+      //       .text(d.county);
+      //   }
+      // });
       // });
     }
   }
@@ -296,7 +304,7 @@
 <p>COVIDCAST Data</p>
 <p>
   currently viewing sensor
-  <b>{$currentSensor}</b>
+  <b>{$currentSensorName}</b>
   at the
   <b>{$currentLevel}</b>
   level
