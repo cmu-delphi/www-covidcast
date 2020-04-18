@@ -22,13 +22,13 @@ export const sensors = readable([
     name: 'Lab Tests (Quidel)',
     id: 'quidel',
     signal: 'negativeprop',
-    levels: ['county', 'msa'],
+    levels: ['county', 'msa', 'state'],
   },
   {
     name: 'Search Trends (Google)',
     id: 'ght',
     signal: 'smoothedsearch',
-    levels: ['msa'],
+    levels: ['msa', 'state'],
   },
 ]);
 
