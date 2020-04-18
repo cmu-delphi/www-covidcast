@@ -25,7 +25,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 5px;
+    /* border-radius: 5px; */
     cursor: pointer;
     background-color: transparent;
 
@@ -118,24 +118,24 @@
 
   .buttons-group .button:first-child {
     border-top-color: #dbdbdb;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
+    /* border-top-left-radius: 4px; */
+    /* border-top-right-radius: 4px; */
   }
 
   .buttons-group .button:last-child {
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
+    /* border-bottom-left-radius: 4px; */
+    /* border-bottom-right-radius: 4px; */
   }
 
   .buttons-group-side .button:first-child {
     border-left-color: #dbdbdb;
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
+    /* border-top-left-radius: 4px; */
+    /* border-bottom-left-radius: 4px; */
   }
 
   .buttons-group-side .button:last-child {
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
+    /* border-top-right-radius: 4px; */
+    /* border-bottom-right-radius: 4px; */
   }
 
   .buttons-group .button.selected,

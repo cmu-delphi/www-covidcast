@@ -127,7 +127,7 @@
     z-index: 1000;
     width: 250px;
     background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 8px;
+    /* border-radius: 8px; */
     padding: 10px 10px;
     box-sizing: border-box;
 
@@ -145,7 +145,7 @@
     z-index: 1000;
     /* max-width: 750px; */
     /* background-color: rgba(255, 255, 255, 0.7); */
-    border-radius: 8px;
+    /* border-radius: 8px; */
     padding: 10px 10px;
     box-sizing: border-box;
 
@@ -183,7 +183,7 @@
     max-width: 400px;
     width: 400px;
     background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 1rem;
+    /* border-radius: 1rem; */
     padding: 10px 15px;
     box-sizing: border-box;
 
@@ -196,7 +196,7 @@
     left: 20px;
     z-index: 1002;
     /* background-color: rgba(255, 255, 255, 0.7); */
-    border-radius: 8px;
+    /* border-radius: 8px; */
     padding: 5px 10px;
     box-sizing: border-box;
     width: 500px;
