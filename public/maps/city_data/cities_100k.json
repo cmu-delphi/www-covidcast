@@ -1,0 +1,4107 @@
+{
+   "type": "FeatureCollection",
+   "features": [
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -74.0059413,40.7127837 ]
+    },
+    "properties": {
+    "city":"New York",
+    "growth_from_2000_to_2013":"4.8%",
+    "population":8405837,
+    "rank":1,
+    "state":"New York"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -118.2436849,34.0522342 ]
+    },
+    "properties": {
+    "city":"Los Angeles",
+    "growth_from_2000_to_2013":"4.8%",
+    "population":3884307,
+    "rank":2,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -87.6297982,41.8781136 ]
+    },
+    "properties": {
+    "city":"Chicago",
+    "growth_from_2000_to_2013":"-6.1%",
+    "population":2718782,
+    "rank":3,
+    "state":"Illinois"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -95.3698028,29.7604267 ]
+    },
+    "properties": {
+    "city":"Houston",
+    "growth_from_2000_to_2013":"11.0%",
+    "population":2195914,
+    "rank":4,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -75.1652215,39.9525839 ]
+    },
+    "properties": {
+    "city":"Philadelphia",
+    "growth_from_2000_to_2013":"2.6%",
+    "population":1553165,
+    "rank":5,
+    "state":"Pennsylvania"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -112.0740373,33.4483771 ]
+    },
+    "properties": {
+    "city":"Phoenix",
+    "growth_from_2000_to_2013":"14.0%",
+    "population":1513367,
+    "rank":6,
+    "state":"Arizona"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -98.49362819999999,29.4241219 ]
+    },
+    "properties": {
+    "city":"San Antonio",
+    "growth_from_2000_to_2013":"21.0%",
+    "population":1409019,
+    "rank":7,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.1610838,32.715738 ]
+    },
+    "properties": {
+    "city":"San Diego",
+    "growth_from_2000_to_2013":"10.5%",
+    "population":1355896,
+    "rank":8,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -96.79698789999999,32.7766642 ]
+    },
+    "properties": {
+    "city":"Dallas",
+    "growth_from_2000_to_2013":"5.6%",
+    "population":1257676,
+    "rank":9,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -121.8863286,37.3382082 ]
+    },
+    "properties": {
+    "city":"San Jose",
+    "growth_from_2000_to_2013":"10.5%",
+    "population":998537,
+    "rank":10,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -97.7430608,30.267153 ]
+    },
+    "properties": {
+    "city":"Austin",
+    "growth_from_2000_to_2013":"31.7%",
+    "population":885400,
+    "rank":11,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -86.158068,39.768403 ]
+    },
+    "properties": {
+    "city":"Indianapolis",
+    "growth_from_2000_to_2013":"7.8%",
+    "population":843393,
+    "rank":12,
+    "state":"Indiana"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -81.65565099999999,30.3321838 ]
+    },
+    "properties": {
+    "city":"Jacksonville",
+    "growth_from_2000_to_2013":"14.3%",
+    "population":842583,
+    "rank":13,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.4194155,37.7749295 ]
+    },
+    "properties": {
+    "city":"San Francisco",
+    "growth_from_2000_to_2013":"7.7%",
+    "population":837442,
+    "rank":14,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -82.99879419999999,39.9611755 ]
+    },
+    "properties": {
+    "city":"Columbus",
+    "growth_from_2000_to_2013":"14.8%",
+    "population":822553,
+    "rank":15,
+    "state":"Ohio"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -80.8431267,35.2270869 ]
+    },
+    "properties": {
+    "city":"Charlotte",
+    "growth_from_2000_to_2013":"39.1%",
+    "population":792862,
+    "rank":16,
+    "state":"North Carolina"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -97.3307658,32.7554883 ]
+    },
+    "properties": {
+    "city":"Fort Worth",
+    "growth_from_2000_to_2013":"45.1%",
+    "population":792727,
+    "rank":17,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -83.0457538,42.331427 ]
+    },
+    "properties": {
+    "city":"Detroit",
+    "growth_from_2000_to_2013":"-27.1%",
+    "population":688701,
+    "rank":18,
+    "state":"Michigan"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -106.4424559,31.7775757 ]
+    },
+    "properties": {
+    "city":"El Paso",
+    "growth_from_2000_to_2013":"19.4%",
+    "population":674433,
+    "rank":19,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -90.0489801,35.1495343 ]
+    },
+    "properties": {
+    "city":"Memphis",
+    "growth_from_2000_to_2013":"-5.3%",
+    "population":653450,
+    "rank":20,
+    "state":"Tennessee"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.3320708,47.6062095 ]
+    },
+    "properties": {
+    "city":"Seattle",
+    "growth_from_2000_to_2013":"15.6%",
+    "population":652405,
+    "rank":21,
+    "state":"Washington"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -104.990251,39.7392358 ]
+    },
+    "properties": {
+    "city":"Denver",
+    "growth_from_2000_to_2013":"16.7%",
+    "population":649495,
+    "rank":22,
+    "state":"Colorado"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -77.0368707,38.9071923 ]
+    },
+    "properties": {
+    "city":"Washington",
+    "growth_from_2000_to_2013":"13.0%",
+    "population":646449,
+    "rank":23,
+    "state":"District of Columbia"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -71.0588801,42.3600825 ]
+    },
+    "properties": {
+    "city":"Boston",
+    "growth_from_2000_to_2013":"9.4%",
+    "population":645966,
+    "rank":24,
+    "state":"Massachusetts"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -86.7816016,36.1626638 ]
+    },
+    "properties": {
+    "city":"Nashville-Davidson",
+    "growth_from_2000_to_2013":"16.2%",
+    "population":634464,
+    "rank":25,
+    "state":"Tennessee"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -76.6121893,39.2903848 ]
+    },
+    "properties": {
+    "city":"Baltimore",
+    "growth_from_2000_to_2013":"-4.0%",
+    "population":622104,
+    "rank":26,
+    "state":"Maryland"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -97.5164276,35.4675602 ]
+    },
+    "properties": {
+    "city":"Oklahoma City",
+    "growth_from_2000_to_2013":"20.2%",
+    "population":610613,
+    "rank":27,
+    "state":"Oklahoma"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -85.7584557,38.2526647 ]
+    },
+    "properties": {
+    "city":"Louisville/Jefferson County",
+    "growth_from_2000_to_2013":"10.0%",
+    "population":609893,
+    "rank":28,
+    "state":"Kentucky"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.6764816,45.5230622 ]
+    },
+    "properties": {
+    "city":"Portland",
+    "growth_from_2000_to_2013":"15.0%",
+    "population":609456,
+    "rank":29,
+    "state":"Oregon"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -115.1398296,36.1699412 ]
+    },
+    "properties": {
+    "city":"Las Vegas",
+    "growth_from_2000_to_2013":"24.5%",
+    "population":603488,
+    "rank":30,
+    "state":"Nevada"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -87.9064736,43.0389025 ]
+    },
+    "properties": {
+    "city":"Milwaukee",
+    "growth_from_2000_to_2013":"0.3%",
+    "population":599164,
+    "rank":31,
+    "state":"Wisconsin"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -106.6055534,35.0853336 ]
+    },
+    "properties": {
+    "city":"Albuquerque",
+    "growth_from_2000_to_2013":"23.5%",
+    "population":556495,
+    "rank":32,
+    "state":"New Mexico"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -110.926479,32.2217429 ]
+    },
+    "properties": {
+    "city":"Tucson",
+    "growth_from_2000_to_2013":"7.5%",
+    "population":526116,
+    "rank":33,
+    "state":"Arizona"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -119.7725868,36.7468422 ]
+    },
+    "properties": {
+    "city":"Fresno",
+    "growth_from_2000_to_2013":"18.3%",
+    "population":509924,
+    "rank":34,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -121.4943996,38.5815719 ]
+    },
+    "properties": {
+    "city":"Sacramento",
+    "growth_from_2000_to_2013":"17.2%",
+    "population":479686,
+    "rank":35,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -118.1937395,33.7700504 ]
+    },
+    "properties": {
+    "city":"Long Beach",
+    "growth_from_2000_to_2013":"1.5%",
+    "population":469428,
+    "rank":36,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -94.5785667,39.0997265 ]
+    },
+    "properties": {
+    "city":"Kansas City",
+    "growth_from_2000_to_2013":"5.5%",
+    "population":467007,
+    "rank":37,
+    "state":"Missouri"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -111.8314724,33.4151843 ]
+    },
+    "properties": {
+    "city":"Mesa",
+    "growth_from_2000_to_2013":"13.5%",
+    "population":457587,
+    "rank":38,
+    "state":"Arizona"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -75.97798499999999,36.8529263 ]
+    },
+    "properties": {
+    "city":"Virginia Beach",
+    "growth_from_2000_to_2013":"5.1%",
+    "population":448479,
+    "rank":39,
+    "state":"Virginia"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -84.3879824,33.7489954 ]
+    },
+    "properties": {
+    "city":"Atlanta",
+    "growth_from_2000_to_2013":"6.2%",
+    "population":447841,
+    "rank":40,
+    "state":"Georgia"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -104.8213634,38.8338816 ]
+    },
+    "properties": {
+    "city":"Colorado Springs",
+    "growth_from_2000_to_2013":"21.4%",
+    "population":439886,
+    "rank":41,
+    "state":"Colorado"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -95.99798829999999,41.2523634 ]
+    },
+    "properties": {
+    "city":"Omaha",
+    "growth_from_2000_to_2013":"5.9%",
+    "population":434353,
+    "rank":42,
+    "state":"Nebraska"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -78.6381787,35.7795897 ]
+    },
+    "properties": {
+    "city":"Raleigh",
+    "growth_from_2000_to_2013":"48.7%",
+    "population":431746,
+    "rank":43,
+    "state":"North Carolina"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -80.1917902,25.7616798 ]
+    },
+    "properties": {
+    "city":"Miami",
+    "growth_from_2000_to_2013":"14.9%",
+    "population":417650,
+    "rank":44,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.2711137,37.8043637 ]
+    },
+    "properties": {
+    "city":"Oakland",
+    "growth_from_2000_to_2013":"1.3%",
+    "population":406253,
+    "rank":45,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -93.2650108,44.977753 ]
+    },
+    "properties": {
+    "city":"Minneapolis",
+    "growth_from_2000_to_2013":"4.5%",
+    "population":400070,
+    "rank":46,
+    "state":"Minnesota"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -95.99277500000001,36.1539816 ]
+    },
+    "properties": {
+    "city":"Tulsa",
+    "growth_from_2000_to_2013":"1.3%",
+    "population":398121,
+    "rank":47,
+    "state":"Oklahoma"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -81.6943605,41.49932 ]
+    },
+    "properties": {
+    "city":"Cleveland",
+    "growth_from_2000_to_2013":"-18.1%",
+    "population":390113,
+    "rank":48,
+    "state":"Ohio"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -97.336111,37.688889 ]
+    },
+    "properties": {
+    "city":"Wichita",
+    "growth_from_2000_to_2013":"9.7%",
+    "population":386552,
+    "rank":49,
+    "state":"Kansas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -97.10806559999999,32.735687 ]
+    },
+    "properties": {
+    "city":"Arlington",
+    "growth_from_2000_to_2013":"13.3%",
+    "population":379577,
+    "rank":50,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -90.0715323,29.95106579999999 ]
+    },
+    "properties": {
+    "city":"New Orleans",
+    "growth_from_2000_to_2013":"-21.6%",
+    "population":378715,
+    "rank":51,
+    "state":"Louisiana"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -119.0187125,35.3732921 ]
+    },
+    "properties": {
+    "city":"Bakersfield",
+    "growth_from_2000_to_2013":"48.4%",
+    "population":363630,
+    "rank":52,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -82.4571776,27.950575 ]
+    },
+    "properties": {
+    "city":"Tampa",
+    "growth_from_2000_to_2013":"16.0%",
+    "population":352957,
+    "rank":53,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -157.8583333,21.3069444 ]
+    },
+    "properties": {
+    "city":"Honolulu",
+    "growth_from_2000_to_2013":"-6.2%",
+    "population":347884,
+    "rank":54,
+    "state":"Hawaii"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -104.8319195,39.7294319 ]
+    },
+    "properties": {
+    "city":"Aurora",
+    "growth_from_2000_to_2013":"24.4%",
+    "population":345803,
+    "rank":55,
+    "state":"Colorado"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.9145036,33.8352932 ]
+    },
+    "properties": {
+    "city":"Anaheim",
+    "growth_from_2000_to_2013":"4.7%",
+    "population":345012,
+    "rank":56,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.8678338,33.7455731 ]
+    },
+    "properties": {
+    "city":"Santa Ana",
+    "growth_from_2000_to_2013":"-1.2%",
+    "population":334227,
+    "rank":57,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -90.19940419999999,38.6270025 ]
+    },
+    "properties": {
+    "city":"St. Louis",
+    "growth_from_2000_to_2013":"-8.2%",
+    "population":318416,
+    "rank":58,
+    "state":"Missouri"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.3961564,33.9533487 ]
+    },
+    "properties": {
+    "city":"Riverside",
+    "growth_from_2000_to_2013":"22.5%",
+    "population":316619,
+    "rank":59,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -97.39638099999999,27.8005828 ]
+    },
+    "properties": {
+    "city":"Corpus Christi",
+    "growth_from_2000_to_2013":"14.1%",
+    "population":316381,
+    "rank":60,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -84.5037164,38.0405837 ]
+    },
+    "properties": {
+    "city":"Lexington-Fayette",
+    "growth_from_2000_to_2013":"18.0%",
+    "population":308428,
+    "rank":61,
+    "state":"Kentucky"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.9958864,40.44062479999999 ]
+    },
+    "properties": {
+    "city":"Pittsburgh",
+    "growth_from_2000_to_2013":"-8.3%",
+    "population":305841,
+    "rank":62,
+    "state":"Pennsylvania"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -149.9002778,61.2180556 ]
+    },
+    "properties": {
+    "city":"Anchorage",
+    "growth_from_2000_to_2013":"15.4%",
+    "population":300950,
+    "rank":63,
+    "state":"Alaska"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -121.2907796,37.9577016 ]
+    },
+    "properties": {
+    "city":"Stockton",
+    "growth_from_2000_to_2013":"21.8%",
+    "population":298118,
+    "rank":64,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -84.5120196,39.1031182 ]
+    },
+    "properties": {
+    "city":"Cincinnati",
+    "growth_from_2000_to_2013":"-10.1%",
+    "population":297517,
+    "rank":65,
+    "state":"Ohio"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -93.0899578,44.9537029 ]
+    },
+    "properties": {
+    "city":"St. Paul",
+    "growth_from_2000_to_2013":"2.8%",
+    "population":294873,
+    "rank":66,
+    "state":"Minnesota"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -83.55521200000001,41.6639383 ]
+    },
+    "properties": {
+    "city":"Toledo",
+    "growth_from_2000_to_2013":"-10.0%",
+    "population":282313,
+    "rank":67,
+    "state":"Ohio"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.7919754,36.0726354 ]
+    },
+    "properties": {
+    "city":"Greensboro",
+    "growth_from_2000_to_2013":"22.3%",
+    "population":279639,
+    "rank":68,
+    "state":"North Carolina"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -74.1723667,40.735657 ]
+    },
+    "properties": {
+    "city":"Newark",
+    "growth_from_2000_to_2013":"2.1%",
+    "population":278427,
+    "rank":69,
+    "state":"New Jersey"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -96.6988856,33.0198431 ]
+    },
+    "properties": {
+    "city":"Plano",
+    "growth_from_2000_to_2013":"22.4%",
+    "population":274409,
+    "rank":70,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -114.9817213,36.0395247 ]
+    },
+    "properties": {
+    "city":"Henderson",
+    "growth_from_2000_to_2013":"51.0%",
+    "population":270811,
+    "rank":71,
+    "state":"Nevada"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -96.6851982,40.8257625 ]
+    },
+    "properties": {
+    "city":"Lincoln",
+    "growth_from_2000_to_2013":"18.0%",
+    "population":268738,
+    "rank":72,
+    "state":"Nebraska"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -78.8783689,42.88644679999999 ]
+    },
+    "properties": {
+    "city":"Buffalo",
+    "growth_from_2000_to_2013":"-11.3%",
+    "population":258959,
+    "rank":73,
+    "state":"New York"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -74.0776417,40.72815749999999 ]
+    },
+    "properties": {
+    "city":"Jersey City",
+    "growth_from_2000_to_2013":"7.2%",
+    "population":257342,
+    "rank":74,
+    "state":"New Jersey"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.0841955,32.6400541 ]
+    },
+    "properties": {
+    "city":"Chula Vista",
+    "growth_from_2000_to_2013":"46.2%",
+    "population":256780,
+    "rank":75,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -85.1393513,41.079273 ]
+    },
+    "properties": {
+    "city":"Fort Wayne",
+    "growth_from_2000_to_2013":"1.0%",
+    "population":256496,
+    "rank":76,
+    "state":"Indiana"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -81.3792365,28.5383355 ]
+    },
+    "properties": {
+    "city":"Orlando",
+    "growth_from_2000_to_2013":"31.2%",
+    "population":255483,
+    "rank":77,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -82.64,27.773056 ]
+    },
+    "properties": {
+    "city":"St. Petersburg",
+    "growth_from_2000_to_2013":"0.3%",
+    "population":249688,
+    "rank":78,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -111.8412502,33.3061605 ]
+    },
+    "properties": {
+    "city":"Chandler",
+    "growth_from_2000_to_2013":"38.7%",
+    "population":249146,
+    "rank":79,
+    "state":"Arizona"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -99.48032409999999,27.5305671 ]
+    },
+    "properties": {
+    "city":"Laredo",
+    "growth_from_2000_to_2013":"38.2%",
+    "population":248142,
+    "rank":80,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -76.28587259999999,36.8507689 ]
+    },
+    "properties": {
+    "city":"Norfolk",
+    "growth_from_2000_to_2013":"5.0%",
+    "population":246139,
+    "rank":81,
+    "state":"Virginia"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -78.898619,35.9940329 ]
+    },
+    "properties": {
+    "city":"Durham",
+    "growth_from_2000_to_2013":"29.9%",
+    "population":245475,
+    "rank":82,
+    "state":"North Carolina"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -89.4012302,43.0730517 ]
+    },
+    "properties": {
+    "city":"Madison",
+    "growth_from_2000_to_2013":"15.8%",
+    "population":243344,
+    "rank":83,
+    "state":"Wisconsin"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -101.8551665,33.5778631 ]
+    },
+    "properties": {
+    "city":"Lubbock",
+    "growth_from_2000_to_2013":"19.6%",
+    "population":239538,
+    "rank":84,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.7946942,33.6839473 ]
+    },
+    "properties": {
+    "city":"Irvine",
+    "growth_from_2000_to_2013":"61.3%",
+    "population":236716,
+    "rank":85,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -80.244216,36.09985959999999 ]
+    },
+    "properties": {
+    "city":"Winston-Salem",
+    "growth_from_2000_to_2013":"16.9%",
+    "population":236441,
+    "rank":86,
+    "state":"North Carolina"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -112.1859866,33.5386523 ]
+    },
+    "properties": {
+    "city":"Glendale",
+    "growth_from_2000_to_2013":"5.7%",
+    "population":234632,
+    "rank":87,
+    "state":"Arizona"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -96.63888329999999,32.912624 ]
+    },
+    "properties": {
+    "city":"Garland",
+    "growth_from_2000_to_2013":"8.5%",
+    "population":234566,
+    "rank":88,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -80.2781057,25.8575963 ]
+    },
+    "properties": {
+    "city":"Hialeah",
+    "growth_from_2000_to_2013":"3.2%",
+    "population":233394,
+    "rank":89,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -119.8138027,39.5296329 ]
+    },
+    "properties": {
+    "city":"Reno",
+    "growth_from_2000_to_2013":"26.8%",
+    "population":233294,
+    "rank":90,
+    "state":"Nevada"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -76.2874927,36.7682088 ]
+    },
+    "properties": {
+    "city":"Chesapeake",
+    "growth_from_2000_to_2013":"15.1%",
+    "population":230571,
+    "rank":91,
+    "state":"Virginia"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -111.789027,33.3528264 ]
+    },
+    "properties": {
+    "city":"Gilbert",
+    "growth_from_2000_to_2013":"96.0%",
+    "population":229972,
+    "rank":92,
+    "state":"Arizona"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -91.1403196,30.4582829 ]
+    },
+    "properties": {
+    "city":"Baton Rouge",
+    "growth_from_2000_to_2013":"0.4%",
+    "population":229426,
+    "rank":93,
+    "state":"Louisiana"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -96.9488945,32.8140177 ]
+    },
+    "properties": {
+    "city":"Irving",
+    "growth_from_2000_to_2013":"19.1%",
+    "population":228653,
+    "rank":94,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -111.9260519,33.4941704 ]
+    },
+    "properties": {
+    "city":"Scottsdale",
+    "growth_from_2000_to_2013":"11.0%",
+    "population":226918,
+    "rank":95,
+    "state":"Arizona"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -115.1175013,36.1988592 ]
+    },
+    "properties": {
+    "city":"North Las Vegas",
+    "growth_from_2000_to_2013":"92.2%",
+    "population":226877,
+    "rank":96,
+    "state":"Nevada"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -121.9885719,37.5482697 ]
+    },
+    "properties": {
+    "city":"Fremont",
+    "growth_from_2000_to_2013":"10.0%",
+    "population":224922,
+    "rank":97,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -116.2146068,43.6187102 ]
+    },
+    "properties": {
+    "city":"Boise City",
+    "growth_from_2000_to_2013":"9.5%",
+    "population":214237,
+    "rank":98,
+    "state":"Idaho"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -77.4360481,37.5407246 ]
+    },
+    "properties": {
+    "city":"Richmond",
+    "growth_from_2000_to_2013":"8.2%",
+    "population":214114,
+    "rank":99,
+    "state":"Virginia"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.2897652,34.1083449 ]
+    },
+    "properties": {
+    "city":"San Bernardino",
+    "growth_from_2000_to_2013":"13.0%",
+    "population":213708,
+    "rank":100,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -86.80248999999999,33.5206608 ]
+    },
+    "properties": {
+    "city":"Birmingham",
+    "growth_from_2000_to_2013":"-12.3%",
+    "population":212113,
+    "rank":101,
+    "state":"Alabama"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.4260466,47.6587802 ]
+    },
+    "properties": {
+    "city":"Spokane",
+    "growth_from_2000_to_2013":"7.0%",
+    "population":210721,
+    "rank":102,
+    "state":"Washington"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -77.6109219,43.16103 ]
+    },
+    "properties": {
+    "city":"Rochester",
+    "growth_from_2000_to_2013":"-4.1%",
+    "population":210358,
+    "rank":103,
+    "state":"New York"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -93.6091064,41.6005448 ]
+    },
+    "properties": {
+    "city":"Des Moines",
+    "growth_from_2000_to_2013":"3.9%",
+    "population":207510,
+    "rank":104,
+    "state":"Iowa"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -120.9968782,37.63909719999999 ]
+    },
+    "properties": {
+    "city":"Modesto",
+    "growth_from_2000_to_2013":"7.7%",
+    "population":204933,
+    "rank":105,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -78.87835849999999,35.0526641 ]
+    },
+    "properties": {
+    "city":"Fayetteville",
+    "growth_from_2000_to_2013":"2.4%",
+    "population":204408,
+    "rank":106,
+    "state":"North Carolina"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.4442906,47.2528768 ]
+    },
+    "properties": {
+    "city":"Tacoma",
+    "growth_from_2000_to_2013":"4.9%",
+    "population":203446,
+    "rank":107,
+    "state":"Washington"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -119.1770516,34.1975048 ]
+    },
+    "properties": {
+    "city":"Oxnard",
+    "growth_from_2000_to_2013":"18.2%",
+    "population":203007,
+    "rank":108,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.435048,34.0922335 ]
+    },
+    "properties": {
+    "city":"Fontana",
+    "growth_from_2000_to_2013":"38.3%",
+    "population":203003,
+    "rank":109,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -84.9877094,32.4609764 ]
+    },
+    "properties": {
+    "city":"Columbus",
+    "growth_from_2000_to_2013":"8.7%",
+    "population":202824,
+    "rank":110,
+    "state":"Georgia"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -86.2999689,32.3668052 ]
+    },
+    "properties": {
+    "city":"Montgomery",
+    "growth_from_2000_to_2013":"-0.1%",
+    "population":201332,
+    "rank":111,
+    "state":"Alabama"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.2296717,33.9424658 ]
+    },
+    "properties": {
+    "city":"Moreno Valley",
+    "growth_from_2000_to_2013":"40.4%",
+    "population":201175,
+    "rank":112,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -93.7501789,32.5251516 ]
+    },
+    "properties": {
+    "city":"Shreveport",
+    "growth_from_2000_to_2013":"-0.1%",
+    "population":200327,
+    "rank":113,
+    "state":"Louisiana"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -88.32007150000001,41.7605849 ]
+    },
+    "properties": {
+    "city":"Aurora",
+    "growth_from_2000_to_2013":"38.4%",
+    "population":199963,
+    "rank":114,
+    "state":"Illinois"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -73.89874689999999,40.9312099 ]
+    },
+    "properties": {
+    "city":"Yonkers",
+    "growth_from_2000_to_2013":"1.8%",
+    "population":199766,
+    "rank":115,
+    "state":"New York"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -81.51900529999999,41.0814447 ]
+    },
+    "properties": {
+    "city":"Akron",
+    "growth_from_2000_to_2013":"-8.6%",
+    "population":198100,
+    "rank":116,
+    "state":"Ohio"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.9992265,33.660297 ]
+    },
+    "properties": {
+    "city":"Huntington Beach",
+    "growth_from_2000_to_2013":"3.9%",
+    "population":197575,
+    "rank":117,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -92.28959479999999,34.7464809 ]
+    },
+    "properties": {
+    "city":"Little Rock",
+    "growth_from_2000_to_2013":"7.6%",
+    "population":197357,
+    "rank":118,
+    "state":"Arkansas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -82.0105148,33.4734978 ]
+    },
+    "properties": {
+    "city":"Augusta-Richmond County",
+    "growth_from_2000_to_2013":"1.1%",
+    "population":197350,
+    "rank":119,
+    "state":"Georgia"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -101.8312969,35.2219971 ]
+    },
+    "properties": {
+    "city":"Amarillo",
+    "growth_from_2000_to_2013":"12.8%",
+    "population":196429,
+    "rank":120,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -118.255075,34.1425078 ]
+    },
+    "properties": {
+    "city":"Glendale",
+    "growth_from_2000_to_2013":"0.3%",
+    "population":196021,
+    "rank":121,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -88.0398912,30.6953657 ]
+    },
+    "properties": {
+    "city":"Mobile",
+    "growth_from_2000_to_2013":"-1.9%",
+    "population":194899,
+    "rank":122,
+    "state":"Alabama"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -85.6680863,42.9633599 ]
+    },
+    "properties": {
+    "city":"Grand Rapids",
+    "growth_from_2000_to_2013":"-2.8%",
+    "population":192294,
+    "rank":123,
+    "state":"Michigan"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -111.8910474,40.7607793 ]
+    },
+    "properties": {
+    "city":"Salt Lake City",
+    "growth_from_2000_to_2013":"5.1%",
+    "population":191180,
+    "rank":124,
+    "state":"Utah"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -84.28073289999999,30.4382559 ]
+    },
+    "properties": {
+    "city":"Tallahassee",
+    "growth_from_2000_to_2013":"21.8%",
+    "population":186411,
+    "rank":125,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -86.5861037,34.7303688 ]
+    },
+    "properties": {
+    "city":"Huntsville",
+    "growth_from_2000_to_2013":"16.3%",
+    "population":186254,
+    "rank":126,
+    "state":"Alabama"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -96.99778459999999,32.7459645 ]
+    },
+    "properties": {
+    "city":"Grand Prairie",
+    "growth_from_2000_to_2013":"43.1%",
+    "population":183372,
+    "rank":127,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -83.9207392,35.9606384 ]
+    },
+    "properties": {
+    "city":"Knoxville",
+    "growth_from_2000_to_2013":"3.9%",
+    "population":183270,
+    "rank":128,
+    "state":"Tennessee"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -71.8022934,42.2625932 ]
+    },
+    "properties": {
+    "city":"Worcester",
+    "growth_from_2000_to_2013":"5.8%",
+    "population":182544,
+    "rank":129,
+    "state":"Massachusetts"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -76.4730122,37.0870821 ]
+    },
+    "properties": {
+    "city":"Newport News",
+    "growth_from_2000_to_2013":"0.9%",
+    "population":182020,
+    "rank":130,
+    "state":"Virginia"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -97.4974838,25.9017472 ]
+    },
+    "properties": {
+    "city":"Brownsville",
+    "growth_from_2000_to_2013":"26.8%",
+    "population":181860,
+    "rank":131,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -94.6707917,38.9822282 ]
+    },
+    "properties": {
+    "city":"Overland Park",
+    "growth_from_2000_to_2013":"19.4%",
+    "population":181260,
+    "rank":132,
+    "state":"Kansas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -118.542586,34.3916641 ]
+    },
+    "properties": {
+    "city":"Santa Clarita",
+    "growth_from_2000_to_2013":"15.3%",
+    "population":179590,
+    "rank":133,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -71.4128343,41.8239891 ]
+    },
+    "properties": {
+    "city":"Providence",
+    "growth_from_2000_to_2013":"2.3%",
+    "population":177994,
+    "rank":134,
+    "state":"Rhode Island"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.9414477,33.7739053 ]
+    },
+    "properties": {
+    "city":"Garden Grove",
+    "growth_from_2000_to_2013":"5.8%",
+    "population":175140,
+    "rank":135,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -85.3096801,35.0456297 ]
+    },
+    "properties": {
+    "city":"Chattanooga",
+    "growth_from_2000_to_2013":"10.5%",
+    "population":173366,
+    "rank":136,
+    "state":"Tennessee"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.3794834,33.1958696 ]
+    },
+    "properties": {
+    "city":"Oceanside",
+    "growth_from_2000_to_2013":"6.6%",
+    "population":172794,
+    "rank":137,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -90.1848103,32.2987573 ]
+    },
+    "properties": {
+    "city":"Jackson",
+    "growth_from_2000_to_2013":"-6.8%",
+    "population":172638,
+    "rank":138,
+    "state":"Mississippi"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -80.13731740000001,26.1224386 ]
+    },
+    "properties": {
+    "city":"Fort Lauderdale",
+    "growth_from_2000_to_2013":"0.7%",
+    "population":172389,
+    "rank":139,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.7140548,38.440429 ]
+    },
+    "properties": {
+    "city":"Santa Rosa",
+    "growth_from_2000_to_2013":"15.2%",
+    "population":171990,
+    "rank":140,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.5931084,34.10639889999999 ]
+    },
+    "properties": {
+    "city":"Rancho Cucamonga",
+    "growth_from_2000_to_2013":"32.7%",
+    "population":171386,
+    "rank":141,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -80.3582261,27.2730492 ]
+    },
+    "properties": {
+    "city":"Port St. Lucie",
+    "growth_from_2000_to_2013":"91.7%",
+    "population":171016,
+    "rank":142,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -111.9400054,33.4255104 ]
+    },
+    "properties": {
+    "city":"Tempe",
+    "growth_from_2000_to_2013":"5.8%",
+    "population":168228,
+    "rank":143,
+    "state":"Arizona"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.6508876,34.0633443 ]
+    },
+    "properties": {
+    "city":"Ontario",
+    "growth_from_2000_to_2013":"5.5%",
+    "population":167500,
+    "rank":144,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.6614861,45.6387281 ]
+    },
+    "properties": {
+    "city":"Vancouver",
+    "growth_from_2000_to_2013":"14.2%",
+    "population":167405,
+    "rank":145,
+    "state":"Washington"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -81.9495331,26.5628537 ]
+    },
+    "properties": {
+    "city":"Cape Coral",
+    "growth_from_2000_to_2013":"60.4%",
+    "population":165831,
+    "rank":146,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -96.73110340000001,43.5445959 ]
+    },
+    "properties": {
+    "city":"Sioux Falls",
+    "growth_from_2000_to_2013":"31.1%",
+    "population":164676,
+    "rank":147,
+    "state":"South Dakota"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -93.29229889999999,37.2089572 ]
+    },
+    "properties": {
+    "city":"Springfield",
+    "growth_from_2000_to_2013":"7.8%",
+    "population":164122,
+    "rank":148,
+    "state":"Missouri"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -112.2373779,33.5805955 ]
+    },
+    "properties": {
+    "city":"Peoria",
+    "growth_from_2000_to_2013":"46.5%",
+    "population":162592,
+    "rank":149,
+    "state":"Arizona"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -80.2962555,26.007765 ]
+    },
+    "properties": {
+    "city":"Pembroke Pines",
+    "growth_from_2000_to_2013":"17.4%",
+    "population":162329,
+    "rank":150,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -121.3716178,38.4087993 ]
+    },
+    "properties": {
+    "city":"Elk Grove",
+    "growth_from_2000_to_2013":"97.1%",
+    "population":161007,
+    "rank":151,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -123.0350963,44.9428975 ]
+    },
+    "properties": {
+    "city":"Salem",
+    "growth_from_2000_to_2013":"16.4%",
+    "population":160614,
+    "rank":152,
+    "state":"Oregon"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -118.1541632,34.6867846 ]
+    },
+    "properties": {
+    "city":"Lancaster",
+    "growth_from_2000_to_2013":"33.8%",
+    "population":159523,
+    "rank":153,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.5664384,33.8752935 ]
+    },
+    "properties": {
+    "city":"Corona",
+    "growth_from_2000_to_2013":"23.6%",
+    "population":159503,
+    "rank":154,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -123.0867536,44.0520691 ]
+    },
+    "properties": {
+    "city":"Eugene",
+    "growth_from_2000_to_2013":"14.4%",
+    "population":159190,
+    "rank":155,
+    "state":"Oregon"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -118.1164613,34.5794343 ]
+    },
+    "properties": {
+    "city":"Palmdale",
+    "growth_from_2000_to_2013":"33.7%",
+    "population":157161,
+    "rank":156,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -121.6555013,36.6777372 ]
+    },
+    "properties": {
+    "city":"Salinas",
+    "growth_from_2000_to_2013":"8.4%",
+    "population":155662,
+    "rank":157,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -72.589811,42.1014831 ]
+    },
+    "properties": {
+    "city":"Springfield",
+    "growth_from_2000_to_2013":"1.1%",
+    "population":153703,
+    "rank":158,
+    "state":"Massachusetts"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -95.2091006,29.6910625 ]
+    },
+    "properties": {
+    "city":"Pasadena",
+    "growth_from_2000_to_2013":"7.5%",
+    "population":152735,
+    "rank":159,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -105.084423,40.5852602 ]
+    },
+    "properties": {
+    "city":"Fort Collins",
+    "growth_from_2000_to_2013":"26.6%",
+    "population":152061,
+    "rank":160,
+    "state":"Colorado"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.0807964,37.6688205 ]
+    },
+    "properties": {
+    "city":"Hayward",
+    "growth_from_2000_to_2013":"7.5%",
+    "population":151574,
+    "rank":161,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.7499909,34.055103 ]
+    },
+    "properties": {
+    "city":"Pomona",
+    "growth_from_2000_to_2013":"2.1%",
+    "population":151348,
+    "rank":162,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -78.7811169,35.79154 ]
+    },
+    "properties": {
+    "city":"Cary",
+    "growth_from_2000_to_2013":"55.1%",
+    "population":151088,
+    "rank":163,
+    "state":"North Carolina"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -89.0939952,42.2711311 ]
+    },
+    "properties": {
+    "city":"Rockford",
+    "growth_from_2000_to_2013":"-1.0%",
+    "population":150251,
+    "rank":164,
+    "state":"Illinois"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -77.0469214,38.8048355 ]
+    },
+    "properties": {
+    "city":"Alexandria",
+    "growth_from_2000_to_2013":"15.0%",
+    "population":148892,
+    "rank":165,
+    "state":"Virginia"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.086421,33.1192068 ]
+    },
+    "properties": {
+    "city":"Escondido",
+    "growth_from_2000_to_2013":"10.7%",
+    "population":148738,
+    "rank":166,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -96.6397822,33.1972465 ]
+    },
+    "properties": {
+    "city":"McKinney",
+    "growth_from_2000_to_2013":"165.3%",
+    "population":148559,
+    "rank":167,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -94.6274636,39.114053 ]
+    },
+    "properties": {
+    "city":"Kansas City",
+    "growth_from_2000_to_2013":"1.1%",
+    "population":148483,
+    "rank":168,
+    "state":"Kansas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -88.0817251,41.525031 ]
+    },
+    "properties": {
+    "city":"Joliet",
+    "growth_from_2000_to_2013":"36.5%",
+    "population":147806,
+    "rank":169,
+    "state":"Illinois"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.0363496,37.36883 ]
+    },
+    "properties": {
+    "city":"Sunnyvale",
+    "growth_from_2000_to_2013":"11.9%",
+    "population":147559,
+    "rank":170,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -118.3406288,33.8358492 ]
+    },
+    "properties": {
+    "city":"Torrance",
+    "growth_from_2000_to_2013":"6.6%",
+    "population":147478,
+    "rank":171,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -73.19517669999999,41.1865478 ]
+    },
+    "properties": {
+    "city":"Bridgeport",
+    "growth_from_2000_to_2013":"5.4%",
+    "population":147216,
+    "rank":172,
+    "state":"Connecticut"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -105.0813734,39.7047095 ]
+    },
+    "properties": {
+    "city":"Lakewood",
+    "growth_from_2000_to_2013":"1.9%",
+    "population":147214,
+    "rank":173,
+    "state":"Colorado"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -80.1494901,26.0112014 ]
+    },
+    "properties": {
+    "city":"Hollywood",
+    "growth_from_2000_to_2013":"4.8%",
+    "population":146526,
+    "rank":174,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -74.17181099999999,40.9167654 ]
+    },
+    "properties": {
+    "city":"Paterson",
+    "growth_from_2000_to_2013":"-2.2%",
+    "population":145948,
+    "rank":175,
+    "state":"New Jersey"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -88.1535352,41.7508391 ]
+    },
+    "properties": {
+    "city":"Naperville",
+    "growth_from_2000_to_2013":"12.0%",
+    "population":144864,
+    "rank":176,
+    "state":"Illinois"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -76.14742439999999,43.0481221 ]
+    },
+    "properties": {
+    "city":"Syracuse",
+    "growth_from_2000_to_2013":"-0.9%",
+    "population":144669,
+    "rank":177,
+    "state":"New York"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -96.5991593,32.76679550000001 ]
+    },
+    "properties": {
+    "city":"Mesquite",
+    "growth_from_2000_to_2013":"14.7%",
+    "population":143484,
+    "rank":178,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -84.1916069,39.7589478 ]
+    },
+    "properties": {
+    "city":"Dayton",
+    "growth_from_2000_to_2013":"-13.5%",
+    "population":143355,
+    "rank":179,
+    "state":"Ohio"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -81.09983419999999,32.0835407 ]
+    },
+    "properties": {
+    "city":"Savannah",
+    "growth_from_2000_to_2013":"7.5%",
+    "population":142772,
+    "rank":180,
+    "state":"Georgia"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -87.3594528,36.5297706 ]
+    },
+    "properties": {
+    "city":"Clarksville",
+    "growth_from_2000_to_2013":"36.9%",
+    "population":142357,
+    "rank":181,
+    "state":"Tennessee"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.8531119,33.7877944 ]
+    },
+    "properties": {
+    "city":"Orange",
+    "growth_from_2000_to_2013":"7.7%",
+    "population":139969,
+    "rank":182,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -118.1445155,34.1477849 ]
+    },
+    "properties": {
+    "city":"Pasadena",
+    "growth_from_2000_to_2013":"3.8%",
+    "population":139731,
+    "rank":183,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.9242966,33.8703596 ]
+    },
+    "properties": {
+    "city":"Fullerton",
+    "growth_from_2000_to_2013":"9.8%",
+    "population":138981,
+    "rank":184,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -97.72779589999999,31.1171194 ]
+    },
+    "properties": {
+    "city":"Killeen",
+    "growth_from_2000_to_2013":"52.1%",
+    "population":137147,
+    "rank":185,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -96.82361159999999,33.1506744 ]
+    },
+    "properties": {
+    "city":"Frisco",
+    "growth_from_2000_to_2013":"287.7%",
+    "population":136791,
+    "rank":186,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -76.34522179999999,37.0298687 ]
+    },
+    "properties": {
+    "city":"Hampton",
+    "growth_from_2000_to_2013":"-6.6%",
+    "population":136699,
+    "rank":187,
+    "state":"Virginia"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -98.23001239999999,26.2034071 ]
+    },
+    "properties": {
+    "city":"McAllen",
+    "growth_from_2000_to_2013":"27.6%",
+    "population":136639,
+    "rank":188,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -83.01465259999999,42.5144566 ]
+    },
+    "properties": {
+    "city":"Warren",
+    "growth_from_2000_to_2013":"-2.3%",
+    "population":134873,
+    "rank":189,
+    "state":"Michigan"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.2006786,47.610377 ]
+    },
+    "properties": {
+    "city":"Bellevue",
+    "growth_from_2000_to_2013":"19.1%",
+    "population":133992,
+    "rank":190,
+    "state":"Washington"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -112.0010501,40.6916132 ]
+    },
+    "properties": {
+    "city":"West Valley City",
+    "growth_from_2000_to_2013":"22.2%",
+    "population":133579,
+    "rank":191,
+    "state":"Utah"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -81.0348144,34.0007104 ]
+    },
+    "properties": {
+    "city":"Columbia",
+    "growth_from_2000_to_2013":"11.7%",
+    "population":133358,
+    "rank":192,
+    "state":"South Carolina"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -94.81912849999999,38.8813958 ]
+    },
+    "properties": {
+    "city":"Olathe",
+    "growth_from_2000_to_2013":"40.4%",
+    "population":131885,
+    "rank":193,
+    "state":"Kansas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -83.0302033,42.5803122 ]
+    },
+    "properties": {
+    "city":"Sterling Heights",
+    "growth_from_2000_to_2013":"5.2%",
+    "population":131224,
+    "rank":194,
+    "state":"Michigan"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -72.9278835,41.308274 ]
+    },
+    "properties": {
+    "city":"New Haven",
+    "growth_from_2000_to_2013":"5.5%",
+    "population":130660,
+    "rank":195,
+    "state":"Connecticut"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -80.30356019999999,25.9860762 ]
+    },
+    "properties": {
+    "city":"Miramar",
+    "growth_from_2000_to_2013":"74.7%",
+    "population":130288,
+    "rank":196,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -97.1466695,31.549333 ]
+    },
+    "properties": {
+    "city":"Waco",
+    "growth_from_2000_to_2013":"12.5%",
+    "population":129030,
+    "rank":197,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -118.8375937,34.1705609 ]
+    },
+    "properties": {
+    "city":"Thousand Oaks",
+    "growth_from_2000_to_2013":"9.5%",
+    "population":128731,
+    "rank":198,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -91.6656232,41.9778795 ]
+    },
+    "properties": {
+    "city":"Cedar Rapids",
+    "growth_from_2000_to_2013":"5.4%",
+    "population":128429,
+    "rank":199,
+    "state":"Iowa"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.93105120000001,32.7764749 ]
+    },
+    "properties": {
+    "city":"Charleston",
+    "growth_from_2000_to_2013":"29.2%",
+    "population":127999,
+    "rank":200,
+    "state":"South Carolina"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -119.2920585,36.3302284 ]
+    },
+    "properties": {
+    "city":"Visalia",
+    "growth_from_2000_to_2013":"33.6%",
+    "population":127763,
+    "rank":201,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -95.68901849999999,39.0558235 ]
+    },
+    "properties": {
+    "city":"Topeka",
+    "growth_from_2000_to_2013":"3.4%",
+    "population":127679,
+    "rank":202,
+    "state":"Kansas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -74.2107006,40.6639916 ]
+    },
+    "properties": {
+    "city":"Elizabeth",
+    "growth_from_2000_to_2013":"5.5%",
+    "population":127558,
+    "rank":203,
+    "state":"New Jersey"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -82.32482619999999,29.6516344 ]
+    },
+    "properties": {
+    "city":"Gainesville",
+    "growth_from_2000_to_2013":"12.8%",
+    "population":127488,
+    "rank":204,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -104.9719243,39.8680412 ]
+    },
+    "properties": {
+    "city":"Thornton",
+    "growth_from_2000_to_2013":"52.9%",
+    "population":127359,
+    "rank":205,
+    "state":"Colorado"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -121.2880059,38.7521235 ]
+    },
+    "properties": {
+    "city":"Roseville",
+    "growth_from_2000_to_2013":"56.2%",
+    "population":127035,
+    "rank":206,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -96.8899636,32.9756415 ]
+    },
+    "properties": {
+    "city":"Carrollton",
+    "growth_from_2000_to_2013":"14.9%",
+    "population":126700,
+    "rank":207,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -80.2706044,26.271192 ]
+    },
+    "properties": {
+    "city":"Coral Springs",
+    "growth_from_2000_to_2013":"5.7%",
+    "population":126604,
+    "rank":208,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -73.5387341,41.0534302 ]
+    },
+    "properties": {
+    "city":"Stamford",
+    "growth_from_2000_to_2013":"7.6%",
+    "population":126456,
+    "rank":209,
+    "state":"Connecticut"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -118.781482,34.2694474 ]
+    },
+    "properties": {
+    "city":"Simi Valley",
+    "growth_from_2000_to_2013":"12.6%",
+    "population":126181,
+    "rank":210,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.0310733,37.9779776 ]
+    },
+    "properties": {
+    "city":"Concord",
+    "growth_from_2000_to_2013":"2.9%",
+    "population":125880,
+    "rank":211,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -72.6850932,41.76371109999999 ]
+    },
+    "properties": {
+    "city":"Hartford",
+    "growth_from_2000_to_2013":"0.6%",
+    "population":125017,
+    "rank":212,
+    "state":"Connecticut"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.2348431,47.3809335 ]
+    },
+    "properties": {
+    "city":"Kent",
+    "growth_from_2000_to_2013":"54.3%",
+    "population":124435,
+    "rank":213,
+    "state":"Washington"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -92.0198427,30.2240897 ]
+    },
+    "properties": {
+    "city":"Lafayette",
+    "growth_from_2000_to_2013":"11.0%",
+    "population":124276,
+    "rank":214,
+    "state":"Louisiana"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -102.0779146,31.9973456 ]
+    },
+    "properties": {
+    "city":"Midland",
+    "growth_from_2000_to_2013":"30.4%",
+    "population":123933,
+    "rank":215,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -112.3679279,33.6292337 ]
+    },
+    "properties": {
+    "city":"Surprise",
+    "growth_from_2000_to_2013":"281.9%",
+    "population":123546,
+    "rank":216,
+    "state":"Arizona"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -97.13306829999999,33.2148412 ]
+    },
+    "properties": {
+    "city":"Denton",
+    "growth_from_2000_to_2013":"47.1%",
+    "population":123099,
+    "rank":217,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.2927641,34.5362184 ]
+    },
+    "properties": {
+    "city":"Victorville",
+    "growth_from_2000_to_2013":"87.6%",
+    "population":121096,
+    "rank":218,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -87.5710898,37.9715592 ]
+    },
+    "properties": {
+    "city":"Evansville",
+    "growth_from_2000_to_2013":"-0.8%",
+    "population":120310,
+    "rank":219,
+    "state":"Indiana"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -121.9552356,37.3541079 ]
+    },
+    "properties": {
+    "city":"Santa Clara",
+    "growth_from_2000_to_2013":"17.4%",
+    "population":120245,
+    "rank":220,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -99.73314390000002,32.4487364 ]
+    },
+    "properties": {
+    "city":"Abilene",
+    "growth_from_2000_to_2013":"3.6%",
+    "population":120099,
+    "rank":221,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -83.357567,33.9519347 ]
+    },
+    "properties": {
+    "city":"Athens-Clarke County",
+    "growth_from_2000_to_2013":"19.0%",
+    "population":119980,
+    "rank":222,
+    "state":"Georgia"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.2566367,38.1040864 ]
+    },
+    "properties": {
+    "city":"Vallejo",
+    "growth_from_2000_to_2013":"1.2%",
+    "population":118837,
+    "rank":223,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -75.4901833,40.6084305 ]
+    },
+    "properties": {
+    "city":"Allentown",
+    "growth_from_2000_to_2013":"11.2%",
+    "population":118577,
+    "rank":224,
+    "state":"Pennsylvania"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -97.4394777,35.2225668 ]
+    },
+    "properties": {
+    "city":"Norman",
+    "growth_from_2000_to_2013":"22.0%",
+    "population":118197,
+    "rank":225,
+    "state":"Oklahoma"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -94.1265562,30.080174 ]
+    },
+    "properties": {
+    "city":"Beaumont",
+    "growth_from_2000_to_2013":"3.7%",
+    "population":117796,
+    "rank":226,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -94.41550679999999,39.0911161 ]
+    },
+    "properties": {
+    "city":"Independence",
+    "growth_from_2000_to_2013":"3.2%",
+    "population":117240,
+    "rank":227,
+    "state":"Missouri"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -86.39027,35.8456213 ]
+    },
+    "properties": {
+    "city":"Murfreesboro",
+    "growth_from_2000_to_2013":"65.1%",
+    "population":117044,
+    "rank":228,
+    "state":"Tennessee"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -83.7430378,42.2808256 ]
+    },
+    "properties": {
+    "city":"Ann Arbor",
+    "growth_from_2000_to_2013":"2.0%",
+    "population":117025,
+    "rank":229,
+    "state":"Michigan"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -89.6501481,39.78172130000001 ]
+    },
+    "properties": {
+    "city":"Springfield",
+    "growth_from_2000_to_2013":"4.2%",
+    "population":117006,
+    "rank":230,
+    "state":"Illinois"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.272747,37.8715926 ]
+    },
+    "properties": {
+    "city":"Berkeley",
+    "growth_from_2000_to_2013":"13.3%",
+    "population":116768,
+    "rank":231,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -89.5889864,40.6936488 ]
+    },
+    "properties": {
+    "city":"Peoria",
+    "growth_from_2000_to_2013":"3.0%",
+    "population":116513,
+    "rank":232,
+    "state":"Illinois"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -111.6585337,40.2338438 ]
+    },
+    "properties": {
+    "city":"Provo",
+    "growth_from_2000_to_2013":"10.0%",
+    "population":116288,
+    "rank":233,
+    "state":"Utah"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -118.0275667,34.0686206 ]
+    },
+    "properties": {
+    "city":"El Monte",
+    "growth_from_2000_to_2013":"-0.4%",
+    "population":115708,
+    "rank":234,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -92.3340724,38.9517053 ]
+    },
+    "properties": {
+    "city":"Columbia",
+    "growth_from_2000_to_2013":"34.0%",
+    "population":115276,
+    "rank":235,
+    "state":"Missouri"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -84.5555347,42.732535 ]
+    },
+    "properties": {
+    "city":"Lansing",
+    "growth_from_2000_to_2013":"-4.4%",
+    "population":113972,
+    "rank":236,
+    "state":"Michigan"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -96.7898034,46.8771863 ]
+    },
+    "properties": {
+    "city":"Fargo",
+    "growth_from_2000_to_2013":"24.9%",
+    "population":113658,
+    "rank":237,
+    "state":"North Dakota"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -118.1331593,33.9401088 ]
+    },
+    "properties": {
+    "city":"Downey",
+    "growth_from_2000_to_2013":"5.3%",
+    "population":113242,
+    "rank":238,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.9186689,33.6411316 ]
+    },
+    "properties": {
+    "city":"Costa Mesa",
+    "growth_from_2000_to_2013":"2.4%",
+    "population":112174,
+    "rank":239,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -77.9447102,34.2257255 ]
+    },
+    "properties": {
+    "city":"Wilmington",
+    "growth_from_2000_to_2013":"24.8%",
+    "population":112067,
+    "rank":240,
+    "state":"North Carolina"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -105.0874842,39.8027644 ]
+    },
+    "properties": {
+    "city":"Arvada",
+    "growth_from_2000_to_2013":"9.2%",
+    "population":111707,
+    "rank":241,
+    "state":"Colorado"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -118.3531311,33.9616801 ]
+    },
+    "properties": {
+    "city":"Inglewood",
+    "growth_from_2000_to_2013":"-1.0%",
+    "population":111542,
+    "rank":242,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -80.2456045,25.9420377 ]
+    },
+    "properties": {
+    "city":"Miami Gardens",
+    "growth_from_2000_to_2013":"10.5%",
+    "population":111378,
+    "rank":243,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.3505939,33.1580933 ]
+    },
+    "properties": {
+    "city":"Carlsbad",
+    "growth_from_2000_to_2013":"39.7%",
+    "population":110972,
+    "rank":244,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -105.0372046,39.8366528 ]
+    },
+    "properties": {
+    "city":"Westminster",
+    "growth_from_2000_to_2013":"9.4%",
+    "population":110945,
+    "rank":245,
+    "state":"Colorado"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -92.4801989,44.0121221 ]
+    },
+    "properties": {
+    "city":"Rochester",
+    "growth_from_2000_to_2013":"23.9%",
+    "population":110742,
+    "rank":246,
+    "state":"Minnesota"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -102.3676431,31.8456816 ]
+    },
+    "properties": {
+    "city":"Odessa",
+    "growth_from_2000_to_2013":"22.3%",
+    "population":110720,
+    "rank":247,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -71.4547891,42.9956397 ]
+    },
+    "properties": {
+    "city":"Manchester",
+    "growth_from_2000_to_2013":"2.9%",
+    "population":110378,
+    "rank":248,
+    "state":"New Hampshire"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -88.2825668,42.0354084 ]
+    },
+    "properties": {
+    "city":"Elgin",
+    "growth_from_2000_to_2013":"16.0%",
+    "population":110145,
+    "rank":249,
+    "state":"Illinois"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -111.9391031,40.6096698 ]
+    },
+    "properties": {
+    "city":"West Jordan",
+    "growth_from_2000_to_2013":"38.4%",
+    "population":110077,
+    "rank":250,
+    "state":"Utah"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -97.678896,30.5082551 ]
+    },
+    "properties": {
+    "city":"Round Rock",
+    "growth_from_2000_to_2013":"81.0%",
+    "population":109821,
+    "rank":251,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -82.8001026,27.9658533 ]
+    },
+    "properties": {
+    "city":"Clearwater",
+    "growth_from_2000_to_2013":"0.1%",
+    "population":109703,
+    "rank":252,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -73.0514965,41.5581525 ]
+    },
+    "properties": {
+    "city":"Waterbury",
+    "growth_from_2000_to_2013":"2.2%",
+    "population":109676,
+    "rank":253,
+    "state":"Connecticut"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.4302013,45.5001357 ]
+    },
+    "properties": {
+    "city":"Gresham",
+    "growth_from_2000_to_2013":"20.7%",
+    "population":109397,
+    "rank":254,
+    "state":"Oregon"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.0399663,38.24935809999999 ]
+    },
+    "properties": {
+    "city":"Fairfield",
+    "growth_from_2000_to_2013":"12.8%",
+    "population":109320,
+    "rank":255,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -108.5006904,45.7832856 ]
+    },
+    "properties": {
+    "city":"Billings",
+    "growth_from_2000_to_2013":"18.6%",
+    "population":109059,
+    "rank":256,
+    "state":"Montana"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -71.31617179999999,42.6334247 ]
+    },
+    "properties": {
+    "city":"Lowell",
+    "growth_from_2000_to_2013":"3.4%",
+    "population":108861,
+    "rank":257,
+    "state":"Massachusetts"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -119.2290316,34.274646 ]
+    },
+    "properties": {
+    "city":"San Buenaventura (Ventura)",
+    "growth_from_2000_to_2013":"7.4%",
+    "population":108817,
+    "rank":258,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -104.6091409,38.2544472 ]
+    },
+    "properties": {
+    "city":"Pueblo",
+    "growth_from_2000_to_2013":"5.9%",
+    "population":108249,
+    "rank":259,
+    "state":"Colorado"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -80.0053176,35.9556923 ]
+    },
+    "properties": {
+    "city":"High Point",
+    "growth_from_2000_to_2013":"24.3%",
+    "population":107741,
+    "rank":260,
+    "state":"North Carolina"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.9389526,34.0686208 ]
+    },
+    "properties": {
+    "city":"West Covina",
+    "growth_from_2000_to_2013":"2.3%",
+    "population":107740,
+    "rank":261,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.3477486,37.9357576 ]
+    },
+    "properties": {
+    "city":"Richmond",
+    "growth_from_2000_to_2013":"7.9%",
+    "population":107571,
+    "rank":262,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.2139232,33.5539143 ]
+    },
+    "properties": {
+    "city":"Murrieta",
+    "growth_from_2000_to_2013":"107.4%",
+    "population":107479,
+    "rank":263,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -71.10973349999999,42.3736158 ]
+    },
+    "properties": {
+    "city":"Cambridge",
+    "growth_from_2000_to_2013":"5.5%",
+    "population":107289,
+    "rank":264,
+    "state":"Massachusetts"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -121.805789,38.0049214 ]
+    },
+    "properties": {
+    "city":"Antioch",
+    "growth_from_2000_to_2013":"16.9%",
+    "population":107100,
+    "rank":265,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.1483648,33.4936391 ]
+    },
+    "properties": {
+    "city":"Temecula",
+    "growth_from_2000_to_2013":"55.4%",
+    "population":106780,
+    "rank":266,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -118.081733,33.9022367 ]
+    },
+    "properties": {
+    "city":"Norwalk",
+    "growth_from_2000_to_2013":"1.9%",
+    "population":106589,
+    "rank":267,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -104.8771726,39.5807452 ]
+    },
+    "properties": {
+    "city":"Centennial",
+    "growth_from_2000_to_2013":"3.5%",
+    "population":106114,
+    "rank":268,
+    "state":"Colorado"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.2020794,47.9789848 ]
+    },
+    "properties": {
+    "city":"Everett",
+    "growth_from_2000_to_2013":"9.4%",
+    "population":105370,
+    "rank":269,
+    "state":"Washington"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -80.5886646,28.0344621 ]
+    },
+    "properties": {
+    "city":"Palm Bay",
+    "growth_from_2000_to_2013":"31.7%",
+    "population":104898,
+    "rank":270,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -98.4933873,33.9137085 ]
+    },
+    "properties": {
+    "city":"Wichita Falls",
+    "growth_from_2000_to_2013":"0.7%",
+    "population":104898,
+    "rank":271,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -88.019826,44.51915899999999 ]
+    },
+    "properties": {
+    "city":"Green Bay",
+    "growth_from_2000_to_2013":"1.9%",
+    "population":104779,
+    "rank":272,
+    "state":"Wisconsin"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.4702079,37.6879241 ]
+    },
+    "properties": {
+    "city":"Daly City",
+    "growth_from_2000_to_2013":"1.0%",
+    "population":104739,
+    "rank":273,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -118.3089661,34.1808392 ]
+    },
+    "properties": {
+    "city":"Burbank",
+    "growth_from_2000_to_2013":"4.2%",
+    "population":104709,
+    "rank":274,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -96.7298519,32.9483335 ]
+    },
+    "properties": {
+    "city":"Richardson",
+    "growth_from_2000_to_2013":"13.2%",
+    "population":104475,
+    "rank":275,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -80.1247667,26.2378597 ]
+    },
+    "properties": {
+    "city":"Pompano Beach",
+    "growth_from_2000_to_2013":"4.0%",
+    "population":104410,
+    "rank":276,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.9748103,32.8546197 ]
+    },
+    "properties": {
+    "city":"North Charleston",
+    "growth_from_2000_to_2013":"27.4%",
+    "population":104054,
+    "rank":277,
+    "state":"South Carolina"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -95.7974526,36.060949 ]
+    },
+    "properties": {
+    "city":"Broken Arrow",
+    "growth_from_2000_to_2013":"28.2%",
+    "population":103500,
+    "rank":278,
+    "state":"Oklahoma"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -105.2705456,40.0149856 ]
+    },
+    "properties": {
+    "city":"Boulder",
+    "growth_from_2000_to_2013":"9.0%",
+    "population":103166,
+    "rank":279,
+    "state":"Colorado"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -80.0533746,26.7153424 ]
+    },
+    "properties": {
+    "city":"West Palm Beach",
+    "growth_from_2000_to_2013":"23.5%",
+    "population":102436,
+    "rank":280,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -120.4357191,34.9530337 ]
+    },
+    "properties": {
+    "city":"Santa Maria",
+    "growth_from_2000_to_2013":"30.9%",
+    "population":102216,
+    "rank":281,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -116.9625269,32.7947731 ]
+    },
+    "properties": {
+    "city":"El Cajon",
+    "growth_from_2000_to_2013":"7.4%",
+    "population":102211,
+    "rank":282,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -90.5776367,41.5236437 ]
+    },
+    "properties": {
+    "city":"Davenport",
+    "growth_from_2000_to_2013":"3.9%",
+    "population":102157,
+    "rank":283,
+    "state":"Iowa"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.3703235,34.1064001 ]
+    },
+    "properties": {
+    "city":"Rialto",
+    "growth_from_2000_to_2013":"9.8%",
+    "population":101910,
+    "rank":284,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -106.7636538,32.3199396 ]
+    },
+    "properties": {
+    "city":"Las Cruces",
+    "growth_from_2000_to_2013":"37.6%",
+    "population":101324,
+    "rank":285,
+    "state":"New Mexico"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.3255254,37.5629917 ]
+    },
+    "properties": {
+    "city":"San Mateo",
+    "growth_from_2000_to_2013":"9.0%",
+    "population":101128,
+    "rank":286,
+    "state":"California"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -96.994174,33.046233 ]
+    },
+    "properties": {
+    "city":"Lewisville",
+    "growth_from_2000_to_2013":"28.9%",
+    "population":101074,
+    "rank":287,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -86.25198979999999,41.6763545 ]
+    },
+    "properties": {
+    "city":"South Bend",
+    "growth_from_2000_to_2013":"-6.8%",
+    "population":100886,
+    "rank":288,
+    "state":"Indiana"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -81.9498042,28.0394654 ]
+    },
+    "properties": {
+    "city":"Lakeland",
+    "growth_from_2000_to_2013":"18.3%",
+    "population":100710,
+    "rank":289,
+    "state":"Florida"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -80.085059,42.12922409999999 ]
+    },
+    "properties": {
+    "city":"Erie",
+    "growth_from_2000_to_2013":"-2.8%",
+    "population":100671,
+    "rank":290,
+    "state":"Pennsylvania"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -95.30106239999999,32.3512601 ]
+    },
+    "properties": {
+    "city":"Tyler",
+    "growth_from_2000_to_2013":"18.6%",
+    "population":100223,
+    "rank":291,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -95.2860474,29.5635666 ]
+    },
+    "properties": {
+    "city":"Pearland",
+    "growth_from_2000_to_2013":"117.2%",
+    "population":100065,
+    "rank":292,
+    "state":"Texas"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -96.3344068,30.627977 ]
+    },
+    "properties": {
+    "city":"College Station",
+    "growth_from_2000_to_2013":"45.2%",
+    "population":100050,
+    "rank":293,
+    "state":"Texas"
+    }
+  }
+]
+}
