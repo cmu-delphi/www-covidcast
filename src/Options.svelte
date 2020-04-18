@@ -1,18 +1,51 @@
 <script>
   import { data, sensors, currentSensor, levels, currentLevel, signalType } from './stores.js';
 
+  let hide = false;
+
+  function toggleHide() {
+    hide = !hide;
+  }
+
   currentSensor.subscribe(sens =>
     data ? '' : $data[sens][$currentLevel] ? '' : currentLevel.set($sensors.find(d => d.id === sens).levels[0]),
   );
 </script>
 
 <style>
-  .pure-u-1 {
-    box-sizing: border-box;
-    padding: 5px;
+  .options {
+    width: 100%;
+    position: relative;
   }
 
-  .options,
+  .toggle-button {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: transparent;
+
+    transition: all 0.1s ease-in;
+  }
+
+  .toggle-button:hover {
+    background-color: rgb(228, 228, 228);
+  }
+
+  .toggle-button.float {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .toggle-button-icon {
+    width: 24px;
+    height: 24px;
+  }
+
   .option {
     width: 100%;
   }
@@ -35,7 +68,7 @@
   }
 
   .buttons-group .button {
-    min-width: 220px;
+    width: 220px;
     font-size: 1rem;
     background-color: #fff;
     border-color: #dbdbdb;
@@ -82,47 +115,57 @@
 </style>
 
 <div class="options">
-  <div class="option">
-    <div class="buttons-group-title">Data Source</div>
-    <div class="buttons-group">
-      {#each $sensors as sensor}
+  {#if hide}
+    <div class="toggle-button" on:click={toggleHide}>
+      <img class="toggle-button-icon" src="./assets/imgs/layers-24px.svg" alt="" />
+    </div>
+  {:else}
+    <div class="toggle-button float" on:click={toggleHide}>
+      <img class="toggle-button-icon" src="./assets/imgs/layers_clear-24px.svg" alt="" />
+    </div>
+
+    <div class="option">
+      <div class="buttons-group-title">Data Source</div>
+      <div class="buttons-group">
+        {#each $sensors as sensor}
+          <button
+            class="button {$currentSensor === sensor.id ? 'selected' : null}"
+            on:click={() => currentSensor.set(sensor.id)}>
+            {sensor.name}
+          </button>
+        {/each}
+      </div>
+    </div>
+
+    <br />
+
+    <div class="option">
+      <div class="buttons-group-title">Geographic Level</div>
+      <div class="buttons-group">
+        {#each $sensors.find(d => d.id === $currentSensor).levels as level}
+          <button class="button {$currentLevel === level ? 'selected' : null}" on:click={() => currentLevel.set(level)}>
+            {$levels[level]}
+          </button>
+        {/each}
+      </div>
+    </div>
+
+    <br />
+
+    <div class="option">
+      <div class="buttons-group-title">Signal Type</div>
+      <div class="buttons-group">
         <button
-          class="button {$currentSensor === sensor.id ? 'selected' : null}"
-          on:click={() => currentSensor.set(sensor.id)}>
-          {sensor.name}
+          class="button {$signalType === 'direction' ? 'selected' : null}"
+          on:click={() => signalType.set('direction')}>
+          Direction
         </button>
-      {/each}
-    </div>
-  </div>
-
-  <br />
-
-  <div class="option">
-    <div class="buttons-group-title">Geographic Level</div>
-    <div class="buttons-group">
-      {#each $sensors.find(d => d.id === $currentSensor).levels as level}
-        <button class="button {$currentLevel === level ? 'selected' : null}" on:click={() => currentLevel.set(level)}>
-          {$levels[level]}
+        <button class="button {$signalType === 'value' ? 'selected' : null}" on:click={() => signalType.set('value')}>
+          Value
         </button>
-      {/each}
+      </div>
     </div>
-  </div>
-
-  <br />
-
-  <div class="option">
-    <div class="buttons-group-title">Signal Type</div>
-    <div class="buttons-group">
-      <button
-        class="button {$signalType === 'direction' ? 'selected' : null}"
-        on:click={() => signalType.set('direction')}>
-        Direction
-      </button>
-      <button class="button {$signalType === 'value' ? 'selected' : null}" on:click={() => signalType.set('value')}>
-        Value
-      </button>
-    </div>
-  </div>
+  {/if}
 </div>
 
 <!-- <div class="options">

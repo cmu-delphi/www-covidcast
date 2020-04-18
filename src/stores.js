@@ -75,6 +75,7 @@ export const signalType = writable('direction');
 export const currentWeek = writable(202014);
 // EpiWeek in form YYYYMMDD
 export const currentDate = writable(20200412);
+export const currentRange = writable([0, 1]);
 
 // Data points for the current sensor, level, and day.
 export const currentData = derived(
