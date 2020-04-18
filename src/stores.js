@@ -7,25 +7,25 @@ import * as d3 from 'd3';
 // For updated sensors/API and update this accordingly.
 export const sensors = readable([
   {
-    name: 'Facebook Surveys',
+    name: 'Surveys (Facebook)',
     id: 'fb_survey',
     signal: 'cli',
     levels: ['county', 'msa'],
   },
   {
-    name: 'Google Surveys',
+    name: 'Surveys (Google)',
     id: 'google-survey',
     signal: 'cli',
-    levels: ['county'],
+    levels: ['county', 'state'],
   },
   {
-    name: 'Quidel Flu Tests',
+    name: 'Lab Tests (Quidel)',
     id: 'quidel',
-    signal: 'negativeratio',
+    signal: 'negativeprop',
     levels: ['county', 'msa'],
   },
   {
-    name: 'Google Health Trends',
+    name: 'Search Trends (Google)',
     id: 'ght',
     signal: 'smoothedsearch',
     levels: ['msa'],
@@ -91,6 +91,7 @@ export const currentData = derived(
     if ($data) {
       let currDat = $data[$sensor][$level];
       let level = currDat ? $level : $sensors.find((d) => d.id === $sensor).levels[0];
+      console.log($data, $sensor, level);
       return $data[$sensor][level].filter((d) => d.time_value === $date);
     } else return [];
   },

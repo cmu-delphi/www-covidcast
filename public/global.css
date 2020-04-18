@@ -110,3 +110,8 @@ button.mapboxgl-ctrl-zoom-in,
 button.mapboxgl-ctrl-zoom-out {
   margin: 0;
 }
+
+.axis {
+  font-size: 12px;
+  font-family: 'Open Sans', sans-serif;
+}

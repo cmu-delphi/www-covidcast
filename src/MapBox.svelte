@@ -49,8 +49,10 @@
       }),
     );
     currentRange.set(minMax);
+    console.log(minMax);
 
     let dat = $geojsons.get($currentLevel);
+    console.log(dat);
     dat.features.forEach(d => {
       let id;
       if ($currentLevel === 'county') {
@@ -79,7 +81,7 @@
       type: 'fill',
       filter: ['!=', 'val', -100],
       paint: {
-        'fill-outline-color': 'black',
+        'fill-outline-color': '#616161',
         'fill-color': {
           property: 'val',
           stops: stops,
@@ -89,9 +91,10 @@
 
     map.on('click', $currentLevel, function(e) {
       currentRegion.set(e.features[0].properties.id);
+      console.log(e.features[0].properties);
       new mapboxgl.Popup()
         .setLngLat(e.lngLat)
-        .setHTML(e.features[0].properties.NAME + '<br />' + e.features[0].properties.val)
+        .setHTML(e.features[0].properties.NAME)
         .addTo(map);
     });
     currentTimeDataReadyOnMay.set(true);
@@ -126,7 +129,7 @@
         source: 'county-outline',
         type: 'fill',
         paint: {
-          'fill-color': '#f9f9f9',
+          'fill-color': '#e4dac4',
           'fill-outline-color': '#e0e0e0',
         },
       });
