@@ -84,6 +84,8 @@ export const currentDataReadyOnMay = writable(false);
 export const currentRange = writable([0, 1]);
 export const currentRegion = writable('');
 
+export const metaStats = writable(null);
+
 // Data points for the current sensor, level, and day.
 export const currentData = derived(
   [data, sensors, currentSensor, currentLevel, currentDate],

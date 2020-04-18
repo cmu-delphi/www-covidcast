@@ -7,12 +7,14 @@
   import MapBox from './MapBox.svelte';
   import Graph from './Graph.svelte';
 
-  import { data, sensors, times, signalType, currentRange } from './stores.js';
+  import { data, sensors, times, signalType, currentRange, currentDataReadyOnMay, metaStats } from './stores.js';
 
   import * as d3 from 'd3';
 
   const ENDPOINT = 'https://delphi.cmu.edu/epidata/api.php?source=covidcast&time_type=day';
   const ENDPOINT_META = 'https://delphi.cmu.edu/epidata/api.php?source=covidcast_meta';
+
+  let error = null;
 
   // this is for graph dev purposes
   let use_real_data = true;
@@ -21,7 +23,8 @@
     console.log('using fake network requests');
     onMount(_ => {
       d3.json('./temp_graph_data/meta_request_results.json').then(meta => {
-        console.log(meta);
+        metaStats.set(meta.epidata);
+
         let queries = [];
         let entries = [];
         let timeMap = new Map();
@@ -54,6 +57,10 @@
           data.set(dat);
         });
       });
+    }).catch(err => {
+      error = err;
+      currentDataReadyOnMay.set(true);
+      console.log(err);
     });
   }
 
@@ -64,7 +71,8 @@
       fetch(ENDPOINT_META)
         .then(d => d.json())
         .then(meta => {
-          console.log(meta);
+          metaStats.set(meta.epidata);
+
           let queries = [];
           let entries = [];
           let timeMap = new Map();
@@ -101,6 +109,11 @@
             times.set(timeMap);
             data.set(dat);
           });
+        })
+        .catch(err => {
+          error = err;
+          currentDataReadyOnMay.set(true);
+          console.log(err);
         });
     });
   }
@@ -200,7 +213,25 @@
   .graph-container:hover {
     background-color: rgba(255, 255, 255, 0.9);
   }  */
+
+  .error-message-container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: gray;
+  }
 </style>
+
+{#if error}
+  <div class="error-message-container">Failed to load data. Please try again later...</div>
+{/if}
 
 <MapBox />
 
