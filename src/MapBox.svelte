@@ -163,7 +163,7 @@
 
   .state-buttons-holder {
     position: absolute;
-    top: 81px;
+    top: 92px;
     right: 9px;
     z-index: 100;
   }
