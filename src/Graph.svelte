@@ -297,11 +297,10 @@
 <p>
   currently viewing sensor
   <b>{$currentSensor}</b>
-  at level
+  at the
   <b>{$currentLevel}</b>
-  for
+  level
   <!-- <b>{$selectedRegion}</b> -->
-  <button onclick={_ => callMyFunction()} value="Update" />
 </p>
 
 <!-- bind:this sets the variable el to the HTML div you can then select using d3 as above-->
