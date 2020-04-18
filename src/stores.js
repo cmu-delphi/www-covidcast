@@ -69,6 +69,8 @@ export const data = writable();
 export const dates = writable();
 export const currentSensor = writable('google-survey');
 export const currentLevel = writable('county');
+// Options are 'direction' and 'value'
+export const signalType = writable('direction');
 // EpiWeek in form YYYYWW
 export const currentWeek = writable(202014);
 // EpiWeek in form YYYYMMDD
@@ -88,15 +90,15 @@ export const currentData = derived(
 
 // sample data to test line graph
 export const sampleData = readable([], function start(set) {
-  let parseTime = d3.timeParse("%Y-%m-%d");
-  d3.csv("./sampleData.csv").then((d) =>
+  let parseTime = d3.timeParse('%Y-%m-%d');
+  d3.csv('./sampleData.csv').then((d) =>
     set(
       d.map((s) => ({
         date: parseTime(s.Date),
         value: s.Incidence,
-        county: s.County
-      }))
-    )
+        county: s.County,
+      })),
+    ),
   );
 });
 // Data points for the current sensor, level, and geographic region.
