@@ -11,7 +11,7 @@
     transition: all 0.1s ease-in;
   }
 
-  .legend:focus {
+  .legend:hover {
     background-color: rgba(255, 255, 255, 0.9);
   }
 
