@@ -77,7 +77,7 @@
 
     map.getSource($currentLevel).setData(dat);
 
-    map.getStyle().layers.length > 3 ? map.removeLayer(map.getStyle().layers[3].id) : '';
+    map.getStyle().layers.length > 5 ? map.removeLayer(map.getStyle().layers[5].id) : '';
     map.addLayer(
       {
         id: $currentLevel,
@@ -92,7 +92,7 @@
           },
         },
       },
-      'city-point-cluster',
+      'city-point-unclustered',
     );
 
     map.on('click', $currentLevel, function(e) {
@@ -167,12 +167,12 @@
         },
       });
       map.addLayer({
-        id: 'city-point-cluster',
+        id: 'city-point-unclustered',
         source: 'city-point',
         type: 'symbol',
-        filter: ['has', 'point_count'],
+        filter: ['!', ['has', 'point_count']],
         layout: {
-          'text-field': ['get', 'city', ['get', 'largest']],
+          'text-field': ['get', 'city'],
           'text-font': ['Open Sans Regular'],
           'text-size': 12,
         },
@@ -182,12 +182,12 @@
         },
       });
       map.addLayer({
-        id: 'city-point-unclustered',
+        id: 'city-point-clustered',
         source: 'city-point',
         type: 'symbol',
-        filter: ['!', ['has', 'point_count']],
+        filter: ['has', 'point_count'],
         layout: {
-          'text-field': ['get', 'city'],
+          'text-field': ['get', 'city', ['get', 'largest']],
           'text-font': ['Open Sans Regular'],
           'text-size': 12,
         },
