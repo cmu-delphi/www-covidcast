@@ -130,7 +130,7 @@
     right: 50px;
     z-index: 1000;
     /* max-width: 750px; */
-    background-color: rgba(255, 255, 255, 0.7);
+    /* background-color: rgba(255, 255, 255, 0.7); */
     border-radius: 8px;
     padding: 10px 10px;
     box-sizing: border-box;
