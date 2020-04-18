@@ -80,7 +80,7 @@ export const signalType = writable('direction');
 export const currentWeek = writable(202014);
 // EpiWeek in form YYYYMMDD
 export const currentDate = writable(20200412);
-export const currentTimeDataReadyOnMay = writable(false);
+export const currentDataReadyOnMay = writable(false);
 export const currentRange = writable([0, 1]);
 export const currentRegion = writable('');
 

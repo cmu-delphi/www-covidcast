@@ -1,5 +1,5 @@
 <script>
-  import { currentDate, times, currentSensor, currentTimeDataReadyOnMay } from './stores.js';
+  import { currentDate, times, currentSensor, currentDataReadyOnMay } from './stores.js';
   import * as d3 from 'd3';
 
   let parseTime = d3.timeParse('%Y%m%d');
@@ -22,7 +22,7 @@
     currentDate.set(max);
   }
 
-  currentTimeDataReadyOnMay.subscribe(d => console.log('map set:', d));
+  currentDataReadyOnMay.subscribe(d => console.log('map set:', d));
 </script>
 
 <style>
@@ -125,13 +125,13 @@
     {min}
     {max}
     on:mouseup={_ => {
-      currentTimeDataReadyOnMay.set(false);
+      currentDataReadyOnMay.set(false);
       currentDate.set(val);
     }}
     class="slider"
     bind:value={val} />
   <p>{prettyDate}</p>
-  {#if $currentTimeDataReadyOnMay === false}
+  {#if $currentDataReadyOnMay === false}
     <div class="loader-container">
       <div class="loader" />
     </div>
