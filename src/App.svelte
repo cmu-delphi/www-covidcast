@@ -143,7 +143,7 @@
       fetch(ENDPOINT_META)
         .then(d => d.json())
         .then(meta => {
-          metaData.set(meta);
+          metaData.set(meta.epidata);
           let timeMap = new Map();
           $sensors.forEach(s => {
             let matchedMeta = meta.epidata.find(

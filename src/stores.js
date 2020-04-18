@@ -56,11 +56,11 @@ export const geojsons = readable(new Map(), function start(set) {
 });
 
 export const times = writable(null);
-export const regionDataStats = writable(null);
 export const dates = writable();
 
 export const mounted = writable(0);
-export const metaData = writable({});
+export const metaData = writable([]);
+
 export const currentSensor = writable('google-survey');
 export const currentSensorName = derived(
   [sensors, currentSensor],
@@ -85,7 +85,11 @@ export const timeSliceCache = writable(new Map());
 export const data = writable([]);
 export const regionData = writable([]);
 export const currentData = writable([]);
-export const metaStats = writable(null);
+
+export const regionDataStats = derived([metaData, currentSensor, currentLevel], ([$meta, $sensor, $level]) => {
+  console.log($meta, $sensor, $level);
+  return $meta.find((d) => d.data_source === $sensor && d.geo_type === $level);
+});
 
 // regionDataStats[0] is hopefully going to give you the min/max. for example:
 /**
