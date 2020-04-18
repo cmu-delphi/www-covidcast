@@ -289,6 +289,7 @@
         // .attr("class", "line")
         .attr('fill', 'none')
         .attr('stroke', 'red')
+        .attr('stroke-width', 3)
         .attr('d', line(myData));
 
       // label lines by county
