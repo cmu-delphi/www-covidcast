@@ -76,6 +76,7 @@ export const currentWeek = writable(202014);
 // EpiWeek in form YYYYMMDD
 export const currentDate = writable(20200412);
 export const currentRange = writable([0, 1]);
+export const currentRegion = writable('');
 
 // Data points for the current sensor, level, and day.
 export const currentData = derived(
@@ -85,6 +86,17 @@ export const currentData = derived(
       let currDat = $data[$sensor][$level];
       let level = currDat ? $level : $sensors.find((d) => d.id === $sensor).levels[0];
       return $data[$sensor][level].filter((d) => d.time_value === $date);
+    } else return [];
+  },
+);
+// Data points for the current sensor, level, and day.
+export const regionData = derived(
+  [data, sensors, currentSensor, currentLevel, currentRegion],
+  ([$data, $sensors, $sensor, $level, $region]) => {
+    if ($data && $region) {
+      let currDat = $data[$sensor][$level];
+      let level = currDat ? $level : $sensors.find((d) => d.id === $sensor).levels[0];
+      return $data[$sensor][level].filter((d) => d.geo_value === $region);
     } else return [];
   },
 );
@@ -102,7 +114,3 @@ export const sampleData = readable([], function start(set) {
     ),
   );
 });
-// Data points for the current sensor, level, and geographic region.
-// export const regionData = derived();
-
-export const selectedRegion = writable('');

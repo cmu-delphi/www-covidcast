@@ -153,8 +153,8 @@
     <br />
 
     <div class="option">
-      <div class="buttons-group-title">Signal Type</div>
-      <div class="buttons-group">
+      <!-- <div class="buttons-group-title">Signal Type</div> -->
+      <div class="buttons-group-side">
         <button
           class="button {$signalType === 'direction' ? 'selected' : null}"
           on:click={() => signalType.set('direction')}>

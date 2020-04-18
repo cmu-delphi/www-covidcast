@@ -1,10 +1,12 @@
 <script>
   import { onMount } from 'svelte';
-  import { selectedRegion, currentSensor, currentLevel, currentData, sampleData } from './stores.js';
+  import { currentRegion, currentSensor, currentLevel, currentData, sampleData, regionData } from './stores.js';
   import * as d3 from 'd3';
 
   // to get the value for sampleData, use $sampleData.
   // It is currently in the form of {date: , value: }
+
+  regionData.subscribe(d => console.log(d));
 
   let el;
   let w;
@@ -18,7 +20,7 @@
   // $: w, drawGraph();
 
   // This subscribes to sample data to redraw the graph every time the data changes.
-  selectedRegion.subscribe(_ => updateGraph());
+  // selectedRegion.subscribe(_ => updateGraph());
   onMount(_ => drawGraph());
 
   // local variables for permissible graph types
@@ -43,7 +45,7 @@
       var dataResults = parseData();
       var graphType = dataResults[0];
       var graphData = dataResults[1];
-      if(userCharts[currentChart].isChart()) {
+      if (userCharts[currentChart].isChart()) {
         userCharts[currentChart].draw();
       } else {
         userCharts[currentChart] = new Chart(graphType, graphData);
@@ -56,7 +58,7 @@
   function parseData() {
     // console.log('get data');
     let data = $currentData;
-    let region = $selectedRegion;
+    let region = $currentRegion;
     // console.log('first element' + data['0']);
     // console.log('region: ' + region);
 
@@ -135,7 +137,7 @@
           chart.setData(data);
           break;
         case 'Line_Graph':
-          console.log('line graph')
+          console.log('line graph');
           chart = new LineGraph();
           chart.setData(data);
           break;
@@ -162,7 +164,7 @@
       try {
         this.chartType in charts ? (result = true) : (result = false);
       } catch (e) {
-        if(e.name == 'ReferenceError') {
+        if (e.name == 'ReferenceError') {
           result = false;
         }
       }
@@ -334,9 +336,7 @@
   }
 
   // todo: display user friendly names on graph
-  function displayName() {
-
-  }
+  function displayName() {}
 </script>
 
 <p>COVIDCAST Data</p>
@@ -346,8 +346,8 @@
   at level
   <b>{$currentLevel}</b>
   for
-  <b>{$selectedRegion}</b>
-  <button onclick="{_ => callMyFunction()}" value="Update"></button>
+  <!-- <b>{$selectedRegion}</b> -->
+  <button onclick={_ => callMyFunction()} value="Update" />
 </p>
 
 <!-- bind:this sets the variable el to the HTML div you can then select using d3 as above-->

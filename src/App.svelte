@@ -229,9 +229,9 @@
       Increasing
     </p>
   {:else}
-    <p>{$currentRange[0].toFixed(2)}</p>
+    <p>None</p>
     <p class="legend-bar" />
-    <p>{$currentRange[1].toFixed(2)}</p>
+    <p>High</p>
   {/if}
 </div>
 

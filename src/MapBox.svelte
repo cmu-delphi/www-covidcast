@@ -2,7 +2,7 @@
   import mapboxgl from 'mapbox-gl';
   import {
     levels,
-    selectedRegion,
+    currentRegion,
     geojsons,
     currentLevel,
     currentSensor,
@@ -57,6 +57,7 @@
       } else if ($currentLevel === 'msa') {
         id = d.properties.CBSAFP;
       }
+      d.properties.id = id;
       if (geoIds.has(id) && mappedVals.get(id)) {
         d.properties.val = mappedVals.get(id);
       } else {
@@ -70,7 +71,6 @@
     }
 
     map.getSource($currentLevel).setData(dat);
-    console.log(map.getStyle().layers);
     map.getStyle().layers.find(d => d.id === $currentLevel) ? map.removeLayer($currentLevel) : '';
     map.addLayer({
       id: $currentLevel,
@@ -87,8 +87,7 @@
     });
 
     map.on('click', $currentLevel, function(e) {
-      selectedRegion.set(e.features[0].properties.GEO_ID);
-      console.log(e.features[0].properties);
+      currentRegion.set(e.features[0].properties.id);
       new mapboxgl.Popup()
         .setLngLat(e.lngLat)
         .setHTML(e.features[0].properties.NAME + '<br />' + e.features[0].properties.val)
@@ -157,14 +156,14 @@
 
 <style>
   .map-container {
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     position: relative;
   }
 
   .state-buttons-holder {
     position: absolute;
-    top: 95px;
+    top: 81px;
     right: 9px;
     z-index: 100;
   }
