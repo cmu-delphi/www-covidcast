@@ -7,7 +7,22 @@
   import MapBox from './MapBox.svelte';
   import Graph from './Graph.svelte';
 
-  import { data, sensors, times, signalType, currentRange } from './stores.js';
+  import {
+    sensors,
+    times,
+    signalType,
+    currentRange,
+    currentSensor,
+    currentDate,
+    currentLevel,
+    currentRegion,
+    regionSliceCache,
+    timeSliceCache,
+    currentData,
+    regionData,
+    metaData,
+    mounted,
+  } from './stores.js';
 
   import * as d3 from 'd3';
 
@@ -57,50 +72,99 @@
     });
   }
 
-  if (use_real_data === true) {
-    console.log('using real network requests');
-    // Fetch data for each sensor and granularity
+  function updateRegionSliceCache(sensor, level, date) {
+    if (!$mounted) return;
+    let cacheEntry = $regionSliceCache.get(sensor + level + date);
+    if (!cacheEntry) {
+      let q =
+        ENDPOINT +
+        '&data_source=' +
+        sensor +
+        '&signal=' +
+        $sensors.find(d => d.id === sensor).signal +
+        '&geo_type=' +
+        level +
+        '&time_values=' +
+        date +
+        '&geo_value=*';
+      fetch(q)
+        .then(d => d.json())
+        .then(d => {
+          currentData.set(d.epidata);
+          regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
+        });
+    } else currentData.set(cacheEntry);
+  }
+
+  function updateTimeSliceCache(sensor, level, region) {
+    if (!$mounted) return;
+    let cacheEntry = $timeSliceCache.get(sensor + level + region);
+    if (!cacheEntry) {
+      let q =
+        ENDPOINT +
+        '&data_source=' +
+        sensor +
+        '&signal=' +
+        $sensors.find(d => d.id === sensor).signal +
+        '&geo_type=' +
+        level +
+        '&time_values=20100101-20300101' +
+        '&geo_value=' +
+        region;
+      fetch(q)
+        .then(d => d.json())
+        .then(d => {
+          regionData.set(d.epidata);
+          timeSliceCache.update(m => m.set(sensor + level + region, d.epidata));
+        });
+    } else regionData.set(cacheEntry);
+  }
+
+  currentSensor.subscribe(s => {
+    updateRegionSliceCache(s, $currentLevel, $currentDate);
+    updateTimeSliceCache(s, $currentLevel, $currentRegion);
+  });
+  currentLevel.subscribe(l => {
+    updateRegionSliceCache($currentSensor, l, $currentDate);
+    updateRegionSliceCache($currentSensor, l, $currentRegion);
+  });
+  currentDate.subscribe(d => updateRegionSliceCache($currentSensor, $currentLevel, d));
+  currentRegion.subscribe(r => updateTimeSliceCache($currentSensor, $currentLevel, r));
+
+  if (use_real_data) {
     onMount(_ => {
       fetch(ENDPOINT_META)
         .then(d => d.json())
         .then(meta => {
-          console.log(meta);
-          let queries = [];
-          let entries = [];
+          metaData.set(meta);
           let timeMap = new Map();
-          $sensors.forEach(sens => {
-            let date = meta.epidata.find(d => d.data_source === sens.id);
-            let minDate = date.min_time;
-            let maxDate = date.max_time;
-            timeMap.set(sens.id, [minDate, maxDate]);
-            sens.levels.forEach(l => {
-              let query =
-                ENDPOINT +
-                '&data_source=' +
-                sens.id +
-                '&signal=' +
-                sens.signal +
-                '&geo_type=' +
-                l +
-                '&time_values=' +
-                minDate +
-                '-' +
-                maxDate +
-                '&geo_value=*';
-              queries.push(fetch(query).then(d => d.json()));
-              entries.push([sens.id, l]);
-            });
+          $sensors.forEach(s => {
+            let matchedMeta = meta.epidata.find(
+              d => d.data_source === s.id && d.signal === s.signal && d.time_type === 'day',
+            );
+            timeMap.set(s.id, [matchedMeta.min_time, matchedMeta.max_time]);
           });
-          let dat = {};
-          Promise.all(queries).then(d => {
-            console.log(d);
-            entries.forEach((ent, i) => {
-              dat[ent[0]] ? '' : (dat[ent[0]] = {});
-              dat[ent[0]][ent[1]] = d[i].epidata;
+          times.set(timeMap);
+          fetch(
+            ENDPOINT +
+              '&data_source=' +
+              $currentSensor +
+              '&signal=' +
+              $sensors.find(d => d.id === $currentSensor).signal +
+              '&geo_type=' +
+              $currentLevel +
+              '&time_values=' +
+              timeMap.get($currentSensor)[1] +
+              '&geo_value=*',
+          )
+            .then(d => d.json())
+            .then(d => {
+              regionSliceCache.update(m =>
+                m.set($currentSensor + $currentLevel + timeMap.get($currentSensor)[1], d.epidata),
+              );
+              currentData.set(d.epidata);
+              mounted.set(1);
             });
-            times.set(timeMap);
-            data.set(dat);
-          });
         });
     });
   }

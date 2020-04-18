@@ -8,7 +8,6 @@
     currentSensor,
     currentData,
     currentRange,
-    data,
     signalType,
     currentDataReadyOnMay,
   } from './stores.js';
@@ -27,8 +26,9 @@
   $: if (!map && $geojsons.size !== 0 && $currentData.length !== 0) initializeMap();
 
   // Update the map when sensor or level changes.
-  currentLevel.subscribe(_ => updateMap());
-  currentSensor.subscribe(_ => updateMap());
+  // currentLevel.subscribe(_ => updateMap());
+  // currentSensor.subscribe(_ => updateMap());
+  // rData.subscribe(_ => updateMap());
   currentData.subscribe(_ => updateMap());
   signalType.subscribe(_ => updateMap());
 
@@ -49,10 +49,8 @@
       }),
     );
     currentRange.set(minMax);
-    console.log(minMax);
 
     let dat = $geojsons.get($currentLevel);
-    console.log(dat);
     dat.features.forEach(d => {
       let id;
       if ($currentLevel === 'county') {
