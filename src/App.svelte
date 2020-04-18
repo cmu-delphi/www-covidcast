@@ -43,6 +43,7 @@
 
         let dat = {};
         Promise.all(queries).then(d => {
+          console.log(d);
           entries.forEach((ent, i) => {
             dat[ent[0]] ? '' : (dat[ent[0]] = {});
             dat[ent[0]][ent[1]] = d[i].epidata;

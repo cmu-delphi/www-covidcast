@@ -20,7 +20,7 @@
   // $: w, drawGraph();
 
   // This subscribes to sample data to redraw the graph every time the data changes.
-  // selectedRegion.subscribe(_ => updateGraph());
+  currentRegion.subscribe(_ => updateGraph());
   onMount(_ => drawGraph());
 
   // local variables for permissible graph types
