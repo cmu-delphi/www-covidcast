@@ -203,7 +203,7 @@
       // construct the x and y domain from the data
       this.x.domain(
         this.getData().map(function(d) {
-          return d.date;
+          return d.time_value;
         }),
       );
       this.y.domain([
@@ -221,7 +221,7 @@
         .append('rect')
         .attr('class', 'bar')
         .attr('x', function(d) {
-          return this.x(d.date);
+          return this.x(d.time_value);
         })
         .attr('width', this.x.bandwidth())
         .attr('y', function(d) {
@@ -264,6 +264,16 @@
         .append('g')
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
+      var formatTime = d3.timeFormat('%m/%d');
+      var parseTime = d3.timeParse('%Y%m%d');
+      var k = d3.keys(myData);
+      var times = k.map(i => parseTime(myData[k[i]]['time_value']));
+      // var timestamps = a[index];
+      // console.log(myData[0]['time_value']);
+      // var timestamps = d => { return d3.timeFormat(d.time_value) };
+      console.log('parse time: ' + times);
+      var timestamps = times.map(stamp => formatTime(stamp));
+      console.log('format time: ' + timestamps);
       var x = d3
         .scaleTime()
         .domain(d3.extent(myData, d => d.time_value))
