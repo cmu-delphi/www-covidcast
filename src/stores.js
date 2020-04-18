@@ -35,7 +35,7 @@ export const sensors = readable([
 export const levels = readable({
   county: 'County',
   state: 'State',
-  msa: 'Metropolitan Statistical Area'
+  msa: 'Metropolitan Statistical Area',
 });
 
 // This loads all the GeoJSON's for each granularity that the MapBox component reads as layers.
@@ -43,7 +43,7 @@ export const geojsons = readable(new Map(), function start(set) {
   Promise.all([
     d3.json('./maps/albers_usa_gz_2010_us_050_00_5m.json'),
     d3.json('./maps/albers_usa_gz_2010_us_040_00_5m.json'),
-    d3.json('./maps/albers_usa_tl_2019_us_metdiv.json'),
+    d3.json('./maps/msa-albers.json'),
     d3.json('./maps/city_data/cities-reprojected.json'),
   ]).then(([a, b, c, d]) => {
     let m = new Map();
