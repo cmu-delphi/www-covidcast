@@ -107,13 +107,13 @@
 <style>
   .options-container {
     position: absolute;
-    top: 2vh;
-    left: 2vh;
+    top: 10px;
+    left: 10px;
     z-index: 1000;
-    max-width: 400px;
+    width: 250px;
     background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 1rem;
-    padding: 10px 15px;
+    border-radius: 8px;
+    padding: 10px 10px;
     box-sizing: border-box;
 
     transition: all 0.1s ease-in;
