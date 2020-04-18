@@ -15,7 +15,8 @@
   let parseTime = d3.timeParse('%Y%m%d');
 
   regionData.subscribe(d => updateGraph(d));
-  regionDataStats.subscribe(d => console.log(d));
+  regionDataStats.subscribe(d => setChartRange(d));
+  // regionDataStats.subscribe(d => console.log(d));
 
   let el;
   let w;
@@ -76,16 +77,14 @@
     return [cType, data];
   }
 
-  function getRange() {
-    let sensorType = $currentSensor;
-    console.log('sensor: ' + sensorType);
-    var sensorRanges = {
-      'fb_survey' : [0, 0.25],
-      'google-survey' : [0, 0.25],
-      'quidel' : [0, 100],
-      'health-trends' : [0, 100]
+  function setChartRange() {
+    // let stats = $regionDataStats;
+    // console.log('stats: ' + stats);
+    // let min = dataStats.min_value;
+    // let max = dataStats.max_value;
+    if(userCharts[currentChart] != undefined) {
+      userCharts[currentChart].setRange(stats.min_value, stats.max_value);
     }
-    return sensorRanges[sensorType];
   }
 
   class Chart {
@@ -266,19 +265,16 @@
       var parseTime = d3.timeParse('%Y%m%d');
       var k = d3.keys(myData);
       var times = k.map(i => parseTime(myData[k[i]]['time_value']));
-      // var timestamps = a[index];
-      // console.log(myData[0]['time_value']);
-      // var timestamps = d => { return d3.timeFormat(d.time_value) };
-      console.log('parse time: ' + times);
       var timestamps = times.map(stamp => formatTime(stamp));
       console.log('format time: ' + timestamps);
+      console.log('range: ' + this.min + ' ' + this.max);
       var x = d3
         .scaleTime()
         .domain(d3.extent(myData, d => parseTime(d.time_value)))
         .range([0, width]);
       var y = d3
         .scaleLinear()
-        .domain([0, 0.25])
+        .domain([0, 100])
         .range([height, 0]);
 
       svg
@@ -288,13 +284,13 @@
         .call(
           d3
             .axisBottom(x)
-            .tickFormat(d3.timeFormat('%b %d'))
-            .ticks(d3.timeDay.every(1)),
+            .tickFormat(d3.timeFormat('%m/%d'))
+            .ticks(d3.timeWeek.every(1)),
         );
       svg
         .append('g')
         .attr('class', 'axis')
-        .call(d3.axisLeft(y).ticks(5));
+        .call(d3.axisLeft(y).ticks(1).tickValues([0,95]));
 
       let line = d3
         .line()
@@ -308,6 +304,41 @@
         .attr('stroke', 'red')
         .attr('stroke-width', 3)
         .attr('d', line(myData));
+
+      // label the y-axis
+      svg
+        .append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 0-margin.left)
+        .attr('x', 0-(height/2))
+        .attr('dy', '1em')
+        .style('text-anchor', 'middle')
+        .text('Intensity');
+      svg
+        .append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 0-margin.left)
+        .attr('x', 0-(0.25*height))
+        .attr('dy', '4em')
+        .attr('font-size', 9)
+        .style('text-anchor', 'right')
+        .text('More');
+      svg
+        .append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 0-margin.left)
+        .attr('x', 0-(0.9*height))
+        .attr('dy', '4em')
+        .attr('font-size', 9)
+        .style('text-anchor', 'left')
+        .text('Less');
+
+      // label the x-axis
+      svg
+        .append('text')
+        .attr('transform', 'translate(' + (width/2) + ', ' + (height + margin.top + 20) + ')')
+        .style('text-anchor', 'middle')
+        .text('Date');
 
       // label lines by src
       // data.forEach(function(d) {
