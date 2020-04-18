@@ -1,5 +1,6 @@
 <script>
   import { signalType } from './stores.js';
+  import { DIRECTION_THEME } from './theme.js';
 </script>
 
 <style>
@@ -29,12 +30,8 @@
     /* border-radius: 50%; */
     margin-right: 10px;
     display: inline-block;
-    border: 1px solid #dbdbdb;
+    /* border: 1px solid #dbdbdb; */
     border-top-style: none;
-  }
-
-  .color:first-child {
-    border-top-style: solid;
   }
 
   .legend p {
@@ -46,33 +43,9 @@
     padding: 0px;
   }
 
-  .color.dec {
-    background-color: #224477;
-  }
-
-  .color.const {
-    background-color: #fff;
-  }
-
-  .color.inc {
-    background-color: #c41230;
-  }
-
   .direction-indicators {
     margin-right: 6px;
   }
-
-  /* .direction-indicators.inc {
-    color: #c41230;
-  }
-
-  .direction-indicators.const {
-    color: #fff;
-  }
-
-  .direction-indicators.dec {
-    color: #224477;
-  } */
 
   .legend-bar {
     background: linear-gradient(to top, #fff, #c41230);
@@ -86,17 +59,17 @@
 <div class="legend {$signalType === 'value' ? 'value' : null}">
   {#if $signalType === 'direction'}
     <p>
-      <span class="color inc" />
+      <span class="color inc" style="background-color: {DIRECTION_THEME.increasing}" />
       <span class="direction-indicators inc">&#8599;</span>
       Increasing
     </p>
     <p>
-      <span class="color const" />
+      <span class="color const" style="background-color: {DIRECTION_THEME.steady}" />
       <span class="direction-indicators const">&#8594;</span>
       Steady
     </p>
     <p>
-      <span class="color dec" />
+      <span class="color dec" style="background-color: {DIRECTION_THEME.decreasing}" />
       <span class="direction-indicators dec">&#8600;</span>
       Decreasing
     </p>
