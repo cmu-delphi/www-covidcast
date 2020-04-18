@@ -115,3 +115,8 @@ button.mapboxgl-ctrl-zoom-out {
   font-size: 12px;
   font-family: 'Open Sans', sans-serif;
 }
+
+button.mapboxgl-popup-close-button {
+  padding: 2px;
+  color: #666;
+}
