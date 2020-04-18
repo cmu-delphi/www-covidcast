@@ -19,7 +19,20 @@
   }
 
   .toggle-button {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
     cursor: pointer;
+    background-color: transparent;
+
+    transition: all 0.1s ease-in;
+  }
+
+  .toggle-button:hover {
+    background-color: rgb(228, 228, 228);
   }
 
   .toggle-button.float {
