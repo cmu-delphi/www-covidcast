@@ -16,6 +16,7 @@
   let use_real_data = true;
 
   if (use_real_data === false) {
+    console.log('using fake network requests');
     onMount(_ => {
       d3.json('./temp_graph_data/meta_request_results.json').then(meta => {
         console.log(meta);
@@ -58,6 +59,7 @@
   }
 
   if (use_real_data === true) {
+    console.log('using real network requests');
     // Fetch data for each sensor and granularity
     onMount(_ => {
       fetch(ENDPOINT_META)
