@@ -1,5 +1,5 @@
 <script>
-  import { data, sensors, currentSensor, levels, currentLevel, signalType } from './stores.js';
+  import { data, sensors, currentSensor, levels, currentLevel, signalType, currentDataReadyOnMay } from './stores.js';
 
   let hide = false;
 
@@ -94,7 +94,10 @@
       {#each $sensors as sensor}
         <button
           class="button {$currentSensor === sensor.id ? 'selected' : null}"
-          on:click={() => currentSensor.set(sensor.id)}>
+          on:click={() => {
+            currentDataReadyOnMay.set(false);
+            currentSensor.set(sensor.id);
+          }}>
           {sensor.name}
         </button>
       {/each}
