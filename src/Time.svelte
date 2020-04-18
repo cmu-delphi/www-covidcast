@@ -24,9 +24,7 @@
 </script>
 
 <style>
-  #time_slider {
-    width: 350px;
-  }
+
 </style>
 
 <div class="time">

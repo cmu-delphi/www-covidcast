@@ -115,9 +115,11 @@ body {
 
 .slider {
   -webkit-appearance: none;
-  width: 200px;
+  width: 320px;
   height: 6px;
-  border-radius: 5px;
+  padding: 0;
+  border-radius: 5px !important;
+  border-style: none;
   background: #d3d3d3;
   outline: none;
   opacity: 0.7;
@@ -135,7 +137,7 @@ body {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: var(--red-alpha);
+  background: var(--red);
   cursor: pointer;
 }
 
@@ -143,7 +145,7 @@ body {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: var(--red-alpha);
+  background: var(--red);
   cursor: pointer;
 }
 
