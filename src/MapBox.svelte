@@ -11,6 +11,7 @@
     signalType,
     currentDataReadyOnMay,
   } from './stores.js';
+  import { DIRECTION_THEME } from './theme.js';
 
   const LAT = -1.2;
   const LON = -0.5;
@@ -74,7 +75,7 @@
 
     let stops = [[minMax[0], '#fff'], [minMax[1], '#c41230']];
     if ($signalType === 'direction') {
-      stops = [[-1, '#224477'], [0, '#fff'], [1, '#c41230']];
+      stops = [[-1, DIRECTION_THEME.decreasing], [0, DIRECTION_THEME.steady], [1, DIRECTION_THEME.increasing]];
     }
 
     map.getSource($currentLevel).setData(dat);
