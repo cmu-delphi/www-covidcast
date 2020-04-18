@@ -27,4 +27,4 @@ http://localhost:5000/frame.html
 ## Figma Mock-up
 https://www.figma.com/file/CkdJq5qlvpQNhUsaihBsFE/Delphi-Covid-Forecasting?node-id=0%3A1
 
-The most current mock is 'Design 7'
+The most current mock (for the graph) is 'Design 7'. Other mock to consider is 'Current Design Plan' . Mocks may lag dev changes.
