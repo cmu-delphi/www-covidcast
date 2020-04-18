@@ -13,11 +13,6 @@
   let el;
   let w;
 
-  // test data - global variables for line graph
-  var counties = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'];
-  var currentDate = new Date(2020, 3, 14);
-  var test = 0;
-
   // the $ syntax just says, if w is changed, run drawGraph() - e.g. redraw the graph when the window is resized.
   // $: w, drawGraph();
 
@@ -40,17 +35,14 @@
   }
 
   function updateGraph(data) {
-    console.log('update');
     if (userCharts != undefined) {
       if (userCharts[currentChart].isChart()) {
         userCharts[currentChart].draw();
       } else {
-        console.log('parse data');
         var dataResults = parseData(data);
         var graphType = dataResults[0];
         var graphData = dataResults[1];
         userCharts[currentChart] = new Chart(graphType, graphData);
-        console.log('debug: ' + userCharts[currentChart].isChart());
         userCharts[currentChart].draw();
       }
     }
@@ -65,16 +57,28 @@
     // let re = new RegExp('US[0-9]+');
     // let geo = region.match(re);
     // console.log('region data: ' + geo);
-    console.log('data: ' + data);
-    for(var i=0; i<data.length; i++) {
-      console.log(data[i].time_value);
-    }
+    // console.log('data: ' + data);
+    // for(var i=0; i<data.length; i++) {
+    //   console.log(data[i].time_value);
+    // }
 
     // todo: finish parsing data
 
     // todo: determine chart type based on data
     var cType = lineGraph;
     return [cType, data];
+  }
+
+  function getRange() {
+    let sensorType = $currentSensor;
+    console.log('sensor: ' + sensorType);
+    var sensorRanges = {
+      'fb_survey' : [0, 0.25],
+      'google-survey' : [0, 0.25],
+      'quidel' : [0, 100],
+      'health-trends' : [0, 100]
+    }
+    return sensorRanges[sensorType];
   }
 
   class Chart {
@@ -91,7 +95,6 @@
         case 'Line_Graph':
           chart = new LineGraph();
           chart.setData(data);
-          console.log('debug: ' + chart.getData());
           break;
         default:
           TypeError('Chart type not a valid type.');
@@ -100,7 +103,6 @@
     }
 
     setData(data) {
-      console.log('set data')
       // this.verifyDataFormat(data);
       // if(this.data === null) {
         this.data = data;
@@ -163,6 +165,14 @@
     }
 
     updateChart() {}
+
+    setRange(min, max) {
+      this.min = min;
+      this.max = max;
+    }
+    updateAxes() {
+
+    }
   }
 
   class BarChart extends Chart {
@@ -229,10 +239,8 @@
         .remove();
 
       // line graph
-      // sampleData.subscribe(_ => {
-      //   let data = $sampleData;
         let myData = this.getData();
-        console.log('my data: ' + myData);
+
         // size chart
         var margin = { top: 20, right: 20, bottom: 70, left: 40 },
           width = w - margin.left - margin.right,
@@ -274,7 +282,7 @@
           .attr('stroke', 'red')
           .attr('d', line(myData));
 
-        // label lines by county
+        // label lines by src
         // data.forEach(function(d) {
         //   //   var color = counties.indexOf(d.county);
         //   if (d.date.getTime() == currentDate.getTime()) {
