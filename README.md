@@ -18,6 +18,10 @@ To deploy an update run
 
 `npm run deploy`
 
+To view a version of the visualization in the frame of a cmu.edu site, run the server and go to:
+
+http://localhost:5000/frame.html
+
 ### Project Structure
 
 ## Figma Mock-up

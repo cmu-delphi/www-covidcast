@@ -1,5 +1,5 @@
 <script>
-  import { data, sensors, currentSensor, levels, currentLevel } from './stores.js';
+  import { data, sensors, currentSensor, levels, currentLevel, signalType } from './stores.js';
 
   currentSensor.subscribe(sens =>
     data ? '' : $data[sens][$currentLevel] ? '' : currentLevel.set($sensors.find(d => d.id === sens).levels[0]),
@@ -105,6 +105,22 @@
           {$levels[level]}
         </button>
       {/each}
+    </div>
+  </div>
+
+  <br />
+
+  <div class="option">
+    <div class="buttons-group-title">Signal Type</div>
+    <div class="buttons-group">
+      <button
+        class="button {$signalType === 'direction' ? 'selected' : null}"
+        on:click={() => signalType.set('direction')}>
+        Direction
+      </button>
+      <button class="button {$signalType === 'value' ? 'selected' : null}" on:click={() => signalType.set('value')}>
+        Value
+      </button>
     </div>
   </div>
 </div>

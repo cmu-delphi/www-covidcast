@@ -1,0 +1,292 @@
+{
+  "result": 1,
+  "epidata": [
+    {
+      "data_source": "fb_survey",
+      "signal": "cli",
+      "time_type": "day",
+      "geo_type": "county",
+      "min_time": 20200406,
+      "max_time": 20200413,
+      "num_locations": 555,
+      "min_value": 0,
+      "max_value": 5.0805650596568
+    },
+    {
+      "data_source": "fb_survey",
+      "signal": "cli",
+      "time_type": "day",
+      "geo_type": "hrr",
+      "min_time": 20200406,
+      "max_time": 20200413,
+      "num_locations": 292,
+      "min_value": 0,
+      "max_value": 4.5506535947712
+    },
+    {
+      "data_source": "fb_survey",
+      "signal": "cli",
+      "time_type": "day",
+      "geo_type": "msa",
+      "min_time": 20200406,
+      "max_time": 20200413,
+      "num_locations": 317,
+      "min_value": 0,
+      "max_value": 3.977435427287
+    },
+    {
+      "data_source": "fb_survey",
+      "signal": "ili",
+      "time_type": "day",
+      "geo_type": "county",
+      "min_time": 20200406,
+      "max_time": 20200413,
+      "num_locations": 555,
+      "min_value": 0,
+      "max_value": 5.0805650596568
+    },
+    {
+      "data_source": "fb_survey",
+      "signal": "ili",
+      "time_type": "day",
+      "geo_type": "hrr",
+      "min_time": 20200406,
+      "max_time": 20200413,
+      "num_locations": 292,
+      "min_value": 0,
+      "max_value": 4.5506535947712
+    },
+    {
+      "data_source": "fb_survey",
+      "signal": "ili",
+      "time_type": "day",
+      "geo_type": "msa",
+      "min_time": 20200406,
+      "max_time": 20200413,
+      "num_locations": 317,
+      "min_value": 0,
+      "max_value": 3.977435427287
+    },
+    {
+      "data_source": "ght",
+      "signal": "rawsearch",
+      "time_type": "day",
+      "geo_type": "dma",
+      "min_time": 20200201,
+      "max_time": 20200412,
+      "num_locations": 210,
+      "min_value": 0,
+      "max_value": 29484.029484029
+    },
+    {
+      "data_source": "ght",
+      "signal": "rawsearch",
+      "time_type": "day",
+      "geo_type": "hrr",
+      "min_time": 20200201,
+      "max_time": 20200412,
+      "num_locations": 149,
+      "min_value": 0,
+      "max_value": 29484.029484029
+    },
+    {
+      "data_source": "ght",
+      "signal": "rawsearch",
+      "time_type": "day",
+      "geo_type": "msa",
+      "min_time": 20200201,
+      "max_time": 20200412,
+      "num_locations": 132,
+      "min_value": 0,
+      "max_value": 29484.029484029
+    },
+    {
+      "data_source": "ght",
+      "signal": "raw_search",
+      "time_type": "day",
+      "geo_type": "dma",
+      "min_time": 20200220,
+      "max_time": 20200412,
+      "num_locations": 210,
+      "min_value": 0,
+      "max_value": 53093.964858671
+    },
+    {
+      "data_source": "ght",
+      "signal": "raw_search",
+      "time_type": "day",
+      "geo_type": "hrr",
+      "min_time": 20200220,
+      "max_time": 20200412,
+      "num_locations": 149,
+      "min_value": 0,
+      "max_value": 30007.501875469
+    },
+    {
+      "data_source": "ght",
+      "signal": "raw_search",
+      "time_type": "day",
+      "geo_type": "msa",
+      "min_time": 20200220,
+      "max_time": 20200412,
+      "num_locations": 132,
+      "min_value": 0,
+      "max_value": 30007.501875469
+    },
+    {
+      "data_source": "ght",
+      "signal": "smoothedsearch",
+      "time_type": "day",
+      "geo_type": "dma",
+      "min_time": 20200201,
+      "max_time": 20200412,
+      "num_locations": 210,
+      "min_value": 0,
+      "max_value": 13389.137237793
+    },
+    {
+      "data_source": "ght",
+      "signal": "smoothedsearch",
+      "time_type": "day",
+      "geo_type": "hrr",
+      "min_time": 20200201,
+      "max_time": 20200412,
+      "num_locations": 149,
+      "min_value": 0,
+      "max_value": 13389.137237793
+    },
+    {
+      "data_source": "ght",
+      "signal": "smoothedsearch",
+      "time_type": "day",
+      "geo_type": "msa",
+      "min_time": 20200201,
+      "max_time": 20200412,
+      "num_locations": 132,
+      "min_value": 0,
+      "max_value": 13389.137237793
+    },
+    {
+      "data_source": "ght",
+      "signal": "smoothed_search",
+      "time_type": "day",
+      "geo_type": "dma",
+      "min_time": 20200220,
+      "max_time": 20200412,
+      "num_locations": 210,
+      "min_value": 0,
+      "max_value": 16664.520938455
+    },
+    {
+      "data_source": "ght",
+      "signal": "smoothed_search",
+      "time_type": "day",
+      "geo_type": "hrr",
+      "min_time": 20200220,
+      "max_time": 20200412,
+      "num_locations": 149,
+      "min_value": 0,
+      "max_value": 10094.847749432
+    },
+    {
+      "data_source": "ght",
+      "signal": "smoothed_search",
+      "time_type": "day",
+      "geo_type": "msa",
+      "min_time": 20200220,
+      "max_time": 20200412,
+      "num_locations": 132,
+      "min_value": 0,
+      "max_value": 10094.847749432
+    },
+    {
+      "data_source": "google-survey",
+      "signal": "cli",
+      "time_type": "day",
+      "geo_type": "county",
+      "min_time": 20200411,
+      "max_time": 20200416,
+      "num_locations": 599,
+      "min_value": 0.026455026455026,
+      "max_value": 0.31923076923077
+    },
+    {
+      "data_source": "google-survey",
+      "signal": "cli",
+      "time_type": "day",
+      "geo_type": "hrr",
+      "min_time": 20200411,
+      "max_time": 20200416,
+      "num_locations": 281,
+      "min_value": 0.038415220826755,
+      "max_value": 0.2337038683496
+    },
+    {
+      "data_source": "google-survey",
+      "signal": "cli",
+      "time_type": "day",
+      "geo_type": "msa",
+      "min_time": 20200411,
+      "max_time": 20200416,
+      "num_locations": 324,
+      "min_value": 0.026455026455026,
+      "max_value": 0.18555347838193
+    },
+    {
+      "data_source": "quidel",
+      "signal": "negativeprop",
+      "time_type": "day",
+      "geo_type": "county",
+      "min_time": 20200201,
+      "max_time": 20200409,
+      "num_locations": 766,
+      "min_value": 0.090909090909091,
+      "max_value": 1
+    },
+    {
+      "data_source": "quidel",
+      "signal": "negativeprop",
+      "time_type": "day",
+      "geo_type": "hrr",
+      "min_time": 20200201,
+      "max_time": 20200409,
+      "num_locations": 254,
+      "min_value": 0.2,
+      "max_value": 1
+    },
+    {
+      "data_source": "quidel",
+      "signal": "negativeprop",
+      "time_type": "day",
+      "geo_type": "msa",
+      "min_time": 20200201,
+      "max_time": 20200409,
+      "num_locations": 269,
+      "min_value": 0.090909090909091,
+      "max_value": 1
+    },
+    {
+      "data_source": "quidel",
+      "signal": "negativeratio",
+      "time_type": "day",
+      "geo_type": "county",
+      "min_time": 20200101,
+      "max_time": 20200409,
+      "num_locations": 584,
+      "min_value": 0,
+      "max_value": 1
+    },
+    {
+      "data_source": "quidel",
+      "signal": "negativeratio",
+      "time_type": "day",
+      "geo_type": "hrr",
+      "min_time": 20200101,
+      "max_time": 20200409,
+      "num_locations": 246,
+      "min_value": 0,
+      "max_value": 1
+    }
+  ],
+  "message": "success"
+}

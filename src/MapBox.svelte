@@ -1,6 +1,15 @@
 <script>
   import mapboxgl from 'mapbox-gl';
-  import { levels, selectedRegion, geojsons, currentLevel, currentSensor, currentData, data } from './stores.js';
+  import {
+    levels,
+    selectedRegion,
+    geojsons,
+    currentLevel,
+    currentSensor,
+    currentData,
+    data,
+    signalType,
+  } from './stores.js';
 
   const LAT = -1.2;
   const LON = -0.5;
@@ -19,18 +28,19 @@
   currentLevel.subscribe(_ => updateMap());
   currentSensor.subscribe(_ => updateMap());
   currentData.subscribe(_ => updateMap());
+  signalType.subscribe(_ => updateMap());
 
   function updateMap() {
     if (!mounted) return;
-    Object.keys($levels).forEach(l => map.setLayoutProperty(l, 'visibility', 'none'));
-    map.setLayoutProperty($currentLevel, 'visibility', 'visible');
 
-    // TODO: Can currently only draw for county.
-    console.log($currentData);
+    let minMax = [999999999, -1];
     let mappedVals = new Map();
     let geoIds = new Set(
       $currentData.map(d => {
-        mappedVals.set(d.geo_value, d.direction);
+        let dat = d[$signalType];
+        minMax[0] = dat < minMax[0] ? dat : minMax[0];
+        minMax[1] = dat > minMax[1] ? dat : minMax[1];
+        mappedVals.set(d.geo_value, d[$signalType]);
         return d.geo_value;
       }),
     );
@@ -50,7 +60,36 @@
       }
     });
 
+    let stops = [[minMax[0], '#fff'], [minMax[1], '#c41230']];
+    if ($signalType === 'direction') {
+      stops = [[-1, '#224477'], [0, '#fff'], [1, '#c41230']];
+    }
+
     map.getSource($currentLevel).setData(dat);
+    map.removeLayer($currentLevel);
+    map.addLayer({
+      id: $currentLevel,
+      source: $currentLevel,
+      type: 'fill',
+      // layout: { visibility: 'none' },
+      filter: ['!=', 'val', -100],
+      paint: {
+        'fill-outline-color': 'black',
+        'fill-color': {
+          property: 'val',
+          stops: stops,
+        },
+      },
+    });
+
+    map.on('click', $currentLevel, function(e) {
+      selectedRegion.set(e.features[0].properties.GEO_ID);
+      console.log(e.features[0].properties);
+      new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(e.features[0].properties.NAME + '<br />' + e.features[0].properties.val)
+        .addTo(map);
+    });
   }
 
   function initializeMap() {
@@ -61,6 +100,7 @@
       center: [LON, LAT],
       zoom: ZOOM,
       minZoom: ZOOM,
+
       // maxBounds: new mapboxgl.LngLatBounds([-23.25, -14.54], [21.8, 13.4])
     })
       .addControl(
@@ -80,15 +120,6 @@
         data: $geojsons.get('state'),
       });
       map.addLayer({
-        id: 'state-outline',
-        source: 'state-outline',
-        type: 'fill',
-        paint: {
-          'fill-color': '#f9f9f9',
-          'fill-outline-color': '#e3e3e3',
-        },
-      });
-      map.addLayer({
         id: 'county-outline',
         source: 'county-outline',
         type: 'fill',
@@ -97,36 +128,36 @@
           'fill-outline-color': '#e0e0e0',
         },
       });
+      map.addLayer({
+        id: 'state-outline',
+        source: 'state-outline',
+        type: 'fill',
+        paint: {
+          'fill-color': 'rgba(0, 0, 0, 0)',
+          'fill-outline-color': '#bcbcbc',
+        },
+      });
       Object.keys($levels).forEach(name => {
         let data = $geojsons.get(name);
-        console.log(data);
         map.addSource(name, {
           type: 'geojson',
           data: data,
         });
-        map.addLayer({
-          id: name,
-          source: name,
-          type: 'fill',
-          layout: { visibility: 'none' },
-          filter: ['!=', 'val', -100],
-          paint: {
-            'fill-color': {
-              property: 'val',
-              stops: [[-1, '#224477'], [0, '#fff'], [1, '#c41230']],
-            },
-            'fill-outline-color': 'black',
-          },
-        });
-        map.on('click', name, function(e) {
-          selectedRegion.set(e.features[0].properties.GEO_ID);
-          console.log(e.features[0].properties);
-          new mapboxgl.Popup()
-            .setLngLat(e.lngLat)
-            .setHTML(e.features[0].properties.NAME + '<br />' + e.features[0].properties.val)
-            .addTo(map);
-        });
+        // map.addLayer({
+        //   id: name,
+        //   source: name,
+        //   type: 'fill',
+        //   layout: { visibility: 'none' },
+        //   filter: ['!=', 'val', -100],
+        //   paint: {
+        //     'fill-outline-color': 'black',
+        //   },
+        // });
       });
+
+      //Disable touch zoom, it makes gesture scrolling difficult
+      map.scrollZoom.disable();
+
       // Set all layers to not visible and currentLevel visible.
       mounted = true;
       updateMap();

@@ -7,14 +7,18 @@
 
   import { data, sensors, times } from './stores.js';
 
+  import * as d3 from 'd3';
+
   const ENDPOINT = 'https://delphi.cmu.edu/epidata/api.php?source=covidcast&time_type=day';
   const ENDPOINT_META = 'https://delphi.cmu.edu/epidata/api.php?source=covidcast_meta';
 
-  // Fetch data for each sensor and granularity
-  onMount(_ => {
-    fetch(ENDPOINT_META)
-      .then(d => d.json())
-      .then(meta => {
+  // this is for graph dev purposes
+  let use_real_data = true;
+
+  if (use_real_data === false) {
+    console.log('using fake network requests');
+    onMount(_ => {
+      d3.json('./temp_graph_data/meta_request_results.json').then(meta => {
         console.log(meta);
         let queries = [];
         let entries = [];
@@ -25,28 +29,24 @@
           let maxDate = date.max_time;
           timeMap.set(sens.id, [minDate, maxDate]);
           sens.levels.forEach(l => {
-            let query =
-              ENDPOINT +
-              '&data_source=' +
-              sens.id +
-              '&signal=' +
-              sens.signal +
-              '&geo_type=' +
-              l +
-              '&time_values=' +
-              minDate +
-              '-' +
-              maxDate +
-              '&geo_value=*';
-            queries.push(fetch(query).then(d => d.json()));
             entries.push([sens.id, l]);
           });
         });
-        queries.push();
+
+        // faking queries with d3.json()
+        queries.push(d3.json('./temp_graph_data/fb_survey_cli_county_20200406-20200413.json'));
+        queries.push(d3.json('./temp_graph_data/fb_survey_cli_msa_20200406-20200413.json'));
+        queries.push(d3.json('./temp_graph_data/google-survey_cli_county_20200411-20200416.json'));
+        queries.push(d3.json('./temp_graph_data/quidel_negativeratio_county_20200201-20200409.json'));
+        queries.push(d3.json('./temp_graph_data/quidel_negativeratio_msa_20200201-20200409.json'));
+        queries.push(d3.json('./temp_graph_data/ght_smoothedsearch_msa_20200201-20200412.json'));
+
         let dat = {};
         Promise.all(queries).then(d => {
           console.log(d);
           let metadata = d[d.length - 1];
+          console.log(entries);
+          console.log(timeMap);
           entries.forEach((ent, i) => {
             dat[ent[0]] ? '' : (dat[ent[0]] = {});
             dat[ent[0]][ent[1]] = d[i].epidata;
@@ -55,12 +55,61 @@
           data.set(dat);
         });
       });
-  });
+    });
+  }
+
+  if (use_real_data === true) {
+    console.log('using real network requests');
+    // Fetch data for each sensor and granularity
+    onMount(_ => {
+      fetch(ENDPOINT_META)
+        .then(d => d.json())
+        .then(meta => {
+          console.log(meta);
+          let queries = [];
+          let entries = [];
+          let timeMap = new Map();
+          $sensors.forEach(sens => {
+            let date = meta.epidata.find(d => d.data_source === sens.id);
+            let minDate = date.min_time;
+            let maxDate = date.max_time;
+            timeMap.set(sens.id, [minDate, maxDate]);
+            sens.levels.forEach(l => {
+              let query =
+                ENDPOINT +
+                '&data_source=' +
+                sens.id +
+                '&signal=' +
+                sens.signal +
+                '&geo_type=' +
+                l +
+                '&time_values=' +
+                minDate +
+                '-' +
+                maxDate +
+                '&geo_value=*';
+              queries.push(fetch(query).then(d => d.json()));
+              entries.push([sens.id, l]);
+            });
+          });
+          let dat = {};
+          Promise.all(queries).then(d => {
+            console.log(d);
+            entries.forEach((ent, i) => {
+              dat[ent[0]] ? '' : (dat[ent[0]] = {});
+              dat[ent[0]][ent[1]] = d[i].epidata;
+            });
+            times.set(timeMap);
+            data.set(dat);
+          });
+        });
+    });
+  }
 </script>
 
 <style>
   .options-container {
-    position: fixed;
+    position: absolute;
     top: 2vh;
     left: 2vh;
     z-index: 1000;
@@ -77,7 +126,7 @@
   }
 
   .graph-container {
-    position: fixed;
+    position: absolute;
     bottom: 2vh;
     right: 2vh;
     z-index: 1001;
@@ -91,7 +140,7 @@
   }
 
   .time-container {
-    position: fixed;
+    position: absolute;
     bottom: 4vh;
     left: calc(2vh + 400px);
     z-index: 1002;
@@ -125,7 +174,7 @@
   <Graph />
 </div>
 
-<!-- 
+<!--
 <div class="pure-g">
   <div class="pure-u-1 pure-u-md-2-3">
     <div class="block">
