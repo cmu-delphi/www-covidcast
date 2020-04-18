@@ -51,7 +51,8 @@
           var dataResults = parseData(data);
           var graphType = dataResults[0];
           var graphData = dataResults[1];
-          userCharts[currentChart] = new Chart(graphType, graphData);
+          var range = dataResults[2];
+          userCharts[currentChart] = new Chart(graphType, graphData, range);
           userCharts[currentChart].draw();
         }
       }
@@ -75,8 +76,9 @@
     // todo: finish parsing data
 
     // todo: determine chart type based on data
+    var dataRange = userCharts[currentChart].getRange();
     var cType = lineGraph;
-    return [cType, data];
+    return [cType, data, dataRange];
   }
 
   function setChartRange(data) {
@@ -96,7 +98,7 @@
   }
 
   class Chart {
-    constructor(chartType, data) {
+    constructor(chartType, data, dataRange) {
       var chart;
       this.chartType = chartType;
       this.x = null;
@@ -109,6 +111,7 @@
         case 'Line_Graph':
           chart = new LineGraph();
           chart.setData(data);
+          chart.setRange(dataRange[0], dataRange[1]);
           break;
         default:
           TypeError('Chart type not a valid type.');
@@ -181,9 +184,13 @@
     updateChart() {}
 
     setRange(min, max) {
+      console.log('setting: ' + min + ' ' + max);
+      console.log(min[0]);
       this.min = min;
       this.max = max;
     }
+
+    getRange() { return [this.min, this.max] };
     updateAxes() {}
   }
 
@@ -280,7 +287,7 @@
         .range([0, width]);
       var y = d3
         .scaleLinear()
-        .domain([0, 100])
+        .domain([this.min, this.max])
         .range([height, 0]);
 
       svg
