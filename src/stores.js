@@ -62,7 +62,7 @@ export const currentSensor = writable('google-survey');
 // 'county', 'state', or 'msa'
 export const currentLevel = writable('county');
 // Options are 'direction' and 'value'.
-export const signalType = writable('direction');
+export const signalType = writable('value');
 // EpiWeek in form YYYYMMDD.
 export const currentDate = writable(20200412);
 // Range of time for the map slider.
