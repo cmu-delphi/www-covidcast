@@ -3,6 +3,7 @@
   import Options from './Options.svelte';
   import Tabs from './Tabs.svelte';
   import Time from './Time.svelte';
+  import Legend from './Legend.svelte';
   import MapBox from './MapBox.svelte';
   import Graph from './Graph.svelte';
 
@@ -147,16 +148,16 @@
 
   .legend-container {
     position: absolute;
-    bottom: calc(2vh + 410px);
-    right: 2vh;
-    z-index: 1001;
-    width: 400px;
-    background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 1rem;
-    padding: 10px 15px;
-    box-sizing: border-box;
-    display: inline-flex;
-    justify-content: space-between;
+    top: 200px;
+    bottom: 200px;
+    left: 20px;
+    z-index: 1000;
+    /* background-color: rgba(255, 255, 255, 0.7); */
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
     transition: all 0.1s ease-in;
   }
@@ -196,36 +197,6 @@
   .graph-container:hover {
     background-color: rgba(255, 255, 255, 0.9);
   }
-
-  .color {
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
-    display: inline-block;
-    border: 1px solid #dbdbdb;
-  }
-
-  .legend-container p {
-    align-items: center;
-    justify-content: center;
-    display: flex;
-  }
-
-  .legend-bar {
-    background: linear-gradient(to right, #fff, #c41230);
-    width: 300px;
-    height: 20px;
-  }
-
-  .dec {
-    background-color: #224477;
-  }
-  .const {
-    background-color: #fff;
-  }
-  .inc {
-    background-color: #c41230;
-  }
 </style>
 
 <MapBox />
@@ -243,52 +214,9 @@
 </div>
 
 <div class="legend-container">
-  {#if $signalType === 'direction'}
-    <p>
-      <span class="color dec" />
-      Decreasing
-    </p>
-    <p>
-      <span class="color const" />
-      Constant
-    </p>
-    <p>
-      <span class="color inc" />
-      Increasing
-    </p>
-  {:else}
-    <p>None</p>
-    <p class="legend-bar" />
-    <p>High</p>
-  {/if}
+  <Legend />
 </div>
 
 <div class="graph-container">
   <Graph />
 </div>
-
-<!--
-<div class="pure-g">
-  <div class="pure-u-1 pure-u-md-2-3">
-    <div class="block">
-      <Options />
-    </div>
-  </div>
-  <div class="pure-u-1 pure-u-md-1-3">
-    <div class="block">
-      <Time />
-    </div>
-  </div>
-</div>
-<div class="pure-g">
-  <div class="pure-u-1 pure-u-md-2-3">
-    <div class="block">
-      <MapBox />
-    </div>
-  </div>
-  <div class="pure-u-1 pure-u-md-1-3">
-    <div class="block">
-      <Graph />
-    </div>
-  </div>
-</div> -->
