@@ -9,9 +9,11 @@
   let el;
   let w;
 
-  // global variables for line graph
+  // test data - global variables for line graph
   var counties = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'];
   var currentDate = new Date(2020, 3, 14);
+  var test = 0;
+
   // the $ syntax just says, if w is changed, run drawGraph() - e.g. redraw the graph when the window is resized.
   // $: w, drawGraph();
 
@@ -38,17 +40,25 @@
     if (userCharts != undefined) {
       var test = userCharts[currentChart].isChart(this);
       console.log(test);
-      userCharts[currentChart].isChart(this) ? userCharts[currentChart].draw() : userCharts[currentChart] = new Chart(fetchData());
+      var dataResults = parseData();
+      var graphType = dataResults[0];
+      var graphData = dataResults[1];
+      if(userCharts[currentChart].isChart()) {
+        userCharts[currentChart].draw();
+      } else {
+        userCharts[currentChart] = new Chart(graphType, graphData);
+        userCharts[currentChart].draw();
+      }
     }
   }
 
   // parse data
-  function fetchData() {
-    console.log('get data');
+  function parseData() {
+    // console.log('get data');
     let data = $currentData;
     let region = $selectedRegion;
-    console.log('first element' + data['0']);
-    console.log('region: ' + region);
+    // console.log('first element' + data['0']);
+    // console.log('region: ' + region);
 
     // search for the ID
     let re = new RegExp('US[0-9]+');
@@ -68,44 +78,10 @@
     // console.log('filter: ' + gData);
 
     // todo: finish parsing data
-    var graphData =   {
-                    "county1" : {
-                      "03-30-2020" : 20,
-                      "03-31-2020" : 22,
-                      "04-01-2020" : 28,
-                      "04-02-2020" : 33,
-                      "04-03-2020" : 45,
-                      "04-04-2020" : 47,
-                      "04-05-2020" : 49,
-                      "04-06-2020" : 50,
-                      "04-07-2020" : 51,
-                      "04-08-2020" : 52,
-                      "04-09-2020" : 51,
-                      "04-10-2020" : 53,
-                      "04-11-2020" : 52,
-                      "04-12-2020" : 52,
-                      "04-13-2020" : 53
-                    },
-                    "county2" : {
-                      "03-30-2020" : 68,
-                      "03-31-2020" : 69,
-                      "04-01-2020" : 69,
-                      "04-02-2020" : 70,
-                      "04-03-2020" : 72,
-                      "04-04-2020" : 74,
-                      "04-05-2020" : 76,
-                      "04-06-2020" : 78,
-                      "04-07-2020" : 80,
-                      "04-08-2020" : 83,
-                      "04-09-2020" : 86,
-                      "04-10-2020" : 89,
-                      "04-11-2020" : 92,
-                      "04-12-2020" : 96,
-                      "04-13-2020" : 101
-                    }
-                  }
+
     // todo: determine chart type based on data
-    var chartType = lineGraph;
+    var cType = lineGraph;
+    console.log(cType);
 
     var graphData = {
       county1: {
@@ -143,13 +119,13 @@
         '04-13-2020': 101,
       },
     };
-    return chartType, graphData;
+    return [cType, graphData];
   }
 
   class Chart {
     constructor(chartType, data) {
-      console.log('chart constructor: ' + chartType);
       var chart;
+      this.chartType = chartType;
       this.x = null;
       this.y = null;
       switch (chartType) {
@@ -159,6 +135,7 @@
           chart.setData(data);
           break;
         case 'Line_Graph':
+          console.log('line graph')
           chart = new LineGraph();
           chart.setData(data);
           break;
@@ -180,10 +157,10 @@
       return this.data;
     }
 
-    isChart(chart) {
+    isChart() {
       var result = null;
       try {
-        chart.chartType in charts ? (result = true) : (result = false);
+        this.chartType in charts ? (result = true) : (result = false);
       } catch (e) {
         if(e.name == 'ReferenceError') {
           result = false;
@@ -247,6 +224,7 @@
     }
 
     draw() {
+      console.log('draw bar chart');
       super.draw();
 
       // construct the x and y domain from the data
@@ -291,6 +269,7 @@
 
   class LineGraph extends Chart {
     draw() {
+      console.log('draw line graph');
       // if there is an existing chart, remove it and redraw
       d3.select(el)
         .selectAll('*')
@@ -353,9 +332,14 @@
       });
     }
   }
+
+  // todo: display user friendly names on graph
+  function displayName() {
+
+  }
 </script>
 
-<p>cool line graph with options</p>
+<p>COVIDCAST Data</p>
 <p>
   currently viewing sensor
   <b>{$currentSensor}</b>
@@ -363,6 +347,7 @@
   <b>{$currentLevel}</b>
   for
   <b>{$selectedRegion}</b>
+  <button onclick="{_ => callMyFunction()}" value="Update"></button>
 </p>
 
 <!-- bind:this sets the variable el to the HTML div you can then select using d3 as above-->
