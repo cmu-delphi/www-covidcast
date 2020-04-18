@@ -13,7 +13,7 @@
   const ENDPOINT_META = 'https://delphi.cmu.edu/epidata/api.php?source=covidcast_meta';
 
   // this is for graph dev purposes
-  let use_real_data = false;
+  let use_real_data = true;
 
   if (use_real_data === false) {
     onMount(_ => {
