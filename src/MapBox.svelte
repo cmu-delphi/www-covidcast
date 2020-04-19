@@ -29,7 +29,14 @@
   $: if (!map && $geojsons.size !== 0 && $currentData.length !== 0) initializeMap();
 
   // Update the map when sensor or level changes.
-  currentData.subscribe(_ => updateMap());
+  currentData.subscribe(_ => {
+    console.log($currentData);
+    try {
+      updateMap();
+    } catch (err) {
+      console.log(err);
+    }
+  });
   signalType.subscribe(_ => updateMap());
 
   function updateMap() {

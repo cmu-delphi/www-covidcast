@@ -79,7 +79,8 @@
     });
   }
 
-  function updateRegionSliceCache(sensor, level, date) {
+  function updateRegionSliceCache(sensor, level, date, reason = 'unspecified') {
+    console.log($regionSliceCache);
     if (!$mounted) return;
     console.log(sensor, level, date, $times.get(sensor));
     if (!$sensors.find(d => d.id === sensor).levels.includes(level)) return;
@@ -101,11 +102,18 @@
       fetch(q)
         .then(d => d.json())
         .then(d => {
-          console.log(q, d);
-          currentData.set(d.epidata);
-          regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
+          console.log(reason, q, d);
+          if (d.result < 0 || d.message.includes('no results')) {
+            console.log('bad api call, not updating regionSliceCache');
+          } else {
+            currentData.set(d.epidata);
+            regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
+          }
         });
-    } else currentData.set(cacheEntry);
+    } else {
+      console.log(reason, 'got in cache');
+      currentData.set(cacheEntry);
+    }
   }
 
   function updateTimeSliceCache(sensor, level, region) {
@@ -151,12 +159,12 @@
 
   currentLevel.subscribe(l => {
     console.log('level update');
-    updateRegionSliceCache($currentSensor, l, $currentDate);
+    updateRegionSliceCache($currentSensor, l, $currentDate, 'level change');
   });
 
   currentDate.subscribe(d => {
     console.log('date update');
-    updateRegionSliceCache($currentSensor, $currentLevel, d);
+    updateRegionSliceCache($currentSensor, $currentLevel, d, 'date change');
   });
 
   currentRegion.subscribe(r => {
