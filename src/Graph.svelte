@@ -15,6 +15,7 @@
 
   let el;
   let w;
+  let t;
 
   // the $ syntax just says, if w is changed, run drawGraph() - e.g. redraw the graph when the window is resized.
   // $: w, drawGraph();
@@ -156,6 +157,46 @@
       return title;
     }
 
+    getChartTitle() {
+      var ChartTitle = 'Currently viewing sensor ';
+      let title = '';
+      let sensor = $currentSensor;
+      let geoLevel = $currentLevel;
+      console.log(geoLevel);
+      switch (sensor) {
+        case 'google-survey':
+          title = 'Survey (Google)';
+          break;
+        case 'fb_survey':
+          title = 'Survey (Facebook)';
+          break;
+        case 'quidel':
+          title = 'Lab Tests (Quidel)';
+          break;
+        case 'ght':
+          title = 'Search Trends (Google)';
+          break;
+        case 'doctor-visits':
+          title = 'Doctor Visits';
+          break;
+        default:
+          break;
+      }
+      let geoTitle = '';
+      switch (geoLevel) {
+        case 'county':
+          geoTitle = 'County';
+          break;
+        case 'state':
+          geoTitle = 'State';
+          break;
+        default:
+          break;
+      }
+      var cT =  ChartTitle + ' <strong> ' + title + '</strong> at the <strong>' + geoTitle + '</strong> level';
+      d3.select(t).html(cT);
+    }
+
     isChart() {
       var result = null;
       try {
@@ -277,7 +318,7 @@
         .range([0, width]);
       var y = d3
         .scaleLinear()
-        .domain([this.min, this.max*1.2])
+        .domain([this.min, this.max*1.3])
         .range([height, 0]);
 
       svg
@@ -328,6 +369,15 @@
         .attr('transform', 'translate(' + width / 2 + ', ' + (height + margin.top + 20) + ')')
         .style('text-anchor', 'middle')
         .text('Date');
+
+      // label the chart
+      this.getChartTitle();
+      // var chartTitle = this.getChartTitle();
+      // svg
+      //   .append('text')
+      //   .attr('transform', 'translate(' + width/2 + ', ' + 0 + ')')
+      //   .style('text-anchor', 'middle')
+      //   .text(chartTitle);
     }
   }
 
@@ -344,16 +394,7 @@
 </style>
 
 <h4 class="graph-title">Intensity Data Over Time</h4>
-<p>
-  Currently viewing sensor
-  <b>{$currentSensorName}</b>
-  at the
-  <b>{$currentLevelName}</b>
-  level
-  <!-- <b>{$selectedRegion}</b> -->
-
-  <!-- bind:this sets the variable el to the HTML div you can then select using d3 as above-->
-</p>
+<p bind:this={t}></p>
 <div bind:clientWidth={w}>
   <div bind:this={el} />
 </div>
