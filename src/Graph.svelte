@@ -278,6 +278,7 @@
         .append('g')
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
+      // set date range
       var parseTime = d3.timeParse('%Y%m%d');
       var formatTime = d3.timeFormat('%m-%d-%Y');
       var k = d3.keys(myData);
@@ -288,18 +289,28 @@
       var twoWeeks = 60 * 60 * 24 * 1000 * 7 * 2;
       var bisectDate = d3.bisector(function(d) {
           return d.time_value;
-        }).right,
-      maxDate = maxDate - twoWeeks;
-      maxDate = new Date(maxDate);
-      myData = myData.filter(it => parseTime(it['time_value']) > maxDate);
-      var ticks = myData.length;
+        }).right;
+      var minDate = maxDate - twoWeeks;
+      minDate = new Date(minDate);
+      myData = myData.filter(it => parseTime(it['time_value']) < maxDate);
+      myData = myData.filter(it => parseTime(it['time_value']) > minDate);
+
+      // set x-axis ticks based off of data sparsity and format y-axis ticks
+      var xTicks = myData.length;
+      var formatXTicks = (xTicks < 6) ? xTicks : d3.timeDay.every(3);
+      var scalePercentages = function(d) { return formatPercent(d*100) };
+      var formatPercent = d3.format('%')(1);
+      var percentFormat = (this.getYAxis() == 'Percentage');
+      // console.log(percentFormat);
+      var formatYTicks = (percentFormat) ? d3.format('+.0%')(1) : 8;
+      console.log(formatYTicks);
       var x = d3
         .scaleTime()
         .domain(d3.extent(myData, d => parseTime(d.time_value)))
         .range([0, width]);
       var y = d3
         .scaleLinear()
-        .domain([this.min, this.max * 1.3])
+        .domain([this.min, this.max * 1.2])
         .range([height, 0]);
 
       svg
@@ -310,12 +321,12 @@
           d3
             .axisBottom(x)
             .tickFormat(d3.timeFormat('%m/%d'))
-            .ticks(d3.timeDay.every(4)),
+            .ticks(formatXTicks),
         );
       svg
         .append('g')
         .attr('class', 'axis')
-        .call(d3.axisLeft(y).ticks(8));
+        .call(d3.axisLeft(y).ticks(formatYTicks));
 
       let line = d3
         .line()
@@ -435,7 +446,7 @@
   }
   .graph-description {
       text-align: center;
-      margin: 0px;
+      margin: 10px 0px 0px 0px;
       font-size: 12px;
       font-style: italic;
   }
