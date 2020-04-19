@@ -102,7 +102,7 @@
 
   .buttons-group button.button:disabled {
     background-color: rgb(211, 211, 211);
-    color: #fff;
+    color: #6c757d;
     cursor: not-allowed;
   }
 
@@ -170,7 +170,7 @@
 
   .buttons-group-side button.button:disabled {
     background-color: rgb(211, 211, 211);
-    color: #fff;
+    color: #6c757d;
     cursor: not-allowed;
   }
 
