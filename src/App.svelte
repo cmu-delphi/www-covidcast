@@ -245,7 +245,7 @@
 
   .legend-container {
     position: absolute;
-    top: 230px;
+    top: 240px;
     left: 10px;
     z-index: 1000;
     /* background-color: rgba(255, 255, 255, 0.7); */
