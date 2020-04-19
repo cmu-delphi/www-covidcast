@@ -11,6 +11,7 @@
     currentRange,
     signalType,
     currentDataReadyOnMay,
+    metaData,
   } from './stores.js';
   import { DIRECTION_THEME } from './theme.js';
 
@@ -33,14 +34,17 @@
 
   function updateMap() {
     if (!mounted) return;
+    let thisMeta = $metaData.find(d => d.data_source === $currentSensor && d.geo_type === $currentLevel);
+    let minMax = [thisMeta.min_value, thisMeta.max_value];
 
-    let minMax = [999999999, -1];
+    // console.log(thisMeta);
+    // let minMax = [999999999, -1];
     let mappedVals = new Map();
     let geoIds = new Set(
       $currentData.map(d => {
         let dat = d[$signalType];
-        minMax[0] = dat < minMax[0] ? dat : minMax[0];
-        minMax[1] = dat > minMax[1] ? dat : minMax[1];
+        // minMax[0] = dat < minMax[0] ? dat : minMax[0];
+        // minMax[1] = dat > minMax[1] ? dat : minMax[1];
         if (dat !== null) {
           mappedVals.set(d.geo_value.toUpperCase(), d[$signalType]);
         }
