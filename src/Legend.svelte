@@ -1,5 +1,5 @@
 <script>
-  import { signalType } from "./stores.js";
+  import { signalType, stats, currentSensor } from "./stores.js";
   import { DIRECTION_THEME } from "./theme.js";
 </script>
 

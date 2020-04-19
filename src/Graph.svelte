@@ -385,7 +385,7 @@
         .data(myData)
         .enter()
         .append("circle")
-        .attr("r", 5)
+        .attr("r", 4)
         .attr("cx", d => x(parseTime(d.time_value)))
         .attr("cy", d => y(+d.value))
         .style("fill", DIRECTION_THEME.gradientMiddle);
@@ -427,6 +427,11 @@
         .append("g")
         .attr("class", "focus")
         .style("display", "none");
+
+      focus
+        .append("circle")
+        .attr("r", 7)
+        .style("fill", DIRECTION_THEME.gradientMiddle);
 
       focus
         .append("rect")
@@ -537,7 +542,7 @@
 </style>
 
 <div class="graph-container">
-  <h5 class="graph-title">{t}</h5>
+  <h5 bind:this={t} class="graph-title" />
   <p class="graph-description">{$currentRegionName}</p>
 
   <div bind:clientWidth={w}>
