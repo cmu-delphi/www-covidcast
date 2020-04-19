@@ -19,9 +19,60 @@
 
   let container;
   let map;
+  let popup;
+  let hoveredId;
+  let clickedId;
 
   // Boolean tracking if the map has been initialized.
   let mounted = false;
+
+  // Mouse event handlers
+  const onMouseEnter = level => e => {
+    // popup
+    map.getCanvas().style.cursor = 'pointer';
+
+    var title = e.features[0].properties.NAME;
+    popup
+      .setLngLat(e.lngLat)
+      .setHTML(title)
+      .addTo(map);
+  };
+  const onMouseMove = level => e => {
+    // hover state
+    if (hoveredId) {
+      map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
+    }
+    hoveredId = e.features[0].id;
+    map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
+
+    // popup
+    var title = e.features[0].properties.NAME;
+    popup.setLngLat(e.lngLat).setHTML(title);
+  };
+  const onMouseLeave = level => e => {
+    // hover state
+    if (hoveredId) {
+      map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
+    }
+    hoveredId = null;
+
+    map.getCanvas().style.cursor = '';
+    popup.remove();
+  };
+  const onClick = level => e => {
+    if (clickedId) {
+      map.setFeatureState({ source: level, id: clickedId }, { select: false });
+    }
+
+    if (clickedId !== e.features[0].id) {
+      clickedId = e.features[0].id;
+      map.setFeatureState({ source: level, id: clickedId }, { select: true });
+      currentRegion.set(e.features[0].properties.id);
+    } else {
+      clickedId = null;
+      currentRegion.set('');
+    }
+  };
 
   // If it hasn't been initialized and we have geojsons and initial data, create map.
   $: if (!map && $geojsons.size !== 0 && $currentData.length !== 0) initializeMap();
@@ -38,62 +89,51 @@
       map.getLayer($currentLevel) && map.removeLayer($currentLevel);
     }
 
-    let minMax = [999999999, -1];
+    let valueMinMax = [999999999, -1];
     let valueMappedVals = new Map();
-    let valueGeoIds = new Set(
-      $currentData.map(d => {
-        let dat = d.value;
-        minMax[0] = dat < minMax[0] ? dat : minMax[0];
-        minMax[1] = dat > minMax[1] ? dat : minMax[1];
-        if (dat !== null) {
-          valueMappedVals.set(d.geo_value.toUpperCase(), dat);
-        }
-        return d.geo_value.toUpperCase();
-      }),
-    );
     let directionMappedVals = new Map();
-    let directionGeoIds = new Set(
+
+    let geoIds = new Set(
       $currentData.map(d => {
-        let dat = d.direction;
-        minMax[0] = dat < minMax[0] ? dat : minMax[0];
-        minMax[1] = dat > minMax[1] ? dat : minMax[1];
-        if (dat !== null) {
-          directionMappedVals.set(d.geo_value.toUpperCase(), dat);
+        const key = d.geo_value.toUpperCase();
+        const dat = d.value;
+        valueMinMax[0] = dat < valueMinMax[0] ? dat : valueMinMax[0];
+        valueMinMax[1] = dat > valueMinMax[1] ? dat : valueMinMax[1];
+
+        if (d.value !== null) {
+          valueMappedVals.set(key, d.value);
         }
-        return d.geo_value.toUpperCase();
+        if (d.direction !== null) {
+          directionMappedVals.set(key, d.direction);
+        }
+
+        return key;
       }),
     );
-    currentRange.set(minMax);
+
+    currentRange.set($signalType === 'value' ? valueMinMax : [-1, 1]);
 
     let dat = $geojsons.get($currentLevel);
     dat.features.forEach(d => {
-      let id;
-      if ($currentLevel === 'county') {
-        id = d.properties.GEO_ID.slice(-5);
-      } else if ($currentLevel === 'msa') {
-        id = d.properties.cbsafp;
-      } else if ($currentLevel === 'state') {
-        id = d.properties.POSTAL;
-      }
-      d.properties.id = id;
+      const id = d.properties.id;
 
       d.properties.value = -100;
       d.properties.direction = -100;
-      if (valueGeoIds.has(id) && valueMappedVals.get(id) !== null) {
+      if (geoIds.has(id) && valueMappedVals.get(id) !== null) {
         d.properties.value = valueMappedVals.get(id);
       }
-      if (directionGeoIds.has(id) && directionMappedVals.get(id) !== null) {
+      if (geoIds.has(id) && directionMappedVals.get(id) !== null) {
         d.properties.direction = directionMappedVals.get(id);
       }
     });
 
-    let stops = [[minMax[0], '#fff'], [minMax[1], '#c41230']];
-    if ($signalType === 'direction') {
+    let stops;
+    if ($signalType === 'value') {
+      stops = [[valueMinMax[0], '#fff'], [valueMinMax[1], '#c41230']];
+    } else {
       stops = [[-1, DIRECTION_THEME.decreasing], [0, DIRECTION_THEME.steady], [1, DIRECTION_THEME.increasing]];
     }
     console.log('data update');
-    console.log(valueGeoIds, valueMappedVals);
-    console.log(directionGeoIds, directionMappedVals);
     console.log(dat);
     if (['data', 'init'].includes(type)) {
       map.getSource($currentLevel).setData(dat);
@@ -122,7 +162,7 @@
                 },
               },
             },
-            'city-point-unclustered',
+            `${$currentLevel}-hover`,
           );
         }
       } else {
@@ -130,13 +170,6 @@
       }
     });
 
-    map.on('click', $currentLevel, function(e) {
-      currentRegion.set(e.features[0].properties.id);
-      new mapboxgl.Popup()
-        .setLngLat(e.lngLat)
-        .setHTML("<p class='tooltip-text'>" + e.features[0].properties.NAME + '</p>')
-        .addTo(map);
-    });
     currentDataReadyOnMay.set(true);
     window.performance.measure('update-map', 'update-map-start');
   }
@@ -233,6 +266,30 @@
           'fill-outline-color': '#bcbcbc',
         },
       });
+
+      Object.keys($levels).forEach(name => {
+        const data = $geojsons.get(name);
+        map.addSource(name, {
+          type: 'geojson',
+          data: $geojsons.get(name),
+        });
+        console.log(data);
+        map.addLayer({
+          id: `${name}-hover`,
+          source: name,
+          type: 'line',
+          paint: {
+            'line-color': '#313131',
+            'line-width': [
+              'case',
+              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
+              4,
+              0,
+            ],
+          },
+        });
+      });
+
       map.addLayer({
         id: 'city-point-unclustered',
         source: 'city-point',
@@ -264,16 +321,19 @@
         },
       });
 
-      Object.keys($levels).forEach(name => {
-        let data = $geojsons.get(name);
-        map.addSource(name, {
-          type: 'geojson',
-          data: data,
-        });
-      });
-
       mounted = true;
       updateMap('init');
+    });
+
+    popup = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false,
+    });
+    Object.keys($levels).forEach(level => {
+      map.on('mouseenter', level, onMouseEnter(level));
+      map.on('mousemove', level, onMouseMove(level));
+      map.on('mouseleave', level, onMouseLeave(level));
+      map.on('click', level, onClick(level));
     });
   }
 
