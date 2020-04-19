@@ -60,7 +60,6 @@
     updateSliderUI();
 
     currentDate.set(max);
-    updateRegionSliceCache($currentSensor, $currentLevel, max);
   }
 
   function updateSliderUI() {
