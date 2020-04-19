@@ -85,10 +85,51 @@
     /* white-space: nowrap; */
 
     transition: all 0.1s ease-in;
+
+    position: relative;
+  }
+
+  .buttons-group .button:first-child {
+    border-top-color: #dbdbdb;
+    /* border-top-left-radius: 4px; */
+    /* border-top-right-radius: 4px; */
+  }
+
+  .buttons-group .button:last-child {
+    /* border-bottom-left-radius: 4px; */
+    /* border-bottom-right-radius: 4px; */
   }
 
   .buttons-group button.button:disabled {
     cursor: not-allowed;
+  }
+
+  .buttons-group button.button .disabled-tooltip {
+    visibility: hidden;
+    width: 100px;
+    background-color: #444;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 5px;
+    position: absolute;
+    z-index: 1;
+    top: -5px;
+    left: 105%;
+  }
+
+  .buttons-group button.button .disabled-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent #444 transparent transparent;
+  }
+  .buttons-group button.button:hover .disabled-tooltip {
+    visibility: visible;
   }
 
   .buttons-group-side {
@@ -120,21 +161,12 @@
     /* white-space: nowrap; */
 
     transition: all 0.1s ease-in;
+
+    position: relative;
   }
 
   .buttons-group-side button.button:disabled {
     cursor: not-allowed;
-  }
-
-  .buttons-group .button:first-child {
-    border-top-color: #dbdbdb;
-    /* border-top-left-radius: 4px; */
-    /* border-top-right-radius: 4px; */
-  }
-
-  .buttons-group .button:last-child {
-    /* border-bottom-left-radius: 4px; */
-    /* border-bottom-right-radius: 4px; */
   }
 
   .buttons-group-side .button:first-child {
@@ -146,6 +178,35 @@
   .buttons-group-side .button:last-child {
     /* border-top-right-radius: 4px; */
     /* border-bottom-right-radius: 4px; */
+  }
+
+  .buttons-group-side button.button .disabled-tooltip {
+    visibility: hidden;
+    width: 100px;
+    background-color: #444;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 5px;
+    position: absolute;
+    z-index: 1;
+    top: 150%;
+    left: 50%;
+    margin-left: -60px;
+  }
+
+  .buttons-group-side button.button .disabled-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #444 transparent;
+  }
+  .buttons-group-side button.button:hover .disabled-tooltip {
+    visibility: visible;
   }
 
   .buttons-group .button.selected,
@@ -185,6 +246,9 @@
             class="button {$currentLevel === level ? 'selected' : ''}"
             on:click={() => currentLevel.set(level)}
             disabled={$sensors.find(d => d.id === $currentSensor).levels.includes(level) === false}>
+            {#if $sensors.find(d => d.id === $currentSensor).levels.includes(level) === false}
+              <span class="disabled-tooltip">Currently unavailable</span>
+            {/if}
             {$levels[level]}
           </button>
         {/each}
@@ -208,6 +272,9 @@
           class="button {$signalType === 'direction' ? 'selected' : ''}"
           on:click={() => signalType.set('direction')}
           disabled={$currentSensor === 'fb_survey'}>
+          {#if $currentSensor === 'fb_survey'}
+            <span class="disabled-tooltip">Currently unavailable</span>
+          {/if}
           Direction
         </button>
 
