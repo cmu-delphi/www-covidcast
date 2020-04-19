@@ -296,7 +296,7 @@
 
   .legend-container {
     position: absolute;
-    top: 230px;
+    top: 240px;
     left: 10px;
     z-index: 1000;
     /* background-color: rgba(255, 255, 255, 0.7); */
@@ -371,20 +371,20 @@
 
 <MapBox />
 
-<div class="options-container">
-  <Options />
-</div>
-
 <div class="tabs-container">
   <Tabs />
 </div>
 
-<div class="time-container">
-  <Time {updateRegionSliceCache} />
+<div class="options-container">
+  <Options />
 </div>
 
 <div class="legend-container">
   <Legend />
+</div>
+
+<div class="time-container">
+  <Time {updateRegionSliceCache} />
 </div>
 
 <div class="graph-container">
