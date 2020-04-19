@@ -196,9 +196,8 @@
   }
 
   .load-more-button:hover {
-    /* background-color: rgb(255, 255, 255); */
-    /* transform: scale(1.05); */
-    font-weight: 600;
+    background-color: #5a6268;
+    color: #fff;
   }
 
   .load-more-button:focus {
@@ -206,8 +205,8 @@
   }
 
   .load-more-button:disabled {
-    background-color: rgb(165, 169, 173);
-    color: rgb(221, 221, 221);
+    background-color: rgb(211, 211, 211);
+    color: #fff;
     cursor: not-allowed;
     font-weight: 300;
     font-size: 0.7rem;

@@ -101,8 +101,8 @@
   }
 
   .buttons-group button.button:disabled {
-    background-color: rgb(165, 169, 173);
-    color: rgb(221, 221, 221);
+    background-color: rgb(211, 211, 211);
+    color: #fff;
     cursor: not-allowed;
   }
 
@@ -169,8 +169,8 @@
   }
 
   .buttons-group-side button.button:disabled {
-    background-color: rgb(165, 169, 173);
-    color: rgb(221, 221, 221);
+    background-color: rgb(211, 211, 211);
+    color: #fff;
     cursor: not-allowed;
   }
 
@@ -216,10 +216,16 @@
 
   .buttons-group .button.selected,
   .buttons-group-side .button.selected {
-    background-color: #5a6268;
+    background-color: rgb(108, 117, 125);
     /* border-color: transparent; */
     color: #fff;
-    font-weight: 700;
+    font-weight: 600;
+  }
+
+  .buttons-group .button:hover,
+  .buttons-group-side .button:hover {
+    background-color: #5a6268;
+    color: #fff;
   }
 
   .buttons-group .button:focus,

@@ -75,10 +75,15 @@
   }
 
   .buttons-group-side .button.selected {
-    background-color: #5a6268;
+    background-color: rgb(108, 117, 125);
     /* border-color: transparent; */
     color: #fff;
-    font-weight: 700;
+    font-weight: 600;
+  }
+
+  .buttons-group-side .button:hover {
+    background-color: #5a6268;
+    color: #fff;
   }
 
   .buttons-group-side .button:focus,
