@@ -11,8 +11,8 @@ export const sensors = readable([
     id: 'doctor-visits',
     signal: 'cli',
     levels: ['county', 'msa', 'state'],
-    mean: 0.006030485489803647,
-    std: 0.013801679072425752,
+    mean: 0.4394626779949559,
+    std: 0.9567364668042898,
   },
   {
     name: 'Surveys (Facebook)',
@@ -38,14 +38,14 @@ export const sensors = readable([
     mean: 816.6838496834541,
     std: 1393.0004748818299,
   },
-  // {
-  //   name: 'Lab Tests (Quidel)',
-  //   id: 'quidel',
-  //   signal: 'negativeprop',
-  //   levels: ['msa', 'state'],
-  //   mean: 0.7633679440541352,
-  //   std: 0.14096501061147534,
-  // },
+  {
+    name: 'Lab Tests (Quidel)',
+    id: 'quidel',
+    signal: 'smooth_negativeprop',
+    levels: ['msa', 'state'],
+    mean: 0.7633679440541352,
+    std: 0.14096501061147534,
+  },
 ]);
 
 export const levels = readable({
@@ -87,6 +87,7 @@ export const geojsons = readable(new Map(), function start(set) {
 });
 
 export const times = writable(null);
+export const stats = writable(null);
 
 export const mounted = writable(0);
 export const metaData = writable([]);

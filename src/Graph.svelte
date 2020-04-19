@@ -11,7 +11,9 @@
     currentSensorName,
     currentLevelName,
     currentDate,
-    times
+    times,
+    stats,
+    sensors
   } from "./stores.js";
   import { DIRECTION_THEME } from "./theme.js";
   import * as d3 from "d3";
@@ -498,23 +500,25 @@
   }
 
   function calculateSD() {
-    var dataStats = {
-      fb_survey: { Mean: 0.8079823818179086, StDv: 0.562744728536263 },
-      ght: { Mean: 816.6838496834541, StDv: 1393.0004748818299 },
-      "google-survey": {
-        Mean: 0.08931870876166044,
-        StDv: 0.026190562137119736
-      },
-      quidel: { Mean: 0.7633679440541352, StDv: 0.14096501061147534 },
-      optum: { Mean: 0.006030485489803647, StDv: 0.013801679072425752 }
-    };
-    var sensor = $currentSensor;
-    console.log("sensor: " + sensor);
-    var sd = dataStats[sensor].StDv;
-    var avg = dataStats[sensor].Mean;
-    var upperbound = avg + 2 * sd;
-    var lowerbound = avg - 2 * sd;
-    userCharts[currentChart].setRange(lowerbound, upperbound);
+    //   var dataStats = {
+    //     fb_survey: { Mean: 0.8079823818179086, StDv: 0.562744728536263 },
+    //     ght: { Mean: 816.6838496834541, StDv: 1393.0004748818299 },
+    //     "google-survey": {
+    //       Mean: 0.08931870876166044,
+    //       StDv: 0.026190562137119736
+    //     },
+    //     quidel: { Mean: 0.7633679440541352, StDv: 0.14096501061147534 },
+    //     optum: { Mean: 0.006030485489803647, StDv: 0.013801679072425752 }
+    //   };
+    //   var sensor = $currentSensor;
+    //   console.log("sensor: " + sensor);
+    //   var sd = dataStats[sensor].StDv;
+    //   var avg = dataStats[sensor].Mean;
+    //   var upperbound = avg + 2 * sd;
+    //   var lowerbound = avg - 2 * sd;
+    let sts = $stats.get($currentSensor);
+    let minMax = [sts.mean - 2 * sts.std, sts.mean + 2 * sts.std];
+    userCharts[currentChart].setRange(minMax[0], minMax[1]);
   }
 </script>
 
