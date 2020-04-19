@@ -6,9 +6,6 @@
   function toggleHide() {
     hide = !hide;
   }
-
-  console.log($sensors.find(d => d.id === $currentSensor).levels.includes('msa'));
-  console.log(Object.keys($levels));
 </script>
 
 <style>
@@ -209,7 +206,8 @@
         </button>
         <button
           class="button {$signalType === 'direction' ? 'selected' : ''}"
-          on:click={() => signalType.set('direction')}>
+          on:click={() => signalType.set('direction')}
+          disabled={$currentSensor === 'fb_survey'}>
           Direction
         </button>
 
