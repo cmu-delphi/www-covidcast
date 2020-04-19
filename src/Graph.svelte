@@ -314,12 +314,9 @@
 
       // set date range
       var parseTime = d3.timeParse("%Y%m%d");
-      var formatTime = d3.timeFormat("%m-%d-%Y");
       var k = d3.keys(myData);
       var times = k.map(i => parseTime(myData[k[i]]["time_value"]));
-      // var maxDate = Math.max.apply(null, times);
       var maxDate = parseTime($currentDate);
-      // console.log("max: " + maxDate);
       var twoWeeks = 60 * 60 * 24 * 1000 * 7 * 2;
       var bisectDate = d3.bisector(function(d) {
         return d.time_value;
@@ -335,10 +332,8 @@
       var scalePercentages = function(d) {
         return formatPercent(d * 100);
       };
-      // var formatPercent = d3.format("%")(1);
       var percentFormat = this.getYAxis() == "Percentage";
       var formatYTicks = percentFormat ? d3.format(".0%") : d3.format("");
-      // console.log(formatYTicks);
       var x = d3
         .scaleTime()
         .domain(d3.extent(myData, d => parseTime(d.time_value)))
@@ -349,16 +344,10 @@
         .range([height, 0]);
 
       // peg values to max and min if out of range
-      // var values = k.map(i => myData[k[i]]["value"]);
-      // console.log('for loop')
       for(var i=0; i < myData.length; i++) {
-        // console.log(Number(myData.value));
         if(Number(myData[i].value) < this.min) {
-          // console.log('min hit: ' + myData[i].value + ' ' + this.min);
           myData[i].value = this.min;
         } else if(Number(myData[i].value) > this.max) {
-          // console.log('max hit');
-          // console.log('max hit: ' + myData[i].value + ' ' + this.max);
           myData[i].value = this.max;
         }
       }
@@ -384,7 +373,6 @@
         .x(d => x(parseTime(d.time_value)))
         .y(d => y(+d.value));
 
-      // console.log(DIRECTION_THEME.max);
       svg
         .append("path")
         .attr("fill", "none")
@@ -502,31 +490,16 @@
   }
 
   function calculateSD() {
-    // var dataset = userCharts[currentChart].getData();
     var dataset = $currentData;
-    // console.log('dataset: ' + dataset);
-    // console.log('len: ' + dataset.length);
     var k = d3.keys(dataset);
     var values = k.map(i => dataset[k[i]]['value']);
-    // var min = Math.min(values);
-    // var max = Math.max(values);
-    // console.log(typeof(values[0]));
-    // console.log('values: ' + values);
     var sum = values.reduce((i, j) => i + j, 0);
-    // console.log('sum: ' + sum);
     var n = userCharts[currentChart].getN();
-    // console.log('n: ' + n);
     var avg = sum/n;
-    // console.log('avg: ' + avg);
     var diff = values.reduce(d => Math.pow((d-avg), 2));
-    // console.log('diff: ' + diff);
     var sd = Math.sqrt((1/(n - 1))*diff);
-    // console.log('sd: ' + sd);
     var upperbound = avg + 3*sd;
-    // console.log('upperbound: ' + upperbound);
     var lowerbound = avg - 3*sd;
-    // console.log('lowerbound: ' + lowerbound);
-    // console.log('min: ' + userCharts[currentChart].min + ' max: ' + userCharts[currentChart].max);
     userCharts[currentChart].setRange(lowerbound, upperbound);
   }
 </script>
@@ -546,9 +519,9 @@
 </style>
 
 <div class="graph-container">
-  <!-- <h5 bind:this={t} class="graph-title"/> -->
-  <h5 class="graph-title">Intensity Over Time</h5>
-  <p class="graph-description">{$currentRegionName}</p>
+    <h5 bind:this={t} class="graph-title"/>
+    <p class="graph-description">{$currentRegionName}</p>
+
   <div bind:clientWidth={w}>
     <div bind:this={el} />
   </div>
