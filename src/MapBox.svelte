@@ -81,6 +81,9 @@
   currentData.subscribe(_ => updateMap('data'));
   signalType.subscribe(_ => updateMap('signal'));
 
+  // Remove all highlights when the level changes
+  currentLevel.subscribe(_ => Object.keys($levels).forEach(level => map && map.removeFeatureState({ source: level })));
+
   function updateMap(type) {
     if (!mounted) return;
     window.performance.mark('update-map-start');
