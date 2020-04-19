@@ -3,6 +3,7 @@
   import {
     levels,
     currentRegion,
+    currentRegionName,
     geojsons,
     currentLevel,
     currentSensor,
@@ -66,7 +67,7 @@
       }
     });
 
-    let stops = [[minMax[0], '#fff'], [minMax[1], '#c41230']];
+    let stops = [[minMax[0], '#fff'], [minMax[1], DIRECTION_THEME.max]];
     if ($signalType === 'direction') {
       stops = [[-1, DIRECTION_THEME.decreasing], [0, DIRECTION_THEME.steady], [1, DIRECTION_THEME.increasing]];
     }
@@ -106,6 +107,8 @@
 
     map.on('click', $currentLevel, function(e) {
       currentRegion.set(e.features[0].properties.id);
+      console.log(e.features[0].properties.NAME + '');
+      currentRegionName.set(e.features[0].properties.NAME);
       new mapboxgl.Popup()
         .setLngLat(e.lngLat)
         .setHTML("<p class='tooltip-text'>" + e.features[0].properties.NAME + '</p>')

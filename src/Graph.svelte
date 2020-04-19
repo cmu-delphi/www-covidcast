@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import {
     currentRegion,
+    currentRegionName,
     currentSensor,
     currentLevel,
     currentData,
@@ -452,10 +453,17 @@
     text-align: center;
     margin: 0px;
   }
+  .graph-subtitle {
+    text-align: center;
+    margin: 0px;
+    font-size: 14px;
+    font-style: italic;
+  }
 </style>
 
-<h4 class="graph-title">Intensity Data Over Time</h4>
-<p bind:this={t} />
+<h4 class="graph-title">Intensity Over Time</h4>
+<p class="graph-subtitle">{$currentRegionName}</p>
+<!-- <p bind:this={t} /> -->
 <div bind:clientWidth={w}>
   <div bind:this={el} />
 </div>

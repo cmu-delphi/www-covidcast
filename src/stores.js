@@ -71,6 +71,7 @@ export const currentDate = writable(20200412);
 export const currentRange = writable([0, 1]);
 // Region GEO_ID for filtering the line chart.
 export const currentRegion = writable('');
+export const currentRegionName = writable('');
 export const currentDataReadyOnMay = writable(false);
 
 export const currentSensorName = derived(
