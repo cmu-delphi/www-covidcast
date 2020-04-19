@@ -14,7 +14,7 @@
     currentDataReadyOnMay,
     metaData,
   } from './stores.js';
-  import { DIRECTION_THEME } from './theme.js';
+  import { DIRECTION_THEME, MAP_THEME } from './theme.js';
 
   const LAT = -1.2;
   const LON = -0.5;
@@ -320,13 +320,17 @@
           source: name,
           type: 'line',
           paint: {
-            'line-color': '#313131',
-            'line-width': [
-              'case',
-              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
-              2,
-              0,
-            ],
+            'line-color': MAP_THEME.hoverRegionOutline,
+            'line-width': ['case', ['any', ['boolean', ['feature-state', 'hover'], false]], 2, 0],
+          },
+        });
+        map.addLayer({
+          id: `${name}-selected`,
+          source: name,
+          type: 'line',
+          paint: {
+            'line-color': MAP_THEME.selectedRegionOutline,
+            'line-width': ['case', ['any', ['boolean', ['feature-state', 'select'], false]], 2, 0],
           },
         });
       });
