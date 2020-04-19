@@ -159,7 +159,10 @@
     updateRegionSliceCache($currentSensor, $currentLevel, d);
   });
 
-  currentRegion.subscribe(r => updateTimeSliceCache($currentSensor, $currentLevel, r));
+  currentRegion.subscribe(r => {
+    console.log('update region');
+    updateTimeSliceCache($currentSensor, $currentLevel, r);
+  });
 
   if (use_real_data) {
     onMount(_ => {

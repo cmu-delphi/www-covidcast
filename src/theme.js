@@ -5,7 +5,7 @@
 // };
 
 export const DIRECTION_THEME = {
-  decreasing: '#7bcce7',
+  decreasing: 'rgb(72, 167, 236)',
   steady: '#f0f0f0',
   increasing: '#ffae90',
   max: '#ffae90',
