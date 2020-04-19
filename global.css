@@ -34,7 +34,7 @@ html,
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Open Sans", sans-serif;
 }
 
 #vizbox {
@@ -110,9 +110,9 @@ button.mapboxgl-ctrl-zoom-out {
   margin: 0;
 }
 
-.axis {
-  font-size: 12px;
-  font-family: 'Open Sans', sans-serif;
+.axis-text {
+  font-size: 14px;
+  font-family: "Open Sans", sans-serif;
 }
 
 button.mapboxgl-popup-close-button {
@@ -121,6 +121,6 @@ button.mapboxgl-popup-close-button {
 }
 
 .tooltip-text {
-  font-family: 'Open Sans' sans-serif;
+  font-family: "Open Sans" sans-serif;
   margin: 0px;
 }
