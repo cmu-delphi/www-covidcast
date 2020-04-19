@@ -32,58 +32,12 @@
   let error = null;
   let changingSensor = false;
 
-  // this is for graph dev purposes
-  let use_real_data = true;
-
-  // if (use_real_data === false) {
-  //   console.log('using fake network requests');
-  //   onMount(_ => {
-  //     d3.json('./temp_graph_data/meta_request_results.json').then(meta => {
-  //       metaStats.set(meta.epidata);
-
-  //       let queries = [];
-  //       let entries = [];
-  //       let timeMap = new Map();
-  //       $sensors.forEach(sens => {
-  //         let date = meta.epidata.find(d => d.data_source === sens.id);
-  //         let minDate = date.min_time;
-  //         let maxDate = date.max_time;
-  //         timeMap.set(sens.id, [minDate, maxDate]);
-  //         sens.levels.forEach(l => {
-  //           entries.push([sens.id, l]);
-  //         });
-  //       });
-
-  //       // faking queries with d3.json()
-  //       queries.push(d3.json('./temp_graph_data/fb_survey_cli_county_20200406-20200413.json'));
-  //       queries.push(d3.json('./temp_graph_data/fb_survey_cli_msa_20200406-20200413.json'));
-  //       queries.push(d3.json('./temp_graph_data/google-survey_cli_county_20200411-20200416.json'));
-  //       queries.push(d3.json('./temp_graph_data/quidel_negativeratio_county_20200201-20200409.json'));
-  //       queries.push(d3.json('./temp_graph_data/quidel_negativeratio_msa_20200201-20200409.json'));
-  //       queries.push(d3.json('./temp_graph_data/ght_smoothedsearch_msa_20200201-20200412.json'));
-
-  //       let dat = {};
-  //       Promise.all(queries).then(d => {
-  //         console.log(d);
-  //         entries.forEach((ent, i) => {
-  //           dat[ent[0]] ? '' : (dat[ent[0]] = {});
-  //           dat[ent[0]][ent[1]] = d[i].epidata;
-  //         });
-  //         times.set(timeMap);
-  //         data.set(dat);
-  //       });
-  //     });
-  //   }).catch(err => {
-  //     error = err;
-  //     currentDataReadyOnMay.set(true);
-  //   });
-  // }
-
-  function updateRegionSliceCache(sensor, level, date) {
+  function updateRegionSliceCache(sensor, level, date, reason = 'unspecified') {
+    console.log($regionSliceCache);
     if (!$mounted) return;
     console.log(sensor, level, date, $times.get(sensor));
     if (!$sensors.find(d => d.id === sensor).levels.includes(level)) return;
-    if (date > $times.get(sensor)[1]) return;
+    if (date > $times.get(sensor)[1] || reason === 'level change') return;
 
     let cacheEntry = $regionSliceCache.get(sensor + level + date);
     if (!cacheEntry) {
@@ -101,11 +55,20 @@
       fetch(q)
         .then(d => d.json())
         .then(d => {
-          console.log(q, d);
-          currentData.set(d.epidata);
-          regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
+          console.log(reason, q, d);
+          if (d.result < 0 || d.message.includes('no results')) {
+            console.log('bad api call, not updating regionSliceCache');
+            currentData.set([]);
+            regionSliceCache.update(m => m.set(sensor + level + date, []));
+          } else {
+            currentData.set(d.epidata);
+            regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
+          }
         });
-    } else currentData.set(cacheEntry);
+    } else {
+      console.log(reason, 'got in cache');
+      currentData.set(cacheEntry);
+    }
   }
 
   function updateTimeSliceCache(sensor, level, region) {
@@ -136,27 +99,50 @@
     } else regionData.set(cacheEntry);
   }
 
+  let levelChangedWhenSensorChanged = false;
+  let dateChangedWhenSensorChanged = false;
+
   currentSensor.subscribe(s => {
     if (!$mounted) return;
+    // facebook fix
+    if (s === 'fb_survey') {
+      signalType.set('value');
+    }
+
     let l = $currentLevel;
+    let date = $times.get(s)[1];
+
     if (!$sensors.find(d => d.id === s).levels.includes($currentLevel)) {
       console.log('update?');
       l = $sensors.find(d => d.id === s).levels[0];
+      levelChangedWhenSensorChanged = true;
       currentLevel.set(l);
     }
-    console.log('now?');
-    currentDate.set($times.get(s)[1]);
-    // updateRegionSliceCache(s, $currentLevel, $currentDate);
+    if (date !== $currentDate) {
+      console.log('now?');
+      dateChangedWhenSensorChanged = true;
+      currentDate.set(date);
+    }
+
+    updateRegionSliceCache(s, l, date, 'sensor-change');
   });
 
   currentLevel.subscribe(l => {
     console.log('level update');
-    updateRegionSliceCache($currentSensor, l, $currentDate);
+    if (levelChangedWhenSensorChanged) {
+      levelChangedWhenSensorChanged = false;
+    } else {
+      updateRegionSliceCache($currentSensor, l, $currentDate, 'level-change');
+    }
   });
 
   currentDate.subscribe(d => {
     console.log('date update');
-    updateRegionSliceCache($currentSensor, $currentLevel, d);
+    if (dateChangedWhenSensorChanged) {
+      dateChangedWhenSensorChanged = false;
+    } else {
+      updateRegionSliceCache($currentSensor, $currentLevel, d, 'date-change');
+    }
   });
 
   currentRegion.subscribe(r => {
@@ -164,43 +150,57 @@
     updateTimeSliceCache($currentSensor, $currentLevel, r);
   });
 
-  if (use_real_data) {
-    onMount(_ => {
-      fetch(ENDPOINT_META)
-        .then(d => d.json())
-        .then(meta => {
-          metaData.set(meta.epidata);
-          let timeMap = new Map();
-          $sensors.forEach(s => {
-            let matchedMeta = meta.epidata.find(
-              d => d.data_source === s.id && d.signal === s.signal && d.time_type === 'day',
-            );
-            timeMap.set(s.id, [matchedMeta.min_time, matchedMeta.max_time]);
-          });
-          times.set(timeMap);
-          fetch(
-            ENDPOINT +
-              '&data_source=' +
-              $currentSensor +
-              '&signal=' +
-              $sensors.find(d => d.id === $currentSensor).signal +
-              '&geo_type=' +
-              $currentLevel +
-              '&time_values=' +
-              timeMap.get($currentSensor)[1] +
-              '&geo_value=*',
-          )
-            .then(d => d.json())
-            .then(d => {
+  onMount(_ => {
+    fetch(ENDPOINT_META)
+      .then(d => d.json())
+      .then(meta => {
+        metaData.set(meta.epidata);
+        let timeMap = new Map();
+        $sensors.forEach(s => {
+          let matchedMeta = meta.epidata.find(
+            d => d.data_source === s.id && d.signal === s.signal && d.time_type === 'day',
+          );
+          timeMap.set(s.id, [matchedMeta.min_time, matchedMeta.max_time]);
+        });
+        times.set(timeMap);
+
+        let l = $currentLevel;
+        if (!$sensors.find(d => d.id === $currentSensor).levels.includes($currentLevel)) {
+          console.log('update?');
+          l = $sensors.find(d => d.id === $currentSensor).levels[0];
+          currentLevel.set(l);
+        }
+
+        let q =
+          ENDPOINT +
+          '&data_source=' +
+          $currentSensor +
+          '&signal=' +
+          $sensors.find(d => d.id === $currentSensor).signal +
+          '&geo_type=' +
+          l +
+          '&time_values=' +
+          timeMap.get($currentSensor)[1] +
+          '&geo_value=*';
+        fetch(q)
+          .then(d => d.json())
+          .then(d => {
+            console.log(q, d);
+            if (d.result < 0 || d.message.includes('no results')) {
+              console.log('bad api call, not updating regionSliceCache');
+              currentData.set([]);
+              regionSliceCache.update(m => m.set($currentSensor + $currentLevel + timeMap.get($currentSensor)[1], []));
+            } else {
+              currentData.set(d.epidata);
               regionSliceCache.update(m =>
                 m.set($currentSensor + $currentLevel + timeMap.get($currentSensor)[1], d.epidata),
               );
-              currentData.set(d.epidata);
-              mounted.set(1);
-            });
-        });
-    });
-  }
+            }
+
+            mounted.set(1);
+          });
+      });
+  });
 </script>
 
 <style>
@@ -245,7 +245,7 @@
 
   .legend-container {
     position: absolute;
-    top: 230px;
+    top: 240px;
     left: 10px;
     z-index: 1000;
     /* background-color: rgba(255, 255, 255, 0.7); */
@@ -320,20 +320,20 @@
 
 <MapBox />
 
-<div class="options-container">
-  <Options />
-</div>
-
 <div class="tabs-container">
   <Tabs />
 </div>
 
-<div class="time-container">
-  <Time {updateRegionSliceCache} />
+<div class="options-container">
+  <Options />
 </div>
 
 <div class="legend-container">
   <Legend />
+</div>
+
+<div class="time-container">
+  <Time {updateRegionSliceCache} />
 </div>
 
 <div class="graph-container">
