@@ -69,12 +69,12 @@
     margin: 0;
     font-size: 1em;
     font-weight: 400;
-    background-color: rgb(222, 222, 222);
+    background-color: #fff;
     border-style: solid;
     border-color: #dbdbdb;
     border-top-color: transparent;
     border-width: 1px;
-    color: #363636;
+    color: #6c757d;
     cursor: pointer;
     justify-content: center;
     padding-bottom: calc(0.5em - 1px);
@@ -101,6 +101,8 @@
   }
 
   .buttons-group button.button:disabled {
+    background-color: rgb(165, 169, 173);
+    color: rgb(221, 221, 221);
     cursor: not-allowed;
   }
 
@@ -128,6 +130,7 @@
     border-style: solid;
     border-color: transparent #444 transparent transparent;
   }
+
   .buttons-group button.button:hover .disabled-tooltip {
     visibility: visible;
   }
@@ -145,12 +148,12 @@
     margin: 0;
     font-size: 1em;
     font-weight: 400;
-    background-color: rgb(222, 222, 222);
+    background-color: #fff;
     border-style: solid;
     border-color: #dbdbdb;
     border-left-color: transparent;
     border-width: 1px;
-    color: #363636;
+    color: #6c757d;
     cursor: pointer;
     justify-content: center;
     padding-bottom: calc(0.5em - 1px);
@@ -166,6 +169,8 @@
   }
 
   .buttons-group-side button.button:disabled {
+    background-color: rgb(165, 169, 173);
+    color: rgb(221, 221, 221);
     cursor: not-allowed;
   }
 
@@ -211,10 +216,10 @@
 
   .buttons-group .button.selected,
   .buttons-group-side .button.selected {
-    background-color: #fff;
+    background-color: #5a6268;
     /* border-color: transparent; */
-    color: #000;
-    font-weight: 600;
+    color: #fff;
+    font-weight: 700;
   }
 
   .buttons-group .button:focus,
@@ -223,6 +228,34 @@
   .buttons-group-side .button:active {
     box-shadow: none !important;
     outline: none;
+  }
+
+  button.button:disabled:hover {
+    animation: shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    transform: translate3d(0, 0, 0);
+  }
+
+  @keyframes shake {
+    10%,
+    90% {
+      transform: translate3d(-1px, 0, 0);
+    }
+
+    20%,
+    80% {
+      transform: translate3d(2px, 0, 0);
+    }
+
+    30%,
+    50%,
+    70% {
+      transform: translate3d(-4px, 0, 0);
+    }
+
+    40%,
+    60% {
+      transform: translate3d(4px, 0, 0);
+    }
   }
 </style>
 

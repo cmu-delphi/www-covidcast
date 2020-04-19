@@ -45,12 +45,12 @@
     font-size: 1em;
     font-weight: 400;
     line-height: 1em;
-    background-color: rgb(222, 222, 222);
+    background-color: #fff;
     border-style: solid;
     border-color: #dbdbdb;
     border-left-color: transparent;
     border-width: 1px;
-    color: #363636;
+    color: #6c757d;
     cursor: pointer;
     justify-content: center;
     padding-bottom: calc(0.5em - 1px);
@@ -75,10 +75,10 @@
   }
 
   .buttons-group-side .button.selected {
-    background-color: #fff;
+    background-color: #5a6268;
     /* border-color: transparent; */
-    color: #000;
-    font-weight: 600;
+    color: #fff;
+    font-weight: 700;
   }
 
   .buttons-group-side .button:focus,

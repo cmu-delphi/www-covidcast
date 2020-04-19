@@ -62,7 +62,7 @@ export const metaData = writable([]);
 
 export const currentSensor = writable('google-survey');
 // 'county', 'state', or 'msa'
-export const currentLevel = writable('county');
+export const currentLevel = writable('county'); // might want to change this to state by default
 // Options are 'direction' and 'value'.
 export const signalType = writable('value');
 // EpiWeek in form YYYYMMDD.
