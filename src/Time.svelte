@@ -6,9 +6,11 @@
   let timeSliderPaddingLeft;
   let timeSliderPaddingRight;
   let timeSlider;
+  let selectedDateDisplay;
 
   let parseTime = d3.timeParse('%Y%m%d');
   let formatTime = d3.timeFormat('%B %d, %Y');
+  let formatTimeWithoutYear = d3.timeFormat('%B %d');
 
   let interval = 14;
   let sliderTotalLength = 320; // in px
@@ -124,14 +126,25 @@
 
   onMount(_ => {
     console.log(document.querySelector('#time_slider'));
-    document.querySelector('#time_slider').addEventListener('input', event => {
-      console.log(event.target);
-      // if (value < dataRangeMin && rectifiedMin <= dataRangeMin) {
-      //   document.querySelector('#time_slider').value = dataRangeMin;
-      // } else if (value > dataRangeMax && rectifiedMax >= dataRangeMax) {
-      //   document.querySelector('#time_slider').value = dataRangeMax;
-      // }
-    });
+    console.log(document.querySelector('.time .selected-date'));
+    document.querySelector('#time_slider').addEventListener(
+      'input',
+      function(event) {
+        // console.log(event.target);
+        let element = event.target;
+        const ratio = (element.value - element.min) / (element.max - element.min);
+        const elementWidth = parseInt(element.style.width.split('px')[0], 10);
+        console.log(elementWidth * ratio);
+        console.log(document.querySelector('.time .selected-date').style.width);
+        console.log(parseInt(selectedDateDisplay.style.right.split('px')[0], 10));
+
+        // if (value < dataRangeMin && rectifiedMin <= dataRangeMin) {
+        //   document.querySelector('#time_slider').value = dataRangeMin;
+        // } else if (value > dataRangeMax && rectifiedMax >= dataRangeMax) {
+        //   document.querySelector('#time_slider').value = dataRangeMax;
+        // }
+      }.bind(this),
+    );
   });
 
   // currentDataReadyOnMay.subscribe(d => console.log('map set:', d));
@@ -145,11 +158,28 @@
     position: relative;
   }
 
+  .selected-date {
+    position: absolute;
+    top: -20px;
+    left: 10px;
+    /* width: 300px; */
+    height: 24px;
+    /* background-color: lightgray; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   .time p {
     flex-shrink: 0;
     margin-left: 10px;
     margin-right: 10px;
     color: var(--grey);
+  }
+
+  .time p.min-max {
+    font-size: 0.8rem;
+    color: #666;
   }
 
   #timeSliderPaddingLeft,
@@ -162,6 +192,10 @@
     background: repeating-linear-gradient(-45deg, #666, #666 2px, #eee 2px, #eee 4px);
     outline: none;
     opacity: 0.7;
+  }
+
+  #timeSliderPaddingLeft {
+    position: relative;
   }
 
   .slider {
@@ -241,7 +275,10 @@
 </style>
 
 <div class="time">
-  <p>{formatTime(new Date(rectifiedMin))}</p>
+  <div class="selected-date" bind:this={selectedDateDisplay}>
+    Viewing data for: {formatTimeWithoutYear(new Date(rectifiedVal))}
+  </div>
+  <p class="min-max">{formatTime(new Date(rectifiedMin))}</p>
   <div id="timeSliderPaddingLeft" bind:this={timeSliderPaddingLeft} />
   <input
     id="time_slider"
@@ -254,7 +291,7 @@
     class="slider"
     bind:value={rectifiedVal} />
   <div id="timeSliderPaddingRight" bind:this={timeSliderPaddingRight} />
-  <p>{formatTime(new Date(rectifiedMax))}</p>
+  <p class="min-max">{formatTime(new Date(rectifiedMax))} (Today)</p>
 
   {#if $currentDataReadyOnMay === false}
     <div class="loader-container">

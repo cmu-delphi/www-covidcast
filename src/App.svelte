@@ -282,7 +282,7 @@
     /* border-radius: 8px; */
     padding: 5px 10px;
     box-sizing: border-box;
-    width: 500px;
+    width: 550px;
 
     transition: all 0.1s ease-in;
   }
