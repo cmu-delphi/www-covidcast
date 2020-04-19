@@ -6,6 +6,9 @@
   function toggleHide() {
     hide = !hide;
   }
+
+  console.log($sensors.find(d => d.id === $currentSensor).levels.includes('msa'));
+  console.log(Object.keys($levels));
 </script>
 
 <style>
@@ -64,7 +67,7 @@
     flex-direction: column;
   }
 
-  .buttons-group .button {
+  .buttons-group button.button {
     width: 100%;
     margin: 0;
     font-size: 1em;
@@ -87,6 +90,10 @@
     transition: all 0.1s ease-in;
   }
 
+  .buttons-group button.button:disabled {
+    cursor: not-allowed;
+  }
+
   .buttons-group-side {
     width: 100%;
     display: flex;
@@ -94,7 +101,7 @@
     justify-content: stretch;
   }
 
-  .buttons-group-side .button {
+  .buttons-group-side button.button {
     /* width: 50%; */
     flex-grow: 1;
     margin: 0;
@@ -116,6 +123,10 @@
     /* white-space: nowrap; */
 
     transition: all 0.1s ease-in;
+  }
+
+  .buttons-group-side button.button:disabled {
+    cursor: not-allowed;
   }
 
   .buttons-group .button:first-child {
@@ -172,11 +183,19 @@
     <div class="option">
       <!-- <div class="buttons-group-title">Geographic Level</div> -->
       <div class="buttons-group">
-        {#each $sensors.find(d => d.id === $currentSensor).levels as level}
-          <button class="button {$currentLevel === level ? 'selected' : null}" on:click={() => currentLevel.set(level)}>
+        {#each Object.keys($levels) as level}
+          <button
+            class="button {$currentLevel === level ? 'selected' : ''}"
+            on:click={() => currentLevel.set(level)}
+            disabled={$sensors.find(d => d.id === $currentSensor).levels.includes(level) === false}>
             {$levels[level]}
           </button>
         {/each}
+        <!-- {#each $sensors.find(d => d.id === $currentSensor).levels as level}
+          <button class="button {$currentLevel === level ? 'selected' : ''}" on:click={() => currentLevel.set(level)}>
+            {$levels[level]}
+          </button>
+        {/each} -->
       </div>
     </div>
 
@@ -185,11 +204,11 @@
     <div class="option">
       <!-- <div class="buttons-group-title">Signal Type</div> -->
       <div class="buttons-group-side">
-        <button class="button {$signalType === 'value' ? 'selected' : null}" on:click={() => signalType.set('value')}>
+        <button class="button {$signalType === 'value' ? 'selected' : ''}" on:click={() => signalType.set('value')}>
           Intensity
         </button>
         <button
-          class="button {$signalType === 'direction' ? 'selected' : null}"
+          class="button {$signalType === 'direction' ? 'selected' : ''}"
           on:click={() => signalType.set('direction')}>
           Direction
         </button>
@@ -198,27 +217,3 @@
     </div>
   {/if}
 </div>
-
-<!-- <div class="options">
-  <form class="pure-form">
-    <div class="pure-g">
-      <div class="pure-u-1 pure-u-md-1-2">
-        <label for="sensor">Select sensor:</label>
-        <select id="sensor" bind:value={$currentSensor}>
-          {#each $sensors as sensor}
-            <option value={sensor.id}>{sensor.name}</option>
-          {/each}
-        </select>
-      </div>
-
-      <div class="pure-u-1 pure-u-md-1-2">
-        <label for="level">Select level:</label>
-        <select id="level" bind:value={$currentLevel}>
-          {#each $sensors.find(d => d.id === $currentSensor).levels as level}
-            <option value={level}>{$levels[level]}</option>
-          {/each}
-        </select>
-      </div>
-    </div>
-  </form>
-</div> -->

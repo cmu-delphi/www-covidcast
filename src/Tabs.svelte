@@ -94,7 +94,7 @@
     <div class="buttons-group-side">
       {#each $sensors as sensor}
         <button
-          class="button {$currentSensor === sensor.id ? 'selected' : null}"
+          class="button {$currentSensor === sensor.id ? 'selected' : ''}"
           on:click={() => {
             currentDataReadyOnMay.set(false);
             currentSensor.set(sensor.id);
