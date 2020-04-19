@@ -137,10 +137,8 @@
   }
 
   function sliderOnMouseUp() {
-    window.performance.mark('start sliderOnMouseUp');
     currentDataReadyOnMay.set(false);
     currentDate.set(calculateValFromRectified(rectifiedVal));
-    window.performance.measure('sliderOnMouseUp', 'start sliderOnMouseUp');
   }
 
   function loadMoreDataRange() {
