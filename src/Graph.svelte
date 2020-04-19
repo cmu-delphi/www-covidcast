@@ -482,8 +482,8 @@
                 formatYTicks(d.value)
             );
         } catch (err) {
-          console.log(err);
-          focus.style("display", "none");
+          // just ignore error and bravely carry on
+          // console.log(err);
         }
       }
     }
