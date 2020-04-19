@@ -275,10 +275,11 @@
     width: 320px;
     height: 6px;
     padding: 0;
-    border-style: none;
+    border: none;
     background: #d3d3d3;
     outline: none;
-    opacity: 0.7;
+    opacity: .9;
+    margin: 0;
   }
 
   .slider::-moz-focus-outer {
