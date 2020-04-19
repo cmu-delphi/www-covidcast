@@ -78,11 +78,16 @@
   $: if (!map && $geojsons.size !== 0 && $currentData.length !== 0) initializeMap();
 
   // Update the map when sensor or level changes.
-  currentData.subscribe(_ => updateMap());
-  signalType.subscribe(_ => updateMap());
+  currentData.subscribe(_ => updateMap('data'));
+  signalType.subscribe(_ => updateMap('signal'));
 
-  function updateMap() {
+  function updateMap(type) {
     if (!mounted) return;
+    window.performance.mark('update-map-start');
+
+    if (type === 'data') {
+      map.getLayer($currentLevel) && map.removeLayer($currentLevel);
+    }
 
     let valueMinMax = [999999999, -1];
     let valueMappedVals = new Map();
@@ -138,7 +143,7 @@
       if (name === $currentLevel) {
         if (map.getLayer(name)) {
           map.setPaintProperty(name, 'fill-color', {
-            property: 'val',
+            property: $signalType,
             stops: stops,
           });
           map.setLayoutProperty(name, 'visibility', 'visible');
@@ -148,11 +153,11 @@
               id: $currentLevel,
               source: $currentLevel,
               type: 'fill',
-              filter: ['!=', 'val', -100],
+              filter: ['!=', $signalType, -100],
               paint: {
                 'fill-outline-color': '#616161',
                 'fill-color': {
-                  property: 'val',
+                  property: $signalType,
                   stops: stops,
                 },
               },
@@ -166,6 +171,7 @@
     });
 
     currentDataReadyOnMay.set(true);
+    window.performance.measure('update-map', 'update-map-start');
   }
 
   function initializeMap() {
@@ -179,6 +185,37 @@
     })
       .addControl(new mapboxgl.AttributionControl({ compact: true }))
       .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+
+    map.on('data', ev => {
+      if (ev.dataType === 'source') {
+        if (ev.coord && ev.coord.key) {
+          if (ev.isSourceLoaded) {
+            window.performance.measure(`Load ${ev.coord.key}`, `Start Load ${ev.coord.key}`);
+          } else {
+            window.performance.mark(`Start Load ${ev.coord.key}`);
+          }
+        } else {
+          window.performance.measure(`Load Data`, `Start Load Data`);
+        }
+      } else {
+        // console.log(ev);
+      }
+    });
+    map.on('dataloading', ev => {
+      if (ev.dataType === 'source') {
+        if (ev.coord && ev.coord.key) {
+          if (ev.isSourceLoaded) {
+            window.performance.measure(`Load ${ev.coord.key}`, `Start Load ${ev.coord.key}`);
+          } else {
+            window.performance.mark(`Start Load ${ev.coord.key}`);
+          }
+        } else {
+          window.performance.mark(`Start Load Data`);
+        }
+      } else {
+        // console.log(ev);
+      }
+    });
 
     //Disable touch zoom, it makes gesture scrolling difficult
     map.scrollZoom.disable();
@@ -285,7 +322,7 @@
       });
 
       mounted = true;
-      updateMap();
+      updateMap('init');
     });
 
     popup = new mapboxgl.Popup({
