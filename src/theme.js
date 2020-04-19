@@ -1,3 +1,4 @@
+// https://www.cmu.edu/brand/brand-guidelines/web.html
 export const DIRECTION_THEME = {
   decreasing: "rgba(170, 102, 0, .3)",
   steady: "rgba(204, 0, 0, .5)",

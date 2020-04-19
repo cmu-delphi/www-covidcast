@@ -105,6 +105,7 @@
     });
 
     let center = minMax[0] + (minMax[1] - minMax[0]) / 2;
+    // https://www.cmu.edu/brand/brand-guidelines/web.html
     let stops = [
       [minMax[0],'rgba(170, 102, 0, .3)'],
       [center, 'rgba(204, 0, 0, .65)'],
