@@ -267,8 +267,6 @@
     <button aria-label="toggle options" class="toggle-button" on:click={toggleHide}>
       <img class="toggle-button-icon" src="./assets/imgs/layers_clear-24px.svg" alt="" />
     </button>
-    <br />
-    <br />
 
     <div class="option">
       <!-- <div class="buttons-group-title">Geographic Level</div> -->
