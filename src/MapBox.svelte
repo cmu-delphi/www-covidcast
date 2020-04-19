@@ -342,7 +342,7 @@
           'text-size': 12,
         },
         paint: {
-          'text-halo-color': '#ffffff',
+          'text-halo-color': '#fff',
           'text-halo-width': 2,
         },
       });
@@ -357,7 +357,7 @@
           'text-size': 12,
         },
         paint: {
-          'text-halo-color': '#ffffff',
+          'text-halo-color': '#fff',
           'text-halo-width': 2,
         },
       });
@@ -439,6 +439,7 @@
 <div bind:this={container} class="map-container">
   <div class="state-buttons-holder">
     <button
+      aria-label="show entire map"
       data-state="us48"
       id="bounds-button"
       class="pg-button bounds-button"
