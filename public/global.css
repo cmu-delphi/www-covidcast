@@ -121,6 +121,11 @@ button.mapboxgl-popup-close-button {
 }
 
 .tooltip-text {
-  font-family: 'Open Sans' sans-serif;
+  font-family: 'Open Sans', sans-serif;
   margin: 0px;
+}
+
+input:focus,
+button:focus {
+  outline: black 2px solid !important;
 }
