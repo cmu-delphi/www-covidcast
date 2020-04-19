@@ -1,5 +1,5 @@
 <script>
-  import mapboxgl from "mapbox-gl";
+  import mapboxgl from 'mapbox-gl';
   import {
     levels,
     currentRegion,
@@ -12,9 +12,9 @@
     currentRange,
     signalType,
     currentDataReadyOnMay,
-    metaData
-  } from "./stores.js";
-  import { DIRECTION_THEME } from "./theme.js";
+    metaData,
+  } from './stores.js';
+  import { DIRECTION_THEME } from './theme.js';
 
   const LAT = -1.2;
   const LON = -0.5;
@@ -68,16 +68,7 @@
 
   function updateMap() {
     if (!mounted) return;
-<<<<<<< HEAD
-    let thisMeta = $metaData.find(
-      d => d.data_source === $currentSensor && d.geo_type === $currentLevel
-    );
-=======
-    console.log($metaData);
-    console.log($currentSensor, $currentLevel);
     let thisMeta = $metaData.find(d => d.data_source === $currentSensor && d.geo_type === $currentLevel);
-    console.log(thisMeta);
->>>>>>> 6a4c7a0785c0e04f589d997590afdfecdf2319b7
     let minMax = [thisMeta.min_value, thisMeta.max_value];
 
     // console.log(thisMeta);
@@ -91,18 +82,18 @@
           mappedVals.set(d.geo_value.toUpperCase(), d[$signalType]);
         }
         return d.geo_value.toUpperCase();
-      })
+      }),
     );
     currentRange.set(minMax);
 
     let dat = $geojsons.get($currentLevel);
     dat.features.forEach(d => {
       let id;
-      if ($currentLevel === "county") {
+      if ($currentLevel === 'county') {
         id = d.properties.GEO_ID.slice(-5);
-      } else if ($currentLevel === "msa") {
+      } else if ($currentLevel === 'msa') {
         id = d.properties.cbsafp;
-      } else if ($currentLevel === "state") {
+      } else if ($currentLevel === 'state') {
         id = d.properties.POSTAL;
       }
       d.properties.id = id;
@@ -114,17 +105,9 @@
     });
 
     let center = minMax[0] + (minMax[1] - minMax[0]) / 2;
-    let stops = [
-      [minMax[0], "rgb(255, 237, 160)"],
-      [center, "rgb(252, 78, 42)"],
-      [minMax[1], "rgb(128, 0, 38)"]
-    ];
-    if ($signalType === "direction") {
-      stops = [
-        [-1, DIRECTION_THEME.decreasing],
-        [0, DIRECTION_THEME.steady],
-        [1, DIRECTION_THEME.increasing]
-      ];
+    let stops = [[minMax[0], 'rgb(255, 237, 160)'], [center, 'rgb(252, 78, 42)'], [minMax[1], 'rgb(128, 0, 38)']];
+    if ($signalType === 'direction') {
+      stops = [[-1, DIRECTION_THEME.decreasing], [0, DIRECTION_THEME.steady], [1, DIRECTION_THEME.increasing]];
     }
 
     map.getSource($currentLevel).setData(dat);
@@ -132,43 +115,41 @@
     Object.keys($levels).forEach(name => {
       if (name === $currentLevel) {
         if (map.getLayer(name)) {
-          map.setPaintProperty(name, "fill-color", {
-            property: "val",
-            stops: stops
+          map.setPaintProperty(name, 'fill-color', {
+            property: 'val',
+            stops: stops,
           });
-          map.setLayoutProperty(name, "visibility", "visible");
+          map.setLayoutProperty(name, 'visibility', 'visible');
         } else {
           map.addLayer(
             {
               id: $currentLevel,
               source: $currentLevel,
-              type: "fill",
-              filter: ["!=", "val", -100],
+              type: 'fill',
+              filter: ['!=', 'val', -100],
               paint: {
-                "fill-outline-color": "#616161",
-                "fill-color": {
-                  property: "val",
-                  stops: stops
-                }
-              }
+                'fill-outline-color': '#616161',
+                'fill-color': {
+                  property: 'val',
+                  stops: stops,
+                },
+              },
             },
-            "city-point-unclustered"
+            'city-point-unclustered',
           );
         }
       } else {
-        map.getLayer(name) && map.setLayoutProperty(name, "visibility", "none");
+        map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none');
       }
     });
 
-    map.on("click", $currentLevel, function(e) {
+    map.on('click', $currentLevel, function(e) {
       currentRegion.set(e.features[0].properties.id);
-      console.log(e.features[0].properties.NAME + "");
+      console.log(e.features[0].properties.NAME + '');
       currentRegionName.set(e.features[0].properties.NAME);
       new mapboxgl.Popup()
         .setLngLat(e.lngLat)
-        .setHTML(
-          "<p class='tooltip-text'>" + e.features[0].properties.NAME + "</p>"
-        )
+        .setHTML("<p class='tooltip-text'>" + e.features[0].properties.NAME + '</p>')
         .addTo(map);
     });
     currentDataReadyOnMay.set(true);
@@ -178,106 +159,99 @@
     map = new mapboxgl.Map({
       attributionControl: false,
       container,
-      style: "./maps/mapbox_albers_usa_style.json",
+      style: './maps/mapbox_albers_usa_style.json',
       center: [LON, LAT],
       zoom: ZOOM,
-      minZoom: ZOOM
+      minZoom: ZOOM,
     })
       .addControl(new mapboxgl.AttributionControl({ compact: true }))
-      .addControl(
-        new mapboxgl.NavigationControl({ showCompass: false }),
-        "top-right"
-      );
+      .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
 
     //Disable touch zoom, it makes gesture scrolling difficult
     map.scrollZoom.disable();
 
-    map.on("load", function() {
-      map.addSource("county-outline", {
-        type: "geojson",
-        data: $geojsons.get("county")
+    map.on('load', function() {
+      map.addSource('county-outline', {
+        type: 'geojson',
+        data: $geojsons.get('county'),
       });
-      map.addSource("state-outline", {
-        type: "geojson",
-        data: $geojsons.get("state")
+      map.addSource('state-outline', {
+        type: 'geojson',
+        data: $geojsons.get('state'),
       });
-      map.addSource("city-point", {
-        type: "geojson",
-        data: $geojsons.get("city"),
+      map.addSource('city-point', {
+        type: 'geojson',
+        data: $geojsons.get('city'),
         cluster: true,
         clusterMaxZoom: 14, // Max zoom to cluster points on
         clusterRadius: 100, // Radius of each cluster when clustering points (defaults to 50),
         clusterProperties: {
           largest: [
             [
-              "case",
-              [
-                "<",
-                ["get", "rank", ["accumulated"]],
-                ["get", "rank", ["get", "largest"]]
-              ],
-              ["accumulated"],
-              ["properties"]
+              'case',
+              ['<', ['get', 'rank', ['accumulated']], ['get', 'rank', ['get', 'largest']]],
+              ['accumulated'],
+              ['properties'],
             ],
-            ["properties"]
-          ]
-        }
+            ['properties'],
+          ],
+        },
       });
       map.addLayer({
-        id: "county-outline",
-        source: "county-outline",
-        type: "fill",
+        id: 'county-outline',
+        source: 'county-outline',
+        type: 'fill',
         paint: {
-          "fill-color": "#e4dac4",
-          "fill-outline-color": "#e0e0e0",
-          "fill-opacity": 0.4
-        }
+          'fill-color': '#e4dac4',
+          'fill-outline-color': '#e0e0e0',
+          'fill-opacity': 0.4,
+        },
       });
       map.addLayer({
-        id: "state-outline",
-        source: "state-outline",
-        type: "fill",
+        id: 'state-outline',
+        source: 'state-outline',
+        type: 'fill',
         paint: {
-          "fill-color": "rgba(0, 0, 0, 0)",
-          "fill-outline-color": "#bcbcbc"
-        }
+          'fill-color': 'rgba(0, 0, 0, 0)',
+          'fill-outline-color': '#bcbcbc',
+        },
       });
       map.addLayer({
-        id: "city-point-unclustered",
-        source: "city-point",
-        type: "symbol",
-        filter: ["!", ["has", "point_count"]],
+        id: 'city-point-unclustered',
+        source: 'city-point',
+        type: 'symbol',
+        filter: ['!', ['has', 'point_count']],
         layout: {
-          "text-field": ["get", "city"],
-          "text-font": ["Open Sans Regular"],
-          "text-size": 12
+          'text-field': ['get', 'city'],
+          'text-font': ['Open Sans Regular'],
+          'text-size': 12,
         },
         paint: {
-          "text-halo-color": "#fff",
-          "text-halo-width": 2
-        }
+          'text-halo-color': '#fff',
+          'text-halo-width': 2,
+        },
       });
       map.addLayer({
-        id: "city-point-clustered",
-        source: "city-point",
-        type: "symbol",
-        filter: ["has", "point_count"],
+        id: 'city-point-clustered',
+        source: 'city-point',
+        type: 'symbol',
+        filter: ['has', 'point_count'],
         layout: {
-          "text-field": ["get", "city", ["get", "largest"]],
-          "text-font": ["Open Sans Regular"],
-          "text-size": 12
+          'text-field': ['get', 'city', ['get', 'largest']],
+          'text-font': ['Open Sans Regular'],
+          'text-size': 12,
         },
         paint: {
-          "text-halo-color": "#fff",
-          "text-halo-width": 2
-        }
+          'text-halo-color': '#fff',
+          'text-halo-width': 2,
+        },
       });
 
       Object.keys($levels).forEach(name => {
         let data = $geojsons.get(name);
         map.addSource(name, {
-          type: "geojson",
-          data: data
+          type: 'geojson',
+          data: data,
         });
       });
 
@@ -323,7 +297,7 @@
     border: 1px solid #d5d5d5;
     border-radius: 4px;
     text-align: center;
-    font-family: "FranklinITCProBold", Helvetica, Arial, sans-serif;
+    font-family: 'FranklinITCProBold', Helvetica, Arial, sans-serif;
     line-height: 16px;
     cursor: pointer;
     text-decoration: none;
