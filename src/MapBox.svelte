@@ -27,21 +27,38 @@
   $: if (!map && $geojsons.size !== 0 && $currentData.length !== 0) initializeMap();
 
   // Update the map when sensor or level changes.
-  currentData.subscribe(_ => updateMap());
-  signalType.subscribe(_ => updateMap());
+  currentData.subscribe(_ => updateMap('data'));
+  signalType.subscribe(_ => updateMap('signal'));
 
-  function updateMap() {
+  function updateMap(type) {
     if (!mounted) return;
+    window.performance.mark('update-map-start');
+
+    if (type === 'data') {
+      map.getLayer($currentLevel) && map.removeLayer($currentLevel);
+    }
 
     let minMax = [999999999, -1];
-    let mappedVals = new Map();
-    let geoIds = new Set(
+    let valueMappedVals = new Map();
+    let valueGeoIds = new Set(
       $currentData.map(d => {
-        let dat = d[$signalType];
+        let dat = d.value;
         minMax[0] = dat < minMax[0] ? dat : minMax[0];
         minMax[1] = dat > minMax[1] ? dat : minMax[1];
         if (dat !== null) {
-          mappedVals.set(d.geo_value.toUpperCase(), d[$signalType]);
+          valueMappedVals.set(d.geo_value.toUpperCase(), dat);
+        }
+        return d.geo_value.toUpperCase();
+      }),
+    );
+    let directionMappedVals = new Map();
+    let directionGeoIds = new Set(
+      $currentData.map(d => {
+        let dat = d.direction;
+        minMax[0] = dat < minMax[0] ? dat : minMax[0];
+        minMax[1] = dat > minMax[1] ? dat : minMax[1];
+        if (dat !== null) {
+          directionMappedVals.set(d.geo_value.toUpperCase(), dat);
         }
         return d.geo_value.toUpperCase();
       }),
@@ -59,10 +76,14 @@
         id = d.properties.POSTAL;
       }
       d.properties.id = id;
-      if (geoIds.has(id) && mappedVals.get(id) !== null) {
-        d.properties.val = mappedVals.get(id);
-      } else {
-        d.properties.val = -100;
+
+      d.properties.value = -100;
+      d.properties.direction = -100;
+      if (valueGeoIds.has(id) && valueMappedVals.get(id) !== null) {
+        d.properties.value = valueMappedVals.get(id);
+      }
+      if (directionGeoIds.has(id) && directionMappedVals.get(id) !== null) {
+        d.properties.direction = directionMappedVals.get(id);
       }
     });
 
@@ -70,14 +91,19 @@
     if ($signalType === 'direction') {
       stops = [[-1, DIRECTION_THEME.decreasing], [0, DIRECTION_THEME.steady], [1, DIRECTION_THEME.increasing]];
     }
-
-    map.getSource($currentLevel).setData(dat);
+    console.log('data update');
+    console.log(valueGeoIds, valueMappedVals);
+    console.log(directionGeoIds, directionMappedVals);
+    console.log(dat);
+    if (['data', 'init'].includes(type)) {
+      map.getSource($currentLevel).setData(dat);
+    }
 
     Object.keys($levels).forEach(name => {
       if (name === $currentLevel) {
         if (map.getLayer(name)) {
           map.setPaintProperty(name, 'fill-color', {
-            property: 'val',
+            property: $signalType,
             stops: stops,
           });
           map.setLayoutProperty(name, 'visibility', 'visible');
@@ -87,11 +113,11 @@
               id: $currentLevel,
               source: $currentLevel,
               type: 'fill',
-              filter: ['!=', 'val', -100],
+              filter: ['!=', $signalType, -100],
               paint: {
                 'fill-outline-color': '#616161',
                 'fill-color': {
-                  property: 'val',
+                  property: $signalType,
                   stops: stops,
                 },
               },
@@ -112,6 +138,7 @@
         .addTo(map);
     });
     currentDataReadyOnMay.set(true);
+    window.performance.measure('update-map', 'update-map-start');
   }
 
   function initializeMap() {
@@ -125,6 +152,37 @@
     })
       .addControl(new mapboxgl.AttributionControl({ compact: true }))
       .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+
+    map.on('data', ev => {
+      if (ev.dataType === 'source') {
+        if (ev.coord && ev.coord.key) {
+          if (ev.isSourceLoaded) {
+            window.performance.measure(`Load ${ev.coord.key}`, `Start Load ${ev.coord.key}`);
+          } else {
+            window.performance.mark(`Start Load ${ev.coord.key}`);
+          }
+        } else {
+          window.performance.measure(`Load Data`, `Start Load Data`);
+        }
+      } else {
+        // console.log(ev);
+      }
+    });
+    map.on('dataloading', ev => {
+      if (ev.dataType === 'source') {
+        if (ev.coord && ev.coord.key) {
+          if (ev.isSourceLoaded) {
+            window.performance.measure(`Load ${ev.coord.key}`, `Start Load ${ev.coord.key}`);
+          } else {
+            window.performance.mark(`Start Load ${ev.coord.key}`);
+          }
+        } else {
+          window.performance.mark(`Start Load Data`);
+        }
+      } else {
+        // console.log(ev);
+      }
+    });
 
     //Disable touch zoom, it makes gesture scrolling difficult
     map.scrollZoom.disable();
@@ -215,7 +273,7 @@
       });
 
       mounted = true;
-      updateMap();
+      updateMap('init');
     });
   }
 
