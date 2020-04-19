@@ -22,7 +22,7 @@ export const sensors = readable([
     name: 'Lab Tests (Quidel)',
     id: 'quidel',
     signal: 'negativeprop',
-    levels: ['county', 'msa', 'state'],
+    levels: ['msa', 'state'],
   },
   {
     name: 'Search Trends (Google)',
@@ -33,9 +33,9 @@ export const sensors = readable([
 ]);
 
 export const levels = readable({
-  county: 'County',
   state: 'State',
-  msa: 'Metropolitan Statistical Area',
+  msa: 'Metro Area',
+  county: 'County',
 });
 
 // This loads all the GeoJSON's for each granularity that the MapBox component reads as layers.
@@ -75,9 +75,9 @@ export const times = writable(null);
 export const mounted = writable(0);
 export const metaData = writable([]);
 
-export const currentSensor = writable('google-survey');
+export const currentSensor = writable('google-survey'); // google-survey
 // 'county', 'state', or 'msa'
-export const currentLevel = writable('county');
+export const currentLevel = writable('county'); // might want to change this to state by default
 // Options are 'direction' and 'value'.
 export const signalType = writable('value');
 // EpiWeek in form YYYYMMDD.
@@ -85,7 +85,8 @@ export const currentDate = writable(20200412);
 // Range of time for the map slider.
 export const currentRange = writable([0, 1]);
 // Region GEO_ID for filtering the line chart.
-export const currentRegion = writable('');
+export const currentRegion = writable('42003');
+export const currentRegionName = writable('');
 export const currentDataReadyOnMay = writable(false);
 
 export const currentSensorName = derived(

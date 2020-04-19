@@ -34,12 +34,15 @@ html,
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Open Sans", sans-serif;
 }
 
 #vizbox {
+  position: relative;
   width: 100%;
-  height: 100vh;
+  height: 90vh;
+  min-width: 1021px;
+  min-height: 550px;
 }
 
 .title {
@@ -102,18 +105,14 @@ body {
   display: inline-flex;
 }
 
-#vizbox {
-  position: relative;
-}
-
 button.mapboxgl-ctrl-zoom-in,
 button.mapboxgl-ctrl-zoom-out {
   margin: 0;
 }
 
-.axis {
-  font-size: 12px;
-  font-family: 'Open Sans', sans-serif;
+.axis-text {
+  font-size: 14px;
+  font-family: "Open Sans", sans-serif;
 }
 
 button.mapboxgl-popup-close-button {
@@ -122,7 +121,6 @@ button.mapboxgl-popup-close-button {
 }
 
 .tooltip-text {
-  font-family: 'Open Sans' sans-serif;
+  font-family: "Open Sans" sans-serif;
   margin: 0px;
-  padding: 5px;
 }

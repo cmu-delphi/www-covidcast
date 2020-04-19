@@ -1,7 +1,8 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount } from "svelte";
   import {
     currentRegion,
+    currentRegionName,
     currentSensor,
     currentLevel,
     currentData,
@@ -9,9 +10,11 @@
     regionDataStats,
     currentSensorName,
     currentLevelName,
-    currentDataReadyOnMay,
-  } from './stores.js';
-  import * as d3 from 'd3';
+    currentDate,
+    times
+  } from "./stores.js";
+  import { DIRECTION_THEME } from "./theme.js";
+  import * as d3 from "d3";
 
   let el;
   let w;
@@ -26,14 +29,15 @@
   onMount(_ => drawGraph());
 
   // local variables for permissible graph types
-  const barChart = 'Bar_Chart';
-  const lineGraph = 'Line_Graph';
+  const barChart = "Bar_Chart";
+  const lineGraph = "Line_Graph";
   const charts = [barChart, lineGraph];
   let userCharts = [];
   let currentChart = 0;
 
   regionData.subscribe(d => updateGraph(d));
   regionDataStats.subscribe(d => setChartRange(d));
+  currentDate.subscribe(_ => updateGraphTimeRange());
   // currentDataReadyOnMay.subscribe(d => setFocus());
   // regionDataStats.subscribe(d => console.log(d));
 
@@ -53,10 +57,17 @@
           var graphType = dataResults[0];
           var graphData = dataResults[1];
           var range = dataResults[2];
-          userCharts[currentChart] = new Chart(graphType, graphData, range);
+          var n = dataResults[3]
+          userCharts[currentChart] = new Chart(graphType, graphData, range, n);
           userCharts[currentChart].draw();
         }
       }
+    }
+  }
+
+  function updateGraphTimeRange() {
+    if (userCharts[currentChart]) {
+      userCharts[currentChart].draw();
     }
   }
 
@@ -78,42 +89,50 @@
 
     // todo: determine chart type based on data
     var dataRange = userCharts[currentChart].getRange();
+    var n = userCharts[currentChart].getN();
     var cType = lineGraph;
-    return [cType, data, dataRange];
+    return [cType, data, dataRange, n];
   }
 
   function setChartRange(data) {
     if (data) {
+      console.log('data: ' + data);
       let { min_value, max_value } = data;
-      // let stats = $regionDataStats;
-      // console.log('stats: ' + stats);
+      let { num_locations } = data;
+      console.log(num_locations);
+      let stats = $regionDataStats;
+      // console.log('data: ' + data[0]);
+      console.log('stats: ' + stats);
       // let min = dataStats.min_value;
       // let max = dataStats.max_value;
       // console.log(currentChart);
       if (userCharts[currentChart] !== undefined) {
         userCharts[currentChart].setRange(min_value, max_value);
+        userCharts[currentChart].setN(num_locations);
+
       }
     }
   }
 
   class Chart {
-    constructor(chartType, data, dataRange) {
+    constructor(chartType, data, dataRange, num) {
       var chart;
       this.chartType = chartType;
       this.x = null;
       this.y = null;
       switch (chartType) {
-        case 'Bar_Chart':
+        case "Bar_Chart":
           chart = new BarChart();
           chart.setData(data);
           break;
-        case 'Line_Graph':
+        case "Line_Graph":
           chart = new LineGraph();
           chart.setData(data);
           chart.setRange(dataRange[0], dataRange[1]);
+          chart.setN(num);
           break;
         default:
-          TypeError('Chart type not a valid type.');
+          TypeError("Chart type not a valid type.");
       }
       return chart;
     }
@@ -128,28 +147,39 @@
     }
 
     getData() {
-      return this.data;
+          return this.data;
+    }
+
+    setN(num) {
+      this.n = num;
+    }
+
+    getN() {
+      if(this.n) {
+        return this.n;
+      } else {
+        console.log('n: ' + this.n);
+      }
     }
 
     getYAxis() {
-      let title = '';
+      let title = "";
       let sensor = $currentSensor;
-      console.log(sensor);
       switch (sensor) {
-        case 'google-survey':
-          title = 'Percentage';
+        case "google-survey":
+          title = "Percentage";
           break;
-        case 'fb_survey':
-          title = 'Percentage';
+        case "fb_survey":
+          title = "Percentage";
           break;
-        case 'quidel':
-          title = 'Percentage';
+        case "quidel":
+          title = "Percentage";
           break;
-        case 'ght':
-          title = 'Frequency';
+        case "ght":
+          title = "Frequency";
           break;
-        case 'doctor-visits':
-          title = 'Percentage';
+        case "doctor-visits":
+          title = "Percentage";
           break;
         default:
           break;
@@ -158,42 +188,16 @@
     }
 
     getChartTitle() {
-      var ChartTitle = 'Currently viewing sensor ';
-      let title = '';
-      let sensor = $currentSensor;
-      let geoLevel = $currentLevel;
-      console.log(geoLevel);
-      switch (sensor) {
-        case 'google-survey':
-          title = 'Survey (Google)';
-          break;
-        case 'fb_survey':
-          title = 'Survey (Facebook)';
-          break;
-        case 'quidel':
-          title = 'Lab Tests (Quidel)';
-          break;
-        case 'ght':
-          title = 'Search Trends (Google)';
-          break;
-        case 'doctor-visits':
-          title = 'Doctor Visits';
-          break;
-        default:
-          break;
-      }
-      let geoTitle = '';
-      switch (geoLevel) {
-        case 'county':
-          geoTitle = 'County';
-          break;
-        case 'state':
-          geoTitle = 'State';
-          break;
-        default:
-          break;
-      }
-      var cT =  ChartTitle + ' <strong> ' + title + '</strong> at the <strong>' + geoTitle + '</strong> level';
+      var ChartTitle = "Currently viewing sensor ";
+      let sensor = $currentSensorName;
+      let geoLevel = $currentLevelName;
+      var cT =
+        ChartTitle +
+        " <strong> " +
+        sensor +
+        "</strong> at the <strong>" +
+        geoLevel +
+        "</strong> level";
       d3.select(t).html(cT);
     }
 
@@ -202,7 +206,7 @@
       try {
         this.chartType in charts ? (result = true) : (result = false);
       } catch (e) {
-        if (e.name == 'ReferenceError') {
+        if (e.name == "ReferenceError") {
           result = false;
         }
       }
@@ -214,7 +218,7 @@
     draw() {
       // if there is an existing chart, remove it and redraw
       d3.select(el)
-        .selectAll('*')
+        .selectAll("*")
         .remove();
 
       // size chart
@@ -223,7 +227,7 @@
         height = 0.75 * w - margin.top - margin.bottom;
 
       // parse the date time
-      var parseDate = d3.timeParse('%Y%m%d');
+      var parseDate = d3.timeParse("%Y%m%d");
 
       // set ranges
       this.x = d3.scaleBand().rangeRound([0, width]);
@@ -232,18 +236,18 @@
       // attach graphic
       var svg = d3
         .select(el)
-        .append('svg')
-        .attr('width', width + margin.left + margin.right)
-        .attr('height', height + margin.top + margin.bottom)
-        .append('g')
-        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
       // draw axes
       svg
-        .append('g')
-        .attr('transform', 'translate(0,' + height + ')')
-        .call(d3.axisBottom(this.x).tickFormat('%m %d'));
-      svg.append('g').call(d3.axisLeft(this.y));
+        .append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(this.x).tickFormat("%m %d"));
+      svg.append("g").call(d3.axisLeft(this.y));
     }
 
     updateChart() {}
@@ -264,12 +268,16 @@
     verifyDataFormat(data) {
       super.verifyDataFormat();
       !Number.isInteger(Object.values(data))
-        ? TypeError('Provided data is of the wrong type. Only integers accepted.')
+        ? TypeError(
+            "Provided data is of the wrong type. Only integers accepted."
+          )
         : true;
       data.length > 1
-        ? RangeError('Bar charts are only valid for single data sources. Comparisons are not supported.')
+        ? RangeError(
+            "Bar charts are only valid for single data sources. Comparisons are not supported."
+          )
         : true;
-      data.length < 1 ? ReferenceError('No data was provided.') : true;
+      data.length < 1 ? ReferenceError("No data was provided.") : true;
     }
 
     draw() {
@@ -279,122 +287,249 @@
 
   class LineGraph extends Chart {
     draw() {
+      // test function
+      calculateSD();
+
       // if there is an existing chart, remove it and redraw
       d3.select(el)
-        .selectAll('*')
+        .selectAll("*")
         .remove();
 
       // line graph
       let myData = this.getData();
-      console.log('length: ' + myData);
 
       // size chart
-      var margin = { top: 20, right: 20, bottom: 70, left: 60 },
+      var margin = { top: 5, right: 20, bottom: 50, left: 60 },
         width = w - margin.left - margin.right,
         height = 0.75 * w - margin.top - margin.bottom;
 
-      d3.select(el).html('');
+      d3.select(el).html("");
       var svg = d3
         .select(el)
-        .append('svg')
-        .attr('width', width + margin.left + margin.right)
-        .attr('height', height + margin.top + margin.bottom)
-        .append('g')
-        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-
-      var parseTime = d3.timeParse('%Y%m%d');
-      var formatTime = d3.timeFormat('%m-%d-%Y');
+      // set date range
+      var parseTime = d3.timeParse("%Y%m%d");
+      var formatTime = d3.timeFormat("%m-%d-%Y");
       var k = d3.keys(myData);
-      var times = k.map(i => parseTime(myData[k[i]]['time_value']));
-      var maxDate = Math.max.apply(null, times);
-      var twoWeeks = 60*60*24*1000*7*2;
-      maxDate = maxDate - twoWeeks;
-      maxDate = new Date(maxDate);
-      myData = myData.filter(it => (parseTime(it['time_value']) > maxDate));
+      var times = k.map(i => parseTime(myData[k[i]]["time_value"]));
+      // var maxDate = Math.max.apply(null, times);
+      var maxDate = parseTime($currentDate);
+      console.log("max: " + maxDate);
+      var twoWeeks = 60 * 60 * 24 * 1000 * 7 * 2;
+      var bisectDate = d3.bisector(function(d) {
+        return d.time_value;
+      }).right;
+      var minDate = maxDate - twoWeeks;
+      minDate = new Date(minDate);
+      myData = myData.filter(it => parseTime(it["time_value"]) < maxDate);
+      myData = myData.filter(it => parseTime(it["time_value"]) > minDate);
+
+      // set x-axis ticks based off of data sparsity and format y-axis ticks
+      var xTicks = myData.length;
+      var formatXTicks = xTicks < 6 ? xTicks : d3.timeDay.every(3);
+      var scalePercentages = function(d) {
+        return formatPercent(d * 100);
+      };
+      // var formatPercent = d3.format("%")(1);
+      var percentFormat = this.getYAxis() == "Percentage";
+      var formatYTicks = percentFormat ? d3.format(".0%") : d3.format("");
+      // console.log(formatYTicks);
       var x = d3
         .scaleTime()
         .domain(d3.extent(myData, d => parseTime(d.time_value)))
         .range([0, width]);
       var y = d3
         .scaleLinear()
-        .domain([this.min, this.max*1.3])
+        .domain([this.min, this.max * 1.2])
         .range([height, 0]);
 
       svg
-        .append('g')
-        .attr('class', 'axis')
-        .attr('transform', 'translate(0,' + height + ')')
+        .append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(0," + height + ")")
         .call(
           d3
             .axisBottom(x)
-            .tickFormat(d3.timeFormat('%m/%d'))
-            .ticks(d3.timeDay.every(4)),
+            .tickFormat(d3.timeFormat("%m/%d"))
+            .ticks(formatXTicks)
         );
       svg
-        .append('g')
-        .attr('class', 'axis')
-        .call(
-          d3
-            .axisLeft(y)
-            .ticks(8)
-        );
+        .append("g")
+        .attr("class", "axis")
+        .call(d3.axisLeft(y).tickFormat(formatYTicks));
 
       let line = d3
         .line()
         .x(d => x(parseTime(d.time_value)))
         .y(d => y(+d.value));
 
+      // console.log(DIRECTION_THEME.max);
       svg
-        .append('path')
-        .attr('fill', 'none')
-        .attr('stroke', '#CB2F4A')
-        .attr('stroke-width', 3)
-        .attr('d', line(myData));
+        .append("path")
+        .attr("fill", "none")
+        .attr("stroke", DIRECTION_THEME.max)
+        .attr("stroke-width", 3)
+        .attr("d", line(myData));
 
       // label the y-axis
       var label = this.getYAxis();
       svg
-        .append('text')
-        .attr('transform', 'rotate(-90)')
-        .attr('y', 0 - margin.left)
-        .attr('x', 0 - height / 2)
-        .attr('dy', '0.75em')
-        .style('text-anchor', 'middle')
+        .append("text")
+        .attr("class", "axis-text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - margin.left)
+        .attr("x", 0 - height / 2)
+        .attr("dy", "0.75em")
+        .style("text-anchor", "middle")
         .text(label);
 
       // label the x-axis
       svg
-        .append('text')
-        .attr('transform', 'translate(' + width / 2 + ', ' + (height + margin.top + 20) + ')')
-        .style('text-anchor', 'middle')
-        .text('Date');
+        .append("text")
+        .attr("class", "axis-text")
+        .attr(
+          "transform",
+          "translate(" + width / 2 + ", " + (height + margin.top + 30) + ")"
+        )
+        .style("text-anchor", "middle")
+        .text("Date");
 
       // label the chart
       this.getChartTitle();
-      // var chartTitle = this.getChartTitle();
-      // svg
-      //   .append('text')
-      //   .attr('transform', 'translate(' + width/2 + ', ' + 0 + ')')
-      //   .style('text-anchor', 'middle')
-      //   .text(chartTitle);
+      var chartTitle = this.getChartTitle();
+      svg
+        .append("text")
+        .attr("transform", "translate(" + width / 2 + ", " + 0 + ")")
+        .style("text-anchor", "middle")
+        .text(chartTitle);
+
+      // line chart tooltip
+      let focus = svg
+        .append("g")
+        .attr("class", "focus")
+        .style("display", "none");
+
+      focus
+        .append("circle")
+        .attr("r", 5)
+        .style("fill", "red");
+
+      focus
+        .append("rect")
+        .attr("class", "tooltip")
+        .attr("width", 80)
+        .attr("height", 30)
+        .attr("x", -40)
+        .attr("y", -40)
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .style("fill", "white")
+        .style("stroke", "#666");
+
+      focus
+        .append("text")
+        .attr("class", "tooltip-date")
+        .attr("x", -35)
+        .attr("y", -20)
+        .style("font-size", "12px");
+
+      svg
+        .append("rect")
+        .attr("class", "overlay")
+        .attr("width", width)
+        .attr("height", height)
+        .style("fill", "none")
+        .style("pointer-events", "all")
+        .on("mouseover", function() {
+          focus.style("display", null);
+        })
+        .on("mouseout", function() {
+          focus.style("display", "none");
+        })
+        .on("mousemove", mousemove);
+
+      function mousemove() {
+        var x0 = x.invert(d3.mouse(this)[0]);
+        var i = bisectDate(myData, +calculateValFromRectified(x0), 1);
+        var d0 = myData[i - 1];
+        var d1 = myData[i];
+        var d =
+          x0 - parseTime(d0.time_value) > parseTime(d1.time_value) - x0
+            ? d1
+            : d0;
+        focus.attr(
+          "transform",
+          "translate(" + x(parseTime(d.time_value)) + "," + y(d.value) + ")"
+        );
+        focus
+          .select(".tooltip-date")
+          .text(
+            d3.timeFormat("%m/%d")(parseTime(d.time_value)) +
+              ": " +
+              d3.format(",.3f")(d.value)
+          );
+      }
     }
   }
 
-  function setFocus() {
+  function calculateValFromRectified(rectified) {
+    let tempDate = new Date(rectified);
+    let year = tempDate.getFullYear();
+    let month = ("0" + (tempDate.getMonth() + 1)).slice(-2);
+    let date = ("0" + tempDate.getDate()).slice(-2);
+    return year + month + date;
+  }
 
+  function calculateSD() {
+    // var dataset = userCharts[currentChart].getData();
+    var dataset = $currentData;
+    console.log('dataset: ' + dataset);
+    console.log('len: ' + dataset.length);
+    var k = d3.keys(dataset);
+    var values = k.map(i => dataset[k[i]]['value']);
+    console.log('values: ' + values);
+    var sum = values.reduce((i, j) => i + j, 0);
+    console.log('sum: ' + sum);
+    var n = userCharts[currentChart].getN();
+    console.log('n: ' + n);
+    var avg = sum/n;
+    console.log('avg: ' + avg);
+    var diff = values.reduce(d => Math.pow((d-avg), 2));
+    console.log('diff: ' + diff);
+    var sd = Math.sqrt((1/(n - 1))*diff);
+    console.log('sd: ' + sd);
+    var upperbound = avg + 3*sd;
+    console.log('upperbound: ' + upperbound);
+    var lowerbound = avg - 3*sd;
+    console.log('lowerbound: ' + lowerbound);
+    console.log('min: ' + userCharts[currentChart].min + ' max: ' + userCharts[currentChart].max);
   }
 </script>
 
 <style>
   .graph-title {
     text-align: center;
+    font-size: 14px;
     margin: 0px;
+  }
+  .graph-description {
+    text-align: center;
+    margin: 5px 0px 0px 0px;
+    font-size: 14px;
+    font-style: italic;
   }
 </style>
 
-<h4 class="graph-title">Intensity Data Over Time</h4>
-<p bind:this={t}></p>
-<div bind:clientWidth={w}>
-  <div bind:this={el} />
+<div class="graph-container">
+  <!-- <h5 bind:this={t} class="graph-title"/> -->
+  <h5 class="graph-title">Intensity Over Time</h5>
+  <p class="graph-description">{$currentRegionName}</p>
+  <div bind:clientWidth={w}>
+    <div bind:this={el} />
+  </div>
 </div>

@@ -11,6 +11,7 @@
     box-sizing: border-box;
     background-color: rgba(255, 255, 255, 0.7);
     transition: all 0.1s ease-in;
+    height: 100%;
   }
 
   .legend:hover {
@@ -26,7 +27,7 @@
 
   .color {
     width: 20px;
-    height: 80px;
+    height: 100%;
     /* border-radius: 50%; */
     margin-right: 10px;
     display: inline-block;
@@ -48,34 +49,37 @@
   }
 
   .legend-bar {
-    background: linear-gradient(to top, #fff, #c41230);
     width: 20px;
-    height: 300px;
+    height: 100%;
     margin-top: 10px;
     margin-bottom: 10px;
   }
+
+  .direction-p {
+    height: 33%;
+  }
 </style>
 
-<div class="legend {$signalType === 'value' ? 'value' : null}">
+<div class="legend {$signalType === 'value' ? 'value' : ''}">
   {#if $signalType === 'direction'}
-    <p>
+    <p class="direction-p">
       <span class="color inc" style="background-color: {DIRECTION_THEME.increasing}" />
       <span class="direction-indicators inc">&#8599;</span>
       Increasing
     </p>
-    <p>
+    <p class="direction-p">
       <span class="color const" style="background-color: {DIRECTION_THEME.steady}" />
       <span class="direction-indicators const">&#8594;</span>
       Steady
     </p>
-    <p>
+    <p class="direction-p">
       <span class="color dec" style="background-color: {DIRECTION_THEME.decreasing}" />
       <span class="direction-indicators dec">&#8600;</span>
       Decreasing
     </p>
   {:else}
     <p>High</p>
-    <div class="legend-bar" />
+    <div class="legend-bar" style="background: linear-gradient(to top, #fff, {DIRECTION_THEME.max})" />
     <p>None</p>
   {/if}
 </div>

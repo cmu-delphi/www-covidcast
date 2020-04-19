@@ -3,13 +3,16 @@
   import {
     levels,
     currentRegion,
+    currentRegionName,
     geojsons,
-    currentLevel,
     currentSensor,
+    currentLevel,
+    currentDate,
     currentData,
     currentRange,
     signalType,
     currentDataReadyOnMay,
+    metaData,
   } from './stores.js';
   import { DIRECTION_THEME } from './theme.js';
 
@@ -75,33 +78,66 @@
   };
 
   // If it hasn't been initialized and we have geojsons and initial data, create map.
-  $: if (!map && $geojsons.size !== 0 && $currentData.length !== 0) initializeMap();
+  $: if (
+    !map &&
+    $geojsons.size !== 0 &&
+    //  && $currentData.length !== 0
+    $metaData.length !== 0
+  ) {
+    initializeMap();
+  }
 
   // Update the map when sensor or level changes.
-  currentData.subscribe(_ => updateMap('data'));
-  signalType.subscribe(_ => updateMap('signal'));
-
-  // Remove all highlights when the level changes
-  currentLevel.subscribe(_ => Object.keys($levels).forEach(level => map && map.removeFeatureState({ source: level })));
+  currentData.subscribe(_ => {
+    try {
+      updateMap('data');
+    } catch (err) {
+      console.log(err);
+    }
+  });
+  currentLevel.subscribe(_ => {
+    try {
+      updateMap('data');
+    } catch (err) {
+      console.log(err);
+    }
+  });
+  currentDate.subscribe(_ => {
+    try {
+      updateMap('data');
+    } catch (err) {
+      console.log(err);
+    }
+  });
+  signalType.subscribe(_ => {
+    try {
+      updateMap('signal');
+    } catch (err) {
+      console.log(err);
+    }
+  });
 
   function updateMap(type) {
     if (!mounted) return;
     window.performance.mark('update-map-start');
+    Object.keys($levels).forEach(level => map && map.removeFeatureState({ source: level }));
 
     if (type === 'data') {
       map.getLayer($currentLevel) && map.removeLayer($currentLevel);
     }
 
-    let valueMinMax = [999999999, -1];
+    console.log($metaData);
+    console.log($currentSensor, $currentLevel);
+    let thisMeta = $metaData.find(d => d.data_source === $currentSensor && d.geo_type === $currentLevel);
+    console.log(thisMeta);
+
+    let valueMinMax = [thisMeta.min_value, thisMeta.max_value];
     let valueMappedVals = new Map();
     let directionMappedVals = new Map();
 
     let geoIds = new Set(
       $currentData.map(d => {
         const key = d.geo_value.toUpperCase();
-        const dat = d.value;
-        valueMinMax[0] = dat < valueMinMax[0] ? dat : valueMinMax[0];
-        valueMinMax[1] = dat > valueMinMax[1] ? dat : valueMinMax[1];
 
         if (d.value !== null) {
           valueMappedVals.set(key, d.value);
@@ -132,7 +168,7 @@
 
     let stops;
     if ($signalType === 'value') {
-      stops = [[valueMinMax[0], '#fff'], [valueMinMax[1], '#c41230']];
+      stops = [[valueMinMax[0], '#fff'], [valueMinMax[1], DIRECTION_THEME.max]];
     } else {
       stops = [[-1, DIRECTION_THEME.decreasing], [0, DIRECTION_THEME.steady], [1, DIRECTION_THEME.increasing]];
     }
@@ -346,7 +382,7 @@
 <style>
   .map-container {
     width: 100%;
-    height: 100vh;
+    height: 90vh;
     position: relative;
   }
 
