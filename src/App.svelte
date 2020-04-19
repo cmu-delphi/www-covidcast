@@ -35,49 +35,49 @@
   // this is for graph dev purposes
   let use_real_data = true;
 
-  if (use_real_data === false) {
-    console.log('using fake network requests');
-    onMount(_ => {
-      d3.json('./temp_graph_data/meta_request_results.json').then(meta => {
-        metaStats.set(meta.epidata);
+  // if (use_real_data === false) {
+  //   console.log('using fake network requests');
+  //   onMount(_ => {
+  //     d3.json('./temp_graph_data/meta_request_results.json').then(meta => {
+  //       metaStats.set(meta.epidata);
 
-        let queries = [];
-        let entries = [];
-        let timeMap = new Map();
-        $sensors.forEach(sens => {
-          let date = meta.epidata.find(d => d.data_source === sens.id);
-          let minDate = date.min_time;
-          let maxDate = date.max_time;
-          timeMap.set(sens.id, [minDate, maxDate]);
-          sens.levels.forEach(l => {
-            entries.push([sens.id, l]);
-          });
-        });
+  //       let queries = [];
+  //       let entries = [];
+  //       let timeMap = new Map();
+  //       $sensors.forEach(sens => {
+  //         let date = meta.epidata.find(d => d.data_source === sens.id);
+  //         let minDate = date.min_time;
+  //         let maxDate = date.max_time;
+  //         timeMap.set(sens.id, [minDate, maxDate]);
+  //         sens.levels.forEach(l => {
+  //           entries.push([sens.id, l]);
+  //         });
+  //       });
 
-        // faking queries with d3.json()
-        queries.push(d3.json('./temp_graph_data/fb_survey_cli_county_20200406-20200413.json'));
-        queries.push(d3.json('./temp_graph_data/fb_survey_cli_msa_20200406-20200413.json'));
-        queries.push(d3.json('./temp_graph_data/google-survey_cli_county_20200411-20200416.json'));
-        queries.push(d3.json('./temp_graph_data/quidel_negativeratio_county_20200201-20200409.json'));
-        queries.push(d3.json('./temp_graph_data/quidel_negativeratio_msa_20200201-20200409.json'));
-        queries.push(d3.json('./temp_graph_data/ght_smoothedsearch_msa_20200201-20200412.json'));
+  //       // faking queries with d3.json()
+  //       queries.push(d3.json('./temp_graph_data/fb_survey_cli_county_20200406-20200413.json'));
+  //       queries.push(d3.json('./temp_graph_data/fb_survey_cli_msa_20200406-20200413.json'));
+  //       queries.push(d3.json('./temp_graph_data/google-survey_cli_county_20200411-20200416.json'));
+  //       queries.push(d3.json('./temp_graph_data/quidel_negativeratio_county_20200201-20200409.json'));
+  //       queries.push(d3.json('./temp_graph_data/quidel_negativeratio_msa_20200201-20200409.json'));
+  //       queries.push(d3.json('./temp_graph_data/ght_smoothedsearch_msa_20200201-20200412.json'));
 
-        let dat = {};
-        Promise.all(queries).then(d => {
-          console.log(d);
-          entries.forEach((ent, i) => {
-            dat[ent[0]] ? '' : (dat[ent[0]] = {});
-            dat[ent[0]][ent[1]] = d[i].epidata;
-          });
-          times.set(timeMap);
-          data.set(dat);
-        });
-      });
-    }).catch(err => {
-      error = err;
-      currentDataReadyOnMay.set(true);
-    });
-  }
+  //       let dat = {};
+  //       Promise.all(queries).then(d => {
+  //         console.log(d);
+  //         entries.forEach((ent, i) => {
+  //           dat[ent[0]] ? '' : (dat[ent[0]] = {});
+  //           dat[ent[0]][ent[1]] = d[i].epidata;
+  //         });
+  //         times.set(timeMap);
+  //         data.set(dat);
+  //       });
+  //     });
+  //   }).catch(err => {
+  //     error = err;
+  //     currentDataReadyOnMay.set(true);
+  //   });
+  // }
 
   function updateRegionSliceCache(sensor, level, date) {
     if (!$mounted) return;
@@ -245,7 +245,7 @@
 
   .legend-container {
     position: absolute;
-    top: 250px;
+    top: 200px;
     left: 10px;
     z-index: 1000;
     /* background-color: rgba(255, 255, 255, 0.7); */
@@ -256,6 +256,8 @@
     justify-content: center;
 
     transition: all 0.1s ease-in;
+
+    height: 40%;
   }
 
   .graph-container {
