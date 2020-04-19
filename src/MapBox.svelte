@@ -27,11 +27,12 @@
   $: if (!map && $geojsons.size !== 0 && $currentData.length !== 0) initializeMap();
 
   // Update the map when sensor or level changes.
-  currentData.subscribe(_ => updateMap());
-  signalType.subscribe(_ => updateMap());
+  currentData.subscribe(_ => updateMap('data'));
+  signalType.subscribe(_ => updateMap('signal'));
 
-  function updateMap() {
+  function updateMap(type) {
     if (!mounted) return;
+    window.performance.mark('update-map-start');
 
     let minMax = [999999999, -1];
     let mappedVals = new Map();
@@ -70,8 +71,10 @@
     if ($signalType === 'direction') {
       stops = [[-1, DIRECTION_THEME.decreasing], [0, DIRECTION_THEME.steady], [1, DIRECTION_THEME.increasing]];
     }
-
-    map.getSource($currentLevel).setData(dat);
+    console.log(dat);
+    if (['data', 'init'].includes(type)) {
+      map.getSource($currentLevel).setData(dat);
+    }
 
     Object.keys($levels).forEach(name => {
       if (name === $currentLevel) {
@@ -112,6 +115,7 @@
         .addTo(map);
     });
     currentDataReadyOnMay.set(true);
+    window.performance.measure('update-map', 'update-map-start');
   }
 
   function initializeMap() {
@@ -125,6 +129,37 @@
     })
       .addControl(new mapboxgl.AttributionControl({ compact: true }))
       .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+
+    map.on('data', ev => {
+      if (ev.dataType === 'source') {
+        if (ev.coord && ev.coord.key) {
+          if (ev.isSourceLoaded) {
+            window.performance.measure(`Load ${ev.coord.key}`, `Start Load ${ev.coord.key}`);
+          } else {
+            window.performance.mark(`Start Load ${ev.coord.key}`);
+          }
+        } else {
+          console.log(ev);
+        }
+      } else {
+        // console.log(ev);
+      }
+    });
+    map.on('dataloading', ev => {
+      if (ev.dataType === 'source') {
+        if (ev.coord && ev.coord.key) {
+          if (ev.isSourceLoaded) {
+            window.performance.measure(`Load ${ev.coord.key}`, `Start Load ${ev.coord.key}`);
+          } else {
+            window.performance.mark(`Start Load ${ev.coord.key}`);
+          }
+        } else {
+          console.log(ev);
+        }
+      } else {
+        // console.log(ev);
+      }
+    });
 
     //Disable touch zoom, it makes gesture scrolling difficult
     map.scrollZoom.disable();
@@ -215,7 +250,7 @@
       });
 
       mounted = true;
-      updateMap();
+      updateMap('init');
     });
   }
 
