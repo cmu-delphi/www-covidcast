@@ -206,7 +206,7 @@
     top: 10px;
     left: 10px;
     z-index: 1000;
-    width: 250px;
+    width: 220px;
     background-color: rgba(255, 255, 255, 0.7);
     /* border-radius: 8px; */
     padding: 10px 10px;
