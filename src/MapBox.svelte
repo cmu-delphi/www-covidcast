@@ -70,6 +70,7 @@
 
     if (clickedId !== e.features[0].id) {
       clickedId = e.features[0].id;
+      console.log(clickedId);
       map.setFeatureState({ source: level, id: clickedId }, { select: true });
       currentRegionName.set(e.features[0].properties.NAME);
       currentRegion.set(e.features[0].properties.id);
@@ -218,6 +219,20 @@
         map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none');
       }
     });
+
+    if (type === 'init') {
+      const viableFeatures = dat.features.filter(f => f.properties[$signalType] !== -100);
+
+      const index = Math.floor(Math.random() * (viableFeatures.length - 1));
+      console.log(dat.features);
+      console.log(viableFeatures, viableFeatures.length, index);
+      const randomFeature = viableFeatures[index];
+      console.log(randomFeature);
+      currentRegionName.set(randomFeature.properties.NAME);
+      currentRegion.set(randomFeature.properties.id);
+      clickedId = randomFeature.id;
+      map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+    }
 
     currentDataReadyOnMay.set(true);
     window.performance.measure('update-map', 'update-map-start');
