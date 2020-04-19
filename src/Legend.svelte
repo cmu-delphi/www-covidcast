@@ -1,6 +1,6 @@
 <script>
-  import { signalType, stats, currentSensor } from "./stores.js";
-  import { DIRECTION_THEME } from "./theme.js";
+  import { signalType, stats, currentSensor } from './stores.js';
+  import { DIRECTION_THEME } from './theme.js';
 </script>
 
 <style>
@@ -60,28 +60,20 @@
   }
 </style>
 
-<div
-  aria-label="legend"
-  class="legend {$signalType === 'value' ? 'value' : ''}">
+<div aria-label="legend" class="legend {$signalType === 'value' ? 'value' : ''}">
   {#if $signalType === 'direction'}
     <p class="direction-p">
-      <span
-        class="color inc"
-        style="background-color: {DIRECTION_THEME.increasing}" />
+      <span class="color inc" style="background-color: {DIRECTION_THEME.increasing}" />
       <span aria-hidden="true" class="direction-indicators inc">&#8599;</span>
       Increasing
     </p>
     <p class="direction-p">
-      <span
-        class="color const"
-        style="background-color: {DIRECTION_THEME.steady}" />
+      <span class="color const" style="background-color: {DIRECTION_THEME.steady}" />
       <span aria-hidden="true" class="direction-indicators const">&#8594;</span>
       Steady
     </p>
     <p class="direction-p">
-      <span
-        class="color dec"
-        style="background-color: {DIRECTION_THEME.decreasing}" />
+      <span class="color dec" style="background-color: {DIRECTION_THEME.decreasing}" />
       <span aria-hidden="true" class="direction-indicators dec">&#8600;</span>
       Decreasing
     </p>
@@ -89,8 +81,7 @@
     <p>High</p>
     <div
       class="legend-bar"
-      style="background: linear-gradient(to top, {DIRECTION_THEME.gradientMin}, {DIRECTION_THEME.gradientMiddle},
-      {DIRECTION_THEME.gradientMax})" />
+      style="background: linear-gradient(to top, {DIRECTION_THEME.gradientMin}, {DIRECTION_THEME.gradientMiddle}, {DIRECTION_THEME.gradientMax})" />
     <p>None</p>
   {/if}
 </div>
