@@ -57,7 +57,8 @@
           var graphType = dataResults[0];
           var graphData = dataResults[1];
           var range = dataResults[2];
-          userCharts[currentChart] = new Chart(graphType, graphData, range);
+          var n = dataResults[3]
+          userCharts[currentChart] = new Chart(graphType, graphData, range, n);
           userCharts[currentChart].draw();
         }
       }
@@ -88,26 +89,33 @@
 
     // todo: determine chart type based on data
     var dataRange = userCharts[currentChart].getRange();
+    var n = userCharts[currentChart].getN();
     var cType = lineGraph;
-    return [cType, data, dataRange];
+    return [cType, data, dataRange, n];
   }
 
   function setChartRange(data) {
     if (data) {
+      console.log('data: ' + data);
       let { min_value, max_value } = data;
-      // let stats = $regionDataStats;
-      // console.log('stats: ' + stats);
+      let { num_locations } = data;
+      console.log(num_locations);
+      let stats = $regionDataStats;
+      // console.log('data: ' + data[0]);
+      console.log('stats: ' + stats);
       // let min = dataStats.min_value;
       // let max = dataStats.max_value;
       // console.log(currentChart);
       if (userCharts[currentChart] !== undefined) {
         userCharts[currentChart].setRange(min_value, max_value);
+        userCharts[currentChart].setN(num_locations);
+
       }
     }
   }
 
   class Chart {
-    constructor(chartType, data, dataRange) {
+    constructor(chartType, data, dataRange, num) {
       var chart;
       this.chartType = chartType;
       this.x = null;
@@ -121,6 +129,7 @@
           chart = new LineGraph();
           chart.setData(data);
           chart.setRange(dataRange[0], dataRange[1]);
+          chart.setN(num);
           break;
         default:
           TypeError('Chart type not a valid type.');
@@ -138,7 +147,19 @@
     }
 
     getData() {
-      return this.data;
+          return this.data;
+    }
+
+    setN(num) {
+      this.n = num;
+    }
+
+    getN() {
+      if(this.n) {
+        return this.n;
+      } else {
+        console.log('n: ' + this.n);
+      }
     }
 
     getYAxis() {
@@ -256,6 +277,9 @@
 
   class LineGraph extends Chart {
     draw() {
+      // test function
+      calculateSD();
+
       // if there is an existing chart, remove it and redraw
       d3.select(el)
         .selectAll('*')
@@ -333,7 +357,7 @@
         .x(d => x(parseTime(d.time_value)))
         .y(d => y(+d.value));
 
-      console.log(DIRECTION_THEME.max);
+      // console.log(DIRECTION_THEME.max);
       svg
         .append('path')
         .attr('fill', 'none')
@@ -435,7 +459,30 @@
     return year + month + date;
   }
 
-  function setFocus() {}
+  function calculateSD() {
+    // var dataset = userCharts[currentChart].getData();
+    var dataset = $currentData;
+    console.log('dataset: ' + dataset);
+    console.log('len: ' + dataset.length);
+    var k = d3.keys(dataset);
+    var values = k.map(i => dataset[k[i]]['value']);
+    console.log('values: ' + values);
+    var sum = values.reduce((i, j) => i + j, 0);
+    console.log('sum: ' + sum);
+    var n = userCharts[currentChart].getN();
+    console.log('n: ' + n);
+    var avg = sum/n;
+    console.log('avg: ' + avg);
+    var diff = values.reduce(d => Math.pow((d-avg), 2));
+    console.log('diff: ' + diff);
+    var sd = Math.sqrt((1/(n - 1))*diff);
+    console.log('sd: ' + sd);
+    var upperbound = avg + 3*sd;
+    console.log('upperbound: ' + upperbound);
+    var lowerbound = avg - 3*sd;
+    console.log('lowerbound: ' + lowerbound);
+    console.log('min: ' + userCharts[currentChart].min + ' max: ' + userCharts[currentChart].max);
+  }
 </script>
 
 <style>
