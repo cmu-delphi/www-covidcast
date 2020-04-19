@@ -39,6 +39,21 @@ export const levels = readable({
 });
 
 // This loads all the GeoJSON's for each granularity that the MapBox component reads as layers.
+const injectIDs = (level, data) => {
+  data.features.forEach((d) => {
+    d.properties.level = level;
+
+    if (level === 'county') {
+      d.id = d.properties.id = d.properties.GEO_ID.slice(-5);
+    } else if (level === 'msa') {
+      d.id = d.properties.id = d.properties.cbsafp;
+    } else if (level === 'state') {
+      d.properties.id = d.properties.POSTAL;
+      d.id = d.properties.STATE;
+    }
+  });
+  return data;
+};
 export const geojsons = readable(new Map(), function start(set) {
   Promise.all([
     d3.json('./maps/albers_usa_gz_2010_us_050_00_5m.json'),
@@ -47,9 +62,9 @@ export const geojsons = readable(new Map(), function start(set) {
     d3.json('./maps/city_data/cities-reprojected.json'),
   ]).then(([a, b, c, d]) => {
     let m = new Map();
-    m.set('county', a);
-    m.set('state', b);
-    m.set('msa', c);
+    m.set('county', injectIDs('county', a));
+    m.set('state', injectIDs('state', b));
+    m.set('msa', injectIDs('msa', c));
     m.set('city', d);
     set(m);
   });
