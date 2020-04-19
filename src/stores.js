@@ -33,9 +33,9 @@ export const sensors = readable([
 ]);
 
 export const levels = readable({
-  county: 'County',
   state: 'State',
   msa: 'Metro Area',
+  county: 'County',
 });
 
 // This loads all the GeoJSON's for each granularity that the MapBox component reads as layers.
