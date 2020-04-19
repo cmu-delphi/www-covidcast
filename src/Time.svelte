@@ -1,17 +1,39 @@
 <script>
+  import { onMount } from 'svelte';
   import { currentDate, times, currentSensor, currentDataReadyOnMay } from './stores.js';
   import * as d3 from 'd3';
 
+  let timeSliderPaddingLeft;
+  let timeSliderPaddingRight;
+  let timeSlider;
+  let selectedDateDisplay;
+
   let parseTime = d3.timeParse('%Y%m%d');
   let formatTime = d3.timeFormat('%B %d, %Y');
+  let formatTimeWithoutYear = d3.timeFormat('%B %d');
+
+  let interval = 14;
+  let rectifiedRange = interval;
+  let sliderTotalLength = 320; // in px
+  let canLoadMore = true;
 
   let val = $currentDate;
   let min = $currentDate;
   let max = $currentDate;
 
+  let today = new Date(
+    new Date()
+      .toJSON()
+      .slice(0, 10)
+      .replace(/-/g, '/'),
+  );
+
   let rectifiedVal = parseTime(val).getTime();
-  let rectifiedMin = parseTime(min).getTime();
-  let rectifiedMax = parseTime(max).getTime();
+  let rectifiedMax = today.getTime();
+  let rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
+
+  let dataRangeMin = parseTime(min).getTime();
+  let dataRangeMax = parseTime(max).getTime();
 
   let prettyDate = '';
   $: prettyDate = formatTime(new Date(rectifiedVal));
@@ -21,15 +43,89 @@
     rectifiedVal = parseTime(val).getTime();
   });
   times.subscribe(t => (t ? update($currentSensor, t) : ''));
-  currentSensor.subscribe(s => ($times ? update(s, $times) : ''));
+  currentSensor.subscribe(s => ($times ? update(s, $times, true) : ''));
 
-  function update(s, t) {
-    min = t.get(s)[0];
+  function update(s, t, newSensor = false) {
+    if (newSensor) {
+      // reset range
+      rectifiedRange = interval;
+      rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
+    }
+
     max = t.get(s)[1];
-    rectifiedMin = parseTime(min).getTime();
-    rectifiedMax = parseTime(max).getTime();
+    min = t.get(s)[0];
+    dataRangeMin = parseTime(min).getTime();
+    dataRangeMax = parseTime(max).getTime();
+
+    updateSliderUI();
+
     currentDate.set(max);
-    console.log(min, max);
+  }
+
+  function updateSliderUI() {
+    if (dataRangeMax <= rectifiedMax && dataRangeMin >= rectifiedMin) {
+      /**
+       * fall within
+       *    -------------------
+       *        ---------
+       */
+      let leftPercentage = (dataRangeMin - rectifiedMin) / (rectifiedRange * 86400 * 1000);
+      let middlePercentage = (dataRangeMax - dataRangeMin) / (rectifiedRange * 86400 * 1000);
+      let rightPercentage = (rectifiedMax - dataRangeMax) / (rectifiedRange * 86400 * 1000);
+      timeSliderPaddingLeft.setAttribute('style', `width: ${Math.round(leftPercentage * sliderTotalLength) + 'px'}`);
+      timeSlider.setAttribute('style', `width: ${Math.round(middlePercentage * sliderTotalLength) + 'px'}`);
+      timeSliderPaddingRight.setAttribute('style', `width: ${Math.round(rightPercentage * sliderTotalLength) + 'px'}`);
+      timeSlider.setAttribute('min', dataRangeMin);
+      timeSlider.setAttribute('max', dataRangeMax);
+      canLoadMore = false;
+    } else if (dataRangeMax <= rectifiedMax && dataRangeMin <= rectifiedMin) {
+      /**
+       *
+       *    -------------------
+       *  ---------
+       */
+      let leftPercentage = 0;
+      let middlePercentage = (dataRangeMax - rectifiedMin) / (rectifiedRange * 86400 * 1000);
+      let rightPercentage = (rectifiedMax - dataRangeMax) / (rectifiedRange * 86400 * 1000);
+      timeSliderPaddingLeft.setAttribute('style', `width: ${Math.round(leftPercentage * sliderTotalLength) + 'px'}`);
+      timeSlider.setAttribute('style', `width: ${Math.round(middlePercentage * sliderTotalLength) + 'px'}`);
+      timeSliderPaddingRight.setAttribute('style', `width: ${Math.round(rightPercentage * sliderTotalLength) + 'px'}`);
+      timeSlider.setAttribute('min', rectifiedMin);
+      timeSlider.setAttribute('max', dataRangeMax);
+      canLoadMore = true;
+    } else if (dataRangeMax >= rectifiedMax && dataRangeMin >= rectifiedMin) {
+      /**
+       *
+       *    -------------------
+       *                ---------
+       */
+      let leftPercentage = (dataRangeMin - rectifiedMin) / (rectifiedRange * 86400 * 1000);
+      let middlePercentage = (rectifiedMax - dataRangeMin) / (rectifiedRange * 86400 * 1000);
+      let rightPercentage = 0;
+      timeSliderPaddingLeft.setAttribute('style', `width: ${Math.round(leftPercentage * sliderTotalLength) + 'px'}`);
+      timeSlider.setAttribute('style', `width: ${Math.round(middlePercentage * sliderTotalLength) + 'px'}`);
+      timeSliderPaddingRight.setAttribute('style', `width: ${Math.round(rightPercentage * sliderTotalLength) + 'px'}`);
+      timeSlider.setAttribute('min', dataRangeMin);
+      timeSlider.setAttribute('max', rectifiedMax);
+      canLoadMore = false;
+    } else if (dataRangeMax >= rectifiedMax && dataRangeMin <= rectifiedMin) {
+      /**
+       *
+       *    -------------------
+       *  -----------------------
+       */
+      let leftPercentage = 0;
+      let middlePercentage = 1;
+      let rightPercentage = 0;
+      timeSliderPaddingLeft.setAttribute('style', `width: ${Math.round(leftPercentage * sliderTotalLength) + 'px'}`);
+      timeSlider.setAttribute('style', `width: ${Math.round(middlePercentage * sliderTotalLength) + 'px'}`);
+      timeSliderPaddingRight.setAttribute('style', `width: ${Math.round(rightPercentage * sliderTotalLength) + 'px'}`);
+      timeSlider.setAttribute('min', rectifiedMin);
+      timeSlider.setAttribute('max', rectifiedMax);
+      canLoadMore = true;
+    }
+
+    console.log(canLoadMore);
   }
 
   function calculateValFromRectified(rectified) {
@@ -45,6 +141,12 @@
     currentDate.set(calculateValFromRectified(rectifiedVal));
   }
 
+  function loadMoreDataRange() {
+    rectifiedRange += interval;
+    rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
+    updateSliderUI();
+  }
+
   // currentDataReadyOnMay.subscribe(d => console.log('map set:', d));
 </script>
 
@@ -56,10 +158,88 @@
     position: relative;
   }
 
+  .selected-date {
+    position: absolute;
+    top: -20px;
+    left: 10px;
+    /* width: 300px; */
+    height: 24px;
+    /* background-color: lightgray; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .load-more-button {
+    position: absolute;
+    bottom: -18px;
+    left: 10px;
+
+    margin: 0;
+    font-size: 0.7rem;
+    font-weight: 300;
+    background-color: rgb(222, 222, 222);
+    border-style: solid;
+    border-color: #eeeeee;
+    border-width: 1px;
+    color: #363636;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: calc(0.3rem - 1px);
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: calc(0.3rem - 1px);
+
+    transition: all 0.1s ease-in;
+  }
+
+  .load-more-button:hover {
+    /* background-color: rgb(255, 255, 255); */
+    /* transform: scale(1.05); */
+    font-weight: 600;
+  }
+
+  .load-more-button:focus {
+    outline: none;
+  }
+
+  .load-more-button:disabled {
+    background-color: rgb(204, 204, 204);
+    color: rgb(102, 102, 102);
+    cursor: not-allowed;
+    font-weight: 300;
+    font-size: 0.7rem;
+    transform: none;
+  }
+
   .time p {
     flex-shrink: 0;
     margin-left: 10px;
+    margin-right: 10px;
     color: var(--grey);
+  }
+
+  .time p.min-max {
+    font-size: 0.8rem;
+    color: #666;
+  }
+
+  #timeSliderPaddingLeft,
+  #timeSliderPaddingRight {
+    /* flex-grow: 1; */
+    height: 6px;
+    padding: 0;
+    border-style: none;
+    /* background: #7e7e7e; */
+    background: repeating-linear-gradient(-45deg, #666, #666 2px, #eee 2px, #eee 4px);
+    outline: none;
+    opacity: 0.7;
+  }
+
+  #timeSliderPaddingLeft {
+    position: relative;
   }
 
   .slider {
@@ -68,17 +248,10 @@
     width: 320px;
     height: 6px;
     padding: 0;
-    border-radius: 5px !important;
     border-style: none;
     background: #d3d3d3;
     outline: none;
     opacity: 0.7;
-    -webkit-transition: 0.2s;
-    transition: opacity 0.2s;
-  }
-
-  .slider:hover {
-    opacity: 1;
   }
 
   .slider::-moz-focus-outer {
@@ -146,8 +319,17 @@
 </style>
 
 <div class="time">
+  <div class="selected-date" bind:this={selectedDateDisplay}>
+    Viewing data for: {formatTimeWithoutYear(new Date(rectifiedVal))}
+  </div>
+
+  <button class="load-more-button" on:click={loadMoreDataRange} disabled={!canLoadMore}>Load 2 more weeks</button>
+
+  <p class="min-max">{formatTime(new Date(rectifiedMin))}</p>
+  <div id="timeSliderPaddingLeft" bind:this={timeSliderPaddingLeft} />
   <input
     id="time_slider"
+    bind:this={timeSlider}
     type="range"
     min={rectifiedMin}
     max={rectifiedMax}
@@ -155,7 +337,9 @@
     on:mouseup={sliderOnMouseUp}
     class="slider"
     bind:value={rectifiedVal} />
-  <p>{prettyDate}</p>
+  <div id="timeSliderPaddingRight" bind:this={timeSliderPaddingRight} />
+  <p class="min-max">{formatTime(new Date(rectifiedMax))} (Today)</p>
+
   {#if $currentDataReadyOnMay === false}
     <div class="loader-container">
       <div class="loader" />

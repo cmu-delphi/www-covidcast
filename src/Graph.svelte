@@ -88,7 +88,7 @@
       // console.log('stats: ' + stats);
       // let min = dataStats.min_value;
       // let max = dataStats.max_value;
-      console.log(currentChart);
+      // console.log(currentChart);
       if (userCharts[currentChart] !== undefined) {
         userCharts[currentChart].setRange(min_value, max_value);
       }
@@ -144,7 +144,7 @@
         case 'quidel':
           title = 'Percentage';
           break;
-        case 'search-trends':
+        case 'ght':
           title = 'Frequency';
           break;
         case 'doctor-visits':
@@ -212,7 +212,9 @@
       this.max = max;
     }
 
-    getRange() { return [this.min, this.max] };
+    getRange() {
+      return [this.min, this.max];
+    }
     updateAxes() {}
   }
 
@@ -269,7 +271,6 @@
       maxDate = maxDate - twoWeeks;
       maxDate = new Date(maxDate);
       myData = myData.filter(it => (parseTime(it['time_value']) > maxDate));
-
       var x = d3
         .scaleTime()
         .domain(d3.extent(myData, d => parseTime(d.time_value)))
