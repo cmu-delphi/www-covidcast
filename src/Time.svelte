@@ -178,11 +178,11 @@
     margin: 0;
     font-size: 0.7rem;
     font-weight: 300;
-    background-color: rgb(222, 222, 222);
+    background-color: #fff;
     border-style: solid;
-    border-color: #eeeeee;
+    border-color: #dbdbdb;
     border-width: 1px;
-    color: #363636;
+    color: #6c757d;
     cursor: pointer;
     display: flex;
     justify-content: center;
@@ -196,9 +196,8 @@
   }
 
   .load-more-button:hover {
-    /* background-color: rgb(255, 255, 255); */
-    /* transform: scale(1.05); */
-    font-weight: 600;
+    background-color: #5a6268;
+    color: #fff;
   }
 
   .load-more-button:focus {
@@ -206,12 +205,40 @@
   }
 
   .load-more-button:disabled {
-    background-color: rgb(204, 204, 204);
-    color: rgb(102, 102, 102);
+    background-color: rgb(211, 211, 211);
+    color: #fff;
     cursor: not-allowed;
     font-weight: 300;
     font-size: 0.7rem;
     transform: none;
+  }
+
+  .load-more-button:disabled:hover {
+    animation: shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    transform: translate3d(0, 0, 0);
+  }
+
+  @keyframes shake {
+    10%,
+    90% {
+      transform: translate3d(-1px, 0, 0);
+    }
+
+    20%,
+    80% {
+      transform: translate3d(2px, 0, 0);
+    }
+
+    30%,
+    50%,
+    70% {
+      transform: translate3d(-4px, 0, 0);
+    }
+
+    40%,
+    60% {
+      transform: translate3d(4px, 0, 0);
+    }
   }
 
   .time p {
