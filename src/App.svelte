@@ -227,7 +227,7 @@
     /* max-width: 750px; */
     /* background-color: rgba(255, 255, 255, 0.7); */
     /* border-radius: 8px; */
-    padding: 10px 10px;
+    /* padding: 10px 10px; */
     box-sizing: border-box;
 
     display: flex;
@@ -243,8 +243,7 @@
   .legend-container {
     position: absolute;
     top: 200px;
-    bottom: 160px;
-    left: 20px;
+    left: 10px;
     z-index: 1000;
     /* background-color: rgba(255, 255, 255, 0.7); */
 
@@ -273,12 +272,12 @@
 
   .time-container {
     position: absolute;
-    bottom: 60px;
-    left: 20px;
+    bottom: 10px;
+    left: 10px;
     z-index: 1002;
-    /* background-color: rgba(255, 255, 255, 0.7); */
+    background-color: rgba(255, 255, 255, 0.7);
     /* border-radius: 8px; */
-    padding: 5px 10px;
+    padding: 30px 10px;
     box-sizing: border-box;
     /* width: 550px; */
 

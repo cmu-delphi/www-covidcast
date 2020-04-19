@@ -38,8 +38,9 @@ body {
 }
 
 #vizbox {
+  position: relative;
   width: 100%;
-  height: 100vh;
+  height: 90vh;
 }
 
 .title {
@@ -100,10 +101,6 @@ body {
 
 .inline {
   display: inline-flex;
-}
-
-#vizbox {
-  position: relative;
 }
 
 button.mapboxgl-ctrl-zoom-in,
