@@ -83,14 +83,14 @@
 
   function setChartRange(data) {
     if (data) {
-      console.log(data);
+      // console.log(data);
       let { min_value, max_value } = data;
-      console.log(min_value, max_value);
+      // console.log(min_value, max_value);
       // let stats = $regionDataStats;
       // console.log('stats: ' + stats);
       // let min = dataStats.min_value;
       // let max = dataStats.max_value;
-      console.log(currentChart);
+      // console.log(currentChart);
       if (userCharts[currentChart] !== undefined) {
         userCharts[currentChart].setRange(min_value, max_value);
       }
@@ -184,13 +184,15 @@
     updateChart() {}
 
     setRange(min, max) {
-      console.log('setting: ' + min + ' ' + max);
-      console.log(min[0]);
+      // console.log('setting: ' + min + ' ' + max);
+      // console.log(min[0]);
       this.min = min;
       this.max = max;
     }
 
-    getRange() { return [this.min, this.max] };
+    getRange() {
+      return [this.min, this.max];
+    }
     updateAxes() {}
   }
 
@@ -279,8 +281,8 @@
       var k = d3.keys(myData);
       var times = k.map(i => parseTime(myData[k[i]]['time_value']));
       var timestamps = times.map(stamp => formatTime(stamp));
-      console.log('format time: ' + timestamps);
-      console.log('range: ' + this.min + ' ' + this.max);
+      // console.log('format time: ' + timestamps);
+      // console.log('range: ' + this.min + ' ' + this.max);
       var x = d3
         .scaleTime()
         .domain(d3.extent(myData, d => parseTime(d.time_value)))
@@ -383,7 +385,7 @@
   }
 </style>
 
-<h5 class="graph-title">Intensity Data Over Time</h5>
+<h5 class="graph-title">Intensity Over Time</h5>
 <p>
   Currently viewing sensor
   <b>{$currentSensorName}</b>

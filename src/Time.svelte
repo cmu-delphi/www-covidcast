@@ -1,6 +1,8 @@
 <script>
-  import { currentDate, times, currentSensor, currentDataReadyOnMay } from './stores.js';
+  import { currentDate, times, currentSensor, currentDataReadyOnMay, currentLevel } from './stores.js';
   import * as d3 from 'd3';
+
+  export let updateRegionSliceCache;
 
   let parseTime = d3.timeParse('%Y%m%d');
   let formatTime = d3.timeFormat('%B %d, %Y');
@@ -29,7 +31,7 @@
     rectifiedMin = parseTime(min).getTime();
     rectifiedMax = parseTime(max).getTime();
     currentDate.set(max);
-    console.log(min, max);
+    updateRegionSliceCache($currentSensor, $currentLevel, max);
   }
 
   function calculateValFromRectified(rectified) {

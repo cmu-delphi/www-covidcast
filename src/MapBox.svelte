@@ -27,16 +27,11 @@
   $: if (!map && $geojsons.size !== 0 && $currentData.length !== 0) initializeMap();
 
   // Update the map when sensor or level changes.
-  // currentLevel.subscribe(_ => updateMap());
-  // currentSensor.subscribe(_ => updateMap());
-  // rData.subscribe(_ => updateMap());
   currentData.subscribe(_ => updateMap());
   signalType.subscribe(_ => updateMap());
 
   function updateMap() {
     if (!mounted) return;
-    console.log($currentData);
-    console.log('draw map', $currentLevel);
 
     let minMax = [999999999, -1];
     let mappedVals = new Map();
@@ -52,10 +47,8 @@
       }),
     );
     currentRange.set(minMax);
-    console.log(geoIds, mappedVals);
 
     let dat = $geojsons.get($currentLevel);
-    console.log(dat.features);
     dat.features.forEach(d => {
       let id;
       if ($currentLevel === 'county') {
@@ -113,10 +106,9 @@
 
     map.on('click', $currentLevel, function(e) {
       currentRegion.set(e.features[0].properties.id);
-      console.log(e.features[0].properties);
       new mapboxgl.Popup()
         .setLngLat(e.lngLat)
-        .setHTML('<p>' + e.features[0].properties.NAME + '</p>')
+        .setHTML("<p class='tooltip-text'>" + e.features[0].properties.NAME + '</p>')
         .addTo(map);
     });
     currentDataReadyOnMay.set(true);

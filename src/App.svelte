@@ -30,6 +30,7 @@
   const ENDPOINT_META = 'https://delphi.cmu.edu/epidata/api.php?source=covidcast_meta';
 
   let error = null;
+  let changingSensor = false;
 
   // this is for graph dev purposes
   let use_real_data = true;
@@ -80,18 +81,11 @@
 
   function updateRegionSliceCache(sensor, level, date) {
     if (!$mounted) return;
-    // if (sensor === $currentSensor && level === $currentLevel && date === $currentDate) return;
-    console.log('update region slice');
-    // let currSens = $sensors.find(d => d.id === sensor);
-    // let l = currSens.levels[0];
-    // if (!currSens.levels.includes($currentLevel)) level = l;
-    // let dateRange = $times.get(sensor);
-    // date = $currentDate;
-    // if (date > dateRange[1]) {
-    //   date = dateRange[1];
-    // }
+    console.log(sensor, level, date, $times.get(sensor));
+    if (!$sensors.find(d => d.id === sensor).levels.includes(level)) return;
+    if (date > $times.get(sensor)[1]) return;
+
     let cacheEntry = $regionSliceCache.get(sensor + level + date);
-    console.log(cacheEntry);
     if (!cacheEntry) {
       let q =
         ENDPOINT +
@@ -107,23 +101,18 @@
       fetch(q)
         .then(d => d.json())
         .then(d => {
-          console.log(q, d);
           currentData.set(d.epidata);
           regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
-          // currentDate.set(date);
-          // currentLevel.set(level);
         });
     } else currentData.set(cacheEntry);
   }
 
   function updateTimeSliceCache(sensor, level, region) {
     if (!$mounted) return;
-    // if (sensor === $currentSensor && level === $currentLevel && region === $currentRegion) return;
     if (!region) {
       regionData.set([]);
       return;
     }
-    console.log('update timeseries');
     let cacheEntry = $timeSliceCache.get(sensor + level + region);
     if (!cacheEntry) {
       let q =
@@ -147,20 +136,28 @@
   }
 
   currentSensor.subscribe(s => {
-    // Have to somehow update the currentDate.
     if (!$mounted) return;
+    let l = $currentLevel;
+    if (!$sensors.find(d => d.id === s).levels.includes($currentLevel)) {
+      console.log('update?');
+      l = $sensors.find(d => d.id === s).levels[0];
+      currentLevel.set(l);
+    }
+    console.log('now?');
     currentDate.set($times.get(s)[1]);
     // updateRegionSliceCache(s, $currentLevel, $currentDate);
-    // updateTimeSliceCache(s, $currentLevel, $currentRegion);
   });
+
   currentLevel.subscribe(l => {
+    console.log('level update');
     updateRegionSliceCache($currentSensor, l, $currentDate);
-    // updateTimeSliceCache($currentSensor, l, '');
-    // currentRegion.set('');
   });
-  currentDate.subscribe(d => {
-    updateRegionSliceCache($currentSensor, $currentLevel, d);
-  });
+
+  // currentDate.subscribe(d => {
+  //   console.log('date update');
+  //   updateRegionSliceCache($currentSensor, $currentLevel, d);
+  // });
+
   currentRegion.subscribe(r => updateTimeSliceCache($currentSensor, $currentLevel, r));
 
   if (use_real_data) {
@@ -327,7 +324,7 @@
 </div>
 
 <div class="time-container">
-  <Time />
+  <Time {updateRegionSliceCache} />
 </div>
 
 <div class="legend-container">
