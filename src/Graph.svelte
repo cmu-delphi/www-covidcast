@@ -454,8 +454,8 @@
             .select('.tooltip-date')
             .text(d3.timeFormat('%m/%d')(parseTime(d.time_value)) + ': ' + d3.format(',.3f')(d.value));
         } catch (err) {
-          console.log(err);
-          focus.style('display', 'none');
+          // just ignore error and bravely carry on
+          // console.log(err);
         }
       }
     }
