@@ -96,13 +96,13 @@
 
   function setChartRange(data) {
     if (data) {
-      console.log('data: ' + data);
+      // console.log('data: ' + data);
       let { min_value, max_value } = data;
       let { num_locations } = data;
-      console.log(num_locations);
+      // console.log(num_locations);
       let stats = $regionDataStats;
       // console.log('data: ' + data[0]);
-      console.log('stats: ' + stats);
+      // console.log('stats: ' + stats);
       // let min = dataStats.min_value;
       // let max = dataStats.max_value;
       // console.log(currentChart);
@@ -319,7 +319,7 @@
       var times = k.map(i => parseTime(myData[k[i]]["time_value"]));
       // var maxDate = Math.max.apply(null, times);
       var maxDate = parseTime($currentDate);
-      console.log("max: " + maxDate);
+      // console.log("max: " + maxDate);
       var twoWeeks = 60 * 60 * 24 * 1000 * 7 * 2;
       var bisectDate = d3.bisector(function(d) {
         return d.time_value;
@@ -347,6 +347,22 @@
         .scaleLinear()
         .domain([this.min, this.max * 1.2])
         .range([height, 0]);
+
+      // peg values to max and min if out of range
+      // var values = k.map(i => myData[k[i]]["value"]);
+      // console.log('for loop')
+      for(var i=0; i < myData.length; i++) {
+        // console.log(Number(myData.value));
+        if(Number(myData[i].value) < this.min) {
+          // console.log('min hit: ' + myData[i].value + ' ' + this.min);
+          myData[i].value = this.min;
+        } else if(Number(myData[i].value) > this.max) {
+          // console.log('max hit');
+          // console.log('max hit: ' + myData[i].value + ' ' + this.max);
+          myData[i].value = this.max;
+        }
+      }
+
 
       svg
         .append("g")
@@ -488,26 +504,30 @@
   function calculateSD() {
     // var dataset = userCharts[currentChart].getData();
     var dataset = $currentData;
-    console.log('dataset: ' + dataset);
-    console.log('len: ' + dataset.length);
+    // console.log('dataset: ' + dataset);
+    // console.log('len: ' + dataset.length);
     var k = d3.keys(dataset);
     var values = k.map(i => dataset[k[i]]['value']);
-    console.log('values: ' + values);
+    // var min = Math.min(values);
+    // var max = Math.max(values);
+    // console.log(typeof(values[0]));
+    // console.log('values: ' + values);
     var sum = values.reduce((i, j) => i + j, 0);
-    console.log('sum: ' + sum);
+    // console.log('sum: ' + sum);
     var n = userCharts[currentChart].getN();
-    console.log('n: ' + n);
+    // console.log('n: ' + n);
     var avg = sum/n;
-    console.log('avg: ' + avg);
+    // console.log('avg: ' + avg);
     var diff = values.reduce(d => Math.pow((d-avg), 2));
-    console.log('diff: ' + diff);
+    // console.log('diff: ' + diff);
     var sd = Math.sqrt((1/(n - 1))*diff);
-    console.log('sd: ' + sd);
+    // console.log('sd: ' + sd);
     var upperbound = avg + 3*sd;
-    console.log('upperbound: ' + upperbound);
+    // console.log('upperbound: ' + upperbound);
     var lowerbound = avg - 3*sd;
-    console.log('lowerbound: ' + lowerbound);
-    console.log('min: ' + userCharts[currentChart].min + ' max: ' + userCharts[currentChart].max);
+    // console.log('lowerbound: ' + lowerbound);
+    // console.log('min: ' + userCharts[currentChart].min + ' max: ' + userCharts[currentChart].max);
+    userCharts[currentChart].setRange(lowerbound, upperbound);
   }
 </script>
 
