@@ -49,13 +49,12 @@
 
   .legend-bar {
     width: 20px;
-    height: 300px;
+    height: 250px;
     margin-top: 10px;
-    margin-bottom: 10px;
   }
 </style>
 
-<div class="legend {$signalType === 'value' ? 'value' : null}">
+<div class="legend {$signalType === 'value' ? 'value' : ''}">
   {#if $signalType === 'direction'}
     <p>
       <span class="color inc" style="background-color: {DIRECTION_THEME.increasing}" />

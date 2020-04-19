@@ -45,12 +45,12 @@
     font-size: 1em;
     font-weight: 400;
     line-height: 1em;
-    background-color: rgb(222, 222, 222);
+    background-color: #fff;
     border-style: solid;
     border-color: #dbdbdb;
     border-left-color: transparent;
     border-width: 1px;
-    color: #363636;
+    color: #6c757d;
     cursor: pointer;
     justify-content: center;
     padding-bottom: calc(0.5em - 1px);
@@ -75,10 +75,15 @@
   }
 
   .buttons-group-side .button.selected {
-    background-color: #fff;
+    background-color: rgb(108, 117, 125);
     /* border-color: transparent; */
-    color: #000;
+    color: #fff;
     font-weight: 600;
+  }
+
+  .buttons-group-side .button:hover {
+    background-color: #5a6268;
+    color: #fff;
   }
 
   .buttons-group-side .button:focus,
@@ -94,7 +99,7 @@
     <div class="buttons-group-side">
       {#each $sensors as sensor}
         <button
-          class="button {$currentSensor === sensor.id ? 'selected' : null}"
+          class="button {$currentSensor === sensor.id ? 'selected' : ''}"
           on:click={() => {
             currentDataReadyOnMay.set(false);
             currentSensor.set(sensor.id);
