@@ -27,9 +27,10 @@
       .slice(0, 10)
       .replace(/-/g, '/'),
   );
+  let yesterday = new Date(today.getTime() - 86400 * 1000);
 
   let rectifiedVal = parseTime(val).getTime();
-  let rectifiedMax = today.getTime();
+  let rectifiedMax = yesterday.getTime();
   let rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
 
   let dataRangeMin = parseTime(min).getTime();
@@ -370,7 +371,7 @@
     class="slider"
     bind:value={rectifiedVal} />
   <div id="timeSliderPaddingRight" bind:this={timeSliderPaddingRight} />
-  <p aria-label="maximum value" class="min-max">{formatTime(new Date(rectifiedMax))} (Today)</p>
+  <p aria-label="maximum value" class="min-max">{formatTime(new Date(rectifiedMax))} (Yesterday)</p>
 
   {#if $currentDataReadyOnMay === false}
     <div class="loader-container">
