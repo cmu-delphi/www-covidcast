@@ -13,8 +13,6 @@
   } from './stores.js';
   import * as d3 from 'd3';
 
-  let parseTime = d3.timeParse('%Y%m%d');
-
   let el;
   let w;
 
@@ -35,7 +33,7 @@
 
   regionData.subscribe(d => updateGraph(d));
   regionDataStats.subscribe(d => setChartRange(d));
-  currentDataReadyOnMay.subscribe(d => setFocus());
+  // currentDataReadyOnMay.subscribe(d => setFocus());
   // regionDataStats.subscribe(d => console.log(d));
 
   function drawGraph() {
@@ -85,9 +83,7 @@
 
   function setChartRange(data) {
     if (data) {
-      console.log(data);
       let { min_value, max_value } = data;
-      console.log(min_value, max_value);
       // let stats = $regionDataStats;
       // console.log('stats: ' + stats);
       // let min = dataStats.min_value;
@@ -132,6 +128,32 @@
 
     getData() {
       return this.data;
+    }
+
+    getYAxis() {
+      let title = '';
+      let sensor = $currentSensor;
+      console.log(sensor);
+      switch (sensor) {
+        case 'google-survey':
+          title = 'Percentage';
+          break;
+        case 'fb_survey':
+          title = 'Percentage';
+          break;
+        case 'quidel':
+          title = 'Percentage';
+          break;
+        case 'search-trends':
+          title = 'Frequency';
+          break;
+        case 'doctor-visits':
+          title = 'Percentage';
+          break;
+        default:
+          break;
+      }
+      return title;
     }
 
     isChart() {
@@ -186,8 +208,6 @@
     updateChart() {}
 
     setRange(min, max) {
-      console.log('setting: ' + min + ' ' + max);
-      console.log(min[0]);
       this.min = min;
       this.max = max;
     }
@@ -226,7 +246,7 @@
       console.log('length: ' + myData);
 
       // size chart
-      var margin = { top: 20, right: 20, bottom: 70, left: 40 },
+      var margin = { top: 20, right: 20, bottom: 70, left: 60 },
         width = w - margin.left - margin.right,
         height = 0.75 * w - margin.top - margin.bottom;
 
@@ -241,24 +261,22 @@
 
 
       var parseTime = d3.timeParse('%Y%m%d');
-      // var k = d3.keys(myData);
-      // var times = k.map(i => parseTime(myData[k[i]]['time_value']));
-      // console.log(times);
-      // var max = Math.max(times);
-      // console.log('max: ' + max);
-      // var twoWeeks = 60*60*24*1000*7*2;
-      // times = times.filter(i => ((max-i)/twoWeeks) > 1);
-      // console.log('result: ' + times);
-      // var timestamps = times.map(stamp => formatTime(stamp));
-      // console.log('format time: ' + timestamps);
-      // console.log('range: ' + this.min + ' ' + this.max);
+      var formatTime = d3.timeFormat('%m-%d-%Y');
+      var k = d3.keys(myData);
+      var times = k.map(i => parseTime(myData[k[i]]['time_value']));
+      var maxDate = Math.max.apply(null, times);
+      var twoWeeks = 60*60*24*1000*7*2;
+      maxDate = maxDate - twoWeeks;
+      maxDate = new Date(maxDate);
+      myData = myData.filter(it => (parseTime(it['time_value']) > maxDate));
+
       var x = d3
         .scaleTime()
         .domain(d3.extent(myData, d => parseTime(d.time_value)))
         .range([0, width]);
       var y = d3
         .scaleLinear()
-        .domain([this.min, this.max])
+        .domain([this.min, this.max*1.2])
         .range([height, 0]);
 
       svg
@@ -269,7 +287,7 @@
           d3
             .axisBottom(x)
             .tickFormat(d3.timeFormat('%m/%d'))
-            .ticks(d3.timeDay.every(3)),
+            .ticks(d3.timeDay.every(4)),
         );
       svg
         .append('g')
@@ -277,8 +295,7 @@
         .call(
           d3
             .axisLeft(y)
-            .ticks(1)
-            .tickValues([0, 95]),
+            .ticks(8)
         );
 
       let line = d3
@@ -289,37 +306,20 @@
       svg
         .append('path')
         .attr('fill', 'none')
-        .attr('stroke', 'red')
+        .attr('stroke', '#CB2F4A')
         .attr('stroke-width', 3)
         .attr('d', line(myData));
 
       // label the y-axis
+      var label = this.getYAxis();
       svg
         .append('text')
         .attr('transform', 'rotate(-90)')
         .attr('y', 0 - margin.left)
         .attr('x', 0 - height / 2)
-        .attr('dy', '1em')
+        .attr('dy', '0.75em')
         .style('text-anchor', 'middle')
-        .text('Intensity');
-      svg
-        .append('text')
-        .attr('transform', 'rotate(-90)')
-        .attr('y', 0 - margin.left)
-        .attr('x', 0 - 0.25 * height)
-        .attr('dy', '4em')
-        .attr('font-size', 9)
-        .style('text-anchor', 'right')
-        .text('More');
-      svg
-        .append('text')
-        .attr('transform', 'rotate(-90)')
-        .attr('y', 0 - margin.left)
-        .attr('x', 0 - 0.9 * height)
-        .attr('dy', '4em')
-        .attr('font-size', 9)
-        .style('text-anchor', 'left')
-        .text('Less');
+        .text(label);
 
       // label the x-axis
       svg
@@ -327,18 +327,6 @@
         .attr('transform', 'translate(' + width / 2 + ', ' + (height + margin.top + 20) + ')')
         .style('text-anchor', 'middle')
         .text('Date');
-
-      // label lines by src
-      // data.forEach(function(d) {
-      //   //   var color = counties.indexOf(d.county);
-      //   if (d.date.getTime() == currentDate.getTime()) {
-      //     svg
-      //       .append('text')
-      //       .attr('transform', 'translate(' + (width + 3) + ',' + y(d.value) + ')')
-      //       .style('font-size', '10px')
-      //       .text(d.county);
-      //   }
-      // });
     }
   }
 
