@@ -3,6 +3,7 @@
   import {
     levels,
     currentRegion,
+    currentRegionName,
     geojsons,
     currentLevel,
     currentSensor,
@@ -67,9 +68,11 @@
     if (clickedId !== e.features[0].id) {
       clickedId = e.features[0].id;
       map.setFeatureState({ source: level, id: clickedId }, { select: true });
+      currentRegionName.set(e.features[0].properties.NAME);
       currentRegion.set(e.features[0].properties.id);
     } else {
       clickedId = null;
+      currentRegionName.set('');
       currentRegion.set('');
     }
   };
@@ -130,10 +133,8 @@
       }
     });
 
-    let stops;
-    if ($signalType === 'value') {
-      stops = [[valueMinMax[0], '#fff'], [valueMinMax[1], '#c41230']];
-    } else {
+    let stops = [[valueMinMax[0], '#fff'], [valueMinMax[1], DIRECTION_THEME.max]];
+    if ($signalType === 'direction') {
       stops = [[-1, DIRECTION_THEME.decreasing], [0, DIRECTION_THEME.steady], [1, DIRECTION_THEME.increasing]];
     }
     console.log('data update');

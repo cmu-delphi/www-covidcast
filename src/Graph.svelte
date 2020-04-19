@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import {
     currentRegion,
+    currentRegionName,
     currentSensor,
     currentLevel,
     currentData,
@@ -193,7 +194,7 @@
         default:
           break;
       }
-      var cT =  ChartTitle + ' <strong> ' + title + '</strong> at the <strong>' + geoTitle + '</strong> level';
+      var cT = ChartTitle + ' <strong> ' + title + '</strong> at the <strong>' + geoTitle + '</strong> level';
       d3.select(t).html(cT);
     }
 
@@ -289,7 +290,7 @@
       console.log('length: ' + myData);
 
       // size chart
-      var margin = { top: 20, right: 20, bottom: 70, left: 60 },
+      var margin = { top: 20, right: 45, bottom: 70, left: 60 },
         width = w - margin.left - margin.right,
         height = 0.75 * w - margin.top - margin.bottom;
 
@@ -302,23 +303,25 @@
         .append('g')
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-
       var parseTime = d3.timeParse('%Y%m%d');
       var formatTime = d3.timeFormat('%m-%d-%Y');
       var k = d3.keys(myData);
       var times = k.map(i => parseTime(myData[k[i]]['time_value']));
       var maxDate = Math.max.apply(null, times);
-      var twoWeeks = 60*60*24*1000*7*2;
-      maxDate = maxDate - twoWeeks;
+      var twoWeeks = 60 * 60 * 24 * 1000 * 7 * 2;
+      var bisectDate = d3.bisector(function(d) {
+          return d.time_value;
+        }).right,
+        maxDate = maxDate - twoWeeks;
       maxDate = new Date(maxDate);
-      myData = myData.filter(it => (parseTime(it['time_value']) > maxDate));
+      myData = myData.filter(it => parseTime(it['time_value']) > maxDate);
       var x = d3
         .scaleTime()
         .domain(d3.extent(myData, d => parseTime(d.time_value)))
         .range([0, width]);
       var y = d3
         .scaleLinear()
-        .domain([this.min, this.max*1.3])
+        .domain([this.min, this.max * 1.3])
         .range([height, 0]);
 
       svg
@@ -334,11 +337,7 @@
       svg
         .append('g')
         .attr('class', 'axis')
-        .call(
-          d3
-            .axisLeft(y)
-            .ticks(8)
-        );
+        .call(d3.axisLeft(y).ticks(8));
 
       let line = d3
         .line()
@@ -378,12 +377,75 @@
       //   .attr('transform', 'translate(' + width/2 + ', ' + 0 + ')')
       //   .style('text-anchor', 'middle')
       //   .text(chartTitle);
+
+      // line chart tooltip
+      let focus = svg
+        .append('g')
+        .attr('class', 'focus')
+        .style('display', 'none');
+
+      focus
+        .append('circle')
+        .attr('r', 5)
+        .style('fill', 'red');
+
+      focus
+        .append('rect')
+        .attr('class', 'tooltip')
+        .attr('width', 80)
+        .attr('height', 30)
+        .attr('x', -40)
+        .attr('y', -40)
+        .attr('rx', 4)
+        .attr('ry', 4)
+        .style('fill', 'white')
+        .style('stroke', '#666');
+
+      focus
+        .append('text')
+        .attr('class', 'tooltip-date')
+        .attr('x', -35)
+        .attr('y', -20)
+        .style('font-size', '12px');
+
+      svg
+        .append('rect')
+        .attr('class', 'overlay')
+        .attr('width', width)
+        .attr('height', height)
+        .style('fill', 'none')
+        .style('pointer-events', 'all')
+        .on('mouseover', function() {
+          focus.style('display', null);
+        })
+        .on('mouseout', function() {
+          focus.style('display', 'none');
+        })
+        .on('mousemove', mousemove);
+
+      function mousemove() {
+        var x0 = x.invert(d3.mouse(this)[0]);
+        var i = bisectDate(myData, +calculateValFromRectified(x0), 1);
+        var d0 = myData[i - 1];
+        var d1 = myData[i];
+        var d = x0 - parseTime(d0.time_value) > parseTime(d1.time_value) - x0 ? d1 : d0;
+        focus.attr('transform', 'translate(' + x(parseTime(d.time_value)) + ',' + y(d.value) + ')');
+        focus
+          .select('.tooltip-date')
+          .text(d3.timeFormat('%m/%d')(parseTime(d.time_value)) + ': ' + d3.format(',.3f')(d.value));
+      }
     }
   }
 
-  function setFocus() {
-
+  function calculateValFromRectified(rectified) {
+    let tempDate = new Date(rectified);
+    let year = tempDate.getFullYear();
+    let month = ('0' + (tempDate.getMonth() + 1)).slice(-2);
+    let date = ('0' + tempDate.getDate()).slice(-2);
+    return year + month + date;
   }
+
+  function setFocus() {}
 </script>
 
 <style>
@@ -391,10 +453,17 @@
     text-align: center;
     margin: 0px;
   }
+  .graph-subtitle {
+    text-align: center;
+    margin: 0px;
+    font-size: 14px;
+    font-style: italic;
+  }
 </style>
 
-<h4 class="graph-title">Intensity Data Over Time</h4>
-<p bind:this={t}></p>
+<h4 class="graph-title">Intensity Over Time</h4>
+<p class="graph-subtitle">{$currentRegionName}</p>
+<!-- <p bind:this={t} /> -->
 <div bind:clientWidth={w}>
   <div bind:this={el} />
 </div>

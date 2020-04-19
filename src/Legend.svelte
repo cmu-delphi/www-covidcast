@@ -48,7 +48,6 @@
   }
 
   .legend-bar {
-    background: linear-gradient(to top, #fff, #c41230);
     width: 20px;
     height: 300px;
     margin-top: 10px;
@@ -75,7 +74,7 @@
     </p>
   {:else}
     <p>High</p>
-    <div class="legend-bar" />
+    <div class="legend-bar" style="background: linear-gradient(to top, #fff, {DIRECTION_THEME.max})" />
     <p>None</p>
   {/if}
 </div>

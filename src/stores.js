@@ -22,7 +22,7 @@ export const sensors = readable([
     name: 'Lab Tests (Quidel)',
     id: 'quidel',
     signal: 'negativeprop',
-    levels: ['county', 'msa', 'state'],
+    levels: ['msa', 'state'],
   },
   {
     name: 'Search Trends (Google)',
@@ -86,6 +86,7 @@ export const currentDate = writable(20200412);
 export const currentRange = writable([0, 1]);
 // Region GEO_ID for filtering the line chart.
 export const currentRegion = writable('');
+export const currentRegionName = writable('');
 export const currentDataReadyOnMay = writable(false);
 
 export const currentSensorName = derived(
