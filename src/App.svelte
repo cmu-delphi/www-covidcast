@@ -1,11 +1,11 @@
 <script>
-  import { onMount } from 'svelte';
-  import Options from './Options.svelte';
-  import Tabs from './Tabs.svelte';
-  import Time from './Time.svelte';
-  import Legend from './Legend.svelte';
-  import MapBox from './MapBox.svelte';
-  import Graph from './Graph.svelte';
+  import { onMount } from "svelte";
+  import Options from "./Options.svelte";
+  import Tabs from "./Tabs.svelte";
+  import Time from "./Time.svelte";
+  import Legend from "./Legend.svelte";
+  import MapBox from "./MapBox.svelte";
+  import Graph from "./Graph.svelte";
 
   import {
     sensors,
@@ -21,52 +21,56 @@
     currentData,
     regionData,
     metaData,
-    mounted,
-  } from './stores.js';
+    mounted
+  } from "./stores.js";
 
-  import * as d3 from 'd3';
+  import * as d3 from "d3";
 
-  const ENDPOINT = 'https://delphi.cmu.edu/epidata/api.php?source=covidcast&time_type=day';
-  const ENDPOINT_META = 'https://delphi.cmu.edu/epidata/api.php?source=covidcast_meta';
+  const ENDPOINT =
+    "https://delphi.cmu.edu/epidata/api.php?source=covidcast&time_type=day";
+  const ENDPOINT_META =
+    "https://delphi.cmu.edu/epidata/api.php?source=covidcast_meta";
 
   let error = null;
   let changingSensor = false;
 
-  function updateRegionSliceCache(sensor, level, date, reason = 'unspecified') {
+  function updateRegionSliceCache(sensor, level, date, reason = "unspecified") {
     console.log($regionSliceCache);
     if (!$mounted) return;
     console.log(sensor, level, date, $times.get(sensor));
     if (!$sensors.find(d => d.id === sensor).levels.includes(level)) return;
-    if (date > $times.get(sensor)[1] || reason === 'level change') return;
+    if (date > $times.get(sensor)[1] || reason === "level change") return;
 
     let cacheEntry = $regionSliceCache.get(sensor + level + date);
     if (!cacheEntry) {
       let q =
         ENDPOINT +
-        '&data_source=' +
+        "&data_source=" +
         sensor +
-        '&signal=' +
+        "&signal=" +
         $sensors.find(d => d.id === sensor).signal +
-        '&geo_type=' +
+        "&geo_type=" +
         level +
-        '&time_values=' +
+        "&time_values=" +
         date +
-        '&geo_value=*';
+        "&geo_value=*";
       fetch(q)
         .then(d => d.json())
         .then(d => {
           console.log(reason, q, d);
-          if (d.result < 0 || d.message.includes('no results')) {
-            console.log('bad api call, not updating regionSliceCache');
+          if (d.result < 0 || d.message.includes("no results")) {
+            console.log("bad api call, not updating regionSliceCache");
             currentData.set([]);
             regionSliceCache.update(m => m.set(sensor + level + date, []));
           } else {
             currentData.set(d.epidata);
-            regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
+            regionSliceCache.update(m =>
+              m.set(sensor + level + date, d.epidata)
+            );
           }
         });
     } else {
-      console.log(reason, 'got in cache');
+      console.log(reason, "got in cache");
       currentData.set(cacheEntry);
     }
   }
@@ -81,14 +85,14 @@
     if (!cacheEntry) {
       let q =
         ENDPOINT +
-        '&data_source=' +
+        "&data_source=" +
         sensor +
-        '&signal=' +
+        "&signal=" +
         $sensors.find(d => d.id === sensor).signal +
-        '&geo_type=' +
+        "&geo_type=" +
         level +
-        '&time_values=20100101-20300101' +
-        '&geo_value=' +
+        "&time_values=20100101-20300101" +
+        "&geo_value=" +
         region;
       fetch(q)
         .then(d => d.json())
@@ -105,48 +109,48 @@
   currentSensor.subscribe(s => {
     if (!$mounted) return;
     // facebook fix
-    if (s === 'fb_survey') {
-      signalType.set('value');
+    if (s === "fb_survey") {
+      signalType.set("value");
     }
 
     let l = $currentLevel;
     let date = $times.get(s)[1];
 
     if (!$sensors.find(d => d.id === s).levels.includes($currentLevel)) {
-      console.log('update?');
+      console.log("update?");
       l = $sensors.find(d => d.id === s).levels[0];
       levelChangedWhenSensorChanged = true;
       currentLevel.set(l);
     }
     if (date !== $currentDate) {
-      console.log('now?');
+      console.log("now?");
       dateChangedWhenSensorChanged = true;
       currentDate.set(date);
     }
 
-    updateRegionSliceCache(s, l, date, 'sensor-change');
+    updateRegionSliceCache(s, l, date, "sensor-change");
   });
 
   currentLevel.subscribe(l => {
-    console.log('level update');
+    console.log("level update");
     if (levelChangedWhenSensorChanged) {
       levelChangedWhenSensorChanged = false;
     } else {
-      updateRegionSliceCache($currentSensor, l, $currentDate, 'level-change');
+      updateRegionSliceCache($currentSensor, l, $currentDate, "level-change");
     }
   });
 
   currentDate.subscribe(d => {
-    console.log('date update');
+    console.log("date update");
     if (dateChangedWhenSensorChanged) {
       dateChangedWhenSensorChanged = false;
     } else {
-      updateRegionSliceCache($currentSensor, $currentLevel, d, 'date-change');
+      updateRegionSliceCache($currentSensor, $currentLevel, d, "date-change");
     }
   });
 
   currentRegion.subscribe(r => {
-    console.log('update region');
+    console.log("update region");
     updateTimeSliceCache($currentSensor, $currentLevel, r);
   });
 
@@ -155,45 +159,66 @@
       .then(d => d.json())
       .then(meta => {
         metaData.set(meta.epidata);
+        console.log(meta.epidata);
         let timeMap = new Map();
         $sensors.forEach(s => {
           let matchedMeta = meta.epidata.find(
-            d => d.data_source === s.id && d.signal === s.signal && d.time_type === 'day',
+            d =>
+              d.data_source === s.id &&
+              d.signal === s.signal &&
+              d.time_type === "day"
           );
+          console.log(s, matchedMeta);
           timeMap.set(s.id, [matchedMeta.min_time, matchedMeta.max_time]);
         });
         times.set(timeMap);
 
         let l = $currentLevel;
-        if (!$sensors.find(d => d.id === $currentSensor).levels.includes($currentLevel)) {
-          console.log('update?');
+        if (
+          !$sensors
+            .find(d => d.id === $currentSensor)
+            .levels.includes($currentLevel)
+        ) {
+          console.log("update?");
           l = $sensors.find(d => d.id === $currentSensor).levels[0];
           currentLevel.set(l);
         }
 
         let q =
           ENDPOINT +
-          '&data_source=' +
+          "&data_source=" +
           $currentSensor +
-          '&signal=' +
+          "&signal=" +
           $sensors.find(d => d.id === $currentSensor).signal +
-          '&geo_type=' +
+          "&geo_type=" +
           l +
-          '&time_values=' +
+          "&time_values=" +
           timeMap.get($currentSensor)[1] +
-          '&geo_value=*';
+          "&geo_value=*";
         fetch(q)
           .then(d => d.json())
           .then(d => {
             console.log(q, d);
-            if (d.result < 0 || d.message.includes('no results')) {
-              console.log('bad api call, not updating regionSliceCache');
+            if (d.result < 0 || d.message.includes("no results")) {
+              console.log("bad api call, not updating regionSliceCache");
               currentData.set([]);
-              regionSliceCache.update(m => m.set($currentSensor + $currentLevel + timeMap.get($currentSensor)[1], []));
+              regionSliceCache.update(m =>
+                m.set(
+                  $currentSensor +
+                    $currentLevel +
+                    timeMap.get($currentSensor)[1],
+                  []
+                )
+              );
             } else {
               currentData.set(d.epidata);
               regionSliceCache.update(m =>
-                m.set($currentSensor + $currentLevel + timeMap.get($currentSensor)[1], d.epidata),
+                m.set(
+                  $currentSensor +
+                    $currentLevel +
+                    timeMap.get($currentSensor)[1],
+                  d.epidata
+                )
               );
             }
 
@@ -315,7 +340,9 @@
 </style>
 
 {#if error}
-  <div class="error-message-container">Failed to load data. Please try again later...</div>
+  <div class="error-message-container">
+    Failed to load data. Please try again later...
+  </div>
 {/if}
 
 <MapBox />

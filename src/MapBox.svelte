@@ -12,7 +12,8 @@
     currentRange,
     signalType,
     currentDataReadyOnMay,
-    metaData
+    metaData,
+    sensors
   } from "./stores.js";
   import { DIRECTION_THEME, MAP_THEME } from "./theme.js";
 
@@ -135,9 +136,14 @@
     let thisMeta = $metaData.find(
       d => d.data_source === $currentSensor && d.geo_type === $currentLevel
     );
-    console.log(thisMeta);
+    let statData = $sensors.find(d => d.id === $currentSensor);
+    let valueMinMax = [
+      statData.mean - 2 * statData.std,
+      statData.mean + 2 * statData.std
+    ];
+    // console.log(thisMeta);
 
-    let valueMinMax = [thisMeta.min_value, thisMeta.max_value];
+    // let valueMinMax = [thisMeta.min_value, thisMeta.max_value];
     let valueMappedVals = new Map();
     let directionMappedVals = new Map();
 
