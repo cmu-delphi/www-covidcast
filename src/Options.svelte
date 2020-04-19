@@ -229,10 +229,10 @@
     outline: none;
   }
 
-  button.button:disabled:hover {
+  /* button.button:disabled:hover {
     animation: shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
     transform: translate3d(0, 0, 0);
-  }
+  } */
 
   @keyframes shake {
     10%,

@@ -206,17 +206,17 @@
 
   .load-more-button:disabled {
     background-color: rgb(211, 211, 211);
-    color: #fff;
+    color: #6c757d;
     cursor: not-allowed;
     font-weight: 300;
     font-size: 0.7rem;
     transform: none;
   }
 
-  .load-more-button:disabled:hover {
+  /* .load-more-button:disabled:hover {
     animation: shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
     transform: translate3d(0, 0, 0);
-  }
+  } */
 
   @keyframes shake {
     10%,

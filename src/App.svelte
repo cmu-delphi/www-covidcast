@@ -79,11 +79,12 @@
   //   });
   // }
 
-  function updateRegionSliceCache(sensor, level, date) {
+  function updateRegionSliceCache(sensor, level, date, reason = 'unspecified') {
+    console.log($regionSliceCache);
     if (!$mounted) return;
     console.log(sensor, level, date, $times.get(sensor));
     if (!$sensors.find(d => d.id === sensor).levels.includes(level)) return;
-    if (date > $times.get(sensor)[1]) return;
+    if (date > $times.get(sensor)[1] || reason === 'level change') return;
 
     let cacheEntry = $regionSliceCache.get(sensor + level + date);
     if (!cacheEntry) {
@@ -101,11 +102,20 @@
       fetch(q)
         .then(d => d.json())
         .then(d => {
-          console.log(q, d);
-          currentData.set(d.epidata);
-          regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
+          console.log(reason, q, d);
+          if (d.result < 0 || d.message.includes('no results')) {
+            console.log('bad api call, not updating regionSliceCache');
+            currentData.set([]);
+            regionSliceCache.update(m => m.set(sensor + level + date, []));
+          } else {
+            currentData.set(d.epidata);
+            regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
+          }
         });
-    } else currentData.set(cacheEntry);
+    } else {
+      console.log(reason, 'got in cache');
+      currentData.set(cacheEntry);
+    }
   }
 
   function updateTimeSliceCache(sensor, level, region) {
@@ -136,27 +146,50 @@
     } else regionData.set(cacheEntry);
   }
 
+  let levelChangedWhenSensorChanged = false;
+  let dateChangedWhenSensorChanged = false;
+
   currentSensor.subscribe(s => {
     if (!$mounted) return;
+    // facebook fix
+    if (s === 'fb_survey') {
+      signalType.set('value');
+    }
+
     let l = $currentLevel;
+    let date = $times.get(s)[1];
+
     if (!$sensors.find(d => d.id === s).levels.includes($currentLevel)) {
       console.log('update?');
       l = $sensors.find(d => d.id === s).levels[0];
+      levelChangedWhenSensorChanged = true;
       currentLevel.set(l);
     }
-    console.log('now?');
-    currentDate.set($times.get(s)[1]);
-    // updateRegionSliceCache(s, $currentLevel, $currentDate);
+    if (date !== $currentDate) {
+      console.log('now?');
+      dateChangedWhenSensorChanged = true;
+      currentDate.set(date);
+    }
+
+    updateRegionSliceCache(s, l, date, 'sensor-change');
   });
 
   currentLevel.subscribe(l => {
     console.log('level update');
-    updateRegionSliceCache($currentSensor, l, $currentDate);
+    if (levelChangedWhenSensorChanged) {
+      levelChangedWhenSensorChanged = false;
+    } else {
+      updateRegionSliceCache($currentSensor, l, $currentDate, 'level-change');
+    }
   });
 
   currentDate.subscribe(d => {
     console.log('date update');
-    updateRegionSliceCache($currentSensor, $currentLevel, d);
+    if (dateChangedWhenSensorChanged) {
+      dateChangedWhenSensorChanged = false;
+    } else {
+      updateRegionSliceCache($currentSensor, $currentLevel, d, 'date-change');
+    }
   });
 
   currentRegion.subscribe(r => {
@@ -178,24 +211,42 @@
             timeMap.set(s.id, [matchedMeta.min_time, matchedMeta.max_time]);
           });
           times.set(timeMap);
-          fetch(
+
+          let l = $currentLevel;
+          if (!$sensors.find(d => d.id === $currentSensor).levels.includes($currentLevel)) {
+            console.log('update?');
+            l = $sensors.find(d => d.id === $currentSensor).levels[0];
+            currentLevel.set(l);
+          }
+
+          let q =
             ENDPOINT +
-              '&data_source=' +
-              $currentSensor +
-              '&signal=' +
-              $sensors.find(d => d.id === $currentSensor).signal +
-              '&geo_type=' +
-              $currentLevel +
-              '&time_values=' +
-              timeMap.get($currentSensor)[1] +
-              '&geo_value=*',
-          )
+            '&data_source=' +
+            $currentSensor +
+            '&signal=' +
+            $sensors.find(d => d.id === $currentSensor).signal +
+            '&geo_type=' +
+            l +
+            '&time_values=' +
+            timeMap.get($currentSensor)[1] +
+            '&geo_value=*';
+          fetch(q)
             .then(d => d.json())
             .then(d => {
-              regionSliceCache.update(m =>
-                m.set($currentSensor + $currentLevel + timeMap.get($currentSensor)[1], d.epidata),
-              );
-              currentData.set(d.epidata);
+              console.log(q, d);
+              if (d.result < 0 || d.message.includes('no results')) {
+                console.log('bad api call, not updating regionSliceCache');
+                currentData.set([]);
+                regionSliceCache.update(m =>
+                  m.set($currentSensor + $currentLevel + timeMap.get($currentSensor)[1], []),
+                );
+              } else {
+                currentData.set(d.epidata);
+                regionSliceCache.update(m =>
+                  m.set($currentSensor + $currentLevel + timeMap.get($currentSensor)[1], d.epidata),
+                );
+              }
+
               mounted.set(1);
             });
         });

@@ -5,8 +5,9 @@
     currentRegion,
     currentRegionName,
     geojsons,
-    currentLevel,
     currentSensor,
+    currentLevel,
+    currentDate,
     currentData,
     currentRange,
     signalType,
@@ -26,15 +27,51 @@
   let mounted = false;
 
   // If it hasn't been initialized and we have geojsons and initial data, create map.
-  $: if (!map && $geojsons.size !== 0 && $currentData.length !== 0) initializeMap();
+  $: if (
+    !map &&
+    $geojsons.size !== 0 &&
+    //  && $currentData.length !== 0
+    $metaData.length !== 0
+  ) {
+    initializeMap();
+  }
 
   // Update the map when sensor or level changes.
-  currentData.subscribe(_ => updateMap());
-  signalType.subscribe(_ => updateMap());
+  currentData.subscribe(_ => {
+    try {
+      updateMap();
+    } catch (err) {
+      console.log(err);
+    }
+  });
+  currentLevel.subscribe(_ => {
+    try {
+      updateMap();
+    } catch (err) {
+      console.log(err);
+    }
+  });
+  currentDate.subscribe(_ => {
+    try {
+      updateMap();
+    } catch (err) {
+      console.log(err);
+    }
+  });
+  signalType.subscribe(_ => {
+    try {
+      updateMap();
+    } catch (err) {
+      console.log(err);
+    }
+  });
 
   function updateMap() {
     if (!mounted) return;
+    console.log($metaData);
+    console.log($currentSensor, $currentLevel);
     let thisMeta = $metaData.find(d => d.data_source === $currentSensor && d.geo_type === $currentLevel);
+    console.log(thisMeta);
     let minMax = [thisMeta.min_value, thisMeta.max_value];
 
     // console.log(thisMeta);
