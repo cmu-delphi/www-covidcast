@@ -1,6 +1,6 @@
 :root {
-  --red: #c41230;
-  --red-alpha: rgba(187, 0, 0, 0.8);
+  --red: #cc0000;
+  --red-alpha: rgba(187, 0, 0, 0);
   --grey: rgba(0, 0, 0, 0.7);
 }
 

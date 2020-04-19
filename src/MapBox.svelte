@@ -105,7 +105,11 @@
     });
 
     let center = minMax[0] + (minMax[1] - minMax[0]) / 2;
-    let stops = [[minMax[0], 'rgb(255, 237, 160)'], [center, 'rgb(252, 78, 42)'], [minMax[1], 'rgb(128, 0, 38)']];
+    let stops = [
+      [minMax[0],'rgba(170, 102, 0, .3)'],
+      [center, 'rgba(204, 0, 0, .65)'],
+      [minMax[1], 'rgb(204, 0, 0)']
+    ];
     if ($signalType === 'direction') {
       stops = [[-1, DIRECTION_THEME.decreasing], [0, DIRECTION_THEME.steady], [1, DIRECTION_THEME.increasing]];
     }

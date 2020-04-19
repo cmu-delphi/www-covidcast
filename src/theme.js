@@ -1,8 +1,8 @@
 export const DIRECTION_THEME = {
-  decreasing: "rgb(72, 167, 236)",
-  steady: "#f0f0f0",
-  increasing: "#ffae90",
-  max: "#ffae90",
+  decreasing: "rgba(170, 102, 0, .3)",
+  steady: "rgba(204, 0, 0, .5)",
+  increasing: "rgba(204, 0, 0, 1)",
+  max: "rgba(204, 0, 0, 1)",
 };
 
 // export const DIRECTION_THEME = {
