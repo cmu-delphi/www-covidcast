@@ -70,9 +70,11 @@
     if (clickedId !== e.features[0].id) {
       clickedId = e.features[0].id;
       map.setFeatureState({ source: level, id: clickedId }, { select: true });
+      currentRegionName.set(e.features[0].properties.NAME);
       currentRegion.set(e.features[0].properties.id);
     } else {
       clickedId = null;
+      currentRegionName.set('');
       currentRegion.set('');
     }
   };
@@ -322,7 +324,7 @@
             'line-width': [
               'case',
               ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
-              4,
+              2,
               0,
             ],
           },
