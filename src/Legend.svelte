@@ -60,21 +60,21 @@
   }
 </style>
 
-<div class="legend {$signalType === 'value' ? 'value' : ''}">
+<div aria-label="legend" class="legend {$signalType === 'value' ? 'value' : ''}">
   {#if $signalType === 'direction'}
     <p class="direction-p">
       <span class="color inc" style="background-color: {DIRECTION_THEME.increasing}" />
-      <span class="direction-indicators inc">&#8599;</span>
+      <span aria-hidden="true" class="direction-indicators inc">&#8599;</span>
       Increasing
     </p>
     <p class="direction-p">
       <span class="color const" style="background-color: {DIRECTION_THEME.steady}" />
-      <span class="direction-indicators const">&#8594;</span>
+      <span aria-hidden="true" class="direction-indicators const">&#8594;</span>
       Steady
     </p>
     <p class="direction-p">
       <span class="color dec" style="background-color: {DIRECTION_THEME.decreasing}" />
-      <span class="direction-indicators dec">&#8600;</span>
+      <span aria-hidden="true" class="direction-indicators dec">&#8600;</span>
       Decreasing
     </p>
   {:else}

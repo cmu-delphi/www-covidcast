@@ -18,24 +18,17 @@
   .toggle-button {
     width: 28px;
     height: 28px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     /* border-radius: 5px; */
     cursor: pointer;
     background-color: transparent;
+    padding: 0;
+    border: 0;
 
     transition: all 0.1s ease-in;
   }
 
   .toggle-button:hover {
     background-color: rgb(228, 228, 228);
-  }
-
-  .toggle-button.float {
-    position: absolute;
-    top: 0;
-    left: 0;
   }
 
   .toggle-button-icon {
@@ -236,10 +229,10 @@
     outline: none;
   }
 
-  button.button:disabled:hover {
+  /* button.button:disabled:hover {
     animation: shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
     transform: translate3d(0, 0, 0);
-  }
+  } */
 
   @keyframes shake {
     10%,
@@ -267,19 +260,17 @@
 
 <div class="options">
   {#if hide}
-    <div class="toggle-button" on:click={toggleHide}>
+    <button aria-label="toggle options" class="toggle-button" on:click={toggleHide}>
       <img class="toggle-button-icon" src="./assets/imgs/layers-24px.svg" alt="" />
-    </div>
+    </button>
   {:else}
-    <div class="toggle-button float" on:click={toggleHide}>
+    <button aria-label="toggle options" class="toggle-button" on:click={toggleHide}>
       <img class="toggle-button-icon" src="./assets/imgs/layers_clear-24px.svg" alt="" />
-    </div>
-    <br />
-    <br />
+    </button>
 
     <div class="option">
       <!-- <div class="buttons-group-title">Geographic Level</div> -->
-      <div class="buttons-group">
+      <div aria-label="geographic level" class="buttons-group">
         {#each Object.keys($levels) as level}
           <button
             class="button {$currentLevel === level ? 'selected' : ''}"
@@ -303,7 +294,7 @@
 
     <div class="option">
       <!-- <div class="buttons-group-title">Signal Type</div> -->
-      <div class="buttons-group-side">
+      <div aria-label="display type" class="buttons-group-side">
         <button class="button {$signalType === 'value' ? 'selected' : ''}" on:click={() => signalType.set('value')}>
           Intensity
         </button>

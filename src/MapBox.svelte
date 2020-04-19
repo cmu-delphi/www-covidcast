@@ -5,8 +5,9 @@
     currentRegion,
     currentRegionName,
     geojsons,
-    currentLevel,
     currentSensor,
+    currentLevel,
+    currentDate,
     currentData,
     currentRange,
     signalType,
@@ -26,11 +27,44 @@
   let mounted = false;
 
   // If it hasn't been initialized and we have geojsons and initial data, create map.
-  $: if (!map && $geojsons.size !== 0 && $currentData.length !== 0) initializeMap();
+  $: if (
+    !map &&
+    $geojsons.size !== 0 &&
+    //  && $currentData.length !== 0
+    $metaData.length !== 0
+  ) {
+    initializeMap();
+  }
 
   // Update the map when sensor or level changes.
-  currentData.subscribe(_ => updateMap());
-  signalType.subscribe(_ => updateMap());
+  currentData.subscribe(_ => {
+    try {
+      updateMap();
+    } catch (err) {
+      console.log(err);
+    }
+  });
+  currentLevel.subscribe(_ => {
+    try {
+      updateMap();
+    } catch (err) {
+      console.log(err);
+    }
+  });
+  currentDate.subscribe(_ => {
+    try {
+      updateMap();
+    } catch (err) {
+      console.log(err);
+    }
+  });
+  signalType.subscribe(_ => {
+    try {
+      updateMap();
+    } catch (err) {
+      console.log(err);
+    }
+  });
 
   function updateMap() {
     if (!mounted) return;
@@ -43,8 +77,7 @@
     let geoIds = new Set(
       $currentData.map(d => {
         let dat = d[$signalType];
-        // minMax[0] = dat < minMax[0] ? dat : minMax[0];
-        // minMax[1] = dat > minMax[1] ? dat : minMax[1];
+        // minMax[0] = dat < minMax[0] ? dat : minMax[0]; minMax[1] = dat > minMax[1] ? dat : minMax[1];
         if (dat !== null) {
           mappedVals.set(d.geo_value.toUpperCase(), d[$signalType]);
         }
@@ -71,7 +104,8 @@
       }
     });
 
-    let stops = [[minMax[0], '#fff'], [minMax[1], DIRECTION_THEME.max]];
+    let center = minMax[0] + (minMax[1] - minMax[0]) / 2;
+    let stops = [[minMax[0], 'rgb(255, 237, 160)'], [center, 'rgb(252, 78, 42)'], [minMax[1], 'rgb(128, 0, 38)']];
     if ($signalType === 'direction') {
       stops = [[-1, DIRECTION_THEME.decreasing], [0, DIRECTION_THEME.steady], [1, DIRECTION_THEME.increasing]];
     }
@@ -193,7 +227,7 @@
           'text-size': 12,
         },
         paint: {
-          'text-halo-color': '#ffffff',
+          'text-halo-color': '#fff',
           'text-halo-width': 2,
         },
       });
@@ -208,7 +242,7 @@
           'text-size': 12,
         },
         paint: {
-          'text-halo-color': '#ffffff',
+          'text-halo-color': '#fff',
           'text-halo-width': 2,
         },
       });
@@ -287,6 +321,7 @@
 <div bind:this={container} class="map-container">
   <div class="state-buttons-holder">
     <button
+      aria-label="show entire map"
       data-state="us48"
       id="bounds-button"
       class="pg-button bounds-button"

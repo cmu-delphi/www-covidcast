@@ -206,17 +206,17 @@
 
   .load-more-button:disabled {
     background-color: rgb(211, 211, 211);
-    color: #fff;
+    color: #6c757d;
     cursor: not-allowed;
     font-weight: 300;
     font-size: 0.7rem;
     transform: none;
   }
 
-  .load-more-button:disabled:hover {
+  /* .load-more-button:disabled:hover {
     animation: shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
     transform: translate3d(0, 0, 0);
-  }
+  } */
 
   @keyframes shake {
     10%,
@@ -345,27 +345,30 @@
   }
 </style>
 
-<div class="time">
-  <div class="selected-date" bind:this={selectedDateDisplay}>
+<div aria-label="date" class="time">
+  <div aria-live="assertive" id="time-label" class="selected-date" bind:this={selectedDateDisplay}>
     Viewing estimates for: {formatTimeWithoutYear(new Date(rectifiedVal))}
   </div>
 
   <button class="load-more-button" on:click={loadMoreDataRange} disabled={!canLoadMore}>Load 2 more weeks</button>
 
-  <p class="min-max">{formatTime(new Date(rectifiedMin))}</p>
+  <p aria-label="minimum value" class="min-max">{formatTime(new Date(rectifiedMin))}</p>
   <div id="timeSliderPaddingLeft" bind:this={timeSliderPaddingLeft} />
   <input
+    aria-controls="time-label"
     id="time_slider"
     bind:this={timeSlider}
     type="range"
     min={rectifiedMin}
     max={rectifiedMax}
     step={86400000}
+    aria-label={formatTimeWithoutYear(new Date(rectifiedVal))}
     on:mouseup={sliderOnMouseUp}
+    on:keyup={sliderOnMouseUp}
     class="slider"
     bind:value={rectifiedVal} />
   <div id="timeSliderPaddingRight" bind:this={timeSliderPaddingRight} />
-  <p class="min-max">{formatTime(new Date(rectifiedMax))} (Today)</p>
+  <p aria-label="maximum value" class="min-max">{formatTime(new Date(rectifiedMax))} (Today)</p>
 
   {#if $currentDataReadyOnMay === false}
     <div class="loader-container">

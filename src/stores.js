@@ -60,7 +60,7 @@ export const times = writable(null);
 export const mounted = writable(0);
 export const metaData = writable([]);
 
-export const currentSensor = writable('google-survey');
+export const currentSensor = writable('google-survey'); // google-survey
 // 'county', 'state', or 'msa'
 export const currentLevel = writable('county'); // might want to change this to state by default
 // Options are 'direction' and 'value'.

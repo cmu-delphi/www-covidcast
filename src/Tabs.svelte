@@ -96,7 +96,7 @@
 <div class="options">
   <div class="option">
     <!-- <div class="buttons-group-title">Data Source</div> -->
-    <div class="buttons-group-side">
+    <div aria-label="Data Source" class="buttons-group-side">
       {#each $sensors as sensor}
         <button
           class="button {$currentSensor === sensor.id ? 'selected' : ''}"
