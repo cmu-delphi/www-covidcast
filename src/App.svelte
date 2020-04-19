@@ -320,20 +320,20 @@
 
 <MapBox />
 
-<div class="options-container">
-  <Options />
-</div>
-
 <div class="tabs-container">
   <Tabs />
 </div>
 
-<div class="time-container">
-  <Time {updateRegionSliceCache} />
+<div class="options-container">
+  <Options />
 </div>
 
 <div class="legend-container">
   <Legend />
+</div>
+
+<div class="time-container">
+  <Time {updateRegionSliceCache} />
 </div>
 
 <div class="graph-container">
