@@ -54,7 +54,7 @@
   }
 </style>
 
-<div class="legend {$signalType === 'value' ? 'value' : null}">
+<div class="legend {$signalType === 'value' ? 'value' : ''}">
   {#if $signalType === 'direction'}
     <p>
       <span class="color inc" style="background-color: {DIRECTION_THEME.increasing}" />
