@@ -19,14 +19,14 @@
     "zoom": 4.035119632783768,
     "bearing": 0,
     "pitch": 0,
-    "glyphs": "http://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
+    "glyphs": "https://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
     "sources": {},
     "layers": [
         {
             "id": "background",
             "type": "background",
             "paint": {
-                "background-color": "#ffffff"
+                "background-color": "#f7f7f7"
             }
         }
     ]

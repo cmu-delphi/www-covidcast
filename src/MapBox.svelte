@@ -11,6 +11,7 @@
     currentRange,
     signalType,
     currentDataReadyOnMay,
+    metaData,
   } from './stores.js';
   import { DIRECTION_THEME } from './theme.js';
 
@@ -95,7 +96,9 @@
       map.getLayer($currentLevel) && map.removeLayer($currentLevel);
     }
 
-    let valueMinMax = [999999999, -1];
+    let thisMeta = $metaData.find(d => d.data_source === $currentSensor && d.geo_type === $currentLevel);
+    let valueMinMax = [thisMeta.min_value, thisMeta.max_value];
+    // let valueMinMax = [999999999, -1];
     let valueMappedVals = new Map();
     let directionMappedVals = new Map();
 
@@ -103,8 +106,8 @@
       $currentData.map(d => {
         const key = d.geo_value.toUpperCase();
         const dat = d.value;
-        valueMinMax[0] = dat < valueMinMax[0] ? dat : valueMinMax[0];
-        valueMinMax[1] = dat > valueMinMax[1] ? dat : valueMinMax[1];
+        // valueMinMax[0] = dat < valueMinMax[0] ? dat : valueMinMax[0];
+        // valueMinMax[1] = dat > valueMinMax[1] ? dat : valueMinMax[1];
 
         if (d.value !== null) {
           valueMappedVals.set(key, d.value);
@@ -287,7 +290,7 @@
             'line-width': [
               'case',
               ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
-              4,
+              2,
               0,
             ],
           },
@@ -347,7 +350,7 @@
 <style>
   .map-container {
     width: 100%;
-    height: 100vh;
+    height: 90vh;
     position: relative;
   }
 
