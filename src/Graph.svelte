@@ -10,8 +10,10 @@
     regionDataStats,
     currentSensorName,
     currentLevelName,
-    currentDataReadyOnMay,
+    currentDate,
+    times
   } from './stores.js';
+  import { DIRECTION_THEME } from './theme.js';
   import * as d3 from 'd3';
 
   let el;
@@ -35,6 +37,7 @@
 
   regionData.subscribe(d => updateGraph(d));
   regionDataStats.subscribe(d => setChartRange(d));
+  currentDate.subscribe(_ => updateGraphTimeRange());
   // currentDataReadyOnMay.subscribe(d => setFocus());
   // regionDataStats.subscribe(d => console.log(d));
 
@@ -58,6 +61,12 @@
           userCharts[currentChart].draw();
         }
       }
+    }
+  }
+
+  function updateGraphTimeRange() {
+    if(userCharts[currentChart]) {
+      userCharts[currentChart].draw();
     }
   }
 
@@ -135,7 +144,6 @@
     getYAxis() {
       let title = '';
       let sensor = $currentSensor;
-      console.log(sensor);
       switch (sensor) {
         case 'google-survey':
           title = 'Percentage';
@@ -160,41 +168,9 @@
 
     getChartTitle() {
       var ChartTitle = 'Currently viewing sensor ';
-      let title = '';
-      let sensor = $currentSensor;
-      let geoLevel = $currentLevel;
-      console.log(geoLevel);
-      switch (sensor) {
-        case 'google-survey':
-          title = 'Survey (Google)';
-          break;
-        case 'fb_survey':
-          title = 'Survey (Facebook)';
-          break;
-        case 'quidel':
-          title = 'Lab Tests (Quidel)';
-          break;
-        case 'ght':
-          title = 'Search Trends (Google)';
-          break;
-        case 'doctor-visits':
-          title = 'Doctor Visits';
-          break;
-        default:
-          break;
-      }
-      let geoTitle = '';
-      switch (geoLevel) {
-        case 'county':
-          geoTitle = 'County';
-          break;
-        case 'state':
-          geoTitle = 'State';
-          break;
-        default:
-          break;
-      }
-      var cT = ChartTitle + ' <strong> ' + title + '</strong> at the <strong>' + geoTitle + '</strong> level';
+      let sensor = $currentSensorName;
+      let geoLevel = $currentLevelName;
+      var cT = ChartTitle + ' <strong> ' + sensor + '</strong> at the <strong>' + geoLevel + '</strong> level';
       d3.select(t).html(cT);
     }
 
@@ -287,7 +263,6 @@
 
       // line graph
       let myData = this.getData();
-      console.log('length: ' + myData);
 
       // size chart
       var margin = { top: 5, right: 20, bottom: 50, left: 60 },
@@ -303,25 +278,39 @@
         .append('g')
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
+      // set date range
       var parseTime = d3.timeParse('%Y%m%d');
       var formatTime = d3.timeFormat('%m-%d-%Y');
       var k = d3.keys(myData);
       var times = k.map(i => parseTime(myData[k[i]]['time_value']));
-      var maxDate = Math.max.apply(null, times);
+      // var maxDate = Math.max.apply(null, times);
+      var maxDate = parseTime($currentDate);
+      console.log('max: ' + maxDate);
       var twoWeeks = 60 * 60 * 24 * 1000 * 7 * 2;
       var bisectDate = d3.bisector(function(d) {
           return d.time_value;
-        }).right,
-        maxDate = maxDate - twoWeeks;
-      maxDate = new Date(maxDate);
-      myData = myData.filter(it => parseTime(it['time_value']) > maxDate);
+        }).right;
+      var minDate = maxDate - twoWeeks;
+      minDate = new Date(minDate);
+      myData = myData.filter(it => parseTime(it['time_value']) < maxDate);
+      myData = myData.filter(it => parseTime(it['time_value']) > minDate);
+
+      // set x-axis ticks based off of data sparsity and format y-axis ticks
+      var xTicks = myData.length;
+      var formatXTicks = (xTicks < 6) ? xTicks : d3.timeDay.every(3);
+      var scalePercentages = function(d) { return formatPercent(d*100) };
+      var formatPercent = d3.format('%')(1);
+      var percentFormat = (this.getYAxis() == 'Percentage');
+      // console.log(percentFormat);
+      var formatYTicks = (percentFormat) ? d3.format('+.0%')(1) : 8;
+      console.log(formatYTicks);
       var x = d3
         .scaleTime()
         .domain(d3.extent(myData, d => parseTime(d.time_value)))
         .range([0, width]);
       var y = d3
         .scaleLinear()
-        .domain([this.min, this.max * 1.3])
+        .domain([this.min, this.max * 1.2])
         .range([height, 0]);
 
       svg
@@ -332,22 +321,23 @@
           d3
             .axisBottom(x)
             .tickFormat(d3.timeFormat('%m/%d'))
-            .ticks(d3.timeDay.every(4)),
+            .ticks(formatXTicks),
         );
       svg
         .append('g')
         .attr('class', 'axis')
-        .call(d3.axisLeft(y).ticks(8));
+        .call(d3.axisLeft(y).ticks(formatYTicks));
 
       let line = d3
         .line()
         .x(d => x(parseTime(d.time_value)))
         .y(d => y(+d.value));
 
+      console.log(DIRECTION_THEME.max);
       svg
         .append('path')
         .attr('fill', 'none')
-        .attr('stroke', '#CB2F4A')
+        .attr('stroke', 'red')
         .attr('stroke-width', 3)
         .attr('d', line(myData));
 
@@ -371,12 +361,12 @@
 
       // label the chart
       this.getChartTitle();
-      // var chartTitle = this.getChartTitle();
-      // svg
-      //   .append('text')
-      //   .attr('transform', 'translate(' + width/2 + ', ' + 0 + ')')
-      //   .style('text-anchor', 'middle')
-      //   .text(chartTitle);
+      var chartTitle = this.getChartTitle();
+      svg
+        .append('text')
+        .attr('transform', 'translate(' + width/2 + ', ' + 0 + ')')
+        .style('text-anchor', 'middle')
+        .text(chartTitle);
 
       // line chart tooltip
       let focus = svg
@@ -451,19 +441,21 @@
 <style>
   .graph-title {
     text-align: center;
-    margin: 0px;
-  }
-  .graph-subtitle {
-    text-align: center;
-    margin: 0px;
+    margin: 20px 45px 0px 60px;
     font-size: 14px;
-    font-style: italic;
+  }
+  .graph-description {
+      text-align: center;
+      margin: 10px 0px 0px 0px;
+      font-size: 12px;
+      font-style: italic;
   }
 </style>
 
-<h4 class="graph-title">Intensity Over Time</h4>
-<p class="graph-subtitle">{$currentRegionName}</p>
-<!-- <p bind:this={t} /> -->
-<div bind:clientWidth={w}>
-  <div bind:this={el} />
+<div class="graph-container">
+  <h5 bind:this={t} class="graph-title"/>
+  <p class="graph-description">{$currentRegionName}</p>
+  <div bind:clientWidth={w}>
+    <div bind:this={el} />
+  </div>
 </div>
