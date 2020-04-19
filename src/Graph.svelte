@@ -352,7 +352,7 @@
         }
       }
 
-
+      
       svg
         .append("g")
         .attr("class", "axis")
@@ -490,16 +490,19 @@
   }
 
   function calculateSD() {
-    var dataset = $currentData;
-    var k = d3.keys(dataset);
-    var values = k.map(i => dataset[k[i]]['value']);
-    var sum = values.reduce((i, j) => i + j, 0);
-    var n = userCharts[currentChart].getN();
-    var avg = sum/n;
-    var diff = values.reduce(d => Math.pow((d-avg), 2));
-    var sd = Math.sqrt((1/(n - 1))*diff);
-    var upperbound = avg + 3*sd;
-    var lowerbound = avg - 3*sd;
+    var dataStats = {
+      'fb_survey' : { 'Mean' : 0.8079823818179086, 'StDv' : 0.562744728536263},
+      'ght' : { 'Mean' : 816.6838496834541, 'StDv' : 1393.0004748818299},
+      'google-survey' : { 'Mean' : 0.08931870876166044, 'StDv' : 0.026190562137119736},
+      'quidel' : { 'Mean' : 0.7633679440541352, 'StDv' : 0.14096501061147534},
+      'optum' : { 'Mean' : 0.006030485489803647, 'StDv' : 0.013801679072425752}
+    }
+    var sensor = $currentSensor;
+    console.log('sensor: ' + sensor);
+    var sd = dataStats[sensor].StDv;
+    var avg = dataStats[sensor].Mean;
+    var upperbound = avg + 2*sd;
+    var lowerbound = avg - 2*sd;
     userCharts[currentChart].setRange(lowerbound, upperbound);
   }
 </script>
