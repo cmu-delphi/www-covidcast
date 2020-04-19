@@ -316,8 +316,8 @@
         source: 'county-outline',
         type: 'fill',
         paint: {
-          'fill-color': '#e4dac4',
-          'fill-outline-color': '#e0e0e0',
+          'fill-color': MAP_THEME.countyFill,
+          'fill-outline-color': MAP_THEME.countyOutline,
           'fill-opacity': 0.4,
         },
       });
@@ -327,7 +327,7 @@
         type: 'fill',
         paint: {
           'fill-color': 'rgba(0, 0, 0, 0)',
-          'fill-outline-color': '#bcbcbc',
+          'fill-outline-color': MAP_THEME.stateOutline,
         },
       });
 

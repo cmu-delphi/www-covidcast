@@ -21,4 +21,7 @@ export const DIRECTION_THEME = {
 export const MAP_THEME = {
   selectedRegionOutline: '#313131',
   hoverRegionOutline: '#777',
+  stateOutline: '#bcbcbc',
+  countyFill: '#e4dac4',
+  countyOutline: '#e0e0e0', 
 };
