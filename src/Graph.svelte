@@ -290,7 +290,7 @@
       console.log('length: ' + myData);
 
       // size chart
-      var margin = { top: 20, right: 45, bottom: 70, left: 60 },
+      var margin = { top: 5, right: 20, bottom: 50, left: 60 },
         width = w - margin.left - margin.right,
         height = 0.75 * w - margin.top - margin.bottom;
 
@@ -365,7 +365,7 @@
       // label the x-axis
       svg
         .append('text')
-        .attr('transform', 'translate(' + width / 2 + ', ' + (height + margin.top + 20) + ')')
+        .attr('transform', 'translate(' + width / 2 + ', ' + (height + margin.top + 30) + ')')
         .style('text-anchor', 'middle')
         .text('Date');
 
