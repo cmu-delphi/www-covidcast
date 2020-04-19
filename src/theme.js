@@ -3,6 +3,9 @@ export const DIRECTION_THEME = {
   steady: '#f0f0f0',
   increasing: '#ffae90',
   max: '#ffae90',
+  gradientMin: 'rgb(255, 237, 160)',
+  gradientMiddle: 'rgb(252, 78, 42)',
+  gradientMax: 'rgb(128, 0, 38)',
 };
 
 // export const DIRECTION_THEME = {
