@@ -322,7 +322,7 @@
 
 <div class="time">
   <div class="selected-date" bind:this={selectedDateDisplay}>
-    Viewing data for: {formatTimeWithoutYear(new Date(rectifiedVal))}
+    Viewing estimates for: {formatTimeWithoutYear(new Date(rectifiedVal))}
   </div>
 
   <button class="load-more-button" on:click={loadMoreDataRange} disabled={!canLoadMore}>Load 2 more weeks</button>
