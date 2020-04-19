@@ -49,9 +49,8 @@
 
   .legend-bar {
     width: 20px;
-    height: 300px;
+    height: 250px;
     margin-top: 10px;
-    margin-bottom: 10px;
   }
 </style>
 
