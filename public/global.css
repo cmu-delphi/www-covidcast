@@ -128,9 +128,8 @@ button.mapboxgl-popup-close-button {
 
 input:focus,
 button:focus {
-  outline: #5E666E 3px solid !important;
+  outline: var(--red-alpha) 1px solid !important;
   z-index: 100;
-
 }
 
 .map-popup .mapboxgl-popup-content {
