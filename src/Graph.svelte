@@ -379,6 +379,7 @@
       var formatXTicks = xTicks < 6 ? xTicks : d3.timeDay.every(3);
       var formatYTicks = this.getFormat();
 
+      let max = this.max;
       var x = d3
         .scaleTime()
         .domain(d3.extent(myData, d => parseTime(d.time_value)))
@@ -390,9 +391,11 @@
 
       // peg values to max and min if out of range
       for (var i = 0; i < myData.length; i++) {
+        myData[i].max = false;
         if (Number(myData[i].value) < this.min) {
           myData[i].value = this.min;
         } else if (Number(myData[i].value) > this.max) {
+          myData[i].max = true;
           myData[i].value = this.max;
         }
       }
@@ -431,7 +434,8 @@
           return (
             d3.timeFormat("%m/%d")(parseTime(d.time_value)) +
             ": " +
-            formatYTicks(d.value)
+            d.value.toFixed(2) +
+            "%"
           );
         });
 
@@ -445,7 +449,9 @@
         .attr("r", 4)
         .attr("cx", d => x(parseTime(d.time_value)))
         .attr("cy", d => y(+d.value))
-        .style("fill", DIRECTION_THEME.gradientMiddle)
+        .style("fill", d =>
+          d.max ? DIRECTION_THEME.gradientMax : DIRECTION_THEME.gradientMiddle
+        )
         .on("mouseover", tip.show)
         .on("mouseout", tip.hide);
 
@@ -512,7 +518,7 @@
   }
   .graph-description {
     text-align: center;
-    margin: 5px 0px 0px 0px;
+    margin: 5px 0px 7px 0px;
     font-size: 14px;
     font-style: italic;
   }
