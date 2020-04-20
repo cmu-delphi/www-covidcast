@@ -17,6 +17,7 @@
     currentDate,
     currentLevel,
     currentRegion,
+    currentRegionName,
     regionSliceCache,
     timeSliceCache,
     currentData,
@@ -97,6 +98,7 @@
       fetch(q)
         .then(d => d.json())
         .then(d => {
+          console.log(q, d);
           regionData.set(d.epidata);
           timeSliceCache.update(m => m.set(sensor + level + region, d.epidata));
         });
@@ -108,6 +110,7 @@
 
   currentSensor.subscribe(s => {
     if (!$mounted) return;
+
     // facebook fix
     if (s === 'fb-survey') {
       signalType.set('value');
@@ -120,7 +123,12 @@
       console.log('update?');
       l = $sensors.find(d => d.id === s).levels[0];
       levelChangedWhenSensorChanged = true;
+      currentRegion.set('');
+      currentRegionName.set('');
       currentLevel.set(l);
+    } else {
+      // update regiondata
+      updateTimeSliceCache(s, l, $currentRegion);
     }
     if (date !== $currentDate) {
       console.log('now?');
@@ -136,6 +144,8 @@
     if (levelChangedWhenSensorChanged) {
       levelChangedWhenSensorChanged = false;
     } else {
+      currentRegion.set('');
+      currentRegionName.set('');
       updateRegionSliceCache($currentSensor, l, $currentDate, 'level-change');
     }
   });

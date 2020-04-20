@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from 'svelte';
   import mapboxgl from 'mapbox-gl';
   import {
     levels,
@@ -19,15 +20,27 @@
   } from './stores.js';
   import { DIRECTION_THEME, MAP_THEME } from './theme.js';
 
-  const LAT = -1.2;
-  const LON = -0.5;
-  const ZOOM = 4.3; // should be set to 4.4 as default
+  let LAT = -1.2;
+  let LON = -0.5;
+  let ZOOM = 3.9; // should be set to 4.3 as default
 
   let container;
   let map;
   let popup;
   let hoveredId;
   let clickedId;
+
+  onMount(_ => {
+    let containerWidth = container.clientWidth;
+    console.log('map view width:', containerWidth);
+    if (containerWidth <= 1021) {
+      ZOOM = 3.9;
+    } else if (containerWidth > 1021 && containerWidth < 1280) {
+      ZOOM = 4.1;
+    } else if (containerWidth >= 1280) {
+      ZOOM = 4.3;
+    }
+  });
 
   // Boolean tracking if the map has been initialized.
   let mapMounted = false;
@@ -72,6 +85,7 @@
     }
 
     if (clickedId !== e.features[0].id) {
+      console.log(e.features[0]);
       clickedId = e.features[0].id;
       console.log(clickedId);
       map.setFeatureState({ source: level, id: clickedId }, { select: true });
@@ -127,7 +141,7 @@
 
   mounted.subscribe(_ => {
     try {
-      updateMap('signal');
+      updateMap('mounted');
     } catch (err) {
       console.log(err);
     }
@@ -230,22 +244,79 @@
       }
     });
 
-    // set a random focus on start up
-    if (chosenRandom === false && $mounted && dat.features.filter(f => f.properties[$signalType] !== -100).length > 0) {
-      const viableFeatures = dat.features.filter(f => f.properties[$signalType] !== -100);
+    const viableFeatures = dat.features.filter(f => f.properties[$signalType] !== -100);
 
-      const index = Math.floor(Math.random() * (viableFeatures.length - 1));
-      console.log(dat.features);
-      console.log(viableFeatures, viableFeatures.length, index);
-      const randomFeature = viableFeatures[index];
-      console.log(randomFeature);
-      console.log(randomFeature.properties.NAME);
-      currentRegionName.set(randomFeature.properties.NAME);
-      currentRegion.set(randomFeature.properties.id);
-      clickedId = randomFeature.id;
-      map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-      chosenRandom = true;
+    // set a random focus on start up
+    if (chosenRandom === false && $mounted) {
+      if (viableFeatures.length > 0) {
+        const found = viableFeatures.filter(
+          f => f.properties.id === '42003' || f.properties.id === '38300' || f.properties.id === 'PA',
+        );
+        if (found.length > 0) {
+          // found allegheny / Pittsburgh
+          const randomFeature = found[0];
+          console.log(randomFeature);
+          currentRegionName.set(randomFeature.properties.NAME);
+          currentRegion.set(randomFeature.properties.id);
+          clickedId = randomFeature.id;
+          map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+          chosenRandom = true;
+        } else {
+          const index = Math.floor(Math.random() * (viableFeatures.length - 1));
+          console.log(dat.features);
+          console.log(viableFeatures, viableFeatures.length, index);
+          const randomFeature = viableFeatures[index];
+          console.log(randomFeature);
+          console.log(randomFeature.properties.NAME);
+          currentRegionName.set(randomFeature.properties.NAME);
+          currentRegion.set(randomFeature.properties.id);
+          clickedId = randomFeature.id;
+          map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+          chosenRandom = true;
+        }
+      }
     }
+
+    console.log($currentRegion);
+    console.log(viableFeatures.filter(f => f.properties.id === $currentRegion).length);
+    if ($currentRegion) {
+      const found = viableFeatures.filter(f => f.properties.id === $currentRegion);
+      if (found.length > 0) {
+        clickedId = found[0].id;
+        console.log('clickedId', clickedId);
+        map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+      } else {
+        clickedId = null;
+        currentRegion.set('');
+        currentRegionName.set('');
+        console.log('no current region');
+      }
+    }
+
+    // if (
+    //   chosenRandom === false &&
+    //   $mounted &&
+    //   dat.features.filter(f => f.properties[$signalType] !== -100).length > 0
+    // ) {
+    //   const viableFeatures = dat.features.filter(
+    //     f => f.properties[$signalType] !== -100
+    //   );
+
+    //   const index = Math.floor(Math.random() * (viableFeatures.length - 1));
+    //   console.log(dat.features);
+    //   console.log(viableFeatures, viableFeatures.length, index);
+    //   const randomFeature = viableFeatures[index];
+    //   console.log(randomFeature);
+    //   console.log(randomFeature.properties.NAME);
+    //   currentRegionName.set(randomFeature.properties.NAME);
+    //   currentRegion.set(randomFeature.properties.id);
+    //   clickedId = randomFeature.id;
+    //   map.setFeatureState(
+    //     { source: $currentLevel, id: clickedId },
+    //     { select: true }
+    //   );
+    //   chosenRandom = true;
+    // }
 
     currentDataReadyOnMay.set(true);
     window.performance.measure('update-map', 'update-map-start');
@@ -357,16 +428,17 @@
           type: 'line',
           paint: {
             'line-color': MAP_THEME.hoverRegionOutline,
-            'line-width': ['case', ['any', ['boolean', ['feature-state', 'hover'], false]], 2, 0],
+            'line-width': ['case', ['any', ['boolean', ['feature-state', 'hover'], false]], 4, 0],
           },
         });
+
         map.addLayer({
           id: `${name}-selected`,
           source: name,
           type: 'line',
           paint: {
             'line-color': MAP_THEME.selectedRegionOutline,
-            'line-width': ['case', ['any', ['boolean', ['feature-state', 'select'], false]], 2, 0],
+            'line-width': ['case', ['any', ['boolean', ['feature-state', 'select'], false]], 4, 0],
           },
         });
       });

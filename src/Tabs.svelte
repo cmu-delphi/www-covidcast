@@ -85,6 +85,8 @@
     background-color: #fff;
     color: #333;
     font-weight: 400;
+    font-size: 0.95em;
+    line-height: 1.2em;
     text-align: center;
     border-radius: 6px;
     padding: 5px 5px;
@@ -123,7 +125,7 @@
 
   .buttons-group-side .button:focus,
   .buttons-group-side .button:active {
-    box-shadow: none !important;
+    /* box-shadow: none !important; */
     outline: none;
   }
 </style>
@@ -134,6 +136,7 @@
     <div aria-label="Data Source" class="buttons-group-side">
       {#each $sensors as sensor}
         <button
+          aria-selected={$currentSensor === sensor.id ? 'true' : 'false'}
           class="button {$currentSensor === sensor.id ? 'selected' : ''}"
           on:click={() => {
             currentDataReadyOnMay.set(false);

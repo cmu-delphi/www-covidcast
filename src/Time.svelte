@@ -139,8 +139,14 @@
 
   function sliderOnMouseUp() {
     window.performance.mark('start sliderOnMouseUp');
-    currentDataReadyOnMay.set(false);
-    currentDate.set(calculateValFromRectified(rectifiedVal));
+    // only update currentDataReadyOnMay when the date actually changed
+    currentDate.update(d => {
+      let newDate = calculateValFromRectified(rectifiedVal);
+      if (d !== newDate) {
+        currentDataReadyOnMay.set(false);
+      }
+      return newDate;
+    });
     window.performance.measure('sliderOnMouseUp', 'start sliderOnMouseUp');
   }
 
@@ -308,11 +314,13 @@
   }
 
   .loader-container {
-    position: absolute;
+    /* position: absolute;
     top: 0;
     bottom: 0;
     right: -40px;
-    width: 40px;
+    width: 40px; */
+
+    height: 100%;
 
     display: flex;
     align-items: center;
