@@ -17,6 +17,7 @@
   } from './stores.js';
   import { DIRECTION_THEME } from './theme.js';
   import * as d3 from 'd3';
+  import d3Tip from 'd3-tip';
 
   let el;
   let w;
@@ -370,6 +371,15 @@
         .attr('stroke-width', 3)
         .attr('d', line(myData));
 
+      let tip = d3Tip()
+        .attr('class', 'd3-tip')
+        .offset([-10, 0])
+        .html(function(d) {
+          return d3.timeFormat('%m/%d')(parseTime(d.time_value)) + ': ' + formatYTicks(d.value);
+        });
+
+      svg.call(tip);
+
       svg
         .selectAll('circle')
         .data(myData)
@@ -378,7 +388,9 @@
         .attr('r', 4)
         .attr('cx', d => x(parseTime(d.time_value)))
         .attr('cy', d => y(+d.value))
-        .style('fill', DIRECTION_THEME.gradientMiddle);
+        .style('fill', DIRECTION_THEME.gradientMiddle)
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
 
       // label the y-axis
       var label = this.getYAxis();
@@ -408,68 +420,6 @@
         .attr('transform', 'translate(' + width / 2 + ', ' + 0 + ')')
         .style('text-anchor', 'middle')
         .text(chartTitle);
-
-      // line chart tooltip
-      let focus = svg
-        .append('g')
-        .attr('class', 'focus')
-        .style('display', 'none');
-
-      focus
-        .append('circle')
-        .attr('r', 7)
-        .style('fill', DIRECTION_THEME.gradientMiddle);
-
-      focus
-        .append('rect')
-        .attr('class', 'tooltip')
-        .attr('width', 80)
-        .attr('height', 30)
-        .attr('x', -40)
-        .attr('y', -40)
-        .attr('rx', 4)
-        .attr('ry', 4)
-        .style('fill', 'white')
-        .style('stroke', '#666');
-
-      focus
-        .append('text')
-        .attr('class', 'tooltip-date')
-        .attr('text-anchor', 'middle')
-        .attr('y', -20)
-        .style('font-size', '12px');
-
-      svg
-        .append('rect')
-        .attr('class', 'overlay')
-        .attr('width', width)
-        .attr('height', height)
-        .style('fill', 'none')
-        .style('pointer-events', 'all')
-        .on('mouseover', function() {
-          focus.style('display', null);
-        })
-        .on('mouseout', function() {
-          focus.style('display', 'none');
-        })
-        .on('mousemove', mousemove);
-
-      function mousemove() {
-        try {
-          var x0 = x.invert(d3.mouse(this)[0]);
-          var i = bisectDate(myData, +calculateValFromRectified(x0), 1);
-          var d0 = myData[i - 1];
-          var d1 = myData[i];
-          var d = x0 - parseTime(d0.time_value) > parseTime(d1.time_value) - x0 ? d1 : d0;
-          focus.attr('transform', 'translate(' + x(parseTime(d.time_value)) + ',' + y(d.value) + ')');
-          focus
-            .select('.tooltip-date')
-            .text(d3.timeFormat('%m/%d')(parseTime(d.time_value)) + ': ' + formatYTicks(d.value));
-        } catch (err) {
-          // just ignore error and bravely carry on
-          // console.log(err);
-        }
-      }
     }
   }
 
