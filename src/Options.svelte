@@ -108,6 +108,8 @@
     background-color: #fff;
     color: #333;
     font-weight: 400;
+    font-size: 0.95em;
+    line-height: 1.2em;
     text-align: center;
     border-radius: 6px;
     padding: 5px 5px;
@@ -190,6 +192,8 @@
     border-color: #666;
     background-color: #fff;
     color: #333;
+    font-size: 0.95em;
+    line-height: 1.2em;
     font-weight: 400;
     text-align: center;
     border-radius: 6px;
