@@ -7,28 +7,44 @@ import * as d3 from 'd3';
 // For updated sensors/API and update this accordingly.
 export const sensors = readable([
   {
+    name: 'Doctor Visits',
+    id: 'doctor-visits',
+    signal: 'cli',
+    levels: ['county', 'msa', 'state'],
+    mean: 0.4394626779949559,
+    std: 0.9567364668042898,
+  },
+  {
     name: 'Surveys (Facebook)',
     id: 'fb_survey',
     signal: 'cli',
     levels: ['county', 'msa'],
+    mean: 0.8079823818179086,
+    std: 0.562744728536263,
   },
   {
     name: 'Surveys (Google)',
     id: 'google-survey',
     signal: 'cli',
     levels: ['county', 'state'],
-  },
-  {
-    name: 'Lab Tests (Quidel)',
-    id: 'quidel',
-    signal: 'negativeprop',
-    levels: ['msa', 'state'],
+    mean: 0.08931870876166044,
+    std: 0.026190562137119736,
   },
   {
     name: 'Search Trends (Google)',
     id: 'ght',
     signal: 'smoothedsearch',
     levels: ['msa', 'state'],
+    mean: 816.6838496834541,
+    std: 1393.0004748818299,
+  },
+  {
+    name: 'Lab Tests (Quidel)',
+    id: 'quidel',
+    signal: 'smooth_negativeprop',
+    levels: ['msa', 'state'],
+    mean: 0.7633679440541352,
+    std: 0.14096501061147534,
   },
 ]);
 
@@ -71,6 +87,7 @@ export const geojsons = readable(new Map(), function start(set) {
 });
 
 export const times = writable(null);
+export const stats = writable(null);
 
 export const mounted = writable(0);
 export const metaData = writable([]);

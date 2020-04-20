@@ -1,5 +1,5 @@
 <script>
-  import { signalType } from './stores.js';
+  import { signalType, stats, currentSensor } from './stores.js';
   import { DIRECTION_THEME } from './theme.js';
 </script>
 
@@ -79,7 +79,9 @@
     </p>
   {:else}
     <p>High</p>
-    <div class="legend-bar" style="background: linear-gradient(to top, #fff, {DIRECTION_THEME.max})" />
+    <div
+      class="legend-bar"
+      style="background: linear-gradient(to top, {DIRECTION_THEME.gradientMin}, {DIRECTION_THEME.gradientMiddle}, {DIRECTION_THEME.gradientMax})" />
     <p>None</p>
   {/if}
 </div>

@@ -10,6 +10,7 @@
   import {
     sensors,
     times,
+    stats,
     signalType,
     currentRange,
     currentSensor,
@@ -154,15 +155,23 @@
     fetch(ENDPOINT_META)
       .then(d => d.json())
       .then(meta => {
-        metaData.set(meta.epidata);
+        console.log(meta.epidata);
         let timeMap = new Map();
+        let statsMap = new Map();
         $sensors.forEach(s => {
           let matchedMeta = meta.epidata.find(
             d => d.data_source === s.id && d.signal === s.signal && d.time_type === 'day',
           );
+          console.log(s, matchedMeta);
           timeMap.set(s.id, [matchedMeta.min_time, matchedMeta.max_time]);
+          statsMap.set(s.id, {
+            mean: matchedMeta.mean_value,
+            std: matchedMeta.stdev_value,
+          });
         });
+        stats.set(statsMap);
         times.set(timeMap);
+        metaData.set(meta.epidata);
 
         let l = $currentLevel;
         if (!$sensors.find(d => d.id === $currentSensor).levels.includes($currentLevel)) {

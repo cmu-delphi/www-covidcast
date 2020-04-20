@@ -2,6 +2,7 @@
   import mapboxgl from 'mapbox-gl';
   import {
     levels,
+    stats,
     currentRegion,
     currentRegionName,
     geojsons,
@@ -13,8 +14,9 @@
     signalType,
     currentDataReadyOnMay,
     metaData,
+    sensors,
   } from './stores.js';
-  import { DIRECTION_THEME } from './theme.js';
+  import { DIRECTION_THEME, MAP_THEME } from './theme.js';
 
   const LAT = -1.2;
   const LON = -0.5;
@@ -69,6 +71,7 @@
 
     if (clickedId !== e.features[0].id) {
       clickedId = e.features[0].id;
+      console.log(clickedId);
       map.setFeatureState({ source: level, id: clickedId }, { select: true });
       currentRegionName.set(e.features[0].properties.NAME);
       currentRegion.set(e.features[0].properties.id);
@@ -84,7 +87,8 @@
     !map &&
     $geojsons.size !== 0 &&
     //  && $currentData.length !== 0
-    $metaData.length !== 0
+    $metaData.length !== 0 &&
+    $stats
   ) {
     initializeMap();
   }
@@ -128,12 +132,12 @@
       map.getLayer($currentLevel) && map.removeLayer($currentLevel);
     }
 
-    console.log($metaData);
-    console.log($currentSensor, $currentLevel);
     let thisMeta = $metaData.find(d => d.data_source === $currentSensor && d.geo_type === $currentLevel);
-    console.log(thisMeta);
+    let sts = $stats.get($currentSensor);
+    let valueMinMax = [sts.mean - 2 * sts.std, sts.mean + 2 * sts.std];
+    // console.log(thisMeta);
 
-    let valueMinMax = [thisMeta.min_value, thisMeta.max_value];
+    // let valueMinMax = [thisMeta.min_value, thisMeta.max_value];
     let valueMappedVals = new Map();
     let directionMappedVals = new Map();
 
@@ -170,7 +174,12 @@
 
     let stops;
     if ($signalType === 'value') {
-      stops = [[valueMinMax[0], '#fff'], [valueMinMax[1], DIRECTION_THEME.max]];
+      let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
+      stops = [
+        [valueMinMax[0], DIRECTION_THEME.gradientMin],
+        [center, DIRECTION_THEME.gradientMiddle],
+        [valueMinMax[1], DIRECTION_THEME.gradientMax],
+      ];
     } else {
       stops = [[-1, DIRECTION_THEME.decreasing], [0, DIRECTION_THEME.steady], [1, DIRECTION_THEME.increasing]];
     }
@@ -210,6 +219,20 @@
         map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none');
       }
     });
+
+    if (type === 'init') {
+      const viableFeatures = dat.features.filter(f => f.properties[$signalType] !== -100);
+
+      const index = Math.floor(Math.random() * (viableFeatures.length - 1));
+      console.log(dat.features);
+      console.log(viableFeatures, viableFeatures.length, index);
+      const randomFeature = viableFeatures[index];
+      console.log(randomFeature);
+      currentRegionName.set(randomFeature.properties.NAME);
+      currentRegion.set(randomFeature.properties.id);
+      clickedId = randomFeature.id;
+      map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+    }
 
     currentDataReadyOnMay.set(true);
     window.performance.measure('update-map', 'update-map-start');
@@ -293,8 +316,8 @@
         source: 'county-outline',
         type: 'fill',
         paint: {
-          'fill-color': '#e4dac4',
-          'fill-outline-color': '#e0e0e0',
+          'fill-color': MAP_THEME.countyFill,
+          'fill-outline-color': MAP_THEME.countyOutline,
           'fill-opacity': 0.4,
         },
       });
@@ -304,7 +327,7 @@
         type: 'fill',
         paint: {
           'fill-color': 'rgba(0, 0, 0, 0)',
-          'fill-outline-color': '#bcbcbc',
+          'fill-outline-color': MAP_THEME.stateOutline,
         },
       });
 
@@ -320,13 +343,17 @@
           source: name,
           type: 'line',
           paint: {
-            'line-color': '#313131',
-            'line-width': [
-              'case',
-              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
-              2,
-              0,
-            ],
+            'line-color': MAP_THEME.hoverRegionOutline,
+            'line-width': ['case', ['any', ['boolean', ['feature-state', 'hover'], false]], 2, 0],
+          },
+        });
+        map.addLayer({
+          id: `${name}-selected`,
+          source: name,
+          type: 'line',
+          paint: {
+            'line-color': MAP_THEME.selectedRegionOutline,
+            'line-width': ['case', ['any', ['boolean', ['feature-state', 'select'], false]], 2, 0],
           },
         });
       });
