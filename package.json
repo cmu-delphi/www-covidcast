@@ -1,16 +1,18 @@
 {
-  "name": "svelte-app",
+  "name": "delphi-hcii-covidcast",
   "version": "1.0.0",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "start": "sirv public",
     "deploy": "npm run build; gh-pages -d public",
+    "release": "npm run build && bestzip release.zip public/*",
     "prettier": "npx prettier --write \"{,!(node_modules)/**/}*.{js,jsx,svelte}\""
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^11.0.0",
     "@rollup/plugin-node-resolve": "^7.0.0",
+    "bestzip": "^2.1.5",
     "gh-pages": "^2.2.0",
     "prettier": "^2.0.4",
     "prettier-plugin-svelte": "^0.7.0",

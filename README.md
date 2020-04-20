@@ -18,6 +18,10 @@ To deploy an update run
 
 `npm run deploy`
 
+To release, run
+
+`npm run release`
+
 To view a version of the visualization in the frame of a cmu.edu site, run the server and go to:
 
 http://localhost:5000/frame.html
@@ -25,6 +29,7 @@ http://localhost:5000/frame.html
 ### Project Structure
 
 ## Figma Mock-up
+
 https://www.figma.com/file/CkdJq5qlvpQNhUsaihBsFE/Delphi-Covid-Forecasting?node-id=0%3A1
 
 The most current mock (for the graph) is 'Design 7'. Other mock to consider is 'Current Design Plan' . Mocks may lag dev changes.
