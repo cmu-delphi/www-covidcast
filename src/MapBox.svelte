@@ -15,6 +15,7 @@
     currentDataReadyOnMay,
     metaData,
     sensors,
+    mounted,
   } from './stores.js';
   import { DIRECTION_THEME, MAP_THEME } from './theme.js';
 
@@ -29,7 +30,8 @@
   let clickedId;
 
   // Boolean tracking if the map has been initialized.
-  let mounted = false;
+  let mapMounted = false;
+  let chosenRandom = false;
 
   // Mouse event handlers
   const onMouseEnter = level => e => {
@@ -123,8 +125,16 @@
     }
   });
 
+  mounted.subscribe(_ => {
+    try {
+      updateMap('signal');
+    } catch (err) {
+      console.log(err);
+    }
+  });
+
   function updateMap(type) {
-    if (!mounted) return;
+    if (!mapMounted) return;
     window.performance.mark('update-map-start');
     Object.keys($levels).forEach(level => map && map.removeFeatureState({ source: level }));
 
@@ -220,7 +230,8 @@
       }
     });
 
-    if (type === 'init') {
+    // set a random focus on start up
+    if (chosenRandom === false && $mounted && dat.features.filter(f => f.properties[$signalType] !== -100).length > 0) {
       const viableFeatures = dat.features.filter(f => f.properties[$signalType] !== -100);
 
       const index = Math.floor(Math.random() * (viableFeatures.length - 1));
@@ -228,10 +239,12 @@
       console.log(viableFeatures, viableFeatures.length, index);
       const randomFeature = viableFeatures[index];
       console.log(randomFeature);
+      console.log(randomFeature.properties.NAME);
       currentRegionName.set(randomFeature.properties.NAME);
       currentRegion.set(randomFeature.properties.id);
       clickedId = randomFeature.id;
       map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+      chosenRandom = true;
     }
 
     currentDataReadyOnMay.set(true);
@@ -389,7 +402,7 @@
         },
       });
 
-      mounted = true;
+      mapMounted = true;
       updateMap('init');
     });
 
