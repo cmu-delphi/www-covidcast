@@ -352,7 +352,7 @@
         }
       }
 
-      
+
       svg
         .append("g")
         .attr("class", "axis")
@@ -504,6 +504,11 @@
     var upperbound = avg + 2*sd;
     var lowerbound = avg - 2*sd;
     userCharts[currentChart].setRange(lowerbound, upperbound);
+  }
+
+  function dataDescription() {
+    
+
   }
 </script>
 
