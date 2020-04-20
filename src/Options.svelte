@@ -107,6 +107,7 @@
     border-color: #666;
     background-color: #fff;
     color: #333;
+    font-weight: 400;
     text-align: center;
     border-radius: 6px;
     padding: 5px 5px;
@@ -189,6 +190,7 @@
     border-color: #666;
     background-color: #fff;
     color: #333;
+    font-weight: 400;
     text-align: center;
     border-radius: 6px;
     padding: 5px 5px;
