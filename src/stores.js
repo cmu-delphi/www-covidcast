@@ -16,7 +16,7 @@ export const sensors = readable([
   },
   {
     name: 'Surveys (Facebook)',
-    id: 'fb_survey',
+    id: 'fb-survey',
     signal: 'cli',
     levels: ['county', 'msa'],
     mean: 0.8079823818179086,
