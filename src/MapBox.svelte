@@ -144,7 +144,7 @@
 
     let thisMeta = $metaData.find(d => d.data_source === $currentSensor && d.geo_type === $currentLevel);
     let sts = $stats.get($currentSensor);
-    let valueMinMax = [sts.mean - 2 * sts.std, sts.mean + 2 * sts.std];
+    let valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
     // console.log(thisMeta);
 
     // let valueMinMax = [thisMeta.min_value, thisMeta.max_value];

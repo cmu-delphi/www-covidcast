@@ -11,7 +11,7 @@
 
   function updateLowHigh(sens, stats) {
     let sts = stats.get(sens);
-    let valueMinMax = [sts.mean - 2 * sts.std, sts.mean + 2 * sts.std];
+    let valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
 
     let h = Math.min(100, valueMinMax[1]).toFixed(2) + "%";
     let l = Math.max(0, valueMinMax[0]).toFixed(2) + "%";

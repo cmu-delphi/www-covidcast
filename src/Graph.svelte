@@ -220,18 +220,33 @@
       }
       return format;
     }
+
     getChartTitle() {
-      var ChartTitle = "Currently viewing sensor ";
-      let sensor = $currentSensorName;
-      let geoLevel = $currentLevelName;
-      var cT =
-        ChartTitle +
-        " <strong> " +
-        sensor +
-        "</strong> at the <strong>" +
-        geoLevel +
-        "</strong> level";
-      d3.select(t).html(cT);
+      let sensor = $currentSensor;
+      let title = "";
+      switch (sensor) {
+        // console.log(sensorKeys['google']);
+        case sensorKeys["google"]:
+          title = "Google surveys reporting covid symptoms in the community";
+          break;
+        case sensorKeys["fb"]:
+          title = "Surveys via Facebook reporting covid symptoms in household";
+          break;
+        case sensorKeys["q"]:
+          title = "Flu tests returning negative for flu";
+          break;
+        case sensorKeys["ght"]:
+          title = "Covid-related Google searches";
+          break;
+        case sensorKeys["dr"]:
+          title = "Doctor visits with covid-like symptoms";
+          break;
+        default:
+          console.log("default");
+          break;
+      }
+      console.log(title);
+      d3.select(t).html(title);
     }
 
     isChart() {
@@ -479,10 +494,7 @@
   function calculateSD() {
     let sensor = $currentSensor;
     let sts = $stats.get(sensor);
-    var minMax =
-      sensor == sensorKeys["dr"]
-        ? [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std]
-        : [sts.mean - 2 * sts.std, sts.mean + 2 * sts.std];
+    var minMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
     if (minMax[0] < 0) {
       minMax[0] = 0;
     }
