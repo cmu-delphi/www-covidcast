@@ -227,19 +227,19 @@
       switch (sensor) {
         // console.log(sensorKeys['google']);
         case sensorKeys["google"]:
-          title = "Google surveys reporting covid symptoms in the community";
+          title = "Google surveys reporting COVID symptoms in the community";
           break;
         case sensorKeys["fb"]:
-          title = "Surveys via Facebook reporting covid symptoms in household";
+          title = "Surveys via Facebook reporting COVID symptoms in household";
           break;
         case sensorKeys["q"]:
           title = "Flu tests returning negative for flu";
           break;
         case sensorKeys["ght"]:
-          title = "Covid-related Google searches";
+          title = "COVID-related Google searches";
           break;
         case sensorKeys["dr"]:
-          title = "Doctor visits with covid-like symptoms";
+          title = "Doctor visits with COVID-like symptoms";
           break;
         default:
           console.log("default");
@@ -379,26 +379,29 @@
       var formatXTicks = xTicks < 6 ? xTicks : d3.timeDay.every(3);
       var formatYTicks = this.getFormat();
 
-      let max = this.max;
+      let chartMax = this.max;
+      // peg values to max and min if out of range
+      for (var i = 0; i < myData.length; i++) {
+        myData[i].max = false;
+        if (+myData[i].value < this.min) {
+          myData[i].value = this.min;
+        } else if (+myData[i].value > this.max) {
+          myData[i].max = true;
+          // myData[i].value = this.max;
+          if (+myData[i].value > chartMax) chartMax = +myData[i].value;
+        }
+      }
+      console.log(chartMax);
+      console.log(myData);
+
       var x = d3
         .scaleTime()
         .domain(d3.extent(myData, d => parseTime(d.time_value)))
         .range([0, width]);
       var y = d3
         .scaleLinear()
-        .domain([0, this.max])
+        .domain([0, chartMax])
         .range([height, 0]);
-
-      // peg values to max and min if out of range
-      for (var i = 0; i < myData.length; i++) {
-        myData[i].max = false;
-        if (Number(myData[i].value) < this.min) {
-          myData[i].value = this.min;
-        } else if (Number(myData[i].value) > this.max) {
-          myData[i].max = true;
-          myData[i].value = this.max;
-        }
-      }
 
       svg
         .append("g")
