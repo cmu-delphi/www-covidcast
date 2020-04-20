@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from 'svelte';
   import mapboxgl from 'mapbox-gl';
   import {
     levels,
@@ -19,15 +20,27 @@
   } from './stores.js';
   import { DIRECTION_THEME, MAP_THEME } from './theme.js';
 
-  const LAT = -1.2;
-  const LON = -0.5;
-  const ZOOM = 4.3; // should be set to 4.4 as default
+  let LAT = -1.2;
+  let LON = -0.5;
+  let ZOOM = 3.9; // should be set to 4.3 as default
 
   let container;
   let map;
   let popup;
   let hoveredId;
   let clickedId;
+
+  onMount(_ => {
+    let containerWidth = container.clientWidth;
+    console.log('map view width:', containerWidth);
+    if (containerWidth <= 1021) {
+      ZOOM = 3.9;
+    } else if (containerWidth > 1021 && containerWidth < 1280) {
+      ZOOM = 4.1;
+    } else if (containerWidth >= 1280) {
+      ZOOM = 4.3;
+    }
+  });
 
   // Boolean tracking if the map has been initialized.
   let mapMounted = false;
