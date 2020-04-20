@@ -177,7 +177,7 @@
           title = 'Percentage';
           break;
         case 'ght':
-          title = 'Frequency';
+          title = 'Search Frequency';
           break;
         case 'doctor-visits':
           title = 'Percentage';
@@ -188,6 +188,32 @@
       return title;
     }
 
+    getFormat() {
+      let sensor = $currentSensor;
+      var format = '';
+      switch (sensor) {
+        case 'google-survey':
+          var p = Math.max(0, d3.precisionFixed(0.001) -2),
+              f = d3.format('.' + p + '%');
+          format = d3.format(f);
+          break;
+        case 'fb_survey':
+          format = d3.format('.0%');
+          break;
+        case 'quidel':
+          format = 'Percentage';
+          break;
+        case 'ght':
+          format = d3.format('.0f');
+          break;
+        case 'doctor-visits':
+          format = 'Percentage';
+          break;
+        default:
+          break;
+      }
+      return format;
+    }
     getChartTitle() {
       var ChartTitle = 'Currently viewing sensor ';
       let sensor = $currentSensorName;
@@ -316,15 +342,13 @@
       minDate = new Date(minDate);
       myData = myData.filter(it => parseTime(it['time_value']) < maxDate);
       myData = myData.filter(it => parseTime(it['time_value']) > minDate);
+      console.log('values: ' + myData);
 
       // set x-axis ticks based off of data sparsity and format y-axis ticks
       var xTicks = myData.length;
       var formatXTicks = xTicks < 6 ? xTicks : d3.timeDay.every(3);
-      var scalePercentages = function(d) {
-        return formatPercent(d * 100);
-      };
       var percentFormat = this.getYAxis() == 'Percentage';
-      var formatYTicks = percentFormat ? d3.format('.0%') : d3.format('.0f');
+      var formatYTicks = this.getFormat(); //  percentFormat ? d3.format('.0%') : d3.format('.0f');
       var x = d3
         .scaleTime()
         .domain(d3.extent(myData, d => parseTime(d.time_value)))
