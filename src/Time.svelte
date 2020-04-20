@@ -314,11 +314,13 @@
   }
 
   .loader-container {
-    position: absolute;
+    /* position: absolute;
     top: 0;
     bottom: 0;
     right: -40px;
-    width: 40px;
+    width: 40px; */
+
+    height: 100%;
 
     display: flex;
     align-items: center;
