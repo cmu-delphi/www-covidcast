@@ -172,22 +172,14 @@
         case 'google-survey':
           title = 'Percentage';
           break;
-<<<<<<< HEAD
         case 'fb-survey':
-=======
-        case 'fb_survey':
->>>>>>> c20825a186359b9ba1eb42bb1098c0b78ba258b7
           title = 'Percentage';
           break;
         case 'quidel':
           title = 'Percentage';
           break;
         case 'ght':
-<<<<<<< HEAD
           title = 'Relative Frequency';
-=======
-          title = 'Frequency';
->>>>>>> c20825a186359b9ba1eb42bb1098c0b78ba258b7
           break;
         case 'doctor-visits':
           title = 'Percentage';
@@ -222,12 +214,34 @@
       }
       return format;
     }
+
     getChartTitle() {
-      var ChartTitle = 'Currently viewing sensor ';
-      let sensor = $currentSensorName;
-      let geoLevel = $currentLevelName;
-      var cT = ChartTitle + ' <strong> ' + sensor + '</strong> at the <strong>' + geoLevel + '</strong> level';
-      d3.select(t).html(cT);
+      let sensor = $currentSensor;
+      console.log(sensor);
+      let title = '';
+      switch (sensor) {
+        // console.log(sensorKeys['google']);
+        case sensorKeys['google']:
+          title = 'Google surveys reporting covid symptoms in the community';
+          break;
+        case sensorKeys['fb']:
+          title = 'Surveys via Facebook reporting covid symptoms in household';
+          break;
+        case sensorKeys['q']:
+          title = 'Flu tests returning negative for flu';
+          break;
+        case sensorKeys['ght']:
+          title = 'Covid-related Google searches';
+          break;
+        case sensorKeys['dr']:
+          title = 'Doctor visits with covid-like symptoms';
+          break;
+        default:
+          console.log('default');
+          break;
+      }
+      console.log(title);
+      d3.select(t).html(title);
     }
 
     isChart() {
@@ -350,23 +364,12 @@
       minDate = new Date(minDate);
       myData = myData.filter(it => parseTime(it['time_value']) < maxDate);
       myData = myData.filter(it => parseTime(it['time_value']) > minDate);
-<<<<<<< HEAD
-      console.log('values: ' + myData);
-=======
->>>>>>> c20825a186359b9ba1eb42bb1098c0b78ba258b7
 
       // set x-axis ticks based off of data sparsity and format y-axis ticks
       var xTicks = myData.length;
       var formatXTicks = xTicks < 6 ? xTicks : d3.timeDay.every(3);
-<<<<<<< HEAD
       var formatYTicks = this.getFormat();
-=======
-      var scalePercentages = function(d) {
-        return formatPercent(d * 100);
-      };
-      var percentFormat = this.getYAxis() == 'Percentage';
-      var formatYTicks = percentFormat ? d3.format('.0%') : d3.format('.0f');
->>>>>>> c20825a186359b9ba1eb42bb1098c0b78ba258b7
+
       var x = d3
         .scaleTime()
         .domain(d3.extent(myData, d => parseTime(d.time_value)))
@@ -475,7 +478,7 @@
   function calculateSD() {
     let sensor = $currentSensor;
     let sts = $stats.get(sensor);
-    var minMax = (sensor == sensorKeys['dr']) ? [sts.mean - 3*sts.std, sts.mean + 3*sts.std] : [sts.mean - 2*sts.std, sts.mean + 2*sts.std];
+    var minMax = (sensor == sensorKeys['dr']) ? [sts.mean - 3*sts.std, sts.mean + 3*sts.std] : [sts.mean - 2.5*sts.std, sts.mean + 2.5*sts.std];
     if(minMax[0] < 0) { minMax[0] = 0 };
     userCharts[currentChart].setRange(minMax[0], minMax[1]);
   }
