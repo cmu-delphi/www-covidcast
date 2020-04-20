@@ -12,18 +12,16 @@
   function updateLowHigh(sens, stats) {
     let sts = stats.get(sens);
     let valueMinMax = [sts.mean - 2 * sts.std, sts.mean + 2 * sts.std];
-    console.log(valueMinMax);
 
-    let h = Math.min(1, valueMinMax[1]);
-    let l = Math.max(0, valueMinMax[0]);
-    let format = d3.format(".0%");
+    let h = Math.min(100, valueMinMax[1]).toFixed(2) + "%";
+    let l = Math.max(0, valueMinMax[0]).toFixed(2) + "%";
     if (sens === "ght") {
-      h = valueMinMax[1];
-      format = d3.format(".0f");
+      h = valueMinMax[1].toFixed(2);
+      l = Math.max(0, valueMinMax[0]).toFixed(2);
     }
 
-    high = format(h);
-    low = format(l);
+    high = h;
+    low = l;
   }
 </script>
 
