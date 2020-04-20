@@ -20,7 +20,7 @@ export const DIRECTION_THEME = {
 
 export const MAP_THEME = {
   selectedRegionOutline: "#009647",
-  hoverRegionOutline: "black",
+  hoverRegionOutline: "#654321",
   stateOutline: "#bcbcbc",
   countyFill: "#e4dac4",
   countyOutline: "#e0e0e0",
