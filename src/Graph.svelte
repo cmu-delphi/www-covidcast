@@ -540,13 +540,15 @@
   .graph-title {
     text-align: center;
     font-size: 14px;
-    margin: 0px;
+    margin: 3px 0px !important;
+    padding: 0px !important;
   }
   .graph-description {
     text-align: center;
-    margin: 5px 0px 7px 0px;
+    margin: 5px 0px 7px 0px !important;
     font-size: 14px;
     font-style: italic;
+    padding: 0px !important;
   }
 </style>
 
