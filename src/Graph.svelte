@@ -482,7 +482,7 @@
     var minMax =
       sensor == sensorKeys["dr"]
         ? [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std]
-        : [sts.mean - 2 * sts.std, sts.mean + 2 * sts.std];
+        : [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
     if (minMax[0] < 0) {
       minMax[0] = 0;
     }
