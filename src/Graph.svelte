@@ -170,7 +170,7 @@
         case 'google-survey':
           title = 'Percentage';
           break;
-        case 'fb_survey':
+        case 'fb-survey':
           title = 'Percentage';
           break;
         case 'quidel':
@@ -193,21 +193,19 @@
       var format = '';
       switch (sensor) {
         case 'google-survey':
-          var p = Math.max(0, d3.precisionFixed(0.001) -2),
-              f = d3.format('.' + p + '%');
-          format = d3.format(f);
+          format = (d => d + '%');
           break;
-        case 'fb_survey':
-          format = d3.format('.0%');
+        case 'fb-survey':
+          format = (d => d + '%');
           break;
         case 'quidel':
-          format = 'Percentage';
+          format = (d => d + '%');
           break;
         case 'ght':
           format = d3.format('.0f');
           break;
         case 'doctor-visits':
-          format = 'Percentage';
+          format = (d => d + '%');
           break;
         default:
           break;
@@ -347,15 +345,14 @@
       // set x-axis ticks based off of data sparsity and format y-axis ticks
       var xTicks = myData.length;
       var formatXTicks = xTicks < 6 ? xTicks : d3.timeDay.every(3);
-      var percentFormat = this.getYAxis() == 'Percentage';
-      var formatYTicks = this.getFormat(); //  percentFormat ? d3.format('.0%') : d3.format('.0f');
+      var formatYTicks = this.getFormat();
       var x = d3
         .scaleTime()
         .domain(d3.extent(myData, d => parseTime(d.time_value)))
         .range([0, width]);
       var y = d3
         .scaleLinear()
-        .domain([this.min, this.max * 1.2])
+        .domain([0, this.max])
         .range([height, 0]);
 
       // peg values to max and min if out of range
@@ -508,6 +505,7 @@
   function calculateSD() {
     let sts = $stats.get($currentSensor);
     let minMax = [sts.mean - 2 * sts.std, sts.mean + 2 * sts.std];
+    if(minMax[0] < 0) { minMax[0] = 0 };
     userCharts[currentChart].setRange(minMax[0], minMax[1]);
   }
 
