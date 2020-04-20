@@ -233,7 +233,7 @@
   .buttons-group .button:active,
   .buttons-group-side .button:focus,
   .buttons-group-side .button:active {
-    box-shadow: none !important;
+    /* box-shadow: none !important; */
     outline: none;
   }
 
@@ -268,11 +268,11 @@
 
 <div class="options">
   {#if hide}
-    <button aria-label="toggle options" class="toggle-button" on:click={toggleHide}>
+    <button role="switch" aria-checked="false" aria-label="toggle options" class="toggle-button" on:click={toggleHide}>
       <img class="toggle-button-icon" src="./assets/imgs/layers-24px.svg" alt="" />
     </button>
   {:else}
-    <button aria-label="toggle options" class="toggle-button" on:click={toggleHide}>
+    <button role="switch" aria-checked="true" aria-label="toggle options" class="toggle-button" on:click={toggleHide}>
       <img class="toggle-button-icon" src="./assets/imgs/layers_clear-24px.svg" alt="" />
     </button>
 
@@ -281,6 +281,7 @@
       <div aria-label="geographic level" class="buttons-group">
         {#each Object.keys($levels) as level}
           <button
+            aria-selected={$currentLevel === level ? 'true' : 'false'}
             class="button {$currentLevel === level ? 'selected' : ''}"
             on:click={() => currentLevel.set(level)}
             disabled={$sensors.find(d => d.id === $currentSensor).levels.includes(level) === false}>
@@ -303,10 +304,14 @@
     <div class="option">
       <!-- <div class="buttons-group-title">Signal Type</div> -->
       <div aria-label="display type" class="buttons-group-side">
-        <button class="button {$signalType === 'value' ? 'selected' : ''}" on:click={() => signalType.set('value')}>
+        <button
+          aria-selected={$signalType === 'value' ? 'true' : 'false'}
+          class="button {$signalType === 'value' ? 'selected' : ''}"
+          on:click={() => signalType.set('value')}>
           Intensity
         </button>
         <button
+          aria-selected={$signalType === 'direction' ? 'true' : 'false'}
           class="button {$signalType === 'direction' ? 'selected' : ''}"
           on:click={() => signalType.set('direction')}
           disabled={$currentSensor === 'fb-survey'}>

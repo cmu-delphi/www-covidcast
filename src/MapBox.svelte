@@ -418,6 +418,7 @@
             'line-width': ['case', ['any', ['boolean', ['feature-state', 'hover'], false]], 4, 0],
           },
         });
+
         map.addLayer({
           id: `${name}-selected`,
           source: name,
