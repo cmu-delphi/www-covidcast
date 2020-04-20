@@ -50,7 +50,7 @@
     regionDataStats.subscribe(d => setChartRange(d));
     currentDate.subscribe(_ => updateGraphTimeRange());
     currentRegion.subscribe(region => {
-      console.log(region);
+      ////console.log(region);
       if (!region) {
         let chart = new Chart();
         chart.draw();
@@ -59,10 +59,10 @@
       }
     });
     currentSensor.subscribe(_ => {
-      console.log(_);
+      ////console.log(_);
       if (userCharts != undefined) {
         if (userCharts[currentChart].isChart()) {
-          console.log('is chart');
+          ////console.log('is chart');
           userCharts[currentChart].getChartTitle();
         } else {
           let chart = new Chart();
@@ -74,7 +74,7 @@
       }
     });
     // currentDataReadyOnMay.subscribe(d => setFocus());
-    // regionDataStats.subscribe(d => console.log(d));
+    // regionDataStats.subscribe(d => ////console.log(d));
   });
 
   function drawGraph() {
@@ -84,8 +84,8 @@
   }
 
   function updateGraph(data) {
-    console.log(data);
-    console.log($currentRegion);
+    ////console.log(data);
+    ////console.log($currentRegion);
     try {
       if (data.length !== 0 && $currentRegion) {
         if (userCharts != undefined) {
@@ -103,7 +103,7 @@
         }
       }
     } catch (err) {
-      console.log(err);
+      ////console.log(err);
     }
   }
 
@@ -121,10 +121,10 @@
     // search for the ID
     // let re = new RegExp('US[0-9]+');
     // let geo = region.match(re);
-    // console.log('region data: ' + geo);
-    // console.log('data: ' + data);
+    // ////console.log('region data: ' + geo);
+    // ////console.log('data: ' + data);
     // for (var i = 0; i < data.length; i++) {
-    //   console.log(data[i].time_value);
+    //   ////console.log(data[i].time_value);
     // }
 
     // todo: finish parsing data
@@ -137,26 +137,26 @@
   }
 
   function setChartRange(data) {
-    console.log(data);
+    ////console.log(data);
     try {
       if (data) {
-        // console.log('data: ' + data);
+        // ////console.log('data: ' + data);
         let { min_value, max_value } = data;
         let { num_locations } = data;
-        // console.log(num_locations);
+        // ////console.log(num_locations);
         let stats = $regionDataStats;
-        // console.log('data: ' + data[0]);
-        // console.log('stats: ' + stats);
+        // ////console.log('data: ' + data[0]);
+        // ////console.log('stats: ' + stats);
         // let min = dataStats.min_value;
         // let max = dataStats.max_value;
-        // console.log(currentChart);
+        // ////console.log(currentChart);
         if (userCharts[currentChart] !== undefined) {
           userCharts[currentChart].setRange(min_value, max_value);
           userCharts[currentChart].setN(num_locations);
         }
       }
     } catch (error) {
-      console.log(error);
+      ////console.log(error);
     }
   }
 
@@ -204,7 +204,7 @@
       if (this.n) {
         return this.n;
       } else {
-        console.log('n: ' + this.n);
+        ////console.log('n: ' + this.n);
       }
     }
 
@@ -262,7 +262,7 @@
       let sensor = $currentSensor;
       let title = '';
       switch (sensor) {
-        // console.log(sensorKeys['google']);
+        // ////console.log(sensorKeys['google']);
         case sensorKeys['google']:
           title = 'Google surveys reporting COVID symptoms in the community';
           break;
@@ -279,10 +279,10 @@
           title = 'Doctor visits with COVID-like symptoms';
           break;
         default:
-          console.log('default');
+          ////console.log('default');
           break;
       }
-      console.log(title);
+      ////console.log(title);
       d3.select(t).html(title);
     }
 
@@ -424,8 +424,8 @@
           if (+myData[i].value > chartMax) chartMax = +myData[i].value;
         }
       }
-      console.log(chartMax);
-      console.log(myData);
+      ////console.log(chartMax);
+      ////console.log(myData);
 
       var x = d3
         .scaleTime()

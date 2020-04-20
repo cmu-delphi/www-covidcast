@@ -126,7 +126,7 @@
       canLoadMore = true;
     }
 
-    console.log(canLoadMore);
+    ////console.log(canLoadMore);
   }
 
   function calculateValFromRectified(rectified) {
@@ -156,7 +156,7 @@
     updateSliderUI();
   }
 
-  // currentDataReadyOnMay.subscribe(d => console.log('map set:', d));
+  // currentDataReadyOnMay.subscribe(d => ////console.log('map set:', d));
 </script>
 
 <style>

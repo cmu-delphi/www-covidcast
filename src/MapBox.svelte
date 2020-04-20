@@ -32,7 +32,7 @@
 
   onMount(_ => {
     let containerWidth = container.clientWidth;
-    console.log('map view width:', containerWidth);
+    ////console.log('map view width:', containerWidth);
     if (containerWidth <= 1021) {
       ZOOM = 3.9;
     } else if (containerWidth > 1021 && containerWidth < 1280) {
@@ -85,9 +85,9 @@
     }
 
     if (clickedId !== e.features[0].id) {
-      console.log(e.features[0]);
+      ////console.log(e.features[0]);
       clickedId = e.features[0].id;
-      console.log(clickedId);
+      ////console.log(clickedId);
       map.setFeatureState({ source: level, id: clickedId }, { select: true });
       currentRegionName.set(e.features[0].properties.NAME);
       currentRegion.set(e.features[0].properties.id);
@@ -114,28 +114,28 @@
     try {
       updateMap('data');
     } catch (err) {
-      console.log(err);
+      ////console.log(err);
     }
   });
   currentLevel.subscribe(_ => {
     try {
       updateMap('data');
     } catch (err) {
-      console.log(err);
+      ////console.log(err);
     }
   });
   currentDate.subscribe(_ => {
     try {
       updateMap('data');
     } catch (err) {
-      console.log(err);
+      ////console.log(err);
     }
   });
   signalType.subscribe(_ => {
     try {
       updateMap('signal');
     } catch (err) {
-      console.log(err);
+      ////console.log(err);
     }
   });
 
@@ -143,7 +143,7 @@
     try {
       updateMap('mounted');
     } catch (err) {
-      console.log(err);
+      ////console.log(err);
     }
   });
 
@@ -159,7 +159,7 @@
     let thisMeta = $metaData.find(d => d.data_source === $currentSensor && d.geo_type === $currentLevel);
     let sts = $stats.get($currentSensor);
     let valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
-    // console.log(thisMeta);
+    // ////console.log(thisMeta);
 
     // let valueMinMax = [thisMeta.min_value, thisMeta.max_value];
     let valueMappedVals = new Map();
@@ -207,8 +207,8 @@
     } else {
       stops = [[-1, DIRECTION_THEME.decreasing], [0, DIRECTION_THEME.steady], [1, DIRECTION_THEME.increasing]];
     }
-    console.log('data update');
-    console.log(dat);
+    ////console.log('data update');
+    ////console.log(dat);
     if (['data', 'init'].includes(type)) {
       map.getSource($currentLevel).setData(dat);
     }
@@ -255,7 +255,7 @@
         if (found.length > 0) {
           // found allegheny / Pittsburgh
           const randomFeature = found[0];
-          console.log(randomFeature);
+          ////console.log(randomFeature);
           currentRegionName.set(randomFeature.properties.NAME);
           currentRegion.set(randomFeature.properties.id);
           clickedId = randomFeature.id;
@@ -263,11 +263,11 @@
           chosenRandom = true;
         } else {
           const index = Math.floor(Math.random() * (viableFeatures.length - 1));
-          console.log(dat.features);
-          console.log(viableFeatures, viableFeatures.length, index);
+          ////console.log(dat.features);
+          ////console.log(viableFeatures, viableFeatures.length, index);
           const randomFeature = viableFeatures[index];
-          console.log(randomFeature);
-          console.log(randomFeature.properties.NAME);
+          ////console.log(randomFeature);
+          ////console.log(randomFeature.properties.NAME);
           currentRegionName.set(randomFeature.properties.NAME);
           currentRegion.set(randomFeature.properties.id);
           clickedId = randomFeature.id;
@@ -277,19 +277,19 @@
       }
     }
 
-    console.log($currentRegion);
-    console.log(viableFeatures.filter(f => f.properties.id === $currentRegion).length);
+    ////console.log($currentRegion);
+    ////console.log(viableFeatures.filter(f => f.properties.id === $currentRegion).length);
     if ($currentRegion) {
       const found = viableFeatures.filter(f => f.properties.id === $currentRegion);
       if (found.length > 0) {
         clickedId = found[0].id;
-        console.log('clickedId', clickedId);
+        ////console.log('clickedId', clickedId);
         map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
       } else {
         clickedId = null;
         currentRegion.set('');
         currentRegionName.set('');
-        console.log('no current region');
+        ////console.log('no current region');
       }
     }
 
@@ -303,11 +303,11 @@
     //   );
 
     //   const index = Math.floor(Math.random() * (viableFeatures.length - 1));
-    //   console.log(dat.features);
-    //   console.log(viableFeatures, viableFeatures.length, index);
+    //   ////console.log(dat.features);
+    //   ////console.log(viableFeatures, viableFeatures.length, index);
     //   const randomFeature = viableFeatures[index];
-    //   console.log(randomFeature);
-    //   console.log(randomFeature.properties.NAME);
+    //   ////console.log(randomFeature);
+    //   ////console.log(randomFeature.properties.NAME);
     //   currentRegionName.set(randomFeature.properties.NAME);
     //   currentRegion.set(randomFeature.properties.id);
     //   clickedId = randomFeature.id;
@@ -346,7 +346,7 @@
           window.performance.measure(`Load Data`, `Start Load Data`);
         }
       } else {
-        // console.log(ev);
+        // ////console.log(ev);
       }
     });
     map.on('dataloading', ev => {
@@ -361,7 +361,7 @@
           window.performance.mark(`Start Load Data`);
         }
       } else {
-        // console.log(ev);
+        // ////console.log(ev);
       }
     });
 
@@ -421,7 +421,7 @@
           type: 'geojson',
           data: $geojsons.get(name),
         });
-        console.log(data);
+        ////console.log(data);
         map.addLayer({
           id: `${name}-hover`,
           source: name,

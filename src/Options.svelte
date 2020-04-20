@@ -317,11 +317,7 @@
         <button
           aria-selected={$signalType === 'direction' ? 'true' : 'false'}
           class="button {$signalType === 'direction' ? 'selected' : ''}"
-          on:click={() => signalType.set('direction')}
-          disabled={$currentSensor === 'fb-survey'}>
-          {#if $currentSensor === 'fb-survey'}
-            <span class="disabled-tooltip">Currently unavailable</span>
-          {/if}
+          on:click={() => signalType.set('direction')}>
           Direction
         </button>
 
