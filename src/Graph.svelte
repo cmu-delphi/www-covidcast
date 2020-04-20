@@ -37,6 +37,7 @@
   const charts = [barChart, lineGraph];
   let userCharts = [];
   let currentChart = 0;
+  let sensorKeys = { 'dr': 'doctor-visits', 'fb' : 'fb-survey', 'google': 'google-survey', 'ght' : 'ght', 'q' : 'quidel'};
 
   regionData.subscribe(d => updateGraph(d));
   regionDataStats.subscribe(d => setChartRange(d));
@@ -470,8 +471,9 @@
   }
 
   function calculateSD() {
-    let sts = $stats.get($currentSensor);
-    let minMax = [sts.mean - 2 * sts.std, sts.mean + 2 * sts.std];
+    let sensor = $currentSensor;
+    let sts = $stats.get(sensor);
+    var minMax = (sensor == sensorKeys['dr']) ? [sts.mean - 3*sts.std, sts.mean + 3*sts.std] : [sts.mean - 2*sts.std, sts.mean + 2*sts.std];
     if(minMax[0] < 0) { minMax[0] = 0 };
     userCharts[currentChart].setRange(minMax[0], minMax[1]);
   }
