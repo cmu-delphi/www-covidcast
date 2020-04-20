@@ -29,7 +29,6 @@
   // This subscribes to sample data to redraw the graph every time the data changes.
   // todo: fix current region subscription
   // currentRegion.subscribe(_ => updateGraph());
-  onMount(_ => drawGraph());
 
   // local variables for permissible graph types
   const barChart = 'Bar_Chart';
@@ -45,11 +44,38 @@
     q: 'quidel',
   };
 
-  regionData.subscribe(d => updateGraph(d));
-  regionDataStats.subscribe(d => setChartRange(d));
-  currentDate.subscribe(_ => updateGraphTimeRange());
-  // currentDataReadyOnMay.subscribe(d => setFocus());
-  // regionDataStats.subscribe(d => console.log(d));
+  onMount(_ => {
+    drawGraph();
+    regionData.subscribe(d => updateGraph(d));
+    regionDataStats.subscribe(d => setChartRange(d));
+    currentDate.subscribe(_ => updateGraphTimeRange());
+    currentRegion.subscribe(region => {
+      console.log(region);
+      if (!region) {
+        let chart = new Chart();
+        chart.draw();
+        userCharts = [];
+        userCharts.push(chart);
+      }
+    });
+    currentSensor.subscribe(_ => {
+      console.log(_);
+      if (userCharts != undefined) {
+        if (userCharts[currentChart].isChart()) {
+          console.log('is chart');
+          userCharts[currentChart].getChartTitle();
+        } else {
+          let chart = new Chart();
+          chart.getChartTitle();
+          chart.draw();
+          userCharts = [];
+          userCharts.push(chart);
+        }
+      }
+    });
+    // currentDataReadyOnMay.subscribe(d => setFocus());
+    // regionDataStats.subscribe(d => console.log(d));
+  });
 
   function drawGraph() {
     let chart = new Chart();
@@ -58,20 +84,26 @@
   }
 
   function updateGraph(data) {
-    if (data.length !== 0) {
-      if (userCharts != undefined) {
-        if (userCharts[currentChart].isChart()) {
-          userCharts[currentChart].draw();
-        } else {
-          var dataResults = parseData(data);
-          var graphType = dataResults[0];
-          var graphData = dataResults[1];
-          var range = dataResults[2];
-          var n = dataResults[3];
-          userCharts[currentChart] = new Chart(graphType, graphData, range, n);
-          userCharts[currentChart].draw();
+    console.log(data);
+    console.log($currentRegion);
+    try {
+      if (data.length !== 0 && $currentRegion) {
+        if (userCharts != undefined) {
+          if (userCharts[currentChart].isChart()) {
+            userCharts[currentChart].draw();
+          } else {
+            var dataResults = parseData(data);
+            var graphType = dataResults[0];
+            var graphData = dataResults[1];
+            var range = dataResults[2];
+            var n = dataResults[3];
+            userCharts[currentChart] = new Chart(graphType, graphData, range, n);
+            userCharts[currentChart].draw();
+          }
         }
       }
+    } catch (err) {
+      console.log(err);
     }
   }
 
@@ -105,21 +137,26 @@
   }
 
   function setChartRange(data) {
-    if (data) {
-      // console.log('data: ' + data);
-      let { min_value, max_value } = data;
-      let { num_locations } = data;
-      // console.log(num_locations);
-      let stats = $regionDataStats;
-      // console.log('data: ' + data[0]);
-      // console.log('stats: ' + stats);
-      // let min = dataStats.min_value;
-      // let max = dataStats.max_value;
-      // console.log(currentChart);
-      if (userCharts[currentChart] !== undefined) {
-        userCharts[currentChart].setRange(min_value, max_value);
-        userCharts[currentChart].setN(num_locations);
+    console.log(data);
+    try {
+      if (data) {
+        // console.log('data: ' + data);
+        let { min_value, max_value } = data;
+        let { num_locations } = data;
+        // console.log(num_locations);
+        let stats = $regionDataStats;
+        // console.log('data: ' + data[0]);
+        // console.log('stats: ' + stats);
+        // let min = dataStats.min_value;
+        // let max = dataStats.max_value;
+        // console.log(currentChart);
+        if (userCharts[currentChart] !== undefined) {
+          userCharts[currentChart].setRange(min_value, max_value);
+          userCharts[currentChart].setN(num_locations);
+        }
       }
+    } catch (error) {
+      console.log(error);
     }
   }
 

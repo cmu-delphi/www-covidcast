@@ -107,7 +107,7 @@ export const currentDate = writable(20200412);
 // Range of time for the map slider.
 export const currentRange = writable([0, 1]);
 // Region GEO_ID for filtering the line chart.
-export const currentRegion = writable('42003');
+export const currentRegion = writable(''); // 42003 - Allegheny; 38300 - Pittsburgh; PA - Pennsylvania
 export const currentRegionName = writable('');
 export const currentDataReadyOnMay = writable(false);
 
