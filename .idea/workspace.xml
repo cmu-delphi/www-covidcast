@@ -35,8 +35,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Graph.svelte">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2507">
-              <caret line="496" column="61" selection-start-line="496" selection-start-column="61" selection-end-line="496" selection-end-column="61" />
+            <state relative-caret-position="227">
+              <caret line="502" column="61" selection-start-line="502" selection-start-column="61" selection-end-line="502" selection-end-column="61" />
               <folding>
                 <element signature="e#11#44#0#HTML" expanded="true" />
               </folding>
@@ -218,7 +218,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="129567000" />
+    <option name="totallyTimeSpent" value="129808000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -358,8 +358,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Graph.svelte">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2507">
-          <caret line="496" column="61" selection-start-line="496" selection-start-column="61" selection-end-line="496" selection-end-column="61" />
+        <state relative-caret-position="227">
+          <caret line="502" column="61" selection-start-line="502" selection-start-column="61" selection-end-line="502" selection-end-column="61" />
           <folding>
             <element signature="e#11#44#0#HTML" expanded="true" />
           </folding>
