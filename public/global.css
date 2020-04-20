@@ -130,3 +130,17 @@ input:focus,
 button:focus {
   outline: black 2px solid !important;
 }
+
+/* change background and tip color to green */
+.map-popup .mapboxgl-popup-content {
+  background-color: #fff;
+  padding: 5px 5px;
+  color: #333;
+  border-color: #666;
+  border-style: solid;
+  border-width: 1px;
+}
+.map-popup .mapboxgl-popup-tip {
+  /* need to figure out a way to make this smaller */
+  border-top-color: #666;
+}
