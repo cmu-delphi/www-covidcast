@@ -101,9 +101,12 @@
 
   .buttons-group button.button .disabled-tooltip {
     visibility: hidden;
-    width: 100px;
-    background-color: #444;
-    color: #fff;
+    width: 80px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #666;
+    background-color: #fff;
+    color: #333;
     text-align: center;
     border-radius: 6px;
     padding: 5px 5px;
@@ -121,7 +124,7 @@
     margin-top: -5px;
     border-width: 5px;
     border-style: solid;
-    border-color: transparent #444 transparent transparent;
+    border-color: transparent #666 transparent transparent;
   }
 
   .buttons-group button.button:hover .disabled-tooltip {
@@ -180,9 +183,12 @@
 
   .buttons-group-side button.button .disabled-tooltip {
     visibility: hidden;
-    width: 100px;
-    background-color: #444;
-    color: #fff;
+    width: 80px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #666;
+    background-color: #fff;
+    color: #333;
     text-align: center;
     border-radius: 6px;
     padding: 5px 5px;
@@ -190,7 +196,7 @@
     z-index: 1;
     top: 150%;
     left: 50%;
-    margin-left: -60px;
+    margin-left: -50px;
   }
 
   .buttons-group-side button.button .disabled-tooltip::after {
@@ -201,7 +207,7 @@
     margin-left: -5px;
     border-width: 5px;
     border-style: solid;
-    border-color: transparent transparent #444 transparent;
+    border-color: transparent transparent #666 transparent;
   }
   .buttons-group-side button.button:hover .disabled-tooltip {
     visibility: visible;
@@ -301,8 +307,8 @@
         <button
           class="button {$signalType === 'direction' ? 'selected' : ''}"
           on:click={() => signalType.set('direction')}
-          disabled={$currentSensor === 'fb_survey'}>
-          {#if $currentSensor === 'fb_survey'}
+          disabled={$currentSensor === 'fb-survey'}>
+          {#if $currentSensor === 'fb-survey'}
             <span class="disabled-tooltip">Currently unavailable</span>
           {/if}
           Direction

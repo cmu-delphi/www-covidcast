@@ -106,7 +106,7 @@
   currentSensor.subscribe(s => {
     if (!$mounted) return;
     // facebook fix
-    if (s === 'fb_survey') {
+    if (s === 'fb-survey') {
       signalType.set('value');
     }
 

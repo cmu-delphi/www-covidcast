@@ -396,6 +396,7 @@
     popup = new mapboxgl.Popup({
       closeButton: false,
       closeOnClick: false,
+      className: 'map-popup',
     });
     Object.keys($levels).forEach(level => {
       map.on('mouseenter', level, onMouseEnter(level));
