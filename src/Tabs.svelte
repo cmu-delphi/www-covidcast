@@ -61,6 +61,8 @@
     /* white-space: nowrap; */
 
     transition: all 0.1s ease-in;
+
+    position: relative;
   }
 
   .buttons-group-side .button:first-child {
@@ -72,6 +74,39 @@
   .buttons-group-side .button:last-child {
     /* border-top-right-radius: 4px; */
     /* border-bottom-right-radius: 4px; */
+  }
+
+  .buttons-group-side button.button .button-tooltip {
+    visibility: hidden;
+    width: 180px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #666;
+    background-color: #fff;
+    color: #333;
+    font-weight: 400;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 5px;
+    position: absolute;
+    z-index: 1;
+    top: 150%;
+    left: 50%;
+    margin-left: -90px;
+  }
+
+  .buttons-group-side button.button .button-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #666 transparent;
+  }
+  .buttons-group-side button.button:hover .button-tooltip {
+    visibility: visible;
   }
 
   .buttons-group-side .button.selected {
@@ -104,6 +139,7 @@
             currentDataReadyOnMay.set(false);
             currentSensor.set(sensor.id);
           }}>
+          <span class="button-tooltip">{sensor.tooltipText}</span>
           {sensor.name}
         </button>
       {/each}
