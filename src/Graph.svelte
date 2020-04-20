@@ -178,14 +178,14 @@
         case "google-survey":
           title = "Percentage";
           break;
-        case 'fb-survey':
-          title = 'Percentage';
+        case "fb-survey":
+          title = "Percentage";
           break;
         case "quidel":
           title = "Percentage";
           break;
-        case 'ght':
-          title = 'Relative Frequency';
+        case "ght":
+          title = "Relative Frequency";
           break;
         case "doctor-visits":
           title = "Percentage";
@@ -223,26 +223,26 @@
 
     getChartTitle() {
       let sensor = $currentSensor;
-      let title = '';
+      let title = "";
       switch (sensor) {
         // console.log(sensorKeys['google']);
-        case sensorKeys['google']:
-          title = 'Google surveys reporting covid symptoms in the community';
+        case sensorKeys["google"]:
+          title = "Google surveys reporting covid symptoms in the community";
           break;
-        case sensorKeys['fb']:
-          title = 'Surveys via Facebook reporting covid symptoms in household';
+        case sensorKeys["fb"]:
+          title = "Surveys via Facebook reporting covid symptoms in household";
           break;
-        case sensorKeys['q']:
-          title = 'Flu tests returning negative for flu';
+        case sensorKeys["q"]:
+          title = "Flu tests returning negative for flu";
           break;
-        case sensorKeys['ght']:
-          title = 'Covid-related Google searches';
+        case sensorKeys["ght"]:
+          title = "Covid-related Google searches";
           break;
-        case sensorKeys['dr']:
-          title = 'Doctor visits with covid-like symptoms';
+        case sensorKeys["dr"]:
+          title = "Doctor visits with covid-like symptoms";
           break;
         default:
-          console.log('default');
+          console.log("default");
           break;
       }
       console.log(title);
@@ -371,14 +371,15 @@
       }).right;
       var minDate = maxDate - twoWeeks;
       minDate = new Date(minDate);
-      myData = myData.filter(it => parseTime(it['time_value']) < maxDate);
-      myData = myData.filter(it => parseTime(it['time_value']) > minDate);
+      myData = myData.filter(it => parseTime(it["time_value"]) < maxDate);
+      myData = myData.filter(it => parseTime(it["time_value"]) > minDate);
 
       // set x-axis ticks based off of data sparsity and format y-axis ticks
       var xTicks = myData.length;
       var formatXTicks = xTicks < 6 ? xTicks : d3.timeDay.every(3);
       var formatYTicks = this.getFormat();
 
+      let max = this.max;
       var x = d3
         .scaleTime()
         .domain(d3.extent(myData, d => parseTime(d.time_value)))
@@ -390,9 +391,11 @@
 
       // peg values to max and min if out of range
       for (var i = 0; i < myData.length; i++) {
+        myData[i].max = false;
         if (Number(myData[i].value) < this.min) {
           myData[i].value = this.min;
         } else if (Number(myData[i].value) > this.max) {
+          myData[i].max = true;
           myData[i].value = this.max;
         }
       }
@@ -431,7 +434,8 @@
           return (
             d3.timeFormat("%m/%d")(parseTime(d.time_value)) +
             ": " +
-            formatYTicks(d.value)
+            d.value.toFixed(2) +
+            "%"
           );
         });
 
@@ -445,7 +449,9 @@
         .attr("r", 4)
         .attr("cx", d => x(parseTime(d.time_value)))
         .attr("cy", d => y(+d.value))
-        .style("fill", DIRECTION_THEME.gradientMiddle)
+        .style("fill", d =>
+          d.max ? DIRECTION_THEME.gradientMax : DIRECTION_THEME.gradientMiddle
+        )
         .on("mouseover", tip.show)
         .on("mouseout", tip.hide);
 
@@ -494,8 +500,10 @@
   function calculateSD() {
     let sensor = $currentSensor;
     let sts = $stats.get(sensor);
-    var minMax = [sts.mean - 3*sts.std, sts.mean + 3*sts.std];
-    if(minMax[0] < 0) { minMax[0] = 0 };
+    var minMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
+    if (minMax[0] < 0) {
+      minMax[0] = 0;
+    }
     userCharts[currentChart].setRange(minMax[0], minMax[1]);
   }
 
@@ -510,7 +518,7 @@
   }
   .graph-description {
     text-align: center;
-    margin: 5px 0px 0px 0px;
+    margin: 5px 0px 7px 0px;
     font-size: 14px;
     font-style: italic;
   }

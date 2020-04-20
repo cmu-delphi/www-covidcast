@@ -73,12 +73,15 @@
   }
 
   function updateTimeSliceCache(sensor, level, region) {
+    console.log(region);
+    console.log($mounted);
     if (!$mounted) return;
     if (!region) {
       regionData.set([]);
       return;
     }
     let cacheEntry = $timeSliceCache.get(sensor + level + region);
+    console.log(cacheEntry);
     if (!cacheEntry) {
       let q =
         ENDPOINT +
