@@ -128,5 +128,51 @@ button.mapboxgl-popup-close-button {
 
 input:focus,
 button:focus {
-  outline: black 2px solid !important;
+  outline: #666 2px solid !important;
+}
+
+.map-popup .mapboxgl-popup-content {
+  background-color: #fff;
+  padding: 5px 5px;
+  color: #333;
+  border-color: #666;
+  border-style: solid;
+  border-radius: 4px;
+  border-width: 1px;
+}
+.map-popup .mapboxgl-popup-tip {
+  border-width: 4px;
+  border-top-color: #666;
+}
+
+.d3-tip {
+  background-color: #fff;
+  padding: 5px 5px;
+  color: #333;
+  border-color: #666;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 99999;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: #666;
+  content: '\25BC';
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips specifically */
+.d3-tip.n:after {
+  margin: 0 0 0 0;
+  top: 100%;
+  left: 0;
 }
