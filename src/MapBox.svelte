@@ -1,5 +1,7 @@
 <script>
   import { onMount } from 'svelte';
+  import colorParse from 'color-parse';
+  import invertColor from 'invert-color';
   import debounce from 'lodash/debounce';
   import mapboxgl from 'mapbox-gl';
   import {
@@ -30,6 +32,13 @@
   let popup;
   let hoveredId;
   let clickedId;
+
+  /*
+  bgColor:string - 'rgb(xx,yy,zz)'
+*/
+  function getTextColorBasedOnBackground(bgColor) {
+    return invertColor(colorParse(bgColor).values, true);
+  }
 
   onMount(_ => {
     let containerWidth = container.clientWidth;
@@ -67,7 +76,60 @@
     map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
 
     // popup
-    var title = e.features[0].properties.NAME;
+    console.log(e.features[0]);
+    // var title = e.features[0].properties.NAME;
+    const { value, direction, NAME } = e.features[0].properties;
+    const fillColor = e.features[0].layer.paint['fill-color'].toString();
+    var title = `
+      <div class="map-popup-region-name">
+      ${NAME} ${$currentLevel === 'county' ? 'County' : ''}
+      </div>
+      <div class="map-popup-region-value-container">
+        ${
+          $signalType === 'value'
+            ? $currentSensor !== 'ght'
+              ? 'Percentage: <span class="map-popup-region-value" style="background-color: ' +
+                fillColor +
+                '; color: ' +
+                getTextColorBasedOnBackground(fillColor) +
+                ';">' +
+                value.toFixed(2) +
+                '%</span>'
+              : 'Relative Frequency: <span class="map-popup-region-value" style="background-color: ' +
+                fillColor +
+                '; color: ' +
+                getTextColorBasedOnBackground(fillColor) +
+                ';">' +
+                value.toFixed(2) +
+                '</span>'
+            : ''
+        }
+        ${
+          $signalType === 'direction'
+            ? 'Direction: ' +
+              (direction === 1
+                ? '<span class="map-popup-region-value" style="background-color: ' +
+                  DIRECTION_THEME.increasing +
+                  '; color: ' +
+                  getTextColorBasedOnBackground(DIRECTION_THEME.increasing) +
+                  '">&#8599; Increasing</span>'
+                : direction === -1
+                ? '<span class="map-popup-region-value" style="background-color: ' +
+                  DIRECTION_THEME.decreasing +
+                  '; color: ' +
+                  getTextColorBasedOnBackground(DIRECTION_THEME.decreasing) +
+                  '">&#8600; Decreasing</span>'
+                : direction === 0
+                ? '<span class="map-popup-region-value" style="background-color: ' +
+                  DIRECTION_THEME.steady +
+                  '; color: ' +
+                  getTextColorBasedOnBackground(DIRECTION_THEME.steady) +
+                  '">&#8594; Steady</span>'
+                : '<span class="map-popup-region-value">n/a</span>')
+            : ''
+        }
+      </div>
+    `;
     popup.setLngLat(e.lngLat).setHTML(title);
   };
   const onMouseLeave = level => e => {

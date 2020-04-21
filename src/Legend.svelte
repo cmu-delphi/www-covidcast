@@ -96,7 +96,7 @@
       Decreasing
     </p>
   {:else}
-    <p>{high}</p>
+    <p>{high}+</p>
     <div
       class="legend-bar"
       style="background: linear-gradient(to top, {DIRECTION_THEME.gradientMin}, {DIRECTION_THEME.gradientMiddle}, {DIRECTION_THEME.gradientMax})" />

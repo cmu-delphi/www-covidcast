@@ -1,6 +1,6 @@
-const color_low = "rgb(255, 237, 160)";
-const color_medium = "rgb(252, 78, 42)";
-const color_high = "rgb(128, 0, 0)";
+const color_low = 'rgb(255, 237, 160)';
+const color_medium = 'rgb(253, 96, 65)';
+const color_high = 'rgb(128, 0, 0)';
 
 export const DIRECTION_THEME = {
   decreasing: color_low,
@@ -13,9 +13,9 @@ export const DIRECTION_THEME = {
 };
 
 export const MAP_THEME = {
-  selectedRegionOutline: "#000000",
-  hoverRegionOutline: "#ffffff",
-  stateOutline: "#bcbcbc",
-  countyFill: "#e4dac4",
-  countyOutline: "#e0e0e0",
+  selectedRegionOutline: '#000000',
+  hoverRegionOutline: '#ffffff',
+  stateOutline: '#bcbcbc',
+  countyFill: '#e4dac4',
+  countyOutline: '#e0e0e0',
 };
