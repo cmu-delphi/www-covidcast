@@ -179,7 +179,7 @@
   });
   currentLevel.subscribe(_ => {
     try {
-      console.log('currentLevel');
+      // console.log('currentLevel');
       updateMap('data');
     } catch (err) {
       ////console.log(err);
@@ -204,7 +204,7 @@
   });
   signalType.subscribe(_ => {
     try {
-      console.log('signal');
+      // console.log('signal');
       updateMap('signal');
     } catch (err) {
       ////console.log(err);
@@ -221,23 +221,19 @@
 
   function updateMap(type) {
     if (!mapMounted) return;
-    // console.log(type);
-    window.performance.mark('update-map-start');
+
     Object.keys($levels).forEach(level => map && map.removeFeatureState({ source: level }));
 
-    if (type === 'data') {
-      map.getLayer($currentLevel) && map.removeLayer($currentLevel);
-    }
+    // if (type === 'data') {
+    //   map.getLayer($currentLevel) && map.removeLayer($currentLevel);
+    // }
 
     let thisMeta = $metaData.find(d => d.data_source === $currentSensor && d.geo_type === $currentLevel);
     let sts = $stats.get($currentSensor);
     let valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
-    // ////console.log(thisMeta);
 
-    // let valueMinMax = [thisMeta.min_value, thisMeta.max_value];
     let valueMappedVals = new Map();
     let directionMappedVals = new Map();
-
     let geoIds = new Set(
       $currentData.map(d => {
         const key = d.geo_value.toUpperCase();
@@ -280,8 +276,7 @@
     } else {
       stops = [[-1, DIRECTION_THEME.decreasing], [0, DIRECTION_THEME.steady], [1, DIRECTION_THEME.increasing]];
     }
-    ////console.log('data update');
-    ////console.log(dat);
+
     if (['data', 'init'].includes(type)) {
       map.getSource($currentLevel).setData(dat);
     }
@@ -294,23 +289,6 @@
             stops: stops,
           });
           map.setLayoutProperty(name, 'visibility', 'visible');
-        } else {
-          map.addLayer(
-            {
-              id: $currentLevel,
-              source: $currentLevel,
-              type: 'fill',
-              filter: ['!=', $signalType, -100],
-              paint: {
-                'fill-outline-color': '#616161',
-                'fill-color': {
-                  property: $signalType,
-                  stops: stops,
-                },
-              },
-            },
-            `${$currentLevel}-hover`,
-          );
         }
       } else {
         map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none');
@@ -366,32 +344,6 @@
       }
     }
 
-    // if (
-    //   chosenRandom === false &&
-    //   $mounted &&
-    //   dat.features.filter(f => f.properties[$signalType] !== -100).length > 0
-    // ) {
-    //   const viableFeatures = dat.features.filter(
-    //     f => f.properties[$signalType] !== -100
-    //   );
-
-    //   const index = Math.floor(Math.random() * (viableFeatures.length - 1));
-    //   ////console.log(dat.features);
-    //   ////console.log(viableFeatures, viableFeatures.length, index);
-    //   const randomFeature = viableFeatures[index];
-    //   ////console.log(randomFeature);
-    //   ////console.log(randomFeature.properties.NAME);
-    //   currentRegionName.set(randomFeature.properties.NAME);
-    //   currentRegion.set(randomFeature.properties.id);
-    //   clickedId = randomFeature.id;
-    //   map.setFeatureState(
-    //     { source: $currentLevel, id: clickedId },
-    //     { select: true }
-    //   );
-    //   chosenRandom = true;
-    // }
-
-    // currentDataReadyOnMay.set(true);
     window.performance.measure('update-map', 'update-map-start');
   }
 
@@ -406,38 +358,6 @@
     })
       .addControl(new mapboxgl.AttributionControl({ compact: true }))
       .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
-
-    map.on('data', ev => {
-      if (ev.dataType === 'source') {
-        if (ev.coord && ev.coord.key) {
-          if (ev.isSourceLoaded) {
-            window.performance.measure(`Load ${ev.coord.key}`, `Start Load ${ev.coord.key}`);
-          } else {
-            window.performance.mark(`Start Load ${ev.coord.key}`);
-          }
-        } else {
-          window.performance.measure(`Load Data`, `Start Load Data`);
-        }
-      } else {
-        // ////console.log(ev);
-      }
-    });
-
-    map.on('dataloading', ev => {
-      if (ev.dataType === 'source') {
-        if (ev.coord && ev.coord.key) {
-          if (ev.isSourceLoaded) {
-            window.performance.measure(`Load ${ev.coord.key}`, `Start Load ${ev.coord.key}`);
-          } else {
-            window.performance.mark(`Start Load ${ev.coord.key}`);
-          }
-        } else {
-          window.performance.mark(`Start Load Data`);
-        }
-      } else {
-        // ////console.log(ev);
-      }
-    });
 
     map.on(
       'render',
@@ -476,6 +396,7 @@
           ],
         },
       });
+
       map.addLayer({
         id: 'county-outline',
         source: 'county-outline',
@@ -553,6 +474,23 @@
           'text-halo-color': '#fff',
           'text-halo-width': 2,
         },
+      });
+
+      Object.keys($levels).forEach(name => {
+        map.addLayer(
+          {
+            id: name,
+            source: name,
+            type: 'fill',
+            visibility: 'none',
+            filter: ['!=', $signalType, -100],
+            paint: {
+              'fill-outline-color': '#616161',
+              'fill-color': MAP_THEME.countyFill,
+            },
+          },
+          `${name}-hover`,
+        );
       });
 
       mapMounted = true;
