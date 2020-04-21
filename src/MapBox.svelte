@@ -517,7 +517,7 @@
     position: relative;
     width: 29px;
     height: 29px;
-    color: #3a3a3a;
+    color: #333;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -526,7 +526,6 @@
     box-sizing: content-box;
     background-color: white;
     border: 1px solid #d5d5d5;
-    border-radius: 4px;
     text-align: center;
     font-family: 'FranklinITCProBold', Helvetica, Arial, sans-serif;
     line-height: 16px;
