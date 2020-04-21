@@ -119,13 +119,13 @@
     let l = $currentLevel;
     let minDate = $times.get(s)[0],
       maxDate = $times.get(s)[1];
-    console.log(minDate, maxDate);
+    // console.log(minDate, maxDate);
     let date = maxDate;
     if ($currentDate >= minDate && $currentDate <= maxDate) {
       // data available at current date
       date = $currentDate;
     }
-    console.log(date);
+    // console.log(date);
 
     if (!$sensors.find(d => d.id === s).levels.includes($currentLevel)) {
       //console.log('update?');

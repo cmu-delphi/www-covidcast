@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { currentDate, times, currentSensor, currentDataReadyOnMay } from './stores.js';
+  import { currentDate, times, currentSensor, currentDataReadyOnMay, timeRangeOnSlider } from './stores.js';
   import * as d3 from 'd3';
 
   let timeSliderPaddingLeft;
@@ -70,7 +70,7 @@
       parseTime($currentDate).getTime() >= rectifiedMin &&
       parseTime($currentDate).getTime() <= rectifiedMax
     ) {
-      console.log('fine not to change slider range');
+      // console.log('fine not to change slider range');
     } else {
       // reset range
       // console.log('reset range');
@@ -104,6 +104,10 @@
       timeSliderPaddingRight.setAttribute('style', `width: ${Math.round(rightPercentage * sliderTotalLength) + 'px'}`);
       timeSlider.setAttribute('min', dataRangeMin);
       timeSlider.setAttribute('max', dataRangeMax);
+      timeRangeOnSlider.set({
+        min: +calculateValFromRectified(dataRangeMin),
+        max: +calculateValFromRectified(dataRangeMax),
+      });
       canLoadMore = false;
     } else if (dataRangeMax <= rectifiedMax && dataRangeMin <= rectifiedMin) {
       /**
@@ -120,6 +124,10 @@
       timeSliderPaddingRight.setAttribute('style', `width: ${Math.round(rightPercentage * sliderTotalLength) + 'px'}`);
       timeSlider.setAttribute('min', rectifiedMin);
       timeSlider.setAttribute('max', dataRangeMax);
+      timeRangeOnSlider.set({
+        min: +calculateValFromRectified(rectifiedMin),
+        max: +calculateValFromRectified(dataRangeMax),
+      });
       canLoadMore = true;
     } else if (dataRangeMax >= rectifiedMax && dataRangeMin >= rectifiedMin) {
       /**
@@ -136,6 +144,10 @@
       timeSliderPaddingRight.setAttribute('style', `width: ${Math.round(rightPercentage * sliderTotalLength) + 'px'}`);
       timeSlider.setAttribute('min', dataRangeMin);
       timeSlider.setAttribute('max', rectifiedMax);
+      timeRangeOnSlider.set({
+        min: +calculateValFromRectified(dataRangeMin),
+        max: +calculateValFromRectified(rectifiedMax),
+      });
       canLoadMore = false;
     } else if (dataRangeMax >= rectifiedMax && dataRangeMin <= rectifiedMin) {
       /**
@@ -152,6 +164,10 @@
       timeSliderPaddingRight.setAttribute('style', `width: ${Math.round(rightPercentage * sliderTotalLength) + 'px'}`);
       timeSlider.setAttribute('min', rectifiedMin);
       timeSlider.setAttribute('max', rectifiedMax);
+      timeRangeOnSlider.set({
+        min: +calculateValFromRectified(rectifiedMin),
+        max: +calculateValFromRectified(rectifiedMax),
+      });
       canLoadMore = true;
     }
 
