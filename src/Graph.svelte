@@ -23,13 +23,6 @@
   let w;
   let t;
 
-  // the $ syntax just says, if w is changed, run drawGraph() - e.g. redraw the graph when the window is resized.
-  // $: w, drawGraph();
-
-  // This subscribes to sample data to redraw the graph every time the data changes.
-  // todo: fix current region subscription
-  // currentRegion.subscribe(_ => updateGraph());
-
   // local variables for permissible graph types
   const barChart = 'Bar_Chart';
   const lineGraph = 'Line_Graph';
@@ -116,20 +109,7 @@
   // parse data
   function parseData(clickedData) {
     let data = clickedData;
-    // let region = $currentRegion;
 
-    // search for the ID
-    // let re = new RegExp('US[0-9]+');
-    // let geo = region.match(re);
-    // ////console.log('region data: ' + geo);
-    // ////console.log('data: ' + data);
-    // for (var i = 0; i < data.length; i++) {
-    //   ////console.log(data[i].time_value);
-    // }
-
-    // todo: finish parsing data
-
-    // todo: determine chart type based on data
     var dataRange = userCharts[currentChart].getRange();
     var n = userCharts[currentChart].getN();
     var cType = lineGraph;
@@ -426,6 +406,10 @@
       }
       ////console.log(chartMax);
       ////console.log(myData);
+
+      if (chartMax > 100 && $currentSensor !== 'ght') {
+        chartMax = 100;
+      }
 
       var x = d3
         .scaleTime()
