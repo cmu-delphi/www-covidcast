@@ -499,11 +499,12 @@
     width: 100%;
     height: 90vh;
     position: relative;
+    min-height: 550px;
   }
 
   .state-buttons-holder {
     position: absolute;
-    top: 92px;
+    top: 79px;
     right: 9px;
     z-index: 100;
   }

@@ -131,3 +131,7 @@ button.mapboxgl-popup-close-button {
   padding: 5px;
   cursor: pointer;
 }
+
+.mapboxgl-canvas {
+  min-height: 550px;
+}
