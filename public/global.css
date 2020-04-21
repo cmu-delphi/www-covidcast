@@ -1,43 +1,12 @@
 :root {
-  --red: #c41230;
-  --red-alpha: rgba(187, 0, 0, 0.8);
-  --grey: rgba(0, 0, 0, 0.7);
-}
-
-/* h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p {
-  margin: 0px;
-} */
-
-.cmu-red {
-  color: #b00;
-}
-
-.cmu-steel-grey {
-  color: #e0e0e0;
-}
-
-.cmu-iron-gray {
-  color: #666;
-}
-
-.cmu-black {
-  color: 000000;
-}
-
-html,
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Open Sans', sans-serif;
+  --red: #c00;
+  --grey: #767676;
 }
 
 #vizbox {
+  margin: 0;
+  padding: 0;
+  font-family: 'Open Sans', sans-serif;
   position: relative;
   width: 100%;
   height: 90vh;
@@ -56,7 +25,6 @@ body {
   font-size: 16px;
   color: var(--grey);
   font-style: italic;
-  font-weight: 300;
 }
 
 .block {
@@ -66,34 +34,6 @@ body {
 .background {
   fill: none;
   pointer-events: all;
-}
-
-#states {
-  fill: #aaa;
-}
-
-#states .active {
-  display: none;
-}
-
-#state-borders {
-  fill: none;
-  stroke: #fff;
-  stroke-width: 1.5px;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-  pointer-events: none;
-}
-
-.county-boundary {
-  fill: #aaa;
-  stroke: #fff;
-  stroke-width: 0.5px;
-}
-
-.county-boundary:hover,
-.state:hover {
-  fill: var(--red);
 }
 
 .line {
@@ -118,7 +58,7 @@ button.mapboxgl-ctrl-zoom-out {
 
 button.mapboxgl-popup-close-button {
   padding: 2px;
-  color: #666;
+  color: var(--grey);
 }
 
 .tooltip-text {
@@ -126,32 +66,34 @@ button.mapboxgl-popup-close-button {
   margin: 0px;
 }
 
-input:focus,
-button:focus {
-  /* outline: var(--red-alpha) 1px solid !important; */
-  box-shadow: 0 0 2px 2px #0096ff !important;
+#vizbox input:focus,
+#vizbox button:focus {
+  outline: var(--red) 1px solid !important;
+  box-shadow: 0 0 0 4px #fff !important;
+  border: solid 1px var(--red) !important;
   z-index: 10000;
 }
 
 .map-popup .mapboxgl-popup-content {
   background-color: #fff;
   padding: 5px 5px;
-  color: #333;
-  border-color: #666;
+  color: var(--grey);
+  border-color: var(--grey);
   border-style: solid;
   border-radius: 4px;
   border-width: 1px;
 }
+
 .map-popup .mapboxgl-popup-tip {
   border-width: 4px;
-  border-top-color: #666;
+  border-top-color: var(--grey);
 }
 
 .d3-tip {
   background-color: #fff;
   padding: 5px 5px;
-  color: #333;
-  border-color: #666;
+  color: var(--grey);
+  border-color: var(--grey);
   border-style: solid;
   border-width: 1px;
   border-radius: 4px;
@@ -160,21 +102,36 @@ button:focus {
 }
 
 /* Creates a small triangle extender for the tooltip */
-.d3-tip:after {
+.d3-tip::after {
   box-sizing: border-box;
   display: inline;
   font-size: 10px;
   width: 100%;
   line-height: 1;
-  color: #666;
+  color: var(--grey);
   content: '\25BC';
   position: absolute;
   text-align: center;
 }
 
 /* Style northward tooltips specifically */
-.d3-tip.n:after {
-  margin: 0 0 0 0;
+.d3-tip.n::after {
+  margin: 0;
   top: 100%;
   left: 0;
+}
+
+.mapboxgl-ctrl-group,
+.mapboxgl-ctrl-group button:focus,
+.mapboxgl-ctrl-group button:focus:first-child {
+  border-radius: 0;
+}
+
+#vizbox circle {
+  padding: 5px;
+  cursor: pointer;
+}
+
+.mapboxgl-canvas {
+  min-height: 550px;
 }

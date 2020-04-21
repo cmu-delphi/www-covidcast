@@ -31,13 +31,9 @@
     /* border-radius: 8px; */
     padding: 10px 10px;
     box-sizing: border-box;
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.9);
     transition: all 0.1s ease-in;
     height: 100%;
-  }
-
-  .legend:hover {
-    background-color: rgba(255, 255, 255, 0.9);
   }
 
   .legend.value {

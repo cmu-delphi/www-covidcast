@@ -227,7 +227,7 @@
     left: 10px;
     z-index: 1000;
     /* width: 220px; */
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.9);
     /* border-radius: 8px; */
     padding: 10px 10px;
     box-sizing: border-box;
@@ -245,7 +245,7 @@
     right: 50px;
     z-index: 1000;
     /* max-width: 750px; */
-    /* background-color: rgba(255, 255, 255, 0.7); */
+    /* background-color: rgba(255, 255, 255, 0.9); */
     /* border-radius: 8px; */
     /* padding: 10px 10px; */
     box-sizing: border-box;
@@ -262,10 +262,10 @@
 
   .legend-container {
     position: absolute;
-    top: 240px;
+    top: 204px;
     left: 10px;
     z-index: 1000;
-    /* background-color: rgba(255, 255, 255, 0.7); */
+    /* background-color: rgba(255, 255, 255, 0.9); */
 
     display: flex;
     flex-direction: column;
@@ -279,14 +279,14 @@
 
   .graph-container {
     position: absolute;
-    bottom: 2vh;
-    right: 2vh;
+    bottom: 10px;
+    right: 10px;
     z-index: 1001;
     max-width: 400px;
     width: 400px;
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.9);
     /* border-radius: 1rem; */
-    padding: 10px 15px;
+    padding: 6px 13px 0;
     box-sizing: border-box;
 
     transition: all 0.1s ease-in;
@@ -297,7 +297,7 @@
     bottom: 10px;
     left: 10px;
     z-index: 1002;
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.9);
     /* border-radius: 8px; */
     padding: 30px 10px;
     box-sizing: border-box;
@@ -305,16 +305,6 @@
 
     transition: all 0.1s ease-in;
   }
-
-  .options-container:hover {
-    background-color: rgba(255, 255, 255, 0.9);
-  }
-
-  /* .options-container:hover,
-  .time-container:hover,
-  .graph-container:hover {
-    background-color: rgba(255, 255, 255, 0.9);
-  }  */
 
   .error-message-container {
     position: absolute;
