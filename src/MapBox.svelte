@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import debounce from 'lodash/debounce';
   import mapboxgl from 'mapbox-gl';
   import {
     levels,
@@ -318,7 +319,7 @@
     //   chosenRandom = true;
     // }
 
-    currentDataReadyOnMay.set(true);
+    // currentDataReadyOnMay.set(true);
     window.performance.measure('update-map', 'update-map-start');
   }
 
@@ -349,6 +350,7 @@
         // ////console.log(ev);
       }
     });
+
     map.on('dataloading', ev => {
       if (ev.dataType === 'source') {
         if (ev.coord && ev.coord.key) {
@@ -364,6 +366,13 @@
         // ////console.log(ev);
       }
     });
+
+    map.on(
+      'render',
+      debounce(ev => {
+        currentDataReadyOnMay.set(true);
+      }, 150),
+    );
 
     //Disable touch zoom, it makes gesture scrolling difficult
     map.scrollZoom.disable();

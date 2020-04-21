@@ -1,5 +1,5 @@
 <script>
-  import { sensors, currentSensor, levels, currentLevel, signalType } from './stores.js';
+  import { sensors, currentSensor, levels, currentLevel, signalType, currentDataReadyOnMay } from './stores.js';
 
   let hide = false;
 
@@ -287,7 +287,10 @@
           <button
             aria-selected={$currentLevel === level ? 'true' : 'false'}
             class="button {$currentLevel === level ? 'selected' : ''}"
-            on:click={() => currentLevel.set(level)}
+            on:click={() => {
+              currentDataReadyOnMay.set(false);
+              currentLevel.set(level);
+            }}
             disabled={$sensors.find(d => d.id === $currentSensor).levels.includes(level) === false}>
             {#if $sensors.find(d => d.id === $currentSensor).levels.includes(level) === false}
               <span class="disabled-tooltip">Currently unavailable</span>
