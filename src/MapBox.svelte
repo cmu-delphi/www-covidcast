@@ -343,7 +343,6 @@
         ////console.log('no current region');
       }
     }
-
   }
 
   function initializeMap() {
