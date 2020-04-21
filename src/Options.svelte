@@ -314,13 +314,19 @@
         <button
           aria-selected={$signalType === 'value' ? 'true' : 'false'}
           class="button {$signalType === 'value' ? 'selected' : ''}"
-          on:click={() => signalType.set('value')}>
+          on:click={() => {
+            currentDataReadyOnMay.set(false);
+            signalType.set('value');
+          }}>
           Intensity
         </button>
         <button
           aria-selected={$signalType === 'direction' ? 'true' : 'false'}
           class="button {$signalType === 'direction' ? 'selected' : ''}"
-          on:click={() => signalType.set('direction')}>
+          on:click={() => {
+            currentDataReadyOnMay.set(false);
+            signalType.set('direction');
+          }}>
           Direction
         </button>
 

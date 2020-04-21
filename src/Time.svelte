@@ -295,6 +295,7 @@
     border: 0;
   }
 
+  /* Special styling for WebKit/Blink */
   .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
@@ -305,7 +306,17 @@
     cursor: pointer;
   }
 
+  /* All the same stuff for Firefox */
   .slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--red);
+    cursor: pointer;
+  }
+
+  /* All the same stuff for IE */
+  .slider::-ms-thumb {
     width: 20px;
     height: 20px;
     border-radius: 50%;
