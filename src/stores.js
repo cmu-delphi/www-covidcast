@@ -19,7 +19,7 @@ export const sensors = readable([
     name: 'Surveys (Facebook)',
     id: 'fb-survey',
     tooltipText: 'CMU symptom surveys offered via Facebook - thank you Facebook!',
-    signal: 'cli',
+    signal: 'scli',
     levels: ['county', 'msa', 'state'],
     mean: 0.8079823818179086,
     std: 0.562744728536263,

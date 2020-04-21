@@ -113,6 +113,11 @@
 
     let l = $currentLevel;
     let date = $times.get(s)[1];
+    // if ($currentDate > date[0] && $currentDate < date[1]) {
+    //   date = $currentDate;
+    // } else {
+    //   date = date[1];
+    // }
 
     if (!$sensors.find(d => d.id === s).levels.includes($currentLevel)) {
       //console.log('update?');
@@ -163,7 +168,7 @@
     fetch(ENDPOINT_META)
       .then(d => d.json())
       .then(meta => {
-        //console.log(meta.epidata);
+        console.log(meta.epidata);
         let timeMap = new Map();
         let statsMap = new Map();
         $sensors.forEach(s => {

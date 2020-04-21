@@ -161,19 +161,14 @@
   };
 
   // If it hasn't been initialized and we have geojsons and initial data, create map.
-  $: if (
-    !map &&
-    $geojsons.size !== 0 &&
-    //  && $currentData.length !== 0
-    $metaData.length !== 0 &&
-    $stats
-  ) {
+  $: if (!map && $geojsons.size !== 0 && $metaData.length !== 0 && $stats) {
     initializeMap();
   }
 
   // Update the map when sensor or level changes.
   currentData.subscribe(_ => {
     try {
+      // console.log('currentData');
       updateMap('data');
     } catch (err) {
       ////console.log(err);
@@ -181,6 +176,7 @@
   });
   currentLevel.subscribe(_ => {
     try {
+      // console.log('currentLevel');
       updateMap('data');
     } catch (err) {
       ////console.log(err);
@@ -188,6 +184,7 @@
   });
   currentDate.subscribe(_ => {
     try {
+      // console.log('currentDate');
       updateMap('data');
     } catch (err) {
       ////console.log(err);
@@ -211,6 +208,7 @@
 
   function updateMap(type) {
     if (!mapMounted) return;
+    // console.log(type);
     window.performance.mark('update-map-start');
     Object.keys($levels).forEach(level => map && map.removeFeatureState({ source: level }));
 
@@ -250,10 +248,10 @@
 
       d.properties.value = -100;
       d.properties.direction = -100;
-      if (geoIds.has(id) && valueMappedVals.get(id) !== null) {
+      if (geoIds.has(id) && valueMappedVals.get(id) !== undefined) {
         d.properties.value = valueMappedVals.get(id);
       }
-      if (geoIds.has(id) && directionMappedVals.get(id) !== null) {
+      if (geoIds.has(id) && directionMappedVals.get(id) !== undefined) {
         d.properties.direction = directionMappedVals.get(id);
       }
     });

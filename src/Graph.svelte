@@ -247,7 +247,7 @@
           title = 'Google surveys reporting COVID symptoms in the community';
           break;
         case sensorKeys['fb']:
-          title = 'Surveys via Facebook reporting COVID symptoms in household';
+          title = 'Facebook surveys reporting COVID symptoms';
           break;
         case sensorKeys['q']:
           title = 'Flu tests returning negative for flu';
@@ -311,8 +311,8 @@
       svg
         .append('g')
         .attr('transform', 'translate(0,' + height + ')')
-        .call(d3.axisBottom(this.x).tickFormat('%m %d'));
-      svg.append('g').call(d3.axisLeft(this.y));
+        .call(d3.axisBottom(this.x).tickFormat(''));
+      svg.append('g').call(d3.axisLeft(this.y).tickFormat(''));
     }
 
     updateChart() {}
@@ -464,7 +464,8 @@
         .attr('r', 4)
         .attr('cx', d => x(parseTime(d.time_value)))
         .attr('cy', d => y(+d.value))
-        .style('fill', d => (d.max ? DIRECTION_THEME.gradientMax : DIRECTION_THEME.gradientMiddle))
+        .style('fill', DIRECTION_THEME.gradientMiddle)
+        // .style('fill', d => (d.max ? DIRECTION_THEME.gradientMax : DIRECTION_THEME.gradientMiddle))
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
 
