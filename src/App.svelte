@@ -57,13 +57,18 @@
       fetch(q)
         .then(d => d.json())
         .then(d => {
-          //console.log(reason, q, d);
+          // console.log(reason, q, d);
           if (d.result < 0 || d.message.includes('no results')) {
             //console.log('bad api call, not updating regionSliceCache');
             currentData.set([]);
             regionSliceCache.update(m => m.set(sensor + level + date, []));
           } else {
-            currentData.set(d.epidata);
+            // attach signature
+            let { epidata } = d;
+            epidata = epidata.map(item => {
+              return { ...item, sensor, level };
+            });
+            currentData.set(epidata);
             regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
           }
         });
@@ -168,7 +173,7 @@
     fetch(ENDPOINT_META)
       .then(d => d.json())
       .then(meta => {
-        console.log(meta.epidata);
+        // console.log(meta.epidata);
         let timeMap = new Map();
         let statsMap = new Map();
         $sensors.forEach(s => {
@@ -213,7 +218,12 @@
               currentData.set([]);
               regionSliceCache.update(m => m.set($currentSensor + $currentLevel + timeMap.get($currentSensor)[1], []));
             } else {
-              currentData.set(d.epidata);
+              // attach signature
+              let { epidata } = d;
+              epidata = epidata.map(item => {
+                return { ...item, sensor: $currentSensor, level: l };
+              });
+              currentData.set(epidata);
               regionSliceCache.update(m =>
                 m.set($currentSensor + $currentLevel + timeMap.get($currentSensor)[1], d.epidata),
               );

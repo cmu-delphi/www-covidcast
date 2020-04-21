@@ -61,6 +61,7 @@
     updateSliderUI();
 
     currentDate.set(max);
+    console.log('set to max');
   }
 
   function updateSliderUI() {

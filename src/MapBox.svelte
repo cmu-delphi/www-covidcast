@@ -169,6 +169,9 @@
   currentData.subscribe(_ => {
     try {
       // console.log('currentData');
+      // console.log($currentDate, $currentSensor, $currentLevel);
+      // console.log(_);
+      // console.log('updating map due to currentData change');
       updateMap('data');
     } catch (err) {
       ////console.log(err);
@@ -176,7 +179,7 @@
   });
   currentLevel.subscribe(_ => {
     try {
-      // console.log('currentLevel');
+      console.log('currentLevel');
       updateMap('data');
     } catch (err) {
       ////console.log(err);
@@ -185,6 +188,15 @@
   currentDate.subscribe(_ => {
     try {
       // console.log('currentDate');
+      // console.log($currentDate, $currentSensor, $currentLevel);
+      // console.log($currentData);
+      if (
+        $currentData.length > 0 &&
+        ($currentData[0].sensor !== $currentSensor || $currentData[0].level !== $currentLevel)
+      ) {
+        return;
+      }
+      // console.log('updating map due to currentDate change');
       updateMap('data');
     } catch (err) {
       ////console.log(err);
@@ -192,6 +204,7 @@
   });
   signalType.subscribe(_ => {
     try {
+      console.log('signal');
       updateMap('signal');
     } catch (err) {
       ////console.log(err);
