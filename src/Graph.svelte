@@ -543,7 +543,10 @@
 </style>
 
 <h5 bind:this={t} class="graph-title" />
-<p class="graph-description">{$currentRegionName} {$currentRegionName && $currentLevel === 'county' ? 'County' : ''}</p>
+<p class="graph-description">
+  {$currentRegionName} {$currentRegionName && $currentLevel === 'county' ? 'County' : ''}
+  {$currentLevel === 'msa' ? 'Metro Area' : ''}
+</p>
 
 <div bind:clientWidth={w}>
   <div bind:this={el} />

@@ -81,7 +81,7 @@
     const fillColor = e.features[0].layer.paint['fill-color'].toString();
     var title = `
       <div class="map-popup-region-name">
-      ${NAME} ${$currentLevel === 'county' ? 'County' : ''}
+      ${NAME} ${$currentLevel === 'county' ? 'County' : ''} ${$currentLevel === 'msa' ? 'Metro Area' : ''}
       </div>
       <div class="map-popup-region-value-container">
         ${
