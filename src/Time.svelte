@@ -137,8 +137,8 @@
     return year + month + date;
   }
 
-  function sliderOnMouseUp() {
-    window.performance.mark('start sliderOnMouseUp');
+  function sliderOnChange() {
+    window.performance.mark('start sliderOnChange');
     // only update currentDataReadyOnMay when the date actually changed
     currentDate.update(d => {
       let newDate = calculateValFromRectified(rectifiedVal);
@@ -147,7 +147,7 @@
       }
       return newDate;
     });
-    window.performance.measure('sliderOnMouseUp', 'start sliderOnMouseUp');
+    window.performance.measure('sliderOnChange', 'start sliderOnChange');
   }
 
   function loadMoreDataRange() {
@@ -375,8 +375,9 @@
     max={rectifiedMax}
     step={86400000}
     aria-label={formatTimeWithoutYear(new Date(rectifiedVal))}
-    on:mouseup={sliderOnMouseUp}
-    on:keyup={sliderOnMouseUp}
+    on:mouseup={sliderOnChange}
+    on:touchend={sliderOnChange}
+    on:keyup={sliderOnChange}
     class="slider"
     bind:value={rectifiedVal} />
   <div id="timeSliderPaddingRight" bind:this={timeSliderPaddingRight} />
