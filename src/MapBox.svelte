@@ -344,7 +344,6 @@
       }
     }
 
-    window.performance.measure('update-map', 'update-map-start');
   }
 
   function initializeMap() {
