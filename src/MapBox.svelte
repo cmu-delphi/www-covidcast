@@ -76,7 +76,6 @@
     map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
 
     // popup
-    console.log(e.features[0]);
     // var title = e.features[0].properties.NAME;
     const { value, direction, NAME } = e.features[0].properties;
     const fillColor = e.features[0].layer.paint['fill-color'].toString();
