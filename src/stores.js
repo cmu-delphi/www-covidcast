@@ -9,7 +9,7 @@ export const sensors = readable([
   {
     name: 'Doctor Visits',
     id: 'doctor-visits',
-    tooltipText: "Doctor's visits due to COVID-like symptoms",
+    tooltipText: 'Doctor’s visits due to covid-like symptoms',
     signal: 'cli',
     levels: ['county', 'msa', 'state'],
     mean: 0.4394626779949559,
@@ -18,17 +18,17 @@ export const sensors = readable([
   {
     name: 'Surveys (Facebook)',
     id: 'fb-survey',
-    tooltipText: 'CMU symptom surveys offered via Facebook - Thank you Facebook!',
-    signal: 'cli',
-    levels: ['county', 'msa'],
+    tooltipText: 'CMU symptom surveys offered via Facebook - thank you Facebook!',
+    signal: 'scli',
+    levels: ['county', 'msa', 'state'],
     mean: 0.8079823818179086,
     std: 0.562744728536263,
   },
   {
     name: 'Surveys (Google)',
     id: 'google-survey',
-    tooltipText: 'Symptom surveys run by Google - Thank you Google!',
-    signal: 'cli',
+    tooltipText: 'Symptom surveys run by Google - thank you Google!',
+    signal: '3cli',
     levels: ['county', 'state', 'msa'],
     mean: 0.08931870876166044,
     std: 0.026190562137119736,
@@ -36,7 +36,7 @@ export const sensors = readable([
   {
     name: 'Search Trends (Google)',
     id: 'ght',
-    tooltipText: 'COVID-related search frequency via Google Health Trends - Thank you Google!',
+    tooltipText: 'Covid-related search frequency from Google’s Health Trends team - thank you Google!',
     signal: 'smoothedsearch',
     levels: ['msa', 'state'],
     mean: 816.6838496834541,
@@ -45,7 +45,7 @@ export const sensors = readable([
   {
     name: 'Flu Tests (Quidel)',
     id: 'quidel',
-    tooltipText: 'Flu test results - Thank you Quidel!',
+    tooltipText: 'Flu results - thank you Quidel!',
     signal: 'smooth_negativeprop',
     levels: ['msa', 'state'],
     mean: 0.7633679440541352,
@@ -103,7 +103,7 @@ export const currentLevel = writable('county'); // might want to change this to 
 // Options are 'direction' and 'value'.
 export const signalType = writable('value');
 // EpiWeek in form YYYYMMDD.
-export const currentDate = writable(20200412);
+export const currentDate = writable(20200420);
 // Range of time for the map slider.
 export const currentRange = writable([0, 1]);
 // Region GEO_ID for filtering the line chart.

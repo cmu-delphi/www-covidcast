@@ -23,13 +23,6 @@
   let w;
   let t;
 
-  // the $ syntax just says, if w is changed, run drawGraph() - e.g. redraw the graph when the window is resized.
-  // $: w, drawGraph();
-
-  // This subscribes to sample data to redraw the graph every time the data changes.
-  // todo: fix current region subscription
-  // currentRegion.subscribe(_ => updateGraph());
-
   // local variables for permissible graph types
   const barChart = 'Bar_Chart';
   const lineGraph = 'Line_Graph';
@@ -50,7 +43,7 @@
     regionDataStats.subscribe(d => setChartRange(d));
     currentDate.subscribe(_ => updateGraphTimeRange());
     currentRegion.subscribe(region => {
-      console.log(region);
+      ////console.log(region);
       if (!region) {
         let chart = new Chart();
         chart.draw();
@@ -59,10 +52,10 @@
       }
     });
     currentSensor.subscribe(_ => {
-      console.log(_);
+      ////console.log(_);
       if (userCharts != undefined) {
         if (userCharts[currentChart].isChart()) {
-          console.log('is chart');
+          ////console.log('is chart');
           userCharts[currentChart].getChartTitle();
         } else {
           let chart = new Chart();
@@ -74,7 +67,7 @@
       }
     });
     // currentDataReadyOnMay.subscribe(d => setFocus());
-    // regionDataStats.subscribe(d => console.log(d));
+    // regionDataStats.subscribe(d => ////console.log(d));
   });
 
   function drawGraph() {
@@ -84,8 +77,8 @@
   }
 
   function updateGraph(data) {
-    console.log(data);
-    console.log($currentRegion);
+    ////console.log(data);
+    ////console.log($currentRegion);
     try {
       if (data.length !== 0 && $currentRegion) {
         if (userCharts != undefined) {
@@ -103,7 +96,7 @@
         }
       }
     } catch (err) {
-      console.log(err);
+      ////console.log(err);
     }
   }
 
@@ -116,20 +109,7 @@
   // parse data
   function parseData(clickedData) {
     let data = clickedData;
-    // let region = $currentRegion;
 
-    // search for the ID
-    // let re = new RegExp('US[0-9]+');
-    // let geo = region.match(re);
-    // console.log('region data: ' + geo);
-    // console.log('data: ' + data);
-    // for (var i = 0; i < data.length; i++) {
-    //   console.log(data[i].time_value);
-    // }
-
-    // todo: finish parsing data
-
-    // todo: determine chart type based on data
     var dataRange = userCharts[currentChart].getRange();
     var n = userCharts[currentChart].getN();
     var cType = lineGraph;
@@ -137,26 +117,26 @@
   }
 
   function setChartRange(data) {
-    console.log(data);
+    ////console.log(data);
     try {
       if (data) {
-        // console.log('data: ' + data);
+        // ////console.log('data: ' + data);
         let { min_value, max_value } = data;
         let { num_locations } = data;
-        // console.log(num_locations);
+        // ////console.log(num_locations);
         let stats = $regionDataStats;
-        // console.log('data: ' + data[0]);
-        // console.log('stats: ' + stats);
+        // ////console.log('data: ' + data[0]);
+        // ////console.log('stats: ' + stats);
         // let min = dataStats.min_value;
         // let max = dataStats.max_value;
-        // console.log(currentChart);
+        // ////console.log(currentChart);
         if (userCharts[currentChart] !== undefined) {
           userCharts[currentChart].setRange(min_value, max_value);
           userCharts[currentChart].setN(num_locations);
         }
       }
     } catch (error) {
-      console.log(error);
+      ////console.log(error);
     }
   }
 
@@ -204,7 +184,7 @@
       if (this.n) {
         return this.n;
       } else {
-        console.log('n: ' + this.n);
+        ////console.log('n: ' + this.n);
       }
     }
 
@@ -262,12 +242,12 @@
       let sensor = $currentSensor;
       let title = '';
       switch (sensor) {
-        // console.log(sensorKeys['google']);
+        // ////console.log(sensorKeys['google']);
         case sensorKeys['google']:
           title = 'Google surveys reporting COVID symptoms in the community';
           break;
         case sensorKeys['fb']:
-          title = 'Surveys via Facebook reporting COVID symptoms in household';
+          title = 'Facebook surveys reporting COVID symptoms';
           break;
         case sensorKeys['q']:
           title = 'Flu tests returning negative for flu';
@@ -279,10 +259,10 @@
           title = 'Doctor visits with COVID-like symptoms';
           break;
         default:
-          console.log('default');
+          ////console.log('default');
           break;
       }
-      console.log(title);
+      ////console.log(title);
       d3.select(t).html(title);
     }
 
@@ -331,8 +311,8 @@
       svg
         .append('g')
         .attr('transform', 'translate(0,' + height + ')')
-        .call(d3.axisBottom(this.x).tickFormat('%m %d'));
-      svg.append('g').call(d3.axisLeft(this.y));
+        .call(d3.axisBottom(this.x).tickFormat(''));
+      svg.append('g').call(d3.axisLeft(this.y).tickFormat(''));
     }
 
     updateChart() {}
@@ -409,7 +389,7 @@
 
       // set x-axis ticks based off of data sparsity and format y-axis ticks
       var xTicks = myData.length;
-      var formatXTicks = xTicks < 6 ? xTicks : d3.timeDay.every(3);
+      var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(3);
       var formatYTicks = this.getFormat();
 
       let chartMax = this.max;
@@ -424,8 +404,12 @@
           if (+myData[i].value > chartMax) chartMax = +myData[i].value;
         }
       }
-      console.log(chartMax);
-      console.log(myData);
+      ////console.log(chartMax);
+      ////console.log(myData);
+
+      if (chartMax > 100 && $currentSensor !== 'ght') {
+        chartMax = 100;
+      }
 
       var x = d3
         .scaleTime()
@@ -433,7 +417,7 @@
         .range([0, width]);
       var y = d3
         .scaleLinear()
-        .domain([0, chartMax])
+        .domain([this.min, chartMax])
         .range([height, 0]);
 
       svg
@@ -467,7 +451,12 @@
         .attr('class', 'd3-tip')
         .offset([-10, 0])
         .html(function(d) {
-          return d3.timeFormat('%m/%d')(parseTime(d.time_value)) + ': ' + d.value.toFixed(2) + '%';
+          return (
+            d3.timeFormat('%m/%d')(parseTime(d.time_value)) +
+            ': ' +
+            d.value.toFixed(2) +
+            ($currentSensor === 'ght' ? '' : '%')
+          );
         });
 
       svg.call(tip);
@@ -480,7 +469,8 @@
         .attr('r', 4)
         .attr('cx', d => x(parseTime(d.time_value)))
         .attr('cy', d => y(+d.value))
-        .style('fill', d => (d.max ? DIRECTION_THEME.gradientMax : DIRECTION_THEME.gradientMiddle))
+        .style('fill', DIRECTION_THEME.gradientMiddle)
+        // .style('fill', d => (d.max ? DIRECTION_THEME.gradientMax : DIRECTION_THEME.gradientMiddle))
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
 

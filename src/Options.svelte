@@ -1,5 +1,5 @@
 <script>
-  import { sensors, currentSensor, levels, currentLevel, signalType } from './stores.js';
+  import { sensors, currentSensor, levels, currentLevel, signalType, currentDataReadyOnMay } from './stores.js';
 
   let hide = false;
 
@@ -25,10 +25,6 @@
     border: 0;
 
     transition: all 0.1s ease-in;
-  }
-
-  .toggle-button:hover {
-    background-color: rgb(228, 228, 228);
   }
 
   .toggle-button-icon {
@@ -67,7 +63,7 @@
     border-color: #dbdbdb;
     border-top-color: transparent;
     border-width: 1px;
-    color: #6c757d;
+    color: #666666;
     cursor: pointer;
     justify-content: center;
     padding-bottom: calc(0.5em - 1px);
@@ -95,7 +91,7 @@
 
   .buttons-group button.button:disabled {
     background-color: rgb(211, 211, 211);
-    color: #6c757d;
+    color: #666666;
     cursor: not-allowed;
   }
 
@@ -152,7 +148,7 @@
     border-color: #dbdbdb;
     border-left-color: transparent;
     border-width: 1px;
-    color: #6c757d;
+    color: #666666;
     cursor: pointer;
     justify-content: center;
     padding-bottom: calc(0.5em - 1px);
@@ -169,7 +165,7 @@
 
   .buttons-group-side button.button:disabled {
     background-color: rgb(211, 211, 211);
-    color: #6c757d;
+    color: #666666;
     cursor: not-allowed;
   }
 
@@ -221,7 +217,7 @@
 
   .buttons-group .button.selected,
   .buttons-group-side .button.selected {
-    background-color: rgb(108, 117, 125);
+    background-color: #767676;
     /* border-color: transparent; */
     color: #fff;
     font-weight: 600;
@@ -229,7 +225,7 @@
 
   .buttons-group .button:hover,
   .buttons-group-side .button:hover {
-    background-color: #5a6268;
+    background-color: #666666;
     color: #fff;
   }
 
@@ -287,7 +283,10 @@
           <button
             aria-selected={$currentLevel === level ? 'true' : 'false'}
             class="button {$currentLevel === level ? 'selected' : ''}"
-            on:click={() => currentLevel.set(level)}
+            on:click={() => {
+              currentDataReadyOnMay.set(false);
+              currentLevel.set(level);
+            }}
             disabled={$sensors.find(d => d.id === $currentSensor).levels.includes(level) === false}>
             {#if $sensors.find(d => d.id === $currentSensor).levels.includes(level) === false}
               <span class="disabled-tooltip">Currently unavailable</span>
@@ -311,17 +310,19 @@
         <button
           aria-selected={$signalType === 'value' ? 'true' : 'false'}
           class="button {$signalType === 'value' ? 'selected' : ''}"
-          on:click={() => signalType.set('value')}>
+          on:click={() => {
+            currentDataReadyOnMay.set(false);
+            signalType.set('value');
+          }}>
           Intensity
         </button>
         <button
           aria-selected={$signalType === 'direction' ? 'true' : 'false'}
           class="button {$signalType === 'direction' ? 'selected' : ''}"
-          on:click={() => signalType.set('direction')}
-          disabled={$currentSensor === 'fb-survey'}>
-          {#if $currentSensor === 'fb-survey'}
-            <span class="disabled-tooltip">Currently unavailable</span>
-          {/if}
+          on:click={() => {
+            currentDataReadyOnMay.set(false);
+            signalType.set('direction');
+          }}>
           Direction
         </button>
 

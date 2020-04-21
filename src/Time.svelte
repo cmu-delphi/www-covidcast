@@ -47,20 +47,30 @@
   currentSensor.subscribe(s => ($times ? update(s, $times, true) : ''));
 
   function update(s, t, newSensor = false) {
-    if (newSensor) {
-      // reset range
-      rectifiedRange = interval;
-      rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
-    }
-
     max = t.get(s)[1];
     min = t.get(s)[0];
     dataRangeMin = parseTime(min).getTime();
     dataRangeMax = parseTime(max).getTime();
 
+    if (newSensor) {
+      if (
+        (dataRangeMin =
+          parseTime(min).getTime() <= rectifiedMin &&
+          parseTime($currentDate).getTime() > rectifiedMin &&
+          parseTime($currentDate).getTime() < rectifiedMax)
+      ) {
+        // console.log('fine not to change slider range');
+      } else {
+        // reset range
+        rectifiedRange = interval;
+        rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
+      }
+    }
+
     updateSliderUI();
 
-    currentDate.set(max);
+    // currentDate.set(max);
+    // console.log('set to max');
   }
 
   function updateSliderUI() {
@@ -126,7 +136,7 @@
       canLoadMore = true;
     }
 
-    console.log(canLoadMore);
+    ////console.log(canLoadMore);
   }
 
   function calculateValFromRectified(rectified) {
@@ -137,8 +147,8 @@
     return year + month + date;
   }
 
-  function sliderOnMouseUp() {
-    window.performance.mark('start sliderOnMouseUp');
+  function sliderOnChange() {
+    window.performance.mark('start sliderOnChange');
     // only update currentDataReadyOnMay when the date actually changed
     currentDate.update(d => {
       let newDate = calculateValFromRectified(rectifiedVal);
@@ -147,7 +157,7 @@
       }
       return newDate;
     });
-    window.performance.measure('sliderOnMouseUp', 'start sliderOnMouseUp');
+    window.performance.measure('sliderOnChange', 'start sliderOnChange');
   }
 
   function loadMoreDataRange() {
@@ -156,7 +166,7 @@
     updateSliderUI();
   }
 
-  // currentDataReadyOnMay.subscribe(d => console.log('map set:', d));
+  // currentDataReadyOnMay.subscribe(d => ////console.log('map set:', d));
 </script>
 
 <style>
@@ -186,12 +196,11 @@
 
     margin: 0;
     font-size: 0.7rem;
-    font-weight: 300;
     background-color: #fff;
     border-style: solid;
     border-color: #dbdbdb;
     border-width: 1px;
-    color: #6c757d;
+    color: #666666;
     cursor: pointer;
     display: flex;
     justify-content: center;
@@ -205,7 +214,7 @@
   }
 
   .load-more-button:hover {
-    background-color: #5a6268;
+    background-color: #666666;
     color: #fff;
   }
 
@@ -215,9 +224,8 @@
 
   .load-more-button:disabled {
     background-color: rgb(211, 211, 211);
-    color: #6c757d;
+    color: #666666;
     cursor: not-allowed;
-    font-weight: 300;
     font-size: 0.7rem;
     transform: none;
   }
@@ -295,6 +303,7 @@
     border: 0;
   }
 
+  /* Special styling for WebKit/Blink */
   .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
@@ -305,7 +314,17 @@
     cursor: pointer;
   }
 
+  /* All the same stuff for Firefox */
   .slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--red);
+    cursor: pointer;
+  }
+
+  /* All the same stuff for IE */
+  .slider::-ms-thumb {
     width: 20px;
     height: 20px;
     border-radius: 50%;
@@ -375,8 +394,9 @@
     max={rectifiedMax}
     step={86400000}
     aria-label={formatTimeWithoutYear(new Date(rectifiedVal))}
-    on:mouseup={sliderOnMouseUp}
-    on:keyup={sliderOnMouseUp}
+    on:mouseup={sliderOnChange}
+    on:touchend={sliderOnChange}
+    on:keyup={sliderOnChange}
     class="slider"
     bind:value={rectifiedVal} />
   <div id="timeSliderPaddingRight" bind:this={timeSliderPaddingRight} />

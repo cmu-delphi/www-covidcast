@@ -3,8 +3,8 @@
   import { DIRECTION_THEME } from './theme.js';
   import * as d3 from 'd3';
 
-  let high = 1;
-  let low = 0;
+  let high = '';
+  let low = '';
 
   currentSensor.subscribe(s => ($stats ? updateLowHigh(s, $stats) : ''));
   stats.subscribe(s => (s ? updateLowHigh($currentSensor, s) : ''));
@@ -31,13 +31,9 @@
     /* border-radius: 8px; */
     padding: 10px 10px;
     box-sizing: border-box;
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.9);
     transition: all 0.1s ease-in;
     height: 100%;
-  }
-
-  .legend:hover {
-    background-color: rgba(255, 255, 255, 0.9);
   }
 
   .legend.value {
@@ -100,7 +96,7 @@
       Decreasing
     </p>
   {:else}
-    <p>{high}</p>
+    <p>{high ? high + '+' : ''}</p>
     <div
       class="legend-bar"
       style="background: linear-gradient(to top, {DIRECTION_THEME.gradientMin}, {DIRECTION_THEME.gradientMiddle}, {DIRECTION_THEME.gradientMax})" />

@@ -35,9 +35,9 @@
   let changingSensor = false;
 
   function updateRegionSliceCache(sensor, level, date, reason = 'unspecified') {
-    console.log($regionSliceCache);
+    //console.log($regionSliceCache);
     if (!$mounted) return;
-    console.log(sensor, level, date, $times.get(sensor));
+    //console.log(sensor, level, date, $times.get(sensor));
     if (!$sensors.find(d => d.id === sensor).levels.includes(level)) return;
     if (date > $times.get(sensor)[1] || reason === 'level change') return;
 
@@ -57,32 +57,37 @@
       fetch(q)
         .then(d => d.json())
         .then(d => {
-          console.log(reason, q, d);
+          // console.log(reason, q, d);
           if (d.result < 0 || d.message.includes('no results')) {
-            console.log('bad api call, not updating regionSliceCache');
+            //console.log('bad api call, not updating regionSliceCache');
             currentData.set([]);
             regionSliceCache.update(m => m.set(sensor + level + date, []));
           } else {
-            currentData.set(d.epidata);
+            // attach signature
+            let { epidata } = d;
+            epidata = epidata.map(item => {
+              return { ...item, sensor, level };
+            });
+            currentData.set(epidata);
             regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
           }
         });
     } else {
-      console.log(reason, 'got in cache');
+      //console.log(reason, 'got in cache');
       currentData.set(cacheEntry);
     }
   }
 
   function updateTimeSliceCache(sensor, level, region) {
-    console.log(region);
-    console.log($mounted);
+    //console.log(region);
+    //console.log($mounted);
     if (!$mounted) return;
     if (!region) {
       regionData.set([]);
       return;
     }
     let cacheEntry = $timeSliceCache.get(sensor + level + region);
-    console.log(cacheEntry);
+    //console.log(cacheEntry);
     if (!cacheEntry) {
       let q =
         ENDPOINT +
@@ -98,7 +103,7 @@
       fetch(q)
         .then(d => d.json())
         .then(d => {
-          console.log(q, d);
+          //console.log(q, d);
           regionData.set(d.epidata);
           timeSliceCache.update(m => m.set(sensor + level + region, d.epidata));
         });
@@ -111,16 +116,19 @@
   currentSensor.subscribe(s => {
     if (!$mounted) return;
 
-    // facebook fix
-    if (s === 'fb-survey') {
-      signalType.set('value');
-    }
-
     let l = $currentLevel;
-    let date = $times.get(s)[1];
+    let minDate = $times.get(s)[0],
+      maxDate = $times.get(s)[1];
+    console.log(minDate, maxDate);
+    let date = maxDate;
+    if ($currentDate > minDate && $currentDate < maxDate) {
+      // data available at current date
+      date = $currentDate;
+    }
+    console.log(date);
 
     if (!$sensors.find(d => d.id === s).levels.includes($currentLevel)) {
-      console.log('update?');
+      //console.log('update?');
       l = $sensors.find(d => d.id === s).levels[0];
       levelChangedWhenSensorChanged = true;
       currentRegion.set('');
@@ -131,7 +139,7 @@
       updateTimeSliceCache(s, l, $currentRegion);
     }
     if (date !== $currentDate) {
-      console.log('now?');
+      //console.log('now?');
       dateChangedWhenSensorChanged = true;
       currentDate.set(date);
     }
@@ -140,7 +148,7 @@
   });
 
   currentLevel.subscribe(l => {
-    console.log('level update');
+    //console.log('level update');
     if (levelChangedWhenSensorChanged) {
       levelChangedWhenSensorChanged = false;
     } else {
@@ -151,7 +159,7 @@
   });
 
   currentDate.subscribe(d => {
-    console.log('date update');
+    //console.log('date update');
     if (dateChangedWhenSensorChanged) {
       dateChangedWhenSensorChanged = false;
     } else {
@@ -160,7 +168,7 @@
   });
 
   currentRegion.subscribe(r => {
-    console.log('update region');
+    //console.log('update region');
     updateTimeSliceCache($currentSensor, $currentLevel, r);
   });
 
@@ -168,14 +176,14 @@
     fetch(ENDPOINT_META)
       .then(d => d.json())
       .then(meta => {
-        console.log(meta.epidata);
+        // console.log(meta.epidata);
         let timeMap = new Map();
         let statsMap = new Map();
         $sensors.forEach(s => {
           let matchedMeta = meta.epidata.find(
             d => d.data_source === s.id && d.signal === s.signal && d.time_type === 'day',
           );
-          console.log(s, matchedMeta);
+          //console.log(s, matchedMeta);
           timeMap.set(s.id, [matchedMeta.min_time, matchedMeta.max_time]);
           statsMap.set(s.id, {
             mean: matchedMeta.mean_value,
@@ -188,10 +196,15 @@
 
         let l = $currentLevel;
         if (!$sensors.find(d => d.id === $currentSensor).levels.includes($currentLevel)) {
-          console.log('update?');
+          //console.log('update?');
           l = $sensors.find(d => d.id === $currentSensor).levels[0];
           currentLevel.set(l);
         }
+
+        let date = timeMap.get($currentSensor)[1];
+        // set to nearest available date
+        dateChangedWhenSensorChanged = true;
+        currentDate.set(date);
 
         let q =
           ENDPOINT +
@@ -202,21 +215,24 @@
           '&geo_type=' +
           l +
           '&time_values=' +
-          timeMap.get($currentSensor)[1] +
+          date +
           '&geo_value=*';
         fetch(q)
           .then(d => d.json())
           .then(d => {
-            console.log(q, d);
+            //console.log(q, d);
             if (d.result < 0 || d.message.includes('no results')) {
-              console.log('bad api call, not updating regionSliceCache');
+              //console.log('bad api call, not updating regionSliceCache');
               currentData.set([]);
-              regionSliceCache.update(m => m.set($currentSensor + $currentLevel + timeMap.get($currentSensor)[1], []));
+              regionSliceCache.update(m => m.set($currentSensor + $currentLevel + date, []));
             } else {
-              currentData.set(d.epidata);
-              regionSliceCache.update(m =>
-                m.set($currentSensor + $currentLevel + timeMap.get($currentSensor)[1], d.epidata),
-              );
+              // attach signature
+              let { epidata } = d;
+              epidata = epidata.map(item => {
+                return { ...item, sensor: $currentSensor, level: l };
+              });
+              currentData.set(epidata);
+              regionSliceCache.update(m => m.set($currentSensor + $currentLevel + date, d.epidata));
             }
 
             mounted.set(1);
@@ -232,7 +248,7 @@
     left: 10px;
     z-index: 1000;
     /* width: 220px; */
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.9);
     /* border-radius: 8px; */
     padding: 10px 10px;
     box-sizing: border-box;
@@ -250,7 +266,7 @@
     right: 50px;
     z-index: 1000;
     /* max-width: 750px; */
-    /* background-color: rgba(255, 255, 255, 0.7); */
+    /* background-color: rgba(255, 255, 255, 0.9); */
     /* border-radius: 8px; */
     /* padding: 10px 10px; */
     box-sizing: border-box;
@@ -267,10 +283,10 @@
 
   .legend-container {
     position: absolute;
-    top: 240px;
+    top: 204px;
     left: 10px;
     z-index: 1000;
-    /* background-color: rgba(255, 255, 255, 0.7); */
+    /* background-color: rgba(255, 255, 255, 0.9); */
 
     display: flex;
     flex-direction: column;
@@ -284,14 +300,14 @@
 
   .graph-container {
     position: absolute;
-    bottom: 2vh;
-    right: 2vh;
+    bottom: 10px;
+    right: 10px;
     z-index: 1001;
     max-width: 400px;
     width: 400px;
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.9);
     /* border-radius: 1rem; */
-    padding: 10px 15px;
+    padding: 6px 13px 0;
     box-sizing: border-box;
 
     transition: all 0.1s ease-in;
@@ -302,7 +318,7 @@
     bottom: 10px;
     left: 10px;
     z-index: 1002;
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.9);
     /* border-radius: 8px; */
     padding: 30px 10px;
     box-sizing: border-box;
@@ -310,16 +326,6 @@
 
     transition: all 0.1s ease-in;
   }
-
-  .options-container:hover {
-    background-color: rgba(255, 255, 255, 0.9);
-  }
-
-  /* .options-container:hover,
-  .time-container:hover,
-  .graph-container:hover {
-    background-color: rgba(255, 255, 255, 0.9);
-  }  */
 
   .error-message-container {
     position: absolute;
@@ -355,7 +361,7 @@
 </div>
 
 <div class="time-container">
-  <Time {updateRegionSliceCache} />
+  <Time />
 </div>
 
 <div class="graph-container">

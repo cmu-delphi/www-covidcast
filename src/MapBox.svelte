@@ -1,5 +1,8 @@
 <script>
   import { onMount } from 'svelte';
+  import colorParse from 'color-parse';
+  import invertColor from 'invert-color';
+  import debounce from 'lodash/debounce';
   import mapboxgl from 'mapbox-gl';
   import {
     levels,
@@ -30,9 +33,16 @@
   let hoveredId;
   let clickedId;
 
+  /*
+  bgColor:string - 'rgb(xx,yy,zz)'
+*/
+  function getTextColorBasedOnBackground(bgColor) {
+    return invertColor(colorParse(bgColor).values, true);
+  }
+
   onMount(_ => {
     let containerWidth = container.clientWidth;
-    console.log('map view width:', containerWidth);
+    ////console.log('map view width:', containerWidth);
     if (containerWidth <= 1021) {
       ZOOM = 3.9;
     } else if (containerWidth > 1021 && containerWidth < 1280) {
@@ -66,7 +76,59 @@
     map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
 
     // popup
-    var title = e.features[0].properties.NAME;
+    // var title = e.features[0].properties.NAME;
+    const { value, direction, NAME } = e.features[0].properties;
+    const fillColor = e.features[0].layer.paint['fill-color'].toString();
+    var title = `
+      <div class="map-popup-region-name">
+      ${NAME} ${$currentLevel === 'county' ? 'County' : ''}
+      </div>
+      <div class="map-popup-region-value-container">
+        ${
+          $signalType === 'value'
+            ? $currentSensor !== 'ght'
+              ? 'Percentage: <span class="map-popup-region-value" style="background-color: ' +
+                fillColor +
+                '; color: ' +
+                getTextColorBasedOnBackground(fillColor) +
+                ';">' +
+                value.toFixed(2) +
+                '%</span>'
+              : 'Relative Frequency: <span class="map-popup-region-value" style="background-color: ' +
+                fillColor +
+                '; color: ' +
+                getTextColorBasedOnBackground(fillColor) +
+                ';">' +
+                value.toFixed(2) +
+                '</span>'
+            : ''
+        }
+        ${
+          $signalType === 'direction'
+            ? 'Direction: ' +
+              (direction === 1
+                ? '<span class="map-popup-region-value" style="background-color: ' +
+                  DIRECTION_THEME.increasing +
+                  '; color: ' +
+                  getTextColorBasedOnBackground(DIRECTION_THEME.increasing) +
+                  '">&#8599; Increasing</span>'
+                : direction === -1
+                ? '<span class="map-popup-region-value" style="background-color: ' +
+                  DIRECTION_THEME.decreasing +
+                  '; color: ' +
+                  getTextColorBasedOnBackground(DIRECTION_THEME.decreasing) +
+                  '">&#8600; Decreasing</span>'
+                : direction === 0
+                ? '<span class="map-popup-region-value" style="background-color: ' +
+                  DIRECTION_THEME.steady +
+                  '; color: ' +
+                  getTextColorBasedOnBackground(DIRECTION_THEME.steady) +
+                  '">&#8594; Steady</span>'
+                : '<span class="map-popup-region-value">n/a</span>')
+            : ''
+        }
+      </div>
+    `;
     popup.setLngLat(e.lngLat).setHTML(title);
   };
   const onMouseLeave = level => e => {
@@ -85,9 +147,9 @@
     }
 
     if (clickedId !== e.features[0].id) {
-      console.log(e.features[0]);
+      ////console.log(e.features[0]);
       clickedId = e.features[0].id;
-      console.log(clickedId);
+      ////console.log(clickedId);
       map.setFeatureState({ source: level, id: clickedId }, { select: true });
       currentRegionName.set(e.features[0].properties.NAME);
       currentRegion.set(e.features[0].properties.id);
@@ -99,43 +161,53 @@
   };
 
   // If it hasn't been initialized and we have geojsons and initial data, create map.
-  $: if (
-    !map &&
-    $geojsons.size !== 0 &&
-    //  && $currentData.length !== 0
-    $metaData.length !== 0 &&
-    $stats
-  ) {
+  $: if (!map && $geojsons.size !== 0 && $metaData.length !== 0 && $stats) {
     initializeMap();
   }
 
   // Update the map when sensor or level changes.
   currentData.subscribe(_ => {
     try {
+      // console.log('currentData');
+      // console.log($currentDate, $currentSensor, $currentLevel);
+      // console.log(_);
+      // console.log('updating map due to currentData change');
       updateMap('data');
     } catch (err) {
-      console.log(err);
+      ////console.log(err);
     }
   });
   currentLevel.subscribe(_ => {
     try {
+      // console.log('currentLevel');
       updateMap('data');
     } catch (err) {
-      console.log(err);
+      ////console.log(err);
     }
   });
   currentDate.subscribe(_ => {
     try {
+      // console.log('currentDate');
+      // console.log($currentDate, $currentSensor, $currentLevel);
+      // console.log($currentData);
+      if (
+        $currentData.length > 0 &&
+        ($currentData[0].sensor !== $currentSensor || $currentData[0].level !== $currentLevel)
+      ) {
+        return;
+      }
+      // console.log('updating map due to currentDate change');
       updateMap('data');
     } catch (err) {
-      console.log(err);
+      ////console.log(err);
     }
   });
   signalType.subscribe(_ => {
     try {
+      // console.log('signal');
       updateMap('signal');
     } catch (err) {
-      console.log(err);
+      ////console.log(err);
     }
   });
 
@@ -143,28 +215,25 @@
     try {
       updateMap('mounted');
     } catch (err) {
-      console.log(err);
+      ////console.log(err);
     }
   });
 
   function updateMap(type) {
     if (!mapMounted) return;
-    window.performance.mark('update-map-start');
+
     Object.keys($levels).forEach(level => map && map.removeFeatureState({ source: level }));
 
-    if (type === 'data') {
-      map.getLayer($currentLevel) && map.removeLayer($currentLevel);
-    }
+    // if (type === 'data') {
+    //   map.getLayer($currentLevel) && map.removeLayer($currentLevel);
+    // }
 
     let thisMeta = $metaData.find(d => d.data_source === $currentSensor && d.geo_type === $currentLevel);
     let sts = $stats.get($currentSensor);
     let valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
-    // console.log(thisMeta);
 
-    // let valueMinMax = [thisMeta.min_value, thisMeta.max_value];
     let valueMappedVals = new Map();
     let directionMappedVals = new Map();
-
     let geoIds = new Set(
       $currentData.map(d => {
         const key = d.geo_value.toUpperCase();
@@ -188,10 +257,10 @@
 
       d.properties.value = -100;
       d.properties.direction = -100;
-      if (geoIds.has(id) && valueMappedVals.get(id) !== null) {
+      if (geoIds.has(id) && valueMappedVals.get(id) !== undefined) {
         d.properties.value = valueMappedVals.get(id);
       }
-      if (geoIds.has(id) && directionMappedVals.get(id) !== null) {
+      if (geoIds.has(id) && directionMappedVals.get(id) !== undefined) {
         d.properties.direction = directionMappedVals.get(id);
       }
     });
@@ -207,8 +276,7 @@
     } else {
       stops = [[-1, DIRECTION_THEME.decreasing], [0, DIRECTION_THEME.steady], [1, DIRECTION_THEME.increasing]];
     }
-    console.log('data update');
-    console.log(dat);
+
     if (['data', 'init'].includes(type)) {
       map.getSource($currentLevel).setData(dat);
     }
@@ -221,23 +289,6 @@
             stops: stops,
           });
           map.setLayoutProperty(name, 'visibility', 'visible');
-        } else {
-          map.addLayer(
-            {
-              id: $currentLevel,
-              source: $currentLevel,
-              type: 'fill',
-              filter: ['!=', $signalType, -100],
-              paint: {
-                'fill-outline-color': '#616161',
-                'fill-color': {
-                  property: $signalType,
-                  stops: stops,
-                },
-              },
-            },
-            `${$currentLevel}-hover`,
-          );
         }
       } else {
         map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none');
@@ -255,7 +306,7 @@
         if (found.length > 0) {
           // found allegheny / Pittsburgh
           const randomFeature = found[0];
-          console.log(randomFeature);
+          ////console.log(randomFeature);
           currentRegionName.set(randomFeature.properties.NAME);
           currentRegion.set(randomFeature.properties.id);
           clickedId = randomFeature.id;
@@ -263,11 +314,11 @@
           chosenRandom = true;
         } else {
           const index = Math.floor(Math.random() * (viableFeatures.length - 1));
-          console.log(dat.features);
-          console.log(viableFeatures, viableFeatures.length, index);
+          ////console.log(dat.features);
+          ////console.log(viableFeatures, viableFeatures.length, index);
           const randomFeature = viableFeatures[index];
-          console.log(randomFeature);
-          console.log(randomFeature.properties.NAME);
+          ////console.log(randomFeature);
+          ////console.log(randomFeature.properties.NAME);
           currentRegionName.set(randomFeature.properties.NAME);
           currentRegion.set(randomFeature.properties.id);
           clickedId = randomFeature.id;
@@ -277,49 +328,22 @@
       }
     }
 
-    console.log($currentRegion);
-    console.log(viableFeatures.filter(f => f.properties.id === $currentRegion).length);
+    ////console.log($currentRegion);
+    ////console.log(viableFeatures.filter(f => f.properties.id === $currentRegion).length);
     if ($currentRegion) {
       const found = viableFeatures.filter(f => f.properties.id === $currentRegion);
       if (found.length > 0) {
         clickedId = found[0].id;
-        console.log('clickedId', clickedId);
+        ////console.log('clickedId', clickedId);
         map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
       } else {
         clickedId = null;
         currentRegion.set('');
         currentRegionName.set('');
-        console.log('no current region');
+        ////console.log('no current region');
       }
     }
 
-    // if (
-    //   chosenRandom === false &&
-    //   $mounted &&
-    //   dat.features.filter(f => f.properties[$signalType] !== -100).length > 0
-    // ) {
-    //   const viableFeatures = dat.features.filter(
-    //     f => f.properties[$signalType] !== -100
-    //   );
-
-    //   const index = Math.floor(Math.random() * (viableFeatures.length - 1));
-    //   console.log(dat.features);
-    //   console.log(viableFeatures, viableFeatures.length, index);
-    //   const randomFeature = viableFeatures[index];
-    //   console.log(randomFeature);
-    //   console.log(randomFeature.properties.NAME);
-    //   currentRegionName.set(randomFeature.properties.NAME);
-    //   currentRegion.set(randomFeature.properties.id);
-    //   clickedId = randomFeature.id;
-    //   map.setFeatureState(
-    //     { source: $currentLevel, id: clickedId },
-    //     { select: true }
-    //   );
-    //   chosenRandom = true;
-    // }
-
-    currentDataReadyOnMay.set(true);
-    window.performance.measure('update-map', 'update-map-start');
   }
 
   function initializeMap() {
@@ -334,36 +358,12 @@
       .addControl(new mapboxgl.AttributionControl({ compact: true }))
       .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
 
-    map.on('data', ev => {
-      if (ev.dataType === 'source') {
-        if (ev.coord && ev.coord.key) {
-          if (ev.isSourceLoaded) {
-            window.performance.measure(`Load ${ev.coord.key}`, `Start Load ${ev.coord.key}`);
-          } else {
-            window.performance.mark(`Start Load ${ev.coord.key}`);
-          }
-        } else {
-          window.performance.measure(`Load Data`, `Start Load Data`);
-        }
-      } else {
-        // console.log(ev);
-      }
-    });
-    map.on('dataloading', ev => {
-      if (ev.dataType === 'source') {
-        if (ev.coord && ev.coord.key) {
-          if (ev.isSourceLoaded) {
-            window.performance.measure(`Load ${ev.coord.key}`, `Start Load ${ev.coord.key}`);
-          } else {
-            window.performance.mark(`Start Load ${ev.coord.key}`);
-          }
-        } else {
-          window.performance.mark(`Start Load Data`);
-        }
-      } else {
-        // console.log(ev);
-      }
-    });
+    map.on(
+      'render',
+      debounce(ev => {
+        currentDataReadyOnMay.set(true);
+      }, 150),
+    );
 
     //Disable touch zoom, it makes gesture scrolling difficult
     map.scrollZoom.disable();
@@ -395,6 +395,7 @@
           ],
         },
       });
+
       map.addLayer({
         id: 'county-outline',
         source: 'county-outline',
@@ -421,7 +422,7 @@
           type: 'geojson',
           data: $geojsons.get(name),
         });
-        console.log(data);
+        ////console.log(data);
         map.addLayer({
           id: `${name}-hover`,
           source: name,
@@ -474,6 +475,23 @@
         },
       });
 
+      Object.keys($levels).forEach(name => {
+        map.addLayer(
+          {
+            id: name,
+            source: name,
+            type: 'fill',
+            visibility: 'none',
+            filter: ['!=', $signalType, -100],
+            paint: {
+              'fill-outline-color': '#616161',
+              'fill-color': MAP_THEME.countyFill,
+            },
+          },
+          `${name}-hover`,
+        );
+      });
+
       mapMounted = true;
       updateMap('init');
     });
@@ -499,11 +517,12 @@
     width: 100%;
     height: 90vh;
     position: relative;
+    min-height: 550px;
   }
 
   .state-buttons-holder {
     position: absolute;
-    top: 92px;
+    top: 79px;
     right: 9px;
     z-index: 100;
   }
@@ -517,7 +536,7 @@
     position: relative;
     width: 29px;
     height: 29px;
-    color: #3a3a3a;
+    color: #333;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -526,7 +545,6 @@
     box-sizing: content-box;
     background-color: white;
     border: 1px solid #d5d5d5;
-    border-radius: 4px;
     text-align: center;
     font-family: 'FranklinITCProBold', Helvetica, Arial, sans-serif;
     line-height: 16px;
