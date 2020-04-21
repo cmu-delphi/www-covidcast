@@ -82,17 +82,23 @@
   {#if $signalType === 'direction'}
     <p class="direction-p">
       <span class="color inc" style="background-color: {DIRECTION_THEME.increasing}" />
-      <span aria-hidden="true" class="direction-indicators inc">&#8599;</span>
+      <span aria-hidden="true" class="direction-indicators inc">
+        {@html DIRECTION_THEME.increasingIcon}
+      </span>
       Increasing
     </p>
     <p class="direction-p">
       <span class="color const" style="background-color: {DIRECTION_THEME.steady}" />
-      <span aria-hidden="true" class="direction-indicators const">&#8594;</span>
+      <span aria-hidden="true" class="direction-indicators const">
+        {@html DIRECTION_THEME.steadyIcon}
+      </span>
       Steady
     </p>
     <p class="direction-p">
       <span class="color dec" style="background-color: {DIRECTION_THEME.decreasing}" />
-      <span aria-hidden="true" class="direction-indicators dec">&#8600;</span>
+      <span aria-hidden="true" class="direction-indicators dec">
+        {@html DIRECTION_THEME.decreasingIcon}
+      </span>
       Decreasing
     </p>
   {:else}
