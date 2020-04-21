@@ -111,19 +111,25 @@
                   DIRECTION_THEME.increasing +
                   '; color: ' +
                   getTextColorBasedOnBackground(DIRECTION_THEME.increasing) +
-                  '">&#8599; Increasing</span>'
+                  '">' +
+                  DIRECTION_THEME.increasingIcon +
+                  ' Increasing</span>'
                 : direction === -1
                 ? '<span class="map-popup-region-value" style="background-color: ' +
                   DIRECTION_THEME.decreasing +
                   '; color: ' +
                   getTextColorBasedOnBackground(DIRECTION_THEME.decreasing) +
-                  '">&#8600; Decreasing</span>'
+                  '">' +
+                  DIRECTION_THEME.decreasingIcon +
+                  ' Decreasing</span>'
                 : direction === 0
                 ? '<span class="map-popup-region-value" style="background-color: ' +
                   DIRECTION_THEME.steady +
                   '; color: ' +
                   getTextColorBasedOnBackground(DIRECTION_THEME.steady) +
-                  '">&#8594; Steady</span>'
+                  '">' +
+                  DIRECTION_THEME.steadyIcon +
+                  ' Steady</span>'
                 : '<span class="map-popup-region-value">n/a</span>')
             : ''
         }

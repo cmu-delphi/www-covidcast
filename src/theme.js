@@ -3,9 +3,12 @@ const color_medium = 'rgb(253, 96, 65)';
 const color_high = 'rgb(128, 0, 0)';
 
 export const DIRECTION_THEME = {
-  decreasing: color_low,
-  steady: color_medium,
   increasing: color_high,
+  steady: color_medium,
+  decreasing: color_low,
+  increasingIcon: '&#9650;',
+  steadyIcon: '&#9644;',
+  decreasingIcon: '&#9660;',
   max: color_high,
   gradientMin: color_low,
   gradientMiddle: color_medium,
