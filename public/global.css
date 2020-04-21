@@ -55,6 +55,12 @@ button.mapboxgl-ctrl-zoom-out {
 .axis-text {
   font-size: 14px;
   font-family: 'Open Sans', sans-serif;
+  color: var(--grey);
+}
+
+.axes {
+  font-family: 'Open Sans', sans-serif;
+  color: var(--grey);
 }
 
 button.mapboxgl-popup-close-button {

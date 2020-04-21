@@ -34,7 +34,7 @@
     fb: 'fb-survey',
     google: 'google-survey',
     ght: 'ght',
-    q: 'quidel',
+    q: 'quidel'
   };
 
   onMount(_ => {
@@ -192,19 +192,19 @@
       let title = '';
       let sensor = $currentSensor;
       switch (sensor) {
-        case 'google-survey':
+        case sensorKeys['google']:
           title = 'Percentage';
           break;
-        case 'fb-survey':
+        case sensorKeys['fb']:
           title = 'Percentage';
           break;
-        case 'quidel':
+        case sensorKeys['q']:
           title = 'Percentage';
           break;
-        case 'ght':
+        case sensorKeys['ght']:
           title = 'Relative Frequency';
           break;
-        case 'doctor-visits':
+        case sensorKeys['dr']:
           title = 'Percentage';
           break;
         default:
@@ -217,19 +217,19 @@
       let sensor = $currentSensor;
       var format = '';
       switch (sensor) {
-        case 'google-survey':
+        case sensorKeys['google']:
           format = d => d + '%';
           break;
-        case 'fb-survey':
+        case sensorKeys['fb']:
           format = d => d + '%';
           break;
-        case 'quidel':
+        case sensorKeys['q']:
           format = d => d + '%';
           break;
-        case 'ght':
+        case sensorKeys['ght']:
           format = d3.format('.0f');
           break;
-        case 'doctor-visits':
+        case sensorKeys['dr']:
           format = d => d + '%';
           break;
         default:
@@ -400,14 +400,12 @@
           myData[i].value = this.min;
         } else if (+myData[i].value > this.max) {
           myData[i].max = true;
-          // myData[i].value = this.max;
           if (+myData[i].value > chartMax) chartMax = +myData[i].value;
         }
       }
-      ////console.log(chartMax);
-      ////console.log(myData);
 
-      if (chartMax > 100 && $currentSensor !== 'ght') {
+
+      if (chartMax > 100 && $currentSensor !== sensorKeys['ght']) {
         chartMax = 100;
       }
 
@@ -455,7 +453,7 @@
             d3.timeFormat('%m/%d')(parseTime(d.time_value)) +
             ': ' +
             d.value.toFixed(2) +
-            ($currentSensor === 'ght' ? '' : '%')
+            ($currentSensor === sensorKeys['ght'] ? '' : '%')
           );
         });
 
@@ -470,7 +468,6 @@
         .attr('cx', d => x(parseTime(d.time_value)))
         .attr('cy', d => y(+d.value))
         .style('fill', DIRECTION_THEME.gradientMiddle)
-        // .style('fill', d => (d.max ? DIRECTION_THEME.gradientMax : DIRECTION_THEME.gradientMiddle))
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
 
@@ -499,6 +496,7 @@
       var chartTitle = this.getChartTitle();
       svg
         .append('text')
+        .attr('class', 'graph-title')
         .attr('transform', 'translate(' + width / 2 + ', ' + 0 + ')')
         .style('text-anchor', 'middle')
         .text(chartTitle);
@@ -532,18 +530,22 @@
     font-size: 14px;
     margin: 3px 0px !important;
     padding: 0px !important;
-  }
+    font-family: 'Open Sans', sans-serif;
+    color: var(--darkgrey);
+}
   .graph-description {
     text-align: center;
     margin: 5px 0px 7px 0px !important;
     font-size: 14px;
-    font-style: italic;
     padding: 0px !important;
   }
 </style>
 
 <h5 bind:this={t} class="graph-title" />
-<p class="graph-description">{$currentRegionName} {$currentRegionName && $currentLevel === 'county' ? 'County' : ''}</p>
+<p class="graph-description">
+  {$currentRegionName} {$currentRegionName && $currentLevel === 'county' ? 'County' : ''}
+  {$currentLevel === 'msa' ? 'Metro Area' : ''}
+</p>
 
 <div bind:clientWidth={w}>
   <div bind:this={el} />
