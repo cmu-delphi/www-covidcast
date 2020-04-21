@@ -117,12 +117,15 @@
     if (!$mounted) return;
 
     let l = $currentLevel;
-    let date = $times.get(s)[1];
-    // if ($currentDate > date[0] && $currentDate < date[1]) {
-    //   date = $currentDate;
-    // } else {
-    //   date = date[1];
-    // }
+    let minDate = $times.get(s)[0],
+      maxDate = $times.get(s)[1];
+    console.log(minDate, maxDate);
+    let date = maxDate;
+    if ($currentDate > minDate && $currentDate < maxDate) {
+      // data available at current date
+      date = $currentDate;
+    }
+    console.log(date);
 
     if (!$sensors.find(d => d.id === s).levels.includes($currentLevel)) {
       //console.log('update?');
@@ -198,6 +201,11 @@
           currentLevel.set(l);
         }
 
+        let date = timeMap.get($currentSensor)[1];
+        // set to nearest available date
+        dateChangedWhenSensorChanged = true;
+        currentDate.set(date);
+
         let q =
           ENDPOINT +
           '&data_source=' +
@@ -207,7 +215,7 @@
           '&geo_type=' +
           l +
           '&time_values=' +
-          timeMap.get($currentSensor)[1] +
+          date +
           '&geo_value=*';
         fetch(q)
           .then(d => d.json())
@@ -216,7 +224,7 @@
             if (d.result < 0 || d.message.includes('no results')) {
               //console.log('bad api call, not updating regionSliceCache');
               currentData.set([]);
-              regionSliceCache.update(m => m.set($currentSensor + $currentLevel + timeMap.get($currentSensor)[1], []));
+              regionSliceCache.update(m => m.set($currentSensor + $currentLevel + date, []));
             } else {
               // attach signature
               let { epidata } = d;
@@ -224,9 +232,7 @@
                 return { ...item, sensor: $currentSensor, level: l };
               });
               currentData.set(epidata);
-              regionSliceCache.update(m =>
-                m.set($currentSensor + $currentLevel + timeMap.get($currentSensor)[1], d.epidata),
-              );
+              regionSliceCache.update(m => m.set($currentSensor + $currentLevel + date, d.epidata));
             }
 
             mounted.set(1);

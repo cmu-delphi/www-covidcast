@@ -47,21 +47,30 @@
   currentSensor.subscribe(s => ($times ? update(s, $times, true) : ''));
 
   function update(s, t, newSensor = false) {
-    if (newSensor) {
-      // reset range
-      rectifiedRange = interval;
-      rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
-    }
-
     max = t.get(s)[1];
     min = t.get(s)[0];
     dataRangeMin = parseTime(min).getTime();
     dataRangeMax = parseTime(max).getTime();
 
+    if (newSensor) {
+      if (
+        (dataRangeMin =
+          parseTime(min).getTime() <= rectifiedMin &&
+          parseTime($currentDate).getTime() > rectifiedMin &&
+          parseTime($currentDate).getTime() < rectifiedMax)
+      ) {
+        // console.log('fine not to change slider range');
+      } else {
+        // reset range
+        rectifiedRange = interval;
+        rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
+      }
+    }
+
     updateSliderUI();
 
-    currentDate.set(max);
-    console.log('set to max');
+    // currentDate.set(max);
+    // console.log('set to max');
   }
 
   function updateSliderUI() {
