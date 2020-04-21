@@ -389,7 +389,7 @@
 
       // set x-axis ticks based off of data sparsity and format y-axis ticks
       var xTicks = myData.length;
-      var formatXTicks = xTicks < 6 ? xTicks : d3.timeDay.every(3);
+      var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(3);
       var formatYTicks = this.getFormat();
 
       let chartMax = this.max;
@@ -417,7 +417,7 @@
         .range([0, width]);
       var y = d3
         .scaleLinear()
-        .domain([0, chartMax])
+        .domain([this.min, chartMax])
         .range([height, 0]);
 
       svg
@@ -451,7 +451,12 @@
         .attr('class', 'd3-tip')
         .offset([-10, 0])
         .html(function(d) {
-          return d3.timeFormat('%m/%d')(parseTime(d.time_value)) + ': ' + d.value.toFixed(2) + '%';
+          return (
+            d3.timeFormat('%m/%d')(parseTime(d.time_value)) +
+            ': ' +
+            d.value.toFixed(2) +
+            ($currentSensor === 'ght' ? '' : '%')
+          );
         });
 
       svg.call(tip);
