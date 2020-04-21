@@ -542,13 +542,9 @@
   }
 </style>
 
-<div class="graph-container">
-  <h5 bind:this={t} class="graph-title" />
-  <p class="graph-description">
-    {$currentRegionName} {$currentRegionName && $currentLevel === 'county' ? 'County' : ''}
-  </p>
+<h5 bind:this={t} class="graph-title" />
+<p class="graph-description">{$currentRegionName} {$currentRegionName && $currentLevel === 'county' ? 'County' : ''}</p>
 
-  <div bind:clientWidth={w}>
-    <div bind:this={el} />
-  </div>
+<div bind:clientWidth={w}>
+  <div bind:this={el} />
 </div>
