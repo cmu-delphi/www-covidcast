@@ -126,3 +126,8 @@ button.mapboxgl-popup-close-button {
 .mapboxgl-ctrl-group button:focus:first-child {
   border-radius: 0;
 }
+
+#vizbox circle {
+  padding: 5px;
+  cursor: pointer;
+}
