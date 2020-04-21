@@ -385,7 +385,7 @@
       var minDate = maxDate - twoWeeks;
       minDate = new Date(minDate);
       myData = myData.filter(it => parseTime(it['time_value']) <= maxDate);
-      myData = myData.filter(it => parseTime(it['time_value']) > minDate);
+      myData = myData.filter(it => parseTime(it['time_value']) >= minDate);
 
       // set x-axis ticks based off of data sparsity and format y-axis ticks
       var xTicks = myData.length;
