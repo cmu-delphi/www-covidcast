@@ -9,7 +9,7 @@ export const sensors = readable([
   {
     name: 'Doctor Visits',
     id: 'doctor-visits',
-    tooltipText: "Doctor's visits due to COVID-like symptoms",
+    tooltipText: 'Doctor’s visits due to covid-like symptoms',
     signal: 'cli',
     levels: ['county', 'msa', 'state'],
     mean: 0.4394626779949559,
@@ -18,7 +18,7 @@ export const sensors = readable([
   {
     name: 'Surveys (Facebook)',
     id: 'fb-survey',
-    tooltipText: 'CMU symptom surveys offered via Facebook - Thank you Facebook!',
+    tooltipText: 'CMU symptom surveys offered via Facebook - thank you Facebook!',
     signal: 'cli',
     levels: ['county', 'msa', 'state'],
     mean: 0.8079823818179086,
@@ -27,7 +27,7 @@ export const sensors = readable([
   {
     name: 'Surveys (Google)',
     id: 'google-survey',
-    tooltipText: 'Symptom surveys run by Google - Thank you Google!',
+    tooltipText: 'Symptom surveys run by Google - thank you Google!',
     signal: 'cli',
     levels: ['county', 'state', 'msa'],
     mean: 0.08931870876166044,
@@ -36,7 +36,7 @@ export const sensors = readable([
   {
     name: 'Search Trends (Google)',
     id: 'ght',
-    tooltipText: 'COVID-related search frequency via Google Health Trends - Thank you Google!',
+    tooltipText: 'Covid-related search frequency from Google’s Health Trends team - thank you Google!',
     signal: 'smoothedsearch',
     levels: ['msa', 'state'],
     mean: 816.6838496834541,
@@ -45,7 +45,7 @@ export const sensors = readable([
   {
     name: 'Flu Tests (Quidel)',
     id: 'quidel',
-    tooltipText: 'Flu test results - Thank you Quidel!',
+    tooltipText: 'Flu results - thank you Quidel!',
     signal: 'smooth_negativeprop',
     levels: ['msa', 'state'],
     mean: 0.7633679440541352,
