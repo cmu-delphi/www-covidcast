@@ -385,7 +385,7 @@
       var minDate = maxDate - twoWeeks;
       minDate = new Date(minDate);
       myData = myData.filter(it => parseTime(it['time_value']) <= maxDate);
-      myData = myData.filter(it => parseTime(it['time_value']) > minDate);
+      myData = myData.filter(it => parseTime(it['time_value']) >= minDate);
 
       // set x-axis ticks based off of data sparsity and format y-axis ticks
       var xTicks = myData.length;
@@ -541,13 +541,12 @@
   }
 </style>
 
-<div class="graph-container">
-  <h5 bind:this={t} class="graph-title" />
-  <p class="graph-description">
-    {$currentRegionName} {$currentRegionName && $currentLevel === 'county' ? 'County' : ''}
-  </p>
+<h5 bind:this={t} class="graph-title" />
+<p class="graph-description">
+  {$currentRegionName} {$currentRegionName && $currentLevel === 'county' ? 'County' : ''}
+  {$currentLevel === 'msa' ? 'Metro Area' : ''}
+</p>
 
-  <div bind:clientWidth={w}>
-    <div bind:this={el} />
-  </div>
+<div bind:clientWidth={w}>
+  <div bind:this={el} />
 </div>

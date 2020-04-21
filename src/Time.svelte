@@ -52,14 +52,16 @@
     dataRangeMin = parseTime(min).getTime();
     dataRangeMax = parseTime(max).getTime();
 
+    console.log('current', $currentDate);
+    console.log('rectfiedmin:', calculateValFromRectified(rectifiedMin));
+
     if (newSensor) {
       if (
-        (dataRangeMin =
-          parseTime(min).getTime() <= rectifiedMin &&
-          parseTime($currentDate).getTime() > rectifiedMin &&
-          parseTime($currentDate).getTime() < rectifiedMax)
+        dataRangeMin <= rectifiedMin &&
+        parseTime($currentDate).getTime() >= rectifiedMin &&
+        parseTime($currentDate).getTime() <= rectifiedMax
       ) {
-        // console.log('fine not to change slider range');
+        console.log('fine not to change slider range');
       } else {
         // reset range
         rectifiedRange = interval;
@@ -163,6 +165,10 @@
   function loadMoreDataRange() {
     rectifiedRange += interval;
     rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
+    if (rectifiedMin < dataRangeMin) {
+      rectifiedMin = dataRangeMin;
+    }
+
     updateSliderUI();
   }
 
