@@ -186,12 +186,11 @@
 
     margin: 0;
     font-size: 0.7rem;
-    font-weight: 300;
     background-color: #fff;
     border-style: solid;
     border-color: #dbdbdb;
     border-width: 1px;
-    color: #6c757d;
+    color: #666666;
     cursor: pointer;
     display: flex;
     justify-content: center;
@@ -205,7 +204,7 @@
   }
 
   .load-more-button:hover {
-    background-color: #5a6268;
+    background-color: #666666;
     color: #fff;
   }
 
@@ -215,9 +214,8 @@
 
   .load-more-button:disabled {
     background-color: rgb(211, 211, 211);
-    color: #6c757d;
+    color: #666666;
     cursor: not-allowed;
-    font-weight: 300;
     font-size: 0.7rem;
     transform: none;
   }
