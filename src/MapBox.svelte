@@ -458,7 +458,7 @@
         id: 'city-point-unclustered',
         source: 'city-point',
         type: 'symbol',
-        filter: ['>', 'population', 5000000],
+        filter: ['>', 'population', 900000],
         maxzoom: 4,
         layout: {
           'text-field': ['get', 'city'],
@@ -474,7 +474,7 @@
         id: 'city-point-unclustered-2',
         source: 'city-point',
         type: 'symbol',
-        filter: ['>', 'population', 1000000],
+        filter: ['>', 'population', 500000],
         maxzoom: 6,
         minzoom: 4,
         layout: {
@@ -491,7 +491,7 @@
         id: 'city-point-unclustered-3',
         source: 'city-point',
         type: 'symbol',
-        filter: ['>', 'population', 500000],
+        filter: ['>', 'population', 250000],
         maxzoom: 8,
         minzoom: 6,
         layout: {
