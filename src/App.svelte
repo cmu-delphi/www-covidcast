@@ -177,7 +177,6 @@
     fetch(ENDPOINT_META)
       .then(d => d.json())
       .then(meta => {
-        console.log(meta.epidata);
         let timeMap = new Map();
         let statsMap = new Map();
         $sensors.forEach(s => {

@@ -45,28 +45,40 @@
     currentDate.subscribe(_ => updateGraphTimeRange());
     currentRegion.subscribe(region => {
       if (!region) {
-        let chart = new Chart();
-        chart.draw();
-        userCharts = [];
-        userCharts.push(chart);
+        if(userCharts[currentChart].isChart()) {
+          userCharts[currentChart].draw();
+          console.log('draw existing chart-current region, increment: ' + currentChart);
+        } else {
+          let chart = new Chart();
+          chart.draw();
+          userCharts.push(chart);
+          currentChart += 1;
+          console.log('new chart-current region, increment: ' + currentChart);
+        }
+
       }
     });
     currentSensor.subscribe(_ => {
       if (userCharts != undefined) {
         if (userCharts[currentChart].isChart()) {
+          console.log('is chart-current sensor, increment: ' + currentChart);
           userCharts[currentChart].getChartTitle();
         } else {
+          console.log('is chart fail: ' + userCharts[currentChart].isChart());
           let chart = new Chart();
           chart.getChartTitle();
           chart.draw();
-          userCharts = [];
           userCharts.push(chart);
+          currentChart += 1;
+          console.log('new chart-current sensor, increment: ' + currentChart);
         }
       }
     });
     timeRangeOnSlider.subscribe(({ min, max }) => {
-      setChartDomain(min, max);
-      userCharts[currentChart].draw();
+      if(userCharts != undefined) {
+        setChartDomain(min, max);
+        userCharts[currentChart].draw();
+      }
     });
   });
 
@@ -74,6 +86,7 @@
     let chart = new Chart();
     chart.draw();
     userCharts.push(chart);
+    console.log('new chart-draw graph, increment' + currentChart);
   }
 
   function updateGraph(data) {
@@ -269,6 +282,7 @@
       var result = null;
       try {
         this.chartType in charts ? (result = true) : (result = false);
+        console.log(this.chartType in charts);
       } catch (e) {
         if (e.name == 'ReferenceError') {
           result = false;
@@ -396,7 +410,6 @@
       var xTicks = myData.length;
       var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(4);
       formatXTicks = xTicks < 40 ? d3.timeDay.every(4) : d3.timeDay.every(7);
-      console.log(formatXTicks);
       var formatYTicks = this.getFormat();
 
       // peg values to max and min if out of range
