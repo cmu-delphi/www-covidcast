@@ -37,7 +37,8 @@
   bgColor:string - 'rgb(xx,yy,zz)'
 */
   function getTextColorBasedOnBackground(bgColor) {
-    return invertColor(colorParse(bgColor).values, true);
+    // https://github.com/onury/invert-color
+    return invertColor(colorParse(bgColor).values, { black: '#000', white: '#fff', threshold: 0.32 });
   }
 
   onMount(_ => {
