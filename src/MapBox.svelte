@@ -385,21 +385,22 @@
       map.addSource('city-point', {
         type: 'geojson',
         data: $geojsons.get('city'),
-        cluster: true,
-        clusterMaxZoom: 14, // Max zoom to cluster points on
-        clusterRadius: 100, // Radius of each cluster when clustering points (defaults to 50),
-        clusterProperties: {
-          largest: [
-            [
-              'case',
-              ['<', ['get', 'rank', ['accumulated']], ['get', 'rank', ['get', 'largest']]],
-              ['accumulated'],
-              ['properties'],
-            ],
-            ['properties'],
-          ],
-        },
+        // cluster: true,
+        // clusterMaxZoom: 14, // Max zoom to cluster points on
+        // clusterRadius: 100, // Radius of each cluster when clustering points (defaults to 50),
+        // clusterProperties: {
+        //   largest: [
+        //     [
+        //       'case',
+        //       ['<', ['get', 'rank', ['accumulated']], ['get', 'rank', ['get', 'largest']]],
+        //       ['accumulated'],
+        //       ['properties'],
+        //     ],
+        //     ['properties'],
+        //   ],
+        // },
       });
+      console.log(map.getSource('city-point'));
 
       map.addLayer({
         id: 'county-outline',
@@ -453,7 +454,8 @@
         id: 'city-point-unclustered',
         source: 'city-point',
         type: 'symbol',
-        filter: ['!', ['has', 'point_count']],
+        filter: ['<', 'rank', 16],
+        maxzoom: 6,
         layout: {
           'text-field': ['get', 'city'],
           'text-font': ['Open Sans Regular'],
@@ -465,12 +467,14 @@
         },
       });
       map.addLayer({
-        id: 'city-point-clustered',
+        id: 'city-point-unclustered-2',
         source: 'city-point',
         type: 'symbol',
-        filter: ['has', 'point_count'],
+        filter: ['<', 'rank', 100],
+        maxzoom: 8,
+        minzoom: 6,
         layout: {
-          'text-field': ['get', 'city', ['get', 'largest']],
+          'text-field': ['get', 'city'],
           'text-font': ['Open Sans Regular'],
           'text-size': 12,
         },
@@ -479,6 +483,36 @@
           'text-halo-width': 2,
         },
       });
+      map.addLayer({
+        id: 'city-point-unclustered-3',
+        source: 'city-point',
+        type: 'symbol',
+        minzoom: 8,
+        layout: {
+          'text-field': ['get', 'city'],
+          'text-font': ['Open Sans Regular'],
+          'text-size': 12,
+        },
+        paint: {
+          'text-halo-color': '#fff',
+          'text-halo-width': 2,
+        },
+      });
+      // map.addLayer({
+      //   id: 'city-point-clustered',
+      //   source: 'city-point',
+      //   type: 'symbol',
+      //   filter: ['has', 'point_count'],
+      //   layout: {
+      //     'text-field': ['get', 'city', ['get', 'largest']],
+      //     'text-font': ['Open Sans Regular'],
+      //     'text-size': 12,
+      //   },
+      //   paint: {
+      //     'text-halo-color': '#fff',
+      //     'text-halo-width': 2,
+      //   },
+      // });
 
       Object.keys($levels).forEach(name => {
         map.addLayer(
