@@ -30,7 +30,7 @@
   let container;
   let map;
   let popup;
-  let hoveredId;
+  let hoveredId = null;
   let megaHoveredId;
   let clickedId;
   let megaClickedId;
@@ -70,8 +70,8 @@
 
   const onMouseMove = level => e => {
     // console.log(hoveredId);
-    map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
-    map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
+    map.setFeatureState({ source: level }, { hover: false });
+    map.setFeatureState({ source: 'mega-county' }, { hover: false });
     if (level !== 'mega-county') {
       if (hoveredId !== e.features[0].id) {
         map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
@@ -82,6 +82,7 @@
       map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
     } else {
       map.setFeatureState({ source: level, id: megaHoveredId }, { hover: false });
+      console.log(hoveredId);
       if (hoveredId === null) {
         if (megaHoveredId !== e.features[0].id) {
           map.setFeatureState({ source: level, id: megaHoveredId }, { hover: false });
@@ -282,6 +283,7 @@
     let drawMega = $currentLevel === 'county';
 
     Object.keys($levels).forEach(level => map && map.removeFeatureState({ source: level }));
+    map.removeFeatureState({ source: 'mega-county' });
 
     // if (type === 'data') {
     //   map.getLayer($currentLevel) && map.removeLayer($currentLevel);
@@ -295,7 +297,6 @@
     let directionMappedVals = new Map();
     let valueMappedMega = new Map();
     let directionMappedMega = new Map();
-    console.log($currentData);
 
     let geoIds = new Set(
       $currentData.map(d => {
@@ -446,8 +447,11 @@
         clickedId = found[0].id;
         ////console.log('clickedId', clickedId);
         map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+        // if ($currentLevel === 'county')
+        //   map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: true });
       } else {
         clickedId = null;
+        // if ($currentLevel === 'county') megaClickedId = null;
         currentRegion.set('');
         currentRegionName.set('');
         ////console.log('no current region');
