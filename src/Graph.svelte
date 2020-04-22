@@ -574,9 +574,7 @@
 
 <style>
   .graph {
-    padding: 0px 6px;
     max-height: 380px;
-    width: 374px;
   }
 
   .graph-title {
@@ -594,6 +592,11 @@
     font-size: 14px;
     padding: 0px !important;
   }
+
+  .graph-itself {
+    margin: 0px 6px;
+    width: 374px;
+  }
 </style>
 
 <div class="graph">
@@ -603,7 +606,7 @@
     {$currentLevel === 'msa' ? 'Metro Area' : ''}
   </p>
 
-  <div bind:clientWidth={w}>
+  <div bind:clientWidth={w} class="graph-itself">
     <div bind:this={el} />
   </div>
 </div>

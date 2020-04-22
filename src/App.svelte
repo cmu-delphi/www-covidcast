@@ -240,8 +240,17 @@
 
             mounted.set(1);
           });
+      })
+      .catch(err => {
+        console.log(err);
       });
   });
+
+  let graphShowStatus = true;
+
+  function toggleGraphShowStatus() {
+    graphShowStatus = !graphShowStatus;
+  }
 </script>
 
 <style>
@@ -302,6 +311,8 @@
   }
 
   .graph-container {
+    /* border: 1px dotted black; */
+
     position: absolute;
     z-index: 1001;
     bottom: 10px;
@@ -311,7 +322,7 @@
     width: 400px; */
     background-color: rgba(255, 255, 255, 0.9);
     /* border-radius: 1rem; */
-    padding: 6px 5px;
+    padding: 5px 5px;
     box-sizing: border-box;
 
     transition: opacity 0.3s ease-in-out;
@@ -323,6 +334,108 @@
   .graph-container.show {
     visibility: unset;
     opacity: 1;
+  }
+
+  .hide-graph-button-anchor {
+    position: relative;
+  }
+
+  .hide-graph-button {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    color: #333;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    background-color: transparent;
+    padding: 0;
+    border: 0;
+
+    transition: opacity 0.1s ease-in;
+
+    opacity: 0.7;
+  }
+
+  .hide-graph-button:hover {
+    opacity: 1;
+  }
+
+  .graph-toggole-button-container {
+    position: absolute;
+    z-index: 1001;
+    bottom: 10px;
+    right: 10px;
+    /* max-width: 400px;
+    max-height: 400px;
+    width: 400px; */
+    background-color: rgba(255, 255, 255, 0.9);
+    /* border-radius: 1rem; */
+    padding: 5px 5px;
+    box-sizing: border-box;
+  }
+
+  .graph-toggle-button {
+    width: 30px;
+    height: 30px;
+    /* border-radius: 5px; */
+    cursor: pointer;
+    background-color: transparent;
+    padding: 0;
+    border: 0;
+
+    transition: all 0.1s ease-in;
+
+    position: relative;
+  }
+
+  .graph-toggle-button:hover {
+    background-color: #eee;
+  }
+
+  img.toggle-button-icon {
+    width: 24px;
+    height: 24px;
+    background: transparent;
+  }
+
+  button.graph-toggle-button .button-tooltip {
+    visibility: hidden;
+    width: 120px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #666;
+    background-color: #fff;
+    color: #333;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 14px;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 5px;
+    position: absolute;
+    z-index: 1;
+    top: 0px;
+    right: 120%;
+  }
+
+  button.graph-toggle-button .button-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent transparent #666;
+  }
+
+  button.graph-toggle-button:hover .button-tooltip {
+    visibility: visible;
   }
 
   .time-container {
@@ -376,6 +489,23 @@
   <Time />
 </div>
 
-<div class="graph-container {$mapfirstLoaded ? 'show' : ''}">
+<!-- need to add the $mapfirstLoaded check -->
+{#if $mapfirstLoaded && !graphShowStatus}
+  <div class="graph-toggole-button-container">
+    <button title="Show graph" class="graph-toggle-button" aria-label="toggle graph" on:click={toggleGraphShowStatus}>
+      <span class="button-tooltip">Show line graph</span>
+      <img class="toggle-button-icon" src="./assets/imgs/line-graph-icon.png" alt="" />
+    </button>
+  </div>
+{/if}
+
+<!-- need to add the $mapfirstLoaded check -->
+<div class="graph-container {$mapfirstLoaded && graphShowStatus ? 'show' : ''}">
+  <div class="hide-graph-button-anchor">
+    <button title="Hide graph" aria-label="toggle graph" on:click={toggleGraphShowStatus} class="hide-graph-button">
+      &#10005;
+    </button>
+  </div>
+
   <Graph />
 </div>
