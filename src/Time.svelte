@@ -1,6 +1,14 @@
 <script>
   import { onMount } from 'svelte';
-  import { currentDate, times, currentSensor, currentDataReadyOnMay, timeRangeOnSlider } from './stores.js';
+  import {
+    currentDate,
+    times,
+    currentSensor,
+    currentDataReadyOnMay,
+    signalType,
+    currentLevel,
+    timeRangeOnSlider,
+  } from './stores.js';
   import * as d3 from 'd3';
 
   let timeSliderPaddingLeft;
@@ -207,8 +215,11 @@
     updateSliderUI();
   }
 
+  currentSensor.subscribe(_ => cancelPlay());
+  currentLevel.subscribe(_ => cancelPlay());
+  signalType.subscribe(_ => cancelPlay());
+
   function playTime() {
-    console.log(playInterval);
     if (!playInterval) {
       if (rectifiedVal >= rectifiedMax) return;
       playInterval = setInterval(_ => {
@@ -216,14 +227,17 @@
           rectifiedVal += 86400000;
           sliderOnChange();
         } else {
-          clearInterval(playInterval);
-          playInterval = null;
+          cancelPlay();
         }
       }, 2000);
     } else {
-      clearInterval(playInterval);
-      playInterval = null;
+      cancelPlay();
     }
+  }
+
+  function cancelPlay() {
+    clearInterval(playInterval);
+    playInterval = null;
   }
 
   // currentDataReadyOnMay.subscribe(d => ////console.log('map set:', d));
@@ -474,8 +488,8 @@
     viewBox="0 0 200 200"
     alt="Play video"
     on:click={_ => playTime()}
-    fill={playInterval ? 'red' : 'grey'}
-    stroke={playInterval ? 'red' : 'grey'}>
+    fill={playInterval ? '#c00' : '#666'}
+    stroke={playInterval ? '#c00' : '#666'}>
     <circle cx="100" cy="100" r="90" fill="none" stroke-width="15" />
     <polygon points="70, 55 70, 145 145, 100" />
   </svg>
