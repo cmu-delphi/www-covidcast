@@ -387,7 +387,7 @@
       // size chart
       var margin = { top: 5, right: 42, bottom: 50, left: 60 }, // right need to be wide enough to accommodate the tooltip
         width = w - margin.left - margin.right,
-        height = 0.75 * w - margin.top - margin.bottom;
+        height = 0.85 * w - margin.top - margin.bottom;
 
       d3.select(el).html('');
       var svg = d3
@@ -412,7 +412,7 @@
 
       // set x-axis ticks based off of data sparsity and format y-axis ticks
       var xTicks = myData.length;
-      var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(xTicks % 6);
+      var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(4);
       var formatYTicks = this.getFormat();
 
       let chartMax = this.max;
@@ -452,7 +452,8 @@
         )
         .selectAll('text')
           .attr('y', 10)
-          .attr('x', -12)
+          .attr('x', -20)
+          .attr('dy', '0em')
           .attr('transform', 'rotate(-60)');
 
       svg
@@ -516,7 +517,7 @@
       svg
         .append('text')
         .attr('class', 'axis-text')
-        .attr('transform', 'translate(' + width / 2 + ', ' + (height + margin.top + 30) + ')')
+        .attr('transform', 'translate(' + width / 2 + ', ' + (height + margin.top + 40) + ')')
         .style('text-anchor', 'middle')
         .text('Date');
 
