@@ -86,7 +86,7 @@
       map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
     } else {
       map.setFeatureState({ source: level, id: megaHoveredId }, { hover: false });
-      console.log(hoveredId);
+      // console.log(hoveredId);
       if (hoveredId === null) {
         if (megaHoveredId !== e.features[0].id) {
           map.setFeatureState({ source: level, id: megaHoveredId }, { hover: false });
@@ -252,7 +252,7 @@
   });
   currentLevel.subscribe(_ => {
     try {
-      console.log('map currentLevel');
+      // console.log('map currentLevel');
       updateMap('data');
     } catch (err) {
       console.log(err);
@@ -352,7 +352,7 @@
           d.properties.direction = directionMappedMega.get(id);
         }
       });
-      console.log(megaDat.features.map(d => d.properties.direction));
+      // console.log(megaDat.features.map(d => d.properties.direction));
     }
 
     let dat = $geojsons.get($currentLevel);
@@ -425,7 +425,7 @@
     } else {
       map.setLayoutProperty('mega-county', 'visibility', 'none');
     }
-    console.log(map.getStyle().layers);
+    // console.log(map.getStyle().layers);
 
     const viableFeatures = dat.features.filter(f => f.properties[$signalType] !== -100);
 
