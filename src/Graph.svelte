@@ -239,7 +239,7 @@
           format = d => d + '%';
           break;
         case sensorKeys['q']:
-          format = d => d + '%';
+          format = d => d;
           break;
         case sensorKeys['ght']:
           format = d3.format('.0f');
