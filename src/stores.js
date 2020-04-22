@@ -28,7 +28,7 @@ export const sensors = readable([
     name: 'Surveys (Google)',
     id: 'google-survey',
     tooltipText: 'Symptom surveys run by Google - thank you Google!',
-    signal: '3cli',
+    signal: '5cli',
     levels: ['county', 'state', 'msa'],
     mean: 0.08931870876166044,
     std: 0.026190562137119736,
