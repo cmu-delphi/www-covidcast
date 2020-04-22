@@ -73,7 +73,6 @@
     // console.log('rectfiedmin:', calculateValFromRectified(rectifiedMin));
     // console.log('dataMin:', dataRangeMin, min);
 
-    // if (newSensor) {
     if (
       newSensor &&
       dataRangeMin <= rectifiedMin &&
@@ -86,11 +85,7 @@
       // console.log('reset range');
       rectifiedRange = interval;
       rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
-      // if (rectifiedMin < dataRangeMin) {
-      //   rectifiedMin = dataRangeMin;
-      // }
     }
-    // }
 
     updateSliderUI();
 
@@ -221,10 +216,11 @@
 
   function playTime() {
     if (!playInterval) {
-      if (rectifiedVal >= rectifiedMax) return;
+      let maxDateOnSlider = +timeSlider.getAttribute('max');
+      if (rectifiedVal >= maxDateOnSlider) return;
       playInterval = setInterval(_ => {
-        if (rectifiedVal < rectifiedMax) {
-          rectifiedVal += 86400000;
+        if (rectifiedVal < maxDateOnSlider) {
+          rectifiedVal += 86400 * 1000;
           sliderOnChange();
         } else {
           cancelPlay();
@@ -486,12 +482,19 @@
     xmlns="http://www.w3.org/2000/svg"
     class="play-button"
     viewBox="0 0 200 200"
-    alt="Play video"
+    alt="play"
     on:click={_ => playTime()}
     fill={playInterval ? '#c00' : '#666'}
     stroke={playInterval ? '#c00' : '#666'}>
     <circle cx="100" cy="100" r="90" fill="none" stroke-width="15" />
-    <polygon points="70, 55 70, 145 145, 100" />
+    <!-- <polygon points="70, 55 70, 145 145, 100" /> -->
+    {#if playInterval}
+      <rect x="65" y="52" width="20" height="90" />
+      <rect x="115" y="52" width="20" height="90" />
+    {:else}
+      <polygon points="70, 55 70, 145 145, 100" />
+    {/if}
+
   </svg>
 
   {#if $currentDataReadyOnMay === false}
