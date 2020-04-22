@@ -14,6 +14,7 @@
     times,
     stats,
     sensors,
+    signalType,
     timeRangeOnSlider,
   } from './stores.js';
   import { DIRECTION_THEME } from './theme.js';
@@ -43,6 +44,7 @@
     regionData.subscribe(d => updateGraph(d));
     regionDataStats.subscribe(d => setChartRange(d));
     currentDate.subscribe(_ => updateGraphTimeRange());
+    signalType.subscribe(_ => updateGraph($regionData));
     currentRegion.subscribe(region => {
       ////console.log(region);
       if (!region) {
@@ -72,7 +74,7 @@
       }
     });
     timeRangeOnSlider.subscribe(({ min, max }) => {
-      console.log('min:', min, 'max:', max);
+      // console.log('min:', min, 'max:', max);
       setChartDomain(min, max);
       userCharts[currentChart].draw();
     });
@@ -212,10 +214,10 @@
           title = 'Percentage';
           break;
         case sensorKeys['q']:
-          title = 'Percentage';
+          title = 'Tests per device';
           break;
         case sensorKeys['ght']:
-          title = 'Relative Frequency';
+          title = 'Relative frequency';
           break;
         case sensorKeys['dr']:
           title = 'Percentage';
@@ -237,7 +239,7 @@
           format = d => d + '%';
           break;
         case sensorKeys['q']:
-          format = d => d + '%';
+          format = d => d;
           break;
         case sensorKeys['ght']:
           format = d3.format('.0f');
@@ -263,7 +265,7 @@
           title = 'Facebook surveys reporting COVID symptoms';
           break;
         case sensorKeys['q']:
-          title = 'Flu tests returning negative for flu';
+          title = 'Influenza testing demand';
           break;
         case sensorKeys['ght']:
           title = 'COVID-related Google searches';
@@ -402,7 +404,6 @@
       // set date range
       var parseTime = d3.timeParse('%Y%m%d');
       var domain = this.getDomain();
-      //console.log('domain: ' + domain[0]);
       var minDate = parseTime(domain[0]);
       var maxDate = parseTime(domain[1]);
       var bisectDate = d3.bisector(function(d) {
@@ -416,9 +417,19 @@
       var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(4);
       var formatYTicks = this.getFormat();
 
+      let currDate = parseTime($currentDate);
+      let currDateSeven = parseTime($currentDate);
+      currDateSeven.setDate(currDate.getDate() - 7);
+
       let chartMax = this.max;
       // peg values to max and min if out of range
       for (var i = 0; i < myData.length; i++) {
+        let directionDate = parseTime(myData[i].time_value);
+        if (directionDate >= currDateSeven && directionDate <= currDate) {
+          myData[i].inDirection = true;
+        } else {
+          myData[i].inDirection = false;
+        }
         myData[i].max = false;
         if (+myData[i].value < this.min) {
           myData[i].value = this.min;
@@ -497,7 +508,16 @@
         .attr('cx', d => x(parseTime(d.time_value)))
         .attr('cy', d => y(+d.value))
         .style('stroke-width', 3)
-        .style('fill', d => (d.time_value == $currentDate ? '#ffffff' : DIRECTION_THEME.gradientMiddle))
+        .style('fill', d => {
+          let color = DIRECTION_THEME.gradientMiddle;
+          if (d.time_value == $currentDate) {
+            color = 'white';
+          } else if (d.inDirection && $signalType === 'direction') {
+            color = 'black';
+          }
+          // console.log($currentDate, d.time_value, color);
+          return color;
+        })
         .style('stroke', d => (d.time_value == $currentDate ? DIRECTION_THEME.gradientMiddle : 'none'))
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
@@ -557,6 +577,11 @@
 </script>
 
 <style>
+  .graph {
+    max-height: 380px;
+    max-width: 400px;
+  }
+
   .graph-title {
     text-align: center;
     font-size: 14px;
@@ -565,11 +590,17 @@
     font-family: 'Open Sans', sans-serif;
     color: var(--darkgrey);
   }
+
   .graph-description {
     text-align: center;
-    margin: 5px 0px 7px 0px !important;
+    margin: 3px 0px 3px 0px !important;
     font-size: 14px;
     padding: 0px !important;
+  }
+
+  .graph-itself {
+    margin: 0px 6px;
+    width: 374px;
   }
 </style>
 
@@ -581,6 +612,6 @@
   {$currentRegionName && $currentLevel === 'msa' ? 'Metro Area' : ''}
 </p>
 
-<div bind:clientWidth={w}>
+<div bind:clientWidth={w} class="graph-itself">
   <div bind:this={el} />
 </div>

@@ -29,16 +29,24 @@
 
   import * as d3 from 'd3';
 
-  const ENDPOINT = 'https://delphi.cmu.edu/epidata/api.php?source=covidcast&time_type=day';
-  const ENDPOINT_META = 'https://delphi.cmu.edu/epidata/api.php?source=covidcast_meta';
+  const ENDPOINT = 'https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&time_type=day';
+  const ENDPOINT_META = 'https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast_meta';
 
   let error = null;
   let changingSensor = false;
 
+  let graphShowStatus = false;
+
+  function toggleGraphShowStatus(event, to = null) {
+    if (to !== null) {
+      graphShowStatus = to;
+    } else {
+      graphShowStatus = !graphShowStatus;
+    }
+  }
+
   function updateRegionSliceCache(sensor, level, date, reason = 'unspecified') {
-    //console.log($regionSliceCache);
     if (!$mounted) return;
-    //console.log(sensor, level, date, $times.get(sensor));
     if (!$sensors.find(d => d.id === sensor).levels.includes(level)) return;
     if (date > $times.get(sensor)[1] || reason === 'level change') return;
 
@@ -104,7 +112,7 @@
       fetch(q)
         .then(d => d.json())
         .then(d => {
-          //console.log(q, d);
+          // console.log(q, d);
           regionData.set(d.epidata);
           timeSliceCache.update(m => m.set(sensor + level + region, d.epidata));
         });
@@ -173,20 +181,25 @@
   currentRegion.subscribe(r => {
     //console.log('update region');
     updateTimeSliceCache($currentSensor, $currentLevel, r);
+    if (r) {
+      toggleGraphShowStatus(null, true);
+    } else {
+      toggleGraphShowStatus(null, false);
+    }
   });
 
   onMount(_ => {
     fetch(ENDPOINT_META)
       .then(d => d.json())
       .then(meta => {
-        console.log(meta.epidata);
+        // console.log(meta.epidata);
         let timeMap = new Map();
         let statsMap = new Map();
         $sensors.forEach(s => {
           let matchedMeta = meta.epidata.find(
             d => d.data_source === s.id && d.signal === s.signal && d.time_type === 'day',
           );
-          //console.log(s, matchedMeta);
+          console.log(s, matchedMeta);
           timeMap.set(s.id, [matchedMeta.min_time, matchedMeta.max_time]);
           statsMap.set(s.id, {
             mean: matchedMeta.mean_value,
@@ -240,6 +253,9 @@
 
             mounted.set(1);
           });
+      })
+      .catch(err => {
+        console.log(err);
       });
   });
 </script>
@@ -302,16 +318,18 @@
   }
 
   .graph-container {
+    /* border: 1px dotted black; */
+
     position: absolute;
     z-index: 1001;
     bottom: 10px;
     right: 10px;
-    max-width: 400px;
+    /* max-width: 400px;
     max-height: 400px;
-    width: 400px;
+    width: 400px; */
     background-color: rgba(255, 255, 255, 0.9);
     /* border-radius: 1rem; */
-    padding: 6px 13px 0;
+    padding: 5px 5px;
     box-sizing: border-box;
 
     transition: opacity 0.3s ease-in-out;
@@ -323,6 +341,108 @@
   .graph-container.show {
     visibility: unset;
     opacity: 1;
+  }
+
+  .hide-graph-button-anchor {
+    position: relative;
+  }
+
+  .hide-graph-button {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    color: #333;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    background-color: transparent;
+    padding: 0;
+    border: 0;
+
+    transition: opacity 0.1s ease-in;
+
+    opacity: 0.7;
+  }
+
+  .hide-graph-button:hover {
+    opacity: 1;
+  }
+
+  .graph-toggole-button-container {
+    position: absolute;
+    z-index: 1001;
+    bottom: 10px;
+    right: 10px;
+    /* max-width: 400px;
+    max-height: 400px;
+    width: 400px; */
+    background-color: rgba(255, 255, 255, 0.9);
+    /* border-radius: 1rem; */
+    padding: 5px 5px;
+    box-sizing: border-box;
+  }
+
+  .graph-toggle-button {
+    width: 30px;
+    height: 30px;
+    /* border-radius: 5px; */
+    cursor: pointer;
+    background-color: transparent;
+    padding: 0;
+    border: 0;
+
+    transition: all 0.1s ease-in;
+
+    position: relative;
+  }
+
+  .graph-toggle-button:hover {
+    background-color: #eee;
+  }
+
+  img.toggle-button-icon {
+    width: 24px;
+    height: 24px;
+    background: transparent;
+  }
+
+  button.graph-toggle-button .button-tooltip {
+    visibility: hidden;
+    width: 120px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #666;
+    background-color: #fff;
+    color: #333;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 14px;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 5px;
+    position: absolute;
+    z-index: 1;
+    top: 0px;
+    right: 120%;
+  }
+
+  button.graph-toggle-button .button-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent transparent #666;
+  }
+
+  button.graph-toggle-button:hover .button-tooltip {
+    visibility: visible;
   }
 
   .time-container {
@@ -376,6 +496,27 @@
   <Time />
 </div>
 
-<div class="graph-container {$mapfirstLoaded ? 'show' : ''}">
+<!-- need to add the $mapfirstLoaded check -->
+{#if $mapfirstLoaded && !graphShowStatus}
+  <div class="graph-toggole-button-container">
+    <button
+      title="Show graph"
+      class="graph-toggle-button"
+      aria-label="toggle graph"
+      on:click={event => toggleGraphShowStatus(false)}>
+      <span class="button-tooltip">Show line graph</span>
+      <img class="toggle-button-icon" src="./assets/imgs/line-graph-icon.png" alt="" />
+    </button>
+  </div>
+{/if}
+
+<!-- need to add the $mapfirstLoaded check -->
+<div class="graph-container {$mapfirstLoaded && graphShowStatus ? 'show' : ''}">
+  <div class="hide-graph-button-anchor">
+    <button title="Hide graph" aria-label="toggle graph" on:click={toggleGraphShowStatus} class="hide-graph-button">
+      &#10005;
+    </button>
+  </div>
+
   <Graph />
 </div>

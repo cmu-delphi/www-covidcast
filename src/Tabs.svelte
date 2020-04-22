@@ -136,7 +136,7 @@
     <div aria-label="Data Source" class="buttons-group-side">
       {#each $sensors as sensor}
         <button
-          aria-selected={$currentSensor === sensor.id ? 'true' : 'false'}
+          aria-pressed={$currentSensor === sensor.id ? 'true' : 'false'}
           class="button {$currentSensor === sensor.id ? 'selected' : ''}"
           on:click={() => {
             currentDataReadyOnMay.set(false);
