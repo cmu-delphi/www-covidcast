@@ -58,8 +58,10 @@
     rectifiedVal = parseTime(val).getTime();
     if (rectifiedVal >= rectifiedMax) {
       rectifiedVal = rectifiedMax;
+      currentDate.set(+calculateValFromRectified(rectifiedVal));
     } else if (rectifiedVal <= rectifiedMin) {
       rectifiedVal = rectifiedMin;
+      currentDate.set(+calculateValFromRectified(rectifiedVal));
     }
   });
   times.subscribe(t => (t ? update($currentSensor, t) : ''));
@@ -87,6 +89,10 @@
       // console.log('reset range');
       rectifiedRange = interval;
       rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
+      if (rectifiedMin < dataRangeMin) {
+        rectifiedMin = dataRangeMin;
+        rectifiedRange = (rectifiedMax - rectifiedMin) / (86400 * 1000);
+      }
     }
 
     updateSliderUI();
@@ -106,6 +112,7 @@
       let leftPercentage = (dataRangeMin - rectifiedMin) / (rectifiedRange * 86400 * 1000);
       let middlePercentage = (dataRangeMax - dataRangeMin) / (rectifiedRange * 86400 * 1000);
       let rightPercentage = (rectifiedMax - dataRangeMax) / (rectifiedRange * 86400 * 1000);
+      console.log(leftPercentage, middlePercentage, rightPercentage);
       timeSliderPaddingLeft.setAttribute('style', `width: ${Math.round(leftPercentage * sliderTotalLength) + 'px'}`);
       timeSlider.setAttribute('style', `width: ${Math.round(middlePercentage * sliderTotalLength) + 'px'}`);
       timeSliderPaddingRight.setAttribute('style', `width: ${Math.round(rightPercentage * sliderTotalLength) + 'px'}`);
@@ -207,6 +214,7 @@
     rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
     if (rectifiedMin < dataRangeMin) {
       rectifiedMin = dataRangeMin;
+      rectifiedRange = (rectifiedMax - rectifiedMin) / (86400 * 1000);
     }
 
     updateSliderUI();
