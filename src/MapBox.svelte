@@ -63,13 +63,15 @@
     // popup
     map.getCanvas().style.cursor = 'pointer';
     // if (level !== 'mega-county') {
-    megaHoveredId = null;
+    // megaHoveredId = null;
     // }
     popup.setLngLat(e.lngLat).addTo(map);
   };
 
   const onMouseMove = level => e => {
     // console.log(hoveredId);
+    map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
+    map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
     if (level !== 'mega-county') {
       if (hoveredId !== e.features[0].id) {
         map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
