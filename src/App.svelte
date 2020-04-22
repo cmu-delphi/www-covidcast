@@ -25,7 +25,9 @@
     metaData,
     mounted,
     mapfirstLoaded,
+    yesterday,
   } from './stores.js';
+  import { calculateValFromRectified } from './util.js';
 
   import * as d3 from 'd3';
 
@@ -199,7 +201,11 @@
           let matchedMeta = meta.epidata.find(
             d => d.data_source === s.id && d.signal === s.signal && d.time_type === 'day',
           );
-          console.log(s, matchedMeta);
+          // console.log(s, matchedMeta);
+          const yesterdayConverted = +calculateValFromRectified(yesterday);
+          if (matchedMeta.max_time > yesterdayConverted) {
+            matchedMeta.max_time = yesterdayConverted;
+          }
           timeMap.set(s.id, [matchedMeta.min_time, matchedMeta.max_time]);
           statsMap.set(s.id, {
             mean: matchedMeta.mean_value,

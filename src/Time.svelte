@@ -8,6 +8,7 @@
     signalType,
     currentLevel,
     timeRangeOnSlider,
+    yesterday,
   } from './stores.js';
   import { calculateValFromRectified } from './util.js';
   import * as d3 from 'd3';
@@ -35,14 +36,6 @@
   let val = $currentDate;
   let min = $currentDate;
   let max = $currentDate;
-
-  let today = new Date(
-    new Date()
-      .toJSON()
-      .slice(0, 10)
-      .replace(/-/g, '/'),
-  );
-  let yesterday = new Date(today.getTime() - 86400 * 1000);
 
   let rectifiedVal = parseTime(val).getTime();
   let rectifiedMax = yesterday.getTime();
