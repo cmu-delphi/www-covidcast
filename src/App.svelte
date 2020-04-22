@@ -46,9 +46,7 @@
   }
 
   function updateRegionSliceCache(sensor, level, date, reason = 'unspecified') {
-    //console.log($regionSliceCache);
     if (!$mounted) return;
-    //console.log(sensor, level, date, $times.get(sensor));
     if (!$sensors.find(d => d.id === sensor).levels.includes(level)) return;
     if (date > $times.get(sensor)[1] || reason === 'level change') return;
 

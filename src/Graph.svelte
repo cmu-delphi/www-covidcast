@@ -345,7 +345,7 @@
     }
 
     getDomain() {
-      // console.log('get domain: ' + this.minDate);
+      //console.log('get domain: ' + this.minDate);
       return [this.minDate, this.maxDate];
     }
     updateAxes() {}
@@ -384,7 +384,7 @@
       console.log('my data:' + myData[0]);
 
       // size chart
-      var margin = { top: 5, right: 42, bottom: 50, left: 60 }, // right need to be wide enough to accommodate the tooltip
+      var margin = { top: 15, right: 42, bottom: 50, left: 60 }, // right need to be wide enough to accommodate the tooltip
         width = w - margin.left - margin.right,
         height = 0.85 * w - margin.top - margin.bottom;
 
@@ -400,7 +400,6 @@
       // set date range
       var parseTime = d3.timeParse('%Y%m%d');
       var domain = this.getDomain();
-      // console.log('domain: ' + domain[0]);
       var minDate = parseTime(domain[0]);
       var maxDate = parseTime(domain[1]);
       var bisectDate = d3.bisector(function(d) {
@@ -525,6 +524,7 @@
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
 
+      //console.log($currentRegion);
       // label the y-axis
       var label = this.getYAxis();
       svg
@@ -597,14 +597,23 @@
   }
 </style>
 
+<<<<<<< HEAD
+<h5 bind:this={t} class="graph-title" />
+<p class="graph-description">
+  {$currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' === '000' ? 'Rest of' : ''}
+  {$currentRegionName}
+  {$currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' !== '000' ? 'County' : ''}
+  {$currentRegionName && $currentLevel === 'msa' ? 'Metro Area' : ''}
+</p>
+=======
 <div class="graph">
   <h5 bind:this={t} class="graph-title" />
   <p class="graph-description">
     {$currentRegionName} {$currentRegionName && $currentLevel === 'county' ? 'County' : ''}
     {$currentRegionName && $currentLevel === 'msa' ? 'Metro Area' : ''}
   </p>
+>>>>>>> a19631622f89218af30687ce4be61707c85b7759
 
-  <div bind:clientWidth={w} class="graph-itself">
-    <div bind:this={el} />
-  </div>
+<div bind:clientWidth={w} class="graph-itself">
+  <div bind:this={el} />
 </div>
