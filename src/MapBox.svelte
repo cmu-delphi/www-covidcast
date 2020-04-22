@@ -247,7 +247,7 @@
 
     let valueMappedVals = new Map();
     let directionMappedVals = new Map();
-    console.log($currentData);
+    // console.log($currentData);
     let geoIds = new Set(
       $currentData.map(d => {
         const key = d.geo_value.toUpperCase();

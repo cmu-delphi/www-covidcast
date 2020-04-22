@@ -58,6 +58,8 @@
     rectifiedVal = parseTime(val).getTime();
     if (rectifiedVal >= rectifiedMax) {
       rectifiedVal = rectifiedMax;
+    } else if (rectifiedVal <= rectifiedMin) {
+      rectifiedVal = rectifiedMin;
     }
   });
   times.subscribe(t => (t ? update($currentSensor, t) : ''));
