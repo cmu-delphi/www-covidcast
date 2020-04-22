@@ -247,6 +247,8 @@
 
     let valueMappedVals = new Map();
     let directionMappedVals = new Map();
+
+    // console.log($currentData);
     let geoIds = new Set(
       $currentData.map(d => {
         const key = d.geo_value.toUpperCase();
@@ -432,6 +434,7 @@
         // },
       });
 
+      // console.log(map.getSource('city-point'));
       map.addLayer({
         id: 'county-outline',
         source: 'county-outline',
@@ -517,7 +520,7 @@
         id: 'city-point-unclustered-3',
         source: 'city-point',
         type: 'symbol',
-        filter: ['>', 'population', 250000],
+        filter: ['>', 'population', 100000],
         maxzoom: 8,
         minzoom: 6,
         layout: {
