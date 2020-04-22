@@ -70,6 +70,7 @@
     timeRangeOnSlider.subscribe(({ min, max }) => {
       console.log('min:', min, 'max:', max);
       setChartDomain(min, max);
+      userCharts[currentChart].draw();
     });
   });
 
@@ -452,7 +453,7 @@
         .selectAll('text')
           .attr('y', 10)
           .attr('x', -12)
-          .attr('transform', 'rotate(-45)');
+          .attr('transform', 'rotate(-60)');
 
       svg
         .append('g')
@@ -490,10 +491,11 @@
         .data(myData)
         .enter()
         .append('circle')
-        .attr('r', 4)
+        .attr('r', d => (d.time_value == $currentDate)? 6 : 4)
         .attr('cx', d => x(parseTime(d.time_value)))
         .attr('cy', d => y(+d.value))
-        .style('fill', DIRECTION_THEME.gradientMiddle)
+        .style('fill', d => (d.time_value == $currentDate)? '#ffffff' : DIRECTION_THEME.gradientMiddle)
+        .style('stroke', d => (d.time_value == $currentDate)? DIRECTION_THEME.gradientMiddle : 'none')
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
 
