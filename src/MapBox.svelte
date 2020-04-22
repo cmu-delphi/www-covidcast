@@ -19,6 +19,7 @@
     metaData,
     sensors,
     mounted,
+    mapfirstLoaded,
   } from './stores.js';
   import { DIRECTION_THEME, MAP_THEME } from './theme.js';
 
@@ -366,6 +367,11 @@
     map.on('idle', ev => {
       // console.log(ev);
       currentDataReadyOnMay.set(true);
+      mapfirstLoaded.set(true);
+    });
+
+    map.on('error', ev => {
+      mapfirstLoaded.set(true);
     });
 
     //Disable touch zoom, it makes gesture scrolling difficult

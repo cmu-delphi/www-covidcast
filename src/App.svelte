@@ -24,6 +24,7 @@
     regionData,
     metaData,
     mounted,
+    mapfirstLoaded,
   } from './stores.js';
 
   import * as d3 from 'd3';
@@ -300,9 +301,9 @@
 
   .graph-container {
     position: absolute;
+    z-index: 1001;
     bottom: 10px;
     right: 10px;
-    z-index: 1001;
     max-width: 400px;
     max-height: 400px;
     width: 400px;
@@ -311,7 +312,15 @@
     padding: 6px 13px 0;
     box-sizing: border-box;
 
-    transition: all 0.1s ease-in;
+    transition: opacity 0.3s ease-in-out;
+
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  .graph-container.show {
+    visibility: unset;
+    opacity: 1;
   }
 
   .time-container {
@@ -365,6 +374,6 @@
   <Time />
 </div>
 
-<div class="graph-container">
+<div class="graph-container {$mapfirstLoaded ? 'show' : ''}">
   <Graph />
 </div>
