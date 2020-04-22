@@ -88,21 +88,29 @@
       <div class="map-popup-region-value-container">
         ${
           $signalType === 'value'
-            ? $currentSensor !== 'ght'
-              ? 'Percentage: <span class="map-popup-region-value" style="background-color: ' +
-                fillColor +
-                '; color: ' +
-                getTextColorBasedOnBackground(fillColor) +
-                ';">' +
-                value.toFixed(2) +
-                '%</span>'
-              : 'Relative Frequency: <span class="map-popup-region-value" style="background-color: ' +
+            ? $currentSensor === 'ght'
+              ? 'Relative Frequency: <span class="map-popup-region-value" style="background-color: ' +
                 fillColor +
                 '; color: ' +
                 getTextColorBasedOnBackground(fillColor) +
                 ';">' +
                 value.toFixed(2) +
                 '</span>'
+              : $currentSensor === 'quidel'
+              ? 'Tests per Device: <span class="map-popup-region-value" style="background-color: ' +
+                fillColor +
+                '; color: ' +
+                getTextColorBasedOnBackground(fillColor) +
+                ';">' +
+                value.toFixed(2) +
+                '</span>'
+              : 'Percentage: <span class="map-popup-region-value" style="background-color: ' +
+                fillColor +
+                '; color: ' +
+                getTextColorBasedOnBackground(fillColor) +
+                ';">' +
+                value.toFixed(2) +
+                '%</span>'
             : ''
         }
         ${

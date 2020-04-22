@@ -76,7 +76,7 @@
       }
     });
     timeRangeOnSlider.subscribe(({ min, max }) => {
-      if(userCharts != undefined) {
+      if (userCharts != undefined) {
         setChartDomain(min, max);
         userCharts[currentChart].draw();
       }
@@ -109,8 +109,7 @@
           }
         }
       }
-    } catch (err) {
-    }
+    } catch (err) {}
   }
 
   function updateGraphTimeRange() {
@@ -495,7 +494,7 @@
             d3.timeFormat('%m/%d')(parseTime(d.time_value)) +
             ': ' +
             d.value.toFixed(2) +
-            ($currentSensor === sensorKeys['ght'] ? '' : '%')
+            ($currentSensor === sensorKeys['ght'] || $currentSensor === sensorKeys['q'] ? '' : '%')
           );
         });
 
@@ -609,7 +608,7 @@
   <h5 bind:this={t} class="graph-title" />
   <p class="graph-description">
     {$currentRegionName} {$currentRegionName && $currentLevel === 'county' ? 'County' : ''}
-    {$currentLevel === 'msa' ? 'Metro Area' : ''}
+    {$currentRegionName && $currentLevel === 'msa' ? 'Metro Area' : ''}
   </p>
 
   <div bind:clientWidth={w} class="graph-itself">
