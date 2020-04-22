@@ -125,6 +125,8 @@
     if ($currentDate >= minDate && $currentDate <= maxDate) {
       // data available at current date
       date = $currentDate;
+    } else if ($currentDate > maxDate) {
+      date = maxDate;
     }
     // console.log(date);
 

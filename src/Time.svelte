@@ -457,7 +457,7 @@
     Viewing estimates for: {formatTimeWithoutYear(new Date(rectifiedVal))}
   </div>
 
-  <button class="load-more-button" on:click={loadMoreDataRange} disabled={!canLoadMore}>Load 2 more weeks</button>
+  <button class="load-more-button" on:click={loadMoreDataRange} disabled={!canLoadMore}>Load up to 2 more weeks</button>
 
   <p aria-label="minimum value" class="min-max">{formatTime(new Date(rectifiedMin))}</p>
   <div id="timeSliderPaddingLeft" bind:this={timeSliderPaddingLeft} />

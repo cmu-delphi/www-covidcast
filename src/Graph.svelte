@@ -45,6 +45,7 @@
     currentDate.subscribe(_ => updateGraphTimeRange());
     currentRegion.subscribe(region => {
       if (!region) {
+<<<<<<< HEAD
         if(userCharts[currentChart].isChart()) {
           userCharts[currentChart].draw();
           console.log('draw existing chart-current region, increment: ' + currentChart);
@@ -56,6 +57,16 @@
           console.log('new chart-current region, increment: ' + currentChart);
         }
 
+=======
+        // console.log('draw blank graph')
+        userCharts[currentChart].setData([]);
+        userCharts[currentChart].draw();
+
+        // let chart = new Chart();
+        // chart.draw();
+        // userCharts = [];
+        // userCharts.push(chart);
+>>>>>>> 9ea39e9043b8efaaca02e3471b3ad9727087a41d
       }
     });
     currentSensor.subscribe(_ => {
@@ -101,7 +112,7 @@
             var graphData = dataResults[1];
             var range = dataResults[2];
             var n = dataResults[3];
-            var domain = dataResults[4]
+            var domain = dataResults[4];
             userCharts[currentChart] = new Chart(graphType, graphData, range, n, domain);
             userCharts[currentChart].draw();
           }
@@ -139,21 +150,18 @@
           userCharts[currentChart].setN(num_locations);
         }
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   function setChartDomain(min, max) {
     try {
-      if(userCharts[currentChart] != undefined) {
+      if (userCharts[currentChart] != undefined) {
         let minDate = min;
         let maxDate = max;
         userCharts[currentChart].setDomain(min, max);
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   }
-
 
   class Chart {
     constructor(chartType, data, dataRange, num, domain) {
@@ -279,6 +287,7 @@
     }
 
     isChart() {
+      console.log(this.chartType);
       var result = null;
       try {
         this.chartType in charts ? (result = true) : (result = false);
@@ -450,10 +459,10 @@
             .ticks(formatXTicks),
         )
         .selectAll('text')
-          .attr('y', 10)
-          .attr('x', -20)
-          .attr('dy', '0em')
-          .attr('transform', 'rotate(-60)');
+        .attr('y', 10)
+        .attr('x', -20)
+        .attr('dy', '0em')
+        .attr('transform', 'rotate(-60)');
 
       svg
         .append('g')
@@ -494,12 +503,12 @@
         .data(myData)
         .enter()
         .append('circle')
-        .attr('r', d => (d.time_value == $currentDate)? 6 : 4)
+        .attr('r', d => (d.time_value == $currentDate ? 6 : 4))
         .attr('cx', d => x(parseTime(d.time_value)))
         .attr('cy', d => y(+d.value))
         .style('stroke-width', 3)
-        .style('fill', d => (d.time_value == $currentDate)? '#ffffff' : DIRECTION_THEME.gradientMiddle)
-        .style('stroke', d => (d.time_value == $currentDate)? DIRECTION_THEME.gradientMiddle : 'none')
+        .style('fill', d => (d.time_value == $currentDate ? '#ffffff' : DIRECTION_THEME.gradientMiddle))
+        .style('stroke', d => (d.time_value == $currentDate ? DIRECTION_THEME.gradientMiddle : 'none'))
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
 
