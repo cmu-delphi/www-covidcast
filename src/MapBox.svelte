@@ -2,7 +2,6 @@
   import { onMount } from 'svelte';
   import colorParse from 'color-parse';
   import invertColor from 'invert-color';
-  import debounce from 'lodash/debounce';
   import mapboxgl from 'mapbox-gl';
   import {
     levels,
@@ -20,6 +19,7 @@
     metaData,
     sensors,
     mounted,
+    mapfirstLoaded,
   } from './stores.js';
   import { DIRECTION_THEME, MAP_THEME } from './theme.js';
 
@@ -37,7 +37,8 @@
   bgColor:string - 'rgb(xx,yy,zz)'
 */
   function getTextColorBasedOnBackground(bgColor) {
-    return invertColor(colorParse(bgColor).values, true);
+    // https://github.com/onury/invert-color
+    return invertColor(colorParse(bgColor).values, { black: '#000', white: '#fff', threshold: 0.32 });
   }
 
   onMount(_ => {
@@ -363,12 +364,15 @@
       .addControl(new mapboxgl.AttributionControl({ compact: true }))
       .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
 
-    map.on(
-      'render',
-      debounce(ev => {
-        currentDataReadyOnMay.set(true);
-      }, 150),
-    );
+    map.on('idle', ev => {
+      // console.log(ev);
+      currentDataReadyOnMay.set(true);
+      mapfirstLoaded.set(true);
+    });
+
+    map.on('error', ev => {
+      mapfirstLoaded.set(true);
+    });
 
     //Disable touch zoom, it makes gesture scrolling difficult
     map.scrollZoom.disable();

@@ -128,3 +128,4 @@ export const regionDataStats = derived([metaData, currentSensor, currentLevel], 
 );
 
 export const timeRangeOnSlider = writable({ min: 0, max: 0 });
+export const mapfirstLoaded = writable(false);
