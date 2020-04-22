@@ -70,6 +70,7 @@
     timeRangeOnSlider.subscribe(({ min, max }) => {
       console.log('min:', min, 'max:', max);
       setChartDomain(min, max);
+      userCharts[currentChart].draw();
     });
   });
 
@@ -386,7 +387,7 @@
       // size chart
       var margin = { top: 5, right: 42, bottom: 50, left: 60 }, // right need to be wide enough to accommodate the tooltip
         width = w - margin.left - margin.right,
-        height = 0.75 * w - margin.top - margin.bottom;
+        height = 0.85 * w - margin.top - margin.bottom;
 
       d3.select(el).html('');
       var svg = d3
@@ -411,7 +412,7 @@
 
       // set x-axis ticks based off of data sparsity and format y-axis ticks
       var xTicks = myData.length;
-      var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(xTicks % 6);
+      var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(4);
       var formatYTicks = this.getFormat();
 
       let chartMax = this.max;
@@ -451,8 +452,9 @@
         )
         .selectAll('text')
           .attr('y', 10)
-          .attr('x', -12)
-          .attr('transform', 'rotate(-45)');
+          .attr('x', -20)
+          .attr('dy', '0em')
+          .attr('transform', 'rotate(-60)');
 
       svg
         .append('g')
@@ -490,10 +492,12 @@
         .data(myData)
         .enter()
         .append('circle')
-        .attr('r', 4)
+        .attr('r', d => (d.time_value == $currentDate)? 6 : 4)
         .attr('cx', d => x(parseTime(d.time_value)))
         .attr('cy', d => y(+d.value))
-        .style('fill', DIRECTION_THEME.gradientMiddle)
+        .style('stroke-width', 3)
+        .style('fill', d => (d.time_value == $currentDate)? '#ffffff' : DIRECTION_THEME.gradientMiddle)
+        .style('stroke', d => (d.time_value == $currentDate)? DIRECTION_THEME.gradientMiddle : 'none')
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
 
@@ -513,7 +517,7 @@
       svg
         .append('text')
         .attr('class', 'axis-text')
-        .attr('transform', 'translate(' + width / 2 + ', ' + (height + margin.top + 30) + ')')
+        .attr('transform', 'translate(' + width / 2 + ', ' + (height + margin.top + 40) + ')')
         .style('text-anchor', 'middle')
         .text('Date');
 
