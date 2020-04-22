@@ -104,7 +104,7 @@
       fetch(q)
         .then(d => d.json())
         .then(d => {
-          console.log(q, d);
+          // console.log(q, d);
           regionData.set(d.epidata);
           timeSliceCache.update(m => m.set(sensor + level + region, d.epidata));
         });
