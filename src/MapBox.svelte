@@ -35,9 +35,6 @@
   let clickedId;
   let megaClickedId;
 
-  /*
-  bgColor:string - 'rgb(xx,yy,zz)'
-*/
   function getTextColorBasedOnBackground(bgColor) {
     // https://github.com/onury/invert-color
     return invertColor(colorParse(bgColor).values, { black: '#000', white: '#fff', threshold: 0.32 });
@@ -56,7 +53,6 @@
 
   // Boolean tracking if the map has been initialized.
   let mapMounted = false;
-  let chosenRandom = false;
 
   // Mouse event handlers
   const onMouseEnter = level => e => {
@@ -193,10 +189,6 @@
   };
 
   const onClick = level => e => {
-    // If we've clicked on a county, don't select the mega county;
-    // console.log(hoveredId, clickedId, megaHoveredId, megaClickedId);
-    // if (level === 'mega-county' && hoveredId !== null) return;
-
     if (clickedId) {
       map.setFeatureState({ source: level, id: clickedId }, { select: false });
     }
@@ -205,7 +197,6 @@
     }
 
     if (level === 'mega-county') {
-      console.log('hoveredId', hoveredId, 'clickedId', clickedId);
       if (hoveredId !== null) return;
       map.setFeatureState({ source: 'county', id: clickedId }, { select: false });
       clickedId = null;
@@ -241,10 +232,6 @@
   // Update the map when sensor or level changes.
   currentData.subscribe(_ => {
     try {
-      // console.log('currentData');
-      // console.log($currentDate, $currentSensor, $currentLevel);
-      // console.log(_);
-      // console.log('updating map due to currentData change');
       updateMap('data');
     } catch (err) {
       ////console.log(err);
@@ -260,16 +247,12 @@
   });
   currentDate.subscribe(_ => {
     try {
-      // console.log('currentDate');
-      // console.log($currentDate, $currentSensor, $currentLevel);
-      // console.log($currentData);
       if (
         $currentData.length > 0 &&
         ($currentData[0].sensor !== $currentSensor || $currentData[0].level !== $currentLevel)
       ) {
         return;
       }
-      // console.log('updating map due to currentDate change');
       updateMap('data');
     } catch (err) {
       ////console.log(err);
@@ -299,10 +282,6 @@
 
     Object.keys($levels).forEach(level => map && map.removeFeatureState({ source: level }));
     map.removeFeatureState({ source: 'mega-county' });
-
-    // if (type === 'data') {
-    //   map.getLayer($currentLevel) && map.removeLayer($currentLevel);
-    // }
 
     let thisMeta = $metaData.find(d => d.data_source === $currentSensor && d.geo_type === $currentLevel);
     let sts = $stats.get($currentSensor);
@@ -352,7 +331,6 @@
           d.properties.direction = directionMappedMega.get(id);
         }
       });
-      // console.log(megaDat.features.map(d => d.properties.direction));
     }
 
     let dat = $geojsons.get($currentLevel);
@@ -425,71 +403,32 @@
     } else {
       map.setLayoutProperty('mega-county', 'visibility', 'none');
     }
-    // console.log(map.getStyle().layers);
 
     const viableFeatures = dat.features.filter(f => f.properties[$signalType] !== -100);
 
     // set a random focus on start up
-    if (chosenRandom === false && $mounted) {
-      if (viableFeatures.length > 0) {
-        const found = viableFeatures.filter(
-          f => f.properties.id === '42003' || f.properties.id === '38300' || f.properties.id === 'PA',
-        );
-        if (found.length > 0) {
-          // found allegheny / Pittsburgh
-          const randomFeature = found[0];
-          ////console.log(randomFeature);
-          currentRegionName.set(randomFeature.properties.NAME);
-          currentRegion.set(randomFeature.properties.id);
-          clickedId = randomFeature.id;
-          map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-          chosenRandom = true;
-        } else {
-          // const viableFeatures = dat.features.filter(f => f.properties[$signalType] !== -100);
-          const index = Math.floor(Math.random() * (viableFeatures.length - 1));
-          ////console.log(dat.features);
-          ////console.log(viableFeatures, viableFeatures.length, index);
-          const randomFeature = viableFeatures[index];
-          ////console.log(randomFeature);
-          ////console.log(randomFeature.properties.NAME);
-          currentRegionName.set(randomFeature.properties.NAME);
-          currentRegion.set(randomFeature.properties.id);
-          clickedId = randomFeature.id;
-          map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-          chosenRandom = true;
-        }
-      }
-    } else if (viableFeatures > 0) {
-      // const viableFeatures = dat.features.filter(f => f.properties[$signalType] !== -100);
-      const index = Math.floor(Math.random() * (viableFeatures.length - 1));
-      ////console.log(dat.features);
-      ////console.log(viableFeatures, viableFeatures.length, index);
-      const randomFeature = viableFeatures[index];
+    if (type === 'mounted') {
+      const found = viableFeatures.filter(
+        f => f.properties.id === '42003' || f.properties.id === '38300' || f.properties.id === 'PA',
+      );
+      // found allegheny / Pittsburgh
+      const initialRegion = found[0];
       ////console.log(randomFeature);
-      ////console.log(randomFeature.properties.NAME);
-      currentRegionName.set(randomFeature.properties.NAME);
-      currentRegion.set(randomFeature.properties.id);
-      clickedId = randomFeature.id;
+      currentRegionName.set(initialRegion.properties.NAME);
+      currentRegion.set(initialRegion.properties.id);
+      clickedId = initialRegion.id;
       map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-      chosenRandom = true;
     }
 
-    ////console.log($currentRegion);
-    ////console.log(viableFeatures.filter(f => f.properties.id === $currentRegion).length);
     if ($currentRegion) {
+      const megaFound = megaDat.features.filter(f => f.properties.STATE + '000' === $currentRegion + '');
       const found = viableFeatures.filter(f => f.properties.id === $currentRegion);
+      if (megaFound.length > 0) {
+        megaClickedId = parseInt(megaFound[0].properties.STATE);
+        map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: true });
+      }
       if (found.length > 0) {
         clickedId = found[0].id;
-        ////console.log('clickedId', clickedId);
-        map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-        // if ($currentLevel === 'county')
-        //   map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: true });
-      } else {
-        const index = Math.floor(Math.random() * (viableFeatures.length - 1));
-        const randomFeature = viableFeatures[index];
-        currentRegionName.set(randomFeature.properties.NAME);
-        currentRegion.set(randomFeature.properties.id);
-        clickedId = randomFeature.id;
         map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
       }
     }

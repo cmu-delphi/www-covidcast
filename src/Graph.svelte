@@ -42,37 +42,37 @@
 
   onMount(_ => {
     drawGraph();
-    console.log('on mount called');
+    // console.log('on mount called');
     regionData.subscribe(d => updateGraph(d));
     regionDataStats.subscribe(d => setChartRange(d));
     currentDate.subscribe(_ => updateGraphTimeRange());
     signalType.subscribe(_ => updateGraph($regionData));
     currentRegion.subscribe(region => {
-      console.log('current region changed: ' + region);
+      // console.log('current region changed: ' + region);
       if (!region) {
         userCharts[currentChart].setData([]);
         userCharts[currentChart].draw();
       }
     });
     currentLevel.subscribe(_ => {
-      console.log('level changed:' + $currentLevel);
+      // console.log('level changed:' + $currentLevel);
     });
     currentSensor.subscribe(_ => {
-      console.log('current sensor changed: ' + $currentSensor);
+      // console.log('current sensor changed: ' + $currentSensor);
       if (userCharts != undefined) {
         if (userCharts[currentChart].isChart()) {
-          console.log('is chart-current sensor, increment: ' + currentChart);
-          console.log($currentSensor);
+          // console.log('is chart-current sensor, increment: ' + currentChart);
+          // console.log($currentSensor);
           userCharts[currentChart].getChartTitle();
         } else {
-          console.log('is chart fail: ' + userCharts[currentChart].isChart());
-          console.log($currentSensor);
+          // console.log('is chart fail: ' + userCharts[currentChart].isChart());
+          // console.log($currentSensor);
           let chart = new Chart();
           chart.getChartTitle();
           chart.draw();
           userCharts.push(chart);
           currentChart += 1;
-          console.log('new chart-current sensor, increment: ' + currentChart);
+          // console.log('new chart-current sensor, increment: ' + currentChart);
         }
       }
     });
@@ -88,11 +88,11 @@
     let chart = new Chart();
     chart.draw();
     userCharts.push(chart);
-    console.log('new chart-draw graph, increment' + currentChart);
+    // console.log('new chart-draw graph, increment' + currentChart);
   }
 
   function updateGraph(data) {
-    console.log('update graph');
+    // console.log('update graph');
     try {
       if (data.length !== 0 && $currentRegion) {
         if (userCharts != undefined) {
@@ -282,7 +282,7 @@
       var result = null;
       try {
         this.chartType in charts ? (result = true) : (result = false);
-        console.log(this.chartType in charts);
+        // console.log(this.chartType in charts);
       } catch (e) {
         if (e.name == 'ReferenceError') {
           result = false;
@@ -381,7 +381,7 @@
 
       // line graph
       let myData = this.getData();
-      console.log('my data:' + myData[0]);
+      // console.log('my data:' + myData[0]);
 
       // size chart
       var margin = { top: 15, right: 42, bottom: 70, left: 60 }, // right need to be wide enough to accommodate the tooltip
@@ -437,7 +437,7 @@
       }
 
       if (chartMax > 100 && $currentSensor !== 'ght' && $currentSensor !== 'quidel') {
-        console.log('seeting max');
+        // console.log('seeting max');
         chartMax = 100;
       }
 
