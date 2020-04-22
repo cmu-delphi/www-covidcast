@@ -14,6 +14,7 @@
     times,
     stats,
     sensors,
+    timeRangeOnSlider,
   } from './stores.js';
   import { DIRECTION_THEME } from './theme.js';
   import * as d3 from 'd3';
@@ -34,7 +35,7 @@
     fb: 'fb-survey',
     google: 'google-survey',
     ght: 'ght',
-    q: 'quidel'
+    q: 'quidel',
   };
 
   onMount(_ => {
@@ -65,6 +66,9 @@
           userCharts.push(chart);
         }
       }
+    });
+    timeRangeOnSlider.subscribe(({ min, max }) => {
+      console.log('min:', min, 'max:', max);
     });
     // currentDataReadyOnMay.subscribe(d => setFocus());
     // regionDataStats.subscribe(d => ////console.log(d));
@@ -404,7 +408,6 @@
         }
       }
 
-
       if (chartMax > 100 && $currentSensor !== sensorKeys['ght']) {
         chartMax = 100;
       }
@@ -537,7 +540,7 @@
     padding: 0px !important;
     font-family: 'Open Sans', sans-serif;
     color: var(--darkgrey);
-}
+  }
   .graph-description {
     text-align: center;
     margin: 5px 0px 7px 0px !important;

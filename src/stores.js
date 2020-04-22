@@ -126,3 +126,5 @@ export const currentData = writable([]);
 export const regionDataStats = derived([metaData, currentSensor, currentLevel], ([$meta, $sensor, $level]) =>
   $meta.find((d) => d.data_source === $sensor && d.geo_type === $level),
 );
+
+export const timeRangeOnSlider = writable({ min: 0, max: 0 });
