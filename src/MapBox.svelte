@@ -2,7 +2,6 @@
   import { onMount } from 'svelte';
   import colorParse from 'color-parse';
   import invertColor from 'invert-color';
-  import debounce from 'lodash/debounce';
   import mapboxgl from 'mapbox-gl';
   import {
     levels,
@@ -364,12 +363,10 @@
       .addControl(new mapboxgl.AttributionControl({ compact: true }))
       .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
 
-    map.on(
-      'render',
-      debounce(ev => {
-        currentDataReadyOnMay.set(true);
-      }, 150),
-    );
+    map.on('idle', ev => {
+      // console.log(ev);
+      currentDataReadyOnMay.set(true);
+    });
 
     //Disable touch zoom, it makes gesture scrolling difficult
     map.scrollZoom.disable();
