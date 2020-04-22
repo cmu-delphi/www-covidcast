@@ -323,7 +323,7 @@
             currentDataReadyOnMay.set(false);
             signalType.set('direction');
           }}>
-          Direction
+          7-day Trend
         </button>
 
       </div>
