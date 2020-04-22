@@ -494,6 +494,7 @@
         .attr('r', d => (d.time_value == $currentDate)? 6 : 4)
         .attr('cx', d => x(parseTime(d.time_value)))
         .attr('cy', d => y(+d.value))
+        .style('stroke-width', 3)
         .style('fill', d => (d.time_value == $currentDate)? '#ffffff' : DIRECTION_THEME.gradientMiddle)
         .style('stroke', d => (d.time_value == $currentDate)? DIRECTION_THEME.gradientMiddle : 'none')
         .on('mouseover', tip.show)
