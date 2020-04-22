@@ -40,16 +40,22 @@
 
   onMount(_ => {
     drawGraph();
+    console.log('on mount called');
     regionData.subscribe(d => updateGraph(d));
     regionDataStats.subscribe(d => setChartRange(d));
     currentDate.subscribe(_ => updateGraphTimeRange());
     currentRegion.subscribe(region => {
+      console.log('current region changed: ' + region);
       if (!region) {
         userCharts[currentChart].setData([]);
         userCharts[currentChart].draw();
       }
     });
+    currentLevel.subscribe(_ => {
+      console.log('level changed:' + $currentLevel);
+    });
     currentSensor.subscribe(_ => {
+      console.log('current sensor changed: ' + $currentSensor);
       if (userCharts != undefined) {
         if (userCharts[currentChart].isChart()) {
           console.log('is chart-current sensor, increment: ' + currentChart);
@@ -83,6 +89,7 @@
   }
 
   function updateGraph(data) {
+    console.log('update graph');
     try {
       if (data.length !== 0 && $currentRegion) {
         if (userCharts != undefined) {
@@ -228,7 +235,7 @@
           format = d => d + '%';
           break;
         case sensorKeys['q']:
-          format = d => d + '%';
+          format = d3.format('.0f');
           break;
         case sensorKeys['ght']:
           format = d3.format('.0f');
@@ -371,6 +378,7 @@
 
       // line graph
       let myData = this.getData();
+      console.log('my data:' + myData[0]);
 
       // size chart
       var margin = { top: 5, right: 42, bottom: 50, left: 60 }, // right need to be wide enough to accommodate the tooltip
