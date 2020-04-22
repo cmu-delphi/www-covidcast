@@ -109,7 +109,7 @@
         }
         ${
           $signalType === 'direction'
-            ? 'Direction: ' +
+            ? '7-day Trend: ' +
               (direction === 1
                 ? '<span class="map-popup-region-value" style="background-color: ' +
                   DIRECTION_THEME.increasing +
