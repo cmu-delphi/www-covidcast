@@ -359,7 +359,7 @@
       style: './maps/mapbox_albers_usa_style.json',
       center: [LON, LAT],
       zoom: ZOOM,
-      minZoom: ZOOM,
+      minZoom: ZOOM - 1,
     })
       .addControl(new mapboxgl.AttributionControl({ compact: true }))
       .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
