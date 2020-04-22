@@ -416,7 +416,7 @@
         //   ],
         // },
       });
-      console.log(map.getSource('city-point'));
+      // console.log(map.getSource('city-point'));
 
       map.addLayer({
         id: 'county-outline',
