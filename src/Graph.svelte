@@ -46,10 +46,20 @@
     currentRegion.subscribe(region => {
       ////console.log(region);
       if (!region) {
-        let chart = new Chart();
-        chart.draw();
-        userCharts = [];
-        userCharts.push(chart);
+        console.log(userCharts[currentChart]);
+        console.log(userCharts[currentChart].isChart());
+        // let chart = new Chart();
+        // chart.draw();
+        // userCharts = [];
+        // userCharts.push(chart);
+        if (userCharts[currentChart].isChart()) {
+          console.log('is chart');
+          userCharts[currentChart].setData([]);
+          userCharts[currentChart].draw();
+        } else {
+          console.log('draw graph called');
+          drawGraph();
+        }
       }
     });
     currentSensor.subscribe(_ => {
@@ -94,7 +104,7 @@
             var graphData = dataResults[1];
             var range = dataResults[2];
             var n = dataResults[3];
-            var domain = dataResults[4]
+            var domain = dataResults[4];
             userCharts[currentChart] = new Chart(graphType, graphData, range, n, domain);
             userCharts[currentChart].draw();
           }
@@ -134,22 +144,19 @@
           userCharts[currentChart].setN(num_locations);
         }
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   function setChartDomain(min, max) {
     console.log('called domain: ' + min + ' ' + max);
     try {
-      if(userCharts[currentChart] != undefined) {
+      if (userCharts[currentChart] != undefined) {
         let minDate = min;
         let maxDate = max;
         userCharts[currentChart].setDomain(min, max);
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   }
-
 
   class Chart {
     constructor(chartType, data, dataRange, num, domain) {
@@ -338,7 +345,6 @@
       return [this.min, this.max];
     }
 
-
     setDomain(minDate, maxDate) {
       console.log('set domain: ' + minDate + ' ' + maxDate);
       this.minDate = minDate;
@@ -451,10 +457,10 @@
             .ticks(formatXTicks),
         )
         .selectAll('text')
-          .attr('y', 10)
-          .attr('x', -20)
-          .attr('dy', '0em')
-          .attr('transform', 'rotate(-60)');
+        .attr('y', 10)
+        .attr('x', -20)
+        .attr('dy', '0em')
+        .attr('transform', 'rotate(-60)');
 
       svg
         .append('g')
@@ -492,12 +498,12 @@
         .data(myData)
         .enter()
         .append('circle')
-        .attr('r', d => (d.time_value == $currentDate)? 6 : 4)
+        .attr('r', d => (d.time_value == $currentDate ? 6 : 4))
         .attr('cx', d => x(parseTime(d.time_value)))
         .attr('cy', d => y(+d.value))
         .style('stroke-width', 3)
-        .style('fill', d => (d.time_value == $currentDate)? '#ffffff' : DIRECTION_THEME.gradientMiddle)
-        .style('stroke', d => (d.time_value == $currentDate)? DIRECTION_THEME.gradientMiddle : 'none')
+        .style('fill', d => (d.time_value == $currentDate ? '#ffffff' : DIRECTION_THEME.gradientMiddle))
+        .style('stroke', d => (d.time_value == $currentDate ? DIRECTION_THEME.gradientMiddle : 'none'))
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
 
