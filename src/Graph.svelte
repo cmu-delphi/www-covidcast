@@ -575,6 +575,7 @@
 <style>
   .graph {
     max-height: 380px;
+    max-width: 400px;
   }
 
   .graph-title {

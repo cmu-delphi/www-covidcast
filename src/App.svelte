@@ -35,6 +35,16 @@
   let error = null;
   let changingSensor = false;
 
+  let graphShowStatus = false;
+
+  function toggleGraphShowStatus(event, to = null) {
+    if (to !== null) {
+      graphShowStatus = to;
+    } else {
+      graphShowStatus = !graphShowStatus;
+    }
+  }
+
   function updateRegionSliceCache(sensor, level, date, reason = 'unspecified') {
     //console.log($regionSliceCache);
     if (!$mounted) return;
@@ -173,6 +183,11 @@
   currentRegion.subscribe(r => {
     //console.log('update region');
     updateTimeSliceCache($currentSensor, $currentLevel, r);
+    if (r) {
+      toggleGraphShowStatus(null, true);
+    } else {
+      toggleGraphShowStatus(null, false);
+    }
   });
 
   onMount(_ => {
@@ -245,12 +260,6 @@
         console.log(err);
       });
   });
-
-  let graphShowStatus = true;
-
-  function toggleGraphShowStatus() {
-    graphShowStatus = !graphShowStatus;
-  }
 </script>
 
 <style>
@@ -492,7 +501,11 @@
 <!-- need to add the $mapfirstLoaded check -->
 {#if $mapfirstLoaded && !graphShowStatus}
   <div class="graph-toggole-button-container">
-    <button title="Show graph" class="graph-toggle-button" aria-label="toggle graph" on:click={toggleGraphShowStatus}>
+    <button
+      title="Show graph"
+      class="graph-toggle-button"
+      aria-label="toggle graph"
+      on:click={event => toggleGraphShowStatus(false)}>
       <span class="button-tooltip">Show line graph</span>
       <img class="toggle-button-icon" src="./assets/imgs/line-graph-icon.png" alt="" />
     </button>
