@@ -353,10 +353,12 @@
         ////console.log('clickedId', clickedId);
         map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
       } else {
-        clickedId = null;
-        currentRegion.set('');
-        currentRegionName.set('');
-        ////console.log('no current region');
+        const index = Math.floor(Math.random() * (viableFeatures.length - 1));
+        const randomFeature = viableFeatures[index];
+        currentRegionName.set(randomFeature.properties.NAME);
+        currentRegion.set(randomFeature.properties.id);
+        clickedId = randomFeature.id;
+        map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
       }
     }
   }
