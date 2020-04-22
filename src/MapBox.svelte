@@ -31,8 +31,9 @@
   let map;
   let popup;
   let hoveredId;
-  let hoverIdBack;
+  let megaHoveredId;
   let clickedId;
+  let megaClickedId;
 
   /*
   bgColor:string - 'rgb(xx,yy,zz)'
@@ -61,27 +62,45 @@
   const onMouseEnter = level => e => {
     // popup
     map.getCanvas().style.cursor = 'pointer';
-    map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
-    hoveredId = null;
-
+    // if (level !== 'mega-county') {
+    megaHoveredId = null;
+    // }
     popup.setLngLat(e.lngLat).addTo(map);
   };
 
   const onMouseMove = level => e => {
-    // hover state
-    console.log(hoveredId, level);
-    if (hoveredId) {
-      map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
+    if (level !== 'mega-county') {
+      if (hoveredId !== e.features[0].id) {
+        map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
+        map.setFeatureState({ source: level, id: megaHoveredId }, { hover: false });
+      }
+
+      hoveredId = e.features[0].id;
+      map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
+    } else {
+      map.setFeatureState({ source: level, id: megaHoveredId }, { hover: false });
+      if (hoveredId === null) {
+        if (megaHoveredId !== e.features[0].id) {
+          map.setFeatureState({ source: level, id: megaHoveredId }, { hover: false });
+        }
+
+        megaHoveredId = e.features[0].id;
+        map.setFeatureState({ source: level, id: megaHoveredId }, { hover: true });
+      } else {
+        console.log('BADNESS', megaHoveredId);
+        map.setFeatureState({ source: level, id: megaHoveredId }, { hover: false });
+        megaHoveredId = null;
+      }
     }
-    hoveredId = e.features[0].id;
-    map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
-    console.log(hoveredId, level);
+
+    if (hoveredId !== null && level === 'mega-county') return;
 
     // popup
     const { value, direction, NAME } = e.features[0].properties;
     const fillColor = e.features[0].layer.paint['fill-color'].toString();
     var title = `
       <div class="map-popup-region-name">
+      ${level === 'mega-county' ? 'Rest of' : ''}
       ${NAME} ${$currentLevel === 'county' && level !== 'mega-county' ? 'County' : ''} ${
       $currentLevel === 'msa' ? 'Metro Area' : ''
     }
@@ -138,37 +157,60 @@
         }
       </div>
     `;
-    popup.setLngLat(e.lngLat).setHTML(title);
+    popup
+      .setLngLat(e.lngLat)
+      .setHTML(title)
+      .addTo(map);
   };
 
   const onMouseLeave = level => e => {
-    // hover state
-    if (hoveredId) {
-      map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
-    }
+    console.log('LEAVE', level, hoveredId);
+    if (level === 'mega-county' && hoveredId !== null) megaHoveredId = null;
+    map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
     hoveredId = null;
+    map.setFeatureState({ source: level, id: megaHoveredId }, { hover: false });
 
     map.getCanvas().style.cursor = '';
     popup.remove();
   };
 
   const onClick = level => e => {
-    console.log(e.features[0].id);
+    // If we've clicked on a county, don't select the mega county;
+    console.log(hoveredId, clickedId, megaHoveredId, megaClickedId);
+    if (level === 'mega-county' && hoveredId !== null) return;
+
     if (clickedId) {
       map.setFeatureState({ source: level, id: clickedId }, { select: false });
     }
+    if (megaClickedId) {
+      map.setFeatureState({ source: level, id: megaClickedId }, { select: false });
+    }
 
-    if (clickedId !== e.features[0].id) {
-      ////console.log(e.features[0]);
-      clickedId = e.features[0].id;
-      ////console.log(clickedId);
-      map.setFeatureState({ source: level, id: clickedId }, { select: true });
-      currentRegionName.set(e.features[0].properties.NAME);
-      currentRegion.set(e.features[0].properties.id);
-    } else {
+    if (level === 'mega-county') {
       clickedId = null;
-      currentRegionName.set('');
-      currentRegion.set('');
+      if (megaClickedId !== e.features[0].id) {
+        console.log(e.features[0].properties);
+        console.log('set meta', e.features[0].properties.id + '000');
+        megaClickedId = e.features[0].id;
+        map.setFeatureState({ source: level, id: megaClickedId }, { select: true });
+        currentRegionName.set(e.features[0].properties.NAME);
+        currentRegion.set(e.features[0].properties.STATE + '000');
+      } else {
+        megaClickedId = null;
+        currentRegionName.set('');
+        currentRegion.set('');
+      }
+    } else {
+      if (clickedId !== e.features[0].id) {
+        clickedId = e.features[0].id;
+        map.setFeatureState({ source: level, id: clickedId }, { select: true });
+        currentRegionName.set(e.features[0].properties.NAME);
+        currentRegion.set(e.features[0].properties.id);
+      } else {
+        clickedId = null;
+        currentRegionName.set('');
+        currentRegion.set('');
+      }
     }
   };
 

@@ -502,6 +502,7 @@
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
 
+      console.log($currentRegion);
       // label the y-axis
       var label = this.getYAxis();
       svg
@@ -574,8 +575,10 @@
 
 <h5 bind:this={t} class="graph-title" />
 <p class="graph-description">
-  {$currentRegionName} {$currentRegionName && $currentLevel === 'county' ? 'County' : ''}
-  {$currentLevel === 'msa' ? 'Metro Area' : ''}
+  {$currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' === '000' ? 'Rest of' : ''}
+  {$currentRegionName}
+  {$currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' !== '000' ? 'County' : ''}
+  {$currentRegionName && $currentLevel === 'msa' ? 'Metro Area' : ''}
 </p>
 
 <div bind:clientWidth={w}>
