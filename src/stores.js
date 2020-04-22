@@ -21,8 +21,6 @@ export const sensors = readable([
     tooltipText: 'CMU symptom surveys offered via Facebook - thank you Facebook!',
     signal: 'scli',
     levels: ['county', 'msa', 'state'],
-    mean: 0.8079823818179086,
-    std: 0.562744728536263,
   },
   {
     name: 'Surveys (Google)',
@@ -30,8 +28,6 @@ export const sensors = readable([
     tooltipText: 'Symptom surveys run by Google - thank you Google!',
     signal: '5cli',
     levels: ['county', 'state', 'msa'],
-    mean: 0.08931870876166044,
-    std: 0.026190562137119736,
   },
   {
     name: 'Search Trends (Google)',
@@ -39,17 +35,13 @@ export const sensors = readable([
     tooltipText: 'Covid-related search frequency from Google’s Health Trends team - thank you Google!',
     signal: 'smoothedsearch',
     levels: ['msa', 'state'],
-    mean: 816.6838496834541,
-    std: 1393.0004748818299,
   },
   {
     name: 'Flu Testing (Quidel)',
     id: 'quidel',
     tooltipText: 'Influenza testing demand from Quidel, Inc. - thank you Quidel!',
-    signal: 'smooth_negativeprop',
+    signal: 'smoothed_tests_per_device',
     levels: ['msa', 'state'],
-    mean: 0.7633679440541352,
-    std: 0.14096501061147534,
   },
 ]);
 

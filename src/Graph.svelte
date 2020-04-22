@@ -214,10 +214,10 @@
           title = 'Percentage';
           break;
         case sensorKeys['q']:
-          title = 'Percentage';
+          title = 'Tests per device';
           break;
         case sensorKeys['ght']:
-          title = 'Relative Frequency';
+          title = 'Relative frequency';
           break;
         case sensorKeys['dr']:
           title = 'Percentage';
@@ -265,7 +265,7 @@
           title = 'Facebook surveys reporting COVID symptoms';
           break;
         case sensorKeys['q']:
-          title = 'Flu tests returning negative for flu';
+          title = 'Influenza testing demand';
           break;
         case sensorKeys['ght']:
           title = 'COVID-related Google searches';
