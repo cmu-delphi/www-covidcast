@@ -69,12 +69,12 @@
   const onMouseMove = level => e => {
     // hover state
     if (level === 'state-outline') {
-      popup.setLngLat(e.lngLat).setHTML('No data available');
+      popup.setLngLat(e.lngLat).setHTML('Estimate unavailable');
       return;
     }
     hoverOnState = false;
     if (hoveredId) {
-      map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
+      map.setFeatureState({ source: level }, { hover: false });
     }
     hoveredId = e.features[0].id;
     map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
@@ -291,7 +291,12 @@
         [valueMinMax[1], DIRECTION_THEME.gradientMax],
       ];
     } else {
-      stops = [[-1, DIRECTION_THEME.decreasing], [0, DIRECTION_THEME.steady], [1, DIRECTION_THEME.increasing]];
+      stops = [
+        [-100, MAP_THEME.countyFill],
+        [-1, DIRECTION_THEME.decreasing],
+        [0, DIRECTION_THEME.steady],
+        [1, DIRECTION_THEME.increasing],
+      ];
     }
 
     if (['data', 'init'].includes(type)) {
