@@ -45,37 +45,19 @@
     currentDate.subscribe(_ => updateGraphTimeRange());
     currentRegion.subscribe(region => {
       if (!region) {
-<<<<<<< HEAD
-        if(userCharts[currentChart].isChart()) {
-          userCharts[currentChart].draw();
-          console.log('draw existing chart-current region, increment: ' + currentChart);
-        } else {
-          let chart = new Chart();
-          chart.draw();
-          userCharts.push(chart);
-          currentChart += 1;
-          console.log('new chart-current region, increment: ' + currentChart);
-        }
-
-=======
-        // console.log('draw blank graph')
         userCharts[currentChart].setData([]);
         userCharts[currentChart].draw();
-
-        // let chart = new Chart();
-        // chart.draw();
-        // userCharts = [];
-        // userCharts.push(chart);
->>>>>>> 9ea39e9043b8efaaca02e3471b3ad9727087a41d
       }
     });
     currentSensor.subscribe(_ => {
       if (userCharts != undefined) {
         if (userCharts[currentChart].isChart()) {
           console.log('is chart-current sensor, increment: ' + currentChart);
+          console.log($currentSensor);
           userCharts[currentChart].getChartTitle();
         } else {
           console.log('is chart fail: ' + userCharts[currentChart].isChart());
+          console.log($currentSensor);
           let chart = new Chart();
           chart.getChartTitle();
           chart.draw();
@@ -221,7 +203,7 @@
           title = 'Percentage';
           break;
         case sensorKeys['q']:
-          title = 'Percentage';
+          title = 'Tests per Device';
           break;
         case sensorKeys['ght']:
           title = 'Relative Frequency';
@@ -269,10 +251,10 @@
           title = 'Google surveys reporting COVID symptoms in the community';
           break;
         case sensorKeys['fb']:
-          title = 'Facebook surveys reporting COVID symptoms';
+          title = 'Surveys via Facebook reporting COVID symptoms in household';
           break;
         case sensorKeys['q']:
-          title = 'Flu tests returning negative for flu';
+          title = 'Influenza Testing Demand';
           break;
         case sensorKeys['ght']:
           title = 'COVID-related Google searches';
