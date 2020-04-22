@@ -493,7 +493,7 @@
             d3.timeFormat('%m/%d')(parseTime(d.time_value)) +
             ': ' +
             d.value.toFixed(2) +
-            ($currentSensor === sensorKeys['ght'] ? '' : '%')
+            ($currentSensor === sensorKeys['ght'] || $currentSensor === sensorKeys['q'] ? '' : '%')
           );
         });
 
@@ -604,6 +604,7 @@
   }
 </style>
 
+<<<<<<< HEAD
 <h5 bind:this={t} class="graph-title" />
 <p class="graph-description">
   {$currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' === '000' ? 'Rest of' : ''}
@@ -611,6 +612,14 @@
   {$currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' !== '000' ? 'County' : ''}
   {$currentRegionName && $currentLevel === 'msa' ? 'Metro Area' : ''}
 </p>
+=======
+<div class="graph">
+  <h5 bind:this={t} class="graph-title" />
+  <p class="graph-description">
+    {$currentRegionName} {$currentRegionName && $currentLevel === 'county' ? 'County' : ''}
+    {$currentRegionName && $currentLevel === 'msa' ? 'Metro Area' : ''}
+  </p>
+>>>>>>> a19631622f89218af30687ce4be61707c85b7759
 
 <div bind:clientWidth={w} class="graph-itself">
   <div bind:this={el} />
