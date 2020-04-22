@@ -62,7 +62,6 @@
       if (userCharts != undefined) {
         if (userCharts[currentChart].isChart()) {
           // console.log('is chart-current sensor, increment: ' + currentChart);
-          // console.log($currentSensor);
           userCharts[currentChart].getChartTitle();
         } else {
           // console.log('is chart fail: ' + userCharts[currentChart].isChart());
@@ -410,8 +409,11 @@
 
       // set x-axis ticks based off of data sparsity and format y-axis ticks
       var xTicks = myData.length;
-      var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(4);
-      formatXTicks = xTicks < 40 ? d3.timeDay.every(4) : d3.timeDay.every(7);
+      // var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(5);
+      // formatXTicks = xTicks > 40 ? d3.timeDay.every(5) : d3.format(10);
+      // var formatXTicks = 8;
+      console.log('format: ' + formatXTicks);
+
       var formatYTicks = this.getFormat();
 
       let currDate = parseTime($currentDate);
@@ -456,12 +458,9 @@
         .append('g')
         .attr('class', 'axis')
         .attr('transform', 'translate(0,' + height + ')')
-        .call(
-          d3
-            .axisBottom(x)
-            .tickFormat(d3.timeFormat('%m/%d'))
-            .ticks(formatXTicks),
-        )
+        .call(d3.axisBottom(x).ticks(8, d3.timeFormat('%m/%d')));
+
+      svg
         .selectAll('text')
         .attr('y', 10)
         .attr('x', -20)
@@ -572,7 +571,7 @@
 
 <style>
   .graph {
-    max-height: 350px;
+    max-height: 370px;
     max-width: 400px;
   }
 

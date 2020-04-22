@@ -739,7 +739,7 @@
       data-state="us48"
       id="bounds-button"
       class="pg-button bounds-button"
-      on:click={_ => map.easeTo({ center: [LON, LAT], zoom: ZOOM })}>
+      on:click={_ => map.easeTo({ center: [LON, LAT], zoom: ZOOM, bearing: 0, pitch: 0})}>
       <img src="./assets/imgs/us48.png" alt="" />
     </button>
   </div>
