@@ -13,6 +13,7 @@
     let sts = stats.get(sens);
     let valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
 
+    // DON"T CAP FOR QUIDEL
     let h = Math.min(100, valueMinMax[1]).toFixed(2) + '%';
     let l = Math.max(0, valueMinMax[0]).toFixed(2) + '%';
     if (sens === 'ght') {

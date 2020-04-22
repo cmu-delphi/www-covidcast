@@ -244,10 +244,10 @@
   });
   currentLevel.subscribe(_ => {
     try {
-      // console.log('currentLevel');
+      console.log('map currentLevel');
       updateMap('data');
     } catch (err) {
-      ////console.log(err);
+      console.log(err);
     }
   });
   currentDate.subscribe(_ => {
@@ -437,6 +437,7 @@
           map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
           chosenRandom = true;
         } else {
+          // const viableFeatures = dat.features.filter(f => f.properties[$signalType] !== -100);
           const index = Math.floor(Math.random() * (viableFeatures.length - 1));
           ////console.log(dat.features);
           ////console.log(viableFeatures, viableFeatures.length, index);
@@ -450,6 +451,19 @@
           chosenRandom = true;
         }
       }
+    } else if (viableFeatures > 0) {
+      // const viableFeatures = dat.features.filter(f => f.properties[$signalType] !== -100);
+      const index = Math.floor(Math.random() * (viableFeatures.length - 1));
+      ////console.log(dat.features);
+      ////console.log(viableFeatures, viableFeatures.length, index);
+      const randomFeature = viableFeatures[index];
+      ////console.log(randomFeature);
+      ////console.log(randomFeature.properties.NAME);
+      currentRegionName.set(randomFeature.properties.NAME);
+      currentRegion.set(randomFeature.properties.id);
+      clickedId = randomFeature.id;
+      map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+      chosenRandom = true;
     }
 
     ////console.log($currentRegion);
@@ -463,11 +477,12 @@
         // if ($currentLevel === 'county')
         //   map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: true });
       } else {
-        clickedId = null;
-        // if ($currentLevel === 'county') megaClickedId = null;
-        currentRegion.set('');
-        currentRegionName.set('');
-        ////console.log('no current region');
+        const index = Math.floor(Math.random() * (viableFeatures.length - 1));
+        const randomFeature = viableFeatures[index];
+        currentRegionName.set(randomFeature.properties.NAME);
+        currentRegion.set(randomFeature.properties.id);
+        clickedId = randomFeature.id;
+        map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
       }
     }
   }
@@ -514,6 +529,7 @@
         data: $geojsons.get('state'),
       });
 
+      // console.log(map.getSource('city-point'));
       map.addLayer({
         id: 'county-outline',
         source: 'county-outline',
