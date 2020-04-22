@@ -14,6 +14,7 @@
     times,
     stats,
     sensors,
+    signalType,
     timeRangeOnSlider,
   } from './stores.js';
   import { DIRECTION_THEME } from './theme.js';
@@ -43,6 +44,7 @@
     regionData.subscribe(d => updateGraph(d));
     regionDataStats.subscribe(d => setChartRange(d));
     currentDate.subscribe(_ => updateGraphTimeRange());
+    signalType.subscribe(_ => updateGraph($regionData));
     currentRegion.subscribe(region => {
       ////console.log(region);
       if (!region) {
@@ -416,9 +418,19 @@
       var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(4);
       var formatYTicks = this.getFormat();
 
+      let currDate = parseTime($currentDate);
+      let currDateSeven = parseTime($currentDate);
+      currDateSeven.setDate(currDate.getDate() - 7);
+
       let chartMax = this.max;
       // peg values to max and min if out of range
       for (var i = 0; i < myData.length; i++) {
+        let directionDate = parseTime(myData[i].time_value);
+        if (directionDate >= currDateSeven && directionDate <= currDate) {
+          myData[i].inDirection = true;
+        } else {
+          myData[i].inDirection = false;
+        }
         myData[i].max = false;
         if (+myData[i].value < this.min) {
           myData[i].value = this.min;
@@ -497,7 +509,12 @@
         .attr('cx', d => x(parseTime(d.time_value)))
         .attr('cy', d => y(+d.value))
         .style('stroke-width', 3)
-        .style('fill', d => (d.time_value == $currentDate ? '#ffffff' : DIRECTION_THEME.gradientMiddle))
+        .style('fill', d => {
+          console.log(d.time_value);
+          if (d.time_value === $currentDate) return 'white';
+          if (d.inDirection && $signalType === 'direction') return 'black';
+          return DIRECTION_THEME.gradientMiddle;
+        })
         .style('stroke', d => (d.time_value == $currentDate ? DIRECTION_THEME.gradientMiddle : 'none'))
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
