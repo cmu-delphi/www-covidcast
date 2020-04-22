@@ -32,6 +32,7 @@
   let popup;
   let hoveredId;
   let clickedId;
+  let hoverOnState;
 
   /*
   bgColor:string - 'rgb(xx,yy,zz)'
@@ -61,15 +62,17 @@
   const onMouseEnter = level => e => {
     // popup
     map.getCanvas().style.cursor = 'pointer';
+    let hoverOnState = true;
 
-    var title = e.features[0].properties.NAME;
-    popup
-      .setLngLat(e.lngLat)
-      .setHTML(title)
-      .addTo(map);
+    popup.setLngLat(e.lngLat).addTo(map);
   };
   const onMouseMove = level => e => {
     // hover state
+    if (level === 'state-outline') {
+      popup.setLngLat(e.lngLat).setHTML('No data available');
+      return;
+    }
+    hoverOnState = false;
     if (hoveredId) {
       map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
     }
@@ -138,6 +141,7 @@
     `;
     popup.setLngLat(e.lngLat).setHTML(title);
   };
+
   const onMouseLeave = level => e => {
     // hover state
     if (hoveredId) {
@@ -146,6 +150,11 @@
     hoveredId = null;
 
     map.getCanvas().style.cursor = '';
+    if (!hoverOnState) {
+      hoverOnState = true;
+      map.getCanvas().style.cursor = 'pointer';
+      return;
+    }
     popup.remove();
   };
   const onClick = level => e => {
@@ -241,6 +250,7 @@
 
     let valueMappedVals = new Map();
     let directionMappedVals = new Map();
+    console.log($currentData);
     let geoIds = new Set(
       $currentData.map(d => {
         const key = d.geo_value.toUpperCase();
@@ -561,6 +571,9 @@
       closeOnClick: false,
       className: 'map-popup',
     });
+    map.on('mouseenter', 'state-outline', onMouseEnter('state-outline'));
+    map.on('mousemove', 'state-outline', onMouseMove('state-outline'));
+    map.on('mouseleave', 'state-outline', onMouseLeave('state-outline'));
     Object.keys($levels).forEach(level => {
       map.on('mouseenter', level, onMouseEnter(level));
       map.on('mousemove', level, onMouseMove(level));
