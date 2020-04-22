@@ -45,7 +45,7 @@ export const sensors = readable([
   {
     name: 'Flu Testing (Quidel)',
     id: 'quidel',
-    tooltipText: 'Influenza testing demand from Quidel, Inc. -- thank you Quidel!',
+    tooltipText: 'Influenza testing demand from Quidel, Inc. - thank you Quidel!',
     signal: 'smooth_negativeprop',
     levels: ['msa', 'state'],
     mean: 0.7633679440541352,
