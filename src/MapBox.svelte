@@ -454,8 +454,8 @@
         id: 'city-point-unclustered',
         source: 'city-point',
         type: 'symbol',
-        filter: ['<', 'rank', 16],
-        maxzoom: 6,
+        filter: ['>', 'population', 5000000],
+        maxzoom: 4,
         layout: {
           'text-field': ['get', 'city'],
           'text-font': ['Open Sans Regular'],
@@ -470,7 +470,24 @@
         id: 'city-point-unclustered-2',
         source: 'city-point',
         type: 'symbol',
-        filter: ['<', 'rank', 100],
+        filter: ['>', 'population', 1000000],
+        maxzoom: 6,
+        minzoom: 4,
+        layout: {
+          'text-field': ['get', 'city'],
+          'text-font': ['Open Sans Regular'],
+          'text-size': 12,
+        },
+        paint: {
+          'text-halo-color': '#fff',
+          'text-halo-width': 2,
+        },
+      });
+      map.addLayer({
+        id: 'city-point-unclustered-3',
+        source: 'city-point',
+        type: 'symbol',
+        filter: ['>', 'population', 500000],
         maxzoom: 8,
         minzoom: 6,
         layout: {
@@ -484,7 +501,7 @@
         },
       });
       map.addLayer({
-        id: 'city-point-unclustered-3',
+        id: 'city-point-unclustered-4',
         source: 'city-point',
         type: 'symbol',
         minzoom: 8,
