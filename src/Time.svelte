@@ -1,12 +1,16 @@
 <script>
   import { onMount } from 'svelte';
-  import { currentDate, times, currentSensor, currentDataReadyOnMay } from './stores.js';
+  import { currentDate, times, currentSensor, currentDataReadyOnMay, timeRangeOnSlider } from './stores.js';
   import * as d3 from 'd3';
 
   let timeSliderPaddingLeft;
   let timeSliderPaddingRight;
   let timeSlider;
   let selectedDateDisplay;
+
+  // onMount(_ => {
+  //   timeSlider = document.querySelector('#time_slider');
+  // });
 
   let parseTime = d3.timeParse('%Y%m%d');
   let formatTime = d3.timeFormat('%B %d, %Y');
@@ -44,6 +48,9 @@
   currentDate.subscribe(d => {
     val = d;
     rectifiedVal = parseTime(val).getTime();
+    if (rectifiedVal >= rectifiedMax) {
+      rectifiedVal = rectifiedMax;
+    }
   });
   times.subscribe(t => (t ? update($currentSensor, t) : ''));
   currentSensor.subscribe(s => ($times ? update(s, $times, true) : ''));
@@ -54,22 +61,28 @@
     dataRangeMin = parseTime(min).getTime();
     dataRangeMax = parseTime(max).getTime();
 
-    console.log('current', $currentDate);
-    console.log('rectfiedmin:', calculateValFromRectified(rectifiedMin));
+    // console.log('current', $currentDate);
+    // console.log('rectfiedmin:', calculateValFromRectified(rectifiedMin));
+    // console.log('dataMin:', dataRangeMin, min);
 
-    if (newSensor) {
-      if (
-        dataRangeMin <= rectifiedMin &&
-        parseTime($currentDate).getTime() >= rectifiedMin &&
-        parseTime($currentDate).getTime() <= rectifiedMax
-      ) {
-        console.log('fine not to change slider range');
-      } else {
-        // reset range
-        rectifiedRange = interval;
-        rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
-      }
+    // if (newSensor) {
+    if (
+      newSensor &&
+      dataRangeMin <= rectifiedMin &&
+      parseTime($currentDate).getTime() >= rectifiedMin &&
+      parseTime($currentDate).getTime() <= rectifiedMax
+    ) {
+      // console.log('fine not to change slider range');
+    } else {
+      // reset range
+      // console.log('reset range');
+      rectifiedRange = interval;
+      rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
+      // if (rectifiedMin < dataRangeMin) {
+      //   rectifiedMin = dataRangeMin;
+      // }
     }
+    // }
 
     updateSliderUI();
 
@@ -84,6 +97,7 @@
        *    -------------------
        *        ---------
        */
+      // console.log('within');
       let leftPercentage = (dataRangeMin - rectifiedMin) / (rectifiedRange * 86400 * 1000);
       let middlePercentage = (dataRangeMax - dataRangeMin) / (rectifiedRange * 86400 * 1000);
       let rightPercentage = (rectifiedMax - dataRangeMax) / (rectifiedRange * 86400 * 1000);
@@ -92,6 +106,10 @@
       timeSliderPaddingRight.setAttribute('style', `width: ${Math.round(rightPercentage * sliderTotalLength) + 'px'}`);
       timeSlider.setAttribute('min', dataRangeMin);
       timeSlider.setAttribute('max', dataRangeMax);
+      timeRangeOnSlider.set({
+        min: +calculateValFromRectified(dataRangeMin),
+        max: +calculateValFromRectified(dataRangeMax),
+      });
       canLoadMore = false;
     } else if (dataRangeMax <= rectifiedMax && dataRangeMin <= rectifiedMin) {
       /**
@@ -99,6 +117,7 @@
        *    -------------------
        *  ---------
        */
+      // console.log('left');
       let leftPercentage = 0;
       let middlePercentage = (dataRangeMax - rectifiedMin) / (rectifiedRange * 86400 * 1000);
       let rightPercentage = (rectifiedMax - dataRangeMax) / (rectifiedRange * 86400 * 1000);
@@ -107,6 +126,10 @@
       timeSliderPaddingRight.setAttribute('style', `width: ${Math.round(rightPercentage * sliderTotalLength) + 'px'}`);
       timeSlider.setAttribute('min', rectifiedMin);
       timeSlider.setAttribute('max', dataRangeMax);
+      timeRangeOnSlider.set({
+        min: +calculateValFromRectified(rectifiedMin),
+        max: +calculateValFromRectified(dataRangeMax),
+      });
       canLoadMore = true;
     } else if (dataRangeMax >= rectifiedMax && dataRangeMin >= rectifiedMin) {
       /**
@@ -114,6 +137,7 @@
        *    -------------------
        *                ---------
        */
+      // console.log('right');
       let leftPercentage = (dataRangeMin - rectifiedMin) / (rectifiedRange * 86400 * 1000);
       let middlePercentage = (rectifiedMax - dataRangeMin) / (rectifiedRange * 86400 * 1000);
       let rightPercentage = 0;
@@ -122,6 +146,10 @@
       timeSliderPaddingRight.setAttribute('style', `width: ${Math.round(rightPercentage * sliderTotalLength) + 'px'}`);
       timeSlider.setAttribute('min', dataRangeMin);
       timeSlider.setAttribute('max', rectifiedMax);
+      timeRangeOnSlider.set({
+        min: +calculateValFromRectified(dataRangeMin),
+        max: +calculateValFromRectified(rectifiedMax),
+      });
       canLoadMore = false;
     } else if (dataRangeMax >= rectifiedMax && dataRangeMin <= rectifiedMin) {
       /**
@@ -129,6 +157,7 @@
        *    -------------------
        *  -----------------------
        */
+      // console.log('out');
       let leftPercentage = 0;
       let middlePercentage = 1;
       let rightPercentage = 0;
@@ -137,6 +166,10 @@
       timeSliderPaddingRight.setAttribute('style', `width: ${Math.round(rightPercentage * sliderTotalLength) + 'px'}`);
       timeSlider.setAttribute('min', rectifiedMin);
       timeSlider.setAttribute('max', rectifiedMax);
+      timeRangeOnSlider.set({
+        min: +calculateValFromRectified(rectifiedMin),
+        max: +calculateValFromRectified(rectifiedMax),
+      });
       canLoadMore = true;
     }
 
@@ -423,8 +456,8 @@
     id="time_slider"
     bind:this={timeSlider}
     type="range"
-    min={rectifiedMin}
-    max={rectifiedMax}
+    min={0}
+    max={0}
     step={86400000}
     aria-label={formatTimeWithoutYear(new Date(rectifiedVal))}
     on:mouseup={sliderOnChange}

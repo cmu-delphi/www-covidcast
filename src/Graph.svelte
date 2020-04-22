@@ -14,6 +14,7 @@
     times,
     stats,
     sensors,
+    timeRangeOnSlider,
   } from './stores.js';
   import { DIRECTION_THEME } from './theme.js';
   import * as d3 from 'd3';
@@ -66,8 +67,11 @@
         }
       }
     });
-    // currentDataReadyOnMay.subscribe(d => setFocus());
-    // regionDataStats.subscribe(d => ////console.log(d));
+    timeRangeOnSlider.subscribe(({ min, max }) => {
+      console.log('min:', min, 'max:', max);
+      setChartDomain(min, max);
+      userCharts[currentChart].draw();
+    });
   });
 
   function drawGraph() {
@@ -90,7 +94,8 @@
             var graphData = dataResults[1];
             var range = dataResults[2];
             var n = dataResults[3];
-            userCharts[currentChart] = new Chart(graphType, graphData, range, n);
+            var domain = dataResults[4]
+            userCharts[currentChart] = new Chart(graphType, graphData, range, n, domain);
             userCharts[currentChart].draw();
           }
         }
@@ -112,36 +117,42 @@
 
     var dataRange = userCharts[currentChart].getRange();
     var n = userCharts[currentChart].getN();
+    var domain = userCharts[currentChart].getDomain();
     var cType = lineGraph;
-    return [cType, data, dataRange, n];
+    return [cType, data, dataRange, n, domain];
   }
 
   function setChartRange(data) {
     ////console.log(data);
     try {
       if (data) {
-        // ////console.log('data: ' + data);
         let { min_value, max_value } = data;
         let { num_locations } = data;
-        // ////console.log(num_locations);
         let stats = $regionDataStats;
-        // ////console.log('data: ' + data[0]);
-        // ////console.log('stats: ' + stats);
-        // let min = dataStats.min_value;
-        // let max = dataStats.max_value;
-        // ////console.log(currentChart);
         if (userCharts[currentChart] !== undefined) {
           userCharts[currentChart].setRange(min_value, max_value);
           userCharts[currentChart].setN(num_locations);
         }
       }
     } catch (error) {
-      ////console.log(error);
     }
   }
 
+  function setChartDomain(min, max) {
+    console.log('called domain: ' + min + ' ' + max);
+    try {
+      if(userCharts[currentChart] != undefined) {
+        let minDate = min;
+        let maxDate = max;
+        userCharts[currentChart].setDomain(min, max);
+      }
+    } catch (e) {
+    }
+  }
+
+
   class Chart {
-    constructor(chartType, data, dataRange, num) {
+    constructor(chartType, data, dataRange, num, domain) {
       var chart;
       this.chartType = chartType;
       this.x = null;
@@ -156,6 +167,7 @@
           chart.setData(data);
           chart.setRange(dataRange[0], dataRange[1]);
           chart.setN(num);
+          chart.setDomain(domain[0], domain[1]);
           break;
         default:
           TypeError('Chart type not a valid type.');
@@ -192,19 +204,19 @@
       let title = '';
       let sensor = $currentSensor;
       switch (sensor) {
-        case 'google-survey':
+        case sensorKeys['google']:
           title = 'Percentage';
           break;
-        case 'fb-survey':
+        case sensorKeys['fb']:
           title = 'Percentage';
           break;
-        case 'quidel':
+        case sensorKeys['q']:
           title = 'Percentage';
           break;
-        case 'ght':
+        case sensorKeys['ght']:
           title = 'Relative Frequency';
           break;
-        case 'doctor-visits':
+        case sensorKeys['dr']:
           title = 'Percentage';
           break;
         default:
@@ -217,19 +229,19 @@
       let sensor = $currentSensor;
       var format = '';
       switch (sensor) {
-        case 'google-survey':
+        case sensorKeys['google']:
           format = d => d + '%';
           break;
-        case 'fb-survey':
+        case sensorKeys['fb']:
           format = d => d + '%';
           break;
-        case 'quidel':
+        case sensorKeys['q']:
           format = d => d + '%';
           break;
-        case 'ght':
+        case sensorKeys['ght']:
           format = d3.format('.0f');
           break;
-        case 'doctor-visits':
+        case sensorKeys['dr']:
           format = d => d + '%';
           break;
         default:
@@ -325,6 +337,19 @@
     getRange() {
       return [this.min, this.max];
     }
+
+
+    setDomain(minDate, maxDate) {
+      console.log('set domain: ' + minDate + ' ' + maxDate);
+      this.minDate = minDate;
+      this.maxDate = maxDate;
+      console.log('this: ' + this.minDate);
+    }
+
+    getDomain() {
+      console.log('get domain: ' + this.minDate);
+      return [this.minDate, this.maxDate];
+    }
     updateAxes() {}
   }
 
@@ -375,21 +400,19 @@
 
       // set date range
       var parseTime = d3.timeParse('%Y%m%d');
-      var k = d3.keys(myData);
-      var times = k.map(i => parseTime(myData[k[i]]['time_value']));
-      var maxDate = parseTime($currentDate);
-      var twoWeeks = 60 * 60 * 24 * 1000 * 7 * 2;
+      var domain = this.getDomain();
+      console.log('domain: ' + domain[0]);
+      var minDate = parseTime(domain[0]);
+      var maxDate = parseTime(domain[1]);
       var bisectDate = d3.bisector(function(d) {
         return d.time_value;
       }).right;
-      var minDate = maxDate - twoWeeks;
-      minDate = new Date(minDate);
       myData = myData.filter(it => parseTime(it['time_value']) <= maxDate);
       myData = myData.filter(it => parseTime(it['time_value']) >= minDate);
 
       // set x-axis ticks based off of data sparsity and format y-axis ticks
       var xTicks = myData.length;
-      var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(3);
+      var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(xTicks % 6);
       var formatYTicks = this.getFormat();
 
       let chartMax = this.max;
@@ -400,14 +423,11 @@
           myData[i].value = this.min;
         } else if (+myData[i].value > this.max) {
           myData[i].max = true;
-          // myData[i].value = this.max;
           if (+myData[i].value > chartMax) chartMax = +myData[i].value;
         }
       }
-      ////console.log(chartMax);
-      ////console.log(myData);
 
-      if (chartMax > 100 && $currentSensor !== 'ght') {
+      if (chartMax > 100 && $currentSensor !== sensorKeys['ght']) {
         chartMax = 100;
       }
 
@@ -429,7 +449,12 @@
             .axisBottom(x)
             .tickFormat(d3.timeFormat('%m/%d'))
             .ticks(formatXTicks),
-        );
+        )
+        .selectAll('text')
+          .attr('y', 10)
+          .attr('x', -12)
+          .attr('transform', 'rotate(-60)');
+
       svg
         .append('g')
         .attr('class', 'axis')
@@ -455,7 +480,7 @@
             d3.timeFormat('%m/%d')(parseTime(d.time_value)) +
             ': ' +
             d.value.toFixed(2) +
-            ($currentSensor === 'ght' ? '' : '%')
+            ($currentSensor === sensorKeys['ght'] ? '' : '%')
           );
         });
 
@@ -466,11 +491,11 @@
         .data(myData)
         .enter()
         .append('circle')
-        .attr('r', 4)
+        .attr('r', d => (d.time_value == $currentDate)? 6 : 4)
         .attr('cx', d => x(parseTime(d.time_value)))
         .attr('cy', d => y(+d.value))
-        .style('fill', DIRECTION_THEME.gradientMiddle)
-        // .style('fill', d => (d.max ? DIRECTION_THEME.gradientMax : DIRECTION_THEME.gradientMiddle))
+        .style('fill', d => (d.time_value == $currentDate)? '#ffffff' : DIRECTION_THEME.gradientMiddle)
+        .style('stroke', d => (d.time_value == $currentDate)? DIRECTION_THEME.gradientMiddle : 'none')
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
 
@@ -499,6 +524,7 @@
       var chartTitle = this.getChartTitle();
       svg
         .append('text')
+        .attr('class', 'graph-title')
         .attr('transform', 'translate(' + width / 2 + ', ' + 0 + ')')
         .style('text-anchor', 'middle')
         .text(chartTitle);
@@ -532,12 +558,13 @@
     font-size: 14px;
     margin: 3px 0px !important;
     padding: 0px !important;
+    font-family: 'Open Sans', sans-serif;
+    color: var(--darkgrey);
   }
   .graph-description {
     text-align: center;
     margin: 5px 0px 7px 0px !important;
     font-size: 14px;
-    font-style: italic;
     padding: 0px !important;
   }
 </style>
