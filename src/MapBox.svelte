@@ -68,14 +68,14 @@
   };
   const onMouseMove = level => e => {
     // hover state
-    if (level === 'state-outline') {
-      popup.setLngLat(e.lngLat).setHTML('No data available');
-      return;
-    }
-    hoverOnState = false;
     if (hoveredId) {
       map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
     }
+    // if (level === 'state-outline') {
+    //   popup.setLngLat(e.lngLat).setHTML('No data available');
+    //   return;
+    // }
+    // hoverOnState = false;
     hoveredId = e.features[0].id;
     map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
 
@@ -150,11 +150,11 @@
     hoveredId = null;
 
     map.getCanvas().style.cursor = '';
-    if (!hoverOnState) {
-      hoverOnState = true;
-      map.getCanvas().style.cursor = 'pointer';
-      return;
-    }
+    // if (!hoverOnState) {
+    //   hoverOnState = true;
+    //   map.getCanvas().style.cursor = 'pointer';
+    //   return;
+    // }
     popup.remove();
   };
   const onClick = level => e => {
@@ -238,6 +238,8 @@
   function updateMap(type) {
     if (!mapMounted) return;
 
+    let drawMega = $currentLevel === 'county';
+
     Object.keys($levels).forEach(level => map && map.removeFeatureState({ source: level }));
 
     // if (type === 'data') {
@@ -250,16 +252,27 @@
 
     let valueMappedVals = new Map();
     let directionMappedVals = new Map();
+    let valueMappedMega = new Map();
+    let directionMappedMega = new Map();
     console.log($currentData);
+
     let geoIds = new Set(
       $currentData.map(d => {
         const key = d.geo_value.toUpperCase();
 
         if (d.value !== null) {
-          valueMappedVals.set(key, d.value);
+          if (drawMega && key.slice(-3) + '' === '000') {
+            valueMappedMega.set(key.slice(0, 2) + '', d.value);
+          } else {
+            valueMappedVals.set(key, d.value);
+          }
         }
         if (d.direction !== null) {
-          directionMappedVals.set(key, d.direction);
+          if (drawMega && key.slice(-3) + '' === '000') {
+            directionMappedMega.set(key.slice(0, 2) + '', d.direction);
+          } else {
+            directionMappedVals.set(key, d.direction);
+          }
         }
 
         return key;
@@ -267,6 +280,23 @@
     );
 
     currentRange.set($signalType === 'value' ? valueMinMax : [-1, 1]);
+
+    let megaDat = $geojsons.get('state');
+    if (drawMega) {
+      megaDat.features.forEach(d => {
+        const id = d.properties.STATE;
+
+        d.properties.value = -100;
+        d.properties.direction = -100;
+        if (geoIds.has(id + '000') && valueMappedMega.get(id) !== undefined) {
+          d.properties.value = valueMappedMega.get(id);
+        }
+        if (geoIds.has(id + '000') && directionMappedMega.get(id) !== undefined) {
+          d.properties.direction = directionMappedMega.get(id);
+        }
+      });
+      console.log(megaDat.features.map(d => d.properties.direction));
+    }
 
     let dat = $geojsons.get($currentLevel);
     dat.features.forEach(d => {
@@ -283,6 +313,7 @@
     });
 
     let stops;
+    let stopsMega;
     if ($signalType === 'value') {
       let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
       stops = [
@@ -290,12 +321,23 @@
         [center, DIRECTION_THEME.gradientMiddle],
         [valueMinMax[1], DIRECTION_THEME.gradientMax],
       ];
+      stopsMega = [
+        [valueMinMax[0], DIRECTION_THEME.gradientMinMega],
+        [center, DIRECTION_THEME.gradientMiddleMega],
+        [valueMinMax[1], DIRECTION_THEME.gradientMaxMega],
+      ];
     } else {
       stops = [[-1, DIRECTION_THEME.decreasing], [0, DIRECTION_THEME.steady], [1, DIRECTION_THEME.increasing]];
+      stopsMega = [
+        [-1, DIRECTION_THEME.gradientMinMega],
+        [0, DIRECTION_THEME.gradientMiddleMega],
+        [1, DIRECTION_THEME.gradientMaxMega],
+      ];
     }
 
     if (['data', 'init'].includes(type)) {
       map.getSource($currentLevel).setData(dat);
+      drawMega ? map.getSource('state-outline').setData(megaDat) : '';
     }
 
     Object.keys($levels).forEach(name => {
@@ -311,6 +353,15 @@
         map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none');
       }
     });
+    if (drawMega) {
+      map.setPaintProperty('state-outline', 'fill-color', {
+        property: $signalType,
+        stops: stopsMega,
+      });
+    } else {
+      map.setPaintProperty('state-outline', 'fill-color', 'rgba(0, 0, 0, 0)');
+    }
+    console.log(map.getStyle().layers);
 
     const viableFeatures = dat.features.filter(f => f.properties[$signalType] !== -100);
 
