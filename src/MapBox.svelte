@@ -503,7 +503,7 @@
         id: 'city-point-unclustered-3',
         source: 'city-point',
         type: 'symbol',
-        filter: ['>', 'population', 250000],
+        filter: ['>', 'population', 100000],
         maxzoom: 8,
         minzoom: 6,
         layout: {
