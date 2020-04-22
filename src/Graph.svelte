@@ -142,7 +142,7 @@
   }
 
   function setChartDomain(min, max) {
-    console.log('called domain: ' + min + ' ' + max);
+    // console.log('called domain: ' + min + ' ' + max);
     try {
       if (userCharts[currentChart] != undefined) {
         let minDate = min;
@@ -280,7 +280,7 @@
     }
 
     isChart() {
-      console.log(this.chartType);
+      // console.log(this.chartType);
       var result = null;
       try {
         this.chartType in charts ? (result = true) : (result = false);
@@ -341,14 +341,14 @@
     }
 
     setDomain(minDate, maxDate) {
-      console.log('set domain: ' + minDate + ' ' + maxDate);
+      // console.log('set domain: ' + minDate + ' ' + maxDate);
       this.minDate = minDate;
       this.maxDate = maxDate;
-      console.log('this: ' + this.minDate);
+      //console.log('this: ' + this.minDate);
     }
 
     getDomain() {
-      console.log('get domain: ' + this.minDate);
+      //console.log('get domain: ' + this.minDate);
       return [this.minDate, this.maxDate];
     }
     updateAxes() {}
@@ -402,7 +402,7 @@
       // set date range
       var parseTime = d3.timeParse('%Y%m%d');
       var domain = this.getDomain();
-      console.log('domain: ' + domain[0]);
+      //console.log('domain: ' + domain[0]);
       var minDate = parseTime(domain[0]);
       var maxDate = parseTime(domain[1]);
       var bisectDate = d3.bisector(function(d) {
@@ -502,7 +502,7 @@
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
 
-      console.log($currentRegion);
+      //console.log($currentRegion);
       // label the y-axis
       var label = this.getYAxis();
       svg

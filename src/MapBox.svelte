@@ -69,6 +69,7 @@
   };
 
   const onMouseMove = level => e => {
+    // console.log(hoveredId);
     if (level !== 'mega-county') {
       if (hoveredId !== e.features[0].id) {
         map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
@@ -87,7 +88,7 @@
         megaHoveredId = e.features[0].id;
         map.setFeatureState({ source: level, id: megaHoveredId }, { hover: true });
       } else {
-        console.log('BADNESS', megaHoveredId);
+        // console.log('BADNESS', megaHoveredId);
         map.setFeatureState({ source: level, id: megaHoveredId }, { hover: false });
         megaHoveredId = null;
       }
@@ -164,11 +165,10 @@
   };
 
   const onMouseLeave = level => e => {
-    console.log('LEAVE', level, hoveredId);
+    map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
     if (level === 'mega-county' && hoveredId !== null) megaHoveredId = null;
     map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
     hoveredId = null;
-    map.setFeatureState({ source: level, id: megaHoveredId }, { hover: false });
 
     map.getCanvas().style.cursor = '';
     popup.remove();
@@ -176,8 +176,8 @@
 
   const onClick = level => e => {
     // If we've clicked on a county, don't select the mega county;
-    console.log(hoveredId, clickedId, megaHoveredId, megaClickedId);
-    if (level === 'mega-county' && hoveredId !== null) return;
+    // console.log(hoveredId, clickedId, megaHoveredId, megaClickedId);
+    // if (level === 'mega-county' && hoveredId !== null) return;
 
     if (clickedId) {
       map.setFeatureState({ source: level, id: clickedId }, { select: false });
@@ -187,10 +187,11 @@
     }
 
     if (level === 'mega-county') {
+      console.log('hoveredId', hoveredId, 'clickedId', clickedId);
+      if (hoveredId !== null) return;
+      map.setFeatureState({ source: 'county', id: clickedId }, { select: false });
       clickedId = null;
       if (megaClickedId !== e.features[0].id) {
-        console.log(e.features[0].properties);
-        console.log('set meta', e.features[0].properties.id + '000');
         megaClickedId = e.features[0].id;
         map.setFeatureState({ source: level, id: megaClickedId }, { select: true });
         currentRegionName.set(e.features[0].properties.NAME);
