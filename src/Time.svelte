@@ -17,6 +17,8 @@
   let sliderTotalLength = 320; // in px
   let canLoadMore = true;
 
+  let playInterval;
+
   let val = $currentDate;
   let min = $currentDate;
   let max = $currentDate;
@@ -170,6 +172,25 @@
     }
 
     updateSliderUI();
+  }
+
+  function playTime() {
+    console.log(playInterval);
+    if (!playInterval) {
+      if (rectifiedVal >= rectifiedMax) return;
+      playInterval = setInterval(_ => {
+        if (rectifiedVal < rectifiedMax) {
+          rectifiedVal += 86400000;
+          sliderOnChange();
+        } else {
+          clearInterval(playInterval);
+          playInterval = null;
+        }
+      }, 2000);
+    } else {
+      clearInterval(playInterval);
+      playInterval = null;
+    }
   }
 
   // currentDataReadyOnMay.subscribe(d => ////console.log('map set:', d));
@@ -362,6 +383,12 @@
     animation: spin 1s linear infinite;
   }
 
+  .play-button {
+    width: 30px;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+
   /* Safari */
   @-webkit-keyframes spin {
     0% {
@@ -407,6 +434,18 @@
     bind:value={rectifiedVal} />
   <div id="timeSliderPaddingRight" bind:this={timeSliderPaddingRight} />
   <p aria-label="maximum value" class="min-max">{formatTime(new Date(rectifiedMax))} (Yesterday)</p>
+
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    class="play-button"
+    viewBox="0 0 200 200"
+    alt="Play video"
+    on:click={_ => playTime()}
+    fill={playInterval ? 'red' : 'grey'}
+    stroke={playInterval ? 'red' : 'grey'}>
+    <circle cx="100" cy="100" r="90" fill="none" stroke-width="15" />
+    <polygon points="70, 55 70, 145 145, 100" />
+  </svg>
 
   {#if $currentDataReadyOnMay === false}
     <div class="loader-container">
