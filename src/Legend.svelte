@@ -16,7 +16,7 @@
     // DON"T CAP FOR QUIDEL
     let h = Math.min(100, valueMinMax[1]).toFixed(2) + '%';
     let l = Math.max(0, valueMinMax[0]).toFixed(2) + '%';
-    if (sens === 'ght') {
+    if (sens === 'ght' || sens === 'quidel') {
       h = valueMinMax[1].toFixed(2);
       l = Math.max(0, valueMinMax[0]).toFixed(2);
     }

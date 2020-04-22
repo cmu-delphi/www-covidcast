@@ -31,8 +31,8 @@
 
   import * as d3 from 'd3';
 
-  const ENDPOINT = 'https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&time_type=day';
-  const ENDPOINT_META = 'https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast_meta';
+  const ENDPOINT = 'https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day';
+  const ENDPOINT_META = 'https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast_meta&cached=true';
 
   let error = null;
   let changingSensor = false;
