@@ -44,7 +44,6 @@
     regionDataStats.subscribe(d => setChartRange(d));
     currentDate.subscribe(_ => updateGraphTimeRange());
     currentRegion.subscribe(region => {
-      ////console.log(region);
       if (!region) {
         let chart = new Chart();
         chart.draw();
@@ -53,10 +52,8 @@
       }
     });
     currentSensor.subscribe(_ => {
-      ////console.log(_);
       if (userCharts != undefined) {
         if (userCharts[currentChart].isChart()) {
-          ////console.log('is chart');
           userCharts[currentChart].getChartTitle();
         } else {
           let chart = new Chart();
@@ -68,7 +65,6 @@
       }
     });
     timeRangeOnSlider.subscribe(({ min, max }) => {
-      console.log('min:', min, 'max:', max);
       setChartDomain(min, max);
       userCharts[currentChart].draw();
     });
@@ -81,15 +77,13 @@
   }
 
   function updateGraph(data) {
-    ////console.log(data);
-    ////console.log($currentRegion);
     try {
       if (data.length !== 0 && $currentRegion) {
         if (userCharts != undefined) {
           if (userCharts[currentChart].isChart()) {
             userCharts[currentChart].draw();
           } else {
-            var dataResults = parseData(data);
+            var dataResults = transferData(data);
             var graphType = dataResults[0];
             var graphData = dataResults[1];
             var range = dataResults[2];
@@ -101,7 +95,6 @@
         }
       }
     } catch (err) {
-      ////console.log(err);
     }
   }
 
@@ -111,10 +104,9 @@
     }
   }
 
-  // parse data
-  function parseData(clickedData) {
+  // transfer data to new graph
+  function transferData(clickedData) {
     let data = clickedData;
-
     var dataRange = userCharts[currentChart].getRange();
     var n = userCharts[currentChart].getN();
     var domain = userCharts[currentChart].getDomain();
@@ -139,7 +131,6 @@
   }
 
   function setChartDomain(min, max) {
-    console.log('called domain: ' + min + ' ' + max);
     try {
       if(userCharts[currentChart] != undefined) {
         let minDate = min;
@@ -195,8 +186,6 @@
     getN() {
       if (this.n) {
         return this.n;
-      } else {
-        ////console.log('n: ' + this.n);
       }
     }
 
@@ -271,10 +260,8 @@
           title = 'Doctor visits with COVID-like symptoms';
           break;
         default:
-          ////console.log('default');
           break;
       }
-      ////console.log(title);
       d3.select(t).html(title);
     }
 
@@ -338,16 +325,12 @@
       return [this.min, this.max];
     }
 
-
     setDomain(minDate, maxDate) {
-      console.log('set domain: ' + minDate + ' ' + maxDate);
       this.minDate = minDate;
       this.maxDate = maxDate;
-      console.log('this: ' + this.minDate);
     }
 
     getDomain() {
-      console.log('get domain: ' + this.minDate);
       return [this.minDate, this.maxDate];
     }
     updateAxes() {}
@@ -401,7 +384,6 @@
       // set date range
       var parseTime = d3.timeParse('%Y%m%d');
       var domain = this.getDomain();
-      console.log('domain: ' + domain[0]);
       var minDate = parseTime(domain[0]);
       var maxDate = parseTime(domain[1]);
       var bisectDate = d3.bisector(function(d) {
@@ -413,10 +395,12 @@
       // set x-axis ticks based off of data sparsity and format y-axis ticks
       var xTicks = myData.length;
       var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(4);
+      formatXTicks = xTicks < 40 ? d3.timeDay.every(4) : d3.timeDay.every(7);
+      console.log(formatXTicks);
       var formatYTicks = this.getFormat();
 
-      let chartMax = this.max;
       // peg values to max and min if out of range
+      let chartMax = this.max;
       for (var i = 0; i < myData.length; i++) {
         myData[i].max = false;
         if (+myData[i].value < this.min) {
@@ -431,6 +415,7 @@
         chartMax = 100;
       }
 
+      // scale x and y axes
       var x = d3
         .scaleTime()
         .domain(d3.extent(myData, d => parseTime(d.time_value)))
@@ -440,6 +425,7 @@
         .domain([this.min, chartMax])
         .range([height, 0]);
 
+      // append the axes
       svg
         .append('g')
         .attr('class', 'axis')
@@ -461,6 +447,7 @@
         .attr('class', 'axis')
         .call(d3.axisLeft(y).tickFormat(formatYTicks));
 
+      // draw the line graph
       let line = d3
         .line()
         .x(d => x(parseTime(d.time_value)))
@@ -473,6 +460,7 @@
         .attr('stroke-width', 3)
         .attr('d', line(myData));
 
+      // define tool tip
       let tip = d3Tip()
         .attr('class', 'd3-tip')
         .offset([-10, 0])
@@ -487,6 +475,7 @@
 
       svg.call(tip);
 
+      // add the data to the graph
       svg
         .selectAll('circle')
         .data(myData)
@@ -541,6 +530,7 @@
     return year + month + date;
   }
 
+  // calculate the graph's min and max range based off the dataset's standard deviation
   function calculateSD() {
     let sensor = $currentSensor;
     let sts = $stats.get(sensor);
@@ -550,8 +540,6 @@
     }
     userCharts[currentChart].setRange(minMax[0], minMax[1]);
   }
-
-  function dataDescription() {}
 </script>
 
 <style>
