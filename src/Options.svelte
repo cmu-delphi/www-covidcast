@@ -281,7 +281,7 @@
       <div aria-label="geographic level" class="buttons-group">
         {#each Object.keys($levels) as level}
           <button
-            aria-selected={$currentLevel === level ? 'true' : 'false'}
+            aria-pressed={$currentLevel === level ? 'true' : 'false'}
             class="button {$currentLevel === level ? 'selected' : ''}"
             on:click={() => {
               currentDataReadyOnMay.set(false);
@@ -308,7 +308,7 @@
       <!-- <div class="buttons-group-title">Signal Type</div> -->
       <div aria-label="display type" class="buttons-group-side">
         <button
-          aria-selected={$signalType === 'value' ? 'true' : 'false'}
+          aria-pressed={$signalType === 'value' ? 'true' : 'false'}
           class="button {$signalType === 'value' ? 'selected' : ''}"
           on:click={() => {
             currentDataReadyOnMay.set(false);
@@ -317,7 +317,7 @@
           Intensity
         </button>
         <button
-          aria-selected={$signalType === 'direction' ? 'true' : 'false'}
+          aria-pressed={$signalType === 'direction' ? 'true' : 'false'}
           class="button {$signalType === 'direction' ? 'selected' : ''}"
           on:click={() => {
             currentDataReadyOnMay.set(false);
