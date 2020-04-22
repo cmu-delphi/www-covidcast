@@ -32,7 +32,6 @@
   let popup;
   let hoveredId;
   let clickedId;
-  let hoverOnState;
 
   /*
   bgColor:string - 'rgb(xx,yy,zz)'
@@ -62,20 +61,19 @@
   const onMouseEnter = level => e => {
     // popup
     map.getCanvas().style.cursor = 'pointer';
-    let hoverOnState = true;
-
     popup.setLngLat(e.lngLat).addTo(map);
   };
+
   const onMouseMove = level => e => {
     // hover state
     if (level === 'state-outline') {
-      popup.setLngLat(e.lngLat).setHTML('Estimate unavailable');
+      popup
+        .setLngLat(e.lngLat)
+        .setHTML('Estimate unavailable')
+        .addTo(map);
       return;
     }
-    hoverOnState = false;
-    if (hoveredId) {
-      map.setFeatureState({ source: level }, { hover: false });
-    }
+    map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
     hoveredId = e.features[0].id;
     map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
 
@@ -143,6 +141,10 @@
   };
 
   const onMouseLeave = level => e => {
+    if (level === 'state-outline') {
+      popup.remove();
+      return;
+    }
     // hover state
     if (hoveredId) {
       map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
@@ -150,11 +152,6 @@
     hoveredId = null;
 
     map.getCanvas().style.cursor = '';
-    if (!hoverOnState) {
-      hoverOnState = true;
-      map.getCanvas().style.cursor = 'pointer';
-      return;
-    }
     popup.remove();
   };
   const onClick = level => e => {
