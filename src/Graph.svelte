@@ -453,12 +453,19 @@
         .domain([this.min, chartMax])
         .range([height, 0]);
 
+      var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(4);
+      // var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(5);
       // append the axes
       svg
         .append('g')
         .attr('class', 'axis')
         .attr('transform', 'translate(0,' + height + ')')
-        .call(d3.axisBottom(x).ticks(8, d3.timeFormat('%m/%d')));
+        .call(
+          d3
+            .axisBottom(x)
+            .tickFormat(d3.timeFormat('%m/%d'))
+            .ticks(7),
+        );
 
       svg
         .selectAll('text')
