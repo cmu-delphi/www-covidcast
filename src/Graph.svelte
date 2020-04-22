@@ -510,10 +510,14 @@
         .attr('cy', d => y(+d.value))
         .style('stroke-width', 3)
         .style('fill', d => {
-          // console.log(d.time_value);
-          if (d.time_value === $currentDate) return 'white';
-          if (d.inDirection && $signalType === 'direction') return 'black';
-          return DIRECTION_THEME.gradientMiddle;
+          let color = DIRECTION_THEME.gradientMiddle;
+          if (d.time_value == $currentDate) {
+            color = 'white';
+          } else if (d.inDirection && $signalType === 'direction') {
+            color = 'black';
+          }
+          // console.log($currentDate, d.time_value, color);
+          return color;
         })
         .style('stroke', d => (d.time_value == $currentDate ? DIRECTION_THEME.gradientMiddle : 'none'))
         .on('mouseover', tip.show)
