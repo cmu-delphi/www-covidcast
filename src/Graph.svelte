@@ -46,20 +46,14 @@
     currentRegion.subscribe(region => {
       ////console.log(region);
       if (!region) {
-        console.log(userCharts[currentChart]);
-        console.log(userCharts[currentChart].isChart());
+        // console.log('draw blank graph')
+        userCharts[currentChart].setData([]);
+        userCharts[currentChart].draw();
+
         // let chart = new Chart();
         // chart.draw();
         // userCharts = [];
         // userCharts.push(chart);
-        if (userCharts[currentChart].isChart()) {
-          console.log('is chart');
-          userCharts[currentChart].setData([]);
-          userCharts[currentChart].draw();
-        } else {
-          console.log('draw graph called');
-          drawGraph();
-        }
       }
     });
     currentSensor.subscribe(_ => {
@@ -286,6 +280,7 @@
     }
 
     isChart() {
+      console.log(this.chartType);
       var result = null;
       try {
         this.chartType in charts ? (result = true) : (result = false);
