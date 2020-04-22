@@ -306,12 +306,12 @@
     z-index: 1001;
     bottom: 10px;
     right: 10px;
-    max-width: 400px;
+    /* max-width: 400px;
     max-height: 400px;
-    width: 400px;
+    width: 400px; */
     background-color: rgba(255, 255, 255, 0.9);
     /* border-radius: 1rem; */
-    padding: 6px 13px 0;
+    padding: 6px 5px;
     box-sizing: border-box;
 
     transition: opacity 0.3s ease-in-out;

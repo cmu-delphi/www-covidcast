@@ -510,7 +510,7 @@
         .attr('cy', d => y(+d.value))
         .style('stroke-width', 3)
         .style('fill', d => {
-          console.log(d.time_value);
+          // console.log(d.time_value);
           if (d.time_value === $currentDate) return 'white';
           if (d.inDirection && $signalType === 'direction') return 'black';
           return DIRECTION_THEME.gradientMiddle;
@@ -573,6 +573,12 @@
 </script>
 
 <style>
+  .graph {
+    padding: 0px 6px;
+    max-height: 380px;
+    width: 374px;
+  }
+
   .graph-title {
     text-align: center;
     font-size: 14px;
@@ -581,20 +587,23 @@
     font-family: 'Open Sans', sans-serif;
     color: var(--darkgrey);
   }
+
   .graph-description {
     text-align: center;
-    margin: 5px 0px 7px 0px !important;
+    margin: 3px 0px 3px 0px !important;
     font-size: 14px;
     padding: 0px !important;
   }
 </style>
 
-<h5 bind:this={t} class="graph-title" />
-<p class="graph-description">
-  {$currentRegionName} {$currentRegionName && $currentLevel === 'county' ? 'County' : ''}
-  {$currentLevel === 'msa' ? 'Metro Area' : ''}
-</p>
+<div class="graph">
+  <h5 bind:this={t} class="graph-title" />
+  <p class="graph-description">
+    {$currentRegionName} {$currentRegionName && $currentLevel === 'county' ? 'County' : ''}
+    {$currentLevel === 'msa' ? 'Metro Area' : ''}
+  </p>
 
-<div bind:clientWidth={w}>
-  <div bind:this={el} />
+  <div bind:clientWidth={w}>
+    <div bind:this={el} />
+  </div>
 </div>
