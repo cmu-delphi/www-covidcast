@@ -384,7 +384,7 @@
       console.log('my data:' + myData[0]);
 
       // size chart
-      var margin = { top: 15, right: 42, bottom: 50, left: 60 }, // right need to be wide enough to accommodate the tooltip
+      var margin = { top: 15, right: 42, bottom: 70, left: 60 }, // right need to be wide enough to accommodate the tooltip
         width = w - margin.left - margin.right,
         height = 0.85 * w - margin.top - margin.bottom;
 
@@ -436,7 +436,8 @@
         }
       }
 
-      if (chartMax > 100 && $currentSensor !== sensorKeys['ght']) {
+      if (chartMax > 100 && $currentSensor !== 'ght' && $currentSensor !== 'quidel') {
+        console.log('seeting max');
         chartMax = 100;
       }
 
@@ -571,7 +572,7 @@
 
 <style>
   .graph {
-    max-height: 390px;
+    max-height: 350px;
     max-width: 400px;
   }
 
