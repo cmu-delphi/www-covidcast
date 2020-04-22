@@ -42,37 +42,37 @@
 
   onMount(_ => {
     drawGraph();
-    console.log('on mount called');
+    // console.log('on mount called');
     regionData.subscribe(d => updateGraph(d));
     regionDataStats.subscribe(d => setChartRange(d));
     currentDate.subscribe(_ => updateGraphTimeRange());
     signalType.subscribe(_ => updateGraph($regionData));
     currentRegion.subscribe(region => {
-      console.log('current region changed: ' + region);
+      // console.log('current region changed: ' + region);
       if (!region) {
         userCharts[currentChart].setData([]);
         userCharts[currentChart].draw();
       }
     });
     currentLevel.subscribe(_ => {
-      console.log('level changed:' + $currentLevel);
+      // console.log('level changed:' + $currentLevel);
     });
     currentSensor.subscribe(_ => {
-      console.log('current sensor changed: ' + $currentSensor);
+      // console.log('current sensor changed: ' + $currentSensor);
       if (userCharts != undefined) {
         if (userCharts[currentChart].isChart()) {
-          console.log('is chart-current sensor, increment: ' + currentChart);
+          // console.log('is chart-current sensor, increment: ' + currentChart);
           console.log($currentSensor);
           userCharts[currentChart].getChartTitle();
         } else {
-          console.log('is chart fail: ' + userCharts[currentChart].isChart());
-          console.log($currentSensor);
+          // console.log('is chart fail: ' + userCharts[currentChart].isChart());
+          // console.log($currentSensor);
           let chart = new Chart();
           chart.getChartTitle();
           chart.draw();
           userCharts.push(chart);
           currentChart += 1;
-          console.log('new chart-current sensor, increment: ' + currentChart);
+          // console.log('new chart-current sensor, increment: ' + currentChart);
         }
       }
     });
@@ -88,11 +88,11 @@
     let chart = new Chart();
     chart.draw();
     userCharts.push(chart);
-    console.log('new chart-draw graph, increment' + currentChart);
+    // console.log('new chart-draw graph, increment' + currentChart);
   }
 
   function updateGraph(data) {
-    console.log('update graph');
+    // console.log('update graph');
     try {
       if (data.length !== 0 && $currentRegion) {
         if (userCharts != undefined) {
@@ -282,7 +282,7 @@
       var result = null;
       try {
         this.chartType in charts ? (result = true) : (result = false);
-        console.log(this.chartType in charts);
+        // console.log(this.chartType in charts);
       } catch (e) {
         if (e.name == 'ReferenceError') {
           result = false;
@@ -410,8 +410,11 @@
 
       // set x-axis ticks based off of data sparsity and format y-axis ticks
       var xTicks = myData.length;
-      var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(4);
-      formatXTicks = xTicks < 40 ? d3.timeDay.every(4) : d3.timeDay.every(7);
+      // var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(5);
+      // formatXTicks = xTicks > 40 ? d3.timeDay.every(5) : d3.format(10);
+      // var formatXTicks = 8;
+      console.log('format: ' + formatXTicks);
+
       var formatYTicks = this.getFormat();
 
       let currDate = parseTime($currentDate);
@@ -455,13 +458,10 @@
         .append('g')
         .attr('class', 'axis')
         .attr('transform', 'translate(0,' + height + ')')
-        .call(
-          d3
-            .axisBottom(x)
-            .tickFormat(d3.timeFormat('%m/%d'))
-            .ticks(formatXTicks),
-        )
-        .selectAll('text')
+        .call(d3.axisBottom(x).ticks(8, d3.timeFormat('%m/%d')))
+
+       svg
+         .selectAll('text')
         .attr('y', 10)
         .attr('x', -20)
         .attr('dy', '0em')
