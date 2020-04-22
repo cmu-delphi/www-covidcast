@@ -121,7 +121,7 @@
     let minDate = $times.get(s)[0],
       maxDate = $times.get(s)[1];
     // console.log(minDate, maxDate);
-    let date = maxDate;
+    let date = minDate;
     if ($currentDate >= minDate && $currentDate <= maxDate) {
       // data available at current date
       date = $currentDate;
