@@ -119,3 +119,11 @@ export const regionDataStats = derived([metaData, currentSensor, currentLevel], 
 
 export const timeRangeOnSlider = writable({ min: 0, max: 0 });
 export const mapfirstLoaded = writable(false);
+
+const today = new Date(new Date().toJSON().slice(0, 10).replace(/-/g, '/'));
+export const yesterday = new Date(today.getTime() - 86400 * 1000);
+
+// export const today = readable(new Date(new Date().toJSON().slice(0, 10).replace(/-/g, '/')));
+// export const yesterday = derived([today], ([$today]) => {
+//   new Date($today.getTime() - 86400 * 1000);
+// });

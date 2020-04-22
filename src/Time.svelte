@@ -8,6 +8,7 @@
     signalType,
     currentLevel,
     timeRangeOnSlider,
+    yesterday,
   } from './stores.js';
   import { calculateValFromRectified } from './util.js';
   import * as d3 from 'd3';
@@ -35,14 +36,6 @@
   let val = $currentDate;
   let min = $currentDate;
   let max = $currentDate;
-
-  let today = new Date(
-    new Date()
-      .toJSON()
-      .slice(0, 10)
-      .replace(/-/g, '/'),
-  );
-  let yesterday = new Date(today.getTime() - 86400 * 1000);
 
   let rectifiedVal = parseTime(val).getTime();
   let rectifiedMax = yesterday.getTime();
@@ -429,10 +422,22 @@
     animation: spin 1s linear infinite;
   }
 
+  button.play-button-container-button {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    margin-right: 10px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   .play-button {
     width: 30px;
     cursor: pointer;
-    margin-right: 10px;
   }
 
   /* Safari */
@@ -481,24 +486,27 @@
   <div id="timeSliderPaddingRight" bind:this={timeSliderPaddingRight} />
   <p aria-label="maximum value" class="min-max">{formatTime(new Date(rectifiedMax))} (Yesterday)</p>
 
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    class="play-button"
-    viewBox="0 0 200 200"
-    alt="play"
-    on:click={_ => playTime()}
-    fill={playInterval ? '#c00' : '#666'}
-    stroke={playInterval ? '#c00' : '#666'}>
-    <circle cx="100" cy="100" r="90" fill="none" stroke-width="15" />
-    <!-- <polygon points="70, 55 70, 145 145, 100" /> -->
-    {#if playInterval}
-      <rect x="65" y="52" width="20" height="90" />
-      <rect x="115" y="52" width="20" height="90" />
-    {:else}
-      <polygon points="70, 55 70, 145 145, 100" />
-    {/if}
-
-  </svg>
+  <button
+    aria-pressed={playInterval ? 'true' : 'false'}
+    class="play-button-container-button"
+    on:click={_ => playTime()}>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="play-button"
+      viewBox="0 0 200 200"
+      alt="play"
+      fill={playInterval ? '#c00' : '#666'}
+      stroke={playInterval ? '#c00' : '#666'}>
+      <circle cx="100" cy="100" r="90" fill="none" stroke-width="15" />
+      <!-- <polygon points="70, 55 70, 145 145, 100" /> -->
+      {#if playInterval}
+        <rect x="65" y="52" width="20" height="90" />
+        <rect x="115" y="52" width="20" height="90" />
+      {:else}
+        <polygon points="70, 55 70, 145 145, 100" />
+      {/if}
+    </svg>
+  </button>
 
   {#if $currentDataReadyOnMay === false}
     <div class="loader-container">
