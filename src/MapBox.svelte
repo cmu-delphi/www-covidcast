@@ -62,14 +62,18 @@
   const onMouseEnter = level => e => {
     // popup
     map.getCanvas().style.cursor = 'pointer';
-    // if (level !== 'mega-county') {
-    // megaHoveredId = null;
-    // }
     popup.setLngLat(e.lngLat).addTo(map);
   };
 
   const onMouseMove = level => e => {
-    // console.log(hoveredId);
+    if (level === 'state-outline') {
+      map.getCanvas().style.cursor = 'pointer';
+      popup
+        .setLngLat(e.lngLat)
+        .setHTML('Estimate unavailable')
+        .addTo(map);
+      return;
+    }
     map.setFeatureState({ source: level }, { hover: false });
     map.setFeatureState({ source: 'mega-county' }, { hover: false });
     if (level !== 'mega-county') {
@@ -91,7 +95,6 @@
         megaHoveredId = e.features[0].id;
         map.setFeatureState({ source: level, id: megaHoveredId }, { hover: true });
       } else {
-        // console.log('BADNESS', megaHoveredId);
         map.setFeatureState({ source: level, id: megaHoveredId }, { hover: false });
         megaHoveredId = null;
       }
@@ -131,7 +134,7 @@
         }
         ${
           $signalType === 'direction'
-            ? 'Direction: ' +
+            ? '7-day Trend: ' +
               (direction === 1
                 ? '<span class="map-popup-region-value" style="background-color: ' +
                   DIRECTION_THEME.increasing +
@@ -168,6 +171,10 @@
   };
 
   const onMouseLeave = level => e => {
+    if (level === 'state-outline') {
+      popup.remove();
+      return;
+    }
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
     if (level === 'mega-county' && hoveredId !== null) megaHoveredId = null;
     map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
@@ -369,8 +376,14 @@
         [valueMinMax[1], DIRECTION_THEME.gradientMaxMega],
       ];
     } else {
-      stops = [[-1, DIRECTION_THEME.decreasing], [0, DIRECTION_THEME.steady], [1, DIRECTION_THEME.increasing]];
+      stops = [
+        [-100, MAP_THEME.countyFill],
+        [-1, DIRECTION_THEME.decreasing],
+        [0, DIRECTION_THEME.steady],
+        [1, DIRECTION_THEME.increasing],
+      ];
       stopsMega = [
+        [-100, MAP_THEME.countyFill],
         [-1, DIRECTION_THEME.gradientMinMega],
         [0, DIRECTION_THEME.gradientMiddleMega],
         [1, DIRECTION_THEME.gradientMaxMega],
@@ -689,6 +702,7 @@
       closeOnClick: false,
       className: 'map-popup',
     });
+    map.on('mousemove', 'state-outline', onMouseMove('state-outline'));
     [...Object.keys($levels), 'mega-county'].forEach(level => {
       map.on('mouseenter', level, onMouseEnter(level));
       map.on('mousemove', level, onMouseMove(level));
