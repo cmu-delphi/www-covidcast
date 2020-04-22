@@ -31,8 +31,8 @@
   let map;
   let popup;
   let hoveredId;
+  let hoverIdBack;
   let clickedId;
-  let hoverOnState;
 
   /*
   bgColor:string - 'rgb(xx,yy,zz)'
@@ -44,7 +44,6 @@
 
   onMount(_ => {
     let containerWidth = container.clientWidth;
-    ////console.log('map view width:', containerWidth);
     if (containerWidth <= 1021) {
       ZOOM = 3.9;
     } else if (containerWidth > 1021 && containerWidth < 1280) {
@@ -62,30 +61,30 @@
   const onMouseEnter = level => e => {
     // popup
     map.getCanvas().style.cursor = 'pointer';
-    let hoverOnState = true;
+    map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
+    hoveredId = null;
 
     popup.setLngLat(e.lngLat).addTo(map);
   };
+
   const onMouseMove = level => e => {
     // hover state
+    console.log(hoveredId, level);
     if (hoveredId) {
       map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
     }
-    // if (level === 'state-outline') {
-    //   popup.setLngLat(e.lngLat).setHTML('No data available');
-    //   return;
-    // }
-    // hoverOnState = false;
     hoveredId = e.features[0].id;
     map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
+    console.log(hoveredId, level);
 
     // popup
-    // var title = e.features[0].properties.NAME;
     const { value, direction, NAME } = e.features[0].properties;
     const fillColor = e.features[0].layer.paint['fill-color'].toString();
     var title = `
       <div class="map-popup-region-name">
-      ${NAME} ${$currentLevel === 'county' ? 'County' : ''} ${$currentLevel === 'msa' ? 'Metro Area' : ''}
+      ${NAME} ${$currentLevel === 'county' && level !== 'mega-county' ? 'County' : ''} ${
+      $currentLevel === 'msa' ? 'Metro Area' : ''
+    }
       </div>
       <div class="map-popup-region-value-container">
         ${
@@ -150,14 +149,11 @@
     hoveredId = null;
 
     map.getCanvas().style.cursor = '';
-    // if (!hoverOnState) {
-    //   hoverOnState = true;
-    //   map.getCanvas().style.cursor = 'pointer';
-    //   return;
-    // }
     popup.remove();
   };
+
   const onClick = level => e => {
+    console.log(e.features[0].id);
     if (clickedId) {
       map.setFeatureState({ source: level, id: clickedId }, { select: false });
     }
@@ -337,7 +333,7 @@
 
     if (['data', 'init'].includes(type)) {
       map.getSource($currentLevel).setData(dat);
-      drawMega ? map.getSource('state-outline').setData(megaDat) : '';
+      drawMega ? map.getSource('mega-county').setData(megaDat) : '';
     }
 
     Object.keys($levels).forEach(name => {
@@ -354,12 +350,13 @@
       }
     });
     if (drawMega) {
-      map.setPaintProperty('state-outline', 'fill-color', {
+      map.setPaintProperty('mega-county', 'fill-color', {
         property: $signalType,
         stops: stopsMega,
       });
+      map.setLayoutProperty('mega-county', 'visibility', 'visible');
     } else {
-      map.setPaintProperty('state-outline', 'fill-color', 'rgba(0, 0, 0, 0)');
+      map.setLayoutProperty('mega-county', 'visibility', 'none');
     }
     console.log(map.getStyle().layers);
 
@@ -426,7 +423,6 @@
       .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
 
     map.on('idle', ev => {
-      // console.log(ev);
       currentDataReadyOnMay.set(true);
       mapfirstLoaded.set(true);
     });
@@ -450,22 +446,11 @@
       map.addSource('city-point', {
         type: 'geojson',
         data: $geojsons.get('city'),
-        // cluster: true,
-        // clusterMaxZoom: 14, // Max zoom to cluster points on
-        // clusterRadius: 100, // Radius of each cluster when clustering points (defaults to 50),
-        // clusterProperties: {
-        //   largest: [
-        //     [
-        //       'case',
-        //       ['<', ['get', 'rank', ['accumulated']], ['get', 'rank', ['get', 'largest']]],
-        //       ['accumulated'],
-        //       ['properties'],
-        //     ],
-        //     ['properties'],
-        //   ],
-        // },
       });
-      console.log(map.getSource('city-point'));
+      map.addSource('mega-county', {
+        type: 'geojson',
+        data: $geojsons.get('state'),
+      });
 
       map.addLayer({
         id: 'county-outline',
@@ -484,6 +469,25 @@
         paint: {
           'fill-color': 'rgba(0, 0, 0, 0)',
           'fill-outline-color': MAP_THEME.stateOutline,
+        },
+      });
+      map.addLayer({
+        id: `mega-county-hover`,
+        source: 'mega-county',
+        type: 'line',
+        paint: {
+          'line-color': MAP_THEME.hoverRegionOutline,
+          'line-width': ['case', ['any', ['boolean', ['feature-state', 'hover'], false]], 4, 0],
+        },
+      });
+
+      map.addLayer({
+        id: `mega-county-selected`,
+        source: 'mega-county',
+        type: 'line',
+        paint: {
+          'line-color': MAP_THEME.selectedRegionOutline,
+          'line-width': ['case', ['any', ['boolean', ['feature-state', 'select'], false]], 4, 0],
         },
       });
 
@@ -595,6 +599,20 @@
       //     'text-halo-width': 2,
       //   },
       // });
+      map.addLayer(
+        {
+          id: 'mega-county',
+          source: 'mega-county',
+          type: 'fill',
+          visibility: 'none',
+          filter: ['!=', $signalType, -100],
+          paint: {
+            'fill-outline-color': '#616161',
+            'fill-color': MAP_THEME.countyFill,
+          },
+        },
+        `mega-county-hover`,
+      );
 
       Object.keys($levels).forEach(name => {
         map.addLayer(
@@ -622,10 +640,7 @@
       closeOnClick: false,
       className: 'map-popup',
     });
-    map.on('mouseenter', 'state-outline', onMouseEnter('state-outline'));
-    map.on('mousemove', 'state-outline', onMouseMove('state-outline'));
-    map.on('mouseleave', 'state-outline', onMouseLeave('state-outline'));
-    Object.keys($levels).forEach(level => {
+    [...Object.keys($levels), 'mega-county'].forEach(level => {
       map.on('mouseenter', level, onMouseEnter(level));
       map.on('mousemove', level, onMouseMove(level));
       map.on('mouseleave', level, onMouseLeave(level));
