@@ -17,6 +17,7 @@
     signalType,
     timeRangeOnSlider,
   } from './stores.js';
+  import { calculateValFromRectified } from './util.js';
   import { DIRECTION_THEME } from './theme.js';
   import * as d3 from 'd3';
   import d3Tip from 'd3-tip';
@@ -554,14 +555,6 @@
         .style('text-anchor', 'middle')
         .text(chartTitle);
     }
-  }
-
-  function calculateValFromRectified(rectified) {
-    let tempDate = new Date(rectified);
-    let year = tempDate.getFullYear();
-    let month = ('0' + (tempDate.getMonth() + 1)).slice(-2);
-    let date = ('0' + tempDate.getDate()).slice(-2);
-    return year + month + date;
   }
 
   // calculate the graph's min and max range based off the dataset's standard deviation

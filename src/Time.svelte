@@ -9,6 +9,7 @@
     currentLevel,
     timeRangeOnSlider,
   } from './stores.js';
+  import { calculateValFromRectified } from './util.js';
   import * as d3 from 'd3';
 
   let timeSliderPaddingLeft;
@@ -185,15 +186,7 @@
       canLoadMore = true;
     }
 
-    ////console.log(canLoadMore);
-  }
-
-  function calculateValFromRectified(rectified) {
-    let tempDate = new Date(rectified);
-    let year = tempDate.getFullYear();
-    let month = ('0' + (tempDate.getMonth() + 1)).slice(-2);
-    let date = ('0' + tempDate.getDate()).slice(-2);
-    return year + month + date;
+    // console.log(canLoadMore);
   }
 
   function sliderOnChange() {
