@@ -384,12 +384,12 @@
       }).right;
       var minDate = maxDate - twoWeeks;
       minDate = new Date(minDate);
-      myData = myData.filter(it => parseTime(it['time_value']) <= maxDate);
-      myData = myData.filter(it => parseTime(it['time_value']) >= minDate);
+      // myData = myData.filter(it => parseTime(it['time_value']) <= maxDate);
+      // myData = myData.filter(it => parseTime(it['time_value']) >= minDate);
 
       // set x-axis ticks based off of data sparsity and format y-axis ticks
       var xTicks = myData.length;
-      var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(3);
+      var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(xTicks % 6);
       var formatYTicks = this.getFormat();
 
       let chartMax = this.max;
@@ -427,7 +427,12 @@
             .axisBottom(x)
             .tickFormat(d3.timeFormat('%m/%d'))
             .ticks(formatXTicks),
-        );
+        )
+        .selectAll('text')
+          .attr('y', 10)
+          .attr('x', -12)
+          .attr('transform', 'rotate(-45)');
+
       svg
         .append('g')
         .attr('class', 'axis')
