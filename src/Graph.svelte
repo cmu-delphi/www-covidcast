@@ -412,7 +412,7 @@
       // var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(5);
       // formatXTicks = xTicks > 40 ? d3.timeDay.every(5) : d3.format(10);
       // var formatXTicks = 8;
-      console.log('format: ' + formatXTicks);
+      // console.log('format: ' + formatXTicks);
 
       var formatYTicks = this.getFormat();
 
@@ -536,14 +536,14 @@
                 break;
             }
           } else if (d.time_value == $currentDate && $signalType === 'value') {
-              color = 'white';
+            color = 'white';
           }
           return color;
         })
         .style('stroke', '#767676')
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
-      myData.map(d => console.log(d));
+      // myData.map(d => console.log(d));
 
       // var colorScale = d3.scaleLinear()
       //                     .domain([chartMin, chartMax])
@@ -552,14 +552,13 @@
       // svg.select('#'+$currentDate)
       //   .enter()
       //   .style('fill', d => {colorScale(d.value)});
-            // else if(d.time_value == $currentDate && $signalType === 'value') {
-            //             color = colorScale(d.value);
-            //           }
-            // add the data to the graph
-         //d => (d.time_value == $currentDate ? DIRECTION_THEME.gradientMiddle : 'none'))
-
+      // else if(d.time_value == $currentDate && $signalType === 'value') {
+      //             color = colorScale(d.value);
+      //           }
+      // add the data to the graph
       //d => (d.time_value == $currentDate ? DIRECTION_THEME.gradientMiddle : 'none'))
 
+      //d => (d.time_value == $currentDate ? DIRECTION_THEME.gradientMiddle : 'none'))
 
       //console.log($currentRegion);
       // label the y-axis
