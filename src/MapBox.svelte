@@ -184,7 +184,7 @@
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
     if (level === 'mega-county' && hoveredId !== null) megaHoveredId = null;
     map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
-    hoveredId = null;
+    if (level !== 'mega-county') hoveredId = null;
 
     map.getCanvas().style.cursor = '';
     popup.remove();
