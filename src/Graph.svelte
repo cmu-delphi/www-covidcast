@@ -422,6 +422,7 @@
 
       // peg values to max and min if out of range
       let chartMax = this.max;
+      let chartMin = this.min;
       for (var i = 0; i < myData.length; i++) {
         let directionDate = parseTime(myData[i].time_value);
         if (directionDate >= currDateSeven && directionDate <= currDate) {
@@ -488,7 +489,7 @@
       svg
         .append('path')
         .attr('fill', 'none')
-        .attr('stroke', DIRECTION_THEME.gradientMiddle)
+        .attr('stroke', '#767676') // DIRECTION_THEME.gradientMiddle)
         .attr('stroke-width', 3)
         .attr('d', line(myData));
 
@@ -507,7 +508,6 @@
 
       svg.call(tip);
 
-      // add the data to the graph
       svg
         .selectAll('circle')
         .data(myData)
@@ -516,19 +516,50 @@
         .attr('r', d => (d.time_value == $currentDate ? 6 : 4))
         .attr('cx', d => x(parseTime(d.time_value)))
         .attr('cy', d => y(+d.value))
-        .style('stroke-width', d => (d.time_value == $currentDate ? 3 : 1))
+        .attr('id', d => d.time_value)
+        .style('stroke-width', d => (d.time_value == $currentDate ? 1 : 1))
         .style('fill', d => {
-          let color = DIRECTION_THEME.gradientMiddle;
-          if (d.time_value == $currentDate || (d.inDirection && $signalType === 'direction')) {
-            color = 'white';
+          let color = '#767676';
+          if (d.inDirection && $signalType === 'direction') {
+            switch (d.direction) {
+              case 1:
+                color = DIRECTION_THEME.increasing;
+                break;
+              case 0:
+                color = DIRECTION_THEME.steady;
+                break;
+              case -1:
+                color = DIRECTION_THEME.decreasing;
+                break;
+              default:
+                color = 'white';
+                break;
+            }
+          } else if (d.time_value == $currentDate && $signalType === 'value') {
+              color = 'white';
           }
-          // console.log($currentDate, d.time_value, color);
           return color;
         })
-        .style('stroke', DIRECTION_THEME.gradientMiddle)
+        .style('stroke', '#767676')
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
+      myData.map(d => console.log(d));
+
+      // var colorScale = d3.scaleLinear()
+      //                     .domain([chartMin, chartMax])
+      //                     .range([gradientMin, gradientMiddle, gradientMax])
+      //                     .interpolate(d3.interpolateHcl);
+      // svg.select('#'+$currentDate)
+      //   .enter()
+      //   .style('fill', d => {colorScale(d.value)});
+            // else if(d.time_value == $currentDate && $signalType === 'value') {
+            //             color = colorScale(d.value);
+            //           }
+            // add the data to the graph
+         //d => (d.time_value == $currentDate ? DIRECTION_THEME.gradientMiddle : 'none'))
+
       //d => (d.time_value == $currentDate ? DIRECTION_THEME.gradientMiddle : 'none'))
+
 
       //console.log($currentRegion);
       // label the y-axis
