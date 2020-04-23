@@ -516,20 +516,19 @@
         .attr('r', d => (d.time_value == $currentDate ? 6 : 4))
         .attr('cx', d => x(parseTime(d.time_value)))
         .attr('cy', d => y(+d.value))
-        .style('stroke-width', 3)
+        .style('stroke-width', d => (d.time_value == $currentDate ? 3 : 1))
         .style('fill', d => {
           let color = DIRECTION_THEME.gradientMiddle;
-          if (d.time_value == $currentDate) {
+          if (d.time_value == $currentDate || d.inDirection && $signalType === 'direction') {
             color = 'white';
-          } else if (d.inDirection && $signalType === 'direction') {
-            color = 'black';
           }
           // console.log($currentDate, d.time_value, color);
           return color;
         })
-        .style('stroke', d => (d.time_value == $currentDate ? DIRECTION_THEME.gradientMiddle : 'none'))
+        .style('stroke', DIRECTION_THEME.gradientMiddle)
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
+         //d => (d.time_value == $currentDate ? DIRECTION_THEME.gradientMiddle : 'none'))
 
       //console.log($currentRegion);
       // label the y-axis
