@@ -38,7 +38,7 @@ export const sensors = readable([
     name: 'Flu Testing (Quidel)',
     id: 'quidel',
     tooltipText: 'Influenza testing demand from Quidel, Inc. - thank you Quidel!',
-    signal: 'smoothed_pct_negative',
+    signal: 'smoothed_tests_per_device',
     levels: ['msa', 'state'],
   },
 ]);

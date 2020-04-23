@@ -269,7 +269,6 @@
 
   mounted.subscribe(_ => {
     try {
-      console.log('mounted!!!!');
       updateMap('mounted');
     } catch (err) {
       ////console.log(err);
@@ -277,6 +276,13 @@
   });
 
   function updateMap(type) {
+    if (type === 'mounted') {
+      console.log('mounting that bb');
+      currentRegionName.set('Allegheny');
+      currentRegion.set('42003');
+      clickedId = '42003';
+      map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+    }
     if (!mapMounted) return;
 
     let drawMega = $currentLevel === 'county';
@@ -406,19 +412,6 @@
     }
 
     const viableFeatures = dat.features.filter(f => f.properties[$signalType] !== -100);
-
-    if (type === 'mounted') {
-      // const found = viableFeatures.filter(
-      //   f => f.properties.id === '42003' || f.properties.id === '38300' || f.properties.id === 'PA',
-      // );
-      // found allegheny / Pittsburgh
-      // const initialRegion = found[0];
-      ////console.log(randomFeature);
-      currentRegionName.set('Allegheny');
-      currentRegion.set('42003');
-      clickedId = '42003';
-      map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-    }
 
     if ($currentRegion) {
       const megaFound = megaDat.features.filter(f => f.properties.STATE + '000' === $currentRegion + '');
