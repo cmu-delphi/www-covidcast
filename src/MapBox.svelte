@@ -21,6 +21,7 @@
     mounted,
     mapfirstLoaded,
   } from './stores.js';
+  import { defaultRegionOnStartup } from './util.js';
   import { DIRECTION_THEME, MAP_THEME } from './theme.js';
 
   let LAT = -1.2;
@@ -53,6 +54,7 @@
 
   // Boolean tracking if the map has been initialized.
   let mapMounted = false;
+  let chosenRandom = false;
 
   // Mouse event handlers
   const onMouseEnter = level => e => {
@@ -276,13 +278,6 @@
   });
 
   function updateMap(type) {
-    if (type === 'mounted') {
-      console.log('mounting that bb');
-      currentRegionName.set('Allegheny');
-      currentRegion.set('42003');
-      clickedId = '42003';
-      map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-    }
     if (!mapMounted) return;
 
     let drawMega = $currentLevel === 'county';
@@ -412,6 +407,40 @@
     }
 
     const viableFeatures = dat.features.filter(f => f.properties[$signalType] !== -100);
+
+    // set a random focus on start up
+    if (chosenRandom === false && $mounted) {
+      if (viableFeatures.length > 0) {
+        const found = viableFeatures.filter(
+          f =>
+            f.properties.id === defaultRegionOnStartup.county ||
+            f.properties.id === defaultRegionOnStartup.msa ||
+            f.properties.id === defaultRegionOnStartup.state,
+        );
+        if (found.length > 0) {
+          // found allegheny / Pittsburgh
+          const randomFeature = found[0];
+          ////console.log(randomFeature);
+          currentRegionName.set(randomFeature.properties.NAME);
+          currentRegion.set(randomFeature.properties.id);
+          clickedId = randomFeature.id;
+          map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+          chosenRandom = true;
+        } else {
+          const index = Math.floor(Math.random() * (viableFeatures.length - 1));
+          ////console.log(dat.features);
+          ////console.log(viableFeatures, viableFeatures.length, index);
+          const randomFeature = viableFeatures[index];
+          ////console.log(randomFeature);
+          ////console.log(randomFeature.properties.NAME);
+          currentRegionName.set(randomFeature.properties.NAME);
+          currentRegion.set(randomFeature.properties.id);
+          clickedId = randomFeature.id;
+          map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+          chosenRandom = true;
+        }
+      }
+    }
 
     if ($currentRegion) {
       const megaFound = megaDat.features.filter(f => f.properties.STATE + '000' === $currentRegion + '');
