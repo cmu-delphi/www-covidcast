@@ -418,7 +418,7 @@
 
       let currDate = parseTime($currentDate);
       let currDateSeven = parseTime($currentDate);
-      currDateSeven.setDate(currDate.getDate() - 7);
+      currDateSeven.setDate(currDate.getDate() - 6);
 
       // peg values to max and min if out of range
       let chartMax = this.max;
