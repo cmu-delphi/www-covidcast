@@ -1,5 +1,6 @@
 import { writable, readable, derived } from 'svelte/store';
 import * as d3 from 'd3';
+import moment from 'moment';
 
 // Manually curated list of sensors with metadata.
 // Selected so that we know we are able to display them.
@@ -120,10 +121,5 @@ export const regionDataStats = derived([metaData, currentSensor, currentLevel], 
 export const timeRangeOnSlider = writable({ min: 0, max: 0 });
 export const mapfirstLoaded = writable(false);
 
-const today = new Date(new Date().toJSON().slice(0, 10).replace(/-/g, '/'));
-export const yesterday = new Date(today.getTime() - 86400 * 1000);
-
-// export const today = readable(new Date(new Date().toJSON().slice(0, 10).replace(/-/g, '/')));
-// export const yesterday = derived([today], ([$today]) => {
-//   new Date($today.getTime() - 86400 * 1000);
-// });
+const today = new Date();
+export const yesterday = +moment(new Date(today.getTime() - 86400 * 1000)).format('YYYYMMDD');

@@ -38,7 +38,7 @@
   let max = $currentDate;
 
   let rectifiedVal = parseTime(val).getTime();
-  let rectifiedMax = yesterday.getTime();
+  let rectifiedMax = parseTime(yesterday).getTime();
   let rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
 
   let dataRangeMin = parseTime(min).getTime();

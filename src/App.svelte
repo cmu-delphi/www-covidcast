@@ -202,9 +202,8 @@
             d => d.data_source === s.id && d.signal === s.signal && d.time_type === 'day',
           );
           // console.log(s, matchedMeta);
-          const yesterdayConverted = +calculateValFromRectified(yesterday);
-          if (matchedMeta.max_time > yesterdayConverted) {
-            matchedMeta.max_time = yesterdayConverted;
+          if (matchedMeta.max_time > yesterday) {
+            matchedMeta.max_time = yesterday;
           }
           timeMap.set(s.id, [matchedMeta.min_time, matchedMeta.max_time]);
           statsMap.set(s.id, {
@@ -257,7 +256,6 @@
               regionSliceCache.update(m => m.set($currentSensor + $currentLevel + date, d.epidata));
             }
 
-            console.log('why . no set');
             mounted.set(1);
           });
       })

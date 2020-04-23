@@ -5,3 +5,9 @@ export const calculateValFromRectified = (rectified) => {
   let date = ('0' + tempDate.getDate()).slice(-2);
   return year + month + date;
 };
+
+export const defaultRegionOnStartup = {
+  county: '42003', // allegheny
+  msa: '38300', // Pittsburgh
+  state: 'PA', // Pennsylvania
+};
