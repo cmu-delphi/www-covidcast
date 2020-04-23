@@ -4,6 +4,7 @@ const color_high = 'rgb(128, 0, 0)';
 const color_low_mega = 'rgba(255, 237, 160, 0.5)';
 const color_medium_mega = 'rgba(253, 96, 65, 0.5)';
 const color_high_mega = 'rgba(128, 0, 0, 0.5)';
+const color_graph_line = '#767676';
 
 export const DIRECTION_THEME = {
   increasing: color_high,

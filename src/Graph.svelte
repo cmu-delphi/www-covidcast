@@ -488,7 +488,7 @@
       svg
         .append('path')
         .attr('fill', 'none')
-        .attr('stroke', DIRECTION_THEME.gradientMiddle)
+        .attr('stroke', '#767676') // DIRECTION_THEME.gradientMiddle)
         .attr('stroke-width', 3)
         .attr('d', line(myData));
 
@@ -516,18 +516,31 @@
         .attr('r', d => (d.time_value == $currentDate ? 6 : 4))
         .attr('cx', d => x(parseTime(d.time_value)))
         .attr('cy', d => y(+d.value))
-        .style('stroke-width', d => (d.time_value == $currentDate ? 3 : 1))
+        .style('stroke-width', d => (d.time_value == $currentDate ? 1 : 1))
         .style('fill', d => {
-          let color = DIRECTION_THEME.gradientMiddle;
+          let color = '#767676'; // DIRECTION_THEME.gradientMiddle;
           if (d.time_value == $currentDate || d.inDirection && $signalType === 'direction') {
-            color = 'white';
+            switch (d.direction) {
+              case 1:
+                color = DIRECTION_THEME.increasing;
+                break;
+              case 0:
+                color = DIRECTION_THEME.steady;
+                break;
+              case -1:
+                color = DIRECTION_THEME.decreasing;
+                break;
+              default:
+                color = 'white';
+                break;
+            }
           }
-          // console.log($currentDate, d.time_value, color);
           return color;
         })
-        .style('stroke', DIRECTION_THEME.gradientMiddle)
+        .style('stroke', '#767676')
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
+      myData.map(d => console.log(d));
          //d => (d.time_value == $currentDate ? DIRECTION_THEME.gradientMiddle : 'none'))
 
       //console.log($currentRegion);
