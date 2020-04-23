@@ -269,6 +269,7 @@
 
   mounted.subscribe(_ => {
     try {
+      console.log('mounted!!!!');
       updateMap('mounted');
     } catch (err) {
       ////console.log(err);
@@ -406,17 +407,16 @@
 
     const viableFeatures = dat.features.filter(f => f.properties[$signalType] !== -100);
 
-    // set a random focus on start up
     if (type === 'mounted') {
-      const found = viableFeatures.filter(
-        f => f.properties.id === '42003' || f.properties.id === '38300' || f.properties.id === 'PA',
-      );
+      // const found = viableFeatures.filter(
+      //   f => f.properties.id === '42003' || f.properties.id === '38300' || f.properties.id === 'PA',
+      // );
       // found allegheny / Pittsburgh
-      const initialRegion = found[0];
+      // const initialRegion = found[0];
       ////console.log(randomFeature);
-      currentRegionName.set(initialRegion.properties.NAME);
-      currentRegion.set(initialRegion.properties.id);
-      clickedId = initialRegion.id;
+      currentRegionName.set('Allegheny');
+      currentRegion.set('42003');
+      clickedId = '42003';
       map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
     }
 
@@ -739,7 +739,7 @@
       data-state="us48"
       id="bounds-button"
       class="pg-button bounds-button"
-      on:click={_ => map.easeTo({ center: [LON, LAT], zoom: ZOOM, bearing: 0, pitch: 0})}>
+      on:click={_ => map.easeTo({ center: [LON, LAT], zoom: ZOOM, bearing: 0, pitch: 0 })}>
       <img src="./assets/imgs/us48.png" alt="" />
     </button>
   </div>

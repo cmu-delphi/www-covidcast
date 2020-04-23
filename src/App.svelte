@@ -257,6 +257,7 @@
               regionSliceCache.update(m => m.set($currentSensor + $currentLevel + date, d.epidata));
             }
 
+            console.log('why . no set');
             mounted.set(1);
           });
       })
