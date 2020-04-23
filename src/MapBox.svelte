@@ -359,12 +359,12 @@
     if ($signalType === 'value') {
       let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
       stops = [
-        [valueMinMax[0], DIRECTION_THEME.gradientMin],
+        [Math.max(0, valueMinMax[0]), DIRECTION_THEME.gradientMin],
         [center, DIRECTION_THEME.gradientMiddle],
         [valueMinMax[1], DIRECTION_THEME.gradientMax],
       ];
       stopsMega = [
-        [valueMinMax[0], DIRECTION_THEME.gradientMinMega],
+        [Math.max(0, valueMinMax[0]), DIRECTION_THEME.gradientMinMega],
         [center, DIRECTION_THEME.gradientMiddleMega],
         [valueMinMax[1], DIRECTION_THEME.gradientMaxMega],
       ];
