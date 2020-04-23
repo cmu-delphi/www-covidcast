@@ -53,10 +53,10 @@
     }
   });
 
-  currentRegion.subscribe(d => {
-    console.log(d);
-  });
-  regionData.subscribe(d => console.log(d));
+  // currentRegion.subscribe(d => {
+  //   console.log(d);
+  // });
+  // regionData.subscribe(d => console.log(d));
 
   // Boolean tracking if the map has been initialized.
   let mapMounted = false;

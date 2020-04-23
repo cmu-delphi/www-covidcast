@@ -98,7 +98,20 @@
       return;
     }
     let cacheEntry = $timeSliceCache.get(sensor + level + region);
-    //console.log(cacheEntry);
+    // console.log(cacheEntry);
+
+    // check if the currentRegion has data on the current date
+    const checkIfCurrentRegionHasDataOnCurrentDate = (region_data = []) => {
+      // console.log(region_data);
+      let flag = false;
+      region_data.forEach(item => {
+        if (item.time_value == $currentDate) {
+          flag = true;
+        }
+      });
+      return flag;
+    };
+
     if (!cacheEntry) {
       let q =
         ENDPOINT +
@@ -117,8 +130,18 @@
           // console.log(q, d);
           regionData.set(d.epidata);
           timeSliceCache.update(m => m.set(sensor + level + region, d.epidata));
+          if (!checkIfCurrentRegionHasDataOnCurrentDate(d.epidata)) {
+            currentRegion.set('');
+            currentRegionName.set('');
+          }
         });
-    } else regionData.set(cacheEntry);
+    } else {
+      regionData.set(cacheEntry);
+      if (!checkIfCurrentRegionHasDataOnCurrentDate(cacheEntry)) {
+        currentRegion.set('');
+        currentRegionName.set('');
+      }
+    }
   }
 
   let levelChangedWhenSensorChanged = false;
