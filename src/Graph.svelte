@@ -520,7 +520,7 @@
         .style('stroke-width', d => (d.time_value == $currentDate ? 1 : 1))
         .style('fill', d => {
           let color = '#767676';
-          if (d.time_value == $currentDate && d.inDirection && $signalType === 'direction') {
+          if (d.inDirection && $signalType === 'direction') {
             switch (d.direction) {
               case 1:
                 color = DIRECTION_THEME.increasing;
@@ -535,11 +535,8 @@
                 color = 'white';
                 break;
             }
-          } else if (d.time_value == $currentDate) {
-            let color = DIRECTION_THEME.gradientMiddle;
-            if (d.time_value == $currentDate || (d.inDirection && $signalType === 'direction')) {
+          } else if (d.time_value == $currentDate && $signalType === 'value') {
               color = 'white';
-            }
           }
           return color;
         })
