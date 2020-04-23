@@ -536,7 +536,10 @@
                 break;
             }
           } else if (d.time_value == $currentDate) {
-            color = 'white';
+            let color = DIRECTION_THEME.gradientMiddle;
+            if (d.time_value == $currentDate || (d.inDirection && $signalType === 'direction')) {
+              color = 'white';
+            }
           }
           return color;
         })
@@ -557,6 +560,9 @@
             //           }
             // add the data to the graph
          //d => (d.time_value == $currentDate ? DIRECTION_THEME.gradientMiddle : 'none'))
+
+      //d => (d.time_value == $currentDate ? DIRECTION_THEME.gradientMiddle : 'none'))
+
 
       //console.log($currentRegion);
       // label the y-axis
