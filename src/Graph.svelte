@@ -211,7 +211,7 @@
           title = 'Percentage';
           break;
         case sensorKeys['q']:
-          title = 'Tests per Device';
+          title = 'Tests per device';
           break;
         case sensorKeys['ght']:
           title = 'Relative frequency';
@@ -519,7 +519,7 @@
         .style('stroke-width', d => (d.time_value == $currentDate ? 3 : 1))
         .style('fill', d => {
           let color = DIRECTION_THEME.gradientMiddle;
-          if (d.time_value == $currentDate || d.inDirection && $signalType === 'direction') {
+          if (d.time_value == $currentDate || (d.inDirection && $signalType === 'direction')) {
             color = 'white';
           }
           // console.log($currentDate, d.time_value, color);
@@ -528,7 +528,7 @@
         .style('stroke', DIRECTION_THEME.gradientMiddle)
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
-         //d => (d.time_value == $currentDate ? DIRECTION_THEME.gradientMiddle : 'none'))
+      //d => (d.time_value == $currentDate ? DIRECTION_THEME.gradientMiddle : 'none'))
 
       //console.log($currentRegion);
       // label the y-axis
