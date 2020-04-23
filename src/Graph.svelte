@@ -211,7 +211,7 @@
           title = 'Percentage';
           break;
         case sensorKeys['q']:
-          title = 'Tests per Device';
+          title = 'Tests per device';
           break;
         case sensorKeys['ght']:
           title = 'Relative frequency';
@@ -422,6 +422,7 @@
 
       // peg values to max and min if out of range
       let chartMax = this.max;
+      let chartMin = this.min;
       for (var i = 0; i < myData.length; i++) {
         let directionDate = parseTime(myData[i].time_value);
         if (directionDate >= currDateSeven && directionDate <= currDate) {
@@ -507,7 +508,6 @@
 
       svg.call(tip);
 
-      // add the data to the graph
       svg
         .selectAll('circle')
         .data(myData)
@@ -516,10 +516,11 @@
         .attr('r', d => (d.time_value == $currentDate ? 6 : 4))
         .attr('cx', d => x(parseTime(d.time_value)))
         .attr('cy', d => y(+d.value))
+        .attr('id', d => d.time_value)
         .style('stroke-width', d => (d.time_value == $currentDate ? 1 : 1))
         .style('fill', d => {
-          let color = '#767676'; // DIRECTION_THEME.gradientMiddle;
-          if (d.time_value == $currentDate || d.inDirection && $signalType === 'direction') {
+          let color = '#767676';
+          if (d.time_value == $currentDate && d.inDirection && $signalType === 'direction') {
             switch (d.direction) {
               case 1:
                 color = DIRECTION_THEME.increasing;
@@ -534,6 +535,8 @@
                 color = 'white';
                 break;
             }
+          } else if (d.time_value == $currentDate) {
+            color = 'white';
           }
           return color;
         })
@@ -541,6 +544,18 @@
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
       myData.map(d => console.log(d));
+
+      // var colorScale = d3.scaleLinear()
+      //                     .domain([chartMin, chartMax])
+      //                     .range([gradientMin, gradientMiddle, gradientMax])
+      //                     .interpolate(d3.interpolateHcl);
+      // svg.select('#'+$currentDate)
+      //   .enter()
+      //   .style('fill', d => {colorScale(d.value)});
+            // else if(d.time_value == $currentDate && $signalType === 'value') {
+            //             color = colorScale(d.value);
+            //           }
+            // add the data to the graph
          //d => (d.time_value == $currentDate ? DIRECTION_THEME.gradientMiddle : 'none'))
 
       //console.log($currentRegion);
