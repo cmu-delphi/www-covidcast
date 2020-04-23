@@ -20,6 +20,7 @@
     sensors,
     mounted,
     mapfirstLoaded,
+    regionData,
   } from './stores.js';
   import { defaultRegionOnStartup } from './util.js';
   import { DIRECTION_THEME, MAP_THEME } from './theme.js';
@@ -51,6 +52,11 @@
       ZOOM = 4.3;
     }
   });
+
+  currentRegion.subscribe(d => {
+    console.log(d);
+  });
+  regionData.subscribe(d => console.log(d));
 
   // Boolean tracking if the map has been initialized.
   let mapMounted = false;

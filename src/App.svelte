@@ -127,6 +127,14 @@
   currentSensor.subscribe(s => {
     if (!$mounted) return;
 
+    // let dateInRange = false;
+    // $regionData.forEach(d => {
+    //   console.log(d, d.time_value, $currentDate);
+    //   if (d.time_value === $currentDate) dateInRange = true;
+    // });
+    // console.log(dateInRange);
+    // if (!dateInRange)
+
     let l = $currentLevel;
     let minDate = $times.get(s)[0],
       maxDate = $times.get(s)[1];
