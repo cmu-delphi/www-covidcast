@@ -427,10 +427,14 @@
           // found allegheny / Pittsburgh
           const randomFeature = found[0];
           ////console.log(randomFeature);
-          currentRegionName.set(randomFeature.properties.NAME);
-          currentRegion.set(randomFeature.properties.id);
-          clickedId = randomFeature.id;
-          map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+          // currentRegionName.set(randomFeature.properties.NAME);
+          // currentRegion.set(randomFeature.properties.id);
+          // clickedId = randomFeature.id;
+          // map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+          currentRegionName.set('');
+          currentRegion.set('');
+          // clickedId = randomFeature.id;
+          // map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
           chosenRandom = true;
         } else {
           const index = Math.floor(Math.random() * (viableFeatures.length - 1));

@@ -298,33 +298,33 @@
         .selectAll('*')
         .remove();
 
-      // size chart
-      var margin = { top: 20, right: 20, bottom: 70, left: 40 },
-        width = w - margin.left - margin.right,
-        height = 0.75 * w - margin.top - margin.bottom;
+      // // size chart
+      // var margin = { top: 20, right: 20, bottom: 70, left: 40 },
+      //   width = w - margin.left - margin.right,
+      //   height = 0.75 * w - margin.top - margin.bottom;
 
-      // parse the date time
-      var parseDate = d3.timeParse('%Y%m%d');
+      // // parse the date time
+      // var parseDate = d3.timeParse('%Y%m%d');
 
-      // set ranges
-      this.x = d3.scaleBand().rangeRound([0, width]);
-      this.y = d3.scaleLinear().range([height, 0]);
+      // // set ranges
+      // this.x = d3.scaleBand().rangeRound([0, width]);
+      // this.y = d3.scaleLinear().range([height, 0]);
 
-      // attach graphic
-      var svg = d3
-        .select(el)
-        .append('svg')
-        .attr('width', width + margin.left + margin.right)
-        .attr('height', height + margin.top + margin.bottom)
-        .append('g')
-        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+      // // attach graphic
+      // var svg = d3
+      //   .select(el)
+      //   .append('svg')
+      //   .attr('width', width + margin.left + margin.right)
+      //   .attr('height', height + margin.top + margin.bottom)
+      //   .append('g')
+      //   .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-      // draw axes
-      svg
-        .append('g')
-        .attr('transform', 'translate(0,' + height + ')')
-        .call(d3.axisBottom(this.x).tickFormat(''));
-      svg.append('g').call(d3.axisLeft(this.y).tickFormat(''));
+      // // draw axes
+      // svg
+      //   .append('g')
+      //   .attr('transform', 'translate(0,' + height + ')')
+      //   .call(d3.axisBottom(this.x).tickFormat(''));
+      // svg.append('g').call(d3.axisLeft(this.y).tickFormat(''));
     }
 
     updateChart() {}
