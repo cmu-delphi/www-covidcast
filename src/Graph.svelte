@@ -178,12 +178,7 @@
     }
 
     setData(data) {
-      // this.verifyDataFormat(data);
-      // if(this.data === null) {
       this.data = data;
-      // } else {
-      //   new Error('Cannot set data. Data already set. Use update method to change values.');
-      // }
     }
 
     getData() {
@@ -201,87 +196,24 @@
     }
 
     getYAxis() {
-      let title = '';
-      let sensor = $currentSensor;
-      switch (sensor) {
-        case sensorKeys['google']:
-          title = 'Percentage';
-          break;
-        case sensorKeys['fb']:
-          title = 'Percentage';
-          break;
-        case sensorKeys['q']:
-          title = 'Tests per device';
-          break;
-        case sensorKeys['ght']:
-          title = 'Relative frequency';
-          break;
-        case sensorKeys['dr']:
-          title = 'Percentage';
-          break;
-        default:
-          break;
-      }
-      return title;
+      return $sensors.find(d => d.id === $currentSensor).yAxis;
     }
 
     getFormat() {
-      let sensor = $currentSensor;
-      var format = '';
-      switch (sensor) {
-        case sensorKeys['google']:
-          format = d => d + '%';
-          break;
-        case sensorKeys['fb']:
-          format = d => d + '%';
-          break;
-        case sensorKeys['q']:
-          format = d3.format('.0f');
-          break;
-        case sensorKeys['ght']:
-          format = d3.format('.0f');
-          break;
-        case sensorKeys['dr']:
-          format = d => d + '%';
-          break;
-        default:
-          break;
-      }
-      return format;
+      let format = $sensors.find(d => d.id === $currentSensor).format;
+      if (format === 'percent') return d => d + '%';
+      else if (format === 'raw') return d3.format('.0f');
+      return d => d;
     }
 
     getChartTitle() {
-      let sensor = $currentSensor;
-      let title = '';
-      switch (sensor) {
-        // ////console.log(sensorKeys['google']);
-        case sensorKeys['google']:
-          title = 'Google surveys reporting COVID symptoms in the community';
-          break;
-        case sensorKeys['fb']:
-          title = 'Surveys via Facebook reporting COVID symptoms in household';
-          break;
-        case sensorKeys['q']:
-          title = 'Influenza testing demand';
-          break;
-        case sensorKeys['ght']:
-          title = 'COVID-related Google searches';
-          break;
-        case sensorKeys['dr']:
-          title = 'Doctor visits with COVID-like symptoms';
-          break;
-        default:
-          break;
-      }
-      d3.select(t).html(title);
+      t = $sensors.find(d => d.id === $currentSensor).title;
     }
 
     isChart() {
-      // console.log(this.chartType);
       var result = null;
       try {
         this.chartType in charts ? (result = true) : (result = false);
-        // console.log(this.chartType in charts);
       } catch (e) {
         if (e.name == 'ReferenceError') {
           result = false;
@@ -289,8 +221,6 @@
       }
       return result;
     }
-
-    verifyDataFormat() {}
 
     draw() {
       // if there is an existing chart, remove it and redraw
@@ -328,8 +258,6 @@
       svg.append('g').call(d3.axisLeft(this.y).tickFormat(''));
     }
 
-    updateChart() {}
-
     setRange(min, max) {
       this.min = min;
       this.max = max;
@@ -348,7 +276,6 @@
       //console.log('get domain: ' + this.minDate);
       return [this.minDate, this.maxDate];
     }
-    updateAxes() {}
   }
 
   class BarChart extends Chart {
@@ -635,7 +562,7 @@
 </style>
 
 <div class="graph">
-  <h5 bind:this={t} class="graph-title" />
+  <h5 class="graph-title">{t}</h5>
   <p class="graph-description">
     {$currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' === '000' ? 'Rest of' : ''}
     {$currentRegionName}

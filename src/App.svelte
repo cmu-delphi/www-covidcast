@@ -27,8 +27,8 @@
     mapfirstLoaded,
     yesterday,
   } from './stores.js';
-  import { calculateValFromRectified } from './util.js';
 
+  import { calculateValFromRectified } from './util.js';
   import * as d3 from 'd3';
 
   const ENDPOINT = 'https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day';
@@ -36,7 +36,6 @@
 
   let error = null;
   let changingSensor = false;
-
   let graphShowStatus = false;
 
   function toggleGraphShowStatus(event, to = null) {
@@ -150,18 +149,9 @@
   currentSensor.subscribe(s => {
     if (!$mounted) return;
 
-    // let dateInRange = false;
-    // $regionData.forEach(d => {
-    //   console.log(d, d.time_value, $currentDate);
-    //   if (d.time_value === $currentDate) dateInRange = true;
-    // });
-    // console.log(dateInRange);
-    // if (!dateInRange)
-
     let l = $currentLevel;
     let minDate = $times.get(s)[0],
       maxDate = $times.get(s)[1];
-    // console.log(minDate, maxDate);
     let date = minDate;
     if ($currentDate >= minDate && $currentDate <= maxDate) {
       // data available at current date
@@ -169,10 +159,8 @@
     } else if ($currentDate > maxDate) {
       date = maxDate;
     }
-    // console.log(date);
 
     if (!$sensors.find(d => d.id === s).levels.includes($currentLevel)) {
-      //console.log('update?');
       l = $sensors.find(d => d.id === s).levels[0];
       levelChangedWhenSensorChanged = true;
       currentRegion.set('');
@@ -225,14 +213,13 @@
     fetch(ENDPOINT_META)
       .then(d => d.json())
       .then(meta => {
-        // console.log(meta.epidata);
         let timeMap = new Map();
         let statsMap = new Map();
         $sensors.forEach(s => {
           let matchedMeta = meta.epidata.find(
             d => d.data_source === s.id && d.signal === s.signal && d.time_type === 'day',
           );
-          // console.log(s, matchedMeta);
+
           if (matchedMeta.max_time > yesterday) {
             matchedMeta.max_time = yesterday;
           }
@@ -242,13 +229,13 @@
             std: matchedMeta.stdev_value,
           });
         });
+
         stats.set(statsMap);
         times.set(timeMap);
         metaData.set(meta.epidata);
 
         let l = $currentLevel;
         if (!$sensors.find(d => d.id === $currentSensor).levels.includes($currentLevel)) {
-          //console.log('update?');
           l = $sensors.find(d => d.id === $currentSensor).levels[0];
           currentLevel.set(l);
         }
@@ -272,13 +259,10 @@
         fetch(q)
           .then(d => d.json())
           .then(d => {
-            //console.log(q, d);
             if (d.result < 0 || d.message.includes('no results')) {
-              //console.log('bad api call, not updating regionSliceCache');
               currentData.set([]);
               regionSliceCache.update(m => m.set($currentSensor + $currentLevel + date, []));
             } else {
-              // attach signature
               let { epidata } = d;
               epidata = epidata.map(item => {
                 return { ...item, sensor: $currentSensor, level: l };
