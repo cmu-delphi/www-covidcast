@@ -2,62 +2,69 @@ import { writable, readable, derived } from 'svelte/store';
 import * as d3 from 'd3';
 import moment from 'moment';
 
-// Manually curated list of sensors with metadata.
-// Selected so that we know we are able to display them.
-// Check https://delphi.cmu.edu/epidata/api.php?source=covidcast_meta
-// For updated sensors/API and update this accordingly.
-export const sensors = readable([
-  {
-    name: 'Doctor Visits',
-    id: 'doctor-visits',
-    tooltipText: 'Doctor’s visits due to covid-like symptoms',
-    title: 'Doctor visits with COVID-like symptoms',
-    yAxis: 'Percentage',
-    format: 'percent',
-    signal: 'smoothed_cli',
-    levels: ['county', 'msa', 'state'],
+// Set of options for which signals to display.
+// Checks the ?sensors= URI parameter for a custom view,
+// otherwise uses the default.
+export const sensors = readable(
+  [
+    {
+      name: 'Doctor Visits',
+      id: 'doctor-visits',
+      tooltipText: 'Doctor’s visits due to covid-like symptoms',
+      title: 'Doctor visits with COVID-like symptoms',
+      yAxis: 'Percentage',
+      format: 'percent',
+      signal: 'smoothed_cli',
+      levels: ['county', 'msa', 'state'],
+    },
+    {
+      name: 'Surveys (Facebook)',
+      id: 'fb-survey',
+      tooltipText: 'CMU symptom surveys offered via Facebook - thank you Facebook!',
+      title: 'Surveys via Facebook reporting COVID symptoms in household',
+      yAxis: 'Percentage',
+      format: 'percent',
+      signal: 'smoothed_cli',
+      levels: ['county', 'msa', 'state'],
+    },
+    {
+      name: 'Surveys (Google)',
+      id: 'google-survey',
+      tooltipText: 'Symptom surveys run by Google - thank you Google!',
+      title: 'Google surveys reporting COVID symptoms in the community',
+      yAxis: 'Percentage',
+      format: 'percent',
+      signal: 'smoothed_cli',
+      levels: ['county', 'state', 'msa'],
+    },
+    {
+      name: 'Search Trends (Google)',
+      id: 'ght',
+      tooltipText: 'Covid-related search frequency from Google’s Health Trends team - thank you Google!',
+      title: 'COVID-related Google searches',
+      yAxis: 'Relative frequency',
+      format: 'raw',
+      signal: 'smoothed_search',
+      levels: ['msa', 'state'],
+    },
+    {
+      name: 'Flu Testing (Quidel)',
+      id: 'quidel',
+      tooltipText: 'Influenza testing demand from Quidel, Inc. - thank you Quidel!',
+      title: 'Influenza testing demand',
+      yAxis: 'Tests per device',
+      format: 'raw',
+      signal: 'smoothed_tests_per_device',
+      levels: ['msa', 'state'],
+    },
+  ],
+  function start(set) {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    let sensorsOption = urlParams.get('sensors');
+    sensorsOption ? set(JSON.parse(decodeURIComponent(sensorsOption))) : '';
   },
-  {
-    name: 'Surveys (Facebook)',
-    id: 'fb-survey',
-    tooltipText: 'CMU symptom surveys offered via Facebook - thank you Facebook!',
-    title: 'Surveys via Facebook reporting COVID symptoms in household',
-    yAxis: 'Percentage',
-    format: 'percent',
-    signal: 'smoothed_cli',
-    levels: ['county', 'msa', 'state'],
-  },
-  {
-    name: 'Surveys (Google)',
-    id: 'google-survey',
-    tooltipText: 'Symptom surveys run by Google - thank you Google!',
-    title: 'Google surveys reporting COVID symptoms in the community',
-    yAxis: 'Percentage',
-    format: 'percent',
-    signal: 'smoothed_cli',
-    levels: ['county', 'state', 'msa'],
-  },
-  {
-    name: 'Search Trends (Google)',
-    id: 'ght',
-    tooltipText: 'Covid-related search frequency from Google’s Health Trends team - thank you Google!',
-    title: 'COVID-related Google searches',
-    yAxis: 'Relative frequency',
-    format: 'raw',
-    signal: 'smoothed_search',
-    levels: ['msa', 'state'],
-  },
-  {
-    name: 'Flu Testing (Quidel)',
-    id: 'quidel',
-    tooltipText: 'Influenza testing demand from Quidel, Inc. - thank you Quidel!',
-    title: 'Influenza testing demand',
-    yAxis: 'Tests per device',
-    format: 'raw',
-    signal: 'smoothed_tests_per_device',
-    levels: ['msa', 'state'],
-  },
-]);
+);
 
 export const levels = readable({
   state: 'State',

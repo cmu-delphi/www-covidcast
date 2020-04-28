@@ -129,7 +129,6 @@
   }
 
   function setChartRange(data) {
-    ////console.log(data);
     try {
       if (data) {
         let { min_value, max_value } = data;
