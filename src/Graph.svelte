@@ -464,10 +464,10 @@
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide)
         .on('click', d => {
-          d3.select('.d3-tip').remove();
+          tip.hide;
+          d3.selectAll('.d3-tip').remove();
           currentDate.set(d.time_value);
         });
-      // myData.map(d => console.log(d));
 
       // var colorScale = d3.scaleLinear()
       //                     .domain([chartMin, chartMax])
@@ -484,7 +484,6 @@
 
       //d => (d.time_value == $currentDate ? DIRECTION_THEME.gradientMiddle : 'none'))
 
-      //console.log($currentRegion);
       // label the y-axis
       var label = this.getYAxis();
       svg
