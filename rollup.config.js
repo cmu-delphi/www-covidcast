@@ -36,6 +36,9 @@ export default {
       dedupe: ['svelte'],
     }),
     commonjs(),
+    //Buble will automatically transpile for IE and legacy Edge
+    //Initial steps followed from: https://blog.az.sg/posts/svelte-and-ie11/
+    //dangerousForOf: true was added for "for ...of" used in (at least) svelte core. It's use is not recommended
     buble({
 
       objectAssign: 'Object.assign',
