@@ -4,7 +4,7 @@
     currentDate,
     times,
     currentSensor,
-    currentDataReadyOnMay,
+    currentDataReadyOnMap,
     signalType,
     currentLevel,
     timeRangeOnSlider,
@@ -184,11 +184,11 @@
 
   function sliderOnChange() {
     window.performance.mark('start sliderOnChange');
-    // only update currentDataReadyOnMay when the date actually changed
+    // only update currentDataReadyOnMap when the date actually changed
     currentDate.update(d => {
       let newDate = calculateValFromRectified(rectifiedVal);
       if (d !== newDate) {
-        currentDataReadyOnMay.set(false);
+        currentDataReadyOnMap.set(false);
       }
       return newDate;
     });
@@ -232,7 +232,7 @@
     playInterval = null;
   }
 
-  // currentDataReadyOnMay.subscribe(d => ////console.log('map set:', d));
+  // currentDataReadyOnMap.subscribe(d => ////console.log('map set:', d));
 </script>
 
 <style>
@@ -508,7 +508,7 @@
     </svg>
   </button>
 
-  {#if $currentDataReadyOnMay === false}
+  {#if $currentDataReadyOnMap === false}
     <div class="loader-container">
       <div class="loader" />
     </div>

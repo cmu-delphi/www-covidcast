@@ -13,16 +13,13 @@
     let sts = stats.get(sens);
     let valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
 
-    // DON"T CAP FOR QUIDEL
-    let h = Math.min(100, valueMinMax[1]).toFixed(2) + '%';
-    let l = Math.max(0, valueMinMax[0]).toFixed(2) + '%';
     if (sens === 'ght' || sens === 'quidel') {
-      h = valueMinMax[1].toFixed(2);
-      l = Math.max(0, valueMinMax[0]).toFixed(2);
+      high = valueMinMax[1].toFixed(2);
+      low = Math.max(0, valueMinMax[0]).toFixed(2);
+    } else {
+      high = Math.min(100, valueMinMax[1]).toFixed(2) + '%';
+      low = Math.max(0, valueMinMax[0]).toFixed(2) + '%';
     }
-
-    high = h;
-    low = l;
   }
 </script>
 
@@ -103,7 +100,7 @@
       Decreasing
     </p>
   {:else}
-    <p>{high ? high + '+' : ''}</p>
+    <p>{high ? high + ' +' : ''}</p>
     <div
       class="legend-bar"
       style="background: linear-gradient(to top, {DIRECTION_THEME.gradientMin}, {DIRECTION_THEME.gradientMiddle}, {DIRECTION_THEME.gradientMax})" />

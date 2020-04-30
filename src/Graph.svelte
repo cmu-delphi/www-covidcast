@@ -32,13 +32,6 @@
   const charts = [barChart, lineGraph];
   let userCharts = [];
   let currentChart = 0;
-  let sensorKeys = {
-    dr: 'doctor-visits',
-    fb: 'fb-survey',
-    google: 'google-survey',
-    ght: 'ght',
-    q: 'quidel',
-  };
 
   onMount(_ => {
     drawGraph();
@@ -429,7 +422,7 @@
             d3.timeFormat('%m/%d')(parseTime(d.time_value)) +
             ': ' +
             d.value.toFixed(2) +
-            ($currentSensor === sensorKeys['ght'] || $currentSensor === sensorKeys['q'] ? '' : '%')
+            ($currentSensor === 'ght' || $currentSensor === 'quidel' ? '' : '%')
           );
         });
 
@@ -469,7 +462,11 @@
         })
         .style('stroke', '#767676')
         .on('mouseover', tip.show)
-        .on('mouseout', tip.hide);
+        .on('mouseout', tip.hide)
+        .on('click', d => {
+          d3.select('.d3-tip').remove();
+          currentDate.set(d.time_value);
+        });
       // myData.map(d => console.log(d));
 
       // var colorScale = d3.scaleLinear()
@@ -545,6 +542,7 @@
     padding: 0px !important;
     font-family: 'Open Sans', sans-serif;
     color: var(--darkgrey);
+    padding-left: 30px !important;
   }
 
   .graph-description {
@@ -552,6 +550,7 @@
     margin: 3px 0px 3px 0px !important;
     font-size: 14px;
     padding: 0px !important;
+    padding-left: 30px !important;
   }
 
   .graph-itself {

@@ -15,19 +15,17 @@
     currentData,
     currentRange,
     signalType,
-    currentDataReadyOnMay,
+    currentDataReadyOnMap,
     metaData,
-    sensors,
     mounted,
-    mapfirstLoaded,
-    regionData,
+    mapFirstLoaded,
   } from './stores.js';
   import { defaultRegionOnStartup } from './util.js';
   import { DIRECTION_THEME, MAP_THEME } from './theme.js';
 
   let LAT = -1.2;
   let LON = -0.5;
-  let ZOOM = 3.9; // should be set to 4.3 as default
+  let ZOOM = 3.9;
 
   let container;
   let map;
@@ -36,6 +34,10 @@
   let megaHoveredId;
   let clickedId;
   let megaClickedId;
+
+  // Boolean tracking if the map has been initialized.
+  let mapMounted = false;
+  let chosenRandom = false;
 
   function getTextColorBasedOnBackground(bgColor) {
     // https://github.com/onury/invert-color
@@ -53,18 +55,8 @@
     }
   });
 
-  // currentRegion.subscribe(d => {
-  //   console.log(d);
-  // });
-  // regionData.subscribe(d => console.log(d));
-
-  // Boolean tracking if the map has been initialized.
-  let mapMounted = false;
-  let chosenRandom = false;
-
   // Mouse event handlers
   const onMouseEnter = level => e => {
-    // popup
     map.getCanvas().style.cursor = 'pointer';
     popup.setLngLat(e.lngLat).addTo(map);
   };
@@ -238,92 +230,64 @@
   }
 
   // Update the map when sensor or level changes.
-  currentData.subscribe(_ => {
-    try {
-      updateMap('data');
-    } catch (err) {
-      ////console.log(err);
-    }
-  });
-  currentLevel.subscribe(_ => {
-    try {
-      // console.log('map currentLevel');
-      updateMap('data');
-    } catch (err) {
-      console.log(err);
-    }
-  });
+  currentData.subscribe(_ => updateMap('data'));
+  currentLevel.subscribe(_ => updateMap('data'));
+  signalType.subscribe(_ => updateMap('signal'));
+  mounted.subscribe(_ => updateMap('mounted'));
   currentDate.subscribe(_ => {
-    try {
-      if (
-        $currentData.length > 0 &&
-        ($currentData[0].sensor !== $currentSensor || $currentData[0].level !== $currentLevel)
-      ) {
-        return;
-      }
-      updateMap('data');
-    } catch (err) {
-      ////console.log(err);
+    if (
+      $currentData.length > 0 &&
+      ($currentData[0].sensor !== $currentSensor || $currentData[0].level !== $currentLevel)
+    ) {
+      return;
     }
-  });
-  signalType.subscribe(_ => {
-    try {
-      // console.log('signal');
-      updateMap('signal');
-    } catch (err) {
-      ////console.log(err);
-    }
-  });
-
-  mounted.subscribe(_ => {
-    try {
-      updateMap('mounted');
-    } catch (err) {
-      ////console.log(err);
-    }
+    updateMap('data');
   });
 
   function updateMap(type) {
     if (!mapMounted) return;
 
+    // Reset all hover/click states.
+    [...Object.keys($levels), 'mega-county'].forEach(level => map && map.removeFeatureState({ source: level }));
+
+    // If we're lookinga t counties, draw the mega-county states.
     let drawMega = $currentLevel === 'county';
 
-    Object.keys($levels).forEach(level => map && map.removeFeatureState({ source: level }));
-    map.removeFeatureState({ source: 'mega-county' });
-
+    // Get the range for the heatmap.
     let thisMeta = $metaData.find(d => d.data_source === $currentSensor && d.geo_type === $currentLevel);
-    let sts = $stats.get($currentSensor);
-    let valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
+    let thisStats = $stats.get($currentSensor);
+    let valueMinMax = [thisStats.mean - 3 * thisStats.std, thisStats.mean + 3 * thisStats.std];
+    currentRange.set($signalType === 'value' ? valueMinMax : [-1, 1]);
 
     let valueMappedVals = new Map();
     let directionMappedVals = new Map();
     let valueMappedMega = new Map();
     let directionMappedMega = new Map();
 
+    // Get the GEO_IDS and value/directions from the API data, including mega counties if necessary.
     let geoIds = new Set(
       $currentData.map(d => {
         const key = d.geo_value.toUpperCase();
+        const megaIndicator = key.slice(-3) + '';
+        const megaKey = key.slice(0, 2) + '';
 
         if (d.value !== null) {
-          if (drawMega && key.slice(-3) + '' === '000') {
-            valueMappedMega.set(key.slice(0, 2) + '', d.value);
+          if (drawMega && megaIndicator === '000') {
+            valueMappedMega.set(megaKey, d.value);
           } else {
             valueMappedVals.set(key, d.value);
           }
         }
         if (d.direction !== null) {
-          if (drawMega && key.slice(-3) + '' === '000') {
-            directionMappedMega.set(key.slice(0, 2) + '', d.direction);
+          if (drawMega && megaIndicator === '000') {
+            directionMappedMega.set(megaKey, d.direction);
           } else {
             directionMappedVals.set(key, d.direction);
           }
         }
-
         return key;
       }),
     );
-
-    currentRange.set($signalType === 'value' ? valueMinMax : [-1, 1]);
 
     let megaDat = $geojsons.get('state');
     if (drawMega) {
@@ -424,25 +388,14 @@
             f.properties.id === defaultRegionOnStartup.state,
         );
         if (found.length > 0) {
-          // found allegheny / Pittsburgh
+          // found Allegheny / Pittsburgh
           const randomFeature = found[0];
-          ////console.log(randomFeature);
-          // currentRegionName.set(randomFeature.properties.NAME);
-          // currentRegion.set(randomFeature.properties.id);
-          // clickedId = randomFeature.id;
-          // map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
           currentRegionName.set('');
           currentRegion.set('');
-          // clickedId = randomFeature.id;
-          // map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
           chosenRandom = true;
         } else {
           const index = Math.floor(Math.random() * (viableFeatures.length - 1));
-          ////console.log(dat.features);
-          ////console.log(viableFeatures, viableFeatures.length, index);
           const randomFeature = viableFeatures[index];
-          ////console.log(randomFeature);
-          ////console.log(randomFeature.properties.NAME);
           currentRegionName.set(randomFeature.properties.NAME);
           currentRegion.set(randomFeature.properties.id);
           clickedId = randomFeature.id;
@@ -478,17 +431,30 @@
       .addControl(new mapboxgl.AttributionControl({ compact: true }))
       .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
 
+    //Disable touch zoom, it makes gesture scrolling difficult
+    map.scrollZoom.disable();
+
+    popup = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false,
+      className: 'map-popup',
+    });
+    map.on('mousemove', 'state-outline', onMouseMove('state-outline'));
+    [...Object.keys($levels), 'mega-county'].forEach(level => {
+      map.on('mouseenter', level, onMouseEnter(level));
+      map.on('mousemove', level, onMouseMove(level));
+      map.on('mouseleave', level, onMouseLeave(level));
+      map.on('click', level, onClick(level));
+    });
+
     map.on('idle', ev => {
-      currentDataReadyOnMay.set(true);
-      mapfirstLoaded.set(true);
+      currentDataReadyOnMap.set(true);
+      mapFirstLoaded.set(true);
     });
 
     map.on('error', ev => {
-      mapfirstLoaded.set(true);
+      mapFirstLoaded.set(true);
     });
-
-    //Disable touch zoom, it makes gesture scrolling difficult
-    map.scrollZoom.disable();
 
     map.on('load', function() {
       map.addSource('county-outline', {
@@ -508,7 +474,6 @@
         data: $geojsons.get('state'),
       });
 
-      // console.log(map.getSource('city-point'));
       map.addLayer({
         id: 'county-outline',
         source: 'county-outline',
@@ -528,25 +493,6 @@
           'fill-outline-color': MAP_THEME.stateOutline,
         },
       });
-      map.addLayer({
-        id: `mega-county-hover`,
-        source: 'mega-county',
-        type: 'line',
-        paint: {
-          'line-color': MAP_THEME.hoverRegionOutline,
-          'line-width': ['case', ['any', ['boolean', ['feature-state', 'hover'], false]], 4, 0],
-        },
-      });
-
-      map.addLayer({
-        id: `mega-county-selected`,
-        source: 'mega-county',
-        type: 'line',
-        paint: {
-          'line-color': MAP_THEME.selectedRegionOutline,
-          'line-width': ['case', ['any', ['boolean', ['feature-state', 'select'], false]], 4, 0],
-        },
-      });
 
       Object.keys($levels).forEach(name => {
         const data = $geojsons.get(name);
@@ -554,7 +500,9 @@
           type: 'geojson',
           data: $geojsons.get(name),
         });
-        ////console.log(data);
+      });
+
+      ['mega-county', ...Object.keys($levels)].forEach(name => {
         map.addLayer({
           id: `${name}-hover`,
           source: name,
@@ -641,21 +589,7 @@
           'text-halo-width': 2,
         },
       });
-      // map.addLayer({
-      //   id: 'city-point-clustered',
-      //   source: 'city-point',
-      //   type: 'symbol',
-      //   filter: ['has', 'point_count'],
-      //   layout: {
-      //     'text-field': ['get', 'city', ['get', 'largest']],
-      //     'text-font': ['Open Sans Regular'],
-      //     'text-size': 12,
-      //   },
-      //   paint: {
-      //     'text-halo-color': '#fff',
-      //     'text-halo-width': 2,
-      //   },
-      // });
+
       map.addLayer(
         {
           id: 'mega-county',
@@ -690,19 +624,6 @@
 
       mapMounted = true;
       updateMap('init');
-    });
-
-    popup = new mapboxgl.Popup({
-      closeButton: false,
-      closeOnClick: false,
-      className: 'map-popup',
-    });
-    map.on('mousemove', 'state-outline', onMouseMove('state-outline'));
-    [...Object.keys($levels), 'mega-county'].forEach(level => {
-      map.on('mouseenter', level, onMouseEnter(level));
-      map.on('mousemove', level, onMouseMove(level));
-      map.on('mouseleave', level, onMouseLeave(level));
-      map.on('click', level, onClick(level));
     });
   }
 

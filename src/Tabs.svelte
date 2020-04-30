@@ -1,11 +1,5 @@
 <script>
-  import { sensors, currentSensor, levels, currentLevel, signalType, currentDataReadyOnMay } from './stores.js';
-
-  let hide = false;
-
-  function toggleHide() {
-    hide = !hide;
-  }
+  import { sensors, currentSensor, levels, currentLevel, signalType, currentDataReadyOnMap } from './stores.js';
 </script>
 
 <style>
@@ -132,14 +126,13 @@
 
 <div class="options">
   <div class="option">
-    <!-- <div class="buttons-group-title">Data Source</div> -->
     <div aria-label="Data Source" class="buttons-group-side">
       {#each $sensors as sensor}
         <button
           aria-pressed={$currentSensor === sensor.id ? 'true' : 'false'}
           class="button {$currentSensor === sensor.id ? 'selected' : ''}"
           on:click={() => {
-            currentDataReadyOnMay.set(false);
+            currentDataReadyOnMap.set(false);
             currentSensor.set(sensor.id);
           }}>
           <span class="button-tooltip">{sensor.tooltipText}</span>

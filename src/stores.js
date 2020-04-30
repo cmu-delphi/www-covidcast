@@ -88,6 +88,7 @@ const injectIDs = (level, data) => {
   });
   return data;
 };
+
 export const geojsons = readable(new Map(), function start(set) {
   Promise.all([
     d3.json('./maps/counties-simple.json'),
@@ -110,19 +111,20 @@ export const stats = writable(null);
 export const mounted = writable(0);
 export const metaData = writable([]);
 
-export const currentSensor = writable('doctor-visits'); // google-survey
+export const currentSensor = writable('doctor-visits');
 // 'county', 'state', or 'msa'
-export const currentLevel = writable('county'); // might want to change this to state by default
+export const currentLevel = writable('county');
 // Options are 'direction' and 'value'.
 export const signalType = writable('value');
 // EpiWeek in form YYYYMMDD.
 export const currentDate = writable(20200420);
 // Range of time for the map slider.
 export const currentRange = writable([0, 1]);
-// Region GEO_ID for filtering the line chart.
-export const currentRegion = writable(''); // 42003 - Allegheny; 38300 - Pittsburgh; PA - Pennsylvania
+// Region GEO_ID for filtering the line chart
+// 42003 - Allegheny; 38300 - Pittsburgh; PA - Pennsylvaniat.
+export const currentRegion = writable('');
 export const currentRegionName = writable('');
-export const currentDataReadyOnMay = writable(false);
+export const currentDataReadyOnMap = writable(false);
 
 export const currentSensorName = derived(
   [sensors, currentSensor],
@@ -141,7 +143,7 @@ export const regionDataStats = derived([metaData, currentSensor, currentLevel], 
 );
 
 export const timeRangeOnSlider = writable({ min: 0, max: 0 });
-export const mapfirstLoaded = writable(false);
+export const mapFirstLoaded = writable(false);
 
 const today = new Date();
 export const yesterday = +moment(new Date(today.getTime() - 86400 * 1000)).format('YYYYMMDD');
