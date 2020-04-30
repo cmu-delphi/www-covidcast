@@ -359,7 +359,7 @@
   }
 
   .graph-container.show {
-    visibility: unset;
+    visibility: visible;
     opacity: 1;
   }
 
