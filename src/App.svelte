@@ -514,7 +514,11 @@
 <!-- need to add the $mapFirstLoaded check -->
 <div class="graph-container {$mapFirstLoaded && graphShowStatus ? 'show' : ''}">
   <div class="hide-graph-button-anchor">
-    <button title="Hide graph" aria-label="toggle graph" on:click={toggleGraphShowStatus} class="hide-graph-button">
+    <button
+      title="Hide time series"
+      aria-label="toggle graph"
+      on:click={toggleGraphShowStatus}
+      class="hide-graph-button">
       &#10005;
     </button>
   </div>

@@ -23,7 +23,7 @@
   import { defaultRegionOnStartup } from './util.js';
   import { DIRECTION_THEME, MAP_THEME } from './theme.js';
 
-  let LAT = 0;
+  let LAT = -0.5;
   let LON = -0.5;
   let ZOOM = 3.9;
 

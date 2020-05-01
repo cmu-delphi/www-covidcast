@@ -128,6 +128,10 @@ button.mapboxgl-popup-close-button {
   min-height: 550px;
 }
 
+.map-popup {
+  z-index: 10000;
+}
+
 .map-popup .mapboxgl-popup-content {
   background-color: #fff;
   padding: 5px 5px;
