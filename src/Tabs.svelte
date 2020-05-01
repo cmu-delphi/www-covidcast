@@ -129,35 +129,35 @@
     /* border-style: solid;
     border-width: 1px;
     border-color: #666; */
-    /* background-color: rgb(247, 247, 247, 0.2); */
-    background-color: transparent;
+    background-color: rgba(255, 255, 255, 0.9);
+    /* background-color: transparent; */
     color: #333;
     font-weight: 400;
     font-size: 1.6em;
-    line-height: 1.5em;
+    line-height: 1.2em;
     font-weight: 600;
     text-align: center;
     padding: 5px 24px;
 
     pointer-events: none;
 
-    /* position: relative; */
+    position: relative;
   }
 
   .banner-text {
     padding: 1px 5px;
     margin: 0;
-    /* background: transparent; */
-    background-color: rgb(247, 247, 247, 0.2);
+    background: transparent;
+    /* background-color: rgba(255,255,255, 0.9); */
     pointer-events: auto;
 
-    position: relative;
+    /* position: relative; */
   }
 
   .hide-banner-button {
     position: absolute;
-    top: -6px;
-    left: -20px;
+    top: 3px;
+    left: 3px;
     width: 20px;
     height: 20px;
     color: #333;
@@ -201,20 +201,17 @@
 
 {#if shouldDisplayBanner}
   <div class="banner-container">
-    <div class="banner">
-
-      <span class="banner-text">
-        <button
-          title="Hide map title"
-          aria-label="toggle banner"
-          class="hide-banner-button"
-          on:click={_ => {
-            shouldDisplayBanner = false;
-          }}>
-          &#10005;
-        </button>
-        {currentSensorTooltip}
-      </span>
-    </div>
+    <h2 class="banner">
+      <button
+        title="Hide map title"
+        aria-label="toggle banner"
+        class="hide-banner-button"
+        on:click={_ => {
+          shouldDisplayBanner = false;
+        }}>
+        &#10005;
+      </button>
+      <span class="banner-text">{currentSensorTooltip}</span>
+    </h2>
   </div>
 {/if}
