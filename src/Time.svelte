@@ -369,6 +369,37 @@
     border: 0;
   }
 
+  input[type='range'].slider::-ms-track {
+    width: 320px;
+    height: 6px;
+    cursor: pointer;
+
+    /* Hides the slider so custom styles can be added */
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+  }
+
+  .slider::-ms-tooltip {
+    display: none;
+  }
+
+  .slider::-ms-fill-lower {
+    background: #d3d3d3;
+  }
+
+  .slider:focus::-ms-fill-lower {
+    background: #d3d3d3;
+  }
+
+  .slider::-ms-fill-upper {
+    background: #d3d3d3;
+  }
+
+  .slider:focus::-ms-fill-upper {
+    background: #d3d3d3;
+  }
+
   /* Special styling for WebKit/Blink */
   .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -394,7 +425,7 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: var(--red);
+    background: #c00;
     cursor: pointer;
   }
 
