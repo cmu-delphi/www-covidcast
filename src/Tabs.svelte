@@ -1,7 +1,7 @@
 <script>
   import { sensors, currentSensor, levels, currentLevel, signalType, currentDataReadyOnMap } from './stores.js';
 
-  $: currentSensorTooltip = $sensors.find(s => s.id === $currentSensor).tooltipText;
+  $: currentSensorTooltip = $sensors.find(s => s.id === $currentSensor).mapTitleText;
 
   let shouldDisplayBanner = true;
 </script>
@@ -121,18 +121,19 @@
   }
 
   .banner {
-    max-width: 630px;
+    max-width: 800px;
     /* border-radius: 6px; */
-    border-style: solid;
+    /* border-style: solid;
     border-width: 1px;
-    border-color: #666;
-    background-color: #fff;
+    border-color: #666; */
+    background-color: rgb(247, 247, 247, 0.2);
     color: #444;
     font-weight: 400;
-    font-size: 1em;
-    line-height: 1.2em;
+    font-size: 1.6em;
+    line-height: 1.7em;
+    font-weight: 600;
     text-align: center;
-    padding: 8px 25px;
+    padding: 8px 20px;
 
     pointer-events: auto;
 
@@ -142,11 +143,11 @@
   .hide-banner-button {
     position: absolute;
     top: 0;
-    right: 0;
-    width: 15px;
-    height: 15px;
+    left: 0;
+    width: 20px;
+    height: 20px;
     color: #333;
-    font-size: 10px;
+    font-size: 16px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -176,7 +177,7 @@
           currentSensor.set(sensor.id);
           shouldDisplayBanner = true;
         }}>
-        <!-- <span class="button-tooltip">{sensor.tooltipText}</span> -->
+        <span class="button-tooltip">{sensor.tooltipText}</span>
         {sensor.name}
       </button>
     {/each}
