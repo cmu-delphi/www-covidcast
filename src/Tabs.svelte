@@ -1,36 +1,18 @@
 <script>
-  import { sensors, currentSensor, levels, currentLevel, signalType, currentDataReadyOnMay } from './stores.js';
+  import { sensors, currentSensor, levels, currentLevel, signalType, currentDataReadyOnMap } from './stores.js';
 
-  let hide = false;
+  $: currentSensorTooltip = $sensors.find(s => s.id === $currentSensor).tooltipText;
 
-  function toggleHide() {
-    hide = !hide;
-  }
+  let shouldDisplayBanner = true;
 </script>
 
 <style>
-  .options {
+  .options-container {
     font-size: 0.8rem;
     width: 100%;
-    position: relative;
-  }
-
-  .option {
-    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-
-  .buttons-group-title {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-right: 15px;
-
-    font-weight: 600;
-    font-size: 1em;
-    line-height: 1em;
   }
 
   .buttons-group-side {
@@ -38,6 +20,7 @@
     align-items: stretch;
     /* justify-content: center; */
     /* flex-wrap: wrap; */
+    pointer-events: auto;
   }
 
   .buttons-group-side .button {
@@ -128,25 +111,90 @@
     /* box-shadow: none !important; */
     outline: none;
   }
+
+  .banner-container {
+    font-size: 0.9rem;
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .banner {
+    max-width: 630px;
+    /* border-radius: 6px; */
+    border-style: solid;
+    border-width: 1px;
+    border-color: #666;
+    background-color: #fff;
+    color: #444;
+    font-weight: 400;
+    font-size: 1em;
+    line-height: 1.2em;
+    text-align: center;
+    padding: 8px 25px;
+
+    pointer-events: auto;
+
+    position: relative;
+  }
+
+  .hide-banner-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 15px;
+    height: 15px;
+    color: #333;
+    font-size: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    background-color: transparent;
+    padding: 0;
+    border: 0;
+
+    transition: opacity 0.1s ease-in;
+
+    opacity: 0.5;
+  }
+
+  .hide-banner-button:hover {
+    opacity: 1;
+  }
 </style>
 
-<div class="options">
-  <div class="option">
-    <!-- <div class="buttons-group-title">Data Source</div> -->
-    <div aria-label="Data Source" class="buttons-group-side">
-      {#each $sensors as sensor}
-        <button
-          aria-pressed={$currentSensor === sensor.id ? 'true' : 'false'}
-          class="button {$currentSensor === sensor.id ? 'selected' : ''}"
-          on:click={() => {
-            currentDataReadyOnMay.set(false);
-            currentSensor.set(sensor.id);
-          }}>
-          <span class="button-tooltip">{sensor.tooltipText}</span>
-          {sensor.name}
-        </button>
-      {/each}
+<div class="options-container">
+  <div aria-label="Data Source" class="buttons-group-side">
+    {#each $sensors as sensor}
+      <button
+        aria-pressed={$currentSensor === sensor.id ? 'true' : 'false'}
+        class="button {$currentSensor === sensor.id ? 'selected' : ''}"
+        on:click={() => {
+          currentDataReadyOnMap.set(false);
+          currentSensor.set(sensor.id);
+          shouldDisplayBanner = true;
+        }}>
+        <!-- <span class="button-tooltip">{sensor.tooltipText}</span> -->
+        {sensor.name}
+      </button>
+    {/each}
+  </div>
+</div>
+
+{#if shouldDisplayBanner}
+  <div class="banner-container">
+    <div class="banner">
+      <button
+        aria-label="toggle banner"
+        class="hide-banner-button"
+        on:click={_ => {
+          shouldDisplayBanner = false;
+        }}>
+        &#10005;
+      </button>
+      {currentSensorTooltip}
     </div>
   </div>
-
-</div>
+{/if}

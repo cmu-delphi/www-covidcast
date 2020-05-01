@@ -1,11 +1,7 @@
 <script>
-  import { sensors, currentSensor, levels, currentLevel, signalType, currentDataReadyOnMay } from './stores.js';
+  import { sensors, currentSensor, levels, currentLevel, signalType, currentDataReadyOnMap } from './stores.js';
 
   let hide = false;
-
-  function toggleHide() {
-    hide = !hide;
-  }
 </script>
 
 <style>
@@ -268,23 +264,32 @@
 
 <div class="options">
   {#if hide}
-    <button role="switch" aria-checked="false" aria-label="toggle options" class="toggle-button" on:click={toggleHide}>
+    <button
+      role="switch"
+      aria-checked="false"
+      aria-label="toggle options"
+      class="toggle-button"
+      on:click={_ => (hide = !hide)}>
       <img class="toggle-button-icon" src="./assets/imgs/layers-24px.svg" alt="" />
     </button>
   {:else}
-    <button role="switch" aria-checked="true" aria-label="toggle options" class="toggle-button" on:click={toggleHide}>
+    <button
+      role="switch"
+      aria-checked="true"
+      aria-label="toggle options"
+      class="toggle-button"
+      on:click={_ => (hide = !hide)}>
       <img class="toggle-button-icon" src="./assets/imgs/layers_clear-24px.svg" alt="" />
     </button>
 
     <div class="option">
-      <!-- <div class="buttons-group-title">Geographic Level</div> -->
       <div aria-label="geographic level" class="buttons-group">
         {#each Object.keys($levels) as level}
           <button
             aria-pressed={$currentLevel === level ? 'true' : 'false'}
             class="button {$currentLevel === level ? 'selected' : ''}"
             on:click={() => {
-              currentDataReadyOnMay.set(false);
+              currentDataReadyOnMap.set(false);
               currentLevel.set(level);
             }}
             disabled={$sensors.find(d => d.id === $currentSensor).levels.includes(level) === false}>
@@ -294,24 +299,18 @@
             {$levels[level]}
           </button>
         {/each}
-        <!-- {#each $sensors.find(d => d.id === $currentSensor).levels as level}
-          <button class="button {$currentLevel === level ? 'selected' : ''}" on:click={() => currentLevel.set(level)}>
-            {$levels[level]}
-          </button>
-        {/each} -->
       </div>
     </div>
 
     <br />
 
     <div class="option">
-      <!-- <div class="buttons-group-title">Signal Type</div> -->
       <div aria-label="display type" class="buttons-group-side">
         <button
           aria-pressed={$signalType === 'value' ? 'true' : 'false'}
           class="button {$signalType === 'value' ? 'selected' : ''}"
           on:click={() => {
-            currentDataReadyOnMay.set(false);
+            currentDataReadyOnMap.set(false);
             signalType.set('value');
           }}>
           Intensity
@@ -320,7 +319,7 @@
           aria-pressed={$signalType === 'direction' ? 'true' : 'false'}
           class="button {$signalType === 'direction' ? 'selected' : ''}"
           on:click={() => {
-            currentDataReadyOnMay.set(false);
+            currentDataReadyOnMap.set(false);
             signalType.set('direction');
           }}>
           7-day Trend

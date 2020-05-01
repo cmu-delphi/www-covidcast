@@ -24,7 +24,7 @@
     regionData,
     metaData,
     mounted,
-    mapfirstLoaded,
+    mapFirstLoaded,
     yesterday,
   } from './stores.js';
 
@@ -37,6 +37,8 @@
   let error = null;
   let changingSensor = false;
   let graphShowStatus = false;
+  let levelChangedWhenSensorChanged = false;
+  let dateChangedWhenSensorChanged = false;
 
   function toggleGraphShowStatus(event, to = null) {
     if (to !== null) {
@@ -67,13 +69,10 @@
       fetch(q)
         .then(d => d.json())
         .then(d => {
-          // console.log(reason, q, d);
           if (d.result < 0 || d.message.includes('no results')) {
-            //console.log('bad api call, not updating regionSliceCache');
             currentData.set([]);
             regionSliceCache.update(m => m.set(sensor + level + date, []));
           } else {
-            // attach signature
             let { epidata } = d;
             epidata = epidata.map(item => {
               return { ...item, sensor, level };
@@ -83,25 +82,20 @@
           }
         });
     } else {
-      //console.log(reason, 'got in cache');
       currentData.set(cacheEntry);
     }
   }
 
   function updateTimeSliceCache(sensor, level, region) {
-    //console.log(region);
-    //console.log($mounted);
     if (!$mounted) return;
     if (!region) {
       regionData.set([]);
       return;
     }
     let cacheEntry = $timeSliceCache.get(sensor + level + region);
-    // console.log(cacheEntry);
 
     // check if the currentRegion has data on the current date
     const checkIfCurrentRegionHasDataOnCurrentDate = (region_data = []) => {
-      // console.log(region_data);
       let flag = false;
       region_data.forEach(item => {
         if (item.time_value == $currentDate) {
@@ -143,9 +137,6 @@
     }
   }
 
-  let levelChangedWhenSensorChanged = false;
-  let dateChangedWhenSensorChanged = false;
-
   currentSensor.subscribe(s => {
     if (!$mounted) return;
 
@@ -154,7 +145,6 @@
       maxDate = $times.get(s)[1];
     let date = minDate;
     if ($currentDate >= minDate && $currentDate <= maxDate) {
-      // data available at current date
       date = $currentDate;
     } else if ($currentDate > maxDate) {
       date = maxDate;
@@ -171,7 +161,6 @@
       updateTimeSliceCache(s, l, $currentRegion);
     }
     if (date !== $currentDate) {
-      //console.log('now?');
       dateChangedWhenSensorChanged = true;
       currentDate.set(date);
     }
@@ -180,7 +169,6 @@
   });
 
   currentLevel.subscribe(l => {
-    //console.log('level update');
     if (levelChangedWhenSensorChanged) {
       levelChangedWhenSensorChanged = false;
     } else {
@@ -191,7 +179,6 @@
   });
 
   currentDate.subscribe(d => {
-    //console.log('date update');
     if (dateChangedWhenSensorChanged) {
       dateChangedWhenSensorChanged = false;
     } else {
@@ -200,7 +187,6 @@
   });
 
   currentRegion.subscribe(r => {
-    //console.log('update region');
     updateTimeSliceCache($currentSensor, $currentLevel, r);
     if (r) {
       toggleGraphShowStatus(null, true);
@@ -273,9 +259,6 @@
 
             mounted.set(1);
           });
-      })
-      .catch(err => {
-        console.log(err);
       });
   });
 </script>
@@ -310,11 +293,9 @@
     /* padding: 10px 10px; */
     box-sizing: border-box;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
     transition: all 0.1s ease-in;
+
+    pointer-events: none;
 
     /* background-color: black; */
     /* border: 1px solid black; */
@@ -516,22 +497,22 @@
   <Time />
 </div>
 
-<!-- need to add the $mapfirstLoaded check -->
-{#if $mapfirstLoaded && !graphShowStatus}
+<!-- need to add the $mapFirstLoaded check -->
+{#if $mapFirstLoaded && !graphShowStatus}
   <div class="graph-toggole-button-container">
     <button
       title="Show graph"
       class="graph-toggle-button"
       aria-label="toggle graph"
       on:click={event => toggleGraphShowStatus(false)}>
-      <span class="button-tooltip">Show line graph</span>
+      <span class="button-tooltip">Show time series</span>
       <img class="toggle-button-icon" src="./assets/imgs/line-graph-icon.png" alt="" />
     </button>
   </div>
 {/if}
 
-<!-- need to add the $mapfirstLoaded check -->
-<div class="graph-container {$mapfirstLoaded && graphShowStatus ? 'show' : ''}">
+<!-- need to add the $mapFirstLoaded check -->
+<div class="graph-container {$mapFirstLoaded && graphShowStatus ? 'show' : ''}">
   <div class="hide-graph-button-anchor">
     <button title="Hide graph" aria-label="toggle graph" on:click={toggleGraphShowStatus} class="hide-graph-button">
       &#10005;
