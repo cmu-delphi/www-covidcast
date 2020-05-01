@@ -199,7 +199,7 @@
     }
 
     getChartTitle() {
-      t = $sensors.find(d => d.id === $currentSensor).title;
+      t = $sensors.find(d => d.id === $currentSensor).chartTitleText;
     }
 
     isChart() {
@@ -538,10 +538,10 @@
     text-align: center;
     font-size: 14px;
     margin: 3px 0px !important;
-    padding: 0px !important;
+    padding: 0px 20px 0px 20px !important;
     font-family: 'Open Sans', sans-serif;
     color: var(--darkgrey);
-    padding-left: 30px !important;
+    /* padding-left: 30px !important; */
   }
 
   .graph-description {
