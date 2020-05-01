@@ -293,11 +293,9 @@
     /* padding: 10px 10px; */
     box-sizing: border-box;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
     transition: all 0.1s ease-in;
+
+    pointer-events: none;
 
     /* background-color: black; */
     /* border: 1px solid black; */
@@ -507,7 +505,7 @@
       class="graph-toggle-button"
       aria-label="toggle graph"
       on:click={event => toggleGraphShowStatus(false)}>
-      <span class="button-tooltip">Show line graph</span>
+      <span class="button-tooltip">Show time series</span>
       <img class="toggle-button-icon" src="./assets/imgs/line-graph-icon.png" alt="" />
     </button>
   </div>
