@@ -35,7 +35,6 @@
   const ENDPOINT_META = 'https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast_meta&cached=true';
 
   let isIE = window.document.documentMode; // https://stackoverflow.com/a/21712356
-  console.log(isIE);
 
   let error = null;
   let changingSensor = false;
