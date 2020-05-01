@@ -121,19 +121,22 @@
   }
 
   .banner {
+    box-sizing: border-box;
     max-width: 800px;
     /* border-radius: 6px; */
     /* border-style: solid;
     border-width: 1px;
     border-color: #666; */
     background-color: rgb(247, 247, 247, 0.2);
-    color: #444;
+    /* background-color: transparent;
+    text-shadow: 0px 0px 30px rgb(165, 165, 165); */
+    color: #333;
     font-weight: 400;
     font-size: 1.6em;
     line-height: 1.7em;
     font-weight: 600;
     text-align: center;
-    padding: 8px 20px;
+    padding: 5px 24px;
 
     pointer-events: auto;
 
