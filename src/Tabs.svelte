@@ -4,6 +4,8 @@
   $: currentSensorTooltip = $sensors.find(s => s.id === $currentSensor).mapTitleText;
 
   let shouldDisplayBanner = true;
+
+  export let isIE;
 </script>
 
 <style>
@@ -182,6 +184,7 @@
   <div aria-label="Data Source" class="buttons-group-side">
     {#each $sensors as sensor}
       <button
+        title={isIE !== undefined ? sensor.tooltipText : ''}
         aria-pressed={$currentSensor === sensor.id ? 'true' : 'false'}
         class="button {$currentSensor === sensor.id ? 'selected' : ''}"
         on:click={() => {

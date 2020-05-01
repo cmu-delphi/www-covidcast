@@ -34,6 +34,9 @@
   const ENDPOINT = 'https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day';
   const ENDPOINT_META = 'https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast_meta&cached=true';
 
+  let isIE = window.document.documentMode; // https://stackoverflow.com/a/21712356
+  console.log(isIE);
+
   let error = null;
   let changingSensor = false;
   let graphShowStatus = false;
@@ -482,11 +485,11 @@
 <MapBox />
 
 <div class="tabs-container">
-  <Tabs />
+  <Tabs {isIE} />
 </div>
 
 <div class="options-container">
-  <Options />
+  <Options {isIE} />
 </div>
 
 <div class="legend-container">
@@ -501,9 +504,9 @@
 {#if $mapFirstLoaded && !graphShowStatus}
   <div class="graph-toggole-button-container">
     <button
-      title="Show graph"
+      title={isIE !== undefined ? 'Show time series' : ''}
       class="graph-toggle-button"
-      aria-label="toggle graph"
+      aria-label="show time series"
       on:click={event => toggleGraphShowStatus(false)}>
       <span class="button-tooltip">Show time series</span>
       <img class="toggle-button-icon" src="./assets/imgs/line-graph-icon.png" alt="" />
@@ -516,7 +519,7 @@
   <div class="hide-graph-button-anchor">
     <button
       title="Hide time series"
-      aria-label="toggle graph"
+      aria-label="Hide time series"
       on:click={toggleGraphShowStatus}
       class="hide-graph-button">
       &#10005;

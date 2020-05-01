@@ -2,6 +2,7 @@
   import { sensors, currentSensor, levels, currentLevel, signalType, currentDataReadyOnMap } from './stores.js';
 
   let hide = false;
+  export let isIE;
 </script>
 
 <style>
@@ -292,6 +293,9 @@
               currentDataReadyOnMap.set(false);
               currentLevel.set(level);
             }}
+            title={$sensors
+              .find(d => d.id === $currentSensor)
+              .levels.includes(level) === false && isIE ? 'Currently unavailable' : ''}
             disabled={$sensors.find(d => d.id === $currentSensor).levels.includes(level) === false}>
             {#if $sensors.find(d => d.id === $currentSensor).levels.includes(level) === false}
               <span class="disabled-tooltip">Currently unavailable</span>
