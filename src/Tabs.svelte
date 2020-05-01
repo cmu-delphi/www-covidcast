@@ -187,8 +187,7 @@
   <div class="banner-container">
     <div class="banner">
       <button
-        title="Hide graph"
-        aria-label="toggle graph"
+        aria-label="toggle banner"
         class="hide-banner-button"
         on:click={_ => {
           shouldDisplayBanner = false;
