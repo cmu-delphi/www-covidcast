@@ -1,5 +1,8 @@
 <script>
   import { onMount } from 'svelte';
+  import { calculateValFromRectified } from './util.js';
+  import * as d3 from 'd3';
+
   import Options from './Options.svelte';
   import Tabs from './Tabs.svelte';
   import Time from './Time.svelte';
@@ -29,26 +32,33 @@
     yesterday,
   } from './stores.js';
 
-  import { calculateValFromRectified } from './util.js';
-  import * as d3 from 'd3';
-
   const ENDPOINT = 'https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day';
   const ENDPOINT_META = 'https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast_meta&cached=true';
 
-  let isIE = window.document.documentMode; // https://stackoverflow.com/a/21712356
-
+  // https://stackoverflow.com/a/21712356
+  let isIE = window.document.documentMode;
   let error = null;
-  let changingSensor = false;
   let graphShowStatus = false;
+  let changingSensor = false;
   let levelChangedWhenSensorChanged = false;
   let dateChangedWhenSensorChanged = false;
 
-  function toggleGraphShowStatus(event, to = null) {
-    if (to !== null) {
-      graphShowStatus = to;
-    } else {
-      graphShowStatus = !graphShowStatus;
-    }
+  timeSliceCache.subscribe(d => console.log(d));
+
+  function callAPI(id, signal, level, date, region) {
+    return fetch(
+      ENDPOINT +
+        '&data_source=' +
+        id +
+        '&signal=' +
+        signal +
+        '&geo_type=' +
+        level +
+        '&time_values=' +
+        date +
+        '&geo_value=' +
+        region,
+    ).then(d => d.json());
   }
 
   function updateRegionSliceCache(sensor, level, date, reason = 'unspecified') {
@@ -58,32 +68,19 @@
 
     let cacheEntry = $regionSliceCache.get(sensor + level + date);
     if (!cacheEntry) {
-      let q =
-        ENDPOINT +
-        '&data_source=' +
-        $sensorMap.get(sensor).id +
-        '&signal=' +
-        $sensorMap.get(sensor).signal +
-        '&geo_type=' +
-        level +
-        '&time_values=' +
-        date +
-        '&geo_value=*';
-      fetch(q)
-        .then(d => d.json())
-        .then(d => {
-          if (d.result < 0 || d.message.includes('no results')) {
-            currentData.set([]);
-            regionSliceCache.update(m => m.set(sensor + level + date, []));
-          } else {
-            let { epidata } = d;
-            epidata = epidata.map(item => {
-              return { ...item, sensor, level };
-            });
-            currentData.set(epidata);
-            regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
-          }
-        });
+      callAPI($sensorMap.get(sensor).id, $sensorMap.get(sensor).signal, level, date, '*').then(d => {
+        if (d.result < 0 || d.message.includes('no results')) {
+          currentData.set([]);
+          regionSliceCache.update(m => m.set(sensor + level + date, []));
+        } else {
+          let { epidata } = d;
+          epidata = epidata.map(item => {
+            return { ...item, sensor, level };
+          });
+          currentData.set(epidata);
+          regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
+        }
+      });
     } else {
       currentData.set(cacheEntry);
     }
@@ -95,7 +92,6 @@
       regionData.set([]);
       return;
     }
-    let cacheEntry = $timeSliceCache.get(sensor + level + region);
 
     // check if the currentRegion has data on the current date
     const checkIfCurrentRegionHasDataOnCurrentDate = (region_data = []) => {
@@ -108,29 +104,16 @@
       return flag;
     };
 
+    let cacheEntry = $timeSliceCache.get(sensor + level + region);
     if (!cacheEntry) {
-      let q =
-        ENDPOINT +
-        '&data_source=' +
-        $sensorMap.get(sensor).id +
-        '&signal=' +
-        $sensorMap.get(sensor).signal +
-        '&geo_type=' +
-        level +
-        '&time_values=20100101-20300101' +
-        '&geo_value=' +
-        region;
-      fetch(q)
-        .then(d => d.json())
-        .then(d => {
-          // console.log(q, d);
-          regionData.set(d.epidata);
-          timeSliceCache.update(m => m.set(sensor + level + region, d.epidata));
-          if (!checkIfCurrentRegionHasDataOnCurrentDate(d.epidata)) {
-            currentRegion.set('');
-            currentRegionName.set('');
-          }
-        });
+      callAPI($sensorMap.get(sensor).id, $sensorMap.get(sensor).signal, level, '20100101-20500101', region).then(d => {
+        regionData.set(d.epidata);
+        timeSliceCache.update(m => m.set(sensor + level + region, d.epidata));
+        if (!checkIfCurrentRegionHasDataOnCurrentDate(d.epidata)) {
+          currentRegion.set('');
+          currentRegionName.set('');
+        }
+      });
     } else {
       regionData.set(cacheEntry);
       if (!checkIfCurrentRegionHasDataOnCurrentDate(cacheEntry)) {
@@ -160,7 +143,6 @@
       currentRegionName.set('');
       currentLevel.set(l);
     } else {
-      // update regiondata
       updateTimeSliceCache(s, l, $currentRegion);
     }
     if (date !== $currentDate) {
@@ -175,8 +157,10 @@
     if (levelChangedWhenSensorChanged) {
       levelChangedWhenSensorChanged = false;
     } else {
-      currentRegion.set('');
-      currentRegionName.set('');
+      if ($mounted) {
+        currentRegion.set('');
+        currentRegionName.set('');
+      }
       updateRegionSliceCache($currentSensor, l, $currentDate, 'level-change');
     }
   });
@@ -235,36 +219,48 @@
         dateChangedWhenSensorChanged = true;
         currentDate.set(date);
 
-        let q =
-          ENDPOINT +
-          '&data_source=' +
-          $sensorMap.get($currentSensor).id +
-          '&signal=' +
-          $sensorMap.get($currentSensor).signal +
-          '&geo_type=' +
-          l +
-          '&time_values=' +
-          date +
-          '&geo_value=*';
-        fetch(q)
-          .then(d => d.json())
-          .then(d => {
-            if (d.result < 0 || d.message.includes('no results')) {
-              currentData.set([]);
-              regionSliceCache.update(m => m.set($currentSensor + $currentLevel + date, []));
-            } else {
-              let { epidata } = d;
-              epidata = epidata.map(item => {
-                return { ...item, sensor: $currentSensor, level: l };
-              });
-              currentData.set(epidata);
-              regionSliceCache.update(m => m.set($currentSensor + $currentLevel + date, d.epidata));
-            }
+        callAPI($sensorMap.get($currentSensor).id, $sensorMap.get($currentSensor).signal, l, date, '*').then(d => {
+          if (d.result < 0 || d.message.includes('no results')) {
+            currentData.set([]);
+            regionSliceCache.update(m => m.set($currentSensor + $currentLevel + date, []));
+          } else {
+            let { epidata } = d;
+            epidata = epidata.map(item => {
+              return { ...item, sensor: $currentSensor, level: l };
+            });
+            currentData.set(epidata);
+            regionSliceCache.update(m => m.set($currentSensor + $currentLevel + date, d.epidata));
+          }
 
-            mounted.set(1);
-          });
+          mounted.set(1);
+          if ($currentRegion) {
+            updateTimeSliceCache($currentSensor, $currentLevel, $currentRegion);
+          }
+        });
       });
   });
+
+  function toggleGraphShowStatus(event, to = null) {
+    if (to !== null) {
+      graphShowStatus = to;
+    } else {
+      graphShowStatus = !graphShowStatus;
+    }
+  }
+
+  function updateURIParameters(sensor, level, region, date, signalType) {
+    window.history.replaceState(
+      {},
+      document.title,
+      '?sensor=' + sensor + '&level=' + level + '&region=' + region + '&date=' + date + '&signalType=' + signalType,
+    );
+  }
+  // Keep the URL updated with the current state
+  currentSensor.subscribe(s => updateURIParameters(s, $currentLevel, $currentRegion, $currentDate, $signalType));
+  currentLevel.subscribe(l => updateURIParameters($currentSensor, l, $currentRegion, $currentDate, $signalType));
+  currentRegion.subscribe(r => updateURIParameters($currentSensor, $currentLevel, r, $currentDate, $signalType));
+  currentDate.subscribe(d => updateURIParameters($currentSensor, $currentLevel, $currentRegion, d, $signalType));
+  signalType.subscribe(t => updateURIParameters($currentSensor, $currentLevel, $currentRegion, $currentDate, t));
 </script>
 
 <style>
@@ -273,16 +269,10 @@
     top: 10px;
     left: 10px;
     z-index: 1000;
-    /* width: 220px; */
     background-color: rgba(255, 255, 255, 0.9);
-    /* border-radius: 8px; */
     padding: 10px 10px;
     box-sizing: border-box;
-
     transition: all 0.1s ease-in;
-
-    /* background-color: black; */
-    /* border: 1px solid black; */
   }
 
   .tabs-container {
@@ -291,18 +281,9 @@
     left: 50px;
     right: 50px;
     z-index: 1000;
-    /* max-width: 750px; */
-    /* background-color: rgba(255, 255, 255, 0.9); */
-    /* border-radius: 8px; */
-    /* padding: 10px 10px; */
     box-sizing: border-box;
-
     transition: all 0.1s ease-in;
-
     pointer-events: none;
-
-    /* background-color: black; */
-    /* border: 1px solid black; */
   }
 
   .legend-container {
@@ -310,35 +291,23 @@
     top: 204px;
     left: 10px;
     z-index: 1000;
-    /* background-color: rgba(255, 255, 255, 0.9); */
-
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
     transition: all 0.1s ease-in;
-
     height: 40%;
   }
 
   .graph-container {
-    /* border: 1px dotted black; */
-
     position: absolute;
     z-index: 1001;
     bottom: 10px;
     right: 10px;
-    /* max-width: 400px;
-    max-height: 400px;
-    width: 400px; */
     background-color: rgba(255, 255, 255, 0.9);
-    /* border-radius: 1rem; */
     padding: 5px 5px;
     box-sizing: border-box;
-
     transition: opacity 0.3s ease-in-out;
-
     visibility: hidden;
     opacity: 0;
   }
@@ -367,9 +336,7 @@
     background-color: transparent;
     padding: 0;
     border: 0;
-
     transition: opacity 0.1s ease-in;
-
     opacity: 0.7;
   }
 
@@ -382,11 +349,7 @@
     z-index: 1001;
     bottom: 10px;
     right: 10px;
-    /* max-width: 400px;
-    max-height: 400px;
-    width: 400px; */
     background-color: rgba(255, 255, 255, 0.9);
-    /* border-radius: 1rem; */
     padding: 5px 5px;
     box-sizing: border-box;
   }
@@ -394,14 +357,11 @@
   .graph-toggle-button {
     width: 30px;
     height: 30px;
-    /* border-radius: 5px; */
     cursor: pointer;
     background-color: transparent;
     padding: 0;
     border: 0;
-
     transition: all 0.1s ease-in;
-
     position: relative;
   }
 
@@ -456,11 +416,8 @@
     left: 10px;
     z-index: 1002;
     background-color: rgba(255, 255, 255, 0.9);
-    /* border-radius: 8px; */
     padding: 30px 10px;
     box-sizing: border-box;
-    /* width: 550px; */
-
     transition: all 0.1s ease-in;
   }
 
@@ -470,11 +427,9 @@
     bottom: 0;
     left: 0;
     right: 0;
-
     display: flex;
     justify-content: center;
     align-items: center;
-
     color: gray;
   }
 </style>

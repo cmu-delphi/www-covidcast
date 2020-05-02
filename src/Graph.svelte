@@ -34,38 +34,30 @@
   let userCharts = [];
   let currentChart = 0;
 
+  regionData.subscribe(d => console.log(d));
+
   onMount(_ => {
     drawGraph();
-    // console.log('on mount called');
     regionData.subscribe(d => updateGraph(d));
     regionDataStats.subscribe(d => setChartRange(d));
     currentDate.subscribe(_ => updateGraphTimeRange());
     signalType.subscribe(_ => updateGraph($regionData));
     currentRegion.subscribe(region => {
-      // console.log('current region changed: ' + region);
       if (!region) {
         userCharts[currentChart].setData([]);
         userCharts[currentChart].draw();
       }
     });
-    currentLevel.subscribe(_ => {
-      // console.log('level changed:' + $currentLevel);
-    });
     currentSensor.subscribe(_ => {
-      // console.log('current sensor changed: ' + $currentSensor);
       if (userCharts != undefined) {
         if (userCharts[currentChart].isChart()) {
-          // console.log('is chart-current sensor, increment: ' + currentChart);
           userCharts[currentChart].getChartTitle();
         } else {
-          // console.log('is chart fail: ' + userCharts[currentChart].isChart());
-          // console.log($currentSensor);
           let chart = new Chart();
           chart.getChartTitle();
           chart.draw();
           userCharts.push(chart);
           currentChart += 1;
-          // console.log('new chart-current sensor, increment: ' + currentChart);
         }
       }
     });
@@ -81,11 +73,9 @@
     let chart = new Chart();
     chart.draw();
     userCharts.push(chart);
-    // console.log('new chart-draw graph, increment' + currentChart);
   }
 
   function updateGraph(data) {
-    // console.log('update graph');
     try {
       if (data.length !== 0 && $currentRegion) {
         if (userCharts != undefined) {
@@ -301,7 +291,8 @@
 
       // line graph
       let myData = this.getData();
-      // console.log('my data:' + myData[0]);
+      console.log(myData);
+      console.log($currentData);
 
       // size chart
       var margin = { top: 15, right: 42, bottom: 70, left: 60 }, // right need to be wide enough to accommodate the tooltip

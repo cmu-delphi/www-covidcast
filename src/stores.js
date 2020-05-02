@@ -1,6 +1,10 @@
 import { writable, readable, derived } from 'svelte/store';
+import { injectIDs } from './util.js';
 import * as d3 from 'd3';
 import moment from 'moment';
+
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
 
 // Set of options for which signals to display.
 // Checks the ?sensors= URI parameter for a custom view,
@@ -63,9 +67,7 @@ export const sensors = readable(
       levels: ['msa', 'state'],
     },
   ],
-  function start(set) {
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
+  (set) => {
     let sensorsOption = urlParams.get('sensors');
     sensorsOption ? set(JSON.parse(decodeURIComponent(sensorsOption))) : '';
   },
@@ -86,22 +88,6 @@ export const levels = readable({
 });
 
 // This loads all the GeoJSON's for each granularity that the MapBox component reads as layers.
-const injectIDs = (level, data) => {
-  data.features.forEach((d) => {
-    d.properties.level = level;
-
-    if (level === 'county') {
-      d.id = d.properties.id = d.properties.GEO_ID.slice(-5);
-    } else if (level === 'msa') {
-      d.id = d.properties.id = d.properties.cbsafp;
-    } else if (level === 'state') {
-      d.properties.id = d.properties.POSTAL;
-      d.id = d.properties.STATE;
-    }
-  });
-  return data;
-};
-
 export const geojsons = readable(new Map(), function start(set) {
   Promise.all([
     d3.json('./maps/counties-simple.json'),
@@ -118,27 +104,48 @@ export const geojsons = readable(new Map(), function start(set) {
   });
 });
 
+export const metaData = writable([]);
 export const times = writable(null);
 export const stats = writable(null);
 
 export const mounted = writable(0);
-export const metaData = writable([]);
-
-export const currentSensor = writable('doctor-visits-smoothed_cli');
-// 'county', 'state', or 'msa'
-export const currentLevel = writable('county');
-// Options are 'direction' and 'value'.
-export const signalType = writable('value');
-// EpiWeek in form YYYYMMDD.
-export const currentDate = writable(20200420);
-// Range of time for the map slider.
-export const currentRange = writable([0, 1]);
-// Region GEO_ID for filtering the line chart
-// 42003 - Allegheny; 38300 - Pittsburgh; PA - Pennsylvaniat.
-export const currentRegion = writable('');
-export const currentRegionName = writable('');
+export const mapFirstLoaded = writable(false);
 export const currentDataReadyOnMap = writable(false);
 
+export const currentSensor = writable('doctor-visits-smoothed_cli', (set) => {
+  let sensor = urlParams.get('sensor');
+  sensor ? set(sensor) : '';
+  return () => '';
+});
+// 'county', 'state', or 'msa'
+export const currentLevel = writable('county', (set) => {
+  let level = urlParams.get('level');
+  level ? set(level) : '';
+  return () => '';
+});
+// Options are 'direction' and 'value'.
+export const signalType = writable('value', (set) => {
+  let signalT = urlParams.get('signalType');
+  signalT ? set(signalT) : '';
+  return () => '';
+});
+// EpiWeek in form YYYYMMDD.
+export const currentDate = writable(20200420, (set) => {
+  let date = urlParams.get('date');
+  date ? set(date) : '';
+  return () => '';
+});
+// Region GEO_ID for filtering the line chart
+// 42003 - Allegheny; 38300 - Pittsburgh; PA - Pennsylvania.
+export const currentRegion = writable('', (set) => {
+  let region = urlParams.get('region');
+  region ? set(region) : '';
+  return () => '';
+});
+// Range of time for the map slider.
+export const currentRange = writable([0, 1]);
+
+export const currentRegionName = writable('');
 export const currentSensorName = derived(
   [sensorMap, currentSensor],
   ([$sensorMap, $currentSensor]) => $sensorMap.get($currentSensor).name,
@@ -158,7 +165,4 @@ export const regionDataStats = derived(
 );
 
 export const timeRangeOnSlider = writable({ min: 0, max: 0 });
-export const mapFirstLoaded = writable(false);
-
-const today = new Date();
-export const yesterday = +moment(new Date(today.getTime() - 86400 * 1000)).format('YYYYMMDD');
+export const yesterday = +moment(new Date(new Date().getTime() - 86400 * 1000)).format('YYYYMMDD');

@@ -23,6 +23,8 @@
   import { defaultRegionOnStartup } from './util.js';
   import { DIRECTION_THEME, MAP_THEME } from './theme.js';
 
+  currentRegion.subscribe(d => console.log(d));
+
   let LAT = -0.5;
   let LON = -0.5;
   let ZOOM = 3.9;
@@ -246,7 +248,6 @@
 
   function updateMap(type) {
     if (!mapMounted) return;
-    console.log('draw?', type);
 
     // Reset all hover/click states.
     [...Object.keys($levels), 'mega-county'].forEach(level => map && map.removeFeatureState({ source: level }));
@@ -391,8 +392,11 @@
         if (found.length > 0) {
           // found Allegheny / Pittsburgh
           const randomFeature = found[0];
-          currentRegionName.set('');
-          currentRegion.set('');
+          if ($currentRegion === '') {
+            console.log('found?');
+            currentRegionName.set('');
+            currentRegion.set('');
+          }
           chosenRandom = true;
         } else {
           const index = Math.floor(Math.random() * (viableFeatures.length - 1));

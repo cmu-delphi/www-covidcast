@@ -9,6 +9,8 @@
     currentDataReadyOnMap,
   } from './stores.js';
 
+  let currentSensorTooltip;
+  $: console.log($currentSensor);
   $: currentSensorTooltip = $sensorMap.get($currentSensor).mapTitleText;
 
   let shouldDisplayBanner = true;

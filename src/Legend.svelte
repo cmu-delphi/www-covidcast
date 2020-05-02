@@ -11,7 +11,6 @@
 
   function updateLowHigh(sens, stats) {
     let sts = stats.get(sens);
-    console.log(stats);
     let valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
 
     if (sens === 'ght' || sens === 'quidel') {
