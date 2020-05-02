@@ -71,6 +71,14 @@ export const sensors = readable(
   },
 );
 
+// The ID to reference each sensor is the indicator name + signal type.
+// This map is used to find the information for each sensor.
+export const sensorMap = derived(sensors, ($sensors) => {
+  let map = new Map();
+  $sensors.forEach((d) => map.set(d.id + '-' + d.signal, d));
+  return map;
+});
+
 export const levels = readable({
   state: 'State',
   msa: 'Metro Area',
@@ -116,7 +124,7 @@ export const stats = writable(null);
 export const mounted = writable(0);
 export const metaData = writable([]);
 
-export const currentSensor = writable('doctor-visits');
+export const currentSensor = writable('doctor-visits-smoothed_cli');
 // 'county', 'state', or 'msa'
 export const currentLevel = writable('county');
 // Options are 'direction' and 'value'.
@@ -132,8 +140,8 @@ export const currentRegionName = writable('');
 export const currentDataReadyOnMap = writable(false);
 
 export const currentSensorName = derived(
-  [sensors, currentSensor],
-  ([$sensors, $currentSensor]) => $sensors.filter((item) => item.id === $currentSensor)[0].name,
+  [sensorMap, currentSensor],
+  ([$sensorMap, $currentSensor]) => $sensorMap.get($currentSensor).name,
 );
 export const currentLevelName = derived([levels, currentLevel], ([$levels, $currentLevel]) => $levels[$currentLevel]);
 
@@ -143,8 +151,10 @@ export const timeSliceCache = writable(new Map());
 export const regionData = writable([]);
 export const currentData = writable([]);
 
-export const regionDataStats = derived([metaData, currentSensor, currentLevel], ([$meta, $sensor, $level]) =>
-  $meta.find((d) => d.data_source === $sensor && d.geo_type === $level),
+export const regionDataStats = derived(
+  [metaData, currentSensor, sensorMap, currentLevel],
+  ([$meta, $sensor, $sensorMap, $level]) =>
+    $meta.find((d) => d.data_source === $sensorMap.get($sensor) && d.geo_type === $level),
 );
 
 export const timeRangeOnSlider = writable({ min: 0, max: 0 });

@@ -246,6 +246,7 @@
 
   function updateMap(type) {
     if (!mapMounted) return;
+    console.log('draw?', type);
 
     // Reset all hover/click states.
     [...Object.keys($levels), 'mega-county'].forEach(level => map && map.removeFeatureState({ source: level }));

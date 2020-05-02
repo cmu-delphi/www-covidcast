@@ -1,7 +1,15 @@
 <script>
-  import { sensors, currentSensor, levels, currentLevel, signalType, currentDataReadyOnMap } from './stores.js';
+  import {
+    sensors,
+    sensorMap,
+    currentSensor,
+    levels,
+    currentLevel,
+    signalType,
+    currentDataReadyOnMap,
+  } from './stores.js';
 
-  $: currentSensorTooltip = $sensors.find(s => s.id === $currentSensor).mapTitleText;
+  $: currentSensorTooltip = $sensorMap.get($currentSensor).mapTitleText;
 
   let shouldDisplayBanner = true;
 
@@ -182,18 +190,18 @@
 
 <div class="options-container">
   <div aria-label="Data Source" class="buttons-group-side">
-    {#each $sensors as sensor}
+    {#each Array.from($sensorMap.keys()) as sensor}
       <button
-        title={isIE !== undefined ? sensor.tooltipText : ''}
-        aria-pressed={$currentSensor === sensor.id ? 'true' : 'false'}
-        class="button {$currentSensor === sensor.id ? 'selected' : ''}"
+        title={isIE !== undefined ? $sensorMap.get(sensor).tooltipText : ''}
+        aria-pressed={$currentSensor === sensor ? 'true' : 'false'}
+        class="button {$currentSensor === sensor ? 'selected' : ''}"
         on:click={() => {
           currentDataReadyOnMap.set(false);
-          currentSensor.set(sensor.id);
+          currentSensor.set(sensor);
           shouldDisplayBanner = true;
         }}>
-        <span class="button-tooltip">{sensor.tooltipText}</span>
-        {sensor.name}
+        <span class="button-tooltip">{$sensorMap.get(sensor).tooltipText}</span>
+        {$sensorMap.get(sensor).name}
       </button>
     {/each}
   </div>

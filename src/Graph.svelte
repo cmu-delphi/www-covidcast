@@ -14,6 +14,7 @@
     times,
     stats,
     sensors,
+    sensorMap,
     signalType,
     timeRangeOnSlider,
   } from './stores.js';
@@ -188,18 +189,18 @@
     }
 
     getYAxis() {
-      return $sensors.find(d => d.id === $currentSensor).yAxis;
+      return $sensorMap.get($currentSensor).yAxis;
     }
 
     getFormat() {
-      let format = $sensors.find(d => d.id === $currentSensor).format;
+      let format = $sensorMap.get($currentSensor).format;
       if (format === 'percent') return d => d + '%';
       else if (format === 'raw') return d3.format('.0f');
       return d => d;
     }
 
     getChartTitle() {
-      t = $sensors.find(d => d.id === $currentSensor).chartTitleText;
+      t = $sensorMap.get($currentSensor).chartTitleText;
     }
 
     isChart() {

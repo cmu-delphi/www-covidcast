@@ -9,6 +9,7 @@
 
   import {
     sensors,
+    sensorMap,
     times,
     stats,
     signalType,
@@ -52,7 +53,7 @@
 
   function updateRegionSliceCache(sensor, level, date, reason = 'unspecified') {
     if (!$mounted) return;
-    if (!$sensors.find(d => d.id === sensor).levels.includes(level)) return;
+    if (!$sensorMap.get(sensor).levels.includes(level)) return;
     if (date > $times.get(sensor)[1] || reason === 'level change') return;
 
     let cacheEntry = $regionSliceCache.get(sensor + level + date);
@@ -60,9 +61,9 @@
       let q =
         ENDPOINT +
         '&data_source=' +
-        sensor +
+        $sensorMap.get(sensor).id +
         '&signal=' +
-        $sensors.find(d => d.id === sensor).signal +
+        $sensorMap.get(sensor).signal +
         '&geo_type=' +
         level +
         '&time_values=' +
@@ -111,9 +112,9 @@
       let q =
         ENDPOINT +
         '&data_source=' +
-        sensor +
+        $sensorMap.get(sensor).id +
         '&signal=' +
-        $sensors.find(d => d.id === sensor).signal +
+        $sensorMap.get(sensor).signal +
         '&geo_type=' +
         level +
         '&time_values=20100101-20300101' +
@@ -152,8 +153,8 @@
       date = maxDate;
     }
 
-    if (!$sensors.find(d => d.id === s).levels.includes($currentLevel)) {
-      l = $sensors.find(d => d.id === s).levels[0];
+    if (!$sensorMap.get(s).levels.includes($currentLevel)) {
+      l = $sensorMap.get(s).levels[0];
       levelChangedWhenSensorChanged = true;
       currentRegion.set('');
       currentRegionName.set('');
@@ -203,16 +204,17 @@
       .then(meta => {
         let timeMap = new Map();
         let statsMap = new Map();
-        $sensors.forEach(s => {
+        Array.from($sensorMap.keys()).forEach(sensorKey => {
+          let sData = $sensorMap.get(sensorKey);
           let matchedMeta = meta.epidata.find(
-            d => d.data_source === s.id && d.signal === s.signal && d.time_type === 'day',
+            d => d.data_source === sData.id && d.signal === sData.signal && d.time_type === 'day',
           );
 
           if (matchedMeta.max_time > yesterday) {
             matchedMeta.max_time = yesterday;
           }
-          timeMap.set(s.id, [matchedMeta.min_time, matchedMeta.max_time]);
-          statsMap.set(s.id, {
+          timeMap.set(sensorKey, [matchedMeta.min_time, matchedMeta.max_time]);
+          statsMap.set(sensorKey, {
             mean: matchedMeta.mean_value,
             std: matchedMeta.stdev_value,
           });
@@ -223,8 +225,8 @@
         metaData.set(meta.epidata);
 
         let l = $currentLevel;
-        if (!$sensors.find(d => d.id === $currentSensor).levels.includes($currentLevel)) {
-          l = $sensors.find(d => d.id === $currentSensor).levels[0];
+        if (!$sensorMap.get($currentSensor).levels.includes($currentLevel)) {
+          l = $sensorMap.get($currentSensor).levels[0];
           currentLevel.set(l);
         }
 
@@ -236,9 +238,9 @@
         let q =
           ENDPOINT +
           '&data_source=' +
-          $currentSensor +
+          $sensorMap.get($currentSensor).id +
           '&signal=' +
-          $sensors.find(d => d.id === $currentSensor).signal +
+          $sensorMap.get($currentSensor).signal +
           '&geo_type=' +
           l +
           '&time_values=' +
