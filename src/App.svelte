@@ -30,6 +30,7 @@
     mounted,
     mapFirstLoaded,
     yesterday,
+    customDataView,
   } from './stores.js';
 
   const ENDPOINT = 'https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day';
@@ -215,7 +216,6 @@
         }
 
         let date = timeMap.get($currentSensor)[1];
-        // set to nearest available date
         dateChangedWhenSensorChanged = true;
         currentDate.set(date);
 
@@ -249,10 +249,27 @@
   }
 
   function updateURIParameters(sensor, level, region, date, signalType) {
+    let pre = '';
+    if ($customDataView) {
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      pre = 'sensors=' + urlParams.get('sensors') + '&';
+    }
     window.history.replaceState(
       {},
       document.title,
-      '?sensor=' + sensor + '&level=' + level + '&region=' + region + '&date=' + date + '&signalType=' + signalType,
+      '?' +
+        pre +
+        'sensor=' +
+        sensor +
+        '&level=' +
+        level +
+        '&region=' +
+        region +
+        '&date=' +
+        date +
+        '&signalType=' +
+        signalType,
     );
   }
   // Keep the URL updated with the current state
