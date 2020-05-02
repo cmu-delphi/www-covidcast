@@ -406,12 +406,23 @@
         .x(d => x(parseTime(d.time_value)))
         .y(d => y(+d.value));
 
+      let area = d3
+        .area()
+        .x(d => x(parseTime(d.time_value)))
+        .y0(d => y(Math.max(0, +d.value - d.stderr)))
+        .y1(d => y(+d.value + d.stderr));
+
       svg
         .append('path')
         .attr('fill', 'none')
         .attr('stroke', '#767676') // DIRECTION_THEME.gradientMiddle)
         .attr('stroke-width', 3)
         .attr('d', line(myData));
+
+      svg
+        .append('path')
+        .attr('fill', 'rgba(0, 0, 0, 0.1')
+        .attr('d', area(myData));
 
       // define tool tip
       let tip = d3Tip()
