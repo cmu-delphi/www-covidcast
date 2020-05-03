@@ -23,8 +23,6 @@
   import { defaultRegionOnStartup } from './util.js';
   import { DIRECTION_THEME, MAP_THEME } from './theme.js';
 
-  currentRegion.subscribe(d => console.log(d));
-
   let LAT = -0.5;
   let LON = -0.5;
   let ZOOM = 3.9;
@@ -393,9 +391,8 @@
           // found Allegheny / Pittsburgh
           const randomFeature = found[0];
           if ($currentRegion === '') {
-            console.log('found?');
-            currentRegionName.set('');
-            currentRegion.set('');
+            currentRegionName.set(randomFeature.NAME);
+            currentRegion.set(randomFeature.id);
           }
           chosenRandom = true;
         } else {
