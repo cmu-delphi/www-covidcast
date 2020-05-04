@@ -19,6 +19,7 @@
     metaData,
     mounted,
     mapFirstLoaded,
+    sensorMap,
   } from './stores.js';
   import { defaultRegionOnStartup } from './util.js';
   import { DIRECTION_THEME, MAP_THEME } from './theme.js';
@@ -111,7 +112,7 @@
       <div class="map-popup-region-value-container">
         ${
           $signalType === 'value'
-            ? $currentSensor === 'ght'
+            ? $sensorMap.get($currentSensor).id === 'ght'
               ? 'Relative Frequency: <span class="map-popup-region-value" style="background-color: ' +
                 fillColor +
                 '; color: ' +
@@ -119,7 +120,7 @@
                 ';">' +
                 value.toFixed(2) +
                 '</span>'
-              : $currentSensor === 'quidel'
+              : $sensorMap.get($currentSensor).id === 'quidel'
               ? 'Tests per Device: <span class="map-popup-region-value" style="background-color: ' +
                 fillColor +
                 '; color: ' +

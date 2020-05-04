@@ -34,8 +34,6 @@
   let userCharts = [];
   let currentChart = 0;
 
-  regionData.subscribe(d => console.log(d));
-
   onMount(_ => {
     drawGraph();
     regionData.subscribe(d => updateGraph(d));
@@ -291,8 +289,6 @@
 
       // line graph
       let myData = this.getData();
-      console.log(myData);
-      console.log($currentData);
 
       // size chart
       var margin = { top: 15, right: 42, bottom: 70, left: 60 }, // right need to be wide enough to accommodate the tooltip
@@ -351,7 +347,7 @@
         }
       }
 
-      if (chartMax > 100 && $currentSensor !== 'ght' && $currentSensor !== 'quidel') {
+      if (chartMax > 100 && $sensorMap.get($currentSensor).format === 'percent') {
         // console.log('seeting max');
         chartMax = 100;
       }
@@ -425,7 +421,7 @@
             d3.timeFormat('%m/%d')(parseTime(d.time_value)) +
             ': ' +
             d.value.toFixed(2) +
-            ($currentSensor === 'ght' || $currentSensor === 'quidel' ? '' : '%')
+            ($sensorMap.get($currentSensor).format === 'percent' ? '%' : '')
           );
         });
 

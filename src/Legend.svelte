@@ -1,5 +1,5 @@
 <script>
-  import { signalType, stats, currentSensor } from './stores.js';
+  import { signalType, stats, currentSensor, sensorMap } from './stores.js';
   import { DIRECTION_THEME } from './theme.js';
   import * as d3 from 'd3';
 
@@ -13,12 +13,12 @@
     let sts = stats.get(sens);
     let valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
 
-    if (sens === 'ght' || sens === 'quidel') {
+    if ($sensorMap.get($currentSensor).format === 'raw') {
       high = valueMinMax[1].toFixed(2);
       low = Math.max(0, valueMinMax[0]).toFixed(2);
     } else {
-      high = Math.min(100, valueMinMax[1]).toFixed(2) + '%';
-      low = Math.max(0, valueMinMax[0]).toFixed(2) + '%';
+      high = Math.min(100, valueMinMax[1]).toFixed(2) + '% ';
+      low = Math.max(0, valueMinMax[0]).toFixed(2) + '% ';
     }
   }
 </script>
@@ -100,7 +100,7 @@
       Decreasing
     </p>
   {:else}
-    <p>{high ? high + ' +' : ''}</p>
+    <p>{high ? high + '+' : ''}</p>
     <div
       class="legend-bar"
       style="background: linear-gradient(to top, {DIRECTION_THEME.gradientMin}, {DIRECTION_THEME.gradientMiddle}, {DIRECTION_THEME.gradientMax})" />
