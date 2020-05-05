@@ -16,7 +16,6 @@
     currentRange,
     signalType,
     currentDataReadyOnMap,
-    metaData,
     mounted,
     mapFirstLoaded,
     sensorMap,
@@ -226,7 +225,7 @@
   };
 
   // If it hasn't been initialized and we have geojsons and initial data, create map.
-  $: if (!map && $geojsons.size !== 0 && $metaData.length !== 0 && $stats) {
+  $: if (!map && $geojsons.size !== 0 && $stats) {
     initializeMap();
   }
 
@@ -255,7 +254,6 @@
     let drawMega = $currentLevel === 'county';
 
     // Get the range for the heatmap.
-    let thisMeta = $metaData.find(d => d.data_source === $currentSensor && d.geo_type === $currentLevel);
     let thisStats = $stats.get($currentSensor);
     let valueMinMax = [thisStats.mean - 3 * thisStats.std, thisStats.mean + 3 * thisStats.std];
     currentRange.set($signalType === 'value' ? valueMinMax : [-1, 1]);

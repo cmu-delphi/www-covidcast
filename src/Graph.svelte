@@ -7,7 +7,6 @@
     currentLevel,
     currentData,
     regionData,
-    regionDataStats,
     currentSensorName,
     currentLevelName,
     currentDate,
@@ -37,7 +36,6 @@
   onMount(_ => {
     drawGraph();
     regionData.subscribe(d => updateGraph(d));
-    regionDataStats.subscribe(d => setChartRange(d));
     currentDate.subscribe(_ => updateGraphTimeRange());
     signalType.subscribe(_ => updateGraph($regionData));
     currentRegion.subscribe(region => {
@@ -110,19 +108,18 @@
     return [cType, data, dataRange, n, domain];
   }
 
-  function setChartRange(data) {
-    try {
-      if (data) {
-        let { min_value, max_value } = data;
-        let { num_locations } = data;
-        let stats = $regionDataStats;
-        if (userCharts[currentChart] !== undefined) {
-          userCharts[currentChart].setRange(min_value, max_value);
-          userCharts[currentChart].setN(num_locations);
-        }
-      }
-    } catch (error) {}
-  }
+  // function setChartRange(data) {
+  //   try {
+  //     if (data) {
+  //       let { min_value, max_value } = data;
+  //       let { num_locations } = data;
+  //       if (userCharts[currentChart] !== undefined) {
+  //         userCharts[currentChart].setRange(min_value, max_value);
+  //         userCharts[currentChart].setN(num_locations);
+  //       }
+  //     }
+  //   } catch (error) {}
+  // }
 
   function setChartDomain(min, max) {
     try {
@@ -291,7 +288,7 @@
       let myData = this.getData();
 
       // size chart
-      var margin = { top: 15, right: 42, bottom: 70, left: 60 }, // right need to be wide enough to accommodate the tooltip
+      var margin = { top: 15, right: 35, bottom: 70, left: 60 }, // right need to be wide enough to accommodate the tooltip
         width = w - margin.left - margin.right,
         height = 0.85 * w - margin.top - margin.bottom;
 
@@ -348,6 +345,13 @@
       }
 
       if (chartMax > 100 && $sensorMap.get($currentSensor).format === 'percent') {
+        // console.log('seeting max');
+        // console.log('seeting max');
+        // console.log('seeting max');
+        // console.log('seeting max');
+        // console.log('seeting max');
+        // console.log('seeting max');
+        // console.log('seeting max');
         // console.log('seeting max');
         chartMax = 100;
       }

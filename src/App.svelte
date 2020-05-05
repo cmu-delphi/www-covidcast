@@ -26,7 +26,6 @@
     timeSliceCache,
     currentData,
     regionData,
-    metaData,
     mounted,
     mapFirstLoaded,
     yesterday,
@@ -43,8 +42,6 @@
   let changingSensor = false;
   let levelChangedWhenSensorChanged = false;
   let dateChangedWhenSensorChanged = false;
-
-  timeSliceCache.subscribe(d => console.log(d));
 
   function callAPI(id, signal, level, date, region) {
     return fetch(
@@ -195,19 +192,26 @@
             d => d.data_source === sData.id && d.signal === sData.signal && d.time_type === 'day',
           );
 
-          if (matchedMeta.max_time > yesterday) {
-            matchedMeta.max_time = yesterday;
+          if (matchedMeta) {
+            if (matchedMeta.max_time > yesterday) {
+              matchedMeta.max_time = yesterday;
+            }
+            timeMap.set(sensorKey, [matchedMeta.min_time, matchedMeta.max_time]);
+            statsMap.set(sensorKey, {
+              mean: matchedMeta.mean_value,
+              std: matchedMeta.stdev_value,
+            });
+          } else {
+            // If no metadata, use information from sensors.
+            timeMap.set(sensorKey, [sData.minTime, sData.maxTime]);
+            statsMap.set(sensorKey, {
+              mean: sData.mean,
+              std: sData.std,
+            });
           }
-          timeMap.set(sensorKey, [matchedMeta.min_time, matchedMeta.max_time]);
-          statsMap.set(sensorKey, {
-            mean: matchedMeta.mean_value,
-            std: matchedMeta.stdev_value,
-          });
         });
-
         stats.set(statsMap);
         times.set(timeMap);
-        metaData.set(meta.epidata);
 
         let l = $currentLevel;
         if (!$sensorMap.get($currentSensor).levels.includes($currentLevel)) {
@@ -216,8 +220,8 @@
         }
 
         let date = timeMap.get($currentSensor)[1];
-        dateChangedWhenSensorChanged = true;
-        currentDate.set(date);
+        // dateChangedWhenSensorChanged = true;
+        // currentDate.set(date);
 
         callAPI($sensorMap.get($currentSensor).id, $sensorMap.get($currentSensor).signal, l, date, '*').then(d => {
           if (d.result < 0 || d.message.includes('no results')) {

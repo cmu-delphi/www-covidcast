@@ -104,7 +104,6 @@ export const geojsons = readable(new Map(), function start(set) {
   });
 });
 
-export const metaData = writable([]);
 export const times = writable(null);
 export const stats = writable(null);
 
@@ -158,12 +157,6 @@ export const timeSliceCache = writable(new Map());
 
 export const regionData = writable([]);
 export const currentData = writable([]);
-
-export const regionDataStats = derived(
-  [metaData, currentSensor, sensorMap, currentLevel],
-  ([$meta, $sensor, $sensorMap, $level]) =>
-    $meta.find((d) => d.data_source === $sensorMap.get($sensor) && d.geo_type === $level),
-);
 
 export const timeRangeOnSlider = writable({ min: 0, max: 0 });
 export const yesterday = +moment(new Date(new Date().getTime() - 86400 * 1000)).format('YYYYMMDD');
