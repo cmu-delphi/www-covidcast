@@ -18,7 +18,7 @@
 </script>
 
 <style>
-  .options-container {
+  .tabs {
     font-size: 0.8rem;
     width: 100%;
     display: flex;
@@ -28,22 +28,24 @@
 
   .buttons-group-side {
     display: flex;
+    justify-content: center;
     align-items: stretch;
+    flex-wrap: wrap;
     /* justify-content: center; */
     /* flex-wrap: wrap; */
     pointer-events: auto;
   }
 
   .buttons-group-side .button {
-    margin: 0;
+    flex-shrink: 0;
     font-size: 1em;
     font-weight: 400;
     line-height: 1em;
     background-color: #fff;
     border-style: solid;
     border-color: #dbdbdb;
-    border-left-color: transparent;
     border-width: 1px;
+    margin: -0.5px;
     color: #666666;
     cursor: pointer;
     justify-content: center;
@@ -57,17 +59,6 @@
     transition: all 0.1s ease-in;
 
     position: relative;
-  }
-
-  .buttons-group-side .button:first-child {
-    border-left-color: #dbdbdb;
-    /* border-top-left-radius: 4px; */
-    /* border-bottom-left-radius: 4px; */
-  }
-
-  .buttons-group-side .button:last-child {
-    /* border-top-right-radius: 4px; */
-    /* border-bottom-right-radius: 4px; */
   }
 
   .buttons-group-side button.button .button-tooltip {
@@ -125,7 +116,7 @@
 
   .banner-container {
     font-size: 0.9rem;
-    margin-top: 16px;
+    margin-top: 12px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -189,7 +180,7 @@
   }
 </style>
 
-<div class="options-container">
+<div class="tabs">
   <div aria-label="Data Source" class="buttons-group-side">
     {#each Array.from($sensorMap.keys()) as sensor}
       <button
@@ -210,7 +201,7 @@
 
 {#if shouldDisplayBanner}
   <div class="banner-container">
-    <h2 class="banner">
+    <div class="banner">
       <button
         title="Hide map title"
         aria-label="toggle banner"
@@ -221,6 +212,6 @@
         &#10005;
       </button>
       <span class="banner-text">{currentSensorTooltip}</span>
-    </h2>
+    </div>
   </div>
 {/if}

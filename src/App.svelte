@@ -285,6 +285,7 @@
     position: absolute;
     top: 10px;
     left: 10px;
+    max-width: 210px;
     z-index: 1000;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 10px 10px;
@@ -295,8 +296,8 @@
   .tabs-container {
     position: absolute;
     top: 10px;
-    left: 50px;
-    right: 50px;
+    left: 220px;
+    right: 220px;
     z-index: 1000;
     box-sizing: border-box;
     transition: all 0.1s ease-in;
