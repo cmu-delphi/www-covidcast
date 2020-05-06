@@ -18,10 +18,6 @@
   let timeSlider;
   let selectedDateDisplay;
 
-  // onMount(_ => {
-  //   timeSlider = document.querySelector('#time_slider');
-  // });
-
   let parseTime = d3.timeParse('%Y%m%d');
   let formatTime = d3.timeFormat('%B %d, %Y');
   let formatTimeWithoutYear = d3.timeFormat('%B %d');
@@ -47,17 +43,22 @@
   let prettyDate = '';
   $: prettyDate = formatTime(new Date(rectifiedVal));
 
-  currentDate.subscribe(d => {
-    val = d;
-    rectifiedVal = parseTime(val).getTime();
-    if (rectifiedVal >= rectifiedMax) {
-      rectifiedVal = rectifiedMax;
-      currentDate.set(+calculateValFromRectified(rectifiedVal));
-    } else if (rectifiedVal <= rectifiedMin) {
-      rectifiedVal = rectifiedMin;
-      currentDate.set(+calculateValFromRectified(rectifiedVal));
-    }
+  onMount(() => {
+    currentDate.subscribe(d => {
+      if (d === 20100420) return;
+      val = d;
+      rectifiedVal = parseTime(val).getTime();
+      if (rectifiedVal >= rectifiedMax) {
+        rectifiedVal = rectifiedMax;
+        currentDate.set(+calculateValFromRectified(rectifiedVal));
+      } else if (rectifiedVal <= rectifiedMin) {
+        rectifiedVal = rectifiedMin;
+        currentDate.set(+calculateValFromRectified(rectifiedVal));
+      }
+      updateSliderUI();
+    });
   });
+
   times.subscribe(t => (t ? update($currentSensor, t) : ''));
   currentSensor.subscribe(s => ($times ? update(s, $times, true) : ''));
 

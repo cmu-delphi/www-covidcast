@@ -60,22 +60,18 @@
   }
 
   function updateRegionSliceCache(sensor, level, date, reason = 'unspecified') {
-    if (!$mounted) return;
-    if (!$sensorMap.get(sensor).levels.includes(level)) return;
-    if (date > $times.get(sensor)[1] || reason === 'level change') return;
+    let sEntry = $sensorMap.get(sensor);
+    if (!$mounted || !sEntry.levels.includes(level) || date > $times.get(sensor)[1] || reason === 'level change')
+      return;
 
     let cacheEntry = $regionSliceCache.get(sensor + level + date);
     if (!cacheEntry) {
-      callAPI($sensorMap.get(sensor).id, $sensorMap.get(sensor).signal, level, date, '*').then(d => {
+      callAPI(sEntry.id, sEntry.signal, level, date, '*').then(d => {
         if (d.result < 0 || d.message.includes('no results')) {
           currentData.set([]);
           regionSliceCache.update(m => m.set(sensor + level + date, []));
         } else {
-          let { epidata } = d;
-          epidata = epidata.map(item => {
-            return { ...item, sensor, level };
-          });
-          currentData.set(epidata);
+          currentData.set(d.epidata);
           regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
         }
       });
@@ -85,6 +81,7 @@
   }
 
   function updateTimeSliceCache(sensor, level, region) {
+    let sEntry = $sensorMap.get(sensor);
     if (!$mounted) return;
     if (!region) {
       regionData.set([]);
@@ -104,7 +101,7 @@
 
     let cacheEntry = $timeSliceCache.get(sensor + level + region);
     if (!cacheEntry) {
-      callAPI($sensorMap.get(sensor).id, $sensorMap.get(sensor).signal, level, '20100101-20500101', region).then(d => {
+      callAPI(sEntry.id, sEntry.signal, level, '20100101-20500101', region).then(d => {
         regionData.set(d.epidata);
         timeSliceCache.update(m => m.set(sensor + level + region, d.epidata));
         if (!checkIfCurrentRegionHasDataOnCurrentDate(d.epidata)) {
@@ -164,20 +161,14 @@
   });
 
   currentDate.subscribe(d => {
-    if (dateChangedWhenSensorChanged) {
-      dateChangedWhenSensorChanged = false;
-    } else {
-      updateRegionSliceCache($currentSensor, $currentLevel, d, 'date-change');
-    }
+    dateChangedWhenSensorChanged
+      ? (dateChangedWhenSensorChanged = false)
+      : updateRegionSliceCache($currentSensor, $currentLevel, d, 'date-change');
   });
 
   currentRegion.subscribe(r => {
     updateTimeSliceCache($currentSensor, $currentLevel, r);
-    if (r) {
-      toggleGraphShowStatus(null, true);
-    } else {
-      toggleGraphShowStatus(null, false);
-    }
+    r ? toggleGraphShowStatus(null, true) : toggleGraphShowStatus(null, false);
   });
 
   onMount(_ => {
@@ -186,10 +177,12 @@
       .then(meta => {
         let timeMap = new Map();
         let statsMap = new Map();
+
         Array.from($sensorMap.keys()).forEach(sensorKey => {
-          let sData = $sensorMap.get(sensorKey);
+          let sEntry = $sensorMap.get(sensorKey);
+
           let matchedMeta = meta.epidata.find(
-            d => d.data_source === sData.id && d.signal === sData.signal && d.time_type === 'day',
+            d => d.data_source === sEntry.id && d.signal === sEntry.signal && d.time_type === 'day',
           );
 
           if (matchedMeta) {
@@ -203,13 +196,14 @@
             });
           } else {
             // If no metadata, use information from sensors.
-            timeMap.set(sensorKey, [sData.minTime, sData.maxTime]);
+            timeMap.set(sensorKey, [sEntry.minTime, sEntry.maxTime]);
             statsMap.set(sensorKey, {
-              mean: sData.mean,
-              std: sData.std,
+              mean: sEntry.mean,
+              std: sEntry.std,
             });
           }
         });
+
         stats.set(statsMap);
         times.set(timeMap);
 
@@ -219,28 +213,17 @@
           currentLevel.set(l);
         }
 
-        let date = timeMap.get($currentSensor)[1];
-        // dateChangedWhenSensorChanged = true;
-        // currentDate.set(date);
+        let date = $currentDate;
+        if (date === 20100420) {
+          date = timeMap.get($currentSensor)[1];
+          currentDate.set(date);
+        }
 
-        callAPI($sensorMap.get($currentSensor).id, $sensorMap.get($currentSensor).signal, l, date, '*').then(d => {
-          if (d.result < 0 || d.message.includes('no results')) {
-            currentData.set([]);
-            regionSliceCache.update(m => m.set($currentSensor + $currentLevel + date, []));
-          } else {
-            let { epidata } = d;
-            epidata = epidata.map(item => {
-              return { ...item, sensor: $currentSensor, level: l };
-            });
-            currentData.set(epidata);
-            regionSliceCache.update(m => m.set($currentSensor + $currentLevel + date, d.epidata));
-          }
-
-          mounted.set(1);
-          if ($currentRegion) {
-            updateTimeSliceCache($currentSensor, $currentLevel, $currentRegion);
-          }
-        });
+        mounted.set(1);
+        updateRegionSliceCache($currentSensor, l, date);
+        if ($currentRegion) {
+          updateTimeSliceCache($currentSensor, $currentLevel, $currentRegion);
+        }
       });
   });
 

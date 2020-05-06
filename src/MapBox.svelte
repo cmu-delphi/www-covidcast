@@ -1,8 +1,10 @@
 <script>
-  import { onMount } from 'svelte';
   import colorParse from 'color-parse';
   import invertColor from 'invert-color';
   import mapboxgl from 'mapbox-gl';
+  import { onMount } from 'svelte';
+  import { defaultRegionOnStartup, getTextColorBasedOnBackground } from './util.js';
+  import { DIRECTION_THEME, MAP_THEME } from './theme.js';
   import {
     levels,
     stats,
@@ -20,29 +22,21 @@
     mapFirstLoaded,
     sensorMap,
   } from './stores.js';
-  import { defaultRegionOnStartup } from './util.js';
-  import { DIRECTION_THEME, MAP_THEME } from './theme.js';
 
   let LAT = -0.5;
   let LON = -0.5;
   let ZOOM = 3.9;
 
-  let container;
-  let map;
-  let popup;
-  let hoveredId = null;
-  let megaHoveredId;
-  let clickedId;
-  let megaClickedId;
-
   // Boolean tracking if the map has been initialized.
   let mapMounted = false;
   let chosenRandom = false;
-
-  function getTextColorBasedOnBackground(bgColor) {
-    // https://github.com/onury/invert-color
-    return invertColor(colorParse(bgColor).values, { black: '#000', white: '#fff', threshold: 0.32 });
-  }
+  let hoveredId = null;
+  let container;
+  let map;
+  let popup;
+  let megaHoveredId;
+  let clickedId;
+  let megaClickedId;
 
   onMount(_ => {
     let containerWidth = container.clientWidth;
@@ -70,30 +64,20 @@
         .addTo(map);
       return;
     }
-    map.setFeatureState({ source: level }, { hover: false });
-    map.setFeatureState({ source: 'mega-county' }, { hover: false });
-    if (level !== 'mega-county') {
-      if (hoveredId !== e.features[0].id) {
-        map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
-        map.setFeatureState({ source: level, id: megaHoveredId }, { hover: false });
-      }
 
-      hoveredId = e.features[0].id;
-      map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
-    } else {
-      map.setFeatureState({ source: level, id: megaHoveredId }, { hover: false });
-      // console.log(hoveredId);
+    map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
+    map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
+
+    if (level === 'mega-county') {
       if (hoveredId === null) {
-        if (megaHoveredId !== e.features[0].id) {
-          map.setFeatureState({ source: level, id: megaHoveredId }, { hover: false });
-        }
-
         megaHoveredId = e.features[0].id;
         map.setFeatureState({ source: level, id: megaHoveredId }, { hover: true });
       } else {
-        map.setFeatureState({ source: level, id: megaHoveredId }, { hover: false });
         megaHoveredId = null;
       }
+    } else {
+      hoveredId = e.features[0].id;
+      map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
     }
 
     if (hoveredId !== null && level === 'mega-county') return;
@@ -101,6 +85,7 @@
     // popup
     const { value, direction, NAME } = e.features[0].properties;
     const fillColor = e.features[0].layer.paint['fill-color'].toString();
+
     var title = `
       <div class="map-popup-region-name">
       ${level === 'mega-county' ? 'Rest of' : ''}
@@ -168,6 +153,7 @@
         }
       </div>
     `;
+
     popup
       .setLngLat(e.lngLat)
       .setHTML(title)
@@ -181,6 +167,7 @@
     }
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
     if (level === 'mega-county' && hoveredId !== null) megaHoveredId = null;
+
     map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
     if (level !== 'mega-county') hoveredId = null;
 
@@ -193,24 +180,25 @@
       map.setFeatureState({ source: level, id: clickedId }, { select: false });
     }
     if (megaClickedId) {
-      map.setFeatureState({ source: level, id: megaClickedId }, { select: false });
+      map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: false });
     }
 
     if (level === 'mega-county') {
       if (hoveredId !== null) return;
-      map.setFeatureState({ source: 'county', id: clickedId }, { select: false });
-      clickedId = null;
-      if (megaClickedId !== e.features[0].id) {
-        megaClickedId = e.features[0].id;
-        map.setFeatureState({ source: level, id: megaClickedId }, { select: true });
-        currentRegionName.set(e.features[0].properties.NAME);
-        currentRegion.set(e.features[0].properties.STATE + '000');
-      } else {
+      if (megaHoveredId === megaClickedId) {
         megaClickedId = null;
         currentRegionName.set('');
         currentRegion.set('');
+        return;
       }
+      map.setFeatureState({ source: 'county', id: clickedId }, { select: false });
+      clickedId = null;
+      megaClickedId = e.features[0].id;
+      map.setFeatureState({ source: level, id: megaClickedId }, { select: true });
+      currentRegionName.set(e.features[0].properties.NAME);
+      currentRegion.set(e.features[0].properties.STATE + '000');
     } else {
+      megaClickedId = null;
       if (clickedId !== e.features[0].id) {
         clickedId = e.features[0].id;
         map.setFeatureState({ source: level, id: clickedId }, { select: true });
@@ -250,7 +238,7 @@
     // Reset all hover/click states.
     [...Object.keys($levels), 'mega-county'].forEach(level => map && map.removeFeatureState({ source: level }));
 
-    // If we're lookinga t counties, draw the mega-county states.
+    // If we're looking at counties, draw the mega-county states.
     let drawMega = $currentLevel === 'county';
 
     // Get the range for the heatmap.
@@ -390,8 +378,10 @@
           // found Allegheny / Pittsburgh
           const randomFeature = found[0];
           if ($currentRegion === '') {
-            currentRegionName.set(randomFeature.NAME);
+            currentRegionName.set(randomFeature.properties.NAME);
             currentRegion.set(randomFeature.id);
+            clickedId = randomFeature.id;
+            map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
           }
           chosenRandom = true;
         } else {
@@ -627,8 +617,6 @@
       updateMap('init');
     });
   }
-
-  function zoomBack() {}
 </script>
 
 <style>
@@ -682,7 +670,6 @@
 
   .state-buttons-holder .pg-button img {
     width: 90%;
-    /* height: 100%; */
   }
 </style>
 

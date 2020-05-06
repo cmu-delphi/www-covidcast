@@ -130,7 +130,7 @@ export const signalType = writable('value', (set) => {
   return () => '';
 });
 // EpiWeek in form YYYYMMDD.
-export const currentDate = writable(20200420, (set) => {
+export const currentDate = writable(20100420, (set) => {
   let date = urlParams.get('date');
   date ? set(date) : '';
   return () => '';

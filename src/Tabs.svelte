@@ -9,12 +9,12 @@
     currentDataReadyOnMap,
   } from './stores.js';
 
-  let currentSensorTooltip;
-  $: currentSensorTooltip = $sensorMap.get($currentSensor).mapTitleText;
+  export let isIE;
 
   let shouldDisplayBanner = true;
+  let currentSensorTooltip;
 
-  export let isIE;
+  $: currentSensorTooltip = $sensorMap.get($currentSensor).mapTitleText;
 </script>
 
 <style>

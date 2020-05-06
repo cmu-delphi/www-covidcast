@@ -549,10 +549,9 @@
 
   .graph-description {
     text-align: center;
-    margin: 3px 0px 3px 0px !important;
+    margin: 3px 20px 3px 20px !important;
     font-size: 14px;
     padding: 0px !important;
-    padding-left: 30px !important;
   }
 
   .graph-itself {
