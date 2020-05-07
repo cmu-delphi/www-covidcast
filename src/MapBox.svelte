@@ -87,8 +87,6 @@
     const fillColor = e.features[0].layer.paint['fill-color'].toString();
     const sens = $sensorMap.get($currentSensor);
 
-    console.log(e.features[0].properties);
-
     let title =
       (level === 'mega-county' ? 'Rest of ' : '') +
       NAME +

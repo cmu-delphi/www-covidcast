@@ -21,9 +21,6 @@
   .tabs {
     font-size: 0.8rem;
     width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
   }
 
   .buttons-group-side {
@@ -180,7 +177,6 @@
 
   .tab-label {
     font-weight: 800;
-    font-style: italic;
     flex-shrink: 0;
     font-size: 1em;
     line-height: 1em;
@@ -198,20 +194,17 @@
     padding-top: calc(0.5em - 1px);
     text-align: center;
     color: black;
-    /* white-space: nowrap; */
-
-    transition: all 0.1s ease-in;
-
     position: relative;
   }
 
   .official-side {
-    margin-left: 20px;
+    margin-top: 5px;
   }
 </style>
 
 <div class="tabs">
   <div aria-label="Data Source" class="buttons-group-side">
+    <button title="Indicators: " class="tab-label">Indicators:</button>
     {#each Array.from($sensorMap.keys()).filter(d => !$sensorMap.get(d).official) as sensor}
       <button
         title={isIE !== undefined ? $sensorMap.get(sensor).tooltipText : ''}

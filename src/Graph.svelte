@@ -351,7 +351,12 @@
 
       var xTicks = myData.length;
 
-      var formatYTicks = this.getFormat();
+      let formatYTicks;
+      let format = $sensorMap.get($currentSensor).format;
+      if (format === 'percent') formatYTicks = d => d + '%';
+      else if (format === 'raw') {
+        formatYTicks = y.domain[1] - y.domain[0] > 10 ? d3.format('.0f') : d3.format('.1f');
+      }
       var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(4);
 
       // append the axes
