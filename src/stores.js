@@ -14,12 +14,12 @@ export const sensors = readable(
     {
       name: 'Doctor Visits',
       id: 'doctor-visits',
-      tooltipText: 'Percentage of doctor visits that are due to COVID-like Symptoms',
-      mapTitleText: 'Percentage of doctor visits that are due to COVID-like Symptoms',
-      chartTitleText: 'Percentage of doctor visits that are due to COVID-like Symptoms',
+      tooltipText: 'Percentage of doctor visits that are due to COVID-like symptoms',
+      mapTitleText: 'Percentage of doctor visits that are due to COVID-like symptoms',
+      chartTitleText: 'Percentage of doctor visits that are due to COVID-like symptoms',
       yAxis: 'Percentage',
       format: 'percent',
-      signal: 'smoothed_adj_cli',
+      signal: 'smoothed_cli',
       levels: ['county', 'msa', 'state'],
       official: false,
     },
@@ -60,18 +60,6 @@ export const sensors = readable(
       official: false,
     },
     {
-      name: 'Consensus',
-      id: 'consensus',
-      tooltipText: 'Consensus Score of All Indicators Available for This Date',
-      mapTitleText: 'Consensus Score of All Indicators Available for This Date',
-      chartTitleText: 'Consensus Score of All Indicators Available for This Date',
-      yAxis: 'Score (arbitrary scale)',
-      format: 'raw',
-      signal: 'consensus_day',
-      levels: ['county', 'msa', 'state'],
-      official: false,
-    },
-    {
       name: 'Cases (JHU)',
       id: 'jhu-csse',
       tooltipText: 'New COVID-19 cases per 100,000 people, as reported by Johns Hopkins University',
@@ -96,7 +84,6 @@ export const sensors = readable(
       official: true,
     },
   ],
-
   (set) => {
     let sensorsOption = urlParams.get('sensors');
     sensorsOption ? set(JSON.parse(decodeURIComponent(sensorsOption))) : '';
@@ -142,7 +129,7 @@ export const mapFirstLoaded = writable(false);
 export const currentDataReadyOnMap = writable(false);
 export const customDataView = readable(true, (set) => (urlParams.get('sensors') ? set(true) : set(false)));
 
-export const currentSensor = writable('doctor-visits-smoothed_adj_cli', (set) => {
+export const currentSensor = writable('doctor-visits-smoothed_cli', (set) => {
   let sensor = urlParams.get('sensor');
   sensor ? set(sensor) : '';
   return () => '';
