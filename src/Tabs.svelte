@@ -14,7 +14,6 @@
   let shouldDisplayBanner = true;
   let currentSensorTooltip;
 
-  $: console.log($currentSensor, $sensorMap);
   $: currentSensorTooltip = $sensorMap.get($currentSensor).mapTitleText;
 </script>
 

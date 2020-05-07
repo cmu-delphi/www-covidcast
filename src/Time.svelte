@@ -68,10 +68,6 @@
     dataRangeMin = parseTime(min).getTime();
     dataRangeMax = parseTime(max).getTime();
 
-    // console.log('current', $currentDate);
-    // console.log('rectfiedmin:', calculateValFromRectified(rectifiedMin));
-    // console.log('dataMin:', dataRangeMin, min);
-
     if (
       newSensor &&
       dataRangeMin <= rectifiedMin &&
@@ -80,8 +76,6 @@
     ) {
       // console.log('fine not to change slider range');
     } else {
-      // reset range
-      // console.log('reset range');
       rectifiedRange = interval;
       rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
       if (rectifiedMin < dataRangeMin) {
@@ -232,8 +226,6 @@
     clearInterval(playInterval);
     playInterval = null;
   }
-
-  // currentDataReadyOnMap.subscribe(d => ////console.log('map set:', d));
 </script>
 
 <style>
@@ -248,9 +240,7 @@
     position: absolute;
     top: -20px;
     left: 10px;
-    /* width: 300px; */
     height: 24px;
-    /* background-color: lightgray; */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -297,11 +287,6 @@
     transform: none;
   }
 
-  /* .load-more-button:disabled:hover {
-    animation: shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-    transform: translate3d(0, 0, 0);
-  } */
-
   @keyframes shake {
     10%,
     90% {
@@ -339,11 +324,9 @@
 
   #timeSliderPaddingLeft,
   #timeSliderPaddingRight {
-    /* flex-grow: 1; */
     height: 6px;
     padding: 0;
     border-style: none;
-    /* background: #7e7e7e; */
     background: repeating-linear-gradient(-45deg, #666, #666 2px, #eee 2px, #eee 4px);
     outline: none;
     opacity: 0.7;
@@ -354,7 +337,6 @@
   }
 
   .slider {
-    /* flex-grow: 1; */
     -webkit-appearance: none;
     width: 320px;
     height: 6px;

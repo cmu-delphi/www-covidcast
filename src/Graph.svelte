@@ -16,6 +16,7 @@
     sensorMap,
     signalType,
     timeRangeOnSlider,
+    yesterday,
   } from './stores.js';
   import { calculateValFromRectified } from './util.js';
   import { DIRECTION_THEME } from './theme.js';
@@ -32,8 +33,6 @@
   const charts = [barChart, lineGraph];
   let userCharts = [];
   let currentChart = 0;
-
-  currentRegionName.subscribe(d => console.log(d));
 
   onMount(_ => {
     drawGraph();
@@ -341,10 +340,11 @@
         chartMax = 100;
       }
 
+      // console.log(d3.extent(myData, d => parseTime(d.time_value)))
       // scale x and y axes
       var x = d3
         .scaleTime()
-        .domain(d3.extent(myData, d => parseTime(d.time_value)))
+        .domain([d3.extent(myData, d => parseTime(d.time_value))[0], parseTime(yesterday)])
         .range([0, width]);
       var y = d3
         .scaleLinear()
