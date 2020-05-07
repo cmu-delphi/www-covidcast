@@ -39,7 +39,6 @@
   .buttons-group-side .button {
     flex-shrink: 0;
     font-size: 1em;
-    font-weight: 400;
     line-height: 1em;
     background-color: #fff;
     border-style: solid;
@@ -178,11 +177,59 @@
   .hide-banner-button:hover {
     opacity: 1;
   }
+
+  .tab-label {
+    font-weight: 800;
+    font-style: italic;
+    flex-shrink: 0;
+    font-size: 1em;
+    line-height: 1em;
+    background-color: #fff;
+    border-style: solid;
+    border-color: #dbdbdb;
+    border-width: 1px;
+    margin: -0.5px;
+    color: #666666;
+    cursor: default;
+    justify-content: center;
+    padding-bottom: calc(0.5em - 1px);
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: calc(0.5em - 1px);
+    text-align: center;
+    color: black;
+    /* white-space: nowrap; */
+
+    transition: all 0.1s ease-in;
+
+    position: relative;
+  }
+
+  .official-side {
+    margin-left: 20px;
+  }
 </style>
 
 <div class="tabs">
   <div aria-label="Data Source" class="buttons-group-side">
-    {#each Array.from($sensorMap.keys()) as sensor}
+    {#each Array.from($sensorMap.keys()).filter(d => !$sensorMap.get(d).official) as sensor}
+      <button
+        title={isIE !== undefined ? $sensorMap.get(sensor).tooltipText : ''}
+        aria-pressed={$currentSensor === sensor ? 'true' : 'false'}
+        class="button {$currentSensor === sensor ? 'selected' : ''}"
+        on:click={() => {
+          currentDataReadyOnMap.set(false);
+          currentSensor.set(sensor);
+          shouldDisplayBanner = true;
+        }}>
+        <span class="button-tooltip">{$sensorMap.get(sensor).tooltipText}</span>
+        {$sensorMap.get(sensor).name}
+      </button>
+    {/each}
+  </div>
+  <div aria-label="Data Source" class="official-side buttons-group-side">
+    <button title="Official Reports: " class="tab-label">Official Reports:</button>
+    {#each Array.from($sensorMap.keys()).filter(d => $sensorMap.get(d).official) as sensor}
       <button
         title={isIE !== undefined ? $sensorMap.get(sensor).tooltipText : ''}
         aria-pressed={$currentSensor === sensor ? 'true' : 'false'}

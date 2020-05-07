@@ -85,78 +85,62 @@
     // popup
     const { value, direction, NAME } = e.features[0].properties;
     const fillColor = e.features[0].layer.paint['fill-color'].toString();
+    const sens = $sensorMap.get($currentSensor);
 
-    var title = `
-      <div class="map-popup-region-name">
-      ${level === 'mega-county' ? 'Rest of' : ''}
-      ${NAME} ${$currentLevel === 'county' && level !== 'mega-county' ? 'County' : ''} ${
-      $currentLevel === 'msa' ? 'Metro Area' : ''
-    }
-      </div>
+    console.log(e.features[0].properties);
+
+    let title =
+      (level === 'mega-county' ? 'Rest of ' : '') +
+      NAME +
+      ($currentLevel === 'county' && level !== 'mega-county' ? ' County' : '');
+
+    let body;
+    if ($signalType === 'value') {
+      body = `
       <div class="map-popup-region-value-container">
-        ${
-          $signalType === 'value'
-            ? $sensorMap.get($currentSensor).id === 'ght'
-              ? 'Relative Frequency: <span class="map-popup-region-value" style="background-color: ' +
-                fillColor +
-                '; color: ' +
-                getTextColorBasedOnBackground(fillColor) +
-                ';">' +
-                value.toFixed(2) +
-                '</span>'
-              : $sensorMap.get($currentSensor).id === 'quidel'
-              ? 'Tests per Device: <span class="map-popup-region-value" style="background-color: ' +
-                fillColor +
-                '; color: ' +
-                getTextColorBasedOnBackground(fillColor) +
-                ';">' +
-                value.toFixed(2) +
-                '</span>'
-              : 'Percentage: <span class="map-popup-region-value" style="background-color: ' +
-                fillColor +
-                '; color: ' +
-                getTextColorBasedOnBackground(fillColor) +
-                ';">' +
-                value.toFixed(2) +
-                '%</span>'
-            : ''
-        }
-        ${
-          $signalType === 'direction'
-            ? '7-day Trend: ' +
-              (direction === 1
-                ? '<span class="map-popup-region-value" style="background-color: ' +
-                  DIRECTION_THEME.increasing +
-                  '; color: ' +
-                  getTextColorBasedOnBackground(DIRECTION_THEME.increasing) +
-                  '">' +
-                  DIRECTION_THEME.increasingIcon +
-                  ' Increasing</span>'
-                : direction === -1
-                ? '<span class="map-popup-region-value" style="background-color: ' +
-                  DIRECTION_THEME.decreasing +
-                  '; color: ' +
-                  getTextColorBasedOnBackground(DIRECTION_THEME.decreasing) +
-                  '">' +
-                  DIRECTION_THEME.decreasingIcon +
-                  ' Decreasing</span>'
-                : direction === 0
-                ? '<span class="map-popup-region-value" style="background-color: ' +
-                  DIRECTION_THEME.steady +
-                  '; color: ' +
-                  getTextColorBasedOnBackground(DIRECTION_THEME.steady) +
-                  '">' +
-                  DIRECTION_THEME.steadyIcon +
-                  ' Steady</span>'
-                : '<span class="map-popup-region-value">n/a</span>')
-            : ''
-        }
+        ${sens.yAxis}:
+        <span class="map-popup-region-value" 
+              style="background-color: ${fillColor}; 
+                     color: ${getTextColorBasedOnBackground(fillColor)};">
+          ${value.toFixed(2)}
+          ${sens.format === 'percent' ? '%' : ''}
+        </span>
       </div>
-    `;
+      `;
+    } else {
+      let color, icon, text;
+      if (direction === 1) {
+        color = DIRECTION_THEME.increasing;
+        icon = DIRECTION_THEME.increasingIcon;
+        text = 'Increasing';
+      } else if (direction === 0) {
+        color = DIRECTION_THEME.steady;
+        icon = DIRECTION_THEME.steadyIcon;
+        text = 'Steady';
+      } else {
+        color = DIRECTION_THEME.decreasing;
+        icon = DIRECTION_THEME.decreasingIcon;
+        text = 'Decreasing';
+      }
+
+      body = `<div class="map-popup-region-value-container">
+                <span class="map-popup-region-value" 
+                      style="background-color: ${color};
+                      color: 
+                      ${getTextColorBasedOnBackground(color)};">
+                  ${icon} ${text} 
+                </span>
+               </div>`;
+    }
+
+    body =
+      `<div class="map-popup-region-name">
+        ${title}
+      </div>` + body;
 
     popup
       .setLngLat(e.lngLat)
-      .setHTML(title)
+      .setHTML(body)
       .addTo(map);
   };
 

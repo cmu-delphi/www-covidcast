@@ -180,7 +180,7 @@
     getFormat() {
       let format = $sensorMap.get($currentSensor).format;
       if (format === 'percent') return d => d + '%';
-      else if (format === 'raw') return d3.format('.0f');
+      else if (format === 'raw') return d3.format('.1f');
       return d => d;
     }
 
@@ -312,15 +312,6 @@
       myData = myData.filter(it => parseTime(it['time_value']) <= maxDate);
       myData = myData.filter(it => parseTime(it['time_value']) >= minDate);
 
-      // set x-axis ticks based off of data sparsity and format y-axis ticks
-      var xTicks = myData.length;
-      // var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(5);
-      // formatXTicks = xTicks > 40 ? d3.timeDay.every(5) : d3.format(10);
-      // var formatXTicks = 8;
-      // console.log('format: ' + formatXTicks);
-
-      var formatYTicks = this.getFormat();
-
       let currDate = parseTime($currentDate);
       let currDateSeven = parseTime($currentDate);
       currDateSeven.setDate(currDate.getDate() - 6);
@@ -345,14 +336,6 @@
       }
 
       if (chartMax > 100 && $sensorMap.get($currentSensor).format === 'percent') {
-        // console.log('seeting max');
-        // console.log('seeting max');
-        // console.log('seeting max');
-        // console.log('seeting max');
-        // console.log('seeting max');
-        // console.log('seeting max');
-        // console.log('seeting max');
-        // console.log('seeting max');
         chartMax = 100;
       }
 
@@ -366,8 +349,11 @@
         .domain([this.min, chartMax])
         .range([height, 0]);
 
+      var xTicks = myData.length;
+
+      var formatYTicks = this.getFormat();
       var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(4);
-      // var formatXTicks = xTicks < 6 ? d3.timeDay.every(1) : d3.timeDay.every(5);
+
       // append the axes
       svg
         .append('g')
@@ -566,7 +552,6 @@
     {$currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' === '000' ? 'Rest of' : ''}
     {$currentRegionName}
     {$currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' !== '000' ? 'County' : ''}
-    {$currentRegionName && $currentLevel === 'msa' ? 'Metro Area' : ''}
   </p>
 
   <div bind:clientWidth={w} class="graph-itself">

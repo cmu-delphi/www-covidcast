@@ -177,6 +177,8 @@
       .then(meta => {
         let timeMap = new Map();
         let statsMap = new Map();
+        console.log(meta.epidata.filter(d => d.data_source === 'jhu-csse'));
+        console.log(meta.epidata.map(d => d.data_source));
 
         Array.from($sensorMap.keys()).forEach(sensorKey => {
           let sEntry = $sensorMap.get(sensorKey);
