@@ -33,6 +33,8 @@
   let userCharts = [];
   let currentChart = 0;
 
+  currentRegionName.subscribe(d => console.log(d));
+
   onMount(_ => {
     drawGraph();
     regionData.subscribe(d => updateGraph(d));
@@ -416,7 +418,8 @@
             d3.timeFormat('%m/%d')(parseTime(d.time_value)) +
             ': ' +
             d.value.toFixed(2) +
-            ($sensorMap.get($currentSensor).format === 'percent' ? '%' : '')
+            ($sensorMap.get($currentSensor).format === 'percent' ? '%' : '') +
+            (d.stderr ? ' ± ' + d.stderr.toFixed(2) : '')
           );
         });
 

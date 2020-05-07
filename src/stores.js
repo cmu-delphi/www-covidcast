@@ -19,7 +19,7 @@ export const sensors = readable(
       chartTitleText: 'Percentage of doctor visits that are due to COVID-like Symptoms',
       yAxis: 'Percentage',
       format: 'percent',
-      signal: 'smoothed_cli',
+      signal: 'smoothed_adj_cli',
       levels: ['county', 'msa', 'state'],
       official: false,
     },
@@ -53,37 +53,50 @@ export const sensors = readable(
       tooltipText: 'Relative frequency of COVID-related Google searches',
       mapTitleText: 'Relative frequency of COVID-related Google searches',
       chartTitleText: 'Relative frequency of COVID-related Google searches',
-      yAxis: 'Relative frequency',
+      yAxis: 'Frequency (arbitrary scale)',
       format: 'raw',
       signal: 'smoothed_search',
       levels: ['msa', 'state'],
       official: false,
     },
     {
+      name: 'Consensus',
+      id: 'consensus',
+      tooltipText: 'Consensus Score of All Indicators Available for This Date',
+      mapTitleText: 'Consensus Score of All Indicators Available for This Date',
+      chartTitleText: 'Consensus Score of All Indicators Available for This Date',
+      yAxis: 'Score (arbitrary scale)',
+      format: 'raw',
+      signal: 'consensus_day',
+      levels: ['county', 'msa', 'state'],
+      official: false,
+    },
+    {
       name: 'Cases (JHU)',
       id: 'jhu-csse',
-      tooltipText: 'New COVID cases per 100k people, as reported by Johns Hopkins University',
-      mapTitleText: 'New confirmed COVID-19 cases per 100k people',
-      chartTitleText: 'New confirmed COVID-19 cases per 100k people',
-      yAxis: 'Cases per 100k people',
+      tooltipText: 'New COVID-19 cases per 100,000 people, as reported by Johns Hopkins University',
+      mapTitleText: 'New confirmed COVID-19 cases per 100,000 people',
+      chartTitleText: 'New confirmed COVID-19 cases per 100,000 people',
+      yAxis: 'Cases per 100,000 people',
       format: 'raw',
-      signal: 'confirmed_incidence',
+      signal: 'confirmed_incidence_prop',
       levels: ['msa', 'county', 'state'],
       official: true,
     },
     {
       name: 'Deaths (JHU)',
       id: 'jhu-csse',
-      tooltipText: 'New COVID deaths per 100k people, as reported by Johns Hopkins University',
-      mapTitleText: 'New COVID-19 deaths per 100k people',
-      chartTitleText: 'New COVID-19 deaths per 100k people',
-      yAxis: 'Deaths per 100k people',
+      tooltipText: 'New COVID-19 deaths per 100,000 people, as reported by Johns Hopkins University',
+      mapTitleText: 'New COVID-19 deaths per 100,000 people',
+      chartTitleText: 'New COVID-19 deaths per 100,000 people',
+      yAxis: 'Deaths per 100,000 people',
       format: 'raw',
-      signal: 'deaths_incidence',
+      signal: 'deaths_incidence_prop',
       levels: ['msa', 'county', 'state'],
       official: true,
     },
   ],
+
   (set) => {
     let sensorsOption = urlParams.get('sensors');
     sensorsOption ? set(JSON.parse(decodeURIComponent(sensorsOption))) : '';
@@ -129,7 +142,7 @@ export const mapFirstLoaded = writable(false);
 export const currentDataReadyOnMap = writable(false);
 export const customDataView = readable(true, (set) => (urlParams.get('sensors') ? set(true) : set(false)));
 
-export const currentSensor = writable('doctor-visits-smoothed_cli', (set) => {
+export const currentSensor = writable('doctor-visits-smoothed_adj_cli', (set) => {
   let sensor = urlParams.get('sensor');
   sensor ? set(sensor) : '';
   return () => '';

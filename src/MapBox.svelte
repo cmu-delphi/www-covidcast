@@ -56,6 +56,7 @@
   };
 
   const onMouseMove = level => e => {
+    popup.remove();
     if (level === 'state-outline') {
       map.getCanvas().style.cursor = 'pointer';
       popup
@@ -383,10 +384,12 @@
       const found = viableFeatures.filter(f => f.properties.id === $currentRegion);
       if (megaFound.length > 0) {
         megaClickedId = parseInt(megaFound[0].properties.STATE);
+        currentRegionName.set(megaFound[0].properties.NAME);
         map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: true });
       }
       if (found.length > 0) {
         clickedId = found[0].id;
+        currentRegionName.set(found[0].properties.NAME);
         map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
       }
     }
@@ -413,6 +416,7 @@
       className: 'map-popup',
     });
     map.on('mousemove', 'state-outline', onMouseMove('state-outline'));
+    map.on('mouseleave', 'state-outline', onMouseLeave('state-outline'));
     [...Object.keys($levels), 'mega-county'].forEach(level => {
       map.on('mouseenter', level, onMouseEnter(level));
       map.on('mousemove', level, onMouseMove(level));
