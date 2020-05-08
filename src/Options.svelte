@@ -328,6 +328,9 @@
           }}
           disabled={$sensorMap.get($currentSensor).official ? true : false}>
           7-day Trend
+          {#if $sensorMap.get($currentSensor).official}
+            <span class="disabled-tooltip">Currently unavailable</span>
+          {/if}
         </button>
 
       </div>
