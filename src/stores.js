@@ -129,7 +129,7 @@ export const mapFirstLoaded = writable(false);
 export const currentDataReadyOnMap = writable(false);
 export const customDataView = readable(true, (set) => (urlParams.get('sensors') ? set(true) : set(false)));
 
-export const currentSensor = writable('doctor-visits-smoothed_cli', (set) => {
+export const currentSensor = writable('doctor-visits-smoothed_adj_cli', (set) => {
   let sensor = urlParams.get('sensor');
   sensor ? set(sensor) : '';
   return () => '';

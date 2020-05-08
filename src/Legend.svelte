@@ -32,6 +32,8 @@
     background-color: rgba(255, 255, 255, 0.9);
     transition: all 0.1s ease-in;
     height: 100%;
+    display: flex;
+    flex-direction: column;
   }
 
   .legend.value {
@@ -49,6 +51,7 @@
     display: inline-block;
     /* border: 1px solid #dbdbdb; */
     border-top-style: none;
+    transition: none;
   }
 
   .legend p {
@@ -56,12 +59,8 @@
     align-items: center;
     justify-content: flex-start;
     color: rgba(0, 0, 0, 0.7);
-    margin: 0px 0px;
+    margin-right: 5px;
     padding: 0px;
-  }
-
-  .direction-indicators {
-    margin-right: 6px;
   }
 
   .legend-bar {
@@ -73,32 +72,34 @@
 
   .direction-p {
     height: 33%;
+    display: inline-flex;
+    align-items: center;
   }
 </style>
 
 <div aria-label="legend" class="legend {$signalType === 'value' ? 'value' : ''}">
   {#if $signalType === 'direction'}
-    <p class="direction-p">
-      <span class="color inc" style="background-color: {DIRECTION_THEME.increasing}" />
-      <span aria-hidden="true" class="direction-indicators inc">
+    <div class="direction-p">
+      <div class="color inc" style="background-color: {DIRECTION_THEME.increasing}" />
+      <p aria-hidden="true" class="direction-indicators inc">
         {@html DIRECTION_THEME.increasingIcon}
-      </span>
-      Increasing
-    </p>
-    <p class="direction-p">
-      <span class="color const" style="background-color: {DIRECTION_THEME.steady}" />
-      <span aria-hidden="true" class="direction-indicators const">
+      </p>
+      <p>Increasing</p>
+    </div>
+    <div class="direction-p">
+      <div class="color inc" style="background-color: {DIRECTION_THEME.steady}" />
+      <p aria-hidden="true" class="direction-indicators inc">
         {@html DIRECTION_THEME.steadyIcon}
-      </span>
-      Steady
-    </p>
-    <p class="direction-p">
-      <span class="color dec" style="background-color: {DIRECTION_THEME.decreasing}" />
-      <span aria-hidden="true" class="direction-indicators dec">
+      </p>
+      <p>Steady</p>
+    </div>
+    <div class="direction-p">
+      <div class="color inc" style="background-color: {DIRECTION_THEME.decreasing}" />
+      <p aria-hidden="true" class="direction-indicators inc">
         {@html DIRECTION_THEME.decreasingIcon}
-      </span>
-      Decreasing
-    </p>
+      </p>
+      <p>Decreasing</p>
+    </div>
   {:else}
     <p>{high ? high + '+' : ''}</p>
     <div

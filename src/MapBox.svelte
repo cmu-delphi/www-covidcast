@@ -56,7 +56,6 @@
   };
 
   const onMouseMove = level => e => {
-    popup.remove();
     if (level === 'state-outline') {
       map.getCanvas().style.cursor = 'pointer';
       popup
