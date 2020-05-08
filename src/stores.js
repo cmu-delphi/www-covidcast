@@ -1,4 +1,4 @@
-import { writable, readable, derived } from 'svelte/store';
+import { writable, readable, derived, get } from 'svelte/store';
 import { injectIDs } from './util.js';
 import * as d3 from 'd3';
 import moment from 'moment';
@@ -19,7 +19,7 @@ export const sensors = readable(
       chartTitleText: 'Percentage of doctor visits that are due to COVID-like symptoms',
       yAxis: 'Percentage',
       format: 'percent',
-      signal: 'smoothed_cli',
+      signal: 'smoothed_adj_cli',
       levels: ['county', 'msa', 'state'],
       official: false,
     },
@@ -129,9 +129,9 @@ export const mapFirstLoaded = writable(false);
 export const currentDataReadyOnMap = writable(false);
 export const customDataView = readable(true, (set) => (urlParams.get('sensors') ? set(true) : set(false)));
 
-export const currentSensor = writable('doctor-visits-smoothed_adj_cli', (set) => {
+export const currentSensor = writable('', (set) => {
   let sensor = urlParams.get('sensor');
-  sensor ? set(sensor) : '';
+  sensor ? set(sensor) : set(Array.from(get(sensorMap).keys())[0]);
   return () => '';
 });
 // 'county', 'state', or 'msa'
