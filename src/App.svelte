@@ -145,6 +145,8 @@
       currentDate.set(date);
     }
 
+    $sensorMap.get(s).official ? signalType.set('value') : '';
+
     updateRegionSliceCache(s, l, date, 'sensor-change');
   });
 
