@@ -325,7 +325,8 @@
           on:click={() => {
             currentDataReadyOnMap.set(false);
             signalType.set('direction');
-          }}>
+          }}
+          disabled={$sensorMap.get($currentSensor).official ? true : false}>
           7-day Trend
         </button>
 
