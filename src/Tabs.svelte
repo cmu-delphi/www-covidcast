@@ -28,8 +28,6 @@
     justify-content: center;
     align-items: stretch;
     flex-wrap: wrap;
-    /* justify-content: center; */
-    /* flex-wrap: wrap; */
     pointer-events: auto;
   }
 
@@ -50,10 +48,7 @@
     padding-right: 1em;
     padding-top: calc(0.5em - 1px);
     text-align: center;
-    /* white-space: nowrap; */
-
     transition: all 0.1s ease-in;
-
     position: relative;
   }
 
@@ -94,7 +89,6 @@
 
   .buttons-group-side .button.selected {
     background-color: #767676;
-    /* border-color: transparent; */
     color: #fff;
     font-weight: 600;
   }
@@ -106,7 +100,6 @@
 
   .buttons-group-side .button:focus,
   .buttons-group-side .button:active {
-    /* box-shadow: none !important; */
     outline: none;
   }
 
@@ -121,12 +114,7 @@
   .banner {
     box-sizing: border-box;
     max-width: 800px;
-    /* border-radius: 6px; */
-    /* border-style: solid;
-    border-width: 1px;
-    border-color: #666; */
     background-color: rgba(255, 255, 255, 0.9);
-    /* background-color: transparent; */
     color: #333;
     font-weight: 400;
     font-size: 1.6em;
@@ -134,9 +122,7 @@
     font-weight: 600;
     text-align: center;
     padding: 5px 24px;
-
     pointer-events: none;
-
     position: relative;
   }
 
@@ -144,10 +130,7 @@
     padding: 1px 5px;
     margin: 0;
     background: transparent;
-    /* background-color: rgba(255,255,255, 0.9); */
     pointer-events: auto;
-
-    /* position: relative; */
   }
 
   .hide-banner-button {
@@ -165,7 +148,6 @@
     background-color: transparent;
     padding: 0;
     border: 0;
-
     transition: opacity 0.1s ease-in;
     pointer-events: auto;
     opacity: 0.5;

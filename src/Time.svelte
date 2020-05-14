@@ -83,11 +83,7 @@
         rectifiedRange = (rectifiedMax - rectifiedMin) / (86400 * 1000);
       }
     }
-
     updateSliderUI();
-
-    // currentDate.set(max);
-    // console.log('set to max');
   }
 
   function updateSliderUI() {
@@ -173,8 +169,6 @@
       });
       canLoadMore = true;
     }
-
-    // console.log(canLoadMore);
   }
 
   function sliderOnChange() {
@@ -250,7 +244,6 @@
     position: absolute;
     bottom: -18px;
     left: 10px;
-
     margin: 0;
     font-size: 0.7rem;
     background-color: #fff;
@@ -266,7 +259,6 @@
     padding-left: 0.5rem;
     padding-right: 0.5rem;
     padding-top: calc(0.3rem - 1px);
-
     transition: all 0.1s ease-in;
   }
 
@@ -413,14 +405,7 @@
   }
 
   .loader-container {
-    /* position: absolute;
-    top: 0;
-    bottom: 0;
-    right: -40px;
-    width: 40px; */
-
     height: 100%;
-
     display: flex;
     align-items: center;
     justify-content: center;
@@ -512,7 +497,6 @@
       fill={playInterval ? '#c00' : '#666'}
       stroke={playInterval ? '#c00' : '#666'}>
       <circle cx="100" cy="100" r="90" fill="none" stroke-width="15" />
-      <!-- <polygon points="70, 55 70, 145 145, 100" /> -->
       {#if playInterval}
         <rect x="65" y="52" width="20" height="90" />
         <rect x="115" y="52" width="20" height="90" />

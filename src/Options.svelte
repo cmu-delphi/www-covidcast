@@ -15,12 +15,10 @@
   .toggle-button {
     width: 28px;
     height: 28px;
-    /* border-radius: 5px; */
     cursor: pointer;
     background-color: transparent;
     padding: 0;
     border: 0;
-
     transition: all 0.1s ease-in;
   }
 
@@ -31,17 +29,6 @@
 
   .option {
     width: 100%;
-  }
-
-  .buttons-group-title {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 5px;
-
-    font-weight: 600;
-    font-size: 1em;
   }
 
   .buttons-group {
@@ -68,22 +55,12 @@
     padding-right: 1em;
     padding-top: calc(0.5em - 1px);
     text-align: center;
-    /* white-space: nowrap; */
-
     transition: all 0.1s ease-in;
-
     position: relative;
   }
 
   .buttons-group .button:first-child {
     border-top-color: #dbdbdb;
-    /* border-top-left-radius: 4px; */
-    /* border-top-right-radius: 4px; */
-  }
-
-  .buttons-group .button:last-child {
-    /* border-bottom-left-radius: 4px; */
-    /* border-bottom-right-radius: 4px; */
   }
 
   .buttons-group button.button:disabled {
@@ -135,7 +112,6 @@
   }
 
   .buttons-group-side button.button {
-    /* width: 50%; */
     flex-grow: 1;
     margin: 0;
     font-size: 1em;
@@ -153,10 +129,7 @@
     padding-right: 1em;
     padding-top: calc(0.5em - 1px);
     text-align: center;
-    /* white-space: nowrap; */
-
     transition: all 0.1s ease-in;
-
     position: relative;
   }
 
@@ -168,13 +141,6 @@
 
   .buttons-group-side .button:first-child {
     border-left-color: #dbdbdb;
-    /* border-top-left-radius: 4px; */
-    /* border-bottom-left-radius: 4px; */
-  }
-
-  .buttons-group-side .button:last-child {
-    /* border-top-right-radius: 4px; */
-    /* border-bottom-right-radius: 4px; */
   }
 
   .buttons-group-side button.button .disabled-tooltip {
@@ -215,7 +181,6 @@
   .buttons-group .button.selected,
   .buttons-group-side .button.selected {
     background-color: #767676;
-    /* border-color: transparent; */
     color: #fff;
     font-weight: 600;
   }
@@ -230,14 +195,8 @@
   .buttons-group .button:active,
   .buttons-group-side .button:focus,
   .buttons-group-side .button:active {
-    /* box-shadow: none !important; */
     outline: none;
   }
-
-  /* button.button:disabled:hover {
-    animation: shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-    transform: translate3d(0, 0, 0);
-  } */
 
   @keyframes shake {
     10%,

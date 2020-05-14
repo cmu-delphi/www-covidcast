@@ -1,6 +1,4 @@
 <script>
-  import colorParse from 'color-parse';
-  import invertColor from 'invert-color';
   import mapboxgl from 'mapbox-gl';
   import { onMount } from 'svelte';
   import { defaultRegionOnStartup, getTextColorBasedOnBackground } from './util.js';

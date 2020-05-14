@@ -46,10 +46,8 @@
   .color {
     width: 20px;
     height: 100%;
-    /* border-radius: 50%; */
     margin-right: 10px;
     display: inline-block;
-    /* border: 1px solid #dbdbdb; */
     border-top-style: none;
     transition: none;
   }

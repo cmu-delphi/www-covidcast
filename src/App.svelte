@@ -1,7 +1,5 @@
 <script>
   import { onMount } from 'svelte';
-  import { calculateValFromRectified } from './util.js';
-  import * as d3 from 'd3';
 
   import Options from './Options.svelte';
   import Tabs from './Tabs.svelte';
@@ -11,12 +9,10 @@
   import Graph from './Graph.svelte';
 
   import {
-    sensors,
     sensorMap,
     times,
     stats,
     signalType,
-    currentRange,
     currentSensor,
     currentDate,
     currentLevel,
@@ -35,8 +31,9 @@
   const ENDPOINT = 'https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day';
   const ENDPOINT_META = 'https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast_meta&cached=true';
 
-  // https://stackoverflow.com/a/21712356
+  // Fix for IE: https://stackoverflow.com/a/21712356
   let isIE = window.document.documentMode;
+
   let error = null;
   let graphShowStatus = false;
   let changingSensor = false;
@@ -59,6 +56,7 @@
     ).then(d => d.json());
   }
 
+  // We cache API calls for all regions at a given time and update currentData.
   function updateRegionSliceCache(sensor, level, date, reason = 'unspecified') {
     let sEntry = $sensorMap.get(sensor);
     if (!$mounted || !sEntry.levels.includes(level) || date > $times.get(sensor)[1] || reason === 'level change')
@@ -80,6 +78,7 @@
     }
   }
 
+  // We cache API calls for all time at a given region and update regionData.
   function updateTimeSliceCache(sensor, level, region) {
     let sEntry = $sensorMap.get(sensor);
     if (!$mounted) return;
@@ -118,6 +117,7 @@
     }
   }
 
+  // Since we don't want multiple updates, but currentSensor changes can update // the level and date, we have flags that prevent the async updates.
   currentSensor.subscribe(s => {
     if (!$mounted) return;
 
@@ -216,6 +216,8 @@
         }
 
         let date = $currentDate;
+        // Magic number of default date - if no URL params, use max date
+        // available
         if (date === 20100420) {
           date = timeMap.get($currentSensor)[1];
           currentDate.set(date);
@@ -237,6 +239,7 @@
     }
   }
 
+  // Constantly keep the URL parameters updated with the current state.
   function updateURIParameters(sensor, level, region, date, signalType) {
     let pre = '';
     if ($customDataView) {
