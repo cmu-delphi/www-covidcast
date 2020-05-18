@@ -186,7 +186,6 @@
           let matchedMeta = meta.epidata.find(
             d => d.data_source === sEntry.id && d.signal === sEntry.signal && d.time_type === 'day',
           );
-
           if (matchedMeta) {
             if (matchedMeta.max_time > yesterday) {
               matchedMeta.max_time = yesterday;

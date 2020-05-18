@@ -1,5 +1,12 @@
-import { writable, readable, derived, get } from 'svelte/store';
-import { injectIDs } from './util.js';
+import {
+  writable,
+  readable,
+  derived,
+  get
+} from 'svelte/store';
+import {
+  injectIDs
+} from './util.js';
 import * as d3 from 'd3';
 import moment from 'moment';
 
@@ -10,8 +17,7 @@ const urlParams = new URLSearchParams(queryString);
 // Checks the ?sensors= URI parameter for a custom view,
 // otherwise uses the default.
 export const sensors = readable(
-  [
-    {
+  [{
       name: 'Doctor Visits',
       id: 'doctor-visits',
       tooltipText: 'Percentage of doctor visits that are due to COVID-like symptoms',
@@ -34,18 +40,7 @@ export const sensors = readable(
       signal: 'smoothed_cli',
       levels: ['county', 'msa', 'state'],
       official: false,
-    },
-    {
-      name: 'Surveys (Google)',
-      id: 'google-survey',
-      tooltipText: 'Percentage of Google survey respondents reporting COVID-like symptoms in their community',
-      mapTitleText: 'Percentage of Google survey respondents reporting COVID-like symptoms in their community',
-      chartTitleText: 'Percentage of Google survey respondents reporting COVID-like symptoms in their community',
-      yAxis: 'Percentage',
-      format: 'percent',
-      signal: 'smoothed_cli',
-      levels: ['county', 'state', 'msa'],
-      official: false,
+      bolded: false,
     },
     {
       name: 'Search Trends (Google)',
@@ -58,6 +53,20 @@ export const sensors = readable(
       signal: 'smoothed_search',
       levels: ['msa', 'state'],
       official: false,
+      bolded: false,
+    },
+    {
+      name: 'Combined',
+      id: 'consensus',
+      tooltipText: 'Daily combined indicator (of Doctor Visits, Surveys (Facebook), and Search Trends (Google))',
+      mapTitleText: 'Daily combined indicator',
+      chartTitleText: 'Combined indicator',
+      yAxis: 'Value',
+      format: 'raw',
+      signal: 'consensus_day',
+      levels: ['county', 'msa', 'state'],
+      official: false,
+      bolded: true,
     },
     {
       name: 'Cases (JHU)',
@@ -70,6 +79,7 @@ export const sensors = readable(
       signal: 'confirmed_incidence_prop',
       levels: ['msa', 'county', 'state'],
       official: true,
+      bolded: false,
     },
     {
       name: 'Deaths (JHU)',
@@ -82,6 +92,7 @@ export const sensors = readable(
       signal: 'deaths_incidence_prop',
       levels: ['msa', 'county', 'state'],
       official: true,
+      bolded: false,
     },
   ],
   (set) => {
@@ -175,5 +186,8 @@ export const timeSliceCache = writable(new Map());
 export const regionData = writable([]);
 export const currentData = writable([]);
 
-export const timeRangeOnSlider = writable({ min: 0, max: 0 });
+export const timeRangeOnSlider = writable({
+  min: 0,
+  max: 0,
+});
 export const yesterday = +moment(new Date(new Date().getTime() - 86400 * 1000)).format('YYYYMMDD');

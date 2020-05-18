@@ -198,7 +198,9 @@
           shouldDisplayBanner = true;
         }}>
         <span class="button-tooltip">{$sensorMap.get(sensor).tooltipText}</span>
-        {$sensorMap.get(sensor).name}
+        {#if $sensorMap.get(sensor).bolded}
+          <b>{$sensorMap.get(sensor).name}</b>
+        {:else}{$sensorMap.get(sensor).name}{/if}
       </button>
     {/each}
   </div>
