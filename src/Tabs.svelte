@@ -188,20 +188,35 @@
   <div aria-label="Data Source" class="buttons-group-side">
     <button title="Indicators: " class="tab-label">Indicators:</button>
     {#each Array.from($sensorMap.keys()).filter(d => !$sensorMap.get(d).official) as sensor}
-      <button
-        title={isIE !== undefined ? $sensorMap.get(sensor).tooltipText : ''}
-        aria-pressed={$currentSensor === sensor ? 'true' : 'false'}
-        class="button {$currentSensor === sensor ? 'selected' : ''}"
-        on:click={() => {
-          currentDataReadyOnMap.set(false);
-          currentSensor.set(sensor);
-          shouldDisplayBanner = true;
-        }}>
-        <span class="button-tooltip">{$sensorMap.get(sensor).tooltipText}</span>
-        {#if $sensorMap.get(sensor).bolded}
-          <b>{$sensorMap.get(sensor).name}</b>
-        {:else}{$sensorMap.get(sensor).name}{/if}
-      </button>
+      {#if $sensorMap.get(sensor).bolded}
+        <!-- Button text is red -->
+        <button
+          title={isIE !== undefined ? $sensorMap.get(sensor).tooltipText : ''}
+          aria-pressed={$currentSensor === sensor ? 'true' : 'false'}
+          class="button {$currentSensor === sensor ? 'selected' : ''}"
+          style="color: #8b0000;"
+          on:click={() => {
+            currentDataReadyOnMap.set(false);
+            currentSensor.set(sensor);
+            shouldDisplayBanner = true;
+          }}>
+          <span class="button-tooltip">{$sensorMap.get(sensor).tooltipText}</span>
+          {$sensorMap.get(sensor).name}
+        </button>
+      {:else}
+        <button
+          title={isIE !== undefined ? $sensorMap.get(sensor).tooltipText : ''}
+          aria-pressed={$currentSensor === sensor ? 'true' : 'false'}
+          class="button {$currentSensor === sensor ? 'selected' : ''}"
+          on:click={() => {
+            currentDataReadyOnMap.set(false);
+            currentSensor.set(sensor);
+            shouldDisplayBanner = true;
+          }}>
+          <span class="button-tooltip">{$sensorMap.get(sensor).tooltipText}</span>
+          {$sensorMap.get(sensor).name}
+        </button>
+      {/if}
     {/each}
   </div>
   <div aria-label="Data Source" class="official-side buttons-group-side">

@@ -101,11 +101,14 @@
     let cacheEntry = $timeSliceCache.get(sensor + level + region);
     if (!cacheEntry) {
       callAPI(sEntry.id, sEntry.signal, level, '20100101-20500101', region).then(d => {
-        regionData.set(d.epidata);
-        timeSliceCache.update(m => m.set(sensor + level + region, d.epidata));
+        // regionData.set(d.epidata);
+        // timeSliceCache.update(m => m.set(sensor + level + region, d.epidata));
         if (!checkIfCurrentRegionHasDataOnCurrentDate(d.epidata)) {
           currentRegion.set('');
           currentRegionName.set('');
+        } else {
+          regionData.set(d.epidata);
+          timeSliceCache.update(m => m.set(sensor + level + region, d.epidata));
         }
       });
     } else {

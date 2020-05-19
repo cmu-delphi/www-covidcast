@@ -65,7 +65,6 @@
 
     map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
-
     if (level === 'mega-county') {
       if (hoveredId === null) {
         megaHoveredId = e.features[0].id;
@@ -79,12 +78,10 @@
     }
 
     if (hoveredId !== null && level === 'mega-county') return;
-
     // popup
     const { value, direction, NAME } = e.features[0].properties;
     const fillColor = e.features[0].layer.paint['fill-color'].toString();
     const sens = $sensorMap.get($currentSensor);
-
     let title =
       (level === 'mega-county' ? 'Rest of ' : '') +
       NAME +
@@ -92,17 +89,32 @@
 
     let body;
     if ($signalType === 'value') {
-      body = `
-      <div class="map-popup-region-value-container">
-        ${sens.yAxis}:
-        <span class="map-popup-region-value" 
-              style="background-color: ${fillColor}; 
-                     color: ${getTextColorBasedOnBackground(fillColor)};">
-          ${value.toFixed(2)}
-          ${sens.format === 'percent' ? '%' : ''}
-        </span>
-      </div>
-      `;
+      // More information displayed when deaths is shown
+      if (sens.name === 'Deaths (JHU)') {
+        body = `
+          <div class="map-popup-region-value-container">
+            ${sens.yAxis}:
+            <span class="map-popup-region-value" 
+                  style="background-color: ${fillColor}; 
+                        color: ${getTextColorBasedOnBackground(fillColor)};">
+              ${value.toFixed(2)}
+              ${sens.format === 'percent' ? '%' : ''}
+            </span>
+          </div>
+        `;
+      } else {
+        body = `
+          <div class="map-popup-region-value-container">
+            ${sens.yAxis}:
+            <span class="map-popup-region-value" 
+                  style="background-color: ${fillColor}; 
+                        color: ${getTextColorBasedOnBackground(fillColor)};">
+              ${value.toFixed(2)}
+              ${sens.format === 'percent' ? '%' : ''}
+            </span>
+          </div>
+        `;
+      }
     } else {
       let color, icon, text;
       if (direction === 1) {

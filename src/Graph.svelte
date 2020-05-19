@@ -174,7 +174,7 @@
           ': ' +
           d.value.toFixed(2) +
           ($sensorMap.get(sensor).format === 'percent' ? '%' : '') +
-          (d.stderr ? ' ± ' + d.stderr.toFixed(2) : '')
+          (d.stderr ? ' ± ' + d.stderr.toFixed(2) + ($sensorMap.get(sensor).format === 'percent' ? '%' : '') : '')
         );
       });
     svg.call(tip);
