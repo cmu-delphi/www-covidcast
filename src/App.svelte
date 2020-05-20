@@ -41,11 +41,6 @@
   let dateChangedWhenSensorChanged = false;
 
   function callAPI(id, signal, level, date, region) {
-    console.log(id);
-    console.log(signal);
-    console.log(level);
-    console.log(date);
-    console.log(region);
     return fetch(
       ENDPOINT +
         '&data_source=' +

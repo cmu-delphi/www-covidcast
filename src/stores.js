@@ -133,7 +133,7 @@ export const geojsons = readable(new Map(), function start(set) {
   Promise.all([
     d3.json('./maps/counties-simple.json'),
     d3.json('./maps/states-simple.json'),
-    d3.json('./maps/msa-albers-simple.json'),
+    d3.json('./maps/msa-albers-new.json'),
     d3.json('./maps/city_data/cities-reprojected.json'),
   ]).then(([a, b, c, d]) => {
     let m = new Map();
