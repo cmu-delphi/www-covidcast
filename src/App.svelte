@@ -56,6 +56,23 @@
     ).then(d => d.json());
   }
 
+  // combining json with same geolocations but different value properties
+  // json1 value is ratio of deaths, json2 value is total number of deaths
+  function extend(json1, json2) {
+    var new_epidata = [];
+    var data1 = json1.epidata;
+    var data2 = json2.epidata;
+    for (var i = 0; i < data1.length; i++) {
+      var death_ratio = data1[i].value;
+      var total_daily_death = data2[i].value;
+      data1[i].death_ratio = death_ratio;
+      delete data1[i].value;
+      data1[i].total_daily_death = total_daily_death;
+      new_epidata.push(data1[i]);
+    }
+    return new_epidata;
+  }
+
   // We cache API calls for all regions at a given time and update currentData.
   function updateRegionSliceCache(sensor, level, date, reason = 'unspecified') {
     let sEntry = $sensorMap.get(sensor);
@@ -69,8 +86,17 @@
           currentData.set([]);
           regionSliceCache.update(m => m.set(sensor + level + date, []));
         } else {
-          currentData.set(d.epidata);
-          regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
+          // when displaying deaths, need to disply more info
+          if (sEntry.signal === 'deaths_incidence_prop') {
+            callAPI(sEntry.id, 'deaths_incidence_num', level, date, '*').then(d1 => {
+              var extended = extend(d, d1);
+              currentData.set(extended);
+              regionSliceCache.update(m => m.set(sensor + level + date, extended));
+            });
+          } else {
+            currentData.set(d.epidata);
+            regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
+          }
         }
       });
     } else {

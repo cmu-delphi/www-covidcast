@@ -81,6 +81,7 @@
     // popup
     const { value, direction, NAME } = e.features[0].properties;
     const fillColor = e.features[0].layer.paint['fill-color'].toString();
+
     const sens = $sensorMap.get($currentSensor);
     let title =
       (level === 'mega-county' ? 'Rest of ' : '') +
@@ -91,8 +92,10 @@
     if ($signalType === 'value') {
       // More information displayed when deaths is shown
       if (sens.name === 'Deaths (JHU)') {
+        const death_num = e.features[0].properties.value1;
         body = `
           <div class="map-popup-region-value-container">
+            Deaths : ${death_num} <br>
             ${sens.yAxis}:
             <span class="map-popup-region-value" 
                   style="background-color: ${fillColor}; 
@@ -100,6 +103,7 @@
               ${value.toFixed(2)}
               ${sens.format === 'percent' ? '%' : ''}
             </span>
+            
           </div>
         `;
       } else {
@@ -251,10 +255,18 @@
         const megaKey = key.slice(0, 2) + '';
 
         if (d.value !== null) {
-          if (drawMega && megaIndicator === '000') {
-            valueMappedMega.set(megaKey, d.value);
+          var info = [];
+          if ($sensorMap.get($currentSensor).name === 'Deaths (JHU)') {
+            info.push(d.death_ratio);
+            info.push(d.total_daily_death);
           } else {
-            valueMappedVals.set(key, d.value);
+            info.push(d.value);
+          }
+
+          if (drawMega && megaIndicator === '000') {
+            valueMappedMega.set(megaKey, info);
+          } else {
+            valueMappedVals.set(key, info);
           }
         }
         if (d.direction !== null) {
@@ -275,8 +287,12 @@
 
         d.properties.value = -100;
         d.properties.direction = -100;
+
         if (geoIds.has(id + '000') && valueMappedMega.get(id) !== undefined) {
-          d.properties.value = valueMappedMega.get(id);
+          d.properties.value = valueMappedMega.get(id)[0];
+          if ($sensorMap.get($currentSensor).name === 'Deaths (JHU)') {
+            d.properties.value1 = valueMappedMega.get(id)[1];
+          }
         }
         if (geoIds.has(id + '000') && directionMappedMega.get(id) !== undefined) {
           d.properties.direction = directionMappedMega.get(id);
@@ -290,8 +306,12 @@
 
       d.properties.value = -100;
       d.properties.direction = -100;
+
       if (geoIds.has(id) && valueMappedVals.get(id) !== undefined) {
-        d.properties.value = valueMappedVals.get(id);
+        d.properties.value = valueMappedVals.get(id)[0];
+        if ($sensorMap.get($currentSensor).name === 'Deaths (JHU)') {
+          d.properties.value1 = valueMappedVals.get(id)[1];
+        }
       }
       if (geoIds.has(id) && directionMappedVals.get(id) !== undefined) {
         d.properties.direction = directionMappedVals.get(id);
@@ -331,7 +351,6 @@
       map.getSource($currentLevel).setData(dat);
       drawMega ? map.getSource('mega-county').setData(megaDat) : '';
     }
-
     Object.keys($levels).forEach(name => {
       if (name === $currentLevel) {
         if (map.getLayer(name)) {

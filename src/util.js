@@ -26,7 +26,11 @@ export const injectIDs = (level, data) => {
 };
 export function getTextColorBasedOnBackground(bgColor) {
   // https://github.com/onury/invert-color
-  return invertColor(colorParse(bgColor).values, { black: '#000', white: '#fff', threshold: 0.32 });
+  return invertColor(colorParse(bgColor).values, {
+    black: '#000',
+    white: '#fff',
+    threshold: 0.32
+  });
 }
 
 export const defaultRegionOnStartup = {
