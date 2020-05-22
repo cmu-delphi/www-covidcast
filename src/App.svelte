@@ -127,14 +127,14 @@
     let cacheEntry = $timeSliceCache.get(sensor + level + region);
     if (!cacheEntry) {
       callAPI(sEntry.id, sEntry.signal, level, '20100101-20500101', region).then(d => {
-        // regionData.set(d.epidata);
-        // timeSliceCache.update(m => m.set(sensor + level + region, d.epidata));
+        // creating deepcopy to avoid tampering with the data stored in cache
+        const epi_data = JSON.parse(JSON.stringify(d.epidata));
+        timeSliceCache.update(m => m.set(sensor + level + region, epi_data));
         if (!checkIfCurrentRegionHasDataOnCurrentDate(d.epidata)) {
           currentRegion.set('');
           currentRegionName.set('');
         } else {
           regionData.set(d.epidata);
-          timeSliceCache.update(m => m.set(sensor + level + region, d.epidata));
         }
       });
     } else {

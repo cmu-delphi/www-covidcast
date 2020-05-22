@@ -122,7 +122,6 @@
     if (chartMax > 100 && $sensorMap.get(sensor).format === 'percent') {
       chartMax = 100;
     }
-
     // scale x and y axes
     var x = d3
       .scaleTime()
