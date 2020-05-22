@@ -1,5 +1,5 @@
 {
-  "name": "delphi-hcii-covidcast",
+  "name": "www-covidcast",
   "version": "1.0.0",
   "scripts": {
     "build": "rollup -c",
