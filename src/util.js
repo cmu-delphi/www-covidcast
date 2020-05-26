@@ -12,7 +12,6 @@ export const calculateValFromRectified = (rectified) => {
 export const injectIDs = (level, data) => {
   data.features.forEach((d) => {
     d.properties.level = level;
-
     if (level === 'county') {
       d.id = d.properties.id = d.properties.GEO_ID.slice(-5);
     } else if (level === 'msa') {

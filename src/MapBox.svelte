@@ -79,7 +79,7 @@
 
     if (hoveredId !== null && level === 'mega-county') return;
     // popup
-    const { value, direction, NAME } = e.features[0].properties;
+    const { value, direction, NAME, Population } = e.features[0].properties;
     const fillColor = e.features[0].layer.paint['fill-color'].toString();
 
     const sens = $sensorMap.get($currentSensor);
@@ -95,6 +95,7 @@
         const death_num = e.features[0].properties.value1;
         body = `
           <div class="map-popup-region-value-container">
+            Population: ${Population} <br>
             Deaths : ${death_num} <br>
             ${sens.yAxis}:
             <span class="map-popup-region-value" 

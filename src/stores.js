@@ -131,9 +131,9 @@ export const levels = readable({
 // This loads all the GeoJSON's for each granularity that the MapBox component reads as layers.
 export const geojsons = readable(new Map(), function start(set) {
   Promise.all([
-    d3.json('./maps/counties-simple.json'),
-    d3.json('./maps/states-simple.json'),
-    d3.json('./maps/msa-albers-new.json'),
+    d3.json('./maps/new_counties.json'),
+    d3.json('./maps/new_states.json'),
+    d3.json('./maps/new_msa.json'),
     d3.json('./maps/city_data/cities-reprojected.json'),
   ]).then(([a, b, c, d]) => {
     let m = new Map();
