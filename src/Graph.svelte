@@ -36,9 +36,11 @@
       .remove();
 
     if (w > 400) w = 400;
+
     const margin = { top: 15, right: 35, bottom: 70, left: 60 },
       width = w - margin.left - margin.right,
       height = 0.85 * w - margin.top - margin.bottom;
+
     // size chart
 
     // set ranges
@@ -46,6 +48,7 @@
     let y = d3.scaleLinear().range([height, 0]);
 
     // attach graphic
+
     var svg = d3
       .select(el)
       .append('svg')
@@ -258,7 +261,7 @@
     svg
       .append('text')
       .attr('class', 'axis-text')
-      .attr('transform', 'translate(' + width / 2 + ', ' + (height + margin.top + 40) + ')')
+      .attr('transform', 'translate(' + width / 2 + ', ' + (height + margin.top + 30) + ')')
       .style('text-anchor', 'middle')
       .text('Date');
   }
@@ -276,8 +279,8 @@
 
 <style>
   .graph {
-    max-height: 390px;
-    max-width: 400px;
+    max-height: 351px;
+    max-width: 360px;
   }
 
   .graph-title {

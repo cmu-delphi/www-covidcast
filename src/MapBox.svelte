@@ -48,7 +48,6 @@
       //ZOOM = 4.3;
       ZOOM = Math.min(4.3, containerWidth / 350);
     }
-    console.log(containerWidth);
   });
 
   // Mouse event handlers
