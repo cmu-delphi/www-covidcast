@@ -39,12 +39,16 @@
   onMount(_ => {
     let containerWidth = container.clientWidth;
     if (containerWidth <= 1021) {
-      ZOOM = 3.9;
+      //ZOOM = 3.9;
+      ZOOM = containerWidth / 300;
     } else if (containerWidth > 1021 && containerWidth < 1280) {
-      ZOOM = 4.1;
+      //ZOOM = 4.1;
+      ZOOM = containerWidth / 330;
     } else if (containerWidth >= 1280) {
-      ZOOM = 4.3;
+      //ZOOM = 4.3;
+      ZOOM = Math.min(4.3, containerWidth / 350);
     }
+    console.log(containerWidth);
   });
 
   // Mouse event handlers
@@ -58,7 +62,7 @@
       map.getCanvas().style.cursor = 'pointer';
       popup
         .setLngLat(e.lngLat)
-        .setHTML('Estimate unavailable')
+        .setHTML('Estimate unavailable for rest of ' + e.features[0].properties.NAME)
         .addTo(map);
       return;
     }

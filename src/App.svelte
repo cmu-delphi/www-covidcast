@@ -128,13 +128,14 @@
     if (!cacheEntry) {
       callAPI(sEntry.id, sEntry.signal, level, '20100101-20500101', region).then(d => {
         // creating deepcopy to avoid tampering with the data stored in cache
-        const epi_data = JSON.parse(JSON.stringify(d.epidata));
-        timeSliceCache.update(m => m.set(sensor + level + region, epi_data));
         if (!checkIfCurrentRegionHasDataOnCurrentDate(d.epidata)) {
           currentRegion.set('');
           currentRegionName.set('');
+          timeSliceCache.update(m => m.set(sensor + level + region, d.epidata));
         } else {
+          const epi_data = JSON.parse(JSON.stringify(d.epidata));
           regionData.set(d.epidata);
+          timeSliceCache.update(m => m.set(sensor + level + region, epi_data));
         }
       });
     } else {
