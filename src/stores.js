@@ -76,7 +76,7 @@ export const sensors = readable(
       chartTitleText: 'Combination of COVID-19 indicators',
       yAxis: 'Combined value (arbitrary scale)',
       format: 'raw',
-      signal: 'nmf_day_doc_fbs_ght',
+      signal: 'nmf_day_doc_fbc_fbs_ght',
       levels: ['county', 'msa', 'state'],
       official: false,
       bolded: true,
