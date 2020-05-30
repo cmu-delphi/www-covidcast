@@ -95,7 +95,9 @@
     if ($signalType === 'value') {
       // More information displayed when deaths is shown
       if (sens.name === 'Deaths (JHU)') {
-        const death_num = e.features[0].properties.value1;
+        const death_num = e.features[0].properties.value;
+        const ratio = e.features[0].properties.value1;
+        /*
         body = `
           <div class="map-popup-region-value-container">
             Population: ${Population} <br>
@@ -106,6 +108,20 @@
                         color: ${getTextColorBasedOnBackground(fillColor)};">
               ${value.toFixed(2)}
               ${sens.format === 'percent' ? '%' : ''}
+            </span>
+            
+          </div>
+        `;
+        */
+        body = `
+          <div class="map-popup-region-value-container">
+            Population: ${Population} <br>
+            ${sens.yAxis}: ${ratio.toFixed(2)} ${sens.format === 'percent' ? '%' : ''} <br>
+            Deaths:
+            <span class="map-popup-region-value" 
+                  style="background-color: ${fillColor}; 
+                        color: ${getTextColorBasedOnBackground(fillColor)};">
+              ${death_num}
             </span>
             
           </div>
@@ -242,8 +258,18 @@
     let drawMega = $currentLevel === 'county';
 
     // Get the range for the heatmap.
-    let thisStats = $stats.get($currentSensor);
-    let valueMinMax = [thisStats.mean - 3 * thisStats.std, thisStats.mean + 3 * thisStats.std];
+    let thisStats;
+    let valueMinMax;
+
+    // Customize min max values for deaths
+    if ($sensorMap.get($currentSensor).name === 'Deaths (JHU)') {
+      thisStats = $stats.get($currentSensor + '_count');
+      valueMinMax = [thisStats.low, thisStats.high];
+    } else {
+      thisStats = $stats.get($currentSensor);
+      valueMinMax = [thisStats.mean - 3 * thisStats.std, thisStats.mean + 3 * thisStats.std];
+    }
+
     currentRange.set($signalType === 'value' ? valueMinMax : [-1, 1]);
 
     let valueMappedVals = new Map();
@@ -295,7 +321,8 @@
         if (geoIds.has(id + '000') && valueMappedMega.get(id) !== undefined) {
           d.properties.value = valueMappedMega.get(id)[0];
           if ($sensorMap.get($currentSensor).name === 'Deaths (JHU)') {
-            d.properties.value1 = valueMappedMega.get(id)[1];
+            d.properties.value = valueMappedVals.get(id)[1];
+            d.properties.value1 = valueMappedVals.get(id)[0];
           }
         }
         if (geoIds.has(id + '000') && directionMappedMega.get(id) !== undefined) {
@@ -314,7 +341,8 @@
       if (geoIds.has(id) && valueMappedVals.get(id) !== undefined) {
         d.properties.value = valueMappedVals.get(id)[0];
         if ($sensorMap.get($currentSensor).name === 'Deaths (JHU)') {
-          d.properties.value1 = valueMappedVals.get(id)[1];
+          d.properties.value = valueMappedVals.get(id)[1];
+          d.properties.value1 = valueMappedVals.get(id)[0];
         }
       }
       if (geoIds.has(id) && directionMappedVals.get(id) !== undefined) {
@@ -326,16 +354,31 @@
     let stopsMega;
     if ($signalType === 'value') {
       let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
-      stops = [
-        [Math.max(0, valueMinMax[0]), DIRECTION_THEME.gradientMin],
-        [center, DIRECTION_THEME.gradientMiddle],
-        [valueMinMax[1], DIRECTION_THEME.gradientMax],
-      ];
-      stopsMega = [
-        [Math.max(0, valueMinMax[0]), DIRECTION_THEME.gradientMinMega],
-        [center, DIRECTION_THEME.gradientMiddleMega],
-        [valueMinMax[1], DIRECTION_THEME.gradientMaxMega],
-      ];
+      if ($sensorMap.get($currentSensor).name === 'Deaths (JHU)') {
+        stops = [
+          [0, MAP_THEME.countyFill],
+          [valueMinMax[0], DIRECTION_THEME.gradientMin],
+          [center, DIRECTION_THEME.gradientMiddle],
+          [valueMinMax[1], DIRECTION_THEME.gradientMax],
+        ];
+        stopsMega = [
+          [valueMinMax[0], DIRECTION_THEME.gradientMinMega],
+          [center, DIRECTION_THEME.gradientMiddleMega],
+          [valueMinMax[1], DIRECTION_THEME.gradientMaxMega],
+        ];
+      } else {
+        stops = [
+          [0, MAP_THEME.countyFill],
+          [Math.max(0, valueMinMax[0]), DIRECTION_THEME.gradientMin],
+          [center, DIRECTION_THEME.gradientMiddle],
+          [valueMinMax[1], DIRECTION_THEME.gradientMax],
+        ];
+        stopsMega = [
+          [Math.max(0, valueMinMax[0]), DIRECTION_THEME.gradientMinMega],
+          [center, DIRECTION_THEME.gradientMiddleMega],
+          [valueMinMax[1], DIRECTION_THEME.gradientMaxMega],
+        ];
+      }
     } else {
       stops = [
         [-100, MAP_THEME.countyFill],

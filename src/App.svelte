@@ -212,7 +212,6 @@
 
         Array.from($sensorMap.keys()).forEach(sensorKey => {
           let sEntry = $sensorMap.get(sensorKey);
-
           let matchedMeta = meta.epidata.find(
             d => d.data_source === sEntry.id && d.signal === sEntry.signal && d.time_type === 'day',
           );
@@ -220,13 +219,22 @@
             if (matchedMeta.max_time > yesterday) {
               matchedMeta.max_time = yesterday;
             }
+
             timeMap.set(sensorKey, [matchedMeta.min_time, matchedMeta.max_time]);
             statsMap.set(sensorKey, {
               mean: matchedMeta.mean_value,
               std: matchedMeta.stdev_value,
             });
+            // add min/max count for death count
+            if (sEntry.signal === 'deaths_incidence_prop') {
+              statsMap.set(sensorKey + '_count', {
+                low: Math.max(matchedMeta.min_value, 1),
+                high: matchedMeta.max_value,
+              });
+            }
           } else {
             // If no metadata, use information from sensors.
+            // Used for testing new data
             timeMap.set(sensorKey, [sEntry.minTime, sEntry.maxTime]);
             statsMap.set(sensorKey, {
               mean: sEntry.mean,
