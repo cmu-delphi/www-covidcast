@@ -356,7 +356,7 @@
       let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
       if ($sensorMap.get($currentSensor).name === 'Deaths (JHU)') {
         stops = [
-          [0, MAP_THEME.countyFill],
+          [0, DIRECTION_THEME.deathMin],
           [valueMinMax[0], DIRECTION_THEME.gradientMin],
           [center, DIRECTION_THEME.gradientMiddle],
           [valueMinMax[1], DIRECTION_THEME.gradientMax],
@@ -368,7 +368,6 @@
         ];
       } else {
         stops = [
-          [0, MAP_THEME.countyFill],
           [Math.max(0, valueMinMax[0]), DIRECTION_THEME.gradientMin],
           [center, DIRECTION_THEME.gradientMiddle],
           [valueMinMax[1], DIRECTION_THEME.gradientMax],

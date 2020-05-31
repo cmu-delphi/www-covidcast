@@ -10,8 +10,16 @@
   stats.subscribe(s => (s ? updateLowHigh($currentSensor, s) : ''));
 
   function updateLowHigh(sens, stats) {
-    let sts = stats.get(sens);
-    let valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
+    let sts;
+    let valueMinMax;
+
+    if ($currentSensor === 'jhu-csse-deaths_incidence_prop') {
+      sts = stats.get(sens + '_count');
+      valueMinMax = [sts.low, sts.high];
+    } else {
+      sts = stats.get(sens);
+      valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
+    }
 
     if ($sensorMap.get($currentSensor).format === 'raw') {
       high = valueMinMax[1].toFixed(2);

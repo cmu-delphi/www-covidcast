@@ -14,6 +14,7 @@ export const DIRECTION_THEME = {
   steadyIcon: '&#9644;',
   decreasingIcon: '&#9660;',
   max: color_high,
+  deathMin: '#F2F2F2',
   gradientMin: color_low,
   gradientMiddle: color_medium,
   gradientMax: color_high,
