@@ -97,22 +97,6 @@
       if (sens.name === 'Deaths (JHU)') {
         const death_num = e.features[0].properties.value;
         const ratio = e.features[0].properties.value1;
-        /*
-        body = `
-          <div class="map-popup-region-value-container">
-            Population: ${Population} <br>
-            Deaths : ${death_num} <br>
-            ${sens.yAxis}:
-            <span class="map-popup-region-value" 
-                  style="background-color: ${fillColor}; 
-                        color: ${getTextColorBasedOnBackground(fillColor)};">
-              ${value.toFixed(2)}
-              ${sens.format === 'percent' ? '%' : ''}
-            </span>
-            
-          </div>
-        `;
-        */
         body = `
           <div class="map-popup-region-value-container">
             Population: ${Population} <br>
@@ -321,8 +305,8 @@
         if (geoIds.has(id + '000') && valueMappedMega.get(id) !== undefined) {
           d.properties.value = valueMappedMega.get(id)[0];
           if ($sensorMap.get($currentSensor).name === 'Deaths (JHU)') {
-            d.properties.value = valueMappedVals.get(id)[1];
-            d.properties.value1 = valueMappedVals.get(id)[0];
+            d.properties.value = valueMappedMega.get(id)[1];
+            d.properties.value1 = valueMappedMega.get(id)[0];
           }
         }
         if (geoIds.has(id + '000') && directionMappedMega.get(id) !== undefined) {

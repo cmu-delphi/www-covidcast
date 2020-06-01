@@ -279,8 +279,8 @@
 
 <style>
   .graph {
-    max-height: 351px;
-    max-width: 360px;
+    max-height: 390px;
+    max-width: 400px;
   }
 
   .graph-title {

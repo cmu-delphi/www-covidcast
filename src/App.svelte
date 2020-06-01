@@ -200,7 +200,13 @@
 
   currentRegion.subscribe(r => {
     updateTimeSliceCache($currentSensor, $currentLevel, r);
-    r ? toggleGraphShowStatus(null, true) : toggleGraphShowStatus(null, false);
+    if (!$mounted) {
+      toggleGraphShowStatus(null, false);
+    } else if (r) {
+      toggleGraphShowStatus(null, true);
+    } else {
+      toggleGraphShowStatus(null, false);
+    }
   });
 
   onMount(_ => {
@@ -301,6 +307,7 @@
         signalType,
     );
   }
+
   // Keep the URL updated with the current state
   currentSensor.subscribe(s => updateURIParameters(s, $currentLevel, $currentRegion, $currentDate, $signalType));
   currentLevel.subscribe(l => updateURIParameters($currentSensor, l, $currentRegion, $currentDate, $signalType));
@@ -402,8 +409,8 @@
   }
 
   .graph-toggle-button {
-    width: 30px;
-    height: 30px;
+    width: 70px;
+    height: 35px;
     cursor: pointer;
     background-color: transparent;
     padding: 0;
@@ -414,12 +421,6 @@
 
   .graph-toggle-button:hover {
     background-color: #eee;
-  }
-
-  img.toggle-button-icon {
-    width: 24px;
-    height: 24px;
-    background: transparent;
   }
 
   button.graph-toggle-button .button-tooltip {
@@ -512,7 +513,7 @@
       aria-label="show time series"
       on:click={event => toggleGraphShowStatus(false)}>
       <span class="button-tooltip">Show time series</span>
-      <img class="toggle-button-icon" src="./assets/imgs/line-graph-icon.png" alt="" />
+      <b>Time Graph</b>
     </button>
   </div>
 {/if}
