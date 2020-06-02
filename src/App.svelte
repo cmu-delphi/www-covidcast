@@ -63,11 +63,11 @@
     var data1 = json1.epidata;
     var data2 = json2.epidata;
     for (var i = 0; i < data1.length; i++) {
-      var death_ratio = data1[i].value;
-      var total_daily_death = data2[i].value;
-      data1[i].death_ratio = death_ratio;
+      var ratio = data1[i].value;
+      var count = data2[i].value;
+      data1[i].ratio = ratio;
       delete data1[i].value;
-      data1[i].total_daily_death = total_daily_death;
+      data1[i].count = count;
       new_epidata.push(data1[i]);
     }
     return new_epidata;
@@ -86,14 +86,42 @@
           currentData.set([]);
           regionSliceCache.update(m => m.set(sensor + level + date, []));
         } else {
-          // when displaying deaths, need to disply more info
-          if (sEntry.signal === 'deaths_incidence_prop') {
-            callAPI(sEntry.id, 'deaths_incidence_num', level, date, '*').then(d1 => {
-              var extended = extend(d, d1);
-              currentData.set(extended);
-              regionSliceCache.update(m => m.set(sensor + level + date, extended));
-            });
-          } else {
+          const death_regex = /deaths_incidence_/;
+          const cases_regex = /confirmed_incidence_/;
+          // deaths needs both count and ratio
+          if (sEntry.signal.match(death_regex)) {
+            if (sEntry.signal === 'deaths_incidence_prop') {
+              callAPI(sEntry.id, 'deaths_incidence_num', level, date, '*').then(d1 => {
+                var extended = extend(d, d1);
+                currentData.set(extended);
+                regionSliceCache.update(m => m.set(sensor + level + date, extended));
+              });
+            } else {
+              callAPI(sEntry.id, 'deaths_incidence_prop', level, date, '*').then(d1 => {
+                var extended = extend(d, d1);
+                currentData.set(extended);
+                regionSliceCache.update(m => m.set(sensor + level + date, extended));
+              });
+            }
+          }
+          // cases needs both count and ratio
+          else if (sEntry.signal.match(cases_regex)) {
+            if (sEntry.signal === 'confirmed_incidence_prop') {
+              callAPI(sEntry.id, 'confirmed_incidence_num', level, date, '*').then(d1 => {
+                var extended = extend(d, d1);
+                currentData.set(extended);
+                regionSliceCache.update(m => m.set(sensor + level + date, extended));
+              });
+            } else {
+              callAPI(sEntry.id, 'confirmed_incidence_prop', level, date, '*').then(d1 => {
+                var extended = extend(d, d1);
+                currentData.set(extended);
+                regionSliceCache.update(m => m.set(sensor + level + date, extended));
+              });
+            }
+          }
+          // everything else
+          else {
             currentData.set(d.epidata);
             regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
           }
@@ -232,7 +260,7 @@
               std: matchedMeta.stdev_value,
             });
             // add min/max count for death count
-            if (sEntry.signal === 'deaths_incidence_prop') {
+            if (sEntry.signal.match(/num/)) {
               statsMap.set(sensorKey + '_count', {
                 low: Math.max(matchedMeta.min_value, 1),
                 high: matchedMeta.max_value,

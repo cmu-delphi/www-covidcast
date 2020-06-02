@@ -28,6 +28,7 @@ export const sensors = readable(
       signal: 'smoothed_adj_cli',
       levels: ['county', 'msa', 'state'],
       official: false,
+      bolded: false
     },
     {
       name: 'Symptoms (FB)',
@@ -40,7 +41,7 @@ export const sensors = readable(
       signal: 'smoothed_cli',
       levels: ['county', 'msa', 'state'],
       official: false,
-      bolded: false,
+      bolded: false
     },
     {
       name: 'Symptoms in Community (FB)',
@@ -53,7 +54,7 @@ export const sensors = readable(
       signal: 'smoothed_hh_cmnty_cli',
       levels: ['county', 'msa', 'state'],
       official: false,
-      bolded: false,
+      bolded: false
     },
     {
       name: 'Search Trends (Google)',
@@ -66,47 +67,73 @@ export const sensors = readable(
       signal: 'smoothed_search',
       levels: ['msa', 'state'],
       official: false,
-      bolded: false,
+      bolded: false
     },
     {
-      name: 'Combined',
-      id: 'indicator-combination',
+      name: "Combined",
+      id: "indicator-combination",
       tooltipText: 'Combination of COVID-19 indicators available at this geographic level',
       mapTitleText: 'Combination of COVID-19 indicators',
       chartTitleText: 'Combination of COVID-19 indicators',
       yAxis: 'Combined value (arbitrary scale)',
-      format: 'raw',
-      signal: 'nmf_day_doc_fbc_fbs_ght',
-      levels: ['county', 'msa', 'state'],
+      format: "raw",
+      signal: "nmf_day_doc_fbc_fbs_ght",
+      levels: ["county", "msa", "state"],
       official: false,
-      bolded: true,
+      bolded: true
     },
     {
-      name: 'Cases (JHU)',
+      name: 'Cases',
       id: 'jhu-csse',
-      tooltipText: 'New COVID-19 cases per 100,000 people, as reported by Johns Hopkins University',
-      mapTitleText: 'New confirmed COVID-19 cases per 100,000 people',
-      chartTitleText: 'New confirmed COVID-19 cases per 100,000 people',
+      tooltipText: 'Daily confirmed COVID-19 cases, as reported by Johns Hopkins University',
+      mapTitleText: 'Daily confirmed COVID-19 cases',
+      chartTitleText: 'Daily confirmed COVID-19 cases',
+      yAxis: 'Cases',
+      format: 'raw',
+      signal: 'confirmed_incidence_num',
+      levels: ['msa', 'county', 'state'],
+      official: true,
+      bolded: false
+    },
+    {
+      name: 'Cases per capita',
+      id: 'jhu-csse',
+      tooltipText: 'Daily confirmed COVID-19 cases per 100,000 people, based on data reported by Johns Hopkins University',
+      mapTitleText: 'Daily confirmed COVID-19 cases per 100,000 people',
+      chartTitleText: 'Daily confirmed COVID-19 cases per 100,000 people',
       yAxis: 'Cases per 100,000 people',
       format: 'raw',
       signal: 'confirmed_incidence_prop',
       levels: ['msa', 'county', 'state'],
       official: true,
-      bolded: false,
+      bolded: false
     },
     {
-      name: 'Deaths (JHU)',
+      name: 'Deaths',
       id: 'jhu-csse',
-      tooltipText: 'New COVID-19 deaths per 100,000 people, as reported by Johns Hopkins University',
-      mapTitleText: 'New COVID-19 deaths per 100,000 people',
-      chartTitleText: 'New COVID-19 deaths per 100,000 people',
+      tooltipText: 'Daily COVID-19 deaths, as reported by Johns Hopkins University',
+      mapTitleText: 'Daily COVID-19 deaths',
+      chartTitleText: 'Daily COVID-19 deaths',
+      yAxis: 'Deaths',
+      format: 'raw',
+      signal: 'deaths_incidence_num',
+      levels: ['msa', 'county', 'state'],
+      official: true,
+      bolded: false
+    },
+    {
+      name: 'Deaths per capita',
+      id: 'jhu-csse',
+      tooltipText: 'Daily COVID-19 deaths per 100,000 people, based on data reported by Johns Hopkins University',
+      mapTitleText: 'Daily COVID-19 deaths per 100,000 people',
+      chartTitleText: 'Daily COVID-19 deaths per 100,000 people',
       yAxis: 'Deaths per 100,000 people',
       format: 'raw',
       signal: 'deaths_incidence_prop',
       levels: ['msa', 'county', 'state'],
       official: true,
-      bolded: false,
-    },
+      bolded: false
+    }
   ],
   (set) => {
     let sensorsOption = urlParams.get('sensors');

@@ -94,20 +94,68 @@
     let body;
     if ($signalType === 'value') {
       // More information displayed when deaths is shown
-      if (sens.name === 'Deaths (JHU)') {
+      if ($currentSensor.match(/deaths_incidence_num/)) {
         const death_num = e.features[0].properties.value;
         const ratio = e.features[0].properties.value1;
         body = `
           <div class="map-popup-region-value-container">
             Population: ${Population} <br>
-            ${sens.yAxis}: ${ratio.toFixed(2)} ${sens.format === 'percent' ? '%' : ''} <br>
-            Deaths:
+            Death per 100,000 people: ${ratio.toFixed(2)} ${sens.format === 'percent' ? '%' : ''} <br>
+            ${sens.yAxis}:
             <span class="map-popup-region-value" 
                   style="background-color: ${fillColor}; 
                         color: ${getTextColorBasedOnBackground(fillColor)};">
               ${death_num}
             </span>
             
+          </div>
+        `;
+      } else if ($currentSensor.match(/deaths_incidence_prop/)) {
+        const death_num = e.features[0].properties.value;
+        const ratio = e.features[0].properties.value1;
+        body = `
+          <div class="map-popup-region-value-container">
+            Population: ${Population} <br>
+            Deaths: ${death_num} <br>
+            ${sens.yAxis}:
+            <span class="map-popup-region-value" 
+                  style="background-color: ${fillColor}; 
+                        color: ${getTextColorBasedOnBackground(fillColor)};">
+              ${ratio.toFixed(2)}
+              ${sens.format === 'percent' ? '%' : ''}
+            </span>
+          </div>
+        `;
+      } else if ($currentSensor.match(/confirmed_incidence_num/)) {
+        const cases_num = e.features[0].properties.value;
+        const ratio = e.features[0].properties.value1;
+        body = `
+          <div class="map-popup-region-value-container">
+            Population: ${Population} <br>
+            Cases per 100,000 people: ${ratio.toFixed(2)} ${sens.format === 'percent' ? '%' : ''} <br>
+            ${sens.yAxis}:
+            <span class="map-popup-region-value" 
+                  style="background-color: ${fillColor}; 
+                        color: ${getTextColorBasedOnBackground(fillColor)};">
+              ${cases_num}
+            </span>
+            
+          </div>
+        `;
+      } else if ($currentSensor.match(/confirmed_incidence_prop/)) {
+        const cases_num = e.features[0].properties.value;
+        const ratio = e.features[0].properties.value1;
+        body = `
+          <div class="map-popup-region-value-container">
+            Population: ${Population} <br>
+            Cases: ${cases_num} <br>
+            ${sens.yAxis}:
+            <span class="map-popup-region-value" 
+                  style="background-color: ${fillColor}; 
+                        color: ${getTextColorBasedOnBackground(fillColor)};">
+              ${ratio.toFixed(2)}
+              ${sens.format === 'percent' ? '%' : ''}
+            </span>
           </div>
         `;
       } else {
@@ -246,7 +294,7 @@
     let valueMinMax;
 
     // Customize min max values for deaths
-    if ($sensorMap.get($currentSensor).name === 'Deaths (JHU)') {
+    if ($currentSensor.match(/num/)) {
       thisStats = $stats.get($currentSensor + '_count');
       valueMinMax = [thisStats.low, thisStats.high];
     } else {
@@ -270,9 +318,9 @@
 
         if (d.value !== null) {
           var info = [];
-          if ($sensorMap.get($currentSensor).name === 'Deaths (JHU)') {
-            info.push(d.death_ratio);
-            info.push(d.total_daily_death);
+          if ($currentSensor.match(/prop/) || $currentSensor.match(/num/)) {
+            info.push(d.ratio);
+            info.push(d.count);
           } else {
             info.push(d.value);
           }
@@ -304,7 +352,11 @@
 
         if (geoIds.has(id + '000') && valueMappedMega.get(id) !== undefined) {
           d.properties.value = valueMappedMega.get(id)[0];
-          if ($sensorMap.get($currentSensor).name === 'Deaths (JHU)') {
+
+          if ($currentSensor.match(/num/)) {
+            d.properties.value = valueMappedMega.get(id)[0];
+            d.properties.value1 = valueMappedMega.get(id)[1];
+          } else if ($currentSensor.match(/prop/)) {
             d.properties.value = valueMappedMega.get(id)[1];
             d.properties.value1 = valueMappedMega.get(id)[0];
           }
@@ -324,7 +376,10 @@
 
       if (geoIds.has(id) && valueMappedVals.get(id) !== undefined) {
         d.properties.value = valueMappedVals.get(id)[0];
-        if ($sensorMap.get($currentSensor).name === 'Deaths (JHU)') {
+        if ($currentSensor.match(/num/)) {
+          d.properties.value = valueMappedVals.get(id)[0];
+          d.properties.value1 = valueMappedVals.get(id)[1];
+        } else if ($currentSensor.match(/prop/)) {
           d.properties.value = valueMappedVals.get(id)[1];
           d.properties.value1 = valueMappedVals.get(id)[0];
         }
@@ -338,7 +393,7 @@
     let stopsMega;
     if ($signalType === 'value') {
       let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
-      if ($sensorMap.get($currentSensor).name === 'Deaths (JHU)') {
+      if ($currentSensor.match(/num/)) {
         stops = [
           [0, DIRECTION_THEME.deathMin],
           [valueMinMax[0], DIRECTION_THEME.gradientMin],
@@ -346,6 +401,7 @@
           [valueMinMax[1], DIRECTION_THEME.gradientMax],
         ];
         stopsMega = [
+          [0, DIRECTION_THEME.deathMin],
           [valueMinMax[0], DIRECTION_THEME.gradientMinMega],
           [center, DIRECTION_THEME.gradientMiddleMega],
           [valueMinMax[1], DIRECTION_THEME.gradientMaxMega],

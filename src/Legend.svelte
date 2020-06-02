@@ -13,7 +13,7 @@
     let sts;
     let valueMinMax;
 
-    if ($currentSensor === 'jhu-csse-deaths_incidence_prop') {
+    if ($currentSensor.match(/num/)) {
       sts = stats.get(sens + '_count');
       valueMinMax = [sts.low, sts.high];
     } else {
