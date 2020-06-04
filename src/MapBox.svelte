@@ -392,6 +392,7 @@
     let stops;
     let stopsMega;
     if ($signalType === 'value') {
+      valueMinMax[0] = Math.max(0, valueMinMax[0]);
       let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
       if ($currentSensor.match(/num/)) {
         stops = [
@@ -408,12 +409,12 @@
         ];
       } else {
         stops = [
-          [Math.max(0, valueMinMax[0]), DIRECTION_THEME.gradientMin],
+          [valueMinMax[0], DIRECTION_THEME.gradientMin],
           [center, DIRECTION_THEME.gradientMiddle],
           [valueMinMax[1], DIRECTION_THEME.gradientMax],
         ];
         stopsMega = [
-          [Math.max(0, valueMinMax[0]), DIRECTION_THEME.gradientMinMega],
+          [valueMinMax[0], DIRECTION_THEME.gradientMinMega],
           [center, DIRECTION_THEME.gradientMiddleMega],
           [valueMinMax[1], DIRECTION_THEME.gradientMaxMega],
         ];
