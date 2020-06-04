@@ -1,32 +1,35 @@
 <script>
-  import { signalType, stats, currentSensor, sensorMap } from './stores.js';
+  import { signalType, stats, currentSensor, sensorMap, currentLevel } from './stores.js';
   import { DIRECTION_THEME } from './theme.js';
   import * as d3 from 'd3';
 
   let high = '';
   let low = '';
 
-  currentSensor.subscribe(s => ($stats ? updateLowHigh(s, $stats) : ''));
-  stats.subscribe(s => (s ? updateLowHigh($currentSensor, s) : ''));
+  currentSensor.subscribe(s => ($stats ? updateLowHigh(s, $stats, $currentLevel) : ''));
+  stats.subscribe(s => (s ? updateLowHigh($currentSensor, s, $currentLevel) : ''));
+  currentLevel.subscribe(l => ($stats ? updateLowHigh($currentSensor, $stats, l) : ''));
 
-  function updateLowHigh(sens, stats) {
+  function updateLowHigh(sens, stats, level) {
     let sts;
     let valueMinMax;
 
     if ($currentSensor.match(/num/)) {
-      sts = stats.get(sens + '_count');
-      valueMinMax = [sts.low, sts.high];
+      sts = stats.get(sens + '_' + level);
+      valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
+
+      high = Math.round(valueMinMax[1]);
+      low = Math.round(Math.max(0, valueMinMax[0]));
     } else {
       sts = stats.get(sens);
       valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
-    }
-
-    if ($sensorMap.get($currentSensor).format === 'raw') {
-      high = valueMinMax[1].toFixed(2);
-      low = Math.max(0, valueMinMax[0]).toFixed(2);
-    } else {
-      high = Math.min(100, valueMinMax[1]).toFixed(2) + '% ';
-      low = Math.max(0, valueMinMax[0]).toFixed(2) + '% ';
+      if ($sensorMap.get($currentSensor).format === 'raw') {
+        high = valueMinMax[1].toFixed(2);
+        low = Math.max(0, valueMinMax[0]).toFixed(2);
+      } else {
+        high = Math.min(100, valueMinMax[1]).toFixed(2) + '% ';
+        low = Math.max(0, valueMinMax[0]).toFixed(2) + '% ';
+      }
     }
   }
 </script>

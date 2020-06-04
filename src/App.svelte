@@ -98,7 +98,7 @@
               });
             } else {
               callAPI(sEntry.id, 'deaths_incidence_prop', level, date, '*').then(d1 => {
-                var extended = extend(d, d1);
+                var extended = extend(d1, d);
                 currentData.set(extended);
                 regionSliceCache.update(m => m.set(sensor + level + date, extended));
               });
@@ -114,7 +114,7 @@
               });
             } else {
               callAPI(sEntry.id, 'confirmed_incidence_prop', level, date, '*').then(d1 => {
-                var extended = extend(d, d1);
+                var extended = extend(d1, d);
                 currentData.set(extended);
                 regionSliceCache.update(m => m.set(sensor + level + date, extended));
               });
@@ -246,34 +246,63 @@
 
         Array.from($sensorMap.keys()).forEach(sensorKey => {
           let sEntry = $sensorMap.get(sensorKey);
-          let matchedMeta = meta.epidata.find(
-            d => d.data_source === sEntry.id && d.signal === sEntry.signal && d.time_type === 'day',
-          );
-          if (matchedMeta) {
-            if (matchedMeta.max_time > yesterday) {
-              matchedMeta.max_time = yesterday;
-            }
+          let matchedMeta;
+          // need to chagne mean / std for counts
+          if (sEntry.signal.match(/num/)) {
+            const regions = sEntry.levels;
+            regions.forEach(region => {
+              matchedMeta = meta.epidata.find(
+                d =>
+                  d.data_source === sEntry.id &&
+                  d.signal === sEntry.signal &&
+                  d.time_type === 'day' &&
+                  d.geo_type === region,
+              );
+              if (matchedMeta) {
+                if (matchedMeta.max_time > yesterday) {
+                  matchedMeta.max_time = yesterday;
+                }
 
-            timeMap.set(sensorKey, [matchedMeta.min_time, matchedMeta.max_time]);
-            statsMap.set(sensorKey, {
-              mean: matchedMeta.mean_value,
-              std: matchedMeta.stdev_value,
+                timeMap.set(sensorKey, [matchedMeta.min_time, matchedMeta.max_time]);
+
+                statsMap.set(sensorKey + '_' + region, {
+                  mean: matchedMeta.mean_value,
+                  std: matchedMeta.stdev_value,
+                });
+              } else {
+                // If no metadata, use information from sensors
+                // Used for testing new data
+                timeMap.set(sensorKey, [sEntry.minTime, sEntry.maxTime]);
+                statsMap.set(sensorKey, {
+                  mean: sEntry.mean,
+                  std: sEntry.std,
+                });
+              }
             });
-            // add min/max count for death count
-            if (sEntry.signal.match(/num/)) {
-              statsMap.set(sensorKey + '_count', {
-                low: Math.max(matchedMeta.min_value, 1),
-                high: matchedMeta.max_value,
+          } else {
+            matchedMeta = meta.epidata.find(
+              d => d.data_source === sEntry.id && d.signal === sEntry.signal && d.time_type === 'day',
+            );
+            if (matchedMeta) {
+              if (matchedMeta.max_time > yesterday) {
+                matchedMeta.max_time = yesterday;
+              }
+
+              timeMap.set(sensorKey, [matchedMeta.min_time, matchedMeta.max_time]);
+
+              statsMap.set(sensorKey, {
+                mean: matchedMeta.mean_value,
+                std: matchedMeta.stdev_value,
+              });
+            } else {
+              // If no metadata, use information from sensors
+              // Used for testing new data
+              timeMap.set(sensorKey, [sEntry.minTime, sEntry.maxTime]);
+              statsMap.set(sensorKey, {
+                mean: sEntry.mean,
+                std: sEntry.std,
               });
             }
-          } else {
-            // If no metadata, use information from sensors.
-            // Used for testing new data
-            timeMap.set(sensorKey, [sEntry.minTime, sEntry.maxTime]);
-            statsMap.set(sensorKey, {
-              mean: sEntry.mean,
-              std: sEntry.std,
-            });
           }
         });
 

@@ -92,6 +92,7 @@
       ($currentLevel === 'county' && level !== 'mega-county' ? ' County' : '');
 
     let body;
+    //console.log(e.features[0].properties);
     if ($signalType === 'value') {
       // More information displayed when deaths is shown
       if ($currentSensor.match(/deaths_incidence_num/)) {
@@ -111,8 +112,8 @@
           </div>
         `;
       } else if ($currentSensor.match(/deaths_incidence_prop/)) {
-        const death_num = e.features[0].properties.value;
-        const ratio = e.features[0].properties.value1;
+        const death_num = e.features[0].properties.value1;
+        const ratio = e.features[0].properties.value;
         body = `
           <div class="map-popup-region-value-container">
             Population: ${Population} <br>
@@ -143,8 +144,8 @@
           </div>
         `;
       } else if ($currentSensor.match(/confirmed_incidence_prop/)) {
-        const cases_num = e.features[0].properties.value;
-        const ratio = e.features[0].properties.value1;
+        const cases_num = e.features[0].properties.value1;
+        const ratio = e.features[0].properties.value;
         body = `
           <div class="map-popup-region-value-container">
             Population: ${Population} <br>
@@ -295,8 +296,11 @@
 
     // Customize min max values for deaths
     if ($currentSensor.match(/num/)) {
-      thisStats = $stats.get($currentSensor + '_count');
-      valueMinMax = [thisStats.low, thisStats.high];
+      thisStats = $stats.get($currentSensor + '_' + $currentLevel);
+      valueMinMax = [
+        Math.round(Math.max(0, thisStats.mean - 3 * thisStats.std)),
+        Math.round(thisStats.mean + 3 * thisStats.std),
+      ];
     } else {
       thisStats = $stats.get($currentSensor);
       valueMinMax = [thisStats.mean - 3 * thisStats.std, thisStats.mean + 3 * thisStats.std];
@@ -317,14 +321,12 @@
         const megaKey = key.slice(0, 2) + '';
 
         if (d.value !== null) {
-          var info = [];
+          var info;
           if ($currentSensor.match(/prop/) || $currentSensor.match(/num/)) {
-            info.push(d.ratio);
-            info.push(d.count);
+            info = [d.count, d.ratio];
           } else {
-            info.push(d.value);
+            info = [d.value];
           }
-
           if (drawMega && megaIndicator === '000') {
             valueMappedMega.set(megaKey, info);
           } else {
@@ -373,7 +375,6 @@
 
       d.properties.value = -100;
       d.properties.direction = -100;
-
       if (geoIds.has(id) && valueMappedVals.get(id) !== undefined) {
         d.properties.value = valueMappedVals.get(id)[0];
         if ($currentSensor.match(/num/)) {
@@ -394,6 +395,7 @@
     if ($signalType === 'value') {
       valueMinMax[0] = Math.max(0, valueMinMax[0]);
       let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
+
       if ($currentSensor.match(/num/)) {
         stops = [
           [0, DIRECTION_THEME.deathMin],

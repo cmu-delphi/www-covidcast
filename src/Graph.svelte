@@ -139,7 +139,11 @@
     let format = $sensorMap.get(sensor).format;
     if (format === 'percent') formatYTicks = d => d + '%';
     else if (format === 'raw') {
-      formatYTicks = y.domain[1] - y.domain[0] > 10 ? d3.format('.0f') : d3.format('.1f');
+      if (sensor.match(/num/)) {
+        formatYTicks = d3.format('d');
+      } else {
+        formatYTicks = y.domain[1] - y.domain[0] > 10 ? d3.format('.0f') : d3.format('.1f');
+      }
     }
     var formatXTicks = data.length < 6 ? d3.timeDay.every(1) : d3.timeDay.every(4);
 
@@ -174,7 +178,7 @@
         return (
           d3.timeFormat('%m/%d')(parseTime(d.time_value)) +
           ': ' +
-          d.value.toFixed(2) +
+          (sensor.match(/num/) ? Math.round(d.value) : d.value.toFixed(2)) +
           ($sensorMap.get(sensor).format === 'percent' ? '%' : '') +
           (d.stderr ? ' ± ' + d.stderr.toFixed(2) + ($sensorMap.get(sensor).format === 'percent' ? '%' : '') : '')
         );
@@ -268,7 +272,12 @@
 
   // calculate the graph's min and max range based off the dataset's standard deviation
   function calculateSD(sensor) {
-    let sts = $stats.get(sensor);
+    let sts;
+    if ($currentSensor.match(/num/)) {
+      sts = $stats.get(sensor + '_' + $currentLevel);
+    } else {
+      sts = $stats.get(sensor);
+    }
     var minMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
     if (minMax[0] < 0) {
       minMax[0] = 0;
