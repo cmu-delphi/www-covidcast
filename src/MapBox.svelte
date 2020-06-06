@@ -20,6 +20,7 @@
     mapFirstLoaded,
     sensorMap,
   } from './stores.js';
+  import * as d3 from 'd3';
 
   let LAT = -0.5;
   let LON = -0.5;
@@ -54,6 +55,9 @@
   const onMouseEnter = level => e => {
     map.getCanvas().style.cursor = 'pointer';
     popup.setLngLat(e.lngLat).addTo(map);
+
+    map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
+    map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
   };
 
   const onMouseMove = level => e => {
@@ -68,22 +72,53 @@
 
     map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
+
+    var fillColor;
     if (level === 'mega-county') {
       if (hoveredId === null) {
         megaHoveredId = e.features[0].id;
         map.setFeatureState({ source: level, id: megaHoveredId }, { hover: true });
+        // get hover color for mega county
+        fillColor = e.features[0].layer.paint['fill-color'].toString();
       } else {
         megaHoveredId = null;
       }
     } else {
       hoveredId = e.features[0].id;
       map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
+
+      //get hover color for regular county
+      var color_stops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
+      var value_range = [];
+      var color_range = [];
+
+      for (var i = 0; i < color_stops.length; i++) {
+        value_range.push(color_stops[i][0]);
+        color_range.push(color_stops[i][1].match(/\d+/g));
+      }
+
+      var ramp = d3
+        .scaleLinear()
+        .domain(value_range)
+        .range(color_range);
+
+      var stat_high = color_stops[color_stops.length - 1][0];
+      var stat_low = color_stops[0][0];
+      const value = e.features[0].properties.value;
+      if (value <= stat_low) {
+        fillColor = color_stops[0][1];
+      } else if (value > stat_high) {
+        fillColor = color_stops[color_stops.length - 1][1];
+      } else {
+        var arr = ramp(value);
+        fillColor = 'rgb(' + arr.join(', ') + ')';
+      }
     }
 
     if (hoveredId !== null && level === 'mega-county') return;
     // popup
     const { value, direction, NAME, Population } = e.features[0].properties;
-    const fillColor = e.features[0].layer.paint['fill-color'].toString();
+    //const fillColor = e.features[0].layer.paint['fill-color'].toString();
 
     const sens = $sensorMap.get($currentSensor);
     let title =
@@ -92,9 +127,8 @@
       ($currentLevel === 'county' && level !== 'mega-county' ? ' County' : '');
 
     let body;
-    //console.log(e.features[0].properties);
     if ($signalType === 'value') {
-      // More information displayed when deaths is shown
+      // More information displayed when counts is shown
       if ($currentSensor.match(/deaths_incidence_num/)) {
         const death_num = e.features[0].properties.value;
         const ratio = e.features[0].properties.value1;
