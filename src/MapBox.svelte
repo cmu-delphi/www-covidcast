@@ -430,15 +430,15 @@
       valueMinMax[0] = Math.max(0, valueMinMax[0]);
       let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
 
-      if ($currentSensor.match(/num/)) {
+      if ($currentSensor.match(/num/) || $currentSensor.match(/prop/)) {
         stops = [
-          [0, DIRECTION_THEME.deathMin],
+          [0, DIRECTION_THEME.countMin],
           [valueMinMax[0], DIRECTION_THEME.gradientMin],
           [center, DIRECTION_THEME.gradientMiddle],
           [valueMinMax[1], DIRECTION_THEME.gradientMax],
         ];
         stopsMega = [
-          [0, DIRECTION_THEME.deathMin],
+          [0, DIRECTION_THEME.countMin],
           [valueMinMax[0], DIRECTION_THEME.gradientMinMega],
           [center, DIRECTION_THEME.gradientMiddleMega],
           [valueMinMax[1], DIRECTION_THEME.gradientMaxMega],

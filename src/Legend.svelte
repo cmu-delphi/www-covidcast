@@ -109,6 +109,13 @@
       </p>
       <p>Decreasing</p>
     </div>
+  {:else if $currentSensor.match(/num/)}
+    <p>{high ? high + '+' : ''}</p>
+    <div
+      class="legend-bar"
+      style="background: linear-gradient(to top, {DIRECTION_THEME.countMin} 2% ,{DIRECTION_THEME.gradientMin} 2%, {DIRECTION_THEME.gradientMiddle}
+      51%, {DIRECTION_THEME.gradientMax} 100%)" />
+    <p>{low}</p>
   {:else}
     <p>{high ? high + '+' : ''}</p>
     <div
