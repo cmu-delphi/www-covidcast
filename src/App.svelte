@@ -63,8 +63,8 @@
     var data1 = json1.epidata;
     var data2 = json2.epidata;
     for (var i = 0; i < data1.length; i++) {
-      var ratio = data1[i].value;
-      var count = data2[i].value;
+      var ratio = Math.max(0, data1[i].value);
+      var count = Math.max(0, data2[i].value);
       data1[i].ratio = ratio;
       delete data1[i].value;
       data1[i].count = count;

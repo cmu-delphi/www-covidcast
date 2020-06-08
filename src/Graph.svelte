@@ -100,12 +100,13 @@
     });
 
     let currDate = parseTime(date);
-    let currDateSeven = new Date().setDate(currDate.getDate() - 7);
+    let currDateSeven = d3.timeDay.offset(currDate, -7);
 
     // peg values to max and min if out of range
     let minMax = calculateSD(sensor);
     let chartMax = minMax[1];
     let chartMin = minMax[0];
+
     for (var i = 0; i < data.length; i++) {
       let directionDate = parseTime(data[i].time_value);
       if (directionDate >= currDateSeven && directionDate <= currDate) {
@@ -221,6 +222,7 @@
       .style('stroke-width', d => (d.time_value == date ? 1 : 1))
       .style('fill', d => {
         let color = '#767676';
+        console.log(d.inDirection);
         if (d.inDirection && signal === 'direction') {
           switch (d.direction) {
             case 1:
