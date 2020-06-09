@@ -222,7 +222,6 @@
       .style('stroke-width', d => (d.time_value == date ? 1 : 1))
       .style('fill', d => {
         let color = '#767676';
-        console.log(d.inDirection);
         if (d.inDirection && signal === 'direction') {
           switch (d.direction) {
             case 1:

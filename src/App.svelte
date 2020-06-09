@@ -39,6 +39,7 @@
   let changingSensor = false;
   let levelChangedWhenSensorChanged = false;
   let dateChangedWhenSensorChanged = false;
+  let first_loaded = true;
 
   function callAPI(id, signal, level, date, region) {
     return fetch(
@@ -228,8 +229,9 @@
 
   currentRegion.subscribe(r => {
     updateTimeSliceCache($currentSensor, $currentLevel, r);
-    if (!$mounted) {
+    if (first_loaded && r !== '') {
       toggleGraphShowStatus(null, false);
+      first_loaded = false;
     } else if (r) {
       toggleGraphShowStatus(null, true);
     } else {

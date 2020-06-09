@@ -158,6 +158,7 @@
   }
 
   .tab-label {
+    pointer-events: none;
     font-weight: 800;
     flex-shrink: 0;
     font-size: 1em;
