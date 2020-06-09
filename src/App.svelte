@@ -469,6 +469,7 @@
     width: 70px;
     height: 35px;
     cursor: pointer;
+    color: #333;
     background-color: transparent;
     padding: 0;
     border: 0;
