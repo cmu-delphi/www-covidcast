@@ -91,28 +91,30 @@
       var color_stops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
       var value_range = [];
       var color_range = [];
-
       for (var i = 0; i < color_stops.length; i++) {
         value_range.push(color_stops[i][0]);
         color_range.push(color_stops[i][1].match(/\d+/g));
       }
-
       var ramp = d3
         .scaleLinear()
         .domain(value_range)
         .range(color_range);
+      ramp.clamp(true);
 
-      var stat_high = color_stops[color_stops.length - 1][0];
-      var stat_low = color_stops[0][0];
       const value = e.features[0].properties.value;
-      if (value <= stat_low) {
-        fillColor = color_stops[0][1];
-      } else if (value > stat_high) {
-        fillColor = color_stops[color_stops.length - 1][1];
-      } else {
-        var arr = ramp(value);
-        fillColor = 'rgb(' + arr.join(', ') + ')';
-      }
+      var arr = ramp(value);
+      fillColor = 'rgb(' + arr.join(', ') + ')';
+
+      /*
+      var value_range = [color_stops[0][0], color_stops[color_stops.length - 1][0]];
+
+      const logScale = d3.scaleSymlog().domain(value_range);
+      const colorScaleLog = d3.scaleSequential(d => d3.interpolateYlOrRd(logScale(d)));
+
+      const value = e.features[0].properties.value;
+      var arr = colorScaleLog(value);
+      fillColor = arr;
+      */
     }
 
     if (hoveredId !== null && level === 'mega-county') return;
@@ -431,6 +433,7 @@
       let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
 
       if ($currentSensor.match(/num/) || $currentSensor.match(/prop/)) {
+        valueMinMax[0] = Math.max(valueMinMax[0], 1);
         stops = [
           [0, DIRECTION_THEME.countMin],
           [valueMinMax[0], DIRECTION_THEME.gradientMin],
