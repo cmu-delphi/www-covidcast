@@ -729,7 +729,7 @@
         },
         paint: {
           'text-halo-color': '#fff',
-          'text-halo-width': 02,
+          'text-halo-width': 0,
         },
       });
 
