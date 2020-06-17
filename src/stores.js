@@ -90,7 +90,11 @@ export const sensors = readable(
       chartTitleText: 'Daily confirmed COVID-19 cases',
       yAxis: 'Cases',
       format: 'raw',
-      signal: 'confirmed_incidence_num',
+      signal: 'wip_confirmed_7dav_incid_num',
+      mean: 17.4414,
+      std: 0.234267,
+      minTime: 20200220,
+      maxTime: 20200615,
       levels: ['msa', 'county', 'state'],
       official: true,
       bolded: false
@@ -103,7 +107,11 @@ export const sensors = readable(
       chartTitleText: 'Daily confirmed COVID-19 cases per 100,000 people',
       yAxis: 'Cases per 100,000 people',
       format: 'raw',
-      signal: 'confirmed_incidence_prop',
+      signal: 'wip_confirmed_7dav_incid_prop',
+      mean: 3.36989,
+      std: 0.0193027,
+      minTime: 20200220,
+      maxTime: 20200615,
       levels: ['msa', 'county', 'state'],
       official: true,
       bolded: false
@@ -116,7 +124,11 @@ export const sensors = readable(
       chartTitleText: 'Daily COVID-19 deaths',
       yAxis: 'Deaths',
       format: 'raw',
-      signal: 'deaths_incidence_num',
+      signal: 'wip_deaths_7dav_incid_num',
+      mean: 0.979916,
+      std: 0.0194883,
+      minTime: 20200220,
+      maxTime: 20200615,
       levels: ['msa', 'county', 'state'],
       official: true,
       bolded: false
@@ -129,7 +141,11 @@ export const sensors = readable(
       chartTitleText: 'Daily COVID-19 deaths per 100,000 people',
       yAxis: 'Deaths per 100,000 people',
       format: 'raw',
-      signal: 'deaths_incidence_prop',
+      signal: 'wip_deaths_7dav_incid_prop',
+      mean: 0.135952,
+      std: 0.000759016,
+      minTime: 20200220,
+      maxTime: 20200615,
       levels: ['msa', 'county', 'state'],
       official: true,
       bolded: false
@@ -154,6 +170,7 @@ export const levels = readable({
   msa: 'Metro Area',
   county: 'County',
 });
+
 
 // This loads all the GeoJSON's for each granularity that the MapBox component reads as layers.
 export const geojsons = readable(new Map(), function start(set) {

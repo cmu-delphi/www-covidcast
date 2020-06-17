@@ -2,9 +2,11 @@
   import { signalType, stats, currentSensor, sensorMap, currentLevel } from './stores.js';
   import { DIRECTION_THEME } from './theme.js';
   import * as d3 from 'd3';
+  import logspace from 'compute-logspace';
 
   let high = '';
   let low = '';
+  $: colorArr = [{ label: '0', color: DIRECTION_THEME.countMin }];
 
   currentSensor.subscribe(s => ($stats ? updateLowHigh(s, $stats, $currentLevel) : ''));
   stats.subscribe(s => (s ? updateLowHigh($currentSensor, s, $currentLevel) : ''));
@@ -37,8 +39,17 @@
     }
     colorArr = [{ label: '0', color: DIRECTION_THEME.countMin }];
     var max = Math.log(valueMinMax[1]) / Math.log(10);
+    /*
+    var arr = logspace(0, max, 7);
+    const colorScaleLog = d3.scaleSequentialLog(d3.interpolateYlOrRd).domain([1, valueMinMax[1]]);
+    for (var i = 0; i < arr.length; i++) {
+      arr[i] = Math.round(arr[i]);
+      if (i == arr.length - 1) {
+        colorArr.push({ label: arr[i] + '+', color: colorScaleLog(arr[i]) });
+      } else {
+        colorArr.push({ label: arr[i] + ' - ' + Math.round(arr[i + 1]), color: colorScaleLog(arr[i]) });
     var min = Math.log(Math.max(0.01, valueMinMax[0])) / Math.log(10);
-
+*/
     var arr = logspace(min, max, 7);
     const colorScaleLog = d3.scaleSequentialLog(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
     for (var i = 0; i < arr.length; i++) {
@@ -70,7 +81,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: left;
   }
 
   .color {
@@ -103,6 +114,13 @@
     display: inline-flex;
     align-items: center;
   }
+
+  .count-p {
+    height: 12.5%;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+  }
 </style>
 
 <div aria-label="legend" class="legend {$signalType === 'value' ? 'value' : ''}">
@@ -129,12 +147,12 @@
       <p>Decreasing</p>
     </div>
   {:else if $currentSensor.match(/num/)}
-    <p>{high ? high + '+' : ''}</p>
-    <div
-      class="legend-bar"
-      style="background: linear-gradient(to top, {DIRECTION_THEME.countMin} 2% ,{DIRECTION_THEME.gradientMin} 2%, {DIRECTION_THEME.gradientMiddle}
-      51%, {DIRECTION_THEME.gradientMax} 100%)" />
-    <p>{low}</p>
+    {#each colorArr as { label, color }, i}
+      <div class="count-p">
+        <div class="color inc" style="background-color: {color}" />
+        <p>{label}</p>
+      </div>
+    {/each}
   {:else}
     <p>{high ? high + '+' : ''}</p>
     <div

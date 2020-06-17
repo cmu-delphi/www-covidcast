@@ -1,8 +1,11 @@
 <script>
+  //import mapboxgl from 'mapbox-gl';
+  import { onMount, setContext } from 'svelte';
   import mapboxgl from 'mapbox-gl';
-  import { onMount } from 'svelte';
   import { defaultRegionOnStartup, getTextColorBasedOnBackground } from './util.js';
   import { DIRECTION_THEME, MAP_THEME } from './theme.js';
+  import AutoComplete from 'simple-svelte-autocomplete';
+
   import {
     levels,
     stats,
@@ -21,10 +24,20 @@
     sensorMap,
   } from './stores.js';
   import * as d3 from 'd3';
+  import logspace from 'compute-logspace';
 
   let LAT = -0.5;
   let LON = -0.5;
   let ZOOM = 3.9;
+  let R = 6378137.0;
+  const projection = d3
+    .geoAlbersUsa()
+    .translate([0, 0])
+    .scale(R);
+  const projectionMercartor = d3
+    .geoMercator()
+    .translate([0, 0])
+    .scale(R);
 
   // Boolean tracking if the map has been initialized.
   let mapMounted = false;
@@ -36,6 +49,14 @@
   let megaHoveredId;
   let clickedId;
   let megaClickedId;
+  let state_lst = [];
+  let county_lst = [];
+  let msa_lst = [];
+
+  let selectedRegion;
+  $: region_lst = [];
+  $: loaded = false;
+  $: currentSensorTooltip = $sensorMap.get($currentSensor).mapTitleText;
 
   onMount(_ => {
     let containerWidth = container.clientWidth;
@@ -49,13 +70,16 @@
       //ZOOM = 4.3;
       ZOOM = Math.min(4.3, containerWidth / 350);
     }
+    Promise.all([d3.json('./maps/name_id_info.json')]).then(([a]) => {
+      region_lst = a['all'];
+      loaded = true;
+    });
   });
 
   // Mouse event handlers
   const onMouseEnter = level => e => {
     map.getCanvas().style.cursor = 'pointer';
     popup.setLngLat(e.lngLat).addTo(map);
-
     map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
   };
@@ -80,6 +104,10 @@
         map.setFeatureState({ source: level, id: megaHoveredId }, { hover: true });
         // get hover color for mega county
         var color_stops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
+<<<<<<< HEAD
+        console.log(color_stops);
+=======
+>>>>>>> 56de08532143bc109b346421896f68d2dab7b7a7
         var value_range = [];
         var color_range = [];
         for (var i = 0; i < color_stops.length; i++) {
@@ -104,32 +132,56 @@
 
       //get hover color for regular county
       var color_stops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
-      var value_range = [];
-      var color_range = [];
-      for (var i = 0; i < color_stops.length; i++) {
-        value_range.push(color_stops[i][0]);
-        color_range.push(color_stops[i][1].match(/\d+/g));
+      if ($currentSensor.match(/num/)) {
+        var value_range = [];
+        var color_range = [];
+        for (var i = 0; i < color_stops.length; i++) {
+          value_range.push(color_stops[i][0]);
+          color_range.push(color_stops[i][1].match(/\d+/g));
+        }
+        var ramp = d3
+          .scaleLinear()
+          .domain(value_range)
+          .range(color_range);
+        ramp.clamp(true);
+
+        const value = e.features[0].properties.value;
+        var arr = ramp(value);
+        fillColor = 'rgb(' + arr.join(', ') + ')';
+
+        /*
+        var value_range = [color_stops[0][0], color_stops[color_stops.length - 1][0]];
+
+        const logScale = d3.scaleSymlog().domain(value_range);
+        const colorScaleLog = d3.scaleSequential(d => d3.interpolateYlOrRd(logScale(d)));
+        //const colorScaleLog = d3.scaleSequentialLog(d3.interpolateYlOrRd);
+        console.log(colorScaleLog.ticks(7));
+        console.log(colorScaleLog.invert(0.2));
+        var log = d3.scaleLog().domain([1, 200]);
+        var logformat = logScale.tickFormat(7, '');
+        //console.log(logScale.ticks(7).map(logformat));
+        const value = e.features[0].properties.value;
+        console.log()
+        var arr = colorScaleLog(value);
+        fillColor = arr;
+        */
+      } else {
+        var value_range = [];
+        var color_range = [];
+        for (var i = 0; i < color_stops.length; i++) {
+          value_range.push(color_stops[i][0]);
+          color_range.push(color_stops[i][1].match(/\d+/g));
+        }
+        var ramp = d3
+          .scaleLinear()
+          .domain(value_range)
+          .range(color_range);
+        ramp.clamp(true);
+
+        const value = e.features[0].properties.value;
+        var arr = ramp(value);
+        fillColor = 'rgb(' + arr.join(', ') + ')';
       }
-      var ramp = d3
-        .scaleLinear()
-        .domain(value_range)
-        .range(color_range);
-      ramp.clamp(true);
-
-      const value = e.features[0].properties.value;
-      var arr = ramp(value);
-      fillColor = 'rgb(' + arr.join(', ') + ')';
-
-      /*
-      var value_range = [color_stops[0][0], color_stops[color_stops.length - 1][0]];
-
-      const logScale = d3.scaleSymlog().domain(value_range);
-      const colorScaleLog = d3.scaleSequential(d => d3.interpolateYlOrRd(logScale(d)));
-
-      const value = e.features[0].properties.value;
-      var arr = colorScaleLog(value);
-      fillColor = arr;
-      */
     }
 
     if (hoveredId !== null && level === 'mega-county') return;
@@ -282,7 +334,6 @@
     if (megaClickedId) {
       map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: false });
     }
-
     if (level === 'mega-county') {
       if (hoveredId !== null) return;
       if (megaHoveredId === megaClickedId) {
@@ -291,6 +342,7 @@
         currentRegion.set('');
         return;
       }
+
       map.setFeatureState({ source: 'county', id: clickedId }, { select: false });
       clickedId = null;
       megaClickedId = e.features[0].id;
@@ -319,7 +371,9 @@
 
   // Update the map when sensor or level changes.
   currentData.subscribe(_ => updateMap('data'));
-  currentLevel.subscribe(_ => updateMap('data'));
+  currentLevel.subscribe(s => {
+    updateMap('data');
+  });
   signalType.subscribe(_ => updateMap('signal'));
   mounted.subscribe(_ => updateMap('mounted'));
   currentDate.subscribe(_ => {
@@ -444,31 +498,57 @@
       valueMinMax[0] = Math.max(0, valueMinMax[0]);
       let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
 
-      if ($currentSensor.match(/num/) || $currentSensor.match(/prop/)) {
-        valueMinMax[0] = Math.max(valueMinMax[0], 1);
+      let colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
+      const c1 = d3.rgb(colorScaleLinear(valueMinMax[0]));
+      const c2 = d3.rgb(colorScaleLinear(center));
+      const c3 = d3.rgb(colorScaleLinear(valueMinMax[1]));
+      c1.opacity = 0.5;
+      c2.opacity = 0.5;
+      c3.opacity = 0.5;
+
+      if ($currentSensor.match(/num/)) {
+        var max = Math.log(valueMinMax[1]) / Math.log(10);
+        var arr = logspace(0, max, 7);
+        const colorScaleLog = d3.scaleSequentialLog(d3.interpolateYlOrRd).domain([1, valueMinMax[1]]);
+
+        var tmp_stops = [[0, DIRECTION_THEME.countMin]];
+        for (var i = 0; i < arr.length; i++) {
+          tmp_stops.push([Math.round(arr[i]), colorScaleLog(arr[i])]);
+        }
+        stops = tmp_stops;
+        stopsMega = [
+          [0, DIRECTION_THEME.countMin],
+          [valueMinMax[0], c1.toString()],
+          [center, c2.toString()],
+          [valueMinMax[1], c3.toString()],
+        ];
+      } else if ($currentSensor.match(/prop/)) {
         stops = [
           [0, DIRECTION_THEME.countMin],
-          [valueMinMax[0], DIRECTION_THEME.gradientMin],
-          [center, DIRECTION_THEME.gradientMiddle],
-          [valueMinMax[1], DIRECTION_THEME.gradientMax],
+          [valueMinMax[0], colorScaleLinear(valueMinMax[0])],
+          [center, colorScaleLinear(center)],
+          [valueMinMax[1], colorScaleLinear(valueMinMax[1])],
         ];
         stopsMega = [
           [0, DIRECTION_THEME.countMin],
-          [valueMinMax[0], DIRECTION_THEME.gradientMinMega],
-          [center, DIRECTION_THEME.gradientMiddleMega],
-          [valueMinMax[1], DIRECTION_THEME.gradientMaxMega],
+          [valueMinMax[0], c1.toString()],
+          [center, c2.toString()],
+          [valueMinMax[1], c3.toString()],
         ];
       } else {
         stops = [
-          [valueMinMax[0], DIRECTION_THEME.gradientMin],
-          [center, DIRECTION_THEME.gradientMiddle],
-          [valueMinMax[1], DIRECTION_THEME.gradientMax],
+          [valueMinMax[0], colorScaleLinear(valueMinMax[0])],
+          [center, colorScaleLinear(center)],
+          [valueMinMax[1], colorScaleLinear(valueMinMax[1])],
         ];
+        stopsMega = [[valueMinMax[0], c1.toString()], [center, c2.toString()], [valueMinMax[1], c3.toString()]];
+        /*
         stopsMega = [
           [valueMinMax[0], DIRECTION_THEME.gradientMinMega],
           [center, DIRECTION_THEME.gradientMiddleMega],
           [valueMinMax[1], DIRECTION_THEME.gradientMaxMega],
         ];
+        */
       }
     } else {
       stops = [
@@ -769,13 +849,48 @@
       updateMap('init');
     });
   }
+
+  function geocode(query) {
+    var mapboxAccessToken =
+      'pk.eyJ1Ijoicm9iaW4taGFuIiwiYSI6ImNrYmg3cnNndzAwbG4ycmswMDR3em5qdG4ifQ.ayYbyyloJEyumEVIRC5Wmw';
+    return fetch(
+      'https://api.tiles.mapbox.com/geocoding/v5/mapbox.places/' +
+        encodeURIComponent(query) +
+        '.json?access_token=' +
+        mapboxAccessToken +
+        '&autocomplete=false&country=us&types=place%2Cregion',
+    ).then(d => d.json());
+  }
 </script>
 
 <style>
+  .banner {
+    font-size: 20px;
+    top: 12px;
+    position: absolute;
+    line-height: 1.2em;
+    font-weight: 600;
+    text-align: center;
+    align-items: center;
+    pointer-events: none;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .search {
+    position: absolute;
+    width: 50%;
+    left: 25%;
+    top: 60px;
+    z-index: 1001;
+  }
   .map-container {
     width: 100%;
-    height: 90vh;
+    height: 80vh;
     position: relative;
+    top: 100px;
     min-height: 550px;
   }
 
@@ -825,6 +940,68 @@
   }
 </style>
 
+<div class="banner">
+  <span class="banner-text">{currentSensorTooltip}</span>
+</div>
+
+{#if loaded && region_lst.length != 0}
+  <div class="search">
+    <AutoComplete
+      placeholder="Search"
+      items={region_lst}
+      bind:selectedItem={selectedRegion}
+      labelFieldName="display_name"
+      keywordsFunction={place => place.display_name}
+      maxItemsToShowInList="5"
+      minCharactersToSearch="2"
+      onChange={_ => {
+        if (typeof selectedRegion !== 'undefined') {
+          if (selectedRegion['level'] !== $currentLevel) {
+            currentDataReadyOnMap.set(false);
+            currentLevel.set(selectedRegion['level']);
+          }
+          if (clickedId) {
+            map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: false });
+          }
+          if (megaClickedId) {
+            map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: false });
+          }
+          megaClickedId = null;
+          currentRegionName.set(selectedRegion['name']);
+          currentRegion.set(selectedRegion['property_id']);
+          clickedId = parseInt(selectedRegion['id']);
+          map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+          let zoom_level;
+          if (selectedRegion['level'] === 'county') {
+            zoom_level = 6.5;
+          } else if (selectedRegion['level'] === 'msa') {
+            zoom_level = 6;
+          } else {
+            zoom_level = 5;
+          }
+          var long_offset = 0;
+          var lat_offset = 0;
+          var query = selectedRegion['display_name'];
+          if (selectedRegion['id'] === '72' || selectedRegion['id'].substring(0, 2) === '72') {
+            query = 'Florida';
+            long_offset = 6;
+            lat_offset = -3;
+          } else if (selectedRegion['id'].substring(0, 2) == '02') {
+            query = 'Alaska';
+            zoom_level = 6;
+          }
+          geocode(query).then(d => {
+            var coords = projectionMercartor.invert(projection(d.features[0].center));
+            if (selectedRegion['property_id'] === 'PR' || selectedRegion['id'].substring(0, 2) === '72') {
+              coords[0] += long_offset;
+              coords[1] += lat_offset;
+            }
+            map.flyTo({ center: coords, zoom: zoom_level, essential: true });
+          });
+        }
+      }} />
+  </div>
+{/if}
 <div bind:this={container} class="map-container">
   <div class="state-buttons-holder">
     <button
