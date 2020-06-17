@@ -79,7 +79,22 @@
         megaHoveredId = e.features[0].id;
         map.setFeatureState({ source: level, id: megaHoveredId }, { hover: true });
         // get hover color for mega county
-        fillColor = e.features[0].layer.paint['fill-color'].toString();
+        var color_stops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
+        var value_range = [];
+        var color_range = [];
+        for (var i = 0; i < color_stops.length; i++) {
+          value_range.push(color_stops[i][0]);
+          color_range.push(color_stops[i][1].match(/\d+(\.\d{1,2})?/g));
+        }
+        var ramp = d3
+          .scaleLinear()
+          .domain(value_range)
+          .range(color_range);
+        ramp.clamp(true);
+
+        const value = e.features[0].properties.value;
+        var arr = ramp(value);
+        fillColor = 'rgba(' + arr.join(', ') + ')';
       } else {
         megaHoveredId = null;
       }
@@ -333,10 +348,7 @@
     // Customize min max values for deaths
     if ($currentSensor.match(/num/)) {
       thisStats = $stats.get($currentSensor + '_' + $currentLevel);
-      valueMinMax = [
-        Math.round(Math.max(0, thisStats.mean - 3 * thisStats.std)),
-        Math.round(thisStats.mean + 3 * thisStats.std),
-      ];
+      valueMinMax = [Math.max(0.01, thisStats.mean - 3 * thisStats.std), thisStats.mean + 3 * thisStats.std];
     } else {
       thisStats = $stats.get($currentSensor);
       valueMinMax = [thisStats.mean - 3 * thisStats.std, thisStats.mean + 3 * thisStats.std];
