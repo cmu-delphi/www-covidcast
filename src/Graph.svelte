@@ -141,7 +141,8 @@
     if (format === 'percent') formatYTicks = d => d + '%';
     else if (format === 'raw') {
       if (sensor.match(/num/)) {
-        formatYTicks = d3.format('d');
+        //formatYTicks = d3.format('d');
+        formatYTicks = y.domain[1] - y.domain[0] > 10 ? d3.format('.0f') : d3.format('.2f');
       } else {
         formatYTicks = y.domain[1] - y.domain[0] > 10 ? d3.format('.0f') : d3.format('.1f');
       }
@@ -179,7 +180,8 @@
         return (
           d3.timeFormat('%m/%d')(parseTime(d.time_value)) +
           ': ' +
-          (sensor.match(/num/) ? Math.round(d.value) : d.value.toFixed(2)) +
+          //(sensor.match(/num/) ? Math.round(d.value) : d.value.toFixed(2)) +
+          d.value.toFixed(2) +
           ($sensorMap.get(sensor).format === 'percent' ? '%' : '') +
           (d.stderr ? ' ± ' + d.stderr.toFixed(2) + ($sensorMap.get(sensor).format === 'percent' ? '%' : '') : '')
         );

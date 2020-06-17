@@ -20,8 +20,12 @@
       sts = stats.get(sens + '_' + level);
       valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
 
+      /*
       high = Math.round(valueMinMax[1]);
       low = Math.round(Math.max(0, valueMinMax[0]));
+      */
+      high = valueMinMax[1].toFixed(2);
+      low = Math.max(0, valueMinMax[0]).toFixed(2);
     } else {
       sts = stats.get(sens);
       valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
@@ -35,6 +39,7 @@
     }
     colorArr = [{ label: '0', color: DIRECTION_THEME.countMin }];
     var max = Math.log(valueMinMax[1]) / Math.log(10);
+    /*
     var arr = logspace(0, max, 7);
     const colorScaleLog = d3.scaleSequentialLog(d3.interpolateYlOrRd).domain([1, valueMinMax[1]]);
     for (var i = 0; i < arr.length; i++) {
@@ -43,6 +48,17 @@
         colorArr.push({ label: arr[i] + '+', color: colorScaleLog(arr[i]) });
       } else {
         colorArr.push({ label: arr[i] + ' - ' + Math.round(arr[i + 1]), color: colorScaleLog(arr[i]) });
+    var min = Math.log(Math.max(0.01, valueMinMax[0])) / Math.log(10);
+*/
+    var arr = logspace(min, max, 7);
+    const colorScaleLog = d3.scaleSequentialLog(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
+    for (var i = 0; i < arr.length; i++) {
+      //arr[i] = Math.round(arr[i]);
+      arr[i] = parseFloat(arr[i]).toFixed(2);
+      if (i == arr.length - 1) {
+        colorArr.push({ label: arr[i] + '+', color: colorScaleLog(arr[i]) });
+      } else {
+        colorArr.push({ label: arr[i] + ' - ' + parseFloat(arr[i + 1]).toFixed(2), color: colorScaleLog(arr[i]) });
       }
     }
   }

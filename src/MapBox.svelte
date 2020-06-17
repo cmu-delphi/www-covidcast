@@ -104,7 +104,10 @@
         map.setFeatureState({ source: level, id: megaHoveredId }, { hover: true });
         // get hover color for mega county
         var color_stops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
+<<<<<<< HEAD
         console.log(color_stops);
+=======
+>>>>>>> 56de08532143bc109b346421896f68d2dab7b7a7
         var value_range = [];
         var color_range = [];
         for (var i = 0; i < color_stops.length; i++) {
@@ -399,10 +402,7 @@
     // Customize min max values for deaths
     if ($currentSensor.match(/num/)) {
       thisStats = $stats.get($currentSensor + '_' + $currentLevel);
-      valueMinMax = [
-        Math.round(Math.max(0, thisStats.mean - 3 * thisStats.std)),
-        Math.round(thisStats.mean + 3 * thisStats.std),
-      ];
+      valueMinMax = [Math.max(0.01, thisStats.mean - 3 * thisStats.std), thisStats.mean + 3 * thisStats.std];
     } else {
       thisStats = $stats.get($currentSensor);
       valueMinMax = [thisStats.mean - 3 * thisStats.std, thisStats.mean + 3 * thisStats.std];
@@ -760,7 +760,7 @@
         },
         paint: {
           'text-halo-color': '#fff',
-          'text-halo-width': 2,
+          'text-halo-width': 0,
         },
       });
       map.addLayer({
@@ -777,7 +777,7 @@
         },
         paint: {
           'text-halo-color': '#fff',
-          'text-halo-width': 2,
+          'text-halo-width': 0,
         },
       });
       map.addLayer({
@@ -794,7 +794,7 @@
         },
         paint: {
           'text-halo-color': '#fff',
-          'text-halo-width': 2,
+          'text-halo-width': 0,
         },
       });
       map.addLayer({
@@ -809,7 +809,7 @@
         },
         paint: {
           'text-halo-color': '#fff',
-          'text-halo-width': 2,
+          'text-halo-width': 02,
         },
       });
 
@@ -821,7 +821,7 @@
           visibility: 'none',
           filter: ['!=', $signalType, -100],
           paint: {
-            'fill-outline-color': '#616161',
+            'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
             'fill-color': MAP_THEME.countyFill,
           },
         },
@@ -837,7 +837,7 @@
             visibility: 'none',
             filter: ['!=', $signalType, -100],
             paint: {
-              'fill-outline-color': '#616161',
+              'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
               'fill-color': MAP_THEME.countyFill,
             },
           },

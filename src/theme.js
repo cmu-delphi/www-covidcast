@@ -24,9 +24,10 @@ export const DIRECTION_THEME = {
 };
 
 export const MAP_THEME = {
-  selectedRegionOutline: '#000000',
-  hoverRegionOutline: '#ffffff',
-  stateOutline: '#bcbcbc',
+  selectedRegionOutline: '#333333', //'#000000',
+  hoverRegionOutline: '#cccccc', //'#ffffff',
+  stateOutline: '#ffffff', //'#bcbcbc',
   countyFill: '#e4dac4',
-  countyOutline: '#e0e0e0',
+  countyOutline: '#ffffff', //'#e0e0e0',
+  countyOutlineWhenFilled: '#ffffff' //'#616161',
 };
