@@ -48,8 +48,8 @@
         colorArr.push({ label: arr[i] + '+', color: colorScaleLog(arr[i]) });
       } else {
         colorArr.push({ label: arr[i] + ' - ' + Math.round(arr[i + 1]), color: colorScaleLog(arr[i]) });
+    */
     var min = Math.log(Math.max(0.01, valueMinMax[0])) / Math.log(10);
-*/
     var arr = logspace(min, max, 7);
     const colorScaleLog = d3.scaleSequentialLog(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
     for (var i = 0; i < arr.length; i++) {

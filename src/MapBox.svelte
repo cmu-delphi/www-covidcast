@@ -104,10 +104,6 @@
         map.setFeatureState({ source: level, id: megaHoveredId }, { hover: true });
         // get hover color for mega county
         var color_stops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
-<<<<<<< HEAD
-        console.log(color_stops);
-=======
->>>>>>> 56de08532143bc109b346421896f68d2dab7b7a7
         var value_range = [];
         var color_range = [];
         for (var i = 0; i < color_stops.length; i++) {
