@@ -7,6 +7,7 @@
   import Legend from './Legend.svelte';
   import MapBox from './MapBox.svelte';
   import Graph from './Graph.svelte';
+  import Search from './Search.svelte';
 
   import {
     sensorMap,
@@ -79,7 +80,6 @@
     let sEntry = $sensorMap.get(sensor);
     if (!$mounted || !sEntry.levels.includes(level) || date > $times.get(sensor)[1] || reason === 'level change')
       return;
-
     let cacheEntry = $regionSliceCache.get(sensor + level + date);
     if (!cacheEntry) {
       callAPI(sEntry.id, sEntry.signal, level, date, '*').then(d => {
@@ -87,18 +87,21 @@
           currentData.set([]);
           regionSliceCache.update(m => m.set(sensor + level + date, []));
         } else {
-          const death_regex = /deaths_incidence_/;
-          const cases_regex = /confirmed_incidence_/;
+          //const death_regex = /deaths_incidence_/;
+          //const cases_regex = /confirmed_incidence_/;
+          const death_regex = /deaths_/;
+          const cases_regex = /confirmed_/;
           // deaths needs both count and ratio
           if (sEntry.signal.match(death_regex)) {
-            if (sEntry.signal === 'deaths_incidence_prop') {
+            // deaths_incidence_prop
+            if (sEntry.signal === 'wip_deaths_7dav_incid_prop') {
               callAPI(sEntry.id, 'deaths_incidence_num', level, date, '*').then(d1 => {
                 var extended = extend(d, d1);
                 currentData.set(extended);
                 regionSliceCache.update(m => m.set(sensor + level + date, extended));
               });
             } else {
-              callAPI(sEntry.id, 'deaths_incidence_prop', level, date, '*').then(d1 => {
+              callAPI(sEntry.id, 'wip_deaths_7dav_incid_prop', level, date, '*').then(d1 => {
                 var extended = extend(d1, d);
                 currentData.set(extended);
                 regionSliceCache.update(m => m.set(sensor + level + date, extended));
@@ -107,14 +110,15 @@
           }
           // cases needs both count and ratio
           else if (sEntry.signal.match(cases_regex)) {
-            if (sEntry.signal === 'confirmed_incidence_prop') {
+            // confirmed_incidence_prop
+            if (sEntry.signal === 'wip_confirmed_7dav_incid_prop') {
               callAPI(sEntry.id, 'confirmed_incidence_num', level, date, '*').then(d1 => {
                 var extended = extend(d, d1);
                 currentData.set(extended);
                 regionSliceCache.update(m => m.set(sensor + level + date, extended));
               });
             } else {
-              callAPI(sEntry.id, 'confirmed_incidence_prop', level, date, '*').then(d1 => {
+              callAPI(sEntry.id, 'wip_confirmed_7dav_incid_prop', level, date, '*').then(d1 => {
                 var extended = extend(d1, d);
                 currentData.set(extended);
                 regionSliceCache.update(m => m.set(sensor + level + date, extended));
@@ -157,7 +161,21 @@
     if (!cacheEntry) {
       callAPI(sEntry.id, sEntry.signal, level, '20100101-20500101', region).then(d => {
         // creating deepcopy to avoid tampering with the data stored in cache
+        console.log(
+          ENDPOINT +
+            '&data_source=' +
+            sEntry.id +
+            '&signal=' +
+            sEntry.signal +
+            '&geo_type=' +
+            level +
+            '&time_values=' +
+            '20100101-20500101' +
+            '&geo_value=' +
+            region,
+        );
         if (!checkIfCurrentRegionHasDataOnCurrentDate(d.epidata)) {
+          console.log('nope');
           currentRegion.set('');
           currentRegionName.set('');
           timeSliceCache.update(m => m.set(sensor + level + region, d.epidata));
@@ -275,7 +293,7 @@
                 // If no metadata, use information from sensors
                 // Used for testing new data
                 timeMap.set(sensorKey, [sEntry.minTime, sEntry.maxTime]);
-                statsMap.set(sensorKey, {
+                statsMap.set(sensorKey + '_' + region, {
                   mean: sEntry.mean,
                   std: sEntry.std,
                 });
@@ -378,7 +396,7 @@
 <style>
   .options-container {
     position: absolute;
-    top: 10px;
+    top: 110px;
     left: 10px;
     max-width: 210px;
     z-index: 1000;
@@ -388,20 +406,9 @@
     transition: all 0.1s ease-in;
   }
 
-  .tabs-container {
-    position: absolute;
-    top: 10px;
-    left: 220px;
-    right: 220px;
-    z-index: 1000;
-    box-sizing: border-box;
-    transition: all 0.1s ease-in;
-    pointer-events: none;
-  }
-
   .legend-container {
     position: absolute;
-    top: 204px;
+    top: 344px;
     left: 10px;
     z-index: 1000;
     display: flex;
@@ -415,7 +422,7 @@
   .graph-container {
     position: absolute;
     z-index: 1001;
-    bottom: 10px;
+    bottom: 0px;
     right: 10px;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 5px 5px;
@@ -547,10 +554,6 @@
 {/if}
 
 <MapBox />
-
-<div class="tabs-container">
-  <Tabs {isIE} />
-</div>
 
 <div class="options-container">
   <Options {isIE} />

@@ -2,6 +2,17 @@
   import { sensorMap, currentSensor, levels, currentLevel, signalType, currentDataReadyOnMap } from './stores.js';
 
   let hide = false;
+  let shouldDisplayBanner = true;
+
+  $: sensor = $currentSensor;
+  $: level = $currentLevel;
+
+  currentSensor.subscribe(s => {
+    if ($sensorMap.get($currentSensor).levels.includes(level) === false) {
+      level = $levels['msa'];
+    }
+  });
+
   export let isIE;
 </script>
 
@@ -35,38 +46,6 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-  }
-
-  .buttons-group button.button {
-    width: 100%;
-    margin: 0;
-    font-size: 1em;
-    font-weight: 400;
-    background-color: #fff;
-    border-style: solid;
-    border-color: #dbdbdb;
-    border-top-color: transparent;
-    border-width: 1px;
-    color: #666666;
-    cursor: pointer;
-    justify-content: center;
-    padding-bottom: calc(0.5em - 1px);
-    padding-left: 1em;
-    padding-right: 1em;
-    padding-top: calc(0.5em - 1px);
-    text-align: center;
-    transition: all 0.1s ease-in;
-    position: relative;
-  }
-
-  .buttons-group .button:first-child {
-    border-top-color: #dbdbdb;
-  }
-
-  .buttons-group button.button:disabled {
-    background-color: rgb(211, 211, 211);
-    color: #666666;
-    cursor: not-allowed;
   }
 
   .buttons-group button.button .disabled-tooltip {
@@ -178,21 +157,17 @@
     visibility: visible;
   }
 
-  .buttons-group .button.selected,
   .buttons-group-side .button.selected {
     background-color: #767676;
     color: #fff;
     font-weight: 600;
   }
 
-  .buttons-group .button:hover,
   .buttons-group-side .button:hover {
     background-color: #666666;
     color: #fff;
   }
 
-  .buttons-group .button:focus,
-  .buttons-group .button:active,
   .buttons-group-side .button:focus,
   .buttons-group-side .button:active {
     outline: none;
@@ -241,28 +216,50 @@
       on:click={_ => (hide = !hide)}>
       <img class="toggle-button-icon" src="./assets/imgs/layers_clear-24px.svg" alt="" />
     </button>
+    <div class="option">
+      <p style="font-size: 15px;">
+        <strong>Geo-level:</strong>
+      </p>
+      <select
+        aria-label="geographic level"
+        class="buttons-group"
+        bind:value={level}
+        on:change={() => {
+          currentDataReadyOnMap.set(false);
+          currentLevel.set(level);
+        }}>
+        {#each Object.keys($levels) as level}
+          <option value={level} disabled={$sensorMap.get($currentSensor).levels.includes(level) === false}>
+            {$levels[level]}
+          </option>
+        {/each}
+      </select>
+    </div>
 
     <div class="option">
-      <div aria-label="geographic level" class="buttons-group">
-        {#each Object.keys($levels) as level}
-          <button
-            aria-pressed={$currentLevel === level ? 'true' : 'false'}
-            class="button {$currentLevel === level ? 'selected' : ''}"
-            on:click={() => {
-              currentDataReadyOnMap.set(false);
-              currentLevel.set(level);
-            }}
-            title={$sensorMap
-              .get($currentSensor)
-              .levels.includes(level) === false && isIE ? 'Currently unavailable' : ''}
-            disabled={$sensorMap.get($currentSensor).levels.includes(level) === false}>
-            {#if $sensorMap.get($currentSensor).levels.includes(level) === false}
-              <span class="disabled-tooltip">Currently unavailable</span>
-            {/if}
-            {$levels[level]}
-          </button>
-        {/each}
-      </div>
+      <p style="font-size: 15px;">
+        <strong>Indicators:</strong>
+      </p>
+      <select
+        aria-label="geographic level"
+        class="buttons-group"
+        bind:value={sensor}
+        on:change={() => {
+          currentDataReadyOnMap.set(false);
+          currentSensor.set(sensor);
+          shouldDisplayBanner = true;
+        }}>
+        <optgroup label="Indicators">
+          {#each Array.from($sensorMap.keys()).filter(d => !$sensorMap.get(d).official) as sensor}
+            <option title={$sensorMap.get(sensor).tooltipText} value={sensor}>{$sensorMap.get(sensor).name}</option>
+          {/each}
+        </optgroup>
+        <optgroup label="Official Reports">
+          {#each Array.from($sensorMap.keys()).filter(d => $sensorMap.get(d).official) as sensor}
+            <option title={$sensorMap.get(sensor).tooltipText} value={sensor}>{$sensorMap.get(sensor).name}</option>
+          {/each}
+        </optgroup>
+      </select>
     </div>
 
     <br />
