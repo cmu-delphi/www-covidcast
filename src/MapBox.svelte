@@ -668,7 +668,7 @@
         },
         paint: {
           'text-halo-color': '#fff',
-          'text-halo-width': 2,
+          'text-halo-width': 0,
         },
       });
       map.addLayer({
@@ -685,7 +685,7 @@
         },
         paint: {
           'text-halo-color': '#fff',
-          'text-halo-width': 2,
+          'text-halo-width': 0,
         },
       });
       map.addLayer({
@@ -702,7 +702,7 @@
         },
         paint: {
           'text-halo-color': '#fff',
-          'text-halo-width': 2,
+          'text-halo-width': 0,
         },
       });
       map.addLayer({
@@ -717,7 +717,7 @@
         },
         paint: {
           'text-halo-color': '#fff',
-          'text-halo-width': 2,
+          'text-halo-width': 02,
         },
       });
 
@@ -729,7 +729,7 @@
           visibility: 'none',
           filter: ['!=', $signalType, -100],
           paint: {
-            'fill-outline-color': '#616161',
+            'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
             'fill-color': MAP_THEME.countyFill,
           },
         },
@@ -745,7 +745,7 @@
             visibility: 'none',
             filter: ['!=', $signalType, -100],
             paint: {
-              'fill-outline-color': '#616161',
+              'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
               'fill-color': MAP_THEME.countyFill,
             },
           },
