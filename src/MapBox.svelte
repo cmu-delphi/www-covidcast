@@ -503,13 +503,16 @@
       c3.opacity = 0.5;
 
       if ($currentSensor.match(/num/)) {
+        var min = Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10);
         var max = Math.log(valueMinMax[1]) / Math.log(10);
-        var arr = logspace(0, max, 7);
-        const colorScaleLog = d3.scaleSequentialLog(d3.interpolateYlOrRd).domain([1, valueMinMax[1]]);
+        var arr = logspace(min, max, 7);
+        const colorScaleLog = d3
+          .scaleSequentialLog(d3.interpolateYlOrRd)
+          .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]]);
 
         var tmp_stops = [[0, DIRECTION_THEME.countMin]];
         for (var i = 0; i < arr.length; i++) {
-          tmp_stops.push([Math.round(arr[i]), colorScaleLog(arr[i])]);
+          tmp_stops.push([arr[i], colorScaleLog(arr[i])]);
         }
         stops = tmp_stops;
         stopsMega = [

@@ -293,10 +293,22 @@
                 // If no metadata, use information from sensors
                 // Used for testing new data
                 timeMap.set(sensorKey, [sEntry.minTime, sEntry.maxTime]);
-                statsMap.set(sensorKey + '_' + region, {
-                  mean: sEntry.mean,
-                  std: sEntry.std,
-                });
+                if (region === 'county') {
+                  statsMap.set(sensorKey + '_' + region, {
+                    mean: sEntry.county_mean,
+                    std: sEntry.county_std,
+                  });
+                } else if (region === 'msa') {
+                  statsMap.set(sensorKey + '_' + region, {
+                    mean: sEntry.msa_mean,
+                    std: sEntry.msa_std,
+                  });
+                } else {
+                  statsMap.set(sensorKey + '_' + region, {
+                    mean: sEntry.state_mean,
+                    std: sEntry.state_std,
+                  });
+                }
               }
             });
           } else {
