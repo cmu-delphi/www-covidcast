@@ -1,13 +1,10 @@
 <script>
   import { onMount } from 'svelte';
-
   import Options from './Options.svelte';
-  import Tabs from './Tabs.svelte';
   import Time from './Time.svelte';
   import Legend from './Legend.svelte';
   import MapBox from './MapBox.svelte';
   import Graph from './Graph.svelte';
-  import Search from './Search.svelte';
 
   import {
     sensorMap,

@@ -6,7 +6,8 @@
 
   let high = '';
   let low = '';
-  $: colorArr = [{ label: '0', color: DIRECTION_THEME.countMin }];
+  $: logColorArr = [{ label: '0', color: DIRECTION_THEME.countMin }];
+  $: linColorArr = [DIRECTION_THEME.countMin, DIRECTION_THEME.countMin, DIRECTION_THEME.countMin];
 
   currentSensor.subscribe(s => ($stats ? updateLowHigh(s, $stats, $currentLevel) : ''));
   stats.subscribe(s => (s ? updateLowHigh($currentSensor, s, $currentLevel) : ''));
@@ -19,13 +20,40 @@
     if ($currentSensor.match(/num/)) {
       sts = stats.get(sens + '_' + level);
       valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
-
       /*
       high = Math.round(valueMinMax[1]);
       low = Math.round(Math.max(0, valueMinMax[0]));
       */
       high = valueMinMax[1].toFixed(2);
       low = Math.max(0, valueMinMax[0]).toFixed(2);
+
+      /*
+      var arr = logspace(0, max, 7);
+      const colorScaleLog = d3.scaleSequentialLog(d3.interpolateYlOrRd).domain([1, valueMinMax[1]]);
+      for (var i = 0; i < arr.length; i++) {
+        arr[i] = Math.round(arr[i]);
+        if (i == arr.length - 1) {
+          colorArr.push({ label: arr[i] + '+', color: colorScaleLog(arr[i]) });
+        } else {
+          colorArr.push({ label: arr[i] + ' - ' + Math.round(arr[i + 1]), color: colorScaleLog(arr[i]) });
+      */
+
+      logColorArr = [{ label: '0', color: DIRECTION_THEME.countMin }];
+      var max = Math.log(valueMinMax[1]) / Math.log(10);
+      var min = Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10);
+      var arr = logspace(min, max, 7);
+      const colorScaleLog = d3
+        .scaleSequentialLog(d3.interpolateYlOrRd)
+        .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]]);
+      for (var i = 0; i < arr.length; i++) {
+        //arr[i] = Math.round(arr[i]);
+        arr[i] = parseFloat(arr[i]).toFixed(2);
+        if (i == arr.length - 1) {
+          logColorArr.push({ label: arr[i] + '+', color: colorScaleLog(arr[i]) });
+        } else {
+          logColorArr.push({ label: arr[i] + ' - ' + parseFloat(arr[i + 1]).toFixed(2), color: colorScaleLog(arr[i]) });
+        }
+      }
     } else {
       sts = stats.get(sens);
       valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
@@ -36,32 +64,10 @@
         high = Math.min(100, valueMinMax[1]).toFixed(2) + '% ';
         low = Math.max(0, valueMinMax[0]).toFixed(2) + '% ';
       }
-    }
-    colorArr = [{ label: '0', color: DIRECTION_THEME.countMin }];
-    var max = Math.log(valueMinMax[1]) / Math.log(10);
-    /*
-    var arr = logspace(0, max, 7);
-    const colorScaleLog = d3.scaleSequentialLog(d3.interpolateYlOrRd).domain([1, valueMinMax[1]]);
-    for (var i = 0; i < arr.length; i++) {
-      arr[i] = Math.round(arr[i]);
-      if (i == arr.length - 1) {
-        colorArr.push({ label: arr[i] + '+', color: colorScaleLog(arr[i]) });
-      } else {
-        colorArr.push({ label: arr[i] + ' - ' + Math.round(arr[i + 1]), color: colorScaleLog(arr[i]) });
-    */
-    var min = Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10);
-    var arr = logspace(min, max, 7);
-    const colorScaleLog = d3
-      .scaleSequentialLog(d3.interpolateYlOrRd)
-      .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]]);
-    for (var i = 0; i < arr.length; i++) {
-      //arr[i] = Math.round(arr[i]);
-      arr[i] = parseFloat(arr[i]).toFixed(2);
-      if (i == arr.length - 1) {
-        colorArr.push({ label: arr[i] + '+', color: colorScaleLog(arr[i]) });
-      } else {
-        colorArr.push({ label: arr[i] + ' - ' + parseFloat(arr[i + 1]).toFixed(2), color: colorScaleLog(arr[i]) });
-      }
+      const colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
+      let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
+
+      linColorArr = [colorScaleLinear(valueMinMax[0]), colorScaleLinear(center), colorScaleLinear(valueMinMax[1])];
     }
   }
 </script>
@@ -149,7 +155,7 @@
       <p>Decreasing</p>
     </div>
   {:else if $currentSensor.match(/num/)}
-    {#each colorArr as { label, color }, i}
+    {#each logColorArr as { label, color }, i}
       <div class="count-p">
         <div class="color inc" style="background-color: {color}" />
         <p>{label}</p>
@@ -159,7 +165,7 @@
     <p>{high ? high + '+' : ''}</p>
     <div
       class="legend-bar"
-      style="background: linear-gradient(to top, {DIRECTION_THEME.gradientMin}, {DIRECTION_THEME.gradientMiddle}, {DIRECTION_THEME.gradientMax})" />
+      style="background: linear-gradient(to top, {linColorArr[0]}, {linColorArr[1]}, {linColorArr[2]})" />
     <p>{low}</p>
   {/if}
 </div>
