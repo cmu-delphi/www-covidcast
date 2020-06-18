@@ -756,7 +756,7 @@
         },
         paint: {
           'text-halo-color': '#fff',
-          'text-halo-width': 0,
+          'text-halo-width': 2,
         },
       });
       map.addLayer({
@@ -773,7 +773,7 @@
         },
         paint: {
           'text-halo-color': '#fff',
-          'text-halo-width': 0,
+          'text-halo-width': 2,
         },
       });
       map.addLayer({
@@ -790,7 +790,7 @@
         },
         paint: {
           'text-halo-color': '#fff',
-          'text-halo-width': 0,
+          'text-halo-width': 2,
         },
       });
       map.addLayer({
@@ -805,7 +805,7 @@
         },
         paint: {
           'text-halo-color': '#fff',
-          'text-halo-width': 0,
+          'text-halo-width': 2,
         },
       });
 
