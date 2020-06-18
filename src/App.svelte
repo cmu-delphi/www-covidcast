@@ -87,8 +87,6 @@
           currentData.set([]);
           regionSliceCache.update(m => m.set(sensor + level + date, []));
         } else {
-          //const death_regex = /deaths_incidence_/;
-          //const cases_regex = /confirmed_incidence_/;
           const death_regex = /deaths_/;
           const cases_regex = /confirmed_/;
           // deaths needs both count and ratio
@@ -161,21 +159,7 @@
     if (!cacheEntry) {
       callAPI(sEntry.id, sEntry.signal, level, '20100101-20500101', region).then(d => {
         // creating deepcopy to avoid tampering with the data stored in cache
-        console.log(
-          ENDPOINT +
-            '&data_source=' +
-            sEntry.id +
-            '&signal=' +
-            sEntry.signal +
-            '&geo_type=' +
-            level +
-            '&time_values=' +
-            '20100101-20500101' +
-            '&geo_value=' +
-            region,
-        );
         if (!checkIfCurrentRegionHasDataOnCurrentDate(d.epidata)) {
-          console.log('nope');
           currentRegion.set('');
           currentRegionName.set('');
           timeSliceCache.update(m => m.set(sensor + level + region, d.epidata));
