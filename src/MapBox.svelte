@@ -915,7 +915,7 @@
 {#if loaded && region_lst.length != 0}
   <div class="search">
     <AutoComplete
-      placeholder="Search"
+      placeholder="Search for a location..."
       items={region_lst}
       bind:selectedItem={selectedRegion}
       labelFieldName="display_name"
