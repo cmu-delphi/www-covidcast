@@ -187,8 +187,8 @@
         body = `
           <div class="map-popup-region-value-container">
             Population: ${Population} <br>
-            ${date}: ${count} <br>
-            ${sens.yAxis}:
+            ${sens.yAxis} (${date}): ${count} <br>
+            ${sens.yAxis} (7-day avg):
             <span class="map-popup-region-value" 
                   style="background-color: ${fillColor}; 
                         color: ${getTextColorBasedOnBackground(fillColor)};">
@@ -203,8 +203,8 @@
         body = `
           <div class="map-popup-region-value-container">
             Population: ${Population} <br>
-            ${date}: ${count.toFixed(2)} <br>
-            ${sens.yAxis}:
+            ${sens.yAxis} (${date}): ${count.toFixed(2)} <br>
+            ${sens.yAxis} (7-day avg):
             <span class="map-popup-region-value" 
                   style="background-color: ${fillColor}; 
                         color: ${getTextColorBasedOnBackground(fillColor)};">
