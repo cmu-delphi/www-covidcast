@@ -27,8 +27,7 @@ export const sensors = readable(
       format: 'percent',
       signal: 'smoothed_adj_cli',
       levels: ['county', 'msa', 'state'],
-      official: false,
-      bolded: false
+      official: false
     },
     {
       name: 'Symptoms (FB)',
@@ -41,7 +40,6 @@ export const sensors = readable(
       signal: 'smoothed_cli',
       levels: ['county', 'msa', 'state'],
       official: false,
-      bolded: false
     },
     {
       name: 'Symptoms in Community (FB)',
@@ -54,7 +52,6 @@ export const sensors = readable(
       signal: 'smoothed_hh_cmnty_cli',
       levels: ['county', 'msa', 'state'],
       official: false,
-      bolded: false
     },
     {
       name: 'Search Trends (Google)',
@@ -67,7 +64,6 @@ export const sensors = readable(
       signal: 'smoothed_search',
       levels: ['msa', 'state'],
       official: false,
-      bolded: false
     },
     {
       name: "Combined",
@@ -80,7 +76,6 @@ export const sensors = readable(
       signal: "nmf_day_doc_fbc_fbs_ght",
       levels: ["county", "msa", "state"],
       official: false,
-      bolded: true
     },
     {
       name: 'Cases',
@@ -90,18 +85,9 @@ export const sensors = readable(
       chartTitleText: 'Daily confirmed COVID-19 cases',
       yAxis: 'Cases',
       format: 'raw',
-      signal: 'wip_confirmed_7dav_incid_num',
-      county_mean: 6.783976,
-      county_std: 35.80719,
-      msa_mean: 47.90808,
-      msa_std: 137.0323,
-      state_mean: 410.2892,
-      state_std: 507.9982,
-      minTime: 20200220,
-      maxTime: 20200615,
+      signal: 'confirmed_7dav_incidence_num',
       levels: ['msa', 'county', 'state'],
       official: true,
-      bolded: false
     },
     {
       name: 'Cases per capita',
@@ -111,11 +97,7 @@ export const sensors = readable(
       chartTitleText: 'Daily confirmed COVID-19 cases per 100,000 people',
       yAxis: 'Cases per 100,000 people',
       format: 'raw',
-      signal: 'wip_confirmed_7dav_incid_prop',
-      mean: 5.402349,
-      std: 17.64126,
-      minTime: 20200220,
-      maxTime: 20200615,
+      signal: 'confirmed_7dav_incidence_prop',
       levels: ['msa', 'county', 'state'],
       official: true,
       bolded: false
@@ -128,18 +110,9 @@ export const sensors = readable(
       chartTitleText: 'Daily COVID-19 deaths',
       yAxis: 'Deaths',
       format: 'raw',
-      signal: 'wip_deaths_7dav_incid_num',
-      county_mean: .2707674,
-      county_std: 1.593871,
-      msa_mean: 2.026356,
-      msa_std: 8.021987,
-      state_mean: 16.37622,
-      state_std: 21.42209,
-      minTime: 20200220,
-      maxTime: 20200615,
+      signal: 'deaths_7dav_incidence_num',
       levels: ['msa', 'county', 'state'],
       official: true,
-      bolded: false
     },
     {
       name: 'Deaths per capita',
@@ -149,14 +122,9 @@ export const sensors = readable(
       chartTitleText: 'Daily COVID-19 deaths per 100,000 people',
       yAxis: 'Deaths per 100,000 people',
       format: 'raw',
-      signal: 'wip_deaths_7dav_incid_prop',
-      mean: .1645661,
-      std: .5832552,
-      minTime: 20200220,
-      maxTime: 20200615,
+      signal: 'deaths_7dav_incidence_prop',
       levels: ['msa', 'county', 'state'],
       official: true,
-      bolded: false
     }
   ],
   (set) => {

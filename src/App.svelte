@@ -56,15 +56,15 @@
   }
 
   // combining json with same geolocations but different value properties
-  // json1 value is ratio of deaths, json2 value is total number of deaths
+  // json1 value is 7 day average, json2 value is single count
   function extend(json1, json2) {
     var new_epidata = [];
     var data1 = json1.epidata;
     var data2 = json2.epidata;
     for (var i = 0; i < data1.length; i++) {
-      var ratio = Math.max(0, data1[i].value);
+      var avg = Math.max(0, data1[i].value);
       var count = Math.max(0, data2[i].value);
-      data1[i].ratio = ratio;
+      data1[i].avg = avg;
       delete data1[i].value;
       data1[i].count = count;
       new_epidata.push(data1[i]);
@@ -89,15 +89,15 @@
           // deaths needs both count and ratio
           if (sEntry.signal.match(death_regex)) {
             // deaths_incidence_prop
-            if (sEntry.signal === 'wip_deaths_7dav_incid_prop') {
-              callAPI(sEntry.id, 'deaths_incidence_num', level, date, '*').then(d1 => {
+            if (sEntry.signal === 'deaths_7dav_incidence_prop') {
+              callAPI(sEntry.id, 'deaths_incidence_prop', level, date, '*').then(d1 => {
                 var extended = extend(d, d1);
                 currentData.set(extended);
                 regionSliceCache.update(m => m.set(sensor + level + date, extended));
               });
             } else {
-              callAPI(sEntry.id, 'wip_deaths_7dav_incid_prop', level, date, '*').then(d1 => {
-                var extended = extend(d1, d);
+              callAPI(sEntry.id, 'deaths_incidence_num', level, date, '*').then(d1 => {
+                var extended = extend(d, d1);
                 currentData.set(extended);
                 regionSliceCache.update(m => m.set(sensor + level + date, extended));
               });
@@ -106,15 +106,15 @@
           // cases needs both count and ratio
           else if (sEntry.signal.match(cases_regex)) {
             // confirmed_incidence_prop
-            if (sEntry.signal === 'wip_confirmed_7dav_incid_prop') {
-              callAPI(sEntry.id, 'confirmed_incidence_num', level, date, '*').then(d1 => {
+            if (sEntry.signal === 'confirmed_7dav_incidence_prop') {
+              callAPI(sEntry.id, 'confirmed_incidence_prop', level, date, '*').then(d1 => {
                 var extended = extend(d, d1);
                 currentData.set(extended);
                 regionSliceCache.update(m => m.set(sensor + level + date, extended));
               });
             } else {
-              callAPI(sEntry.id, 'wip_confirmed_7dav_incid_prop', level, date, '*').then(d1 => {
-                var extended = extend(d1, d);
+              callAPI(sEntry.id, 'confirmed_incidence_num', level, date, '*').then(d1 => {
+                var extended = extend(d, d1);
                 currentData.set(extended);
                 regionSliceCache.update(m => m.set(sensor + level + date, extended));
               });

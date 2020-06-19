@@ -26,6 +26,9 @@
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
 
+  let parseTime = d3.timeParse('%Y%m%d');
+  let formatTimeWithoutYear = d3.timeFormat('%B %d');
+
   let LAT = -0.5;
   let LON = -0.5;
   let ZOOM = 3.9;
@@ -144,23 +147,6 @@
         const value = e.features[0].properties.value;
         var arr = ramp(value);
         fillColor = 'rgb(' + arr.join(', ') + ')';
-
-        /*
-        var value_range = [color_stops[0][0], color_stops[color_stops.length - 1][0]];
-
-        const logScale = d3.scaleSymlog().domain(value_range);
-        const colorScaleLog = d3.scaleSequential(d => d3.interpolateYlOrRd(logScale(d)));
-        //const colorScaleLog = d3.scaleSequentialLog(d3.interpolateYlOrRd);
-        console.log(colorScaleLog.ticks(7));
-        console.log(colorScaleLog.invert(0.2));
-        var log = d3.scaleLog().domain([1, 200]);
-        var logformat = logScale.tickFormat(7, '');
-        //console.log(logScale.ticks(7).map(logformat));
-        const value = e.features[0].properties.value;
-        console.log()
-        var arr = colorScaleLog(value);
-        fillColor = arr;
-        */
       } else {
         var value_range = [];
         var color_range = [];
@@ -168,6 +154,7 @@
           value_range.push(color_stops[i][0]);
           color_range.push(color_stops[i][1].match(/\d+/g));
         }
+
         var ramp = d3
           .scaleLinear()
           .domain(value_range)
@@ -183,77 +170,45 @@
     if (hoveredId !== null && level === 'mega-county') return;
     // popup
     const { value, direction, NAME, Population } = e.features[0].properties;
-    //const fillColor = e.features[0].layer.paint['fill-color'].toString();
+
+    const date = formatTimeWithoutYear(parseTime($currentDate));
 
     const sens = $sensorMap.get($currentSensor);
     let title =
       (level === 'mega-county' ? 'Rest of ' : '') +
       NAME +
       ($currentLevel === 'county' && level !== 'mega-county' ? ' County' : '');
-
     let body;
     if ($signalType === 'value') {
       // More information displayed when counts is shown
-      if ($currentSensor.match(/deaths_incidence_num/)) {
-        const death_num = e.features[0].properties.value;
-        const ratio = e.features[0].properties.value1;
+      if ($currentSensor.match(/incidence_num/)) {
+        const avg = e.features[0].properties.value;
+        const count = e.features[0].properties.value1;
         body = `
           <div class="map-popup-region-value-container">
             Population: ${Population} <br>
-            Death per 100,000 people: ${ratio.toFixed(2)} ${sens.format === 'percent' ? '%' : ''} <br>
+            ${date}: ${count} <br>
             ${sens.yAxis}:
             <span class="map-popup-region-value" 
                   style="background-color: ${fillColor}; 
                         color: ${getTextColorBasedOnBackground(fillColor)};">
-              ${death_num}
+              ${avg.toFixed(2)}
             </span>
             
           </div>
         `;
-      } else if ($currentSensor.match(/deaths_incidence_prop/)) {
-        const death_num = e.features[0].properties.value1;
-        const ratio = e.features[0].properties.value;
+      } else if ($currentSensor.match(/incidence_prop/)) {
+        const avg = e.features[0].properties.value;
+        const count = e.features[0].properties.value1;
         body = `
           <div class="map-popup-region-value-container">
             Population: ${Population} <br>
-            Deaths: ${death_num} <br>
+            ${date}: ${count.toFixed(2)} <br>
             ${sens.yAxis}:
             <span class="map-popup-region-value" 
                   style="background-color: ${fillColor}; 
                         color: ${getTextColorBasedOnBackground(fillColor)};">
-              ${ratio.toFixed(2)}
-              ${sens.format === 'percent' ? '%' : ''}
-            </span>
-          </div>
-        `;
-      } else if ($currentSensor.match(/confirmed_incidence_num/)) {
-        const cases_num = e.features[0].properties.value;
-        const ratio = e.features[0].properties.value1;
-        body = `
-          <div class="map-popup-region-value-container">
-            Population: ${Population} <br>
-            Cases per 100,000 people: ${ratio.toFixed(2)} ${sens.format === 'percent' ? '%' : ''} <br>
-            ${sens.yAxis}:
-            <span class="map-popup-region-value" 
-                  style="background-color: ${fillColor}; 
-                        color: ${getTextColorBasedOnBackground(fillColor)};">
-              ${cases_num}
-            </span>
-            
-          </div>
-        `;
-      } else if ($currentSensor.match(/confirmed_incidence_prop/)) {
-        const cases_num = e.features[0].properties.value1;
-        const ratio = e.features[0].properties.value;
-        body = `
-          <div class="map-popup-region-value-container">
-            Population: ${Population} <br>
-            Cases: ${cases_num} <br>
-            ${sens.yAxis}:
-            <span class="map-popup-region-value" 
-                  style="background-color: ${fillColor}; 
-                        color: ${getTextColorBasedOnBackground(fillColor)};">
-              ${ratio.toFixed(2)}
+              ${avg.toFixed(2)}
               ${sens.format === 'percent' ? '%' : ''}
             </span>
           </div>
@@ -420,9 +375,10 @@
 
         if (d.value !== null) {
           var info;
-          if ($currentSensor.match(/prop/) || $currentSensor.match(/num/)) {
-            info = [d.count, d.ratio];
+          if ($currentSensor.match(/confirmed/) || $currentSensor.match(/deaths/)) {
+            info = [d.avg, d.count];
           } else {
+            console.log($currentSensor);
             info = [d.value];
           }
           if (drawMega && megaIndicator === '000') {
@@ -453,12 +409,9 @@
         if (geoIds.has(id + '000') && valueMappedMega.get(id) !== undefined) {
           d.properties.value = valueMappedMega.get(id)[0];
 
-          if ($currentSensor.match(/num/)) {
+          if ($currentSensor.match(/7dav_incidence/)) {
             d.properties.value = valueMappedMega.get(id)[0];
             d.properties.value1 = valueMappedMega.get(id)[1];
-          } else if ($currentSensor.match(/prop/)) {
-            d.properties.value = valueMappedMega.get(id)[1];
-            d.properties.value1 = valueMappedMega.get(id)[0];
           }
         }
         if (geoIds.has(id + '000') && directionMappedMega.get(id) !== undefined) {
@@ -475,12 +428,9 @@
       d.properties.direction = -100;
       if (geoIds.has(id) && valueMappedVals.get(id) !== undefined) {
         d.properties.value = valueMappedVals.get(id)[0];
-        if ($currentSensor.match(/num/)) {
+        if ($currentSensor.match(/7dav_incidence/)) {
           d.properties.value = valueMappedVals.get(id)[0];
           d.properties.value1 = valueMappedVals.get(id)[1];
-        } else if ($currentSensor.match(/prop/)) {
-          d.properties.value = valueMappedVals.get(id)[1];
-          d.properties.value1 = valueMappedVals.get(id)[0];
         }
       }
       if (geoIds.has(id) && directionMappedVals.get(id) !== undefined) {
@@ -509,7 +459,6 @@
       c5.opacity = 0.5;
 
       if ($currentSensor.match(/num/)) {
-        console.log(valueMinMax);
         var min = Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10);
         var max = Math.log(valueMinMax[1]) / Math.log(10);
         var arr = logspace(min, max, 7);
@@ -584,7 +533,6 @@
         [1, DIRECTION_THEME.gradientMaxMega],
       ];
     }
-
     if (['data', 'init'].includes(type)) {
       map.getSource($currentLevel).setData(dat);
       drawMega ? map.getSource('mega-county').setData(megaDat) : '';

@@ -6,7 +6,7 @@
 
   let high = '';
   let low = '';
-  $: logColorArr = [{ label: '0', color: DIRECTION_THEME.countMin }];
+  $: logColorArr = [{ label: '0', from_color: DIRECTION_THEME.countMin, to_color: DIRECTION_THEME.countMin }];
   $: linColorArr = [
     DIRECTION_THEME.countMin,
     DIRECTION_THEME.countMin,
@@ -26,23 +26,9 @@
     if ($currentSensor.match(/num/)) {
       sts = stats.get(sens + '_' + level);
       valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
-      /*
-      high = Math.round(valueMinMax[1]);
-      low = Math.round(Math.max(0, valueMinMax[0]));
-      */
+
       high = valueMinMax[1].toFixed(2);
       low = Math.max(0, valueMinMax[0]).toFixed(2);
-
-      /*
-      var arr = logspace(0, max, 7);
-      const colorScaleLog = d3.scaleSequentialLog(d3.interpolateYlOrRd).domain([1, valueMinMax[1]]);
-      for (var i = 0; i < arr.length; i++) {
-        arr[i] = Math.round(arr[i]);
-        if (i == arr.length - 1) {
-          colorArr.push({ label: arr[i] + '+', color: colorScaleLog(arr[i]) });
-        } else {
-          colorArr.push({ label: arr[i] + ' - ' + Math.round(arr[i + 1]), color: colorScaleLog(arr[i]) });
-      */
 
       logColorArr = [{ label: '0', color: DIRECTION_THEME.countMin }];
       var max = Math.log(valueMinMax[1]) / Math.log(10);
@@ -52,12 +38,19 @@
         .scaleSequentialLog(d3.interpolateYlOrRd)
         .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]]);
       for (var i = 0; i < arr.length; i++) {
-        //arr[i] = Math.round(arr[i]);
         arr[i] = parseFloat(arr[i]).toFixed(2);
         if (i == arr.length - 1) {
-          logColorArr.push({ label: arr[i] + '+', color: colorScaleLog(arr[i]) });
+          logColorArr.unshift({
+            label: arr[i] + '+',
+            from_color: colorScaleLog(arr[i]),
+            to_color: colorScaleLog(arr[i]),
+          });
         } else {
-          logColorArr.push({ label: arr[i] + ' - ' + parseFloat(arr[i + 1]).toFixed(2), color: colorScaleLog(arr[i]) });
+          logColorArr.unshift({
+            label: arr[i] + ' - ' + parseFloat(arr[i + 1]).toFixed(2),
+            from_color: colorScaleLog(arr[i]),
+            to_color: colorScaleLog(arr[i + 1]),
+          });
         }
       }
     } else {
@@ -170,9 +163,9 @@
       <p>Decreasing</p>
     </div>
   {:else if $currentSensor.match(/num/)}
-    {#each logColorArr as { label, color }, i}
+    {#each logColorArr as { label, from_color, to_color }, i}
       <div class="count-p">
-        <div class="color inc" style="background-color: {color}" />
+        <div class="color inc" style="background: linear-gradient(to top, {from_color}, {to_color})" />
         <p>{label}</p>
       </div>
     {/each}
