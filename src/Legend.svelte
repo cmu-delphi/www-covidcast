@@ -30,28 +30,21 @@
       high = valueMinMax[1].toFixed(2);
       low = Math.max(0, valueMinMax[0]).toFixed(2);
 
-      logColorArr = [{ label: '0', color: DIRECTION_THEME.countMin }];
+      logColorArr = [{ label: '0', from_color: DIRECTION_THEME.countMin, to_color: DIRECTION_THEME.countMin }];
       var max = Math.log(valueMinMax[1]) / Math.log(10);
       var min = Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10);
       var arr = logspace(min, max, 7);
+      console.log(arr);
       const colorScaleLog = d3
         .scaleSequentialLog(d3.interpolateYlOrRd)
         .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]]);
-      for (var i = 0; i < arr.length; i++) {
+      for (var i = 0; i < arr.length - 1; i++) {
         arr[i] = parseFloat(arr[i]).toFixed(2);
-        if (i == arr.length - 1) {
-          logColorArr.unshift({
-            label: arr[i] + '+',
-            from_color: colorScaleLog(arr[i]),
-            to_color: colorScaleLog(arr[i]),
-          });
-        } else {
-          logColorArr.unshift({
-            label: arr[i] + ' - ' + parseFloat(arr[i + 1]).toFixed(2),
-            from_color: colorScaleLog(arr[i]),
-            to_color: colorScaleLog(arr[i + 1]),
-          });
-        }
+        logColorArr.unshift({
+          label: arr[i],
+          from_color: colorScaleLog(arr[i]),
+          to_color: colorScaleLog(arr[i + 1]),
+        });
       }
     } else {
       sts = stats.get(sens);
@@ -121,8 +114,7 @@
   .legend-bar {
     width: 20px;
     height: 100%;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    align-self: end;
   }
 
   .direction-p {
@@ -132,10 +124,21 @@
   }
 
   .count-p {
-    height: 12.5%;
+    height: 14%;
     width: 100%;
     display: inline-flex;
     align-items: center;
+  }
+  .tick-p {
+    height: 1px;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+  }
+  .tick {
+    display: block;
+    height: 100%;
+    margin-right: 30px;
   }
 </style>
 
@@ -163,18 +166,31 @@
       <p>Decreasing</p>
     </div>
   {:else if $currentSensor.match(/num/)}
+    <div class="tick-p">
+      <div class="tick" style="background: black" />
+      <p>{high ? high + '+' : ''}</p>
+    </div>
     {#each logColorArr as { label, from_color, to_color }, i}
       <div class="count-p">
         <div class="color inc" style="background: linear-gradient(to top, {from_color}, {to_color})" />
+      </div>
+      <div class="tick-p">
+        <div class="tick" style="background: black" />
         <p>{label}</p>
       </div>
     {/each}
   {:else}
-    <p>{high ? high + '+' : ''}</p>
+    <div class="tick-p">
+      <div class="tick" style="background: black" />
+      <p>{high ? high + '+' : ''}</p>
+    </div>
     <div
       class="legend-bar"
       style="background: linear-gradient(to top, {linColorArr[0]}, {linColorArr[1]}, {linColorArr[2]}, {linColorArr[3]},
       {linColorArr[4]})" />
-    <p>{low}</p>
+    <div class="tick-p">
+      <div class="tick" style="background: black" />
+      <p>{low}</p>
+    </div>
   {/if}
 </div>

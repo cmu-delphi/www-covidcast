@@ -401,7 +401,7 @@
 
   .legend-container {
     position: absolute;
-    top: 344px;
+    top: 315px;
     left: 10px;
     z-index: 1000;
     display: flex;
