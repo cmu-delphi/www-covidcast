@@ -716,6 +716,23 @@
       });
 
       map.addLayer({
+        id: 'city-point-unclustered-pit',
+        source: 'city-point',
+        type: 'symbol',
+        filter: ['==', 'city', 'Pittsburgh'],
+        maxzoom: 8,
+        layout: {
+          'text-field': ['get', 'city'],
+          'text-font': ['Open Sans Regular'],
+          'text-size': 12,
+        },
+        paint: {
+          'text-halo-color': '#fff',
+          'text-halo-width': 2,
+        },
+      });
+
+      map.addLayer({
         id: 'city-point-unclustered',
         source: 'city-point',
         type: 'symbol',
