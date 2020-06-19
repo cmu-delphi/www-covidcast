@@ -398,7 +398,7 @@
     // Customize min max values for deaths
     if ($currentSensor.match(/num/)) {
       thisStats = $stats.get($currentSensor + '_' + $currentLevel);
-      valueMinMax = [Math.max(0.01, thisStats.mean - 3 * thisStats.std), thisStats.mean + 3 * thisStats.std];
+      valueMinMax = [Math.max(0.14, thisStats.mean - 3 * thisStats.std), thisStats.mean + 3 * thisStats.std];
     } else {
       thisStats = $stats.get($currentSensor);
       valueMinMax = [thisStats.mean - 3 * thisStats.std, thisStats.mean + 3 * thisStats.std];
@@ -493,16 +493,23 @@
     if ($signalType === 'value') {
       valueMinMax[0] = Math.max(0, valueMinMax[0]);
       let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
+      let first_half_center = valueMinMax[0] + (center - valueMinMax[0]) / 2;
+      let second_half_center = center + (valueMinMax[1] - center) / 2;
 
       let colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
       const c1 = d3.rgb(colorScaleLinear(valueMinMax[0]));
-      const c2 = d3.rgb(colorScaleLinear(center));
-      const c3 = d3.rgb(colorScaleLinear(valueMinMax[1]));
+      const c2 = d3.rgb(colorScaleLinear(first_half_center));
+      const c3 = d3.rgb(colorScaleLinear(center));
+      const c4 = d3.rgb(colorScaleLinear(second_half_center));
+      const c5 = d3.rgb(colorScaleLinear(valueMinMax[1]));
       c1.opacity = 0.5;
       c2.opacity = 0.5;
       c3.opacity = 0.5;
+      c4.opacity = 0.5;
+      c5.opacity = 0.5;
 
       if ($currentSensor.match(/num/)) {
+        console.log(valueMinMax);
         var min = Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10);
         var max = Math.log(valueMinMax[1]) / Math.log(10);
         var arr = logspace(min, max, 7);
@@ -518,29 +525,43 @@
         stopsMega = [
           [0, DIRECTION_THEME.countMin],
           [valueMinMax[0], c1.toString()],
-          [center, c2.toString()],
-          [valueMinMax[1], c3.toString()],
+          [first_half_center, c2.toString()],
+          [center, c3.toString()],
+          [second_half_center, c4.toString()],
+          [valueMinMax[1], c5.toString()],
         ];
       } else if ($currentSensor.match(/prop/)) {
         stops = [
           [0, DIRECTION_THEME.countMin],
           [valueMinMax[0], colorScaleLinear(valueMinMax[0])],
+          [first_half_center, colorScaleLinear(first_half_center)],
           [center, colorScaleLinear(center)],
+          [second_half_center, colorScaleLinear(second_half_center)],
           [valueMinMax[1], colorScaleLinear(valueMinMax[1])],
         ];
         stopsMega = [
           [0, DIRECTION_THEME.countMin],
           [valueMinMax[0], c1.toString()],
-          [center, c2.toString()],
-          [valueMinMax[1], c3.toString()],
+          [first_half_center, c2.toString()],
+          [center, c3.toString()],
+          [second_half_center, c4.toString()],
+          [valueMinMax[1], c5.toString()],
         ];
       } else {
         stops = [
           [valueMinMax[0], colorScaleLinear(valueMinMax[0])],
+          [first_half_center, colorScaleLinear(first_half_center)],
           [center, colorScaleLinear(center)],
+          [second_half_center, colorScaleLinear(second_half_center)],
           [valueMinMax[1], colorScaleLinear(valueMinMax[1])],
         ];
-        stopsMega = [[valueMinMax[0], c1.toString()], [center, c2.toString()], [valueMinMax[1], c3.toString()]];
+        stopsMega = [
+          [valueMinMax[0], c1.toString()],
+          [first_half_center, c2.toString()],
+          [center, c3.toString()],
+          [second_half_center, c4.toString()],
+          [valueMinMax[1], c5.toString()],
+        ];
         /*
         stopsMega = [
           [valueMinMax[0], DIRECTION_THEME.gradientMinMega],

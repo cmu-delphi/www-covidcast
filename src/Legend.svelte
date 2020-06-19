@@ -7,7 +7,13 @@
   let high = '';
   let low = '';
   $: logColorArr = [{ label: '0', color: DIRECTION_THEME.countMin }];
-  $: linColorArr = [DIRECTION_THEME.countMin, DIRECTION_THEME.countMin, DIRECTION_THEME.countMin];
+  $: linColorArr = [
+    DIRECTION_THEME.countMin,
+    DIRECTION_THEME.countMin,
+    DIRECTION_THEME.countMin,
+    DIRECTION_THEME.countMin,
+    DIRECTION_THEME.countMin,
+  ];
 
   currentSensor.subscribe(s => ($stats ? updateLowHigh(s, $stats, $currentLevel) : ''));
   stats.subscribe(s => (s ? updateLowHigh($currentSensor, s, $currentLevel) : ''));
@@ -60,14 +66,23 @@
       if ($sensorMap.get($currentSensor).format === 'raw') {
         high = valueMinMax[1].toFixed(2);
         low = Math.max(0, valueMinMax[0]).toFixed(2);
+        valueMinMax[0] = Math.max(0, valueMinMax[0]);
       } else {
         high = Math.min(100, valueMinMax[1]).toFixed(2) + '% ';
         low = Math.max(0, valueMinMax[0]).toFixed(2) + '% ';
+        valueMinMax[1] = Math.min(100, valueMinMax[1]);
       }
       const colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
       let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
-
-      linColorArr = [colorScaleLinear(valueMinMax[0]), colorScaleLinear(center), colorScaleLinear(valueMinMax[1])];
+      let first_half_center = valueMinMax[0] + (center - valueMinMax[0]) / 2;
+      let second_half_center = center + (valueMinMax[1] - center) / 2;
+      linColorArr = [
+        colorScaleLinear(valueMinMax[0]),
+        colorScaleLinear(first_half_center),
+        colorScaleLinear(center),
+        colorScaleLinear(second_half_center),
+        colorScaleLinear(valueMinMax[1]),
+      ];
     }
   }
 </script>
@@ -165,7 +180,8 @@
     <p>{high ? high + '+' : ''}</p>
     <div
       class="legend-bar"
-      style="background: linear-gradient(to top, {linColorArr[0]}, {linColorArr[1]}, {linColorArr[2]})" />
+      style="background: linear-gradient(to top, {linColorArr[0]}, {linColorArr[1]}, {linColorArr[2]}, {linColorArr[3]},
+      {linColorArr[4]})" />
     <p>{low}</p>
   {/if}
 </div>

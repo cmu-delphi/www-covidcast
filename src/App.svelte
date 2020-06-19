@@ -392,7 +392,7 @@
     top: 110px;
     left: 10px;
     max-width: 210px;
-    z-index: 1000;
+    z-index: 1001;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 10px 10px;
     box-sizing: border-box;
