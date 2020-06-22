@@ -228,7 +228,7 @@
 
     const date = formatTimeWithoutYear(parseTime($currentDate));
     const sens = $sensorMap.get($currentSensor);
-    const population_commas = Population.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
+    const population_commas = parseInt(Population).toLocaleString();
     let title =
       (level === 'mega-county' ? 'Rest of ' : '') +
       NAME +
