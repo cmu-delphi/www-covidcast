@@ -34,7 +34,6 @@
       var max = Math.log(valueMinMax[1]) / Math.log(10);
       var min = Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10);
       var arr = logspace(min, max, 7);
-      console.log(arr);
       const colorScaleLog = d3
         .scaleSequentialLog(d3.interpolateYlOrRd)
         .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]]);

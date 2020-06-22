@@ -33,6 +33,41 @@
     flex-direction: column;
   }
 
+  .buttons-group button.button .disabled-tooltip {
+    visibility: hidden;
+    width: 80px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #666;
+    background-color: #fff;
+    color: #333;
+    font-weight: 400;
+    font-size: 0.95em;
+    line-height: 1.2em;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 5px;
+    position: absolute;
+    z-index: 1;
+    top: -5px;
+    left: 105%;
+  }
+
+  .buttons-group button.button .disabled-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent #666 transparent transparent;
+  }
+
+  .buttons-group button.button:hover .disabled-tooltip {
+    visibility: visible;
+  }
+
   .buttons-group-side {
     width: 100%;
     display: flex;
@@ -72,6 +107,41 @@
     border-left-color: #dbdbdb;
   }
 
+  .buttons-group-side button.button .disabled-tooltip {
+    visibility: hidden;
+    width: 80px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #666;
+    background-color: #fff;
+    color: #333;
+    font-size: 0.95em;
+    line-height: 1.2em;
+    font-weight: 400;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 5px;
+    position: absolute;
+    z-index: 1;
+    top: 150%;
+    left: 50%;
+    margin-left: -50px;
+  }
+
+  .buttons-group-side button.button .disabled-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #666 transparent;
+  }
+  .buttons-group-side button.button:hover .disabled-tooltip {
+    visibility: visible;
+  }
+
   .buttons-group-side .button.selected {
     background-color: #767676;
     color: #fff;
@@ -90,6 +160,7 @@
   p {
     margin-bottom: 5px;
   }
+
   @keyframes shake {
     10%,
     90% {
@@ -115,6 +186,7 @@
 </style>
 
 <div class="options">
+
   <div class="option">
     <p style="font-size: 15px;">
       <strong>Geo-level:</strong>
@@ -180,10 +252,14 @@
         on:click={() => {
           currentDataReadyOnMap.set(false);
           signalType.set('direction');
-        }}>
+        }}
+        disabled={$sensorMap.get($currentSensor).official ? true : false}>
         7-day Trend
+        {#if $sensorMap.get($currentSensor).official}
+          <span class="disabled-tooltip">Currently unavailable</span>
+        {/if}
       </button>
+
     </div>
   </div>
-
 </div>
