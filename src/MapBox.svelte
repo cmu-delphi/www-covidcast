@@ -227,14 +227,15 @@
     const { value, direction, NAME, STATE, Population } = e.features[0].properties;
 
     const date = formatTimeWithoutYear(parseTime($currentDate));
-
     const sens = $sensorMap.get($currentSensor);
+    const population_commas = Population.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
     let title =
       (level === 'mega-county' ? 'Rest of ' : '') +
       NAME +
       ($currentLevel === 'county' && level !== 'mega-county' ? ' County' : '') +
       (level === 'county' ? ', ' + dict[STATE] : '');
     let body;
+
     if ($signalType === 'value') {
       // More information displayed when counts is shown
       if ($currentSensor.match(/incidence_num/)) {
@@ -242,9 +243,10 @@
         const count = e.features[0].properties.value1;
         body = `
           <div class="map-popup-region-value-container">
-            Population: ${Population} <br>
-            ${sens.yAxis} (${date}): ${count} <br>
-            ${sens.yAxis} (7-day avg):
+            Population: ${population_commas} <br>
+            <u>${sens.yAxis}</u>: <br>
+            &emsp; ${date}: ${count} <br>
+            &emsp; 7-day avg:
             <span class="map-popup-region-value" 
                   style="background-color: ${fillColor}; 
                         color: ${getTextColorBasedOnBackground(fillColor)};">
@@ -258,9 +260,10 @@
         const count = e.features[0].properties.value1;
         body = `
           <div class="map-popup-region-value-container">
-            Population: ${Population} <br>
-            ${sens.yAxis} (${date}): ${count.toFixed(2)} <br>
-            ${sens.yAxis} (7-day avg):
+            Population: ${population_commas} <br>
+            <u>${sens.yAxis}</u>: <br>
+            &emsp; ${date}: ${count.toFixed(2)} <br>
+            &emsp; 7-day avg:
             <span class="map-popup-region-value" 
                   style="background-color: ${fillColor}; 
                         color: ${getTextColorBasedOnBackground(fillColor)};">

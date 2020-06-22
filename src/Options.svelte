@@ -244,7 +244,7 @@
           currentDataReadyOnMap.set(false);
           signalType.set('value');
         }}>
-        Intensity
+        {$currentSensor.match(/num/) ? 'Count' : 'Intensity'}
       </button>
       <button
         aria-pressed={$signalType === 'direction' ? 'true' : 'false'}
