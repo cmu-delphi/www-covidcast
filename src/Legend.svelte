@@ -70,6 +70,10 @@
       ];
     }
   }
+
+  function sig_figs(value, sigFigs) {
+    return parseFloat(value).toPrecision(sigFigs);
+  }
 </script>
 
 <style>
@@ -113,7 +117,7 @@
   .legend-bar {
     width: 20px;
     height: 100%;
-    align-self: end;
+    align-self: first baseline;
   }
 
   .direction-p {
@@ -167,7 +171,7 @@
   {:else if $currentSensor.match(/num/)}
     <div class="tick-p">
       <div class="tick" style="background: black" />
-      <p>{high ? high + '+' : ''}</p>
+      <p>{high ? sig_figs(high, 3) + '+' : ''}</p>
     </div>
     {#each logColorArr as { label, from_color, to_color }, i}
       <div class="count-p">
@@ -175,13 +179,13 @@
       </div>
       <div class="tick-p">
         <div class="tick" style="background: black" />
-        <p>{label}</p>
+        <p>{sig_figs(label, 3)}</p>
       </div>
     {/each}
   {:else}
     <div class="tick-p">
       <div class="tick" style="background: black" />
-      <p>{high ? high + '+' : ''}</p>
+      <p>{high ? sig_figs(high, 3) + '+' : ''}</p>
     </div>
     <div
       class="legend-bar"
@@ -189,7 +193,7 @@
       {linColorArr[4]})" />
     <div class="tick-p">
       <div class="tick" style="background: black" />
-      <p>{low}</p>
+      <p>{sig_figs(low, 3)}</p>
     </div>
   {/if}
 </div>

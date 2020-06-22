@@ -409,13 +409,13 @@
     align-items: center;
     justify-content: center;
     transition: all 0.1s ease-in;
-    height: 40%;
+    height: 35%;
   }
 
   .graph-container {
     position: absolute;
     z-index: 1001;
-    bottom: 15px;
+    bottom: 0px;
     right: 10px;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 5px 5px;
@@ -460,7 +460,7 @@
   .graph-toggole-button-container {
     position: absolute;
     z-index: 1001;
-    bottom: 15px;
+    bottom: 0px;
     right: 10px;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 5px 5px;
@@ -468,8 +468,8 @@
   }
 
   .graph-toggle-button {
-    width: 70px;
-    height: 35px;
+    width: 85px;
+    height: 40px;
     font-size: 14px;
     cursor: pointer;
     color: #333;
@@ -521,7 +521,7 @@
 
   .time-container {
     position: absolute;
-    bottom: 15px;
+    bottom: 0px;
     left: 10px;
     z-index: 1002;
     background-color: rgba(255, 255, 255, 0.9);
@@ -570,7 +570,7 @@
       aria-label="show time series"
       on:click={event => toggleGraphShowStatus(false)}>
       <span class="button-tooltip">Show time series</span>
-      <b>Time Graph</b>
+      <b>View Time Graph</b>
     </button>
   </div>
 {/if}

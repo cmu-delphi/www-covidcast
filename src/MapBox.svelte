@@ -279,7 +279,7 @@
             <span class="map-popup-region-value" 
                   style="background-color: ${fillColor}; 
                         color: ${getTextColorBasedOnBackground(fillColor)};">
-              ${parseFloat(value.toFixed(2)).toLocaleString}
+              ${parseFloat(value.toFixed(2)).toLocaleString()}
               ${sens.format === 'percent' ? '%' : ''}
             </span>
           </div>

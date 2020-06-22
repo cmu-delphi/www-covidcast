@@ -42,6 +42,7 @@
 
   let prettyDate = '';
   $: prettyDate = formatTime(new Date(rectifiedVal));
+  var weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   onMount(() => {
     currentDate.subscribe(d => {
@@ -461,7 +462,7 @@
 
 <div aria-label="date" class="time">
   <div aria-live="assertive" id="time-label" class="selected-date" bind:this={selectedDateDisplay}>
-    Viewing estimates for: {formatTimeWithoutYear(new Date(rectifiedVal))}
+    Viewing estimates for: {weekday[new Date(rectifiedVal).getDay()] + ', ' + formatTimeWithoutYear(new Date(rectifiedVal))}
   </div>
 
   <button class="load-more-button" on:click={loadMoreDataRange} disabled={!canLoadMore}>Load up to 2 more weeks</button>

@@ -27,7 +27,7 @@ export const sensors = readable(
       format: 'percent',
       signal: 'smoothed_adj_cli',
       levels: ['county', 'msa', 'state'],
-      official: false
+      official: false,
     },
     {
       name: 'Symptoms (FB)',
@@ -51,6 +51,30 @@ export const sensors = readable(
       format: 'percent',
       signal: 'smoothed_hh_cmnty_cli',
       levels: ['county', 'msa', 'state'],
+      official: false,
+    },
+    {
+      name: 'Full-time work (Safegraph)',
+      id: 'safegraph',
+      tooltipText: 'Proportion of people working full time, based on Safegraph mobility data',
+      mapTitleText: 'Proportion of people working full time, based on Safegraph mobility data',
+      chartTitleText: 'Proportion of people working full time, based on Safegraph mobility data',
+      yAxis: 'Proportion',
+      format: 'raw',
+      signal: 'full_time_work_prop',
+      levels: ['county', 'state'],
+      official: false,
+    },
+    {
+      name: 'Part-time work (Safegraph)',
+      id: 'safegraph',
+      tooltipText: 'Proportion of people working part time, based on Safegraph mobility data',
+      mapTitleText: 'Proportion of people working part time, based on Safegraph mobility data',
+      chartTitleText: 'Proportion of people working part time, based on Safegraph mobility data',
+      yAxis: 'Proportion',
+      format: 'raw',
+      signal: 'part_time_work_prop',
+      levels: ['county', 'state'],
       official: false,
     },
     {
@@ -100,7 +124,6 @@ export const sensors = readable(
       signal: 'confirmed_7dav_incidence_prop',
       levels: ['msa', 'county', 'state'],
       official: true,
-      bolded: false
     },
     {
       name: 'Deaths',
