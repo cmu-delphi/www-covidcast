@@ -250,7 +250,7 @@
             <span class="map-popup-region-value" 
                   style="background-color: ${fillColor}; 
                         color: ${getTextColorBasedOnBackground(fillColor)};">
-              ${avg.toFixed(2)}
+              ${parseFloat(avg.toFixed(2)).toLocaleString()}
             </span>
             
           </div>
@@ -267,7 +267,7 @@
             <span class="map-popup-region-value" 
                   style="background-color: ${fillColor}; 
                         color: ${getTextColorBasedOnBackground(fillColor)};">
-              ${avg.toFixed(2)}
+              ${parseFloat(avg.toFixed(2)).toLocaleString()}
               ${sens.format === 'percent' ? '%' : ''}
             </span>
           </div>
@@ -279,7 +279,7 @@
             <span class="map-popup-region-value" 
                   style="background-color: ${fillColor}; 
                         color: ${getTextColorBasedOnBackground(fillColor)};">
-              ${value.toFixed(2)}
+              ${parseFloat(value.toFixed(2)).toLocaleString}
               ${sens.format === 'percent' ? '%' : ''}
             </span>
           </div>

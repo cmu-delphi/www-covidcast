@@ -415,7 +415,7 @@
   .graph-container {
     position: absolute;
     z-index: 1001;
-    bottom: 0px;
+    bottom: 15px;
     right: 10px;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 5px 5px;
@@ -460,7 +460,7 @@
   .graph-toggole-button-container {
     position: absolute;
     z-index: 1001;
-    bottom: 10px;
+    bottom: 15px;
     right: 10px;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 5px 5px;
@@ -470,6 +470,7 @@
   .graph-toggle-button {
     width: 70px;
     height: 35px;
+    font-size: 14px;
     cursor: pointer;
     color: #333;
     background-color: transparent;
@@ -520,7 +521,7 @@
 
   .time-container {
     position: absolute;
-    bottom: 10px;
+    bottom: 15px;
     left: 10px;
     z-index: 1002;
     background-color: rgba(255, 255, 255, 0.9);
