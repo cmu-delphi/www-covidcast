@@ -156,7 +156,6 @@
 
     let currDate = parseTime(date);
     let currDateSeven = d3.timeDay.offset(currDate, -7);
-
     // peg values to max and min if out of range
     let minMax = calculateSD(sensor);
     let chartMax = minMax[1];
@@ -195,12 +194,15 @@
     let format = $sensorMap.get(sensor).format;
     if (format === 'percent') formatYTicks = d => d + '%';
     else if (format === 'raw') {
-      if (sensor.match(/num/)) {
-        //formatYTicks = d3.format('d');
-        formatYTicks = y.domain[1] - y.domain[0] > 10 ? d3.format('.0f') : d3.format('.2f');
+      const range = y.domain()[1] - y.domain()[0];
+      if (range > 10) {
+        formatYTicks = d3.format('.0f');
+      } else if (range < 1) {
+        formatYTicks = d3.format('.2f');
       } else {
-        formatYTicks = y.domain[1] - y.domain[0] > 10 ? d3.format('.0f') : d3.format('.1f');
+        formatYTicks = d3.format('.1f');
       }
+      //formatYTicks = y.domain[1] - y.domain[0] > 10 ? d3.format('.0f') : d3.format('.1f');
     }
     var formatXTicks = data.length < 6 ? d3.timeDay.every(1) : d3.timeDay.every(4);
 

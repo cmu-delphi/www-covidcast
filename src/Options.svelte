@@ -220,7 +220,7 @@
         currentSensor.set(sensor);
         shouldDisplayBanner = true;
       }}>
-      <optgroup label="Indicators">
+      <optgroup label="Indicator">
         {#each Array.from($sensorMap.keys()).filter(d => !$sensorMap.get(d).official) as sensor}
           <option title={$sensorMap.get(sensor).tooltipText} value={sensor}>{$sensorMap.get(sensor).name}</option>
         {/each}

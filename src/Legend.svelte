@@ -27,8 +27,8 @@
       sts = stats.get(sens + '_' + level);
       valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
 
-      high = valueMinMax[1].toFixed(2);
-      low = Math.max(0, valueMinMax[0]).toFixed(2);
+      high = sig_figs(valueMinMax[1].toFixed(2), 3);
+      low = sig_figs(Math.max(0, valueMinMax[0]).toFixed(2), 3);
 
       logColorArr = [{ label: '0', from_color: DIRECTION_THEME.countMin, to_color: DIRECTION_THEME.countMin }];
       var max = Math.log(valueMinMax[1]) / Math.log(10);
@@ -49,12 +49,12 @@
       sts = stats.get(sens);
       valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
       if ($sensorMap.get($currentSensor).format === 'raw') {
-        high = valueMinMax[1].toFixed(2);
-        low = Math.max(0, valueMinMax[0]).toFixed(2);
+        high = sig_figs(valueMinMax[1].toFixed(2), 3);
+        low = sig_figs(Math.max(0, valueMinMax[0]).toFixed(2), 3);
         valueMinMax[0] = Math.max(0, valueMinMax[0]);
       } else {
-        high = Math.min(100, valueMinMax[1]).toFixed(2) + '% ';
-        low = Math.max(0, valueMinMax[0]).toFixed(2) + '% ';
+        high = sig_figs(Math.min(100, valueMinMax[1]).toFixed(2), 3) + '% ';
+        low = sig_figs(Math.max(0, valueMinMax[0]).toFixed(2), 3) + '% ';
         valueMinMax[1] = Math.min(100, valueMinMax[1]);
       }
       const colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
@@ -72,7 +72,7 @@
   }
 
   function sig_figs(value, sigFigs) {
-    return parseFloat(value).toPrecision(sigFigs);
+    return parseFloat(parseFloat(value).toPrecision(sigFigs));
   }
 </script>
 
@@ -171,7 +171,7 @@
   {:else if $currentSensor.match(/num/)}
     <div class="tick-p">
       <div class="tick" style="background: black" />
-      <p>{high ? sig_figs(high, 3) + '+' : ''}</p>
+      <p>{high ? high + '+' : ''}</p>
     </div>
     {#each logColorArr as { label, from_color, to_color }, i}
       <div class="count-p">
@@ -185,7 +185,7 @@
   {:else}
     <div class="tick-p">
       <div class="tick" style="background: black" />
-      <p>{high ? sig_figs(high, 3) + '+' : ''}</p>
+      <p>{high ? high + '+' : ''}</p>
     </div>
     <div
       class="legend-bar"
@@ -193,7 +193,7 @@
       {linColorArr[4]})" />
     <div class="tick-p">
       <div class="tick" style="background: black" />
-      <p>{sig_figs(low, 3)}</p>
+      <p>{low}</p>
     </div>
   {/if}
 </div>
