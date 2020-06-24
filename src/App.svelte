@@ -413,11 +413,9 @@
   }
 
   .graph-container {
-    position: relative;
-    float: right;
-    width: 410px;
+    position: absolute;
     z-index: 1001;
-    bottom: 382px;
+    bottom: 24px;
     right: 10px;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 5px 5px;
@@ -460,10 +458,10 @@
   }
 
   .graph-toggole-button-container {
-    position: relative;
+    position: absolute;
     float: right;
     z-index: 1001;
-    bottom: 60px;
+    bottom: 24px;
     right: 10px;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 5px 5px;
@@ -523,10 +521,9 @@
   }
 
   .time-container {
-    position: relative;
-    bottom: 10px;
+    position: absolute;
+    bottom: 24px;
     left: 10px;
-    width: 660px;
     z-index: 1002;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 30px 10px;

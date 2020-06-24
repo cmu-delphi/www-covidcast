@@ -209,10 +209,10 @@
 
   <div class="option">
     <p style="font-size: 15px;">
-      <strong>Indicators:</strong>
+      <strong>Indicator:</strong>
     </p>
     <select
-      aria-label="geographic level"
+      aria-label="indicator options"
       class="buttons-group"
       bind:value={sensor}
       on:change={() => {
@@ -220,7 +220,7 @@
         currentSensor.set(sensor);
         shouldDisplayBanner = true;
       }}>
-      <optgroup label="Indicator">
+      <optgroup label="Indicators">
         {#each Array.from($sensorMap.keys()).filter(d => !$sensorMap.get(d).official) as sensor}
           <option title={$sensorMap.get(sensor).tooltipText} value={sensor}>{$sensorMap.get(sensor).name}</option>
         {/each}
