@@ -231,6 +231,13 @@
     position: relative;
   }
 
+  #time-label {
+    font-family: 'Open Sans', sans-serif;
+    line-height: 1rem;
+    font-size: 16px;
+    font-weight: 400;
+  }
+
   .selected-date {
     position: absolute;
     top: -20px;
@@ -311,6 +318,7 @@
   }
 
   .time p.min-max {
+    font-family: 'Open Sans', sans-serif;
     font-size: 0.8rem;
     color: #666;
   }

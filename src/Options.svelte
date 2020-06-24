@@ -27,6 +27,11 @@
     width: 100%;
   }
 
+  .option .option-title {
+    margin-bottom: 0px !important;
+    padding-bottom: 0px !important;
+  }
+
   .buttons-group {
     width: 100%;
     display: flex;
@@ -188,7 +193,7 @@
 <div class="options">
 
   <div class="option">
-    <p style="font-size: 15px;">
+    <p style="font-size: 15px;" class="option-title">
       <strong>Geo-level:</strong>
     </p>
     <select
@@ -208,7 +213,7 @@
   </div>
 
   <div class="option">
-    <p style="font-size: 15px;">
+    <p style="font-size: 15px;" class="option-title">
       <strong>Indicator:</strong>
     </p>
     <select

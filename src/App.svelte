@@ -412,7 +412,7 @@
     height: 35%;
   }
 
-  .graph-container {
+  /* .graph-container {
     position: absolute;
     z-index: 1001;
     bottom: 24px;
@@ -529,7 +529,7 @@
     padding: 30px 10px;
     box-sizing: border-box;
     transition: all 0.1s ease-in;
-  }
+  } */
 
   .error-message-container {
     position: absolute;
@@ -548,7 +548,7 @@
   <div class="error-message-container">Failed to load data. Please try again later...</div>
 {/if}
 
-<MapBox />
+<MapBox {isIE} {graphShowStatus} {toggleGraphShowStatus} />
 
 <div class="options-container">
   <Options {isIE} />
@@ -558,12 +558,11 @@
   <Legend />
 </div>
 
-<div class="time-container">
+<!-- <div class="time-container">
   <Time />
-</div>
+</div> -->
 
-<!-- need to add the $mapFirstLoaded check -->
-{#if $mapFirstLoaded && !graphShowStatus}
+<!-- {#if $mapFirstLoaded && !graphShowStatus}
   <div class="graph-toggole-button-container">
     <button
       title={isIE !== undefined ? 'Show time series' : ''}
@@ -576,7 +575,6 @@
   </div>
 {/if}
 
-<!-- need to add the $mapFirstLoaded check -->
 <div class="graph-container {$mapFirstLoaded && graphShowStatus ? 'show' : ''}">
   <div class="hide-graph-button-anchor">
     <button
@@ -589,4 +587,4 @@
   </div>
 
   <Graph />
-</div>
+</div> -->
