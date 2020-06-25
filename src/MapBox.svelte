@@ -5,6 +5,8 @@
   import { defaultRegionOnStartup, getTextColorBasedOnBackground } from './util.js';
   import { DIRECTION_THEME, MAP_THEME } from './theme.js';
   import AutoComplete from 'simple-svelte-autocomplete';
+  import Options from './Options.svelte';
+  import Legend from './Legend.svelte';
   import Time from './Time.svelte';
   import Graph from './Graph.svelte';
 
@@ -987,9 +989,34 @@
     width: 90%;
   }
 
+  .options-container {
+    position: absolute;
+    top: 12px;
+    left: 10px;
+    max-width: 210px;
+    z-index: 1001;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 10px 10px;
+    box-sizing: border-box;
+    transition: all 0.1s ease-in;
+  }
+
+  .legend-container {
+    position: absolute;
+    top: 220px;
+    left: 10px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s ease-in;
+    height: 40%;
+  }
+
   .time-container {
     position: absolute;
-    bottom: 24px;
+    bottom: 12px;
     left: 10px;
     z-index: 1002;
     background-color: rgba(255, 255, 255, 0.9);
@@ -1001,7 +1028,7 @@
   .graph-container {
     position: absolute;
     z-index: 1001;
-    bottom: 24px;
+    bottom: 12px;
     right: 10px;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 5px 5px;
@@ -1047,7 +1074,7 @@
     position: absolute;
     float: right;
     z-index: 1001;
-    bottom: 24px;
+    bottom: 12px;
     right: 10px;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 5px 5px;
@@ -1171,6 +1198,14 @@
   </div>
 {/if}
 <div bind:this={container} class="map-container">
+  <div class="options-container">
+    <Options {isIE} />
+  </div>
+
+  <div class="legend-container">
+    <Legend />
+  </div>
+
   <div class="state-buttons-holder">
     <button
       aria-label="show entire map"
