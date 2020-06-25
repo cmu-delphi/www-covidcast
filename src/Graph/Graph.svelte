@@ -18,9 +18,9 @@
     timeRangeOnSlider,
     yesterday,
     mounted,
-  } from './stores.js';
-  import { calculateValFromRectified } from './util.js';
-  import { DIRECTION_THEME } from './theme.js';
+  } from '../stores.js';
+  import { calculateValFromRectified } from '../util.js';
+  import { DIRECTION_THEME } from '../theme.js';
   import * as d3 from 'd3';
   import d3Tip from 'd3-tip';
 
