@@ -36,6 +36,19 @@
   let first_loaded = true;
 
   function callAPI(id, signal, level, date, region) {
+    console.log(
+      ENDPOINT +
+        '&data_source=' +
+        id +
+        '&signal=' +
+        signal +
+        '&geo_type=' +
+        level +
+        '&time_values=' +
+        date +
+        '&geo_value=' +
+        region,
+    );
     return fetch(
       ENDPOINT +
         '&data_source=' +
@@ -68,6 +81,12 @@
     return new_epidata;
   }
 
+  function check_wip(signal_name, other_signal) {
+    if (signal_name.match(/wip/)) {
+      return 'wip_' + other_signal.replace('incidence', 'incid');
+    }
+    return other_signal;
+  }
   // We cache API calls for all regions at a given time and update currentData.
   function updateRegionSliceCache(sensor, level, date, reason = 'unspecified') {
     let sEntry = $sensorMap.get(sensor);
@@ -86,13 +105,13 @@
           if (sEntry.signal.match(death_regex)) {
             // deaths_incidence_prop
             if (sEntry.signal === 'deaths_7dav_incidence_prop') {
-              callAPI(sEntry.id, 'deaths_incidence_prop', level, date, '*').then(d1 => {
+              callAPI(sEntry.id, check_wip(sEntry.signal, 'deaths_incidence_prop'), level, date, '*').then(d1 => {
                 var extended = extend(d, d1);
                 currentData.set(extended);
                 regionSliceCache.update(m => m.set(sensor + level + date, extended));
               });
             } else {
-              callAPI(sEntry.id, 'deaths_incidence_num', level, date, '*').then(d1 => {
+              callAPI(sEntry.id, check_wip(sEntry.signal, 'deaths_incidence_num'), level, date, '*').then(d1 => {
                 var extended = extend(d, d1);
                 currentData.set(extended);
                 regionSliceCache.update(m => m.set(sensor + level + date, extended));
@@ -103,13 +122,13 @@
           else if (sEntry.signal.match(cases_regex)) {
             // confirmed_incidence_prop
             if (sEntry.signal === 'confirmed_7dav_incidence_prop') {
-              callAPI(sEntry.id, 'confirmed_incidence_prop', level, date, '*').then(d1 => {
+              callAPI(sEntry.id, check_wip(sEntry.signal, 'confirmed_incidence_prop'), level, date, '*').then(d1 => {
                 var extended = extend(d, d1);
                 currentData.set(extended);
                 regionSliceCache.update(m => m.set(sensor + level + date, extended));
               });
             } else {
-              callAPI(sEntry.id, 'confirmed_incidence_num', level, date, '*').then(d1 => {
+              callAPI(sEntry.id, check_wip(sEntry.signal, 'confirmed_incidence_num'), level, date, '*').then(d1 => {
                 var extended = extend(d, d1);
                 currentData.set(extended);
                 regionSliceCache.update(m => m.set(sensor + level + date, extended));
