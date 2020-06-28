@@ -7,6 +7,7 @@
   import AutoComplete from 'simple-svelte-autocomplete';
   import Options from './Options.svelte';
   import Legend from './Legend.svelte';
+  import Banner from './Banner.svelte';
   import Time from './Time.svelte';
   import Graph from './Graph/Graph.svelte';
   import GraphContainer from './Graph/GraphContainer.svelte';
@@ -33,6 +34,7 @@
 
   export let isIE, graphShowStatus, toggleGraphShowStatus;
 
+  let searchErrorComponent;
   let parseTime = d3.timeParse('%Y%m%d');
   let formatTimeWithoutYear = d3.timeFormat('%B %d');
 
@@ -59,13 +61,11 @@
   let megaHoveredId;
   let clickedId;
   let megaClickedId;
-  let state_lst = [];
-  let county_lst = [];
-  let msa_lst = [];
-
   let selectedRegion;
+
   $: region_lst = [];
   $: loaded = false;
+  $: invalid_search = false;
   $: currentSensorTooltip = $sensorMap.get($currentSensor).mapTitleText;
 
   var dict = {
@@ -911,6 +911,72 @@
         '&autocomplete=false&country=us&types=place%2Cregion',
     ).then(d => d.json());
   }
+  function get_zoom_query(selectedRegion) {
+    let zoom_level;
+    if (selectedRegion['level'] === 'county') {
+      zoom_level = 6.5;
+    } else if (selectedRegion['level'] === 'msa') {
+      zoom_level = 6;
+    } else {
+      zoom_level = 5;
+    }
+    var long_offset = 0;
+    var lat_offset = 0;
+    var query = selectedRegion['display_name'];
+    if (selectedRegion['id'] === '72' || selectedRegion['id'].substring(0, 2) === '72') {
+      query = 'Florida';
+      long_offset = 6;
+      lat_offset = -3;
+    } else if (selectedRegion['id'].substring(0, 2) == '02') {
+      query = 'Alaska';
+      zoom_level = 6;
+    }
+    return [query, zoom_level, long_offset, lat_offset];
+  }
+
+  function search_element(selectedRegion) {
+    let has_value_flag = false;
+    const levels_avail = $sensorMap.get($currentSensor).levels;
+    for (var i = 0; i < levels_avail.length; i++) {
+      if (selectedRegion['level'] === levels_avail[i]) {
+        has_value_flag = true;
+        break;
+      }
+    }
+    if (!has_value_flag) {
+      invalid_search = true;
+      searchErrorComponent.count();
+    } else {
+      if (selectedRegion['level'] !== $currentLevel) {
+        currentDataReadyOnMap.set(false);
+        currentLevel.set(selectedRegion['level']);
+      }
+      if (clickedId) {
+        map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: false });
+      }
+      if (megaClickedId) {
+        map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: false });
+      }
+      megaClickedId = null;
+      currentRegionName.set(selectedRegion['name']);
+      currentRegion.set(selectedRegion['property_id']);
+      clickedId = parseInt(selectedRegion['id']);
+      map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+      const search_info = get_zoom_query(selectedRegion);
+      const query = search_info[0];
+      const zoom_level = search_info[1];
+      const long_offset = search_info[2];
+      const lat_offset = search_info[3];
+      geocode(query).then(d => {
+        var coords = projectionMercartor.invert(projection(d.features[0].center));
+        if (selectedRegion['property_id'] === 'PR' || selectedRegion['id'].substring(0, 2) === '72') {
+          coords[0] += long_offset;
+          coords[1] += lat_offset;
+        }
+        map.flyTo({ center: coords, zoom: zoom_level, essential: true });
+      });
+    }
+  }
 </script>
 
 <style>
@@ -1015,6 +1081,19 @@
     height: 40%;
   }
 
+  .invalid_search-container {
+    position: absolute;
+    transition: opacity 0.3s ease-in-out;
+    z-index: 1003;
+    top: 12px;
+    width: 250px;
+    background-color: rgba(255, 255, 255, 0.9);
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .time-container {
     position: absolute;
     bottom: 12px;
@@ -1043,48 +1122,7 @@
       minCharactersToSearch="2"
       onChange={_ => {
         if (typeof selectedRegion !== 'undefined') {
-          if (selectedRegion['level'] !== $currentLevel) {
-            currentDataReadyOnMap.set(false);
-            currentLevel.set(selectedRegion['level']);
-          }
-          if (clickedId) {
-            map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: false });
-          }
-          if (megaClickedId) {
-            map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: false });
-          }
-          megaClickedId = null;
-          currentRegionName.set(selectedRegion['name']);
-          currentRegion.set(selectedRegion['property_id']);
-          clickedId = parseInt(selectedRegion['id']);
-          map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-          let zoom_level;
-          if (selectedRegion['level'] === 'county') {
-            zoom_level = 6.5;
-          } else if (selectedRegion['level'] === 'msa') {
-            zoom_level = 6;
-          } else {
-            zoom_level = 5;
-          }
-          var long_offset = 0;
-          var lat_offset = 0;
-          var query = selectedRegion['display_name'];
-          if (selectedRegion['id'] === '72' || selectedRegion['id'].substring(0, 2) === '72') {
-            query = 'Florida';
-            long_offset = 6;
-            lat_offset = -3;
-          } else if (selectedRegion['id'].substring(0, 2) == '02') {
-            query = 'Alaska';
-            zoom_level = 6;
-          }
-          geocode(query).then(d => {
-            var coords = projectionMercartor.invert(projection(d.features[0].center));
-            if (selectedRegion['property_id'] === 'PR' || selectedRegion['id'].substring(0, 2) === '72') {
-              coords[0] += long_offset;
-              coords[1] += lat_offset;
-            }
-            map.flyTo({ center: coords, zoom: zoom_level, essential: true });
-          });
+          search_element(selectedRegion);
         }
       }} />
   </div>
@@ -1096,6 +1134,10 @@
 
   <div class="legend-container">
     <Legend />
+  </div>
+
+  <div class="invalid_search-container">
+    <Banner bind:this={searchErrorComponent} />
   </div>
 
   <div class="state-buttons-holder">

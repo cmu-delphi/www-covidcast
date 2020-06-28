@@ -36,19 +36,6 @@
   let first_loaded = true;
 
   function callAPI(id, signal, level, date, region) {
-    console.log(
-      ENDPOINT +
-        '&data_source=' +
-        id +
-        '&signal=' +
-        signal +
-        '&geo_type=' +
-        level +
-        '&time_values=' +
-        date +
-        '&geo_value=' +
-        region,
-    );
     return fetch(
       ENDPOINT +
         '&data_source=' +
