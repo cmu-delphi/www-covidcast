@@ -30,6 +30,17 @@ export const sensors = readable(
       official: false,
     },
     {
+      name: "Hospital Admissions",
+      id: "hospital-admissions",
+      tooltipText: "Percentage of daily hospital admissions with COVID-19 associated diagnoses",
+      mapTitleText: "Percentage of daily hospital admissions with COVID-19 associated diagnoses",
+      chartTitleText: "Percentage of daily hospital admissions with COVID-19 associated diagnoses",
+      yAxis: "Percentage",
+      format: "percent",
+      signal: "smoothed_adj_covid19",
+      levels: ["county", "msa", "state"],
+    },
+    {
       name: 'Symptoms (FB)',
       id: 'fb-survey',
       tooltipText: 'Percentage of people with COVID-like symptoms, based on Facebook surveys',
