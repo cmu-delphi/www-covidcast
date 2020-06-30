@@ -19,8 +19,8 @@
   let selectedDateDisplay;
 
   let parseTime = d3.timeParse('%Y%m%d');
-  let formatTime = d3.timeFormat('%B %d, %Y');
-  let formatTimeWithoutYear = d3.timeFormat('%B %d');
+  let formatTime = d3.timeFormat('%B %-d, %Y');
+  let formatTimeWithoutYear = d3.timeFormat('%B %-d');
 
   let interval = 14;
   let rectifiedRange = interval;
@@ -470,7 +470,7 @@
 
 <div aria-label="date" class="time">
   <div aria-live="assertive" id="time-label" class="selected-date" bind:this={selectedDateDisplay}>
-    Viewing estimates for: {weekday[new Date(rectifiedVal).getDay()] + ', ' + formatTimeWithoutYear(new Date(rectifiedVal))}
+    Estimates for {weekday[new Date(rectifiedVal).getDay()] + ', ' + formatTimeWithoutYear(new Date(rectifiedVal))}
   </div>
 
   <button class="load-more-button" on:click={loadMoreDataRange} disabled={!canLoadMore}>Load up to 2 more weeks</button>

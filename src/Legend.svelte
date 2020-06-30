@@ -7,13 +7,7 @@
   let high = '';
   let low = '';
   $: logColorArr = [{ label: '0', from_color: DIRECTION_THEME.countMin, to_color: DIRECTION_THEME.countMin }];
-  $: linColorArr = [
-    DIRECTION_THEME.countMin,
-    DIRECTION_THEME.countMin,
-    DIRECTION_THEME.countMin,
-    DIRECTION_THEME.countMin,
-    DIRECTION_THEME.countMin,
-  ];
+  $: linColorArr = [];
 
   currentSensor.subscribe(s => ($stats ? updateLowHigh(s, $stats, $currentLevel) : ''));
   stats.subscribe(s => (s ? updateLowHigh($currentSensor, s, $currentLevel) : ''));
@@ -55,24 +49,36 @@
       } else {
         high = sig_figs(Math.min(100, valueMinMax[1]).toFixed(2), 3) + '% ';
         low = sig_figs(Math.max(0, valueMinMax[0]).toFixed(2), 3) + '% ';
+        valueMinMax[0] = Math.max(0, valueMinMax[0]);
         valueMinMax[1] = Math.min(100, valueMinMax[1]);
       }
+      console.log(valueMinMax);
       const colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
-      let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
-      let first_half_center = valueMinMax[0] + (center - valueMinMax[0]) / 2;
-      let second_half_center = center + (valueMinMax[1] - center) / 2;
-      linColorArr = [
-        colorScaleLinear(valueMinMax[0]),
-        colorScaleLinear(first_half_center),
-        colorScaleLinear(center),
-        colorScaleLinear(second_half_center),
-        colorScaleLinear(valueMinMax[1]),
-      ];
+      var arr = split_domain(valueMinMax[0], valueMinMax[1], 7);
+      linColorArr = [];
+      for (var i = 0; i < arr.length - 1; i++) {
+        arr[i] = parseFloat(arr[i]).toFixed(2);
+        linColorArr.unshift({
+          label: arr[i],
+          from_color: colorScaleLinear(arr[i]),
+          to_color: colorScaleLinear(arr[i + 1]),
+        });
+      }
     }
   }
 
   function sig_figs(value, sigFigs) {
     return parseFloat(parseFloat(value).toPrecision(sigFigs));
+  }
+
+  function split_domain(min, max, parts) {
+    let split_arr = [min];
+    const increment = (max - min) / parts;
+    for (var i = 1; i < parts; i++) {
+      split_arr.push(split_arr[i - 1] + increment);
+    }
+    split_arr.push(max);
+    return split_arr;
   }
 </script>
 
@@ -187,13 +193,14 @@
       <div class="tick" style="background: black" />
       <p>{high ? high + '+' : ''}</p>
     </div>
-    <div
-      class="legend-bar"
-      style="background: linear-gradient(to top, {linColorArr[0]}, {linColorArr[1]}, {linColorArr[2]}, {linColorArr[3]},
-      {linColorArr[4]})" />
-    <div class="tick-p">
-      <div class="tick" style="background: black" />
-      <p>{low}</p>
-    </div>
+    {#each linColorArr as { label, from_color, to_color }, j}
+      <div class="count-p">
+        <div class="color inc" style="background: linear-gradient(to top, {from_color}, {to_color})" />
+      </div>
+      <div class="tick-p">
+        <div class="tick" style="background: black" />
+        <p>{sig_figs(label, 3)}</p>
+      </div>
+    {/each}
   {/if}
 </div>
