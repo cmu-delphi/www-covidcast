@@ -155,16 +155,25 @@
     });
 
     let currDate = parseTime(date);
-    let currDateSeven = d3.timeDay.offset(currDate, -7);
+    let currDateSeven = d3.timeDay.offset(currDate, -6);
     // peg values to max and min if out of range
     let minMax = calculateSD(sensor);
     let chartMax = minMax[1];
     let chartMin = minMax[0];
 
-    for (var i = 0; i < data.length; i++) {
+    let latest_direction = -100;
+    let hit_latest_node = false;
+    for (var i = data.length - 1; i >= 0; i--) {
       let directionDate = parseTime(data[i].time_value);
       if (directionDate >= currDateSeven && directionDate <= currDate) {
         data[i].inDirection = true;
+        if (!hit_latest_node) {
+          latest_direction = data[i].direction;
+          data[i].coloredDirection = latest_direction;
+          hit_latest_node = true;
+        } else {
+          data[i].coloredDirection = latest_direction;
+        }
       } else {
         data[i].inDirection = false;
       }
@@ -282,7 +291,7 @@
       .style('fill', d => {
         let color = '#767676';
         if (d.inDirection && signal === 'direction') {
-          switch (d.direction) {
+          switch (d.coloredDirection) {
             case 1:
               color = DIRECTION_THEME.increasing;
               break;
