@@ -25,17 +25,14 @@
 
   .option {
     width: 100%;
+    display: inline-block;
   }
-
+  .toggle {
+    width: 200px;
+  }
   .option .option-title {
     margin-bottom: 0px !important;
     padding-bottom: 0px !important;
-  }
-
-  .buttons-group {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
   }
 
   .buttons-group button.button .disabled-tooltip {
@@ -162,8 +159,17 @@
   .buttons-group-side .button:active {
     outline: none;
   }
-  p {
-    margin-bottom: 5px;
+  label {
+    display: inline-block;
+  }
+  select.indicators {
+    display: inline-block;
+    width: 200px;
+    margin-bottom: 10px;
+  }
+  select.geo-level {
+    display: inline-block;
+    width: 125px;
   }
 
   @keyframes shake {
@@ -193,32 +199,12 @@
 <div class="options">
 
   <div class="option">
-    <p style="font-size: 15px;" class="option-title">
-      <strong>Geo-level:</strong>
-    </p>
-    <select
-      aria-label="geographic level"
-      class="buttons-group"
-      bind:value={level}
-      on:change={() => {
-        currentDataReadyOnMap.set(false);
-        currentLevel.set(level);
-      }}>
-      {#each Object.keys($levels) as level}
-        <option value={level} disabled={$sensorMap.get($currentSensor).levels.includes(level) === false}>
-          {$levels[level]}
-        </option>
-      {/each}
-    </select>
-  </div>
-
-  <div class="option">
-    <p style="font-size: 15px;" class="option-title">
-      <strong>Indicator:</strong>
-    </p>
+    <label style="font-size: 15px;" class="option-title">
+      <strong>Displaying</strong>
+    </label>
     <select
       aria-label="indicator options"
-      class="buttons-group"
+      class="indicators"
       bind:value={sensor}
       on:change={() => {
         currentDataReadyOnMap.set(false);
@@ -236,11 +222,31 @@
         {/each}
       </optgroup>
     </select>
+
+    <label style="font-size: 15px;" class="option-title">
+      <strong>&nbsp;for&nbsp;</strong>
+    </label>
+
+    <select
+      aria-label="geographic level"
+      class="geo-level"
+      bind:value={level}
+      on:change={() => {
+        currentDataReadyOnMap.set(false);
+        currentLevel.set(level);
+      }}>
+      {#each Object.keys($levels) as level}
+        <option value={level} disabled={$sensorMap.get($currentSensor).levels.includes(level) === false}>
+          {$levels[level]}
+        </option>
+      {/each}
+    </select>
+
   </div>
 
   <br />
 
-  <div class="option">
+  <div class="toggle">
     <div aria-label="display type" class="buttons-group-side">
       <button
         aria-pressed={$signalType === 'value' ? 'true' : 'false'}

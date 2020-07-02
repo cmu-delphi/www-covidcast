@@ -995,19 +995,11 @@
     margin-right: auto;
   }
 
-  .search {
-    position: absolute;
-    width: 50%;
-    left: 25%;
-    top: 60px;
-    z-index: 1001;
-  }
-
   .map-container {
     width: 100%;
     height: 80vh;
     position: relative;
-    top: 100px;
+    top: 50px;
     min-height: 550px;
   }
 
@@ -1060,7 +1052,7 @@
     position: absolute;
     top: 12px;
     left: 10px;
-    max-width: 220px;
+    max-width: 500px;
     z-index: 1001;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 10px 10px;
@@ -1068,9 +1060,17 @@
     transition: all 0.1s ease-in;
   }
 
+  .search {
+    position: absolute;
+    width: 450px;
+    right: 75px;
+    top: 12px;
+    z-index: 1001;
+  }
+
   .legend-container {
     position: absolute;
-    top: 220px;
+    top: 170px;
     left: 10px;
     z-index: 1000;
     display: flex;
@@ -1078,7 +1078,7 @@
     align-items: center;
     justify-content: center;
     transition: all 0.1s ease-in;
-    height: 40%;
+    height: 45%;
   }
 
   .invalid_search-container {
@@ -1110,27 +1110,28 @@
   <span class="banner-text">{currentSensorTooltip}</span>
 </div>
 
-{#if loaded && region_lst.length != 0}
-  <div class="search">
-    <AutoComplete
-      placeholder="Search for a location..."
-      items={region_lst}
-      bind:selectedItem={selectedRegion}
-      labelFieldName="display_name"
-      keywordsFunction={place => place.display_name}
-      maxItemsToShowInList="5"
-      minCharactersToSearch="2"
-      onChange={_ => {
-        if (typeof selectedRegion !== 'undefined') {
-          search_element(selectedRegion);
-        }
-      }} />
-  </div>
-{/if}
 <div bind:this={container} class="map-container">
   <div class="options-container">
     <Options {isIE} />
   </div>
+
+  {#if loaded && region_lst.length != 0}
+    <div class="search">
+      <AutoComplete
+        placeholder="Search for a location..."
+        items={region_lst}
+        bind:selectedItem={selectedRegion}
+        labelFieldName="display_name"
+        keywordsFunction={place => place.display_name}
+        maxItemsToShowInList="5"
+        minCharactersToSearch="2"
+        onChange={_ => {
+          if (typeof selectedRegion !== 'undefined') {
+            search_element(selectedRegion);
+          }
+        }} />
+    </div>
+  {/if}
 
   <div class="legend-container">
     <Legend />
