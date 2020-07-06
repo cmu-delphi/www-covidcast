@@ -1122,9 +1122,7 @@
         items={region_lst}
         bind:selectedItem={selectedRegion}
         labelFieldName="display_name"
-        keywordsFunction={place => place.display_name}
         maxItemsToShowInList="5"
-        minCharactersToSearch="2"
         onChange={_ => {
           if (typeof selectedRegion !== 'undefined') {
             search_element(selectedRegion);

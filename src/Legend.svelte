@@ -120,12 +120,6 @@
     padding: 0px;
   }
 
-  .legend-bar {
-    width: 20px;
-    height: 100%;
-    align-self: first baseline;
-  }
-
   .direction-p {
     height: 33%;
     display: inline-flex;
