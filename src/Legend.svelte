@@ -47,8 +47,8 @@
         low = sig_figs(Math.max(0, valueMinMax[0]).toFixed(2), 3);
         valueMinMax[0] = Math.max(0, valueMinMax[0]);
       } else {
-        high = sig_figs(Math.min(100, valueMinMax[1]).toFixed(2), 3) + '% ';
-        low = sig_figs(Math.max(0, valueMinMax[0]).toFixed(2), 3) + '% ';
+        high = sig_figs(Math.min(100, valueMinMax[1]).toFixed(2), 3) + '%';
+        low = sig_figs(Math.max(0, valueMinMax[0]).toFixed(2), 3) + '%';
         valueMinMax[0] = Math.max(0, valueMinMax[0]);
         valueMinMax[1] = Math.min(100, valueMinMax[1]);
       }
@@ -220,7 +220,7 @@
     background-color: rgba(255, 255, 255, 0.9);
     transition: all 0.1s ease-in;
     height: 100%;
-    width: 350px;
+    width: 360px;
     flex-direction: column;
   }
 
@@ -261,7 +261,6 @@
     margin-right: 1px;
     text-align: left;
     font-size: 80%;
-
     list-style: none;
   }
 
@@ -275,7 +274,7 @@
   .legend-grouping ul li.ends {
     display: block;
     float: left;
-    width: 5px;
+    width: 20px;
     margin-bottom: 6px;
     margin-right: 1px;
     text-align: left;
@@ -287,7 +286,7 @@
     display: block;
     float: left;
     height: 15px;
-    width: 5px;
+    width: 20px;
   }
 </style>
 
