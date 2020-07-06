@@ -52,7 +52,6 @@
         valueMinMax[0] = Math.max(0, valueMinMax[0]);
         valueMinMax[1] = Math.min(100, valueMinMax[1]);
       }
-      console.log(valueMinMax);
       const colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
       var arr = split_domain(valueMinMax[0], valueMinMax[1], 7);
       linColorArr = [];
@@ -220,7 +219,7 @@
     background-color: rgba(255, 255, 255, 0.9);
     transition: all 0.1s ease-in;
     height: 100%;
-    width: 360px;
+    width: 366px;
     flex-direction: column;
   }
 
@@ -242,10 +241,13 @@
     float: left;
     width: 110px;
     margin-bottom: 6px;
+    margin-left: 0px;
+    padding-top: 0px;
     text-align: center;
     font-size: 80%;
     list-style: none;
   }
+
   .trend-legend-grouping ul.legend-labels li span {
     display: block;
     float: left;
@@ -259,6 +261,8 @@
     width: 43px;
     margin-bottom: 6px;
     margin-right: 1px;
+    margin-left: 0px;
+    padding-top: 0px;
     text-align: left;
     font-size: 80%;
     list-style: none;
@@ -274,9 +278,11 @@
   .legend-grouping ul li.ends {
     display: block;
     float: left;
-    width: 20px;
+    width: 37px;
     margin-bottom: 6px;
     margin-right: 1px;
+    margin-left: 0px;
+    padding-top: 0px;
     text-align: left;
     font-size: 80%;
     list-style: none;
@@ -286,7 +292,7 @@
     display: block;
     float: left;
     height: 15px;
-    width: 20px;
+    width: 37px;
   }
 </style>
 

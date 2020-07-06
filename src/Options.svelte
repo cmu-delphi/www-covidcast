@@ -39,7 +39,7 @@
 
   select.indicators {
     display: inline-block;
-    width: 200px;
+    width: 230px;
   }
 
   select.geo-level {
