@@ -23,7 +23,6 @@
   let formatTimeWithoutYear = d3.timeFormat('%B %-d');
 
   let interval = 14;
-  let rectifiedRange = interval;
   let sliderTotalLength = 320; // in px
   let canLoadMore = true;
 
@@ -35,6 +34,8 @@
 
   let rectifiedVal = parseTime(val).getTime();
   let rectifiedMax = parseTime(yesterday).getTime();
+
+  let rectifiedRange = interval;
   let rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
 
   let dataRangeMin = parseTime(min).getTime();
@@ -52,10 +53,11 @@
       if (rectifiedVal >= rectifiedMax) {
         rectifiedVal = rectifiedMax;
         currentDate.set(+calculateValFromRectified(rectifiedVal));
-      } else if (rectifiedVal <= rectifiedMin) {
-        rectifiedVal = rectifiedMin;
+      } else if (rectifiedVal < rectifiedMin) {
+        // rectifiedVal = rectifiedMin;
         currentDate.set(+calculateValFromRectified(rectifiedVal));
       }
+      console.log(calculateValFromRectified(rectifiedMin));
       updateSliderUI();
     });
   });
@@ -79,6 +81,10 @@
     } else {
       rectifiedRange = interval;
       rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
+      while (parseTime($currentDate).getTime() < rectifiedMin) {
+        rectifiedRange += interval;
+        rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
+      }
       if (rectifiedMin < dataRangeMin) {
         rectifiedMin = dataRangeMin;
         rectifiedRange = (rectifiedMax - rectifiedMin) / (86400 * 1000);
@@ -192,7 +198,6 @@
       rectifiedMin = dataRangeMin;
       rectifiedRange = (rectifiedMax - rectifiedMin) / (86400 * 1000);
     }
-
     updateSliderUI();
   }
 
