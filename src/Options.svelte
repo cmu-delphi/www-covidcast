@@ -283,6 +283,7 @@
           class="button {$signalType === 'direction' ? 'selected' : ''}"
           on:click={() => {
             currentDataReadyOnMap.set(false);
+            encoding.set('color');
             signalType.set('direction');
           }}
           disabled={$sensorMap.get($currentSensor).official ? true : false}>

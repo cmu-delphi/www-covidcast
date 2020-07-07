@@ -956,6 +956,7 @@
           source: center('state'),
           type: 'circle',
           visibility: 'none',
+          filter: ['!=', $signalType, -100],
           paint: {
             'circle-radius': 0,
             'circle-color': ENCODING_BUBBLES_THEME.color,
