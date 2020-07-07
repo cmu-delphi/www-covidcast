@@ -198,8 +198,10 @@
       map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
 
       //get hover color for regular county
-      var color_stops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
-      if ($currentSensor.match(/num/)) {
+      let color_stops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
+      if ($encoding == 'bubble') {
+        fillColor = 'white';
+      } else if ($currentSensor.match(/num/)) {
         var value_range = [];
         var color_range = [];
         for (var i = 0; i < color_stops.length; i++) {
@@ -618,7 +620,6 @@
       drawMega ? map.getSource('mega-county').setData(megaDat) : '';
     }
 
-    console.log($encoding);
     if ($encoding == 'color') {
       // hide all bubble layers
       Object.keys($levels).forEach(
@@ -938,18 +939,21 @@
         );
       });
 
-      map.addLayer({
-        id: 'state-centers',
-        source: 'state-centers',
-        type: 'circle',
-        visibility: 'none',
-        paint: {
-          'circle-radius': ['*', ['get', 'value'], 0.003],
-          'circle-color': ENCODING_BUBBLES_THEME.color,
-          'circle-stroke-color': ENCODING_BUBBLES_THEME.strokeColor,
-          'circle-stroke-width': ENCODING_BUBBLES_THEME.strokeWidth,
+      map.addLayer(
+        {
+          id: center('state'),
+          source: center('state'),
+          type: 'circle',
+          visibility: 'none',
+          paint: {
+            'circle-radius': ['*', ['get', 'value'], 0.003],
+            'circle-color': ENCODING_BUBBLES_THEME.color,
+            'circle-stroke-color': ENCODING_BUBBLES_THEME.strokeColor,
+            'circle-stroke-width': ENCODING_BUBBLES_THEME.strokeWidth,
+          },
         },
-      });
+        'state-hover',
+      );
 
       // Object.keys($levels).forEach(name => {
       //   if (name !== 'state') return;
