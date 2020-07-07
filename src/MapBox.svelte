@@ -1155,7 +1155,7 @@
     align-items: center;
     justify-content: center;
     transition: all 0.1s ease-in;
-    height: 100px;
+    height: 120px;
   }
 
   .invalid_search-container {

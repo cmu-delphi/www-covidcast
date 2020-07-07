@@ -41,5 +41,5 @@ export const ENCODING_BUBBLE_THEME = {
     msa: 20,
     state: 20,
   },
-  base: 2,
+  base: 3,
 };

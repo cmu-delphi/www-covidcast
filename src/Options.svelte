@@ -77,18 +77,6 @@
       transform: translate3d(4px, 0, 0);
     }
   }
-
-  #encoding-options {
-    display: flex;
-  }
-
-  #encoding-options > div {
-    margin-right: 0.5rem;
-  }
-
-  .hidden {
-    display: none;
-  }
 </style>
 
 <div class="options">
@@ -138,60 +126,4 @@
     </select>
 
   </div>
-
-  <br />
-
-<<<<<<< HEAD
-  <div id="encoding-options">
-    <div class="toggle">
-      <div aria-label="display type" class="buttons-group-side">
-        <button
-          aria-pressed={$signalType === 'value' ? 'true' : 'false'}
-          class="button {$signalType === 'value' ? 'selected' : ''}"
-          on:click={() => {
-            currentDataReadyOnMap.set(false);
-            signalType.set('value');
-          }}>
-          {$currentSensor.match(/num/) ? 'Count' : 'Intensity'}
-        </button>
-        <button
-          aria-pressed={$signalType === 'direction' ? 'true' : 'false'}
-          class="button {$signalType === 'direction' ? 'selected' : ''}"
-          on:click={() => {
-            currentDataReadyOnMap.set(false);
-            encoding.set('color');
-            signalType.set('direction');
-          }}
-          disabled={$sensorMap.get($currentSensor).official ? true : false}>
-          7-day Trend
-          {#if $sensorMap.get($currentSensor).official}
-            <span class="disabled-tooltip">Currently unavailable</span>
-          {/if}
-        </button>
-      </div>
-    </div>
-
-    <div class="toggle {$signalType === 'direction' ? 'hidden' : ''}">
-      <div aria-label="encoding type" class="buttons-group-side">
-        <button
-          aria-pressed={$encoding === 'color' ? 'true' : 'false'}
-          class="button {$encoding === 'color' ? 'selected' : ''}"
-          on:click={() => {
-            encoding.set('color');
-          }}>
-          Choropleth
-        </button>
-        <button
-          aria-pressed={$encoding === 'bubble' ? 'true' : 'false'}
-          class="button {$encoding === 'bubble' ? 'selected' : ''}"
-          on:click={() => {
-            encoding.set('bubble');
-          }}>
-          Bubbles
-        </button>
-      </div>
-    </div>
-  </div>
-=======
->>>>>>> remotes/origin/main
 </div>
