@@ -519,8 +519,10 @@
       });
     });
 
-    let stops;
-    let stopsMega;
+    let stops, stopsMega;
+    let base = ENCODING_BUBBLES_THEME.base,
+      coef;
+
     if ($signalType === 'value') {
       valueMinMax[0] = Math.max(0, valueMinMax[0]);
       let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
@@ -600,6 +602,7 @@
         ];
         */
       }
+      coef = ENCODING_BUBBLES_THEME.maxRadius[$currentLevel] / (Math.log(valueMinMax[1] + 1) / Math.log(base));
     } else {
       stops = [
         [-100, MAP_THEME.countyFill],
@@ -614,6 +617,7 @@
         [1, DIRECTION_THEME.gradientMaxMega],
       ];
     }
+
     if (['data', 'init'].includes(type)) {
       map.getSource($currentLevel).setData(dat);
       map.getSource(center($currentLevel)).setData(centerDat);
@@ -649,7 +653,7 @@
         map.setLayoutProperty('mega-county', 'visibility', 'none');
       }
     } else if ($encoding == 'bubble') {
-      // hide all color layers except for the one for the current level
+      // hide all color layers except for the one for the current level (for tooltip)
       Object.keys($levels).forEach(name => map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none'));
       if (map.getLayer($currentLevel)) {
         map.setPaintProperty($currentLevel, 'fill-color', MAP_THEME.countyFill);
@@ -660,7 +664,14 @@
       Object.keys($levels).forEach(
         name => map.getLayer(center(name)) && map.setLayoutProperty(center(name), 'visibility', 'none'),
       );
-      map.getLayer(center($currentLevel)) && map.setLayoutProperty(center($currentLevel), 'visibility', 'visible');
+      if (map.getLayer(center($currentLevel))) {
+        map.setPaintProperty(center($currentLevel), 'circle-radius', [
+          '*',
+          ['/', ['ln', ['+', ['get', 'value'], 1]], ['ln', base]],
+          coef,
+        ]);
+        map.setLayoutProperty(center($currentLevel), 'visibility', 'visible');
+      }
 
       map.setLayoutProperty('mega-county', 'visibility', 'none');
     }
@@ -946,7 +957,7 @@
           type: 'circle',
           visibility: 'none',
           paint: {
-            'circle-radius': ['*', ['get', 'value'], 0.003],
+            'circle-radius': 0,
             'circle-color': ENCODING_BUBBLES_THEME.color,
             'circle-stroke-color': ENCODING_BUBBLES_THEME.strokeColor,
             'circle-stroke-width': ENCODING_BUBBLES_THEME.strokeWidth,

@@ -36,4 +36,10 @@ export const ENCODING_BUBBLES_THEME = {
   color: 'transparent',
   strokeColor: '#666',
   strokeWidth: 1,
+  maxRadius: {
+    county: 20,
+    msa: 20,
+    state: 20,
+  },
+  base: 1.5,
 };
