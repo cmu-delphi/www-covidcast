@@ -32,7 +32,7 @@ export const MAP_THEME = {
   countyOutlineWhenFilled: '#ffffff', //'#616161',
 };
 
-export const ENCODING_BUBBLES_THEME = {
+export const ENCODING_BUBBLE_THEME = {
   color: 'transparent',
   strokeColor: '#666',
   strokeWidth: 1,

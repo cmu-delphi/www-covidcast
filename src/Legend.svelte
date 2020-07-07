@@ -1,17 +1,58 @@
 <script>
-  import { signalType, stats, currentSensor, sensorMap, currentLevel } from './stores.js';
-  import { DIRECTION_THEME } from './theme.js';
+  import { signalType, stats, currentSensor, sensorMap, currentLevel, encoding } from './stores.js';
+  import { DIRECTION_THEME, ENCODING_BUBBLE_THEME } from './theme.js';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
+  import { getNiceNumber } from './util.js';
 
   let high = '';
   let low = '';
+  let bubbleLegend = [];
   $: logColorArr = [{ label: '0', from_color: DIRECTION_THEME.countMin, to_color: DIRECTION_THEME.countMin }];
   $: linColorArr = [];
 
-  currentSensor.subscribe(s => ($stats ? updateLowHigh(s, $stats, $currentLevel) : ''));
-  stats.subscribe(s => (s ? updateLowHigh($currentSensor, s, $currentLevel) : ''));
-  currentLevel.subscribe(l => ($stats ? updateLowHigh($currentSensor, $stats, l) : ''));
+  currentSensor.subscribe(s => ($stats ? update(s, $stats, $currentLevel, $encoding) : ''));
+  stats.subscribe(s => (s ? update($currentSensor, s, $currentLevel, $encoding) : ''));
+  currentLevel.subscribe(l => ($stats ? update($currentSensor, $stats, l, $encoding) : ''));
+  encoding.subscribe(e => ($stats ? update($currentSensor, $stats, $currentLevel, e) : ''));
+
+  function update(sens, stats, level, encoding) {
+    if (encoding == 'color') {
+      updateLowHigh(sens, stats, level, encoding);
+      return;
+    }
+
+    let sts, valueMax;
+    if ($currentSensor.match(/num/)) {
+      sts = stats.get(sens + '_' + level);
+    } else {
+      sts = stats.get(sens);
+    }
+    valueMax = getNiceNumber(sts.mean + 3 * sts.std);
+
+    let coef =
+      ENCODING_BUBBLE_THEME.maxRadius[$currentLevel] /
+      ((Math.log(valueMax) + 0.001) / Math.log(ENCODING_BUBBLE_THEME.base));
+
+    let scale = x => (coef * Math.log(x + 0.001)) / Math.log(ENCODING_BUBBLE_THEME.base);
+    let revert = x => Math.pow(Math.E, (x * Math.log(ENCODING_BUBBLE_THEME.base)) / coef) - 0.001;
+
+    bubbleLegend = d3.range(6).map(i => {
+      let targetRadius = (ENCODING_BUBBLE_THEME.maxRadius[$currentLevel] / 6) * (6 - i);
+      let candidateX = revert(targetRadius);
+      let x = getNiceNumber(candidateX);
+
+      return [scale(x), x];
+    });
+
+    // remove duplicates
+    let last;
+    bubbleLegend = bubbleLegend.filter(b => {
+      if (last === b[0]) return false;
+      last = b[0];
+      return true;
+    });
+  }
 
   function updateLowHigh(sens, stats, level) {
     let sts;
@@ -142,58 +183,73 @@
     height: 100%;
     margin-right: 30px;
   }
+
+  .bubble {
+    border: 1px solid #666;
+    border-radius: 200px;
+    display: inline-block;
+  }
 </style>
 
 <div aria-label="legend" class="legend {$signalType === 'value' ? 'value' : ''}">
-  {#if $signalType === 'direction'}
-    <div class="direction-p">
-      <div class="color inc" style="background-color: {DIRECTION_THEME.increasing}" />
-      <p aria-hidden="true" class="direction-indicators inc">
-        {@html DIRECTION_THEME.increasingIcon}
-      </p>
-      <p>Increasing</p>
-    </div>
-    <div class="direction-p">
-      <div class="color inc" style="background-color: {DIRECTION_THEME.steady}" />
-      <p aria-hidden="true" class="direction-indicators inc">
-        {@html DIRECTION_THEME.steadyIcon}
-      </p>
-      <p>Steady</p>
-    </div>
-    <div class="direction-p">
-      <div class="color inc" style="background-color: {DIRECTION_THEME.decreasing}" />
-      <p aria-hidden="true" class="direction-indicators inc">
-        {@html DIRECTION_THEME.decreasingIcon}
-      </p>
-      <p>Decreasing</p>
-    </div>
-  {:else if $currentSensor.match(/num/)}
-    <div class="tick-p">
-      <div class="tick" style="background: black" />
-      <p>{high ? high + '+' : ''}</p>
-    </div>
-    {#each logColorArr as { label, from_color, to_color }, i}
-      <div class="count-p">
-        <div class="color inc" style="background: linear-gradient(to top, {from_color}, {to_color})" />
+  {#if $encoding === 'color'}
+    {#if $signalType === 'direction'}
+      <div class="direction-p">
+        <div class="color inc" style="background-color: {DIRECTION_THEME.increasing}" />
+        <p aria-hidden="true" class="direction-indicators inc">
+          {@html DIRECTION_THEME.increasingIcon}
+        </p>
+        <p>Increasing</p>
       </div>
+      <div class="direction-p">
+        <div class="color inc" style="background-color: {DIRECTION_THEME.steady}" />
+        <p aria-hidden="true" class="direction-indicators inc">
+          {@html DIRECTION_THEME.steadyIcon}
+        </p>
+        <p>Steady</p>
+      </div>
+      <div class="direction-p">
+        <div class="color inc" style="background-color: {DIRECTION_THEME.decreasing}" />
+        <p aria-hidden="true" class="direction-indicators inc">
+          {@html DIRECTION_THEME.decreasingIcon}
+        </p>
+        <p>Decreasing</p>
+      </div>
+    {:else if $currentSensor.match(/num/)}
       <div class="tick-p">
         <div class="tick" style="background: black" />
-        <p>{sig_figs(label, 3)}</p>
+        <p>{high ? high + '+' : ''}</p>
       </div>
-    {/each}
-  {:else}
-    <div class="tick-p">
-      <div class="tick" style="background: black" />
-      <p>{high ? high + '+' : ''}</p>
-    </div>
-    {#each linColorArr as { label, from_color, to_color }, j}
-      <div class="count-p">
-        <div class="color inc" style="background: linear-gradient(to top, {from_color}, {to_color})" />
-      </div>
+      {#each logColorArr as { label, from_color, to_color }, i}
+        <div class="count-p">
+          <div class="color inc" style="background: linear-gradient(to top, {from_color}, {to_color})" />
+        </div>
+        <div class="tick-p">
+          <div class="tick" style="background: black" />
+          <p>{sig_figs(label, 3)}</p>
+        </div>
+      {/each}
+    {:else}
       <div class="tick-p">
         <div class="tick" style="background: black" />
-        <p>{sig_figs(label, 3)}</p>
+        <p>{high ? high + '+' : ''}</p>
       </div>
+      {#each linColorArr as { label, from_color, to_color }, j}
+        <div class="count-p">
+          <div class="color inc" style="background: linear-gradient(to top, {from_color}, {to_color})" />
+        </div>
+        <div class="tick-p">
+          <div class="tick" style="background: black" />
+          <p>{sig_figs(label, 3)}</p>
+        </div>
+      {/each}
+    {/if}
+  {:else if $encoding === 'bubble'}
+    {#each bubbleLegend as [r, value]}
+      <div>
+        <div style="width: {r * 2}px; height: {r * 2}px; margin-top: .5rem" class="bubble" />
+      </div>
+      {value.toLocaleString('en')}
     {/each}
   {/if}
 </div>

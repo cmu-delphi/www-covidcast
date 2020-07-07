@@ -2,8 +2,8 @@
   //import mapboxgl from 'mapbox-gl';
   import { onMount, setContext } from 'svelte';
   import mapboxgl from 'mapbox-gl';
-  import { defaultRegionOnStartup, getTextColorBasedOnBackground } from './util.js';
-  import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLES_THEME } from './theme.js';
+  import { defaultRegionOnStartup, getTextColorBasedOnBackground, getNiceNumber } from './util.js';
+  import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME } from './theme.js';
   import AutoComplete from 'simple-svelte-autocomplete';
   import Options from './Options.svelte';
   import Legend from './Legend.svelte';
@@ -520,7 +520,7 @@
     });
 
     let stops, stopsMega;
-    let base = ENCODING_BUBBLES_THEME.base,
+    let base = ENCODING_BUBBLE_THEME.base,
       coef;
 
     if ($signalType === 'value') {
@@ -602,7 +602,12 @@
         ];
         */
       }
-      coef = ENCODING_BUBBLES_THEME.maxRadius[$currentLevel] / (Math.log(valueMinMax[1] + 1) / Math.log(base));
+
+      // radius = ceof * log_{base} (value + 0.001)
+
+      coef =
+        ENCODING_BUBBLE_THEME.maxRadius[$currentLevel] /
+        (Math.log(getNiceNumber(valueMinMax[1]) + 0.001) / Math.log(base));
     } else {
       stops = [
         [-100, MAP_THEME.countyFill],
@@ -667,7 +672,7 @@
       if (map.getLayer(center($currentLevel))) {
         map.setPaintProperty(center($currentLevel), 'circle-radius', [
           '*',
-          ['/', ['ln', ['+', ['get', 'value'], 1]], ['ln', base]],
+          ['/', ['ln', ['+', ['get', 'value'], 0.001]], ['ln', base]],
           coef,
         ]);
         map.setLayoutProperty(center($currentLevel), 'visibility', 'visible');
@@ -959,38 +964,13 @@
           filter: ['!=', $signalType, -100],
           paint: {
             'circle-radius': 0,
-            'circle-color': ENCODING_BUBBLES_THEME.color,
-            'circle-stroke-color': ENCODING_BUBBLES_THEME.strokeColor,
-            'circle-stroke-width': ENCODING_BUBBLES_THEME.strokeWidth,
+            'circle-color': ENCODING_BUBBLE_THEME.color,
+            'circle-stroke-color': ENCODING_BUBBLE_THEME.strokeColor,
+            'circle-stroke-width': ENCODING_BUBBLE_THEME.strokeWidth,
           },
         },
         'state-hover',
       );
-
-      // Object.keys($levels).forEach(name => {
-      //   if (name !== 'state') return;
-      //   map.addLayer(
-      //     {
-      //       id: name + '2',
-      //       source: name,
-      //       type: 'circle',
-      //       //visibility: 'none',
-      //       filter: ['!=', $signalType, -100],
-      //       paint: {
-      //         'circle-radius': ['*', ['get', 'value'], 30],
-      //         // {
-      //         //   property: 'confirmed_7dav_incidence_num',
-      //         //   stops: [[10, 5], [50, 10], [100, 15], [500, 20]],
-      //         // },
-      //         'circle-color': {
-      //           property: 'confirmed_7dav_incidence_num',
-      //           stops: [[10, 'red'], [50, 'blue'], [100, 'orange'], [500, 'purple']],
-      //         },
-      //       },
-      //     },
-      //     `${name}-hover`,
-      //   );
-      // });
 
       mapMounted = true;
       updateMap('init');
@@ -1176,6 +1156,7 @@
     justify-content: center;
     transition: all 0.1s ease-in;
     height: 45%;
+    min-height: 380px;
   }
 
   .invalid_search-container {
