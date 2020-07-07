@@ -9,7 +9,7 @@
   .graph-container {
     position: absolute;
     z-index: 1001;
-    bottom: 12px;
+    bottom: 124px;
     right: 10px;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 5px 5px;
@@ -55,7 +55,7 @@
     position: absolute;
     float: right;
     z-index: 1001;
-    bottom: 12px;
+    bottom: 124px;
     right: 10px;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 5px 5px;

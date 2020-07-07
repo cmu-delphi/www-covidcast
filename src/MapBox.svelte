@@ -1147,7 +1147,7 @@
 
   .legend-container {
     position: absolute;
-    top: 170px;
+    bottom: 12px;
     left: 10px;
     z-index: 1000;
     display: flex;
@@ -1155,8 +1155,7 @@
     align-items: center;
     justify-content: center;
     transition: all 0.1s ease-in;
-    height: 45%;
-    min-height: 380px;
+    height: 100px;
   }
 
   .invalid_search-container {
@@ -1175,7 +1174,7 @@
   .time-container {
     position: absolute;
     bottom: 12px;
-    left: 10px;
+    right: 10px;
     z-index: 1002;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 30px 10px;

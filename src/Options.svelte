@@ -35,146 +35,21 @@
     width: 100%;
     display: inline-block;
   }
-  .toggle {
-    width: 200px;
-  }
+
   .option .option-title {
     margin-bottom: 0px !important;
     padding-bottom: 0px !important;
   }
 
-  .buttons-group button.button .disabled-tooltip {
-    visibility: hidden;
-    width: 80px;
-    border-style: solid;
-    border-width: 1px;
-    border-color: #666;
-    background-color: #fff;
-    color: #333;
-    font-weight: 400;
-    font-size: 0.95em;
-    line-height: 1.2em;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px 5px;
-    position: absolute;
-    z-index: 1;
-    top: -5px;
-    left: 105%;
-  }
-
-  .buttons-group button.button .disabled-tooltip::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    right: 100%;
-    margin-top: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent #666 transparent transparent;
-  }
-
-  .buttons-group button.button:hover .disabled-tooltip {
-    visibility: visible;
-  }
-
-  .buttons-group-side {
-    width: 100%;
-    display: flex;
-    align-items: stretch;
-    justify-content: stretch;
-  }
-
-  .buttons-group-side button.button {
-    flex-grow: 1;
-    margin: 0;
-    font-size: 1em;
-    font-weight: 400;
-    background-color: #fff;
-    border-style: solid;
-    border-color: #dbdbdb;
-    border-left-color: transparent;
-    border-width: 1px;
-    color: #666666;
-    cursor: pointer;
-    justify-content: center;
-    padding-bottom: calc(0.5em - 1px);
-    padding-left: 1em;
-    padding-right: 1em;
-    padding-top: calc(0.5em - 1px);
-    text-align: center;
-    transition: all 0.1s ease-in;
-    position: relative;
-  }
-
-  .buttons-group-side button.button:disabled {
-    background-color: rgb(211, 211, 211);
-    color: #666666;
-    cursor: not-allowed;
-  }
-
-  .buttons-group-side .button:first-child {
-    border-left-color: #dbdbdb;
-  }
-
-  .buttons-group-side button.button .disabled-tooltip {
-    visibility: hidden;
-    width: 80px;
-    border-style: solid;
-    border-width: 1px;
-    border-color: #666;
-    background-color: #fff;
-    color: #333;
-    font-size: 0.95em;
-    line-height: 1.2em;
-    font-weight: 400;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px 5px;
-    position: absolute;
-    z-index: 1;
-    top: 150%;
-    left: 50%;
-    margin-left: -50px;
-  }
-
-  .buttons-group-side button.button .disabled-tooltip::after {
-    content: '';
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent transparent #666 transparent;
-  }
-  .buttons-group-side button.button:hover .disabled-tooltip {
-    visibility: visible;
-  }
-
-  .buttons-group-side .button.selected {
-    background-color: #767676;
-    color: #fff;
-    font-weight: 600;
-  }
-
-  .buttons-group-side .button:hover {
-    background-color: #666666;
-    color: #fff;
-  }
-
-  .buttons-group-side .button:focus,
-  .buttons-group-side .button:active {
-    outline: none;
-  }
   label {
     display: inline-block;
   }
+
   select.indicators {
     display: inline-block;
-    width: 200px;
-    margin-bottom: 10px;
+    width: 230px;
   }
+
   select.geo-level {
     display: inline-block;
     width: 125px;
@@ -266,6 +141,7 @@
 
   <br />
 
+<<<<<<< HEAD
   <div id="encoding-options">
     <div class="toggle">
       <div aria-label="display type" class="buttons-group-side">
@@ -316,4 +192,6 @@
       </div>
     </div>
   </div>
+=======
+>>>>>>> remotes/origin/main
 </div>

@@ -357,7 +357,7 @@
 
 <style>
   .graph {
-    max-height: 390px;
+    max-height: 370px;
     max-width: 400px;
   }
 
