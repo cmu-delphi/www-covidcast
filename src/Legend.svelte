@@ -52,7 +52,6 @@
         valueMinMax[0] = Math.max(0, valueMinMax[0]);
         valueMinMax[1] = Math.min(100, valueMinMax[1]);
       }
-      console.log(valueMinMax);
       const colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
       var arr = split_domain(valueMinMax[0], valueMinMax[1], 7);
       linColorArr = [];

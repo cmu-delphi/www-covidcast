@@ -29,5 +29,11 @@ export const MAP_THEME = {
   stateOutline: '#ffffff', //'#bcbcbc',
   countyFill: '#eeeeee', //'#e4dac4',
   countyOutline: '#ffffff', //'#e0e0e0',
-  countyOutlineWhenFilled: '#ffffff' //'#616161',
+  countyOutlineWhenFilled: '#ffffff', //'#616161',
+};
+
+export const ENCODING_BUBBLES_THEME = {
+  color: 'transparent',
+  strokeColor: '#666',
+  strokeWidth: 1,
 };

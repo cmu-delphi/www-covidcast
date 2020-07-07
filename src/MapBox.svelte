@@ -3,7 +3,7 @@
   import { onMount, setContext } from 'svelte';
   import mapboxgl from 'mapbox-gl';
   import { defaultRegionOnStartup, getTextColorBasedOnBackground } from './util.js';
-  import { DIRECTION_THEME, MAP_THEME } from './theme.js';
+  import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLES_THEME } from './theme.js';
   import AutoComplete from 'simple-svelte-autocomplete';
   import Options from './Options.svelte';
   import Legend from './Legend.svelte';
@@ -24,6 +24,7 @@
     currentData,
     currentRange,
     signalType,
+    encoding,
     currentDataReadyOnMap,
     mounted,
     mapFirstLoaded,
@@ -67,6 +68,11 @@
   $: loaded = false;
   $: invalid_search = false;
   $: currentSensorTooltip = $sensorMap.get($currentSensor).mapTitleText;
+
+  // given the level (state/msa/county), returns the name of its "centered" source/layer
+  function center(level) {
+    return `${level}-centers`;
+  }
 
   var dict = {
     '10': 'DE',
@@ -392,6 +398,7 @@
     updateMap('data');
   });
   signalType.subscribe(_ => updateMap('signal'));
+  encoding.subscribe(_ => updateMap('encoding'));
   mounted.subscribe(_ => updateMap('mounted'));
   currentDate.subscribe(_ => {
     if (
@@ -486,21 +493,28 @@
     }
 
     let dat = $geojsons.get($currentLevel);
-    dat.features.forEach(d => {
-      const id = d.properties.id;
+    let centerDat = $geojsons.get(center($currentLevel));
 
-      d.properties.value = -100;
-      d.properties.direction = -100;
-      if (geoIds.has(id) && valueMappedVals.get(id) !== undefined) {
-        d.properties.value = valueMappedVals.get(id)[0];
-        if ($currentSensor.match(/7dav_incidence/)) {
+    // set the value of the chosen sensor to each states/counties
+    // dat: data for cholopleth
+    // centerDat: data for bubbles
+    [dat, centerDat].forEach(ds => {
+      ds.features.forEach(d => {
+        const id = d.properties.id;
+
+        d.properties.value = -100;
+        d.properties.direction = -100;
+        if (geoIds.has(id) && valueMappedVals.get(id) !== undefined) {
           d.properties.value = valueMappedVals.get(id)[0];
-          d.properties.value1 = valueMappedVals.get(id)[1];
+          if ($currentSensor.match(/7dav_incidence/)) {
+            d.properties.value = valueMappedVals.get(id)[0];
+            d.properties.value1 = valueMappedVals.get(id)[1];
+          }
         }
-      }
-      if (geoIds.has(id) && directionMappedVals.get(id) !== undefined) {
-        d.properties.direction = directionMappedVals.get(id);
-      }
+        if (geoIds.has(id) && directionMappedVals.get(id) !== undefined) {
+          d.properties.direction = directionMappedVals.get(id);
+        }
+      });
     });
 
     let stops;
@@ -600,28 +614,53 @@
     }
     if (['data', 'init'].includes(type)) {
       map.getSource($currentLevel).setData(dat);
+      map.getSource(center($currentLevel)).setData(centerDat);
       drawMega ? map.getSource('mega-county').setData(megaDat) : '';
     }
-    Object.keys($levels).forEach(name => {
-      if (name === $currentLevel) {
-        if (map.getLayer(name)) {
-          map.setPaintProperty(name, 'fill-color', {
-            property: $signalType,
-            stops: stops,
-          });
-          map.setLayoutProperty(name, 'visibility', 'visible');
+
+    console.log($encoding);
+    if ($encoding == 'color') {
+      // hide all bubble layers
+      Object.keys($levels).forEach(
+        name => map.getLayer(center(name)) && map.setLayoutProperty(center(name), 'visibility', 'none'),
+      );
+
+      Object.keys($levels).forEach(name => {
+        if (name === $currentLevel) {
+          if (map.getLayer(name)) {
+            map.setPaintProperty(name, 'fill-color', {
+              property: $signalType,
+              stops: stops,
+            });
+            map.setLayoutProperty(name, 'visibility', 'visible');
+          }
+        } else {
+          map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none');
         }
-      } else {
-        map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none');
-      }
-    });
-    if (drawMega) {
-      map.setPaintProperty('mega-county', 'fill-color', {
-        property: $signalType,
-        stops: stopsMega,
       });
-      map.setLayoutProperty('mega-county', 'visibility', 'visible');
-    } else {
+      if (drawMega) {
+        map.setPaintProperty('mega-county', 'fill-color', {
+          property: $signalType,
+          stops: stopsMega,
+        });
+        map.setLayoutProperty('mega-county', 'visibility', 'visible');
+      } else {
+        map.setLayoutProperty('mega-county', 'visibility', 'none');
+      }
+    } else if ($encoding == 'bubble') {
+      // hide all color layers except for the one for the current level
+      Object.keys($levels).forEach(name => map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none'));
+      if (map.getLayer($currentLevel)) {
+        map.setPaintProperty($currentLevel, 'fill-color', MAP_THEME.countyFill);
+        map.setLayoutProperty($currentLevel, 'visibility', 'visible');
+      }
+
+      // hide all bubble layer except for the one for the current level
+      Object.keys($levels).forEach(
+        name => map.getLayer(center(name)) && map.setLayoutProperty(center(name), 'visibility', 'none'),
+      );
+      map.getLayer(center($currentLevel)) && map.setLayoutProperty(center($currentLevel), 'visibility', 'visible');
+
       map.setLayoutProperty('mega-county', 'visibility', 'none');
     }
 
@@ -728,6 +767,10 @@
       map.addSource('mega-county', {
         type: 'geojson',
         data: $geojsons.get('state'),
+      });
+      map.addSource('state-centers', {
+        type: 'geojson',
+        data: $geojsons.get('state-centers'),
       });
 
       map.addLayer({
@@ -895,6 +938,44 @@
         );
       });
 
+      map.addLayer({
+        id: 'state-centers',
+        source: 'state-centers',
+        type: 'circle',
+        visibility: 'none',
+        paint: {
+          'circle-radius': ['*', ['get', 'value'], 0.003],
+          'circle-color': ENCODING_BUBBLES_THEME.color,
+          'circle-stroke-color': ENCODING_BUBBLES_THEME.strokeColor,
+          'circle-stroke-width': ENCODING_BUBBLES_THEME.strokeWidth,
+        },
+      });
+
+      // Object.keys($levels).forEach(name => {
+      //   if (name !== 'state') return;
+      //   map.addLayer(
+      //     {
+      //       id: name + '2',
+      //       source: name,
+      //       type: 'circle',
+      //       //visibility: 'none',
+      //       filter: ['!=', $signalType, -100],
+      //       paint: {
+      //         'circle-radius': ['*', ['get', 'value'], 30],
+      //         // {
+      //         //   property: 'confirmed_7dav_incidence_num',
+      //         //   stops: [[10, 5], [50, 10], [100, 15], [500, 20]],
+      //         // },
+      //         'circle-color': {
+      //           property: 'confirmed_7dav_incidence_num',
+      //           stops: [[10, 'red'], [50, 'blue'], [100, 'orange'], [500, 'purple']],
+      //         },
+      //       },
+      //     },
+      //     `${name}-hover`,
+      //   );
+      // });
+
       mapMounted = true;
       updateMap('init');
     });
@@ -969,7 +1050,7 @@
       const lat_offset = search_info[3];
       geocode(query).then(d => {
         var coords = projectionMercartor.invert(projection(d.features[0].center));
-        if (selectedRegion['property_id'] === 'PR' || selectedRegion['id'].substring(0, 2) === '72') {
+        if (selectedRegion['property_id'] === 'PR' || selectedRegion['id'].substring(0, 2) === '72' /* Puerto Rico */) {
           coords[0] += long_offset;
           coords[1] += lat_offset;
         }
