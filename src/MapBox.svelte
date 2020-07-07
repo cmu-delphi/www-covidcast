@@ -497,6 +497,7 @@
     let dat = $geojsons.get($currentLevel);
     let centerDat = $geojsons.get(center($currentLevel));
 
+    console.log(dat);
     // set the value of the chosen sensor to each states/counties
     // dat: data for cholopleth
     // centerDat: data for bubbles
@@ -785,9 +786,12 @@
         type: 'geojson',
         data: $geojsons.get('state'),
       });
-      map.addSource('state-centers', {
-        type: 'geojson',
-        data: $geojsons.get('state-centers'),
+
+      Object.keys($levels).forEach(level => {
+        map.addSource(center(level), {
+          type: 'geojson',
+          data: $geojsons.get(center(level)),
+        });
       });
 
       map.addLayer({
@@ -955,22 +959,24 @@
         );
       });
 
-      map.addLayer(
-        {
-          id: center('state'),
-          source: center('state'),
-          type: 'circle',
-          visibility: 'none',
-          filter: ['!=', $signalType, -100],
-          paint: {
-            'circle-radius': 0,
-            'circle-color': ENCODING_BUBBLE_THEME.color,
-            'circle-stroke-color': ENCODING_BUBBLE_THEME.strokeColor,
-            'circle-stroke-width': ENCODING_BUBBLE_THEME.strokeWidth,
+      Object.keys($levels).forEach(level => {
+        map.addLayer(
+          {
+            id: center(level),
+            source: center(level),
+            type: 'circle',
+            visibility: 'none',
+            filter: ['!=', $signalType, -100],
+            paint: {
+              'circle-radius': 0,
+              'circle-color': ENCODING_BUBBLE_THEME.color,
+              'circle-stroke-color': ENCODING_BUBBLE_THEME.strokeColor,
+              'circle-stroke-width': ENCODING_BUBBLE_THEME.strokeWidth,
+            },
           },
-        },
-        'state-hover',
-      );
+          `${level}-hover`,
+        );
+      });
 
       mapMounted = true;
       updateMap('init');

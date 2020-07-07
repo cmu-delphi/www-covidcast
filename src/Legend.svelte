@@ -453,7 +453,7 @@
         <ul class="legend-labels">
           {#each logColorArr as { label, from_color, to_color }, j}
             <li class="colored">
-              <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
+              <span class="colorcghnced" style="background: linear-gradient(to right, {from_color}, {to_color})" />
               {sig_figs(label, 3)}
             </li>
           {/each}

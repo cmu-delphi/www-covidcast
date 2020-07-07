@@ -191,13 +191,17 @@ export const geojsons = readable(new Map(), function start(set) {
     d3.json('./maps/new_msa.json'),
     d3.json('./maps/city_data/cities-reprojected.json'),
     d3.json('./maps/state_centers.json'),
-  ]).then(([a, b, c, d, e]) => {
+    d3.json('./maps/county_centers.json'),
+    d3.json('./maps/msa_centers.json'),
+  ]).then(([a, b, c, d, e, f, g]) => {
     let m = new Map();
     m.set('county', injectIDs('county', a));
     m.set('state', injectIDs('state', b));
     m.set('msa', injectIDs('msa', c));
     m.set('city', d);
     m.set('state-centers', e);
+    m.set('county-centers', f);
+    m.set('msa-centers', g);
     set(m);
   });
 });
