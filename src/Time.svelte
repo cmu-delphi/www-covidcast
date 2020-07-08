@@ -57,7 +57,6 @@
         // rectifiedVal = rectifiedMin;
         currentDate.set(+calculateValFromRectified(rectifiedVal));
       }
-      console.log(calculateValFromRectified(rectifiedMin));
       updateSliderUI();
     });
   });
@@ -81,9 +80,12 @@
     } else {
       rectifiedRange = interval;
       rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
-      while (parseTime($currentDate).getTime() < rectifiedMin) {
-        rectifiedRange += interval;
-        rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
+      if ($currentDate !== 20100420) {
+        while (parseTime($currentDate).getTime() < rectifiedMin) {
+          console.log('test');
+          rectifiedRange += interval;
+          rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
+        }
       }
       if (rectifiedMin < dataRangeMin) {
         rectifiedMin = dataRangeMin;
