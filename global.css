@@ -161,3 +161,9 @@ button.mapboxgl-popup-close-button {
   color: #fff;
   padding: 2px 4px;
 }
+
+.mapboxgl-ctrl.mapboxgl-ctrl-group {
+  outline: none;
+  /* border: none; */
+  border-radius: 3px;
+}
