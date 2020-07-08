@@ -1100,17 +1100,14 @@
   .state-buttons-holder .pg-button {
     font-size: 23px;
     position: relative;
-    width: 29px;
-    height: 29px;
+    width: 28px;
+    height: 28px;
     color: #333;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
     padding: 0;
     box-sizing: content-box;
-    background-color: white;
-    border: 1px solid #d5d5d5;
     text-align: center;
     font-family: 'FranklinITCProBold', Helvetica, Arial, sans-serif;
     line-height: 16px;
@@ -1121,10 +1118,15 @@
     transition-duration: 0.15s;
     transition-property: background-color;
     transition-timing-function: ease-in-out;
+
+    /* rounded design refresh */
+    border: 2px solid #dedede;
+    border-radius: 4px;
+    background-color: #ffffff;
   }
 
   .state-buttons-holder .pg-button:hover {
-    background-color: rgb(213, 213, 213);
+    background-color: #f2f2f2;
   }
 
   .state-buttons-holder .pg-button img {
@@ -1137,10 +1139,14 @@
     left: 10px;
     max-width: 500px;
     z-index: 1001;
-    background-color: rgba(255, 255, 255, 0.9);
     padding: 10px 10px;
     box-sizing: border-box;
     transition: all 0.1s ease-in;
+
+    /* rounded design refresh */
+    border-radius: 7px;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
   }
 
   .search {
@@ -1162,6 +1168,11 @@
     justify-content: center;
     transition: all 0.1s ease-in;
     height: 120px;
+
+    /* rounded design refresh */
+    border-radius: 7px;
+    background-color: #ffffff;
+    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
   }
 
   .invalid_search-container {
@@ -1182,10 +1193,14 @@
     bottom: 12px;
     right: 10px;
     z-index: 1002;
-    background-color: rgba(255, 255, 255, 0.9);
     padding: 30px 10px;
     box-sizing: border-box;
     transition: all 0.1s ease-in;
+
+    /* rounded design refresh */
+    border-radius: 7px;
+    background-color: #ffffff;
+    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
   }
 </style>
 

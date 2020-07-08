@@ -57,7 +57,6 @@
         // rectifiedVal = rectifiedMin;
         currentDate.set(+calculateValFromRectified(rectifiedVal));
       }
-      console.log(calculateValFromRectified(rectifiedMin));
       updateSliderUI();
     });
   });
@@ -81,9 +80,12 @@
     } else {
       rectifiedRange = interval;
       rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
-      while (parseTime($currentDate).getTime() < rectifiedMin) {
-        rectifiedRange += interval;
-        rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
+      if ($currentDate !== 20100420) {
+        while (parseTime($currentDate).getTime() < rectifiedMin) {
+          console.log('test');
+          rectifiedRange += interval;
+          rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
+        }
       }
       if (rectifiedMin < dataRangeMin) {
         rectifiedMin = dataRangeMin;
@@ -260,9 +262,6 @@
     margin: 0;
     font-size: 0.7rem;
     background-color: #fff;
-    border-style: solid;
-    border-color: #dbdbdb;
-    border-width: 1px;
     color: #666666;
     cursor: pointer;
     display: flex;
@@ -273,6 +272,12 @@
     padding-right: 0.5rem;
     padding-top: calc(0.3rem - 1px);
     transition: all 0.1s ease-in;
+
+    /* rounded design refresh */
+    border-style: solid;
+    border-color: #dbdbdb;
+    border-width: 1px;
+    border-radius: 4px;
   }
 
   .load-more-button:hover {

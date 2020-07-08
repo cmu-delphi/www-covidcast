@@ -132,7 +132,7 @@
 
 <style>
   .toggle {
-    width: 200px;
+    width: 230px;
     padding-bottom: 15px;
   }
   .buttons-group button.button .disabled-tooltip {
@@ -179,13 +179,12 @@
 
   .buttons-group-side button.button {
     flex-grow: 1;
-    margin: 0;
+    margin: 0px;
     font-size: 1em;
     font-weight: 400;
     background-color: #fff;
     border-style: solid;
     border-color: #dbdbdb;
-    border-left-color: transparent;
     border-width: 1px;
     color: #666666;
     cursor: pointer;
@@ -195,8 +194,10 @@
     padding-right: 0.5em;
     padding-top: calc(0.5em - 1px);
     text-align: center;
-    transition: all 0.1s ease-in;
+
     position: relative;
+
+    border-radius: 4px;
   }
 
   .buttons-group-side button.button:disabled {
@@ -206,7 +207,7 @@
   }
 
   .buttons-group-side .button:first-child {
-    border-left-color: #dbdbdb;
+    margin-right: 4px;
   }
 
   .buttons-group-side button.button .disabled-tooltip {
@@ -248,6 +249,8 @@
     background-color: #767676;
     color: #fff;
     font-weight: 600;
+
+    border: none;
   }
 
   .buttons-group-side .button:hover {
@@ -263,12 +266,13 @@
   .legend {
     font-size: 0.8rem;
     /* border-radius: 8px; */
-    padding: 10px 10px;
+    padding: 15px 15px;
     box-sizing: border-box;
-    background-color: rgba(255, 255, 255, 0.9);
+
     transition: all 0.1s ease-in;
+
     height: 100%;
-    width: 380px;
+    width: 376px;
     flex-direction: column;
   }
 

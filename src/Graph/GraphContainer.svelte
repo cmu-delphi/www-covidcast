@@ -11,12 +11,16 @@
     z-index: 1001;
     bottom: 124px;
     right: 10px;
-    background-color: rgba(255, 255, 255, 0.9);
     padding: 5px 5px;
     box-sizing: border-box;
     transition: opacity 0.3s ease-in-out;
     visibility: hidden;
     opacity: 0;
+
+    /* rounded design refresh */
+    border-radius: 7px;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
   }
 
   .graph-container.show {
@@ -57,9 +61,13 @@
     z-index: 1001;
     bottom: 124px;
     right: 10px;
-    background-color: rgba(255, 255, 255, 0.9);
     padding: 5px 5px;
     box-sizing: border-box;
+
+    /* rounded design refresh */
+    border-radius: 7px;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
   }
 
   .graph-toggle-button {
