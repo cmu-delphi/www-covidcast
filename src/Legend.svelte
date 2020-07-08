@@ -146,8 +146,10 @@
     padding-right: 1em;
     padding-top: calc(0.5em - 1px);
     text-align: center;
-    transition: all 0.1s ease-in;
+
     position: relative;
+
+    /* transition: all 0.1s ease-in; */
   }
 
   .buttons-group-side button.button:disabled {
@@ -158,6 +160,14 @@
 
   .buttons-group-side .button:first-child {
     border-left-color: #dbdbdb;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+
+  .buttons-group-side .button:last-child {
+    border-left-color: #dbdbdb;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
   }
 
   .buttons-group-side button.button .disabled-tooltip {
@@ -199,6 +209,8 @@
     background-color: #767676;
     color: #fff;
     font-weight: 600;
+
+    border: none;
   }
 
   .buttons-group-side .button:hover {
