@@ -19,6 +19,9 @@
     if ($sensorMap.get($currentSensor).levels.includes(level) === false) {
       level = $levels['msa'];
     }
+    if (!$currentSensor.match(/num/)) {
+      encoding.set('color');
+    }
   });
 
   export let isIE;

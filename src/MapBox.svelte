@@ -497,7 +497,6 @@
     let dat = $geojsons.get($currentLevel);
     let centerDat = $geojsons.get(center($currentLevel));
 
-    console.log(dat);
     // set the value of the chosen sensor to each states/counties
     // dat: data for cholopleth
     // centerDat: data for bubbles
@@ -663,6 +662,7 @@
       Object.keys($levels).forEach(name => map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none'));
       if (map.getLayer($currentLevel)) {
         map.setPaintProperty($currentLevel, 'fill-color', MAP_THEME.countyFill);
+
         map.setLayoutProperty($currentLevel, 'visibility', 'visible');
       }
 

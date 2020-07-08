@@ -25,7 +25,7 @@
   encoding.subscribe(e => ($stats ? update($currentSensor, $stats, $currentLevel, e) : ''));
 
   function update(sens, stats, level, encoding) {
-    if (encoding == 'color') {
+    if (encoding === 'color') {
       updateLowHigh(sens, stats, level, encoding);
       return;
     }
@@ -191,8 +191,8 @@
     cursor: pointer;
     justify-content: center;
     padding-bottom: calc(0.5em - 1px);
-    padding-left: 1em;
-    padding-right: 1em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
     padding-top: calc(0.5em - 1px);
     text-align: center;
     transition: all 0.1s ease-in;
@@ -405,7 +405,7 @@
       </div>
     </div>
 
-    <div class="toggle {$signalType === 'direction' ? 'hidden' : ''}">
+    <div class="toggle {$signalType === 'direction' || !$currentSensor.match(/num/) ? 'hidden' : ''}">
       <div aria-label="encoding type" class="buttons-group-side">
         <button
           aria-pressed={$encoding === 'color' ? 'true' : 'false'}
@@ -453,7 +453,7 @@
         <ul class="legend-labels">
           {#each logColorArr as { label, from_color, to_color }, j}
             <li class="colored">
-              <span class="colorcghnced" style="background: linear-gradient(to right, {from_color}, {to_color})" />
+              <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
               {sig_figs(label, 3)}
             </li>
           {/each}
