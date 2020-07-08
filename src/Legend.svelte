@@ -1,17 +1,66 @@
 <script>
-  import { signalType, stats, currentSensor, sensorMap, currentLevel, currentDataReadyOnMap } from './stores.js';
-  import { DIRECTION_THEME } from './theme.js';
+  import { DIRECTION_THEME, ENCODING_BUBBLE_THEME } from './theme.js';
+  import {
+    signalType,
+    stats,
+    currentSensor,
+    sensorMap,
+    currentLevel,
+    currentDataReadyOnMap,
+    encoding,
+  } from './stores.js';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
+  import { getNiceNumber } from './util.js';
 
   let high = '';
   let low = '';
+  let bubbleLegend = [];
   $: logColorArr = [{ label: '0', from_color: DIRECTION_THEME.countMin, to_color: DIRECTION_THEME.countMin }];
   $: linColorArr = [];
 
-  currentSensor.subscribe(s => ($stats ? updateLowHigh(s, $stats, $currentLevel) : ''));
-  stats.subscribe(s => (s ? updateLowHigh($currentSensor, s, $currentLevel) : ''));
-  currentLevel.subscribe(l => ($stats ? updateLowHigh($currentSensor, $stats, l) : ''));
+  currentSensor.subscribe(s => ($stats ? update(s, $stats, $currentLevel, $encoding) : ''));
+  stats.subscribe(s => (s ? update($currentSensor, s, $currentLevel, $encoding) : ''));
+  currentLevel.subscribe(l => ($stats ? update($currentSensor, $stats, l, $encoding) : ''));
+  encoding.subscribe(e => ($stats ? update($currentSensor, $stats, $currentLevel, e) : ''));
+
+  function update(sens, stats, level, encoding) {
+    if (encoding === 'color') {
+      updateLowHigh(sens, stats, level, encoding);
+      return;
+    }
+
+    let sts, valueMax;
+    if ($currentSensor.match(/num/)) {
+      sts = stats.get(sens + '_' + level);
+    } else {
+      sts = stats.get(sens);
+    }
+    valueMax = getNiceNumber(sts.mean + 3 * sts.std);
+
+    let coef =
+      ENCODING_BUBBLE_THEME.maxRadius[$currentLevel] /
+      ((Math.log(valueMax) + 0.001) / Math.log(ENCODING_BUBBLE_THEME.base));
+
+    let scale = x => (coef * Math.log(x + 0.001)) / Math.log(ENCODING_BUBBLE_THEME.base);
+    let revert = x => Math.pow(Math.E, (x * Math.log(ENCODING_BUBBLE_THEME.base)) / coef) - 0.001;
+
+    bubbleLegend = d3.range(6).map(i => {
+      let targetRadius = (ENCODING_BUBBLE_THEME.maxRadius[$currentLevel] / 6) * (6 - i);
+      let candidateX = revert(targetRadius);
+      let x = getNiceNumber(candidateX);
+
+      return [scale(x), x];
+    });
+
+    // remove duplicates
+    let last;
+    bubbleLegend = bubbleLegend.filter(b => {
+      if (last === b[0]) return false;
+      last = b[0];
+      return true;
+    });
+  }
 
   function updateLowHigh(sens, stats, level) {
     let sts;
@@ -141,8 +190,8 @@
     cursor: pointer;
     justify-content: center;
     padding-bottom: calc(0.5em - 1px);
-    padding-left: 1em;
-    padding-right: 1em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
     padding-top: calc(0.5em - 1px);
     text-align: center;
 
@@ -298,89 +347,152 @@
     height: 15px;
     width: 37px;
   }
+
+  .bubble {
+    border: 1px solid #666;
+    border-radius: 200px;
+    display: inline-block;
+  }
+
+  #encoding-options {
+    display: flex;
+  }
+
+  #encoding-options > div {
+    margin-right: 0.5rem;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  #bubble-legend {
+    display: flex;
+  }
+
+  .bubble-legend-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-self: center;
+    margin-right: 1rem;
+  }
 </style>
 
 <div aria-label="legend" class="legend {$signalType === 'value' ? 'value' : ''}">
+  <div id="encoding-options">
+    <div class="toggle">
+      <div aria-label="display type" class="buttons-group-side">
+        <button
+          aria-pressed={$signalType === 'value' ? 'true' : 'false'}
+          class="button {$signalType === 'value' ? 'selected' : ''}"
+          on:click={() => {
+            currentDataReadyOnMap.set(false);
+            signalType.set('value');
+          }}>
+          {$currentSensor.match(/num/) ? 'Count' : 'Intensity'}
+        </button>
+        <button
+          aria-pressed={$signalType === 'direction' ? 'true' : 'false'}
+          class="button {$signalType === 'direction' ? 'selected' : ''}"
+          on:click={() => {
+            currentDataReadyOnMap.set(false);
+            signalType.set('direction');
+          }}
+          disabled={$sensorMap.get($currentSensor).official ? true : false}>
+          7-day Trend
+          {#if $sensorMap.get($currentSensor).official}
+            <span class="disabled-tooltip">Currently unavailable</span>
+          {/if}
+        </button>
 
-  <div class="toggle">
-    <div aria-label="display type" class="buttons-group-side">
-      <button
-        aria-pressed={$signalType === 'value' ? 'true' : 'false'}
-        class="button {$signalType === 'value' ? 'selected' : ''}"
-        on:click={() => {
-          currentDataReadyOnMap.set(false);
-          signalType.set('value');
-        }}>
-        {$currentSensor.match(/num/) ? 'Count' : 'Intensity'}
-      </button>
-      <button
-        aria-pressed={$signalType === 'direction' ? 'true' : 'false'}
-        class="button {$signalType === 'direction' ? 'selected' : ''}"
-        on:click={() => {
-          currentDataReadyOnMap.set(false);
-          signalType.set('direction');
-        }}
-        disabled={$sensorMap.get($currentSensor).official ? true : false}>
-        7-day Trend
-        {#if $sensorMap.get($currentSensor).official}
-          <span class="disabled-tooltip">Currently unavailable</span>
-        {/if}
-      </button>
+      </div>
+    </div>
 
+    <div class="toggle {$signalType === 'direction' || !$currentSensor.match(/num/) ? 'hidden' : ''}">
+      <div aria-label="encoding type" class="buttons-group-side">
+        <button
+          aria-pressed={$encoding === 'color' ? 'true' : 'false'}
+          class="button {$encoding === 'color' ? 'selected' : ''}"
+          on:click={() => {
+            encoding.set('color');
+          }}>
+          Choropleth
+        </button>
+        <button
+          aria-pressed={$encoding === 'bubble' ? 'true' : 'false'}
+          class="button {$encoding === 'bubble' ? 'selected' : ''}"
+          on:click={() => {
+            encoding.set('bubble');
+          }}>
+          Bubbles
+        </button>
+      </div>
     </div>
   </div>
 
-  {#if $signalType === 'direction'}
-    <div class="trend-legend-grouping">
-      <ul class="legend-labels">
-        <li>
-          <span style="background-color: {DIRECTION_THEME.increasing}" />
-          {@html DIRECTION_THEME.increasingIcon}
-          Increasing
-        </li>
-        <li>
-          <span style="background-color: {DIRECTION_THEME.steady}" />
-          {@html DIRECTION_THEME.steadyIcon}
-          Steady
-        </li>
-        <li>
-          <span style="background-color: {DIRECTION_THEME.decreasing}" />
-          {@html DIRECTION_THEME.decreasingIcon}
-          Decreasing
-        </li>
-      </ul>
-    </div>
-  {:else if $currentSensor.match(/num/)}
-    <div class="legend-grouping">
-      <ul class="legend-labels">
-        {#each logColorArr as { label, from_color, to_color }, j}
-          <li class="colored">
-            <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
-            {sig_figs(label, 3)}
+  {#if $encoding === 'color'}
+    {#if $signalType === 'direction'}
+      <div class="trend-legend-grouping">
+        <ul class="legend-labels">
+          <li>
+            <span style="background-color: {DIRECTION_THEME.increasing}" />
+            {@html DIRECTION_THEME.increasingIcon}
+            Increasing
           </li>
-        {/each}
-        <li class="ends">
-          <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
-          {high ? high + '+' : ''}
-        </li>
-      </ul>
-
-    </div>
-  {:else}
-    <div class="legend-grouping">
-      <ul class="legend-labels">
-        {#each linColorArr as { label, from_color, to_color }, j}
-          <li class="colored">
-            <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
-            {sig_figs(label, 3)}
+          <li>
+            <span style="background-color: {DIRECTION_THEME.steady}" />
+            {@html DIRECTION_THEME.steadyIcon}
+            Steady
           </li>
-        {/each}
-        <li class="ends">
-          <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
-          {high ? high + '+' : ''}
-        </li>
-      </ul>
+          <li>
+            <span style="background-color: {DIRECTION_THEME.decreasing}" />
+            {@html DIRECTION_THEME.decreasingIcon}
+            Decreasing
+          </li>
+        </ul>
+      </div>
+    {:else if $currentSensor.match(/num/)}
+      <div class="legend-grouping">
+        <ul class="legend-labels">
+          {#each logColorArr as { label, from_color, to_color }, j}
+            <li class="colored">
+              <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
+              {sig_figs(label, 3)}
+            </li>
+          {/each}
+          <li class="ends">
+            <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
+            {high ? high + '+' : ''}
+          </li>
+        </ul>
 
+      </div>
+    {:else}
+      <div class="legend-grouping">
+        <ul class="legend-labels">
+          {#each linColorArr as { label, from_color, to_color }, j}
+            <li class="colored">
+              <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
+              {sig_figs(label, 3)}
+            </li>
+          {/each}
+          <li class="ends">
+            <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
+            {high ? high + '+' : ''}
+          </li>
+        </ul>
+
+      </div>
+    {/if}
+  {:else if $encoding === 'bubble'}
+    <div id="bubble-legend">
+      {#each bubbleLegend as [r, value]}
+        <div class="bubble-legend-item">
+          <div style="width: {r * 2}px; height: {r * 2}px;" class="bubble" />
+          <span>{value.toLocaleString('en')}</span>
+        </div>
+      {/each}
     </div>
   {/if}
 </div>

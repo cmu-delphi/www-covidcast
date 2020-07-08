@@ -1,0 +1,782 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [8.09977892356089, -6.060260830966031]
+      },
+      "properties": {
+        "NAME": "Alabama",
+        "GEO_ID": "0400000US01",
+        "STATE": "01",
+        "POSTAL": "AL",
+        "id": "AL",
+        "Population": "4903185"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-17.135857111960384, -8.79941083746821]
+      },
+      "properties": {
+        "NAME": "Alaska",
+        "GEO_ID": "0400000US02",
+        "STATE": "02",
+        "POSTAL": "AK",
+        "id": "AK",
+        "Population": "731545"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-11.895609143831331, -3.709284169838189]
+      },
+      "properties": {
+        "NAME": "Arizona",
+        "GEO_ID": "0400000US04",
+        "STATE": "04",
+        "POSTAL": "AZ",
+        "id": "AZ",
+        "Population": "7278717"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [3.557356925468538, -3.873434353428813]
+      },
+      "properties": {
+        "NAME": "Arkansas",
+        "GEO_ID": "0400000US05",
+        "STATE": "05",
+        "POSTAL": "AR",
+        "id": "AR",
+        "Population": "3017804"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-17.926825958898373, 0.3351806223933987]
+      },
+      "properties": {
+        "NAME": "California",
+        "GEO_ID": "0400000US06",
+        "STATE": "06",
+        "POSTAL": "CA",
+        "id": "CA",
+        "Population": "39512223"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-6.7171121956856, 0.7693573233989195]
+      },
+      "properties": {
+        "NAME": "Colorado",
+        "GEO_ID": "0400000US08",
+        "STATE": "08",
+        "POSTAL": "CO",
+        "id": "CO",
+        "Population": "5758736"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [17.582469634143497, 5.026876959534984]
+      },
+      "properties": {
+        "NAME": "Connecticut",
+        "GEO_ID": "0400000US09",
+        "STATE": "09",
+        "POSTAL": "CT",
+        "id": "CT",
+        "Population": "3565287"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.120899234582804, 1.9961685029081262]
+      },
+      "properties": {
+        "NAME": "Delaware",
+        "GEO_ID": "0400000US10",
+        "STATE": "10",
+        "POSTAL": "DE",
+        "id": "DE",
+        "Population": "973764"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [14.998093161553278, 1.6669321374529542]
+      },
+      "properties": {
+        "NAME": "District of Columbia",
+        "GEO_ID": "0400000US11",
+        "STATE": "11",
+        "POSTAL": "DC",
+        "id": "DC",
+        "Population": "705749"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [13.035406741958345, -9.77516571715743]
+      },
+      "properties": {
+        "NAME": "Florida",
+        "GEO_ID": "0400000US12",
+        "STATE": "12",
+        "POSTAL": "FL",
+        "id": "FL",
+        "Population": "21477737"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [10.867038621079155, -4.8081225651941315]
+      },
+      "properties": {
+        "NAME": "Georgia",
+        "GEO_ID": "0400000US13",
+        "STATE": "13",
+        "POSTAL": "GA",
+        "id": "GA",
+        "Population": "10617423"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-7.823644765414666, -12.224736551441762]
+      },
+      "properties": {
+        "NAME": "Hawaii",
+        "GEO_ID": "0400000US15",
+        "STATE": "15",
+        "POSTAL": "HI",
+        "id": "HI",
+        "Population": "1415872"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-12.868787934901457, 6.710313386685114]
+      },
+      "properties": {
+        "NAME": "Idaho",
+        "GEO_ID": "0400000US16",
+        "STATE": "16",
+        "POSTAL": "ID",
+        "id": "ID",
+        "Population": "1787065"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.772619937029655, 1.5062885512655557]
+      },
+      "properties": {
+        "NAME": "Illinois",
+        "GEO_ID": "0400000US17",
+        "STATE": "17",
+        "POSTAL": "IL",
+        "id": "IL",
+        "Population": "12671821"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.9162394667176015, 1.9738887337280846]
+      },
+      "properties": {
+        "NAME": "Indiana",
+        "GEO_ID": "0400000US18",
+        "STATE": "18",
+        "POSTAL": "IN",
+        "id": "IN",
+        "Population": "6732219"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.247235338523756, 3.38132852095056]
+      },
+      "properties": {
+        "NAME": "Iowa",
+        "GEO_ID": "0400000US19",
+        "STATE": "19",
+        "POSTAL": "IA",
+        "id": "IA",
+        "Population": "3155070"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-1.0862056820947648, -0.18710671395962558]
+      },
+      "properties": {
+        "NAME": "Kansas",
+        "GEO_ID": "0400000US20",
+        "STATE": "20",
+        "POSTAL": "KS",
+        "id": "KS",
+        "Population": "2913314"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [9.61389475915536, -0.3052047270011374]
+      },
+      "properties": {
+        "NAME": "Kentucky",
+        "GEO_ID": "0400000US21",
+        "STATE": "21",
+        "POSTAL": "KY",
+        "id": "KY",
+        "Population": "4467673"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [3.6234629062998973, -8.28081220583612]
+      },
+      "properties": {
+        "NAME": "Louisiana",
+        "GEO_ID": "0400000US22",
+        "STATE": "22",
+        "POSTAL": "LA",
+        "id": "LA",
+        "Population": "4648794"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [19.19065693688702, 9.347906905128097]
+      },
+      "properties": {
+        "NAME": "Maine",
+        "GEO_ID": "0400000US23",
+        "STATE": "23",
+        "POSTAL": "ME",
+        "id": "ME",
+        "Population": "1344212"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [15.252343370939471, 1.8586326106093218]
+      },
+      "properties": {
+        "NAME": "Maryland",
+        "GEO_ID": "0400000US24",
+        "STATE": "24",
+        "POSTAL": "MD",
+        "id": "MD",
+        "Population": "6045680"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [18.32112508924306, 6.0517747867865435]
+      },
+      "properties": {
+        "NAME": "Massachusetts",
+        "GEO_ID": "0400000US25",
+        "STATE": "25",
+        "POSTAL": "MA",
+        "id": "MA",
+        "Population": "6892503"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [8.659021783626264, 6.00635036322969]
+      },
+      "properties": {
+        "NAME": "Michigan",
+        "GEO_ID": "0400000US26",
+        "STATE": "26",
+        "POSTAL": "MI",
+        "id": "MI",
+        "Population": "9986857"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [1.4067980766268566, 7.715892158914945]
+      },
+      "properties": {
+        "NAME": "Minnesota",
+        "GEO_ID": "0400000US27",
+        "STATE": "27",
+        "POSTAL": "MN",
+        "id": "MN",
+        "Population": "5639632"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.460850473122953, -5.584945482262578]
+      },
+      "properties": {
+        "NAME": "Mississippi",
+        "GEO_ID": "0400000US28",
+        "STATE": "28",
+        "POSTAL": "MS",
+        "id": "MS",
+        "Population": "2976149"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [3.0927008126948747, -0.0817809394076107]
+      },
+      "properties": {
+        "NAME": "Missouri",
+        "GEO_ID": "0400000US29",
+        "STATE": "29",
+        "POSTAL": "MO",
+        "id": "MO",
+        "Population": "6137428"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-8.782636034836514, 8.926469980459846]
+      },
+      "properties": {
+        "NAME": "Montana",
+        "GEO_ID": "0400000US30",
+        "STATE": "30",
+        "POSTAL": "MT",
+        "id": "MT",
+        "Population": "1068778"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-2.508105260564348, 2.884987950154324]
+      },
+      "properties": {
+        "NAME": "Nebraska",
+        "GEO_ID": "0400000US31",
+        "STATE": "31",
+        "POSTAL": "NE",
+        "id": "NE",
+        "Population": "1934408"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-15.541576615695675, 2.9789416714298422]
+      },
+      "properties": {
+        "NAME": "Nevada",
+        "GEO_ID": "0400000US32",
+        "STATE": "32",
+        "POSTAL": "NV",
+        "id": "NV",
+        "Population": "3080156"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [17.829593444868095, 7.567071114261296]
+      },
+      "properties": {
+        "NAME": "New Hampshire",
+        "GEO_ID": "0400000US33",
+        "STATE": "33",
+        "POSTAL": "NH",
+        "id": "NH",
+        "Population": "1359711"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.40728361873678, 2.9213859223315732]
+      },
+      "properties": {
+        "NAME": "New Jersey",
+        "GEO_ID": "0400000US34",
+        "STATE": "34",
+        "POSTAL": "NJ",
+        "id": "NJ",
+        "Population": "8882190"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-7.731409334594155, -3.999552411346203]
+      },
+      "properties": {
+        "NAME": "New Mexico",
+        "GEO_ID": "0400000US35",
+        "STATE": "35",
+        "POSTAL": "NM",
+        "id": "NM",
+        "Population": "2096829"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [15.612903639756754, 6.003224312302769]
+      },
+      "properties": {
+        "NAME": "New York",
+        "GEO_ID": "0400000US36",
+        "STATE": "36",
+        "POSTAL": "NY",
+        "id": "NY",
+        "Population": "19453561"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [12.636212400274694, -1.9712052876420485]
+      },
+      "properties": {
+        "NAME": "North Carolina",
+        "GEO_ID": "0400000US37",
+        "STATE": "37",
+        "POSTAL": "NC",
+        "id": "NC",
+        "Population": "10488084"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-2.54504236420867, 9.017575990667966]
+      },
+      "properties": {
+        "NAME": "North Dakota",
+        "GEO_ID": "0400000US38",
+        "STATE": "38",
+        "POSTAL": "ND",
+        "id": "ND",
+        "Population": "762062"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [10.253538676250002, 2.3517645987448605]
+      },
+      "properties": {
+        "NAME": "Ohio",
+        "GEO_ID": "0400000US39",
+        "STATE": "39",
+        "POSTAL": "OH",
+        "id": "OH",
+        "Population": "11689100"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-0.2739935221644022, -2.637696205327247]
+      },
+      "properties": {
+        "NAME": "Oklahoma",
+        "GEO_ID": "0400000US40",
+        "STATE": "40",
+        "POSTAL": "OK",
+        "id": "OK",
+        "Population": "3956971"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-16.90211332106329, 7.567071114261296]
+      },
+      "properties": {
+        "NAME": "Oregon",
+        "GEO_ID": "0400000US41",
+        "STATE": "41",
+        "POSTAL": "OR",
+        "id": "OR",
+        "Population": "4217737"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [14.407374153749819, 3.905574143640507]
+      },
+      "properties": {
+        "NAME": "Pennsylvania",
+        "GEO_ID": "0400000US42",
+        "STATE": "42",
+        "POSTAL": "PA",
+        "id": "PA",
+        "Population": "12801989"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [18.41931067293059, 5.34458836087161]
+      },
+      "properties": {
+        "NAME": "Rhode Island",
+        "GEO_ID": "0400000US44",
+        "STATE": "44",
+        "POSTAL": "RI",
+        "id": "RI",
+        "Population": "1059361"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [12.647337910818065, -3.953767738975055]
+      },
+      "properties": {
+        "NAME": "South Carolina",
+        "GEO_ID": "0400000US45",
+        "STATE": "45",
+        "POSTAL": "SC",
+        "id": "SC",
+        "Population": "5148714"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-2.381197829954677, 5.889462283982402]
+      },
+      "properties": {
+        "NAME": "South Dakota",
+        "GEO_ID": "0400000US46",
+        "STATE": "46",
+        "POSTAL": "SD",
+        "id": "SD",
+        "Population": "884659"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.952257118277327, -2.4997485562851898]
+      },
+      "properties": {
+        "NAME": "Tennessee",
+        "GEO_ID": "0400000US47",
+        "STATE": "47",
+        "POSTAL": "TN",
+        "id": "TN",
+        "Population": "6829174"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-2.95344534859619, -7.666244196436148]
+      },
+      "properties": {
+        "NAME": "Texas",
+        "GEO_ID": "0400000US48",
+        "STATE": "48",
+        "POSTAL": "TX",
+        "id": "TX",
+        "Population": "28995881"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-11.685543425743619, 1.7462826311451352]
+      },
+      "properties": {
+        "NAME": "Utah",
+        "GEO_ID": "0400000US49",
+        "STATE": "49",
+        "POSTAL": "UT",
+        "id": "UT",
+        "Population": "3205958"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.996584894353788, 7.354881865928964]
+      },
+      "properties": {
+        "NAME": "Vermont",
+        "GEO_ID": "0400000US50",
+        "STATE": "50",
+        "POSTAL": "VT",
+        "id": "VT",
+        "Population": "623989"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [14.420886277797456, 0.5415909390819436]
+      },
+      "properties": {
+        "NAME": "Virginia",
+        "GEO_ID": "0400000US51",
+        "STATE": "51",
+        "POSTAL": "VA",
+        "id": "VA",
+        "Population": "8535519"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-16.10432668290573, 11.181523666029914]
+      },
+      "properties": {
+        "NAME": "Washington",
+        "GEO_ID": "0400000US53",
+        "STATE": "53",
+        "POSTAL": "WA",
+        "id": "WA",
+        "Population": "7614893"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [12.341557521721807, 1.2720283671105252]
+      },
+      "properties": {
+        "NAME": "West Virginia",
+        "GEO_ID": "0400000US54",
+        "STATE": "54",
+        "POSTAL": "WV",
+        "id": "WV",
+        "Population": "1792147"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.084525173063939, 5.98712918247858]
+      },
+      "properties": {
+        "NAME": "Wisconsin",
+        "GEO_ID": "0400000US55",
+        "STATE": "55",
+        "POSTAL": "WI",
+        "id": "WI",
+        "Population": "5822434"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-7.719240903319116, 4.890824480085318]
+      },
+      "properties": {
+        "NAME": "Wyoming",
+        "GEO_ID": "0400000US56",
+        "STATE": "56",
+        "POSTAL": "WY",
+        "id": "WY",
+        "Population": "578759"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [19.5, -12.5] },
+      "properties": {
+        "NAME": "Puerto Rico",
+        "GEO_ID": "0400000US72",
+        "STATE": "72",
+        "POSTAL": "PR",
+        "id": "PR",
+        "Population": 2933408
+      }
+    }
+  ]
+}

@@ -2,8 +2,8 @@
   //import mapboxgl from 'mapbox-gl';
   import { onMount, setContext } from 'svelte';
   import mapboxgl from 'mapbox-gl';
-  import { defaultRegionOnStartup, getTextColorBasedOnBackground } from './util.js';
-  import { DIRECTION_THEME, MAP_THEME } from './theme.js';
+  import { defaultRegionOnStartup, getTextColorBasedOnBackground, getNiceNumber } from './util.js';
+  import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME } from './theme.js';
   import AutoComplete from 'simple-svelte-autocomplete';
   import Options from './Options.svelte';
   import Legend from './Legend.svelte';
@@ -24,6 +24,7 @@
     currentData,
     currentRange,
     signalType,
+    encoding,
     currentDataReadyOnMap,
     mounted,
     mapFirstLoaded,
@@ -67,6 +68,11 @@
   $: loaded = false;
   $: invalid_search = false;
   $: currentSensorTooltip = $sensorMap.get($currentSensor).mapTitleText;
+
+  // given the level (state/msa/county), returns the name of its "centered" source/layer
+  function center(level) {
+    return `${level}-centers`;
+  }
 
   var dict = {
     '10': 'DE',
@@ -192,8 +198,10 @@
       map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
 
       //get hover color for regular county
-      var color_stops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
-      if ($currentSensor.match(/num/)) {
+      let color_stops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
+      if ($encoding == 'bubble') {
+        fillColor = 'white';
+      } else if ($currentSensor.match(/num/)) {
         var value_range = [];
         var color_range = [];
         for (var i = 0; i < color_stops.length; i++) {
@@ -392,6 +400,7 @@
     updateMap('data');
   });
   signalType.subscribe(_ => updateMap('signal'));
+  encoding.subscribe(_ => updateMap('encoding'));
   mounted.subscribe(_ => updateMap('mounted'));
   currentDate.subscribe(_ => {
     if (
@@ -486,25 +495,34 @@
     }
 
     let dat = $geojsons.get($currentLevel);
-    dat.features.forEach(d => {
-      const id = d.properties.id;
+    let centerDat = $geojsons.get(center($currentLevel));
 
-      d.properties.value = -100;
-      d.properties.direction = -100;
-      if (geoIds.has(id) && valueMappedVals.get(id) !== undefined) {
-        d.properties.value = valueMappedVals.get(id)[0];
-        if ($currentSensor.match(/7dav_incidence/)) {
+    // set the value of the chosen sensor to each states/counties
+    // dat: data for cholopleth
+    // centerDat: data for bubbles
+    [dat, centerDat].forEach(ds => {
+      ds.features.forEach(d => {
+        const id = d.properties.id;
+
+        d.properties.value = -100;
+        d.properties.direction = -100;
+        if (geoIds.has(id) && valueMappedVals.get(id) !== undefined) {
           d.properties.value = valueMappedVals.get(id)[0];
-          d.properties.value1 = valueMappedVals.get(id)[1];
+          if ($currentSensor.match(/7dav_incidence/)) {
+            d.properties.value = valueMappedVals.get(id)[0];
+            d.properties.value1 = valueMappedVals.get(id)[1];
+          }
         }
-      }
-      if (geoIds.has(id) && directionMappedVals.get(id) !== undefined) {
-        d.properties.direction = directionMappedVals.get(id);
-      }
+        if (geoIds.has(id) && directionMappedVals.get(id) !== undefined) {
+          d.properties.direction = directionMappedVals.get(id);
+        }
+      });
     });
 
-    let stops;
-    let stopsMega;
+    let stops, stopsMega;
+    let base = ENCODING_BUBBLE_THEME.base,
+      coef;
+
     if ($signalType === 'value') {
       valueMinMax[0] = Math.max(0, valueMinMax[0]);
       let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
@@ -584,6 +602,12 @@
         ];
         */
       }
+
+      // radius = ceof * log_{base} (value + 0.001)
+
+      coef =
+        ENCODING_BUBBLE_THEME.maxRadius[$currentLevel] /
+        (Math.log(getNiceNumber(valueMinMax[1]) + 0.001) / Math.log(base));
     } else {
       stops = [
         [-100, MAP_THEME.countyFill],
@@ -598,30 +622,63 @@
         [1, DIRECTION_THEME.gradientMaxMega],
       ];
     }
+
     if (['data', 'init'].includes(type)) {
       map.getSource($currentLevel).setData(dat);
+      map.getSource(center($currentLevel)).setData(centerDat);
       drawMega ? map.getSource('mega-county').setData(megaDat) : '';
     }
-    Object.keys($levels).forEach(name => {
-      if (name === $currentLevel) {
-        if (map.getLayer(name)) {
-          map.setPaintProperty(name, 'fill-color', {
-            property: $signalType,
-            stops: stops,
-          });
-          map.setLayoutProperty(name, 'visibility', 'visible');
+
+    if ($encoding == 'color') {
+      // hide all bubble layers
+      Object.keys($levels).forEach(
+        name => map.getLayer(center(name)) && map.setLayoutProperty(center(name), 'visibility', 'none'),
+      );
+
+      Object.keys($levels).forEach(name => {
+        if (name === $currentLevel) {
+          if (map.getLayer(name)) {
+            map.setPaintProperty(name, 'fill-color', {
+              property: $signalType,
+              stops: stops,
+            });
+            map.setLayoutProperty(name, 'visibility', 'visible');
+          }
+        } else {
+          map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none');
         }
-      } else {
-        map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none');
-      }
-    });
-    if (drawMega) {
-      map.setPaintProperty('mega-county', 'fill-color', {
-        property: $signalType,
-        stops: stopsMega,
       });
-      map.setLayoutProperty('mega-county', 'visibility', 'visible');
-    } else {
+      if (drawMega) {
+        map.setPaintProperty('mega-county', 'fill-color', {
+          property: $signalType,
+          stops: stopsMega,
+        });
+        map.setLayoutProperty('mega-county', 'visibility', 'visible');
+      } else {
+        map.setLayoutProperty('mega-county', 'visibility', 'none');
+      }
+    } else if ($encoding == 'bubble') {
+      // hide all color layers except for the one for the current level (for tooltip)
+      Object.keys($levels).forEach(name => map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none'));
+      if (map.getLayer($currentLevel)) {
+        map.setPaintProperty($currentLevel, 'fill-color', MAP_THEME.countyFill);
+
+        map.setLayoutProperty($currentLevel, 'visibility', 'visible');
+      }
+
+      // hide all bubble layer except for the one for the current level
+      Object.keys($levels).forEach(
+        name => map.getLayer(center(name)) && map.setLayoutProperty(center(name), 'visibility', 'none'),
+      );
+      if (map.getLayer(center($currentLevel))) {
+        map.setPaintProperty(center($currentLevel), 'circle-radius', [
+          '*',
+          ['/', ['ln', ['+', ['get', 'value'], 0.001]], ['ln', base]],
+          coef,
+        ]);
+        map.setLayoutProperty(center($currentLevel), 'visibility', 'visible');
+      }
+
       map.setLayoutProperty('mega-county', 'visibility', 'none');
     }
 
@@ -728,6 +785,13 @@
       map.addSource('mega-county', {
         type: 'geojson',
         data: $geojsons.get('state'),
+      });
+
+      Object.keys($levels).forEach(level => {
+        map.addSource(center(level), {
+          type: 'geojson',
+          data: $geojsons.get(center(level)),
+        });
       });
 
       map.addLayer({
@@ -895,6 +959,25 @@
         );
       });
 
+      Object.keys($levels).forEach(level => {
+        map.addLayer(
+          {
+            id: center(level),
+            source: center(level),
+            type: 'circle',
+            visibility: 'none',
+            filter: ['!=', $signalType, -100],
+            paint: {
+              'circle-radius': 0,
+              'circle-color': ENCODING_BUBBLE_THEME.color,
+              'circle-stroke-color': ENCODING_BUBBLE_THEME.strokeColor,
+              'circle-stroke-width': ENCODING_BUBBLE_THEME.strokeWidth,
+            },
+          },
+          `${level}-hover`,
+        );
+      });
+
       mapMounted = true;
       updateMap('init');
     });
@@ -969,7 +1052,7 @@
       const lat_offset = search_info[3];
       geocode(query).then(d => {
         var coords = projectionMercartor.invert(projection(d.features[0].center));
-        if (selectedRegion['property_id'] === 'PR' || selectedRegion['id'].substring(0, 2) === '72') {
+        if (selectedRegion['property_id'] === 'PR' || selectedRegion['id'].substring(0, 2) === '72' /* Puerto Rico */) {
           coords[0] += long_offset;
           coords[1] += lat_offset;
         }
@@ -1084,7 +1167,7 @@
     align-items: center;
     justify-content: center;
     transition: all 0.1s ease-in;
-    height: 100px;
+    height: 120px;
 
     /* rounded design refresh */
     border-radius: 7px;

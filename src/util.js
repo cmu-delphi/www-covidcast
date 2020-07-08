@@ -10,7 +10,7 @@ export const calculateValFromRectified = (rectified) => {
 };
 
 export const injectIDs = (level, data) => {
-  var lst = []
+  var lst = [];
   data.features.forEach((d) => {
     d.properties.level = level;
     if (level === 'county') {
@@ -61,14 +61,22 @@ export const injectIDs = (level, data) => {
   return data;
 };
 
-
 export function getTextColorBasedOnBackground(bgColor) {
   // https://github.com/onury/invert-color
   return invertColor(colorParse(bgColor).values, {
     black: '#000',
     white: '#fff',
-    threshold: 0.32
+    threshold: 0.32,
   });
+}
+
+export function getNiceNumber(num) {
+  let nice = Math.pow(10, Math.ceil(Math.log10(num)));
+
+  if (num < 0.25 * nice) nice = 0.25 * nice;
+  else if (num < 0.5 * nice) nice = 0.5 * nice;
+
+  return nice;
 }
 
 export const defaultRegionOnStartup = {

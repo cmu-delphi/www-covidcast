@@ -1,5 +1,13 @@
 <script>
-  import { sensorMap, currentSensor, levels, currentLevel, signalType, currentDataReadyOnMap } from './stores.js';
+  import {
+    sensorMap,
+    currentSensor,
+    levels,
+    currentLevel,
+    signalType,
+    currentDataReadyOnMap,
+    encoding,
+  } from './stores.js';
 
   let hide = false;
   let shouldDisplayBanner = true;
@@ -10,6 +18,9 @@
   currentSensor.subscribe(s => {
     if ($sensorMap.get($currentSensor).levels.includes(level) === false) {
       level = $levels['msa'];
+    }
+    if (!$currentSensor.match(/num/)) {
+      encoding.set('color');
     }
   });
 
@@ -118,7 +129,4 @@
     </select>
 
   </div>
-
-  <br />
-
 </div>

@@ -7,6 +7,7 @@
     times,
     stats,
     signalType,
+    encoding,
     currentSensor,
     currentDate,
     currentLevel,
@@ -355,7 +356,7 @@
   }
 
   // Constantly keep the URL parameters updated with the current state.
-  function updateURIParameters(sensor, level, region, date, signalType) {
+  function updateURIParameters(sensor, level, region, date, signalType, encoding) {
     let pre = '';
     if ($customDataView) {
       const queryString = window.location.search;
@@ -376,16 +377,31 @@
         '&date=' +
         date +
         '&signalType=' +
-        signalType,
+        signalType +
+        '&encoding=' +
+        encoding,
     );
   }
 
   // Keep the URL updated with the current state
-  currentSensor.subscribe(s => updateURIParameters(s, $currentLevel, $currentRegion, $currentDate, $signalType));
-  currentLevel.subscribe(l => updateURIParameters($currentSensor, l, $currentRegion, $currentDate, $signalType));
-  currentRegion.subscribe(r => updateURIParameters($currentSensor, $currentLevel, r, $currentDate, $signalType));
-  currentDate.subscribe(d => updateURIParameters($currentSensor, $currentLevel, $currentRegion, d, $signalType));
-  signalType.subscribe(t => updateURIParameters($currentSensor, $currentLevel, $currentRegion, $currentDate, t));
+  currentSensor.subscribe(s =>
+    updateURIParameters(s, $currentLevel, $currentRegion, $currentDate, $signalType, $encoding),
+  );
+  currentLevel.subscribe(l =>
+    updateURIParameters($currentSensor, l, $currentRegion, $currentDate, $signalType, $encoding),
+  );
+  currentRegion.subscribe(r =>
+    updateURIParameters($currentSensor, $currentLevel, r, $currentDate, $signalType, $encoding),
+  );
+  currentDate.subscribe(d =>
+    updateURIParameters($currentSensor, $currentLevel, $currentRegion, d, $signalType, $encoding),
+  );
+  signalType.subscribe(t =>
+    updateURIParameters($currentSensor, $currentLevel, $currentRegion, $currentDate, t, $encoding),
+  );
+  encoding.subscribe(e =>
+    updateURIParameters($currentSensor, $currentLevel, $currentRegion, $currentDate, $signalType, e),
+  );
 </script>
 
 <style>

@@ -1,12 +1,5 @@
-import {
-  writable,
-  readable,
-  derived,
-  get
-} from 'svelte/store';
-import {
-  injectIDs
-} from './util.js';
+import { writable, readable, derived, get } from 'svelte/store';
+import { injectIDs } from './util.js';
 import * as d3 from 'd3';
 import moment from 'moment';
 
@@ -17,7 +10,8 @@ const urlParams = new URLSearchParams(queryString);
 // Checks the ?sensors= URI parameter for a custom view,
 // otherwise uses the default.
 export const sensors = readable(
-  [{
+  [
+    {
       name: 'Doctor Visits',
       id: 'doctor-visits',
       tooltipText: 'Percentage of daily doctor visits that are due to COVID-like symptoms',
@@ -30,15 +24,15 @@ export const sensors = readable(
       official: false,
     },
     {
-      name: "Hospital Admissions",
-      id: "hospital-admissions",
-      tooltipText: "Percentage of daily hospital admissions with COVID-19 associated diagnoses",
-      mapTitleText: "Percentage of daily hospital admissions with COVID-19 associated diagnoses",
-      chartTitleText: "Percentage of daily hospital admissions with COVID-19 associated diagnoses",
-      yAxis: "Percentage",
-      format: "percent",
-      signal: "smoothed_adj_covid19",
-      levels: ["county", "msa", "state"],
+      name: 'Hospital Admissions',
+      id: 'hospital-admissions',
+      tooltipText: 'Percentage of daily hospital admissions with COVID-19 associated diagnoses',
+      mapTitleText: 'Percentage of daily hospital admissions with COVID-19 associated diagnoses',
+      chartTitleText: 'Percentage of daily hospital admissions with COVID-19 associated diagnoses',
+      yAxis: 'Percentage',
+      format: 'percent',
+      signal: 'smoothed_adj_covid19',
+      levels: ['county', 'msa', 'state'],
       official: false,
     },
     {
@@ -56,9 +50,12 @@ export const sensors = readable(
     {
       name: 'Symptoms in Community (FB)',
       id: 'fb-survey',
-      tooltipText: 'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
-      mapTitleText: 'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
-      chartTitleText: 'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
+      tooltipText:
+        'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
+      mapTitleText:
+        'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
+      chartTitleText:
+        'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
       yAxis: 'Percentage',
       format: 'percent',
       signal: 'smoothed_hh_cmnty_cli',
@@ -102,21 +99,22 @@ export const sensors = readable(
       official: false,
     },
     {
-      name: "Combined",
-      id: "indicator-combination",
+      name: 'Combined',
+      id: 'indicator-combination',
       tooltipText: 'Combination of COVID-19 indicators available at this geographic level',
       mapTitleText: 'Combination of COVID-19 indicators',
       chartTitleText: 'Combination of COVID-19 indicators',
       yAxis: 'Combined value (arbitrary scale)',
-      format: "raw",
-      signal: "nmf_day_doc_fbc_fbs_ght",
-      levels: ["county", "msa", "state"],
+      format: 'raw',
+      signal: 'nmf_day_doc_fbc_fbs_ght',
+      levels: ['county', 'msa', 'state'],
       official: false,
     },
     {
       name: 'Cases',
-      id: "indicator-combination",
-      tooltipText: 'Daily new confirmed COVID-19 cases (7-day average), based on data reported by USAFacts and Johns Hopkins University',
+      id: 'indicator-combination',
+      tooltipText:
+        'Daily new confirmed COVID-19 cases (7-day average), based on data reported by USAFacts and Johns Hopkins University',
       mapTitleText: 'Daily new confirmed COVID-19 cases (7-day average)',
       chartTitleText: 'Daily new confirmed COVID-19 cases (7-day average)',
       yAxis: 'Cases',
@@ -127,8 +125,9 @@ export const sensors = readable(
     },
     {
       name: 'Cases per 100,000 People',
-      id: "indicator-combination",
-      tooltipText: 'Daily new confirmed COVID-19 cases per 100,000 people (7-day average), based on data reported by USAFacts and Johns Hopkins University',
+      id: 'indicator-combination',
+      tooltipText:
+        'Daily new confirmed COVID-19 cases per 100,000 people (7-day average), based on data reported by USAFacts and Johns Hopkins University',
       mapTitleText: 'Daily new confirmed COVID-19 cases per 100,000 people (7-day average)',
       chartTitleText: 'Daily new confirmed COVID-19 cases per 100,000 people (7-day average)',
       yAxis: 'Cases per 100,000 people',
@@ -139,8 +138,9 @@ export const sensors = readable(
     },
     {
       name: 'Deaths',
-      id: "indicator-combination",
-      tooltipText: 'Daily new COVID-19 deaths (7-day average), based on data reported by USAFacts and Johns Hopkins University',
+      id: 'indicator-combination',
+      tooltipText:
+        'Daily new COVID-19 deaths (7-day average), based on data reported by USAFacts and Johns Hopkins University',
       mapTitleText: 'Daily new COVID-19 deaths (7-day average)',
       chartTitleText: 'Daily new COVID-19 deaths (7-day average)',
       yAxis: 'Deaths',
@@ -151,8 +151,9 @@ export const sensors = readable(
     },
     {
       name: 'Deaths per 100,000 People',
-      id: "indicator-combination",
-      tooltipText: 'Daily new COVID-19 deaths per 100,000 people (7-day average), based on data reported by USAFacts and Johns Hopkins University',
+      id: 'indicator-combination',
+      tooltipText:
+        'Daily new COVID-19 deaths per 100,000 people (7-day average), based on data reported by USAFacts and Johns Hopkins University',
       mapTitleText: 'Daily new COVID-19 deaths per 100,000 people (7-day average)',
       chartTitleText: 'Daily new COVID-19 deaths per 100,000 people (7-day average)',
       yAxis: 'Deaths per 100,000 people',
@@ -160,7 +161,7 @@ export const sensors = readable(
       signal: 'deaths_7dav_incidence_prop',
       levels: ['msa', 'county', 'state'],
       official: true,
-    }
+    },
   ],
   (set) => {
     let sensorsOption = urlParams.get('sensors');
@@ -182,7 +183,6 @@ export const levels = readable({
   county: 'County',
 });
 
-
 // This loads all the GeoJSON's for each granularity that the MapBox component reads as layers.
 export const geojsons = readable(new Map(), function start(set) {
   Promise.all([
@@ -190,12 +190,18 @@ export const geojsons = readable(new Map(), function start(set) {
     d3.json('./maps/new_states.json'),
     d3.json('./maps/new_msa.json'),
     d3.json('./maps/city_data/cities-reprojected.json'),
-  ]).then(([a, b, c, d]) => {
+    d3.json('./maps/state_centers.json'),
+    d3.json('./maps/county_centers.json'),
+    d3.json('./maps/msa_centers.json'),
+  ]).then(([a, b, c, d, e, f, g]) => {
     let m = new Map();
     m.set('county', injectIDs('county', a));
     m.set('state', injectIDs('state', b));
     m.set('msa', injectIDs('msa', c));
     m.set('city', d);
+    m.set('state-centers', e);
+    m.set('county-centers', f);
+    m.set('msa-centers', g);
     set(m);
   });
 });
@@ -223,6 +229,12 @@ export const currentLevel = writable('county', (set) => {
 export const signalType = writable('value', (set) => {
   let signalT = urlParams.get('signalType');
   signalT ? set(signalT) : '';
+  return () => '';
+});
+// Options are 'color' and 'bubble'
+export const encoding = writable('color', (set) => {
+  let encoding = urlParams.get('encoding');
+  encoding ? set(encoding) : '';
   return () => '';
 });
 // EpiWeek in form YYYYMMDD.
