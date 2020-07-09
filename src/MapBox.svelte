@@ -51,6 +51,13 @@
     .geoMercator()
     .translate([0, 0])
     .scale(R);
+  const city_points = [
+    'city-point-unclustered-pit',
+    'city-point-unclustered',
+    'city-point-unclustered-2',
+    'city-point-unclustered-3',
+    'city-point-unclustered-4',
+  ];
 
   // Boolean tracking if the map has been initialized.
   let mapMounted = false;
@@ -397,6 +404,7 @@
   // Update the map when sensor or level changes.
   currentData.subscribe(_ => updateMap('data'));
   currentLevel.subscribe(s => {
+    updateLabels(s);
     updateMap('data');
   });
   signalType.subscribe(_ => updateMap('signal'));
@@ -845,13 +853,12 @@
       });
 
       map.addLayer({
-        id: 'city-point-unclustered-pit',
-        source: 'city-point',
+        id: 'state-names',
+        source: center('state'),
         type: 'symbol',
-        filter: ['==', 'city', 'Pittsburgh'],
         maxzoom: 8,
         layout: {
-          'text-field': ['get', 'city'],
+          'text-field': ['get', 'NAME'],
           'text-font': ['Open Sans Regular'],
           'text-size': 12,
         },
@@ -862,6 +869,23 @@
       });
 
       map.addLayer({
+        id: 'city-point-unclustered-pit',
+        source: 'city-point',
+        type: 'symbol',
+        filter: ['==', 'city', 'Pittsburgh'],
+        maxzoom: 8,
+        layout: {
+          'text-field': ['get', 'city'],
+          'text-font': ['Open Sans Regular'],
+          'text-size': 12,
+          visibility: 'none',
+        },
+        paint: {
+          'text-halo-color': '#fff',
+          'text-halo-width': 2,
+        },
+      });
+      map.addLayer({
         id: 'city-point-unclustered',
         source: 'city-point',
         type: 'symbol',
@@ -871,6 +895,7 @@
           'text-field': ['get', 'city'],
           'text-font': ['Open Sans Regular'],
           'text-size': 12,
+          visibility: 'none',
         },
         paint: {
           'text-halo-color': '#fff',
@@ -888,6 +913,7 @@
           'text-field': ['get', 'city'],
           'text-font': ['Open Sans Regular'],
           'text-size': 12,
+          visibility: 'none',
         },
         paint: {
           'text-halo-color': '#fff',
@@ -905,6 +931,7 @@
           'text-field': ['get', 'city'],
           'text-font': ['Open Sans Regular'],
           'text-size': 12,
+          visibility: 'none',
         },
         paint: {
           'text-halo-color': '#fff',
@@ -920,12 +947,15 @@
           'text-field': ['get', 'city'],
           'text-font': ['Open Sans Regular'],
           'text-size': 12,
+          visibility: 'none',
         },
         paint: {
           'text-halo-color': '#fff',
           'text-halo-width': 2,
         },
       });
+
+      updateLabels($currentLevel);
 
       map.addLayer(
         {
@@ -981,6 +1011,22 @@
       mapMounted = true;
       updateMap('init');
     });
+  }
+
+  function updateLabels(s) {
+    if (map) {
+      if (s !== 'state') {
+        city_points.forEach(name => {
+          map.setLayoutProperty(name, 'visibility', 'visible');
+        });
+        map.setLayoutProperty('state-names', 'visibility', 'none');
+      } else {
+        city_points.forEach(name => {
+          map.setLayoutProperty(name, 'visibility', 'none');
+        });
+        map.setLayoutProperty('state-names', 'visibility', 'visible');
+      }
+    }
   }
 
   function search_element(selectedRegion) {
