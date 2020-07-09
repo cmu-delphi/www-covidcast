@@ -983,40 +983,6 @@
     });
   }
 
-  function geocode(query) {
-    var mapboxAccessToken =
-      'pk.eyJ1Ijoicm9iaW4taGFuIiwiYSI6ImNrYmg3cnNndzAwbG4ycmswMDR3em5qdG4ifQ.ayYbyyloJEyumEVIRC5Wmw';
-    return fetch(
-      'https://api.tiles.mapbox.com/geocoding/v5/mapbox.places/' +
-        encodeURIComponent(query) +
-        '.json?access_token=' +
-        mapboxAccessToken +
-        '&autocomplete=false&country=us&types=place%2Cregion',
-    ).then(d => d.json());
-  }
-  function get_zoom_query(selectedRegion) {
-    let zoom_level;
-    if (selectedRegion['level'] === 'county') {
-      zoom_level = 6.5;
-    } else if (selectedRegion['level'] === 'msa') {
-      zoom_level = 6;
-    } else {
-      zoom_level = 5;
-    }
-    var long_offset = 0;
-    var lat_offset = 0;
-    var query = selectedRegion['display_name'];
-    if (selectedRegion['id'] === '72' || selectedRegion['id'].substring(0, 2) === '72') {
-      query = 'Florida';
-      long_offset = 6;
-      lat_offset = -3;
-    } else if (selectedRegion['id'].substring(0, 2) == '02') {
-      query = 'Alaska';
-      zoom_level = 6;
-    }
-    return [query, zoom_level, long_offset, lat_offset];
-  }
-
   function search_element(selectedRegion) {
     let has_value_flag = false;
     const levels_avail = $sensorMap.get($currentSensor).levels;
@@ -1040,24 +1006,34 @@
       if (megaClickedId) {
         map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: false });
       }
+
       megaClickedId = null;
       currentRegionName.set(selectedRegion['name']);
       currentRegion.set(selectedRegion['property_id']);
       clickedId = parseInt(selectedRegion['id']);
       map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-      const search_info = get_zoom_query(selectedRegion);
-      const query = search_info[0];
-      const zoom_level = search_info[1];
-      const long_offset = search_info[2];
-      const lat_offset = search_info[3];
-      geocode(query).then(d => {
-        var coords = projectionMercartor.invert(projection(d.features[0].center));
-        if (selectedRegion['property_id'] === 'PR' || selectedRegion['id'].substring(0, 2) === '72' /* Puerto Rico */) {
-          coords[0] += long_offset;
-          coords[1] += lat_offset;
+
+      // Get zoom and center of selected location
+      var centers_data = $geojsons.get(center($currentLevel))['features'];
+      let center_location;
+      for (var i = 0; i < centers_data.length; i++) {
+        var info = centers_data[i];
+        if (info['properties']['id'] == selectedRegion['property_id']) {
+          center_location = info['geometry']['coordinates'];
+          break;
         }
-        map.flyTo({ center: coords, zoom: zoom_level, essential: true });
-      });
+      }
+
+      let zoom_level;
+      if (selectedRegion['level'] === 'county') {
+        zoom_level = 6.5;
+      } else if (selectedRegion['level'] === 'msa') {
+        zoom_level = 6;
+      } else {
+        zoom_level = 5;
+      }
+
+      map.flyTo({ center: center_location, zoom: zoom_level, essential: true });
     }
   }
 </script>
