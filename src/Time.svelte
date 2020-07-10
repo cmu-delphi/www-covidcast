@@ -525,7 +525,7 @@
     </svg>
   </button>
 
-  {#if $currentDataReadyOnMap === false}
+  {#if !$currentDataReadyOnMap}
     <div class="loader-container">
       <div class="loader" />
     </div>

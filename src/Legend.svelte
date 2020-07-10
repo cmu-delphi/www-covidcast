@@ -387,8 +387,10 @@
           aria-pressed={$signalType === 'value' ? 'true' : 'false'}
           class="button {$signalType === 'value' ? 'selected' : ''}"
           on:click={() => {
-            currentDataReadyOnMap.set(false);
-            signalType.set('value');
+            if ($signalType !== 'value') {
+              currentDataReadyOnMap.set(false);
+              signalType.set('value');
+            }
           }}>
           {$currentSensor.match(/num/) ? 'Count' : 'Intensity'}
         </button>
@@ -396,8 +398,10 @@
           aria-pressed={$signalType === 'direction' ? 'true' : 'false'}
           class="button {$signalType === 'direction' ? 'selected' : ''}"
           on:click={() => {
-            currentDataReadyOnMap.set(false);
-            signalType.set('direction');
+            if ($signalType !== 'direction') {
+              currentDataReadyOnMap.set(false);
+              signalType.set('direction');
+            }
           }}
           disabled={$sensorMap.get($currentSensor).official ? true : false}>
           7-day Trend
