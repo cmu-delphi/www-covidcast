@@ -51,7 +51,7 @@
     .geoMercator()
     .translate([0, 0])
     .scale(R);
-  const city_points = [
+  const cityPoints = [
     'city-point-unclustered-pit',
     'city-point-unclustered',
     'city-point-unclustered-2',
@@ -71,9 +71,9 @@
   let megaClickedId;
   let selectedRegion;
 
-  $: region_lst = [];
+  $: regionList = [];
   $: loaded = false;
-  $: invalid_search = false;
+  $: invalidSearch = false;
   $: currentSensorTooltip = $sensorMap.get($currentSensor).mapTitleText;
 
   // given the level (state/msa/county), returns the name of its "centered" source/layer
@@ -81,7 +81,7 @@
     return `${level}-centers`;
   }
 
-  var dict = {
+  let dict = {
     '10': 'DE',
     '11': 'DC',
     '12': 'FL',
@@ -149,7 +149,7 @@
       ZOOM = Math.min(4.3, containerWidth / 350);
     }
     Promise.all([d3.json('./maps/name_id_info.json')]).then(([a]) => {
-      region_lst = a['all'];
+      regionList = a['all'];
       loaded = true;
     });
   });
@@ -175,27 +175,27 @@
     map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
 
-    var fillColor;
+    let fillColor;
     if (level === 'mega-county') {
       if (hoveredId === null) {
         megaHoveredId = e.features[0].id;
         map.setFeatureState({ source: level, id: megaHoveredId }, { hover: true });
         // get hover color for mega county
-        var color_stops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
-        var value_range = [];
-        var color_range = [];
-        for (var i = 0; i < color_stops.length; i++) {
-          value_range.push(color_stops[i][0]);
-          color_range.push(color_stops[i][1].match(/\d+(\.\d{1,2})?/g));
+        let colorStops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
+        let valueDomain = [];
+        let colorRange = [];
+        for (let i = 0; i < colorStops.length; i++) {
+          valueDomain.push(colorStops[i][0]);
+          colorRange.push(colorStops[i][1].match(/\d+(\.\d{1,2})?/g));
         }
-        var ramp = d3
+        let ramp = d3
           .scaleLinear()
-          .domain(value_range)
-          .range(color_range);
+          .domain(valueDomain)
+          .range(colorRange);
         ramp.clamp(true);
 
         const value = e.features[0].properties.value;
-        var arr = ramp(value);
+        let arr = ramp(value);
         fillColor = 'rgba(' + arr.join(', ') + ')';
       } else {
         megaHoveredId = null;
@@ -205,41 +205,41 @@
       map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
 
       //get hover color for regular county
-      let color_stops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
-      if ($encoding == 'bubble') {
+      let colorStops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
+      if ($encoding === 'bubble') {
         fillColor = 'white';
       } else if ($currentSensor.match(/num/)) {
-        var value_range = [];
-        var color_range = [];
-        for (var i = 0; i < color_stops.length; i++) {
-          value_range.push(color_stops[i][0]);
-          color_range.push(color_stops[i][1].match(/\d+/g));
+        let valueDomain = [];
+        let colorRange = [];
+        for (let i = 0; i < colorStops.length; i++) {
+          valueDomain.push(colorStops[i][0]);
+          colorRange.push(colorStops[i][1].match(/\d+/g));
         }
-        var ramp = d3
+        let ramp = d3
           .scaleLinear()
-          .domain(value_range)
-          .range(color_range);
+          .domain(valueDomain)
+          .range(colorRange);
         ramp.clamp(true);
 
         const value = e.features[0].properties.value;
-        var arr = ramp(value);
+        let arr = ramp(value);
         fillColor = 'rgb(' + arr.join(', ') + ')';
       } else {
-        var value_range = [];
-        var color_range = [];
-        for (var i = 0; i < color_stops.length; i++) {
-          value_range.push(color_stops[i][0]);
-          color_range.push(color_stops[i][1].match(/\d+/g));
+        let valueDomain = [];
+        let colorRange = [];
+        for (let i = 0; i < colorStops.length; i++) {
+          valueDomain.push(colorStops[i][0]);
+          colorRange.push(colorStops[i][1].match(/\d+/g));
         }
 
-        var ramp = d3
+        let ramp = d3
           .scaleLinear()
-          .domain(value_range)
-          .range(color_range);
+          .domain(valueDomain)
+          .range(colorRange);
         ramp.clamp(true);
 
         const value = e.features[0].properties.value;
-        var arr = ramp(value);
+        let arr = ramp(value);
         fillColor = 'rgb(' + arr.join(', ') + ')';
       }
     }
@@ -250,7 +250,7 @@
 
     const date = formatTimeWithoutYear(parseTime($currentDate));
     const sens = $sensorMap.get($currentSensor);
-    const population_commas = parseInt(Population).toLocaleString();
+    const popCommas = parseInt(Population).toLocaleString();
     let title =
       (level === 'mega-county' ? 'Rest of ' : '') +
       NAME +
@@ -265,7 +265,7 @@
         const count = e.features[0].properties.value1;
         body = `
           <div class="map-popup-region-value-container">
-            Population: ${population_commas} <br>
+            Population: ${popCommas} <br>
             <u>${sens.yAxis}</u>: <br>
             &emsp; ${date}: ${count} <br>
             &emsp; 7-day avg:
@@ -282,7 +282,7 @@
         const count = e.features[0].properties.value1;
         body = `
           <div class="map-popup-region-value-container">
-            Population: ${population_commas} <br>
+            Population: ${popCommas} <br>
             <u>${sens.yAxis}</u>: <br>
             &emsp; ${date}: ${count.toFixed(2)} <br>
             &emsp; 7-day avg:
@@ -457,7 +457,7 @@
         const megaKey = key.slice(0, 2) + '';
 
         if (d.value !== null) {
-          var info;
+          let info;
           if ($currentSensor.match(/confirmed/) || $currentSensor.match(/deaths/)) {
             info = [d.avg, d.count];
           } else {
@@ -534,14 +534,14 @@
     if ($signalType === 'value') {
       valueMinMax[0] = Math.max(0, valueMinMax[0]);
       let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
-      let first_half_center = valueMinMax[0] + (center - valueMinMax[0]) / 2;
-      let second_half_center = center + (valueMinMax[1] - center) / 2;
+      let firstHalfCenter = valueMinMax[0] + (center - valueMinMax[0]) / 2;
+      let secondHalfCenter = center + (valueMinMax[1] - center) / 2;
 
       let colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
       const c1 = d3.rgb(colorScaleLinear(valueMinMax[0]));
-      const c2 = d3.rgb(colorScaleLinear(first_half_center));
+      const c2 = d3.rgb(colorScaleLinear(firstHalfCenter));
       const c3 = d3.rgb(colorScaleLinear(center));
-      const c4 = d3.rgb(colorScaleLinear(second_half_center));
+      const c4 = d3.rgb(colorScaleLinear(secondHalfCenter));
       const c5 = d3.rgb(colorScaleLinear(valueMinMax[1]));
       c1.opacity = 0.5;
       c2.opacity = 0.5;
@@ -550,65 +550,58 @@
       c5.opacity = 0.5;
 
       if ($currentSensor.match(/num/)) {
-        var min = Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10);
-        var max = Math.log(valueMinMax[1]) / Math.log(10);
-        var arr = logspace(min, max, 7);
+        let min = Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10);
+        let max = Math.log(valueMinMax[1]) / Math.log(10);
+        let arr = logspace(min, max, 7);
         const colorScaleLog = d3
           .scaleSequentialLog(d3.interpolateYlOrRd)
           .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]]);
 
-        var tmp_stops = [[0, DIRECTION_THEME.countMin]];
-        for (var i = 0; i < arr.length; i++) {
-          tmp_stops.push([arr[i], colorScaleLog(arr[i])]);
+        let tempStops = [[0, DIRECTION_THEME.countMin]];
+        for (let i = 0; i < arr.length; i++) {
+          tempStops.push([arr[i], colorScaleLog(arr[i])]);
         }
-        stops = tmp_stops;
+        stops = tempStops;
         stopsMega = [
           [0, DIRECTION_THEME.countMin],
           [valueMinMax[0], c1.toString()],
-          [first_half_center, c2.toString()],
+          [firstHalfCenter, c2.toString()],
           [center, c3.toString()],
-          [second_half_center, c4.toString()],
+          [secondHalfCenter, c4.toString()],
           [valueMinMax[1], c5.toString()],
         ];
       } else if ($currentSensor.match(/prop/)) {
         stops = [
           [0, DIRECTION_THEME.countMin],
           [valueMinMax[0], colorScaleLinear(valueMinMax[0])],
-          [first_half_center, colorScaleLinear(first_half_center)],
+          [firstHalfCenter, colorScaleLinear(firstHalfCenter)],
           [center, colorScaleLinear(center)],
-          [second_half_center, colorScaleLinear(second_half_center)],
+          [secondHalfCenter, colorScaleLinear(secondHalfCenter)],
           [valueMinMax[1], colorScaleLinear(valueMinMax[1])],
         ];
         stopsMega = [
           [0, DIRECTION_THEME.countMin],
           [valueMinMax[0], c1.toString()],
-          [first_half_center, c2.toString()],
+          [firstHalfCenter, c2.toString()],
           [center, c3.toString()],
-          [second_half_center, c4.toString()],
+          [secondHalfCenter, c4.toString()],
           [valueMinMax[1], c5.toString()],
         ];
       } else {
         stops = [
           [valueMinMax[0], colorScaleLinear(valueMinMax[0])],
-          [first_half_center, colorScaleLinear(first_half_center)],
+          [firstHalfCenter, colorScaleLinear(firstHalfCenter)],
           [center, colorScaleLinear(center)],
-          [second_half_center, colorScaleLinear(second_half_center)],
+          [secondHalfCenter, colorScaleLinear(secondHalfCenter)],
           [valueMinMax[1], colorScaleLinear(valueMinMax[1])],
         ];
         stopsMega = [
           [valueMinMax[0], c1.toString()],
-          [first_half_center, c2.toString()],
+          [firstHalfCenter, c2.toString()],
           [center, c3.toString()],
-          [second_half_center, c4.toString()],
+          [secondHalfCenter, c4.toString()],
           [valueMinMax[1], c5.toString()],
         ];
-        /*
-        stopsMega = [
-          [valueMinMax[0], DIRECTION_THEME.gradientMinMega],
-          [center, DIRECTION_THEME.gradientMiddleMega],
-          [valueMinMax[1], DIRECTION_THEME.gradientMaxMega],
-        ];
-        */
       }
 
       // radius = ceof * log_{base} (value + 0.001)
@@ -1016,12 +1009,12 @@
   function updateLabels(s) {
     if (map) {
       if (s !== 'state') {
-        city_points.forEach(name => {
+        cityPoints.forEach(name => {
           map.setLayoutProperty(name, 'visibility', 'visible');
         });
         map.setLayoutProperty('state-names', 'visibility', 'none');
       } else {
-        city_points.forEach(name => {
+        cityPoints.forEach(name => {
           map.setLayoutProperty(name, 'visibility', 'none');
         });
         map.setLayoutProperty('state-names', 'visibility', 'visible');
@@ -1029,17 +1022,17 @@
     }
   }
 
-  function search_element(selectedRegion) {
-    let has_value_flag = false;
-    const levels_avail = $sensorMap.get($currentSensor).levels;
-    for (var i = 0; i < levels_avail.length; i++) {
-      if (selectedRegion['level'] === levels_avail[i]) {
-        has_value_flag = true;
+  function searchElement(selectedRegion) {
+    let hasValueFlag = false;
+    const availLevels = $sensorMap.get($currentSensor).levels;
+    for (let i = 0; i < availLevels.length; i++) {
+      if (selectedRegion['level'] === availLevels[i]) {
+        hasValueFlag = true;
         break;
       }
     }
-    if (!has_value_flag) {
-      invalid_search = true;
+    if (!hasValueFlag) {
+      invalidSearch = true;
       searchErrorComponent.count();
     } else {
       if (selectedRegion['level'] !== $currentLevel) {
@@ -1060,26 +1053,26 @@
       map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
 
       // Get zoom and center of selected location
-      var centers_data = $geojsons.get(center($currentLevel))['features'];
+      let centersData = $geojsons.get(center($currentLevel))['features'];
       let center_location;
-      for (var i = 0; i < centers_data.length; i++) {
-        var info = centers_data[i];
+      for (let i = 0; i < centersData.length; i++) {
+        let info = centersData[i];
         if (info['properties']['id'] == selectedRegion['property_id']) {
           center_location = info['geometry']['coordinates'];
           break;
         }
       }
 
-      let zoom_level;
+      let zoomLevel;
       if (selectedRegion['level'] === 'county') {
-        zoom_level = 6.5;
+        zoomLevel = 6.5;
       } else if (selectedRegion['level'] === 'msa') {
-        zoom_level = 6;
+        zoomLevel = 6;
       } else {
-        zoom_level = 5;
+        zoomLevel = 5;
       }
 
-      map.flyTo({ center: center_location, zoom: zoom_level, essential: true });
+      map.flyTo({ center: center_location, zoom: zoomLevel, essential: true });
     }
   }
 </script>
@@ -1235,17 +1228,17 @@
     <Options {isIE} />
   </div>
 
-  {#if loaded && region_lst.length != 0}
+  {#if loaded && regionList.length != 0}
     <div class="search">
       <AutoComplete
         placeholder="Search for a location..."
-        items={region_lst}
+        items={regionList}
         bind:selectedItem={selectedRegion}
         labelFieldName="display_name"
         maxItemsToShowInList="5"
         onChange={_ => {
           if (typeof selectedRegion !== 'undefined') {
-            search_element(selectedRegion);
+            searchElement(selectedRegion);
           }
         }} />
     </div>
