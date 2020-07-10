@@ -404,7 +404,6 @@
   // Update the map when sensor or level changes.
   currentData.subscribe(_ => updateMap('data'));
   currentLevel.subscribe(s => {
-    updateLabels(s);
     updateMap('data');
   });
   signalType.subscribe(_ => updateMap('signal'));
@@ -862,68 +861,75 @@
         type: 'symbol',
         maxzoom: 8,
         layout: {
-          'text-field': ['get', 'NAME'],
-          'text-font': ['Open Sans Regular'],
-          'text-size': 12,
+          'text-field': ['upcase', ['get', 'NAME']],
+          'text-font': ['Open Sans Bold'],
+          'text-size': 11,
         },
         paint: {
+          'text-opacity': 0.5,
           'text-halo-color': '#fff',
-          'text-halo-width': 2,
+          'text-halo-width': 1,
         },
       });
 
-      map.addLayer({
-        id: 'city-point-unclustered-pit',
-        source: 'city-point',
-        type: 'symbol',
-        filter: ['==', 'city', 'Pittsburgh'],
-        maxzoom: 8,
-        layout: {
-          'text-field': ['get', 'city'],
-          'text-font': ['Open Sans Regular'],
-          'text-size': 12,
-          visibility: 'none',
+      map.addLayer(
+        {
+          id: 'city-point-unclustered-pit',
+          source: 'city-point',
+          type: 'symbol',
+          filter: ['==', 'city', 'Pittsburgh'],
+          maxzoom: 8,
+          layout: {
+            'text-field': ['get', 'city'],
+            'text-font': ['Open Sans Regular'],
+            'text-size': 12,
+          },
+          paint: {
+            'text-halo-color': '#fff',
+            'text-halo-width': 1.5,
+          },
         },
-        paint: {
-          'text-halo-color': '#fff',
-          'text-halo-width': 2,
+        'state-names',
+      );
+      map.addLayer(
+        {
+          id: 'city-point-unclustered',
+          source: 'city-point',
+          type: 'symbol',
+          filter: ['>', 'population', 900000],
+          maxzoom: 4,
+          layout: {
+            'text-field': ['get', 'city'],
+            'text-font': ['Open Sans Regular'],
+            'text-size': 12,
+          },
+          paint: {
+            'text-halo-color': '#fff',
+            'text-halo-width': 1.5,
+          },
         },
-      });
-      map.addLayer({
-        id: 'city-point-unclustered',
-        source: 'city-point',
-        type: 'symbol',
-        filter: ['>', 'population', 900000],
-        maxzoom: 4,
-        layout: {
-          'text-field': ['get', 'city'],
-          'text-font': ['Open Sans Regular'],
-          'text-size': 12,
-          visibility: 'none',
+        'state-names',
+      );
+      map.addLayer(
+        {
+          id: 'city-point-unclustered-2',
+          source: 'city-point',
+          type: 'symbol',
+          filter: ['>', 'population', 500000],
+          maxzoom: 6,
+          minzoom: 4,
+          layout: {
+            'text-field': ['get', 'city'],
+            'text-font': ['Open Sans Regular'],
+            'text-size': 12,
+          },
+          paint: {
+            'text-halo-color': '#fff',
+            'text-halo-width': 1.5,
+          },
         },
-        paint: {
-          'text-halo-color': '#fff',
-          'text-halo-width': 2,
-        },
-      });
-      map.addLayer({
-        id: 'city-point-unclustered-2',
-        source: 'city-point',
-        type: 'symbol',
-        filter: ['>', 'population', 500000],
-        maxzoom: 6,
-        minzoom: 4,
-        layout: {
-          'text-field': ['get', 'city'],
-          'text-font': ['Open Sans Regular'],
-          'text-size': 12,
-          visibility: 'none',
-        },
-        paint: {
-          'text-halo-color': '#fff',
-          'text-halo-width': 2,
-        },
-      });
+        'state-names',
+      );
       map.addLayer({
         id: 'city-point-unclustered-3',
         source: 'city-point',
@@ -935,31 +941,30 @@
           'text-field': ['get', 'city'],
           'text-font': ['Open Sans Regular'],
           'text-size': 12,
-          visibility: 'none',
         },
         paint: {
           'text-halo-color': '#fff',
-          'text-halo-width': 2,
+          'text-halo-width': 1.5,
         },
       });
-      map.addLayer({
-        id: 'city-point-unclustered-4',
-        source: 'city-point',
-        type: 'symbol',
-        minzoom: 8,
-        layout: {
-          'text-field': ['get', 'city'],
-          'text-font': ['Open Sans Regular'],
-          'text-size': 12,
-          visibility: 'none',
+      map.addLayer(
+        {
+          id: 'city-point-unclustered-4',
+          source: 'city-point',
+          type: 'symbol',
+          minzoom: 8,
+          layout: {
+            'text-field': ['get', 'city'],
+            'text-font': ['Open Sans Regular'],
+            'text-size': 12,
+          },
+          paint: {
+            'text-halo-color': '#fff',
+            'text-halo-width': 1.5,
+          },
         },
-        paint: {
-          'text-halo-color': '#fff',
-          'text-halo-width': 2,
-        },
-      });
-
-      updateLabels($currentLevel);
+        'state-names',
+      );
 
       map.addLayer(
         {
@@ -1017,22 +1022,6 @@
       mapMounted = true;
       updateMap('init');
     });
-  }
-
-  function updateLabels(s) {
-    if (map) {
-      if (s !== 'state') {
-        cityPoints.forEach(name => {
-          map.setLayoutProperty(name, 'visibility', 'visible');
-        });
-        map.setLayoutProperty('state-names', 'visibility', 'none');
-      } else {
-        cityPoints.forEach(name => {
-          map.setLayoutProperty(name, 'visibility', 'none');
-        });
-        map.setLayoutProperty('state-names', 'visibility', 'visible');
-      }
-    }
   }
 
   function searchElement(selectedRegion) {
