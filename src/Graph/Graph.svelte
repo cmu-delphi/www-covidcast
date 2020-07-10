@@ -30,7 +30,7 @@
   let w;
   let t;
 
-  var dict = {
+  let dict = {
     '10': 'DE',
     '11': 'DC',
     '12': 'FL',
@@ -104,7 +104,7 @@
 
     // attach graphic
 
-    var svg = d3
+    let svg = d3
       .select(el)
       .append('svg')
       .attr('width', width + margin.left + margin.right)
@@ -137,7 +137,7 @@
       width = w - margin.left - margin.right,
       height = 0.85 * w - margin.top - margin.bottom;
 
-    var svg = d3
+    let svg = d3
       .select(el)
       .append('svg')
       .attr('width', width + margin.left + margin.right)
@@ -146,8 +146,8 @@
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
     // set date range
-    var minDate = parseTime(range.min);
-    var maxDate = parseTime(range.max);
+    let minDate = parseTime(range.min);
+    let maxDate = parseTime(range.max);
 
     data = data.filter(it => {
       let t = parseTime(it['time_value']);
@@ -163,7 +163,7 @@
 
     let latest_direction = -100;
     let hit_latest_node = false;
-    for (var i = data.length - 1; i >= 0; i--) {
+    for (let i = data.length - 1; i >= 0; i--) {
       let directionDate = parseTime(data[i].time_value);
       if (directionDate >= currDateSeven && directionDate <= currDate) {
         data[i].inDirection = true;
@@ -190,11 +190,11 @@
       chartMax = 100;
     }
     // scale x and y axes
-    var x = d3
+    let x = d3
       .scaleTime()
       .domain([d3.extent(data, d => parseTime(d.time_value))[0], parseTime(yesterday)])
       .range([0, width]);
-    var y = d3
+    let y = d3
       .scaleLinear()
       .domain([minMax[0], chartMax])
       .range([height, 0]);
@@ -213,7 +213,7 @@
       }
       //formatYTicks = y.domain[1] - y.domain[0] > 10 ? d3.format('.0f') : d3.format('.1f');
     }
-    var formatXTicks = data.length < 6 ? d3.timeDay.every(1) : d3.timeDay.every(4);
+    let formatXTicks = data.length < 6 ? d3.timeDay.every(1) : d3.timeDay.every(4);
 
     // append the axes
     svg
@@ -347,7 +347,7 @@
     } else {
       sts = $stats.get(sensor);
     }
-    var minMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
+    let minMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
     if (minMax[0] < 0) {
       minMax[0] = 0;
     }

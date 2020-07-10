@@ -43,7 +43,7 @@
 
   let prettyDate = '';
   $: prettyDate = formatTime(new Date(rectifiedVal));
-  var weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  let weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   onMount(() => {
     currentDate.subscribe(d => {
