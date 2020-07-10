@@ -70,17 +70,17 @@
       sts = stats.get(sens + '_' + level);
       valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
 
-      high = sig_figs(valueMinMax[1].toFixed(2), 3);
-      low = sig_figs(Math.max(0, valueMinMax[0]).toFixed(2), 3);
+      high = getSigfigs(valueMinMax[1].toFixed(2), 3);
+      low = getSigfigs(Math.max(0, valueMinMax[0]).toFixed(2), 3);
 
       logColorArr = [{ label: '0', from_color: DIRECTION_THEME.countMin, to_color: DIRECTION_THEME.countMin }];
-      var max = Math.log(valueMinMax[1]) / Math.log(10);
-      var min = Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10);
-      var arr = logspace(min, max, 7);
+      let max = Math.log(valueMinMax[1]) / Math.log(10);
+      let min = Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10);
+      let arr = logspace(min, max, 7);
       const colorScaleLog = d3
         .scaleSequentialLog(d3.interpolateYlOrRd)
         .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]]);
-      for (var i = 0; i < arr.length - 1; i++) {
+      for (let i = 0; i < arr.length - 1; i++) {
         arr[i] = parseFloat(arr[i]).toFixed(2);
         logColorArr.push({
           label: arr[i],
@@ -92,19 +92,19 @@
       sts = stats.get(sens);
       valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
       if ($sensorMap.get($currentSensor).format === 'raw') {
-        high = sig_figs(valueMinMax[1].toFixed(2), 3);
-        low = sig_figs(Math.max(0, valueMinMax[0]).toFixed(2), 3);
+        high = getSigfigs(valueMinMax[1].toFixed(2), 3);
+        low = getSigfigs(Math.max(0, valueMinMax[0]).toFixed(2), 3);
         valueMinMax[0] = Math.max(0, valueMinMax[0]);
       } else {
-        high = sig_figs(Math.min(100, valueMinMax[1]).toFixed(2), 3) + '%';
-        low = sig_figs(Math.max(0, valueMinMax[0]).toFixed(2), 3) + '%';
+        high = getSigfigs(Math.min(100, valueMinMax[1]).toFixed(2), 3) + '%';
+        low = getSigfigs(Math.max(0, valueMinMax[0]).toFixed(2), 3) + '%';
         valueMinMax[0] = Math.max(0, valueMinMax[0]);
         valueMinMax[1] = Math.min(100, valueMinMax[1]);
       }
       const colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
-      var arr = split_domain(valueMinMax[0], valueMinMax[1], 7);
+      let arr = splitDomain(valueMinMax[0], valueMinMax[1], 7);
       linColorArr = [];
-      for (var i = 0; i < arr.length - 1; i++) {
+      for (let i = 0; i < arr.length - 1; i++) {
         arr[i] = parseFloat(arr[i]).toFixed(2);
         linColorArr.push({
           label: arr[i],
@@ -115,18 +115,18 @@
     }
   }
 
-  function sig_figs(value, sigFigs) {
+  function getSigfigs(value, sigFigs) {
     return parseFloat(parseFloat(value).toPrecision(sigFigs));
   }
 
-  function split_domain(min, max, parts) {
-    let split_arr = [min];
+  function splitDomain(min, max, parts) {
+    let splits = [min];
     const increment = (max - min) / parts;
-    for (var i = 1; i < parts; i++) {
-      split_arr.push(split_arr[i - 1] + increment);
+    for (let i = 1; i < parts; i++) {
+      splits.push(splits[i - 1] + increment);
     }
-    split_arr.push(max);
-    return split_arr;
+    splits.push(max);
+    return splits;
   }
 </script>
 
@@ -462,7 +462,7 @@
           {#each logColorArr as { label, from_color, to_color }, j}
             <li class="colored">
               <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
-              {sig_figs(label, 3)}
+              {getSigfigs(label, 3)}
             </li>
           {/each}
           <li class="ends">
@@ -478,7 +478,7 @@
           {#each linColorArr as { label, from_color, to_color }, j}
             <li class="colored">
               <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
-              {sig_figs(label, 3)}
+              {getSigfigs(label, 3)}
             </li>
           {/each}
           <li class="ends">
