@@ -672,11 +672,22 @@
         name => map.getLayer(center(name)) && map.setLayoutProperty(center(name), 'visibility', 'none'),
       );
       if (map.getLayer(center($currentLevel))) {
+        let flatStops = stops.reduce((acc, val) => acc.concat(val), []);
+        flatStops.shift(); // remove the first element which has a value of 0 since the "step" expression of mapbox does not require it.
+
+        flatStops[0] = 'transparent';
         map.setPaintProperty(center($currentLevel), 'circle-radius', [
           '*',
           ['/', ['ln', ['+', ['get', 'value'], 0.001]], ['ln', base]],
           coef,
         ]);
+        map.setPaintProperty(
+          center($currentLevel),
+          'circle-stroke-color',
+          ['step', ['get', 'value']].concat(flatStops),
+        );
+        map.setPaintProperty(center($currentLevel), 'circle-color', ['step', ['get', 'value']].concat(flatStops));
+
         map.setLayoutProperty(center($currentLevel), 'visibility', 'visible');
       }
 
@@ -995,6 +1006,8 @@
               'circle-color': ENCODING_BUBBLE_THEME.color,
               'circle-stroke-color': ENCODING_BUBBLE_THEME.strokeColor,
               'circle-stroke-width': ENCODING_BUBBLE_THEME.strokeWidth,
+              'circle-opacity': ENCODING_BUBBLE_THEME.opacity,
+              'circle-stroke-opacity': ENCODING_BUBBLE_THEME.strokeOpacity,
             },
           },
           `${level}-hover`,

@@ -36,10 +36,12 @@ export const ENCODING_BUBBLE_THEME = {
   color: 'transparent',
   strokeColor: '#666',
   strokeWidth: 1,
+  opacity: 0.5,
+  strokeOpacity: 1,
   maxRadius: {
-    county: 20,
-    msa: 20,
-    state: 20,
+    county: 10,
+    msa: 15,
+    state: 30,
   },
   base: 3,
 };
