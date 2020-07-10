@@ -404,6 +404,7 @@
   // Update the map when sensor or level changes.
   currentData.subscribe(_ => updateMap('data'));
   currentLevel.subscribe(s => {
+    label_states();
     updateMap('data');
   });
   signalType.subscribe(_ => updateMap('signal'));
@@ -742,6 +743,16 @@
     }
   }
 
+  function label_states() {
+    if (map !== undefined) {
+      if ($currentLevel == 'state') {
+        map.setLayoutProperty('state-names', 'visibility', 'visible');
+      } else {
+        map.setLayoutProperty('state-names', 'visibility', 'none');
+      }
+    }
+  }
+
   function initializeMap() {
     map = new mapboxgl.Map({
       attributionControl: false,
@@ -965,6 +976,8 @@
         },
         'state-names',
       );
+
+      label_states();
 
       map.addLayer(
         {
