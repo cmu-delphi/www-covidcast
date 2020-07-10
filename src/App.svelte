@@ -34,7 +34,7 @@
   let changingSensor = false;
   let levelChangedWhenSensorChanged = false;
   let dateChangedWhenSensorChanged = false;
-  let first_loaded = true;
+  let firstLoaded = true;
 
   function callAPI(id, signal, level, date, region) {
     return fetch(
@@ -55,25 +55,25 @@
   // combining json with same geolocations but different value properties
   // json1 value is 7 day average, json2 value is single count
   function extend(json1, json2) {
-    var new_epidata = [];
-    var data1 = json1.epidata;
-    var data2 = json2.epidata;
-    for (var i = 0; i < data1.length; i++) {
-      var avg = Math.max(0, data1[i].value);
-      var count = Math.max(0, data2[i].value);
+    let newEpiData = [];
+    let data1 = json1.epidata;
+    let data2 = json2.epidata;
+    for (let i = 0; i < data1.length; i++) {
+      let avg = Math.max(0, data1[i].value);
+      let count = Math.max(0, data2[i].value);
       data1[i].avg = avg;
       delete data1[i].value;
       data1[i].count = count;
-      new_epidata.push(data1[i]);
+      newEpiData.push(data1[i]);
     }
-    return new_epidata;
+    return newEpiData;
   }
 
-  function check_wip(signal_name, other_signal) {
-    if (signal_name.match(/wip/)) {
-      return 'wip_' + other_signal.replace('incidence', 'incid');
+  function check_wip(signalName, otherSignal) {
+    if (signalName.match(/wip/)) {
+      return 'wip_' + otherSignal.replace('incidence', 'incid');
     }
-    return other_signal;
+    return otherSignal;
   }
   // We cache API calls for all regions at a given time and update currentData.
   function updateRegionSliceCache(sensor, level, date, reason = 'unspecified') {
@@ -87,37 +87,37 @@
           currentData.set([]);
           regionSliceCache.update(m => m.set(sensor + level + date, []));
         } else {
-          const death_regex = /deaths_/;
-          const cases_regex = /confirmed_/;
+          const deathsRegex = /deaths_/;
+          const casesRegex = /confirmed_/;
           // deaths needs both count and ratio
-          if (sEntry.signal.match(death_regex)) {
+          if (sEntry.signal.match(deathsRegex)) {
             // deaths_incidence_prop
             if (sEntry.signal === 'deaths_7dav_incidence_prop') {
               callAPI(sEntry.id, check_wip(sEntry.signal, 'deaths_incidence_prop'), level, date, '*').then(d1 => {
-                var extended = extend(d, d1);
+                let extended = extend(d, d1);
                 currentData.set(extended);
                 regionSliceCache.update(m => m.set(sensor + level + date, extended));
               });
             } else {
               callAPI(sEntry.id, check_wip(sEntry.signal, 'deaths_incidence_num'), level, date, '*').then(d1 => {
-                var extended = extend(d, d1);
+                let extended = extend(d, d1);
                 currentData.set(extended);
                 regionSliceCache.update(m => m.set(sensor + level + date, extended));
               });
             }
           }
           // cases needs both count and ratio
-          else if (sEntry.signal.match(cases_regex)) {
+          else if (sEntry.signal.match(casesRegex)) {
             // confirmed_incidence_prop
             if (sEntry.signal === 'confirmed_7dav_incidence_prop') {
               callAPI(sEntry.id, check_wip(sEntry.signal, 'confirmed_incidence_prop'), level, date, '*').then(d1 => {
-                var extended = extend(d, d1);
+                let extended = extend(d, d1);
                 currentData.set(extended);
                 regionSliceCache.update(m => m.set(sensor + level + date, extended));
               });
             } else {
               callAPI(sEntry.id, check_wip(sEntry.signal, 'confirmed_incidence_num'), level, date, '*').then(d1 => {
-                var extended = extend(d, d1);
+                let extended = extend(d, d1);
                 currentData.set(extended);
                 regionSliceCache.update(m => m.set(sensor + level + date, extended));
               });
@@ -231,9 +231,9 @@
 
   currentRegion.subscribe(r => {
     updateTimeSliceCache($currentSensor, $currentLevel, r);
-    if (first_loaded && r !== '') {
+    if (firstLoaded && r !== '') {
       toggleGraphShowStatus(null, false);
-      first_loaded = false;
+      firstLoaded = false;
     } else if (r) {
       toggleGraphShowStatus(null, true);
     } else {
