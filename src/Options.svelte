@@ -42,7 +42,7 @@
   .option .option-title {
     margin-left: 5px;
     margin-right: 5px;
-    color: #111;
+    color: #444;
     margin-bottom: 0px !important;
     padding-bottom: 0px !important;
   }
@@ -57,7 +57,7 @@
     border: none;
     color: #111;
     line-height: 1.3;
-    padding: 0.6em 1.4em 0.5em 0.8em;
+    padding: 0.4em 1.4em 0.4em 0.8em;
 
     -moz-appearance: none;
     -webkit-appearance: none;
@@ -65,7 +65,7 @@
 
     background-image: linear-gradient(45deg, transparent 50%, gray 50%),
       linear-gradient(135deg, gray 50%, transparent 50%);
-    background-position: calc(100% - 15px) calc(1em + 0px), calc(100% - 10px) calc(1em + 0px);
+    background-position: calc(100% - 15px) calc(0.85em + 0px), calc(100% - 10px) calc(0.85em + 0px);
     background-size: 5px 5px, 5px 5px;
     background-repeat: no-repeat;
 

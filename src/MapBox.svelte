@@ -5,6 +5,7 @@
   import { defaultRegionOnStartup, getTextColorBasedOnBackground, getNiceNumber } from './util.js';
   import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME } from './theme.js';
   import AutoComplete from 'simple-svelte-autocomplete';
+  import IoIosSearch from 'svelte-icons/io/IoIosSearch.svelte';
   import Options from './Options.svelte';
   import Legend from './Legend.svelte';
   import Banner from './Banner.svelte';
@@ -1169,7 +1170,7 @@
     left: 10px;
     max-width: 500px;
     z-index: 1001;
-    padding: 10px 10px;
+    padding: 8px 8px;
     box-sizing: border-box;
     transition: all 0.1s ease-in;
 
@@ -1177,14 +1178,42 @@
     border-radius: 7px;
     background-color: rgba(255, 255, 255, 0.9);
     box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
+
+    font-family: 'Open Sans', Helvetica, sans-serif !important;
   }
 
-  .search {
+  .search-container {
     position: absolute;
     width: 450px;
     right: 75px;
     top: 12px;
     z-index: 1001;
+
+    background-color: #fff;
+    box-shadow: 0px 4px 30px rgba(151, 151, 151, 0.25);
+    border-radius: 7px;
+
+    display: flex;
+  }
+
+  .search-icon-container {
+    flex-shrink: 0;
+    width: 30px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .search-icon {
+    width: 20px;
+    height: 20px;
+    color: #9b9b9b;
+  }
+
+  .search {
+    flex-grow: 1;
+    font-size: 14px;
   }
 
   .legend-container {
@@ -1244,18 +1273,26 @@
   </div>
 
   {#if loaded && regionList.length != 0}
-    <div class="search">
-      <AutoComplete
-        placeholder="Search for a location..."
-        items={regionList}
-        bind:selectedItem={selectedRegion}
-        labelFieldName="display_name"
-        maxItemsToShowInList="5"
-        onChange={_ => {
-          if (typeof selectedRegion !== 'undefined') {
-            searchElement(selectedRegion);
-          }
-        }} />
+    <div class="search-container">
+      <div class="search-icon-container">
+        <div class="search-icon">
+          <IoIosSearch />
+        </div>
+      </div>
+      <div class="search">
+        <AutoComplete
+          className="search-bar"
+          placeholder="Search for a location..."
+          items={regionList}
+          bind:selectedItem={selectedRegion}
+          labelFieldName="display_name"
+          maxItemsToShowInList="5"
+          onChange={_ => {
+            if (typeof selectedRegion !== 'undefined') {
+              searchElement(selectedRegion);
+            }
+          }} />
+      </div>
     </div>
   {/if}
 
