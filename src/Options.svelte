@@ -40,12 +40,40 @@
   }
 
   .option .option-title {
+    margin-left: 5px;
+    margin-right: 5px;
+    color: #111;
     margin-bottom: 0px !important;
     padding-bottom: 0px !important;
   }
 
   label {
     display: inline-block;
+  }
+
+  select {
+    background-color: #ececec;
+    border-radius: 5px;
+    border: none;
+    color: #111;
+    line-height: 1.3;
+    padding: 0.6em 1.4em 0.5em 0.8em;
+
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+
+    background-image: linear-gradient(45deg, transparent 50%, gray 50%),
+      linear-gradient(135deg, gray 50%, transparent 50%);
+    background-position: calc(100% - 15px) calc(1em + 0px), calc(100% - 10px) calc(1em + 0px);
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+
+    transition: all 0.1s ease-in;
+  }
+
+  select:hover {
+    background-color: #dcdcdc;
   }
 
   select.indicators {
@@ -85,9 +113,7 @@
 <div class="options">
 
   <div class="option">
-    <label style="font-size: 15px;" class="option-title">
-      <strong>Displaying</strong>
-    </label>
+    <label style="font-size: 15px;" class="option-title">Displaying</label>
     <select
       aria-label="indicator options"
       class="indicators"
@@ -109,9 +135,7 @@
       </optgroup>
     </select>
 
-    <label style="font-size: 15px;" class="option-title">
-      <strong>&nbsp;for&nbsp;</strong>
-    </label>
+    <label style="font-size: 15px;" class="option-title">for</label>
 
     <select
       aria-label="geographic level"

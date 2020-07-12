@@ -178,6 +178,7 @@
   }
 
   .buttons-group-side button.button {
+    width: 110px;
     flex-grow: 1;
     margin: 0px;
     font-size: 1em;
@@ -186,7 +187,8 @@
     border-style: solid;
     border-color: #dbdbdb;
     border-width: 1px;
-    color: #666666;
+    border-radius: 4px;
+    color: #666;
     cursor: pointer;
     justify-content: center;
     padding-bottom: calc(0.5em - 1px);
@@ -196,13 +198,11 @@
     text-align: center;
 
     position: relative;
-
-    border-radius: 4px;
   }
 
   .buttons-group-side button.button:disabled {
     background-color: rgb(211, 211, 211);
-    color: #666666;
+    color: #666;
     cursor: not-allowed;
   }
 
@@ -246,16 +246,16 @@
   }
 
   .buttons-group-side .button.selected {
-    background-color: #767676;
-    color: #fff;
+    background-color: #ececec;
+    color: #111;
     font-weight: 600;
 
-    border: none;
+    border-color: transparent;
   }
 
   .buttons-group-side .button:hover {
-    background-color: #666666;
-    color: #fff;
+    background-color: #dcdcdc;
+    color: #111;
   }
 
   .buttons-group-side .button:focus,
