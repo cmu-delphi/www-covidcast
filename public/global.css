@@ -195,7 +195,7 @@ button.mapboxgl-popup-close-button {
 .search-bar .autocomplete-list {
   padding-top: 3px !important;
   padding-left: 3px !important;
-  border: transparent !important;
+  border-color: transparent !important;
   background-color: transparent !important;
   width: 96% !important;
 }

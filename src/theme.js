@@ -30,6 +30,7 @@ export const MAP_THEME = {
   countyFill: '#eeeeee', //'#e4dac4',
   countyOutline: '#ffffff', //'#e0e0e0',
   countyOutlineWhenFilled: '#ffffff', //'#616161',
+  zoneOutline: 'blue', //'#e0e0e0',
 };
 
 export const ENCODING_BUBBLE_THEME = {
