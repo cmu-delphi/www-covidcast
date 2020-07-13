@@ -82,6 +82,10 @@
     return `${level}-centers`;
   }
 
+  function centerHighlight(level) {
+    return `${level}-centers-highlight`;
+  }
+
   let dict = {
     '10': 'DE',
     '11': 'DC',
@@ -686,9 +690,10 @@
       }
 
       // hide all bubble layer except for the one for the current level
-      Object.keys($levels).forEach(
-        name => map.getLayer(center(name)) && map.setLayoutProperty(center(name), 'visibility', 'none'),
-      );
+      Object.keys($levels).forEach(name => {
+        map.setLayoutProperty(center(name), 'visibility', 'none');
+        map.setLayoutProperty(centerHighlight(name), 'visibility', 'none');
+      });
       if (map.getLayer(center($currentLevel))) {
         const flatten = arr => arr.reduce((acc, val) => acc.concat(val), []);
 
@@ -698,22 +703,21 @@
         flatStops.shift(); // remove the first element which has a value of 0 since the "step" expression of mapbox does not require it.
 
         flatStops[0] = 'transparent';
-        map.setPaintProperty(
-          center($currentLevel),
-          'circle-stroke-color',
-          ['step', ['get', 'value']].concat(flatStops),
-        );
+        let colorExpression = ['step', ['get', 'value']].concat(flatStops);
 
-        map.setPaintProperty(center($currentLevel), 'circle-color', ['step', ['get', 'value']].concat(flatStops));
+        map.setPaintProperty(center($currentLevel), 'circle-stroke-color', colorExpression);
+        map.setPaintProperty(centerHighlight($currentLevel), 'circle-stroke-color', colorExpression);
+
+        map.setPaintProperty(center($currentLevel), 'circle-color', colorExpression);
+        map.setPaintProperty(centerHighlight($currentLevel), 'circle-color', colorExpression);
 
         // radius scale
-        map.setPaintProperty(
-          center($currentLevel),
-          'circle-radius',
-          ['step', ['get', 'value'], 0].concat(flatten(radiusStops)),
-        );
+        let radiusExpression = ['step', ['get', 'value'], 0].concat(flatten(radiusStops));
+        map.setPaintProperty(center($currentLevel), 'circle-radius', radiusExpression);
+        map.setPaintProperty(centerHighlight($currentLevel), 'circle-radius', radiusExpression);
 
         map.setLayoutProperty(center($currentLevel), 'visibility', 'visible');
+        map.setLayoutProperty(centerHighlight($currentLevel), 'visibility', 'visible');
       }
 
       map.setLayoutProperty('mega-county', 'visibility', 'none');
@@ -738,6 +742,7 @@
             currentRegion.set(randomFeature.id);
             clickedId = randomFeature.id;
             map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+            map.setFeatureState({ source: center($currentLevel), id: clickedId }, { select: true });
           }
           chosenRandom = true;
         } else {
@@ -745,8 +750,10 @@
           const randomFeature = viableFeatures[index];
           currentRegionName.set(randomFeature.properties.NAME);
           currentRegion.set(randomFeature.properties.id);
+
           clickedId = randomFeature.id;
           map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+          map.setFeatureState({ source: center($currentLevel), id: clickedId }, { select: true });
           chosenRandom = true;
         }
       }
@@ -764,6 +771,7 @@
         clickedId = found[0].id;
         currentRegionName.set(found[0].properties.NAME);
         map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+        map.setFeatureState({ source: center($currentLevel), id: clickedId }, { select: true });
       }
     }
   }
@@ -1049,18 +1057,64 @@
               'circle-radius': 0,
               'circle-color': ENCODING_BUBBLE_THEME.color,
               'circle-stroke-color': ENCODING_BUBBLE_THEME.strokeColor,
-              'circle-stroke-width': [
+              'circle-stroke-width': ENCODING_BUBBLE_THEME.strokeWidth,
+              'circle-opacity': [
                 'case',
                 [
                   'any',
                   ['boolean', ['feature-state', 'hover'], false],
                   ['boolean', ['feature-state', 'select'], false],
                 ],
-                ENCODING_BUBBLE_THEME.strokeWidthHovered,
-                ENCODING_BUBBLE_THEME.strokeWidth,
+                0,
+                ENCODING_BUBBLE_THEME.opacity,
               ],
-              'circle-opacity': ENCODING_BUBBLE_THEME.opacity,
-              'circle-stroke-opacity': ENCODING_BUBBLE_THEME.strokeOpacity,
+              'circle-stroke-opacity': [
+                'case',
+                [
+                  'any',
+                  ['boolean', ['feature-state', 'hover'], false],
+                  ['boolean', ['feature-state', 'select'], false],
+                ],
+                0,
+                ENCODING_BUBBLE_THEME.strokeOpacity,
+              ],
+            },
+          },
+          `${level}-hover`,
+        );
+
+        map.addLayer(
+          {
+            id: centerHighlight(level),
+            source: center(level),
+            type: 'circle',
+            visibility: 'none',
+            filter: ['>', ['get', 'value'], 0],
+            paint: {
+              'circle-radius': 0,
+              'circle-color': ENCODING_BUBBLE_THEME.color,
+              'circle-stroke-color': ENCODING_BUBBLE_THEME.strokeColor,
+              'circle-stroke-width': ENCODING_BUBBLE_THEME.strokeWidthHovered,
+              'circle-opacity': [
+                'case',
+                [
+                  'any',
+                  ['boolean', ['feature-state', 'hover'], false],
+                  ['boolean', ['feature-state', 'select'], false],
+                ],
+                ENCODING_BUBBLE_THEME.opacity,
+                0,
+              ],
+              'circle-stroke-opacity': [
+                'case',
+                [
+                  'any',
+                  ['boolean', ['feature-state', 'hover'], false],
+                  ['boolean', ['feature-state', 'select'], false],
+                ],
+                ENCODING_BUBBLE_THEME.strokeOpacity,
+                0,
+              ],
             },
           },
           'city-point-unclustered-pit',
@@ -1101,6 +1155,7 @@
       currentRegion.set(selectedRegion['property_id']);
       clickedId = parseInt(selectedRegion['id']);
       map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+      map.setFeatureState({ source: center($currentLevel), id: clickedId }, { select: true });
 
       // Get zoom and center of selected location
       let centersData = $geojsons.get(center($currentLevel))['features'];

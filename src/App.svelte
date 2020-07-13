@@ -145,9 +145,9 @@
     }
 
     // check if the currentRegion has data on the current date
-    const checkIfCurrentRegionHasDataOnCurrentDate = (region_data = []) => {
+    const checkIfCurrentRegionHasDataOnCurrentDate = (regionData = []) => {
       let flag = false;
-      region_data.forEach(item => {
+      regionData.forEach(item => {
         if (item.time_value == $currentDate) {
           flag = true;
         }
