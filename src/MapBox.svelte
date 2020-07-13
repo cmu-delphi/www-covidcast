@@ -493,8 +493,8 @@
           d.properties.value = valueMappedMega.get(id)[0];
 
           if ($currentSensor.match(/7dav_incidence/)) {
-            d.properties.value = valueMappedMega.get(id)[0];
-            d.properties.value1 = valueMappedMega.get(id)[1];
+            d.properties.value = valueMappedMega.get(id)[0]; // 7-day avg
+            d.properties.value1 = valueMappedMega.get(id)[1]; // count
           }
         }
         if (geoIds.has(id + '000') && directionMappedMega.get(id) !== undefined) {
@@ -517,6 +517,7 @@
         d.properties.direction = -100;
         if (geoIds.has(id) && valueMappedVals.get(id) !== undefined) {
           d.properties.value = valueMappedVals.get(id)[0];
+
           if ($currentSensor.match(/7dav_incidence/)) {
             d.properties.value = valueMappedVals.get(id)[0];
             d.properties.value1 = valueMappedVals.get(id)[1];
@@ -529,8 +530,7 @@
     });
 
     let stops, stopsMega;
-    let base = ENCODING_BUBBLE_THEME.base,
-      coef;
+    let radiusStops;
 
     if ($signalType === 'value') {
       valueMinMax[0] = Math.max(0, valueMinMax[0]);
@@ -571,6 +571,21 @@
           [secondHalfCenter, c4.toString()],
           [valueMinMax[1], c5.toString()],
         ];
+
+        const minRadius = ENCODING_BUBBLE_THEME.minRadius[$currentLevel],
+          maxRadius = ENCODING_BUBBLE_THEME.maxRadius[$currentLevel];
+
+        const radiusScaleLog = d3
+          .scaleLog([minRadius, maxRadius])
+          .domain(colorScaleLog.domain())
+          .base(ENCODING_BUBBLE_THEME.base);
+
+        let numBands = 5;
+
+        radiusStops = d3.range(numBands).map(i => {
+          let r = (i / (numBands - 1)) * (maxRadius - minRadius) + minRadius;
+          return [radiusScaleLog.invert(r), r];
+        });
       } else if ($currentSensor.match(/prop/)) {
         stops = [
           [0, DIRECTION_THEME.countMin],
@@ -604,12 +619,6 @@
           [valueMinMax[1], c5.toString()],
         ];
       }
-
-      // radius = ceof * log_{base} (value + 0.001)
-
-      coef =
-        ENCODING_BUBBLE_THEME.maxRadius[$currentLevel] /
-        (Math.log(getNiceNumber(valueMinMax[1]) + 0.001) / Math.log(base));
     } else {
       stops = [
         [-100, MAP_THEME.countyFill],
@@ -673,21 +682,28 @@
         name => map.getLayer(center(name)) && map.setLayoutProperty(center(name), 'visibility', 'none'),
       );
       if (map.getLayer(center($currentLevel))) {
-        let flatStops = stops.reduce((acc, val) => acc.concat(val), []);
+        const flatten = arr => arr.reduce((acc, val) => acc.concat(val), []);
+
+        // color scale (color + stroke color)
+
+        let flatStops = flatten(stops);
         flatStops.shift(); // remove the first element which has a value of 0 since the "step" expression of mapbox does not require it.
 
         flatStops[0] = 'transparent';
-        map.setPaintProperty(center($currentLevel), 'circle-radius', [
-          '*',
-          ['/', ['ln', ['+', ['get', 'value'], 0.001]], ['ln', base]],
-          coef,
-        ]);
         map.setPaintProperty(
           center($currentLevel),
           'circle-stroke-color',
           ['step', ['get', 'value']].concat(flatStops),
         );
+
         map.setPaintProperty(center($currentLevel), 'circle-color', ['step', ['get', 'value']].concat(flatStops));
+
+        // radius scale
+        map.setPaintProperty(
+          center($currentLevel),
+          'circle-radius',
+          ['step', ['get', 'value'], 0].concat(flatten(radiusStops)),
+        );
 
         map.setLayoutProperty(center($currentLevel), 'visibility', 'visible');
       }
@@ -1019,7 +1035,7 @@
             source: center(level),
             type: 'circle',
             visibility: 'none',
-            filter: ['!=', $signalType, -100],
+            filter: ['>', ['get', 'value'], 0],
             paint: {
               'circle-radius': 0,
               'circle-color': ENCODING_BUBBLE_THEME.color,
@@ -1226,7 +1242,7 @@
     align-items: center;
     justify-content: center;
     transition: all 0.1s ease-in;
-    height: 120px;
+    height: 105px;
 
     /* rounded design refresh */
     border-radius: 7px;

@@ -25,41 +25,7 @@
   encoding.subscribe(e => ($stats ? update($currentSensor, $stats, $currentLevel, e) : ''));
 
   function update(sens, stats, level, encoding) {
-    if (encoding === 'color') {
-      updateLowHigh(sens, stats, level, encoding);
-      return;
-    }
-
-    let sts, valueMax;
-    if ($currentSensor.match(/num/)) {
-      sts = stats.get(sens + '_' + level);
-    } else {
-      sts = stats.get(sens);
-    }
-    valueMax = getNiceNumber(sts.mean + 3 * sts.std);
-
-    let coef =
-      ENCODING_BUBBLE_THEME.maxRadius[$currentLevel] /
-      ((Math.log(valueMax) + 0.001) / Math.log(ENCODING_BUBBLE_THEME.base));
-
-    let scale = x => (coef * Math.log(x + 0.001)) / Math.log(ENCODING_BUBBLE_THEME.base);
-    let revert = x => Math.pow(Math.E, (x * Math.log(ENCODING_BUBBLE_THEME.base)) / coef) - 0.001;
-
-    bubbleLegend = d3.range(6).map(i => {
-      let targetRadius = (ENCODING_BUBBLE_THEME.maxRadius[$currentLevel] / 6) * (6 - i);
-      let candidateX = revert(targetRadius);
-      let x = getNiceNumber(candidateX);
-
-      return [scale(x), x];
-    });
-
-    // remove duplicates
-    let last;
-    bubbleLegend = bubbleLegend.filter(b => {
-      if (last === b[0]) return false;
-      last = b[0];
-      return true;
-    });
+    updateLowHigh(sens, stats, level, encoding);
   }
 
   function updateLowHigh(sens, stats, level) {
@@ -272,7 +238,8 @@
     transition: all 0.1s ease-in;
 
     height: 100%;
-    width: 376px;
+    /* if the option for the bubble encoding is visible for specific indicators (e.g., cases), the width of the legend can expand. So do not fix it to a certain number.*/
+    /* width: 376px; */
     flex-direction: column;
   }
 
@@ -435,68 +402,57 @@
     </div>
   </div>
 
-  {#if $encoding === 'color'}
-    {#if $signalType === 'direction'}
-      <div class="trend-legend-grouping">
-        <ul class="legend-labels">
-          <li>
-            <span style="background-color: {DIRECTION_THEME.increasing}" />
-            {@html DIRECTION_THEME.increasingIcon}
-            Increasing
+  {#if $signalType === 'direction'}
+    <div class="trend-legend-grouping">
+      <ul class="legend-labels">
+        <li>
+          <span style="background-color: {DIRECTION_THEME.increasing}" />
+          {@html DIRECTION_THEME.increasingIcon}
+          Increasing
+        </li>
+        <li>
+          <span style="background-color: {DIRECTION_THEME.steady}" />
+          {@html DIRECTION_THEME.steadyIcon}
+          Steady
+        </li>
+        <li>
+          <span style="background-color: {DIRECTION_THEME.decreasing}" />
+          {@html DIRECTION_THEME.decreasingIcon}
+          Decreasing
+        </li>
+      </ul>
+    </div>
+  {:else if $currentSensor.match(/num/)}
+    <div class="legend-grouping">
+      <ul class="legend-labels">
+        {#each logColorArr as { label, from_color, to_color }, j}
+          <li class="colored">
+            <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
+            {getSigfigs(label, 3)}
           </li>
-          <li>
-            <span style="background-color: {DIRECTION_THEME.steady}" />
-            {@html DIRECTION_THEME.steadyIcon}
-            Steady
-          </li>
-          <li>
-            <span style="background-color: {DIRECTION_THEME.decreasing}" />
-            {@html DIRECTION_THEME.decreasingIcon}
-            Decreasing
-          </li>
-        </ul>
-      </div>
-    {:else if $currentSensor.match(/num/)}
-      <div class="legend-grouping">
-        <ul class="legend-labels">
-          {#each logColorArr as { label, from_color, to_color }, j}
-            <li class="colored">
-              <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
-              {getSigfigs(label, 3)}
-            </li>
-          {/each}
-          <li class="ends">
-            <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
-            {high ? high + '+' : ''}
-          </li>
-        </ul>
+        {/each}
+        <li class="ends">
+          <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
+          {high ? high + '+' : ''}
+        </li>
+      </ul>
 
-      </div>
-    {:else}
-      <div class="legend-grouping">
-        <ul class="legend-labels">
-          {#each linColorArr as { label, from_color, to_color }, j}
-            <li class="colored">
-              <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
-              {getSigfigs(label, 3)}
-            </li>
-          {/each}
-          <li class="ends">
-            <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
-            {high ? high + '+' : ''}
+    </div>
+  {:else}
+    <div class="legend-grouping">
+      <ul class="legend-labels">
+        {#each linColorArr as { label, from_color, to_color }, j}
+          <li class="colored">
+            <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
+            {getSigfigs(label, 3)}
           </li>
-        </ul>
+        {/each}
+        <li class="ends">
+          <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
+          {high ? high + '+' : ''}
+        </li>
+      </ul>
 
-      </div>
-    {/if}
-  {:else if $encoding === 'bubble'}
-    <div id="bubble-legend">
-      {#each bubbleLegend as [r, value]}
-        <div class="bubble-legend-item">
-          <div style="width: {r * 2}px; height: {r * 2}px;" class="bubble" />
-          <span>{value.toLocaleString('en')}</span>
-        </div>
-      {/each}
     </div>
   {/if}
 </div>
