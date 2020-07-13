@@ -193,7 +193,8 @@ export const geojsons = readable(new Map(), function start(set) {
     d3.json('./maps/state_centers.json'),
     d3.json('./maps/county_centers.json'),
     d3.json('./maps/msa_centers.json'),
-  ]).then(([a, b, c, d, e, f, g]) => {
+    d3.json('./maps/new_zones.json'),
+  ]).then(([a, b, c, d, e, f, g, h]) => {
     let m = new Map();
     m.set('county', injectIDs('county', a));
     m.set('state', injectIDs('state', b));
@@ -202,6 +203,7 @@ export const geojsons = readable(new Map(), function start(set) {
     m.set('state-centers', e);
     m.set('county-centers', f);
     m.set('msa-centers', g);
+    m.set('zone', h);
     set(m);
   });
 });
@@ -219,30 +221,35 @@ export const currentSensor = writable('', (set) => {
   sensor ? set(sensor) : set(Array.from(get(sensorMap).keys())[0]);
   return () => '';
 });
+
 // 'county', 'state', or 'msa'
 export const currentLevel = writable('county', (set) => {
   let level = urlParams.get('level');
   level ? set(level) : '';
   return () => '';
 });
+
 // Options are 'direction' and 'value'.
 export const signalType = writable('value', (set) => {
   let signalT = urlParams.get('signalType');
   signalT ? set(signalT) : '';
   return () => '';
 });
+
 // Options are 'color' and 'bubble'
 export const encoding = writable('color', (set) => {
   let encoding = urlParams.get('encoding');
   encoding ? set(encoding) : '';
   return () => '';
 });
+
 // EpiWeek in form YYYYMMDD.
 export const currentDate = writable(20100420, (set) => {
   let date = urlParams.get('date');
   date ? set(date) : '';
   return () => '';
 });
+
 // Region GEO_ID for filtering the line chart
 // 42003 - Allegheny; 38300 - Pittsburgh; PA - Pennsylvania.
 export const currentRegion = writable('', (set) => {
@@ -250,6 +257,14 @@ export const currentRegion = writable('', (set) => {
   region ? set(region) : '';
   return () => '';
 });
+
+// currently only supporting 'swpa' - South western Pennsylvania
+export const currentZone = writable('', (set) => {
+  let zone = urlParams.get('zone');
+  zone ? set(zone) : '';
+  return () => '';
+});
+
 // Range of time for the map slider.
 export const currentRange = writable([0, 1]);
 

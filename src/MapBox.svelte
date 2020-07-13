@@ -24,6 +24,7 @@
     currentDate,
     currentData,
     currentRange,
+    currentZone,
     signalType,
     encoding,
     currentDataReadyOnMap,
@@ -43,6 +44,11 @@
   let LAT = -0.5;
   let LON = -0.5;
   let ZOOM = 3.9;
+
+  let SWPA_LAT = 2.8;
+  let SWPA_LON = 12.6;
+  let SWPA_ZOOM = 7.7;
+
   let R = 6378137.0;
   const projection = d3
     .geoAlbersUsa()
@@ -755,12 +761,23 @@
   }
 
   function initializeMap() {
+    console.log($currentZone);
+    let lon = LON,
+      lat = LAT,
+      zoom = ZOOM;
+
+    if ($currentZone === 'swpa') {
+      lon = SWPA_LON;
+      lat = SWPA_LAT;
+      zoom = SWPA_ZOOM;
+    }
+
     map = new mapboxgl.Map({
       attributionControl: false,
       container,
       style: './maps/mapbox_albers_usa_style.json',
-      center: [LON, LAT],
-      zoom: ZOOM,
+      center: [lon, lat],
+      zoom: zoom,
       minZoom: ZOOM - 1,
     })
       .addControl(new mapboxgl.AttributionControl({ compact: true }))
@@ -809,6 +826,10 @@
         type: 'geojson',
         data: $geojsons.get('state'),
       });
+      map.addSource('zone-outline', {
+        type: 'geojson',
+        data: $geojsons.get('zone'),
+      });
 
       Object.keys($levels).forEach(level => {
         map.addSource(center(level), {
@@ -827,6 +848,7 @@
           'fill-opacity': 0.4,
         },
       });
+
       map.addLayer({
         id: 'state-outline',
         source: 'state-outline',
@@ -1033,9 +1055,28 @@
         );
       });
 
+      if ($currentZone === 'swpa') {
+        showZoneBoundary('swpa');
+      }
+
       mapMounted = true;
       updateMap('init');
     });
+  }
+
+  function showZoneBoundary(zoneName) {
+    if (zoneName === 'swpa') {
+      map.addLayer({
+        id: 'zone-outline',
+        source: 'zone-outline',
+        type: 'line',
+        paint: {
+          'line-color': MAP_THEME.zoneOutline,
+          'line-width': 2,
+          'line-dasharray': [2, 2],
+        },
+      });
+    }
   }
 
   function searchElement(selectedRegion) {
@@ -1122,6 +1163,17 @@
     top: 79px;
     right: 9px;
     z-index: 100;
+  }
+
+  #swpa-button-holder.state-buttons-holder {
+    position: absolute;
+    top: 120px;
+    right: 9px;
+    z-index: 100;
+  }
+
+  #swpa-button-holder.state-buttons-holder button {
+    font-size: 9px;
   }
 
   .state-buttons-holder button:focus {
@@ -1310,10 +1362,26 @@
       data-state="us48"
       id="bounds-button"
       class="pg-button bounds-button"
-      on:click={_ => map.easeTo({ center: [LON, LAT], zoom: ZOOM, bearing: 0, pitch: 0 })}>
+      on:click={_ => {
+        map.easeTo({ center: [LON, LAT], zoom: ZOOM, bearing: 0, pitch: 0 });
+      }}>
       <img src="./assets/imgs/us48.png" alt="" />
     </button>
   </div>
+
+  {#if $currentZone.length > 0}
+    <div class="state-buttons-holder" id="swpa-button-holder">
+      <button
+        aria-label="show swpa boundary"
+        class="pg-button bounds-button"
+        on:click={_ => {
+          map.easeTo({ center: [SWPA_LON, SWPA_LAT], zoom: SWPA_ZOOM, bearing: 0, pitch: 0 });
+          showZoneBoundary('swpa');
+        }}>
+        SWPA
+      </button>
+    </div>
+  {/if}
 
   <div class="time-container">
     <Time />

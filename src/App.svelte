@@ -12,6 +12,7 @@
     currentDate,
     currentLevel,
     currentRegion,
+    currentZone,
     currentRegionName,
     regionSliceCache,
     timeSliceCache,
@@ -356,7 +357,7 @@
   }
 
   // Constantly keep the URL parameters updated with the current state.
-  function updateURIParameters(sensor, level, region, date, signalType, encoding) {
+  function updateURIParameters(sensor, level, region, date, signalType, encoding, zone) {
     let pre = '';
     if ($customDataView) {
       const queryString = window.location.search;
@@ -379,28 +380,32 @@
         '&signalType=' +
         signalType +
         '&encoding=' +
-        encoding,
+        encoding +
+        (zone ? '&zone=' + zone : ''),
     );
   }
 
   // Keep the URL updated with the current state
   currentSensor.subscribe(s =>
-    updateURIParameters(s, $currentLevel, $currentRegion, $currentDate, $signalType, $encoding),
+    updateURIParameters(s, $currentLevel, $currentRegion, $currentDate, $signalType, $encoding, $currentZone),
   );
   currentLevel.subscribe(l =>
-    updateURIParameters($currentSensor, l, $currentRegion, $currentDate, $signalType, $encoding),
+    updateURIParameters($currentSensor, l, $currentRegion, $currentDate, $signalType, $encoding, $currentZone),
   );
   currentRegion.subscribe(r =>
-    updateURIParameters($currentSensor, $currentLevel, r, $currentDate, $signalType, $encoding),
+    updateURIParameters($currentSensor, $currentLevel, r, $currentDate, $signalType, $encoding, $currentZone),
   );
   currentDate.subscribe(d =>
-    updateURIParameters($currentSensor, $currentLevel, $currentRegion, d, $signalType, $encoding),
+    updateURIParameters($currentSensor, $currentLevel, $currentRegion, d, $signalType, $encoding, $currentZone),
   );
   signalType.subscribe(t =>
-    updateURIParameters($currentSensor, $currentLevel, $currentRegion, $currentDate, t, $encoding),
+    updateURIParameters($currentSensor, $currentLevel, $currentRegion, $currentDate, t, $encoding, $currentZone),
   );
   encoding.subscribe(e =>
-    updateURIParameters($currentSensor, $currentLevel, $currentRegion, $currentDate, $signalType, e),
+    updateURIParameters($currentSensor, $currentLevel, $currentRegion, $currentDate, $signalType, e, $currentZone),
+  );
+  currentZone.subscribe(z =>
+    updateURIParameters($currentSensor, $currentLevel, $currentRegion, $currentDate, $signalType, $encoding, z),
   );
 </script>
 
