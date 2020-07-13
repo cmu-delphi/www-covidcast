@@ -25,6 +25,16 @@
   });
 
   export let isIE;
+
+  function make_plural(level) {
+    if (level === 'State') {
+      return 'States';
+    } else if (level === 'County') {
+      return 'Counties';
+    } else if (level === 'Metro Area') {
+      return 'Metro Areas';
+    }
+  }
 </script>
 
 <style>
@@ -147,7 +157,7 @@
       }}>
       {#each Object.keys($levels) as level}
         <option value={level} disabled={$sensorMap.get($currentSensor).levels.includes(level) === false}>
-          {$levels[level]}
+          {make_plural($levels[level])}
         </option>
       {/each}
     </select>
