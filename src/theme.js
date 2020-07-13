@@ -36,6 +36,7 @@ export const ENCODING_BUBBLE_THEME = {
   color: 'transparent',
   strokeColor: '#666',
   strokeWidth: 1,
+  strokeWidthHovered: 4,
   opacity: 0.5,
   strokeOpacity: 1,
   minRadius: {

@@ -160,6 +160,7 @@
     map.getCanvas().style.cursor = 'pointer';
     popup.setLngLat(e.lngLat).addTo(map);
     map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
+    map.setFeatureState({ source: center(level), id: hoveredId }, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
   };
 
@@ -174,6 +175,7 @@
     }
 
     map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
+    map.setFeatureState({ source: center(level), id: hoveredId }, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
 
     let fillColor;
@@ -204,6 +206,7 @@
     } else {
       hoveredId = e.features[0].id;
       map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
+      map.setFeatureState({ source: center(level), id: hoveredId }, { hover: true });
 
       //get hover color for regular county
       let colorStops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
@@ -354,6 +357,8 @@
     if (level === 'mega-county' && hoveredId !== null) megaHoveredId = null;
 
     map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
+    map.setFeatureState({ source: center(level), id: hoveredId }, { hover: false });
+
     if (level !== 'mega-county') hoveredId = null;
 
     map.getCanvas().style.cursor = '';
@@ -363,6 +368,7 @@
   const onClick = level => e => {
     if (clickedId) {
       map.setFeatureState({ source: level, id: clickedId }, { select: false });
+      map.setFeatureState({ source: center(level), id: clickedId }, { select: false });
     }
     if (megaClickedId) {
       map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: false });
@@ -380,6 +386,7 @@
       clickedId = null;
       megaClickedId = e.features[0].id;
       map.setFeatureState({ source: level, id: megaClickedId }, { select: true });
+      map.setFeatureState({ source: center(level), id: megaClickedId }, { select: true });
       currentRegionName.set(e.features[0].properties.NAME);
       currentRegion.set(e.features[0].properties.STATE + '000');
     } else {
@@ -387,6 +394,7 @@
       if (clickedId !== e.features[0].id) {
         clickedId = e.features[0].id;
         map.setFeatureState({ source: level, id: clickedId }, { select: true });
+        map.setFeatureState({ source: center(level), id: clickedId }, { select: true });
         currentRegionName.set(e.features[0].properties.NAME);
         currentRegion.set(e.features[0].properties.id);
       } else {
@@ -792,6 +800,7 @@
     });
     map.on('mousemove', 'state-outline', onMouseMove('state-outline'));
     map.on('mouseleave', 'state-outline', onMouseLeave('state-outline'));
+
     [...Object.keys($levels), 'mega-county'].forEach(level => {
       map.on('mouseenter', level, onMouseEnter(level));
       map.on('mousemove', level, onMouseMove(level));
@@ -1011,11 +1020,11 @@
         `mega-county-hover`,
       );
 
-      Object.keys($levels).forEach(name => {
+      Object.keys($levels).forEach(level => {
         map.addLayer(
           {
-            id: name,
-            source: name,
+            id: level,
+            source: level,
             type: 'fill',
             visibility: 'none',
             filter: ['!=', $signalType, -100],
@@ -1024,7 +1033,7 @@
               'fill-color': MAP_THEME.countyFill,
             },
           },
-          `${name}-hover`,
+          `${level}-hover`,
         );
       });
 
@@ -1040,12 +1049,21 @@
               'circle-radius': 0,
               'circle-color': ENCODING_BUBBLE_THEME.color,
               'circle-stroke-color': ENCODING_BUBBLE_THEME.strokeColor,
-              'circle-stroke-width': ENCODING_BUBBLE_THEME.strokeWidth,
+              'circle-stroke-width': [
+                'case',
+                [
+                  'any',
+                  ['boolean', ['feature-state', 'hover'], false],
+                  ['boolean', ['feature-state', 'select'], false],
+                ],
+                ENCODING_BUBBLE_THEME.strokeWidthHovered,
+                ENCODING_BUBBLE_THEME.strokeWidth,
+              ],
               'circle-opacity': ENCODING_BUBBLE_THEME.opacity,
               'circle-stroke-opacity': ENCODING_BUBBLE_THEME.strokeOpacity,
             },
           },
-          `${level}-hover`,
+          'city-point-unclustered-pit',
         );
       });
 

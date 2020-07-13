@@ -199,9 +199,9 @@ export const geojsons = readable(new Map(), function start(set) {
     m.set('state', injectIDs('state', b));
     m.set('msa', injectIDs('msa', c));
     m.set('city', d);
-    m.set('state-centers', e);
-    m.set('county-centers', f);
-    m.set('msa-centers', g);
+    m.set('state-centers', injectIDs('state-centers', e));
+    m.set('county-centers', injectIDs('county-centers', f));
+    m.set('msa-centers', injectIDs('msa-centers', g));
     set(m);
   });
 });

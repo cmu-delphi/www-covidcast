@@ -49,6 +49,12 @@ export const injectIDs = (level, data) => {
           'level': level
         })
       */
+    } else if (level === 'county-centers') {
+      d.id = d.properties.GEO_ID.slice(-5);
+    } else if (level == 'msa-centers') {
+      d.id = d.properties.id;
+    } else if (level == 'state-centers') {
+      d.id = d.properties.STATE;
     }
     //console.log(d)
     //lst.push({
