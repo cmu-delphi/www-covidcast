@@ -31,6 +31,7 @@
     mounted,
     mapFirstLoaded,
     sensorMap,
+    radiusScale,
   } from './stores.js';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
@@ -547,8 +548,7 @@
       });
     });
 
-    let stops, stopsMega;
-    let radiusLogScale;
+    let stops, stopsMega, currentRadiusScale;
 
     if ($signalType === 'value') {
       valueMinMax[0] = Math.max(0, valueMinMax[0]);
@@ -594,10 +594,11 @@
         const minRadius = ENCODING_BUBBLE_THEME.minRadius[$currentLevel],
           maxRadius = ENCODING_BUBBLE_THEME.maxRadius[$currentLevel];
 
-        radiusLogScale = logScale()
+        currentRadiusScale = logScale()
           .domain(colorScaleLog.domain())
           .range([minRadius, maxRadius])
           .base(ENCODING_BUBBLE_THEME.base);
+        radiusScale.set(currentRadiusScale);
       } else if ($currentSensor.match(/prop/)) {
         stops = [
           [0, DIRECTION_THEME.countMin],
@@ -713,7 +714,7 @@
         map.setPaintProperty(centerHighlight($currentLevel), 'circle-color', colorExpression);
 
         // radius scale
-        const [a, b, base] = radiusLogScale.coef();
+        const [a, b, base] = currentRadiusScale.coef();
         const baseLog = Math.log10(base);
 
         let radiusExpression = ['+', ['*', a, ['/', ['log10', ['get', 'value']], baseLog]], b];
@@ -1365,7 +1366,7 @@
     align-items: center;
     justify-content: center;
     transition: all 0.1s ease-in;
-    height: 105px;
+    /*height: 105px;*/
 
     /* rounded design refresh */
     border-radius: 7px;

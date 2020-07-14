@@ -1,5 +1,5 @@
 import { writable, readable, derived, get } from 'svelte/store';
-import { injectIDs } from './util.js';
+import { injectIDs, logScale } from './util.js';
 import * as d3 from 'd3';
 import moment from 'moment';
 
@@ -286,3 +286,5 @@ export const timeRangeOnSlider = writable({
   max: 0,
 });
 export const yesterday = +moment(new Date(new Date().getTime() - 86400 * 1000)).format('YYYYMMDD');
+
+export const radiusScale = writable(logScale());
