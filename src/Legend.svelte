@@ -8,14 +8,15 @@
     currentLevel,
     currentDataReadyOnMap,
     encoding,
+    radiusScale,
   } from './stores.js';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
-  import { getNiceNumber } from './util.js';
 
   let high = '';
   let low = '';
-  let bubbleLegend = [];
+  let colorScaleLog;
+
   $: logColorArr = [{ label: '0', from_color: DIRECTION_THEME.countMin, to_color: DIRECTION_THEME.countMin }];
   $: linColorArr = [];
 
@@ -23,6 +24,7 @@
   stats.subscribe(s => (s ? update($currentSensor, s, $currentLevel, $encoding) : ''));
   currentLevel.subscribe(l => ($stats ? update($currentSensor, $stats, l, $encoding) : ''));
   encoding.subscribe(e => ($stats ? update($currentSensor, $stats, $currentLevel, e) : ''));
+  radiusScale.subscribe(e => ($stats ? update($currentSensor, $stats, $currentLevel, $encoding) : ''));
 
   function update(sens, stats, level, encoding) {
     updateLowHigh(sens, stats, level, encoding);
@@ -43,11 +45,14 @@
       let max = Math.log(valueMinMax[1]) / Math.log(10);
       let min = Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10);
       let arr = logspace(min, max, 7);
-      const colorScaleLog = d3
+
+      colorScaleLog = d3
         .scaleSequentialLog(d3.interpolateYlOrRd)
         .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]]);
+
       for (let i = 0; i < arr.length - 1; i++) {
         arr[i] = parseFloat(arr[i]).toFixed(2);
+
         logColorArr.push({
           label: arr[i],
           from_color: colorScaleLog(arr[i]),
@@ -93,6 +98,16 @@
     }
     splits.push(max);
     return splits;
+  }
+
+  function getBubbleFill(value) {
+    let bubbleFill = d3.rgb(colorScaleLog(value));
+    bubbleFill.opacity = 0.5;
+    return bubbleFill.toString();
+  }
+
+  function getBubbleBorder(value) {
+    return colorScaleLog(value);
   }
 </script>
 
@@ -260,7 +275,6 @@
     display: block;
     float: left;
     width: 110px;
-    margin-bottom: 6px;
     margin-left: 0px;
     padding-top: 0px;
     text-align: center;
@@ -279,7 +293,6 @@
     display: block;
     float: left;
     width: 43px;
-    margin-bottom: 6px;
     margin-right: 1px;
     margin-left: 0px;
     padding-top: 0px;
@@ -299,7 +312,6 @@
     display: block;
     float: left;
     width: 37px;
-    margin-bottom: 6px;
     margin-right: 1px;
     margin-left: 0px;
     padding-top: 0px;
@@ -315,10 +327,24 @@
     width: 37px;
   }
 
+  .bubble-legend ul {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .bubble-legend li {
+    display: flex;
+    font-size: 80%;
+    align-items: center;
+  }
+
   .bubble {
     border: 1px solid #666;
     border-radius: 200px;
     display: inline-block;
+    margin-right: 0.3rem;
   }
 
   #encoding-options {
@@ -331,18 +357,6 @@
 
   .hidden {
     display: none;
-  }
-
-  #bubble-legend {
-    display: flex;
-  }
-
-  .bubble-legend-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    align-self: center;
-    margin-right: 1rem;
   }
 </style>
 
@@ -401,58 +415,82 @@
       </div>
     </div>
   </div>
-
-  {#if $signalType === 'direction'}
-    <div class="trend-legend-grouping">
-      <ul class="legend-labels">
-        <li>
-          <span style="background-color: {DIRECTION_THEME.increasing}" />
-          {@html DIRECTION_THEME.increasingIcon}
-          Increasing
-        </li>
-        <li>
-          <span style="background-color: {DIRECTION_THEME.steady}" />
-          {@html DIRECTION_THEME.steadyIcon}
-          Steady
-        </li>
-        <li>
-          <span style="background-color: {DIRECTION_THEME.decreasing}" />
-          {@html DIRECTION_THEME.decreasingIcon}
-          Decreasing
-        </li>
-      </ul>
-    </div>
-  {:else if $currentSensor.match(/num/)}
-    <div class="legend-grouping">
-      <ul class="legend-labels">
-        {#each logColorArr as { label, from_color, to_color }, j}
-          <li class="colored">
-            <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
-            {getSigfigs(label, 3)}
+  {#if $encoding === 'color'}
+    {#if $signalType === 'direction'}
+      <div class="trend-legend-grouping">
+        <ul class="legend-labels">
+          <li>
+            <span style="background-color: {DIRECTION_THEME.increasing}" />
+            {@html DIRECTION_THEME.increasingIcon}
+            Increasing
           </li>
-        {/each}
-        <li class="ends">
-          <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
-          {high ? high + '+' : ''}
-        </li>
-      </ul>
-
-    </div>
-  {:else}
-    <div class="legend-grouping">
-      <ul class="legend-labels">
-        {#each linColorArr as { label, from_color, to_color }, j}
-          <li class="colored">
-            <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
-            {getSigfigs(label, 3)}
+          <li>
+            <span style="background-color: {DIRECTION_THEME.steady}" />
+            {@html DIRECTION_THEME.steadyIcon}
+            Steady
           </li>
+          <li>
+            <span style="background-color: {DIRECTION_THEME.decreasing}" />
+            {@html DIRECTION_THEME.decreasingIcon}
+            Decreasing
+          </li>
+        </ul>
+      </div>
+    {:else if $currentSensor.match(/num/)}
+      <div class="legend-grouping">
+        <ul class="legend-labels">
+          {#each logColorArr as { label, from_color, to_color }, j}
+            <li class="colored">
+              <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
+              {getSigfigs(label, 3)}
+            </li>
+          {/each}
+          <li class="ends">
+            <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
+            {high ? high + '+' : ''}
+          </li>
+        </ul>
+      </div>
+    {:else}
+      <div class="legend-grouping">
+        <ul class="legend-labels">
+          {#each linColorArr as { label, from_color, to_color }, j}
+            <li class="colored">
+              <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
+              {getSigfigs(label, 3)}
+            </li>
+          {/each}
+          <li class="ends">
+            <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
+            {high ? high + '+' : ''}
+          </li>
+        </ul>
+      </div>
+    {/if}
+  {:else if $encoding === 'bubble'}
+    <div class="bubble-legend">
+      <ul>
+        {#if high}
+          <li class="colored">
+            <div
+              style="width: {$radiusScale(+high) * 2}px; height: {$radiusScale(+high) * 2}px; background: {getBubbleFill(+high)};border-color:
+              {getBubbleBorder(+high)}"
+              class="bubble" />
+            <div>{high ? high + '+' : ''}</div>
+          </li>
+        {/if}
+        {#each [...logColorArr].reverse() as { label, from_color, to_color }, j}
+          {#if +label > 0}
+            <li class="colored">
+              <div
+                style="width: {$radiusScale(+label) * 2}px; height: {$radiusScale(+label) * 2}px;background: {getBubbleFill(+label)};border-color:
+                {from_color}"
+                class="bubble" />
+              <div>{getSigfigs(label, 3)}</div>
+            </li>
+          {/if}
         {/each}
-        <li class="ends">
-          <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
-          {high ? high + '+' : ''}
-        </li>
       </ul>
-
     </div>
   {/if}
 </div>

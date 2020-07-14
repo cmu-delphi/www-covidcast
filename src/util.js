@@ -1,5 +1,6 @@
 import colorParse from 'color-parse';
 import invertColor from 'invert-color';
+import { scaleLinear } from 'd3';
 
 export const calculateValFromRectified = (rectified) => {
   let tempDate = new Date(rectified);
@@ -76,13 +77,57 @@ export function getTextColorBasedOnBackground(bgColor) {
   });
 }
 
-export function getNiceNumber(num) {
-  let nice = Math.pow(10, Math.ceil(Math.log10(num)));
+// A d3-like continuous log scale.
+// Because MapBox does not support applying a custom function for a property,
+// so we cannot use d3.scaleLog().
 
-  if (num < 0.25 * nice) nice = 0.25 * nice;
-  else if (num < 0.5 * nice) nice = 0.5 * nice;
+export function logScale() {
+  let a = 1,
+    b = 0,
+    base = 10,
+    domain = [1, 1],
+    range = [0, 0];
 
-  return nice;
+  function log(x) {
+    return Math.log(x) / Math.log(base);
+  }
+
+  function fit() {
+    a = (range[1] - range[0]) / (log(domain[1]) - log(domain[0]));
+    b = range[0] - a * log(domain[0]);
+  }
+
+  // y = a log (x) + b
+  function scale(x) {
+    return a * log(x) + b;
+  }
+
+  scale.domain = function () {
+    if (!arguments.length) return domain;
+    domain = arguments[0];
+    fit();
+    return scale;
+  };
+
+  scale.range = function () {
+    if (!arguments.length) return range;
+    range = arguments[0];
+    fit();
+    return scale;
+  };
+
+  scale.base = function () {
+    if (!arguments.length) return base;
+    base = arguments[0];
+    fit();
+    return scale;
+  };
+
+  scale.coef = function () {
+    return [a, b, base];
+  };
+
+  return scale;
 }
 
 export const defaultRegionOnStartup = {
