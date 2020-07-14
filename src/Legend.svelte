@@ -470,16 +470,7 @@
   {:else if $encoding === 'bubble'}
     <div class="bubble-legend">
       <ul>
-        {#if high}
-          <li class="colored">
-            <div
-              style="width: {$radiusScale(+high) * 2}px; height: {$radiusScale(+high) * 2}px; background: {getBubbleFill(+high)};border-color:
-              {getBubbleBorder(+high)}"
-              class="bubble" />
-            <div>{high ? high + '+' : ''}</div>
-          </li>
-        {/if}
-        {#each [...logColorArr].reverse() as { label, from_color, to_color }, j}
+        {#each [...logColorArr] as { label, from_color, to_color }, j}
           {#if +label > 0}
             <li class="colored">
               <div
@@ -490,6 +481,15 @@
             </li>
           {/if}
         {/each}
+        {#if high}
+          <li class="colored">
+            <div
+              style="width: {$radiusScale(+high) * 2}px; height: {$radiusScale(+high) * 2}px; background: {getBubbleFill(+high)};border-color:
+              {getBubbleBorder(+high)}"
+              class="bubble" />
+            <div>{high ? high + '+' : ''}</div>
+          </li>
+        {/if}
       </ul>
     </div>
   {/if}
