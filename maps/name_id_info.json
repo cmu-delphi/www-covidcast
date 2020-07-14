@@ -3374,7 +3374,7 @@
             "level": "county"
         },
         {
-            "display_name": "Carson City County, NV",
+            "display_name": "Carson City, NV",
             "name": "Carson City",
             "id": "32510",
             "property_id": "32510",
@@ -6482,91 +6482,91 @@
             "level": "county"
         },
         {
-            "display_name": "Buena Vista County, VA",
+            "display_name": "Buena Vista, VA",
             "name": "Buena Vista",
             "id": "51530",
             "property_id": "51530",
             "level": "county"
         },
         {
-            "display_name": "Colonial Heights County, VA",
+            "display_name": "Colonial Heights, VA",
             "name": "Colonial Heights",
             "id": "51570",
             "property_id": "51570",
             "level": "county"
         },
         {
-            "display_name": "Emporia County, VA",
+            "display_name": "Emporia, VA",
             "name": "Emporia",
             "id": "51595",
             "property_id": "51595",
             "level": "county"
         },
         {
-            "display_name": "Falls Church County, VA",
+            "display_name": "Falls Church, VA",
             "name": "Falls Church",
             "id": "51610",
             "property_id": "51610",
             "level": "county"
         },
         {
-            "display_name": "Galax County, VA",
+            "display_name": "Galax, VA",
             "name": "Galax",
             "id": "51640",
             "property_id": "51640",
             "level": "county"
         },
         {
-            "display_name": "Harrisonburg County, VA",
+            "display_name": "Harrisonburg, VA",
             "name": "Harrisonburg",
             "id": "51660",
             "property_id": "51660",
             "level": "county"
         },
         {
-            "display_name": "Manassas County, VA",
+            "display_name": "Manassas, VA",
             "name": "Manassas",
             "id": "51683",
             "property_id": "51683",
             "level": "county"
         },
         {
-            "display_name": "Martinsville County, VA",
+            "display_name": "Martinsville, VA",
             "name": "Martinsville",
             "id": "51690",
             "property_id": "51690",
             "level": "county"
         },
         {
-            "display_name": "Norton County, VA",
+            "display_name": "Norton, VA",
             "name": "Norton",
             "id": "51720",
             "property_id": "51720",
             "level": "county"
         },
         {
-            "display_name": "Portsmouth County, VA",
+            "display_name": "Portsmouth, VA",
             "name": "Portsmouth",
             "id": "51740",
             "property_id": "51740",
             "level": "county"
         },
         {
-            "display_name": "Roanoke County, VA",
+            "display_name": "Roanoke, VA",
             "name": "Roanoke",
             "id": "51770",
             "property_id": "51770",
             "level": "county"
         },
         {
-            "display_name": "Waynesboro County, VA",
+            "display_name": "Waynesboro, VA",
             "name": "Waynesboro",
             "id": "51820",
             "property_id": "51820",
             "level": "county"
         },
         {
-            "display_name": "Williamsburg County, VA",
+            "display_name": "Williamsburg, VA",
             "name": "Williamsburg",
             "id": "51830",
             "property_id": "51830",
@@ -12334,7 +12334,7 @@
             "level": "county"
         },
         {
-            "display_name": "Baltimore County, MD",
+            "display_name": "Baltimore, MD",
             "name": "Baltimore",
             "id": "24005",
             "property_id": "24005",
@@ -15463,7 +15463,7 @@
             "level": "county"
         },
         {
-            "display_name": "St. Louis County, MO",
+            "display_name": "St. Louis, MO",
             "name": "St. Louis",
             "id": "29189",
             "property_id": "29189",
@@ -15554,7 +15554,7 @@
             "level": "county"
         },
         {
-            "display_name": "St. Louis County, MO",
+            "display_name": "St. Louis, MO",
             "name": "St. Louis",
             "id": "29510",
             "property_id": "29510",
@@ -19383,7 +19383,7 @@
             "level": "county"
         },
         {
-            "display_name": "Fairfax County, VA",
+            "display_name": "Fairfax, VA",
             "name": "Fairfax",
             "id": "51059",
             "property_id": "51059",
@@ -19404,7 +19404,7 @@
             "level": "county"
         },
         {
-            "display_name": "Franklin County, VA",
+            "display_name": "Franklin, VA",
             "name": "Franklin",
             "id": "51067",
             "property_id": "51067",
@@ -20076,7 +20076,7 @@
             "level": "county"
         },
         {
-            "display_name": "Roanoke County, VA",
+            "display_name": "Roanoke, VA",
             "name": "Roanoke",
             "id": "51161",
             "property_id": "51161",
@@ -20321,42 +20321,42 @@
             "level": "county"
         },
         {
-            "display_name": "Alexandria County, VA",
+            "display_name": "Alexandria, VA",
             "name": "Alexandria",
             "id": "51510",
             "property_id": "51510",
             "level": "county"
         },
         {
-            "display_name": "Bristol County, VA",
+            "display_name": "Bristol, VA",
             "name": "Bristol",
             "id": "51520",
             "property_id": "51520",
             "level": "county"
         },
         {
-            "display_name": "Charlottesville County, VA",
+            "display_name": "Charlottesville, VA",
             "name": "Charlottesville",
             "id": "51540",
             "property_id": "51540",
             "level": "county"
         },
         {
-            "display_name": "Chesapeake County, VA",
+            "display_name": "Chesapeake, VA",
             "name": "Chesapeake",
             "id": "51550",
             "property_id": "51550",
             "level": "county"
         },
         {
-            "display_name": "Covington County, VA",
+            "display_name": "Covington, VA",
             "name": "Covington",
             "id": "51580",
             "property_id": "51580",
             "level": "county"
         },
         {
-            "display_name": "Danville County, VA",
+            "display_name": "Danville, VA",
             "name": "Danville",
             "id": "51590",
             "property_id": "51590",
@@ -20377,21 +20377,21 @@
             "level": "county"
         },
         {
-            "display_name": "Fredericksburg County, VA",
+            "display_name": "Fredericksburg, VA",
             "name": "Fredericksburg",
             "id": "51630",
             "property_id": "51630",
             "level": "county"
         },
         {
-            "display_name": "Hampton County, VA",
+            "display_name": "Hampton, VA",
             "name": "Hampton",
             "id": "51650",
             "property_id": "51650",
             "level": "county"
         },
         {
-            "display_name": "Hopewell County, VA",
+            "display_name": "Hopewell, VA",
             "name": "Hopewell",
             "id": "51670",
             "property_id": "51670",
@@ -20566,98 +20566,98 @@
             "level": "county"
         },
         {
-            "display_name": "Lexington County, VA",
+            "display_name": "Lexington, VA",
             "name": "Lexington",
             "id": "51678",
             "property_id": "51678",
             "level": "county"
         },
         {
-            "display_name": "Lynchburg County, VA",
+            "display_name": "Lynchburg, VA",
             "name": "Lynchburg",
             "id": "51680",
             "property_id": "51680",
             "level": "county"
         },
         {
-            "display_name": "Manassas Park County, VA",
+            "display_name": "Manassas Park, VA",
             "name": "Manassas Park",
             "id": "51685",
             "property_id": "51685",
             "level": "county"
         },
         {
-            "display_name": "Newport News County, VA",
+            "display_name": "Newport News, VA",
             "name": "Newport News",
             "id": "51700",
             "property_id": "51700",
             "level": "county"
         },
         {
-            "display_name": "Norfolk County, VA",
+            "display_name": "Norfolk, VA",
             "name": "Norfolk",
             "id": "51710",
             "property_id": "51710",
             "level": "county"
         },
         {
-            "display_name": "Petersburg County, VA",
+            "display_name": "Petersburg, VA",
             "name": "Petersburg",
             "id": "51730",
             "property_id": "51730",
             "level": "county"
         },
         {
-            "display_name": "Poquoson County, VA",
+            "display_name": "Poquoson, VA",
             "name": "Poquoson",
             "id": "51735",
             "property_id": "51735",
             "level": "county"
         },
         {
-            "display_name": "Radford County, VA",
+            "display_name": "Radford, VA",
             "name": "Radford",
             "id": "51750",
             "property_id": "51750",
             "level": "county"
         },
         {
-            "display_name": "Richmond County, VA",
+            "display_name": "Richmond, VA",
             "name": "Richmond",
             "id": "51760",
             "property_id": "51760",
             "level": "county"
         },
         {
-            "display_name": "Salem County, VA",
+            "display_name": "Salem, VA",
             "name": "Salem",
             "id": "51775",
             "property_id": "51775",
             "level": "county"
         },
         {
-            "display_name": "Staunton County, VA",
+            "display_name": "Staunton, VA",
             "name": "Staunton",
             "id": "51790",
             "property_id": "51790",
             "level": "county"
         },
         {
-            "display_name": "Suffolk County, VA",
+            "display_name": "Suffolk, VA",
             "name": "Suffolk",
             "id": "51800",
             "property_id": "51800",
             "level": "county"
         },
         {
-            "display_name": "Virginia Beach County, VA",
+            "display_name": "Virginia Beach, VA",
             "name": "Virginia Beach",
             "id": "51810",
             "property_id": "51810",
             "level": "county"
         },
         {
-            "display_name": "Winchester County, VA",
+            "display_name": "Winchester, VA",
             "name": "Winchester",
             "id": "51840",
             "property_id": "51840",
