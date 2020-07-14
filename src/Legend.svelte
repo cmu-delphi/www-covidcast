@@ -11,7 +11,6 @@
   } from './stores.js';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
-  import { getNiceNumber } from './util.js';
 
   let high = '';
   let low = '';
@@ -26,6 +25,10 @@
 
   function update(sens, stats, level, encoding) {
     updateLowHigh(sens, stats, level, encoding);
+
+    if (encoding === 'color') {
+      return;
+    }
   }
 
   function updateLowHigh(sens, stats, level) {
@@ -401,58 +404,68 @@
       </div>
     </div>
   </div>
-
-  {#if $signalType === 'direction'}
-    <div class="trend-legend-grouping">
-      <ul class="legend-labels">
-        <li>
-          <span style="background-color: {DIRECTION_THEME.increasing}" />
-          {@html DIRECTION_THEME.increasingIcon}
-          Increasing
-        </li>
-        <li>
-          <span style="background-color: {DIRECTION_THEME.steady}" />
-          {@html DIRECTION_THEME.steadyIcon}
-          Steady
-        </li>
-        <li>
-          <span style="background-color: {DIRECTION_THEME.decreasing}" />
-          {@html DIRECTION_THEME.decreasingIcon}
-          Decreasing
-        </li>
-      </ul>
-    </div>
-  {:else if $currentSensor.match(/num/)}
-    <div class="legend-grouping">
-      <ul class="legend-labels">
-        {#each logColorArr as { label, from_color, to_color }, j}
-          <li class="colored">
-            <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
-            {getSigfigs(label, 3)}
+  {#if $encoding === 'color'}
+    {#if $signalType === 'direction'}
+      <div class="trend-legend-grouping">
+        <ul class="legend-labels">
+          <li>
+            <span style="background-color: {DIRECTION_THEME.increasing}" />
+            {@html DIRECTION_THEME.increasingIcon}
+            Increasing
           </li>
-        {/each}
-        <li class="ends">
-          <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
-          {high ? high + '+' : ''}
-        </li>
-      </ul>
-
-    </div>
-  {:else}
-    <div class="legend-grouping">
-      <ul class="legend-labels">
-        {#each linColorArr as { label, from_color, to_color }, j}
-          <li class="colored">
-            <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
-            {getSigfigs(label, 3)}
+          <li>
+            <span style="background-color: {DIRECTION_THEME.steady}" />
+            {@html DIRECTION_THEME.steadyIcon}
+            Steady
           </li>
-        {/each}
-        <li class="ends">
-          <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
-          {high ? high + '+' : ''}
-        </li>
-      </ul>
+          <li>
+            <span style="background-color: {DIRECTION_THEME.decreasing}" />
+            {@html DIRECTION_THEME.decreasingIcon}
+            Decreasing
+          </li>
+        </ul>
+      </div>
+    {:else if $currentSensor.match(/num/)}
+      <div class="legend-grouping">
+        <ul class="legend-labels">
+          {#each logColorArr as { label, from_color, to_color }, j}
+            <li class="colored">
+              <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
+              {getSigfigs(label, 3)}
+            </li>
+          {/each}
+          <li class="ends">
+            <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
+            {high ? high + '+' : ''}
+          </li>
+        </ul>
 
+      </div>
+    {:else}
+      <div class="legend-grouping">
+        <ul class="legend-labels">
+          {#each linColorArr as { label, from_color, to_color }, j}
+            <li class="colored">
+              <span class="colored" style="background: linear-gradient(to right, {from_color}, {to_color})" />
+              {getSigfigs(label, 3)}
+            </li>
+          {/each}
+          <li class="ends">
+            <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
+            {high ? high + '+' : ''}
+          </li>
+        </ul>
+
+      </div>
+    {/if}
+  {:else if $encoding === 'bubble'}
+    <div id="bubble-legend">
+      {#each bubbleLegend as [r, value]}
+        <div class="bubble-legend-item">
+          <div style="width: {r * 2}px; height: {r * 2}px;" class="bubble" />
+          <span>{value.toLocaleString('en')}</span>
+        </div>
+      {/each}
     </div>
   {/if}
 </div>
