@@ -1,17 +1,123 @@
-import { writable, readable, derived, get } from 'svelte/store';
-import { injectIDs, logScale } from './util.js';
+import {
+  writable,
+  readable,
+  derived,
+  get
+} from 'svelte/store';
+import {
+  injectIDs,
+  logScale
+} from './util.js';
 import * as d3 from 'd3';
 import moment from 'moment';
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 
+export const dict = {
+  '10': 'DE',
+  '11': 'DC',
+  '12': 'FL',
+  '13': 'GA',
+  '15': 'HI',
+  '16': 'ID',
+  '17': 'IL',
+  '18': 'IN',
+  '19': 'IA',
+  '20': 'KS',
+  '21': 'KY',
+  '22': 'LA',
+  '23': 'ME',
+  '24': 'MD',
+  '25': 'MA',
+  '26': 'MI',
+  '27': 'MN',
+  '28': 'MS',
+  '29': 'MO',
+  '30': 'MT',
+  '31': 'NE',
+  '32': 'NV',
+  '33': 'NH',
+  '34': 'NJ',
+  '35': 'NM',
+  '36': 'NY',
+  '37': 'NC',
+  '38': 'ND',
+  '39': 'OH',
+  '40': 'OK',
+  '41': 'OR',
+  '42': 'PA',
+  '44': 'RI',
+  '45': 'SC',
+  '46': 'SD',
+  '47': 'TN',
+  '48': 'TX',
+  '49': 'UT',
+  '50': 'VT',
+  '51': 'VA',
+  '53': 'WA',
+  '54': 'WV',
+  '55': 'WI',
+  '56': 'WY',
+  '72': 'PR',
+  '01': 'AL',
+  '02': 'AK',
+  '04': 'AZ',
+  '05': 'AR',
+  '06': 'CA',
+  '08': 'CO',
+  '09': 'CT',
+};
+
+export const special_counties = [
+  'Baltimore',
+  'St. Louis',
+  'Carson City',
+  'Alexandria',
+  'Bristol',
+  'Buena Vista',
+  'Charlottesville',
+  'Chesapeake',
+  'Colonila Heights',
+  'Covington',
+  'Danville',
+  'Emporia',
+  'Fairfax',
+  'Falls Church',
+  'Franklin',
+  'Fredericksburg',
+  'Galax',
+  'Hampton',
+  'Harrisonburg',
+  'Hopewell',
+  'Lexington',
+  'Lynchburg',
+  'Manassas',
+  'Martinsville',
+  'Newport News',
+  'Norfolk',
+  'Norton',
+  'Petersburg',
+  'Poquoson',
+  'Portsmouth',
+  'Radford',
+  'Richmond',
+  'Roanoke',
+  'Salem',
+  'Staunton',
+  'Suffolk',
+  'Virginia Beach',
+  'Waynesboro',
+  'Williamsburg',
+  'Winchester',
+];
+
+
 // Set of options for which signals to display.
 // Checks the ?sensors= URI parameter for a custom view,
 // otherwise uses the default.
 export const sensors = readable(
-  [
-    {
+  [{
       name: 'Doctor Visits',
       id: 'doctor-visits',
       tooltipText: 'Percentage of daily doctor visits that are due to COVID-like symptoms',
@@ -50,12 +156,9 @@ export const sensors = readable(
     {
       name: 'Symptoms in Community (FB)',
       id: 'fb-survey',
-      tooltipText:
-        'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
-      mapTitleText:
-        'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
-      chartTitleText:
-        'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
+      tooltipText: 'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
+      mapTitleText: 'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
+      chartTitleText: 'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
       yAxis: 'Percentage',
       format: 'percent',
       signal: 'smoothed_hh_cmnty_cli',
@@ -113,8 +216,7 @@ export const sensors = readable(
     {
       name: 'Cases',
       id: 'indicator-combination',
-      tooltipText:
-        'Daily new confirmed COVID-19 cases (7-day average), based on data reported by USAFacts and Johns Hopkins University',
+      tooltipText: 'Daily new confirmed COVID-19 cases (7-day average), based on data reported by USAFacts and Johns Hopkins University',
       mapTitleText: 'Daily new confirmed COVID-19 cases (7-day average)',
       chartTitleText: 'Daily new confirmed COVID-19 cases (7-day average)',
       yAxis: 'Cases',
@@ -126,8 +228,7 @@ export const sensors = readable(
     {
       name: 'Cases per 100,000 People',
       id: 'indicator-combination',
-      tooltipText:
-        'Daily new confirmed COVID-19 cases per 100,000 people (7-day average), based on data reported by USAFacts and Johns Hopkins University',
+      tooltipText: 'Daily new confirmed COVID-19 cases per 100,000 people (7-day average), based on data reported by USAFacts and Johns Hopkins University',
       mapTitleText: 'Daily new confirmed COVID-19 cases per 100,000 people (7-day average)',
       chartTitleText: 'Daily new confirmed COVID-19 cases per 100,000 people (7-day average)',
       yAxis: 'Cases per 100,000 people',
@@ -139,8 +240,7 @@ export const sensors = readable(
     {
       name: 'Deaths',
       id: 'indicator-combination',
-      tooltipText:
-        'Daily new COVID-19 deaths (7-day average), based on data reported by USAFacts and Johns Hopkins University',
+      tooltipText: 'Daily new COVID-19 deaths (7-day average), based on data reported by USAFacts and Johns Hopkins University',
       mapTitleText: 'Daily new COVID-19 deaths (7-day average)',
       chartTitleText: 'Daily new COVID-19 deaths (7-day average)',
       yAxis: 'Deaths',
@@ -152,8 +252,7 @@ export const sensors = readable(
     {
       name: 'Deaths per 100,000 People',
       id: 'indicator-combination',
-      tooltipText:
-        'Daily new COVID-19 deaths per 100,000 people (7-day average), based on data reported by USAFacts and Johns Hopkins University',
+      tooltipText: 'Daily new COVID-19 deaths per 100,000 people (7-day average), based on data reported by USAFacts and Johns Hopkins University',
       mapTitleText: 'Daily new COVID-19 deaths per 100,000 people (7-day average)',
       chartTitleText: 'Daily new COVID-19 deaths per 100,000 people (7-day average)',
       yAxis: 'Deaths per 100,000 people',
