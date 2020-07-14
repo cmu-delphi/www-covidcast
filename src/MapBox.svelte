@@ -660,9 +660,10 @@
 
     if ($encoding == 'color') {
       // hide all bubble layers
-      Object.keys($levels).forEach(
-        name => map.getLayer(center(name)) && map.setLayoutProperty(center(name), 'visibility', 'none'),
-      );
+      Object.keys($levels).forEach(name => {
+        map.setLayoutProperty(center(name), 'visibility', 'none');
+        map.setLayoutProperty(centerHighlight(name), 'visibility', 'none');
+      });
 
       Object.keys($levels).forEach(name => {
         if (name === $currentLevel) {
