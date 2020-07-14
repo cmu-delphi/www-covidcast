@@ -1,5 +1,12 @@
-import { writable, readable, derived, get } from 'svelte/store';
-import { injectIDs } from './util.js';
+import {
+  writable,
+  readable,
+  derived,
+  get
+} from 'svelte/store';
+import {
+  injectIDs
+} from './util.js';
 import * as d3 from 'd3';
 import moment from 'moment';
 
@@ -10,8 +17,7 @@ const urlParams = new URLSearchParams(queryString);
 // Checks the ?sensors= URI parameter for a custom view,
 // otherwise uses the default.
 export const sensors = readable(
-  [
-    {
+  [{
       name: 'Doctor Visits',
       id: 'doctor-visits',
       tooltipText: 'Percentage of daily doctor visits that are due to COVID-like symptoms',
@@ -50,12 +56,9 @@ export const sensors = readable(
     {
       name: 'Symptoms in Community (FB)',
       id: 'fb-survey',
-      tooltipText:
-        'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
-      mapTitleText:
-        'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
-      chartTitleText:
-        'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
+      tooltipText: 'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
+      mapTitleText: 'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
+      chartTitleText: 'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
       yAxis: 'Percentage',
       format: 'percent',
       signal: 'smoothed_hh_cmnty_cli',
@@ -113,8 +116,7 @@ export const sensors = readable(
     {
       name: 'Cases',
       id: 'indicator-combination',
-      tooltipText:
-        'Daily new confirmed COVID-19 cases (7-day average), based on data reported by USAFacts and Johns Hopkins University',
+      tooltipText: 'Daily new confirmed COVID-19 cases (7-day average), based on data reported by USAFacts and Johns Hopkins University',
       mapTitleText: 'Daily new confirmed COVID-19 cases (7-day average)',
       chartTitleText: 'Daily new confirmed COVID-19 cases (7-day average)',
       yAxis: 'Cases',
@@ -126,8 +128,7 @@ export const sensors = readable(
     {
       name: 'Cases per 100,000 People',
       id: 'indicator-combination',
-      tooltipText:
-        'Daily new confirmed COVID-19 cases per 100,000 people (7-day average), based on data reported by USAFacts and Johns Hopkins University',
+      tooltipText: 'Daily new confirmed COVID-19 cases per 100,000 people (7-day average), based on data reported by USAFacts and Johns Hopkins University',
       mapTitleText: 'Daily new confirmed COVID-19 cases per 100,000 people (7-day average)',
       chartTitleText: 'Daily new confirmed COVID-19 cases per 100,000 people (7-day average)',
       yAxis: 'Cases per 100,000 people',
@@ -139,8 +140,7 @@ export const sensors = readable(
     {
       name: 'Deaths',
       id: 'indicator-combination',
-      tooltipText:
-        'Daily new COVID-19 deaths (7-day average), based on data reported by USAFacts and Johns Hopkins University',
+      tooltipText: 'Daily new COVID-19 deaths (7-day average), based on data reported by USAFacts and Johns Hopkins University',
       mapTitleText: 'Daily new COVID-19 deaths (7-day average)',
       chartTitleText: 'Daily new COVID-19 deaths (7-day average)',
       yAxis: 'Deaths',
@@ -152,8 +152,7 @@ export const sensors = readable(
     {
       name: 'Deaths per 100,000 People',
       id: 'indicator-combination',
-      tooltipText:
-        'Daily new COVID-19 deaths per 100,000 people (7-day average), based on data reported by USAFacts and Johns Hopkins University',
+      tooltipText: 'Daily new COVID-19 deaths per 100,000 people (7-day average), based on data reported by USAFacts and Johns Hopkins University',
       mapTitleText: 'Daily new COVID-19 deaths per 100,000 people (7-day average)',
       chartTitleText: 'Daily new COVID-19 deaths per 100,000 people (7-day average)',
       yAxis: 'Deaths per 100,000 people',

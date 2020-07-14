@@ -1309,7 +1309,7 @@
     position: absolute;
     top: 12px;
     left: 10px;
-    max-width: 500px;
+    max-width: 650px;
     z-index: 1001;
     padding: 8px 8px;
     box-sizing: border-box;
@@ -1325,7 +1325,7 @@
 
   .search-container {
     position: absolute;
-    width: 450px;
+    width: 400px;
     right: 75px;
     top: 12px;
     z-index: 1001;
