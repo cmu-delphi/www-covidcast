@@ -11,6 +11,7 @@
     currentDataReadyOnMap,
     encoding,
     currentDate,
+    times,
   } from './stores.js';
   import Calendar from 'svelte-calendar';
   import * as d3 from 'd3';
@@ -23,7 +24,12 @@
 
   $: sensor = $currentSensor;
   $: level = $currentLevel;
-  let selectedDate = writable(parseTime($currentDate));
+  // let selectedDate = writable(parseTime($currentDate));
+  $: selectedDate = parseTime($currentDate);
+  if ($currentDate !== 20100420) {
+    selectedDate = parseTime($currentDate);
+  }
+  $: start_end_dates = [];
 
   currentSensor.subscribe(s => {
     if ($sensorMap.get($currentSensor).levels.includes(level) === false) {
@@ -34,23 +40,13 @@
     }
   });
 
-  onMount(() => {
-    selectedDate.subscribe(d => {
-      console.log(d);
-      console.log('test');
-      if (d === 20100420) return;
-      currentDate.set(convertDate(d));
-    });
-  });
+  $: if (selectedDate !== undefined) {
+    currentDate.set(convertDate(selectedDate));
+  }
+  $: if ($times !== null) {
+    start_end_dates = $times.get($currentSensor);
+  }
 
-  /*
-  currentDate.subscribe(d => {
-    console.log(d);
-    if (d !== 20100420) {
-      selectedDate.set(parseTime(d));
-    }
-  });
-*/
   export let isIE;
 
   function make_plural(level) {
@@ -194,10 +190,10 @@
 
     <label style="font-size: 15px;" class="option-title">on</label>
 
-    {#if selectedDate !== undefined}
-      <Calendar bind:selected={$selectedDate}>
-        <button class="calendar">
-          {#if $selectedDate}{formatTime($selectedDate)}{:else}Select Date{/if}
+    {#if selectedDate !== undefined && start_end_dates.length !== 0}
+      <Calendar bind:selected={selectedDate} start={parseTime(start_end_dates[0])} end={parseTime(start_end_dates[1])}>
+        <button class="calendar" on:>
+          {#if selectedDate}{formatTime(selectedDate)}{:else}Select Date{/if}
         </button>
       </Calendar>
     {/if}
