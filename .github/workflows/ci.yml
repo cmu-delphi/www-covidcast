@@ -19,7 +19,7 @@ jobs:
             ${{ runner.OS }}-node-
             ${{ runner.OS }}-
       - run: npm ci
-      - run: npm lint
+      - run: npm run lint
       - run: npm run build
       # - name: Deploy
       #   if: github.ref == 'refs/heads/master' && github.event_name == 'push'
