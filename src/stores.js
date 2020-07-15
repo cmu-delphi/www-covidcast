@@ -1,7 +1,6 @@
 import { writable, readable, derived, get } from 'svelte/store';
 import { injectIDs, logScale } from './util.js';
 import * as d3 from 'd3';
-import moment from 'moment';
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
@@ -383,5 +382,8 @@ export const timeRangeOnSlider = writable({
   min: 0,
   max: 0,
 });
-export const yesterday = +moment(new Date(new Date().getTime() - 86400 * 1000)).format('YYYYMMDD');
+
+export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
+export const yesterday = Number.parseInt(d3.timeFormat('%Y%0m%0d')(yesterdayDate), 10);
+
 export const radiusScale = writable(logScale());
