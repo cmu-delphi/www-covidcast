@@ -20,6 +20,10 @@ To deploy an update run
 
 `npm run deploy`
 
+To lint or check for styling, run
+
+`npm run lint`
+
 To release, run
 
 `npm run release`
