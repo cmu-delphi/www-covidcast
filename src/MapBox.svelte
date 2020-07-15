@@ -1,6 +1,6 @@
 <script>
   //import mapboxgl from 'mapbox-gl';
-  import { onMount, setContext } from 'svelte';
+  import { onMount } from 'svelte';
   import mapboxgl from 'mapbox-gl';
   import { defaultRegionOnStartup, getTextColorBasedOnBackground, logScale } from './util.js';
   import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME } from './theme.js';
@@ -10,7 +10,6 @@
   import Legend from './Legend.svelte';
   import Banner from './Banner.svelte';
   import Time from './Time.svelte';
-  import Graph from './Graph/Graph.svelte';
   import GraphContainer from './Graph/GraphContainer.svelte';
 
   import {
@@ -52,17 +51,6 @@
   let SWPA_LON = 12.6;
   let SWPA_ZOOM = 7.7;
 
-  let R = 6378137.0;
-  const projection = d3.geoAlbersUsa().translate([0, 0]).scale(R);
-  const projectionMercartor = d3.geoMercator().translate([0, 0]).scale(R);
-  const cityPoints = [
-    'city-point-unclustered-pit',
-    'city-point-unclustered',
-    'city-point-unclustered-2',
-    'city-point-unclustered-3',
-    'city-point-unclustered-4',
-  ];
-
   // Boolean tracking if the map has been initialized.
   let mapMounted = false;
   let chosenRandom = false;
@@ -89,7 +77,7 @@
     return `${level}-centers-highlight`;
   }
 
-  onMount((_) => {
+  onMount(() => {
     let containerWidth = container.clientWidth;
     if (containerWidth <= 1021) {
       //ZOOM = 3.9;
@@ -212,12 +200,12 @@
             <u>${sens.yAxis}</u>: <br>
             &emsp; ${date}: ${count} <br>
             &emsp; 7-day avg:
-            <span class="map-popup-region-value" 
-                  style="background-color: ${fillColor}; 
+            <span class="map-popup-region-value"
+                  style="background-color: ${fillColor};
                         color: ${getTextColorBasedOnBackground(fillColor)};">
               ${parseFloat(avg.toFixed(2)).toLocaleString()}
             </span>
-            
+
           </div>
         `;
       } else if ($currentSensor.match(/incidence_prop/)) {
@@ -229,8 +217,8 @@
             <u>${sens.yAxis}</u>: <br>
             &emsp; ${date}: ${count.toFixed(2)} <br>
             &emsp; 7-day avg:
-            <span class="map-popup-region-value" 
-                  style="background-color: ${fillColor}; 
+            <span class="map-popup-region-value"
+                  style="background-color: ${fillColor};
                         color: ${getTextColorBasedOnBackground(fillColor)};">
               ${parseFloat(avg.toFixed(2)).toLocaleString()}
               ${sens.format === 'percent' ? '%' : ''}
@@ -241,8 +229,8 @@
         body = `
           <div class="map-popup-region-value-container">
             ${sens.yAxis}:
-            <span class="map-popup-region-value" 
-                  style="background-color: ${fillColor}; 
+            <span class="map-popup-region-value"
+                  style="background-color: ${fillColor};
                         color: ${getTextColorBasedOnBackground(fillColor)};">
               ${parseFloat(value.toFixed(2)).toLocaleString()}
               ${sens.format === 'percent' ? '%' : ''}
@@ -267,11 +255,11 @@
       }
 
       body = `<div class="map-popup-region-value-container">
-                <span class="map-popup-region-value" 
+                <span class="map-popup-region-value"
                       style="background-color: ${color};
-                      color: 
+                      color:
                       ${getTextColorBasedOnBackground(color)};">
-                  ${icon} ${text} 
+                  ${icon} ${text}
                 </span>
                </div>`;
     }
@@ -284,7 +272,7 @@
     popup.setLngLat(e.lngLat).setHTML(body).addTo(map);
   };
 
-  const onMouseLeave = (level) => (e) => {
+  const onMouseLeave = (level) => () => {
     if (level === 'state-outline') {
       popup.remove();
       return;
@@ -347,15 +335,15 @@
   }
 
   // Update the map when sensor or level changes.
-  currentData.subscribe((_) => updateMap('data'));
-  currentLevel.subscribe((s) => {
+  currentData.subscribe(() => updateMap('data'));
+  currentLevel.subscribe(() => {
     label_states();
     updateMap('data');
   });
-  signalType.subscribe((_) => updateMap('signal'));
-  encoding.subscribe((_) => updateMap('encoding'));
-  mounted.subscribe((_) => updateMap('mounted'));
-  currentDate.subscribe((_) => {
+  signalType.subscribe(() => updateMap('signal'));
+  encoding.subscribe(() => updateMap('encoding'));
+  mounted.subscribe(() => updateMap('mounted'));
+  currentDate.subscribe(() => {
     if (
       $currentData.length > 0 &&
       ($currentData[0].sensor !== $currentSensor || $currentData[0].level !== $currentLevel)
@@ -768,12 +756,12 @@
       map.on('click', level, onClick(level));
     });
 
-    map.on('idle', (ev) => {
+    map.on('idle', () => {
       currentDataReadyOnMap.set(true);
       mapFirstLoaded.set(true);
     });
 
-    map.on('error', (ev) => {
+    map.on('error', () => {
       mapFirstLoaded.set(true);
     });
 
@@ -828,7 +816,6 @@
       });
 
       Object.keys($levels).forEach((name) => {
-        const data = $geojsons.get(name);
         map.addSource(name, {
           type: 'geojson',
           data: $geojsons.get(name),
@@ -1345,7 +1332,7 @@
 
 <div bind:this={container} class="map-container">
   <div class="options-container">
-    <Options {isIE} />
+    <Options />
   </div>
 
   {#if loaded && regionList.length != 0}
@@ -1363,7 +1350,7 @@
           bind:selectedItem={selectedRegion}
           labelFieldName="display_name"
           maxItemsToShowInList="5"
-          onChange={(_) => {
+          onChange={() => {
             if (typeof selectedRegion !== 'undefined') {
               searchElement(selectedRegion);
             }
@@ -1386,7 +1373,7 @@
       data-state="us48"
       id="bounds-button"
       class="pg-button bounds-button"
-      on:click={(_) => {
+      on:click={() => {
         map.easeTo({ center: [LON, LAT], zoom: ZOOM, bearing: 0, pitch: 0 });
       }}>
       <img src="./assets/imgs/us48.png" alt="" />
@@ -1398,7 +1385,7 @@
       <button
         aria-label="show swpa boundary"
         class="pg-button bounds-button"
-        on:click={(_) => {
+        on:click={() => {
           map.easeTo({ center: [SWPA_LON, SWPA_LAT], zoom: SWPA_ZOOM, bearing: 0, pitch: 0 });
           showZoneBoundary('swpa');
         }}>

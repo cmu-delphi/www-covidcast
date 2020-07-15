@@ -6,8 +6,8 @@ Polyfills for IE compatability
 -https://github.com/github/fetch
 -https://www.npmjs.com/package/polyfill-array-includes
 */
-require('es6-shim');
-require('url-search-params-polyfill');
+import 'es6-shim';
+import 'url-search-params-polyfill';
 import 'whatwg-fetch';
 import 'polyfill-array-includes';
 

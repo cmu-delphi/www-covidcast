@@ -1,6 +1,5 @@
 <script>
   import { fade } from 'svelte/transition';
-  import { writable } from 'svelte/store';
 
   $: tick = 0;
   let timer;

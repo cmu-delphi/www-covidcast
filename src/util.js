@@ -1,6 +1,5 @@
 import colorParse from 'color-parse';
 import invertColor from 'invert-color';
-import { scaleLinear } from 'd3';
 
 export const calculateValFromRectified = (rectified) => {
   let tempDate = new Date(rectified);

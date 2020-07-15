@@ -5,14 +5,9 @@
     currentRegionName,
     currentSensor,
     currentLevel,
-    currentData,
     regionData,
-    currentSensorName,
-    currentLevelName,
     currentDate,
-    times,
     stats,
-    sensors,
     sensorMap,
     signalType,
     timeRangeOnSlider,
@@ -21,7 +16,6 @@
     dict,
     special_counties,
   } from '../stores.js';
-  import { calculateValFromRectified } from '../util.js';
   import { DIRECTION_THEME } from '../theme.js';
   import * as d3 from 'd3';
   import d3Tip from 'd3-tip';
@@ -30,9 +24,8 @@
 
   let el;
   let w;
-  let t;
 
-  onMount((_) => {
+  onMount(() => {
     d3.select(el).selectAll('*').remove();
 
     if (w > 400) w = 400;
@@ -102,7 +95,6 @@
     // peg values to max and min if out of range
     let minMax = calculateSD(sensor);
     let chartMax = minMax[1];
-    let chartMin = minMax[0];
 
     let latest_direction = -100;
     let hit_latest_node = false;
@@ -153,7 +145,7 @@
       }
       //formatYTicks = y.domain[1] - y.domain[0] > 10 ? d3.format('.0f') : d3.format('.1f');
     }
-    let formatXTicks = data.length < 6 ? d3.timeDay.every(1) : d3.timeDay.every(4);
+    // let formatXTicks = data.length < 6 ? d3.timeDay.every(1) : d3.timeDay.every(4);
 
     // append the axes
     svg
@@ -274,20 +266,20 @@
     return minMax;
   }
 
-  function get_display_name() {
-    let title = '';
-    if ($currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' === '000') {
-      title += 'Rest of';
-    }
-    title += $currentRegionName;
-    if ($currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' !== '000') {
-      if (!special_counties.includes($currentRegionName)) {
-        title += 'County, ';
-      }
-      title += dict[$currentRegion.slice(0, 2)];
-    }
-    return title;
-  }
+  // function get_display_name() {
+  //   let title = '';
+  //   if ($currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' === '000') {
+  //     title += 'Rest of';
+  //   }
+  //   title += $currentRegionName;
+  //   if ($currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' !== '000') {
+  //     if (!special_counties.includes($currentRegionName)) {
+  //       title += 'County, ';
+  //     }
+  //     title += dict[$currentRegion.slice(0, 2)];
+  //   }
+  //   return title;
+  // }
 </script>
 
 <style>

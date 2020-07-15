@@ -1,8 +1,8 @@
 {
-    "recommendations": [
-      "dbaeumer.vscode-eslint",
-      "esbenp.prettier-vscode",
-      "jamesbirtles.svelte-vscode",
-      "ardenivanov.svelte-intellisense"
-    ]
-  }
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "jamesbirtles.svelte-vscode",
+    "ardenivanov.svelte-intellisense"
+  ]
+}
