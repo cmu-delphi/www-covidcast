@@ -19,7 +19,6 @@
     currentData,
     regionData,
     mounted,
-    mapFirstLoaded,
     yesterday,
     customDataView,
   } from './stores.js';
@@ -32,7 +31,6 @@
 
   let error = null;
   let graphShowStatus = false;
-  let changingSensor = false;
   let levelChangedWhenSensorChanged = false;
   let dateChangedWhenSensorChanged = false;
   let firstLoaded = true;
@@ -242,7 +240,7 @@
     }
   });
 
-  onMount((_) => {
+  onMount(() => {
     fetch(ENDPOINT_META)
       .then((d) => d.json())
       .then((meta) => {

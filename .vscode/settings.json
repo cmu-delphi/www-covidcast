@@ -23,8 +23,5 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "eslint.enable": true,
-  "eslint.validate": [
-    "javascript",
-    "svelte"
-  ]
+  "eslint.validate": ["javascript", "svelte"]
 }

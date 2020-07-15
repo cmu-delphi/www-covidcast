@@ -1,13 +1,9 @@
 <script>
-  import { writable } from 'svelte/store';
-  import { onMount } from 'svelte';
-
   import {
     sensorMap,
     currentSensor,
     levels,
     currentLevel,
-    signalType,
     currentDataReadyOnMap,
     encoding,
     currentDate,
@@ -16,8 +12,6 @@
   import Calendar from 'svelte-calendar';
   import * as d3 from 'd3';
 
-  let hide = false;
-  let shouldDisplayBanner = true;
   let formatTime = d3.timeFormat('%B %-d, %Y');
   let convertDate = d3.timeFormat('%Y%m%d');
   let parseTime = d3.timeParse('%Y%m%d');
@@ -31,7 +25,7 @@
   }
   $: start_end_dates = [];
 
-  currentSensor.subscribe((s) => {
+  currentSensor.subscribe(() => {
     if ($sensorMap.get($currentSensor).levels.includes(level) === false) {
       level = $levels['msa'];
     }
@@ -46,8 +40,6 @@
   $: if ($times !== null) {
     start_end_dates = $times.get($currentSensor);
   }
-
-  export let isIE;
 
   function make_plural(level) {
     if (level === 'State') {
@@ -157,7 +149,6 @@
       on:change={() => {
         currentDataReadyOnMap.set(false);
         currentSensor.set(sensor);
-        shouldDisplayBanner = true;
       }}>
       <optgroup label="Indicators">
         {#each Array.from($sensorMap.keys()).filter((d) => !$sensorMap.get(d).official) as sensor}
