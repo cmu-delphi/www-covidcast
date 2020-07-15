@@ -1,0 +1,11 @@
+/node_modules
+/public/build/
+/package-lock.json
+.gitignore
+.prettierignore
+/old_maps
+*.ico
+*.png
+*.svg
+*.csv
+/public/maps

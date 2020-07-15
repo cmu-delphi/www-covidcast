@@ -20,11 +20,11 @@
   $: logColorArr = [{ label: '0', from_color: DIRECTION_THEME.countMin, to_color: DIRECTION_THEME.countMin }];
   $: linColorArr = [];
 
-  currentSensor.subscribe(s => ($stats ? update(s, $stats, $currentLevel, $encoding) : ''));
-  stats.subscribe(s => (s ? update($currentSensor, s, $currentLevel, $encoding) : ''));
-  currentLevel.subscribe(l => ($stats ? update($currentSensor, $stats, l, $encoding) : ''));
-  encoding.subscribe(e => ($stats ? update($currentSensor, $stats, $currentLevel, e) : ''));
-  radiusScale.subscribe(e => ($stats ? update($currentSensor, $stats, $currentLevel, $encoding) : ''));
+  currentSensor.subscribe((s) => ($stats ? update(s, $stats, $currentLevel, $encoding) : ''));
+  stats.subscribe((s) => (s ? update($currentSensor, s, $currentLevel, $encoding) : ''));
+  currentLevel.subscribe((l) => ($stats ? update($currentSensor, $stats, l, $encoding) : ''));
+  encoding.subscribe((e) => ($stats ? update($currentSensor, $stats, $currentLevel, e) : ''));
+  radiusScale.subscribe((e) => ($stats ? update($currentSensor, $stats, $currentLevel, $encoding) : ''));
 
   function update(sens, stats, level, encoding) {
     updateLowHigh(sens, stats, level, encoding);
