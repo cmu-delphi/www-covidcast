@@ -31,7 +31,7 @@
   }
   $: start_end_dates = [];
 
-  currentSensor.subscribe(s => {
+  currentSensor.subscribe((s) => {
     if ($sensorMap.get($currentSensor).levels.includes(level) === false) {
       level = $levels['msa'];
     }
@@ -160,12 +160,12 @@
         shouldDisplayBanner = true;
       }}>
       <optgroup label="Indicators">
-        {#each Array.from($sensorMap.keys()).filter(d => !$sensorMap.get(d).official) as sensor}
+        {#each Array.from($sensorMap.keys()).filter((d) => !$sensorMap.get(d).official) as sensor}
           <option title={$sensorMap.get(sensor).tooltipText} value={sensor}>{$sensorMap.get(sensor).name}</option>
         {/each}
       </optgroup>
       <optgroup label="Official Reports">
-        {#each Array.from($sensorMap.keys()).filter(d => $sensorMap.get(d).official) as sensor}
+        {#each Array.from($sensorMap.keys()).filter((d) => $sensorMap.get(d).official) as sensor}
           <option title={$sensorMap.get(sensor).tooltipText} value={sensor}>{$sensorMap.get(sensor).name}</option>
         {/each}
       </optgroup>

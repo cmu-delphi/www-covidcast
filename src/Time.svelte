@@ -46,7 +46,7 @@
   let weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   onMount(() => {
-    currentDate.subscribe(d => {
+    currentDate.subscribe((d) => {
       if (d === 20100420) return;
       val = d;
       rectifiedVal = parseTime(val).getTime();
@@ -61,9 +61,9 @@
     });
   });
 
-  times.subscribe(t => (t ? update($currentSensor, t) : ''));
-  currentSensor.subscribe(s => ($times ? update(s, $times, true) : ''));
-  currentDate.subscribe(t => ($times ? update($currentSensor, $times) : ''));
+  times.subscribe((t) => (t ? update($currentSensor, t) : ''));
+  currentSensor.subscribe((s) => ($times ? update(s, $times, true) : ''));
+  currentDate.subscribe((t) => ($times ? update($currentSensor, $times) : ''));
 
   function update(s, t, newSensor = false) {
     max = t.get(s)[1];
@@ -183,7 +183,7 @@
   function sliderOnChange() {
     window.performance.mark('start sliderOnChange');
     // only update currentDataReadyOnMap when the date actually changed
-    currentDate.update(d => {
+    currentDate.update((d) => {
       let newDate = calculateValFromRectified(rectifiedVal);
       if (d !== newDate) {
         currentDataReadyOnMap.set(false);
@@ -203,15 +203,15 @@
     updateSliderUI();
   }
 
-  currentSensor.subscribe(_ => cancelPlay());
-  currentLevel.subscribe(_ => cancelPlay());
-  signalType.subscribe(_ => cancelPlay());
+  currentSensor.subscribe((_) => cancelPlay());
+  currentLevel.subscribe((_) => cancelPlay());
+  signalType.subscribe((_) => cancelPlay());
 
   function playTime() {
     if (!playInterval) {
       let maxDateOnSlider = +timeSlider.getAttribute('max');
       if (rectifiedVal >= maxDateOnSlider) return;
-      playInterval = setInterval(_ => {
+      playInterval = setInterval((_) => {
         if (rectifiedVal < maxDateOnSlider) {
           rectifiedVal += 86400 * 1000;
           sliderOnChange();
@@ -507,7 +507,7 @@
   <button
     aria-pressed={playInterval ? 'true' : 'false'}
     class="play-button-container-button"
-    on:click={_ => playTime()}>
+    on:click={(_) => playTime()}>
     <svg
       xmlns="http://www.w3.org/2000/svg"
       class="play-button"
