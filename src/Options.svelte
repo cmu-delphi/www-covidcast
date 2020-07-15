@@ -1,4 +1,7 @@
 <script>
+  import { writable } from 'svelte/store';
+  import { onMount } from 'svelte';
+
   import {
     sensorMap,
     currentSensor,
@@ -7,13 +10,26 @@
     signalType,
     currentDataReadyOnMap,
     encoding,
+    currentDate,
+    times,
   } from './stores.js';
+  import Calendar from 'svelte-calendar';
+  import * as d3 from 'd3';
 
   let hide = false;
   let shouldDisplayBanner = true;
+  let formatTime = d3.timeFormat('%B %-d, %Y');
+  let convertDate = d3.timeFormat('%Y%m%d');
+  let parseTime = d3.timeParse('%Y%m%d');
 
   $: sensor = $currentSensor;
   $: level = $currentLevel;
+  // let selectedDate = writable(parseTime($currentDate));
+  $: selectedDate = parseTime($currentDate);
+  if ($currentDate !== 20100420) {
+    selectedDate = parseTime($currentDate);
+  }
+  $: start_end_dates = [];
 
   currentSensor.subscribe(s => {
     if ($sensorMap.get($currentSensor).levels.includes(level) === false) {
@@ -23,6 +39,13 @@
       encoding.set('color');
     }
   });
+
+  $: if (selectedDate !== undefined) {
+    currentDate.set(convertDate(selectedDate));
+  }
+  $: if ($times !== null) {
+    start_end_dates = $times.get($currentSensor);
+  }
 
   export let isIE;
 
@@ -95,6 +118,9 @@
     display: inline-block;
     width: 125px;
   }
+  .calendar {
+    display: inline-block;
+  }
 
   @keyframes shake {
     10%,
@@ -162,5 +188,14 @@
       {/each}
     </select>
 
+    <label style="font-size: 15px;" class="option-title">on</label>
+
+    {#if selectedDate !== undefined && start_end_dates.length !== 0}
+      <Calendar bind:selected={selectedDate} start={parseTime(start_end_dates[0])} end={parseTime(start_end_dates[1])}>
+        <button class="calendar" on:>
+          {#if selectedDate}{formatTime(selectedDate)}{:else}Select Date{/if}
+        </button>
+      </Calendar>
+    {/if}
   </div>
 </div>

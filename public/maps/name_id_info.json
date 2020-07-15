@@ -12334,7 +12334,7 @@
             "level": "county"
         },
         {
-            "display_name": "Baltimore, MD",
+            "display_name": "Baltimore County, MD",
             "name": "Baltimore",
             "id": "24005",
             "property_id": "24005",
@@ -12992,7 +12992,7 @@
             "level": "county"
         },
         {
-            "display_name": "Baltimore County, MD",
+            "display_name": "Baltimore, MD",
             "name": "Baltimore",
             "id": "24510",
             "property_id": "24510",
@@ -15463,7 +15463,7 @@
             "level": "county"
         },
         {
-            "display_name": "St. Louis, MO",
+            "display_name": "St. Louis County, MO",
             "name": "St. Louis",
             "id": "29189",
             "property_id": "29189",

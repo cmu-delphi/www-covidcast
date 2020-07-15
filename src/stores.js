@@ -385,5 +385,4 @@ export const timeRangeOnSlider = writable({
   max: 0,
 });
 export const yesterday = +moment(new Date(new Date().getTime() - 86400 * 1000)).format('YYYYMMDD');
-
 export const radiusScale = writable(logScale());

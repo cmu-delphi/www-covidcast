@@ -63,6 +63,7 @@
 
   times.subscribe(t => (t ? update($currentSensor, t) : ''));
   currentSensor.subscribe(s => ($times ? update(s, $times, true) : ''));
+  currentDate.subscribe(t => ($times ? update($currentSensor, $times) : ''));
 
   function update(s, t, newSensor = false) {
     max = t.get(s)[1];
@@ -82,7 +83,6 @@
       rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
       if ($currentDate !== 20100420) {
         while (parseTime($currentDate).getTime() < rectifiedMin) {
-          console.log('test');
           rectifiedRange += interval;
           rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
         }
