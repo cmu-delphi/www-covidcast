@@ -5,9 +5,10 @@
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "start": "sirv public",
+    "lint": "prettier --check \"**/*\" ",
     "deploy": "npm run build; gh-pages -d public",
     "release": "npm run build && bestzip release.zip public/*",
-    "prettier": "npx prettier --write \"{,!(node_modules)/**/}*.{js,jsx,svelte}\""
+    "prettier": "prettier --write \"**/*\""
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^11.1.0",
