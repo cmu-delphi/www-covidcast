@@ -28,8 +28,8 @@ http://localhost:5000/frame.html
 
 ### Project Structure
 
-## Figma Mock-up
+## Figma Mock-ups
 
-https://www.figma.com/file/CkdJq5qlvpQNhUsaihBsFE/Delphi-Covid-Forecasting?node-id=0%3A1
+Current Figma:  https://www.figma.com/file/CZ3YwWBL2md9j39qdcBfDs/COVIDCast?node-id=0%3A1
 
-The most current mock (for the graph) is 'Design 7'. Other mock to consider is 'Current Design Plan' . Mocks may lag dev changes.
+Old Figma:  https://www.figma.com/file/CkdJq5qlvpQNhUsaihBsFE/Delphi-Covid-Forecasting?node-id=0%3A1
