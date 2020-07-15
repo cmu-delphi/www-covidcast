@@ -28,6 +28,10 @@ To release, run
 
 `npm run release`
 
+If you have having trouble with any of them, run
+
+`npm ci`
+
 To view a version of the visualization in the frame of a cmu.edu site, run the server and go to:
 
 http://localhost:5000/frame.html
