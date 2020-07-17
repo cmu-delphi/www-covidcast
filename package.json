@@ -24,6 +24,7 @@
     "eslint": "^7.4.0",
     "eslint-plugin-svelte3": "^2.7.3",
     "gh-pages": "^3.1.0",
+    "html-webpack-harddisk-plugin": "^1.0.2",
     "html-webpack-plugin": "^4.3.0",
     "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
@@ -44,6 +45,7 @@
     "d3-tip": "^0.9.1",
     "invert-color": "^2.0.0",
     "mapbox-gl": "^1.11.1",
+    "regenerator-runtime": "^0.13.5",
     "simple-svelte-autocomplete": "^1.1.2",
     "svelte-calendar": "^1.5.0",
     "svelte-icons": "^2.1.0"

@@ -1,5 +1,5 @@
 import { writable, readable, derived, get } from 'svelte/store';
-import { injectIDs, logScale } from './util.js';
+import { injectIDs, logScale } from '../util';
 import * as d3 from 'd3';
 
 const queryString = window.location.search;

@@ -4,6 +4,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
 
 const devMode = process.env.NODE_ENV !== 'production';
 
@@ -17,7 +18,7 @@ module.exports = () => {
       path: path.resolve(__dirname, 'public'),
       filename: 'build/[name].js',
       chunkFilename: 'build/[name].js?id=[chunkhash]',
-      publicPath: './',
+      // publicPath: './',
     },
 
     resolve: {
@@ -43,7 +44,7 @@ module.exports = () => {
             {
               loader: 'svelte-loader',
               options: {
-                hotReload: devMode,
+                hotReload: false,
                 emitCss: true,
               },
             },
@@ -55,7 +56,7 @@ module.exports = () => {
             {
               loader: MiniCssExtractPlugin.loader,
               options: {
-                hmr: devMode,
+                hmr: false,
                 esModule: true,
               },
             },
@@ -66,10 +67,10 @@ module.exports = () => {
     },
 
     devServer: {
-      contentBase: './public',
+      contentBase: path.join(__dirname, 'public'),
+      watchContentBase: true,
       host: 'localhost',
-      hot: devMode,
-      progress: true,
+      hot: false,
     },
 
     plugins: [
@@ -77,12 +78,15 @@ module.exports = () => {
         patterns: ['./src/static'],
       }),
       new HtmlWebpackPlugin({
+        alwaysWriteToDisk: true,
         template: './src/index.html',
       }),
       new HtmlWebpackPlugin({
+        alwaysWriteToDisk: true,
         filename: 'frame.html',
         template: './src/frame.html',
       }),
+      new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({
         filename: 'build/[name].css',
         chunkFilename: 'build/[id].css',

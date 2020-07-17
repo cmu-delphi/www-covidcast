@@ -1,5 +1,5 @@
 <script>
-  import { DIRECTION_THEME } from '../theme.js';
+  import { DIRECTION_THEME } from '../theme';
   import {
     signalType,
     stats,
@@ -9,7 +9,7 @@
     currentDataReadyOnMap,
     encoding,
     radiusScale,
-  } from '../stores.js';
+  } from '../stores';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
 
