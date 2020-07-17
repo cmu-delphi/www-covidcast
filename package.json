@@ -3,14 +3,23 @@
   "version": "1.5.3",
   "private": true,
   "description": "",
+  "homepage": "https://github.com/cmu-delphi/www-covidcast",
+  "bugs": {
+    "url": "https://github.com/cmu-delphi/www-covidcast/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cmu-delphi/www-covidcast.git"
+  },
   "scripts": {
     "start": "cross-env NODE_ENV=development webpack-dev-server -d --open",
     "build": "cross-env NODE_ENV=production webpack -p",
     "deploy": "npm run build; gh-pages -d public",
-    "release": "npm run build && bestzip release.zip public/*",
+    "zip": "cd public && bestzip ../release.zip *",
     "prettier": "prettier --write \"**/*\"",
     "lint": "eslint src --ext .js,.svelte && prettier --check \"**/*\"",
-    "lint:fix": "eslint src --ext .js,.svelte --fix && prettier --write \"**/*\""
+    "lint:fix": "eslint src --ext .js,.svelte --fix && prettier --write \"**/*\"",
+    "release": "release-it"
   },
   "devDependencies": {
     "@babel/core": "^7.10.5",
