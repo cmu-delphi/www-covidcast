@@ -1,6 +1,6 @@
 <script>
   import Graph from './Graph.svelte';
-  import { mapFirstLoaded } from '../stores.js';
+  import { mapFirstLoaded } from '../../stores.js';
 
   export let isIE, graphShowStatus, toggleGraphShowStatus;
 </script>

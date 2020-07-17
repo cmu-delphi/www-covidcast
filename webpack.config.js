@@ -3,6 +3,8 @@ const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
 const devMode = process.env.NODE_ENV !== 'production';
 
 module.exports = () => {
@@ -73,6 +75,13 @@ module.exports = () => {
     plugins: [
       new CopyPlugin({
         patterns: ['./src/static'],
+      }),
+      new HtmlWebpackPlugin({
+        template: './src/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        filename: 'frame.html',
+        template: './src/frame.html',
       }),
       new MiniCssExtractPlugin({
         filename: 'build/[name].css',

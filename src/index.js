@@ -1,5 +1,6 @@
 import 'core-js/stable';
-import App from './App.svelte';
+import './global.css';
+import App from './components/App.svelte';
 
 const hostElement = document.querySelector('#vizbox') || document.body;
 

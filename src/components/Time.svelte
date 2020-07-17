@@ -9,8 +9,8 @@
     currentLevel,
     timeRangeOnSlider,
     yesterday,
-  } from './stores.js';
-  import { calculateValFromRectified } from './util.js';
+  } from '../stores.js';
+  import { calculateValFromRectified } from '../util.js';
   import * as d3 from 'd3';
 
   let timeSliderPaddingLeft;

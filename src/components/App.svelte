@@ -21,7 +21,7 @@
     mounted,
     yesterday,
     customDataView,
-  } from './stores.js';
+  } from '../stores.js';
 
   const ENDPOINT = 'https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day';
   const ENDPOINT_META = 'https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast_meta&cached=true';
@@ -48,7 +48,7 @@
         date +
         '&geo_value=' +
         region,
-    ).then((d) => d.json());
+    ).then(d => d.json());
   }
 
   // combining json with same geolocations but different value properties
@@ -81,10 +81,10 @@
       return;
     let cacheEntry = $regionSliceCache.get(sensor + level + date);
     if (!cacheEntry) {
-      callAPI(sEntry.id, sEntry.signal, level, date, '*').then((d) => {
+      callAPI(sEntry.id, sEntry.signal, level, date, '*').then(d => {
         if (d.result < 0 || d.message.includes('no results')) {
           currentData.set([]);
-          regionSliceCache.update((m) => m.set(sensor + level + date, []));
+          regionSliceCache.update(m => m.set(sensor + level + date, []));
         } else {
           const deathsRegex = /deaths_/;
           const casesRegex = /confirmed_/;
@@ -92,16 +92,16 @@
           if (sEntry.signal.match(deathsRegex)) {
             // deaths_incidence_prop
             if (sEntry.signal === 'deaths_7dav_incidence_prop') {
-              callAPI(sEntry.id, check_wip(sEntry.signal, 'deaths_incidence_prop'), level, date, '*').then((d1) => {
+              callAPI(sEntry.id, check_wip(sEntry.signal, 'deaths_incidence_prop'), level, date, '*').then(d1 => {
                 let extended = extend(d, d1);
                 currentData.set(extended);
-                regionSliceCache.update((m) => m.set(sensor + level + date, extended));
+                regionSliceCache.update(m => m.set(sensor + level + date, extended));
               });
             } else {
-              callAPI(sEntry.id, check_wip(sEntry.signal, 'deaths_incidence_num'), level, date, '*').then((d1) => {
+              callAPI(sEntry.id, check_wip(sEntry.signal, 'deaths_incidence_num'), level, date, '*').then(d1 => {
                 let extended = extend(d, d1);
                 currentData.set(extended);
-                regionSliceCache.update((m) => m.set(sensor + level + date, extended));
+                regionSliceCache.update(m => m.set(sensor + level + date, extended));
               });
             }
           }
@@ -109,23 +109,23 @@
           else if (sEntry.signal.match(casesRegex)) {
             // confirmed_incidence_prop
             if (sEntry.signal === 'confirmed_7dav_incidence_prop') {
-              callAPI(sEntry.id, check_wip(sEntry.signal, 'confirmed_incidence_prop'), level, date, '*').then((d1) => {
+              callAPI(sEntry.id, check_wip(sEntry.signal, 'confirmed_incidence_prop'), level, date, '*').then(d1 => {
                 let extended = extend(d, d1);
                 currentData.set(extended);
-                regionSliceCache.update((m) => m.set(sensor + level + date, extended));
+                regionSliceCache.update(m => m.set(sensor + level + date, extended));
               });
             } else {
-              callAPI(sEntry.id, check_wip(sEntry.signal, 'confirmed_incidence_num'), level, date, '*').then((d1) => {
+              callAPI(sEntry.id, check_wip(sEntry.signal, 'confirmed_incidence_num'), level, date, '*').then(d1 => {
                 let extended = extend(d, d1);
                 currentData.set(extended);
-                regionSliceCache.update((m) => m.set(sensor + level + date, extended));
+                regionSliceCache.update(m => m.set(sensor + level + date, extended));
               });
             }
           }
           // everything else
           else {
             currentData.set(d.epidata);
-            regionSliceCache.update((m) => m.set(sensor + level + date, d.epidata));
+            regionSliceCache.update(m => m.set(sensor + level + date, d.epidata));
           }
         }
       });
@@ -146,7 +146,7 @@
     // check if the currentRegion has data on the current date
     const checkIfCurrentRegionHasDataOnCurrentDate = (regionData = []) => {
       let flag = false;
-      regionData.forEach((item) => {
+      regionData.forEach(item => {
         if (item.time_value == $currentDate) {
           flag = true;
         }
@@ -156,16 +156,16 @@
 
     let cacheEntry = $timeSliceCache.get(sensor + level + region);
     if (!cacheEntry) {
-      callAPI(sEntry.id, sEntry.signal, level, '20100101-20500101', region).then((d) => {
+      callAPI(sEntry.id, sEntry.signal, level, '20100101-20500101', region).then(d => {
         // creating deepcopy to avoid tampering with the data stored in cache
         if (!checkIfCurrentRegionHasDataOnCurrentDate(d.epidata)) {
           currentRegion.set('');
           currentRegionName.set('');
-          timeSliceCache.update((m) => m.set(sensor + level + region, d.epidata));
+          timeSliceCache.update(m => m.set(sensor + level + region, d.epidata));
         } else {
           const epi_data = JSON.parse(JSON.stringify(d.epidata));
           regionData.set(d.epidata);
-          timeSliceCache.update((m) => m.set(sensor + level + region, epi_data));
+          timeSliceCache.update(m => m.set(sensor + level + region, epi_data));
         }
       });
     } else {
@@ -178,7 +178,7 @@
   }
 
   // Since we don't want multiple updates, but currentSensor changes can update // the level and date, we have flags that prevent the async updates.
-  currentSensor.subscribe((s) => {
+  currentSensor.subscribe(s => {
     if (!$mounted) return;
 
     let l = $currentLevel;
@@ -210,7 +210,7 @@
     updateRegionSliceCache(s, l, date, 'sensor-change');
   });
 
-  currentLevel.subscribe((l) => {
+  currentLevel.subscribe(l => {
     if (levelChangedWhenSensorChanged) {
       levelChangedWhenSensorChanged = false;
     } else {
@@ -222,13 +222,13 @@
     }
   });
 
-  currentDate.subscribe((d) => {
+  currentDate.subscribe(d => {
     dateChangedWhenSensorChanged
       ? (dateChangedWhenSensorChanged = false)
       : updateRegionSliceCache($currentSensor, $currentLevel, d, 'date-change');
   });
 
-  currentRegion.subscribe((r) => {
+  currentRegion.subscribe(r => {
     updateTimeSliceCache($currentSensor, $currentLevel, r);
     if (firstLoaded && r !== '') {
       toggleGraphShowStatus(null, false);
@@ -242,20 +242,20 @@
 
   onMount(() => {
     fetch(ENDPOINT_META)
-      .then((d) => d.json())
-      .then((meta) => {
+      .then(d => d.json())
+      .then(meta => {
         let timeMap = new Map();
         let statsMap = new Map();
 
-        Array.from($sensorMap.keys()).forEach((sensorKey) => {
+        Array.from($sensorMap.keys()).forEach(sensorKey => {
           let sEntry = $sensorMap.get(sensorKey);
           let matchedMeta;
           // need to chagne mean / std for counts
           if (sEntry.signal.match(/num/)) {
             const regions = sEntry.levels;
-            regions.forEach((region) => {
+            regions.forEach(region => {
               matchedMeta = meta.epidata.find(
-                (d) =>
+                d =>
                   d.data_source === sEntry.id &&
                   d.signal === sEntry.signal &&
                   d.time_type === 'day' &&
@@ -296,7 +296,7 @@
             });
           } else {
             matchedMeta = meta.epidata.find(
-              (d) => d.data_source === sEntry.id && d.signal === sEntry.signal && d.time_type === 'day',
+              d => d.data_source === sEntry.id && d.signal === sEntry.signal && d.time_type === 'day',
             );
             if (matchedMeta) {
               if (matchedMeta.max_time > yesterday) {
@@ -384,25 +384,25 @@
   }
 
   // Keep the URL updated with the current state
-  currentSensor.subscribe((s) =>
+  currentSensor.subscribe(s =>
     updateURIParameters(s, $currentLevel, $currentRegion, $currentDate, $signalType, $encoding, $currentZone),
   );
-  currentLevel.subscribe((l) =>
+  currentLevel.subscribe(l =>
     updateURIParameters($currentSensor, l, $currentRegion, $currentDate, $signalType, $encoding, $currentZone),
   );
-  currentRegion.subscribe((r) =>
+  currentRegion.subscribe(r =>
     updateURIParameters($currentSensor, $currentLevel, r, $currentDate, $signalType, $encoding, $currentZone),
   );
-  currentDate.subscribe((d) =>
+  currentDate.subscribe(d =>
     updateURIParameters($currentSensor, $currentLevel, $currentRegion, d, $signalType, $encoding, $currentZone),
   );
-  signalType.subscribe((t) =>
+  signalType.subscribe(t =>
     updateURIParameters($currentSensor, $currentLevel, $currentRegion, $currentDate, t, $encoding, $currentZone),
   );
-  encoding.subscribe((e) =>
+  encoding.subscribe(e =>
     updateURIParameters($currentSensor, $currentLevel, $currentRegion, $currentDate, $signalType, e, $currentZone),
   );
-  currentZone.subscribe((z) =>
+  currentZone.subscribe(z =>
     updateURIParameters($currentSensor, $currentLevel, $currentRegion, $currentDate, $signalType, $encoding, z),
   );
 </script>

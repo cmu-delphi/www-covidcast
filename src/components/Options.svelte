@@ -8,7 +8,7 @@
     encoding,
     currentDate,
     times,
-  } from './stores.js';
+  } from '../stores.js';
   import Calendar from 'svelte-calendar';
   import * as d3 from 'd3';
 
