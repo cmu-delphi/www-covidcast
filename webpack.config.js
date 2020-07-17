@@ -44,6 +44,7 @@ module.exports = () => {
             {
               loader: 'svelte-loader',
               options: {
+                dev: devMode,
                 hotReload: false,
                 emitCss: true,
               },
