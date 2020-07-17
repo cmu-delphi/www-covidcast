@@ -43,7 +43,7 @@
   function setSensor(e) {
     const value = e.currentTarget.value;
     if (!$sensorMap.get(value).levels.includes($currentLevel)) {
-      $currentLevel = $levels['msa'];
+      $currentLevel = 'msa';
     }
     if (!value.match(/num/)) {
       // eslint-disable-next-line no-unused-vars
@@ -156,12 +156,12 @@
       on:change={setSensor}
       on:blur={setSensor}>
       <optgroup label="Indicators">
-        {#each Array.from($sensorMap.keys()).filter((d) => !$sensorMap.get(d).official) as sensor}
+        {#each Array.from($sensorMap.keys()).filter(d => !$sensorMap.get(d).official) as sensor}
           <option title={$sensorMap.get(sensor).tooltipText} value={sensor}>{$sensorMap.get(sensor).name}</option>
         {/each}
       </optgroup>
       <optgroup label="Official Reports">
-        {#each Array.from($sensorMap.keys()).filter((d) => $sensorMap.get(d).official) as sensor}
+        {#each Array.from($sensorMap.keys()).filter(d => $sensorMap.get(d).official) as sensor}
           <option title={$sensorMap.get(sensor).tooltipText} value={sensor}>{$sensorMap.get(sensor).name}</option>
         {/each}
       </optgroup>
