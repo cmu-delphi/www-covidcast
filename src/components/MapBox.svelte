@@ -1231,10 +1231,6 @@
     background-color: #f2f2f2;
   }
 
-  .state-buttons-holder .pg-button img {
-    width: 90%;
-  }
-
   .options-container {
     position: absolute;
     top: 12px;
@@ -1332,6 +1328,13 @@
     background-color: #ffffff;
     box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
   }
+
+  .bounds-button {
+    background: url('../assets/us48.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 90%;
+  }
 </style>
 
 <div class="banner">
@@ -1383,9 +1386,7 @@
       class="pg-button bounds-button"
       on:click={() => {
         map.easeTo({ center: [LON, LAT], zoom: ZOOM, bearing: 0, pitch: 0 });
-      }}>
-      <img src="./assets/imgs/us48.png" alt="" />
-    </button>
+      }} />
   </div>
 
   {#if $currentZone.length > 0}
