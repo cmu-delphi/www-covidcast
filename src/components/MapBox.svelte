@@ -1169,6 +1169,14 @@
     min-height: 550px;
   }
 
+  .map-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
   .state-buttons-holder {
     position: absolute;
     top: 79px;
@@ -1330,7 +1338,7 @@
   <span class="banner-text">{currentSensorTooltip}</span>
 </div>
 
-<div bind:this={container} class="map-container">
+<div class="map-container">
   <div class="options-container">
     <Options />
   </div>
@@ -1399,4 +1407,6 @@
   </div>
 
   <GraphContainer {isIE} {graphShowStatus} {toggleGraphShowStatus} />
+
+  <div class="map-wrapper" bind:this={container} />
 </div>
