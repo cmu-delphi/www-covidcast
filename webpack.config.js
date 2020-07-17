@@ -64,6 +64,25 @@ module.exports = () => {
             'css-loader',
           ],
         },
+        {
+          test: /\.(png|jpg|gif|svg|jpeg)$/i,
+          use: [
+            {
+              loader: 'url-loader',
+              options: {
+                limit: 8192,
+              },
+            },
+          ],
+        },
+        {
+          test: /\.json$/i,
+          use: [
+            {
+              loader: 'json-loader',
+            },
+          ],
+        },
       ],
     },
 
