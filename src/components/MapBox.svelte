@@ -2,8 +2,9 @@
   //import mapboxgl from 'mapbox-gl';
   import { onMount } from 'svelte';
   import mapboxgl from 'mapbox-gl';
-  import { defaultRegionOnStartup, getTextColorBasedOnBackground, logScale } from './util.js';
-  import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME } from './theme.js';
+  import 'mapbox-gl/dist/mapbox-gl.css';
+  import { defaultRegionOnStartup, getTextColorBasedOnBackground, logScale } from '../util';
+  import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME } from '../theme';
   import AutoComplete from 'simple-svelte-autocomplete';
   import IoIosSearch from 'svelte-icons/io/IoIosSearch.svelte';
   import Options from './Options.svelte';
@@ -11,7 +12,6 @@
   import Banner from './Banner.svelte';
   import Time from './Time.svelte';
   import GraphContainer from './Graph/GraphContainer.svelte';
-
   import {
     levels,
     stats,
@@ -33,7 +33,7 @@
     radiusScale,
     dict,
     special_counties,
-  } from './stores.js';
+  } from '../stores';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
 
@@ -1169,6 +1169,14 @@
     min-height: 550px;
   }
 
+  .map-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
   .state-buttons-holder {
     position: absolute;
     top: 79px;
@@ -1330,7 +1338,7 @@
   <span class="banner-text">{currentSensorTooltip}</span>
 </div>
 
-<div bind:this={container} class="map-container">
+<div class="map-container">
   <div class="options-container">
     <Options />
   </div>
@@ -1399,4 +1407,6 @@
   </div>
 
   <GraphContainer {isIE} {graphShowStatus} {toggleGraphShowStatus} />
+
+  <div class="map-wrapper" bind:this={container} />
 </div>

@@ -15,8 +15,8 @@
     mounted,
     dict,
     special_counties,
-  } from '../stores.js';
-  import { DIRECTION_THEME } from '../theme.js';
+  } from '../../stores';
+  import { DIRECTION_THEME } from '../../theme';
   import * as d3 from 'd3';
   import d3Tip from 'd3-tip';
 
