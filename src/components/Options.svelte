@@ -1,12 +1,5 @@
 <script>
-  import {
-    sensorMap,
-    currentSensor,
-    levels,
-    currentLevel,
-    currentDate,
-    times,
-  } from '../stores';
+  import { sensorMap, currentSensor, levels, currentLevel, currentDate, times } from '../stores';
   import Calendar from 'svelte-calendar';
   import * as d3 from 'd3';
 
@@ -129,17 +122,14 @@
 
   <div class="option">
     <label style="font-size: 15px;" class="option-title">Displaying</label>
-    <select
-      aria-label="indicator options"
-      class="indicators"
-      bind:value={$currentSensor}>
+    <select aria-label="indicator options" class="indicators" bind:value={$currentSensor}>
       <optgroup label="Indicators">
-        {#each Array.from($sensorMap.keys()).filter(d => !$sensorMap.get(d).official) as sensor}
+        {#each Array.from($sensorMap.keys()).filter((d) => !$sensorMap.get(d).official) as sensor}
           <option title={$sensorMap.get(sensor).tooltipText} value={sensor}>{$sensorMap.get(sensor).name}</option>
         {/each}
       </optgroup>
       <optgroup label="Official Reports">
-        {#each Array.from($sensorMap.keys()).filter(d => $sensorMap.get(d).official) as sensor}
+        {#each Array.from($sensorMap.keys()).filter((d) => $sensorMap.get(d).official) as sensor}
           <option title={$sensorMap.get(sensor).tooltipText} value={sensor}>{$sensorMap.get(sensor).name}</option>
         {/each}
       </optgroup>
@@ -147,10 +137,7 @@
 
     <label style="font-size: 15px;" class="option-title">for</label>
 
-    <select
-      aria-label="geographic level"
-      class="geo-level"
-      bind:value={$currentLevel}>
+    <select aria-label="geographic level" class="geo-level" bind:value={$currentLevel}>
       {#each Object.keys($levels) as level}
         <option value={level} disabled={$sensorMap.get($currentSensor).levels.includes(level) === false}>
           {make_plural($levels[level])}
