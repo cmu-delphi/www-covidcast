@@ -20,10 +20,10 @@
   $: logColorArr = [{ label: '0', from_color: DIRECTION_THEME.countMin, to_color: DIRECTION_THEME.countMin }];
   $: linColorArr = [];
 
-  currentSensor.subscribe((s) => ($stats ? update(s, $stats, $currentLevel, $encoding) : ''));
-  stats.subscribe((s) => (s ? update($currentSensor, s, $currentLevel, $encoding) : ''));
-  currentLevel.subscribe((l) => ($stats ? update($currentSensor, $stats, l, $encoding) : ''));
-  encoding.subscribe((e) => ($stats ? update($currentSensor, $stats, $currentLevel, e) : ''));
+  currentSensor.subscribe(s => ($stats ? update(s, $stats, $currentLevel, $encoding) : ''));
+  stats.subscribe(s => (s ? update($currentSensor, s, $currentLevel, $encoding) : ''));
+  currentLevel.subscribe(l => ($stats ? update($currentSensor, $stats, l, $encoding) : ''));
+  encoding.subscribe(e => ($stats ? update($currentSensor, $stats, $currentLevel, e) : ''));
   radiusScale.subscribe(() => ($stats ? update($currentSensor, $stats, $currentLevel, $encoding) : ''));
 
   function update(sens, stats, level, encoding) {
@@ -268,8 +268,8 @@
   .trend-legend-grouping ul {
     margin: 0;
     padding: 0;
-    float: left;
-    list-style: none;
+    display: flex;
+    justify-content: space-around;
   }
   .trend-legend-grouping ul li {
     display: block;
@@ -337,6 +337,7 @@
   .bubble-legend li {
     display: flex;
     font-size: 80%;
+    padding-right: 10px;
     align-items: center;
   }
 
@@ -353,10 +354,6 @@
 
   #encoding-options > div {
     margin-right: 0.5rem;
-  }
-
-  .hidden {
-    display: none;
   }
 </style>
 
@@ -391,27 +388,6 @@
           {/if}
         </button>
 
-      </div>
-    </div>
-
-    <div class="toggle {$signalType === 'direction' || !$currentSensor.match(/num/) ? 'hidden' : ''}">
-      <div aria-label="encoding type" class="buttons-group-side">
-        <button
-          aria-pressed={$encoding === 'color' ? 'true' : 'false'}
-          class="button {$encoding === 'color' ? 'selected' : ''}"
-          on:click={() => {
-            encoding.set('color');
-          }}>
-          Choropleth
-        </button>
-        <button
-          aria-pressed={$encoding === 'bubble' ? 'true' : 'false'}
-          class="button {$encoding === 'bubble' ? 'selected' : ''}"
-          on:click={() => {
-            encoding.set('bubble');
-          }}>
-          Bubbles
-        </button>
       </div>
     </div>
   </div>
