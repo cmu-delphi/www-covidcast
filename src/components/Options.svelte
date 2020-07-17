@@ -4,10 +4,8 @@
     currentSensor,
     levels,
     currentLevel,
-    currentDataReadyOnMap,
     currentDate,
     times,
-    encoding,
   } from '../stores';
   import Calendar from 'svelte-calendar';
   import * as d3 from 'd3';
@@ -38,24 +36,6 @@
     } else if (level === 'Metro Area') {
       return 'Metro Areas';
     }
-  }
-
-  function setSensor(e) {
-    const value = e.currentTarget.value;
-    if (!$sensorMap.get(value).levels.includes($currentLevel)) {
-      $currentLevel = 'msa';
-    }
-    if (!value.match(/num/)) {
-      // eslint-disable-next-line no-unused-vars
-      $encoding = 'color';
-    }
-    $currentDataReadyOnMap = false;
-    $currentSensor = value;
-  }
-  function setLevel(e) {
-    // eslint-disable-next-line no-unused-vars
-    $currentDataReadyOnMap = false;
-    $currentLevel = e.currentTarget.value;
   }
 </script>
 
@@ -152,9 +132,7 @@
     <select
       aria-label="indicator options"
       class="indicators"
-      value={$currentSensor}
-      on:change={setSensor}
-      on:blur={setSensor}>
+      bind:value={$currentSensor}>
       <optgroup label="Indicators">
         {#each Array.from($sensorMap.keys()).filter(d => !$sensorMap.get(d).official) as sensor}
           <option title={$sensorMap.get(sensor).tooltipText} value={sensor}>{$sensorMap.get(sensor).name}</option>
@@ -172,9 +150,7 @@
     <select
       aria-label="geographic level"
       class="geo-level"
-      value={$currentLevel}
-      on:change={setLevel}
-      on:blur={setLevel}>
+      bind:value={$currentLevel}>
       {#each Object.keys($levels) as level}
         <option value={level} disabled={$sensorMap.get($currentSensor).levels.includes(level) === false}>
           {make_plural($levels[level])}

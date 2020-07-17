@@ -14,6 +14,7 @@
     currentRegion,
     currentZone,
     currentRegionName,
+    currentDataReadyOnMap,
     regionSliceCache,
     timeSliceCache,
     currentData,
@@ -179,6 +180,8 @@
 
   // Since we don't want multiple updates, but currentSensor changes can update // the level and date, we have flags that prevent the async updates.
   currentSensor.subscribe((s) => {
+    $currentDataReadyOnMap = false;
+
     if (!$mounted) return;
 
     let l = $currentLevel;
@@ -200,6 +203,10 @@
     } else {
       updateTimeSliceCache(s, l, $currentRegion);
     }
+    // reset encoding
+    if (!s.match(/num/)) {
+      $encoding = 'color';
+    }
     if (date !== $currentDate) {
       dateChangedWhenSensorChanged = true;
       currentDate.set(date);
@@ -211,6 +218,9 @@
   });
 
   currentLevel.subscribe((l) => {
+    // eslint-disable-next-line no-unused-vars
+    $currentDataReadyOnMap = false;
+
     if (levelChangedWhenSensorChanged) {
       levelChangedWhenSensorChanged = false;
     } else {
