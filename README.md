@@ -14,7 +14,7 @@ To begin development, clone this repository and run
 
 To run the development server, run
 
-`npm run dev`
+`npm run start`
 
 To deploy an update run
 
