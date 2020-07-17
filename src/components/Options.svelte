@@ -35,25 +35,15 @@
 <style>
   .options {
     font-size: 0.8rem;
-    width: 100%;
     position: relative;
+    display: flex;
+    align-items: center;
   }
 
-  .option {
-    width: 100%;
-    display: inline-block;
-  }
-
-  .option .option-title {
-    margin-left: 5px;
-    margin-right: 5px;
+  .option-title {
+    font-size: 15px;
+    margin: 0 5px;
     color: #444;
-    margin-bottom: 0px !important;
-    padding-bottom: 0px !important;
-  }
-
-  label {
-    display: inline-block;
   }
 
   select,
@@ -81,21 +71,21 @@
     background-repeat: no-repeat;
   }
 
+  .calendar:hover,
   select:hover {
     background-color: #dcdcdc;
   }
 
   select.indicators {
-    display: inline-block;
-    width: 230px;
+    flex-grow: 3;
   }
 
   select.geo-level {
-    display: inline-block;
-    width: 125px;
+    flex-grow: 1;
   }
-  .calendar {
-    display: inline-block;
+
+  .calendar-wrapper {
+    flex-grow: 2;
   }
 
   @keyframes shake {
@@ -123,39 +113,41 @@
 </style>
 
 <div class="options">
-
-  <div class="option">
-    <label style="font-size: 15px;" class="option-title">Displaying</label>
-    <select aria-label="indicator options" class="indicators" bind:value={$currentSensor}>
-      <optgroup label="Indicators">
-        {#each Array.from($sensorMap.keys()).filter((d) => !$sensorMap.get(d).official) as sensor}
-          <option title={$sensorMap.get(sensor).tooltipText} value={sensor}>{$sensorMap.get(sensor).name}</option>
-        {/each}
-      </optgroup>
-      <optgroup label="Official Reports">
-        {#each Array.from($sensorMap.keys()).filter((d) => $sensorMap.get(d).official) as sensor}
-          <option title={$sensorMap.get(sensor).tooltipText} value={sensor}>{$sensorMap.get(sensor).name}</option>
-        {/each}
-      </optgroup>
-    </select>
-
-    <label style="font-size: 15px;" class="option-title">for</label>
-
-    <select aria-label="geographic level" class="geo-level" bind:value={$currentLevel}>
-      {#each Object.keys($levels) as level}
-        <option value={level} disabled={$sensorMap.get($currentSensor).levels.includes(level) === false}>
-          {makePlural($levels[level])}
-        </option>
+  <label class="option-title" for="option-indicator">Displaying</label>
+  <select id="option-indicator" aria-label="indicator options" class="indicators" bind:value={$currentSensor}>
+    <optgroup label="Indicators">
+      {#each Array.from($sensorMap.keys()).filter((d) => !$sensorMap.get(d).official) as sensor}
+        <option title={$sensorMap.get(sensor).tooltipText} value={sensor}>{$sensorMap.get(sensor).name}</option>
       {/each}
-    </select>
+    </optgroup>
+    <optgroup label="Official Reports">
+      {#each Array.from($sensorMap.keys()).filter((d) => $sensorMap.get(d).official) as sensor}
+        <option title={$sensorMap.get(sensor).tooltipText} value={sensor}>{$sensorMap.get(sensor).name}</option>
+      {/each}
+    </optgroup>
+  </select>
 
-    <label style="font-size: 15px;" class="option-title">on</label>
+  <label class="option-title" for="option-geo-level">for</label>
 
-    {#if selectedDate !== undefined && start_end_dates.length !== 0}
-      <Calendar bind:selected={selectedDate} start={parseTime(start_end_dates[0])} end={parseTime(start_end_dates[1])}>
-        <button class="calendar" on:>
-          {#if selectedDate}{formatTime(selectedDate)}{:else}Select Date{/if}
-        </button>
+  <select id="option-geo-level" aria-label="geographic level" class="geo-level" bind:value={$currentLevel}>
+    {#each Object.keys($levels) as level}
+      <option value={level} disabled={$sensorMap.get($currentSensor).levels.includes(level) === false}>
+        {makePlural($levels[level])}
+      </option>
+    {/each}
+  </select>
+
+  <label class="option-title" for="option-date">on</label>
+
+  <div class="calendar-wrapper">
+    {#if selectedDate != null && start_end_dates.length !== 0}
+      <Calendar
+        bind:selected={selectedDate}
+        start={parseTime(start_end_dates[0])}
+        end={parseTime(start_end_dates[1])}
+        formattedSelected={formatTime(selectedDate)}
+        style="--test=5;">
+        <button id="option-date" class="calendar" on:>{formatTime(selectedDate)}</button>
       </Calendar>
     {/if}
   </div>
