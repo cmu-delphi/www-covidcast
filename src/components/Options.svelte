@@ -21,7 +21,7 @@
     start_end_dates = $times.get($currentSensor);
   }
 
-  function make_plural(level) {
+  function makePlural(level) {
     if (level === 'State') {
       return 'States';
     } else if (level === 'County') {
@@ -140,7 +140,7 @@
     <select aria-label="geographic level" class="geo-level" bind:value={$currentLevel}>
       {#each Object.keys($levels) as level}
         <option value={level} disabled={$sensorMap.get($currentSensor).levels.includes(level) === false}>
-          {make_plural($levels[level])}
+          {makePlural($levels[level])}
         </option>
       {/each}
     </select>
