@@ -6,7 +6,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
 const WorkboxPlugin = require('workbox-webpack-plugin');
-const { EnvironmentPlugin } = require('webpack');
+const { EnvironmentPlugin, DefinePlugin } = require('webpack');
+const pkg = require('./package.json');
 
 const devMode = process.env.NODE_ENV !== 'production';
 
@@ -76,6 +77,9 @@ module.exports = () => {
     },
 
     plugins: [
+      new DefinePlugin({
+        __VERSION__: JSON.stringify(pkg.version),
+      }),
       new EnvironmentPlugin(['NODE_ENV']),
       new CopyPlugin({
         patterns: ['./src/static'],
