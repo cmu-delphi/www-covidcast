@@ -149,7 +149,7 @@
         formattedSelected={formatTime(selectedDate)}
         style="--test=5;">
         <button id="option-date" class="calendar" on:>
-          {formatTime(selectedDate)}
+          {formatTime(selectedDate)} &nbsp;
           {@html DIRECTION_THEME.decreasingIcon}
         </button>
       </Datepicker>
