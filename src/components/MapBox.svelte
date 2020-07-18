@@ -1310,7 +1310,6 @@
     position: absolute;
     bottom: 12px;
     left: 10px;
-    height: 95px;
     z-index: 1000;
     display: flex;
     flex-direction: column;
@@ -1352,6 +1351,9 @@
     background-color: #ffffff;
     box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
   }
+  .hidden {
+    display: none;
+  }
 </style>
 
 <div class="banner">
@@ -1364,7 +1366,7 @@
     <Options />
   </div>
 
-  <div class="toggle-container">
+  <div class="toggle-container {$signalType === 'direction' || !$currentSensor.match(/num/) ? 'hidden' : ''}">
     <Toggle />
   </div>
 

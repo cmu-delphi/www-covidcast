@@ -1,5 +1,5 @@
 <script>
-  import { signalType, currentSensor, encoding } from '../stores';
+  import { encoding } from '../stores';
 
   function toggle_switch() {
     if ($encoding === 'color') {
@@ -15,41 +15,6 @@
     font-size: 0.8rem;
     position: relative;
     align-items: center;
-  }
-
-  .buttons-group button.button .disabled-tooltip {
-    visibility: hidden;
-    width: 80px;
-    border-style: solid;
-    border-width: 1px;
-    border-color: #666;
-    background-color: #fff;
-    color: #333;
-    font-weight: 400;
-    font-size: 0.95em;
-    line-height: 1.2em;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px 5px;
-    position: absolute;
-    z-index: 1;
-    top: -5px;
-    left: 105%;
-  }
-
-  .buttons-group button.button .disabled-tooltip::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    right: 100%;
-    margin-top: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent #666 transparent transparent;
-  }
-
-  .buttons-group button.button:hover .disabled-tooltip {
-    visibility: visible;
   }
 
   .buttons-group-side {
@@ -93,50 +58,9 @@
     margin-right: 4px;
   }
 
-  .buttons-group-side button.button .disabled-tooltip {
-    visibility: hidden;
-    width: 80px;
-    border-style: solid;
-    border-width: 1px;
-    border-color: #666;
-    background-color: #fff;
-    color: #333;
-    font-size: 0.95em;
-    line-height: 1.2em;
-    font-weight: 400;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px 5px;
-    position: absolute;
-    z-index: 1;
-    top: 150%;
-    left: 50%;
-    margin-left: -50px;
-  }
-
-  .buttons-group-side button.button .disabled-tooltip::after {
-    content: '';
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent transparent #666 transparent;
-  }
-  .buttons-group-side button.button:hover .disabled-tooltip {
-    visibility: visible;
-  }
-
   .buttons-group-side .button:hover {
     background-color: #dcdcdc;
     color: #111;
-  }
-  .buttons-group-side .button.selected {
-    background-color: #dcdcdc;
-    color: #111;
-
-    border-color: transparent;
   }
 
   .buttons-group-side .button:focus,
@@ -153,11 +77,11 @@
       class="button {$encoding === 'bubble' ? 'selected' : ''}"
       on:click={() => {
         toggle_switch();
-      }}
-      disabled={$signalType === 'direction' || !$currentSensor.match(/num/) ? true : false}>
-      <img src="./assets/imgs/bubble_icon.svg" alt="" />
-      {#if $signalType === 'direction' || !$currentSensor.match(/num/)}
-        <span class="disabled-tooltip">Unavailable</span>
+      }}>
+      {#if $encoding === 'bubble'}
+        <img src="./assets/imgs/choropleth_icon.svg" alt="" />
+      {:else}
+        <img src="./assets/imgs/bubble_icon.svg" alt="" />
       {/if}
     </button>
   </div>
