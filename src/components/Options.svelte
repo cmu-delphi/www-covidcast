@@ -1,6 +1,7 @@
 <script>
   import { sensorMap, currentSensor, levels, currentLevel, currentDate, times } from '../stores';
-  import Calendar from 'svelte-calendar';
+  import { DIRECTION_THEME } from '../theme';
+  import Datepicker from './Calendar/Datepicker.svelte';
   import * as d3 from 'd3';
 
   let formatTime = d3.timeFormat('%B %-d, %Y');
@@ -141,14 +142,17 @@
 
   <div class="calendar-wrapper">
     {#if selectedDate != null && start_end_dates.length !== 0}
-      <Calendar
+      <Datepicker
         bind:selected={selectedDate}
         start={parseTime(start_end_dates[0])}
         end={parseTime(start_end_dates[1])}
         formattedSelected={formatTime(selectedDate)}
         style="--test=5;">
-        <button id="option-date" class="calendar" on:>{formatTime(selectedDate)}</button>
-      </Calendar>
+        <button id="option-date" class="calendar" on:>
+          {formatTime(selectedDate)}
+          {@html DIRECTION_THEME.decreasingIcon}
+        </button>
+      </Datepicker>
     {/if}
   </div>
 </div>
