@@ -1257,7 +1257,7 @@
 
   .toggle-container {
     position: absolute;
-    top: 60px;
+    top: 68px;
     left: 10px;
     width: 100px;
     z-index: 1001;

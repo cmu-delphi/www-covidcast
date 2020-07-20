@@ -16,7 +16,9 @@
     position: relative;
     align-items: center;
   }
-
+  .button {
+    height: 40px;
+  }
   .buttons-group-side {
     width: 100%;
     display: flex;
@@ -79,9 +81,9 @@
         toggle_switch();
       }}>
       {#if $encoding === 'bubble'}
-        <img src="./assets/imgs/choropleth_icon.svg" alt="" />
+        <img src="./assets/imgs/choropleth.png" height="31" alt="" />
       {:else}
-        <img src="./assets/imgs/bubble_icon.svg" alt="" />
+        <img src="./assets/imgs/bubble.png" height="31" alt="" />
       {/if}
     </button>
   </div>
