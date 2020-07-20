@@ -17,7 +17,7 @@
     align-items: center;
   }
   .button {
-    height: 40px;
+    position: relative;
   }
   .buttons-group-side {
     width: 100%;
