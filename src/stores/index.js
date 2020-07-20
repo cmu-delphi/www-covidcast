@@ -1,276 +1,27 @@
 import { writable, readable, derived, get } from 'svelte/store';
 import { injectIDs, logScale } from '../util';
 import * as d3 from 'd3';
+import { sensorList } from './constants';
+export { dict, special_counties } from './constants';
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 
-export const dict = {
-  '10': 'DE',
-  '11': 'DC',
-  '12': 'FL',
-  '13': 'GA',
-  '15': 'HI',
-  '16': 'ID',
-  '17': 'IL',
-  '18': 'IN',
-  '19': 'IA',
-  '20': 'KS',
-  '21': 'KY',
-  '22': 'LA',
-  '23': 'ME',
-  '24': 'MD',
-  '25': 'MA',
-  '26': 'MI',
-  '27': 'MN',
-  '28': 'MS',
-  '29': 'MO',
-  '30': 'MT',
-  '31': 'NE',
-  '32': 'NV',
-  '33': 'NH',
-  '34': 'NJ',
-  '35': 'NM',
-  '36': 'NY',
-  '37': 'NC',
-  '38': 'ND',
-  '39': 'OH',
-  '40': 'OK',
-  '41': 'OR',
-  '42': 'PA',
-  '44': 'RI',
-  '45': 'SC',
-  '46': 'SD',
-  '47': 'TN',
-  '48': 'TX',
-  '49': 'UT',
-  '50': 'VT',
-  '51': 'VA',
-  '53': 'WA',
-  '54': 'WV',
-  '55': 'WI',
-  '56': 'WY',
-  '72': 'PR',
-  '01': 'AL',
-  '02': 'AK',
-  '04': 'AZ',
-  '05': 'AR',
-  '06': 'CA',
-  '08': 'CO',
-  '09': 'CT',
-};
-
-export const special_counties = [
-  'Baltimore',
-  'St. Louis',
-  'Carson City',
-  'Alexandria',
-  'Bristol',
-  'Buena Vista',
-  'Charlottesville',
-  'Chesapeake',
-  'Colonila Heights',
-  'Covington',
-  'Danville',
-  'Emporia',
-  'Fairfax',
-  'Falls Church',
-  'Franklin',
-  'Fredericksburg',
-  'Galax',
-  'Hampton',
-  'Harrisonburg',
-  'Hopewell',
-  'Lexington',
-  'Lynchburg',
-  'Manassas',
-  'Martinsville',
-  'Newport News',
-  'Norfolk',
-  'Norton',
-  'Petersburg',
-  'Poquoson',
-  'Portsmouth',
-  'Radford',
-  'Richmond',
-  'Roanoke',
-  'Salem',
-  'Staunton',
-  'Suffolk',
-  'Virginia Beach',
-  'Waynesboro',
-  'Williamsburg',
-  'Winchester',
-];
-
 // Set of options for which signals to display.
 // Checks the ?sensors= URI parameter for a custom view,
 // otherwise uses the default.
-export const sensors = readable(
-  [
-    {
-      name: 'Doctor Visits',
-      id: 'doctor-visits',
-      tooltipText: 'Percentage of daily doctor visits that are due to COVID-like symptoms',
-      mapTitleText: 'Percentage of daily doctor visits that are due to COVID-like symptoms',
-      chartTitleText: 'Percentage of daily doctor visits that are due to COVID-like symptoms',
-      yAxis: 'Percentage',
-      format: 'percent',
-      signal: 'smoothed_adj_cli',
-      levels: ['county', 'msa', 'state'],
-      official: false,
-    },
-    {
-      name: 'Hospital Admissions',
-      id: 'hospital-admissions',
-      tooltipText: 'Percentage of daily hospital admissions with COVID-19 associated diagnoses',
-      mapTitleText: 'Percentage of daily hospital admissions with COVID-19 associated diagnoses',
-      chartTitleText: 'Percentage of daily hospital admissions with COVID-19 associated diagnoses',
-      yAxis: 'Percentage',
-      format: 'percent',
-      signal: 'smoothed_adj_covid19',
-      levels: ['county', 'msa', 'state'],
-      official: false,
-    },
-    {
-      name: 'Symptoms (FB)',
-      id: 'fb-survey',
-      tooltipText: 'Percentage of people with COVID-like symptoms, based on Facebook surveys',
-      mapTitleText: 'Percentage of people with COVID-like symptoms, based on Facebook surveys',
-      chartTitleText: 'Percentage of people with COVID-like symptoms, based on Facebook surveys',
-      yAxis: 'Percentage',
-      format: 'percent',
-      signal: 'smoothed_cli',
-      levels: ['county', 'msa', 'state'],
-      official: false,
-    },
-    {
-      name: 'Symptoms in Community (FB)',
-      id: 'fb-survey',
-      tooltipText:
-        'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
-      mapTitleText:
-        'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
-      chartTitleText:
-        'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
-      yAxis: 'Percentage',
-      format: 'percent',
-      signal: 'smoothed_hh_cmnty_cli',
-      levels: ['county', 'msa', 'state'],
-      official: false,
-    },
-    {
-      name: 'Away from Home 6hr+ (SG)',
-      id: 'safegraph',
-      tooltipText: 'Proportion of people spending 6 hours or more away from home, based on SafeGraph mobility data',
-      mapTitleText: 'Proportion of people spending 6 hours or more away from home, based on SafeGraph mobility data',
-      chartTitleText: 'Proportion of people spending 6 hours or more away from home, based on SafeGraph mobility data',
-      yAxis: 'Proportion',
-      format: 'raw',
-      signal: 'full_time_work_prop',
-      levels: ['county', 'state'],
-      official: false,
-    },
-    {
-      name: 'Away from Home 3-6hr (SG)',
-      id: 'safegraph',
-      tooltipText: 'Proportion of people spending 3-6 hours away from home, based on SafeGraph mobility data',
-      mapTitleText: 'Proportion of people spending 3-6 hours away from home, based on SafeGraph mobility data',
-      chartTitleText: 'Proportion of people spending 3-6 hours away from home, based on SafeGraph mobility data',
-      yAxis: 'Proportion',
-      format: 'raw',
-      signal: 'part_time_work_prop',
-      levels: ['county', 'state'],
-      official: false,
-    },
-    {
-      name: 'Search Trends (Google)',
-      id: 'ght',
-      tooltipText: 'Relative frequency of COVID-related Google searches',
-      mapTitleText: 'Relative frequency of COVID-related Google searches',
-      chartTitleText: 'Relative frequency of COVID-related Google searches',
-      yAxis: 'Frequency (arbitrary scale)',
-      format: 'raw',
-      signal: 'smoothed_search',
-      levels: ['msa', 'state'],
-      official: false,
-    },
-    {
-      name: 'Combined',
-      id: 'indicator-combination',
-      tooltipText: 'Combination of COVID-19 indicators available at this geographic level',
-      mapTitleText: 'Combination of COVID-19 indicators',
-      chartTitleText: 'Combination of COVID-19 indicators',
-      yAxis: 'Combined value (arbitrary scale)',
-      format: 'raw',
-      signal: 'nmf_day_doc_fbc_fbs_ght',
-      levels: ['county', 'msa', 'state'],
-      official: false,
-    },
-    {
-      name: 'Cases',
-      id: 'indicator-combination',
-      tooltipText:
-        'Daily new confirmed COVID-19 cases (7-day average), based on data reported by USAFacts and Johns Hopkins University',
-      mapTitleText: 'Daily new confirmed COVID-19 cases (7-day average)',
-      chartTitleText: 'Daily new confirmed COVID-19 cases (7-day average)',
-      yAxis: 'Cases',
-      format: 'raw',
-      signal: 'confirmed_7dav_incidence_num',
-      levels: ['msa', 'county', 'state'],
-      official: true,
-    },
-    {
-      name: 'Cases per 100,000 People',
-      id: 'indicator-combination',
-      tooltipText:
-        'Daily new confirmed COVID-19 cases per 100,000 people (7-day average), based on data reported by USAFacts and Johns Hopkins University',
-      mapTitleText: 'Daily new confirmed COVID-19 cases per 100,000 people (7-day average)',
-      chartTitleText: 'Daily new confirmed COVID-19 cases per 100,000 people (7-day average)',
-      yAxis: 'Cases per 100,000 people',
-      format: 'raw',
-      signal: 'confirmed_7dav_incidence_prop',
-      levels: ['msa', 'county', 'state'],
-      official: true,
-    },
-    {
-      name: 'Deaths',
-      id: 'indicator-combination',
-      tooltipText:
-        'Daily new COVID-19 deaths (7-day average), based on data reported by USAFacts and Johns Hopkins University',
-      mapTitleText: 'Daily new COVID-19 deaths (7-day average)',
-      chartTitleText: 'Daily new COVID-19 deaths (7-day average)',
-      yAxis: 'Deaths',
-      format: 'raw',
-      signal: 'deaths_7dav_incidence_num',
-      levels: ['msa', 'county', 'state'],
-      official: true,
-    },
-    {
-      name: 'Deaths per 100,000 People',
-      id: 'indicator-combination',
-      tooltipText:
-        'Daily new COVID-19 deaths per 100,000 people (7-day average), based on data reported by USAFacts and Johns Hopkins University',
-      mapTitleText: 'Daily new COVID-19 deaths per 100,000 people (7-day average)',
-      chartTitleText: 'Daily new COVID-19 deaths per 100,000 people (7-day average)',
-      yAxis: 'Deaths per 100,000 people',
-      format: 'raw',
-      signal: 'deaths_7dav_incidence_prop',
-      levels: ['msa', 'county', 'state'],
-      official: true,
-    },
-  ],
-  (set) => {
-    let sensorsOption = urlParams.get('sensors');
-    sensorsOption ? set(JSON.parse(decodeURIComponent(sensorsOption))) : '';
-  },
-);
+export const sensors = readable(sensorList, (set) => {
+  const sensorsOption = urlParams.get('sensors');
+  if (sensorsOption) {
+    set(JSON.parse(decodeURIComponent(sensorsOption)));
+  }
+});
 
 // The ID to reference each sensor is the indicator name + signal type.
 // This map is used to find the information for each sensor.
 export const sensorMap = derived(sensors, ($sensors) => {
-  let map = new Map();
-  $sensors.forEach((d) => map.set(d.id + '-' + d.signal, d));
+  const map = new Map();
+  $sensors.forEach((d) => map.set(`${d.id}-${d.signal}`, d));
   return map;
 });
 
@@ -281,7 +32,7 @@ export const levels = readable({
 });
 
 // This loads all the GeoJSON's for each granularity that the MapBox component reads as layers.
-export const geojsons = readable(new Map(), function start(set) {
+export const geojsons = readable(new Map(), (set) => {
   Promise.all([
     d3.json('./maps/new_counties.json'),
     d3.json('./maps/new_states.json'),
@@ -291,16 +42,16 @@ export const geojsons = readable(new Map(), function start(set) {
     d3.json('./maps/county_centers.json'),
     d3.json('./maps/msa_centers.json'),
     d3.json('./maps/new_zones.json'),
-  ]).then(([a, b, c, d, e, f, g, h]) => {
-    let m = new Map();
-    m.set('county', injectIDs('county', a));
-    m.set('state', injectIDs('state', b));
-    m.set('msa', injectIDs('msa', c));
-    m.set('city', d);
-    m.set('state-centers', injectIDs('state-centers', e));
-    m.set('county-centers', injectIDs('county-centers', f));
-    m.set('msa-centers', injectIDs('msa-centers', g));
-    m.set('zone', h);
+  ]).then(([counties, states, msa, cities, stateCenters, countyCenters, msaCenters, newZones]) => {
+    const m = new Map();
+    m.set('county', injectIDs('county', counties));
+    m.set('state', injectIDs('state', states));
+    m.set('msa', injectIDs('msa', msa));
+    m.set('city', cities);
+    m.set('state-centers', injectIDs('state-centers', stateCenters));
+    m.set('county-centers', injectIDs('county-centers', countyCenters));
+    m.set('msa-centers', injectIDs('msa-centers', msaCenters));
+    m.set('zone', newZones);
     set(m);
   });
 });
@@ -311,55 +62,68 @@ export const stats = writable(null);
 export const mounted = writable(0);
 export const mapFirstLoaded = writable(false);
 export const currentDataReadyOnMap = writable(false);
-export const customDataView = readable(true, (set) => (urlParams.get('sensors') ? set(true) : set(false)));
+export const customDataView = readable(true, (set) => {
+  set(urlParams.get('sensors') != null);
+});
 
 export const currentSensor = writable('', (set) => {
-  let sensor = urlParams.get('sensor');
-  sensor ? set(sensor) : set(Array.from(get(sensorMap).keys())[0]);
-  return () => '';
+  const sensor = urlParams.get('sensor');
+  if (sensor && get(sensorMap).has(sensor)) {
+    set(sensor);
+  } else {
+    const firstKey = Array.from(get(sensorMap).keys())[0];
+    set(firstKey);
+  }
 });
 
 // 'county', 'state', or 'msa'
 export const currentLevel = writable('county', (set) => {
-  let level = urlParams.get('level');
-  level ? set(level) : '';
-  return () => '';
+  const level = urlParams.get('level');
+  if (['county', 'state', 'msa'].includes(level)) {
+    set(level);
+  }
 });
 
 // Options are 'direction' and 'value'.
 export const signalType = writable('value', (set) => {
-  let signalT = urlParams.get('signalType');
-  signalT ? set(signalT) : '';
-  return () => '';
+  const signalT = urlParams.get('signalType');
+  if (signalT === 'direction' || signalT === 'value') {
+    set(signalT);
+  }
 });
 
 // Options are 'color' and 'bubble'
 export const encoding = writable('color', (set) => {
-  let encoding = urlParams.get('encoding');
-  encoding ? set(encoding) : '';
-  return () => '';
+  const encoding = urlParams.get('encoding');
+  if (encoding === 'color' || encoding === 'bubble') {
+    set(encoding);
+  }
 });
 
 // EpiWeek in form YYYYMMDD.
 export const currentDate = writable(20100420, (set) => {
-  let date = urlParams.get('date');
-  date ? set(date) : '';
-  return () => '';
+  const date = urlParams.get('date');
+  if (/\d{8}/.test(date)) {
+    set(date);
+  }
 });
 
 // Region GEO_ID for filtering the line chart
 // 42003 - Allegheny; 38300 - Pittsburgh; PA - Pennsylvania.
 export const currentRegion = writable('', (set) => {
-  let region = urlParams.get('region');
-  region ? set(region) : '';
-  return () => '';
+  const region = urlParams.get('region');
+  // TODO validation
+  if (region) {
+    set(region);
+  }
 });
 
 // currently only supporting 'swpa' - South western Pennsylvania
 export const currentZone = writable('', (set) => {
-  let zone = urlParams.get('zone');
-  zone ? set(zone) : '';
-  return () => '';
+  const zone = urlParams.get('zone');
+  if (zone === 'swpa') {
+    set(zone);
+  }
 });
 
 // Range of time for the map slider.
