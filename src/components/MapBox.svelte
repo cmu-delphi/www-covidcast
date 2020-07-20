@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
   import mapboxgl from 'mapbox-gl';
   import 'mapbox-gl/dist/mapbox-gl.css';
-  import { defaultRegionOnStartup, getTextColorBasedOnBackground, logScale } from '../util';
+  import { getTextColorBasedOnBackground, logScale } from '../util';
   import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME } from '../theme';
   import AutoComplete from 'simple-svelte-autocomplete';
   import IoIosSearch from 'svelte-icons/io/IoIosSearch.svelte';
@@ -34,6 +34,7 @@
     radiusScale,
     dict,
     special_counties,
+    defaultRegionOnStartup,
   } from '../stores';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';

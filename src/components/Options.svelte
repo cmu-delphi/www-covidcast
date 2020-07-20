@@ -1,5 +1,5 @@
 <script>
-  import { sensorMap, currentSensor, levels, currentLevel, currentDate, times } from '../stores';
+  import { sensorMap, currentSensor, levels, currentLevel, currentDate, times, makePlural } from '../stores';
   import { DIRECTION_THEME } from '../theme';
   import Datepicker from './Calendar/Datepicker.svelte';
   import * as d3 from 'd3';
@@ -20,16 +20,6 @@
   }
   $: if ($times !== null) {
     start_end_dates = $times.get($currentSensor);
-  }
-
-  function makePlural(level) {
-    if (level === 'State') {
-      return 'States';
-    } else if (level === 'County') {
-      return 'Counties';
-    } else if (level === 'Metro Area') {
-      return 'Metro Areas';
-    }
   }
 </script>
 
