@@ -42,19 +42,21 @@
   }
 
   .option-title {
-    font-size: 15px;
+    font-size: 14px;
     margin: 0 5px;
     color: #444;
   }
 
   select,
   .calendar {
+    font-size: 14px;
+
     background-color: #ececec;
     border-radius: 5px;
     border: none;
     color: #111;
     line-height: 1.3;
-    padding: 0.4em 0.8em;
+    padding: 0.4em 0.6em;
 
     -moz-appearance: none;
     -webkit-appearance: none;
