@@ -249,3 +249,19 @@ export const sensorList = [
     official: true,
   },
 ];
+
+export const defaultRegionOnStartup = {
+  county: '42003', // Allegheny
+  msa: '38300', // Pittsburgh
+  state: 'PA', // Pennsylvania
+};
+
+export function makePlural(level) {
+  if (level === 'State') {
+    return 'States';
+  } else if (level === 'County') {
+    return 'Counties';
+  } else if (level === 'Metro Area') {
+    return 'Metro Areas';
+  }
+}

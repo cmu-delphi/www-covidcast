@@ -128,9 +128,3 @@ export function logScale() {
 
   return scale;
 }
-
-export const defaultRegionOnStartup = {
-  county: '42003', // Allegheny
-  msa: '38300', // Pittsburgh
-  state: 'PA', // Pennsylvania
-};
