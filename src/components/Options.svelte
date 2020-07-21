@@ -28,6 +28,7 @@
     position: relative;
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
   }
 
   .option-title {
@@ -49,6 +50,8 @@
     appearance: none;
 
     transition: all 0.1s ease-in;
+    flex: 1 1 auto;
+    white-space: nowrap;
   }
 
   select {
@@ -65,15 +68,8 @@
     background-color: #dcdcdc;
   }
 
-  select.indicators {
-    flex-grow: 3;
-  }
-
-  select.geo-level {
-    flex-grow: 1;
-  }
-  .calendar-wrapper {
-    flex-grow: 2;
+  :global(.datepicker) {
+    margin: unset;
   }
 </style>
 
@@ -95,9 +91,7 @@
       {/each}
     </optgroup>
   </select>
-
   <label class="option-title base-font-size" for="option-geo-level">for</label>
-
   <select
     id="option-geo-level"
     aria-label="geographic level"
@@ -111,20 +105,16 @@
   </select>
 
   <label class="option-title base-font-size" for="option-date">on</label>
-
-  <div class="calendar-wrapper">
-    {#if selectedDate != null && start_end_dates.length !== 0}
-      <Datepicker
-        bind:selected={selectedDate}
-        start={parseTime(start_end_dates[0])}
-        end={parseTime(start_end_dates[1])}
-        formattedSelected={formatTime(selectedDate)}
-        style="--test=5;">
-        <button id="option-date" class="calendar base-font-size" on:>
-          {formatTime(selectedDate)} &nbsp;
-          {@html DIRECTION_THEME.decreasingIcon}
-        </button>
-      </Datepicker>
-    {/if}
-  </div>
+  {#if selectedDate != null && start_end_dates.length !== 0}
+    <Datepicker
+      bind:selected={selectedDate}
+      start={parseTime(start_end_dates[0])}
+      end={parseTime(start_end_dates[1])}
+      formattedSelected={formatTime(selectedDate)}>
+      <button id="option-date" class="calendar base-font-size" on:>
+        {formatTime(selectedDate)} &nbsp;
+        {@html DIRECTION_THEME.decreasingIcon}
+      </button>
+    </Datepicker>
+  {/if}
 </div>
