@@ -15,11 +15,17 @@ import {
 } from '../stores';
 import { get } from 'svelte/store';
 import { callAPI, callMetaAPI } from './api';
-import { check_wip, extend } from './utils';
+import { checkWIP, combineAverageWithCount } from './utils';
 import { isCountSignal, isCasesSignal, isDeathSignal } from './signals';
 
 function toRegionCacheKey(sensor, level, date) {
   return sensor + level + date;
+}
+function toTimeSliceCacheKey(sensor, level, region) {
+  return sensor + level + region;
+}
+function toStatsRegionKey(sensorKey, region) {
+  return sensorKey + '_' + region;
 }
 
 // We cache API calls for all regions at a given time and update currentData.
@@ -47,8 +53,8 @@ export function updateRegionSliceCache(sensor, level, date, reason = 'unspecifie
 
     // deaths_incidence_prop
     if (sEntry.signal === 'deaths_7dav_incidence_prop') {
-      return callAPI(sEntry.id, check_wip(sEntry.signal, 'deaths_incidence_prop'), level, date, '*').then((d1) => {
-        const extended = extend(d, d1);
+      return callAPI(sEntry.id, checkWIP(sEntry.signal, 'deaths_incidence_prop'), level, date, '*').then((d1) => {
+        const extended = combineAverageWithCount(d, d1);
         currentData.set(extended);
         regionSliceCache.update((m) => m.set(cacheKey, extended));
         return extended;
@@ -56,8 +62,8 @@ export function updateRegionSliceCache(sensor, level, date, reason = 'unspecifie
     }
     // deaths needs both count and ratio
     if (isDeathSignal(sEntry.signal)) {
-      return callAPI(sEntry.id, check_wip(sEntry.signal, 'deaths_incidence_num'), level, date, '*').then((d1) => {
-        let extended = extend(d, d1);
+      return callAPI(sEntry.id, checkWIP(sEntry.signal, 'deaths_incidence_num'), level, date, '*').then((d1) => {
+        let extended = combineAverageWithCount(d, d1);
         currentData.set(extended);
         regionSliceCache.update((m) => m.set(cacheKey, extended));
         return extended;
@@ -65,8 +71,8 @@ export function updateRegionSliceCache(sensor, level, date, reason = 'unspecifie
     }
     // confirmed_incidence_prop
     if (sEntry.signal === 'confirmed_7dav_incidence_prop') {
-      return callAPI(sEntry.id, check_wip(sEntry.signal, 'confirmed_incidence_prop'), level, date, '*').then((d1) => {
-        const extended = extend(d, d1);
+      return callAPI(sEntry.id, checkWIP(sEntry.signal, 'confirmed_incidence_prop'), level, date, '*').then((d1) => {
+        const extended = combineAverageWithCount(d, d1);
         currentData.set(extended);
         regionSliceCache.update((m) => m.set(cacheKey, extended));
         return extended;
@@ -74,8 +80,8 @@ export function updateRegionSliceCache(sensor, level, date, reason = 'unspecifie
     }
     // cases needs both count and ratio
     if (isCasesSignal(sEntry.signal)) {
-      return callAPI(sEntry.id, check_wip(sEntry.signal, 'confirmed_incidence_num'), level, date, '*').then((d1) => {
-        const extended = extend(d, d1);
+      return callAPI(sEntry.id, checkWIP(sEntry.signal, 'confirmed_incidence_num'), level, date, '*').then((d1) => {
+        const extended = combineAverageWithCount(d, d1);
         currentData.set(extended);
         regionSliceCache.update((m) => m.set(cacheKey, extended));
         return extended;
@@ -87,10 +93,6 @@ export function updateRegionSliceCache(sensor, level, date, reason = 'unspecifie
     regionSliceCache.update((m) => m.set(cacheKey, d.epidata));
     return d.epidata;
   });
-}
-
-function toTimeSliceCacheKey(sensor, level, region) {
-  return sensor + level + region;
 }
 
 // We cache API calls for all time at a given region and update regionData.
@@ -133,10 +135,6 @@ export function updateTimeSliceCache(sensor, level, region) {
     timeSliceCache.update((m) => m.set(cacheKey, epi_data));
     return epi_data;
   });
-}
-
-function toStatsRegionKey(sensorKey, region) {
-  return sensorKey + '_' + region;
 }
 
 function processMetaData(meta) {

@@ -17,6 +17,7 @@ function updateURIParameters(delta) {
   // just update the current state
   const params = new URLSearchParams(window.location.search);
 
+  // update params with state
   Object.keys(state).forEach((key) => {
     const v = state[key];
     if (v) {
