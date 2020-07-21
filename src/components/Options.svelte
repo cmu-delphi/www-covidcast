@@ -31,14 +31,12 @@
   }
 
   .option-title {
-    font-size: 0.88rem;
     margin: 0 5px;
     color: #444;
   }
 
   select,
   .calendar {
-    font-size: 0.88rem;
     background-color: #ececec;
     border-radius: 5px;
     border: none;
@@ -80,8 +78,12 @@
 </style>
 
 <div class="options">
-  <label class="option-title" for="option-indicator">Displaying</label>
-  <select id="option-indicator" aria-label="indicator options" class="indicators" bind:value={$currentSensor}>
+  <label class="option-title base-font-size" for="option-indicator">Displaying</label>
+  <select
+    id="option-indicator"
+    aria-label="indicator options"
+    class="indicators base-font-size"
+    bind:value={$currentSensor}>
     <optgroup label="Indicators">
       {#each Array.from($sensorMap.keys()).filter((d) => !$sensorMap.get(d).official) as sensor}
         <option title={$sensorMap.get(sensor).tooltipText} value={sensor}>{$sensorMap.get(sensor).name}</option>
@@ -94,9 +96,13 @@
     </optgroup>
   </select>
 
-  <label class="option-title" for="option-geo-level">for</label>
+  <label class="option-title base-font-size" for="option-geo-level">for</label>
 
-  <select id="option-geo-level" aria-label="geographic level" class="geo-level" bind:value={$currentLevel}>
+  <select
+    id="option-geo-level"
+    aria-label="geographic level"
+    class="geo-level base-font-size"
+    bind:value={$currentLevel}>
     {#each Object.keys($levels) as level}
       <option value={level} disabled={$sensorMap.get($currentSensor).levels.includes(level) === false}>
         {makePlural($levels[level])}
@@ -104,7 +110,7 @@
     {/each}
   </select>
 
-  <label class="option-title" for="option-date">on</label>
+  <label class="option-title base-font-size" for="option-date">on</label>
 
   <div class="calendar-wrapper">
     {#if selectedDate != null && start_end_dates.length !== 0}
@@ -114,7 +120,7 @@
         end={parseTime(start_end_dates[1])}
         formattedSelected={formatTime(selectedDate)}
         style="--test=5;">
-        <button id="option-date" class="calendar" on:>
+        <button id="option-date" class="calendar base-font-size" on:>
           {formatTime(selectedDate)} &nbsp;
           {@html DIRECTION_THEME.decreasingIcon}
         </button>

@@ -167,3 +167,7 @@ button.mapboxgl-popup-close-button {
   /* border: none; */
   border-radius: 3px;
 }
+
+.base-font-size {
+  font-size: 0.88rem;
+}

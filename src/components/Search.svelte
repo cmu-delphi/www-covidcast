@@ -19,7 +19,6 @@
 
 <style>
   .root {
-    font-size: 0.88rem;
     flex: 1 1 0;
     display: flex;
     padding: 0 0.2em;
@@ -80,7 +79,7 @@
   }
 </style>
 
-<div class="root {className}">
+<div class="root base-font-size {className}">
   <div class="search-icon">
     <IoIosSearch />
   </div>

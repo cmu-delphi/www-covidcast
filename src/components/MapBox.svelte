@@ -10,6 +10,7 @@
   import Legend from './Legend.svelte';
   import Banner from './Banner.svelte';
   import Search from './Search.svelte';
+  import MapControls from './MapControls.svelte';
   import Time from './Time.svelte';
   import GraphContainer from './Graph/GraphContainer.svelte';
   import {
@@ -735,9 +736,8 @@
       center: [lon, lat],
       zoom: zoom,
       minZoom: ZOOM - 1,
-    })
-      .addControl(new mapboxgl.AttributionControl({ compact: true }))
-      .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+    }).addControl(new mapboxgl.AttributionControl({ compact: true }));
+    // .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
 
     //Disable touch zoom, it makes gesture scrolling difficult
     map.scrollZoom.disable();
@@ -1180,64 +1180,6 @@
     height: 100%;
   }
 
-  .state-buttons-holder {
-    position: absolute;
-    top: 79px;
-    right: 9px;
-    z-index: 100;
-  }
-
-  #swpa-button-holder.state-buttons-holder {
-    position: absolute;
-    top: 120px;
-    right: 9px;
-    z-index: 100;
-  }
-
-  #swpa-button-holder.state-buttons-holder button {
-    font-size: 9px;
-  }
-
-  .state-buttons-holder button:focus {
-    outline: none;
-  }
-
-  .state-buttons-holder .pg-button {
-    font-size: 23px;
-    position: relative;
-    width: 28px;
-    height: 28px;
-    color: #333;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    box-sizing: content-box;
-    text-align: center;
-    font-family: 'FranklinITCProBold', Helvetica, Arial, sans-serif;
-    line-height: 16px;
-    cursor: pointer;
-    text-decoration: none;
-    user-select: none;
-    transition-delay: 0s;
-    transition-duration: 0.15s;
-    transition-property: background-color;
-    transition-timing-function: ease-in-out;
-
-    /* rounded design refresh */
-    border: 2px solid #dedede;
-    border-radius: 4px;
-    background-color: #ffffff;
-  }
-
-  .state-buttons-holder .pg-button:hover {
-    background-color: #f2f2f2;
-  }
-
-  .state-buttons-holder .pg-button img {
-    width: 90%;
-  }
-
   .overlay-container {
     /* rounded design refresh */
     border-radius: 7px;
@@ -1251,6 +1193,7 @@
     left: 10px;
     max-width: 650px;
     z-index: 1001;
+
     padding: 8px 8px;
     box-sizing: border-box;
     transition: all 0.1s ease-in;
@@ -1263,10 +1206,10 @@
     left: 10px;
     width: 100px;
     z-index: 1001;
+
     padding: 8px 8px;
     box-sizing: border-box;
     transition: all 0.1s ease-in;
-
     font-family: 'Open Sans', Helvetica, sans-serif !important;
   }
 
@@ -1276,11 +1219,11 @@
     right: 75px;
     top: 12px;
     z-index: 1001;
+    display: flex;
+    align-items: center;
 
     padding: 8px 8px;
     box-sizing: border-box;
-    display: flex;
-    align-items: center;
   }
 
   .legend-container {
@@ -1288,12 +1231,13 @@
     bottom: 12px;
     left: 10px;
     z-index: 1000;
+    /*height: 105px;*/
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
     transition: all 0.1s ease-in;
-    /*height: 105px;*/
   }
 
   .invalid_search-container {
@@ -1318,6 +1262,17 @@
     box-sizing: border-box;
     transition: all 0.1s ease-in;
   }
+
+  .map-controls-container {
+    position: absolute;
+    top: 12px;
+    right: 10px;
+
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+  }
+
   .hidden {
     display: none;
   }
@@ -1353,32 +1308,25 @@
     <Banner bind:this={searchErrorComponent} />
   </div>
 
-  <div class="state-buttons-holder">
-    <button
-      aria-label="show entire map"
-      data-state="us48"
-      id="bounds-button"
-      class="pg-button bounds-button"
-      on:click={() => {
+  <div class="map-controls-container">
+    <MapControls
+      zoom={map ? map.getZoom() : 0}
+      maxZoom={map ? map.getMaxZoom() : 100}
+      minZoom={map ? map.getMinZoom() : -100}
+      on:zoomIn={() => {
+        map.zoomIn();
+      }}
+      on:zoomOut={() => {
+        map.zoomOut();
+      }}
+      on:reset={() => {
         map.easeTo({ center: [LON, LAT], zoom: ZOOM, bearing: 0, pitch: 0 });
-      }}>
-      <img src="./assets/imgs/us48.png" alt="" />
-    </button>
+      }}
+      on:swpa={() => {
+        map.easeTo({ center: [SWPA_LON, SWPA_LAT], zoom: SWPA_ZOOM, bearing: 0, pitch: 0 });
+        showZoneBoundary('swpa');
+      }} />
   </div>
-
-  {#if $currentZone.length > 0}
-    <div class="state-buttons-holder" id="swpa-button-holder">
-      <button
-        aria-label="show swpa boundary"
-        class="pg-button bounds-button"
-        on:click={() => {
-          map.easeTo({ center: [SWPA_LON, SWPA_LAT], zoom: SWPA_ZOOM, bearing: 0, pitch: 0 });
-          showZoneBoundary('swpa');
-        }}>
-        SWPA
-      </button>
-    </div>
-  {/if}
 
   <div class="time-container overlay-container">
     <Time />
