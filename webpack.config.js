@@ -17,8 +17,8 @@ module.exports = () => {
 
     output: {
       path: path.resolve(__dirname, 'public'),
-      filename: 'build/[name].js',
-      chunkFilename: 'build/[name].js?id=[chunkhash]',
+      filename: '[name].js',
+      chunkFilename: '[name].js?id=[chunkhash]',
       // publicPath: './',
     },
 
@@ -109,8 +109,8 @@ module.exports = () => {
       }),
       new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({
-        filename: 'build/[name].css',
-        chunkFilename: 'build/[id].css',
+        filename: '[name].css',
+        chunkFilename: '[id].css',
       }),
       !devMode && new CleanWebpackPlugin(),
     ].filter(Boolean),
