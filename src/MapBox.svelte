@@ -2,8 +2,8 @@
   //import mapboxgl from 'mapbox-gl';
   import { onMount, setContext } from 'svelte';
   import mapboxgl from 'mapbox-gl';
-  import { defaultRegionOnStartup, getTextColorBasedOnBackground, logScale } from './util.js';
-  import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME } from './theme.js';
+  import { defaultRegionOnStartup, getTextColorBasedOnBackground, LogScale, flatten } from './util.js';
+  import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from './theme.js';
   import AutoComplete from 'simple-svelte-autocomplete';
   import IoIosSearch from 'svelte-icons/io/IoIosSearch.svelte';
   import Options from './Options.svelte';
@@ -35,6 +35,7 @@
     dict,
     special_counties,
   } from './stores.js';
+
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
 
@@ -541,7 +542,7 @@
         const minRadius = ENCODING_BUBBLE_THEME.minRadius[$currentLevel],
           maxRadius = ENCODING_BUBBLE_THEME.maxRadius[$currentLevel];
 
-        currentRadiusScale = logScale()
+        currentRadiusScale = LogScale()
           .domain(colorScaleLog.domain())
           .range([minRadius, maxRadius])
           .base(ENCODING_BUBBLE_THEME.base);
@@ -600,8 +601,6 @@
       drawMega ? map.getSource('mega-county').setData(megaDat) : '';
     }
 
-    console.log($encoding);
-
     if ($encoding === 'color') {
       // hide all bubble layers
       Object.keys($levels).forEach(name => {
@@ -646,8 +645,6 @@
         map.setLayoutProperty(centerHighlight(name), 'visibility', 'none');
       });
       if (map.getLayer(center($currentLevel))) {
-        const flatten = arr => arr.reduce((acc, val) => acc.concat(val), []);
-
         // color scale (color + stroke color)
 
         let flatStops = flatten(stops);
@@ -679,6 +676,29 @@
     } else if ($encoding === 'spike') {
       // test codes for spikes
 
+      const useLog = true,
+        useColor = false,
+        valueMin = valueMinMax[0],
+        valueMax = valueMinMax[1],
+        maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel],
+        size = ENCODING_SPIKE_THEME.size[$currentLevel];
+      let scale;
+
+      if (useLog) {
+        scale = d3
+          .scaleLog()
+          .range([0, maxHeight])
+          .domain([0.0001, valueMax])
+          .base(2);
+
+        console.log(maxHeight, valueMax);
+      } else {
+        scale = d3
+          .scaleSqrt()
+          .range([0, maxHeight])
+          .domain([0, valueMax]);
+      }
+
       Object.keys($levels).forEach(name => {
         map.setLayoutProperty(center(name), 'visibility', 'none');
         map.setLayoutProperty(centerHighlight(name), 'visibility', 'none');
@@ -687,20 +707,21 @@
       map.setLayoutProperty($currentLevel, 'visibility', 'visible');
 
       const centers = $geojsons.get(center($currentLevel));
-      console.log(centers);
-      const size = 0.1;
+      const features = centers.features.filter(feature => feature.properties.value > 0);
+
       const spikes = {
         type: 'FeatureCollection',
-        features: centers.features.map(county => {
-          const center = county.geometry.coordinates;
-          // console.log(center, county.properties.value);
+        features: features.map(feature => {
+          const center = feature.geometry.coordinates,
+            value = feature.properties.value;
           return {
             geometry: {
               coordinates: [
-                [[center[0] - size, center[1]], [center[0], center[1] + size * 2], [center[0] + size, center[1]]],
+                [[center[0] - size, center[1]], [center[0], center[1] + scale(value)], [center[0] + size, center[1]]],
               ],
               type: 'Polygon',
             },
+            properties: { value: value },
             type: 'Feature',
           };
         }),
@@ -708,25 +729,34 @@
 
       const spikeOutlines = {
         type: 'FeatureCollection',
-        features: centers.features.map(county => {
-          const center = county.geometry.coordinates;
-          // console.log(center, county.properties.value);
+        features: features.map(feature => {
+          const center = feature.geometry.coordinates,
+            value = feature.properties.value;
+
           return {
             geometry: {
               coordinates: [
                 [center[0] - size, center[1]],
-                [center[0], center[1] + size * 2],
+                [center[0], center[1] + scale(value)],
                 [center[0] + size, center[1]],
               ],
               type: 'LineString',
             },
+            properties: { value: value },
             type: 'Feature',
           };
         }),
       };
 
-      console.log(spikes);
+      if (useColor) {
+        let flatStops = flatten(stops);
+        flatStops.shift(); // remove the first element which has a value of 0 since the "step" expression of mapbox does not require it.
 
+        flatStops[0] = 'transparent';
+        let colorExpression = ['step', ['get', 'value']].concat(flatStops);
+        map.setPaintProperty('spike', 'fill-color', colorExpression);
+        map.setPaintProperty(outline('spike'), 'line-color', colorExpression);
+      }
       map.getSource('spike').setData(spikes);
       map.getSource(outline('spike')).setData(spikeOutlines);
     }
@@ -1179,9 +1209,10 @@
         id: 'spike',
         type: 'fill',
         source: 'spike',
+        filter: ['>', ['get', 'value'], 0],
         paint: {
-          'fill-color': 'red',
-          'fill-opacity': 0.1,
+          'fill-color': ENCODING_SPIKE_THEME.color,
+          'fill-opacity': ENCODING_SPIKE_THEME.fillOpacity,
           'fill-outline-color': 'transparent',
         },
       });
@@ -1190,13 +1221,15 @@
         id: outline('spike'),
         type: 'line',
         source: outline('spike'),
+        filter: ['>', ['get', 'value'], 0],
         layout: {
           'line-cap': 'round',
           'line-join': 'round',
         },
         paint: {
-          'line-color': 'blue',
-          'line-width': 1,
+          'line-color': ENCODING_SPIKE_THEME.color,
+          'line-width': ENCODING_SPIKE_THEME.strokeWidth[$currentLevel],
+          'line-opacity': ENCODING_SPIKE_THEME.strokeOpacity,
         },
       });
       encoding.set('spike');

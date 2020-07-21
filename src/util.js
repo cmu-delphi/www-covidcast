@@ -81,7 +81,7 @@ export function getTextColorBasedOnBackground(bgColor) {
 // Because MapBox does not support applying a custom function for a property,
 // so we cannot use d3.scaleLog().
 
-export function logScale() {
+export function LogScale() {
   let a = 1,
     b = 0,
     base = 10,
@@ -135,3 +135,7 @@ export const defaultRegionOnStartup = {
   msa: '38300', // Pittsburgh
   state: 'PA', // Pennsylvania
 };
+
+export function flatten(arr) {
+  return arr.reduce((acc, val) => acc.concat(val), []);
+}

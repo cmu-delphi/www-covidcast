@@ -52,3 +52,24 @@ export const ENCODING_BUBBLE_THEME = {
   },
   base: 2,
 };
+
+export const ENCODING_SPIKE_THEME = {
+  color: 'red',
+  fillOpacity: 0.2,
+  strokeOpacity: 0.8,
+  strokeWidth: {
+    county: 1,
+    msa: 1.5,
+    state: 2,
+  },
+  maxHeight: {
+    county: 0.5,
+    msa: 1,
+    state: 2,
+  },
+  size: {
+    county: 0.1,
+    msa: 0.2,
+    state: 0.4,
+  },
+};
