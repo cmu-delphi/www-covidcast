@@ -1090,8 +1090,40 @@
     }
   }
 
+  function resetHighlightedFeature() {
+    if (clickedId) {
+      map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: false });
+    }
+    clickedId = null;
+    if (megaClickedId) {
+      map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: false });
+    }
+    megaClickedId = null;
+  }
+
+  function highlightFeature(selectedRegion) {
+    clickedId = Number.parseInt(selectedRegion['id']);
+
+    map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+    map.setFeatureState({ source: center($currentLevel), id: clickedId }, { select: true });
+  }
+
+  function resetSearch() {
+    if (!selectedRegion) {
+      // not set before
+      return;
+    }
+    selectedRegion = null;
+    // reset and fly out
+    currentRegionName.set('');
+    currentRegion.set('');
+    resetHighlightedFeature();
+    // fly out
+    map.flyTo({ center: [LON, LAT], zoom: ZOOM, bearing: 0, pitch: 0, essential: true });
+  }
+
   function searchElement(e) {
-    const selectedRegion = e.detail;
+    selectedRegion = e.detail;
 
     let hasValueFlag = false;
     const availLevels = $sensorMap.get($currentSensor).levels;
@@ -1109,19 +1141,12 @@
         currentDataReadyOnMap.set(false);
         currentLevel.set(selectedRegion['level']);
       }
-      if (clickedId) {
-        map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: false });
-      }
-      if (megaClickedId) {
-        map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: false });
-      }
+      resetHighlightedFeature();
 
-      megaClickedId = null;
       currentRegionName.set(selectedRegion['name']);
       currentRegion.set(selectedRegion['property_id']);
-      clickedId = parseInt(selectedRegion['id']);
-      map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-      map.setFeatureState({ source: center($currentLevel), id: clickedId }, { select: true });
+
+      highlightFeature(selectedRegion);
 
       // Get zoom and center of selected location
       let centersData = $geojsons.get(center($currentLevel))['features'];
@@ -1215,7 +1240,6 @@
 
   .search-container {
     position: absolute;
-    width: 400px;
     right: 75px;
     top: 12px;
     z-index: 1001;
@@ -1284,7 +1308,7 @@
 
 <div class="map-container">
 
-  <div class="options-container overlay-container">
+  <div class="options-container overlay-container base-font-size">
     <Options />
   </div>
 
@@ -1295,8 +1319,8 @@
   </div>
 
   {#if loaded && regionList.length != 0}
-    <div class="search-container overlay-container">
-      <Search {regionList} {selectedRegion} on:search={searchElement} />
+    <div class="search-container overlay-container base-font-size">
+      <Search {regionList} {selectedRegion} on:search={searchElement} on:reset={resetSearch} />
     </div>
   {/if}
 

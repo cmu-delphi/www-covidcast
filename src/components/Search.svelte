@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte';
   import AutoComplete from 'simple-svelte-autocomplete';
   import IoIosSearch from 'svelte-icons/io/IoIosSearch.svelte';
+  import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
 
   const dispatch = createEventDispatcher();
 
@@ -10,15 +11,23 @@
   let className = '';
   export { className as class };
 
-  function onSearch() {
-    if (typeof selectedRegion !== 'undefined' && selectedRegion !== '') {
-      dispatch('search', selectedRegion);
+  let searchVisible = false;
+
+  export let mobile = false;
+
+  function onSearch(value) {
+    if (value === selectedRegion) {
+      return;
+    }
+    if (typeof value !== 'undefined' && value !== '') {
+      dispatch('search', value);
     }
   }
 </script>
 
 <style>
   .root {
+    width: 25em;
     flex: 1 1 0;
     display: flex;
     padding: 0 0.2em;
@@ -37,6 +46,10 @@
 
   .search {
     flex-grow: 1;
+  }
+
+  .hidden {
+    display: none;
   }
 
   /* search bar */
@@ -79,18 +92,53 @@
   }
 </style>
 
-<div class="root base-font-size {className}">
+<div class="root {className}">
   <div class="search-icon">
-    <IoIosSearch />
+    {#if mobile}
+      <button
+        class="pg-button"
+        type="button"
+        title="Show Search Field"
+        aria-label="Show Search Field"
+        on:click={() => {
+          if (selectedRegion) {
+            return;
+          }
+          searchVisible = !searchVisible;
+        }}>
+        <IoIosSearch />
+      </button>
+    {:else}
+      <IoIosSearch />
+    {/if}
   </div>
-  <div class="search">
+  <div class="search" class:hidden={mobile && !searchVisible && !selectedRegion}>
     <AutoComplete
       className="search-bar"
       placeholder="Search for a location..."
       items={regionList}
-      bind:selectedItem={selectedRegion}
+      selectedItem={selectedRegion}
       labelFieldName="display_name"
       maxItemsToShowInList="5"
       onChange={onSearch} />
+  </div>
+  <div class="search-icon" class:hidden={!selectedRegion} on:click={() => dispatch('reset')}>
+    {#if mobile}
+      <button
+        class="pg-button"
+        type="button"
+        title="Show Search Field"
+        aria-label="Show Search Field"
+        on:click={() => {
+          if (selectedRegion) {
+            return;
+          }
+          searchVisible = !searchVisible;
+        }}>
+        <IoIosSearch />
+      </button>
+    {:else}
+      <IoIosClose />
+    {/if}
   </div>
 </div>
