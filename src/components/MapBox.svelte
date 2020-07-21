@@ -1293,6 +1293,13 @@
   .hidden {
     display: none;
   }
+
+  .bounds-button {
+    background: url('../assets/us48.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 90%;
+  }
 </style>
 
 <div class="banner">
