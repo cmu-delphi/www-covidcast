@@ -1175,26 +1175,14 @@
 
 <style>
   .banner {
-    font-size: 20px;
-    top: 12px;
-    position: absolute;
-    line-height: 1.2em;
+    font-size: 1.3rem;
     font-weight: 600;
     text-align: center;
-    align-items: center;
-    pointer-events: none;
-    left: 0;
-    right: 0;
-    margin-left: auto;
-    margin-right: auto;
   }
 
   .map-container {
-    width: 100%;
-    height: 80vh;
     position: relative;
-    top: 50px;
-    min-height: 550px;
+    flex: 1 1 550px;
   }
 
   .map-wrapper {
@@ -1230,7 +1218,6 @@
     position: absolute;
     top: 68px;
     left: 10px;
-    width: 100px;
     z-index: 1001;
   }
 
@@ -1293,29 +1280,14 @@
   .hidden {
     display: none;
   }
-
-  .bounds-button {
-    background: url('../assets/us48.png');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 90%;
-  }
 </style>
 
-<div class="banner">
-  <span class="banner-text">{currentSensorTooltip}</span>
-</div>
+<h2 class="banner">{currentSensorTooltip}</h2>
 
-<div class="map-container">
+<main class="map-container">
 
   <div class="options-container container-bg base-font-size container-style">
     <Options />
-  </div>
-
-  <div
-    class="toggle-container container-bg container-style"
-    class:hidden={$signalType === 'direction' || !$currentSensor.match(/num/)}>
-    <Toggle />
   </div>
 
   {#if loaded && regionList.length != 0}
@@ -1323,14 +1295,6 @@
       <Search {regionList} {selectedRegion} on:search={searchElement} on:reset={resetSearch} />
     </div>
   {/if}
-
-  <div class="legend-container container-bg">
-    <Legend />
-  </div>
-
-  <div class="invalid_search-container">
-    <Banner bind:this={searchErrorComponent} />
-  </div>
 
   <div class="map-controls-container">
     <MapControls
@@ -1352,6 +1316,20 @@
       }} />
   </div>
 
+  <div
+    class="toggle-container container-bg base-font-size container-style"
+    class:hidden={$signalType === 'direction' || !$currentSensor.match(/num/)}>
+    <Toggle />
+  </div>
+
+  <div class="legend-container container-bg">
+    <Legend />
+  </div>
+
+  <div class="invalid_search-container">
+    <Banner bind:this={searchErrorComponent} />
+  </div>
+
   <div class="time-container container-bg">
     <Time />
   </div>
@@ -1359,4 +1337,4 @@
   <GraphContainer {isIE} {graphShowStatus} {toggleGraphShowStatus} />
 
   <div class="map-wrapper" bind:this={container} />
-</div>
+</main>
