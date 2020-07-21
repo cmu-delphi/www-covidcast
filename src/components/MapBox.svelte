@@ -65,6 +65,9 @@
   let megaClickedId;
   let selectedRegion;
 
+  export let isMobile = false;
+  export let isPortrait = false;
+
   $: regionList = [];
   $: loaded = false;
   $: invalidSearch = false;
@@ -1176,6 +1179,7 @@
 <style>
   .banner {
     font-size: 1.3rem;
+    line-height: 1.2em;
     font-weight: 600;
     text-align: center;
   }
@@ -1293,7 +1297,12 @@
 
   {#if loaded && regionList.length != 0}
     <div class="search-container container-bg base-font-size container-style">
-      <Search {regionList} {selectedRegion} on:search={searchElement} on:reset={resetSearch} />
+      <Search
+        {regionList}
+        {selectedRegion}
+        on:search={searchElement}
+        on:reset={resetSearch}
+        mobile={isMobile && isPortrait} />
     </div>
   {/if}
 
