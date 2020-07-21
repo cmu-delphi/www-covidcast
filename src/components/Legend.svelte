@@ -282,7 +282,7 @@
     list-style: none;
   }
 
-  .trend-legend-grouping ul.legend-labels li span {
+  .trend-legend-grouping ul.legend-labels li div.color-block {
     display: block;
     float: left;
     height: 15px;
@@ -396,17 +396,17 @@
       <div class="trend-legend-grouping">
         <ul class="legend-labels">
           <li>
-            <span style="background-color: {DIRECTION_THEME.increasing}" />
+            <div class="color-block" style="background-color: {DIRECTION_THEME.increasing}" />
             {@html DIRECTION_THEME.increasingIcon}
             Increasing
           </li>
           <li>
-            <span style="background-color: {DIRECTION_THEME.steady}" />
+            <div class="color-block" style="background-color: {DIRECTION_THEME.steady}" />
             {@html DIRECTION_THEME.steadyIcon}
             Steady
           </li>
           <li>
-            <span style="background-color: {DIRECTION_THEME.decreasing}" />
+            <div class="color-block" style="background-color: {DIRECTION_THEME.decreasing}" />
             {@html DIRECTION_THEME.decreasingIcon}
             Decreasing
           </li>
