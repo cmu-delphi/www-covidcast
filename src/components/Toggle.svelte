@@ -15,6 +15,11 @@
     color: #444;
   }
 
+  .option-title {
+    margin: 0 5px;
+    color: #444;
+  }
+
   .button {
     margin-top: 0.2em;
     background-size: 60%;
@@ -32,7 +37,7 @@
 </style>
 
 <div class="toggle">
-  <span>Switch to</span>
+  <label class="option-title">Switch to</label>
   <button
     aria-pressed={$encoding === 'bubble' ? 'true' : 'false'}
     class="pg-button button"
