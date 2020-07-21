@@ -31,14 +31,14 @@
   }
 
   .option-title {
-    font-size: 0.8rem;
+    font-size: 0.88rem;
     margin: 0 5px;
     color: #444;
   }
 
   select,
   .calendar {
-    font-size: 0.8rem;
+    font-size: 0.88rem;
     background-color: #ececec;
     border-radius: 5px;
     border: none;

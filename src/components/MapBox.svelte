@@ -5,12 +5,11 @@
   import 'mapbox-gl/dist/mapbox-gl.css';
   import { getTextColorBasedOnBackground, logScale } from '../util';
   import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME } from '../theme';
-  import AutoComplete from 'simple-svelte-autocomplete';
-  import IoIosSearch from 'svelte-icons/io/IoIosSearch.svelte';
   import Options from './Options.svelte';
   import Toggle from './Toggle.svelte';
   import Legend from './Legend.svelte';
   import Banner from './Banner.svelte';
+  import Search from './Search.svelte';
   import Time from './Time.svelte';
   import GraphContainer from './Graph/GraphContainer.svelte';
   import {
@@ -1091,7 +1090,9 @@
     }
   }
 
-  function searchElement(selectedRegion) {
+  function searchElement(e) {
+    const selectedRegion = e.detail;
+
     let hasValueFlag = false;
     const availLevels = $sensorMap.get($currentSensor).levels;
     for (let i = 0; i < availLevels.length; i++) {
@@ -1237,6 +1238,13 @@
     width: 90%;
   }
 
+  .overlay-container {
+    /* rounded design refresh */
+    border-radius: 7px;
+    background-color: #ffffff;
+    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
+  }
+
   .options-container {
     position: absolute;
     top: 12px;
@@ -1246,12 +1254,6 @@
     padding: 8px 8px;
     box-sizing: border-box;
     transition: all 0.1s ease-in;
-
-    /* rounded design refresh */
-    border-radius: 7px;
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
-
     font-family: 'Open Sans', Helvetica, sans-serif !important;
   }
 
@@ -1265,11 +1267,6 @@
     box-sizing: border-box;
     transition: all 0.1s ease-in;
 
-    /* rounded design refresh */
-    border-radius: 7px;
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
-
     font-family: 'Open Sans', Helvetica, sans-serif !important;
   }
 
@@ -1280,31 +1277,10 @@
     top: 12px;
     z-index: 1001;
 
-    background-color: #fff;
-    box-shadow: 0px 4px 30px rgba(151, 151, 151, 0.25);
-    border-radius: 7px;
-
-    display: flex;
-  }
-
-  .search-icon-container {
-    flex-shrink: 0;
-    width: 30px;
-    height: 44px;
+    padding: 8px 8px;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-  }
-
-  .search-icon {
-    width: 20px;
-    height: 20px;
-    color: #9b9b9b;
-  }
-
-  .search {
-    flex-grow: 1;
-    font-size: 14px;
   }
 
   .legend-container {
@@ -1318,11 +1294,6 @@
     justify-content: center;
     transition: all 0.1s ease-in;
     /*height: 105px;*/
-
-    /* rounded design refresh */
-    border-radius: 7px;
-    background-color: #ffffff;
-    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
   }
 
   .invalid_search-container {
@@ -1346,11 +1317,6 @@
     padding: 30px 10px;
     box-sizing: border-box;
     transition: all 0.1s ease-in;
-
-    /* rounded design refresh */
-    border-radius: 7px;
-    background-color: #ffffff;
-    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
   }
   .hidden {
     display: none;
@@ -1363,39 +1329,23 @@
 
 <div class="map-container">
 
-  <div class="options-container">
+  <div class="options-container overlay-container">
     <Options />
   </div>
 
-  <div class="toggle-container {$signalType === 'direction' || !$currentSensor.match(/num/) ? 'hidden' : ''}">
+  <div
+    class="toggle-container overlay-container"
+    class:hidden={$signalType === 'direction' || !$currentSensor.match(/num/)}>
     <Toggle />
   </div>
 
   {#if loaded && regionList.length != 0}
-    <div class="search-container">
-      <div class="search-icon-container">
-        <div class="search-icon">
-          <IoIosSearch />
-        </div>
-      </div>
-      <div class="search">
-        <AutoComplete
-          className="search-bar"
-          placeholder="Search for a location..."
-          items={regionList}
-          bind:selectedItem={selectedRegion}
-          labelFieldName="display_name"
-          maxItemsToShowInList="5"
-          onChange={() => {
-            if (typeof selectedRegion !== 'undefined') {
-              searchElement(selectedRegion);
-            }
-          }} />
-      </div>
+    <div class="search-container overlay-container">
+      <Search {regionList} {selectedRegion} on:search={searchElement} />
     </div>
   {/if}
 
-  <div class="legend-container">
+  <div class="legend-container overlay-container">
     <Legend />
   </div>
 
@@ -1430,7 +1380,7 @@
     </div>
   {/if}
 
-  <div class="time-container">
+  <div class="time-container overlay-container">
     <Time />
   </div>
 
