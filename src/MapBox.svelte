@@ -95,6 +95,10 @@
     return `${level}-centers-highlight`;
   }
 
+  function outline(level) {
+    return `${level}-outline`;
+  }
+
   onMount(_ => {
     let containerWidth = container.clientWidth;
     if (containerWidth <= 1021) {
@@ -596,7 +600,9 @@
       drawMega ? map.getSource('mega-county').setData(megaDat) : '';
     }
 
-    if ($encoding == 'color') {
+    console.log($encoding);
+
+    if ($encoding === 'color') {
       // hide all bubble layers
       Object.keys($levels).forEach(name => {
         map.setLayoutProperty(center(name), 'visibility', 'none');
@@ -625,7 +631,7 @@
       } else {
         map.setLayoutProperty('mega-county', 'visibility', 'none');
       }
-    } else if ($encoding == 'bubble') {
+    } else if ($encoding === 'bubble') {
       // hide all color layers except for the one for the current level (for tooltip)
       Object.keys($levels).forEach(name => map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none'));
       if (map.getLayer($currentLevel)) {
@@ -670,6 +676,59 @@
       }
 
       map.setLayoutProperty('mega-county', 'visibility', 'none');
+    } else if ($encoding === 'spike') {
+      // test codes for spikes
+
+      Object.keys($levels).forEach(name => {
+        map.setLayoutProperty(center(name), 'visibility', 'none');
+        map.setLayoutProperty(centerHighlight(name), 'visibility', 'none');
+        map.setLayoutProperty(name, 'visibility', 'none');
+      });
+      map.setLayoutProperty($currentLevel, 'visibility', 'visible');
+
+      const centers = $geojsons.get(center($currentLevel));
+      console.log(centers);
+      const size = 0.1;
+      const spikes = {
+        type: 'FeatureCollection',
+        features: centers.features.map(county => {
+          const center = county.geometry.coordinates;
+          // console.log(center, county.properties.value);
+          return {
+            geometry: {
+              coordinates: [
+                [[center[0] - size, center[1]], [center[0], center[1] + size * 2], [center[0] + size, center[1]]],
+              ],
+              type: 'Polygon',
+            },
+            type: 'Feature',
+          };
+        }),
+      };
+
+      const spikeOutlines = {
+        type: 'FeatureCollection',
+        features: centers.features.map(county => {
+          const center = county.geometry.coordinates;
+          // console.log(center, county.properties.value);
+          return {
+            geometry: {
+              coordinates: [
+                [center[0] - size, center[1]],
+                [center[0], center[1] + size * 2],
+                [center[0] + size, center[1]],
+              ],
+              type: 'LineString',
+            },
+            type: 'Feature',
+          };
+        }),
+      };
+
+      console.log(spikes);
+
+      map.getSource('spike').setData(spikes);
+      map.getSource(outline('spike')).setData(spikeOutlines);
     }
 
     const viableFeatures = dat.features.filter(f => f.properties[$signalType] !== -100);
@@ -822,6 +881,22 @@
           type: 'geojson',
           data: $geojsons.get(center(level)),
         });
+      });
+
+      map.addSource('spike', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [],
+        },
+      });
+
+      map.addSource(outline('spike'), {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [],
+        },
       });
 
       map.addLayer({
@@ -1099,6 +1174,32 @@
       if ($currentZone === 'swpa') {
         showZoneBoundary('swpa');
       }
+
+      map.addLayer({
+        id: 'spike',
+        type: 'fill',
+        source: 'spike',
+        paint: {
+          'fill-color': 'red',
+          'fill-opacity': 0.1,
+          'fill-outline-color': 'transparent',
+        },
+      });
+
+      map.addLayer({
+        id: outline('spike'),
+        type: 'line',
+        source: outline('spike'),
+        layout: {
+          'line-cap': 'round',
+          'line-join': 'round',
+        },
+        paint: {
+          'line-color': 'blue',
+          'line-width': 1,
+        },
+      });
+      encoding.set('spike');
 
       mapMounted = true;
       updateMap('init');
