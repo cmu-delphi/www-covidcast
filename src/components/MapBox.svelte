@@ -11,6 +11,7 @@
   import Banner from './Banner.svelte';
   import Search from './Search.svelte';
   import MapControls from './MapControls.svelte';
+  import Title from './Title.svelte';
   import Time from './Time.svelte';
   import GraphContainer from './Graph/GraphContainer.svelte';
   import {
@@ -71,7 +72,6 @@
   $: regionList = [];
   $: loaded = false;
   $: invalidSearch = false;
-  $: currentSensorTooltip = $sensorMap.get($currentSensor).mapTitleText;
 
   // given the level (state/msa/county), returns the name of its "centered" source/layer
   function center(level) {
@@ -1177,11 +1177,19 @@
 </script>
 
 <style>
-  .banner {
-    font-size: 1.3rem;
-    line-height: 1.2em;
-    font-weight: 600;
-    text-align: center;
+  .top-container {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    left: 12px;
+
+    display: grid;
+    grid-gap: 0.1em;
+    grid-template-columns: auto 2fr 1fr 1fr auto;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      'options options player search controls'
+      'toggle title title title controls';
   }
 
   :global(.map-container) {
@@ -1213,26 +1221,47 @@
   }
 
   .options-container {
-    position: absolute;
-    top: 12px;
-    left: 10px;
     z-index: 1001;
+    max-width: 50em;
+    grid-area: options;
   }
 
   .toggle-container {
-    position: absolute;
-    top: 68px;
-    left: 10px;
     z-index: 1001;
+    grid-area: toggle;
+  }
+
+  .title-container {
+    z-index: 1001;
+    grid-area: title;
+  }
+
+  .player-container {
+    z-index: 1001;
+    grid-area: player;
+  }
+
+  .search-container-wrapper {
+    grid-area: search;
+    position: relative;
   }
 
   .search-container {
     position: absolute;
-    right: 75px;
-    top: 12px;
-    z-index: 1001;
+    right: 0;
+    top: 0;
+    max-width: 100%;
+    z-index: 1002;
     display: flex;
     align-items: center;
+  }
+
+  .map-controls-container {
+    margin-left: 1em;
+    z-index: 1001;
+    grid-area: controls;
+    display: flex;
+    align-items: flex-start;
   }
 
   .legend-container {
@@ -1272,64 +1301,58 @@
     transition: all 0.1s ease-in;
   }
 
-  .map-controls-container {
-    position: absolute;
-    top: 12px;
-    right: 10px;
-
-    z-index: 1001;
-    display: flex;
-    align-items: center;
-  }
-
   .hidden {
     display: none;
   }
 </style>
 
-<h2 class="banner">{currentSensorTooltip}</h2>
-
 <main class="map-container">
-
-  <div class="options-container container-bg base-font-size container-style">
-    <Options />
-  </div>
-
-  {#if loaded && regionList.length != 0}
-    <div class="search-container container-bg base-font-size container-style">
-      <Search
-        {regionList}
-        {selectedRegion}
-        on:search={searchElement}
-        on:reset={resetSearch}
-        mobile={isMobile && isPortrait} />
+  <div class="top-container">
+    <div class="options-container container-bg base-font-size container-style">
+      <Options />
     </div>
-  {/if}
-
-  <div class="map-controls-container">
-    <MapControls
-      zoom={map ? map.getZoom() : 0}
-      maxZoom={map ? map.getMaxZoom() : 100}
-      minZoom={map ? map.getMinZoom() : -100}
-      on:zoomIn={() => {
-        map.zoomIn();
-      }}
-      on:zoomOut={() => {
-        map.zoomOut();
-      }}
-      on:reset={() => {
-        map.easeTo({ center: [LON, LAT], zoom: ZOOM, bearing: 0, pitch: 0 });
-      }}
-      on:swpa={() => {
-        map.easeTo({ center: [SWPA_LON, SWPA_LAT], zoom: SWPA_ZOOM, bearing: 0, pitch: 0 });
-        showZoneBoundary('swpa');
-      }} />
-  </div>
-
-  <div
-    class="toggle-container container-bg base-font-size container-style"
-    class:hidden={$signalType === 'direction' || !$currentSensor.match(/num/)}>
-    <Toggle />
+    <div class="player-container container-bg base-font-size container-style">
+      <!-- Player -->
+    </div>
+    <div class="search-container-wrapper">
+      {#if loaded && regionList.length != 0}
+        <div class="search-container container-bg base-font-size container-style">
+          <Search
+            {regionList}
+            {selectedRegion}
+            on:search={searchElement}
+            on:reset={resetSearch}
+            mobile={isMobile && isPortrait} />
+        </div>
+      {/if}
+    </div>
+    <div
+      class="toggle-container container-bg base-font-size container-style"
+      class:hidden={$signalType === 'direction' || !$currentSensor.match(/num/)}>
+      <Toggle />
+    </div>
+    <div class="title-container">
+      <Title />
+    </div>
+    <div class="map-controls-container">
+      <MapControls
+        zoom={map ? map.getZoom() : 0}
+        maxZoom={map ? map.getMaxZoom() : 100}
+        minZoom={map ? map.getMinZoom() : -100}
+        on:zoomIn={() => {
+          map.zoomIn();
+        }}
+        on:zoomOut={() => {
+          map.zoomOut();
+        }}
+        on:reset={() => {
+          map.easeTo({ center: [LON, LAT], zoom: ZOOM, bearing: 0, pitch: 0 });
+        }}
+        on:swpa={() => {
+          map.easeTo({ center: [SWPA_LON, SWPA_LAT], zoom: SWPA_ZOOM, bearing: 0, pitch: 0 });
+          showZoneBoundary('swpa');
+        }} />
+    </div>
   </div>
 
   <div class="legend-container container-bg">

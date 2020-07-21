@@ -74,7 +74,7 @@
 
   .search {
     flex-grow: 1;
-    width: 27em;
+    width: 20em;
   }
 
   .hidden {
