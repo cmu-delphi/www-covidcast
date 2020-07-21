@@ -10,10 +10,10 @@
   font-family: 'Open Sans', sans-serif;
   position: relative;
   width: 100%;
-  height: 90vh;
-  min-width: 1021px;
-  min-height: 550px;
   line-height: 1rem;
+
+  display: flex;
+  flex-direction: column;
 }
 
 .title {
@@ -170,6 +170,10 @@ button.mapboxgl-popup-close-button {
 
 .base-font-size {
   font-size: 0.88rem;
+}
+
+#vizbox [aria-hidden] {
+  display: none;
 }
 
 @import './styles/pg-button.css';
