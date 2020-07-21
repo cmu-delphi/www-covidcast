@@ -4,9 +4,9 @@
   import Datepicker from './Calendar/Datepicker.svelte';
   import * as d3 from 'd3';
 
-  let formatTime = d3.timeFormat('%B %-d, %Y');
-  let convertDate = d3.timeFormat('%Y%m%d');
-  let parseTime = d3.timeParse('%Y%m%d');
+  const formatTime = d3.timeFormat('%B %-d, %Y');
+  const convertDate = d3.timeFormat('%Y%m%d');
+  const parseTime = d3.timeParse('%Y%m%d');
 
   // let selectedDate = writable(parseTime($currentDate));
   $: selectedDate = parseTime($currentDate);
@@ -25,22 +25,20 @@
 
 <style>
   .options {
-    font-size: 0.8rem;
     position: relative;
     display: flex;
     align-items: center;
   }
 
   .option-title {
-    font-size: 14px;
+    font-size: 0.8rem;
     margin: 0 5px;
     color: #444;
   }
 
   select,
   .calendar {
-    font-size: 14px;
-
+    font-size: 0.8rem;
     background-color: #ececec;
     border-radius: 5px;
     border: none;
@@ -76,32 +74,8 @@
   select.geo-level {
     flex-grow: 1;
   }
-
   .calendar-wrapper {
     flex-grow: 2;
-  }
-
-  @keyframes shake {
-    10%,
-    90% {
-      transform: translate3d(-1px, 0, 0);
-    }
-
-    20%,
-    80% {
-      transform: translate3d(2px, 0, 0);
-    }
-
-    30%,
-    50%,
-    70% {
-      transform: translate3d(-4px, 0, 0);
-    }
-
-    40%,
-    60% {
-      transform: translate3d(4px, 0, 0);
-    }
   }
 </style>
 
