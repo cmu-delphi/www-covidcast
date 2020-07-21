@@ -1185,11 +1185,11 @@
 
     display: grid;
     grid-gap: 0.1em;
-    grid-template-columns: auto 2fr 1fr 1fr auto;
+    grid-template-columns: auto 2fr 1fr auto;
     grid-template-rows: auto auto;
     grid-template-areas:
-      'options options player search controls'
-      'toggle title title title controls';
+      'options options search controls'
+      'toggle title title controls';
   }
 
   :global(.map-container) {
@@ -1202,8 +1202,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    right: 0;
+    bottom: 0;
   }
 
   .container-bg {
@@ -1236,11 +1236,6 @@
     grid-area: title;
   }
 
-  .player-container {
-    z-index: 1001;
-    grid-area: player;
-  }
-
   .search-container-wrapper {
     grid-area: search;
     position: relative;
@@ -1254,6 +1249,26 @@
     z-index: 1002;
     display: flex;
     align-items: center;
+  }
+
+  @media only screen and (max-width: 767px) {
+    .top-container {
+      grid-template-columns: auto 1fr auto;
+      grid-template-rows: auto auto auto;
+      grid-template-areas:
+        'options options options'
+        'search title controls'
+        'toggle title controls';
+    }
+
+    .search-container {
+      height: 1.5em;
+    }
+
+    .search-container {
+      right: unset;
+      left: 0;
+    }
   }
 
   .map-controls-container {
@@ -1310,9 +1325,6 @@
   <div class="top-container">
     <div class="options-container container-bg base-font-size container-style">
       <Options />
-    </div>
-    <div class="player-container container-bg base-font-size container-style">
-      <!-- Player -->
     </div>
     <div class="search-container-wrapper">
       {#if loaded && regionList.length != 0}
