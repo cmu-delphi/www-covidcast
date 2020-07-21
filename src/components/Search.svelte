@@ -11,9 +11,24 @@
   let className = '';
   export { className as class };
 
+  /**
+   * @type {HTMLElement | null}
+   */
+  let root = null;
   let searchVisible = false;
 
   export let mobile = false;
+
+  function toggleSearchField() {
+    if (selectedRegion) {
+      return;
+    }
+    searchVisible = !searchVisible;
+    if (searchVisible && root && root.querySelector('input')) {
+      // focus on next frame
+      requestAnimationFrame(() => root.querySelector('input').focus());
+    }
+  }
 
   function onSearch(value) {
     if (value === selectedRegion) {
@@ -23,18 +38,24 @@
       dispatch('search', value);
     }
   }
+
+  function resetSearch() {
+    searchVisible = false;
+    dispatch('reset');
+  }
+
+  $: hideSearchField = mobile && !searchVisible && !selectedRegion;
 </script>
 
 <style>
   .root {
-    width: 25em;
     flex: 1 1 0;
     display: flex;
     padding: 0 0.2em;
     align-items: center;
   }
 
-  .search-icon {
+  .search-button {
     color: #9b9b9b;
     width: 1.4em;
     margin: 0 0.2em;
@@ -42,10 +63,18 @@
     display: flex;
     align-self: flex-start;
     align-items: center;
+    border: none;
+    background: none;
+  }
+
+  .reset-button {
+    z-index: 1;
+    margin-left: -1.6em;
   }
 
   .search {
     flex-grow: 1;
+    width: 20em;
   }
 
   .hidden {
@@ -92,27 +121,17 @@
   }
 </style>
 
-<div class="root {className}">
-  <div class="search-icon">
-    {#if mobile}
-      <button
-        class="pg-button"
-        type="button"
-        title="Show Search Field"
-        aria-label="Show Search Field"
-        on:click={() => {
-          if (selectedRegion) {
-            return;
-          }
-          searchVisible = !searchVisible;
-        }}>
-        <IoIosSearch />
-      </button>
-    {:else}
-      <IoIosSearch />
-    {/if}
-  </div>
-  <div class="search" class:hidden={mobile && !searchVisible && !selectedRegion}>
+<div bind:this={root} class="root {className}">
+  <button
+    class="search-button"
+    class:pg-button={mobile}
+    disabled={!mobile}
+    title="Show Search Field"
+    aria-label="Show Search Field"
+    on:click={toggleSearchField}>
+    <IoIosSearch />
+  </button>
+  <div class="search" class:hidden={hideSearchField}>
     <AutoComplete
       className="search-bar"
       placeholder="Search for a location..."
@@ -122,23 +141,12 @@
       maxItemsToShowInList="5"
       onChange={onSearch} />
   </div>
-  <div class="search-icon" class:hidden={!selectedRegion} on:click={() => dispatch('reset')}>
-    {#if mobile}
-      <button
-        class="pg-button"
-        type="button"
-        title="Show Search Field"
-        aria-label="Show Search Field"
-        on:click={() => {
-          if (selectedRegion) {
-            return;
-          }
-          searchVisible = !searchVisible;
-        }}>
-        <IoIosSearch />
-      </button>
-    {:else}
-      <IoIosClose />
-    {/if}
-  </div>
+  <button
+    class="pg-button search-button reset-button"
+    class:hidden={hideSearchField || !selectedRegion}
+    on:click={resetSearch}
+    title="Clear Search Field"
+    aria-label="Clear Search Field">
+    <IoIosClose />
+  </button>
 </div>
