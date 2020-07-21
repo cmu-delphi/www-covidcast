@@ -24,37 +24,6 @@
     margin-bottom: 0.2em;
   }
 
-  .pg-button {
-    width: 2.2em;
-    padding: 0.2em;
-    box-sizing: border-box;
-
-    position: relative;
-    color: #333;
-    display: flex;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-
-    cursor: pointer;
-    text-decoration: none;
-    user-select: none;
-
-    transition-delay: 0s;
-    transition-duration: 0.15s;
-    transition-property: background-color;
-    transition-timing-function: ease-in-out;
-
-    /* rounded design refresh */
-    border: 2px solid #dedede;
-    border-radius: 4px;
-    background-color: #ffffff;
-  }
-
-  .pg-button:disabled {
-    cursor: not-allowed;
-  }
-
   .button-group > button:first-of-type {
     border-bottom: none;
     border-bottom-right-radius: 0;
@@ -64,14 +33,6 @@
     border-top-right-radius: 0;
     border-top-left-radius: 0;
     border-top-width: 1px;
-  }
-
-  .pg-button:focus {
-    outline: none;
-  }
-
-  .pg-button:hover {
-    background-color: #f2f2f2;
   }
 </style>
 
