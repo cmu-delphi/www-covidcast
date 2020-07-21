@@ -1205,24 +1205,25 @@
     height: 100%;
   }
 
-  .overlay-container {
+  .container-bg {
     /* rounded design refresh */
     border-radius: 7px;
     background-color: #ffffff;
     box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
   }
 
-  .options-container {
-    position: absolute;
-    top: 12px;
-    left: 10px;
-    max-width: 650px;
-    z-index: 1001;
-
+  .container-style {
     padding: 8px 8px;
     box-sizing: border-box;
     transition: all 0.1s ease-in;
     font-family: 'Open Sans', Helvetica, sans-serif !important;
+  }
+
+  .options-container {
+    position: absolute;
+    top: 12px;
+    left: 10px;
+    z-index: 1001;
   }
 
   .toggle-container {
@@ -1231,11 +1232,6 @@
     left: 10px;
     width: 100px;
     z-index: 1001;
-
-    padding: 8px 8px;
-    box-sizing: border-box;
-    transition: all 0.1s ease-in;
-    font-family: 'Open Sans', Helvetica, sans-serif !important;
   }
 
   .search-container {
@@ -1245,9 +1241,6 @@
     z-index: 1001;
     display: flex;
     align-items: center;
-
-    padding: 8px 8px;
-    box-sizing: border-box;
   }
 
   .legend-container {
@@ -1308,23 +1301,23 @@
 
 <div class="map-container">
 
-  <div class="options-container overlay-container base-font-size">
+  <div class="options-container container-bg base-font-size container-style">
     <Options />
   </div>
 
   <div
-    class="toggle-container overlay-container"
+    class="toggle-container container-bg container-style"
     class:hidden={$signalType === 'direction' || !$currentSensor.match(/num/)}>
     <Toggle />
   </div>
 
   {#if loaded && regionList.length != 0}
-    <div class="search-container overlay-container base-font-size">
+    <div class="search-container container-bg base-font-size container-style">
       <Search {regionList} {selectedRegion} on:search={searchElement} on:reset={resetSearch} />
     </div>
   {/if}
 
-  <div class="legend-container overlay-container">
+  <div class="legend-container container-bg">
     <Legend />
   </div>
 
@@ -1352,7 +1345,7 @@
       }} />
   </div>
 
-  <div class="time-container overlay-container">
+  <div class="time-container container-bg">
     <Time />
   </div>
 
