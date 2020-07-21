@@ -88,6 +88,8 @@
     background-color: transparent !important;
     padding-left: 6px !important;
     padding-right: 6px !important;
+    /* for cmu style*/
+    margin: 0;
     width: 95% !important;
     color: #111 !important;
   }

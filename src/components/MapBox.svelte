@@ -1180,9 +1180,10 @@
     text-align: center;
   }
 
-  .map-container {
+  :global(.map-container) {
     position: relative;
-    flex: 1 1 550px;
+    flex: 1 1 80vh;
+    min-height: 550px;
   }
 
   .map-wrapper {

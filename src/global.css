@@ -177,3 +177,17 @@ button.mapboxgl-popup-close-button {
 }
 
 @import './styles/pg-button.css';
+
+/** index.html page **/
+.test-page {
+  margin: 0;
+}
+
+.test-page #vizbox {
+  width: 100vw;
+  height: 100vh;
+}
+
+.test-page .map-container {
+  height: unset;
+}
