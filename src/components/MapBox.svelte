@@ -9,7 +9,7 @@
   import Toggle from './Toggle.svelte';
   import Legend from './Legend.svelte';
   import Banner from './Banner.svelte';
-  import Search from './SearchControls.svelte';
+  import AutoComplete from './Search.svelte';
   import MapControls from './MapControls.svelte';
   import Title from './Title.svelte';
   import Time from './Time.svelte';
@@ -1130,8 +1130,15 @@
     map.flyTo({ center: [LON, LAT], zoom: ZOOM, bearing: 0, pitch: 0, essential: true });
   }
 
-  function searchElement(e) {
-    selectedRegion = e.detail;
+  function searchElement(selection) {
+    if (selectedRegion === selection) {
+      return;
+    }
+    if(!selection) {
+      return resetSearch();
+    }
+
+    selectedRegion = selection;
 
     let hasValueFlag = false;
     const availLevels = $sensorMap.get($currentSensor).levels;
@@ -1347,12 +1354,14 @@
     <div class="search-container-wrapper">
       {#if loaded && regionList.length != 0}
         <div class="search-container container-bg base-font-size container-style">
-          <Search
-            {regionList}
-            {selectedRegion}
-            on:search={searchElement}
-            on:reset={resetSearch}
-            mobile={isMobile && isPortrait} />
+          <AutoComplete
+            className="search"
+            placeholder="Search for a location..."
+            items={regionList}
+            selectedItem={selectedRegion}
+            labelFieldName="display_name"
+            maxItemsToShowInList="5"
+            onChange={searchElement} />
         </div>
       {/if}
     </div>

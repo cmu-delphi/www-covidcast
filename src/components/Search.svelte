@@ -1,4 +1,7 @@
 <script>
+  import IoIosSearch from 'svelte-icons/io/IoIosSearch.svelte';
+  import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
+
   // the list of items  the user can select from
   export let items;
 
@@ -49,8 +52,6 @@
   export let maxItemsToShowInList = 0;
   export let noResultsText = 'No results found';
 
-  const uniqueId = 'sautocomplete-' + Math.floor(Math.random() * 1000);
-
   function safeStringFunction(theFunction, argument) {
     if (typeof theFunction !== 'function') {
       console.error('Not a function: ' + theFunction + ', argument: ' + argument);
@@ -91,7 +92,7 @@
   // the text displayed when no option is selected
   export let placeholder = undefined;
   // apply a className to the control
-  export let className = undefined;
+  export let className = '';
   // generate an HTML input with this name, containing the current value
   export let name = undefined;
   // adds the disabled tag to the HTML input
@@ -308,22 +309,32 @@
     close();
   }
 
+  function onResetItem() {
+    if (debug) {
+      console.log('onResetItem');
+    }
+
+    selectListItem({ item: undefined });
+    close();
+  }
+
+  function onContainerClick(e) {
+    e.stopPropagation();
+    if (debug) {
+      console.log('onDocumentClick inside');
+    }
+    // resetListToAllItemsAndOpen();
+    highlight();
+  }
+
   function onDocumentClick(e) {
     if (debug) {
       console.log('onDocumentClick: ' + JSON.stringify(e.target));
     }
-    if (e.target.closest('.' + uniqueId)) {
-      if (debug) {
-        console.log('onDocumentClick inside');
-      }
-      // resetListToAllItemsAndOpen();
-      highlight();
-    } else {
-      if (debug) {
-        console.log('onDocumentClick outside');
-      }
-      close();
+    if (debug) {
+      console.log('onDocumentClick outside');
     }
+    close();
   }
 
   function onKeyDown(e) {
@@ -503,26 +514,55 @@
 
 <style>
   .autocomplete {
-    min-width: 200px;
+    width: 20em;
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
   }
+
   .autocomplete * {
     box-sizing: border-box;
   }
-  .autocomplete-input {
-    font: inherit;
-    width: 100%;
-    height: 100%;
-    padding: 5px 11px;
+
+  .search-row {
+    display: flex;
   }
+
+  .search-button {
+    color: #9b9b9b;
+    width: 1.4em;
+    margin: 0 0.2em;
+    padding: 5px 0;
+    display: flex;
+    align-self: flex-start;
+    align-items: center;
+    border: none;
+    background: none;
+  }
+
+  .autocomplete-input {
+    flex: 1 1 0;
+    min-width: 0;
+    font: inherit;
+    padding: 5px 6px;
+    /* for cmu style*/
+    margin: 0;
+    color: #111;
+    outline: none;
+    border: none;
+  }
+
+  input.autocomplete-input:focus {
+    outline: none !important;
+    border: none;
+    border-bottom: solid 1px var(--red);
+  }
+
   .autocomplete-list {
-    background: #fff;
-    position: relative;
-    width: 100%;
     overflow-y: auto;
     z-index: 99;
-    padding: 10px 0;
+    padding: 10px 3px;
     top: 0px;
-    border: 1px solid #999;
     max-height: calc(15 * (1rem + 10px) + 15px);
     user-select: none;
   }
@@ -534,41 +574,66 @@
     color: #333;
     cursor: pointer;
     line-height: 1;
+
+    border-radius: 5px;
+    transition: all 0.1s ease-in;
   }
 
   .autocomplete-list-item:hover,
   .autocomplete-list-item.selected {
-    background-color: #2e69e2;
     color: #fff;
+    background-color: var(--red);
   }
+
   .autocomplete-list-item-no-results {
     padding: 5px 15px;
     color: #999;
     line-height: 1;
   }
 
-  .autocomplete-list.hidden {
+  .hidden {
     display: none;
+  }
+  .reset-button {
+    z-index: 1;
+    margin-left: -1.6em;
   }
 </style>
 
-<div class="{className} autocomplete select is-fullwidth {uniqueId}">
-  <input
-    type="text"
-    class="input autocomplete-input"
-    {placeholder}
-    {name}
-    {disabled}
-    {title}
-    bind:this={input}
-    bind:value={text}
-    on:input={onInput}
-    on:focus={onFocus}
-    on:keydown={onKeyDown}
-    on:click={onInputClick}
-    on:keypress={onKeyPress} />
+<div class="{className} autocomplete select" on:click={onContainerClick}>
+  <div class="search-row">
+    <!-- class:pg-button={mobile}
+      disabled={!mobile} -->
+    <button class="search-button" title="Show Search Field" aria-label="Show Search Field">
+      <IoIosSearch />
+    </button>
+    <input
+      type="text"
+      size="5"
+      class="input autocomplete-input"
+      {placeholder}
+      {name}
+      {disabled}
+      {title}
+      bind:this={input}
+      bind:value={text}
+      on:input={onInput}
+      on:focus={onFocus}
+      on:keydown={onKeyDown}
+      on:click={onInputClick}
+      on:keypress={onKeyPress} />
+    <button
+      class="pg-button search-button reset-button"
+      class:hidden={!text}
+      on:click={onResetItem}
+      title="Clear Search Field"
+      aria-label="Clear Search Field">
+      <IoIosClose />
+    </button>
 
-  <div class="autocomplete-list {opened ? '' : 'hidden'} is-fullwidth" bind:this={list}>
+  </div>
+
+  <div class="autocomplete-list" class:hidden={!opened} bind:this={list}>
     {#if filteredListItems && filteredListItems.length > 0}
       {#each filteredListItems as listItem, i}
         {#if maxItemsToShowInList <= 0 || i < maxItemsToShowInList}
