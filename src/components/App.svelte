@@ -21,9 +21,9 @@
   // Fix for IE: https://stackoverflow.com/a/21712356
   const isIE = window.document.documentMode;
 
-  // const isDesktop = window.matchMedia('@media only screen and (min-width: 768px)');
-  const isMobileQuery = window.matchMedia('@media only screen and (max-width: 767px)');
-  const isPortraitQuery = window.matchMedia('@media only screen and (orientation: portrait)');
+  // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
+  const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
+  const isPortraitQuery = window.matchMedia('only screen and (orientation: portrait)');
 
   $: isMobile = isMobileQuery.matches;
   $: isPortrait = isPortraitQuery.matches;
