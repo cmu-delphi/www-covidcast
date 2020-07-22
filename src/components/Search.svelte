@@ -7,39 +7,39 @@
   export let keywordsFieldName = labelFieldName;
   export let valueFieldName = undefined;
 
-  export let labelFunction = function(item) {
+  export let labelFunction = function (item) {
     if (item === undefined || item === null) {
       return '';
     }
     return labelFieldName ? item[labelFieldName] : item;
   };
 
-  export let keywordsFunction = function(item) {
+  export let keywordsFunction = function (item) {
     if (item === undefined || item === null) {
       return '';
     }
     return keywordsFieldName ? item[keywordsFieldName] : item;
   };
 
-  export let valueFunction = function(item) {
+  export let valueFunction = function (item) {
     if (item === undefined || item === null) {
       return item;
     }
     return valueFieldName ? item[valueFieldName] : item;
   };
 
-  export let keywordsCleanFunction = function(keywords) {
+  export let keywordsCleanFunction = function (keywords) {
     return keywords;
   };
 
-  export let textCleanFunction = function(userEnteredText) {
+  export let textCleanFunction = function (userEnteredText) {
     return userEnteredText;
   };
 
-  export let beforeChange = function(oldSelectedItem, newSelectedItem) {
+  export let beforeChange = function (oldSelectedItem, newSelectedItem) {
     return [oldSelectedItem, newSelectedItem];
   };
-  export let onChange = function(newSelectedItem) {
+  export let onChange = function (newSelectedItem) {
     return newSelectedItem;
   };
 
@@ -206,11 +206,11 @@
 
     const searchWords = textFiltered.split(' ');
 
-    let tempfilteredListItems = listItems.filter(listItem => {
+    let tempfilteredListItems = listItems.filter((listItem) => {
       const itemKeywords = listItem.keywords;
 
       let matches = 0;
-      searchWords.forEach(searchWord => {
+      searchWords.forEach((searchWord) => {
         if (itemKeywords.includes(searchWord)) {
           matches++;
         }
@@ -488,10 +488,10 @@
     let repl = '';
     for (; n < len; n++) repl += n % 2 ? `<b>$${n}</b>` : `$${n}`;
 
-    return i => {
+    return (i) => {
       const newI = Object.assign({ highlighted: {} }, i);
       if (fields) {
-        fields.forEach(f => {
+        fields.forEach((f) => {
           if (!newI[f]) return;
           newI.highlighted[f] = newI[f].replace(reg, repl);
         });
