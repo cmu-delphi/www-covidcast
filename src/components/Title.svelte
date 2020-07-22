@@ -12,6 +12,12 @@
     text-align: center;
     color: #b4b4b4;
   }
+  /** mobile **/
+  @media only screen and (max-width: 767px) {
+    .banner {
+      font-size: 1rem;
+    }
+  }
 </style>
 
 <h2 class="banner">{currentSensorTooltip}</h2>
