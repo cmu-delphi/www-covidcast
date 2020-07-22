@@ -9,7 +9,7 @@
   import Toggle from './Toggle.svelte';
   import Legend from './Legend.svelte';
   import Banner from './Banner.svelte';
-  import Search from './Search.svelte';
+  import Search from './SearchControls.svelte';
   import MapControls from './MapControls.svelte';
   import Title from './Title.svelte';
   import Time from './Time.svelte';
