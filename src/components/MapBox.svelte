@@ -1234,6 +1234,9 @@
   .title-container {
     z-index: 1001;
     grid-area: title;
+    align-self: center;
+    justify-self: center;
+    padding: 0 1em;
   }
 
   .search-container-wrapper {
@@ -1251,6 +1254,7 @@
     align-items: center;
   }
 
+  /** mobile **/
   @media only screen and (max-width: 767px) {
     .top-container {
       grid-template-columns: auto 1fr auto;
@@ -1268,6 +1272,14 @@
     .search-container {
       right: unset;
       left: 0;
+    }
+  }
+
+  /** desktop **/
+  @media only screen and (min-width: 767px) {
+    .title-container {
+      background-color: unset;
+      box-shadow: none;
     }
   }
 
@@ -1343,7 +1355,7 @@
       class:hidden={$signalType === 'direction' || !$currentSensor.match(/num/)}>
       <Toggle />
     </div>
-    <div class="title-container">
+    <div class="title-container container-bg">
       <Title />
     </div>
     <div class="map-controls-container">

@@ -10,6 +10,7 @@
     line-height: 1.2em;
     font-weight: 600;
     text-align: center;
+    color: #b4b4b4;
   }
 </style>
 
