@@ -5,8 +5,8 @@
   import 'mapbox-gl/dist/mapbox-gl.css';
   import { getTextColorBasedOnBackground, logScale } from '../util';
   import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME } from '../theme';
-  import AutoComplete from 'simple-svelte-autocomplete';
   import IoIosSearch from 'svelte-icons/io/IoIosSearch.svelte';
+  import AutoComplete from './Search.svelte';
   import Options from './Options.svelte';
   import Toggle from './Toggle.svelte';
   import Legend from './Legend.svelte';
