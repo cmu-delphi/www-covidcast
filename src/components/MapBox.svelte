@@ -82,18 +82,23 @@
     return `${level}-centers-highlight`;
   }
 
-  onMount(() => {
-    let containerWidth = container.clientWidth;
+  function guessZoomFactor(container, currentZoom) {
+    const containerWidth = container.clientWidth;
     if (containerWidth <= 1021) {
       //ZOOM = 3.9;
-      ZOOM = containerWidth / 300;
+      return containerWidth / 300;
     } else if (containerWidth > 1021 && containerWidth < 1280) {
       //ZOOM = 4.1;
-      ZOOM = containerWidth / 330;
+      return containerWidth / 330;
     } else if (containerWidth >= 1280) {
       //ZOOM = 4.3;
-      ZOOM = Math.min(4.3, containerWidth / 350);
+      return Math.min(4.3, containerWidth / 350);
     }
+    return currentZoom;
+  }
+
+  onMount(() => {
+    ZOOM = guessZoomFactor(container, ZOOM);
     Promise.all([d3.json('./maps/name_id_info.json')]).then(([a]) => {
       regionList = a['all'];
       loaded = true;
@@ -1139,40 +1144,41 @@
     if (!hasValueFlag) {
       invalidSearch = true;
       searchErrorComponent.count();
-    } else {
-      if (selectedRegion['level'] !== $currentLevel) {
-        currentDataReadyOnMap.set(false);
-        currentLevel.set(selectedRegion['level']);
-      }
-      resetHighlightedFeature();
-
-      currentRegionName.set(selectedRegion['name']);
-      currentRegion.set(selectedRegion['property_id']);
-
-      highlightFeature(selectedRegion);
-
-      // Get zoom and center of selected location
-      let centersData = $geojsons.get(center($currentLevel))['features'];
-      let center_location;
-      for (let i = 0; i < centersData.length; i++) {
-        let info = centersData[i];
-        if (info['properties']['id'] == selectedRegion['property_id']) {
-          center_location = info['geometry']['coordinates'];
-          break;
-        }
-      }
-
-      let zoomLevel;
-      if (selectedRegion['level'] === 'county') {
-        zoomLevel = 6.5;
-      } else if (selectedRegion['level'] === 'msa') {
-        zoomLevel = 6;
-      } else {
-        zoomLevel = 5;
-      }
-
-      map.flyTo({ center: center_location, zoom: zoomLevel, essential: true });
+      return;
     }
+    if (selectedRegion['level'] !== $currentLevel) {
+      currentDataReadyOnMap.set(false);
+      currentLevel.set(selectedRegion['level']);
+    }
+    resetHighlightedFeature();
+
+    currentRegionName.set(selectedRegion['name']);
+    currentRegion.set(selectedRegion['property_id']);
+
+    highlightFeature(selectedRegion);
+
+    // Get zoom and center of selected location
+    let centersData = $geojsons.get(center($currentLevel))['features'];
+    let center_location;
+    for (let i = 0; i < centersData.length; i++) {
+      let info = centersData[i];
+      if (info['properties']['id'] == selectedRegion['property_id']) {
+        center_location = info['geometry']['coordinates'];
+        break;
+      }
+    }
+
+    // TODO better zoom
+    let zoomLevel;
+    if (selectedRegion['level'] === 'county') {
+      zoomLevel = 6.5;
+    } else if (selectedRegion['level'] === 'msa') {
+      zoomLevel = 6;
+    } else {
+      zoomLevel = 5;
+    }
+
+    map.flyTo({ center: center_location, zoom: zoomLevel, essential: true });
   }
 </script>
 
