@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import AutoComplete from 'simple-svelte-autocomplete';
+  import AutoComplete from './Search.svelte';
   import IoIosSearch from 'svelte-icons/io/IoIosSearch.svelte';
   import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
 
