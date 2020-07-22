@@ -27,7 +27,6 @@
     position: relative;
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
   }
 
   .option-title {
@@ -43,6 +42,8 @@
     color: #111;
     line-height: 1.3;
     padding: 0.4em 0.6em;
+    width: auto;
+    min-width: 0;
 
     -moz-appearance: none;
     -webkit-appearance: none;
