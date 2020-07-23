@@ -18,8 +18,19 @@
   import '../stores/urlHandler';
   import { updateTimeSliceCache, updateRegionSliceCache, loadMetaData } from '../data';
 
-  // Fix for IE: https://stackoverflow.com/a/21712356
-  let isIE = window.document.documentMode;
+  // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
+  const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
+  const isPortraitQuery = window.matchMedia('only screen and (orientation: portrait)');
+
+  $: isMobile = isMobileQuery.matches;
+  $: isPortrait = isPortraitQuery.matches;
+  // detect changes
+  isMobileQuery.addListener((r) => {
+    isMobile = r.matches;
+  });
+  isPortraitQuery.addListener((r) => {
+    isPortrait = r.matches;
+  });
 
   let error = null;
   let graphShowStatus = false;
@@ -146,4 +157,4 @@
   <div class="error-message-container">Failed to load data. Please try again later...</div>
 {/if}
 
-<MapBox {isIE} {graphShowStatus} {toggleGraphShowStatus} />
+<MapBox {graphShowStatus} {toggleGraphShowStatus} />

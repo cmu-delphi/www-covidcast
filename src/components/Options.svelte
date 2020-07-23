@@ -3,9 +3,9 @@
   import Datepicker from './Calendar/Datepicker.svelte';
   import * as d3 from 'd3';
 
-  let formatTime = d3.timeFormat('%B %-d, %Y');
-  let convertDate = d3.timeFormat('%Y%m%d');
-  let parseTime = d3.timeParse('%Y%m%d');
+  const formatTime = d3.timeFormat('%B %-d, %Y');
+  const convertDate = d3.timeFormat('%Y%m%d');
+  const parseTime = d3.timeParse('%Y%m%d');
 
   // let selectedDate = writable(parseTime($currentDate));
   $: selectedDate = parseTime($currentDate);
@@ -24,34 +24,34 @@
 
 <style>
   .options {
-    font-size: 0.8rem;
     position: relative;
     display: flex;
     align-items: center;
   }
 
   .option-title {
-    font-size: 14px;
     margin: 0 5px;
     color: #444;
   }
 
   select,
   .calendar {
-    font-size: 14px;
-
     background-color: #ececec;
     border-radius: 5px;
     border: none;
     color: #111;
     line-height: 1.3;
     padding: 0.4em 0.6em;
+    width: auto;
+    min-width: 0;
 
     -moz-appearance: none;
     -webkit-appearance: none;
     appearance: none;
 
     transition: all 0.1s ease-in;
+    flex: 1 1 auto;
+    white-space: nowrap;
   }
 
   select,
@@ -69,45 +69,18 @@
     background-color: #dcdcdc;
   }
 
-  select.indicators {
-    flex-grow: 3;
-  }
-
-  select.geo-level {
-    flex-grow: 1;
-  }
-
-  .calendar-wrapper {
-    flex-grow: 2;
-  }
-
-  @keyframes shake {
-    10%,
-    90% {
-      transform: translate3d(-1px, 0, 0);
-    }
-
-    20%,
-    80% {
-      transform: translate3d(2px, 0, 0);
-    }
-
-    30%,
-    50%,
-    70% {
-      transform: translate3d(-4px, 0, 0);
-    }
-
-    40%,
-    60% {
-      transform: translate3d(4px, 0, 0);
-    }
+  :global(.datepicker) {
+    margin: unset;
   }
 </style>
 
 <div class="options">
-  <label class="option-title" for="option-indicator">Displaying</label>
-  <select id="option-indicator" aria-label="indicator options" class="indicators" bind:value={$currentSensor}>
+  <label class="option-title base-font-size" for="option-indicator">Displaying</label>
+  <select
+    id="option-indicator"
+    aria-label="indicator options"
+    class="indicators base-font-size"
+    bind:value={$currentSensor}>
     <optgroup label="Indicators">
       {#each Array.from($sensorMap.keys()).filter((d) => !$sensorMap.get(d).official) as sensor}
         <option title={$sensorMap.get(sensor).tooltipText} value={sensor}>{$sensorMap.get(sensor).name}</option>
@@ -119,28 +92,26 @@
       {/each}
     </optgroup>
   </select>
-
-  <label class="option-title" for="option-geo-level">for</label>
-
-  <select id="option-geo-level" aria-label="geographic level" class="geo-level" bind:value={$currentLevel}>
+  <label class="option-title base-font-size" for="option-geo-level">for</label>
+  <select
+    id="option-geo-level"
+    aria-label="geographic level"
+    class="geo-level base-font-size"
+    bind:value={$currentLevel}>
     {#each Object.keys($levels) as level}
       <option value={level} disabled={$sensorMap.get($currentSensor).levels.includes(level) === false}>
         {makePlural($levels[level])}
       </option>
     {/each}
   </select>
-
-  <label class="option-title" for="option-date">on</label>
-
-  <div class="calendar-wrapper">
-    {#if selectedDate != null && start_end_dates.length !== 0}
-      <Datepicker
-        bind:selected={selectedDate}
-        start={parseTime(start_end_dates[0])}
-        end={parseTime(start_end_dates[1])}
-        formattedSelected={formatTime(selectedDate)}>
-        <button id="option-date" class="calendar" on:>{formatTime(selectedDate)}</button>
-      </Datepicker>
-    {/if}
-  </div>
+  <label class="option-title base-font-size" for="option-date">on</label>
+  {#if selectedDate != null && start_end_dates.length !== 0}
+    <Datepicker
+      bind:selected={selectedDate}
+      start={parseTime(start_end_dates[0])}
+      end={parseTime(start_end_dates[1])}
+      formattedSelected={formatTime(selectedDate)}>
+      <button id="option-date" class="calendar base-font-size" on:>{formatTime(selectedDate)}</button>
+    </Datepicker>
+  {/if}
 </div>
