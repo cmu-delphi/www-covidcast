@@ -11,7 +11,8 @@
   import Toggle from './Toggle.svelte';
   import Legend from './Legend.svelte';
   import Banner from './Banner.svelte';
-  import Time from './Time.svelte';
+  // import Time from './Time.svelte';
+  import LineSmallMultiples from './LineSmallMultiples.svelte';
   import GraphContainer from './Graph/GraphContainer.svelte';
   import {
     levels,
@@ -98,7 +99,7 @@
   });
 
   // Mouse event handlers
-  const onMouseEnter = (level) => (e) => {
+  const onMouseEnter = level => e => {
     map.getCanvas().style.cursor = 'pointer';
     popup.setLngLat(e.lngLat).addTo(map);
     map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
@@ -106,7 +107,7 @@
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
   };
 
-  const onMouseMove = (level) => (e) => {
+  const onMouseMove = level => e => {
     if (level === 'state-outline') {
       map.getCanvas().style.cursor = 'pointer';
       popup
@@ -133,7 +134,10 @@
           valueDomain.push(colorStops[i][0]);
           colorRange.push(colorStops[i][1].match(/\d+(\.\d{1,2})?/g));
         }
-        let ramp = d3.scaleLinear().domain(valueDomain).range(colorRange);
+        let ramp = d3
+          .scaleLinear()
+          .domain(valueDomain)
+          .range(colorRange);
         ramp.clamp(true);
 
         const value = e.features[0].properties.value;
@@ -158,7 +162,10 @@
           valueDomain.push(colorStops[i][0]);
           colorRange.push(colorStops[i][1].match(/\d+/g));
         }
-        let ramp = d3.scaleLinear().domain(valueDomain).range(colorRange);
+        let ramp = d3
+          .scaleLinear()
+          .domain(valueDomain)
+          .range(colorRange);
         ramp.clamp(true);
 
         const value = e.features[0].properties.value;
@@ -172,7 +179,10 @@
           colorRange.push(colorStops[i][1].match(/\d+/g));
         }
 
-        let ramp = d3.scaleLinear().domain(valueDomain).range(colorRange);
+        let ramp = d3
+          .scaleLinear()
+          .domain(valueDomain)
+          .range(colorRange);
         ramp.clamp(true);
 
         const value = e.features[0].properties.value;
@@ -271,10 +281,13 @@
         ${title}
       </div>` + body;
 
-    popup.setLngLat(e.lngLat).setHTML(body).addTo(map);
+    popup
+      .setLngLat(e.lngLat)
+      .setHTML(body)
+      .addTo(map);
   };
 
-  const onMouseLeave = (level) => () => {
+  const onMouseLeave = level => () => {
     if (level === 'state-outline') {
       popup.remove();
       return;
@@ -291,7 +304,7 @@
     popup.remove();
   };
 
-  const onClick = (level) => (e) => {
+  const onClick = level => e => {
     if (clickedId) {
       map.setFeatureState({ source: level, id: clickedId }, { select: false });
       map.setFeatureState({ source: center(level), id: clickedId }, { select: false });
@@ -359,7 +372,7 @@
     if (!mapMounted) return;
 
     // Reset all hover/click states.
-    [...Object.keys($levels), 'mega-county'].forEach((level) => map && map.removeFeatureState({ source: level }));
+    [...Object.keys($levels), 'mega-county'].forEach(level => map && map.removeFeatureState({ source: level }));
 
     // If we're looking at counties, draw the mega-county states.
     let drawMega = $currentLevel === 'county';
@@ -386,7 +399,7 @@
 
     // Get the GEO_IDS and value/directions from the API data, including mega counties if necessary.
     let geoIds = new Set(
-      $currentData.map((d) => {
+      $currentData.map(d => {
         const key = d.geo_value.toUpperCase();
         const megaIndicator = key.slice(-3) + '';
         const megaKey = key.slice(0, 2) + '';
@@ -417,7 +430,7 @@
 
     let megaDat = $geojsons.get('state');
     if (drawMega) {
-      megaDat.features.forEach((d) => {
+      megaDat.features.forEach(d => {
         const id = d.properties.STATE;
 
         d.properties.value = -100;
@@ -443,8 +456,8 @@
     // set the value of the chosen sensor to each states/counties
     // dat: data for cholopleth
     // centerDat: data for bubbles
-    [dat, centerDat].forEach((ds) => {
-      ds.features.forEach((d) => {
+    [dat, centerDat].forEach(ds => {
+      ds.features.forEach(d => {
         const id = d.properties.id;
 
         d.properties.value = -100;
@@ -570,12 +583,12 @@
 
     if ($encoding == 'color') {
       // hide all bubble layers
-      Object.keys($levels).forEach((name) => {
+      Object.keys($levels).forEach(name => {
         map.setLayoutProperty(center(name), 'visibility', 'none');
         map.setLayoutProperty(centerHighlight(name), 'visibility', 'none');
       });
 
-      Object.keys($levels).forEach((name) => {
+      Object.keys($levels).forEach(name => {
         if (name === $currentLevel) {
           if (map.getLayer(name)) {
             map.setPaintProperty(name, 'fill-color', {
@@ -599,7 +612,7 @@
       }
     } else if ($encoding == 'bubble') {
       // hide all color layers except for the one for the current level (for tooltip)
-      Object.keys($levels).forEach((name) => map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none'));
+      Object.keys($levels).forEach(name => map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none'));
       if (map.getLayer($currentLevel)) {
         map.setPaintProperty($currentLevel, 'fill-color', MAP_THEME.countyFill);
 
@@ -607,12 +620,12 @@
       }
 
       // hide all bubble layer except for the one for the current level
-      Object.keys($levels).forEach((name) => {
+      Object.keys($levels).forEach(name => {
         map.setLayoutProperty(center(name), 'visibility', 'none');
         map.setLayoutProperty(centerHighlight(name), 'visibility', 'none');
       });
       if (map.getLayer(center($currentLevel))) {
-        const flatten = (arr) => arr.reduce((acc, val) => acc.concat(val), []);
+        const flatten = arr => arr.reduce((acc, val) => acc.concat(val), []);
 
         // color scale (color + stroke color)
 
@@ -644,13 +657,13 @@
       map.setLayoutProperty('mega-county', 'visibility', 'none');
     }
 
-    const viableFeatures = dat.features.filter((f) => f.properties[$signalType] !== -100);
+    const viableFeatures = dat.features.filter(f => f.properties[$signalType] !== -100);
 
     // set a random focus on start up
     if (chosenRandom === false && $mounted) {
       if (viableFeatures.length > 0) {
         const found = viableFeatures.filter(
-          (f) =>
+          f =>
             f.properties.id === defaultRegionOnStartup.county ||
             f.properties.id === defaultRegionOnStartup.msa ||
             f.properties.id === defaultRegionOnStartup.state,
@@ -681,8 +694,8 @@
     }
 
     if ($currentRegion) {
-      const megaFound = megaDat.features.filter((f) => f.properties.STATE + '000' === $currentRegion + '');
-      const found = viableFeatures.filter((f) => f.properties.id === $currentRegion);
+      const megaFound = megaDat.features.filter(f => f.properties.STATE + '000' === $currentRegion + '');
+      const found = viableFeatures.filter(f => f.properties.id === $currentRegion);
       if (megaFound.length > 0) {
         megaClickedId = parseInt(megaFound[0].properties.STATE);
         currentRegionName.set(megaFound[0].properties.NAME);
@@ -751,7 +764,7 @@
     map.on('mousemove', 'state-outline', onMouseMove('state-outline'));
     map.on('mouseleave', 'state-outline', onMouseLeave('state-outline'));
 
-    [...Object.keys($levels), 'mega-county'].forEach((level) => {
+    [...Object.keys($levels), 'mega-county'].forEach(level => {
       map.on('mouseenter', level, onMouseEnter(level));
       map.on('mousemove', level, onMouseMove(level));
       map.on('mouseleave', level, onMouseLeave(level));
@@ -767,7 +780,7 @@
       mapFirstLoaded.set(true);
     });
 
-    map.on('load', function () {
+    map.on('load', function() {
       map.addSource('county-outline', {
         type: 'geojson',
         data: $geojsons.get('county'),
@@ -789,7 +802,7 @@
         data: $geojsons.get('zone'),
       });
 
-      Object.keys($levels).forEach((level) => {
+      Object.keys($levels).forEach(level => {
         map.addSource(center(level), {
           type: 'geojson',
           data: $geojsons.get(center(level)),
@@ -817,14 +830,14 @@
         },
       });
 
-      Object.keys($levels).forEach((name) => {
+      Object.keys($levels).forEach(name => {
         map.addSource(name, {
           type: 'geojson',
           data: $geojsons.get(name),
         });
       });
 
-      ['mega-county', ...Object.keys($levels)].forEach((name) => {
+      ['mega-county', ...Object.keys($levels)].forEach(name => {
         map.addLayer({
           id: `${name}-hover`,
           source: name,
@@ -974,7 +987,7 @@
         `mega-county-hover`,
       );
 
-      Object.keys($levels).forEach((level) => {
+      Object.keys($levels).forEach(level => {
         map.addLayer(
           {
             id: level,
@@ -991,7 +1004,7 @@
         );
       });
 
-      Object.keys($levels).forEach((level) => {
+      Object.keys($levels).forEach(level => {
         map.addLayer(
           {
             id: center(level),
@@ -1338,7 +1351,7 @@
     margin-right: auto;
   }
 
-  .time-container {
+  /* .time-container {
     position: absolute;
     bottom: 12px;
     right: 10px;
@@ -1346,12 +1359,10 @@
     padding: 30px 10px;
     box-sizing: border-box;
     transition: all 0.1s ease-in;
-
-    /* rounded design refresh */
     border-radius: 7px;
     background-color: #ffffff;
     box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
-  }
+  } */
   .hidden {
     display: none;
   }
@@ -1430,8 +1441,12 @@
     </div>
   {/if}
 
-  <div class="time-container">
+  <!-- <div class="time-container">
     <Time />
+  </div> -->
+
+  <div class="small-multiples">
+    <LineSmallMultiples />
   </div>
 
   <GraphContainer {isIE} {graphShowStatus} {toggleGraphShowStatus} />
