@@ -130,10 +130,6 @@ export function LogScale() {
   return scale;
 }
 
-export function flatten(arr) {
-  return arr.reduce((acc, val) => acc.concat(val), []);
-}
-
 export function zip(a1, a2) {
   return a1.map((value, index) => [value, a2[index]]);
 }

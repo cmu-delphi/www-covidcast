@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
   import mapboxgl from 'mapbox-gl';
   import 'mapbox-gl/dist/mapbox-gl.css';
-  import { getTextColorBasedOnBackground, LogScale, flatten, zip, transparent } from '../util.js';
+  import { getTextColorBasedOnBackground, LogScale, zip, transparent } from '../util.js';
   import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../theme.js';
   import AutoComplete from 'simple-svelte-autocomplete';
   import IoIosSearch from 'svelte-icons/io/IoIosSearch.svelte';
@@ -92,7 +92,7 @@
 
   // helper function for multiple calls of map.setFeatureState
   function setFeatureStateMultiple(sources, id, state) {
-    sources.forEach((s) => {
+    sources.forEach(s => {
       map.setFeatureState({ source: s, id: id }, state);
     });
   }
@@ -116,14 +116,14 @@
   });
 
   // Mouse event handlers
-  const onMouseEnter = (level) => (e) => {
+  const onMouseEnter = level => e => {
     map.getCanvas().style.cursor = 'pointer';
     ($encoding === 'spike' ? topPopup : popup).setLngLat(e.lngLat).addTo(map);
     setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
   };
 
-  const onMouseMove = (level) => (e) => {
+  const onMouseMove = level => e => {
     if (level === 'state-outline') {
       map.getCanvas().style.cursor = 'pointer';
       ($encoding === 'spike' ? topPopup : popup)
@@ -247,10 +247,13 @@
         ${title}
       </div>` + body;
 
-    ($encoding === 'spike' ? topPopup : popup).setLngLat(e.lngLat).setHTML(body).addTo(map);
+    ($encoding === 'spike' ? topPopup : popup)
+      .setLngLat(e.lngLat)
+      .setHTML(body)
+      .addTo(map);
   };
 
-  const onMouseLeave = (level) => () => {
+  const onMouseLeave = level => () => {
     if (level === 'state-outline') {
       popup.remove();
       topPopup.remove();
@@ -268,7 +271,7 @@
     topPopup.remove();
   };
 
-  const onClick = (level) => (e) => {
+  const onClick = level => e => {
     if (clickedId) {
       setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, { select: false });
     }
@@ -336,7 +339,7 @@
     if (!mapMounted) return;
 
     // Reset all hover/click states.
-    [...Object.keys($levels), 'mega-county'].forEach((level) => map && map.removeFeatureState({ source: level }));
+    [...Object.keys($levels), 'mega-county'].forEach(level => map && map.removeFeatureState({ source: level }));
 
     // If we're looking at counties, draw the mega-county states.
     let drawMega = $currentLevel === 'county';
@@ -363,7 +366,7 @@
 
     // Get the GEO_IDS and value/directions from the API data, including mega counties if necessary.
     let geoIds = new Set(
-      $currentData.map((d) => {
+      $currentData.map(d => {
         const key = d.geo_value.toUpperCase();
         const megaIndicator = key.slice(-3) + '';
         const megaKey = key.slice(0, 2) + '';
@@ -394,7 +397,7 @@
 
     let megaDat = $geojsons.get('state');
     if (drawMega) {
-      megaDat.features.forEach((d) => {
+      megaDat.features.forEach(d => {
         const id = d.properties.STATE;
 
         d.properties.value = -100;
@@ -420,8 +423,8 @@
     // set the value of the chosen sensor to each states/counties
     // dat: data for cholopleth
     // centerDat: data for bubbles and spikes
-    [dat, centerDat].forEach((ds) => {
-      ds.features.forEach((d) => {
+    [dat, centerDat].forEach(ds => {
+      ds.features.forEach(d => {
         const id = d.properties.id;
 
         d.properties.value = -100;
@@ -468,8 +471,8 @@
       // domainStops5 is used for other cases (prop signals)
       const domainStops5 = [valueMinMax[0], firstHalfCenter, center, secondHalfCenter, valueMinMax[1]];
 
-      const logColors7 = domainStops7.map((c) => colorScaleLog(c).toString());
-      const linearColors5 = domainStops5.map((c) => colorScaleLinear(c).toString());
+      const logColors7 = domainStops7.map(c => colorScaleLog(c).toString());
+      const linearColors5 = domainStops5.map(c => colorScaleLinear(c).toString());
 
       if (isCountSignal($currentSensor)) {
         // use log scale
@@ -512,11 +515,11 @@
       colorStops.set(stops);
     }
 
-    const show = (name) => map.setLayoutProperty(name, 'visibility', 'visible'),
-      hide = (name) => map.setLayoutProperty(name, 'visibility', 'none'),
-      showAll = (names) => names.forEach(show),
-      hideAll = (names) => names.forEach(hide),
-      otherLevels = Object.keys($levels).filter((name) => name !== $currentLevel);
+    const show = name => map.setLayoutProperty(name, 'visibility', 'visible'),
+      hide = name => map.setLayoutProperty(name, 'visibility', 'none'),
+      showAll = names => names.forEach(show),
+      hideAll = names => names.forEach(hide),
+      otherLevels = Object.keys($levels).filter(name => name !== $currentLevel);
 
     if ($encoding === 'color') {
       // hide all other layers
@@ -551,7 +554,7 @@
       showAll([BUBBLE_LAYER, highlight(BUBBLE_LAYER)]);
 
       // color scale (color + stroke color)
-      let flatStops = flatten(stops);
+      let flatStops = stops.flat();
       flatStops.shift(); // remove the first element which has a value of 0 since the "step" expression of MapBox can omit the first range.
 
       flatStops[0] = 'transparent';
@@ -599,25 +602,24 @@
         maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel],
         size = ENCODING_SPIKE_THEME.size[$currentLevel];
 
-      const scale = d3.scaleSqrt().range([0, maxHeight]).domain([0, valueMax]);
+      const scale = d3
+        .scaleSqrt()
+        .range([0, maxHeight])
+        .domain([0, valueMax]);
 
       spikeHeightScale.set(scale);
       const centers = $geojsons.get(center($currentLevel));
-      const features = centers.features.filter((feature) => feature.properties.value > 0);
+      const features = centers.features.filter(feature => feature.properties.value > 0);
 
       const spikes = {
         type: 'FeatureCollection',
-        features: features.map((feature) => {
+        features: features.map(feature => {
           const center = feature.geometry.coordinates,
             value = feature.properties.value;
           return {
             geometry: {
               coordinates: [
-                [
-                  [center[0] - size, center[1]],
-                  [center[0], center[1] + scale(value)],
-                  [center[0] + size, center[1]],
-                ],
+                [[center[0] - size, center[1]], [center[0], center[1] + scale(value)], [center[0] + size, center[1]]],
               ],
               type: 'Polygon',
             },
@@ -630,7 +632,7 @@
 
       const spikeOutlines = {
         type: 'FeatureCollection',
-        features: features.map((feature) => {
+        features: features.map(feature => {
           const center = feature.geometry.coordinates,
             value = feature.properties.value;
 
@@ -650,7 +652,7 @@
         }),
       };
 
-      let flatStops = flatten(stops);
+      let flatStops = stops.flat();
       flatStops.shift(); // remove the first element which has a value of 0 since the "step" expression of mapbox does not require it.
 
       flatStops[0] = 'transparent';
@@ -667,13 +669,13 @@
       hide('mega-county');
     }
 
-    const viableFeatures = dat.features.filter((f) => f.properties[$signalType] !== -100);
+    const viableFeatures = dat.features.filter(f => f.properties[$signalType] !== -100);
 
     // set a random focus on start up
     if (chosenRandom === false && $mounted) {
       if (viableFeatures.length > 0) {
         const found = viableFeatures.filter(
-          (f) =>
+          f =>
             f.properties.id === defaultRegionOnStartup.county ||
             f.properties.id === defaultRegionOnStartup.msa ||
             f.properties.id === defaultRegionOnStartup.state,
@@ -706,8 +708,8 @@
     }
 
     if ($currentRegion) {
-      const megaFound = megaDat.features.filter((f) => f.properties.STATE + '000' === $currentRegion + '');
-      const found = viableFeatures.filter((f) => f.properties.id === $currentRegion);
+      const megaFound = megaDat.features.filter(f => f.properties.STATE + '000' === $currentRegion + '');
+      const found = viableFeatures.filter(f => f.properties.id === $currentRegion);
       if (megaFound.length > 0) {
         megaClickedId = parseInt(megaFound[0].properties.STATE);
         currentRegionName.set(megaFound[0].properties.NAME);
@@ -784,7 +786,7 @@
     map.on('mousemove', 'state-outline', onMouseMove('state-outline'));
     map.on('mouseleave', 'state-outline', onMouseLeave('state-outline'));
 
-    [...Object.keys($levels), 'mega-county'].forEach((level) => {
+    [...Object.keys($levels), 'mega-county'].forEach(level => {
       map.on('mouseenter', level, onMouseEnter(level));
       map.on('mousemove', level, onMouseMove(level));
       map.on('mouseleave', level, onMouseLeave(level));
@@ -800,7 +802,7 @@
       mapFirstLoaded.set(true);
     });
 
-    map.on('load', function () {
+    map.on('load', function() {
       map.addSource(outline('county'), {
         type: 'geojson',
         data: $geojsons.get('county'),
@@ -822,7 +824,7 @@
         data: $geojsons.get('zone'),
       });
 
-      Object.keys($levels).forEach((level) => {
+      Object.keys($levels).forEach(level => {
         map.addSource(center(level), {
           type: 'geojson',
           data: $geojsons.get(center(level)),
@@ -874,14 +876,14 @@
         },
       });
 
-      Object.keys($levels).forEach((name) => {
+      Object.keys($levels).forEach(name => {
         map.addSource(name, {
           type: 'geojson',
           data: $geojsons.get(name),
         });
       });
 
-      ['mega-county', ...Object.keys($levels)].forEach((name) => {
+      ['mega-county', ...Object.keys($levels)].forEach(name => {
         map.addLayer({
           id: `${name}-hover`,
           source: name,
@@ -1031,7 +1033,7 @@
         `mega-county-hover`,
       );
 
-      Object.keys($levels).forEach((level) => {
+      Object.keys($levels).forEach(level => {
         map.addLayer(
           {
             id: level,
