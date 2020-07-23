@@ -24,7 +24,7 @@
     currentRegionName,
   });
   let regionName = '';
-  currentRegionName.subscribe(d => {
+  currentRegionName.subscribe((d) => {
     regionName = d;
   });
 
@@ -59,22 +59,22 @@
       },
     };
 
-    json(apiURL).then(d => {
+    json(apiURL).then((d) => {
       // console.log('---->', apiURL, d);
 
-      d.epidata = d.epidata.map(d => {
+      d.epidata = d.epidata.map((d) => {
         let s = '' + d.time_value;
         d.time_value = new Date(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} 12:01`);
         return d;
       });
       lineChartSchema.data.values = d.epidata;
 
-      embed(`#${source}-${signal}-chart`, lineChartSchema, { actions: false }).catch(error => console.error(error));
+      embed(`#${source}-${signal}-chart`, lineChartSchema, { actions: false }).catch((error) => console.error(error));
     });
   }
 
   onMount(() => {
-    $sensors.forEach(s => {
+    $sensors.forEach((s) => {
       generateLineChart(s.signal, s.id);
     });
   });
