@@ -32,6 +32,7 @@
     mapFirstLoaded,
     sensorMap,
     colorScale,
+    colorStops,
     bubbleRadiusScale,
     spikeHeightScale,
     dict,
@@ -478,20 +479,23 @@
         stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops7, logColors7));
         stopsMega = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops7, logColors7));
 
-        // store the color scale (used for tooltips)
+        // store the color scale (used for tooltips and legend)
         colorScale.set(colorScaleLog);
+        colorStops.set(stops);
       } else if (isPropSignal($currentSensor)) {
         stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, linearColors5));
         stopsMega = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, transparent(linearColors5, 0.5)));
 
-        // store the color scale (used for tooltips)
+        // store the color scale (used for tooltips and legend)
         colorScale.set(colorScaleLinear);
+        colorStops.set(stops);
       } else {
         stops = zip(domainStops5, linearColors5);
         stopsMega = zip(domainStops5, transparent(linearColors5, 0.5));
 
-        // store the color scale (used for tooltips)
+        // store the color scale (used for tooltips and legend)
         colorScale.set(colorScaleLinear);
+        colorStops.set(stops);
       }
     } else {
       // signalType is 'direction'
@@ -507,6 +511,8 @@
         [0, DIRECTION_THEME.gradientMiddleMega],
         [1, DIRECTION_THEME.gradientMaxMega],
       ];
+
+      colorStops.set(stops);
     }
 
     const show = name => map.setLayoutProperty(name, 'visibility', 'visible'),
