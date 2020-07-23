@@ -518,15 +518,6 @@
         // use log scale
         stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops7, logColors7));
         stopsMega = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, linearColors5));
-
-        const minRadius = ENCODING_BUBBLE_THEME.minRadius[$currentLevel],
-          maxRadius = ENCODING_BUBBLE_THEME.maxRadius[$currentLevel];
-
-        currentRadiusScale = LogScale()
-          .domain(colorScaleLog.domain())
-          .range([minRadius, maxRadius])
-          .base(ENCODING_BUBBLE_THEME.base);
-        radiusScale.set(currentRadiusScale);
       } else if (isPropSignal($currentSensor)) {
         stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, linearColors5));
         stopsMega = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, transparent(linearColors5, 0.5)));
@@ -604,6 +595,16 @@
 
       map.setPaintProperty(BUBBLE_LAYER, 'circle-color', colorExpression);
       map.setPaintProperty(highlight(BUBBLE_LAYER), 'circle-color', colorExpression);
+
+      const minRadius = ENCODING_BUBBLE_THEME.minRadius[$currentLevel],
+        maxRadius = ENCODING_BUBBLE_THEME.maxRadius[$currentLevel];
+
+      currentRadiusScale = LogScale()
+        .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]])
+        .range([minRadius, maxRadius])
+        .base(ENCODING_BUBBLE_THEME.base);
+
+      radiusScale.set(currentRadiusScale);
 
       // radius scale
       const [a, b, base] = currentRadiusScale.coef();
