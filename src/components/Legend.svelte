@@ -24,9 +24,9 @@
   $: logColorArr = [{ label: '0', from: DIRECTION_THEME.countMin, to: DIRECTION_THEME.countMin }];
   $: linColorArr = [];
 
-  currentSensor.subscribe(s => ($stats ? update(s, $stats, $currentLevel) : ''));
-  stats.subscribe(s => (s ? update($currentSensor, s, $currentLevel) : ''));
-  currentLevel.subscribe(l => ($stats ? update($currentSensor, $stats, l) : ''));
+  currentSensor.subscribe((s) => ($stats ? update(s, $stats, $currentLevel) : ''));
+  stats.subscribe((s) => (s ? update($currentSensor, s, $currentLevel) : ''));
+  currentLevel.subscribe((l) => ($stats ? update($currentSensor, $stats, l) : ''));
   encoding.subscribe(() => ($stats ? update($currentSensor, $stats, $currentLevel) : ''));
 
   function update(sens, stats, level) {
