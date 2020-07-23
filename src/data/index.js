@@ -117,10 +117,10 @@ export function updateTimeSliceCache(sensor, level, region) {
       return d.epidata;
     }
     // creating deepcopy to avoid tampering with the data stored in cache
-    const epi_data = JSON.parse(JSON.stringify(d.epidata));
+    const epiData = JSON.parse(JSON.stringify(d.epidata));
     regionData.set(d.epidata);
-    timeSliceCache.update((m) => m.set(cacheKey, epi_data));
-    return epi_data;
+    timeSliceCache.update((m) => m.set(cacheKey, epiData));
+    return epiData;
   });
 }
 

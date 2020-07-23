@@ -160,7 +160,7 @@
     const date = formatTimeWithoutYear(parseTime($currentDate));
     const sens = $sensorMap.get($currentSensor);
     const popCommas = parseInt(Population).toLocaleString();
-    let title = (level === 'mega-county' ? 'Rest of ' : '') + NAME + get_label_specifics(NAME, STATE, level);
+    let title = (level === 'mega-county' ? 'Rest of ' : '') + NAME + getLabelSpecifics(NAME, STATE, level);
     let body;
 
     if ($signalType === 'value') {
@@ -312,7 +312,7 @@
   // Update the map when sensor or level changes.
   currentData.subscribe(() => updateMap('data'));
   currentLevel.subscribe(() => {
-    label_states();
+    labelStates();
     updateMap('data');
   });
   signalType.subscribe(() => updateMap('signal'));
@@ -719,7 +719,7 @@
     }
   }
 
-  function get_label_specifics(name, state, level) {
+  function getLabelSpecifics(name, state, level) {
     let text = '';
     if ($currentLevel === 'county' && level !== 'mega-county' && !special_counties.includes(name)) {
       text += ' County';
@@ -730,7 +730,7 @@
     return text;
   }
 
-  function label_states() {
+  function labelStates() {
     if (map !== undefined) {
       if ($currentLevel == 'state') {
         map.setLayoutProperty('state-names', 'visibility', 'visible');
@@ -1001,7 +1001,7 @@
         'state-names',
       );
 
-      label_states();
+      labelStates();
 
       map.addLayer(
         {
@@ -1279,11 +1279,11 @@
 
     // Get zoom and center of selected location
     let centersData = $geojsons.get(center($currentLevel))['features'];
-    let center_location;
+    let centerLocation;
     for (let i = 0; i < centersData.length; i++) {
       let info = centersData[i];
       if (info['properties']['id'] == selectedRegion['property_id']) {
-        center_location = info['geometry']['coordinates'];
+        centerLocation = info['geometry']['coordinates'];
         break;
       }
     }
@@ -1300,7 +1300,7 @@
       zoomLevel = 5;
     }
 
-    map.flyTo({ center: center_location, zoom: zoomLevel, essential: true });
+    map.flyTo({ center: centerLocation, zoom: zoomLevel, essential: true });
   }
 </script>
 
