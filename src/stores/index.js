@@ -1,5 +1,5 @@
 import { writable, readable, derived, get } from 'svelte/store';
-import { injectIDs, logScale } from '../util';
+import { injectIDs, LogScale } from '../util';
 import * as d3 from 'd3';
 import { sensorList } from './constants';
 export { dict, special_counties, defaultRegionOnStartup, makePlural } from './constants';
@@ -93,10 +93,10 @@ export const signalType = writable('value', (set) => {
   }
 });
 
-// Options are 'color' and 'bubble'
+// Options are 'color', 'bubble', and 'spike'
 export const encoding = writable('color', (set) => {
   const encoding = urlParams.get('encoding');
-  if (encoding === 'color' || encoding === 'bubble') {
+  if (encoding === 'color' || encoding === 'bubble' || encoding === 'spike') {
     set(encoding);
   }
 });
@@ -151,4 +151,7 @@ export const timeRangeOnSlider = writable({
 export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
 export const yesterday = Number.parseInt(d3.timeFormat('%Y%0m%0d')(yesterdayDate), 10);
 
-export const radiusScale = writable(logScale());
+export const colorScale = writable([]);
+export const colorStops = writable([]);
+export const bubbleRadiusScale = writable(LogScale());
+export const spikeHeightScale = writable(d3.scaleSqrt());

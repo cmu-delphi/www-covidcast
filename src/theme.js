@@ -37,7 +37,7 @@ export const ENCODING_BUBBLE_THEME = {
   color: 'transparent',
   strokeColor: '#666',
   strokeWidth: 1,
-  strokeWidthHovered: 4,
+  strokeWidthHighlighted: 4,
   opacity: 0.5,
   strokeOpacity: 1,
   minRadius: {
@@ -46,9 +46,30 @@ export const ENCODING_BUBBLE_THEME = {
     state: 6,
   },
   maxRadius: {
-    county: 10,
-    msa: 15,
-    state: 30,
+    county: 6,
+    msa: 10,
+    state: 25,
   },
   base: 2,
+};
+
+export const ENCODING_SPIKE_THEME = {
+  fillOpacity: 0.2,
+  strokeOpacity: 0.8,
+  strokeWidth: {
+    county: 1,
+    msa: 1.5,
+    state: 2,
+  },
+  strokeWidthHighlighted: 4,
+  maxHeight: {
+    county: 0.5,
+    msa: 1,
+    state: 2,
+  },
+  size: {
+    county: 0.1,
+    msa: 0.2,
+    state: 0.4,
+  },
 };
