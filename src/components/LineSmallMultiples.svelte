@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { sensors } from '../stores/index.js';
+  import { json } from 'd3-fetch';
   // import { readable } from 'svelte/store';
   import {
     currentRegion,
@@ -11,6 +12,7 @@
     // currentData,
     // currentRange,
   } from '../stores';
+  // import { callAPI, callMetaAPI } from '../data/api';
 
   import { default as embed } from 'vega-embed';
   // import { compile } from 'vega-lite'
@@ -24,31 +26,53 @@
     regionName = d;
   });
 
-  const lineChartSchema = {
-    $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
-    description: 'Simple bar chart',
-    data: {
-      values: [
-        { x: 'A', y: 28 },
-        { x: 'y', B: 55 },
-        { x: 'C', y: 43 },
-        { x: 'D', y: 91 },
-        { x: 'E', y: 81 },
-        { x: 'F', y: 53 },
-        { x: 'G', y: 19 },
-        { x: 'H', y: 87 },
-        { x: 'I', y: 52 },
-      ],
-    },
-    mark: 'bar',
-    encoding: {
-      x: { field: 'x', type: 'ordinal' },
-      y: { field: 'y', type: 'quantitative' },
-    },
-  };
+  function generateLineChart(signal = 'part_time_work_prop', source = 'safegraph') {
+    const apiURL = `https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day&data_source=${source}&signal=${signal}&geo_type=county&time_values=20200301-20200710&geo_value=06001`;
+    const lineChartSchema = {
+      $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
+      description: 'Simple chart',
+      height: 50,
+      // data: {
+      //   values: [
+      //     { x: 'A', y: 28 },
+      //     { x: 'y', B: 55 },
+      //     { x: 'C', y: 43 },
+      //     { x: 'D', y: 91 },
+      //     { x: 'E', y: 81 },
+      //     { x: 'F', y: 53 },
+      //     { x: 'G', y: 19 },
+      //     { x: 'H', y: 87 },
+      //     { x: 'I', y: 52 },
+      //   ],
+      // },
+      data: {
+        url: apiURL,
+        format: 'json',
+      },
+      mark: 'line',
+      encoding: {
+        x: { field: 'time_value', type: 'temporal', timeUnit: 'date' },
+        y: { field: 'value', type: 'quantitative' },
+      },
+    };
+
+    json(apiURL).then(d => {
+      //d.json()
+      console.log('---->', d);
+
+      d.epidata = d.epidata.map(d => {
+        let s = '' + d.time_value;
+        d.time_value = new Date(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} 12:01`);
+        return d;
+      });
+      lineChartSchema.data.values = d.epidata;
+
+      embed('#linechart', lineChartSchema, { actions: false }).catch(error => console.error(error));
+    });
+  }
 
   onMount(() => {
-    embed('#linechart', lineChartSchema, { actions: false }).catch(error => console.error(error));
+    generateLineChart();
   });
 </script>
 
@@ -70,15 +94,14 @@
     display: inline-block;
     margin-right: 2em;
     padding: 8px;
-    width: 129px;
     height: 129px;
   }
 </style>
 
 <div class="small-multiples">
-  {#if regionName}
+  <!-- {#if regionName}
     <h1>{regionName}</h1>
-  {/if}
+  {/if} -->
 
   {#each $sensors.slice(0, 3) as sensor, i}
     <li id="linechart">{sensor.name}</li>
