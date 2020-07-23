@@ -2,7 +2,7 @@ import { writable, readable, derived, get } from 'svelte/store';
 import { injectIDs, LogScale } from '../util';
 import * as d3 from 'd3';
 import { sensorList } from './constants';
-export { dict, special_counties, defaultRegionOnStartup, makePlural } from './constants';
+export { dict, specialCounties, defaultRegionOnStartup, makePlural } from './constants';
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);

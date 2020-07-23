@@ -53,7 +53,7 @@ export const dict = {
   '09': 'CT',
 };
 
-export const special_counties = [
+export const specialCounties = [
   'Baltimore',
   'St. Louis',
   'Carson City',
