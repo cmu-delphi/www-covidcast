@@ -38,6 +38,7 @@
   } from '../stores';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
+  import loadNameIdInfo from '../maps/name_id_info';
 
   export let isIE, graphShowStatus, toggleGraphShowStatus;
 
@@ -79,6 +80,11 @@
     return `${level}-centers-highlight`;
   }
 
+  loadNameIdInfo().then((data) => {
+    regionList = data;
+    loaded = true;
+  });
+
   onMount(() => {
     let containerWidth = container.clientWidth;
     if (containerWidth <= 1021) {
@@ -91,10 +97,6 @@
       //ZOOM = 4.3;
       ZOOM = Math.min(4.3, containerWidth / 350);
     }
-    Promise.all([d3.json('./maps/name_id_info.json')]).then(([a]) => {
-      regionList = a['all'];
-      loaded = true;
-    });
   });
 
   // Mouse event handlers
