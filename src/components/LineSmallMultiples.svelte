@@ -23,18 +23,18 @@
     currentRegion,
     currentRegionName,
   });
-  let regionName = '';
-  currentRegionName.subscribe((d) => {
-    regionName = d;
+  let region = '';
+  currentRegion.subscribe((d) => {
+    region = d;
+    generateAllCharts();
   });
 
-  function generateLineChart(signal = 'part_time_work_prop', source = 'covidcast') {
-    const apiURL = `https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day&data_source=${source}&signal=${signal}&geo_type=county&time_values=20200501-20200710&geo_value=06001`;
+  function generateLineChart(signal = 'part_time_work_prop', source = 'covidcast', sensor) {
+    const apiURL = `https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day&data_source=${source}&signal=${signal}&geo_type=county&time_values=20200401-20200710&geo_value=${region}`;
     const lineChartSchema = {
       $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
-      description: 'Simple chart',
-      height: 50,
-      width: 150,
+      height: 36,
+      width: 120,
       // data: {
       //   values: [
       //     { x: 'A', y: 28 },
@@ -49,13 +49,34 @@
       //   ],
       // },
       data: {
-        url: apiURL,
-        format: 'json',
+        values: null, // to be filled by API
       },
-      mark: 'line',
+      // mark: 'line',
+      mark: {
+        type: 'line',
+        interpolate: 'monotone',
+      },
       encoding: {
-        x: { field: 'time_value', type: 'temporal', timeUnit: 'date' },
-        y: { field: 'value', type: 'quantitative' },
+        color: {
+          value: 'grey',
+        },
+        x: {
+          field: 'time_value',
+          type: 'temporal',
+          axis: {
+            title: 'Date',
+            format: '%b',
+            formatType: 'time',
+            tickCount: 4,
+          },
+        },
+        y: {
+          field: 'value',
+          type: 'quantitative',
+          axis: {
+            title: sensor ? (sensor.yAxis.length < 15 ? sensor.yAxis : ' ') : ' ',
+          },
+        },
       },
     };
 
@@ -64,50 +85,59 @@
 
       d.epidata = d.epidata.map((d) => {
         let s = '' + d.time_value;
-        d.time_value = new Date(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} 12:01`);
+        d.time_value = new Date(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} 12:01`).toString();
         return d;
       });
       lineChartSchema.data.values = d.epidata;
-
+      console.log(lineChartSchema);
       embed(`#${source}-${signal}-chart`, lineChartSchema, { actions: false }).catch((error) => console.error(error));
     });
   }
 
-  onMount(() => {
+  function generateAllCharts() {
     $sensors.forEach((s) => {
-      generateLineChart(s.signal, s.id);
+      generateLineChart(s.signal, s.id, s);
     });
+  }
+
+  onMount(() => {
+    generateAllCharts();
   });
 </script>
 
 <style>
   .small-multiples {
+    text-align: center;
     z-index: 100;
     position: absolute;
     right: 0.5em;
     bottom: 24px;
-    padding: 0.5em;
-    width: 42vw;
-    height: 20vh;
+    padding: 0.25em;
+    width: 55vw;
+    height: 22vh;
     overflow-y: auto;
 
     background-color: white;
   }
 
   .small-multiples li {
+    text-align: left;
     display: inline-block;
     vertical-align: top;
     margin: 0;
-    margin-right: 2em;
+    margin-right: 0.25em;
     margin-bottom: 0.25em;
     padding: 8px;
-    height: 129px;
-    width: 22%;
+    height: 100px;
+    width: 150px;
   }
   .small-multiples li h5 {
     height: 2.5em;
     margin: 0;
     padding: 0;
+  }
+  h3 {
+    margin: 0.25em;
   }
 </style>
 
@@ -115,10 +145,10 @@
   <!-- {#if regionName}
     <h1>{regionName}</h1>
   {/if} -->
-
+  <h3>{$sensors.length} available signals</h3>
   {#each $sensors as sensor, i}
     <li id="{sensor.id}-{sensor.signal}">
-      <h5>{sensor.name}</h5>
+      <h5 title={sensor.tooltipText}>{sensor.name}</h5>
       <div id="{sensor.id}-{sensor.signal}-chart" />
     </li>
   {/each}
