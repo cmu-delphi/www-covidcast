@@ -28,6 +28,26 @@ function toStatsRegionKey(sensorKey, region) {
   return sensorKey + '_' + region;
 }
 
+function getAdditionalSignal(signal) {
+  // deaths_incidence_prop
+  if (signal === 'deaths_7dav_incidence_prop') {
+    return checkWIP(signal, 'deaths_incidence_prop');
+  }
+  // deaths needs both count and ratio
+  if (isDeathSignal(signal)) {
+    return checkWIP(signal, 'deaths_incidence_num');
+  }
+  // confirmed_incidence_prop
+  if (signal === 'confirmed_7dav_incidence_prop') {
+    return checkWIP(signal, 'confirmed_incidence_prop');
+  }
+  // cases needs both count and ratio
+  if (isCasesSignal(signal)) {
+    return checkWIP(signal, 'confirmed_incidence_num');
+  }
+  return null;
+}
+
 // We cache API calls for all regions at a given time and update currentData.
 export function updateRegionSliceCache(sensor, level, date, reason = 'unspecified') {
   const sEntry = get(sensorMapStore).get(sensor);
@@ -44,54 +64,21 @@ export function updateRegionSliceCache(sensor, level, date, reason = 'unspecifie
     return Promise.resolve(cacheEntry);
   }
 
-  return callAPI(sEntry.id, sEntry.signal, level, date, '*').then((d) => {
+  const additionalSignal = getAdditionalSignal(sEntry.signal);
+
+  return Promise.all([
+    callAPI(sEntry.id, sEntry.signal, level, date, '*'),
+    additionalSignal ? callAPI(sEntry.id, additionalSignal, level, date, '*') : null,
+  ]).then(([d, d1]) => {
     if (d.result < 0 || d.message.includes('no results')) {
       currentData.set([]);
       regionSliceCache.update((m) => m.set(cacheKey, []));
       return [];
     }
-
-    // deaths_incidence_prop
-    if (sEntry.signal === 'deaths_7dav_incidence_prop') {
-      return callAPI(sEntry.id, checkWIP(sEntry.signal, 'deaths_incidence_prop'), level, date, '*').then((d1) => {
-        const extended = combineAverageWithCount(d, d1);
-        currentData.set(extended);
-        regionSliceCache.update((m) => m.set(cacheKey, extended));
-        return extended;
-      });
-    }
-    // deaths needs both count and ratio
-    if (isDeathSignal(sEntry.signal)) {
-      return callAPI(sEntry.id, checkWIP(sEntry.signal, 'deaths_incidence_num'), level, date, '*').then((d1) => {
-        let extended = combineAverageWithCount(d, d1);
-        currentData.set(extended);
-        regionSliceCache.update((m) => m.set(cacheKey, extended));
-        return extended;
-      });
-    }
-    // confirmed_incidence_prop
-    if (sEntry.signal === 'confirmed_7dav_incidence_prop') {
-      return callAPI(sEntry.id, checkWIP(sEntry.signal, 'confirmed_incidence_prop'), level, date, '*').then((d1) => {
-        const extended = combineAverageWithCount(d, d1);
-        currentData.set(extended);
-        regionSliceCache.update((m) => m.set(cacheKey, extended));
-        return extended;
-      });
-    }
-    // cases needs both count and ratio
-    if (isCasesSignal(sEntry.signal)) {
-      return callAPI(sEntry.id, checkWIP(sEntry.signal, 'confirmed_incidence_num'), level, date, '*').then((d1) => {
-        const extended = combineAverageWithCount(d, d1);
-        currentData.set(extended);
-        regionSliceCache.update((m) => m.set(cacheKey, extended));
-        return extended;
-      });
-    }
-
-    // everything else
-    currentData.set(d.epidata);
-    regionSliceCache.update((m) => m.set(cacheKey, d.epidata));
-    return d.epidata;
+    const data = d1 ? combineAverageWithCount(d, d1) : d.epidata;
+    currentData.set(data);
+    regionSliceCache.update((m) => m.set(cacheKey, data));
+    return data;
   });
 }
 
