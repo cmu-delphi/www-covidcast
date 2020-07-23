@@ -160,4 +160,4 @@
   <div class="error-message-container">Failed to load data. Please try again later...</div>
 {/if}
 
-<MapBox {isIE} {graphShowStatus} {toggleGraphShowStatus} {isMobile} {isPortrait} />
+<MapBox {isIE} {graphShowStatus} {toggleGraphShowStatus} />

@@ -116,6 +116,9 @@
   $: selectedItem, onSelectedItemChanged();
 
   // HTML elements
+  /**
+   * @type HTMLInputElement
+   */
   let input;
   let list;
 
@@ -510,14 +513,24 @@
       return newI;
     };
   }
+
+  function focusSearch() {
+    if (input) {
+      input.focus();
+    }
+  }
 </script>
 
 <style>
   .autocomplete {
-    width: 20em;
-    flex: 1 1 0;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    max-width: min(25em, 100%);
   }
 
   .autocomplete * {
@@ -528,7 +541,7 @@
     display: flex;
   }
 
-  .search-button {
+  .icon {
     color: #9b9b9b;
     width: 1.4em;
     margin: 0 0.2em;
@@ -538,11 +551,14 @@
     align-items: center;
     border: none;
     background: none;
+    flex: 0 0 1.4em;
   }
 
   .autocomplete-input {
     flex: 1 1 0;
-    min-width: 0;
+    min-width: 15em;
+    width: 20em;
+    max-width: 30em;
     font: inherit;
     padding: 5px 6px;
     /* for cmu style*/
@@ -550,18 +566,19 @@
     color: #111;
     outline: none;
     border: none;
+    border-bottom: 1px solid transparent;
   }
 
   input.autocomplete-input:focus {
     outline: none !important;
-    border: none;
-    border-bottom: solid 1px var(--red);
+    border-bottom: 1px solid var(--red);
   }
 
   .autocomplete-list {
     overflow-y: auto;
     z-index: 99;
-    padding: 10px 3px;
+    margin-left: 0.9em; /** search icon size */
+    padding: 10px 0;
     top: 0px;
     max-height: calc(15 * (1rem + 10px) + 15px);
     user-select: none;
@@ -598,19 +615,36 @@
     z-index: 1;
     margin-left: -1.6em;
   }
+
+  /** mobile **/
+  @media only screen and (max-width: 767px) {
+    .autocomplete {
+      max-width: 25em;
+      left: 0;
+      right: unset;
+    }
+
+    .autocomplete-input {
+      transition: max-width, padding 0.25s ease;
+    }
+
+    .autocomplete.empty:not(.open) .autocomplete-input {
+      max-width: 0;
+      min-width: unset;
+      padding: 5px 0;
+    }
+  }
 </style>
 
-<div class="{className} autocomplete select" on:click={onContainerClick}>
+<div class="{className} autocomplete select" on:click={onContainerClick} class:empty={!text} class:open={opened}>
   <div class="search-row">
-    <!-- class:pg-button={mobile}
-      disabled={!mobile} -->
-    <button class="search-button" title="Show Search Field" aria-label="Show Search Field">
+    <button class="icon" on:click={focusSearch} title="Show Search Field" aria-label="Show Search Field">
       <IoIosSearch />
     </button>
     <input
       type="text"
       size="5"
-      class="input autocomplete-input"
+      class="autocomplete-input"
       {placeholder}
       {name}
       {disabled}
@@ -623,7 +657,7 @@
       on:click={onInputClick}
       on:keypress={onKeyPress} />
     <button
-      class="pg-button search-button reset-button"
+      class="icon reset-button"
       class:hidden={!text}
       on:click={onResetItem}
       title="Clear Search Field"

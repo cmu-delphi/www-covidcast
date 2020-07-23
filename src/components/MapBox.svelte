@@ -9,7 +9,7 @@
   import Toggle from './Toggle.svelte';
   import Legend from './Legend.svelte';
   import Banner from './Banner.svelte';
-  import AutoComplete from './Search.svelte';
+  import Search from './Search.svelte';
   import MapControls from './MapControls.svelte';
   import Title from './Title.svelte';
   import Time from './Time.svelte';
@@ -65,9 +65,6 @@
   let clickedId;
   let megaClickedId;
   let selectedRegion;
-
-  export let isMobile = false;
-  export let isPortrait = false;
 
   $: regionList = [];
   $: loaded = false;
@@ -1134,7 +1131,7 @@
     if (selectedRegion === selection) {
       return;
     }
-    if(!selection) {
+    if (!selection) {
       return resetSearch();
     }
 
@@ -1219,14 +1216,14 @@
     bottom: 0;
   }
 
-  .container-bg {
+  :global(.container-bg) {
     /* rounded design refresh */
     border-radius: 7px;
     background-color: #ffffff;
     box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
   }
 
-  .container-style {
+  :global(.container-style) {
     padding: 8px 8px;
     box-sizing: border-box;
     transition: all 0.1s ease-in;
@@ -1234,7 +1231,7 @@
   }
 
   .options-container {
-    z-index: 1001;
+    z-index: 1003;
     max-width: 50em;
     grid-area: options;
   }
@@ -1247,7 +1244,7 @@
   .title-container {
     z-index: 1001;
     grid-area: title;
-    align-self: center;
+    align-self: flex-start;
     justify-self: center;
     padding: 0 1em;
   }
@@ -1255,16 +1252,11 @@
   .search-container-wrapper {
     grid-area: search;
     position: relative;
+    min-width: 2.8em;
   }
 
-  .search-container {
-    position: absolute;
-    right: 0;
-    top: 0;
-    max-width: 100%;
+  .search-container-wrapper > :global(*) {
     z-index: 1002;
-    display: flex;
-    align-items: center;
   }
 
   /** mobile **/
@@ -1276,15 +1268,6 @@
         'options options options'
         'search title controls'
         'toggle title controls';
-    }
-
-    .search-container {
-      height: 1.5em;
-    }
-
-    .search-container {
-      right: unset;
-      left: 0;
     }
   }
 
@@ -1351,18 +1334,16 @@
     <div class="options-container container-bg base-font-size container-style">
       <Options />
     </div>
-    <div class="search-container-wrapper">
+    <div class="search-container-wrapper base-font-size">
       {#if loaded && regionList.length != 0}
-        <div class="search-container container-bg base-font-size container-style">
-          <AutoComplete
-            className="search"
-            placeholder="Search for a location..."
-            items={regionList}
-            selectedItem={selectedRegion}
-            labelFieldName="display_name"
-            maxItemsToShowInList="5"
-            onChange={searchElement} />
-        </div>
+        <Search
+          className="search-container container-bg container-style"
+          placeholder="Search for a location..."
+          items={regionList}
+          selectedItem={selectedRegion}
+          labelFieldName="display_name"
+          maxItemsToShowInList="5"
+          onChange={searchElement} />
       {/if}
     </div>
     <div
