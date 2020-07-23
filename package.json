@@ -60,6 +60,6 @@
   },
   "lint-staged": {
     "*.{js,svelte}": "eslint --cache --fix",
-    "*.{js,css,md}": "prettier --write"
+    "*.{js,css,md,svelte}": "prettier --write"
   }
 }
