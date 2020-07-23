@@ -110,7 +110,7 @@
     map.getCanvas().style.cursor = 'pointer';
     popup.setLngLat(e.lngLat).addTo(map);
     map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
-    map.setFeatureState({ source: center(level), id: hoveredId }, { hover: false });
+    map.setFeatureState({ source: BUBBLE_LAYER, id: hoveredId }, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
   };
 
@@ -125,7 +125,7 @@
     }
 
     map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
-    map.setFeatureState({ source: center(level), id: hoveredId }, { hover: false });
+    map.setFeatureState({ source: BUBBLE_LAYER, id: hoveredId }, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
 
     let fillColor;
@@ -156,7 +156,7 @@
     } else {
       hoveredId = e.features[0].id;
       map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
-      map.setFeatureState({ source: center(level), id: hoveredId }, { hover: true });
+      map.setFeatureState({ source: BUBBLE_LAYER, id: hoveredId }, { hover: true });
 
       //get hover color for regular county
       let colorStops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
@@ -303,7 +303,7 @@
     if (level === 'mega-county' && hoveredId !== null) megaHoveredId = null;
 
     map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
-    map.setFeatureState({ source: center(level), id: hoveredId }, { hover: false });
+    map.setFeatureState({ source: BUBBLE_LAYER, id: hoveredId }, { hover: false });
 
     if (level !== 'mega-county') hoveredId = null;
 
@@ -314,7 +314,7 @@
   const onClick = level => e => {
     if (clickedId) {
       map.setFeatureState({ source: level, id: clickedId }, { select: false });
-      map.setFeatureState({ source: center(level), id: clickedId }, { select: false });
+      map.setFeatureState({ source: BUBBLE_LAYER, id: clickedId }, { select: false });
     }
     if (megaClickedId) {
       map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: false });
@@ -332,7 +332,7 @@
       clickedId = null;
       megaClickedId = e.features[0].id;
       map.setFeatureState({ source: level, id: megaClickedId }, { select: true });
-      map.setFeatureState({ source: center(level), id: megaClickedId }, { select: true });
+      map.setFeatureState({ source: BUBBLE_LAYER, id: megaClickedId }, { select: true });
       currentRegionName.set(e.features[0].properties.NAME);
       currentRegion.set(e.features[0].properties.STATE + '000');
     } else {
@@ -340,7 +340,7 @@
       if (clickedId !== e.features[0].id) {
         clickedId = e.features[0].id;
         map.setFeatureState({ source: level, id: clickedId }, { select: true });
-        map.setFeatureState({ source: center(level), id: clickedId }, { select: true });
+        map.setFeatureState({ source: BUBBLE_LAYER, id: clickedId }, { select: true });
         currentRegionName.set(e.features[0].properties.NAME);
         currentRegion.set(e.features[0].properties.id);
       } else {
@@ -615,9 +615,6 @@
       map.setPaintProperty(BUBBLE_LAYER, 'circle-radius', radiusExpression);
       map.setPaintProperty(highlight(BUBBLE_LAYER), 'circle-radius', radiusExpression);
 
-      map.setLayoutProperty(BUBBLE_LAYER, 'visibility', 'visible');
-      map.setLayoutProperty(highlight(BUBBLE_LAYER), 'visibility', 'visible');
-
       hide('mega-county');
     } else if ($encoding === 'spike') {
       // hide all color layers except one for the current level
@@ -690,6 +687,8 @@
 
       map.getSource(SPIKE_LAYER).setData(spikes);
       map.getSource(outline(SPIKE_LAYER)).setData(spikeOutlines);
+
+      hide('mega-county');
     }
 
     const viableFeatures = dat.features.filter(f => f.properties[$signalType] !== -100);
@@ -711,7 +710,7 @@
             currentRegion.set(randomFeature.id);
             clickedId = randomFeature.id;
             map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-            map.setFeatureState({ source: center($currentLevel), id: clickedId }, { select: true });
+            map.setFeatureState({ source: BUBBLE_LAYER, id: clickedId }, { select: true });
           }
           chosenRandom = true;
         } else {
@@ -722,7 +721,7 @@
 
           clickedId = randomFeature.id;
           map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-          map.setFeatureState({ source: center($currentLevel), id: clickedId }, { select: true });
+          map.setFeatureState({ source: BUBBLE_LAYER, id: clickedId }, { select: true });
           chosenRandom = true;
         }
       }
@@ -740,7 +739,7 @@
         clickedId = found[0].id;
         currentRegionName.set(found[0].properties.NAME);
         map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-        map.setFeatureState({ source: center($currentLevel), id: clickedId }, { select: true });
+        map.setFeatureState({ source: BUBBLE_LAYER, id: clickedId }, { select: true });
       }
     }
   }
@@ -1152,7 +1151,6 @@
           'line-opacity': ENCODING_SPIKE_THEME.strokeOpacity,
         },
       });
-      // encoding.set('spike');
 
       if ($currentZone === 'swpa') {
         showZoneBoundary('swpa');
@@ -1207,7 +1205,7 @@
       currentRegion.set(selectedRegion['property_id']);
       clickedId = parseInt(selectedRegion['id']);
       map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-      map.setFeatureState({ source: center($currentLevel), id: clickedId }, { select: true });
+      map.setFeatureState({ source: BUBBLE_LAYER, id: clickedId }, { select: true });
 
       // Get zoom and center of selected location
       let centersData = $geojsons.get(center($currentLevel))['features'];
