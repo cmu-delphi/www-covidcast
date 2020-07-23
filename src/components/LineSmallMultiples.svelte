@@ -24,7 +24,7 @@
     currentRegionName,
   });
   let regionName = '';
-  currentRegionName.subscribe((d) => {
+  currentRegionName.subscribe(d => {
     regionName = d;
   });
 
@@ -34,6 +34,7 @@
       $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
       description: 'Simple chart',
       height: 50,
+      width: 150,
       // data: {
       //   values: [
       //     { x: 'A', y: 28 },
@@ -58,22 +59,22 @@
       },
     };
 
-    json(apiURL).then((d) => {
+    json(apiURL).then(d => {
       // console.log('---->', apiURL, d);
 
-      d.epidata = d.epidata.map((d) => {
+      d.epidata = d.epidata.map(d => {
         let s = '' + d.time_value;
         d.time_value = new Date(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} 12:01`);
         return d;
       });
       lineChartSchema.data.values = d.epidata;
 
-      embed(`#${source}-${signal}-chart`, lineChartSchema, { actions: false }).catch((error) => console.error(error));
+      embed(`#${source}-${signal}-chart`, lineChartSchema, { actions: false }).catch(error => console.error(error));
     });
   }
 
   onMount(() => {
-    $sensors.forEach((s) => {
+    $sensors.forEach(s => {
       generateLineChart(s.signal, s.id);
     });
   });
@@ -83,11 +84,11 @@
   .small-multiples {
     z-index: 100;
     position: absolute;
-    right: 140px;
+    right: 0.5em;
     bottom: 24px;
-    padding: 1em;
-    width: 50vw;
-    height: 30vh;
+    padding: 0.5em;
+    width: 42vw;
+    height: 20vh;
     overflow-y: auto;
 
     background-color: white;
@@ -95,9 +96,18 @@
 
   .small-multiples li {
     display: inline-block;
+    vertical-align: top;
+    margin: 0;
     margin-right: 2em;
+    margin-bottom: 0.25em;
     padding: 8px;
     height: 129px;
+    width: 22%;
+  }
+  .small-multiples li h5 {
+    height: 2.5em;
+    margin: 0;
+    padding: 0;
   }
 </style>
 
@@ -108,7 +118,7 @@
 
   {#each $sensors as sensor, i}
     <li id="{sensor.id}-{sensor.signal}">
-      <h3>{sensor.name}</h3>
+      <h5>{sensor.name}</h5>
       <div id="{sensor.id}-{sensor.signal}-chart" />
     </li>
   {/each}
