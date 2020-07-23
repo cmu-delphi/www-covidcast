@@ -151,4 +151,6 @@ export const timeRangeOnSlider = writable({
 export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
 export const yesterday = Number.parseInt(d3.timeFormat('%Y%0m%0d')(yesterdayDate), 10);
 
-export const radiusScale = writable(LogScale());
+export const colorScale = writable([]);
+export const bubbleRadiusScale = writable(LogScale());
+export const spikeHeightScale = writable(d3.scaleSqrt());

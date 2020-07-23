@@ -31,7 +31,9 @@
     mounted,
     mapFirstLoaded,
     sensorMap,
-    radiusScale,
+    colorScale,
+    bubbleRadiusScale,
+    spikeHeightScale,
     dict,
     special_counties,
     defaultRegionOnStartup,
@@ -133,69 +135,21 @@
       if (hoveredId === null) {
         megaHoveredId = e.features[0].id;
         map.setFeatureState({ source: level, id: megaHoveredId }, { hover: true });
-        // get hover color for mega county
-        let colorStops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
-        let valueDomain = [];
-        let colorRange = [];
-        for (let i = 0; i < colorStops.length; i++) {
-          valueDomain.push(colorStops[i][0]);
-          colorRange.push(colorStops[i][1].match(/\d+(\.\d{1,2})?/g));
-        }
-        let ramp = d3
-          .scaleLinear()
-          .domain(valueDomain)
-          .range(colorRange);
-        ramp.clamp(true);
 
         const value = e.features[0].properties.value;
-        let arr = ramp(value);
-        fillColor = 'rgba(' + arr.join(', ') + ')';
+        fillColor = $colorScale(value);
       } else {
         megaHoveredId = null;
       }
     } else {
+      // The hovered element is not a mega county. It can be county, msa, state, bubble, or spike.
+
       hoveredId = e.features[0].id;
       map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
       map.setFeatureState({ source: BUBBLE_LAYER, id: hoveredId }, { hover: true });
 
-      //get hover color for regular county
-      let colorStops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
-      if ($encoding === 'bubble') {
-        fillColor = 'white';
-      } else if ($currentSensor.match(/num/)) {
-        let valueDomain = [];
-        let colorRange = [];
-        for (let i = 0; i < colorStops.length; i++) {
-          valueDomain.push(colorStops[i][0]);
-          colorRange.push(colorStops[i][1].match(/\d+/g));
-        }
-        let ramp = d3
-          .scaleLinear()
-          .domain(valueDomain)
-          .range(colorRange);
-        ramp.clamp(true);
-
-        const value = e.features[0].properties.value;
-        let arr = ramp(value);
-        fillColor = 'rgb(' + arr.join(', ') + ')';
-      } else {
-        let valueDomain = [];
-        let colorRange = [];
-        for (let i = 0; i < colorStops.length; i++) {
-          valueDomain.push(colorStops[i][0]);
-          colorRange.push(colorStops[i][1].match(/\d+/g));
-        }
-
-        let ramp = d3
-          .scaleLinear()
-          .domain(valueDomain)
-          .range(colorRange);
-        ramp.clamp(true);
-
-        const value = e.features[0].properties.value;
-        let arr = ramp(value);
-        fillColor = 'rgb(' + arr.join(', ') + ')';
-      }
+      const value = e.features[0].properties.value;
+      fillColor = $colorScale(value);
     }
 
     if (hoveredId !== null && level === 'mega-county') return;
@@ -508,7 +462,7 @@
         Math.log(valueMinMax[1]) / Math.log(10),
         7,
       );
-      // domainStops5 is used for other cases (mega or prop signals)
+      // domainStops5 is used for other cases (prop signals)
       const domainStops5 = [valueMinMax[0], firstHalfCenter, center, secondHalfCenter, valueMinMax[1]];
 
       const logColors7 = domainStops7.map(c => colorScaleLog(c).toString());
@@ -517,13 +471,22 @@
       if (isCountSignal($currentSensor)) {
         // use log scale
         stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops7, logColors7));
-        stopsMega = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, linearColors5));
+        stopsMega = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops7, logColors7));
+
+        // store the color scale (used for tooltips)
+        colorScale.set(colorScaleLog);
       } else if (isPropSignal($currentSensor)) {
         stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, linearColors5));
         stopsMega = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, transparent(linearColors5, 0.5)));
+
+        // store the color scale (used for tooltips)
+        colorScale.set(colorScaleLinear);
       } else {
         stops = zip(domainStops5, linearColors5);
         stopsMega = zip(domainStops5, transparent(linearColors5, 0.5));
+
+        // store the color scale (used for tooltips)
+        colorScale.set(colorScaleLinear);
       }
     } else {
       // signalType is 'direction'
@@ -604,7 +567,7 @@
         .range([minRadius, maxRadius])
         .base(ENCODING_BUBBLE_THEME.base);
 
-      radiusScale.set(currentRadiusScale);
+      bubbleRadiusScale.set(currentRadiusScale);
 
       // radius scale
       const [a, b, base] = currentRadiusScale.coef();
@@ -635,6 +598,7 @@
         .range([0, maxHeight])
         .domain([0, valueMax]);
 
+      spikeHeightScale.set(scale);
       const centers = $geojsons.get(center($currentLevel));
       const features = centers.features.filter(feature => feature.properties.value > 0);
 
@@ -1344,7 +1308,7 @@
     position: absolute;
     top: 68px;
     left: 10px;
-    width: 140px;
+    width: 200px;
     z-index: 1001;
     padding: 8px 8px;
     box-sizing: border-box;

@@ -14,20 +14,17 @@
   }
 
   button.selected {
-    display: none;
   }
 
   .buttons-group-side {
     width: 100%;
     display: flex;
     align-items: stretch;
-    justify-content: stretch;
+    justify-content: space-between;
     padding-top: 5px;
   }
 
   .buttons-group-side button.button {
-    width: 110px;
-    flex-grow: 1;
     margin: 0px;
     font-size: 1em;
     font-weight: 400;
@@ -48,14 +45,18 @@
     position: relative;
   }
 
+  .button:active {
+    border-radius: 4px;
+  }
+
   .buttons-group-side button.button:disabled {
     background-color: rgb(211, 211, 211);
     color: #666;
     cursor: not-allowed;
   }
 
-  .buttons-group-side .button:first-child {
-    margin-right: 4px;
+  .buttons-group-side .button {
+    margin: 0px 0.5rem 0px 0.5rem;
   }
 
   .buttons-group-side .button:hover {

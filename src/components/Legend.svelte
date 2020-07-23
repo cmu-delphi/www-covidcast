@@ -8,7 +8,7 @@
     currentLevel,
     currentDataReadyOnMap,
     encoding,
-    radiusScale,
+    bubbleRadiusScale,
   } from '../stores';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
@@ -20,11 +20,11 @@
   $: logColorArr = [{ label: '0', from_color: DIRECTION_THEME.countMin, to_color: DIRECTION_THEME.countMin }];
   $: linColorArr = [];
 
-  currentSensor.subscribe((s) => ($stats ? update(s, $stats, $currentLevel, $encoding) : ''));
-  stats.subscribe((s) => (s ? update($currentSensor, s, $currentLevel, $encoding) : ''));
-  currentLevel.subscribe((l) => ($stats ? update($currentSensor, $stats, l, $encoding) : ''));
-  encoding.subscribe((e) => ($stats ? update($currentSensor, $stats, $currentLevel, e) : ''));
-  radiusScale.subscribe(() => ($stats ? update($currentSensor, $stats, $currentLevel, $encoding) : ''));
+  currentSensor.subscribe(s => ($stats ? update(s, $stats, $currentLevel, $encoding) : ''));
+  stats.subscribe(s => (s ? update($currentSensor, s, $currentLevel, $encoding) : ''));
+  currentLevel.subscribe(l => ($stats ? update($currentSensor, $stats, l, $encoding) : ''));
+  encoding.subscribe(e => ($stats ? update($currentSensor, $stats, $currentLevel, e) : ''));
+  bubbleRadiusScale.subscribe(() => ($stats ? update($currentSensor, $stats, $currentLevel, $encoding) : ''));
 
   function update(sens, stats, level, encoding) {
     updateLowHigh(sens, stats, level, encoding);
@@ -450,8 +450,8 @@
           {#if +label > 0}
             <li class="colored">
               <div
-                style="width: {$radiusScale(+label) * 2}px; height: {$radiusScale(+label) * 2}px;background: {getBubbleFill(+label)};border-color:
-                {from_color}"
+                style="width: {$bubbleRadiusScale(+label) * 2}px; height: {$bubbleRadiusScale(+label) * 2}px;background:
+                {getBubbleFill(+label)};border-color: {from_color}"
                 class="bubble" />
               <div>{getSigfigs(label, 3)}</div>
             </li>
@@ -460,7 +460,7 @@
         {#if high}
           <li class="colored">
             <div
-              style="width: {$radiusScale(+high) * 2}px; height: {$radiusScale(+high) * 2}px; background: {getBubbleFill(+high)};border-color:
+              style="width: {$bubbleRadiusScale(+high) * 2}px; height: {$bubbleRadiusScale(+high) * 2}px; background: {getBubbleFill(+high)};border-color:
               {getBubbleBorder(+high)}"
               class="bubble" />
             <div>{high ? high + '+' : ''}</div>
