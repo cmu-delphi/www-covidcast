@@ -11,7 +11,7 @@
   import Legend from './Legend.svelte';
   import Banner from './Banner.svelte';
   import Time from './Time.svelte';
-  import {computeBounds} from './geoUtils';
+  import { computeBounds } from './geoUtils';
   import GraphContainer from './Graph/GraphContainer.svelte';
   import {
     levels,
