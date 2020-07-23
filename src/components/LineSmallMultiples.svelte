@@ -17,6 +17,8 @@
   import { default as embed } from 'vega-embed';
   // import { compile } from 'vega-lite'
 
+  console.log($sensors);
+
   console.log({
     currentRegion,
     currentRegionName,
@@ -26,7 +28,7 @@
     regionName = d;
   });
 
-  function generateLineChart(signal = 'part_time_work_prop', source = 'safegraph') {
+  function generateLineChart(signal = 'part_time_work_prop', source = 'covidcast') {
     const apiURL = `https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day&data_source=${source}&signal=${signal}&geo_type=county&time_values=20200301-20200710&geo_value=06001`;
     const lineChartSchema = {
       $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
@@ -57,8 +59,7 @@
     };
 
     json(apiURL).then(d => {
-      //d.json()
-      console.log('---->', d);
+      // console.log('---->', apiURL, d);
 
       d.epidata = d.epidata.map(d => {
         let s = '' + d.time_value;
@@ -67,12 +68,14 @@
       });
       lineChartSchema.data.values = d.epidata;
 
-      embed('#linechart', lineChartSchema, { actions: false }).catch(error => console.error(error));
+      embed(`#${source}-${signal}-chart`, lineChartSchema, { actions: false }).catch(error => console.error(error));
     });
   }
 
   onMount(() => {
-    generateLineChart();
+    $sensors.forEach(s => {
+      generateLineChart(s.signal, s.id);
+    });
   });
 </script>
 
@@ -103,7 +106,10 @@
     <h1>{regionName}</h1>
   {/if} -->
 
-  {#each $sensors.slice(0, 3) as sensor, i}
-    <li id="linechart">{sensor.name}</li>
+  {#each $sensors as sensor, i}
+    <li id="{sensor.id}-{sensor.signal}">
+      <h3>{sensor.name}</h3>
+      <div id="{sensor.id}-{sensor.signal}-chart" />
+    </li>
   {/each}
 </div>
