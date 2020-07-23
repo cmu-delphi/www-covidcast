@@ -47,6 +47,7 @@
   import { S } from './MapBox/sources';
   import bounds from './MapBox/bounds.json';
   import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './MapBox/encodings';
+  import loadNameIdInfo from '../maps/name_id_info';
 
   export let graphShowStatus, toggleGraphShowStatus;
 
@@ -102,11 +103,12 @@
     });
   }
 
+  loadNameIdInfo().then((data) => {
+    regionList = data;
+    loaded = true;
+  });
+
   onMount(() => {
-    Promise.all([d3.json('./maps/name_id_info.json')]).then(([a]) => {
-      regionList = a['all'];
-      loaded = true;
-    });
   });
 
   // Mouse event handlers
