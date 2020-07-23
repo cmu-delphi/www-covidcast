@@ -511,17 +511,15 @@
 
     const show = name => map.setLayoutProperty(name, 'visibility', 'visible'),
       hide = name => map.setLayoutProperty(name, 'visibility', 'none'),
+      showAll = names => names.forEach(show),
+      hideAll = names => names.forEach(hide),
       otherLevels = Object.keys($levels).filter(name => name !== $currentLevel);
 
     if ($encoding === 'color') {
       // hide all other layers
-      hide(BUBBLE_LAYER);
-      hide(highlight(BUBBLE_LAYER));
-      hide(SPIKE_LAYER);
-      hide(outline(SPIKE_LAYER));
-      hide(highlight(SPIKE_LAYER));
-      hide(highlight(outline(SPIKE_LAYER)));
-      otherLevels.forEach(hide);
+      hideAll([BUBBLE_LAYER, highlight(BUBBLE_LAYER)]);
+      hideAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
+      hideAll(otherLevels);
 
       show($currentLevel);
 
@@ -541,17 +539,13 @@
       }
     } else if ($encoding === 'bubble') {
       // hide all color layers except for one for the current level (for tooltip)
-      otherLevels.forEach(name => hide(name));
+      hideAll(otherLevels);
       show($currentLevel);
       map.setPaintProperty($currentLevel, 'fill-color', MAP_THEME.countyFill);
-      hide(SPIKE_LAYER);
-      hide(outline(SPIKE_LAYER));
-      hide(highlight(SPIKE_LAYER));
-      hide(highlight(outline(SPIKE_LAYER)));
+      hideAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
 
       // show bubble layers
-      show(BUBBLE_LAYER);
-      show(highlight(BUBBLE_LAYER));
+      showAll([BUBBLE_LAYER, highlight(BUBBLE_LAYER)]);
 
       // color scale (color + stroke color)
       let flatStops = flatten(stops);
@@ -590,16 +584,13 @@
       hide('mega-county');
     } else if ($encoding === 'spike') {
       // hide all color layers except one for the current level
-      otherLevels.forEach(name => hide(name));
+
+      hideAll(otherLevels);
       show($currentLevel);
       map.setPaintProperty($currentLevel, 'fill-color', MAP_THEME.countyFill);
-      hide(BUBBLE_LAYER);
-      hide(highlight(BUBBLE_LAYER));
+      hideAll([BUBBLE_LAYER, highlight(BUBBLE_LAYER)]);
 
-      show(SPIKE_LAYER);
-      show(outline(SPIKE_LAYER));
-      show(highlight(SPIKE_LAYER));
-      show(highlight(outline(SPIKE_LAYER)));
+      showAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
 
       const valueMax = valueMinMax[1],
         maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel],
