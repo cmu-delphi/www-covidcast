@@ -1,5 +1,5 @@
 import { writable, readable, derived, get } from 'svelte/store';
-import { injectIDs, logScale } from '../util';
+import { injectIDs, LogScale } from '../util';
 import * as d3 from 'd3';
 import { sensorList } from './constants';
 export { dict, special_counties, defaultRegionOnStartup, makePlural } from './constants';
@@ -151,4 +151,4 @@ export const timeRangeOnSlider = writable({
 export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
 export const yesterday = Number.parseInt(d3.timeFormat('%Y%0m%0d')(yesterdayDate), 10);
 
-export const radiusScale = writable(logScale());
+export const radiusScale = writable(LogScale());
