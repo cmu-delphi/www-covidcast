@@ -29,7 +29,7 @@
   });
 
   function generateLineChart(signal = 'part_time_work_prop', source = 'covidcast') {
-    const apiURL = `https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day&data_source=${source}&signal=${signal}&geo_type=county&time_values=20200301-20200710&geo_value=06001`;
+    const apiURL = `https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day&data_source=${source}&signal=${signal}&geo_type=county&time_values=20200501-20200710&geo_value=06001`;
     const lineChartSchema = {
       $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
       description: 'Simple chart',
