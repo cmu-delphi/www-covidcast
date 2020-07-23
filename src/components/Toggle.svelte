@@ -1,13 +1,5 @@
 <script>
   import { encoding } from '../stores';
-
-  function toggle_switch() {
-    if ($encoding === 'color') {
-      encoding.set('bubble');
-    } else {
-      encoding.set('color');
-    }
-  }
 </script>
 
 <style>
@@ -16,9 +8,15 @@
     position: relative;
     align-items: center;
   }
+
   .button {
     position: relative;
   }
+
+  button.selected {
+    display: none;
+  }
+
   .buttons-group-side {
     width: 100%;
     display: flex;
@@ -73,18 +71,31 @@
 
 <div class="toggle">
   <span>Switch to</span>
+
   <div aria-label="encoding type" class="buttons-group-side">
+    <button
+      aria-pressed={$encoding === 'color' ? 'true' : 'false'}
+      class="button {$encoding === 'color' ? 'selected' : ''}"
+      on:click={() => {
+        encoding.set('color');
+      }}>
+      <img src="./assets/imgs/choropleth.png" height="31" alt="choropleth icon" />
+    </button>
     <button
       aria-pressed={$encoding === 'bubble' ? 'true' : 'false'}
       class="button {$encoding === 'bubble' ? 'selected' : ''}"
       on:click={() => {
-        toggle_switch();
+        encoding.set('bubble');
       }}>
-      {#if $encoding === 'bubble'}
-        <img src="./assets/imgs/choropleth.png" height="31" alt="" />
-      {:else}
-        <img src="./assets/imgs/bubble.png" height="31" alt="" />
-      {/if}
+      <img src="./assets/imgs/bubble.png" height="31" alt="bubble icon" />
+    </button>
+    <button
+      aria-pressed={$encoding === 'spike' ? 'true' : 'false'}
+      class="button {$encoding === 'spike' ? 'selected' : ''}"
+      on:click={() => {
+        encoding.set('spike');
+      }}>
+      SPIKE
     </button>
   </div>
 </div>

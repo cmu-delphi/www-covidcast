@@ -564,6 +564,7 @@
         ];
       }
     } else {
+      // signalType is 'direction'
       stops = [
         [-100, MAP_THEME.countyFill],
         [-1, DIRECTION_THEME.decreasing],
@@ -659,27 +660,13 @@
     } else if ($encoding === 'spike') {
       // test codes for spikes
 
-      const useLog = true,
-        useColor = false,
-        valueMax = valueMinMax[1],
+      const valueMax = valueMinMax[1],
         maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel],
         size = ENCODING_SPIKE_THEME.size[$currentLevel];
-      let scale;
-
-      if (useLog) {
-        scale = d3
-          .scaleLog()
-          .range([0, maxHeight])
-          .domain([0.0001, valueMax])
-          .base(2);
-
-        console.log(maxHeight, valueMax);
-      } else {
-        scale = d3
-          .scaleSqrt()
-          .range([0, maxHeight])
-          .domain([0, valueMax]);
-      }
+      const scale = d3
+        .scaleSqrt()
+        .range([0, maxHeight])
+        .domain([0, valueMax]);
 
       Object.keys($levels).forEach(name => {
         map.setLayoutProperty(center(name), 'visibility', 'none');
@@ -730,15 +717,14 @@
         }),
       };
 
-      if (useColor) {
-        let flatStops = flatten(stops);
-        flatStops.shift(); // remove the first element which has a value of 0 since the "step" expression of mapbox does not require it.
+      let flatStops = flatten(stops);
+      flatStops.shift(); // remove the first element which has a value of 0 since the "step" expression of mapbox does not require it.
 
-        flatStops[0] = 'transparent';
-        let colorExpression = ['step', ['get', 'value']].concat(flatStops);
-        map.setPaintProperty('spike', 'fill-color', colorExpression);
-        map.setPaintProperty(outline('spike'), 'line-color', colorExpression);
-      }
+      flatStops[0] = 'transparent';
+      let colorExpression = ['step', ['get', 'value']].concat(flatStops);
+      map.setPaintProperty('spike', 'fill-color', colorExpression);
+      map.setPaintProperty(outline('spike'), 'line-color', colorExpression);
+
       map.getSource('spike').setData(spikes);
       map.getSource(outline('spike')).setData(spikeOutlines);
     }
@@ -1403,7 +1389,7 @@
     position: absolute;
     top: 68px;
     left: 10px;
-    width: 100px;
+    width: 140px;
     z-index: 1001;
     padding: 8px 8px;
     box-sizing: border-box;
