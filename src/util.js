@@ -78,7 +78,7 @@ export function getTextColorBasedOnBackground(bgColor) {
 }
 
 // A d3-like continuous log scale.
-// Because MapBox does not support applying a custom function for a property,
+// Because MapBox does not support applying a custom function to a property,
 // so we cannot use d3.scaleLog().
 
 export function LogScale() {
