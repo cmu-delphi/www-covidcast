@@ -93,10 +93,10 @@ export const signalType = writable('value', (set) => {
   }
 });
 
-// Options are 'color' and 'bubble'
+// Options are 'color', 'bubble', and 'spike'
 export const encoding = writable('color', (set) => {
   const encoding = urlParams.get('encoding');
-  if (encoding === 'color' || encoding === 'bubble') {
+  if (encoding === 'color' || encoding === 'bubble' || encoding === 'spike') {
     set(encoding);
   }
 });
