@@ -89,6 +89,13 @@
     return `${name}-outline`;
   }
 
+  // helper function for multiple calls of map.setFeatureState
+  function setFeatureStateMultiple(sources, id, state) {
+    sources.forEach(s => {
+      map.setFeatureState({ source: s, id: id }, state);
+    });
+  }
+
   onMount(() => {
     let containerWidth = container.clientWidth;
     if (containerWidth <= 1021) {
@@ -111,8 +118,7 @@
   const onMouseEnter = level => e => {
     map.getCanvas().style.cursor = 'pointer';
     popup.setLngLat(e.lngLat).addTo(map);
-    map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
-    map.setFeatureState({ source: BUBBLE_LAYER, id: hoveredId }, { hover: false });
+    setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
   };
 
@@ -126,8 +132,7 @@
       return;
     }
 
-    map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
-    map.setFeatureState({ source: BUBBLE_LAYER, id: hoveredId }, { hover: false });
+    setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
 
     let fillColor;
@@ -145,8 +150,7 @@
       // The hovered element is not a mega county. It can be county, msa, state, bubble, or spike.
 
       hoveredId = e.features[0].id;
-      map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
-      map.setFeatureState({ source: BUBBLE_LAYER, id: hoveredId }, { hover: true });
+      setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: true });
 
       const value = e.features[0].properties.value;
       fillColor = $colorScale(value);
@@ -256,8 +260,7 @@
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
     if (level === 'mega-county' && hoveredId !== null) megaHoveredId = null;
 
-    map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
-    map.setFeatureState({ source: BUBBLE_LAYER, id: hoveredId }, { hover: false });
+    setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: false });
 
     if (level !== 'mega-county') hoveredId = null;
 
@@ -267,8 +270,7 @@
 
   const onClick = level => e => {
     if (clickedId) {
-      map.setFeatureState({ source: level, id: clickedId }, { select: false });
-      map.setFeatureState({ source: BUBBLE_LAYER, id: clickedId }, { select: false });
+      setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, { select: false });
     }
     if (megaClickedId) {
       map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: false });
@@ -285,16 +287,17 @@
       map.setFeatureState({ source: 'county', id: clickedId }, { select: false });
       clickedId = null;
       megaClickedId = e.features[0].id;
-      map.setFeatureState({ source: level, id: megaClickedId }, { select: true });
-      map.setFeatureState({ source: BUBBLE_LAYER, id: megaClickedId }, { select: true });
+      setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], megaClickedId, {
+        select: true,
+      });
+
       currentRegionName.set(e.features[0].properties.NAME);
       currentRegion.set(e.features[0].properties.STATE + '000');
     } else {
       megaClickedId = null;
       if (clickedId !== e.features[0].id) {
         clickedId = e.features[0].id;
-        map.setFeatureState({ source: level, id: clickedId }, { select: true });
-        map.setFeatureState({ source: BUBBLE_LAYER, id: clickedId }, { select: true });
+        setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, { select: true });
         currentRegionName.set(e.features[0].properties.NAME);
         currentRegion.set(e.features[0].properties.id);
       } else {
@@ -513,7 +516,9 @@
       hide(BUBBLE_LAYER);
       hide(highlight(BUBBLE_LAYER));
       hide(SPIKE_LAYER);
+      hide(outline(SPIKE_LAYER));
       hide(highlight(SPIKE_LAYER));
+      hide(highlight(outline(SPIKE_LAYER)));
       otherLevels.forEach(hide);
 
       show($currentLevel);
@@ -538,7 +543,9 @@
       show($currentLevel);
       map.setPaintProperty($currentLevel, 'fill-color', MAP_THEME.countyFill);
       hide(SPIKE_LAYER);
+      hide(outline(SPIKE_LAYER));
       hide(highlight(SPIKE_LAYER));
+      hide(highlight(outline(SPIKE_LAYER)));
 
       // show bubble layers
       show(BUBBLE_LAYER);
@@ -588,6 +595,8 @@
 
       show(SPIKE_LAYER);
       show(outline(SPIKE_LAYER));
+      show(highlight(SPIKE_LAYER));
+      show(highlight(outline(SPIKE_LAYER)));
 
       const valueMax = valueMinMax[1],
         maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel],
@@ -616,6 +625,7 @@
             },
             properties: { value: value },
             type: 'Feature',
+            id: feature.id,
           };
         }),
       };
@@ -637,6 +647,7 @@
             },
             properties: { value: value },
             type: 'Feature',
+            id: feature.id,
           };
         }),
       };
@@ -648,6 +659,9 @@
       let colorExpression = ['step', ['get', 'value']].concat(flatStops);
       map.setPaintProperty(SPIKE_LAYER, 'fill-color', colorExpression);
       map.setPaintProperty(outline(SPIKE_LAYER), 'line-color', colorExpression);
+      map.setPaintProperty(highlight(SPIKE_LAYER), 'fill-color', colorExpression);
+      map.setPaintProperty(highlight(outline(SPIKE_LAYER)), 'line-color', colorExpression);
+      map.setPaintProperty(outline(SPIKE_LAYER), 'line-width', ENCODING_SPIKE_THEME.strokeWidth[$currentLevel]);
 
       map.getSource(SPIKE_LAYER).setData(spikes);
       map.getSource(outline(SPIKE_LAYER)).setData(spikeOutlines);
@@ -673,8 +687,9 @@
             currentRegionName.set(randomFeature.properties.NAME);
             currentRegion.set(randomFeature.id);
             clickedId = randomFeature.id;
-            map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-            map.setFeatureState({ source: BUBBLE_LAYER, id: clickedId }, { select: true });
+            setFeatureStateMultiple([$currentLevel, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
+              select: true,
+            });
           }
           chosenRandom = true;
         } else {
@@ -684,8 +699,9 @@
           currentRegion.set(randomFeature.properties.id);
 
           clickedId = randomFeature.id;
-          map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-          map.setFeatureState({ source: BUBBLE_LAYER, id: clickedId }, { select: true });
+          setFeatureStateMultiple([$currentLevel, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
+            select: true,
+          });
           chosenRandom = true;
         }
       }
@@ -702,8 +718,9 @@
       if (found.length > 0) {
         clickedId = found[0].id;
         currentRegionName.set(found[0].properties.NAME);
-        map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-        map.setFeatureState({ source: BUBBLE_LAYER, id: clickedId }, { select: true });
+        setFeatureStateMultiple([$currentLevel, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
+          select: true,
+        });
       }
     }
   }
@@ -1026,7 +1043,7 @@
         );
       });
 
-      // two layers for bubbles
+      // 2 layers for bubbles
 
       map.addLayer(
         {
@@ -1068,7 +1085,7 @@
             'circle-radius': 0,
             'circle-color': ENCODING_BUBBLE_THEME.color,
             'circle-stroke-color': ENCODING_BUBBLE_THEME.strokeColor,
-            'circle-stroke-width': ENCODING_BUBBLE_THEME.strokeWidthHovered,
+            'circle-stroke-width': ENCODING_BUBBLE_THEME.strokeWidthHighlighted,
             'circle-opacity': [
               'case',
               ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
@@ -1086,35 +1103,94 @@
         'city-point-unclustered-pit',
       );
 
-      // four layers for spikes
+      // 4 layers for spikes
 
-      map.addLayer({
-        id: SPIKE_LAYER,
-        type: 'fill',
-        source: SPIKE_LAYER,
-        filter: ['>', ['get', 'value'], 0],
-        paint: {
-          'fill-color': ENCODING_SPIKE_THEME.color,
-          'fill-opacity': ENCODING_SPIKE_THEME.fillOpacity,
-          'fill-outline-color': 'transparent',
+      map.addLayer(
+        {
+          id: SPIKE_LAYER,
+          type: 'fill',
+          source: SPIKE_LAYER,
+          filter: ['>', ['get', 'value'], 0],
+          paint: {
+            'fill-color': 'transparent',
+            'fill-opacity': [
+              'case',
+              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
+              0,
+              ENCODING_SPIKE_THEME.fillOpacity,
+            ],
+            'fill-outline-color': 'transparent',
+          },
         },
-      });
+        'county-hover',
+      );
 
-      map.addLayer({
-        id: outline(SPIKE_LAYER),
-        type: 'line',
-        source: outline(SPIKE_LAYER),
-        filter: ['>', ['get', 'value'], 0],
-        layout: {
-          'line-cap': 'round',
-          'line-join': 'round',
+      map.addLayer(
+        {
+          id: outline(SPIKE_LAYER),
+          type: 'line',
+          source: outline(SPIKE_LAYER),
+          filter: ['>', ['get', 'value'], 0],
+          layout: {
+            'line-cap': 'round',
+            'line-join': 'round',
+          },
+          paint: {
+            'line-color': 'transparent',
+            'line-opacity': [
+              'case',
+              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
+              0,
+              ENCODING_SPIKE_THEME.strokeOpacity,
+            ],
+          },
         },
-        paint: {
-          'line-color': ENCODING_SPIKE_THEME.color,
-          'line-width': ENCODING_SPIKE_THEME.strokeWidth[$currentLevel],
-          'line-opacity': ENCODING_SPIKE_THEME.strokeOpacity,
+        'county-hover',
+      );
+
+      map.addLayer(
+        {
+          id: highlight(SPIKE_LAYER),
+          type: 'fill',
+          source: SPIKE_LAYER,
+          filter: ['>', ['get', 'value'], 0],
+          paint: {
+            'fill-color': 'transparent',
+            'fill-opacity': [
+              'case',
+              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
+              ENCODING_SPIKE_THEME.fillOpacity,
+              0,
+            ],
+            'fill-outline-color': 'transparent',
+          },
         },
-      });
+        'city-point-unclustered-pit',
+      );
+
+      map.addLayer(
+        {
+          id: highlight(outline(SPIKE_LAYER)),
+          type: 'line',
+          source: outline(SPIKE_LAYER),
+          filter: ['>', ['get', 'value'], 0],
+          layout: {
+            'line-cap': 'round',
+            'line-join': 'round',
+          },
+          paint: {
+            'line-color': 'transparent',
+            'line-width': ENCODING_SPIKE_THEME.strokeWidthHighlighted,
+            'line-opacity': [
+              'case',
+              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
+              ENCODING_SPIKE_THEME.strokeOpacity,
+              0,
+            ],
+          },
+        },
+        'city-point-unclustered-pit',
+      );
 
       if ($currentZone === 'swpa') {
         showZoneBoundary('swpa');
@@ -1168,8 +1244,9 @@
       currentRegionName.set(selectedRegion['name']);
       currentRegion.set(selectedRegion['property_id']);
       clickedId = parseInt(selectedRegion['id']);
-      map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-      map.setFeatureState({ source: BUBBLE_LAYER, id: clickedId }, { select: true });
+      setFeatureStateMultiple([$currentLevel, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
+        select: true,
+      });
 
       // Get zoom and center of selected location
       let centersData = $geojsons.get(center($currentLevel))['features'];

@@ -37,7 +37,7 @@ export const ENCODING_BUBBLE_THEME = {
   color: 'transparent',
   strokeColor: '#666',
   strokeWidth: 1,
-  strokeWidthHovered: 4,
+  strokeWidthHighlighted: 4,
   opacity: 0.5,
   strokeOpacity: 1,
   minRadius: {
@@ -54,7 +54,6 @@ export const ENCODING_BUBBLE_THEME = {
 };
 
 export const ENCODING_SPIKE_THEME = {
-  color: 'red',
   fillOpacity: 0.2,
   strokeOpacity: 0.8,
   strokeWidth: {
@@ -62,6 +61,7 @@ export const ENCODING_SPIKE_THEME = {
     msa: 1.5,
     state: 2,
   },
+  strokeWidthHighlighted: 4,
   maxHeight: {
     county: 0.5,
     msa: 1,
