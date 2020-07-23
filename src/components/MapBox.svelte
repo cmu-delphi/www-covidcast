@@ -62,7 +62,7 @@
   let hoveredId = null;
   let container;
   let map;
-  let popup;
+  let popup, topPopup;
   let megaHoveredId;
   let clickedId;
   let megaClickedId;
@@ -117,7 +117,7 @@
   // Mouse event handlers
   const onMouseEnter = level => e => {
     map.getCanvas().style.cursor = 'pointer';
-    popup.setLngLat(e.lngLat).addTo(map);
+    ($encoding === 'spike' ? topPopup : popup).setLngLat(e.lngLat).addTo(map);
     setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
   };
@@ -125,7 +125,7 @@
   const onMouseMove = level => e => {
     if (level === 'state-outline') {
       map.getCanvas().style.cursor = 'pointer';
-      popup
+      ($encoding === 'spike' ? topPopup : popup)
         .setLngLat(e.lngLat)
         .setHTML('Estimate unavailable for rest of ' + e.features[0].properties.NAME)
         .addTo(map);
@@ -246,7 +246,7 @@
         ${title}
       </div>` + body;
 
-    popup
+    ($encoding === 'spike' ? topPopup : popup)
       .setLngLat(e.lngLat)
       .setHTML(body)
       .addTo(map);
@@ -255,6 +255,7 @@
   const onMouseLeave = level => () => {
     if (level === 'state-outline') {
       popup.remove();
+      topPopup.remove();
       return;
     }
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
@@ -266,6 +267,7 @@
 
     map.getCanvas().style.cursor = '';
     popup.remove();
+    topPopup.remove();
   };
 
   const onClick = level => e => {
@@ -590,6 +592,7 @@
       // hide all color layers except one for the current level
       otherLevels.forEach(name => hide(name));
       show($currentLevel);
+      map.setPaintProperty($currentLevel, 'fill-color', MAP_THEME.countyFill);
       hide(BUBBLE_LAYER);
       hide(highlight(BUBBLE_LAYER));
 
@@ -775,6 +778,13 @@
       closeButton: false,
       closeOnClick: false,
       className: 'map-popup',
+    });
+
+    topPopup = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false,
+      className: 'map-popup',
+      anchor: 'top',
     });
     map.on('mousemove', 'state-outline', onMouseMove('state-outline'));
     map.on('mouseleave', 'state-outline', onMouseLeave('state-outline'));
