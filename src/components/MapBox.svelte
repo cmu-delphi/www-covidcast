@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
   import mapboxgl from 'mapbox-gl';
   import 'mapbox-gl/dist/mapbox-gl.css';
-  import { getTextColorBasedOnBackground, LogScale, flatten } from '../util.js';
+  import { getTextColorBasedOnBackground, LogScale, flatten, zip, transparent } from '../util.js';
   import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../theme.js';
   import AutoComplete from 'simple-svelte-autocomplete';
   import IoIosSearch from 'svelte-icons/io/IoIosSearch.svelte';
@@ -38,6 +38,7 @@
   } from '../stores';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
+  import { isCountSignal, isPropSignal } from '../data/signals';
 
   export let isIE, graphShowStatus, toggleGraphShowStatus;
 
@@ -458,7 +459,7 @@
 
     // set the value of the chosen sensor to each states/counties
     // dat: data for cholopleth
-    // centerDat: data for bubbles
+    // centerDat: data for bubbles and spikes
     [dat, centerDat].forEach(ds => {
       ds.features.forEach(d => {
         const id = d.properties.id;
@@ -479,48 +480,41 @@
       });
     });
 
+    if (['data', 'init'].includes(type)) {
+      map.getSource($currentLevel).setData(dat);
+      map.getSource(center($currentLevel)).setData(centerDat);
+      drawMega ? map.getSource('mega-county').setData(megaDat) : '';
+    }
+
     let stops, stopsMega, currentRadiusScale;
 
     if ($signalType === 'value') {
       valueMinMax[0] = Math.max(0, valueMinMax[0]);
-      let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
-      let firstHalfCenter = valueMinMax[0] + (center - valueMinMax[0]) / 2;
-      let secondHalfCenter = center + (valueMinMax[1] - center) / 2;
+      const center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2,
+        firstHalfCenter = valueMinMax[0] + (center - valueMinMax[0]) / 2,
+        secondHalfCenter = center + (valueMinMax[1] - center) / 2;
 
-      let colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
+      const colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
+      const colorScaleLog = d3
+        .scaleSequentialLog(d3.interpolateYlOrRd)
+        .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]]);
 
-      const c1 = d3.rgb(colorScaleLinear(valueMinMax[0]));
-      const c2 = d3.rgb(colorScaleLinear(firstHalfCenter));
-      const c3 = d3.rgb(colorScaleLinear(center));
-      const c4 = d3.rgb(colorScaleLinear(secondHalfCenter));
-      const c5 = d3.rgb(colorScaleLinear(valueMinMax[1]));
-      c1.opacity = 0.5;
-      c2.opacity = 0.5;
-      c3.opacity = 0.5;
-      c4.opacity = 0.5;
-      c5.opacity = 0.5;
+      // domainStops7 is used to determine the colors of regions for count signals.
+      const domainStops7 = logspace(
+        Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10),
+        Math.log(valueMinMax[1]) / Math.log(10),
+        7,
+      );
+      // domainStops5 is used for other cases (mega or prop signals)
+      const domainStops5 = [valueMinMax[0], firstHalfCenter, center, secondHalfCenter, valueMinMax[1]];
 
-      if ($currentSensor.match(/num/)) {
-        let min = Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10);
-        let max = Math.log(valueMinMax[1]) / Math.log(10);
-        let arr = logspace(min, max, 7);
-        const colorScaleLog = d3
-          .scaleSequentialLog(d3.interpolateYlOrRd)
-          .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]]);
+      const logColors7 = domainStops7.map(c => colorScaleLog(c).toString());
+      const linearColors5 = domainStops5.map(c => colorScaleLinear(c).toString());
 
-        let tempStops = [[0, DIRECTION_THEME.countMin]];
-        for (let i = 0; i < arr.length; i++) {
-          tempStops.push([arr[i], colorScaleLog(arr[i])]);
-        }
-        stops = tempStops;
-        stopsMega = [
-          [0, DIRECTION_THEME.countMin],
-          [valueMinMax[0], c1.toString()],
-          [firstHalfCenter, c2.toString()],
-          [center, c3.toString()],
-          [secondHalfCenter, c4.toString()],
-          [valueMinMax[1], c5.toString()],
-        ];
+      if (isCountSignal($currentSensor)) {
+        // use log scale
+        stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops7, logColors7));
+        stopsMega = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, linearColors5));
 
         const minRadius = ENCODING_BUBBLE_THEME.minRadius[$currentLevel],
           maxRadius = ENCODING_BUBBLE_THEME.maxRadius[$currentLevel];
@@ -530,38 +524,12 @@
           .range([minRadius, maxRadius])
           .base(ENCODING_BUBBLE_THEME.base);
         radiusScale.set(currentRadiusScale);
-      } else if ($currentSensor.match(/prop/)) {
-        stops = [
-          [0, DIRECTION_THEME.countMin],
-          [valueMinMax[0], colorScaleLinear(valueMinMax[0])],
-          [firstHalfCenter, colorScaleLinear(firstHalfCenter)],
-          [center, colorScaleLinear(center)],
-          [secondHalfCenter, colorScaleLinear(secondHalfCenter)],
-          [valueMinMax[1], colorScaleLinear(valueMinMax[1])],
-        ];
-        stopsMega = [
-          [0, DIRECTION_THEME.countMin],
-          [valueMinMax[0], c1.toString()],
-          [firstHalfCenter, c2.toString()],
-          [center, c3.toString()],
-          [secondHalfCenter, c4.toString()],
-          [valueMinMax[1], c5.toString()],
-        ];
+      } else if (isPropSignal($currentSensor)) {
+        stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, linearColors5));
+        stopsMega = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, transparent(linearColors5, 0.5)));
       } else {
-        stops = [
-          [valueMinMax[0], colorScaleLinear(valueMinMax[0])],
-          [firstHalfCenter, colorScaleLinear(firstHalfCenter)],
-          [center, colorScaleLinear(center)],
-          [secondHalfCenter, colorScaleLinear(secondHalfCenter)],
-          [valueMinMax[1], colorScaleLinear(valueMinMax[1])],
-        ];
-        stopsMega = [
-          [valueMinMax[0], c1.toString()],
-          [firstHalfCenter, c2.toString()],
-          [center, c3.toString()],
-          [secondHalfCenter, c4.toString()],
-          [valueMinMax[1], c5.toString()],
-        ];
+        stops = zip(domainStops5, linearColors5);
+        stopsMega = zip(domainStops5, transparent(linearColors5, 0.5));
       }
     } else {
       // signalType is 'direction'
@@ -577,12 +545,6 @@
         [0, DIRECTION_THEME.gradientMiddleMega],
         [1, DIRECTION_THEME.gradientMaxMega],
       ];
-    }
-
-    if (['data', 'init'].includes(type)) {
-      map.getSource($currentLevel).setData(dat);
-      map.getSource(center($currentLevel)).setData(centerDat);
-      drawMega ? map.getSource('mega-county').setData(megaDat) : '';
     }
 
     if ($encoding === 'color') {
@@ -1199,7 +1161,7 @@
           'line-opacity': ENCODING_SPIKE_THEME.strokeOpacity,
         },
       });
-      encoding.set('spike');
+      // encoding.set('spike');
 
       mapMounted = true;
       updateMap('init');
