@@ -40,7 +40,7 @@
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
 
-  export let isIE, graphShowStatus, toggleGraphShowStatus;
+  export let graphShowStatus, toggleGraphShowStatus;
 
   let searchErrorComponent;
   let parseTime = d3.timeParse('%Y%m%d');
@@ -1370,7 +1370,7 @@
     <Time />
   </div>
 
-  <GraphContainer {isIE} {graphShowStatus} {toggleGraphShowStatus} />
+  <GraphContainer {graphShowStatus} {toggleGraphShowStatus} />
 
   <div class="map-wrapper" bind:this={container} />
 </main>

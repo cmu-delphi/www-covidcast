@@ -2,7 +2,7 @@
   import Graph from './Graph.svelte';
   import { mapFirstLoaded } from '../../stores';
 
-  export let isIE, graphShowStatus, toggleGraphShowStatus;
+  export let graphShowStatus, toggleGraphShowStatus;
 </script>
 
 <style>
@@ -126,11 +126,7 @@
 
 {#if $mapFirstLoaded && !graphShowStatus}
   <div class="graph-toggole-button-container">
-    <button
-      title={isIE !== undefined ? 'Show time series' : ''}
-      class="graph-toggle-button"
-      aria-label="show time series"
-      on:click={() => toggleGraphShowStatus(false)}>
+    <button class="graph-toggle-button" aria-label="show time series" on:click={() => toggleGraphShowStatus(false)}>
       <span class="button-tooltip">Show time series</span>
       <b>View Time Graph</b>
     </button>
