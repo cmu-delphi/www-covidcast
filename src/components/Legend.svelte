@@ -1,5 +1,5 @@
 <script>
-  import { DIRECTION_THEME, ENCODING_BUBBLE_THEME } from './theme.js';
+  import { DIRECTION_THEME } from '../theme';
   import {
     signalType,
     stats,
@@ -9,7 +9,7 @@
     currentDataReadyOnMap,
     encoding,
     radiusScale,
-  } from './stores.js';
+  } from '../stores';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
 
@@ -20,11 +20,11 @@
   $: logColorArr = [{ label: '0', from_color: DIRECTION_THEME.countMin, to_color: DIRECTION_THEME.countMin }];
   $: linColorArr = [];
 
-  currentSensor.subscribe(s => ($stats ? update(s, $stats, $currentLevel, $encoding) : ''));
-  stats.subscribe(s => (s ? update($currentSensor, s, $currentLevel, $encoding) : ''));
-  currentLevel.subscribe(l => ($stats ? update($currentSensor, $stats, l, $encoding) : ''));
-  encoding.subscribe(e => ($stats ? update($currentSensor, $stats, $currentLevel, e) : ''));
-  radiusScale.subscribe(e => ($stats ? update($currentSensor, $stats, $currentLevel, $encoding) : ''));
+  currentSensor.subscribe((s) => ($stats ? update(s, $stats, $currentLevel, $encoding) : ''));
+  stats.subscribe((s) => (s ? update($currentSensor, s, $currentLevel, $encoding) : ''));
+  currentLevel.subscribe((l) => ($stats ? update($currentSensor, $stats, l, $encoding) : ''));
+  encoding.subscribe((e) => ($stats ? update($currentSensor, $stats, $currentLevel, e) : ''));
+  radiusScale.subscribe(() => ($stats ? update($currentSensor, $stats, $currentLevel, $encoding) : ''));
 
   function update(sens, stats, level, encoding) {
     updateLowHigh(sens, stats, level, encoding);
@@ -268,8 +268,8 @@
   .trend-legend-grouping ul {
     margin: 0;
     padding: 0;
-    float: left;
-    list-style: none;
+    display: flex;
+    justify-content: space-around;
   }
   .trend-legend-grouping ul li {
     display: block;
@@ -282,7 +282,7 @@
     list-style: none;
   }
 
-  .trend-legend-grouping ul.legend-labels li span {
+  .trend-legend-grouping ul.legend-labels li div.color-block {
     display: block;
     float: left;
     height: 15px;
@@ -337,6 +337,7 @@
   .bubble-legend li {
     display: flex;
     font-size: 80%;
+    padding-right: 10px;
     align-items: center;
   }
 
@@ -353,10 +354,6 @@
 
   #encoding-options > div {
     margin-right: 0.5rem;
-  }
-
-  .hidden {
-    display: none;
   }
 </style>
 
@@ -384,7 +381,7 @@
               signalType.set('direction');
             }
           }}
-          disabled={$sensorMap.get($currentSensor).official ? true : false}>
+          disabled={true}>
           7-day Trend
           {#if $sensorMap.get($currentSensor).official}
             <span class="disabled-tooltip">Currently unavailable</span>
@@ -393,44 +390,23 @@
 
       </div>
     </div>
-
-    <div class="toggle {$signalType === 'direction' || !$currentSensor.match(/num/) ? 'hidden' : ''}">
-      <div aria-label="encoding type" class="buttons-group-side">
-        <button
-          aria-pressed={$encoding === 'color' ? 'true' : 'false'}
-          class="button {$encoding === 'color' ? 'selected' : ''}"
-          on:click={() => {
-            encoding.set('color');
-          }}>
-          Choropleth
-        </button>
-        <button
-          aria-pressed={$encoding === 'bubble' ? 'true' : 'false'}
-          class="button {$encoding === 'bubble' ? 'selected' : ''}"
-          on:click={() => {
-            encoding.set('bubble');
-          }}>
-          Bubbles
-        </button>
-      </div>
-    </div>
   </div>
   {#if $encoding === 'color'}
     {#if $signalType === 'direction'}
       <div class="trend-legend-grouping">
         <ul class="legend-labels">
           <li>
-            <span style="background-color: {DIRECTION_THEME.increasing}" />
+            <div class="color-block" style="background-color: {DIRECTION_THEME.increasing}" />
             {@html DIRECTION_THEME.increasingIcon}
             Increasing
           </li>
           <li>
-            <span style="background-color: {DIRECTION_THEME.steady}" />
+            <div class="color-block" style="background-color: {DIRECTION_THEME.steady}" />
             {@html DIRECTION_THEME.steadyIcon}
             Steady
           </li>
           <li>
-            <span style="background-color: {DIRECTION_THEME.decreasing}" />
+            <div class="color-block" style="background-color: {DIRECTION_THEME.decreasing}" />
             {@html DIRECTION_THEME.decreasingIcon}
             Decreasing
           </li>

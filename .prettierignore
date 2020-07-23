@@ -1,0 +1,13 @@
+/node_modules
+/package-lock.json
+.gitignore
+.browserslistrc
+.gitattributes
+.prettierignore
+/old_maps
+*.ico
+*.png
+*.svg
+*.csv
+/public
+/src/static

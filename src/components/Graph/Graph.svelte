@@ -5,14 +5,9 @@
     currentRegionName,
     currentSensor,
     currentLevel,
-    currentData,
     regionData,
-    currentSensorName,
-    currentLevelName,
     currentDate,
-    times,
     stats,
-    sensors,
     sensorMap,
     signalType,
     timeRangeOnSlider,
@@ -20,9 +15,8 @@
     mounted,
     dict,
     special_counties,
-  } from '../stores.js';
-  import { calculateValFromRectified } from '../util.js';
-  import { DIRECTION_THEME } from '../theme.js';
+  } from '../../stores';
+  import { DIRECTION_THEME } from '../../theme';
   import * as d3 from 'd3';
   import d3Tip from 'd3-tip';
 
@@ -30,12 +24,9 @@
 
   let el;
   let w;
-  let t;
 
-  onMount(_ => {
-    d3.select(el)
-      .selectAll('*')
-      .remove();
+  onMount(() => {
+    d3.select(el).selectAll('*').remove();
 
     if (w > 400) w = 400;
 
@@ -66,18 +57,16 @@
       .call(d3.axisBottom(x).tickFormat(''));
     svg.append('g').call(d3.axisLeft(y).tickFormat(''));
 
-    regionData.subscribe(d => updateGraph(d, $timeRangeOnSlider, $currentDate, $currentSensor, $signalType));
-    signalType.subscribe(s => updateGraph($regionData, $timeRangeOnSlider, $currentDate, $currentSensor, s));
-    timeRangeOnSlider.subscribe(r => updateGraph($regionData, r, $currentDate, $currentSensor, $signalType));
+    regionData.subscribe((d) => updateGraph(d, $timeRangeOnSlider, $currentDate, $currentSensor, $signalType));
+    signalType.subscribe((s) => updateGraph($regionData, $timeRangeOnSlider, $currentDate, $currentSensor, s));
+    timeRangeOnSlider.subscribe((r) => updateGraph($regionData, r, $currentDate, $currentSensor, $signalType));
   });
 
   function updateGraph(data, range, date, sensor, signal) {
     if (!$mounted) return;
 
     // if there is an existing chart, remove it and redraw
-    d3.select(el)
-      .selectAll('*')
-      .remove();
+    d3.select(el).selectAll('*').remove();
     d3.select(el).html('');
 
     const margin = { top: 15, right: 35, bottom: 70, left: 60 },
@@ -96,7 +85,7 @@
     let minDate = parseTime(range.min);
     let maxDate = parseTime(range.max);
 
-    data = data.filter(it => {
+    data = data.filter((it) => {
       let t = parseTime(it['time_value']);
       return t >= minDate && t <= maxDate;
     });
@@ -106,7 +95,6 @@
     // peg values to max and min if out of range
     let minMax = calculateSD(sensor);
     let chartMax = minMax[1];
-    let chartMin = minMax[0];
 
     let latest_direction = -100;
     let hit_latest_node = false;
@@ -139,16 +127,13 @@
     // scale x and y axes
     let x = d3
       .scaleTime()
-      .domain([d3.extent(data, d => parseTime(d.time_value))[0], parseTime(yesterday)])
+      .domain([d3.extent(data, (d) => parseTime(d.time_value))[0], parseTime(yesterday)])
       .range([0, width]);
-    let y = d3
-      .scaleLinear()
-      .domain([minMax[0], chartMax])
-      .range([height, 0]);
+    let y = d3.scaleLinear().domain([minMax[0], chartMax]).range([height, 0]);
 
     let formatYTicks;
     let format = $sensorMap.get(sensor).format;
-    if (format === 'percent') formatYTicks = d => d + '%';
+    if (format === 'percent') formatYTicks = (d) => d + '%';
     else if (format === 'raw') {
       const range = y.domain()[1] - y.domain()[0];
       if (range > 10) {
@@ -160,36 +145,24 @@
       }
       //formatYTicks = y.domain[1] - y.domain[0] > 10 ? d3.format('.0f') : d3.format('.1f');
     }
-    let formatXTicks = data.length < 6 ? d3.timeDay.every(1) : d3.timeDay.every(4);
+    // let formatXTicks = data.length < 6 ? d3.timeDay.every(1) : d3.timeDay.every(4);
 
     // append the axes
     svg
       .append('g')
       .attr('class', 'axis')
       .attr('transform', 'translate(0,' + height + ')')
-      .call(
-        d3
-          .axisBottom(x)
-          .tickFormat(d3.timeFormat('%m/%d'))
-          .ticks(7),
-      );
+      .call(d3.axisBottom(x).tickFormat(d3.timeFormat('%m/%d')).ticks(7));
 
-    svg
-      .selectAll('text')
-      .attr('dy', '8px')
-      .attr('dx', '-6px')
-      .attr('transform', 'rotate(-30)');
+    svg.selectAll('text').attr('dy', '8px').attr('dx', '-6px').attr('transform', 'rotate(-30)');
 
-    svg
-      .append('g')
-      .attr('class', 'axis')
-      .call(d3.axisLeft(y).tickFormat(formatYTicks));
+    svg.append('g').attr('class', 'axis').call(d3.axisLeft(y).tickFormat(formatYTicks));
 
     // define tool tip
     let tip = d3Tip()
       .attr('class', 'd3-tip')
       .offset([-10, 0])
-      .html(function(d) {
+      .html(function (d) {
         return (
           d3.timeFormat('%m/%d')(parseTime(d.time_value)) +
           ': ' +
@@ -204,38 +177,30 @@
     // draw the line graph
     let line = d3
       .line()
-      .x(d => x(parseTime(d.time_value)))
-      .y(d => y(+d.value));
+      .x((d) => x(parseTime(d.time_value)))
+      .y((d) => y(+d.value));
 
     let area = d3
       .area()
-      .x(d => x(parseTime(d.time_value)))
-      .y0(d => y(Math.max(0, +d.value - d.stderr)))
-      .y1(d => y(+d.value + d.stderr));
+      .x((d) => x(parseTime(d.time_value)))
+      .y0((d) => y(Math.max(0, +d.value - d.stderr)))
+      .y1((d) => y(+d.value + d.stderr));
 
-    svg
-      .append('path')
-      .attr('fill', 'none')
-      .attr('stroke', '#767676')
-      .attr('stroke-width', 3)
-      .attr('d', line(data));
+    svg.append('path').attr('fill', 'none').attr('stroke', '#767676').attr('stroke-width', 3).attr('d', line(data));
 
-    svg
-      .append('path')
-      .attr('fill', 'rgba(0, 0, 0, 0.1')
-      .attr('d', area(data));
+    svg.append('path').attr('fill', 'rgba(0, 0, 0, 0.1').attr('d', area(data));
 
     svg
       .selectAll('circle')
       .data(data)
       .enter()
       .append('circle')
-      .attr('r', d => (d.time_value == date ? 6 : 4))
-      .attr('cx', d => x(parseTime(d.time_value)))
-      .attr('cy', d => y(+d.value))
-      .attr('id', d => d.time_value)
-      .style('stroke-width', d => (d.time_value == date ? 1 : 1))
-      .style('fill', d => {
+      .attr('r', (d) => (d.time_value == date ? 6 : 4))
+      .attr('cx', (d) => x(parseTime(d.time_value)))
+      .attr('cy', (d) => y(+d.value))
+      .attr('id', (d) => d.time_value)
+      .style('stroke-width', (d) => (d.time_value == date ? 1 : 1))
+      .style('fill', (d) => {
         let color = '#767676';
         if (d.inDirection && signal === 'direction') {
           switch (d.coloredDirection) {
@@ -260,7 +225,7 @@
       .style('stroke', '#767676')
       .on('mouseover', tip.show)
       .on('mouseout', tip.hide)
-      .on('click', d => {
+      .on('click', (d) => {
         tip.hide;
         d3.selectAll('.d3-tip').remove();
         currentDate.set(d.time_value);
@@ -301,20 +266,20 @@
     return minMax;
   }
 
-  function get_display_name() {
-    let title = '';
-    if ($currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' === '000') {
-      title += 'Rest of';
-    }
-    title += $currentRegionName;
-    if ($currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' !== '000') {
-      if (!special_counties.includes($currentRegionName)) {
-        title += 'County, ';
-      }
-      title += dict[$currentRegion.slice(0, 2)];
-    }
-    return title;
-  }
+  // function get_display_name() {
+  //   let title = '';
+  //   if ($currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' === '000') {
+  //     title += 'Rest of';
+  //   }
+  //   title += $currentRegionName;
+  //   if ($currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' !== '000') {
+  //     if (!special_counties.includes($currentRegionName)) {
+  //       title += 'County, ';
+  //     }
+  //     title += dict[$currentRegion.slice(0, 2)];
+  //   }
+  //   return title;
+  // }
 </script>
 
 <style>

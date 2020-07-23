@@ -1,6 +1,6 @@
 <script>
   import Graph from './Graph.svelte';
-  import { mapFirstLoaded } from '../stores.js';
+  import { mapFirstLoaded } from '../../stores';
 
   export let isIE, graphShowStatus, toggleGraphShowStatus;
 </script>
@@ -130,7 +130,7 @@
       title={isIE !== undefined ? 'Show time series' : ''}
       class="graph-toggle-button"
       aria-label="show time series"
-      on:click={event => toggleGraphShowStatus(false)}>
+      on:click={() => toggleGraphShowStatus(false)}>
       <span class="button-tooltip">Show time series</span>
       <b>View Time Graph</b>
     </button>

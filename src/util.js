@@ -1,6 +1,5 @@
 import colorParse from 'color-parse';
 import invertColor from 'invert-color';
-import { scaleLinear } from 'd3';
 
 export const calculateValFromRectified = (rectified) => {
   let tempDate = new Date(rectified);
@@ -129,12 +128,6 @@ export function LogScale() {
 
   return scale;
 }
-
-export const defaultRegionOnStartup = {
-  county: '42003', // Allegheny
-  msa: '38300', // Pittsburgh
-  state: 'PA', // Pennsylvania
-};
 
 export function flatten(arr) {
   return arr.reduce((acc, val) => acc.concat(val), []);
