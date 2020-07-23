@@ -1,5 +1,4 @@
 <script>
-  //import mapboxgl from 'mapbox-gl';
   import { onMount } from 'svelte';
   import mapboxgl from 'mapbox-gl';
   import 'mapbox-gl/dist/mapbox-gl.css';
@@ -12,6 +11,7 @@
   import Legend from './Legend.svelte';
   import Banner from './Banner.svelte';
   import Time from './Time.svelte';
+  import {computeBounds} from './geoUtils';
   import GraphContainer from './Graph/GraphContainer.svelte';
   import {
     levels,
@@ -45,13 +45,20 @@
   let parseTime = d3.timeParse('%Y%m%d');
   let formatTimeWithoutYear = d3.timeFormat('%B %d');
 
-  let LAT = -0.5;
-  let LON = -0.5;
-  let ZOOM = 3.9;
-
-  let SWPA_LAT = 2.8;
-  let SWPA_LON = 12.6;
-  let SWPA_ZOOM = 7.7;
+  /**
+   * @type {mapboxgl.LngLatBounds}
+   */
+  let stateBounds = null;
+  let stateBoundsOptions = {
+    padding: 20, //px
+    linear: false,
+  };
+  let zoneBounds = null;
+  let zoneBoundsOptions = {
+    padding: 20, //px
+    linear: false,
+  };
+  $: showCurrentZone = $currentZone === 'swpa';
 
   // Boolean tracking if the map has been initialized.
   let mapMounted = false;
@@ -80,17 +87,6 @@
   }
 
   onMount(() => {
-    let containerWidth = container.clientWidth;
-    if (containerWidth <= 1021) {
-      //ZOOM = 3.9;
-      ZOOM = containerWidth / 300;
-    } else if (containerWidth > 1021 && containerWidth < 1280) {
-      //ZOOM = 4.1;
-      ZOOM = containerWidth / 330;
-    } else if (containerWidth >= 1280) {
-      //ZOOM = 4.3;
-      ZOOM = Math.min(4.3, containerWidth / 350);
-    }
     Promise.all([d3.json('./maps/name_id_info.json')]).then(([a]) => {
       regionList = a['all'];
       loaded = true;
@@ -719,23 +715,15 @@
   }
 
   function initializeMap() {
-    let lon = LON,
-      lat = LAT,
-      zoom = ZOOM;
-
-    if ($currentZone === 'swpa') {
-      lon = SWPA_LON;
-      lat = SWPA_LAT;
-      zoom = SWPA_ZOOM;
-    }
+    stateBounds = computeBounds($geojsons.get('state'));
+    zoneBounds = computeBounds($geojsons.get('zone'));
 
     map = new mapboxgl.Map({
       attributionControl: false,
       container,
       style: './maps/mapbox_albers_usa_style.json',
-      center: [lon, lat],
-      zoom: zoom,
-      minZoom: ZOOM - 1,
+      bounds: showCurrentZone ? zoneBounds : stateBounds,
+      fitBounds: showCurrentZone ? zoneBoundsOptions : stateBoundsOptions,
     })
       .addControl(new mapboxgl.AttributionControl({ compact: true }))
       .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
@@ -1410,7 +1398,7 @@
       id="bounds-button"
       class="pg-button bounds-button"
       on:click={() => {
-        map.easeTo({ center: [LON, LAT], zoom: ZOOM, bearing: 0, pitch: 0 });
+        map.fitBounds(stateBounds, stateBoundsOptions);
       }}>
       <img src="./assets/imgs/us48.png" alt="" />
     </button>
@@ -1422,7 +1410,7 @@
         aria-label="show swpa boundary"
         class="pg-button bounds-button"
         on:click={() => {
-          map.easeTo({ center: [SWPA_LON, SWPA_LAT], zoom: SWPA_ZOOM, bearing: 0, pitch: 0 });
+          map.fitBounds(zoneBounds, zoneBoundsOptions);
           showZoneBoundary('swpa');
         }}>
         SWPA
