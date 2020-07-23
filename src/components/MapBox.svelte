@@ -1,17 +1,18 @@
 <script>
-  //import mapboxgl from 'mapbox-gl';
   import { onMount } from 'svelte';
   import mapboxgl from 'mapbox-gl';
   import 'mapbox-gl/dist/mapbox-gl.css';
   import { getTextColorBasedOnBackground, LogScale, zip, transparent } from '../util.js';
   import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../theme.js';
-  import AutoComplete from 'simple-svelte-autocomplete';
-  import IoIosSearch from 'svelte-icons/io/IoIosSearch.svelte';
   import Options from './Options.svelte';
   import Toggle from './Toggle.svelte';
   import Legend from './Legend.svelte';
   import Banner from './Banner.svelte';
+  import Search from './Search.svelte';
+  import MapControls from './MapControls.svelte';
+  import Title from './Title.svelte';
   import Time from './Time.svelte';
+  import { computeBounds } from './geoUtils';
   import GraphContainer from './Graph/GraphContainer.svelte';
   import {
     levels,
@@ -43,19 +44,26 @@
   import logspace from 'compute-logspace';
   import { isCountSignal, isPropSignal } from '../data/signals';
 
-  export let isIE, graphShowStatus, toggleGraphShowStatus;
+  export let graphShowStatus, toggleGraphShowStatus;
 
   let searchErrorComponent;
   let parseTime = d3.timeParse('%Y%m%d');
   let formatTimeWithoutYear = d3.timeFormat('%B %d');
 
-  let LAT = -0.5;
-  let LON = -0.5;
-  let ZOOM = 3.9;
-
-  let SWPA_LAT = 2.8;
-  let SWPA_LON = 12.6;
-  let SWPA_ZOOM = 7.7;
+  /**
+   * @type {mapboxgl.LngLatBounds}
+   */
+  let stateBounds = null;
+  let stateBoundsOptions = {
+    padding: 20, //px
+    linear: false,
+  };
+  let zoneBounds = null;
+  let zoneBoundsOptions = {
+    padding: 20, //px
+    linear: false,
+  };
+  $: showCurrentZone = $currentZone === 'swpa';
 
   // Boolean tracking if the map has been initialized.
   let mapMounted = false;
@@ -72,7 +80,6 @@
   $: regionList = [];
   $: loaded = false;
   $: invalidSearch = false;
-  $: currentSensorTooltip = $sensorMap.get($currentSensor).mapTitleText;
 
   const BUBBLE_LAYER = 'bubble',
     SPIKE_LAYER = 'spike';
@@ -98,17 +105,6 @@
   }
 
   onMount(() => {
-    let containerWidth = container.clientWidth;
-    if (containerWidth <= 1021) {
-      //ZOOM = 3.9;
-      ZOOM = containerWidth / 300;
-    } else if (containerWidth > 1021 && containerWidth < 1280) {
-      //ZOOM = 4.1;
-      ZOOM = containerWidth / 330;
-    } else if (containerWidth >= 1280) {
-      //ZOOM = 4.3;
-      ZOOM = Math.min(4.3, containerWidth / 350);
-    }
     Promise.all([d3.json('./maps/name_id_info.json')]).then(([a]) => {
       regionList = a['all'];
       loaded = true;
@@ -745,26 +741,17 @@
   }
 
   function initializeMap() {
-    let lon = LON,
-      lat = LAT,
-      zoom = ZOOM;
-
-    if ($currentZone === 'swpa') {
-      lon = SWPA_LON;
-      lat = SWPA_LAT;
-      zoom = SWPA_ZOOM;
-    }
+    stateBounds = computeBounds($geojsons.get('state'));
+    zoneBounds = computeBounds($geojsons.get('zone'));
 
     map = new mapboxgl.Map({
       attributionControl: false,
       container,
       style: './maps/mapbox_albers_usa_style.json',
-      center: [lon, lat],
-      zoom: zoom,
-      minZoom: ZOOM - 1,
-    })
-      .addControl(new mapboxgl.AttributionControl({ compact: true }))
-      .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+      bounds: showCurrentZone ? zoneBounds : stateBounds,
+      fitBounds: showCurrentZone ? zoneBoundsOptions : stateBoundsOptions,
+    }).addControl(new mapboxgl.AttributionControl({ compact: true }));
+    // .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
 
     //Disable touch zoom, it makes gesture scrolling difficult
     map.scrollZoom.disable();
@@ -1221,7 +1208,48 @@
     }
   }
 
-  function searchElement(selectedRegion) {
+  function resetHighlightedFeature() {
+    if (clickedId) {
+      map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: false });
+    }
+    clickedId = null;
+    if (megaClickedId) {
+      map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: false });
+    }
+    megaClickedId = null;
+  }
+
+  function highlightFeature(selectedRegion) {
+    clickedId = Number.parseInt(selectedRegion['id']);
+
+    map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+    map.setFeatureState({ source: center($currentLevel), id: clickedId }, { select: true });
+  }
+
+  function resetSearch() {
+    if (!selectedRegion) {
+      // not set before
+      return;
+    }
+    selectedRegion = null;
+    // reset and fly out
+    currentRegionName.set('');
+    currentRegion.set('');
+    resetHighlightedFeature();
+    // fly out
+    map.fitBounds(stateBounds, stateBoundsOptions);
+  }
+
+  function searchElement(selection) {
+    if (selectedRegion === selection) {
+      return;
+    }
+    if (!selection) {
+      return resetSearch();
+    }
+
+    selectedRegion = selection;
+
     let hasValueFlag = false;
     const availLevels = $sensorMap.get($currentSensor).levels;
     for (let i = 0; i < availLevels.length; i++) {
@@ -1233,72 +1261,68 @@
     if (!hasValueFlag) {
       invalidSearch = true;
       searchErrorComponent.count();
-    } else {
-      if (selectedRegion['level'] !== $currentLevel) {
-        currentDataReadyOnMap.set(false);
-        currentLevel.set(selectedRegion['level']);
-      }
-      if (clickedId) {
-        map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: false });
-      }
-      if (megaClickedId) {
-        map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: false });
-      }
-
-      megaClickedId = null;
-      currentRegionName.set(selectedRegion['name']);
-      currentRegion.set(selectedRegion['property_id']);
-      clickedId = parseInt(selectedRegion['id']);
-      setFeatureStateMultiple([$currentLevel, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
-        select: true,
-      });
-
-      // Get zoom and center of selected location
-      let centersData = $geojsons.get(center($currentLevel))['features'];
-      let center_location;
-      for (let i = 0; i < centersData.length; i++) {
-        let info = centersData[i];
-        if (info['properties']['id'] == selectedRegion['property_id']) {
-          center_location = info['geometry']['coordinates'];
-          break;
-        }
-      }
-
-      let zoomLevel;
-      if (selectedRegion['level'] === 'county') {
-        zoomLevel = 6.5;
-      } else if (selectedRegion['level'] === 'msa') {
-        zoomLevel = 6;
-      } else {
-        zoomLevel = 5;
-      }
-
-      map.flyTo({ center: center_location, zoom: zoomLevel, essential: true });
+      return;
     }
+    if (selectedRegion['level'] !== $currentLevel) {
+      currentDataReadyOnMap.set(false);
+      currentLevel.set(selectedRegion['level']);
+    }
+    resetHighlightedFeature();
+
+    megaClickedId = null;
+    currentRegionName.set(selectedRegion['name']);
+    currentRegion.set(selectedRegion['property_id']);
+    clickedId = parseInt(selectedRegion['id']);
+    setFeatureStateMultiple([$currentLevel, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
+      select: true,
+    });
+
+    // Get zoom and center of selected location
+    let centersData = $geojsons.get(center($currentLevel))['features'];
+    let center_location;
+    for (let i = 0; i < centersData.length; i++) {
+      let info = centersData[i];
+      if (info['properties']['id'] == selectedRegion['property_id']) {
+        center_location = info['geometry']['coordinates'];
+        break;
+      }
+    }
+
+    highlightFeature(selectedRegion);
+
+    // TODO better zoom
+    let zoomLevel;
+    if (selectedRegion['level'] === 'county') {
+      zoomLevel = 6.5;
+    } else if (selectedRegion['level'] === 'msa') {
+      zoomLevel = 6;
+    } else {
+      zoomLevel = 5;
+    }
+
+    map.flyTo({ center: center_location, zoom: zoomLevel, essential: true });
   }
 </script>
 
 <style>
-  .banner {
-    font-size: 20px;
-    top: 12px;
+  .top-container {
     position: absolute;
-    line-height: 1.2em;
-    font-weight: 600;
-    text-align: center;
-    align-items: center;
-    pointer-events: none;
-    left: 0;
-    right: 0;
-    margin-left: auto;
-    margin-right: auto;
+    top: 10px;
+    right: 12px;
+    left: 12px;
+
+    display: grid;
+    grid-gap: 0.1em;
+    grid-template-columns: auto 2fr 1fr auto;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      'options options search controls'
+      'toggle title title controls';
   }
 
-  .map-container {
-    width: 100%;
-    height: 80vh;
+  :global(.map-container) {
     position: relative;
-    top: 50px;
+    flex: 1 1 80vh;
     min-height: 550px;
   }
 
@@ -1306,136 +1330,79 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    right: 0;
+    bottom: 0;
   }
 
-  .state-buttons-holder {
-    position: absolute;
-    top: 79px;
-    right: 9px;
-    z-index: 100;
-  }
-
-  #swpa-button-holder.state-buttons-holder {
-    position: absolute;
-    top: 120px;
-    right: 9px;
-    z-index: 100;
-  }
-
-  #swpa-button-holder.state-buttons-holder button {
-    font-size: 9px;
-  }
-
-  .state-buttons-holder button:focus {
-    outline: none;
-  }
-
-  .state-buttons-holder .pg-button {
-    font-size: 23px;
-    position: relative;
-    width: 28px;
-    height: 28px;
-    color: #333;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    box-sizing: content-box;
-    text-align: center;
-    font-family: 'FranklinITCProBold', Helvetica, Arial, sans-serif;
-    line-height: 16px;
-    cursor: pointer;
-    text-decoration: none;
-    user-select: none;
-    transition-delay: 0s;
-    transition-duration: 0.15s;
-    transition-property: background-color;
-    transition-timing-function: ease-in-out;
-
+  :global(.container-bg) {
     /* rounded design refresh */
-    border: 2px solid #dedede;
-    border-radius: 4px;
+    border-radius: 7px;
     background-color: #ffffff;
+    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
   }
 
-  .state-buttons-holder .pg-button:hover {
-    background-color: #f2f2f2;
-  }
-
-  .state-buttons-holder .pg-button img {
-    width: 90%;
+  :global(.container-style) {
+    padding: 8px 8px;
+    box-sizing: border-box;
+    transition: all 0.1s ease-in;
+    font-family: 'Open Sans', Helvetica, sans-serif !important;
   }
 
   .options-container {
-    position: absolute;
-    top: 12px;
-    left: 10px;
-    max-width: 650px;
-    z-index: 1001;
-    padding: 8px 8px;
-    box-sizing: border-box;
-    transition: all 0.1s ease-in;
-
-    /* rounded design refresh */
-    border-radius: 7px;
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
-
-    font-family: 'Open Sans', Helvetica, sans-serif !important;
+    z-index: 1003;
+    max-width: 50em;
+    grid-area: options;
   }
 
   .toggle-container {
-    position: absolute;
-    top: 68px;
-    left: 10px;
-    width: 200px;
     z-index: 1001;
-    padding: 8px 8px;
-    box-sizing: border-box;
-    transition: all 0.1s ease-in;
-
-    /* rounded design refresh */
-    border-radius: 7px;
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
-
-    font-family: 'Open Sans', Helvetica, sans-serif !important;
+    grid-area: toggle;
   }
 
-  .search-container {
-    position: absolute;
-    width: 400px;
-    right: 75px;
-    top: 12px;
+  .title-container {
     z-index: 1001;
+    grid-area: title;
+    align-self: flex-start;
+    justify-self: center;
+    padding: 0 1em;
+  }
 
-    background-color: #fff;
-    box-shadow: 0px 4px 30px rgba(151, 151, 151, 0.25);
-    border-radius: 7px;
+  .search-container-wrapper {
+    grid-area: search;
+    position: relative;
+    min-width: 2.8em;
+  }
 
+  .search-container-wrapper > :global(*) {
+    z-index: 1002;
+  }
+
+  /** mobile **/
+  @media only screen and (max-width: 767px) {
+    .top-container {
+      grid-template-columns: auto 1fr auto;
+      grid-template-rows: auto auto auto;
+      grid-template-areas:
+        'options options options'
+        'search title controls'
+        'toggle title controls';
+    }
+  }
+
+  /** desktop **/
+  @media only screen and (min-width: 767px) {
+    .title-container {
+      background-color: unset;
+      box-shadow: none;
+    }
+  }
+
+  .map-controls-container {
+    margin-left: 1em;
+    z-index: 1001;
+    grid-area: controls;
     display: flex;
-  }
-
-  .search-icon-container {
-    flex-shrink: 0;
-    width: 30px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-  }
-
-  .search-icon {
-    width: 20px;
-    height: 20px;
-    color: #9b9b9b;
-  }
-
-  .search {
-    flex-grow: 1;
-    font-size: 14px;
+    align-items: flex-start;
   }
 
   .legend-container {
@@ -1443,17 +1410,13 @@
     bottom: 12px;
     left: 10px;
     z-index: 1000;
+    /*height: 105px;*/
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    transition: all 0.1s ease-in;
-    /*height: 105px;*/
 
-    /* rounded design refresh */
-    border-radius: 7px;
-    background-color: #ffffff;
-    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
+    transition: all 0.1s ease-in;
   }
 
   .invalid_search-container {
@@ -1477,56 +1440,60 @@
     padding: 30px 10px;
     box-sizing: border-box;
     transition: all 0.1s ease-in;
-
-    /* rounded design refresh */
-    border-radius: 7px;
-    background-color: #ffffff;
-    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
   }
+
   .hidden {
     display: none;
   }
 </style>
 
-<div class="banner">
-  <span class="banner-text">{currentSensorTooltip}</span>
-</div>
-
-<div class="map-container">
-
-  <div class="options-container">
-    <Options />
-  </div>
-
-  <div class="toggle-container {$signalType === 'direction' || !$currentSensor.match(/num/) ? 'hidden' : ''}">
-    <Toggle />
-  </div>
-
-  {#if loaded && regionList.length != 0}
-    <div class="search-container">
-      <div class="search-icon-container">
-        <div class="search-icon">
-          <IoIosSearch />
-        </div>
-      </div>
-      <div class="search">
-        <AutoComplete
-          className="search-bar"
+<main class="map-container">
+  <div class="top-container">
+    <div class="options-container container-bg base-font-size container-style">
+      <Options />
+    </div>
+    <div class="search-container-wrapper base-font-size">
+      {#if loaded && regionList.length != 0}
+        <Search
+          className="search-container container-bg container-style"
           placeholder="Search for a location..."
           items={regionList}
-          bind:selectedItem={selectedRegion}
+          selectedItem={selectedRegion}
           labelFieldName="display_name"
           maxItemsToShowInList="5"
-          onChange={() => {
-            if (typeof selectedRegion !== 'undefined') {
-              searchElement(selectedRegion);
-            }
-          }} />
-      </div>
+          onChange={searchElement} />
+      {/if}
     </div>
-  {/if}
+    <div
+      class="toggle-container container-bg base-font-size container-style"
+      class:hidden={$signalType === 'direction' || !$currentSensor.match(/num/)}>
+      <Toggle />
+    </div>
+    <div class="title-container container-bg">
+      <Title />
+    </div>
+    <div class="map-controls-container">
+      <MapControls
+        zoom={map ? map.getZoom() : 0}
+        maxZoom={map ? map.getMaxZoom() : 100}
+        minZoom={map ? map.getMinZoom() : -100}
+        on:zoomIn={() => {
+          map.zoomIn();
+        }}
+        on:zoomOut={() => {
+          map.zoomOut();
+        }}
+        on:reset={() => {
+          map.fitBounds(stateBounds, stateBoundsOptions);
+        }}
+        on:swpa={() => {
+          map.fitBounds(zoneBounds, zoneBoundsOptions);
+          showZoneBoundary('swpa');
+        }} />
+    </div>
+  </div>
 
-  <div class="legend-container">
+  <div class="legend-container container-bg">
     <Legend />
   </div>
 
@@ -1534,38 +1501,11 @@
     <Banner bind:this={searchErrorComponent} />
   </div>
 
-  <div class="state-buttons-holder">
-    <button
-      aria-label="show entire map"
-      data-state="us48"
-      id="bounds-button"
-      class="pg-button bounds-button"
-      on:click={() => {
-        map.easeTo({ center: [LON, LAT], zoom: ZOOM, bearing: 0, pitch: 0 });
-      }}>
-      <img src="./assets/imgs/us48.png" alt="" />
-    </button>
-  </div>
-
-  {#if $currentZone.length > 0}
-    <div class="state-buttons-holder" id="swpa-button-holder">
-      <button
-        aria-label="show swpa boundary"
-        class="pg-button bounds-button"
-        on:click={() => {
-          map.easeTo({ center: [SWPA_LON, SWPA_LAT], zoom: SWPA_ZOOM, bearing: 0, pitch: 0 });
-          showZoneBoundary('swpa');
-        }}>
-        SWPA
-      </button>
-    </div>
-  {/if}
-
-  <div class="time-container">
+  <div class="time-container container-bg">
     <Time />
   </div>
 
-  <GraphContainer {isIE} {graphShowStatus} {toggleGraphShowStatus} />
+  <GraphContainer {graphShowStatus} {toggleGraphShowStatus} />
 
   <div class="map-wrapper" bind:this={container} />
-</div>
+</main>

@@ -14,6 +14,7 @@
   }
 
   button.selected {
+    background-color: #dcdcdc !important;
   }
 
   .buttons-group-side {
@@ -41,8 +42,10 @@
     padding-right: 0.5em;
     padding-top: calc(0.5em - 1px);
     text-align: center;
-
     position: relative;
+  }
+  .buttons-group-side button.button:not(:last-child) {
+    margin-right: 0.5em;
   }
 
   .button:active {
