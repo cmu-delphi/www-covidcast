@@ -1,6 +1,5 @@
 <script>
   import { sensorMap, currentSensor, levels, currentLevel, currentDate, times, makePlural } from '../stores';
-  import { DIRECTION_THEME } from '../theme';
   import Datepicker from './Calendar/Datepicker.svelte';
   import * as d3 from 'd3';
 
@@ -55,8 +54,9 @@
     transition: all 0.1s ease-in;
   }
 
-  select {
-    padding-right: 1.4em;
+  select,
+  .calendar {
+    padding-right: 1.7em;
     background-image: linear-gradient(45deg, transparent 50%, gray 50%),
       linear-gradient(135deg, gray 50%, transparent 50%);
     background-position: calc(100% - 15px) calc(0.85em + 0px), calc(100% - 10px) calc(0.85em + 0px);
@@ -138,12 +138,8 @@
         bind:selected={selectedDate}
         start={parseTime(start_end_dates[0])}
         end={parseTime(start_end_dates[1])}
-        formattedSelected={formatTime(selectedDate)}
-        style="--test=5;">
-        <button id="option-date" class="calendar" on:>
-          {formatTime(selectedDate)} &nbsp;
-          {@html DIRECTION_THEME.decreasingIcon}
-        </button>
+        formattedSelected={formatTime(selectedDate)}>
+        <button id="option-date" class="calendar" on:>{formatTime(selectedDate)}</button>
       </Datepicker>
     {/if}
   </div>
