@@ -1,3 +1,5 @@
+import { timeFormat } from 'd3';
+
 export const dict = {
   '10': 'DE',
   '11': 'DC',
@@ -96,6 +98,54 @@ export const specialCounties = [
   'Winchester',
 ];
 
+export const levelList = [
+  {
+    id: 'state',
+    label: 'State',
+    labelPlural: 'States',
+  },
+  {
+    id: 'msa',
+    label: 'Metro Area',
+    labelPlural: 'Metro Areas',
+  },
+  {
+    id: 'county',
+    label: 'County',
+    labelPlural: 'Counties',
+  },
+];
+export const levels = levelList.map((l) => l.id);
+
+const levelById = new Map(levelList.map((l) => [l.id, l]));
+
+export function getLevelInfo(level) {
+  return levelById.get(level) || { id: '?', label: 'Invalid level', labelPlural: 'Invalid level' };
+}
+
+export function withSensorEntryKey(sensorEntry) {
+  return Object.assign(sensorEntry, {
+    key: `${sensorEntry.id}-${sensorEntry.signal}`,
+  });
+}
+
+/**
+ * @typedef {object} SensorEntry
+ * @property {string} key
+ * @property {string} name
+ * @property {string} id
+ * @property {string} signal
+ * @property {string} tooltipText
+ * @property {string} chartTitleText
+ * @property {string} yAxis
+ * @property {string} format
+ * @property {string} signal
+ * @property {string[]} levels
+ * @property {boolean[]} official
+ */
+/**
+ * @type {SensorEntry[]}
+ */
 export const sensorList = [
   {
     name: 'Doctor Visits',
@@ -248,7 +298,7 @@ export const sensorList = [
     levels: ['msa', 'county', 'state'],
     official: true,
   },
-];
+].map(withSensorEntryKey);
 
 export const defaultRegionOnStartup = {
   county: '42003', // Allegheny
@@ -256,12 +306,5 @@ export const defaultRegionOnStartup = {
   state: 'PA', // Pennsylvania
 };
 
-export function makePlural(level) {
-  if (level === 'State') {
-    return 'States';
-  } else if (level === 'County') {
-    return 'Counties';
-  } else if (level === 'Metro Area') {
-    return 'Metro Areas';
-  }
-}
+export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
+export const yesterday = Number.parseInt(timeFormat('%Y%0m%0d')(yesterdayDate), 10);

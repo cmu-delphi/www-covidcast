@@ -31,7 +31,6 @@
     currentDataReadyOnMap,
     mounted,
     mapFirstLoaded,
-    sensorMap,
     colorScale,
     colorStops,
     bubbleRadiusScale,
@@ -39,6 +38,7 @@
     dict,
     specialCounties,
     defaultRegionOnStartup,
+    currentSensorEntry,
   } from '../stores';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
@@ -158,7 +158,7 @@
     const { value, direction, NAME, STATE, Population } = e.features[0].properties;
 
     const date = formatTimeWithoutYear(parseTime($currentDate));
-    const sens = $sensorMap.get($currentSensor);
+    const sens = $currentSensorEntry;
     const popCommas = parseInt(Population).toLocaleString();
     let title = (level === 'mega-county' ? 'Rest of ' : '') + NAME + getLabelSpecifics(NAME, STATE, level);
     let body;
@@ -332,7 +332,7 @@
     if (!mapMounted) return;
 
     // Reset all hover/click states.
-    [...Object.keys($levels), 'mega-county'].forEach((level) => map && map.removeFeatureState({ source: level }));
+    [...levels, 'mega-county'].forEach((level) => map && map.removeFeatureState({ source: level }));
 
     // If we're looking at counties, draw the mega-county states.
     let drawMega = $currentLevel === 'county';
@@ -512,7 +512,7 @@
       hide = (name) => map.setLayoutProperty(name, 'visibility', 'none'),
       showAll = (names) => names.forEach(show),
       hideAll = (names) => names.forEach(hide),
-      otherLevels = Object.keys($levels).filter((name) => name !== $currentLevel);
+      otherLevels = levels.filter((name) => name !== $currentLevel);
 
     if ($encoding === 'color') {
       // hide all other layers
@@ -771,7 +771,7 @@
     map.on('mousemove', 'state-outline', onMouseMove('state-outline'));
     map.on('mouseleave', 'state-outline', onMouseLeave('state-outline'));
 
-    [...Object.keys($levels), 'mega-county'].forEach((level) => {
+    [...levels, 'mega-county'].forEach((level) => {
       map.on('mouseenter', level, onMouseEnter(level));
       map.on('mousemove', level, onMouseMove(level));
       map.on('mouseleave', level, onMouseLeave(level));
@@ -809,7 +809,7 @@
         data: $geojsons.get('zone'),
       });
 
-      Object.keys($levels).forEach((level) => {
+      levels.forEach((level) => {
         map.addSource(center(level), {
           type: 'geojson',
           data: $geojsons.get(center(level)),
@@ -861,14 +861,14 @@
         },
       });
 
-      Object.keys($levels).forEach((name) => {
+      levels.forEach((name) => {
         map.addSource(name, {
           type: 'geojson',
           data: $geojsons.get(name),
         });
       });
 
-      ['mega-county', ...Object.keys($levels)].forEach((name) => {
+      ['mega-county', ...levels].forEach((name) => {
         map.addLayer({
           id: `${name}-hover`,
           source: name,
@@ -1018,7 +1018,7 @@
         `mega-county-hover`,
       );
 
-      Object.keys($levels).forEach((level) => {
+      levels.forEach((level) => {
         map.addLayer(
           {
             id: level,
@@ -1251,7 +1251,7 @@
     selectedRegion = selection;
 
     let hasValueFlag = false;
-    const availLevels = $sensorMap.get($currentSensor).levels;
+    const availLevels = $currentSensorEntry.levels;
     for (let i = 0; i < availLevels.length; i++) {
       if (selectedRegion['level'] === availLevels[i]) {
         hasValueFlag = true;

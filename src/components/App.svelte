@@ -40,6 +40,7 @@
 
   // Since we don't want multiple updates, but currentSensor changes can update // the level and date, we have flags that prevent the async updates.
   currentSensor.subscribe((s) => {
+    const sensorEntry = $sensorMap.get(s);
     $currentDataReadyOnMap = false;
 
     if (!$mounted) {
@@ -56,8 +57,8 @@
       date = maxDate;
     }
 
-    if (!$sensorMap.get(s).levels.includes($currentLevel)) {
-      l = $sensorMap.get(s).levels[0];
+    if (!sensorEntry.levels.includes($currentLevel)) {
+      l = sensorEntry.levels[0];
       levelChangedWhenSensorChanged = true;
       currentRegion.set('');
       currentRegionName.set('');
@@ -75,7 +76,9 @@
       currentDate.set(date);
     }
 
-    $sensorMap.get(s).official ? signalType.set('value') : '';
+    if (sensorEntry.official) {
+      signalType.set('value');
+    }
 
     updateRegionSliceCache(s, l, date, 'sensor-change');
   });

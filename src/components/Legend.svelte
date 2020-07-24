@@ -4,11 +4,11 @@
     signalType,
     stats,
     currentSensor,
-    sensorMap,
     currentLevel,
     currentDataReadyOnMap,
     encoding,
     bubbleRadiusScale,
+    currentSensorEntry,
   } from '../stores';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
@@ -68,7 +68,7 @@
     } else {
       sts = stats.get(sens);
       valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
-      if ($sensorMap.get($currentSensor).format === 'raw') {
+      if ($currentSensorEntry.format === 'raw') {
         high = getSigfigs(valueMinMax[1].toFixed(2), 3);
         low = getSigfigs(Math.max(0, valueMinMax[0]).toFixed(2), 3);
         valueMinMax[0] = Math.max(0, valueMinMax[0]);
@@ -427,7 +427,7 @@
           }}
           disabled={true}>
           7-day Trend
-          {#if $sensorMap.get($currentSensor).official}
+          {#if $currentSensorEntry.official}
             <span class="disabled-tooltip">Currently unavailable</span>
           {/if}
         </button>
