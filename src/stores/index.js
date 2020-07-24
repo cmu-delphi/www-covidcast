@@ -23,6 +23,9 @@ export const inOfficialSensors = derived([sensors], ([sensors]) => sensors.filte
 // The ID to reference each sensor is the indicator name + signal type.
 // This map is used to find the information for each sensor.
 export const sensorMap = derived(sensors, ($sensors) => {
+  /**
+   * @type {Map<string, import('./constants').SensorEntry>}
+   */
   const map = new Map();
   $sensors.forEach((d) => map.set(d.key, d));
   return map;

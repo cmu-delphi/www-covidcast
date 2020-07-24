@@ -2,21 +2,36 @@ import { callAPI } from './api';
 import { checkWIP, combineAverageWithCount } from './utils';
 import { isCasesSignal, isDeathSignal } from './signals';
 
+/**
+ * @typedef {import('../stores/constants').SensorEntry} SensorEntry
+ */
+/**
+ * @typedef {object} EpiDataRow
+ * @property {number} direction
+ * @property {string} geo_value
+ * @property {number} issue
+ * @property {number} lag
+ * @property {number | null} sample_size
+ * @property {stderr | null} stderr
+ * @property {number} time_value
+ * @property {number} value
+ */
+
 const TIME_RANGE = '20100101-20500101';
 // TODO use LRU map
 
 // Note: store the promise to also have hits on currently loading ones
 /**
- * @type {Map<string, Promise<any[]>>}
+ * @type {Map<string, Promise<EpiDataRow[]>>}
  */
 const regionSliceCache = new Map();
 /**
- * @type {Map<string, Promise<any[]>>}
+ * @type {Map<string, Promise<EpiDataRow[]>>}
  */
 const timeSliceCache = new Map();
 
 /**
- * @param {import('../stores/constants').SensorEntry} sensorEntry
+ * @param {SensorEntry} sensorEntry
  * @param {string} level
  * @param {string} date
  */
@@ -24,7 +39,7 @@ function toRegionCacheKey(sensorEntry, level, date) {
   return `${sensorEntry.key}-${level}-${date}`;
 }
 /**
- * @param {import('../stores/constants').SensorEntry} sensorEntry
+ * @param {SensorEntry} sensorEntry
  * @param {string} level
  * @param {string} region
  */
@@ -35,6 +50,7 @@ function toTimeSliceCacheKey(sensorEntry, level, region) {
 /**
  *
  * @param {string} signal
+ * @returns {string}
  */
 function getAdditionalSignal(signal) {
   // deaths_incidence_prop
@@ -56,6 +72,13 @@ function getAdditionalSignal(signal) {
   return null;
 }
 
+/**
+ *
+ * @param {SensorEntry} sensorEntry
+ * @param {string} level
+ * @param {string} date
+ * @returns {Promise<EpiDataRow[]>}
+ */
 export function fetchRegionSlice(sensorEntry, level, date) {
   const cacheKey = toRegionCacheKey(sensorEntry, level, date);
 
@@ -82,6 +105,12 @@ export function fetchRegionSlice(sensorEntry, level, date) {
   return promise;
 }
 
+/**
+ * @param {SensorEntry} sensorEntry
+ * @param {string} level
+ * @param {string | undefined} region
+ * @returns {Promise<EpiDataRow[]>}
+ */
 export function fetchTimeSlice(sensorEntry, level, region) {
   if (!region) {
     return Promise.resolve([]);
