@@ -23,21 +23,10 @@
   .root > div {
     margin-bottom: 0.2em;
   }
-
-  .button-group > button:first-of-type {
-    border-bottom: none;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
-  }
-  .button-group > button:last-of-type {
-    border-top-right-radius: 0;
-    border-top-left-radius: 0;
-    border-top-width: 1px;
-  }
 </style>
 
 <div class="root base-font-size {className}">
-  <div class="button-group">
+  <div class="pg-button-vertical-group">
     <button
       class="pg-button"
       type="button"
