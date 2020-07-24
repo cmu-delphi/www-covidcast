@@ -1,12 +1,9 @@
 <script>
-  //import mapboxgl from 'mapbox-gl';
   import { onMount } from 'svelte';
   import mapboxgl from 'mapbox-gl';
   import 'mapbox-gl/dist/mapbox-gl.css';
-  import { getTextColorBasedOnBackground, logScale } from '../util';
-  import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME } from '../theme';
-  import AutoComplete from 'simple-svelte-autocomplete';
-  import IoIosSearch from 'svelte-icons/io/IoIosSearch.svelte';
+  import { getTextColorBasedOnBackground, LogScale, zip, transparent } from '../util.js';
+  import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../theme.js';
   import Options from './Options.svelte';
   import Toggle from './Toggle.svelte';
   import Legend from './Legend.svelte';
@@ -14,6 +11,10 @@
   // import Time from './Time.svelte';
   import LineSmallMultiples from './LineSmallMultiples.svelte';
   // import GraphContainer from './Graph/GraphContainer.svelte';
+  import Search from './Search.svelte';
+  import MapControls from './MapControls.svelte';
+  import Title from './Title.svelte';
+  import { computeBounds } from './geoUtils';
   import {
     levels,
     stats,
@@ -31,28 +32,39 @@
     currentDataReadyOnMap,
     mounted,
     mapFirstLoaded,
-    sensorMap,
-    radiusScale,
+    colorScale,
+    colorStops,
+    bubbleRadiusScale,
+    spikeHeightScale,
     dict,
-    special_counties,
+    specialCounties,
     defaultRegionOnStartup,
+    currentSensorEntry,
   } from '../stores';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
+  import { isCountSignal, isPropSignal } from '../data/signals';
 
-  // export let isIE, graphShowStatus, toggleGraphShowStatus;
+  // export let graphShowStatus, toggleGraphShowStatus;
 
   let searchErrorComponent;
   let parseTime = d3.timeParse('%Y%m%d');
   let formatTimeWithoutYear = d3.timeFormat('%B %d');
 
-  let LAT = -0.5;
-  let LON = -0.5;
-  let ZOOM = 3.9;
-
-  let SWPA_LAT = 2.8;
-  let SWPA_LON = 12.6;
-  let SWPA_ZOOM = 7.7;
+  /**
+   * @type {mapboxgl.LngLatBounds}
+   */
+  let stateBounds = null;
+  let stateBoundsOptions = {
+    padding: 20, //px
+    linear: false,
+  };
+  let zoneBounds = null;
+  let zoneBoundsOptions = {
+    padding: 20, //px
+    linear: false,
+  };
+  $: showCurrentZone = $currentZone === 'swpa';
 
   // Boolean tracking if the map has been initialized.
   let mapMounted = false;
@@ -60,7 +72,7 @@
   let hoveredId = null;
   let container;
   let map;
-  let popup;
+  let popup, topPopup;
   let megaHoveredId;
   let clickedId;
   let megaClickedId;
@@ -69,29 +81,31 @@
   $: regionList = [];
   $: loaded = false;
   $: invalidSearch = false;
-  $: currentSensorTooltip = $sensorMap.get($currentSensor).mapTitleText;
+
+  const BUBBLE_LAYER = 'bubble',
+    SPIKE_LAYER = 'spike';
 
   // given the level (state/msa/county), returns the name of its "centered" source/layer
-  function center(level) {
-    return `${level}-centers`;
+  function center(name) {
+    return `${name}-centers`;
   }
 
-  function centerHighlight(level) {
-    return `${level}-centers-highlight`;
+  function highlight(name) {
+    return `${name}-highlight`;
+  }
+
+  function outline(name) {
+    return `${name}-outline`;
+  }
+
+  // helper function for multiple calls of map.setFeatureState
+  function setFeatureStateMultiple(sources, id, state) {
+    sources.forEach((s) => {
+      map.setFeatureState({ source: s, id: id }, state);
+    });
   }
 
   onMount(() => {
-    let containerWidth = container.clientWidth;
-    if (containerWidth <= 1021) {
-      //ZOOM = 3.9;
-      ZOOM = containerWidth / 300;
-    } else if (containerWidth > 1021 && containerWidth < 1280) {
-      //ZOOM = 4.1;
-      ZOOM = containerWidth / 330;
-    } else if (containerWidth >= 1280) {
-      //ZOOM = 4.3;
-      ZOOM = Math.min(4.3, containerWidth / 350);
-    }
     Promise.all([d3.json('./maps/name_id_info.json')]).then(([a]) => {
       regionList = a['all'];
       loaded = true;
@@ -101,24 +115,22 @@
   // Mouse event handlers
   const onMouseEnter = (level) => (e) => {
     map.getCanvas().style.cursor = 'pointer';
-    popup.setLngLat(e.lngLat).addTo(map);
-    map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
-    map.setFeatureState({ source: center(level), id: hoveredId }, { hover: false });
+    ($encoding === 'spike' ? topPopup : popup).setLngLat(e.lngLat).addTo(map);
+    setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
   };
 
   const onMouseMove = (level) => (e) => {
     if (level === 'state-outline') {
       map.getCanvas().style.cursor = 'pointer';
-      popup
+      ($encoding === 'spike' ? topPopup : popup)
         .setLngLat(e.lngLat)
         .setHTML('Estimate unavailable for rest of ' + e.features[0].properties.NAME)
         .addTo(map);
       return;
     }
 
-    map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
-    map.setFeatureState({ source: center(level), id: hoveredId }, { hover: false });
+    setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
 
     let fillColor;
@@ -126,60 +138,20 @@
       if (hoveredId === null) {
         megaHoveredId = e.features[0].id;
         map.setFeatureState({ source: level, id: megaHoveredId }, { hover: true });
-        // get hover color for mega county
-        let colorStops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
-        let valueDomain = [];
-        let colorRange = [];
-        for (let i = 0; i < colorStops.length; i++) {
-          valueDomain.push(colorStops[i][0]);
-          colorRange.push(colorStops[i][1].match(/\d+(\.\d{1,2})?/g));
-        }
-        let ramp = d3.scaleLinear().domain(valueDomain).range(colorRange);
-        ramp.clamp(true);
 
         const value = e.features[0].properties.value;
-        let arr = ramp(value);
-        fillColor = 'rgba(' + arr.join(', ') + ')';
+        fillColor = $colorScale(value);
       } else {
         megaHoveredId = null;
       }
     } else {
+      // The hovered element is not a mega county. It can be county, msa, state, bubble, or spike.
+
       hoveredId = e.features[0].id;
-      map.setFeatureState({ source: level, id: hoveredId }, { hover: true });
-      map.setFeatureState({ source: center(level), id: hoveredId }, { hover: true });
+      setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: true });
 
-      //get hover color for regular county
-      let colorStops = map.getLayer(level).getPaintProperty('fill-color')['stops'];
-      if ($encoding === 'bubble') {
-        fillColor = 'white';
-      } else if ($currentSensor.match(/num/)) {
-        let valueDomain = [];
-        let colorRange = [];
-        for (let i = 0; i < colorStops.length; i++) {
-          valueDomain.push(colorStops[i][0]);
-          colorRange.push(colorStops[i][1].match(/\d+/g));
-        }
-        let ramp = d3.scaleLinear().domain(valueDomain).range(colorRange);
-        ramp.clamp(true);
-
-        const value = e.features[0].properties.value;
-        let arr = ramp(value);
-        fillColor = 'rgb(' + arr.join(', ') + ')';
-      } else {
-        let valueDomain = [];
-        let colorRange = [];
-        for (let i = 0; i < colorStops.length; i++) {
-          valueDomain.push(colorStops[i][0]);
-          colorRange.push(colorStops[i][1].match(/\d+/g));
-        }
-
-        let ramp = d3.scaleLinear().domain(valueDomain).range(colorRange);
-        ramp.clamp(true);
-
-        const value = e.features[0].properties.value;
-        let arr = ramp(value);
-        fillColor = 'rgb(' + arr.join(', ') + ')';
-      }
+      const value = e.features[0].properties.value;
+      fillColor = $colorScale(value);
     }
 
     if (hoveredId !== null && level === 'mega-county') return;
@@ -187,9 +159,9 @@
     const { value, direction, NAME, STATE, Population } = e.features[0].properties;
 
     const date = formatTimeWithoutYear(parseTime($currentDate));
-    const sens = $sensorMap.get($currentSensor);
+    const sens = $currentSensorEntry;
     const popCommas = parseInt(Population).toLocaleString();
-    let title = (level === 'mega-county' ? 'Rest of ' : '') + NAME + get_label_specifics(NAME, STATE, level);
+    let title = (level === 'mega-county' ? 'Rest of ' : '') + NAME + getLabelSpecifics(NAME, STATE, level);
     let body;
 
     if ($signalType === 'value') {
@@ -272,32 +244,34 @@
         ${title}
       </div>` + body;
 
-    popup.setLngLat(e.lngLat).setHTML(body).addTo(map);
+    ($encoding === 'spike' ? topPopup : popup).setLngLat(e.lngLat).setHTML(body).addTo(map);
   };
 
   const onMouseLeave = (level) => () => {
     if (level === 'state-outline') {
       popup.remove();
+      topPopup.remove();
       return;
     }
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
     if (level === 'mega-county' && hoveredId !== null) megaHoveredId = null;
 
-    map.setFeatureState({ source: level, id: hoveredId }, { hover: false });
-    map.setFeatureState({ source: center(level), id: hoveredId }, { hover: false });
+    setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: false });
 
     if (level !== 'mega-county') hoveredId = null;
 
     map.getCanvas().style.cursor = '';
     popup.remove();
+    topPopup.remove();
   };
 
   const onClick = (level) => (e) => {
     if (clickedId) {
-      map.setFeatureState({ source: level, id: clickedId }, { select: false });
-      map.setFeatureState({ source: center(level), id: clickedId }, { select: false });
+      // reset
+      setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, { select: false });
     }
     if (megaClickedId) {
+      // reset
       map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: false });
     }
     if (level === 'mega-county') {
@@ -312,22 +286,26 @@
       map.setFeatureState({ source: 'county', id: clickedId }, { select: false });
       clickedId = null;
       megaClickedId = e.features[0].id;
-      map.setFeatureState({ source: level, id: megaClickedId }, { select: true });
-      map.setFeatureState({ source: center(level), id: megaClickedId }, { select: true });
+      setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], megaClickedId, {
+        select: true,
+      });
+
       currentRegionName.set(e.features[0].properties.NAME);
       currentRegion.set(e.features[0].properties.STATE + '000');
+      selectedRegion = findSelectedRegion(e.features[0].properties.STATE);
     } else {
       megaClickedId = null;
       if (clickedId !== e.features[0].id) {
         clickedId = e.features[0].id;
-        map.setFeatureState({ source: level, id: clickedId }, { select: true });
-        map.setFeatureState({ source: center(level), id: clickedId }, { select: true });
+        setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, { select: true });
         currentRegionName.set(e.features[0].properties.NAME);
         currentRegion.set(e.features[0].properties.id);
+        selectedRegion = findSelectedRegion(e.features[0].properties.id);
       } else {
         clickedId = null;
         currentRegionName.set('');
         currentRegion.set('');
+        selectedRegion = null;
       }
     }
   };
@@ -340,7 +318,7 @@
   // Update the map when sensor or level changes.
   currentData.subscribe(() => updateMap('data'));
   currentLevel.subscribe(() => {
-    label_states();
+    labelStates();
     updateMap('data');
   });
   signalType.subscribe(() => updateMap('signal'));
@@ -360,7 +338,7 @@
     if (!mapMounted) return;
 
     // Reset all hover/click states.
-    [...Object.keys($levels), 'mega-county'].forEach((level) => map && map.removeFeatureState({ source: level }));
+    [...levels, 'mega-county'].forEach((level) => map && map.removeFeatureState({ source: level }));
 
     // If we're looking at counties, draw the mega-county states.
     let drawMega = $currentLevel === 'county';
@@ -443,7 +421,7 @@
 
     // set the value of the chosen sensor to each states/counties
     // dat: data for cholopleth
-    // centerDat: data for bubbles
+    // centerDat: data for bubbles and spikes
     [dat, centerDat].forEach((ds) => {
       ds.features.forEach((d) => {
         const id = d.properties.id;
@@ -464,91 +442,62 @@
       });
     });
 
+    if (['data', 'init'].includes(type)) {
+      map.getSource($currentLevel).setData(dat);
+      map.getSource(center($currentLevel)).setData(centerDat);
+      drawMega ? map.getSource('mega-county').setData(megaDat) : '';
+    }
+
     let stops, stopsMega, currentRadiusScale;
 
     if ($signalType === 'value') {
       valueMinMax[0] = Math.max(0, valueMinMax[0]);
-      let center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
-      let firstHalfCenter = valueMinMax[0] + (center - valueMinMax[0]) / 2;
-      let secondHalfCenter = center + (valueMinMax[1] - center) / 2;
+      const center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2,
+        firstHalfCenter = valueMinMax[0] + (center - valueMinMax[0]) / 2,
+        secondHalfCenter = center + (valueMinMax[1] - center) / 2;
 
-      let colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
+      const colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
+      const colorScaleLog = d3
+        .scaleSequentialLog(d3.interpolateYlOrRd)
+        .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]]);
 
-      const c1 = d3.rgb(colorScaleLinear(valueMinMax[0]));
-      const c2 = d3.rgb(colorScaleLinear(firstHalfCenter));
-      const c3 = d3.rgb(colorScaleLinear(center));
-      const c4 = d3.rgb(colorScaleLinear(secondHalfCenter));
-      const c5 = d3.rgb(colorScaleLinear(valueMinMax[1]));
-      c1.opacity = 0.5;
-      c2.opacity = 0.5;
-      c3.opacity = 0.5;
-      c4.opacity = 0.5;
-      c5.opacity = 0.5;
+      // domainStops7 is used to determine the colors of regions for count signals.
+      const domainStops7 = logspace(
+        Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10),
+        Math.log(valueMinMax[1]) / Math.log(10),
+        7,
+      );
+      // domainStops5 is used for other cases (prop signals)
+      const domainStops5 = [valueMinMax[0], firstHalfCenter, center, secondHalfCenter, valueMinMax[1]];
 
-      if ($currentSensor.match(/num/)) {
-        let min = Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10);
-        let max = Math.log(valueMinMax[1]) / Math.log(10);
-        let arr = logspace(min, max, 7);
-        const colorScaleLog = d3
-          .scaleSequentialLog(d3.interpolateYlOrRd)
-          .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]]);
+      const logColors7 = domainStops7.map((c) => colorScaleLog(c).toString());
+      const linearColors5 = domainStops5.map((c) => colorScaleLinear(c).toString());
 
-        let tempStops = [[0, DIRECTION_THEME.countMin]];
-        for (let i = 0; i < arr.length; i++) {
-          tempStops.push([arr[i], colorScaleLog(arr[i])]);
-        }
-        stops = tempStops;
-        stopsMega = [
-          [0, DIRECTION_THEME.countMin],
-          [valueMinMax[0], c1.toString()],
-          [firstHalfCenter, c2.toString()],
-          [center, c3.toString()],
-          [secondHalfCenter, c4.toString()],
-          [valueMinMax[1], c5.toString()],
-        ];
+      if (isCountSignal($currentSensor)) {
+        // use log scale
+        stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops7, logColors7));
+        stopsMega = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops7, logColors7));
 
-        const minRadius = ENCODING_BUBBLE_THEME.minRadius[$currentLevel],
-          maxRadius = ENCODING_BUBBLE_THEME.maxRadius[$currentLevel];
+        // store the color scale (used for tooltips and legend)
+        colorScale.set(colorScaleLog);
+        colorStops.set(stops);
+      } else if (isPropSignal($currentSensor)) {
+        stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, linearColors5));
+        stopsMega = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, transparent(linearColors5, 0.5)));
 
-        currentRadiusScale = logScale()
-          .domain(colorScaleLog.domain())
-          .range([minRadius, maxRadius])
-          .base(ENCODING_BUBBLE_THEME.base);
-        radiusScale.set(currentRadiusScale);
-      } else if ($currentSensor.match(/prop/)) {
-        stops = [
-          [0, DIRECTION_THEME.countMin],
-          [valueMinMax[0], colorScaleLinear(valueMinMax[0])],
-          [firstHalfCenter, colorScaleLinear(firstHalfCenter)],
-          [center, colorScaleLinear(center)],
-          [secondHalfCenter, colorScaleLinear(secondHalfCenter)],
-          [valueMinMax[1], colorScaleLinear(valueMinMax[1])],
-        ];
-        stopsMega = [
-          [0, DIRECTION_THEME.countMin],
-          [valueMinMax[0], c1.toString()],
-          [firstHalfCenter, c2.toString()],
-          [center, c3.toString()],
-          [secondHalfCenter, c4.toString()],
-          [valueMinMax[1], c5.toString()],
-        ];
+        // store the color scale (used for tooltips and legend)
+        colorScale.set(colorScaleLinear);
+        colorStops.set(stops);
       } else {
-        stops = [
-          [valueMinMax[0], colorScaleLinear(valueMinMax[0])],
-          [firstHalfCenter, colorScaleLinear(firstHalfCenter)],
-          [center, colorScaleLinear(center)],
-          [secondHalfCenter, colorScaleLinear(secondHalfCenter)],
-          [valueMinMax[1], colorScaleLinear(valueMinMax[1])],
-        ];
-        stopsMega = [
-          [valueMinMax[0], c1.toString()],
-          [firstHalfCenter, c2.toString()],
-          [center, c3.toString()],
-          [secondHalfCenter, c4.toString()],
-          [valueMinMax[1], c5.toString()],
-        ];
+        stops = zip(domainStops5, linearColors5);
+        stopsMega = zip(domainStops5, transparent(linearColors5, 0.5));
+
+        // store the color scale (used for tooltips and legend)
+        colorScale.set(colorScaleLinear);
+        colorStops.set(stops);
       }
     } else {
+      // signalType is 'direction'
       stops = [
         [-100, MAP_THEME.countyFill],
         [-1, DIRECTION_THEME.decreasing],
@@ -561,88 +510,163 @@
         [0, DIRECTION_THEME.gradientMiddleMega],
         [1, DIRECTION_THEME.gradientMaxMega],
       ];
+
+      colorStops.set(stops);
     }
 
-    if (['data', 'init'].includes(type)) {
-      map.getSource($currentLevel).setData(dat);
-      map.getSource(center($currentLevel)).setData(centerDat);
-      drawMega ? map.getSource('mega-county').setData(megaDat) : '';
-    }
+    const show = (name) => map.setLayoutProperty(name, 'visibility', 'visible'),
+      hide = (name) => map.setLayoutProperty(name, 'visibility', 'none'),
+      showAll = (names) => names.forEach(show),
+      hideAll = (names) => names.forEach(hide),
+      otherLevels = levels.filter((name) => name !== $currentLevel);
 
-    if ($encoding == 'color') {
-      // hide all bubble layers
-      Object.keys($levels).forEach((name) => {
-        map.setLayoutProperty(center(name), 'visibility', 'none');
-        map.setLayoutProperty(centerHighlight(name), 'visibility', 'none');
+    if ($encoding === 'color') {
+      // hide all other layers
+      hideAll([BUBBLE_LAYER, highlight(BUBBLE_LAYER)]);
+      hideAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
+      hideAll(otherLevels);
+
+      show($currentLevel);
+
+      map.setPaintProperty($currentLevel, 'fill-color', {
+        property: $signalType,
+        stops: stops,
       });
 
-      Object.keys($levels).forEach((name) => {
-        if (name === $currentLevel) {
-          if (map.getLayer(name)) {
-            map.setPaintProperty(name, 'fill-color', {
-              property: $signalType,
-              stops: stops,
-            });
-            map.setLayoutProperty(name, 'visibility', 'visible');
-          }
-        } else {
-          map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none');
-        }
-      });
       if (drawMega) {
         map.setPaintProperty('mega-county', 'fill-color', {
           property: $signalType,
           stops: stopsMega,
         });
-        map.setLayoutProperty('mega-county', 'visibility', 'visible');
+        show('mega-county');
       } else {
-        map.setLayoutProperty('mega-county', 'visibility', 'none');
+        hide('mega-county');
       }
-    } else if ($encoding == 'bubble') {
-      // hide all color layers except for the one for the current level (for tooltip)
-      Object.keys($levels).forEach((name) => map.getLayer(name) && map.setLayoutProperty(name, 'visibility', 'none'));
-      if (map.getLayer($currentLevel)) {
-        map.setPaintProperty($currentLevel, 'fill-color', MAP_THEME.countyFill);
+    } else if ($encoding === 'bubble') {
+      // hide all color layers except for one for the current level (for tooltip)
+      hideAll(otherLevels);
+      show($currentLevel);
+      map.setPaintProperty($currentLevel, 'fill-color', MAP_THEME.countyFill);
+      hideAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
 
-        map.setLayoutProperty($currentLevel, 'visibility', 'visible');
-      }
+      // show bubble layers
+      showAll([BUBBLE_LAYER, highlight(BUBBLE_LAYER)]);
 
-      // hide all bubble layer except for the one for the current level
-      Object.keys($levels).forEach((name) => {
-        map.setLayoutProperty(center(name), 'visibility', 'none');
-        map.setLayoutProperty(centerHighlight(name), 'visibility', 'none');
-      });
-      if (map.getLayer(center($currentLevel))) {
-        const flatten = (arr) => arr.reduce((acc, val) => acc.concat(val), []);
+      // color scale (color + stroke color)
+      let flatStops = stops.flat();
+      flatStops.shift(); // remove the first element which has a value of 0 since the "step" expression of MapBox can omit the first range.
 
-        // color scale (color + stroke color)
+      flatStops[0] = 'transparent';
+      let colorExpression = ['step', ['get', 'value']].concat(flatStops);
 
-        let flatStops = flatten(stops);
-        flatStops.shift(); // remove the first element which has a value of 0 since the "step" expression of mapbox does not require it.
+      map.getSource(BUBBLE_LAYER).setData(map.getSource(center($currentLevel))._data);
 
-        flatStops[0] = 'transparent';
-        let colorExpression = ['step', ['get', 'value']].concat(flatStops);
+      map.setPaintProperty(BUBBLE_LAYER, 'circle-stroke-color', colorExpression);
+      map.setPaintProperty(highlight(BUBBLE_LAYER), 'circle-stroke-color', colorExpression);
 
-        map.setPaintProperty(center($currentLevel), 'circle-stroke-color', colorExpression);
-        map.setPaintProperty(centerHighlight($currentLevel), 'circle-stroke-color', colorExpression);
+      map.setPaintProperty(BUBBLE_LAYER, 'circle-color', colorExpression);
+      map.setPaintProperty(highlight(BUBBLE_LAYER), 'circle-color', colorExpression);
 
-        map.setPaintProperty(center($currentLevel), 'circle-color', colorExpression);
-        map.setPaintProperty(centerHighlight($currentLevel), 'circle-color', colorExpression);
+      const minRadius = ENCODING_BUBBLE_THEME.minRadius[$currentLevel],
+        maxRadius = ENCODING_BUBBLE_THEME.maxRadius[$currentLevel];
 
-        // radius scale
-        const [a, b, base] = currentRadiusScale.coef();
-        const baseLog = Math.log10(base);
+      currentRadiusScale = LogScale()
+        .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]])
+        .range([minRadius, maxRadius])
+        .base(ENCODING_BUBBLE_THEME.base);
 
-        let radiusExpression = ['+', ['*', a, ['/', ['log10', ['get', 'value']], baseLog]], b];
+      bubbleRadiusScale.set(currentRadiusScale);
 
-        map.setPaintProperty(center($currentLevel), 'circle-radius', radiusExpression);
-        map.setPaintProperty(centerHighlight($currentLevel), 'circle-radius', radiusExpression);
+      // radius scale
+      const [a, b, base] = currentRadiusScale.coef();
+      const baseLog = Math.log10(base);
 
-        map.setLayoutProperty(center($currentLevel), 'visibility', 'visible');
-        map.setLayoutProperty(centerHighlight($currentLevel), 'visibility', 'visible');
-      }
+      let radiusExpression = ['+', ['*', a, ['/', ['log10', ['get', 'value']], baseLog]], b];
 
-      map.setLayoutProperty('mega-county', 'visibility', 'none');
+      map.setPaintProperty(BUBBLE_LAYER, 'circle-radius', radiusExpression);
+      map.setPaintProperty(highlight(BUBBLE_LAYER), 'circle-radius', radiusExpression);
+
+      hide('mega-county');
+    } else if ($encoding === 'spike') {
+      // hide all color layers except one for the current level
+
+      hideAll(otherLevels);
+      show($currentLevel);
+      map.setPaintProperty($currentLevel, 'fill-color', MAP_THEME.countyFill);
+      hideAll([BUBBLE_LAYER, highlight(BUBBLE_LAYER)]);
+
+      showAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
+
+      const valueMax = valueMinMax[1],
+        maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel],
+        size = ENCODING_SPIKE_THEME.size[$currentLevel];
+
+      const scale = d3.scaleSqrt().range([0, maxHeight]).domain([0, valueMax]);
+
+      spikeHeightScale.set(scale);
+      const centers = $geojsons.get(center($currentLevel));
+      const features = centers.features.filter((feature) => feature.properties.value > 0);
+
+      const spikes = {
+        type: 'FeatureCollection',
+        features: features.map((feature) => {
+          const center = feature.geometry.coordinates,
+            value = feature.properties.value;
+          return {
+            geometry: {
+              coordinates: [
+                [
+                  [center[0] - size, center[1]],
+                  [center[0], center[1] + scale(value)],
+                  [center[0] + size, center[1]],
+                ],
+              ],
+              type: 'Polygon',
+            },
+            properties: { value: value },
+            type: 'Feature',
+            id: feature.id,
+          };
+        }),
+      };
+
+      const spikeOutlines = {
+        type: 'FeatureCollection',
+        features: features.map((feature) => {
+          const center = feature.geometry.coordinates,
+            value = feature.properties.value;
+
+          return {
+            geometry: {
+              coordinates: [
+                [center[0] - size, center[1]],
+                [center[0], center[1] + scale(value)],
+                [center[0] + size, center[1]],
+              ],
+              type: 'LineString',
+            },
+            properties: { value: value },
+            type: 'Feature',
+            id: feature.id,
+          };
+        }),
+      };
+
+      let flatStops = stops.flat();
+      flatStops.shift(); // remove the first element which has a value of 0 since the "step" expression of mapbox does not require it.
+
+      flatStops[0] = 'transparent';
+      let colorExpression = ['step', ['get', 'value']].concat(flatStops);
+      map.setPaintProperty(SPIKE_LAYER, 'fill-color', colorExpression);
+      map.setPaintProperty(outline(SPIKE_LAYER), 'line-color', colorExpression);
+      map.setPaintProperty(highlight(SPIKE_LAYER), 'fill-color', colorExpression);
+      map.setPaintProperty(highlight(outline(SPIKE_LAYER)), 'line-color', colorExpression);
+      map.setPaintProperty(outline(SPIKE_LAYER), 'line-width', ENCODING_SPIKE_THEME.strokeWidth[$currentLevel]);
+
+      map.getSource(SPIKE_LAYER).setData(spikes);
+      map.getSource(outline(SPIKE_LAYER)).setData(spikeOutlines);
+
+      hide('mega-county');
     }
 
     const viableFeatures = dat.features.filter((f) => f.properties[$signalType] !== -100);
@@ -663,8 +687,9 @@
             currentRegionName.set(randomFeature.properties.NAME);
             currentRegion.set(randomFeature.id);
             clickedId = randomFeature.id;
-            map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-            map.setFeatureState({ source: center($currentLevel), id: clickedId }, { select: true });
+            setFeatureStateMultiple([$currentLevel, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
+              select: true,
+            });
           }
           chosenRandom = true;
         } else {
@@ -674,33 +699,35 @@
           currentRegion.set(randomFeature.properties.id);
 
           clickedId = randomFeature.id;
-          map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-          map.setFeatureState({ source: center($currentLevel), id: clickedId }, { select: true });
+          setFeatureStateMultiple([$currentLevel, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
+            select: true,
+          });
           chosenRandom = true;
         }
       }
     }
 
     if ($currentRegion) {
-      const megaFound = megaDat.features.filter((f) => f.properties.STATE + '000' === $currentRegion + '');
-      const found = viableFeatures.filter((f) => f.properties.id === $currentRegion);
-      if (megaFound.length > 0) {
-        megaClickedId = parseInt(megaFound[0].properties.STATE);
-        currentRegionName.set(megaFound[0].properties.NAME);
+      const megaFound = megaDat.features.find((f) => f.properties.STATE + '000' === $currentRegion + '');
+      const found = viableFeatures.find((f) => f.properties.id === $currentRegion);
+      if (megaFound) {
+        megaClickedId = parseInt(megaFound.properties.STATE);
+        currentRegionName.set(megaFound.properties.NAME);
         map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: true });
       }
-      if (found.length > 0) {
-        clickedId = found[0].id;
-        currentRegionName.set(found[0].properties.NAME);
-        map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-        map.setFeatureState({ source: center($currentLevel), id: clickedId }, { select: true });
+      if (found) {
+        clickedId = found.id;
+        currentRegionName.set(found.properties.NAME);
+        setFeatureStateMultiple([$currentLevel, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
+          select: true,
+        });
       }
     }
   }
 
-  function get_label_specifics(name, state, level) {
+  function getLabelSpecifics(name, state, level) {
     let text = '';
-    if ($currentLevel === 'county' && level !== 'mega-county' && !special_counties.includes(name)) {
+    if ($currentLevel === 'county' && level !== 'mega-county' && !specialCounties.includes(name)) {
       text += ' County';
     }
     if (level === 'county') {
@@ -709,7 +736,7 @@
     return text;
   }
 
-  function label_states() {
+  function labelStates() {
     if (map !== undefined) {
       if ($currentLevel == 'state') {
         map.setLayoutProperty('state-names', 'visibility', 'visible');
@@ -720,26 +747,17 @@
   }
 
   function initializeMap() {
-    let lon = LON,
-      lat = LAT,
-      zoom = ZOOM;
-
-    if ($currentZone === 'swpa') {
-      lon = SWPA_LON;
-      lat = SWPA_LAT;
-      zoom = SWPA_ZOOM;
-    }
+    stateBounds = computeBounds($geojsons.get('state'));
+    zoneBounds = computeBounds($geojsons.get('zone'));
 
     map = new mapboxgl.Map({
       attributionControl: false,
       container,
       style: './maps/mapbox_albers_usa_style.json',
-      center: [lon, lat],
-      zoom: zoom,
-      minZoom: ZOOM - 1,
-    })
-      .addControl(new mapboxgl.AttributionControl({ compact: true }))
-      .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+      bounds: showCurrentZone ? zoneBounds : stateBounds,
+      fitBounds: showCurrentZone ? zoneBoundsOptions : stateBoundsOptions,
+    }).addControl(new mapboxgl.AttributionControl({ compact: true }));
+    // .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
 
     //Disable touch zoom, it makes gesture scrolling difficult
     map.scrollZoom.disable();
@@ -749,10 +767,17 @@
       closeOnClick: false,
       className: 'map-popup',
     });
+
+    topPopup = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false,
+      className: 'map-popup',
+      anchor: 'top',
+    });
     map.on('mousemove', 'state-outline', onMouseMove('state-outline'));
     map.on('mouseleave', 'state-outline', onMouseLeave('state-outline'));
 
-    [...Object.keys($levels), 'mega-county'].forEach((level) => {
+    [...levels, 'mega-county'].forEach((level) => {
       map.on('mouseenter', level, onMouseEnter(level));
       map.on('mousemove', level, onMouseMove(level));
       map.on('mouseleave', level, onMouseLeave(level));
@@ -769,11 +794,11 @@
     });
 
     map.on('load', function () {
-      map.addSource('county-outline', {
+      map.addSource(outline('county'), {
         type: 'geojson',
         data: $geojsons.get('county'),
       });
-      map.addSource('state-outline', {
+      map.addSource(outline('state'), {
         type: 'geojson',
         data: $geojsons.get('state'),
       });
@@ -790,16 +815,40 @@
         data: $geojsons.get('zone'),
       });
 
-      Object.keys($levels).forEach((level) => {
+      levels.forEach((level) => {
         map.addSource(center(level), {
           type: 'geojson',
           data: $geojsons.get(center(level)),
         });
       });
 
+      map.addSource(BUBBLE_LAYER, {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [],
+        },
+      });
+
+      map.addSource(SPIKE_LAYER, {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [],
+        },
+      });
+
+      map.addSource(outline(SPIKE_LAYER), {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [],
+        },
+      });
+
       map.addLayer({
-        id: 'county-outline',
-        source: 'county-outline',
+        id: outline('county'),
+        source: outline('county'),
         type: 'fill',
         paint: {
           'fill-color': MAP_THEME.countyFill,
@@ -809,8 +858,8 @@
       });
 
       map.addLayer({
-        id: 'state-outline',
-        source: 'state-outline',
+        id: outline('state'),
+        source: outline('state'),
         type: 'fill',
         paint: {
           'fill-color': 'rgba(0, 0, 0, 0)',
@@ -818,14 +867,14 @@
         },
       });
 
-      Object.keys($levels).forEach((name) => {
+      levels.forEach((name) => {
         map.addSource(name, {
           type: 'geojson',
           data: $geojsons.get(name),
         });
       });
 
-      ['mega-county', ...Object.keys($levels)].forEach((name) => {
+      ['mega-county', ...levels].forEach((name) => {
         map.addLayer({
           id: `${name}-hover`,
           source: name,
@@ -958,7 +1007,7 @@
         'state-names',
       );
 
-      label_states();
+      labelStates();
 
       map.addLayer(
         {
@@ -975,7 +1024,7 @@
         `mega-county-hover`,
       );
 
-      Object.keys($levels).forEach((level) => {
+      levels.forEach((level) => {
         map.addLayer(
           {
             id: level,
@@ -992,81 +1041,154 @@
         );
       });
 
-      Object.keys($levels).forEach((level) => {
-        map.addLayer(
-          {
-            id: center(level),
-            source: center(level),
-            type: 'circle',
-            visibility: 'none',
-            filter: ['>', ['get', 'value'], 0],
-            paint: {
-              'circle-radius': 0,
-              'circle-color': ENCODING_BUBBLE_THEME.color,
-              'circle-stroke-color': ENCODING_BUBBLE_THEME.strokeColor,
-              'circle-stroke-width': ENCODING_BUBBLE_THEME.strokeWidth,
-              'circle-opacity': [
-                'case',
-                [
-                  'any',
-                  ['boolean', ['feature-state', 'hover'], false],
-                  ['boolean', ['feature-state', 'select'], false],
-                ],
-                0,
-                ENCODING_BUBBLE_THEME.opacity,
-              ],
-              'circle-stroke-opacity': [
-                'case',
-                [
-                  'any',
-                  ['boolean', ['feature-state', 'hover'], false],
-                  ['boolean', ['feature-state', 'select'], false],
-                ],
-                0,
-                ENCODING_BUBBLE_THEME.strokeOpacity,
-              ],
-            },
-          },
-          `${level}-hover`,
-        );
+      // 2 layers for bubbles
 
-        map.addLayer(
-          {
-            id: centerHighlight(level),
-            source: center(level),
-            type: 'circle',
-            visibility: 'none',
-            filter: ['>', ['get', 'value'], 0],
-            paint: {
-              'circle-radius': 0,
-              'circle-color': ENCODING_BUBBLE_THEME.color,
-              'circle-stroke-color': ENCODING_BUBBLE_THEME.strokeColor,
-              'circle-stroke-width': ENCODING_BUBBLE_THEME.strokeWidthHovered,
-              'circle-opacity': [
-                'case',
-                [
-                  'any',
-                  ['boolean', ['feature-state', 'hover'], false],
-                  ['boolean', ['feature-state', 'select'], false],
-                ],
-                ENCODING_BUBBLE_THEME.opacity,
-                0,
-              ],
-              'circle-stroke-opacity': [
-                'case',
-                [
-                  'any',
-                  ['boolean', ['feature-state', 'hover'], false],
-                  ['boolean', ['feature-state', 'select'], false],
-                ],
-                ENCODING_BUBBLE_THEME.strokeOpacity,
-                0,
-              ],
-            },
+      map.addLayer(
+        {
+          id: BUBBLE_LAYER,
+          source: BUBBLE_LAYER,
+          type: 'circle',
+          visibility: 'none',
+          filter: ['>', ['get', 'value'], 0],
+          paint: {
+            'circle-radius': 0,
+            'circle-color': ENCODING_BUBBLE_THEME.color,
+            'circle-stroke-color': ENCODING_BUBBLE_THEME.strokeColor,
+            'circle-stroke-width': ENCODING_BUBBLE_THEME.strokeWidth,
+            'circle-opacity': [
+              'case',
+              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
+              0,
+              ENCODING_BUBBLE_THEME.opacity,
+            ],
+            'circle-stroke-opacity': [
+              'case',
+              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
+              0,
+              ENCODING_BUBBLE_THEME.strokeOpacity,
+            ],
           },
-          'city-point-unclustered-pit',
-        );
-      });
+        },
+        'county-hover',
+      );
+
+      map.addLayer(
+        {
+          id: highlight(BUBBLE_LAYER),
+          source: BUBBLE_LAYER,
+          type: 'circle',
+          visibility: 'none',
+          filter: ['>', ['get', 'value'], 0],
+          paint: {
+            'circle-radius': 0,
+            'circle-color': ENCODING_BUBBLE_THEME.color,
+            'circle-stroke-color': ENCODING_BUBBLE_THEME.strokeColor,
+            'circle-stroke-width': ENCODING_BUBBLE_THEME.strokeWidthHighlighted,
+            'circle-opacity': [
+              'case',
+              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
+              ENCODING_BUBBLE_THEME.opacity,
+              0,
+            ],
+            'circle-stroke-opacity': [
+              'case',
+              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
+              ENCODING_BUBBLE_THEME.strokeOpacity,
+              0,
+            ],
+          },
+        },
+        'city-point-unclustered-pit',
+      );
+
+      // 4 layers for spikes
+
+      map.addLayer(
+        {
+          id: SPIKE_LAYER,
+          type: 'fill',
+          source: SPIKE_LAYER,
+          filter: ['>', ['get', 'value'], 0],
+          paint: {
+            'fill-color': 'transparent',
+            'fill-opacity': [
+              'case',
+              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
+              0,
+              ENCODING_SPIKE_THEME.fillOpacity,
+            ],
+            'fill-outline-color': 'transparent',
+          },
+        },
+        'county-hover',
+      );
+
+      map.addLayer(
+        {
+          id: outline(SPIKE_LAYER),
+          type: 'line',
+          source: outline(SPIKE_LAYER),
+          filter: ['>', ['get', 'value'], 0],
+          layout: {
+            'line-cap': 'round',
+            'line-join': 'round',
+          },
+          paint: {
+            'line-color': 'transparent',
+            'line-opacity': [
+              'case',
+              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
+              0,
+              ENCODING_SPIKE_THEME.strokeOpacity,
+            ],
+          },
+        },
+        'county-hover',
+      );
+
+      map.addLayer(
+        {
+          id: highlight(SPIKE_LAYER),
+          type: 'fill',
+          source: SPIKE_LAYER,
+          filter: ['>', ['get', 'value'], 0],
+          paint: {
+            'fill-color': 'transparent',
+            'fill-opacity': [
+              'case',
+              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
+              ENCODING_SPIKE_THEME.fillOpacity,
+              0,
+            ],
+            'fill-outline-color': 'transparent',
+          },
+        },
+        'city-point-unclustered-pit',
+      );
+
+      map.addLayer(
+        {
+          id: highlight(outline(SPIKE_LAYER)),
+          type: 'line',
+          source: outline(SPIKE_LAYER),
+          filter: ['>', ['get', 'value'], 0],
+          layout: {
+            'line-cap': 'round',
+            'line-join': 'round',
+          },
+          paint: {
+            'line-color': 'transparent',
+            'line-width': ENCODING_SPIKE_THEME.strokeWidthHighlighted,
+            'line-opacity': [
+              'case',
+              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
+              ENCODING_SPIKE_THEME.strokeOpacity,
+              0,
+            ],
+          },
+        },
+        'city-point-unclustered-pit',
+      );
 
       if ($currentZone === 'swpa') {
         showZoneBoundary('swpa');
@@ -1092,9 +1214,54 @@
     }
   }
 
-  function searchElement(selectedRegion) {
+  function resetHighlightedFeature() {
+    if (clickedId) {
+      map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: false });
+    }
+    clickedId = null;
+    if (megaClickedId) {
+      map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: false });
+    }
+    megaClickedId = null;
+  }
+
+  function highlightFeature(selectedRegion) {
+    clickedId = Number.parseInt(selectedRegion['id']);
+
+    map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
+    map.setFeatureState({ source: center($currentLevel), id: clickedId }, { select: true });
+  }
+
+  function findSelectedRegion(id) {
+    return regionList != null && regionList.find((d) => d.property_id === id);
+  }
+
+  function resetSearch() {
+    if (!selectedRegion) {
+      // not set before
+      return;
+    }
+    selectedRegion = null;
+    // reset and fly out
+    currentRegionName.set('');
+    currentRegion.set('');
+    resetHighlightedFeature();
+    // fly out
+    map.fitBounds(stateBounds, stateBoundsOptions);
+  }
+
+  function searchElement(selection) {
+    if (selectedRegion === selection) {
+      return;
+    }
+    if (!selection) {
+      return resetSearch();
+    }
+
+    selectedRegion = selection;
+
     let hasValueFlag = false;
-    const availLevels = $sensorMap.get($currentSensor).levels;
+    const availLevels = $currentSensorEntry.levels;
     for (let i = 0; i < availLevels.length; i++) {
       if (selectedRegion['level'] === availLevels[i]) {
         hasValueFlag = true;
@@ -1104,71 +1271,68 @@
     if (!hasValueFlag) {
       invalidSearch = true;
       searchErrorComponent.count();
-    } else {
-      if (selectedRegion['level'] !== $currentLevel) {
-        currentDataReadyOnMap.set(false);
-        currentLevel.set(selectedRegion['level']);
-      }
-      if (clickedId) {
-        map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: false });
-      }
-      if (megaClickedId) {
-        map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: false });
-      }
-
-      megaClickedId = null;
-      currentRegionName.set(selectedRegion['name']);
-      currentRegion.set(selectedRegion['property_id']);
-      clickedId = parseInt(selectedRegion['id']);
-      map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-      map.setFeatureState({ source: center($currentLevel), id: clickedId }, { select: true });
-
-      // Get zoom and center of selected location
-      let centersData = $geojsons.get(center($currentLevel))['features'];
-      let center_location;
-      for (let i = 0; i < centersData.length; i++) {
-        let info = centersData[i];
-        if (info['properties']['id'] == selectedRegion['property_id']) {
-          center_location = info['geometry']['coordinates'];
-          break;
-        }
-      }
-
-      let zoomLevel;
-      if (selectedRegion['level'] === 'county') {
-        zoomLevel = 6.5;
-      } else if (selectedRegion['level'] === 'msa') {
-        zoomLevel = 6;
-      } else {
-        zoomLevel = 5;
-      }
-
-      map.flyTo({ center: center_location, zoom: zoomLevel, essential: true });
+      return;
     }
+    if (selectedRegion['level'] !== $currentLevel) {
+      currentDataReadyOnMap.set(false);
+      currentLevel.set(selectedRegion['level']);
+    }
+    resetHighlightedFeature();
+
+    megaClickedId = null;
+    currentRegionName.set(selectedRegion['name']);
+    currentRegion.set(selectedRegion['property_id']);
+    clickedId = parseInt(selectedRegion['id']);
+    setFeatureStateMultiple([$currentLevel, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
+      select: true,
+    });
+
+    // Get zoom and center of selected location
+    let centersData = $geojsons.get(center($currentLevel))['features'];
+    let centerLocation;
+    for (let i = 0; i < centersData.length; i++) {
+      let info = centersData[i];
+      if (info['properties']['id'] == selectedRegion['property_id']) {
+        centerLocation = info['geometry']['coordinates'];
+        break;
+      }
+    }
+
+    highlightFeature(selectedRegion);
+
+    // TODO better zoom
+    let zoomLevel;
+    if (selectedRegion['level'] === 'county') {
+      zoomLevel = 6.5;
+    } else if (selectedRegion['level'] === 'msa') {
+      zoomLevel = 6;
+    } else {
+      zoomLevel = 5;
+    }
+
+    map.flyTo({ center: centerLocation, zoom: zoomLevel, essential: true });
   }
 </script>
 
 <style>
-  .banner {
-    font-size: 20px;
-    top: 12px;
+  .top-container {
     position: absolute;
-    line-height: 1.2em;
-    font-weight: 600;
-    text-align: center;
-    align-items: center;
-    pointer-events: none;
-    left: 0;
-    right: 0;
-    margin-left: auto;
-    margin-right: auto;
+    top: 10px;
+    right: 12px;
+    left: 12px;
+
+    display: grid;
+    grid-gap: 0.1em;
+    grid-template-columns: auto 2fr 1fr auto;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      'options options search controls'
+      'toggle title title controls';
   }
 
-  .map-container {
-    width: 100%;
-    height: 80vh;
+  :global(.map-container) {
     position: relative;
-    top: 50px;
+    flex: 1 1 80vh;
     min-height: 550px;
   }
 
@@ -1176,136 +1340,79 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    right: 0;
+    bottom: 0;
   }
 
-  .state-buttons-holder {
-    position: absolute;
-    top: 79px;
-    right: 9px;
-    z-index: 100;
-  }
-
-  #swpa-button-holder.state-buttons-holder {
-    position: absolute;
-    top: 120px;
-    right: 9px;
-    z-index: 100;
-  }
-
-  #swpa-button-holder.state-buttons-holder button {
-    font-size: 9px;
-  }
-
-  .state-buttons-holder button:focus {
-    outline: none;
-  }
-
-  .state-buttons-holder .pg-button {
-    font-size: 23px;
-    position: relative;
-    width: 28px;
-    height: 28px;
-    color: #333;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    box-sizing: content-box;
-    text-align: center;
-    font-family: 'FranklinITCProBold', Helvetica, Arial, sans-serif;
-    line-height: 16px;
-    cursor: pointer;
-    text-decoration: none;
-    user-select: none;
-    transition-delay: 0s;
-    transition-duration: 0.15s;
-    transition-property: background-color;
-    transition-timing-function: ease-in-out;
-
+  :global(.container-bg) {
     /* rounded design refresh */
-    border: 2px solid #dedede;
-    border-radius: 4px;
+    border-radius: 7px;
     background-color: #ffffff;
+    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
   }
 
-  .state-buttons-holder .pg-button:hover {
-    background-color: #f2f2f2;
-  }
-
-  .state-buttons-holder .pg-button img {
-    width: 90%;
+  :global(.container-style) {
+    padding: 8px 8px;
+    box-sizing: border-box;
+    transition: all 0.1s ease-in;
+    font-family: 'Open Sans', Helvetica, sans-serif !important;
   }
 
   .options-container {
-    position: absolute;
-    top: 12px;
-    left: 10px;
-    max-width: 650px;
-    z-index: 1001;
-    padding: 8px 8px;
-    box-sizing: border-box;
-    transition: all 0.1s ease-in;
-
-    /* rounded design refresh */
-    border-radius: 7px;
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
-
-    font-family: 'Open Sans', Helvetica, sans-serif !important;
+    z-index: 1003;
+    max-width: 50em;
+    grid-area: options;
   }
 
   .toggle-container {
-    position: absolute;
-    top: 68px;
-    left: 10px;
-    width: 100px;
     z-index: 1001;
-    padding: 8px 8px;
-    box-sizing: border-box;
-    transition: all 0.1s ease-in;
-
-    /* rounded design refresh */
-    border-radius: 7px;
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
-
-    font-family: 'Open Sans', Helvetica, sans-serif !important;
+    grid-area: toggle;
   }
 
-  .search-container {
-    position: absolute;
-    width: 400px;
-    right: 75px;
-    top: 12px;
+  .title-container {
     z-index: 1001;
+    grid-area: title;
+    align-self: flex-start;
+    justify-self: center;
+    padding: 0 1em;
+  }
 
-    background-color: #fff;
-    box-shadow: 0px 4px 30px rgba(151, 151, 151, 0.25);
-    border-radius: 7px;
+  .search-container-wrapper {
+    grid-area: search;
+    position: relative;
+    min-width: 2.8em;
+  }
 
+  .search-container-wrapper > :global(*) {
+    z-index: 1002;
+  }
+
+  /** mobile **/
+  @media only screen and (max-width: 767px) {
+    .top-container {
+      grid-template-columns: auto 1fr auto;
+      grid-template-rows: auto auto auto;
+      grid-template-areas:
+        'options options options'
+        'search title controls'
+        'toggle title controls';
+    }
+  }
+
+  /** desktop **/
+  @media only screen and (min-width: 767px) {
+    .title-container {
+      background-color: unset;
+      box-shadow: none;
+    }
+  }
+
+  .map-controls-container {
+    margin-left: 1em;
+    z-index: 1001;
+    grid-area: controls;
     display: flex;
-  }
-
-  .search-icon-container {
-    flex-shrink: 0;
-    width: 30px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-  }
-
-  .search-icon {
-    width: 20px;
-    height: 20px;
-    color: #9b9b9b;
-  }
-
-  .search {
-    flex-grow: 1;
-    font-size: 14px;
+    align-items: flex-start;
   }
 
   .legend-container {
@@ -1313,17 +1420,13 @@
     bottom: 12px;
     left: 10px;
     z-index: 1000;
+    /*height: 105px;*/
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    transition: all 0.1s ease-in;
-    /*height: 105px;*/
 
-    /* rounded design refresh */
-    border-radius: 7px;
-    background-color: #ffffff;
-    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
+    transition: all 0.1s ease-in;
   }
 
   .invalid_search-container {
@@ -1356,45 +1459,53 @@
   }
 </style>
 
-<div class="banner">
-  <span class="banner-text">{currentSensorTooltip}</span>
-</div>
-
-<div class="map-container">
-
-  <div class="options-container">
-    <Options />
-  </div>
-
-  <div class="toggle-container {$signalType === 'direction' || !$currentSensor.match(/num/) ? 'hidden' : ''}">
-    <Toggle />
-  </div>
-
-  {#if loaded && regionList.length != 0}
-    <div class="search-container">
-      <div class="search-icon-container">
-        <div class="search-icon">
-          <IoIosSearch />
-        </div>
-      </div>
-      <div class="search">
-        <AutoComplete
-          className="search-bar"
+<main class="map-container">
+  <div class="top-container">
+    <div class="options-container container-bg base-font-size container-style">
+      <Options />
+    </div>
+    <div class="search-container-wrapper base-font-size">
+      {#if loaded && regionList.length != 0}
+        <Search
+          className="search-container container-bg container-style"
           placeholder="Search for a location..."
           items={regionList}
-          bind:selectedItem={selectedRegion}
+          selectedItem={selectedRegion}
           labelFieldName="display_name"
           maxItemsToShowInList="5"
-          onChange={() => {
-            if (typeof selectedRegion !== 'undefined') {
-              searchElement(selectedRegion);
-            }
-          }} />
-      </div>
+          onChange={searchElement} />
+      {/if}
     </div>
-  {/if}
+    <div
+      class="toggle-container container-bg base-font-size container-style"
+      class:hidden={$signalType === 'direction' || !$currentSensor.match(/num/)}>
+      <Toggle />
+    </div>
+    <div class="title-container container-bg">
+      <Title />
+    </div>
+    <div class="map-controls-container">
+      <MapControls
+        zoom={map ? map.getZoom() : 0}
+        maxZoom={map ? map.getMaxZoom() : 100}
+        minZoom={map ? map.getMinZoom() : -100}
+        on:zoomIn={() => {
+          map.zoomIn();
+        }}
+        on:zoomOut={() => {
+          map.zoomOut();
+        }}
+        on:reset={() => {
+          map.fitBounds(stateBounds, stateBoundsOptions);
+        }}
+        on:swpa={() => {
+          map.fitBounds(zoneBounds, zoneBoundsOptions);
+          showZoneBoundary('swpa');
+        }} />
+    </div>
+  </div>
 
-  <div class="legend-container">
+  <div class="legend-container container-bg">
     <Legend />
   </div>
 
@@ -1402,36 +1513,9 @@
     <Banner bind:this={searchErrorComponent} />
   </div>
 
-  <div class="state-buttons-holder">
-    <button
-      aria-label="show entire map"
-      data-state="us48"
-      id="bounds-button"
-      class="pg-button bounds-button"
-      on:click={() => {
-        map.easeTo({ center: [LON, LAT], zoom: ZOOM, bearing: 0, pitch: 0 });
-      }}>
-      <img src="./assets/imgs/us48.png" alt="" />
-    </button>
-  </div>
-
-  {#if $currentZone.length > 0}
-    <div class="state-buttons-holder" id="swpa-button-holder">
-      <button
-        aria-label="show swpa boundary"
-        class="pg-button bounds-button"
-        on:click={() => {
-          map.easeTo({ center: [SWPA_LON, SWPA_LAT], zoom: SWPA_ZOOM, bearing: 0, pitch: 0 });
-          showZoneBoundary('swpa');
-        }}>
-        SWPA
-      </button>
-    </div>
-  {/if}
-
-  <!-- <div class="time-container">
+  <div class="time-container container-bg">
     <Time />
-  </div> -->
+  </div>
 
   <div class="small-multiples">
     <LineSmallMultiples />
@@ -1440,4 +1524,4 @@
   <!-- <GraphContainer {isIE} {graphShowStatus} {toggleGraphShowStatus} /> -->
 
   <div class="map-wrapper" bind:this={container} />
-</div>
+</main>

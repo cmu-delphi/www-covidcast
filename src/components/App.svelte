@@ -18,8 +18,19 @@
   import '../stores/urlHandler';
   import { updateTimeSliceCache, updateRegionSliceCache, loadMetaData } from '../data';
 
-  // Fix for IE: https://stackoverflow.com/a/21712356
-  let isIE = window.document.documentMode;
+  // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
+  const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
+  const isPortraitQuery = window.matchMedia('only screen and (orientation: portrait)');
+
+  $: isMobile = isMobileQuery.matches;
+  $: isPortrait = isPortraitQuery.matches;
+  // detect changes
+  isMobileQuery.addListener((r) => {
+    isMobile = r.matches;
+  });
+  isPortraitQuery.addListener((r) => {
+    isPortrait = r.matches;
+  });
 
   let error = null;
   let graphShowStatus = false;
@@ -29,6 +40,7 @@
 
   // Since we don't want multiple updates, but currentSensor changes can update // the level and date, we have flags that prevent the async updates.
   currentSensor.subscribe((s) => {
+    const sensorEntry = $sensorMap.get(s);
     $currentDataReadyOnMap = false;
 
     if (!$mounted) {
@@ -45,8 +57,8 @@
       date = maxDate;
     }
 
-    if (!$sensorMap.get(s).levels.includes($currentLevel)) {
-      l = $sensorMap.get(s).levels[0];
+    if (!sensorEntry.levels.includes($currentLevel)) {
+      l = sensorEntry.levels[0];
       levelChangedWhenSensorChanged = true;
       currentRegion.set('');
       currentRegionName.set('');
@@ -64,7 +76,9 @@
       currentDate.set(date);
     }
 
-    $sensorMap.get(s).official ? signalType.set('value') : '';
+    if (sensorEntry.official) {
+      signalType.set('value');
+    }
 
     updateRegionSliceCache(s, l, date, 'sensor-change');
   });
@@ -146,4 +160,4 @@
   <div class="error-message-container">Failed to load data. Please try again later...</div>
 {/if}
 
-<MapBox {isIE} {graphShowStatus} {toggleGraphShowStatus} />
+<MapBox {graphShowStatus} {toggleGraphShowStatus} />

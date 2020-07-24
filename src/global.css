@@ -4,16 +4,33 @@
   --darkgrey: #333;
 }
 
+/** ie 11 */
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  #vizbox > .ie-banner {
+    flex-grow: 1;
+    display: flex !important;
+    align-items: center;
+    text-align: center;
+    font-size: 1.4rem;
+    justify-content: center;
+    line-height: 1.2;
+  }
+
+  #vizbox > .ie-banner > * {
+    max-width: 20em;
+  }
+}
+
 #vizbox {
   margin: 0;
   padding: 0;
   font-family: 'Open Sans', sans-serif;
   position: relative;
   width: 100%;
-  height: 90vh;
-  min-width: 1021px;
-  min-height: 550px;
   line-height: 1rem;
+
+  display: flex;
+  flex-direction: column;
 }
 
 .title {
@@ -168,47 +185,26 @@ button.mapboxgl-popup-close-button {
   border-radius: 3px;
 }
 
-/* search bar */
-.search-bar {
-  font-size: 14px !important;
-  font-family: 'Open Sans', Helvetica, sans-serif !important;
+.base-font-size {
+  font-size: 0.88rem;
 }
 
-.search-bar .input.autocomplete-input {
-  border-color: transparent !important;
-  background-color: transparent !important;
-
-  height: 36px !important;
-  margin: 4px !important;
-  padding-left: 6px !important;
-  padding-right: 6px !important;
-  width: 95% !important;
-  color: #111 !important;
+#vizbox [aria-hidden] {
+  display: none;
 }
 
-.search-bar .input.autocomplete-input:focus {
-  outline: none !important;
-  background-color: transparent !important;
-  border-bottom: solid 1px var(--red) !important;
+@import './styles/pg-button.css';
+
+/** index.html page **/
+.test-page {
+  margin: 0;
 }
 
-.search-bar .autocomplete-list {
-  padding-top: 3px !important;
-  padding-left: 3px !important;
-  border-color: transparent !important;
-  background-color: transparent !important;
-  width: 96% !important;
+.test-page #vizbox {
+  width: 100vw;
+  height: 100vh;
 }
 
-.search-bar .autocomplete-list .autocomplete-list-item {
-  border-radius: 5px !important;
-  background-color: transparent !important;
-  transition: all 0.1s ease-in !important;
-}
-
-.search-bar .autocomplete-list .autocomplete-list-item.selected,
-.search-bar .autocomplete-list .autocomplete-list-item:hover {
-  background-color: var(--red) !important;
-  border-radius: 5px !important;
-  color: #fff !important;
+.test-page .map-container {
+  height: unset;
 }

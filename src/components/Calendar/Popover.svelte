@@ -201,7 +201,7 @@
     bind:this={contentsWrapper}>
     <div class="contents" bind:this={contentsAnimated}>
       <div class="contents-inner">
-        <slot name="contents" />
+        <slot />
       </div>
     </div>
   </div>

@@ -1,0 +1,79 @@
+.pg-button {
+  width: 2.2em;
+  padding: 0.2em;
+  line-height: 1;
+  margin: unset;
+  box-sizing: border-box;
+
+  position: relative;
+  color: #333;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  text-decoration: none;
+  user-select: none;
+
+  transition-delay: 0s;
+  transition-duration: 0.15s;
+  transition-property: background-color;
+  transition-timing-function: ease-in-out;
+
+  /* rounded design refresh */
+  border: 2px solid #dedede;
+  border-radius: 4px;
+  background-color: #ffffff;
+}
+
+.pg-button:disabled {
+  background-color: #d3d3d3;
+  cursor: not-allowed;
+}
+
+.pg-button:focus {
+  outline: none;
+}
+
+.pg-button:hover {
+  background-color: #f2f2f2;
+}
+
+.pg-button-group {
+  display: flex;
+  justify-content: space-around;
+}
+
+.pg-button-vertical-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.pg-button-group .pg-button:nth-child(n + 2) {
+  border-left-width: 1px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.pg-button-group .pg-button:nth-last-child(n + 2) {
+  border-right: none;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.pg-button-vertical-group .pg-button:nth-child(n + 2) {
+  border-top-width: 1px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.pg-button-vertical-group .pg-button:nth-last-child(n + 2) {
+  border-bottom: none;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.pg-button-group > .selected {
+  background-color: #f2f2f2;
+}

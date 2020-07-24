@@ -1,8 +1,17 @@
 import { writable, readable, derived, get } from 'svelte/store';
-import { injectIDs, logScale } from '../util';
+import { injectIDs, LogScale } from '../util';
 import * as d3 from 'd3';
-import { sensorList } from './constants';
-export { dict, special_counties, defaultRegionOnStartup, makePlural } from './constants';
+import { sensorList, withSensorEntryKey } from './constants';
+export {
+  dict,
+  specialCounties,
+  defaultRegionOnStartup,
+  getLevelInfo,
+  levels,
+  levelList,
+  yesterday,
+  yesterdayDate,
+} from './constants';
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
@@ -13,22 +22,22 @@ const urlParams = new URLSearchParams(queryString);
 export const sensors = readable(sensorList, (set) => {
   const sensorsOption = urlParams.get('sensors');
   if (sensorsOption) {
-    set(JSON.parse(decodeURIComponent(sensorsOption)));
+    set(withSensorEntryKey(JSON.parse(decodeURIComponent(sensorsOption))));
   }
 });
+
+export const officialSensors = derived([sensors], ([sensors]) => sensors.filter((d) => d.official));
+export const inOfficialSensors = derived([sensors], ([sensors]) => sensors.filter((d) => !d.official));
 
 // The ID to reference each sensor is the indicator name + signal type.
 // This map is used to find the information for each sensor.
 export const sensorMap = derived(sensors, ($sensors) => {
+  /**
+   * @type {Map<string, import('./constants').SensorEntry>}
+   */
   const map = new Map();
-  $sensors.forEach((d) => map.set(`${d.id}-${d.signal}`, d));
+  $sensors.forEach((d) => map.set(d.key, d));
   return map;
-});
-
-export const levels = readable({
-  state: 'State',
-  msa: 'Metro Area',
-  county: 'County',
 });
 
 // This loads all the GeoJSON's for each granularity that the MapBox component reads as layers.
@@ -93,10 +102,10 @@ export const signalType = writable('value', (set) => {
   }
 });
 
-// Options are 'color' and 'bubble'
+// Options are 'color', 'bubble', and 'spike'
 export const encoding = writable('color', (set) => {
   const encoding = urlParams.get('encoding');
-  if (encoding === 'color' || encoding === 'bubble') {
+  if (encoding === 'color' || encoding === 'bubble' || encoding === 'spike') {
     set(encoding);
   }
 });
@@ -131,14 +140,10 @@ export const currentZone = writable('', (set) => {
 export const currentRange = writable([0, 1]);
 
 export const currentRegionName = writable('');
-export const currentSensorName = derived(
-  [sensorMap, currentSensor],
-  ([$sensorMap, $currentSensor]) => $sensorMap.get($currentSensor).name,
-);
-export const currentLevelName = derived([levels, currentLevel], ([$levels, $currentLevel]) => $levels[$currentLevel]);
 
-export const regionSliceCache = writable(new Map());
-export const timeSliceCache = writable(new Map());
+export const currentSensorEntry = derived([sensorMap, currentSensor], ([$sensorMap, $currentSensor]) =>
+  $sensorMap.get($currentSensor),
+);
 
 export const regionData = writable([]);
 export const currentData = writable([]);
@@ -148,7 +153,7 @@ export const timeRangeOnSlider = writable({
   max: 0,
 });
 
-export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
-export const yesterday = Number.parseInt(d3.timeFormat('%Y%0m%0d')(yesterdayDate), 10);
-
-export const radiusScale = writable(logScale());
+export const colorScale = writable([]);
+export const colorStops = writable([]);
+export const bubbleRadiusScale = writable(LogScale());
+export const spikeHeightScale = writable(d3.scaleSqrt());

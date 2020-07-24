@@ -1,3 +1,4 @@
+import * as d3 from 'd3';
 import colorParse from 'color-parse';
 import invertColor from 'invert-color';
 
@@ -77,10 +78,10 @@ export function getTextColorBasedOnBackground(bgColor) {
 }
 
 // A d3-like continuous log scale.
-// Because MapBox does not support applying a custom function for a property,
+// Because MapBox does not support applying a custom function to a property,
 // so we cannot use d3.scaleLog().
 
-export function logScale() {
+export function LogScale() {
   let a = 1,
     b = 0,
     base = 10,
@@ -127,4 +128,16 @@ export function logScale() {
   };
 
   return scale;
+}
+
+export function zip(a1, a2) {
+  return a1.map((value, index) => [value, a2[index]]);
+}
+
+export function transparent(colors, opacity) {
+  return colors.map((c) => {
+    const rgba = d3.rgb(c);
+    rgba.opacity = opacity;
+    return rgba.toString();
+  });
 }

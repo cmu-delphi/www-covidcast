@@ -14,7 +14,7 @@
     yesterday,
     mounted,
     dict,
-    special_counties,
+    specialCounties,
   } from '../../stores';
   import { DIRECTION_THEME } from '../../theme';
   import * as d3 from 'd3';
@@ -96,18 +96,18 @@
     let minMax = calculateSD(sensor);
     let chartMax = minMax[1];
 
-    let latest_direction = -100;
-    let hit_latest_node = false;
+    let latestDirection = -100;
+    let hitLatestNode = false;
     for (let i = data.length - 1; i >= 0; i--) {
       let directionDate = parseTime(data[i].time_value);
       if (directionDate >= currDateSeven && directionDate <= currDate) {
         data[i].inDirection = true;
-        if (!hit_latest_node) {
-          latest_direction = data[i].direction;
-          data[i].coloredDirection = latest_direction;
-          hit_latest_node = true;
+        if (!hitLatestNode) {
+          latestDirection = data[i].direction;
+          data[i].coloredDirection = latestDirection;
+          hitLatestNode = true;
         } else {
-          data[i].coloredDirection = latest_direction;
+          data[i].coloredDirection = latestDirection;
         }
       } else {
         data[i].inDirection = false;
@@ -266,14 +266,14 @@
     return minMax;
   }
 
-  // function get_display_name() {
+  // function getDisplayName() {
   //   let title = '';
   //   if ($currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' === '000') {
   //     title += 'Rest of';
   //   }
   //   title += $currentRegionName;
   //   if ($currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' !== '000') {
-  //     if (!special_counties.includes($currentRegionName)) {
+  //     if (!specialCounties.includes($currentRegionName)) {
   //       title += 'County, ';
   //     }
   //     title += dict[$currentRegion.slice(0, 2)];
@@ -315,7 +315,7 @@
   <p class="graph-description">
     {$currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' === '000' ? 'Rest of' : ''}
     {$currentRegionName}
-    {$currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' !== '000' ? (!special_counties.includes($currentRegionName) ? 'County, ' : ', ') + dict[$currentRegion.slice(0, 2)] : ''}
+    {$currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' !== '000' ? (!specialCounties.includes($currentRegionName) ? 'County, ' : ', ') + dict[$currentRegion.slice(0, 2)] : ''}
   </p>
 
   <div bind:clientWidth={w} class="graph-itself">

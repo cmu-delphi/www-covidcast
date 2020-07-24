@@ -3,7 +3,6 @@
   import NavBar from './NavBar.svelte';
   import Popover from './Popover.svelte';
   import { getMonths } from './lib/helpers';
-  import { formatDate, internationalize } from 'timeUtils';
   import { keyCodes, keyCodesArray } from './lib/keyCodes';
   import { onMount, createEventDispatcher } from 'svelte';
 
@@ -12,7 +11,6 @@
 
   let popover;
 
-  export let format = '#{m}/#{d}/#{Y}';
   export let start = new Date(1987, 9, 29);
   export let end = new Date(2020, 9, 29);
   export let selected = today;
@@ -56,7 +54,6 @@
   export let dayHighlightedBackgroundColor = '#efefef';
   export let dayHighlightedTextColor = '#4a4a4a';
 
-  internationalize({ daysOfWeek, monthsOfYear });
   let sortedDaysOfWeek =
     weekStart === 0
       ? daysOfWeek
@@ -113,9 +110,6 @@
   `;
 
   export let formattedSelected;
-  $: {
-    formattedSelected = typeof format === 'function' ? format(selected) : formatDate(selected, format);
-  }
 
   onMount(() => {
     month = selected.getMonth();
@@ -323,31 +317,29 @@
         {/if}
       </slot>
     </div>
-    <div slot="contents">
-      <div class="calendar">
-        <NavBar
-          {month}
-          {year}
-          {canIncrementMonth}
-          {canDecrementMonth}
-          {start}
-          {end}
-          {monthsOfYear}
-          on:monthSelected={(e) => changeMonth(e.detail)}
-          on:incrementMonth={(e) => incrementMonth(e.detail)} />
-        <div class="legend">
-          {#each sortedDaysOfWeek as day}
-            <span>{day[1]}</span>
-          {/each}
-        </div>
-        <Month
-          {visibleMonth}
-          {selected}
-          {highlighted}
-          {shouldShakeDate}
-          id={visibleMonthId}
-          on:dateSelected={(e) => registerSelection(e.detail)} />
+    <div class="calendar">
+      <NavBar
+        {month}
+        {year}
+        {canIncrementMonth}
+        {canDecrementMonth}
+        {start}
+        {end}
+        {monthsOfYear}
+        on:monthSelected={(e) => changeMonth(e.detail)}
+        on:incrementMonth={(e) => incrementMonth(e.detail)} />
+      <div class="legend">
+        {#each sortedDaysOfWeek as day}
+          <span>{day[1]}</span>
+        {/each}
       </div>
+      <Month
+        {visibleMonth}
+        {selected}
+        {highlighted}
+        {shouldShakeDate}
+        id={visibleMonthId}
+        on:dateSelected={(e) => registerSelection(e.detail)} />
     </div>
   </Popover>
 </div>
