@@ -2,7 +2,16 @@ import { writable, readable, derived, get } from 'svelte/store';
 import { injectIDs, LogScale } from '../util';
 import * as d3 from 'd3';
 import { sensorList, withSensorEntryKey } from './constants';
-export { dict, specialCounties, defaultRegionOnStartup, getLevelInfo, levels, levelList } from './constants';
+export {
+  dict,
+  specialCounties,
+  defaultRegionOnStartup,
+  getLevelInfo,
+  levels,
+  levelList,
+  yesterday,
+  yesterdayDate,
+} from './constants';
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
@@ -143,9 +152,6 @@ export const timeRangeOnSlider = writable({
   min: 0,
   max: 0,
 });
-
-export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
-export const yesterday = Number.parseInt(d3.timeFormat('%Y%0m%0d')(yesterdayDate), 10);
 
 export const colorScale = writable([]);
 export const colorStops = writable([]);

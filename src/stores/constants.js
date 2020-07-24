@@ -1,3 +1,5 @@
+import { timeFormat } from 'd3';
+
 export const dict = {
   '10': 'DE',
   '11': 'DC',
@@ -303,3 +305,6 @@ export const defaultRegionOnStartup = {
   msa: '38300', // Pittsburgh
   state: 'PA', // Pennsylvania
 };
+
+export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
+export const yesterday = Number.parseInt(timeFormat('%Y%0m%0d')(yesterdayDate), 10);
