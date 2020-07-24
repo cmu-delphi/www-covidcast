@@ -1,7 +1,7 @@
 import { writable, readable, derived, get } from 'svelte/store';
 import { injectIDs, LogScale } from '../util';
 import * as d3 from 'd3';
-import { sensorList } from './constants';
+import { sensorList, withSensorEntryKey } from './constants';
 export { dict, specialCounties, defaultRegionOnStartup, getLevelInfo, levels, levelList } from './constants';
 
 const queryString = window.location.search;
@@ -13,15 +13,18 @@ const urlParams = new URLSearchParams(queryString);
 export const sensors = readable(sensorList, (set) => {
   const sensorsOption = urlParams.get('sensors');
   if (sensorsOption) {
-    set(JSON.parse(decodeURIComponent(sensorsOption)));
+    set(withSensorEntryKey(JSON.parse(decodeURIComponent(sensorsOption))));
   }
 });
+
+export const officialSensors = derived([sensors], ([sensors]) => sensors.filter((d) => d.official));
+export const inOfficialSensors = derived([sensors], ([sensors]) => sensors.filter((d) => !d.official));
 
 // The ID to reference each sensor is the indicator name + signal type.
 // This map is used to find the information for each sensor.
 export const sensorMap = derived(sensors, ($sensors) => {
   const map = new Map();
-  $sensors.forEach((d) => map.set(`${d.id}-${d.signal}`, d));
+  $sensors.forEach((d) => map.set(d.key, d));
   return map;
 });
 

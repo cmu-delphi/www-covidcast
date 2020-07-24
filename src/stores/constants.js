@@ -121,6 +121,29 @@ export function getLevelInfo(level) {
   return levelById.get(level) || { id: '?', label: 'Invalid level', labelPlural: 'Invalid level' };
 }
 
+export function withSensorEntryKey(sensorEntry) {
+  return Object.assign(sensorEntry, {
+    key: `${sensorEntry.id}-${sensorEntry.signal}`,
+  });
+}
+
+/**
+ * @typedef {object} SensorEntry
+ * @property {string} key
+ * @property {string} name
+ * @property {string} id
+ * @property {string} signal
+ * @property {string} tooltipText
+ * @property {string} chartTitleText
+ * @property {string} yAxis
+ * @property {string} format
+ * @property {string} signal
+ * @property {string[]} levels
+ * @property {boolean[]} official
+ */
+/**
+ * @type {SensorEntry[]}
+ */
 export const sensorList = [
   {
     name: 'Doctor Visits',
@@ -273,7 +296,7 @@ export const sensorList = [
     levels: ['msa', 'county', 'state'],
     official: true,
   },
-];
+].map(withSensorEntryKey);
 
 export const defaultRegionOnStartup = {
   county: '42003', // Allegheny

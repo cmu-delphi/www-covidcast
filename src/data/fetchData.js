@@ -15,16 +15,27 @@ const regionSliceCache = new Map();
  */
 const timeSliceCache = new Map();
 
-function toSensorEntryKey(sensorEntry) {
-  return `${sensorEntry.id}-${sensorEntry.signal}`;
-}
+/**
+ * @param {import('../stores/constants').SensorEntry} sensorEntry
+ * @param {string} level
+ * @param {string} date
+ */
 function toRegionCacheKey(sensorEntry, level, date) {
-  return `${toSensorEntryKey(sensorEntry)}-${level}-${date}`;
+  return `${sensorEntry.key}-${level}-${date}`;
 }
+/**
+ * @param {import('../stores/constants').SensorEntry} sensorEntry
+ * @param {string} level
+ * @param {string} region
+ */
 function toTimeSliceCacheKey(sensorEntry, level, region) {
-  return `${toSensorEntryKey(sensorEntry)}-${level}-${region}`;
+  return `${sensorEntry.key}-${level}-${region}`;
 }
 
+/**
+ *
+ * @param {string} signal
+ */
 function getAdditionalSignal(signal) {
   // deaths_incidence_prop
   if (signal === 'deaths_7dav_incidence_prop') {
@@ -84,7 +95,9 @@ export function fetchTimeSlice(sensorEntry, level, region) {
   }
 
   const promise = callAPI(sensorEntry.id, sensorEntry.signal, level, TIME_RANGE, region).then((d) => {
-    timeSliceCache.set(cacheKey, d.epidata);
+    if (d.result < 0 || d.message.includes('no results')) {
+      return [];
+    }
     return d.epidata;
   });
   timeSliceCache.set(cacheEntry, promise);

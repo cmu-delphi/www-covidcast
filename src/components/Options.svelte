@@ -1,5 +1,14 @@
 <script>
-  import { sensorMap, currentSensor, currentLevel, currentDate, times, levelList } from '../stores';
+  import {
+    currentSensor,
+    currentLevel,
+    currentDate,
+    times,
+    levelList,
+    currentSensorEntry,
+    inOfficialSensors,
+    officialSensors,
+  } from '../stores';
   import Datepicker from './Calendar/Datepicker.svelte';
   import * as d3 from 'd3';
 
@@ -82,13 +91,13 @@
     class="indicators base-font-size"
     bind:value={$currentSensor}>
     <optgroup label="Indicators">
-      {#each Array.from($sensorMap.keys()).filter((d) => !$sensorMap.get(d).official) as sensor}
-        <option title={$sensorMap.get(sensor).tooltipText} value={sensor}>{$sensorMap.get(sensor).name}</option>
+      {#each $inOfficialSensors as sensor}
+        <option title={sensor.tooltipText} value={sensor.key}>{sensor.name}</option>
       {/each}
     </optgroup>
     <optgroup label="Official Reports">
-      {#each Array.from($sensorMap.keys()).filter((d) => $sensorMap.get(d).official) as sensor}
-        <option title={$sensorMap.get(sensor).tooltipText} value={sensor}>{$sensorMap.get(sensor).name}</option>
+      {#each $officialSensors as sensor}
+        <option title={sensor.tooltipText} value={sensor.key}>{sensor.name}</option>
       {/each}
     </optgroup>
   </select>
@@ -99,9 +108,7 @@
     class="geo-level base-font-size"
     bind:value={$currentLevel}>
     {#each levelList as level}
-      <option value={level.id} disabled={!$sensorMap.get($currentSensor).levels.includes(level.id)}>
-        {level.labelPlural}
-      </option>
+      <option value={level.id} disabled={!$currentSensorEntry.levels.includes(level.id)}>{level.labelPlural}</option>
     {/each}
   </select>
   <label class="option-title base-font-size" for="option-date">on</label>

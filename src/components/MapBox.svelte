@@ -31,7 +31,6 @@
     currentDataReadyOnMap,
     mounted,
     mapFirstLoaded,
-    sensorMap,
     colorScale,
     colorStops,
     bubbleRadiusScale,
@@ -39,6 +38,7 @@
     dict,
     specialCounties,
     defaultRegionOnStartup,
+    currentSensorEntry,
   } from '../stores';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
@@ -158,7 +158,7 @@
     const { value, direction, NAME, STATE, Population } = e.features[0].properties;
 
     const date = formatTimeWithoutYear(parseTime($currentDate));
-    const sens = $sensorMap.get($currentSensor);
+    const sens = $currentSensorEntry;
     const popCommas = parseInt(Population).toLocaleString();
     let title = (level === 'mega-county' ? 'Rest of ' : '') + NAME + getLabelSpecifics(NAME, STATE, level);
     let body;
@@ -1251,7 +1251,7 @@
     selectedRegion = selection;
 
     let hasValueFlag = false;
-    const availLevels = $sensorMap.get($currentSensor).levels;
+    const availLevels = $currentSensorEntry.levels;
     for (let i = 0; i < availLevels.length; i++) {
       if (selectedRegion['level'] === availLevels[i]) {
         hasValueFlag = true;
