@@ -266,9 +266,11 @@
 
   const onClick = (level) => (e) => {
     if (clickedId) {
+      // reset
       setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, { select: false });
     }
     if (megaClickedId) {
+      // reset
       map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: false });
     }
     if (level === 'mega-county') {
@@ -289,6 +291,7 @@
 
       currentRegionName.set(e.features[0].properties.NAME);
       currentRegion.set(e.features[0].properties.STATE + '000');
+      selectedRegion = findSelectedRegion(e.features[0].properties.STATE);
     } else {
       megaClickedId = null;
       if (clickedId !== e.features[0].id) {
@@ -296,10 +299,12 @@
         setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, { select: true });
         currentRegionName.set(e.features[0].properties.NAME);
         currentRegion.set(e.features[0].properties.id);
+        selectedRegion = findSelectedRegion(e.features[0].properties.id);
       } else {
         clickedId = null;
         currentRegionName.set('');
         currentRegion.set('');
+        selectedRegion = null;
       }
     }
   };
@@ -702,16 +707,16 @@
     }
 
     if ($currentRegion) {
-      const megaFound = megaDat.features.filter((f) => f.properties.STATE + '000' === $currentRegion + '');
-      const found = viableFeatures.filter((f) => f.properties.id === $currentRegion);
-      if (megaFound.length > 0) {
-        megaClickedId = parseInt(megaFound[0].properties.STATE);
-        currentRegionName.set(megaFound[0].properties.NAME);
+      const megaFound = megaDat.features.find((f) => f.properties.STATE + '000' === $currentRegion + '');
+      const found = viableFeatures.find((f) => f.properties.id === $currentRegion);
+      if (megaFound) {
+        megaClickedId = parseInt(megaFound.properties.STATE);
+        currentRegionName.set(megaFound.properties.NAME);
         map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: true });
       }
-      if (found.length > 0) {
-        clickedId = found[0].id;
-        currentRegionName.set(found[0].properties.NAME);
+      if (found) {
+        clickedId = found.id;
+        currentRegionName.set(found.properties.NAME);
         setFeatureStateMultiple([$currentLevel, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
           select: true,
         });
@@ -1224,6 +1229,10 @@
 
     map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
     map.setFeatureState({ source: center($currentLevel), id: clickedId }, { select: true });
+  }
+
+  function findSelectedRegion(id) {
+    return regionList != null && regionList.find((d) => d.property_id === id);
   }
 
   function resetSearch() {
