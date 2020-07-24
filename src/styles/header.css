@@ -1,3 +1,47 @@
+.roof.invert form {
+  position: relative;
+  height: unset;
+}
+
+.roof.invert > div {
+  justify-content: space-between;
+}
+
+.roof.invert .wordmark {
+}
+
+.viz-menu-button {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 3em;
+  width: 2em;
+}
+
+.viz-menu-button > svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+.viz-menu {
+  line-height: initial;
+  display: flex;
+}
+
+.viz-menu > a {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.2em 1em;
+  font-size: 1.1rem;
+}
+.viz-menu > a:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
 .viz-name {
   margin: 1em 0;
   padding-top: 0;
@@ -43,6 +87,27 @@
 
 /** mobile **/
 @media only screen and (max-width: 767px) {
+  .roof.invert form {
+    display: none;
+  }
+
+  .roof.invert > div {
+    padding-bottom: 0;
+  }
+
+  .roof div.viz-menu {
+    display: none;
+    padding-bottom: 0;
+  }
+
+  .viz-menu-button.open + .viz-menu {
+    display: flex;
+  }
+
+  .viz-menu-button {
+    display: block;
+  }
+
   .viz-name > h1 {
     font-size: 1.8rem;
   }
