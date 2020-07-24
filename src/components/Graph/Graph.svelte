@@ -14,7 +14,7 @@
     yesterday,
     mounted,
     dict,
-    special_counties,
+    specialCounties,
   } from '../../stores';
   import { DIRECTION_THEME } from '../../theme';
   import * as d3 from 'd3';
@@ -315,7 +315,7 @@
   <p class="graph-description">
     {$currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' === '000' ? 'Rest of' : ''}
     {$currentRegionName}
-    {$currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' !== '000' ? (!special_counties.includes($currentRegionName) ? 'County, ' : ', ') + dict[$currentRegion.slice(0, 2)] : ''}
+    {$currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' !== '000' ? (!specialCounties.includes($currentRegionName) ? 'County, ' : ', ') + dict[$currentRegion.slice(0, 2)] : ''}
   </p>
 
   <div bind:clientWidth={w} class="graph-itself">
