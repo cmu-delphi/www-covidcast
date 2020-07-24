@@ -37,7 +37,7 @@
     bubbleRadiusScale,
     spikeHeightScale,
     dict,
-    special_counties,
+    specialCounties,
     defaultRegionOnStartup,
   } from '../stores';
   import * as d3 from 'd3';
@@ -721,7 +721,7 @@
 
   function getLabelSpecifics(name, state, level) {
     let text = '';
-    if ($currentLevel === 'county' && level !== 'mega-county' && !special_counties.includes(name)) {
+    if ($currentLevel === 'county' && level !== 'mega-county' && !specialCounties.includes(name)) {
       text += ' County';
     }
     if (level === 'county') {
