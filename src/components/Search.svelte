@@ -556,7 +556,7 @@
 
   .autocomplete-input {
     flex: 1 1 0;
-    min-width: 15em;
+    min-width: 12em;
     width: 20em;
     max-width: 30em;
     font: inherit;

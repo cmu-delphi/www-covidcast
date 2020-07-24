@@ -1321,11 +1321,12 @@
     left: 12px;
 
     display: grid;
-    grid-gap: 0.1em;
+    grid-gap: 0.4em;
     grid-template-columns: auto 2fr 1fr auto;
     grid-template-rows: auto auto;
     grid-template-areas:
       'options options search controls'
+      'toggle title title controls'
       'toggle title title controls';
   }
 
@@ -1373,7 +1374,7 @@
     grid-area: title;
     align-self: flex-start;
     justify-self: center;
-    padding: 0 1em;
+    padding: 0.2em 1em;
   }
 
   .search-container-wrapper {
@@ -1384,6 +1385,7 @@
 
   .search-container-wrapper > :global(*) {
     z-index: 1002;
+    min-height: 100%;
   }
 
   /** mobile **/
@@ -1412,6 +1414,7 @@
     grid-area: controls;
     display: flex;
     align-items: flex-start;
+    height: 0;
   }
 
   .legend-container {
