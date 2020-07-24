@@ -273,7 +273,7 @@
   //   }
   //   title += $currentRegionName;
   //   if ($currentRegionName && $currentLevel === 'county' && $currentRegion.slice(-3) + '' !== '000') {
-  //     if (!special_counties.includes($currentRegionName)) {
+  //     if (!specialCounties.includes($currentRegionName)) {
   //       title += 'County, ';
   //     }
   //     title += dict[$currentRegion.slice(0, 2)];
