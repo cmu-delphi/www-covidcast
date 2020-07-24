@@ -102,11 +102,6 @@ module.exports = () => {
         alwaysWriteToDisk: true,
         template: './src/index.html',
       }),
-      new HtmlWebpackPlugin({
-        alwaysWriteToDisk: true,
-        filename: 'frame.html',
-        template: './src/frame.html',
-      }),
       new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({
         filename: '[name].css',

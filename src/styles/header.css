@@ -1,0 +1,54 @@
+.viz-name {
+  margin: 1em 0;
+  padding-top: 0;
+  padding-bottom: 0;
+
+  display: flex;
+  align-items: flex-end;
+
+  color: var(--darkgrey);
+}
+
+.viz-name > h1 {
+  font-size: 2rem;
+  padding: 0;
+  font-weight: 500;
+}
+
+.viz-name > h2 {
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-left: 2em;
+  margin-bottom: 0.2em;
+  color: var(--grey);
+}
+
+.group-link {
+  color: inherit;
+  border-bottom: none;
+}
+
+.title-link {
+  color: var(--red) !important;
+  border-bottom: none;
+}
+
+.viz-mission {
+  padding-top: 0.2em;
+  padding-bottom: 0.5em;
+  color: var(--darkgrey);
+}
+
+.mission-link {
+  color: var(--red);
+  font-weight: 700;
+}
+
+.team-link {
+  color: inherit;
+  text-decoration: underline;
+  border-bottom: none;
+  font-weight: 700;
+  font-style: italic;
+}
