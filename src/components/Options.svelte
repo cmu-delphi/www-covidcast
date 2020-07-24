@@ -1,5 +1,5 @@
 <script>
-  import { sensorMap, currentSensor, levels, currentLevel, currentDate, times, makePlural } from '../stores';
+  import { sensorMap, currentSensor, currentLevel, currentDate, times, levelList } from '../stores';
   import Datepicker from './Calendar/Datepicker.svelte';
   import * as d3 from 'd3';
 
@@ -98,9 +98,9 @@
     aria-label="geographic level"
     class="geo-level base-font-size"
     bind:value={$currentLevel}>
-    {#each Object.keys($levels) as level}
-      <option value={level} disabled={$sensorMap.get($currentSensor).levels.includes(level) === false}>
-        {makePlural($levels[level])}
+    {#each levelList as level}
+      <option value={level.id} disabled={!$sensorMap.get($currentSensor).levels.includes(level.id)}>
+        {level.labelPlural}
       </option>
     {/each}
   </select>

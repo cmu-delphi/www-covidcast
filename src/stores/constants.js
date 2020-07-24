@@ -96,6 +96,31 @@ export const specialCounties = [
   'Winchester',
 ];
 
+export const levelList = [
+  {
+    id: 'state',
+    label: 'State',
+    labelPlural: 'States',
+  },
+  {
+    id: 'msa',
+    label: 'Metro Area',
+    labelPlural: 'Metro Areas',
+  },
+  {
+    id: 'county',
+    label: 'County',
+    labelPlural: 'Counties',
+  },
+];
+export const levels = levelList.map((l) => l.id);
+
+const levelById = new Map(levelList.map((l) => [l.id, l]));
+
+export function getLevelInfo(level) {
+  return levelById.get(level) || { id: '?', label: 'Invalid level', labelPlural: 'Invalid level' };
+}
+
 export const sensorList = [
   {
     name: 'Doctor Visits',
@@ -255,13 +280,3 @@ export const defaultRegionOnStartup = {
   msa: '38300', // Pittsburgh
   state: 'PA', // Pennsylvania
 };
-
-export function makePlural(level) {
-  if (level === 'State') {
-    return 'States';
-  } else if (level === 'County') {
-    return 'Counties';
-  } else if (level === 'Metro Area') {
-    return 'Metro Areas';
-  }
-}

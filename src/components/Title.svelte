@@ -1,7 +1,5 @@
 <script>
-  import { sensorMap, currentSensor } from '../stores';
-
-  $: currentSensorTooltip = $sensorMap.get($currentSensor).mapTitleText;
+  import { currentSensorEntry } from '../stores';
 </script>
 
 <style>
@@ -20,4 +18,4 @@
   }
 </style>
 
-<h2 class="banner">{currentSensorTooltip}</h2>
+<h2 class="banner">{$currentSensorEntry.mapTitleText}</h2>

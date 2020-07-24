@@ -2,7 +2,7 @@ import { writable, readable, derived, get } from 'svelte/store';
 import { injectIDs, LogScale } from '../util';
 import * as d3 from 'd3';
 import { sensorList } from './constants';
-export { dict, specialCounties, defaultRegionOnStartup, makePlural } from './constants';
+export { dict, specialCounties, defaultRegionOnStartup, getLevelInfo, levels, levelList } from './constants';
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
@@ -23,12 +23,6 @@ export const sensorMap = derived(sensors, ($sensors) => {
   const map = new Map();
   $sensors.forEach((d) => map.set(`${d.id}-${d.signal}`, d));
   return map;
-});
-
-export const levels = readable({
-  state: 'State',
-  msa: 'Metro Area',
-  county: 'County',
 });
 
 // This loads all the GeoJSON's for each granularity that the MapBox component reads as layers.
@@ -131,11 +125,10 @@ export const currentZone = writable('', (set) => {
 export const currentRange = writable([0, 1]);
 
 export const currentRegionName = writable('');
-export const currentSensorName = derived(
-  [sensorMap, currentSensor],
-  ([$sensorMap, $currentSensor]) => $sensorMap.get($currentSensor).name,
+
+export const currentSensorEntry = derived([sensorMap, currentSensor], ([$sensorMap, $currentSensor]) =>
+  $sensorMap.get($currentSensor),
 );
-export const currentLevelName = derived([levels, currentLevel], ([$levels, $currentLevel]) => $levels[$currentLevel]);
 
 export const regionData = writable([]);
 export const currentData = writable([]);
