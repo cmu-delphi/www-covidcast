@@ -137,9 +137,6 @@ export const currentSensorName = derived(
 );
 export const currentLevelName = derived([levels, currentLevel], ([$levels, $currentLevel]) => $levels[$currentLevel]);
 
-export const regionSliceCache = writable(new Map());
-export const timeSliceCache = writable(new Map());
-
 export const regionData = writable([]);
 export const currentData = writable([]);
 
