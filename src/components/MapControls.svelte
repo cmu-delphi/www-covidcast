@@ -1,9 +1,10 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { currentZone } from '../stores';
+  import { currentZone, currentLevel } from '../stores';
   import IoMdAdd from 'svelte-icons/io/IoMdAdd.svelte';
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
   import IoMdHome from 'svelte-icons/io/IoMdHome.svelte';
+  import TiTag from 'svelte-icons/ti/TiTag.svelte';
 
   const dispatch = createEventDispatcher();
   export let className = '';
@@ -62,6 +63,20 @@
       <IoMdHome />
     </button>
   </div>
+  {#if $currentLevel == 'state'}
+    <div>
+      <button
+        class="pg-button"
+        type="button"
+        title="Hide state labels"
+        aria-label="Hide state labels"
+        on:click={() => {
+          dispatch('hideLabels');
+        }}>
+        <TiTag />
+      </button>
+    </div>
+  {/if}
   {#if $currentZone.length > 0}
     <div>
       <button

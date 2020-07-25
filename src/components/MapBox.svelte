@@ -745,6 +745,14 @@
     }
   }
 
+  function toggle_state_label() {
+    if (map.getLayoutProperty('state-names', 'visibility') === 'visible') {
+      map.setLayoutProperty('state-names', 'visibility', 'none');
+    } else {
+      map.setLayoutProperty('state-names', 'visibility', 'visible');
+    }
+  }
+
   function initializeMap() {
     stateBounds = computeBounds($geojsons.get('state'));
     zoneBounds = computeBounds($geojsons.get('zone'));
@@ -1494,6 +1502,9 @@
         }}
         on:reset={() => {
           map.fitBounds(stateBounds, stateBoundsOptions);
+        }}
+        on:hideLabels={() => {
+          toggle_state_label();
         }}
         on:swpa={() => {
           map.fitBounds(zoneBounds, zoneBoundsOptions);
