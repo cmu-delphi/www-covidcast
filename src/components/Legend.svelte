@@ -425,7 +425,7 @@
               signalType.set('direction');
             }
           }}
-          disabled={true}>
+          disabled={$currentSensorEntry.official}>
           7-day Trend
           {#if $currentSensorEntry.official}
             <span class="disabled-tooltip">Currently unavailable</span>

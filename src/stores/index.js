@@ -97,8 +97,8 @@ export const currentLevel = writable('county', (set) => {
 export const signalType = writable('value', (set) => {
   const signalT = urlParams.get('signalType');
   if (signalT === 'direction' || signalT === 'value') {
-    //set(signalT);
-    set('value');
+    set(signalT);
+    //set('value');
   }
 });
 
