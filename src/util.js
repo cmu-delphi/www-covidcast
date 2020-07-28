@@ -179,6 +179,10 @@ export function zip(a1, a2) {
 }
 
 export function transparent(colors, opacity) {
+  if (!Array.isArray(colors)) {
+    return transparent([colors], opacity)[0];
+  }
+
   return colors.map((c) => {
     const rgba = d3.rgb(c);
     rgba.opacity = opacity;

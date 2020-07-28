@@ -153,7 +153,7 @@ export const timeRangeOnSlider = writable({
   max: 0,
 });
 
-export const colorScale = writable([]);
+export const colorScale = writable(d3.scaleSequentialLog());
 export const colorStops = writable([]);
 export const bubbleRadiusScale = writable(LogScale());
 export const spikeHeightScale = writable(d3.scaleSqrt());

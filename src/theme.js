@@ -51,8 +51,10 @@ export const ENCODING_BUBBLE_THEME = {
     state: 20,
   },
   radiusScale: {
-    type: 'sqrt', // one of ['sqrt', 'log', 'linear']
-    base: 2, // if type is log, base is needed
+    count: {
+      type: 'sqrt', // one of ['sqrt', 'log', 'linear']
+      // base: 2, // if type is log, base is needed. Otherwise, ignored.
+    },
   },
 };
 

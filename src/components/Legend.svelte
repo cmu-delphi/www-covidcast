@@ -1,5 +1,5 @@
 <script>
-  import { DIRECTION_THEME, ENCODING_SPIKE_THEME } from '../theme';
+  import { DIRECTION_THEME, ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../theme';
   import {
     signalType,
     stats,
@@ -7,15 +7,16 @@
     currentLevel,
     currentDataReadyOnMap,
     encoding,
+    colorScale,
     bubbleRadiusScale,
     currentSensorEntry,
   } from '../stores';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
+  import { isCountSignal } from '../data/signals';
+  import { transparent } from '../util';
 
-  let high = '';
-  let low = '';
-  let colorScaleLog;
+  let high;
   let spikeBase = 40,
     size = 0,
     maxHeight,
@@ -28,6 +29,8 @@
   stats.subscribe((s) => (s ? update($currentSensor, s, $currentLevel) : ''));
   currentLevel.subscribe((l) => ($stats ? update($currentSensor, $stats, l) : ''));
   encoding.subscribe(() => ($stats ? update($currentSensor, $stats, $currentLevel) : ''));
+  colorScale.subscribe(() => ($stats ? update($currentSensor, $stats, $currentLevel) : ''));
+  bubbleRadiusScale.subscribe(() => ($stats ? update($currentSensor, $stats, $currentLevel) : ''));
 
   function update(sens, stats, level) {
     // for signalType === 'direction', the legend is hardcoded.
@@ -36,29 +39,24 @@
     let sts;
     let valueMinMax;
 
-    if ($currentSensor.match(/num/)) {
+    if (isCountSignal($currentSensor)) {
       sts = stats.get(sens + '_' + level);
       valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
 
       high = getSigfigs(valueMinMax[1].toFixed(2), 3);
-      low = getSigfigs(Math.max(0, valueMinMax[0]).toFixed(2), 3);
 
       logColorArr = [{ label: '0', from: DIRECTION_THEME.countMin, to: DIRECTION_THEME.countMin }];
       let max = Math.log(valueMinMax[1]) / Math.log(10);
       let min = Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10);
       let arr = logspace(min, max, 7);
 
-      colorScaleLog = d3
-        .scaleSequentialLog(d3.interpolateYlOrRd)
-        .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]]);
-
       for (let i = 0; i < arr.length - 1; i++) {
         arr[i] = parseFloat(arr[i]).toFixed(2);
 
         logColorArr.push({
           label: arr[i],
-          from: colorScaleLog(arr[i]),
-          to: colorScaleLog(arr[i + 1]),
+          from: $colorScale(arr[i]),
+          to: $colorScale(arr[i + 1]),
         });
       }
 
@@ -70,23 +68,21 @@
       valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
       if ($currentSensorEntry.format === 'raw') {
         high = getSigfigs(valueMinMax[1].toFixed(2), 3);
-        low = getSigfigs(Math.max(0, valueMinMax[0]).toFixed(2), 3);
         valueMinMax[0] = Math.max(0, valueMinMax[0]);
       } else {
         high = getSigfigs(Math.min(100, valueMinMax[1]).toFixed(2), 3) + '%';
-        low = getSigfigs(Math.max(0, valueMinMax[0]).toFixed(2), 3) + '%';
         valueMinMax[0] = Math.max(0, valueMinMax[0]);
         valueMinMax[1] = Math.min(100, valueMinMax[1]);
       }
-      const colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
+
       let arr = splitDomain(valueMinMax[0], valueMinMax[1], 7);
       linColorArr = [];
       for (let i = 0; i < arr.length - 1; i++) {
         arr[i] = parseFloat(arr[i]).toFixed(2);
         linColorArr.push({
           label: arr[i],
-          from: colorScaleLinear(arr[i]),
-          to: colorScaleLinear(arr[i + 1]),
+          from: $colorScale(arr[i]),
+          to: $colorScale(arr[i + 1]),
         });
       }
     }
@@ -106,16 +102,6 @@
     return splits;
   }
 
-  function getBubbleFill(value) {
-    let bubbleFill = d3.rgb(colorScaleLog(value));
-    bubbleFill.opacity = 0.5;
-    return bubbleFill.toString();
-  }
-
-  function getBubbleBorder(value) {
-    return colorScaleLog(value);
-  }
-
   function getSpikePath(value) {
     if (!heightScale) return '';
     return `M 0 ${heightScale(+value)} L ${size} 0 L ${size * 2} ${heightScale(+value)}`;
@@ -127,13 +113,13 @@
   }
 
   function getSpikeFill(value) {
-    let spikeFill = d3.rgb(colorScaleLog(value));
+    let spikeFill = d3.rgb($colorScale(value));
     spikeFill.opacity = ENCODING_SPIKE_THEME.fillOpacity;
     return spikeFill.toString();
   }
 
   function getSpikeStroke(value) {
-    let spikeStroke = d3.rgb(colorScaleLog(value));
+    let spikeStroke = d3.rgb($colorScale(value));
     spikeStroke.opacity = ENCODING_SPIKE_THEME.strokeOpacity;
     return spikeStroke.toString();
   }
@@ -456,7 +442,7 @@
           </li>
         </ul>
       </div>
-    {:else if $currentSensor.match(/num/)}
+    {:else if isCountSignal($currentSensor)}
       <div class="legend-grouping">
         <ul class="legend-labels">
           {#each logColorArr as { label, from, to }, j}
@@ -495,7 +481,7 @@
             <li class="colored">
               <div
                 style="width: {$bubbleRadiusScale(+label) * 2}px; height: {$bubbleRadiusScale(+label) * 2}px;background:
-                {getBubbleFill(+label)};border-color: {from}"
+                {transparent($colorScale(+label), ENCODING_BUBBLE_THEME.opacity)};border-color: {$colorScale(+label)}"
                 class="bubble" />
               <div>{getSigfigs(label, 3)}</div>
             </li>
@@ -504,8 +490,8 @@
         {#if high}
           <li class="colored">
             <div
-              style="width: {$bubbleRadiusScale(+high) * 2}px; height: {$bubbleRadiusScale(+high) * 2}px; background: {getBubbleFill(+high)};border-color:
-              {getBubbleBorder(+high)}"
+              style="background: {transparent($colorScale(+high), ENCODING_BUBBLE_THEME.opacity)};width: {$bubbleRadiusScale(+high) * 2}px;
+              height: {$bubbleRadiusScale(+high) * 2}px;border-color: {$colorScale(+high)}"
               class="bubble" />
             <div>{high ? high + '+' : ''}</div>
           </li>
@@ -515,7 +501,7 @@
   {:else if $encoding === 'spike'}
     <div class="spike-legend">
       <ul>
-        {#each [...logColorArr] as { label, from, to }, j}
+        {#each [...logColorArr] as { label }, j}
           {#if +label > 0}
             <li>
               <svg width={size * 2 + 10} height={getSpikeHeight(+label) + 10}>
