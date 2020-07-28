@@ -76,7 +76,7 @@
       currentDate.set(date);
     }
 
-    if (sensorEntry.official) {
+    if (sensorEntry.type === 'late' && sensorEntry.id !== 'hospital-admissions') {
       signalType.set('value');
     }
 

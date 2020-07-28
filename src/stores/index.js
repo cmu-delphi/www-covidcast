@@ -26,8 +26,9 @@ export const sensors = readable(sensorList, (set) => {
   }
 });
 
-export const officialSensors = derived([sensors], ([sensors]) => sensors.filter((d) => d.official));
-export const inOfficialSensors = derived([sensors], ([sensors]) => sensors.filter((d) => !d.official));
+export const publicSensors = derived([sensors], ([sensors]) => sensors.filter((d) => d.type == 'public'));
+export const earlySensors = derived([sensors], ([sensors]) => sensors.filter((d) => d.type == 'early'));
+export const lateSensors = derived([sensors], ([sensors]) => sensors.filter((d) => d.type == 'late'));
 
 // The ID to reference each sensor is the indicator name + signal type.
 // This map is used to find the information for each sensor.

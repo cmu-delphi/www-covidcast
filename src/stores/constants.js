@@ -120,7 +120,13 @@ export const levels = levelList.map((l) => l.id);
 const levelById = new Map(levelList.map((l) => [l.id, l]));
 
 export function getLevelInfo(level) {
-  return levelById.get(level) || { id: '?', label: 'Invalid level', labelPlural: 'Invalid level' };
+  return (
+    levelById.get(level) || {
+      id: '?',
+      label: 'Invalid level',
+      labelPlural: 'Invalid level',
+    }
+  );
 }
 
 export function withSensorEntryKey(sensorEntry) {
@@ -157,7 +163,7 @@ export const sensorList = [
     format: 'percent',
     signal: 'smoothed_adj_cli',
     levels: ['county', 'msa', 'state'],
-    official: false,
+    type: 'early',
   },
   {
     name: 'Hospital Admissions',
@@ -169,7 +175,7 @@ export const sensorList = [
     format: 'percent',
     signal: 'smoothed_adj_covid19',
     levels: ['county', 'msa', 'state'],
-    official: false,
+    type: 'late',
   },
   {
     name: 'Symptoms (FB)',
@@ -181,7 +187,7 @@ export const sensorList = [
     format: 'percent',
     signal: 'smoothed_cli',
     levels: ['county', 'msa', 'state'],
-    official: false,
+    type: 'early',
   },
   {
     name: 'Symptoms in Community (FB)',
@@ -196,7 +202,7 @@ export const sensorList = [
     format: 'percent',
     signal: 'smoothed_hh_cmnty_cli',
     levels: ['county', 'msa', 'state'],
-    official: false,
+    type: 'early',
   },
   {
     name: 'Away from Home 6hr+ (SG)',
@@ -208,7 +214,7 @@ export const sensorList = [
     format: 'raw',
     signal: 'full_time_work_prop',
     levels: ['county', 'state'],
-    official: false,
+    type: 'public',
   },
   {
     name: 'Away from Home 3-6hr (SG)',
@@ -220,7 +226,7 @@ export const sensorList = [
     format: 'raw',
     signal: 'part_time_work_prop',
     levels: ['county', 'state'],
-    official: false,
+    type: 'public',
   },
   {
     name: 'Search Trends (Google)',
@@ -232,7 +238,7 @@ export const sensorList = [
     format: 'raw',
     signal: 'smoothed_search',
     levels: ['msa', 'state'],
-    official: false,
+    type: 'public',
   },
   {
     name: 'Combined',
@@ -244,7 +250,7 @@ export const sensorList = [
     format: 'raw',
     signal: 'nmf_day_doc_fbc_fbs_ght',
     levels: ['county', 'msa', 'state'],
-    official: false,
+    type: 'early',
   },
   {
     name: 'Cases',
@@ -257,7 +263,7 @@ export const sensorList = [
     format: 'raw',
     signal: 'confirmed_7dav_incidence_num',
     levels: ['msa', 'county', 'state'],
-    official: true,
+    type: 'late',
   },
   {
     name: 'Cases per 100,000 People',
@@ -270,7 +276,7 @@ export const sensorList = [
     format: 'raw',
     signal: 'confirmed_7dav_incidence_prop',
     levels: ['msa', 'county', 'state'],
-    official: true,
+    type: 'late',
   },
   {
     name: 'Deaths',
@@ -283,7 +289,7 @@ export const sensorList = [
     format: 'raw',
     signal: 'deaths_7dav_incidence_num',
     levels: ['msa', 'county', 'state'],
-    official: true,
+    type: 'late',
   },
   {
     name: 'Deaths per 100,000 People',
@@ -296,7 +302,7 @@ export const sensorList = [
     format: 'raw',
     signal: 'deaths_7dav_incidence_prop',
     levels: ['msa', 'county', 'state'],
-    official: true,
+    type: 'late',
   },
 ].map(withSensorEntryKey);
 

@@ -425,9 +425,9 @@
               signalType.set('direction');
             }
           }}
-          disabled={$currentSensorEntry.official}>
+          disabled={$currentSensorEntry.type === 'late' && $currentSensorEntry.id !== 'hospital-admissions'}>
           7-day Trend
-          {#if $currentSensorEntry.official}
+          {#if $currentSensorEntry.type === 'late' && $currentSensorEntry.id !== 'hospital-admissions'}
             <span class="disabled-tooltip">Currently unavailable</span>
           {/if}
         </button>
