@@ -189,3 +189,7 @@ export function transparent(colors, opacity) {
     return rgba.toString();
   });
 }
+
+export function pairAdjacent(arr) {
+  return new Array(arr.length - 1).fill(0).map((x, i) => [arr[i], arr[i + 1]]);
+}

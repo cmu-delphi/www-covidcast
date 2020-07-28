@@ -77,4 +77,9 @@ export const ENCODING_SPIKE_THEME = {
     msa: 0.2,
     state: 0.4,
   },
+  /*
+    Spikes are drawn as shapes in a projeciton space.
+    To draw them in a pixel space (i.e., legend), we multiply a constant to their sizes.
+  */
+  baseSize: 40,
 };

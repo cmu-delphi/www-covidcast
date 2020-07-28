@@ -14,16 +14,16 @@
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
   import { isCountSignal } from '../data/signals';
-  import { transparent } from '../util';
+  import { transparent, pairAdjacent } from '../util';
 
-  let high;
-  let spikeBase = 40,
+  let spikeBase = ENCODING_SPIKE_THEME.baseSize,
     size = 0,
     maxHeight,
     heightScale;
 
-  $: logColorArr = [{ label: '0', from: DIRECTION_THEME.countMin, to: DIRECTION_THEME.countMin }];
-  $: linColorArr = [];
+  let high = '';
+  let logLabels = [['0', '0']];
+  let linearLabels = [];
 
   currentSensor.subscribe((s) => ($stats ? update(s, $stats, $currentLevel) : ''));
   stats.subscribe((s) => (s ? update($currentSensor, s, $currentLevel) : ''));
@@ -45,20 +45,18 @@
 
       high = getSigfigs(valueMinMax[1].toFixed(2), 3);
 
-      logColorArr = [{ label: '0', from: DIRECTION_THEME.countMin, to: DIRECTION_THEME.countMin }];
+      logLabels = ['0'];
       let max = Math.log(valueMinMax[1]) / Math.log(10);
       let min = Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10);
       let arr = logspace(min, max, 7);
 
-      for (let i = 0; i < arr.length - 1; i++) {
+      for (let i = 0; i < arr.length; i++) {
         arr[i] = parseFloat(arr[i]).toFixed(2);
 
-        logColorArr.push({
-          label: arr[i],
-          from: $colorScale(arr[i]),
-          to: $colorScale(arr[i + 1]),
-        });
+        logLabels.push(arr[i]);
       }
+
+      logLabels = pairAdjacent(logLabels);
 
       size = ENCODING_SPIKE_THEME.size[$currentLevel] * spikeBase;
       maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel] * spikeBase;
@@ -76,15 +74,12 @@
       }
 
       let arr = splitDomain(valueMinMax[0], valueMinMax[1], 7);
-      linColorArr = [];
-      for (let i = 0; i < arr.length - 1; i++) {
+      linearLabels = [];
+      for (let i = 0; i < arr.length; i++) {
         arr[i] = parseFloat(arr[i]).toFixed(2);
-        linColorArr.push({
-          label: arr[i],
-          from: $colorScale(arr[i]),
-          to: $colorScale(arr[i + 1]),
-        });
+        linearLabels.push(arr[i]);
       }
+      linearLabels = pairAdjacent(linearLabels);
     }
   }
 
@@ -445,10 +440,12 @@
     {:else if isCountSignal($currentSensor)}
       <div class="legend-grouping">
         <ul class="legend-labels">
-          {#each logColorArr as { label, from, to }, j}
+          {#each logLabels as [label1, label2]}
             <li class="colored">
-              <span class="colored" style="background: linear-gradient(to right, {from}, {to})" />
-              {getSigfigs(label, 3)}
+              <span
+                class="colored"
+                style="background: linear-gradient(to right, {$colorScale(+label1)}, {$colorScale(+label2)})" />
+              {getSigfigs(label1, 3)}
             </li>
           {/each}
           <li class="ends">
@@ -460,10 +457,12 @@
     {:else}
       <div class="legend-grouping">
         <ul class="legend-labels">
-          {#each linColorArr as { label, from, to }, j}
+          {#each linearLabels as [label1, label2]}
             <li class="colored">
-              <span class="colored" style="background: linear-gradient(to right, {from}, {to})" />
-              {getSigfigs(label, 3)}
+              <span
+                class="colored"
+                style="background: linear-gradient(to right, {$colorScale(+label1)}, {$colorScale(+label2)})" />
+              {getSigfigs(label1, 3)}
             </li>
           {/each}
           <li class="ends">
@@ -476,7 +475,7 @@
   {:else if $encoding === 'bubble'}
     <div class="bubble-legend">
       <ul>
-        {#each [...logColorArr] as { label, from, to }, j}
+        {#each logLabels as [label], j}
           {#if +label > 0}
             <li class="colored">
               <div
@@ -501,7 +500,7 @@
   {:else if $encoding === 'spike'}
     <div class="spike-legend">
       <ul>
-        {#each [...logColorArr] as { label }, j}
+        {#each logLabels as [label]}
           {#if +label > 0}
             <li>
               <svg width={size * 2 + 10} height={getSpikeHeight(+label) + 10}>
