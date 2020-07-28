@@ -1,6 +1,6 @@
 import { writable, readable, derived, get } from 'svelte/store';
 import { injectIDs } from '../util';
-import { LogScale } from '../components/scale.js';
+import { LogScale, SqrtScale } from '../components/scale.js';
 import * as d3 from 'd3';
 import { sensorList, withSensorEntryKey } from './constants';
 export {
@@ -157,4 +157,4 @@ export const timeRangeOnSlider = writable({
 export const colorScale = writable(d3.scaleSequentialLog());
 export const colorStops = writable([]);
 export const bubbleRadiusScale = writable(LogScale());
-export const spikeHeightScale = writable(d3.scaleSqrt());
+export const spikeHeightScale = writable(SqrtScale());

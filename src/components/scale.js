@@ -56,7 +56,12 @@ export function LogScale() {
   };
 
   scale.coef = function () {
-    return [a, b, base];
+    if (!arguments.length) return [a, b];
+    a = arguments[0];
+    b = arguments[1];
+    base = arguments[2];
+
+    return scale;
   };
 
   scale.expr = function () {
@@ -64,6 +69,9 @@ export function LogScale() {
     return ['+', ['*', a, ['/', ['log10', ['get', 'value']], baseLog]], b];
   };
 
+  scale.clone = function () {
+    return LogScale().coef(scale.coef());
+  };
   return scale;
 }
 
@@ -103,11 +111,19 @@ export function SqrtScale() {
   };
 
   scale.coef = function () {
-    return [a, b];
+    if (!arguments.length) return [a, b];
+    a = arguments[0];
+    b = arguments[1];
+
+    return scale;
   };
 
   scale.expr = function () {
     return ['+', ['*', a, ['sqrt', ['get', 'value']]], b];
+  };
+
+  scale.clone = function () {
+    return SqrtScale().coef(scale.coef());
   };
 
   return scale;
@@ -145,11 +161,19 @@ export function LinearScale() {
   };
 
   scale.coef = function () {
-    return [a, b];
+    if (!arguments.length) return [a, b];
+    a = arguments[0];
+    b = arguments[1];
+
+    return scale;
   };
 
   scale.expr = function () {
     return ['+', ['*', a, ['get', 'value']], b];
+  };
+
+  scale.clone = function () {
+    return LinearScale().coef(scale.coef());
   };
 
   return scale;

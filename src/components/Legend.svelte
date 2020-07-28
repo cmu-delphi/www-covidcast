@@ -9,9 +9,9 @@
     encoding,
     colorScale,
     bubbleRadiusScale,
+    spikeHeightScale,
     currentSensorEntry,
   } from '../stores';
-  import * as d3 from 'd3';
   import logspace from 'compute-logspace';
   import { isCountSignal } from '../data/signals';
   import { transparent, pairAdjacent } from '../util';
@@ -33,6 +33,7 @@
   encoding.subscribe(() => ($stats ? update($currentSensor, $stats, $currentLevel) : ''));
   colorScale.subscribe(() => ($stats ? update($currentSensor, $stats, $currentLevel) : ''));
   bubbleRadiusScale.subscribe(() => ($stats ? update($currentSensor, $stats, $currentLevel) : ''));
+  spikeHeightScale.subscribe(() => ($stats ? update($currentSensor, $stats, $currentLevel) : ''));
 
   function update(sens, stats, level) {
     // for signalType === 'direction', the legend is hardcoded.
@@ -41,15 +42,18 @@
     let sts;
     let valueMinMax;
 
+    size = ENCODING_SPIKE_THEME.size[$currentLevel] * spikeBase;
+    maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel] * spikeBase;
+
     if (isCountSignal($currentSensor)) {
       sts = stats.get(sens + '_' + level);
-      valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
+      valueMinMax = [Math.max(0.14, sts.mean - 3 * sts.std), sts.mean + 3 * sts.std];
 
       high = getSigfigs(valueMinMax[1].toFixed(2), 3);
 
       labels = ['0'];
+      let min = Math.log(valueMinMax[0]) / Math.log(10);
       let max = Math.log(valueMinMax[1]) / Math.log(10);
-      let min = Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10);
       let arr = logspace(min, max, 7);
 
       for (let i = 0; i < arr.length; i++) {
@@ -59,9 +63,7 @@
 
       labels = pairAdjacent(labels);
 
-      size = ENCODING_SPIKE_THEME.size[$currentLevel] * spikeBase;
-      maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel] * spikeBase;
-      heightScale = d3.scaleSqrt([0, maxHeight]).domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]]);
+      heightScale = $spikeHeightScale.clone().range([0, maxHeight]).domain(valueMinMax);
     } else {
       sts = stats.get(sens);
       valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
@@ -84,6 +86,7 @@
         labels.push(arr[i]);
       }
       labels = pairAdjacent(labels);
+      heightScale = $spikeHeightScale.clone().range([0, maxHeight]).domain(valueMinMax);
     }
   }
 
@@ -101,15 +104,10 @@
     return splits;
   }
 
-  function getSpikePath(value) {
+  $: getSpikePath = (value) => {
     if (!heightScale) return '';
     return `M 0 ${heightScale(+value)} L ${size} 0 L ${size * 2} ${heightScale(+value)}`;
-  }
-
-  function getSpikeHeight(value) {
-    if (!heightScale) return 0;
-    return heightScale(+value);
-  }
+  };
 </script>
 
 <style>
@@ -359,6 +357,8 @@
 
   .spike-legend svg {
     display: block;
+    max-width: 200px;
+    max-height: 200px;
   }
 
   .bubble {
@@ -366,6 +366,8 @@
     border-radius: 200px;
     display: inline-block;
     margin-right: 0.3rem;
+    max-width: 200px;
+    max-height: 200px;
   }
 
   .spike {
@@ -495,7 +497,7 @@
         {#each labels as [label]}
           {#if +label > 0}
             <li>
-              <svg width={size * 2 + spikePadding * 2} height={getSpikeHeight(+label) + spikePadding * 2}>
+              <svg width={size * 2 + spikePadding * 2} height={heightScale(+label) + spikePadding * 2}>
                 <g style="transform:translate({spikePadding}px, {spikePadding}px)">
                   <path
                     d={getSpikePath(+label)}
@@ -510,7 +512,7 @@
         {/each}
         {#if high}
           <li>
-            <svg width={size * 2 + spikePadding * 2} height={getSpikeHeight(+high) + spikePadding * 2}>
+            <svg width={size * 2 + spikePadding * 2} height={heightScale(+high) + spikePadding * 2}>
               <g style="transform:translate({spikePadding}px, {spikePadding}px)">
                 <path
                   d={getSpikePath(+high)}
