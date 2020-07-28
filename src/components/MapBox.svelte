@@ -547,7 +547,11 @@
       hideAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
 
       // show bubble layers
-      showAll([BUBBLE_LAYER, highlight(BUBBLE_LAYER)]);
+      if ($signalType === 'direction') {
+        hideAll([BUBBLE_LAYER, highlight(BUBBLE_LAYER)]);
+      } else {
+        showAll([BUBBLE_LAYER, highlight(BUBBLE_LAYER)]);
+      }
 
       // color scale (color + stroke color)
       let flatStops = stops.flat();
@@ -584,7 +588,11 @@
       map.setPaintProperty($currentLevel, 'fill-color', MAP_THEME.countyFill);
       hideAll([BUBBLE_LAYER, highlight(BUBBLE_LAYER)]);
 
-      showAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
+      if ($signalType === 'direction') {
+        hideAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
+      } else {
+        showAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
+      }
 
       const valueMax = valueMinMax[1],
         maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel],

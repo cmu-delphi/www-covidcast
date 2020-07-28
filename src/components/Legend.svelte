@@ -410,28 +410,28 @@
       </div>
     </div>
   </div>
-  {#if $encoding === 'color'}
-    {#if $signalType === 'direction'}
-      <div class="trend-legend-grouping">
-        <ul class="legend-labels">
-          <li>
-            <div class="color-block" style="background-color: {DIRECTION_THEME.increasing}" />
-            {@html DIRECTION_THEME.increasingIcon}
-            Increasing
-          </li>
-          <li>
-            <div class="color-block" style="background-color: {DIRECTION_THEME.steady}" />
-            {@html DIRECTION_THEME.steadyIcon}
-            Steady
-          </li>
-          <li>
-            <div class="color-block" style="background-color: {DIRECTION_THEME.decreasing}" />
-            {@html DIRECTION_THEME.decreasingIcon}
-            Decreasing
-          </li>
-        </ul>
-      </div>
-    {:else if isCountSignal($currentSensor)}
+  {#if $signalType === 'direction'}
+    <div class="trend-legend-grouping">
+      <ul class="legend-labels">
+        <li>
+          <div class="color-block" style="background-color: {DIRECTION_THEME.increasing}" />
+          {@html DIRECTION_THEME.increasingIcon}
+          Increasing
+        </li>
+        <li>
+          <div class="color-block" style="background-color: {DIRECTION_THEME.steady}" />
+          {@html DIRECTION_THEME.steadyIcon}
+          Steady
+        </li>
+        <li>
+          <div class="color-block" style="background-color: {DIRECTION_THEME.decreasing}" />
+          {@html DIRECTION_THEME.decreasingIcon}
+          Decreasing
+        </li>
+      </ul>
+    </div>
+  {:else if $encoding === 'color'}
+    {#if isCountSignal($currentSensor)}
       <div class="legend-grouping">
         <ul class="legend-labels">
           {#each labels as [label1, label2]}
