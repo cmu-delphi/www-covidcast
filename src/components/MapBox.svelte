@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import mapboxgl from 'mapbox-gl';
   import 'mapbox-gl/dist/mapbox-gl.css';
-  import { getTextColorBasedOnBackground, LogScale, zip, transparent } from '../util.js';
+  import { getTextColorBasedOnBackground, LogScale, SqrtScale, LinearScale, zip, transparent } from '../util.js';
   import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../theme.js';
   import Options from './Options.svelte';
   import Toggle from './Toggle.svelte';
@@ -569,18 +569,31 @@
       const minRadius = ENCODING_BUBBLE_THEME.minRadius[$currentLevel],
         maxRadius = ENCODING_BUBBLE_THEME.maxRadius[$currentLevel];
 
-      currentRadiusScale = LogScale()
-        .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]])
-        .range([minRadius, maxRadius])
-        .base(ENCODING_BUBBLE_THEME.base);
+      let radiusExpression;
+
+      if (ENCODING_BUBBLE_THEME.radiusScale.type === 'sqrt') {
+        currentRadiusScale = SqrtScale()
+          .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]])
+          .range([minRadius, maxRadius]);
+        const [a, b] = currentRadiusScale.coef();
+        radiusExpression = ['+', ['*', a, ['sqrt', ['get', 'value']]], b];
+      } else if (ENCODING_BUBBLE_THEME.radiusScale.type === 'linear') {
+        currentRadiusScale = LinearScale()
+          .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]])
+          .range([minRadius, maxRadius]);
+        const [a, b] = currentRadiusScale.coef();
+        radiusExpression = ['+', ['*', a, ['get', 'value']], b];
+      } else {
+        currentRadiusScale = LogScale()
+          .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]])
+          .range([minRadius, maxRadius])
+          .base(ENCODING_BUBBLE_THEME.base);
+        const [a, b, base] = currentRadiusScale.coef();
+        const baseLog = Math.log10(base);
+        radiusExpression = ['+', ['*', a, ['/', ['log10', ['get', 'value']], baseLog]], b];
+      }
 
       bubbleRadiusScale.set(currentRadiusScale);
-
-      // radius scale
-      const [a, b, base] = currentRadiusScale.coef();
-      const baseLog = Math.log10(base);
-
-      let radiusExpression = ['+', ['*', a, ['/', ['log10', ['get', 'value']], baseLog]], b];
 
       map.setPaintProperty(BUBBLE_LAYER, 'circle-radius', radiusExpression);
       map.setPaintProperty(highlight(BUBBLE_LAYER), 'circle-radius', radiusExpression);

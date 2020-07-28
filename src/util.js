@@ -16,40 +16,11 @@ export const injectIDs = (level, data) => {
     d.properties.level = level;
     if (level === 'county') {
       d.id = d.properties.id = d.properties.GEO_ID.slice(-5);
-      /*
-        lst.push({
-          'display_name': d.properties.NAME + " County, " + dict[d.properties.STATE],
-          'name': d.properties.NAME,
-          'id': d.id,
-          'property_id': d.properties.id,
-          'level': level
-        })
-      */
     } else if (level === 'msa') {
       d.id = d.properties.id = d.properties.cbsafp;
-      /*
-        lst.push({
-          'display_name': d.properties.NAME,
-          'name': d.properties.NAME,
-          'id': d.id,
-          'property_id': d.properties.id,
-          'level': level
-        })
-      */
     } else if (level === 'state') {
       d.properties.id = d.properties.POSTAL;
       d.id = d.properties.STATE;
-      /*
-        dict[d.id] = d.properties.POSTAL
-
-        lst.push({
-          'display_name': d.properties.NAME,
-          'name': d.properties.NAME,
-          'id': d.id,
-          'property_id': d.properties.id,
-          'level': level
-        })
-      */
     } else if (level === 'county-centers') {
       d.id = d.properties.GEO_ID.slice(-5);
     } else if (level == 'msa-centers') {
@@ -57,14 +28,7 @@ export const injectIDs = (level, data) => {
     } else if (level == 'state-centers') {
       d.id = d.properties.STATE;
     }
-    //console.log(d)
-    //lst.push({
-    //  'name': d.properties.NAME,
-    //  'id': d.id,
-    //  'property_id': d.properties.id
-    //})
   });
-  //console.log(lst);
   return data;
 };
 
@@ -125,6 +89,86 @@ export function LogScale() {
 
   scale.coef = function () {
     return [a, b, base];
+  };
+
+  return scale;
+}
+
+// d3-like Squre Root Scale
+export function SqrtScale() {
+  let a = 1,
+    b = 0,
+    domain = [1, 1],
+    range = [0, 0];
+
+  function sqrt(x) {
+    return Math.sqrt(x);
+  }
+
+  function fit() {
+    a = (range[1] - range[0]) / (sqrt(domain[1]) - sqrt(domain[0]));
+    b = range[0] - a * sqrt(domain[0]);
+  }
+
+  // y = a log (x) + b
+  function scale(x) {
+    return a * sqrt(x) + b;
+  }
+
+  scale.domain = function () {
+    if (!arguments.length) return domain;
+    domain = arguments[0];
+    fit();
+    return scale;
+  };
+
+  scale.range = function () {
+    if (!arguments.length) return range;
+    range = arguments[0];
+    fit();
+    return scale;
+  };
+
+  scale.coef = function () {
+    return [a, b];
+  };
+
+  return scale;
+}
+
+// d3-like Linear Scale
+export function LinearScale() {
+  let a = 1,
+    b = 0,
+    domain = [1, 1],
+    range = [0, 0];
+
+  function fit() {
+    a = (range[1] - range[0]) / (domain[1] - domain[0]);
+    b = range[0] - a * domain[0];
+  }
+
+  // y = a log (x) + b
+  function scale(x) {
+    return a * x + b;
+  }
+
+  scale.domain = function () {
+    if (!arguments.length) return domain;
+    domain = arguments[0];
+    fit();
+    return scale;
+  };
+
+  scale.range = function () {
+    if (!arguments.length) return range;
+    range = arguments[0];
+    fit();
+    return scale;
+  };
+
+  scale.coef = function () {
+    return [a, b];
   };
 
   return scale;

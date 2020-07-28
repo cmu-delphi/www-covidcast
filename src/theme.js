@@ -48,9 +48,12 @@ export const ENCODING_BUBBLE_THEME = {
   maxRadius: {
     county: 6,
     msa: 10,
-    state: 25,
+    state: 20,
   },
-  base: 2,
+  radiusScale: {
+    type: 'sqrt', // one of ['sqrt', 'log', 'linear']
+    base: 2, // if type is log, base is needed
+  },
 };
 
 export const ENCODING_SPIKE_THEME = {
