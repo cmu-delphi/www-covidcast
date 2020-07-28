@@ -21,6 +21,8 @@
     maxHeight,
     heightScale;
 
+  let spikePadding = 5;
+
   let high = '';
   let logLabels = [['0', '0']];
   let linearLabels = [];
@@ -52,7 +54,6 @@
 
       for (let i = 0; i < arr.length; i++) {
         arr[i] = parseFloat(arr[i]).toFixed(2);
-
         logLabels.push(arr[i]);
       }
 
@@ -105,18 +106,6 @@
   function getSpikeHeight(value) {
     if (!heightScale) return 0;
     return heightScale(+value);
-  }
-
-  function getSpikeFill(value) {
-    let spikeFill = d3.rgb($colorScale(value));
-    spikeFill.opacity = ENCODING_SPIKE_THEME.fillOpacity;
-    return spikeFill.toString();
-  }
-
-  function getSpikeStroke(value) {
-    let spikeStroke = d3.rgb($colorScale(value));
-    spikeStroke.opacity = ENCODING_SPIKE_THEME.strokeOpacity;
-    return spikeStroke.toString();
   }
 </script>
 
@@ -503,13 +492,13 @@
         {#each logLabels as [label]}
           {#if +label > 0}
             <li>
-              <svg width={size * 2 + 10} height={getSpikeHeight(+label) + 10}>
-                <g style="transform:translate(5px, 5px)">
+              <svg width={size * 2 + spikePadding * 2} height={getSpikeHeight(+label) + spikePadding * 2}>
+                <g style="transform:translate({spikePadding}px, {spikePadding}px)">
                   <path
                     d={getSpikePath(+label)}
                     class="spike"
-                    fill={getSpikeFill(+label)}
-                    stroke={getSpikeStroke(+label)} />
+                    fill={transparent($colorScale(+label), ENCODING_SPIKE_THEME.fillOpacity)}
+                    stroke={transparent($colorScale(+label), ENCODING_SPIKE_THEME.strokeOpacity)} />
                 </g>
               </svg>
               <div>{getSigfigs(label, 3)}</div>
@@ -518,9 +507,14 @@
         {/each}
         {#if high}
           <li>
-            <svg width={size * 2 + 10} height={getSpikeHeight(+high) + 10}>
-              <g style="transform:translate(5px, 5px)">
-                <path d={getSpikePath(+high)} class="spike" fill={getSpikeFill(+high)} stroke={getSpikeStroke(+high)} />
+            <svg width={size * 2 + spikePadding * 2} height={getSpikeHeight(+high) + spikePadding * 2}>
+              <g style="transform:translate({spikePadding}px, {spikePadding}px)">
+                <path
+                  d={getSpikePath(+high)}
+                  class="spike"
+                  fill={transparent($colorScale(+high), ENCODING_SPIKE_THEME.fillOpacity)}
+                  stroke={transparent($colorScale(+high), ENCODING_SPIKE_THEME.strokeOpacity)} />
+                />
               </g>
             </svg>
             <div>{getSigfigs(high, 3)}+</div>
