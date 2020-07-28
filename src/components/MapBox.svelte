@@ -549,7 +549,6 @@
       let flatStops = stops.flat();
       let colorExpression = ['interpolate', ['linear'], ['get', 'value']].concat(flatStops);
 
-      console.log(colorExpression);
       map.getSource(BUBBLE_LAYER).setData(map.getSource(center($currentLevel))._data);
 
       map.setPaintProperty(BUBBLE_LAYER, 'circle-stroke-color', colorExpression);
