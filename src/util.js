@@ -11,7 +11,6 @@ export const calculateValFromRectified = (rectified) => {
 };
 
 export const injectIDs = (level, data) => {
-  // var lst = [];
   data.features.forEach((d) => {
     d.properties.level = level;
     if (level === 'county') {

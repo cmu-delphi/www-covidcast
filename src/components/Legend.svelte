@@ -387,7 +387,7 @@
               signalType.set('value');
             }
           }}>
-          {$currentSensor.match(/num/) ? 'Count' : 'Intensity'}
+          {isCountSignal($currentSensor) ? 'Count' : 'Intensity'}
         </button>
         <button
           aria-pressed={$signalType === 'direction' ? 'true' : 'false'}
@@ -442,7 +442,7 @@
           {/each}
           <li class="ends">
             <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
-            {high ? high + '+' : ''}
+            {high ? high + unit + '+' : ''}
           </li>
         </ul>
       </div>
@@ -459,7 +459,7 @@
           {/each}
           <li class="ends">
             <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
-            {high ? high + '+' : ''}
+            {high ? high + unit + '+' : ''}
           </li>
         </ul>
       </div>
@@ -519,7 +519,7 @@
                   stroke={transparent($colorScale(+high), ENCODING_SPIKE_THEME.strokeOpacity)} />
               </g>
             </svg>
-            <div>{getSigfigs(high, 3)}+</div>
+            <div>{high ? high + unit + '+' : ''}</div>
           </li>
         {/if}
       </ul>

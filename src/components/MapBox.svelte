@@ -353,7 +353,7 @@
       valueMinMax = [Math.max(0.14, thisStats.mean - 3 * thisStats.std), thisStats.mean + 3 * thisStats.std];
     } else {
       thisStats = $stats.get($currentSensor);
-      valueMinMax = [thisStats.mean - 3 * thisStats.std, thisStats.mean + 3 * thisStats.std];
+      valueMinMax = [Math.max(0, thisStats.mean - 3 * thisStats.std), thisStats.mean + 3 * thisStats.std];
     }
 
     currentRange.set($signalType === 'value' ? valueMinMax : [-1, 1]);
@@ -451,29 +451,18 @@
     let stops, stopsMega, currentRadiusScale;
 
     if ($signalType === 'value') {
-      valueMinMax[0] = Math.max(0, valueMinMax[0]);
-      const center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2,
-        firstHalfCenter = valueMinMax[0] + (center - valueMinMax[0]) / 2,
-        secondHalfCenter = center + (valueMinMax[1] - center) / 2;
-
-      const colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
-      const colorScaleLog = d3
-        .scaleSequentialLog(d3.interpolateYlOrRd)
-        .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]]);
-
-      // domainStops7 is used to determine the colors of regions for count signals.
-      const domainStops7 = logspace(
-        Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10),
-        Math.log(valueMinMax[1]) / Math.log(10),
-        7,
-      );
-      // domainStops5 is used for other cases (prop signals)
-      const domainStops5 = [valueMinMax[0], firstHalfCenter, center, secondHalfCenter, valueMinMax[1]];
-
-      const logColors7 = domainStops7.map((c) => colorScaleLog(c).toString());
-      const linearColors5 = domainStops5.map((c) => colorScaleLinear(c).toString());
-
       if (isCountSignal($currentSensor)) {
+        const colorScaleLog = d3.scaleSequentialLog(d3.interpolateYlOrRd).domain(valueMinMax);
+
+        // domainStops7 is used to determine the colors of regions for count signals.
+        const domainStops7 = logspace(
+          Math.log(valueMinMax[0]) / Math.log(10),
+          Math.log(valueMinMax[1]) / Math.log(10),
+          7,
+        );
+
+        const logColors7 = domainStops7.map((c) => colorScaleLog(c).toString());
+
         // use log scale
         stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops7, logColors7));
         stopsMega = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops7, logColors7));
@@ -481,20 +470,33 @@
         // store the color scale (used for tooltips and legend)
         colorScale.set(colorScaleLog);
         colorStops.set(stops);
-      } else if (isPropSignal($currentSensor)) {
-        stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, linearColors5));
-        stopsMega = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, transparent(linearColors5, 0.5)));
-
-        // store the color scale (used for tooltips and legend)
-        colorScale.set(colorScaleLinear);
-        colorStops.set(stops);
       } else {
-        stops = zip(domainStops5, linearColors5);
-        stopsMega = zip(domainStops5, transparent(linearColors5, 0.5));
+        const center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2,
+          firstHalfCenter = valueMinMax[0] + (center - valueMinMax[0]) / 2,
+          secondHalfCenter = center + (valueMinMax[1] - center) / 2;
 
-        // store the color scale (used for tooltips and legend)
-        colorScale.set(colorScaleLinear);
-        colorStops.set(stops);
+        const colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain(valueMinMax);
+
+        // domainStops5 is used for other cases (prop signals)
+        const domainStops5 = [valueMinMax[0], firstHalfCenter, center, secondHalfCenter, valueMinMax[1]];
+
+        const linearColors5 = domainStops5.map((c) => colorScaleLinear(c).toString());
+
+        if (isPropSignal($currentSensor)) {
+          stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, linearColors5));
+          stopsMega = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, transparent(linearColors5, 0.5)));
+
+          // store the color scale (used for tooltips and legend)
+          colorScale.set(colorScaleLinear);
+          colorStops.set(stops);
+        } else {
+          stops = zip(domainStops5, linearColors5);
+          stopsMega = zip(domainStops5, transparent(linearColors5, 0.5));
+
+          // store the color scale (used for tooltips and legend)
+          colorScale.set(colorScaleLinear);
+          colorStops.set(stops);
+        }
       }
     } else {
       // signalType is 'direction'
@@ -572,9 +574,7 @@
 
       const radiusScaleTheme = ENCODING_BUBBLE_THEME.radiusScale[getType($currentSensor)];
 
-      currentRadiusScale = parseScaleSpec(radiusScaleTheme)
-        .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]])
-        .range([minRadius, maxRadius]);
+      currentRadiusScale = parseScaleSpec(radiusScaleTheme).domain(valueMinMax).range([minRadius, maxRadius]);
 
       const radiusExpression = currentRadiusScale.expr();
 
