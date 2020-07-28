@@ -6,7 +6,6 @@
     sensorMap,
     times,
     signalType,
-    encoding,
     currentSensor,
     currentDate,
     currentLevel,
@@ -67,10 +66,10 @@
       updateTimeSliceCache(s, l, $currentRegion);
     }
     // reset encoding
-    if (!s.match(/num/)) {
+    /*if (!s.match(/num/)) {
       // eslint-disable-next-line no-unused-vars
       $encoding = 'color';
-    }
+    }*/
     if (date !== $currentDate) {
       dateChangedWhenSensorChanged = true;
       currentDate.set(date);

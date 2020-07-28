@@ -48,9 +48,19 @@ export const ENCODING_BUBBLE_THEME = {
   maxRadius: {
     county: 6,
     msa: 10,
-    state: 25,
+    state: 20,
   },
-  base: 2,
+  radiusScale: {
+    count: {
+      type: 'sqrt', // one of ['sqrt', 'log', 'linear']
+    },
+    prop: {
+      type: 'linear',
+    },
+    other: {
+      type: 'linear',
+    },
+  },
 };
 
 export const ENCODING_SPIKE_THEME = {
@@ -71,5 +81,21 @@ export const ENCODING_SPIKE_THEME = {
     county: 0.1,
     msa: 0.2,
     state: 0.4,
+  },
+  /*
+    Spikes are drawn as shapes in a projeciton space.
+    To draw them in a pixel space (i.e., legend), we multiply a constant to their sizes.
+  */
+  baseSize: 40,
+  heightScale: {
+    count: {
+      type: 'sqrt',
+    },
+    prop: {
+      type: 'linear',
+    },
+    other: {
+      type: 'linear',
+    },
   },
 };
