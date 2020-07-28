@@ -82,4 +82,9 @@ export const ENCODING_SPIKE_THEME = {
     To draw them in a pixel space (i.e., legend), we multiply a constant to their sizes.
   */
   baseSize: 40,
+  heightScale: {
+    count: {
+      type: 'sqrt',
+    },
+  },
 };

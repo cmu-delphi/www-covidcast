@@ -2,8 +2,9 @@
   import { onMount } from 'svelte';
   import mapboxgl from 'mapbox-gl';
   import 'mapbox-gl/dist/mapbox-gl.css';
-  import { getTextColorBasedOnBackground, LogScale, SqrtScale, LinearScale, zip, transparent } from '../util.js';
+  import { getTextColorBasedOnBackground, zip, transparent } from '../util.js';
   import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../theme.js';
+  import { parseScaleSpec } from './scale.js';
   import Options from './Options.svelte';
   import Toggle from './Toggle.svelte';
   import Legend from './Legend.svelte';
@@ -571,32 +572,11 @@
 
       const radiusScaleTheme = ENCODING_BUBBLE_THEME.radiusScale[getType($currentSensor)];
 
-      let radiusExpression;
+      currentRadiusScale = parseScaleSpec(radiusScaleTheme)
+        .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]])
+        .range([minRadius, maxRadius]);
 
-      if (radiusScaleTheme.type === 'sqrt') {
-        currentRadiusScale = SqrtScale()
-          .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]])
-          .range([minRadius, maxRadius]);
-
-        const [a, b] = currentRadiusScale.coef();
-        radiusExpression = ['+', ['*', a, ['sqrt', ['get', 'value']]], b];
-      } else if (radiusScaleTheme.type === 'linear') {
-        currentRadiusScale = LinearScale()
-          .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]])
-          .range([minRadius, maxRadius]);
-
-        const [a, b] = currentRadiusScale.coef();
-        radiusExpression = ['+', ['*', a, ['get', 'value']], b];
-      } else {
-        currentRadiusScale = LogScale()
-          .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]])
-          .range([minRadius, maxRadius])
-          .base(radiusScaleTheme.base);
-
-        const [a, b, base] = currentRadiusScale.coef(),
-          baseLog = Math.log10(base);
-        radiusExpression = ['+', ['*', a, ['/', ['log10', ['get', 'value']], baseLog]], b];
-      }
+      const radiusExpression = currentRadiusScale.expr();
 
       bubbleRadiusScale.set(currentRadiusScale);
 
