@@ -69,6 +69,7 @@
         high = getSigfigs(valueMinMax[1].toFixed(2), 3);
         valueMinMax[0] = Math.max(0, valueMinMax[0]);
       } else {
+        // otherwise, it's 'percent'.
         high = getSigfigs(Math.min(100, valueMinMax[1]).toFixed(2), 3) + '%';
         valueMinMax[0] = Math.max(0, valueMinMax[0]);
         valueMinMax[1] = Math.min(100, valueMinMax[1]);
@@ -514,7 +515,6 @@
                   class="spike"
                   fill={transparent($colorScale(+high), ENCODING_SPIKE_THEME.fillOpacity)}
                   stroke={transparent($colorScale(+high), ENCODING_SPIKE_THEME.strokeOpacity)} />
-                />
               </g>
             </svg>
             <div>{getSigfigs(high, 3)}+</div>
