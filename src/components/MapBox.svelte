@@ -556,10 +556,7 @@
 
       // color scale (color + stroke color)
       let flatStops = stops.flat();
-      flatStops.shift(); // remove the first element which has a value of 0 since the "step" expression of MapBox can omit the first range.
-
-      flatStops[0] = 'transparent';
-      let colorExpression = ['step', ['get', 'value']].concat(flatStops);
+      let colorExpression = ['interpolate', ['linear'], ['get', 'value']].concat(flatStops);
 
       map.getSource(BUBBLE_LAYER).setData(map.getSource(center($currentLevel))._data);
 
@@ -652,10 +649,7 @@
       };
 
       let flatStops = stops.flat();
-      flatStops.shift(); // remove the first element which has a value of 0 since the "step" expression of mapbox does not require it.
-
-      flatStops[0] = 'transparent';
-      let colorExpression = ['step', ['get', 'value']].concat(flatStops);
+      let colorExpression = ['interpolate', ['linear'], ['get', 'value']].concat(flatStops);
       map.setPaintProperty(SPIKE_LAYER, 'fill-color', colorExpression);
       map.setPaintProperty(outline(SPIKE_LAYER), 'line-color', colorExpression);
       map.setPaintProperty(highlight(SPIKE_LAYER), 'fill-color', colorExpression);
