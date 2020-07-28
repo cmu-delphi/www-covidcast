@@ -43,7 +43,7 @@
   } from '../stores';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
-  import { isCountSignal, isPropSignal, getType } from '../data/signals';
+  import { isCountSignal, getType } from '../data/signals';
 
   export let graphShowStatus, toggleGraphShowStatus;
 
@@ -482,21 +482,12 @@
 
         const linearColors5 = domainStops5.map((c) => colorScaleLinear(c).toString());
 
-        if (isPropSignal($currentSensor)) {
-          stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, linearColors5));
-          stopsMega = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, transparent(linearColors5, 0.5)));
+        stops = zip(domainStops5, linearColors5);
+        stopsMega = zip(domainStops5, transparent(linearColors5, 0.5));
 
-          // store the color scale (used for tooltips and legend)
-          colorScale.set(colorScaleLinear);
-          colorStops.set(stops);
-        } else {
-          stops = zip(domainStops5, linearColors5);
-          stopsMega = zip(domainStops5, transparent(linearColors5, 0.5));
-
-          // store the color scale (used for tooltips and legend)
-          colorScale.set(colorScaleLinear);
-          colorStops.set(stops);
-        }
+        // store the color scale (used for tooltips and legend)
+        colorScale.set(colorScaleLinear);
+        colorStops.set(stops);
       }
     } else {
       // signalType is 'direction'
@@ -558,6 +549,7 @@
       let flatStops = stops.flat();
       let colorExpression = ['interpolate', ['linear'], ['get', 'value']].concat(flatStops);
 
+      console.log(colorExpression);
       map.getSource(BUBBLE_LAYER).setData(map.getSource(center($currentLevel))._data);
 
       map.setPaintProperty(BUBBLE_LAYER, 'circle-stroke-color', colorExpression);
