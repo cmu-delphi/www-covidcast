@@ -53,7 +53,12 @@ export const ENCODING_BUBBLE_THEME = {
   radiusScale: {
     count: {
       type: 'sqrt', // one of ['sqrt', 'log', 'linear']
-      // base: 2, // if type is log, base is needed. Otherwise, ignored.
+    },
+    prop: {
+      type: 'linear',
+    },
+    other: {
+      type: 'linear',
     },
   },
 };
@@ -85,6 +90,12 @@ export const ENCODING_SPIKE_THEME = {
   heightScale: {
     count: {
       type: 'sqrt',
+    },
+    prop: {
+      type: 'linear',
+    },
+    other: {
+      type: 'linear',
     },
   },
 };

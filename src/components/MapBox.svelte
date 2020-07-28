@@ -348,7 +348,7 @@
     let valueMinMax;
 
     // Customize min max values for deaths
-    if ($currentSensor.match(/num/)) {
+    if (isCountSignal($currentSensor)) {
       thisStats = $stats.get($currentSensor + '_' + $currentLevel);
       valueMinMax = [Math.max(0.14, thisStats.mean - 3 * thisStats.std), thisStats.mean + 3 * thisStats.std];
     } else {
@@ -598,9 +598,11 @@
         maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel],
         size = ENCODING_SPIKE_THEME.size[$currentLevel];
 
-      const scale = d3.scaleSqrt().range([0, maxHeight]).domain([0, valueMax]);
+      const heightScaleTheme = ENCODING_SPIKE_THEME.heightScale[getType($currentSensor)];
 
-      spikeHeightScale.set(scale);
+      const heightScale = parseScaleSpec(heightScaleTheme).range([0, maxHeight]).domain([0, valueMax]);
+
+      spikeHeightScale.set(heightScale);
       const centers = $geojsons.get(center($currentLevel));
       const features = centers.features.filter((feature) => feature.properties.value > 0);
 
@@ -614,7 +616,7 @@
               coordinates: [
                 [
                   [center[0] - size, center[1]],
-                  [center[0], center[1] + scale(value)],
+                  [center[0], center[1] + heightScale(value)],
                   [center[0] + size, center[1]],
                 ],
               ],
@@ -637,7 +639,7 @@
             geometry: {
               coordinates: [
                 [center[0] - size, center[1]],
-                [center[0], center[1] + scale(value)],
+                [center[0], center[1] + heightScale(value)],
                 [center[0] + size, center[1]],
               ],
               type: 'LineString',
@@ -1481,7 +1483,8 @@
     </div>
     <div
       class="toggle-container container-bg base-font-size container-style"
-      class:hidden={$signalType === 'direction' || !$currentSensor.match(/num/)}>
+      class:hidden={$signalType === 'direction'}>
+      <!-- !$currentSensor.match(/num/)-->
       <Toggle />
     </div>
     <div class="title-container container-bg">

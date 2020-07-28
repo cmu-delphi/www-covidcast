@@ -23,9 +23,9 @@
 
   let spikePadding = 5;
 
-  let high = '';
-  let logLabels = [['0', '0']];
-  let linearLabels = [];
+  let high = '',
+    unit = '';
+  let labels = [['0', '0']];
 
   currentSensor.subscribe((s) => ($stats ? update(s, $stats, $currentLevel) : ''));
   stats.subscribe((s) => (s ? update($currentSensor, s, $currentLevel) : ''));
@@ -47,17 +47,17 @@
 
       high = getSigfigs(valueMinMax[1].toFixed(2), 3);
 
-      logLabels = ['0'];
+      labels = ['0'];
       let max = Math.log(valueMinMax[1]) / Math.log(10);
       let min = Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10);
       let arr = logspace(min, max, 7);
 
       for (let i = 0; i < arr.length; i++) {
         arr[i] = parseFloat(arr[i]).toFixed(2);
-        logLabels.push(arr[i]);
+        labels.push(arr[i]);
       }
 
-      logLabels = pairAdjacent(logLabels);
+      labels = pairAdjacent(labels);
 
       size = ENCODING_SPIKE_THEME.size[$currentLevel] * spikeBase;
       maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel] * spikeBase;
@@ -67,21 +67,23 @@
       valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
       if ($currentSensorEntry.format === 'raw') {
         high = getSigfigs(valueMinMax[1].toFixed(2), 3);
+        unit = '';
         valueMinMax[0] = Math.max(0, valueMinMax[0]);
       } else {
         // otherwise, it's 'percent'.
-        high = getSigfigs(Math.min(100, valueMinMax[1]).toFixed(2), 3) + '%';
+        high = getSigfigs(Math.min(100, valueMinMax[1]).toFixed(2), 3);
+        unit = '%';
         valueMinMax[0] = Math.max(0, valueMinMax[0]);
         valueMinMax[1] = Math.min(100, valueMinMax[1]);
       }
 
       let arr = splitDomain(valueMinMax[0], valueMinMax[1], 7);
-      linearLabels = [];
+      labels = [];
       for (let i = 0; i < arr.length; i++) {
         arr[i] = parseFloat(arr[i]).toFixed(2);
-        linearLabels.push(arr[i]);
+        labels.push(arr[i]);
       }
-      linearLabels = pairAdjacent(linearLabels);
+      labels = pairAdjacent(labels);
     }
   }
 
@@ -430,7 +432,7 @@
     {:else if isCountSignal($currentSensor)}
       <div class="legend-grouping">
         <ul class="legend-labels">
-          {#each logLabels as [label1, label2]}
+          {#each labels as [label1, label2]}
             <li class="colored">
               <span
                 class="colored"
@@ -447,7 +449,7 @@
     {:else}
       <div class="legend-grouping">
         <ul class="legend-labels">
-          {#each linearLabels as [label1, label2]}
+          {#each labels as [label1, label2]}
             <li class="colored">
               <span
                 class="colored"
@@ -465,7 +467,7 @@
   {:else if $encoding === 'bubble'}
     <div class="bubble-legend">
       <ul>
-        {#each logLabels as [label], j}
+        {#each labels as [label], j}
           {#if +label > 0}
             <li class="colored">
               <div
@@ -482,7 +484,7 @@
               style="background: {transparent($colorScale(+high), ENCODING_BUBBLE_THEME.opacity)};width: {$bubbleRadiusScale(+high) * 2}px;
               height: {$bubbleRadiusScale(+high) * 2}px;border-color: {$colorScale(+high)}"
               class="bubble" />
-            <div>{high ? high + '+' : ''}</div>
+            <div>{high ? high + unit + '+' : ''}</div>
           </li>
         {/if}
       </ul>
@@ -490,7 +492,7 @@
   {:else if $encoding === 'spike'}
     <div class="spike-legend">
       <ul>
-        {#each logLabels as [label]}
+        {#each labels as [label]}
           {#if +label > 0}
             <li>
               <svg width={size * 2 + spikePadding * 2} height={getSpikeHeight(+label) + spikePadding * 2}>

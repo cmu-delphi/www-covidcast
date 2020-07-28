@@ -3,7 +3,7 @@ export function parseScaleSpec(spec) {
     case 'sqrt':
       return SqrtScale();
     case 'log':
-      return LogScale();
+      return LogScale().base(spec.base || 10);
     case 'linear':
       return LinearScale();
   }
