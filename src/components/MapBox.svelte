@@ -1015,7 +1015,7 @@
           source: 'mega-county',
           type: 'fill',
           visibility: 'none',
-          filter: ['!=', $signalType, -100],
+          filter: ['!=', 'value', -100],
           paint: {
             'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
             'fill-color': MAP_THEME.countyFill,
@@ -1031,7 +1031,7 @@
             source: level,
             type: 'fill',
             visibility: 'none',
-            filter: ['!=', $signalType, -100],
+            filter: ['!=', 'value', -100],
             paint: {
               'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
               'fill-color': MAP_THEME.countyFill,
