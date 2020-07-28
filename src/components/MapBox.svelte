@@ -132,7 +132,6 @@
 
     setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
-
     let fillColor;
     if (level === 'mega-county') {
       if (hoveredId === null) {
@@ -163,7 +162,6 @@
     const popCommas = parseInt(Population).toLocaleString();
     let title = (level === 'mega-county' ? 'Rest of ' : '') + NAME + getLabelSpecifics(NAME, STATE, level);
     let body;
-
     if ($signalType === 'value') {
       // More information displayed when counts is shown
       if ($currentSensor.match(/incidence_num/)) {
@@ -223,10 +221,14 @@
         color = DIRECTION_THEME.steady;
         icon = DIRECTION_THEME.steadyIcon;
         text = 'Steady';
-      } else {
+      } else if (direction === -1) {
         color = DIRECTION_THEME.decreasing;
         icon = DIRECTION_THEME.decreasingIcon;
         text = 'Decreasing';
+      } else {
+        color = MAP_THEME.countyFill;
+        icon = '';
+        text = 'Estimate Unavailable';
       }
 
       body = `<div class="map-popup-region-value-container">
@@ -321,7 +323,9 @@
     labelStates();
     updateMap('data');
   });
-  signalType.subscribe(() => updateMap('signal'));
+  signalType.subscribe(() => {
+    updateMap('signal');
+  });
   encoding.subscribe(() => updateMap('encoding'));
   mounted.subscribe(() => updateMap('mounted'));
   currentDate.subscribe(() => {
@@ -766,6 +770,7 @@
       className: 'map-popup',
       anchor: 'top',
     });
+
     map.on('mousemove', 'state-outline', onMouseMove('state-outline'));
     map.on('mouseleave', 'state-outline', onMouseLeave('state-outline'));
 
@@ -963,23 +968,26 @@
         },
         'state-names',
       );
-      map.addLayer({
-        id: 'city-point-unclustered-3',
-        source: 'city-point',
-        type: 'symbol',
-        filter: ['>', 'population', 100000],
-        maxzoom: 8,
-        minzoom: 6,
-        layout: {
-          'text-field': ['get', 'city'],
-          'text-font': ['Open Sans Regular'],
-          'text-size': 12,
+      map.addLayer(
+        {
+          id: 'city-point-unclustered-3',
+          source: 'city-point',
+          type: 'symbol',
+          filter: ['>', 'population', 100000],
+          maxzoom: 8,
+          minzoom: 6,
+          layout: {
+            'text-field': ['get', 'city'],
+            'text-font': ['Open Sans Regular'],
+            'text-size': 12,
+          },
+          paint: {
+            'text-halo-color': '#fff',
+            'text-halo-width': 1.5,
+          },
         },
-        paint: {
-          'text-halo-color': '#fff',
-          'text-halo-width': 1.5,
-        },
-      });
+        'state-names',
+      );
       map.addLayer(
         {
           id: 'city-point-unclustered-4',
