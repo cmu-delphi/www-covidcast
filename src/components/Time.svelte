@@ -12,6 +12,7 @@
   } from '../stores';
   import { calculateValFromRectified } from '../util';
   import * as d3 from 'd3';
+  import { trackEvent } from '../stores/ga';
 
   let timeSliderPaddingLeft;
   let timeSliderPaddingRight;
@@ -194,6 +195,7 @@
   }
 
   function loadMoreDataRange() {
+    trackEvent('player', 'loadMore');
     rectifiedRange += interval;
     rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
     if (rectifiedMin < dataRangeMin) {
@@ -211,6 +213,7 @@
     if (!playInterval) {
       let maxDateOnSlider = +timeSlider.getAttribute('max');
       if (rectifiedVal >= maxDateOnSlider) return;
+      trackEvent('player', 'play');
       playInterval = setInterval(() => {
         if (rectifiedVal < maxDateOnSlider) {
           rectifiedVal += 86400 * 1000;
@@ -225,6 +228,9 @@
   }
 
   function cancelPlay() {
+    if (playInterval) {
+      trackEvent('player', 'cancel');
+    }
     clearInterval(playInterval);
     playInterval = null;
   }

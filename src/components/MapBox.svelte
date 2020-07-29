@@ -44,6 +44,7 @@
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
   import { isCountSignal, getType } from '../data/signals';
+  import { trackEvent } from '../stores/ga.js';
 
   export let graphShowStatus, toggleGraphShowStatus;
 
@@ -1266,6 +1267,8 @@
       return resetSearch();
     }
 
+    trackEvent('region', 'search', selectedRegion.name);
+
     selectedRegion = selection;
 
     let hasValueFlag = false;
@@ -1500,18 +1503,23 @@
         maxZoom={map ? map.getMaxZoom() : 100}
         minZoom={map ? map.getMinZoom() : -100}
         on:zoomIn={() => {
+          trackEvent('map', 'zoomIn');
           map.zoomIn();
         }}
         on:zoomOut={() => {
+          trackEvent('map', 'zoomOut');
           map.zoomOut();
         }}
         on:reset={() => {
+          trackEvent('map', 'fitUS');
           map.fitBounds(stateBounds, stateBoundsOptions);
         }}
         on:hideLabels={() => {
+          trackEvent('map', 'toggleStateLabel');
           toggle_state_label();
         }}
         on:swpa={() => {
+          trackEvent('map', 'fitSWPA');
           map.fitBounds(zoneBounds, zoneBoundsOptions);
           showZoneBoundary('swpa');
         }} />

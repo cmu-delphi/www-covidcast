@@ -1,5 +1,6 @@
 import { currentSensor, currentLevel, currentRegion, currentDate, signalType, encoding, currentZone } from '.';
 import { get } from 'svelte/store';
+import { trackUrl } from './ga';
 
 // Constantly keep the URL parameters updated with the current state.
 function updateURIParameters(delta) {
@@ -27,6 +28,8 @@ function updateURIParameters(delta) {
     }
   });
   window.history.replaceState(state, document.title, `?${params.toString()}`);
+
+  trackUrl(`?${params.toString()}`);
 }
 
 // Keep the URL updated with the current state
