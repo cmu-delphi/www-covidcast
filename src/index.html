@@ -54,61 +54,68 @@
   </head>
 
   <body>
-    <header class="viz-header">
-      <div class="roof red invert">
-        <div>
-          <a class="wordmark" href="//www.cmu.edu/">Carnegie Mellon University</a>
-          <form action="https://web-search.andrew.cmu.edu/search" class="search">
-            <input name="entqr" type="hidden" value="3" />
-            <input name="entsp" type="hidden" value="a" />
-            <input name="sort" type="hidden" value="date:D:L:d1" />
-            <input name="output" type="hidden" value="xml_no_dtd" />
-            <input name="client" type="hidden" value="default_frontend" />
-            <input name="ud" type="hidden" value="1" />
-            <input name="oe" type="hidden" value="UTF-8" />
-            <input name="ie" type="hidden" value="UTF-8" />
-            <input name="proxystylesheet" type="hidden" value="default_frontend" />
-            <label
-              ><span>Search</span>
-              <input name="q" placeholder="Search" title="Type keywords into this box, then press enter." />
-            </label>
-            <button title="Submit" type="submit">Search</button> <input name="site" type="hidden" value="" />
-          </form>
-          <a class="viz-menu-button">
-            <svg viewBox="0 0 512 512">
-              <path
-                d="M432 176H80c-8.8 0-16-7.2-16-16s7.2-16 16-16h352c8.8 0 16 7.2 16 16s-7.2 16-16 16zM432 272H80c-8.8 0-16-7.2-16-16s7.2-16 16-16h352c8.8 0 16 7.2 16 16s-7.2 16-16 16zM432 368H80c-8.8 0-16-7.2-16-16s7.2-16 16-16h352c8.8 0 16 7.2 16 16s-7.2 16-16 16z"
-              />
-            </svg>
-          </a>
-          <div class="viz-menu">
-            <a href="#">API</a>
-            <a href="#">Team</a>
+    <div id="container">
+      <header class="viz-header">
+        <div class="roof red invert">
+          <div>
+            <a class="wordmark" href="//www.cmu.edu/">Carnegie Mellon University</a>
+            <a aria-haspopup="true" aria-label="Menu" class="menu-btn" href="#nav"><b>—</b><b>—</b><b>—</b></a>
+            <form action="https://web-search.andrew.cmu.edu/search" class="search">
+              <input name="entqr" type="hidden" value="3" />
+              <input name="entsp" type="hidden" value="a" />
+              <input name="sort" type="hidden" value="date:D:L:d1" />
+              <input name="output" type="hidden" value="xml_no_dtd" />
+              <input name="client" type="hidden" value="default_frontend" />
+              <input name="ud" type="hidden" value="1" />
+              <input name="oe" type="hidden" value="UTF-8" />
+              <input name="ie" type="hidden" value="UTF-8" />
+              <input name="proxystylesheet" type="hidden" value="default_frontend" />
+              <label
+                ><span>Search</span>
+                <input name="q" placeholder="Search" title="Type keywords into this box, then press enter." />
+              </label>
+              <button title="Submit" type="submit">Search</button> <input name="site" type="hidden" value="" />
+            </form>
           </div>
         </div>
-      </div>
-      <div class="viz-name">
-        <h1><a href="index.html">COVIDcast</a></h1>
-        <h2>Real-time COVID-19 Indicators</h2>
-        <h3>
-          <a class="group-link" href="https://delphi.cmu.edu/" target="_blank" rel="noopener noreferrer"
-            >by Delphi Research Group</a
-          >
-        </h3>
-      </div>
-      <div class="viz-mission">
-        The <span class="mission-link">mission</span> of the
-        <a href="#" class="team-link">CMU Delphi COVID-19 Response Team</a> is to help combat the COVID-19 pandemic and
-        save lives and livelihoods.
-      </div>
-    </header>
-    <main id="vizbox">
-      <div class="ie-banner" style="display: none;">
-        <div>
-          Internet Explorer 11 is no longer supported. We encourage you to use a more modern web browser, such as
-          Firefox, Chrome, or Safari.
+        <div class="viz-name">
+          <h1><a href="index.html">COVIDcast</a></h1>
+          <h2>Real-time COVID-19 Indicators</h2>
+          <h3>
+            <a class="group-link" href="https://delphi.cmu.edu/" target="_blank" rel="noopener noreferrer"
+              >by Delphi Research Group</a
+            >
+          </h3>
         </div>
-      </div>
-    </main>
+        <div class="viz-mission">
+          The <span class="mission-link">mission</span> of the
+          <a href="#" class="team-link">CMU Delphi COVID-19 Response Team</a> is to help combat the COVID-19 pandemic
+          and save lives and livelihoods.
+        </div>
+      </header>
+      <main id="vizbox">
+        <div class="ie-banner" style="display: none;">
+          <div>
+            Internet Explorer 11 is no longer supported. We encourage you to use a more modern web browser, such as
+            Firefox, Chrome, or Safari.
+          </div>
+        </div>
+      </main>
+    </div>
+    <footer>
+      <nav id="nav">
+        <ul>
+          <li><a href="#">DELPHI</a></li>
+          <li><a href="#">CovidCast</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#" class="external" target="_blank" rel="noopener noreferrer">API</a></li>
+          <li><a href="#">Team</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </nav>
+    </footer>
+    <script src="//www.cmu.edu/common/standard-v6/js/list.min.js" type="text/javascript"></script>
+    <script src="//www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js" type="text/javascript"></script>
+    <script src="//www.cmu.edu/common/standard-v6/js/main.min.js" type="text/javascript"></script>
   </body>
 </html>
