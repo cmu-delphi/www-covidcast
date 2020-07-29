@@ -15,7 +15,9 @@
     mounted,
   } from '../stores';
   import '../stores/urlHandler';
+  import '../stores/ga';
   import { updateTimeSliceCache, updateRegionSliceCache, loadMetaData } from '../data';
+  import { trackEvent } from '../stores/ga';
 
   // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
   const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
@@ -138,6 +140,7 @@
     } else {
       graphShowStatus = !graphShowStatus;
     }
+    trackEvent('graph', graphShowStatus ? 'show' : 'hide');
   }
 </script>
 
