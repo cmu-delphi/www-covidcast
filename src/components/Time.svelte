@@ -506,6 +506,7 @@
 
   <button
     aria-pressed={playInterval ? 'true' : 'false'}
+    title={playInterval ? 'Stop timeline to a specific date' : 'Play timeline to see how data changes over time'}
     class="play-button-container-button"
     on:click={() => playTime()}>
     <svg
