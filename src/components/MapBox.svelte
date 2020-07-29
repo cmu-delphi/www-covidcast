@@ -2,8 +2,9 @@
   import { onMount } from 'svelte';
   import mapboxgl from 'mapbox-gl';
   import 'mapbox-gl/dist/mapbox-gl.css';
-  import { getTextColorBasedOnBackground, LogScale, zip, transparent } from '../util.js';
+  import { getTextColorBasedOnBackground, zip, transparent } from '../util.js';
   import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../theme.js';
+  import { parseScaleSpec } from './scale.js';
   import Options from './Options.svelte';
   import Toggle from './Toggle.svelte';
   import Legend from './Legend.svelte';
@@ -42,7 +43,7 @@
   } from '../stores';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
-  import { isCountSignal, isPropSignal } from '../data/signals';
+  import { isCountSignal, getType } from '../data/signals';
 
   export let graphShowStatus, toggleGraphShowStatus;
 
@@ -131,7 +132,6 @@
 
     setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
-
     let fillColor;
     if (level === 'mega-county') {
       if (hoveredId === null) {
@@ -162,7 +162,6 @@
     const popCommas = parseInt(Population).toLocaleString();
     let title = (level === 'mega-county' ? 'Rest of ' : '') + NAME + getLabelSpecifics(NAME, STATE, level);
     let body;
-
     if ($signalType === 'value') {
       // More information displayed when counts is shown
       if ($currentSensor.match(/incidence_num/)) {
@@ -222,10 +221,14 @@
         color = DIRECTION_THEME.steady;
         icon = DIRECTION_THEME.steadyIcon;
         text = 'Steady';
-      } else {
+      } else if (direction === -1) {
         color = DIRECTION_THEME.decreasing;
         icon = DIRECTION_THEME.decreasingIcon;
         text = 'Decreasing';
+      } else {
+        color = MAP_THEME.countyFill;
+        icon = '';
+        text = 'Estimate Unavailable';
       }
 
       body = `<div class="map-popup-region-value-container">
@@ -320,7 +323,9 @@
     labelStates();
     updateMap('data');
   });
-  signalType.subscribe(() => updateMap('signal'));
+  signalType.subscribe(() => {
+    updateMap('signal');
+  });
   encoding.subscribe(() => updateMap('encoding'));
   mounted.subscribe(() => updateMap('mounted'));
   currentDate.subscribe(() => {
@@ -347,12 +352,12 @@
     let valueMinMax;
 
     // Customize min max values for deaths
-    if ($currentSensor.match(/num/)) {
+    if (isCountSignal($currentSensor)) {
       thisStats = $stats.get($currentSensor + '_' + $currentLevel);
       valueMinMax = [Math.max(0.14, thisStats.mean - 3 * thisStats.std), thisStats.mean + 3 * thisStats.std];
     } else {
       thisStats = $stats.get($currentSensor);
-      valueMinMax = [thisStats.mean - 3 * thisStats.std, thisStats.mean + 3 * thisStats.std];
+      valueMinMax = [Math.max(0, thisStats.mean - 3 * thisStats.std), thisStats.mean + 3 * thisStats.std];
     }
 
     currentRange.set($signalType === 'value' ? valueMinMax : [-1, 1]);
@@ -450,29 +455,18 @@
     let stops, stopsMega, currentRadiusScale;
 
     if ($signalType === 'value') {
-      valueMinMax[0] = Math.max(0, valueMinMax[0]);
-      const center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2,
-        firstHalfCenter = valueMinMax[0] + (center - valueMinMax[0]) / 2,
-        secondHalfCenter = center + (valueMinMax[1] - center) / 2;
-
-      const colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain([valueMinMax[0], valueMinMax[1]]);
-      const colorScaleLog = d3
-        .scaleSequentialLog(d3.interpolateYlOrRd)
-        .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]]);
-
-      // domainStops7 is used to determine the colors of regions for count signals.
-      const domainStops7 = logspace(
-        Math.log(Math.max(0.14, valueMinMax[0])) / Math.log(10),
-        Math.log(valueMinMax[1]) / Math.log(10),
-        7,
-      );
-      // domainStops5 is used for other cases (prop signals)
-      const domainStops5 = [valueMinMax[0], firstHalfCenter, center, secondHalfCenter, valueMinMax[1]];
-
-      const logColors7 = domainStops7.map((c) => colorScaleLog(c).toString());
-      const linearColors5 = domainStops5.map((c) => colorScaleLinear(c).toString());
-
       if (isCountSignal($currentSensor)) {
+        const colorScaleLog = d3.scaleSequentialLog(d3.interpolateYlOrRd).domain(valueMinMax);
+
+        // domainStops7 is used to determine the colors of regions for count signals.
+        const domainStops7 = logspace(
+          Math.log(valueMinMax[0]) / Math.log(10),
+          Math.log(valueMinMax[1]) / Math.log(10),
+          7,
+        );
+
+        const logColors7 = domainStops7.map((c) => colorScaleLog(c).toString());
+
         // use log scale
         stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops7, logColors7));
         stopsMega = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops7, logColors7));
@@ -480,14 +474,18 @@
         // store the color scale (used for tooltips and legend)
         colorScale.set(colorScaleLog);
         colorStops.set(stops);
-      } else if (isPropSignal($currentSensor)) {
-        stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, linearColors5));
-        stopsMega = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, transparent(linearColors5, 0.5)));
-
-        // store the color scale (used for tooltips and legend)
-        colorScale.set(colorScaleLinear);
-        colorStops.set(stops);
       } else {
+        const center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2,
+          firstHalfCenter = valueMinMax[0] + (center - valueMinMax[0]) / 2,
+          secondHalfCenter = center + (valueMinMax[1] - center) / 2;
+
+        const colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain(valueMinMax);
+
+        // domainStops5 is used for other cases (prop signals)
+        const domainStops5 = [valueMinMax[0], firstHalfCenter, center, secondHalfCenter, valueMinMax[1]];
+
+        const linearColors5 = domainStops5.map((c) => colorScaleLinear(c).toString());
+
         stops = zip(domainStops5, linearColors5);
         stopsMega = zip(domainStops5, transparent(linearColors5, 0.5));
 
@@ -549,14 +547,15 @@
       hideAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
 
       // show bubble layers
-      showAll([BUBBLE_LAYER, highlight(BUBBLE_LAYER)]);
+      if ($signalType === 'direction') {
+        hideAll([BUBBLE_LAYER, highlight(BUBBLE_LAYER)]);
+      } else {
+        showAll([BUBBLE_LAYER, highlight(BUBBLE_LAYER)]);
+      }
 
       // color scale (color + stroke color)
       let flatStops = stops.flat();
-      flatStops.shift(); // remove the first element which has a value of 0 since the "step" expression of MapBox can omit the first range.
-
-      flatStops[0] = 'transparent';
-      let colorExpression = ['step', ['get', 'value']].concat(flatStops);
+      let colorExpression = ['interpolate', ['linear'], ['get', 'value']].concat(flatStops);
 
       map.getSource(BUBBLE_LAYER).setData(map.getSource(center($currentLevel))._data);
 
@@ -569,18 +568,13 @@
       const minRadius = ENCODING_BUBBLE_THEME.minRadius[$currentLevel],
         maxRadius = ENCODING_BUBBLE_THEME.maxRadius[$currentLevel];
 
-      currentRadiusScale = LogScale()
-        .domain([Math.max(0.14, valueMinMax[0]), valueMinMax[1]])
-        .range([minRadius, maxRadius])
-        .base(ENCODING_BUBBLE_THEME.base);
+      const radiusScaleTheme = ENCODING_BUBBLE_THEME.radiusScale[getType($currentSensor)];
+
+      currentRadiusScale = parseScaleSpec(radiusScaleTheme).domain(valueMinMax).range([minRadius, maxRadius]);
+
+      const radiusExpression = currentRadiusScale.expr();
 
       bubbleRadiusScale.set(currentRadiusScale);
-
-      // radius scale
-      const [a, b, base] = currentRadiusScale.coef();
-      const baseLog = Math.log10(base);
-
-      let radiusExpression = ['+', ['*', a, ['/', ['log10', ['get', 'value']], baseLog]], b];
 
       map.setPaintProperty(BUBBLE_LAYER, 'circle-radius', radiusExpression);
       map.setPaintProperty(highlight(BUBBLE_LAYER), 'circle-radius', radiusExpression);
@@ -594,15 +588,21 @@
       map.setPaintProperty($currentLevel, 'fill-color', MAP_THEME.countyFill);
       hideAll([BUBBLE_LAYER, highlight(BUBBLE_LAYER)]);
 
-      showAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
+      if ($signalType === 'direction') {
+        hideAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
+      } else {
+        showAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
+      }
 
       const valueMax = valueMinMax[1],
         maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel],
         size = ENCODING_SPIKE_THEME.size[$currentLevel];
 
-      const scale = d3.scaleSqrt().range([0, maxHeight]).domain([0, valueMax]);
+      const heightScaleTheme = ENCODING_SPIKE_THEME.heightScale[getType($currentSensor)];
 
-      spikeHeightScale.set(scale);
+      const heightScale = parseScaleSpec(heightScaleTheme).range([0, maxHeight]).domain([0, valueMax]);
+
+      spikeHeightScale.set(heightScale);
       const centers = $geojsons.get(center($currentLevel));
       const features = centers.features.filter((feature) => feature.properties.value > 0);
 
@@ -616,7 +616,7 @@
               coordinates: [
                 [
                   [center[0] - size, center[1]],
-                  [center[0], center[1] + scale(value)],
+                  [center[0], center[1] + heightScale(value)],
                   [center[0] + size, center[1]],
                 ],
               ],
@@ -639,7 +639,7 @@
             geometry: {
               coordinates: [
                 [center[0] - size, center[1]],
-                [center[0], center[1] + scale(value)],
+                [center[0], center[1] + heightScale(value)],
                 [center[0] + size, center[1]],
               ],
               type: 'LineString',
@@ -652,10 +652,7 @@
       };
 
       let flatStops = stops.flat();
-      flatStops.shift(); // remove the first element which has a value of 0 since the "step" expression of mapbox does not require it.
-
-      flatStops[0] = 'transparent';
-      let colorExpression = ['step', ['get', 'value']].concat(flatStops);
+      let colorExpression = ['interpolate', ['linear'], ['get', 'value']].concat(flatStops);
       map.setPaintProperty(SPIKE_LAYER, 'fill-color', colorExpression);
       map.setPaintProperty(outline(SPIKE_LAYER), 'line-color', colorExpression);
       map.setPaintProperty(highlight(SPIKE_LAYER), 'fill-color', colorExpression);
@@ -745,6 +742,14 @@
     }
   }
 
+  function toggle_state_label() {
+    if (map.getLayoutProperty('state-names', 'visibility') === 'visible') {
+      map.setLayoutProperty('state-names', 'visibility', 'none');
+    } else {
+      map.setLayoutProperty('state-names', 'visibility', 'visible');
+    }
+  }
+
   function initializeMap() {
     stateBounds = computeBounds($geojsons.get('state'));
     zoneBounds = computeBounds($geojsons.get('zone'));
@@ -773,6 +778,7 @@
       className: 'map-popup',
       anchor: 'top',
     });
+
     map.on('mousemove', 'state-outline', onMouseMove('state-outline'));
     map.on('mouseleave', 'state-outline', onMouseLeave('state-outline'));
 
@@ -970,23 +976,26 @@
         },
         'state-names',
       );
-      map.addLayer({
-        id: 'city-point-unclustered-3',
-        source: 'city-point',
-        type: 'symbol',
-        filter: ['>', 'population', 100000],
-        maxzoom: 8,
-        minzoom: 6,
-        layout: {
-          'text-field': ['get', 'city'],
-          'text-font': ['Open Sans Regular'],
-          'text-size': 12,
+      map.addLayer(
+        {
+          id: 'city-point-unclustered-3',
+          source: 'city-point',
+          type: 'symbol',
+          filter: ['>', 'population', 100000],
+          maxzoom: 8,
+          minzoom: 6,
+          layout: {
+            'text-field': ['get', 'city'],
+            'text-font': ['Open Sans Regular'],
+            'text-size': 12,
+          },
+          paint: {
+            'text-halo-color': '#fff',
+            'text-halo-width': 1.5,
+          },
         },
-        paint: {
-          'text-halo-color': '#fff',
-          'text-halo-width': 1.5,
-        },
-      });
+        'state-names',
+      );
       map.addLayer(
         {
           id: 'city-point-unclustered-4',
@@ -1014,7 +1023,7 @@
           source: 'mega-county',
           type: 'fill',
           visibility: 'none',
-          filter: ['!=', $signalType, -100],
+          filter: ['!=', 'value', -100],
           paint: {
             'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
             'fill-color': MAP_THEME.countyFill,
@@ -1030,7 +1039,7 @@
             source: level,
             type: 'fill',
             visibility: 'none',
-            filter: ['!=', $signalType, -100],
+            filter: ['!=', 'value', -100],
             paint: {
               'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
               'fill-color': MAP_THEME.countyFill,
@@ -1478,7 +1487,8 @@
     </div>
     <div
       class="toggle-container container-bg base-font-size container-style"
-      class:hidden={$signalType === 'direction' || !$currentSensor.match(/num/)}>
+      class:hidden={$signalType === 'direction'}>
+      <!-- !$currentSensor.match(/num/)-->
       <Toggle />
     </div>
     <div class="title-container container-bg">
@@ -1497,6 +1507,9 @@
         }}
         on:reset={() => {
           map.fitBounds(stateBounds, stateBoundsOptions);
+        }}
+        on:hideLabels={() => {
+          toggle_state_label();
         }}
         on:swpa={() => {
           map.fitBounds(zoneBounds, zoneBoundsOptions);

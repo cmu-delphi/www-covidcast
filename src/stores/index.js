@@ -1,5 +1,6 @@
 import { writable, readable, derived, get } from 'svelte/store';
-import { injectIDs, LogScale } from '../util';
+import { injectIDs } from '../util';
+import { LogScale, SqrtScale } from '../components/scale.js';
 import * as d3 from 'd3';
 import { sensorList, withSensorEntryKey } from './constants';
 export {
@@ -26,8 +27,9 @@ export const sensors = readable(sensorList, (set) => {
   }
 });
 
-export const officialSensors = derived([sensors], ([sensors]) => sensors.filter((d) => d.official));
-export const inOfficialSensors = derived([sensors], ([sensors]) => sensors.filter((d) => !d.official));
+export const publicSensors = derived([sensors], ([sensors]) => sensors.filter((d) => d.type == 'public'));
+export const earlySensors = derived([sensors], ([sensors]) => sensors.filter((d) => d.type == 'early'));
+export const lateSensors = derived([sensors], ([sensors]) => sensors.filter((d) => d.type == 'late'));
 
 // The ID to reference each sensor is the indicator name + signal type.
 // This map is used to find the information for each sensor.
@@ -97,8 +99,8 @@ export const currentLevel = writable('county', (set) => {
 export const signalType = writable('value', (set) => {
   const signalT = urlParams.get('signalType');
   if (signalT === 'direction' || signalT === 'value') {
-    //set(signalT);
-    set('value');
+    set(signalT);
+    //set('value');
   }
 });
 
@@ -153,7 +155,7 @@ export const timeRangeOnSlider = writable({
   max: 0,
 });
 
-export const colorScale = writable([]);
+export const colorScale = writable(d3.scaleSequentialLog());
 export const colorStops = writable([]);
 export const bubbleRadiusScale = writable(LogScale());
-export const spikeHeightScale = writable(d3.scaleSqrt());
+export const spikeHeightScale = writable(SqrtScale());
