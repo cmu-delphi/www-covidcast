@@ -14,19 +14,20 @@
   } from '../stores';
   // import { callAPI, callMetaAPI } from '../data/api';
 
-  const width = 150;
-  const height = 45;
+  const width = 100;
+  const height = 30;
 
   import { default as embed } from 'vega-embed';
   // import { compile } from 'vega-lite'
 
-  let smallMultipleStart = 0;
+  //let smallMultipleStart = 0;
   let smallMultipleContainer = null;
 
   // TODO: Fix in Safari
   // TODO: Don't show metrics that have no data
   // TODO: Make end date of range programmatic
   // TODO: Make the active signal first in the list of small multiples
+  // TODO: On active sensor change, scroll so it is first in small
 
   // TODO: Color signal title by current region's color scale in that metric
 
@@ -38,7 +39,7 @@
   function idToSensor(id) {
     return $sensors.find((e) => e.key === id);
   }
-
+  /*
   function smallMultipleNext() {
     handleSmallMultipleNav('next');
     // smallMultipleContainer.scrollLeft += width * 1.35;
@@ -71,6 +72,7 @@
       });
     } else return false;
   }
+  */
 
   let singleView = false;
   function toggleSingleView(focusSignal = null) {
@@ -98,7 +100,7 @@
     generateSingleChart();
   });
 
-  function generateLineChart(signal = 'part_time_work_prop', source = 'covidcast', sensor) {
+  function generateLineChart(signal = 'part_time_work_prop', source = 'covidcast') {
     const apiURL = `https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day&data_source=${source}&signal=${signal}&geo_type=${$currentLevel}&time_values=20200401-20200720&geo_value=${region}`;
     const lineChartSchema = {
       $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
@@ -115,19 +117,12 @@
         x: {
           field: 'time_value',
           type: 'temporal',
-          axis: {
-            title: null, //'Date',
-            format: '%b',
-            formatType: 'time',
-            tickCount: 4,
-          },
+          axis: null,
         },
         y: {
           field: 'value',
           type: 'quantitative',
-          axis: {
-            title: sensor ? (sensor.yAxis.length < 15 ? sensor.yAxis : ' ') : ' ',
-          },
+          axis: null,
         },
       },
       layer: [
@@ -314,12 +309,12 @@
     right: 0.5em;
     bottom: 24px;
     padding: 0.25em;
-    width: 55vw;
-    height: 12vh;
+    width: 65vw;
+    height: 28vh;
     min-height: 140px;
-    overflow-x: auto;
+    /* overflow-x: auto;
     overflow-y: hidden;
-    white-space: nowrap;
+    white-space: nowrap; */
 
     background-color: white;
   }
@@ -329,13 +324,15 @@
     display: inline-block;
     vertical-align: top;
     margin: 0;
-    margin-right: 0.25em;
-    margin-bottom: 0.25em;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    width: 130px;
     padding: 2px;
     /* height: 100px;
     width: 150px; */
   }
   .small-multiples li h5 {
+    font-size: 10px;
     /* height: 2.5em; */
     margin: 0;
     padding: 0;
@@ -361,10 +358,10 @@
   <h4>
     {#if singleView}{$currentSensor}{:else}{$sensors.length} available signals{/if}
 
-    <span hidden={singleView}>
+    <!-- <span hidden={singleView}>
       <button on:click={smallMultiplePrev}>Previous</button>
       <button on:click={smallMultipleNext}>Next</button>
-    </span>
+    </span> -->
     <button on:click={toggleSingleView}>
       {#if singleView}All metrics{:else}Single metric{/if}
     </button>
