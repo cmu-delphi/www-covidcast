@@ -60,6 +60,9 @@
     padding: 20, //px
     linear: false,
   };
+
+  // eslint-disable-next-line no-unused-vars
+  let initialZoomView = true;
   let zoneBounds = null;
   let zoneBoundsOptions = {
     padding: 20, //px
@@ -751,9 +754,20 @@
     }
   }
 
+  function onResize() {
+    if (!initialZoomView) {
+      return;
+    }
+    trackEvent('map', 'resize');
+    requestAnimationFrame(() => {
+      map.fitBounds(stateBounds, stateBoundsOptions);
+    });
+  }
+
   function initializeMap() {
     stateBounds = computeBounds($geojsons.get('state'));
     zoneBounds = computeBounds($geojsons.get('zone'));
+    initialZoomView = !showCurrentZone;
 
     map = new mapboxgl.Map({
       attributionControl: false,
@@ -1323,6 +1337,10 @@
 
     map.flyTo({ center: centerLocation, zoom: zoomLevel, essential: true });
   }
+
+  function markInitialView(value) {
+    initialZoomView = value;
+  }
 </script>
 
 <style>
@@ -1503,14 +1521,17 @@
         maxZoom={map ? map.getMaxZoom() : 100}
         minZoom={map ? map.getMinZoom() : -100}
         on:zoomIn={() => {
+          markInitialView(false);
           trackEvent('map', 'zoomIn');
           map.zoomIn();
         }}
         on:zoomOut={() => {
+          markInitialView(false);
           trackEvent('map', 'zoomOut');
           map.zoomOut();
         }}
         on:reset={() => {
+          markInitialView(true);
           trackEvent('map', 'fitUS');
           map.fitBounds(stateBounds, stateBoundsOptions);
         }}
@@ -1519,6 +1540,7 @@
           toggle_state_label();
         }}
         on:swpa={() => {
+          markInitialView(false);
           trackEvent('map', 'fitSWPA');
           map.fitBounds(zoneBounds, zoneBoundsOptions);
           showZoneBoundary('swpa');
@@ -1542,3 +1564,4 @@
 
   <div class="map-wrapper" bind:this={container} />
 </main>
+<svelte:window on:resize={onResize} />
