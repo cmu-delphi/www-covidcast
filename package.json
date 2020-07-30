@@ -50,7 +50,10 @@
     "invert-color": "^2.0.0",
     "mapbox-gl": "^1.11.1",
     "regenerator-runtime": "^0.13.5",
-    "svelte-icons": "^2.1.0"
+    "svelte-icons": "^2.1.0",
+    "vega": "^5.13.0",
+    "vega-embed": "^6.10.0",
+    "vega-lite": "^4.14.0"
   },
   "husky": {
     "hooks": {

@@ -11,9 +11,11 @@
   import Search from './Search.svelte';
   import MapControls from './MapControls.svelte';
   import Title from './Title.svelte';
-  import Time from './Time.svelte';
+  // import Time from './Time.svelte';
   import { computeBounds } from './geoUtils';
-  import GraphContainer from './Graph/GraphContainer.svelte';
+  // import GraphContainer from './Graph/GraphContainer.svelte';
+  import LineSmallMultiples from './LineSmallMultiples.svelte';
+
   import {
     levels,
     stats,
@@ -1521,11 +1523,15 @@
     <Banner bind:this={searchErrorComponent} />
   </div>
 
-  <div class="time-container container-bg">
+  <!-- <div class="time-container container-bg">
     <Time />
-  </div>
+  </div> -->
 
-  <GraphContainer {graphShowStatus} {toggleGraphShowStatus} />
+  <!-- <GraphContainer {graphShowStatus} {toggleGraphShowStatus} /> -->
+
+  <div class="small-multiples">
+    <LineSmallMultiples />
+  </div>
 
   <div class="map-wrapper" bind:this={container} />
 </main>
