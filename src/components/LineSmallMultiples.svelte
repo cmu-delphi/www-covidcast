@@ -23,13 +23,17 @@
   let smallMultipleStart = 0;
   let smallMultipleContainer = null;
 
-  // TODO: Add single metric view
-  // TODO: Don't let the user go under 0 or above the total number of signals shown
-  // TODO: Determine the widths and distances between elements and advance by that amount
   // TODO: Fix in Safari
   // TODO: Don't show metrics that have no data
   // TODO: Make end date of range programmatic
-  // TODO: Make it work for metro areas and states
+  // TODO: Make the active signal first in the list of small multiples
+
+  // TODO: Color signal title by current region's color scale in that metric
+
+  // DONE: Make it work for metro areas and states
+  // DONE: Add single metric view
+  // DONE: Determine the widths and distances between elements and advance by that amount
+  // DONE: Don't let the user go under 0 or above the total number of signals shown
 
   function idToSensor(id) {
     return $sensors.find((e) => e.key === id);
@@ -37,17 +41,34 @@
 
   function smallMultipleNext() {
     handleSmallMultipleNav('next');
-    smallMultipleContainer.scrollLeft += width * 1.35;
+    // smallMultipleContainer.scrollLeft += width * 1.35;
   }
   function smallMultiplePrev() {
     handleSmallMultipleNav('prev');
-    smallMultipleContainer.scrollLeft -= width * 1.35;
+    // smallMultipleContainer.scrollLeft -= width * 1.35;
   }
   function handleSmallMultipleNav(direction = 'next') {
+    const steps = document.querySelectorAll('.small-multiples li');
+    const stepNum = steps.length;
+    // console.log({ step, steps }, step.offsetLeft);
     if (direction === 'next') {
-      smallMultipleStart += 1;
+      if (smallMultipleStart === stepNum) smallMultipleStart = 0;
+      else smallMultipleStart += 1;
+      const step = steps[smallMultipleStart];
+
+      smallMultipleContainer.scrollTo({
+        left: step.offsetLeft,
+        behavior: 'smooth',
+      });
     } else if (direction === 'prev') {
-      smallMultipleStart -= 1;
+      if (smallMultipleStart === 0) smallMultipleStart = 0;
+      else smallMultipleStart -= 1;
+      const step = steps[smallMultipleStart];
+
+      smallMultipleContainer.scrollTo({
+        left: step.offsetLeft,
+        behavior: 'smooth',
+      });
     } else return false;
   }
 
