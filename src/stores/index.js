@@ -15,7 +15,7 @@ export {
 } from './constants';
 
 /**
- * @typedef {import('svelte/store').Writable} Writableb
+ * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
  */
 
 const queryString = window.location.search;
@@ -82,7 +82,7 @@ export const customDataView = readable(true, (set) => {
 });
 
 /**
- * @type {Writable<'overview' | 'compare' | 'hotspots'>}
+ * @type {import('svelte/store').Writable<'overview' | 'compare' | 'hotspots'>}
  */
 export const currentMode = writable('overview', (set) => {
   const mode = urlParams.get('mode');
@@ -165,7 +165,13 @@ export const currentSensorEntry = derived([sensorMap, currentSensor], ([$sensorM
   $sensorMap.get($currentSensor),
 );
 
+/**
+ * @type {import('svelte/store').Writable<EpiDataRow[]>}
+ */
 export const regionData = writable([]);
+/**
+ * @type {import('svelte/store').Writable<EpiDataRow[]>}
+ */
 export const currentData = writable([]);
 
 export const timeRangeOnSlider = writable({
