@@ -1283,9 +1283,9 @@
       return resetSearch();
     }
 
-    trackEvent('region', 'search', selectedRegion.name);
-
     selectedRegion = selection;
+
+    trackEvent('region', 'search', selectedRegion.name);
 
     let hasValueFlag = false;
     const availLevels = $currentSensorEntry.levels;
