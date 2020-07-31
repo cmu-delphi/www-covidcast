@@ -29,7 +29,7 @@
   let vegaPromise = null;
 
   let loading = true;
-  let empty = false;
+  let noData = false;
 
   $: updateData(vegaPromise, data);
 
@@ -39,7 +39,7 @@
     }
     loading = true;
     Promise.all([vegaPromise, data]).then(([vega, d]) => {
-      empty = !d || d.length === 0;
+      noData = !d || d.length === 0;
       vega.view
         .change(
           'values',
@@ -82,4 +82,4 @@
   });
 </script>
 
-<div bind:this={root} class="root" class:loading class:no-data={empty} />
+<div bind:this={root} class="root" class:loading={loading && !noData} class:no-data={noData} />
