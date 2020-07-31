@@ -14,6 +14,7 @@ import { isCasesSignal, isDeathSignal } from './signals';
  * @property {number | null} sample_size
  * @property {stderr | null} stderr
  * @property {number} time_value
+ * @property {Date} date_value the time_value as a Date
  * @property {number} value
  */
 
@@ -45,6 +46,18 @@ function toRegionCacheKey(sensorEntry, level, date) {
  */
 function toTimeSliceCacheKey(sensorEntry, level, region) {
   return `${sensorEntry.key}-${level}-${region}`;
+}
+
+function parseData(data) {
+  for (const row of data) {
+    if (row.time_value == null) {
+      row.date_value = null;
+      continue;
+    }
+    const s = row.time_value.toString();
+    row.date_value = new Date(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} 12:01`);
+  }
+  return data;
 }
 
 /**
@@ -99,7 +112,7 @@ export function fetchRegionSlice(sensorEntry, level, date) {
       return [];
     }
     const data = d1 ? combineAverageWithCount(d, d1) : d.epidata;
-    return data;
+    return parseData(data);
   });
   regionSliceCache.set(cacheKey, promise);
   return promise;
@@ -127,7 +140,7 @@ export function fetchTimeSlice(sensorEntry, level, region) {
     if (d.result < 0 || d.message.includes('no results')) {
       return [];
     }
-    return d.epidata;
+    return parseData(d.epidata);
   });
   timeSliceCache.set(cacheEntry, promise);
 
