@@ -5,6 +5,7 @@
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
   import IoMdHome from 'svelte-icons/io/IoMdHome.svelte';
   import TiTag from 'svelte-icons/ti/TiTag.svelte';
+  import Loading from './Loading.svelte';
 
   const dispatch = createEventDispatcher();
   export let className = '';
@@ -91,4 +92,5 @@
       </button>
     </div>
   {/if}
+  <Loading />
 </div>
