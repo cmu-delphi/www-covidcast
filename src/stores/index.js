@@ -14,6 +14,10 @@ export {
   yesterdayDate,
 } from './constants';
 
+/**
+ * @typedef {import('svelte/store').Writable} Writableb
+ */
+
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 
@@ -75,6 +79,16 @@ export const mapFirstLoaded = writable(false);
 export const currentDataReadyOnMap = writable(false);
 export const customDataView = readable(true, (set) => {
   set(urlParams.get('sensors') != null);
+});
+
+/**
+ * @type {Writable<'overview' | 'compare' | 'hotspots'>}
+ */
+export const currentMode = writable('overview', (set) => {
+  const mode = urlParams.get('mode');
+  if (mode === 'compare' || mode === 'overview' || mode === 'hotspots') {
+    set(mode);
+  }
 });
 
 export const currentSensor = writable('', (set) => {
