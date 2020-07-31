@@ -9,6 +9,6 @@
   }
 </style>
 
-{#if $currentDataReadyOnMap}
+{#if !$currentDataReadyOnMap}
   <div class="loader loading" />
 {/if}
