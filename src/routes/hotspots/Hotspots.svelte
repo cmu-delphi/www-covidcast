@@ -22,7 +22,7 @@
     // TODO generalize this process into the stores
     const props = properties.get(row.geo_value.toUpperCase());
     return {
-      id: row.geo_value,
+      id: row.geo_value.toUpperCase(),
       name: props ? props.NAME : row.geo_value,
       population: props ? Number.parseInt(props.Population, 10) : null,
       value: row.value,
