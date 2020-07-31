@@ -82,4 +82,4 @@
   });
 </script>
 
-<div bind:this={root} class="root" class:loading={loading && !noData} class:no-data={noData} />
+<div bind:this={root} class="root" class:loading-bg={loading && !noData} class:no-data={noData} />
