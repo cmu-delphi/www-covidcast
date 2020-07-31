@@ -19,7 +19,7 @@
   import { DIRECTION_THEME } from '../../theme';
   import * as d3 from 'd3';
   import d3Tip from 'd3-tip';
-
+  import { isCountSignal } from '../../data/signals';
   const parseTime = d3.timeParse('%Y%m%d');
 
   let el;
@@ -254,7 +254,7 @@
   // calculate the graph's min and max range based off the dataset's standard deviation
   function calculateSD(sensor) {
     let sts;
-    if ($currentSensor.match(/num/)) {
+    if (isCountSignal($currentSensor)) {
       sts = $stats.get(sensor + '_' + $currentLevel);
     } else {
       sts = $stats.get(sensor);
