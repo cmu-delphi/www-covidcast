@@ -1,13 +1,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import { default as embed } from 'vega-embed';
-  /**
-   * @typedef {import('../stores/fetchData').EpiDataRow} EpiDataRow
-   */
 
-  /**
-   * @type {Promise<EpiDataRow[]>}
-   */
   export let data = Promise.resolve([]);
 
   /**
