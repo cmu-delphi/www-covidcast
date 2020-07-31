@@ -29,15 +29,17 @@
   let vegaPromise = null;
 
   let loading = true;
+  let empty = false;
 
-  $: updateData();
+  $: updateData(vegaPromise, data);
 
-  function updateData() {
+  function updateData(vegaPromise, data) {
     if (!vegaPromise) {
       return;
     }
     loading = true;
     Promise.all([vegaPromise, data]).then(([vega, d]) => {
+      empty = !d || d.length === 0;
       vega.view
         .change(
           'values',
@@ -63,7 +65,7 @@
     });
     vegaPromise.then((r) => {
       vega = r;
-      updateData();
+      updateData(r, data);
     });
     vegaPromise.catch((error) => console.error(error));
   });
@@ -80,4 +82,4 @@
   });
 </script>
 
-<div bind:this={root} class:loading />
+<div bind:this={root} class="root" class:loading class:no-data={empty} />
