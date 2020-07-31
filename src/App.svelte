@@ -22,6 +22,7 @@
   import Compare from './routes/compare/Compare.svelte';
   import Hotspots from './routes/hotspots/Hotspots.svelte';
   import { isDeathSignal, isCasesSignal } from '../data/signals';
+  import ModeToggle from './components/ModeToggle.svelte';
 
   // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
   const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
@@ -134,6 +135,19 @@
 </script>
 
 <style>
+  .root {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mode-switcher {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5em;
+  }
+
   .error-message-container {
     position: absolute;
     top: 0;
@@ -151,10 +165,15 @@
   <div class="error-message-container">Failed to load data. Please try again later...</div>
 {/if}
 
-{#if $currentMode === 'overview'}
-  <Overview />
-{:else if $currentMode === 'compare'}
-  <Compare />
-{:else if $currentMode === 'hotspots'}
-  <Hotspots />
-{/if}
+<div class="root">
+  <div class="mode-switcher">
+    <ModeToggle />
+  </div>
+  {#if $currentMode === 'overview'}
+    <Overview />
+  {:else if $currentMode === 'compare'}
+    <Compare />
+  {:else if $currentMode === 'hotspots'}
+    <Hotspots />
+  {/if}
+</div>
