@@ -5,7 +5,7 @@
   // import { readable } from 'svelte/store';
   import {
     currentRegion,
-    currentRegionName,
+    // currentRegionName,
     currentSensor,
     currentLevel,
     // currentDate,
@@ -13,8 +13,9 @@
     // currentRange,
   } from '../stores';
   // import { callAPI, callMetaAPI } from '../data/api';
+  import moment from 'moment';
 
-  const width = 100;
+  let width = 172;
   const height = 30;
 
   import { default as embed } from 'vega-embed';
@@ -22,12 +23,18 @@
 
   //let smallMultipleStart = 0;
   let smallMultipleContainer = null;
-
+  const sensorSmallMultipleBlacklist = [
+    'ght-smoothed_search',
+    'indicator-combination-confirmed_7dav_incidence_num',
+    'indicator-combination-deaths_7dav_incidence_num',
+    'safegraph-full_time_work_prop',
+  ];
+  let filteredSensors = $sensors.filter((s) => !sensorSmallMultipleBlacklist.includes(s.key));
+  console.log($sensors);
   // TODO: Fix in Safari
   // TODO: Don't show metrics that have no data
+  // TODO: Filter out sensors we don't want
   // TODO: Make end date of range programmatic
-  // TODO: Make the active signal first in the list of small multiples
-  // TODO: On active sensor change, scroll so it is first in small
 
   // TODO: Color signal title by current region's color scale in that metric
 
@@ -77,18 +84,18 @@
   let singleView = false;
   function toggleSingleView(focusSignal = null) {
     if (focusSignal.type !== 'click' && !singleView) {
-      console.log('Setting signal to ', focusSignal);
+      // console.log('Setting signal to ', focusSignal);
       $currentSensor = focusSignal;
     }
     singleView = !singleView;
   }
 
-  console.log($sensors);
+  // console.log($sensors);
 
-  console.log({
-    currentRegion,
-    currentRegionName,
-  });
+  // console.log({
+  //   currentRegion,
+  //   currentRegionName,
+  // });
   let region = '';
 
   currentRegion.subscribe((d) => {
@@ -181,24 +188,27 @@
       }
       d.epidata = d.epidata.map((d) => {
         let s = '' + d.time_value;
-        d.time_value = new Date(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} 12:01`).toString();
+        // d.time_value = new Date(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} 12:01`).toString();
+        d.time_value = moment(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} 12:01`); //.toString();
+
         return d;
       });
       lineChartSchema.data.values = d.epidata;
+      console.log('Making a chart', lineChartSchema);
       embed(`#${source}-${signal}-chart`, lineChartSchema, { actions: false }).catch((error) => console.error(error));
     });
   }
 
   function generateSingleChart() {
-    console.log({ $currentSensor });
+    // console.log({ $currentSensor });
     const s = idToSensor($currentSensor);
-    console.log('s!!!!', s);
+    // console.log('s!!!!', s);
     const apiURL = `https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day&data_source=${s.id}&signal=${s.signal}&geo_type=${$currentLevel}&time_values=20200401-20200710&geo_value=${region}`;
     // const apiURL = `https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day&data_source=doctor-visits&signal=smoothed_adj_cli&geo_type=county&time_values=20200401-20200710&geo_value=45051`;
     const singleLineChartSchema = {
       $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
-      height: 75,
-      width: 600,
+      height: 118,
+      width: 768,
       data: {
         values: null, // to be filled by API
       },
@@ -276,6 +286,7 @@
     };
 
     json(apiURL).then((d) => {
+      if (!d.epidata) return;
       d.epidata = d.epidata.map((d) => {
         let s = '' + d.time_value;
         d.time_value = new Date(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} 12:01`).toString();
@@ -287,7 +298,7 @@
   }
 
   function generateAllCharts() {
-    $sensors.forEach((s) => {
+    filteredSensors.forEach((s) => {
       generateLineChart(s.signal, s.id, s);
     });
 
@@ -296,6 +307,8 @@
 
   onMount(() => {
     smallMultipleContainer = document.getElementById('small-multiple-container');
+    console.log(smallMultipleContainer);
+    console.log('width', width);
 
     // generateAllCharts();
   });
@@ -307,32 +320,47 @@
     z-index: 100;
     position: absolute;
     right: 0.5em;
-    bottom: 24px;
+    bottom: 12px;
     padding: 0.25em;
     width: 65vw;
-    height: 28vh;
-    min-height: 140px;
+    /* height: 30vh; */
+    min-height: 192px;
+    max-height: 30vh;
     /* overflow-x: auto;
     overflow-y: hidden;
     white-space: nowrap; */
-
+    overflow-y: auto;
     background-color: white;
   }
 
+  #single-chart {
+    margin-top: 1em;
+  }
+  #multiples-charts {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: start;
+    justify-content: start;
+    margin-top: 2.5em;
+  }
   .small-multiples li {
     text-align: left;
-    display: inline-block;
+    /* display: inline-block; */
+    flex: 1 1 22%;
     vertical-align: top;
     margin: 0;
     margin-right: 4px;
     margin-bottom: 4px;
-    width: 130px;
-    padding: 2px;
+    padding: 0;
+    padding-top: 0.27em;
     /* height: 100px;
     width: 150px; */
+    list-style-type: none;
+    text-align: center;
   }
   .small-multiples li h5 {
-    font-size: 10px;
+    /*font-size: 9px;*/
     /* height: 2.5em; */
     margin: 0;
     padding: 0;
@@ -343,10 +371,25 @@
     margin: 0;
   }
   .small-multiples h4 {
-    position: sticky;
-    left: 0.25em;
-    margin: 0;
-    margin-bottom: 0.25em;
+    margin-top: 0.2em;
+    /* margin-bottom: 0.2em; */
+    font-weight: normal;
+  }
+  #metric-toggle {
+    position: absolute;
+    right: 0.4em;
+    top: 0.4em;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  .button {
+    min-width: 110px;
+    border-radius: 4px;
+    border: 1px solid #dbdbdb;
+    padding: 0.5em;
   }
 </style>
 
@@ -356,33 +399,31 @@
   {/if} -->
 
   <h4>
-    {#if singleView}{$currentSensor}{:else}{$sensors.length} available signals{/if}
+    {#if singleView}
+      <strong>{idToSensor($currentSensor).name}</strong>
+    {/if}
+    <!-- {:else}{filteredSensors.length} available signals{/if} -->
 
     <!-- <span hidden={singleView}>
       <button on:click={smallMultiplePrev}>Previous</button>
       <button on:click={smallMultipleNext}>Next</button>
     </span> -->
-    <button on:click={toggleSingleView}>
+    <button on:click={toggleSingleView} id="metric-toggle" class="button">
       {#if singleView}All metrics{:else}Single metric{/if}
     </button>
   </h4>
 
-  <!-- {#if !singleView} -->
+  <div id="single-chart" hidden={!singleView}>
+    <!-- <div id="single-{sensor.id}-{sensor.signal}-chart" class="single-sensor-chart" /> -->
+    <div id="single-sensor-chart" class="single-sensor-chart" />
+  </div>
+
   <div id="multiples-charts" hidden={singleView}>
-    {#each $sensors as sensor, i}
+    {#each filteredSensors as sensor, i}
       <li id="{sensor.id}-{sensor.signal}">
         <h5 title={sensor.tooltipText} on:click={() => toggleSingleView(sensor.key)}>{sensor.name}</h5>
         <div id="{sensor.id}-{sensor.signal}-chart" class="sensor-chart" />
       </li>
     {/each}
   </div>
-  <!-- {/if} -->
-
-  <!-- {#if singleView} -->
-  <div id="single-chart" hidden={!singleView}>
-    <!-- <div id="single-{sensor.id}-{sensor.signal}-chart" class="single-sensor-chart" /> -->
-    <div id="single-sensor-chart" class="single-sensor-chart" />
-
-  </div>
-  <!-- {/if} -->
 </div>
