@@ -9,10 +9,11 @@
    * @param {Map<string, any>} properties
    */
   function toHotspotData(row, properties, level) {
+    // TODO generalize this process into the stores
     const props = properties.get(row.geo_value.toUpperCase());
     return {
       name: props ? props.NAME : row.geo_value,
-      population: props ? Number.parseInt(props.population, 10) : 'Unknown',
+      population: props ? Number.parseInt(props.Population, 10) : null,
       value: row.value,
       level: level,
       geo_value: row.geo_value,
@@ -24,20 +25,26 @@
     return row;
   }
 
+  const TOP_HOTSPOTS = 10;
+
   function byHotspot(a, b) {
+    // TODO better ranking
     if (a.value !== b.value) {
       return a.value < b.value ? 1 : -1;
     }
     return a.geo_value.localeCompare(b.geo_value);
   }
 
+  // property lookup using geojson properties
   $: properties = !$geojsons.has($currentLevel)
     ? new Map()
     : new Map($geojsons.get($currentLevel).features.map((r) => [r.properties.id, r.properties]));
+
+  // transform current data
   $: data = $currentData
     .map((row) => toHotspotData(row, properties, $currentLevel))
     .sort(byHotspot)
-    .slice(0, 10)
+    .slice(0, TOP_HOTSPOTS)
     .map((d) => addData(d, $currentSensorEntry));
 </script>
 
@@ -111,6 +118,7 @@
       <thead>
         <tr>
           <th rowspan="2">Name</th>
+          <th rowspan="2">Population</th>
           <th colspan="2">{$currentSensorEntry.name}</th>
         </tr>
         <tr>
@@ -122,7 +130,8 @@
         {#each data as row}
           <tr>
             <td>{row.name}</td>
-            <td class="right">{row.value.toFixed(3)}</td>
+            <td class="right">{row.population != null ? row.population.toLocaleString() : ''}</td>
+            <td class="right">{row.value != null ? row.value.toFixed(3) : 'Unknown'}</td>
             <td class="chart">
               <LineChart data={row.data} />
             </td>
