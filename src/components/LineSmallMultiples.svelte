@@ -188,7 +188,6 @@
       }
       d.epidata = d.epidata.map((d) => {
         let s = '' + d.time_value;
-        // d.time_value = new Date(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} 12:01`).toString();
         d.time_value = moment(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} 12:01`); //.toString();
 
         return d;
@@ -289,7 +288,7 @@
       if (!d.epidata) return;
       d.epidata = d.epidata.map((d) => {
         let s = '' + d.time_value;
-        d.time_value = new Date(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} 12:01`).toString();
+        d.time_value = moment(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} 12:01`); //.toString();
         return d;
       });
       singleLineChartSchema.data.values = d.epidata;
