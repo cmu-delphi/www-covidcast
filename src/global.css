@@ -151,3 +151,4 @@ button.mapboxgl-popup-close-button {
 }
 
 @import './styles/pg-button.css';
+@import './styles/loading.css';
