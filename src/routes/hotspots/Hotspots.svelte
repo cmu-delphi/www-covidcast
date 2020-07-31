@@ -1,8 +1,18 @@
 <script>
   import Options from '../../components/Options.svelte';
-  import { currentData, geojsons, currentLevel, currentSensorEntry, currentDate } from '../../stores';
+  import {
+    currentData,
+    geojsons,
+    currentLevel,
+    currentSensorEntry,
+    currentDate,
+    currentMode,
+    currentRegion,
+    currentRegionName,
+  } from '../../stores';
   import LineChart from '../../components/vega/LineChart.svelte';
   import { fetchTimeSlice } from '../../data/fetchData';
+  import IoIosPin from 'svelte-icons/io/IoIosPin.svelte';
 
   /**
    * @param {import('../../data/fetchData').EpiDataRow} row
@@ -12,6 +22,7 @@
     // TODO generalize this process into the stores
     const props = properties.get(row.geo_value.toUpperCase());
     return {
+      id: row.geo_value,
       name: props ? props.NAME : row.geo_value,
       population: props ? Number.parseInt(props.Population, 10) : null,
       value: row.value,
@@ -46,6 +57,12 @@
     .sort(byHotspot)
     .slice(0, TOP_HOTSPOTS)
     .map((d) => addData(d, $currentSensorEntry));
+
+  function jumpTo(row) {
+    currentMode.set('overview');
+    currentRegion.set(row.id);
+    currentRegionName.set(row.name);
+  }
 </script>
 
 <style>
@@ -67,6 +84,16 @@
 
   .table td {
     vertical-align: middle;
+  }
+
+  .name {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .name > span {
+    margin-right: 0.5em;
   }
 
   .right {
@@ -129,7 +156,12 @@
       <tbody>
         {#each data as row}
           <tr>
-            <td>{row.name}</td>
+            <td class="name">
+              <span>{row.name}</span>
+              <button class="pg-button" title="Show on Map" on:click={jumpTo(row)}>
+                <IoIosPin />
+              </button>
+            </td>
             <td class="right">{row.population != null ? row.population.toLocaleString() : ''}</td>
             <td class="right">{row.value != null ? row.value.toFixed(3) : 'Unknown'}</td>
             <td class="chart">
