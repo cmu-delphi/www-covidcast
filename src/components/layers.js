@@ -21,4 +21,12 @@ export const L = {
       fill: 'bubble-highlight-fill',
     },
   },
+  spike: {
+    fill: 'spike-fill',
+    stroke: 'spike-stroke',
+    highlight: {
+      fill: 'spike-highlight-fill',
+      stroke: 'spike-highlight-stroke',
+    },
+  },
 };

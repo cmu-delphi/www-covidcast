@@ -88,15 +88,9 @@
   $: loaded = false;
   $: invalidSearch = false;
 
-  const SPIKE_LAYER = 'spike';
-
   // given the level (state/msa/county), returns the name of its "centered" source/layer
   function center(name) {
     return `${name}-centers`;
-  }
-
-  function highlight(name) {
-    return `${name}-highlight`;
   }
 
   function outline(name) {
@@ -525,7 +519,7 @@
     if ($encoding === 'color') {
       // hide all other layers
       hideAll([L.bubble.fill, L.bubble.highlight.fill]);
-      hideAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
+      hideAll([L.spike.fill, L.spike.stroke, L.spike.highlight.fill, L.spike.highlight.stroke]);
       hideAll(otherLevels);
 
       show($currentLevel);
@@ -549,7 +543,7 @@
       hideAll(otherLevels);
       show($currentLevel);
       map.setPaintProperty($currentLevel, 'fill-color', MAP_THEME.countyFill);
-      hideAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
+      hideAll([L.spike.fill, L.spike.stroke, L.spike.highlight.fill, L.spike.highlight.stroke]);
 
       // show bubble layers
       if ($signalType === 'direction') {
@@ -594,9 +588,9 @@
       hideAll([L.bubble.fill, L.bubble.highlight.fill]);
 
       if ($signalType === 'direction') {
-        hideAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
+        hideAll([L.spike.fill, L.spike.stroke, L.spike.highlight.fill, L.spike.highlight.stroke]);
       } else {
-        showAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
+        showAll([L.spike.fill, L.spike.stroke, L.spike.highlight.fill, L.spike.highlight.stroke]);
       }
 
       const valueMax = valueMinMax[1],
@@ -658,11 +652,11 @@
 
       let flatStops = stops.flat();
       let colorExpression = ['interpolate', ['linear'], ['get', 'value']].concat(flatStops);
-      map.setPaintProperty(SPIKE_LAYER, 'fill-color', colorExpression);
-      map.setPaintProperty(outline(SPIKE_LAYER), 'line-color', colorExpression);
-      map.setPaintProperty(highlight(SPIKE_LAYER), 'fill-color', colorExpression);
-      map.setPaintProperty(highlight(outline(SPIKE_LAYER)), 'line-color', colorExpression);
-      map.setPaintProperty(outline(SPIKE_LAYER), 'line-width', ENCODING_SPIKE_THEME.strokeWidth[$currentLevel]);
+      map.setPaintProperty(L.spike.fill, 'fill-color', colorExpression);
+      map.setPaintProperty(L.spike.stroke, 'line-color', colorExpression);
+      map.setPaintProperty(L.spike.highlight.fill, 'fill-color', colorExpression);
+      map.setPaintProperty(L.spike.highlight.stroke, 'line-color', colorExpression);
+      map.setPaintProperty(L.spike.stroke, 'line-width', ENCODING_SPIKE_THEME.strokeWidth[$currentLevel]);
 
       map.getSource(S.spike.fill).setData(spikes);
       map.getSource(S.spike.stroke).setData(spikeOutlines);
@@ -1129,7 +1123,7 @@
 
       map.addLayer(
         {
-          id: SPIKE_LAYER,
+          id: L.spike.fill,
           type: 'fill',
           source: S.spike.fill,
           filter: ['>', ['get', 'value'], 0],
@@ -1149,7 +1143,7 @@
 
       map.addLayer(
         {
-          id: outline(SPIKE_LAYER),
+          id: L.spike.stroke,
           type: 'line',
           source: S.spike.stroke,
           filter: ['>', ['get', 'value'], 0],
@@ -1172,7 +1166,7 @@
 
       map.addLayer(
         {
-          id: highlight(SPIKE_LAYER),
+          id: L.spike.highlight.fill,
           type: 'fill',
           source: S.spike.fill,
           filter: ['>', ['get', 'value'], 0],
@@ -1192,7 +1186,7 @@
 
       map.addLayer(
         {
-          id: highlight(outline(SPIKE_LAYER)),
+          id: L.spike.highlight.stroke,
           type: 'line',
           source: S.spike.stroke,
           filter: ['>', ['get', 'value'], 0],
@@ -1309,7 +1303,7 @@
     currentRegionName.set(selectedRegion['name']);
     currentRegion.set(selectedRegion['property_id']);
     clickedId = parseInt(selectedRegion['id']);
-    setFeatureStateMultiple([$currentLevel, L.bubble.fill, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
+    setFeatureStateMultiple([$currentLevel, L.bubble.fill, L.spike.fill, L.spike.stroke], clickedId, {
       select: true,
     });
 
