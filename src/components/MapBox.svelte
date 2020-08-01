@@ -88,15 +88,6 @@
   $: loaded = false;
   $: invalidSearch = false;
 
-  // given the level (state/msa/county), returns the name of its "centered" source/layer
-  function center(name) {
-    return `${name}-centers`;
-  }
-
-  function outline(name) {
-    return `${name}-outline`;
-  }
-
   // helper function for multiple calls of map.setFeatureState
   function setFeatureStateMultiple(sources, id, state) {
     sources.forEach((s) => {
@@ -116,7 +107,7 @@
     map.getCanvas().style.cursor = 'pointer';
     ($encoding === 'spike' ? topPopup : popup).setLngLat(e.lngLat).addTo(map);
     setFeatureStateMultiple([level, S.bubble, S.spike.fill, S.spike.stroke], hoveredId, { hover: false });
-    map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
+    map.setFeatureState({ source: S.megaCounty, id: megaHoveredId }, { hover: false });
   };
 
   const onMouseMove = (level) => (e) => {
@@ -130,7 +121,7 @@
     }
 
     setFeatureStateMultiple([level, S.bubble, S.spike.fill, S.spike.stroke], hoveredId, { hover: false });
-    map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
+    map.setFeatureState({ source: S.megaCounty, id: megaHoveredId }, { hover: false });
     let fillColor;
     if (level === 'mega-county') {
       if (hoveredId === null) {
@@ -254,7 +245,7 @@
       topPopup.remove();
       return;
     }
-    map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
+    map.setFeatureState({ source: S.megaCounty, id: megaHoveredId }, { hover: false });
     if (level === 'mega-county' && hoveredId !== null) megaHoveredId = null;
 
     setFeatureStateMultiple([level, S.bubble, S.spike.fill, S.spike.stroke], hoveredId, { hover: false });
@@ -273,7 +264,7 @@
     }
     if (megaClickedId) {
       // reset
-      map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: false });
+      map.setFeatureState({ source: S.megaCounty, id: megaClickedId }, { select: false });
     }
     if (level === 'mega-county') {
       if (hoveredId !== null) return;
@@ -420,7 +411,7 @@
     }
 
     let dat = $geojsons.get($currentLevel);
-    let centerDat = $geojsons.get(center($currentLevel));
+    let centerDat = $geojsons.get(S[$currentLevel].center);
 
     // set the value of the chosen sensor to each states/counties
     // dat: data for cholopleth
@@ -447,8 +438,8 @@
 
     if (['data', 'init'].includes(type)) {
       map.getSource($currentLevel).setData(dat);
-      map.getSource(center($currentLevel)).setData(centerDat);
-      drawMega ? map.getSource('mega-county').setData(megaDat) : '';
+      map.getSource(S[$currentLevel].center).setData(centerDat);
+      drawMega ? map.getSource(S.megaCounty).setData(megaDat) : '';
     }
 
     let stops, stopsMega, currentRadiusScale;
@@ -556,7 +547,7 @@
       let flatStops = stops.flat();
       let colorExpression = ['interpolate', ['linear'], ['get', 'value']].concat(flatStops);
 
-      map.getSource(S.bubble).setData(map.getSource(center($currentLevel))._data);
+      map.getSource(S.bubble).setData(map.getSource(S[$currentLevel].center)._data);
 
       map.setPaintProperty(L.bubble.fill, 'circle-stroke-color', colorExpression);
       map.setPaintProperty(L.bubble.highlight.fill, 'circle-stroke-color', colorExpression);
@@ -602,7 +593,7 @@
       const heightScale = parseScaleSpec(heightScaleTheme).range([0, maxHeight]).domain([0, valueMax]);
 
       spikeHeightScale.set(heightScale);
-      const centers = $geojsons.get(center($currentLevel));
+      const centers = $geojsons.get(S[$currentLevel].center);
       const features = centers.features.filter((feature) => feature.properties.value > 0);
 
       const spikes = {
@@ -708,7 +699,7 @@
       if (megaFound) {
         megaClickedId = parseInt(megaFound.properties.STATE);
         currentRegionName.set(megaFound.properties.NAME);
-        map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: true });
+        map.setFeatureState({ source: S.megaCounty, id: megaClickedId }, { select: true });
       }
       if (found) {
         clickedId = found.id;
@@ -809,31 +800,31 @@
     });
 
     map.on('load', function () {
-      map.addSource(outline('county'), {
+      map.addSource(S.county.border, {
         type: 'geojson',
         data: $geojsons.get('county'),
       });
-      map.addSource(outline('state'), {
+      map.addSource(S.state.border, {
         type: 'geojson',
         data: $geojsons.get('state'),
       });
-      map.addSource('city-point', {
+      map.addSource(S.cityPoint, {
         type: 'geojson',
         data: $geojsons.get('city'),
       });
-      map.addSource('mega-county', {
+      map.addSource(S.megaCounty, {
         type: 'geojson',
         data: $geojsons.get('state'),
       });
-      map.addSource('zone-outline', {
+      map.addSource(S.zoneOutline, {
         type: 'geojson',
         data: $geojsons.get('zone'),
       });
 
       levels.forEach((level) => {
-        map.addSource(center(level), {
+        map.addSource(S[level].center, {
           type: 'geojson',
-          data: $geojsons.get(center(level)),
+          data: $geojsons.get(S[level].center),
         });
       });
 
@@ -862,8 +853,8 @@
       });
 
       map.addLayer({
-        id: outline('county'),
-        source: outline('county'),
+        id: L.county.border,
+        source: S.county.border,
         type: 'fill',
         paint: {
           'fill-color': MAP_THEME.countyFill,
@@ -873,8 +864,8 @@
       });
 
       map.addLayer({
-        id: outline('state'),
-        source: outline('state'),
+        id: L.state.border,
+        source: S.state.border,
         type: 'fill',
         paint: {
           'fill-color': 'rgba(0, 0, 0, 0)',
@@ -913,7 +904,7 @@
 
       map.addLayer({
         id: 'state-names',
-        source: center('state'),
+        source: S.state.center,
         type: 'symbol',
         maxzoom: 8,
         layout: {
@@ -931,7 +922,7 @@
       map.addLayer(
         {
           id: 'city-point-unclustered-pit',
-          source: 'city-point',
+          source: S.cityPoint,
           type: 'symbol',
           filter: ['==', 'city', 'Pittsburgh'],
           maxzoom: 8,
@@ -950,7 +941,7 @@
       map.addLayer(
         {
           id: 'city-point-unclustered',
-          source: 'city-point',
+          source: S.cityPoint,
           type: 'symbol',
           filter: ['>', 'population', 900000],
           maxzoom: 4,
@@ -969,7 +960,7 @@
       map.addLayer(
         {
           id: 'city-point-unclustered-2',
-          source: 'city-point',
+          source: S.cityPoint,
           type: 'symbol',
           filter: ['>', 'population', 500000],
           maxzoom: 6,
@@ -989,7 +980,7 @@
       map.addLayer(
         {
           id: 'city-point-unclustered-3',
-          source: 'city-point',
+          source: S.cityPoint,
           type: 'symbol',
           filter: ['>', 'population', 100000],
           maxzoom: 8,
@@ -1009,7 +1000,7 @@
       map.addLayer(
         {
           id: 'city-point-unclustered-4',
-          source: 'city-point',
+          source: S.cityPoint,
           type: 'symbol',
           minzoom: 8,
           layout: {
@@ -1030,7 +1021,7 @@
       map.addLayer(
         {
           id: 'mega-county',
-          source: 'mega-county',
+          source: S.megaCounty,
           type: 'fill',
           visibility: 'none',
           filter: ['!=', 'value', -100],
@@ -1221,7 +1212,7 @@
     if (zoneName === 'swpa') {
       map.addLayer({
         id: 'zone-outline',
-        source: 'zone-outline',
+        source: S.zoneOutline,
         type: 'line',
         paint: {
           'line-color': MAP_THEME.zoneOutline,
@@ -1238,7 +1229,7 @@
     }
     clickedId = null;
     if (megaClickedId) {
-      map.setFeatureState({ source: 'mega-county', id: megaClickedId }, { select: false });
+      map.setFeatureState({ source: S.megaCounty, id: megaClickedId }, { select: false });
     }
     megaClickedId = null;
   }
@@ -1247,7 +1238,7 @@
     clickedId = Number.parseInt(selectedRegion['id']);
 
     map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-    map.setFeatureState({ source: center($currentLevel), id: clickedId }, { select: true });
+    map.setFeatureState({ source: S[$currentLevel].center, id: clickedId }, { select: true });
   }
 
   function findSelectedRegion(id) {
@@ -1308,7 +1299,7 @@
     });
 
     // Get zoom and center of selected location
-    let centersData = $geojsons.get(center($currentLevel))['features'];
+    let centersData = $geojsons.get(S[$currentLevel].center)['features'];
     let centerLocation;
     for (let i = 0; i < centersData.length; i++) {
       let info = centersData[i];

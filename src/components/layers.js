@@ -12,9 +12,15 @@ Layer names used in MapBox
 */
 
 export const L = {
-  state: 'state',
-  msa: 'msa',
-  county: 'county',
+  state: {
+    border: 'state-border',
+  },
+  msa: {
+    border: 'msa-border',
+  },
+  county: {
+    border: 'county-border',
+  },
   bubble: {
     fill: 'bubble-fill',
     highlight: {
