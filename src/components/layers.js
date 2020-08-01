@@ -13,13 +13,28 @@ Layer names used in MapBox
 
 export const L = {
   state: {
-    border: 'state-border',
+    fill: 'state-fill',
+    stroke: 'state-stroke',
+    hover: 'state-hover',
+    selected: 'state-selected',
   },
   msa: {
-    border: 'msa-border',
+    fill: 'msa-fill',
+    stroke: 'msa-stroke',
+    hover: 'msa-hover',
+    selected: 'msa-selected',
   },
   county: {
-    border: 'county-border',
+    fill: 'county-fill',
+    stroke: 'county-stroke',
+    hover: 'county-hover',
+    selected: 'county-selected',
+  },
+  'mega-county': {
+    fill: 'mega-county-fill',
+    stroke: 'mega-county-stroke',
+    hover: 'mega-county-hover',
+    selected: 'mega-county-selected',
   },
   bubble: {
     fill: 'bubble-fill',

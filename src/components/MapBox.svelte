@@ -106,12 +106,12 @@
   const onMouseEnter = (level) => (e) => {
     map.getCanvas().style.cursor = 'pointer';
     ($encoding === 'spike' ? topPopup : popup).setLngLat(e.lngLat).addTo(map);
-    setFeatureStateMultiple([level, S.bubble, S.spike.fill, S.spike.stroke], hoveredId, { hover: false });
-    map.setFeatureState({ source: S.megaCounty, id: megaHoveredId }, { hover: false });
+    setFeatureStateMultiple([S[level].border, S.bubble, S.spike.fill, S.spike.stroke], hoveredId, { hover: false });
+    map.setFeatureState({ source: S['mega-county'].border, id: megaHoveredId }, { hover: false });
   };
 
   const onMouseMove = (level) => (e) => {
-    if (level === 'state-outline') {
+    if (level === L.state.stroke) {
       map.getCanvas().style.cursor = 'pointer';
       ($encoding === 'spike' ? topPopup : popup)
         .setLngLat(e.lngLat)
@@ -120,13 +120,13 @@
       return;
     }
 
-    setFeatureStateMultiple([level, S.bubble, S.spike.fill, S.spike.stroke], hoveredId, { hover: false });
-    map.setFeatureState({ source: S.megaCounty, id: megaHoveredId }, { hover: false });
+    setFeatureStateMultiple([S[level].border, S.bubble, S.spike.fill, S.spike.stroke], hoveredId, { hover: false });
+    map.setFeatureState({ source: S['mega-county'].border, id: megaHoveredId }, { hover: false });
     let fillColor;
     if (level === 'mega-county') {
       if (hoveredId === null) {
         megaHoveredId = e.features[0].id;
-        map.setFeatureState({ source: level, id: megaHoveredId }, { hover: true });
+        map.setFeatureState({ source: S[level].border, id: megaHoveredId }, { hover: true });
 
         const value = e.features[0].properties.value;
         fillColor = $colorScale(value);
@@ -137,7 +137,7 @@
       // The hovered element is not a mega county. It can be county, msa, state, bubble, or spike.
 
       hoveredId = e.features[0].id;
-      setFeatureStateMultiple([level, S.bubble, S.spike.fill, S.spike.stroke], hoveredId, { hover: true });
+      setFeatureStateMultiple([S[level].border, S.bubble, S.spike.fill, S.spike.stroke], hoveredId, { hover: true });
 
       const value = e.features[0].properties.value;
       fillColor = $colorScale(value);
@@ -240,15 +240,15 @@
   };
 
   const onMouseLeave = (level) => () => {
-    if (level === 'state-outline') {
+    if (level === L.state.stroke) {
       popup.remove();
       topPopup.remove();
       return;
     }
-    map.setFeatureState({ source: S.megaCounty, id: megaHoveredId }, { hover: false });
+    map.setFeatureState({ source: S['mega-county'].border, id: megaHoveredId }, { hover: false });
     if (level === 'mega-county' && hoveredId !== null) megaHoveredId = null;
 
-    setFeatureStateMultiple([level, S.bubble, S.spike.fill, S.spike.stroke], hoveredId, { hover: false });
+    setFeatureStateMultiple([S[level].border, S.bubble, S.spike.fill, S.spike.stroke], hoveredId, { hover: false });
 
     if (level !== 'mega-county') hoveredId = null;
 
@@ -260,11 +260,11 @@
   const onClick = (level) => (e) => {
     if (clickedId) {
       // reset
-      setFeatureStateMultiple([level, S.bubble, S.spike.fill, S.spike.stroke], clickedId, { select: false });
+      setFeatureStateMultiple([S[level].border, S.bubble, S.spike.fill, S.spike.stroke], clickedId, { select: false });
     }
     if (megaClickedId) {
       // reset
-      map.setFeatureState({ source: S.megaCounty, id: megaClickedId }, { select: false });
+      map.setFeatureState({ source: S['mega-county'].border, id: megaClickedId }, { select: false });
     }
     if (level === 'mega-county') {
       if (hoveredId !== null) return;
@@ -275,10 +275,10 @@
         return;
       }
 
-      map.setFeatureState({ source: 'county', id: clickedId }, { select: false });
+      map.setFeatureState({ source: S['county'].border, id: clickedId }, { select: false });
       clickedId = null;
       megaClickedId = e.features[0].id;
-      setFeatureStateMultiple([level, S.bubble, S.spike.fill, S.spike.stroke], megaClickedId, {
+      setFeatureStateMultiple([S[level].border, S.bubble, S.spike.fill, S.spike.stroke], megaClickedId, {
         select: true,
       });
 
@@ -289,7 +289,7 @@
       megaClickedId = null;
       if (clickedId !== e.features[0].id) {
         clickedId = e.features[0].id;
-        setFeatureStateMultiple([level, S.bubble, S.spike.fill, S.spike.stroke], clickedId, { select: true });
+        setFeatureStateMultiple([S[level].border, S.bubble, S.spike.fill, S.spike.stroke], clickedId, { select: true });
         currentRegionName.set(e.features[0].properties.NAME);
         currentRegion.set(e.features[0].properties.id);
         selectedRegion = findSelectedRegion(e.features[0].properties.id);
@@ -437,9 +437,9 @@
     });
 
     if (['data', 'init'].includes(type)) {
-      map.getSource($currentLevel).setData(dat);
+      map.getSource(S[$currentLevel].border).setData(dat);
       map.getSource(S[$currentLevel].center).setData(centerDat);
-      drawMega ? map.getSource(S.megaCounty).setData(megaDat) : '';
+      drawMega ? map.getSource(S['mega-county'].border).setData(megaDat) : '';
     }
 
     let stops, stopsMega, currentRadiusScale;
@@ -511,29 +511,29 @@
       // hide all other layers
       hideAll([L.bubble.fill, L.bubble.highlight.fill]);
       hideAll([L.spike.fill, L.spike.stroke, L.spike.highlight.fill, L.spike.highlight.stroke]);
-      hideAll(otherLevels);
+      hideAll(otherLevels.map((l) => L[l].fill));
 
-      show($currentLevel);
+      show(L[$currentLevel].fill);
 
-      map.setPaintProperty($currentLevel, 'fill-color', {
+      map.setPaintProperty(L[$currentLevel].fill, 'fill-color', {
         property: $signalType,
         stops: stops,
       });
 
       if (drawMega) {
-        map.setPaintProperty('mega-county', 'fill-color', {
+        map.setPaintProperty(L['mega-county'].fill, 'fill-color', {
           property: $signalType,
           stops: stopsMega,
         });
-        show('mega-county');
+        show(L['mega-county'].fill);
       } else {
-        hide('mega-county');
+        hide(L['mega-county'].fill);
       }
     } else if ($encoding === 'bubble') {
       // hide all color layers except for one for the current level (for tooltip)
-      hideAll(otherLevels);
-      show($currentLevel);
-      map.setPaintProperty($currentLevel, 'fill-color', MAP_THEME.countyFill);
+      hideAll(otherLevels.map((l) => L[l].fill));
+      show(L[$currentLevel].fill);
+      map.setPaintProperty(L[$currentLevel].fill, 'fill-color', MAP_THEME.countyFill);
       hideAll([L.spike.fill, L.spike.stroke, L.spike.highlight.fill, L.spike.highlight.stroke]);
 
       // show bubble layers
@@ -573,9 +573,9 @@
     } else if ($encoding === 'spike') {
       // hide all color layers except one for the current level
 
-      hideAll(otherLevels);
-      show($currentLevel);
-      map.setPaintProperty($currentLevel, 'fill-color', MAP_THEME.countyFill);
+      hideAll(otherLevels.map((l) => L[l].fill));
+      show(L[$currentLevel].fill);
+      map.setPaintProperty(L[$currentLevel].fill, 'fill-color', MAP_THEME.countyFill);
       hideAll([L.bubble.fill, L.bubble.highlight.fill]);
 
       if ($signalType === 'direction') {
@@ -699,7 +699,7 @@
       if (megaFound) {
         megaClickedId = parseInt(megaFound.properties.STATE);
         currentRegionName.set(megaFound.properties.NAME);
-        map.setFeatureState({ source: S.megaCounty, id: megaClickedId }, { select: true });
+        map.setFeatureState({ source: S['mega-county'].border, id: megaClickedId }, { select: true });
       }
       if (found) {
         clickedId = found.id;
@@ -724,7 +724,7 @@
 
   function labelStates() {
     if (map !== undefined) {
-      if ($currentLevel == 'state') {
+      if ($currentLevel === 'state') {
         map.setLayoutProperty('state-names', 'visibility', 'visible');
       } else {
         map.setLayoutProperty('state-names', 'visibility', 'none');
@@ -732,7 +732,7 @@
     }
   }
 
-  function toggle_state_label() {
+  function toggleStateLabel() {
     if (map.getLayoutProperty('state-names', 'visibility') === 'visible') {
       map.setLayoutProperty('state-names', 'visibility', 'none');
     } else {
@@ -747,6 +747,57 @@
     trackEvent('map', 'resize');
     requestAnimationFrame(() => {
       map.fitBounds(stateBounds, stateBoundsOptions);
+    });
+  }
+
+  function addSources() {
+    map.addSource(S.cityPoint, {
+      type: 'geojson',
+      data: $geojsons.get('city'),
+    });
+    map.addSource(S['mega-county'].border, {
+      type: 'geojson',
+      data: $geojsons.get('state'),
+    });
+    map.addSource(S.zoneOutline, {
+      type: 'geojson',
+      data: $geojsons.get('zone'),
+    });
+
+    levels.forEach((level) => {
+      map.addSource(S[level].border, {
+        type: 'geojson',
+        data: $geojsons.get(level),
+      });
+
+      map.addSource(S[level].center, {
+        type: 'geojson',
+        data: $geojsons.get(S[level].center),
+      });
+    });
+
+    map.addSource(S.bubble, {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    });
+
+    map.addSource(S.spike.fill, {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    });
+
+    map.addSource(S.spike.stroke, {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
     });
   }
 
@@ -780,14 +831,15 @@
       anchor: 'top',
     });
 
-    map.on('mousemove', 'state-outline', onMouseMove('state-outline'));
-    map.on('mouseleave', 'state-outline', onMouseLeave('state-outline'));
+    map
+      .on('mousemove', L.state.stroke, onMouseMove(L.state.stroke))
+      .on('mouseleave', L.state.stroke, onMouseLeave(L.state.stroke));
 
     [...levels, 'mega-county'].forEach((level) => {
-      map.on('mouseenter', level, onMouseEnter(level));
-      map.on('mousemove', level, onMouseMove(level));
-      map.on('mouseleave', level, onMouseLeave(level));
-      map.on('click', level, onClick(level));
+      map.on('mouseenter', L[level].fill, onMouseEnter(level));
+      map.on('mousemove', L[level].fill, onMouseMove(level));
+      map.on('mouseleave', L[level].fill, onMouseLeave(level));
+      map.on('click', L[level].fill, onClick(level));
     });
 
     map.on('idle', () => {
@@ -800,60 +852,10 @@
     });
 
     map.on('load', function () {
-      map.addSource(S.county.border, {
-        type: 'geojson',
-        data: $geojsons.get('county'),
-      });
-      map.addSource(S.state.border, {
-        type: 'geojson',
-        data: $geojsons.get('state'),
-      });
-      map.addSource(S.cityPoint, {
-        type: 'geojson',
-        data: $geojsons.get('city'),
-      });
-      map.addSource(S.megaCounty, {
-        type: 'geojson',
-        data: $geojsons.get('state'),
-      });
-      map.addSource(S.zoneOutline, {
-        type: 'geojson',
-        data: $geojsons.get('zone'),
-      });
-
-      levels.forEach((level) => {
-        map.addSource(S[level].center, {
-          type: 'geojson',
-          data: $geojsons.get(S[level].center),
-        });
-      });
-
-      map.addSource(S.bubble, {
-        type: 'geojson',
-        data: {
-          type: 'FeatureCollection',
-          features: [],
-        },
-      });
-
-      map.addSource(S.spike.fill, {
-        type: 'geojson',
-        data: {
-          type: 'FeatureCollection',
-          features: [],
-        },
-      });
-
-      map.addSource(S.spike.stroke, {
-        type: 'geojson',
-        data: {
-          type: 'FeatureCollection',
-          features: [],
-        },
-      });
+      addSources();
 
       map.addLayer({
-        id: L.county.border,
+        id: L.county.stroke,
         source: S.county.border,
         type: 'fill',
         paint: {
@@ -864,7 +866,7 @@
       });
 
       map.addLayer({
-        id: L.state.border,
+        id: L.state.stroke,
         source: S.state.border,
         type: 'fill',
         paint: {
@@ -873,17 +875,10 @@
         },
       });
 
-      levels.forEach((name) => {
-        map.addSource(name, {
-          type: 'geojson',
-          data: $geojsons.get(name),
-        });
-      });
-
-      ['mega-county', ...levels].forEach((name) => {
+      ['mega-county', ...levels].forEach((level) => {
         map.addLayer({
-          id: `${name}-hover`,
-          source: name,
+          id: L[level].hover,
+          source: S[level].border,
           type: 'line',
           paint: {
             'line-color': MAP_THEME.hoverRegionOutline,
@@ -892,8 +887,8 @@
         });
 
         map.addLayer({
-          id: `${name}-selected`,
-          source: name,
+          id: L[level].selected,
+          source: S[level].border,
           type: 'line',
           paint: {
             'line-color': MAP_THEME.selectedRegionOutline,
@@ -1020,8 +1015,8 @@
 
       map.addLayer(
         {
-          id: 'mega-county',
-          source: S.megaCounty,
+          id: L['mega-county'].fill,
+          source: S['mega-county'].border,
           type: 'fill',
           visibility: 'none',
           filter: ['!=', 'value', -100],
@@ -1030,14 +1025,14 @@
             'fill-color': MAP_THEME.countyFill,
           },
         },
-        `mega-county-hover`,
+        L['mega-county'].hover,
       );
 
       levels.forEach((level) => {
         map.addLayer(
           {
-            id: level,
-            source: level,
+            id: L[level].fill,
+            source: S[level].border,
             type: 'fill',
             visibility: 'none',
             filter: ['!=', 'value', -100],
@@ -1046,7 +1041,7 @@
               'fill-color': MAP_THEME.countyFill,
             },
           },
-          `${level}-hover`,
+          L[level].hover,
         );
       });
 
@@ -1078,7 +1073,7 @@
             ],
           },
         },
-        'county-hover',
+        L.county.hover,
       );
 
       map.addLayer(
@@ -1129,7 +1124,7 @@
             'fill-outline-color': 'transparent',
           },
         },
-        'county-hover',
+        L.county.hover,
       );
 
       map.addLayer(
@@ -1152,7 +1147,7 @@
             ],
           },
         },
-        'county-hover',
+        L.county.hover,
       );
 
       map.addLayer(
@@ -1229,7 +1224,7 @@
     }
     clickedId = null;
     if (megaClickedId) {
-      map.setFeatureState({ source: S.megaCounty, id: megaClickedId }, { select: false });
+      map.setFeatureState({ source: S['mega-county'].border, id: megaClickedId }, { select: false });
     }
     megaClickedId = null;
   }
@@ -1520,7 +1515,7 @@
         }}
         on:hideLabels={() => {
           trackEvent('map', 'toggleStateLabel');
-          toggle_state_label();
+          toggleStateLabel();
         }}
         on:swpa={() => {
           markInitialView(false);
