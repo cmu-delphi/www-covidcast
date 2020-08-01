@@ -121,7 +121,7 @@
   const onMouseEnter = (level) => (e) => {
     map.getCanvas().style.cursor = 'pointer';
     ($encoding === 'spike' ? topPopup : popup).setLngLat(e.lngLat).addTo(map);
-    setFeatureStateMultiple([level, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: false });
+    setFeatureStateMultiple([level, S.bubble, S.spike.fill, S.spike.stroke], hoveredId, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
   };
 
@@ -135,7 +135,7 @@
       return;
     }
 
-    setFeatureStateMultiple([level, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: false });
+    setFeatureStateMultiple([level, S.bubble, S.spike.fill, S.spike.stroke], hoveredId, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
     let fillColor;
     if (level === 'mega-county') {
@@ -152,7 +152,7 @@
       // The hovered element is not a mega county. It can be county, msa, state, bubble, or spike.
 
       hoveredId = e.features[0].id;
-      setFeatureStateMultiple([level, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: true });
+      setFeatureStateMultiple([level, S.bubble, S.spike.fill, S.spike.stroke], hoveredId, { hover: true });
 
       const value = e.features[0].properties.value;
       fillColor = $colorScale(value);
@@ -263,7 +263,7 @@
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
     if (level === 'mega-county' && hoveredId !== null) megaHoveredId = null;
 
-    setFeatureStateMultiple([level, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: false });
+    setFeatureStateMultiple([level, S.bubble, S.spike.fill, S.spike.stroke], hoveredId, { hover: false });
 
     if (level !== 'mega-county') hoveredId = null;
 
@@ -275,7 +275,7 @@
   const onClick = (level) => (e) => {
     if (clickedId) {
       // reset
-      setFeatureStateMultiple([level, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, { select: false });
+      setFeatureStateMultiple([level, S.bubble, S.spike.fill, S.spike.stroke], clickedId, { select: false });
     }
     if (megaClickedId) {
       // reset
@@ -293,7 +293,7 @@
       map.setFeatureState({ source: 'county', id: clickedId }, { select: false });
       clickedId = null;
       megaClickedId = e.features[0].id;
-      setFeatureStateMultiple([level, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], megaClickedId, {
+      setFeatureStateMultiple([level, S.bubble, S.spike.fill, S.spike.stroke], megaClickedId, {
         select: true,
       });
 
@@ -304,7 +304,7 @@
       megaClickedId = null;
       if (clickedId !== e.features[0].id) {
         clickedId = e.features[0].id;
-        setFeatureStateMultiple([level, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, { select: true });
+        setFeatureStateMultiple([level, S.bubble, S.spike.fill, S.spike.stroke], clickedId, { select: true });
         currentRegionName.set(e.features[0].properties.NAME);
         currentRegion.set(e.features[0].properties.id);
         selectedRegion = findSelectedRegion(e.features[0].properties.id);
@@ -664,8 +664,8 @@
       map.setPaintProperty(highlight(outline(SPIKE_LAYER)), 'line-color', colorExpression);
       map.setPaintProperty(outline(SPIKE_LAYER), 'line-width', ENCODING_SPIKE_THEME.strokeWidth[$currentLevel]);
 
-      map.getSource(SPIKE_LAYER).setData(spikes);
-      map.getSource(outline(SPIKE_LAYER)).setData(spikeOutlines);
+      map.getSource(S.spike.fill).setData(spikes);
+      map.getSource(S.spike.stroke).setData(spikeOutlines);
 
       hide('mega-county');
     }
@@ -688,7 +688,7 @@
             currentRegionName.set(randomFeature.properties.NAME);
             currentRegion.set(randomFeature.id);
             clickedId = randomFeature.id;
-            setFeatureStateMultiple([$currentLevel, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
+            setFeatureStateMultiple([S.bubble, S.spike.fill, S.spike.stroke], clickedId, {
               select: true,
             });
           }
@@ -700,7 +700,7 @@
           currentRegion.set(randomFeature.properties.id);
 
           clickedId = randomFeature.id;
-          setFeatureStateMultiple([$currentLevel, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
+          setFeatureStateMultiple([S.bubble, S.spike.fill, S.spike.stroke], clickedId, {
             select: true,
           });
           chosenRandom = true;
@@ -719,7 +719,7 @@
       if (found) {
         clickedId = found.id;
         currentRegionName.set(found.properties.NAME);
-        setFeatureStateMultiple([$currentLevel, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
+        setFeatureStateMultiple([S.bubble, S.spike.fill, S.spike.stroke], clickedId, {
           select: true,
         });
       }
@@ -851,7 +851,7 @@
         },
       });
 
-      map.addSource(SPIKE_LAYER, {
+      map.addSource(S.spike.fill, {
         type: 'geojson',
         data: {
           type: 'FeatureCollection',
@@ -859,7 +859,7 @@
         },
       });
 
-      map.addSource(outline(SPIKE_LAYER), {
+      map.addSource(S.spike.stroke, {
         type: 'geojson',
         data: {
           type: 'FeatureCollection',
@@ -1131,7 +1131,7 @@
         {
           id: SPIKE_LAYER,
           type: 'fill',
-          source: SPIKE_LAYER,
+          source: S.spike.fill,
           filter: ['>', ['get', 'value'], 0],
           paint: {
             'fill-color': 'transparent',
@@ -1151,7 +1151,7 @@
         {
           id: outline(SPIKE_LAYER),
           type: 'line',
-          source: outline(SPIKE_LAYER),
+          source: S.spike.stroke,
           filter: ['>', ['get', 'value'], 0],
           layout: {
             'line-cap': 'round',
@@ -1174,7 +1174,7 @@
         {
           id: highlight(SPIKE_LAYER),
           type: 'fill',
-          source: SPIKE_LAYER,
+          source: S.spike.fill,
           filter: ['>', ['get', 'value'], 0],
           paint: {
             'fill-color': 'transparent',
@@ -1194,7 +1194,7 @@
         {
           id: highlight(outline(SPIKE_LAYER)),
           type: 'line',
-          source: outline(SPIKE_LAYER),
+          source: S.spike.stroke,
           filter: ['>', ['get', 'value'], 0],
           layout: {
             'line-cap': 'round',
