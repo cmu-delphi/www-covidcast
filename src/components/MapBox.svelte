@@ -4,7 +4,7 @@
   import 'mapbox-gl/dist/mapbox-gl.css';
   import { getTextColorBasedOnBackground, zip, transparent } from '../util.js';
   import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../theme.js';
-  import { parseScaleSpec } from './scale.js';
+  import { parseScaleSpec } from './scales.js';
   import Options from './Options.svelte';
   import Toggle from './Toggle.svelte';
   import Legend from './Legend.svelte';
@@ -45,6 +45,8 @@
   import logspace from 'compute-logspace';
   import { isCountSignal, getType } from '../data/signals';
   import { trackEvent } from '../stores/ga.js';
+  import { L } from './layers.js';
+  import { S } from './sources.js';
 
   export let graphShowStatus, toggleGraphShowStatus;
 
@@ -86,8 +88,7 @@
   $: loaded = false;
   $: invalidSearch = false;
 
-  const BUBBLE_LAYER = 'bubble',
-    SPIKE_LAYER = 'spike';
+  const SPIKE_LAYER = 'spike';
 
   // given the level (state/msa/county), returns the name of its "centered" source/layer
   function center(name) {
@@ -120,7 +121,7 @@
   const onMouseEnter = (level) => (e) => {
     map.getCanvas().style.cursor = 'pointer';
     ($encoding === 'spike' ? topPopup : popup).setLngLat(e.lngLat).addTo(map);
-    setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: false });
+    setFeatureStateMultiple([level, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
   };
 
@@ -134,7 +135,7 @@
       return;
     }
 
-    setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: false });
+    setFeatureStateMultiple([level, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: false });
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
     let fillColor;
     if (level === 'mega-county') {
@@ -151,7 +152,7 @@
       // The hovered element is not a mega county. It can be county, msa, state, bubble, or spike.
 
       hoveredId = e.features[0].id;
-      setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: true });
+      setFeatureStateMultiple([level, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: true });
 
       const value = e.features[0].properties.value;
       fillColor = $colorScale(value);
@@ -262,7 +263,7 @@
     map.setFeatureState({ source: 'mega-county', id: megaHoveredId }, { hover: false });
     if (level === 'mega-county' && hoveredId !== null) megaHoveredId = null;
 
-    setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: false });
+    setFeatureStateMultiple([level, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], hoveredId, { hover: false });
 
     if (level !== 'mega-county') hoveredId = null;
 
@@ -274,7 +275,7 @@
   const onClick = (level) => (e) => {
     if (clickedId) {
       // reset
-      setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, { select: false });
+      setFeatureStateMultiple([level, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, { select: false });
     }
     if (megaClickedId) {
       // reset
@@ -292,7 +293,7 @@
       map.setFeatureState({ source: 'county', id: clickedId }, { select: false });
       clickedId = null;
       megaClickedId = e.features[0].id;
-      setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], megaClickedId, {
+      setFeatureStateMultiple([level, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], megaClickedId, {
         select: true,
       });
 
@@ -303,7 +304,7 @@
       megaClickedId = null;
       if (clickedId !== e.features[0].id) {
         clickedId = e.features[0].id;
-        setFeatureStateMultiple([level, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, { select: true });
+        setFeatureStateMultiple([level, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, { select: true });
         currentRegionName.set(e.features[0].properties.NAME);
         currentRegion.set(e.features[0].properties.id);
         selectedRegion = findSelectedRegion(e.features[0].properties.id);
@@ -366,10 +367,10 @@
 
     currentRange.set($signalType === 'value' ? valueMinMax : [-1, 1]);
 
-    let valueMappedVals = new Map();
-    let directionMappedVals = new Map();
-    let valueMappedMega = new Map();
-    let directionMappedMega = new Map();
+    let valueMappedVals = new Map(),
+      directionMappedVals = new Map(),
+      valueMappedMega = new Map(),
+      directionMappedMega = new Map();
 
     // Get the GEO_IDS and value/directions from the API data, including mega counties if necessary.
     let geoIds = new Set(
@@ -523,7 +524,7 @@
 
     if ($encoding === 'color') {
       // hide all other layers
-      hideAll([BUBBLE_LAYER, highlight(BUBBLE_LAYER)]);
+      hideAll([L.bubble.fill, L.bubble.highlight.fill]);
       hideAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
       hideAll(otherLevels);
 
@@ -552,22 +553,22 @@
 
       // show bubble layers
       if ($signalType === 'direction') {
-        hideAll([BUBBLE_LAYER, highlight(BUBBLE_LAYER)]);
+        hideAll([L.bubble.fill, L.bubble.highlight.fill]);
       } else {
-        showAll([BUBBLE_LAYER, highlight(BUBBLE_LAYER)]);
+        showAll([L.bubble.fill, L.bubble.highlight.fill]);
       }
 
       // color scale (color + stroke color)
       let flatStops = stops.flat();
       let colorExpression = ['interpolate', ['linear'], ['get', 'value']].concat(flatStops);
 
-      map.getSource(BUBBLE_LAYER).setData(map.getSource(center($currentLevel))._data);
+      map.getSource(S.bubble).setData(map.getSource(center($currentLevel))._data);
 
-      map.setPaintProperty(BUBBLE_LAYER, 'circle-stroke-color', colorExpression);
-      map.setPaintProperty(highlight(BUBBLE_LAYER), 'circle-stroke-color', colorExpression);
+      map.setPaintProperty(L.bubble.fill, 'circle-stroke-color', colorExpression);
+      map.setPaintProperty(L.bubble.highlight.fill, 'circle-stroke-color', colorExpression);
 
-      map.setPaintProperty(BUBBLE_LAYER, 'circle-color', colorExpression);
-      map.setPaintProperty(highlight(BUBBLE_LAYER), 'circle-color', colorExpression);
+      map.setPaintProperty(L.bubble.fill, 'circle-color', colorExpression);
+      map.setPaintProperty(L.bubble.highlight.fill, 'circle-color', colorExpression);
 
       const minRadius = ENCODING_BUBBLE_THEME.minRadius[$currentLevel],
         maxRadius = ENCODING_BUBBLE_THEME.maxRadius[$currentLevel];
@@ -580,8 +581,8 @@
 
       bubbleRadiusScale.set(currentRadiusScale);
 
-      map.setPaintProperty(BUBBLE_LAYER, 'circle-radius', radiusExpression);
-      map.setPaintProperty(highlight(BUBBLE_LAYER), 'circle-radius', radiusExpression);
+      map.setPaintProperty(L.bubble.fill, 'circle-radius', radiusExpression);
+      map.setPaintProperty(L.bubble.highlight.fill, 'circle-radius', radiusExpression);
 
       hide('mega-county');
     } else if ($encoding === 'spike') {
@@ -590,7 +591,7 @@
       hideAll(otherLevels);
       show($currentLevel);
       map.setPaintProperty($currentLevel, 'fill-color', MAP_THEME.countyFill);
-      hideAll([BUBBLE_LAYER, highlight(BUBBLE_LAYER)]);
+      hideAll([L.bubble.fill, L.bubble.highlight.fill]);
 
       if ($signalType === 'direction') {
         hideAll([SPIKE_LAYER, outline(SPIKE_LAYER), highlight(SPIKE_LAYER), highlight(outline(SPIKE_LAYER))]);
@@ -687,7 +688,7 @@
             currentRegionName.set(randomFeature.properties.NAME);
             currentRegion.set(randomFeature.id);
             clickedId = randomFeature.id;
-            setFeatureStateMultiple([$currentLevel, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
+            setFeatureStateMultiple([$currentLevel, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
               select: true,
             });
           }
@@ -699,7 +700,7 @@
           currentRegion.set(randomFeature.properties.id);
 
           clickedId = randomFeature.id;
-          setFeatureStateMultiple([$currentLevel, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
+          setFeatureStateMultiple([$currentLevel, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
             select: true,
           });
           chosenRandom = true;
@@ -718,7 +719,7 @@
       if (found) {
         clickedId = found.id;
         currentRegionName.set(found.properties.NAME);
-        setFeatureStateMultiple([$currentLevel, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
+        setFeatureStateMultiple([$currentLevel, S.bubble, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
           select: true,
         });
       }
@@ -842,7 +843,7 @@
         });
       });
 
-      map.addSource(BUBBLE_LAYER, {
+      map.addSource(S.bubble, {
         type: 'geojson',
         data: {
           type: 'FeatureCollection',
@@ -1068,8 +1069,8 @@
 
       map.addLayer(
         {
-          id: BUBBLE_LAYER,
-          source: BUBBLE_LAYER,
+          id: L.bubble.fill,
+          source: S.bubble,
           type: 'circle',
           visibility: 'none',
           filter: ['>', ['get', 'value'], 0],
@@ -1097,8 +1098,8 @@
 
       map.addLayer(
         {
-          id: highlight(BUBBLE_LAYER),
-          source: BUBBLE_LAYER,
+          id: L.bubble.highlight.fill,
+          source: S.bubble,
           type: 'circle',
           visibility: 'none',
           filter: ['>', ['get', 'value'], 0],
@@ -1308,7 +1309,7 @@
     currentRegionName.set(selectedRegion['name']);
     currentRegion.set(selectedRegion['property_id']);
     clickedId = parseInt(selectedRegion['id']);
-    setFeatureStateMultiple([$currentLevel, BUBBLE_LAYER, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
+    setFeatureStateMultiple([$currentLevel, L.bubble.fill, SPIKE_LAYER, outline(SPIKE_LAYER)], clickedId, {
       select: true,
     });
 
