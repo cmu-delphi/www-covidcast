@@ -47,7 +47,7 @@
   import { trackEvent } from '../stores/ga.js';
   import { L } from './layers.js';
   import { S } from './sources.js';
-
+  import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './encodings';
   export let graphShowStatus, toggleGraphShowStatus;
 
   let searchErrorComponent;
@@ -83,6 +83,12 @@
   let clickedId;
   let megaClickedId;
   let selectedRegion;
+
+  const encodings = {
+    color: new ChoroplethEncoding(),
+    bubble: new BubbleEncoding(ENCODING_BUBBLE_THEME),
+    spike: new SpikeEncoding(ENCODING_SPIKE_THEME),
+  };
 
   $: regionList = [];
   $: loaded = false;
@@ -502,20 +508,20 @@
       colorStops.set(stops);
     }
 
+    // changed the visibility of layers
+
     const show = (name) => map.setLayoutProperty(name, 'visibility', 'visible'),
-      hide = (name) => map.setLayoutProperty(name, 'visibility', 'none'),
-      showAll = (names) => names.forEach(show),
-      hideAll = (names) => names.forEach(hide),
-      otherLevels = levels.filter((name) => name !== $currentLevel);
+      hide = (name) => map.setLayoutProperty(name, 'visibility', 'none');
+
+    const allEncodingLayers = Object.values(encodings)
+      .flatMap((enc) => enc.layers)
+      .concat([L['mega-county'].fill]);
+    const visibleLayers = encodings[$encoding].getVisibleLayers($currentLevel, $signalType);
+
+    allEncodingLayers.filter((l) => !visibleLayers.includes(l)).forEach(hide);
+    visibleLayers.forEach(show);
 
     if ($encoding === 'color') {
-      // hide all other layers
-      hideAll([L.bubble.fill, L.bubble.highlight.fill]);
-      hideAll([L.spike.fill, L.spike.stroke, L.spike.highlight.fill, L.spike.highlight.stroke]);
-      hideAll(otherLevels.map((l) => L[l].fill));
-
-      show(L[$currentLevel].fill);
-
       map.setPaintProperty(L[$currentLevel].fill, 'fill-color', {
         property: $signalType,
         stops: stops,
@@ -527,23 +533,9 @@
           stops: stopsMega,
         });
         show(L['mega-county'].fill);
-      } else {
-        hide(L['mega-county'].fill);
       }
     } else if ($encoding === 'bubble') {
-      // hide all color layers except for one for the current level (for tooltip)
-      hideAll(otherLevels.map((l) => L[l].fill));
-      show(L[$currentLevel].fill);
       map.setPaintProperty(L[$currentLevel].fill, 'fill-color', MAP_THEME.countyFill);
-      hideAll([L.spike.fill, L.spike.stroke, L.spike.highlight.fill, L.spike.highlight.stroke]);
-
-      // show bubble layers
-      if ($signalType === 'direction') {
-        hideAll([L.bubble.fill, L.bubble.highlight.fill]);
-      } else {
-        showAll([L.bubble.fill, L.bubble.highlight.fill]);
-      }
-
       // color scale (color + stroke color)
       let flatStops = stops.flat();
       let colorExpression = ['interpolate', ['linear'], ['get', 'value']].concat(flatStops);
@@ -569,22 +561,8 @@
 
       map.setPaintProperty(L.bubble.fill, 'circle-radius', radiusExpression);
       map.setPaintProperty(L.bubble.highlight.fill, 'circle-radius', radiusExpression);
-
-      hide('mega-county');
     } else if ($encoding === 'spike') {
-      // hide all color layers except one for the current level
-
-      hideAll(otherLevels.map((l) => L[l].fill));
-      show(L[$currentLevel].fill);
       map.setPaintProperty(L[$currentLevel].fill, 'fill-color', MAP_THEME.countyFill);
-      hideAll([L.bubble.fill, L.bubble.highlight.fill]);
-
-      if ($signalType === 'direction') {
-        hideAll([L.spike.fill, L.spike.stroke, L.spike.highlight.fill, L.spike.highlight.stroke]);
-      } else {
-        showAll([L.spike.fill, L.spike.stroke, L.spike.highlight.fill, L.spike.highlight.stroke]);
-      }
-
       const valueMax = valueMinMax[1],
         maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel],
         size = ENCODING_SPIKE_THEME.size[$currentLevel];
@@ -652,8 +630,6 @@
 
       map.getSource(S.spike.fill).setData(spikes);
       map.getSource(S.spike.stroke).setData(spikeOutlines);
-
-      hide('mega-county');
     }
 
     const viableFeatures = dat.features.filter((f) => f.properties[$signalType] !== -100);
@@ -777,28 +753,205 @@
       });
     });
 
-    map.addSource(S.bubble, {
-      type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: [],
+    Object.values(encodings).forEach((enc) => {
+      enc.addSources(map);
+    });
+  }
+
+  function addLayers() {
+    map.addLayer({
+      id: L.county.stroke,
+      source: S.county.border,
+      type: 'fill',
+      paint: {
+        'fill-color': MAP_THEME.countyFill,
+        'fill-outline-color': MAP_THEME.countyOutline,
+        'fill-opacity': 0.4,
       },
     });
 
-    map.addSource(S.spike.fill, {
-      type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: [],
+    map.addLayer({
+      id: L.state.stroke,
+      source: S.state.border,
+      type: 'fill',
+      paint: {
+        'fill-color': 'rgba(0, 0, 0, 0)',
+        'fill-outline-color': MAP_THEME.stateOutline,
       },
     });
 
-    map.addSource(S.spike.stroke, {
-      type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: [],
+    ['mega-county', ...levels].forEach((level) => {
+      map.addLayer({
+        id: L[level].hover,
+        source: S[level].border,
+        type: 'line',
+        paint: {
+          'line-color': MAP_THEME.hoverRegionOutline,
+          'line-width': ['case', ['any', ['boolean', ['feature-state', 'hover'], false]], 4, 0],
+        },
+      });
+
+      map.addLayer({
+        id: L[level].selected,
+        source: S[level].border,
+        type: 'line',
+        paint: {
+          'line-color': MAP_THEME.selectedRegionOutline,
+          'line-width': ['case', ['any', ['boolean', ['feature-state', 'select'], false]], 4, 0],
+        },
+      });
+    });
+
+    map.addLayer({
+      id: L.state.names,
+      source: S.state.center,
+      type: 'symbol',
+      maxzoom: 8,
+      layout: {
+        'text-field': ['upcase', ['get', 'NAME']],
+        'text-font': ['Open Sans Bold'],
+        'text-size': 11,
       },
+      paint: {
+        'text-opacity': 0.5,
+        'text-halo-color': '#fff',
+        'text-halo-width': 1,
+      },
+    });
+
+    map.addLayer(
+      {
+        id: 'city-point-unclustered-pit',
+        source: S.cityPoint,
+        type: 'symbol',
+        filter: ['==', 'city', 'Pittsburgh'],
+        maxzoom: 8,
+        layout: {
+          'text-field': ['get', 'city'],
+          'text-font': ['Open Sans Regular'],
+          'text-size': 12,
+        },
+        paint: {
+          'text-halo-color': '#fff',
+          'text-halo-width': 1.5,
+        },
+      },
+      L.state.names,
+    );
+    map.addLayer(
+      {
+        id: 'city-point-unclustered',
+        source: S.cityPoint,
+        type: 'symbol',
+        filter: ['>', 'population', 900000],
+        maxzoom: 4,
+        layout: {
+          'text-field': ['get', 'city'],
+          'text-font': ['Open Sans Regular'],
+          'text-size': 12,
+        },
+        paint: {
+          'text-halo-color': '#fff',
+          'text-halo-width': 1.5,
+        },
+      },
+      L.state.names,
+    );
+    map.addLayer(
+      {
+        id: 'city-point-unclustered-2',
+        source: S.cityPoint,
+        type: 'symbol',
+        filter: ['>', 'population', 500000],
+        maxzoom: 6,
+        minzoom: 4,
+        layout: {
+          'text-field': ['get', 'city'],
+          'text-font': ['Open Sans Regular'],
+          'text-size': 12,
+        },
+        paint: {
+          'text-halo-color': '#fff',
+          'text-halo-width': 1.5,
+        },
+      },
+      L.state.names,
+    );
+    map.addLayer(
+      {
+        id: 'city-point-unclustered-3',
+        source: S.cityPoint,
+        type: 'symbol',
+        filter: ['>', 'population', 100000],
+        maxzoom: 8,
+        minzoom: 6,
+        layout: {
+          'text-field': ['get', 'city'],
+          'text-font': ['Open Sans Regular'],
+          'text-size': 12,
+        },
+        paint: {
+          'text-halo-color': '#fff',
+          'text-halo-width': 1.5,
+        },
+      },
+      L.state.names,
+    );
+    map.addLayer(
+      {
+        id: 'city-point-unclustered-4',
+        source: S.cityPoint,
+        type: 'symbol',
+        minzoom: 8,
+        layout: {
+          'text-field': ['get', 'city'],
+          'text-font': ['Open Sans Regular'],
+          'text-size': 12,
+        },
+        paint: {
+          'text-halo-color': '#fff',
+          'text-halo-width': 1.5,
+        },
+      },
+      L.state.names,
+    );
+
+    labelStates();
+
+    map.addLayer(
+      {
+        id: L['mega-county'].fill,
+        source: S['mega-county'].border,
+        type: 'fill',
+        visibility: 'none',
+        filter: ['!=', 'value', -100],
+        paint: {
+          'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
+          'fill-color': MAP_THEME.countyFill,
+        },
+      },
+      L['mega-county'].hover,
+    );
+
+    levels.forEach((level) => {
+      map.addLayer(
+        {
+          id: L[level].fill,
+          source: S[level].border,
+          type: 'fill',
+          visibility: 'none',
+          filter: ['!=', 'value', -100],
+          paint: {
+            'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
+            'fill-color': MAP_THEME.countyFill,
+          },
+        },
+        L[level].hover,
+      );
+    });
+
+    Object.values(encodings).forEach((enc) => {
+      enc.addLayers(map);
     });
   }
 
@@ -854,346 +1007,7 @@
 
     map.on('load', function () {
       addSources();
-
-      map.addLayer({
-        id: L.county.stroke,
-        source: S.county.border,
-        type: 'fill',
-        paint: {
-          'fill-color': MAP_THEME.countyFill,
-          'fill-outline-color': MAP_THEME.countyOutline,
-          'fill-opacity': 0.4,
-        },
-      });
-
-      map.addLayer({
-        id: L.state.stroke,
-        source: S.state.border,
-        type: 'fill',
-        paint: {
-          'fill-color': 'rgba(0, 0, 0, 0)',
-          'fill-outline-color': MAP_THEME.stateOutline,
-        },
-      });
-
-      ['mega-county', ...levels].forEach((level) => {
-        map.addLayer({
-          id: L[level].hover,
-          source: S[level].border,
-          type: 'line',
-          paint: {
-            'line-color': MAP_THEME.hoverRegionOutline,
-            'line-width': ['case', ['any', ['boolean', ['feature-state', 'hover'], false]], 4, 0],
-          },
-        });
-
-        map.addLayer({
-          id: L[level].selected,
-          source: S[level].border,
-          type: 'line',
-          paint: {
-            'line-color': MAP_THEME.selectedRegionOutline,
-            'line-width': ['case', ['any', ['boolean', ['feature-state', 'select'], false]], 4, 0],
-          },
-        });
-      });
-
-      map.addLayer({
-        id: L.state.names,
-        source: S.state.center,
-        type: 'symbol',
-        maxzoom: 8,
-        layout: {
-          'text-field': ['upcase', ['get', 'NAME']],
-          'text-font': ['Open Sans Bold'],
-          'text-size': 11,
-        },
-        paint: {
-          'text-opacity': 0.5,
-          'text-halo-color': '#fff',
-          'text-halo-width': 1,
-        },
-      });
-
-      map.addLayer(
-        {
-          id: 'city-point-unclustered-pit',
-          source: S.cityPoint,
-          type: 'symbol',
-          filter: ['==', 'city', 'Pittsburgh'],
-          maxzoom: 8,
-          layout: {
-            'text-field': ['get', 'city'],
-            'text-font': ['Open Sans Regular'],
-            'text-size': 12,
-          },
-          paint: {
-            'text-halo-color': '#fff',
-            'text-halo-width': 1.5,
-          },
-        },
-        L.state.names,
-      );
-      map.addLayer(
-        {
-          id: 'city-point-unclustered',
-          source: S.cityPoint,
-          type: 'symbol',
-          filter: ['>', 'population', 900000],
-          maxzoom: 4,
-          layout: {
-            'text-field': ['get', 'city'],
-            'text-font': ['Open Sans Regular'],
-            'text-size': 12,
-          },
-          paint: {
-            'text-halo-color': '#fff',
-            'text-halo-width': 1.5,
-          },
-        },
-        L.state.names,
-      );
-      map.addLayer(
-        {
-          id: 'city-point-unclustered-2',
-          source: S.cityPoint,
-          type: 'symbol',
-          filter: ['>', 'population', 500000],
-          maxzoom: 6,
-          minzoom: 4,
-          layout: {
-            'text-field': ['get', 'city'],
-            'text-font': ['Open Sans Regular'],
-            'text-size': 12,
-          },
-          paint: {
-            'text-halo-color': '#fff',
-            'text-halo-width': 1.5,
-          },
-        },
-        L.state.names,
-      );
-      map.addLayer(
-        {
-          id: 'city-point-unclustered-3',
-          source: S.cityPoint,
-          type: 'symbol',
-          filter: ['>', 'population', 100000],
-          maxzoom: 8,
-          minzoom: 6,
-          layout: {
-            'text-field': ['get', 'city'],
-            'text-font': ['Open Sans Regular'],
-            'text-size': 12,
-          },
-          paint: {
-            'text-halo-color': '#fff',
-            'text-halo-width': 1.5,
-          },
-        },
-        L.state.names,
-      );
-      map.addLayer(
-        {
-          id: 'city-point-unclustered-4',
-          source: S.cityPoint,
-          type: 'symbol',
-          minzoom: 8,
-          layout: {
-            'text-field': ['get', 'city'],
-            'text-font': ['Open Sans Regular'],
-            'text-size': 12,
-          },
-          paint: {
-            'text-halo-color': '#fff',
-            'text-halo-width': 1.5,
-          },
-        },
-        L.state.names,
-      );
-
-      labelStates();
-
-      map.addLayer(
-        {
-          id: L['mega-county'].fill,
-          source: S['mega-county'].border,
-          type: 'fill',
-          visibility: 'none',
-          filter: ['!=', 'value', -100],
-          paint: {
-            'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
-            'fill-color': MAP_THEME.countyFill,
-          },
-        },
-        L['mega-county'].hover,
-      );
-
-      levels.forEach((level) => {
-        map.addLayer(
-          {
-            id: L[level].fill,
-            source: S[level].border,
-            type: 'fill',
-            visibility: 'none',
-            filter: ['!=', 'value', -100],
-            paint: {
-              'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
-              'fill-color': MAP_THEME.countyFill,
-            },
-          },
-          L[level].hover,
-        );
-      });
-
-      // 2 layers for bubbles
-
-      map.addLayer(
-        {
-          id: L.bubble.fill,
-          source: S.bubble,
-          type: 'circle',
-          visibility: 'none',
-          filter: ['>', ['get', 'value'], 0],
-          paint: {
-            'circle-radius': 0,
-            'circle-color': ENCODING_BUBBLE_THEME.color,
-            'circle-stroke-color': ENCODING_BUBBLE_THEME.strokeColor,
-            'circle-stroke-width': ENCODING_BUBBLE_THEME.strokeWidth,
-            'circle-opacity': [
-              'case',
-              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
-              0,
-              ENCODING_BUBBLE_THEME.opacity,
-            ],
-            'circle-stroke-opacity': [
-              'case',
-              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
-              0,
-              ENCODING_BUBBLE_THEME.strokeOpacity,
-            ],
-          },
-        },
-        L.county.hover,
-      );
-
-      map.addLayer(
-        {
-          id: L.bubble.highlight.fill,
-          source: S.bubble,
-          type: 'circle',
-          visibility: 'none',
-          filter: ['>', ['get', 'value'], 0],
-          paint: {
-            'circle-radius': 0,
-            'circle-color': ENCODING_BUBBLE_THEME.color,
-            'circle-stroke-color': ENCODING_BUBBLE_THEME.strokeColor,
-            'circle-stroke-width': ENCODING_BUBBLE_THEME.strokeWidthHighlighted,
-            'circle-opacity': [
-              'case',
-              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
-              ENCODING_BUBBLE_THEME.opacity,
-              0,
-            ],
-            'circle-stroke-opacity': [
-              'case',
-              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
-              ENCODING_BUBBLE_THEME.strokeOpacity,
-              0,
-            ],
-          },
-        },
-        'city-point-unclustered-pit',
-      );
-
-      // 4 layers for spikes
-
-      map.addLayer(
-        {
-          id: L.spike.fill,
-          type: 'fill',
-          source: S.spike.fill,
-          filter: ['>', ['get', 'value'], 0],
-          paint: {
-            'fill-color': 'transparent',
-            'fill-opacity': [
-              'case',
-              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
-              0,
-              ENCODING_SPIKE_THEME.fillOpacity,
-            ],
-            'fill-outline-color': 'transparent',
-          },
-        },
-        L.county.hover,
-      );
-
-      map.addLayer(
-        {
-          id: L.spike.stroke,
-          type: 'line',
-          source: S.spike.stroke,
-          filter: ['>', ['get', 'value'], 0],
-          layout: {
-            'line-cap': 'round',
-            'line-join': 'round',
-          },
-          paint: {
-            'line-color': 'transparent',
-            'line-opacity': [
-              'case',
-              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
-              0,
-              ENCODING_SPIKE_THEME.strokeOpacity,
-            ],
-          },
-        },
-        L.county.hover,
-      );
-
-      map.addLayer(
-        {
-          id: L.spike.highlight.fill,
-          type: 'fill',
-          source: S.spike.fill,
-          filter: ['>', ['get', 'value'], 0],
-          paint: {
-            'fill-color': 'transparent',
-            'fill-opacity': [
-              'case',
-              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
-              ENCODING_SPIKE_THEME.fillOpacity,
-              0,
-            ],
-            'fill-outline-color': 'transparent',
-          },
-        },
-        'city-point-unclustered-pit',
-      );
-
-      map.addLayer(
-        {
-          id: L.spike.highlight.stroke,
-          type: 'line',
-          source: S.spike.stroke,
-          filter: ['>', ['get', 'value'], 0],
-          layout: {
-            'line-cap': 'round',
-            'line-join': 'round',
-          },
-          paint: {
-            'line-color': 'transparent',
-            'line-width': ENCODING_SPIKE_THEME.strokeWidthHighlighted,
-            'line-opacity': [
-              'case',
-              ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
-              ENCODING_SPIKE_THEME.strokeOpacity,
-              0,
-            ],
-          },
-        },
-        'city-point-unclustered-pit',
-      );
+      addLayers();
 
       if ($currentZone === 'swpa') {
         showZoneBoundary('swpa');
