@@ -17,6 +17,7 @@ export const L = {
     stroke: 'state-stroke',
     hover: 'state-hover',
     selected: 'state-selected',
+    names: 'state-names',
   },
   msa: {
     fill: 'msa-fill',

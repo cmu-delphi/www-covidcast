@@ -91,6 +91,7 @@
   // helper function for multiple calls of map.setFeatureState
   function setFeatureStateMultiple(sources, id, state) {
     sources.forEach((s) => {
+      if (!map.getSource(s)) throw `source ${s} does not exist`;
       map.setFeatureState({ source: s, id: id }, state);
     });
   }
@@ -725,18 +726,18 @@
   function labelStates() {
     if (map !== undefined) {
       if ($currentLevel === 'state') {
-        map.setLayoutProperty('state-names', 'visibility', 'visible');
+        map.setLayoutProperty(L.state.names, 'visibility', 'visible');
       } else {
-        map.setLayoutProperty('state-names', 'visibility', 'none');
+        map.setLayoutProperty(L.state.names, 'visibility', 'none');
       }
     }
   }
 
   function toggleStateLabel() {
-    if (map.getLayoutProperty('state-names', 'visibility') === 'visible') {
-      map.setLayoutProperty('state-names', 'visibility', 'none');
+    if (map.getLayoutProperty(L.state.names, 'visibility') === 'visible') {
+      map.setLayoutProperty(L.state.names, 'visibility', 'none');
     } else {
-      map.setLayoutProperty('state-names', 'visibility', 'visible');
+      map.setLayoutProperty(L.state.names, 'visibility', 'visible');
     }
   }
 
@@ -898,7 +899,7 @@
       });
 
       map.addLayer({
-        id: 'state-names',
+        id: L.state.names,
         source: S.state.center,
         type: 'symbol',
         maxzoom: 8,
@@ -931,7 +932,7 @@
             'text-halo-width': 1.5,
           },
         },
-        'state-names',
+        L.state.names,
       );
       map.addLayer(
         {
@@ -950,7 +951,7 @@
             'text-halo-width': 1.5,
           },
         },
-        'state-names',
+        L.state.names,
       );
       map.addLayer(
         {
@@ -970,7 +971,7 @@
             'text-halo-width': 1.5,
           },
         },
-        'state-names',
+        L.state.names,
       );
       map.addLayer(
         {
@@ -990,7 +991,7 @@
             'text-halo-width': 1.5,
           },
         },
-        'state-names',
+        L.state.names,
       );
       map.addLayer(
         {
@@ -1008,7 +1009,7 @@
             'text-halo-width': 1.5,
           },
         },
-        'state-names',
+        L.state.names,
       );
 
       labelStates();
@@ -1289,7 +1290,7 @@
     currentRegionName.set(selectedRegion['name']);
     currentRegion.set(selectedRegion['property_id']);
     clickedId = parseInt(selectedRegion['id']);
-    setFeatureStateMultiple([$currentLevel, L.bubble.fill, L.spike.fill, L.spike.stroke], clickedId, {
+    setFeatureStateMultiple([S[$currentLevel].border, S.bubble, S.spike.fill, S.spike.stroke], clickedId, {
       select: true,
     });
 
