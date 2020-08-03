@@ -51,4 +51,13 @@ export const L = {
       stroke: 'spike-highlight-stroke',
     },
   },
+  zoneOutline: 'zone-outline',
+  cityPoints: {
+    pit: 'city-point-unclustered-pit',
+    1: 'city-point-unclustered-1',
+    2: 'city-point-unclustered-2',
+    3: 'city-point-unclustered-3',
+    4: 'city-point-unclustered-4',
+    5: 'city-point-unclustered-5',
+  },
 };

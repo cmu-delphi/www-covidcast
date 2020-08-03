@@ -821,7 +821,7 @@
 
     map.addLayer(
       {
-        id: 'city-point-unclustered-pit',
+        id: L.cityPoints.pit,
         source: S.cityPoint,
         type: 'symbol',
         filter: ['==', 'city', 'Pittsburgh'],
@@ -840,7 +840,7 @@
     );
     map.addLayer(
       {
-        id: 'city-point-unclustered',
+        id: L.cityPoints.pit[1],
         source: S.cityPoint,
         type: 'symbol',
         filter: ['>', 'population', 900000],
@@ -859,7 +859,7 @@
     );
     map.addLayer(
       {
-        id: 'city-point-unclustered-2',
+        id: L.cityPoints.pit[2],
         source: S.cityPoint,
         type: 'symbol',
         filter: ['>', 'population', 500000],
@@ -879,7 +879,7 @@
     );
     map.addLayer(
       {
-        id: 'city-point-unclustered-3',
+        id: L.cityPoints.pit[3],
         source: S.cityPoint,
         type: 'symbol',
         filter: ['>', 'population', 100000],
@@ -899,7 +899,7 @@
     );
     map.addLayer(
       {
-        id: 'city-point-unclustered-4',
+        id: L.cityPoints.pit[4],
         source: S.cityPoint,
         type: 'symbol',
         minzoom: 8,
@@ -1021,7 +1021,7 @@
   function showZoneBoundary(zoneName) {
     if (zoneName === 'swpa') {
       map.addLayer({
-        id: 'zone-outline',
+        id: L.zoneOutline,
         source: S.zoneOutline,
         type: 'line',
         paint: {
