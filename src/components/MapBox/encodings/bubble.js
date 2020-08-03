@@ -2,6 +2,7 @@ import { L } from '../layers';
 import { S } from '../sources';
 import { getType } from '../../../data/signals';
 import { parseScaleSpec } from '../../../stores/scales';
+import { HAS_VALUE, caseHovered, addSource } from './utils';
 
 export default class BubbleEncoding {
   constructor(theme) {
@@ -15,75 +16,33 @@ export default class BubbleEncoding {
   }
 
   addSources(map) {
-    map.addSource(S.bubble, {
-      type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: [],
-      },
-    });
+    addSource(map, S.bubble);
   }
 
   addLayers(map) {
     // 2 layers for bubbles
-
-    map.addLayer(
-      {
-        id: L.bubble.fill,
-        source: S.bubble,
-        type: 'circle',
-        visibility: 'none',
-        filter: ['>', ['get', 'value'], 0],
-        paint: {
-          'circle-radius': 0,
-          'circle-color': this.theme.color,
-          'circle-stroke-color': this.theme.strokeColor,
-          'circle-stroke-width': this.theme.strokeWidth,
-          'circle-opacity': [
-            'case',
-            ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
-            0,
-            this.theme.opacity,
-          ],
-          'circle-stroke-opacity': [
-            'case',
-            ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
-            0,
-            this.theme.strokeOpacity,
-          ],
+    const addLayer = (id, reference, hovered = false) => {
+      map.addLayer(
+        {
+          id,
+          source: S.bubble,
+          type: 'circle',
+          visibility: 'none',
+          filter: HAS_VALUE,
+          paint: {
+            'circle-radius': 0,
+            'circle-color': this.theme.color,
+            'circle-stroke-color': this.theme.strokeColor,
+            'circle-stroke-width': this.theme.strokeWidth,
+            'circle-opacity': caseHovered(0, this.theme.opacity, hovered),
+            'circle-stroke-opacity': caseHovered(0, this.theme.strokeOpacity, hovered),
+          },
         },
-      },
-      L.county.hover,
-    );
-
-    map.addLayer(
-      {
-        id: L.bubble.highlight.fill,
-        source: S.bubble,
-        type: 'circle',
-        visibility: 'none',
-        filter: ['>', ['get', 'value'], 0],
-        paint: {
-          'circle-radius': 0,
-          'circle-color': this.theme.color,
-          'circle-stroke-color': this.theme.strokeColor,
-          'circle-stroke-width': this.theme.strokeWidthHighlighted,
-          'circle-opacity': [
-            'case',
-            ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
-            this.theme.opacity,
-            0,
-          ],
-          'circle-stroke-opacity': [
-            'case',
-            ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
-            this.theme.strokeOpacity,
-            0,
-          ],
-        },
-      },
-      'city-point-unclustered-pit',
-    );
+        reference,
+      );
+    };
+    addLayer(L.bubble.fill, L.county.hover);
+    addLayer(L.bubble.highlight.fill, 'city-point-unclustered-pit', true);
   }
 
   encode(map, level, signalType, sensor, valueMinMax, stops) {

@@ -1,6 +1,6 @@
 import { writable, readable, derived, get } from 'svelte/store';
 import { injectIDs } from '../util';
-import { LogScale, SqrtScale } from './scales.js';
+import { LogScale, SqrtScale } from './scales';
 import * as d3 from 'd3';
 import { sensorList, withSensorEntryKey } from './constants';
 export {
