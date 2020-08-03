@@ -50,6 +50,8 @@ export default class MapBoxWrapper {
       attributionControl: false,
       container,
       style,
+      // bounds: this.zoom.stateBounds,
+      // fitBoundsOptions: this.zoom.stateBoundsOptions,
     });
     this.map.addControl(new AttributionControl({ compact: true }));
     // .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
@@ -58,10 +60,6 @@ export default class MapBoxWrapper {
     this.map.scrollZoom.disable();
 
     this.zoom.initZoom(this.map, showZone);
-
-    this.map.on('idle', () => {
-      this.trigger('ready');
-    });
 
     let resolveCallback = null;
 
@@ -143,13 +141,15 @@ export default class MapBoxWrapper {
       },
     });
 
-    levelsWithMega.forEach((level) => {
+    [levelMegaCounty.id, ...levels].forEach((level) => {
       map.addLayer({
         id: L[level].fill,
         source: S[level].border,
         type: 'fill',
-        visibility: 'none',
         filter: IS_NOT_MISSING,
+        layout: {
+          visibility: 'none',
+        },
         paint: {
           'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
           'fill-color': MAP_THEME.countyFill,
@@ -181,7 +181,9 @@ export default class MapBoxWrapper {
       id: L.zoneOutline,
       source: S.zoneOutline,
       type: 'line',
-      visibility: 'none',
+      layout: {
+        visibility: 'none',
+      },
       paint: {
         'line-color': MAP_THEME.zoneOutline,
         'line-width': 2,
