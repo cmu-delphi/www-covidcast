@@ -1,4 +1,5 @@
 import { Map as MapBox, AttributionControl } from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import { L, addCityLayers } from './layers';
 import { S, geoJsonSources } from './sources';
 import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './encodings';
@@ -17,6 +18,7 @@ export default class MapBoxWrapper {
      * @type {MapBox | null}
      */
     this.map = null;
+    this.mapReady = false;
     /**
      * @type {InteractiveMap | null}
      */
@@ -34,18 +36,20 @@ export default class MapBoxWrapper {
     this.zoom = new ZoomMap();
   }
 
+  trigger(event, infos) {
+    console.log(event, infos);
+    // TODO
+  }
+
   /**
    *
    * @param {HTMLElement} container
    */
   initMap(container, showZone = false) {
-    const { bounds, fitBounds } = this.zoom.initZoom(showZone);
     this.map = new MapBox({
       attributionControl: false,
       container,
       style,
-      bounds,
-      fitBounds,
     });
     this.map.addControl(new AttributionControl({ compact: true }));
     // .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
@@ -53,26 +57,34 @@ export default class MapBoxWrapper {
     //Disable touch zoom, it makes gesture scrolling difficult
     this.map.scrollZoom.disable();
 
-    this.zoom.map = this.map;
+    this.zoom.initZoom(this.map, showZone);
 
     this.map.on('idle', () => {
       this.trigger('ready');
     });
 
-    this.map.getSource('').setData;
+    let resolveCallback = null;
+
+    // promise when it is done
+    const p = new Promise((resolve) => {
+      resolveCallback = resolve;
+    });
 
     this.map.on('load', () => {
-      this.addSources().then(() => {
-        this.addLayers();
-        this.interactive = new InteractiveMap(this.map, this);
-        if (showZone) {
-          this.zoom.showSWPA();
-        }
-        // TODO init based on selected county
-        // // if ($currentLevel === 'state') -> show states()
-        this.updateMap('init');
-      });
+      this.addSources()
+        .then(() => {
+          this.addLayers();
+          this.interactive = new InteractiveMap(this.map, this);
+          if (showZone) {
+            this.zoom.showSWPA();
+          }
+        })
+        .then(() => {
+          this.mapReady = true;
+          resolveCallback(this);
+        });
     });
+    return p;
   }
 
   addSources() {
@@ -88,7 +100,7 @@ export default class MapBoxWrapper {
       });
       map.addSource(S.zoneOutline, {
         type: 'geojson',
-        data: r.zoneOutline,
+        data: r.newZones,
       });
       levels.forEach((level) => {
         map.addSource(S[level].border, {
@@ -132,20 +144,17 @@ export default class MapBoxWrapper {
     });
 
     levelsWithMega.forEach((level) => {
-      map.addLayer(
-        {
-          id: L[level].fill,
-          source: S[level].border,
-          type: 'fill',
-          visibility: 'none',
-          filter: IS_NOT_MISSING,
-          paint: {
-            'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
-            'fill-color': MAP_THEME.countyFill,
-          },
+      map.addLayer({
+        id: L[level].fill,
+        source: S[level].border,
+        type: 'fill',
+        visibility: 'none',
+        filter: IS_NOT_MISSING,
+        paint: {
+          'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
+          'fill-color': MAP_THEME.countyFill,
         },
-        L[level].hover,
-      );
+      });
 
       map.addLayer({
         id: L[level].hover,
@@ -187,6 +196,7 @@ export default class MapBoxWrapper {
   }
 
   destroy() {
+    this.mapReady = false;
     if (this.map) {
       this.map.remove();
       this.zoom.map = null;
@@ -196,11 +206,24 @@ export default class MapBoxWrapper {
 
   updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, stopsMega) {
     // changed the visibility of layers
-    this.level = level;
+    if (this.level !== level) {
+      this.level = level;
+      if (level === 'state') {
+        // TODO show state labels
+      }
+    }
     this.encoding = this.encodings.find((d) => d.id === encoding);
+
+    if (!this.map || !this.mapReady) {
+      return;
+    }
+
+    // Reset all hover/click states.
+    levelsWithMega.forEach((level) => this.map.removeFeatureState({ source: S[level].border }));
 
     const allEncodingLayers = this.encodings.flatMap((d) => d.layers).concat([L[levelMegaCounty.id].fill]);
     const visibleLayers = new Set(this.encoding.getVisibleLayers(level, signalType));
+
     allEncodingLayers.forEach((layer) => {
       this.map.setLayoutProperty(layer, 'visibility', visibleLayers.has(layer) ? 'visible' : 'none');
     });
@@ -225,7 +248,7 @@ export default class MapBoxWrapper {
     if (!source) {
       return;
     }
-    const data = source.data;
+    const data = source._data; // semi hacky
 
     data.features.forEach((d) => {
       const id = idExtractor(d.properties);
