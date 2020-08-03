@@ -43,7 +43,7 @@ export default class InteractiveMap {
     levels.forEach((level) => {
       this.map.on('mouseenter', L[level].fill, this._onLevelMouseEnter.bind(this));
       this.map.on('mouseleave', L[level].fill, this._onLevelMouseLeave.bind(this));
-      this.map.on('mousemove', L[level].fill, this._onMapMouseMove.bind(this, level));
+      this.map.on('mousemove', L[level].fill, this._onLevelMouseMove.bind(this, level));
       this.map.on('click', L[level].fill, this._onLevelMouseClick.bind(this));
     });
     this.map.on('mouseenter', L[levelMegaCounty.id].fill, this._onLevelMouseEnter.bind(this));
