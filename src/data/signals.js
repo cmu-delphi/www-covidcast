@@ -7,8 +7,12 @@ export function isPropSignal(signal) {
 }
 
 export function getType(signal) {
-  if (isCountSignal(signal)) return 'count';
-  else if (isPropSignal(signal)) return 'prop';
+  if (isCountSignal(signal)) {
+    return 'count';
+  }
+  if (isPropSignal(signal)) {
+    return 'prop';
+  }
   return 'other';
 }
 
