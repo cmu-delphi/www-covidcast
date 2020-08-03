@@ -122,7 +122,7 @@ export const levelMegaCounty = {
   label: 'Mega County',
   labelPlural: 'Mega Counties',
 };
-export const levelsWithMega = levels.concat(levelMegaCounty);
+export const levelsWithMega = levels.concat(levelMegaCounty.id);
 
 const levelById = new Map(levelList.map((l) => [l.id, l]));
 

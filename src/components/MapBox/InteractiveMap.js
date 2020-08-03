@@ -37,8 +37,8 @@ export default class InteractiveMap {
   }
 
   initListeners() {
-    this.map.on('mouseleave', this._onMapMouseLeave.bind(this));
-    this.map.on('mousemove', this._onMapMouseMove.bind(this));
+    this.map.on('mouseleave', L.state.stroke, this._onMapMouseLeave.bind(this));
+    this.map.on('mousemove', L.state.stroke, this._onMapMouseMove.bind(this));
 
     levels.forEach((level) => {
       this.map.on('mouseenter', L[level].fill, this._onLevelMouseEnter.bind(this));

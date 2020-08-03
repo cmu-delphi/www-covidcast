@@ -21,18 +21,9 @@ export default class ZoomMap {
     };
   }
 
-  initZoom(showZone = false) {
+  initZoom(map, showZone = false) {
+    this.map = map;
     this.initialZoomView = showZone;
-    if (showZone) {
-      return {
-        bounds: this.zoneBounds,
-        fitBounds: this.zoneBoundsOptions,
-      };
-    }
-    return {
-      bounds: this.stateBounds,
-      fitBounds: this.stateBoundsOptions,
-    };
   }
 
   getZoom() {

@@ -92,7 +92,7 @@ export function addCityLayers(map) {
         id,
         source: S.cityPoint,
         type: 'symbol',
-        filter,
+        ...(filter ? { filter } : {}),
         ...extras,
         layout: {
           'text-field': ['get', 'city'],
