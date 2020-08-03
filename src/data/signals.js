@@ -25,3 +25,7 @@ export function isCasesSignal(signal) {
   const casesRegex = /confirmed_/;
   return signal.match(casesRegex);
 }
+
+export function is7DavIncidence(signal) {
+  return signal.match(/7dav_incidence/);
+}

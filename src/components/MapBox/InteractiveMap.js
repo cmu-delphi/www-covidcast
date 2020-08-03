@@ -197,4 +197,8 @@ export default class InteractiveMap {
       obj.mega = mega;
     }
   }
+
+  select(id) {
+    this._updateHighlight(this.select, id, null);
+  }
 }
