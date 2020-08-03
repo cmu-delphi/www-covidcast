@@ -339,7 +339,7 @@
     if (!mapMounted) return;
 
     // Reset all hover/click states.
-    [...levels, 'mega-county'].forEach((level) => map && map.removeFeatureState({ source: level }));
+    [...levels, 'mega-county'].forEach((level) => map && map.removeFeatureState({ source: S[level].border }));
 
     // If we're looking at counties, draw the mega-county states.
     let drawMega = $currentLevel === 'county';
@@ -1035,20 +1035,15 @@
 
   function resetHighlightedFeature() {
     if (clickedId) {
-      map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: false });
+      setFeatureStateMultiple([S[$currentLevel].border, S.bubble, S.spike.fill, S.spike.stroke], clickedId, {
+        select: false,
+      });
     }
     clickedId = null;
     if (megaClickedId) {
       map.setFeatureState({ source: S['mega-county'].border, id: megaClickedId }, { select: false });
     }
     megaClickedId = null;
-  }
-
-  function highlightFeature(selectedRegion) {
-    clickedId = Number.parseInt(selectedRegion['id']);
-
-    map.setFeatureState({ source: $currentLevel, id: clickedId }, { select: true });
-    map.setFeatureState({ source: S[$currentLevel].center, id: clickedId }, { select: true });
   }
 
   function findSelectedRegion(id) {
@@ -1118,8 +1113,6 @@
         break;
       }
     }
-
-    highlightFeature(selectedRegion);
 
     // TODO better zoom
     let zoomLevel;
