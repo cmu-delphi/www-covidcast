@@ -1,3 +1,5 @@
+import { json } from 'd3';
+
 export const S = {
   state: {
     border: 'state-border',
@@ -24,3 +26,22 @@ export const S = {
   megaCounty: 'mega-county',
   zoneOutline: 'zone-outline',
 };
+
+export const geoJsonSources = Promise.all([
+  json('./maps/new_counties.json'),
+  json('./maps/new_states.json'),
+  json('./maps/new_msa.json'),
+  json('./maps/city_data/cities-reprojected.json'),
+  json('./maps/state_centers.json'),
+  json('./maps/county_centers.json'),
+  json('./maps/msa_centers.json'),
+  json('./maps/new_zones.json'),
+]).then(([county, state, msa, cities, stateCenters, countyCenters, msaCenters, newZones]) => {
+  return {
+    county: { border: county, center: countyCenters },
+    state: { border: state, center: stateCenters },
+    msa: { border: msa, center: msaCenters },
+    cities,
+    newZones,
+  };
+});
