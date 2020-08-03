@@ -43,9 +43,9 @@
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
   import { isCountSignal, isPropSignal, isDeathSignal, isCasesSignal } from '../data/signals';
-  import { trackEvent } from '../stores/ga.js';
-  import { L } from './MapBox/layers.js';
-  import { S } from './MapBox/sources.js';
+  import { trackEvent } from '../stores/ga';
+  import { L } from './MapBox/layers';
+  import { S } from './MapBox/sources';
   import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './MapBox/encodings';
 
   export let graphShowStatus, toggleGraphShowStatus;

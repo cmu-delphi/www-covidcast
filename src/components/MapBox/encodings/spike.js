@@ -2,7 +2,6 @@ import { L } from '../layers';
 import { S } from '../sources';
 import { getType } from '../../../data/signals';
 import { parseScaleSpec } from '../../../stores/scales';
-import { HAS_VALUE, caseHovered, addSource } from './utils';
 
 export default class SpikeEncoding {
   constructor(theme) {
@@ -16,55 +15,112 @@ export default class SpikeEncoding {
   }
 
   addSources(map) {
-    addSource(map, S.spike.fill);
-    addSource(map, S.spike.stroke);
+    map.addSource(S.spike.fill, {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    });
+
+    map.addSource(S.spike.stroke, {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    });
   }
 
   addLayers(map) {
     // 4 layers for spikes
-    const addFillLayer = (id, reference, hovered = false) => {
-      map.addLayer(
-        {
-          id,
-          type: 'fill',
-          source: S.spike.fill,
-          filter: HAS_VALUE,
-          paint: {
-            'fill-color': 'transparent',
-            'fill-outline-color': 'transparent',
-            'fill-opacity': caseHovered(0, this.theme.fillOpacity, hovered),
-          },
-        },
-        reference,
-      );
-    };
-    addFillLayer(L.spike.fill, L.county.hover);
-    addFillLayer(L.spike.highlight.fill, 'city-point-unclustered-pit', true);
 
-    const addLineLayer = (id, reference, hovered = false, extraStyles = {}) => {
-      map.addLayer(
-        {
-          id,
-          type: 'line',
-          source: S.spike.stroke,
-          filter: HAS_VALUE,
-          layout: {
-            'line-cap': 'round',
-            'line-join': 'round',
-          },
-          paint: {
-            'line-color': 'transparent',
-            ...extraStyles,
-            'line-opacity': caseHovered(0, this.theme.strokeOpacity, hovered),
-          },
+    map.addLayer(
+      {
+        id: L.spike.fill,
+        type: 'fill',
+        source: S.spike.fill,
+        filter: ['>', ['get', 'value'], 0],
+        paint: {
+          'fill-color': 'transparent',
+          'fill-opacity': [
+            'case',
+            ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
+            0,
+            this.theme.fillOpacity,
+          ],
+          'fill-outline-color': 'transparent',
         },
-        reference,
-      );
-    };
-    addLineLayer(L.spike.stroke, L.county.hover);
-    addLineLayer(L.spike.highlight.stroke, 'city-point-unclustered-pit', true, {
-      'line-width': this.theme.strokeWidthHighlighted,
-    });
+      },
+      L.county.hover,
+    );
+
+    map.addLayer(
+      {
+        id: L.spike.stroke,
+        type: 'line',
+        source: S.spike.stroke,
+        filter: ['>', ['get', 'value'], 0],
+        layout: {
+          'line-cap': 'round',
+          'line-join': 'round',
+        },
+        paint: {
+          'line-color': 'transparent',
+          'line-opacity': [
+            'case',
+            ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
+            0,
+            this.theme.strokeOpacity,
+          ],
+        },
+      },
+      L.county.hover,
+    );
+
+    map.addLayer(
+      {
+        id: L.spike.highlight.fill,
+        type: 'fill',
+        source: S.spike.fill,
+        filter: ['>', ['get', 'value'], 0],
+        paint: {
+          'fill-color': 'transparent',
+          'fill-opacity': [
+            'case',
+            ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
+            this.theme.fillOpacity,
+            0,
+          ],
+          'fill-outline-color': 'transparent',
+        },
+      },
+      'city-point-unclustered-pit',
+    );
+
+    map.addLayer(
+      {
+        id: L.spike.highlight.stroke,
+        type: 'line',
+        source: S.spike.stroke,
+        filter: ['>', ['get', 'value'], 0],
+        layout: {
+          'line-cap': 'round',
+          'line-join': 'round',
+        },
+        paint: {
+          'line-color': 'transparent',
+          'line-width': this.theme.strokeWidthHighlighted,
+          'line-opacity': [
+            'case',
+            ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
+            this.theme.strokeOpacity,
+            0,
+          ],
+        },
+      },
+      'city-point-unclustered-pit',
+    );
   }
 
   encode(map, level, signalType, sensor, valueMinMax, stops) {
