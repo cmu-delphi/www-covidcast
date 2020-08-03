@@ -1,5 +1,5 @@
 <script>
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import { levelMegaCounty } from '../../stores/constants';
   import {
     bubbleRadiusScale,
@@ -34,10 +34,14 @@
 
   let ready = false;
 
+  const dispatch = createEventDispatcher();
+
   onMount(() => {
     wrapper.initMap(container, showCurrentZone).then(() => {
       // update date init
+      console.log('mark ready');
       ready = true;
+      dispatch('ready');
     });
   });
 
@@ -109,21 +113,22 @@
     wrapper.updateSource(S[level].center, values, directions, sensor, updateData, idCheck);
   }
 
-  $: mapData = generateDataLookup($currentData, $currentSensor, drawMega, ready);
+  $: mapData = generateDataLookup($currentData, $currentSensor, drawMega);
   $: {
     // update mega
     if (drawMega) {
-      updateMegaSources(mapData.geoIds, mapData.mega.value, mapData.mega.direction, $currentSensor, true);
+      updateMegaSources(mapData.geoIds, mapData.mega.value, mapData.mega.direction, $currentSensor, true, ready);
     }
   }
   $: {
     // update levels
-    updateLevelSources(mapData.geoIds, $currentLevel, mapData.value, mapData.direction, $currentSensor, true);
+    console.log('update ready', ready);
+    updateLevelSources(mapData.geoIds, $currentLevel, mapData.value, mapData.direction, $currentSensor, true, ready);
   }
   $: {
     // update encodings upon change
     if ($stats) {
-      updateEncoding($currentLevel, $encoding, $currentSensor, $signalType, $stats);
+      updateEncoding($currentLevel, $encoding, $currentSensor, $signalType, $stats, ready);
     }
   }
 
