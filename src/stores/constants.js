@@ -253,7 +253,7 @@ export const sensorList = [
     maxTime: 20200723,
     mean: 8.833278903565226,
     std: 6.719844888386422,
-    levels: ['hrr', 'msa', 'state'],
+    levels: ['state', 'msa', 'hrr'],
     type: 'late',
   },
   {
