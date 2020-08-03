@@ -11,7 +11,6 @@
   import Search from './Search.svelte';
   import MapControls from './MapControls.svelte';
   import Title from './Title.svelte';
-  import { computeBounds } from './MapBox/geoUtils';
   import LineSmallMultiples from './LineSmallMultiples.svelte';
   import {
     levels,
@@ -45,6 +44,7 @@
   import { trackEvent } from '../stores/ga';
   import { L } from './MapBox/layers';
   import { S } from './MapBox/sources';
+  import bounds from './MapBox/bounds.json';
   import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './MapBox/encodings';
 
   export let graphShowStatus, toggleGraphShowStatus;
@@ -56,7 +56,7 @@
   /**
    * @type {mapboxgl.LngLatBounds}
    */
-  let stateBounds = null;
+  let stateBounds = bounds.states;
   let stateBoundsOptions = {
     padding: 20, //px
     linear: false,
@@ -64,7 +64,7 @@
 
   // eslint-disable-next-line no-unused-vars
   let initialZoomView = true;
-  let zoneBounds = null;
+  let zoneBounds = bounds.zones;
   let zoneBoundsOptions = {
     padding: 20, //px
     linear: false,
@@ -865,8 +865,6 @@
   }
 
   function initializeMap() {
-    stateBounds = computeBounds($geojsons.get('state'));
-    zoneBounds = computeBounds($geojsons.get('zone'));
     initialZoomView = !showCurrentZone;
 
     map = new mapboxgl.Map({
