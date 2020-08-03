@@ -4,7 +4,6 @@
   import 'mapbox-gl/dist/mapbox-gl.css';
   import { getTextColorBasedOnBackground, zip, transparent } from '../util.js';
   import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../theme.js';
-  import { parseScaleSpec } from './scales.js';
   import Options from './Options.svelte';
   import Toggle from './Toggle.svelte';
   import Legend from './Legend.svelte';
@@ -43,7 +42,7 @@
   } from '../stores';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
-  import { isCountSignal, getType } from '../data/signals';
+  import { isCountSignal } from '../data/signals';
   import { trackEvent } from '../stores/ga.js';
   import { L } from './layers.js';
   import { S } from './sources.js';
@@ -449,7 +448,7 @@
       drawMega ? map.getSource(S['mega-county'].border).setData(megaDat) : '';
     }
 
-    let stops, stopsMega, currentRadiusScale;
+    let stops, stopsMega;
 
     if ($signalType === 'value') {
       if (isCountSignal($currentSensor)) {
@@ -521,115 +520,25 @@
     allEncodingLayers.filter((l) => !visibleLayers.includes(l)).forEach(hide);
     visibleLayers.forEach(show);
 
-    if ($encoding === 'color') {
-      map.setPaintProperty(L[$currentLevel].fill, 'fill-color', {
-        property: $signalType,
-        stops: stops,
-      });
+    const ret = encodings[$encoding].encode(
+      map,
+      $currentLevel,
+      $signalType,
+      $currentSensor,
+      valueMinMax,
+      stops,
+      drawMega && stopsMega,
+    );
 
+    // post encoding logic
+    if ($encoding === 'color') {
       if (drawMega) {
-        map.setPaintProperty(L['mega-county'].fill, 'fill-color', {
-          property: $signalType,
-          stops: stopsMega,
-        });
         show(L['mega-county'].fill);
       }
     } else if ($encoding === 'bubble') {
-      map.setPaintProperty(L[$currentLevel].fill, 'fill-color', MAP_THEME.countyFill);
-      // color scale (color + stroke color)
-      let flatStops = stops.flat();
-      let colorExpression = ['interpolate', ['linear'], ['get', 'value']].concat(flatStops);
-
-      map.getSource(S.bubble).setData(map.getSource(S[$currentLevel].center)._data);
-
-      map.setPaintProperty(L.bubble.fill, 'circle-stroke-color', colorExpression);
-      map.setPaintProperty(L.bubble.highlight.fill, 'circle-stroke-color', colorExpression);
-
-      map.setPaintProperty(L.bubble.fill, 'circle-color', colorExpression);
-      map.setPaintProperty(L.bubble.highlight.fill, 'circle-color', colorExpression);
-
-      const minRadius = ENCODING_BUBBLE_THEME.minRadius[$currentLevel],
-        maxRadius = ENCODING_BUBBLE_THEME.maxRadius[$currentLevel];
-
-      const radiusScaleTheme = ENCODING_BUBBLE_THEME.radiusScale[getType($currentSensor)];
-
-      currentRadiusScale = parseScaleSpec(radiusScaleTheme).domain(valueMinMax).range([minRadius, maxRadius]);
-
-      const radiusExpression = currentRadiusScale.expr();
-
-      bubbleRadiusScale.set(currentRadiusScale);
-
-      map.setPaintProperty(L.bubble.fill, 'circle-radius', radiusExpression);
-      map.setPaintProperty(L.bubble.highlight.fill, 'circle-radius', radiusExpression);
+      bubbleRadiusScale.set(ret);
     } else if ($encoding === 'spike') {
-      map.setPaintProperty(L[$currentLevel].fill, 'fill-color', MAP_THEME.countyFill);
-      const valueMax = valueMinMax[1],
-        maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel],
-        size = ENCODING_SPIKE_THEME.size[$currentLevel];
-
-      const heightScaleTheme = ENCODING_SPIKE_THEME.heightScale[getType($currentSensor)];
-
-      const heightScale = parseScaleSpec(heightScaleTheme).range([0, maxHeight]).domain([0, valueMax]);
-
-      spikeHeightScale.set(heightScale);
-      const centers = $geojsons.get(S[$currentLevel].center);
-      const features = centers.features.filter((feature) => feature.properties.value > 0);
-
-      const spikes = {
-        type: 'FeatureCollection',
-        features: features.map((feature) => {
-          const center = feature.geometry.coordinates,
-            value = feature.properties.value;
-          return {
-            geometry: {
-              coordinates: [
-                [
-                  [center[0] - size, center[1]],
-                  [center[0], center[1] + heightScale(value)],
-                  [center[0] + size, center[1]],
-                ],
-              ],
-              type: 'Polygon',
-            },
-            properties: { value: value },
-            type: 'Feature',
-            id: feature.id,
-          };
-        }),
-      };
-
-      const spikeOutlines = {
-        type: 'FeatureCollection',
-        features: features.map((feature) => {
-          const center = feature.geometry.coordinates,
-            value = feature.properties.value;
-
-          return {
-            geometry: {
-              coordinates: [
-                [center[0] - size, center[1]],
-                [center[0], center[1] + heightScale(value)],
-                [center[0] + size, center[1]],
-              ],
-              type: 'LineString',
-            },
-            properties: { value: value },
-            type: 'Feature',
-            id: feature.id,
-          };
-        }),
-      };
-
-      let flatStops = stops.flat();
-      let colorExpression = ['interpolate', ['linear'], ['get', 'value']].concat(flatStops);
-      map.setPaintProperty(L.spike.fill, 'fill-color', colorExpression);
-      map.setPaintProperty(L.spike.stroke, 'line-color', colorExpression);
-      map.setPaintProperty(L.spike.highlight.fill, 'fill-color', colorExpression);
-      map.setPaintProperty(L.spike.highlight.stroke, 'line-color', colorExpression);
-      map.setPaintProperty(L.spike.stroke, 'line-width', ENCODING_SPIKE_THEME.strokeWidth[$currentLevel]);
-
-      map.getSource(S.spike.fill).setData(spikes);
-      map.getSource(S.spike.stroke).setData(spikeOutlines);
+      spikeHeightScale.set(ret);
     }
 
     const viableFeatures = dat.features.filter((f) => f.properties[$signalType] !== -100);

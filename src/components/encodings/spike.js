@@ -1,5 +1,7 @@
 import { L } from '../layers.js';
 import { S } from '../sources.js';
+import { getType } from '../../data/signals';
+import { parseScaleSpec } from '../scales.js';
 
 export default class SpikeEncoding {
   constructor(theme) {
@@ -119,5 +121,77 @@ export default class SpikeEncoding {
       },
       'city-point-unclustered-pit',
     );
+  }
+
+  encode(map, level, signalType, sensor, valueMinMax, stops) {
+    map.setPaintProperty(L[level].fill, 'fill-color', this.theme.countyFill);
+    const valueMax = valueMinMax[1],
+      maxHeight = this.theme.maxHeight[level],
+      size = this.theme.size[level];
+
+    const heightScaleTheme = this.theme.heightScale[getType(sensor)];
+
+    const heightScale = parseScaleSpec(heightScaleTheme).range([0, maxHeight]).domain([0, valueMax]);
+
+    const centers = map.getSource(S[level].center)._data;
+    const features = centers.features.filter((feature) => feature.properties.value > 0);
+
+    const spikes = {
+      type: 'FeatureCollection',
+      features: features.map((feature) => {
+        const center = feature.geometry.coordinates,
+          value = feature.properties.value;
+        return {
+          geometry: {
+            coordinates: [
+              [
+                [center[0] - size, center[1]],
+                [center[0], center[1] + heightScale(value)],
+                [center[0] + size, center[1]],
+              ],
+            ],
+            type: 'Polygon',
+          },
+          properties: { value: value },
+          type: 'Feature',
+          id: feature.id,
+        };
+      }),
+    };
+
+    const spikeOutlines = {
+      type: 'FeatureCollection',
+      features: features.map((feature) => {
+        const center = feature.geometry.coordinates,
+          value = feature.properties.value;
+
+        return {
+          geometry: {
+            coordinates: [
+              [center[0] - size, center[1]],
+              [center[0], center[1] + heightScale(value)],
+              [center[0] + size, center[1]],
+            ],
+            type: 'LineString',
+          },
+          properties: { value: value },
+          type: 'Feature',
+          id: feature.id,
+        };
+      }),
+    };
+
+    let flatStops = stops.flat();
+    let colorExpression = ['interpolate', ['linear'], ['get', 'value']].concat(flatStops);
+    map.setPaintProperty(L.spike.fill, 'fill-color', colorExpression);
+    map.setPaintProperty(L.spike.stroke, 'line-color', colorExpression);
+    map.setPaintProperty(L.spike.highlight.fill, 'fill-color', colorExpression);
+    map.setPaintProperty(L.spike.highlight.stroke, 'line-color', colorExpression);
+    map.setPaintProperty(L.spike.stroke, 'line-width', this.theme.strokeWidth[level]);
+
+    map.getSource(S.spike.fill).setData(spikes);
+    map.getSource(S.spike.stroke).setData(spikeOutlines);
+
+    return heightScale;
   }
 }
