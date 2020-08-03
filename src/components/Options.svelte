@@ -19,7 +19,7 @@
 
   // let selectedDate = writable(parseTime($currentDate));
   $: selectedDate = parseTime($currentDate);
-  // if ($currentDate !== 20100420) {
+  // if ($currentDate !== MAGIC_START_DATE) {
   //   selectedDate = parseTime($currentDate);
   // }
   $: start_end_dates = [];

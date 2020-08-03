@@ -10,6 +10,7 @@ import {
   stats,
   currentSensor,
   currentLevel,
+  MAGIC_START_DATE,
 } from '../stores';
 import { get } from 'svelte/store';
 import { callMetaAPI } from './api';
@@ -92,7 +93,7 @@ function processMetaData(meta) {
   let date = get(currentDate);
   // Magic number of default date - if no URL params, use max date
   // available
-  if (date === 20100420) {
+  if (date === MAGIC_START_DATE) {
     date = timeMap.get(sensor)[1];
     currentDate.set(date);
   }

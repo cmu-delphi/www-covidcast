@@ -9,6 +9,7 @@
     currentLevel,
     timeRangeOnSlider,
     yesterday,
+    MAGIC_START_DATE,
   } from '../stores';
   import { calculateValFromRectified } from '../util';
   import * as d3 from 'd3';
@@ -48,7 +49,7 @@
 
   onMount(() => {
     currentDate.subscribe((d) => {
-      if (d === 20100420) return;
+      if (d === MAGIC_START_DATE) return;
       val = d;
       rectifiedVal = parseTime(val).getTime();
       if (rectifiedVal >= rectifiedMax) {
@@ -82,7 +83,7 @@
     } else {
       rectifiedRange = interval;
       rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
-      if ($currentDate !== 20100420) {
+      if ($currentDate !== MAGIC_START_DATE) {
         while (parseTime($currentDate).getTime() < rectifiedMin) {
           rectifiedRange += interval;
           rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
