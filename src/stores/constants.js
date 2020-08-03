@@ -117,6 +117,13 @@ export const levelList = [
 ];
 export const levels = levelList.map((l) => l.id);
 
+export const levelMegaCounty = {
+  id: 'mega-county',
+  label: 'Mega County',
+  labelPlural: 'Mega Counties',
+};
+export const levelsWithMega = levels.concat(levelMegaCounty);
+
 const levelById = new Map(levelList.map((l) => [l.id, l]));
 
 export function getLevelInfo(level) {

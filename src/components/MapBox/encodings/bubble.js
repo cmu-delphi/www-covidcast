@@ -6,6 +6,7 @@ import { HAS_VALUE, caseHovered, addSource } from './utils';
 
 export default class BubbleEncoding {
   constructor(theme) {
+    this.id = 'bubble';
     this.theme = theme;
     this.layers = [L.bubble.fill, L.bubble.highlight.fill];
   }

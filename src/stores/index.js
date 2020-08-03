@@ -183,3 +183,9 @@ export const colorScale = writable(d3.scaleSequentialLog());
 export const colorStops = writable([]);
 export const bubbleRadiusScale = writable(LogScale());
 export const spikeHeightScale = writable(SqrtScale());
+
+export const regionList = writable([], (set) => {
+  d3.json('./maps/name_id_info.json').then((a) => {
+    set(a.all);
+  });
+});

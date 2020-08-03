@@ -6,6 +6,7 @@ import { HAS_VALUE, caseHovered, addSource } from './utils';
 
 export default class SpikeEncoding {
   constructor(theme) {
+    this.id = 'spike';
     this.theme = theme;
     this.layers = [L.spike.fill, L.spike.stroke, L.spike.highlight.fill, L.spike.highlight.stroke];
   }
