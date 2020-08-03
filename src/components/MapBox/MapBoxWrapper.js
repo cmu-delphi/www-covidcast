@@ -5,9 +5,11 @@ import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './encodings';
 import { MAP_THEME, ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../../theme';
 import { levels } from '../../stores';
 import { levelsWithMega, levelMegaCounty } from '../../stores/constants';
-import { IS_NOT_MISSING } from './encodings/utils';
+import { IS_NOT_MISSING, MISSING_VALUE } from './encodings/utils';
 import InteractiveMap from './InteractiveMap';
 import ZoomMap from './ZoomMap';
+import style from './mapbox_albers_usa_style.json';
+import { is7DavIncidence } from '../../data/signals';
 
 export default class MapBoxWrapper {
   constructor() {
@@ -15,6 +17,10 @@ export default class MapBoxWrapper {
      * @type {MapBox | null}
      */
     this.map = null;
+    /**
+     * @type {InteractiveMap | null}
+     */
+    this.interactive = null;
     /**
      * @type {(ChoroplethEncoding | BubbleEncoding | SpikeEncoding)[]}
      */
@@ -37,7 +43,7 @@ export default class MapBoxWrapper {
     this.map = new MapBox({
       attributionControl: false,
       container,
-      style: './maps/mapbox_albers_usa_style.json',
+      style,
       bounds,
       fitBounds,
     });
@@ -52,6 +58,8 @@ export default class MapBoxWrapper {
     this.map.on('idle', () => {
       this.trigger('ready');
     });
+
+    this.map.getSource('').setData;
 
     this.map.on('load', () => {
       this.addSources().then(() => {
@@ -184,5 +192,99 @@ export default class MapBoxWrapper {
       this.zoom.map = null;
       this.map = null;
     }
+  }
+
+  updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, stopsMega) {
+    // changed the visibility of layers
+    this.level = level;
+    this.encoding = this.encodings.find((d) => d.id === encoding);
+
+    const allEncodingLayers = this.encodings.flatMap((d) => d.layers).concat([L[levelMegaCounty.id].fill]);
+    const visibleLayers = new Set(this.encoding.getVisibleLayers(level, signalType));
+    allEncodingLayers.forEach((layer) => {
+      this.map.setLayoutProperty(layer, 'visibility', visibleLayers.has(layer) ? 'visible' : 'none');
+    });
+
+    return this.encoding.encode(this.map, level, signalType, sensor, valueMinMax, stops, stopsMega);
+  }
+
+  /**
+   *
+   * @param {string} sourceId
+   * @param {Map<string, [number, number]>} values
+   * @param {Map<string, number>} directions
+   * @param {string} sensor
+   * @param {(props: any) => string | null} idExtractor
+   * @param {boolean} updateData
+   */
+  updateSource(sourceId, values, directions, sensor, updateData, idExtractor) {
+    if (!this.map) {
+      return;
+    }
+    const source = this.map.getSource(sourceId);
+    if (!source) {
+      return;
+    }
+    const data = source.data;
+
+    data.features.forEach((d) => {
+      const id = idExtractor(d.properties);
+
+      d.properties.value = MISSING_VALUE;
+      d.properties.direction = MISSING_VALUE;
+
+      if (!id) {
+        return;
+      }
+
+      if (values.has(id)) {
+        d.properties.value = values.get(id)[0];
+
+        if (is7DavIncidence(sensor)) {
+          d.properties.value = values.get(id)[0]; // 7-day avg
+          d.properties.value1 = values.get(id)[1]; // count
+        }
+      }
+      if (directions.has(id)) {
+        d.properties.direction = directions.get(id);
+      }
+    });
+
+    if (updateData) {
+      source.setData(data);
+    }
+  }
+
+  select(featureId) {
+    if (!this.map || !this.interactive) {
+      return;
+    }
+    this.interactive.select(featureId);
+
+    // TODO
+    //   this.map.getSource()
+    //   // Get zoom and center of selected location
+    //   let centersData = $geojsons.get(S[].center)['features'];
+    //   let centerLocation;
+    //   for (let i = 0; i < centersData.length; i++) {
+    //     let info = centersData[i];
+    //     if (info['properties']['id'] == selectedRegion['property_id']) {
+    //       centerLocation = info['geometry']['coordinates'];
+    //       break;
+    //     }
+    //   }
+
+    //   // TODO better zoom
+    //   let zoomLevel;
+    //   if (selectedRegion['level'] === 'county') {
+    //     zoomLevel = 6.5;
+    //   } else if (selectedRegion['level'] === 'msa') {
+    //     zoomLevel = 6;
+    //   } else {
+    //     zoomLevel = 5;
+    //   }
+
+    //   map.flyTo({ center: centerLocation, zoom: zoomLevel, essential: true });
+    // }
   }
 }
