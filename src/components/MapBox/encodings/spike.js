@@ -1,7 +1,7 @@
-import { L } from '../layers.js';
-import { S } from '../sources.js';
-import { getType } from '../../data/signals';
-import { parseScaleSpec } from '../scales.js';
+import { L } from '../layers';
+import { S } from '../sources';
+import { getType } from '../../../data/signals';
+import { parseScaleSpec } from '../../../stores/scales';
 
 export default class SpikeEncoding {
   constructor(theme) {

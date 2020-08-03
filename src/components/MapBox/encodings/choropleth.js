@@ -1,4 +1,4 @@
-import { L } from '../layers.js';
+import { L } from '../layers';
 
 export default class ChoroplethEncoding {
   constructor() {

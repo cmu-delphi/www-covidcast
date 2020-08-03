@@ -2,8 +2,8 @@
   import { onMount } from 'svelte';
   import mapboxgl from 'mapbox-gl';
   import 'mapbox-gl/dist/mapbox-gl.css';
-  import { getTextColorBasedOnBackground, zip, transparent } from '../util.js';
-  import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../theme.js';
+  import { getTextColorBasedOnBackground, zip, transparent } from '../util';
+  import { DIRECTION_THEME, MAP_THEME, ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../theme';
   import Options from './Options.svelte';
   import Toggle from './Toggle.svelte';
   import Legend from './Legend.svelte';
@@ -12,7 +12,7 @@
   import MapControls from './MapControls.svelte';
   import Title from './Title.svelte';
   import Time from './Time.svelte';
-  import { computeBounds } from './geoUtils';
+  import { computeBounds } from './MapBox/geoUtils';
   import GraphContainer from './Graph/GraphContainer.svelte';
   import {
     levels,
@@ -43,10 +43,11 @@
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
   import { isCountSignal } from '../data/signals';
-  import { trackEvent } from '../stores/ga.js';
-  import { L } from './layers.js';
-  import { S } from './sources.js';
-  import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './encodings';
+  import { trackEvent } from '../stores/ga';
+  import { L } from './MapBox/layers';
+  import { S } from './MapBox/sources';
+  import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './MapBox/encodings';
+
   export let graphShowStatus, toggleGraphShowStatus;
 
   let searchErrorComponent;
