@@ -17,7 +17,7 @@
   /**
    * @param {import('../../data/fetchData').EpiDataRow} row
    * @param {Map<string, any>} properties
-   */
+   * @param {string} level   */
   function toHotspotData(row, properties, level) {
     // TODO generalize this process into the stores
     const props = properties.get(row.geo_value.toUpperCase());
@@ -26,7 +26,7 @@
       name: props ? props.NAME : row.geo_value,
       population: props ? Number.parseInt(props.Population, 10) : null,
       value: row.value,
-      level: level,
+      level,
       geo_value: row.geo_value,
     };
   }
