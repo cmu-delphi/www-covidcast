@@ -21,6 +21,20 @@ export default class ZoomMap {
     };
   }
 
+  initZoom(showZone = false) {
+    this.initialZoomView = showZone;
+    if (showZone) {
+      return {
+        bounds: this.zoneBounds,
+        fitBounds: this.zoneBoundsOptions,
+      };
+    }
+    return {
+      bounds: this.stateBounds,
+      fitBounds: this.stateBoundsOptions,
+    };
+  }
+
   getZoom() {
     return this.map ? this.map.getZoom() : 0;
   }
