@@ -28,7 +28,9 @@ export default class BubbleEncoding {
           id,
           source: S.bubble,
           type: 'circle',
-          visibility: 'none',
+          layout: {
+            visibility: 'none',
+          },
           filter: HAS_VALUE,
           paint: {
             'circle-radius': 0,
