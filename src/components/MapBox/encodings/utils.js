@@ -9,6 +9,9 @@ export function caseHovered(thenCase, elseCase, invert = false) {
 
 export const HAS_VALUE = ['>', ['get', 'value'], 0];
 
+export const MISSING_VALUE = -100;
+export const IS_NOT_MISSING = ['!=', 'value', MISSING_VALUE];
+
 export function addSource(map, id) {
   map.addSource(id, {
     type: 'geojson',
