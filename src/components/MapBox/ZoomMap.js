@@ -21,9 +21,11 @@ export default class ZoomMap {
     };
   }
 
-  initZoom(map, showZone = false) {
-    this.map = map;
+  initZoom(showZone = false) {
     this.initialZoomView = showZone;
+    return showZone
+      ? { bounds: this.zoneBounds, fitBounds: this.zoneBoundsOptions }
+      : { bounds: this.stateBounds, fitBounds: this.stateBoundsOptions };
   }
 
   getZoom() {
@@ -72,7 +74,6 @@ export default class ZoomMap {
   }
 
   /**
-   *
    * @param {boolean} value
    */
   showStateLabels(value) {

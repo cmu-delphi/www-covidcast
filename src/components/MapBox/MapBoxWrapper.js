@@ -49,16 +49,14 @@ export default class MapBoxWrapper {
       attributionControl: false,
       container,
       style,
-      // bounds: this.zoom.stateBounds,
-      // fitBoundsOptions: this.zoom.stateBoundsOptions,
+      ...this.zoom.initZoom(showZone),
     });
+    this.zoom.map = this.map;
     this.map.addControl(new AttributionControl({ compact: true }));
     // .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
 
     //Disable touch zoom, it makes gesture scrolling difficult
     this.map.scrollZoom.disable();
-
-    this.zoom.initZoom(this.map, showZone);
 
     let resolveCallback = null;
 
