@@ -1,3 +1,5 @@
+import { injectIDs } from '../../util';
+
 export const S = {
   state: {
     border: 'state-border',
@@ -42,9 +44,9 @@ export const geoJsonSources = Promise.all([
   json('./maps/new_zones.json'),
 ]).then(([county, state, msa, cities, stateCenters, countyCenters, msaCenters, newZones]) => {
   return {
-    county: { border: county, center: countyCenters },
-    state: { border: state, center: stateCenters },
-    msa: { border: msa, center: msaCenters },
+    county: { border: injectIDs('county', county), center: injectIDs('county-centers', countyCenters) },
+    state: { border: injectIDs('state', state), center: injectIDs('state-centers', stateCenters) },
+    msa: { border: injectIDs('msa', msa), center: injectIDs('msa-centers', msaCenters) },
     cities,
     newZones,
   };
