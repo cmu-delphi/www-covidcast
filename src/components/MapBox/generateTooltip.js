@@ -59,6 +59,7 @@ function generateDirectionTooltip(direction) {
 
 function generateSignalTooltip(value, value1, Population) {
   const fillColor = get(colorScale)(value);
+  const fgColor = getTextColorBasedOnBackground(fillColor);
   const popCommas = Number.parseInt(Population, 10).toLocaleString();
   const date = formatTimeWithoutYear(parseTime(get(currentDate)));
   const sens = get(currentSensorEntry);
@@ -68,6 +69,7 @@ function generateSignalTooltip(value, value1, Population) {
   if (sensor.match(/incidence_num/)) {
     const avg = value;
     const count = value1;
+    // TODO color the average by the color of the current value?
     return `
       <div class="map-popup-region-value-container">
         Population: ${popCommas} <br>
@@ -75,8 +77,7 @@ function generateSignalTooltip(value, value1, Population) {
         &emsp; ${date}: ${count} <br>
         &emsp; 7-day avg:
         <span class="map-popup-region-value"
-              style="background-color: ${fillColor};
-                    color: ${getTextColorBasedOnBackground(fillColor)};">
+              style="background-color: ${fillColor}; color: ${fgColor};">
           ${parseFloat(avg.toFixed(2)).toLocaleString()}
         </span>
 
@@ -93,8 +94,7 @@ function generateSignalTooltip(value, value1, Population) {
         &emsp; ${date}: ${count.toFixed(2)} <br>
         &emsp; 7-day avg:
         <span class="map-popup-region-value"
-              style="background-color: ${fillColor};
-                    color: ${getTextColorBasedOnBackground(fillColor)};">
+              style="background-color: ${fillColor}; color: ${fgColor};">
           ${parseFloat(avg.toFixed(2)).toLocaleString()}
           ${sens.format === 'percent' ? '%' : ''}
         </span>
@@ -105,8 +105,7 @@ function generateSignalTooltip(value, value1, Population) {
     <div class="map-popup-region-value-container">
       ${sens.yAxis}:
       <span class="map-popup-region-value"
-            style="background-color: ${fillColor};
-                  color: ${getTextColorBasedOnBackground(fillColor)};">
+            style="background-color: ${fillColor}; color: ${fgColor};">
         ${parseFloat(value.toFixed(2)).toLocaleString()}
         ${sens.format === 'percent' ? '%' : ''}
       </span>
