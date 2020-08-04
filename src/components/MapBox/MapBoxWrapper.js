@@ -14,10 +14,10 @@ import { is7DavIncidence } from '../../data/signals';
 export default class MapBoxWrapper {
   /**
    *
-   * @param {(type: string, data: any) => void} trigger
+   * @param {(type: string, data: any) => void} dispatch
    */
-  constructor(trigger) {
-    this.trigger = trigger;
+  constructor(dispatch) {
+    this.dispatch = dispatch;
     /**
      * @type {MapBox | null}
      */
@@ -66,7 +66,7 @@ export default class MapBoxWrapper {
     });
 
     this.map.on('idle', () => {
-      this.trigger('idle');
+      this.dispatch('idle');
     });
 
     this.map.on('load', () => {
@@ -81,7 +81,7 @@ export default class MapBoxWrapper {
         })
         .then(() => {
           this.mapReady = true;
-          this.trigger('ready');
+          this.dispatch('ready');
           resolveCallback(this);
         });
     });

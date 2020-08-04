@@ -34,27 +34,6 @@
     });
   });
 
-  // Update the map when sensor or level changes.
-  // currentData.subscribe(() => updateMap('data'));
-  // currentLevel.subscribe(() => {
-  //   labelStates();
-  //   updateMap('data');
-  // });
-  // signalType.subscribe(() => {
-  //   updateMap('signal');
-  // });
-  // encoding.subscribe(() => updateMap('encoding'));
-  // mounted.subscribe(() => updateMap('mounted'));
-  // currentDate.subscribe(() => {
-  //   if (
-  //     $currentData.length > 0 &&
-  //     ($currentData[0].sensor !== $currentSensor || $currentData[0].level !== $currentLevel)
-  //   ) {
-  //     return;
-  //   }
-  //   updateMap('data');
-  // });
-
   function updateEncoding(level, encoding, sensor, signalType, stats) {
     // Get the range for the heatmap.
     const valueMinMax = determineMinMax(stats, sensor, level);
@@ -107,12 +86,12 @@
   $: {
     // update mega
     if (drawMega) {
+      // add the ready parameter such that we also track it
       updateMegaSources(mapData.geoIds, mapData.mega.value, mapData.mega.direction, sensor, true, ready);
     }
   }
   $: {
     // update levels
-    console.log('update ready', ready);
     updateLevelSources(mapData.geoIds, level, mapData.value, mapData.direction, sensor, true, ready);
   }
   $: {
@@ -122,14 +101,7 @@
     }
   }
 
-  // function updateMap(type) {
-  //   if (!mapMounted) return;
-
-  //   // If we're looking at counties, draw the mega-county states.
-  //   let drawMega = $currentLevel === 'county';
-
-  //   const updateData = ['data', 'init'].includes(type);
-
+  // TODO auto select a region upon start
   //   const viableFeatures = dat.features.filter((f) => f.properties[$signalType] !== MISSING_VALUE);
 
   //   // set a random focus on start up
