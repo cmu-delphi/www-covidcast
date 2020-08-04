@@ -36,7 +36,7 @@ export default class MapBoxWrapper {
       new SpikeEncoding(ENCODING_SPIKE_THEME),
     ];
     this.encoding = this.encodings[0];
-    this.level = 'state'; // TODO
+    this.level = '';
     this.zoom = new ZoomMap();
   }
 
