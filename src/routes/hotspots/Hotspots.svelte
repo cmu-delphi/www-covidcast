@@ -16,11 +16,11 @@
 
   /**
    * @param {import('../../data/fetchData').EpiDataRow} row
-   * @param {Map<string, import('../../maps/nameIdInfo').NameInfo>} lookup
+   * @param {(id: string) => import('../../maps/nameIdInfo').NameInfo} lookup
    * @param {string} level   */
   function toHotspotData(row, lookup, level) {
     // TODO generalize this process into the stores
-    const props = lookup.get(row.geo_value.toUpperCase());
+    const props = lookup(row.geo_value);
     return {
       id: row.geo_value.toUpperCase(),
       name: props ? props.display_name : row.geo_value,
