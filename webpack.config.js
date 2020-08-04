@@ -75,6 +75,10 @@ module.exports = () => {
             },
           ],
         },
+        {
+          test: /\.(txt|csv|tsv)$/i,
+          use: 'raw-loader',
+        },
       ],
     },
 

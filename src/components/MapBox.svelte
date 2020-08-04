@@ -1,5 +1,4 @@
 <script>
-  import { onMount } from 'svelte';
   import mapboxgl from 'mapbox-gl';
   import 'mapbox-gl/dist/mapbox-gl.css';
   import { getTextColorBasedOnBackground, zip, transparent } from '../util';
@@ -46,6 +45,7 @@
   import { S } from './MapBox/sources';
   import bounds from './MapBox/bounds.json';
   import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './MapBox/encodings';
+  import loadNameIdInfo from '../maps/name_id_info';
 
   export let graphShowStatus, toggleGraphShowStatus;
 
@@ -101,11 +101,9 @@
     });
   }
 
-  onMount(() => {
-    Promise.all([d3.json('./maps/name_id_info.json')]).then(([a]) => {
-      regionList = a['all'];
-      loaded = true;
-    });
+  loadNameIdInfo().then((data) => {
+    regionList = data;
+    loaded = true;
   });
 
   // Mouse event handlers
