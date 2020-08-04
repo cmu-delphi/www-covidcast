@@ -1,5 +1,3 @@
-import { json } from 'd3';
-
 export const S = {
   state: {
     border: 'state-border',
@@ -26,6 +24,12 @@ export const S = {
   megaCounty: 'mega-county',
   zoneOutline: 'zone-outline',
 };
+
+const fetchOptions = process.env.NODE_ENV === 'development' ? { cache: 'force-cache' } : {};
+
+function json(url) {
+  return fetch(url, fetchOptions).then((r) => r.json());
+}
 
 export const geoJsonSources = Promise.all([
   json('./maps/new_counties.json'),
