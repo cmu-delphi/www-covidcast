@@ -18,6 +18,7 @@
     spikeHeightScale,
     regionSearchList,
     currentRegionInfo,
+    currentRegion,
     selectByInfo,
     selectByFeature,
   } from '../../stores';
@@ -31,6 +32,12 @@
    * @type {MapBox}
    */
   let map;
+
+  function initialReady() {
+    if (!$currentRegion) {
+      map.selectRandom();
+    }
+  }
 </script>
 
 <style>
@@ -219,6 +226,7 @@
     showCurrentZone={$currentZone === 'swpa'}
     selection={$currentRegionInfo}
     encoding={$encoding}
+    on:ready={() => initialReady()}
     on:range={(e) => currentRange.set(e.detail)}
     on:colorScale={(e) => colorScale.set(e.detail)}
     on:colorStops={(e) => colorStops.set(e.detail)}

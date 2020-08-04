@@ -204,4 +204,8 @@ export default class InteractiveMap {
     this._updateHighlight(this.clicked, id, megaId);
     return bak;
   }
+
+  forceHover(feature) {
+    this._updateHighlight(this.hovered, feature.id, null);
+  }
 }
