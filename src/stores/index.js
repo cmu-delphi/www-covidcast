@@ -102,6 +102,9 @@ export const currentSensor = writable('', (set) => {
     set(firstKey);
   }
 });
+export const currentSensorEntry = derived([sensorMap, currentSensor], ([$sensorMap, $currentSensor]) =>
+  $sensorMap.get($currentSensor),
+);
 
 // 'county', 'state', or 'msa'
 export const currentLevel = writable('county', (set) => {
@@ -149,6 +152,7 @@ export const currentRegion = writable('', (set) => {
     set(region);
   }
 });
+export const currentRegionName = writable('');
 
 // currently only supporting 'swpa' - South western Pennsylvania
 export const currentZone = writable('', (set) => {
@@ -157,15 +161,6 @@ export const currentZone = writable('', (set) => {
     set(zone);
   }
 });
-
-// Range of time for the map slider.
-export const currentRange = writable([0, 1]);
-
-export const currentRegionName = writable('');
-
-export const currentSensorEntry = derived([sensorMap, currentSensor], ([$sensorMap, $currentSensor]) =>
-  $sensorMap.get($currentSensor),
-);
 
 /**
  * @type {import('svelte/store').Writable<EpiDataRow[]>}
@@ -181,6 +176,8 @@ export const timeRangeOnSlider = writable({
   max: 0,
 });
 
+// Range of time for the map slider.
+export const currentRange = writable([0, 1]);
 export const colorScale = writable(d3.scaleSequentialLog());
 export const colorStops = writable([]);
 export const bubbleRadiusScale = writable(LogScale());
