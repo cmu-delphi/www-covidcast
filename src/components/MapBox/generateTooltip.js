@@ -5,14 +5,13 @@ import {
   signalType,
   currentSensor,
   specialCounties,
-  dict,
   currentDate,
   currentSensorEntry,
   colorScale,
 } from '../../stores';
 import { DIRECTION_THEME, MAP_THEME } from '../../theme';
 import { getTextColorBasedOnBackground } from '../../util';
-import { levelMegaCounty } from '../../stores/constants';
+import { levelMegaCounty, dict } from '../../stores/constants';
 
 const parseTime = timeParse('%Y%m%d');
 const formatTimeWithoutYear = timeFormat('%B %d');

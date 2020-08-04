@@ -1,6 +1,5 @@
 import { Popup } from 'mapbox-gl';
-import { levels } from '../../stores';
-import { levelMegaCounty } from '../../stores/constants';
+import { levelMegaCounty, levels } from '../../stores/constants';
 import { generateTooltip } from './generateTooltip';
 import { L } from './layers';
 import { S } from './sources';
