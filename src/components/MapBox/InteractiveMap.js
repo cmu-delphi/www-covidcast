@@ -7,7 +7,7 @@ import { S } from './sources';
 export default class InteractiveMap {
   /**
    * @param {import('mapbox-gl').Map} map
-   * @param {{readonly encoding: string, readonly level: string, trigger(type: string, id: string | null)}} adapter
+   * @param {{readonly encoding: string, readonly level: string, dispatch(type: string, detail: any)}} adapter
    */
   constructor(map, adapter) {
     this.adapter = adapter;
@@ -79,7 +79,7 @@ export default class InteractiveMap {
     const feature = e.features[0];
     const nextValue = this.clicked.id === feature.id ? null : feature.id;
     this._updateHighlight(this.clicked, nextValue, null);
-    this.adapter.trigger('select', nextValue ? feature.properties.id : null);
+    this.adapter.dispatch('select', nextValue ? feature : null);
   }
 
   /**
@@ -92,11 +92,11 @@ export default class InteractiveMap {
     if (this.hovered.mega === this.clicked.mega) {
       // reset
       this._updateHighlight(this.clicked, null, null);
-      this.adapter.trigger('selectMega', null);
+      this.adapter.dispatch('selectMega', null);
       return;
     }
     const feature = e.features[0];
-    this.adapter.trigger('selectMega', feature.properties.STATE + '000');
+    this.adapter.dispatch('selectMega', feature);
     this._updateHighlight(this.clicked, null, feature.id);
   }
 
