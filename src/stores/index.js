@@ -15,6 +15,7 @@ export {
   yesterday,
   yesterdayDate,
 } from './constants';
+export * from './search';
 
 /**
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
@@ -48,6 +49,7 @@ export const sensorMap = derived(sensors, ($sensors) => {
   return map;
 });
 
+// TODO remove once the old map is gone
 // This loads all the GeoJSON's for each granularity that the MapBox component reads as layers.
 export const geojsons = readable(new Map(), (set) => {
   Promise.all([
@@ -190,9 +192,3 @@ export const colorScale = writable(d3.scaleSequentialLog());
 export const colorStops = writable([]);
 export const bubbleRadiusScale = writable(LogScale());
 export const spikeHeightScale = writable(SqrtScale());
-
-export const regionList = writable([], (set) => {
-  d3.json('./maps/name_id_info.json').then((a) => {
-    set(a.all);
-  });
-});

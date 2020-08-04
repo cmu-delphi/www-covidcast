@@ -1,5 +1,15 @@
 import { dsvFormat } from 'd3';
 
+/**
+ * @typedef {object} NameInfo
+ * @property {name_id_info} direction
+ * @property {string} name name to search
+ * @property {string} display_name name to show
+ * @property {string} id ?
+ * @property {string} property_id geojson: feature.property.id
+ * @property {'state' | 'county' | 'msa'} level
+ */
+
 export default function loadNameIdInfo() {
   return import('./name_id_info.csv').then((mod) => {
     /**
@@ -7,7 +17,7 @@ export default function loadNameIdInfo() {
      */
     const raw = mod.default;
     /**
-     * @type {{name: string; display_name: string, id: string, property_id: string, level: string}[]}
+     * @type {NameInfo[]}
      */
     const data = dsvFormat(';').parse(raw);
 
