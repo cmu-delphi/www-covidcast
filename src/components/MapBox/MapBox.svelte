@@ -1,20 +1,7 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import { levelMegaCounty } from '../../stores/constants';
-  import {
-    bubbleRadiusScale,
-    colorScale,
-    colorStops,
-    currentData,
-    currentLevel,
-    currentRange,
-    currentSensor,
-    currentZone,
-    encoding,
-    signalType,
-    spikeHeightScale,
-    stats,
-  } from '../../stores';
+  import { stats } from '../../stores';
   import { determineColorScale, determineMinMax } from './colors';
   import { generateDataLookup } from './data';
   import MapBoxWrapper from './MapBoxWrapper';
@@ -29,8 +16,14 @@
 
   export const zoom = wrapper.zoom;
 
-  $: showCurrentZone = $currentZone === 'swpa';
-  $: drawMega = $currentLevel === 'county';
+  export let data;
+  export let sensor;
+  export let level;
+  export let encoding;
+  export let signalType;
+  export let showCurrentZone;
+
+  $: drawMega = level === 'county';
 
   let ready = false;
 
@@ -39,7 +32,6 @@
   onMount(() => {
     wrapper.initMap(container, showCurrentZone).then(() => {
       // update date init
-      console.log('mark ready');
       ready = true;
       dispatch('ready');
     });
@@ -69,22 +61,23 @@
   function updateEncoding(level, encoding, sensor, signalType, stats) {
     // Get the range for the heatmap.
     const valueMinMax = determineMinMax(stats, sensor, level);
-    currentRange.set(signalType === 'value' ? valueMinMax : [-1, 1]);
+
+    dispatch('range', signalType === 'value' ? valueMinMax : [-1, 1]);
+
     const { stops, stopsMega, scale } = determineColorScale(valueMinMax, signalType, sensor);
     if (scale) {
-      // store the color scale (used for tooltips and legend)
-      colorScale.set(scale);
+      dispatch('colorScale', scale);
     }
     // update store
-    colorStops.set(stops);
+    dispatch('colorStops', stops);
 
     const drawMega = level === 'county';
     const ret = wrapper.updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, drawMega && stopsMega);
     // post encoding logic
     if (encoding === 'bubble') {
-      bubbleRadiusScale.set(ret);
+      dispatch('bubbleScale', ret);
     } else if (encoding === 'spike') {
-      spikeHeightScale.set(ret);
+      dispatch('spikeScale', ret);
     }
   }
 
@@ -113,22 +106,22 @@
     wrapper.updateSource(S[level].center, values, directions, sensor, updateData, idCheck);
   }
 
-  $: mapData = generateDataLookup($currentData, $currentSensor, drawMega);
+  $: mapData = generateDataLookup(data, sensor, drawMega);
   $: {
     // update mega
     if (drawMega) {
-      updateMegaSources(mapData.geoIds, mapData.mega.value, mapData.mega.direction, $currentSensor, true, ready);
+      updateMegaSources(mapData.geoIds, mapData.mega.value, mapData.mega.direction, sensor, true, ready);
     }
   }
   $: {
     // update levels
     console.log('update ready', ready);
-    updateLevelSources(mapData.geoIds, $currentLevel, mapData.value, mapData.direction, $currentSensor, true, ready);
+    updateLevelSources(mapData.geoIds, level, mapData.value, mapData.direction, sensor, true, ready);
   }
   $: {
     // update encodings upon change
     if ($stats) {
-      updateEncoding($currentLevel, $encoding, $currentSensor, $signalType, $stats, ready);
+      updateEncoding(level, encoding, sensor, signalType, $stats, ready);
     }
   }
 
