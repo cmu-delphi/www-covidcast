@@ -24,10 +24,6 @@ export default class MapBoxWrapper {
      */
     this.map = null;
     this.mapReady = false;
-    /**
-     * the zoom level upon resetting
-     */
-    this.baseZoomScale = 1;
 
     /**
      * @type {InteractiveMap | null}
@@ -81,13 +77,13 @@ export default class MapBoxWrapper {
         .then(() => {
           this.addLayers();
           this.interactive = new InteractiveMap(this.map, this);
-          this.baseZoomScale = this.map.getZoom();
           if (showZone) {
             this.zoom.showSWPA();
           }
           this.zoom.showStateLabels(this.level === 'state');
         })
         .then(() => {
+          this.zoom.ready();
           this.mapReady = true;
           this.dispatch('ready');
           resolveCallback(this);
@@ -331,7 +327,7 @@ export default class MapBoxWrapper {
     }
     // show in focus
     this.map.fitBounds(geojsonExtent(feature), {
-      maxZoom: this.baseZoomScale * 1.5,
+      maxZoom: this.zoom.getZoom() * 1.5,
       linear: false,
       essential: true,
     });
