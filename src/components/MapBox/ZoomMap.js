@@ -13,6 +13,7 @@ export default class ZoomMap {
       padding: 20, //px
       linear: false,
     };
+    this.stateZoom = 1;
     this.initialZoomView = true;
     this.zoneBounds = new LngLatBounds(bounds.zones);
     this.zoneBoundsOptions = {
@@ -55,6 +56,13 @@ export default class ZoomMap {
     }
     this.initialZoomView = true;
     this.map.fitBounds(this.stateBounds, this.stateBoundsOptions);
+    this.map.once('idle', () => {
+      this.ready();
+    });
+  }
+
+  ready() {
+    this.stateZoom = this.map.getZoom();
   }
 
   resized() {
