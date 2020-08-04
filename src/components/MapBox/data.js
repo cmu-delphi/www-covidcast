@@ -16,7 +16,7 @@ export function generateDataLookup(data, sensor, drawMega) {
     const megaKey = key.slice(0, 2) + '';
     geoIds.add(key);
 
-    if (d.value !== null) {
+    if (d.value != null || d.avg != null) {
       let info;
       if (isCasesSignal(sensor) || isDeathSignal(sensor)) {
         info = [d.avg, d.count];
