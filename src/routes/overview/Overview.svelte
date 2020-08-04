@@ -16,19 +16,45 @@
     colorStops,
     bubbleRadiusScale,
     spikeHeightScale,
+    regionSearchList,
+    currentRegion,
+    currentRegionInfo,
+    currentRegionName,
   } from '../../stores';
   import Toggle from '../../components/Toggle.svelte';
   import Title from '../../components/Title.svelte';
   import MapControls from '../../components/MapControls.svelte';
   import { trackEvent } from '../../stores/ga';
+  import Search from '../../components/Search.svelte';
 
   /**
    * @type {MapBox}
    */
   let map;
 
-  function select(id) {
-    console.log('select', id);
+  function select(feature) {
+    const id = feature ? feature.properties.id : null;
+    console.log('select', feature, id);
+  }
+  function selectMega(feature) {
+    const id = feature ? feature.properties.STATE + '000' : null;
+    console.log('selectMega', feature, id);
+  }
+  /**
+   * @param {import('../../maps/nameIdInfo').NameInfo | null} elem
+   */
+  function searchElement(elem) {
+    if (elem === $currentRegionInfo) {
+      return;
+    }
+    // the info is derived
+    if (elem) {
+      currentRegion.set(elem.id);
+      currentRegionName.set(elem.display_name);
+    } else {
+      currentRegion.set('');
+      currentRegionName.set('');
+    }
   }
 </script>
 
@@ -152,7 +178,18 @@
     <div class="options-container container-bg base-font-size container-style">
       <Options />
     </div>
-    <div class="search-container-wrapper base-font-size" />
+    <div class="search-container-wrapper base-font-size" class:loading={$regionSearchList.length === 0}>
+      {#if $regionSearchList.length > 0}
+        <Search
+          className="search-container container-bg container-style"
+          placeholder="Search for a location..."
+          items={$regionSearchList}
+          selectedItem={$currentRegionInfo}
+          labelFieldName="display_name"
+          maxItemsToShowInList="5"
+          onChange={searchElement} />
+      {/if}
+    </div>
     <div
       class="toggle-container container-bg base-font-size container-style"
       class:hidden={$signalType === 'direction'}>
@@ -211,5 +248,6 @@
     on:colorStops={(e) => colorStops.set(e.detail)}
     on:bubbleScale={(e) => bubbleRadiusScale.set(e.detail)}
     on:spikeScale={(e) => spikeHeightScale.set(e.detail)}
-    on:select={(e) => select(e.detail)} />
+    on:select={(e) => select(e.detail)}
+    on:selectMega={(e) => selectMega(e.detail)} />
 </main>
