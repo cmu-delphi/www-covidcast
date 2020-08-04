@@ -17,6 +17,10 @@
 
   export const zoom = wrapper.zoom;
 
+  export function selectRandom() {
+    wrapper.selectRandom();
+  }
+
   export let data = [];
   export let sensor = '';
   export let level = 'state';
@@ -115,63 +119,6 @@
     // update selection
     wrapper.select(selection);
   }
-
-  // TODO auto select a region upon start
-  //   const viableFeatures = dat.features.filter((f) => f.properties[$signalType] !== MISSING_VALUE);
-
-  //   // set a random focus on start up
-  //   if (chosenRandom === false && $mounted) {
-  //     if (viableFeatures.length > 0) {
-  //       const found = viableFeatures.filter(
-  //         (f) =>
-  //           f.properties.id === defaultRegionOnStartup.county ||
-  //           f.properties.id === defaultRegionOnStartup.msa ||
-  //           f.properties.id === defaultRegionOnStartup.state,
-  //       );
-  //       if (found.length > 0) {
-  //         // found Allegheny / Pittsburgh
-  //         const randomFeature = found[0];
-  //         if ($currentRegion === '') {
-  //           currentRegionName.set(randomFeature.properties.NAME);
-  //           currentRegion.set(randomFeature.id);
-  //           clickedId = randomFeature.id;
-  //           setFeatureStateMultiple([S.bubble, S.spike.fill, S.spike.stroke], clickedId, {
-  //             select: true,
-  //           });
-  //         }
-  //         chosenRandom = true;
-  //       } else {
-  //         const index = Math.floor(Math.random() * (viableFeatures.length - 1));
-  //         const randomFeature = viableFeatures[index];
-  //         currentRegionName.set(randomFeature.properties.NAME);
-  //         currentRegion.set(randomFeature.properties.id);
-
-  //         clickedId = randomFeature.id;
-  //         setFeatureStateMultiple([S.bubble, S.spike.fill, S.spike.stroke], clickedId, {
-  //           select: true,
-  //         });
-  //         chosenRandom = true;
-  //       }
-  //     }
-  //   }
-
-  //   if ($currentRegion) {
-  //     const megaFound = megaDat.features.find((f) => f.properties.STATE + '000' === $currentRegion + '');
-  //     const found = viableFeatures.find((f) => f.properties.id === $currentRegion);
-  //     if (megaFound) {
-  //       megaClickedId = parseInt(megaFound.properties.STATE);
-  //       currentRegionName.set(megaFound.properties.NAME);
-  //       map.setFeatureState({ source: S['mega-county'].border, id: megaClickedId }, { select: true });
-  //     }
-  //     if (found) {
-  //       clickedId = found.id;
-  //       currentRegionName.set(found.properties.NAME);
-  //       setFeatureStateMultiple([S.bubble, S.spike.fill, S.spike.stroke], clickedId, {
-  //         select: true,
-  //       });
-  //     }
-  //   }
-  // }
 
   function onResize() {
     wrapper.zoom.resized();

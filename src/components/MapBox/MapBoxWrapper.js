@@ -4,7 +4,7 @@ import { L, addCityLayers } from './layers';
 import { S, geoJsonSources } from './sources';
 import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './encodings';
 import { MAP_THEME, ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../../theme';
-import { levelsWithMega, levelMegaCounty, levels } from '../../stores/constants';
+import { levelMegaCounty, levels, defaultRegionOnStartup } from '../../stores/constants';
 import { IS_NOT_MISSING, MISSING_VALUE } from './encodings/utils';
 import InteractiveMap from './InteractiveMap';
 import ZoomMap from './ZoomMap';
@@ -231,9 +231,6 @@ export default class MapBoxWrapper {
       this.zoom.showStateLabels(level === 'state');
     }
 
-    // Reset all hover/click states.
-    levelsWithMega.forEach((level) => this.map.removeFeatureState({ source: S[level].border }));
-
     const allEncodingLayers = this.encodings.flatMap((d) => d.layers).concat([L[levelMegaCounty.id].fill]);
     const visibleLayers = new Set(this.encoding.getVisibleLayers(level, signalType));
 
@@ -338,5 +335,29 @@ export default class MapBoxWrapper {
       linear: false,
       essential: true,
     });
+  }
+
+  selectRandom() {
+    if (!this.map || !this.mapReady) {
+      return;
+    }
+    const defaultRegion = defaultRegionOnStartup[this.level];
+    const source = this.map.getSource(S[this.level].border);
+    if (!source) {
+      return;
+    }
+
+    const defaultFeature = source._data.features.find((d) => d.properties.id === defaultRegion);
+    if (defaultFeature && defaultFeature.properties.value !== MISSING_VALUE) {
+      this.interactive.forceHover(defaultFeature);
+      this.dispatch('select', defaultFeature);
+      return;
+    }
+
+    const viableFeatures = source._data.features.filter((d) => d.properties.value !== MISSING_VALUE);
+    const index = Math.floor(Math.random() * (viableFeatures.length - 1));
+    const randomFeature = viableFeatures[index];
+    this.interactive.forceHover(randomFeature);
+    this.dispatch('select', randomFeature);
   }
 }
