@@ -6,6 +6,10 @@ export function isPropSignal(signal) {
   return signal.match(/prop/);
 }
 
+export function isNumSignal(signal) {
+  return isPropSignal(signal) || isCountSignal(signal);
+}
+
 export function getType(signal) {
   if (isCountSignal(signal)) return 'count';
   else if (isPropSignal(signal)) return 'prop';
