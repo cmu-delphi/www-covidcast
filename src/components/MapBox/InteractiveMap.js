@@ -174,7 +174,7 @@ export default class InteractiveMap {
     const clearState = { [attr]: false };
 
     // match ids
-    if (obj.id != id) {
+    if (obj.id !== id) {
       const layers = [S[this.adapter.level].border, S.bubble, S.spike.fill, S.spike.stroke];
       if (obj.id) {
         this._setFeatureStateMultiple(layers, obj.id, clearState);
@@ -186,7 +186,7 @@ export default class InteractiveMap {
     }
 
     // match mega
-    if (obj.mega != mega) {
+    if (obj.mega !== mega) {
       if (obj.mega) {
         this.map.setFeatureState({ source: S[levelMegaCounty.id].border, id: obj.mega }, clearState);
       }
@@ -198,6 +198,8 @@ export default class InteractiveMap {
   }
 
   select(id) {
-    this._updateHighlight(this.select, id, null);
+    const bak = this.clicked.id;
+    this._updateHighlight(this.clicked, id, null);
+    return bak;
   }
 }
