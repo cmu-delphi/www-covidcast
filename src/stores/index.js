@@ -3,6 +3,7 @@ import { injectIDs } from '../util';
 import { LogScale, SqrtScale } from './scales';
 import * as d3 from 'd3';
 import { sensorList, withSensorEntryKey } from './constants';
+import { regionSearchList } from './search';
 export {
   dict,
   specialCounties,
@@ -153,6 +154,18 @@ export const currentRegion = writable('', (set) => {
   }
 });
 export const currentRegionName = writable('');
+
+/**
+ * current region info (could also be null)
+ */
+export const currentRegionInfo = derived([currentRegion, regionSearchList], ([current, search]) => {
+  console.log(
+    'derive current',
+    current,
+    search.find((d) => d.id == current),
+  );
+  return search.find((d) => d.id == current) || null;
+});
 
 // currently only supporting 'swpa' - South western Pennsylvania
 export const currentZone = writable('', (set) => {
