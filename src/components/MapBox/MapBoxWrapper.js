@@ -10,6 +10,7 @@ import InteractiveMap from './InteractiveMap';
 import ZoomMap from './ZoomMap';
 import style from './mapbox_albers_usa_style.json';
 import { is7DavIncidence } from '../../data/signals';
+import geojsonExtent from '@mapbox/geojson-extent';
 
 export default class MapBoxWrapper {
   /**
@@ -23,6 +24,11 @@ export default class MapBoxWrapper {
      */
     this.map = null;
     this.mapReady = false;
+    /**
+     * the zoom level upon resetting
+     */
+    this.baseZoomScale = 1;
+
     /**
      * @type {InteractiveMap | null}
      */
@@ -49,7 +55,8 @@ export default class MapBoxWrapper {
       attributionControl: false,
       container,
       style,
-      ...this.zoom.initZoom(showZone),
+      bounds: this.zoom.stateBounds,
+      fitBounds: this.zoom.stateBoundsOptions,
     });
     this.zoom.map = this.map;
     this.map.addControl(new AttributionControl({ compact: true }));
@@ -74,6 +81,7 @@ export default class MapBoxWrapper {
         .then(() => {
           this.addLayers();
           this.interactive = new InteractiveMap(this.map, this);
+          this.baseZoomScale = this.map.getZoom();
           if (showZone) {
             this.zoom.showSWPA();
           }
@@ -97,7 +105,7 @@ export default class MapBoxWrapper {
       });
       map.addSource(S[levelMegaCounty.id].border, {
         type: 'geojson',
-        data: r.state.border,
+        data: r.mega,
       });
       map.addSource(S.zoneOutline, {
         type: 'geojson',
@@ -293,44 +301,42 @@ export default class MapBoxWrapper {
     if (!this.map || !this.interactive) {
       return;
     }
-    const oldSelection = this.interactive.select(selection ? selection.id : null);
+    const oldSelection = this.interactive.select(selection);
 
-    if (oldSelection && !selection) {
+    // clear selection
+    if ((oldSelection.id != null || oldSelection.mega != null) && !selection) {
       // fly out
       this.zoom.resetZoom();
       return;
     }
 
-    if (!selection) {
+    // use == on purpose since it could be a number or string
+    // if no selection or we hover the selection don't fly to
+    if (
+      !selection ||
+      (selection.level !== levelMegaCounty.id && this.interactive.hovered.id == selection.property_id) ||
+      (selection.level === levelMegaCounty.id && this.interactive.hovered.mega == selection.property_id)
+    ) {
       return;
     }
 
     // fly to
+    // should also work for mega counties
+    const source = this.map.getSource(S[selection.level].border);
+    if (!source) {
+      return;
+    }
+    // hacky
+    const feature = source._data.features.find((d) => d.properties.id === selection.property_id);
 
-    // TODO
-    //   this.map.getSource()
-    //   // Get zoom and center of selected location
-    //   let centersData = $geojsons.get(S[].center)['features'];
-    //   let centerLocation;
-    //   for (let i = 0; i < centersData.length; i++) {
-    //     let info = centersData[i];
-    //     if (info['properties']['id'] == selectedRegion['property_id']) {
-    //       centerLocation = info['geometry']['coordinates'];
-    //       break;
-    //     }
-    //   }
-
-    //   // TODO better zoom
-    //   let zoomLevel;
-    //   if (selectedRegion['level'] === 'county') {
-    //     zoomLevel = 6.5;
-    //   } else if (selectedRegion['level'] === 'msa') {
-    //     zoomLevel = 6;
-    //   } else {
-    //     zoomLevel = 5;
-    //   }
-
-    //   map.flyTo({ center: centerLocation, zoom: zoomLevel, essential: true });
-    // }
+    if (!feature) {
+      return;
+    }
+    // show in focus
+    this.map.fitBounds(geojsonExtent(feature), {
+      maxZoom: this.baseZoomScale * 1.5,
+      linear: false,
+      essential: true,
+    });
   }
 }

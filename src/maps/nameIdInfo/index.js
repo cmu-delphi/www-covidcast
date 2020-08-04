@@ -2,7 +2,6 @@ import { dsvFormat } from 'd3';
 
 /**
  * @typedef {object} NameInfo
- * @property {name_id_info} direction
  * @property {string} display_name name to show and search
  * @property {string} name name for param
  * @property {string} id param id

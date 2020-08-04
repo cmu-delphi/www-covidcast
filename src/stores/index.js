@@ -1,9 +1,9 @@
 import { writable, readable, derived, get } from 'svelte/store';
-import { injectIDs } from '../util';
 import { LogScale, SqrtScale } from './scales';
 import * as d3 from 'd3';
 import { sensorList, withSensorEntryKey } from './constants';
-import { regionSearchList } from './search';
+import { regionSearchLookup } from './search';
+import { injectIDs } from '../components/MapBox/sources';
 export {
   dict,
   specialCounties,
@@ -14,7 +14,7 @@ export {
   yesterday,
   yesterdayDate,
 } from './constants';
-export * from './search';
+export { regionSearchList } from './search';
 
 /**
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
@@ -158,9 +158,32 @@ export const currentRegionName = writable('');
 /**
  * current region info (could also be null)
  */
-export const currentRegionInfo = derived([currentRegion, regionSearchList], ([current, search]) => {
-  return search.find((d) => d.property_id == current) || null;
-});
+export const currentRegionInfo = derived([currentRegion, regionSearchLookup], ([current, lookup]) =>
+  lookup.get(current),
+);
+
+/**
+ *
+ * @param {import('../maps/nameIdInfo').NameInfo | null} elem
+ */
+export function selectByInfo(elem) {
+  if (elem === get(currentRegionInfo)) {
+    return;
+  }
+  if (elem) {
+    currentRegion.set(elem.property_id);
+    currentRegionName.set(elem.display_name);
+    // the info is derived
+  } else {
+    currentRegion.set('');
+    currentRegionName.set('');
+  }
+}
+
+export function selectByFeature(feature) {
+  const lookup = get(regionSearchLookup);
+  selectByInfo(feature ? lookup.get(feature.properties.id) : null);
+}
 
 // currently only supporting 'swpa' - South western Pennsylvania
 export const currentZone = writable('', (set) => {
