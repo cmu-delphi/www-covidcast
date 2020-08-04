@@ -79,6 +79,7 @@ export default class MapBoxWrapper {
           if (showZone) {
             this.zoom.showSWPA();
           }
+          this.zoom.showStateLabels(this.level === 'state');
         })
         .then(() => {
           this.mapReady = true;
@@ -214,9 +215,7 @@ export default class MapBoxWrapper {
     // changed the visibility of layers
     if (this.level !== level) {
       this.level = level;
-      if (level === 'state') {
-        // TODO show state labels
-      }
+      this.zoom.showStateLabels(level === 'state');
     }
     this.encoding = this.encodings.find((d) => d.id === encoding);
 
@@ -270,8 +269,10 @@ export default class MapBoxWrapper {
         d.properties.value = values.get(id)[0];
 
         if (is7DavIncidence(sensor)) {
-          d.properties.value = values.get(id)[0]; // 7-day avg
+          // value ... 7-day avg
           d.properties.value1 = values.get(id)[1]; // count
+        } else {
+          delete d.properties.value1;
         }
       }
       if (directions.has(id)) {
