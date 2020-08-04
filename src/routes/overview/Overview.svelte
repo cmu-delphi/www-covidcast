@@ -1,6 +1,6 @@
 <script>
   import MapBox from '../../components/MapBox/MapBox.svelte';
-  // import LineSmallMultiples from '../../components/LineSmallMultiples.svelte';
+  import LineSmallMultiples from '../../components/LineSmallMultiples.svelte';
   import Legend from '../../components/Legend.svelte';
   import Options from '../../components/Options.svelte';
   import {
@@ -213,7 +213,7 @@
   </div>
 
   <div class="small-multiples">
-    <!-- <LineSmallMultiples /> -->
+    <LineSmallMultiples />
   </div>
 
   <MapBox
