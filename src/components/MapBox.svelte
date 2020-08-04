@@ -36,6 +36,7 @@
     specialCounties,
     defaultRegionOnStartup,
     currentSensorEntry,
+    regionSearchList,
   } from '../stores';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
@@ -45,7 +46,6 @@
   import { S } from './MapBox/sources';
   import bounds from './MapBox/bounds.json';
   import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './MapBox/encodings';
-  import loadNameIdInfo from '../maps/name_id_info';
 
   export let graphShowStatus, toggleGraphShowStatus;
 
@@ -89,8 +89,7 @@
     spike: new SpikeEncoding(ENCODING_SPIKE_THEME),
   };
 
-  $: regionList = [];
-  $: loaded = false;
+  $: loaded = $regionSearchList.length > 0;
   $: invalidSearch = false;
 
   // helper function for multiple calls of map.setFeatureState
@@ -100,11 +99,6 @@
       map.setFeatureState({ source: s, id: id }, state);
     });
   }
-
-  loadNameIdInfo().then((data) => {
-    regionList = data;
-    loaded = true;
-  });
 
   // Mouse event handlers
   const onMouseEnter = (level) => (e) => {
@@ -952,7 +946,7 @@
   }
 
   function findSelectedRegion(id) {
-    return regionList != null && regionList.find((d) => d.property_id === id);
+    return regionSearchList != null && regionSearchList.find((d) => d.property_id === id);
   }
 
   function resetSearch() {
@@ -1189,11 +1183,11 @@
       <Options />
     </div>
     <div class="search-container-wrapper base-font-size">
-      {#if loaded && regionList.length != 0}
+      {#if loaded && regionSearchList.length != 0}
         <Search
           className="search-container container-bg container-style"
           placeholder="Search for a location..."
-          items={regionList}
+          items={regionSearchList}
           selectedItem={selectedRegion}
           labelFieldName="display_name"
           maxItemsToShowInList="5"
