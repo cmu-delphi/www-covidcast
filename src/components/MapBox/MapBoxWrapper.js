@@ -211,14 +211,16 @@ export default class MapBoxWrapper {
 
   updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, stopsMega) {
     // changed the visibility of layers
-    if (this.level !== level) {
-      this.level = level;
-      this.zoom.showStateLabels(level === 'state');
-    }
+    const oldLevel = this.level;
+    this.level = level;
     this.encoding = this.encodings.find((d) => d.id === encoding);
 
     if (!this.map || !this.mapReady) {
       return;
+    }
+
+    if (oldLevel !== level) {
+      this.zoom.showStateLabels(level === 'state');
     }
 
     // Reset all hover/click states.
@@ -283,6 +285,10 @@ export default class MapBoxWrapper {
     }
   }
 
+  /**
+   *
+   * @param {string | null} featureId
+   */
   select(featureId) {
     if (!this.map || !this.interactive) {
       return;
