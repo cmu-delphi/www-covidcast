@@ -1,9 +1,8 @@
 import { writable, readable, derived, get } from 'svelte/store';
 import { LogScale, SqrtScale } from './scales';
-import * as d3 from 'd3';
+import { scaleSequentialLog } from 'd3';
 import { sensorList, withSensorEntryKey } from './constants';
 import { regionSearchLookup } from './search';
-import { injectIDs } from '../components/MapBox/sources';
 export {
   dict,
   specialCounties,
@@ -46,32 +45,6 @@ export const sensorMap = derived(sensors, ($sensors) => {
   const map = new Map();
   $sensors.forEach((d) => map.set(d.key, d));
   return map;
-});
-
-// TODO remove once the old map is gone
-// This loads all the GeoJSON's for each granularity that the MapBox component reads as layers.
-export const geojsons = readable(new Map(), (set) => {
-  Promise.all([
-    d3.json('./maps/new_counties.json'),
-    d3.json('./maps/new_states.json'),
-    d3.json('./maps/new_msa.json'),
-    d3.json('./maps/city_data/cities-reprojected.json'),
-    d3.json('./maps/state_centers.json'),
-    d3.json('./maps/county_centers.json'),
-    d3.json('./maps/msa_centers.json'),
-    d3.json('./maps/new_zones.json'),
-  ]).then(([counties, states, msa, cities, stateCenters, countyCenters, msaCenters, newZones]) => {
-    const m = new Map();
-    m.set('county', injectIDs('county', counties));
-    m.set('state', injectIDs('state', states));
-    m.set('msa', injectIDs('msa', msa));
-    m.set('city', cities);
-    m.set('state-centers', injectIDs('state-centers', stateCenters));
-    m.set('county-centers', injectIDs('county-centers', countyCenters));
-    m.set('msa-centers', injectIDs('msa-centers', msaCenters));
-    m.set('zone', newZones);
-    set(m);
-  });
 });
 
 export const times = writable(null);
@@ -209,7 +182,7 @@ export const timeRangeOnSlider = writable({
 
 // Range of time for the map slider.
 export const currentRange = writable([0, 1]);
-export const colorScale = writable(d3.scaleSequentialLog());
+export const colorScale = writable(scaleSequentialLog());
 export const colorStops = writable([]);
 export const bubbleRadiusScale = writable(LogScale());
 export const spikeHeightScale = writable(SqrtScale());
