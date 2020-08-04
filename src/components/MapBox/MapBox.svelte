@@ -12,7 +12,8 @@
    */
   let container = null;
 
-  const wrapper = new MapBoxWrapper();
+  const dispatch = createEventDispatcher();
+  const wrapper = new MapBoxWrapper((event, data) => dispatch(event, data));
 
   export const zoom = wrapper.zoom;
 
@@ -27,13 +28,9 @@
 
   let ready = false;
 
-  const dispatch = createEventDispatcher();
-
   onMount(() => {
     wrapper.initMap(container, showCurrentZone).then(() => {
-      // update date init
       ready = true;
-      dispatch('ready');
     });
   });
 

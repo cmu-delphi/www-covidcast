@@ -4,8 +4,7 @@ import { L, addCityLayers } from './layers';
 import { S, geoJsonSources } from './sources';
 import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './encodings';
 import { MAP_THEME, ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../../theme';
-import { levels } from '../../stores';
-import { levelsWithMega, levelMegaCounty } from '../../stores/constants';
+import { levelsWithMega, levelMegaCounty, levels } from '../../stores/constants';
 import { IS_NOT_MISSING, MISSING_VALUE } from './encodings/utils';
 import InteractiveMap from './InteractiveMap';
 import ZoomMap from './ZoomMap';
@@ -13,7 +12,12 @@ import style from './mapbox_albers_usa_style.json';
 import { is7DavIncidence } from '../../data/signals';
 
 export default class MapBoxWrapper {
-  constructor() {
+  /**
+   *
+   * @param {(type: string, data: any) => void} trigger
+   */
+  constructor(trigger) {
+    this.trigger = trigger;
     /**
      * @type {MapBox | null}
      */
@@ -34,11 +38,6 @@ export default class MapBoxWrapper {
     this.encoding = this.encodings[0];
     this.level = 'state'; // TODO
     this.zoom = new ZoomMap();
-  }
-
-  trigger(event, infos) {
-    console.log(event, infos);
-    // TODO
   }
 
   /**
@@ -68,6 +67,10 @@ export default class MapBoxWrapper {
       resolveCallback = resolve;
     });
 
+    this.map.on('idle', () => {
+      this.trigger('idle');
+    });
+
     this.map.on('load', () => {
       this.addSources()
         .then(() => {
@@ -79,6 +82,7 @@ export default class MapBoxWrapper {
         })
         .then(() => {
           this.mapReady = true;
+          this.trigger('ready');
           resolveCallback(this);
         });
     });

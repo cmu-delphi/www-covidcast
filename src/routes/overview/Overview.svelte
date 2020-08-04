@@ -1,6 +1,6 @@
 <script>
   import MapBox from '../../components/MapBox/MapBox.svelte';
-  import LineSmallMultiples from '../../components/LineSmallMultiples.svelte';
+  // import LineSmallMultiples from '../../components/LineSmallMultiples.svelte';
   import Legend from '../../components/Legend.svelte';
   import Options from '../../components/Options.svelte';
   import {
@@ -26,6 +26,10 @@
    * @type {MapBox}
    */
   let map;
+
+  function select(id) {
+    console.log('select', id);
+  }
 </script>
 
 <style>
@@ -190,12 +194,12 @@
   </div>
 
   <div class="small-multiples">
-    <LineSmallMultiples />
+    <!-- <LineSmallMultiples /> -->
   </div>
 
   <MapBox
     bind:this={map}
-    on:ready={() => currentDataReadyOnMap.set(true)}
+    on:idle={() => currentDataReadyOnMap.set(true)}
     data={$currentData}
     sensor={$currentSensor}
     level={$currentLevel}
@@ -206,5 +210,6 @@
     on:colorScale={(e) => colorScale.set(e.detail)}
     on:colorStops={(e) => colorStops.set(e.detail)}
     on:bubbleScale={(e) => bubbleRadiusScale.set(e.detail)}
-    on:spikeScale={(e) => spikeHeightScale.set(e.detail)} />
+    on:spikeScale={(e) => spikeHeightScale.set(e.detail)}
+    on:select={(e) => select(e.detail)} />
 </main>
