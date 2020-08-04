@@ -287,13 +287,25 @@ export default class MapBoxWrapper {
 
   /**
    *
-   * @param {string | null} featureId
+   * @param {import('../../maps/nameIdInfo').NameInfo | null} selection
    */
-  select(featureId) {
+  select(selection) {
     if (!this.map || !this.interactive) {
       return;
     }
-    this.interactive.select(featureId);
+    const oldSelection = this.interactive.select(selection ? selection.id : null);
+
+    if (oldSelection && !selection) {
+      // fly out
+      this.zoom.resetZoom();
+      return;
+    }
+
+    if (!selection) {
+      return;
+    }
+
+    // fly to
 
     // TODO
     //   this.map.getSource()

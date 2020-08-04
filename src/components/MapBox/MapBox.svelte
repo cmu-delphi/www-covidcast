@@ -17,12 +17,16 @@
 
   export const zoom = wrapper.zoom;
 
-  export let data;
-  export let sensor;
-  export let level;
-  export let encoding;
-  export let signalType;
-  export let showCurrentZone;
+  export let data = [];
+  export let sensor = '';
+  export let level = 'state';
+  export let encoding = 'color';
+  export let signalType = 'value';
+  export let showCurrentZone = false;
+  /**
+   * @type {import('../../maps/nameIdInfo').NameInfo | null}
+   */
+  export let selection = null;
 
   $: drawMega = level === 'county';
 
@@ -33,6 +37,10 @@
       ready = true;
     });
   });
+
+  function dummyTrack() {
+    // dummy function to mark a given argument as tracked
+  }
 
   function updateEncoding(level, encoding, sensor, signalType, stats) {
     // Get the range for the heatmap.
@@ -85,20 +93,27 @@
   $: mapData = generateDataLookup(data, sensor, drawMega);
   $: {
     // update mega
+    dummyTrack(ready);
     if (drawMega) {
-      // add the ready parameter such that we also track it
-      updateMegaSources(mapData.geoIds, mapData.mega.value, mapData.mega.direction, sensor, true, ready);
+      updateMegaSources(mapData.geoIds, mapData.mega.value, mapData.mega.direction, sensor, true);
     }
   }
   $: {
+    dummyTrack(ready);
     // update levels
-    updateLevelSources(mapData.geoIds, level, mapData.value, mapData.direction, sensor, true, ready);
+    updateLevelSources(mapData.geoIds, level, mapData.value, mapData.direction, sensor, true);
   }
   $: {
+    dummyTrack(ready);
     // update encodings upon change
     if ($stats) {
-      updateEncoding(level, encoding, sensor, signalType, $stats, ready);
+      updateEncoding(level, encoding, sensor, signalType, $stats);
     }
+  }
+  $: {
+    dummyTrack(ready);
+    // update selection
+    wrapper.select(selection);
   }
 
   // TODO auto select a region upon start

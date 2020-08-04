@@ -32,14 +32,6 @@
    */
   let map;
 
-  function select(feature) {
-    const id = feature ? feature.properties.id : null;
-    console.log('select', feature, id);
-  }
-  function selectMega(feature) {
-    const id = feature ? feature.properties.STATE + '000' : null;
-    console.log('selectMega', feature, id);
-  }
   /**
    * @param {import('../../maps/nameIdInfo').NameInfo | null} elem
    */
@@ -47,14 +39,28 @@
     if (elem === $currentRegionInfo) {
       return;
     }
-    // the info is derived
     if (elem) {
-      currentRegion.set(elem.id);
+      currentRegion.set(elem.property_id);
       currentRegionName.set(elem.display_name);
+      // the info is derived
     } else {
       currentRegion.set('');
       currentRegionName.set('');
     }
+  }
+
+  function select(feature) {
+    if (!feature) {
+      currentRegion.set('');
+      currentRegionName.set('');
+      return;
+    }
+    currentRegion.set(feature.properties.id);
+    currentRegionName.set(feature.properties.NAME);
+  }
+  function selectMega(feature) {
+    const id = feature ? feature.properties.STATE + '000' : null;
+    console.log('selectMega', feature, id);
   }
 </script>
 
@@ -242,6 +248,7 @@
     level={$currentLevel}
     signalType={$signalType}
     showCurrentZone={$currentZone === 'swpa'}
+    selection={$currentRegionInfo}
     encoding={$encoding}
     on:range={(e) => currentRange.set(e.detail)}
     on:colorScale={(e) => colorScale.set(e.detail)}

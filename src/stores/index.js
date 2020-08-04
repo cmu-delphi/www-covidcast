@@ -159,12 +159,7 @@ export const currentRegionName = writable('');
  * current region info (could also be null)
  */
 export const currentRegionInfo = derived([currentRegion, regionSearchList], ([current, search]) => {
-  console.log(
-    'derive current',
-    current,
-    search.find((d) => d.id == current),
-  );
-  return search.find((d) => d.id == current) || null;
+  return search.find((d) => d.property_id == current) || null;
 });
 
 // currently only supporting 'swpa' - South western Pennsylvania
