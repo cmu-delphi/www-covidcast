@@ -75,10 +75,8 @@ export default class InteractiveMap {
    * @param {import('mapbox-gl').MapMouseEvent} e
    */
   _onLevelMouseClick(e) {
-    this.clicked.mega = null;
     const feature = e.features[0];
     const nextValue = this.clicked.id === feature.id ? null : feature.id;
-    this._updateHighlight(this.clicked, nextValue, null);
     this.adapter.dispatch('select', nextValue ? feature : null);
   }
 
@@ -91,13 +89,11 @@ export default class InteractiveMap {
     }
     if (this.hovered.mega === this.clicked.mega) {
       // reset
-      this._updateHighlight(this.clicked, null, null);
       this.adapter.dispatch('selectMega', null);
       return;
     }
     const feature = e.features[0];
     this.adapter.dispatch('selectMega', feature);
-    this._updateHighlight(this.clicked, null, feature.id);
   }
 
   _onMapMouseLeave() {
@@ -197,9 +193,15 @@ export default class InteractiveMap {
     }
   }
 
-  select(id) {
-    const bak = this.clicked.id;
-    this._updateHighlight(this.clicked, id, null);
+  /**
+   *
+   * @param {import('../../maps/nameIdInfo').NameInfo | null} selection
+   */
+  select(selection) {
+    const bak = Object.assign({}, this.clicked);
+    const id = selection != null && selection.level !== levelMegaCounty.id ? Number(selection.id) : null;
+    const megaId = selection != null && selection.level === levelMegaCounty.id ? Number(selection.id) : null;
+    this._updateHighlight(this.clicked, id, megaId);
     return bak;
   }
 }

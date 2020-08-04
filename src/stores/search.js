@@ -1,9 +1,30 @@
-import { writable } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import loadNameIdInfo from '../maps/nameIdInfo';
+import { levelMegaCounty } from './constants';
 
 /**
  * @type {import('svelte/store').Writable<import('../maps/nameIdInfo').NameInfo[]>}
  */
 export const regionSearchList = writable([], (set) => {
-  loadNameIdInfo().then((r) => set(r));
+  loadNameIdInfo().then((r) => {
+    // generate mega counties by copying the states
+    r.filter((d) => d.level === 'state').forEach((elem) => {
+      r.push(elem.id + '000', {
+        id: elem.id + '000',
+        display_name: `Rest of ${elem.display_name}`,
+        level: levelMegaCounty.id,
+        name: `Rest of ${elem.name}`,
+        property_id: elem.id + '000',
+      });
+    });
+    set(r);
+  });
 });
+
+/**
+ * helper to resolve a given id to a name info object
+ */
+export const regionSearchLookup = derived(
+  [regionSearchList],
+  ([regions]) => new Map(regions.map((d) => [d.property_id, d])),
+);

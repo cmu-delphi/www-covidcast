@@ -17,9 +17,9 @@
     bubbleRadiusScale,
     spikeHeightScale,
     regionSearchList,
-    currentRegion,
     currentRegionInfo,
-    currentRegionName,
+    selectByInfo,
+    selectByFeature,
   } from '../../stores';
   import Toggle from '../../components/Toggle.svelte';
   import Title from '../../components/Title.svelte';
@@ -31,37 +31,6 @@
    * @type {MapBox}
    */
   let map;
-
-  /**
-   * @param {import('../../maps/nameIdInfo').NameInfo | null} elem
-   */
-  function searchElement(elem) {
-    if (elem === $currentRegionInfo) {
-      return;
-    }
-    if (elem) {
-      currentRegion.set(elem.property_id);
-      currentRegionName.set(elem.display_name);
-      // the info is derived
-    } else {
-      currentRegion.set('');
-      currentRegionName.set('');
-    }
-  }
-
-  function select(feature) {
-    if (!feature) {
-      currentRegion.set('');
-      currentRegionName.set('');
-      return;
-    }
-    currentRegion.set(feature.properties.id);
-    currentRegionName.set(feature.properties.NAME);
-  }
-  function selectMega(feature) {
-    const id = feature ? feature.properties.STATE + '000' : null;
-    console.log('selectMega', feature, id);
-  }
 </script>
 
 <style>
@@ -193,7 +162,7 @@
           selectedItem={$currentRegionInfo}
           labelFieldName="display_name"
           maxItemsToShowInList="5"
-          onChange={searchElement} />
+          onChange={selectByInfo} />
       {/if}
     </div>
     <div
@@ -255,6 +224,6 @@
     on:colorStops={(e) => colorStops.set(e.detail)}
     on:bubbleScale={(e) => bubbleRadiusScale.set(e.detail)}
     on:spikeScale={(e) => spikeHeightScale.set(e.detail)}
-    on:select={(e) => select(e.detail)}
-    on:selectMega={(e) => selectMega(e.detail)} />
+    on:select={(e) => selectByFeature(e.detail)}
+    on:selectMega={(e) => selectByFeature(e.detail)} />
 </main>

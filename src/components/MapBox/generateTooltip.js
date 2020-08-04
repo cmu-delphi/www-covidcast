@@ -116,7 +116,7 @@ function generateSignalTooltip(value, value1, Population) {
 export function generateTooltip(feature, level) {
   const { value, direction, NAME, STATE, Population, value1 } = feature.properties;
 
-  const title = (level === levelMegaCounty.id ? 'Rest of ' : '') + NAME + getLabelSpecifics(NAME, STATE, level);
+  const title = NAME + getLabelSpecifics(NAME, STATE, level);
 
   const body =
     get(signalType) === 'value'
