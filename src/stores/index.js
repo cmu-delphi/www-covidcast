@@ -139,9 +139,7 @@ export const currentRegionName = writable('');
 /**
  * current region info (could also be null)
  */
-export const currentRegionInfo = derived([currentRegion, regionSearchLookup], ([current, lookup]) =>
-  lookup.get(current),
-);
+export const currentRegionInfo = derived([currentRegion, regionSearchLookup], ([current, lookup]) => lookup(current));
 
 /**
  *
@@ -163,7 +161,7 @@ export function selectByInfo(elem) {
 
 export function selectByFeature(feature) {
   const lookup = get(regionSearchLookup);
-  selectByInfo(feature ? lookup.get(feature.properties.id) : null);
+  selectByInfo(feature ? lookup(feature.properties.id) : null);
 }
 
 // currently only supporting 'swpa' - South western Pennsylvania

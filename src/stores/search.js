@@ -24,7 +24,15 @@ export const regionSearchList = writable([], (set) => {
 /**
  * helper to resolve a given id to a name info object
  */
-export const regionSearchLookup = derived(
-  [regionSearchList],
-  ([regions]) => new Map(regions.map((d) => [d.property_id, d])),
-);
+export const regionSearchLookup = derived([regionSearchList], ([regions]) => {
+  const map = new Map(regions.map((d) => [String(d.property_id).toLowerCase(), d]));
+  // also by id lookup
+  regions.forEach((region) => {
+    const key = String(region.id).toLowerCase();
+    if (!map.has(key)) {
+      map.set(key, region);
+    }
+  });
+
+  return (id) => map.get(String(id).toLowerCase());
+});
