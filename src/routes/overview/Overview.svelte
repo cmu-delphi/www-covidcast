@@ -3,7 +3,20 @@
   import LineSmallMultiples from '../../components/LineSmallMultiples.svelte';
   import Legend from '../../components/Legend.svelte';
   import Options from '../../components/Options.svelte';
-  import { signalType, currentDataReadyOnMap } from '../../stores';
+  import {
+    signalType,
+    currentDataReadyOnMap,
+    currentData,
+    currentSensor,
+    currentLevel,
+    encoding,
+    currentZone,
+    currentRange,
+    colorScale,
+    colorStops,
+    bubbleRadiusScale,
+    spikeHeightScale,
+  } from '../../stores';
   import Toggle from '../../components/Toggle.svelte';
   import Title from '../../components/Title.svelte';
   import MapControls from '../../components/MapControls.svelte';
@@ -180,5 +193,18 @@
     <LineSmallMultiples />
   </div>
 
-  <MapBox bind:this={map} on:ready={() => currentDataReadyOnMap.set(true)} />
+  <MapBox
+    bind:this={map}
+    on:ready={() => currentDataReadyOnMap.set(true)}
+    data={$currentData}
+    sensor={$currentSensor}
+    level={$currentLevel}
+    signalType={$signalType}
+    showCurrentZone={$currentZone === 'swpa'}
+    encoding={$encoding}
+    on:range={(e) => currentRange.set(e.detail)}
+    on:colorScale={(e) => colorScale.set(e.detail)}
+    on:colorStops={(e) => colorStops.set(e.detail)}
+    on:bubbleScale={(e) => bubbleRadiusScale.set(e.detail)}
+    on:spikeScale={(e) => spikeHeightScale.set(e.detail)} />
 </main>
