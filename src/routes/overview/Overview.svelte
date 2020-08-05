@@ -22,7 +22,7 @@
     selectByInfo,
     selectByFeature,
   } from '../../stores';
-  import Toggle from '../../components/Toggle.svelte';
+  import ToggleEncoding from '../../components/ToggleEncoding.svelte';
   import Title from '../../components/Title.svelte';
   import MapControls from '../../components/MapControls.svelte';
   import Search from '../../components/Search.svelte';
@@ -192,7 +192,7 @@
       class="toggle-container container-bg base-font-size container-style"
       class:hidden={$signalType === 'direction'}>
       <!-- !$currentSensor.match(/num/)-->
-      <Toggle />
+      <ToggleEncoding />
     </div>
     <div class="title-container container-bg">
       <Title />
