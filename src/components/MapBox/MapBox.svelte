@@ -26,12 +26,12 @@
   export function selectRandom() {
     wrapper.selectRandom();
   }
-
   export let data = [];
   export let sensor = '';
   export let level = 'state';
   export let encoding = 'color';
   export let signalType = 'value';
+  export let animationDuration = 0;
   /**
    * @type {import('../../maps/nameIdInfo').NameInfo | null}
    */
@@ -42,6 +42,7 @@
   let ready = false;
 
   onMount(() => {
+    wrapper.animationDuration = animationDuration;
     wrapper.initMap(container).then(() => {
       ready = true;
     });
