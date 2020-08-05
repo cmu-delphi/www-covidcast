@@ -18,4 +18,7 @@
   }
 </style>
 
-<h2 class="banner">{$currentSensorEntry.mapTitleText}</h2>
+<h2 class="banner">
+  {$currentSensorEntry.mapTitleText}
+  <slot />
+</h2>
