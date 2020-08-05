@@ -90,6 +90,9 @@
     singleView = !singleView;
   }
 
+  function setSingleView(singleViewBoolean = false) {
+    singleView = singleViewBoolean;
+  }
   // console.log($sensors);
 
   // console.log({
@@ -97,15 +100,6 @@
   //   currentRegionName,
   // });
   let region = '';
-
-  currentRegion.subscribe((d) => {
-    region = d;
-    generateAllCharts();
-  });
-
-  currentSensor.subscribe(() => {
-    generateSingleChart();
-  });
 
   function generateLineChart(signal = 'part_time_work_prop', source = 'covidcast') {
     const apiURL = `https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day&data_source=${source}&signal=${signal}&geo_type=${$currentLevel}&time_values=20200401-20200720&geo_value=${region}`;
@@ -124,7 +118,10 @@
         x: {
           field: 'time_value',
           type: 'temporal',
-          axis: null,
+          // axis: null,
+          axis: {
+            title: null,
+          },
         },
         y: {
           field: 'value',
@@ -201,13 +198,21 @@
   function generateSingleChart() {
     // console.log({ $currentSensor });
     const s = idToSensor($currentSensor);
+    smallMultipleContainer = document.getElementById('small-multiple-container');
+
+    if (smallMultipleContainer) console.log('WIDTH!', smallMultipleContainer.offsetWidth);
     // console.log('s!!!!', s);
     const apiURL = `https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day&data_source=${s.id}&signal=${s.signal}&geo_type=${$currentLevel}&time_values=20200401-20200710&geo_value=${region}`;
     // const apiURL = `https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day&data_source=doctor-visits&signal=smoothed_adj_cli&geo_type=county&time_values=20200401-20200710&geo_value=45051`;
     const singleLineChartSchema = {
       $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
-      height: 118,
-      width: 768,
+      height: 124,
+      width: smallMultipleContainer ? smallMultipleContainer.offsetWidth : 624,
+      // render: 'svg',
+      // autosize: {
+      //   type: 'fit',
+      //   contains: 'padding',
+      // },
       data: {
         values: null, // to be filled by API
       },
@@ -223,15 +228,16 @@
             title: null, //'Date',
             format: '%b %e',
             formatType: 'time',
-            // tickCount: 4,
+            tickCount: 'month',
           },
         },
         y: {
           field: 'value',
           type: 'quantitative',
           axis: {
-            // title: sensor ? (sensor.yAxis.length < 15 ? sensor.yAxis : ' ') : ' ',
-            title: null,
+            // title: s ? (s.yAxis.length < 15 ? s.yAxis : ' ') : ' ',
+            // title: null,
+            title: s.yAxis ? s.yAxis : ' ',
           },
         },
       },
@@ -297,6 +303,7 @@
   }
 
   function generateAllCharts() {
+    console.log('width', width);
     filteredSensors.forEach((s) => {
       generateLineChart(s.signal, s.id, s);
     });
@@ -305,43 +312,53 @@
   }
 
   onMount(() => {
-    smallMultipleContainer = document.getElementById('small-multiple-container');
     console.log(smallMultipleContainer);
     console.log('width', width);
 
-    // generateAllCharts();
+    currentRegion.subscribe((d) => {
+      region = d;
+      generateAllCharts();
+    });
+
+    currentSensor.subscribe(() => {
+      generateSingleChart();
+    });
   });
 </script>
 
 <style>
   .small-multiples {
-    text-align: center;
     z-index: 100;
     position: absolute;
     right: 0.5em;
     bottom: 12px;
     padding: 0.25em;
-    width: 65vw;
-    /* height: 30vh; */
-    min-height: 192px;
-    max-height: 30vh;
+    width: 68vw;
+    /* min-height: 224px;
+    max-height: 36vh; */
+    height: 250px;
     /* overflow-x: auto;
     overflow-y: hidden;
     white-space: nowrap; */
-    overflow-y: auto;
+    /* overflow-y: auto; */
     background-color: white;
   }
-
   #single-chart {
-    margin-top: 1em;
+    margin-top: 0.5em;
+    overflow-y: hidden;
+    overflow-x: auto;
   }
+
   #multiples-charts {
     width: 100%;
     display: flex;
     flex-wrap: wrap;
     align-items: start;
     justify-content: start;
-    margin-top: 2.5em;
+    margin-top: 1.5em;
+    height: 190px;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
   .small-multiples li {
     text-align: left;
@@ -361,56 +378,113 @@
   .small-multiples li h5 {
     /*font-size: 9px;*/
     /* height: 2.5em; */
+    text-align: left;
     margin: 0;
     padding: 0;
+    padding-left: 1em;
     color: #999;
     cursor: pointer;
+  }
+  .small-multiples li h5:hover {
+    text-decoration: underline;
   }
   .sensor-chart {
     margin: 0;
   }
-  .small-multiples h4 {
-    margin-top: 0.2em;
-    /* margin-bottom: 0.2em; */
-    font-weight: normal;
-  }
+
   #metric-toggle {
     position: absolute;
     right: 0.4em;
     top: 0.4em;
+    width: 12%;
+  }
+
+  .button {
+    min-width: 110px;
+    border-radius: 4px 4px 0 0;
+    margin: 0;
+    border: 1px solid #dbdbdb;
+    padding: 0.5em;
+  }
+
+  button.active {
+    font-weight: bold !important;
+  }
+
+  .small-multiples-topbar {
+    /* border: 1px solid black; */
+  }
+
+  .small-multiples-topbar h4 {
+    font-size: 1.4rem;
+  }
+
+  .small-multiples-topbar h4,
+  .small-multiples-topbar h5 {
+    margin: 1em 0.5em;
+    margin-bottom: 0;
+  }
+
+  .small-multiples-topbar h5 {
+    margin-left: 1em;
+  }
+
+  .small-multiples-tabbar {
+    position: absolute;
+    height: 32px;
+    top: -30px;
+    left: 8px;
+  }
+
+  #single-sensor-chart,
+  #single-chart {
+    width: 100%;
   }
 
   [hidden] {
     display: none !important;
   }
+  .vega-embed > svg {
+    width: 100%;
+    height: 100%;
+  }
 
-  .button {
-    min-width: 110px;
-    border-radius: 4px;
-    border: 1px solid #dbdbdb;
-    padding: 0.5em;
+  .active {
+    background-color: white;
   }
 </style>
 
 <div class="small-multiples container-bg" id="small-multiple-container">
-  <!-- {#if regionName}
+  <div class="small-multiples-tabbar">
+    <!-- <button on:click={toggleSingleView} id="metric-toggle" class="button">
+      {#if singleView}All indicators{:else}{/if}
+    </button> -->
+    <div id="metric-toggles">
+      <button on:click={() => setSingleView(false)} class="button" class:active={!singleView}>All indicators</button>
+
+      <button on:click={() => setSingleView(true)} class="button" class:active={singleView}>
+        <u>{idToSensor($currentSensor).name}</u>
+        over time
+      </button>
+    </div>
+  </div>
+  <div class="small-multiples-topbar">
+    <!-- {#if regionName}
     <h1>{regionName}</h1>
   {/if} -->
 
-  <h4>
-    {#if singleView}
-      <strong>{idToSensor($currentSensor).name}</strong>
-    {/if}
-    <!-- {:else}{filteredSensors.length} available signals{/if} -->
+    <h4>
+      {#if singleView}{idToSensor($currentSensor).name}{:else}{filteredSensors.length} available indicators{/if}
 
-    <!-- <span hidden={singleView}>
+      <!-- <span hidden={singleView}>
       <button on:click={smallMultiplePrev}>Previous</button>
       <button on:click={smallMultipleNext}>Next</button>
     </span> -->
-    <button on:click={toggleSingleView} id="metric-toggle" class="button">
-      {#if singleView}All metrics{:else}Single metric{/if}
-    </button>
-  </h4>
+    </h4>
+
+    <h5 hidden={!singleView}>{idToSensor($currentSensor).tooltipText}</h5>
+
+  </div>
 
   <div id="single-chart" hidden={!singleView}>
     <!-- <div id="single-{sensor.id}-{sensor.signal}-chart" class="single-sensor-chart" /> -->
