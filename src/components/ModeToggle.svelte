@@ -1,23 +1,6 @@
 <script>
   import { currentMode } from '../stores';
-
-  const modes = [
-    {
-      value: 'overview',
-      label: 'Overview',
-      tooltip: 'Switch to Overview Mode',
-    },
-    {
-      value: 'compare',
-      label: 'Compare',
-      tooltip: 'Switch to Comparison Mode',
-    },
-    {
-      value: 'hotspots',
-      label: 'Hotspots',
-      tooltip: 'Switch to Hotspots Mode',
-    },
-  ];
+  import { modes } from '../routes';
 </script>
 
 <style>
@@ -31,11 +14,11 @@
 <div aria-label="application mode" class="pg-button-group">
   {#each modes as mode}
     <button
-      aria-pressed={$currentMode === mode.value ? 'true' : 'false'}
+      aria-pressed={$currentMode === mode ? 'true' : 'false'}
       class="pg-button button"
-      class:selected={$currentMode === mode.value}
+      class:selected={$currentMode === mode}
       on:click={() => {
-        $currentMode = mode.value;
+        $currentMode = mode;
       }}
       title={mode.tooltip}>
       {mode.label}
