@@ -583,7 +583,12 @@
       map.setPaintProperty(BUBBLE_LAYER, 'circle-radius', radiusExpression);
       map.setPaintProperty(highlight(BUBBLE_LAYER), 'circle-radius', radiusExpression);
 
-      hide('mega-county');
+      if (drawMega) {
+        map.setPaintProperty('mega-county', 'fill-color', MAP_THEME.countyFill);
+        show('mega-county');
+      } else {
+        hide('mega-county');
+      }
     } else if ($encoding === 'spike') {
       // hide all color layers except one for the current level
 
@@ -666,7 +671,12 @@
       map.getSource(SPIKE_LAYER).setData(spikes);
       map.getSource(outline(SPIKE_LAYER)).setData(spikeOutlines);
 
-      hide('mega-county');
+      if (drawMega) {
+        map.setPaintProperty('mega-county', 'fill-color', MAP_THEME.countyFill);
+        show('mega-county');
+      } else {
+        hide('mega-county');
+      }
     }
 
     const viableFeatures = dat.features.filter((f) => f.properties[$signalType] !== -100);
