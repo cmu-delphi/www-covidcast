@@ -245,13 +245,33 @@ export default class MapBoxWrapper {
 
   /**
    *
+   * @param {'county' | 'state' | 'msa'} level
+   * @param {Map<string, [number, number]>} values
+   * @param {Map<string, number>} directions
+   * @param {string} sensor
+   */
+  updateSources(level, values, directions, sensor) {
+    if (!this.map || !this.mapReady) {
+      return;
+    }
+    if (level === 'county') {
+      this.updateSource(S[levelMegaCounty.id].border, values, directions, sensor);
+    }
+    this.updateSource(S[level].border, values, directions, sensor);
+    this.updateSource(S[level].center, values, directions, sensor);
+
+    for (const encoding of this.encodings) {
+      encoding.updateSources(this.map, level);
+    }
+  }
+  /**
+   *
    * @param {string} sourceId
    * @param {Map<string, [number, number]>} values
    * @param {Map<string, number>} directions
    * @param {string} sensor
-   * @param {(props: any) => string | null} idExtractor
    */
-  updateSource(sourceId, values, directions, sensor, copyTo = []) {
+  updateSource(sourceId, values, directions, sensor) {
     if (!this.map) {
       return;
     }
@@ -282,15 +302,7 @@ export default class MapBoxWrapper {
     });
 
     source.setData(data);
-
-    if (copyTo.length > 0) {
-      for (const copy of copyTo) {
-        const s = this.map.getSource(copy);
-        if (s) {
-          s.setData(data);
-        }
-      }
-    }
+    return data;
   }
 
   /**

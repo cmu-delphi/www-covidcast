@@ -33,4 +33,8 @@ export default class ChoroplethEncoding {
       map.setLayoutProperty(L[levelMegaCounty.id].fill, 'visibility', 'visible');
     }
   }
+
+  updateSources() {
+    // dummy
+  }
 }

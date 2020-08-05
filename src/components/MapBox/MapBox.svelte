@@ -1,11 +1,9 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
-  import { levelMegaCounty } from '../../stores/constants';
   import { stats } from '../../stores';
   import { determineColorScale, determineMinMax } from './colors';
   import { generateDataLookup } from './data';
   import MapBoxWrapper from './MapBoxWrapper';
-  import { S } from './sources';
   import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './encodings';
   import { ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../../theme';
 
@@ -71,11 +69,7 @@
   $: {
     // update mega
     dummyTrack(ready);
-    if (drawMega) {
-      wrapper.updateSource(S[levelMegaCounty.id].border, mapData.values, mapData.directions, sensor);
-    }
-    wrapper.updateSource(S[level].border, mapData.values, mapData.directions, sensor);
-    wrapper.updateSource(S[level].center, mapData.values, mapData.directions, sensor, [S.bubble]);
+    wrapper.updateSources(level, mapData.values, mapData.directions, sensor);
   }
   $: {
     dummyTrack(ready);
