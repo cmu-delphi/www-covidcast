@@ -40,7 +40,7 @@ export default class MapBoxWrapper {
    *
    * @param {HTMLElement} container
    */
-  initMap(container, showZone = false) {
+  initMap(container) {
     this.map = new MapBox({
       attributionControl: false,
       container,
@@ -71,9 +71,6 @@ export default class MapBoxWrapper {
         .then(() => {
           this.addLayers();
           this.interactive = new InteractiveMap(this.map, this);
-          if (showZone) {
-            this.zoom.showSWPA();
-          }
           this.zoom.showStateLabels(this.level === 'state');
         })
         .then(() => {

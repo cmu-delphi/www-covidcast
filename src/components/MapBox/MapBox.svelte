@@ -32,7 +32,6 @@
   export let level = 'state';
   export let encoding = 'color';
   export let signalType = 'value';
-  export let showCurrentZone = false;
   /**
    * @type {import('../../maps/nameIdInfo').NameInfo | null}
    */
@@ -43,7 +42,7 @@
   let ready = false;
 
   onMount(() => {
-    wrapper.initMap(container, showCurrentZone).then(() => {
+    wrapper.initMap(container).then(() => {
       ready = true;
     });
   });
@@ -66,16 +65,16 @@
     });
   }
 
-  $: mapData = generateDataLookup(data, sensor, drawMega);
+  $: mapData = generateDataLookup(data, sensor);
 
   $: {
     // update mega
     dummyTrack(ready);
     if (drawMega) {
-      wrapper.updateSource(S[levelMegaCounty.id].border, mapData.mega.value, mapData.mega.direction, sensor);
+      wrapper.updateSource(S[levelMegaCounty.id].border, mapData.values, mapData.directions, sensor);
     }
-    wrapper.updateSource(S[level].border, mapData.value, mapData.direction, sensor);
-    wrapper.updateSource(S[level].center, mapData.value, mapData.direction, sensor);
+    wrapper.updateSource(S[level].border, mapData.values, mapData.directions, sensor);
+    wrapper.updateSource(S[level].center, mapData.values, mapData.directions, sensor);
   }
   $: {
     dummyTrack(ready);
