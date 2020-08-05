@@ -2,13 +2,17 @@ import { L } from '../layers';
 import { S } from '../sources';
 import { getType } from '../../../data/signals';
 import { parseScaleSpec } from '../../../stores/scales';
-import { HAS_VALUE, caseHovered, addSource } from './utils';
+import { HAS_VALUE, caseHovered } from './utils';
+import { levels } from '../../../stores';
 
 export default class SpikeEncoding {
   constructor(theme) {
     this.id = 'spike';
     this.theme = theme;
     this.layers = [L.spike.fill, L.spike.stroke, L.spike.highlight.fill, L.spike.highlight.stroke];
+
+    this.heightScale = () => 0;
+    this.sources = {};
   }
 
   getVisibleLayers(level, signalType) {
@@ -16,9 +20,59 @@ export default class SpikeEncoding {
     return this.layers.concat([L[level].fill]);
   }
 
+  generateSources(map, level = 'county') {
+    const centers = map.getSource(S[level].center)._data;
+    const size = this.theme.size[level];
+
+    const spikes = {
+      type: 'FeatureCollection',
+      features: centers.features.map((feature) => {
+        const center = feature.geometry.coordinates;
+
+        return {
+          ...feature,
+          geometry: {
+            coordinates: [
+              [
+                [center[0] - size, center[1]],
+                [center[0], center[1]],
+                [center[0] + size, center[1]],
+              ],
+            ],
+            type: 'Polygon',
+          },
+        };
+      }),
+    };
+
+    const spikeOutlines = {
+      type: 'FeatureCollection',
+      features: spikes.features.map((feature) => {
+        return {
+          ...feature,
+          geometry: {
+            ...feature.geometry,
+            type: 'LineString',
+          },
+        };
+      }),
+    };
+    return { fill: spikes, stroke: spikeOutlines };
+  }
+
   addSources(map) {
-    addSource(map, S.spike.fill);
-    addSource(map, S.spike.stroke);
+    levels.forEach((level) => {
+      // generate a lookup
+      this.sources[level] = this.generateSources(map, level);
+    });
+    map.addSource(S.spike.fill, {
+      type: 'geojson',
+      data: this.sources.county.fill,
+    });
+    map.addSource(S.spike.stroke, {
+      type: 'geojson',
+      data: this.sources.county.stroke,
+    });
   }
 
   addLayers(map) {
@@ -70,63 +124,14 @@ export default class SpikeEncoding {
 
   encode(map, level, signalType, sensor, valueMinMax, stops) {
     map.setPaintProperty(L[level].fill, 'fill-color', this.theme.countyFill);
+
     const valueMax = valueMinMax[1],
-      maxHeight = this.theme.maxHeight[level],
-      size = this.theme.size[level];
+      maxHeight = this.theme.maxHeight[level];
 
     const heightScaleTheme = this.theme.heightScale[getType(sensor)];
 
-    const heightScale = parseScaleSpec(heightScaleTheme).range([0, maxHeight]).domain([0, valueMax]);
-
-    // TODO won't work since we encode is just updated on encoding changes not data changes
-
-    const centers = map.getSource(S[level].center)._data;
-    const features = centers.features.filter((feature) => feature.properties.value > 0);
-
-    const spikes = {
-      type: 'FeatureCollection',
-      features: features.map((feature) => {
-        const center = feature.geometry.coordinates,
-          value = feature.properties.value;
-        return {
-          geometry: {
-            coordinates: [
-              [
-                [center[0] - size, center[1]],
-                [center[0], center[1] + heightScale(value)],
-                [center[0] + size, center[1]],
-              ],
-            ],
-            type: 'Polygon',
-          },
-          properties: { value: value },
-          type: 'Feature',
-          id: feature.id,
-        };
-      }),
-    };
-
-    const spikeOutlines = {
-      type: 'FeatureCollection',
-      features: features.map((feature) => {
-        const center = feature.geometry.coordinates,
-          value = feature.properties.value;
-
-        return {
-          geometry: {
-            coordinates: [
-              [center[0] - size, center[1]],
-              [center[0], center[1] + heightScale(value)],
-              [center[0] + size, center[1]],
-            ],
-            type: 'LineString',
-          },
-          properties: { value: value },
-          type: 'Feature',
-          id: feature.id,
-        };
-      }),
-    };
+    this.heightScale = parseScaleSpec(heightScaleTheme).range([0, maxHeight]).domain([0, valueMax]);
+    this.updateSources(map, level);
 
     let flatStops = stops.flat();
     let colorExpression = ['interpolate', ['linear'], ['get', 'value']].concat(flatStops);
@@ -136,9 +141,29 @@ export default class SpikeEncoding {
     map.setPaintProperty(L.spike.highlight.stroke, 'line-color', colorExpression);
     map.setPaintProperty(L.spike.stroke, 'line-width', this.theme.strokeWidth[level]);
 
-    map.getSource(S.spike.fill).setData(spikes);
-    map.getSource(S.spike.stroke).setData(spikeOutlines);
+    return this.heightScale;
+  }
 
-    return heightScale;
+  copyAndUpdate(source, ref) {
+    source.features.forEach((feature, i) => {
+      // update props
+      feature.properties = ref.features[i].properties;
+      // the 0 coordinate is value independent
+      const poly = feature.geometry.coordinates[0];
+      const base = poly[0][1];
+      // update height
+      poly[1][1] = base + this.heightScale(feature.properties.value);
+    });
+  }
+
+  updateSources(map, level) {
+    const sources = this.sources[level];
+    const ref = map.getSource(S[level].center)._data;
+
+    // inject new data and rescale into our sources
+    this.copyAndUpdate(sources.fill, ref);
+    map.getSource(S.spike.fill).setData(sources.fill);
+    this.copyAndUpdate(sources.stroke, ref);
+    map.getSource(S.spike.stroke).setData(sources.stroke);
   }
 }

@@ -2,7 +2,7 @@ import { L } from '../layers';
 import { S } from '../sources';
 import { getType } from '../../../data/signals';
 import { parseScaleSpec } from '../../../stores/scales';
-import { HAS_VALUE, caseHovered, addSource } from './utils';
+import { HAS_VALUE, caseHovered } from './utils';
 
 export default class BubbleEncoding {
   constructor(theme) {
@@ -17,7 +17,13 @@ export default class BubbleEncoding {
   }
 
   addSources(map) {
-    addSource(map, S.bubble);
+    // copy from centers
+    // level will update upon update sources
+    const data = map.getSource(S.county.center)._data;
+    map.addSource(S.bubble, {
+      type: 'geojson',
+      data,
+    });
   }
 
   addLayers(map, helpers) {
@@ -74,5 +80,10 @@ export default class BubbleEncoding {
     map.setPaintProperty(L.bubble.highlight.fill, 'circle-radius', radiusExpression);
 
     return currentRadiusScale;
+  }
+
+  updateSources(map, level) {
+    // copy from centers in the right level
+    map.getSource(S.bubble).setData(map.getSource(S[level].center)._data);
   }
 }
