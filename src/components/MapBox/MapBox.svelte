@@ -49,24 +49,15 @@
   function updateEncoding(level, encoding, sensor, signalType, stats) {
     // Get the range for the heatmap.
     const valueMinMax = determineMinMax(stats, sensor, level);
-
-    dispatch('range', signalType === 'value' ? valueMinMax : [-1, 1]);
-
     const { stops, stopsMega, scale } = determineColorScale(valueMinMax, signalType, sensor);
-    if (scale) {
-      dispatch('colorScale', scale);
-    }
-    // update store
-    dispatch('colorStops', stops);
-
     const drawMega = level === 'county';
     const ret = wrapper.updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, drawMega && stopsMega);
-    // post encoding logic
-    if (encoding === 'bubble') {
-      dispatch('bubbleScale', ret);
-    } else if (encoding === 'spike') {
-      dispatch('spikeScale', ret);
-    }
+    dispatch('updatedEncoding', {
+      range: signalType === 'value' ? valueMinMax : [-1, 1],
+      custom: ret,
+      scale,
+      stops,
+    });
   }
 
   function updateMegaSources(geoIds, values, directions, sensor, updateData) {
