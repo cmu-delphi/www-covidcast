@@ -74,7 +74,7 @@
       wrapper.updateSource(S[levelMegaCounty.id].border, mapData.values, mapData.directions, sensor);
     }
     wrapper.updateSource(S[level].border, mapData.values, mapData.directions, sensor);
-    wrapper.updateSource(S[level].center, mapData.values, mapData.directions, sensor);
+    wrapper.updateSource(S[level].center, mapData.values, mapData.directions, sensor, [S.bubble]);
   }
   $: {
     dummyTrack(ready);

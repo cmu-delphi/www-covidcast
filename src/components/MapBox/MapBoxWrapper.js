@@ -236,7 +236,7 @@ export default class MapBoxWrapper {
    * @param {string} sensor
    * @param {(props: any) => string | null} idExtractor
    */
-  updateSource(sourceId, values, directions, sensor) {
+  updateSource(sourceId, values, directions, sensor, copyTo = []) {
     if (!this.map) {
       return;
     }
@@ -267,6 +267,15 @@ export default class MapBoxWrapper {
     });
 
     source.setData(data);
+
+    if (copyTo.length > 0) {
+      for (const copy of copyTo) {
+        const s = this.map.getSource(copy);
+        if (s) {
+          s.setData(data);
+        }
+      }
+    }
   }
 
   /**

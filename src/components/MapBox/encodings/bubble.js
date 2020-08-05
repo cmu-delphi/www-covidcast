@@ -54,8 +54,6 @@ export default class BubbleEncoding {
     let flatStops = stops.flat();
     let colorExpression = ['interpolate', ['linear'], ['get', 'value']].concat(flatStops);
 
-    map.getSource(S.bubble).setData(map.getSource(S[level].center)._data);
-
     map.setPaintProperty(L.bubble.fill, 'circle-stroke-color', colorExpression);
     map.setPaintProperty(L.bubble.highlight.fill, 'circle-stroke-color', colorExpression);
 

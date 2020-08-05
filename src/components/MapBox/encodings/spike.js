@@ -78,6 +78,8 @@ export default class SpikeEncoding {
 
     const heightScale = parseScaleSpec(heightScaleTheme).range([0, maxHeight]).domain([0, valueMax]);
 
+    // TODO won't work since we encode is just updated on encoding changes not data changes
+
     const centers = map.getSource(S[level].center)._data;
     const features = centers.features.filter((feature) => feature.properties.value > 0);
 
