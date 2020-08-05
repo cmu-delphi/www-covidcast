@@ -125,7 +125,10 @@
           type: 'temporal',
           // axis: null,
           axis: {
-            title: null,
+            title: null, //'Date',
+            format: '%b %e',
+            formatType: 'time',
+            tickCount: 'month',
           },
         },
         y: {
