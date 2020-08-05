@@ -20,7 +20,7 @@ export default class BubbleEncoding {
     addSource(map, S.bubble);
   }
 
-  addLayers(map) {
+  addLayers(map, helpers) {
     // 2 layers for bubbles
     const addLayer = (id, reference, hovered = false) => {
       map.addLayer(
@@ -39,6 +39,7 @@ export default class BubbleEncoding {
             'circle-stroke-width': this.theme.strokeWidth,
             'circle-opacity': caseHovered(0, this.theme.opacity, hovered),
             'circle-stroke-opacity': caseHovered(0, this.theme.strokeOpacity, hovered),
+            ...helpers.animationOptions('circle-radius'),
           },
         },
         reference,

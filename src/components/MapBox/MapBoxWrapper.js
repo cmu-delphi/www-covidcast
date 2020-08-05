@@ -24,6 +24,7 @@ export default class MapBoxWrapper {
      */
     this.map = null;
     this.mapReady = false;
+    this.animationDuration = 0;
 
     /**
      * @type {InteractiveMap | null}
@@ -116,6 +117,18 @@ export default class MapBoxWrapper {
     });
   }
 
+  animationOptions(prop) {
+    if (!this.animationDuration) {
+      return {};
+    }
+    return {
+      [prop + '-transition']: {
+        duration: this.animationDuration,
+        delay: 0,
+      },
+    };
+  }
+
   addLayers() {
     const map = this.map;
     map.addLayer({
@@ -126,6 +139,7 @@ export default class MapBoxWrapper {
         'fill-color': MAP_THEME.countyFill,
         'fill-outline-color': MAP_THEME.countyOutline,
         'fill-opacity': 0.4,
+        ...this.animationOptions('fill-color'),
       },
     });
 
@@ -151,6 +165,7 @@ export default class MapBoxWrapper {
         paint: {
           'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
           'fill-color': MAP_THEME.countyFill,
+          ...this.animationOptions('fill-color'),
         },
       });
 
@@ -191,7 +206,7 @@ export default class MapBoxWrapper {
 
     addCityLayers(map);
     this.encodings.forEach((enc) => {
-      enc.addLayers(map);
+      enc.addLayers(map, this);
     });
   }
 
