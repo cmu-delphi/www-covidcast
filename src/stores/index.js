@@ -3,6 +3,8 @@ import { LogScale, SqrtScale } from './scales';
 import { scaleSequentialLog } from 'd3';
 import { sensorList, withSensorEntryKey } from './constants';
 import { regionSearchLookup } from './search';
+import { modes } from '../routes';
+
 export {
   dict,
   specialCounties,
@@ -58,12 +60,12 @@ export const customDataView = readable(true, (set) => {
 });
 
 /**
- * @type {import('svelte/store').Writable<'overview' | 'compare' | 'hotspots'>}
+ * @type {import('svelte/store').Writable<import('../routes').Mode>}
  */
-export const currentMode = writable('overview', (set) => {
+export const currentMode = writable(modes[0], (set) => {
   const mode = urlParams.get('mode');
-  if (mode === 'compare' || mode === 'overview' || mode === 'hotspots') {
-    set(mode);
+  if (modes.find((d) => d.id === mode)) {
+    set(modes.find((d) => d.id === mode));
   }
 });
 
