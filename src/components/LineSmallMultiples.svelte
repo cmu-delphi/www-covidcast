@@ -106,7 +106,9 @@
     const lineChartSchema = {
       $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
       height: height,
-      width: width,
+      // width: width,
+      width: smallMultipleContainer ? smallMultipleContainer.offsetWidth * 0.21 : width,
+      padding: 0,
       data: {
         values: null, // to be filled by API
       },
@@ -141,7 +143,7 @@
             index: {
               type: 'single',
               on: 'mousemove',
-              encodings: ['x'],
+              encodings: ['x', 'y'],
               nearest: true,
             },
           },
@@ -171,8 +173,25 @@
           ],
           mark: 'text',
           encoding: {
-            y: { value: 10 },
-            text: { field: 'time_value', type: 'temporal' },
+            y: { value: height - 5 },
+            text: { field: 'time_value', type: 'temporal', format: '%m %d' },
+          },
+        },
+        {
+          transform: [
+            {
+              filter: {
+                and: ['index.time_value', { selection: 'index' }],
+              },
+            },
+          ],
+          mark: 'text',
+          encoding: {
+            y: { value: height - 15 },
+            text: { field: 'value', type: 'quantitative', format: '.1r' },
+            color: {
+              value: 'black',
+            },
           },
         },
       ],
@@ -206,8 +225,8 @@
     // const apiURL = `https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day&data_source=doctor-visits&signal=smoothed_adj_cli&geo_type=county&time_values=20200401-20200710&geo_value=45051`;
     const singleLineChartSchema = {
       $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
-      height: 124,
-      width: smallMultipleContainer ? smallMultipleContainer.offsetWidth : 624,
+      height: 100,
+      width: smallMultipleContainer ? smallMultipleContainer.offsetWidth * 0.94 : 624,
       // render: 'svg',
       // autosize: {
       //   type: 'fit',
@@ -304,6 +323,7 @@
 
   function generateAllCharts() {
     console.log('width', width);
+    smallMultipleContainer = document.getElementById('small-multiple-container');
     filteredSensors.forEach((s) => {
       generateLineChart(s.signal, s.id, s);
     });
@@ -330,13 +350,13 @@
   .small-multiples {
     z-index: 100;
     position: absolute;
-    right: 0.5em;
+    right: 1em;
     bottom: 12px;
     padding: 0.25em;
     width: 68vw;
     /* min-height: 224px;
     max-height: 36vh; */
-    height: 250px;
+    max-height: 35vh;
     /* overflow-x: auto;
     overflow-y: hidden;
     white-space: nowrap; */
@@ -353,12 +373,17 @@
     width: 100%;
     display: flex;
     flex-wrap: wrap;
-    align-items: start;
-    justify-content: start;
+    align-items: flex-end;
+    justify-content: flex-start;
+    flex-direction: row;
+    align-content: flex-start;
     margin-top: 1.5em;
-    height: 190px;
+    /* overflow-y: auto;
+    overflow-x: hidden; */
+    overflow: hidden;
+    min-height: 150px;
+    max-height: 20vh;
     overflow-y: auto;
-    overflow-x: hidden;
   }
   .small-multiples li {
     text-align: left;
@@ -366,11 +391,11 @@
     flex: 1 1 22%;
     vertical-align: top;
     margin: 0;
-    margin-right: 4px;
-    margin-bottom: 4px;
+    /* margin-right: 4px; */
+    /* margin-bottom: 4px; */
     padding: 0;
-    padding-top: 0.27em;
-    /* height: 100px;
+    /* padding-top: 0.27em; */
+    /* 'height': 100px;
     width: 150px; */
     list-style-type: none;
     text-align: center;
@@ -381,7 +406,7 @@
     text-align: left;
     margin: 0;
     padding: 0;
-    padding-left: 1em;
+    padding-left: 1.45em;
     color: #999;
     cursor: pointer;
   }
@@ -463,8 +488,9 @@
       <button on:click={() => setSingleView(false)} class="button" class:active={!singleView}>All indicators</button>
 
       <button on:click={() => setSingleView(true)} class="button" class:active={singleView}>
+        Single indicator:
         <u>{idToSensor($currentSensor).name}</u>
-        over time
+
       </button>
     </div>
   </div>
@@ -488,7 +514,7 @@
 
   <div id="single-chart" hidden={!singleView}>
     <!-- <div id="single-{sensor.id}-{sensor.signal}-chart" class="single-sensor-chart" /> -->
-    <div id="single-sensor-chart" class="single-sensor-chart" />
+    <div id="single-sensor-chart" />
   </div>
 
   <div id="multiples-charts" hidden={singleView}>
