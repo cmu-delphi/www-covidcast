@@ -59,7 +59,7 @@ export default class MapBoxWrapper {
     // .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
 
     //Disable touch zoom, it makes gesture scrolling difficult
-    this.map.scrollZoom.disable();
+    // this.map.scrollZoom.disable();
 
     let resolveCallback = null;
 
