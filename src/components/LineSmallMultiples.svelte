@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { sensors } from '../stores/index.js';
   import { json } from 'd3-fetch';
+  import { timeFormat } from 'd3';
   // import { readable } from 'svelte/store';
   import {
     currentRegion,
@@ -18,6 +19,8 @@
   let width = 172;
   const height = 30;
 
+  const finalDay = timeFormat('%Y%m%d')(new Date());
+
   import { default as embed } from 'vega-embed';
   // import { compile } from 'vega-lite'
 
@@ -33,11 +36,10 @@
   console.log($sensors);
   // TODO: Fix in Safari
   // TODO: Don't show metrics that have no data
-  // TODO: Filter out sensors we don't want
-  // TODO: Make end date of range programmatic
-
   // TODO: Color signal title by current region's color scale in that metric
 
+  // DONE: Filter out sensors we don't want
+  // DONE: Make end date of range programmatic
   // DONE: Make it work for metro areas and states
   // DONE: Add single metric view
   // DONE: Determine the widths and distances between elements and advance by that amount
@@ -102,7 +104,8 @@
   let region = '';
 
   function generateLineChart(signal = 'part_time_work_prop', source = 'covidcast') {
-    const apiURL = `https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day&data_source=${source}&signal=${signal}&geo_type=${$currentLevel}&time_values=20200401-20200720&geo_value=${region}`;
+    const apiURL = `https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day&data_source=${source}&signal=${signal}&geo_type=${$currentLevel}&time_values=20200401-${finalDay}&geo_value=${region}`;
+
     const lineChartSchema = {
       $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
       height: height,
@@ -221,12 +224,12 @@
 
     if (smallMultipleContainer) console.log('WIDTH!', smallMultipleContainer.offsetWidth);
     // console.log('s!!!!', s);
-    const apiURL = `https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day&data_source=${s.id}&signal=${s.signal}&geo_type=${$currentLevel}&time_values=20200401-20200710&geo_value=${region}`;
-    // const apiURL = `https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day&data_source=doctor-visits&signal=smoothed_adj_cli&geo_type=county&time_values=20200401-20200710&geo_value=45051`;
+    const apiURL = `https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day&data_source=${s.id}&signal=${s.signal}&geo_type=${$currentLevel}&time_values=20200401-${finalDay}&geo_value=${region}`;
+
     const singleLineChartSchema = {
       $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
-      height: 100,
-      width: smallMultipleContainer ? smallMultipleContainer.offsetWidth * 0.94 : 624,
+      height: 105,
+      width: smallMultipleContainer ? smallMultipleContainer.offsetWidth * 0.92 : 624,
       // render: 'svg',
       // autosize: {
       //   type: 'fit',
@@ -304,6 +307,23 @@
           encoding: {
             y: { value: 10 },
             text: { field: 'time_value', type: 'temporal' },
+          },
+        },
+        {
+          transform: [
+            {
+              filter: {
+                and: ['index.time_value', { selection: 'index' }],
+              },
+            },
+          ],
+          mark: 'text',
+          encoding: {
+            y: { value: 20 },
+            text: { field: 'value', type: 'quantitative', format: '.1r' },
+            color: {
+              value: 'black',
+            },
           },
         },
       ],
