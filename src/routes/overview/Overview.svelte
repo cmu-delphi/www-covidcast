@@ -25,7 +25,6 @@
   import Toggle from '../../components/Toggle.svelte';
   import Title from '../../components/Title.svelte';
   import MapControls from '../../components/MapControls.svelte';
-  import { trackEvent } from '../../stores/ga';
   import Search from '../../components/Search.svelte';
 
   /**
@@ -199,30 +198,7 @@
       <Title />
     </div>
     <div class="map-controls-container">
-      <MapControls
-        zoom={map ? map.zoom.getZoom() : 0}
-        maxZoom={map ? map.zoom.getMaxZoom() : 100}
-        minZoom={map ? map.zoom.getMinZoom() : -100}
-        on:zoomIn={() => {
-          trackEvent('map', 'zoomIn');
-          map.zoom.zoomIn();
-        }}
-        on:zoomOut={() => {
-          trackEvent('map', 'zoomOut');
-          map.zoom.zoomOut();
-        }}
-        on:reset={() => {
-          trackEvent('map', 'fitUS');
-          map.zoom.resetZoom();
-        }}
-        on:hideLabels={() => {
-          trackEvent('map', 'toggleStateLabel');
-          map.zoom.toggleStateLabels();
-        }}
-        on:swpa={() => {
-          trackEvent('map', 'fitSWPA');
-          map.zoom.fitSWPA();
-        }} />
+      <MapControls zoom={map ? map.zoom : null} />
     </div>
   </div>
   <div class="legend-container container-bg">
