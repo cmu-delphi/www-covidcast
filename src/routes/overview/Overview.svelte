@@ -38,6 +38,20 @@
       map.selectRandom();
     }
   }
+
+  function updatedEncoding(info) {
+    currentRange.set(info.range);
+    if (info.scale) {
+      colorScale.set(info.scale);
+    }
+    colorStops.set(info.stops);
+    if ($encoding === 'bubble') {
+      bubbleRadiusScale.set(info.custom);
+    }
+    if ($encoding === 'spike') {
+      spikeHeightScale.set(info.custom);
+    }
+  }
 </script>
 
 <style>
@@ -227,11 +241,7 @@
     selection={$currentRegionInfo}
     encoding={$encoding}
     on:ready={() => initialReady()}
-    on:range={(e) => currentRange.set(e.detail)}
-    on:colorScale={(e) => colorScale.set(e.detail)}
-    on:colorStops={(e) => colorStops.set(e.detail)}
-    on:bubbleScale={(e) => bubbleRadiusScale.set(e.detail)}
-    on:spikeScale={(e) => spikeHeightScale.set(e.detail)}
+    on:updatedEncoding={(e) => updatedEncoding(e.detail)}
     on:select={(e) => selectByFeature(e.detail)}
     on:selectMega={(e) => selectByFeature(e.detail)} />
 </main>
