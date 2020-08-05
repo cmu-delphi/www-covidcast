@@ -1,23 +1,23 @@
-import { Map as MapBox, AttributionControl } from 'mapbox-gl';
+import geojsonExtent from '@mapbox/geojson-extent';
+import { AttributionControl, Map as MapBox } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { L, addCityLayers } from './layers';
-import { S, geoJsonSources } from './sources';
-import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './encodings';
-import { MAP_THEME, ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../../theme';
-import { levelMegaCounty, levels, defaultRegionOnStartup } from '../../stores/constants';
+import { is7DavIncidence } from '../../data/signals';
+import { defaultRegionOnStartup, levelMegaCounty, levels } from '../../stores/constants';
+import { MAP_THEME } from '../../theme';
 import { IS_NOT_MISSING, MISSING_VALUE } from './encodings/utils';
 import InteractiveMap from './InteractiveMap';
-import ZoomMap from './ZoomMap';
+import { addCityLayers, L } from './layers';
 import style from './mapbox_albers_usa_style.json';
-import { is7DavIncidence } from '../../data/signals';
-import geojsonExtent from '@mapbox/geojson-extent';
+import { geoJsonSources, S } from './sources';
+import ZoomMap from './ZoomMap';
 
 export default class MapBoxWrapper {
   /**
    *
    * @param {(type: string, data: any) => void} dispatch
+   * @param {import('./encodings').Encoding[]} encodings
    */
-  constructor(dispatch) {
+  constructor(dispatch, encodings) {
     this.dispatch = dispatch;
     /**
      * @type {MapBox | null}
@@ -29,14 +29,8 @@ export default class MapBoxWrapper {
      * @type {InteractiveMap | null}
      */
     this.interactive = null;
-    /**
-     * @type {(ChoroplethEncoding | BubbleEncoding | SpikeEncoding)[]}
-     */
-    this.encodings = [
-      new ChoroplethEncoding(),
-      new BubbleEncoding(ENCODING_BUBBLE_THEME),
-      new SpikeEncoding(ENCODING_SPIKE_THEME),
-    ];
+
+    this.encodings = encodings;
     this.encoding = this.encodings[0];
     this.level = '';
     this.zoom = new ZoomMap();
@@ -244,9 +238,8 @@ export default class MapBoxWrapper {
    * @param {Map<string, number>} directions
    * @param {string} sensor
    * @param {(props: any) => string | null} idExtractor
-   * @param {boolean} updateData
    */
-  updateSource(sourceId, values, directions, sensor, updateData, idExtractor) {
+  updateSource(sourceId, values, directions, sensor) {
     if (!this.map) {
       return;
     }
@@ -257,14 +250,9 @@ export default class MapBoxWrapper {
     const data = source._data; // semi hacky
 
     data.features.forEach((d) => {
-      const id = idExtractor(d.properties);
-
+      const id = d.properties.id;
       d.properties.value = MISSING_VALUE;
       d.properties.direction = MISSING_VALUE;
-
-      if (!id) {
-        return;
-      }
 
       if (values.has(id)) {
         d.properties.value = values.get(id)[0];
@@ -281,9 +269,7 @@ export default class MapBoxWrapper {
       }
     });
 
-    if (updateData) {
-      source.setData(data);
-    }
+    source.setData(data);
   }
 
   /**
