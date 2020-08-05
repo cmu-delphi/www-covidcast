@@ -6,6 +6,8 @@
   import { generateDataLookup } from './data';
   import MapBoxWrapper from './MapBoxWrapper';
   import { S } from './sources';
+  import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './encodings';
+  import { ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../../theme';
 
   /**
    * @type {HTMLElement | null}
@@ -13,7 +15,11 @@
   let container = null;
 
   const dispatch = createEventDispatcher();
-  const wrapper = new MapBoxWrapper((event, data) => dispatch(event, data));
+  const wrapper = new MapBoxWrapper((event, data) => dispatch(event, data), [
+    new ChoroplethEncoding(),
+    new BubbleEncoding(ENCODING_BUBBLE_THEME),
+    new SpikeEncoding(ENCODING_SPIKE_THEME),
+  ]);
 
   export const zoom = wrapper.zoom;
 
@@ -60,43 +66,16 @@
     });
   }
 
-  function updateMegaSources(geoIds, values, directions, sensor, updateData) {
-    const idCheck = (props) => {
-      const id = props.STATE;
-      const megaId = id + '000';
-
-      if (!geoIds.has(megaId)) {
-        return null;
-      }
-      return id;
-    };
-    wrapper.updateSource(S[levelMegaCounty.id].border, values, directions, sensor, updateData, idCheck);
-  }
-
-  function updateLevelSources(geoIds, level, values, directions, sensor, updateData) {
-    const idCheck = (props) => {
-      const id = props.id;
-      if (!geoIds.has(id)) {
-        return null;
-      }
-      return id;
-    };
-    wrapper.updateSource(S[level].border, values, directions, sensor, updateData, idCheck);
-    wrapper.updateSource(S[level].center, values, directions, sensor, updateData, idCheck);
-  }
-
   $: mapData = generateDataLookup(data, sensor, drawMega);
+
   $: {
     // update mega
     dummyTrack(ready);
     if (drawMega) {
-      updateMegaSources(mapData.geoIds, mapData.mega.value, mapData.mega.direction, sensor, true);
+      wrapper.updateSource(S[levelMegaCounty.id].border, mapData.mega.value, mapData.mega.direction, sensor);
     }
-  }
-  $: {
-    dummyTrack(ready);
-    // update levels
-    updateLevelSources(mapData.geoIds, level, mapData.value, mapData.direction, sensor, true);
+    wrapper.updateSource(S[level].border, mapData.value, mapData.direction, sensor);
+    wrapper.updateSource(S[level].center, mapData.value, mapData.direction, sensor);
   }
   $: {
     dummyTrack(ready);
