@@ -18,9 +18,6 @@
   import './stores/urlHandler';
   import './stores/ga';
   import { updateTimeSliceCache, updateRegionSliceCache, loadMetaData } from './data';
-  import Overview from './routes/overview/Overview.svelte';
-  import Compare from './routes/compare/Compare.svelte';
-  import Hotspots from './routes/hotspots/Hotspots.svelte';
   import { isDeathSignal, isCasesSignal } from '../data/signals';
   import ModeToggle from './components/ModeToggle.svelte';
 
@@ -132,6 +129,8 @@
       }
     });
   });
+
+  $: currentComponent = $currentMode.component();
 </script>
 
 <style>
@@ -159,6 +158,10 @@
     align-items: center;
     color: gray;
   }
+
+  .loader {
+    flex-grow: 1;
+  }
 </style>
 
 {#if error}
@@ -169,11 +172,14 @@
   <div class="mode-switcher">
     <ModeToggle />
   </div>
-  {#if $currentMode === 'overview'}
-    <Overview />
-  {:else if $currentMode === 'compare'}
-    <Compare />
-  {:else if $currentMode === 'hotspots'}
-    <Hotspots />
-  {/if}
+  {#await currentComponent}
+    <div class="loader loading" />
+  {:then value}
+    <svelte:component this={value} />
+  {:catch error}
+    <div class="loader">
+      Error loading current mode
+      <pre>{error}</pre>
+    </div>
+  {/await}
 </div>

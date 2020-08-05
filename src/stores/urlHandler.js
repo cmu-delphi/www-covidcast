@@ -21,7 +21,7 @@ function updateURIParameters(delta) {
     signalType: get(signalType),
     encoding: get(encoding),
     zone: get(currentZone),
-    mode: get(currentMode),
+    mode: get(currentMode).id,
     ...delta, // inject current delta
   };
 
@@ -61,7 +61,7 @@ signalType.subscribe((signalType) =>
   }),
 );
 encoding.subscribe((encoding) => updateURIParameters({ encoding }));
-currentMode.subscribe((mode) => updateURIParameters({ mode }));
+currentMode.subscribe((mode) => updateURIParameters({ mode: mode.id }));
 currentZone.subscribe((zone) =>
   updateURIParameters({
     zone,
