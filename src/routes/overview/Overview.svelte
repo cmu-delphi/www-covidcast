@@ -34,6 +34,9 @@
   let map;
 
   function initialReady() {
+    if ($currentZone === 'swpa') {
+      map.zoom.showSWPA();
+    }
     if (!$currentRegion) {
       map.selectRandom();
     }
@@ -237,7 +240,6 @@
     sensor={$currentSensor}
     level={$currentLevel}
     signalType={$signalType}
-    showCurrentZone={$currentZone === 'swpa'}
     selection={$currentRegionInfo}
     encoding={$encoding}
     on:ready={() => initialReady()}
