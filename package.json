@@ -49,6 +49,7 @@
     "d3-tip": "^0.9.1",
     "invert-color": "^2.0.0",
     "mapbox-gl": "^1.11.1",
+    "moment": "^2.27.0",
     "regenerator-runtime": "^0.13.7",
     "svelte-icons": "^2.1.0",
     "vega": "^5.13.0",
