@@ -44,9 +44,10 @@
   import logspace from 'compute-logspace';
   import { isCountSignal, isDeathSignal, isCasesSignal } from '../data/signals';
   import { trackEvent } from '../stores/ga.js';
-  import { L } from './layers.js';
-  import { S } from './sources.js';
-  import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './encodings';
+  import { L } from './MapBox/layers.js';
+  import { S } from './MapBox/sources.js';
+  import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './MapBox/encodings';
+
   export let graphShowStatus, toggleGraphShowStatus;
 
   let searchErrorComponent;
