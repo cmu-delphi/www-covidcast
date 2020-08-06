@@ -30,7 +30,7 @@
     'ght-smoothed_search',
     'indicator-combination-confirmed_7dav_incidence_num',
     'indicator-combination-deaths_7dav_incidence_num',
-    'safegraph-full_time_work_prop',
+    // 'safegraph-full_time_work_prop',
   ];
   let filteredSensors = $sensors.filter((s) => !sensorSmallMultipleBlacklist.includes(s.key));
   console.log($sensors);
@@ -110,7 +110,7 @@
       $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
       height: height,
       // width: width,
-      width: smallMultipleContainer ? smallMultipleContainer.offsetWidth * 0.21 : width,
+      width: smallMultipleContainer ? smallMultipleContainer.offsetWidth * 0.16 : width,
       padding: 0,
       data: {
         values: null, // to be filled by API
@@ -405,13 +405,14 @@
     overflow-x: hidden; */
     overflow: hidden;
     min-height: 150px;
-    max-height: 20vh;
+    max-height: 22vh;
     overflow-y: auto;
   }
   .small-multiples li {
+    /* border: 1px solid red; */
     text-align: left;
     /* display: inline-block; */
-    flex: 1 1 22%;
+    flex: 1 1 18%;
     vertical-align: top;
     margin: 0;
     /* margin-right: 4px; */
