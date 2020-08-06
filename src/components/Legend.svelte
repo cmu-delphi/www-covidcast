@@ -25,7 +25,7 @@
 
   let high = '',
     unit = '';
-  let labels = [['0', '0']];
+  let labels = [];
 
   currentSensor.subscribe((s) => ($stats ? update(s, $stats, $currentLevel) : ''));
   stats.subscribe((s) => (s ? update($currentSensor, s, $currentLevel) : ''));
@@ -66,7 +66,7 @@
       heightScale = $spikeHeightScale.clone().range([0, maxHeight]).domain(valueMinMax);
     } else {
       sts = stats.get(sens);
-      valueMinMax = [sts.mean - 3 * sts.std, sts.mean + 3 * sts.std];
+      valueMinMax = [Math.max(0.14, sts.mean - 3 * sts.std), sts.mean + 3 * sts.std];
       if ($currentSensorEntry.format === 'raw') {
         high = getSigfigs(valueMinMax[1].toFixed(2), 3);
         unit = '';
@@ -78,9 +78,8 @@
         valueMinMax[0] = Math.max(0, valueMinMax[0]);
         valueMinMax[1] = Math.min(100, valueMinMax[1]);
       }
-
       let arr = splitDomain(valueMinMax[0], valueMinMax[1], 7);
-      labels = [];
+      labels = ['0'];
       for (let i = 0; i < arr.length; i++) {
         arr[i] = parseFloat(arr[i]).toFixed(2);
         labels.push(arr[i]);
@@ -476,12 +475,21 @@
       <div class="legend-grouping">
         <ul class="legend-labels">
           {#each labels as [label1, label2]}
-            <li class="colored">
-              <span
-                class="colored"
-                style="background: linear-gradient(to right, {$colorScale(+label1)}, {$colorScale(+label2)})" />
-              {getSigfigs(label1, 3)}
-            </li>
+            {#if +label1 === 0}
+              <li class="colored">
+                <span
+                  class="colored"
+                  style="background: linear-gradient(to right, {DIRECTION_THEME.countMin}, {DIRECTION_THEME.countMin})" />
+                {getSigfigs(label1, 3)}
+              </li>
+            {:else}
+              <li class="colored">
+                <span
+                  class="colored"
+                  style="background: linear-gradient(to right, {$colorScale(+label1)}, {$colorScale(+label2)})" />
+                {getSigfigs(label1, 3)}
+              </li>
+            {/if}
           {/each}
           <li class="ends">
             <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
@@ -493,12 +501,21 @@
       <div class="legend-grouping">
         <ul class="legend-labels">
           {#each labels as [label1, label2]}
-            <li class="colored">
-              <span
-                class="colored"
-                style="background: linear-gradient(to right, {$colorScale(+label1)}, {$colorScale(+label2)})" />
-              {getSigfigs(label1, 3)}
-            </li>
+            {#if +label1 === 0}
+              <li class="colored">
+                <span
+                  class="colored"
+                  style="background: linear-gradient(to right, {DIRECTION_THEME.countMin}, {DIRECTION_THEME.countMin})" />
+                {getSigfigs(label1, 3)}
+              </li>
+            {:else}
+              <li class="colored">
+                <span
+                  class="colored"
+                  style="background: linear-gradient(to right, {$colorScale(+label1)}, {$colorScale(+label2)})" />
+                {getSigfigs(label1, 3)}
+              </li>
+            {/if}
           {/each}
           <li class="ends">
             <span class="ends" style="background: rgba(255, 255, 255, 0.9);" />
