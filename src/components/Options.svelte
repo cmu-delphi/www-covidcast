@@ -85,7 +85,7 @@
 </style>
 
 <div class="options">
-  <span class="option-title base-font-size" for="option-indicator">Displaying</span>
+  <span class="option-title" for="option-indicator">Displaying</span>
   <select
     id="option-indicator"
     aria-label="indicator options"
@@ -107,7 +107,7 @@
       {/each}
     </optgroup>
   </select>
-  <span class="option-title base-font-size" for="option-geo-level">for</span>
+  <span class="option-title">for</span>
   <select
     id="option-geo-level"
     aria-label="geographic level"
@@ -117,14 +117,14 @@
       <option value={level.id} disabled={!$currentSensorEntry.levels.includes(level.id)}>{level.labelPlural}</option>
     {/each}
   </select>
-  <span class="option-title base-font-size" for="option-date">on</span>
+  <span class="option-title">on</span>
   {#if selectedDate != null && start_end_dates.length !== 0}
     <Datepicker
       bind:selected={selectedDate}
       start={parseTime(start_end_dates[0])}
       end={parseTime(start_end_dates[1])}
       formattedSelected={formatTime(selectedDate)}>
-      <button id="option-date" class="calendar base-font-size" on:>{formatTime(selectedDate)}</button>
+      <button aria-label="selected date" class="calendar base-font-size" on:>{formatTime(selectedDate)}</button>
     </Datepicker>
   {/if}
 </div>

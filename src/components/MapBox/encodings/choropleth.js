@@ -1,4 +1,4 @@
-import { L } from '../layers.js';
+import { L } from '../layers';
 
 export default class ChoroplethEncoding {
   constructor() {
@@ -10,11 +10,11 @@ export default class ChoroplethEncoding {
   }
 
   addSources() {
-    // does nothing since all sources/layers required for cholopleth already exist in the map
+    // does nothing since all sources/layers required for choropleth already exist in the map
   }
 
   addLayers() {
-    // does nothing since all sources/layers required for cholopleth already exist in the map
+    // does nothing since all sources/layers required for choropleth already exist in the map
   }
 
   encode(map, level, signalType, sensor, valueMinMax, stops, stopsMega) {

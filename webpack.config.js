@@ -103,9 +103,9 @@ module.exports = () => {
         template: './src/index.html',
       }),
       new HtmlWebpackPlugin({
+        filename: 'embed.html',
         alwaysWriteToDisk: true,
-        filename: 'frame.html',
-        template: './src/frame.html',
+        template: './src/embed.html',
       }),
       new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({
