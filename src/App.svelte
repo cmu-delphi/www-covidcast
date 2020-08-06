@@ -12,12 +12,14 @@
     currentRegion,
     currentRegionName,
     currentDataReadyOnMap,
+    encoding,
     mounted,
   } from './stores';
   import './stores/urlHandler';
   import './stores/ga';
   import { updateTimeSliceCache, updateRegionSliceCache, loadMetaData } from './data';
   import ModeToggle from './components/ModeToggle.svelte';
+  import { isDeathSignal, isCasesSignal } from './data/signals';
 
   // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
   const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
@@ -77,6 +79,10 @@
 
     if (sensorEntry.type === 'late' && sensorEntry.id !== 'hospital-admissions') {
       signalType.set('value');
+    }
+
+    if (!isDeathSignal($currentSensor) && !isCasesSignal($currentSensor)) {
+      encoding.set('color');
     }
 
     updateRegionSliceCache(s, l, date, 'sensor-change');

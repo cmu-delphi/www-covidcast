@@ -4,19 +4,13 @@
   --darkgrey: #333;
 }
 
-body {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  width: 100vw;
-  height: 100vh;
-  font-family: 'Open Sans', sans-serif;
-}
-
 @import './styles/header.css';
+@import './styles/embed.css';
+
 @import './styles/ie11.css';
 
 #vizbox {
+  font-family: 'Open Sans', sans-serif;
   margin: 0;
   padding: 0;
   position: relative;

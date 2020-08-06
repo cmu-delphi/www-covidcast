@@ -1,3 +1,12 @@
+body.viz-body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  font-family: 'Open Sans', sans-serif;
+}
+
 .viz-header {
   display: flex;
   flex-direction: column;
@@ -49,11 +58,11 @@
 
 /** mobile **/
 @media only screen and (max-width: 767px) {
-  .roof.invert form {
+  .viz-header > .roof.invert form {
     display: none;
   }
 
-  .roof.invert > div {
+  .viz-header > .roof.invert > div {
     padding-bottom: 0;
   }
 
@@ -67,7 +76,7 @@
   }
 }
 
-.group-link {
+.viz-group-link {
   color: inherit;
   border-bottom: none;
 }
@@ -79,12 +88,12 @@
   color: var(--darkgrey);
 }
 
-.mission-link {
+.viz-mission-link {
   color: var(--red);
   font-weight: 700;
 }
 
-.team-link {
+.viz-team-link {
   color: inherit;
   text-decoration: underline;
   border-bottom: none;
@@ -92,8 +101,12 @@
   font-style: italic;
 }
 
-#container {
+.viz-container {
   flex: 1 1 0;
   display: flex;
   flex-direction: column;
+}
+
+footer.viz-footer > nav {
+  display: none;
 }

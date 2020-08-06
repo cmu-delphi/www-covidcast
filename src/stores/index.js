@@ -28,7 +28,7 @@ const urlParams = new URLSearchParams(queryString);
 export const sensors = readable(sensorList, (set) => {
   const sensorsOption = urlParams.get('sensors');
   if (sensorsOption) {
-    set(withSensorEntryKey(JSON.parse(decodeURIComponent(sensorsOption))));
+    set(JSON.parse(decodeURIComponent(sensorsOption)).map(withSensorEntryKey));
   }
 });
 
