@@ -43,7 +43,7 @@
   } from '../stores';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
-  import { isCountSignal, isDeathSignal, isCasesSignal, getType } from '../data/signals';
+  import { isCountSignal, isPropSignal, isDeathSignal, isCasesSignal, getType } from '../data/signals';
   import { trackEvent } from '../stores/ga.js';
 
   export let graphShowStatus, toggleGraphShowStatus;
@@ -477,6 +477,24 @@
 
         // store the color scale (used for tooltips and legend)
         colorScale.set(colorScaleLog);
+        colorStops.set(stops);
+      } else if (isPropSignal($currentSensor)) {
+        const center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2,
+          firstHalfCenter = valueMinMax[0] + (center - valueMinMax[0]) / 2,
+          secondHalfCenter = center + (valueMinMax[1] - center) / 2;
+
+        const colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain(valueMinMax);
+
+        // domainStops5 is used for other cases (prop signals)
+        const domainStops5 = [valueMinMax[0], firstHalfCenter, center, secondHalfCenter, valueMinMax[1]];
+
+        const linearColors5 = domainStops5.map((c) => colorScaleLinear(c).toString());
+
+        stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, linearColors5));
+        stopsMega = zip(domainStops5, transparent(linearColors5, 0.5));
+
+        // store the color scale (used for tooltips and legend)
+        colorScale.set(colorScaleLinear);
         colorStops.set(stops);
       } else {
         const center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2,
