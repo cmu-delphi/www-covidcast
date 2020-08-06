@@ -1,0 +1,112 @@
+body.viz-body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.viz-header {
+  display: flex;
+  flex-direction: column;
+}
+
+.viz-name {
+  order: 4;
+  margin: 1em 0;
+  padding-top: 0;
+  padding-bottom: 0;
+
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+
+  color: var(--darkgrey);
+}
+
+.viz-name > * {
+  margin: 0;
+  padding: 0;
+  font-weight: 500;
+}
+
+.viz-name > h1 {
+  font-size: 1.9rem;
+  padding-right: 0.2em;
+}
+
+.viz-name > h1 > a {
+  color: var(--red) !important;
+  border-bottom: none;
+}
+
+.viz-name > h2 {
+  color: var(--darkgrey);
+  border-left: 1px solid currentColor;
+  padding-left: 0.2em;
+  font-weight: 500;
+  padding-right: 1.5em;
+}
+
+.viz-name > h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+  color: var(--grey);
+}
+
+/** mobile **/
+@media only screen and (max-width: 767px) {
+  .viz-header > .roof.invert form {
+    display: none;
+  }
+
+  .viz-header > .roof.invert > div {
+    padding-bottom: 0;
+  }
+
+  .viz-name > h1 {
+    font-size: 1.8rem;
+  }
+  .viz-name > h2 {
+    font-size: 1rem;
+    padding-right: 0.5em;
+    align-self: center;
+  }
+}
+
+.viz-group-link {
+  color: inherit;
+  border-bottom: none;
+}
+
+.viz-mission {
+  order: 5;
+  padding-top: 0.2em;
+  padding-bottom: 0.5em;
+  color: var(--darkgrey);
+}
+
+.viz-mission-link {
+  color: var(--red);
+  font-weight: 700;
+}
+
+.viz-team-link {
+  color: inherit;
+  text-decoration: underline;
+  border-bottom: none;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.viz-container {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+}
+
+footer.viz-footer > nav {
+  display: none;
+}
