@@ -42,12 +42,11 @@
   } from '../stores';
   import * as d3 from 'd3';
   import logspace from 'compute-logspace';
-  import { isCountSignal } from '../data/signals';
-  import { trackEvent } from '../stores/ga';
-  import { L } from './MapBox/layers';
-  import { S } from './MapBox/sources';
-  import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './MapBox/encodings';
-
+  import { isCountSignal, isDeathSignal, isCasesSignal } from '../data/signals';
+  import { trackEvent } from '../stores/ga.js';
+  import { L } from './layers.js';
+  import { S } from './sources.js';
+  import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './encodings';
   export let graphShowStatus, toggleGraphShowStatus;
 
   let searchErrorComponent;
@@ -537,9 +536,22 @@
         show(L['mega-county'].fill);
       }
     } else if ($encoding === 'bubble') {
+      if (drawMega) {
+        map.setPaintProperty('mega-county', 'fill-color', ENCODING_BUBBLE_THEME.countyFill);
+        show(L['mega-county'].fill);
+      } else {
+        hide(L['mega-county'].fill);
+      }
+
       bubbleRadiusScale.set(ret);
     } else if ($encoding === 'spike') {
       spikeHeightScale.set(ret);
+      if (drawMega) {
+        map.setPaintProperty('mega-county', 'fill-color', ENCODING_SPIKE_THEME.countyFill);
+        show(L['mega-county'].fill);
+      } else {
+        hide(L['mega-county'].fill);
+      }
     }
 
     const viableFeatures = dat.features.filter((f) => f.properties[$signalType] !== -100);
@@ -1207,7 +1219,7 @@
     </div>
     <div
       class="toggle-container container-bg base-font-size container-style"
-      class:hidden={$signalType === 'direction'}>
+      class:hidden={$signalType === 'direction' || !(isDeathSignal($currentSensor) || isCasesSignal($currentSensor))}>
       <!-- !$currentSensor.match(/num/)-->
       <Toggle />
     </div>
