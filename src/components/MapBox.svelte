@@ -310,7 +310,7 @@
   };
 
   // If it hasn't been initialized and we have geojsons and initial data, create map.
-  $: if (!map && $geojsons.size !== 0 && $stats) {
+  $: if (!map && $geojsons.size !== 0 && $stats && container) {
     initializeMap();
   }
 
