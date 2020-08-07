@@ -113,7 +113,7 @@ export const encoding = writable('color', (set) => {
 });
 
 // EpiWeek in form YYYYMMDD.
-export const currentDate = writable(20100420, (set) => {
+export const currentDate = writable(20200701, (set) => {
   const date = urlParams.get('date');
   if (/\d{8}/.test(date)) {
     set(date);
