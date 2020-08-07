@@ -1,6 +1,6 @@
 <script>
   import { colorScale, currentLevel, currentSensorEntry, stats, currentDataReadyOnMap } from '../../stores';
-  import { generateLabels, getSigfigs } from './utils';
+  import { getSigfigs, generateLabels } from '../MapBox/colors';
   import { DIRECTION_THEME } from '../../theme';
 
   let high = '';

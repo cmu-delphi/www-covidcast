@@ -9,7 +9,7 @@
     currentDataReadyOnMap,
   } from '../../stores';
   import { transparent } from '../../util';
-  import { getSigfigs, generateLabels } from './utils';
+  import { getSigfigs, generateLabels } from '../MapBox/colors';
 
   let high = '';
   let unit = '';
