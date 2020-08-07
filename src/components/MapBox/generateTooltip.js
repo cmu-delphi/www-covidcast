@@ -1,19 +1,18 @@
-import { timeFormat, timeParse } from 'd3';
+import { timeFormat } from 'd3';
 import { get } from 'svelte/store';
 import {
   currentLevel,
   signalType,
   currentSensor,
   specialCounties,
-  currentDate,
   currentSensorEntry,
   colorScale,
+  currentDateObject,
 } from '../../stores';
 import { DIRECTION_THEME, MAP_THEME } from '../../theme';
 import { getTextColorBasedOnBackground } from '../../util';
 import { levelMegaCounty, dict } from '../../stores/constants';
 
-const parseTime = timeParse('%Y%m%d');
 const formatTimeWithoutYear = timeFormat('%B %d');
 
 function getLabelSpecifics(name, state, level) {
@@ -61,7 +60,7 @@ function generateSignalTooltip(value, value1, Population) {
   const fillColor = get(colorScale)(value);
   const fgColor = getTextColorBasedOnBackground(fillColor);
   const popCommas = Number.parseInt(Population, 10).toLocaleString();
-  const date = formatTimeWithoutYear(parseTime(get(currentDate)));
+  const date = formatTimeWithoutYear(currentDateObject);
   const sens = get(currentSensorEntry);
   const sensor = get(currentSensor);
 
