@@ -13,7 +13,7 @@ export function determineMinMax(statsLookup, sensor, level) {
   }
 
   const stats = statsLookup.get(sensor);
-  return [Math.max(0.14, stats.mean - 3 * stats.std), stats.mean + 3 * stats.std];
+  return [Math.max(0, stats.mean - 3 * stats.std), stats.mean + 3 * stats.std];
 }
 
 export function determineColorScale(valueMinMax, signalType, sensor) {

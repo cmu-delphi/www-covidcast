@@ -1,6 +1,5 @@
 <script>
   import MapBox from '../../components/MapBox/MapBox.svelte';
-  import LineSmallMultiples from '../../components/LineSmallMultiples.svelte';
   import Legend from '../../components/Legend.svelte';
   import Options from '../../components/Options.svelte';
   import {
@@ -27,6 +26,9 @@
   import MapControls from '../../components/MapControls.svelte';
   import Search from '../../components/Search.svelte';
   import { isDeathSignal, isCasesSignal } from '../../data/signals';
+  import { trackEvent } from '../../stores/ga';
+  import Time from '../../components/Time.svelte';
+  import GraphContainer from '../../components/Graph/GraphContainer.svelte';
 
   /**
    * @type {MapBox}
@@ -54,6 +56,28 @@
     if ($encoding === 'spike') {
       spikeHeightScale.set(info.custom);
     }
+  }
+
+  let graphShowStatus = false;
+  let firstLoaded = true;
+
+  currentRegion.subscribe((r) => {
+    if (firstLoaded && r !== '') {
+      toggleGraphShowStatus(null, false);
+      firstLoaded = false;
+    } else if (r) {
+      toggleGraphShowStatus(null, true);
+    } else {
+      toggleGraphShowStatus(null, false);
+    }
+  });
+  function toggleGraphShowStatus(event, to = null) {
+    if (to !== null) {
+      graphShowStatus = to;
+    } else {
+      graphShowStatus = !graphShowStatus;
+    }
+    trackEvent('graph', graphShowStatus ? 'show' : 'hide');
   }
 </script>
 
@@ -167,6 +191,16 @@
     transition: all 0.1s ease-in;
   }
 
+  .time-container {
+    position: absolute;
+    bottom: 12px;
+    right: 10px;
+    z-index: 1002;
+    padding: 30px 10px;
+    box-sizing: border-box;
+    transition: all 0.1s ease-in;
+  }
+
   .hidden {
     display: none;
   }
@@ -205,9 +239,11 @@
     <Legend />
   </div>
 
-  <div class="small-multiples">
-    <LineSmallMultiples />
+  <div class="time-container container-bg">
+    <Time />
   </div>
+
+  <GraphContainer {graphShowStatus} {toggleGraphShowStatus} />
 
   <MapBox
     bind:this={map}

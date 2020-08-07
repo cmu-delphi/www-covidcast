@@ -236,6 +236,11 @@ export default class MapBoxWrapper {
     const allEncodingLayers = this.encodings.flatMap((d) => d.layers).concat([L[levelMegaCounty.id].fill]);
     const visibleLayers = new Set(this.encoding.getVisibleLayers(level, signalType));
 
+    if (level === 'county') {
+      // draw mega in every encoding
+      visibleLayers.add(L[levelMegaCounty.id].fill);
+    }
+
     allEncodingLayers.forEach((layer) => {
       this.map.setLayoutProperty(layer, 'visibility', visibleLayers.has(layer) ? 'visible' : 'none');
     });

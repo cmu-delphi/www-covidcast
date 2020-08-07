@@ -17,7 +17,7 @@
   } from './stores';
   import './stores/urlHandler';
   import './stores/ga';
-  import { updateRegionSliceCache, loadMetaData } from './data';
+  import { updateRegionSliceCache, loadMetaData, updateTimeSliceCache } from './data';
   import { isDeathSignal, isCasesSignal } from './data/signals';
   import ModeToggle from './components/ModeToggle.svelte';
   import { modes } from './routes';
@@ -66,13 +66,8 @@
       currentRegionName.set('');
       currentLevel.set(l);
     } else {
-      // updateTimeSliceCache(s, l, $currentRegion);
+      updateTimeSliceCache(s, l, $currentRegion);
     }
-    // reset encoding
-    /*if (!s.match(/num/)) {
-      // eslint-disable-next-line no-unused-vars
-      $encoding = 'color';
-    }*/
     if (date !== $currentDate) {
       dateChangedWhenSensorChanged = true;
       currentDate.set(date);
@@ -115,19 +110,19 @@
     }
   });
 
-  // currentRegion.subscribe((r) => {
-  //   if ($mounted) {
-  //     updateTimeSliceCache($currentSensor, $currentLevel, r);
-  //   }
-  // });
+  currentRegion.subscribe((r) => {
+    if ($mounted) {
+      updateTimeSliceCache($currentSensor, $currentLevel, r);
+    }
+  });
 
   onMount(() => {
     loadMetaData().then(({ level, date }) => {
       $mounted = 1;
       updateRegionSliceCache($currentSensor, level, date);
-      // if ($currentRegion) {
-      //   updateTimeSliceCache($currentSensor, $currentLevel, $currentRegion);
-      // }
+      if ($currentRegion) {
+        updateTimeSliceCache($currentSensor, $currentLevel, $currentRegion);
+      }
     });
   });
 

@@ -38,6 +38,10 @@ export function generateLabels(stats, sensorEntry, level) {
     };
   }
 
+  if (!isCountSignal(sensorEntry.key)) {
+    valueMinMax[0] = Math.max(0.14, valueMinMax[0]);
+  }
+
   let high = getSigfigs(valueMinMax[1].toFixed(2), 3);
   let unit = '';
 

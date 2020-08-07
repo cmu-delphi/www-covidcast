@@ -4,7 +4,6 @@ import { scaleSequentialLog } from 'd3';
 import { sensorList, withSensorEntryKey } from './constants';
 import { modes } from '../routes';
 import { parseAPITime } from '../data/utils';
-import { regionSearchList } from './search';
 import { regionSearchLookup } from './search';
 export {
   dict,
