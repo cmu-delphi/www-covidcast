@@ -440,9 +440,8 @@
           disabled={true}>
           7-day Trend
           <!-- {#if $currentSensorEntry.type === 'late' && $currentSensorEntry.id !== 'hospital-admissions'} -->
-          {#if true}
-            <span class="disabled-tooltip">Currently unavailable</span>
-          {/if}
+          <span class="disabled-tooltip">Currently unavailable</span>
+          <!-- {/if} -->
         </button>
 
       </div>
