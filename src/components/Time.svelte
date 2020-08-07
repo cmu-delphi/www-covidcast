@@ -98,6 +98,9 @@
   }
 
   function updateSliderUI() {
+    if (!timeSliderPaddingLeft) {
+      return;
+    }
     if (dataRangeMax <= rectifiedMax && dataRangeMin >= rectifiedMin) {
       /**
        * fall within
