@@ -2,7 +2,7 @@ import { writable, readable, derived, get } from 'svelte/store';
 import { LogScale, SqrtScale } from './scales';
 import { scaleSequentialLog } from 'd3';
 import { sensorList, withSensorEntryKey } from './constants';
-import { modes } from '../routes';
+import modes from '../modes';
 import { parseAPITime } from '../data/utils';
 import { regionSearchLookup } from './search';
 export {

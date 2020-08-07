@@ -1,5 +1,4 @@
-import { timeFormat } from 'd3';
-
+import { formatAPITime } from '../data';
 export const dict = {
   '10': 'DE',
   '11': 'DC',
@@ -154,7 +153,8 @@ export function withSensorEntryKey(sensorEntry) {
  * @property {string} format
  * @property {string} signal
  * @property {string[]} levels
- * @property {boolean[]} official
+ * @property {'public' | 'early' | 'late'} type
+ * @property {string?} api
  */
 /**
  * @type {SensorEntry[]}
@@ -336,4 +336,4 @@ export const defaultRegionOnStartup = {
 };
 
 export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
-export const yesterday = Number.parseInt(timeFormat('%Y%0m%0d')(yesterdayDate), 10);
+export const yesterday = Number.parseInt(formatAPITime(yesterdayDate), 10);

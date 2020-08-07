@@ -17,6 +17,9 @@ import { callMetaAPI } from './api';
 import { isCountSignal } from './signals';
 import { fetchRegionSlice, fetchTimeSlice } from './fetchData';
 
+export * from './signals';
+export { formatAPITime, parseAPITime } from './utils';
+
 // We cache API calls for all regions at a given time and update currentData.
 export function updateRegionSliceCache(sensor, level, date, reason = 'unspecified') {
   const sensorEntry = get(sensorMapStore).get(sensor);

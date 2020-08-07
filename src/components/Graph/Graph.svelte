@@ -19,11 +19,12 @@
   import { DIRECTION_THEME } from '../../theme';
   import * as d3 from 'd3';
   import d3Tip from 'd3-tip';
-  import { isCountSignal } from '../../data/signals';
-  const parseTime = d3.timeParse('%Y%m%d');
+  import { isCountSignal, parseAPITime } from '../../data';
 
   let el;
   let w;
+
+  const tickFormat = d3.timeFormat('%m/%d');
 
   onMount(() => {
     d3.select(el).selectAll('*').remove();
@@ -82,15 +83,15 @@
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
     // set date range
-    let minDate = parseTime(range.min);
-    let maxDate = parseTime(range.max);
+    let minDate = parseAPITime(range.min);
+    let maxDate = parseAPITime(range.max);
 
     data = data.filter((it) => {
-      let t = parseTime(it['time_value']);
+      let t = parseAPITime(it['time_value']);
       return t >= minDate && t <= maxDate;
     });
 
-    let currDate = parseTime(date);
+    let currDate = parseAPITime(date);
     let currDateSeven = d3.timeDay.offset(currDate, -6);
     // peg values to max and min if out of range
     let minMax = calculateSD(sensor);
@@ -99,7 +100,7 @@
     let latestDirection = -100;
     let hitLatestNode = false;
     for (let i = data.length - 1; i >= 0; i--) {
-      let directionDate = parseTime(data[i].time_value);
+      let directionDate = parseAPITime(data[i].time_value);
       if (directionDate >= currDateSeven && directionDate <= currDate) {
         data[i].inDirection = true;
         if (!hitLatestNode) {
@@ -127,7 +128,7 @@
     // scale x and y axes
     let x = d3
       .scaleTime()
-      .domain([d3.extent(data, (d) => parseTime(d.time_value))[0], parseTime(yesterday)])
+      .domain([d3.extent(data, (d) => parseAPITime(d.time_value))[0], parseAPITime(yesterday)])
       .range([0, width]);
     let y = d3.scaleLinear().domain([minMax[0], chartMax]).range([height, 0]);
 
@@ -152,7 +153,7 @@
       .append('g')
       .attr('class', 'axis')
       .attr('transform', 'translate(0,' + height + ')')
-      .call(d3.axisBottom(x).tickFormat(d3.timeFormat('%m/%d')).ticks(7));
+      .call(d3.axisBottom(x).tickFormat(tickFormat).ticks(7));
 
     svg.selectAll('text').attr('dy', '8px').attr('dx', '-6px').attr('transform', 'rotate(-30)');
 
@@ -164,7 +165,7 @@
       .offset([-10, 0])
       .html(function (d) {
         return (
-          d3.timeFormat('%m/%d')(parseTime(d.time_value)) +
+          tickFormat(parseAPITime(d.time_value)) +
           ': ' +
           //(sensor.match(/num/) ? Math.round(d.value) : d.value.toFixed(2)) +
           d.value.toFixed(2) +
@@ -177,12 +178,12 @@
     // draw the line graph
     let line = d3
       .line()
-      .x((d) => x(parseTime(d.time_value)))
+      .x((d) => x(parseAPITime(d.time_value)))
       .y((d) => y(+d.value));
 
     let area = d3
       .area()
-      .x((d) => x(parseTime(d.time_value)))
+      .x((d) => x(parseAPITime(d.time_value)))
       .y0((d) => y(Math.max(0, +d.value - d.stderr)))
       .y1((d) => y(+d.value + d.stderr));
 
@@ -196,7 +197,7 @@
       .enter()
       .append('circle')
       .attr('r', (d) => (d.time_value == date ? 6 : 4))
-      .attr('cx', (d) => x(parseTime(d.time_value)))
+      .attr('cx', (d) => x(parseAPITime(d.time_value)))
       .attr('cy', (d) => y(+d.value))
       .attr('id', (d) => d.time_value)
       .style('stroke-width', (d) => (d.time_value == date ? 1 : 1))
