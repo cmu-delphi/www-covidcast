@@ -9,7 +9,7 @@
 /**
  * @type {Mode[]}
  */
-export const modes = [
+export default [
   {
     id: 'overview',
     label: 'Overview',

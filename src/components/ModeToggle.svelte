@@ -1,6 +1,6 @@
 <script>
   import { currentMode } from '../stores';
-  import { modes } from '../routes';
+  import modes from '../modes';
 </script>
 
 <style>

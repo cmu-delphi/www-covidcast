@@ -20,7 +20,7 @@
   import { updateTimeSliceCache, updateRegionSliceCache, loadMetaData } from './data';
   import { isDeathSignal, isCasesSignal } from './data/signals';
   import ModeToggle from './components/ModeToggle.svelte';
-  import { modes } from './routes';
+  import modes from './modes';
 
   // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
   const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
