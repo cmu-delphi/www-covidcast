@@ -47,11 +47,11 @@
   import { L } from './MapBox/layers.js';
   import { S } from './MapBox/sources.js';
   import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './MapBox/encodings';
+  import { parseAPITime } from '../data';
 
   export let graphShowStatus, toggleGraphShowStatus;
 
   let searchErrorComponent;
-  let parseTime = d3.timeParse('%Y%m%d');
   let formatTimeWithoutYear = d3.timeFormat('%B %d');
 
   /**
@@ -154,7 +154,7 @@
     // popup
     const { value, direction, NAME, STATE, Population } = e.features[0].properties;
 
-    const date = formatTimeWithoutYear(parseTime($currentDate));
+    const date = formatTimeWithoutYear(parseAPITime($currentDate));
     const sens = $currentSensorEntry;
     const popCommas = parseInt(Population).toLocaleString();
     let title = (level === 'mega-county' ? 'Rest of ' : '') + NAME + getLabelSpecifics(NAME, STATE, level);

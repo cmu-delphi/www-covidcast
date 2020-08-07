@@ -3,7 +3,7 @@ import { injectIDs } from '../util';
 import { LogScale, SqrtScale } from './scales';
 import * as d3 from 'd3';
 import { sensorList, withSensorEntryKey } from './constants';
-import { modes } from '../routes';
+import modes from '../modes';
 import { parseAPITime } from '../data/utils';
 export {
   dict,

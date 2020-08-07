@@ -8,19 +8,19 @@
     signalType,
     currentLevel,
     timeRangeOnSlider,
-    yesterday,
     MAGIC_START_DATE,
+    yesterdayDate,
   } from '../stores';
   import { calculateValFromRectified } from '../util';
   import * as d3 from 'd3';
   import { trackEvent } from '../stores/ga';
+  import { parseAPITime } from '../data';
 
   let timeSliderPaddingLeft;
   let timeSliderPaddingRight;
   let timeSlider;
   let selectedDateDisplay;
 
-  let parseTime = d3.timeParse('%Y%m%d');
   let formatTime = d3.timeFormat('%B %-d, %Y');
   let formatTimeWithoutYear = d3.timeFormat('%B %-d');
 
@@ -34,14 +34,14 @@
   let min = $currentDate;
   let max = $currentDate;
 
-  let rectifiedVal = parseTime(val).getTime();
-  let rectifiedMax = parseTime(yesterday).getTime();
+  let rectifiedVal = parseAPITime(val).getTime();
+  let rectifiedMax = yesterdayDate.getTime();
 
   let rectifiedRange = interval;
   let rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
 
-  let dataRangeMin = parseTime(min).getTime();
-  let dataRangeMax = parseTime(max).getTime();
+  let dataRangeMin = parseAPITime(min).getTime();
+  let dataRangeMax = parseAPITime(max).getTime();
 
   let prettyDate = '';
   $: prettyDate = formatTime(new Date(rectifiedVal));
@@ -51,7 +51,7 @@
     currentDate.subscribe((d) => {
       if (d === MAGIC_START_DATE) return;
       val = d;
-      rectifiedVal = parseTime(val).getTime();
+      rectifiedVal = parseAPITime(val).getTime();
       if (rectifiedVal >= rectifiedMax) {
         rectifiedVal = rectifiedMax;
         currentDate.set(+calculateValFromRectified(rectifiedVal));
@@ -70,21 +70,21 @@
   function update(s, t, newSensor = false) {
     max = t.get(s)[1];
     min = t.get(s)[0];
-    dataRangeMin = parseTime(min).getTime();
-    dataRangeMax = parseTime(max).getTime();
+    dataRangeMin = parseAPITime(min).getTime();
+    dataRangeMax = parseAPITime(max).getTime();
 
     if (
       newSensor &&
       dataRangeMin <= rectifiedMin &&
-      parseTime($currentDate).getTime() >= rectifiedMin &&
-      parseTime($currentDate).getTime() <= rectifiedMax
+      parseAPITime($currentDate).getTime() >= rectifiedMin &&
+      parseAPITime($currentDate).getTime() <= rectifiedMax
     ) {
       // console.log('fine not to change slider range');
     } else {
       rectifiedRange = interval;
       rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
       if ($currentDate !== MAGIC_START_DATE) {
-        while (parseTime($currentDate).getTime() < rectifiedMin) {
+        while (parseAPITime($currentDate).getTime() < rectifiedMin) {
           rectifiedRange += interval;
           rectifiedMin = rectifiedMax - rectifiedRange * 86400 * 1000;
         }

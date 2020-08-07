@@ -12,20 +12,19 @@
   } from '../stores';
   import Datepicker from './Calendar/Datepicker.svelte';
   import * as d3 from 'd3';
+  import { formatAPITime, parseAPITime } from '../data';
 
   const formatTime = d3.timeFormat('%B %-d, %Y');
-  const convertDate = d3.timeFormat('%Y%m%d');
-  const parseTime = d3.timeParse('%Y%m%d');
 
   // let selectedDate = writable(parseTime($currentDate));
-  $: selectedDate = parseTime($currentDate);
+  $: selectedDate = parseAPITime($currentDate);
   // if ($currentDate !== MAGIC_START_DATE) {
   //   selectedDate = parseTime($currentDate);
   // }
   $: start_end_dates = [];
 
   $: if (selectedDate !== undefined) {
-    currentDate.set(convertDate(selectedDate));
+    currentDate.set(formatAPITime(selectedDate));
   }
   $: if ($times !== null) {
     start_end_dates = $times.get($currentSensor);
@@ -121,8 +120,8 @@
   {#if selectedDate != null && start_end_dates.length !== 0}
     <Datepicker
       bind:selected={selectedDate}
-      start={parseTime(start_end_dates[0])}
-      end={parseTime(start_end_dates[1])}
+      start={parseAPITime(start_end_dates[0])}
+      end={parseAPITime(start_end_dates[1])}
       formattedSelected={formatTime(selectedDate)}>
       <button aria-label="selected date" class="calendar base-font-size" on:>{formatTime(selectedDate)}</button>
     </Datepicker>

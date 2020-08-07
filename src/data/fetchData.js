@@ -1,4 +1,4 @@
-import { callAPI } from './api';
+import { callAPIEndPoint } from './api';
 import { checkWIP, combineAverageWithCount, parseAPITime, formatAPITime } from './utils';
 import { isCasesSignal, isDeathSignal } from './signals';
 
@@ -104,8 +104,8 @@ export function fetchRegionSlice(sensorEntry, level, date) {
   const additionalSignal = getAdditionalSignal(sensorEntry.signal);
 
   const promise = Promise.all([
-    callAPI(sensorEntry.id, sensorEntry.signal, level, date, '*'),
-    additionalSignal ? callAPI(sensorEntry.id, additionalSignal, level, date, '*') : null,
+    callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.signal, level, date, '*'),
+    additionalSignal ? callAPIEndPoint(sensorEntry.api, sensorEntry.id, additionalSignal, level, date, '*') : null,
   ]).then(([d, d1]) => {
     if (d.result < 0 || d.message.includes('no results')) {
       return [];
@@ -135,12 +135,14 @@ export function fetchTimeSlice(sensorEntry, level, region) {
     return cacheEntry;
   }
 
-  const promise = callAPI(sensorEntry.id, sensorEntry.signal, level, TIME_RANGE, region).then((d) => {
-    if (d.result < 0 || d.message.includes('no results')) {
-      return [];
-    }
-    return parseData(d.epidata);
-  });
+  const promise = callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.signal, level, TIME_RANGE, region).then(
+    (d) => {
+      if (d.result < 0 || d.message.includes('no results')) {
+        return [];
+      }
+      return parseData(d.epidata);
+    },
+  );
   timeSliceCache.set(cacheEntry, promise);
 
   return promise;
