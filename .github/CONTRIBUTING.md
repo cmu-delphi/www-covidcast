@@ -68,6 +68,10 @@ An exception of this rule are hotfixes which fixes specific bugs in the current 
 
 Follow the pull request template request review of the primary code and also assign the primary code owner.
 
+### Draft Pull Requests
+
+Draft pull requests can be created to collect early feedback during the development. The code is not stable yet, nor the feature. Once the implementation is complete the PR should be marked `Ready for Review`.
+
 ### Pull Request Reviews
 
 Every pull request has to be reviewed. The review should be done by the primary code owner of this repository.
