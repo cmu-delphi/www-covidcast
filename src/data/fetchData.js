@@ -1,5 +1,5 @@
 import { callAPI } from './api';
-import { checkWIP, combineAverageWithCount } from './utils';
+import { checkWIP, combineAverageWithCount, parseAPITime, formatAPITime } from './utils';
 import { isCasesSignal, isDeathSignal } from './signals';
 
 /**
@@ -37,7 +37,7 @@ const timeSliceCache = new Map();
  * @param {string} date
  */
 function toRegionCacheKey(sensorEntry, level, date) {
-  return `${sensorEntry.key}-${level}-${date}`;
+  return `${sensorEntry.key}-${level}-${date instanceof Date ? formatAPITime(date) : date}`;
 }
 /**
  * @param {SensorEntry} sensorEntry
@@ -54,8 +54,7 @@ function parseData(data) {
       row.date_value = null;
       continue;
     }
-    const s = row.time_value.toString();
-    row.date_value = new Date(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} 12:01`);
+    row.date_value = parseAPITime(row.time_value.toString());
   }
   return data;
 }
