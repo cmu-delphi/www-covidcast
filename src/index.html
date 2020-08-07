@@ -28,7 +28,7 @@
     <link href="https://www.cmu.edu/favicon.ico" rel="icon" />
     <link href="https://www.cmu.edu/favicon-152.png" rel="apple-touch-icon-precomposed" />
     <meta content="#9f0000" name="msapplication-TileColor" />
-    <meta content="//www.cmu.edu/favicon-144.png" name="msapplication-TileImage" />
+    <meta content="https://www.cmu.edu/favicon-144.png" name="msapplication-TileImage" />
 
     <link
       href="https://www.cmu.edu/common/standard-v6/css/main.min.css"
@@ -65,8 +65,8 @@
     </script>
   </head>
 
-  <body>
-    <div id="container">
+  <body class="viz-body">
+    <div id="container" class="viz-container">
       <header class="viz-header">
         <div class="roof red invert">
           <div>
@@ -94,15 +94,15 @@
           <h1><a href="index.html">COVIDcast</a></h1>
           <h2>Real-time COVID-19 Indicators</h2>
           <h3>
-            <a class="group-link" href="https://delphi.cmu.edu/" target="_blank" rel="noopener noreferrer"
+            <a class="viz-group-link" href="https://delphi.cmu.edu/" target="_blank" rel="noopener noreferrer"
               >by Delphi Research Group</a
             >
           </h3>
         </div>
         <div class="viz-mission">
-          The <span class="mission-link">mission</span> of the
-          <a href="#" class="team-link">CMU Delphi COVID-19 Response Team</a> is to help combat the COVID-19 pandemic
-          and save lives and livelihoods.
+          The <span class="viz-mission-link">mission</span> of the
+          <a href="#" class="viz-team-link">CMU Delphi COVID-19 Response Team</a> is to help combat the COVID-19
+          pandemic and save lives and livelihoods.
         </div>
       </header>
       <main id="vizbox">
@@ -114,15 +114,14 @@
         </div>
       </main>
     </div>
-    <footer>
+    <footer class="viz-footer">
       <nav id="nav">
         <ul>
-          <li><a href="https://delphi.cmu.edu/">DELPHI</a></li>
+          <li><a href="https://delphi.cmu.edu/">Delphi</a></li>
           <li class="active"><a href="https://covidcast.cmu.edu">COVIDcast</a></li>
+          <li><a href="https://cmu-delphi.github.io/delphi-epidata/">Data</a></li>
           <li><a href="https://delphi.cmu.edu/blog">Blog</a></li>
-          <li><a href="https://covidcast.cmu.edu/methodology.html">About the Data</a></li>
-          <li><a href="https://covidcast.cmu.edu/survey.html">Surveys</a></li>
-          <li><a href="https://covidcast.cmu.edu/covid19-response-team.html">Team</a></li>
+          <li><a href="https://github.com/cmu-delphi/">Github</a></li>
         </ul>
       </nav>
     </footer>

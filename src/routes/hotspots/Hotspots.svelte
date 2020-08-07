@@ -13,6 +13,7 @@
   import { fetchTimeSlice } from '../../data/fetchData';
   import IoIosPin from 'svelte-icons/io/IoIosPin.svelte';
   import { regionSearchLookup } from '../../stores/search';
+  import { modes } from '..';
 
   /**
    * @param {import('../../data/fetchData').EpiDataRow} row
@@ -53,7 +54,7 @@
     .map((d) => addData(d, $currentSensorEntry));
 
   function jumpTo(row) {
-    currentMode.set('overview');
+    currentMode.set(modes.find((d) => d.id === 'overview'));
     currentRegion.set(row.id);
     currentRegionName.set(row.name);
   }
