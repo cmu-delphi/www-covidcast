@@ -4,6 +4,7 @@
 
 <style>
   .root {
+    flex-grow: 1;
   }
 </style>
 
