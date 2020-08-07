@@ -1,6 +1,13 @@
 <script>
   import { ENCODING_BUBBLE_THEME } from '../../theme';
-  import { stats, currentLevel, colorScale, bubbleRadiusScale, currentSensorEntry } from '../../stores';
+  import {
+    stats,
+    currentLevel,
+    colorScale,
+    bubbleRadiusScale,
+    currentSensorEntry,
+    currentDataReadyOnMap,
+  } from '../../stores';
   import { transparent } from '../../util';
   import { getSigfigs, generateLabels } from './utils';
 
@@ -42,7 +49,7 @@
   }
 </style>
 
-<ul class="bubble-legend">
+<ul class="bubble-legend" class:loading-bg={!$currentDataReadyOnMap}>
   {#each labels as [label], j}
     {#if +label > 0}
       <li class="colored">
