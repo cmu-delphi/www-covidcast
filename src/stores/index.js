@@ -4,6 +4,7 @@ import { scaleSequentialLog } from 'd3';
 import { sensorList, withSensorEntryKey } from './constants';
 import { regionSearchLookup } from './search';
 import { modes } from '../routes';
+import { parseAPITime } from '../data/utils';
 
 export {
   dict,
@@ -112,12 +113,17 @@ export const encoding = writable('color', (set) => {
  * magic date that will be replaced by the latest date
  */
 export const MAGIC_START_DATE = '20100420';
-export const currentDate = writable('20100420', (set) => {
+export const currentDate = writable(MAGIC_START_DATE, (set) => {
   const date = urlParams.get('date');
   if (/\d{8}/.test(date)) {
     set(date);
   }
 });
+
+/**
+ * current date as a Date object
+ */
+export const currentDateObject = derived([currentDate], ([date]) => (!date ? null : parseAPITime(date)));
 
 // Region GEO_ID for filtering the line chart
 // 42003 - Allegheny; 38300 - Pittsburgh; PA - Pennsylvania.
