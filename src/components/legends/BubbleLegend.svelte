@@ -6,7 +6,7 @@
 
   let high = '';
   let unit = '';
-  let labels = [['0', '0']];
+  let labels = [];
 
   $: {
     const r = generateLabels($stats, $currentSensorEntry, $currentLevel);

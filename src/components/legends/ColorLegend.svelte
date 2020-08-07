@@ -1,10 +1,11 @@
 <script>
   import { colorScale, currentLevel, currentSensorEntry, stats } from '../../stores';
   import { generateLabels, getSigfigs } from './utils';
+  import { DIRECTION_THEME } from '../../theme';
 
   let high = '';
   let unit = '';
-  let labels = [['0', '0']];
+  let labels = [];
 
   $: {
     const r = generateLabels($stats, $currentSensorEntry, $currentLevel);
@@ -64,9 +65,15 @@
 <ul>
   {#each labels as [label1, label2]}
     <li class="colored">
-      <span
-        class="colored"
-        style="background: linear-gradient(to right, {$colorScale(+label1)}, {$colorScale(+label2)})" />
+      {#if +label1 === 0}
+        <span
+          class="colored"
+          style="background: linear-gradient(to right, {DIRECTION_THEME.countMin}, {DIRECTION_THEME.countMin})" />
+      {:else}
+        <span
+          class="colored"
+          style="background: linear-gradient(to right, {$colorScale(+label1)}, {$colorScale(+label2)})" />
+      {/if}
       {getSigfigs(label1, 3)}
     </li>
   {/each}
