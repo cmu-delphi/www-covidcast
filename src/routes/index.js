@@ -22,10 +22,10 @@ export const modes = [
   //   tooltip: 'Switch to Comparison Mode',
   //   component: () => import('./compare/Compare.svelte').then((r) => r.default),
   // },
-  // {
-  //   id: 'hotspots',
-  //   label: 'Hotspots',
-  //   tooltip: 'Switch to Hotspots Mode',
-  //   component: () => import('./hotspots/Hotspots.svelte').then((r) => r.default),
-  // },
+  {
+    id: 'hotspots',
+    label: 'Hotspots',
+    tooltip: 'Switch to Hotspots Mode',
+    component: () => import('./hotspots/Hotspots.svelte').then((r) => r.default),
+  },
 ];
