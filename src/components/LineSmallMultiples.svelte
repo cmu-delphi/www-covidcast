@@ -3,29 +3,21 @@
   import { sensors } from '../stores/index.js';
   import { json } from 'd3-fetch';
   import { timeFormat } from 'd3';
-  // import { readable } from 'svelte/store';
-  import {
-    currentRegion,
-    // currentRegionName,
-    currentSensor,
-    currentLevel,
-    // currentDate,
-    // currentData,
-    // currentRange,
-  } from '../stores';
-  // import { callAPI, callMetaAPI } from '../data/api';
+  import { currentRegion, currentSensor, currentLevel } from '../stores';
   import moment from 'moment';
 
+  // Default width and height for small multiples
   let width = 172;
   const height = 30;
 
+  // Create a date for today in the API's date format
   const finalDay = timeFormat('%Y%m%d')(new Date());
 
   import { default as embed } from 'vega-embed';
-  // import { compile } from 'vega-lite'
 
-  //let smallMultipleStart = 0;
   let smallMultipleContainer = null;
+
+  // An array of keys that will NOT be shown in small multiples
   const sensorSmallMultipleBlacklist = [
     'ght-smoothed_search',
     'indicator-combination-confirmed_7dav_incidence_num',
@@ -33,21 +25,12 @@
     // 'safegraph-full_time_work_prop',
   ];
   let filteredSensors = $sensors.filter((s) => !sensorSmallMultipleBlacklist.includes(s.key));
-  console.log($sensors);
-  // TODO: Fix in Safari
-  // TODO: Don't show metrics that have no data
-  // TODO: Color signal title by current region's color scale in that metric
-
-  // DONE: Filter out sensors we don't want
-  // DONE: Make end date of range programmatic
-  // DONE: Make it work for metro areas and states
-  // DONE: Add single metric view
-  // DONE: Determine the widths and distances between elements and advance by that amount
-  // DONE: Don't let the user go under 0 or above the total number of signals shown
 
   function idToSensor(id) {
     return $sensors.find((e) => e.key === id);
   }
+
+  // Carousel approach to small multiples
   /*
   function smallMultipleNext() {
     handleSmallMultipleNav('next');
@@ -83,10 +66,10 @@
   }
   */
 
+  // Whether we are showing a single metric or everything at once
   let singleView = false;
   function toggleSingleView(focusSignal = null) {
     if (focusSignal.type !== 'click' && !singleView) {
-      // console.log('Setting signal to ', focusSignal);
       $currentSensor = focusSignal;
     }
     singleView = !singleView;
@@ -95,14 +78,10 @@
   function setSingleView(singleViewBoolean = false) {
     singleView = singleViewBoolean;
   }
-  // console.log($sensors);
 
-  // console.log({
-  //   currentRegion,
-  //   currentRegionName,
-  // });
   let region = '';
 
+  // Generate a small multiple chart with data from the API
   function generateLineChart(signal = 'part_time_work_prop', source = 'covidcast') {
     const apiURL = `https://api.covidcast.cmu.edu/epidata/api.php?source=covidcast&cached=true&time_type=day&data_source=${source}&signal=${signal}&geo_type=${$currentLevel}&time_values=20200401-${finalDay}&geo_value=${region}`;
 
@@ -220,6 +199,7 @@
     });
   }
 
+  // Generate a single, larger line chart with slightly different behavior
   function generateSingleChart() {
     // console.log({ $currentSensor });
     const s = idToSensor($currentSensor);
@@ -344,8 +324,8 @@
     });
   }
 
+  // Generate all small multiple charts and the larger single chart
   function generateAllCharts() {
-    console.log('width', width);
     smallMultipleContainer = document.getElementById('small-multiple-container');
     filteredSensors.forEach((s) => {
       generateLineChart(s.signal, s.id, s);
@@ -355,9 +335,6 @@
   }
 
   onMount(() => {
-    console.log(smallMultipleContainer);
-    console.log('width', width);
-
     currentRegion.subscribe((d) => {
       region = d;
       generateAllCharts();
@@ -377,13 +354,7 @@
     bottom: 12px;
     padding: 0.25em;
     width: 68vw;
-    /* min-height: 224px;
-    max-height: 36vh; */
     max-height: 35vh;
-    /* overflow-x: auto;
-    overflow-y: hidden;
-    white-space: nowrap; */
-    /* overflow-y: auto; */
     background-color: white;
   }
   #single-chart {
@@ -401,32 +372,21 @@
     flex-direction: row;
     align-content: flex-start;
     margin-top: 1.5em;
-    /* overflow-y: auto;
-    overflow-x: hidden; */
     overflow: hidden;
     min-height: 150px;
     max-height: 22vh;
     overflow-y: auto;
   }
   .small-multiples li {
-    /* border: 1px solid red; */
     text-align: left;
-    /* display: inline-block; */
     flex: 1 1 18%;
     vertical-align: top;
     margin: 0;
-    /* margin-right: 4px; */
-    /* margin-bottom: 4px; */
     padding: 0;
-    /* padding-top: 0.27em; */
-    /* 'height': 100px;
-    width: 150px; */
     list-style-type: none;
     text-align: center;
   }
   .small-multiples li h5 {
-    /*font-size: 9px;*/
-    /* height: 2.5em; */
     text-align: left;
     margin: 0;
     padding: 0;
@@ -461,7 +421,6 @@
   }
 
   .small-multiples-topbar {
-    /* border: 1px solid black; */
   }
 
   .small-multiples-topbar h4 {
@@ -490,6 +449,7 @@
     width: 100%;
   }
 
+  /* eslint-disable-next-line css-unused-selector*/
   [hidden] {
     display: none !important;
   }
@@ -505,9 +465,6 @@
 
 <div class="small-multiples container-bg" id="small-multiple-container">
   <div class="small-multiples-tabbar">
-    <!-- <button on:click={toggleSingleView} id="metric-toggle" class="button">
-      {#if singleView}All indicators{:else}{/if}
-    </button> -->
     <div id="metric-toggles">
       <button on:click={() => setSingleView(false)} class="button" class:active={!singleView}>All indicators</button>
 
@@ -519,17 +476,8 @@
     </div>
   </div>
   <div class="small-multiples-topbar">
-    <!-- {#if regionName}
-    <h1>{regionName}</h1>
-  {/if} -->
-
     <h4>
       {#if singleView}{idToSensor($currentSensor).name}{:else}{filteredSensors.length} available indicators{/if}
-
-      <!-- <span hidden={singleView}>
-      <button on:click={smallMultiplePrev}>Previous</button>
-      <button on:click={smallMultipleNext}>Next</button>
-    </span> -->
     </h4>
 
     <h5 hidden={!singleView}>{idToSensor($currentSensor).tooltipText}</h5>
@@ -537,7 +485,6 @@
   </div>
 
   <div id="single-chart" hidden={!singleView}>
-    <!-- <div id="single-{sensor.id}-{sensor.signal}-chart" class="single-sensor-chart" /> -->
     <div id="single-sensor-chart" />
   </div>
 

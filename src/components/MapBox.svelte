@@ -48,7 +48,7 @@
   import { isCountSignal, isDeathSignal, isCasesSignal, getType } from '../data/signals';
   import { trackEvent } from '../stores/ga.js';
 
-  export let graphShowStatus, toggleGraphShowStatus;
+  // export let graphShowStatus, toggleGraphShowStatus;
 
   let searchErrorComponent;
   let parseTime = d3.timeParse('%Y%m%d');
@@ -1483,7 +1483,7 @@
     margin-right: auto;
   }
 
-  .time-container {
+  /* .time-container {
     position: absolute;
     bottom: 12px;
     right: 10px;
@@ -1491,7 +1491,7 @@
     padding: 30px 10px;
     box-sizing: border-box;
     transition: all 0.1s ease-in;
-  }
+  } */
 
   .hidden {
     display: none;
