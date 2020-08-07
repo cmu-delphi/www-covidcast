@@ -75,14 +75,6 @@ module.exports = () => {
             },
           ],
         },
-        {
-          test: /\.json$/i,
-          use: [
-            {
-              loader: 'json-loader',
-            },
-          ],
-        },
       ],
     },
 

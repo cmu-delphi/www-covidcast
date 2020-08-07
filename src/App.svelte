@@ -18,8 +18,9 @@
   import './stores/urlHandler';
   import './stores/ga';
   import { updateTimeSliceCache, updateRegionSliceCache, loadMetaData } from './data';
-  import { isDeathSignal, isCasesSignal } from '../data/signals';
+  import { isDeathSignal, isCasesSignal } from './data/signals';
   import ModeToggle from './components/ModeToggle.svelte';
+  import { modes } from './routes';
 
   // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
   const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
@@ -169,9 +170,11 @@
 {/if}
 
 <div class="root">
-  <div class="mode-switcher">
-    <ModeToggle />
-  </div>
+  {#if modes.length > 1}
+    <div class="mode-switcher">
+      <ModeToggle />
+    </div>
+  {/if}
   {#await currentComponent}
     <div class="loader loading" />
   {:then value}
