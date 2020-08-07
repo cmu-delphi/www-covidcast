@@ -326,8 +326,10 @@ export default class MapBoxWrapper {
     // if no selection or we hover the selection don't fly to
     if (
       !selection ||
-      (selection.level !== levelMegaCounty.id && this.interactive.hovered.id == selection.property_id) ||
-      (selection.level === levelMegaCounty.id && this.interactive.hovered.mega == selection.property_id)
+      (selection.level !== levelMegaCounty.id &&
+        (this.interactive.hovered.id == selection.property_id || oldSelection.id == selection.property_id)) ||
+      (selection.level === levelMegaCounty.id &&
+        (this.interactive.hovered.mega == selection.property_id || oldSelection.mega == selection.property_id))
     ) {
       return;
     }
