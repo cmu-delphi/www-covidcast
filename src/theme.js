@@ -35,6 +35,7 @@ export const MAP_THEME = {
 
 export const ENCODING_BUBBLE_THEME = {
   color: 'transparent',
+  countyFill: '#eeeeee',
   strokeColor: '#666',
   strokeWidth: 1,
   strokeWidthHighlighted: 4,
@@ -65,6 +66,7 @@ export const ENCODING_BUBBLE_THEME = {
 
 export const ENCODING_SPIKE_THEME = {
   fillOpacity: 0.2,
+  countyFill: '#eeeeee',
   strokeOpacity: 0.8,
   strokeWidth: {
     county: 1,

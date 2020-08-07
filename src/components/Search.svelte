@@ -541,7 +541,7 @@
     display: flex;
   }
 
-  .search-icon {
+  .search-button {
     color: #9b9b9b;
     width: 1.4em;
     margin: 0 0.2em;
@@ -556,7 +556,7 @@
 
   .autocomplete-input {
     flex: 1 1 0;
-    min-width: 15em;
+    min-width: 12em;
     width: 20em;
     max-width: 30em;
     font: inherit;
@@ -638,7 +638,7 @@
 
 <div class="{className} autocomplete select" on:click={onContainerClick} class:empty={!text} class:open={opened}>
   <div class="search-row">
-    <button class="search-icon" on:click={focusSearch} title="Show Search Field" aria-label="Show Search Field">
+    <button class="search-button" on:click={focusSearch} title="Show Search Field" aria-label="Show Search Field">
       <IoIosSearch />
     </button>
     <input
@@ -657,7 +657,7 @@
       on:click={onInputClick}
       on:keypress={onKeyPress} />
     <button
-      class="search-icon reset-button"
+      class="search-button reset-button"
       class:hidden={!text}
       on:click={onResetItem}
       title="Clear Search Field"
