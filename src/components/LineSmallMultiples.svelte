@@ -371,7 +371,7 @@
     justify-content: flex-start;
     flex-direction: row;
     align-content: flex-start;
-    margin-top: 1.5em;
+    /* margin-top: 1.5em; */
     overflow: hidden;
     min-height: 150px;
     max-height: 22vh;
@@ -387,10 +387,12 @@
     text-align: center;
   }
   .small-multiples li h5 {
+    font-size: 12px;
+    line-height: 1em;
     text-align: left;
     margin: 0;
     padding: 0;
-    padding-left: 1.45em;
+    padding-left: 0.5em;
     color: #999;
     cursor: pointer;
   }
@@ -429,12 +431,13 @@
 
   .small-multiples-topbar h4,
   .small-multiples-topbar h5 {
-    margin: 1em 0.5em;
+    padding: 0;
+    margin: 0.5em 0.25em;
     margin-bottom: 0;
   }
 
   .small-multiples-topbar h5 {
-    margin-left: 1em;
+    /* margin-left: 1em; */
   }
 
   .small-multiples-tabbar {
@@ -442,6 +445,9 @@
     height: 32px;
     top: -30px;
     left: 8px;
+  }
+
+  .small-multiples-tabbar button {
   }
 
   #single-sensor-chart,
@@ -459,7 +465,8 @@
   }
 
   .active {
-    background-color: white;
+    opacity: 1;
+    /* background-color: white; */
   }
 </style>
 
