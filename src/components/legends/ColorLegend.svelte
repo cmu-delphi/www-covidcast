@@ -1,5 +1,5 @@
 <script>
-  import { colorScale, currentLevel, currentSensorEntry, stats } from '../../stores';
+  import { colorScale, currentLevel, currentSensorEntry, stats, currentDataReadyOnMap } from '../../stores';
   import { generateLabels, getSigfigs } from './utils';
   import { DIRECTION_THEME } from '../../theme';
 
@@ -62,7 +62,7 @@
   }
 </style>
 
-<ul>
+<ul class:loading-bg={!$currentDataReadyOnMap}>
   {#each labels as [label1, label2]}
     <li class="colored">
       {#if +label1 === 0}

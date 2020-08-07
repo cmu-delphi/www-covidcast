@@ -1,6 +1,13 @@
 <script>
   import { ENCODING_SPIKE_THEME } from '../../theme';
-  import { stats, currentLevel, colorScale, spikeHeightScale, currentSensorEntry } from '../../stores';
+  import {
+    stats,
+    currentLevel,
+    colorScale,
+    spikeHeightScale,
+    currentSensorEntry,
+    currentDataReadyOnMap,
+  } from '../../stores';
   import { transparent } from '../../util';
   import { getSigfigs, generateLabels } from './utils';
 
@@ -61,7 +68,7 @@
   }
 </style>
 
-<ul class="spike-legend">
+<ul class="spike-legend" class:loading-bg={!$currentDataReadyOnMap}>
   {#each labels as [label]}
     {#if +label > 0}
       <li>
