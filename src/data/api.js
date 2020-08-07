@@ -1,7 +1,16 @@
+import { formatAPITime } from './utils';
+
 const ENDPOINT = 'https://api.covidcast.cmu.edu/epidata/api.php';
 
 const fetchOptions = process.env.NODE_ENV === 'development' ? { cache: 'force-cache' } : {};
 
+/**
+ * @param {string} id
+ * @param {string} signal
+ * @param {string} level
+ * @param {Date | string} date
+ * @param {string} region
+ */
 export function callAPI(id, signal, level, date, region) {
   const url = new URL(ENDPOINT);
   url.searchParams.set('source', 'covidcast');
@@ -9,7 +18,7 @@ export function callAPI(id, signal, level, date, region) {
   url.searchParams.set('data_source', id);
   url.searchParams.set('signal', signal);
   url.searchParams.set('geo_type', level);
-  url.searchParams.set('time_values', date);
+  url.searchParams.set('time_values', date instanceof Date ? formatAPITime(date) : date);
   url.searchParams.set('time_type', 'day');
   url.searchParams.set('geo_value', region);
   return fetch(url.toString(), fetchOptions).then((d) => d.json());
