@@ -1,4 +1,4 @@
-import { isCountSignal } from '../../data/signals';
+import { isCountSignal, isPropSignal } from '../../data/signals';
 import * as d3 from 'd3';
 import logspace from 'compute-logspace';
 import { DIRECTION_THEME, MAP_THEME } from '../../theme';
@@ -13,7 +13,7 @@ export function determineMinMax(statsLookup, sensor, level) {
   }
 
   const stats = statsLookup.get(sensor);
-  return [Math.max(0, stats.mean - 3 * stats.std), stats.mean + 3 * stats.std];
+  return [Math.max(0.14, stats.mean - 3 * stats.std), stats.mean + 3 * stats.std];
 }
 
 export function determineColorScale(valueMinMax, signalType, sensor) {
@@ -27,6 +27,9 @@ export function determineColorScale(valueMinMax, signalType, sensor) {
 function determineValueColorScale(valueMinMax, sensor) {
   if (isCountSignal(sensor)) {
     return countSignalColorScale(valueMinMax);
+  }
+  if (isPropSignal(sensor)) {
+    return propSignalColorScale(valueMinMax);
   }
   return regularSignalColorScale(valueMinMax);
 }
@@ -63,6 +66,20 @@ function regularSignalColorScale(valueMinMax) {
   const stops = zip(domainStops5, linearColors5);
   const stopsMega = zip(domainStops5, transparent(linearColors5, 0.5));
 
+  return { stops, stopsMega, scale: colorScaleLinear };
+}
+
+function propSignalColorScale(valueMinMax) {
+  const center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
+  const firstHalfCenter = valueMinMax[0] + (center - valueMinMax[0]) / 2;
+  const secondHalfCenter = center + (valueMinMax[1] - center) / 2;
+  const colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain(valueMinMax);
+  // domainStops5 is used for other cases (prop signals)
+  const domainStops5 = [valueMinMax[0], firstHalfCenter, center, secondHalfCenter, valueMinMax[1]];
+  const linearColors5 = domainStops5.map((c) => colorScaleLinear(c).toString());
+
+  const stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, linearColors5));
+  const stopsMega = zip(domainStops5, transparent(linearColors5, 0.5));
   return { stops, stopsMega, scale: colorScaleLinear };
 }
 

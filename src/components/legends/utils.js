@@ -66,7 +66,7 @@ export function generateLabels(stats, sensorEntry, level) {
   }
 
   const arr = splitDomain(valueMinMax[0], valueMinMax[1], 7);
-  const labels = arr2labels(arr);
+  const labels = ['0', ...arr2labels(arr)];
 
   return {
     labels: pairAdjacent(labels),

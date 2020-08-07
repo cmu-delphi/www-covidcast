@@ -26,6 +26,7 @@
   import Title from '../../components/Title.svelte';
   import MapControls from '../../components/MapControls.svelte';
   import Search from '../../components/Search.svelte';
+  import { isDeathSignal, isCasesSignal } from '../../data/signals';
 
   /**
    * @type {MapBox}
@@ -190,8 +191,7 @@
     </div>
     <div
       class="toggle-container container-bg base-font-size container-style"
-      class:hidden={$signalType === 'direction'}>
-      <!-- !$currentSensor.match(/num/)-->
+      class:hidden={$signalType === 'direction' || !(isDeathSignal($currentSensor) || isCasesSignal($currentSensor))}>
       <ToggleEncoding />
     </div>
     <div class="title-container container-bg">
