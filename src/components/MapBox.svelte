@@ -11,7 +11,7 @@
   import Search from './Search.svelte';
   import MapControls from './MapControls.svelte';
   import Title from './Title.svelte';
-  import { computeBounds } from './geoUtils';
+  import { computeBounds } from './MapBox/geoUtils';
   import LineSmallMultiples from './LineSmallMultiples.svelte';
   import {
     levels,
