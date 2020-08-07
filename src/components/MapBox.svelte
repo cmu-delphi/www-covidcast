@@ -13,7 +13,6 @@
   import Title from './Title.svelte';
   import { computeBounds } from './geoUtils';
   import LineSmallMultiples from './LineSmallMultiples.svelte';
-  import { computeBounds } from './MapBox/geoUtils';
   import {
     levels,
     stats,
