@@ -1360,13 +1360,19 @@
     right: 12px;
     left: 12px;
 
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .top-left-container {
+    flex: 1 1 0;
     display: grid;
     grid-gap: 0.1em;
     grid-template-columns: auto 2fr 1fr auto;
     grid-template-rows: auto auto;
     grid-template-areas:
-      'options options search controls'
-      'toggle title title controls';
+      'options options search'
+      'toggle title title';
   }
 
   :global(.map-container) {
@@ -1433,8 +1439,8 @@
       grid-template-rows: auto auto auto;
       grid-template-areas:
         'options options options'
-        'search title controls'
-        'toggle title controls';
+        'search title'
+        'toggle title';
     }
   }
 
@@ -1498,29 +1504,31 @@
 
 <main class="map-container">
   <div class="top-container">
-    <div class="options-container container-bg base-font-size container-style">
-      <Options />
-    </div>
-    <div class="search-container-wrapper base-font-size">
-      {#if loaded && regionList.length != 0}
-        <Search
-          className="search-container container-bg container-style"
-          placeholder="Search for a location..."
-          items={regionList}
-          selectedItem={selectedRegion}
-          labelFieldName="display_name"
-          maxItemsToShowInList="5"
-          onChange={searchElement} />
-      {/if}
-    </div>
-    <div
-      class="toggle-container container-bg base-font-size container-style"
-      class:hidden={$signalType === 'direction' || !(isDeathSignal($currentSensor) || isCasesSignal($currentSensor))}>
-      <!-- !$currentSensor.match(/num/)-->
-      <Toggle />
-    </div>
-    <div class="title-container container-bg">
-      <Title />
+    <div class="top-left-container">
+      <div class="options-container container-bg base-font-size container-style">
+        <Options />
+      </div>
+      <div class="search-container-wrapper base-font-size">
+        {#if loaded && regionList.length != 0}
+          <Search
+            className="search-container container-bg container-style"
+            placeholder="Search for a location..."
+            items={regionList}
+            selectedItem={selectedRegion}
+            labelFieldName="display_name"
+            maxItemsToShowInList="5"
+            onChange={searchElement} />
+        {/if}
+      </div>
+      <div
+        class="toggle-container container-bg base-font-size container-style"
+        class:hidden={$signalType === 'direction' || !(isDeathSignal($currentSensor) || isCasesSignal($currentSensor))}>
+        <!-- !$currentSensor.match(/num/)-->
+        <Toggle />
+      </div>
+      <div class="title-container container-bg">
+        <Title />
+      </div>
     </div>
     <div class="map-controls-container">
       <MapControls
