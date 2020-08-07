@@ -147,7 +147,8 @@ export function withSensorEntryKey(sensorEntry) {
  * @property {string} format
  * @property {string} signal
  * @property {string[]} levels
- * @property {boolean[]} official
+ * @property {'public' | 'early' | 'late'} type
+ * @property {string?} api
  */
 /**
  * @type {SensorEntry[]}
