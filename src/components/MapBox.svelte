@@ -46,6 +46,7 @@
   import { L } from './MapBox/layers.js';
   import { S } from './MapBox/sources.js';
   import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './MapBox/encodings';
+  import { calculateValFromRectified } from '../util';
 
   // export let graphShowStatus, toggleGraphShowStatus;
 
@@ -105,6 +106,13 @@
     Promise.all([d3.json('./maps/name_id_info.json')]).then(([a]) => {
       regionList = a['all'];
       loaded = true;
+      // Get today
+      const today = new Date();
+      // Subtract 4 days
+      const backDate = today.setDate(today.getDate() - 4);
+      // Turn that date into our number format YYYYMMDD
+      // and set the current global date to that
+      currentDate.set(calculateValFromRectified(backDate));
     });
   });
 
