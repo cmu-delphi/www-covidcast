@@ -13,7 +13,7 @@
   import LineChart from '../../components/vega/LineChart.svelte';
   import { fetchTimeSlice } from '../../data/fetchData';
   import IoIosPin from 'svelte-icons/io/IoIosPin.svelte';
-  import { modes } from '..';
+  import modes from '..';
 
   /**
    * @param {import('../../data/fetchData').EpiDataRow} row
