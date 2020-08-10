@@ -116,6 +116,13 @@ export const levelList = [
 ];
 export const levels = levelList.map((l) => l.id);
 
+export const levelMegaCounty = {
+  id: 'mega-county',
+  label: 'Mega County',
+  labelPlural: 'Mega Counties',
+};
+export const levelsWithMega = levels.concat(levelMegaCounty.id);
+
 const levelById = new Map(levelList.map((l) => [l.id, l]));
 
 export function getLevelInfo(level) {
@@ -133,6 +140,8 @@ export function withSensorEntryKey(sensorEntry) {
     key: `${sensorEntry.id}-${sensorEntry.signal}`,
   });
 }
+
+export const defaultSensorId = 'doctor-visits';
 
 /**
  * @typedef {object} SensorEntry

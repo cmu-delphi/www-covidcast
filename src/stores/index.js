@@ -1,10 +1,10 @@
 import { writable, readable, derived, get } from 'svelte/store';
-import { injectIDs } from '../util';
 import { LogScale, SqrtScale } from './scales';
-import * as d3 from 'd3';
-import { sensorList, withSensorEntryKey } from './constants';
+import { scaleSequentialLog } from 'd3';
+import { sensorList, withSensorEntryKey, defaultSensorId } from './constants';
 import modes from '../modes';
 import { parseAPITime } from '../data/utils';
+import { regionSearchLookup } from './search';
 export {
   dict,
   specialCounties,
@@ -15,6 +15,7 @@ export {
   yesterday,
   yesterdayDate,
 } from './constants';
+export { regionSearchList } from './search';
 
 /**
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
@@ -48,31 +49,6 @@ export const sensorMap = derived(sensors, ($sensors) => {
   return map;
 });
 
-// This loads all the GeoJSON's for each granularity that the MapBox component reads as layers.
-export const geojsons = readable(new Map(), (set) => {
-  Promise.all([
-    d3.json('./maps/new_counties.json'),
-    d3.json('./maps/new_states.json'),
-    d3.json('./maps/new_msa.json'),
-    d3.json('./maps/city_data/cities-reprojected.json'),
-    d3.json('./maps/state_centers.json'),
-    d3.json('./maps/county_centers.json'),
-    d3.json('./maps/msa_centers.json'),
-    d3.json('./maps/new_zones.json'),
-  ]).then(([counties, states, msa, cities, stateCenters, countyCenters, msaCenters, newZones]) => {
-    const m = new Map();
-    m.set('county', injectIDs('county', counties));
-    m.set('state', injectIDs('state', states));
-    m.set('msa', injectIDs('msa', msa));
-    m.set('city', cities);
-    m.set('state-centers', injectIDs('state-centers', stateCenters));
-    m.set('county-centers', injectIDs('county-centers', countyCenters));
-    m.set('msa-centers', injectIDs('msa-centers', msaCenters));
-    m.set('zone', newZones);
-    set(m);
-  });
-});
-
 export const times = writable(null);
 export const stats = writable(null);
 
@@ -98,10 +74,18 @@ export const currentSensor = writable('', (set) => {
   if (sensor && get(sensorMap).has(sensor)) {
     set(sensor);
   } else {
-    const firstKey = Array.from(get(sensorMap).keys())[0];
-    set(firstKey);
+    const activeSensors = get(sensors);
+    const defaultSensor = activeSensors.find((d) => d.id === defaultSensorId);
+    if (defaultSensor) {
+      set(defaultSensor.key);
+    } else {
+      set(activeSensors[0].key);
+    }
   }
 });
+export const currentSensorEntry = derived([sensorMap, currentSensor], ([$sensorMap, $currentSensor]) =>
+  $sensorMap.get($currentSensor),
+);
 
 // 'county', 'state', or 'msa'
 export const currentLevel = writable('county', (set) => {
@@ -115,8 +99,8 @@ export const currentLevel = writable('county', (set) => {
 export const signalType = writable('value', (set) => {
   const signalT = urlParams.get('signalType');
   if (signalT === 'direction' || signalT === 'value') {
-    set(signalT);
-    //set('value');
+    // set(signalT);
+    set('value');
   }
 });
 
@@ -154,6 +138,35 @@ export const currentRegion = writable('', (set) => {
     set(region);
   }
 });
+export const currentRegionName = writable('');
+
+/**
+ * current region info (could also be null)
+ */
+export const currentRegionInfo = derived([currentRegion, regionSearchLookup], ([current, lookup]) => lookup(current));
+
+/**
+ *
+ * @param {import('../maps/nameIdInfo').NameInfo | null} elem
+ */
+export function selectByInfo(elem) {
+  if (elem === get(currentRegionInfo)) {
+    return;
+  }
+  if (elem) {
+    currentRegion.set(elem.property_id);
+    currentRegionName.set(elem.display_name);
+    // the info is derived
+  } else {
+    currentRegion.set('');
+    currentRegionName.set('');
+  }
+}
+
+export function selectByFeature(feature) {
+  const lookup = get(regionSearchLookup);
+  selectByInfo(feature ? lookup(feature.properties.id) : null);
+}
 
 // currently only supporting 'swpa' - South western Pennsylvania
 export const currentZone = writable('', (set) => {
@@ -162,15 +175,6 @@ export const currentZone = writable('', (set) => {
     set(zone);
   }
 });
-
-// Range of time for the map slider.
-export const currentRange = writable([0, 1]);
-
-export const currentRegionName = writable('');
-
-export const currentSensorEntry = derived([sensorMap, currentSensor], ([$sensorMap, $currentSensor]) =>
-  $sensorMap.get($currentSensor),
-);
 
 /**
  * @type {import('svelte/store').Writable<EpiDataRow[]>}
@@ -186,7 +190,9 @@ export const timeRangeOnSlider = writable({
   max: 0,
 });
 
-export const colorScale = writable(d3.scaleSequentialLog());
+// Range of time for the map slider.
+export const currentRange = writable([0, 1]);
+export const colorScale = writable(scaleSequentialLog());
 export const colorStops = writable([]);
 export const bubbleRadiusScale = writable(LogScale());
 export const spikeHeightScale = writable(SqrtScale());

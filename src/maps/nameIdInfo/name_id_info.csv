@@ -1,0 +1,3662 @@
+id;name;level;property_id;display_name
+02261;Valdez-Cordova;county;;Valdez-Cordova County, AK
+02270;Wade Hampton;county;;Wade Hampton County, AK
+02275;Wrangell;county;;Wrangell County, AK
+02290;Yukon-Koyukuk;county;;Yukon-Koyukuk County, AK
+04003;Cochise;county;;Cochise County, AZ
+04009;Graham;county;;Graham County, AZ
+04012;La Paz;county;;La Paz County, AZ
+04015;Mohave;county;;Mohave County, AZ
+04023;Santa Cruz;county;;Santa Cruz County, AZ
+05005;Baxter;county;;Baxter County, AR
+05023;Cleburne;county;;Cleburne County, AR
+05025;Cleveland;county;;Cleveland County, AR
+05027;Columbia;county;;Columbia County, AR
+05037;Cross;county;;Cross County, AR
+05043;Drew;county;;Drew County, AR
+05051;Garland;county;;Garland County, AR
+05059;Hot Spring;county;;Hot Spring County, AR
+05067;Jackson;county;;Jackson County, AR
+05081;Little River;county;;Little River County, AR
+05087;Madison;county;;Madison County, AR
+05097;Montgomery;county;;Montgomery County, AR
+05109;Pike;county;;Pike County, AR
+05111;Poinsett;county;;Poinsett County, AR
+05123;St. Francis;county;;St. Francis County, AR
+05129;Searcy;county;;Searcy County, AR
+05135;Sharp;county;;Sharp County, AR
+05139;Union;county;;Union County, AR
+08053;Hinsdale;county;;Hinsdale County, CO
+08061;Kiowa;county;;Kiowa County, CO
+08073;Lincoln;county;;Lincoln County, CO
+08079;Mineral;county;;Mineral County, CO
+08085;Montrose;county;;Montrose County, CO
+08095;Phillips;county;;Phillips County, CO
+08101;Pueblo;county;;Pueblo County, CO
+08105;Rio Grande;county;;Rio Grande County, CO
+08115;Sedgwick;county;;Sedgwick County, CO
+08121;Washington;county;;Washington County, CO
+09013;Tolland;county;;Tolland County, CT
+09015;Windham;county;;Windham County, CT
+12005;Bay;county;;Bay County, FL
+12013;Calhoun;county;;Calhoun County, FL
+12019;Clay;county;;Clay County, FL
+12033;Escambia;county;;Escambia County, FL
+12041;Gilchrist;county;;Gilchrist County, FL
+12049;Hardee;county;;Hardee County, FL
+12055;Highlands;county;;Highlands County, FL
+12067;Lafayette;county;;Lafayette County, FL
+12077;Liberty;county;;Liberty County, FL
+12081;Manatee;county;;Manatee County, FL
+12083;Marion;county;;Marion County, FL
+12087;Monroe;county;;Monroe County, FL
+12099;Palm Beach;county;;Palm Beach County, FL
+12107;Putnam;county;;Putnam County, FL
+12123;Taylor;county;;Taylor County, FL
+12133;Washington;county;;Washington County, FL
+13009;Baldwin;county;;Baldwin County, GA
+13019;Berrien;county;;Berrien County, GA
+13035;Butts;county;;Butts County, GA
+13043;Candler;county;;Candler County, GA
+13047;Catoosa;county;;Catoosa County, GA
+13055;Chattooga;county;;Chattooga County, GA
+13071;Colquitt;county;;Colquitt County, GA
+13075;Cook;county;;Cook County, GA
+13081;Crisp;county;;Crisp County, GA
+13093;Dooly;county;;Dooly County, GA
+13101;Echols;county;;Echols County, GA
+13109;Evans;county;;Evans County, GA
+13119;Franklin;county;;Franklin County, GA
+05141;Van Buren;county;;Van Buren County, AR
+05143;Washington;county;;Washington County, AR
+05147;Woodruff;county;;Woodruff County, AR
+06011;Colusa;county;;Colusa County, CA
+06021;Glenn;county;;Glenn County, CA
+06031;Kings;county;;Kings County, CA
+06043;Mariposa;county;;Mariposa County, CA
+06049;Modoc;county;;Modoc County, CA
+06067;Sacramento;county;;Sacramento County, CA
+06071;San Bernardino;county;;San Bernardino County, CA
+06083;Santa Barbara;county;;Santa Barbara County, CA
+06089;Shasta;county;;Shasta County, CA
+06107;Tulare;county;;Tulare County, CA
+08001;Adams;county;;Adams County, CO
+08003;Alamosa;county;;Alamosa County, CO
+08011;Bent;county;;Bent County, CO
+08013;Boulder;county;;Boulder County, CO
+08014;Broomfield;county;;Broomfield County, CO
+08025;Crowley;county;;Crowley County, CO
+08039;Elbert;county;;Elbert County, CO
+08047;Gilpin;county;;Gilpin County, CO
+01001;Autauga;county;;Autauga County, AL
+01003;Baldwin;county;;Baldwin County, AL
+01007;Bibb;county;;Bibb County, AL
+01011;Bullock;county;;Bullock County, AL
+01021;Chilton;county;;Chilton County, AL
+01031;Coffee;county;;Coffee County, AL
+01037;Coosa;county;;Coosa County, AL
+01045;Dale;county;;Dale County, AL
+01055;Etowah;county;;Etowah County, AL
+01059;Franklin;county;;Franklin County, AL
+01075;Lamar;county;;Lamar County, AL
+01087;Macon;county;;Macon County, AL
+01093;Marion;county;;Marion County, AL
+01103;Morgan;county;;Morgan County, AL
+01111;Randolph;county;;Randolph County, AL
+01119;Sumter;county;;Sumter County, AL
+01131;Wilcox;county;;Wilcox County, AL
+02013;Aleutians East;county;;Aleutians East County, AK
+02050;Bethel;county;;Bethel County, AK
+02105;Hoonah-Angoon;county;;Hoonah-Angoon County, AK
+02122;Kenai Peninsula;county;;Kenai Peninsula County, AK
+02130;Ketchikan Gateway;county;;Ketchikan Gateway County, AK
+02150;Kodiak Island;county;;Kodiak Island County, AK
+02164;Lake and Peninsula;county;;Lake and Peninsula County, AK
+02180;Nome;county;;Nome County, AK
+02185;North Slope;county;;North Slope County, AK
+02188;Northwest Arctic;county;;Northwest Arctic County, AK
+02195;Petersburg;county;;Petersburg County, AK
+02220;Sitka;county;;Sitka County, AK
+17069;Hardin;county;;Hardin County, IL
+17079;Jasper;county;;Jasper County, IL
+17081;Jefferson;county;;Jefferson County, IL
+17087;Johnson;county;;Johnson County, IL
+17093;Kendall;county;;Kendall County, IL
+17099;LaSalle;county;;LaSalle County, IL
+17103;Lee;county;;Lee County, IL
+17109;McDonough;county;;McDonough County, IL
+17115;Macon;county;;Macon County, IL
+17121;Marion;county;;Marion County, IL
+17129;Menard;county;;Menard County, IL
+17135;Montgomery;county;;Montgomery County, IL
+17141;Ogle;county;;Ogle County, IL
+17147;Piatt;county;;Piatt County, IL
+17155;Putnam;county;;Putnam County, IL
+17159;Richland;county;;Richland County, IL
+17165;Saline;county;;Saline County, IL
+17171;Scott;county;;Scott County, IL
+17175;Stark;county;;Stark County, IL
+17187;Warren;county;;Warren County, IL
+17189;Washington;county;;Washington County, IL
+17197;Will;county;;Will County, IL
+18001;Adams;county;;Adams County, IN
+18007;Benton;county;;Benton County, IN
+18011;Boone;county;;Boone County, IN
+18017;Cass;county;;Cass County, IN
+18023;Clinton;county;;Clinton County, IN
+18031;Decatur;county;;Decatur County, IN
+18035;Delaware;county;;Delaware County, IN
+18041;Fayette;county;;Fayette County, IN
+18047;Franklin;county;;Franklin County, IN
+18049;Fulton;county;;Fulton County, IN
+18053;Grant;county;;Grant County, IN
+18055;Greene;county;;Greene County, IN
+18065;Henry;county;;Henry County, IN
+18069;Huntington;county;;Huntington County, IN
+18075;Jay;county;;Jay County, IN
+18081;Johnson;county;;Johnson County, IN
+18085;Kosciusko;county;;Kosciusko County, IN
+18093;Lawrence;county;;Lawrence County, IN
+18095;Madison;county;;Madison County, IN
+18101;Martin;county;;Martin County, IN
+18107;Montgomery;county;;Montgomery County, IN
+18113;Noble;county;;Noble County, IN
+18117;Orange;county;;Orange County, IN
+18127;Porter;county;;Porter County, IN
+18131;Pulaski;county;;Pulaski County, IN
+18133;Putnam;county;;Putnam County, IN
+18139;Rush;county;;Rush County, IN
+18145;Shelby;county;;Shelby County, IN
+18157;Tippecanoe;county;;Tippecanoe County, IN
+18159;Tipton;county;;Tipton County, IN
+18167;Vigo;county;;Vigo County, IN
+18177;Wayne;county;;Wayne County, IN
+18179;Wells;county;;Wells County, IN
+19001;Adair;county;;Adair County, IA
+19007;Appanoose;county;;Appanoose County, IA
+19013;Black Hawk;county;;Black Hawk County, IA
+19017;Bremer;county;;Bremer County, IA
+19021;Buena Vista;county;;Buena Vista County, IA
+19027;Carroll;county;;Carroll County, IA
+19031;Cedar;county;;Cedar County, IA
+19035;Cherokee;county;;Cherokee County, IA
+19039;Clarke;county;;Clarke County, IA
+13125;Glascock;county;;Glascock County, GA
+13127;Glynn;county;;Glynn County, GA
+13131;Grady;county;;Grady County, GA
+13143;Haralson;county;;Haralson County, GA
+13149;Heard;county;;Heard County, GA
+13155;Irwin;county;;Irwin County, GA
+13163;Jefferson;county;;Jefferson County, GA
+13171;Lamar;county;;Lamar County, GA
+13177;Lee;county;;Lee County, GA
+13189;McDuffie;county;;McDuffie County, GA
+13199;Meriwether;county;;Meriwether County, GA
+13217;Newton;county;;Newton County, GA
+13223;Paulding;county;;Paulding County, GA
+13227;Pickens;county;;Pickens County, GA
+13233;Polk;county;;Polk County, GA
+13243;Randolph;county;;Randolph County, GA
+13249;Schley;county;;Schley County, GA
+13261;Sumter;county;;Sumter County, GA
+13273;Terrell;county;;Terrell County, GA
+13277;Tift;county;;Tift County, GA
+13285;Troup;county;;Troup County, GA
+13295;Walker;county;;Walker County, GA
+13307;Webster;county;;Webster County, GA
+13311;White;county;;White County, GA
+13315;Wilcox;county;;Wilcox County, GA
+15005;Kalawao;county;;Kalawao County, HI
+15009;Maui;county;;Maui County, HI
+16009;Benewah;county;;Benewah County, ID
+16019;Bonneville;county;;Bonneville County, ID
+16025;Camas;county;;Camas County, ID
+16041;Franklin;county;;Franklin County, ID
+16045;Gem;county;;Gem County, ID
+16049;Idaho;county;;Idaho County, ID
+16057;Latah;county;;Latah County, ID
+16059;Lemhi;county;;Lemhi County, ID
+16067;Minidoka;county;;Minidoka County, ID
+16081;Teton;county;;Teton County, ID
+17005;Bond;county;;Bond County, IL
+17007;Boone;county;;Boone County, IL
+17009;Brown;county;;Brown County, IL
+17019;Champaign;county;;Champaign County, IL
+17025;Clay;county;;Clay County, IL
+17029;Coles;county;;Coles County, IL
+17035;Cumberland;county;;Cumberland County, IL
+17037;DeKalb;county;;DeKalb County, IL
+17041;Douglas;county;;Douglas County, IL
+17049;Effingham;county;;Effingham County, IL
+17053;Ford;county;;Ford County, IL
+17065;Hamilton;county;;Hamilton County, IL
+20209;Wyandotte;county;;Wyandotte County, KS
+21001;Adair;county;;Adair County, KY
+21005;Anderson;county;;Anderson County, KY
+21021;Boyle;county;;Boyle County, KY
+21029;Bullitt;county;;Bullitt County, KY
+21035;Calloway;county;;Calloway County, KY
+21045;Casey;county;;Casey County, KY
+21053;Clinton;county;;Clinton County, KY
+21061;Edmonson;county;;Edmonson County, KY
+21073;Franklin;county;;Franklin County, KY
+21081;Grant;county;;Grant County, KY
+21083;Graves;county;;Graves County, KY
+21097;Harrison;county;;Harrison County, KY
+21103;Henry;county;;Henry County, KY
+21113;Jessamine;county;;Jessamine County, KY
+21129;Lee;county;;Lee County, KY
+21137;Lincoln;county;;Lincoln County, KY
+21141;Logan;county;;Logan County, KY
+21149;McLean;county;;McLean County, KY
+21157;Marshall;county;;Marshall County, KY
+21165;Menifee;county;;Menifee County, KY
+21169;Metcalfe;county;;Metcalfe County, KY
+21179;Nelson;county;;Nelson County, KY
+21189;Owsley;county;;Owsley County, KY
+21195;Pike;county;;Pike County, KY
+21201;Robertson;county;;Robertson County, KY
+21215;Spencer;county;;Spencer County, KY
+21227;Warren;county;;Warren County, KY
+21237;Wolfe;county;;Wolfe County, KY
+22003;Allen;county;;Allen County, LA
+22013;Bienville;county;;Bienville County, LA
+22027;Claiborne;county;;Claiborne County, LA
+22037;East Feliciana;county;;East Feliciana County, LA
+22047;Iberville;county;;Iberville County, LA
+22059;La Salle;county;;La Salle County, LA
+22073;Ouachita;county;;Ouachita County, LA
+22075;Plaquemines;county;;Plaquemines County, LA
+22087;St. Bernard;county;;St. Bernard County, LA
+22089;St. Charles;county;;St. Charles County, LA
+22105;Tangipahoa;county;;Tangipahoa County, LA
+22111;Union;county;;Union County, LA
+19041;Clay;county;;Clay County, IA
+19043;Clayton;county;;Clayton County, IA
+19047;Crawford;county;;Crawford County, IA
+19055;Delaware;county;;Delaware County, IA
+19063;Emmet;county;;Emmet County, IA
+19065;Fayette;county;;Fayette County, IA
+19069;Franklin;county;;Franklin County, IA
+19075;Grundy;county;;Grundy County, IA
+19079;Hamilton;county;;Hamilton County, IA
+19087;Henry;county;;Henry County, IA
+19091;Humboldt;county;;Humboldt County, IA
+19095;Iowa;county;;Iowa County, IA
+19101;Jefferson;county;;Jefferson County, IA
+19105;Jones;county;;Jones County, IA
+19113;Linn;county;;Linn County, IA
+19117;Lucas;county;;Lucas County, IA
+19121;Madison;county;;Madison County, IA
+19123;Mahaska;county;;Mahaska County, IA
+19131;Mitchell;county;;Mitchell County, IA
+19135;Monroe;county;;Monroe County, IA
+19141;O'Brien;county;;O'Brien County, IA
+19147;Palo Alto;county;;Palo Alto County, IA
+19151;Pocahontas;county;;Pocahontas County, IA
+19157;Poweshiek;county;;Poweshiek County, IA
+19159;Ringgold;county;;Ringgold County, IA
+19165;Shelby;county;;Shelby County, IA
+19169;Story;county;;Story County, IA
+19175;Union;county;;Union County, IA
+19179;Wapello;county;;Wapello County, IA
+19183;Washington;county;;Washington County, IA
+19195;Worth;county;;Worth County, IA
+19197;Wright;county;;Wright County, IA
+20001;Allen;county;;Allen County, KS
+20013;Brown;county;;Brown County, KS
+20017;Chase;county;;Chase County, KS
+20025;Clark;county;;Clark County, KS
+20027;Clay;county;;Clay County, KS
+20029;Cloud;county;;Cloud County, KS
+20031;Coffey;county;;Coffey County, KS
+20033;Comanche;county;;Comanche County, KS
+20041;Dickinson;county;;Dickinson County, KS
+20047;Edwards;county;;Edwards County, KS
+20049;Elk;county;;Elk County, KS
+20055;Finney;county;;Finney County, KS
+20063;Gove;county;;Gove County, KS
+20067;Grant;county;;Grant County, KS
+20073;Greenwood;county;;Greenwood County, KS
+20077;Harper;county;;Harper County, KS
+20083;Hodgeman;county;;Hodgeman County, KS
+20093;Kearny;county;;Kearny County, KS
+20095;Kingman;county;;Kingman County, KS
+20101;Lane;county;;Lane County, KS
+20105;Lincoln;county;;Lincoln County, KS
+20109;Logan;county;;Logan County, KS
+20117;Marshall;county;;Marshall County, KS
+20131;Nemaha;county;;Nemaha County, KS
+20139;Osage;county;;Osage County, KS
+20151;Pratt;county;;Pratt County, KS
+20155;Reno;county;;Reno County, KS
+20163;Rooks;county;;Rooks County, KS
+20165;Rush;county;;Rush County, KS
+20169;Saline;county;;Saline County, KS
+20177;Shawnee;county;;Shawnee County, KS
+20185;Stafford;county;;Stafford County, KS
+20189;Stevens;county;;Stevens County, KS
+20193;Thomas;county;;Thomas County, KS
+20199;Wallace;county;;Wallace County, KS
+20205;Wilson;county;;Wilson County, KS
+26057;Gratiot;county;;Gratiot County, MI
+26059;Hillsdale;county;;Hillsdale County, MI
+26061;Houghton;county;;Houghton County, MI
+26065;Ingham;county;;Ingham County, MI
+26067;Ionia;county;;Ionia County, MI
+26069;Iosco;county;;Iosco County, MI
+26073;Isabella;county;;Isabella County, MI
+26077;Kalamazoo;county;;Kalamazoo County, MI
+26083;Keweenaw;county;;Keweenaw County, MI
+26085;Lake;county;;Lake County, MI
+26093;Livingston;county;;Livingston County, MI
+26097;Mackinac;county;;Mackinac County, MI
+26103;Marquette;county;;Marquette County, MI
+26107;Mecosta;county;;Mecosta County, MI
+26109;Menominee;county;;Menominee County, MI
+26111;Midland;county;;Midland County, MI
+26117;Montcalm;county;;Montcalm County, MI
+26123;Newaygo;county;;Newaygo County, MI
+26129;Ogemaw;county;;Ogemaw County, MI
+26133;Osceola;county;;Osceola County, MI
+26135;Oscoda;county;;Oscoda County, MI
+26137;Otsego;county;;Otsego County, MI
+26143;Roscommon;county;;Roscommon County, MI
+26151;Sanilac;county;;Sanilac County, MI
+26155;Shiawassee;county;;Shiawassee County, MI
+26161;Washtenaw;county;;Washtenaw County, MI
+27009;Benton;county;;Benton County, MN
+27017;Carlton;county;;Carlton County, MN
+27027;Clay;county;;Clay County, MN
+27029;Clearwater;county;;Clearwater County, MN
+27031;Cook;county;;Cook County, MN
+27039;Dodge;county;;Dodge County, MN
+27041;Douglas;county;;Douglas County, MN
+27051;Grant;county;;Grant County, MN
+27057;Hubbard;county;;Hubbard County, MN
+27059;Isanti;county;;Isanti County, MN
+27065;Kanabec;county;;Kanabec County, MN
+27073;Lac qui Parle;county;;Lac qui Parle County, MN
+27079;Le Sueur;county;;Le Sueur County, MN
+27081;Lincoln;county;;Lincoln County, MN
+27083;Lyon;county;;Lyon County, MN
+27085;McLeod;county;;McLeod County, MN
+27091;Martin;county;;Martin County, MN
+27111;Otter Tail;county;;Otter Tail County, MN
+27119;Polk;county;;Polk County, MN
+27121;Pope;county;;Pope County, MN
+27125;Red Lake;county;;Red Lake County, MN
+27131;Rice;county;;Rice County, MN
+27137;St. Louis;county;;St. Louis County, MN
+27143;Sibley;county;;Sibley County, MN
+27147;Steele;county;;Steele County, MN
+27153;Todd;county;;Todd County, MN
+27159;Wadena;county;;Wadena County, MN
+27165;Watonwan;county;;Watonwan County, MN
+27167;Wilkin;county;;Wilkin County, MN
+28003;Alcorn;county;;Alcorn County, MS
+28007;Attala;county;;Attala County, MS
+28013;Calhoun;county;;Calhoun County, MS
+28023;Clarke;county;;Clarke County, MS
+28031;Covington;county;;Covington County, MS
+28035;Forrest;county;;Forrest County, MS
+28037;Franklin;county;;Franklin County, MS
+28043;Grenada;county;;Grenada County, MS
+28057;Itawamba;county;;Itawamba County, MS
+28061;Jasper;county;;Jasper County, MS
+28065;Jefferson Davis;county;;Jefferson Davis County, MS
+28067;Jones;county;;Jones County, MS
+28073;Lamar;county;;Lamar County, MS
+22119;Webster;county;;Webster County, LA
+22121;West Baton Rouge;county;;West Baton Rouge County, LA
+22127;Winn;county;;Winn County, LA
+23003;Aroostook;county;;Aroostook County, ME
+23005;Cumberland;county;;Cumberland County, ME
+23009;Hancock;county;;Hancock County, ME
+23023;Sagadahoc;county;;Sagadahoc County, ME
+23029;Washington;county;;Washington County, ME
+24001;Allegany;county;;Allegany County, MD
+24003;Anne Arundel;county;;Anne Arundel County, MD
+24017;Charles;county;;Charles County, MD
+24019;Dorchester;county;;Dorchester County, MD
+24027;Howard;county;;Howard County, MD
+24029;Kent;county;;Kent County, MD
+24035;Queen Anne's;county;;Queen Anne's County, MD
+24037;St. Mary's;county;;St. Mary's County, MD
+24041;Talbot;county;;Talbot County, MD
+24043;Washington;county;;Washington County, MD
+25003;Berkshire;county;;Berkshire County, MA
+25019;Nantucket;county;;Nantucket County, MA
+26005;Allegan;county;;Allegan County, MI
+26009;Antrim;county;;Antrim County, MI
+26015;Barry;county;;Barry County, MI
+26019;Benzie;county;;Benzie County, MI
+26025;Calhoun;county;;Calhoun County, MI
+26035;Clare;county;;Clare County, MI
+26037;Clinton;county;;Clinton County, MI
+26039;Crawford;county;;Crawford County, MI
+26045;Eaton;county;;Eaton County, MI
+26049;Genesee;county;;Genesee County, MI
+30045;Judith Basin;county;;Judith Basin County, MT
+30051;Liberty;county;;Liberty County, MT
+30065;Musselshell;county;;Musselshell County, MT
+30075;Powder River;county;;Powder River County, MT
+30091;Sheridan;county;;Sheridan County, MT
+30101;Toole;county;;Toole County, MT
+31001;Adams;county;;Adams County, NE
+31005;Arthur;county;;Arthur County, NE
+31009;Blaine;county;;Blaine County, NE
+31017;Brown;county;;Brown County, NE
+31029;Chase;county;;Chase County, NE
+31035;Clay;county;;Clay County, NE
+31037;Colfax;county;;Colfax County, NE
+31039;Cuming;county;;Cuming County, NE
+31047;Dawson;county;;Dawson County, NE
+31057;Dundy;county;;Dundy County, NE
+31063;Frontier;county;;Frontier County, NE
+31069;Garden;county;;Garden County, NE
+31073;Gosper;county;;Gosper County, NE
+31085;Hayes;county;;Hayes County, NE
+31091;Hooker;county;;Hooker County, NE
+31093;Howard;county;;Howard County, NE
+31097;Johnson;county;;Johnson County, NE
+31109;Lancaster;county;;Lancaster County, NE
+31111;Lincoln;county;;Lincoln County, NE
+31115;Loup;county;;Loup County, NE
+31117;McPherson;county;;McPherson County, NE
+31121;Merrick;county;;Merrick County, NE
+31123;Morrill;county;;Morrill County, NE
+31129;Nuckolls;county;;Nuckolls County, NE
+31135;Perkins;county;;Perkins County, NE
+31139;Pierce;county;;Pierce County, NE
+31149;Rock;county;;Rock County, NE
+31151;Saline;county;;Saline County, NE
+31157;Scotts Bluff;county;;Scotts Bluff County, NE
+31163;Sherman;county;;Sherman County, NE
+31167;Stanton;county;;Stanton County, NE
+31171;Thomas;county;;Thomas County, NE
+31179;Wayne;county;;Wayne County, NE
+31183;Wheeler;county;;Wheeler County, NE
+31185;York;county;;York County, NE
+32003;Clark;county;;Clark County, NV
+32015;Lander;county;;Lander County, NV
+32027;Pershing;county;;Pershing County, NV
+32510;Carson City;county;;Carson City, NV
+33007;Coos;county;;Coos County, NH
+33009;Grafton;county;;Grafton County, NH
+33013;Merrimack;county;;Merrimack County, NH
+34003;Bergen;county;;Bergen County, NJ
+34017;Hudson;county;;Hudson County, NJ
+34029;Ocean;county;;Ocean County, NJ
+34035;Somerset;county;;Somerset County, NJ
+35001;Bernalillo;county;;Bernalillo County, NM
+28075;Lauderdale;county;;Lauderdale County, MS
+28077;Lawrence;county;;Lawrence County, MS
+28079;Leake;county;;Leake County, MS
+28081;Lee;county;;Lee County, MS
+28085;Lincoln;county;;Lincoln County, MS
+28091;Marion;county;;Marion County, MS
+28097;Montgomery;county;;Montgomery County, MS
+28101;Newton;county;;Newton County, MS
+28107;Panola;county;;Panola County, MS
+28115;Pontotoc;county;;Pontotoc County, MS
+28117;Prentiss;county;;Prentiss County, MS
+28123;Scott;county;;Scott County, MS
+28129;Smith;county;;Smith County, MS
+28139;Tippah;county;;Tippah County, MS
+28145;Union;county;;Union County, MS
+28153;Wayne;county;;Wayne County, MS
+28159;Winston;county;;Winston County, MS
+29001;Adair;county;;Adair County, MO
+29007;Audrain;county;;Audrain County, MO
+29015;Benton;county;;Benton County, MO
+29025;Caldwell;county;;Caldwell County, MO
+29027;Callaway;county;;Callaway County, MO
+29035;Carter;county;;Carter County, MO
+29043;Christian;county;;Christian County, MO
+29049;Clinton;county;;Clinton County, MO
+29053;Cooper;county;;Cooper County, MO
+29057;Dade;county;;Dade County, MO
+29063;DeKalb;county;;DeKalb County, MO
+29067;Douglas;county;;Douglas County, MO
+29075;Gentry;county;;Gentry County, MO
+29079;Grundy;county;;Grundy County, MO
+29085;Hickory;county;;Hickory County, MO
+29093;Iron;county;;Iron County, MO
+29095;Jackson;county;;Jackson County, MO
+29101;Johnson;county;;Johnson County, MO
+29103;Knox;county;;Knox County, MO
+29109;Lawrence;county;;Lawrence County, MO
+29115;Linn;county;;Linn County, MO
+29119;McDonald;county;;McDonald County, MO
+29125;Maries;county;;Maries County, MO
+29135;Moniteau;county;;Moniteau County, MO
+29139;Montgomery;county;;Montgomery County, MO
+29149;Oregon;county;;Oregon County, MO
+29159;Pettis;county;;Pettis County, MO
+29161;Phelps;county;;Phelps County, MO
+29167;Polk;county;;Polk County, MO
+29175;Randolph;county;;Randolph County, MO
+29185;St. Clair;county;;St. Clair County, MO
+29187;St. Francois;county;;St. Francois County, MO
+29197;Schuyler;county;;Schuyler County, MO
+29203;Shannon;county;;Shannon County, MO
+29211;Sullivan;county;;Sullivan County, MO
+29215;Texas;county;;Texas County, MO
+29221;Washington;county;;Washington County, MO
+29229;Wright;county;;Wright County, MO
+30001;Beaverhead;county;;Beaverhead County, MT
+30011;Carter;county;;Carter County, MT
+30025;Fallon;county;;Fallon County, MT
+30035;Glacier;county;;Glacier County, MT
+37179;Union;county;;Union County, NC
+37181;Vance;county;;Vance County, NC
+37191;Wayne;county;;Wayne County, NC
+38003;Barnes;county;;Barnes County, ND
+38007;Billings;county;;Billings County, ND
+38013;Burke;county;;Burke County, ND
+38017;Cass;county;;Cass County, ND
+38019;Cavalier;county;;Cavalier County, ND
+38027;Eddy;county;;Eddy County, ND
+38031;Foster;county;;Foster County, ND
+38039;Griggs;county;;Griggs County, ND
+38041;Hettinger;county;;Hettinger County, ND
+38045;LaMoure;county;;LaMoure County, ND
+38057;Mercer;county;;Mercer County, ND
+38063;Nelson;county;;Nelson County, ND
+38069;Pierce;county;;Pierce County, ND
+38075;Renville;county;;Renville County, ND
+38083;Sheridan;county;;Sheridan County, ND
+38089;Stark;county;;Stark County, ND
+38095;Towner;county;;Towner County, ND
+38097;Traill;county;;Traill County, ND
+38103;Wells;county;;Wells County, ND
+39003;Allen;county;;Allen County, OH
+39011;Auglaize;county;;Auglaize County, OH
+39019;Carroll;county;;Carroll County, OH
+39023;Clark;county;;Clark County, OH
+39031;Coshocton;county;;Coshocton County, OH
+39033;Crawford;county;;Crawford County, OH
+39041;Delaware;county;;Delaware County, OH
+39047;Fayette;county;;Fayette County, OH
+39053;Gallia;county;;Gallia County, OH
+39055;Geauga;county;;Geauga County, OH
+39059;Guernsey;county;;Guernsey County, OH
+39065;Hardin;county;;Hardin County, OH
+39073;Hocking;county;;Hocking County, OH
+39077;Huron;county;;Huron County, OH
+39089;Licking;county;;Licking County, OH
+39091;Logan;county;;Logan County, OH
+39097;Madison;county;;Madison County, OH
+39103;Medina;county;;Medina County, OH
+39109;Miami;county;;Miami County, OH
+39117;Morrow;county;;Morrow County, OH
+39125;Paulding;county;;Paulding County, OH
+39131;Pike;county;;Pike County, OH
+39137;Putnam;county;;Putnam County, OH
+39143;Sandusky;county;;Sandusky County, OH
+39147;Seneca;county;;Seneca County, OH
+39157;Tuscarawas;county;;Tuscarawas County, OH
+39159;Union;county;;Union County, OH
+39165;Warren;county;;Warren County, OH
+39169;Wayne;county;;Wayne County, OH
+40005;Atoka;county;;Atoka County, OK
+40011;Blaine;county;;Blaine County, OK
+40019;Carter;county;;Carter County, OK
+40027;Cleveland;county;;Cleveland County, OK
+40037;Creek;county;;Creek County, OK
+40039;Custer;county;;Custer County, OK
+40043;Dewey;county;;Dewey County, OK
+40053;Grant;county;;Grant County, OK
+35011;De Baca;county;;De Baca County, NM
+35015;Eddy;county;;Eddy County, NM
+35017;Grant;county;;Grant County, NM
+35027;Lincoln;county;;Lincoln County, NM
+35035;Otero;county;;Otero County, NM
+35047;San Miguel;county;;San Miguel County, NM
+35057;Torrance;county;;Torrance County, NM
+35061;Valencia;county;;Valencia County, NM
+36011;Cayuga;county;;Cayuga County, NY
+36021;Columbia;county;;Columbia County, NY
+36023;Cortland;county;;Cortland County, NY
+36033;Franklin;county;;Franklin County, NY
+36041;Hamilton;county;;Hamilton County, NY
+36049;Lewis;county;;Lewis County, NY
+36057;Montgomery;county;;Montgomery County, NY
+36065;Oneida;county;;Oneida County, NY
+36073;Orleans;county;;Orleans County, NY
+36079;Putnam;county;;Putnam County, NY
+36087;Rockland;county;;Rockland County, NY
+36095;Schoharie;county;;Schoharie County, NY
+36107;Tioga;county;;Tioga County, NY
+36117;Wayne;county;;Wayne County, NY
+37001;Alamance;county;;Alamance County, NC
+37003;Alexander;county;;Alexander County, NC
+37005;Alleghany;county;;Alleghany County, NC
+37017;Bladen;county;;Bladen County, NC
+37025;Cabarrus;county;;Cabarrus County, NC
+37033;Caswell;county;;Caswell County, NC
+37043;Clay;county;;Clay County, NC
+37055;Dare;county;;Dare County, NC
+37057;Davidson;county;;Davidson County, NC
+37063;Durham;county;;Durham County, NC
+37073;Gates;county;;Gates County, NC
+37081;Guilford;county;;Guilford County, NC
+37091;Hertford;county;;Hertford County, NC
+37101;Johnston;county;;Johnston County, NC
+37109;Lincoln;county;;Lincoln County, NC
+37123;Montgomery;county;;Montgomery County, NC
+37127;Nash;county;;Nash County, NC
+37135;Orange;county;;Orange County, NC
+37145;Person;county;;Person County, NC
+37151;Randolph;county;;Randolph County, NC
+37155;Robeson;county;;Robeson County, NC
+37167;Stanly;county;;Stanly County, NC
+45045;Greenville;county;;Greenville County, SC
+45047;Greenwood;county;;Greenwood County, SC
+45051;Horry;county;;Horry County, SC
+45061;Lee;county;;Lee County, SC
+45081;Saluda;county;;Saluda County, SC
+45087;Union;county;;Union County, SC
+46003;Aurora;county;;Aurora County, SD
+46005;Beadle;county;;Beadle County, SD
+46013;Brown;county;;Brown County, SD
+46017;Buffalo;county;;Buffalo County, SD
+46025;Clark;county;;Clark County, SD
+46029;Codington;county;;Codington County, SD
+46043;Douglas;county;;Douglas County, SD
+46045;Edmunds;county;;Edmunds County, SD
+46055;Haakon;county;;Haakon County, SD
+46061;Hanson;county;;Hanson County, SD
+46067;Hutchinson;county;;Hutchinson County, SD
+46073;Jerauld;county;;Jerauld County, SD
+46077;Kingsbury;county;;Kingsbury County, SD
+46079;Lake;county;;Lake County, SD
+46087;McCook;county;;McCook County, SD
+46097;Miner;county;;Miner County, SD
+46099;Minnehaha;county;;Minnehaha County, SD
+46107;Potter;county;;Potter County, SD
+46111;Sanborn;county;;Sanborn County, SD
+46121;Todd;county;;Todd County, SD
+46125;Turner;county;;Turner County, SD
+46137;Ziebach;county;;Ziebach County, SD
+47003;Bedford;county;;Bedford County, TN
+47005;Benton;county;;Benton County, TN
+47015;Cannon;county;;Cannon County, TN
+47017;Carroll;county;;Carroll County, TN
+47031;Coffee;county;;Coffee County, TN
+47039;Decatur;county;;Decatur County, TN
+47047;Fayette;county;;Fayette County, TN
+47053;Gibson;county;;Gibson County, TN
+47061;Grundy;county;;Grundy County, TN
+47069;Hardeman;county;;Hardeman County, TN
+47077;Henderson;county;;Henderson County, TN
+47083;Houston;county;;Houston County, TN
+47099;Lawrence;county;;Lawrence County, TN
+47107;McMinn;county;;McMinn County, TN
+47113;Madison;county;;Madison County, TN
+47125;Montgomery;county;;Montgomery County, TN
+47133;Overton;county;;Overton County, TN
+47153;Sequatchie;county;;Sequatchie County, TN
+47169;Trousdale;county;;Trousdale County, TN
+47173;Union;county;;Union County, TN
+47179;Washington;county;;Washington County, TN
+40057;Harmon;county;;Harmon County, OK
+40059;Harper;county;;Harper County, OK
+40063;Hughes;county;;Hughes County, OK
+40069;Johnston;county;;Johnston County, OK
+40073;Kingfisher;county;;Kingfisher County, OK
+40077;Latimer;county;;Latimer County, OK
+40091;McIntosh;county;;McIntosh County, OK
+40097;Mayes;county;;Mayes County, OK
+40103;Noble;county;;Noble County, OK
+40109;Oklahoma;county;;Oklahoma County, OK
+40119;Payne;county;;Payne County, OK
+40125;Pottawatomie;county;;Pottawatomie County, OK
+40131;Rogers;county;;Rogers County, OK
+40137;Stephens;county;;Stephens County, OK
+40147;Washington;county;;Washington County, OK
+40153;Woodward;county;;Woodward County, OK
+41013;Crook;county;;Crook County, OR
+41025;Harney;county;;Harney County, OR
+41031;Jefferson;county;;Jefferson County, OR
+41049;Morrow;county;;Morrow County, OR
+41053;Polk;county;;Polk County, OR
+41067;Washington;county;;Washington County, OR
+42007;Beaver;county;;Beaver County, PA
+42011;Berks;county;;Berks County, PA
+42013;Blair;county;;Blair County, PA
+42015;Bradford;county;;Bradford County, PA
+42023;Cameron;county;;Cameron County, PA
+42047;Elk;county;;Elk County, PA
+42053;Forest;county;;Forest County, PA
+42063;Indiana;county;;Indiana County, PA
+42069;Lackawanna;county;;Lackawanna County, PA
+42075;Lebanon;county;;Lebanon County, PA
+42083;McKean;county;;McKean County, PA
+42093;Montour;county;;Montour County, PA
+42105;Potter;county;;Potter County, PA
+42107;Schuylkill;county;;Schuylkill County, PA
+42113;Sullivan;county;;Sullivan County, PA
+42119;Union;county;;Union County, PA
+42131;Wyoming;county;;Wyoming County, PA
+45001;Abbeville;county;;Abbeville County, SC
+45009;Bamberg;county;;Bamberg County, SC
+45023;Chester;county;;Chester County, SC
+45031;Darlington;county;;Darlington County, SC
+45039;Fairfield;county;;Fairfield County, SC
+48173;Glasscock;county;;Glasscock County, TX
+48175;Goliad;county;;Goliad County, TX
+48179;Gray;county;;Gray County, TX
+48183;Gregg;county;;Gregg County, TX
+48189;Hale;county;;Hale County, TX
+48193;Hamilton;county;;Hamilton County, TX
+48205;Hartley;county;;Hartley County, TX
+48207;Haskell;county;;Haskell County, TX
+48209;Hays;county;;Hays County, TX
+48219;Hockley;county;;Hockley County, TX
+48221;Hood;county;;Hood County, TX
+48227;Howard;county;;Howard County, TX
+48231;Hunt;county;;Hunt County, TX
+48233;Hutchinson;county;;Hutchinson County, TX
+48237;Jack;county;;Jack County, TX
+48243;Jeff Davis;county;;Jeff Davis County, TX
+48251;Johnson;county;;Johnson County, TX
+48253;Jones;county;;Jones County, TX
+48263;Kent;county;;Kent County, TX
+48265;Kerr;county;;Kerr County, TX
+48269;King;county;;King County, TX
+48279;Lamb;county;;Lamb County, TX
+48281;Lampasas;county;;Lampasas County, TX
+48291;Liberty;county;;Liberty County, TX
+48293;Limestone;county;;Limestone County, TX
+48303;Lubbock;county;;Lubbock County, TX
+48305;Lynn;county;;Lynn County, TX
+48309;McLennan;county;;McLennan County, TX
+48311;McMullen;county;;McMullen County, TX
+48317;Martin;county;;Martin County, TX
+48325;Medina;county;;Medina County, TX
+48327;Menard;county;;Menard County, TX
+48335;Mitchell;county;;Mitchell County, TX
+48341;Moore;county;;Moore County, TX
+48345;Motley;county;;Motley County, TX
+48353;Nolan;county;;Nolan County, TX
+48357;Ochiltree;county;;Ochiltree County, TX
+48359;Oldham;county;;Oldham County, TX
+48363;Palo Pinto;county;;Palo Pinto County, TX
+48365;Panola;county;;Panola County, TX
+48367;Parker;county;;Parker County, TX
+48375;Potter;county;;Potter County, TX
+48379;Rains;county;;Rains County, TX
+48381;Randall;county;;Randall County, TX
+48393;Roberts;county;;Roberts County, TX
+48397;Rockwall;county;;Rockwall County, TX
+48399;Runnels;county;;Runnels County, TX
+48407;San Jacinto;county;;San Jacinto County, TX
+48413;Schleicher;county;;Schleicher County, TX
+48417;Shackelford;county;;Shackelford County, TX
+48429;Stephens;county;;Stephens County, TX
+48431;Sterling;county;;Sterling County, TX
+48437;Swisher;county;;Swisher County, TX
+48441;Taylor;county;;Taylor County, TX
+48445;Terry;county;;Terry County, TX
+48455;Trinity;county;;Trinity County, TX
+48461;Upton;county;;Upton County, TX
+48467;Van Zandt;county;;Van Zandt County, TX
+48481;Wharton;county;;Wharton County, TX
+48483;Wheeler;county;;Wheeler County, TX
+48491;Williamson;county;;Williamson County, TX
+48497;Wise;county;;Wise County, TX
+48503;Young;county;;Young County, TX
+48507;Zavala;county;;Zavala County, TX
+49011;Davis;county;;Davis County, UT
+49021;Iron;county;;Iron County, UT
+47183;Weakley;county;;Weakley County, TN
+47185;White;county;;White County, TN
+48003;Andrews;county;;Andrews County, TX
+48009;Archer;county;;Archer County, TX
+48011;Armstrong;county;;Armstrong County, TX
+48013;Atascosa;county;;Atascosa County, TX
+48017;Bailey;county;;Bailey County, TX
+48023;Baylor;county;;Baylor County, TX
+48027;Bell;county;;Bell County, TX
+48031;Blanco;county;;Blanco County, TX
+48037;Bowie;county;;Bowie County, TX
+48047;Brooks;county;;Brooks County, TX
+48059;Callahan;county;;Callahan County, TX
+48063;Camp;county;;Camp County, TX
+48065;Carson;county;;Carson County, TX
+48069;Castro;county;;Castro County, TX
+48075;Childress;county;;Childress County, TX
+48079;Cochran;county;;Cochran County, TX
+48081;Coke;county;;Coke County, TX
+48087;Collingsworth;county;;Collingsworth County, TX
+48093;Comanche;county;;Comanche County, TX
+48099;Coryell;county;;Coryell County, TX
+48101;Cottle;county;;Cottle County, TX
+48107;Crosby;county;;Crosby County, TX
+48111;Dallam;county;;Dallam County, TX
+48115;Dawson;county;;Dawson County, TX
+48121;Denton;county;;Denton County, TX
+48125;Dickens;county;;Dickens County, TX
+48131;Duval;county;;Duval County, TX
+48143;Erath;county;;Erath County, TX
+48145;Falls;county;;Falls County, TX
+48149;Fayette;county;;Fayette County, TX
+48159;Franklin;county;;Franklin County, TX
+48163;Frio;county;;Frio County, TX
+48171;Gillespie;county;;Gillespie County, TX
+53035;Kitsap;county;;Kitsap County, WA
+53045;Mason;county;;Mason County, WA
+53059;Skamania;county;;Skamania County, WA
+53069;Wahkiakum;county;;Wahkiakum County, WA
+54001;Barbour;county;;Barbour County, WV
+54013;Calhoun;county;;Calhoun County, WV
+54021;Gilmer;county;;Gilmer County, WV
+54033;Harrison;county;;Harrison County, WV
+54041;Lewis;county;;Lewis County, WV
+54047;McDowell;county;;McDowell County, WV
+54061;Monongalia;county;;Monongalia County, WV
+54067;Nicholas;county;;Nicholas County, WV
+54089;Summers;county;;Summers County, WV
+54101;Webster;county;;Webster County, WV
+54105;Wirt;county;;Wirt County, WV
+55001;Adams;county;;Adams County, WI
+55005;Barron;county;;Barron County, WI
+55015;Calumet;county;;Calumet County, WI
+55017;Chippewa;county;;Chippewa County, WI
+55025;Dane;county;;Dane County, WI
+55027;Dodge;county;;Dodge County, WI
+55033;Dunn;county;;Dunn County, WI
+55035;Eau Claire;county;;Eau Claire County, WI
+55039;Fond du Lac;county;;Fond du Lac County, WI
+55045;Green;county;;Green County, WI
+55047;Green Lake;county;;Green Lake County, WI
+55053;Jackson;county;;Jackson County, WI
+55065;Lafayette;county;;Lafayette County, WI
+55067;Langlade;county;;Langlade County, WI
+55073;Marathon;county;;Marathon County, WI
+55075;Marinette;county;;Marinette County, WI
+55081;Monroe;county;;Monroe County, WI
+55085;Oneida;county;;Oneida County, WI
+55097;Portage;county;;Portage County, WI
+55099;Price;county;;Price County, WI
+55103;Richland;county;;Richland County, WI
+55107;Rusk;county;;Rusk County, WI
+55113;Sawyer;county;;Sawyer County, WI
+55127;Walworth;county;;Walworth County, WI
+55131;Washington;county;;Washington County, WI
+55137;Waushara;county;;Waushara County, WI
+56005;Campbell;county;;Campbell County, WY
+56015;Goshen;county;;Goshen County, WY
+56025;Natrona;county;;Natrona County, WY
+56031;Platte;county;;Platte County, WY
+56041;Uinta;county;;Uinta County, WY
+56045;Weston;county;;Weston County, WY
+72007;Aguas Buenas;county;;Aguas Buenas County, PR
+72009;Aibonito;county;;Aibonito County, PR
+72015;Arroyo;county;;Arroyo County, PR
+49027;Millard;county;;Millard County, UT
+49031;Piute;county;;Piute County, UT
+49039;Sanpete;county;;Sanpete County, UT
+49053;Washington;county;;Washington County, UT
+50003;Bennington;county;;Bennington County, VT
+50009;Essex;county;;Essex County, VT
+50015;Lamoille;county;;Lamoille County, VT
+50023;Washington;county;;Washington County, VT
+51003;Albemarle;county;;Albemarle County, VA
+51013;Arlington;county;;Arlington County, VA
+51025;Brunswick;county;;Brunswick County, VA
+51035;Carroll;county;;Carroll County, VA
+51043;Clarke;county;;Clarke County, VA
+51049;Cumberland;county;;Cumberland County, VA
+51063;Floyd;county;;Floyd County, VA
+51075;Goochland;county;;Goochland County, VA
+51081;Greensville;county;;Greensville County, VA
+51097;King and Queen;county;;King and Queen County, VA
+51109;Louisa;county;;Louisa County, VA
+51121;Montgomery;county;;Montgomery County, VA
+51127;New Kent;county;;New Kent County, VA
+51135;Nottoway;county;;Nottoway County, VA
+51145;Powhatan;county;;Powhatan County, VA
+51159;Richmond;county;;Richmond County, VA
+51169;Scott;county;;Scott County, VA
+51181;Surry;county;;Surry County, VA
+51187;Warren;county;;Warren County, VA
+51197;Wythe;county;;Wythe County, VA
+51515;Bedford;county;;Bedford County, VA
+51530;Buena Vista;county;;Buena Vista, VA
+51570;Colonial Heights;county;;Colonial Heights, VA
+51595;Emporia;county;;Emporia, VA
+51610;Falls Church;county;;Falls Church, VA
+51640;Galax;county;;Galax, VA
+51660;Harrisonburg;county;;Harrisonburg, VA
+51683;Manassas;county;;Manassas, VA
+51690;Martinsville;county;;Martinsville, VA
+51720;Norton;county;;Norton, VA
+51740;Portsmouth;county;;Portsmouth, VA
+51770;Roanoke;county;;Roanoke, VA
+51820;Waynesboro;county;;Waynesboro, VA
+51830;Williamsburg;county;;Williamsburg, VA
+53013;Columbia;county;;Columbia County, WA
+53023;Garfield;county;;Garfield County, WA
+04019;Pima;county;;Pima County, AZ
+04021;Pinal;county;;Pinal County, AZ
+04025;Yavapai;county;;Yavapai County, AZ
+04027;Yuma;county;;Yuma County, AZ
+05001;Arkansas;county;;Arkansas County, AR
+05003;Ashley;county;;Ashley County, AR
+05007;Benton;county;;Benton County, AR
+05009;Boone;county;;Boone County, AR
+05011;Bradley;county;;Bradley County, AR
+05013;Calhoun;county;;Calhoun County, AR
+05015;Carroll;county;;Carroll County, AR
+05017;Chicot;county;;Chicot County, AR
+05019;Clark;county;;Clark County, AR
+05021;Clay;county;;Clay County, AR
+05029;Conway;county;;Conway County, AR
+05031;Craighead;county;;Craighead County, AR
+05033;Crawford;county;;Crawford County, AR
+05035;Crittenden;county;;Crittenden County, AR
+72017;Barceloneta;county;;Barceloneta County, PR
+72019;Barranquitas;county;;Barranquitas County, PR
+72021;Bayam�n;county;;Bayam�n County, PR
+72023;Cabo Rojo;county;;Cabo Rojo County, PR
+72027;Camuy;county;;Camuy County, PR
+72039;Ciales;county;;Ciales County, PR
+72043;Coamo;county;;Coamo County, PR
+72051;Dorado;county;;Dorado County, PR
+72054;Florida;county;;Florida County, PR
+72063;Gurabo;county;;Gurabo County, PR
+72069;Humacao;county;;Humacao County, PR
+72077;Juncos;county;;Juncos County, PR
+72085;Las Piedras;county;;Las Piedras County, PR
+72089;Luquillo;county;;Luquillo County, PR
+72095;Maunabo;county;;Maunabo County, PR
+72105;Naranjito;county;;Naranjito County, PR
+72109;Patillas;county;;Patillas County, PR
+72117;Rinc�n;county;;Rinc�n County, PR
+72121;Sabana Grande;county;;Sabana Grande County, PR
+72129;San Lorenzo;county;;San Lorenzo County, PR
+72133;Santa Isabel;county;;Santa Isabel County, PR
+72145;Vega Baja;county;;Vega Baja County, PR
+72149;Villalba;county;;Villalba County, PR
+02240;Southeast Fairbanks;county;;Southeast Fairbanks County, AK
+02282;Yakutat;county;;Yakutat County, AK
+04001;Apache;county;;Apache County, AZ
+04005;Coconino;county;;Coconino County, AZ
+04007;Gila;county;;Gila County, AZ
+04011;Greenlee;county;;Greenlee County, AZ
+04013;Maricopa;county;;Maricopa County, AZ
+04017;Navajo;county;;Navajo County, AZ
+05101;Newton;county;;Newton County, AR
+05103;Ouachita;county;;Ouachita County, AR
+05105;Perry;county;;Perry County, AR
+05107;Phillips;county;;Phillips County, AR
+05113;Polk;county;;Polk County, AR
+05115;Pope;county;;Pope County, AR
+05117;Prairie;county;;Prairie County, AR
+05119;Pulaski;county;;Pulaski County, AR
+05121;Randolph;county;;Randolph County, AR
+05125;Saline;county;;Saline County, AR
+05127;Scott;county;;Scott County, AR
+05131;Sebastian;county;;Sebastian County, AR
+05133;Sevier;county;;Sevier County, AR
+05137;Stone;county;;Stone County, AR
+08051;Gunnison;county;;Gunnison County, CO
+08055;Huerfano;county;;Huerfano County, CO
+08057;Jackson;county;;Jackson County, CO
+08059;Jefferson;county;;Jefferson County, CO
+08063;Kit Carson;county;;Kit Carson County, CO
+08065;Lake;county;;Lake County, CO
+08067;La Plata;county;;La Plata County, CO
+08069;Larimer;county;;Larimer County, CO
+08071;Las Animas;county;;Las Animas County, CO
+08075;Logan;county;;Logan County, CO
+08077;Mesa;county;;Mesa County, CO
+08081;Moffat;county;;Moffat County, CO
+05039;Dallas;county;;Dallas County, AR
+05041;Desha;county;;Desha County, AR
+05045;Faulkner;county;;Faulkner County, AR
+05047;Franklin;county;;Franklin County, AR
+05049;Fulton;county;;Fulton County, AR
+05053;Grant;county;;Grant County, AR
+05055;Greene;county;;Greene County, AR
+05057;Hempstead;county;;Hempstead County, AR
+05061;Howard;county;;Howard County, AR
+05063;Independence;county;;Independence County, AR
+05065;Izard;county;;Izard County, AR
+05069;Jefferson;county;;Jefferson County, AR
+05071;Johnson;county;;Johnson County, AR
+05073;Lafayette;county;;Lafayette County, AR
+05075;Lawrence;county;;Lawrence County, AR
+05077;Lee;county;;Lee County, AR
+05083;Logan;county;;Logan County, AR
+05085;Lonoke;county;;Lonoke County, AR
+05089;Marion;county;;Marion County, AR
+05091;Miller;county;;Miller County, AR
+05093;Mississippi;county;;Mississippi County, AR
+05095;Monroe;county;;Monroe County, AR
+05099;Nevada;county;;Nevada County, AR
+09001;Fairfield;county;;Fairfield County, CT
+09003;Hartford;county;;Hartford County, CT
+09005;Litchfield;county;;Litchfield County, CT
+09007;Middlesex;county;;Middlesex County, CT
+09009;New Haven;county;;New Haven County, CT
+09011;New London;county;;New London County, CT
+10001;Kent;county;;Kent County, DE
+10003;New Castle;county;;New Castle County, DE
+10005;Sussex;county;;Sussex County, DE
+11001;District of Columbia;county;;District of Columbia County, DC
+12001;Alachua;county;;Alachua County, FL
+12003;Baker;county;;Baker County, FL
+12007;Bradford;county;;Bradford County, FL
+12009;Brevard;county;;Brevard County, FL
+12011;Broward;county;;Broward County, FL
+12015;Charlotte;county;;Charlotte County, FL
+12017;Citrus;county;;Citrus County, FL
+12021;Collier;county;;Collier County, FL
+08083;Montezuma;county;;Montezuma County, CO
+08087;Morgan;county;;Morgan County, CO
+08089;Otero;county;;Otero County, CO
+08091;Ouray;county;;Ouray County, CO
+08093;Park;county;;Park County, CO
+08097;Pitkin;county;;Pitkin County, CO
+08099;Prowers;county;;Prowers County, CO
+08103;Rio Blanco;county;;Rio Blanco County, CO
+08107;Routt;county;;Routt County, CO
+08109;Saguache;county;;Saguache County, CO
+08111;San Juan;county;;San Juan County, CO
+08113;San Miguel;county;;San Miguel County, CO
+08117;Summit;county;;Summit County, CO
+08119;Teller;county;;Teller County, CO
+08123;Weld;county;;Weld County, CO
+08125;Yuma;county;;Yuma County, CO
+12086;Miami-Dade;county;;Miami-Dade County, FL
+12089;Nassau;county;;Nassau County, FL
+12091;Okaloosa;county;;Okaloosa County, FL
+12093;Okeechobee;county;;Okeechobee County, FL
+12095;Orange;county;;Orange County, FL
+12097;Osceola;county;;Osceola County, FL
+12101;Pasco;county;;Pasco County, FL
+12103;Pinellas;county;;Pinellas County, FL
+12105;Polk;county;;Polk County, FL
+12109;St. Johns;county;;St. Johns County, FL
+12111;St. Lucie;county;;St. Lucie County, FL
+12113;Santa Rosa;county;;Santa Rosa County, FL
+12115;Sarasota;county;;Sarasota County, FL
+12117;Seminole;county;;Seminole County, FL
+12119;Sumter;county;;Sumter County, FL
+12121;Suwannee;county;;Suwannee County, FL
+12125;Union;county;;Union County, FL
+12127;Volusia;county;;Volusia County, FL
+12129;Wakulla;county;;Wakulla County, FL
+12131;Walton;county;;Walton County, FL
+13001;Appling;county;;Appling County, GA
+13003;Atkinson;county;;Atkinson County, GA
+12023;Columbia;county;;Columbia County, FL
+12029;Dixie;county;;Dixie County, FL
+12031;Duval;county;;Duval County, FL
+12035;Flagler;county;;Flagler County, FL
+12037;Franklin;county;;Franklin County, FL
+12039;Gadsden;county;;Gadsden County, FL
+12043;Glades;county;;Glades County, FL
+12045;Gulf;county;;Gulf County, FL
+12047;Hamilton;county;;Hamilton County, FL
+12051;Hendry;county;;Hendry County, FL
+12053;Hernando;county;;Hernando County, FL
+12057;Hillsborough;county;;Hillsborough County, FL
+12059;Holmes;county;;Holmes County, FL
+12061;Indian River;county;;Indian River County, FL
+12063;Jackson;county;;Jackson County, FL
+12065;Jefferson;county;;Jefferson County, FL
+12069;Lake;county;;Lake County, FL
+12071;Lee;county;;Lee County, FL
+12073;Leon;county;;Leon County, FL
+12075;Levy;county;;Levy County, FL
+12079;Madison;county;;Madison County, FL
+12085;Martin;county;;Martin County, FL
+13069;Coffee;county;;Coffee County, GA
+13073;Columbia;county;;Columbia County, GA
+13077;Coweta;county;;Coweta County, GA
+13079;Crawford;county;;Crawford County, GA
+13083;Dade;county;;Dade County, GA
+13085;Dawson;county;;Dawson County, GA
+13087;Decatur;county;;Decatur County, GA
+13089;DeKalb;county;;DeKalb County, GA
+13091;Dodge;county;;Dodge County, GA
+13095;Dougherty;county;;Dougherty County, GA
+13097;Douglas;county;;Douglas County, GA
+13099;Early;county;;Early County, GA
+13103;Effingham;county;;Effingham County, GA
+13105;Elbert;county;;Elbert County, GA
+13107;Emanuel;county;;Emanuel County, GA
+13111;Fannin;county;;Fannin County, GA
+13113;Fayette;county;;Fayette County, GA
+13115;Floyd;county;;Floyd County, GA
+13117;Forsyth;county;;Forsyth County, GA
+13121;Fulton;county;;Fulton County, GA
+13123;Gilmer;county;;Gilmer County, GA
+05145;White;county;;White County, AR
+05149;Yell;county;;Yell County, AR
+06001;Alameda;county;;Alameda County, CA
+06003;Alpine;county;;Alpine County, CA
+13005;Bacon;county;;Bacon County, GA
+13007;Baker;county;;Baker County, GA
+13011;Banks;county;;Banks County, GA
+13013;Barrow;county;;Barrow County, GA
+13015;Bartow;county;;Bartow County, GA
+13017;Ben Hill;county;;Ben Hill County, GA
+13021;Bibb;county;;Bibb County, GA
+13023;Bleckley;county;;Bleckley County, GA
+13025;Brantley;county;;Brantley County, GA
+13027;Brooks;county;;Brooks County, GA
+13029;Bryan;county;;Bryan County, GA
+13031;Bulloch;county;;Bulloch County, GA
+13033;Burke;county;;Burke County, GA
+13037;Calhoun;county;;Calhoun County, GA
+13039;Camden;county;;Camden County, GA
+13045;Carroll;county;;Carroll County, GA
+13049;Charlton;county;;Charlton County, GA
+13051;Chatham;county;;Chatham County, GA
+13053;Chattahoochee;county;;Chattahoochee County, GA
+13057;Cherokee;county;;Cherokee County, GA
+13061;Clay;county;;Clay County, GA
+13063;Clayton;county;;Clayton County, GA
+13065;Clinch;county;;Clinch County, GA
+13067;Cobb;county;;Cobb County, GA
+06041;Marin;county;;Marin County, CA
+06045;Mendocino;county;;Mendocino County, CA
+06047;Merced;county;;Merced County, CA
+06051;Mono;county;;Mono County, CA
+06053;Monterey;county;;Monterey County, CA
+06055;Napa;county;;Napa County, CA
+06057;Nevada;county;;Nevada County, CA
+06059;Orange;county;;Orange County, CA
+06061;Placer;county;;Placer County, CA
+06063;Plumas;county;;Plumas County, CA
+06065;Riverside;county;;Riverside County, CA
+06069;San Benito;county;;San Benito County, CA
+06073;San Diego;county;;San Diego County, CA
+06075;San Francisco;county;;San Francisco County, CA
+06077;San Joaquin;county;;San Joaquin County, CA
+06005;Amador;county;;Amador County, CA
+06007;Butte;county;;Butte County, CA
+06009;Calaveras;county;;Calaveras County, CA
+06013;Contra Costa;county;;Contra Costa County, CA
+06015;Del Norte;county;;Del Norte County, CA
+06017;El Dorado;county;;El Dorado County, CA
+06019;Fresno;county;;Fresno County, CA
+06023;Humboldt;county;;Humboldt County, CA
+06025;Imperial;county;;Imperial County, CA
+06027;Inyo;county;;Inyo County, CA
+06029;Kern;county;;Kern County, CA
+06033;Lake;county;;Lake County, CA
+06035;Lassen;county;;Lassen County, CA
+06037;Los Angeles;county;;Los Angeles County, CA
+06039;Madera;county;;Madera County, CA
+18123;Perry;county;;Perry County, IN
+18125;Pike;county;;Pike County, IN
+18129;Posey;county;;Posey County, IN
+18135;Randolph;county;;Randolph County, IN
+18137;Ripley;county;;Ripley County, IN
+18141;St. Joseph;county;;St. Joseph County, IN
+18143;Scott;county;;Scott County, IN
+18147;Spencer;county;;Spencer County, IN
+18149;Starke;county;;Starke County, IN
+18151;Steuben;county;;Steuben County, IN
+18153;Sullivan;county;;Sullivan County, IN
+18155;Switzerland;county;;Switzerland County, IN
+18161;Union;county;;Union County, IN
+18163;Vanderburgh;county;;Vanderburgh County, IN
+26003;Alger;county;;Alger County, MI
+26007;Alpena;county;;Alpena County, MI
+26011;Arenac;county;;Arenac County, MI
+26013;Baraga;county;;Baraga County, MI
+26017;Bay;county;;Bay County, MI
+26021;Berrien;county;;Berrien County, MI
+26023;Branch;county;;Branch County, MI
+26027;Cass;county;;Cass County, MI
+26029;Charlevoix;county;;Charlevoix County, MI
+21041;Carroll;county;;Carroll County, KY
+21043;Carter;county;;Carter County, KY
+21047;Christian;county;;Christian County, KY
+21049;Clark;county;;Clark County, KY
+21051;Clay;county;;Clay County, KY
+21055;Crittenden;county;;Crittenden County, KY
+21057;Cumberland;county;;Cumberland County, KY
+21059;Daviess;county;;Daviess County, KY
+21063;Elliott;county;;Elliott County, KY
+21065;Estill;county;;Estill County, KY
+21067;Fayette;county;;Fayette County, KY
+21069;Fleming;county;;Fleming County, KY
+20079;Harvey;county;;Harvey County, KS
+20081;Haskell;county;;Haskell County, KS
+20085;Jackson;county;;Jackson County, KS
+20087;Jefferson;county;;Jefferson County, KS
+20089;Jewell;county;;Jewell County, KS
+20091;Johnson;county;;Johnson County, KS
+20097;Kiowa;county;;Kiowa County, KS
+20099;Labette;county;;Labette County, KS
+20103;Leavenworth;county;;Leavenworth County, KS
+20107;Linn;county;;Linn County, KS
+20111;Lyon;county;;Lyon County, KS
+20113;McPherson;county;;McPherson County, KS
+20115;Marion;county;;Marion County, KS
+20119;Meade;county;;Meade County, KS
+20121;Miami;county;;Miami County, KS
+20125;Montgomery;county;;Montgomery County, KS
+20127;Morris;county;;Morris County, KS
+20129;Morton;county;;Morton County, KS
+20133;Neosho;county;;Neosho County, KS
+20135;Ness;county;;Ness County, KS
+20137;Norton;county;;Norton County, KS
+20141;Osborne;county;;Osborne County, KS
+20145;Pawnee;county;;Pawnee County, KS
+20147;Phillips;county;;Phillips County, KS
+18165;Vermillion;county;;Vermillion County, IN
+26071;Iron;county;;Iron County, MI
+26075;Jackson;county;;Jackson County, MI
+26079;Kalkaska;county;;Kalkaska County, MI
+26081;Kent;county;;Kent County, MI
+26087;Lapeer;county;;Lapeer County, MI
+26089;Leelanau;county;;Leelanau County, MI
+26091;Lenawee;county;;Lenawee County, MI
+26095;Luce;county;;Luce County, MI
+26099;Macomb;county;;Macomb County, MI
+26101;Manistee;county;;Manistee County, MI
+26105;Mason;county;;Mason County, MI
+26113;Missaukee;county;;Missaukee County, MI
+26031;Cheboygan;county;;Cheboygan County, MI
+26033;Chippewa;county;;Chippewa County, MI
+26041;Delta;county;;Delta County, MI
+26043;Dickinson;county;;Dickinson County, MI
+26047;Emmet;county;;Emmet County, MI
+26051;Gladwin;county;;Gladwin County, MI
+21071;Floyd;county;;Floyd County, KY
+21075;Fulton;county;;Fulton County, KY
+21077;Gallatin;county;;Gallatin County, KY
+21079;Garrard;county;;Garrard County, KY
+21085;Grayson;county;;Grayson County, KY
+21087;Green;county;;Green County, KY
+21089;Greenup;county;;Greenup County, KY
+21091;Hancock;county;;Hancock County, KY
+21093;Hardin;county;;Hardin County, KY
+20149;Pottawatomie;county;;Pottawatomie County, KS
+20153;Rawlins;county;;Rawlins County, KS
+20157;Republic;county;;Republic County, KS
+20159;Rice;county;;Rice County, KS
+20161;Riley;county;;Riley County, KS
+20167;Russell;county;;Russell County, KS
+20171;Scott;county;;Scott County, KS
+20173;Sedgwick;county;;Sedgwick County, KS
+20175;Seward;county;;Seward County, KS
+20179;Sheridan;county;;Sheridan County, KS
+20181;Sherman;county;;Sherman County, KS
+20183;Smith;county;;Smith County, KS
+20187;Stanton;county;;Stanton County, KS
+20191;Sumner;county;;Sumner County, KS
+20195;Trego;county;;Trego County, KS
+20197;Wabaunsee;county;;Wabaunsee County, KS
+20201;Washington;county;;Washington County, KS
+20203;Wichita;county;;Wichita County, KS
+20207;Woodson;county;;Woodson County, KS
+26063;Huron;county;;Huron County, MI
+26115;Monroe;county;;Monroe County, MI
+26119;Montmorency;county;;Montmorency County, MI
+26121;Muskegon;county;;Muskegon County, MI
+26125;Oakland;county;;Oakland County, MI
+26127;Oceana;county;;Oceana County, MI
+26131;Ontonagon;county;;Ontonagon County, MI
+26139;Ottawa;county;;Ottawa County, MI
+26141;Presque Isle;county;;Presque Isle County, MI
+26145;Saginaw;county;;Saginaw County, MI
+26147;St. Clair;county;;St. Clair County, MI
+26053;Gogebic;county;;Gogebic County, MI
+26055;Grand Traverse;county;;Grand Traverse County, MI
+30047;Lake;county;;Lake County, MT
+30049;Lewis and Clark;county;;Lewis and Clark County, MT
+30053;Lincoln;county;;Lincoln County, MT
+30055;McCone;county;;McCone County, MT
+30057;Madison;county;;Madison County, MT
+21095;Harlan;county;;Harlan County, KY
+21099;Hart;county;;Hart County, KY
+21101;Henderson;county;;Henderson County, KY
+21105;Hickman;county;;Hickman County, KY
+21107;Hopkins;county;;Hopkins County, KY
+21109;Jackson;county;;Jackson County, KY
+21111;Jefferson;county;;Jefferson County, KY
+21115;Johnson;county;;Johnson County, KY
+21117;Kenton;county;;Kenton County, KY
+21119;Knott;county;;Knott County, KY
+21121;Knox;county;;Knox County, KY
+06079;San Luis Obispo;county;;San Luis Obispo County, CA
+06081;San Mateo;county;;San Mateo County, CA
+06085;Santa Clara;county;;Santa Clara County, CA
+06087;Santa Cruz;county;;Santa Cruz County, CA
+06091;Sierra;county;;Sierra County, CA
+06093;Siskiyou;county;;Siskiyou County, CA
+06095;Solano;county;;Solano County, CA
+06097;Sonoma;county;;Sonoma County, CA
+06099;Stanislaus;county;;Stanislaus County, CA
+26149;St. Joseph;county;;St. Joseph County, MI
+26153;Schoolcraft;county;;Schoolcraft County, MI
+26157;Tuscola;county;;Tuscola County, MI
+26159;Van Buren;county;;Van Buren County, MI
+26163;Wayne;county;;Wayne County, MI
+26165;Wexford;county;;Wexford County, MI
+27001;Aitkin;county;;Aitkin County, MN
+27005;Becker;county;;Becker County, MN
+27007;Beltrami;county;;Beltrami County, MN
+27011;Big Stone;county;;Big Stone County, MN
+27013;Blue Earth;county;;Blue Earth County, MN
+27015;Brown;county;;Brown County, MN
+27019;Carver;county;;Carver County, MN
+27021;Cass;county;;Cass County, MN
+27023;Chippewa;county;;Chippewa County, MN
+27025;Chisago;county;;Chisago County, MN
+27033;Cottonwood;county;;Cottonwood County, MN
+18169;Wabash;county;;Wabash County, IN
+18171;Warren;county;;Warren County, IN
+18173;Warrick;county;;Warrick County, IN
+18175;Washington;county;;Washington County, IN
+18181;White;county;;White County, IN
+18183;Whitley;county;;Whitley County, IN
+19003;Adams;county;;Adams County, IA
+19005;Allamakee;county;;Allamakee County, IA
+19009;Audubon;county;;Audubon County, IA
+19011;Benton;county;;Benton County, IA
+19015;Boone;county;;Boone County, IA
+19019;Buchanan;county;;Buchanan County, IA
+19023;Butler;county;;Butler County, IA
+19025;Calhoun;county;;Calhoun County, IA
+19029;Cass;county;;Cass County, IA
+19033;Cerro Gordo;county;;Cerro Gordo County, IA
+19037;Chickasaw;county;;Chickasaw County, IA
+13129;Gordon;county;;Gordon County, GA
+13133;Greene;county;;Greene County, GA
+13135;Gwinnett;county;;Gwinnett County, GA
+13137;Habersham;county;;Habersham County, GA
+13139;Hall;county;;Hall County, GA
+21123;Larue;county;;Larue County, KY
+21125;Laurel;county;;Laurel County, KY
+21127;Lawrence;county;;Lawrence County, KY
+21131;Leslie;county;;Leslie County, KY
+21133;Letcher;county;;Letcher County, KY
+21135;Lewis;county;;Lewis County, KY
+21139;Livingston;county;;Livingston County, KY
+21143;Lyon;county;;Lyon County, KY
+21145;McCracken;county;;McCracken County, KY
+06103;Tehama;county;;Tehama County, CA
+06105;Trinity;county;;Trinity County, CA
+06109;Tuolumne;county;;Tuolumne County, CA
+06111;Ventura;county;;Ventura County, CA
+06113;Yolo;county;;Yolo County, CA
+06115;Yuba;county;;Yuba County, CA
+08005;Arapahoe;county;;Arapahoe County, CO
+08007;Archuleta;county;;Archuleta County, CO
+08009;Baca;county;;Baca County, CO
+08015;Chaffee;county;;Chaffee County, CO
+08017;Cheyenne;county;;Cheyenne County, CO
+27035;Crow Wing;county;;Crow Wing County, MN
+27037;Dakota;county;;Dakota County, MN
+27043;Faribault;county;;Faribault County, MN
+27045;Fillmore;county;;Fillmore County, MN
+27047;Freeborn;county;;Freeborn County, MN
+27049;Goodhue;county;;Goodhue County, MN
+27053;Hennepin;county;;Hennepin County, MN
+27055;Houston;county;;Houston County, MN
+27061;Itasca;county;;Itasca County, MN
+27063;Jackson;county;;Jackson County, MN
+27067;Kandiyohi;county;;Kandiyohi County, MN
+27069;Kittson;county;;Kittson County, MN
+13141;Hancock;county;;Hancock County, GA
+13145;Harris;county;;Harris County, GA
+13147;Hart;county;;Hart County, GA
+13151;Henry;county;;Henry County, GA
+13153;Houston;county;;Houston County, GA
+13157;Jackson;county;;Jackson County, GA
+13159;Jasper;county;;Jasper County, GA
+13161;Jeff Davis;county;;Jeff Davis County, GA
+13165;Jenkins;county;;Jenkins County, GA
+13167;Johnson;county;;Johnson County, GA
+13169;Jones;county;;Jones County, GA
+13173;Lanier;county;;Lanier County, GA
+13175;Laurens;county;;Laurens County, GA
+13179;Liberty;county;;Liberty County, GA
+21147;McCreary;county;;McCreary County, KY
+21151;Madison;county;;Madison County, KY
+21153;Magoffin;county;;Magoffin County, KY
+21155;Marion;county;;Marion County, KY
+21159;Martin;county;;Martin County, KY
+21161;Mason;county;;Mason County, KY
+21163;Meade;county;;Meade County, KY
+21167;Mercer;county;;Mercer County, KY
+21171;Monroe;county;;Monroe County, KY
+21173;Montgomery;county;;Montgomery County, KY
+21175;Morgan;county;;Morgan County, KY
+21177;Muhlenberg;county;;Muhlenberg County, KY
+06101;Sutter;county;;Sutter County, CA
+08019;Clear Creek;county;;Clear Creek County, CO
+08021;Conejos;county;;Conejos County, CO
+08023;Costilla;county;;Costilla County, CO
+08027;Custer;county;;Custer County, CO
+08029;Delta;county;;Delta County, CO
+08031;Denver;county;;Denver County, CO
+08033;Dolores;county;;Dolores County, CO
+08037;Eagle;county;;Eagle County, CO
+08041;El Paso;county;;El Paso County, CO
+08043;Fremont;county;;Fremont County, CO
+08045;Garfield;county;;Garfield County, CO
+08049;Grand;county;;Grand County, CO
+27071;Koochiching;county;;Koochiching County, MN
+27075;Lake;county;;Lake County, MN
+27077;Lake of the Woods;county;;Lake of the Woods County, MN
+27087;Mahnomen;county;;Mahnomen County, MN
+27089;Marshall;county;;Marshall County, MN
+27093;Meeker;county;;Meeker County, MN
+27095;Mille Lacs;county;;Mille Lacs County, MN
+27097;Morrison;county;;Morrison County, MN
+27101;Murray;county;;Murray County, MN
+13181;Lincoln;county;;Lincoln County, GA
+13183;Long;county;;Long County, GA
+13185;Lowndes;county;;Lowndes County, GA
+13187;Lumpkin;county;;Lumpkin County, GA
+13191;McIntosh;county;;McIntosh County, GA
+13193;Macon;county;;Macon County, GA
+13195;Madison;county;;Madison County, GA
+13197;Marion;county;;Marion County, GA
+13201;Miller;county;;Miller County, GA
+13205;Mitchell;county;;Mitchell County, GA
+13207;Monroe;county;;Monroe County, GA
+13209;Montgomery;county;;Montgomery County, GA
+13211;Morgan;county;;Morgan County, GA
+13213;Murray;county;;Murray County, GA
+21181;Nicholas;county;;Nicholas County, KY
+21183;Ohio;county;;Ohio County, KY
+21185;Oldham;county;;Oldham County, KY
+21187;Owen;county;;Owen County, KY
+21191;Pendleton;county;;Pendleton County, KY
+21193;Perry;county;;Perry County, KY
+21197;Powell;county;;Powell County, KY
+21199;Pulaski;county;;Pulaski County, KY
+21203;Rockcastle;county;;Rockcastle County, KY
+21205;Rowan;county;;Rowan County, KY
+21207;Russell;county;;Russell County, KY
+21209;Scott;county;;Scott County, KY
+21213;Simpson;county;;Simpson County, KY
+21217;Taylor;county;;Taylor County, KY
+01005;Barbour;county;;Barbour County, AL
+01009;Blount;county;;Blount County, AL
+01013;Butler;county;;Butler County, AL
+01015;Calhoun;county;;Calhoun County, AL
+01017;Chambers;county;;Chambers County, AL
+01019;Cherokee;county;;Cherokee County, AL
+01023;Choctaw;county;;Choctaw County, AL
+01025;Clarke;county;;Clarke County, AL
+01027;Clay;county;;Clay County, AL
+01029;Cleburne;county;;Cleburne County, AL
+01033;Colbert;county;;Colbert County, AL
+01035;Conecuh;county;;Conecuh County, AL
+27103;Nicollet;county;;Nicollet County, MN
+27105;Nobles;county;;Nobles County, MN
+27107;Norman;county;;Norman County, MN
+27113;Pennington;county;;Pennington County, MN
+27115;Pine;county;;Pine County, MN
+27117;Pipestone;county;;Pipestone County, MN
+27123;Ramsey;county;;Ramsey County, MN
+27127;Redwood;county;;Redwood County, MN
+27129;Renville;county;;Renville County, MN
+27133;Rock;county;;Rock County, MN
+27135;Roseau;county;;Roseau County, MN
+27139;Scott;county;;Scott County, MN
+27141;Sherburne;county;;Sherburne County, MN
+13215;Muscogee;county;;Muscogee County, GA
+13219;Oconee;county;;Oconee County, GA
+13221;Oglethorpe;county;;Oglethorpe County, GA
+13225;Peach;county;;Peach County, GA
+13229;Pierce;county;;Pierce County, GA
+13231;Pike;county;;Pike County, GA
+13235;Pulaski;county;;Pulaski County, GA
+13237;Putnam;county;;Putnam County, GA
+13239;Quitman;county;;Quitman County, GA
+13241;Rabun;county;;Rabun County, GA
+13245;Richmond;county;;Richmond County, GA
+13247;Rockdale;county;;Rockdale County, GA
+21219;Todd;county;;Todd County, KY
+21221;Trigg;county;;Trigg County, KY
+21223;Trimble;county;;Trimble County, KY
+21225;Union;county;;Union County, KY
+21229;Washington;county;;Washington County, KY
+21231;Wayne;county;;Wayne County, KY
+21233;Webster;county;;Webster County, KY
+21235;Whitley;county;;Whitley County, KY
+21239;Woodford;county;;Woodford County, KY
+22001;Acadia;county;;Acadia County, LA
+22005;Ascension;county;;Ascension County, LA
+22007;Assumption;county;;Assumption County, LA
+22009;Avoyelles;county;;Avoyelles County, LA
+22011;Beauregard;county;;Beauregard County, LA
+01039;Covington;county;;Covington County, AL
+01041;Crenshaw;county;;Crenshaw County, AL
+01043;Cullman;county;;Cullman County, AL
+01047;Dallas;county;;Dallas County, AL
+01049;DeKalb;county;;DeKalb County, AL
+01051;Elmore;county;;Elmore County, AL
+01053;Escambia;county;;Escambia County, AL
+01057;Fayette;county;;Fayette County, AL
+01061;Geneva;county;;Geneva County, AL
+01063;Greene;county;;Greene County, AL
+01065;Hale;county;;Hale County, AL
+01067;Henry;county;;Henry County, AL
+01069;Houston;county;;Houston County, AL
+27145;Stearns;county;;Stearns County, MN
+27149;Stevens;county;;Stevens County, MN
+27151;Swift;county;;Swift County, MN
+27155;Traverse;county;;Traverse County, MN
+27157;Wabasha;county;;Wabasha County, MN
+27161;Waseca;county;;Waseca County, MN
+27163;Washington;county;;Washington County, MN
+27169;Winona;county;;Winona County, MN
+27171;Wright;county;;Wright County, MN
+27173;Yellow Medicine;county;;Yellow Medicine County, MN
+28001;Adams;county;;Adams County, MS
+13251;Screven;county;;Screven County, GA
+13253;Seminole;county;;Seminole County, GA
+13255;Spalding;county;;Spalding County, GA
+13257;Stephens;county;;Stephens County, GA
+13259;Stewart;county;;Stewart County, GA
+13263;Talbot;county;;Talbot County, GA
+13265;Taliaferro;county;;Taliaferro County, GA
+13267;Tattnall;county;;Tattnall County, GA
+13269;Taylor;county;;Taylor County, GA
+13271;Telfair;county;;Telfair County, GA
+13275;Thomas;county;;Thomas County, GA
+22015;Bossier;county;;Bossier County, LA
+22017;Caddo;county;;Caddo County, LA
+22019;Calcasieu;county;;Calcasieu County, LA
+22021;Caldwell;county;;Caldwell County, LA
+22023;Cameron;county;;Cameron County, LA
+22025;Catahoula;county;;Catahoula County, LA
+22029;Concordia;county;;Concordia County, LA
+22031;De Soto;county;;De Soto County, LA
+22033;East Baton Rouge;county;;East Baton Rouge County, LA
+01073;Jefferson;county;;Jefferson County, AL
+01077;Lauderdale;county;;Lauderdale County, AL
+01079;Lawrence;county;;Lawrence County, AL
+01081;Lee;county;;Lee County, AL
+01085;Lowndes;county;;Lowndes County, AL
+01089;Madison;county;;Madison County, AL
+01091;Marengo;county;;Marengo County, AL
+01095;Marshall;county;;Marshall County, AL
+01097;Mobile;county;;Mobile County, AL
+01099;Monroe;county;;Monroe County, AL
+01101;Montgomery;county;;Montgomery County, AL
+28005;Amite;county;;Amite County, MS
+28009;Benton;county;;Benton County, MS
+28011;Bolivar;county;;Bolivar County, MS
+28015;Carroll;county;;Carroll County, MS
+28017;Chickasaw;county;;Chickasaw County, MS
+28019;Choctaw;county;;Choctaw County, MS
+28021;Claiborne;county;;Claiborne County, MS
+28025;Clay;county;;Clay County, MS
+28027;Coahoma;county;;Coahoma County, MS
+28029;Copiah;county;;Copiah County, MS
+28033;DeSoto;county;;DeSoto County, MS
+28039;George;county;;George County, MS
+28041;Greene;county;;Greene County, MS
+13279;Toombs;county;;Toombs County, GA
+13281;Towns;county;;Towns County, GA
+13283;Treutlen;county;;Treutlen County, GA
+13287;Turner;county;;Turner County, GA
+13289;Twiggs;county;;Twiggs County, GA
+13291;Union;county;;Union County, GA
+13293;Upson;county;;Upson County, GA
+13297;Walton;county;;Walton County, GA
+13299;Ware;county;;Ware County, GA
+13301;Warren;county;;Warren County, GA
+13303;Washington;county;;Washington County, GA
+13305;Wayne;county;;Wayne County, GA
+13309;Wheeler;county;;Wheeler County, GA
+13313;Whitfield;county;;Whitfield County, GA
+22035;East Carroll;county;;East Carroll County, LA
+22039;Evangeline;county;;Evangeline County, LA
+22041;Franklin;county;;Franklin County, LA
+22043;Grant;county;;Grant County, LA
+22045;Iberia;county;;Iberia County, LA
+22049;Jackson;county;;Jackson County, LA
+22051;Jefferson;county;;Jefferson County, LA
+22053;Jefferson Davis;county;;Jefferson Davis County, LA
+22055;Lafayette;county;;Lafayette County, LA
+01071;Jackson;county;;Jackson County, AL
+01105;Perry;county;;Perry County, AL
+01107;Pickens;county;;Pickens County, AL
+01109;Pike;county;;Pike County, AL
+01113;Russell;county;;Russell County, AL
+01115;St. Clair;county;;St. Clair County, AL
+01117;Shelby;county;;Shelby County, AL
+01121;Talladega;county;;Talladega County, AL
+01123;Tallapoosa;county;;Tallapoosa County, AL
+01125;Tuscaloosa;county;;Tuscaloosa County, AL
+01127;Walker;county;;Walker County, AL
+01129;Washington;county;;Washington County, AL
+01133;Winston;county;;Winston County, AL
+28045;Hancock;county;;Hancock County, MS
+28047;Harrison;county;;Harrison County, MS
+28049;Hinds;county;;Hinds County, MS
+28051;Holmes;county;;Holmes County, MS
+28053;Humphreys;county;;Humphreys County, MS
+28055;Issaquena;county;;Issaquena County, MS
+28059;Jackson;county;;Jackson County, MS
+28063;Jefferson;county;;Jefferson County, MS
+28069;Kemper;county;;Kemper County, MS
+28071;Lafayette;county;;Lafayette County, MS
+13317;Wilkes;county;;Wilkes County, GA
+13319;Wilkinson;county;;Wilkinson County, GA
+13321;Worth;county;;Worth County, GA
+15001;Hawaii;county;;Hawaii County, HI
+15003;Honolulu;county;;Honolulu County, HI
+15007;Kauai;county;;Kauai County, HI
+16001;Ada;county;;Ada County, ID
+16003;Adams;county;;Adams County, ID
+22057;Lafourche;county;;Lafourche County, LA
+22061;Lincoln;county;;Lincoln County, LA
+22063;Livingston;county;;Livingston County, LA
+22065;Madison;county;;Madison County, LA
+22067;Morehouse;county;;Morehouse County, LA
+22069;Natchitoches;county;;Natchitoches County, LA
+22071;Orleans;county;;Orleans County, LA
+02016;Aleutians West;county;;Aleutians West County, AK
+02020;Anchorage;county;;Anchorage County, AK
+02060;Bristol Bay;county;;Bristol Bay County, AK
+02068;Denali;county;;Denali County, AK
+02070;Dillingham;county;;Dillingham County, AK
+02090;Fairbanks North Star;county;;Fairbanks North Star County, AK
+02100;Haines;county;;Haines County, AK
+02110;Juneau;county;;Juneau County, AK
+22117;Washington;county;;Washington County, LA
+22123;West Carroll;county;;West Carroll County, LA
+22125;West Feliciana;county;;West Feliciana County, LA
+23001;Androscoggin;county;;Androscoggin County, ME
+23007;Franklin;county;;Franklin County, ME
+23011;Kennebec;county;;Kennebec County, ME
+23013;Knox;county;;Knox County, ME
+23015;Lincoln;county;;Lincoln County, ME
+16005;Bannock;county;;Bannock County, ID
+16007;Bear Lake;county;;Bear Lake County, ID
+16011;Bingham;county;;Bingham County, ID
+16013;Blaine;county;;Blaine County, ID
+16015;Boise;county;;Boise County, ID
+16017;Bonner;county;;Bonner County, ID
+16021;Boundary;county;;Boundary County, ID
+16023;Butte;county;;Butte County, ID
+16027;Canyon;county;;Canyon County, ID
+16029;Caribou;county;;Caribou County, ID
+16031;Cassia;county;;Cassia County, ID
+16033;Clark;county;;Clark County, ID
+22077;Pointe Coupee;county;;Pointe Coupee County, LA
+22079;Rapides;county;;Rapides County, LA
+22081;Red River;county;;Red River County, LA
+22083;Richland;county;;Richland County, LA
+22085;Sabine;county;;Sabine County, LA
+22091;St. Helena;county;;St. Helena County, LA
+22093;St. James;county;;St. James County, LA
+22095;St. John the Baptist;county;;St. John the Baptist County, LA
+22097;St. Landry;county;;St. Landry County, LA
+22099;St. Martin;county;;St. Martin County, LA
+22101;St. Mary;county;;St. Mary County, LA
+02170;Matanuska-Susitna;county;;Matanuska-Susitna County, AK
+02198;Prince of Wales-Hyder;county;;Prince of Wales-Hyder County, AK
+02230;Skagway;county;;Skagway County, AK
+17071;Henderson;county;;Henderson County, IL
+17075;Iroquois;county;;Iroquois County, IL
+17077;Jackson;county;;Jackson County, IL
+17083;Jersey;county;;Jersey County, IL
+17085;Jo Daviess;county;;Jo Daviess County, IL
+17089;Kane;county;;Kane County, IL
+17091;Kankakee;county;;Kankakee County, IL
+17095;Knox;county;;Knox County, IL
+17097;Lake;county;;Lake County, IL
+17101;Lawrence;county;;Lawrence County, IL
+17105;Livingston;county;;Livingston County, IL
+17107;Logan;county;;Logan County, IL
+17111;McHenry;county;;McHenry County, IL
+23017;Oxford;county;;Oxford County, ME
+23019;Penobscot;county;;Penobscot County, ME
+23021;Piscataquis;county;;Piscataquis County, ME
+23025;Somerset;county;;Somerset County, ME
+23027;Waldo;county;;Waldo County, ME
+23031;York;county;;York County, ME
+16035;Clearwater;county;;Clearwater County, ID
+16037;Custer;county;;Custer County, ID
+16039;Elmore;county;;Elmore County, ID
+16043;Fremont;county;;Fremont County, ID
+16047;Gooding;county;;Gooding County, ID
+16051;Jefferson;county;;Jefferson County, ID
+16053;Jerome;county;;Jerome County, ID
+16055;Kootenai;county;;Kootenai County, ID
+16061;Lewis;county;;Lewis County, ID
+16063;Lincoln;county;;Lincoln County, ID
+16065;Madison;county;;Madison County, ID
+22103;St. Tammany;county;;St. Tammany County, LA
+22107;Tensas;county;;Tensas County, LA
+22109;Terrebonne;county;;Terrebonne County, LA
+22113;Vermilion;county;;Vermilion County, LA
+22115;Vernon;county;;Vernon County, LA
+19045;Clinton;county;;Clinton County, IA
+19049;Dallas;county;;Dallas County, IA
+19051;Davis;county;;Davis County, IA
+17117;Macoupin;county;;Macoupin County, IL
+17119;Madison;county;;Madison County, IL
+17123;Marshall;county;;Marshall County, IL
+17125;Mason;county;;Mason County, IL
+17127;Massac;county;;Massac County, IL
+17131;Mercer;county;;Mercer County, IL
+17133;Monroe;county;;Monroe County, IL
+17137;Morgan;county;;Morgan County, IL
+17139;Moultrie;county;;Moultrie County, IL
+17143;Peoria;county;;Peoria County, IL
+17145;Perry;county;;Perry County, IL
+17149;Pike;county;;Pike County, IL
+17151;Pope;county;;Pope County, IL
+17153;Pulaski;county;;Pulaski County, IL
+17157;Randolph;county;;Randolph County, IL
+24005;Baltimore;county;;Baltimore County, MD
+24009;Calvert;county;;Calvert County, MD
+24011;Caroline;county;;Caroline County, MD
+24013;Carroll;county;;Carroll County, MD
+24015;Cecil;county;;Cecil County, MD
+24021;Frederick;county;;Frederick County, MD
+16069;Nez Perce;county;;Nez Perce County, ID
+16071;Oneida;county;;Oneida County, ID
+16073;Owyhee;county;;Owyhee County, ID
+16075;Payette;county;;Payette County, ID
+16077;Power;county;;Power County, ID
+16079;Shoshone;county;;Shoshone County, ID
+16083;Twin Falls;county;;Twin Falls County, ID
+16085;Valley;county;;Valley County, ID
+19053;Decatur;county;;Decatur County, IA
+19057;Des Moines;county;;Des Moines County, IA
+19059;Dickinson;county;;Dickinson County, IA
+19061;Dubuque;county;;Dubuque County, IA
+19067;Floyd;county;;Floyd County, IA
+19071;Fremont;county;;Fremont County, IA
+19073;Greene;county;;Greene County, IA
+19077;Guthrie;county;;Guthrie County, IA
+19081;Hancock;county;;Hancock County, IA
+19083;Hardin;county;;Hardin County, IA
+19085;Harrison;county;;Harrison County, IA
+19089;Howard;county;;Howard County, IA
+19093;Ida;county;;Ida County, IA
+19097;Jackson;county;;Jackson County, IA
+19099;Jasper;county;;Jasper County, IA
+19103;Johnson;county;;Johnson County, IA
+19107;Keokuk;county;;Keokuk County, IA
+19109;Kossuth;county;;Kossuth County, IA
+17113;McLean;county;;McLean County, IL
+17161;Rock Island;county;;Rock Island County, IL
+17163;St. Clair;county;;St. Clair County, IL
+17167;Sangamon;county;;Sangamon County, IL
+17169;Schuyler;county;;Schuyler County, IL
+17173;Shelby;county;;Shelby County, IL
+17177;Stephenson;county;;Stephenson County, IL
+17179;Tazewell;county;;Tazewell County, IL
+17181;Union;county;;Union County, IL
+17183;Vermilion;county;;Vermilion County, IL
+17185;Wabash;county;;Wabash County, IL
+17191;Wayne;county;;Wayne County, IL
+17193;White;county;;White County, IL
+17195;Whiteside;county;;Whiteside County, IL
+17199;Williamson;county;;Williamson County, IL
+17201;Winnebago;county;;Winnebago County, IL
+17203;Woodford;county;;Woodford County, IL
+24023;Garrett;county;;Garrett County, MD
+24025;Harford;county;;Harford County, MD
+24031;Montgomery;county;;Montgomery County, MD
+24033;Prince George's;county;;Prince George's County, MD
+24045;Wicomico;county;;Wicomico County, MD
+16087;Washington;county;;Washington County, ID
+17001;Adams;county;;Adams County, IL
+17003;Alexander;county;;Alexander County, IL
+17011;Bureau;county;;Bureau County, IL
+17013;Calhoun;county;;Calhoun County, IL
+17015;Carroll;county;;Carroll County, IL
+17017;Cass;county;;Cass County, IL
+17021;Christian;county;;Christian County, IL
+17023;Clark;county;;Clark County, IL
+17027;Clinton;county;;Clinton County, IL
+19111;Lee;county;;Lee County, IA
+19115;Louisa;county;;Louisa County, IA
+19119;Lyon;county;;Lyon County, IA
+19125;Marion;county;;Marion County, IA
+19127;Marshall;county;;Marshall County, IA
+19129;Mills;county;;Mills County, IA
+19133;Monona;county;;Monona County, IA
+19137;Montgomery;county;;Montgomery County, IA
+19139;Muscatine;county;;Muscatine County, IA
+19143;Osceola;county;;Osceola County, IA
+19145;Page;county;;Page County, IA
+19149;Plymouth;county;;Plymouth County, IA
+18003;Allen;county;;Allen County, IN
+18005;Bartholomew;county;;Bartholomew County, IN
+18009;Blackford;county;;Blackford County, IN
+18013;Brown;county;;Brown County, IN
+18015;Carroll;county;;Carroll County, IN
+18019;Clark;county;;Clark County, IN
+18021;Clay;county;;Clay County, IN
+18025;Crawford;county;;Crawford County, IN
+18027;Daviess;county;;Daviess County, IN
+18029;Dearborn;county;;Dearborn County, IN
+18033;DeKalb;county;;DeKalb County, IN
+18037;Dubois;county;;Dubois County, IN
+18039;Elkhart;county;;Elkhart County, IN
+18043;Floyd;county;;Floyd County, IN
+18051;Gibson;county;;Gibson County, IN
+18059;Hancock;county;;Hancock County, IN
+18061;Harrison;county;;Harrison County, IN
+24047;Worcester;county;;Worcester County, MD
+24510;Baltimore;county;;Baltimore, MD
+25001;Barnstable;county;;Barnstable County, MA
+25005;Bristol;county;;Bristol County, MA
+25007;Dukes;county;;Dukes County, MA
+25009;Essex;county;;Essex County, MA
+25011;Franklin;county;;Franklin County, MA
+17031;Cook;county;;Cook County, IL
+17033;Crawford;county;;Crawford County, IL
+17039;De Witt;county;;De Witt County, IL
+17043;DuPage;county;;DuPage County, IL
+17045;Edgar;county;;Edgar County, IL
+17047;Edwards;county;;Edwards County, IL
+17051;Fayette;county;;Fayette County, IL
+17055;Franklin;county;;Franklin County, IL
+17057;Fulton;county;;Fulton County, IL
+17059;Gallatin;county;;Gallatin County, IL
+17061;Greene;county;;Greene County, IL
+17067;Hancock;county;;Hancock County, IL
+21003;Allen;county;;Allen County, KY
+21007;Ballard;county;;Ballard County, KY
+21009;Barren;county;;Barren County, KY
+19153;Polk;county;;Polk County, IA
+19155;Pottawattamie;county;;Pottawattamie County, IA
+19161;Sac;county;;Sac County, IA
+19163;Scott;county;;Scott County, IA
+19167;Sioux;county;;Sioux County, IA
+19171;Tama;county;;Tama County, IA
+19173;Taylor;county;;Taylor County, IA
+19177;Van Buren;county;;Van Buren County, IA
+19181;Warren;county;;Warren County, IA
+19185;Wayne;county;;Wayne County, IA
+19187;Webster;county;;Webster County, IA
+19189;Winnebago;county;;Winnebago County, IA
+19191;Winneshiek;county;;Winneshiek County, IA
+19193;Woodbury;county;;Woodbury County, IA
+20003;Anderson;county;;Anderson County, KS
+20005;Atchison;county;;Atchison County, KS
+18063;Hendricks;county;;Hendricks County, IN
+18067;Howard;county;;Howard County, IN
+18071;Jackson;county;;Jackson County, IN
+18073;Jasper;county;;Jasper County, IN
+18077;Jefferson;county;;Jefferson County, IN
+18079;Jennings;county;;Jennings County, IN
+18083;Knox;county;;Knox County, IN
+18087;LaGrange;county;;LaGrange County, IN
+18089;Lake;county;;Lake County, IN
+18091;LaPorte;county;;LaPorte County, IN
+18097;Marion;county;;Marion County, IN
+18099;Marshall;county;;Marshall County, IN
+18103;Miami;county;;Miami County, IN
+18105;Monroe;county;;Monroe County, IN
+18109;Morgan;county;;Morgan County, IN
+18111;Newton;county;;Newton County, IN
+18115;Ohio;county;;Ohio County, IN
+18119;Owen;county;;Owen County, IN
+18121;Parke;county;;Parke County, IN
+25013;Hampden;county;;Hampden County, MA
+25015;Hampshire;county;;Hampshire County, MA
+25017;Middlesex;county;;Middlesex County, MA
+25021;Norfolk;county;;Norfolk County, MA
+25023;Plymouth;county;;Plymouth County, MA
+25025;Suffolk;county;;Suffolk County, MA
+25027;Worcester;county;;Worcester County, MA
+26001;Alcona;county;;Alcona County, MI
+21011;Bath;county;;Bath County, KY
+21013;Bell;county;;Bell County, KY
+21015;Boone;county;;Boone County, KY
+21017;Bourbon;county;;Bourbon County, KY
+21019;Boyd;county;;Boyd County, KY
+21023;Bracken;county;;Bracken County, KY
+21025;Breathitt;county;;Breathitt County, KY
+21027;Breckinridge;county;;Breckinridge County, KY
+21031;Butler;county;;Butler County, KY
+21033;Caldwell;county;;Caldwell County, KY
+21037;Campbell;county;;Campbell County, KY
+21039;Carlisle;county;;Carlisle County, KY
+20007;Barber;county;;Barber County, KS
+20011;Bourbon;county;;Bourbon County, KS
+20015;Butler;county;;Butler County, KS
+20019;Chautauqua;county;;Chautauqua County, KS
+20021;Cherokee;county;;Cherokee County, KS
+20023;Cheyenne;county;;Cheyenne County, KS
+20035;Cowley;county;;Cowley County, KS
+20037;Crawford;county;;Crawford County, KS
+20039;Decatur;county;;Decatur County, KS
+20043;Doniphan;county;;Doniphan County, KS
+20045;Douglas;county;;Douglas County, KS
+20051;Ellis;county;;Ellis County, KS
+20053;Ellsworth;county;;Ellsworth County, KS
+20057;Ford;county;;Ford County, KS
+20059;Franklin;county;;Franklin County, KS
+20061;Geary;county;;Geary County, KS
+20065;Graham;county;;Graham County, KS
+20069;Gray;county;;Gray County, KS
+20071;Greeley;county;;Greeley County, KS
+20075;Hamilton;county;;Hamilton County, KS
+29055;Crawford;county;;Crawford County, MO
+29059;Dallas;county;;Dallas County, MO
+29061;Daviess;county;;Daviess County, MO
+29065;Dent;county;;Dent County, MO
+29069;Dunklin;county;;Dunklin County, MO
+29071;Franklin;county;;Franklin County, MO
+29073;Gasconade;county;;Gasconade County, MO
+29077;Greene;county;;Greene County, MO
+29081;Harrison;county;;Harrison County, MO
+29083;Henry;county;;Henry County, MO
+29087;Holt;county;;Holt County, MO
+29089;Howard;county;;Howard County, MO
+29091;Howell;county;;Howell County, MO
+29097;Jasper;county;;Jasper County, MO
+29099;Jefferson;county;;Jefferson County, MO
+45019;Charleston;county;;Charleston County, SC
+45021;Cherokee;county;;Cherokee County, SC
+45025;Chesterfield;county;;Chesterfield County, SC
+45027;Clarendon;county;;Clarendon County, SC
+45029;Colleton;county;;Colleton County, SC
+45033;Dillon;county;;Dillon County, SC
+45035;Dorchester;county;;Dorchester County, SC
+45037;Edgefield;county;;Edgefield County, SC
+45041;Florence;county;;Florence County, SC
+45043;Georgetown;county;;Georgetown County, SC
+48181;Grayson;county;;Grayson County, TX
+35023;Hidalgo;county;;Hidalgo County, NM
+35025;Lea;county;;Lea County, NM
+35028;Los Alamos;county;;Los Alamos County, NM
+35029;Luna;county;;Luna County, NM
+35031;McKinley;county;;McKinley County, NM
+35033;Mora;county;;Mora County, NM
+35037;Quay;county;;Quay County, NM
+35039;Rio Arriba;county;;Rio Arriba County, NM
+35041;Roosevelt;county;;Roosevelt County, NM
+35043;Sandoval;county;;Sandoval County, NM
+35045;San Juan;county;;San Juan County, NM
+35049;Santa Fe;county;;Santa Fe County, NM
+35051;Sierra;county;;Sierra County, NM
+35053;Socorro;county;;Socorro County, NM
+35055;Taos;county;;Taos County, NM
+35059;Union;county;;Union County, NM
+47011;Bradley;county;;Bradley County, TN
+47013;Campbell;county;;Campbell County, TN
+47019;Carter;county;;Carter County, TN
+47021;Cheatham;county;;Cheatham County, TN
+47023;Chester;county;;Chester County, TN
+47025;Claiborne;county;;Claiborne County, TN
+47027;Clay;county;;Clay County, TN
+47029;Cocke;county;;Cocke County, TN
+47033;Crockett;county;;Crockett County, TN
+47035;Cumberland;county;;Cumberland County, TN
+47037;Davidson;county;;Davidson County, TN
+47041;DeKalb;county;;DeKalb County, TN
+47043;Dickson;county;;Dickson County, TN
+29105;Laclede;county;;Laclede County, MO
+47085;Humphreys;county;;Humphreys County, TN
+47087;Jackson;county;;Jackson County, TN
+47089;Jefferson;county;;Jefferson County, TN
+47091;Johnson;county;;Johnson County, TN
+47093;Knox;county;;Knox County, TN
+47095;Lake;county;;Lake County, TN
+47097;Lauderdale;county;;Lauderdale County, TN
+47101;Lewis;county;;Lewis County, TN
+47103;Lincoln;county;;Lincoln County, TN
+48185;Grimes;county;;Grimes County, TX
+48187;Guadalupe;county;;Guadalupe County, TX
+48191;Hall;county;;Hall County, TX
+48195;Hansford;county;;Hansford County, TX
+48197;Hardeman;county;;Hardeman County, TX
+48199;Hardin;county;;Hardin County, TX
+48201;Harris;county;;Harris County, TX
+48203;Harrison;county;;Harrison County, TX
+48211;Hemphill;county;;Hemphill County, TX
+48213;Henderson;county;;Henderson County, TX
+48215;Hidalgo;county;;Hidalgo County, TX
+48217;Hill;county;;Hill County, TX
+36001;Albany;county;;Albany County, NY
+36003;Allegany;county;;Allegany County, NY
+36005;Bronx;county;;Bronx County, NY
+36007;Broome;county;;Broome County, NY
+36009;Cattaraugus;county;;Cattaraugus County, NY
+36013;Chautauqua;county;;Chautauqua County, NY
+36015;Chemung;county;;Chemung County, NY
+36017;Chenango;county;;Chenango County, NY
+36019;Clinton;county;;Clinton County, NY
+36025;Delaware;county;;Delaware County, NY
+36027;Dutchess;county;;Dutchess County, NY
+36029;Erie;county;;Erie County, NY
+47045;Dyer;county;;Dyer County, TN
+47049;Fentress;county;;Fentress County, TN
+47051;Franklin;county;;Franklin County, TN
+47055;Giles;county;;Giles County, TN
+47057;Grainger;county;;Grainger County, TN
+47059;Greene;county;;Greene County, TN
+47063;Hamblen;county;;Hamblen County, TN
+47065;Hamilton;county;;Hamilton County, TN
+47067;Hancock;county;;Hancock County, TN
+47071;Hardin;county;;Hardin County, TN
+47073;Hawkins;county;;Hawkins County, TN
+47075;Haywood;county;;Haywood County, TN
+47079;Henry;county;;Henry County, TN
+47081;Hickman;county;;Hickman County, TN
+47105;Loudon;county;;Loudon County, TN
+47109;McNairy;county;;McNairy County, TN
+47111;Macon;county;;Macon County, TN
+47115;Marion;county;;Marion County, TN
+47117;Marshall;county;;Marshall County, TN
+47119;Maury;county;;Maury County, TN
+47121;Meigs;county;;Meigs County, TN
+47123;Monroe;county;;Monroe County, TN
+47127;Moore;county;;Moore County, TN
+47129;Morgan;county;;Morgan County, TN
+47131;Obion;county;;Obion County, TN
+47135;Perry;county;;Perry County, TN
+47137;Pickett;county;;Pickett County, TN
+47139;Polk;county;;Polk County, TN
+48223;Hopkins;county;;Hopkins County, TX
+48225;Houston;county;;Houston County, TX
+48229;Hudspeth;county;;Hudspeth County, TX
+48235;Irion;county;;Irion County, TX
+48239;Jackson;county;;Jackson County, TX
+48241;Jasper;county;;Jasper County, TX
+48245;Jefferson;county;;Jefferson County, TX
+48247;Jim Hogg;county;;Jim Hogg County, TX
+48249;Jim Wells;county;;Jim Wells County, TX
+48255;Karnes;county;;Karnes County, TX
+48257;Kaufman;county;;Kaufman County, TX
+48259;Kendall;county;;Kendall County, TX
+48261;Kenedy;county;;Kenedy County, TX
+48267;Kimble;county;;Kimble County, TX
+36031;Essex;county;;Essex County, NY
+36035;Fulton;county;;Fulton County, NY
+36037;Genesee;county;;Genesee County, NY
+36039;Greene;county;;Greene County, NY
+36043;Herkimer;county;;Herkimer County, NY
+36045;Jefferson;county;;Jefferson County, NY
+36047;Kings;county;;Kings County, NY
+36051;Livingston;county;;Livingston County, NY
+36053;Madison;county;;Madison County, NY
+36055;Monroe;county;;Monroe County, NY
+36059;Nassau;county;;Nassau County, NY
+36061;New York;county;;New York County, NY
+30059;Meagher;county;;Meagher County, MT
+30061;Mineral;county;;Mineral County, MT
+30063;Missoula;county;;Missoula County, MT
+30067;Park;county;;Park County, MT
+30069;Petroleum;county;;Petroleum County, MT
+30071;Phillips;county;;Phillips County, MT
+30073;Pondera;county;;Pondera County, MT
+30077;Powell;county;;Powell County, MT
+30079;Prairie;county;;Prairie County, MT
+47141;Putnam;county;;Putnam County, TN
+47143;Rhea;county;;Rhea County, TN
+47147;Robertson;county;;Robertson County, TN
+47149;Rutherford;county;;Rutherford County, TN
+47151;Scott;county;;Scott County, TN
+47155;Sevier;county;;Sevier County, TN
+47157;Shelby;county;;Shelby County, TN
+47159;Smith;county;;Smith County, TN
+47161;Stewart;county;;Stewart County, TN
+47163;Sullivan;county;;Sullivan County, TN
+47165;Sumner;county;;Sumner County, TN
+29107;Lafayette;county;;Lafayette County, MO
+29111;Lewis;county;;Lewis County, MO
+29113;Lincoln;county;;Lincoln County, MO
+29117;Livingston;county;;Livingston County, MO
+29121;Macon;county;;Macon County, MO
+29123;Madison;county;;Madison County, MO
+29127;Marion;county;;Marion County, MO
+29129;Mercer;county;;Mercer County, MO
+29131;Miller;county;;Miller County, MO
+29133;Mississippi;county;;Mississippi County, MO
+29137;Monroe;county;;Monroe County, MO
+29141;Morgan;county;;Morgan County, MO
+29143;New Madrid;county;;New Madrid County, MO
+29145;Newton;county;;Newton County, MO
+29147;Nodaway;county;;Nodaway County, MO
+36063;Niagara;county;;Niagara County, NY
+36067;Onondaga;county;;Onondaga County, NY
+36069;Ontario;county;;Ontario County, NY
+36071;Orange;county;;Orange County, NY
+36075;Oswego;county;;Oswego County, NY
+36077;Otsego;county;;Otsego County, NY
+36081;Queens;county;;Queens County, NY
+36083;Rensselaer;county;;Rensselaer County, NY
+36085;Richmond;county;;Richmond County, NY
+36089;St. Lawrence;county;;St. Lawrence County, NY
+36091;Saratoga;county;;Saratoga County, NY
+36093;Schenectady;county;;Schenectady County, NY
+36097;Schuyler;county;;Schuyler County, NY
+36099;Seneca;county;;Seneca County, NY
+30083;Richland;county;;Richland County, MT
+30085;Roosevelt;county;;Roosevelt County, MT
+30087;Rosebud;county;;Rosebud County, MT
+30089;Sanders;county;;Sanders County, MT
+30093;Silver Bow;county;;Silver Bow County, MT
+30095;Stillwater;county;;Stillwater County, MT
+30097;Sweet Grass;county;;Sweet Grass County, MT
+30099;Teton;county;;Teton County, MT
+30103;Treasure;county;;Treasure County, MT
+30105;Valley;county;;Valley County, MT
+30107;Wheatland;county;;Wheatland County, MT
+47167;Tipton;county;;Tipton County, TN
+47171;Unicoi;county;;Unicoi County, TN
+47175;Van Buren;county;;Van Buren County, TN
+47177;Warren;county;;Warren County, TN
+47181;Wayne;county;;Wayne County, TN
+40061;Haskell;county;;Haskell County, OK
+40065;Jackson;county;;Jackson County, OK
+40067;Jefferson;county;;Jefferson County, OK
+40071;Kay;county;;Kay County, OK
+29151;Osage;county;;Osage County, MO
+29153;Ozark;county;;Ozark County, MO
+29155;Pemiscot;county;;Pemiscot County, MO
+29157;Perry;county;;Perry County, MO
+29163;Pike;county;;Pike County, MO
+29165;Platte;county;;Platte County, MO
+29169;Pulaski;county;;Pulaski County, MO
+29171;Putnam;county;;Putnam County, MO
+29173;Ralls;county;;Ralls County, MO
+29177;Ray;county;;Ray County, MO
+29179;Reynolds;county;;Reynolds County, MO
+29181;Ripley;county;;Ripley County, MO
+29183;St. Charles;county;;St. Charles County, MO
+36101;Steuben;county;;Steuben County, NY
+36103;Suffolk;county;;Suffolk County, NY
+36105;Sullivan;county;;Sullivan County, NY
+36109;Tompkins;county;;Tompkins County, NY
+36111;Ulster;county;;Ulster County, NY
+36113;Warren;county;;Warren County, NY
+36115;Washington;county;;Washington County, NY
+36119;Westchester;county;;Westchester County, NY
+36121;Wyoming;county;;Wyoming County, NY
+30081;Ravalli;county;;Ravalli County, MT
+30109;Wibaux;county;;Wibaux County, MT
+30111;Yellowstone;county;;Yellowstone County, MT
+31007;Banner;county;;Banner County, NE
+31011;Boone;county;;Boone County, NE
+31013;Box Butte;county;;Box Butte County, NE
+31015;Boyd;county;;Boyd County, NE
+31019;Buffalo;county;;Buffalo County, NE
+31021;Burt;county;;Burt County, NE
+31023;Butler;county;;Butler County, NE
+31025;Cass;county;;Cass County, NE
+40075;Kiowa;county;;Kiowa County, OK
+40079;Le Flore;county;;Le Flore County, OK
+40081;Lincoln;county;;Lincoln County, OK
+40083;Logan;county;;Logan County, OK
+40085;Love;county;;Love County, OK
+40087;McClain;county;;McClain County, OK
+40089;McCurtain;county;;McCurtain County, OK
+40093;Major;county;;Major County, OK
+40095;Marshall;county;;Marshall County, OK
+40099;Murray;county;;Murray County, OK
+40101;Muskogee;county;;Muskogee County, OK
+29186;Ste. Genevieve;county;;Ste. Genevieve County, MO
+29189;St. Louis;county;;St. Louis County, MO
+29195;Saline;county;;Saline County, MO
+29199;Scotland;county;;Scotland County, MO
+29201;Scott;county;;Scott County, MO
+29205;Shelby;county;;Shelby County, MO
+29207;Stoddard;county;;Stoddard County, MO
+29209;Stone;county;;Stone County, MO
+29213;Taney;county;;Taney County, MO
+29217;Vernon;county;;Vernon County, MO
+29219;Warren;county;;Warren County, MO
+29223;Wayne;county;;Wayne County, MO
+29225;Webster;county;;Webster County, MO
+29227;Worth;county;;Worth County, MO
+29510;St. Louis;county;;St. Louis, MO
+30003;Big Horn;county;;Big Horn County, MT
+36123;Yates;county;;Yates County, NY
+37007;Anson;county;;Anson County, NC
+37009;Ashe;county;;Ashe County, NC
+37011;Avery;county;;Avery County, NC
+37013;Beaufort;county;;Beaufort County, NC
+37015;Bertie;county;;Bertie County, NC
+37019;Brunswick;county;;Brunswick County, NC
+37021;Buncombe;county;;Buncombe County, NC
+37023;Burke;county;;Burke County, NC
+37027;Caldwell;county;;Caldwell County, NC
+37029;Camden;county;;Camden County, NC
+13059;Clarke;county;;Clarke County, GA
+17073;Henry;county;;Henry County, IL
+18057;Hamilton;county;;Hamilton County, IN
+21211;Shelby;county;;Shelby County, KY
+31027;Cedar;county;;Cedar County, NE
+31031;Cherry;county;;Cherry County, NE
+31033;Cheyenne;county;;Cheyenne County, NE
+31041;Custer;county;;Custer County, NE
+31043;Dakota;county;;Dakota County, NE
+31045;Dawes;county;;Dawes County, NE
+31049;Deuel;county;;Deuel County, NE
+31051;Dixon;county;;Dixon County, NE
+31053;Dodge;county;;Dodge County, NE
+31055;Douglas;county;;Douglas County, NE
+31059;Fillmore;county;;Fillmore County, NE
+31061;Franklin;county;;Franklin County, NE
+31065;Furnas;county;;Furnas County, NE
+31067;Gage;county;;Gage County, NE
+31071;Garfield;county;;Garfield County, NE
+31075;Grant;county;;Grant County, NE
+31077;Greeley;county;;Greeley County, NE
+31081;Hamilton;county;;Hamilton County, NE
+31083;Harlan;county;;Harlan County, NE
+40105;Nowata;county;;Nowata County, OK
+40107;Okfuskee;county;;Okfuskee County, OK
+40111;Okmulgee;county;;Okmulgee County, OK
+40113;Osage;county;;Osage County, OK
+40115;Ottawa;county;;Ottawa County, OK
+40117;Pawnee;county;;Pawnee County, OK
+40121;Pittsburg;county;;Pittsburg County, OK
+40123;Pontotoc;county;;Pontotoc County, OK
+40127;Pushmataha;county;;Pushmataha County, OK
+40129;Roger Mills;county;;Roger Mills County, OK
+40133;Seminole;county;;Seminole County, OK
+40135;Sequoyah;county;;Sequoyah County, OK
+40139;Texas;county;;Texas County, OK
+40141;Tillman;county;;Tillman County, OK
+40143;Tulsa;county;;Tulsa County, OK
+30005;Blaine;county;;Blaine County, MT
+30007;Broadwater;county;;Broadwater County, MT
+30009;Carbon;county;;Carbon County, MT
+30013;Cascade;county;;Cascade County, MT
+30015;Chouteau;county;;Chouteau County, MT
+30017;Custer;county;;Custer County, MT
+30019;Daniels;county;;Daniels County, MT
+30021;Dawson;county;;Dawson County, MT
+30023;Deer Lodge;county;;Deer Lodge County, MT
+30027;Fergus;county;;Fergus County, MT
+30029;Flathead;county;;Flathead County, MT
+37031;Carteret;county;;Carteret County, NC
+37035;Catawba;county;;Catawba County, NC
+37037;Chatham;county;;Chatham County, NC
+37039;Cherokee;county;;Cherokee County, NC
+37041;Chowan;county;;Chowan County, NC
+37045;Cleveland;county;;Cleveland County, NC
+37047;Columbus;county;;Columbus County, NC
+37049;Craven;county;;Craven County, NC
+37051;Cumberland;county;;Cumberland County, NC
+37053;Currituck;county;;Currituck County, NC
+31087;Hitchcock;county;;Hitchcock County, NE
+31089;Holt;county;;Holt County, NE
+31095;Jefferson;county;;Jefferson County, NE
+31099;Kearney;county;;Kearney County, NE
+31101;Keith;county;;Keith County, NE
+31103;Keya Paha;county;;Keya Paha County, NE
+31105;Kimball;county;;Kimball County, NE
+31107;Knox;county;;Knox County, NE
+31113;Logan;county;;Logan County, NE
+31125;Nance;county;;Nance County, NE
+31127;Nemaha;county;;Nemaha County, NE
+31131;Otoe;county;;Otoe County, NE
+31133;Pawnee;county;;Pawnee County, NE
+31137;Phelps;county;;Phelps County, NE
+31141;Platte;county;;Platte County, NE
+31143;Polk;county;;Polk County, NE
+31145;Red Willow;county;;Red Willow County, NE
+40145;Wagoner;county;;Wagoner County, OK
+40149;Washita;county;;Washita County, OK
+40151;Woods;county;;Woods County, OK
+41001;Baker;county;;Baker County, OR
+41003;Benton;county;;Benton County, OR
+41005;Clackamas;county;;Clackamas County, OR
+41007;Clatsop;county;;Clatsop County, OR
+41009;Columbia;county;;Columbia County, OR
+41011;Coos;county;;Coos County, OR
+41015;Curry;county;;Curry County, OR
+30031;Gallatin;county;;Gallatin County, MT
+30033;Garfield;county;;Garfield County, MT
+30037;Golden Valley;county;;Golden Valley County, MT
+30039;Granite;county;;Granite County, MT
+30041;Hill;county;;Hill County, MT
+30043;Jefferson;county;;Jefferson County, MT
+37185;Warren;county;;Warren County, NC
+37187;Washington;county;;Washington County, NC
+37189;Watauga;county;;Watauga County, NC
+37193;Wilkes;county;;Wilkes County, NC
+37195;Wilson;county;;Wilson County, NC
+37197;Yadkin;county;;Yadkin County, NC
+37059;Davie;county;;Davie County, NC
+37061;Duplin;county;;Duplin County, NC
+37065;Edgecombe;county;;Edgecombe County, NC
+37067;Forsyth;county;;Forsyth County, NC
+37069;Franklin;county;;Franklin County, NC
+37071;Gaston;county;;Gaston County, NC
+37075;Graham;county;;Graham County, NC
+37077;Granville;county;;Granville County, NC
+37079;Greene;county;;Greene County, NC
+37083;Halifax;county;;Halifax County, NC
+37085;Harnett;county;;Harnett County, NC
+37087;Haywood;county;;Haywood County, NC
+37089;Henderson;county;;Henderson County, NC
+31153;Sarpy;county;;Sarpy County, NE
+31155;Saunders;county;;Saunders County, NE
+31159;Seward;county;;Seward County, NE
+31161;Sheridan;county;;Sheridan County, NE
+31165;Sioux;county;;Sioux County, NE
+31169;Thayer;county;;Thayer County, NE
+31173;Thurston;county;;Thurston County, NE
+31175;Valley;county;;Valley County, NE
+31177;Washington;county;;Washington County, NE
+31181;Webster;county;;Webster County, NE
+32001;Churchill;county;;Churchill County, NV
+32005;Douglas;county;;Douglas County, NV
+32007;Elko;county;;Elko County, NV
+32009;Esmeralda;county;;Esmeralda County, NV
+32011;Eureka;county;;Eureka County, NV
+41017;Deschutes;county;;Deschutes County, OR
+41019;Douglas;county;;Douglas County, OR
+41021;Gilliam;county;;Gilliam County, OR
+41023;Grant;county;;Grant County, OR
+41027;Hood River;county;;Hood River County, OR
+41029;Jackson;county;;Jackson County, OR
+41033;Josephine;county;;Josephine County, OR
+41035;Klamath;county;;Klamath County, OR
+41037;Lake;county;;Lake County, OR
+41039;Lane;county;;Lane County, OR
+41041;Lincoln;county;;Lincoln County, OR
+37199;Yancey;county;;Yancey County, NC
+38001;Adams;county;;Adams County, ND
+38005;Benson;county;;Benson County, ND
+38009;Bottineau;county;;Bottineau County, ND
+38011;Bowman;county;;Bowman County, ND
+38015;Burleigh;county;;Burleigh County, ND
+38021;Dickey;county;;Dickey County, ND
+38023;Divide;county;;Divide County, ND
+38025;Dunn;county;;Dunn County, ND
+38029;Emmons;county;;Emmons County, ND
+38033;Golden Valley;county;;Golden Valley County, ND
+38035;Grand Forks;county;;Grand Forks County, ND
+37093;Hoke;county;;Hoke County, NC
+37095;Hyde;county;;Hyde County, NC
+37097;Iredell;county;;Iredell County, NC
+37099;Jackson;county;;Jackson County, NC
+37103;Jones;county;;Jones County, NC
+37105;Lee;county;;Lee County, NC
+37107;Lenoir;county;;Lenoir County, NC
+37111;McDowell;county;;McDowell County, NC
+37113;Macon;county;;Macon County, NC
+37115;Madison;county;;Madison County, NC
+37117;Martin;county;;Martin County, NC
+31147;Richardson;county;;Richardson County, NE
+32013;Humboldt;county;;Humboldt County, NV
+32017;Lincoln;county;;Lincoln County, NV
+32019;Lyon;county;;Lyon County, NV
+32021;Mineral;county;;Mineral County, NV
+32023;Nye;county;;Nye County, NV
+32029;Storey;county;;Storey County, NV
+32031;Washoe;county;;Washoe County, NV
+32033;White Pine;county;;White Pine County, NV
+33001;Belknap;county;;Belknap County, NH
+33003;Carroll;county;;Carroll County, NH
+41043;Linn;county;;Linn County, OR
+41045;Malheur;county;;Malheur County, OR
+41047;Marion;county;;Marion County, OR
+41051;Multnomah;county;;Multnomah County, OR
+41055;Sherman;county;;Sherman County, OR
+41057;Tillamook;county;;Tillamook County, OR
+41059;Umatilla;county;;Umatilla County, OR
+41061;Union;county;;Union County, OR
+38037;Grant;county;;Grant County, ND
+38043;Kidder;county;;Kidder County, ND
+38047;Logan;county;;Logan County, ND
+38049;McHenry;county;;McHenry County, ND
+38051;McIntosh;county;;McIntosh County, ND
+38053;McKenzie;county;;McKenzie County, ND
+38055;McLean;county;;McLean County, ND
+38059;Morton;county;;Morton County, ND
+38061;Mountrail;county;;Mountrail County, ND
+38065;Oliver;county;;Oliver County, ND
+38067;Pembina;county;;Pembina County, ND
+38071;Ramsey;county;;Ramsey County, ND
+38073;Ransom;county;;Ransom County, ND
+38077;Richland;county;;Richland County, ND
+37119;Mecklenburg;county;;Mecklenburg County, NC
+37121;Mitchell;county;;Mitchell County, NC
+37125;Moore;county;;Moore County, NC
+37129;New Hanover;county;;New Hanover County, NC
+37131;Northampton;county;;Northampton County, NC
+37133;Onslow;county;;Onslow County, NC
+37137;Pamlico;county;;Pamlico County, NC
+37139;Pasquotank;county;;Pasquotank County, NC
+37141;Pender;county;;Pender County, NC
+37143;Perquimans;county;;Perquimans County, NC
+37147;Pitt;county;;Pitt County, NC
+37149;Polk;county;;Polk County, NC
+33005;Cheshire;county;;Cheshire County, NH
+33011;Hillsborough;county;;Hillsborough County, NH
+33015;Rockingham;county;;Rockingham County, NH
+33017;Strafford;county;;Strafford County, NH
+33019;Sullivan;county;;Sullivan County, NH
+34001;Atlantic;county;;Atlantic County, NJ
+34005;Burlington;county;;Burlington County, NJ
+34007;Camden;county;;Camden County, NJ
+34009;Cape May;county;;Cape May County, NJ
+41063;Wallowa;county;;Wallowa County, OR
+41065;Wasco;county;;Wasco County, OR
+41069;Wheeler;county;;Wheeler County, OR
+41071;Yamhill;county;;Yamhill County, OR
+42001;Adams;county;;Adams County, PA
+42003;Allegheny;county;;Allegheny County, PA
+42005;Armstrong;county;;Armstrong County, PA
+42009;Bedford;county;;Bedford County, PA
+42017;Bucks;county;;Bucks County, PA
+42019;Butler;county;;Butler County, PA
+42021;Cambria;county;;Cambria County, PA
+42025;Carbon;county;;Carbon County, PA
+38079;Rolette;county;;Rolette County, ND
+38081;Sargent;county;;Sargent County, ND
+38085;Sioux;county;;Sioux County, ND
+38087;Slope;county;;Slope County, ND
+38091;Steele;county;;Steele County, ND
+38093;Stutsman;county;;Stutsman County, ND
+38099;Walsh;county;;Walsh County, ND
+38101;Ward;county;;Ward County, ND
+38105;Williams;county;;Williams County, ND
+39001;Adams;county;;Adams County, OH
+39005;Ashland;county;;Ashland County, OH
+39007;Ashtabula;county;;Ashtabula County, OH
+37153;Richmond;county;;Richmond County, NC
+37157;Rockingham;county;;Rockingham County, NC
+37159;Rowan;county;;Rowan County, NC
+37161;Rutherford;county;;Rutherford County, NC
+37163;Sampson;county;;Sampson County, NC
+37165;Scotland;county;;Scotland County, NC
+37169;Stokes;county;;Stokes County, NC
+37171;Surry;county;;Surry County, NC
+37173;Swain;county;;Swain County, NC
+37175;Transylvania;county;;Transylvania County, NC
+37177;Tyrrell;county;;Tyrrell County, NC
+34011;Cumberland;county;;Cumberland County, NJ
+34013;Essex;county;;Essex County, NJ
+34015;Gloucester;county;;Gloucester County, NJ
+34019;Hunterdon;county;;Hunterdon County, NJ
+34021;Mercer;county;;Mercer County, NJ
+34023;Middlesex;county;;Middlesex County, NJ
+34025;Monmouth;county;;Monmouth County, NJ
+34027;Morris;county;;Morris County, NJ
+34031;Passaic;county;;Passaic County, NJ
+34033;Salem;county;;Salem County, NJ
+42027;Centre;county;;Centre County, PA
+42029;Chester;county;;Chester County, PA
+42031;Clarion;county;;Clarion County, PA
+42035;Clinton;county;;Clinton County, PA
+42037;Columbia;county;;Columbia County, PA
+42039;Crawford;county;;Crawford County, PA
+42041;Cumberland;county;;Cumberland County, PA
+42043;Dauphin;county;;Dauphin County, PA
+42045;Delaware;county;;Delaware County, PA
+42049;Erie;county;;Erie County, PA
+42051;Fayette;county;;Fayette County, PA
+42055;Franklin;county;;Franklin County, PA
+39009;Athens;county;;Athens County, OH
+39013;Belmont;county;;Belmont County, OH
+39015;Brown;county;;Brown County, OH
+39017;Butler;county;;Butler County, OH
+39021;Champaign;county;;Champaign County, OH
+39025;Clermont;county;;Clermont County, OH
+39027;Clinton;county;;Clinton County, OH
+39029;Columbiana;county;;Columbiana County, OH
+39035;Cuyahoga;county;;Cuyahoga County, OH
+39037;Darke;county;;Darke County, OH
+39039;Defiance;county;;Defiance County, OH
+39043;Erie;county;;Erie County, OH
+39045;Fairfield;county;;Fairfield County, OH
+39049;Franklin;county;;Franklin County, OH
+39051;Fulton;county;;Fulton County, OH
+39057;Greene;county;;Greene County, OH
+45049;Hampton;county;;Hampton County, SC
+45053;Jasper;county;;Jasper County, SC
+45055;Kershaw;county;;Kershaw County, SC
+45057;Lancaster;county;;Lancaster County, SC
+45059;Laurens;county;;Laurens County, SC
+45063;Lexington;county;;Lexington County, SC
+45065;McCormick;county;;McCormick County, SC
+45067;Marion;county;;Marion County, SC
+45069;Marlboro;county;;Marlboro County, SC
+34039;Union;county;;Union County, NJ
+34041;Warren;county;;Warren County, NJ
+35003;Catron;county;;Catron County, NM
+35005;Chaves;county;;Chaves County, NM
+35006;Cibola;county;;Cibola County, NM
+35007;Colfax;county;;Colfax County, NM
+28083;Leflore;county;;Leflore County, MS
+28087;Lowndes;county;;Lowndes County, MS
+28089;Madison;county;;Madison County, MS
+28093;Marshall;county;;Marshall County, MS
+28095;Monroe;county;;Monroe County, MS
+28099;Neshoba;county;;Neshoba County, MS
+28103;Noxubee;county;;Noxubee County, MS
+28105;Oktibbeha;county;;Oktibbeha County, MS
+28109;Pearl River;county;;Pearl River County, MS
+28111;Perry;county;;Perry County, MS
+42057;Fulton;county;;Fulton County, PA
+42059;Greene;county;;Greene County, PA
+42061;Huntingdon;county;;Huntingdon County, PA
+42065;Jefferson;county;;Jefferson County, PA
+42067;Juniata;county;;Juniata County, PA
+42071;Lancaster;county;;Lancaster County, PA
+42073;Lawrence;county;;Lawrence County, PA
+42077;Lehigh;county;;Lehigh County, PA
+42079;Luzerne;county;;Luzerne County, PA
+42081;Lycoming;county;;Lycoming County, PA
+42085;Mercer;county;;Mercer County, PA
+42087;Mifflin;county;;Mifflin County, PA
+42089;Monroe;county;;Monroe County, PA
+42091;Montgomery;county;;Montgomery County, PA
+39061;Hamilton;county;;Hamilton County, OH
+39063;Hancock;county;;Hancock County, OH
+39067;Harrison;county;;Harrison County, OH
+39069;Henry;county;;Henry County, OH
+39071;Highland;county;;Highland County, OH
+39075;Holmes;county;;Holmes County, OH
+39079;Jackson;county;;Jackson County, OH
+39081;Jefferson;county;;Jefferson County, OH
+39083;Knox;county;;Knox County, OH
+39085;Lake;county;;Lake County, OH
+39087;Lawrence;county;;Lawrence County, OH
+39093;Lorain;county;;Lorain County, OH
+39095;Lucas;county;;Lucas County, OH
+39099;Mahoning;county;;Mahoning County, OH
+39101;Marion;county;;Marion County, OH
+45071;Newberry;county;;Newberry County, SC
+45073;Oconee;county;;Oconee County, SC
+45075;Orangeburg;county;;Orangeburg County, SC
+45077;Pickens;county;;Pickens County, SC
+45079;Richland;county;;Richland County, SC
+45083;Spartanburg;county;;Spartanburg County, SC
+45085;Sumter;county;;Sumter County, SC
+45089;Williamsburg;county;;Williamsburg County, SC
+45091;York;county;;York County, SC
+34037;Sussex;county;;Sussex County, NJ
+28113;Pike;county;;Pike County, MS
+28119;Quitman;county;;Quitman County, MS
+28121;Rankin;county;;Rankin County, MS
+28125;Sharkey;county;;Sharkey County, MS
+28127;Simpson;county;;Simpson County, MS
+28131;Stone;county;;Stone County, MS
+28133;Sunflower;county;;Sunflower County, MS
+28135;Tallahatchie;county;;Tallahatchie County, MS
+28137;Tate;county;;Tate County, MS
+28141;Tishomingo;county;;Tishomingo County, MS
+28143;Tunica;county;;Tunica County, MS
+28147;Walthall;county;;Walthall County, MS
+42095;Northampton;county;;Northampton County, PA
+42097;Northumberland;county;;Northumberland County, PA
+42099;Perry;county;;Perry County, PA
+42101;Philadelphia;county;;Philadelphia County, PA
+42103;Pike;county;;Pike County, PA
+42109;Snyder;county;;Snyder County, PA
+42111;Somerset;county;;Somerset County, PA
+42115;Susquehanna;county;;Susquehanna County, PA
+42117;Tioga;county;;Tioga County, PA
+42121;Venango;county;;Venango County, PA
+42123;Warren;county;;Warren County, PA
+39105;Meigs;county;;Meigs County, OH
+39107;Mercer;county;;Mercer County, OH
+39111;Monroe;county;;Monroe County, OH
+39113;Montgomery;county;;Montgomery County, OH
+39115;Morgan;county;;Morgan County, OH
+39119;Muskingum;county;;Muskingum County, OH
+39121;Noble;county;;Noble County, OH
+39123;Ottawa;county;;Ottawa County, OH
+39127;Perry;county;;Perry County, OH
+39129;Pickaway;county;;Pickaway County, OH
+39133;Portage;county;;Portage County, OH
+39135;Preble;county;;Preble County, OH
+39139;Richland;county;;Richland County, OH
+39141;Ross;county;;Ross County, OH
+39145;Scioto;county;;Scioto County, OH
+39149;Shelby;county;;Shelby County, OH
+39151;Stark;county;;Stark County, OH
+46007;Bennett;county;;Bennett County, SD
+46009;Bon Homme;county;;Bon Homme County, SD
+46011;Brookings;county;;Brookings County, SD
+46015;Brule;county;;Brule County, SD
+46019;Butte;county;;Butte County, SD
+46021;Campbell;county;;Campbell County, SD
+46023;Charles Mix;county;;Charles Mix County, SD
+46027;Clay;county;;Clay County, SD
+46031;Corson;county;;Corson County, SD
+46033;Custer;county;;Custer County, SD
+46039;Deuel;county;;Deuel County, SD
+46041;Dewey;county;;Dewey County, SD
+46047;Fall River;county;;Fall River County, SD
+46049;Faulk;county;;Faulk County, SD
+46051;Grant;county;;Grant County, SD
+28151;Washington;county;;Washington County, MS
+28155;Webster;county;;Webster County, MS
+28157;Wilkinson;county;;Wilkinson County, MS
+28161;Yalobusha;county;;Yalobusha County, MS
+28163;Yazoo;county;;Yazoo County, MS
+29003;Andrew;county;;Andrew County, MO
+29005;Atchison;county;;Atchison County, MO
+29009;Barry;county;;Barry County, MO
+29011;Barton;county;;Barton County, MO
+29013;Bates;county;;Bates County, MO
+29017;Bollinger;county;;Bollinger County, MO
+42125;Washington;county;;Washington County, PA
+42127;Wayne;county;;Wayne County, PA
+42129;Westmoreland;county;;Westmoreland County, PA
+42133;York;county;;York County, PA
+44001;Bristol;county;;Bristol County, RI
+44003;Kent;county;;Kent County, RI
+44005;Newport;county;;Newport County, RI
+44007;Providence;county;;Providence County, RI
+39153;Summit;county;;Summit County, OH
+39155;Trumbull;county;;Trumbull County, OH
+39161;Van Wert;county;;Van Wert County, OH
+39163;Vinton;county;;Vinton County, OH
+39167;Washington;county;;Washington County, OH
+39171;Williams;county;;Williams County, OH
+39173;Wood;county;;Wood County, OH
+40001;Adair;county;;Adair County, OK
+40003;Alfalfa;county;;Alfalfa County, OK
+40007;Beaver;county;;Beaver County, OK
+40009;Beckham;county;;Beckham County, OK
+40013;Bryan;county;;Bryan County, OK
+40015;Caddo;county;;Caddo County, OK
+40017;Canadian;county;;Canadian County, OK
+46053;Gregory;county;;Gregory County, SD
+46057;Hamlin;county;;Hamlin County, SD
+46059;Hand;county;;Hand County, SD
+46063;Harding;county;;Harding County, SD
+46065;Hughes;county;;Hughes County, SD
+46069;Hyde;county;;Hyde County, SD
+46071;Jackson;county;;Jackson County, SD
+46075;Jones;county;;Jones County, SD
+46081;Lawrence;county;;Lawrence County, SD
+46083;Lincoln;county;;Lincoln County, SD
+46085;Lyman;county;;Lyman County, SD
+46089;McPherson;county;;McPherson County, SD
+46091;Marshall;county;;Marshall County, SD
+46093;Meade;county;;Meade County, SD
+46095;Mellette;county;;Mellette County, SD
+46101;Moody;county;;Moody County, SD
+29019;Boone;county;;Boone County, MO
+29021;Buchanan;county;;Buchanan County, MO
+29023;Butler;county;;Butler County, MO
+29029;Camden;county;;Camden County, MO
+29031;Cape Girardeau;county;;Cape Girardeau County, MO
+29033;Carroll;county;;Carroll County, MO
+29037;Cass;county;;Cass County, MO
+29039;Cedar;county;;Cedar County, MO
+29041;Chariton;county;;Chariton County, MO
+29045;Clark;county;;Clark County, MO
+29047;Clay;county;;Clay County, MO
+29051;Cole;county;;Cole County, MO
+44009;Washington;county;;Washington County, RI
+45003;Aiken;county;;Aiken County, SC
+45005;Allendale;county;;Allendale County, SC
+45007;Anderson;county;;Anderson County, SC
+45011;Barnwell;county;;Barnwell County, SC
+45013;Beaufort;county;;Beaufort County, SC
+45015;Berkeley;county;;Berkeley County, SC
+45017;Calhoun;county;;Calhoun County, SC
+40021;Cherokee;county;;Cherokee County, OK
+40023;Choctaw;county;;Choctaw County, OK
+40025;Cimarron;county;;Cimarron County, OK
+40029;Coal;county;;Coal County, OK
+40031;Comanche;county;;Comanche County, OK
+40033;Cotton;county;;Cotton County, OK
+40035;Craig;county;;Craig County, OK
+40041;Delaware;county;;Delaware County, OK
+40045;Ellis;county;;Ellis County, OK
+40047;Garfield;county;;Garfield County, OK
+40049;Garvin;county;;Garvin County, OK
+40051;Grady;county;;Grady County, OK
+40055;Greer;county;;Greer County, OK
+35013;Do�a Ana;county;;Do�a Ana County, NM
+35019;Guadalupe;county;;Guadalupe County, NM
+35021;Harding;county;;Harding County, NM
+46103;Pennington;county;;Pennington County, SD
+46105;Perkins;county;;Perkins County, SD
+46109;Roberts;county;;Roberts County, SD
+46113;Shannon;county;;Shannon County, SD
+46115;Spink;county;;Spink County, SD
+46117;Stanley;county;;Stanley County, SD
+46119;Sully;county;;Sully County, SD
+46123;Tripp;county;;Tripp County, SD
+46127;Union;county;;Union County, SD
+46129;Walworth;county;;Walworth County, SD
+46135;Yankton;county;;Yankton County, SD
+47001;Anderson;county;;Anderson County, TN
+47007;Bledsoe;county;;Bledsoe County, TN
+47009;Blount;county;;Blount County, TN
+53065;Stevens;county;;Stevens County, WA
+53067;Thurston;county;;Thurston County, WA
+53071;Walla Walla;county;;Walla Walla County, WA
+53073;Whatcom;county;;Whatcom County, WA
+53075;Whitman;county;;Whitman County, WA
+53077;Yakima;county;;Yakima County, WA
+54003;Berkeley;county;;Berkeley County, WV
+54005;Boone;county;;Boone County, WV
+54007;Braxton;county;;Braxton County, WV
+51009;Amherst;county;;Amherst County, VA
+51011;Appomattox;county;;Appomattox County, VA
+51015;Augusta;county;;Augusta County, VA
+51017;Bath;county;;Bath County, VA
+51019;Bedford;county;;Bedford County, VA
+51021;Bland;county;;Bland County, VA
+51023;Botetourt;county;;Botetourt County, VA
+51027;Buchanan;county;;Buchanan County, VA
+51029;Buckingham;county;;Buckingham County, VA
+51031;Campbell;county;;Campbell County, VA
+54009;Brooke;county;;Brooke County, WV
+51033;Caroline;county;;Caroline County, VA
+51036;Charles City;county;;Charles City County, VA
+51037;Charlotte;county;;Charlotte County, VA
+51041;Chesterfield;county;;Chesterfield County, VA
+51045;Craig;county;;Craig County, VA
+51047;Culpeper;county;;Culpeper County, VA
+51051;Dickenson;county;;Dickenson County, VA
+51053;Dinwiddie;county;;Dinwiddie County, VA
+51057;Essex;county;;Essex County, VA
+51059;Fairfax;county;;Fairfax, VA
+51061;Fauquier;county;;Fauquier County, VA
+51065;Fluvanna;county;;Fluvanna County, VA
+51067;Franklin;county;;Franklin, VA
+51069;Frederick;county;;Frederick County, VA
+51071;Giles;county;;Giles County, VA
+51073;Gloucester;county;;Gloucester County, VA
+51077;Grayson;county;;Grayson County, VA
+51079;Greene;county;;Greene County, VA
+51083;Halifax;county;;Halifax County, VA
+51085;Hanover;county;;Hanover County, VA
+51087;Henrico;county;;Henrico County, VA
+51089;Henry;county;;Henry County, VA
+51091;Highland;county;;Highland County, VA
+48271;Kinney;county;;Kinney County, TX
+48273;Kleberg;county;;Kleberg County, TX
+48275;Knox;county;;Knox County, TX
+48277;Lamar;county;;Lamar County, TX
+48283;La Salle;county;;La Salle County, TX
+48285;Lavaca;county;;Lavaca County, TX
+48287;Lee;county;;Lee County, TX
+48289;Leon;county;;Leon County, TX
+48295;Lipscomb;county;;Lipscomb County, TX
+48297;Live Oak;county;;Live Oak County, TX
+48299;Llano;county;;Llano County, TX
+48301;Loving;county;;Loving County, TX
+48307;McCulloch;county;;McCulloch County, TX
+48313;Madison;county;;Madison County, TX
+48315;Marion;county;;Marion County, TX
+48319;Mason;county;;Mason County, TX
+54011;Cabell;county;;Cabell County, WV
+54015;Clay;county;;Clay County, WV
+54017;Doddridge;county;;Doddridge County, WV
+54019;Fayette;county;;Fayette County, WV
+54023;Grant;county;;Grant County, WV
+54025;Greenbrier;county;;Greenbrier County, WV
+54027;Hampshire;county;;Hampshire County, WV
+54029;Hancock;county;;Hancock County, WV
+54031;Hardy;county;;Hardy County, WV
+51093;Isle of Wight;county;;Isle of Wight County, VA
+51095;James City;county;;James City County, VA
+51099;King George;county;;King George County, VA
+51101;King William;county;;King William County, VA
+51103;Lancaster;county;;Lancaster County, VA
+51105;Lee;county;;Lee County, VA
+51107;Loudoun;county;;Loudoun County, VA
+51111;Lunenburg;county;;Lunenburg County, VA
+51113;Madison;county;;Madison County, VA
+51115;Mathews;county;;Mathews County, VA
+48323;Maverick;county;;Maverick County, TX
+48329;Midland;county;;Midland County, TX
+48331;Milam;county;;Milam County, TX
+48333;Mills;county;;Mills County, TX
+48337;Montague;county;;Montague County, TX
+48339;Montgomery;county;;Montgomery County, TX
+48343;Morris;county;;Morris County, TX
+48347;Nacogdoches;county;;Nacogdoches County, TX
+48349;Navarro;county;;Navarro County, TX
+48351;Newton;county;;Newton County, TX
+48355;Nueces;county;;Nueces County, TX
+54035;Jackson;county;;Jackson County, WV
+54037;Jefferson;county;;Jefferson County, WV
+54039;Kanawha;county;;Kanawha County, WV
+54043;Lincoln;county;;Lincoln County, WV
+54045;Logan;county;;Logan County, WV
+54049;Marion;county;;Marion County, WV
+54051;Marshall;county;;Marshall County, WV
+54053;Mason;county;;Mason County, WV
+54055;Mercer;county;;Mercer County, WV
+51117;Mecklenburg;county;;Mecklenburg County, VA
+51119;Middlesex;county;;Middlesex County, VA
+51125;Nelson;county;;Nelson County, VA
+51131;Northampton;county;;Northampton County, VA
+51133;Northumberland;county;;Northumberland County, VA
+51137;Orange;county;;Orange County, VA
+51139;Page;county;;Page County, VA
+51141;Patrick;county;;Patrick County, VA
+51143;Pittsylvania;county;;Pittsylvania County, VA
+51147;Prince Edward;county;;Prince Edward County, VA
+51149;Prince George;county;;Prince George County, VA
+51153;Prince William;county;;Prince William County, VA
+51155;Pulaski;county;;Pulaski County, VA
+48321;Matagorda;county;;Matagorda County, TX
+48361;Orange;county;;Orange County, TX
+48369;Parmer;county;;Parmer County, TX
+48371;Pecos;county;;Pecos County, TX
+48373;Polk;county;;Polk County, TX
+48377;Presidio;county;;Presidio County, TX
+48383;Reagan;county;;Reagan County, TX
+48385;Real;county;;Real County, TX
+48387;Red River;county;;Red River County, TX
+48389;Reeves;county;;Reeves County, TX
+54057;Mineral;county;;Mineral County, WV
+54063;Monroe;county;;Monroe County, WV
+54065;Morgan;county;;Morgan County, WV
+54069;Ohio;county;;Ohio County, WV
+54071;Pendleton;county;;Pendleton County, WV
+54073;Pleasants;county;;Pleasants County, WV
+51157;Rappahannock;county;;Rappahannock County, VA
+51161;Roanoke;county;;Roanoke, VA
+51163;Rockbridge;county;;Rockbridge County, VA
+51165;Rockingham;county;;Rockingham County, VA
+51167;Russell;county;;Russell County, VA
+51171;Shenandoah;county;;Shenandoah County, VA
+51173;Smyth;county;;Smyth County, VA
+51175;Southampton;county;;Southampton County, VA
+51177;Spotsylvania;county;;Spotsylvania County, VA
+51179;Stafford;county;;Stafford County, VA
+51183;Sussex;county;;Sussex County, VA
+48391;Refugio;county;;Refugio County, TX
+48395;Robertson;county;;Robertson County, TX
+48401;Rusk;county;;Rusk County, TX
+48403;Sabine;county;;Sabine County, TX
+48405;San Augustine;county;;San Augustine County, TX
+48409;San Patricio;county;;San Patricio County, TX
+48411;San Saba;county;;San Saba County, TX
+48415;Scurry;county;;Scurry County, TX
+48419;Shelby;county;;Shelby County, TX
+48421;Sherman;county;;Sherman County, TX
+54075;Pocahontas;county;;Pocahontas County, WV
+54079;Putnam;county;;Putnam County, WV
+54081;Raleigh;county;;Raleigh County, WV
+54083;Randolph;county;;Randolph County, WV
+54085;Ritchie;county;;Ritchie County, WV
+54087;Roane;county;;Roane County, WV
+54091;Taylor;county;;Taylor County, WV
+54093;Tucker;county;;Tucker County, WV
+54095;Tyler;county;;Tyler County, WV
+54097;Upshur;county;;Upshur County, WV
+51185;Tazewell;county;;Tazewell County, VA
+51191;Washington;county;;Washington County, VA
+51193;Westmoreland;county;;Westmoreland County, VA
+51195;Wise;county;;Wise County, VA
+51199;York;county;;York County, VA
+51510;Alexandria;county;;Alexandria, VA
+51520;Bristol;county;;Bristol, VA
+51540;Charlottesville;county;;Charlottesville, VA
+51550;Chesapeake;county;;Chesapeake, VA
+51580;Covington;county;;Covington, VA
+51590;Danville;county;;Danville, VA
+51600;Fairfax;county;;Fairfax County, VA
+51620;Franklin;county;;Franklin County, VA
+51630;Fredericksburg;county;;Fredericksburg, VA
+51650;Hampton;county;;Hampton, VA
+51670;Hopewell;county;;Hopewell, VA
+48423;Smith;county;;Smith County, TX
+48427;Starr;county;;Starr County, TX
+48433;Stonewall;county;;Stonewall County, TX
+48435;Sutton;county;;Sutton County, TX
+48439;Tarrant;county;;Tarrant County, TX
+48443;Terrell;county;;Terrell County, TX
+48447;Throckmorton;county;;Throckmorton County, TX
+48449;Titus;county;;Titus County, TX
+48451;Tom Green;county;;Tom Green County, TX
+48453;Travis;county;;Travis County, TX
+48457;Tyler;county;;Tyler County, TX
+48459;Upshur;county;;Upshur County, TX
+48463;Uvalde;county;;Uvalde County, TX
+48465;Val Verde;county;;Val Verde County, TX
+48469;Victoria;county;;Victoria County, TX
+48471;Walker;county;;Walker County, TX
+54099;Wayne;county;;Wayne County, WV
+54103;Wetzel;county;;Wetzel County, WV
+54107;Wood;county;;Wood County, WV
+54109;Wyoming;county;;Wyoming County, WV
+55003;Ashland;county;;Ashland County, WI
+55007;Bayfield;county;;Bayfield County, WI
+55009;Brown;county;;Brown County, WI
+55011;Buffalo;county;;Buffalo County, WI
+51678;Lexington;county;;Lexington, VA
+51680;Lynchburg;county;;Lynchburg, VA
+51685;Manassas Park;county;;Manassas Park, VA
+51700;Newport News;county;;Newport News, VA
+51710;Norfolk;county;;Norfolk, VA
+51730;Petersburg;county;;Petersburg, VA
+51735;Poquoson;county;;Poquoson, VA
+51750;Radford;county;;Radford, VA
+51760;Richmond;county;;Richmond, VA
+51775;Salem;county;;Salem, VA
+51790;Staunton;county;;Staunton, VA
+51800;Suffolk;county;;Suffolk, VA
+51810;Virginia Beach;county;;Virginia Beach, VA
+51840;Winchester;county;;Winchester, VA
+53001;Adams;county;;Adams County, WA
+53003;Asotin;county;;Asotin County, WA
+53005;Benton;county;;Benton County, WA
+53007;Chelan;county;;Chelan County, WA
+48475;Ward;county;;Ward County, TX
+48477;Washington;county;;Washington County, TX
+48479;Webb;county;;Webb County, TX
+48485;Wichita;county;;Wichita County, TX
+48487;Wilbarger;county;;Wilbarger County, TX
+48489;Willacy;county;;Willacy County, TX
+48493;Wilson;county;;Wilson County, TX
+48495;Winkler;county;;Winkler County, TX
+48499;Wood;county;;Wood County, TX
+48501;Yoakum;county;;Yoakum County, TX
+48505;Zapata;county;;Zapata County, TX
+49001;Beaver;county;;Beaver County, UT
+55013;Burnett;county;;Burnett County, WI
+55019;Clark;county;;Clark County, WI
+55021;Columbia;county;;Columbia County, WI
+55023;Crawford;county;;Crawford County, WI
+55031;Douglas;county;;Douglas County, WI
+55037;Florence;county;;Florence County, WI
+55041;Forest;county;;Forest County, WI
+53009;Clallam;county;;Clallam County, WA
+53011;Clark;county;;Clark County, WA
+53015;Cowlitz;county;;Cowlitz County, WA
+53017;Douglas;county;;Douglas County, WA
+53019;Ferry;county;;Ferry County, WA
+53021;Franklin;county;;Franklin County, WA
+53025;Grant;county;;Grant County, WA
+53027;Grays Harbor;county;;Grays Harbor County, WA
+48473;Waller;county;;Waller County, TX
+49003;Box Elder;county;;Box Elder County, UT
+49005;Cache;county;;Cache County, UT
+49007;Carbon;county;;Carbon County, UT
+49009;Daggett;county;;Daggett County, UT
+49013;Duchesne;county;;Duchesne County, UT
+49015;Emery;county;;Emery County, UT
+49017;Garfield;county;;Garfield County, UT
+49019;Grand;county;;Grand County, UT
+49023;Juab;county;;Juab County, UT
+49025;Kane;county;;Kane County, UT
+55043;Grant;county;;Grant County, WI
+55049;Iowa;county;;Iowa County, WI
+55051;Iron;county;;Iron County, WI
+55055;Jefferson;county;;Jefferson County, WI
+55057;Juneau;county;;Juneau County, WI
+55059;Kenosha;county;;Kenosha County, WI
+55061;Kewaunee;county;;Kewaunee County, WI
+55063;La Crosse;county;;La Crosse County, WI
+55069;Lincoln;county;;Lincoln County, WI
+55071;Manitowoc;county;;Manitowoc County, WI
+55077;Marquette;county;;Marquette County, WI
+55078;Menominee;county;;Menominee County, WI
+53029;Island;county;;Island County, WA
+53031;Jefferson;county;;Jefferson County, WA
+53033;King;county;;King County, WA
+72025;Caguas;county;;Caguas County, PR
+72029;Can�vanas;county;;Can�vanas County, PR
+72031;Carolina;county;;Carolina County, PR
+72033;Cata�o;county;;Cata�o County, PR
+72035;Cayey;county;;Cayey County, PR
+72037;Ceiba;county;;Ceiba County, PR
+72041;Cidra;county;;Cidra County, PR
+72045;Comer�o;county;;Comer�o County, PR
+47187;Williamson;county;;Williamson County, TN
+47189;Wilson;county;;Wilson County, TN
+48001;Anderson;county;;Anderson County, TX
+48005;Angelina;county;;Angelina County, TX
+48007;Aransas;county;;Aransas County, TX
+48015;Austin;county;;Austin County, TX
+48019;Bandera;county;;Bandera County, TX
+48021;Bastrop;county;;Bastrop County, TX
+48025;Bee;county;;Bee County, TX
+48029;Bexar;county;;Bexar County, TX
+48033;Borden;county;;Borden County, TX
+48035;Bosque;county;;Bosque County, TX
+55079;Milwaukee;county;;Milwaukee County, WI
+55083;Oconto;county;;Oconto County, WI
+55087;Outagamie;county;;Outagamie County, WI
+55089;Ozaukee;county;;Ozaukee County, WI
+55091;Pepin;county;;Pepin County, WI
+55093;Pierce;county;;Pierce County, WI
+55095;Polk;county;;Polk County, WI
+55101;Racine;county;;Racine County, WI
+55105;Rock;county;;Rock County, WI
+55109;St. Croix;county;;St. Croix County, WI
+72047;Corozal;county;;Corozal County, PR
+72049;Culebra;county;;Culebra County, PR
+72053;Fajardo;county;;Fajardo County, PR
+72055;Gu�nica;county;;Gu�nica County, PR
+72057;Guayama;county;;Guayama County, PR
+72059;Guayanilla;county;;Guayanilla County, PR
+72061;Guaynabo;county;;Guaynabo County, PR
+72065;Hatillo;county;;Hatillo County, PR
+72067;Hormigueros;county;;Hormigueros County, PR
+72071;Isabela;county;;Isabela County, PR
+72073;Jayuya;county;;Jayuya County, PR
+72075;Juana D�az;county;;Juana D�az County, PR
+72079;Lajas;county;;Lajas County, PR
+72081;Lares;county;;Lares County, PR
+72083;Las Mar�as;county;;Las Mar�as County, PR
+72087;Lo�za;county;;Lo�za County, PR
+72091;Manat�;county;;Manat� County, PR
+72093;Maricao;county;;Maricao County, PR
+72097;Mayag�ez;county;;Mayag�ez County, PR
+72099;Moca;county;;Moca County, PR
+48039;Brazoria;county;;Brazoria County, TX
+48041;Brazos;county;;Brazos County, TX
+48043;Brewster;county;;Brewster County, TX
+48049;Brown;county;;Brown County, TX
+48051;Burleson;county;;Burleson County, TX
+48053;Burnet;county;;Burnet County, TX
+48055;Caldwell;county;;Caldwell County, TX
+48057;Calhoun;county;;Calhoun County, TX
+55111;Sauk;county;;Sauk County, WI
+55115;Shawano;county;;Shawano County, WI
+55117;Sheboygan;county;;Sheboygan County, WI
+55121;Trempealeau;county;;Trempealeau County, WI
+55123;Vernon;county;;Vernon County, WI
+55125;Vilas;county;;Vilas County, WI
+55129;Washburn;county;;Washburn County, WI
+55133;Waukesha;county;;Waukesha County, WI
+55135;Waupaca;county;;Waupaca County, WI
+55139;Winnebago;county;;Winnebago County, WI
+55141;Wood;county;;Wood County, WI
+56001;Albany;county;;Albany County, WY
+56003;Big Horn;county;;Big Horn County, WY
+56007;Carbon;county;;Carbon County, WY
+56009;Converse;county;;Converse County, WY
+56011;Crook;county;;Crook County, WY
+56013;Fremont;county;;Fremont County, WY
+72101;Morovis;county;;Morovis County, PR
+72103;Naguabo;county;;Naguabo County, PR
+72107;Orocovis;county;;Orocovis County, PR
+72111;Pe�uelas;county;;Pe�uelas County, PR
+72113;Ponce;county;;Ponce County, PR
+72115;Quebradillas;county;;Quebradillas County, PR
+72119;R�o Grande;county;;R�o Grande County, PR
+72123;Salinas;county;;Salinas County, PR
+72125;San Germ�n;county;;San Germ�n County, PR
+72127;San Juan;county;;San Juan County, PR
+72131;San Sebasti�n;county;;San Sebasti�n County, PR
+72135;Toa Alta;county;;Toa Alta County, PR
+72137;Toa Baja;county;;Toa Baja County, PR
+72141;Utuado;county;;Utuado County, PR
+72143;Vega Alta;county;;Vega Alta County, PR
+72147;Vieques;county;;Vieques County, PR
+72151;Yabucoa;county;;Yabucoa County, PR
+72153;Yauco;county;;Yauco County, PR
+05079;Lincoln;county;;Lincoln County, AR
+12027;DeSoto;county;;DeSoto County, FL
+48067;Cass;county;;Cass County, TX
+48071;Chambers;county;;Chambers County, TX
+48073;Cherokee;county;;Cherokee County, TX
+48077;Clay;county;;Clay County, TX
+48083;Coleman;county;;Coleman County, TX
+48085;Collin;county;;Collin County, TX
+48089;Colorado;county;;Colorado County, TX
+48091;Comal;county;;Comal County, TX
+48095;Concho;county;;Concho County, TX
+48097;Cooke;county;;Cooke County, TX
+48103;Crane;county;;Crane County, TX
+48105;Crockett;county;;Crockett County, TX
+56017;Hot Springs;county;;Hot Springs County, WY
+56019;Johnson;county;;Johnson County, WY
+56021;Laramie;county;;Laramie County, WY
+56023;Lincoln;county;;Lincoln County, WY
+56027;Niobrara;county;;Niobrara County, WY
+56029;Park;county;;Park County, WY
+56033;Sheridan;county;;Sheridan County, WY
+56035;Sublette;county;;Sublette County, WY
+56037;Sweetwater;county;;Sweetwater County, WY
+56039;Teton;county;;Teton County, WY
+56043;Washakie;county;;Washakie County, WY
+72001;Adjuntas;county;;Adjuntas County, PR
+72003;Aguada;county;;Aguada County, PR
+72005;Aguadilla;county;;Aguadilla County, PR
+72011;A�asco;county;;A�asco County, PR
+72013;Arecibo;county;;Arecibo County, PR
+08035;Douglas;county;;Douglas County, CO
+01083;Limestone;county;;Limestone County, AL
+18045;Fountain;county;;Fountain County, IN
+17063;Grundy;county;;Grundy County, IL
+20009;Barton;county;;Barton County, KS
+20123;Mitchell;county;;Mitchell County, KS
+27003;Anoka;county;;Anoka County, MN
+27109;Olmsted;county;;Olmsted County, MN
+31003;Antelope;county;;Antelope County, NE
+31119;Madison;county;;Madison County, NE
+35009;Curry;county;;Curry County, NM
+39175;Wyandot;county;;Wyandot County, OH
+46035;Davison;county;;Davison County, SD
+47145;Roane;county;;Roane County, TN
+48045;Briscoe;county;;Briscoe County, TX
+48169;Garza;county;;Garza County, TX
+54059;Mingo;county;;Mingo County, WV
+55029;Door;county;;Door County, WI
+55119;Taylor;county;;Taylor County, WI
+72139;Trujillo Alto;county;;Trujillo Alto County, PR
+20143;Ottawa;county;;Ottawa County, KS
+27099;Mower;county;;Mower County, MN
+24039;Somerset;county;;Somerset County, MD
+31079;Hall;county;;Hall County, NE
+28149;Warren;county;;Warren County, MS
+37183;Wake;county;;Wake County, NC
+46037;Day;county;;Day County, SD
+48061;Cameron;county;;Cameron County, TX
+48109;Culberson;county;;Culberson County, TX
+48113;Dallas;county;;Dallas County, TX
+48117;Deaf Smith;county;;Deaf Smith County, TX
+48119;Delta;county;;Delta County, TX
+48123;DeWitt;county;;DeWitt County, TX
+48127;Dimmit;county;;Dimmit County, TX
+48129;Donley;county;;Donley County, TX
+48133;Eastland;county;;Eastland County, TX
+48135;Ector;county;;Ector County, TX
+48137;Edwards;county;;Edwards County, TX
+48139;Ellis;county;;Ellis County, TX
+48141;El Paso;county;;El Paso County, TX
+48147;Fannin;county;;Fannin County, TX
+49029;Morgan;county;;Morgan County, UT
+49033;Rich;county;;Rich County, UT
+49035;Salt Lake;county;;Salt Lake County, UT
+49037;San Juan;county;;San Juan County, UT
+49041;Sevier;county;;Sevier County, UT
+49043;Summit;county;;Summit County, UT
+49045;Tooele;county;;Tooele County, UT
+49047;Uintah;county;;Uintah County, UT
+49049;Utah;county;;Utah County, UT
+42033;Clearfield;county;;Clearfield County, PA
+48177;Gonzales;county;;Gonzales County, TX
+48425;Somervell;county;;Somervell County, TX
+54077;Preston;county;;Preston County, WV
+48151;Fisher;county;;Fisher County, TX
+48153;Floyd;county;;Floyd County, TX
+48155;Foard;county;;Foard County, TX
+48157;Fort Bend;county;;Fort Bend County, TX
+48161;Freestone;county;;Freestone County, TX
+48165;Gaines;county;;Gaines County, TX
+48167;Galveston;county;;Galveston County, TX
+53037;Kittitas;county;;Kittitas County, WA
+53039;Klickitat;county;;Klickitat County, WA
+53041;Lewis;county;;Lewis County, WA
+53043;Lincoln;county;;Lincoln County, WA
+53047;Okanogan;county;;Okanogan County, WA
+49051;Wasatch;county;;Wasatch County, UT
+49055;Wayne;county;;Wayne County, UT
+49057;Weber;county;;Weber County, UT
+50001;Addison;county;;Addison County, VT
+50005;Caledonia;county;;Caledonia County, VT
+50007;Chittenden;county;;Chittenden County, VT
+50011;Franklin;county;;Franklin County, VT
+50013;Grand Isle;county;;Grand Isle County, VT
+50017;Orange;county;;Orange County, VT
+53049;Pacific;county;;Pacific County, WA
+53051;Pend Oreille;county;;Pend Oreille County, WA
+53053;Pierce;county;;Pierce County, WA
+53055;San Juan;county;;San Juan County, WA
+53057;Skagit;county;;Skagit County, WA
+53061;Snohomish;county;;Snohomish County, WA
+53063;Spokane;county;;Spokane County, WA
+50019;Orleans;county;;Orleans County, VT
+50021;Rutland;county;;Rutland County, VT
+50025;Windham;county;;Windham County, VT
+50027;Windsor;county;;Windsor County, VT
+51001;Accomack;county;;Accomack County, VA
+51005;Alleghany;county;;Alleghany County, VA
+51007;Amelia;county;;Amelia County, VA
+01;Alabama;state;AL;
+02;Alaska;state;AK;
+04;Arizona;state;AZ;
+05;Arkansas;state;AR;
+06;California;state;CA;
+08;Colorado;state;CO;
+09;Connecticut;state;CT;
+10;Delaware;state;DE;
+11;District of Columbia;state;DC;
+12;Florida;state;FL;
+13;Georgia;state;GA;
+15;Hawaii;state;HI;
+16;Idaho;state;ID;
+17;Illinois;state;IL;
+18;Indiana;state;IN;
+19;Iowa;state;IA;
+20;Kansas;state;KS;
+21;Kentucky;state;KY;
+22;Louisiana;state;LA;
+23;Maine;state;ME;
+24;Maryland;state;MD;
+25;Massachusetts;state;MA;
+26;Michigan;state;MI;
+27;Minnesota;state;MN;
+28;Mississippi;state;MS;
+29;Missouri;state;MO;
+30;Montana;state;MT;
+31;Nebraska;state;NE;
+32;Nevada;state;NV;
+33;New Hampshire;state;NH;
+34;New Jersey;state;NJ;
+35;New Mexico;state;NM;
+36;New York;state;NY;
+37;North Carolina;state;NC;
+38;North Dakota;state;ND;
+39;Ohio;state;OH;
+40;Oklahoma;state;OK;
+41;Oregon;state;OR;
+42;Pennsylvania;state;PA;
+44;Rhode Island;state;RI;
+45;South Carolina;state;SC;
+46;South Dakota;state;SD;
+47;Tennessee;state;TN;
+48;Texas;state;TX;
+49;Utah;state;UT;
+50;Vermont;state;VT;
+51;Virginia;state;VA;
+53;Washington;state;WA;
+54;West Virginia;state;WV;
+55;Wisconsin;state;WI;
+56;Wyoming;state;WY;
+72;Puerto Rico;state;PR;
+22380;Flagstaff, AZ;msa;;
+38860;Portland-South Portland, ME;msa;;
+29420;Lake Havasu City-Kingman, AZ;msa;;
+40900;Sacramento--Roseville--Arden-Arcade, CA;msa;;
+12100;Atlantic City-Hammonton, NJ;msa;;
+35620;New York-Newark-Jersey City, NY-NJ-PA;msa;;
+12980;Battle Creek, MI;msa;;
+21300;Elmira, NY;msa;;
+24340;Grand Rapids-Wyoming, MI;msa;;
+28740;Kingston, NY;msa;;
+45780;Toledo, OH;msa;;
+23580;Gainesville, GA;msa;;
+14100;Bloomsburg-Berwick, PA;msa;;
+29020;Kokomo, IN;msa;;
+29620;Lansing-East Lansing, MI;msa;;
+26980;Iowa City, IA;msa;;
+19100;Dallas-Fort Worth-Arlington, TX;msa;;
+26300;Hot Springs, AR;msa;;
+39820;Redding, CA;msa;;
+25220;Hammond, LA;msa;;
+16740;Charlotte-Concord-Gastonia, NC-SC;msa;;
+18880;Crestview-Fort Walton Beach-Destin, FL;msa;;
+48540;Wheeling, WV-OH;msa;;
+35380;New Orleans-Metairie, LA;msa;;
+33220;Midland, MI;msa;;
+32780;Medford, OR;msa;;
+30980;Longview, TX;msa;;
+42200;Santa Maria-Santa Barbara, CA;msa;;
+27620;Jefferson City, MO;msa;;
+44220;Springfield, OH;msa;;
+43100;Sheboygan, WI;msa;;
+34620;Muncie, IN;msa;;
+36780;Oshkosh-Neenah, WI;msa;;
+14460;Boston-Cambridge-Newton, MA-NH;msa;;
+36220;Odessa, TX;msa;;
+11540;Appleton, WI;msa;;
+31180;Lubbock, TX;msa;;
+40660;Rome, GA;msa;;
+15940;Canton-Massillon, OH;msa;;
+43420;Sierra Vista-Douglas, AZ;msa;;
+11100;Amarillo, TX;msa;;
+31900;Mansfield, OH;msa;;
+19140;Dalton, GA;msa;;
+25620;Hattiesburg, MS;msa;;
+45500;Texarkana, TX-AR;msa;;
+28100;Kankakee, IL;msa;;
+24860;Greenville-Anderson-Mauldin, SC;msa;;
+22540;Fond du Lac, WI;msa;;
+14020;Bloomington, IN;msa;;
+21340;El Paso, TX;msa;;
+48140;Wausau, WI;msa;;
+10180;Abilene, TX;msa;;
+15500;Burlington, NC;msa;;
+20020;Dothan, AL;msa;;
+42340;Savannah, GA;msa;;
+30700;Lincoln, NE;msa;;
+23900;Gettysburg, PA;msa;;
+19380;Dayton, OH;msa;;
+17820;Colorado Springs, CO;msa;;
+30340;Lewiston-Auburn, ME;msa;;
+42020;San Luis Obispo-Paso Robles-Arroyo Grande, CA;msa;;
+12260;Augusta-Richmond County, GA-SC;msa;;
+11640;Arecibo, PR;msa;;
+10420;Akron, OH;msa;;
+47260;Virginia Beach-Norfolk-Newport News, VA-NC;msa;;
+39380;Pueblo, CO;msa;;
+26580;Huntington-Ashland, WV-KY-OH;msa;;
+47900;Washington-Arlington-Alexandria, DC-VA-MD-WV;msa;;
+14260;Boise City, ID;msa;;
+30780;Little Rock-North Little Rock-Conway, AR;msa;;
+29940;Lawrence, KS;msa;;
+27780;Johnstown, PA;msa;;
+21140;Elkhart-Goshen, IN;msa;;
+20740;Eau Claire, WI;msa;;
+24140;Goldsboro, NC;msa;;
+25020;Guayama, PR;msa;;
+40060;Richmond, VA;msa;;
+19780;Des Moines-West Des Moines, IA;msa;;
+11700;Asheville, NC;msa;;
+47380;Waco, TX;msa;;
+28020;Kalamazoo-Portage, MI;msa;;
+16940;Cheyenne, WY;msa;;
+41860;San Francisco-Oakland-Hayward, CA;msa;;
+11180;Ames, IA;msa;;
+27260;Jacksonville, FL;msa;;
+40980;Saginaw, MI;msa;;
+41420;Salem, OR;msa;;
+41500;Salinas, CA;msa;;
+10540;Albany, OR;msa;;
+39300;Providence-Warwick, RI-MA;msa;;
+41940;San Jose-Sunnyvale-Santa Clara, CA;msa;;
+22420;Flint, MI;msa;;
+41660;San Angelo, TX;msa;;
+48300;Wenatchee, WA;msa;;
+33260;Midland, TX;msa;;
+23420;Fresno, CA;msa;;
+30140;Lebanon, PA;msa;;
+24420;Grants Pass, OR;msa;;
+36100;Ocala, FL;msa;;
+44180;Springfield, MO;msa;;
+42680;Sebastian-Vero Beach, FL;msa;;
+27980;Kahului-Wailuku-Lahaina, HI;msa;;
+11460;Ann Arbor, MI;msa;;
+28940;Knoxville, TN;msa;;
+41700;San Antonio-New Braunfels, TX;msa;;
+26900;Indianapolis-Carmel-Anderson, IN;msa;;
+16300;Cedar Rapids, IA;msa;;
+18020;Columbus, IN;msa;;
+32820;Memphis, TN-MS-AR;msa;;
+16580;Champaign-Urbana, IL;msa;;
+12580;Baltimore-Columbia-Towson, MD;msa;;
+42700;Sebring, FL;msa;;
+37980;Philadelphia-Camden-Wilmington, PA-NJ-DE-MD;msa;;
+37900;Peoria, IL;msa;;
+26420;Houston-The Woodlands-Sugar Land, TX;msa;;
+42540;Scranton--Wilkes-Barre--Hazleton, PA;msa;;
+11020;Altoona, PA;msa;;
+23060;Fort Wayne, IN;msa;;
+40140;Riverside-San Bernardino-Ontario, CA;msa;;
+19300;Daphne-Fairhope-Foley, AL;msa;;
+37860;Pensacola-Ferry Pass-Brent, FL;msa;;
+40420;Rockford, IL;msa;;
+30460;Lexington-Fayette, KY;msa;;
+17980;Columbus, GA-AL;msa;;
+19500;Decatur, IL;msa;;
+13740;Billings, MT;msa;;
+42660;Seattle-Tacoma-Bellevue, WA;msa;;
+32420;Mayagüez, PR;msa;;
+30620;Lima, OH;msa;;
+17460;Cleveland-Elyria, OH;msa;;
+38300;Pittsburgh, PA;msa;;
+41900;San Germán, PR;msa;;
+27180;Jackson, TN;msa;;
+48660;Wichita Falls, TX;msa;;
+13140;Beaumont-Port Arthur, TX;msa;;
+43580;Sioux City, IA-NE-SD;msa;;
+25420;Harrisburg-Carlisle, PA;msa;;
+31340;Lynchburg, VA;msa;;
+38220;Pine Bluff, AR;msa;;
+38060;Phoenix-Mesa-Scottsdale, AZ;msa;;
+26140;Homosassa Springs, FL;msa;;
+42220;Santa Rosa, CA;msa;;
+46140;Tulsa, OK;msa;;
+33140;Michigan City-La Porte, IN;msa;;
+16700;Charleston-North Charleston, SC;msa;;
+36260;Ogden-Clearfield, UT;msa;;
+31740;Manhattan, KS;msa;;
+35840;North Port-Sarasota-Bradenton, FL;msa;;
+43300;Sherman-Denison, TX;msa;;
+33100;Miami-Fort Lauderdale-West Palm Beach, FL;msa;;
+23540;Gainesville, FL;msa;;
+12700;Barnstable Town, MA;msa;;
+12940;Baton Rouge, LA;msa;;
+27100;Jackson, MI;msa;;
+27060;Ithaca, NY;msa;;
+20220;Dubuque, IA;msa;;
+10740;Albuquerque, NM;msa;;
+46060;Tucson, AZ;msa;;
+24020;Glens Falls, NY;msa;;
+39740;Reading, PA;msa;;
+16020;Cape Girardeau, MO-IL;msa;;
+27340;Jacksonville, NC;msa;;
+39140;Prescott, AZ;msa;;
+25180;Hagerstown-Martinsburg, MD-WV;msa;;
+31020;Longview, WA;msa;;
+21060;Elizabethtown-Fort Knox, KY;msa;;
+33780;Monroe, MI;msa;;
+16220;Casper, WY;msa;;
+16540;Chambersburg-Waynesboro, PA;msa;;
+43900;Spartanburg, SC;msa;;
+16860;Chattanooga, TN-GA;msa;;
+15260;Brunswick, GA;msa;;
+44140;Springfield, MA;msa;;
+42140;Santa Fe, NM;msa;;
+44300;State College, PA;msa;;
+14500;Boulder, CO;msa;;
+39460;Punta Gorda, FL;msa;;
+34740;Muskegon, MI;msa;;
+33540;Missoula, MT;msa;;
+39540;Racine, WI;msa;;
+34580;Mount Vernon-Anacortes, WA;msa;;
+29700;Laredo, TX;msa;;
+29540;Lancaster, PA;msa;;
+43620;Sioux Falls, SD;msa;;
+40220;Roanoke, VA;msa;;
+49180;Winston-Salem, NC;msa;;
+22900;Fort Smith, AR-OK;msa;;
+16980;Chicago-Naperville-Elgin, IL-IN-WI;msa;;
+12060;Atlanta-Sandy Springs-Roswell, GA;msa;;
+14540;Bowling Green, KY;msa;;
+26820;Idaho Falls, ID;msa;;
+41140;St. Joseph, MO-KS;msa;;
+45220;Tallahassee, FL;msa;;
+30300;Lewiston, ID-WA;msa;;
+10500;Albany, GA;msa;;
+19660;Deltona-Daytona Beach-Ormond Beach, FL;msa;;
+25980;Hinesville, GA;msa;;
+40340;Rochester, MN;msa;;
+15540;Burlington-South Burlington, VT;msa;;
+25540;Hartford-West Hartford-East Hartford, CT;msa;;
+45300;Tampa-St. Petersburg-Clearwater, FL;msa;;
+17140;Cincinnati, OH-KY-IN;msa;;
+25860;Hickory-Lenoir-Morganton, NC;msa;;
+41540;Salisbury, MD-DE;msa;;
+49740;Yuma, AZ;msa;;
+30860;Logan, UT-ID;msa;;
+24260;Grand Island, NE;msa;;
+33460;Minneapolis-St. Paul-Bloomington, MN-WI;msa;;
+29200;Lafayette-West Lafayette, IN;msa;;
+28660;Killeen-Temple, TX;msa;;
+29100;La Crosse-Onalaska, WI-MN;msa;;
+10580;Albany-Schenectady-Troy, NY;msa;;
+12420;Austin-Round Rock, TX;msa;;
+17780;College Station-Bryan, TX;msa;;
+39580;Raleigh, NC;msa;;
+36740;Orlando-Kissimmee-Sanford, FL;msa;;
+16820;Charlottesville, VA;msa;;
+34980;Nashville-Davidson--Murfreesboro--Franklin, TN;msa;;
+36540;Omaha-Council Bluffs, NE-IA;msa;;
+44420;Staunton-Waynesboro, VA;msa;;
+19820;Detroit-Warren-Dearborn, MI;msa;;
+46520;Urban Honolulu, HI;msa;;
+30020;Lawton, OK;msa;;
+27900;Joplin, MO;msa;;
+29460;Lakeland-Winter Haven, FL;msa;;
+37100;Oxnard-Thousand Oaks-Ventura, CA;msa;;
+35980;Norwich-New London, CT;msa;;
+10780;Alexandria, LA;msa;;
+43780;South Bend-Mishawaka, IN-MI;msa;;
+33660;Mobile, AL;msa;;
+18580;Corpus Christi, TX;msa;;
+28700;Kingsport-Bristol-Bristol, TN-VA;msa;;
+36140;Ocean City, NJ;msa;;
+31860;Mankato-North Mankato, MN;msa;;
+49420;Yakima, WA;msa;;
+49340;Worcester, MA-CT;msa;;
+41740;San Diego-Carlsbad, CA;msa;;
+31420;Macon, GA;msa;;
+45820;Topeka, KS;msa;;
+12020;Athens-Clarke County, GA;msa;;
+13820;Birmingham-Hoover, AL;msa;;
+48620;Wichita, KS;msa;;
+27860;Jonesboro, AR;msa;;
+37620;Parkersburg-Vienna, WV;msa;;
+24580;Green Bay, WI;msa;;
+24500;Great Falls, MT;msa;;
+29740;Las Cruces, NM;msa;;
+38940;Port St. Lucie, FL;msa;;
+46700;Vallejo-Fairfield, CA;msa;;
+25940;Hilton Head Island-Bluffton-Beaufort, SC;msa;;
+47460;Walla Walla, WA;msa;;
+16060;Carbondale-Marion, IL;msa;;
+47020;Victoria, TX;msa;;
+40380;Rochester, NY;msa;;
+44060;Spokane-Spokane Valley, WA;msa;;
+22660;Fort Collins, CO;msa;;
+38340;Pittsfield, MA;msa;;
+37460;Panama City, FL;msa;;
+13380;Bellingham, WA;msa;;
+22140;Farmington, NM;msa;;
+46660;Valdosta, GA;msa;;
+49700;Yuba City, CA;msa;;
+40580;Rocky Mount, NC;msa;;
+17420;Cleveland, TN;msa;;
+31540;Madison, WI;msa;;
+20700;East Stroudsburg, PA;msa;;
+36420;Oklahoma City, OK;msa;;
+48700;Williamsport, PA;msa;;
+39660;Rapid City, SD;msa;;
+46340;Tyler, TX;msa;;
+39900;Reno, NV;msa;;
+31700;Manchester-Nashua, NH;msa;;
+15680;California-Lexington Park, MD;msa;;
+46540;Utica-Rome, NY;msa;;
+17660;Coeur d'Alene, ID;msa;;
+20260;Duluth, MN-WI;msa;;
+48900;Wilmington, NC;msa;;
+47220;Vineland-Bridgeton, NJ;msa;;
+11500;Anniston-Oxford-Jacksonville, AL;msa;;
+23460;Gadsden, AL;msa;;
+17300;Clarksville, TN-KY;msa;;
+34820;Myrtle Beach-Conway-North Myrtle Beach, SC-NC;msa;;
+26380;Houma-Thibodaux, LA;msa;;
+21820;Fairbanks, AK;msa;;
+43340;Shreveport-Bossier City, LA;msa;;
+49620;York-Hanover, PA;msa;;
+15380;Buffalo-Cheektowaga-Niagara Falls, NY;msa;;
+41100;St. George, UT;msa;;
+12540;Bakersfield, CA;msa;;
+10900;Allentown-Bethlehem-Easton, PA-NJ;msa;;
+15980;Cape Coral-Fort Myers, FL;msa;;
+44940;Sumter, SC;msa;;
+33740;Monroe, LA;msa;;
+20100;Dover, DE;msa;;
+47300;Visalia-Porterville, CA;msa;;
+33700;Modesto, CA;msa;;
+39340;Provo-Orem, UT;msa;;
+21500;Erie, PA;msa;;
+41060;St. Cloud, MN;msa;;
+25060;Gulfport-Biloxi-Pascagoula, MS;msa;;
+31460;Madera, CA;msa;;
+28420;Kennewick-Richland, WA;msa;;
+19180;Danville, IL;msa;;
+24780;Greenville, NC;msa;;
+13460;Bend-Redmond, OR;msa;;
+14860;Bridgeport-Stamford-Norwalk, CT;msa;;
+44700;Stockton-Lodi, CA;msa;;
+32900;Merced, CA;msa;;
+34940;Naples-Immokalee-Marco Island, FL;msa;;
+24220;Grand Forks, ND-MN;msa;;
+19460;Decatur, AL;msa;;
+48060;Watertown-Fort Drum, NY;msa;;
+22520;Florence-Muscle Shoals, AL;msa;;
+20500;Durham-Chapel Hill, NC;msa;;
+38660;Ponce, PR;msa;;
+34100;Morristown, TN;msa;;
+10380;Aguadilla-Isabela, PR;msa;;
+45540;The Villages, FL;msa;;
+25500;Harrisonburg, VA;msa;;
+13900;Bismarck, ND;msa;;
+14010;Bloomington, IL;msa;;
+33860;Montgomery, AL;msa;;
+17020;Chico, CA;msa;;
+44100;Springfield, IL;msa;;
+29820;Las Vegas-Henderson-Paradise, NV;msa;;
+49020;Winchester, VA-WV;msa;;
+16180;Carson City, NV;msa;;
+27140;Jackson, MS;msa;;
+35300;New Haven-Milford, CT;msa;;
+19060;Cumberland, MD-WV;msa;;
+45060;Syracuse, NY;msa;;
+12220;Auburn-Opelika, AL;msa;;
+32580;McAllen-Edinburg-Mission, TX;msa;;
+22180;Fayetteville, NC;msa;;
+18140;Columbus, OH;msa;;
+21660;Eugene, OR;msa;;
+36980;Owensboro, KY;msa;;
+21780;Evansville, IN-KY;msa;;
+46220;Tuscaloosa, AL;msa;;
+35100;New Bern, NC;msa;;
+24660;Greensboro-High Point, NC;msa;;
+34060;Morgantown, WV;msa;;
+17900;Columbia, SC;msa;;
+13220;Beckley, WV;msa;;
+47580;Warner Robins, GA;msa;;
+38540;Pocatello, ID;msa;;
+45940;Trenton, NJ;msa;;
+37340;Palm Bay-Melbourne-Titusville, FL;msa;;
+19340;Davenport-Moline-Rock Island, IA-IL;msa;;
+27740;Johnson City, TN;msa;;
+19740;Denver-Aurora-Lakewood, CO;msa;;
+13780;Binghamton, NY;msa;;
+41620;Salt Lake City, UT;msa;;
+12620;Bangor, ME;msa;;
+13020;Bay City, MI;msa;;
+24540;Greeley, CO;msa;;
+41180;St. Louis, MO-IL;msa;;
+31140;Louisville/Jefferson County, KY-IN;msa;;
+22220;Fayetteville-Springdale-Rogers, AR-MO;msa;;
+16620;Charleston, WV;msa;;
+49660;Youngstown-Warren-Boardman, OH-PA;msa;;
+33340;Milwaukee-Waukesha-West Allis, WI;msa;;
+20940;El Centro, CA;msa;;
+28140;Kansas City, MO-KS;msa;;
+17860;Columbia, MO;msa;;
+25260;Hanford-Corcoran, CA;msa;;
+18700;Corvallis, OR;msa;;
+47940;Waterloo-Cedar Falls, IA;msa;;
+41980;San Juan-Carolina-Caguas, PR;msa;;
+24300;Grand Junction, CO;msa;;
+11260;Anchorage, AK;msa;;
+22020;Fargo, ND-MN;msa;;
+45460;Terre Haute, IN;msa;;
+31080;Los Angeles-Long Beach-Anaheim, CA;msa;;
+48260;Weirton-Steubenville, WV-OH;msa;;
+27500;Janesville-Beloit, WI;msa;;
+36500;Olympia-Tumwater, WA;msa;;
+34900;Napa, CA;msa;;
+13980;Blacksburg-Christiansburg-Radford, VA;msa;;
+14740;Bremerton-Silverdale, WA;msa;;
+38900;Portland-Vancouver-Hillsboro, OR-WA;msa;;
+29180;Lafayette, LA;msa;;
+42100;Santa Cruz-Watsonville, CA;msa;;
+22500;Florence, SC;msa;;
+26620;Huntsville, AL;msa;;
+35660;Niles-Benton Harbor, MI;msa;;
+15180;Brownsville-Harlingen, TX;msa;;
+29340;Lake Charles, LA;msa;;

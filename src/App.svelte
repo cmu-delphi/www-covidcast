@@ -17,7 +17,7 @@
   } from './stores';
   import './stores/urlHandler';
   import './stores/ga';
-  import { updateTimeSliceCache, updateRegionSliceCache, loadMetaData } from './data';
+  import { updateRegionSliceCache, loadMetaData, updateTimeSliceCache } from './data';
   import { isDeathSignal, isCasesSignal } from './data/signals';
   import ModeToggle from './components/ModeToggle.svelte';
   import modes from './modes';
@@ -68,11 +68,6 @@
     } else {
       updateTimeSliceCache(s, l, $currentRegion);
     }
-    // reset encoding
-    /*if (!s.match(/num/)) {
-      // eslint-disable-next-line no-unused-vars
-      $encoding = 'color';
-    }*/
     if (date !== $currentDate) {
       dateChangedWhenSensorChanged = true;
       currentDate.set(date);
