@@ -27,8 +27,7 @@
   import Search from '../../components/Search.svelte';
   import { isDeathSignal, isCasesSignal } from '../../data/signals';
   import { trackEvent } from '../../stores/ga';
-  import Time from '../../components/Time.svelte';
-  import GraphContainer from '../../components/Graph/GraphContainer.svelte';
+  import LineSmallMultiples from '../../components/LineSmallMultiples.svelte';
 
   /**
    * @type {MapBox}
@@ -195,16 +194,6 @@
     transition: all 0.1s ease-in;
   }
 
-  .time-container {
-    position: absolute;
-    bottom: 12px;
-    right: 10px;
-    z-index: 1002;
-    padding: 30px 10px;
-    box-sizing: border-box;
-    transition: all 0.1s ease-in;
-  }
-
   .hidden {
     display: none;
   }
@@ -246,11 +235,9 @@
     <Legend />
   </div>
 
-  <div class="time-container container-bg">
-    <Time />
+  <div class="small-multiples">
+    <LineSmallMultiples />
   </div>
-
-  <GraphContainer {graphShowStatus} {toggleGraphShowStatus} />
 
   <MapBox
     bind:this={map}

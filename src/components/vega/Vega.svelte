@@ -26,6 +26,7 @@
   let noData = false;
 
   $: updateData(vegaPromise, data);
+  $: updateSchema(schema);
 
   function updateData(vegaPromise, data) {
     if (!vegaPromise) {
@@ -47,21 +48,22 @@
     });
   }
 
-  onMount(() => {
-    const bb = root.getBoundingClientRect();
-    // don't know why the size diff
-    const margin = 6;
+  function updateSchema(schema) {
+    if (!root) {
+      return;
+    }
     vegaPromise = embed(root, schema, {
       actions: false,
-      width: bb.width - margin,
-      height: bb.height - margin,
-      padding: 0,
     });
     vegaPromise.then((r) => {
       vega = r;
       updateData(r, data);
     });
     vegaPromise.catch((error) => console.error(error));
+  }
+
+  onMount(() => {
+    updateSchema(schema);
   });
 
   onDestroy(() => {

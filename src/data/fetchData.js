@@ -18,7 +18,8 @@ import { isCasesSignal, isDeathSignal } from './signals';
  * @property {number} value
  */
 
-const TIME_RANGE = '20100101-20500101';
+const START_TIME_RANGE = parseAPITime('20100101');
+const END_TIME_RANGE = parseAPITime('20500101');
 // TODO use LRU map
 
 // Note: store the promise to also have hits on currently loading ones
@@ -116,6 +117,26 @@ export function fetchRegionSlice(sensorEntry, level, date) {
   regionSliceCache.set(cacheKey, promise);
   return promise;
 }
+/**
+ * @param {SensorEntry} sensorEntry
+ * @param {string} level
+ * @param {string | undefined} region
+ * @param {Date} startDate
+ * @param {Date} endDate
+ * @returns {Promise<EpiDataRow[]>}
+ */
+export function fetchCustomTimeSlice(sensorEntry, level, region, startDate, endDate) {
+  if (!region) {
+    return Promise.resolve([]);
+  }
+  const timeRange = `${formatAPITime(startDate)}-${formatAPITime(endDate)}`;
+  return callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.signal, level, timeRange, region).then((d) => {
+    if (d.result < 0 || d.message.includes('no results')) {
+      return [];
+    }
+    return parseData(d.epidata);
+  });
+}
 
 /**
  * @param {SensorEntry} sensorEntry
@@ -135,15 +156,7 @@ export function fetchTimeSlice(sensorEntry, level, region) {
     return cacheEntry;
   }
 
-  const promise = callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.signal, level, TIME_RANGE, region).then(
-    (d) => {
-      if (d.result < 0 || d.message.includes('no results')) {
-        return [];
-      }
-      return parseData(d.epidata);
-    },
-  );
+  const promise = fetchCustomTimeSlice(sensorEntry, level, region, START_TIME_RANGE, END_TIME_RANGE);
   timeSliceCache.set(cacheEntry, promise);
-
   return promise;
 }
