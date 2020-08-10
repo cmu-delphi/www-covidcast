@@ -1,6 +1,11 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
   "data": { "name": "values" },
+  "width": "container",
+  "height": "container",
+  "autosize": {
+    "resize": true
+  },
   "encoding": {
     "color": {
       "value": "grey"
@@ -86,8 +91,5 @@
         }
       }
     }
-  ],
-  "autosize": {
-    "type": "fit"
-  }
+  ]
 }

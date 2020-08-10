@@ -52,14 +52,8 @@
     if (!root) {
       return;
     }
-    const bb = root.getBoundingClientRect();
-    // don't know why the size diff
-    const margin = 6;
     vegaPromise = embed(root, schema, {
       actions: false,
-      width: bb.width - margin,
-      height: bb.height - margin,
-      // padding: 0,
     });
     vegaPromise.then((r) => {
       vega = r;

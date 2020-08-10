@@ -48,6 +48,7 @@
     startDay,
     finalDay,
   );
+  // patch in the yAxis name
   $: singleLineChartSchemaPatched = {
     ...singleLineChartSchema,
     encoding: {
@@ -75,7 +76,7 @@
     background-color: white;
   }
 
-  #multiples-charts {
+  .multiples-charts {
     width: 100%;
     display: flex;
     flex-wrap: wrap;
@@ -97,6 +98,8 @@
     padding: 0;
     list-style-type: none;
     text-align: center;
+    display: flex;
+    flex-direction: column;
   }
   .small-multiples li h5 {
     font-size: 12px;
@@ -144,21 +147,23 @@
 
   .single-chart {
     margin-top: 0.5em;
-    height: 105px;
+    width: 95%;
+    height: 136px;
     position: relative;
     padding: 0;
     box-sizing: border-box;
   }
 
   .single-sensor-chart {
-    height: 30px;
+    align-self: center;
+    height: 55px;
+    width: 82%;
     position: relative;
     padding: 0;
     box-sizing: border-box;
   }
 
-  .single-chart > :global(*),
-  .single-sensor-chart > :global(*) {
+  .vega-wrapper > :global(*) {
     position: absolute;
     left: 0;
     top: 0;
@@ -191,20 +196,18 @@
 
   </div>
 
-  <div class="single-chart" class:hidden={!singleView}>
+  <div class="single-chart vega-wrapper" class:hidden={!singleView}>
     {#if singleView}
       <Vega data={singleChartDataPromise} schema={singleLineChartSchemaPatched} />
     {/if}
   </div>
 
-  <div id="multiples-charts" class:hidden={singleView}>
+  <div class="multiples-charts" class:hidden={singleView}>
     {#each smallMultipleLineCharts as sensor}
       <li>
         <h5 title={sensor.tooltipText} on:click={() => toggleSingleView(sensor.key)}>{sensor.name}</h5>
-        <div class="single-sensor-chart">
-          {#if !singleView}
-            <Vega data={sensor.data} schema={sensorSingleLineChartSchema} />
-          {/if}
+        <div class="single-sensor-chart vega-wrapper">
+          <Vega data={sensor.data} schema={sensorSingleLineChartSchema} />
         </div>
       </li>
     {/each}
