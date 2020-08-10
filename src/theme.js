@@ -26,6 +26,7 @@ export const DIRECTION_THEME = {
 export const MAP_THEME = {
   selectedRegionOutline: '#333333', //'#000000',
   hoverRegionOutline: '#cccccc', //'#ffffff',
+  stateFill: 'rgba(0, 0, 0, 0)',
   stateOutline: '#ffffff', //'#bcbcbc',
   countyFill: '#eeeeee', //'#e4dac4',
   countyOutline: '#ffffff', //'#e0e0e0',

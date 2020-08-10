@@ -1,19 +1,18 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
   import { currentZone, currentLevel } from '../stores';
   import IoMdAdd from 'svelte-icons/io/IoMdAdd.svelte';
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
   import IoMdHome from 'svelte-icons/io/IoMdHome.svelte';
   import TiTag from 'svelte-icons/ti/TiTag.svelte';
   import Loading from './Loading.svelte';
+  import { trackEvent } from '../stores/ga';
 
-  const dispatch = createEventDispatcher();
   export let className = '';
 
-  // zoom info for disabling zoom
-  export let zoom = 0;
-  export let maxZoom = Number.POSITIVE_INFINITY;
-  export let minZoom = Number.NEGATIVE_INFINITY;
+  /**
+   * @type {import('./MapBox/ZoomMap').default}
+   */
+  export let zoom;
 </script>
 
 <style>
@@ -34,9 +33,10 @@
       type="button"
       title="Zoom in"
       aria-label="Zoom in"
-      disabled={zoom <= minZoom}
+      disabled={!zoom || zoom.getZoom() <= zoom.getMinZoom()}
       on:click={() => {
-        dispatch('zoomIn');
+        trackEvent('map', 'zoomIn');
+        zoom.zoomIn();
       }}>
       <IoMdAdd />
     </button>
@@ -45,9 +45,10 @@
       type="button"
       title="Zoom out"
       aria-label="Zoom out"
-      disabled={zoom >= maxZoom}
+      disabled={!zoom || zoom.getZoom() >= zoom.getMaxZoom()}
       on:click={() => {
-        dispatch('zoomOut');
+        trackEvent('map', 'zoomOut');
+        zoom.zoomOut();
       }}>
       <IoMdRemove />
     </button>
@@ -58,8 +59,10 @@
       type="button"
       title="Show entire map"
       aria-label="Show entire map"
+      disabled={!zoom}
       on:click={() => {
-        dispatch('reset');
+        trackEvent('map', 'fitUS');
+        zoom.resetZoom();
       }}>
       <IoMdHome />
     </button>
@@ -71,8 +74,10 @@
         type="button"
         title="Hide state labels"
         aria-label="Hide state labels"
+        disabled={!zoom}
         on:click={() => {
-          dispatch('hideLabels');
+          trackEvent('map', 'toggleStateLabel');
+          zoom.toggleStateLabels();
         }}>
         <TiTag />
       </button>
@@ -85,8 +90,10 @@
         type="button"
         title="show swpa boundary"
         aria-label="show swpa boundary"
+        disabled={!zoom}
         on:click={() => {
-          dispatch('swpa');
+          trackEvent('map', 'fitSWPA');
+          zoom.showSWPA();
         }}>
         SWPA
       </button>
