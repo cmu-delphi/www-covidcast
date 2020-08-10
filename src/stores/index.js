@@ -2,7 +2,7 @@ import { writable, readable, derived, get } from 'svelte/store';
 import { injectIDs } from '../util';
 import { LogScale, SqrtScale } from './scales';
 import * as d3 from 'd3';
-import { sensorList, withSensorEntryKey } from './constants';
+import { sensorList, withSensorEntryKey, defaultSensorId } from './constants';
 import modes from '../modes';
 import { parseAPITime } from '../data/utils';
 export {
@@ -98,8 +98,13 @@ export const currentSensor = writable('', (set) => {
   if (sensor && get(sensorMap).has(sensor)) {
     set(sensor);
   } else {
-    const firstKey = Array.from(get(sensorMap).keys())[0];
-    set(firstKey);
+    const activeSensors = get(sensors);
+    const defaultSensor = activeSensors.find((d) => d.id === defaultSensorId);
+    if (defaultSensor) {
+      set(defaultSensor.key);
+    } else {
+      set(activeSensors[0].key);
+    }
   }
 });
 
@@ -115,8 +120,8 @@ export const currentLevel = writable('county', (set) => {
 export const signalType = writable('value', (set) => {
   const signalT = urlParams.get('signalType');
   if (signalT === 'direction' || signalT === 'value') {
-    set(signalT);
-    //set('value');
+    // set(signalT);
+    set('value');
   }
 });
 

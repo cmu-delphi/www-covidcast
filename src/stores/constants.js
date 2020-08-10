@@ -134,6 +134,8 @@ export function withSensorEntryKey(sensorEntry) {
   });
 }
 
+export const defaultSensorId = 'doctor-visits';
+
 /**
  * @typedef {object} SensorEntry
  * @property {string} key
