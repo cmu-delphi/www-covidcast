@@ -9,11 +9,12 @@
     currentRegionName,
     currentDateObject,
   } from '../../stores';
-  import LineChart from '../../components/vega/LineChart.svelte';
+  import hotspotsLineChart from './HotspotsLineChart.json';
   import { fetchTimeSlice } from '../../data/fetchData';
   import IoIosPin from 'svelte-icons/io/IoIosPin.svelte';
   import modes from '..';
   import { regionSearchLookup } from '../../stores/search';
+  import Vega from '../../components/vega/Vega.svelte';
 
   /**
    * @param {import('../../data/fetchData').EpiDataRow} row
@@ -153,7 +154,7 @@
             </td>
             <td class="right">{row.value != null ? row.value.toFixed(3) : 'Unknown'}</td>
             <td class="chart">
-              <LineChart data={row.data} />
+              <Vega data={row.data} spec={hotspotsLineChart} />
             </td>
           </tr>
         {/each}
