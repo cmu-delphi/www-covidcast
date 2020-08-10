@@ -2,18 +2,16 @@
   import { onMount } from 'svelte';
   import { sensors } from '../stores/index.js';
   import { json } from 'd3-fetch';
-  import { timeFormat } from 'd3';
   import { currentRegion, currentSensor, currentLevel } from '../stores';
-  import moment from 'moment';
+  import { default as embed } from 'vega-embed';
+  import { formatAPITime, parseAPITime } from '../data/utils.js';
 
   // Default width and height for small multiples
   let width = 172;
   const height = 30;
 
   // Create a date for today in the API's date format
-  const finalDay = timeFormat('%Y%m%d')(new Date());
-
-  import { default as embed } from 'vega-embed';
+  const finalDay = formatAPITime(new Date());
 
   let smallMultipleContainer = null;
 
@@ -188,8 +186,7 @@
         return;
       }
       d.epidata = d.epidata.map((d) => {
-        let s = '' + d.time_value;
-        d.time_value = moment(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} 12:01`); //.toString();
+        d.time_value = parseAPITime(d.time_value);
 
         return d;
       });
@@ -315,8 +312,7 @@
     json(apiURL).then((d) => {
       if (!d.epidata) return;
       d.epidata = d.epidata.map((d) => {
-        let s = '' + d.time_value;
-        d.time_value = moment(`${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} 12:01`); //.toString();
+        d.time_value = parseAPITime(d.time_value);
         return d;
       });
       singleLineChartSchema.data.values = d.epidata;
