@@ -1,5 +1,5 @@
-import { callAPI } from './api';
-import { checkWIP, combineAverageWithCount } from './utils';
+import { callAPIEndPoint } from './api';
+import { checkWIP, combineAverageWithCount, parseAPITime, formatAPITime } from './utils';
 import { isCasesSignal, isDeathSignal } from './signals';
 
 /**
@@ -14,6 +14,7 @@ import { isCasesSignal, isDeathSignal } from './signals';
  * @property {number | null} sample_size
  * @property {stderr | null} stderr
  * @property {number} time_value
+ * @property {Date} date_value the time_value as a Date
  * @property {number} value
  */
 
@@ -36,7 +37,7 @@ const timeSliceCache = new Map();
  * @param {string} date
  */
 function toRegionCacheKey(sensorEntry, level, date) {
-  return `${sensorEntry.key}-${level}-${date}`;
+  return `${sensorEntry.key}-${level}-${date instanceof Date ? formatAPITime(date) : date}`;
 }
 /**
  * @param {SensorEntry} sensorEntry
@@ -45,6 +46,17 @@ function toRegionCacheKey(sensorEntry, level, date) {
  */
 function toTimeSliceCacheKey(sensorEntry, level, region) {
   return `${sensorEntry.key}-${level}-${region}`;
+}
+
+function parseData(data) {
+  for (const row of data) {
+    if (row.time_value == null) {
+      row.date_value = null;
+      continue;
+    }
+    row.date_value = parseAPITime(row.time_value.toString());
+  }
+  return data;
 }
 
 /**
@@ -92,14 +104,14 @@ export function fetchRegionSlice(sensorEntry, level, date) {
   const additionalSignal = getAdditionalSignal(sensorEntry.signal);
 
   const promise = Promise.all([
-    callAPI(sensorEntry.id, sensorEntry.signal, level, date, '*'),
-    additionalSignal ? callAPI(sensorEntry.id, additionalSignal, level, date, '*') : null,
+    callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.signal, level, date, '*'),
+    additionalSignal ? callAPIEndPoint(sensorEntry.api, sensorEntry.id, additionalSignal, level, date, '*') : null,
   ]).then(([d, d1]) => {
     if (d.result < 0 || d.message.includes('no results')) {
       return [];
     }
     const data = d1 ? combineAverageWithCount(d, d1) : d.epidata;
-    return data;
+    return parseData(data);
   });
   regionSliceCache.set(cacheKey, promise);
   return promise;
@@ -123,12 +135,14 @@ export function fetchTimeSlice(sensorEntry, level, region) {
     return cacheEntry;
   }
 
-  const promise = callAPI(sensorEntry.id, sensorEntry.signal, level, TIME_RANGE, region).then((d) => {
-    if (d.result < 0 || d.message.includes('no results')) {
-      return [];
-    }
-    return d.epidata;
-  });
+  const promise = callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.signal, level, TIME_RANGE, region).then(
+    (d) => {
+      if (d.result < 0 || d.message.includes('no results')) {
+        return [];
+      }
+      return parseData(d.epidata);
+    },
+  );
   timeSliceCache.set(cacheEntry, promise);
 
   return promise;

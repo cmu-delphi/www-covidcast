@@ -1,4 +1,7 @@
 // combining json with same geolocations but different value properties
+
+import { timeParse, timeFormat } from 'd3';
+
 // json1 value is 7 day average, json2 value is single count
 export function combineAverageWithCount(json1, json2) {
   const data1 = json1.epidata;
@@ -21,3 +24,6 @@ export function checkWIP(signalName, otherSignal) {
   }
   return otherSignal;
 }
+
+export const parseAPITime = timeParse('%Y%m%d');
+export const formatAPITime = timeFormat('%Y%m%d');
