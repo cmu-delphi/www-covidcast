@@ -1,0 +1,29 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+  "data": { "name": "values" },
+  "encoding": {
+    "color": {
+      "value": "grey"
+    },
+    "x": {
+      "field": "date_value",
+      "type": "temporal",
+      "axis": null
+    },
+    "y": {
+      "field": "value",
+      "type": "quantitative",
+      "axis": null
+    }
+  },
+  "mark": {
+    "type": "line",
+    "interpolate": "monotone"
+  },
+  "config": {
+    "padding": 0,
+    "view": {
+      "stroke": null
+    }
+  }
+}

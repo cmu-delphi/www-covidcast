@@ -76,12 +76,8 @@ module.exports = () => {
           ],
         },
         {
-          test: /\.json$/i,
-          use: [
-            {
-              loader: 'json-loader',
-            },
-          ],
+          test: /\.(txt|csv|tsv)$/i,
+          use: 'raw-loader',
         },
       ],
     },

@@ -1,7 +1,9 @@
 import { L } from '../layers';
+import { levelMegaCounty } from '../../../stores/constants';
 
 export default class ChoroplethEncoding {
   constructor() {
+    this.id = 'color';
     this.layers = [L.state.fill, L.msa.fill, L.county.fill];
   }
 
@@ -24,10 +26,15 @@ export default class ChoroplethEncoding {
     });
 
     if (stopsMega) {
-      map.setPaintProperty(L['mega-county'].fill, 'fill-color', {
+      map.setPaintProperty(L[levelMegaCounty.id].fill, 'fill-color', {
         property: signalType,
         stops: stopsMega,
       });
+      map.setLayoutProperty(L[levelMegaCounty.id].fill, 'visibility', 'visible');
     }
+  }
+
+  updateSources() {
+    // dummy
   }
 }

@@ -13,15 +13,15 @@
     "lint:fix": "eslint src --ext .js,.svelte --fix && prettier --write \"**/*\""
   },
   "devDependencies": {
-    "@babel/core": "^7.10.5",
-    "@babel/preset-env": "^7.10.4",
+    "@babel/core": "^7.11.0",
+    "@babel/preset-env": "^7.11.0",
     "babel-loader": "^8.1.0",
-    "bestzip": "^2.1.5",
+    "bestzip": "^2.1.6",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^6.0.3",
     "cross-env": "^7.0.2",
-    "css-loader": "^3.6.0",
-    "eslint": "^7.4.0",
+    "css-loader": "^4.1.1",
+    "eslint": "^7.5.0",
     "eslint-plugin-svelte3": "^2.7.3",
     "file-loader": "^6.0.0",
     "gh-pages": "^3.1.0",
@@ -33,10 +33,11 @@
     "mini-css-extract-plugin": "^0.9.0",
     "prettier": "^2.0.5",
     "prettier-plugin-svelte": "^1.1.0",
+    "raw-loader": "^4.0.1",
     "svelte": "^3.24.0",
     "svelte-loader": "^2.13.6",
     "url-loader": "^4.1.0",
-    "webpack": "^4.43.0",
+    "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0"
   },
@@ -49,8 +50,11 @@
     "d3-tip": "^0.9.1",
     "invert-color": "^2.0.0",
     "mapbox-gl": "^1.11.1",
-    "regenerator-runtime": "^0.13.5",
-    "svelte-icons": "^2.1.0"
+    "regenerator-runtime": "^0.13.7",
+    "svelte-icons": "^2.1.0",
+    "vega": "^5.13.0",
+    "vega-embed": "^6.10.0",
+    "vega-lite": "^4.14.1"
   },
   "husky": {
     "hooks": {

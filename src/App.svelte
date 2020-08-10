@@ -1,12 +1,12 @@
 <script>
   import { onMount } from 'svelte';
-  import MapBox from './MapBox.svelte';
 
   import {
     sensorMap,
     times,
     signalType,
     currentSensor,
+    currentMode,
     currentDate,
     currentLevel,
     currentRegion,
@@ -14,12 +14,13 @@
     currentDataReadyOnMap,
     encoding,
     mounted,
-  } from '../stores';
-  import '../stores/urlHandler';
-  import '../stores/ga';
-  import { updateTimeSliceCache, updateRegionSliceCache, loadMetaData } from '../data';
-  import { trackEvent } from '../stores/ga';
-  import { isDeathSignal, isCasesSignal } from '../data/signals';
+  } from './stores';
+  import './stores/urlHandler';
+  import './stores/ga';
+  import { updateRegionSliceCache, loadMetaData, updateTimeSliceCache } from './data';
+  import { isDeathSignal, isCasesSignal } from './data/signals';
+  import ModeToggle from './components/ModeToggle.svelte';
+  import modes from './modes';
 
   // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
   const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
@@ -36,10 +37,8 @@
   });
 
   let error = null;
-  let graphShowStatus = false;
   let levelChangedWhenSensorChanged = false;
   let dateChangedWhenSensorChanged = false;
-  let firstLoaded = true;
 
   // Since we don't want multiple updates, but currentSensor changes can update // the level and date, we have flags that prevent the async updates.
   currentSensor.subscribe((s) => {
@@ -69,11 +68,6 @@
     } else {
       updateTimeSliceCache(s, l, $currentRegion);
     }
-    // reset encoding
-    /*if (!s.match(/num/)) {
-      // eslint-disable-next-line no-unused-vars
-      $encoding = 'color';
-    }*/
     if (date !== $currentDate) {
       dateChangedWhenSensorChanged = true;
       currentDate.set(date);
@@ -120,14 +114,6 @@
     if ($mounted) {
       updateTimeSliceCache($currentSensor, $currentLevel, r);
     }
-    if (firstLoaded && r !== '') {
-      toggleGraphShowStatus(null, false);
-      firstLoaded = false;
-    } else if (r) {
-      toggleGraphShowStatus(null, true);
-    } else {
-      toggleGraphShowStatus(null, false);
-    }
   });
 
   onMount(() => {
@@ -140,17 +126,23 @@
     });
   });
 
-  function toggleGraphShowStatus(event, to = null) {
-    if (to !== null) {
-      graphShowStatus = to;
-    } else {
-      graphShowStatus = !graphShowStatus;
-    }
-    trackEvent('graph', graphShowStatus ? 'show' : 'hide');
-  }
+  $: currentComponent = $currentMode.component();
 </script>
 
 <style>
+  .root {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mode-switcher {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5em;
+  }
+
   .error-message-container {
     position: absolute;
     top: 0;
@@ -162,10 +154,30 @@
     align-items: center;
     color: gray;
   }
+
+  .loader {
+    flex-grow: 1;
+  }
 </style>
 
 {#if error}
   <div class="error-message-container">Failed to load data. Please try again later...</div>
 {/if}
 
-<MapBox {graphShowStatus} {toggleGraphShowStatus} />
+<div class="root">
+  {#if modes.length > 1}
+    <div class="mode-switcher">
+      <ModeToggle />
+    </div>
+  {/if}
+  {#await currentComponent}
+    <div class="loader loading" />
+  {:then value}
+    <svelte:component this={value} />
+  {:catch error}
+    <div class="loader">
+      Error loading current mode
+      <pre>{error}</pre>
+    </div>
+  {/await}
+</div>

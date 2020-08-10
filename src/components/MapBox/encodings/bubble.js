@@ -2,10 +2,11 @@ import { L } from '../layers';
 import { S } from '../sources';
 import { getType } from '../../../data/signals';
 import { parseScaleSpec } from '../../../stores/scales';
-import { HAS_VALUE, caseHovered, addSource } from './utils';
+import { HAS_VALUE, caseHovered } from './utils';
 
 export default class BubbleEncoding {
   constructor(theme) {
+    this.id = 'bubble';
     this.theme = theme;
     this.layers = [L.bubble.fill, L.bubble.highlight.fill];
   }
@@ -16,10 +17,16 @@ export default class BubbleEncoding {
   }
 
   addSources(map) {
-    addSource(map, S.bubble);
+    // copy from centers
+    // level will update upon update sources
+    const data = map.getSource(S.county.center)._data;
+    map.addSource(S.bubble, {
+      type: 'geojson',
+      data,
+    });
   }
 
-  addLayers(map) {
+  addLayers(map, helpers) {
     // 2 layers for bubbles
     const addLayer = (id, reference, hovered = false) => {
       map.addLayer(
@@ -27,7 +34,9 @@ export default class BubbleEncoding {
           id,
           source: S.bubble,
           type: 'circle',
-          visibility: 'none',
+          layout: {
+            visibility: 'none',
+          },
           filter: HAS_VALUE,
           paint: {
             'circle-radius': 0,
@@ -36,6 +45,7 @@ export default class BubbleEncoding {
             'circle-stroke-width': this.theme.strokeWidth,
             'circle-opacity': caseHovered(0, this.theme.opacity, hovered),
             'circle-stroke-opacity': caseHovered(0, this.theme.strokeOpacity, hovered),
+            ...helpers.animationOptions('circle-radius'),
           },
         },
         reference,
@@ -50,8 +60,6 @@ export default class BubbleEncoding {
     // color scale (color + stroke color)
     let flatStops = stops.flat();
     let colorExpression = ['interpolate', ['linear'], ['get', 'value']].concat(flatStops);
-
-    map.getSource(S.bubble).setData(map.getSource(S[level].center)._data);
 
     map.setPaintProperty(L.bubble.fill, 'circle-stroke-color', colorExpression);
     map.setPaintProperty(L.bubble.highlight.fill, 'circle-stroke-color', colorExpression);
@@ -72,5 +80,10 @@ export default class BubbleEncoding {
     map.setPaintProperty(L.bubble.highlight.fill, 'circle-radius', radiusExpression);
 
     return currentRadiusScale;
+  }
+
+  updateSources(map, level) {
+    // copy from centers in the right level
+    map.getSource(S.bubble).setData(map.getSource(S[level].center)._data);
   }
 }
