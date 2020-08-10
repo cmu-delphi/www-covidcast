@@ -24,10 +24,6 @@ To lint or check for styling, run
 
 `npm run lint`
 
-To release, run
-
-`npm run release`
-
 If you have having trouble with any of them, run
 
 `npm ci`
@@ -36,7 +32,12 @@ To view a version of the visualization in the frame of a cmu.edu site, run the s
 
 http://localhost:5000/frame.html
 
-### Project Structure
+### Tagging a release
+To release, run
+
+`npm run release`
+
+Then click on draft new release and tag it with the corresponding version number. Add a short description of the changes made and make sure to attach the release.zip file.
 
 ## Figma Mock-ups
 
