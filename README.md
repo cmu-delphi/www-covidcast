@@ -33,6 +33,7 @@ To view a version of the visualization in the frame of a cmu.edu site, run the s
 http://localhost:5000/frame.html
 
 ### Tagging a release
+
 To release, run
 
 `npm run release`
