@@ -1,8 +1,7 @@
 <script>
-  import { sensors, currentSensorEntry } from '../stores/index.js';
-  import { currentRegion, currentSensor, currentLevel } from '../stores';
-  import { parseAPITime } from '../data/utils.js';
-  import { fetchCustomTimeSlice } from '../data/fetchData.js';
+  import { currentRegion, currentSensor, currentLevel, sensors, currentSensorEntry } from '../stores';
+  import { parseAPITime } from '../data/utils';
+  import { fetchCustomTimeSlice } from '../data/fetchData';
   import Vega from './vega/Vega.svelte';
   import sensorSingleLineChartSchema from './vega/SmallMultipleLineChart.json';
   import singleLineChartSchema from './vega/SmallMultipleSingleLineChart.json';
