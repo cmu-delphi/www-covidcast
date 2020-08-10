@@ -94,14 +94,23 @@
     right: 12px;
     left: 12px;
 
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .top-left-container {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    left: 12px;
+
     display: grid;
     grid-gap: 0.4em;
     grid-template-columns: auto 2fr 1fr auto;
     grid-template-rows: auto auto;
     grid-template-areas:
-      'options options search controls'
-      'toggle title title controls'
-      'toggle title title controls';
+      'options options search'
+      'toggle title title';
   }
 
   :global(.container-bg) {
@@ -150,13 +159,13 @@
 
   /** mobile **/
   @media only screen and (max-width: 767px) {
-    .top-container {
+    .top-left-container {
       grid-template-columns: auto 1fr auto;
       grid-template-rows: auto auto auto;
       grid-template-areas:
         'options options options'
-        'search title controls'
-        'toggle title controls';
+        'search title'
+        'toggle title';
     }
   }
 
@@ -208,28 +217,31 @@
 
 <main class="root">
   <div class="top-container">
-    <div class="options-container container-bg base-font-size container-style">
-      <Options />
-    </div>
-    <div class="search-container-wrapper base-font-size" class:loading={$regionSearchList.length === 0}>
-      {#if $regionSearchList.length > 0}
-        <Search
-          className="search-container container-bg container-style"
-          placeholder="Search for a location..."
-          items={$regionSearchList}
-          selectedItem={$currentRegionInfo}
-          labelFieldName="display_name"
-          maxItemsToShowInList="5"
-          onChange={selectByInfo} />
-      {/if}
-    </div>
-    <div
-      class="toggle-container container-bg base-font-size container-style"
-      class:hidden={$signalType === 'direction' || !(isDeathSignal($currentSensor) || isCasesSignal($currentSensor))}>
-      <ToggleEncoding />
-    </div>
-    <div class="title-container container-bg">
-      <Title />
+    <div class="top-left-container">
+
+      <div class="options-container container-bg base-font-size container-style">
+        <Options />
+      </div>
+      <div class="search-container-wrapper base-font-size" class:loading={$regionSearchList.length === 0}>
+        {#if $regionSearchList.length > 0}
+          <Search
+            className="search-container container-bg container-style"
+            placeholder="Search for a location..."
+            items={$regionSearchList}
+            selectedItem={$currentRegionInfo}
+            labelFieldName="display_name"
+            maxItemsToShowInList="5"
+            onChange={selectByInfo} />
+        {/if}
+      </div>
+      <div
+        class="toggle-container container-bg base-font-size container-style"
+        class:hidden={$signalType === 'direction' || !(isDeathSignal($currentSensor) || isCasesSignal($currentSensor))}>
+        <ToggleEncoding />
+      </div>
+      <div class="title-container container-bg">
+        <Title />
+      </div>
     </div>
     <div class="map-controls-container">
       <MapControls zoom={map ? map.zoom : null} />
