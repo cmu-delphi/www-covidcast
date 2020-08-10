@@ -1,6 +1,11 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
   "data": { "name": "values" },
+  "width": "container",
+  "height": "container",
+  "autosize": {
+    "resize": true
+  },
   "encoding": {
     "color": {
       "value": "grey"
@@ -8,7 +13,12 @@
     "x": {
       "field": "date_value",
       "type": "temporal",
-      "axis": null
+      "axis": {
+        "title": null,
+        "format": "%b %e",
+        "formatType": "time",
+        "tickCount": "month"
+      }
     },
     "y": {
       "field": "value",

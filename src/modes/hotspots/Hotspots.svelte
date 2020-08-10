@@ -8,6 +8,7 @@
     currentMode,
     currentRegion,
     currentRegionName,
+    currentDateObject,
   } from '../../stores';
   import LineChart from '../../components/vega/LineChart.svelte';
   import { fetchTimeSlice } from '../../data/fetchData';
@@ -63,7 +64,6 @@
 <style>
   .root {
     flex: 1 1 0;
-    padding: 0 2%;
     display: flex;
     flex-direction: column;
   }
@@ -109,8 +109,8 @@
   }
 
   .chart {
-    width: 10em;
-    height: 3em;
+    width: 20em;
+    height: 4em;
     position: relative;
     padding: 0;
     box-sizing: border-box;
@@ -122,15 +122,9 @@
     right: 0;
     bottom: 0;
   }
-  /** mobile **/
-  @media only screen and (max-width: 767px) {
-    .root {
-      padding: 0.1em;
-    }
-  }
 </style>
 
-<div class="root">
+<div class="root content">
   <h2>Hotspots</h2>
   <div class="options-container container-bg base-font-size container-style">
     <Options />
@@ -143,18 +137,20 @@
           <th colspan="2">{$currentSensorEntry.name}</th>
         </tr>
         <tr>
-          <th>{$currentDate}</th>
+          <th>{$currentDateObject.toLocaleDateString()}</th>
           <th>Time Series</th>
         </tr>
       </thead>
       <tbody>
         {#each data as row}
           <tr>
-            <td class="name">
-              <span>{row.name}</span>
-              <button class="pg-button" title="Show on Map" on:click={jumpTo(row)}>
-                <IoIosPin />
-              </button>
+            <td>
+              <div class="name">
+                <span>{row.name}</span>
+                <button class="pg-button" title="Show on Map" on:click={jumpTo(row)}>
+                  <IoIosPin />
+                </button>
+              </div>
             </td>
             <td class="right">{row.value != null ? row.value.toFixed(3) : 'Unknown'}</td>
             <td class="chart">
