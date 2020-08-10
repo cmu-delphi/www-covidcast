@@ -11,6 +11,8 @@ Layer names used in MapBox
 ...
 */
 
+import { S } from './sources';
+
 export const L = {
   state: {
     fill: 'state-fill',
@@ -61,3 +63,66 @@ export const L = {
     5: 'city-point-unclustered-5',
   },
 };
+
+/**
+ *
+ * @param {import('mapbox-gl').Map} map
+ */
+export function addCityLayers(map) {
+  map.addLayer({
+    id: L.state.names,
+    source: S.state.center,
+    type: 'symbol',
+    maxzoom: 8,
+    layout: {
+      'text-field': ['upcase', ['get', 'NAME']],
+      'text-font': ['Open Sans Bold'],
+      'text-size': 11,
+    },
+    paint: {
+      'text-opacity': 0.5,
+      'text-halo-color': '#fff',
+      'text-halo-width': 1,
+    },
+  });
+
+  const addCityLayer = (id, filter, extras = {}) => {
+    map.addLayer(
+      {
+        id,
+        source: S.cityPoint,
+        type: 'symbol',
+        ...(filter ? { filter } : {}),
+        ...extras,
+        layout: {
+          'text-field': ['get', 'city'],
+          'text-font': ['Open Sans Regular'],
+          'text-size': 12,
+        },
+        paint: {
+          'text-halo-color': '#fff',
+          'text-halo-width': 1.5,
+        },
+      },
+      L.state.names,
+    );
+  };
+
+  addCityLayer(L.cityPoints.pit, ['==', 'city', 'Pittsburgh'], {
+    maxzoom: 8,
+  });
+  addCityLayer(L.cityPoints.pit[1], ['>', 'population', 900000], {
+    maxzoom: 4,
+  });
+  addCityLayer(L.cityPoints.pit[2], ['>', 'population', 500000], {
+    maxzoom: 6,
+    minzoom: 4,
+  });
+  addCityLayer(L.cityPoints.pit[3], ['>', 'population', 100000], {
+    maxzoom: 8,
+    minzoom: 6,
+  });
+  addCityLayer(L.cityPoints.pit[4], undefined, {
+    minzoom: 8,
+  });
+}
