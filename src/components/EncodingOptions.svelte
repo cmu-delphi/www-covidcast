@@ -1,5 +1,5 @@
 <script>
-  import { signalType, currentSensor, currentDataReadyOnMap, currentSensorEntry } from '../stores';
+  import { signalType, currentSensor, currentDataReadyOnMap } from '../stores';
   import { isCountSignal } from '../data/signals';
 </script>
 
