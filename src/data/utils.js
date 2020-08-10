@@ -25,5 +25,11 @@ export function checkWIP(signalName, otherSignal) {
   return otherSignal;
 }
 
+/**
+ * @type {(v: string) => Date}
+ */
 export const parseAPITime = timeParse('%Y%m%d');
+/**
+ * @type {(v: Date) => string}
+ */
 export const formatAPITime = timeFormat('%Y%m%d');
