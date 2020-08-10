@@ -99,11 +99,7 @@
   }
 
   .top-left-container {
-    position: absolute;
-    top: 10px;
-    right: 12px;
-    left: 12px;
-
+    flex: 1 1 0;
     display: grid;
     grid-gap: 0.4em;
     grid-template-columns: auto 2fr 1fr auto;
@@ -180,7 +176,6 @@
   .map-controls-container {
     margin-left: 1em;
     z-index: 1001;
-    grid-area: controls;
     display: flex;
     align-items: flex-start;
     height: 0;
