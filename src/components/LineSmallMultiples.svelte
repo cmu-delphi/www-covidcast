@@ -122,6 +122,10 @@
     padding: 0.5em;
   }
 
+  .button > span {
+    text-decoration: underline;
+  }
+
   button.active {
     font-weight: bold !important;
   }
@@ -182,7 +186,7 @@
 
       <button on:click={() => setSingleView(true)} class="button" class:active={singleView}>
         Single indicator:
-        <u>{$currentSensorEntry.name}</u>
+        <span>{$currentSensorEntry.name}</span>
       </button>
     </div>
   </div>
