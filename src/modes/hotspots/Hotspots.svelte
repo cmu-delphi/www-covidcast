@@ -154,7 +154,7 @@
             </td>
             <td class="right">{row.value != null ? row.value.toFixed(3) : 'Unknown'}</td>
             <td class="chart">
-              <Vega data={row.data} spec={hotspotsLineChart} />
+              <Vega data={row.data} spec={hotspotsLineChart} signals={{ currentDate: $currentDateObject }} />
             </td>
           </tr>
         {/each}

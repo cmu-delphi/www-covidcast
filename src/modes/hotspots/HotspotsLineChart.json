@@ -6,30 +6,48 @@
   "autosize": {
     "resize": true
   },
-  "encoding": {
-    "color": {
-      "value": "grey"
-    },
-    "x": {
-      "field": "date_value",
-      "type": "temporal",
-      "axis": {
-        "title": null,
-        "format": "%b %e",
-        "formatType": "time",
-        "tickCount": "month"
+  "layer": [
+    {
+      "mark": {
+        "type": "line",
+        "tooltip": true,
+        "interpolate": "monotone"
+      },
+      "encoding": {
+        "color": {
+          "value": "grey"
+        },
+        "x": {
+          "field": "date_value",
+          "type": "temporal",
+          "axis": {
+            "title": null,
+            "format": "%b %e",
+            "formatType": "time",
+            "tickCount": "month"
+          }
+        },
+        "y": {
+          "field": "value",
+          "type": "quantitative",
+          "axis": null
+        }
       }
     },
-    "y": {
-      "field": "value",
-      "type": "quantitative",
-      "axis": null
+    {
+      "mark": {
+        "type": "rule"
+      },
+      "encoding": {
+        "color": {
+          "value": "red"
+        },
+        "x": {
+          "type": "temporal"
+        }
+      }
     }
-  },
-  "mark": {
-    "type": "line",
-    "interpolate": "monotone"
-  },
+  ],
   "config": {
     "padding": 0,
     "view": {
