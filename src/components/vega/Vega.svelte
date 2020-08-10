@@ -1,8 +1,10 @@
 <script>
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import { default as embed } from 'vega-embed';
 
   export let data = Promise.resolve([]);
+
+  const dispatch = createEventDispatcher();
 
   /**
    * @type {import('vega-embed').VisualizationSpec}
@@ -22,12 +24,28 @@
    */
   let vegaPromise = null;
 
+  /**
+   * @type {{[key: string]: any}}
+   */
+  let signals = {};
+
+  /**
+   * signals to dispatch
+   * @types {string[]}
+   */
+  let signalListeners = [];
+
   let loading = true;
   let noData = false;
 
   $: updateData(vegaPromise, data);
   $: updateSpec(spec);
+  $: updateSignals(vegaPromise, signals);
 
+  /**
+   * @param {Promise<import('vega-embed').Result> | null} vegaPromise
+   * @param {Promise<any[]>} data
+   */
   function updateData(vegaPromise, data) {
     if (!vegaPromise) {
       return;
@@ -48,6 +66,24 @@
     });
   }
 
+  /**
+   * @param {Promise<import('vega-embed').Result> | null} vegaPromise
+   * @param {[key: string]: any} signals
+   */
+  function updateSignals(vegaPromise, signals) {
+    if (!vegaPromise) {
+      return;
+    }
+    if (Object.keys(signals).length === 0) {
+      return;
+    }
+    vegaPromise.then((vega) => {
+      Object.entries(signals).forEach(([key, v]) => {
+        vega.view.signal(key, v);
+      });
+    });
+  }
+
   function updateSpec(spec) {
     if (!root) {
       return;
@@ -57,7 +93,14 @@
     });
     vegaPromise.then((r) => {
       vega = r;
+      signalListeners.forEach((signal) => {
+        r.view.addSignalListener(signal, (name, value) => {
+          dispatch(name, value);
+        });
+      });
+      r.view.addSignalListener();
       updateData(r, data);
+      updateSignals(r, signals);
     });
     vegaPromise.catch((error) => console.error(error));
   }
