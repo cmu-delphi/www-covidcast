@@ -4,7 +4,6 @@
     currentData,
     currentLevel,
     currentSensorEntry,
-    currentDate,
     currentMode,
     currentRegion,
     currentRegionName,
