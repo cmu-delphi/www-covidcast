@@ -2,7 +2,6 @@
   import Options from '../../components/Options.svelte';
   import {
     currentData,
-    geojsons,
     currentLevel,
     currentSensorEntry,
     currentDate,
@@ -14,18 +13,18 @@
   import { fetchTimeSlice } from '../../data/fetchData';
   import IoIosPin from 'svelte-icons/io/IoIosPin.svelte';
   import modes from '..';
+  import { regionSearchLookup } from '../../stores/search';
 
   /**
    * @param {import('../../data/fetchData').EpiDataRow} row
-   * @param {Map<string, any>} properties
+   * @param {Map<string, import('../../maps/nameIdInfo').NameInfo>} lookup
    * @param {string} level   */
-  function toHotspotData(row, properties, level) {
+  function toHotspotData(row, lookup, level) {
     // TODO generalize this process into the stores
-    const props = properties.get(row.geo_value.toUpperCase());
+    const props = lookup.get(row.geo_value.toUpperCase());
     return {
       id: row.geo_value.toUpperCase(),
-      name: props ? props.NAME : row.geo_value,
-      population: props ? Number.parseInt(props.Population, 10) : null,
+      name: props ? props.display_name : row.geo_value,
       value: row.value,
       level,
       geo_value: row.geo_value,
@@ -47,14 +46,9 @@
     return a.geo_value.localeCompare(b.geo_value);
   }
 
-  // property lookup using geojson properties
-  $: properties = !$geojsons.has($currentLevel)
-    ? new Map()
-    : new Map($geojsons.get($currentLevel).features.map((r) => [r.properties.id, r.properties]));
-
   // transform current data
   $: data = $currentData
-    .map((row) => toHotspotData(row, properties, $currentLevel))
+    .map((row) => toHotspotData(row, $regionSearchLookup, $currentLevel))
     .sort(byHotspot)
     .slice(0, TOP_HOTSPOTS)
     .map((d) => addData(d, $currentSensorEntry));
