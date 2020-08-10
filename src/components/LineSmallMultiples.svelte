@@ -3,8 +3,8 @@
   import { parseAPITime } from '../data/utils';
   import { fetchCustomTimeSlice } from '../data/fetchData';
   import Vega from './vega/Vega.svelte';
-  import sensorSingleLineChartSchema from './vega/SmallMultipleLineChart.json';
-  import singleLineChartSchema from './vega/SmallMultipleSingleLineChart.json';
+  import sensorSingleLineChartSpec from './vega/SmallMultipleLineChart.json';
+  import singleLineChartSpec from './vega/SmallMultipleSingleLineChart.json';
 
   // An array of keys that will NOT be shown in small multiples
   const sensorSmallMultipleBlacklist = [
@@ -48,14 +48,14 @@
     finalDay,
   );
   // patch in the yAxis name
-  $: singleLineChartSchemaPatched = {
-    ...singleLineChartSchema,
+  $: singleLineChartSpecPatched = {
+    ...singleLineChartSpec,
     encoding: {
-      ...singleLineChartSchema.encoding,
+      ...singleLineChartSpec.encoding,
       y: {
-        ...singleLineChartSchema.encoding.y,
+        ...singleLineChartSpec.encoding.y,
         axis: {
-          ...singleLineChartSchema.encoding.y.axis,
+          ...singleLineChartSpec.encoding.y.axis,
           title: $currentSensorEntry.yAxis ? $currentSensorEntry.yAxis : ' ',
         },
       },
@@ -201,7 +201,7 @@
 
   <div class="single-chart vega-wrapper" class:hidden={!singleView}>
     {#if singleView}
-      <Vega data={singleChartDataPromise} schema={singleLineChartSchemaPatched} />
+      <Vega data={singleChartDataPromise} spec={singleLineChartSpecPatched} />
     {/if}
   </div>
 
@@ -210,7 +210,7 @@
       <li>
         <h5 title={sensor.tooltipText} on:click={() => toggleSingleView(sensor.key)}>{sensor.name}</h5>
         <div class="single-sensor-chart vega-wrapper">
-          <Vega data={sensor.data} schema={sensorSingleLineChartSchema} />
+          <Vega data={sensor.data} spec={sensorSingleLineChartSpec} />
         </div>
       </li>
     {/each}

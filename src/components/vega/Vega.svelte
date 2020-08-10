@@ -7,7 +7,7 @@
   /**
    * @type {import('vega-embed').VisualizationSpec}
    */
-  export let schema;
+  export let spec;
 
   /**
    * @type {HTMLElement|null}
@@ -26,7 +26,7 @@
   let noData = false;
 
   $: updateData(vegaPromise, data);
-  $: updateSchema(schema);
+  $: updateSpec(spec);
 
   function updateData(vegaPromise, data) {
     if (!vegaPromise) {
@@ -48,11 +48,11 @@
     });
   }
 
-  function updateSchema(schema) {
+  function updateSpec(spec) {
     if (!root) {
       return;
     }
-    vegaPromise = embed(root, schema, {
+    vegaPromise = embed(root, spec, {
       actions: false,
     });
     vegaPromise.then((r) => {
@@ -63,7 +63,7 @@
   }
 
   onMount(() => {
-    updateSchema(schema);
+    updateSpec(spec);
   });
 
   onDestroy(() => {

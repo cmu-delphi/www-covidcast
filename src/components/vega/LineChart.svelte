@@ -1,9 +1,9 @@
 <script>
   import Vega from './Vega.svelte';
-  import lineSchema from './LineChart.json';
+  import lineSpec from './LineChart.json';
 
   export let data = [];
-  const schema = lineSchema;
+  const spec = lineSpec;
 </script>
 
-<Vega {data} on: {schema} />
+<Vega {data} on: {spec} />
