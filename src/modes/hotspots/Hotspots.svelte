@@ -21,7 +21,7 @@
    * @param {string} level   */
   function toHotspotData(row, lookup, level) {
     // TODO generalize this process into the stores
-    const props = lookup.get(row.geo_value.toUpperCase());
+    const props = lookup(row.geo_value.toUpperCase());
     return {
       id: row.geo_value.toUpperCase(),
       name: props ? props.display_name : row.geo_value,
@@ -140,7 +140,6 @@
       <thead>
         <tr>
           <th rowspan="2">Name</th>
-          <th rowspan="2">Population</th>
           <th colspan="2">{$currentSensorEntry.name}</th>
         </tr>
         <tr>
@@ -157,7 +156,6 @@
                 <IoIosPin />
               </button>
             </td>
-            <td class="right">{row.population != null ? row.population.toLocaleString() : ''}</td>
             <td class="right">{row.value != null ? row.value.toFixed(3) : 'Unknown'}</td>
             <td class="chart">
               <LineChart data={row.data} />
