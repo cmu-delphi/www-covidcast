@@ -23,7 +23,10 @@ export default class MapBoxWrapper {
      * @type {MapBox | null}
      */
     this.map = null;
-    this.mapReady = false;
+    this.mapSetupReady = false;
+    this.mapDataReady = false;
+    this.mapEncodingReady = false;
+
     this.animationDuration = 0;
 
     /**
@@ -33,7 +36,8 @@ export default class MapBoxWrapper {
 
     this.encodings = encodings;
     this.encoding = this.encodings[0];
-    this.level = '';
+    // set a good default value
+    this.level = 'county';
     this.zoom = new ZoomMap();
   }
 
@@ -76,12 +80,48 @@ export default class MapBoxWrapper {
         })
         .then(() => {
           this.zoom.ready();
-          this.mapReady = true;
-          this.dispatch('ready');
+          this.markReady('setup');
           resolveCallback(this);
         });
     });
     return p;
+  }
+
+  /**
+   *
+   * @param {'data' | 'setup' | 'encoding'} type
+   */
+  markReady(type) {
+    switch (type) {
+      case 'data': {
+        if (this.mapDataReady) {
+          return;
+        }
+        this.mapDataReady = true;
+        this.dispatch('readyData');
+        break;
+      }
+      case 'setup': {
+        if (this.mapSetupReady) {
+          return;
+        }
+        this.mapSetupReady = true;
+        this.dispatch('readySetup');
+        break;
+      }
+      case 'encoding': {
+        if (this.mapEncodingReady) {
+          return;
+        }
+        this.mapEncodingReady = true;
+        this.dispatch('readyEncoding');
+        break;
+      }
+    }
+    // once all are ready
+    if (this.mapSetupReady && this.mapEncodingReady && this.mapDataReady) {
+      this.dispatch('ready');
+    }
   }
 
   addSources() {
@@ -211,7 +251,7 @@ export default class MapBoxWrapper {
   }
 
   destroy() {
-    this.mapReady = false;
+    this.mapSetupReady = false;
     if (this.map) {
       this.map.remove();
       this.zoom.map = null;
@@ -225,7 +265,7 @@ export default class MapBoxWrapper {
     this.level = level;
     this.encoding = this.encodings.find((d) => d.id === encoding);
 
-    if (!this.map || !this.mapReady) {
+    if (!this.map || !this.mapSetupReady) {
       return;
     }
 
@@ -245,7 +285,10 @@ export default class MapBoxWrapper {
       this.map.setLayoutProperty(layer, 'visibility', visibleLayers.has(layer) ? 'visible' : 'none');
     });
 
-    return this.encoding.encode(this.map, level, signalType, sensor, valueMinMax, stops, stopsMega);
+    const r = this.encoding.encode(this.map, level, signalType, sensor, valueMinMax, stops, stopsMega);
+
+    this.markReady('encoding');
+    return r;
   }
 
   /**
@@ -256,7 +299,7 @@ export default class MapBoxWrapper {
    * @param {string} sensor
    */
   updateSources(level, values, directions, sensor) {
-    if (!this.map || !this.mapReady) {
+    if (!this.map || !this.mapSetupReady) {
       return;
     }
     if (level === 'county') {
@@ -267,6 +310,9 @@ export default class MapBoxWrapper {
 
     for (const encoding of this.encodings) {
       encoding.updateSources(this.map, level);
+    }
+    if (values.size > 0 || directions.size > 0) {
+      this.markReady('data');
     }
   }
   /**
@@ -290,6 +336,7 @@ export default class MapBoxWrapper {
       const id = d.properties.id;
       d.properties.value = MISSING_VALUE;
       d.properties.direction = MISSING_VALUE;
+      d.properties.value1 = MISSING_VALUE;
 
       if (values.has(id)) {
         d.properties.value = values.get(id)[0];
@@ -297,8 +344,6 @@ export default class MapBoxWrapper {
         if (is7DavIncidence(sensor)) {
           // value ... 7-day avg
           d.properties.value1 = values.get(id)[1]; // count
-        } else {
-          delete d.properties.value1;
         }
       }
       if (directions.has(id)) {
@@ -360,7 +405,7 @@ export default class MapBoxWrapper {
   }
 
   selectRandom() {
-    if (!this.map || !this.mapReady) {
+    if (!this.map || !this.mapSetupReady) {
       return;
     }
     const defaultRegion = defaultRegionOnStartup[this.level];
@@ -377,6 +422,9 @@ export default class MapBoxWrapper {
     }
 
     const viableFeatures = source._data.features.filter((d) => d.properties.value !== MISSING_VALUE);
+    if (viableFeatures.length === 0) {
+      return;
+    }
     const index = Math.floor(Math.random() * (viableFeatures.length - 1));
     const randomFeature = viableFeatures[index];
     this.interactive.forceHover(randomFeature);
