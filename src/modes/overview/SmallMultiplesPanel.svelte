@@ -1,92 +1,140 @@
 <script>
-  import { currentRegion, currentSensor, currentLevel, sensors, currentSensorEntry } from '../../stores';
-  import { parseAPITime } from '../../data/utils';
-  import { fetchCustomTimeSlice } from '../../data/fetchData';
-  import Vega from '../../components/vega/Vega.svelte';
-  import sensorSingleLineChartSpec from '../../components/vega/SmallMultipleLineChart.json';
-  import singleLineChartSpec from '../../components/vega/SmallMultipleSingleLineChart.json';
-
-  // An array of keys that will NOT be shown in small multiples
-  const sensorSmallMultipleBlacklist = [
-    'ght-smoothed_search',
-    'indicator-combination-confirmed_7dav_incidence_num',
-    'indicator-combination-deaths_7dav_incidence_num',
-    // 'safegraph-full_time_work_prop',
-  ];
-  $: filteredSensors = $sensors.filter((s) => !sensorSmallMultipleBlacklist.includes(s.key));
+  import SmallMultiples from './SmallMultiples.svelte';
+  import {
+    // currentRegion,
+    // currentLevel,
+    // currentSensorEntry,
+    publicSensors,
+    earlySensors,
+    lateSensors,
+    currentRegionName,
+  } from '../../stores';
+  // import { parseAPITime } from '../../data/utils';
+  // import { fetchCustomTimeSlice } from '../../data/fetchData';
+  // import singleLineChartSpec from '../../components/vega/SmallMultipleSingleLineChart.json';
+  import IoIosArrowForward from 'svelte-icons/io/IoIosArrowForward.svelte';
 
   // Create a date for today in the API's date format
-  const startDay = parseAPITime('20200401');
-  const finalDay = new Date();
+  // const startDay = parseAPITime('20200401');
+  // const finalDay = new Date();
 
-  // Whether we are showing a single metric or everything at once
-  let singleView = false;
+  let collapsed = [
+    'ght-smoothed_search',
+    'fb-survey-smoothed_hh_cmnty_cli',
+    'indicator-combination-confirmed_7dav_incidence_num',
+    'indicator-combination-deaths_7dav_incidence_num',
+    'safegraph-full_time_work_prop',
+    'safegraph-part_time_work_prop',
+  ];
+  let collapsedGroup = [];
 
-  function toggleSingleView(focusSignal = null) {
-    if (!singleView) {
-      currentSensor.set(focusSignal);
+  function toggleCollapsed(sensor) {
+    if (collapsed.includes(sensor)) {
+      collapsed = collapsed.filter((d) => d !== sensor);
+    } else {
+      collapsed = [...collapsed, sensor];
     }
-    singleView = !singleView;
   }
 
-  $: smallMultipleLineCharts = filteredSensors.map((signal) => ({
-    key: signal.key,
-    name: signal.name,
-    tooltipText: signal.tooltipText,
-    data: fetchCustomTimeSlice(signal, $currentLevel, $currentRegion, startDay, finalDay),
-  }));
+  function toggleCollapsedGroup(group) {
+    if (collapsedGroup.includes(group)) {
+      collapsedGroup = collapsedGroup.filter((d) => d !== group);
+    } else {
+      collapsedGroup = [...collapsedGroup, group];
+    }
+  }
 
-  $: singleChartDataPromise = fetchCustomTimeSlice(
-    $currentSensorEntry,
-    $currentLevel,
-    $currentRegion,
-    startDay,
-    finalDay,
-  );
-  // patch in the yAxis name
-  $: singleLineChartSpecPatched = {
-    ...singleLineChartSpec,
-    encoding: {
-      ...singleLineChartSpec.encoding,
-      y: {
-        ...singleLineChartSpec.encoding.y,
-        axis: {
-          ...singleLineChartSpec.encoding.y.axis,
-          title: $currentSensorEntry.yAxis ? $currentSensorEntry.yAxis : ' ',
-        },
-      },
+  $: smSensors = [
+    {
+      id: 'public',
+      label: 'Public Behavior',
+      sensors: $publicSensors,
     },
-  };
+    {
+      id: 'early',
+      label: 'Early Indicators',
+      sensors: $earlySensors,
+    },
+    {
+      id: 'late',
+      label: 'Late Indicators',
+      sensors: $lateSensors,
+    },
+  ];
 </script>
 
 <style>
-  .root {
+  ul {
     list-style-type: none;
+    padding: 0 0 0 0.25em;
   }
 
-  .single-sensor-chart {
-    height: 4em;
+  li {
+    margin: 0;
   }
 
-  .vega-wrapper {
+  h4,
+  h5 {
+    display: flex;
+    align-items: center;
+    padding-bottom: 0.2em;
+    cursor: pointer;
+  }
+
+  h4 > span,
+  h5 > span {
+    width: 1.2em;
+    height: 1.2em;
     position: relative;
+    transition: transform 0.25s ease;
+    transform: rotate(90deg);
   }
-  .vega-wrapper > :global(*) {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
+
+  .collapsed {
+    padding-bottom: 0;
+  }
+  .collapsed > h4,
+  .collapsed > h5 {
+    padding-bottom: 0;
+  }
+  .collapsed > h4 > span,
+  .collapsed > h5 > span {
+    transform: rotate(0deg);
+  }
+
+  .collapsed > div,
+  .collapsed > ul {
+    display: none;
   }
 </style>
 
+<h3>{$currentRegionName || 'No Region Selected'}</h3>
 <ul class="root">
-  {#each smallMultipleLineCharts as sensor}
-    <li>
-      <h5 title={sensor.tooltipText} on:click={() => toggleSingleView(sensor.key)}>{sensor.name}</h5>
-      <div class="single-sensor-chart vega-wrapper">
-        <Vega data={sensor.data} spec={sensorSingleLineChartSpec} />
-      </div>
+  {#each smSensors as sensorGroup}
+    <li class:collapsed={collapsedGroup.includes(sensorGroup.id)}>
+      <h4 on:click={() => toggleCollapsedGroup(sensorGroup.id)}>
+        <span>
+          <IoIosArrowForward />
+        </span>
+        {sensorGroup.label}
+      </h4>
+      <ul>
+        {#each sensorGroup.sensors as sensor}
+          <li class:collapsed={collapsed.includes(sensor.key)} data-id={sensor.key}>
+            <h5 title={sensor.tooltipText} on:click={() => toggleCollapsed(sensor.key)}>
+              <span>
+                <IoIosArrowForward />
+              </span>
+              {sensor.name}
+            </h5>
+            <div>
+              {#if !collapsed.includes(sensor.key) && !collapsedGroup.includes(sensorGroup.id)}
+                <SmallMultiples {sensor} />
+              {/if}
+            </div>
+          </li>
+        {/each}
+      </ul>
     </li>
   {/each}
 </ul>
