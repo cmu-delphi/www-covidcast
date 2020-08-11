@@ -9,7 +9,7 @@
   .graph-container {
     position: absolute;
     z-index: 1001;
-    bottom: 124px;
+    bottom: 192px;
     right: 10px;
     padding: 5px 5px;
     box-sizing: border-box;
@@ -59,7 +59,7 @@
     position: absolute;
     float: right;
     z-index: 1001;
-    bottom: 124px;
+    bottom: 192px;
     right: 10px;
     padding: 5px 5px;
     box-sizing: border-box;

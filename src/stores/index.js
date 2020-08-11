@@ -112,11 +112,10 @@ export const encoding = writable('color', (set) => {
   }
 });
 
-// EpiWeek in form YYYYMMDD.
 /**
  * magic date that will be replaced by the latest date
  */
-export const MAGIC_START_DATE = '20100420';
+export const MAGIC_START_DATE = '20200701';
 export const currentDate = writable(MAGIC_START_DATE, (set) => {
   const date = urlParams.get('date');
   if (/\d{8}/.test(date)) {
