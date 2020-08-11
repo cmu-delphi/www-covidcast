@@ -61,7 +61,7 @@
       ? parseAPITime($times.get($currentSensorEntry.key)[1])
       : $currentDateObject;
 
-  const frameRate = 250;
+  const frameRate = 250; // ms
   let bufferCache = 3;
 
   let nextFrameTimeout = -1;
@@ -267,6 +267,7 @@
   </div>
   <MapBox
     bind:this={map}
+    animationDuration={frameRate}
     on:idle={() => currentDataReadyOnMap.set(true)}
     data={$currentData}
     sensor={$currentSensor}
