@@ -74,7 +74,16 @@ export default class BubbleEncoding {
 
     const currentRadiusScale = parseScaleSpec(radiusScaleTheme).domain(valueMinMax).range([minRadius, maxRadius]);
 
-    const radiusExpression = currentRadiusScale.expr();
+    const scaleExpression = currentRadiusScale.expr();
+    const radiusExpression = [
+      'interpolate',
+      ['exponential', 2],
+      ['zoom'],
+      4,
+      scaleExpression,
+      10,
+      ['*', 64, scaleExpression],
+    ];
 
     map.setPaintProperty(L.bubble.fill, 'circle-radius', radiusExpression);
     map.setPaintProperty(L.bubble.highlight.fill, 'circle-radius', radiusExpression);

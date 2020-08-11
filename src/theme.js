@@ -49,8 +49,8 @@ export const ENCODING_BUBBLE_THEME = {
   },
   maxRadius: {
     county: 6,
-    msa: 10,
-    state: 20,
+    msa: 9,
+    state: 18,
   },
   radiusScale: {
     count: {

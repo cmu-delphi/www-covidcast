@@ -56,6 +56,11 @@
     const { stops, stopsMega, scale } = determineColorScale(valueMinMax, signalType, sensor);
     const drawMega = level === 'county';
     const ret = wrapper.updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, drawMega && stopsMega);
+
+    if (!ret) {
+      // A falsy return value means that the map is not ready.
+      return;
+    }
     dispatch('updatedEncoding', {
       range: signalType === 'value' ? valueMinMax : [-1, 1],
       custom: ret,
