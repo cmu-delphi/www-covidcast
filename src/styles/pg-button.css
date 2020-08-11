@@ -36,7 +36,8 @@
   outline: none;
 }
 
-.pg-button:hover {
+.pg-button:hover,
+.pg-button.active {
   background-color: #f2f2f2;
 }
 

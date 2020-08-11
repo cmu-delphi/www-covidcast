@@ -7,12 +7,15 @@
     publicSensors,
     earlySensors,
     lateSensors,
-    currentRegionName,
+    currentRegionInfo,
+    currentSensor,
   } from '../../stores';
   // import { parseAPITime } from '../../data/utils';
   // import { fetchCustomTimeSlice } from '../../data/fetchData';
   // import singleLineChartSpec from '../../components/vega/SmallMultipleSingleLineChart.json';
   import IoIosArrowForward from 'svelte-icons/io/IoIosArrowForward.svelte';
+  import IoMdMap from 'svelte-icons/io/IoMdMap.svelte';
+  import IoMdExpand from 'svelte-icons/io/IoMdExpand.svelte';
 
   // Create a date for today in the API's date format
   // const startDay = parseAPITime('20200401');
@@ -73,16 +76,25 @@
     margin: 0;
   }
 
-  h4,
-  h5 {
+  .header {
     display: flex;
     align-items: center;
     padding-bottom: 0.2em;
     cursor: pointer;
   }
 
-  h4 > span,
-  h5 > span {
+  h4,
+  h5 {
+    flex: 1 1 0;
+    padding: 0;
+  }
+
+  .toolbar {
+    display: flex;
+    font-size: 0.7rem;
+  }
+
+  .toggle {
     width: 1.2em;
     height: 1.2em;
     position: relative;
@@ -93,41 +105,48 @@
   .collapsed {
     padding-bottom: 0;
   }
-  .collapsed > h4,
-  .collapsed > h5 {
-    padding-bottom: 0;
-  }
-  .collapsed > h4 > span,
-  .collapsed > h5 > span {
+  .collapsed .toggle {
     transform: rotate(0deg);
   }
 
-  .collapsed > div,
-  .collapsed > ul {
+  .collapsed > .collapsed-body {
     display: none;
   }
 </style>
 
-<h3>{$currentRegionName || 'No Region Selected'}</h3>
+<h3>{$currentRegionInfo ? $currentRegionInfo.display_name : 'No Region Selected'}</h3>
 <ul class="root">
   {#each smSensors as sensorGroup}
     <li class:collapsed={collapsedGroup.includes(sensorGroup.id)}>
-      <h4 on:click={() => toggleCollapsedGroup(sensorGroup.id)}>
-        <span>
+      <div class="header" on:click={() => toggleCollapsedGroup(sensorGroup.id)}>
+        <span class="toggle">
           <IoIosArrowForward />
         </span>
-        {sensorGroup.label}
-      </h4>
-      <ul>
+        <h4>{sensorGroup.label}</h4>
+      </div>
+      <ul class="collapsed-body">
         {#each sensorGroup.sensors as sensor}
           <li class:collapsed={collapsed.includes(sensor.key)} data-id={sensor.key}>
-            <h5 title={sensor.tooltipText} on:click={() => toggleCollapsed(sensor.key)}>
-              <span>
+            <div class="header" title={sensor.tooltipText} on:click={() => toggleCollapsed(sensor.key)}>
+              <span class="toggle">
                 <IoIosArrowForward />
               </span>
-              {sensor.name}
-            </h5>
-            <div>
+              <h5>{sensor.name}</h5>
+              <div class="toolbar">
+                <button
+                  class="pg-button"
+                  title="Show in Map"
+                  on:click={() => currentSensor.set(sensor.key)}
+                  class:active={$currentSensor === sensor.key}
+                  disabled={$currentSensor === sensor.key}>
+                  <IoMdMap />
+                </button>
+                <button class="pg-button">
+                  <IoMdExpand />
+                </button>
+              </div>
+            </div>
+            <div class="collapsed-body">
               {#if !collapsed.includes(sensor.key) && !collapsedGroup.includes(sensorGroup.id)}
                 <SmallMultiples {sensor} />
               {/if}
