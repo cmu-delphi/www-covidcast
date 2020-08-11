@@ -27,7 +27,7 @@
   /**
    * @type {{[key: string]: any}}
    */
-  let signals = {};
+  export let signals = {};
 
   /**
    * signals to dispatch
@@ -43,15 +43,19 @@
   $: updateSignals(vegaPromise, signals);
 
   /**
-   * @param {Promise<import('vega-embed').Result> | null} vegaPromise
+   * @param {Promise<import('vega-embed').Result> | null} vegaLoader
    * @param {Promise<any[]>} data
    */
-  function updateData(vegaPromise, data) {
-    if (!vegaPromise) {
+  function updateData(vegaLoader, data) {
+    if (!vegaLoader) {
       return;
     }
     loading = true;
-    Promise.all([vegaPromise, data]).then(([vega, d]) => {
+    Promise.all([vegaLoader, data]).then(([vega, d]) => {
+      if (vegaLoader !== vegaPromise) {
+        // outside has changed
+        return;
+      }
       noData = !d || d.length === 0;
       vega.view
         .change(
@@ -67,20 +71,28 @@
   }
 
   /**
-   * @param {Promise<import('vega-embed').Result> | null} vegaPromise
+   * @param {Promise<import('vega-embed').Result> | null} vegaLoader
    * @param {[key: string]: any} signals
    */
-  function updateSignals(vegaPromise, signals) {
-    if (!vegaPromise) {
+  function updateSignals(vegaLoader, signals) {
+    if (!vegaLoader) {
       return;
     }
     if (Object.keys(signals).length === 0) {
       return;
     }
-    vegaPromise.then((vega) => {
+    vegaLoader.then((vega) => {
+      if (vegaLoader !== vegaPromise) {
+        // outside has changed
+        return;
+      }
+      if (!vega) {
+        return;
+      }
       Object.entries(signals).forEach(([key, v]) => {
         vega.view.signal(key, v);
       });
+      vega.view.runAsync();
     });
   }
 
@@ -88,8 +100,20 @@
     if (!root) {
       return;
     }
+    if (vegaPromise) {
+      // cleanup old
+      vegaPromise.then((r) => r.finalize());
+    }
+    vega = null;
     vegaPromise = embed(root, spec, {
       actions: false,
+      patch: (spec) => {
+        spec.signals = spec.signals || [];
+        Object.entries(signals).forEach(([key, v]) => {
+          spec.signals.push({ name: key, value: v });
+        });
+        return spec;
+      },
     });
     vegaPromise.then((r) => {
       vega = r;
@@ -98,9 +122,7 @@
           dispatch(name, value);
         });
       });
-      r.view.addSignalListener();
       updateData(r, data);
-      updateSignals(r, signals);
     });
     vegaPromise.catch((error) => console.error(error));
   }

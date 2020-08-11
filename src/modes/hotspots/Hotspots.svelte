@@ -26,7 +26,7 @@
     return {
       id: row.geo_value.toUpperCase(),
       name: props ? props.display_name : row.geo_value,
-      value: row.value,
+      value: row.count != null ? row.count : row.value,
       level,
       geo_value: row.geo_value,
     };

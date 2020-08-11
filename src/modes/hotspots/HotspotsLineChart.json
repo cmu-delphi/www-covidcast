@@ -35,14 +35,29 @@
       }
     },
     {
+      "transform": [
+        {
+          "aggregate": [
+            {
+              "op": "count",
+              "as": "c"
+            }
+          ]
+        },
+        {
+          "calculate": "toDate(currentDate)",
+          "as": "current"
+        }
+      ],
       "mark": {
         "type": "rule"
       },
       "encoding": {
         "color": {
-          "value": "red"
+          "value": "#c00"
         },
         "x": {
+          "field": "current",
           "type": "temporal"
         }
       }
