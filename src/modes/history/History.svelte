@@ -24,7 +24,9 @@
   import MapControls from '../../components/MapControls.svelte';
   import { isDeathSignal, isCasesSignal } from '../../data/signals';
   import Player from './Player.svelte';
+  import { timeDay } from 'd3';
   import { parseAPITime, formatAPITime } from '../../data';
+  import { fetchRegionSlice } from '../../data/fetchData';
 
   /**
    * @type {MapBox}
@@ -59,11 +61,70 @@
       ? parseAPITime($times.get($currentSensorEntry.key)[1])
       : $currentDateObject;
 
+  const frameRate = 250;
+  let bufferCache = 3;
+
+  let nextFrameTimeout = -1;
+
+  function tick() {
+    nextFrameTimeout = -1;
+    const nextDate = timeDay.offset($currentDateObject, 1);
+    if (nextDate > maxDate) {
+      // end
+      running = false;
+      return;
+    }
+    const data = fetchRegionSlice($currentSensorEntry, $currentLevel, nextDate);
+    // need to wait
+    const started = Date.now();
+    data.then(() => {
+      if (!running) {
+        return;
+      }
+      const needed = Date.now() - started;
+      if (needed > frameRate) {
+        // increase buffer if it was too slow
+        bufferCache = Math.min(bufferCache + 1, 10);
+      }
+      nextFrameTimeout = setTimeout(() => {
+        currentDate.set(formatAPITime(nextDate));
+        tick();
+      }, Math.max(0, frameRate - needed));
+    });
+  }
+
   function toggleRunning() {
     running = !running;
+    if (!running) {
+      // stop
+      if (nextFrameTimeout >= 0) {
+        clearTimeout(nextFrameTimeout);
+        nextFrameTimeout = -1;
+      }
+      return;
+    }
+    // start
+    if (maxDate.getTime() === $currentDateObject.getTime()) {
+      // auto reset
+      currentDate.set(formatAPITime(minDate.getTime()));
+    }
+    tick();
   }
   function jumpToDate(d) {
+    if (running) {
+      // stop upon manual jump
+      toggleRunning();
+    }
     currentDate.set(formatAPITime(d));
+  }
+
+  $: {
+    // fetch buffer size upon date change
+    const date = $currentDateObject;
+    const dates = timeDay.range(timeDay.floor(date), timeDay.offset(date, bufferCache));
+    for (const d of dates) {
+      fetchRegionSlice($currentSensorEntry, $currentLevel, d);
+    }
   }
 </script>
 
