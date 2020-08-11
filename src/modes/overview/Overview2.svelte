@@ -194,13 +194,13 @@
 
 <main class="root">
   <div class="top-container container-style">
-    <div class="options-container base-font-size">
+    <div class="options-container base-font-size container-bg container-style">
       <Options />
     </div>
     <div class="search-container-wrapper base-font-size" class:loading={$regionSearchList.length === 0}>
       {#if $regionSearchList.length > 0}
         <Search
-          className="search-container"
+          className="search-container container-bg container-style"
           placeholder="Search for a location..."
           items={$regionSearchList}
           selectedItem={$currentRegionInfo}
