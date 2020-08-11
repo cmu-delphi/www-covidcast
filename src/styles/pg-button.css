@@ -74,6 +74,7 @@
   border-bottom-right-radius: 0;
 }
 
+.pg-button-vertical-group > .selected,
 .pg-button-group > .selected {
   background-color: #f2f2f2;
 }
