@@ -35,18 +35,13 @@
       }
     },
     {
+      "data": {
+        "values": [{ "date_value": null }]
+      },
       "transform": [
         {
-          "aggregate": [
-            {
-              "op": "count",
-              "as": "c"
-            }
-          ]
-        },
-        {
           "calculate": "toDate(currentDate)",
-          "as": "current"
+          "as": "date_value"
         }
       ],
       "mark": {
@@ -57,7 +52,7 @@
           "value": "#c00"
         },
         "x": {
-          "field": "current",
+          "field": "date_value",
           "type": "temporal"
         }
       }
