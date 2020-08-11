@@ -33,7 +33,8 @@ export default class MapBoxWrapper {
 
     this.encodings = encodings;
     this.encoding = this.encodings[0];
-    this.level = '';
+    // set a good default value
+    this.level = 'county';
     this.zoom = new ZoomMap();
   }
 
@@ -290,6 +291,7 @@ export default class MapBoxWrapper {
       const id = d.properties.id;
       d.properties.value = MISSING_VALUE;
       d.properties.direction = MISSING_VALUE;
+      d.properties.value1 = MISSING_VALUE;
 
       if (values.has(id)) {
         d.properties.value = values.get(id)[0];
@@ -297,8 +299,6 @@ export default class MapBoxWrapper {
         if (is7DavIncidence(sensor)) {
           // value ... 7-day avg
           d.properties.value1 = values.get(id)[1]; // count
-        } else {
-          delete d.properties.value1;
         }
       }
       if (directions.has(id)) {
