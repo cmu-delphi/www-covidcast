@@ -118,7 +118,7 @@
 
   onMount(() => {
     loadMetaData().then(({ level, date }) => {
-      $mounted = 1;
+      mounted.set(true);
       updateRegionSliceCache($currentSensor, level, date);
       if ($currentRegion) {
         updateTimeSliceCache($currentSensor, $currentLevel, $currentRegion);

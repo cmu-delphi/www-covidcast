@@ -10,7 +10,8 @@ import { addCityLayers, L } from './layers';
 import style from './mapbox_albers_usa_style.json';
 import { geoJsonSources, S } from './sources';
 import ZoomMap from './ZoomMap';
-
+import { mounted } from '../../stores';
+import { get } from 'svelte/store';
 export default class MapBoxWrapper {
   /**
    *
@@ -315,7 +316,7 @@ export default class MapBoxWrapper {
    * @param {import('../../maps/nameIdInfo').NameInfo | null} selection
    */
   select(selection) {
-    if (!this.map || !this.interactive) {
+    if (!this.map || !this.interactive || !get(mounted)) {
       return;
     }
     const oldSelection = this.interactive.select(selection);
@@ -360,7 +361,7 @@ export default class MapBoxWrapper {
   }
 
   selectRandom() {
-    if (!this.map || !this.mapReady) {
+    if (!this.map || !this.mapReady || !get(mounted)) {
       return;
     }
     const defaultRegion = defaultRegionOnStartup[this.level];

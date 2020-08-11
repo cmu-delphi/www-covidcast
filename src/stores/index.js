@@ -52,7 +52,7 @@ export const sensorMap = derived(sensors, ($sensors) => {
 export const times = writable(null);
 export const stats = writable(null);
 
-export const mounted = writable(0);
+export const mounted = writable(false);
 export const mapFirstLoaded = writable(false);
 export const currentDataReadyOnMap = writable(false);
 export const customDataView = readable(true, (set) => {
