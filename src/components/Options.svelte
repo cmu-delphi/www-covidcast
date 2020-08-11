@@ -16,6 +16,7 @@
 
   const formatTime = d3.timeFormat('%B %-d, %Y');
 
+  export let showDate = true;
   // let selectedDate = writable(parseTime($currentDate));
   $: selectedDate = parseAPITime($currentDate);
   // if ($currentDate !== MAGIC_START_DATE) {
@@ -116,14 +117,16 @@
       <option value={level.id} disabled={!$currentSensorEntry.levels.includes(level.id)}>{level.labelPlural}</option>
     {/each}
   </select>
-  <span class="option-title">on</span>
-  {#if selectedDate != null && start_end_dates.length !== 0}
-    <Datepicker
-      bind:selected={selectedDate}
-      start={parseAPITime(start_end_dates[0])}
-      end={parseAPITime(start_end_dates[1])}
-      formattedSelected={formatTime(selectedDate)}>
-      <button aria-label="selected date" class="calendar base-font-size" on:>{formatTime(selectedDate)}</button>
-    </Datepicker>
+  {#if showDate}
+    <span class="option-title">on</span>
+    {#if selectedDate != null && start_end_dates.length !== 0}
+      <Datepicker
+        bind:selected={selectedDate}
+        start={parseAPITime(start_end_dates[0])}
+        end={parseAPITime(start_end_dates[1])}
+        formattedSelected={formatTime(selectedDate)}>
+        <button aria-label="selected date" class="calendar base-font-size" on:>{formatTime(selectedDate)}</button>
+      </Datepicker>
+    {/if}
   {/if}
 </div>

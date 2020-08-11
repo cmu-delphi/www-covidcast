@@ -16,6 +16,12 @@ export default [
     tooltip: 'Switch to Overview Mode',
     component: () => import('./overview/Overview.svelte').then((r) => r.default),
   },
+  {
+    id: 'history',
+    label: 'History',
+    tooltip: 'Switch to History Mode',
+    component: () => import('./history/History.svelte').then((r) => r.default),
+  },
   // {
   //   id: 'compare',
   //   label: 'Compare',
