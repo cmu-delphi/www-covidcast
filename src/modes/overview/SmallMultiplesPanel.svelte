@@ -18,6 +18,8 @@
     'safegraph-part_time_work_prop',
   ];
 
+  export let detail = null;
+
   $: smSensors = [
     {
       id: 'public',
@@ -68,12 +70,15 @@
               <button
                 class="pg-button"
                 title="Show in Map"
-                on:click={() => currentSensor.set(sensor.key)}
+                on:click|stopPropagation={() => currentSensor.set(sensor.key)}
                 class:active={$currentSensor === sensor.key}
                 disabled={$currentSensor === sensor.key}>
                 <IoMdMap />
               </button>
-              <button class="pg-button" on:click={() => dispatch('show', sensor)}>
+              <button
+                class="pg-button"
+                class:active={detail === sensor}
+                on:click|stopPropagation={() => dispatch('show', detail === sensor ? null : sensor)}>
                 <IoMdExpand />
               </button>
             </div>

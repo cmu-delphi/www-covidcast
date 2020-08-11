@@ -24,8 +24,8 @@
   import Title from '../../components/Title.svelte';
   import MapControls from '../../components/MapControls.svelte';
   import Search from '../../components/Search.svelte';
-  import { trackEvent } from '../../stores/ga';
   import SmallMultiplesPanel from './SmallMultiplesPanel.svelte';
+  import SmallMultiplesDetail from './SmallMultiplesDetail.svelte';
 
   /**
    * @type {MapBox}
@@ -55,26 +55,13 @@
     }
   }
 
-  let graphShowStatus = false;
-  let firstLoaded = true;
+  /**
+   * @type {import('../../data/fetchData').SensorEntry | null}
+   */
+  let detailSensor = null;
 
-  currentRegion.subscribe((r) => {
-    if (firstLoaded && r !== '') {
-      toggleGraphShowStatus(null, false);
-      firstLoaded = false;
-    } else if (r) {
-      toggleGraphShowStatus(null, true);
-    } else {
-      toggleGraphShowStatus(null, false);
-    }
-  });
-  function toggleGraphShowStatus(event, to = null) {
-    if (to !== null) {
-      graphShowStatus = to;
-    } else {
-      graphShowStatus = !graphShowStatus;
-    }
-    trackEvent('graph', graphShowStatus ? 'show' : 'hide');
+  function onShow(e) {
+    detailSensor = e.detail;
   }
 </script>
 
@@ -190,6 +177,17 @@
 
     transition: all 0.1s ease-in;
   }
+
+  .detail-container {
+    position: absolute;
+    right: 0;
+    z-index: 1005;
+    width: 100%;
+    top: 20%;
+    height: 60%;
+    display: flex;
+    flex-direction: column;
+  }
 </style>
 
 <main class="root">
@@ -236,10 +234,16 @@
         on:updatedEncoding={(e) => updatedEncoding(e.detail)}
         on:select={(e) => selectByFeature(e.detail)}
         on:selectMega={(e) => selectByFeature(e.detail)} />
+
+      {#if detailSensor != null}
+        <div class="detail-container container-bg container-style">
+          <SmallMultiplesDetail sensor={detailSensor} on:close={() => (detailSensor = null)} />
+        </div>
+      {/if}
     </div>
     <div class="panel-container">
       <div class="panel-scroll-container">
-        <SmallMultiplesPanel />
+        <SmallMultiplesPanel on:show={onShow} detail={detailSensor} />
       </div>
     </div>
   </div>
