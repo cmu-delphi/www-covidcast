@@ -1,7 +1,9 @@
 <script>
-  import IoMdPlay from 'svelte-icons/io/IoMdPlay.svelte';
   import IoMdPause from 'svelte-icons/io/IoMdPause.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount, onDestroy } from 'svelte';
+  import { timeMonth } from 'd3';
+  import noUiSlider from 'nouislider';
+  import 'nouislider/distribute/nouislider.css';
 
   const DAY_IN_MS = 24 * 60 * 60 * 1000;
   const dispatch = createEventDispatcher();
@@ -24,12 +26,73 @@
     }
   }
 
-  /**
-   * @type {ChangeEvent} e
-   */
-  function onChange(e) {
-    const n = e.currentTarget.valueAsNumber;
-    dispatch('change', new Date(n));
+  let sliderElement = null;
+  let sliderInstance = null;
+
+  const format = {
+    to: (v) => {
+      return new Date(v).toLocaleDateString();
+    },
+    from: (v) => {
+      return Number.parseInt(v);
+    },
+  };
+
+  onMount(() => {
+    sliderInstance = noUiSlider.create(sliderElement, {
+      step: DAY_IN_MS,
+      tooltips: [format],
+      connect: 'lower',
+      range: {
+        min: min.getTime(),
+        max: max.getTime(),
+      },
+      start: value.getTime(),
+      pips: {
+        mode: 'values',
+        format,
+        values: timeMonth.range(min, max, 2).map((d) => d.getTime()),
+        density: 4,
+        stepped: true,
+      },
+    });
+    sliderInstance.on('change', (values) => {
+      dispatch('change', new Date(Number.parseInt(values[0], 10)));
+    });
+  });
+
+  onDestroy(() => {
+    if (sliderInstance) {
+      sliderInstance.destroy();
+      sliderInstance = null;
+    }
+  });
+
+  $: {
+    const v = value.getTime();
+    if (sliderInstance) {
+      sliderInstance.set(v);
+    }
+  }
+  $: {
+    const minD = min.getTime();
+    const maxD = max.getTime();
+    if (sliderInstance) {
+      sliderInstance.updateOptions(
+        {
+          range: { min: minD, max: maxD },
+          start: value.getTime(),
+          pips: {
+            mode: 'values',
+            format,
+            values: timeMonth.range(min, max, 2).map((d) => d.getTime()),
+            density: 4,
+            stepped: true,
+          },
+        },
+        false,
+      );
+    }
   }
 </script>
 
@@ -69,48 +132,42 @@
   }
 
   .slider {
-    -webkit-appearance: none;
-    width: unset;
+    margin: 0.5em 1em 1.5em 2.5em;
     flex: 1 1 20em;
-    height: 6px;
-    padding: 0;
-    border: none;
-    background: #d3d3d3;
-    outline: none;
-    margin: 12px;
+    height: 8px;
+    font-size: 0.75rem;
   }
 
-  .slider::-moz-focus-outer {
-    border: 0;
+  .slider :global(.noUi-connect) {
+    background: var(--red);
   }
 
-  /* Special styling for WebKit/Blink */
-  .slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
+  .slider :global(.noUi-tooltip) {
+    display: none;
+  }
+  .slider :global(.noUi-active .noUi-tooltip) {
+    display: block;
+  }
+  .slider :global(.noUi-pips-horizontal) {
+    padding: 3px 0;
+  }
+  .slider :global(.noUi-marker-horizontal.noUi-marker-large) {
+    height: 10px;
+  }
+
+  .slider :global(.noUi-handle) {
     border-radius: 50%;
     background: var(--red);
-    cursor: pointer;
-  }
-
-  /* All the same stuff for Firefox */
-  .slider::-moz-range-thumb {
     width: 20px;
     height: 20px;
-    border-radius: 50%;
-    background: var(--red);
-    cursor: pointer;
+    top: -7px;
+    right: -10px;
+    box-shadow: none;
   }
 
-  /* All the same stuff for IE */
-  .slider::-ms-thumb {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #c00;
-    cursor: pointer;
+  .slider :global(.noUi-handle)::before,
+  .slider :global(.noUi-handle)::after {
+    display: none;
   }
 </style>
 
@@ -123,17 +180,12 @@
     {#if running}
       <IoMdPause />
     {:else}
-      <IoMdPlay />
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svelte-c8tyih">
+        <path d="M140 52v408l320-204L140 52z" />
+      </svg>
     {/if}
   </button>
-  <input
-    type="range"
-    min={min.getTime()}
-    max={max.getTime()}
-    step={DAY_IN_MS}
-    class="slider"
-    value={value.getTime()}
-    on:change={onChange} />
+  <div bind:this={sliderElement} class="slider" />
 </div>
 
 <svelte:window on:keydown={onSpacePress} />
