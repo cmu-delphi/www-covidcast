@@ -125,7 +125,7 @@
   .play-button:hover,
   .play-button:focus {
     outline: none !important;
-    color: var(--grey);
+    color: whitesmoke;
   }
   .play-button:active {
     outline: none;

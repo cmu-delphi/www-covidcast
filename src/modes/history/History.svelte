@@ -102,7 +102,7 @@
     flex: 1 1 0;
     display: grid;
     grid-gap: 0.4em;
-    grid-template-columns: auto 2fr 1fr auto;
+    grid-template-columns: auto 1fr 1fr;
     grid-template-rows: auto auto;
     grid-template-areas:
       'options options player'
