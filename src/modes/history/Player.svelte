@@ -1,11 +1,18 @@
 <script>
   import IoMdPlay from 'svelte-icons/io/IoMdPlay.svelte';
   import IoMdPause from 'svelte-icons/io/IoMdPause.svelte';
+  import { createEventDispatcher } from 'svelte';
 
-  let running = false;
+  const DAY_IN_MS = 24 * 60 * 60 * 1000;
+  const dispatch = createEventDispatcher();
+
+  export let running = false;
+  export let value = new Date();
+  export let min = new Date();
+  export let max = new Date();
 
   function toggleRunning() {
-    running = !running;
+    dispatch('toggle', !running);
   }
 
   /**
@@ -15,6 +22,14 @@
     if (e.key === ' ') {
       toggleRunning();
     }
+  }
+
+  /**
+   * @type {ChangeEvent} e
+   */
+  function onChange(e) {
+    const n = e.currentTarget.valueAsNumber;
+    dispatch('change', new Date(n));
   }
 </script>
 
@@ -111,7 +126,14 @@
       <IoMdPlay />
     {/if}
   </button>
-  <input type="range" min={0} max={0} step={86400000} class="slider" />
+  <input
+    type="range"
+    min={min.getTime()}
+    max={max.getTime()}
+    step={DAY_IN_MS}
+    class="slider"
+    value={value.getTime()}
+    on:change={onChange} />
 </div>
 
 <svelte:window on:keydown={onSpacePress} />

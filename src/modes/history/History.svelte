@@ -15,12 +15,16 @@
     bubbleRadiusScale,
     spikeHeightScale,
     currentDateObject,
+    currentSensorEntry,
+    times,
+    currentDate,
   } from '../../stores';
   import ToggleEncoding from '../../components/ToggleEncoding.svelte';
   import Title from '../../components/Title.svelte';
   import MapControls from '../../components/MapControls.svelte';
   import { isDeathSignal, isCasesSignal } from '../../data/signals';
   import Player from './Player.svelte';
+  import { parseAPITime, formatAPITime } from '../../data';
 
   /**
    * @type {MapBox}
@@ -42,6 +46,24 @@
     if ($encoding === 'spike') {
       spikeHeightScale.set(info.custom);
     }
+  }
+
+  let running = false;
+
+  $: minDate =
+    $times != null && $times.has($currentSensorEntry.key)
+      ? parseAPITime($times.get($currentSensorEntry.key)[0])
+      : $currentDateObject;
+  $: maxDate =
+    $times != null && $times.has($currentSensorEntry.key)
+      ? parseAPITime($times.get($currentSensorEntry.key)[1])
+      : $currentDateObject;
+
+  function toggleRunning() {
+    running = !running;
+  }
+  function jumpToDate(d) {
+    currentDate.set(formatAPITime(d));
   }
 </script>
 
@@ -166,7 +188,13 @@
         </Title>
       </div>
       <div class="player-container container-bg container-style base-font-size ">
-        <Player />
+        <Player
+          {running}
+          on:toggle={toggleRunning}
+          value={$currentDateObject}
+          max={maxDate}
+          min={minDate}
+          on:change={(e) => jumpToDate(e.detail)} />
       </div>
     </div>
     <div class="map-controls-container">
