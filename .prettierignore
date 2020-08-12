@@ -11,4 +11,5 @@
 *.csv
 /public
 /src/static
+/src/maps/raw
 /src/maps/processed
