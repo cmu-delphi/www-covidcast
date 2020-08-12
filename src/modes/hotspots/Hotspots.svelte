@@ -15,6 +15,7 @@
   import modes from '..';
   import { regionSearchLookup } from '../../stores/search';
   import Vega from '../../components/vega/Vega.svelte';
+  import { formatAPITime } from '../../data';
 
   /**
    * @param {import('../../data/fetchData').EpiDataRow} row
@@ -32,9 +33,14 @@
     };
   }
 
-  function addData(row, sensor) {
-    row.data = fetchTimeSlice(sensor, row.level, row.geo_value);
-    return row;
+  function byDate(a, b) {
+    if (a.date_value < b.date_value) {
+      return -1;
+    }
+    if (a.date_value > b.date_value) {
+      return 1;
+    }
+    return 0;
   }
 
   const TOP_HOTSPOTS = 10;
@@ -47,12 +53,70 @@
     return a.geo_value.localeCompare(b.geo_value);
   }
 
+  function unifyStartEnd(promises) {
+    // compute the unified data (same min,max)
+    return Promise.all(promises).then((allData) => {
+      // ensure common min / max date
+      const minDate = allData.reduce(
+        (acc, d) => (d.length === 0 ? acc : Math.min(acc, d[0].date_value.getTime())),
+        Number.POSITIVE_INFINITY,
+      );
+      const maxDate = allData.reduce(
+        (acc, d) => (d.length === 0 ? acc : Math.max(acc, d[d.length - 1].date_value.getTime())),
+        Number.NEGATIVE_INFINITY,
+      );
+      if (!Number.isFinite(minDate) || !Number.isFinite(maxDate)) {
+        return allData;
+      }
+      const min = new Date(minDate);
+      const max = new Date(maxDate);
+      return allData.map((rows) => {
+        if (rows.length === 0) {
+          return rows;
+        }
+        const first = rows[0].date_value;
+        if (first > min) {
+          // create a fake min one
+          rows.unshift({
+            ...rows[0],
+            time_value: Number.parseInt(formatAPITime(min), 10),
+            date_value: min,
+            value: null,
+          });
+        }
+        const last = rows[rows.length - 1].date_value;
+        if (last < max) {
+          // create a fake max one
+          rows.push({
+            ...rows[rows.length - 1],
+            time_value: Number.parseInt(formatAPITime(max), 10),
+            date_value: max,
+            value: null,
+          });
+        }
+        return rows;
+      });
+    });
+  }
+
   // transform current data
-  $: data = $currentData
+  $: rawData = $currentData
     .map((row) => toHotspotData(row, $regionSearchLookup, $currentLevel))
     .sort(byHotspot)
-    .slice(0, TOP_HOTSPOTS)
-    .map((d) => addData(d, $currentSensorEntry));
+    .slice(0, TOP_HOTSPOTS);
+
+  $: data = (() => {
+    // fetch all data
+    const promises = rawData.map((row) =>
+      fetchTimeSlice($currentSensorEntry, row.level, row.geo_value).then((d) => d.sort(byDate)),
+    );
+    const all = unifyStartEnd(promises);
+    // inject data
+    return rawData.map((d, i) => {
+      d.data = all.then((arr) => arr[i]);
+      return d;
+    });
+  })();
 
   function jumpTo(row) {
     currentMode.set(modes.find((d) => d.id === 'overview'));
