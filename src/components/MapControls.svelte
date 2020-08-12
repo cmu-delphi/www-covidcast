@@ -1,11 +1,12 @@
 <script>
-  import { currentZone, currentLevel, encoding } from '../stores';
+  import { currentZone, currentLevel, encoding, currentSensor, signalType } from '../stores';
   import IoMdAdd from 'svelte-icons/io/IoMdAdd.svelte';
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
   import IoMdHome from 'svelte-icons/io/IoMdHome.svelte';
   import TiTag from 'svelte-icons/ti/TiTag.svelte';
   import Loading from './Loading.svelte';
   import { trackEvent } from '../stores/ga';
+  import { isDeathSignal, isCasesSignal } from '../data';
 
   export let className = '';
 
@@ -119,7 +120,7 @@
     </div>
   {/if}
 
-  {#if showEncodings}
+  {#if showEncodings && $signalType !== 'direction' && (isDeathSignal($currentSensor) || isCasesSignal($currentSensor))}
     <div class="pg-button-vertical-group">
       <button
         aria-pressed={$encoding === 'color' ? 'true' : 'false'}
