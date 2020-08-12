@@ -1,4 +1,4 @@
-import { dsvFormat } from 'd3';
+import { dsvFormat } from 'd3-dsv';
 import { feature } from 'topojson-client';
 import stateGeoJSON from './processed/state.geojson.json';
 import countyGeoJSON from './processed/county.geojson.json';

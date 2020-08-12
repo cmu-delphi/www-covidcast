@@ -1,4 +1,4 @@
-import { timeFormat } from 'd3';
+import { timeFormat } from 'd3-time-format';
 import { get } from 'svelte/store';
 import { signalType, currentSensor, currentSensorEntry, colorScale, currentDateObject } from '../../stores';
 import { DIRECTION_THEME, MAP_THEME } from '../../theme';

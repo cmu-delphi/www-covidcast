@@ -1,6 +1,6 @@
 import { writable, readable, derived, get } from 'svelte/store';
 import { LogScale, SqrtScale } from './scales';
-import { scaleSequentialLog } from 'd3';
+import { scaleSequentialLog } from 'd3-scale';
 import { sensorList, withSensorEntryKey, defaultSensorId } from './constants';
 import modes from '../modes';
 import { parseAPITime } from '../data/utils';

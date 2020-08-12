@@ -1,5 +1,5 @@
 import boundsInfo from './processed/bounds.json';
-import { dsvFormat } from 'd3';
+import { dsvFormat } from 'd3-dsv';
 import stateRaw from './processed/state.csv';
 import msaRaw from './processed/msa.csv';
 import countyRaw from './processed/county.csv';
