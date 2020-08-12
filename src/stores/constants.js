@@ -1,4 +1,5 @@
-import { formatAPITime } from '../data';
+import { formatAPITime, isCasesSignal, isDeathSignal, isCountSignal, isPropSignal } from '../data';
+import { format } from 'd3';
 export const dict = {
   '10': 'DE',
   '11': 'DC',
@@ -134,13 +135,6 @@ export function getLevelInfo(level) {
     }
   );
 }
-
-export function withSensorEntryKey(sensorEntry) {
-  return Object.assign(sensorEntry, {
-    key: `${sensorEntry.id}-${sensorEntry.signal}`,
-  });
-}
-
 export const defaultSensorId = 'doctor-visits';
 
 /**
@@ -153,11 +147,35 @@ export const defaultSensorId = 'doctor-visits';
  * @property {string} chartTitleText
  * @property {string} yAxis
  * @property {string} format
+ * @property {(v: number) => string} formatValue
  * @property {string} signal
  * @property {string[]} levels
  * @property {'public' | 'early' | 'late'} type
  * @property {string?} api
+ * @property {boolean} isCount is a count signal
+ * @property {boolean} isCasesOrDeath is a cases or death signal
+ * @property {boolean} isProp is a prop signal
  */
+
+const basePercentFormatter = format('.2%');
+const percentFormatter = (v) => basePercentFormatter(v / 100);
+const intFormatter = format(',d');
+const rawFormatter = format(',.2');
+
+export function extendSensorEntry(sensorEntry) {
+  const key = `${sensorEntry.id}-${sensorEntry.signal}`;
+  const isCasesOrDeath = isCasesSignal(key) || isDeathSignal(key);
+  const isCount = isCountSignal(key);
+  const isProp = isPropSignal(key);
+  return Object.assign(sensorEntry, {
+    key,
+    isCasesOrDeath,
+    isCount,
+    isProp,
+    formatValue: sensorEntry.format === 'percent' ? percentFormatter : isCasesOrDeath ? intFormatter : rawFormatter,
+  });
+}
+
 /**
  * @type {SensorEntry[]}
  */
@@ -329,7 +347,7 @@ export const sensorList = [
     levels: ['msa', 'county', 'state'],
     type: 'late',
   },
-].map(withSensorEntryKey);
+].map(extendSensorEntry);
 
 export const defaultRegionOnStartup = {
   county: '42003', // Allegheny

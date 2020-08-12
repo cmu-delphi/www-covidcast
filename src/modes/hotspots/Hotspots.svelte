@@ -8,6 +8,7 @@
     currentRegion,
     currentRegionName,
     currentDateObject,
+    currentSensor,
   } from '../../stores';
   import hotspotsLineChart from './HotspotsLineChart.json';
   import { fetchTimeSlice } from '../../data/fetchData';
@@ -15,7 +16,7 @@
   import modes from '..';
   import { regionSearchLookup } from '../../stores/search';
   import Vega from '../../components/vega/Vega.svelte';
-  import { formatAPITime } from '../../data';
+  import { formatAPITime, isCasesSignal, isDeathSignal } from '../../data';
 
   /**
    * @param {import('../../data/fetchData').EpiDataRow} row
@@ -28,6 +29,7 @@
       id: row.geo_value.toUpperCase(),
       name: props ? props.display_name : row.geo_value,
       value: row.count != null ? row.count : row.value,
+      avg: row.avg,
       level,
       geo_value: row.geo_value,
     };
@@ -123,6 +125,8 @@
     currentRegion.set(row.id);
     currentRegionName.set(row.name);
   }
+
+  $: showAverage = isCasesSignal($currentSensor) || isDeathSignal($currentSensor);
 </script>
 
 <style>
@@ -208,10 +212,13 @@
         <tr>
           <th rowspan="2">Rank</th>
           <th rowspan="2">Name</th>
-          <th colspan="2">{$currentSensorEntry.name}</th>
+          <th colspan={showAverage ? 3 : 2}>{$currentSensorEntry.name}</th>
         </tr>
         <tr>
           <th>{$currentDateObject.toLocaleDateString()}</th>
+          {#if showAverage}
+            <th>7-day Average</th>
+          {/if}
           <th>Time Series</th>
         </tr>
       </thead>
@@ -227,7 +234,10 @@
                 </button>
               </div>
             </td>
-            <td class="right">{row.value != null ? row.value.toFixed(3) : 'Unknown'}</td>
+            <td class="right">{row.value != null ? $currentSensorEntry.formatValue(row.value) : 'Unknown'}</td>
+            {#if showAverage}
+              <td class="right">{row.avg != null ? $currentSensorEntry.formatValue(row.avg) : 'Unknown'}</td>
+            {/if}
             <td class="chart">
               <Vega data={row.data} spec={hotspotsLineChart} signals={{ currentDate: $currentDateObject }} />
             </td>

@@ -1,7 +1,7 @@
 import { writable, readable, derived, get } from 'svelte/store';
 import { LogScale, SqrtScale } from './scales';
 import { scaleSequentialLog } from 'd3';
-import { sensorList, withSensorEntryKey, defaultSensorId } from './constants';
+import { sensorList, extendSensorEntry, defaultSensorId } from './constants';
 import modes from '../modes';
 import { parseAPITime } from '../data/utils';
 import { regionSearchLookup } from './search';
@@ -30,7 +30,7 @@ const urlParams = new URLSearchParams(queryString);
 export const sensors = readable(sensorList, (set) => {
   const sensorsOption = urlParams.get('sensors');
   if (sensorsOption) {
-    set(JSON.parse(decodeURIComponent(sensorsOption)).map(withSensorEntryKey));
+    set(JSON.parse(decodeURIComponent(sensorsOption)).map(extendSensorEntry));
   }
 });
 
