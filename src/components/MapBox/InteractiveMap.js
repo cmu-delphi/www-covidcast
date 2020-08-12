@@ -42,7 +42,7 @@ export default class InteractiveMap {
     levels.forEach((level) => {
       this.map.on('mouseenter', L[level].fill, this._onLevelMouseEnter.bind(this));
       this.map.on('mouseleave', L[level].fill, this._onLevelMouseLeave.bind(this));
-      this.map.on('mousemove', L[level].fill, this._onLevelMouseMove.bind(this, level));
+      this.map.on('mousemove', L[level].fill, this._onLevelMouseMove.bind(this));
       this.map.on('click', L[level].fill, this._onLevelMouseClick.bind(this));
     });
     this.map.on('mouseenter', L[levelMegaCounty.id].fill, this._onLevelMouseEnter.bind(this));
@@ -109,7 +109,7 @@ export default class InteractiveMap {
     const feature = e.features[0];
     this.activePopup
       .setLngLat(e.lngLat)
-      .setHTML(`Estimate unavailable for rest of ${feature.properties.NAME}`)
+      .setHTML(`Estimate unavailable for rest of ${feature.properties.displayName}`)
       .addTo(this.map);
   }
   /**
@@ -125,20 +125,20 @@ export default class InteractiveMap {
     }
     this._updateHighlight(this.hovered, null, feature.id);
 
-    this.activePopup.setLngLat(e.lngLat).setHTML(generateTooltip(feature, levelMegaCounty.id)).addTo(this.map);
+    this.activePopup.setLngLat(e.lngLat).setHTML(generateTooltip(feature)).addTo(this.map);
   }
   /**
    * @param {'state' | 'county' | 'metro-area'} level
    * @param {import('mapbox-gl').MapMouseEvent} e
    */
-  _onLevelMouseMove(level, e) {
+  _onLevelMouseMove(e) {
     this.map.getCanvas().style.cursor = 'pointer';
     const feature = e.features[0];
     // The hovered element is not a mega county. It can be county, msa, state, bubble, or spike.
 
     this._updateHighlight(this.hovered, feature.id, null);
 
-    this.activePopup.setLngLat(e.lngLat).setHTML(generateTooltip(feature, level)).addTo(this.map);
+    this.activePopup.setLngLat(e.lngLat).setHTML(generateTooltip(feature)).addTo(this.map);
   }
 
   /**

@@ -4,11 +4,35 @@ const { dsvFormat } = require('d3');
 const fs = require('fs');
 const path = require('path');
 const { topology } = require('topojson-server');
+const geojsonExtent = require('@mapbox/geojson-extent');
+const { LngLatBounds, LngLat } = require('mapbox-gl');
 
 const QUANTIZATION = 1e4;
 
 const data = require('./raw/name_id_info.json');
 const rows = data.all;
+
+function computeBounds(geojson, scale = 1.2) {
+  const bounds = geojsonExtent(geojson);
+
+  const mapglBounds = new LngLatBounds(new LngLat(bounds[0], bounds[1]), new LngLat(bounds[2], bounds[3]));
+
+  if (scale === 1) {
+    return mapglBounds;
+  }
+
+  const widthLng = bounds[2] - bounds[0];
+  const heightLat = bounds[3] - bounds[1];
+
+  const center = mapglBounds.getCenter();
+  const targetWidth = widthLng * scale;
+  const targetHeight = heightLat * scale;
+
+  return new LngLatBounds(
+    new LngLat(center.lng + targetWidth / 2, center.lat - targetHeight / 2),
+    new LngLat(center.lng - targetWidth / 2, center.lat + targetHeight / 2),
+  );
+}
 
 function states(level = 'state') {
   const geo = require(`./raw/new_states.json`);
@@ -79,7 +103,7 @@ function msa(level = 'msa') {
     path.resolve(__dirname, `./processed/${level}.csv`),
     dsvFormat(',').format(infos, ['id', 'name', 'population', 'lat', 'long']),
   );
-  const topo = topology({ states: geo }, QUANTIZATION);
+  const topo = topology({ [level]: geo }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.geojson.json`), JSON.stringify(topo));
   return geo;
 }
@@ -140,7 +164,7 @@ function counties(level = 'county') {
     path.resolve(__dirname, `./processed/${level}.csv`),
     dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'population', 'lat', 'long']),
   );
-  const topo = topology({ states: geo }, QUANTIZATION);
+  const topo = topology({ [level]: geo }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.geojson.json`), JSON.stringify(topo));
   return geo;
 }
@@ -169,8 +193,22 @@ function cities() {
   );
 }
 
-states();
-msa();
-counties();
-zones();
+const statesGeo = states();
+const msaGeo = msa();
+const countiesGeo = counties();
+const zoneGeo = zones();
 cities();
+
+fs.writeFileSync(
+  path.resolve(__dirname, `./processed/bounds.json`),
+  JSON.stringify(
+    {
+      states: computeBounds(statesGeo).toArray(),
+      msa: computeBounds(msaGeo).toArray(),
+      counties: computeBounds(countiesGeo).toArray(),
+      zones: computeBounds(zoneGeo).toArray(),
+    },
+    null,
+    2,
+  ),
+);

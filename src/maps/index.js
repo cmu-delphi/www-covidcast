@@ -1,9 +1,9 @@
+import boundsInfo from './processed/bounds.json';
 import { dsvFormat } from 'd3';
-import { feature } from 'topojson-client';
 import stateRaw from './processed/state.csv';
 import msaRaw from './processed/msa.csv';
 import countyRaw from './processed/county.csv';
-import citiesRaw from './processed/cities.csv';
+import { levelMegaCounty } from '../stores/constants';
 
 /**
  * @typedef {object} NameInfo
@@ -37,79 +37,27 @@ const stateInfo = parseCSV(stateRaw, 'state');
 const msaInfo = parseCSV(msaRaw, 'msa');
 const countyInfo = parseCSV(countyRaw, 'county');
 
+// generate mega counties by copying the states
+const megaCountyInfo = stateInfo.map((info) => ({
+  id: info.id + '000',
+  propertyId: info.id + '000',
+  name: `Rest of ${info.name}`,
+  displayName: `Rest of ${info.displayName}`,
+  population: null,
+  level: levelMegaCounty.id,
+  lat: null,
+  long: null,
+}));
+
 export const nameInfos = stateInfo
-  .concat(msaInfo, countyInfo)
+  .concat(msaInfo, countyInfo, megaCountyInfo)
   .sort((a, b) => a.displayName.localeCompare(b.displayName));
 
-function generateGeo(topo, level, arr, additionalProperties = {}) {
-  const byId = new Map(arr.map((s) => [s.id, s]));
+export const bounds = boundsInfo;
 
-  const centers = [];
-  const border = feature(topo, level);
-
-  for (const f of border.features) {
-    const d = byId(f.id);
-    const properties = {
-      ...d,
-      id: d.propertyId,
-      ...additionalProperties,
-    };
-
-    f.properties = properties;
-
-    centers.push({
-      type: 'Feature',
-      geometry: {
-        type: 'Point',
-        coordinates: [d.lat, d.long],
-      },
-      id: d.id,
-      properties,
-    });
-  }
-
-  return {
-    centers: {
-      type: 'FeatureCollection',
-      features: centers,
-    },
-    border,
-  };
-}
-
-export function stateGeo(additionalProperties = {}) {
-  return import('./processed/state.geojson.json').then((r) => generateGeo(r, 'state', stateInfo, additionalProperties));
-}
-
-export function msaGeo(additionalProperties = {}) {
-  return import('./processed/msa.geojson.json').then((r) => generateGeo(r, 'msa', msaInfo, additionalProperties));
-}
-
-export function countyGeo(additionalProperties = {}) {
-  return import('./processed/county.geojson.json').then((r) =>
-    generateGeo(r, 'county', countyInfo, additionalProperties),
+export function loadSources(additionalProperties = {}) {
+  // mark to be loaded as fast as possible
+  return import(/* webpackPreload: true */ './geo').then((r) =>
+    r.default(stateInfo, countyInfo, msaInfo, levelMegaCounty.id, additionalProperties),
   );
-}
-
-export function zoneGeo() {
-  return import('./processed/zone.geojson.json').then((r) => ({
-    border: feature(r, 'zone'),
-  }));
-}
-
-export function citiesGeo() {
-  return Promise.resolve({
-    type: 'FeatureCollection',
-    features: dsvFormat(',').parse(citiesRaw, (r) => ({
-      type: 'Feature',
-      geometry: {
-        type: 'Point',
-        coordinates: [Number.parseFloat(r.lat), Number.parseFloat(r.long)],
-      },
-      properties: {
-        displayName: r.name,
-        population: r.population === 'NaN' || r.population === '' ? null : Number.parseInt(r.population, 10),
-      },
-    })),
-  });
 }

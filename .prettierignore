@@ -11,3 +11,4 @@
 *.csv
 /public
 /src/static
+/src/maps/processed
