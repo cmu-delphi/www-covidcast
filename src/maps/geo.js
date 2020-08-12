@@ -69,6 +69,7 @@ function citiesGeo() {
         coordinates: [Number.parseFloat(r.lat), Number.parseFloat(r.long)],
       },
       properties: {
+        name: r.name,
         displayName: r.name,
         population: r.population === 'NaN' || r.population === '' ? null : Number.parseInt(r.population, 10),
       },
