@@ -10,6 +10,7 @@
 @import './styles/ie11.css';
 
 #vizbox {
+  font-display: fallback;
   font-family: 'Open Sans', sans-serif;
   margin: 0;
   padding: 0;
