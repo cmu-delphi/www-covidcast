@@ -13,6 +13,8 @@
   export let min = new Date();
   export let max = new Date();
 
+  let playButton = null;
+
   function toggleRunning() {
     dispatch('toggle', !running);
   }
@@ -21,7 +23,8 @@
    * @type {KeyboardEvent} e
    */
   function onSpacePress(e) {
-    if (e.key === ' ') {
+    if (e.key === ' ' && e.target !== playButton) {
+      // in case we press space on the play button it will trigger a click
       toggleRunning();
     }
   }
@@ -173,6 +176,7 @@
 
 <div class="player">
   <button
+    bind:this={playButton}
     aria-pressed={running ? 'true' : 'false'}
     title={running ? 'Stop timeline to a specific date' : 'Play timeline to see how data changes over time'}
     class="play-button"
