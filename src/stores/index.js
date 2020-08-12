@@ -1,20 +1,11 @@
 import { writable, readable, derived, get } from 'svelte/store';
 import { LogScale, SqrtScale } from './scales';
-import { scaleSequentialLog } from 'd3';
+import { scaleSequentialLog } from 'd3-scale';
 import { sensorList, withSensorEntryKey, defaultSensorId } from './constants';
 import modes from '../modes';
 import { parseAPITime } from '../data/utils';
 import { regionSearchLookup } from './search';
-export {
-  dict,
-  specialCounties,
-  defaultRegionOnStartup,
-  getLevelInfo,
-  levels,
-  levelList,
-  yesterday,
-  yesterdayDate,
-} from './constants';
+export { defaultRegionOnStartup, getLevelInfo, levels, levelList, yesterday, yesterdayDate } from './constants';
 export { regionSearchList } from './search';
 
 /**
@@ -153,8 +144,8 @@ export function selectByInfo(elem) {
     return;
   }
   if (elem) {
-    currentRegion.set(elem.property_id);
-    currentRegionName.set(elem.display_name);
+    currentRegion.set(elem.propertyId);
+    currentRegionName.set(elem.displayName);
     // the info is derived
   } else {
     currentRegion.set('');

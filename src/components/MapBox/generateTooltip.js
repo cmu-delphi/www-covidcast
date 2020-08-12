@@ -1,30 +1,10 @@
-import { timeFormat } from 'd3';
+import { timeFormat } from 'd3-time-format';
 import { get } from 'svelte/store';
-import {
-  currentLevel,
-  signalType,
-  currentSensor,
-  specialCounties,
-  currentSensorEntry,
-  colorScale,
-  currentDateObject,
-} from '../../stores';
+import { signalType, currentSensor, currentSensorEntry, colorScale, currentDateObject } from '../../stores';
 import { DIRECTION_THEME, MAP_THEME } from '../../theme';
 import { getTextColorBasedOnBackground } from '../../util';
-import { levelMegaCounty, dict } from '../../stores/constants';
 
 const formatTimeWithoutYear = timeFormat('%B %d');
-
-function getLabelSpecifics(name, state, level) {
-  let text = '';
-  if (get(currentLevel) === 'county' && level !== levelMegaCounty.id && !specialCounties.includes(name)) {
-    text += ' County';
-  }
-  if (level === 'county') {
-    text += ', ' + dict[state];
-  }
-  return text;
-}
 
 function generateDirectionTooltip(direction) {
   let color, icon, text;
@@ -56,10 +36,10 @@ function generateDirectionTooltip(direction) {
     </div>`;
 }
 
-function generateSignalTooltip(value, value1, Population) {
+function generateSignalTooltip(value, value1, population) {
   const fillColor = get(colorScale)(value);
   const fgColor = getTextColorBasedOnBackground(fillColor);
-  const popCommas = Number.parseInt(Population, 10).toLocaleString();
+  const populationFormatted = population != null ? population.toLocaleString() : 'Unknown';
   const date = formatTimeWithoutYear(get(currentDateObject));
   const sens = get(currentSensorEntry);
   const sensor = get(currentSensor);
@@ -71,7 +51,7 @@ function generateSignalTooltip(value, value1, Population) {
     // TODO color the average by the color of the current value?
     return `
       <div class="map-popup-region-value-container">
-        Population: ${popCommas} <br>
+        Population: ${populationFormatted} <br>
         <u>${sens.yAxis}</u>: <br>
         &emsp; ${date}: ${count} <br>
         &emsp; 7-day avg:
@@ -88,7 +68,7 @@ function generateSignalTooltip(value, value1, Population) {
     const count = value1;
     return `
       <div class="map-popup-region-value-container">
-        Population: ${popCommas} <br>
+        Population: ${populationFormatted} <br>
         <u>${sens.yAxis}</u>: <br>
         &emsp; ${date}: ${count.toFixed(2)} <br>
         &emsp; 7-day avg:
@@ -112,17 +92,15 @@ function generateSignalTooltip(value, value1, Population) {
   `;
 }
 
-export function generateTooltip(feature, level) {
-  const { value, direction, NAME, STATE, Population, value1 } = feature.properties;
-
-  const title = NAME + getLabelSpecifics(NAME, STATE, level);
+export function generateTooltip(feature) {
+  const { value, direction, value1, displayName, population } = feature.properties;
 
   const body =
     get(signalType) === 'value'
-      ? generateSignalTooltip(value, value1, Population)
+      ? generateSignalTooltip(value, value1, population)
       : generateDirectionTooltip(direction);
 
   return `<div class="map-popup-region-name">
-  ${title}
+  ${displayName}
 </div>${body}`;
 }

@@ -10,6 +10,7 @@
 @import './styles/ie11.css';
 
 #vizbox {
+  font-display: fallback;
   font-family: 'Open Sans', sans-serif;
   margin: 0;
   padding: 0;
@@ -59,6 +60,7 @@ button.mapboxgl-popup-close-button {
   box-shadow: 0 0 0 4px #fff !important;
   /* border: solid 1px var(--red) !important; */
   z-index: 10000;
+  background-color: unset;
 }
 
 .d3-tip {
