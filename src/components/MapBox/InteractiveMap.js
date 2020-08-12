@@ -25,10 +25,12 @@ export default class InteractiveMap {
     });
     this.clicked = {
       id: null,
+      level: null,
       mega: null,
     };
     this.hovered = {
       id: null,
+      level: null,
       mega: null,
     };
 
@@ -136,7 +138,7 @@ export default class InteractiveMap {
     const feature = e.features[0];
     // The hovered element is not a mega county. It can be county, msa, state, bubble, or spike.
 
-    this._updateHighlight(this.hovered, feature.id, null);
+    this._updateHighlight(this.hovered, feature.id, null, feature.properties.level);
 
     this.activePopup.setLngLat(e.lngLat).setHTML(generateTooltip(feature, level)).addTo(this.map);
   }
@@ -164,21 +166,26 @@ export default class InteractiveMap {
    * @param {string | null} id
    * @param {string | null} mega
    */
-  _updateHighlight(obj, id = null, mega = null) {
+  _updateHighlight(obj, id = null, mega = null, level = this.adapter.level) {
     const attr = obj === this.clicked ? 'select' : 'hover';
     const setState = { [attr]: true };
     const clearState = { [attr]: false };
 
     // match ids
     if (obj.id !== id) {
-      const layers = [S[this.adapter.level].border, S.bubble, S.spike.fill, S.spike.stroke];
       if (obj.id) {
-        this._setFeatureStateMultiple(layers, obj.id, clearState);
+        this._setFeatureStateMultiple(
+          [S[obj.level].border, S.bubble, S.spike.fill, S.spike.stroke],
+          obj.id,
+          clearState,
+        );
       }
       if (id) {
-        this._setFeatureStateMultiple(layers, id, setState);
+        this._setFeatureStateMultiple([S[level].border, S.bubble, S.spike.fill, S.spike.stroke], id, setState);
       }
       obj.id = id;
+      // store level of selected id
+      obj.level = level;
     }
 
     // match mega
@@ -201,11 +208,11 @@ export default class InteractiveMap {
     const bak = Object.assign({}, this.clicked);
     const id = selection != null && selection.level !== levelMegaCounty.id ? Number(selection.id) : null;
     const megaId = selection != null && selection.level === levelMegaCounty.id ? Number(selection.id) : null;
-    this._updateHighlight(this.clicked, id, megaId);
+    this._updateHighlight(this.clicked, id, megaId, selection != null ? selection.level : this.adapter.level);
     return bak;
   }
 
   forceHover(feature) {
-    this._updateHighlight(this.hovered, feature.id, null);
+    this._updateHighlight(this.hovered, feature.id, null, feature.properties.level);
   }
 }
