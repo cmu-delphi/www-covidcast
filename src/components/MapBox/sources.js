@@ -1,4 +1,5 @@
 import { levelMegaCounty } from '../../stores/constants';
+import { MISSING_VALUE } from './encodings/utils';
 
 export const S = {
   state: {
@@ -36,6 +37,10 @@ function json(url) {
 export function injectIDs(level, data) {
   data.features.forEach((d) => {
     d.properties.level = level;
+    d.properties.value = MISSING_VALUE;
+    d.properties.direction = MISSING_VALUE;
+    d.properties.value1 = MISSING_VALUE;
+
     if (level === 'county') {
       d.id = d.properties.id = d.properties.GEO_ID.slice(-5);
     } else if (level === 'msa') {
@@ -65,6 +70,9 @@ function createMegaCopy(states) {
         level: levelMegaCounty.id,
         id: feature.properties.STATE + '000',
         NAME: `Rest of ${feature.properties.NAME}`,
+        value: MISSING_VALUE,
+        direction: MISSING_VALUE,
+        value1: MISSING_VALUE,
       },
     })),
   };

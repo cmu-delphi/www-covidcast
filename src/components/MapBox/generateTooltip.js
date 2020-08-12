@@ -60,7 +60,7 @@ function generateSignalTooltip(value, value1, Population) {
   const fillColor = get(colorScale)(value);
   const fgColor = getTextColorBasedOnBackground(fillColor);
   const popCommas = Number.parseInt(Population, 10).toLocaleString();
-  const date = formatTimeWithoutYear(currentDateObject);
+  const date = formatTimeWithoutYear(get(currentDateObject));
   const sens = get(currentSensorEntry);
   const sensor = get(currentSensor);
 
