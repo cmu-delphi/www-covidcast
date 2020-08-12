@@ -75,7 +75,7 @@ export function addCityLayers(map) {
     type: 'symbol',
     maxzoom: 8,
     layout: {
-      'text-field': ['upcase', ['get', 'NAME']],
+      'text-field': ['upcase', ['get', 'name']],
       'text-font': ['Open Sans Bold'],
       'text-size': 11,
     },
@@ -95,7 +95,7 @@ export function addCityLayers(map) {
         ...(filter ? { filter } : {}),
         ...extras,
         layout: {
-          'text-field': ['get', 'city'],
+          'text-field': ['get', 'name'],
           'text-font': ['Open Sans Regular'],
           'text-size': 12,
         },
@@ -108,7 +108,7 @@ export function addCityLayers(map) {
     );
   };
 
-  addCityLayer(L.cityPoints.pit, ['==', 'city', 'Pittsburgh'], {
+  addCityLayer(L.cityPoints.pit, ['==', 'name', 'Pittsburgh'], {
     maxzoom: 8,
   });
   addCityLayer(L.cityPoints.pit[1], ['>', 'population', 900000], {

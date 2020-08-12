@@ -377,9 +377,9 @@ export default class MapBoxWrapper {
     if (
       !selection ||
       (selection.level !== levelMegaCounty.id &&
-        (this.interactive.hovered.id == selection.property_id || oldSelection.id == selection.property_id)) ||
+        (this.interactive.hovered.id == selection.propertyId || oldSelection.id == selection.propertyId)) ||
       (selection.level === levelMegaCounty.id &&
-        (this.interactive.hovered.mega == selection.property_id || oldSelection.mega == selection.property_id))
+        (this.interactive.hovered.mega == selection.propertyId || oldSelection.mega == selection.propertyId))
     ) {
       return;
     }
@@ -391,7 +391,7 @@ export default class MapBoxWrapper {
       return;
     }
     // hacky
-    const feature = source._data.features.find((d) => d.properties.id === selection.property_id);
+    const feature = source._data.features.find((d) => d.properties.id === selection.propertyId);
 
     if (!feature) {
       return;

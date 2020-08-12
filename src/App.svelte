@@ -17,7 +17,7 @@
   } from './stores';
   import './stores/urlHandler';
   import './stores/ga';
-  import { updateRegionSliceCache, loadMetaData, updateTimeSliceCache } from './data';
+  import { updateRegionSliceCache, loadMetaData } from './data';
   import { isDeathSignal, isCasesSignal } from './data/signals';
   import ModeToggle from './components/ModeToggle.svelte';
   import modes from './modes';
@@ -65,8 +65,6 @@
       currentRegion.set('');
       currentRegionName.set('');
       currentLevel.set(l);
-    } else {
-      updateTimeSliceCache(s, l, $currentRegion);
     }
     if (date !== $currentDate) {
       dateChangedWhenSensorChanged = true;
@@ -110,19 +108,10 @@
     }
   });
 
-  currentRegion.subscribe((r) => {
-    if ($mounted) {
-      updateTimeSliceCache($currentSensor, $currentLevel, r);
-    }
-  });
-
   onMount(() => {
     loadMetaData().then(({ level, date }) => {
       $mounted = 1;
       updateRegionSliceCache($currentSensor, level, date);
-      if ($currentRegion) {
-        updateTimeSliceCache($currentSensor, $currentLevel, $currentRegion);
-      }
     });
   });
 

@@ -25,10 +25,12 @@ export default class InteractiveMap {
     });
     this.clicked = {
       id: null,
+      level: null,
       mega: null,
     };
     this.hovered = {
       id: null,
+      level: null,
       mega: null,
     };
 
@@ -42,7 +44,7 @@ export default class InteractiveMap {
     levels.forEach((level) => {
       this.map.on('mouseenter', L[level].fill, this._onLevelMouseEnter.bind(this));
       this.map.on('mouseleave', L[level].fill, this._onLevelMouseLeave.bind(this));
-      this.map.on('mousemove', L[level].fill, this._onLevelMouseMove.bind(this, level));
+      this.map.on('mousemove', L[level].fill, this._onLevelMouseMove.bind(this));
       this.map.on('click', L[level].fill, this._onLevelMouseClick.bind(this));
     });
     this.map.on('mouseenter', L[levelMegaCounty.id].fill, this._onLevelMouseEnter.bind(this));
@@ -109,7 +111,7 @@ export default class InteractiveMap {
     const feature = e.features[0];
     this.activePopup
       .setLngLat(e.lngLat)
-      .setHTML(`Estimate unavailable for rest of ${feature.properties.NAME}`)
+      .setHTML(`Estimate unavailable for rest of ${feature.properties.displayName}`)
       .addTo(this.map);
   }
   /**
@@ -125,20 +127,20 @@ export default class InteractiveMap {
     }
     this._updateHighlight(this.hovered, null, feature.id);
 
-    this.activePopup.setLngLat(e.lngLat).setHTML(generateTooltip(feature, levelMegaCounty.id)).addTo(this.map);
+    this.activePopup.setLngLat(e.lngLat).setHTML(generateTooltip(feature)).addTo(this.map);
   }
   /**
    * @param {'state' | 'county' | 'metro-area'} level
    * @param {import('mapbox-gl').MapMouseEvent} e
    */
-  _onLevelMouseMove(level, e) {
+  _onLevelMouseMove(e) {
     this.map.getCanvas().style.cursor = 'pointer';
     const feature = e.features[0];
     // The hovered element is not a mega county. It can be county, msa, state, bubble, or spike.
 
-    this._updateHighlight(this.hovered, feature.id, null);
+    this._updateHighlight(this.hovered, feature.id, null, feature.properties.level);
 
-    this.activePopup.setLngLat(e.lngLat).setHTML(generateTooltip(feature, level)).addTo(this.map);
+    this.activePopup.setLngLat(e.lngLat).setHTML(generateTooltip(feature)).addTo(this.map);
   }
 
   /**
@@ -164,21 +166,26 @@ export default class InteractiveMap {
    * @param {string | null} id
    * @param {string | null} mega
    */
-  _updateHighlight(obj, id = null, mega = null) {
+  _updateHighlight(obj, id = null, mega = null, level = this.adapter.level) {
     const attr = obj === this.clicked ? 'select' : 'hover';
     const setState = { [attr]: true };
     const clearState = { [attr]: false };
 
     // match ids
     if (obj.id !== id) {
-      const layers = [S[this.adapter.level].border, S.bubble, S.spike.fill, S.spike.stroke];
       if (obj.id) {
-        this._setFeatureStateMultiple(layers, obj.id, clearState);
+        this._setFeatureStateMultiple(
+          [S[obj.level].border, S.bubble, S.spike.fill, S.spike.stroke],
+          obj.id,
+          clearState,
+        );
       }
       if (id) {
-        this._setFeatureStateMultiple(layers, id, setState);
+        this._setFeatureStateMultiple([S[level].border, S.bubble, S.spike.fill, S.spike.stroke], id, setState);
       }
       obj.id = id;
+      // store level of selected id
+      obj.level = level;
     }
 
     // match mega
@@ -201,11 +208,11 @@ export default class InteractiveMap {
     const bak = Object.assign({}, this.clicked);
     const id = selection != null && selection.level !== levelMegaCounty.id ? Number(selection.id) : null;
     const megaId = selection != null && selection.level === levelMegaCounty.id ? Number(selection.id) : null;
-    this._updateHighlight(this.clicked, id, megaId);
+    this._updateHighlight(this.clicked, id, megaId, selection != null ? selection.level : this.adapter.level);
     return bak;
   }
 
   forceHover(feature) {
-    this._updateHighlight(this.hovered, feature.id, null);
+    this._updateHighlight(this.hovered, feature.id, null, feature.properties.level);
   }
 }

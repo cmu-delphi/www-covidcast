@@ -1,6 +1,4 @@
-import * as d3 from 'd3';
-import colorParse from 'color-parse';
-import invertColor from 'invert-color';
+import { rgb, hsl } from 'd3-color';
 
 export const calculateValFromRectified = (rectified) => {
   let tempDate = new Date(rectified);
@@ -11,12 +9,8 @@ export const calculateValFromRectified = (rectified) => {
 };
 
 export function getTextColorBasedOnBackground(bgColor) {
-  // https://github.com/onury/invert-color
-  return invertColor(colorParse(bgColor).values, {
-    black: '#000',
-    white: '#fff',
-    threshold: 0.32,
-  });
+  const color = hsl(bgColor);
+  return color.l > 0.32 ? '#000' : '#fff';
 }
 
 export function zip(a1, a2) {
@@ -29,7 +23,7 @@ export function transparent(colors, opacity) {
   }
 
   return colors.map((c) => {
-    const rgba = d3.rgb(c);
+    const rgba = rgb(c);
     rgba.opacity = opacity;
     return rgba.toString();
   });
