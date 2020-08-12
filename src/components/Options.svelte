@@ -11,10 +11,10 @@
     earlySensors,
   } from '../stores';
   import Datepicker from './Calendar/Datepicker.svelte';
-  import * as d3 from 'd3';
+  import { timeFormat } from 'd3-time-format';
   import { formatAPITime, parseAPITime } from '../data';
 
-  const formatTime = d3.timeFormat('%B %-d, %Y');
+  const formatTime = timeFormat('%B %-d, %Y');
 
   export let showDate = true;
   // let selectedDate = writable(parseTime($currentDate));

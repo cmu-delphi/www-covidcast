@@ -1,5 +1,6 @@
 import { isCountSignal, isPropSignal } from '../../data/signals';
-import * as d3 from 'd3';
+import { scaleSequential, scaleSequentialLog } from 'd3-scale';
+import { interpolateYlOrRd } from 'd3-scale-chromatic';
 import logspace from 'compute-logspace';
 import { DIRECTION_THEME, MAP_THEME } from '../../theme';
 import { zip, transparent, pairAdjacent } from '../../util';
@@ -59,7 +60,7 @@ function regularSignalColorScale(valueMinMax) {
     firstHalfCenter = valueMinMax[0] + (center - valueMinMax[0]) / 2,
     secondHalfCenter = center + (valueMinMax[1] - center) / 2;
 
-  const colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain(valueMinMax);
+  const colorScaleLinear = scaleSequential(interpolateYlOrRd).domain(valueMinMax);
 
   // domainStops5 is used for other cases (prop signals)
   const domainStops5 = [valueMinMax[0], firstHalfCenter, center, secondHalfCenter, valueMinMax[1]];
@@ -79,7 +80,7 @@ function propSignalColorScale(valueMinMax) {
   const center = min + (max - min) / 2;
   const firstHalfCenter = min + (center - min) / 2;
   const secondHalfCenter = center + (max - center) / 2;
-  const colorScaleLinear = d3.scaleSequential(d3.interpolateYlOrRd).domain(valueMinMax);
+  const colorScaleLinear = scaleSequential(interpolateYlOrRd).domain(valueMinMax);
   // domainStops5 is used for other cases (prop signals)
   const domainStops5 = [min, firstHalfCenter, center, secondHalfCenter, max];
   const linearColors5 = domainStops5.map((c) => colorScaleLinear(c).toString());
@@ -90,7 +91,7 @@ function propSignalColorScale(valueMinMax) {
 }
 
 function countSignalColorScale(valueMinMax) {
-  const colorScaleLog = d3.scaleSequentialLog(d3.interpolateYlOrRd).domain(valueMinMax);
+  const colorScaleLog = scaleSequentialLog(interpolateYlOrRd).domain(valueMinMax);
 
   // domainStops7 is used to determine the colors of regions for count signals.
   const domainStops7 = logspace(Math.log(valueMinMax[0]) / Math.log(10), Math.log(valueMinMax[1]) / Math.log(10), 7);
