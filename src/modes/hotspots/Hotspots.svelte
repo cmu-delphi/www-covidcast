@@ -155,6 +155,15 @@
     margin-right: 0.5em;
   }
 
+  .name button {
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  .name:hover button {
+    opacity: 1;
+  }
+
   .right {
     text-align: right;
   }
@@ -197,6 +206,7 @@
     <table>
       <thead>
         <tr>
+          <th rowspan="2">Rank</th>
           <th rowspan="2">Name</th>
           <th colspan="2">{$currentSensorEntry.name}</th>
         </tr>
@@ -206,8 +216,9 @@
         </tr>
       </thead>
       <tbody>
-        {#each data as row}
+        {#each data as row, i}
           <tr>
+            <td>{i + 1}.</td>
             <td>
               <div class="name">
                 <span>{row.name}</span>
