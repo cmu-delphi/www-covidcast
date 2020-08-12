@@ -18,8 +18,8 @@ export default [
   },
   {
     id: 'timelapse',
-    label: 'Time Lapse',
-    tooltip: 'Switch to Time Lapse Mode',
+    label: 'Time-lapse',
+    tooltip: 'Switch to Time-lapse Mode',
     component: () => import('./TimeLapse/TimeLapse.svelte').then((r) => r.default),
   },
   // {
