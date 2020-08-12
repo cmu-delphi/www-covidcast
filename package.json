@@ -36,6 +36,8 @@
     "raw-loader": "^4.0.1",
     "svelte": "^3.24.0",
     "svelte-loader": "^2.13.6",
+    "topojson-client": "^3.1.0",
+    "topojson-server": "^3.0.1",
     "url-loader": "^4.1.0",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
