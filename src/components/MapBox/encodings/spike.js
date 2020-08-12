@@ -52,7 +52,7 @@ export default class SpikeEncoding {
           ...feature,
           geometry: {
             ...feature.geometry,
-            type: 'LineString',
+            type: 'MultiLineString',
           },
         };
       }),
