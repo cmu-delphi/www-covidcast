@@ -32,6 +32,15 @@
     transform: rotate(90deg);
   }
 
+  li :global(.toolbar) {
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  li:hover > .header > :global(.toolbar) {
+    opacity: 1;
+  }
+
   .collapsed {
     padding-bottom: 0;
   }
@@ -49,7 +58,7 @@
       <IoIosArrowForward />
     </span>
     <slot name="header" {collapsed} />
-    <slot name="toolbar" {collapsed} />
+    <slot name="toolbar" {collapsed} class="toolbar" />
   </div>
   <div class="collapsed-body">
     <slot {collapsed} />
