@@ -30,6 +30,20 @@ module.exports = () => {
       mainFields: ['svelte', 'browser', 'module', 'main'],
     },
 
+    optimization: {
+      splitChunks: {
+        cacheGroups: {
+          // no splitting of css files
+          styles: {
+            name: 'styles',
+            test: /\.css$/,
+            chunks: 'all',
+            enforce: true,
+          },
+        },
+      },
+    },
+
     module: {
       rules: [
         {
