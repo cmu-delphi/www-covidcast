@@ -17,10 +17,10 @@ export default [
     component: () => import(/* webpackPreload: true */ './overview/Overview.svelte').then((r) => r.default),
   },
   {
-    id: 'history',
-    label: 'History',
-    tooltip: 'Switch to History Mode',
-    component: () => import('./history/History.svelte').then((r) => r.default),
+    id: 'timelapse',
+    label: 'Time Lapse',
+    tooltip: 'Switch to Time Lapse Mode',
+    component: () => import('./TimeLapse/TimeLapse.svelte').then((r) => r.default),
   },
   // {
   //   id: 'compare',
