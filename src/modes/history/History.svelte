@@ -26,7 +26,7 @@
   import Player from './Player.svelte';
   import { timeDay } from 'd3';
   import { parseAPITime, formatAPITime } from '../../data';
-  import { fetchRegionSlice } from '../../data/fetchData';
+  import { fetchRegionSlice, clearRegionCache } from '../../data/fetchData';
 
   /**
    * @type {MapBox}
@@ -55,7 +55,7 @@
   $: minDate =
     $times != null && $times.has($currentSensorEntry.key)
       ? parseAPITime($times.get($currentSensorEntry.key)[0])
-      : $currentDateObject;
+      : timeDay.offset(timeDay.floor($currentDateObject), -1);
   $: maxDate =
     $times != null && $times.has($currentSensorEntry.key)
       ? parseAPITime($times.get($currentSensorEntry.key)[1])
@@ -63,6 +63,9 @@
 
   const frameRate = 250; // ms
   let bufferCache = 3;
+  const maxBufferCache = 7;
+  const bufferedEstimate = new Set();
+  const currentlyBufferingEstimate = new Set();
 
   let nextFrameTimeout = -1;
 
@@ -82,9 +85,9 @@
         return;
       }
       const needed = Date.now() - started;
-      if (needed > frameRate) {
+      if (needed > frameRate && bufferCache < maxBufferCache) {
         // increase buffer if it was too slow
-        bufferCache = Math.min(bufferCache + 1, 10);
+        bufferCache++;
       }
       nextFrameTimeout = setTimeout(() => {
         currentDate.set(formatAPITime(nextDate));
@@ -101,6 +104,7 @@
         clearTimeout(nextFrameTimeout);
         nextFrameTimeout = -1;
       }
+      clearRegionCache();
       return;
     }
     // start
@@ -108,6 +112,7 @@
       // auto reset
       currentDate.set(formatAPITime(minDate.getTime()));
     }
+    clearRegionCache();
     tick();
   }
   function jumpToDate(d) {
@@ -118,13 +123,44 @@
     currentDate.set(formatAPITime(d));
   }
 
+  function fetchDate(date, sensor, level) {
+    const key = `${date}-${sensor.key}-${level}`;
+    if (bufferedEstimate.has(key)) {
+      return;
+    }
+    if (currentlyBufferingEstimate.size >= maxBufferCache) {
+      return;
+    }
+    currentlyBufferingEstimate.add(key);
+    bufferedEstimate.add(key);
+    fetchRegionSlice(sensor, level, date).then(() => {
+      // mark done
+      currentlyBufferingEstimate.delete(key);
+    });
+  }
+
   $: {
     // fetch buffer size upon date change
     const date = $currentDateObject;
+    const sensor = $currentSensorEntry;
+    const level = $currentLevel;
     const dates = timeDay.range(timeDay.floor(date), timeDay.offset(date, bufferCache));
     for (const d of dates) {
-      fetchRegionSlice($currentSensorEntry, $currentLevel, d);
+      // delay for other promises to resolve
+      setTimeout(() => fetchDate(d, sensor, level), 1);
     }
+    // clear caches of old dates and different sensor entries
+    const old = timeDay.offset(timeDay.floor(date), -2);
+    clearRegionCache((key, keyF) => {
+      const start = keyF(sensor, level, '');
+      if (!key.startsWith(start)) {
+        // different level or sensor
+        return true;
+      }
+      const keyDate = parseAPITime(key.slice(start.length));
+      // delete if time is two days behind the current frame
+      return keyDate <= old;
+    });
   }
 </script>
 
