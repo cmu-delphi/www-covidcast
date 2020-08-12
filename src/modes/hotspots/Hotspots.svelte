@@ -20,14 +20,14 @@
 
   /**
    * @param {import('../../data/fetchData').EpiDataRow} row
-   * @param {Map<string, import('../../maps/nameIdInfo').NameInfo>} lookup
+   * @param {Map<string, import('../../maps').NameInfo>} lookup
    * @param {string} level   */
   function toHotspotData(row, lookup, level) {
     // TODO generalize this process into the stores
     const props = lookup(row.geo_value.toUpperCase());
     return {
       id: row.geo_value.toUpperCase(),
-      name: props ? props.display_name : row.geo_value,
+      name: props ? props.displayName : row.geo_value,
       value: row.count != null ? row.count : row.value,
       avg: row.avg,
       level,
