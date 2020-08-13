@@ -22,35 +22,9 @@
   flex-direction: column;
 }
 
-.line {
-  fill: none;
-  stroke: var(--red);
-  stroke-width: 2px;
-}
-
-.inline {
-  display: inline-flex;
-}
-
-.axis-text {
-  font-size: 14px;
-  font-family: 'Open Sans', sans-serif;
-  color: var(--grey);
-}
-
-.axes {
-  font-family: 'Open Sans', sans-serif;
-  color: var(--grey);
-}
-
 button.mapboxgl-popup-close-button {
   padding: 2px;
   color: var(--grey);
-}
-
-.tooltip-text {
-  font-family: 'Open Sans', sans-serif;
-  margin: 0px;
 }
 
 #vizbox input:focus,
@@ -61,43 +35,6 @@ button.mapboxgl-popup-close-button {
   /* border: solid 1px var(--red) !important; */
   z-index: 10000;
   background-color: unset;
-}
-
-.d3-tip {
-  background-color: #fff;
-  padding: 5px 5px;
-  color: var(--grey);
-  border-color: var(--grey);
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 4px;
-  font-size: 12px;
-  z-index: 99999;
-}
-
-/* Creates a small triangle extender for the tooltip */
-.d3-tip::after {
-  box-sizing: border-box;
-  display: inline;
-  font-size: 10px;
-  width: 100%;
-  line-height: 1;
-  color: var(--grey);
-  content: '\25BC';
-  position: absolute;
-  text-align: center;
-}
-
-/* Style northward tooltips specifically */
-.d3-tip.n::after {
-  margin: 0;
-  top: 100%;
-  left: 0;
-}
-
-#vizbox circle {
-  padding: 5px;
-  cursor: pointer;
 }
 
 .mapboxgl-canvas {
