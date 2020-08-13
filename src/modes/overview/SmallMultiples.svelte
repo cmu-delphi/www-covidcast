@@ -10,7 +10,7 @@
    */
   export let sensor;
   // Create a date for today in the API's date format
-  const startDay = parseAPITime('20200401');
+  const startDay = parseAPITime('20200601');
   const finalDay = new Date();
 
   $: data = fetchCustomTimeSlice(sensor, $currentLevel, $currentRegion, startDay, finalDay);
