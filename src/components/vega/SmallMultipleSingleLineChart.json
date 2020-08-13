@@ -6,6 +6,16 @@
   "autosize": {
     "resize": true
   },
+  "transform": [
+    {
+      "calculate": "datum.value + datum.stderr",
+      "as": "value_upper_bound"
+    },
+    {
+      "calculate": "datum.value - datum.stderr",
+      "as": "value_lower_bound"
+    }
+  ],
   "encoding": {
     "color": {
       "value": "grey"
@@ -15,7 +25,7 @@
       "type": "temporal",
       "axis": {
         "title": null,
-        "format": "%b %e",
+        "format": "%m/%d",
         "formatType": "time",
         "tickCount": "month"
       }
@@ -33,6 +43,24 @@
       "mark": {
         "type": "line",
         "interpolate": "monotone"
+      }
+    },
+    {
+      "mark": {
+        "type": "area",
+        "interpolate": "monotone"
+      },
+      "encoding": {
+        "color": {
+          "value": "rgba(0, 0, 0, 0.1)"
+        },
+        "y": {
+          "field": "value_lower_bound",
+          "type": "quantitative"
+        },
+        "y2": {
+          "field": "value_upper_bound"
+        }
       }
     },
     {
