@@ -20,7 +20,7 @@ export default [
     id: 'timelapse',
     label: 'Time-lapse',
     tooltip: 'Switch to Time-lapse Mode',
-    component: () => import('./timeLapse/TimeLapse.svelte').then((r) => r.default),
+    component: () => import('./timelapse/TimeLapse.svelte').then((r) => r.default),
   },
   // {
   //   id: 'compare',
