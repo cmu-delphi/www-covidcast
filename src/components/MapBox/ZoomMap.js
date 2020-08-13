@@ -15,11 +15,6 @@ export default class ZoomMap {
     };
     this.stateZoom = 1;
     this.initialZoomView = true;
-    this.zoneBounds = new LngLatBounds(bounds.zones);
-    this.zoneBoundsOptions = {
-      padding: 20, //px
-      linear: false,
-    };
   }
 
   getZoom() {
@@ -89,14 +84,5 @@ export default class ZoomMap {
       return;
     }
     this.showStateLabels(this.map.getLayoutProperty(L.state.names, 'visibility') !== 'visible');
-  }
-
-  showSWPA() {
-    if (!this.map) {
-      return;
-    }
-    this.initialZoomView = false;
-    this.map.fitBounds(this.zoneBounds, this.zoneBoundsOptions);
-    this.map.setLayoutProperty(L.zoneOutline, 'visibility', 'visible');
   }
 }

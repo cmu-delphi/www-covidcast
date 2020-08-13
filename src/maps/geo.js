@@ -3,7 +3,6 @@ import { feature } from 'topojson-client';
 import stateGeoJSON from './processed/state.geojson.json';
 import countyGeoJSON from './processed/county.geojson.json';
 import msaGeoJSON from './processed/msa.geojson.json';
-import zoneGeoJSON from './processed/zone.geojson.json';
 import citiesRaw from './processed/cities.csv';
 
 function generateGeo(topo, level, arr, additionalProperties = {}) {
@@ -89,14 +88,12 @@ export default function load(stateInfo, countyInfo, msaInfo, megaLevel, addition
   const state = generateGeo(stateGeoJSON, 'state', stateInfo, additionalProperties);
   const county = generateGeo(countyGeoJSON, 'county', countyInfo, additionalProperties);
   const msa = generateGeo(msaGeoJSON, 'msa', msaInfo, additionalProperties);
-  const zone = feature(zoneGeoJSON, 'zone');
   const mega = deriveMegaGeo(state.border, megaLevel);
   const cities = citiesGeo();
   return {
     state,
     county,
     msa,
-    newZones: zone,
     mega,
     cities,
   };

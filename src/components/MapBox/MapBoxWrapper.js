@@ -135,10 +135,6 @@ export default class MapBoxWrapper {
         type: 'geojson',
         data: r.mega,
       });
-      map.addSource(S.zoneOutline, {
-        type: 'geojson',
-        data: r.newZones,
-      });
       levels.forEach((level) => {
         map.addSource(S[level].border, {
           type: 'geojson',
@@ -228,20 +224,6 @@ export default class MapBoxWrapper {
           'line-width': ['case', ['any', ['boolean', ['feature-state', 'select'], false]], 4, 0],
         },
       });
-    });
-
-    map.addLayer({
-      id: L.zoneOutline,
-      source: S.zoneOutline,
-      type: 'line',
-      layout: {
-        visibility: 'none',
-      },
-      paint: {
-        'line-color': MAP_THEME.zoneOutline,
-        'line-width': 2,
-        'line-dasharray': [2, 2],
-      },
     });
 
     addCityLayers(map);

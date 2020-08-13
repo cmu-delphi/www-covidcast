@@ -158,14 +158,6 @@ export function selectByFeature(feature) {
   selectByInfo(feature ? lookup(feature.properties.id) : null);
 }
 
-// currently only supporting 'swpa' - South western Pennsylvania
-export const currentZone = writable('', (set) => {
-  const zone = urlParams.get('zone');
-  if (zone === 'swpa') {
-    set(zone);
-  }
-});
-
 /**
  * @type {import('svelte/store').Writable<EpiDataRow[]>}
  */

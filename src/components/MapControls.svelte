@@ -1,5 +1,5 @@
 <script>
-  import { currentZone, currentLevel } from '../stores';
+  import { currentLevel } from '../stores';
   import IoMdAdd from 'svelte-icons/io/IoMdAdd.svelte';
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
   import IoMdHome from 'svelte-icons/io/IoMdHome.svelte';
@@ -80,22 +80,6 @@
           zoom.toggleStateLabels();
         }}>
         <TiTag />
-      </button>
-    </div>
-  {/if}
-  {#if $currentZone.length > 0}
-    <div>
-      <button
-        class="pg-button"
-        type="button"
-        title="show swpa boundary"
-        aria-label="show swpa boundary"
-        disabled={!zoom}
-        on:click={() => {
-          trackEvent('map', 'fitSWPA');
-          zoom.showSWPA();
-        }}>
-        SWPA
       </button>
     </div>
   {/if}

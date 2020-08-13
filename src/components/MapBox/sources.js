@@ -25,7 +25,6 @@ export const S = {
   },
   cityPoint: 'city-point',
   megaCounty: 'mega-county',
-  zoneOutline: 'zone-outline',
 };
 
 const valueProperties = {
