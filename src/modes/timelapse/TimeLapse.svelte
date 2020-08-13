@@ -27,6 +27,7 @@
   import { timeDay } from 'd3';
   import { parseAPITime, formatAPITime } from '../../data';
   import { fetchRegionSlice, clearRegionCache } from '../../data/fetchData';
+  import { trackEvent } from '../../stores/ga';
 
   /**
    * @type {MapBox}
@@ -99,6 +100,7 @@
   function toggleRunning() {
     running = !running;
     if (!running) {
+      trackEvent('player', 'stop');
       // stop
       if (nextFrameTimeout >= 0) {
         clearTimeout(nextFrameTimeout);
@@ -107,6 +109,7 @@
       clearRegionCache();
       return;
     }
+    trackEvent('player', 'start');
     // start
     if (maxDate.getTime() === $currentDateObject.getTime()) {
       // auto reset
@@ -120,6 +123,7 @@
       // stop upon manual jump
       toggleRunning();
     }
+    trackEvent('player', 'jump', d.toString());
     currentDate.set(formatAPITime(d));
   }
 
