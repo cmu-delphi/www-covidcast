@@ -28,4 +28,10 @@ export default [
   //   tooltip: 'Switch to Hotspots Mode',
   //   component: () => import(/* webpackPrefetch: true */ './hotspots/Hotspots.svelte').then((r) => r.default),
   // },
+  {
+    id: 'swpa',
+    label: 'SWPA',
+    tooltip: 'Switch to SWPA Mode',
+    component: () => import(/* webpackPrefetch: true */ './swpa/SWPA.svelte').then((r) => r.default),
+  },
 ];
