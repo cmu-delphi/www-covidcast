@@ -6,9 +6,7 @@
     times,
     levelList,
     currentSensorEntry,
-    publicSensors,
-    lateSensors,
-    earlySensors,
+    groupedSensorList,
   } from '../stores';
   import Datepicker from './Calendar/Datepicker.svelte';
   import { timeFormat } from 'd3-time-format';
@@ -16,6 +14,7 @@
 
   const formatTime = timeFormat('%B %-d, %Y');
 
+  export let showDate = true;
   // let selectedDate = writable(parseTime($currentDate));
   $: selectedDate = parseAPITime($currentDate);
   // if ($currentDate !== MAGIC_START_DATE) {
@@ -90,21 +89,13 @@
     aria-label="indicator options"
     class="indicators base-font-size"
     bind:value={$currentSensor}>
-    <optgroup label="Public Behavior">
-      {#each $publicSensors as sensor}
-        <option title={sensor.tooltipText} value={sensor.key}>{sensor.name}</option>
-      {/each}
-    </optgroup>
-    <optgroup label="Early Indicators">
-      {#each $earlySensors as sensor}
-        <option title={sensor.tooltipText} value={sensor.key}>{sensor.name}</option>
-      {/each}
-    </optgroup>
-    <optgroup label="Late Indicators">
-      {#each $lateSensors as sensor}
-        <option title={sensor.tooltipText} value={sensor.key}>{sensor.name}</option>
-      {/each}
-    </optgroup>
+    {#each groupedSensorList as sensorGroup}
+      <optgroup label={sensorGroup.label}>
+        {#each sensorGroup.sensors as sensor}
+          <option title={sensor.tooltipText} value={sensor.key}>{sensor.name}</option>
+        {/each}
+      </optgroup>
+    {/each}
   </select>
   <span class="option-title">for</span>
   <select
@@ -116,14 +107,16 @@
       <option value={level.id} disabled={!$currentSensorEntry.levels.includes(level.id)}>{level.labelPlural}</option>
     {/each}
   </select>
-  <span class="option-title">on</span>
-  {#if selectedDate != null && start_end_dates.length !== 0}
-    <Datepicker
-      bind:selected={selectedDate}
-      start={parseAPITime(start_end_dates[0])}
-      end={parseAPITime(start_end_dates[1])}
-      formattedSelected={formatTime(selectedDate)}>
-      <button aria-label="selected date" class="calendar base-font-size" on:>{formatTime(selectedDate)}</button>
-    </Datepicker>
+  {#if showDate}
+    <span class="option-title">on</span>
+    {#if selectedDate != null && start_end_dates.length !== 0}
+      <Datepicker
+        bind:selected={selectedDate}
+        start={parseAPITime(start_end_dates[0])}
+        end={parseAPITime(start_end_dates[1])}
+        formattedSelected={formatTime(selectedDate)}>
+        <button aria-label="selected date" class="calendar base-font-size" on:>{formatTime(selectedDate)}</button>
+      </Datepicker>
+    {/if}
   {/if}
 </div>

@@ -1,8 +1,8 @@
 import { Popup } from 'mapbox-gl';
 import { levelMegaCounty, levels } from '../../stores/constants';
-import { generateTooltip } from './generateTooltip';
 import { L } from './layers';
 import { S } from './sources';
+import Tooltip from './Tooltip.svelte';
 
 export default class InteractiveMap {
   /**
@@ -33,6 +33,14 @@ export default class InteractiveMap {
       level: null,
       mega: null,
     };
+
+    this.tooltipElement = document.createElement('div');
+    this.tooltip = new Tooltip({
+      target: this.tooltipElement,
+      props: {
+        invalid: true,
+      },
+    });
 
     this.initListeners();
   }
@@ -106,19 +114,27 @@ export default class InteractiveMap {
   /**
    * @param {import('mapbox-gl').MapMouseEvent} e
    */
-  _onMapMouseMove(e) {
+  _renderTooltip(e, invalid = false) {
     this.map.getCanvas().style.cursor = 'pointer';
     const feature = e.features[0];
-    this.activePopup
-      .setLngLat(e.lngLat)
-      .setHTML(`Estimate unavailable for rest of ${feature.properties.displayName}`)
-      .addTo(this.map);
+    const popup = this.activePopup;
+    this.tooltip.$set({
+      properties: feature.properties,
+      invalid,
+    });
+    popup.setLngLat(e.lngLat).setDOMContent(this.tooltipElement).addTo(this.map);
+  }
+
+  /**
+   * @param {import('mapbox-gl').MapMouseEvent} e
+   */
+  _onMapMouseMove(e) {
+    this._renderTooltip(e, true);
   }
   /**
    * @param {import('mapbox-gl').MapMouseEvent} e
    */
   _onMegaMouseMove(e) {
-    this.map.getCanvas().style.cursor = 'pointer';
     const feature = e.features[0];
 
     if (this.hovered.id !== null) {
@@ -127,20 +143,19 @@ export default class InteractiveMap {
     }
     this._updateHighlight(this.hovered, null, feature.id);
 
-    this.activePopup.setLngLat(e.lngLat).setHTML(generateTooltip(feature)).addTo(this.map);
+    this._renderTooltip(e);
   }
   /**
    * @param {'state' | 'county' | 'metro-area'} level
    * @param {import('mapbox-gl').MapMouseEvent} e
    */
   _onLevelMouseMove(e) {
-    this.map.getCanvas().style.cursor = 'pointer';
     const feature = e.features[0];
     // The hovered element is not a mega county. It can be county, msa, state, bubble, or spike.
 
     this._updateHighlight(this.hovered, feature.id, null, feature.properties.level);
 
-    this.activePopup.setLngLat(e.lngLat).setHTML(generateTooltip(feature)).addTo(this.map);
+    this._renderTooltip(e);
   }
 
   /**
