@@ -8,7 +8,6 @@
     currentSensor,
     currentLevel,
     encoding,
-    currentZone,
     currentRange,
     colorScale,
     colorStops,
@@ -31,9 +30,6 @@
   let map;
 
   function initialReady() {
-    if ($currentZone === 'swpa') {
-      map.zoom.showSWPA();
-    }
     if (!$currentRegion) {
       map.selectRandom();
     }

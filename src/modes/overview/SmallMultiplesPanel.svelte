@@ -1,6 +1,6 @@
 <script>
   import SmallMultiples from './SmallMultiples.svelte';
-  import { publicSensors, earlySensors, lateSensors, currentSensor } from '../../stores';
+  import { currentSensor, sensorList } from '../../stores';
   import IoMdExpand from 'svelte-icons/io/IoMdExpand.svelte';
   import { createEventDispatcher } from 'svelte';
 
@@ -15,7 +15,7 @@
 
   export let detail = null;
 
-  $: sensors = $publicSensors.concat($earlySensors, $lateSensors).filter((d) => !remove.includes(d.key));
+  const sensors = sensorList.filter((d) => !remove.includes(d.key));
 </script>
 
 <style>
