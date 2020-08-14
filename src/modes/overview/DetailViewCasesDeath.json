@@ -1,0 +1,85 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+  "data": { "name": "values" },
+  "autosize": {
+    "contains": "padding",
+    "resize": true
+  },
+  "vconcat": [
+    {
+      "width": "container",
+      "encoding": {
+        "color": {
+          "value": "#dddddd"
+        },
+        "x": {
+          "field": "date_value",
+          "type": "temporal",
+          "scale": { "domain": { "selection": "brush" } },
+          "axis": {
+            "title": null,
+            "format": "%m/%d",
+            "formatType": "time",
+            "tickCount": "day",
+            "grid": false
+          }
+        },
+        "y": {
+          "field": "count",
+          "type": "quantitative",
+          "axis": {
+            "title": " "
+          }
+        }
+      },
+      "layer": [
+        {
+          "mark": {
+            "type": "bar",
+            "tooltip": true
+          }
+        },
+        {
+          "mark": {
+            "type": "line",
+            "interpolate": "monotone",
+            "tooltip": true
+          },
+          "encoding": {
+            "color": {
+              "value": "black"
+            },
+            "y": {
+              "field": "avg"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "height": 60,
+      "encoding": {
+        "color": {
+          "value": "#eeeeee"
+        },
+        "x": {
+          "field": "date_value",
+          "type": "temporal"
+        },
+        "y": {
+          "field": "count",
+          "type": "quantitative",
+          "axis": {
+            "title": " "
+          }
+        }
+      },
+      "selection": {
+        "brush": { "type": "interval", "encodings": ["x"] }
+      },
+      "mark": {
+        "type": "bar"
+      }
+    }
+  ]
+}

@@ -3,9 +3,11 @@
   import { fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../../components/vega/Vega.svelte';
   import spec from './DetailView.json';
+  import specCasesDeath from './DetailViewCasesDeath.json';
   import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
   import { createEventDispatcher } from 'svelte';
   import { merge } from 'lodash-es';
+  import { isCasesSignal, isDeathSignal } from '../../data';
 
   const dispatch = createEventDispatcher();
   /**
@@ -14,6 +16,7 @@
   export let sensor;
 
   $: data = fetchTimeSlice(sensor, $currentLevel, $currentRegion);
+  $: isCasesOrDeath = isCasesSignal(sensor.key) || isDeathSignal(sensor.key);
 
   function patchSpec(spec, size) {
     return merge({}, spec, {
@@ -89,6 +92,6 @@
   </button>
 </div>
 <div class="single-sensor-chart vega-wrapper">
-  <Vega {data} {spec} {patchSpec} />
+  <Vega {data} spec={isCasesOrDeath ? specCasesDeath : spec} {patchSpec} />
 </div>
 <svelte:window on:keydown={onEscCheck} />
