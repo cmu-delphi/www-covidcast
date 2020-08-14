@@ -130,11 +130,18 @@ export function fetchCustomTimeSlice(sensorEntry, level, region, startDate, endD
     return Promise.resolve([]);
   }
   const timeRange = `${formatAPITime(startDate)}-${formatAPITime(endDate)}`;
-  return callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.signal, level, timeRange, region).then((d) => {
+  const additionalSignal = getAdditionalSignal(sensorEntry.signal);
+  return Promise.all([
+    callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.signal, level, timeRange, region),
+    additionalSignal
+      ? callAPIEndPoint(sensorEntry.api, sensorEntry.id, additionalSignal, level, timeRange, region)
+      : null,
+  ]).then(([d, d1]) => {
     if (d.result < 0 || d.message.includes('no results')) {
       return [];
     }
-    return parseData(d.epidata);
+    const data = d1 ? combineAverageWithCount(d, d1) : d.epidata;
+    return parseData(data);
   });
 }
 

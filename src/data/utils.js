@@ -10,10 +10,9 @@ export function combineAverageWithCount(json1, json2) {
   return data1.map((d1, i) => {
     const d2 = data2[i];
     const avg = Math.max(0, d1.value);
-    const count = Math.max(0, d2.value);
+    const count = d2 ? Math.max(0, d2.value) : null;
     d1.avg = avg;
     d1.count = count;
-    delete d1.value;
     return d1;
   });
 }
