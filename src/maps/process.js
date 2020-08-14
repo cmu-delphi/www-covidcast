@@ -34,6 +34,21 @@ function computeBounds(geojson, scale = 1.2) {
   );
 }
 
+/**
+ *
+ * @param {LngLatBounds} boundsA
+ * @param {LngLatBounds} boundsB
+ */
+function overlaps(boundsA, boundsB) {
+  if (boundsA.getEast() > boundsB.getWest() || boundsA.getWest() < boundsB.getEast()) {
+    return false;
+  }
+  if (boundsA.getSouth() > boundsB.getNorth() || boundsA.getNorth() < boundsB.getSouth()) {
+    return false;
+  }
+  return true;
+}
+
 function states(level = 'state') {
   const geo = require(`./raw/new_states.json`);
 
@@ -169,13 +184,6 @@ function counties(level = 'county') {
   return geo;
 }
 
-function zones() {
-  const geo = require(`./raw/new_zones.json`);
-  const topo = topology({ zone: geo }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/zone.geojson.json`), JSON.stringify(topo));
-  return geo;
-}
-
 function cities() {
   const geo = require(`./raw/city_data/cities-reprojected.json`);
   const infos = geo.features.map((feature) => {
@@ -196,7 +204,6 @@ function cities() {
 const statesGeo = states();
 const msaGeo = msa();
 const countiesGeo = counties();
-const zoneGeo = zones();
 cities();
 
 fs.writeFileSync(
@@ -206,9 +213,28 @@ fs.writeFileSync(
       states: computeBounds(statesGeo).toArray(),
       msa: computeBounds(msaGeo).toArray(),
       counties: computeBounds(countiesGeo).toArray(),
-      zones: computeBounds(zoneGeo).toArray(),
     },
     null,
     2,
   ),
 );
+
+{
+  const zone = require(`./raw/swpa/hrr_zone.json`);
+  const topo = topology({ zone }, QUANTIZATION);
+  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/zone.geojson.json`), JSON.stringify(topo));
+  const bounds = computeBounds(zone, 1);
+
+  Object.entries({
+    state: statesGeo,
+    msa: msaGeo,
+    county: countiesGeo,
+  }).forEach(([level, v]) => {
+    const inZone = {
+      type: 'FeatureCollection',
+      features: v.features.filter((feature) => overlaps(bounds, computeBounds(feature, 1))),
+    };
+    const topo = topology({ [level]: inZone }, QUANTIZATION);
+    fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/${level}.geojson.json`), JSON.stringify(topo));
+  });
+}
