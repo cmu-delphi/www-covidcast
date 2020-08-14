@@ -1,5 +1,5 @@
 <script>
-  import { currentRegion, currentSensor, currentLevel, sensors, currentSensorEntry } from '../stores';
+  import { currentRegion, currentSensor, currentLevel, currentSensorEntry, sensorList } from '../stores';
   import { parseAPITime } from '../data/utils';
   import { fetchCustomTimeSlice } from '../data/fetchData';
   import Vega from './vega/Vega.svelte';
@@ -13,7 +13,7 @@
     'indicator-combination-deaths_7dav_incidence_num',
     // 'safegraph-full_time_work_prop',
   ];
-  $: filteredSensors = $sensors.filter((s) => !sensorSmallMultipleBlacklist.includes(s.key));
+  const filteredSensors = sensorList.filter((s) => !sensorSmallMultipleBlacklist.includes(s.key));
 
   // Create a date for today in the API's date format
   const startDay = parseAPITime('20200401');
