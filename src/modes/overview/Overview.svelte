@@ -21,6 +21,7 @@
     selectByInfo,
     selectByFeature,
     currentSensorEntry,
+    signalShowCumulative,
   } from '../../stores';
   import ToggleEncoding from '../../components/ToggleEncoding.svelte';
   import Title from '../../components/Title.svelte';
@@ -246,6 +247,7 @@
     sensor={$currentSensor}
     level={$currentLevel}
     signalType={$signalType}
+    showCumulative={$signalShowCumulative}
     selection={$currentRegionInfo}
     encoding={$encoding}
     on:ready={() => initialReady()}

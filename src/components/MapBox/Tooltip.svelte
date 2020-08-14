@@ -1,6 +1,6 @@
 <script>
   import { timeFormat } from 'd3-time-format';
-  import { signalType, currentSensorEntry, colorScale, currentDateObject } from '../../stores';
+  import { signalType, currentSensorEntry, colorScale, currentDateObject, signalShowCumulative } from '../../stores';
   import { DIRECTION_THEME } from '../../theme';
   import { getTextColorBasedOnBackground } from '../../util';
 
@@ -81,23 +81,27 @@
           </tr>
           <tr>
             <th>{formatTimeWithoutYear($currentDateObject)}</th>
-            <td class="right" style={colorScaleStyle(properties.count)}>
+            <td class="right" style={$signalShowCumulative ? '' : colorScaleStyle(properties.count)}>
               {$currentSensorEntry.formatValue(properties.count)}
             </td>
           </tr>
           <tr>
             <th>7-day avg</th>
-            <td class="right" style={colorScaleStyle(properties.avg)}>
+            <td class="right" style={$signalShowCumulative ? '' : colorScaleStyle(properties.avg)}>
               {$currentSensorEntry.formatValue(properties.avg)}
             </td>
           </tr>
           <tr>
             <th>{formatTimeWithoutYear($currentDateObject)} (cumulated)</th>
-            <td class="right">{$currentSensorEntry.formatValue(properties.countCumulative)}</td>
+            <td class="right" style={$signalShowCumulative ? colorScaleStyle(properties.countCumulative) : ''}>
+              {$currentSensorEntry.formatValue(properties.countCumulative)}
+            </td>
           </tr>
           <tr>
             <th>7-day avg (cumulated)</th>
-            <td class="right">{$currentSensorEntry.formatValue(properties.avgCumulative)}</td>
+            <td class="right" style={$signalShowCumulative ? colorScaleStyle(properties.avgCumulative) : ''}>
+              {$currentSensorEntry.formatValue(properties.avgCumulative)}
+            </td>
           </tr>
         {:else}
           <tr>

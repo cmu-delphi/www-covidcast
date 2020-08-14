@@ -7,6 +7,7 @@
     bubbleRadiusScale,
     currentSensorEntry,
     currentDataReadyOnMap,
+signalShowCumulative,
   } from '../../stores';
   import { transparent } from '../../util';
   import { getSigfigs, generateLabels } from '../MapBox/colors';
@@ -16,7 +17,7 @@
   let labels = [];
 
   $: {
-    const r = generateLabels($stats, $currentSensorEntry, $currentLevel);
+    const r = generateLabels($stats, $currentSensorEntry, $currentLevel, $signalShowCumulative);
     labels = r.labels;
     high = r.high;
     unit = r.unit;

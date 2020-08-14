@@ -295,16 +295,16 @@ export default class MapBoxWrapper {
    * @param {'county' | 'state' | 'msa'} level
    * @param {import('../../data/fetchData').EpiDataRow[]>} data
    */
-  updateSources(level, data) {
+  updateSources(level, data, primaryValue = 'value') {
     if (!this.map || !this.mapSetupReady) {
       return;
     }
     const lookup = new Map(data.map((d) => [d.geo_value.toUpperCase(), d]));
     if (level === 'county') {
-      this.updateSource(S[levelMegaCounty.id].border, lookup);
+      this.updateSource(S[levelMegaCounty.id].border, lookup, primaryValue);
     }
-    this.updateSource(S[level].border, lookup);
-    this.updateSource(S[level].center, lookup);
+    this.updateSource(S[level].border, lookup, primaryValue);
+    this.updateSource(S[level].center, lookup, primaryValue);
 
     for (const encoding of this.encodings) {
       encoding.updateSources(this.map, level);
@@ -318,7 +318,7 @@ export default class MapBoxWrapper {
    * @param {string} sourceId
    * @param {Map<string, import('../../data/fetchData').EpiDataRow>} values
    */
-  updateSource(sourceId, values) {
+  updateSource(sourceId, values, primaryValue = 'value') {
     if (!this.map) {
       return;
     }
@@ -331,7 +331,7 @@ export default class MapBoxWrapper {
     data.features.forEach((d) => {
       const id = d.properties.id;
       const entry = values.get(id);
-      d.properties.value = entry ? entry.value : MISSING_VALUE;
+      d.properties.value = entry ? entry[primaryValue] : MISSING_VALUE;
       d.properties.direction = entry ? entry.direction : MISSING_VALUE;
       EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
         d.properties[key] = entry && entry[key] != null ? entry[key] : MISSING_VALUE;

@@ -14,6 +14,7 @@
     encoding,
     mounted,
     sensorMap,
+    signalShowCumulative,
   } from './stores';
   import './stores/urlHandler';
   import './stores/ga';
@@ -76,6 +77,7 @@
 
     if (!sensorEntry.isCasesOrDeath) {
       encoding.set('color');
+      signalShowCumulative.set(false);
     }
 
     updateRegionSliceCache(s, l, date, 'sensor-change');

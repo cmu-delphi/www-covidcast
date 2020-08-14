@@ -7,6 +7,7 @@
     spikeHeightScale,
     currentSensorEntry,
     currentDataReadyOnMap,
+signalShowCumulative,
   } from '../../stores';
   import { transparent } from '../../util';
   import { getSigfigs, generateLabels } from '../MapBox/colors';
@@ -26,7 +27,7 @@
     size = ENCODING_SPIKE_THEME.size[$currentLevel] * spikeBase;
     maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel] * spikeBase;
 
-    const r = generateLabels($stats, $currentSensorEntry, $currentLevel);
+    const r = generateLabels($stats, $currentSensorEntry, $currentLevel, $signalShowCumulative);
     labels = r.labels;
     high = r.high;
     unit = r.unit;

@@ -77,6 +77,11 @@ export const signalType = writable('value', (set) => {
   }
 });
 
+// in case of a death signal whether to show cumulative data
+export const signalShowCumulative = writable(false, (set) => {
+  set(urlParams.has('signalC'));
+});
+
 // Options are 'color', 'bubble', and 'spike'
 export const encoding = writable('color', (set) => {
   const encoding = urlParams.get('encoding');
