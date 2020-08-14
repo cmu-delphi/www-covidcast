@@ -1,38 +1,48 @@
 <script>
   import { currentRegion, currentLevel, currentRegionInfo } from '../../stores';
-  import { parseAPITime } from '../../data/utils';
-  import { fetchCustomTimeSlice } from '../../data/fetchData';
+  import { fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../../components/vega/Vega.svelte';
-  import spec from '../../components/vega/SmallMultipleSingleLineChart.json';
+  import spec from './DetailView.json';
   import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
   import { createEventDispatcher } from 'svelte';
+  import { merge } from 'lodash-es';
 
   const dispatch = createEventDispatcher();
   /**
    * @type {import('../../data/fetchData').SensorEntry}
    */
   export let sensor;
-  // Create a date for today in the API's date format
-  const startDay = parseAPITime('20200401');
-  const finalDay = new Date();
 
-  $: data = fetchCustomTimeSlice(sensor, $currentLevel, $currentRegion, startDay, finalDay);
+  $: data = fetchTimeSlice(sensor, $currentLevel, $currentRegion);
 
-  // patch in the yAxis name
-  $: specPatched = {
-    ...spec,
-    encoding: {
-      ...spec.encoding,
-      y: {
-        ...spec.encoding.y,
-        axis: {
-          ...spec.encoding.y.axis,
-          title: sensor.yAxis ? sensor.yAxis : ' ',
+  function patchSpec(spec, size) {
+    return merge({}, spec, {
+      vconcat: [
+        {
+          width: size.width - 45,
+          height: size.height - 60 - 70,
+          encoding: {
+            y: {
+              axis: {
+                title: sensor.yAxis || '',
+              },
+            },
+          },
         },
-      },
-    },
-  };
-
+        {
+          width: size.width - 45,
+          height: 60,
+          encoding: {
+            y: {
+              axis: {
+                title: sensor.yAxis || '',
+              },
+            },
+          },
+        },
+      ],
+    });
+  }
   /**
    * @param {KeyboardEvent} e
    */
@@ -79,6 +89,6 @@
   </button>
 </div>
 <div class="single-sensor-chart vega-wrapper">
-  <Vega {data} spec={specPatched} />
+  <Vega {data} {spec} {patchSpec} />
 </div>
 <svelte:window on:keydown={onEscCheck} />

@@ -25,7 +25,7 @@
   import MapControls from '../../components/MapControls.svelte';
   import Search from '../../components/Search.svelte';
   import SmallMultiplesPanel from './SmallMultiplesPanel.svelte';
-  import SmallMultiplesDetail from './SmallMultiplesDetail.svelte';
+  import DetailView from './DetailView.svelte';
 
   /**
    * @type {MapBox}
@@ -237,7 +237,7 @@
 
       {#if detailSensor != null}
         <div class="detail-container container-bg container-style">
-          <SmallMultiplesDetail sensor={detailSensor} on:close={() => (detailSensor = null)} />
+          <DetailView sensor={detailSensor} on:close={() => (detailSensor = null)} />
         </div>
       {/if}
     </div>

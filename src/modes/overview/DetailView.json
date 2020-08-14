@@ -1,0 +1,111 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+  "data": { "name": "values" },
+  "autosize": {
+    "contains": "padding",
+    "resize": true
+  },
+  "vconcat": [
+    {
+      "width": "container",
+      "layer": [
+        {
+          "mark": {
+            "type": "line",
+            "interpolate": "monotone"
+          }
+        },
+        {
+          "mark": {
+            "type": "area",
+            "interpolate": "monotone"
+          },
+          "encoding": {
+            "color": {
+              "value": "rgba(0, 0, 0, 0.1)"
+            },
+            "y": {
+              "field": "value_lower_bound",
+              "type": "quantitative"
+            },
+            "y2": {
+              "field": "value_upper_bound"
+            }
+          }
+        }
+      ],
+      "encoding": {
+        "color": {
+          "value": "grey"
+        },
+        "x": {
+          "field": "date_value",
+          "type": "temporal",
+          "scale": { "domain": { "selection": "brush" } },
+          "axis": {
+            "title": null,
+            "format": "%m/%d",
+            "formatType": "time",
+            "tickCount": "day",
+            "grid": false
+          }
+        },
+        "y": {
+          "field": "value",
+          "type": "quantitative",
+          "axis": {
+            "title": " "
+          }
+        }
+      }
+    },
+    {
+      "height": 60,
+      "encoding": {
+        "color": {
+          "value": "grey"
+        },
+        "x": {
+          "field": "date_value",
+          "type": "temporal"
+        },
+        "y": {
+          "field": "value",
+          "type": "quantitative",
+          "axis": {
+            "title": " "
+          }
+        }
+      },
+      "layer": [
+        {
+          "selection": {
+            "brush": { "type": "interval", "encodings": ["x"] }
+          },
+          "mark": {
+            "type": "line",
+            "interpolate": "monotone"
+          }
+        },
+        {
+          "mark": {
+            "type": "area",
+            "interpolate": "monotone"
+          },
+          "encoding": {
+            "color": {
+              "value": "rgba(0, 0, 0, 0.1)"
+            },
+            "y": {
+              "field": "value_lower_bound",
+              "type": "quantitative"
+            },
+            "y2": {
+              "field": "value_upper_bound"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
