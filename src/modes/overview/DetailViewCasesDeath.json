@@ -5,13 +5,16 @@
     "contains": "padding",
     "resize": true
   },
+  "transform": [
+    {
+      "calculate": "datum.date_value",
+      "as": "title"
+    }
+  ],
   "vconcat": [
     {
       "width": "container",
       "encoding": {
-        "color": {
-          "value": "#dddddd"
-        },
         "x": {
           "field": "date_value",
           "type": "temporal",
@@ -30,13 +33,29 @@
           "axis": {
             "title": " "
           }
-        }
+        },
+        "tooltip": [
+          { "field": "count", "type": "quantitative", "title": "New Cases", "format": ".2f" },
+          { "field": "avg", "type": "quantitative", "title": "7-day average", "format": ".2f" },
+          { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
+        ]
       },
       "layer": [
         {
+          "selection": {
+            "highlight": { "type": "single", "empty": "none", "on": "mouseover" }
+          },
           "mark": {
-            "type": "bar",
-            "tooltip": true
+            "type": "bar"
+          },
+          "encoding": {
+            "color": {
+              "condition": {
+                "selection": "highlight",
+                "value": "#aaaaaa"
+              },
+              "value": "#dddddd"
+            }
           }
         },
         {
@@ -58,9 +77,20 @@
     },
     {
       "height": 60,
+      "selection": {
+        "highlight": { "type": "single", "empty": "none", "on": "mouseover" },
+        "brush": { "type": "interval", "encodings": ["x"] }
+      },
+      "mark": {
+        "type": "bar"
+      },
       "encoding": {
         "color": {
-          "value": "#eeeeee"
+          "condition": {
+            "selection": "highlight",
+            "value": "#aaaaaa"
+          },
+          "value": "#dddddd"
         },
         "x": {
           "field": "date_value",
@@ -72,13 +102,12 @@
           "axis": {
             "title": " "
           }
-        }
-      },
-      "selection": {
-        "brush": { "type": "interval", "encodings": ["x"] }
-      },
-      "mark": {
-        "type": "bar"
+        },
+        "tooltip": [
+          { "field": "count", "type": "quantitative", "title": "New Cases", "format": ".2f" },
+          { "field": "avg", "type": "quantitative", "title": "7-day average", "format": ".2f" },
+          { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
+        ]
       }
     }
   ]
