@@ -2,7 +2,6 @@
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import { stats, levels as baseLevels } from '../../stores';
   import { determineColorScale, determineMinMax } from './colors';
-  import { generateDataLookup } from './data';
   import MapBoxWrapper from './MapBoxWrapper';
   import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './encodings';
   import { ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../../theme';
@@ -42,6 +41,7 @@
   export let level = 'state';
   export let encoding = 'color';
   export let signalType = 'value';
+  export let showCumulative = false;
   export let animationDuration = 0;
   /**
    * @type {import('../../maps/nameIdInfo').NameInfo | null}
@@ -61,9 +61,9 @@
     // dummy function to mark a given argument as tracked
   }
 
-  function updateEncoding(level, encoding, sensor, signalType, stats) {
+  function updateEncoding(level, encoding, sensor, signalType, stats, showCumulative) {
     // Get the range for the heatmap.
-    const valueMinMax = determineMinMax(stats, sensor, level);
+    const valueMinMax = determineMinMax(stats, sensor, level, showCumulative);
     const { stops, stopsMega, scale } = determineColorScale(valueMinMax, signalType, sensor);
     const drawMega = hasMegaCountyLevel && level === 'county';
     const ret = wrapper.updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, drawMega && stopsMega);
@@ -75,18 +75,16 @@
     });
   }
 
-  $: mapData = generateDataLookup(data, sensor);
-
   $: {
     // update mega
     dummyTrack(ready);
-    wrapper.updateSources(level, mapData.values, mapData.directions, sensor);
+    wrapper.updateSources(level, data, showCumulative ? 'avgCumulative' : 'value');
   }
   $: {
     dummyTrack(ready);
     // update encodings upon change
     if ($stats) {
-      updateEncoding(level, encoding, sensor, signalType, $stats);
+      updateEncoding(level, encoding, sensor, signalType, $stats, showCumulative);
     }
   }
   $: {

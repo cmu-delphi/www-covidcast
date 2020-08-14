@@ -1,4 +1,13 @@
-import { currentSensor, currentLevel, currentRegion, currentDate, signalType, encoding, currentMode } from '.';
+import {
+  currentSensor,
+  currentLevel,
+  currentRegion,
+  currentDate,
+  signalType,
+  encoding,
+  currentMode,
+  signalShowCumulative,
+} from '.';
 
 export function trackUrl(url) {
   if (!window.ga) {
@@ -23,3 +32,4 @@ currentDate.subscribe((date) => trackEvent('date', 'set', date));
 signalType.subscribe((signalType) => trackEvent('signalType', 'set', signalType));
 encoding.subscribe((encoding) => trackEvent('encoding', 'set', encoding));
 currentMode.subscribe((mode) => trackEvent('mode', 'set', mode.id));
+signalShowCumulative.subscribe((show) => trackEvent('signalShowCumulative', 'set', String(show)));

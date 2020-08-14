@@ -19,12 +19,13 @@
     currentRegion,
     selectByInfo,
     selectByFeature,
+    currentSensorEntry,
+    signalShowCumulative,
   } from '../../stores';
   import ToggleEncoding from '../../components/ToggleEncoding.svelte';
   import Title from '../../components/Title.svelte';
   import MapControls from '../../components/MapControls.svelte';
   import Search from '../../components/Search.svelte';
-  import { isDeathSignal, isCasesSignal } from '../../data/signals';
   import { trackEvent } from '../../stores/ga';
   import LineSmallMultiples from '../../components/LineSmallMultiples.svelte';
   import './mapContainer.css';
@@ -203,7 +204,7 @@
       </div>
       <div
         class="toggle-container container-bg base-font-size container-style"
-        class:hidden={$signalType === 'direction' || !(isDeathSignal($currentSensor) || isCasesSignal($currentSensor))}>
+        class:hidden={$signalType === 'direction' || !$currentSensorEntry.isCasesOrDeath}>
         <ToggleEncoding />
       </div>
       <div class="title-container container-bg">
@@ -229,6 +230,7 @@
     sensor={$currentSensor}
     level={$currentLevel}
     signalType={$signalType}
+    showCumulative={$signalShowCumulative}
     selection={$currentRegionInfo}
     encoding={$encoding}
     on:ready={() => initialReady()}

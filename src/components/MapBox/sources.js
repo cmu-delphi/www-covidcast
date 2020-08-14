@@ -1,5 +1,6 @@
 import { MISSING_VALUE } from './encodings/utils';
 import { loadSources } from '../../maps';
+import { EPIDATA_CASES_OR_DEATH_VALUES } from '../../stores/constants';
 
 export const S = {
   state: {
@@ -29,9 +30,11 @@ export const S = {
 
 const valueProperties = {
   value: MISSING_VALUE,
-  value1: MISSING_VALUE,
   direction: MISSING_VALUE,
 };
+EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
+  valueProperties[key] = MISSING_VALUE;
+});
 
 export const geoJsonSources = loadSources(valueProperties);
 
