@@ -18,7 +18,6 @@
   import './stores/urlHandler';
   import './stores/ga';
   import { updateRegionSliceCache, loadMetaData } from './data';
-  import { isDeathSignal, isCasesSignal } from './data/signals';
   import ModeToggle from './components/ModeToggle.svelte';
   import modes from './modes';
 
@@ -75,7 +74,7 @@
       signalType.set('value');
     }
 
-    if (!isDeathSignal($currentSensor) && !isCasesSignal($currentSensor)) {
+    if (!sensorEntry.isCasesOrDeath) {
       encoding.set('color');
     }
 

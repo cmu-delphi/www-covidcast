@@ -139,14 +139,14 @@ export function generateLabels(stats, sensorEntry, level) {
     };
   }
 
-  if (!isCountSignal(sensorEntry.key)) {
+  if (!sensorEntry.isCount) {
     valueMinMax[0] = Math.max(EXPLICIT_ZERO_OFFSET, valueMinMax[0]);
   }
 
   let high = getSigfigs(valueMinMax[1].toFixed(2), 3);
   let unit = '';
 
-  if (isCountSignal(sensorEntry.key)) {
+  if (sensorEntry.isCount) {
     const min = Math.log(valueMinMax[0]) / Math.log(10);
     const max = Math.log(valueMinMax[1]) / Math.log(10);
     const arr = logspace(min, max, 7);

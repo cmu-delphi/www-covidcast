@@ -20,12 +20,12 @@
     currentRegion,
     selectByInfo,
     selectByFeature,
+    currentSensorEntry,
   } from '../../stores';
   import ToggleEncoding from '../../components/ToggleEncoding.svelte';
   import Title from '../../components/Title.svelte';
   import MapControls from '../../components/MapControls.svelte';
   import Search from '../../components/Search.svelte';
-  import { isDeathSignal, isCasesSignal } from '../../data/signals';
   import { trackEvent } from '../../stores/ga';
   import LineSmallMultiples from '../../components/LineSmallMultiples.svelte';
 
@@ -220,7 +220,7 @@
       </div>
       <div
         class="toggle-container container-bg base-font-size container-style"
-        class:hidden={$signalType === 'direction' || !(isDeathSignal($currentSensor) || isCasesSignal($currentSensor))}>
+        class:hidden={$signalType === 'direction' || !$currentSensorEntry.isCasesOrDeath}>
         <ToggleEncoding />
       </div>
       <div class="title-container container-bg">

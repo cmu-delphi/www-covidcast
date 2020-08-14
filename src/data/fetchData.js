@@ -1,6 +1,5 @@
 import { callAPIEndPoint } from './api';
-import { checkWIP, combineAverageWithCount, parseAPITime, formatAPITime } from './utils';
-import { isCasesSignal, isDeathSignal } from './signals';
+import { combineAverageWithCount, parseAPITime, formatAPITime } from './utils';
 
 /**
  * @typedef {import('../stores/constants').SensorEntry} SensorEntry
@@ -62,31 +61,6 @@ function parseData(data) {
 
 /**
  *
- * @param {string} signal
- * @returns {string}
- */
-function getAdditionalSignal(signal) {
-  // deaths_incidence_prop
-  if (signal === 'deaths_7dav_incidence_prop') {
-    return checkWIP(signal, 'deaths_incidence_prop');
-  }
-  // deaths needs both count and ratio
-  if (isDeathSignal(signal)) {
-    return checkWIP(signal, 'deaths_incidence_num');
-  }
-  // confirmed_incidence_prop
-  if (signal === 'confirmed_7dav_incidence_prop') {
-    return checkWIP(signal, 'confirmed_incidence_prop');
-  }
-  // cases needs both count and ratio
-  if (isCasesSignal(signal)) {
-    return checkWIP(signal, 'confirmed_incidence_num');
-  }
-  return null;
-}
-
-/**
- *
  * @param {SensorEntry} sensorEntry
  * @param {string} level
  * @param {string} date
@@ -102,11 +76,11 @@ export function fetchRegionSlice(sensorEntry, level, date) {
     return cacheEntry;
   }
 
-  const additionalSignal = getAdditionalSignal(sensorEntry.signal);
-
   const promise = Promise.all([
     callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.signal, level, date, '*'),
-    additionalSignal ? callAPIEndPoint(sensorEntry.api, sensorEntry.id, additionalSignal, level, date, '*') : null,
+    sensorEntry.additionalSignal
+      ? callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.additionalSignal, level, date, '*')
+      : null,
   ]).then(([d, d1]) => {
     if (d.result < 0 || d.message.includes('no results')) {
       return [];

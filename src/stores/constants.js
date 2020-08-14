@@ -1,4 +1,5 @@
 import { formatAPITime, isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data';
+import { checkWIP } from '../data/utils';
 
 export const levelList = [
   {
@@ -39,6 +40,31 @@ export function getLevelInfo(level) {
 }
 
 /**
+ *
+ * @param {string} entry
+ * @returns {string}
+ */
+function getAdditionalSignal(signal) {
+  // deaths_incidence_prop
+  if (signal === 'deaths_7dav_incidence_prop') {
+    return checkWIP(signal, 'deaths_incidence_prop');
+  }
+  // deaths needs both count and ratio
+  if (isDeathSignal(signal)) {
+    return checkWIP(signal, 'deaths_incidence_num');
+  }
+  // confirmed_incidence_prop
+  if (signal === 'confirmed_7dav_incidence_prop') {
+    return checkWIP(signal, 'confirmed_incidence_prop');
+  }
+  // cases needs both count and ratio
+  if (isCasesSignal(signal)) {
+    return checkWIP(signal, 'confirmed_incidence_num');
+  }
+  return null;
+}
+
+/**
  * @typedef {object} SensorEntry
  * @property {string} key
  * @property {'public' | 'early' | 'late'} type
@@ -54,6 +80,7 @@ export function getLevelInfo(level) {
  * @property {boolean} isCasesOrDeath is cases or death signal
  * @property {boolean} isCount is count signal
  * @property {boolean} isProp is prop signal
+ * @property {string | null} additionalSignal additional signal to load for avg/count
  */
 
 export function extendSensorEntry(sensorEntry) {
@@ -63,6 +90,7 @@ export function extendSensorEntry(sensorEntry) {
     isCasesOrDeath: isCasesSignal(key) || isDeathSignal(key),
     isCount: isCountSignal(key),
     isProp: isPropSignal(key),
+    additionalSignal: getAdditionalSignal(sensorEntry.signal),
   });
 }
 

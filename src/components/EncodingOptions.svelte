@@ -1,6 +1,5 @@
 <script>
-  import { signalType, currentSensor } from '../stores';
-  import { isCountSignal } from '../data/signals';
+  import { signalType, currentSensorEntry } from '../stores';
 </script>
 
 <style>
@@ -30,7 +29,7 @@
           signalType.set('value');
         }
       }}>
-      {isCountSignal($currentSensor) ? 'Count' : 'Intensity'}
+      {$currentSensorEntry.isCount ? 'Count' : 'Intensity'}
     </button>
     <button
       aria-pressed={$signalType === 'direction' ? 'true' : 'false'}
