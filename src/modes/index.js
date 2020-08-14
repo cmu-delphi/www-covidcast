@@ -16,6 +16,12 @@ export default [
     tooltip: 'Switch to Overview Mode',
     component: () => import(/* webpackPreload: true */ './overview/Overview.svelte').then((r) => r.default),
   },
+  {
+    id: 'timelapse',
+    label: 'Time-lapse',
+    tooltip: 'Switch to Time-lapse Mode',
+    component: () => import('./timelapse/TimeLapse.svelte').then((r) => r.default),
+  },
   // {
   //   id: 'compare',
   //   label: 'Compare',
