@@ -3,7 +3,6 @@ import { S } from '../sources';
 import { getType } from '../../../data/signals';
 import { parseScaleSpec } from '../../../stores/scales';
 import { HAS_VALUE, caseHovered } from './utils';
-import { levels } from '../../../stores';
 
 export default class SpikeEncoding {
   constructor(theme) {
@@ -60,24 +59,24 @@ export default class SpikeEncoding {
     return { fill: spikes, stroke: spikeOutlines };
   }
 
-  addSources(map) {
-    levels.forEach((level) => {
+  addSources(map, adapter) {
+    adapter.levels.forEach((level) => {
       // generate a lookup
       this.sources[level] = this.generateSources(map, level);
     });
     map.addSource(S.spike.fill, {
       type: 'geojson',
-      data: this.sources.county.fill,
+      data: this.sources[adapter.level].fill,
     });
     map.addSource(S.spike.stroke, {
       type: 'geojson',
-      data: this.sources.county.stroke,
+      data: this.sources[adapter.level].stroke,
     });
   }
 
-  addLayers(map) {
+  addLayers(map, adapter) {
     // 4 layers for spikes
-    const addFillLayer = (id, reference, hovered = false) => {
+    const addFillLayer = (id, before, hovered = false) => {
       map.addLayer(
         {
           id,
@@ -90,13 +89,13 @@ export default class SpikeEncoding {
             'fill-opacity': caseHovered(0, this.theme.fillOpacity, hovered),
           },
         },
-        reference,
+        before,
       );
     };
-    addFillLayer(L.spike.fill, L.county.hover);
-    addFillLayer(L.spike.highlight.fill, 'city-point-unclustered-pit', true);
+    addFillLayer(L.spike.fill, L[adapter.level].hover);
+    addFillLayer(L.spike.highlight.fill, L.cityPoints.pit, true);
 
-    const addLineLayer = (id, reference, hovered = false, extraStyles = {}) => {
+    const addLineLayer = (id, before, hovered = false, extraStyles = {}) => {
       map.addLayer(
         {
           id,
@@ -113,11 +112,11 @@ export default class SpikeEncoding {
             'line-opacity': caseHovered(0, this.theme.strokeOpacity, hovered),
           },
         },
-        reference,
+        before,
       );
     };
-    addLineLayer(L.spike.stroke, L.county.hover);
-    addLineLayer(L.spike.highlight.stroke, 'city-point-unclustered-pit', true, {
+    addLineLayer(L.spike.stroke, L[adapter.level].hover);
+    addLineLayer(L.spike.highlight.stroke, L.cityPoints.pit, true, {
       'line-width': this.theme.strokeWidthHighlighted,
     });
   }

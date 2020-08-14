@@ -34,3 +34,16 @@ const valueProperties = {
 };
 
 export const geoJsonSources = loadSources(valueProperties);
+
+/**
+ *
+ * @param {import('mapbox-gl').Map} map
+ */
+export function addCitySources(map) {
+  return geoJsonSources.then((r) => {
+    map.addSource(S.cityPoint, {
+      type: 'geojson',
+      data: r.cities,
+    });
+  });
+}

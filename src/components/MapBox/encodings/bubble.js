@@ -16,19 +16,19 @@ export default class BubbleEncoding {
     return this.layers.concat([L[level].fill]);
   }
 
-  addSources(map) {
+  addSources(map, adapter) {
     // copy from centers
     // level will update upon update sources
-    const data = map.getSource(S.county.center)._data;
+    const data = map.getSource(S[adapter.level].center)._data;
     map.addSource(S.bubble, {
       type: 'geojson',
       data,
     });
   }
 
-  addLayers(map, helpers) {
+  addLayers(map, adapter) {
     // 2 layers for bubbles
-    const addLayer = (id, reference, hovered = false) => {
+    const addLayer = (id, before, hovered = false) => {
       map.addLayer(
         {
           id,
@@ -45,14 +45,14 @@ export default class BubbleEncoding {
             'circle-stroke-width': this.theme.strokeWidth,
             'circle-opacity': caseHovered(0, this.theme.opacity, hovered),
             'circle-stroke-opacity': caseHovered(0, this.theme.strokeOpacity, hovered),
-            ...helpers.animationOptions('circle-radius'),
+            ...adapter.animationOptions('circle-radius'),
           },
         },
-        reference,
+        before,
       );
     };
-    addLayer(L.bubble.fill, L.county.hover);
-    addLayer(L.bubble.highlight.fill, 'city-point-unclustered-pit', true);
+    addLayer(L.bubble.fill, L[adapter.level].hover);
+    addLayer(L.bubble.highlight.fill, L.cityPoints.pit, true);
   }
 
   encode(map, level, signalType, sensor, valueMinMax, stops) {

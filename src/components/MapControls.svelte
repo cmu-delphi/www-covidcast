@@ -61,7 +61,7 @@
       aria-label="Show entire map"
       disabled={!zoom}
       on:click={() => {
-        trackEvent('map', 'fitUS');
+        trackEvent('map', 'zoomReset');
         zoom.resetZoom();
       }}>
       <IoMdHome />

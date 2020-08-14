@@ -1,5 +1,5 @@
 import { Popup } from 'mapbox-gl';
-import { levelMegaCounty, levels } from '../../stores/constants';
+import { levelMegaCounty } from '../../stores/constants';
 import { generateTooltip } from './generateTooltip';
 import { L } from './layers';
 import { S } from './sources';
@@ -7,7 +7,7 @@ import { S } from './sources';
 export default class InteractiveMap {
   /**
    * @param {import('mapbox-gl').Map} map
-   * @param {{readonly encoding: string, readonly level: string, dispatch(type: string, detail: any)}} adapter
+   * @param {{readonly encoding: string, readonly level: string, readonly levels: string[], hasMegaCountyLevel: boolean, dispatch(type: string, detail: any)}} adapter
    */
   constructor(map, adapter) {
     this.adapter = adapter;
@@ -38,19 +38,21 @@ export default class InteractiveMap {
   }
 
   initListeners() {
-    this.map.on('mouseleave', L.state.stroke, this._onMapMouseLeave.bind(this));
-    this.map.on('mousemove', L.state.stroke, this._onMapMouseMove.bind(this));
+    this.map.on('mouseleave', L.outline, this._onMapMouseLeave.bind(this));
+    this.map.on('mousemove', L.outline, this._onMapMouseMove.bind(this));
 
-    levels.forEach((level) => {
+    this.adapter.levels.forEach((level) => {
       this.map.on('mouseenter', L[level].fill, this._onLevelMouseEnter.bind(this));
       this.map.on('mouseleave', L[level].fill, this._onLevelMouseLeave.bind(this));
       this.map.on('mousemove', L[level].fill, this._onLevelMouseMove.bind(this));
       this.map.on('click', L[level].fill, this._onLevelMouseClick.bind(this));
     });
-    this.map.on('mouseenter', L[levelMegaCounty.id].fill, this._onLevelMouseEnter.bind(this));
-    this.map.on('mouseleave', L[levelMegaCounty.id].fill, this._onLevelMouseLeave.bind(this));
-    this.map.on('mousemove', L[levelMegaCounty.id].fill, this._onMegaMouseMove.bind(this));
-    this.map.on('click', L[levelMegaCounty.id].fill, this._onMegaMouseClick.bind(this));
+    if (this.adapter.hasMegaCountyLevel) {
+      this.map.on('mouseenter', L[levelMegaCounty.id].fill, this._onLevelMouseEnter.bind(this));
+      this.map.on('mouseleave', L[levelMegaCounty.id].fill, this._onLevelMouseLeave.bind(this));
+      this.map.on('mousemove', L[levelMegaCounty.id].fill, this._onMegaMouseMove.bind(this));
+      this.map.on('click', L[levelMegaCounty.id].fill, this._onMegaMouseClick.bind(this));
+    }
   }
 
   get activePopup() {
@@ -111,7 +113,7 @@ export default class InteractiveMap {
     const feature = e.features[0];
     this.activePopup
       .setLngLat(e.lngLat)
-      .setHTML(`Estimate unavailable for rest of ${feature.properties.displayName}`)
+      .setHTML(`Estimate unavailable for Rest of ${feature.properties.displayName}`)
       .addTo(this.map);
   }
   /**
@@ -189,14 +191,16 @@ export default class InteractiveMap {
     }
 
     // match mega
-    if (obj.mega !== mega) {
-      if (obj.mega) {
-        this.map.setFeatureState({ source: S[levelMegaCounty.id].border, id: obj.mega }, clearState);
+    if (this.adapter.hasMegaCountyLevel) {
+      if (obj.mega !== mega) {
+        if (obj.mega) {
+          this.map.setFeatureState({ source: S[levelMegaCounty.id].border, id: obj.mega }, clearState);
+        }
+        if (mega) {
+          this.map.setFeatureState({ source: S[levelMegaCounty.id].border, id: mega }, setState);
+        }
+        obj.mega = mega;
       }
-      if (mega) {
-        this.map.setFeatureState({ source: S[levelMegaCounty.id].border, id: mega }, setState);
-      }
-      obj.mega = mega;
     }
   }
 

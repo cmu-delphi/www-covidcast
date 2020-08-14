@@ -1,15 +1,15 @@
 import { L } from './layers';
 import { LngLatBounds } from 'mapbox-gl';
-import { bounds } from '../../maps';
 
 export default class ZoomMap {
-  constructor() {
+  constructor(bounds) {
     /**
      * @type {import('mapbox-gl').Map | null}
      */
     this.map = null;
-    this.stateBounds = new LngLatBounds(bounds.states);
-    this.stateBoundsOptions = {
+    // TODO customize
+    this.resetBounds = new LngLatBounds(bounds);
+    this.resetBoundsOptions = {
       padding: 20, //px
       linear: false,
     };
@@ -50,7 +50,7 @@ export default class ZoomMap {
       return;
     }
     this.initialZoomView = true;
-    this.map.fitBounds(this.stateBounds, this.stateBoundsOptions);
+    this.map.fitBounds(this.resetBounds, this.resetBoundsOptions);
     this.map.once('idle', () => {
       this.ready();
     });
@@ -65,7 +65,7 @@ export default class ZoomMap {
       return;
     }
     requestAnimationFrame(() => {
-      this.map.fitBounds(this.stateBounds, this.stateBoundsOptions);
+      this.map.fitBounds(this.resetBounds, this.resetBoundsOptions);
     });
   }
 

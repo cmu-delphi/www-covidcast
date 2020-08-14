@@ -14,28 +14,28 @@ Layer names used in MapBox
 import { S } from './sources';
 
 export const L = {
+  outline: 'state-stroke',
   state: {
     fill: 'state-fill',
-    stroke: 'state-stroke',
     hover: 'state-hover',
     selected: 'state-selected',
     names: 'state-names',
   },
   msa: {
     fill: 'msa-fill',
-    stroke: 'msa-stroke',
+    // stroke: 'msa-stroke',
     hover: 'msa-hover',
     selected: 'msa-selected',
   },
   county: {
     fill: 'county-fill',
-    stroke: 'county-stroke',
+    // stroke: 'county-stroke',
     hover: 'county-hover',
     selected: 'county-selected',
   },
   'mega-county': {
     fill: 'mega-county-fill',
-    stroke: 'mega-county-stroke',
+    // stroke: 'mega-county-stroke',
     hover: 'mega-county-hover',
     selected: 'mega-county-selected',
   },
@@ -53,7 +53,6 @@ export const L = {
       stroke: 'spike-highlight-stroke',
     },
   },
-  zoneOutline: 'zone-outline',
   cityPoints: {
     pit: 'city-point-unclustered-pit',
     1: 'city-point-unclustered-1',
@@ -65,10 +64,9 @@ export const L = {
 };
 
 /**
- *
  * @param {import('mapbox-gl').Map} map
  */
-export function addCityLayers(map) {
+export function addStateLabelLayer(map) {
   map.addLayer({
     id: L.state.names,
     source: S.state.center,
@@ -85,27 +83,29 @@ export function addCityLayers(map) {
       'text-halo-width': 1,
     },
   });
+}
 
+/**
+ * @param {import('mapbox-gl').Map} map
+ */
+export function addCityLayers(map) {
   const addCityLayer = (id, filter, extras = {}) => {
-    map.addLayer(
-      {
-        id,
-        source: S.cityPoint,
-        type: 'symbol',
-        ...(filter ? { filter } : {}),
-        ...extras,
-        layout: {
-          'text-field': ['get', 'name'],
-          'text-font': ['Open Sans Regular'],
-          'text-size': 12,
-        },
-        paint: {
-          'text-halo-color': '#fff',
-          'text-halo-width': 1.5,
-        },
+    map.addLayer({
+      id,
+      source: S.cityPoint,
+      type: 'symbol',
+      ...(filter ? { filter } : {}),
+      ...extras,
+      layout: {
+        'text-field': ['get', 'name'],
+        'text-font': ['Open Sans Regular'],
+        'text-size': 12,
       },
-      L.state.names,
-    );
+      paint: {
+        'text-halo-color': '#fff',
+        'text-halo-width': 1.5,
+      },
+    });
   };
 
   addCityLayer(L.cityPoints.pit, ['==', 'name', 'Pittsburgh'], {

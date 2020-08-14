@@ -6,10 +6,11 @@ import { defaultRegionOnStartup, levelMegaCounty, levels } from '../../stores/co
 import { MAP_THEME } from '../../theme';
 import { IS_NOT_MISSING, MISSING_VALUE } from './encodings/utils';
 import InteractiveMap from './InteractiveMap';
-import { addCityLayers, L } from './layers';
+import { addCityLayers, L, addStateLabelLayer } from './layers';
 import style from './mapbox_albers_usa_style.json';
-import { geoJsonSources, S } from './sources';
+import { geoJsonSources, S, addCitySources } from './sources';
 import ZoomMap from './ZoomMap';
+import { bounds } from '../../maps';
 
 export default class MapBoxWrapper {
   /**
@@ -19,6 +20,12 @@ export default class MapBoxWrapper {
    */
   constructor(dispatch, encodings) {
     this.dispatch = dispatch;
+    // TODO customize
+    this.levels = levels;
+    this.hasMegaCountyLevel = true;
+    // set a good default value
+    this.level = this.levels.includes('county') ? 'county' : this.levels[0];
+
     /**
      * @type {MapBox | null}
      */
@@ -36,9 +43,8 @@ export default class MapBoxWrapper {
 
     this.encodings = encodings;
     this.encoding = this.encodings[0];
-    // set a good default value
-    this.level = 'county';
-    this.zoom = new ZoomMap();
+    // TODO customize
+    this.zoom = new ZoomMap(bounds.states);
   }
 
   /**
@@ -50,8 +56,9 @@ export default class MapBoxWrapper {
       attributionControl: false,
       container,
       style,
-      bounds: this.zoom.stateBounds,
-      fitBounds: this.zoom.stateBoundsOptions,
+      // TODO customize
+      bounds: this.zoom.resetBounds,
+      fitBounds: this.zoom.resetBoundsOptions,
     });
     this.zoom.map = this.map;
     this.map.addControl(new AttributionControl({ compact: true }));
@@ -124,18 +131,16 @@ export default class MapBoxWrapper {
     }
   }
 
-  addSources() {
+  addLevelSources() {
+    const map = this.map;
     return geoJsonSources.then((r) => {
-      const map = this.map;
-      map.addSource(S.cityPoint, {
-        type: 'geojson',
-        data: r.cities,
-      });
-      map.addSource(S[levelMegaCounty.id].border, {
-        type: 'geojson',
-        data: r.mega,
-      });
-      levels.forEach((level) => {
+      if (this.hasMegaCountyLevel) {
+        map.addSource(S[levelMegaCounty.id].border, {
+          type: 'geojson',
+          data: r.mega,
+        });
+      }
+      this.levels.forEach((level) => {
         map.addSource(S[level].border, {
           type: 'geojson',
           data: r[level].border,
@@ -146,9 +151,13 @@ export default class MapBoxWrapper {
           data: r[level].center,
         });
       });
+    });
+  }
 
+  addSources() {
+    return Promise.all([addCitySources(this.map), this.addLevelSources()]).then(() => {
       for (const enc of this.encodings) {
-        enc.addSources(map);
+        enc.addSources(this.map, this);
       }
     });
   }
@@ -167,20 +176,20 @@ export default class MapBoxWrapper {
 
   addLayers() {
     const map = this.map;
-    map.addLayer({
-      id: L.county.stroke,
-      source: S.county.border,
-      type: 'fill',
-      paint: {
-        'fill-color': MAP_THEME.countyFill,
-        'fill-outline-color': MAP_THEME.countyOutline,
-        'fill-opacity': 0.4,
-        ...this.animationOptions('fill-color'),
-      },
-    });
+    // map.addLayer({
+    //   id: L.county.stroke,
+    //   source: S.county.border,
+    //   type: 'fill',
+    //   paint: {
+    //     'fill-color': MAP_THEME.countyFill,
+    //     'fill-outline-color': MAP_THEME.countyOutline,
+    //     'fill-opacity': 0.4,
+    //     ...this.animationOptions('fill-color'),
+    //   },
+    // });
 
     map.addLayer({
-      id: L.state.stroke,
+      id: L.outline,
       source: S.state.border,
       type: 'fill',
       paint: {
@@ -189,7 +198,11 @@ export default class MapBoxWrapper {
       },
     });
 
-    [levelMegaCounty.id, ...levels].forEach((level) => {
+    const levels = this.levels.slice();
+    if (this.hasMegaCountyLevel) {
+      levels.unshift(levelMegaCounty.id);
+    }
+    levels.forEach((level) => {
       map.addLayer({
         id: L[level].fill,
         source: S[level].border,
@@ -227,6 +240,7 @@ export default class MapBoxWrapper {
     });
 
     addCityLayers(map);
+    addStateLabelLayer(map);
     this.encodings.forEach((enc) => {
       enc.addLayers(map, this);
     });
@@ -255,10 +269,13 @@ export default class MapBoxWrapper {
       this.zoom.showStateLabels(level === 'state');
     }
 
-    const allEncodingLayers = this.encodings.flatMap((d) => d.layers).concat([L[levelMegaCounty.id].fill]);
+    const allEncodingLayers = this.encodings.flatMap((d) => d.layers);
+    if (this.hasMegaCountyLevel) {
+      allEncodingLayers.push(L[levelMegaCounty.id].fill);
+    }
     const visibleLayers = new Set(this.encoding.getVisibleLayers(level, signalType));
 
-    if (level === 'county') {
+    if (level === 'county' && this.hasMegaCountyLevel) {
       // draw mega in every encoding
       visibleLayers.add(L[levelMegaCounty.id].fill);
     }
@@ -284,7 +301,7 @@ export default class MapBoxWrapper {
     if (!this.map || !this.mapSetupReady) {
       return;
     }
-    if (level === 'county') {
+    if (level === 'county' && this.hasMegaCountyLevel) {
       this.updateSource(S[levelMegaCounty.id].border, values, directions, sensor);
     }
     this.updateSource(S[level].border, values, directions, sensor);
@@ -390,12 +407,12 @@ export default class MapBoxWrapper {
     if (!this.map || !this.mapSetupReady) {
       return;
     }
-    const defaultRegion = defaultRegionOnStartup[this.level];
     const source = this.map.getSource(S[this.level].border);
     if (!source) {
       return;
     }
 
+    const defaultRegion = defaultRegionOnStartup[this.level];
     const defaultFeature = source._data.features.find((d) => d.properties.id === defaultRegion);
     if (defaultFeature && defaultFeature.properties.value !== MISSING_VALUE) {
       this.interactive.forceHover(defaultFeature);
