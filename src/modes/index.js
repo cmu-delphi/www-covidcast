@@ -20,7 +20,13 @@ export default [
     id: 'overview2',
     label: 'Overview2',
     tooltip: 'Switch to Overview2 Mode',
-    component: () => import('./overview/Overview2.svelte').then((r) => r.default),
+    component: () => import(/* webpackPrefech: true */ './overview/Overview2.svelte').then((r) => r.default),
+  },
+  {
+    id: 'timelapse',
+    label: 'Time-lapse',
+    tooltip: 'Switch to Time-lapse Mode',
+    component: () => import(/* webpackPrefech: true */ './timelapse/TimeLapse.svelte').then((r) => r.default),
   },
   // {
   //   id: 'compare',

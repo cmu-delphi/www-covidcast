@@ -1,6 +1,5 @@
 <script>
   import MapBox from '../../components/MapBox/MapBox.svelte';
-  import Legend from '../../components/Legend.svelte';
   import Options from '../../components/Options.svelte';
   import {
     signalType,
@@ -21,11 +20,10 @@
     selectByInfo,
     selectByFeature,
   } from '../../stores';
-  import Title from '../../components/Title.svelte';
-  import MapControls from '../../components/MapControls.svelte';
   import Search from '../../components/Search.svelte';
   import SmallMultiplesPanel from './SmallMultiplesPanel.svelte';
   import DetailView from './DetailView.svelte';
+  import MapOverlays from './MapOverlays.svelte';
 
   /**
    * @type {MapBox}
@@ -72,20 +70,6 @@
     min-height: 550px;
     display: flex;
     flex-direction: column;
-  }
-
-  :global(.container-bg) {
-    /* rounded design refresh */
-    border-radius: 7px;
-    background-color: #ffffff;
-    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
-  }
-
-  :global(.container-style) {
-    padding: 8px 8px;
-    box-sizing: border-box;
-    transition: all 0.1s ease-in;
-    font-family: 'Open Sans', Helvetica, sans-serif !important;
   }
 
   .top-container {
@@ -135,49 +119,6 @@
     overflow: auto;
   }
 
-  .map-top-overlay {
-    display: flex;
-  }
-
-  .map-controls-container {
-    margin-left: 1em;
-    margin-right: 0.2em;
-    z-index: 1001;
-    display: flex;
-    align-items: flex-start;
-    height: 0;
-  }
-
-  .title-container {
-    flex: 1 1 0;
-    z-index: 1001;
-    align-self: flex-start;
-    justify-self: center;
-    padding: 0.2em 1em;
-  }
-
-  /** desktop **/
-  @media only screen and (min-width: 767px) {
-    .title-container {
-      background-color: unset;
-      box-shadow: none;
-    }
-  }
-
-  .legend-container {
-    position: absolute;
-    bottom: 12px;
-    left: 10px;
-    z-index: 1000;
-    /*height: 105px;*/
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    transition: all 0.1s ease-in;
-  }
-
   .detail-container {
     position: absolute;
     right: 0;
@@ -210,17 +151,7 @@
   </div>
   <div class="content-container">
     <div class="map-container">
-      <div class="map-top-overlay">
-        <div class="title-container container-bg">
-          <Title />
-        </div>
-        <div class="map-controls-container">
-          <MapControls zoom={map ? map.zoom : null} showEncodings />
-        </div>
-      </div>
-      <div class="legend-container container-bg">
-        <Legend />
-      </div>
+      <MapOverlays {map} />
       <MapBox
         bind:this={map}
         on:idle={() => currentDataReadyOnMap.set(true)}
