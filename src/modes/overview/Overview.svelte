@@ -27,6 +27,7 @@
   import { isDeathSignal, isCasesSignal } from '../../data/signals';
   import { trackEvent } from '../../stores/ga';
   import LineSmallMultiples from '../../components/LineSmallMultiples.svelte';
+  import './mapContainer.css';
 
   /**
    * @type {MapBox}
@@ -102,20 +103,6 @@
     grid-template-areas:
       'options options search'
       'toggle title title';
-  }
-
-  :global(.container-bg) {
-    /* rounded design refresh */
-    border-radius: 7px;
-    background-color: #ffffff;
-    box-shadow: 0px 4px 10px rgba(151, 151, 151, 0.25);
-  }
-
-  :global(.container-style) {
-    padding: 8px 8px;
-    box-sizing: border-box;
-    transition: all 0.1s ease-in;
-    font-family: 'Open Sans', Helvetica, sans-serif !important;
   }
 
   .options-container {
