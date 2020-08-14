@@ -108,6 +108,19 @@ export function fetchRegionSlice(sensorEntry, level, date) {
   regionSliceCache.set(cacheKey, promise);
   return promise;
 }
+
+/**
+ *
+ * @param {(key: string, keyFunction) => boolean} toDelete optional function to filter entries to delete
+ */
+export function clearRegionCache(toDelete = null) {
+  if (toDelete) {
+    const toDeleteKeys = Array.from(regionSliceCache.keys()).filter((d) => toDelete(d, toRegionCacheKey));
+    toDeleteKeys.forEach((key) => regionSliceCache.delete(key));
+  } else {
+    regionSliceCache.clear();
+  }
+}
 /**
  * @param {SensorEntry} sensorEntry
  * @param {string} level
