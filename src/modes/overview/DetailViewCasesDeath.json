@@ -94,7 +94,13 @@
         },
         "x": {
           "field": "date_value",
-          "type": "temporal"
+          "type": "temporal",
+          "axis": {
+            "title": null,
+            "format": "%m/%d",
+            "formatType": "time",
+            "tickCount": "week"
+          }
         },
         "y": {
           "field": "count",
