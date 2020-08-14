@@ -1,11 +1,12 @@
 <script>
-  import { currentLevel } from '../stores';
+  import { currentLevel, encoding, currentSensor, signalType } from '../stores';
   import IoMdAdd from 'svelte-icons/io/IoMdAdd.svelte';
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
   import IoMdHome from 'svelte-icons/io/IoMdHome.svelte';
   import TiTag from 'svelte-icons/ti/TiTag.svelte';
   import Loading from './Loading.svelte';
   import { trackEvent } from '../stores/ga';
+  import { isDeathSignal, isCasesSignal } from '../data';
 
   export let className = '';
 
@@ -13,6 +14,8 @@
    * @type {import('./MapBox/ZoomMap').default}
    */
   export let zoom;
+
+  export let showEncodings = false;
 </script>
 
 <style>
@@ -23,6 +26,23 @@
 
   .root > div {
     margin-bottom: 0.2em;
+  }
+
+  .encoding-button {
+    background-size: 80%;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: transparent;
+  }
+
+  .choropleth {
+    background-image: url('../assets/imgs/choropleth.png');
+  }
+  .bubble {
+    background-image: url('../assets/imgs/bubble.png');
+  }
+  .spike {
+    background-image: url('../assets/imgs/spike.png');
   }
 </style>
 
@@ -80,6 +100,43 @@
           zoom.toggleStateLabels();
         }}>
         <TiTag />
+      </button>
+    </div>
+  {/if}
+  {#if showEncodings && $signalType !== 'direction' && (isDeathSignal($currentSensor) || isCasesSignal($currentSensor))}
+    <div class="pg-button-vertical-group">
+      <button
+        aria-pressed={$encoding === 'color' ? 'true' : 'false'}
+        class="pg-button encoding-button choropleth"
+        class:selected={$encoding === 'color'}
+        on:click={() => {
+          encoding.set('color');
+        }}
+        title="Switch to Choropleth">
+        <span aria-hidden>Switch to Choropleth</span>
+        <IoMdHome />
+      </button>
+      <button
+        aria-pressed={$encoding === 'bubble' ? 'true' : 'false'}
+        class="pg-button encoding-button bubble"
+        class:selected={$encoding === 'bubble'}
+        on:click={() => {
+          encoding.set('bubble');
+        }}
+        title="Switch to Bubble Map">
+        <span aria-hidden>Switch to Bubble Map</span>
+        <IoMdHome />
+      </button>
+      <button
+        aria-pressed={$encoding === 'spike' ? 'true' : 'false'}
+        class="pg-button encoding-button spike"
+        class:selected={$encoding === 'spike'}
+        on:click={() => {
+          encoding.set('spike');
+        }}
+        title="Switch to Spike Map">
+        <span aria-hidden>Switch to Spike Map</span>
+        <IoMdHome />
       </button>
     </div>
   {/if}
