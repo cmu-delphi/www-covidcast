@@ -64,17 +64,6 @@ button.mapboxgl-popup-close-button {
   border-top-color: var(--grey);
 }
 
-.map-popup-region-name {
-  font-weight: 600;
-}
-
-.map-popup-region-value {
-  background-color: #767676;
-
-  color: #fff;
-  padding: 2px 4px;
-}
-
 .mapboxgl-ctrl.mapboxgl-ctrl-group {
   outline: none;
   /* border: none; */
