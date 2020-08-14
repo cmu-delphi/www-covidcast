@@ -1,5 +1,6 @@
 import { formatAPITime, isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data';
 import { checkWIP } from '../data/utils';
+import { format } from 'd3-format';
 
 export const levelList = [
   {
@@ -52,6 +53,7 @@ export function getLevelInfo(level) {
  * @property {string} format
  * @property {string} signal
  * @property {string?} api
+ * @property {(v: number) => string} formatValue
  * @property {boolean} isCasesOrDeath is cases or death signal
  * @property {boolean} isCount is count signal
  * @property {boolean} isProp is prop signal
@@ -71,6 +73,10 @@ export function getLevelInfo(level) {
  */
 export const EPIDATA_CASES_OR_DEATH_VALUES = ['avg', 'avgCumulative', 'count', 'countCumulative'];
 
+const basePercentFormatter = format('.2%');
+const percentFormatter = (v) => basePercentFormatter(v / 100);
+const intFormatter = format(',d');
+const rawFormatter = format(',.2f');
 /**
  *
  * @param {*} sensorEntry
@@ -78,9 +84,11 @@ export const EPIDATA_CASES_OR_DEATH_VALUES = ['avg', 'avgCumulative', 'count', '
 export function extendSensorEntry(sensorEntry) {
   const key = `${sensorEntry.id}-${sensorEntry.signal}`;
   const isCasesOrDeath = isCasesSignal(key) || isDeathSignal(key);
+  const isCount = isCountSignal(key);
   return Object.assign(sensorEntry, {
     key,
-    isCount: isCountSignal(key),
+    formatValue: sensorEntry.format === 'percent' ? percentFormatter : isCount ? intFormatter : rawFormatter,
+    isCount,
     isProp: isPropSignal(key),
     isCasesOrDeath,
     casesOrDeathSignals: isCasesOrDeath
