@@ -16,6 +16,12 @@ export default [
     tooltip: 'Switch to Overview Mode',
     component: () => import(/* webpackPreload: true */ './overview/Overview.svelte').then((r) => r.default),
   },
+  {
+    id: 'overview2',
+    label: 'Overview2',
+    tooltip: 'Switch to Overview2 Mode',
+    component: () => import('./overview/Overview2.svelte').then((r) => r.default),
+  },
   // {
   //   id: 'compare',
   //   label: 'Compare',
