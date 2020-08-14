@@ -1,5 +1,4 @@
 import {
-  sensorMap as sensorMapStore,
   currentData,
   regionData,
   currentRegion,
@@ -11,10 +10,10 @@ import {
   currentSensor,
   currentLevel,
   MAGIC_START_DATE,
+  sensorMap,
 } from '../stores';
 import { get } from 'svelte/store';
 import { callMetaAPI } from './api';
-import { isCountSignal } from './signals';
 import { fetchRegionSlice, fetchTimeSlice } from './fetchData';
 
 export * from './signals';
@@ -22,7 +21,7 @@ export { formatAPITime, parseAPITime } from './utils';
 
 // We cache API calls for all regions at a given time and update currentData.
 export function updateRegionSliceCache(sensor, level, date, reason = 'unspecified') {
-  const sensorEntry = get(sensorMapStore).get(sensor);
+  const sensorEntry = sensorMap.get(sensor);
 
   if (!sensorEntry.levels.includes(level) || date > get(times).get(sensor)[1] || reason === 'level change') {
     return Promise.resolve(null);
@@ -35,7 +34,7 @@ export function updateRegionSliceCache(sensor, level, date, reason = 'unspecifie
 
 // We cache API calls for all time at a given region and update regionData.
 export function updateTimeSliceCache(sensor, level, region) {
-  const sensorEntry = get(sensorMapStore).get(sensor);
+  const sensorEntry = sensorMap.get(sensor);
 
   if (!region) {
     regionData.set([]);
@@ -66,14 +65,9 @@ function processMetaData(meta) {
   const timeMap = new Map();
   const statsMap = new Map();
 
-  /**
-   * @type {Map}
-   */
-  const sensorMap = get(sensorMapStore);
-
   sensorMap.forEach((sEntry, sensorKey) => {
     // need to change mean / std for counts
-    if (isCountSignal(sEntry.signal)) {
+    if (sEntry.isCount) {
       loadCountSignal(sEntry, sensorKey, meta, timeMap, statsMap);
     } else {
       loadRegularSignal(sEntry, sensorKey, meta, timeMap, statsMap);

@@ -2,7 +2,6 @@
   import { onMount } from 'svelte';
 
   import {
-    sensorMap,
     times,
     signalType,
     currentSensor,
@@ -14,6 +13,7 @@
     currentDataReadyOnMap,
     encoding,
     mounted,
+    sensorMap,
   } from './stores';
   import './stores/urlHandler';
   import './stores/ga';
@@ -42,7 +42,7 @@
 
   // Since we don't want multiple updates, but currentSensor changes can update // the level and date, we have flags that prevent the async updates.
   currentSensor.subscribe((s) => {
-    const sensorEntry = $sensorMap.get(s);
+    const sensorEntry = sensorMap.get(s);
     $currentDataReadyOnMap = false;
 
     if (!$mounted) {

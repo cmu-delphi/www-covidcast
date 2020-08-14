@@ -1,4 +1,4 @@
-import { formatAPITime } from '../data';
+import { formatAPITime, isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data';
 
 export const levelList = [
   {
@@ -38,14 +38,6 @@ export function getLevelInfo(level) {
   );
 }
 
-export function withSensorEntryKey(sensorEntry) {
-  return Object.assign(sensorEntry, {
-    key: `${sensorEntry.id}-${sensorEntry.signal}`,
-  });
-}
-
-export const defaultSensorId = 'doctor-visits';
-
 /**
  * @typedef {object} SensorEntry
  * @property {string} key
@@ -59,11 +51,24 @@ export const defaultSensorId = 'doctor-visits';
  * @property {string} format
  * @property {string} signal
  * @property {string?} api
+ * @property {boolean} isCasesOrDeath is cases or death signal
+ * @property {boolean} isCount is count signal
+ * @property {boolean} isProp is prop signal
  */
-/**
- * @type {SensorEntry[]}
- */
-export const sensorList = [
+
+export function extendSensorEntry(sensorEntry) {
+  const key = `${sensorEntry.id}-${sensorEntry.signal}`;
+  return Object.assign(sensorEntry, {
+    key,
+    isCasesOrDeath: isCasesSignal(key) || isDeathSignal(key),
+    isCount: isCountSignal(key),
+    isProp: isPropSignal(key),
+  });
+}
+
+export const defaultSensorId = 'doctor-visits';
+
+const defaultSensors = [
   {
     type: 'public',
     name: 'Away from Home 6hr+ (SG)',
@@ -213,7 +218,53 @@ export const sensorList = [
     yAxis: 'Deaths per 100,000 people',
     format: 'raw',
   },
-].map(withSensorEntryKey);
+];
+
+/**
+ * @type {SensorEntry[]}
+ */
+export const sensorList = (() => {
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  const sensorsOption = urlParams.get('sensors');
+  if (sensorsOption) {
+    return JSON.parse(decodeURIComponent(sensorsOption)).map(extendSensorEntry);
+  } else {
+    return defaultSensors.map(extendSensorEntry);
+  }
+})();
+
+export const sensorMap = new Map(sensorList.map((s) => [s.key, s]));
+
+const sensorTypes = [
+  {
+    id: 'public',
+    label: 'Public Behavior',
+  },
+  {
+    id: 'early',
+    label: 'Early Indicators',
+  },
+  {
+    id: 'late',
+    label: 'Late Indicators',
+  },
+  {
+    id: 'other',
+    label: 'Other Indicators',
+  },
+];
+
+export const groupedSensorList = sensorTypes
+  .map((sensorType) => ({
+    ...sensorType,
+    sensors: sensorList.filter(
+      (sensor) =>
+        // same type or the other catch all type
+        sensor.type === sensorType.id || (sensorType.id === 'other' && sensorTypes.every((t) => t.id !== sensor.type)),
+    ),
+  }))
+  .filter((d) => d.sensors.length > 0);
 
 export const defaultRegionOnStartup = {
   county: '42003', // Allegheny
