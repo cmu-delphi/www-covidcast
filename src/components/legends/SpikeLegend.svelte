@@ -7,7 +7,7 @@
     spikeHeightScale,
     currentSensorEntry,
     currentDataReadyOnMap,
-signalShowCumulative,
+    signalShowCumulative,
   } from '../../stores';
   import { transparent } from '../../util';
   import { getSigfigs, generateLabels } from '../MapBox/colors';
