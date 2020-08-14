@@ -5,6 +5,16 @@
     "contains": "padding",
     "resize": true
   },
+  "transform": [
+    {
+      "calculate": "datum.value - datum.stderr",
+      "as": "value_lower_bound"
+    },
+    {
+      "calculate": "datum.value + datum.stderr",
+      "as": "value_upper_bound"
+    }
+  ],
   "vconcat": [
     {
       "width": "container",
