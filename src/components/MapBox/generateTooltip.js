@@ -36,71 +36,52 @@ function generateDirectionTooltip(direction) {
     </div>`;
 }
 
-function generateSignalTooltip(value, value1, population) {
+function coloredBox(value, sensor) {
   const fillColor = get(colorScale)(value);
   const fgColor = getTextColorBasedOnBackground(fillColor);
+  return `<span class="map-popup-region-value" style="background-color: ${fillColor}; color: ${fgColor};">
+    ${parseFloat(value.toFixed(2)).toLocaleString()}
+    ${sensor.format === 'percent' ? '%' : ''}
+  </span>`;
+}
+
+function generateSignalTooltip(properties) {
+  const { value, population } = properties;
+
   const populationFormatted = population != null ? population.toLocaleString() : 'Unknown';
   const date = formatTimeWithoutYear(get(currentDateObject));
+  /**
+   * @type {import('../../data/fetchData').SensorEntry}
+   */
   const sens = get(currentSensorEntry);
-  const sensor = get(currentSensor);
 
-  // More information displayed when counts is shown
-  if (sensor.match(/incidence_num/)) {
-    const avg = value;
-    const count = value1;
-    // TODO color the average by the color of the current value?
+  // More information displayed
+  if (sens.isCasesOrDeath) {
+    const avg = properties.avg;
+    const count = properties.count;
     return `
       <div class="map-popup-region-value-container">
         Population: ${populationFormatted} <br>
         <u>${sens.yAxis}</u>: <br>
-        &emsp; ${date}: ${count} <br>
-        &emsp; 7-day avg:
-        <span class="map-popup-region-value"
-              style="background-color: ${fillColor}; color: ${fgColor};">
-          ${parseFloat(avg.toFixed(2)).toLocaleString()}
-        </span>
-
-      </div>
-    `;
-  }
-  if (sensor.match(/incidence_prop/)) {
-    const avg = value;
-    const count = value1;
-    return `
-      <div class="map-popup-region-value-container">
-        Population: ${populationFormatted} <br>
-        <u>${sens.yAxis}</u>: <br>
-        &emsp; ${date}: ${count.toFixed(2)} <br>
-        &emsp; 7-day avg:
-        <span class="map-popup-region-value"
-              style="background-color: ${fillColor}; color: ${fgColor};">
-          ${parseFloat(avg.toFixed(2)).toLocaleString()}
-          ${sens.format === 'percent' ? '%' : ''}
-        </span>
+        &emsp; ${date}: ${sens.isCount ? count : count.toFixed(2)} <br>
+        &emsp; 7-day avg: ${coloredBox(avg, sens)}
       </div>
     `;
   }
   return `
     <div class="map-popup-region-value-container">
-      ${sens.yAxis}:
-      <span class="map-popup-region-value"
-            style="background-color: ${fillColor}; color: ${fgColor};">
-        ${parseFloat(value.toFixed(2)).toLocaleString()}
-        ${sens.format === 'percent' ? '%' : ''}
-      </span>
+      ${sens.yAxis}: ${coloredBox(value, sens)}
     </div>
   `;
 }
 
 export function generateTooltip(feature) {
-  const { value, direction, value1, displayName, population } = feature.properties;
-
   const body =
     get(signalType) === 'value'
-      ? generateSignalTooltip(value, value1, population)
-      : generateDirectionTooltip(direction);
+      ? generateSignalTooltip(feature.properties)
+      : generateDirectionTooltip(feature.properties.direction);
 
   return `<div class="map-popup-region-name">
-  ${displayName}
+  ${feature.properties.displayName}
 </div>${body}`;
 }

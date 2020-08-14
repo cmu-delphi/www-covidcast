@@ -40,31 +40,6 @@ export function getLevelInfo(level) {
 }
 
 /**
- *
- * @param {string} entry
- * @returns {string}
- */
-function getAdditionalSignal(signal) {
-  // deaths_incidence_prop
-  if (signal === 'deaths_7dav_incidence_prop') {
-    return checkWIP(signal, 'deaths_incidence_prop');
-  }
-  // deaths needs both count and ratio
-  if (isDeathSignal(signal)) {
-    return checkWIP(signal, 'deaths_incidence_num');
-  }
-  // confirmed_incidence_prop
-  if (signal === 'confirmed_7dav_incidence_prop') {
-    return checkWIP(signal, 'confirmed_incidence_prop');
-  }
-  // cases needs both count and ratio
-  if (isCasesSignal(signal)) {
-    return checkWIP(signal, 'confirmed_incidence_num');
-  }
-  return null;
-}
-
-/**
  * @typedef {object} SensorEntry
  * @property {string} key
  * @property {'public' | 'early' | 'late'} type
@@ -80,17 +55,42 @@ function getAdditionalSignal(signal) {
  * @property {boolean} isCasesOrDeath is cases or death signal
  * @property {boolean} isCount is count signal
  * @property {boolean} isProp is prop signal
- * @property {string | null} additionalSignal additional signal to load for avg/count
+ * @property {Record<keyof EpiDataCasesOrDeathValues, string>} casesOrDeathSignals signal to load for cases or death
  */
 
+/**
+ * @typedef {object} EpiDataCasesOrDeathValues
+ * @property {number} avg
+ * @property {number} count
+ * @property {number} avgCumulative
+ * @property {number} countCumulative
+ */
+
+/**
+ * @type {(keyof EpiDataCasesOrDeathValues)[]}
+ */
+export const EPIDATA_CASES_OR_DEATH_VALUES = ['avg', 'avgCumulative', 'count', 'countCumulative'];
+
+/**
+ *
+ * @param {*} sensorEntry
+ */
 export function extendSensorEntry(sensorEntry) {
   const key = `${sensorEntry.id}-${sensorEntry.signal}`;
+  const isCasesOrDeath = isCasesSignal(key) || isDeathSignal(key);
   return Object.assign(sensorEntry, {
     key,
-    isCasesOrDeath: isCasesSignal(key) || isDeathSignal(key),
     isCount: isCountSignal(key),
     isProp: isPropSignal(key),
-    additionalSignal: getAdditionalSignal(sensorEntry.signal),
+    isCasesOrDeath,
+    casesOrDeathSignals: isCasesOrDeath
+      ? {
+          avg: sensorEntry.signal,
+          avgCumulative: checkWIP(sensorEntry.signal, sensorEntry.signal.replace('incidence', 'cumulative')),
+          count: checkWIP(sensorEntry.signal, sensorEntry.signal.replace('7dav_', '')),
+          countCumulative: checkWIP(sensorEntry.signal, sensorEntry.signal.replace('7dav_incidence', 'cumulative')),
+        }
+      : {},
   });
 }
 

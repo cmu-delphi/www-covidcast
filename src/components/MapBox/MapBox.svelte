@@ -2,7 +2,6 @@
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import { stats } from '../../stores';
   import { determineColorScale, determineMinMax } from './colors';
-  import { generateDataLookup } from './data';
   import MapBoxWrapper from './MapBoxWrapper';
   import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './encodings';
   import { ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../../theme';
@@ -64,12 +63,10 @@
     });
   }
 
-  $: mapData = generateDataLookup(data, sensor);
-
   $: {
     // update mega
     dummyTrack(ready);
-    wrapper.updateSources(level, mapData.values, mapData.directions, sensor);
+    wrapper.updateSources(level, data);
   }
   $: {
     dummyTrack(ready);

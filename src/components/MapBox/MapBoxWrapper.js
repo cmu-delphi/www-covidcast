@@ -1,8 +1,7 @@
 import geojsonExtent from '@mapbox/geojson-extent';
 import { AttributionControl, Map as MapBox } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { is7DavIncidence } from '../../data/signals';
-import { defaultRegionOnStartup, levelMegaCounty, levels } from '../../stores/constants';
+import { defaultRegionOnStartup, levelMegaCounty, levels, EPIDATA_CASES_OR_DEATH_VALUES } from '../../stores/constants';
 import { MAP_THEME } from '../../theme';
 import { IS_NOT_MISSING, MISSING_VALUE } from './encodings/utils';
 import InteractiveMap from './InteractiveMap';
@@ -294,35 +293,32 @@ export default class MapBoxWrapper {
   /**
    *
    * @param {'county' | 'state' | 'msa'} level
-   * @param {Map<string, [number, number]>} values
-   * @param {Map<string, number>} directions
-   * @param {string} sensor
+   * @param {import('../../data/fetchData').EpiDataRow[]>} data
    */
-  updateSources(level, values, directions, sensor) {
+  updateSources(level, data) {
     if (!this.map || !this.mapSetupReady) {
       return;
     }
+    const lookup = new Map(data.map((d) => [d.geo_value.toUpperCase(), d]));
     if (level === 'county') {
-      this.updateSource(S[levelMegaCounty.id].border, values, directions, sensor);
+      this.updateSource(S[levelMegaCounty.id].border, lookup);
     }
-    this.updateSource(S[level].border, values, directions, sensor);
-    this.updateSource(S[level].center, values, directions, sensor);
+    this.updateSource(S[level].border, lookup);
+    this.updateSource(S[level].center, lookup);
 
     for (const encoding of this.encodings) {
       encoding.updateSources(this.map, level);
     }
-    if (values.size > 0 || directions.size > 0) {
+    if (data.length > 0) {
       this.markReady('data');
     }
   }
   /**
    *
    * @param {string} sourceId
-   * @param {Map<string, [number, number]>} values
-   * @param {Map<string, number>} directions
-   * @param {string} sensor
+   * @param {Map<string, import('../../data/fetchData').EpiDataRow>} values
    */
-  updateSource(sourceId, values, directions, sensor) {
+  updateSource(sourceId, values) {
     if (!this.map) {
       return;
     }
@@ -334,21 +330,12 @@ export default class MapBoxWrapper {
 
     data.features.forEach((d) => {
       const id = d.properties.id;
-      d.properties.value = MISSING_VALUE;
-      d.properties.direction = MISSING_VALUE;
-      d.properties.value1 = MISSING_VALUE;
-
-      if (values.has(id)) {
-        d.properties.value = values.get(id)[0];
-
-        if (is7DavIncidence(sensor)) {
-          // value ... 7-day avg
-          d.properties.value1 = values.get(id)[1]; // count
-        }
-      }
-      if (directions.has(id)) {
-        d.properties.direction = directions.get(id);
-      }
+      const entry = values.get(id);
+      d.properties.value = entry ? entry.value : MISSING_VALUE;
+      d.properties.direction = entry ? entry.direction : MISSING_VALUE;
+      EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
+        d.properties[key] = entry && entry[key] != null ? entry[key] : MISSING_VALUE;
+      });
     });
 
     source.setData(data);

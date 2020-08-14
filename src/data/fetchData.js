@@ -1,5 +1,6 @@
 import { callAPIEndPoint } from './api';
-import { combineAverageWithCount, parseAPITime, formatAPITime } from './utils';
+import { parseAPITime, formatAPITime, combineSignals } from './utils';
+import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 
 /**
  * @typedef {import('../stores/constants').SensorEntry} SensorEntry
@@ -15,6 +16,10 @@ import { combineAverageWithCount, parseAPITime, formatAPITime } from './utils';
  * @property {number} time_value
  * @property {Date} date_value the time_value as a Date
  * @property {number} value
+ */
+
+/**
+ * @typedef {EpiDataRow & EpiDataCasesOrDeathValues} EpiDataCasesOrDeathRow
  */
 
 const START_TIME_RANGE = parseAPITime('20100101');
@@ -76,18 +81,30 @@ export function fetchRegionSlice(sensorEntry, level, date) {
     return cacheEntry;
   }
 
-  const promise = Promise.all([
-    callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.signal, level, date, '*'),
-    sensorEntry.additionalSignal
-      ? callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.additionalSignal, level, date, '*')
-      : null,
-  ]).then(([d, d1]) => {
-    if (d.result < 0 || d.message.includes('no results')) {
-      return [];
-    }
-    const data = d1 ? combineAverageWithCount(d, d1) : d.epidata;
-    return parseData(data);
-  });
+  let promise;
+  if (sensorEntry.isCasesOrDeath) {
+    promise = Promise.all(
+      EPIDATA_CASES_OR_DEATH_VALUES.map((k) =>
+        callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.casesOrDeathSignals[k], level, date, '*'),
+      ),
+    ).then((data) => {
+      if ((data.length > 0 && data[0].result < 0) || data[0].message.includes('no results')) {
+        return [];
+      }
+      const combined = combineSignals(
+        data.map((d) => d.epidata),
+        EPIDATA_CASES_OR_DEATH_VALUES,
+      );
+      return parseData(combined);
+    });
+  } else {
+    promise = callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.signal, level, date, '*').then((d) => {
+      if (d.result < 0 || d.message.includes('no results')) {
+        return [];
+      }
+      return parseData(d.epidata);
+    });
+  }
   regionSliceCache.set(cacheKey, promise);
   return promise;
 }
