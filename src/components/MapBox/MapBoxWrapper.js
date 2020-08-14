@@ -2,7 +2,7 @@ import geojsonExtent from '@mapbox/geojson-extent';
 import { AttributionControl, Map as MapBox } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { is7DavIncidence } from '../../data/signals';
-import { defaultRegionOnStartup, levelMegaCounty, levels } from '../../stores/constants';
+import { defaultRegionOnStartup, levelMegaCounty } from '../../stores/constants';
 import { MAP_THEME } from '../../theme';
 import { IS_NOT_MISSING, MISSING_VALUE } from './encodings/utils';
 import InteractiveMap from './InteractiveMap';
@@ -10,19 +10,25 @@ import { addCityLayers, L, addStateLabelLayer } from './layers';
 import style from './mapbox_albers_usa_style.json';
 import { geoJsonSources, S, addCitySources } from './sources';
 import ZoomMap from './ZoomMap';
-import { bounds } from '../../maps';
+
+/**
+ * @typedef {object} MapBoxWrapperOptions
+ * @property {import('./encodings').Encoding[]} encodings
+ * @property {number[][]} bounds
+ * @property {string[]} levels
+ * @property {boolean} hasMegaCountyLevel
+ */
 
 export default class MapBoxWrapper {
   /**
    *
    * @param {(type: string, data: any) => void} dispatch
-   * @param {import('./encodings').Encoding[]} encodings
+   * @param {MapBoxWrapperOptions} options
    */
-  constructor(dispatch, encodings) {
+  constructor(dispatch, options) {
     this.dispatch = dispatch;
-    // TODO customize
-    this.levels = levels;
-    this.hasMegaCountyLevel = true;
+    this.levels = options.levels;
+    this.hasMegaCountyLevel = options.hasMegaCountyLevel;
     // set a good default value
     this.level = this.levels.includes('county') ? 'county' : this.levels[0];
 
@@ -41,10 +47,9 @@ export default class MapBoxWrapper {
      */
     this.interactive = null;
 
-    this.encodings = encodings;
+    this.encodings = options.encodings;
     this.encoding = this.encodings[0];
-    // TODO customize
-    this.zoom = new ZoomMap(bounds.states);
+    this.zoom = new ZoomMap(options.bounds);
   }
 
   /**

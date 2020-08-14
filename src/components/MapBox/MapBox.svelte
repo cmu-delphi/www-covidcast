@@ -1,11 +1,12 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
-  import { stats } from '../../stores';
+  import { stats, levels } from '../../stores';
   import { determineColorScale, determineMinMax } from './colors';
   import { generateDataLookup } from './data';
   import MapBoxWrapper from './MapBoxWrapper';
   import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './encodings';
   import { ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../../theme';
+  import { bounds } from '../../maps';
 
   /**
    * @type {HTMLElement | null}
@@ -13,11 +14,19 @@
   let container = null;
 
   const dispatch = createEventDispatcher();
-  const wrapper = new MapBoxWrapper((event, data) => dispatch(event, data), [
+
+  export let encodings = [
     new ChoroplethEncoding(),
     new BubbleEncoding(ENCODING_BUBBLE_THEME),
     new SpikeEncoding(ENCODING_SPIKE_THEME),
-  ]);
+  ];
+
+  const wrapper = new MapBoxWrapper((event, data) => dispatch(event, data), {
+    encodings,
+    bounds: bounds.states,
+    levels: levels,
+    hasMegaCountyLevel: true,
+  });
 
   export const zoom = wrapper.zoom;
 
