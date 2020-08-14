@@ -1,6 +1,6 @@
 import { callAPIEndPoint } from './api';
-import { checkWIP, combineAverageWithCount, parseAPITime, formatAPITime } from './utils';
-import { isCasesSignal, isDeathSignal } from './signals';
+import { parseAPITime, formatAPITime, combineSignals } from './utils';
+import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 
 /**
  * @typedef {import('../stores/constants').SensorEntry} SensorEntry
@@ -16,6 +16,10 @@ import { isCasesSignal, isDeathSignal } from './signals';
  * @property {number} time_value
  * @property {Date} date_value the time_value as a Date
  * @property {number} value
+ */
+
+/**
+ * @typedef {EpiDataRow & EpiDataCasesOrDeathValues} EpiDataCasesOrDeathRow
  */
 
 const START_TIME_RANGE = parseAPITime('20100101');
@@ -62,31 +66,6 @@ function parseData(data) {
 
 /**
  *
- * @param {string} signal
- * @returns {string}
- */
-function getAdditionalSignal(signal) {
-  // deaths_incidence_prop
-  if (signal === 'deaths_7dav_incidence_prop') {
-    return checkWIP(signal, 'deaths_incidence_prop');
-  }
-  // deaths needs both count and ratio
-  if (isDeathSignal(signal)) {
-    return checkWIP(signal, 'deaths_incidence_num');
-  }
-  // confirmed_incidence_prop
-  if (signal === 'confirmed_7dav_incidence_prop') {
-    return checkWIP(signal, 'confirmed_incidence_prop');
-  }
-  // cases needs both count and ratio
-  if (isCasesSignal(signal)) {
-    return checkWIP(signal, 'confirmed_incidence_num');
-  }
-  return null;
-}
-
-/**
- *
  * @param {SensorEntry} sensorEntry
  * @param {string} level
  * @param {string} date
@@ -102,18 +81,30 @@ export function fetchRegionSlice(sensorEntry, level, date) {
     return cacheEntry;
   }
 
-  const additionalSignal = getAdditionalSignal(sensorEntry.signal);
-
-  const promise = Promise.all([
-    callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.signal, level, date, '*'),
-    additionalSignal ? callAPIEndPoint(sensorEntry.api, sensorEntry.id, additionalSignal, level, date, '*') : null,
-  ]).then(([d, d1]) => {
-    if (d.result < 0 || d.message.includes('no results')) {
-      return [];
-    }
-    const data = d1 ? combineAverageWithCount(d, d1) : d.epidata;
-    return parseData(data);
-  });
+  let promise;
+  if (sensorEntry.isCasesOrDeath) {
+    promise = Promise.all(
+      EPIDATA_CASES_OR_DEATH_VALUES.map((k) =>
+        callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.casesOrDeathSignals[k], level, date, '*'),
+      ),
+    ).then((data) => {
+      if ((data.length > 0 && data[0].result < 0) || data[0].message.includes('no results')) {
+        return [];
+      }
+      const combined = combineSignals(
+        data.map((d) => d.epidata),
+        EPIDATA_CASES_OR_DEATH_VALUES,
+      );
+      return parseData(combined);
+    });
+  } else {
+    promise = callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.signal, level, date, '*').then((d) => {
+      if (d.result < 0 || d.message.includes('no results')) {
+        return [];
+      }
+      return parseData(d.epidata);
+    });
+  }
   regionSliceCache.set(cacheKey, promise);
   return promise;
 }

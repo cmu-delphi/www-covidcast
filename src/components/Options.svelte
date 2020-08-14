@@ -6,9 +6,7 @@
     times,
     levelList,
     currentSensorEntry,
-    publicSensors,
-    lateSensors,
-    earlySensors,
+    groupedSensorList,
   } from '../stores';
   import Datepicker from './Calendar/Datepicker.svelte';
   import { timeFormat } from 'd3-time-format';
@@ -91,21 +89,13 @@
     aria-label="indicator options"
     class="indicators base-font-size"
     bind:value={$currentSensor}>
-    <optgroup label="Public Behavior">
-      {#each $publicSensors as sensor}
-        <option title={sensor.tooltipText} value={sensor.key}>{sensor.name}</option>
-      {/each}
-    </optgroup>
-    <optgroup label="Early Indicators">
-      {#each $earlySensors as sensor}
-        <option title={sensor.tooltipText} value={sensor.key}>{sensor.name}</option>
-      {/each}
-    </optgroup>
-    <optgroup label="Late Indicators">
-      {#each $lateSensors as sensor}
-        <option title={sensor.tooltipText} value={sensor.key}>{sensor.name}</option>
-      {/each}
-    </optgroup>
+    {#each groupedSensorList as sensorGroup}
+      <optgroup label={sensorGroup.label}>
+        {#each sensorGroup.sensors as sensor}
+          <option title={sensor.tooltipText} value={sensor.key}>{sensor.name}</option>
+        {/each}
+      </optgroup>
+    {/each}
   </select>
   <span class="option-title">for</span>
   <select
