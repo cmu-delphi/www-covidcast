@@ -330,9 +330,9 @@ export default class AMapBoxWrapper {
     if (
       !selection ||
       (selection.level !== levelMegaCounty.id &&
-        (this.interactive.hovered.id == selection.propertyId || oldSelection.id == selection.propertyId)) ||
+        (this.interactive.hovered.id == selection.id || oldSelection.id == selection.id)) ||
       (selection.level === levelMegaCounty.id &&
-        (this.interactive.hovered.mega == selection.propertyId || oldSelection.mega == selection.propertyId))
+        (this.interactive.hovered.mega == selection.id || oldSelection.mega == selection.id))
     ) {
       return;
     }
