@@ -1,5 +1,4 @@
 import { MISSING_VALUE } from './encodings/utils';
-import { loadSources } from '../../maps';
 import { EPIDATA_CASES_OR_DEATH_VALUES } from '../../stores/constants';
 
 export function toBorderSource(level) {
@@ -36,25 +35,10 @@ export const S = {
   megaCounty: 'mega-county',
 };
 
-const valueProperties = {
+export const valueProperties = {
   value: MISSING_VALUE,
   direction: MISSING_VALUE,
 };
 EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
   valueProperties[key] = MISSING_VALUE;
 });
-
-export const geoJsonSources = loadSources(valueProperties);
-
-/**
- *
- * @param {import('mapbox-gl').Map} map
- */
-export function addCitySources(map) {
-  return geoJsonSources.then((r) => {
-    map.addSource(S.cityPoint, {
-      type: 'geojson',
-      data: r.cities,
-    });
-  });
-}

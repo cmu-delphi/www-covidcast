@@ -14,6 +14,7 @@
 
   const formatTime = timeFormat('%B %-d, %Y');
 
+  export let levels = levelList;
   export let showDate = true;
   // let selectedDate = writable(parseTime($currentDate));
   $: selectedDate = parseAPITime($currentDate);
@@ -28,6 +29,14 @@
   $: if ($times !== null) {
     start_end_dates = $times.get($currentSensor);
   }
+
+  $: levelIds = new Set(levels.map((l) => l.id));
+  $: filteredSensorGroups = groupedSensorList
+    .map((g) => ({
+      label: g.label,
+      sensors: g.sensors.filter((d) => d.levels.some((l) => levelIds.has(l))),
+    }))
+    .filter((d) => d.sensors.length > 0);
 </script>
 
 <style>
@@ -89,7 +98,7 @@
     aria-label="indicator options"
     class="indicators base-font-size"
     bind:value={$currentSensor}>
-    {#each groupedSensorList as sensorGroup}
+    {#each filteredSensorGroups as sensorGroup}
       <optgroup label={sensorGroup.label}>
         {#each sensorGroup.sensors as sensor}
           <option title={sensor.tooltipText} value={sensor.key}>{sensor.name}</option>
@@ -103,7 +112,7 @@
     aria-label="geographic level"
     class="geo-level base-font-size"
     bind:value={$currentLevel}>
-    {#each levelList as level}
+    {#each levels as level}
       <option value={level.id} disabled={!$currentSensorEntry.levels.includes(level.id)}>{level.labelPlural}</option>
     {/each}
   </select>

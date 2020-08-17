@@ -1,26 +1,11 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { bounds, loadSources } from '../../maps';
+import { bounds } from '../../maps';
 import { levelMegaCounty, levels } from '../../stores/constants';
 import { ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME, MAP_THEME } from '../../theme';
 import AMapBoxWrapper from './AMapBoxWrapper';
 import { BubbleEncoding, ChoroplethEncoding, SpikeEncoding } from './encodings';
 import { addCityLayers, addStateLabelLayer, L } from './layers';
-import { toBorderSource, valueProperties, S } from './sources';
-
-export const geoJsonSources = loadSources(valueProperties);
-
-/**
- *
- * @param {import('mapbox-gl').Map} map
- */
-export function addCitySources(map) {
-  return geoJsonSources.then((r) => {
-    map.addSource(S.cityPoint, {
-      type: 'geojson',
-      data: r.cities,
-    });
-  });
-}
+import { addCitySources, geoJsonSources, toBorderSource } from './sources';
 
 export default class USMapBoxWrapper extends AMapBoxWrapper {
   /**
@@ -38,18 +23,14 @@ export default class USMapBoxWrapper extends AMapBoxWrapper {
       ],
       level: 'county',
       levels,
-      hasMegaCountyLevel: true,
+      hasMegaCountyLevel: false,
     });
   }
 
   addLevelSources() {
     const map = this.map;
     return geoJsonSources.then((r) => {
-      map.addSource(toBorderSource(levelMegaCounty.id), {
-        type: 'geojson',
-        data: r.mega,
-      });
-      this.levels.forEach((level) => {
+      levels.forEach((level) => {
         this.addLevelSource(level, r[level].border, r[level].center);
       });
     });
@@ -87,8 +68,11 @@ export default class USMapBoxWrapper extends AMapBoxWrapper {
       },
     });
 
-    this.addLevelLayer(levelMegaCounty.id);
-    this.levels.forEach((level) => {
+    const levels = this.levels.slice();
+    if (this.hasMegaCountyLevel) {
+      levels.unshift(levelMegaCounty.id);
+    }
+    levels.forEach((level) => {
       this.addLevelLayer(level);
     });
 
