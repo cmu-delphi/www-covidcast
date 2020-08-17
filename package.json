@@ -21,6 +21,7 @@
     "copy-webpack-plugin": "^6.0.3",
     "cross-env": "^7.0.2",
     "css-loader": "^4.2.1",
+    "dirty-reprojectors": "0.0.2",
     "eslint": "^7.6.0",
     "eslint-plugin-svelte3": "^2.7.3",
     "file-loader": "^6.0.0",

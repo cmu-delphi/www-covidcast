@@ -1,6 +1,6 @@
 // Node script to process the maps and info and generate an optimized version
 
-const { dsvFormat } = require('d3');
+const { dsvFormat, geoContains, geoAlbersUsa } = require('d3');
 const fs = require('fs');
 const path = require('path');
 const { topology } = require('topojson-server');
@@ -39,14 +39,29 @@ function computeBounds(geojson, scale = 1.2) {
  * @param {LngLatBounds} boundsA
  * @param {LngLatBounds} boundsB
  */
-function overlaps(boundsA, boundsB) {
-  if (boundsA.getEast() > boundsB.getWest() || boundsA.getWest() < boundsB.getEast()) {
+function overlaps(boundsA, featureA, feature) {
+  const boundsB = computeBounds(feature, 1);
+
+  function inB(a, b) {
+    return (
+      a.contains(b.getCenter()) ||
+      a.contains(b.getNorthEast()) ||
+      a.contains(b.getNorthWest()) ||
+      a.contains(b.getSouthEast()) ||
+      a.contains(b.getSouthWest())
+    );
+  }
+  if (!inB(boundsA, boundsB) && !inB(boundsB, boundsA)) {
     return false;
   }
-  if (boundsA.getSouth() > boundsB.getNorth() || boundsA.getNorth() < boundsB.getSouth()) {
-    return false;
+  // check in depth
+  // if (feature.geometry.coordinates.some((geo) => geo.some((p) => geoContains(featureA, p)))) {
+  //   return true;
+  // }
+  if (featureA.geometry.coordinates.some((geo) => geo.some((p) => geoContains(feature, p)))) {
+    return true;
   }
-  return true;
+  return false;
 }
 
 function states(level = 'state') {
@@ -201,10 +216,57 @@ function cities() {
   );
 }
 
+function neighborhoods() {
+  const neighborhoods = require('./raw/swpa/neighborhoods_reprojected.geo.json');
+  const infos = neighborhoods.features
+    .map((feature) => {
+      const props = feature.properties;
+      return {
+        id: props.geoid10,
+        name: props.hood,
+        lat: Number.parseFloat(props.intptlat10),
+        long: Number.parseFloat(props.intptlon10),
+      };
+    })
+    .filter((d) => d.id);
+  fs.writeFileSync(
+    path.resolve(__dirname, `./processed/swpa/neighborhood.csv`),
+    dsvFormat(',').format(infos, ['id', 'name', 'lat', 'long']),
+  );
+  const neighbors = topology({ neighborhoods }, QUANTIZATION);
+  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/neighborhood.geojson.json`), JSON.stringify(neighbors));
+  return neighborhoods;
+}
+
+function hrrZone(statesGeo, msaGeo, countiesGeo) {
+  const zone = require(`./raw/swpa/hrr_zone.json`);
+  const topo = topology({ zone }, QUANTIZATION);
+  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/zone.geojson.json`), JSON.stringify(topo));
+  const bounds = computeBounds(zone, 1);
+  Object.entries({
+    state: statesGeo,
+    msa: msaGeo,
+    county: countiesGeo,
+  }).forEach(([level, v]) => {
+    const l = {
+      type: 'FeatureCollection',
+      features: v.features.filter(
+        (feature) => feature.geometry.coordinates.length > 0 && overlaps(bounds, zone.features[0], feature),
+      ),
+    };
+    const topo = topology({ [level]: l }, QUANTIZATION);
+    fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/${level}.geojson.json`), JSON.stringify(topo));
+  });
+  return zone;
+}
+
 const statesGeo = states();
 const msaGeo = msa();
 const countiesGeo = counties();
 cities();
+
+const zoneGeo = hrrZone(statesGeo, msaGeo, countiesGeo);
+const neighborhoodsGeo = neighborhoods();
 
 fs.writeFileSync(
   path.resolve(__dirname, `./processed/bounds.json`),
@@ -213,28 +275,10 @@ fs.writeFileSync(
       states: computeBounds(statesGeo).toArray(),
       msa: computeBounds(msaGeo).toArray(),
       counties: computeBounds(countiesGeo).toArray(),
+      hrrZone: computeBounds(zoneGeo).toArray(),
+      neighborhoods: computeBounds(neighborhoodsGeo).toArray(),
     },
     null,
     2,
   ),
 );
-
-{
-  const zone = require(`./raw/swpa/hrr_zone.json`);
-  const topo = topology({ zone }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/zone.geojson.json`), JSON.stringify(topo));
-  const bounds = computeBounds(zone, 1);
-
-  Object.entries({
-    state: statesGeo,
-    msa: msaGeo,
-    county: countiesGeo,
-  }).forEach(([level, v]) => {
-    const inZone = {
-      type: 'FeatureCollection',
-      features: v.features.filter((feature) => overlaps(bounds, computeBounds(feature, 1))),
-    };
-    const topo = topology({ [level]: inZone }, QUANTIZATION);
-    fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/${level}.geojson.json`), JSON.stringify(topo));
-  });
-}
