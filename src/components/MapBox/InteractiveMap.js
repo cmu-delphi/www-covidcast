@@ -195,12 +195,10 @@ export default class InteractiveMap {
     if (obj.id !== id) {
       if (obj.id) {
         const sources = [toBorderSource(obj.level), this.adapter.encodings.map((e) => e.sources)].flat(2);
-        console.log(sources);
         this._setFeatureStateMultiple(sources, obj.id, clearState);
       }
       if (id) {
         const sources = [toBorderSource(level), this.adapter.encodings.map((e) => e.sources)].flat(2);
-        console.log(sources);
         this._setFeatureStateMultiple(sources, id, setState);
       }
       obj.id = id;

@@ -90,7 +90,7 @@ export default class SpikeEncoding {
             'fill-opacity': caseHovered(0, this.theme.fillOpacity, hovered),
           },
         },
-        before,
+        map.getLayer(before) ? before : undefined,
       );
     };
     addFillLayer(L.spike.fill, toHoverLayer(adapter.level));
@@ -113,7 +113,7 @@ export default class SpikeEncoding {
             'line-opacity': caseHovered(0, this.theme.strokeOpacity, hovered),
           },
         },
-        before,
+        map.getLayer(before) ? before : undefined,
       );
     };
     addLineLayer(L.spike.stroke, toHoverLayer(adapter.level));
@@ -123,7 +123,7 @@ export default class SpikeEncoding {
   }
 
   encode(map, level, signalType, sensor, valueMinMax, stops) {
-    map.setPaintProperty(L[level].fill, 'fill-color', this.theme.countyFill);
+    map.setPaintProperty(toFillLayer(level), 'fill-color', this.theme.countyFill);
 
     const valueMax = valueMinMax[1];
     const maxHeight = this.theme.maxHeight[level];

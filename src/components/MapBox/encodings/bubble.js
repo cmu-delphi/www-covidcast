@@ -49,7 +49,7 @@ export default class BubbleEncoding {
             ...adapter.animationOptions('circle-radius'),
           },
         },
-        before,
+        map.getLayer(before) ? before : undefined,
       );
     };
     addLayer(L.bubble.fill, toHoverLayer(adapter.level));

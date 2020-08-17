@@ -1,9 +1,9 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { bounds, loadSWPASources } from '../../maps';
 import { swpaLevels } from '../../stores/constants';
-import { MAP_THEME } from '../../theme';
+import { MAP_THEME, ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../../theme';
 import AMapBoxWrapper from './AMapBoxWrapper';
-import { ChoroplethEncoding } from './encodings';
+import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './encodings';
 import { L } from './layers';
 import { toBorderSource, valueProperties } from './sources';
 
@@ -20,8 +20,8 @@ export default class USMapBoxWrapper extends AMapBoxWrapper {
       bounds: bounds.hrr,
       encodings: [
         new ChoroplethEncoding(),
-        // new BubbleEncoding(ENCODING_BUBBLE_THEME),
-        // new SpikeEncoding(ENCODING_SPIKE_THEME),
+        new BubbleEncoding(ENCODING_BUBBLE_THEME),
+        new SpikeEncoding(ENCODING_SPIKE_THEME),
       ],
       level: 'county',
       levels: swpaLevels,
@@ -66,6 +66,14 @@ export default class USMapBoxWrapper extends AMapBoxWrapper {
     });
     this.encodings.forEach((enc) => {
       enc.addLayers(map, this);
+    });
+    map.addLayer({
+      id: 'hrr-stroke',
+      source: toBorderSource('hrr'),
+      type: 'line',
+      paint: {
+        'line-color': MAP_THEME.zoneOutline,
+      },
     });
   }
 }
