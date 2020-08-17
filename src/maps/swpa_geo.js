@@ -3,8 +3,10 @@ import countyTopoJSON from './processed/swpa/county.geojson.json';
 import msaTopoJSON from './processed/swpa/msa.geojson.json';
 import neighborhoodTopoJSON from './processed/swpa/neighborhood.geojson.json';
 import zipTopoJSON from './processed/swpa/zip.geojson.json';
+import hrrTopoJSON from './processed/swpa/hrr.geojson.json';
 import { generateGeo } from './utils';
 import { geoCentroid } from 'd3';
+import { feature } from 'topojson-client';
 
 /**
  * loads all geo json sources
@@ -36,6 +38,7 @@ export default function load(stateInfo, countyInfo, msaInfo, neighborhoodInfo, a
     additionalProperties,
   );
   return {
+    hrr: feature(hrrTopoJSON, 'hrr'),
     state,
     msa,
     county,

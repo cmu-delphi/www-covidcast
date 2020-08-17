@@ -270,7 +270,7 @@ function neighborhoods() {
     )
     .filter((d) => d.id && d.geometry.coordinates.length > 0);
 
-  const neighbors = topology({ neighborhoods }, QUANTIZATION);
+  const neighbors = topology({ neighborhood: neighborhoods }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/neighborhood.geojson.json`), JSON.stringify(neighbors));
   return neighborhoods;
 }
@@ -278,7 +278,7 @@ function neighborhoods() {
 function hrrZone(statesGeo, msaGeo, countiesGeo) {
   // hrr num 357
   const zone = require(`./raw/swpa/hrr_zone.json`);
-  const topo = topology({ zone }, QUANTIZATION);
+  const topo = topology({ hrr: zone }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/hrr.geojson.json`), JSON.stringify(topo));
   const bounds = computeBounds(zone, 1);
   const filtered = {};

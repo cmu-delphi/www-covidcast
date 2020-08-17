@@ -76,6 +76,6 @@ export const swpaNameInfos = swpaStateInfo
 export function loadSWPASources(additionalProperties = {}) {
   // mark to be loaded as fast as possible
   return import('./swpa_geo').then((r) =>
-    r.default(swpaStateInfo, swpaCountyInfo, swpaMsaInfo, swpaCountyInfo, swpaNeighborhoodInfo, additionalProperties),
+    r.default(stateInfo, countyInfo, msaInfo, swpaNeighborhoodInfo, additionalProperties),
   );
 }
