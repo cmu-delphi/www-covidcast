@@ -28,12 +28,7 @@ export const levelMegaCounty = {
 };
 export const levelsWithMega = levels.concat(levelMegaCounty.id);
 
-export const swpaLevelList = [
-  {
-    id: 'county',
-    label: 'County',
-    labelPlural: 'Counties',
-  },
+export const swpaLevelList = levelList.concat([
   {
     id: 'zip',
     label: 'Zip Code',
@@ -44,7 +39,7 @@ export const swpaLevelList = [
     label: 'Neighborhood/Municipal',
     labelPlural: 'Neighborhoods/Municipals',
   },
-];
+]);
 export const swpaLevels = swpaLevelList.map((l) => l.id);
 
 const levelById = new Map([...levelList, ...swpaLevelList].map((l) => [l.id, l]));

@@ -1,5 +1,5 @@
-import { L } from '../layers';
-import { S } from '../sources';
+import { L, toHoverLayer, toFillLayer } from '../layers';
+import { S, toCenterSource } from '../sources';
 import { getType } from '../../../data/signals';
 import { parseScaleSpec } from '../../../stores/scales';
 import { HAS_VALUE, caseHovered } from './utils';
@@ -9,6 +9,7 @@ export default class BubbleEncoding {
     this.id = 'bubble';
     this.theme = theme;
     this.layers = [L.bubble.fill, L.bubble.highlight.fill];
+    this.sources = [S.bubble];
   }
 
   getVisibleLayers(level, signalType) {
@@ -19,7 +20,7 @@ export default class BubbleEncoding {
   addSources(map, adapter) {
     // copy from centers
     // level will update upon update sources
-    const data = map.getSource(S[adapter.level].center)._data;
+    const data = map.getSource(toCenterSource(adapter.level))._data;
     map.addSource(S.bubble, {
       type: 'geojson',
       data,
@@ -51,12 +52,12 @@ export default class BubbleEncoding {
         before,
       );
     };
-    addLayer(L.bubble.fill, L[adapter.level].hover);
+    addLayer(L.bubble.fill, toHoverLayer(adapter.level));
     addLayer(L.bubble.highlight.fill, L.cityPoints.pit, true);
   }
 
   encode(map, level, signalType, sensor, valueMinMax, stops) {
-    map.setPaintProperty(L[level].fill, 'fill-color', this.theme.countyFill);
+    map.setPaintProperty(toFillLayer(level), 'fill-color', this.theme.countyFill);
     // color scale (color + stroke color)
     let flatStops = stops.flat();
     let colorExpression = ['interpolate', ['linear'], ['get', 'value']].concat(flatStops);
@@ -84,6 +85,6 @@ export default class BubbleEncoding {
 
   updateSources(map, level) {
     // copy from centers in the right level
-    map.getSource(S.bubble).setData(map.getSource(S[level].center)._data);
+    map.getSource(S.bubble).setData(map.getSource(toCenterSource(level))._data);
   }
 }

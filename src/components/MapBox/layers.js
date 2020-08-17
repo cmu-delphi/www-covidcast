@@ -25,11 +25,11 @@ export function toSelectedLayer(level) {
 
 export const L = {
   outline: 'state-stroke',
+  stateNames: 'state-names',
   state: {
     fill: 'state-fill',
     hover: 'state-hover',
     selected: 'state-selected',
-    names: 'state-names',
   },
   msa: {
     fill: 'msa-fill',
@@ -78,7 +78,7 @@ export const L = {
  */
 export function addStateLabelLayer(map) {
   map.addLayer({
-    id: L.state.names,
+    id: L.stateNames,
     source: S.state.center,
     type: 'symbol',
     maxzoom: 8,

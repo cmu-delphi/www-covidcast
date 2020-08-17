@@ -7,13 +7,13 @@ import { BubbleEncoding, ChoroplethEncoding, SpikeEncoding } from './encodings';
 import { addCityLayers, addStateLabelLayer, L } from './layers';
 import { toBorderSource, valueProperties, S } from './sources';
 
-export const geoJsonSources = loadSources(valueProperties);
+const geoJsonSources = loadSources(valueProperties);
 
 /**
  *
  * @param {import('mapbox-gl').Map} map
  */
-export function addCitySources(map) {
+function addCitySources(map) {
   return geoJsonSources.then((r) => {
     map.addSource(S.cityPoint, {
       type: 'geojson',

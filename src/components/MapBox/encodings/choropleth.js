@@ -1,10 +1,11 @@
-import { L } from '../layers';
+import { L, toFillLayer } from '../layers';
 import { levelMegaCounty } from '../../../stores/constants';
 
 export default class ChoroplethEncoding {
   constructor() {
     this.id = 'color';
-    this.layers = [L.state.fill, L.msa.fill, L.county.fill];
+    this.layers = [];
+    this.sources = [];
   }
 
   getVisibleLayers(level) {
@@ -20,17 +21,17 @@ export default class ChoroplethEncoding {
   }
 
   encode(map, level, signalType, sensor, valueMinMax, stops, stopsMega) {
-    map.setPaintProperty(L[level].fill, 'fill-color', {
+    map.setPaintProperty(toFillLayer(level), 'fill-color', {
       property: signalType,
       stops: stops,
     });
 
     if (stopsMega) {
-      map.setPaintProperty(L[levelMegaCounty.id].fill, 'fill-color', {
+      map.setPaintProperty(toFillLayer(levelMegaCounty.id), 'fill-color', {
         property: signalType,
         stops: stopsMega,
       });
-      map.setLayoutProperty(L[levelMegaCounty.id].fill, 'visibility', 'visible');
+      map.setLayoutProperty(toFillLayer(levelMegaCounty.id), 'visibility', 'visible');
     }
   }
 

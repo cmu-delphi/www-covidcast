@@ -73,16 +73,16 @@ export default class ZoomMap {
    * @param {boolean} value
    */
   showStateLabels(value) {
-    if (!this.map) {
+    if (!this.map || !this.map.getLayer(L.stateNames)) {
       return;
     }
-    this.map.setLayoutProperty(L.state.names, 'visibility', value ? 'visible' : 'none');
+    this.map.setLayoutProperty(L.stateNames, 'visibility', value ? 'visible' : 'none');
   }
 
   toggleStateLabels() {
-    if (!this.map) {
+    if (!this.map || !this.map.getLayer(L.stateNames)) {
       return;
     }
-    this.showStateLabels(this.map.getLayoutProperty(L.state.names, 'visibility') !== 'visible');
+    this.showStateLabels(this.map.getLayoutProperty(L.stateNames, 'visibility') !== 'visible');
   }
 }

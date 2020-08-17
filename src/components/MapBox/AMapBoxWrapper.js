@@ -222,6 +222,10 @@ export default class AMapBoxWrapper {
     this.level = level;
     this.encoding = this.encodings.find((d) => d.id === encoding);
 
+    if (!this.hasMegaCountyLevel) {
+      stopsMega = null;
+    }
+
     if (!this.map || !this.mapSetupReady) {
       return;
     }

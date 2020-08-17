@@ -1,5 +1,5 @@
-import { L } from '../layers';
-import { S } from '../sources';
+import { L, toFillLayer, toHoverLayer } from '../layers';
+import { S, toCenterSource } from '../sources';
 import { getType } from '../../../data/signals';
 import { parseScaleSpec } from '../../../stores/scales';
 import { HAS_VALUE, caseHovered } from './utils';
@@ -9,18 +9,19 @@ export default class SpikeEncoding {
     this.id = 'spike';
     this.theme = theme;
     this.layers = [L.spike.fill, L.spike.stroke, L.spike.highlight.fill, L.spike.highlight.stroke];
+    this.sources = [S.spike.fill, S.spike.stroke];
 
     this.heightScale = () => 0;
-    this.sources = {};
+    this.sourceLookup = {};
   }
 
   getVisibleLayers(level, signalType) {
     if (signalType === 'direction') return [];
-    return this.layers.concat([L[level].fill]);
+    return this.layers.concat([toFillLayer(level)]);
   }
 
   generateSources(map, level = 'county') {
-    const centers = map.getSource(S[level].center)._data;
+    const centers = map.getSource(toCenterSource(level))._data;
     const size = this.theme.size[level];
 
     const spikes = {
@@ -62,15 +63,15 @@ export default class SpikeEncoding {
   addSources(map, adapter) {
     adapter.levels.forEach((level) => {
       // generate a lookup
-      this.sources[level] = this.generateSources(map, level);
+      this.sourceLookup[level] = this.generateSources(map, level);
     });
     map.addSource(S.spike.fill, {
       type: 'geojson',
-      data: this.sources[adapter.level].fill,
+      data: this.sourceLookup[adapter.level].fill,
     });
     map.addSource(S.spike.stroke, {
       type: 'geojson',
-      data: this.sources[adapter.level].stroke,
+      data: this.sourceLookup[adapter.level].stroke,
     });
   }
 
@@ -92,7 +93,7 @@ export default class SpikeEncoding {
         before,
       );
     };
-    addFillLayer(L.spike.fill, L[adapter.level].hover);
+    addFillLayer(L.spike.fill, toHoverLayer(adapter.level));
     addFillLayer(L.spike.highlight.fill, L.cityPoints.pit, true);
 
     const addLineLayer = (id, before, hovered = false, extraStyles = {}) => {
@@ -115,7 +116,7 @@ export default class SpikeEncoding {
         before,
       );
     };
-    addLineLayer(L.spike.stroke, L[adapter.level].hover);
+    addLineLayer(L.spike.stroke, toHoverLayer(adapter.level));
     addLineLayer(L.spike.highlight.stroke, L.cityPoints.pit, true, {
       'line-width': this.theme.strokeWidthHighlighted,
     });
@@ -124,8 +125,8 @@ export default class SpikeEncoding {
   encode(map, level, signalType, sensor, valueMinMax, stops) {
     map.setPaintProperty(L[level].fill, 'fill-color', this.theme.countyFill);
 
-    const valueMax = valueMinMax[1],
-      maxHeight = this.theme.maxHeight[level];
+    const valueMax = valueMinMax[1];
+    const maxHeight = this.theme.maxHeight[level];
 
     const heightScaleTheme = this.theme.heightScale[getType(sensor)];
 
@@ -156,8 +157,8 @@ export default class SpikeEncoding {
   }
 
   updateSources(map, level) {
-    const sources = this.sources[level];
-    const ref = map.getSource(S[level].center)._data;
+    const sources = this.sourceLookup[level];
+    const ref = map.getSource(toCenterSource(level))._data;
 
     // inject new data and rescale into our sources
     this.copyAndUpdate(sources.fill, ref);
