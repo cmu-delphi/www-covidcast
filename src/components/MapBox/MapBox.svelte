@@ -1,12 +1,12 @@
 <script>
-  import { onMount, onDestroy, createEventDispatcher } from 'svelte';
-  import { stats, levels as baseLevels } from '../../stores';
+  import { createEventDispatcher, onDestroy, onMount } from 'svelte';
+  import { stats } from '../../stores';
   import { determineColorScale, determineMinMax } from './colors';
-  import MapBoxWrapper from './MapBoxWrapper';
-  import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './encodings';
-  import { ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../../theme';
-  import { bounds as allBounds } from '../../maps';
 
+  /**
+   * @type {{new(): import('./AMapBoxWrapper').default}}
+   */
+  export let wrapperClass;
   /**
    * @type {HTMLElement | null}
    */
@@ -14,22 +14,7 @@
 
   const dispatch = createEventDispatcher();
 
-  export let encodings = [
-    new ChoroplethEncoding(),
-    new BubbleEncoding(ENCODING_BUBBLE_THEME),
-    new SpikeEncoding(ENCODING_SPIKE_THEME),
-  ];
-
-  export let levels = baseLevels;
-  export let hasMegaCountyLevel = true;
-  export let bounds = allBounds.states;
-
-  const wrapper = new MapBoxWrapper((event, data) => dispatch(event, data), {
-    encodings,
-    bounds,
-    levels,
-    hasMegaCountyLevel,
-  });
+  const wrapper = new wrapperClass((event, data) => dispatch(event, data));
 
   export const zoom = wrapper.zoom;
 
@@ -65,7 +50,7 @@
     // Get the range for the heatmap.
     const valueMinMax = determineMinMax(stats, sensor, level, showCumulative);
     const { stops, stopsMega, scale } = determineColorScale(valueMinMax, signalType, sensor);
-    const drawMega = hasMegaCountyLevel && level === 'county';
+    const drawMega = level === 'county';
     const ret = wrapper.updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, drawMega && stopsMega);
     dispatch('updatedEncoding', {
       range: signalType === 'value' ? valueMinMax : [-1, 1],

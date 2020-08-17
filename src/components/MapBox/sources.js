@@ -2,6 +2,14 @@ import { MISSING_VALUE } from './encodings/utils';
 import { loadSources } from '../../maps';
 import { EPIDATA_CASES_OR_DEATH_VALUES } from '../../stores/constants';
 
+export function toBorderSource(level) {
+  return `${level}-border`;
+}
+
+export function toCenterSource(level) {
+  return `${level}-centers`;
+}
+
 export const S = {
   state: {
     border: 'state-border',

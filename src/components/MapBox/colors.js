@@ -104,7 +104,7 @@ function countSignalColorScale(valueMinMax) {
 
   // use log scale
   const stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops7, logColors7));
-  const stopsMega = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops7, logColors7));
+  const stopsMega = stops;
   return { stops, stopsMega, scale: colorScaleLog };
 }
 

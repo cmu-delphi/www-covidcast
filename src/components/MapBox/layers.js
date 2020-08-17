@@ -13,6 +13,16 @@ Layer names used in MapBox
 
 import { S } from './sources';
 
+export function toFillLayer(level) {
+  return `${level}-fill`;
+}
+export function toHoverLayer(level) {
+  return `${level}-hover`;
+}
+export function toSelectedLayer(level) {
+  return `${level}-selected`;
+}
+
 export const L = {
   outline: 'state-stroke',
   state: {

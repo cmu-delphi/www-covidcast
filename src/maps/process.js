@@ -281,6 +281,7 @@ function hrrZone(statesGeo, msaGeo, countiesGeo) {
   const topo = topology({ zone }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/hrr.geojson.json`), JSON.stringify(topo));
   const bounds = computeBounds(zone, 1);
+  const filtered = {};
   Object.entries({
     state: statesGeo,
     msa: msaGeo,
@@ -294,7 +295,9 @@ function hrrZone(statesGeo, msaGeo, countiesGeo) {
     };
     const topo = topology({ [level]: l }, QUANTIZATION);
     fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/${level}.geojson.json`), JSON.stringify(topo));
+    filtered[level] = l.features.map((d) => d.id);
   });
+  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/filterInfo.json`), JSON.stringify(filtered));
 
   return zone;
 }
