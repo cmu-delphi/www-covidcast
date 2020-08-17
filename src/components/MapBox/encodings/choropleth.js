@@ -1,4 +1,4 @@
-import { L, toFillLayer } from '../layers';
+import { toFillLayer } from '../layers';
 import { levelMegaCounty } from '../../../stores/constants';
 
 export default class ChoroplethEncoding {
@@ -9,7 +9,7 @@ export default class ChoroplethEncoding {
   }
 
   getVisibleLayers(level) {
-    return [L[level].fill];
+    return [toFillLayer(level)];
   }
 
   addSources() {

@@ -26,29 +26,6 @@ export function toSelectedLayer(level) {
 export const L = {
   outline: 'state-stroke',
   stateNames: 'state-names',
-  state: {
-    fill: 'state-fill',
-    hover: 'state-hover',
-    selected: 'state-selected',
-  },
-  msa: {
-    fill: 'msa-fill',
-    // stroke: 'msa-stroke',
-    hover: 'msa-hover',
-    selected: 'msa-selected',
-  },
-  county: {
-    fill: 'county-fill',
-    // stroke: 'county-stroke',
-    hover: 'county-hover',
-    selected: 'county-selected',
-  },
-  'mega-county': {
-    fill: 'mega-county-fill',
-    // stroke: 'mega-county-stroke',
-    hover: 'mega-county-hover',
-    selected: 'mega-county-selected',
-  },
   bubble: {
     fill: 'bubble-fill',
     highlight: {

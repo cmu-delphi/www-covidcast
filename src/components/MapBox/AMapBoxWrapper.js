@@ -235,6 +235,7 @@ export default class AMapBoxWrapper {
     }
 
     const allEncodingLayers = this.encodings.flatMap((d) => d.layers);
+    allEncodingLayers.push(...this.levels.map((level) => toFillLayer(level)));
     if (this.hasMegaCountyLevel) {
       allEncodingLayers.push(toFillLayer(levelMegaCounty.id));
     }

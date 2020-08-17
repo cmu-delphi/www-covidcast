@@ -14,7 +14,7 @@ export default class BubbleEncoding {
 
   getVisibleLayers(level, signalType) {
     if (signalType === 'direction') return [];
-    return this.layers.concat([L[level].fill]);
+    return this.layers.concat([toFillLayer(level)]);
   }
 
   addSources(map, adapter) {
