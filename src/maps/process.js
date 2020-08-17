@@ -1,8 +1,9 @@
 // Node script to process the maps and info and generate an optimized version
 
-const { dsvFormat, geoContains, geoCentroid } = require('d3');
+const { dsvFormat, geoCentroid } = require('d3');
 const fs = require('fs');
 const path = require('path');
+const intersect = require('@turf/intersect').default;
 const { topology } = require('topojson-server');
 const geojsonExtent = require('@mapbox/geojson-extent');
 const { LngLatBounds, LngLat } = require('mapbox-gl');
@@ -36,10 +37,10 @@ function computeBounds(geojson, scale = 1.2) {
 
 /**
  *
- * @param {LngLatBounds} boundsA
+ * @param {LngLatBounds} target
  * @param {LngLatBounds} boundsB
  */
-function overlaps(boundsA, featureA, feature) {
+function overlaps(target, targetFeature, feature) {
   const boundsB = computeBounds(feature, 1);
 
   function inB(a, b) {
@@ -51,17 +52,10 @@ function overlaps(boundsA, featureA, feature) {
       a.contains(b.getSouthWest())
     );
   }
-  if (!inB(boundsA, boundsB) && !inB(boundsB, boundsA)) {
+  if (!inB(target, boundsB) && !inB(boundsB, target)) {
     return false;
   }
-  // check in depth
-  // if (feature.geometry.coordinates.some((geo) => geo.some((p) => geoContains(featureA, p)))) {
-  //   return true;
-  // }
-  if (featureA.geometry.coordinates.some((geo) => geo.some((p) => geoContains(feature, p)))) {
-    return true;
-  }
-  return false;
+  return intersect(targetFeature, feature) != null;
 }
 
 function states(level = 'state') {
