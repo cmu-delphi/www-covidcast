@@ -1,6 +1,6 @@
 // Node script to process the maps and info and generate an optimized version
 
-const { dsvFormat, geoContains } = require('d3');
+const { dsvFormat, geoContains, geoCentroid } = require('d3');
 const fs = require('fs');
 const path = require('path');
 const { topology } = require('topojson-server');
@@ -218,21 +218,58 @@ function cities() {
 
 function neighborhoods() {
   const neighborhoods = require('./raw/swpa/neighborhoods_reprojected.geo.json');
-  const infos = neighborhoods.features
-    .map((feature) => {
+  const municipal = require('./raw/swpa/Allegheny_County_Municipal_Boundaries_reprojected.geo.json');
+  const infos = [
+    ...neighborhoods.features.map((feature) => {
       const props = feature.properties;
       return {
         id: props.geoid10,
+        municode: null,
         name: props.hood,
+        displayName: props.hood,
+        type: 'neighborhood',
         lat: Number.parseFloat(props.intptlat10),
         long: Number.parseFloat(props.intptlon10),
+        cog: null,
+        region: null,
       };
-    })
-    .filter((d) => d.id);
+    }),
+    ...municipal.features.map((feature) => {
+      const props = feature.properties;
+      const center = geoCentroid(feature);
+      return {
+        id: props.CNTL_ID,
+        municode: props.MUNICODE,
+        name: props.NAME,
+        displayName: props.LABEL,
+        type: props.TYPE.toLowerCase(),
+        lat: center[0],
+        long: center[1],
+        cog: props.COG,
+        region: props.REGION,
+      };
+    }),
+  ].filter((d) => d.id);
+  // {"FID":1,"NAME":"CHESWICK","TYPE":"BOROUGH","LABEL":"Cheswick Borough","COG":"Allegheny Valley North","SCHOOLD":"Allegheny Valley","CONGDIST":4,"FIPS":13392,"REGION":"NH","ACRES":350.19128417,"SQMI":0.54717391,"MUNICODE":"815","CNTL_ID":"003100","CNTYCOUNCIL":7,"EOC":"NEWCOM","ASSESSORTERRITORY":"East","VALUATIONAREA":"Alle-Kiski Valley","YEARCONVERTED":1966,"GlobalID":"{F29648DC-0D4F-4E35-8F2D-7B465DCFF308}","SHAPE_Length":0.04917208282736798,"SHAPE_Area":0.00015137060470303174}
   fs.writeFileSync(
     path.resolve(__dirname, `./processed/swpa/neighborhood.csv`),
-    dsvFormat(',').format(infos, ['id', 'name', 'lat', 'long']),
+    dsvFormat(',').format(infos, ['id', 'municode', 'name', 'displayName', 'type', 'lat', 'long', 'cog', 'region']),
   );
+  neighborhoods.features = neighborhoods.features
+    .map((d) => ({
+      ...d,
+      id: d.properties.geoid10,
+      properties: {},
+    }))
+    .concat(
+      municipal.features.map((d) => ({
+        ...d,
+        id: d.properties.CNTL_ID,
+        properties: {},
+      })),
+    )
+    .filter((d) => d.id && d.geometry.coordinates.length > 0);
+
   const neighbors = topology({ neighborhoods }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/neighborhood.geojson.json`), JSON.stringify(neighbors));
   return neighborhoods;
