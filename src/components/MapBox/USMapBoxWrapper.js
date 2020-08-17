@@ -7,7 +7,7 @@ import { BubbleEncoding, ChoroplethEncoding, SpikeEncoding } from './encodings';
 import { addCityLayers, addStateLabelLayer, L } from './layers';
 import { addCitySources, geoJsonSources, toBorderSource } from './sources';
 
-export default class MapBoxWrapper extends AMapBoxWrapper {
+export default class USMapBoxWrapper extends AMapBoxWrapper {
   /**
    *
    * @param {(type: string, data: any) => void} dispatch
@@ -22,6 +22,7 @@ export default class MapBoxWrapper extends AMapBoxWrapper {
         new SpikeEncoding(ENCODING_SPIKE_THEME),
       ],
       level: 'county',
+      levels,
       hasMegaCountyLevel: true,
     });
   }

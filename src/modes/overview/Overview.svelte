@@ -29,6 +29,7 @@
   import { trackEvent } from '../../stores/ga';
   import LineSmallMultiples from '../../components/LineSmallMultiples.svelte';
   import './mapContainer.css';
+  import USMapBoxWrapper from '../../components/MapBox/USMapBoxWrapper';
 
   /**
    * @type {MapBox}
@@ -236,5 +237,6 @@
     on:ready={() => initialReady()}
     on:updatedEncoding={(e) => updatedEncoding(e.detail)}
     on:select={(e) => selectByFeature(e.detail)}
-    on:selectMega={(e) => selectByFeature(e.detail)} />
+    on:selectMega={(e) => selectByFeature(e.detail)}
+    wrapperClass={USMapBoxWrapper} />
 </main>

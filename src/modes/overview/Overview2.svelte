@@ -23,6 +23,7 @@
   import SmallMultiplesPanel from './SmallMultiplesPanel.svelte';
   import SmallMultiplesDetail from './SmallMultiplesDetail.svelte';
   import MapOverlays from './MapOverlays.svelte';
+  import USMapBoxWrapper from '../../components/MapBox/USMapBoxWrapper';
 
   /**
    * @type {MapBox}
@@ -160,7 +161,8 @@
         on:ready={() => initialReady()}
         on:updatedEncoding={(e) => updatedEncoding(e.detail)}
         on:select={(e) => selectByFeature(e.detail)}
-        on:selectMega={(e) => selectByFeature(e.detail)} />
+        on:selectMega={(e) => selectByFeature(e.detail)}
+        wrapperClass={USMapBoxWrapper} />
 
       {#if detailSensor != null}
         <div class="detail-container container-bg container-style">

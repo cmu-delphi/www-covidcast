@@ -15,6 +15,7 @@ import ZoomMap from './ZoomMap';
  * @property {import('./encodings').Encoding[]} encodings
  * @property {number[][]} bounds
  * @property {string} level
+ * @property {string[]} levels
  * @property {boolean} hasMegaCountyLevel
  */
 export default class AMapBoxWrapper {
@@ -42,6 +43,7 @@ export default class AMapBoxWrapper {
 
     // set a good default value
     this.level = options.level;
+    this.levels = options.levels;
     this.hasMegaCountyLevel = options.hasMegaCountyLevel;
     this.encodings = options.encodings;
     this.encoding = this.encodings[0];

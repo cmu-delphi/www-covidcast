@@ -28,6 +28,7 @@
   import { parseAPITime, formatAPITime } from '../../data';
   import { fetchRegionSlice, clearRegionCache } from '../../data/fetchData';
   import { trackEvent } from '../../stores/ga';
+  import USMapBoxWrapper from '../../components/MapBox/USMapBoxWrapper';
 
   /**
    * @type {MapBox}
@@ -314,5 +315,6 @@
     level={$currentLevel}
     signalType={$signalType}
     encoding={$encoding}
-    on:updatedEncoding={(e) => updatedEncoding(e.detail)} />
+    on:updatedEncoding={(e) => updatedEncoding(e.detail)}
+    wrapperClass={USMapBoxWrapper} />
 </main>
