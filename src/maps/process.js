@@ -1,6 +1,6 @@
 // Node script to process the maps and info and generate an optimized version
 
-const { dsvFormat, geoContains, geoAlbersUsa } = require('d3');
+const { dsvFormat, geoContains } = require('d3');
 const fs = require('fs');
 const path = require('path');
 const { topology } = require('topojson-server');
@@ -239,9 +239,10 @@ function neighborhoods() {
 }
 
 function hrrZone(statesGeo, msaGeo, countiesGeo) {
+  // hrr num 357
   const zone = require(`./raw/swpa/hrr_zone.json`);
   const topo = topology({ zone }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/zone.geojson.json`), JSON.stringify(topo));
+  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/hrr.geojson.json`), JSON.stringify(topo));
   const bounds = computeBounds(zone, 1);
   Object.entries({
     state: statesGeo,
@@ -257,7 +258,29 @@ function hrrZone(statesGeo, msaGeo, countiesGeo) {
     const topo = topology({ [level]: l }, QUANTIZATION);
     fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/${level}.geojson.json`), JSON.stringify(topo));
   });
+
   return zone;
+}
+
+function zipHrr(hrrNum = '357') {
+  const zip = require(`./raw/swpa/cb_2019_us_zcta510_500k.json_reprojected.geo.json`);
+  const mapping = dsvFormat(',').parse(
+    fs.readFileSync(path.resolve(__dirname, './raw/swpa/ZipHsaHrr18.csv')).toString(),
+  );
+  const validZip = new Set(mapping.filter((m) => m.hrrnum === hrrNum).map((d) => d.zipcode18));
+  const data = {
+    type: 'FeatureCollection',
+    features: zip.features
+      .filter((feature) => validZip.has(String(feature.properties.GEOID10)))
+      .map((feature) => ({
+        ...feature,
+        id: feature.properties.GEOID10,
+        properties: {},
+      })),
+  };
+  const geo = topology({ zip: data }, QUANTIZATION);
+  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/zip.geojson.json`), JSON.stringify(geo));
+  return data;
 }
 
 const statesGeo = states();
@@ -265,8 +288,9 @@ const msaGeo = msa();
 const countiesGeo = counties();
 cities();
 
-const zoneGeo = hrrZone(statesGeo, msaGeo, countiesGeo);
+const hrrGeo = hrrZone(statesGeo, msaGeo, countiesGeo);
 const neighborhoodsGeo = neighborhoods();
+const zipGeo = zipHrr();
 
 fs.writeFileSync(
   path.resolve(__dirname, `./processed/bounds.json`),
@@ -275,8 +299,9 @@ fs.writeFileSync(
       states: computeBounds(statesGeo).toArray(),
       msa: computeBounds(msaGeo).toArray(),
       counties: computeBounds(countiesGeo).toArray(),
-      hrrZone: computeBounds(zoneGeo).toArray(),
+      hrr: computeBounds(hrrGeo).toArray(),
       neighborhoods: computeBounds(neighborhoodsGeo).toArray(),
+      zip: computeBounds(zipGeo).toArray(),
     },
     null,
     2,
