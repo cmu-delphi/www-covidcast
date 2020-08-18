@@ -6,7 +6,6 @@
     colorScale,
     bubbleRadiusScale,
     currentSensorEntry,
-    currentDataReadyOnMap,
     signalShowCumulative,
   } from '../../stores';
   import { transparent } from '../../util';
@@ -15,6 +14,8 @@
   let high = '';
   let unit = '';
   let labels = [];
+
+  export let loading = false;
 
   $: {
     const r = generateLabels($stats, $currentSensorEntry, $currentLevel, $signalShowCumulative);
@@ -50,7 +51,7 @@
   }
 </style>
 
-<ul class="bubble-legend" class:loading-bg={!$currentDataReadyOnMap}>
+<ul class="bubble-legend" class:loading-bg={loading}>
   {#each labels as [label], j}
     {#if +label > 0}
       <li class="colored">

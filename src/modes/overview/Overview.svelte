@@ -4,8 +4,6 @@
   import Options from '../../components/Options.svelte';
   import {
     signalType,
-    currentDataReadyOnMap,
-    currentData,
     currentSensor,
     currentLevel,
     encoding,
@@ -29,6 +27,7 @@
   import { trackEvent } from '../../stores/ga';
   import LineSmallMultiples from '../../components/LineSmallMultiples.svelte';
 
+  let loading = true;
   /**
    * @type {MapBox}
    */
@@ -230,11 +229,11 @@
       </div>
     </div>
     <div class="map-controls-container">
-      <MapControls zoom={map ? map.zoom : null} />
+      <MapControls zoom={map ? map.zoom : null} {loading} />
     </div>
   </div>
   <div class="legend-container container-bg">
-    <Legend />
+    <Legend {loading} />
   </div>
 
   <div class="small-multiples">
@@ -243,8 +242,8 @@
 
   <MapBox
     bind:this={map}
-    on:idle={() => currentDataReadyOnMap.set(true)}
-    data={$currentData}
+    on:idle={() => (loading = false)}
+    data={[]}
     sensor={$currentSensor}
     level={$currentLevel}
     signalType={$signalType}

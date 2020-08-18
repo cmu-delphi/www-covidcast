@@ -6,7 +6,6 @@
     colorScale,
     spikeHeightScale,
     currentSensorEntry,
-    currentDataReadyOnMap,
     signalShowCumulative,
   } from '../../stores';
   import { transparent } from '../../util';
@@ -14,6 +13,8 @@
 
   const spikeBase = ENCODING_SPIKE_THEME.baseSize;
   const spikePadding = 5;
+
+  export let loading = false;
 
   let size;
   let maxHeight;
@@ -69,7 +70,7 @@
   }
 </style>
 
-<ul class="spike-legend" class:loading-bg={!$currentDataReadyOnMap}>
+<ul class="spike-legend" class:loading-bg={loading}>
   {#each labels as [label]}
     {#if +label > 0}
       <li>

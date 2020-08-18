@@ -4,8 +4,6 @@
   import Options from '../../components/Options.svelte';
   import {
     signalType,
-    currentDataReadyOnMap,
-    currentData,
     currentSensor,
     currentLevel,
     encoding,
@@ -28,6 +26,7 @@
   import { fetchRegionSlice, clearRegionCache } from '../../data/fetchData';
   import { trackEvent } from '../../stores/ga';
 
+  let loading = false;
   /**
    * @type {MapBox}
    */
@@ -297,17 +296,17 @@
       </div>
     </div>
     <div class="map-controls-container">
-      <MapControls zoom={map ? map.zoom : null} />
+      <MapControls zoom={map ? map.zoom : null} {loading} />
     </div>
   </div>
   <div class="legend-container container-bg">
-    <Legend />
+    <Legend {loading} />
   </div>
   <MapBox
     bind:this={map}
     animationDuration={frameRate}
-    on:idle={() => currentDataReadyOnMap.set(true)}
-    data={$currentData}
+    on:idle={() => (loading = false)}
+    data={[]}
     sensor={$currentSensor}
     level={$currentLevel}
     signalType={$signalType}
