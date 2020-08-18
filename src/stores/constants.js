@@ -33,7 +33,7 @@ export const swpaLevelList = levelList.concat([
   {
     id: 'zip',
     label: 'Zip Code',
-    labelPlural: 'Zip Code',
+    labelPlural: 'Zip Codes',
   },
   {
     id: 'neighborhood',
@@ -275,7 +275,7 @@ const defaultSensors = [
     name: 'Mock Signal',
     id: 'mock',
     signal: 'mock',
-    levels: ['neighborhood', 'zip'],
+    levels: ['county', 'state', 'msa', 'neighborhood', 'zip'],
     tooltipText: 'Mock Signal',
     mapTitleText: 'Mock Signal',
     yAxis: 'Mock Signal',

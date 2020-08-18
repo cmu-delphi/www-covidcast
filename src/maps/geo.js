@@ -1,7 +1,7 @@
 import { dsvFormat } from 'd3-dsv';
-import stateTopoJSON from './processed/state.geojson.json';
-import countyTopoJSON from './processed/county.geojson.json';
-import msaTopoJSON from './processed/msa.geojson.json';
+import stateTopoJSON from './processed/state.topojson.json';
+import countyTopoJSON from './processed/county.topojson.json';
+import msaTopoJSON from './processed/msa.topojson.json';
 import citiesRaw from './processed/cities.csv';
 import { generateGeo } from './utils';
 

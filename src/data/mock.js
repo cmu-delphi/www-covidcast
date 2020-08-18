@@ -52,7 +52,7 @@ export function generateMockSignal(_id, _signal, level, date, region) {
     } else {
       // single
       const timeValue = Number.parseInt(date instanceof Date ? formatAPITime(date) : date, 10);
-      const geoValues = swpaNameInfos.filter((d) => d.level === level).map((d) => d.id);
+      const geoValues = swpaNameInfos.filter((d) => d.level === level).map((d) => d.propertyId);
       for (const geoValue of geoValues) {
         pushEntry(timeValue, geoValue);
       }

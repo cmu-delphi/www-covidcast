@@ -1,9 +1,10 @@
 // Node script to process the maps and info and generate an optimized version
 
-const { dsvFormat, geoCentroid } = require('d3');
+const { dsvFormat } = require('d3');
 const fs = require('fs');
 const path = require('path');
-const intersect = require('@turf/intersect').default;
+const booleanDisjoint = require('@turf/boolean-disjoint').default;
+const centroid = require('@turf/centroid').default;
 const { topology } = require('topojson-server');
 const geojsonExtent = require('@mapbox/geojson-extent');
 const { LngLatBounds, LngLat } = require('mapbox-gl');
@@ -35,29 +36,6 @@ function computeBounds(geojson, scale = 1.2) {
   );
 }
 
-/**
- *
- * @param {LngLatBounds} target
- * @param {LngLatBounds} boundsB
- */
-function overlaps(target, targetFeature, feature) {
-  const boundsB = computeBounds(feature, 1);
-
-  function inB(a, b) {
-    return (
-      a.contains(b.getCenter()) ||
-      a.contains(b.getNorthEast()) ||
-      a.contains(b.getNorthWest()) ||
-      a.contains(b.getSouthEast()) ||
-      a.contains(b.getSouthWest())
-    );
-  }
-  if (!inB(target, boundsB) && !inB(boundsB, target)) {
-    return false;
-  }
-  return intersect(targetFeature, feature) != null;
-}
-
 function states(level = 'state') {
   const geo = require(`./raw/new_states.json`);
 
@@ -80,7 +58,7 @@ function states(level = 'state') {
     dsvFormat(',').format(infos, ['id', 'postal', 'name', 'population', 'lat', 'long']),
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.geojson.json`), JSON.stringify(topo));
+  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
   return geo;
 }
 
@@ -128,7 +106,7 @@ function msa(level = 'msa') {
     dsvFormat(',').format(infos, ['id', 'name', 'population', 'lat', 'long']),
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.geojson.json`), JSON.stringify(topo));
+  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
   return geo;
 }
 
@@ -189,7 +167,7 @@ function counties(level = 'county') {
     dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'population', 'lat', 'long']),
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.geojson.json`), JSON.stringify(topo));
+  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
   return geo;
 }
 
@@ -234,7 +212,7 @@ function neighborhoods() {
     }),
     ...municipal.features.map((feature) => {
       const props = feature.properties;
-      const center = geoCentroid(feature);
+      const center = centroid(feature).geometry.coordinates;
       return {
         id: props.CNTL_ID,
         municode: props.MUNICODE,
@@ -269,16 +247,77 @@ function neighborhoods() {
     .filter((d) => d.id && d.geometry.coordinates.length > 0);
 
   const neighbors = topology({ neighborhood: neighborhoods }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/neighborhood.geojson.json`), JSON.stringify(neighbors));
+  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/neighborhood.topojson.json`), JSON.stringify(neighbors));
   return neighborhoods;
+}
+
+function zipHrr(hrrZone, hrrNum = '357') {
+  const zip = require(`./raw/swpa/cb_2019_us_zcta510_500k.json_reprojected.geo.json`);
+  const mapping = dsvFormat(',').parse(
+    fs.readFileSync(path.resolve(__dirname, './raw/swpa/ZipHsaHrr18.csv')).toString(),
+  );
+  const validZip = new Set(mapping.filter((m) => m.hrrnum === hrrNum).map((d) => d.zipcode18));
+  // something wrong with their shape
+  // validZip.delete('26419');
+  // validZip.delete('26155');
+  // validZip.delete('15701');
+  // validZip.delete('26055');
+  // validZip.delete('16001');
+  // validZip.delete('26039');
+  // validZip.delete('16242');
+  // validZip.delete('15767');
+  // validZip.delete('15825');
+
+  const data = {
+    type: 'FeatureCollection',
+    features: zip.features
+      .filter(
+        (feature) =>
+          validZip.has(String(feature.properties.GEOID10)) &&
+          feature.geometry &&
+          feature.geometry.coordinates.length > 0,
+        // !booleanDisjoint(hrrZone.features[0], feature),
+      )
+      .map((feature) => ({
+        ...feature,
+        id: feature.properties.GEOID10,
+        properties: {},
+      })),
+  };
+
+  data.features.forEach((feature) => {
+    if (feature.bbox[0] < -26) {
+      // some weird box
+      // seems to be in the last box
+      feature.geometry.coordinates.pop();
+      delete feature.bbox;
+    }
+  });
+  const infos = data.features.map((feature) => {
+    const center = centroid(feature).geometry.coordinates;
+    return {
+      id: feature.id,
+      name: feature.id,
+      lat: center[0],
+      long: center[1],
+    };
+  });
+  fs.writeFileSync(
+    path.resolve(__dirname, `./processed/swpa/zip.csv`),
+    dsvFormat(',').format(infos, ['id', 'name', 'lat', 'long']),
+  );
+  const geo = topology({ zip: data }, QUANTIZATION);
+  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/zip.topojson.json`), JSON.stringify(geo));
+  // fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/zip.t.json`), JSON.stringify(data, null, 2));
+  return data;
 }
 
 function hrrZone(statesGeo, msaGeo, countiesGeo) {
   // hrr num 357
   const zone = require(`./raw/swpa/hrr_zone.json`);
+  const hrrZone = zone.features[0];
   const topo = topology({ hrr: zone }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/hrr.geojson.json`), JSON.stringify(topo));
-  const bounds = computeBounds(zone, 1);
+  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/hrr.topojson.json`), JSON.stringify(topo));
   const filtered = {};
   Object.entries({
     state: statesGeo,
@@ -288,37 +327,16 @@ function hrrZone(statesGeo, msaGeo, countiesGeo) {
     const l = {
       type: 'FeatureCollection',
       features: v.features.filter(
-        (feature) => feature.geometry.coordinates.length > 0 && overlaps(bounds, zone.features[0], feature),
+        (feature) => feature.geometry.coordinates.length > 0 && !booleanDisjoint(hrrZone, feature),
       ),
     };
     const topo = topology({ [level]: l }, QUANTIZATION);
-    fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/${level}.geojson.json`), JSON.stringify(topo));
+    fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/${level}.topojson.json`), JSON.stringify(topo));
     filtered[level] = l.features.map((d) => d.id);
   });
   fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/filterInfo.json`), JSON.stringify(filtered));
 
   return zone;
-}
-
-function zipHrr(hrrNum = '357') {
-  const zip = require(`./raw/swpa/cb_2019_us_zcta510_500k.json_reprojected.geo.json`);
-  const mapping = dsvFormat(',').parse(
-    fs.readFileSync(path.resolve(__dirname, './raw/swpa/ZipHsaHrr18.csv')).toString(),
-  );
-  const validZip = new Set(mapping.filter((m) => m.hrrnum === hrrNum).map((d) => d.zipcode18));
-  const data = {
-    type: 'FeatureCollection',
-    features: zip.features
-      .filter((feature) => validZip.has(String(feature.properties.GEOID10)))
-      .map((feature) => ({
-        ...feature,
-        id: feature.properties.GEOID10,
-        properties: {},
-      })),
-  };
-  const geo = topology({ zip: data }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/zip.geojson.json`), JSON.stringify(geo));
-  return data;
 }
 
 const statesGeo = states();
@@ -327,8 +345,8 @@ const countiesGeo = counties();
 cities();
 
 const hrrGeo = hrrZone(statesGeo, msaGeo, countiesGeo);
+const zipGeo = zipHrr(hrrGeo);
 const neighborhoodsGeo = neighborhoods();
-const zipGeo = zipHrr();
 
 fs.writeFileSync(
   path.resolve(__dirname, `./processed/bounds.json`),
