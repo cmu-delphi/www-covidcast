@@ -145,7 +145,7 @@
           placeholder="Search for a location..."
           items={regionSearchList}
           selectedItem={$currentRegionInfo}
-          labelFieldName="display_name"
+          labelFieldName="displayName"
           maxItemsToShowInList="5"
           onChange={selectByInfo} />
       {/if}

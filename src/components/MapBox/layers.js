@@ -11,7 +11,7 @@ Layer names used in MapBox
 ...
 */
 
-import { S } from './sources';
+import { S, toCenterSource } from './sources';
 
 export function toFillLayer(level) {
   return `${level}-fill`;
@@ -56,7 +56,7 @@ export const L = {
 export function addStateLabelLayer(map) {
   map.addLayer({
     id: L.stateNames,
-    source: S.state.center,
+    source: toCenterSource('state'),
     type: 'symbol',
     maxzoom: 8,
     layout: {

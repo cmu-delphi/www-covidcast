@@ -1,7 +1,8 @@
 <script>
-  import { regionSearchList, levelList } from '../../stores';
+  import { levelList } from '../../stores';
   import USMapBoxWrapper from '../../components/MapBox/USMapBoxWrapper';
   import OverviewWrapper from './OverviewWrapper.svelte';
+  import { nameInfos } from '../../maps';
 </script>
 
-<OverviewWrapper wrapperClass={USMapBoxWrapper} regionSearchList={$regionSearchList} {levelList} />
+<OverviewWrapper wrapperClass={USMapBoxWrapper} regionSearchList={nameInfos} {levelList} />
