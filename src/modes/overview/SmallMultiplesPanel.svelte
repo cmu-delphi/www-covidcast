@@ -1,8 +1,10 @@
 <script>
   import SmallMultiples from './SmallMultiples.svelte';
-  import { sensorList, currentSensor } from '../../stores';
+  import { sensorList, currentSensor, currentLevel, currentRegion } from '../../stores';
   import IoMdExpand from 'svelte-icons/io/IoMdExpand.svelte';
   import { createEventDispatcher } from 'svelte';
+  import { parseAPITime } from '../../data';
+  import { fetchMultipleTimeSlices } from '../../data/fetchData';
 
   const dispatch = createEventDispatcher();
 
@@ -15,7 +17,18 @@
 
   export let detail = null;
 
+  // Create a date for today in the API's date format
+  const startDay = parseAPITime('20200401');
+  const finalDay = new Date();
+
   const sensors = sensorList.filter((d) => !remove.includes(d.key));
+
+  $: sensorsWithData = fetchMultipleTimeSlices(sensors, $currentLevel, $currentRegion, startDay, finalDay).map(
+    (data, i) => ({
+      sensor: sensors[i],
+      data,
+    }),
+  );
 </script>
 
 <style>
@@ -57,20 +70,20 @@
 </style>
 
 <ul class="root">
-  {#each sensors as sensor}
+  {#each sensorsWithData as s}
     <li>
       <div class="header">
-        <h5 title={sensor.tooltipText} on:click={() => currentSensor.set(sensor.key)}>{sensor.name}</h5>
+        <h5 title={s.sensor.tooltipText} on:click={() => currentSensor.set(s.sensor.key)}>{s.sensor.name}</h5>
         <div class="toolbar">
           <button
             class="pg-button"
-            class:active={detail === sensor}
-            on:click|stopPropagation={() => dispatch('show', detail === sensor ? null : sensor)}>
+            class:active={detail === s.sensor}
+            on:click|stopPropagation={() => dispatch('show', detail === s.sensor ? null : s.sensor)}>
             <IoMdExpand />
           </button>
         </div>
       </div>
-      <SmallMultiples {sensor} />
+      <SmallMultiples data={s.data} />
     </li>
   {/each}
 </ul>

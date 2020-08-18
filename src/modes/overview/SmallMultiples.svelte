@@ -1,19 +1,8 @@
 <script>
-  import { currentRegion, currentLevel } from '../../stores';
-  import { parseAPITime } from '../../data/utils';
-  import { fetchCustomTimeSlice } from '../../data/fetchData';
   import Vega from '../../components/vega/Vega.svelte';
   import sensorSingleLineChartSpec from '../../components/vega/SmallMultipleLineChart.json';
 
-  /**
-   * @type {import('../../data/fetchData').SensorEntry}
-   */
-  export let sensor;
-  // Create a date for today in the API's date format
-  const startDay = parseAPITime('20200401');
-  const finalDay = new Date();
-
-  $: data = fetchCustomTimeSlice(sensor, $currentLevel, $currentRegion, startDay, finalDay);
+  export let data;
 </script>
 
 <style>

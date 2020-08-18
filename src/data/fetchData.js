@@ -61,6 +61,13 @@ function parseData(data) {
     }
     row.date_value = parseAPITime(row.time_value.toString());
   }
+  // sort by date
+  data.sort((a, b) => {
+    if (a.time_value === b.time_value) {
+      return a.value - b.value;
+    }
+    return a.time_value < b.time_value ? -1 : 1;
+  });
   return data;
 }
 
@@ -181,4 +188,71 @@ export function fetchTimeSlice(sensorEntry, level, region) {
   const promise = fetchCustomTimeSlice(sensorEntry, level, region, START_TIME_RANGE, END_TIME_RANGE);
   timeSliceCache.set(cacheEntry, promise);
   return promise;
+}
+
+/**
+ *
+ * @param {EpiDataRow} row
+ * @param {Date} date
+ * @param {SensorEntry} sensorEntry
+ */
+function createCopy(row, date, sensorEntry) {
+  const copy = Object.assign({}, row, {
+    date_value: date,
+    time_value: Number.parseInt(formatAPITime(date), 10),
+    value: null,
+    stderr: null,
+    direction: null,
+    sample_size: null,
+  });
+  if (sensorEntry.isCasesOrDeath) {
+    EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
+      copy[key] = null;
+    });
+  }
+  return copy;
+}
+/**
+ * fetched multiple signals and synchronizes their start / end date
+ * @param {SensorEntry[]} sensorEntries
+ * @param {string} level
+ * @param {string | undefined} region
+ * @param {Date} startDate
+ * @param {Date} endDate
+ * @returns {Promise<EpiDataRow[]>[]}
+ */
+export function fetchMultipleTimeSlices(sensorEntries, level, region, startDate, endDate) {
+  const all = sensorEntries.map((entry) => fetchCustomTimeSlice(entry, level, region, startDate, endDate));
+  if (sensorEntries.length <= 1) {
+    return all;
+  }
+  // sync start and end date
+  const allDone = Promise.all(all).then((rows) => {
+    const min = rows.reduce(
+      (acc, r) => (r.length === 0 || r[0].date_value == null ? acc : Math.min(acc, r[0].date_value.getTime())),
+      Number.POSITIVE_INFINITY,
+    );
+    const max = rows.reduce(
+      (acc, r) =>
+        r.length === 0 || r[r.length - 1].date_value == null
+          ? acc
+          : Math.max(acc, r[r.length - 1].date_value.getTime()),
+      Number.NEGATIVE_INFINITY,
+    );
+    rows.forEach((r, i) => {
+      if (r.length === 0) {
+        return;
+      }
+      if (r[0].date_value != null && r[0].date_value.getTime() > min) {
+        // inject a min
+        r.unshift(createCopy(r[0], new Date(min), sensorEntries[i]));
+      }
+      if (r[r.length - 1].date_value != null && r[r.length - 1].date_value.getTime() < max) {
+        // inject a max
+        r.push(createCopy(r[r.length - 1], new Date(max), sensorEntries[i]));
+      }
+    });
+    return rows;
+  });
+  return sensorEntries.map((_, i) => allDone.then((r) => r[i]));
 }
