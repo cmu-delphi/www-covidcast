@@ -102,7 +102,7 @@
       if (dataBuffer.has(key)) {
         continue;
       }
-      dataBuffer.set(key, fetchRegionSlice($currentSensorEntry, $currentLevel, date));
+      dataBuffer.set(key, fetchRegionSlice($currentSensorEntry, $currentLevel, toLoad));
     }
   }
 
@@ -329,7 +329,7 @@
       </div>
     </div>
     <div class="map-controls-container">
-      <MapControls zoom={map ? map.zoom : null} {loading} />
+      <MapControls zoom={map ? map.zoom : null} loading={running || loading} />
     </div>
   </div>
   <div class="legend-container container-bg">
