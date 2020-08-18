@@ -213,6 +213,10 @@ function cities() {
 function neighborhoods() {
   const neighborhoods = require('./raw/swpa/neighborhoods_reprojected.geo.json');
   const municipal = require('./raw/swpa/Allegheny_County_Municipal_Boundaries_reprojected.geo.json');
+  municipal.features = municipal.features.filter(
+    (d) => !(d.properties.NAME === 'PITTSBURGH' && d.properties.TYPE === 'CITY'),
+  );
+
   const infos = [
     ...neighborhoods.features.map((feature) => {
       const props = feature.properties;
