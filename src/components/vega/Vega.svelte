@@ -7,7 +7,7 @@
   /**
    * @type {import('vega-embed').VisualizationSpec}
    */
-  export let schema;
+  export let spec;
 
   /**
    * @type {HTMLElement|null}
@@ -26,6 +26,7 @@
   let noData = false;
 
   $: updateData(vegaPromise, data);
+  $: updateSpec(spec);
 
   function updateData(vegaPromise, data) {
     if (!vegaPromise) {
@@ -47,21 +48,22 @@
     });
   }
 
-  onMount(() => {
-    const bb = root.getBoundingClientRect();
-    // don't know why the size diff
-    const margin = 6;
-    vegaPromise = embed(root, schema, {
+  function updateSpec(spec) {
+    if (!root) {
+      return;
+    }
+    vegaPromise = embed(root, spec, {
       actions: false,
-      width: bb.width - margin,
-      height: bb.height - margin,
-      padding: 0,
     });
     vegaPromise.then((r) => {
       vega = r;
       updateData(r, data);
     });
     vegaPromise.catch((error) => console.error(error));
+  }
+
+  onMount(() => {
+    updateSpec(spec);
   });
 
   onDestroy(() => {

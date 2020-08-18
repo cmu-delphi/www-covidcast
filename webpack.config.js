@@ -1,7 +1,7 @@
 /* eslint-env node */
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const CopyPlugin = require('copy-webpack-plugin');
+// const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
@@ -28,6 +28,20 @@ module.exports = () => {
       },
       extensions: ['.mjs', '.js', '.svelte'],
       mainFields: ['svelte', 'browser', 'module', 'main'],
+    },
+
+    optimization: {
+      splitChunks: {
+        cacheGroups: {
+          // no splitting of css files
+          styles: {
+            name: 'styles',
+            test: /\.css$/,
+            chunks: 'all',
+            enforce: true,
+          },
+        },
+      },
     },
 
     module: {
@@ -91,9 +105,9 @@ module.exports = () => {
 
     plugins: [
       new EnvironmentPlugin(['NODE_ENV']),
-      new CopyPlugin({
-        patterns: ['./src/static'],
-      }),
+      // new CopyPlugin({
+      //   patterns: ['./src/static'],
+      // }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
         template: './src/index.html',
@@ -106,7 +120,7 @@ module.exports = () => {
       new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({
         filename: '[name].css',
-        chunkFilename: '[id].css',
+        chunkFilename: '[id].css?id=[chunkhash]',
       }),
       !devMode && new CleanWebpackPlugin(),
     ].filter(Boolean),

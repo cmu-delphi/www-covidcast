@@ -1,6 +1,6 @@
 import { L } from './layers';
-import bounds from './bounds.json';
 import { LngLatBounds } from 'mapbox-gl';
+import { bounds } from '../../maps';
 
 export default class ZoomMap {
   constructor() {

@@ -2,7 +2,6 @@
   import { onMount } from 'svelte';
 
   import {
-    sensorMap,
     times,
     signalType,
     currentSensor,
@@ -14,11 +13,12 @@
     currentDataReadyOnMap,
     encoding,
     mounted,
+    sensorMap,
+    signalShowCumulative,
   } from './stores';
   import './stores/urlHandler';
   import './stores/ga';
-  import { updateRegionSliceCache, loadMetaData, updateTimeSliceCache } from './data';
-  import { isDeathSignal, isCasesSignal } from './data/signals';
+  import { updateRegionSliceCache, loadMetaData } from './data';
   import ModeToggle from './components/ModeToggle.svelte';
   import modes from './modes';
 
@@ -42,7 +42,7 @@
 
   // Since we don't want multiple updates, but currentSensor changes can update // the level and date, we have flags that prevent the async updates.
   currentSensor.subscribe((s) => {
-    const sensorEntry = $sensorMap.get(s);
+    const sensorEntry = sensorMap.get(s);
     $currentDataReadyOnMap = false;
 
     if (!$mounted) {
@@ -65,8 +65,6 @@
       currentRegion.set('');
       currentRegionName.set('');
       currentLevel.set(l);
-    } else {
-      updateTimeSliceCache(s, l, $currentRegion);
     }
     if (date !== $currentDate) {
       dateChangedWhenSensorChanged = true;
@@ -77,8 +75,9 @@
       signalType.set('value');
     }
 
-    if (!isDeathSignal($currentSensor) && !isCasesSignal($currentSensor)) {
+    if (!sensorEntry.isCasesOrDeath) {
       encoding.set('color');
+      signalShowCumulative.set(false);
     }
 
     updateRegionSliceCache(s, l, date, 'sensor-change');
@@ -110,19 +109,10 @@
     }
   });
 
-  currentRegion.subscribe((r) => {
-    if ($mounted) {
-      updateTimeSliceCache($currentSensor, $currentLevel, r);
-    }
-  });
-
   onMount(() => {
     loadMetaData().then(({ level, date }) => {
       mounted.set(true);
       updateRegionSliceCache($currentSensor, level, date);
-      if ($currentRegion) {
-        updateTimeSliceCache($currentSensor, $currentLevel, $currentRegion);
-      }
     });
   });
 

@@ -1,8 +1,7 @@
 import geojsonExtent from '@mapbox/geojson-extent';
 import { AttributionControl, Map as MapBox } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { is7DavIncidence } from '../../data/signals';
-import { defaultRegionOnStartup, levelMegaCounty, levels } from '../../stores/constants';
+import { defaultRegionOnStartup, levelMegaCounty, levels, EPIDATA_CASES_OR_DEATH_VALUES } from '../../stores/constants';
 import { MAP_THEME } from '../../theme';
 import { IS_NOT_MISSING, MISSING_VALUE } from './encodings/utils';
 import InteractiveMap from './InteractiveMap';
@@ -24,7 +23,10 @@ export default class MapBoxWrapper {
      * @type {MapBox | null}
      */
     this.map = null;
-    this.mapReady = false;
+    this.mapSetupReady = false;
+    this.mapDataReady = false;
+    this.mapEncodingReady = false;
+
     this.animationDuration = 0;
 
     /**
@@ -34,7 +36,8 @@ export default class MapBoxWrapper {
 
     this.encodings = encodings;
     this.encoding = this.encodings[0];
-    this.level = '';
+    // set a good default value
+    this.level = 'county';
     this.zoom = new ZoomMap();
   }
 
@@ -77,12 +80,48 @@ export default class MapBoxWrapper {
         })
         .then(() => {
           this.zoom.ready();
-          this.mapReady = true;
-          this.dispatch('ready');
+          this.markReady('setup');
           resolveCallback(this);
         });
     });
     return p;
+  }
+
+  /**
+   *
+   * @param {'data' | 'setup' | 'encoding'} type
+   */
+  markReady(type) {
+    switch (type) {
+      case 'data': {
+        if (this.mapDataReady) {
+          return;
+        }
+        this.mapDataReady = true;
+        this.dispatch('readyData');
+        break;
+      }
+      case 'setup': {
+        if (this.mapSetupReady) {
+          return;
+        }
+        this.mapSetupReady = true;
+        this.dispatch('readySetup');
+        break;
+      }
+      case 'encoding': {
+        if (this.mapEncodingReady) {
+          return;
+        }
+        this.mapEncodingReady = true;
+        this.dispatch('readyEncoding');
+        break;
+      }
+    }
+    // once all are ready
+    if (this.mapSetupReady && this.mapEncodingReady && this.mapDataReady) {
+      this.dispatch('ready');
+    }
   }
 
   addSources() {
@@ -212,7 +251,7 @@ export default class MapBoxWrapper {
   }
 
   destroy() {
-    this.mapReady = false;
+    this.mapSetupReady = false;
     if (this.map) {
       this.map.remove();
       this.zoom.map = null;
@@ -226,7 +265,7 @@ export default class MapBoxWrapper {
     this.level = level;
     this.encoding = this.encodings.find((d) => d.id === encoding);
 
-    if (!this.map || !this.mapReady) {
+    if (!this.map || !this.mapSetupReady) {
       return;
     }
 
@@ -246,38 +285,41 @@ export default class MapBoxWrapper {
       this.map.setLayoutProperty(layer, 'visibility', visibleLayers.has(layer) ? 'visible' : 'none');
     });
 
-    return this.encoding.encode(this.map, level, signalType, sensor, valueMinMax, stops, stopsMega);
+    const r = this.encoding.encode(this.map, level, signalType, sensor, valueMinMax, stops, stopsMega);
+
+    this.markReady('encoding');
+    return r;
   }
 
   /**
    *
    * @param {'county' | 'state' | 'msa'} level
-   * @param {Map<string, [number, number]>} values
-   * @param {Map<string, number>} directions
-   * @param {string} sensor
+   * @param {import('../../data/fetchData').EpiDataRow[]>} data
    */
-  updateSources(level, values, directions, sensor) {
-    if (!this.map || !this.mapReady) {
+  updateSources(level, data, primaryValue = 'value') {
+    if (!this.map || !this.mapSetupReady) {
       return;
     }
+    const lookup = new Map(data.map((d) => [d.geo_value.toUpperCase(), d]));
     if (level === 'county') {
-      this.updateSource(S[levelMegaCounty.id].border, values, directions, sensor);
+      this.updateSource(S[levelMegaCounty.id].border, lookup, primaryValue);
     }
-    this.updateSource(S[level].border, values, directions, sensor);
-    this.updateSource(S[level].center, values, directions, sensor);
+    this.updateSource(S[level].border, lookup, primaryValue);
+    this.updateSource(S[level].center, lookup, primaryValue);
 
     for (const encoding of this.encodings) {
       encoding.updateSources(this.map, level);
+    }
+    if (data.length > 0) {
+      this.markReady('data');
     }
   }
   /**
    *
    * @param {string} sourceId
-   * @param {Map<string, [number, number]>} values
-   * @param {Map<string, number>} directions
-   * @param {string} sensor
+   * @param {Map<string, import('../../data/fetchData').EpiDataRow>} values
    */
-  updateSource(sourceId, values, directions, sensor) {
+  updateSource(sourceId, values, primaryValue = 'value') {
     if (!this.map) {
       return;
     }
@@ -289,22 +331,12 @@ export default class MapBoxWrapper {
 
     data.features.forEach((d) => {
       const id = d.properties.id;
-      d.properties.value = MISSING_VALUE;
-      d.properties.direction = MISSING_VALUE;
-
-      if (values.has(id)) {
-        d.properties.value = values.get(id)[0];
-
-        if (is7DavIncidence(sensor)) {
-          // value ... 7-day avg
-          d.properties.value1 = values.get(id)[1]; // count
-        } else {
-          delete d.properties.value1;
-        }
-      }
-      if (directions.has(id)) {
-        d.properties.direction = directions.get(id);
-      }
+      const entry = values.get(id);
+      d.properties.value = entry ? entry[primaryValue] : MISSING_VALUE;
+      d.properties.direction = entry ? entry.direction : MISSING_VALUE;
+      EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
+        d.properties[key] = entry && entry[key] != null ? entry[key] : MISSING_VALUE;
+      });
     });
 
     source.setData(data);
@@ -333,9 +365,9 @@ export default class MapBoxWrapper {
     if (
       !selection ||
       (selection.level !== levelMegaCounty.id &&
-        (this.interactive.hovered.id == selection.property_id || oldSelection.id == selection.property_id)) ||
+        (this.interactive.hovered.id == selection.propertyId || oldSelection.id == selection.propertyId)) ||
       (selection.level === levelMegaCounty.id &&
-        (this.interactive.hovered.mega == selection.property_id || oldSelection.mega == selection.property_id))
+        (this.interactive.hovered.mega == selection.propertyId || oldSelection.mega == selection.propertyId))
     ) {
       return;
     }
@@ -347,7 +379,7 @@ export default class MapBoxWrapper {
       return;
     }
     // hacky
-    const feature = source._data.features.find((d) => d.properties.id === selection.property_id);
+    const feature = source._data.features.find((d) => d.properties.id === selection.propertyId);
 
     if (!feature) {
       return;
@@ -361,7 +393,7 @@ export default class MapBoxWrapper {
   }
 
   selectRandom() {
-    if (!this.map || !this.mapReady || !get(mounted)) {
+    if (!this.map || !this.mapSetupReady) {
       return;
     }
     const defaultRegion = defaultRegionOnStartup[this.level];
@@ -378,6 +410,9 @@ export default class MapBoxWrapper {
     }
 
     const viableFeatures = source._data.features.filter((d) => d.properties.value !== MISSING_VALUE);
+    if (viableFeatures.length === 0) {
+      return;
+    }
     const index = Math.floor(Math.random() * (viableFeatures.length - 1));
     const randomFeature = viableFeatures[index];
     this.interactive.forceHover(randomFeature);

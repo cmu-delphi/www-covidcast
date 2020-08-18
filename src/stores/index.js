@@ -1,19 +1,20 @@
 import { writable, readable, derived, get } from 'svelte/store';
 import { LogScale, SqrtScale } from './scales';
-import { scaleSequentialLog } from 'd3';
-import { sensorList, withSensorEntryKey, defaultSensorId } from './constants';
+import { scaleSequentialLog } from 'd3-scale';
+import { defaultSensorId, sensorList, sensorMap } from './constants';
 import modes from '../modes';
 import { parseAPITime } from '../data/utils';
 import { regionSearchLookup } from './search';
 export {
-  dict,
-  specialCounties,
   defaultRegionOnStartup,
   getLevelInfo,
   levels,
   levelList,
   yesterday,
   yesterdayDate,
+  sensorList,
+  sensorMap,
+  groupedSensorList,
 } from './constants';
 export { regionSearchList } from './search';
 
@@ -23,31 +24,6 @@ export { regionSearchList } from './search';
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
-
-// Set of options for which signals to display.
-// Checks the ?sensors= URI parameter for a custom view,
-// otherwise uses the default.
-export const sensors = readable(sensorList, (set) => {
-  const sensorsOption = urlParams.get('sensors');
-  if (sensorsOption) {
-    set(JSON.parse(decodeURIComponent(sensorsOption)).map(withSensorEntryKey));
-  }
-});
-
-export const publicSensors = derived([sensors], ([sensors]) => sensors.filter((d) => d.type == 'public'));
-export const earlySensors = derived([sensors], ([sensors]) => sensors.filter((d) => d.type == 'early'));
-export const lateSensors = derived([sensors], ([sensors]) => sensors.filter((d) => d.type == 'late'));
-
-// The ID to reference each sensor is the indicator name + signal type.
-// This map is used to find the information for each sensor.
-export const sensorMap = derived(sensors, ($sensors) => {
-  /**
-   * @type {Map<string, import('./constants').SensorEntry>}
-   */
-  const map = new Map();
-  $sensors.forEach((d) => map.set(d.key, d));
-  return map;
-});
 
 export const times = writable(null);
 export const stats = writable(null);
@@ -71,21 +47,18 @@ export const currentMode = writable(modes[0], (set) => {
 
 export const currentSensor = writable('', (set) => {
   const sensor = urlParams.get('sensor');
-  if (sensor && get(sensorMap).has(sensor)) {
+  if (sensor && sensorMap.has(sensor)) {
     set(sensor);
   } else {
-    const activeSensors = get(sensors);
-    const defaultSensor = activeSensors.find((d) => d.id === defaultSensorId);
+    const defaultSensor = sensorList.find((d) => d.id === defaultSensorId);
     if (defaultSensor) {
       set(defaultSensor.key);
     } else {
-      set(activeSensors[0].key);
+      set(sensorList[0].key);
     }
   }
 });
-export const currentSensorEntry = derived([sensorMap, currentSensor], ([$sensorMap, $currentSensor]) =>
-  $sensorMap.get($currentSensor),
-);
+export const currentSensorEntry = derived([currentSensor], ([$currentSensor]) => sensorMap.get($currentSensor));
 
 // 'county', 'state', or 'msa'
 export const currentLevel = writable('county', (set) => {
@@ -104,6 +77,11 @@ export const signalType = writable('value', (set) => {
   }
 });
 
+// in case of a death signal whether to show cumulative data
+export const signalShowCumulative = writable(false, (set) => {
+  set(urlParams.has('signalC'));
+});
+
 // Options are 'color', 'bubble', and 'spike'
 export const encoding = writable('color', (set) => {
   const encoding = urlParams.get('encoding');
@@ -112,11 +90,10 @@ export const encoding = writable('color', (set) => {
   }
 });
 
-// EpiWeek in form YYYYMMDD.
 /**
  * magic date that will be replaced by the latest date
  */
-export const MAGIC_START_DATE = '20100420';
+export const MAGIC_START_DATE = '20200701';
 export const currentDate = writable(MAGIC_START_DATE, (set) => {
   const date = urlParams.get('date');
   if (/\d{8}/.test(date)) {
@@ -154,8 +131,8 @@ export function selectByInfo(elem) {
     return;
   }
   if (elem) {
-    currentRegion.set(elem.property_id);
-    currentRegionName.set(elem.display_name);
+    currentRegion.set(elem.propertyId);
+    currentRegionName.set(elem.displayName);
     // the info is derived
   } else {
     currentRegion.set('');
