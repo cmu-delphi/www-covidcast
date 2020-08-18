@@ -1,6 +1,7 @@
 import { formatAPITime, isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data';
 import { checkWIP } from '../data/utils';
 import { format } from 'd3-format';
+import { generateMockSignal, generateMockMeta } from '../data/mock';
 
 export const levelList = [
   {
@@ -66,7 +67,8 @@ export function getLevelInfo(level) {
  * @property {string} yAxis
  * @property {string} format
  * @property {string} signal
- * @property {string?} api
+ * @property {string?|() => any[]} api
+ * @property {(() => any[])?} meta
  * @property {(v: number) => string} formatValue
  * @property {boolean} isCasesOrDeath is cases or death signal
  * @property {boolean} isCount is count signal
@@ -267,6 +269,19 @@ const defaultSensors = [
     mapTitleText: 'Daily new COVID-19 deaths per 100,000 people (7-day average)',
     yAxis: 'Deaths per 100,000 people',
     format: 'raw',
+  },
+  {
+    type: 'other',
+    name: 'Mock Signal',
+    id: 'mock',
+    signal: 'mock',
+    levels: ['neighborhood', 'zip'],
+    tooltipText: 'Mock Signal',
+    mapTitleText: 'Mock Signal',
+    yAxis: 'Mock Signal',
+    format: 'percent',
+    api: generateMockSignal,
+    meta: generateMockMeta,
   },
 ];
 

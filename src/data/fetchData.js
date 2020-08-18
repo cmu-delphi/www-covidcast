@@ -12,7 +12,7 @@ import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
  * @property {number} issue
  * @property {number} lag
  * @property {number | null} sample_size
- * @property {stderr | null} stderr
+ * @property {number | null} stderr
  * @property {number} time_value
  * @property {Date} date_value the time_value as a Date
  * @property {number} value

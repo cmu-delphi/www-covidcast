@@ -136,11 +136,9 @@ function loadRegularSignal(sEntry, meta, timeMap, statsMap) {
  * @param {import('./fetchData').SensorEntry} sEntry
  */
 function loadCountSignal(sEntry, meta, timeMap, statsMap) {
-  const regions = sEntry.levels;
-
   const possibleMetaRows = meta.epidata.filter((d) => d.data_source === sEntry.id && d.time_type === 'day');
 
-  regions.forEach((region) => {
+  sEntry.levels.forEach((region) => {
     const statsKey = toStatsRegionKey(sEntry.key, region);
 
     const matchedMeta = possibleMetaRows.find((d) => d.signal === sEntry.signal && d.geo_type === region);
@@ -186,7 +184,7 @@ function loadCountSignal(sEntry, meta, timeMap, statsMap) {
   Object.keys(sEntry.casesOrDeathSignals).map((key) => {
     const signal = sEntry.casesOrDeathSignals[key];
     // compute stats for each sub signal also
-    regions.forEach((region) => {
+    sEntry.levels.forEach((region) => {
       const statsKey = toStatsRegionKey(sEntry.key, region) + `_${key}`;
       const matchedMeta = possibleMetaRows.find((d) => d.signal === signal && d.geo_type === region);
 
@@ -208,6 +206,15 @@ function loadCountSignal(sEntry, meta, timeMap, statsMap) {
   });
 }
 
-export function loadMetaData() {
-  return callMetaAPI().then((meta) => processMetaData(meta));
+/**
+ *
+ * @param {import('../stores/constants').SensorEntry[]} sensors
+ */
+export function loadMetaData(sensors) {
+  const custom = sensors.filter((d) => d.meta).map((d) => d.meta(d.id, d.signal));
+  return Promise.all([callMetaAPI(), ...custom]).then((metas) => {
+    const meta = metas[0];
+    meta.epidata.push(...metas.slice(1).flat(2));
+    return processMetaData(meta);
+  });
 }

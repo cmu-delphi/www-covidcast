@@ -5,7 +5,7 @@ const ENDPOINT = 'https://api.covidcast.cmu.edu/epidata/api.php';
 const fetchOptions = process.env.NODE_ENV === 'development' ? { cache: 'force-cache' } : {};
 
 /**
- * @param {string} endpoint
+ * @param {string | (id: string, signal: string, level: string, date: Date | string, region: string) => any} endpoint
  * @param {string} id
  * @param {string} signal
  * @param {string} level
@@ -13,6 +13,9 @@ const fetchOptions = process.env.NODE_ENV === 'development' ? { cache: 'force-ca
  * @param {string} region
  */
 export function callAPIEndPoint(endpoint, id, signal, level, date, region) {
+  if (typeof endpoint === 'function') {
+    return Promise.resolve(endpoint(id, signal, level, date, region));
+  }
   const url = new URL(endpoint || ENDPOINT);
   url.searchParams.set('source', 'covidcast');
   url.searchParams.set('cached', 'true');

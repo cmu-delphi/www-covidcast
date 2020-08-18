@@ -14,6 +14,7 @@
     encoding,
     mounted,
     sensorMap,
+    sensorList,
     signalShowCumulative,
   } from './stores';
   import './stores/urlHandler';
@@ -110,7 +111,7 @@
   });
 
   onMount(() => {
-    loadMetaData().then(({ level, date }) => {
+    loadMetaData(sensorList).then(({ level, date }) => {
       $mounted = 1;
       updateRegionSliceCache($currentSensor, level, date);
     });
