@@ -19,15 +19,15 @@
     selectByFeature,
     currentSensorEntry,
     signalShowCumulative,
+    currentDateObject,
   } from '../../stores';
   import ToggleEncoding from '../../components/ToggleEncoding.svelte';
   import Title from '../../components/Title.svelte';
   import MapControls from '../../components/MapControls.svelte';
   import Search from '../../components/Search.svelte';
-  import { trackEvent } from '../../stores/ga';
   import LineSmallMultiples from '../../components/LineSmallMultiples.svelte';
+  import { fetchRegionSlice } from '../../data/fetchData';
 
-  let loading = true;
   /**
    * @type {MapBox}
    */
@@ -58,26 +58,13 @@
     }
   }
 
-  let graphShowStatus = false;
-  let firstLoaded = true;
-
-  currentRegion.subscribe((r) => {
-    if (firstLoaded && r !== '') {
-      toggleGraphShowStatus(null, false);
-      firstLoaded = false;
-    } else if (r) {
-      toggleGraphShowStatus(null, true);
-    } else {
-      toggleGraphShowStatus(null, false);
-    }
-  });
-  function toggleGraphShowStatus(event, to = null) {
-    if (to !== null) {
-      graphShowStatus = to;
-    } else {
-      graphShowStatus = !graphShowStatus;
-    }
-    trackEvent('graph', graphShowStatus ? 'show' : 'hide');
+  let data = [];
+  let loading = true;
+  $: {
+    loading = true;
+    fetchRegionSlice($currentSensorEntry, $currentLevel, $currentDateObject).then((r) => {
+      data = r;
+    });
   }
 </script>
 
@@ -243,7 +230,7 @@
   <MapBox
     bind:this={map}
     on:idle={() => (loading = false)}
-    data={[]}
+    {data}
     sensor={$currentSensor}
     level={$currentLevel}
     signalType={$signalType}

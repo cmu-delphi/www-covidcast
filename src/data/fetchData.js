@@ -40,7 +40,7 @@ function parseData(data) {
  *
  * @param {SensorEntry} sensorEntry
  * @param {string} level
- * @param {string} date
+ * @param {string | Date} date
  * @returns {Promise<EpiDataRow[]>}
  */
 export function fetchRegionSlice(sensorEntry, level, date) {
