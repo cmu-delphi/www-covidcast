@@ -73,9 +73,14 @@ export const signalType = writable('value', (set) => {
 });
 
 // in case of a death signal whether to show cumulative data
-export const signalShowCumulative = writable(false, (set) => {
-  set(urlParams.has('signalC'));
+export const signalCasesOrDeathOptions = writable({
+  cumulative: urlParams.has('signalC'),
+  ratio: urlParams.has('signalR'),
 });
+
+export const currentSensorMapTitle = derived([currentSensorEntry, signalCasesOrDeathOptions], ([sensor, options]) =>
+  typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText(options) : sensor.mapTitleText,
+);
 
 // Options are 'color', 'bubble', and 'spike'
 export const encoding = writable('color', (set) => {
@@ -165,7 +170,10 @@ currentSensorEntry.subscribe((sensorEntry) => {
 
   if (!sensorEntry.isCasesOrDeath) {
     encoding.set('color');
-    signalShowCumulative.set(false);
+    signalCasesOrDeathOptions.set({
+      cumulative: false,
+      ratio: false,
+    });
   }
 
   // clamp to time span
