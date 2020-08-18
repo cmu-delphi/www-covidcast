@@ -58,14 +58,8 @@
     }
   }
 
-  let data = [];
   let loading = true;
-  $: {
-    loading = true;
-    fetchRegionSlice($currentSensorEntry, $currentLevel, $currentDateObject).then((r) => {
-      data = r;
-    });
-  }
+  $: data = fetchRegionSlice($currentSensorEntry, $currentLevel, $currentDateObject);
 </script>
 
 <style>
@@ -229,7 +223,7 @@
 
   <MapBox
     bind:this={map}
-    on:idle={() => (loading = false)}
+    on:loading={(e) => (loading = e.detail)}
     {data}
     sensor={$currentSensor}
     level={$currentLevel}

@@ -23,7 +23,7 @@
   export function selectRandom() {
     wrapper.selectRandom();
   }
-  export let data = [];
+  export let data = Promise.resolve([]);
   export let sensor = '';
   export let level = 'state';
   export let encoding = 'color';
@@ -66,7 +66,6 @@
 
   $: {
     // update mega
-    dummyTrack(ready);
     wrapper.updateSources(level, data, showCumulative ? 'avgCumulative' : 'value');
   }
   $: {
