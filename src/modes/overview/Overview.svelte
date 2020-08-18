@@ -10,7 +10,6 @@
     currentLevel,
     encoding,
     currentZone,
-    currentRange,
     colorScale,
     colorStops,
     bubbleRadiusScale,
@@ -45,7 +44,9 @@
   }
 
   function updatedEncoding(info) {
-    currentRange.set(info.range);
+    if (!info) {
+      return;
+    }
     if (info.scale) {
       colorScale.set(info.scale);
     }

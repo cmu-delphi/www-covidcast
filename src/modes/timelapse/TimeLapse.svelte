@@ -9,7 +9,6 @@
     currentSensor,
     currentLevel,
     encoding,
-    currentRange,
     colorScale,
     colorStops,
     bubbleRadiusScale,
@@ -38,7 +37,6 @@
     if (!info) {
       return;
     }
-    currentRange.set(info.range);
     if (info.scale) {
       colorScale.set(info.scale);
     }

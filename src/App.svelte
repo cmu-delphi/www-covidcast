@@ -1,24 +1,10 @@
 <script>
   import { onMount } from 'svelte';
 
-  import {
-    times,
-    signalType,
-    currentSensor,
-    currentMode,
-    currentDate,
-    currentLevel,
-    currentRegion,
-    currentRegionName,
-    currentDataReadyOnMap,
-    encoding,
-    mounted,
-    sensorMap,
-    signalShowCumulative,
-  } from './stores';
+  import { currentMode, appReady } from './stores';
   import './stores/urlHandler';
   import './stores/ga';
-  import { updateRegionSliceCache, loadMetaData } from './data';
+  import { loadMetaData } from './data';
   import ModeToggle from './components/ModeToggle.svelte';
   import modes from './modes';
 
@@ -36,83 +22,9 @@
     isPortrait = r.matches;
   });
 
-  let error = null;
-  let levelChangedWhenSensorChanged = false;
-  let dateChangedWhenSensorChanged = false;
-
-  // Since we don't want multiple updates, but currentSensor changes can update // the level and date, we have flags that prevent the async updates.
-  currentSensor.subscribe((s) => {
-    const sensorEntry = sensorMap.get(s);
-    $currentDataReadyOnMap = false;
-
-    if (!$mounted) {
-      return;
-    }
-
-    let l = $currentLevel;
-    let minDate = $times.get(s)[0],
-      maxDate = $times.get(s)[1];
-    let date = minDate;
-    if ($currentDate >= minDate && $currentDate <= maxDate) {
-      date = $currentDate;
-    } else if ($currentDate > maxDate) {
-      date = maxDate;
-    }
-
-    if (!sensorEntry.levels.includes($currentLevel)) {
-      l = sensorEntry.levels[0];
-      levelChangedWhenSensorChanged = true;
-      currentRegion.set('');
-      currentRegionName.set('');
-      currentLevel.set(l);
-    }
-    if (date !== $currentDate) {
-      dateChangedWhenSensorChanged = true;
-      currentDate.set(date);
-    }
-
-    if (sensorEntry.type === 'late' && sensorEntry.id !== 'hospital-admissions') {
-      signalType.set('value');
-    }
-
-    if (!sensorEntry.isCasesOrDeath) {
-      encoding.set('color');
-      signalShowCumulative.set(false);
-    }
-
-    updateRegionSliceCache(s, l, date, 'sensor-change');
-  });
-
-  currentLevel.subscribe((l) => {
-    // eslint-disable-next-line no-unused-vars
-    $currentDataReadyOnMap = false;
-
-    if (levelChangedWhenSensorChanged) {
-      levelChangedWhenSensorChanged = false;
-      return;
-    }
-    if ($mounted) {
-      currentRegion.set('');
-      currentRegionName.set('');
-    }
-    if (!$mounted) {
-      return;
-    }
-    updateRegionSliceCache($currentSensor, l, $currentDate, 'level-change');
-  });
-
-  currentDate.subscribe((d) => {
-    if (dateChangedWhenSensorChanged) {
-      dateChangedWhenSensorChanged = false;
-    } else if ($mounted) {
-      updateRegionSliceCache($currentSensor, $currentLevel, d, 'date-change');
-    }
-  });
-
   onMount(() => {
-    loadMetaData().then(({ level, date }) => {
-      $mounted = 1;
-      updateRegionSliceCache($currentSensor, level, date);
+    loadMetaData().then(() => {
+      appReady.set(true);
     });
   });
 
@@ -133,26 +45,10 @@
     padding: 0.5em;
   }
 
-  .error-message-container {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: gray;
-  }
-
   .loader {
     flex-grow: 1;
   }
 </style>
-
-{#if error}
-  <div class="error-message-container">Failed to load data. Please try again later...</div>
-{/if}
 
 <div class="root">
   {#if modes.length > 1}
