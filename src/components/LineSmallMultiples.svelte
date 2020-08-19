@@ -9,8 +9,6 @@
   // An array of keys that will NOT be shown in small multiples
   const sensorSmallMultipleBlacklist = [
     'ght-smoothed_search',
-    'indicator-combination-confirmed_7dav_incidence_num',
-    'indicator-combination-deaths_7dav_incidence_num',
     // 'safegraph-full_time_work_prop',
   ];
   const filteredSensors = sensorList.filter((s) => !sensorSmallMultipleBlacklist.includes(s.key));

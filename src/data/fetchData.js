@@ -24,34 +24,6 @@ import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 
 const START_TIME_RANGE = parseAPITime('20100101');
 const END_TIME_RANGE = parseAPITime('20500101');
-// TODO use LRU map
-
-// Note: store the promise to also have hits on currently loading ones
-/**
- * @type {Map<string, Promise<EpiDataRow[]>>}
- */
-const regionSliceCache = new Map();
-/**
- * @type {Map<string, Promise<EpiDataRow[]>>}
- */
-const timeSliceCache = new Map();
-
-/**
- * @param {SensorEntry} sensorEntry
- * @param {string} level
- * @param {string} date
- */
-function toRegionCacheKey(sensorEntry, level, date) {
-  return `${sensorEntry.key}-${level}-${date instanceof Date ? formatAPITime(date) : date}`;
-}
-/**
- * @param {SensorEntry} sensorEntry
- * @param {string} level
- * @param {string} region
- */
-function toTimeSliceCacheKey(sensorEntry, level, region) {
-  return `${sensorEntry.key}-${level}-${region}`;
-}
 
 function parseData(data) {
   for (const row of data) {
@@ -75,19 +47,10 @@ function parseData(data) {
  *
  * @param {SensorEntry} sensorEntry
  * @param {string} level
- * @param {string} date
+ * @param {string | Date} date
  * @returns {Promise<EpiDataRow[]>}
  */
 export function fetchRegionSlice(sensorEntry, level, date) {
-  const cacheKey = toRegionCacheKey(sensorEntry, level, date);
-
-  const cacheEntry = regionSliceCache.get(cacheKey);
-
-  if (cacheEntry) {
-    // cache hit
-    return cacheEntry;
-  }
-
   let promise;
   if (sensorEntry.isCasesOrDeath) {
     promise = Promise.all(
@@ -112,22 +75,9 @@ export function fetchRegionSlice(sensorEntry, level, date) {
       return parseData(d.epidata);
     });
   }
-  regionSliceCache.set(cacheKey, promise);
   return promise;
 }
 
-/**
- *
- * @param {(key: string, keyFunction) => boolean} toDelete optional function to filter entries to delete
- */
-export function clearRegionCache(toDelete = null) {
-  if (toDelete) {
-    const toDeleteKeys = Array.from(regionSliceCache.keys()).filter((d) => toDelete(d, toRegionCacheKey));
-    toDeleteKeys.forEach((key) => regionSliceCache.delete(key));
-  } else {
-    regionSliceCache.clear();
-  }
-}
 /**
  * @param {SensorEntry} sensorEntry
  * @param {string} level
@@ -174,20 +124,7 @@ export function fetchCustomTimeSlice(sensorEntry, level, region, startDate, endD
  * @returns {Promise<EpiDataRow[]>}
  */
 export function fetchTimeSlice(sensorEntry, level, region) {
-  if (!region) {
-    return Promise.resolve([]);
-  }
-
-  const cacheKey = toTimeSliceCacheKey(sensorEntry, level, region);
-  const cacheEntry = timeSliceCache.get(cacheKey);
-
-  if (cacheEntry) {
-    return cacheEntry;
-  }
-
-  const promise = fetchCustomTimeSlice(sensorEntry, level, region, START_TIME_RANGE, END_TIME_RANGE);
-  timeSliceCache.set(cacheEntry, promise);
-  return promise;
+  return fetchCustomTimeSlice(sensorEntry, level, region, START_TIME_RANGE, END_TIME_RANGE);
 }
 
 /**
