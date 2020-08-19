@@ -61,6 +61,6 @@
     <MapControls zoom={map ? map.zoom : null} showEncodings {loading} />
   </div>
 </div>
-<div class="legend-container container-bg">
+<div class="legend-container container-bg container-style">
   <Legend {loading} />
 </div>
