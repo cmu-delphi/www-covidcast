@@ -3,13 +3,10 @@
   import Options from '../../components/Options.svelte';
   import {
     signalType,
-    currentDataReadyOnMap,
-    currentData,
     currentSensor,
     currentLevel,
     encoding,
     currentZone,
-    currentRange,
     colorScale,
     colorStops,
     bubbleRadiusScale,
@@ -19,11 +16,15 @@
     currentRegion,
     selectByInfo,
     selectByFeature,
+    currentSensorEntry,
+    currentDateObject,
+    signalCasesOrDeathOptions,
   } from '../../stores';
   import Search from '../../components/Search.svelte';
   import SmallMultiplesPanel from './SmallMultiplesPanel.svelte';
   import SmallMultiplesDetail from './SmallMultiplesDetail.svelte';
   import MapOverlays from './MapOverlays.svelte';
+  import { fetchRegionSlice } from '../../data/fetchData';
 
   /**
    * @type {MapBox}
@@ -40,7 +41,9 @@
   }
 
   function updatedEncoding(info) {
-    currentRange.set(info.range);
+    if (!info) {
+      return;
+    }
     if (info.scale) {
       colorScale.set(info.scale);
     }
@@ -61,6 +64,9 @@
   function onShow(e) {
     detailSensor = e.detail;
   }
+
+  let loading = true;
+  $: data = fetchRegionSlice($currentSensorEntry, $currentLevel, $currentDateObject);
 </script>
 
 <style>
@@ -151,14 +157,15 @@
   </div>
   <div class="content-container">
     <div class="map-container">
-      <MapOverlays {map} />
+      <MapOverlays {map} {loading} />
       <MapBox
         bind:this={map}
-        on:idle={() => currentDataReadyOnMap.set(true)}
-        data={$currentData}
+        on:loading={(e) => (loading = e.detail)}
+        {data}
         sensor={$currentSensor}
         level={$currentLevel}
         signalType={$signalType}
+        signalOptions={$signalCasesOrDeathOptions}
         selection={$currentRegionInfo}
         encoding={$encoding}
         on:ready={() => initialReady()}

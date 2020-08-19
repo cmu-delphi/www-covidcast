@@ -5,6 +5,7 @@
   import './mapContainer.css';
 
   export let map = null;
+  export let loading = true;
 </script>
 
 <style>
@@ -57,9 +58,9 @@
     <Title />
   </div>
   <div class="map-controls-container">
-    <MapControls zoom={map ? map.zoom : null} showEncodings />
+    <MapControls zoom={map ? map.zoom : null} showEncodings {loading} />
   </div>
 </div>
 <div class="legend-container container-bg">
-  <Legend />
+  <Legend {loading} />
 </div>
