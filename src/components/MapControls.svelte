@@ -16,6 +16,7 @@
   export let zoom;
 
   export let showEncodings = false;
+  export let loading = false;
 </script>
 
 <style>
@@ -119,7 +120,6 @@
       </button>
     </div>
   {/if}
-
   {#if showEncodings && $signalType !== 'direction' && (isDeathSignal($currentSensor) || isCasesSignal($currentSensor))}
     <div class="pg-button-vertical-group">
       <button
@@ -158,5 +158,5 @@
     </div>
   {/if}
 
-  <Loading />
+  <Loading {loading} />
 </div>

@@ -1,8 +1,4 @@
 import {
-  currentData,
-  regionData,
-  currentRegion,
-  currentRegionName,
   times,
   currentDate,
   yesterday,
@@ -15,48 +11,9 @@ import {
 } from '../stores';
 import { get } from 'svelte/store';
 import { callMetaAPI } from './api';
-import { fetchRegionSlice, fetchTimeSlice } from './fetchData';
 
 export * from './signals';
 export { formatAPITime, parseAPITime } from './utils';
-
-// We cache API calls for all regions at a given time and update currentData.
-export function updateRegionSliceCache(sensor, level, date, reason = 'unspecified') {
-  const sensorEntry = sensorMap.get(sensor);
-
-  if (!sensorEntry.levels.includes(level) || date > get(times).get(sensor)[1] || reason === 'level change') {
-    return Promise.resolve(null);
-  }
-  return fetchRegionSlice(sensorEntry, level, date).then((r) => {
-    currentData.set(r);
-    return r;
-  });
-}
-
-// We cache API calls for all time at a given region and update regionData.
-export function updateTimeSliceCache(sensor, level, region) {
-  const sensorEntry = sensorMap.get(sensor);
-
-  if (!region) {
-    regionData.set([]);
-    return Promise.resolve([]);
-  }
-
-  // check if the currentRegion has data on the current date
-  const date = get(currentDate);
-  const checkIfCurrentRegionHasDataOnCurrentDate = (regionData = []) => {
-    return regionData.some((item) => item.time_value == date);
-  };
-
-  return fetchTimeSlice(sensorEntry, level, region).then((r) => {
-    regionData.set(r);
-    if (!checkIfCurrentRegionHasDataOnCurrentDate(r)) {
-      currentRegion.set('');
-      currentRegionName.set('');
-    }
-    return r;
-  });
-}
 
 function toStatsRegionKey(sensorKey, region) {
   return sensorKey + '_' + region;

@@ -129,6 +129,7 @@
   .play-button:focus {
     outline: none !important;
     color: whitesmoke;
+    background: var(--red) !important;
   }
   .play-button:active {
     outline: none;
