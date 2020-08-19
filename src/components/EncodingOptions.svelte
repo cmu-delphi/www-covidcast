@@ -1,5 +1,5 @@
 <script>
-  import { signalType, currentSensorEntry, signalCasesOrDeathOptions } from '../stores';
+  import { currentSensorEntry, signalCasesOrDeathOptions } from '../stores';
 </script>
 
 <style>
@@ -70,7 +70,7 @@
       </button>
     </div>
   {/if}
-  <div aria-label="display type" class="pg-button-group button-group">
+  <!-- <div aria-label="display type" class="pg-button-group button-group">
     <button
       aria-pressed={$signalType === 'value' ? 'true' : 'false'}
       class="pg-button button"
@@ -94,5 +94,5 @@
       disabled>
       7-day Trend
     </button>
-  </div>
+  </div> -->
 </div>

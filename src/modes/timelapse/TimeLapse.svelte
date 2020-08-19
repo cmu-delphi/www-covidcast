@@ -330,7 +330,7 @@
       <MapControls zoom={map ? map.zoom : null} loading={running || loading} />
     </div>
   </div>
-  <div class="legend-container container-bg">
+  <div class="legend-container container-bg container-style">
     <Legend loading={false} />
   </div>
   <MapBox
