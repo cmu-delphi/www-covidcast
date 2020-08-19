@@ -408,6 +408,14 @@ export default class MapBoxWrapper {
     });
   }
 
+  isMissing(feature) {
+    const state = this.map.getFeatureState({
+      source: S[feature.properties.level].border,
+      id: typeof id === 'string' ? Number.parseInt(feature.id, 10) : feature.id,
+    });
+    return state.value == null || state.value === MISSING_VALUE;
+  }
+
   selectRandom() {
     if (!this.map || !this.mapSetupReady) {
       return;
@@ -419,13 +427,13 @@ export default class MapBoxWrapper {
     }
 
     const defaultFeature = source._data.features.find((d) => d.properties.id === defaultRegion);
-    if (defaultFeature && defaultFeature.properties.value !== MISSING_VALUE) {
+    if (defaultFeature && !this.isMissing(defaultFeature)) {
       this.interactive.forceHover(defaultFeature);
       this.dispatch('select', defaultFeature);
       return;
     }
 
-    const viableFeatures = source._data.features.filter((d) => d.properties.value !== MISSING_VALUE);
+    const viableFeatures = source._data.features.filter((d) => !this.isMissing(d));
     if (viableFeatures.length === 0) {
       return;
     }

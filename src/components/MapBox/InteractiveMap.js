@@ -3,7 +3,6 @@ import { levelMegaCounty, levels, levelsWithMega } from '../../stores/constants'
 import { L } from './layers';
 import { S } from './sources';
 import Tooltip from './Tooltip.svelte';
-import { MISSING_VALUE } from './encodings/utils';
 
 export default class InteractiveMap {
   /**
@@ -105,7 +104,7 @@ export default class InteractiveMap {
    */
   _onLevelMouseMove(e) {
     const feature = e.features[0];
-    if (this._isMissing(feature)) {
+    if (this.adapter.isMissing(feature)) {
       return;
     }
     // mark handled
@@ -123,7 +122,7 @@ export default class InteractiveMap {
       return;
     }
     const feature = e.features[0];
-    if (this._isMissing(feature)) {
+    if (this.adapter.isMissing(feature)) {
       return;
     }
 
@@ -149,7 +148,7 @@ export default class InteractiveMap {
    */
   _onLevelMouseClick(e) {
     const feature = e.features[0];
-    if (this._isMissing(feature)) {
+    if (this.adapter.isMissing(feature)) {
       return;
     }
     e.preventDefault(); // mark handled
@@ -166,7 +165,7 @@ export default class InteractiveMap {
       return;
     }
     const feature = e.features[0];
-    if (this._isMissing(feature)) {
+    if (this.adapter.isMissing(feature)) {
       return;
     }
     e.preventDefault(); // mark handled
@@ -189,14 +188,6 @@ export default class InteractiveMap {
       invalid,
     });
     popup.setLngLat(e.lngLat).setDOMContent(this.tooltipElement).addTo(this.map);
-  }
-
-  _isMissing(feature) {
-    const state = this.map.getFeatureState({
-      source: S[feature.properties.level].border,
-      id: typeof id === 'string' ? Number.parseInt(feature.id, 10) : feature.id,
-    });
-    return state.value == null || state.value === MISSING_VALUE;
   }
 
   /**
