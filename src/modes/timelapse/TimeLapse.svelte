@@ -15,7 +15,7 @@
     currentSensorEntry,
     times,
     currentDate,
-    signalShowCumulative,
+    signalCasesOrDeathOptions,
   } from '../../stores';
   import ToggleEncoding from '../../components/ToggleEncoding.svelte';
   import Title from '../../components/Title.svelte';
@@ -192,9 +192,7 @@
   });
 
   $: {
-    const sensor = $currentSensorEntry;
-    const level = $currentLevel;
-    paramChange(sensor, level);
+    paramChange($currentSensorEntry, $currentLevel, $signalCasesOrDeathOptions);
   }
 </script>
 
@@ -332,7 +330,7 @@
       <MapControls zoom={map ? map.zoom : null} loading={running || loading} />
     </div>
   </div>
-  <div class="legend-container container-bg">
+  <div class="legend-container container-bg container-style">
     <Legend loading={false} />
   </div>
   <MapBox
@@ -348,6 +346,6 @@
     level={$currentLevel}
     signalType={$signalType}
     encoding={$encoding}
-    showCumulative={$signalShowCumulative}
+    signalOptions={$signalCasesOrDeathOptions}
     on:updatedEncoding={(e) => updatedEncoding(e.detail)} />
 </main>

@@ -12,12 +12,7 @@
 <style>
   .legend {
     font-size: 0.8rem;
-    /* border-radius: 8px; */
-    padding: 15px 15px;
     box-sizing: border-box;
-
-    transition: all 0.1s ease-in;
-
     height: 100%;
     /* if the option for the bubble encoding is visible for specific indicators (e.g., cases), the width of the legend can expand. So do not fix it to a certain number.*/
     /* width: 376px; */
