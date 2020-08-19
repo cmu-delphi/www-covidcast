@@ -1,4 +1,4 @@
-import { writable, readable, derived, get } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 import { LogScale, SqrtScale } from './scales';
 import { scaleSequentialLog } from 'd3-scale';
 import { defaultSensorId, sensorList, sensorMap, levels, swpaLevels } from './constants';
@@ -28,12 +28,7 @@ const urlParams = new URLSearchParams(queryString);
 export const times = writable(null);
 export const stats = writable(null);
 
-export const mounted = writable(0);
-export const mapFirstLoaded = writable(false);
-export const currentDataReadyOnMap = writable(false);
-export const customDataView = readable(true, (set) => {
-  set(urlParams.get('sensors') != null);
-});
+export const appReady = writable(false);
 
 /**
  * @type {import('svelte/store').Writable<import('../routes').Mode>}
@@ -78,9 +73,14 @@ export const signalType = writable('value', (set) => {
 });
 
 // in case of a death signal whether to show cumulative data
-export const signalShowCumulative = writable(false, (set) => {
-  set(urlParams.has('signalC'));
+export const signalCasesOrDeathOptions = writable({
+  cumulative: urlParams.has('signalC'),
+  ratio: urlParams.has('signalR'),
 });
+
+export const currentSensorMapTitle = derived([currentSensorEntry, signalCasesOrDeathOptions], ([sensor, options]) =>
+  typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText(options) : sensor.mapTitleText,
+);
 
 // Options are 'color', 'bubble', and 'spike'
 export const encoding = writable('color', (set) => {
@@ -115,7 +115,6 @@ export const currentRegion = writable('', (set) => {
     set(region);
   }
 });
-export const currentRegionName = writable('');
 
 /**
  * current region info (could also be null)
@@ -132,11 +131,9 @@ export function selectByInfo(elem) {
   }
   if (elem) {
     currentRegion.set(elem.propertyId);
-    currentRegionName.set(elem.displayName);
     // the info is derived
   } else {
     currentRegion.set('');
-    currentRegionName.set('');
   }
 }
 
@@ -145,23 +142,41 @@ export function selectByFeature(feature) {
   selectByInfo(feature ? lookup(feature.properties.id) : null);
 }
 
-/**
- * @type {import('svelte/store').Writable<EpiDataRow[]>}
- */
-export const regionData = writable([]);
-/**
- * @type {import('svelte/store').Writable<EpiDataRow[]>}
- */
-export const currentData = writable([]);
-
-export const timeRangeOnSlider = writable({
-  min: 0,
-  max: 0,
-});
-
-// Range of time for the map slider.
-export const currentRange = writable([0, 1]);
 export const colorScale = writable(scaleSequentialLog());
 export const colorStops = writable([]);
 export const bubbleRadiusScale = writable(LogScale());
 export const spikeHeightScale = writable(SqrtScale());
+
+// validate if sensor and other parameter matches
+currentSensorEntry.subscribe((sensorEntry) => {
+  // check level
+  const level = get(currentLevel);
+  if (!sensorEntry.levels.includes(level)) {
+    currentRegion.set('');
+    currentLevel.set(sensorEntry.levels[0]);
+  }
+
+  if (sensorEntry.type === 'late' && sensorEntry.id !== 'hospital-admissions') {
+    signalType.set('value');
+  }
+
+  if (!sensorEntry.isCasesOrDeath) {
+    encoding.set('color');
+    signalCasesOrDeathOptions.set({
+      cumulative: false,
+      ratio: false,
+    });
+  }
+
+  // clamp to time span
+  const timesMap = get(times);
+  if (timesMap != null) {
+    const [minDate, maxDate] = timesMap.get(sensorEntry.key);
+    const current = get(currentDate);
+    if (current < minDate) {
+      currentDate.set(minDate);
+    } else if (current > maxDate) {
+      currentDate.set(maxDate);
+    }
+  }
+});

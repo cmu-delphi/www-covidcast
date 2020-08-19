@@ -4,12 +4,9 @@
   import Options from '../../components/Options.svelte';
   import {
     signalType,
-    currentDataReadyOnMap,
-    currentData,
     currentSensor,
     currentLevel,
     encoding,
-    currentRange,
     colorScale,
     colorStops,
     bubbleRadiusScale,
@@ -20,16 +17,17 @@
     selectByInfo,
     selectByFeature,
     currentSensorEntry,
-    signalShowCumulative,
+    signalCasesOrDeathOptions,
+    currentDateObject,
   } from '../../stores';
   import ToggleEncoding from '../../components/ToggleEncoding.svelte';
   import Title from '../../components/Title.svelte';
   import MapControls from '../../components/MapControls.svelte';
   import Search from '../../components/Search.svelte';
-  import { trackEvent } from '../../stores/ga';
   import LineSmallMultiples from '../../components/LineSmallMultiples.svelte';
   import './mapContainer.css';
   import USMapBoxWrapper from '../../components/MapBox/USMapBoxWrapper';
+  import { fetchRegionSlice } from '../../data/fetchData';
 
   /**
    * @type {MapBox}
@@ -43,7 +41,9 @@
   }
 
   function updatedEncoding(info) {
-    currentRange.set(info.range);
+    if (!info) {
+      return;
+    }
     if (info.scale) {
       colorScale.set(info.scale);
     }
@@ -56,27 +56,8 @@
     }
   }
 
-  let graphShowStatus = false;
-  let firstLoaded = true;
-
-  currentRegion.subscribe((r) => {
-    if (firstLoaded && r !== '') {
-      toggleGraphShowStatus(null, false);
-      firstLoaded = false;
-    } else if (r) {
-      toggleGraphShowStatus(null, true);
-    } else {
-      toggleGraphShowStatus(null, false);
-    }
-  });
-  function toggleGraphShowStatus(event, to = null) {
-    if (to !== null) {
-      graphShowStatus = to;
-    } else {
-      graphShowStatus = !graphShowStatus;
-    }
-    trackEvent('graph', graphShowStatus ? 'show' : 'hide');
-  }
+  let loading = true;
+  $: data = fetchRegionSlice($currentSensorEntry, $currentLevel, $currentDateObject);
 </script>
 
 <style>
@@ -213,11 +194,11 @@
       </div>
     </div>
     <div class="map-controls-container">
-      <MapControls zoom={map ? map.zoom : null} />
+      <MapControls zoom={map ? map.zoom : null} {loading} />
     </div>
   </div>
-  <div class="legend-container container-bg">
-    <Legend />
+  <div class="legend-container container-bg container-style">
+    <Legend {loading} />
   </div>
 
   <div class="small-multiples">
@@ -226,12 +207,12 @@
 
   <MapBox
     bind:this={map}
-    on:idle={() => currentDataReadyOnMap.set(true)}
-    data={$currentData}
+    on:loading={(e) => (loading = e.detail)}
+    {data}
     sensor={$currentSensor}
     level={$currentLevel}
     signalType={$signalType}
-    showCumulative={$signalShowCumulative}
+    signalOptions={$signalCasesOrDeathOptions}
     selection={$currentRegionInfo}
     encoding={$encoding}
     on:ready={() => initialReady()}

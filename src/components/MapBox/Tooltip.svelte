@@ -1,12 +1,20 @@
 <script>
   import { timeFormat } from 'd3-time-format';
-  import { signalType, currentSensorEntry, colorScale, currentDateObject, signalShowCumulative } from '../../stores';
+  import {
+    signalType,
+    currentSensorEntry,
+    colorScale,
+    currentDateObject,
+    signalCasesOrDeathOptions,
+  } from '../../stores';
   import { DIRECTION_THEME } from '../../theme';
   import { getTextColorBasedOnBackground } from '../../util';
 
   export let invalid = false;
   export let properties;
   $: value = properties ? properties.value : 0;
+
+  $: options = $signalCasesOrDeathOptions;
 
   const formatTimeWithoutYear = timeFormat('%B %d');
 
@@ -77,30 +85,54 @@
           </tr>
         {:else if $currentSensorEntry.isCasesOrDeath}
           <tr>
-            <th colspan="2" class="area">{$currentSensorEntry.yAxis}</th>
+            <th>{$currentSensorEntry.yAxis}</th>
+            <th class="area">Count</th>
+            <th class="area">Ratio per 100k</th>
           </tr>
           <tr>
             <th>{formatTimeWithoutYear($currentDateObject)}</th>
-            <td class="right" style={$signalShowCumulative ? '' : colorScaleStyle(properties.count)}>
+            <td class="right" style={!options.cumulative && !options.ratio ? colorScaleStyle(properties.count) : ''}>
               {$currentSensorEntry.formatValue(properties.count)}
+            </td>
+            <td
+              class="right"
+              style={!options.cumulative && options.ratio ? colorScaleStyle(properties.countRatio) : ''}>
+              {$currentSensorEntry.formatValue(properties.countRatio)}
             </td>
           </tr>
           <tr>
             <th>7-day avg</th>
-            <td class="right" style={$signalShowCumulative ? '' : colorScaleStyle(properties.avg)}>
+            <td class="right" style={!options.cumulative && !options.ratio ? colorScaleStyle(properties.avg) : ''}>
               {$currentSensorEntry.formatValue(properties.avg)}
+            </td>
+            <td class="right" style={!options.cumulative && options.ratio ? colorScaleStyle(properties.avgRatio) : ''}>
+              {$currentSensorEntry.formatValue(properties.avgRatio)}
             </td>
           </tr>
           <tr>
             <th>{formatTimeWithoutYear($currentDateObject)} (cumulated)</th>
-            <td class="right" style={$signalShowCumulative ? colorScaleStyle(properties.countCumulative) : ''}>
+            <td
+              class="right"
+              style={options.cumulative && !options.ratio ? colorScaleStyle(properties.countCumulative) : ''}>
               {$currentSensorEntry.formatValue(properties.countCumulative)}
+            </td>
+            <td
+              class="right"
+              style={options.cumulative && options.ratio ? colorScaleStyle(properties.countRatioCumulative) : ''}>
+              {$currentSensorEntry.formatValue(properties.countRatioCumulative)}
             </td>
           </tr>
           <tr>
             <th>7-day avg (cumulated)</th>
-            <td class="right" style={$signalShowCumulative ? colorScaleStyle(properties.avgCumulative) : ''}>
+            <td
+              class="right"
+              style={options.cumulative && !options.ratio ? colorScaleStyle(properties.avgCumulative) : ''}>
               {$currentSensorEntry.formatValue(properties.avgCumulative)}
+            </td>
+            <td
+              class="right"
+              style={options.cumulative && options.ratio ? colorScaleStyle(properties.avgRatioCumulative) : ''}>
+              {$currentSensorEntry.formatValue(properties.avgRatioCumulative)}
             </td>
           </tr>
         {:else}

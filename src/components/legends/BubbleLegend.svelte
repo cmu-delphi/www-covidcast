@@ -6,8 +6,7 @@
     colorScale,
     bubbleRadiusScale,
     currentSensorEntry,
-    currentDataReadyOnMap,
-    signalShowCumulative,
+    signalCasesOrDeathOptions,
   } from '../../stores';
   import { transparent } from '../../util';
   import { getSigfigs, generateLabels } from '../MapBox/colors';
@@ -16,8 +15,10 @@
   let unit = '';
   let labels = [];
 
+  export let loading = false;
+
   $: {
-    const r = generateLabels($stats, $currentSensorEntry, $currentLevel, $signalShowCumulative);
+    const r = generateLabels($stats, $currentSensorEntry, $currentLevel, $signalCasesOrDeathOptions);
     labels = r.labels;
     high = r.high;
     unit = r.unit;
@@ -50,7 +51,7 @@
   }
 </style>
 
-<ul class="bubble-legend" class:loading-bg={!$currentDataReadyOnMap}>
+<ul class="bubble-legend" class:loading-bg={loading}>
   {#each labels as [label], j}
     {#if +label > 0}
       <li class="colored">

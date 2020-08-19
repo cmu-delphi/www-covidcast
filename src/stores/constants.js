@@ -56,6 +56,12 @@ export function getLevelInfo(level) {
 }
 
 /**
+ * @typedef {object} CasesOrDeathOptions
+ * @property {boolean} cumulative
+ * @property {boolean} ratio
+ */
+
+/**
  * @typedef {object} SensorEntry
  * @property {string} key
  * @property {'public' | 'early' | 'late'} type
@@ -64,6 +70,7 @@ export function getLevelInfo(level) {
  * @property {string} signal
  * @property {string[]} levels
  * @property {string} tooltipText
+ * @property {string | ((options: CasesOrDeathOptions) => string)} mapTitleText
  * @property {string} yAxis
  * @property {string} format
  * @property {string} signal
@@ -82,17 +89,61 @@ export function getLevelInfo(level) {
  * @property {number} count
  * @property {number} avgCumulative
  * @property {number} countCumulative
+ * @property {number} avgRatio
+ * @property {number} countRatio
+ * @property {number} avgRatioCumulative
+ * @property {number} countRatioCumulative
  */
 
 /**
  * @type {(keyof EpiDataCasesOrDeathValues)[]}
  */
-export const EPIDATA_CASES_OR_DEATH_VALUES = ['avg', 'avgCumulative', 'count', 'countCumulative'];
+export const EPIDATA_CASES_OR_DEATH_VALUES = [
+  'avg',
+  'avgCumulative',
+  'count',
+  'countCumulative',
+  'avgRatio',
+  'avgRatioCumulative',
+  'countRatio',
+  'countRatioCumulative',
+];
 
 const basePercentFormatter = format('.2%');
 const percentFormatter = (v) => basePercentFormatter(v / 100);
 const intFormatter = format(',d');
 const rawFormatter = format(',.2f');
+
+function generateCasesOrDeathSignals(signal) {
+  const ratioSignal = signal.replace('_num', '_prop');
+  return {
+    avg: signal,
+    avgCumulative: checkWIP(signal, signal.replace('incidence', 'cumulative')),
+    count: checkWIP(signal, signal.replace('7dav_', '')),
+    countCumulative: checkWIP(signal, signal.replace('7dav_incidence', 'cumulative')),
+
+    avgRatio: ratioSignal,
+    avgRatioCumulative: checkWIP(ratioSignal, ratioSignal.replace('incidence', 'cumulative')),
+    countRatio: checkWIP(ratioSignal, ratioSignal.replace('7dav_', '')),
+    countRatioCumulative: checkWIP(ratioSignal, ratioSignal.replace('7dav_incidence', 'cumulative')),
+  };
+}
+
+/**
+ * determines the primary value to show or lookup
+ * @param {SensorEntry} sensorEntry
+ * @param {CasesOrDeathOptions} sensorOptions
+ */
+export function primaryValue(sensorEntry, sensorOptions) {
+  if (!sensorEntry.isCasesOrDeath) {
+    return 'value';
+  }
+  if (sensorOptions.cumulative) {
+    return sensorOptions.ratio ? 'avgRatioCumulative' : 'avgCumulative';
+  }
+  return sensorOptions.ratio ? 'avgRatio' : 'avg';
+}
+
 /**
  *
  * @param {*} sensorEntry
@@ -101,20 +152,14 @@ export function extendSensorEntry(sensorEntry) {
   const key = `${sensorEntry.id}-${sensorEntry.signal}`;
   const isCasesOrDeath = isCasesSignal(key) || isDeathSignal(key);
   const isCount = isCountSignal(key);
+  const signal = sensorEntry.signal;
   return Object.assign(sensorEntry, {
     key,
     formatValue: sensorEntry.format === 'percent' ? percentFormatter : isCount ? intFormatter : rawFormatter,
     isCount,
     isProp: isPropSignal(key),
     isCasesOrDeath,
-    casesOrDeathSignals: isCasesOrDeath
-      ? {
-          avg: sensorEntry.signal,
-          avgCumulative: checkWIP(sensorEntry.signal, sensorEntry.signal.replace('incidence', 'cumulative')),
-          count: checkWIP(sensorEntry.signal, sensorEntry.signal.replace('7dav_', '')),
-          countCumulative: checkWIP(sensorEntry.signal, sensorEntry.signal.replace('7dav_incidence', 'cumulative')),
-        }
-      : {},
+    casesOrDeathSignals: isCasesOrDeath ? generateCasesOrDeathSignals(signal) : {},
   });
 }
 
@@ -230,20 +275,20 @@ const defaultSensors = [
     levels: ['msa', 'county', 'state'],
     tooltipText:
       'Daily new confirmed COVID-19 cases (7-day average), based on data reported by USAFacts and Johns Hopkins University',
-    mapTitleText: 'Daily new confirmed COVID-19 cases (7-day average)',
+    mapTitleText: (options) => {
+      if (options.cumulative) {
+        if (options.ratio) {
+          return 'Cumulated daily new COVID-19 cases per 100,000 people (7-day average)';
+        } else {
+          return 'Cumulated daily new COVID-19 cases (7-day average)';
+        }
+      } else if (options.ratio) {
+        return 'Daily new COVID-19 cases per 100,000 people (7-day average)';
+      } else {
+        return 'Daily new COVID-19 cases (7-day average)';
+      }
+    },
     yAxis: 'Cases',
-    format: 'raw',
-  },
-  {
-    type: 'late',
-    name: 'Cases per 100,000 People',
-    id: 'indicator-combination',
-    signal: 'confirmed_7dav_incidence_prop',
-    levels: ['msa', 'county', 'state'],
-    tooltipText:
-      'Daily new confirmed COVID-19 cases per 100,000 people (7-day average), based on data reported by USAFacts and Johns Hopkins University',
-    mapTitleText: 'Daily new confirmed COVID-19 cases per 100,000 people (7-day average)',
-    yAxis: 'Cases per 100,000 people',
     format: 'raw',
   },
   {
@@ -254,20 +299,20 @@ const defaultSensors = [
     levels: ['msa', 'county', 'state'],
     tooltipText:
       'Daily new COVID-19 deaths (7-day average), based on data reported by USAFacts and Johns Hopkins University',
-    mapTitleText: 'Daily new COVID-19 deaths (7-day average)',
+    mapTitleText: (options) => {
+      if (options.cumulative) {
+        if (options.ratio) {
+          return 'Cumulated daily new COVID-19 deaths per 100,000 people (7-day average)';
+        } else {
+          return 'Cumulated daily new COVID-19 deaths (7-day average)';
+        }
+      } else if (options.ratio) {
+        return 'Daily new COVID-19 deaths per 100,000 people (7-day average)';
+      } else {
+        return 'Daily new COVID-19 deaths (7-day average)';
+      }
+    },
     yAxis: 'Deaths',
-    format: 'raw',
-  },
-  {
-    type: 'late',
-    name: 'Deaths per 100,000 People',
-    id: 'indicator-combination',
-    signal: 'deaths_7dav_incidence_prop',
-    levels: ['msa', 'county', 'state', 'hrr'],
-    tooltipText:
-      'Daily new COVID-19 deaths per 100,000 people (7-day average), based on data reported by USAFacts and Johns Hopkins University',
-    mapTitleText: 'Daily new COVID-19 deaths per 100,000 people (7-day average)',
-    yAxis: 'Deaths per 100,000 people',
     format: 'raw',
   },
   {

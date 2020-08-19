@@ -16,6 +16,7 @@
   export let zoom;
 
   export let showEncodings = false;
+  export let loading = false;
 </script>
 
 <style>
@@ -140,5 +141,5 @@
       </button>
     </div>
   {/if}
-  <Loading />
+  <Loading {loading} />
 </div>

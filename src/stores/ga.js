@@ -6,7 +6,7 @@ import {
   signalType,
   encoding,
   currentMode,
-  signalShowCumulative,
+  signalCasesOrDeathOptions,
 } from '.';
 
 export function trackUrl(url) {
@@ -32,4 +32,7 @@ currentDate.subscribe((date) => trackEvent('date', 'set', date));
 signalType.subscribe((signalType) => trackEvent('signalType', 'set', signalType));
 encoding.subscribe((encoding) => trackEvent('encoding', 'set', encoding));
 currentMode.subscribe((mode) => trackEvent('mode', 'set', mode.id));
-signalShowCumulative.subscribe((show) => trackEvent('signalShowCumulative', 'set', String(show)));
+signalCasesOrDeathOptions.subscribe((r) => {
+  trackEvent('signalCasesOrDeathOptions', 'cumulative', String(r.cumulative));
+  trackEvent('signalCasesOrDeathOptions', 'ratio', String(r.ratio));
+});

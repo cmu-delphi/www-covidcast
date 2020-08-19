@@ -1,5 +1,5 @@
 <script>
-  import { currentSensorEntry } from '../stores';
+  import { currentSensorMapTitle } from '../stores';
 </script>
 
 <style>
@@ -19,6 +19,6 @@
 </style>
 
 <h2 class="banner">
-  {$currentSensorEntry.mapTitleText}
+  {$currentSensorMapTitle}
   <slot />
 </h2>
