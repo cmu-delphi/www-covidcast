@@ -9,52 +9,55 @@
     signalCasesOrDeathOptions,
   } from '../../stores';
   import { transparent } from '../../util';
-  import { getSigfigs, generateLabels } from '../MapBox/colors';
+  import { generateLabels } from '../MapBox/colors';
 
   const spikeBase = ENCODING_SPIKE_THEME.baseSize;
   const spikePadding = 5;
 
   export let loading = false;
 
-  let size;
-  let maxHeight;
-  let heightScale;
-
-  let high = '';
-  let unit = '';
-  let labels = [];
-
-  $: {
-    size = ENCODING_SPIKE_THEME.size[$currentLevel] * spikeBase;
-    maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel] * spikeBase;
-
-    const r = generateLabels($stats, $currentSensorEntry, $currentLevel, $signalCasesOrDeathOptions);
-    labels = r.labels;
-    high = r.high;
-    unit = r.unit;
-    heightScale = $spikeHeightScale.clone().range([0, maxHeight]).domain(r.valueMinMax);
-  }
+  $: size = ENCODING_SPIKE_THEME.size[$currentLevel] * spikeBase;
+  $: maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel] * spikeBase;
+  $: r = generateLabels($stats, $currentSensorEntry, $currentLevel, $colorScale, $signalCasesOrDeathOptions);
+  $: heightScale = $spikeHeightScale.clone().range([0, maxHeight]).domain(r.valueMinMax);
+  $: maxPaddingHeight = maxHeight + spikePadding * 2;
 
   function getSpikePath(value) {
     if (!heightScale) {
       return '';
     }
-    return `M 0 ${heightScale(+value)} L ${size} 0 L ${size * 2} ${heightScale(+value)}`;
+    return `M 0 ${heightScale(value)} L ${size} 0 L ${size * 2} ${heightScale(value)}`;
   }
 </script>
 
 <style>
-  .spike-legend {
+  ul {
     margin: 0;
     padding: 0;
     display: flex;
-    justify-content: space-around;
-    align-items: baseline;
-    list-style: none;
+    font-size: 80%;
   }
 
   li {
-    font-size: 80%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    flex: 2 2 0;
+    min-width: 5em;
+    margin-bottom: 1em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    position: relative;
+  }
+
+  li.tick::after {
+    content: attr(title);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
     text-align: center;
   }
 
@@ -70,35 +73,29 @@
   }
 </style>
 
-<ul class="spike-legend" class:loading-bg={loading}>
-  {#each labels as [label]}
-    {#if +label > 0}
-      <li>
-        <svg width={size * 2 + spikePadding * 2} height={heightScale(+label) + spikePadding * 2}>
-          <g style="transform:translate({spikePadding}px, {spikePadding}px)">
-            <path
-              d={getSpikePath(+label)}
-              class="spike"
-              fill={transparent($colorScale(+label), ENCODING_SPIKE_THEME.fillOpacity)}
-              stroke={transparent($colorScale(+label), ENCODING_SPIKE_THEME.strokeOpacity)} />
-          </g>
-        </svg>
-        <div>{getSigfigs(label, 3)}</div>
-      </li>
-    {/if}
-  {/each}
-  {#if high}
-    <li>
-      <svg width={size * 2 + spikePadding * 2} height={heightScale(+high) + spikePadding * 2}>
+<ul class:loading-bg={loading}>
+  {#each r.labels as l}
+    <li class="tick" title={l.label} style="height: {maxPaddingHeight}px">
+      <svg width={size * 2 + spikePadding * 2} height={heightScale(l.value) + spikePadding * 2}>
         <g style="transform:translate({spikePadding}px, {spikePadding}px)">
           <path
-            d={getSpikePath(+high)}
+            d={getSpikePath(l.value)}
             class="spike"
-            fill={transparent($colorScale(+high), ENCODING_SPIKE_THEME.fillOpacity)}
-            stroke={transparent($colorScale(+high), ENCODING_SPIKE_THEME.strokeOpacity)} />
+            fill={transparent(l.color, ENCODING_SPIKE_THEME.fillOpacity)}
+            stroke={transparent(l.color, ENCODING_SPIKE_THEME.strokeOpacity)} />
         </g>
       </svg>
-      <div>{high ? high + unit + '+' : ''}</div>
     </li>
-  {/if}
+  {/each}
+  <li class="tick" title={r.high} style="height: {maxPaddingHeight}px">
+    <svg width={size * 2 + spikePadding * 2} height={heightScale(r.highValue) + spikePadding * 2}>
+      <g style="transform:translate({spikePadding}px, {spikePadding}px)">
+        <path
+          d={getSpikePath(r.highValue)}
+          class="spike"
+          fill={transparent(r.highColor, ENCODING_SPIKE_THEME.fillOpacity)}
+          stroke={transparent(r.highColor, ENCODING_SPIKE_THEME.strokeOpacity)} />
+      </g>
+    </svg>
+  </li>
 </ul>
