@@ -32,7 +32,7 @@ export function caseMissing(thenCase, elseCase) {
   ];
 }
 
-export function colorInterpolation(stops) {
+export function interpolateValue(stops) {
   return caseMissing(
     MAP_THEME.countyFill,
     // else interpolate

@@ -2,7 +2,7 @@ import { L } from '../layers';
 import { S } from '../sources';
 import { getType } from '../../../data/signals';
 import { parseScaleSpec } from '../../../stores/scales';
-import { caseMissing, colorInterpolation } from './utils';
+import { caseMissing, interpolateValue } from './utils';
 import { levels } from '../../../stores';
 
 export default class BubbleEncoding {
@@ -51,7 +51,7 @@ export default class BubbleEncoding {
     map.setPaintProperty(L[level].fill, 'fill-color', this.theme.countyFill);
 
     // color scale (color + stroke color)
-    const colorExpression = colorInterpolation(stops);
+    const colorExpression = interpolateValue(stops);
     const minRadius = this.theme.minRadius[level];
     const maxRadius = this.theme.maxRadius[level];
 
