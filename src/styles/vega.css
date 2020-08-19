@@ -6,3 +6,7 @@
 .vg-tooltip td {
   border: none;
 }
+
+.vg-tooltip td.value {
+  text-align: right !important;
+}

@@ -1,5 +1,5 @@
 <script>
-  import { currentRegion, currentLevel, currentRegionInfo } from '../../stores';
+  import { currentRegion, currentLevel, currentRegionInfo, signalCasesOrDeathOptions } from '../../stores';
   import { fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../../components/vega/Vega.svelte';
   import spec from './DetailView.json';
@@ -8,6 +8,8 @@
   import { createEventDispatcher } from 'svelte';
   import { merge } from 'lodash-es';
   import { isCasesSignal, isDeathSignal } from '../../data';
+  import { primaryValue } from '../../stores/constants';
+  import EncodingOptions from '../../components/EncodingOptions.svelte';
 
   const dispatch = createEventDispatcher();
   /**
@@ -18,36 +20,108 @@
   $: data = fetchTimeSlice(sensor, $currentLevel, $currentRegion);
   $: isCasesOrDeath = isCasesSignal(sensor.key) || isDeathSignal(sensor.key);
 
-  function patchSpec(spec, size) {
-    return merge({}, spec, {
-      vconcat: [
-        {
-          width: size.width - 45,
-          height: size.height - 60 - 70,
-          encoding: {
-            y: {
-              axis: {
-                title: sensor.yAxis || '',
+  $: regularPatch = {
+    vconcat: [
+      {
+        encoding: {
+          y: {
+            axis: {
+              title: sensor.yAxis || '',
+            },
+          },
+          tooltip: [{ title: sensor.name }],
+        },
+      },
+      {
+        encoding: {
+          y: {
+            axis: {
+              title: sensor.yAxis || '',
+            },
+          },
+          tooltip: [{ title: sensor.name }],
+        },
+      },
+    ],
+  };
+  $: casesPatch = {
+    vconcat: [
+      {
+        encoding: {
+          y: {
+            field: primaryValue(sensor, $signalCasesOrDeathOptions).replace('avg', 'count'),
+          },
+          tooltip: [
+            { title: sensor.name },
+            {},
+            { title: `${sensor.name} per 100k` },
+            {},
+            { title: `${sensor.name} (cumulated)` },
+            {},
+            { title: `${sensor.name}  per 100k (cumulated)` },
+          ],
+        },
+        layer: [
+          {},
+          {
+            encoding: {
+              y: {
+                field: primaryValue(sensor, $signalCasesOrDeathOptions),
               },
             },
-            tooltip: [{ title: sensor.name }],
           },
+        ],
+      },
+      {
+        encoding: {
+          y: {
+            field: primaryValue(sensor, $signalCasesOrDeathOptions).replace('avg', 'count'),
+          },
+          tooltip: [{ title: sensor.name }],
         },
+      },
+    ],
+  };
+
+  function generatePatch(title) {
+    return (spec, size) =>
+      merge(
+        {},
+        spec,
         {
-          width: size.width - 45,
-          height: 60,
-          encoding: {
-            y: {
-              axis: {
-                title: sensor.yAxis || '',
+          vconcat: [
+            {
+              width: size.width - 45,
+              height: size.height - 60 - 70,
+              encoding: {
+                y: {
+                  axis: {
+                    title: sensor.yAxis || '',
+                  },
+                },
+                tooltip: [{ title: sensor.name }],
               },
             },
-            tooltip: [{ title: sensor.name }],
-          },
+            {
+              width: size.width - 45,
+              height: 60,
+              encoding: {
+                y: {
+                  axis: {
+                    title: sensor.yAxis || '',
+                  },
+                },
+                tooltip: [{ title: sensor.name }],
+              },
+            },
+          ],
         },
-      ],
-    });
+        title,
+      );
   }
+
+  $: patchSpec = generatePatch(isCasesOrDeath ? casesPatch : regularPatch);
+
   /**
    * @param {KeyboardEvent} e
    */
@@ -84,6 +158,21 @@
     right: 0;
     top: 0;
   }
+
+  .toggles {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .button-group {
+    margin: 0.2em;
+  }
+
+  .button {
+    width: 10em;
+    padding: 0.2em 0.5em;
+  }
 </style>
 
 <div class="header">
@@ -92,6 +181,7 @@
   <button class="pg-button close" on:click={() => dispatch('close')} title="Close this detail view">
     <IoIosClose />
   </button>
+  <EncodingOptions center {sensor} />
 </div>
 <div class="single-sensor-chart vega-wrapper">
   <Vega {data} spec={isCasesOrDeath ? specCasesDeath : spec} {patchSpec} />
