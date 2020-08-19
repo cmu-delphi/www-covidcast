@@ -6,7 +6,6 @@
     currentSensor,
     currentLevel,
     encoding,
-    currentRange,
     colorScale,
     colorStops,
     bubbleRadiusScale,
@@ -17,6 +16,7 @@
     selectByFeature,
     currentSensorEntry,
     currentDateObject,
+    signalCasesOrDeathOptions,
   } from '../../stores';
   import Search from '../../components/Search.svelte';
   import SmallMultiplesPanel from './SmallMultiplesPanel.svelte';
@@ -43,7 +43,6 @@
     if (!info) {
       return;
     }
-    currentRange.set(info.range);
     if (info.scale) {
       colorScale.set(info.scale);
     }
