@@ -1,3 +1,5 @@
+import { MAP_THEME } from '../../../theme';
+
 export function caseHoveredOrSelected(thenCase, elseCase, invert = false) {
   return [
     'case',
@@ -28,4 +30,12 @@ export function caseMissing(thenCase, elseCase) {
     // else interpolate
     elseCase,
   ];
+}
+
+export function colorInterpolation(stops) {
+  return caseMissing(
+    MAP_THEME.countyFill,
+    // else interpolate
+    ['interpolate', ['linear'], ['to-number', ['feature-state', 'value'], 0], ...stops.flat()],
+  );
 }
