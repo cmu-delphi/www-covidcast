@@ -13,6 +13,8 @@
    * @type {import('./MapBox/ZoomMap').default}
    */
   export let zoom;
+
+  export let loading = false;
 </script>
 
 <style>
@@ -99,5 +101,5 @@
       </button>
     </div>
   {/if}
-  <Loading />
+  <Loading {loading} />
 </div>

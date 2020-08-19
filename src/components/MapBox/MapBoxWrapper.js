@@ -23,6 +23,10 @@ export default class MapBoxWrapper {
      */
     this.map = null;
     this.mapSetupReady = false;
+    this.mapSetupReadyPromiseResolver = () => undefined;
+    this.mapSetupReadyPromise = new Promise((resolve) => {
+      this.mapSetupReadyPromiseResolver = resolve;
+    });
     this.mapDataReady = false;
     this.mapEncodingReady = false;
 
@@ -105,6 +109,7 @@ export default class MapBoxWrapper {
           return;
         }
         this.mapSetupReady = true;
+        this.mapSetupReadyPromiseResolver();
         this.dispatch('readySetup');
         break;
       }
@@ -293,35 +298,47 @@ export default class MapBoxWrapper {
   /**
    *
    * @param {'county' | 'state' | 'msa'} level
-   * @param {import('../../data/fetchData').EpiDataRow[]>} data
+   * @param {Promise<import('../../data/fetchData').EpiDataRow[]>>} data
    */
   updateSources(level, data, primaryValue = 'value') {
-    if (!this.map || !this.mapSetupReady) {
-      return;
-    }
-    const lookup = new Map(data.map((d) => [d.geo_value.toUpperCase(), d]));
-    if (level === 'county') {
-      this.updateSource(S[levelMegaCounty.id].border, lookup, primaryValue);
-    }
-    this.updateSource(S[level].border, lookup, primaryValue);
-    this.updateSource(S[level].center, lookup, primaryValue);
+    // flag to compare if we still load the same data
+    const dataFlag = Math.random().toString(36);
+    this._mapDataFlag = dataFlag;
 
-    for (const encoding of this.encodings) {
-      encoding.updateSources(this.map, level);
-    }
-    if (data.length > 0) {
-      this.markReady('data');
-    }
+    this.dispatch('loading', true);
+
+    Promise.all([data, this.mapSetupReadyPromise]).then(([data]) => {
+      if (this._mapDataFlag !== dataFlag) {
+        // some other loading operation is done in the meanwhile
+        return;
+      }
+      // once idle dispatch done loading
+      this.map.once('idle', () => {
+        this.dispatch('loading', false);
+      });
+
+      const lookup = new Map(data.map((d) => [d.geo_value.toUpperCase(), d]));
+      if (level === 'county') {
+        this._updateSource(S[levelMegaCounty.id].border, lookup, primaryValue);
+      }
+      this._updateSource(S[level].border, lookup, primaryValue);
+      this._updateSource(S[level].center, lookup, primaryValue);
+
+      for (const encoding of this.encodings) {
+        encoding.updateSources(this.map, level);
+      }
+      if (data.length > 0) {
+        this.markReady('data');
+      }
+    });
   }
   /**
    *
    * @param {string} sourceId
    * @param {Map<string, import('../../data/fetchData').EpiDataRow>} values
    */
-  updateSource(sourceId, values, primaryValue = 'value') {
-    if (!this.map) {
-      return;
-    }
+  _updateSource(sourceId, values, primaryValue = 'value') {
+    console.assert(this.map != null);
     const source = this.map.getSource(sourceId);
     if (!source) {
       return;

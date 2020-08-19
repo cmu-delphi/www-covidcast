@@ -6,14 +6,15 @@
     colorScale,
     spikeHeightScale,
     currentSensorEntry,
-    currentDataReadyOnMap,
-    signalShowCumulative,
+    signalCasesOrDeathOptions,
   } from '../../stores';
   import { transparent } from '../../util';
   import { getSigfigs, generateLabels } from '../MapBox/colors';
 
   const spikeBase = ENCODING_SPIKE_THEME.baseSize;
   const spikePadding = 5;
+
+  export let loading = false;
 
   let size;
   let maxHeight;
@@ -27,7 +28,7 @@
     size = ENCODING_SPIKE_THEME.size[$currentLevel] * spikeBase;
     maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel] * spikeBase;
 
-    const r = generateLabels($stats, $currentSensorEntry, $currentLevel, $signalShowCumulative);
+    const r = generateLabels($stats, $currentSensorEntry, $currentLevel, $signalCasesOrDeathOptions);
     labels = r.labels;
     high = r.high;
     unit = r.unit;
@@ -69,7 +70,7 @@
   }
 </style>
 
-<ul class="spike-legend" class:loading-bg={!$currentDataReadyOnMap}>
+<ul class="spike-legend" class:loading-bg={loading}>
   {#each labels as [label]}
     {#if +label > 0}
       <li>

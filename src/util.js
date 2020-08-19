@@ -1,13 +1,5 @@
 import { rgb, hsl } from 'd3-color';
 
-export const calculateValFromRectified = (rectified) => {
-  let tempDate = new Date(rectified);
-  let year = tempDate.getFullYear();
-  let month = ('0' + (tempDate.getMonth() + 1)).slice(-2);
-  let date = ('0' + tempDate.getDate()).slice(-2);
-  return year + month + date;
-};
-
 export function getTextColorBasedOnBackground(bgColor) {
   const color = hsl(bgColor);
   return color.l > 0.32 ? '#000' : '#fff';

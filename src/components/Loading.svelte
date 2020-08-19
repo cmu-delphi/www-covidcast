@@ -1,5 +1,5 @@
 <script>
-  import { currentDataReadyOnMap } from '../stores';
+  export let loading = false;
 </script>
 
 <style>
@@ -9,6 +9,6 @@
   }
 </style>
 
-{#if !$currentDataReadyOnMap}
+{#if loading}
   <div class="loader loading" />
 {/if}

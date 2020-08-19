@@ -1,5 +1,5 @@
 <script>
-  import { signalType, currentSensorEntry, signalShowCumulative } from '../stores';
+  import { currentSensorEntry, signalCasesOrDeathOptions } from '../stores';
 </script>
 
 <style>
@@ -21,32 +21,56 @@
 
 <div class="root">
   {#if $currentSensorEntry.isCasesOrDeath}
-    <div aria-label="display cumulative or direct" class="pg-button-group button-group">
+    <div aria-label="display cumulative or indicence" class="pg-button-group button-group">
       <button
-        aria-pressed={!$signalShowCumulative ? 'true' : 'false'}
+        aria-pressed={String(!$signalCasesOrDeathOptions.cumulative)}
         class="pg-button button"
-        class:selected={!$signalShowCumulative}
+        class:selected={!$signalCasesOrDeathOptions.cumulative}
         on:click={() => {
-          if ($signalShowCumulative) {
-            signalShowCumulative.set(false);
+          if ($signalCasesOrDeathOptions.cumulative) {
+            signalCasesOrDeathOptions.set({ ...$signalCasesOrDeathOptions, cumulative: false });
           }
         }}>
         Incidence
       </button>
       <button
-        aria-pressed={$signalShowCumulative ? 'true' : 'false'}
+        aria-pressed={$signalCasesOrDeathOptions.cumulative}
         class="pg-button button"
-        class:selected={$signalShowCumulative}
+        class:selected={$signalCasesOrDeathOptions.cumulative}
         on:click={() => {
-          if (!$signalShowCumulative) {
-            signalShowCumulative.set(true);
+          if (!$signalCasesOrDeathOptions.cumulative) {
+            signalCasesOrDeathOptions.set({ ...$signalCasesOrDeathOptions, cumulative: true });
           }
         }}>
         Cumulative
       </button>
     </div>
+    <div aria-label="display counts or ratio per 100K people" class="pg-button-group button-group">
+      <button
+        aria-pressed={String(!$signalCasesOrDeathOptions.ratio)}
+        class="pg-button button"
+        class:selected={!$signalCasesOrDeathOptions.ratio}
+        on:click={() => {
+          if ($signalCasesOrDeathOptions.ratio) {
+            signalCasesOrDeathOptions.set({ ...$signalCasesOrDeathOptions, ratio: false });
+          }
+        }}>
+        Counts
+      </button>
+      <button
+        aria-pressed={String($signalCasesOrDeathOptions.ratio)}
+        class="pg-button button"
+        class:selected={$signalCasesOrDeathOptions.ratio}
+        on:click={() => {
+          if (!$signalCasesOrDeathOptions.ratio) {
+            signalCasesOrDeathOptions.set({ ...$signalCasesOrDeathOptions, ratio: true });
+          }
+        }}>
+        Ratio per 100K
+      </button>
+    </div>
   {/if}
-  <div aria-label="display type" class="pg-button-group button-group">
+  <!-- <div aria-label="display type" class="pg-button-group button-group">
     <button
       aria-pressed={$signalType === 'value' ? 'true' : 'false'}
       class="pg-button button"
@@ -70,5 +94,5 @@
       disabled>
       7-day Trend
     </button>
-  </div>
+  </div> -->
 </div>

@@ -7,7 +7,7 @@ import {
   signalType,
   encoding,
   currentZone,
-  signalShowCumulative,
+  signalCasesOrDeathOptions,
 } from '.';
 import { get } from 'svelte/store';
 import { trackUrl } from './ga';
@@ -23,7 +23,8 @@ function updateURIParameters(delta) {
     encoding: get(encoding),
     zone: get(currentZone),
     mode: get(currentMode).id,
-    signalC: get(signalShowCumulative),
+    signalC: get(signalCasesOrDeathOptions).cumulative,
+    signalR: get(signalCasesOrDeathOptions).ratio,
     ...delta, // inject current delta
   };
 
@@ -62,9 +63,10 @@ signalType.subscribe((signalType) =>
     signalType,
   }),
 );
-signalShowCumulative.subscribe((signalC) =>
+signalCasesOrDeathOptions.subscribe((r) =>
   updateURIParameters({
-    signalC,
+    signalC: r.cumulative,
+    signalR: r.ratio,
   }),
 );
 encoding.subscribe((encoding) => updateURIParameters({ encoding }));
