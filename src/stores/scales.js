@@ -64,9 +64,9 @@ export function LogScale() {
     return scale;
   };
 
-  scale.expr = function () {
+  scale.expr = function (value) {
     const baseLog = Math.log10(base);
-    return ['+', ['*', a, ['/', ['log10', ['get', 'value']], baseLog]], b];
+    return ['+', ['*', a, ['/', ['log10', value], baseLog]], b];
   };
 
   scale.clone = function () {
@@ -118,8 +118,8 @@ export function SqrtScale() {
     return scale;
   };
 
-  scale.expr = function () {
-    return ['+', ['*', a, ['sqrt', ['get', 'value']]], b];
+  scale.expr = function (value) {
+    return ['+', ['*', a, ['sqrt', value]], b];
   };
 
   scale.clone = function () {
@@ -168,8 +168,8 @@ export function LinearScale() {
     return scale;
   };
 
-  scale.expr = function () {
-    return ['+', ['*', a, ['get', 'value']], b];
+  scale.expr = function (value) {
+    return ['+', ['*', a, value], b];
   };
 
   scale.clone = function () {

@@ -125,9 +125,9 @@
     const mapLoaded = new Promise((resolve) => (mapLoadedResolver = resolve));
     const started = Date.now();
     currentData = getData(date);
-    // let dataNeeded = -1;
+    let dataNeeded = -1;
     currentData.then(() => {
-      // dataNeeded = Date.now() - started;
+      dataNeeded = Date.now() - started;
       // update visual date once the data is loaded but not yet shown
       currentDate.set(formatAPITime(date));
     });
@@ -136,7 +136,7 @@
         return;
       }
       const needed = Date.now() - started;
-      // console.log(needed, dataNeeded, needed - dataNeeded);
+      console.log(needed, dataNeeded, needed - dataNeeded);
       if (needed > FRAME_RATE && bufferCache < MAX_BUFFER_CACHE) {
         // increase buffer if it was too slow
         bufferCache++;

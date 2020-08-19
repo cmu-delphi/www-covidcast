@@ -215,6 +215,20 @@ export default class MapBoxWrapper {
       });
     });
 
+    map.addLayer({
+      id: L.zoneOutline,
+      source: S.zoneOutline,
+      type: 'line',
+      layout: {
+        visibility: 'none',
+      },
+      paint: {
+        'line-color': MAP_THEME.zoneOutline,
+        'line-width': 2,
+        'line-dasharray': [2, 2],
+      },
+    });
+
     [levelMegaCounty.id, ...levels].forEach((level) => {
       map.addLayer({
         id: L[level].hover,
@@ -230,24 +244,11 @@ export default class MapBoxWrapper {
       });
     });
 
-    map.addLayer({
-      id: L.zoneOutline,
-      source: S.zoneOutline,
-      type: 'line',
-      layout: {
-        visibility: 'none',
-      },
-      paint: {
-        'line-color': MAP_THEME.zoneOutline,
-        'line-width': 2,
-        'line-dasharray': [2, 2],
-      },
-    });
-
-    addCityLayers(map);
     this.encodings.forEach((enc) => {
       enc.addLayers(map, this);
     });
+
+    addCityLayers(map);
   }
 
   destroy() {

@@ -15,31 +15,26 @@ import { S } from './sources';
 
 export const L = {
   state: {
-    fill: 'state-fill',
     stroke: 'state-stroke',
-    hover: 'state-hover',
     names: 'state-names',
+
+    fill: 'state-fill',
+    hover: 'state-hover',
+    bubble: 'state-bubble',
   },
   msa: {
     fill: 'msa-fill',
-    stroke: 'msa-stroke',
     hover: 'msa-hover',
+    bubble: 'msa-bubble',
   },
   county: {
     fill: 'county-fill',
-    stroke: 'county-stroke',
     hover: 'county-hover',
+    bubble: 'county-bubble',
   },
   'mega-county': {
     fill: 'mega-county-fill',
-    stroke: 'mega-county-stroke',
     hover: 'mega-county-hover',
-  },
-  bubble: {
-    fill: 'bubble-fill',
-    highlight: {
-      fill: 'bubble-highlight-fill',
-    },
   },
   spike: {
     fill: 'spike-fill',
