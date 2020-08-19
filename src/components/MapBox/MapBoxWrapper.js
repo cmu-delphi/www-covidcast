@@ -298,7 +298,6 @@ export default class MapBoxWrapper {
    * @param {Promise<import('../../data/fetchData').EpiDataRow[]>>} data
    */
   updateSources(level, data, primaryValue = 'value') {
-    console.log('update sources');
     // flag to compare if we still load the same data
     const dataFlag = Math.random().toString(36);
     this._mapDataFlag = dataFlag;
@@ -324,9 +323,7 @@ export default class MapBoxWrapper {
       this._updateSource(S[level].border, lookup, primaryValue);
       this._updateSource(S[level].center, lookup, primaryValue);
 
-      for (const encoding of this.encodings) {
-        encoding.updateSources(this.map, level);
-      }
+      this.encoding.updateSources(this.map, level);
       if (data.length > 0) {
         this.markReady('data');
       }

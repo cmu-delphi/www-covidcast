@@ -190,23 +190,6 @@ export default class InteractiveMap {
     popup.setLngLat(e.lngLat).setDOMContent(this.tooltipElement).addTo(this.map);
   }
 
-  /**
-   * @param {string[]} sources
-   * @param {string} id
-   * @param {{ [key: string]: any;}} state
-   */
-  _setFeatureStateMultiple(sources, id, state) {
-    if (!this.map) {
-      return;
-    }
-    sources.forEach((source) => {
-      if (!this.map.getSource(source)) {
-        throw `source ${source} does not exist`;
-      }
-      this.map.setFeatureState({ source, id }, state);
-    });
-  }
-
   _updateState(source, id, state) {
     this.map.setFeatureState(
       {
@@ -229,7 +212,10 @@ export default class InteractiveMap {
       visibleLevels.add(this.hovered.level);
     }
     for (const level of levelsWithMega) {
-      this.map.setLayoutProperty(L[level].hover, 'visibility', visibleLevels.has(level) ? 'visible' : 'none');
+      const visible = this.map.getLayoutProperty(L[level].hover, 'visibility') !== 'none';
+      if (visible !== visibleLevels.has(level)) {
+        this.map.setLayoutProperty(L[level].hover, 'visibility', visibleLevels.has(level) ? 'visible' : 'none');
+      }
     }
   }
 
@@ -244,13 +230,21 @@ export default class InteractiveMap {
     const setState = { [attr]: true };
     const clearState = { [attr]: false };
 
+    const extraSources = this.adapter.encodings.map((d) => d.interactiveSources).flat();
+
     // match ids
     if (obj.id !== id) {
       if (obj.id) {
         this._updateState(S[obj.level].border, obj.id, clearState);
+        for (const s of extraSources) {
+          this._updateState(s, obj.id, clearState);
+        }
       }
       if (id) {
         this._updateState(S[level].border, id, setState);
+        for (const s of extraSources) {
+          this._updateState(s, id, setState);
+        }
       }
       obj.id = id;
       // store level of selected id

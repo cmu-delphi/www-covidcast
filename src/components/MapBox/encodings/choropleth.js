@@ -6,6 +6,7 @@ export default class ChoroplethEncoding {
   constructor() {
     this.id = 'color';
     this.layers = levels.map((level) => L[level].fill);
+    this.interactiveSources = [];
   }
 
   getVisibleLayers(level) {

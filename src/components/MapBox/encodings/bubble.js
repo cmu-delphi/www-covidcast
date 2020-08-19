@@ -10,6 +10,7 @@ export default class BubbleEncoding {
     this.id = 'bubble';
     this.theme = theme;
     this.layers = levels.map((level) => L[level].bubble);
+    this.interactiveSources = [];
   }
 
   getVisibleLayers(level, signalType) {
@@ -60,7 +61,6 @@ export default class BubbleEncoding {
     const currentRadiusScale = parseScaleSpec(radiusScaleTheme).domain(valueMinMax).range([minRadius, maxRadius]);
 
     const radiusExpression = currentRadiusScale.expr(['to-number', ['feature-state', 'value'], 0]);
-    console.log(radiusExpression);
 
     map.setPaintProperty(L[level].bubble, 'circle-stroke-color', colorExpression);
     map.setPaintProperty(L[level].bubble, 'circle-color', colorExpression);
