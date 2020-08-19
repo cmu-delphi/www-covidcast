@@ -1,17 +1,12 @@
 <script>
   import SmallMultiples from './SmallMultiples.svelte';
-  import { currentSensor, sensorList } from '../../stores';
+  import { sensorList, currentSensor } from '../../stores';
   import IoMdExpand from 'svelte-icons/io/IoMdExpand.svelte';
   import { createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher();
 
-  const remove = [
-    'ght-smoothed_search',
-    'indicator-combination-confirmed_7dav_incidence_num',
-    'indicator-combination-deaths_7dav_incidence_num',
-    'safegraph-full_time_work_prop',
-  ];
+  const remove = ['ght-smoothed_search', 'safegraph-full_time_work_prop'];
 
   export let detail = null;
 
