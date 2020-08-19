@@ -17,10 +17,8 @@ export const S = {
     border: 'mega-county-border',
     //center: 'mega-county-centers',
   },
-  bubble: 'bubble-source',
   spike: {
     fill: 'spike-fill-source',
-    stroke: 'spike-stroke-source',
   },
   cityPoint: 'city-point',
   megaCounty: 'mega-county',
