@@ -1,22 +1,13 @@
 <script>
   import Options from '../../components/Options.svelte';
-  import {
-    currentData,
-    currentLevel,
-    currentSensorEntry,
-    currentMode,
-    currentRegion,
-    currentRegionName,
-    currentDateObject,
-    currentSensor,
-  } from '../../stores';
+  import { currentLevel, currentSensorEntry, currentMode, currentRegion, currentDateObject } from '../../stores';
   import hotspotsLineChart from './HotspotsLineChart.json';
-  import { fetchTimeSlice } from '../../data/fetchData';
+  import { fetchTimeSlice, fetchRegionSlice } from '../../data/fetchData';
   import IoIosPin from 'svelte-icons/io/IoIosPin.svelte';
   import modes from '..';
   import { regionSearchLookup } from '../../stores/search';
   import Vega from '../../components/vega/Vega.svelte';
-  import { formatAPITime, isCasesSignal, isDeathSignal } from '../../data';
+  import { formatAPITime } from '../../data';
 
   /**
    * @param {import('../../data/fetchData').EpiDataRow} row
@@ -102,10 +93,18 @@
   }
 
   // transform current data
-  $: rawData = $currentData
-    .map((row) => toHotspotData(row, $regionSearchLookup, $currentLevel))
-    .sort(byHotspot)
-    .slice(0, TOP_HOTSPOTS);
+  let rawData = [];
+  let loading = true;
+  $: {
+    loading = true;
+    fetchRegionSlice($currentSensorEntry, $currentLevel, $currentDateObject).then((rows) => {
+      rawData = rows
+        .map((row) => toHotspotData(row, $regionSearchLookup, $currentLevel))
+        .sort(byHotspot)
+        .slice(0, TOP_HOTSPOTS);
+      loading = false;
+    });
+  }
 
   $: data = (() => {
     // fetch all data
@@ -123,10 +122,9 @@
   function jumpTo(row) {
     currentMode.set(modes.find((d) => d.id === 'overview'));
     currentRegion.set(row.id);
-    currentRegionName.set(row.name);
   }
 
-  $: showAverage = isCasesSignal($currentSensor) || isDeathSignal($currentSensor);
+  $: isCasesOrDeath = $currentSensorEntry.isCasesOrDeath;
 </script>
 
 <style>
@@ -212,11 +210,11 @@
         <tr>
           <th rowspan="2">Rank</th>
           <th rowspan="2">Name</th>
-          <th colspan={showAverage ? 3 : 2}>{$currentSensorEntry.name}</th>
+          <th colspan={isCasesOrDeath ? 3 : 2}>{$currentSensorEntry.name}</th>
         </tr>
         <tr>
           <th>{$currentDateObject.toLocaleDateString()}</th>
-          {#if showAverage}
+          {#if isCasesOrDeath}
             <th>7-day Average</th>
           {/if}
           <th>Time Series</th>
@@ -235,7 +233,7 @@
               </div>
             </td>
             <td class="right">{row.value != null ? $currentSensorEntry.formatValue(row.value) : 'Unknown'}</td>
-            {#if showAverage}
+            {#if isCasesOrDeath}
               <td class="right">{row.avg != null ? $currentSensorEntry.formatValue(row.avg) : 'Unknown'}</td>
             {/if}
             <td class="chart">
