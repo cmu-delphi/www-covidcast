@@ -341,6 +341,14 @@ export default class MapBoxWrapper {
     source.setData(data);
     return data;
   }
+  updateSourcesOnZoom() {
+    if (!this.map || !this.mapSetupReady) {
+      return;
+    }
+    for (const encoding of this.encodings) {
+      encoding.updateSources(this.map, this.level);
+    }
+  }
 
   /**
    *

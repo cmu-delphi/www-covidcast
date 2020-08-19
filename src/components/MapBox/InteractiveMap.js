@@ -59,6 +59,7 @@ export default class InteractiveMap {
     this.map.on('mouseleave', L[levelMegaCounty.id].fill, this._onLevelMouseLeave.bind(this));
     this.map.on('mousemove', L[levelMegaCounty.id].fill, this._onMegaMouseMove.bind(this));
     this.map.on('click', L[levelMegaCounty.id].fill, this._onMegaMouseClick.bind(this));
+    this.map.on('zoom', this._onZoom.bind(this));
   }
 
   get activePopup() {
@@ -144,6 +145,12 @@ export default class InteractiveMap {
     this._updateHighlight(this.hovered, null, feature.id);
 
     this._renderTooltip(e);
+  }
+  /**
+   * @param {import('mapbox-gl').MapMouseEvent} e
+   */
+  _onZoom() {
+    this.adapter.updateSourcesOnZoom();
   }
   /**
    * @param {'state' | 'county' | 'metro-area'} level

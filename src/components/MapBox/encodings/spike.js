@@ -144,7 +144,7 @@ export default class SpikeEncoding {
     return this.heightScale;
   }
 
-  copyAndUpdate(source, ref) {
+  copyAndUpdate(source, ref, size, zoom) {
     source.features.forEach((feature, i) => {
       // update props
       feature.properties = ref.features[i].properties;
@@ -152,18 +152,21 @@ export default class SpikeEncoding {
       const poly = feature.geometry.coordinates[0];
       const base = poly[0][1];
       // update height
-      poly[1][1] = base + this.heightScale(feature.properties.value);
+      poly[1][1] = base + (this.heightScale(feature.properties.value) / zoom) * 30;
+      poly[0][0] = poly[1][0] - (size / zoom) * 30;
+      poly[2][0] = poly[1][0] + (size / zoom) * 30;
     });
   }
 
   updateSources(map, level) {
     const sources = this.sources[level];
     const ref = map.getSource(S[level].center)._data;
-
+    const zoom = Math.pow(2, map.getZoom());
+    const size = this.theme.size[level];
     // inject new data and rescale into our sources
-    this.copyAndUpdate(sources.fill, ref);
+    this.copyAndUpdate(sources.fill, ref, size, zoom);
     map.getSource(S.spike.fill).setData(sources.fill);
-    this.copyAndUpdate(sources.stroke, ref);
+    this.copyAndUpdate(sources.stroke, ref, size, zoom);
     map.getSource(S.spike.stroke).setData(sources.stroke);
   }
 }
