@@ -4,12 +4,9 @@
   import Options from '../../components/Options.svelte';
   import {
     signalType,
-    currentDataReadyOnMap,
-    currentData,
     currentSensor,
     currentLevel,
     encoding,
-    currentRange,
     colorScale,
     colorStops,
     bubbleRadiusScale,
@@ -18,6 +15,7 @@
     currentSensorEntry,
     times,
     currentDate,
+    signalShowCumulative,
   } from '../../stores';
   import ToggleEncoding from '../../components/ToggleEncoding.svelte';
   import Title from '../../components/Title.svelte';
@@ -26,8 +24,9 @@
   import Player from './Player.svelte';
   import { timeDay } from 'd3';
   import { parseAPITime, formatAPITime } from '../../data';
-  import { fetchRegionSlice, clearRegionCache } from '../../data/fetchData';
+  import { fetchRegionSlice } from '../../data/fetchData';
   import { trackEvent } from '../../stores/ga';
+  import { onMount } from 'svelte';
 
   /**
    * @type {MapBox}
@@ -38,7 +37,6 @@
     if (!info) {
       return;
     }
-    currentRange.set(info.range);
     if (info.scale) {
       colorScale.set(info.scale);
     }
@@ -51,7 +49,21 @@
     }
   }
 
+  const FRAME_RATE = 250; // ms
+  const MAX_BUFFER_CACHE = 7;
+
+  let bufferCache = 3;
+  /**
+   * @type {Map<string, Promise<any>}
+   */
+  const dataBuffer = new Map();
+
+  let nextFrameTimeout = -1;
   let running = false;
+
+  let loading = true;
+  let mapLoadedResolver = () => undefined;
+  let currentData = Promise.resolve([]);
 
   $: minDate =
     $times != null && $times.has($currentSensorEntry.key)
@@ -62,38 +74,76 @@
       ? parseAPITime($times.get($currentSensorEntry.key)[1])
       : $currentDateObject;
 
-  const frameRate = 250; // ms
-  let bufferCache = 3;
-  const maxBufferCache = 7;
-  const bufferedEstimate = new Set();
-  const currentlyBufferingEstimate = new Set();
+  /**
+   * @param {Date} date
+   */
+  function getData(date) {
+    const key = `${date}-${$currentSensorEntry.key}-${$currentLevel}`;
+    // check data buffer
+    if (dataBuffer.has(key)) {
+      const r = dataBuffer.get(key);
+      dataBuffer.delete(r); // delece since used
+      return r;
+    }
+    return fetchRegionSlice($currentSensorEntry, $currentLevel, date);
+  }
 
-  let nextFrameTimeout = -1;
+  /**
+   * @param {Date} date
+   */
+  function prefetchData(date) {
+    let maxCache = timeDay.offset(date, bufferCache);
+    if (maxCache > maxDate) {
+      maxCache = maxDate;
+    }
+    const dates = timeDay.range(timeDay.floor(date), maxCache);
+    for (const toLoad of dates) {
+      const key = `${toLoad}-${$currentSensorEntry.key}-${$currentLevel}`;
+      if (dataBuffer.has(key)) {
+        continue;
+      }
+      dataBuffer.set(key, fetchRegionSlice($currentSensorEntry, $currentLevel, toLoad));
+    }
+  }
 
-  function tick() {
+  function showFrame(date, playNext = false) {
     nextFrameTimeout = -1;
-    const nextDate = timeDay.offset($currentDateObject, 1);
-    if (nextDate > maxDate) {
-      // end
+
+    if (!playNext) {
       running = false;
+      currentData = getData(date);
+      currentData.then(() => {
+        // update visual date once the data is loaded but not yet shown
+        currentDate.set(formatAPITime(date));
+      });
       return;
     }
-    const data = fetchRegionSlice($currentSensorEntry, $currentLevel, nextDate);
-    // need to wait
+
+    const nextDate = timeDay.offset(date, 1);
+    // fetch data
+    prefetchData(date);
+    const mapLoaded = new Promise((resolve) => (mapLoadedResolver = resolve));
     const started = Date.now();
-    data.then(() => {
+    currentData = getData(date);
+    // let dataNeeded = -1;
+    currentData.then(() => {
+      // dataNeeded = Date.now() - started;
+      // update visual date once the data is loaded but not yet shown
+      currentDate.set(formatAPITime(date));
+    });
+    mapLoaded.then(() => {
       if (!running) {
         return;
       }
       const needed = Date.now() - started;
-      if (needed > frameRate && bufferCache < maxBufferCache) {
+      // console.log(needed, dataNeeded, needed - dataNeeded);
+      if (needed > FRAME_RATE && bufferCache < MAX_BUFFER_CACHE) {
         // increase buffer if it was too slow
         bufferCache++;
       }
       nextFrameTimeout = setTimeout(() => {
-        currentDate.set(formatAPITime(nextDate));
-        tick();
-      }, Math.max(0, frameRate - needed));
+        showFrame(nextDate, nextDate < maxDate);
+      }, Math.max(0, FRAME_RATE - needed));
     });
   }
 
@@ -106,65 +156,45 @@
         clearTimeout(nextFrameTimeout);
         nextFrameTimeout = -1;
       }
-      clearRegionCache();
+      dataBuffer.clear();
       return;
     }
     trackEvent('player', 'start');
     // start
     if (maxDate.getTime() === $currentDateObject.getTime()) {
       // auto reset
-      currentDate.set(formatAPITime(minDate.getTime()));
+      showFrame(minDate, true);
+    } else {
+      // tick next day
+      showFrame(timeDay.offset($currentDateObject, 1), true);
     }
-    clearRegionCache();
-    tick();
   }
+
   function jumpToDate(d) {
     if (running) {
       // stop upon manual jump
       toggleRunning();
     }
     trackEvent('player', 'jump', d.toString());
-    currentDate.set(formatAPITime(d));
+    showFrame(d, false);
   }
 
-  function fetchDate(date, sensor, level) {
-    const key = `${date}-${sensor.key}-${level}`;
-    if (bufferedEstimate.has(key)) {
-      return;
+  function paramChange() {
+    // if the user changes the sensor or level we stop and load just the frame
+    if (running) {
+      toggleRunning();
     }
-    if (currentlyBufferingEstimate.size >= maxBufferCache) {
-      return;
-    }
-    currentlyBufferingEstimate.add(key);
-    bufferedEstimate.add(key);
-    fetchRegionSlice(sensor, level, date).then(() => {
-      // mark done
-      currentlyBufferingEstimate.delete(key);
-    });
+    showFrame($currentDateObject, false);
   }
+
+  onMount(() => {
+    showFrame($currentDateObject, false);
+  });
 
   $: {
-    // fetch buffer size upon date change
-    const date = $currentDateObject;
     const sensor = $currentSensorEntry;
     const level = $currentLevel;
-    const dates = timeDay.range(timeDay.floor(date), timeDay.offset(date, bufferCache));
-    for (const d of dates) {
-      // delay for other promises to resolve
-      setTimeout(() => fetchDate(d, sensor, level), 1);
-    }
-    // clear caches of old dates and different sensor entries
-    const old = timeDay.offset(timeDay.floor(date), -2);
-    clearRegionCache((key, keyF) => {
-      const start = keyF(sensor, level, '');
-      if (!key.startsWith(start)) {
-        // different level or sensor
-        return true;
-      }
-      const keyDate = parseAPITime(key.slice(start.length));
-      // delete if time is two days behind the current frame
-      return keyDate <= old;
-    });
+    paramChange(sensor, level);
   }
 </script>
 
@@ -299,20 +329,25 @@
       </div>
     </div>
     <div class="map-controls-container">
-      <MapControls zoom={map ? map.zoom : null} />
+      <MapControls zoom={map ? map.zoom : null} loading={running || loading} />
     </div>
   </div>
   <div class="legend-container container-bg">
-    <Legend />
+    <Legend loading={false} />
   </div>
   <MapBox
     bind:this={map}
-    animationDuration={frameRate}
-    on:idle={() => currentDataReadyOnMap.set(true)}
-    data={$currentData}
+    on:loading={(e) => {
+      loading = e.detail;
+      if (!e.detail) {
+        mapLoadedResolver();
+      }
+    }}
+    data={currentData}
     sensor={$currentSensor}
     level={$currentLevel}
     signalType={$signalType}
     encoding={$encoding}
+    showCumulative={$signalShowCumulative}
     on:updatedEncoding={(e) => updatedEncoding(e.detail)} />
 </main>

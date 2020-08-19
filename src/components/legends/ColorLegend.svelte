@@ -1,18 +1,13 @@
 <script>
-  import {
-    colorScale,
-    currentLevel,
-    currentSensorEntry,
-    stats,
-    currentDataReadyOnMap,
-    signalShowCumulative,
-  } from '../../stores';
+  import { colorScale, currentLevel, currentSensorEntry, stats, signalShowCumulative } from '../../stores';
   import { getSigfigs, generateLabels } from '../MapBox/colors';
   import { DIRECTION_THEME } from '../../theme';
 
   let high = '';
   let unit = '';
   let labels = [];
+
+  export let loading = false;
 
   $: {
     const r = generateLabels($stats, $currentSensorEntry, $currentLevel, $signalShowCumulative);
@@ -69,7 +64,7 @@
   }
 </style>
 
-<ul class:loading-bg={!$currentDataReadyOnMap}>
+<ul class:loading-bg={loading}>
   {#each labels as [label1, label2]}
     <li class="colored">
       {#if +label1 === 0}

@@ -5,6 +5,8 @@
   import ColorLegend from './legends/ColorLegend.svelte';
   import BubbleLegend from './legends/BubbleLegend.svelte';
   import SpikeLegend from './legends/SpikeLegend.svelte';
+
+  export let loading = false;
 </script>
 
 <style>
@@ -34,10 +36,10 @@
   {#if $signalType === 'direction'}
     <DirectionLegend />
   {:else if $encoding === 'color'}
-    <ColorLegend />
+    <ColorLegend {loading} />
   {:else if $encoding === 'bubble'}
-    <BubbleLegend />
+    <BubbleLegend {loading} />
   {:else if $encoding === 'spike'}
-    <SpikeLegend />
+    <SpikeLegend {loading} />
   {/if}
 </div>
