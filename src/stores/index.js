@@ -1,7 +1,7 @@
 import { writable, readable, derived, get } from 'svelte/store';
 import { LogScale, SqrtScale } from './scales';
 import { scaleSequentialLog } from 'd3-scale';
-import { defaultSensorId, sensorList, sensorMap } from './constants';
+import { defaultSensorId, sensorList, sensorMap, levels, swpaLevels } from './constants';
 import modes from '../modes';
 import { parseAPITime } from '../data/utils';
 import { regionSearchLookup } from './search';
@@ -63,7 +63,7 @@ export const currentSensorEntry = derived([currentSensor], ([$currentSensor]) =>
 // 'county', 'state', or 'msa'
 export const currentLevel = writable('county', (set) => {
   const level = urlParams.get('level');
-  if (['county', 'state', 'msa'].includes(level)) {
+  if (levels.includes(level) || swpaLevels.includes(level)) {
     set(level);
   }
 });
