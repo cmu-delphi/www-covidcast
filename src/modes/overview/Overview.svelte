@@ -18,7 +18,7 @@
     selectByInfo,
     selectByFeature,
     currentSensorEntry,
-    signalShowCumulative,
+    signalCasesOrDeathOptions,
     currentDateObject,
   } from '../../stores';
   import ToggleEncoding from '../../components/ToggleEncoding.svelte';
@@ -213,7 +213,7 @@
       <MapControls zoom={map ? map.zoom : null} {loading} />
     </div>
   </div>
-  <div class="legend-container container-bg">
+  <div class="legend-container container-bg container-style">
     <Legend {loading} />
   </div>
 
@@ -228,7 +228,7 @@
     sensor={$currentSensor}
     level={$currentLevel}
     signalType={$signalType}
-    showCumulative={$signalShowCumulative}
+    signalOptions={$signalCasesOrDeathOptions}
     selection={$currentRegionInfo}
     encoding={$encoding}
     on:ready={() => initialReady()}

@@ -5,22 +5,30 @@ import logspace from 'compute-logspace';
 import { DIRECTION_THEME, MAP_THEME } from '../../theme';
 import { zip, transparent, pairAdjacent } from '../../util';
 import { MISSING_VALUE } from './encodings/utils';
+import { primaryValue } from '../../stores/constants';
 
 const MAGIC_MIN_STATS = 0.14;
 const EXPLICIT_ZERO_OFFSET = 0.01;
 
-export function determineMinMax(statsLookup, sensor, level, showCumulative) {
+/**
+ *
+ * @param {*} statsLookup
+ * @param {import('../../stores/constants').SensorEntry} sensorEntry
+ * @param {string} level
+ * @param {import('../../stores/constants').CasesOrDeathOptions} signalOptions
+ */
+export function determineMinMax(statsLookup, sensorEntry, level, signalOptions) {
   // Customize min max values for deaths
-  if (isCountSignal(sensor)) {
-    let key = sensor + '_' + level;
-    if (showCumulative) {
-      key += `_avgCumulative`;
+  if (sensorEntry.isCount) {
+    let key = sensorEntry.key + '_' + level;
+    if (sensorEntry.isCasesOrDeath) {
+      key += `_${primaryValue(sensorEntry, signalOptions)}`;
     }
     const stats = statsLookup.get(key);
     return [Math.max(MAGIC_MIN_STATS, stats.mean - 3 * stats.std), stats.mean + 3 * stats.std];
   }
 
-  const stats = statsLookup.get(sensor);
+  const stats = statsLookup.get(sensorEntry.key);
   return [Math.max(0, stats.mean - 3 * stats.std), stats.mean + 3 * stats.std];
 }
 
@@ -131,8 +139,8 @@ function arr2labels(arr) {
   return labels;
 }
 
-export function generateLabels(stats, sensorEntry, level, showCumulative) {
-  const valueMinMax = stats ? determineMinMax(stats, sensorEntry.key, level, showCumulative) : null;
+export function generateLabels(stats, sensorEntry, level, signalOptions) {
+  const valueMinMax = stats ? determineMinMax(stats, sensorEntry, level, signalOptions) : null;
 
   if (!valueMinMax) {
     return {

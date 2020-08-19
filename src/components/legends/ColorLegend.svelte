@@ -1,5 +1,5 @@
 <script>
-  import { colorScale, currentLevel, currentSensorEntry, stats, signalShowCumulative } from '../../stores';
+  import { colorScale, currentLevel, currentSensorEntry, stats, signalCasesOrDeathOptions } from '../../stores';
   import { getSigfigs, generateLabels } from '../MapBox/colors';
   import { DIRECTION_THEME } from '../../theme';
 
@@ -10,7 +10,7 @@
   export let loading = false;
 
   $: {
-    const r = generateLabels($stats, $currentSensorEntry, $currentLevel, $signalShowCumulative);
+    const r = generateLabels($stats, $currentSensorEntry, $currentLevel, $signalCasesOrDeathOptions);
     labels = r.labels;
     high = r.high;
     unit = r.unit;
