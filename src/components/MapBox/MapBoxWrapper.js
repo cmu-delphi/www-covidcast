@@ -1,9 +1,9 @@
 import geojsonExtent from '@mapbox/geojson-extent';
 import { AttributionControl, Map as MapBox } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { defaultRegionOnStartup, levelMegaCounty, levels, EPIDATA_CASES_OR_DEATH_VALUES } from '../../stores/constants';
+import { defaultRegionOnStartup, levelMegaCounty, levels } from '../../stores/constants';
 import { MAP_THEME } from '../../theme';
-import { IS_NOT_MISSING, MISSING_VALUE, caseHoveredOrSelected, caseSelected } from './encodings/utils';
+import { MISSING_VALUE, caseHoveredOrSelected, caseSelected, caseMissing } from './encodings/utils';
 import InteractiveMap from './InteractiveMap';
 import { addCityLayers, L } from './layers';
 import style from './mapbox_albers_usa_style.json';
@@ -86,10 +86,6 @@ export default class MapBoxWrapper {
           this.markReady('setup');
           resolveCallback(this);
         });
-    });
-
-    this.map.on('render', () => {
-      console.log('render');
     });
 
     return p;
@@ -180,17 +176,17 @@ export default class MapBoxWrapper {
 
   addLayers() {
     const map = this.map;
-    map.addLayer({
-      id: L.county.stroke,
-      source: S.county.border,
-      type: 'fill',
-      paint: {
-        'fill-color': MAP_THEME.countyFill,
-        'fill-outline-color': MAP_THEME.countyOutline,
-        'fill-opacity': 0.4,
-        ...this.animationOptions('fill-color'),
-      },
-    });
+    // map.addLayer({
+    //   id: L.county.stroke,
+    //   source: S.county.border,
+    //   type: 'fill',
+    //   paint: {
+    //     'fill-color': MAP_THEME.countyFill,
+    //     'fill-outline-color': MAP_THEME.countyOutline,
+    //     'fill-opacity': 0.4,
+    //     ...this.animationOptions('fill-color'),
+    //   },
+    // });
 
     map.addLayer({
       id: L.state.stroke,
@@ -207,17 +203,19 @@ export default class MapBoxWrapper {
         id: L[level].fill,
         source: S[level].border,
         type: 'fill',
-        filter: IS_NOT_MISSING,
         layout: {
           visibility: 'none',
         },
         paint: {
           'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
           'fill-color': MAP_THEME.countyFill,
+          'fill-opacity': caseMissing(0, 1),
           ...this.animationOptions('fill-color'),
         },
       });
+    });
 
+    [levelMegaCounty.id, ...levels].forEach((level) => {
       map.addLayer({
         id: L[level].hover,
         source: S[level].border,
@@ -262,7 +260,6 @@ export default class MapBoxWrapper {
   }
 
   updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, stopsMega) {
-    console.log('update options');
     // changed the visibility of layers
     const oldLevel = this.level;
     this.level = level;
@@ -312,14 +309,14 @@ export default class MapBoxWrapper {
         // some other loading operation is done in the meanwhile
         return;
       }
-      console.time('update sources impl');
       // once idle dispatch done loading
       this.map.once('idle', () => {
-        console.time('update sources impl');
         this.dispatch('loading', false);
       });
 
       const lookup = new Map(data.map((d) => [d.geo_value.toUpperCase(), d]));
+      this.interactive.data = lookup;
+
       if (level === 'county') {
         this._updateSource(S[levelMegaCounty.id].border, lookup, primaryValue);
       }
@@ -350,15 +347,16 @@ export default class MapBoxWrapper {
     data.features.forEach((d) => {
       const id = d.properties.id;
       const entry = values.get(id);
-      d.properties.value = entry ? entry[primaryValue] : MISSING_VALUE;
-      d.properties.direction = entry ? entry.direction : MISSING_VALUE;
-      EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
-        d.properties[key] = entry && entry[key] != null ? entry[key] : MISSING_VALUE;
-      });
+      this.map.setFeatureState(
+        {
+          source: sourceId,
+          id: Number.parseInt(d.id, 10),
+        },
+        {
+          value: entry ? entry[primaryValue] : MISSING_VALUE,
+        },
+      );
     });
-
-    source.setData(data);
-    return data;
   }
 
   /**
@@ -383,9 +381,9 @@ export default class MapBoxWrapper {
     if (
       !selection ||
       (selection.level !== levelMegaCounty.id &&
-        (this.interactive.hovered.id == selection.propertyId || oldSelection.id == selection.propertyId)) ||
+        (this.interactive.hovered.id == selection.id || oldSelection.id == selection.id)) ||
       (selection.level === levelMegaCounty.id &&
-        (this.interactive.hovered.mega == selection.propertyId || oldSelection.mega == selection.propertyId))
+        (this.interactive.hovered.mega == selection.id || oldSelection.mega == selection.id))
     ) {
       return;
     }
@@ -397,7 +395,7 @@ export default class MapBoxWrapper {
       return;
     }
     // hacky
-    const feature = source._data.features.find((d) => d.properties.id === selection.propertyId);
+    const feature = source._data.features.find((d) => d.id === selection.id);
 
     if (!feature) {
       return;
