@@ -30,7 +30,6 @@ export default class ChoroplethEncoding {
         property: signalType,
         stops: stopsMega,
       });
-      map.setLayoutProperty(L[levelMegaCounty.id].fill, 'visibility', 'visible');
     }
   }
 

@@ -1,7 +1,15 @@
-export function caseHovered(thenCase, elseCase, invert = false) {
+export function caseHoveredOrSelected(thenCase, elseCase, invert = false) {
   return [
     'case',
     ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
+    invert ? elseCase : thenCase,
+    invert ? thenCase : elseCase,
+  ];
+}
+export function caseSelected(thenCase, elseCase, invert = false) {
+  return [
+    'case',
+    ['boolean', ['feature-state', 'select'], false],
     invert ? elseCase : thenCase,
     invert ? thenCase : elseCase,
   ];

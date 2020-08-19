@@ -2,7 +2,7 @@ import { L } from '../layers';
 import { S } from '../sources';
 import { getType } from '../../../data/signals';
 import { parseScaleSpec } from '../../../stores/scales';
-import { HAS_VALUE, caseHovered } from './utils';
+import { HAS_VALUE, caseHoveredOrSelected } from './utils';
 import { levels } from '../../../stores';
 
 export default class SpikeEncoding {
@@ -87,7 +87,7 @@ export default class SpikeEncoding {
           paint: {
             'fill-color': 'transparent',
             'fill-outline-color': 'transparent',
-            'fill-opacity': caseHovered(0, this.theme.fillOpacity, hovered),
+            'fill-opacity': caseHoveredOrSelected(0, this.theme.fillOpacity, hovered),
           },
         },
         reference,
@@ -110,7 +110,7 @@ export default class SpikeEncoding {
           paint: {
             'line-color': 'transparent',
             ...extraStyles,
-            'line-opacity': caseHovered(0, this.theme.strokeOpacity, hovered),
+            'line-opacity': caseHoveredOrSelected(0, this.theme.strokeOpacity, hovered),
           },
         },
         reference,

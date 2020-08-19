@@ -189,15 +189,18 @@ export default class InteractiveMap {
     // match ids
     if (obj.id !== id) {
       if (obj.id) {
-        this._setFeatureStateMultiple(
-          [S[obj.level].border, S.bubble, S.spike.fill, S.spike.stroke],
-          obj.id,
-          clearState,
-        );
+        this.map.setFeatureState({ source: S[obj.level].border, id: obj.id }, clearState);
       }
       if (id) {
-        this._setFeatureStateMultiple([S[level].border, S.bubble, S.spike.fill, S.spike.stroke], id, setState);
+        this.map.setFeatureState({ source: S[level].border, id }, setState);
       }
+      if (obj.level && obj.level !== level) {
+        this.map.setLayoutProperty(L[obj.level].hover, 'visibility', 'none');
+      }
+      if (id) {
+        this.map.setLayoutProperty(L[level].hover, 'visibility', id ? 'visible' : 'none');
+      }
+
       obj.id = id;
       // store level of selected id
       obj.level = level;
@@ -211,6 +214,7 @@ export default class InteractiveMap {
       if (mega) {
         this.map.setFeatureState({ source: S[levelMegaCounty.id].border, id: mega }, setState);
       }
+      this.map.setLayoutProperty(L[levelMegaCounty.id].hover, 'visibility', id ? 'visible' : 'none');
       obj.mega = mega;
     }
   }

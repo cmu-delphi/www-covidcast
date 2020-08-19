@@ -3,7 +3,7 @@ import { AttributionControl, Map as MapBox } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { defaultRegionOnStartup, levelMegaCounty, levels, EPIDATA_CASES_OR_DEATH_VALUES } from '../../stores/constants';
 import { MAP_THEME } from '../../theme';
-import { IS_NOT_MISSING, MISSING_VALUE } from './encodings/utils';
+import { IS_NOT_MISSING, MISSING_VALUE, caseHoveredOrSelected, caseSelected } from './encodings/utils';
 import InteractiveMap from './InteractiveMap';
 import { addCityLayers, L } from './layers';
 import style from './mapbox_albers_usa_style.json';
@@ -87,6 +87,11 @@ export default class MapBoxWrapper {
           resolveCallback(this);
         });
     });
+
+    this.map.on('render', () => {
+      console.log('render');
+    });
+
     return p;
   }
 
@@ -217,19 +222,12 @@ export default class MapBoxWrapper {
         id: L[level].hover,
         source: S[level].border,
         type: 'line',
-        paint: {
-          'line-color': MAP_THEME.hoverRegionOutline,
-          'line-width': ['case', ['any', ['boolean', ['feature-state', 'hover'], false]], 4, 0],
+        layout: {
+          visibility: 'none',
         },
-      });
-
-      map.addLayer({
-        id: L[level].selected,
-        source: S[level].border,
-        type: 'line',
         paint: {
-          'line-color': MAP_THEME.selectedRegionOutline,
-          'line-width': ['case', ['any', ['boolean', ['feature-state', 'select'], false]], 4, 0],
+          'line-color': caseSelected(MAP_THEME.selectedRegionOutline, MAP_THEME.hoverRegionOutline),
+          'line-width': caseHoveredOrSelected(4, 0),
         },
       });
     });
@@ -264,6 +262,7 @@ export default class MapBoxWrapper {
   }
 
   updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, stopsMega) {
+    console.log('update options');
     // changed the visibility of layers
     const oldLevel = this.level;
     this.level = level;
@@ -301,6 +300,7 @@ export default class MapBoxWrapper {
    * @param {Promise<import('../../data/fetchData').EpiDataRow[]>>} data
    */
   updateSources(level, data, primaryValue = 'value') {
+    console.log('update sources');
     // flag to compare if we still load the same data
     const dataFlag = Math.random().toString(36);
     this._mapDataFlag = dataFlag;
@@ -312,8 +312,10 @@ export default class MapBoxWrapper {
         // some other loading operation is done in the meanwhile
         return;
       }
+      console.time('update sources impl');
       // once idle dispatch done loading
       this.map.once('idle', () => {
+        console.time('update sources impl');
         this.dispatch('loading', false);
       });
 

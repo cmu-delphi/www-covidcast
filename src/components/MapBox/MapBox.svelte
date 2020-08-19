@@ -14,8 +14,8 @@
   const dispatch = createEventDispatcher();
   const wrapper = new MapBoxWrapper((event, data) => dispatch(event, data), [
     new ChoroplethEncoding(),
-    new BubbleEncoding(ENCODING_BUBBLE_THEME),
-    new SpikeEncoding(ENCODING_SPIKE_THEME),
+    // new BubbleEncoding(ENCODING_BUBBLE_THEME),
+    // new SpikeEncoding(ENCODING_SPIKE_THEME),
   ]);
 
   export const zoom = wrapper.zoom;

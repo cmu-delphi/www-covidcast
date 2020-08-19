@@ -18,26 +18,22 @@ export const L = {
     fill: 'state-fill',
     stroke: 'state-stroke',
     hover: 'state-hover',
-    selected: 'state-selected',
     names: 'state-names',
   },
   msa: {
     fill: 'msa-fill',
     stroke: 'msa-stroke',
     hover: 'msa-hover',
-    selected: 'msa-selected',
   },
   county: {
     fill: 'county-fill',
     stroke: 'county-stroke',
     hover: 'county-hover',
-    selected: 'county-selected',
   },
   'mega-county': {
     fill: 'mega-county-fill',
     stroke: 'mega-county-stroke',
     hover: 'mega-county-hover',
-    selected: 'mega-county-selected',
   },
   bubble: {
     fill: 'bubble-fill',

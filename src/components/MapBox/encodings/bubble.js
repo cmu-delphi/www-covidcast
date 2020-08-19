@@ -2,7 +2,7 @@ import { L } from '../layers';
 import { S } from '../sources';
 import { getType } from '../../../data/signals';
 import { parseScaleSpec } from '../../../stores/scales';
-import { HAS_VALUE, caseHovered } from './utils';
+import { HAS_VALUE, caseHoveredOrSelected } from './utils';
 
 export default class BubbleEncoding {
   constructor(theme) {
@@ -43,8 +43,8 @@ export default class BubbleEncoding {
             'circle-color': this.theme.color,
             'circle-stroke-color': this.theme.strokeColor,
             'circle-stroke-width': this.theme.strokeWidth,
-            'circle-opacity': caseHovered(0, this.theme.opacity, hovered),
-            'circle-stroke-opacity': caseHovered(0, this.theme.strokeOpacity, hovered),
+            'circle-opacity': caseHoveredOrSelected(0, this.theme.opacity, hovered),
+            'circle-stroke-opacity': caseHoveredOrSelected(0, this.theme.strokeOpacity, hovered),
             ...helpers.animationOptions('circle-radius'),
           },
         },
