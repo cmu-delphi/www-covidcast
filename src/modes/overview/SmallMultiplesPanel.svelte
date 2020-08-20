@@ -42,6 +42,11 @@
     text-decoration: underline;
   }
 
+  h5:hover,
+  .selected {
+    color: var(--red);
+  }
+
   .header {
     display: flex;
     align-items: center;
@@ -89,7 +94,12 @@
   {#each sensorsWithData as s}
     <li>
       <div class="header">
-        <h5 title={s.sensor.tooltipText} on:click={() => currentSensor.set(s.sensor.key)}>{s.sensor.name}</h5>
+        <h5
+          title={s.sensor.tooltipText}
+          on:click={() => currentSensor.set(s.sensor.key)}
+          class:selected={$currentSensor === s.sensor.key}>
+          {s.sensor.name}
+        </h5>
         <div class="toolbar" class:hidden={!hasRegion}>
           <button
             class="pg-button"
