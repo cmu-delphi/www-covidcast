@@ -1,6 +1,6 @@
 <script>
   import Vega from '../../components/vega/Vega.svelte';
-  import sensorSingleLineChartSpec from '../../components/vega/SmallMultipleLineChart.json';
+  import sensorSingleLineChartSpec from './SmallMultipleChart.json';
 
   export let data;
 </script>
