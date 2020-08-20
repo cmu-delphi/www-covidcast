@@ -28,7 +28,7 @@
     z-index: 1001;
     align-self: flex-start;
     justify-self: center;
-    padding: 0.2em 1em;
+    padding: 0.5em 1em;
   }
 
   /** desktop **/

@@ -61,10 +61,6 @@
    */
   let detailSensor = null;
 
-  function onShow(e) {
-    detailSensor = e.detail;
-  }
-
   let loading = true;
   $: data = fetchRegionSlice($currentSensorEntry, $currentLevel, $currentDateObject);
 </script>
@@ -181,7 +177,7 @@
     </div>
     <div class="panel-container">
       <div class="panel-scroll-container">
-        <SmallMultiplesPanel on:show={onShow} detail={detailSensor} />
+        <SmallMultiplesPanel bind:detail={detailSensor} />
       </div>
     </div>
   </div>

@@ -1,11 +1,5 @@
 <script>
-  import {
-    currentRegion,
-    currentLevel,
-    currentRegionInfo,
-    signalCasesOrDeathOptions,
-    currentDateObject,
-  } from '../../stores';
+  import { currentRegionInfo, signalCasesOrDeathOptions, currentDateObject } from '../../stores';
   import { fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../vega/Vega.svelte';
   import spec from './DetailView.json';
@@ -25,7 +19,7 @@
   $: mapTitle =
     typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText($signalCasesOrDeathOptions) : sensor.mapTitleText;
 
-  $: data = fetchTimeSlice(sensor, $currentLevel, $currentRegion);
+  $: data = fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId);
 
   $: regularPatch = {
     vconcat: [
