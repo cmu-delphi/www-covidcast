@@ -13,7 +13,7 @@
   import './ticks.css';
 
   const spikeBase = ENCODING_SPIKE_THEME.baseSize;
-  const spikePadding = 5;
+  const spikePadding = 2;
 
   export let loading = false;
 
