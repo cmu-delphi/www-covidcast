@@ -54,10 +54,11 @@ export function getLevelInfo(level) {
  * @property {string} id
  * @property {string} signal
  * @property {string[]} levels
- * @property {string} tooltipText
- * @property {string | ((options: CasesOrDeathOptions) => string)} mapTitleText
+ * @property {string | ((options?: CasesOrDeathOptions) => string)} tooltipText
+ * @property {string | ((options?: CasesOrDeathOptions) => string)} mapTitleText
  * @property {string} yAxis
  * @property {string} format
+ * @property {(v: number) => string} formatValue
  * @property {string} signal
  * @property {string?} api
  * @property {(v: number) => string} formatValue
@@ -139,6 +140,7 @@ export function extendSensorEntry(sensorEntry) {
   const signal = sensorEntry.signal;
   return Object.assign(sensorEntry, {
     key,
+    tooltipText: sensorEntry.tooltipText || sensorEntry.mapTitleText,
     formatValue: sensorEntry.format === 'percent' ? percentFormatter : isCount ? intFormatter : rawFormatter,
     isCount,
     isProp: isPropSignal(key),
@@ -156,7 +158,6 @@ const defaultSensors = [
     id: 'safegraph',
     signal: 'full_time_work_prop',
     levels: ['county', 'state'],
-    tooltipText: 'Proportion of people spending 6 hours or more away from home, based on SafeGraph mobility data',
     mapTitleText: 'Proportion of people spending 6 hours or more away from home, based on SafeGraph mobility data',
     yAxis: 'Proportion',
     format: 'raw',
@@ -167,7 +168,6 @@ const defaultSensors = [
     id: 'safegraph',
     signal: 'part_time_work_prop',
     levels: ['county', 'state'],
-    tooltipText: 'Proportion of people spending 3-6 hours away from home, based on SafeGraph mobility data',
     mapTitleText: 'Proportion of people spending 3-6 hours away from home, based on SafeGraph mobility data',
     yAxis: 'Proportion',
     format: 'raw',
@@ -178,7 +178,6 @@ const defaultSensors = [
     id: 'ght',
     signal: 'smoothed_search',
     levels: ['msa', 'state', 'hrr', 'dma'],
-    tooltipText: 'Relative frequency of COVID-related Google searches',
     mapTitleText: 'Relative frequency of COVID-related Google searches',
     yAxis: 'Frequency (arbitrary scale)',
     format: 'raw',
@@ -189,7 +188,6 @@ const defaultSensors = [
     id: 'doctor-visits',
     signal: 'smoothed_adj_cli',
     levels: ['county', 'msa', 'state', 'hrr'],
-    tooltipText: 'Percentage of daily doctor visits that are due to COVID-like symptoms',
     mapTitleText: 'Percentage of daily doctor visits that are due to COVID-like symptoms',
     yAxis: 'Percentage',
     format: 'percent',
@@ -200,7 +198,6 @@ const defaultSensors = [
     id: 'fb-survey',
     signal: 'smoothed_cli',
     levels: ['county', 'msa', 'state', 'hrr'],
-    tooltipText: 'Percentage of people with COVID-like symptoms, based on Facebook surveys',
     mapTitleText: 'Percentage of people with COVID-like symptoms, based on Facebook surveys',
     yAxis: 'Percentage',
     format: 'percent',
@@ -211,8 +208,6 @@ const defaultSensors = [
     id: 'fb-survey',
     signal: 'smoothed_hh_cmnty_cli',
     levels: ['county', 'msa', 'state', 'hrr'],
-    tooltipText:
-      'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
     mapTitleText:
       'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
     yAxis: 'Percentage',
@@ -246,7 +241,6 @@ const defaultSensors = [
     id: 'hospital-admissions',
     signal: 'smoothed_adj_covid19',
     levels: ['county', 'msa', 'state'],
-    tooltipText: 'Percentage of daily hospital admissions with COVID-19 associated diagnoses',
     mapTitleText: 'Percentage of daily hospital admissions with COVID-19 associated diagnoses',
     yAxis: 'Percentage',
     format: 'percent',
@@ -260,6 +254,9 @@ const defaultSensors = [
     tooltipText:
       'Daily new confirmed COVID-19 cases (7-day average), based on data reported by USAFacts and Johns Hopkins University',
     mapTitleText: (options) => {
+      if (!options) {
+        return 'Daily new COVID-19 cases (7-day average)';
+      }
       if (options.cumulative) {
         if (options.ratio) {
           return 'Cumulated daily new COVID-19 cases per 100,000 people (7-day average)';
@@ -284,6 +281,9 @@ const defaultSensors = [
     tooltipText:
       'Daily new COVID-19 deaths (7-day average), based on data reported by USAFacts and Johns Hopkins University',
     mapTitleText: (options) => {
+      if (!options) {
+        return 'Daily new COVID-19 deaths (7-day average)';
+      }
       if (options.cumulative) {
         if (options.ratio) {
           return 'Cumulated daily new COVID-19 deaths per 100,000 people (7-day average)';

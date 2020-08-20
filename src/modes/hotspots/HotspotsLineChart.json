@@ -1,0 +1,65 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+  "data": { "name": "values" },
+  "width": "container",
+  "height": "container",
+  "autosize": {
+    "resize": true
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "line",
+        "tooltip": true,
+        "interpolate": "monotone"
+      },
+      "encoding": {
+        "color": {
+          "value": "grey"
+        },
+        "x": {
+          "field": "date_value",
+          "type": "temporal",
+          "axis": {
+            "title": null,
+            "format": "%m/%d",
+            "formatType": "time",
+            "tickCount": "month"
+          }
+        },
+        "y": {
+          "field": "value",
+          "type": "quantitative",
+          "axis": null
+        }
+      }
+    },
+    {
+      "data": {
+        "values": [{ "date_value": null }]
+      },
+      "transform": [
+        {
+          "calculate": "toDate(currentDate)",
+          "as": "date_value"
+        }
+      ],
+      "mark": "rule",
+      "encoding": {
+        "color": {
+          "value": "#c00"
+        },
+        "x": {
+          "field": "date_value",
+          "type": "temporal"
+        }
+      }
+    }
+  ],
+  "config": {
+    "padding": 0,
+    "view": {
+      "stroke": null
+    }
+  }
+}

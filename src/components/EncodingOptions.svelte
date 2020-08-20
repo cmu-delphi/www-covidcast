@@ -1,5 +1,8 @@
 <script>
   import { currentSensorEntry, signalCasesOrDeathOptions } from '../stores';
+
+  export let center = false;
+  export let sensor = $currentSensorEntry;
 </script>
 
 <style>
@@ -7,6 +10,10 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .center {
+    align-items: center;
   }
 
   .button-group {
@@ -19,8 +26,8 @@
   }
 </style>
 
-<div class="root">
-  {#if $currentSensorEntry.isCasesOrDeath}
+<div class="root" class:center>
+  {#if sensor.isCasesOrDeath}
     <div aria-label="display cumulative or indicence" class="pg-button-group button-group">
       <button
         aria-pressed={String(!$signalCasesOrDeathOptions.cumulative)}
