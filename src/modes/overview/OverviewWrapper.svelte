@@ -20,9 +20,9 @@
   } from '../../stores';
   import Search from '../../components/Search.svelte';
   import SmallMultiplesPanel from './SmallMultiplesPanel.svelte';
-  import SmallMultiplesDetail from './SmallMultiplesDetail.svelte';
-  import MapOverlays from './MapOverlays.svelte';
   import { fetchRegionSlice } from '../../data/fetchData';
+  import DetailView from '../../components/DetailView/DetailView.svelte';
+  import MapOverlays from '../../components/MapOverlays.svelte';
 
   export let wrapperClass;
   export let regionSearchList;
@@ -156,7 +156,7 @@
   </div>
   <div class="content-container">
     <div class="map-container">
-      <MapOverlays {map} {loading} />
+      <MapOverlays {map} mapLoading={loading} legendLoading={loading} />
       <MapBox
         bind:this={map}
         on:loading={(e) => (loading = e.detail)}
@@ -164,8 +164,8 @@
         sensor={$currentSensor}
         level={$currentLevel}
         signalType={$signalType}
-        selection={$currentRegionInfo}
         signalOptions={$signalCasesOrDeathOptions}
+        selection={$currentRegionInfo}
         encoding={$encoding}
         on:ready={() => initialReady()}
         on:updatedEncoding={(e) => updatedEncoding(e.detail)}
@@ -175,7 +175,7 @@
 
       {#if detailSensor != null}
         <div class="detail-container container-bg container-style">
-          <SmallMultiplesDetail sensor={detailSensor} on:close={() => (detailSensor = null)} />
+          <DetailView sensor={detailSensor} on:close={() => (detailSensor = null)} />
         </div>
       {/if}
     </div>

@@ -14,7 +14,7 @@ const QUANTIZATION = 1e4;
 const data = require('./raw/name_id_info.json');
 const rows = data.all;
 
-function computeBounds(geojson, scale = 1.2) {
+function computeBounds(geojson, scale = 1) {
   const bounds = geojsonExtent(geojson);
 
   const mapglBounds = new LngLatBounds(new LngLat(bounds[0], bounds[1]), new LngLat(bounds[2], bounds[3]));

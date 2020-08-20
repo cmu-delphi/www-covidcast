@@ -17,12 +17,6 @@ export default [
     component: () => import(/* webpackPreload: true */ './overview/Overview.svelte').then((r) => r.default),
   },
   {
-    id: 'overview2',
-    label: 'Overview2',
-    tooltip: 'Switch to Overview2 Mode',
-    component: () => import(/* webpackPrefech: true */ './overview/Overview2.svelte').then((r) => r.default),
-  },
-  {
     id: 'timelapse',
     label: 'Time-lapse',
     tooltip: 'Switch to Time-lapse Mode',
