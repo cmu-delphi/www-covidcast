@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import { default as embed } from 'vega-embed';
+  import { observeResize, unobserveResize } from '../../util';
 
   export let data = Promise.resolve([]);
 
@@ -37,9 +38,17 @@
 
   let loading = true;
   let noData = false;
+  export let noDataText = null;
 
+  /**
+   * @type {(import('vega-embed').VisualizationSpec, size: {width: number, height: number}) => (import('vega-embed').VisualizationSpec}
+   */
+  export let patchSpec = null;
+
+  let size = { width: 300, height: 300 };
   $: updateData(vegaPromise, data);
-  $: updateSpec(spec);
+  $: patchedSpec = patchSpec ? patchSpec(spec, size) : spec;
+  $: updateSpec(patchedSpec);
   $: updateSignals(vegaPromise, signals);
 
   /**
@@ -128,10 +137,20 @@
   }
 
   onMount(() => {
-    updateSpec(spec);
+    if (patchSpec) {
+      size = root.getBoundingClientRect();
+      observeResize(root, (s) => {
+        size = s;
+      });
+    } else {
+      updateSpec(spec);
+    }
   });
 
   onDestroy(() => {
+    if (patchSpec) {
+      unobserveResize(root);
+    }
     if (vega) {
       vega.finalize();
       vega = null;
@@ -143,4 +162,9 @@
   });
 </script>
 
-<div bind:this={root} class="root" class:loading-bg={loading && !noData} class:no-data={noData} />
+<div
+  bind:this={root}
+  class="root"
+  class:loading-bg={loading}
+  class:no-data={!loading && noData}
+  data-no-data={noDataText} />

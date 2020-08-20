@@ -1,0 +1,136 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+  "data": { "name": "values" },
+  "autosize": {
+    "contains": "padding",
+    "resize": true
+  },
+  "transform": [
+    {
+      "calculate": "datum.date_value",
+      "as": "title"
+    }
+  ],
+  "vconcat": [
+    {
+      "width": "container",
+      "encoding": {
+        "x": {
+          "field": "date_value",
+          "type": "temporal",
+          "scale": { "domain": { "selection": "brush" } },
+          "axis": {
+            "title": null,
+            "format": "%m/%d",
+            "formatType": "time",
+            "tickCount": "day",
+            "grid": false
+          }
+        },
+        "y": {
+          "field": "count",
+          "type": "quantitative",
+          "axis": {
+            "title": " "
+          }
+        },
+        "tooltip": [
+          { "field": "count", "type": "quantitative", "title": "New Cases", "format": ".2f" },
+          { "field": "avg", "type": "quantitative", "title": "7-day average", "format": ".2f" },
+          { "field": "countRatio", "type": "quantitative", "title": "New Cases per 100k", "format": ".2f" },
+          { "field": "avgRatio", "type": "quantitative", "title": "7-day average per 100k", "format": ".2f" },
+          { "field": "countCumulative", "type": "quantitative", "title": "New Cases (cumulated)", "format": ".2f" },
+          { "field": "avgCumulative", "type": "quantitative", "title": "7-day average (cumulated)", "format": ".2f" },
+          {
+            "field": "countRatioCumulative",
+            "type": "quantitative",
+            "title": "New Cases per 100k (cumulated)",
+            "format": ".2f"
+          },
+          {
+            "field": "avgRatioCumulative",
+            "type": "quantitative",
+            "title": "7-day average per 100k (cumulated)",
+            "format": ".2f"
+          },
+          { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
+        ]
+      },
+      "layer": [
+        {
+          "selection": {
+            "highlight": { "type": "single", "empty": "none", "on": "mouseover" }
+          },
+          "mark": {
+            "type": "bar"
+          },
+          "encoding": {
+            "color": {
+              "condition": {
+                "selection": "highlight",
+                "value": "#aaaaaa"
+              },
+              "value": "#dddddd"
+            }
+          }
+        },
+        {
+          "mark": {
+            "type": "line",
+            "interpolate": "monotone",
+            "tooltip": true
+          },
+          "encoding": {
+            "color": {
+              "value": "black"
+            },
+            "y": {
+              "field": "avg"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "height": 60,
+      "selection": {
+        "highlight": { "type": "single", "empty": "none", "on": "mouseover" },
+        "brush": { "type": "interval", "encodings": ["x"] }
+      },
+      "mark": {
+        "type": "bar"
+      },
+      "encoding": {
+        "color": {
+          "condition": {
+            "selection": "highlight",
+            "value": "#aaaaaa"
+          },
+          "value": "#dddddd"
+        },
+        "x": {
+          "field": "date_value",
+          "type": "temporal",
+          "axis": {
+            "title": null,
+            "format": "%m/%d",
+            "formatType": "time",
+            "tickCount": "week"
+          }
+        },
+        "y": {
+          "field": "count",
+          "type": "quantitative",
+          "axis": {
+            "title": " "
+          }
+        },
+        "tooltip": [
+          { "field": "count", "type": "quantitative", "title": "New Cases", "format": ".2f" },
+          { "field": "avg", "type": "quantitative", "title": "7-day average", "format": ".2f" },
+          { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
+        ]
+      }
+    }
+  ]
+}

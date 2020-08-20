@@ -1,0 +1,12 @@
+.vg-tooltip h2 {
+  padding: 0;
+}
+
+.vg-tooltip tr,
+.vg-tooltip td {
+  border: none;
+}
+
+.vg-tooltip td.value {
+  text-align: right !important;
+}

@@ -1,13 +1,41 @@
-export function caseHovered(thenCase, elseCase, invert = false) {
+import { MAP_THEME } from '../../../theme';
+
+export function caseHoveredOrSelected(thenCase, elseCase, invert = false) {
   return [
     'case',
-    ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'select'], false]],
+    ['any', ['to-boolean', ['feature-state', 'hover']], ['to-boolean', ['feature-state', 'select']]],
+    invert ? elseCase : thenCase,
+    invert ? thenCase : elseCase,
+  ];
+}
+export function caseSelected(thenCase, elseCase, invert = false) {
+  return [
+    'case',
+    ['to-boolean', ['feature-state', 'select']],
     invert ? elseCase : thenCase,
     invert ? thenCase : elseCase,
   ];
 }
 
-export const HAS_VALUE = ['>', ['get', 'value'], 0];
-
 export const MISSING_VALUE = -100;
-export const IS_NOT_MISSING = ['!=', 'value', MISSING_VALUE];
+export const HAS_VALUE = ['>', ['to-number', ['feature-state', 'value'], MISSING_VALUE], 0];
+export const IS_NOT_MISSING = ['!=', ['to-number', ['feature-state', 'value'], MISSING_VALUE], MISSING_VALUE];
+
+export function caseMissing(thenCase, elseCase) {
+  return [
+    'case',
+    // when missing
+    ['==', ['to-number', ['feature-state', 'value'], MISSING_VALUE], MISSING_VALUE],
+    thenCase,
+    // else interpolate
+    elseCase,
+  ];
+}
+
+export function interpolateValue(stops) {
+  return caseMissing(
+    MAP_THEME.countyFill,
+    // else interpolate
+    ['interpolate', ['linear'], ['to-number', ['feature-state', 'value'], 0], ...stops.flat()],
+  );
+}

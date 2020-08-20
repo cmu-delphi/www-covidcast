@@ -1,0 +1,171 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+  "data": { "name": "values" },
+  "autosize": {
+    "contains": "padding",
+    "resize": true
+  },
+  "transform": [
+    {
+      "calculate": "datum.value - datum.stderr",
+      "as": "value_lower_bound"
+    },
+    {
+      "calculate": "datum.value + datum.stderr",
+      "as": "value_upper_bound"
+    },
+    {
+      "calculate": "datum.date_value",
+      "as": "title"
+    }
+  ],
+  "vconcat": [
+    {
+      "width": "container",
+      "encoding": {
+        "color": {
+          "value": "grey"
+        },
+        "x": {
+          "field": "date_value",
+          "type": "temporal",
+          "scale": { "domain": { "selection": "brush" } },
+          "axis": {
+            "title": null,
+            "format": "%m/%d",
+            "formatType": "time",
+            "tickCount": "day",
+            "grid": false
+          }
+        },
+        "y": {
+          "field": "value",
+          "type": "quantitative",
+          "axis": {
+            "title": " "
+          }
+        },
+        "tooltip": [
+          { "field": "value", "type": "quantitative", "title": "Value", "format": ".2f" },
+          { "field": "stderr", "type": "quantitative", "title": "Standard Error", "format": ".2f" },
+          { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
+        ]
+      },
+      "layer": [
+        {
+          "mark": {
+            "type": "line",
+            "interpolate": "monotone"
+          }
+        },
+        {
+          "selection": {
+            "highlight": { "type": "single", "empty": "none", "on": "mouseover" }
+          },
+          "mark": {
+            "type": "circle",
+            "tooltip": true
+          }
+        },
+        {
+          "mark": {
+            "type": "area",
+            "interpolate": "monotone"
+          },
+          "encoding": {
+            "color": {
+              "value": "rgba(0, 0, 0, 0.1)"
+            },
+            "y": {
+              "field": "value_lower_bound",
+              "type": "quantitative"
+            },
+            "y2": {
+              "field": "value_upper_bound"
+            }
+          }
+        },
+        {
+          "transform": [
+            {
+              "filter": {
+                "selection": "highlight"
+              }
+            }
+          ],
+          "mark": "rule"
+        }
+      ]
+    },
+    {
+      "height": 60,
+      "encoding": {
+        "color": {
+          "value": "grey"
+        },
+        "x": {
+          "field": "date_value",
+          "type": "temporal",
+          "axis": {
+            "title": null,
+            "format": "%m/%d",
+            "formatType": "time",
+            "tickCount": "week"
+          }
+        },
+        "y": {
+          "field": "value",
+          "type": "quantitative",
+          "axis": {
+            "title": " "
+          }
+        },
+        "tooltip": [
+          { "field": "value", "type": "quantitative", "title": "Value", "format": ".2f" },
+          { "field": "stderr", "type": "quantitative", "title": "Standard Error", "format": ".2f" },
+          { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
+        ]
+      },
+      "layer": [
+        {
+          "selection": {
+            "highlight": { "type": "single", "empty": "none", "on": "mouseover" },
+            "brush": { "type": "interval", "encodings": ["x"] }
+          },
+          "mark": {
+            "type": "line",
+            "interpolate": "monotone"
+          }
+        },
+        {
+          "mark": {
+            "type": "area",
+            "interpolate": "monotone"
+          },
+          "encoding": {
+            "color": {
+              "value": "rgba(0, 0, 0, 0.1)"
+            },
+            "y": {
+              "field": "value_lower_bound",
+              "type": "quantitative"
+            },
+            "y2": {
+              "field": "value_upper_bound"
+            }
+          }
+        },
+        {
+          "transform": [
+            {
+              "filter": {
+                "selection": "highlight"
+              }
+            }
+          ],
+          "mark": "rule"
+        }
+      ]
+    }
+  ]
+}
