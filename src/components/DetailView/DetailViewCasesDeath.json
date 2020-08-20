@@ -5,12 +5,6 @@
     "contains": "padding",
     "resize": true
   },
-  "transform": [
-    {
-      "calculate": "datum.date_value",
-      "as": "title"
-    }
-  ],
   "vconcat": [
     {
       "width": "container",
@@ -84,6 +78,12 @@
           "data": {
             "name": "values"
           },
+          "transform": [
+            {
+              "calculate": "datum.date_value",
+              "as": "title"
+            }
+          ],
           "selection": {
             "highlight": { "type": "single", "empty": "none", "on": "mouseover" }
           },
@@ -177,6 +177,12 @@
           "data": {
             "name": "values"
           },
+          "transform": [
+            {
+              "calculate": "datum.date_value",
+              "as": "title"
+            }
+          ],
           "selection": {
             "highlight": { "type": "single", "empty": "none", "on": "mouseover" },
             "brush": { "type": "interval", "encodings": ["x"] }
