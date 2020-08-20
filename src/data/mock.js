@@ -1,5 +1,6 @@
 import { formatAPITime } from './utils';
-import { timeDay, randomNormal } from 'd3';
+import { timeDay } from 'd3-time';
+import { randomNormal } from 'd3-random';
 
 const mockStartDate = timeDay.floor(new Date(2020, 4, 1));
 const mockEndDate = timeDay.offset(timeDay.floor(new Date()), -1);
