@@ -21,7 +21,7 @@
   const sensors = sensorList.filter((d) => !remove.includes(d.key));
 
   $: hasRegion = Boolean($currentRegionInfo);
-  $: sensorsWithData = hasRegion
+  $: sensorsWithData = $currentRegionInfo
     ? fetchMultipleTimeSlices(sensors, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, finalDay).map(
         (data, i) => ({
           sensor: sensors[i],
@@ -119,7 +119,7 @@
           data={s.data}
           {spec}
           noDataText={hasRegion ? 'No data available' : 'No location selected'}
-          signals={{ currentDate: hasRegion ? $currentDateObject : null }} />
+          signals={{ currentDate: $currentDateObject }} />
       </div>
     </li>
   {/each}

@@ -159,14 +159,14 @@ export const spikeHeightScale = writable(SqrtScale());
 currentSensorEntry.subscribe((sensorEntry) => {
   // check level
   const level = get(currentLevel);
+
   if (!sensorEntry.levels.includes(level)) {
-    currentRegion.set('');
     currentLevel.set(sensorEntry.levels[0]);
   }
 
-  if (sensorEntry.type === 'late' && sensorEntry.id !== 'hospital-admissions') {
-    signalType.set('value');
-  }
+  // if (sensorEntry.type === 'late' && sensorEntry.id !== 'hospital-admissions') {
+  //   signalType.set('value');
+  // }
 
   if (!sensorEntry.isCasesOrDeath) {
     encoding.set('color');
