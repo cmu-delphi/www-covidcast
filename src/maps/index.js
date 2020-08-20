@@ -99,5 +99,5 @@ nameInfos.concat(swpaNameInfos).forEach((d) => {
 });
 
 export function getInfoByName(name) {
-  return infoLookup.get(name);
+  return infoLookup.get(String(name).toLowerCase());
 }
