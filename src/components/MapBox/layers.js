@@ -19,26 +19,16 @@ export function toFillLayer(level) {
 export function toHoverLayer(level) {
   return `${level}-hover`;
 }
-export function toSelectedLayer(level) {
-  return `${level}-selected`;
+export function toBubbleLayer(level) {
+  return `${level}-hover`;
 }
 
 export const L = {
   outline: 'state-stroke',
   stateNames: 'state-names',
-  bubble: {
-    fill: 'bubble-fill',
-    highlight: {
-      fill: 'bubble-highlight-fill',
-    },
-  },
   spike: {
     fill: 'spike-fill',
     stroke: 'spike-stroke',
-    highlight: {
-      fill: 'spike-highlight-fill',
-      stroke: 'spike-highlight-stroke',
-    },
   },
   cityPoints: {
     pit: 'city-point-unclustered-pit',

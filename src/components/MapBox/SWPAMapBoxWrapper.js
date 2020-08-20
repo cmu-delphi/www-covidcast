@@ -5,9 +5,9 @@ import { MAP_THEME, ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../../th
 import AMapBoxWrapper from './AMapBoxWrapper';
 import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './encodings';
 import { L } from './layers';
-import { toBorderSource, valueProperties } from './sources';
+import { toBorderSource } from './sources';
 
-const geoJsonSources = loadSWPASources(valueProperties);
+const geoJsonSources = loadSWPASources();
 
 export default class USMapBoxWrapper extends AMapBoxWrapper {
   /**
@@ -62,7 +62,10 @@ export default class USMapBoxWrapper extends AMapBoxWrapper {
     });
 
     this.levels.forEach((level) => {
-      this.addLevelLayer(level);
+      this.addFillLevelLayer(level);
+    });
+    this.levels.forEach((level) => {
+      this.addHoverLevelLayer(level);
     });
     this.encodings.forEach((enc) => {
       enc.addLayers(map, this);

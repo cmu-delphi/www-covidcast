@@ -1,11 +1,11 @@
 import geojsonExtent from '@mapbox/geojson-extent';
 import { AttributionControl, Map as MapBox } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { defaultRegionOnStartup, levelMegaCounty, EPIDATA_CASES_OR_DEATH_VALUES } from '../../stores/constants';
+import { defaultRegionOnStartup, levelMegaCounty } from '../../stores/constants';
 import { MAP_THEME } from '../../theme';
-import { IS_NOT_MISSING, MISSING_VALUE } from './encodings/utils';
+import { MISSING_VALUE, caseHoveredOrSelected, caseSelected, caseMissing } from './encodings/utils';
 import InteractiveMap from './InteractiveMap';
-import { toFillLayer, toHoverLayer, toSelectedLayer } from './layers';
+import { toFillLayer, toHoverLayer } from './layers';
 import style from './mapbox_albers_usa_style.json';
 import { toBorderSource, toCenterSource } from './sources';
 import ZoomMap from './ZoomMap';
@@ -95,6 +95,7 @@ export default class AMapBoxWrapper {
           resolveCallback(this);
         });
     });
+
     return p;
   }
 
@@ -171,39 +172,34 @@ export default class AMapBoxWrapper {
     });
   }
 
-  addLevelLayer(level) {
+  addFillLevelLayer(level) {
     this.map.addLayer({
       id: toFillLayer(level),
       source: toBorderSource(level),
       type: 'fill',
-      filter: IS_NOT_MISSING,
       layout: {
         visibility: 'none',
       },
       paint: {
         'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
         'fill-color': MAP_THEME.countyFill,
+        'fill-opacity': caseMissing(0, 1),
         ...this.animationOptions('fill-color'),
       },
     });
+  }
 
+  addHoverLevelLayer(level) {
     this.map.addLayer({
       id: toHoverLayer(level),
       source: toBorderSource(level),
       type: 'line',
-      paint: {
-        'line-color': MAP_THEME.hoverRegionOutline,
-        'line-width': ['case', ['any', ['boolean', ['feature-state', 'hover'], false]], 4, 0],
+      layout: {
+        visibility: 'none',
       },
-    });
-
-    this.map.addLayer({
-      id: toSelectedLayer(level),
-      source: toBorderSource(level),
-      type: 'line',
       paint: {
-        'line-color': MAP_THEME.selectedRegionOutline,
-        'line-width': ['case', ['any', ['boolean', ['feature-state', 'select'], false]], 4, 0],
+        'line-color': caseSelected(MAP_THEME.selectedRegionOutline, MAP_THEME.hoverRegionOutline),
+        'line-width': caseHoveredOrSelected(4, 0),
       },
     });
   }
@@ -284,15 +280,15 @@ export default class AMapBoxWrapper {
       });
 
       const lookup = new Map(data.map((d) => [d.geo_value.toUpperCase(), d]));
+      this.interactive.data = lookup;
+
       if (level === 'county') {
         this._updateSource(toBorderSource(levelMegaCounty.id), lookup, primaryValue);
       }
       this._updateSource(toBorderSource(level), lookup, primaryValue);
       this._updateSource(toCenterSource(level), lookup, primaryValue);
 
-      for (const encoding of this.encodings) {
-        encoding.updateSources(this.map, level);
-      }
+      this.encoding.updateSources(this.map, level);
       if (data.length > 0) {
         this.markReady('data');
       }
@@ -314,15 +310,16 @@ export default class AMapBoxWrapper {
     data.features.forEach((d) => {
       const id = d.properties.id;
       const entry = values.get(id);
-      d.properties.value = entry ? entry[primaryValue] : MISSING_VALUE;
-      d.properties.direction = entry ? entry.direction : MISSING_VALUE;
-      EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
-        d.properties[key] = entry && entry[key] != null ? entry[key] : MISSING_VALUE;
-      });
+      this.map.setFeatureState(
+        {
+          source: sourceId,
+          id: Number.parseInt(d.id, 10),
+        },
+        {
+          value: entry ? entry[primaryValue] : MISSING_VALUE,
+        },
+      );
     });
-
-    source.setData(data);
-    return data;
   }
 
   /**
@@ -361,7 +358,7 @@ export default class AMapBoxWrapper {
       return;
     }
     // hacky
-    const feature = source._data.features.find((d) => d.properties.id === selection.propertyId);
+    const feature = source._data.features.find((d) => d.id === selection.id);
 
     if (!feature) {
       return;
@@ -372,6 +369,14 @@ export default class AMapBoxWrapper {
       linear: false,
       essential: true,
     });
+  }
+
+  isMissing(feature) {
+    const state = this.map.getFeatureState({
+      source: toBorderSource(feature.properties.level),
+      id: typeof id === 'string' ? Number.parseInt(feature.id, 10) : feature.id,
+    });
+    return state.value == null || state.value === MISSING_VALUE;
   }
 
   selectRandom() {
@@ -385,13 +390,13 @@ export default class AMapBoxWrapper {
 
     const defaultRegion = defaultRegionOnStartup[this.level];
     const defaultFeature = source._data.features.find((d) => d.properties.id === defaultRegion);
-    if (defaultFeature && defaultFeature.properties.value !== MISSING_VALUE) {
+    if (defaultFeature && !this.isMissing(defaultFeature)) {
       this.interactive.forceHover(defaultFeature);
       this.dispatch('select', defaultFeature);
       return;
     }
 
-    const viableFeatures = source._data.features.filter((d) => d.properties.value !== MISSING_VALUE);
+    const viableFeatures = source._data.features.filter((d) => !this.isMissing(d));
     if (viableFeatures.length === 0) {
       return;
     }
