@@ -86,7 +86,7 @@ export function fetchRegionSlice(sensorEntry, level, date) {
  * @param {Date} endDate
  * @returns {Promise<EpiDataRow[]>}
  */
-export function fetchCustomTimeSlice(sensorEntry, level, region, startDate, endDate) {
+export function fetchTimeSlice(sensorEntry, level, region, startDate = START_TIME_RANGE, endDate = END_TIME_RANGE) {
   if (!region) {
     return Promise.resolve([]);
   }
@@ -118,16 +118,6 @@ export function fetchCustomTimeSlice(sensorEntry, level, region, startDate, endD
 }
 
 /**
- * @param {SensorEntry} sensorEntry
- * @param {string} level
- * @param {string | undefined} region
- * @returns {Promise<EpiDataRow[]>}
- */
-export function fetchTimeSlice(sensorEntry, level, region) {
-  return fetchCustomTimeSlice(sensorEntry, level, region, START_TIME_RANGE, END_TIME_RANGE);
-}
-
-/**
  *
  * @param {EpiDataRow} row
  * @param {Date} date
@@ -149,22 +139,15 @@ function createCopy(row, date, sensorEntry) {
   }
   return copy;
 }
+
 /**
- * fetched multiple signals and synchronizes their start / end date
- * @param {SensorEntry[]} sensorEntries
- * @param {string} level
- * @param {string | undefined} region
- * @param {Date} startDate
- * @param {Date} endDate
- * @returns {Promise<EpiDataRow[]>[]}
+ *
+ * @param {Promise<EpiDataRow[]>[]} all
+ * @param {((i: number) => SensorEntry)} sensorOf
  */
-export function fetchMultipleTimeSlices(sensorEntries, level, region, startDate, endDate) {
-  const all = sensorEntries.map((entry) => fetchCustomTimeSlice(entry, level, region, startDate, endDate));
-  if (sensorEntries.length <= 1) {
-    return all;
-  }
+function syncStartEnd(all, sensorOf) {
   // sync start and end date
-  const allDone = Promise.all(all).then((rows) => {
+  return Promise.all(all).then((rows) => {
     const min = rows.reduce(
       (acc, r) => (r.length === 0 || r[0].date_value == null ? acc : Math.min(acc, r[0].date_value.getTime())),
       Number.POSITIVE_INFINITY,
@@ -182,14 +165,61 @@ export function fetchMultipleTimeSlices(sensorEntries, level, region, startDate,
       }
       if (r[0].date_value != null && r[0].date_value.getTime() > min) {
         // inject a min
-        r.unshift(createCopy(r[0], new Date(min), sensorEntries[i]));
+        r.unshift(createCopy(r[0], new Date(min), sensorOf(i)));
       }
       if (r[r.length - 1].date_value != null && r[r.length - 1].date_value.getTime() < max) {
         // inject a max
-        r.push(createCopy(r[r.length - 1], new Date(max), sensorEntries[i]));
+        r.push(createCopy(r[r.length - 1], new Date(max), sensorOf(i)));
       }
     });
     return rows;
   });
+}
+
+/**
+ * fetch multiple signals and synchronizes their start / end date
+ * @param {SensorEntry[]} sensorEntries
+ * @param {string} level
+ * @param {string | undefined} region
+ * @param {Date} startDate
+ * @param {Date} endDate
+ * @returns {Promise<EpiDataRow[]>[]}
+ */
+export function fetchMultipleTimeSlices(
+  sensorEntries,
+  level,
+  region,
+  startDate = START_TIME_RANGE,
+  endDate = END_TIME_RANGE,
+) {
+  const all = sensorEntries.map((entry) => fetchTimeSlice(entry, level, region, startDate, endDate));
+  if (sensorEntries.length <= 1) {
+    return all;
+  }
+  const allDone = syncStartEnd(all, (i) => sensorEntries[i]);
   return sensorEntries.map((_, i) => allDone.then((r) => r[i]));
+}
+
+/**
+ * fetch multiple regions and synchronizes their start / end date
+ * @param {SensorEntry} sensorEntry
+ * @param {string} level
+ * @param {string[]} region
+ * @param {Date} startDate
+ * @param {Date} endDate
+ * @returns {Promise<EpiDataRow[]>[]}
+ */
+export function fetchMultipleRegionsTimeSlices(
+  sensorEntry,
+  level,
+  regions,
+  startDate = START_TIME_RANGE,
+  endDate = END_TIME_RANGE,
+) {
+  const all = regions.map((region) => fetchTimeSlice(sensorEntry, level, region, startDate, endDate));
+  if (regions.length <= 1) {
+    return all;
+  }
+  const allDone = syncStartEnd(all, () => sensorEntry);
+  return regions.map((_, i) => allDone.then((r) => r[i]));
 }
