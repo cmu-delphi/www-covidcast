@@ -1,11 +1,12 @@
 <script>
-  import Title from '../../components/Title.svelte';
-  import MapControls from '../../components/MapControls.svelte';
-  import Legend from '../../components/Legend.svelte';
+  import Title from './Title.svelte';
+  import MapControls from './MapControls.svelte';
+  import Legend from './Legend.svelte';
   import './mapContainer.css';
 
   export let map = null;
-  export let loading = true;
+  export let mapLoading = true;
+  export let legendLoading = true;
 </script>
 
 <style>
@@ -55,12 +56,14 @@
 
 <div class="map-top-overlay">
   <div class="title-container container-bg">
-    <Title />
+    <Title>
+      <slot name="title" />
+    </Title>
   </div>
   <div class="map-controls-container">
-    <MapControls zoom={map ? map.zoom : null} showEncodings {loading} />
+    <MapControls zoom={map ? map.zoom : null} showEncodings {mapLoading} />
   </div>
 </div>
 <div class="legend-container container-bg container-style">
-  <Legend {loading} />
+  <Legend {legendLoading} />
 </div>

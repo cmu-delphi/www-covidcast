@@ -23,7 +23,7 @@
   import Search from '../../components/Search.svelte';
   import SmallMultiplesPanel from './SmallMultiplesPanel.svelte';
   import DetailView from '../../components/DetailView/DetailView.svelte';
-  import MapOverlays from './MapOverlays.svelte';
+  import MapOverlays from '../../components/MapOverlays.svelte';
   import { fetchRegionSlice } from '../../data/fetchData';
 
   /**
@@ -157,7 +157,7 @@
   </div>
   <div class="content-container">
     <div class="map-container">
-      <MapOverlays {map} {loading} />
+      <MapOverlays {map} mapLoading={loading} legendLoading={loading} />
       <MapBox
         bind:this={map}
         on:loading={(e) => (loading = e.detail)}
