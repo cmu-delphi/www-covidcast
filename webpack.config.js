@@ -132,6 +132,8 @@ module.exports = () => {
       new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({
         filename: '[name].css',
+        chunkFilename: devMode ? '[name].js' : '[name].[chunkhash].js',
+        ignoreOrder: true,
       }),
       !devMode && new CleanWebpackPlugin(),
     ].filter(Boolean),
