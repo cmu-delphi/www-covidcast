@@ -17,7 +17,7 @@
     signalCasesOrDeathOptions,
   } from '../../stores';
   import Player from './Player.svelte';
-  import { timeDay } from 'd3';
+  import { timeDay } from 'd3-time';
   import { parseAPITime, formatAPITime } from '../../data';
   import { fetchRegionSlice } from '../../data/fetchData';
   import { trackEvent } from '../../stores/ga';

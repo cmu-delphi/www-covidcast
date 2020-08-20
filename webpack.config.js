@@ -5,7 +5,10 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
-const { EnvironmentPlugin } = require('webpack');
+const { EnvironmentPlugin, DefinePlugin } = require('webpack');
+const TerserPlugin = require('terser-webpack-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const pkg = require('./package.json');
 
 const devMode = process.env.NODE_ENV !== 'production';
 
@@ -18,7 +21,7 @@ module.exports = () => {
     output: {
       path: path.resolve(__dirname, 'public'),
       filename: '[name].js',
-      chunkFilename: '[name].js?id=[chunkhash]',
+      chunkFilename: devMode ? '[name].js' : '[name].[chunkhash].js',
       // publicPath: './',
     },
 
@@ -31,6 +34,7 @@ module.exports = () => {
     },
 
     optimization: {
+      minimizer: [new OptimizeCSSAssetsPlugin(), new TerserPlugin()],
       splitChunks: {
         cacheGroups: {
           // no splitting of css files
@@ -39,6 +43,11 @@ module.exports = () => {
             test: /\.css$/,
             chunks: 'all',
             enforce: true,
+          },
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
           },
         },
       },
@@ -104,6 +113,10 @@ module.exports = () => {
     },
 
     plugins: [
+      devMode ? null : new CleanWebpackPlugin(),
+      new DefinePlugin({
+        __VERSION__: JSON.stringify(pkg.version),
+      }),
       new EnvironmentPlugin(['NODE_ENV']),
       // new CopyPlugin({
       //   patterns: ['./src/static'],
@@ -120,10 +133,9 @@ module.exports = () => {
       new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({
         filename: '[name].css',
-        chunkFilename: '[id].css?id=[chunkhash]',
         ignoreOrder: true,
+        chunkFilename: devMode ? '[name].css' : '[name].[chunkhash].css',
       }),
-      !devMode && new CleanWebpackPlugin(),
     ].filter(Boolean),
   };
 };
