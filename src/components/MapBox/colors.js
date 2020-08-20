@@ -3,12 +3,13 @@ import { scaleSequential, scaleSequentialLog } from 'd3-scale';
 import { interpolateYlOrRd } from 'd3-scale-chromatic';
 import logspace from 'compute-logspace';
 import { DIRECTION_THEME, MAP_THEME } from '../../theme';
-import { zip, transparent, pairAdjacent } from '../../util';
+import { zip, transparent } from '../../util';
 import { MISSING_VALUE } from './encodings/utils';
 import { primaryValue } from '../../stores/constants';
 
 const MAGIC_MIN_STATS = 0.14;
 const EXPLICIT_ZERO_OFFSET = 0.01;
+const TICK_COUNT = 7;
 
 /**
  *
@@ -106,7 +107,7 @@ function countSignalColorScale(valueMinMax) {
   const colorScaleLog = scaleSequentialLog(interpolateYlOrRd).domain(valueMinMax);
 
   // domainStops7 is used to determine the colors of regions for count signals.
-  const domainStops7 = logspace(Math.log(valueMinMax[0]) / Math.log(10), Math.log(valueMinMax[1]) / Math.log(10), 7);
+  const domainStops7 = logspace(Math.log10(valueMinMax[0]), Math.log10(valueMinMax[1]), TICK_COUNT);
 
   const logColors7 = domainStops7.map((c) => colorScaleLog(c).toString());
 
@@ -126,69 +127,60 @@ export function splitDomain(min, max, parts) {
   return splits;
 }
 
-export function getSigfigs(value, sigFigs) {
-  return parseFloat(parseFloat(value).toPrecision(sigFigs));
-}
-
-function arr2labels(arr) {
-  const labels = [];
-  for (let i = 0; i < arr.length; i++) {
-    arr[i] = Number.parseFloat(arr[i]).toFixed(2);
-    labels.push(arr[i]);
+/**
+ * @param {import('../../stores/constants').SensorEntry} sensorEntry
+ * @param {[number, number]} valueMinMax
+ */
+function computeTicks(sensorEntry, valueMinMax) {
+  if (sensorEntry.isCount) {
+    const min = Math.log10(Math.max(1, valueMinMax[0]));
+    const max = Math.log10(Math.max(2, valueMinMax[1]));
+    return logspace(min, max, TICK_COUNT);
   }
-  return labels;
+  // manipulates valueMinMax in place!
+  if (sensorEntry.format === 'raw') {
+    valueMinMax[0] = Math.max(EXPLICIT_ZERO_OFFSET, valueMinMax[0]);
+    return splitDomain(valueMinMax[0], valueMinMax[1], TICK_COUNT);
+  }
+  // percent
+  valueMinMax[0] = Math.max(EXPLICIT_ZERO_OFFSET, valueMinMax[0]);
+  valueMinMax[1] = Math.min(100, valueMinMax[1]);
+  return splitDomain(valueMinMax[0], valueMinMax[1], TICK_COUNT);
 }
 
-export function generateLabels(stats, sensorEntry, level, signalOptions) {
+/**
+ * @param {Map<string, any>} stats
+ * @param {import('../../stores/constants').SensorEntry} sensorEntry
+ * @param {string} level
+ * @param {((v: number) => string)} colorScale
+ * @param {import('../../stores/constants').CasesOrDeathOptions} signalOptions
+ */
+export function generateLabels(stats, sensorEntry, level, colorScale, signalOptions) {
   const valueMinMax = stats ? determineMinMax(stats, sensorEntry, level, signalOptions) : null;
 
   if (!valueMinMax) {
     return {
       labels: [],
       high: '',
-      unit: '',
       valueMinMax: [0, 0],
     };
   }
 
-  if (!sensorEntry.isCount) {
-    valueMinMax[0] = Math.max(EXPLICIT_ZERO_OFFSET, valueMinMax[0]);
-  }
-
-  let high = getSigfigs(valueMinMax[1].toFixed(2), 3);
-  let unit = '';
-
-  if (sensorEntry.isCount) {
-    const min = Math.log(valueMinMax[0]) / Math.log(10);
-    const max = Math.log(valueMinMax[1]) / Math.log(10);
-    const arr = logspace(min, max, 7);
-
-    const labels = ['0', ...arr2labels(arr)];
-    return {
-      labels: pairAdjacent(labels),
-      high,
-      unit,
-      valueMinMax,
-    };
-  }
-
-  if (sensorEntry.format === 'raw') {
-    valueMinMax[0] = Math.max(0, valueMinMax[0]);
-  } else {
-    // otherwise, it's 'percent'.
-    high = getSigfigs(Math.min(100, valueMinMax[1]).toFixed(2), 3);
-    unit = '%';
-    valueMinMax[0] = Math.max(0, valueMinMax[0]);
-    valueMinMax[1] = Math.min(100, valueMinMax[1]);
-  }
-
-  const arr = splitDomain(valueMinMax[0], valueMinMax[1], 7);
-  const labels = ['0', ...arr2labels(arr)];
+  const ticks = computeTicks(sensorEntry, valueMinMax);
 
   return {
-    labels: pairAdjacent(labels),
-    high,
-    unit,
+    low: sensorEntry.formatValue(0), // fixed 0
+    lowValue: 0,
+    lowColor: colorScale(0),
+    labels: ticks.slice(0, -1).map((tick, i) => ({
+      label: sensorEntry.formatValue(tick),
+      value: tick,
+      color: colorScale(tick),
+      nextColor: colorScale(ticks[i + 1]),
+    })),
+    high: `${sensorEntry.formatValue(valueMinMax[1])}+`,
+    highValue: valueMinMax[1],
+    highColor: colorScale(valueMinMax[1]),
     valueMinMax,
   };
 }
