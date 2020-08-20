@@ -40,6 +40,7 @@
   let noData = false;
   let hasError = false;
   export let noDataText = 'No data available';
+  $: message = hasError ? 'Error occurred' : noData && !loading ? noDataText : null;
 
   /**
    * @type {(import('vega-embed').VisualizationSpec, size: {width: number, height: number}) => (import('vega-embed').VisualizationSpec}
@@ -61,23 +62,30 @@
       return;
     }
     loading = true;
-    Promise.all([vegaLoader, data]).then(([vega, d]) => {
-      if (vegaLoader !== vegaPromise) {
-        // outside has changed
-        return;
-      }
-      noData = !d || d.length === 0;
-      vega.view
-        .change(
-          'values',
-          vega.view
-            .changeset()
-            .remove(() => true)
-            .insert(d || []),
-        )
-        .runAsync();
-      loading = false;
-    });
+    hasError = false;
+    Promise.all([vegaLoader, data])
+      .then(([vega, d]) => {
+        if (vegaLoader !== vegaPromise) {
+          // outside has changed
+          return;
+        }
+        noData = !d || d.length === 0;
+        vega.view
+          .change(
+            'values',
+            vega.view
+              .changeset()
+              .remove(() => true)
+              .insert(d || []),
+          )
+          .runAsync();
+        loading = false;
+      })
+      .catch((error) => {
+        console.error('error while updating data', error);
+        loading = false;
+        hasError = true;
+      });
   }
 
   /**
@@ -91,22 +99,25 @@
     if (Object.keys(signals).length === 0) {
       return;
     }
-    vegaLoader.then((vega) => {
-      if (vegaLoader !== vegaPromise) {
-        // outside has changed
-        return;
-      }
-      if (!vega) {
-        return;
-      }
-      Object.entries(signals).forEach(([key, v]) => {
-        vega.view.signal(key, v);
+    hasError = false;
+    vegaLoader
+      .then((vega) => {
+        if (vegaLoader !== vegaPromise) {
+          // outside has changed
+          return;
+        }
+        if (!vega) {
+          return;
+        }
+        Object.entries(signals).forEach(([key, v]) => {
+          vega.view.signal(key, v);
+        });
+        vega.view.runAsync();
+      })
+      .catch((error) => {
+        console.error('error while updating signals', error);
+        hasError = true;
       });
-      vega.view.runAsync();
-    }).catch((error) => {
-      console.error(error);
-      hasError = true;
-    });
   }
 
   function updateSpec(spec) {
@@ -118,6 +129,7 @@
       vegaPromise.then((r) => r.finalize());
     }
     vega = null;
+    hasError = false;
     vegaPromise = embed(root, spec, {
       actions: false,
       patch: (spec) => {
@@ -135,9 +147,12 @@
           dispatch(name, value);
         });
       });
-      updateData(r, data);
+      updateData(vegaPromise, data);
     });
-    vegaPromise.catch((error) => console.error(error));
+    vegaPromise.catch((error) => {
+      console.error('error while creating vega', error);
+      hasError = true;
+    });
   }
 
   onMount(() => {
@@ -169,6 +184,6 @@
 <div
   bind:this={root}
   class="root"
-  class:loading-bg={loading}
-  class:message-overlay={hasError || (noData && !loading)}
-  data-message={hasError ? 'Error occurred' : noDataText} />
+  class:loading-bg={!hasError && loading}
+  class:message-overlay={message != null}
+  data-message={message} />
