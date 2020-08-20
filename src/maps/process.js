@@ -1,6 +1,6 @@
 // Node script to process the maps and info and generate an optimized version
 
-const { dsvFormat } = require('d3');
+const { dsvFormat } = require('d3-dsv');
 const fs = require('fs');
 const path = require('path');
 const { topology } = require('topojson-server');

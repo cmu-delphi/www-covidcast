@@ -20,9 +20,9 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run build
-      # - name: Deploy
-      #   if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-      #   uses: peaceiris/actions-gh-pages@v3
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     publish_dir: ./dist
+      - name: Deploy
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
