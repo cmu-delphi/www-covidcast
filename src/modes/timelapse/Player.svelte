@@ -1,12 +1,16 @@
 <script>
   import IoMdPause from 'svelte-icons/io/IoMdPause.svelte';
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';
-  import { timeMonth } from 'd3-time';
+  // import { timeMonth } from 'd3-time';
   import noUiSlider from 'nouislider';
   import 'nouislider/distribute/nouislider.css';
+  import { timeFormat } from 'd3-time-format';
 
   const DAY_IN_MS = 24 * 60 * 60 * 1000;
   const dispatch = createEventDispatcher();
+
+  const dateFormatter = timeFormat('%m/%d');
+  const dateFullFormatter = timeFormat('%x');
 
   export let running = false;
   export let value = new Date();
@@ -17,6 +21,14 @@
 
   function toggleRunning() {
     dispatch('toggle', !running);
+  }
+
+  function dateToDay(d) {
+    return Math.floor(d.getTime()) / DAY_IN_MS;
+  }
+
+  function dayToDate(d) {
+    return new Date(d * DAY_IN_MS);
   }
 
   /**
@@ -32,35 +44,47 @@
   let sliderElement = null;
   let sliderInstance = null;
 
-  const format = {
+  const formatFull = {
     to: (v) => {
-      return new Date(v).toLocaleDateString();
+      return dateFullFormatter(dayToDate(v));
     },
     from: (v) => {
-      return Number.parseInt(v);
+      return Number.parseInt(v, 10);
+    },
+  };
+
+  const formatPip = {
+    to: (v) => {
+      const d = dayToDate(v);
+      if (d.getTime() === min.getTime() || d.getTime() === max.getTime()) {
+        return dateFullFormatter(d);
+      }
+      return dateFormatter(d);
+    },
+    from: (v) => {
+      return Number.parseInt(v, 10);
     },
   };
 
   onMount(() => {
     sliderInstance = noUiSlider.create(sliderElement, {
-      step: DAY_IN_MS,
-      tooltips: [format],
+      step: 1,
+      tooltips: [formatFull],
       connect: 'lower',
       range: {
-        min: min.getTime(),
-        max: max.getTime(),
+        min: dateToDay(min),
+        max: dateToDay(max),
       },
-      start: value.getTime(),
+      start: dateToDay(value),
       pips: {
-        mode: 'values',
-        format,
-        values: timeMonth.range(min, max, 2).map((d) => d.getTime()),
+        mode: 'positions',
+        values: [0, 25, 50, 75, 100],
         density: 4,
-        stepped: true,
+        format: formatPip,
       },
     });
     sliderInstance.on('change', (values) => {
-      dispatch('change', new Date(Number.parseInt(values[0], 10)));
+      dispatch('change', dayToDate(Number.parseInt(values[0], 10)));
     });
   });
 
@@ -72,26 +96,19 @@
   });
 
   $: {
-    const v = value.getTime();
+    const v = dateToDay(value);
     if (sliderInstance) {
       sliderInstance.set(v);
     }
   }
   $: {
-    const minD = min.getTime();
-    const maxD = max.getTime();
+    const minD = dateToDay(min);
+    const maxD = dateToDay(max);
     if (sliderInstance) {
       sliderInstance.updateOptions(
         {
           range: { min: minD, max: maxD },
-          start: value.getTime(),
-          pips: {
-            mode: 'values',
-            format,
-            values: timeMonth.range(min, max, 2).map((d) => d.getTime()),
-            density: 4,
-            stepped: true,
-          },
+          start: dateToDay(value),
         },
         false,
       );
