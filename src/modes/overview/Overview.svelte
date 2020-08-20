@@ -22,7 +22,7 @@
   } from '../../stores';
   import Search from '../../components/Search.svelte';
   import SmallMultiplesPanel from './SmallMultiplesPanel.svelte';
-  import DetailView from './DetailView.svelte';
+  import DetailView from '../../components/DetailView/DetailView.svelte';
   import MapOverlays from './MapOverlays.svelte';
   import { fetchRegionSlice } from '../../data/fetchData';
 

@@ -1,7 +1,7 @@
 <script>
   import { currentRegion, currentLevel, currentRegionInfo, signalCasesOrDeathOptions } from '../../stores';
   import { fetchTimeSlice } from '../../data/fetchData';
-  import Vega from '../../components/vega/Vega.svelte';
+  import Vega from '../vega/Vega.svelte';
   import spec from './DetailView.json';
   import specCasesDeath from './DetailViewCasesDeath.json';
   import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
@@ -9,7 +9,7 @@
   import { merge } from 'lodash-es';
   import { isCasesSignal, isDeathSignal } from '../../data';
   import { primaryValue } from '../../stores/constants';
-  import EncodingOptions from '../../components/EncodingOptions.svelte';
+  import EncodingOptions from '../EncodingOptions.svelte';
 
   const dispatch = createEventDispatcher();
   /**
@@ -157,21 +157,6 @@
     position: absolute;
     right: 0;
     top: 0;
-  }
-
-  .toggles {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-  }
-
-  .button-group {
-    margin: 0.2em;
-  }
-
-  .button {
-    width: 10em;
-    padding: 0.2em 0.5em;
   }
 </style>
 

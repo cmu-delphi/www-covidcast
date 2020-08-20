@@ -1,10 +1,11 @@
 <script>
-  import SmallMultiples from './SmallMultiples.svelte';
   import { sensorList, currentSensor, currentLevel, currentRegion } from '../../stores';
   import IoMdExpand from 'svelte-icons/io/IoMdExpand.svelte';
   import { createEventDispatcher } from 'svelte';
   import { parseAPITime } from '../../data';
   import { fetchMultipleTimeSlices } from '../../data/fetchData';
+  import Vega from '../../components/vega/Vega.svelte';
+  import spec from './SmallMultiplesChart.json';
 
   const dispatch = createEventDispatcher();
 
@@ -62,6 +63,22 @@
     opacity: 0;
     transition: opacity 0.25s ease;
   }
+
+  .single-sensor-chart {
+    height: 4em;
+  }
+
+  .vega-wrapper {
+    position: relative;
+  }
+  .vega-wrapper > :global(*) {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+  }
+
 </style>
 
 <ul class="root">
@@ -78,7 +95,9 @@
           </button>
         </div>
       </div>
-      <SmallMultiples data={s.data} />
+      <div class="single-sensor-chart vega-wrapper">
+        <Vega data={s.data} spec={spec} />
+      </div>
     </li>
   {/each}
 </ul>
