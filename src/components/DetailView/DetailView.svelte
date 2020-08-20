@@ -166,6 +166,10 @@
     right: 0;
     top: 0;
   }
+
+  .encoding {
+    padding-top: 0.5em;
+  }
 </style>
 
 <div class="header">
@@ -174,7 +178,6 @@
   <button class="pg-button close" on:click={() => dispatch('close')} title="Close this detail view">
     <IoIosClose />
   </button>
-  <EncodingOptions center {sensor} />
 </div>
 <div class="single-sensor-chart vega-wrapper">
   <Vega
@@ -182,5 +185,8 @@
     spec={isCasesOrDeath ? specCasesDeath : spec}
     {patchSpec}
     signals={{ currentDate: $currentDateObject }} />
+</div>
+<div class="encoding">
+  <EncodingOptions center {sensor} />
 </div>
 <svelte:window on:keydown={onEscCheck} />
