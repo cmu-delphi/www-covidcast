@@ -19,7 +19,8 @@
   $: mapTitle =
     typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText($signalCasesOrDeathOptions) : sensor.mapTitleText;
 
-  $: data = fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId);
+  $: hasRegion = Boolean($currentRegionInfo);
+  $: data = $currentRegionInfo ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId) : [];
 
   $: regularPatch = {
     vconcat: [
@@ -179,6 +180,7 @@
     {data}
     spec={sensor.isCasesOrDeath ? specCasesDeath : spec}
     {patchSpec}
+    noDataText={hasRegion ? 'No data available' : 'No location selected'}
     signals={{ currentDate: $currentDateObject }} />
 </div>
 <div class="encoding">
