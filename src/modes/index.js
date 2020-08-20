@@ -28,10 +28,10 @@ export default [
   //   tooltip: 'Switch to Comparison Mode',
   //   component: () => import(/* webpackPrefech: true */ './compare/Compare.svelte').then((r) => r.default),
   // },
-  {
-    id: 'hotspots',
-    label: 'Hotspots',
-    tooltip: 'Switch to Hotspots Mode',
-    component: () => import(/* webpackPrefetch: true */ './hotspots/Hotspots.svelte').then((r) => r.default),
-  },
+  // {
+  //   id: 'hotspots',
+  //   label: 'Hotspots',
+  //   tooltip: 'Switch to Hotspots Mode',
+  //   component: () => import(/* webpackPrefetch: true */ './hotspots/Hotspots.svelte').then((r) => r.default),
+  // },
 ];
