@@ -1,5 +1,5 @@
 <script>
-  import { sensorList, currentSensor, currentLevel, currentRegion, currentDateObject } from '../../stores';
+  import { sensorList, currentSensor, currentDateObject, currentRegionInfo } from '../../stores';
   import IoMdExpand from 'svelte-icons/io/IoMdExpand.svelte';
   import { createEventDispatcher } from 'svelte';
   import { parseAPITime } from '../../data';
@@ -19,12 +19,14 @@
 
   const sensors = sensorList.filter((d) => !remove.includes(d.key));
 
-  $: hasRegion = Boolean($currentRegion);
+  $: hasRegion = Boolean($currentRegionInfo);
   $: sensorsWithData = hasRegion
-    ? fetchMultipleTimeSlices(sensors, $currentLevel, $currentRegion, startDay, finalDay).map((data, i) => ({
-        sensor: sensors[i],
-        data,
-      }))
+    ? fetchMultipleTimeSlices(sensors, $currentRegionInfo.level, $currentRegionInfo, startDay, finalDay).map(
+        (data, i) => ({
+          sensor: sensors[i],
+          data,
+        }),
+      )
     : sensors.map((sensor) => ({ sensor, data: [] }));
 </script>
 
