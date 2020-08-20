@@ -114,7 +114,7 @@
           data={s.data}
           {spec}
           noDataText={hasRegion ? null : 'No location selected'}
-          signals={{ currentDate: $currentDateObject }} />
+          signals={{ currentDate: hasRegion ? $currentDateObject : null }} />
       </div>
     </li>
   {/each}

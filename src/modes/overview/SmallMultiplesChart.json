@@ -7,6 +7,12 @@
   "autosize": {
     "resize": true
   },
+  "transform": [
+    {
+      "calculate": "datum.date_value",
+      "as": "title"
+    }
+  ],
   "encoding": {
     "color": {
       "value": "grey"
@@ -25,7 +31,12 @@
       "field": "value",
       "type": "quantitative",
       "axis": null
-    }
+    },
+    "tooltip": [
+      { "field": "value", "type": "quantitative", "title": "Value", "format": ".2f" },
+      { "field": "stderr", "type": "quantitative", "title": "Standard Error", "format": ".2f" },
+      { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
+    ]
   },
   "layer": [
     {
@@ -36,59 +47,35 @@
     },
     {
       "selection": {
-        "index": {
-          "type": "single",
-          "on": "mousemove",
-          "encodings": ["x", "y"],
-          "nearest": true
-        }
+        "highlight": { "type": "single", "empty": "none", "on": "mouseover" }
       },
-      "mark": { "type": "point" },
+      "mark": {
+        "type": "point",
+        "tooltip": true,
+        "radius": 1,
+        "stroke": null,
+        "fill": "grey"
+      },
       "encoding": {
         "y": { "field": "value", "type": "quantitative" },
-        "opacity": { "value": 0 }
+        "opacity": {
+          "condition": {
+            "selection": "highlight",
+            "value": 1
+          },
+          "value": 0
+        }
       }
     },
     {
       "transform": [
         {
           "filter": {
-            "and": ["index.date_value", { "selection": "index" }]
+            "selection": "highlight"
           }
         }
       ],
       "mark": "rule"
-    },
-    {
-      "transform": [
-        {
-          "filter": {
-            "and": ["index.date_value", { "selection": "index" }]
-          }
-        }
-      ],
-      "mark": "text",
-      "encoding": {
-        "y": { "value": 25 },
-        "text": { "field": "date_value", "type": "temporal", "format": "%m %d" }
-      }
-    },
-    {
-      "transform": [
-        {
-          "filter": {
-            "and": ["index.date_value", { "selection": "index" }]
-          }
-        }
-      ],
-      "mark": "text",
-      "encoding": {
-        "y": { "value": 15 },
-        "text": { "field": "value", "type": "quantitative", "format": ".1r" },
-        "color": {
-          "value": "black"
-        }
-      }
     },
     {
       "description": "shows the current data injected via a signal, y: null is on purpose to invalidate a global y",
