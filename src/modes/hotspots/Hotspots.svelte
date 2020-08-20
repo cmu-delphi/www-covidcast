@@ -136,7 +136,6 @@
 </style>
 
 <div class="root content">
-  <h2>Hotspots</h2>
   <div class="options-container container-bg base-font-size container-style">
     <Options />
   </div>
