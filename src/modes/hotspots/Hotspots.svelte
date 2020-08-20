@@ -5,16 +5,15 @@
   import { fetchRegionSlice, fetchMultipleRegionsTimeSlices } from '../../data/fetchData';
   import IoIosPin from 'svelte-icons/io/IoIosPin.svelte';
   import modes from '..';
-  import { regionSearchLookup } from '../../stores/search';
   import Vega from '../../components/vega/Vega.svelte';
+  import { getInfoByName } from '../../maps';
 
   /**
    * @param {import('../../data/fetchData').EpiDataRow} row
-   * @param {Map<string, import('../../maps').NameInfo>} lookup
    * @param {string} level   */
-  function toHotspotData(row, lookup, level) {
+  function toHotspotData(row, level) {
     // TODO generalize this process into the stores
-    const props = lookup(row.geo_value.toUpperCase());
+    const props = getInfoByName(row.geo_value.toUpperCase());
     return {
       id: row.geo_value.toUpperCase(),
       name: props ? props.displayName : row.geo_value,
@@ -42,7 +41,7 @@
     loading = true;
     fetchRegionSlice($currentSensorEntry, $currentLevel, $currentDateObject).then((rows) => {
       rawData = rows
-        .map((row) => toHotspotData(row, $regionSearchLookup, $currentLevel))
+        .map((row) => toHotspotData(row, $currentLevel))
         .sort(byHotspot)
         .slice(0, TOP_HOTSPOTS);
       loading = false;

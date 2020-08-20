@@ -217,7 +217,15 @@ export default class AMapBoxWrapper {
     }
   }
 
+  validateLevel(level) {
+    if (!this.levels.includes(level)) {
+      return this.levels[0];
+    }
+    return level;
+  }
+
   updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, stopsMega) {
+    level = this.validateLevel(level);
     // changed the visibility of layers
     const oldLevel = this.level;
     this.level = level;
@@ -263,6 +271,7 @@ export default class AMapBoxWrapper {
    * @param {Promise<import('../../data/fetchData').EpiDataRow[]>>} data
    */
   updateSources(level, data, primaryValue = 'value') {
+    level = this.validateLevel(level);
     // flag to compare if we still load the same data
     const dataFlag = Math.random().toString(36);
     this._mapDataFlag = dataFlag;

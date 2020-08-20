@@ -81,3 +81,23 @@ export function loadSWPASources(additionalProperties = {}) {
     r.default(stateInfo, countyInfo, msaInfo, swpaNeighborhoodInfo, swapZipInfo, additionalProperties),
   );
 }
+
+/**
+ * helper to resolve a given id to a name info object
+ * @type {Map<string, NameInfo>}
+ */
+const infoLookup = new Map();
+nameInfos.concat(swpaNameInfos).forEach((d) => {
+  const id = String(d.propertyId).toLowerCase();
+  if (!infoLookup.has(id)) {
+    infoLookup.set(id, d);
+  }
+  const key = String(d.id).toLowerCase();
+  if (!infoLookup.has(key)) {
+    infoLookup.set(key, d);
+  }
+});
+
+export function getInfoByName(name) {
+  return infoLookup.get(name);
+}

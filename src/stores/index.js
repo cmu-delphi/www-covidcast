@@ -4,7 +4,7 @@ import { scaleSequentialLog } from 'd3-scale';
 import { defaultSensorId, sensorList, sensorMap, levels, swpaLevels } from './constants';
 import modes from '../modes';
 import { parseAPITime } from '../data/utils';
-import { regionSearchLookup } from './search';
+import { getInfoByName } from '../maps';
 export {
   defaultRegionOnStartup,
   getLevelInfo,
@@ -16,7 +16,6 @@ export {
   sensorMap,
   groupedSensorList,
 } from './constants';
-export { regionSearchList } from './search';
 
 /**
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
@@ -119,7 +118,7 @@ export const currentRegion = writable('', (set) => {
 /**
  * current region info (could also be null)
  */
-export const currentRegionInfo = derived([currentRegion, regionSearchLookup], ([current, lookup]) => lookup(current));
+export const currentRegionInfo = derived([currentRegion], ([current]) => getInfoByName(current));
 
 /**
  *
@@ -138,8 +137,7 @@ export function selectByInfo(elem) {
 }
 
 export function selectByFeature(feature) {
-  const lookup = get(regionSearchLookup);
-  selectByInfo(feature ? lookup(feature.properties.id) : null);
+  selectByInfo(feature ? getInfoByName(feature.properties.id) : null);
 }
 
 export const colorScale = writable(scaleSequentialLog());

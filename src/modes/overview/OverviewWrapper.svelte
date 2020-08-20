@@ -65,6 +65,12 @@
   }
 
   let loading = true;
+  $: {
+    // enforce level is valid
+    if (!levelList.find((d) => d.id === $currentLevel)) {
+      currentLevel.set(levelList[0].id);
+    }
+  }
   $: data = fetchRegionSlice($currentSensorEntry, $currentLevel, $currentDateObject);
 </script>
 
@@ -141,17 +147,15 @@
     <div class="options-container base-font-size container-bg container-style">
       <Options levels={levelList} />
     </div>
-    <div class="search-container-wrapper base-font-size" class:loading={regionSearchList.length === 0}>
-      {#if regionSearchList.length > 0}
-        <Search
-          className="search-container container-bg container-style"
-          placeholder="Search for a location..."
-          items={regionSearchList}
-          selectedItem={$currentRegionInfo}
-          labelFieldName="displayName"
-          maxItemsToShowInList="5"
-          onChange={selectByInfo} />
-      {/if}
+    <div class="search-container-wrapper base-font-size">
+      <Search
+        className="search-container container-bg container-style"
+        placeholder="Search for a location..."
+        items={regionSearchList}
+        selectedItem={$currentRegionInfo}
+        labelFieldName="displayName"
+        maxItemsToShowInList="5"
+        onChange={selectByInfo} />
     </div>
   </div>
   <div class="content-container">
