@@ -1,6 +1,6 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
-  import { default as embed } from 'vega-embed';
+  import embed from 'vega-embed';
   import { observeResize, unobserveResize } from '../../util';
 
   export let data = Promise.resolve([]);
@@ -36,9 +36,10 @@
    */
   let signalListeners = [];
 
-  let loading = true;
+  let loading = false;
   let noData = false;
-  export let noDataText = null;
+  let hasError = false;
+  export let noDataText = 'No data available';
 
   /**
    * @type {(import('vega-embed').VisualizationSpec, size: {width: number, height: number}) => (import('vega-embed').VisualizationSpec}
@@ -102,6 +103,9 @@
         vega.view.signal(key, v);
       });
       vega.view.runAsync();
+    }).catch((error) => {
+      console.error(error);
+      hasError = true;
     });
   }
 
@@ -166,5 +170,5 @@
   bind:this={root}
   class="root"
   class:loading-bg={loading}
-  class:no-data={!loading && noData}
-  data-no-data={noDataText} />
+  class:message-overlay={hasError || (noData && !loading)}
+  data-message={hasError ? 'Error occurred' : noDataText} />

@@ -1,8 +1,8 @@
-.no-data {
+.message-overlay {
   position: relative;
 }
 
-.no-data::before {
+.message-overlay::before {
   position: absolute;
   top: 0;
   left: 0;
@@ -12,7 +12,7 @@
   background: rgba(255, 255, 255, 0.8);
 }
 
-.no-data::after {
+.message-overlay::after {
   z-index: 101;
   position: absolute;
   width: 100%;
@@ -24,9 +24,9 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  content: 'No data available';
+  content: 'error occurred';
 }
 
-.no-data[data-no-data]::after {
-  content: attr(data-no-data);
+.message-overlay[data-message]::after {
+  content: attr(data-message);
 }
