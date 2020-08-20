@@ -19,12 +19,13 @@
 
   const sensors = sensorList.filter((d) => !remove.includes(d.key));
 
-  $: sensorsWithData = fetchMultipleTimeSlices(sensors, $currentLevel, $currentRegion, startDay, finalDay).map(
-    (data, i) => ({
-      sensor: sensors[i],
-      data,
-    }),
-  );
+  $: hasRegion = Boolean($currentRegion);
+  $: sensorsWithData = hasRegion
+    ? fetchMultipleTimeSlices(sensors, $currentLevel, $currentRegion, startDay, finalDay).map((data, i) => ({
+        sensor: sensors[i],
+        data,
+      }))
+    : sensors.map((sensor) => ({ sensor, data: [] }));
 </script>
 
 <style>
@@ -78,6 +79,10 @@
     right: 0;
     bottom: 0;
   }
+
+  .hidden {
+    display: none;
+  }
 </style>
 
 <ul class="root">
@@ -85,7 +90,7 @@
     <li>
       <div class="header">
         <h5 title={s.sensor.tooltipText} on:click={() => currentSensor.set(s.sensor.key)}>{s.sensor.name}</h5>
-        <div class="toolbar">
+        <div class="toolbar" class:hidden={!hasRegion}>
           <button
             class="pg-button"
             class:active={detail === s.sensor}
@@ -95,7 +100,7 @@
         </div>
       </div>
       <div class="single-sensor-chart vega-wrapper">
-        <Vega data={s.data} {spec} />
+        <Vega data={s.data} {spec} noDataText={hasRegion ? null : 'No location selected'} />
       </div>
     </li>
   {/each}

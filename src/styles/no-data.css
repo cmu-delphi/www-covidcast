@@ -26,3 +26,7 @@
   align-items: center;
   content: 'No data available';
 }
+
+.no-data[data-no-data]::after {
+  content: attr(data-no-data);
+}

@@ -25,6 +25,7 @@
 
   let loading = true;
   let noData = false;
+  export let noDataText = null;
 
   /**
    * @type {(import('vega-embed').VisualizationSpec, size: {width: number, height: number}) => (import('vega-embed').VisualizationSpec}
@@ -96,4 +97,9 @@
   });
 </script>
 
-<div bind:this={root} class="root" class:loading-bg={loading && !noData} class:no-data={noData} />
+<div
+  bind:this={root}
+  class="root"
+  class:loading-bg={loading}
+  class:no-data={!loading && noData}
+  data-no-data={noDataText} />
