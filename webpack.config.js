@@ -6,7 +6,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
 const { EnvironmentPlugin, DefinePlugin } = require('webpack');
-const TerserJSPlugin = require('terser-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const pkg = require('./package.json');
 
@@ -34,7 +34,7 @@ module.exports = () => {
     },
 
     optimization: {
-      minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
+      minimizer: [new OptimizeCSSAssetsPlugin(), new TerserPlugin()],
       splitChunks: {
         cacheGroups: {
           // no splitting of css files
@@ -113,6 +113,7 @@ module.exports = () => {
     },
 
     plugins: [
+      devMode ? null : new CleanWebpackPlugin(),
       new DefinePlugin({
         __VERSION__: JSON.stringify(pkg.version),
       }),
@@ -132,10 +133,9 @@ module.exports = () => {
       new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({
         filename: '[name].css',
-        chunkFilename: devMode ? '[name].js' : '[name].[chunkhash].js',
         ignoreOrder: true,
+        chunkFilename: devMode ? '[name].css' : '[name].[chunkhash].css',
       }),
-      !devMode && new CleanWebpackPlugin(),
     ].filter(Boolean),
   };
 };

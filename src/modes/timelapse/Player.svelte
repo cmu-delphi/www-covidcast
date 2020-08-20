@@ -1,7 +1,7 @@
 <script>
   import IoMdPause from 'svelte-icons/io/IoMdPause.svelte';
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';
-  import { timeMonth } from 'd3';
+  import { timeMonth } from 'd3-time';
   import noUiSlider from 'nouislider';
   import 'nouislider/distribute/nouislider.css';
 
