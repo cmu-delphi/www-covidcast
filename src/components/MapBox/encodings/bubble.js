@@ -1,4 +1,4 @@
-import { L, toFillLayer, toBubbleLayer } from '../layers';
+import { toFillLayer, toBubbleLayer } from '../layers';
 import { toCenterSource } from '../sources';
 import { getType } from '../../../data/signals';
 import { parseScaleSpec } from '../../../stores/scales';
@@ -9,7 +9,7 @@ export default class BubbleEncoding {
   constructor(theme) {
     this.id = 'bubble';
     this.theme = theme;
-    this.layers = levels.map((level) => L[level].bubble);
+    this.layers = levels.map((level) => toBubbleLayer(level));
     this.interactiveSources = [];
   }
 

@@ -20,7 +20,7 @@ export function toHoverLayer(level) {
   return `${level}-hover`;
 }
 export function toBubbleLayer(level) {
-  return `${level}-hover`;
+  return `${level}-bubble`;
 }
 
 export const L = {

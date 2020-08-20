@@ -1,6 +1,6 @@
 import { Popup } from 'mapbox-gl';
 import { levelMegaCounty } from '../../stores/constants';
-import { L, toFillLayer } from './layers';
+import { L, toFillLayer, toHoverLayer } from './layers';
 import { toBorderSource } from './sources';
 import Tooltip from './Tooltip.svelte';
 
@@ -42,7 +42,6 @@ export default class InteractiveMap {
       props: {
         properties: null,
         invalid: true,
-        properties: null,
       },
     });
 
@@ -56,7 +55,7 @@ export default class InteractiveMap {
 
     this.adapter.levels.forEach((level) => {
       const fillLayer = toFillLayer(level);
-      // this.map.on('mouseenter', L[level].fill, this._onLevelMouseEnter.bind(this));
+      // this.map.on('mouseenter', fillLayer, this._onLevelMouseEnter.bind(this));
       this.map.on('mouseleave', fillLayer, this._onLevelMouseLeave.bind(this));
       this.map.on('mousemove', fillLayer, this._onLevelMouseMove.bind(this));
       this.map.on('click', fillLayer, this._onLevelMouseClick.bind(this));
@@ -207,19 +206,23 @@ export default class InteractiveMap {
 
   _updateHoverLayerVisibility() {
     const visibleLevels = new Set();
-    if (this.clicked.mega != null || this.hovered.mega != null) {
-      visibleLevels.add(levelMegaCounty.id);
-    }
     if (this.clicked.id != null) {
       visibleLevels.add(this.clicked.level);
     }
     if (this.hovered.id != null) {
       visibleLevels.add(this.hovered.level);
     }
-    for (const level of levelsWithMega) {
-      const visible = this.map.getLayoutProperty(L[level].hover, 'visibility') !== 'none';
+    for (const level of this.adapter.levels) {
+      const visible = this.map.getLayoutProperty(toHoverLayer(level), 'visibility') !== 'none';
       if (visible !== visibleLevels.has(level)) {
-        this.map.setLayoutProperty(L[level].hover, 'visibility', visibleLevels.has(level) ? 'visible' : 'none');
+        this.map.setLayoutProperty(toHoverLayer(level), 'visibility', visibleLevels.has(level) ? 'visible' : 'none');
+      }
+    }
+    if (this.adapter.hasMegaCountyLevel) {
+      const megaVisible = this.clicked.mega != null || this.hovered.mega != null;
+      const visible = this.map.getLayoutProperty(toHoverLayer(levelMegaCounty.id), 'visibility') !== 'none';
+      if (MouseEvent !== visible) {
+        this.map.setLayoutProperty(toHoverLayer(levelMegaCounty.id), 'visibility', megaVisible ? 'visible' : 'none');
       }
     }
   }
