@@ -25,7 +25,12 @@ import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 const START_TIME_RANGE = parseAPITime('20100101');
 const END_TIME_RANGE = parseAPITime('20500101');
 
-function parseData(data) {
+function parseData(d) {
+  if (d.result < 0 || d.message.includes('no results')) {
+    return [];
+  }
+  const data = d.epidata || [];
+
   for (const row of data) {
     if (row.time_value == null) {
       row.date_value = null;
@@ -43,6 +48,45 @@ function parseData(data) {
   return data;
 }
 
+function parseMultipleData(data) {
+  if ((data.length > 0 && data[0].result < 0) || data[0].message.includes('no results')) {
+    return [];
+  }
+  if (data.length === 0) {
+    return [];
+  }
+  const combined = combineSignals(
+    data.map((d) => d.epidata || []),
+    EPIDATA_CASES_OR_DEATH_VALUES,
+  );
+  return parseData({
+    ...data[0],
+    epidata: combined,
+  });
+}
+
+/**
+ * @param {SensorEntry} sensorEntry
+ * @param {string} level
+ * @param {string | undefined} region
+ * @param {Date | string} date
+ * @returns {Promise<EpiDataRow[]>}
+ */
+function fetchData(sensorEntry, level, region, date) {
+  if (!region) {
+    return Promise.resolve([]);
+  }
+  if (sensorEntry.isCasesOrDeath) {
+    return Promise.all(
+      EPIDATA_CASES_OR_DEATH_VALUES.map((k) =>
+        callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.casesOrDeathSignals[k], level, date, region),
+      ),
+    ).then(parseMultipleData);
+  } else {
+    return callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.signal, level, date, region).then(parseData);
+  }
+}
+
 /**
  *
  * @param {SensorEntry} sensorEntry
@@ -51,31 +95,7 @@ function parseData(data) {
  * @returns {Promise<EpiDataRow[]>}
  */
 export function fetchRegionSlice(sensorEntry, level, date) {
-  let promise;
-  if (sensorEntry.isCasesOrDeath) {
-    promise = Promise.all(
-      EPIDATA_CASES_OR_DEATH_VALUES.map((k) =>
-        callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.casesOrDeathSignals[k], level, date, '*'),
-      ),
-    ).then((data) => {
-      if ((data.length > 0 && data[0].result < 0) || data[0].message.includes('no results')) {
-        return [];
-      }
-      const combined = combineSignals(
-        data.map((d) => d.epidata),
-        EPIDATA_CASES_OR_DEATH_VALUES,
-      );
-      return parseData(combined);
-    });
-  } else {
-    promise = callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.signal, level, date, '*').then((d) => {
-      if (d.result < 0 || d.message.includes('no results')) {
-        return [];
-      }
-      return parseData(d.epidata);
-    });
-  }
-  return promise;
+  return fetchData(sensorEntry, level, '*', date);
 }
 
 /**
@@ -91,30 +111,7 @@ export function fetchTimeSlice(sensorEntry, level, region, startDate = START_TIM
     return Promise.resolve([]);
   }
   const timeRange = `${formatAPITime(startDate)}-${formatAPITime(endDate)}`;
-
-  if (sensorEntry.isCasesOrDeath) {
-    return Promise.all(
-      EPIDATA_CASES_OR_DEATH_VALUES.map((k) =>
-        callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.casesOrDeathSignals[k], level, timeRange, region),
-      ),
-    ).then((data) => {
-      if ((data.length > 0 && data[0].result < 0) || data[0].message.includes('no results')) {
-        return [];
-      }
-      const combined = combineSignals(
-        data.map((d) => d.epidata),
-        EPIDATA_CASES_OR_DEATH_VALUES,
-      );
-      return parseData(combined);
-    });
-  } else {
-    return callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.signal, level, timeRange, region).then((d) => {
-      if (d.result < 0 || d.message.includes('no results')) {
-        return [];
-      }
-      return parseData(d.epidata);
-    });
-  }
+  return fetchData(sensorEntry, level, region, timeRange);
 }
 
 /**
