@@ -68,8 +68,7 @@
 <style>
   .root {
     position: relative;
-    flex: 1 1 80vh;
-    min-height: 550px;
+    flex: 1 1 0;
     display: flex;
     flex-direction: column;
   }
