@@ -1,5 +1,11 @@
 <script>
-  import { currentRegion, currentLevel, currentRegionInfo, signalCasesOrDeathOptions } from '../../stores';
+  import {
+    currentRegion,
+    currentLevel,
+    currentRegionInfo,
+    signalCasesOrDeathOptions,
+    currentDateObject,
+  } from '../../stores';
   import { fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../vega/Vega.svelte';
   import spec from './DetailView.json';
@@ -62,8 +68,10 @@
           ],
         },
         layer: [
-          {},
+          {}, // current date
+          {}, // bars
           {
+            // average line
             encoding: {
               y: {
                 field: primaryValue(sensor, $signalCasesOrDeathOptions),
@@ -169,6 +177,10 @@
   <EncodingOptions center {sensor} />
 </div>
 <div class="single-sensor-chart vega-wrapper">
-  <Vega {data} spec={isCasesOrDeath ? specCasesDeath : spec} {patchSpec} />
+  <Vega
+    {data}
+    spec={isCasesOrDeath ? specCasesDeath : spec}
+    {patchSpec}
+    signals={{ currentDate: $currentDateObject }} />
 </div>
 <svelte:window on:keydown={onEscCheck} />

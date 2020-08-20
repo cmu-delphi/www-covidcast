@@ -58,12 +58,36 @@
       },
       "layer": [
         {
+          "description": "shows the current data injected via a signal, y: null is on purpose to invalidate a global y",
+          "data": {
+            "values": [{ "date_value": null }]
+          },
+          "transform": [
+            {
+              "calculate": "toDate(currentDate)",
+              "as": "date_value"
+            }
+          ],
+          "mark": "rule",
+          "encoding": {
+            "color": {
+              "value": "#c00"
+            },
+            "x": {
+              "field": "date_value",
+              "type": "temporal"
+            },
+            "y": null
+          }
+        },
+        {
+          "data": {
+            "name": "values"
+          },
           "selection": {
             "highlight": { "type": "single", "empty": "none", "on": "mouseover" }
           },
-          "mark": {
-            "type": "bar"
-          },
+          "mark": "bar",
           "encoding": {
             "color": {
               "condition": {
@@ -93,13 +117,6 @@
     },
     {
       "height": 60,
-      "selection": {
-        "highlight": { "type": "single", "empty": "none", "on": "mouseover" },
-        "brush": { "type": "interval", "encodings": ["x"] }
-      },
-      "mark": {
-        "type": "bar"
-      },
       "encoding": {
         "color": {
           "condition": {
@@ -130,7 +147,42 @@
           { "field": "avg", "type": "quantitative", "title": "7-day average", "format": ".2f" },
           { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
         ]
-      }
+      },
+      "layer": [
+        {
+          "description": "shows the current data injected via a signal, y: null is on purpose to invalidate a global y",
+          "data": {
+            "values": [{ "date_value": null }]
+          },
+          "transform": [
+            {
+              "calculate": "toDate(currentDate)",
+              "as": "date_value"
+            }
+          ],
+          "mark": "rule",
+          "encoding": {
+            "color": {
+              "value": "#c00"
+            },
+            "x": {
+              "field": "date_value",
+              "type": "temporal"
+            },
+            "y": null
+          }
+        },
+        {
+          "mark": "bar",
+          "data": {
+            "name": "values"
+          },
+          "selection": {
+            "highlight": { "type": "single", "empty": "none", "on": "mouseover" },
+            "brush": { "type": "interval", "encodings": ["x"] }
+          }
+        }
+      ]
     }
   ]
 }

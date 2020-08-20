@@ -94,6 +94,29 @@
             }
           ],
           "mark": "rule"
+        },
+        {
+          "description": "shows the current data injected via a signal, y: null is on purpose to invalidate a global y",
+          "data": {
+            "values": [{ "date_value": null }]
+          },
+          "transform": [
+            {
+              "calculate": "toDate(currentDate)",
+              "as": "date_value"
+            }
+          ],
+          "mark": "rule",
+          "encoding": {
+            "color": {
+              "value": "#c00"
+            },
+            "x": {
+              "field": "date_value",
+              "type": "temporal"
+            },
+            "y": null
+          }
         }
       ]
     },
@@ -164,6 +187,29 @@
             }
           ],
           "mark": "rule"
+        },
+        {
+          "description": "shows the current data injected via a signal, y: null is on purpose to invalidate a global y",
+          "data": {
+            "values": [{ "date_value": null }]
+          },
+          "transform": [
+            {
+              "calculate": "toDate(currentDate)",
+              "as": "date_value"
+            }
+          ],
+          "mark": "rule",
+          "encoding": {
+            "color": {
+              "value": "#c00"
+            },
+            "x": {
+              "field": "date_value",
+              "type": "temporal"
+            },
+            "y": null
+          }
         }
       ]
     }

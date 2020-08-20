@@ -1,5 +1,5 @@
 <script>
-  import { sensorList, currentSensor, currentLevel, currentRegion } from '../../stores';
+  import { sensorList, currentSensor, currentLevel, currentRegion, currentDateObject } from '../../stores';
   import IoMdExpand from 'svelte-icons/io/IoMdExpand.svelte';
   import { createEventDispatcher } from 'svelte';
   import { parseAPITime } from '../../data';
@@ -110,7 +110,11 @@
         </div>
       </div>
       <div class="single-sensor-chart vega-wrapper">
-        <Vega data={s.data} {spec} noDataText={hasRegion ? null : 'No location selected'} />
+        <Vega
+          data={s.data}
+          {spec}
+          noDataText={hasRegion ? null : 'No location selected'}
+          signals={{ currentDate: $currentDateObject }} />
       </div>
     </li>
   {/each}

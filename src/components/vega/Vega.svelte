@@ -70,15 +70,20 @@
           return;
         }
         noData = !d || d.length === 0;
-        vega.view
-          .change(
-            'values',
-            vega.view
-              .changeset()
-              .remove(() => true)
-              .insert(d || []),
-          )
-          .runAsync();
+
+        vega.view.change(
+          'values',
+          vega.view
+            .changeset()
+            .remove(() => true)
+            .insert(d || []),
+        );
+        // also update signals along the way
+        Object.entries(signals).forEach(([key, v]) => {
+          vega.view.signal(key, v);
+        });
+        vega.view.runAsync();
+
         loading = false;
       })
       .catch((error) => {
