@@ -1,5 +1,5 @@
 <script>
-  import { signalType, encoding, currentSensorEntry } from '../stores';
+  import { encoding, currentSensorEntry, isValueSignalType, isDirectionSignalType } from '../stores';
   import EncodingOptions from './EncodingOptions.svelte';
   import DirectionLegend from './legends/DirectionLegend.svelte';
   import ColorLegend from './legends/ColorLegend.svelte';
@@ -26,9 +26,9 @@
   }
 </style>
 
-<div aria-label="legend" class="legend {$signalType === 'value' ? 'value' : ''}">
+<div aria-label="legend" class="legend {$isValueSignalType ? 'value' : ''}">
   <EncodingOptions sensor={$currentSensorEntry} />
-  {#if $signalType === 'direction'}
+  {#if $isDirectionSignalType}
     <DirectionLegend />
   {:else if $encoding === 'color'}
     <ColorLegend {loading} />

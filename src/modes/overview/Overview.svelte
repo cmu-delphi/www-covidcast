@@ -166,8 +166,7 @@
         encoding={$encoding}
         on:ready={() => initialReady()}
         on:updatedEncoding={(e) => updatedEncoding(e.detail)}
-        on:select={(e) => selectByFeature(e.detail)}
-        on:selectMega={(e) => selectByFeature(e.detail)} />
+        on:select={(e) => selectByFeature(e.detail)}/>
 
       {#if detailSensor != null}
         <div class="detail-container container-bg container-style">

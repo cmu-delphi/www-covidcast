@@ -1,4 +1,3 @@
-import { isCountSignal, isPropSignal } from '../../data/signals';
 import { scaleSequential, scaleSequentialLog } from 'd3-scale';
 import { interpolateYlOrRd } from 'd3-scale-chromatic';
 import logspace from 'compute-logspace';
@@ -12,7 +11,6 @@ const EXPLICIT_ZERO_OFFSET = 0.01;
 const TICK_COUNT = 7;
 
 /**
- *
  * @param {*} statsLookup
  * @param {import('../../stores/constants').SensorEntry} sensorEntry
  * @param {string} level
@@ -33,19 +31,28 @@ export function determineMinMax(statsLookup, sensorEntry, level, signalOptions) 
   return [Math.max(0, stats.mean - 3 * stats.std), stats.mean + 3 * stats.std];
 }
 
-export function determineColorScale(valueMinMax, signalType, sensor) {
+/**
+ * @param {import('../../stores/constants').SensorEntry} sensorEntry
+ * @param {'value' || 'direction'} signalType
+ * @param {[number, number]} valueMinMax
+ */
+export function determineColorScale(valueMinMax, signalType, sensorEntry) {
   if (signalType === 'value') {
-    return determineValueColorScale(valueMinMax, sensor);
+    return determineValueColorScale(valueMinMax, sensorEntry);
   }
   // signalType is 'direction'
   return determineDirectionColorScale();
 }
 
-function determineValueColorScale(valueMinMax, sensor) {
-  if (isCountSignal(sensor)) {
+/**
+ * @param {import('../../stores/constants').SensorEntry} sensorEntry
+ * @param {[number, number]} valueMinMax
+ */
+function determineValueColorScale(valueMinMax, sensorEntry) {
+  if (sensorEntry.isCount) {
     return countSignalColorScale(valueMinMax);
   }
-  if (isPropSignal(sensor)) {
+  if (sensorEntry.isProp) {
     return propSignalColorScale(valueMinMax);
   }
   return regularSignalColorScale(valueMinMax);

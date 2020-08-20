@@ -1,11 +1,11 @@
 <script>
   import { timeFormat } from 'd3-time-format';
   import {
-    signalType,
     currentSensorEntry,
     colorScale,
     currentDateObject,
     signalCasesOrDeathOptions,
+    isDirectionSignalType,
   } from '../../stores';
   import { DIRECTION_THEME } from '../../theme';
   import { getTextColorBasedOnBackground } from '../../util';
@@ -62,7 +62,7 @@
             {typeof properties.population == 'number' ? properties.population.toLocaleString() : 'Unknown'}
           </td>
         </tr>
-        {#if $signalType === 'direction'}
+        {#if $isDirectionSignalType}
           <tr>
             {#if properties.value === 1}
               <td colspan="2" style="background-color: {DIRECTION_THEME.increasing}">
