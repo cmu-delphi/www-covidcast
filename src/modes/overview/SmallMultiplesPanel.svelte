@@ -118,7 +118,7 @@
         <Vega
           data={s.data}
           {spec}
-          noDataText={hasRegion ? null : 'No location selected'}
+          noDataText={hasRegion ? 'No data available' : 'No location selected'}
           signals={{ currentDate: hasRegion ? $currentDateObject : null }} />
       </div>
     </li>

@@ -39,6 +39,9 @@
   let loading = false;
   let noData = false;
   let hasError = false;
+
+  export let resetSignalsUponNoData = true;
+
   export let noDataText = 'No data available';
   $: message = hasError ? 'Error occurred' : noData && !loading ? noDataText : null;
 
@@ -80,7 +83,7 @@
         );
         // also update signals along the way
         Object.entries(signals).forEach(([key, v]) => {
-          vega.view.signal(key, v);
+          vega.view.signal(key, resetSignalsUponNoData && noData ? null : v);
         });
         vega.view.runAsync();
 
