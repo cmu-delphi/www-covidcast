@@ -13,7 +13,6 @@
   import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
   import { createEventDispatcher } from 'svelte';
   import { merge } from 'lodash-es';
-  import { isCasesSignal, isDeathSignal } from '../../data';
   import { primaryValue } from '../../stores/constants';
   import EncodingOptions from '../EncodingOptions.svelte';
 
@@ -23,8 +22,10 @@
    */
   export let sensor;
 
+  $: mapTitle =
+    typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText($signalCasesOrDeathOptions) : sensor.mapTitleText;
+
   $: data = fetchTimeSlice(sensor, $currentLevel, $currentRegion);
-  $: isCasesOrDeath = isCasesSignal(sensor.key) || isDeathSignal(sensor.key);
 
   $: regularPatch = {
     vconcat: [
@@ -128,7 +129,7 @@
       );
   }
 
-  $: patchSpec = generatePatch(isCasesOrDeath ? casesPatch : regularPatch);
+  $: patchSpec = generatePatch(sensor.isCasesOrDeath ? casesPatch : regularPatch);
 
   /**
    * @param {KeyboardEvent} e
@@ -174,7 +175,7 @@
 
 <div class="header">
   <h4>{sensor.name} of {$currentRegionInfo ? $currentRegionInfo.displayName : 'Unknown'}</h4>
-  <h5>{sensor.tooltipText}</h5>
+  <h5>{mapTitle}</h5>
   <button class="pg-button close" on:click={() => dispatch('close')} title="Close this detail view">
     <IoIosClose />
   </button>
@@ -182,7 +183,7 @@
 <div class="single-sensor-chart vega-wrapper">
   <Vega
     {data}
-    spec={isCasesOrDeath ? specCasesDeath : spec}
+    spec={sensor.isCasesOrDeath ? specCasesDeath : spec}
     {patchSpec}
     signals={{ currentDate: $currentDateObject }} />
 </div>

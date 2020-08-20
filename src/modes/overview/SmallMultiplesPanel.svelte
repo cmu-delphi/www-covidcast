@@ -95,7 +95,7 @@
     <li>
       <div class="header">
         <h5
-          title={s.sensor.tooltipText}
+          title={typeof s.sensor.tooltipText === 'function' ? s.sensor.tooltipText() : s.sensor.tooltipText}
           on:click={() => currentSensor.set(s.sensor.key)}
           class:selected={$currentSensor === s.sensor.key}>
           {s.sensor.name}

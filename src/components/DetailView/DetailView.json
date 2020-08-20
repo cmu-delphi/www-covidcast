@@ -60,7 +60,11 @@
         },
         {
           "selection": {
-            "highlight": { "type": "single", "empty": "none", "on": "mouseover" }
+            "highlight": {
+              "type": "single",
+              "empty": "none",
+              "on": "mouseover"
+            }
           },
           "mark": {
             "type": "circle",

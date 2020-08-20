@@ -92,7 +92,11 @@
     {#each groupedSensorList as sensorGroup}
       <optgroup label={sensorGroup.label}>
         {#each sensorGroup.sensors as sensor}
-          <option title={sensor.tooltipText} value={sensor.key}>{sensor.name}</option>
+          <option
+            title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
+            value={sensor.key}>
+            {sensor.name}
+          </option>
         {/each}
       </optgroup>
     {/each}
