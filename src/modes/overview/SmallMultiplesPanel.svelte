@@ -1,16 +1,17 @@
 <script>
   import { sensorList, currentSensor, currentDateObject, currentRegionInfo } from '../../stores';
   import IoMdExpand from 'svelte-icons/io/IoMdExpand.svelte';
-  import { createEventDispatcher } from 'svelte';
   import { parseAPITime } from '../../data';
   import { fetchMultipleTimeSlices } from '../../data/fetchData';
   import Vega from '../../components/vega/Vega.svelte';
   import spec from './SmallMultiplesChart.json';
 
-  const dispatch = createEventDispatcher();
-
   const remove = ['ght-smoothed_search', 'safegraph-full_time_work_prop'];
 
+  /**
+   * bi-directional binding
+   * @type {import('../../stores/constants').SensorEntry}
+   */
   export let detail = null;
 
   // Create a date for today in the API's date format
@@ -21,7 +22,7 @@
 
   $: hasRegion = Boolean($currentRegionInfo);
   $: sensorsWithData = hasRegion
-    ? fetchMultipleTimeSlices(sensors, $currentRegionInfo.level, $currentRegionInfo, startDay, finalDay).map(
+    ? fetchMultipleTimeSlices(sensors, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, finalDay).map(
         (data, i) => ({
           sensor: sensors[i],
           data,
@@ -106,7 +107,9 @@
           <button
             class="pg-button"
             class:active={detail === s.sensor}
-            on:click|stopPropagation={() => dispatch('show', detail === s.sensor ? null : s.sensor)}>
+            on:click|stopPropagation={() => {
+              detail = detail === s.sensor ? null : s.sensor;
+            }}>
             <IoMdExpand />
           </button>
         </div>
