@@ -78,7 +78,6 @@
     right: 0;
     bottom: 0;
   }
-
 </style>
 
 <ul class="root">
@@ -96,7 +95,7 @@
         </div>
       </div>
       <div class="single-sensor-chart vega-wrapper">
-        <Vega data={s.data} spec={spec} />
+        <Vega data={s.data} {spec} />
       </div>
     </li>
   {/each}
