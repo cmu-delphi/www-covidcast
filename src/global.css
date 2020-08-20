@@ -4,63 +4,22 @@
   --darkgrey: #333;
 }
 
+@import './styles/header.css';
+@import './styles/embed.css';
+
+@import './styles/ie11.css';
+
 #vizbox {
+  font-display: fallback;
+  font-family: 'Open Sans', sans-serif;
   margin: 0;
   padding: 0;
-  font-family: 'Open Sans', sans-serif;
   position: relative;
-  width: 100%;
-  height: 90vh;
-  min-width: 1021px;
-  min-height: 550px;
+  flex: 1 1 0;
   line-height: 1rem;
-}
 
-.title {
-  font-size: 30px;
-  margin-right: 30px;
-}
-
-.subtitle {
-  margin-top: 5px;
-  font-size: 16px;
-  color: var(--grey);
-  font-style: italic;
-}
-
-.block {
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.background {
-  fill: none;
-  pointer-events: all;
-}
-
-.line {
-  fill: none;
-  stroke: var(--red);
-  stroke-width: 2px;
-}
-
-.inline {
-  display: inline-flex;
-}
-
-button.mapboxgl-ctrl-zoom-in,
-button.mapboxgl-ctrl-zoom-out {
-  margin: 0;
-}
-
-.axis-text {
-  font-size: 14px;
-  font-family: 'Open Sans', sans-serif;
-  color: var(--grey);
-}
-
-.axes {
-  font-family: 'Open Sans', sans-serif;
-  color: var(--grey);
+  display: flex;
+  flex-direction: column;
 }
 
 button.mapboxgl-popup-close-button {
@@ -68,60 +27,14 @@ button.mapboxgl-popup-close-button {
   color: var(--grey);
 }
 
-.tooltip-text {
-  font-family: 'Open Sans', sans-serif;
-  margin: 0px;
-}
-
 #vizbox input:focus,
-#vizbox button:focus {
+#vizbox button:focus,
+#vizbox select:focus {
   outline: var(--red) 1px solid;
   box-shadow: 0 0 0 4px #fff !important;
   /* border: solid 1px var(--red) !important; */
   z-index: 10000;
-}
-
-.d3-tip {
-  background-color: #fff;
-  padding: 5px 5px;
-  color: var(--grey);
-  border-color: var(--grey);
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 4px;
-  font-size: 12px;
-  z-index: 99999;
-}
-
-/* Creates a small triangle extender for the tooltip */
-.d3-tip::after {
-  box-sizing: border-box;
-  display: inline;
-  font-size: 10px;
-  width: 100%;
-  line-height: 1;
-  color: var(--grey);
-  content: '\25BC';
-  position: absolute;
-  text-align: center;
-}
-
-/* Style northward tooltips specifically */
-.d3-tip.n::after {
-  margin: 0;
-  top: 100%;
-  left: 0;
-}
-
-.mapboxgl-ctrl-group,
-.mapboxgl-ctrl-group button:focus,
-.mapboxgl-ctrl-group button:focus:first-child {
-  border-radius: 0;
-}
-
-#vizbox circle {
-  padding: 5px;
-  cursor: pointer;
+  background-color: unset;
 }
 
 .mapboxgl-canvas {
@@ -151,64 +64,20 @@ button.mapboxgl-popup-close-button {
   border-top-color: var(--grey);
 }
 
-.map-popup-region-name {
-  font-weight: 600;
-}
-
-.map-popup-region-value {
-  background-color: #767676;
-
-  color: #fff;
-  padding: 2px 4px;
-}
-
 .mapboxgl-ctrl.mapboxgl-ctrl-group {
   outline: none;
   /* border: none; */
   border-radius: 3px;
 }
 
-/* search bar */
-.search-bar {
-  font-size: 14px !important;
-  font-family: 'Open Sans', Helvetica, sans-serif !important;
+.base-font-size {
+  font-size: 0.88rem;
 }
 
-.search-bar .input.autocomplete-input {
-  border-color: transparent !important;
-  background-color: transparent !important;
-
-  height: 36px !important;
-  margin: 4px !important;
-  padding-left: 6px !important;
-  padding-right: 6px !important;
-  width: 95% !important;
-  color: #111 !important;
+#vizbox [aria-hidden] {
+  display: none;
 }
 
-.search-bar .input.autocomplete-input:focus {
-  outline: none !important;
-  background-color: transparent !important;
-  border-bottom: solid 1px var(--red) !important;
-}
-
-.search-bar .autocomplete-list {
-  padding-top: 3px !important;
-  padding-left: 3px !important;
-  border-color: transparent !important;
-  background-color: transparent !important;
-  width: 96% !important;
-}
-
-.search-bar .autocomplete-list .autocomplete-list-item {
-  border-radius: 5px !important;
-  background-color: transparent !important;
-  transition: all 0.1s ease-in !important;
-}
-
-.search-bar .autocomplete-list .autocomplete-list-item.selected,
-.search-bar .autocomplete-list .autocomplete-list-item:hover {
-  background-color: var(--red) !important;
-  border-radius: 5px !important;
-  color: #fff !important;
-}
+@import './styles/pg-button.css';
+@import './styles/loading.css';
+@import './styles/no-data.css';

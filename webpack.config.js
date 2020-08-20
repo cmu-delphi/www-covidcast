@@ -1,11 +1,10 @@
 /* eslint-env node */
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const CopyPlugin = require('copy-webpack-plugin');
+// const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
-const WorkboxPlugin = require('workbox-webpack-plugin');
 const { EnvironmentPlugin, DefinePlugin } = require('webpack');
 const pkg = require('./package.json');
 
@@ -19,8 +18,8 @@ module.exports = () => {
 
     output: {
       path: path.resolve(__dirname, 'public'),
-      filename: 'build/[name].js',
-      chunkFilename: 'build/[name].js?id=[chunkhash]',
+      filename: '[name].js',
+      chunkFilename: '[name].js?id=[chunkhash]',
       // publicPath: './',
     },
 
@@ -30,6 +29,20 @@ module.exports = () => {
       },
       extensions: ['.mjs', '.js', '.svelte'],
       mainFields: ['svelte', 'browser', 'module', 'main'],
+    },
+
+    optimization: {
+      splitChunks: {
+        cacheGroups: {
+          // no splitting of css files
+          styles: {
+            name: 'styles',
+            test: /\.css$/,
+            chunks: 'all',
+            enforce: true,
+          },
+        },
+      },
     },
 
     module: {
@@ -66,6 +79,21 @@ module.exports = () => {
             'css-loader',
           ],
         },
+        {
+          test: /\.(png|jpg|gif|svg|jpeg)$/i,
+          use: [
+            {
+              loader: 'url-loader',
+              options: {
+                limit: 8192,
+              },
+            },
+          ],
+        },
+        {
+          test: /\.(txt|csv|tsv)$/i,
+          use: 'raw-loader',
+        },
       ],
     },
 
@@ -81,31 +109,24 @@ module.exports = () => {
         __VERSION__: JSON.stringify(pkg.version),
       }),
       new EnvironmentPlugin(['NODE_ENV']),
-      new CopyPlugin({
-        patterns: ['./src/static'],
-      }),
+      // new CopyPlugin({
+      //   patterns: ['./src/static'],
+      // }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
         template: './src/index.html',
       }),
       new HtmlWebpackPlugin({
+        filename: 'embed.html',
         alwaysWriteToDisk: true,
-        filename: 'frame.html',
-        template: './src/frame.html',
+        template: './src/embed.html',
       }),
       new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({
-        filename: 'build/[name].css',
-        chunkFilename: 'build/[id].css',
+        filename: '[name].css',
+        chunkFilename: '[id].css?id=[chunkhash]',
       }),
       !devMode && new CleanWebpackPlugin(),
-      !devMode &&
-        new WorkboxPlugin.GenerateSW({
-          // these options encourage the ServiceWorkers to get in there fast
-          // and not allow any straggling "old" SWs to hang around
-          clientsClaim: true,
-          skipWaiting: true,
-        }),
     ].filter(Boolean),
   };
 };

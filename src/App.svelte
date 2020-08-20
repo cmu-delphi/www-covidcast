@@ -1,0 +1,69 @@
+<script>
+  import { onMount } from 'svelte';
+
+  import { currentMode, appReady } from './stores';
+  import './stores/urlHandler';
+  import './stores/ga';
+  import { loadMetaData } from './data';
+  import ModeToggle from './components/ModeToggle.svelte';
+  import modes from './modes';
+
+  // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
+  const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
+  const isPortraitQuery = window.matchMedia('only screen and (orientation: portrait)');
+
+  $: isMobile = isMobileQuery.matches;
+  $: isPortrait = isPortraitQuery.matches;
+  // detect changes
+  isMobileQuery.addListener((r) => {
+    isMobile = r.matches;
+  });
+  isPortraitQuery.addListener((r) => {
+    isPortrait = r.matches;
+  });
+
+  onMount(() => {
+    loadMetaData().then(() => {
+      appReady.set(true);
+    });
+  });
+
+  $: currentComponent = $currentMode.component();
+</script>
+
+<style>
+  .root {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mode-switcher {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5em;
+  }
+
+  .loader {
+    flex-grow: 1;
+  }
+</style>
+
+<div class="root">
+  {#if modes.length > 1}
+    <div class="mode-switcher">
+      <ModeToggle />
+    </div>
+  {/if}
+  {#await currentComponent}
+    <div class="loader loading" />
+  {:then value}
+    <svelte:component this={value} />
+  {:catch error}
+    <div class="loader">
+      Error loading current mode
+      <pre>{error}</pre>
+    </div>
+  {/await}
+</div>
