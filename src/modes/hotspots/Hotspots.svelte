@@ -131,7 +131,7 @@
 </style>
 
 <div class="root">
-  <Options />
+  <Options className="options-container" />
   <div class="table base-font-size">
     <table>
       <thead>

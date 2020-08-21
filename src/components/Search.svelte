@@ -300,12 +300,9 @@
     width: 1.4em;
     margin: 0;
     padding: 0;
-    align-self: center;
     border: none;
     background: none;
-    flex: 0 0 1.4em;
   }
-
   .autocomplete-input {
     flex: 1 1 0;
     width: 100%;
@@ -372,7 +369,6 @@
   }
   .reset-button {
     z-index: 1;
-    margin-left: -1.6em;
   }
 </style>
 
@@ -385,8 +381,6 @@
     <IoIosSearch />
   </button>
   <input
-    type="text"
-    size="5"
     class="autocomplete-input"
     {placeholder}
     {name}

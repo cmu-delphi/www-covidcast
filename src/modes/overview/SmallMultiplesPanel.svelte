@@ -44,9 +44,8 @@
     cursor: pointer;
     text-decoration: underline;
   }
-
   h5:hover,
-  .selected {
+  li.selected h5 {
     color: var(--red);
   }
 
@@ -62,7 +61,8 @@
     padding: 0;
   }
 
-  li:hover .toolbar {
+  li:hover .toolbar,
+  li.selected .toolbar {
     opacity: 1;
   }
 
@@ -91,16 +91,32 @@
   .hidden {
     display: none;
   }
+
+  /** mobile **/
+  @media only screen and (max-width: 767px) {
+    ul {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-auto-flow: row;
+    }
+    li {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .toolbar {
+      display: none;
+    }
+  }
 </style>
 
 <ul class="root">
   {#each sensorsWithData as s}
-    <li>
+    <li class:selected={$currentSensor === s.sensor.key}>
       <div class="header">
         <h5
           title={typeof s.sensor.tooltipText === 'function' ? s.sensor.tooltipText() : s.sensor.tooltipText}
-          on:click={() => currentSensor.set(s.sensor.key)}
-          class:selected={$currentSensor === s.sensor.key}>
+          on:click={() => currentSensor.set(s.sensor.key)}>
           {s.sensor.name}
         </h5>
         <div class="toolbar" class:hidden={!hasRegion}>

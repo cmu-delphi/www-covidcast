@@ -35,7 +35,6 @@
   .options {
     position: relative;
     display: flex;
-    z-index: 1003;
     max-width: 50em;
     margin: 0 6px;
   }
@@ -90,6 +89,9 @@
 
   /** mobile **/
   @media only screen and (max-width: 767px) {
+    .options {
+      max-width: unset;
+    }
     .option-wrapper {
       padding: 0 2px;
       display: flex;
