@@ -34,7 +34,12 @@
   .options {
     position: relative;
     display: flex;
+  }
+
+  .option-wrapper {
     align-items: center;
+    display: flex;
+    flex: 1 1 auto;
   }
 
   .option-title {
@@ -78,49 +83,66 @@
   }
 
   :global(.datepicker) {
-    margin: unset;
+    margin: 0.25em 0;
+  }
+
+  /** mobile **/
+  @media only screen and (max-width: 767px) {
+    .option-wrapper {
+      padding: 0 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: space-between;
+    }
   }
 </style>
 
 <div class="options">
-  <span class="option-title" for="option-indicator">Displaying</span>
-  <select
-    id="option-indicator"
-    aria-label="indicator options"
-    class="indicators base-font-size"
-    bind:value={$currentSensor}>
-    {#each groupedSensorList as sensorGroup}
-      <optgroup label={sensorGroup.label}>
-        {#each sensorGroup.sensors as sensor}
-          <option
-            title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
-            value={sensor.key}>
-            {sensor.name}
-          </option>
-        {/each}
-      </optgroup>
-    {/each}
-  </select>
-  <span class="option-title">for</span>
-  <select
-    id="option-geo-level"
-    aria-label="geographic level"
-    class="geo-level base-font-size"
-    bind:value={$currentLevel}>
-    {#each levelList as level}
-      <option value={level.id} disabled={!$currentSensorEntry.levels.includes(level.id)}>{level.labelPlural}</option>
-    {/each}
-  </select>
+  <div class="option-wrapper">
+    <span class="option-title">Displaying</span>
+    <select
+      id="option-indicator"
+      aria-label="indicator options"
+      class="indicators base-font-size"
+      bind:value={$currentSensor}>
+      {#each groupedSensorList as sensorGroup}
+        <optgroup label={sensorGroup.label}>
+          {#each sensorGroup.sensors as sensor}
+            <option
+              title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
+              value={sensor.key}>
+              {sensor.name}
+            </option>
+          {/each}
+        </optgroup>
+      {/each}
+    </select>
+  </div>
+  <div class="option-wrapper">
+    <span class="option-title">for</span>
+    <select
+      id="option-geo-level"
+      aria-label="geographic level"
+      class="geo-level base-font-size"
+      bind:value={$currentLevel}>
+      {#each levelList as level}
+        <option value={level.id} disabled={!$currentSensorEntry.levels.includes(level.id)}>{level.labelPlural}</option>
+      {/each}
+    </select>
+  </div>
   {#if showDate}
-    <span class="option-title">on</span>
-    {#if selectedDate != null && start_end_dates.length !== 0}
-      <Datepicker
-        bind:selected={selectedDate}
-        start={parseAPITime(start_end_dates[0])}
-        end={parseAPITime(start_end_dates[1])}
-        formattedSelected={formatTime(selectedDate)}>
-        <button aria-label="selected date" class="calendar base-font-size" on:>{formatTime(selectedDate)}</button>
-      </Datepicker>
-    {/if}
+    <div class="option">
+      <span class="option-title">on</span>
+      {#if selectedDate != null && start_end_dates.length !== 0}
+        <Datepicker
+          bind:selected={selectedDate}
+          start={parseAPITime(start_end_dates[0])}
+          end={parseAPITime(start_end_dates[1])}
+          formattedSelected={formatTime(selectedDate)}>
+          <button aria-label="selected date" class="calendar base-font-size" on:>{formatTime(selectedDate)}</button>
+        </Datepicker>
+      {/if}
+    </div>
   {/if}
 </div>
