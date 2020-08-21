@@ -1,5 +1,5 @@
 import geojsonExtent from '@mapbox/geojson-extent';
-import { AttributionControl, Map as MapBox } from 'mapbox-gl';
+import { Map as MapBox } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { defaultRegionOnStartup, levelMegaCounty, levels } from '../../stores/constants';
 import { MAP_THEME } from '../../theme';
@@ -55,13 +55,15 @@ export default class MapBoxWrapper {
       style,
       bounds: this.zoom.stateBounds,
       fitBounds: this.zoom.stateBoundsOptions,
+      doubleClickZoom: false,
+      dragRotate: false,
+      pitchWithRotate: false,
+      touchPitch: false,
+      touchZoomRotate: false,
     });
     this.zoom.map = this.map;
-    this.map.addControl(new AttributionControl({ compact: true }));
+    // this.map.addControl(new AttributionControl({ compact: true }));
     // .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
-
-    //Disable touch zoom, it makes gesture scrolling difficult
-    // this.map.scrollZoom.disable();
 
     let resolveCallback = null;
 
