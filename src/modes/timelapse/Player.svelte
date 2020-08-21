@@ -101,18 +101,23 @@
       sliderInstance.set(v);
     }
   }
-  $: {
+  function updateSliderRange(min, max) {
+    if (!sliderInstance) {
+      return;
+    }
     const minD = dateToDay(min);
     const maxD = dateToDay(max);
-    if (sliderInstance) {
-      sliderInstance.updateOptions(
-        {
-          range: { min: minD, max: maxD },
-          start: dateToDay(value),
-        },
-        false,
-      );
-    }
+    sliderInstance.updateOptions(
+      {
+        range: { min: minD, max: maxD },
+        start: dateToDay(value),
+      },
+      false,
+    );
+  }
+
+  $: {
+    updateSliderRange(min, max);
   }
 </script>
 
