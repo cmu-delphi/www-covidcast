@@ -7,12 +7,11 @@
     levelList,
     currentSensorEntry,
     groupedSensorList,
+    isMobileDevice,
   } from '../stores';
   import Datepicker from './Calendar/Datepicker.svelte';
   import { timeFormat } from 'd3-time-format';
   import { formatAPITime, parseAPITime } from '../data';
-
-  const formatTime = timeFormat('%B %-d, %Y');
 
   export let className = '';
   export let showDate = true;
@@ -29,6 +28,8 @@
   $: if ($times !== null) {
     start_end_dates = $times.get($currentSensor);
   }
+
+  $: formatTime = $isMobileDevice ? timeFormat('%x') : timeFormat('%B %-d, %Y');
 </script>
 
 <style>
