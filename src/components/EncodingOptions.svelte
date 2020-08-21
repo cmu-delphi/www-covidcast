@@ -22,7 +22,7 @@
   }
 
   .button {
-    width: 10em;
+    width: 9em;
     padding: 0.2em 0.5em;
   }
 </style>
