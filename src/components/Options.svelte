@@ -147,6 +147,8 @@
           formattedSelected={formatTime(selectedDate)}>
           <button aria-label="selected date" class="calendar base-font-size" on:>{formatTime(selectedDate)}</button>
         </Datepicker>
+      {:else}
+        <button aria-label="selected date" class="calendar base-font-size" on:>{formatTime(selectedDate)}</button>
       {/if}
     </div>
   {/if}
