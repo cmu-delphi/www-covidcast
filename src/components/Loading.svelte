@@ -6,6 +6,7 @@
   .loader {
     min-width: 28px;
     min-height: 28px;
+    overflow: hidden;
   }
 </style>
 

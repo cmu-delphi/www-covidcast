@@ -7,10 +7,10 @@
     spikeHeightScale,
     currentSensorEntry,
     signalCasesOrDeathOptions,
+    isMobileDevice,
   } from '../../stores';
   import { transparent } from '../../util';
   import { generateLabels } from '../MapBox/colors';
-  import './ticks.css';
 
   const spikeBase = ENCODING_SPIKE_THEME.baseSize;
   const spikePadding = 2;
@@ -19,7 +19,14 @@
 
   $: size = ENCODING_SPIKE_THEME.size[$currentLevel] * spikeBase;
   $: maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel] * spikeBase;
-  $: r = generateLabels($stats, $currentSensorEntry, $currentLevel, $colorScale, $signalCasesOrDeathOptions);
+  $: r = generateLabels(
+    $stats,
+    $currentSensorEntry,
+    $currentLevel,
+    $colorScale,
+    $signalCasesOrDeathOptions,
+    $isMobileDevice,
+  );
   $: heightScale = $spikeHeightScale.clone().range([0, maxHeight]).domain(r.valueMinMax);
   $: maxPaddingHeight = maxHeight + spikePadding * 2;
 
@@ -32,10 +39,24 @@
 </script>
 
 <style>
+  ul {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    font-size: 80%;
+    justify-content: space-evenly;
+  }
+
   li {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    padding: 0;
+    margin: 0 0.2em;
     align-items: center;
     justify-content: flex-end;
   }
+
   svg {
     display: block;
     max-width: 200px;
@@ -50,7 +71,7 @@
 
 <ul class="legend-ticks" class:loading-bg={loading}>
   {#each r.labels as l}
-    <li class="legend-tick legend-tick-centered" title={l.label} style="height: {maxPaddingHeight}px">
+    <li class="legend-direct-tick">
       <svg width={size * 2 + spikePadding * 2} height={heightScale(l.value) + spikePadding * 2}>
         <g style="transform:translate({spikePadding}px, {spikePadding}px)">
           <path
@@ -60,9 +81,10 @@
             stroke={transparent(l.color, ENCODING_SPIKE_THEME.strokeOpacity)} />
         </g>
       </svg>
+      <span>{l.label}</span>
     </li>
   {/each}
-  <li class="legend-tick legend-tick-centered" title={r.high} style="height: {maxPaddingHeight}px">
+  <li class="legend-direct-tick">
     <svg width={size * 2 + spikePadding * 2} height={heightScale(r.highValue) + spikePadding * 2}>
       <g style="transform:translate({spikePadding}px, {spikePadding}px)">
         <path
@@ -72,5 +94,6 @@
           stroke={transparent(r.highColor, ENCODING_SPIKE_THEME.strokeOpacity)} />
       </g>
     </svg>
+    <span>{r.high}</span>
   </li>
 </ul>

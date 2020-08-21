@@ -1,16 +1,17 @@
 <script>
-  import { sensorList, currentSensor, currentLevel, currentRegion, currentDateObject } from '../../stores';
+  import { sensorList, currentSensor, currentDateObject, currentRegionInfo } from '../../stores';
   import IoMdExpand from 'svelte-icons/io/IoMdExpand.svelte';
-  import { createEventDispatcher } from 'svelte';
   import { parseAPITime } from '../../data';
   import { fetchMultipleTimeSlices } from '../../data/fetchData';
   import Vega from '../../components/vega/Vega.svelte';
   import spec from './SmallMultiplesChart.json';
 
-  const dispatch = createEventDispatcher();
-
   const remove = ['ght-smoothed_search', 'safegraph-full_time_work_prop'];
 
+  /**
+   * bi-directional binding
+   * @type {import('../../stores/constants').SensorEntry}
+   */
   export let detail = null;
 
   // Create a date for today in the API's date format
@@ -19,12 +20,14 @@
 
   const sensors = sensorList.filter((d) => !remove.includes(d.key));
 
-  $: hasRegion = Boolean($currentRegion);
-  $: sensorsWithData = hasRegion
-    ? fetchMultipleTimeSlices(sensors, $currentLevel, $currentRegion, startDay, finalDay).map((data, i) => ({
-        sensor: sensors[i],
-        data,
-      }))
+  $: hasRegion = Boolean($currentRegionInfo);
+  $: sensorsWithData = $currentRegionInfo
+    ? fetchMultipleTimeSlices(sensors, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, finalDay).map(
+        (data, i) => ({
+          sensor: sensors[i],
+          data,
+        }),
+      )
     : sensors.map((sensor) => ({ sensor, data: [] }));
 </script>
 
@@ -41,9 +44,8 @@
     cursor: pointer;
     text-decoration: underline;
   }
-
   h5:hover,
-  .selected {
+  li.selected h5 {
     color: var(--red);
   }
 
@@ -59,7 +61,8 @@
     padding: 0;
   }
 
-  li:hover .toolbar {
+  li:hover .toolbar,
+  li.selected .toolbar {
     opacity: 1;
   }
 
@@ -88,23 +91,41 @@
   .hidden {
     display: none;
   }
+
+  /** mobile **/
+  @media only screen and (max-width: 767px) {
+    ul {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-auto-flow: row;
+    }
+    li {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .toolbar {
+      display: none;
+    }
+  }
 </style>
 
 <ul class="root">
   {#each sensorsWithData as s}
-    <li>
+    <li class:selected={$currentSensor === s.sensor.key}>
       <div class="header">
         <h5
           title={typeof s.sensor.tooltipText === 'function' ? s.sensor.tooltipText() : s.sensor.tooltipText}
-          on:click={() => currentSensor.set(s.sensor.key)}
-          class:selected={$currentSensor === s.sensor.key}>
+          on:click={() => currentSensor.set(s.sensor.key)}>
           {s.sensor.name}
         </h5>
         <div class="toolbar" class:hidden={!hasRegion}>
           <button
             class="pg-button"
             class:active={detail === s.sensor}
-            on:click|stopPropagation={() => dispatch('show', detail === s.sensor ? null : s.sensor)}>
+            on:click|stopPropagation={() => {
+              detail = detail === s.sensor ? null : s.sensor;
+            }}>
             <IoMdExpand />
           </button>
         </div>
@@ -113,8 +134,8 @@
         <Vega
           data={s.data}
           {spec}
-          noDataText={hasRegion ? null : 'No location selected'}
-          signals={{ currentDate: hasRegion ? $currentDateObject : null }} />
+          noDataText={hasRegion ? 'No data available' : 'No location selected'}
+          signals={{ currentDate: $currentDateObject }} />
       </div>
     </li>
   {/each}

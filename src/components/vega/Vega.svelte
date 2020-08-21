@@ -39,6 +39,9 @@
   let loading = false;
   let noData = false;
   let hasError = false;
+
+  export let resetSignalsUponNoData = true;
+
   export let noDataText = 'No data available';
   $: message = hasError ? 'Error occurred' : noData && !loading ? noDataText : null;
 
@@ -63,14 +66,14 @@
     }
     loading = true;
     hasError = false;
+    noData = false;
+
     Promise.all([vegaLoader, data])
       .then(([vega, d]) => {
         if (vegaLoader !== vegaPromise) {
           // outside has changed
           return;
         }
-        noData = !d || d.length === 0;
-
         vega.view.change(
           'values',
           vega.view
@@ -78,17 +81,19 @@
             .remove(() => true)
             .insert(d || []),
         );
+
+        noData = !d || d.length === 0;
         // also update signals along the way
         Object.entries(signals).forEach(([key, v]) => {
-          vega.view.signal(key, v);
+          vega.view.signal(key, resetSignalsUponNoData && noData ? null : v);
         });
         vega.view.runAsync();
-
         loading = false;
       })
       .catch((error) => {
         console.error('error while updating data', error);
         loading = false;
+        noData = false;
         hasError = true;
       });
   }
@@ -190,5 +195,5 @@
   bind:this={root}
   class="root"
   class:loading-bg={!hasError && loading}
-  class:message-overlay={message != null}
+  class:message-overlay={hasError || (noData && !loading)}
   data-message={message} />

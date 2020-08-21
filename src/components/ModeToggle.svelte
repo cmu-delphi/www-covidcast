@@ -14,7 +14,7 @@
 <div aria-label="application mode" class="pg-button-group">
   {#each modes as mode}
     <button
-      aria-pressed={$currentMode === mode ? 'true' : 'false'}
+      aria-pressed={String($currentMode === mode)}
       class="pg-button button"
       class:selected={$currentMode === mode}
       on:click={() => {

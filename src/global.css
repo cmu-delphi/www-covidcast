@@ -2,6 +2,7 @@
   --red: #c00;
   --grey: #767676;
   --darkgrey: #333;
+  --bg: #f7f7f7;
 }
 
 @import './styles/header.css';
@@ -10,7 +11,6 @@
 @import './styles/ie11.css';
 
 #vizbox {
-  font-display: fallback;
   font-family: 'Open Sans', sans-serif;
   margin: 0;
   padding: 0;

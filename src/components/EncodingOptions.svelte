@@ -3,6 +3,7 @@
 
   export let center = false;
   export let sensor = $currentSensorEntry;
+  export let className = '';
 </script>
 
 <style>
@@ -26,8 +27,8 @@
   }
 </style>
 
-<div class="root" class:center>
-  {#if sensor.isCasesOrDeath}
+{#if sensor.isCasesOrDeath}
+  <div class="root {className}" class:center>
     <div aria-label="display cumulative or indicence" class="pg-button-group button-group">
       <button
         aria-pressed={String(!$signalCasesOrDeathOptions.cumulative)}
@@ -76,8 +77,7 @@
         Ratio per 100K
       </button>
     </div>
-  {/if}
-  <!-- <div aria-label="display type" class="pg-button-group button-group">
+    <!-- <div aria-label="display type" class="pg-button-group button-group">
     <button
       aria-pressed={$signalType === 'value' ? 'true' : 'false'}
       class="pg-button button"
@@ -102,4 +102,5 @@
       7-day Trend
     </button>
   </div> -->
-</div>
+  </div>
+{/if}
