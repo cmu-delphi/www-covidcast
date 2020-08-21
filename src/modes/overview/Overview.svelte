@@ -89,7 +89,7 @@
 
   .root > :global(.search-container) {
     grid-area: search;
-    margin: 0 6px 6px 6px;
+    margin: 0 6px 6px 0;
   }
 
   .map-container {
@@ -151,7 +151,7 @@
         'map map';
     }
     .root > :global(.search-container) {
-      margin: 0 6px;
+      margin: 0 0 0 6px;
     }
 
     .mobileHide {
@@ -229,7 +229,7 @@
     {/if}
   </div>
 
-  {#if !isMobileDevice || !mobileShowMap}
+  {#if !$isMobileDevice || !mobileShowMap}
     <div class="panel-container container-bg container-style">
       <div class="panel-scroll-container">
         <SmallMultiplesPanel bind:detail={detailSensor} />
