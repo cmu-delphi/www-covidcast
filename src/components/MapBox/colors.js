@@ -1,4 +1,3 @@
-import { isCountSignal, isPropSignal } from '../../data/signals';
 import { scaleSequential, scaleSequentialLog } from 'd3-scale';
 import { interpolateYlOrRd } from 'd3-scale-chromatic';
 import logspace from 'compute-logspace';
@@ -9,10 +8,10 @@ import { primaryValue } from '../../stores/constants';
 
 const MAGIC_MIN_STATS = 0.14;
 const EXPLICIT_ZERO_OFFSET = 0.01;
+const SMALL_TICK_COUNT = 5;
 const TICK_COUNT = 7;
 
 /**
- *
  * @param {*} statsLookup
  * @param {import('../../stores/constants').SensorEntry} sensorEntry
  * @param {string} level
@@ -33,19 +32,28 @@ export function determineMinMax(statsLookup, sensorEntry, level, signalOptions) 
   return [Math.max(0, stats.mean - 3 * stats.std), stats.mean + 3 * stats.std];
 }
 
-export function determineColorScale(valueMinMax, signalType, sensor) {
+/**
+ * @param {import('../../stores/constants').SensorEntry} sensorEntry
+ * @param {'value' || 'direction'} signalType
+ * @param {[number, number]} valueMinMax
+ */
+export function determineColorScale(valueMinMax, signalType, sensorEntry) {
   if (signalType === 'value') {
-    return determineValueColorScale(valueMinMax, sensor);
+    return determineValueColorScale(valueMinMax, sensorEntry);
   }
   // signalType is 'direction'
   return determineDirectionColorScale();
 }
 
-function determineValueColorScale(valueMinMax, sensor) {
-  if (isCountSignal(sensor)) {
+/**
+ * @param {import('../../stores/constants').SensorEntry} sensorEntry
+ * @param {[number, number]} valueMinMax
+ */
+function determineValueColorScale(valueMinMax, sensorEntry) {
+  if (sensorEntry.isCount) {
     return countSignalColorScale(valueMinMax);
   }
-  if (isPropSignal(sensor)) {
+  if (sensorEntry.isProp) {
     return propSignalColorScale(valueMinMax);
   }
   return regularSignalColorScale(valueMinMax);
@@ -131,21 +139,22 @@ export function splitDomain(min, max, parts) {
  * @param {import('../../stores/constants').SensorEntry} sensorEntry
  * @param {[number, number]} valueMinMax
  */
-function computeTicks(sensorEntry, valueMinMax) {
+function computeTicks(sensorEntry, valueMinMax, small) {
+  const numTicks = small ? SMALL_TICK_COUNT : TICK_COUNT;
   if (sensorEntry.isCount) {
     const min = Math.log10(Math.max(1, valueMinMax[0]));
     const max = Math.log10(Math.max(2, valueMinMax[1]));
-    return logspace(min, max, TICK_COUNT);
+    return logspace(min, max, numTicks);
   }
   // manipulates valueMinMax in place!
   if (sensorEntry.format === 'raw') {
     valueMinMax[0] = Math.max(EXPLICIT_ZERO_OFFSET, valueMinMax[0]);
-    return splitDomain(valueMinMax[0], valueMinMax[1], TICK_COUNT);
+    return splitDomain(valueMinMax[0], valueMinMax[1], numTicks);
   }
   // percent
   valueMinMax[0] = Math.max(EXPLICIT_ZERO_OFFSET, valueMinMax[0]);
   valueMinMax[1] = Math.min(100, valueMinMax[1]);
-  return splitDomain(valueMinMax[0], valueMinMax[1], TICK_COUNT);
+  return splitDomain(valueMinMax[0], valueMinMax[1], numTicks);
 }
 
 /**
@@ -155,7 +164,7 @@ function computeTicks(sensorEntry, valueMinMax) {
  * @param {((v: number) => string)} colorScale
  * @param {import('../../stores/constants').CasesOrDeathOptions} signalOptions
  */
-export function generateLabels(stats, sensorEntry, level, colorScale, signalOptions) {
+export function generateLabels(stats, sensorEntry, level, colorScale, signalOptions, small = false) {
   const valueMinMax = stats ? determineMinMax(stats, sensorEntry, level, signalOptions) : null;
 
   if (!valueMinMax) {
@@ -166,7 +175,7 @@ export function generateLabels(stats, sensorEntry, level, colorScale, signalOpti
     };
   }
 
-  const ticks = computeTicks(sensorEntry, valueMinMax);
+  const ticks = computeTicks(sensorEntry, valueMinMax, small);
 
   return {
     low: sensorEntry.formatValue(0), // fixed 0

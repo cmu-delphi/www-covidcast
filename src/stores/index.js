@@ -1,4 +1,4 @@
-import { writable, derived, get } from 'svelte/store';
+import { writable, derived, get, readable } from 'svelte/store';
 import { LogScale, SqrtScale } from './scales';
 import { scaleSequentialLog } from 'd3-scale';
 import { defaultSensorId, sensorList, sensorMap } from './constants';
@@ -64,13 +64,20 @@ export const currentLevel = writable('county', (set) => {
 });
 
 // Options are 'direction' and 'value'.
-export const signalType = writable('value', (set) => {
-  const signalT = urlParams.get('signalType');
-  if (signalT === 'direction' || signalT === 'value') {
-    // set(signalT);
-    set('value');
-  }
-});
+/**
+ * @type {import('svelte/store').Writable<'direction' | 'value'>}
+ */
+export const signalType = writable('value');
+// , (set) => {
+//   const signalT = urlParams.get('signalType');
+//   if (signalT === 'direction' || signalT === 'value') {
+//     // set(signalT);
+//     set('value');
+//   }
+// });
+
+export const isValueSignalType = derived([signalType], ([v]) => v === 'value');
+export const isDirectionSignalType = derived([signalType], ([v]) => v === 'direction');
 
 // in case of a death signal whether to show cumulative data
 export const signalCasesOrDeathOptions = writable({
@@ -188,3 +195,22 @@ currentSensorEntry.subscribe((sensorEntry) => {
     }
   }
 });
+
+// mobile device detection
+// const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
+
+export const isMobileDevice = readable(false, (set) => {
+  const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
+  set(isMobileQuery.matches);
+  isMobileQuery.addListener((r) => {
+    set(r.matches);
+  });
+});
+
+// export const isPortraitDevice = readable(false, (set) => {
+//   const isPortraitQuery = window.matchMedia('only screen and (orientation: portrait)');
+//   set(isPortraitQuery.matches);
+//   isPortraitQuery.addListener((r) => {
+//     set(r.matches);
+//   });
+// });

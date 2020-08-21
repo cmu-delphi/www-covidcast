@@ -6,6 +6,7 @@
   import 'nouislider/distribute/nouislider.css';
   import { timeFormat } from 'd3-time-format';
 
+  export let className = '';
   const DAY_IN_MS = 24 * 60 * 60 * 1000;
   const dispatch = createEventDispatcher();
 
@@ -101,27 +102,33 @@
       sliderInstance.set(v);
     }
   }
-  $: {
+  function updateSliderRange(min, max) {
+    if (!sliderInstance) {
+      return;
+    }
     const minD = dateToDay(min);
     const maxD = dateToDay(max);
-    if (sliderInstance) {
-      sliderInstance.updateOptions(
-        {
-          range: { min: minD, max: maxD },
-          start: dateToDay(value),
-        },
-        false,
-      );
-    }
+    sliderInstance.updateOptions(
+      {
+        range: { min: minD, max: maxD },
+        start: dateToDay(value),
+      },
+      false,
+    );
+  }
+
+  $: {
+    updateSliderRange(min, max);
   }
 </script>
 
 <style>
   .player {
-    flex: 1 1 auto;
+    margin: 0 6px;
+    max-width: 50em;
     display: flex;
     align-items: center;
-    padding: 0 0.5em;
+    padding: 0.25em 0.5em;
   }
 
   .play-button {
@@ -153,7 +160,7 @@
   }
 
   .slider {
-    margin: 0.5em 1em 1.5em 2.5em;
+    margin: 0.5em 2.5em 1.5em 2.5em;
     flex: 1 1 20em;
     height: 8px;
     font-size: 0.75rem;
@@ -192,7 +199,7 @@
   }
 </style>
 
-<div class="player">
+<div class="player container-bg container-style base-font-size {className}">
   <button
     bind:this={playButton}
     aria-pressed={running ? 'true' : 'false'}

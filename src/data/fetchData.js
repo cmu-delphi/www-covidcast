@@ -141,10 +141,31 @@ function createCopy(row, date, sensorEntry) {
  *
  * @param {Promise<EpiDataRow[]>[]} all
  * @param {((i: number) => SensorEntry)} sensorOf
+ * @param {Date} startDate
+ * @param {Date} endDate
+ * @param {boolean} fitRange
  */
-function syncStartEnd(all, sensorOf) {
+function syncStartEnd(all, sensorOf, startDate, endDate, fitRange = false) {
+  const adaptMinMax = (r, i, min, max) => {
+    if (r.length === 0) {
+      return r;
+    }
+    if (r[0].date_value != null && r[0].date_value.getTime() > min) {
+      // inject a min
+      r.unshift(createCopy(r[0], new Date(min), sensorOf(i)));
+    }
+    if (r[r.length - 1].date_value != null && r[r.length - 1].date_value.getTime() < max) {
+      // inject a max
+      r.push(createCopy(r[r.length - 1], new Date(max), sensorOf(i)));
+    }
+    return r;
+  };
+  if (fitRange) {
+    // fast can adapt every one independently
+    return all.map((promise, i) => promise.then((r) => adaptMinMax(r, i, startDate.getTime(), endDate.getTime())));
+  }
   // sync start and end date
-  return Promise.all(all).then((rows) => {
+  const allDone = Promise.all(all).then((rows) => {
     const min = rows.reduce(
       (acc, r) => (r.length === 0 || r[0].date_value == null ? acc : Math.min(acc, r[0].date_value.getTime())),
       Number.POSITIVE_INFINITY,
@@ -156,21 +177,9 @@ function syncStartEnd(all, sensorOf) {
           : Math.max(acc, r[r.length - 1].date_value.getTime()),
       Number.NEGATIVE_INFINITY,
     );
-    rows.forEach((r, i) => {
-      if (r.length === 0) {
-        return;
-      }
-      if (r[0].date_value != null && r[0].date_value.getTime() > min) {
-        // inject a min
-        r.unshift(createCopy(r[0], new Date(min), sensorOf(i)));
-      }
-      if (r[r.length - 1].date_value != null && r[r.length - 1].date_value.getTime() < max) {
-        // inject a max
-        r.push(createCopy(r[r.length - 1], new Date(max), sensorOf(i)));
-      }
-    });
-    return rows;
+    return rows.map((r, i) => adaptMinMax(r, i, min, max));
   });
+  return all.map((_, i) => allDone.then((r) => r[i]));
 }
 
 /**
@@ -180,6 +189,7 @@ function syncStartEnd(all, sensorOf) {
  * @param {string | undefined} region
  * @param {Date} startDate
  * @param {Date} endDate
+ * @param {boolean} fitRange
  * @returns {Promise<EpiDataRow[]>[]}
  */
 export function fetchMultipleTimeSlices(
@@ -188,13 +198,13 @@ export function fetchMultipleTimeSlices(
   region,
   startDate = START_TIME_RANGE,
   endDate = END_TIME_RANGE,
+  fitRange = false,
 ) {
   const all = sensorEntries.map((entry) => fetchTimeSlice(entry, level, region, startDate, endDate));
   if (sensorEntries.length <= 1) {
     return all;
   }
-  const allDone = syncStartEnd(all, (i) => sensorEntries[i]);
-  return sensorEntries.map((_, i) => allDone.then((r) => r[i]));
+  return syncStartEnd(all, (i) => sensorEntries[i], startDate, endDate, fitRange);
 }
 
 /**
@@ -204,6 +214,7 @@ export function fetchMultipleTimeSlices(
  * @param {string[]} region
  * @param {Date} startDate
  * @param {Date} endDate
+ * @param {boolean} fitRange
  * @returns {Promise<EpiDataRow[]>[]}
  */
 export function fetchMultipleRegionsTimeSlices(
@@ -212,11 +223,11 @@ export function fetchMultipleRegionsTimeSlices(
   regions,
   startDate = START_TIME_RANGE,
   endDate = END_TIME_RANGE,
+  fitRange = false,
 ) {
   const all = regions.map((region) => fetchTimeSlice(sensorEntry, level, region, startDate, endDate));
   if (regions.length <= 1) {
     return all;
   }
-  const allDone = syncStartEnd(all, () => sensorEntry);
-  return regions.map((_, i) => allDone.then((r) => r[i]));
+  return syncStartEnd(all, () => sensorEntry, startDate, endDate, fitRange);
 }

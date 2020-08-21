@@ -8,20 +8,6 @@
   import ModeToggle from './components/ModeToggle.svelte';
   import modes from './modes';
 
-  // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
-  const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
-  const isPortraitQuery = window.matchMedia('only screen and (orientation: portrait)');
-
-  $: isMobile = isMobileQuery.matches;
-  $: isPortrait = isPortraitQuery.matches;
-  // detect changes
-  isMobileQuery.addListener((r) => {
-    isMobile = r.matches;
-  });
-  isPortraitQuery.addListener((r) => {
-    isPortrait = r.matches;
-  });
-
   onMount(() => {
     loadMetaData().then(() => {
       appReady.set(true);

@@ -246,7 +246,6 @@
 <style>
   .datepicker {
     display: inline-block;
-    margin: 0 auto;
     text-align: center;
     overflow: visible;
   }
