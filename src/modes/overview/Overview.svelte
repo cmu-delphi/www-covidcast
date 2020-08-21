@@ -85,10 +85,12 @@
 
   .root > :global(.options-container) {
     grid-area: options;
+    z-index: 1010;
   }
 
   .root > :global(.search-container) {
     grid-area: search;
+    z-index: 1009;
     margin: 0 6px 6px 0;
   }
 

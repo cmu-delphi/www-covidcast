@@ -386,6 +386,7 @@
     {name}
     {disabled}
     {title}
+    aria-label={placeholder}
     bind:this={input}
     bind:value={text}
     on:input={onInput}

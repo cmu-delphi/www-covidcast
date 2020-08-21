@@ -1,5 +1,5 @@
 <script>
-  import { sensorList, currentSensor, currentDateObject, currentRegionInfo } from '../../stores';
+  import { sensorList, currentSensor, currentDateObject, currentRegionInfo, yesterdayDate } from '../../stores';
   import IoMdExpand from 'svelte-icons/io/IoMdExpand.svelte';
   import { parseAPITime } from '../../data';
   import { fetchMultipleTimeSlices } from '../../data/fetchData';
@@ -16,18 +16,23 @@
 
   // Create a date for today in the API's date format
   const startDay = parseAPITime('20200401');
-  const finalDay = new Date();
+  const finalDay = yesterdayDate;
 
   const sensors = sensorList.filter((d) => !remove.includes(d.key));
 
   $: hasRegion = Boolean($currentRegionInfo);
   $: sensorsWithData = $currentRegionInfo
-    ? fetchMultipleTimeSlices(sensors, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, finalDay).map(
-        (data, i) => ({
-          sensor: sensors[i],
-          data,
-        }),
-      )
+    ? fetchMultipleTimeSlices(
+        sensors,
+        $currentRegionInfo.level,
+        $currentRegionInfo.propertyId,
+        startDay,
+        finalDay,
+        true,
+      ).map((data, i) => ({
+        sensor: sensors[i],
+        data,
+      }))
     : sensors.map((sensor) => ({ sensor, data: [] }));
 </script>
 
@@ -37,15 +42,15 @@
     padding: 0 0 0 0.25em;
   }
 
-  h5 {
+  h3 {
     font-size: 0.88rem;
     flex: 1 1 0;
     padding: 0;
     cursor: pointer;
     text-decoration: underline;
   }
-  h5:hover,
-  li.selected h5 {
+  h3:hover,
+  li.selected h3 {
     color: var(--red);
   }
 
@@ -114,14 +119,15 @@
   {#each sensorsWithData as s}
     <li class:selected={$currentSensor === s.sensor.key}>
       <div class="header">
-        <h5
+        <h3
           title={typeof s.sensor.tooltipText === 'function' ? s.sensor.tooltipText() : s.sensor.tooltipText}
           on:click={() => currentSensor.set(s.sensor.key)}>
           {s.sensor.name}
-        </h5>
+        </h3>
         <div class="toolbar" class:hidden={!hasRegion}>
           <button
             class="pg-button"
+            title="Show as detail view"
             class:active={detail === s.sensor}
             on:click|stopPropagation={() => {
               detail = detail === s.sensor ? null : s.sensor;

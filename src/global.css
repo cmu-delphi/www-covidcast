@@ -22,6 +22,20 @@
   flex-direction: column;
 }
 
+/** mobile **/
+@media only screen and (max-height: 800px) {
+  /** reserve all space and let the user scroll to the main app**/
+
+  #vizbox {
+    height: 100vh;
+    flex-basis: 100vh;
+  }
+  body.viz-body {
+    height: unset;
+    width: unset;
+  }
+}
+
 button.mapboxgl-popup-close-button {
   padding: 2px;
   color: var(--grey);

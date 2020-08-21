@@ -40,6 +40,7 @@
     position: relative;
     color: transparent;
     white-space: nowrap;
+    line-height: 1;
   }
 
   .tick-last {
@@ -49,7 +50,7 @@
   .tick::after {
     content: attr(title);
     position: absolute;
-    top: 100%;
+    top: 120%;
     left: 0;
     transform: translate(-50%, 0);
     text-align: center;
