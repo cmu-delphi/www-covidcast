@@ -68,14 +68,13 @@
 <style>
   .root {
     position: relative;
-    flex: 1 1 80vh;
-    min-height: 550px;
+    flex: 1 1 0;
     display: flex;
     flex-direction: column;
   }
 
   .top-container {
-    padding: 0 12px;
+    padding: 0 12px 3px 12px;
     display: flex;
     justify-content: space-between;
   }
