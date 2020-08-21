@@ -205,19 +205,13 @@
       'map map';
   }
 
-  .options-container {
+  .root > :global(.options-container) {
     grid-area: options;
-    z-index: 1003;
-    max-width: 50em;
-    margin: 0 6px;
   }
 
-  .player-container {
+  .root > :global(.player-container) {
     grid-area: player;
     z-index: 1003;
-    margin: 0 6px;
-    max-width: 50em;
-    display: flex;
   }
 
   .map-container {
@@ -234,29 +228,26 @@
     .map-container {
       flex-grow: 1;
     }
-    .player-container {
+    .root > :global(.player-container) {
       order: 3;
       margin-bottom: 6px;
     }
-    .options-container {
+    .root > :global(.options-container) {
       margin-bottom: 6px;
     }
   }
 </style>
 
 <main class="root">
-  <div class="options-container base-font-size container-bg container-style">
-    <Options showDate={false} />
-  </div>
-  <div class="player-container container-bg container-style base-font-size ">
-    <Player
-      {running}
-      on:toggle={toggleRunning}
-      value={$currentDateObject}
-      max={maxDate}
-      min={minDate}
-      on:change={(e) => jumpToDate(e.detail)} />
-  </div>
+  <Options showDate={false} className="options-container" />
+  <Player
+    className="player-container"
+    {running}
+    on:toggle={toggleRunning}
+    value={$currentDateObject}
+    max={maxDate}
+    min={minDate}
+    on:change={(e) => jumpToDate(e.detail)} />
   <div class="map-container">
     <MapOverlays {map} mapLoading={running || loading} legendLoading={false}>
       <div slot="title">{$currentDateObject.toLocaleDateString()}</div>

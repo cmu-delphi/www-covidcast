@@ -70,9 +70,6 @@
     flex-direction: column;
     padding: 0 2%;
   }
-  .options-container {
-    margin-bottom: 0.1em;
-  }
 
   .table {
     flex: 1 1 0;
@@ -134,9 +131,7 @@
 </style>
 
 <div class="root">
-  <div class="options-container container-bg base-font-size container-style">
-    <Options />
-  </div>
+  <Options />
   <div class="table base-font-size">
     <table>
       <thead>

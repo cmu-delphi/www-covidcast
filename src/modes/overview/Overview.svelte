@@ -80,11 +80,8 @@
     justify-content: space-between;
   }
 
-  .options-container {
+  .top-container > :global(.options-container) {
     z-index: 1003;
-    max-width: 50em;
-    flex-grow: 3;
-    margin: 0 6px;
   }
 
   .top-container > :global(.search-container) {
@@ -132,9 +129,7 @@
 
 <main class="root">
   <div class="top-container">
-    <div class="options-container base-font-size container-bg container-style">
-      <Options />
-    </div>
+    <Options className="options-container" />
     {#if !$isMobileDevice}
       <Search
         className="search-container container-bg container-style base-font-size"

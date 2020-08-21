@@ -14,6 +14,7 @@
 
   const formatTime = timeFormat('%B %-d, %Y');
 
+  export let className = '';
   export let showDate = true;
   // let selectedDate = writable(parseTime($currentDate));
   $: selectedDate = parseAPITime($currentDate);
@@ -34,6 +35,9 @@
   .options {
     position: relative;
     display: flex;
+    z-index: 1003;
+    max-width: 50em;
+    margin: 0 6px;
   }
 
   .option-wrapper {
@@ -55,7 +59,7 @@
     color: #111;
     line-height: 1.3;
     padding: 0.4em 0.6em;
-    width: auto;
+    width: 100%;
     min-width: 0;
 
     -moz-appearance: none;
@@ -65,11 +69,9 @@
     transition: all 0.1s ease-in;
     flex: 1 1 auto;
     white-space: nowrap;
-  }
 
-  select,
-  .calendar {
     padding-right: 1.7em;
+
     background-image: linear-gradient(45deg, transparent 50%, gray 50%),
       linear-gradient(135deg, gray 50%, transparent 50%);
     background-position: calc(100% - 15px) calc(0.85em + 0px), calc(100% - 10px) calc(0.85em + 0px);
@@ -95,14 +97,10 @@
       align-items: stretch;
       justify-content: space-between;
     }
-    .calendar,
-    select {
-      width: 100%;
-    }
   }
 </style>
 
-<div class="options">
+<div class="options base-font-size container-bg container-style {className}">
   <div class="option-wrapper">
     <span class="option-title">Displaying</span>
     <select
