@@ -59,9 +59,10 @@ export default class MapBoxWrapper {
       dragRotate: false,
       pitchWithRotate: false,
       touchPitch: false,
-      touchZoomRotate: false,
+      touchZoomRotate: true,
     });
     this.zoom.map = this.map;
+    this.map.touchZoomRotate.disableRotation();
     // this.map.addControl(new AttributionControl({ compact: true }));
     // .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
 
