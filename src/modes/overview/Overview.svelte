@@ -11,7 +11,6 @@
     colorStops,
     bubbleRadiusScale,
     spikeHeightScale,
-    regionSearchList,
     currentRegionInfo,
     currentRegion,
     selectByInfo,
@@ -26,6 +25,7 @@
   import DetailView from '../../components/DetailView/DetailView.svelte';
   import MapOverlays from '../../components/MapOverlays.svelte';
   import { fetchRegionSlice } from '../../data/fetchData';
+  import { nameInfos } from '../../maps';
 
   /**
    * @type {MapBox}
@@ -84,17 +84,13 @@
     z-index: 1003;
     max-width: 50em;
     flex-grow: 3;
+    margin: 0 6px;
   }
 
-  .search-container-wrapper {
-    position: relative;
-    min-width: 2.8em;
+  .top-container > :global(.search-container) {
     flex-grow: 1;
-  }
-
-  .search-container-wrapper > :global(*) {
     z-index: 1002;
-    min-height: 100%;
+    margin: 0 6px;
   }
 
   .content-container {
@@ -110,6 +106,7 @@
   .panel-container {
     flex: 1 1 7rem;
     position: relative;
+    margin: 0 6px;
   }
 
   .panel-scroll-container {
@@ -134,23 +131,19 @@
 </style>
 
 <main class="root">
-  <div class="top-container container-style">
+  <div class="top-container">
     <div class="options-container base-font-size container-bg container-style">
       <Options />
     </div>
     {#if !$isMobileDevice}
-      <div class="search-container-wrapper base-font-size" class:loading={$regionSearchList.length === 0}>
-        {#if $regionSearchList.length > 0}
-          <Search
-            className="search-container container-bg container-style"
-            placeholder="Search for a location..."
-            items={$regionSearchList}
-            selectedItem={$currentRegionInfo}
-            labelFieldName="displayName"
-            maxItemsToShowInList="5"
-            onChange={selectByInfo} />
-        {/if}
-      </div>
+      <Search
+        className="search-container container-bg container-style base-font-size"
+        placeholder="Search for a location..."
+        items={nameInfos}
+        selectedItem={$currentRegionInfo}
+        labelFieldName="displayName"
+        maxItemsToShowInList="5"
+        onChange={selectByInfo} />
     {/if}
   </div>
   <div class="content-container">
@@ -177,7 +170,7 @@
       {/if}
     </div>
     {#if !$isMobileDevice}
-      <div class="panel-container">
+      <div class="panel-container container-bg container-style">
         <div class="panel-scroll-container">
           <SmallMultiplesPanel bind:detail={detailSensor} />
         </div>
