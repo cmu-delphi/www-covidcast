@@ -2,6 +2,7 @@
   --red: #c00;
   --grey: #767676;
   --darkgrey: #333;
+  --bg: #f7f7f7;
 }
 
 @import './styles/header.css';

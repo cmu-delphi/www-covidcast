@@ -1,12 +1,26 @@
 <script>
-  import { colorScale, currentLevel, currentSensorEntry, stats, signalCasesOrDeathOptions } from '../../stores';
+  import {
+    colorScale,
+    currentLevel,
+    currentSensorEntry,
+    stats,
+    signalCasesOrDeathOptions,
+    isMobileDevice,
+  } from '../../stores';
   import { generateLabels } from '../MapBox/colors';
   import { DIRECTION_THEME } from '../../theme';
   import './ticks.css';
 
   export let loading = false;
 
-  $: r = generateLabels($stats, $currentSensorEntry, $currentLevel, $colorScale, $signalCasesOrDeathOptions);
+  $: r = generateLabels(
+    $stats,
+    $currentSensorEntry,
+    $currentLevel,
+    $colorScale,
+    $signalCasesOrDeathOptions,
+    $isMobileDevice,
+  );
 </script>
 
 <style>

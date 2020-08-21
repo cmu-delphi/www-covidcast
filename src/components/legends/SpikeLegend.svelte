@@ -7,6 +7,7 @@
     spikeHeightScale,
     currentSensorEntry,
     signalCasesOrDeathOptions,
+    isMobileDevice,
   } from '../../stores';
   import { transparent } from '../../util';
   import { generateLabels } from '../MapBox/colors';
@@ -19,7 +20,14 @@
 
   $: size = ENCODING_SPIKE_THEME.size[$currentLevel] * spikeBase;
   $: maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel] * spikeBase;
-  $: r = generateLabels($stats, $currentSensorEntry, $currentLevel, $colorScale, $signalCasesOrDeathOptions);
+  $: r = generateLabels(
+    $stats,
+    $currentSensorEntry,
+    $currentLevel,
+    $colorScale,
+    $signalCasesOrDeathOptions,
+    $isMobileDevice,
+  );
   $: heightScale = $spikeHeightScale.clone().range([0, maxHeight]).domain(r.valueMinMax);
   $: maxPaddingHeight = maxHeight + spikePadding * 2;
 

@@ -7,6 +7,7 @@
     bubbleRadiusScale,
     currentSensorEntry,
     signalCasesOrDeathOptions,
+    isMobileDevice,
   } from '../../stores';
   import { transparent } from '../../util';
   import { generateLabels } from '../MapBox/colors';
@@ -14,7 +15,14 @@
 
   export let loading = false;
 
-  $: r = generateLabels($stats, $currentSensorEntry, $currentLevel, $colorScale, $signalCasesOrDeathOptions);
+  $: r = generateLabels(
+    $stats,
+    $currentSensorEntry,
+    $currentLevel,
+    $colorScale,
+    $signalCasesOrDeathOptions,
+    $isMobileDevice,
+  );
   $: maxHeight = $bubbleRadiusScale(r.highValue) * 2;
 </script>
 

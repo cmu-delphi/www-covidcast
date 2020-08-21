@@ -13,7 +13,6 @@
   .legend {
     font-size: 0.8rem;
     box-sizing: border-box;
-    height: 100%;
     /* if the option for the bubble encoding is visible for specific indicators (e.g., cases), the width of the legend can expand. So do not fix it to a certain number.*/
     /* width: 376px; */
     flex-direction: column;

@@ -196,49 +196,66 @@
   .root {
     position: relative;
     flex: 1 1 0;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .top-container {
-    padding: 0 12px 3px 12px;
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    background: var(--bg);
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      'options player'
+      'map map';
   }
 
   .options-container {
+    grid-area: options;
     z-index: 1003;
     max-width: 50em;
-    flex-grow: 1;
+    margin: 0 6px;
   }
 
   .player-container {
+    grid-area: player;
     z-index: 1003;
+    margin: 0 6px;
     max-width: 50em;
-    flex-grow: 1;
     display: flex;
   }
 
   .map-container {
-    flex: 1 1 0;
+    grid-area: map;
     position: relative;
+  }
+
+  /** mobile **/
+  @media only screen and (max-width: 767px) {
+    .root {
+      display: flex;
+      flex-direction: column;
+    }
+    .map-container {
+      flex-grow: 1;
+    }
+    .player-container {
+      order: 3;
+      margin-bottom: 6px;
+    }
+    .options-container {
+      margin-bottom: 6px;
+    }
   }
 </style>
 
 <main class="root">
-  <div class="top-container container-style">
-    <div class="options-container base-font-size container-bg container-style">
-      <Options showDate={false} />
-    </div>
-    <div class="player-container container-bg container-style base-font-size ">
-      <Player
-        {running}
-        on:toggle={toggleRunning}
-        value={$currentDateObject}
-        max={maxDate}
-        min={minDate}
-        on:change={(e) => jumpToDate(e.detail)} />
-    </div>
+  <div class="options-container base-font-size container-bg container-style">
+    <Options showDate={false} />
+  </div>
+  <div class="player-container container-bg container-style base-font-size ">
+    <Player
+      {running}
+      on:toggle={toggleRunning}
+      value={$currentDateObject}
+      max={maxDate}
+      min={minDate}
+      on:change={(e) => jumpToDate(e.detail)} />
   </div>
   <div class="map-container">
     <MapOverlays {map} mapLoading={running || loading} legendLoading={false}>

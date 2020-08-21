@@ -71,6 +71,7 @@
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
+    background: var(--bg);
   }
 
   .top-container {
@@ -165,7 +166,7 @@
         encoding={$encoding}
         on:ready={() => initialReady()}
         on:updatedEncoding={(e) => updatedEncoding(e.detail)}
-        on:select={(e) => selectByFeature(e.detail)}/>
+        on:select={(e) => selectByFeature(e.detail)} />
 
       {#if detailSensor != null}
         <div class="detail-container container-bg container-style">

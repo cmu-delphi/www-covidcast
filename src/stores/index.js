@@ -1,4 +1,4 @@
-import { writable, derived, get } from 'svelte/store';
+import { writable, derived, get, readable } from 'svelte/store';
 import { LogScale, SqrtScale } from './scales';
 import { scaleSequentialLog } from 'd3-scale';
 import { defaultSensorId, sensorList, sensorMap } from './constants';
@@ -195,3 +195,22 @@ currentSensorEntry.subscribe((sensorEntry) => {
     }
   }
 });
+
+// mobile device detection
+// const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
+
+export const isMobileDevice = readable(false, (set) => {
+  const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
+  set(isMobileQuery.matches);
+  isMobileQuery.addListener((r) => {
+    set(r.matches);
+  });
+});
+
+// export const isPortraitDevice = readable(false, (set) => {
+//   const isPortraitQuery = window.matchMedia('only screen and (orientation: portrait)');
+//   set(isPortraitQuery.matches);
+//   isPortraitQuery.addListener((r) => {
+//     set(r.matches);
+//   });
+// });
