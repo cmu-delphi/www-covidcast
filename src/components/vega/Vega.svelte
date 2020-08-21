@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import embed from 'vega-embed';
+  import { Error } from 'vega';
   import { observeResize, unobserveResize } from '../../util';
 
   export let data = Promise.resolve([]);
@@ -142,6 +143,7 @@
     hasError = false;
     vegaPromise = embed(root, spec, {
       actions: false,
+      logLevel: Error,
       patch: (spec) => {
         spec.signals = spec.signals || [];
         Object.entries(signals).forEach(([key, v]) => {
@@ -152,6 +154,7 @@
     });
     vegaPromise.then((r) => {
       vega = r;
+      root.setAttribute('role', 'figure');
       signalListeners.forEach((signal) => {
         r.view.addSignalListener(signal, (name, value) => {
           dispatch(name, value);
