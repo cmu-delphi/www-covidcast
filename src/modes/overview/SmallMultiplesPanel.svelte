@@ -1,5 +1,5 @@
 <script>
-  import { sensorList, currentSensor, currentDateObject, currentRegionInfo } from '../../stores';
+  import { sensorList, currentSensor, currentDateObject, currentRegionInfo, yesterdayDate } from '../../stores';
   import IoMdExpand from 'svelte-icons/io/IoMdExpand.svelte';
   import { parseAPITime } from '../../data';
   import { fetchMultipleTimeSlices } from '../../data/fetchData';
@@ -16,18 +16,23 @@
 
   // Create a date for today in the API's date format
   const startDay = parseAPITime('20200401');
-  const finalDay = new Date();
+  const finalDay = yesterdayDate;
 
   const sensors = sensorList.filter((d) => !remove.includes(d.key));
 
   $: hasRegion = Boolean($currentRegionInfo);
   $: sensorsWithData = $currentRegionInfo
-    ? fetchMultipleTimeSlices(sensors, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, finalDay).map(
-        (data, i) => ({
-          sensor: sensors[i],
-          data,
-        }),
-      )
+    ? fetchMultipleTimeSlices(
+        sensors,
+        $currentRegionInfo.level,
+        $currentRegionInfo.propertyId,
+        startDay,
+        finalDay,
+        true,
+      ).map((data, i) => ({
+        sensor: sensors[i],
+        data,
+      }))
     : sensors.map((sensor) => ({ sensor, data: [] }));
 </script>
 
