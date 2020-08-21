@@ -28,6 +28,7 @@
 
   #vizbox {
     height: 100vh;
+    flex-basis: 100vh;
   }
   body.viz-body {
     height: unset;
