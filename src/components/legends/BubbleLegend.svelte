@@ -11,7 +11,6 @@
   } from '../../stores';
   import { transparent } from '../../util';
   import { generateLabels } from '../MapBox/colors';
-  import './ticks.css';
 
   export let loading = false;
 
@@ -23,15 +22,32 @@
     $signalCasesOrDeathOptions,
     $isMobileDevice,
   );
-  $: maxHeight = $bubbleRadiusScale(r.highValue) * 2;
 </script>
 
 <style>
   ul {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    font-size: 80%;
     justify-content: space-evenly;
   }
 
   li {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    padding: 0;
+    margin: 0 0.2em;
+    align-items: center;
+    justify-content: center;
+    min-width: 2em;
+  }
+
+  .bubble-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
   }
@@ -44,19 +60,25 @@
   }
 </style>
 
-<ul class="legend-ticks" class:loading-bg={loading}>
+<ul class:loading-bg={loading}>
   {#each r.labels as l}
-    <li class="legend-tick legend-tick-centered" title={l.label} style="height: {maxHeight}px">
-      <div
-        class="bubble"
-        style="width: {$bubbleRadiusScale(l.value) * 2}px; height: {$bubbleRadiusScale(l.value) * 2}px;background: {transparent(l.color, ENCODING_BUBBLE_THEME.opacity)};border-color:
-        {l.color}" />
+    <li>
+      <div class="bubble-wrapper">
+        <div
+          class="bubble"
+          style="width: {$bubbleRadiusScale(l.value) * 2}px; height: {$bubbleRadiusScale(l.value) * 2}px;background: {transparent(l.color, ENCODING_BUBBLE_THEME.opacity)};border-color:
+          {l.color}" />
+      </div>
+      <span>{l.label}</span>
     </li>
   {/each}
-  <li class="legend-tick legend-tick-centered" title={r.high} style="height: {maxHeight}px">
-    <div
-      style="width: {$bubbleRadiusScale(r.highValue) * 2}px; height: {$bubbleRadiusScale(r.highValue) * 2}px;background:
-      {transparent(r.highColor, ENCODING_BUBBLE_THEME.opacity)};border-color: {r.highColor}"
-      class="bubble" />
+  <li>
+    <div class="bubble-wrapper">
+      <div
+        style="width: {$bubbleRadiusScale(r.highValue) * 2}px; height: {$bubbleRadiusScale(r.highValue) * 2}px;background:
+        {transparent(r.highColor, ENCODING_BUBBLE_THEME.opacity)};border-color: {r.highColor}"
+        class="bubble" />
+    </div>
+    <span>{r.high}</span>
   </li>
 </ul>
