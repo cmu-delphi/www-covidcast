@@ -157,7 +157,7 @@
   }
 
   .close {
-    font-size: 0.7rem;
+    font-size: 0.88rem;
     position: absolute;
     right: 0;
     top: 0;
