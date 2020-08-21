@@ -19,6 +19,7 @@
     currentSensorEntry,
     currentDateObject,
     signalCasesOrDeathOptions,
+    isMobileDevice,
   } from '../../stores';
   import Search from '../../components/Search.svelte';
   import SmallMultiplesPanel from './SmallMultiplesPanel.svelte';
@@ -75,7 +76,6 @@
   }
 
   .top-container {
-    padding: 0 12px 3px 12px;
     display: flex;
     justify-content: space-between;
   }
@@ -138,18 +138,20 @@
     <div class="options-container base-font-size container-bg container-style">
       <Options />
     </div>
-    <div class="search-container-wrapper base-font-size" class:loading={$regionSearchList.length === 0}>
-      {#if $regionSearchList.length > 0}
-        <Search
-          className="search-container container-bg container-style"
-          placeholder="Search for a location..."
-          items={$regionSearchList}
-          selectedItem={$currentRegionInfo}
-          labelFieldName="displayName"
-          maxItemsToShowInList="5"
-          onChange={selectByInfo} />
-      {/if}
-    </div>
+    {#if !$isMobileDevice}
+      <div class="search-container-wrapper base-font-size" class:loading={$regionSearchList.length === 0}>
+        {#if $regionSearchList.length > 0}
+          <Search
+            className="search-container container-bg container-style"
+            placeholder="Search for a location..."
+            items={$regionSearchList}
+            selectedItem={$currentRegionInfo}
+            labelFieldName="displayName"
+            maxItemsToShowInList="5"
+            onChange={selectByInfo} />
+        {/if}
+      </div>
+    {/if}
   </div>
   <div class="content-container">
     <div class="map-container">
@@ -168,16 +170,18 @@
         on:updatedEncoding={(e) => updatedEncoding(e.detail)}
         on:select={(e) => selectByFeature(e.detail)} />
 
-      {#if detailSensor != null}
+      {#if detailSensor != null && !$isMobileDevice}
         <div class="detail-container container-bg container-style">
           <DetailView sensor={detailSensor} on:close={() => (detailSensor = null)} />
         </div>
       {/if}
     </div>
-    <div class="panel-container">
-      <div class="panel-scroll-container">
-        <SmallMultiplesPanel bind:detail={detailSensor} />
+    {#if !$isMobileDevice}
+      <div class="panel-container">
+        <div class="panel-scroll-container">
+          <SmallMultiplesPanel bind:detail={detailSensor} />
+        </div>
       </div>
-    </div>
+    {/if}
   </div>
 </main>

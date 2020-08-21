@@ -95,6 +95,10 @@
       align-items: stretch;
       justify-content: space-between;
     }
+    .calendar,
+    select {
+      width: 100%;
+    }
   }
 </style>
 
@@ -132,7 +136,7 @@
     </select>
   </div>
   {#if showDate}
-    <div class="option">
+    <div class="option-wrapper">
       <span class="option-title">on</span>
       {#if selectedDate != null && start_end_dates.length !== 0}
         <Datepicker
