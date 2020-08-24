@@ -10,16 +10,19 @@
     selectByInfo,
   } from '../../stores';
   import { fetchRegionSlice } from '../../data/fetchData';
+  // import IoMdAdd from 'svelte-icons/io/IoMdAdd.svelte';
+  import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
   import IoIosPin from 'svelte-icons/io/IoIosPin.svelte';
   import modes from '..';
   import { getInfoByName, nameInfos } from '../../maps';
   import Top10Sensor from './Top10Sensor.svelte';
   import Search from '../../components/Search.svelte';
-  import { levelMegaCounty } from '../../stores/constants';
+  import { levelMegaCounty, groupedSensorList, sensorList } from '../../stores/constants';
 
   /**
    * @typedef {import('../../maps').NameInfo} ValueRow
    * @property {import('../../data/fetchData').EpiDataRow} primary
+   * @property {import('../../data/fetchData').EpiDataRow[]} others
    * @property {number} rank
    */
   /**
@@ -33,6 +36,7 @@
     return {
       ...info,
       primary: row,
+      others: [],
     };
   }
 
@@ -40,6 +44,10 @@
   let showTopN = 10;
   let sortCriteria = 'primary';
   let sortDirectionDesc = true;
+  /**
+   * @type {import('../../stores/constants').SensorEntry[]}
+   */
+  let otherSensors = [];
 
   function applyDirection(comparator, sortDirectionDesc) {
     return sortDirectionDesc ? (a, b) => -comparator(a, b) : comparator;
@@ -61,6 +69,20 @@
         return a.displayName.localeCompare(b.displayName);
       };
     }
+    if (typeof sortCriteria === 'number') {
+      // others
+      return (a, b) => {
+        const oa = a.others[sortCriteria];
+        const ob = b.others[sortCriteria];
+        const va = oa ? oa.value : null;
+        const vb = ob ? ob.value : null;
+        if (va !== vb) {
+          return va < vb ? -1 : 1;
+        }
+        return a.displayName.localeCompare(b.displayName);
+      };
+    }
+
     return (a, b) => {
       if (a.population !== b.population) {
         return a.population < b.population ? -1 : 1;
@@ -78,9 +100,27 @@
   let rows = [];
   $: {
     loading = true;
-    fetchRegionSlice(primary, $currentLevel, $currentDateObject).then((data) => {
-      rows = data.map((row) => extentData(row)).filter((d) => d != null && d.level !== levelMegaCounty.id);
+    const toLoad = [primary, ...otherSensors];
+    Promise.all(toLoad.map((d) => fetchRegionSlice(d, $currentLevel, $currentDateObject))).then((sensorData) => {
+      const data = sensorData[0];
+      const converted = data.map((row) => extentData(row)).filter((d) => d != null && d.level !== levelMegaCounty.id);
       loading = false;
+      if (sensorData.length === 1) {
+        rows = converted;
+        return;
+      }
+      // inject other data
+      const rowById = new Map(converted.map((d) => [d.primary.geo_value, d]));
+      sensorData.slice(1).forEach((other, i) => {
+        for (const row of other) {
+          const r = rowById.get(row.geo_value);
+          if (!r) {
+            continue;
+          }
+          r.others[i] = row;
+        }
+      });
+      rows = converted;
     });
   }
 
@@ -93,11 +133,6 @@
       return d;
     })
     .filter((d, i) => i < showTopN || d.propertyId === $currentRegion);
-
-  // /**
-  //  * @type {import('../../stores/constants').SensorEntry[]}
-  //  */
-  // let otherSensors = [];
 
   function jumpTo(row) {
     currentMode.set(modes.find((d) => d.id === 'overview'));
@@ -115,6 +150,15 @@
     }
     sortCriteria = prop;
     sortDirectionDesc = defaultSortDesc;
+  }
+
+  let chosenColumn = '';
+
+  $: {
+    if (chosenColumn) {
+      otherSensors = otherSensors.concat([sensorList.find((d) => d.key === chosenColumn)]);
+      chosenColumn = '';
+    }
   }
 </script>
 
@@ -152,22 +196,12 @@
     vertical-align: middle;
   }
 
-  .name {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .name > span {
-    margin-right: 0.5em;
-  }
-
-  .name button {
+  tbody button {
     opacity: 0;
     transition: opacity 0.25s ease;
   }
 
-  .name:hover button {
+  tr:hover button {
     opacity: 1;
   }
 
@@ -175,6 +209,7 @@
     background: white;
     text-align: center;
     cursor: pointer;
+    position: relative;
   }
 
   .table > table {
@@ -208,6 +243,20 @@
 
   .desc .sorted::after {
     content: '▼';
+  }
+
+  .add-column {
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1.4em;
+  }
+
+  .remove-column {
+    position: absolute;
+    right: 0.2em;
+    top: 0.2em;
+    font-size: 0.7rem;
   }
 
   /** mobile **/
@@ -252,6 +301,37 @@
             on:click={() => sortClick('primary', true)}>
             {primary.name}
           </th>
+          {#each otherSensors as s, i}
+            <th
+              colspan={s.isCasesOrDeath ? 3 : 2}
+              class:sorted={sortCriteria === i}
+              on:click={() => sortClick(i, true)}>
+              {s.name}
+              <button
+                class="pg-button remove-column"
+                title="Show on Map"
+                on:click={() => (otherSensors = otherSensors.filter((d) => d !== s))}>
+                <IoMdRemove />
+              </button>
+            </th>
+          {/each}
+          <th rowspan="2">
+            <select aria-label="add column options" bind:value={chosenColumn} class="add-column pg-button">
+              <option value="">+</option>
+              {#each groupedSensorList as sensorGroup}
+                <optgroup label={sensorGroup.label}>
+                  {#each sensorGroup.sensors as sensor}
+                    <option
+                      disabled={sensor.key === primary.key || otherSensors.includes(sensor)}
+                      title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
+                      value={sensor.key}>
+                      {sensor.name}
+                    </option>
+                  {/each}
+                </optgroup>
+              {/each}
+            </select>
+          </th>
         </tr>
         <tr>
           <th>{$currentDateObject.toLocaleDateString()}</th>
@@ -259,29 +339,39 @@
             <th>7-day Average</th>
           {/if}
           <th>Time Series</th>
+          {#each otherSensors as s}
+            <th>{$currentDateObject.toLocaleDateString()}</th>
+            {#if s.isCasesOrDeath}
+              <th>7-day Average</th>
+            {/if}
+            <th>Time Series</th>
+          {/each}
         </tr>
       </thead>
       <tbody>
         {#each sortedRows as row, i}
           <tr class:selected={row.propertyId === $currentRegion}>
             <td>{row.rank}.</td>
-            <td>
-              <div class="name">
-                <span>{row.displayName}</span>
-                <button class="pg-button" title="Show on Map" on:click={jumpTo(row)}>
-                  <IoIosPin />
-                </button>
-              </div>
-            </td>
+            <td>{row.displayName}</td>
             <td class="right">{row.population != null ? row.population.toLocaleString() : 'Unknown'}</td>
             <Top10Sensor sensor={primary} single={row.primary} id={row.propertyId} level={row.level} />
+            {#each otherSensors as s, si}
+              <Top10Sensor sensor={s} single={row.others[si]} id={row.propertyId} level={row.level} />
+            {/each}
+            <td class="toolbar">
+              <button class="pg-button" title="Show on Map" on:click={jumpTo(row)}>
+                <IoIosPin />
+              </button>
+            </td>
           </tr>
         {/each}
       </tbody>
       {#if showTopN < rows.length}
         <tfoot>
           <tr>
-            <td colspan={3 + (primary.isCasesOrDeath ? 3 : 2)} class="button-bar">
+            <td
+              colspan={3 + (primary.isCasesOrDeath ? 3 : 2 + otherSensors.reduce((acc, s) => (acc + s.isCasesOrDeath ? 3 : 2), 0))}
+              class="button-bar">
               <button on:click={showMore} class="pg-button">Show More</button>
             </td>
           </tr>

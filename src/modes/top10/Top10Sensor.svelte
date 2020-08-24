@@ -54,10 +54,10 @@
 </style>
 
 {#if sensor.isCasesOrDeath}
-  <td class="right">{single.count != null ? sensor.formatValue(single.count) : 'Unknown'}</td>
-  <td class="right">{single.avg != null ? sensor.formatValue(single.avg) : 'Unknown'}</td>
+  <td class="right">{single && single.count != null ? sensor.formatValue(single.count) : 'Unknown'}</td>
+  <td class="right">{single && single.avg != null ? sensor.formatValue(single.avg) : 'Unknown'}</td>
 {:else}
-  <td class="right">{single.value != null ? sensor.formatValue(single.value) : 'Unknown'}</td>
+  <td class="right">{single && single.value != null ? sensor.formatValue(single.value) : 'Unknown'}</td>
 {/if}
 <td class="chart">
   <Vega {data} {spec} signals={{ currentDate: $currentDateObject }} />
