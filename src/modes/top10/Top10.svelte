@@ -370,7 +370,7 @@
         <tfoot>
           <tr>
             <td
-              colspan={3 + (primary.isCasesOrDeath ? 3 : 2 + otherSensors.reduce((acc, s) => (acc + s.isCasesOrDeath ? 3 : 2), 0))}
+              colspan={3 + (primary.isCasesOrDeath ? 3 : 2) + otherSensors.reduce((acc, s) => (acc + s.isCasesOrDeath ? 3 : 2), 0)}
               class="button-bar">
               <button on:click={showMore} class="pg-button">Show More</button>
             </td>
