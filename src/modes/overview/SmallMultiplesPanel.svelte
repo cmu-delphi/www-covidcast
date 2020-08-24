@@ -1,5 +1,12 @@
 <script>
-  import { sensorList, currentSensor, currentDateObject, currentRegionInfo, yesterdayDate } from '../../stores';
+  import {
+    sensorList,
+    currentSensor,
+    currentDateObject,
+    currentRegionInfo,
+    yesterdayDate,
+    levelList,
+  } from '../../stores';
   import IoMdExpand from 'svelte-icons/io/IoMdExpand.svelte';
   import { parseAPITime } from '../../data';
   import { fetchMultipleTimeSlices } from '../../data/fetchData';
@@ -18,7 +25,9 @@
   const startDay = parseAPITime('20200401');
   const finalDay = yesterdayDate;
 
-  const sensors = sensorList.filter((d) => !remove.includes(d.key));
+  export let levels = levelList;
+  $: levelIds = new Set(levels.map((l) => l.id));
+  $: sensors = sensorList.filter((d) => d.levels.some((l) => levelIds.has(l)) && !remove.includes(d.key));
 
   $: hasRegion = Boolean($currentRegionInfo);
   $: sensorsWithData = $currentRegionInfo
@@ -49,6 +58,7 @@
     cursor: pointer;
     text-decoration: underline;
   }
+
   h3:hover,
   li.selected h3 {
     color: var(--red);

@@ -139,7 +139,7 @@
       aria-label="geographic level"
       class="geo-level base-font-size"
       bind:value={$currentLevel}>
-      {#each levelList as level}
+      {#each levels as level}
         <option value={level.id} disabled={!$currentSensorEntry.levels.includes(level.id)}>{level.labelPlural}</option>
       {/each}
     </select>
