@@ -1,4 +1,5 @@
 import { formatAPITime, isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data';
+import { interpolateYlOrRd } from 'd3-scale-chromatic';
 import { checkWIP } from '../data/utils';
 import { format } from 'd3-format';
 
@@ -66,6 +67,7 @@ export function getLevelInfo(level) {
  * @property {boolean} isCount is count signal
  * @property {boolean} isProp is prop signal
  * @property {Record<keyof EpiDataCasesOrDeathValues, string>} casesOrDeathSignals signal to load for cases or death
+ * @property {)(v: number) => string)} colorScale
  */
 
 /**
@@ -146,11 +148,15 @@ export function extendSensorEntry(sensorEntry) {
     isProp: isPropSignal(key),
     isCasesOrDeath,
     casesOrDeathSignals: isCasesOrDeath ? generateCasesOrDeathSignals(signal) : {},
+    colorScale: sensorEntry.colorScale || interpolateYlOrRd,
   });
 }
 
 export const defaultSensorId = 'doctor-visits';
 
+/**
+ * @type {Partial<SensorEntry>[]}
+ */
 const defaultSensors = [
   {
     type: 'public',
@@ -191,6 +197,7 @@ const defaultSensors = [
     mapTitleText: 'Percentage of daily doctor visits that are due to COVID-like symptoms',
     yAxis: 'Percentage',
     format: 'percent',
+    // colorScale: interpolateBlues,
   },
   {
     type: 'early',
