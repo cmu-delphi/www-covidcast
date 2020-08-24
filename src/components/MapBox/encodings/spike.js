@@ -110,7 +110,7 @@ export default class SpikeEncoding {
   }
 
   updateSources(map, level) {
-    const source = this.sources[level];
+    const source = this.sourceLookup[level];
     const refSource = toCenterSource(level);
     const ref = map.getSource(refSource)._data;
 
