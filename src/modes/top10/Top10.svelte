@@ -1,11 +1,20 @@
 <script>
   import Options from '../../components/Options.svelte';
-  import { currentLevel, currentSensorEntry, currentMode, currentRegion, currentDateObject } from '../../stores';
+  import {
+    currentLevel,
+    currentSensorEntry,
+    currentMode,
+    currentRegion,
+    currentDateObject,
+    currentRegionInfo,
+    selectByInfo,
+  } from '../../stores';
   import { fetchRegionSlice } from '../../data/fetchData';
   import IoIosPin from 'svelte-icons/io/IoIosPin.svelte';
   import modes from '..';
-  import { getInfoByName } from '../../maps';
+  import { getInfoByName, nameInfos } from '../../maps';
   import Top10Sensor from './Top10Sensor.svelte';
+  import Search from '../../components/Search.svelte';
 
   /**
    * @typedef {import('../../maps').NameInfo} ValueRow
@@ -60,7 +69,7 @@
       d.rank = i + 1;
       return d;
     })
-    .slice(0, showTopN);
+    .filter((d, i) => i < showTopN || d.propertyId === $currentRegion);
 
   // /**
   //  * @type {import('../../stores/constants').SensorEntry[]}
@@ -79,14 +88,31 @@
 
 <style>
   .root {
+    position: relative;
     flex: 1 1 0;
-    display: flex;
-    flex-direction: column;
-    padding: 0 2%;
+    display: grid;
+    grid-template-columns: 1fr min(25%, 30em);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      'options search'
+      'table table';
+    gap: 6px;
+  }
+
+  .root > :global(.options-container) {
+    grid-area: options;
+    z-index: 1010;
+  }
+
+  .root > :global(.search-container) {
+    grid-area: search;
+    z-index: 1009;
+    margin: 0 6px 6px 0;
   }
 
   .table {
-    flex: 1 1 0;
+    grid-area: table;
+    margin: 0 6px;
     overflow: auto;
   }
 
@@ -130,16 +156,45 @@
 
   .button-bar {
     text-align: center;
+    border: none;
   }
 
   .button-bar > button {
     width: unset;
     display: inline-block;
   }
+
+  .selected > :global(td) {
+    border: 2px solid var(--red);
+  }
+
+  /** mobile **/
+  @media only screen and (max-width: 767px) {
+    .root {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto 1fr;
+      grid-template-areas:
+        'options'
+        'search'
+        'table';
+    }
+    .root > :global(.search-container) {
+      margin: 0 0 0 6px;
+    }
+  }
 </style>
 
 <div class="root">
   <Options className="options-container" />
+  <Search
+    className="search-container container-bg container-style"
+    placeholder="Search for a location..."
+    items={nameInfos}
+    selectedItem={$currentRegionInfo}
+    labelFieldName="displayName"
+    maxItemsToShowInList="5"
+    on:change={(e) => selectByInfo(e.detail)} />
+
   <div class="table base-font-size">
     <table>
       <thead>
@@ -159,7 +214,7 @@
       </thead>
       <tbody>
         {#each sortedRows as row, i}
-          <tr>
+          <tr class:selected={row.propertyId === $currentRegion}>
             <td>{row.rank}.</td>
             <td>
               <div class="name">
