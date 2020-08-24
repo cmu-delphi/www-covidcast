@@ -1,4 +1,5 @@
 import { rgb, hsl } from 'd3-color';
+import ResizeObserver from 'resize-observer-polyfill';
 
 export function getTextColorBasedOnBackground(bgColor) {
   const color = hsl(bgColor);

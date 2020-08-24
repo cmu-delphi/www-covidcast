@@ -174,7 +174,7 @@ export default class InteractiveMap {
     }
     e.preventDefault(); // mark handled
     const nextValue = this.clicked.mega === feature.id ? null : feature.id;
-    this.adapter.dispatch('selectMega', nextValue ? feature : null);
+    this.adapter.dispatch('select', nextValue ? feature : null);
   }
 
   /**

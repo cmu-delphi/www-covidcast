@@ -1,11 +1,5 @@
 <script>
-  import {
-    currentRegion,
-    currentLevel,
-    currentRegionInfo,
-    signalCasesOrDeathOptions,
-    currentDateObject,
-  } from '../../stores';
+  import { currentRegionInfo, signalCasesOrDeathOptions, currentDateObject } from '../../stores';
   import { fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../vega/Vega.svelte';
   import spec from './DetailView.json';
@@ -25,7 +19,8 @@
   $: mapTitle =
     typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText($signalCasesOrDeathOptions) : sensor.mapTitleText;
 
-  $: data = fetchTimeSlice(sensor, $currentLevel, $currentRegion);
+  $: hasRegion = Boolean($currentRegionInfo);
+  $: data = $currentRegionInfo ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId) : [];
 
   $: regularPatch = {
     vconcat: [
@@ -162,7 +157,7 @@
   }
 
   .close {
-    font-size: 0.7rem;
+    font-size: 0.88rem;
     position: absolute;
     right: 0;
     top: 0;
@@ -185,6 +180,7 @@
     {data}
     spec={sensor.isCasesOrDeath ? specCasesDeath : spec}
     {patchSpec}
+    noDataText={hasRegion ? 'No data available' : 'No location selected'}
     signals={{ currentDate: $currentDateObject }} />
 </div>
 <div class="encoding">

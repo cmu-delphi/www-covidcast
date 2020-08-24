@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import embed from 'vega-embed';
+  import { Error } from 'vega';
   import { observeResize, unobserveResize } from '../../util';
 
   export let data = Promise.resolve([]);
@@ -39,6 +40,9 @@
   let loading = false;
   let noData = false;
   let hasError = false;
+
+  export let resetSignalsUponNoData = true;
+
   export let noDataText = 'No data available';
   $: message = hasError ? 'Error occurred' : noData && !loading ? noDataText : null;
 
@@ -63,14 +67,14 @@
     }
     loading = true;
     hasError = false;
+    noData = false;
+
     Promise.all([vegaLoader, data])
       .then(([vega, d]) => {
         if (vegaLoader !== vegaPromise) {
           // outside has changed
           return;
         }
-        noData = !d || d.length === 0;
-
         vega.view.change(
           'values',
           vega.view
@@ -78,17 +82,19 @@
             .remove(() => true)
             .insert(d || []),
         );
+
+        noData = !d || d.length === 0;
         // also update signals along the way
         Object.entries(signals).forEach(([key, v]) => {
-          vega.view.signal(key, v);
+          vega.view.signal(key, resetSignalsUponNoData && noData ? null : v);
         });
         vega.view.runAsync();
-
         loading = false;
       })
       .catch((error) => {
         console.error('error while updating data', error);
         loading = false;
+        noData = false;
         hasError = true;
       });
   }
@@ -137,6 +143,7 @@
     hasError = false;
     vegaPromise = embed(root, spec, {
       actions: false,
+      logLevel: Error,
       patch: (spec) => {
         spec.signals = spec.signals || [];
         Object.entries(signals).forEach(([key, v]) => {
@@ -147,6 +154,7 @@
     });
     vegaPromise.then((r) => {
       vega = r;
+      root.setAttribute('role', 'figure');
       signalListeners.forEach((signal) => {
         r.view.addSignalListener(signal, (name, value) => {
           dispatch(name, value);
@@ -190,5 +198,5 @@
   bind:this={root}
   class="root"
   class:loading-bg={!hasError && loading}
-  class:message-overlay={message != null}
+  class:message-overlay={hasError || (noData && !loading)}
   data-message={message} />

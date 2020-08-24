@@ -65,11 +65,11 @@
   $: minDate =
     $times != null && $times.has($currentSensorEntry.key)
       ? parseAPITime($times.get($currentSensorEntry.key)[0])
-      : timeDay.offset(timeDay.floor($currentDateObject), -1);
+      : new Date(2020, 1, 1);
   $: maxDate =
     $times != null && $times.has($currentSensorEntry.key)
       ? parseAPITime($times.get($currentSensorEntry.key)[1])
-      : $currentDateObject;
+      : new Date(2020, 8, 1);
 
   /**
    * @param {Date} date
@@ -122,9 +122,9 @@
     const mapLoaded = new Promise((resolve) => (mapLoadedResolver = resolve));
     const started = Date.now();
     currentData = getData(date);
-    // let dataNeeded = -1;
+    let dataNeeded = -1;
     currentData.then(() => {
-      // dataNeeded = Date.now() - started;
+      dataNeeded = Date.now() - started;
       // update visual date once the data is loaded but not yet shown
       currentDate.set(formatAPITime(date));
     });
@@ -133,7 +133,7 @@
         return;
       }
       const needed = Date.now() - started;
-      // console.log(needed, dataNeeded, needed - dataNeeded);
+      console.log(needed, dataNeeded, needed - dataNeeded);
       if (needed > FRAME_RATE && bufferCache < MAX_BUFFER_CACHE) {
         // increase buffer if it was too slow
         bufferCache++;
@@ -196,52 +196,59 @@
 <style>
   .root {
     position: relative;
-    flex: 1 1 80vh;
-    min-height: 550px;
-    display: flex;
-    flex-direction: column;
+    flex: 1 1 0;
+    display: grid;
+    background: var(--bg);
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      'options player'
+      'map map';
   }
 
-  .top-container {
-    padding: 0 12px;
-    display: flex;
-    justify-content: space-between;
+  .root > :global(.options-container) {
+    grid-area: options;
   }
 
-  .options-container {
+  .root > :global(.player-container) {
+    grid-area: player;
     z-index: 1003;
-    max-width: 50em;
-    flex-grow: 1;
-  }
-
-  .player-container {
-    z-index: 1003;
-    max-width: 50em;
-    flex-grow: 1;
-    display: flex;
   }
 
   .map-container {
-    flex: 1 1 0;
+    grid-area: map;
     position: relative;
+  }
+
+  /** mobile **/
+  @media only screen and (max-width: 767px) {
+    .root {
+      display: flex;
+      flex-direction: column;
+    }
+    .map-container {
+      flex-grow: 1;
+    }
+    .root > :global(.player-container) {
+      order: 3;
+      margin-bottom: 6px;
+    }
+    .root > :global(.options-container) {
+      margin-bottom: 6px;
+    }
   }
 </style>
 
 <main class="root">
-  <div class="top-container container-style">
-    <div class="options-container base-font-size container-bg container-style">
-      <Options showDate={false} />
-    </div>
-    <div class="player-container container-bg container-style base-font-size ">
-      <Player
-        {running}
-        on:toggle={toggleRunning}
-        value={$currentDateObject}
-        max={maxDate}
-        min={minDate}
-        on:change={(e) => jumpToDate(e.detail)} />
-    </div>
-  </div>
+  <Options showDate={false} className="options-container" />
+  <Player
+    className="player-container"
+    {running}
+    on:toggle={toggleRunning}
+    value={$currentDateObject}
+    max={maxDate}
+    min={minDate}
+    on:change={(e) => jumpToDate(e.detail)} />
   <div class="map-container">
     <MapOverlays {map} mapLoading={running || loading} legendLoading={false}>
       <div slot="title">{$currentDateObject.toLocaleDateString()}</div>

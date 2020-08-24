@@ -18,13 +18,5 @@
   "pitch": 0,
   "glyphs": "https://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
   "sources": {},
-  "layers": [
-    {
-      "id": "background",
-      "type": "background",
-      "paint": {
-        "background-color": "#f7f7f7"
-      }
-    }
-  ]
+  "layers": []
 }

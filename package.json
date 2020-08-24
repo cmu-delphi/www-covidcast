@@ -74,6 +74,7 @@
     "mapbox-gl": "^1.12.0",
     "nouislider": "^14.6.1",
     "regenerator-runtime": "^0.13.7",
+    "resize-observer-polyfill": "^1.5.1",
     "svelte-icons": "^2.1.0",
     "vega": "^5.14.0",
     "vega-embed": "^6.10.0",

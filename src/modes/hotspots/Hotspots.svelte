@@ -67,15 +67,12 @@
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
-  }
-  .options-container {
-    margin-bottom: 0.1em;
+    padding: 0 2%;
   }
 
   .table {
     flex: 1 1 0;
     overflow: auto;
-    position: relative;
   }
 
   .table td {
@@ -107,9 +104,7 @@
 
   .table th {
     background: white;
-    position: sticky;
     text-align: center;
-    top: 0;
   }
 
   .table > table {
@@ -134,15 +129,13 @@
   }
 </style>
 
-<div class="root content">
-  <div class="options-container container-bg base-font-size container-style">
-    <Options />
-  </div>
+<div class="root">
+  <Options className="options-container" />
   <div class="table base-font-size">
     <table>
       <thead>
         <tr>
-          <th rowspan="2">Rank</th>
+          <th rowspan="2">#</th>
           <th rowspan="2">Name</th>
           <th colspan={isCasesOrDeath ? 3 : 2}>{$currentSensorEntry.name}</th>
         </tr>
