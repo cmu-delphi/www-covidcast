@@ -99,22 +99,6 @@ export function fetchRegionSlice(sensorEntry, level, date) {
 }
 
 /**
- * @param {SensorEntry} sensorEntry
- * @param {string} level
- * @param {string | undefined} region
- * @param {Date} startDate
- * @param {Date} endDate
- * @returns {Promise<EpiDataRow[]>}
- */
-export function fetchTimeSlice(sensorEntry, level, region, startDate = START_TIME_RANGE, endDate = END_TIME_RANGE) {
-  if (!region) {
-    return Promise.resolve([]);
-  }
-  const timeRange = `${formatAPITime(startDate)}-${formatAPITime(endDate)}`;
-  return fetchData(sensorEntry, level, region, timeRange);
-}
-
-/**
  *
  * @param {EpiDataRow} row
  * @param {Date} date
@@ -135,6 +119,47 @@ function createCopy(row, date, sensorEntry) {
     });
   }
   return copy;
+}
+
+/**
+ * @param {SensorEntry} sensorEntry
+ * @param {string} level
+ * @param {string | undefined} region
+ * @param {Date} startDate
+ * @param {Date} endDate
+ * @param {boolean} fitRange
+ * @returns {Promise<EpiDataRow[]>}
+ */
+export function fetchTimeSlice(
+  sensorEntry,
+  level,
+  region,
+  startDate = START_TIME_RANGE,
+  endDate = END_TIME_RANGE,
+  fitRange = false,
+) {
+  if (!region) {
+    return Promise.resolve([]);
+  }
+  const timeRange = `${formatAPITime(startDate)}-${formatAPITime(endDate)}`;
+  const data = fetchData(sensorEntry, level, region, timeRange);
+  if (!fitRange) {
+    return data;
+  }
+  return data.then((r) => {
+    if (r.length === 0) {
+      return r;
+    }
+    if (r[0].date_value != null && r[0].date_value > startDate) {
+      // inject a min
+      r.unshift(createCopy(r[0], startDate, sensorEntry));
+    }
+    if (r[r.length - 1].date_value != null && r[r.length - 1].date_value < endDate) {
+      // inject a max
+      r.push(createCopy(r[r.length - 1], endDate, sensorEntry));
+    }
+    return r;
+  });
 }
 
 /**

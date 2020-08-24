@@ -9,7 +9,7 @@
   } from '../../stores';
   import IoMdExpand from 'svelte-icons/io/IoMdExpand.svelte';
   import { parseAPITime } from '../../data';
-  import { fetchMultipleTimeSlices } from '../../data/fetchData';
+  import { fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../../components/vega/Vega.svelte';
   import spec from './SmallMultiplesChart.json';
 
@@ -30,19 +30,12 @@
   $: sensors = sensorList.filter((d) => d.levels.some((l) => levelIds.has(l)) && !remove.includes(d.key));
 
   $: hasRegion = Boolean($currentRegionInfo);
-  $: sensorsWithData = $currentRegionInfo
-    ? fetchMultipleTimeSlices(
-        sensors,
-        $currentRegionInfo.level,
-        $currentRegionInfo.propertyId,
-        startDay,
-        finalDay,
-        true,
-      ).map((data, i) => ({
-        sensor: sensors[i],
-        data,
-      }))
-    : sensors.map((sensor) => ({ sensor, data: [] }));
+  $: sensorsWithData = sensors.map((sensor) => ({
+    sensor,
+    data: $currentRegionInfo
+      ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, finalDay, true)
+      : [],
+  }));
 </script>
 
 <style>
