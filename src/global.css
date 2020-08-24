@@ -92,6 +92,7 @@ button.mapboxgl-popup-close-button {
   display: none;
 }
 
+@import './styles/map-container.css';
 @import './styles/pg-button.css';
 @import './styles/loading.css';
 @import './styles/message-overlay.css';
