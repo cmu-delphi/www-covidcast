@@ -3,9 +3,9 @@ import { dsvFormat } from 'd3-dsv';
 import stateRaw from './processed/state.csv';
 import msaRaw from './processed/msa.csv';
 import countyRaw from './processed/county.csv';
-import neighborhoodRaw from './processed/swpa/neighborhood.csv';
-import zipRaw from './processed/swpa/zip.csv';
-import swpaFilterInfo from './processed/swpa/filterInfo.json';
+// import neighborhoodRaw from './processed/swpa/neighborhood.csv';
+// import zipRaw from './processed/swpa/zip.csv';
+// import swpaFilterInfo from './processed/swpa/filterInfo.json';
 import { levelMegaCounty } from '../stores/constants';
 
 /**
@@ -65,29 +65,30 @@ export function loadSources(additionalProperties = {}) {
   );
 }
 
-const swpaNeighborhoodInfo = parseCSV(neighborhoodRaw, 'neighborhood');
-const swpaStateInfo = stateInfo.filter((d) => swpaFilterInfo.state.includes(d.id));
-const swpaMsaInfo = msaInfo.filter((d) => swpaFilterInfo.msa.includes(d.id));
-const swpaCountyInfo = countyInfo.filter((d) => swpaFilterInfo.county.includes(d.id));
-const swapZipInfo = parseCSV(zipRaw, 'zip');
+// const swpaNeighborhoodInfo = parseCSV(neighborhoodRaw, 'neighborhood');
+// const swpaStateInfo = stateInfo.filter((d) => swpaFilterInfo.state.includes(d.id));
+// const swpaMsaInfo = msaInfo.filter((d) => swpaFilterInfo.msa.includes(d.id));
+// const swpaCountyInfo = countyInfo.filter((d) => swpaFilterInfo.county.includes(d.id));
+// const swapZipInfo = parseCSV(zipRaw, 'zip');
 
-export const swpaNameInfos = swpaStateInfo
-  .concat(swpaMsaInfo, swpaCountyInfo, swpaNeighborhoodInfo, swapZipInfo)
-  .sort((a, b) => a.displayName.localeCompare(b.displayName));
+// export const swpaNameInfos = swpaStateInfo
+//   .concat(swpaMsaInfo, swpaCountyInfo, swpaNeighborhoodInfo, swapZipInfo)
+//   .sort((a, b) => a.displayName.localeCompare(b.displayName));
 
-export function loadSWPASources(additionalProperties = {}) {
-  // mark to be loaded as fast as possible
-  return import('./swpa_geo').then((r) =>
-    r.default(stateInfo, countyInfo, msaInfo, swpaNeighborhoodInfo, swapZipInfo, additionalProperties),
-  );
-}
+// export function loadSWPASources(additionalProperties = {}) {
+//   // mark to be loaded as fast as possible
+//   return import('./swpa_geo').then((r) =>
+//     r.default(stateInfo, countyInfo, msaInfo, swpaNeighborhoodInfo, swapZipInfo, additionalProperties),
+//   );
+// }
 
 /**
  * helper to resolve a given id to a name info object
  * @type {Map<string, NameInfo>}
  */
 const infoLookup = new Map();
-nameInfos.concat(swpaNameInfos).forEach((d) => {
+// nameInfos.concat(swpaNameInfos).forEach((d) => {
+nameInfos.forEach((d) => {
   const id = String(d.propertyId).toLowerCase();
   if (!infoLookup.has(id)) {
     infoLookup.set(id, d);

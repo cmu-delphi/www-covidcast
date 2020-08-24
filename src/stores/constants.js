@@ -1,7 +1,7 @@
 import { formatAPITime, isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data';
 import { checkWIP } from '../data/utils';
 import { format } from 'd3-format';
-import { generateMockSignal, generateMockMeta } from '../data/mock';
+// import { generateMockSignal, generateMockMeta } from '../data/mock';
 
 export const levelList = [
   {
@@ -315,19 +315,19 @@ const defaultSensors = [
     yAxis: 'Deaths',
     format: 'raw',
   },
-  {
-    type: 'other',
-    name: 'Mock Signal',
-    id: 'mock',
-    signal: 'mock',
-    levels: ['county', 'state', 'msa', 'neighborhood', 'zip'],
-    tooltipText: 'Mock Signal',
-    mapTitleText: 'Mock Signal',
-    yAxis: 'Mock Signal',
-    format: 'percent',
-    api: generateMockSignal,
-    meta: generateMockMeta,
-  },
+  // {
+  //   type: 'other',
+  //   name: 'Mock Signal',
+  //   id: 'mock',
+  //   signal: 'mock',
+  //   levels: ['county', 'state', 'msa', 'neighborhood', 'zip'],
+  //   tooltipText: 'Mock Signal',
+  //   mapTitleText: 'Mock Signal',
+  //   yAxis: 'Mock Signal',
+  //   format: 'percent',
+  //   api: generateMockSignal,
+  //   meta: generateMockMeta,
+  // },
 ];
 
 /**
