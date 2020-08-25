@@ -26,7 +26,6 @@
   import { fetchRegionSlice } from '../../data/fetchData';
   import DetailView from '../../components/DetailView/DetailView.svelte';
   import MapOverlays from '../../components/MapOverlays.svelte';
-  import { trackEvent } from '../../stores/ga';
 
   export let wrapperClass;
   export let regionSearchList;
