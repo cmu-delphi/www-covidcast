@@ -10,7 +10,7 @@
   import IoMdExpand from 'svelte-icons/io/IoMdExpand.svelte';
   import { parseAPITime } from '../../data';
   import { fetchMultipleTimeSlices } from '../../data/fetchData';
-  import Vega from '../../components/vega/Vega.svelte';
+  import Vega from '../../components/Vega.svelte';
   import spec from './SmallMultiplesChart.json';
 
   const remove = ['ght-smoothed_search', 'safegraph-full_time_work_prop'];

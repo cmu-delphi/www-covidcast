@@ -5,7 +5,7 @@
   import { fetchRegionSlice, fetchMultipleRegionsTimeSlices } from '../../data/fetchData';
   import IoIosPin from 'svelte-icons/io/IoIosPin.svelte';
   import modes from '..';
-  import Vega from '../../components/vega/Vega.svelte';
+  import Vega from '../../components/Vega.svelte';
   import { getInfoByName } from '../../maps';
 
   /**

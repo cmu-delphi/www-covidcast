@@ -1,7 +1,7 @@
 <script>
   import { currentRegionInfo, signalCasesOrDeathOptions, currentDateObject } from '../../stores';
   import { fetchTimeSlice } from '../../data/fetchData';
-  import Vega from '../vega/Vega.svelte';
+  import Vega from '../Vega.svelte';
   import spec from './DetailView.json';
   import specCasesDeath from './DetailViewCasesDeath.json';
   import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
