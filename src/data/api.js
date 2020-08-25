@@ -42,9 +42,23 @@ export function callAPI(id, signal, level, date, region) {
   return callAPIEndPoint(ENDPOINT, id, signal, level, date, region);
 }
 
-export function callMetaAPI() {
+/**
+ *
+ * @param {import('.').SensorEntry[]} sensors
+ * @param {string[]} fields
+ * @param {Record<string, string>} filters
+ */
+export function callMetaAPI(sensors, fields, filters) {
   const url = new URL(ENDPOINT);
-  url.searchParams.set('source', 'covidcast_meta');
-  url.searchParams.set('cached', 'true');
-  return fetch(url.toString(), fetchOptions).then((d) => d.json());
+  const data = new FormData();
+  data.set('source', 'covidcast_meta');
+  data.set('cached', 'true');
+  data.set('signals', sensors.map((d) => `${d.id}:${d.signal}`).join(','));
+  data.set('fields', fields.join(','));
+  Object.entries(filters).forEach((entry) => data.set(entry[0], entry[1]));
+  return fetch(url.toString(), {
+    ...fetchOptions,
+    method: 'POST',
+    body: data,
+  }).then((d) => d.json());
 }

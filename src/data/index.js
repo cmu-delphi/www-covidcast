@@ -170,7 +170,17 @@ function loadCountSignal(sEntry, meta, timeMap, statsMap) {
  */
 export function loadMetaData(sensors) {
   const custom = sensors.filter((d) => d.meta).map((d) => d.meta(d.id, d.signal));
-  return Promise.all([callMetaAPI(), ...custom]).then((metas) => {
+  const remoteSignals = sensors.filter((d) => !d.meta);
+  return Promise.all([
+    callMetaAPI(
+      remoteSignals,
+      ['min_time', 'max_time', 'mean_value', 'stdev_value', 'signal', 'geo_type', 'data_source'],
+      {
+        time_type: 'day',
+      },
+    ),
+    ...custom,
+  ]).then((metas) => {
     const meta = metas[0];
     meta.epidata.push(...metas.slice(1).flat(2));
     return processMetaData(meta);
