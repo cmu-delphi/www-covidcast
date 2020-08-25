@@ -1,7 +1,7 @@
 <script>
   import { currentDateObject, yesterdayDate } from '../../stores';
   import spec from '../overview/SmallMultiplesChart.json';
-  import Vega from '../../components/vega/Vega.svelte';
+  import Vega from '../../components/Vega.svelte';
   import { parseAPITime } from '../../data';
   import { fetchTimeSlice } from '../../data/fetchData';
 
