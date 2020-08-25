@@ -70,6 +70,7 @@ export default class AMapBoxWrapper {
       pitchWithRotate: false,
       touchPitch: false,
       touchZoomRotate: true,
+      renderWorldCopies: false,
     });
     this.zoom.map = this.map;
     this.map.touchZoomRotate.disableRotation();

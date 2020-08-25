@@ -9,6 +9,7 @@
   import { merge } from 'lodash-es';
   import { primaryValue } from '../../stores/constants';
   import EncodingOptions from '../EncodingOptions.svelte';
+  import { trackEvent } from '../../stores/ga';
 
   const dispatch = createEventDispatcher();
   /**
@@ -131,6 +132,7 @@
    */
   function onEscCheck(e) {
     if (e.key === 'Escape' || e.key === 'Esc') {
+      trackEvent('detail-view', 'close', 'keyboard');
       dispatch('close');
     }
   }
@@ -171,7 +173,13 @@
 <div class="header">
   <h4>{sensor.name} of {$currentRegionInfo ? $currentRegionInfo.displayName : 'Unknown'}</h4>
   <h5>{mapTitle}</h5>
-  <button class="pg-button close" on:click={() => dispatch('close')} title="Close this detail view">
+  <button
+    class="pg-button close"
+    on:click={() => {
+      trackEvent('detail-view', 'close', 'button');
+      dispatch('close');
+    }}
+    title="Close this detail view">
     <IoIosClose />
   </button>
 </div>

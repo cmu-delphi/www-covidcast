@@ -12,6 +12,7 @@
   import { fetchMultipleTimeSlices } from '../../data/fetchData';
   import Vega from '../../components/Vega.svelte';
   import spec from './SmallMultiplesChart.json';
+  import { trackEvent } from '../../stores/ga';
 
   const remove = ['ght-smoothed_search', 'safegraph-full_time_work_prop'];
 
@@ -131,7 +132,10 @@
       <div class="header">
         <h3
           title={typeof s.sensor.tooltipText === 'function' ? s.sensor.tooltipText() : s.sensor.tooltipText}
-          on:click={() => currentSensor.set(s.sensor.key)}>
+          on:click={() => {
+            trackEvent('side-panel', 'set-sensor', s.sensor.key);
+            currentSensor.set(s.sensor.key);
+          }}>
           {s.sensor.name}
         </h3>
         <div class="toolbar" class:hidden={!hasRegion}>
@@ -140,6 +144,7 @@
             title="Show as detail view"
             class:active={detail === s.sensor}
             on:click|stopPropagation={() => {
+              trackEvent('side-panel', detail === s.sensor ? 'hide-detail' : 'show-detail', s.sensor.key);
               detail = detail === s.sensor ? null : s.sensor;
             }}>
             <IoMdExpand />
