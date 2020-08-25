@@ -142,7 +142,7 @@
     background-position: center;
     background-repeat: no-repeat;
     color: transparent;
-    background-image: url('../../assets/imgs/choropleth.png');
+    background-image: url('../../assets/imgs/choropleth_small.png');
   }
 
   .chart-button {
