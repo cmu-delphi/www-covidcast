@@ -26,6 +26,7 @@
   import { fetchRegionSlice } from '../../data/fetchData';
   import DetailView from '../../components/DetailView/DetailView.svelte';
   import MapOverlays from '../../components/MapOverlays.svelte';
+  import { trackEvent } from '../../stores/ga';
 
   export let wrapperClass;
   export let regionSearchList;
@@ -185,7 +186,10 @@
     selectedItem={$currentRegionInfo}
     labelFieldName="displayName"
     maxItemsToShowInList="5"
-    on:change={(e) => selectByInfo(e.detail)} />
+    on:change={(e) => {
+      selectByInfo(e.detail);
+      trackEvent('search', 'select', e.detail ? e.detail.id : '');
+    }} />
 
   <div class="view-switcher">
     <div class="pg-button-group">
@@ -194,6 +198,7 @@
         class="pg-button map-button"
         class:selected={mobileShowMap}
         on:click={() => {
+          trackEvent('overview', 'show-map', 'true');
           mobileShowMap = true;
         }}
         title="Switch to Map">
@@ -205,6 +210,7 @@
         class="pg-button chart-button"
         class:selected={!mobileShowMap}
         on:click={() => {
+          trackEvent('overview', 'show-map', 'false');
           mobileShowMap = false;
         }}
         title="Switch to Line Charts">
@@ -228,7 +234,10 @@
       encoding={$encoding}
       on:ready={() => initialReady()}
       on:updatedEncoding={(e) => updatedEncoding(e.detail)}
-      on:select={(e) => selectByFeature(e.detail)}
+      on:select={(e) => {
+        selectByFeature(e.detail);
+        trackEvent('map', 'select', e.detail ? e.detail.id : '');
+      }}
       {wrapperClass} />
 
     {#if detailSensor != null}
