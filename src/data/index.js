@@ -8,6 +8,7 @@ import {
   MAGIC_START_DATE,
   sensorMap,
   sensorList,
+  levels,
 } from '../stores';
 import { get } from 'svelte/store';
 import { callMetaAPI } from './api';
@@ -176,7 +177,8 @@ export function loadMetaData(sensors) {
       remoteSignals,
       ['min_time', 'max_time', 'mean_value', 'stdev_value', 'signal', 'geo_type', 'data_source'],
       {
-        time_type: 'day',
+        time_types: 'day',
+        geo_types: levels,
       },
     ),
     ...custom,
