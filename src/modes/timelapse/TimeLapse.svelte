@@ -82,7 +82,9 @@
       dataBuffer.delete(r); // delece since used
       return r;
     }
-    return fetchRegionSlice($currentSensorEntry, $currentLevel, date);
+    return fetchRegionSlice($currentSensorEntry, $currentLevel, date, {
+      stderr: null,
+    });
   }
 
   /**
@@ -99,7 +101,9 @@
       if (dataBuffer.has(key)) {
         continue;
       }
-      dataBuffer.set(key, fetchRegionSlice($currentSensorEntry, $currentLevel, toLoad));
+      dataBuffer.set(key, fetchRegionSlice($currentSensorEntry, $currentLevel, toLoad, {
+        stderr: null
+      }));
     }
   }
 

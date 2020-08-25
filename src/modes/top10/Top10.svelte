@@ -101,7 +101,13 @@
   $: {
     loading = true;
     const toLoad = [primary, ...otherSensors];
-    Promise.all(toLoad.map((d) => fetchRegionSlice(d, $currentLevel, $currentDateObject))).then((sensorData) => {
+    Promise.all(
+      toLoad.map((d) =>
+        fetchRegionSlice(d, $currentLevel, $currentDateObject, {
+          stderr: null
+        }),
+      ),
+    ).then((sensorData) => {
       const data = sensorData[0];
       const converted = data.map((row) => extentData(row)).filter((d) => d != null && d.level !== levelMegaCounty.id);
       loading = false;

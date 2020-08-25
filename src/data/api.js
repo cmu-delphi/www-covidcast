@@ -12,9 +12,9 @@ const fetchOptions = process.env.NODE_ENV === 'development' ? { cache: 'force-ca
  * @param {Date | string} date
  * @param {string} region
  */
-export function callAPIEndPoint(endpoint, id, signal, level, date, region) {
+export function callAPIEndPoint(endpoint, id, signal, level, date, region, fields) {
   if (typeof endpoint === 'function') {
-    return Promise.resolve(endpoint(id, signal, level, date, region));
+    return Promise.resolve(endpoint(id, signal, level, date, region, fields));
   }
   const url = new URL(endpoint || ENDPOINT);
   url.searchParams.set('source', 'covidcast');
@@ -25,6 +25,9 @@ export function callAPIEndPoint(endpoint, id, signal, level, date, region) {
   url.searchParams.set('time_values', date instanceof Date ? formatAPITime(date) : date);
   url.searchParams.set('time_type', 'day');
   url.searchParams.set('geo_value', region);
+  if (fields) {
+    url.searchParams.set('fields', fields.join(','));
+  }
   return fetch(url.toString(), fetchOptions).then((d) => d.json());
 }
 

@@ -13,6 +13,7 @@ import { get } from 'svelte/store';
 import { callMetaAPI } from './api';
 
 export * from './signals';
+export * from './fetchData';
 export { formatAPITime, parseAPITime } from './utils';
 
 function toStatsRegionKey(sensorKey, region) {

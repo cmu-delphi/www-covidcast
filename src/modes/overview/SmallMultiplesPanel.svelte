@@ -34,7 +34,10 @@
   $: sensorsWithData = sensors.map((sensor) => ({
     sensor,
     data: $currentRegionInfo
-      ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, finalDay, true)
+      ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, finalDay, true, {
+          geo_value: $currentRegionInfo.propertyId,
+          stderr: null,
+        })
       : [],
   }));
 </script>
