@@ -2,7 +2,7 @@
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import embed from 'vega-embed';
   import { Error } from 'vega';
-  import { observeResize, unobserveResize } from '../../util';
+  import { observeResize, unobserveResize } from '../util';
 
   export let data = Promise.resolve([]);
 

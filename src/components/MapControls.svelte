@@ -4,7 +4,6 @@
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
   import IoMdHome from 'svelte-icons/io/IoMdHome.svelte';
   import TiTag from 'svelte-icons/ti/TiTag.svelte';
-  import Loading from './Loading.svelte';
   import { trackEvent } from '../stores/ga';
 
   export let className = '';
@@ -43,6 +42,12 @@
   }
   .spike {
     background-image: url('../assets/imgs/spike.png');
+  }
+
+  .loader {
+    min-width: 28px;
+    min-height: 28px;
+    overflow: hidden;
   }
 </style>
 
@@ -140,5 +145,7 @@
       </button>
     </div>
   {/if}
-  <Loading {loading} />
+  {#if loading}
+    <div class="loader loading" />
+  {/if}
 </div>

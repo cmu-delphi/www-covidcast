@@ -47,6 +47,15 @@
     <script>
       var dataLayer = (window.dataLayer = window.dataLayer || []);
       dataLayer.push({ fireGtm: true });
+
+      // also initialize google analytics
+      window.ga =
+        window.ga ||
+        function () {
+          (ga.q = ga.q || []).push(arguments);
+        };
+      ga.l = +new Date();
+      ga('create', 'UA-9172041-1', 'auto');
     </script>
     <script>
       (function (w, d, s, l, i) {
