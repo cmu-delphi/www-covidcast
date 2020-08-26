@@ -1,10 +1,11 @@
 <script>
   import { sensorList, currentSensor, currentDateObject, currentRegionInfo, yesterdayDate } from '../../stores';
-  import IoMdExpand from 'svelte-icons/io/IoMdExpand.svelte';
+  import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
   import { parseAPITime } from '../../data';
   import { fetchMultipleTimeSlices } from '../../data/fetchData';
   import Vega from '../../components/vega/Vega.svelte';
   import spec from './SmallMultiplesChart.json';
+  import { merge } from 'lodash-es';
 
   const remove = ['ght-smoothed_search', 'safegraph-full_time_work_prop'];
 
@@ -20,6 +21,23 @@
 
   const sensors = sensorList.filter((d) => !remove.includes(d.key));
 
+  const specPercent = merge({}, spec, {
+    transform: [
+      {},
+      {
+        calculate: 'datum.value / 100',
+        as: 'value',
+      },
+    ],
+    encoding: {
+      y: {
+        axis: {
+          format: '.0%',
+        },
+      },
+    },
+  });
+
   $: hasRegion = Boolean($currentRegionInfo);
   $: sensorsWithData = $currentRegionInfo
     ? fetchMultipleTimeSlices(
@@ -32,6 +50,7 @@
       ).map((data, i) => ({
         sensor: sensors[i],
         data,
+        spec: sensors[i].format === 'percent' ? specPercent : spec,
       }))
     : sensors.map((sensor) => ({ sensor, data: [] }));
 </script>
@@ -132,14 +151,14 @@
             on:click|stopPropagation={() => {
               detail = detail === s.sensor ? null : s.sensor;
             }}>
-            <IoMdExpand />
+            <FaSearchPlus />
           </button>
         </div>
       </div>
       <div class="single-sensor-chart vega-wrapper">
         <Vega
           data={s.data}
-          {spec}
+          spec={s.spec}
           noDataText={hasRegion ? 'No data available' : 'No location selected'}
           signals={{ currentDate: $currentDateObject }} />
       </div>
