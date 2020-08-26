@@ -9,6 +9,7 @@ import { addCityLayers, L } from './layers';
 import style from './mapbox_albers_usa_style.json';
 import { geoJsonSources, S } from './sources';
 import ZoomMap from './ZoomMap';
+import { observeResize, unobserveResize } from '../../util';
 
 export default class MapBoxWrapper {
   /**
@@ -89,6 +90,10 @@ export default class MapBoxWrapper {
           this.markReady('setup');
           resolveCallback(this);
         });
+    });
+
+    observeResize(container, () => {
+      this.map.resize();
     });
 
     return p;
@@ -257,6 +262,7 @@ export default class MapBoxWrapper {
   destroy() {
     this.mapSetupReady = false;
     if (this.map) {
+      unobserveResize(this.map.getContainer());
       this.map.remove();
       this.zoom.map = null;
       this.map = null;
