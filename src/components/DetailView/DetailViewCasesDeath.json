@@ -86,7 +86,12 @@
             }
           ],
           "selection": {
-            "highlight": { "type": "single", "empty": "none", "on": "mouseover" }
+            "highlight": {
+              "type": "single",
+              "empty": "none",
+              "on": "mouseover",
+              "nearest": true
+            }
           },
           "mark": "bar",
           "encoding": {

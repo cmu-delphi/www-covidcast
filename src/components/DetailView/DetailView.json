@@ -64,6 +64,7 @@
             "highlight": {
               "type": "single",
               "empty": "none",
+              "nearest": true,
               "on": "mouseover"
             }
           },
