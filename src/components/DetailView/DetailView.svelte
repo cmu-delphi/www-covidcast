@@ -36,11 +36,6 @@
       },
       {
         encoding: {
-          y: {
-            axis: {
-              title: sensor.yAxis || '',
-            },
-          },
           tooltip: [{ title: sensor.name }],
         },
       },
@@ -96,7 +91,7 @@
           vconcat: [
             {
               width: size.width - 45,
-              height: size.height - 60 - 70,
+              height: size.height - 40 - 70,
               encoding: {
                 y: {
                   axis: {
@@ -108,13 +103,8 @@
             },
             {
               width: size.width - 45,
-              height: 60,
+              height: 40,
               encoding: {
-                y: {
-                  axis: {
-                    title: sensor.yAxis || '',
-                  },
-                },
                 tooltip: [{ title: sensor.name }],
               },
             },

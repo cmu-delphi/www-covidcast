@@ -25,6 +25,7 @@
           "field": "count",
           "type": "quantitative",
           "axis": {
+            "minExtent": 25,
             "title": " "
           }
         },
@@ -116,7 +117,7 @@
       ]
     },
     {
-      "height": 60,
+      "height": 40,
       "encoding": {
         "color": {
           "condition": {
@@ -139,6 +140,8 @@
           "field": "count",
           "type": "quantitative",
           "axis": {
+            "minExtent": 25,
+            "tickCount": 3,
             "title": " "
           }
         },
@@ -190,5 +193,8 @@
         }
       ]
     }
-  ]
+  ],
+  "config": {
+    "padding": 0
+  }
 }

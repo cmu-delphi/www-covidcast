@@ -42,6 +42,7 @@
           "field": "value",
           "type": "quantitative",
           "axis": {
+            "minExtent": 25,
             "title": " "
           }
         },
@@ -125,7 +126,7 @@
       ]
     },
     {
-      "height": 60,
+      "height": 40,
       "encoding": {
         "color": {
           "value": "grey"
@@ -144,6 +145,8 @@
           "field": "value",
           "type": "quantitative",
           "axis": {
+            "minExtent": 25,
+            "tickCount": 3,
             "title": " "
           }
         },
