@@ -30,7 +30,11 @@
     "y": {
       "field": "value",
       "type": "quantitative",
-      "axis": null
+      "axis": {
+        "title": null,
+        "tickCount": 3,
+        "minExtent": 25
+      }
     },
     "tooltip": [
       { "field": "value", "type": "quantitative", "title": "Value", "format": ".2f" },

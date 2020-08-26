@@ -27,7 +27,7 @@
   import MapOverlays from '../../components/MapOverlays.svelte';
   import { fetchRegionSlice } from '../../data/fetchData';
   import { nameInfos } from '../../maps';
-  import FaBan from 'svelte-icons/fa/FaBan.svelte'
+  import FaBan from 'svelte-icons/fa/FaBan.svelte';
 
   /**
    * @type {MapBox}
@@ -202,43 +202,43 @@
 
   <div class="view-switcher container-bg">
     {#if !$isMobileDevice}
-    <button
-      aria-pressed={String(!desktopShowPanel)}
-      class="pg-button chart-button single-toggle"
-      class:selected={desktopShowPanel}
-      on:click={() => {
-        desktopShowPanel = !desktopShowPanel;
-      }}
-      title="{desktopShowPanel ? 'Hide' : 'Show'} Line Charts panel">
-      <span aria-hidden>{desktopShowPanel ? 'Hide' : 'Show'} Line Charts panel</span>
-      <FaChartLine />
-      <FaBan />
-    </button>
+      <button
+        aria-pressed={String(!desktopShowPanel)}
+        class="pg-button chart-button single-toggle"
+        class:selected={desktopShowPanel}
+        on:click={() => {
+          desktopShowPanel = !desktopShowPanel;
+        }}
+        title="{desktopShowPanel ? 'Hide' : 'Show'} Line Charts panel">
+        <span aria-hidden>{desktopShowPanel ? 'Hide' : 'Show'} Line Charts panel</span>
+        <FaChartLine />
+        <FaBan />
+      </button>
     {:else}
-    <div class="pg-button-group">
-      <button
-        aria-pressed={String(mobileShowMap)}
-        class="pg-button map-button"
-        class:selected={mobileShowMap}
-        on:click={() => {
-          mobileShowMap = true;
-        }}
-        title="Switch to Map">
-        <span aria-hidden>Switch to Map</span>
-        <FaChartLine />
-      </button>
-      <button
-        aria-pressed={String(!mobileShowMap)}
-        class="pg-button chart-button"
-        class:selected={!mobileShowMap}
-        on:click={() => {
-          mobileShowMap = false;
-        }}
-        title="Switch to Line Charts">
-        <span aria-hidden>Switch to Line Charts</span>
-        <FaChartLine />
-      </button>
-    </div>
+      <div class="pg-button-group">
+        <button
+          aria-pressed={String(mobileShowMap)}
+          class="pg-button map-button"
+          class:selected={mobileShowMap}
+          on:click={() => {
+            mobileShowMap = true;
+          }}
+          title="Switch to Map">
+          <span aria-hidden>Switch to Map</span>
+          <FaChartLine />
+        </button>
+        <button
+          aria-pressed={String(!mobileShowMap)}
+          class="pg-button chart-button"
+          class:selected={!mobileShowMap}
+          on:click={() => {
+            mobileShowMap = false;
+          }}
+          title="Switch to Line Charts">
+          <span aria-hidden>Switch to Line Charts</span>
+          <FaChartLine />
+        </button>
+      </div>
     {/if}
   </div>
 
@@ -258,7 +258,7 @@
       on:updatedEncoding={(e) => updatedEncoding(e.detail)}
       on:select={(e) => selectByFeature(e.detail)} />
 
-    {#if detailSensor != null && (!$isMobileDevice && desktopShowPanel)}
+    {#if detailSensor != null && !$isMobileDevice && desktopShowPanel}
       <div class="detail-container container-bg container-style">
         <DetailView sensor={detailSensor} on:close={() => (detailSensor = null)} />
       </div>
