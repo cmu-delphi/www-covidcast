@@ -46,7 +46,7 @@
     {
       "mark": {
         "type": "line",
-        "interpolate": "monotone"
+        "interpolate": "linear"
       }
     },
     {
@@ -61,7 +61,6 @@
         "fill": "grey"
       },
       "encoding": {
-        "y": { "field": "value", "type": "quantitative" },
         "opacity": {
           "condition": {
             "selection": "highlight",
