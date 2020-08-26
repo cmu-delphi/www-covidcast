@@ -9,6 +9,7 @@ import { toFillLayer, toHoverLayer } from './layers';
 import style from './mapbox_albers_usa_style.json';
 import { toBorderSource, toCenterSource } from './sources';
 import ZoomMap from './ZoomMap';
+import { observeResize, unobserveResize } from '../../util';
 
 /**
  * @typedef {object} MapBoxWrapperOptions
@@ -98,6 +99,10 @@ export default class AMapBoxWrapper {
           this._setupReady();
           resolveCallback(this);
         });
+    });
+
+    observeResize(container, () => {
+      this.map.resize();
     });
 
     return p;
@@ -215,6 +220,7 @@ export default class AMapBoxWrapper {
   destroy() {
     this.mapSetupReady = false;
     if (this.map) {
+      unobserveResize(this.map.getContainer());
       this.map.remove();
       this.zoom.map = null;
       this.map = null;

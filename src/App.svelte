@@ -28,6 +28,7 @@
     flex-direction: column;
     align-items: center;
     padding: 0.5em;
+    flex: 0 0 auto;
   }
 
   .loader {

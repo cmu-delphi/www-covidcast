@@ -25,6 +25,7 @@
           "field": "count",
           "type": "quantitative",
           "axis": {
+            "minExtent": 25,
             "title": " "
           }
         },
@@ -85,7 +86,12 @@
             }
           ],
           "selection": {
-            "highlight": { "type": "single", "empty": "none", "on": "mouseover" }
+            "highlight": {
+              "type": "single",
+              "empty": "none",
+              "on": "mouseover",
+              "nearest": true
+            }
           },
           "mark": "bar",
           "encoding": {
@@ -116,7 +122,7 @@
       ]
     },
     {
-      "height": 60,
+      "height": 40,
       "encoding": {
         "color": {
           "condition": {
@@ -139,6 +145,8 @@
           "field": "count",
           "type": "quantitative",
           "axis": {
+            "minExtent": 25,
+            "tickCount": 3,
             "title": " "
           }
         },
@@ -190,5 +198,8 @@
         }
       ]
     }
-  ]
+  ],
+  "config": {
+    "padding": 0
+  }
 }
