@@ -96,7 +96,7 @@ export const EPIDATA_CASES_OR_DEATH_VALUES = [
 
 const basePercentFormatter = format('.2%');
 const percentFormatter = (v) => basePercentFormatter(v / 100);
-const intFormatter = format(',d');
+const countFormatter = format(',.1f');
 const rawFormatter = format(',.2f');
 
 function generateCasesOrDeathSignals(signal) {
@@ -141,7 +141,7 @@ export function extendSensorEntry(sensorEntry) {
   return Object.assign(sensorEntry, {
     key,
     tooltipText: sensorEntry.tooltipText || sensorEntry.mapTitleText,
-    formatValue: sensorEntry.format === 'percent' ? percentFormatter : isCount ? intFormatter : rawFormatter,
+    formatValue: sensorEntry.format === 'percent' ? percentFormatter : isCount ? countFormatter : rawFormatter,
     isCount,
     isProp: isPropSignal(key),
     isCasesOrDeath,
