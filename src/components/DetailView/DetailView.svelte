@@ -169,7 +169,7 @@
 <div class="single-sensor-chart vega-wrapper">
   <Vega
     {data}
-    spec={sensor.isCasesOrDeath ? specCasesDeath : (sensor.hasStdErr ? specStdErr : spec)}
+    spec={sensor.isCasesOrDeath ? specCasesDeath : sensor.hasStdErr ? specStdErr : spec}
     {patchSpec}
     noDataText={hasRegion ? 'No data available' : 'No location selected'}
     signals={{ currentDate: $currentDateObject }} />
