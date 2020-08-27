@@ -159,7 +159,7 @@
 </style>
 
 <div class="header">
-  <h4>{sensor.name} of {$currentRegionInfo ? $currentRegionInfo.displayName : 'Unknown'}</h4>
+  <h4>{sensor.name} in {$currentRegionInfo ? $currentRegionInfo.displayName : 'Unknown'}</h4>
   <h5>{mapTitle}</h5>
   <button class="pg-button close" on:click={() => dispatch('close')} title="Close this detail view">
     <IoIosClose />
