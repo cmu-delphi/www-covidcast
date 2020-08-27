@@ -11,6 +11,10 @@
     {
       "calculate": "datum.date_value",
       "as": "title"
+    },
+    {
+      "calculate": "datum.stderr == null ? NaN : datum.stderr",
+      "as": "stderr_f"
     }
   ],
   "encoding": {
@@ -38,7 +42,7 @@
     },
     "tooltip": [
       { "field": "value", "type": "quantitative", "title": "Value", "format": ".2f" },
-      { "field": "stderr", "type": "quantitative", "title": "Standard Error", "format": ".2f" },
+      { "field": "stderr_f", "type": "quantitative", "title": "Standard Error", "format": ".2f" },
       { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
     ]
   },
@@ -51,7 +55,12 @@
     },
     {
       "selection": {
-        "highlight": { "type": "single", "empty": "none", "on": "mouseover" }
+        "highlight": {
+          "type": "single",
+          "empty": "none",
+          "on": "mouseover",
+          "nearest": true
+        }
       },
       "mark": {
         "type": "point",
