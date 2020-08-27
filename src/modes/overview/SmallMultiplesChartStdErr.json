@@ -11,6 +11,14 @@
     {
       "calculate": "datum.date_value",
       "as": "title"
+    },
+    {
+      "calculate": "datum.value - datum.stderr",
+      "as": "value_lower_bound"
+    },
+    {
+      "calculate": "datum.value + datum.stderr",
+      "as": "value_upper_bound"
     }
   ],
   "encoding": {
@@ -38,6 +46,7 @@
     },
     "tooltip": [
       { "field": "value", "type": "quantitative", "title": "Value", "format": ".2f" },
+      { "field": "stderr", "type": "quantitative", "title": "Standard Error", "format": ".2f" },
       { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
     ]
   },
@@ -72,6 +81,24 @@
             "value": 1
           },
           "value": 0
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "area",
+        "interpolate": "monotone"
+      },
+      "encoding": {
+        "color": {
+          "value": "rgba(0, 0, 0, 0.1)"
+        },
+        "y": {
+          "field": "value_lower_bound",
+          "type": "quantitative"
+        },
+        "y2": {
+          "field": "value_upper_bound"
         }
       }
     },

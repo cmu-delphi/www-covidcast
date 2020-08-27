@@ -5,6 +5,7 @@
   import { fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../../components/vega/Vega.svelte';
   import specBase from './SmallMultiplesChart.json';
+  import specStdErrBase from './SmallMultiplesChartStdErr.json';
   import { merge } from 'lodash-es';
 
   const remove = ['ght-smoothed_search', 'safegraph-full_time_work_prop'];
@@ -30,10 +31,48 @@
       },
     },
   });
+  const specStdErr = merge({}, specStdErrBase, {
+    encoding: {
+      x: {
+        scale: {
+          domain: [startDay.getTime(), finalDay.getTime()],
+        },
+      },
+    },
+  });
 
   const specPercent = merge({}, spec, {
     transform: [
       {},
+      // {
+      //   calculate: '(datum.value - datum.stderr) / 100',
+      // },
+      // {
+      //   calculate: '(datum.value + datum.stderr) / 100',
+      // },
+      {
+        calculate: 'datum.value / 100',
+        as: 'pValue',
+      },
+    ],
+    encoding: {
+      y: {
+        field: 'pValue',
+        axis: {
+          format: '.1%',
+        },
+      },
+    },
+  });
+  const specPercentStdErr = merge({}, specStdErr, {
+    transform: [
+      {},
+      {
+        calculate: '(datum.value - datum.stderr) / 100',
+      },
+      {
+        calculate: '(datum.value + datum.stderr) / 100',
+      },
       {
         calculate: 'datum.value / 100',
         as: 'pValue',
@@ -49,13 +88,23 @@
     },
   });
 
+  /**
+   * @type {import('../../stores/constants').SensorEntry} sensor
+   */
+  function chooseSpec(sensor) {
+    if (sensor.hasStdErr) {
+      return sensor.format === 'percent' ? specPercentStdErr : specStdErr;
+    }
+    return sensor.format === 'percent' ? specPercent : spec;
+  }
+
   $: hasRegion = Boolean($currentRegionInfo);
   $: sensorsWithData = sensors.map((sensor) => ({
     sensor,
     data: $currentRegionInfo
       ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, finalDay, false)
       : [],
-    spec: sensor.format === 'percent' ? specPercent : spec,
+    spec: chooseSpec(sensor),
   }));
 </script>
 

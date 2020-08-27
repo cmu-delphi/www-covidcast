@@ -10,6 +10,7 @@ body.viz-body {
 .viz-header {
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
 }
 
 .viz-name {

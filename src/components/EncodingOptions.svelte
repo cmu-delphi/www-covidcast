@@ -22,7 +22,7 @@
   }
 
   .button {
-    width: 9em;
+    width: 10em;
     padding: 0.2em 0.5em;
   }
 </style>
@@ -53,7 +53,7 @@
         Cumulative
       </button>
     </div>
-    <div aria-label="display counts or ratio per 100K people" class="pg-button-group button-group">
+    <div aria-label="display counts or ratios per 100,000 people" class="pg-button-group button-group">
       <button
         aria-pressed={String(!$signalCasesOrDeathOptions.ratio)}
         class="pg-button button"
@@ -74,7 +74,7 @@
             signalCasesOrDeathOptions.set({ ...$signalCasesOrDeathOptions, ratio: true });
           }
         }}>
-        Ratio per 100K
+        Ratios per 100,000
       </button>
     </div>
     <!-- <div aria-label="display type" class="pg-button-group button-group">

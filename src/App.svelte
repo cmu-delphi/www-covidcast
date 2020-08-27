@@ -18,12 +18,6 @@
 </script>
 
 <style>
-  .root {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-  }
-
   .mode-switcher {
     display: flex;
     flex-direction: column;
@@ -37,20 +31,18 @@
   }
 </style>
 
-<div class="root">
-  {#if modes.length > 1}
-    <div class="mode-switcher">
-      <ModeToggle />
-    </div>
-  {/if}
-  {#await currentComponent}
-    <div class="loader loading" />
-  {:then value}
-    <svelte:component this={value} />
-  {:catch error}
-    <div class="loader">
-      Error loading current mode
-      <pre>{error}</pre>
-    </div>
-  {/await}
-</div>
+{#if modes.length > 1}
+  <div class="mode-switcher">
+    <ModeToggle />
+  </div>
+{/if}
+{#await currentComponent}
+  <div class="loader loading" />
+{:then value}
+  <svelte:component this={value} />
+{:catch error}
+  <div class="loader">
+    Error loading current mode
+    <pre>{error}</pre>
+  </div>
+{/await}
