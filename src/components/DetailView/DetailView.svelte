@@ -4,6 +4,7 @@
   import Vega from '../vega/Vega.svelte';
   import spec from './DetailView.json';
   import specCasesDeath from './DetailViewCasesDeath.json';
+  import specStdErr from './DetailViewStdErr.json';
   import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
   import { createEventDispatcher } from 'svelte';
   import { merge } from 'lodash-es';
@@ -168,7 +169,7 @@
 <div class="single-sensor-chart vega-wrapper">
   <Vega
     {data}
-    spec={sensor.isCasesOrDeath ? specCasesDeath : spec}
+    spec={sensor.isCasesOrDeath ? specCasesDeath : (sensor.hasStdErr ? specStdErr : spec)}
     {patchSpec}
     noDataText={hasRegion ? 'No data available' : 'No location selected'}
     signals={{ currentDate: $currentDateObject }} />

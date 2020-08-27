@@ -90,6 +90,7 @@
               "type": "single",
               "empty": "none",
               "on": "mouseover",
+              "clear": "mouseout",
               "nearest": true
             }
           },

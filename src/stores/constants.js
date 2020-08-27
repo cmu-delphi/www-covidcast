@@ -62,6 +62,7 @@ export function getLevelInfo(level) {
  * @property {string} signal
  * @property {string?} api
  * @property {(v: number) => string} formatValue
+ * @property {boolean} hasStdErr
  * @property {boolean} isCasesOrDeath is cases or death signal
  * @property {boolean} isCount is count signal
  * @property {boolean} isProp is prop signal
@@ -161,6 +162,7 @@ const defaultSensors = [
     mapTitleText: 'Proportion of people spending 6 hours or more away from home, based on SafeGraph mobility data',
     yAxis: 'Proportion',
     format: 'raw',
+    hasStdErr: true,
   },
   {
     type: 'public',
@@ -171,6 +173,7 @@ const defaultSensors = [
     mapTitleText: 'Proportion of people spending 3-6 hours away from home, based on SafeGraph mobility data',
     yAxis: 'Proportion',
     format: 'raw',
+    hasStdErr: true,
   },
   {
     type: 'public',
@@ -181,6 +184,7 @@ const defaultSensors = [
     mapTitleText: 'Relative frequency of COVID-related Google searches',
     yAxis: 'Frequency (arbitrary scale)',
     format: 'raw',
+    hasStdErr: false,
   },
   {
     type: 'early',
@@ -191,6 +195,7 @@ const defaultSensors = [
     mapTitleText: 'Percentage of daily doctor visits that are due to COVID-like symptoms',
     yAxis: 'Percentage',
     format: 'percent',
+    hasStdErr: false,
   },
   {
     type: 'early',
@@ -201,6 +206,7 @@ const defaultSensors = [
     mapTitleText: 'Percentage of people with COVID-like symptoms, based on Facebook surveys',
     yAxis: 'Percentage',
     format: 'percent',
+    hasStdErr: true,
   },
   {
     type: 'early',
@@ -212,6 +218,7 @@ const defaultSensors = [
       'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
     yAxis: 'Percentage',
     format: 'percent',
+    hasStdErr: true,
   },
   {
     type: 'early',
@@ -223,6 +230,7 @@ const defaultSensors = [
     mapTitleText: 'Combination of COVID-19 indicators',
     yAxis: 'Combined value (arbitrary scale)',
     format: 'raw',
+    hasStdErr: true,
   },
   {
     type: 'late',
@@ -234,6 +242,7 @@ const defaultSensors = [
     mapTitleText: 'Daily test positivity rate for COVID-19 antigens',
     yAxis: 'Percentage',
     format: 'percent',
+    hasStdErr: true,
   },
   {
     type: 'late',
@@ -244,6 +253,7 @@ const defaultSensors = [
     mapTitleText: 'Percentage of daily hospital admissions with COVID-19 associated diagnoses',
     yAxis: 'Percentage',
     format: 'percent',
+    hasStdErr: false,
   },
   {
     type: 'late',
@@ -271,6 +281,7 @@ const defaultSensors = [
     },
     yAxis: 'Cases',
     format: 'raw',
+    hasStdErr: false,
   },
   {
     type: 'late',
@@ -298,6 +309,7 @@ const defaultSensors = [
     },
     yAxis: 'Deaths',
     format: 'raw',
+    hasStdErr: false,
   },
 ];
 
