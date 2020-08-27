@@ -87,7 +87,7 @@
           <tr>
             <th>{$currentSensorEntry.yAxis}</th>
             <th class="area">Count</th>
-            <th class="area">Ratio per 100k</th>
+            <th class="area">Ratios per 100,000</th>
           </tr>
           <tr>
             <th>{formatTimeWithoutYear($currentDateObject)}</th>
