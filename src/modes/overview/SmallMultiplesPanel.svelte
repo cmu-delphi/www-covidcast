@@ -1,11 +1,10 @@
 <script>
-  import { sensorList, currentSensor, currentDateObject, currentRegionInfo, yesterdayDate } from '../../stores';
+  import { sensorList, currentSensor, currentDateObject, currentRegionInfo, smallMultipleTimeSpan } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
-  import { parseAPITime } from '../../data';
   import { fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../../components/vega/Vega.svelte';
-  import specBase from './SmallMultiplesChart.json';
-  import specStdErrBase from './SmallMultiplesChartStdErr.json';
+  import spec from './SmallMultiplesChart.json';
+  import specStdErr from './SmallMultiplesChartStdErr.json';
   import { merge } from 'lodash-es';
   import { levelMegaCounty } from '../../stores/constants';
 
@@ -17,32 +16,9 @@
    */
   export let detail = null;
 
-  // Create a date for today in the API's date format
-  const startDay = parseAPITime('20200401');
-  const finalDay = yesterdayDate;
-
   const sensors = sensorList.filter((d) => !remove.includes(d.key));
 
-  const spec = merge({}, specBase, {
-    encoding: {
-      x: {
-        scale: {
-          domain: [startDay.getTime(), finalDay.getTime()],
-        },
-      },
-    },
-  });
-  const specStdErr = merge({}, specStdErrBase, {
-    encoding: {
-      x: {
-        scale: {
-          domain: [startDay.getTime(), finalDay.getTime()],
-        },
-      },
-    },
-  });
-
-  const specPercent = merge({}, spec, {
+  const specPercent = {
     transform: [
       {},
       // {
@@ -64,8 +40,8 @@
         },
       },
     },
-  });
-  const specPercentStdErr = merge({}, specStdErr, {
+  };
+  const specPercentStdErr = {
     transform: [
       {},
       {
@@ -87,16 +63,41 @@
         },
       },
     },
-  });
+  };
 
   /**
    * @type {import('../../stores/constants').SensorEntry} sensor
    */
-  function chooseSpec(sensor) {
-    if (sensor.hasStdErr) {
-      return sensor.format === 'percent' ? specPercentStdErr : specStdErr;
+  function chooseSpec(sensor, min, max) {
+    const time = {
+      encoding: {
+        x: {
+          scale: {
+            domain: [min.getTime(), max.getTime()],
+          },
+        },
+      },
+    };
+
+    return merge(
+      {},
+      sensor.hasStdErr ? specStdErr : spec,
+      time,
+      sensor.format === 'percent' ? (sensor.hasStdErr ? specPercentStdErr : specPercent) : {},
+    );
+  }
+
+  // use local variables with manual setting for better value comparison updates
+  let startDay = $smallMultipleTimeSpan[0];
+  let endDay = $smallMultipleTimeSpan[1];
+
+  $: {
+    if (startDay.getTime() !== $smallMultipleTimeSpan[0].getTime()) {
+      startDay = $smallMultipleTimeSpan[0];
     }
-    return sensor.format === 'percent' ? specPercent : spec;
+    if (endDay.getTime() !== $smallMultipleTimeSpan[1].getTime()) {
+      endDay = $smallMultipleTimeSpan[1];
+    }
   }
 
   $: hasRegion = Boolean($currentRegionInfo);
@@ -110,9 +111,9 @@
     sensor,
     data:
       $currentRegionInfo && !isMegaRegion
-        ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, finalDay, false)
+        ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, endDay, false)
         : [],
-    spec: chooseSpec(sensor),
+    spec: chooseSpec(sensor, startDay, endDay),
   }));
 </script>
 
