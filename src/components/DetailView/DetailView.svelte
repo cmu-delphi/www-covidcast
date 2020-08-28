@@ -1,5 +1,5 @@
 <script>
-  import { currentRegionInfo, signalCasesOrDeathOptions, currentDateObject } from '../../stores';
+  import { currentRegionInfo, signalCasesOrDeathOptions, currentDateObject, smallMultipleTimeSpan } from '../../stores';
   import { fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../vega/Vega.svelte';
   import spec from './DetailView.json';
@@ -45,6 +45,17 @@
         encoding: {
           tooltip: [{ title: sensor.name }],
         },
+        layer: [
+          {
+            selection: {
+              brush: {
+                init: {
+                  x: [$smallMultipleTimeSpan[0].getTime(), $smallMultipleTimeSpan[1].getTime()],
+                },
+              },
+            },
+          },
+        ],
       },
     ],
   };
@@ -85,6 +96,18 @@
           },
           tooltip: [{ title: sensor.name }],
         },
+        layer: [
+          {},
+          {
+            selection: {
+              brush: {
+                init: {
+                  x: [$smallMultipleTimeSpan[0].getTime(), $smallMultipleTimeSpan[1].getTime()],
+                },
+              },
+            },
+          },
+        ],
       },
     ],
   };
