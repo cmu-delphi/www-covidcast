@@ -1,5 +1,6 @@
 // combining json with same geolocations but different value properties
 
+import { timeDay } from 'd3-time';
 import { timeParse, timeFormat } from 'd3-time-format';
 
 // json1 value is 7 day average, json2 value is single count
@@ -31,10 +32,11 @@ export function checkWIP(signalName, otherSignal) {
   return otherSignal;
 }
 
-/**
- * @type {(v: string) => Date}
- */
-export const parseAPITime = timeParse('%Y%m%d');
+const parseAPITimeParser = timeParse('%Y%m%d');
+
+export function parseAPITime(v) {
+  return timeDay(parseAPITimeParser(v));
+}
 /**
  * @type {(v: Date) => string}
  */

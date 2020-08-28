@@ -1,7 +1,7 @@
 <script>
   import { sensorList, currentSensor, currentDateObject, currentRegionInfo, smallMultipleTimeSpan } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
-  import { fetchTimeSlice } from '../../data/fetchData';
+  import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../../components/vega/Vega.svelte';
   import spec from './SmallMultiplesChart.json';
   import specStdErr from './SmallMultiplesChartStdErr.json';
@@ -28,7 +28,7 @@
       //   calculate: '(datum.value + datum.stderr) / 100',
       // },
       {
-        calculate: 'datum.value / 100',
+        calculate: 'datum.value == null ? null : datum.value / 100',
         as: 'pValue',
       },
     ],
@@ -51,7 +51,7 @@
         calculate: '(datum.value + datum.stderr) / 100',
       },
       {
-        calculate: 'datum.value / 100',
+        calculate: 'datum.value == null ? null : datum.value / 100',
         as: 'pValue',
       },
     ],
@@ -111,7 +111,9 @@
     sensor,
     data:
       $currentRegionInfo && !isMegaRegion
-        ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, endDay, false)
+        ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, endDay, false).then(
+            addMissing,
+          )
         : [],
     spec: chooseSpec(sensor, startDay, endDay),
   }));

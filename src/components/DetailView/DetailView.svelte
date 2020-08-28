@@ -1,6 +1,6 @@
 <script>
   import { currentRegionInfo, signalCasesOrDeathOptions, currentDateObject, smallMultipleTimeSpan } from '../../stores';
-  import { fetchTimeSlice } from '../../data/fetchData';
+  import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../vega/Vega.svelte';
   import spec from './DetailView.json';
   import specCasesDeath from './DetailViewCasesDeath.json';
@@ -27,7 +27,9 @@
       ? `Indicators are not available for ${$currentRegionInfo.name}. Please select a county instead`
       : 'No data available'
     : 'No location selected';
-  $: data = $currentRegionInfo ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId) : [];
+  $: data = $currentRegionInfo
+    ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId).then(addMissing)
+    : [];
 
   $: regularPatch = {
     vconcat: [
