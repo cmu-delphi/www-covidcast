@@ -7,6 +7,7 @@
   import specBase from './SmallMultiplesChart.json';
   import specStdErrBase from './SmallMultiplesChartStdErr.json';
   import { merge } from 'lodash-es';
+  import { levelMegaCounty } from '../../stores/constants';
 
   const remove = ['ght-smoothed_search', 'safegraph-full_time_work_prop'];
 
@@ -99,11 +100,18 @@
   }
 
   $: hasRegion = Boolean($currentRegionInfo);
+  $: isMegaRegion = Boolean($currentRegionInfo) && $currentRegionInfo.level === levelMegaCounty.id;
+  $: noDataText = hasRegion
+    ? isMegaRegion
+      ? `Indicators are not available for ${$currentRegionInfo.name}. Please select a county instead`
+      : 'No data available'
+    : 'No location selected';
   $: sensorsWithData = sensors.map((sensor) => ({
     sensor,
-    data: $currentRegionInfo
-      ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, finalDay, false)
-      : [],
+    data:
+      $currentRegionInfo && !isMegaRegion
+        ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, finalDay, false)
+        : [],
     spec: chooseSpec(sensor),
   }));
 </script>
@@ -209,11 +217,7 @@
         </div>
       </div>
       <div class="single-sensor-chart vega-wrapper">
-        <Vega
-          data={s.data}
-          spec={s.spec}
-          noDataText={hasRegion ? 'No data available' : 'No location selected'}
-          signals={{ currentDate: $currentDateObject }} />
+        <Vega data={s.data} spec={s.spec} {noDataText} signals={{ currentDate: $currentDateObject }} />
       </div>
     </li>
   {/each}

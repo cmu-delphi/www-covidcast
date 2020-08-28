@@ -8,7 +8,7 @@
   import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
   import { createEventDispatcher } from 'svelte';
   import { merge } from 'lodash-es';
-  import { primaryValue } from '../../stores/constants';
+  import { levelMegaCounty, primaryValue } from '../../stores/constants';
   import EncodingOptions from '../EncodingOptions.svelte';
 
   const dispatch = createEventDispatcher();
@@ -21,6 +21,12 @@
     typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText($signalCasesOrDeathOptions) : sensor.mapTitleText;
 
   $: hasRegion = Boolean($currentRegionInfo);
+  $: isMegaRegion = Boolean($currentRegionInfo) && $currentRegionInfo.level === levelMegaCounty.id;
+  $: noDataText = hasRegion
+    ? isMegaRegion
+      ? `Indicators are not available for ${$currentRegionInfo.name}. Please select a county instead`
+      : 'No data available'
+    : 'No location selected';
   $: data = $currentRegionInfo ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId) : [];
 
   $: regularPatch = {
@@ -171,7 +177,7 @@
     {data}
     spec={sensor.isCasesOrDeath ? specCasesDeath : sensor.hasStdErr ? specStdErr : spec}
     {patchSpec}
-    noDataText={hasRegion ? 'No data available' : 'No location selected'}
+    {noDataText}
     signals={{ currentDate: $currentDateObject }} />
 </div>
 <div class="encoding">
