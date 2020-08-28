@@ -23,6 +23,8 @@
   import { trackEvent } from '../../stores/ga';
   import { onMount } from 'svelte';
   import MapOverlays from '../../components/MapOverlays.svelte';
+  import modes from '..';
+  import SingleModeToggle from '../../components/SingleModeToggle.svelte';
 
   /**
    * @type {MapBox}
@@ -219,6 +221,14 @@
     position: relative;
   }
 
+  .mode-container {
+    position: absolute;
+    margin: 6px;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+  }
+
   /** mobile **/
   @media only screen and (max-width: 767px) {
     .root {
@@ -252,6 +262,9 @@
     <MapOverlays {map} mapLoading={running || loading} legendLoading={false}>
       <div slot="title">{$currentDateObject.toLocaleDateString()}</div>
     </MapOverlays>
+    <div class="mode-container container-bg container-style">
+      <SingleModeToggle mode={modes[0]} label="Back" />
+    </div>
     <MapBox
       bind:this={map}
       on:loading={(e) => {
