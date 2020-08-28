@@ -82,18 +82,6 @@ body.viz-body {
   border-bottom: none;
 }
 
-.viz-mission {
-  order: 5;
-  padding-top: 0.2em;
-  padding-bottom: 0.5em;
-  color: var(--darkgrey);
-}
-
-.viz-mission-link {
-  color: var(--red);
-  font-weight: 700;
-}
-
 .viz-team-link {
   color: inherit;
   text-decoration: underline;
