@@ -7,7 +7,7 @@
     signalCasesOrDeathOptions,
     isDirectionSignalType,
   } from '../../stores';
-  import { DIRECTION_THEME } from '../../theme';
+  import { DIRECTION_THEME, ZERO_COLOR } from '../../theme';
   import { getTextColorBasedOnBackground } from '../../util';
 
   export let invalid = false;
@@ -22,7 +22,7 @@
    * @param {number} value
    */
   function colorScaleStyle(value) {
-    const color = $colorScale(value);
+    const color = value === 0 ? ZERO_COLOR : $colorScale(value);
     return `background-color: ${color}; color: ${getTextColorBasedOnBackground(color)}`;
   }
 </script>
