@@ -28,11 +28,14 @@ export const MAP_THEME = {
   hoverRegionOutline: '#cccccc', //'#ffffff',
   stateFill: 'rgba(0, 0, 0, 0)',
   stateOutline: '#ffffff', //'#bcbcbc',
-  countyFill: '#eeeeee', //'#e4dac4',
+  countyFill: '#eeeeee', //'#e4dac4', // missing value
   countyOutline: '#ffffff', //'#e0e0e0',
   countyOutlineWhenFilled: '#ffffff', //'#616161',
   zoneOutline: 'blue', //'#e0e0e0',
 };
+
+export const MISSING_COLOR = '#eeeeee';
+export const MISSING_COLOR_OPENGL = [238 / 255, 238 / 255, 238 / 255];
 
 export const ENCODING_BUBBLE_THEME = {
   color: 'transparent',

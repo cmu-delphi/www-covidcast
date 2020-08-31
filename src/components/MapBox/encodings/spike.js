@@ -34,7 +34,7 @@ export default class SpikeEncoding {
     });
   }
 
-  encode(map, level, signalType, sensor, valueMinMax, stops) {
+  encode(map, level, _signalType, sensor, valueMinMax, _stops, _stopsMega, scale) {
     map.setPaintProperty(L[level].fill, 'fill-color', this.theme.countyFill);
 
     const valueMax = valueMinMax[1];
@@ -43,13 +43,13 @@ export default class SpikeEncoding {
     const heightScaleTheme = this.theme.heightScale[getType(sensor)];
 
     this.heightScale = parseScaleSpec(heightScaleTheme).range([0, maxHeight]).domain([0, valueMax]).clamp(true);
-    this.customLayers.get(level).encode(heightScaleTheme, maxHeight, valueMax, stops);
+    this.customLayers.get(level).encode(heightScaleTheme, maxHeight, valueMax, scale);
 
     return this.heightScale;
   }
 
-  updateSources(map, level) {
-    this.customLayers.get(level).updateSources();
+  updateSources(map, level, lookup, primaryValue) {
+    this.customLayers.get(level).updateSources(lookup, primaryValue);
     // const source = this.sources[level];
     // const refSource = S[level].center;
     // const ref = map.getSource(refSource)._data;
