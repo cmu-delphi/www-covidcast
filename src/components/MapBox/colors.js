@@ -141,8 +141,8 @@ export function splitDomain(min, max, parts) {
 function computeTicks(sensorEntry, valueMinMax, small) {
   const numTicks = small ? SMALL_TICK_COUNT : TICK_COUNT;
   if (sensorEntry.isCount) {
-    const min = Math.log10(Math.max(1, valueMinMax[0]));
-    const max = Math.log10(Math.max(2, valueMinMax[1]));
+    const min = Math.log10(Math.max(10e-3, valueMinMax[0]));
+    const max = Math.log10(Math.max(10e-2, valueMinMax[1]));
     return logspace(min, max, numTicks);
   }
   // manipulates valueMinMax in place!
