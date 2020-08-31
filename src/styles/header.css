@@ -18,11 +18,6 @@ body.viz-body {
   margin: 1em 0;
   padding-top: 0;
   padding-bottom: 0;
-
-  display: flex;
-  align-items: flex-end;
-  flex-wrap: wrap;
-
   color: var(--darkgrey);
 }
 
@@ -35,6 +30,8 @@ body.viz-body {
 .viz-name > h1 {
   font-size: 1.9rem;
   padding-right: 0.2em;
+  line-height: 1;
+  display: inline-block;
 }
 
 .viz-name > h1 > a {
@@ -48,13 +45,17 @@ body.viz-body {
   padding-left: 0.2em;
   font-weight: 500;
   padding-right: 1.5em;
+  line-height: 1;
+  display: inline-block;
 }
 
 .viz-name > h3 {
-  font-size: 1rem;
+  font-size: 1.5em;
   font-weight: 500;
   margin: 0;
-  color: var(--grey);
+  color: var(--darkgrey);
+  line-height: 1;
+  display: inline-block;
 }
 
 /** mobile **/
@@ -78,20 +79,8 @@ body.viz-body {
 }
 
 .viz-group-link {
-  color: inherit;
+  color: var(--darkgrey) !important;
   border-bottom: none;
-}
-
-.viz-mission {
-  order: 5;
-  padding-top: 0.2em;
-  padding-bottom: 0.5em;
-  color: var(--darkgrey);
-}
-
-.viz-mission-link {
-  color: var(--red);
-  font-weight: 700;
 }
 
 .viz-team-link {

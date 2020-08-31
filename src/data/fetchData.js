@@ -1,4 +1,5 @@
 import { callAPIEndPoint } from './api';
+import { timeDay } from 'd3-time';
 import { parseAPITime, formatAPITime, combineSignals } from './utils';
 import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 
@@ -129,12 +130,39 @@ function createCopy(row, date, sensorEntry) {
     direction: null,
     sample_size: null,
   });
-  if (sensorEntry.isCasesOrDeath) {
+  if (sensorEntry != null && sensorEntry.isCasesOrDeath) {
     EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
       copy[key] = null;
     });
   }
   return copy;
+}
+
+/**
+ *
+ * @param {EpiDataRow[]} rows
+ */
+export function addMissing(rows) {
+  if (rows.length < 2) {
+    return rows;
+  }
+  const min = rows[0].date_value;
+  const max = rows[rows.length - 1].date_value;
+  const template = rows[0];
+  const base = rows.slice();
+  const range = timeDay.range(min, timeDay.offset(max, 1), 1);
+  if (range.length === rows.length) {
+    // full
+    return rows;
+  }
+  const imputedRows = range.map((date) => {
+    if (base.length > 0 && base[0].date_value.getTime() <= date.getTime()) {
+      return base.shift();
+    }
+    // create an entry
+    return createCopy(template, date);
+  });
+  return imputedRows;
 }
 
 /**
