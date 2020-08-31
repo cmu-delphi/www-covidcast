@@ -10,7 +10,6 @@ export default class BubbleEncoding {
     this.id = 'bubble';
     this.theme = theme;
     this.layers = levels.map((level) => L[level].bubble);
-    this.interactiveSources = [];
   }
 
   getVisibleLayers(level, signalType) {

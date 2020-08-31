@@ -230,21 +230,13 @@ export default class InteractiveMap {
     const setState = { [attr]: true };
     const clearState = { [attr]: false };
 
-    const extraSources = this.adapter.encodings.map((d) => d.interactiveSources).flat();
-
     // match ids
     if (obj.id !== id) {
       if (obj.id) {
         this._updateState(S[obj.level].border, obj.id, clearState);
-        for (const s of extraSources) {
-          this._updateState(s, obj.id, clearState);
-        }
       }
       if (id) {
         this._updateState(S[level].border, id, setState);
-        for (const s of extraSources) {
-          this._updateState(s, id, setState);
-        }
       }
       obj.id = id;
       // store level of selected id
