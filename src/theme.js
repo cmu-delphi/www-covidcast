@@ -35,7 +35,6 @@ export const MAP_THEME = {
 };
 
 export const MISSING_COLOR = '#eeeeee';
-export const MISSING_COLOR_OPENGL = [238 / 255, 238 / 255, 238 / 255];
 
 export const ENCODING_BUBBLE_THEME = {
   color: 'transparent',

@@ -1,5 +1,5 @@
 import { MercatorCoordinate } from 'mapbox-gl';
-import { MISSING_COLOR_OPENGL, MISSING_COLOR, ENCODING_SPIKE_THEME } from '../../../theme';
+import { MISSING_COLOR, ENCODING_SPIKE_THEME } from '../../../theme';
 import { rgb } from 'd3-color';
 
 // create GLSL source for vertex shader
@@ -26,11 +26,15 @@ void main() {
 }`;
 
 // create GLSL source for fragment shader
+
 const fragmentSource = `
 precision mediump float;
 uniform float u_opacity;
 varying vec3 v_color;
 void main() {
+  if (v_color == vec3(0.0,0.0,0.0)) {
+    discard;
+  }
   gl_FragColor = vec4(v_color * u_opacity, u_opacity);
 }`;
 
@@ -122,7 +126,7 @@ export class SpikeLayer {
     this._colorAndHeightBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this._colorAndHeightBuffer);
     this._colorAndHeightData = new Float32Array(this.featureIds.length * 4 * 3); // per vertex rgb color and height
-    this._colorAndHeightData.fill(MISSING_COLOR_OPENGL[0]);
+    this._colorAndHeightData.fill(0);
     gl.bufferData(gl.ARRAY_BUFFER, this._colorAndHeightData, gl.STATIC_DRAW);
 
     this._indexBuffer = gl.createBuffer();
@@ -210,9 +214,9 @@ export class SpikeLayer {
         if (v == null || Number.isNaN(v)) {
           for (let j = 0; j < 3; j++) {
             const r = i * 4 * 3 + j * 4;
-            this._colorAndHeightData[r] = MISSING_COLOR_OPENGL[0];
-            this._colorAndHeightData[r + 1] = MISSING_COLOR_OPENGL[1];
-            this._colorAndHeightData[r + 2] = MISSING_COLOR_OPENGL[1];
+            this._colorAndHeightData[r] = 0;
+            this._colorAndHeightData[r + 1] = 0;
+            this._colorAndHeightData[r + 2] = 0;
             this._colorAndHeightData[r + 3] = 0;
           }
           continue;
