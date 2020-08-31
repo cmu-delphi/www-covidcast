@@ -7,11 +7,11 @@
   },
   "transform": [
     {
-      "calculate": "datum.value - datum.stderr",
+      "calculate": "datum.value == null ? null : datum.value - datum.stderr",
       "as": "value_lower_bound"
     },
     {
-      "calculate": "datum.value + datum.stderr",
+      "calculate": "datum.value == null ? null : datum.value + datum.stderr",
       "as": "value_upper_bound"
     },
     {
