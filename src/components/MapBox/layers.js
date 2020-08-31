@@ -21,24 +21,23 @@ export const L = {
     fill: 'state-fill',
     hover: 'state-hover',
     bubble: 'state-bubble',
+    spike: 'state-spike',
   },
   msa: {
     fill: 'msa-fill',
     hover: 'msa-hover',
     bubble: 'msa-bubble',
+    spike: 'msa-spike',
   },
   county: {
     fill: 'county-fill',
     hover: 'county-hover',
     bubble: 'county-bubble',
+    spike: 'county-spike',
   },
   'mega-county': {
     fill: 'mega-county-fill',
     hover: 'mega-county-hover',
-  },
-  spike: {
-    fill: 'spike-fill',
-    stroke: 'spike-stroke',
   },
   zoneOutline: 'zone-outline',
   cityPoints: {

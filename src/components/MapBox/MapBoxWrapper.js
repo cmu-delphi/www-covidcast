@@ -61,6 +61,7 @@ export default class MapBoxWrapper {
       pitchWithRotate: false,
       touchPitch: false,
       touchZoomRotate: true,
+      antialias: true,
     });
     this.zoom.map = this.map;
     this.map.touchZoomRotate.disableRotation();
@@ -185,10 +186,6 @@ export default class MapBoxWrapper {
           data: r[level].center,
         });
       });
-
-      for (const enc of this.encodings) {
-        enc.addSources(map);
-      }
     });
 
     const sprites = this.addSprites();
@@ -296,7 +293,7 @@ export default class MapBoxWrapper {
     }
   }
 
-  updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, stopsMega) {
+  updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, stopsMega, scale) {
     // changed the visibility of layers
     const oldLevel = this.level;
     this.level = level;
@@ -322,7 +319,7 @@ export default class MapBoxWrapper {
       this.map.setLayoutProperty(layer, 'visibility', visibleLayers.has(layer) ? 'visible' : 'none');
     });
 
-    const r = this.encoding.encode(this.map, level, signalType, sensor, valueMinMax, stops, stopsMega);
+    const r = this.encoding.encode(this.map, level, signalType, sensor, valueMinMax, stops, stopsMega, scale);
 
     this.markReady('encoding');
     return r;
@@ -359,7 +356,9 @@ export default class MapBoxWrapper {
       this._updateSource(S[level].border, lookup, primaryValue);
       this._updateSource(S[level].center, lookup, primaryValue);
 
-      this.encoding.updateSources(this.map, level);
+      for (const encoding of this.encodings) {
+        encoding.updateSources(this.map, level, lookup, primaryValue);
+      }
       if (data.length > 0) {
         this.markReady('data');
       }
