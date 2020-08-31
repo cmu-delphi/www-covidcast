@@ -71,13 +71,13 @@ export class SpikeLayer {
     this._vertexShader = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(this._vertexShader, vertexSource);
     gl.compileShader(this._vertexShader);
-    console.log(gl.getShaderInfoLog(this._vertexShader));
+    // console.log(gl.getShaderInfoLog(this._vertexShader));
 
     // create a fragment shader
     this._fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
     gl.shaderSource(this._fragmentShader, fragmentSource);
     gl.compileShader(this._fragmentShader);
-    console.log(gl.getShaderInfoLog(this._fragmentShader));
+    // console.log(gl.getShaderInfoLog(this._fragmentShader));
 
     // link the two shaders into a WebGL program
     this._program = gl.createProgram();
