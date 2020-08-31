@@ -120,6 +120,19 @@ export class SpikeLayer {
     this._colorAndHeightData = new Float32Array(this.featureIds.length * 4 * 3); // per vertex rgb color and height
     this._colorAndHeightData.fill(MISSING_COLOR_OPENGL[0]);
     gl.bufferData(gl.ARRAY_BUFFER, this._colorAndHeightData, gl.STATIC_DRAW);
+
+    this._indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
+    const data = new Uint16Array(this.featureIds.length * 4); // 2 lines or 4 vertices per feature
+    for (let i = 0; i < this.featureIds.length; i++) {
+      const r = i * 4;
+      const triangleBase = i * 3;
+      data[r] = triangleBase; // first point
+      data[r + 1] = triangleBase + 1; // second point
+      data[r + 2] = triangleBase + 2; // third point
+      data[r + 3] = triangleBase + 1; // second point
+    }
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, gl.STATIC_DRAW);
   }
 
   /**
@@ -129,6 +142,7 @@ export class SpikeLayer {
   onRemove(_map, gl) {
     gl.deleteBuffer(this._centerBuffer);
     gl.deleteBuffer(this._colorAndHeightBuffer);
+    gl.deleteBuffer(this._indexBuffer);
     gl.deleteShader(this._fragmentShader);
     gl.deleteShader(this._vertexShader);
     gl.deleteProgram(this._program);
@@ -153,19 +167,16 @@ export class SpikeLayer {
     gl.enableVertexAttribArray(this._aPos);
     gl.vertexAttribPointer(this._aPos, 3, gl.FLOAT, false, 0, 0);
 
-    // gl.enable(gl.BLEND);
-    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     gl.drawArrays(gl.TRIANGLES, 0, this.featureIds.length * 3);
 
-    // gl.lineWidth(ENCODING_SPIKE_THEME.strokeWidth[this._level] * 2);
-    // // first two
-    // gl.vertexAttribPointer(this._aPos, 3, gl.FLOAT, false, 1, 0);
-    // gl.drawArrays(gl.LINES, 0, this.featureIds.length * 2);
-    // // last two
-    // gl.vertexAttribPointer(this._aPos, 3, gl.FLOAT, false, 1, 1);
-    // gl.uniform1f(this._uOpacity, ENCODING_SPIKE_THEME.strokeOpacity);
-    // gl.drawArrays(gl.LINES, 0, this.featureIds.length * 2);
+    // lines
+    gl.uniform1f(this._uOpacity, ENCODING_SPIKE_THEME.strokeOpacity);
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
+    gl.drawElements(gl.LINES, this.featureIds.length * 4, gl.UNSIGNED_SHORT, 0);
   }
 
   /**
