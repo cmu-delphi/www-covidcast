@@ -12,13 +12,12 @@
   import { transparent } from '../../util';
   import { generateLabels } from '../MapBox/colors';
 
-  const spikeBase = ENCODING_SPIKE_THEME.baseSize;
   const spikePadding = 2;
 
   export let loading = false;
 
-  $: size = ENCODING_SPIKE_THEME.size[$currentLevel] * spikeBase;
-  $: maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel] * spikeBase;
+  $: size = ENCODING_SPIKE_THEME.size[$currentLevel];
+  $: maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel];
   $: r = generateLabels(
     $stats,
     $currentSensorEntry,
@@ -27,7 +26,7 @@
     $signalCasesOrDeathOptions,
     $isMobileDevice,
   );
-  $: heightScale = $spikeHeightScale.clone().range([0, maxHeight]).domain(r.valueMinMax);
+  $: heightScale = $spikeHeightScale;
   $: maxPaddingHeight = maxHeight + spikePadding * 2;
 
   function getSpikePath(value) {

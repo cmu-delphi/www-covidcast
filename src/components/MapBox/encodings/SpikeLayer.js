@@ -1,36 +1,45 @@
 import { MercatorCoordinate } from 'mapbox-gl';
-import { MISSING_COLOR_OPENGL, MISSING_COLOR } from '../../../theme';
+import { MISSING_COLOR_OPENGL, MISSING_COLOR, ENCODING_SPIKE_THEME } from '../../../theme';
 import { rgb } from 'd3-color';
 
 // create GLSL source for vertex shader
 const vertexSource = `
 uniform mat4 u_matrix;
-attribute vec2 a_pos;
-attribute vec3 a_color;
+uniform float u_size;
+uniform float u_yPixelToClip;
+attribute vec3 a_pos;
+attribute vec4 a_colorAndHeight;
 varying vec3 v_color;
 
 void main() {
-    gl_Position = u_matrix * vec4(a_pos, 0.0, 1.0);
-    gl_PointSize = 10.0;
-    v_color = a_color;
+  vec4 p = u_matrix * vec4(a_pos.xy, 0.0, 1.0);
+  if (a_pos.z == 0.0) {
+    p.y += a_colorAndHeight.a * u_yPixelToClip * p.w;
+  } else {
+    p.x += a_pos.z * u_size * p.w;
+  }
+  gl_Position = p;
+  v_color = a_colorAndHeight.rgb;
 }`;
 
 // create GLSL source for fragment shader
 const fragmentSource = `
 precision mediump float;
+uniform float u_opacity;
 varying vec3 v_color;
 void main() {
-  gl_FragColor = vec4(v_color, 1.0);
+  gl_FragColor = vec4(v_color, u_opacity);
 }`;
 
 export class SpikeLayer {
-  constructor(sourceId) {
+  constructor(sourceId, level) {
     this._sourceId = sourceId;
+    this._level = level;
     this._colorsDirty = true;
     this.featureIds = [];
     this._valueLookup = new Map();
     this._valuePrimaryValue = 'value';
-    this._scale = () => MISSING_COLOR;
+    this._valueToColor = () => MISSING_COLOR;
   }
 
   /**
@@ -74,12 +83,19 @@ export class SpikeLayer {
     gl.linkProgram(this._program);
 
     this._uPos = gl.getUniformLocation(this._program, 'u_matrix');
+    this._uOpacity = gl.getUniformLocation(this._program, 'u_opacity');
+    this._uSize = gl.getUniformLocation(this._program, 'u_size');
+    this._uYPixelToClip = gl.getUniformLocation(this._program, 'u_yPixelToClip');
 
     // create and initialize a WebGLBuffer to store centers
     this._aPos = gl.getAttribLocation(this._program, 'a_pos');
     this._centerBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this._centerBuffer);
 
+    // need 3 points to encode which mode it is
+    // -1 ... left corner
+    // 0 ... center
+    // 1 ... right
     const points = map
       .getSource(this._sourceId)
       ._data.features.map((feature) => {
@@ -91,28 +107,28 @@ export class SpikeLayer {
         }
         this.featureIds.push(feature.properties.id);
         const xy = MercatorCoordinate.fromLngLat({ lat, lng });
-        return [xy.x, xy.y];
+        return [xy.x, xy.y, -1, xy.x, xy.y, 0, xy.x, xy.y, 1];
       })
       .flat();
 
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(points), gl.STATIC_DRAW);
 
     // create and initialize a WebGLBuffer to store colors
-    this._aColor = gl.getAttribLocation(this._program, 'a_color');
-    this._colorBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this._colorBuffer);
-    this._colorData = new Float32Array(this.featureIds.length * 3);
-    this._colorData.fill(MISSING_COLOR_OPENGL[0]);
-    gl.bufferData(gl.ARRAY_BUFFER, this._colorData, gl.STATIC_DRAW);
+    this._aColorAndHeight = gl.getAttribLocation(this._program, 'a_colorAndHeight');
+    this._colorAndHeightBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this._colorAndHeightBuffer);
+    this._colorAndHeightData = new Float32Array(this.featureIds.length * 4 * 3); // per vertex rgb color and height
+    this._colorAndHeightData.fill(MISSING_COLOR_OPENGL[0]);
+    gl.bufferData(gl.ARRAY_BUFFER, this._colorAndHeightData, gl.STATIC_DRAW);
   }
 
   /**
-   * @param {import('mapbox-gl').Map} map
+   * @param {import('mapbox-gl').Map} _map
    * @param {WebGLRenderingContext} gl
    */
-  onRemove(map, gl) {
+  onRemove(_map, gl) {
     gl.deleteBuffer(this._centerBuffer);
-    gl.deleteBuffer(this._colorBuffer);
+    gl.deleteBuffer(this._colorAndHeightBuffer);
     gl.deleteShader(this._fragmentShader);
     gl.deleteShader(this._vertexShader);
     gl.deleteProgram(this._program);
@@ -125,20 +141,31 @@ export class SpikeLayer {
   render(gl, matrix) {
     gl.useProgram(this._program);
     gl.uniformMatrix4fv(this._uPos, false, matrix);
+    gl.uniform1f(this._uOpacity, ENCODING_SPIKE_THEME.fillOpacity);
+    gl.uniform1f(this._uSize, ENCODING_SPIKE_THEME.size[this._level] * (2 / gl.canvas.height));
+    gl.uniform1f(this._uYPixelToClip, 2 / gl.canvas.height);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this._colorAndHeightBuffer);
+    gl.enableVertexAttribArray(this._aColorAndHeight);
+    gl.vertexAttribPointer(this._aColorAndHeight, 4, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this._centerBuffer);
     gl.enableVertexAttribArray(this._aPos);
-    gl.vertexAttribPointer(this._aPos, 2, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(this._aPos, 3, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this._colorBuffer);
-    gl.enableVertexAttribArray(this._aColor);
-    gl.vertexAttribPointer(this._aColor, 3, gl.FLOAT, false, 0, 0);
+    // gl.enable(gl.BLEND);
+    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.drawArrays(gl.TRIANGLES, 0, this.featureIds.length * 3);
 
-    gl.drawArrays(gl.POINTS, 0, this.featureIds.length);
-    // gl.drawArrays(gl.LINE_STRIP, 0, 3);
+    // gl.lineWidth(ENCODING_SPIKE_THEME.strokeWidth[this._level] * 2);
+    // // first two
+    // gl.vertexAttribPointer(this._aPos, 3, gl.FLOAT, false, 1, 0);
+    // gl.drawArrays(gl.LINES, 0, this.featureIds.length * 2);
+    // // last two
+    // gl.vertexAttribPointer(this._aPos, 3, gl.FLOAT, false, 1, 1);
+    // gl.uniform1f(this._uOpacity, ENCODING_SPIKE_THEME.strokeOpacity);
+    // gl.drawArrays(gl.LINES, 0, this.featureIds.length * 2);
   }
 
   /**
@@ -150,34 +177,43 @@ export class SpikeLayer {
       this._colorsDirty = false;
       for (let i = 0; i < this.featureIds.length; i++) {
         const id = this.featureIds[i];
-        const r = i * 3;
         const v = this._valueLookup.has(id) ? this._valueLookup.get(id)[this._valuePrimaryValue] : null;
+
+        // 3 points with each 4 components
+
         if (v == null || Number.isNaN(v)) {
-          this._colorData[r] = MISSING_COLOR_OPENGL[0];
-          this._colorData[r + 1] = MISSING_COLOR_OPENGL[1];
-          this._colorData[r + 2] = MISSING_COLOR_OPENGL[1];
+          for (let j = 0; j < 3; j++) {
+            const r = i * 4 * 3 + j * 4;
+            this._colorAndHeightData[r] = MISSING_COLOR_OPENGL[0];
+            this._colorAndHeightData[r + 1] = MISSING_COLOR_OPENGL[1];
+            this._colorAndHeightData[r + 2] = MISSING_COLOR_OPENGL[1];
+            this._colorAndHeightData[r + 3] = 0;
+          }
           continue;
         }
-        const color = rgb(this._scale(v));
-        this._colorData[r] = color.r / 255;
-        this._colorData[r + 1] = color.g / 255;
-        this._colorData[r + 2] = color.b / 255;
+        const color = rgb(this._valueToColor(v));
+        const height = this._valueToSize(v);
+        for (let j = 0; j < 3; j++) {
+          const r = i * 4 * 3 + j * 4;
+          this._colorAndHeightData[r] = color.r / 255;
+          this._colorAndHeightData[r + 1] = color.g / 255;
+          this._colorAndHeightData[r + 2] = color.b / 255;
+          this._colorAndHeightData[r + 3] = height;
+        }
       }
-      gl.bindBuffer(gl.ARRAY_BUFFER, this._colorBuffer);
-      gl.bufferData(gl.ARRAY_BUFFER, this._colorData, gl.STATIC_DRAW);
+      gl.bindBuffer(gl.ARRAY_BUFFER, this._colorAndHeightBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, this._colorAndHeightData, gl.STATIC_DRAW);
     }
   }
 
   /**
    *
-   * @param {'sqrt' | 'linear'} heightScaleTheme
-   * @param {number} maxHeight
-   * @param {number} valueMax
    * @param {((v: value) => string)} scale
    */
-  encode(heightScaleTheme, maxHeight, valueMax, scale) {
+  encode(heightScale, scale) {
     this._colorsDirty = true;
-    this._scale = scale;
+    this._valueToSize = heightScale;
+    this._valueToColor = scale;
   }
 
   updateSources(lookup, primaryValue) {
@@ -186,29 +222,3 @@ export class SpikeLayer {
     this._valuePrimaryValue = primaryValue;
   }
 }
-
-// generateSources(map, level = 'county') {
-//   const centers = map.getSource(S[level].center)._data;
-//   const size = this.theme.size[level];
-
-//   return {
-//     type: 'FeatureCollection',
-//     features: centers.features.map((feature) => {
-//       const center = feature.geometry.coordinates;
-
-//       return {
-//         ...feature,
-//         geometry: {
-//           coordinates: [
-//             [
-//               [center[0] - size, center[1]],
-//               [center[0], center[1]],
-//               [center[0] + size, center[1]],
-//             ],
-//           ],
-//           type: 'Polygon',
-//         },
-//       };
-//     }),
-//   };
-// }

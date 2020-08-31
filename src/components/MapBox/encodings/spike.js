@@ -10,9 +10,7 @@ export default class SpikeEncoding {
     this.id = 'spike';
     this.theme = theme;
     this.layers = levels.map((level) => L[level].spike);
-    this.customLayers = new Map(levels.map((level) => [level, new SpikeLayer(S[level].center)]));
-
-    this.heightScale = () => 0;
+    this.customLayers = new Map(levels.map((level) => [level, new SpikeLayer(S[level].center, level)]));
   }
 
   getVisibleLayers(level, signalType) {
@@ -42,28 +40,13 @@ export default class SpikeEncoding {
 
     const heightScaleTheme = this.theme.heightScale[getType(sensor)];
 
-    this.heightScale = parseScaleSpec(heightScaleTheme).range([0, maxHeight]).domain([0, valueMax]).clamp(true);
-    this.customLayers.get(level).encode(heightScaleTheme, maxHeight, valueMax, scale);
+    const heightScale = parseScaleSpec(heightScaleTheme).range([0, maxHeight]).domain([0, valueMax]).clamp(true);
+    this.customLayers.get(level).encode(heightScale, scale);
 
-    return this.heightScale;
+    return heightScale;
   }
 
   updateSources(map, level, lookup, primaryValue) {
     this.customLayers.get(level).updateSources(lookup, primaryValue);
-    // const source = this.sources[level];
-    // const refSource = S[level].center;
-    // const ref = map.getSource(refSource)._data;
-    // // inject new data and rescale into our sources
-    // source.features.forEach((feature, i) => {
-    //   const refFeature = ref.features[i];
-    //   const state = map.getFeatureState({ source: refSource, id: Number.parseInt(refFeature.id, 10) });
-    //   // the 0 coordinate is value independent
-    //   const poly = feature.geometry.coordinates[0];
-    //   const base = poly[0][1];
-    //   // update height
-    //   poly[1][1] = base + this.heightScale(state.value);
-    //   map.setFeatureState({ source: S.spike.fill, id: Number.parseInt(feature.id, 10) }, state);
-    // });
-    // map.getSource(S.spike.fill).setData(source);
   }
 }

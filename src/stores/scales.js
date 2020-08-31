@@ -32,7 +32,7 @@ export function LogScale() {
 
   // y = a log (x) + b
   function scale(x) {
-    return a * log(x) + b;
+    return a * log(Math.min(clamp ? domain[1] : Number.POSITIVE_INFINITY, x));
   }
 
   scale.domain = function () {
@@ -102,7 +102,7 @@ export function SqrtScale() {
 
   // y = a log (x) + b
   function scale(x) {
-    return a * sqrt(x) + b;
+    return a * sqrt(Math.min(clamp ? domain[1] : Number.POSITIVE_INFINITY, x)) + b;
   }
 
   scale.domain = function () {
@@ -160,7 +160,7 @@ export function LinearScale() {
 
   // y = a log (x) + b
   function scale(x) {
-    return a * x + b;
+    return a * Math.min(clamp ? domain[1] : Number.POSITIVE_INFINITY, x) + b;
   }
 
   scale.domain = function () {
