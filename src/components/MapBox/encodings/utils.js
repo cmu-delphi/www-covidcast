@@ -1,4 +1,4 @@
-import { MAP_THEME, ZERO_COLOR } from '../../../theme';
+import { ZERO_COLOR, MISSING_COLOR } from '../../../theme';
 
 export function caseHoveredOrSelected(thenCase, elseCase, invert = false) {
   return [
@@ -37,7 +37,7 @@ export function interpolateValue(stops) {
     'case',
     // when missing
     ['==', ['to-number', ['feature-state', 'value'], MISSING_VALUE], MISSING_VALUE],
-    MAP_THEME.countyFill,
+    MISSING_COLOR,
     // when 0
     ['==', ['to-number', ['feature-state', 'value'], MISSING_VALUE], 0],
     ZERO_COLOR,

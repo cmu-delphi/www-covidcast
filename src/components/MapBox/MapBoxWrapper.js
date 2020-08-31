@@ -2,7 +2,7 @@ import geojsonExtent from '@mapbox/geojson-extent';
 import { Map as MapBox } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { defaultRegionOnStartup, levelMegaCounty, levels } from '../../stores/constants';
-import { MAP_THEME } from '../../theme';
+import { MAP_THEME, MISSING_COLOR } from '../../theme';
 import { MISSING_VALUE, caseHoveredOrSelected, caseSelected, caseMissing } from './encodings/utils';
 import InteractiveMap from './InteractiveMap';
 import { addCityLayers, L } from './layers';
@@ -201,7 +201,7 @@ export default class MapBoxWrapper {
       source: S.state.border,
       type: 'fill',
       paint: {
-        'fill-color': MAP_THEME.stateFill,
+        'fill-color': MISSING_COLOR,
         'fill-outline-color': MAP_THEME.stateOutline,
       },
     });

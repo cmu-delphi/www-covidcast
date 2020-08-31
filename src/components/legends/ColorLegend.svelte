@@ -8,7 +8,7 @@
     isMobileDevice,
   } from '../../stores';
   import { generateLabels } from '../MapBox/colors';
-  import { MAP_THEME, ZERO_COLOR } from '../../theme';
+  import { MISSING_COLOR, ZERO_COLOR } from '../../theme';
 
   export let loading = false;
 
@@ -68,7 +68,7 @@
 </style>
 
 <ul class:loading-bg={loading}>
-  <li class="tick tick-single" style="background-color: {MAP_THEME.countyFill}" title="NA">{r.high}</li>
+  <li class="tick tick-single" style="background-color: {MISSING_COLOR}" title="NA">{r.high}</li>
   <li class="tick tick-single tick-space" style="background-color: {ZERO_COLOR}" title={r.low}>{r.high}</li>
   {#each r.labels as l}
     <li class="tick" style="background-image: linear-gradient(to right, {l.color}, {l.nextColor})" title={l.label}>
