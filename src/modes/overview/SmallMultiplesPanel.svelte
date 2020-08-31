@@ -1,12 +1,12 @@
 <script>
-  import { sensorList, currentSensor, currentDateObject, currentRegionInfo, yesterdayDate } from '../../stores';
+  import { sensorList, currentSensor, currentDateObject, currentRegionInfo, smallMultipleTimeSpan } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
-  import { parseAPITime } from '../../data';
-  import { fetchTimeSlice } from '../../data/fetchData';
+  import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../../components/vega/Vega.svelte';
-  import specBase from './SmallMultiplesChart.json';
-  import specStdErrBase from './SmallMultiplesChartStdErr.json';
+  import spec from './SmallMultiplesChart.json';
+  import specStdErr from './SmallMultiplesChartStdErr.json';
   import { merge } from 'lodash-es';
+  import { levelMegaCounty } from '../../stores/constants';
 
   const remove = ['ght-smoothed_search', 'safegraph-full_time_work_prop'];
 
@@ -16,32 +16,9 @@
    */
   export let detail = null;
 
-  // Create a date for today in the API's date format
-  const startDay = parseAPITime('20200401');
-  const finalDay = yesterdayDate;
-
   const sensors = sensorList.filter((d) => !remove.includes(d.key));
 
-  const spec = merge({}, specBase, {
-    encoding: {
-      x: {
-        scale: {
-          domain: [startDay.getTime(), finalDay.getTime()],
-        },
-      },
-    },
-  });
-  const specStdErr = merge({}, specStdErrBase, {
-    encoding: {
-      x: {
-        scale: {
-          domain: [startDay.getTime(), finalDay.getTime()],
-        },
-      },
-    },
-  });
-
-  const specPercent = merge({}, spec, {
+  const specPercent = {
     transform: [
       {},
       // {
@@ -51,7 +28,7 @@
       //   calculate: '(datum.value + datum.stderr) / 100',
       // },
       {
-        calculate: 'datum.value / 100',
+        calculate: 'datum.value == null ? null : datum.value / 100',
         as: 'pValue',
       },
     ],
@@ -63,8 +40,8 @@
         },
       },
     },
-  });
-  const specPercentStdErr = merge({}, specStdErr, {
+  };
+  const specPercentStdErr = {
     transform: [
       {},
       {
@@ -74,7 +51,7 @@
         calculate: '(datum.value + datum.stderr) / 100',
       },
       {
-        calculate: 'datum.value / 100',
+        calculate: 'datum.value == null ? null : datum.value / 100',
         as: 'pValue',
       },
     ],
@@ -86,25 +63,55 @@
         },
       },
     },
-  });
+  };
 
   /**
    * @type {import('../../stores/constants').SensorEntry} sensor
    */
-  function chooseSpec(sensor) {
-    if (sensor.hasStdErr) {
-      return sensor.format === 'percent' ? specPercentStdErr : specStdErr;
+  function chooseSpec(sensor, min, max) {
+    const time = {
+      encoding: {
+        x: {
+          scale: {
+            domain: [min.getTime(), max.getTime()],
+          },
+        },
+      },
+    };
+
+    return merge(
+      {},
+      sensor.hasStdErr ? specStdErr : spec,
+      time,
+      sensor.format === 'percent' ? (sensor.hasStdErr ? specPercentStdErr : specPercent) : {},
+    );
+  }
+
+  // use local variables with manual setting for better value comparison updates
+  let startDay = $smallMultipleTimeSpan[0];
+  let endDay = $smallMultipleTimeSpan[1];
+
+  $: {
+    if (startDay.getTime() !== $smallMultipleTimeSpan[0].getTime()) {
+      startDay = $smallMultipleTimeSpan[0];
     }
-    return sensor.format === 'percent' ? specPercent : spec;
+    if (endDay.getTime() !== $smallMultipleTimeSpan[1].getTime()) {
+      endDay = $smallMultipleTimeSpan[1];
+    }
   }
 
   $: hasRegion = Boolean($currentRegionInfo);
+  $: isMegaRegion = Boolean($currentRegionInfo) && $currentRegionInfo.level === levelMegaCounty.id;
+  $: noDataText = hasRegion ? (isMegaRegion ? `Please select a county` : 'No data available') : 'No location selected';
   $: sensorsWithData = sensors.map((sensor) => ({
     sensor,
-    data: $currentRegionInfo
-      ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, finalDay, false)
-      : [],
-    spec: chooseSpec(sensor),
+    data:
+      $currentRegionInfo && !isMegaRegion
+        ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, endDay, false).then(
+            addMissing,
+          )
+        : [],
+    spec: chooseSpec(sensor, startDay, endDay),
   }));
 </script>
 
@@ -128,7 +135,6 @@
 
   .header {
     display: flex;
-    align-items: center;
     padding-bottom: 0.1em;
     cursor: pointer;
   }
@@ -209,11 +215,7 @@
         </div>
       </div>
       <div class="single-sensor-chart vega-wrapper">
-        <Vega
-          data={s.data}
-          spec={s.spec}
-          noDataText={hasRegion ? 'No data available' : 'No location selected'}
-          signals={{ currentDate: $currentDateObject }} />
+        <Vega data={s.data} spec={s.spec} {noDataText} signals={{ currentDate: $currentDateObject }} />
       </div>
     </li>
   {/each}
