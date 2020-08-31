@@ -23,6 +23,8 @@ export const DIRECTION_THEME = {
   gradientMaxMega: colorIncreasingMega,
 };
 
+export const ZERO_COLOR = 'rgb(242,242,242)';
+
 export const MAP_THEME = {
   selectedRegionOutline: '#333333', //'#000000',
   hoverRegionOutline: '#cccccc', //'#ffffff',
@@ -86,7 +88,7 @@ export const ENCODING_SPIKE_THEME = {
     state: 0.4,
   },
   /*
-    Spikes are drawn as shapes in a projeciton space.
+    Spikes are drawn as shapes in a projection space.
     To draw them in a pixel space (i.e., legend), we multiply a constant to their sizes.
   */
   baseSize: 40,

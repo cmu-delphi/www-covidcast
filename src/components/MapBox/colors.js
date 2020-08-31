@@ -1,13 +1,12 @@
 import { scaleSequential, scaleSequentialLog } from 'd3-scale';
 import { interpolateYlOrRd } from 'd3-scale-chromatic';
 import logspace from 'compute-logspace';
-import { DIRECTION_THEME, MAP_THEME } from '../../theme';
+import { DIRECTION_THEME, MAP_THEME, ZERO_COLOR } from '../../theme';
 import { zip, transparent } from '../../util';
 import { MISSING_VALUE } from './encodings/utils';
 import { primaryValue } from '../../stores/constants';
 
 const MAGIC_MIN_STATS = 0.14;
-const EXPLICIT_ZERO_OFFSET = 0.01;
 const SMALL_TICK_COUNT = 5;
 const TICK_COUNT = 7;
 
@@ -95,7 +94,7 @@ function regularSignalColorScale(valueMinMax) {
 }
 
 function propSignalColorScale(valueMinMax) {
-  const min = Math.max(valueMinMax[0], EXPLICIT_ZERO_OFFSET);
+  const min = Math.max(valueMinMax[0], 0);
   const max = Math.max(min + 0.01, valueMinMax[1]);
 
   const center = min + (max - min) / 2;
@@ -106,7 +105,7 @@ function propSignalColorScale(valueMinMax) {
   const domainStops5 = [min, firstHalfCenter, center, secondHalfCenter, max];
   const linearColors5 = domainStops5.map((c) => colorScaleLinear(c).toString());
 
-  const stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops5, linearColors5));
+  const stops = zip(domainStops5, linearColors5);
   const stopsMega = zip(domainStops5, transparent(linearColors5, 0.5));
   return { stops, stopsMega, scale: colorScaleLinear };
 }
@@ -120,8 +119,8 @@ function countSignalColorScale(valueMinMax) {
   const logColors7 = domainStops7.map((c) => colorScaleLog(c).toString());
 
   // use log scale
-  const stops = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops7, logColors7));
-  const stopsMega = [[0, DIRECTION_THEME.countMin]].concat(zip(domainStops7, logColors7));
+  const stops = zip(domainStops7, logColors7);
+  const stopsMega = zip(domainStops7, logColors7);
   return { stops, stopsMega, scale: colorScaleLog };
 }
 
@@ -148,11 +147,11 @@ function computeTicks(sensorEntry, valueMinMax, small) {
   }
   // manipulates valueMinMax in place!
   if (sensorEntry.format === 'raw') {
-    valueMinMax[0] = Math.max(EXPLICIT_ZERO_OFFSET, valueMinMax[0]);
+    valueMinMax[0] = Math.max(0, valueMinMax[0]);
     return splitDomain(valueMinMax[0], valueMinMax[1], numTicks);
   }
   // percent
-  valueMinMax[0] = Math.max(EXPLICIT_ZERO_OFFSET, valueMinMax[0]);
+  valueMinMax[0] = Math.max(0, valueMinMax[0]);
   valueMinMax[1] = Math.min(100, valueMinMax[1]);
   return splitDomain(valueMinMax[0], valueMinMax[1], numTicks);
 }
@@ -180,7 +179,7 @@ export function generateLabels(stats, sensorEntry, level, colorScale, signalOpti
   return {
     low: sensorEntry.formatValue(0), // fixed 0
     lowValue: 0,
-    lowColor: colorScale(0),
+    lowColor: ZERO_COLOR,
     labels: ticks.slice(0, -1).map((tick, i) => ({
       label: sensorEntry.formatValue(tick),
       value: tick,
