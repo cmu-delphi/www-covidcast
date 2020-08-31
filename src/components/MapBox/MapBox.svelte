@@ -57,7 +57,16 @@
     const valueMinMax = determineMinMax(stats, sensorEntry, level, signalOptions);
     const { stops, stopsMega, scale } = determineColorScale(valueMinMax, signalType, sensorEntry);
     const drawMega = level === 'county';
-    const ret = wrapper.updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, drawMega && stopsMega, scale);
+    const ret = wrapper.updateOptions(
+      encoding,
+      level,
+      signalType,
+      sensor,
+      valueMinMax,
+      stops,
+      drawMega && stopsMega,
+      scale,
+    );
     dispatch('updatedEncoding', {
       range: signalType === 'value' ? valueMinMax : [-1, 1],
       custom: ret,
