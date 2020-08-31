@@ -23,6 +23,9 @@ export const DIRECTION_THEME = {
   gradientMaxMega: colorIncreasingMega,
 };
 
+export const MISSING_COLOR = '#eeeeee';
+export const ZERO_COLOR = 'rgb(242,242,242)';
+
 export const MAP_THEME = {
   selectedRegionOutline: '#333333', //'#000000',
   hoverRegionOutline: '#cccccc', //'#ffffff',
@@ -33,8 +36,6 @@ export const MAP_THEME = {
   countyOutlineWhenFilled: '#ffffff', //'#616161',
   zoneOutline: 'blue', //'#e0e0e0',
 };
-
-export const MISSING_COLOR = '#eeeeee';
 
 export const ENCODING_BUBBLE_THEME = {
   color: 'transparent',
