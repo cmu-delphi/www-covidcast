@@ -61,6 +61,7 @@ export default class MapBoxWrapper {
       pitchWithRotate: false,
       touchPitch: false,
       touchZoomRotate: true,
+      antialias: true,
     });
     this.zoom.map = this.map;
     this.map.touchZoomRotate.disableRotation();

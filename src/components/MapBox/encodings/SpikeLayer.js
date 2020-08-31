@@ -7,6 +7,7 @@ const vertexSource = `
 uniform mat4 u_matrix;
 uniform float u_size;
 uniform float u_yPixelToClip;
+uniform vec2 u_jitter;
 attribute vec3 a_pos;
 attribute vec4 a_colorAndHeight;
 varying vec3 v_color;
@@ -18,6 +19,8 @@ void main() {
   } else {
     p.x += a_pos.z * u_size * p.w;
   }
+  p.x += u_jitter.x * p.w;
+  p.y += u_jitter.y * p.w;
   gl_Position = p;
   v_color = a_colorAndHeight.rgb;
 }`;
@@ -86,6 +89,7 @@ export class SpikeLayer {
     this._uOpacity = gl.getUniformLocation(this._program, 'u_opacity');
     this._uSize = gl.getUniformLocation(this._program, 'u_size');
     this._uYPixelToClip = gl.getUniformLocation(this._program, 'u_yPixelToClip');
+    this._uJitter = gl.getUniformLocation(this._program, 'u_jitter');
 
     // create and initialize a WebGLBuffer to store centers
     this._aPos = gl.getAttribLocation(this._program, 'a_pos');
@@ -156,8 +160,11 @@ export class SpikeLayer {
     gl.useProgram(this._program);
     gl.uniformMatrix4fv(this._uPos, false, matrix);
     gl.uniform1f(this._uOpacity, ENCODING_SPIKE_THEME.fillOpacity);
-    gl.uniform1f(this._uSize, ENCODING_SPIKE_THEME.size[this._level] * (2 / gl.canvas.height));
-    gl.uniform1f(this._uYPixelToClip, 2 / gl.canvas.height);
+    const xToClip = 2 / gl.canvas.width;
+    const yToClip = 2 / gl.canvas.height;
+    gl.uniform1f(this._uSize, ENCODING_SPIKE_THEME.size[this._level] * xToClip);
+    gl.uniform1f(this._uYPixelToClip, yToClip);
+    gl.uniform2f(this._uJitter, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this._colorAndHeightBuffer);
     gl.enableVertexAttribArray(this._aColorAndHeight);
@@ -173,9 +180,17 @@ export class SpikeLayer {
     gl.drawArrays(gl.TRIANGLES, 0, this.featureIds.length * 3);
 
     // lines
-    gl.uniform1f(this._uOpacity, ENCODING_SPIKE_THEME.strokeOpacity);
-
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
+
+    gl.uniform1f(this._uOpacity, ENCODING_SPIKE_THEME.strokeOpacity * 0.5);
+    gl.uniform2f(this._uJitter, xToClip * 1, 0);
+    gl.drawElements(gl.LINES, this.featureIds.length * 4, gl.UNSIGNED_SHORT, 0);
+
+    gl.uniform2f(this._uJitter, xToClip * -1, 0);
+    gl.drawElements(gl.LINES, this.featureIds.length * 4, gl.UNSIGNED_SHORT, 0);
+
+    gl.uniform2f(this._uJitter, 0, 0);
+    gl.uniform1f(this._uOpacity, ENCODING_SPIKE_THEME.strokeOpacity);
     gl.drawElements(gl.LINES, this.featureIds.length * 4, gl.UNSIGNED_SHORT, 0);
   }
 
