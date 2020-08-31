@@ -22,7 +22,7 @@ void main() {
   p.x += u_jitter.x * p.w;
   p.y += u_jitter.y * p.w;
   gl_Position = p;
-  v_color = a_colorAndHeight.rgb;
+  v_color = a_colorAndHeight.rgb / 255.0;
 }`;
 
 // create GLSL source for fragment shader
@@ -31,7 +31,7 @@ precision mediump float;
 uniform float u_opacity;
 varying vec3 v_color;
 void main() {
-  gl_FragColor = vec4(v_color, u_opacity);
+  gl_FragColor = vec4(v_color * u_opacity, u_opacity);
 }`;
 
 export class SpikeLayer {
@@ -175,7 +175,7 @@ export class SpikeLayer {
     gl.vertexAttribPointer(this._aPos, 3, gl.FLOAT, false, 0, 0);
 
     gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.blendFunc(gl.ONE, gl.ZERO);
 
     gl.drawArrays(gl.TRIANGLES, 0, this.featureIds.length * 3);
 
@@ -221,9 +221,9 @@ export class SpikeLayer {
         const height = this._valueToSize(v);
         for (let j = 0; j < 3; j++) {
           const r = i * 4 * 3 + j * 4;
-          this._colorAndHeightData[r] = color.r / 255;
-          this._colorAndHeightData[r + 1] = color.g / 255;
-          this._colorAndHeightData[r + 2] = color.b / 255;
+          this._colorAndHeightData[r] = color.r;
+          this._colorAndHeightData[r + 1] = color.g;
+          this._colorAndHeightData[r + 2] = color.b;
           this._colorAndHeightData[r + 3] = height;
         }
       }

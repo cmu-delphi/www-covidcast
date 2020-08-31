@@ -71,14 +71,7 @@ export const ENCODING_BUBBLE_THEME = {
 export const ENCODING_SPIKE_THEME = {
   fillOpacity: 0.2,
   countyFill: '#eeeeee',
-
-  strokeOpacity: 0.8,
-  strokeWidth: {
-    county: 1,
-    msa: 1.5,
-    state: 2,
-  },
-  strokeWidthHighlighted: 4,
+  strokeOpacity: 1,
 
   maxHeight: {
     county: 20,
