@@ -1,0 +1,16 @@
+/** ie 11 */
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  #vizbox > .ie-banner {
+    flex-grow: 1;
+    display: flex !important;
+    align-items: center;
+    text-align: center;
+    font-size: 1.4rem;
+    justify-content: center;
+    line-height: 1.2;
+  }
+
+  #vizbox > .ie-banner > * {
+    max-width: 20em;
+  }
+}

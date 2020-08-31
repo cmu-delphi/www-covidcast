@@ -2,92 +2,43 @@
   --red: #c00;
   --grey: #767676;
   --darkgrey: #333;
+  --bg: #f7f7f7;
 }
 
-/** ie 11 */
-@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-  #vizbox > .ie-banner {
-    flex-grow: 1;
-    display: flex !important;
-    align-items: center;
-    text-align: center;
-    font-size: 1.4rem;
-    justify-content: center;
-    line-height: 1.2;
-  }
+@import './styles/header.css';
+@import './styles/embed.css';
 
-  #vizbox > .ie-banner > * {
-    max-width: 20em;
-  }
-}
+@import './styles/ie11.css';
 
 #vizbox {
+  font-family: 'Open Sans', sans-serif;
   margin: 0;
   padding: 0;
-  font-family: 'Open Sans', sans-serif;
   position: relative;
-  width: 100%;
+  flex: 1 1 0;
   line-height: 1rem;
 
   display: flex;
   flex-direction: column;
 }
 
-.title {
-  font-size: 30px;
-  margin-right: 30px;
-}
+/** mobile **/
+@media only screen and (max-height: 800px) {
+  /** reserve all space and let the user scroll to the main app**/
 
-.subtitle {
-  margin-top: 5px;
-  font-size: 16px;
-  color: var(--grey);
-  font-style: italic;
-}
-
-.block {
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.background {
-  fill: none;
-  pointer-events: all;
-}
-
-.line {
-  fill: none;
-  stroke: var(--red);
-  stroke-width: 2px;
-}
-
-.inline {
-  display: inline-flex;
-}
-
-button.mapboxgl-ctrl-zoom-in,
-button.mapboxgl-ctrl-zoom-out {
-  margin: 0;
-}
-
-.axis-text {
-  font-size: 14px;
-  font-family: 'Open Sans', sans-serif;
-  color: var(--grey);
-}
-
-.axes {
-  font-family: 'Open Sans', sans-serif;
-  color: var(--grey);
+  #vizbox {
+    height: 100vh;
+    flex-basis: 100vh;
+  }
+  body.viz-body {
+    height: 100%;
+    width: 100%;
+  }
 }
 
 button.mapboxgl-popup-close-button {
   padding: 2px;
   color: var(--grey);
-}
-
-.tooltip-text {
-  font-family: 'Open Sans', sans-serif;
-  margin: 0px;
 }
 
 #vizbox input:focus,
@@ -97,49 +48,7 @@ button.mapboxgl-popup-close-button {
   box-shadow: 0 0 0 4px #fff !important;
   /* border: solid 1px var(--red) !important; */
   z-index: 10000;
-}
-
-.d3-tip {
-  background-color: #fff;
-  padding: 5px 5px;
-  color: var(--grey);
-  border-color: var(--grey);
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 4px;
-  font-size: 12px;
-  z-index: 99999;
-}
-
-/* Creates a small triangle extender for the tooltip */
-.d3-tip::after {
-  box-sizing: border-box;
-  display: inline;
-  font-size: 10px;
-  width: 100%;
-  line-height: 1;
-  color: var(--grey);
-  content: '\25BC';
-  position: absolute;
-  text-align: center;
-}
-
-/* Style northward tooltips specifically */
-.d3-tip.n::after {
-  margin: 0;
-  top: 100%;
-  left: 0;
-}
-
-.mapboxgl-ctrl-group,
-.mapboxgl-ctrl-group button:focus,
-.mapboxgl-ctrl-group button:focus:first-child {
-  border-radius: 0;
-}
-
-#vizbox circle {
-  padding: 5px;
-  cursor: pointer;
+  background-color: unset;
 }
 
 .mapboxgl-canvas {
@@ -169,17 +78,6 @@ button.mapboxgl-popup-close-button {
   border-top-color: var(--grey);
 }
 
-.map-popup-region-name {
-  font-weight: 600;
-}
-
-.map-popup-region-value {
-  background-color: #767676;
-
-  color: #fff;
-  padding: 2px 4px;
-}
-
 .mapboxgl-ctrl.mapboxgl-ctrl-group {
   outline: none;
   /* border: none; */
@@ -195,17 +93,6 @@ button.mapboxgl-popup-close-button {
 }
 
 @import './styles/pg-button.css';
-
-/** index.html page **/
-.test-page {
-  margin: 0;
-}
-
-.test-page #vizbox {
-  width: 100vw;
-  height: 100vh;
-}
-
-.test-page .map-container {
-  height: unset;
-}
+@import './styles/loading.css';
+@import './styles/message-overlay.css';
+@import './styles/vega.css';

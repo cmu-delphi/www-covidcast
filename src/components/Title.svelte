@@ -1,5 +1,5 @@
 <script>
-  import { currentSensorEntry } from '../stores';
+  import { currentSensorMapTitle } from '../stores';
 </script>
 
 <style>
@@ -8,7 +8,7 @@
     line-height: 1.2em;
     font-weight: 600;
     text-align: center;
-    color: #b4b4b4;
+    color: #8c8c8c;
   }
   /** mobile **/
   @media only screen and (max-width: 767px) {
@@ -18,4 +18,7 @@
   }
 </style>
 
-<h2 class="banner">{$currentSensorEntry.mapTitleText}</h2>
+<h2 class="banner">
+  {$currentSensorMapTitle}
+  <slot />
+</h2>

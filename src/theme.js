@@ -23,11 +23,15 @@ export const DIRECTION_THEME = {
   gradientMaxMega: colorIncreasingMega,
 };
 
+export const MISSING_COLOR = '#eeeeee';
+export const ZERO_COLOR = 'rgb(242,242,242)';
+
 export const MAP_THEME = {
   selectedRegionOutline: '#333333', //'#000000',
   hoverRegionOutline: '#cccccc', //'#ffffff',
+  stateFill: 'rgba(0, 0, 0, 0)',
   stateOutline: '#ffffff', //'#bcbcbc',
-  countyFill: '#eeeeee', //'#e4dac4',
+  countyFill: '#eeeeee', //'#e4dac4', // missing value
   countyOutline: '#ffffff', //'#e0e0e0',
   countyOutlineWhenFilled: '#ffffff', //'#616161',
   zoneOutline: 'blue', //'#e0e0e0',
@@ -35,6 +39,7 @@ export const MAP_THEME = {
 
 export const ENCODING_BUBBLE_THEME = {
   color: 'transparent',
+  countyFill: '#eeeeee',
   strokeColor: '#666',
   strokeWidth: 1,
   strokeWidthHighlighted: 4,
@@ -65,28 +70,19 @@ export const ENCODING_BUBBLE_THEME = {
 
 export const ENCODING_SPIKE_THEME = {
   fillOpacity: 0.2,
-  strokeOpacity: 0.8,
-  strokeWidth: {
-    county: 1,
-    msa: 1.5,
-    state: 2,
-  },
-  strokeWidthHighlighted: 4,
+  countyFill: '#eeeeee',
+  strokeOpacity: 1,
+
   maxHeight: {
-    county: 0.5,
-    msa: 1,
-    state: 2,
+    county: 20,
+    msa: 40,
+    state: 80,
   },
   size: {
-    county: 0.1,
-    msa: 0.2,
-    state: 0.4,
+    county: 4,
+    msa: 8,
+    state: 16,
   },
-  /*
-    Spikes are drawn as shapes in a projeciton space.
-    To draw them in a pixel space (i.e., legend), we multiply a constant to their sizes.
-  */
-  baseSize: 40,
   heightScale: {
     count: {
       type: 'sqrt',

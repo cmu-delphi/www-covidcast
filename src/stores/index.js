@@ -1,96 +1,60 @@
-import { writable, readable, derived, get } from 'svelte/store';
-import { injectIDs } from '../util';
-import { LogScale, SqrtScale } from '../components/scale.js';
-import * as d3 from 'd3';
-import { sensorList, withSensorEntryKey, defaultSensorId } from './constants';
+import { writable, derived, get, readable } from 'svelte/store';
+import { LogScale, SqrtScale } from './scales';
+import { scaleSequentialLog } from 'd3-scale';
+import { defaultSensorId, sensorList, sensorMap, yesterdayDate } from './constants';
+import modes from '../modes';
+import { parseAPITime } from '../data/utils';
+import { regionSearchLookup } from './search';
 export {
-  dict,
-  specialCounties,
   defaultRegionOnStartup,
   getLevelInfo,
   levels,
   levelList,
   yesterday,
   yesterdayDate,
+  sensorList,
+  sensorMap,
+  groupedSensorList,
 } from './constants';
+import { timeMonth } from 'd3-time';
+export { regionSearchList } from './search';
+
+/**
+ * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
+ */
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 
-// Set of options for which signals to display.
-// Checks the ?sensors= URI parameter for a custom view,
-// otherwise uses the default.
-export const sensors = readable(sensorList, (set) => {
-  const sensorsOption = urlParams.get('sensors');
-  if (sensorsOption) {
-    set(JSON.parse(decodeURIComponent(sensorsOption)).map(withSensorEntryKey));
-  }
-});
-
-export const publicSensors = derived([sensors], ([sensors]) => sensors.filter((d) => d.type == 'public'));
-export const earlySensors = derived([sensors], ([sensors]) => sensors.filter((d) => d.type == 'early'));
-export const lateSensors = derived([sensors], ([sensors]) => sensors.filter((d) => d.type == 'late'));
-
-// The ID to reference each sensor is the indicator name + signal type.
-// This map is used to find the information for each sensor.
-export const sensorMap = derived(sensors, ($sensors) => {
-  /**
-   * @type {Map<string, import('./constants').SensorEntry>}
-   */
-  const map = new Map();
-  $sensors.forEach((d) => map.set(d.key, d));
-  return map;
-});
-
-// This loads all the GeoJSON's for each granularity that the MapBox component reads as layers.
-export const geojsons = readable(new Map(), (set) => {
-  Promise.all([
-    d3.json('./maps/new_counties.json'),
-    d3.json('./maps/new_states.json'),
-    d3.json('./maps/new_msa.json'),
-    d3.json('./maps/city_data/cities-reprojected.json'),
-    d3.json('./maps/state_centers.json'),
-    d3.json('./maps/county_centers.json'),
-    d3.json('./maps/msa_centers.json'),
-    d3.json('./maps/new_zones.json'),
-  ]).then(([counties, states, msa, cities, stateCenters, countyCenters, msaCenters, newZones]) => {
-    const m = new Map();
-    m.set('county', injectIDs('county', counties));
-    m.set('state', injectIDs('state', states));
-    m.set('msa', injectIDs('msa', msa));
-    m.set('city', cities);
-    m.set('state-centers', injectIDs('state-centers', stateCenters));
-    m.set('county-centers', injectIDs('county-centers', countyCenters));
-    m.set('msa-centers', injectIDs('msa-centers', msaCenters));
-    m.set('zone', newZones);
-    set(m);
-  });
-});
-
 export const times = writable(null);
 export const stats = writable(null);
 
-export const mounted = writable(0);
-export const mapFirstLoaded = writable(false);
-export const currentDataReadyOnMap = writable(false);
-export const customDataView = readable(true, (set) => {
-  set(urlParams.get('sensors') != null);
+export const appReady = writable(false);
+
+/**
+ * @type {import('svelte/store').Writable<import('../routes').Mode>}
+ */
+export const currentMode = writable(modes[0], (set) => {
+  const mode = urlParams.get('mode');
+  if (modes.find((d) => d.id === mode)) {
+    set(modes.find((d) => d.id === mode));
+  }
 });
 
 export const currentSensor = writable('', (set) => {
   const sensor = urlParams.get('sensor');
-  if (sensor && get(sensorMap).has(sensor)) {
+  if (sensor && sensorMap.has(sensor)) {
     set(sensor);
   } else {
-    const activeSensors = get(sensors);
-    const defaultSensor = activeSensors.find((d) => d.id === defaultSensorId);
+    const defaultSensor = sensorList.find((d) => d.id === defaultSensorId);
     if (defaultSensor) {
       set(defaultSensor.key);
     } else {
-      set(activeSensors[0].key);
+      set(sensorList[0].key);
     }
   }
 });
+export const currentSensorEntry = derived([currentSensor], ([$currentSensor]) => sensorMap.get($currentSensor));
 
 // 'county', 'state', or 'msa'
 export const currentLevel = writable('county', (set) => {
@@ -101,13 +65,30 @@ export const currentLevel = writable('county', (set) => {
 });
 
 // Options are 'direction' and 'value'.
-export const signalType = writable('value', (set) => {
-  const signalT = urlParams.get('signalType');
-  if (signalT === 'direction' || signalT === 'value') {
-    // set(signalT);
-    set('value');
-  }
+/**
+ * @type {import('svelte/store').Writable<'direction' | 'value'>}
+ */
+export const signalType = writable('value');
+// , (set) => {
+//   const signalT = urlParams.get('signalType');
+//   if (signalT === 'direction' || signalT === 'value') {
+//     // set(signalT);
+//     set('value');
+//   }
+// });
+
+export const isValueSignalType = derived([signalType], ([v]) => v === 'value');
+export const isDirectionSignalType = derived([signalType], ([v]) => v === 'direction');
+
+// in case of a death signal whether to show cumulative data
+export const signalCasesOrDeathOptions = writable({
+  cumulative: urlParams.has('signalC'),
+  ratio: urlParams.has('signalR'),
 });
+
+export const currentSensorMapTitle = derived([currentSensorEntry, signalCasesOrDeathOptions], ([sensor, options]) =>
+  typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText(options) : sensor.mapTitleText,
+);
 
 // Options are 'color', 'bubble', and 'spike'
 export const encoding = writable('color', (set) => {
@@ -117,12 +98,32 @@ export const encoding = writable('color', (set) => {
   }
 });
 
-// EpiWeek in form YYYYMMDD.
-export const currentDate = writable(20100420, (set) => {
+/**
+ * magic date that will be replaced by the latest date
+ */
+export const MAGIC_START_DATE = '20200701';
+export const currentDate = writable(MAGIC_START_DATE, (set) => {
   const date = urlParams.get('date');
   if (/\d{8}/.test(date)) {
     set(date);
   }
+});
+
+/**
+ * current date as a Date object
+ */
+export const currentDateObject = derived([currentDate], ([date]) => (!date ? null : parseAPITime(date)));
+
+export const smallMultipleTimeSpan = derived([currentDateObject], ([date]) => {
+  if (!date) {
+    return [timeMonth.offset(yesterdayDate, -4), yesterdayDate];
+  }
+  let max = timeMonth.offset(date, 2);
+  if (max > yesterdayDate) {
+    max = yesterdayDate;
+  }
+  const min = timeMonth.offset(max, -4);
+  return [min, max];
 });
 
 // Region GEO_ID for filtering the line chart
@@ -135,6 +136,32 @@ export const currentRegion = writable('', (set) => {
   }
 });
 
+/**
+ * current region info (could also be null)
+ */
+export const currentRegionInfo = derived([currentRegion, regionSearchLookup], ([current, lookup]) => lookup(current));
+
+/**
+ *
+ * @param {import('../maps/nameIdInfo').NameInfo | null} elem
+ */
+export function selectByInfo(elem) {
+  if (elem === get(currentRegionInfo)) {
+    return;
+  }
+  if (elem) {
+    currentRegion.set(elem.propertyId);
+    // the info is derived
+  } else {
+    currentRegion.set('');
+  }
+}
+
+export function selectByFeature(feature) {
+  const lookup = get(regionSearchLookup);
+  selectByInfo(feature ? lookup(feature.properties.id) : null);
+}
+
 // currently only supporting 'swpa' - South western Pennsylvania
 export const currentZone = writable('', (set) => {
   const zone = urlParams.get('zone');
@@ -143,24 +170,60 @@ export const currentZone = writable('', (set) => {
   }
 });
 
-// Range of time for the map slider.
-export const currentRange = writable([0, 1]);
-
-export const currentRegionName = writable('');
-
-export const currentSensorEntry = derived([sensorMap, currentSensor], ([$sensorMap, $currentSensor]) =>
-  $sensorMap.get($currentSensor),
-);
-
-export const regionData = writable([]);
-export const currentData = writable([]);
-
-export const timeRangeOnSlider = writable({
-  min: 0,
-  max: 0,
-});
-
-export const colorScale = writable(d3.scaleSequentialLog());
+export const colorScale = writable(scaleSequentialLog());
 export const colorStops = writable([]);
 export const bubbleRadiusScale = writable(LogScale());
 export const spikeHeightScale = writable(SqrtScale());
+
+// validate if sensor and other parameter matches
+currentSensorEntry.subscribe((sensorEntry) => {
+  // check level
+  const level = get(currentLevel);
+
+  if (!sensorEntry.levels.includes(level)) {
+    currentLevel.set(sensorEntry.levels[0]);
+  }
+
+  // if (sensorEntry.type === 'late' && sensorEntry.id !== 'hospital-admissions') {
+  //   signalType.set('value');
+  // }
+
+  if (!sensorEntry.isCasesOrDeath) {
+    encoding.set('color');
+    signalCasesOrDeathOptions.set({
+      cumulative: false,
+      ratio: false,
+    });
+  }
+
+  // clamp to time span
+  const timesMap = get(times);
+  if (timesMap != null) {
+    const [minDate, maxDate] = timesMap.get(sensorEntry.key);
+    const current = get(currentDate);
+    if (current < minDate) {
+      currentDate.set(minDate);
+    } else if (current > maxDate) {
+      currentDate.set(maxDate);
+    }
+  }
+});
+
+// mobile device detection
+// const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
+
+export const isMobileDevice = readable(false, (set) => {
+  const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
+  set(isMobileQuery.matches);
+  isMobileQuery.addListener((r) => {
+    set(r.matches);
+  });
+});
+
+// export const isPortraitDevice = readable(false, (set) => {
+//   const isPortraitQuery = window.matchMedia('only screen and (orientation: portrait)');
+//   set(isPortraitQuery.matches);
+//   isPortraitQuery.addListener((r) => {
+//     set(r.matches);
+//   });
+// });

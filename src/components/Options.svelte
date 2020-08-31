@@ -6,37 +6,44 @@
     times,
     levelList,
     currentSensorEntry,
-    publicSensors,
-    lateSensors,
-    earlySensors,
+    groupedSensorList,
+    isMobileDevice,
   } from '../stores';
   import Datepicker from './Calendar/Datepicker.svelte';
-  import * as d3 from 'd3';
+  import { timeFormat } from 'd3-time-format';
+  import { formatAPITime, parseAPITime } from '../data';
 
-  const formatTime = d3.timeFormat('%B %-d, %Y');
-  const convertDate = d3.timeFormat('%Y%m%d');
-  const parseTime = d3.timeParse('%Y%m%d');
-
+  export let className = '';
+  export let showDate = true;
   // let selectedDate = writable(parseTime($currentDate));
-  $: selectedDate = parseTime($currentDate);
-  // if ($currentDate !== 20100420) {
+  $: selectedDate = parseAPITime($currentDate);
+  // if ($currentDate !== MAGIC_START_DATE) {
   //   selectedDate = parseTime($currentDate);
   // }
   $: start_end_dates = [];
 
   $: if (selectedDate !== undefined) {
-    currentDate.set(convertDate(selectedDate));
+    currentDate.set(formatAPITime(selectedDate));
   }
   $: if ($times !== null) {
     start_end_dates = $times.get($currentSensor);
   }
+
+  $: formatTime = $isMobileDevice ? timeFormat('%x') : timeFormat('%B %-d, %Y');
 </script>
 
 <style>
   .options {
     position: relative;
     display: flex;
+    max-width: 50em;
+    margin: 0 6px;
+  }
+
+  .option-wrapper {
     align-items: center;
+    display: flex;
+    flex: 1 1 auto;
   }
 
   .option-title {
@@ -52,7 +59,7 @@
     color: #111;
     line-height: 1.3;
     padding: 0.4em 0.6em;
-    width: auto;
+    width: 100%;
     min-width: 0;
 
     -moz-appearance: none;
@@ -62,11 +69,9 @@
     transition: all 0.1s ease-in;
     flex: 1 1 auto;
     white-space: nowrap;
-  }
 
-  select,
-  .calendar {
     padding-right: 1.7em;
+
     background-image: linear-gradient(45deg, transparent 50%, gray 50%),
       linear-gradient(135deg, gray 50%, transparent 50%);
     background-position: calc(100% - 15px) calc(0.85em + 0px), calc(100% - 10px) calc(0.85em + 0px);
@@ -80,51 +85,71 @@
   }
 
   :global(.datepicker) {
-    margin: unset;
+    margin: 0.25em 0;
+  }
+
+  /** mobile **/
+  @media only screen and (max-width: 767px) {
+    .options {
+      max-width: unset;
+    }
+    .option-wrapper {
+      padding: 0 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: space-between;
+    }
   }
 </style>
 
-<div class="options">
-  <span class="option-title base-font-size" for="option-indicator">Displaying</span>
-  <select
-    id="option-indicator"
-    aria-label="indicator options"
-    class="indicators base-font-size"
-    bind:value={$currentSensor}>
-    <optgroup label="Public Behavior">
-      {#each $publicSensors as sensor}
-        <option title={sensor.tooltipText} value={sensor.key}>{sensor.name}</option>
+<div class="options base-font-size container-bg container-style {className}">
+  <div class="option-wrapper">
+    <span class="option-title">Displaying</span>
+    <select
+      id="option-indicator"
+      aria-label="indicator options"
+      class="indicators base-font-size"
+      bind:value={$currentSensor}>
+      {#each groupedSensorList as sensorGroup}
+        <optgroup label={sensorGroup.label}>
+          {#each sensorGroup.sensors as sensor}
+            <option
+              title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
+              value={sensor.key}>
+              {sensor.name}
+            </option>
+          {/each}
+        </optgroup>
       {/each}
-    </optgroup>
-    <optgroup label="Early Indicators">
-      {#each $earlySensors as sensor}
-        <option title={sensor.tooltipText} value={sensor.key}>{sensor.name}</option>
+    </select>
+  </div>
+  <div class="option-wrapper">
+    <span class="option-title">for</span>
+    <select
+      id="option-geo-level"
+      aria-label="geographic level"
+      class="geo-level base-font-size"
+      bind:value={$currentLevel}>
+      {#each levelList as level}
+        <option value={level.id} disabled={!$currentSensorEntry.levels.includes(level.id)}>{level.labelPlural}</option>
       {/each}
-    </optgroup>
-    <optgroup label="Late Indicators">
-      {#each $lateSensors as sensor}
-        <option title={sensor.tooltipText} value={sensor.key}>{sensor.name}</option>
-      {/each}
-    </optgroup>
-  </select>
-  <span class="option-title base-font-size" for="option-geo-level">for</span>
-  <select
-    id="option-geo-level"
-    aria-label="geographic level"
-    class="geo-level base-font-size"
-    bind:value={$currentLevel}>
-    {#each levelList as level}
-      <option value={level.id} disabled={!$currentSensorEntry.levels.includes(level.id)}>{level.labelPlural}</option>
-    {/each}
-  </select>
-  <span class="option-title base-font-size" for="option-date">on</span>
-  {#if selectedDate != null && start_end_dates.length !== 0}
-    <Datepicker
-      bind:selected={selectedDate}
-      start={parseTime(start_end_dates[0])}
-      end={parseTime(start_end_dates[1])}
-      formattedSelected={formatTime(selectedDate)}>
-      <button id="option-date" class="calendar base-font-size" on:>{formatTime(selectedDate)}</button>
-    </Datepicker>
+    </select>
+  </div>
+  {#if showDate}
+    <div class="option-wrapper">
+      <span class="option-title">on</span>
+      {#if selectedDate != null && start_end_dates.length !== 0}
+        <Datepicker
+          bind:selected={selectedDate}
+          start={parseAPITime(start_end_dates[0])}
+          end={parseAPITime(start_end_dates[1])}
+          formattedSelected={formatTime(selectedDate)}>
+          <button aria-label="selected date" class="calendar base-font-size" on:>{formatTime(selectedDate)}</button>
+        </Datepicker>
+      {:else}
+        <button aria-label="selected date" class="calendar base-font-size" on:>{formatTime(selectedDate)}</button>
+      {/if}
+    </div>
   {/if}
 </div>

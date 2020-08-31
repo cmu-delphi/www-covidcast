@@ -1,18 +1,21 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
-  import { currentZone, currentLevel } from '../stores';
+  import { currentZone, currentLevel, encoding, isValueSignalType, currentSensorEntry } from '../stores';
   import IoMdAdd from 'svelte-icons/io/IoMdAdd.svelte';
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
   import IoMdHome from 'svelte-icons/io/IoMdHome.svelte';
   import TiTag from 'svelte-icons/ti/TiTag.svelte';
+  import Loading from './Loading.svelte';
+  import { trackEvent } from '../stores/ga';
 
-  const dispatch = createEventDispatcher();
   export let className = '';
 
-  // zoom info for disabling zoom
-  export let zoom = 0;
-  export let maxZoom = Number.POSITIVE_INFINITY;
-  export let minZoom = Number.NEGATIVE_INFINITY;
+  /**
+   * @type {import('./MapBox/ZoomMap').default}
+   */
+  export let zoom;
+
+  export let showEncodings = false;
+  export let loading = false;
 </script>
 
 <style>
@@ -24,6 +27,23 @@
   .root > div {
     margin-bottom: 0.2em;
   }
+
+  .encoding-button {
+    background-size: 80%;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: transparent;
+  }
+
+  .choropleth {
+    background-image: url('../assets/imgs/choropleth.png');
+  }
+  .bubble {
+    background-image: url('../assets/imgs/bubble.png');
+  }
+  .spike {
+    background-image: url('../assets/imgs/spike.png');
+  }
 </style>
 
 <div class="root base-font-size {className}">
@@ -33,9 +53,10 @@
       type="button"
       title="Zoom in"
       aria-label="Zoom in"
-      disabled={zoom <= minZoom}
+      disabled={!zoom || zoom.getZoom() <= zoom.getMinZoom()}
       on:click={() => {
-        dispatch('zoomIn');
+        trackEvent('map', 'zoomIn');
+        zoom.zoomIn();
       }}>
       <IoMdAdd />
     </button>
@@ -44,9 +65,10 @@
       type="button"
       title="Zoom out"
       aria-label="Zoom out"
-      disabled={zoom >= maxZoom}
+      disabled={!zoom || zoom.getZoom() >= zoom.getMaxZoom()}
       on:click={() => {
-        dispatch('zoomOut');
+        trackEvent('map', 'zoomOut');
+        zoom.zoomOut();
       }}>
       <IoMdRemove />
     </button>
@@ -57,8 +79,10 @@
       type="button"
       title="Show entire map"
       aria-label="Show entire map"
+      disabled={!zoom}
       on:click={() => {
-        dispatch('reset');
+        trackEvent('map', 'fitUS');
+        zoom.resetZoom();
       }}>
       <IoMdHome />
     </button>
@@ -70,8 +94,10 @@
         type="button"
         title="Hide state labels"
         aria-label="Hide state labels"
+        disabled={!zoom}
         on:click={() => {
-          dispatch('hideLabels');
+          trackEvent('map', 'toggleStateLabel');
+          zoom.toggleStateLabels();
         }}>
         <TiTag />
       </button>
@@ -84,11 +110,52 @@
         type="button"
         title="show swpa boundary"
         aria-label="show swpa boundary"
+        disabled={!zoom}
         on:click={() => {
-          dispatch('swpa');
+          trackEvent('map', 'fitSWPA');
+          zoom.showSWPA();
         }}>
         SWPA
       </button>
     </div>
   {/if}
+  {#if showEncodings && $isValueSignalType && $currentSensorEntry.isCasesOrDeath}
+    <div class="pg-button-vertical-group">
+      <button
+        aria-pressed={$encoding === 'color' ? 'true' : 'false'}
+        class="pg-button encoding-button choropleth"
+        class:selected={$encoding === 'color'}
+        on:click={() => {
+          encoding.set('color');
+        }}
+        title="Switch to Choropleth">
+        <span aria-hidden>Switch to Choropleth</span>
+        <IoMdHome />
+      </button>
+      <button
+        aria-pressed={$encoding === 'bubble' ? 'true' : 'false'}
+        class="pg-button encoding-button bubble"
+        class:selected={$encoding === 'bubble'}
+        on:click={() => {
+          encoding.set('bubble');
+        }}
+        title="Switch to Bubble Map">
+        <span aria-hidden>Switch to Bubble Map</span>
+        <IoMdHome />
+      </button>
+      <button
+        aria-pressed={$encoding === 'spike' ? 'true' : 'false'}
+        class="pg-button encoding-button spike"
+        class:selected={$encoding === 'spike'}
+        on:click={() => {
+          encoding.set('spike');
+        }}
+        title="Switch to Spike Map">
+        <span aria-hidden>Switch to Spike Map</span>
+        <IoMdHome />
+      </button>
+    </div>
+  {/if}
+
+  <Loading {loading} />
 </div>
