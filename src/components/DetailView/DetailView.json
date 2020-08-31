@@ -133,7 +133,13 @@
       "layer": [
         {
           "selection": {
-            "highlight": { "type": "single", "empty": "none", "on": "mouseover" },
+            "highlight2": {
+              "type": "single",
+              "empty": "none",
+              "nearest": true,
+              "on": "mouseover",
+              "clear": "mouseout"
+            },
             "brush": { "type": "interval", "encodings": ["x"] }
           },
           "mark": {
@@ -145,7 +151,7 @@
           "transform": [
             {
               "filter": {
-                "selection": "highlight"
+                "selection": "highlight2"
               }
             }
           ],

@@ -139,7 +139,6 @@
 
   .header {
     display: flex;
-    align-items: center;
     padding-bottom: 0.1em;
     cursor: pointer;
   }
