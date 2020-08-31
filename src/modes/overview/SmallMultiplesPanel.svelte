@@ -8,15 +8,13 @@
   import { merge } from 'lodash-es';
   import { levelMegaCounty } from '../../stores/constants';
 
-  const remove = ['ght-smoothed_search', 'safegraph-full_time_work_prop'];
-
   /**
    * bi-directional binding
    * @type {import('../../stores/constants').SensorEntry}
    */
   export let detail = null;
 
-  const sensors = sensorList.filter((d) => !remove.includes(d.key));
+  const sensors = sensorList;
 
   const specPercent = {
     transform: [
