@@ -22,11 +22,7 @@
 
   $: hasRegion = Boolean($currentRegionInfo);
   $: isMegaRegion = Boolean($currentRegionInfo) && $currentRegionInfo.level === levelMegaCounty.id;
-  $: noDataText = hasRegion
-    ? isMegaRegion
-      ? `Indicators are not available for ${$currentRegionInfo.name}. Please select a county instead`
-      : 'No data available'
-    : 'No location selected';
+  $: noDataText = hasRegion ? (isMegaRegion ? `Please select a county` : 'No data available') : 'No location selected';
   $: data = $currentRegionInfo
     ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId).then(addMissing)
     : [];
