@@ -58,7 +58,10 @@ export default class BubbleEncoding {
 
     const radiusScaleTheme = this.theme.radiusScale[getType(sensor)];
 
-    const currentRadiusScale = parseScaleSpec(radiusScaleTheme).domain(valueMinMax).range([minRadius, maxRadius]);
+    const currentRadiusScale = parseScaleSpec(radiusScaleTheme)
+      .domain(valueMinMax)
+      .range([minRadius, maxRadius])
+      .clamp(true);
 
     const radiusExpression = currentRadiusScale.expr(['to-number', ['feature-state', 'value'], 0]);
 

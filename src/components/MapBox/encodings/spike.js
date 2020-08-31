@@ -95,7 +95,7 @@ export default class SpikeEncoding {
 
     const heightScaleTheme = this.theme.heightScale[getType(sensor)];
 
-    this.heightScale = parseScaleSpec(heightScaleTheme).range([0, maxHeight]).domain([0, valueMax]);
+    this.heightScale = parseScaleSpec(heightScaleTheme).range([0, maxHeight]).domain([0, valueMax]).clamp(true);
     this.updateSources(map, level);
 
     const colorExpression = interpolateValue(stops);
