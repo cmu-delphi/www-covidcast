@@ -2,7 +2,7 @@ import { scaleSequential, scaleSequentialLog } from 'd3-scale';
 import { interpolateYlOrRd } from 'd3-scale-chromatic';
 import logspace from 'compute-logspace';
 import { DIRECTION_THEME, ZERO_COLOR, MISSING_COLOR } from '../../theme';
-import { zip, transparent } from '../../util';
+import { zip } from '../../util';
 import { MISSING_VALUE } from './encodings/utils';
 import { primaryValue } from '../../stores/constants';
 
@@ -117,7 +117,6 @@ function countSignalColorScale(valueMinMax) {
 
   // use log scale
   const stops = zip(domainStops7, logColors7);
-  const stopsMega = zip(domainStops7, logColors7);
   return { stops, scale: colorScaleLog };
 }
 

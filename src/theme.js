@@ -23,7 +23,7 @@ export const DIRECTION_THEME = {
   gradientMaxMega: colorIncreasingMega,
 };
 
-export const MISSING_COLOR = 'blue';
+export const MISSING_COLOR = '#eeeeee';
 export const ZERO_COLOR = 'rgb(242,242,242)';
 
 export const MAP_THEME = {

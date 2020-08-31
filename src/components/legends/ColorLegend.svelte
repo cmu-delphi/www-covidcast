@@ -68,7 +68,12 @@
 </style>
 
 <ul class:loading-bg={loading}>
-  <li class="tick tick-single" style="background-color: {MISSING_COLOR}" title="NA">{r.high}</li>
+  <li
+    class="tick tick-single"
+    style="background:repeating-linear-gradient(-45deg, {MISSING_COLOR}, white 30%)"
+    title="NA">
+    {r.high}
+  </li>
   <li class="tick tick-single tick-space" style="background-color: {ZERO_COLOR}" title={r.low}>{r.high}</li>
   {#each r.labels as l}
     <li class="tick" style="background-image: linear-gradient(to right, {l.color}, {l.nextColor})" title={l.label}>

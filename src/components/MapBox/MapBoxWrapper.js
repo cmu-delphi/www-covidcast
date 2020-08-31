@@ -137,8 +137,30 @@ export default class MapBoxWrapper {
     }
   }
 
+  addSprites() {
+    const size = 16;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, size, size);
+    const gradient = ctx.createLinearGradient(0, 0, size, size);
+    gradient.addColorStop(0, 'white');
+    gradient.addColorStop(0.25, MISSING_COLOR);
+    gradient.addColorStop(0.5, 'white');
+    gradient.addColorStop(0.75, MISSING_COLOR);
+    gradient.addColorStop(1, 'white');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, size, size);
+
+    const data = ctx.getImageData(0, 0, size, size);
+    this.map.addImage('hatching', data, {
+      sdf: true,
+    });
+  }
+
   addSources() {
-    return geoJsonSources.then((r) => {
+    const data = geoJsonSources.then((r) => {
       const map = this.map;
       map.addSource(S.cityPoint, {
         type: 'geojson',
@@ -168,6 +190,9 @@ export default class MapBoxWrapper {
         enc.addSources(map);
       }
     });
+
+    const sprites = this.addSprites();
+    return Promise.all([data, sprites]);
   }
 
   animationOptions(prop) {
@@ -196,6 +221,7 @@ export default class MapBoxWrapper {
     //   },
     // });
 
+    // fallback missing layer
     map.addLayer({
       id: L.state.stroke,
       source: S.state.border,
@@ -203,6 +229,7 @@ export default class MapBoxWrapper {
       paint: {
         'fill-color': MISSING_COLOR,
         'fill-outline-color': MAP_THEME.stateOutline,
+        'fill-pattern': 'hatching',
       },
     });
 
