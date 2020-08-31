@@ -12,10 +12,6 @@ export default class ChoroplethEncoding {
     return [L[level].fill];
   }
 
-  addSources() {
-    // does nothing since all sources/layers required for choropleth already exist in the map
-  }
-
   addLayers() {
     // does nothing since all sources/layers required for choropleth already exist in the map
   }

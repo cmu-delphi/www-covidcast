@@ -20,8 +20,6 @@ export default class SpikeEncoding {
     return [L[level].fill, L[level].spike];
   }
 
-  addSources() {}
-
   /**
    *
    * @param {import('mapbox-gl').Map} map

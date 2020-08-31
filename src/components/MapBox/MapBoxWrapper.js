@@ -186,10 +186,6 @@ export default class MapBoxWrapper {
           data: r[level].center,
         });
       });
-
-      for (const enc of this.encodings) {
-        enc.addSources(map);
-      }
     });
 
     const sprites = this.addSprites();
@@ -360,7 +356,9 @@ export default class MapBoxWrapper {
       this._updateSource(S[level].border, lookup, primaryValue);
       this._updateSource(S[level].center, lookup, primaryValue);
 
-      this.encoding.updateSources(this.map, level, lookup, primaryValue);
+      for (const encoding of this.encodings) {
+        encoding.updateSources(this.map, level, lookup, primaryValue);
+      }
       if (data.length > 0) {
         this.markReady('data');
       }

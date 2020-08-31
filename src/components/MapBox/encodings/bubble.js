@@ -19,10 +19,6 @@ export default class BubbleEncoding {
     return [L[level].fill, L[level].bubble];
   }
 
-  addSources() {
-    // dummy
-  }
-
   addLayers(map, helpers) {
     // 2 layers for bubbles
     levels.forEach((level) => {
