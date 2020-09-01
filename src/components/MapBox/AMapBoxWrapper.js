@@ -2,7 +2,7 @@ import geojsonExtent from '@mapbox/geojson-extent';
 import { Map as MapBox } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { defaultRegionOnStartup, levelMegaCounty } from '../../stores/constants';
-import { MAP_THEME } from '../../theme';
+import { MAP_THEME, MISSING_COLOR } from '../../theme';
 import { MISSING_VALUE, caseHoveredOrSelected, caseSelected, caseMissing } from './encodings/utils';
 import InteractiveMap from './InteractiveMap';
 import { toFillLayer, toHoverLayer } from './layers';
@@ -72,6 +72,7 @@ export default class AMapBoxWrapper {
       touchPitch: false,
       touchZoomRotate: true,
       renderWorldCopies: false,
+      antialias: true,
     });
     this.zoom.map = this.map;
     this.map.touchZoomRotate.disableRotation();
@@ -90,6 +91,7 @@ export default class AMapBoxWrapper {
     });
 
     this.map.on('load', () => {
+      this.addSprites();
       this.addSources()
         .then(() => {
           this.addLayers();
@@ -150,6 +152,28 @@ export default class AMapBoxWrapper {
     if (this.mapSetupReady && this.mapEncodingReady && this.mapDataReady) {
       this.dispatch('ready');
     }
+  }
+
+  addSprites() {
+    const size = 16;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, size, size);
+    const gradient = ctx.createLinearGradient(0, 0, size, size);
+    gradient.addColorStop(0, 'white');
+    gradient.addColorStop(0.25, MISSING_COLOR);
+    gradient.addColorStop(0.5, 'white');
+    gradient.addColorStop(0.75, MISSING_COLOR);
+    gradient.addColorStop(1, 'white');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, size, size);
+
+    const data = ctx.getImageData(0, 0, size, size);
+    this.map.addImage('hatching', data, {
+      sdf: true,
+    });
   }
 
   addSources() {
@@ -234,7 +258,7 @@ export default class AMapBoxWrapper {
     return level;
   }
 
-  updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, stopsMega) {
+  updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, stopsMega, scale) {
     level = this.validateLevel(level);
     // changed the visibility of layers
     const oldLevel = this.level;
@@ -269,7 +293,7 @@ export default class AMapBoxWrapper {
       this.map.setLayoutProperty(layer, 'visibility', visibleLayers.has(layer) ? 'visible' : 'none');
     });
 
-    const r = this.encoding.encode(this.map, level, signalType, sensor, valueMinMax, stops, stopsMega);
+    const r = this.encoding.encode(this.map, level, signalType, sensor, valueMinMax, stops, stopsMega, scale);
 
     this.markReady('encoding');
     return r;
@@ -307,7 +331,9 @@ export default class AMapBoxWrapper {
       this._updateSource(toBorderSource(level), lookup, primaryValue);
       this._updateSource(toCenterSource(level), lookup, primaryValue);
 
-      this.encoding.updateSources(this.map, level);
+      for (const encoding of this.encodings) {
+        encoding.updateSources(this.map, level, lookup, primaryValue);
+      }
       if (data.length > 0) {
         this.markReady('data');
       }

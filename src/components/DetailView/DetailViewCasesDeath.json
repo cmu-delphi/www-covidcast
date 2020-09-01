@@ -90,6 +90,7 @@
               "type": "single",
               "empty": "none",
               "on": "mouseover",
+              "clear": "mouseout",
               "nearest": true
             }
           },
@@ -126,7 +127,7 @@
       "encoding": {
         "color": {
           "condition": {
-            "selection": "highlight",
+            "selection": "highlight2",
             "value": "#aaaaaa"
           },
           "value": "#dddddd"
@@ -192,7 +193,13 @@
             }
           ],
           "selection": {
-            "highlight": { "type": "single", "empty": "none", "on": "mouseover" },
+            "highlight2": {
+              "type": "single",
+              "empty": "none",
+              "nearest": true,
+              "on": "mouseover",
+              "clear": "mouseout"
+            },
             "brush": { "type": "interval", "encodings": ["x"] }
           }
         }

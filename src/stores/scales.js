@@ -19,6 +19,7 @@ export function LogScale() {
     base = 10,
     domain = [1, 1],
     range = [0, 0];
+  let clamp = false;
 
   function log(x) {
     return Math.log(x) / Math.log(base);
@@ -31,7 +32,7 @@ export function LogScale() {
 
   // y = a log (x) + b
   function scale(x) {
-    return a * log(x) + b;
+    return a * log(Math.min(clamp ? domain[1] : Number.POSITIVE_INFINITY, x));
   }
 
   scale.domain = function () {
@@ -66,7 +67,14 @@ export function LogScale() {
 
   scale.expr = function (value) {
     const baseLog = Math.log10(base);
-    return ['+', ['*', a, ['/', ['log10', value], baseLog]], b];
+    const v = clamp ? ['min', value, domain[1]] : value;
+    return ['+', ['*', a, ['/', ['log10', v], baseLog]], b];
+  };
+
+  scale.clamp = function () {
+    if (!arguments.length) return clamp;
+    clamp = arguments[0];
+    return scale;
   };
 
   scale.clone = function () {
@@ -81,6 +89,7 @@ export function SqrtScale() {
     b = 0,
     domain = [1, 1],
     range = [0, 0];
+  let clamp = false;
 
   function sqrt(x) {
     return Math.sqrt(x);
@@ -93,7 +102,7 @@ export function SqrtScale() {
 
   // y = a log (x) + b
   function scale(x) {
-    return a * sqrt(x) + b;
+    return a * sqrt(Math.min(clamp ? domain[1] : Number.POSITIVE_INFINITY, x)) + b;
   }
 
   scale.domain = function () {
@@ -118,8 +127,15 @@ export function SqrtScale() {
     return scale;
   };
 
+  scale.clamp = function () {
+    if (!arguments.length) return clamp;
+    clamp = arguments[0];
+    return scale;
+  };
+
   scale.expr = function (value) {
-    return ['+', ['*', a, ['sqrt', value]], b];
+    const v = clamp ? ['min', value, domain[1]] : value;
+    return ['+', ['*', a, ['sqrt', v]], b];
   };
 
   scale.clone = function () {
@@ -135,6 +151,7 @@ export function LinearScale() {
     b = 0,
     domain = [1, 1],
     range = [0, 0];
+  let clamp = false;
 
   function fit() {
     a = (range[1] - range[0]) / (domain[1] - domain[0]);
@@ -143,7 +160,7 @@ export function LinearScale() {
 
   // y = a log (x) + b
   function scale(x) {
-    return a * x + b;
+    return a * Math.min(clamp ? domain[1] : Number.POSITIVE_INFINITY, x) + b;
   }
 
   scale.domain = function () {
@@ -168,8 +185,15 @@ export function LinearScale() {
     return scale;
   };
 
+  scale.clamp = function () {
+    if (!arguments.length) return clamp;
+    clamp = arguments[0];
+    return scale;
+  };
+
   scale.expr = function (value) {
-    return ['+', ['*', a, value], b];
+    const v = clamp ? ['min', value, domain[1]] : value;
+    return ['+', ['*', a, v], b];
   };
 
   scale.clone = function () {

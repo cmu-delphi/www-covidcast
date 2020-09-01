@@ -6,16 +6,10 @@ export default class ChoroplethEncoding {
   constructor() {
     this.id = 'color';
     this.layers = [];
-    this.sources = [];
-    this.interactiveSources = [];
   }
 
   getVisibleLayers(level) {
     return [toFillLayer(level)];
-  }
-
-  addSources() {
-    // does nothing since all sources/layers required for choropleth already exist in the map
   }
 
   addLayers() {

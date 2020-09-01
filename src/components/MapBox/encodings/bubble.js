@@ -10,7 +10,6 @@ export default class BubbleEncoding {
     this.id = 'bubble';
     this.theme = theme;
     this.layers = levels.map((level) => toBubbleLayer(level));
-    this.interactiveSources = [];
   }
 
   getVisibleLayers(level, signalType) {
@@ -18,10 +17,6 @@ export default class BubbleEncoding {
       return [];
     }
     return [toFillLayer(level), toBubbleLayer(level)];
-  }
-
-  addSources() {
-    // dummy
   }
 
   addLayers(map, adapter) {
@@ -57,7 +52,10 @@ export default class BubbleEncoding {
 
     const radiusScaleTheme = this.theme.radiusScale[getType(sensor)];
 
-    const currentRadiusScale = parseScaleSpec(radiusScaleTheme).domain(valueMinMax).range([minRadius, maxRadius]);
+    const currentRadiusScale = parseScaleSpec(radiusScaleTheme)
+      .domain(valueMinMax)
+      .range([minRadius, maxRadius])
+      .clamp(true);
 
     const radiusExpression = currentRadiusScale.expr(['to-number', ['feature-state', 'value'], 0]);
 

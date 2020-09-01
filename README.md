@@ -30,9 +30,14 @@ To run the development server, run
 
 the website should open automatically.
 
+### Release Process
+
 To create a release, run
 
-`npm run release`
+1. create a release branch `release-vX.X.X` and push to origin
+1. run `npm run release` and publish the release
+1. create a PR that merges the `release` branch in the `main` branch
+1. create a PR that merges the `main` branch back into the `dev` branch
 
 Then go to the release page and update short description of the changes made.
 

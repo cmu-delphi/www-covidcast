@@ -22,14 +22,13 @@ export function toHoverLayer(level) {
 export function toBubbleLayer(level) {
   return `${level}-bubble`;
 }
+export function toSpikeLayer(level) {
+  return `${level}-spike`;
+}
 
 export const L = {
   outline: 'state-stroke',
   stateNames: 'state-names',
-  spike: {
-    fill: 'spike-fill',
-    stroke: 'spike-stroke',
-  },
   cityPoints: {
     pit: 'city-point-unclustered-pit',
     1: 'city-point-unclustered-1',
