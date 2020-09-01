@@ -32,9 +32,9 @@ export default class USMapBoxWrapper extends AMapBoxWrapper {
     super(dispatch, {
       bounds: bounds.states,
       encodings: [
-        new ChoroplethEncoding(),
-        new BubbleEncoding(ENCODING_BUBBLE_THEME),
-        new SpikeEncoding(ENCODING_SPIKE_THEME),
+        new ChoroplethEncoding(levels),
+        new BubbleEncoding(ENCODING_BUBBLE_THEME, levels),
+        new SpikeEncoding(ENCODING_SPIKE_THEME, levels),
       ],
       level: 'county',
       levels,

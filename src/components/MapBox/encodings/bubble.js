@@ -3,10 +3,9 @@ import { toCenterSource } from '../sources';
 import { getType } from '../../../data/signals';
 import { parseScaleSpec } from '../../../stores/scales';
 import { caseMissing, interpolateValue } from './utils';
-import { levels } from '../../../stores';
 
 export default class BubbleEncoding {
-  constructor(theme) {
+  constructor(theme, levels) {
     this.id = 'bubble';
     this.theme = theme;
     this.layers = levels.map((level) => toBubbleLayer(level));

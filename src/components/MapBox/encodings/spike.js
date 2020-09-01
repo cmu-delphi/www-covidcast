@@ -1,15 +1,14 @@
-import { L, toFillLayer, toSpikeLevel } from '../layers';
+import { L, toFillLayer, toSpikeLayer } from '../layers';
 import { getType } from '../../../data/signals';
 import { parseScaleSpec } from '../../../stores/scales';
 import { SpikeLayer } from './SpikeLayer';
-import { levels } from '../../../stores';
 import { toCenterSource } from '../sources';
 
 export default class SpikeEncoding {
-  constructor(theme) {
+  constructor(theme, levels) {
     this.id = 'spike';
     this.theme = theme;
-    this.layers = levels.map((level) => toSpikeLevel(level));
+    this.layers = levels.map((level) => toSpikeLayer(level));
     this.customLayers = new Map(levels.map((level) => [level, new SpikeLayer(toCenterSource(level), level)]));
   }
 
@@ -24,8 +23,8 @@ export default class SpikeEncoding {
    *
    * @param {import('mapbox-gl').Map} map
    */
-  addLayers(map) {
-    levels.forEach((level) => {
+  addLayers(map, adapter) {
+    adapter.levels.forEach((level) => {
       map.addLayer(this.customLayers.get(level).asLayer(L[level].spike));
     });
   }

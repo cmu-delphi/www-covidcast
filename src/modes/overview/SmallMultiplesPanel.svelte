@@ -2,7 +2,7 @@
   import { sensorList, currentSensor, currentDateObject, currentRegionInfo, smallMultipleTimeSpan } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
-  import Vega from '../../components/vega/Vega.svelte';
+  import Vega from '../../components/Vega.svelte';
   import spec from './SmallMultiplesChart.json';
   import specStdErr from './SmallMultiplesChartStdErr.json';
   import { trackEvent } from '../../stores/ga';
