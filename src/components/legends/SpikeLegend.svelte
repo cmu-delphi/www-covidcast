@@ -8,6 +8,7 @@
     currentSensorEntry,
     signalCasesOrDeathOptions,
     isMobileDevice,
+    zoomMultiply,
   } from '../../stores';
   import { transparent } from '../../util';
   import { generateLabels } from '../MapBox/colors';
@@ -16,8 +17,8 @@
 
   export let loading = false;
 
-  $: size = ENCODING_SPIKE_THEME.size[$currentLevel];
-  $: maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel];
+  $: size = ENCODING_SPIKE_THEME.size[$currentLevel] * $zoomMultiply;
+  $: maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel] * $zoomMultiply;
   $: r = generateLabels(
     $stats,
     $currentSensorEntry,
@@ -29,11 +30,12 @@
   $: heightScale = $spikeHeightScale;
   $: maxPaddingHeight = maxHeight + spikePadding * 2;
 
-  function getSpikePath(value) {
-    if (!heightScale) {
-      return '';
-    }
-    return `M 0 ${heightScale(value)} L ${size} 0 L ${size * 2} ${heightScale(value)}`;
+  let getSpikePath = () => '';
+  $: {
+    const h = heightScale;
+    const s = size;
+    const m = $zoomMultiply;
+    getSpikePath = (value) => `M 0 ${h(value) * m} L ${s} 0 L ${s * 2} ${h(value) * m}`;
   }
 </script>
 
@@ -71,7 +73,7 @@
 <ul class="legend-ticks" class:loading-bg={loading}>
   {#each r.labels as l}
     <li class="legend-direct-tick">
-      <svg width={size * 2 + spikePadding * 2} height={heightScale(l.value) + spikePadding * 2}>
+      <svg width={size * 2 + spikePadding * 2} height={heightScale(l.value) * $zoomMultiply + spikePadding * 2}>
         <g style="transform:translate({spikePadding}px, {spikePadding}px)">
           <path
             d={getSpikePath(l.value)}
@@ -84,7 +86,7 @@
     </li>
   {/each}
   <li class="legend-direct-tick">
-    <svg width={size * 2 + spikePadding * 2} height={heightScale(r.highValue) + spikePadding * 2}>
+    <svg width={size * 2 + spikePadding * 2} height={heightScale(r.highValue) * $zoomMultiply + spikePadding * 2}>
       <g style="transform:translate({spikePadding}px, {spikePadding}px)">
         <path
           d={getSpikePath(r.highValue)}

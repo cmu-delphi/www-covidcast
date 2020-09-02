@@ -227,3 +227,13 @@ export const isMobileDevice = readable(false, (set) => {
 //     set(r.matches);
 //   });
 // });
+
+export const zoom = writable(1);
+export const zoomMax = writable(10);
+export const zoomMin = writable(0);
+export const zoomFactor = writable(1);
+
+export const zoomMultiply = derived(
+  [zoom, zoomMax, zoomMin, zoomFactor],
+  ([zoom, zoomMax, zoomMin, zoomFactor]) => zoomFactor * Math.min(Math.max(zoom, zoomMin), zoomMax),
+);

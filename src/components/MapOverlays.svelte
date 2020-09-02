@@ -8,6 +8,7 @@
   import ColorLegend from './legends/ColorLegend.svelte';
   import BubbleLegend from './legends/BubbleLegend.svelte';
   import SpikeLegend from './legends/SpikeLegend.svelte';
+  import ZoomFactor from './ZoomFactor.svelte';
 
   export let map = null;
   export let mapLoading = true;
@@ -71,6 +72,7 @@
   </div>
 </div>
 <div class="legend-container base-font-size">
+  <ZoomFactor />
   <EncodingOptions sensor={$currentSensorEntry} className="container-bg container-style encoding-wrapper" />
   <div class="container-bg container-style">
     {#if $isDirectionSignalType}

@@ -58,7 +58,7 @@ export default class BubbleEncoding {
       .range([minRadius, maxRadius])
       .clamp(true);
 
-    const radiusExpression = currentRadiusScale.expr(['to-number', ['feature-state', 'value'], 0]);
+    const radiusExpression = ['*', ['zoom'], currentRadiusScale.expr(['to-number', ['feature-state', 'value'], 0])];
 
     map.setPaintProperty(L[level].bubble, 'circle-stroke-color', colorExpression);
     map.setPaintProperty(L[level].bubble, 'circle-color', colorExpression);

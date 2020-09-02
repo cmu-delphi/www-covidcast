@@ -2,7 +2,7 @@ import { L } from '../layers';
 import { getType } from '../../../data/signals';
 import { parseScaleSpec } from '../../../stores/scales';
 import { SpikeLayer } from './SpikeLayer';
-import { levels } from '../../../stores';
+import { levels, zoomMultiply } from '../../../stores';
 import { S } from '../sources';
 
 export default class SpikeEncoding {
@@ -27,6 +27,10 @@ export default class SpikeEncoding {
   addLayers(map) {
     levels.forEach((level) => {
       map.addLayer(this.customLayers.get(level).asLayer(L[level].spike));
+    });
+
+    zoomMultiply.subscribe((v) => {
+      this.customLayers.forEach((layer) => (layer.factor = v));
     });
   }
 

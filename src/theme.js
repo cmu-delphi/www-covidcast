@@ -42,7 +42,6 @@ export const ENCODING_BUBBLE_THEME = {
   countyFill: '#eeeeee',
   strokeColor: '#666',
   strokeWidth: 1,
-  strokeWidthHighlighted: 4,
   opacity: 0.5,
   strokeOpacity: 1,
   minRadius: {

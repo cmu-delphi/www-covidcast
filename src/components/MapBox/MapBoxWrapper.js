@@ -10,6 +10,7 @@ import style from './mapbox_albers_usa_style.json';
 import { geoJsonSources, S } from './sources';
 import ZoomMap from './ZoomMap';
 import { observeResize, unobserveResize } from '../../util';
+import { zoom } from '../../stores';
 
 export default class MapBoxWrapper {
   /**
@@ -64,6 +65,10 @@ export default class MapBoxWrapper {
       antialias: true,
     });
     this.zoom.map = this.map;
+
+    this.map.on('zoom', () => {
+      zoom.set(this.map.getZoom());
+    });
     this.map.touchZoomRotate.disableRotation();
     // this.map.addControl(new AttributionControl({ compact: true }));
     // .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
