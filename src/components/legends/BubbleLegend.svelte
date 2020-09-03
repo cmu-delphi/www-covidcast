@@ -13,6 +13,7 @@
   import { generateLabels } from '../MapBox/colors';
 
   export let loading = false;
+  export let zoom = 1.0;
 
   $: r = generateLabels(
     $stats,
@@ -66,8 +67,8 @@
       <div class="bubble-wrapper">
         <div
           class="bubble"
-          style="width: {$bubbleRadiusScale(l.value) * 2}px; height: {$bubbleRadiusScale(l.value) * 2}px;background: {transparent(l.color, ENCODING_BUBBLE_THEME.opacity)};border-color:
-          {l.color}" />
+          style="width: {$bubbleRadiusScale(l.value) * 2 * zoom}px; height: {$bubbleRadiusScale(l.value) * 2 * zoom}px;background:
+          {transparent(l.color, ENCODING_BUBBLE_THEME.opacity)};border-color: {l.color}" />
       </div>
       <span>{l.label}</span>
     </li>
@@ -75,7 +76,7 @@
   <li>
     <div class="bubble-wrapper">
       <div
-        style="width: {$bubbleRadiusScale(r.highValue) * 2}px; height: {$bubbleRadiusScale(r.highValue) * 2}px;background:
+        style="width: {$bubbleRadiusScale(r.highValue) * 2 * zoom}px; height: {$bubbleRadiusScale(r.highValue) * 2 * zoom}px;background:
         {transparent(r.highColor, ENCODING_BUBBLE_THEME.opacity)};border-color: {r.highColor}"
         class="bubble" />
     </div>

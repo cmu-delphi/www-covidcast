@@ -8,21 +8,26 @@ uniform mat4 u_matrix;
 uniform float u_size;
 uniform float u_yPixelToClip;
 uniform vec2 u_jitter;
+uniform vec2 u_zoom;
+
 attribute vec3 a_pos;
 attribute vec4 a_colorAndHeight;
+
 varying vec3 v_color;
+varying float v_discard;
 
 void main() {
   vec4 p = u_matrix * vec4(a_pos.xy, 0.0, 1.0);
   if (a_pos.z == 0.0) {
-    p.y += a_colorAndHeight.a * u_yPixelToClip * p.w;
+    p.y += a_colorAndHeight.a * u_yPixelToClip * p.w * u_zoom.x;
   } else {
-    p.x += a_pos.z * u_size * p.w;
+    p.x += a_pos.z * u_size * p.w * u_zoom.y;
   }
   p.x += u_jitter.x * p.w;
   p.y += u_jitter.y * p.w;
   gl_Position = p;
   v_color = a_colorAndHeight.rgb / 255.0;
+  v_discard = a_colorAndHeight.a == 0.0 ? 1.0 : 0.0;
 }`;
 
 // create GLSL source for fragment shader
@@ -31,8 +36,10 @@ const fragmentSource = `
 precision mediump float;
 uniform float u_opacity;
 varying vec3 v_color;
+varying float v_discard;
+
 void main() {
-  if (v_color == vec3(0.0,0.0,0.0)) {
+  if (v_discard == 1.0) {
     discard;
   }
   gl_FragColor = vec4(v_color * u_opacity, u_opacity);
@@ -47,6 +54,7 @@ export class SpikeLayer {
     this._valueLookup = new Map();
     this._valuePrimaryValue = 'value';
     this._valueToColor = () => MISSING_COLOR;
+    this.zoom = 1;
   }
 
   /**
@@ -94,6 +102,7 @@ export class SpikeLayer {
     this._uSize = gl.getUniformLocation(this._program, 'u_size');
     this._uYPixelToClip = gl.getUniformLocation(this._program, 'u_yPixelToClip');
     this._uJitter = gl.getUniformLocation(this._program, 'u_jitter');
+    this._uZoom = gl.getUniformLocation(this._program, 'u_zoom');
 
     // create and initialize a WebGLBuffer to store centers
     this._aPos = gl.getAttribLocation(this._program, 'a_pos');
@@ -163,6 +172,8 @@ export class SpikeLayer {
   render(gl, matrix) {
     gl.useProgram(this._program);
     gl.uniformMatrix4fv(this._uPos, false, matrix);
+    gl.uniform2f(this._uZoom, this.zoom, this.zoom);
+
     gl.uniform1f(this._uOpacity, ENCODING_SPIKE_THEME.fillOpacity);
     const xToClip = 2 / gl.canvas.width;
     const yToClip = 2 / gl.canvas.height;

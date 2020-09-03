@@ -21,6 +21,13 @@ export default class SpikeEncoding {
   }
 
   /**
+   * @param {number} zoom
+   */
+  onZoom(zoom) {
+    this.customLayers.forEach((layer) => (layer.zoom = zoom));
+  }
+
+  /**
    *
    * @param {import('mapbox-gl').Map} map
    */

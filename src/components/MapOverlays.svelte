@@ -12,6 +12,7 @@
   export let map = null;
   export let mapLoading = true;
   export let legendLoading = true;
+  export let zoom = 1.0;
 </script>
 
 <style>
@@ -78,9 +79,9 @@
     {:else if $encoding === 'color'}
       <ColorLegend loading={legendLoading} />
     {:else if $encoding === 'bubble'}
-      <BubbleLegend loading={legendLoading} />
+      <BubbleLegend loading={legendLoading} {zoom} />
     {:else if $encoding === 'spike'}
-      <SpikeLegend loading={legendLoading} />
+      <SpikeLegend loading={legendLoading} {zoom} />
     {/if}
   </div>
 </div>

@@ -192,6 +192,7 @@
   $: {
     paramChange($currentSensorEntry, $currentLevel, $signalCasesOrDeathOptions);
   }
+  let zoom = 1.0;
 </script>
 
 <style>
@@ -259,7 +260,7 @@
     min={minDate}
     on:change={(e) => jumpToDate(e.detail)} />
   <div class="map-container">
-    <MapOverlays {map} mapLoading={running || loading} legendLoading={false}>
+    <MapOverlays {map} mapLoading={running || loading} legendLoading={false} {zoom}>
       <div slot="title">{$currentDateObject.toLocaleDateString()}</div>
     </MapOverlays>
     <div class="mode-container container-bg container-style">
@@ -279,6 +280,7 @@
       signalType={$signalType}
       encoding={$encoding}
       signalOptions={$signalCasesOrDeathOptions}
+      on:zoom={(e) => (zoom = e.detail)}
       on:updatedEncoding={(e) => updatedEncoding(e.detail)} />
   </div>
 </main>

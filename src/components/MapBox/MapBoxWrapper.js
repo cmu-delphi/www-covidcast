@@ -10,6 +10,7 @@ import style from './mapbox_albers_usa_style.json';
 import { geoJsonSources, S } from './sources';
 import ZoomMap from './ZoomMap';
 import { observeResize, unobserveResize } from '../../util';
+import { throttle } from 'lodash-es';
 
 export default class MapBoxWrapper {
   /**
@@ -67,6 +68,18 @@ export default class MapBoxWrapper {
     this.map.touchZoomRotate.disableRotation();
     // this.map.addControl(new AttributionControl({ compact: true }));
     // .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+
+    const throttled = throttle((z) => this.dispatch('zoom', z), 100);
+
+    this.map.on('zoom', () => {
+      const z = this.map.getZoom() / this.zoom.stateZoom;
+      for (const encoding of this.encodings) {
+        if (typeof encoding.onZoom === 'function') {
+          encoding.onZoom(z);
+        }
+      }
+      throttled(z);
+    });
 
     let resolveCallback = null;
 
