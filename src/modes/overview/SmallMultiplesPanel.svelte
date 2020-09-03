@@ -1,5 +1,12 @@
 <script>
-  import { sensorList, currentSensor, currentDateObject, currentRegionInfo, smallMultipleTimeSpan } from '../../stores';
+  import {
+    sensorList,
+    currentSensor,
+    currentDateObject,
+    currentRegionInfo,
+    smallMultipleTimeSpan,
+    currentDate,
+  } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../../components/vega/Vega.svelte';
@@ -129,6 +136,12 @@
     const row = e.detail.view.data('data_0').find((d) => d._vgsid_ === id);
     throttled(row ? row.time_value : null);
   }
+  function onClick(e) {
+    const item = e.detail.item;
+    if (item && item.isVoronoi) {
+      currentDate.set(item.datum.datum.time_value);
+    }
+  }
 </script>
 
 <style>
@@ -237,6 +250,8 @@
           {noDataText}
           signals={{ currentDate: $currentDateObject, highlightTimeValue }}
           signalListeners={['highlight']}
+          eventListeners={['click']}
+          on:click={onClick}
           on:signal={onHighlight} />
       </div>
     </li>

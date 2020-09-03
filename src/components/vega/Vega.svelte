@@ -41,6 +41,11 @@
    * @types {string[]}
    */
   export let dataListeners = [];
+  /**
+   * data listeners to dispatch
+   * @types {string[]}
+   */
+  export let eventListeners = [];
 
   let loading = false;
   let noData = false;
@@ -168,6 +173,11 @@
       dataListeners.forEach((data) => {
         r.view.addDataListener(data, (name, value) => {
           dispatch('dataListener', { name, value, view: r.view });
+        });
+      });
+      eventListeners.forEach((type) => {
+        r.view.addEventListener(type, (event, item) => {
+          dispatch(type, { event, item, view: r.view });
         });
       });
       updateData(vegaPromise, data);
