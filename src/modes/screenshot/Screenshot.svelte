@@ -55,7 +55,9 @@
 </style>
 
 <main class="root base-font-size" data-screenshot={ready}>
-  <MapOverlays {map} mapLoading={false} legendLoading={false} interactive={false} />
+  <MapOverlays {map} mapLoading={false} legendLoading={false} interactive={false}>
+    <div slot="title">{$currentDateObject.toLocaleDateString()}</div>
+  </MapOverlays>
   <MapBox
     bind:this={map}
     {data}
