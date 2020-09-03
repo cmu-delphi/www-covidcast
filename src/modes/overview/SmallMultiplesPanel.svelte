@@ -1,11 +1,18 @@
 <script>
-  import { sensorList, currentSensor, currentDateObject, currentRegionInfo, smallMultipleTimeSpan } from '../../stores';
+  import {
+    sensorList,
+    currentSensor,
+    currentDateObject,
+    currentRegionInfo,
+    smallMultipleTimeSpan,
+    currentDate,
+  } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../../components/vega/Vega.svelte';
   import spec from './SmallMultiplesChart.json';
   import specStdErr from './SmallMultiplesChartStdErr.json';
-  import { merge } from 'lodash-es';
+  import { merge, throttle } from 'lodash-es';
   import { levelMegaCounty } from '../../stores/constants';
 
   /**
@@ -111,6 +118,30 @@
         : [],
     spec: chooseSpec(sensor, startDay, endDay),
   }));
+
+  let highlightTimeValue = null;
+
+  const throttled = throttle((value) => {
+    highlightTimeValue = value;
+  }, 10);
+
+  function onHighlight(e) {
+    const highlighted = e.detail.value;
+    const id = highlighted && Array.isArray(highlighted._vgsid_) ? highlighted._vgsid_[0] : null;
+
+    if (!id) {
+      throttled(null);
+      return;
+    }
+    const row = e.detail.view.data('data_0').find((d) => d._vgsid_ === id);
+    throttled(row ? row.time_value : null);
+  }
+  function onClick(e) {
+    const item = e.detail.item;
+    if (item && item.isVoronoi) {
+      currentDate.set(item.datum.datum.time_value);
+    }
+  }
 </script>
 
 <style>
@@ -213,7 +244,15 @@
         </div>
       </div>
       <div class="single-sensor-chart vega-wrapper">
-        <Vega data={s.data} spec={s.spec} {noDataText} signals={{ currentDate: $currentDateObject }} />
+        <Vega
+          data={s.data}
+          spec={s.spec}
+          {noDataText}
+          signals={{ currentDate: $currentDateObject, highlightTimeValue }}
+          signalListeners={['highlight']}
+          eventListeners={['click']}
+          on:click={onClick}
+          on:signal={onHighlight} />
       </div>
     </li>
   {/each}
