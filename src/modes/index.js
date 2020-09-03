@@ -22,6 +22,13 @@ export default [
     tooltip: 'Switch to Time-lapse Mode',
     component: () => import(/* webpackPrefech: true */ './timelapse/TimeLapse.svelte').then((r) => r.default),
   },
+  {
+    id: 'screenshot',
+    hidden: true,
+    label: 'Internal Screenshot Mode',
+    tooltip: 'Internal Screenshot mode',
+    component: () => import(/* webpackPrefech: true */ './screenshot/Screenshot.svelte').then((r) => r.default),
+  },
   // {
   //   id: 'compare',
   //   label: 'Compare',

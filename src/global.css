@@ -36,6 +36,11 @@
   }
 }
 
+body.remote-viz #vizbox {
+  width: 100vw !important;
+  height: 100vh !important;
+}
+
 button.mapboxgl-popup-close-button {
   padding: 2px;
   color: var(--grey);

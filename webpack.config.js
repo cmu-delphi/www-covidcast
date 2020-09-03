@@ -130,6 +130,11 @@ module.exports = () => {
         alwaysWriteToDisk: true,
         template: './src/embed.html',
       }),
+      new HtmlWebpackPlugin({
+        filename: 'remote.html',
+        alwaysWriteToDisk: true,
+        template: './src/remote.html',
+      }),
       new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({
         filename: '[name].css',

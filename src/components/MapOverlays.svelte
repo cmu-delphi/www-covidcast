@@ -12,6 +12,7 @@
   export let map = null;
   export let mapLoading = true;
   export let legendLoading = true;
+  export let interactive = true;
 </script>
 
 <style>
@@ -66,12 +67,16 @@
       <slot name="title" />
     </Title>
   </div>
-  <div class="map-controls-container">
-    <MapControls zoom={map ? map.zoom : null} showEncodings loading={mapLoading} />
-  </div>
+  {#if interactive}
+    <div class="map-controls-container">
+      <MapControls zoom={map ? map.zoom : null} showEncodings loading={mapLoading} />
+    </div>
+  {/if}
 </div>
 <div class="legend-container base-font-size">
-  <EncodingOptions sensor={$currentSensorEntry} className="container-bg container-style encoding-wrapper" />
+  {#if interactive}
+    <EncodingOptions sensor={$currentSensorEntry} className="container-bg container-style encoding-wrapper" />
+  {/if}
   <div class="container-bg container-style">
     {#if $isDirectionSignalType}
       <DirectionLegend />

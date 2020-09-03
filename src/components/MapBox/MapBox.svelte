@@ -31,6 +31,7 @@
   export let signalType = 'value';
   export let signalOptions = {};
   export let animationDuration = 0;
+  export let interactive = true;
   /**
    * @type {import('../../maps/nameIdInfo').NameInfo | null}
    */
@@ -42,7 +43,7 @@
 
   onMount(() => {
     wrapper.animationDuration = animationDuration;
-    wrapper.initMap(container).then(() => {
+    wrapper.initMap(container, interactive).then(() => {
       ready = true;
     });
   });

@@ -49,7 +49,7 @@ export default class MapBoxWrapper {
    *
    * @param {HTMLElement} container
    */
-  initMap(container) {
+  initMap(container, interactive = true) {
     this.map = new MapBox({
       attributionControl: false,
       container,
@@ -60,7 +60,7 @@ export default class MapBoxWrapper {
       dragRotate: false,
       pitchWithRotate: false,
       touchPitch: false,
-      touchZoomRotate: true,
+      touchZoomRotate: interactive,
       antialias: true,
     });
     this.zoom.map = this.map;
@@ -83,7 +83,7 @@ export default class MapBoxWrapper {
       this.addSources()
         .then(() => {
           this.addLayers();
-          this.interactive = new InteractiveMap(this.map, this);
+          this.interactive = interactive ? new InteractiveMap(this.map, this) : null;
           this.zoom.showStateLabels(this.level === 'state');
         })
         .then(() => {
@@ -348,7 +348,9 @@ export default class MapBoxWrapper {
       });
 
       const lookup = new Map(data.map((d) => [d.geo_value.toUpperCase(), d]));
-      this.interactive.data = lookup;
+      if (this.interactive) {
+        this.interactive.data = lookup;
+      }
 
       if (level === 'county') {
         this._updateSource(S[levelMegaCounty.id].border, lookup, primaryValue);
@@ -450,7 +452,7 @@ export default class MapBoxWrapper {
   }
 
   selectRandom() {
-    if (!this.map || !this.mapSetupReady) {
+    if (!this.map || !this.mapSetupReady || !this.interactive) {
       return;
     }
     const defaultRegion = defaultRegionOnStartup[this.level];
