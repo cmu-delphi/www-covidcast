@@ -1,0 +1,10 @@
+{
+  "name": "covidcast-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "puppeteer": "^5.2.1",
+    "puppeteer-cluster": "^0.22.0"
+  }
+}
