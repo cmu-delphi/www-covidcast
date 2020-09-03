@@ -47,13 +47,13 @@ export class CustomLayer {
     this._vertexShader = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(this._vertexShader, this._vertexSource);
     gl.compileShader(this._vertexShader);
-    // console.log(gl.getShaderInfoLog(this._vertexShader));
+    console.log(gl.getShaderInfoLog(this._vertexShader));
 
     // create a fragment shader
     this._fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
     gl.shaderSource(this._fragmentShader, this._fragmentSource);
     gl.compileShader(this._fragmentShader);
-    // console.log(gl.getShaderInfoLog(this._fragmentShader));
+    console.log(gl.getShaderInfoLog(this._fragmentShader));
 
     // link the two shaders into a WebGL program
     this._program = gl.createProgram();
@@ -89,7 +89,6 @@ export class CustomLayer {
 
     // 3 coordinates per vertex
     this._verticesPerFeatures = points.length / 3 / this.featureIds.length;
-    console.log(this._verticesPerFeatures);
 
     // create and initialize a WebGLBuffer to store colors
     this._aColorAndValue = gl.getAttribLocation(this._program, 'a_colorAndValue');
@@ -116,12 +115,11 @@ export class CustomLayer {
    * @param {WebGLRenderingContext} gl
    * @param {number[]} matrix
    */
-  render(gl, matrix) {
+  _prepareRender(gl, matrix) {
     gl.useProgram(this._program);
     gl.uniformMatrix4fv(this._uPos, false, matrix);
     gl.uniform2f(this._uZoom, this.zoom, this.zoom);
 
-    this._setUniforms(gl);
     const xToClip = 2 / gl.canvas.width;
     const yToClip = 2 / gl.canvas.height;
     gl.uniform2f(this._uPixelToClip, xToClip, yToClip);
@@ -135,13 +133,7 @@ export class CustomLayer {
     gl.vertexAttribPointer(this._aPos, 3, gl.FLOAT, false, 0, 0);
 
     gl.enable(gl.BLEND);
-    gl.blendFunc(gl.ONE, gl.ZERO);
-
-    gl.drawArrays(gl.TRIANGLES, 0, this.featureIds.length * this._verticesPerFeatures);
-  }
-
-  _setUniforms() {
-    // hook
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
   }
 
   /**

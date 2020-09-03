@@ -107,17 +107,18 @@ export class SpikeLayer extends CustomLayer {
     gl.deleteBuffer(this._indexBuffer);
   }
 
-  _setUniforms(gl) {
-    gl.uniform1f(this._uOpacity, ENCODING_SPIKE_THEME.fillOpacity);
-    gl.uniform1f(this._uSize, ENCODING_SPIKE_THEME.size[this._level]);
-    gl.uniform2f(this._uJitter, 0, 0);
-  }
   /**
    * @param {WebGLRenderingContext} gl
    * @param {number[]} matrix
    */
   render(gl, matrix) {
-    super.render(gl, matrix);
+    super._prepareRender(gl, matrix);
+
+    gl.uniform1f(this._uOpacity, ENCODING_SPIKE_THEME.fillOpacity);
+    gl.uniform1f(this._uSize, ENCODING_SPIKE_THEME.size[this._level]);
+    gl.uniform2f(this._uJitter, 0, 0);
+
+    gl.drawArrays(gl.TRIANGLES, 0, this.featureIds.length * this._verticesPerFeatures);
     // lines
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
 
