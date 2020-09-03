@@ -37,7 +37,7 @@ export default class SpikeEncoding {
     });
   }
 
-  encode(map, level, _signalType, sensor, valueMinMax, _stops, _stopsMega, scale) {
+  encode(map, { level, sensor, valueMinMax, scale }) {
     map.setPaintProperty(L[level].fill, 'fill-color', this.theme.countyFill);
 
     const valueMax = valueMinMax[1];

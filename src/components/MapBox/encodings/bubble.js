@@ -42,7 +42,7 @@ export default class BubbleEncoding {
     });
   }
 
-  encode(map, level, signalType, sensor, valueMinMax, stops) {
+  encode(map, { level, sensor, valueMinMax, stops, baseZoom }) {
     // constant background
     map.setPaintProperty(L[level].fill, 'fill-color', this.theme.countyFill);
 
@@ -58,7 +58,17 @@ export default class BubbleEncoding {
       .range([minRadius, maxRadius])
       .clamp(true);
 
-    const radiusExpression = currentRadiusScale.expr(['to-number', ['feature-state', 'value'], 0]);
+    const scaleExpression = currentRadiusScale.expr(['to-number', ['feature-state', 'value'], 0]);
+
+    const radiusExpression = [
+      'interpolate',
+      ['exponential', 2],
+      ['/', ['zoom'], baseZoom],
+      4,
+      scaleExpression,
+      10,
+      ['*', 64, scaleExpression],
+    ];
 
     map.setPaintProperty(L[level].bubble, 'circle-stroke-color', colorExpression);
     map.setPaintProperty(L[level].bubble, 'circle-color', colorExpression);

@@ -332,7 +332,16 @@ export default class MapBoxWrapper {
       this.map.setLayoutProperty(layer, 'visibility', visibleLayers.has(layer) ? 'visible' : 'none');
     });
 
-    const r = this.encoding.encode(this.map, level, signalType, sensor, valueMinMax, stops, stopsMega, scale);
+    const r = this.encoding.encode(this.map, {
+      level,
+      signalType,
+      sensor,
+      valueMinMax,
+      stops,
+      stopsMega,
+      scale,
+      baseZoom: this.zoom.stateZoom,
+    });
 
     this.markReady('encoding');
     return r;
