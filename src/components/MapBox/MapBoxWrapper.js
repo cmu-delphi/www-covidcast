@@ -75,7 +75,7 @@ export default class MapBoxWrapper {
       const z = this.map.getZoom() / this.zoom.stateZoom;
       for (const encoding of this.encodings) {
         if (typeof encoding.onZoom === 'function') {
-          encoding.onZoom(z);
+          encoding.onZoom(z * window.devicePixelRatio);
         }
       }
       throttled(z);
