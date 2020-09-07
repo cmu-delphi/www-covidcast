@@ -1,4 +1,5 @@
 const express = require('express');
+const qs = require('querystring');
 const app = express();
 const { Cluster } = require('puppeteer-cluster');
 
@@ -33,10 +34,10 @@ const { Cluster } = require('puppeteer-cluster');
   });
 
   // setup server
-  app.get('/', async function (req, res) {
+  app.get('/api/screenshot/:mode', async function (req, res) {
     try {
-      const screen = await cluster.execute(req.url.slice(req.url.indexOf('?') + 1));
-
+      const args = qs.stringify({ ...req.query, mode: `screenshot-${req.params.mode}` });
+      const screen = await cluster.execute(args);
       // respond with image
       res.writeHead(200, {
         'Content-Type': 'image/png',
