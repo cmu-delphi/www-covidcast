@@ -13,6 +13,7 @@
   export let mapLoading = true;
   export let legendLoading = true;
   export let interactive = true;
+  export let downloadHandler = null;
 </script>
 
 <style>
@@ -69,7 +70,7 @@
   </div>
   {#if interactive}
     <div class="map-controls-container">
-      <MapControls zoom={map ? map.zoom : null} showEncodings loading={mapLoading} />
+      <MapControls zoom={map ? map.zoom : null} showEncodings loading={mapLoading} {downloadHandler} />
     </div>
   {/if}
 </div>

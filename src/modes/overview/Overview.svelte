@@ -17,6 +17,7 @@
     selectByInfo,
     selectByFeature,
     currentSensorEntry,
+    currentDate,
     currentDateObject,
     signalCasesOrDeathOptions,
     isMobileDevice,
@@ -30,6 +31,7 @@
   import FaBan from 'svelte-icons/fa/FaBan.svelte';
   import SingleModeToggle from '../../components/SingleModeToggle.svelte';
   import modes from '..';
+  import { downloadMap } from '../../data/screenshot';
 
   /**
    * @type {MapBox}
@@ -71,6 +73,16 @@
 
   let mobileShowMap = true;
   let desktopShowPanel = true;
+
+  function downloadHandler() {
+    downloadMap({
+      sensor: $currentSensor,
+      level: $currentLevel,
+      date: $currentDate,
+      encoding: $encoding,
+      signalType: $signalType,
+    });
+  }
 </script>
 
 <style>
@@ -253,7 +265,7 @@
   </div>
 
   <div class="map-container" class:mobileHide={!mobileShowMap}>
-    <MapOverlays {map} mapLoading={loading} legendLoading={loading} />
+    <MapOverlays {map} mapLoading={loading} legendLoading={loading} {downloadHandler} />
     <div class="mode-container container-bg container-style">
       <SingleModeToggle mode={modes[1]} />
     </div>

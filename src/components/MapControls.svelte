@@ -4,6 +4,7 @@
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
   import IoMdHome from 'svelte-icons/io/IoMdHome.svelte';
   import TiTag from 'svelte-icons/ti/TiTag.svelte';
+  import IoIosSave from 'svelte-icons/io/IoIosSave.svelte';
   import Loading from './Loading.svelte';
   import { trackEvent } from '../stores/ga';
 
@@ -16,6 +17,8 @@
 
   export let showEncodings = false;
   export let loading = false;
+
+  export let downloadHandler = null;
 </script>
 
 <style>
@@ -87,6 +90,20 @@
       <IoMdHome />
     </button>
   </div>
+  {#if downloadHandler != null}
+    <div>
+      <button
+        class="pg-button"
+        type="button"
+        title="Save Map"
+        on:click={() => {
+          trackEvent('map', 'download');
+          downloadHandler();
+        }}>
+        <IoIosSave />
+      </button>
+    </div>
+  {/if}
   {#if $currentLevel == 'state'}
     <div>
       <button

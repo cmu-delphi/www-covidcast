@@ -23,11 +23,11 @@ export default [
     component: () => import(/* webpackPrefech: true */ './timelapse/TimeLapse.svelte').then((r) => r.default),
   },
   {
-    id: 'screenshot',
+    id: 'screenshot-map',
     hidden: true,
     label: 'Internal Screenshot Mode',
     tooltip: 'Internal Screenshot mode',
-    component: () => import(/* webpackPrefech: true */ './screenshot/Screenshot.svelte').then((r) => r.default),
+    component: () => import(/* webpackPrefech: true */ './screenshot/ScreenshotMap.svelte').then((r) => r.default),
   },
   // {
   //   id: 'compare',
