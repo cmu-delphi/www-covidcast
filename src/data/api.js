@@ -1,7 +1,7 @@
 import { formatAPITime } from './utils';
 import { levelMegaCounty } from '../stores/constants';
 
-const ENDPOINT = 'https://api.covidcast.cmu.edu/epidata/api.php';
+const ENDPOINT = process.env.COVID_API_SERVER;
 
 const fetchOptions = process.env.NODE_ENV === 'development' ? { cache: 'force-cache' } : {};
 
