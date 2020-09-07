@@ -14,6 +14,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development webpack-dev-server -d --open",
     "build": "cross-env NODE_ENV=production webpack -p",
+    "server": "cd server && node index.js",
     "deploy": "npm run build; gh-pages -d public",
     "zip": "cd public && bestzip ../release.zip *",
     "prettier": "prettier --write \"**/*\"",
