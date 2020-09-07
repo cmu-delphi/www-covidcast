@@ -10,6 +10,8 @@
   import { merge } from 'lodash-es';
   import { levelMegaCounty, primaryValue } from '../../stores/constants';
   import EncodingOptions from '../EncodingOptions.svelte';
+  import IoIosSave from 'svelte-icons/io/IoIosSave.svelte';
+  import { downloadUrl } from '../../data/screenshot';
 
   const dispatch = createEventDispatcher();
   /**
@@ -152,6 +154,17 @@
       dispatch('close');
     }
   }
+
+  let vegaRef = null;
+
+  function download() {
+    vegaRef.vegaAccessor().then((view) => {
+      const png = view.toImageURL('png', 2);
+      png.then((url) => {
+        downloadUrl(url, `${sensor.name} in ${$currentRegionInfo ? $currentRegionInfo.displayName : 'Unknown'}.png`);
+      });
+    });
+  }
 </script>
 
 <style>
@@ -180,6 +193,9 @@
     right: 0;
     top: 0;
   }
+  .close > * {
+    display: inline-block;
+  }
 
   .encoding {
     padding-top: 0.5em;
@@ -189,12 +205,18 @@
 <div class="header">
   <h4>{sensor.name} in {$currentRegionInfo ? $currentRegionInfo.displayName : 'Unknown'}</h4>
   <h5>{mapTitle}</h5>
-  <button class="pg-button close" on:click={() => dispatch('close')} title="Close this detail view">
-    <IoIosClose />
-  </button>
+  <div class="close">
+    <button class="pg-button" on:click={download} disabled={!vegaRef} title="Download this view">
+      <IoIosSave />
+    </button>
+    <button class="pg-button" on:click={() => dispatch('close')} title="Close this detail view">
+      <IoIosClose />
+    </button>
+  </div>
 </div>
 <div class="single-sensor-chart vega-wrapper">
   <Vega
+    bind:this={vegaRef}
     {data}
     spec={sensor.isCasesOrDeath ? specCasesDeath : sensor.hasStdErr ? specStdErr : spec}
     {patchSpec}
