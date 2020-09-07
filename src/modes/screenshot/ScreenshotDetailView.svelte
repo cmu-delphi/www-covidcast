@@ -1,13 +1,14 @@
 <script>
   import DetailView from '../../components/DetailView/DetailView.svelte';
 
-  import { currentSensorEntry } from '../../stores';
+  import { currentMode, currentSensorEntry } from '../../stores';
+  import SmallMultiplesPanel from '../overview/SmallMultiplesPanel.svelte';
 
   let ready = null;
 
   function initialReady() {
     setTimeout(() => {
-      ready = 'ready';
+      ready = 'nested';
     }, 500);
   }
 </script>
@@ -24,5 +25,9 @@
 </style>
 
 <main class="root base-font-size" data-screenshot={ready}>
-  <DetailView sensor={$currentSensorEntry} on:ready={initialReady} download />
+  {#if $currentMode.id === 'screenshot-detail'}
+    <DetailView sensor={$currentSensorEntry} on:ready={initialReady} download />
+  {:else}
+    <SmallMultiplesPanel detail={$currentSensorEntry} on:ready={initialReady} download />
+  {/if}
 </main>

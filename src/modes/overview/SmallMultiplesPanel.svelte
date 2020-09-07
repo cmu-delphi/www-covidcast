@@ -7,12 +7,18 @@
   import specStdErr from './SmallMultiplesChartStdErr.json';
   import { merge } from 'lodash-es';
   import { levelMegaCounty } from '../../stores/constants';
+  import { createEventDispatcher } from 'svelte';
+  import { setTimeout } from 'timers';
+
+  const dispatch = createEventDispatcher();
 
   /**
    * bi-directional binding
    * @type {import('../../stores/constants').SensorEntry}
    */
   export let detail = null;
+
+  export let download = false;
 
   const sensors = sensorList;
 
@@ -111,6 +117,14 @@
         : [],
     spec: chooseSpec(sensor, startDay, endDay),
   }));
+
+  $: {
+    Promise.all(sensorsWithData.map((s) => s.data)).then(() => {
+      setTimeout(() => {
+        dispatch('ready');
+      }, 200);
+    });
+  }
 </script>
 
 <style>
@@ -189,11 +203,30 @@
       display: none;
     }
   }
+
+  .download {
+    display: grid;
+    padding: 0.5em;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1em;
+    grid-auto-flow: row;
+    height: 28em;
+  }
+
+  .download li {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .download .toolbar {
+    display: none;
+  }
 </style>
 
-<ul class="root">
+<ul class="root" class:download>
   {#each sensorsWithData as s}
-    <li class:selected={$currentSensor === s.sensor.key}>
+    <li class:selected={!download && $currentSensor === s.sensor.key}>
       <div class="header">
         <h3
           title={typeof s.sensor.tooltipText === 'function' ? s.sensor.tooltipText() : s.sensor.tooltipText}

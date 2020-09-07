@@ -27,15 +27,21 @@ export default [
     hidden: true,
     label: 'Internal Screenshot Mode',
     tooltip: 'Internal Screenshot mode',
-    component: () => import(/* webpackPrefech: true */ './screenshot/ScreenshotMap.svelte').then((r) => r.default),
+    component: () => import('./screenshot/ScreenshotMap.svelte').then((r) => r.default),
   },
   {
     id: 'screenshot-detail',
     hidden: true,
     label: 'Internal Screenshot Detail Mode',
     tooltip: 'Internal Screenshot mode',
-    component: () =>
-      import(/* webpackPrefech: true */ './screenshot/ScreenshotDetailView.svelte').then((r) => r.default),
+    component: () => import('./screenshot/ScreenshotDetailView.svelte').then((r) => r.default),
+  },
+  {
+    id: 'screenshot-panel',
+    hidden: true,
+    label: 'Internal Screenshot Panel Mode',
+    tooltip: 'Internal Screenshot mode',
+    component: () => import('./screenshot/ScreenshotDetailView.svelte').then((r) => r.default),
   },
   // {
   //   id: 'compare',

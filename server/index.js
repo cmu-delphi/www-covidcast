@@ -22,7 +22,7 @@ const { Cluster } = require('puppeteer-cluster');
     const url = `${base}?${query}`;
     console.log(url);
     await page.goto(url);
-    const elem = await page.waitForSelector('[data-screenshot=ready]', {
+    const elem = await page.waitForSelector('[data-screenshot=ready], [data-screenshot=nested] > *', {
       timeout: 10000,
     });
     const bb = await elem.boundingBox();
