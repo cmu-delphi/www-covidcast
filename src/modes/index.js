@@ -29,6 +29,14 @@ export default [
     tooltip: 'Internal Screenshot mode',
     component: () => import(/* webpackPrefech: true */ './screenshot/ScreenshotMap.svelte').then((r) => r.default),
   },
+  {
+    id: 'screenshot-detail',
+    hidden: true,
+    label: 'Internal Screenshot Detail Mode',
+    tooltip: 'Internal Screenshot mode',
+    component: () =>
+      import(/* webpackPrefech: true */ './screenshot/ScreenshotDetailView.svelte').then((r) => r.default),
+  },
   // {
   //   id: 'compare',
   //   label: 'Compare',

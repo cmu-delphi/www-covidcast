@@ -92,6 +92,7 @@
         });
         vega.view.runAsync();
         loading = false;
+        dispatch('ready');
       })
       .catch((error) => {
         console.error('error while updating data', error);

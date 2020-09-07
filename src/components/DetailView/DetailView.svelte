@@ -29,6 +29,8 @@
     ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId).then(addMissing)
     : [];
 
+  export let download = false;
+
   $: regularPatch = {
     vconcat: [
       {
@@ -120,8 +122,8 @@
         {
           vconcat: [
             {
-              width: size.width - 45,
-              height: size.height - 40 - 70,
+              width: size.width - 45 - 20,
+              height: size.height - 40 - 70 - 20,
               encoding: {
                 y: {
                   axis: {
@@ -132,7 +134,7 @@
               },
             },
             {
-              width: size.width - 45,
+              width: size.width - 45 - 20,
               height: 40,
               encoding: {
                 tooltip: [{ title: sensor.name }],
@@ -157,7 +159,7 @@
 
   let vegaRef = null;
 
-  function download() {
+  function downloadVega() {
     vegaRef.vegaAccessor().then((view) => {
       const png = view.toImageURL('png', 2);
       png.then((url) => {
@@ -202,18 +204,20 @@
   }
 </style>
 
-<div class="header">
-  <h4>{sensor.name} in {$currentRegionInfo ? $currentRegionInfo.displayName : 'Unknown'}</h4>
-  <h5>{mapTitle}</h5>
-  <div class="close">
-    <button class="pg-button" on:click={download} disabled={!vegaRef} title="Download this view">
-      <IoIosSave />
-    </button>
-    <button class="pg-button" on:click={() => dispatch('close')} title="Close this detail view">
-      <IoIosClose />
-    </button>
+{#if !download}
+  <div class="header">
+    <h4>{sensor.name} in {$currentRegionInfo ? $currentRegionInfo.displayName : 'Unknown'}</h4>
+    <h5>{mapTitle}</h5>
+    <div class="close">
+      <button class="pg-button" on:click={downloadVega} disabled={!vegaRef} title="Download this view">
+        <IoIosSave />
+      </button>
+      <button class="pg-button" on:click={() => dispatch('close')} title="Close this detail view">
+        <IoIosClose />
+      </button>
+    </div>
   </div>
-</div>
+{/if}
 <div class="single-sensor-chart vega-wrapper">
   <Vega
     bind:this={vegaRef}
@@ -221,9 +225,12 @@
     spec={sensor.isCasesOrDeath ? specCasesDeath : sensor.hasStdErr ? specStdErr : spec}
     {patchSpec}
     {noDataText}
-    signals={{ currentDate: $currentDateObject }} />
+    signals={{ currentDate: $currentDateObject }}
+    on:ready={() => dispatch('ready')} />
 </div>
-<div class="encoding">
-  <EncodingOptions center {sensor} />
-</div>
+{#if !download}
+  <div class="encoding">
+    <EncodingOptions center {sensor} />
+  </div>
+{/if}
 <svelte:window on:keydown={onEscCheck} />
