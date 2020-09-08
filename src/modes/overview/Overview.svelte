@@ -141,6 +141,7 @@
     right: 0;
     bottom: 0;
     z-index: 1000;
+    display: flex;
   }
 
   .map-button {
@@ -255,6 +256,7 @@
   <div class="map-container" class:mobileHide={!mobileShowMap}>
     <MapOverlays {map} mapLoading={loading} legendLoading={loading} />
     <div class="mode-container container-bg container-style">
+      <SingleModeToggle mode={modes[2]} />
       <SingleModeToggle mode={modes[1]} />
     </div>
     <MapBox
