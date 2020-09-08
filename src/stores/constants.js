@@ -33,9 +33,9 @@ const levelById = new Map(levelList.map((l) => [l.id, l]));
 export function getLevelInfo(level) {
   return (
     levelById.get(level) || {
-      id: '?',
-      label: 'Invalid level',
-      labelPlural: 'Invalid level',
+      id: level,
+      label: level.toUpperCase(),
+      labelPlural: level.toUpperCase(),
     }
   );
 }
