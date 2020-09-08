@@ -82,6 +82,8 @@
     levelList = [...levels].map(getLevelInfo);
     geoType = $currentSensorEntry.levels[0];
   });
+
+  let currentMode = 'csv';
 </script>
 
 <style>
@@ -90,7 +92,6 @@
     padding: 1em;
   }
 
-  .code-block,
   .block {
     display: inline-block;
     display: flex;
@@ -111,36 +112,42 @@
     width: auto;
   }
 
-  summary {
-    display: list-item;
-  }
-
-  section,
-  details > div {
+  section {
     padding: 1em;
-  }
-
-  summary h5 {
-    display: inline-block;
-  }
-
-  .code-block {
-    width: unset;
-    flex: 1 1 0;
-  }
-  .code-block p,
-  .code-block code {
-    padding: 0;
   }
 
   pre {
     padding: 0.2em;
     background: #efefef;
   }
+
+  .description {
+    padding: 0;
+    font-size: 80%;
+  }
+
+  form {
+    visibility: hidden;
+  }
+
+  .buttons {
+    display: flex;
+    align-items: center;
+  }
+
+  .buttons > button {
+    min-width: 5em;
+  }
 </style>
 
 <div class="root" class:loading>
   <h4>Export Data</h4>
+  <p>
+    All signals displayed on the COVIDcast map, and numerous other signals, are freely available for download here. You
+    can also access the latest daily through the
+    <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a>
+    .
+  </p>
   <section>
     <h5>1. Select Signal</h5>
     <div class="group">
@@ -173,7 +180,7 @@
     </div>
   </section>
   <section>
-    <h5>2. Specify Parameter</h5>
+    <h5>2. Specify Parameters</h5>
     <div>
       <span>Date Range</span>
       <Datepicker
@@ -199,61 +206,100 @@
           <option value={level.id} disabled={!source || !source.levels.has(level.id)}>{level.labelPlural}</option>
         {/each}
       </select>
+      <p class="description">
+        Each geographic region is identified with a unique identifier, such as FIPS code. See the
+        <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">
+          geographic coding documentation
+        </a>
+        for details.
+      </p>
     </div>
   </section>
   <section>
     <h5>3. Get Data</h5>
-    <form method="GET" action="{CSV_SERVER}/csv" target="_blank">
+    <div class="buttons">
+      <button
+        class="pg-button button"
+        on:click={() => {
+          currentMode = 'csv';
+        }}
+        type="submit"
+        form="form"
+        disabled={!geoType || !signalValue}
+        title="Get in CSV format">
+        CSV
+      </button>
+      <button
+        aria-pressed={String(currentMode === 'python')}
+        class="pg-button button"
+        class:selected={currentMode === 'python'}
+        on:click={() => {
+          currentMode = 'python';
+        }}
+        title="Get Python Code">
+        Python
+      </button>
+      <button
+        aria-pressed={String(currentMode === 'r')}
+        class="pg-button button"
+        class:selected={currentMode === 'r'}
+        on:click={() => {
+          currentMode = 'r';
+        }}
+        title="Get R Code">
+        R
+      </button>
+    </div>
+    {#if currentMode === 'python'}
+      <p>
+        Install
+        <code>covidcast</code>
+        via pip:
+      </p>
+      <pre>pip install covidcast</pre>
+      <p>Fetch data:</p>
+      <pre>
+        {`from datetime import date
+import covidcast
+
+data = covidcast.signal("${source ? source.id : ''}", "${signal ? signal.signal : ''}",
+                    date(${startDate.getFullYear()}, ${startDate.getMonth() + 1}, ${startDate.getDate()}), date(${endDate.getFullYear()}, ${endDate.getMonth() + 1}, ${endDate.getDate()}),
+                    "${geoType}")`}
+      </pre>
+      <p class="description">
+        For more details and examples, see the
+        <a href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/">package documentation.</a>
+      </p>
+    {:else if currentMode === 'r'}
+      <p>
+        Install
+        <code>covidcast</code>
+        using
+        <a href="https://devtools.r-lib.org/">devtools</a>
+        :
+      </p>
+      <pre>devtools::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/covidcast")</pre>
+      <p>Fetch data:</p>
+      <pre>
+        {`library(covidcast)
+
+cli <- suppressMessages(
+covidcast_signal(data_source = "${source ? source.id : ''}", signal = "${signal ? signal.signal : ''}",
+               start_day = "${iso(startDate)}", end_day = "${iso(endDate)}",
+               geo_type = "${geoType}")
+)`}
+      </pre>
+      <p class="description">
+        For more details and examples, see the
+        <a href="https://cmu-delphi.github.io/covidcast/covidcastR/">package documentation.</a>
+      </p>
+    {/if}
+    <form id="form" method="GET" action="{CSV_SERVER}/csv" target="_blank">
       <input type="hidden" name="signal" value={signalValue} />
       <input type="hidden" name="start_day" value={iso(startDate)} />
       <input type="hidden" name="end_day" value={iso(endDate)} />
       <input type="hidden" name="geo_type" value={geoType} />
-      <button type="submit" disabled={!geoType || !signalValue} class="pg-button">Download CSV</button>
     </form>
   </section>
-  <details>
-    <summary>
-      <h5>4. API Clients</h5>
-    </summary>
-
-    <div class="group">
-      <div class="code-block">
-        <h6>Python</h6>
-        <p>
-          Install
-          <code>covidcast</code>
-          via pip
-        </p>
-        <pre>pip install covidcast</pre>
-        <p>Fetch data</p>
-        <pre>
-          {`from datetime import date
-import covidcast
-
-data = covidcast.signal("${source ? source.id : ''}", "${signal ? signal.signal : ''}",
-                        date(${startDate.getFullYear()}, ${startDate.getMonth() + 1}, ${startDate.getDate()}), date(${endDate.getFullYear()}, ${endDate.getMonth() + 1}, ${endDate.getDate()}),
-                        "${geoType}")`}
-        </pre>
-      </div>
-      <div class="code-block">
-        <h6>R</h6>
-        <p>
-          Install
-          <code>covidcast</code>
-        </p>
-        <pre>devtools::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/covidcast")</pre>
-        <p>Fetch data</p>
-        <pre>
-          {`library(covidcast)
-
-cli <- suppressMessages(
-  covidcast_signal(data_source = "${source ? source.id : ''}", signal = "${signal ? signal.signal : ''}",
-                   start_day = "${iso(startDate)}", end_day = "${iso(endDate)}",
-                   geo_type = "${geoType}")
-)`}
-        </pre>
-      </div>
-    </div>
-  </details>
   <SingleModeToggle mode={modes[0]} label="Back" />
 </div>
