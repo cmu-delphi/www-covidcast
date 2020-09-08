@@ -4,7 +4,7 @@ import { CustomLayer } from './CustomLayer';
 // create GLSL source for vertex shader
 const vertexSource = `
 uniform mat4 u_matrix;
-uniform vec2 u_zoom;
+uniform float u_zoom;
 uniform vec2 u_pixelToClip;
 
 attribute vec3 a_pos;
@@ -18,12 +18,12 @@ void main() {
   vec4 p = u_matrix * vec4(a_pos.xy, 0.0, 1.0);
 
   vec2 pos = vec2(a_pos.z < 0.0 ? -1.0 : 1.0, abs(a_pos.z) < 2.0 ? -1.0 : 1.0);
-  p.xy += pos * u_pixelToClip * u_zoom * (a_colorAndValue.a + 1.0) * p.w;
+  p.xy += pos * u_pixelToClip * (u_zoom * a_colorAndValue.a + 1.0) * p.w;
 
   gl_Position = p;
   v_color = a_colorAndValue.rgb / 255.0;
 
-  v_data = vec4(pos, a_colorAndValue.a, 1.0);
+  v_data = vec4(pos, a_colorAndValue.a * u_zoom, 1.0);
   v_discard = a_colorAndValue.a == 0.0 ? 1.0 : 0.0;
 }`;
 
@@ -32,6 +32,7 @@ void main() {
 const fragmentSource = `
 precision mediump float;
 uniform float u_opacity;
+uniform float u_device_pixel_ratio;
 varying vec3 v_color;
 varying float v_discard;
 varying vec4 v_data;
@@ -45,7 +46,7 @@ void main() {
   float radius = v_data.z;
   float stroke_width = v_data.w;
 
-  float blur = -(1.0 / (radius + stroke_width));
+  float blur = -(1.0 / u_device_pixel_ratio / (radius + stroke_width));
   float opacity_t = smoothstep(0.0, blur, extrude_length - 1.0);
 
   float color_t = smoothstep(
@@ -79,6 +80,8 @@ export class BubbleLayer extends CustomLayer {
    */
   onAdd(map, gl) {
     super.onAdd(map, gl);
+
+    this._uDevicePixelRatio = gl.getUniformLocation(this._program, 'u_device_pixel_ratio');
 
     this._indexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
@@ -115,6 +118,7 @@ export class BubbleLayer extends CustomLayer {
     super._prepareRender(gl, matrix);
 
     gl.uniform1f(this._uOpacity, ENCODING_BUBBLE_THEME.fillOpacity);
+    gl.uniform1f(this._uDevicePixelRatio, window.devicePixelRatio);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
     gl.drawElements(gl.TRIANGLES, this.featureIds.length * 6, gl.UNSIGNED_SHORT, 0);

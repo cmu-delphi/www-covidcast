@@ -118,7 +118,7 @@ export class CustomLayer {
   _prepareRender(gl, matrix) {
     gl.useProgram(this._program);
     gl.uniformMatrix4fv(this._uPos, false, matrix);
-    gl.uniform2f(this._uZoom, this.zoom, this.zoom);
+    gl.uniform1f(this._uZoom, this.zoom);
 
     const xToClip = 2 / gl.canvas.width;
     const yToClip = 2 / gl.canvas.height;

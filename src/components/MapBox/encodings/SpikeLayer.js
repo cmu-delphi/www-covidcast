@@ -5,7 +5,7 @@ import { CustomLayer } from './CustomLayer';
 const vertexSource = `
 uniform mat4 u_matrix;
 uniform vec2 u_pixelToClip;
-uniform vec2 u_zoom;
+uniform float u_zoom;
 
 uniform float u_size;
 uniform vec2 u_jitter;
@@ -19,9 +19,9 @@ varying float v_discard;
 void main() {
   vec4 p = u_matrix * vec4(a_pos.xy, 0.0, 1.0);
   if (a_pos.z == 0.0) {
-    p.y += a_colorAndValue.a * u_pixelToClip.y * p.w * u_zoom.x;
+    p.y += a_colorAndValue.a * u_pixelToClip.y * p.w * u_zoom;
   } else {
-    p.x += a_pos.z * u_size * u_pixelToClip.x * p.w * u_zoom.y;
+    p.x += a_pos.z * u_size * u_pixelToClip.x * p.w * u_zoom;
   }
   p.x += u_jitter.x * u_pixelToClip.x * p.w;
   p.y += u_jitter.y * u_pixelToClip.y * p.w;
