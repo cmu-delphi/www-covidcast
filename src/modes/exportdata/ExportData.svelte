@@ -69,6 +69,7 @@
         const known = sensorMap.get(`${dataSource}-${entry.signal}`);
         ds.signals.push({
           id,
+          signal: entry.signal,
           name: known ? known.name : entry.signal,
           description: known ? known.tooltipText : 'no description found',
         });
@@ -89,6 +90,7 @@
     padding: 1em;
   }
 
+  .code-block,
   .block {
     display: inline-block;
     display: flex;
@@ -109,8 +111,31 @@
     width: auto;
   }
 
-  section {
+  summary {
+    display: list-item;
+  }
+
+  section,
+  details > div {
     padding: 1em;
+  }
+
+  summary h5 {
+    display: inline-block;
+  }
+
+  .code-block {
+    width: unset;
+    flex: 1 1 0;
+  }
+  .code-block p,
+  .code-block code {
+    padding: 0;
+  }
+
+  pre {
+    padding: 0.2em;
+    background: #efefef;
   }
 </style>
 
@@ -186,5 +211,49 @@
       <button type="submit" disabled={!geoType || !signalValue} class="pg-button">Download CSV</button>
     </form>
   </section>
+  <details>
+    <summary>
+      <h5>4. API Clients</h5>
+    </summary>
+
+    <div class="group">
+      <div class="code-block">
+        <h6>Python</h6>
+        <p>
+          Install
+          <code>covidcast</code>
+          via pip
+        </p>
+        <pre>pip install covidcast</pre>
+        <p>Fetch data</p>
+        <pre>
+          {`from datetime import date
+import covidcast
+
+data = covidcast.signal("${source ? source.id : ''}", "${signal ? signal.signal : ''}",
+                        date(${startDate.getFullYear()}, ${startDate.getMonth() + 1}, ${startDate.getDate()}), date(${endDate.getFullYear()}, ${endDate.getMonth() + 1}, ${endDate.getDate()}),
+                        "${geoType}")`}
+        </pre>
+      </div>
+      <div class="code-block">
+        <h6>R</h6>
+        <p>
+          Install
+          <code>covidcast</code>
+        </p>
+        <pre>devtools::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/covidcast")</pre>
+        <p>Fetch data</p>
+        <pre>
+          {`library(covidcast)
+
+cli <- suppressMessages(
+  covidcast_signal(data_source = "${source ? source.id : ''}", signal = "${signal ? signal.signal : ''}",
+                   start_day = "${iso(startDate)}", end_day = "${iso(endDate)}",
+                   geo_type = "${geoType}")
+)`}
+        </pre>
+      </div>
+    </div>
+  </details>
   <SingleModeToggle mode={modes[0]} label="Back" />
 </div>
