@@ -8,7 +8,6 @@ import {
   MAGIC_START_DATE,
   sensorMap,
   sensorList,
-  levels,
 } from '../stores';
 import { get } from 'svelte/store';
 import { callMetaAPI } from './api';
@@ -66,7 +65,7 @@ function processMetaData(meta) {
  */
 function loadRegularSignal(sEntry, meta, timeMap, statsMap) {
   const matchedMeta = meta.epidata.find(
-    (d) => d.data_source === sEntry.id && d.signal === sEntry.signal && d.time_type === 'day',
+    (d) => d.data_source === sEntry.id && d.signal === sEntry.signal && (!d.time_type || d.time_type === 'day'),
   );
 
   if (matchedMeta) {
@@ -95,7 +94,9 @@ function loadRegularSignal(sEntry, meta, timeMap, statsMap) {
  * @param {import('./fetchData').SensorEntry} sEntry
  */
 function loadCountSignal(sEntry, meta, timeMap, statsMap) {
-  const possibleMetaRows = meta.epidata.filter((d) => d.data_source === sEntry.id && d.time_type === 'day');
+  const possibleMetaRows = meta.epidata.filter(
+    (d) => d.data_source === sEntry.id && (!d.time_type || d.time_type === 'day'),
+  );
 
   sEntry.levels.forEach((region) => {
     const statsKey = toStatsRegionKey(sEntry.key, region);
@@ -171,14 +172,15 @@ function loadCountSignal(sEntry, meta, timeMap, statsMap) {
  */
 export function loadMetaData(sensors) {
   const custom = sensors.filter((d) => d.meta).map((d) => d.meta(d.id, d.signal));
-  const remoteSignals = sensors.filter((d) => !d.meta);
+  // const remoteSignals = sensors.filter((d) => !d.meta);
+  // TODO filter when ready
   return Promise.all([
     callMetaAPI(
-      remoteSignals,
+      [], // remoteSignals,
       ['min_time', 'max_time', 'mean_value', 'stdev_value', 'signal', 'geo_type', 'data_source'],
       {
-        time_types: 'day',
-        geo_types: levels,
+        // time_types: 'day',
+        // geo_types: levels,
       },
     ),
     ...custom,

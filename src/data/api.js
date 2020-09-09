@@ -52,12 +52,31 @@ export function callAPI(id, signal, level, date, region) {
  */
 export function callMetaAPI(sensors, fields, filters) {
   const url = new URL(ENDPOINT);
+  const urlGet = new URL(ENDPOINT);
   const data = new FormData();
   data.set('source', 'covidcast_meta');
+  urlGet.searchParams.set('source', data.get('source'));
   data.set('cached', 'true');
-  data.set('signals', sensors.map((d) => `${d.id}:${d.signal}`).join(','));
-  data.set('fields', fields.join(','));
-  Object.entries(filters).forEach((entry) => data.set(entry[0], entry[1]));
+  urlGet.searchParams.set('cached', data.get('cached'));
+  if (sensors && sensors.length > 0) {
+    data.set('signals', sensors.map((d) => `${d.id}:${d.signal}`).join(','));
+    urlGet.searchParams.set('signals', data.get('signals'));
+  }
+  if (fields && fields.length > 0) {
+    data.set('fields', fields.join(','));
+    urlGet.searchParams.set('fields', data.get('fields'));
+  }
+  Object.entries(filters).forEach((entry) => {
+    data.set(entry[0], entry[1]);
+    urlGet.searchParams.set(entry[0], entry[1]);
+  });
+
+  const urlGetS = urlGet.toString();
+  if (urlGetS.length < 4096) {
+    // use get
+    return fetch(urlGetS, fetchOptions).then((d) => d.json());
+  }
+
   return fetch(url.toString(), {
     ...fetchOptions,
     method: 'POST',
