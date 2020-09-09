@@ -17,6 +17,7 @@ import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
  * @property {number} time_value
  * @property {Date} date_value the time_value as a Date
  * @property {number} value
+ * @property {string} signal
  */
 
 /**
@@ -49,19 +50,20 @@ function parseData(d) {
   return data;
 }
 
-function parseMultipleData(data) {
-  if ((data.length > 0 && data[0].result < 0) || data[0].message.includes('no results')) {
+function parseMultipleData(d, signals) {
+  if (d.result < 0 || d.message.includes('no results')) {
     return [];
   }
-  if (data.length === 0) {
-    return [];
+  const data = d.epidata || [];
+
+  const bySignal = new Map(signals.map((d) => [d, []]));
+  for (const row of data) {
+    bySignal.get(row.signal).push(row);
   }
-  const combined = combineSignals(
-    data.map((d) => d.epidata || []),
-    EPIDATA_CASES_OR_DEATH_VALUES,
-  );
+  const split = signals.map((k) => bySignal.get(k));
+  const combined = combineSignals(split, EPIDATA_CASES_OR_DEATH_VALUES);
   return parseData({
-    ...data[0],
+    ...d,
     epidata: combined,
   });
 }
@@ -78,11 +80,10 @@ function fetchData(sensorEntry, level, region, date) {
     return Promise.resolve([]);
   }
   if (sensorEntry.isCasesOrDeath) {
-    return Promise.all(
-      EPIDATA_CASES_OR_DEATH_VALUES.map((k) =>
-        callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.casesOrDeathSignals[k], level, date, region),
-      ),
-    ).then(parseMultipleData);
+    const signals = EPIDATA_CASES_OR_DEATH_VALUES.map((k) => sensorEntry.casesOrDeathSignals[k]);
+    return callAPIEndPoint(sensorEntry.api, sensorEntry.id, signals.join(','), level, date, region).then((d) =>
+      parseMultipleData(d, signals),
+    );
   } else {
     return callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.signal, level, date, region).then(parseData);
   }
