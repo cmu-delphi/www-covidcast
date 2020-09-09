@@ -103,9 +103,12 @@
       if (dataBuffer.has(key)) {
         continue;
       }
-      dataBuffer.set(key, fetchRegionSlice($currentSensorEntry, $currentLevel, toLoad, {
-        stderr: null
-      }));
+      dataBuffer.set(
+        key,
+        fetchRegionSlice($currentSensorEntry, $currentLevel, toLoad, {
+          stderr: null,
+        }),
+      );
     }
   }
 

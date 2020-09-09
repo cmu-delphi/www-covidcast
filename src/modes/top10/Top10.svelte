@@ -104,7 +104,7 @@
     Promise.all(
       toLoad.map((d) =>
         fetchRegionSlice(d, $currentLevel, $currentDateObject, {
-          stderr: null
+          stderr: null,
         }),
       ),
     ).then((sensorData) => {
