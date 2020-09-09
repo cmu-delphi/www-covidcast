@@ -370,6 +370,7 @@ export default class AMapBoxWrapper {
     console.assert(this.map != null);
     const source = this.map.getSource(sourceId);
     if (!source) {
+      console.error('invalid source');
       return;
     }
     const data = source._data; // semi hacky

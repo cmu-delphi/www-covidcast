@@ -42,11 +42,7 @@ export default class USMapBoxWrapper extends AMapBoxWrapper {
   }
 
   addSources() {
-    return this.addLevelSources().then(() => {
-      for (const enc of this.encodings) {
-        enc.addSources(this.map, this);
-      }
-    });
+    return this.addLevelSources();
   }
 
   addLayers() {

@@ -56,11 +56,7 @@ export default class USMapBoxWrapper extends AMapBoxWrapper {
   }
 
   addSources() {
-    return Promise.all([addCitySources(this.map), this.addLevelSources()]).then(() => {
-      for (const enc of this.encodings) {
-        enc.addSources(this.map, this);
-      }
-    });
+    return Promise.all([addCitySources(this.map), this.addLevelSources()]);
   }
 
   addLayers() {

@@ -1,4 +1,4 @@
-import { L, toFillLayer, toSpikeLayer } from '../layers';
+import { toFillLayer, toSpikeLayer } from '../layers';
 import { getType } from '../../../data/signals';
 import { parseScaleSpec } from '../../../stores/scales';
 import { SpikeLayer } from './SpikeLayer';
@@ -16,7 +16,7 @@ export default class SpikeEncoding {
     if (signalType === 'direction') {
       return [];
     }
-    return [toFillLayer(level), L[level].spike];
+    return [toFillLayer(level), toSpikeLayer(level)];
   }
 
   /**
@@ -32,7 +32,7 @@ export default class SpikeEncoding {
    */
   addLayers(map, adapter) {
     adapter.levels.forEach((level) => {
-      map.addLayer(this.customLayers.get(level).asLayer(L[level].spike));
+      map.addLayer(this.customLayers.get(level).asLayer(toSpikeLayer(level)));
     });
   }
 
