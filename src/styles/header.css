@@ -15,7 +15,7 @@ body.viz-body {
 
 .viz-name {
   order: 4;
-  margin: 1em 0;
+  margin: 1em 0 0.2em 0;
   padding-top: 0;
   padding-bottom: 0;
   color: var(--darkgrey);
@@ -56,6 +56,23 @@ body.viz-body {
   color: var(--darkgrey);
   line-height: 1;
   display: inline-block;
+}
+
+.viz-subnav {
+  order: 5;
+  margin-bottom: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.viz-subnav li {
+  border: none !important;
+}
+
+.viz-subnav li:not(:first-of-type)::before {
+  content: '•';
+  transform: translate(-0.35em);
 }
 
 /** mobile **/
