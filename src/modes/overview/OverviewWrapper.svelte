@@ -78,6 +78,7 @@
 
   let mobileShowMap = true;
   let desktopShowPanel = true;
+  let zoom = 1;
 </script>
 
 <style>
@@ -266,7 +267,7 @@
   </div>
 
   <div class="map-container" class:mobileHide={!mobileShowMap}>
-    <MapOverlays {map} mapLoading={loading} legendLoading={loading} />
+    <MapOverlays {map} mapLoading={loading} legendLoading={loading} {zoom} />
     <div class="mode-container container-bg container-style">
       <SingleModeToggle mode={modes[1]} />
     </div>
@@ -281,6 +282,7 @@
       selection={$currentRegionInfo}
       encoding={$encoding}
       on:ready={() => initialReady()}
+      on:zoom={(e) => (zoom = e.detail)}
       on:updatedEncoding={(e) => updatedEncoding(e.detail)}
       on:select={(e) => {
         selectByFeature(e.detail);

@@ -10,6 +10,7 @@ import style from './mapbox_albers_usa_style.json';
 import { toBorderSource, toCenterSource } from './sources';
 import ZoomMap from './ZoomMap';
 import { observeResize, unobserveResize } from '../../util';
+import { throttle } from 'lodash-es';
 
 /**
  * @typedef {object} MapBoxWrapperOptions
@@ -78,6 +79,18 @@ export default class AMapBoxWrapper {
     this.map.touchZoomRotate.disableRotation();
     // this.map.addControl(new AttributionControl({ compact: true }));
     // .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+
+    const throttled = throttle((z) => this.dispatch('zoom', z), 100);
+
+    this.map.on('zoom', () => {
+      const z = this.map.getZoom() / this.zoom.stateZoom;
+      for (const encoding of this.encodings) {
+        if (typeof encoding.onZoom === 'function') {
+          encoding.onZoom(z * window.devicePixelRatio);
+        }
+      }
+      throttled(z);
+    });
 
     let resolveCallback = null;
 
@@ -293,7 +306,16 @@ export default class AMapBoxWrapper {
       this.map.setLayoutProperty(layer, 'visibility', visibleLayers.has(layer) ? 'visible' : 'none');
     });
 
-    const r = this.encoding.encode(this.map, level, signalType, sensor, valueMinMax, stops, stopsMega, scale);
+    const r = this.encoding.encode(this.map, {
+      level,
+      signalType,
+      sensor,
+      valueMinMax,
+      stops,
+      stopsMega,
+      scale,
+      baseZoom: this.zoom.stateZoom,
+    });
 
     this.markReady('encoding');
     return r;

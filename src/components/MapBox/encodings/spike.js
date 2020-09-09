@@ -20,6 +20,13 @@ export default class SpikeEncoding {
   }
 
   /**
+   * @param {number} zoom
+   */
+  onZoom(zoom) {
+    this.customLayers.forEach((layer) => (layer.zoom = zoom));
+  }
+
+  /**
    *
    * @param {import('mapbox-gl').Map} map
    */
@@ -29,7 +36,7 @@ export default class SpikeEncoding {
     });
   }
 
-  encode(map, level, _signalType, sensor, valueMinMax, _stops, _stopsMega, scale) {
+  encode(map, { level, sensor, valueMinMax, scale }) {
     map.setPaintProperty(toFillLayer(level), 'fill-color', this.theme.countyFill);
 
     const valueMax = valueMinMax[1];
