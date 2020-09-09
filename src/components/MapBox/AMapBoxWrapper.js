@@ -3,7 +3,7 @@ import { Map as MapBox } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { defaultRegionOnStartup, levelMegaCounty } from '../../stores/constants';
 import { MAP_THEME, MISSING_COLOR } from '../../theme';
-import { MISSING_VALUE, caseHoveredOrSelected, caseSelected, caseMissing } from './encodings/utils';
+import { MISSING_VALUE } from './encodings/utils';
 import InteractiveMap from './InteractiveMap';
 import { toFillLayer, toHoverLayer } from './layers';
 import style from './mapbox_albers_usa_style.json';
@@ -229,7 +229,14 @@ export default class AMapBoxWrapper {
       paint: {
         'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
         'fill-color': MAP_THEME.countyFill,
-        'fill-opacity': caseMissing(0, 1),
+        'fill-opacity': [
+          'case',
+          // when missing
+          ['==', ['to-number', ['feature-state', 'value'], MISSING_VALUE], MISSING_VALUE],
+          0,
+          // else interpolate
+          1,
+        ],
         ...this.animationOptions('fill-color'),
       },
     });
@@ -244,8 +251,18 @@ export default class AMapBoxWrapper {
         visibility: 'none',
       },
       paint: {
-        'line-color': caseSelected(MAP_THEME.selectedRegionOutline, MAP_THEME.hoverRegionOutline),
-        'line-width': caseHoveredOrSelected(4, 0),
+        'line-color': [
+          'case',
+          ['to-boolean', ['feature-state', 'select']],
+          MAP_THEME.selectedRegionOutline,
+          MAP_THEME.hoverRegionOutline,
+        ],
+        'line-width': [
+          'case',
+          ['any', ['to-boolean', ['feature-state', 'hover']], ['to-boolean', ['feature-state', 'select']]],
+          4,
+          0,
+        ],
       },
     });
   }
