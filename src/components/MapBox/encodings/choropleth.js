@@ -6,23 +6,17 @@ export default class ChoroplethEncoding {
   constructor() {
     this.id = 'color';
     this.layers = [];
-    this.sources = [];
-    this.interactiveSources = [];
   }
 
   getVisibleLayers(level) {
     return [toFillLayer(level)];
   }
 
-  addSources() {
-    // does nothing since all sources/layers required for choropleth already exist in the map
-  }
-
   addLayers() {
     // does nothing since all sources/layers required for choropleth already exist in the map
   }
 
-  encode(map, level, signalType, sensor, valueMinMax, stops, stopsMega) {
+  encode(map, { level, stops, stopsMega }) {
     map.setPaintProperty(toFillLayer(level), 'fill-color', interpolateValue(stops));
 
     if (stopsMega) {

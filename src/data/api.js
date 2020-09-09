@@ -1,4 +1,5 @@
 import { formatAPITime } from './utils';
+import { levelMegaCounty } from '../stores/constants';
 
 const ENDPOINT = 'https://api.covidcast.cmu.edu/epidata/api.php';
 
@@ -21,7 +22,8 @@ export function callAPIEndPoint(endpoint, id, signal, level, date, region, field
   url.searchParams.set('cached', 'true');
   url.searchParams.set('data_source', id);
   url.searchParams.set('signal', signal);
-  url.searchParams.set('geo_type', level);
+  // mega counties are stored as counties
+  url.searchParams.set('geo_type', level === levelMegaCounty.id ? 'county' : level);
   url.searchParams.set('time_values', date instanceof Date ? formatAPITime(date) : date);
   url.searchParams.set('time_type', 'day');
   url.searchParams.set('geo_value', region);

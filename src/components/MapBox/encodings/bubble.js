@@ -2,15 +2,14 @@ import { toFillLayer, toBubbleLayer } from '../layers';
 import { toCenterSource } from '../sources';
 import { getType } from '../../../data/signals';
 import { parseScaleSpec } from '../../../stores/scales';
-import { caseMissing, interpolateValue } from './utils';
-import { levels } from '../../../stores';
+import { BubbleLayer } from './BubbleLayer';
 
 export default class BubbleEncoding {
-  constructor(theme) {
+  constructor(theme, levels) {
     this.id = 'bubble';
     this.theme = theme;
     this.layers = levels.map((level) => toBubbleLayer(level));
-    this.interactiveSources = [];
+    this.customLayers = new Map(levels.map((level) => [level, new BubbleLayer(toCenterSource(level), level)]));
   }
 
   getVisibleLayers(level, signalType) {
@@ -20,55 +19,41 @@ export default class BubbleEncoding {
     return [toFillLayer(level), toBubbleLayer(level)];
   }
 
-  addSources() {
-    // dummy
+  /*
+   * @param {number} zoom
+   */
+  onZoom(zoom) {
+    this.customLayers.forEach((layer) => (layer.zoom = zoom));
   }
 
+  /**
+   *
+   * @param {import('mapbox-gl').Map} map
+   */
   addLayers(map, adapter) {
     adapter.levels.forEach((level) => {
-      map.addLayer({
-        id: toBubbleLayer(level),
-        source: toCenterSource(level),
-        type: 'circle',
-        layout: {
-          visibility: 'none',
-        },
-        paint: {
-          'circle-radius': 0,
-          'circle-color': this.theme.color,
-          'circle-stroke-color': this.theme.strokeColor,
-          'circle-stroke-width': this.theme.strokeWidth,
-          'circle-opacity': caseMissing(0, this.theme.opacity),
-          'circle-stroke-opacity': caseMissing(0, this.theme.strokeOpacity),
-          ...adapter.animationOptions('circle-radius'),
-        },
-      });
+      map.addLayer(this.customLayers.get(level).asLayer(toBubbleLayer(level)));
     });
   }
 
-  encode(map, level, signalType, sensor, valueMinMax, stops) {
+  encode(map, { level, sensor, valueMinMax, scale }) {
     // constant background
     map.setPaintProperty(toFillLayer(level), 'fill-color', this.theme.countyFill);
 
     // color scale (color + stroke color)
-    const colorExpression = interpolateValue(stops);
+    // const colorExpression = interpolateValue(stops);
     const minRadius = this.theme.minRadius[level];
     const maxRadius = this.theme.maxRadius[level];
 
     const radiusScaleTheme = this.theme.radiusScale[getType(sensor)];
 
-    const currentRadiusScale = parseScaleSpec(radiusScaleTheme).domain(valueMinMax).range([minRadius, maxRadius]);
+    const radiusScale = parseScaleSpec(radiusScaleTheme).domain(valueMinMax).range([minRadius, maxRadius]).clamp(true);
 
-    const radiusExpression = currentRadiusScale.expr(['to-number', ['feature-state', 'value'], 0]);
-
-    map.setPaintProperty(toBubbleLayer(level), 'circle-stroke-color', colorExpression);
-    map.setPaintProperty(toBubbleLayer(level), 'circle-color', colorExpression);
-    map.setPaintProperty(toBubbleLayer(level), 'circle-radius', radiusExpression);
-
-    return currentRadiusScale;
+    this.customLayers.get(level).encode(radiusScale, scale);
+    return radiusScale;
   }
 
-  updateSources() {
-    // dummy
+  updateSources(map, level, lookup, primaryValue) {
+    this.customLayers.get(level).updateSources(lookup, primaryValue);
   }
 }

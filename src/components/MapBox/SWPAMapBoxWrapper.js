@@ -19,9 +19,9 @@ export default class USMapBoxWrapper extends AMapBoxWrapper {
     super(dispatch, {
       bounds: bounds.hrr,
       encodings: [
-        new ChoroplethEncoding(),
-        new BubbleEncoding(ENCODING_BUBBLE_THEME),
-        new SpikeEncoding(ENCODING_SPIKE_THEME),
+        new ChoroplethEncoding(swpaLevels),
+        new BubbleEncoding(ENCODING_BUBBLE_THEME, swpaLevels),
+        new SpikeEncoding(ENCODING_SPIKE_THEME, swpaLevels),
       ],
       level: 'county',
       levels: swpaLevels,
@@ -42,11 +42,7 @@ export default class USMapBoxWrapper extends AMapBoxWrapper {
   }
 
   addSources() {
-    return this.addLevelSources().then(() => {
-      for (const enc of this.encodings) {
-        enc.addSources(this.map, this);
-      }
-    });
+    return this.addLevelSources();
   }
 
   addLayers() {

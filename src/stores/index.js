@@ -1,7 +1,7 @@
 import { writable, derived, get, readable } from 'svelte/store';
 import { LogScale, SqrtScale } from './scales';
 import { scaleSequentialLog } from 'd3-scale';
-import { defaultSensorId, sensorList, sensorMap, levels, swpaLevels } from './constants';
+import { defaultSensorId, sensorList, sensorMap, yesterdayDate, levels, swpaLevels } from './constants';
 import modes from '../modes';
 import { parseAPITime } from '../data/utils';
 import { getInfoByName } from '../maps';
@@ -16,6 +16,7 @@ export {
   sensorMap,
   groupedSensorList,
 } from './constants';
+import { timeMonth } from 'd3-time';
 
 /**
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
@@ -111,6 +112,18 @@ export const currentDate = writable(MAGIC_START_DATE, (set) => {
  * current date as a Date object
  */
 export const currentDateObject = derived([currentDate], ([date]) => (!date ? null : parseAPITime(date)));
+
+export const smallMultipleTimeSpan = derived([currentDateObject], ([date]) => {
+  if (!date) {
+    return [timeMonth.offset(yesterdayDate, -4), yesterdayDate];
+  }
+  let max = timeMonth.offset(date, 2);
+  if (max > yesterdayDate) {
+    max = yesterdayDate;
+  }
+  const min = timeMonth.offset(max, -4);
+  return [min, max];
+});
 
 // Region GEO_ID for filtering the line chart
 // 42003 - Allegheny; 38300 - Pittsburgh; PA - Pennsylvania.

@@ -1,4 +1,5 @@
 import { callAPIEndPoint } from './api';
+import { timeDay } from 'd3-time';
 import { parseAPITime, formatAPITime, combineSignals } from './utils';
 import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 
@@ -18,6 +19,7 @@ import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
  * @property {number} time_value
  * @property {Date} date_value the time_value as a Date
  * @property {number} value
+ * @property {string} signal
  */
 
 /**
@@ -60,20 +62,38 @@ function parseData(d, mixinData = {}) {
   return data;
 }
 
-function parseMultipleData(data, mixinData = {}) {
-  if ((data.length > 0 && data[0].result < 0) || data[0].message.includes('no results')) {
+function parseMultipleData(d, signals, mixinData = {}) {
+  if (d.result < 0 || d.message.includes('no results')) {
     return [];
   }
-  if (data.length === 0) {
+  const data = d.epidata || [];
+
+  const bySignal = new Map(signals.map((d) => [d, []]));
+  for (const row of data) {
+    bySignal.get(row.signal).push(row);
+  }
+  const split = signals.map((k) => bySignal.get(k));
+  const combined = combineSignals(split, EPIDATA_CASES_OR_DEATH_VALUES);
+  return parseData(
+    {
+      ...d,
+      epidata: combined,
+    },
+    mixinData,
+  );
+}
+
+function parseMultipleSeparateData(dataArr, mixinData = {}) {
+  if (dataArr.length === 0 || dataArr[0].result < 0 || dataArr[0].message.includes('no results')) {
     return [];
   }
   const combined = combineSignals(
-    data.map((d) => d.epidata || []),
+    dataArr.map((d) => d.epidata || []),
     EPIDATA_CASES_OR_DEATH_VALUES,
   );
   return parseData(
     {
-      ...data[0],
+      ...dataArr[0],
       epidata: combined,
     },
     mixinData,
@@ -93,8 +113,7 @@ function fetchData(sensorEntry, level, region, date, mixinValues = {}) {
     return Promise.resolve([]);
   }
   const transferFields = computeTransferFields(mixinValues);
-  if (sensorEntry.isCasesOrDeath) {
-    const fields = ['value'];
+  function fetchSeparate() {
     return Promise.all(
       EPIDATA_CASES_OR_DEATH_VALUES.map((k, i) =>
         callAPIEndPoint(
@@ -104,10 +123,26 @@ function fetchData(sensorEntry, level, region, date, mixinValues = {}) {
           level,
           date,
           region,
-          i === 0 ? transferFields : fields,
+          i === 0 ? transferFields : ['value'],
         ),
       ),
-    ).then((data) => parseMultipleData(data, mixinValues));
+    ).then((d) => parseMultipleSeparateData(d, mixinValues));
+  }
+
+  if (sensorEntry.isCasesOrDeath) {
+    if (level === 'county' && region === '*') {
+      // around 2k
+      return fetchSeparate();
+    }
+    const signals = EPIDATA_CASES_OR_DEATH_VALUES.map((k) => sensorEntry.casesOrDeathSignals[k]);
+    // TODO separate
+    return callAPIEndPoint(sensorEntry.api, sensorEntry.id, signals.join(','), level, date, region).then((d) => {
+      if (d.result === 2) {
+        // need to fetch separately, since too many results
+        return fetchSeparate();
+      }
+      return parseMultipleData(d, signals, mixinValues);
+    });
   } else {
     return callAPIEndPoint(
       sensorEntry.api,
@@ -151,7 +186,7 @@ function createCopy(row, date, sensorEntry) {
     direction: null,
     sample_size: null,
   });
-  if (sensorEntry.isCasesOrDeath) {
+  if (sensorEntry != null && sensorEntry.isCasesOrDeath) {
     EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
       copy[key] = null;
     });
@@ -200,6 +235,33 @@ export function fetchTimeSlice(
     }
     return r;
   });
+}
+
+/**
+ *
+ * @param {EpiDataRow[]} rows
+ */
+export function addMissing(rows) {
+  if (rows.length < 2) {
+    return rows;
+  }
+  const min = rows[0].date_value;
+  const max = rows[rows.length - 1].date_value;
+  const template = rows[0];
+  const base = rows.slice();
+  const range = timeDay.range(min, timeDay.offset(max, 1), 1);
+  if (range.length === rows.length) {
+    // full
+    return rows;
+  }
+  const imputedRows = range.map((date) => {
+    if (base.length > 0 && base[0].date_value.getTime() <= date.getTime()) {
+      return base.shift();
+    }
+    // create an entry
+    return createCopy(template, date);
+  });
+  return imputedRows;
 }
 
 /**

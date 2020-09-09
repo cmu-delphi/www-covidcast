@@ -8,7 +8,7 @@
     isMobileDevice,
   } from '../../stores';
   import { generateLabels } from '../MapBox/colors';
-  import { DIRECTION_THEME } from '../../theme';
+  import { MISSING_COLOR, ZERO_COLOR } from '../../theme';
 
   export let loading = false;
 
@@ -25,7 +25,7 @@
 <style>
   ul {
     margin: 0;
-    padding: 0 2em 0 1em;
+    padding: 0 2em 0 0;
     display: flex;
     font-size: 80%;
   }
@@ -56,10 +56,25 @@
     text-align: center;
     color: #666;
   }
+
+  .tick-space {
+    margin-right: 2em;
+  }
+
+  .tick-single::after {
+    width: 100%;
+    transform: unset;
+  }
 </style>
 
 <ul class:loading-bg={loading}>
-  <li class="tick" style="background-color: {DIRECTION_THEME.countMin}" title={r.low}>{r.high}</li>
+  <li
+    class="tick tick-single"
+    style="background:repeating-linear-gradient(-45deg, {MISSING_COLOR}, white 30%)"
+    title="NA">
+    {r.high}
+  </li>
+  <li class="tick tick-single tick-space" style="background-color: {ZERO_COLOR}" title={r.low}>{r.high}</li>
   {#each r.labels as l}
     <li class="tick" style="background-image: linear-gradient(to right, {l.color}, {l.nextColor})" title={l.label}>
       {r.high}

@@ -178,6 +178,7 @@
   }
   .slider :global(.noUi-pips-horizontal) {
     padding: 3px 0;
+    height: unset;
   }
   .slider :global(.noUi-marker-horizontal.noUi-marker-large) {
     height: 10px;

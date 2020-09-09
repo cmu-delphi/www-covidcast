@@ -1,13 +1,14 @@
 <script>
-  import { currentRegionInfo, signalCasesOrDeathOptions, currentDateObject } from '../../stores';
-  import { fetchTimeSlice } from '../../data/fetchData';
+  import { currentRegionInfo, signalCasesOrDeathOptions, currentDateObject, smallMultipleTimeSpan } from '../../stores';
+  import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../Vega.svelte';
   import spec from './DetailView.json';
   import specCasesDeath from './DetailViewCasesDeath.json';
+  import specStdErr from './DetailViewStdErr.json';
   import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
   import { createEventDispatcher } from 'svelte';
   import { merge } from 'lodash-es';
-  import { primaryValue } from '../../stores/constants';
+  import { levelMegaCounty, primaryValue } from '../../stores/constants';
   import EncodingOptions from '../EncodingOptions.svelte';
   import { trackEvent } from '../../stores/ga';
 
@@ -21,7 +22,11 @@
     typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText($signalCasesOrDeathOptions) : sensor.mapTitleText;
 
   $: hasRegion = Boolean($currentRegionInfo);
-  $: data = $currentRegionInfo ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId) : [];
+  $: isMegaRegion = Boolean($currentRegionInfo) && $currentRegionInfo.level === levelMegaCounty.id;
+  $: noDataText = hasRegion ? (isMegaRegion ? `Please select a county` : 'No data available') : 'No location selected';
+  $: data = $currentRegionInfo
+    ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId).then(addMissing)
+    : [];
 
   $: regularPatch = {
     vconcat: [
@@ -37,13 +42,19 @@
       },
       {
         encoding: {
-          y: {
-            axis: {
-              title: sensor.yAxis || '',
-            },
-          },
           tooltip: [{ title: sensor.name }],
         },
+        layer: [
+          {
+            selection: {
+              brush: {
+                init: {
+                  x: [$smallMultipleTimeSpan[0].getTime(), $smallMultipleTimeSpan[1].getTime()],
+                },
+              },
+            },
+          },
+        ],
       },
     ],
   };
@@ -84,6 +95,18 @@
           },
           tooltip: [{ title: sensor.name }],
         },
+        layer: [
+          {},
+          {
+            selection: {
+              brush: {
+                init: {
+                  x: [$smallMultipleTimeSpan[0].getTime(), $smallMultipleTimeSpan[1].getTime()],
+                },
+              },
+            },
+          },
+        ],
       },
     ],
   };
@@ -97,7 +120,7 @@
           vconcat: [
             {
               width: size.width - 45,
-              height: size.height - 60 - 70,
+              height: size.height - 40 - 70,
               encoding: {
                 y: {
                   axis: {
@@ -109,13 +132,8 @@
             },
             {
               width: size.width - 45,
-              height: 60,
+              height: 40,
               encoding: {
-                y: {
-                  axis: {
-                    title: sensor.yAxis || '',
-                  },
-                },
                 tooltip: [{ title: sensor.name }],
               },
             },
@@ -171,7 +189,7 @@
 </style>
 
 <div class="header">
-  <h4>{sensor.name} of {$currentRegionInfo ? $currentRegionInfo.displayName : 'Unknown'}</h4>
+  <h4>{sensor.name} in {$currentRegionInfo ? $currentRegionInfo.displayName : 'Unknown'}</h4>
   <h5>{mapTitle}</h5>
   <button
     class="pg-button close"
@@ -186,9 +204,9 @@
 <div class="single-sensor-chart vega-wrapper">
   <Vega
     {data}
-    spec={sensor.isCasesOrDeath ? specCasesDeath : spec}
+    spec={sensor.isCasesOrDeath ? specCasesDeath : sensor.hasStdErr ? specStdErr : spec}
     {patchSpec}
-    noDataText={hasRegion ? 'No data available' : 'No location selected'}
+    {noDataText}
     signals={{ currentDate: $currentDateObject }} />
 </div>
 <div class="encoding">

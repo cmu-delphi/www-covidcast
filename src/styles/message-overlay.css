@@ -25,6 +25,11 @@
   justify-content: center;
   align-items: center;
   content: 'error occurred';
+  padding: 0.2em 0 1em 25px;
+  box-sizing: border-box;
+  text-align: center;
+  line-height: 1;
+  font-size: 0.88rem;
 }
 
 .message-overlay[data-message]::after {

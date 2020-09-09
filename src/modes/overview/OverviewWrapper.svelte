@@ -27,6 +27,9 @@
   import DetailView from '../../components/DetailView/DetailView.svelte';
   import MapOverlays from '../../components/MapOverlays.svelte';
   import { trackEvent } from '../../stores/ga';
+  import FaBan from 'svelte-icons/fa/FaBan.svelte';
+  import SingleModeToggle from '../../components/SingleModeToggle.svelte';
+  import modes from '..';
 
   export let wrapperClass;
   export let regionSearchList;
@@ -76,6 +79,8 @@
   });
 
   let mobileShowMap = true;
+  let desktopShowPanel = true;
+  let zoom = 1;
 </script>
 
 <style>
@@ -83,11 +88,11 @@
     position: relative;
     flex: 1 1 0;
     display: grid;
-    grid-template-columns: 1fr min(25%, 30em);
+    grid-template-columns: 1fr min(25%, 30em) auto;
     grid-template-rows: auto 1fr;
     grid-template-areas:
-      'options search'
-      'map panel';
+      'options search view'
+      'map panel panel';
     gap: 6px;
     background: var(--bg);
   }
@@ -100,7 +105,7 @@
   .root > :global(.search-container) {
     grid-area: search;
     z-index: 1009;
-    margin: 0 6px 6px 0;
+    margin: 0;
   }
 
   .map-container {
@@ -135,8 +140,17 @@
   }
 
   .view-switcher {
-    display: none;
+    display: flex;
+    margin-right: 6px;
     grid-area: view;
+  }
+
+  .mode-container {
+    position: absolute;
+    margin: 6px;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
   }
 
   .map-button {
@@ -144,11 +158,31 @@
     background-position: center;
     background-repeat: no-repeat;
     color: transparent;
-    background-image: url('../../assets/imgs/choropleth.png');
+    background-image: url('../../assets/imgs/choropleth_small.png');
   }
 
   .chart-button {
     color: #8c8c8c;
+  }
+
+  .hiddenPanel {
+    grid-template-areas:
+      'options search view'
+      'map map map';
+  }
+
+  .single-toggle > :global(svg:last-of-type) {
+    display: none;
+    position: absolute;
+  }
+
+  .single-toggle.selected > :global(svg:first-of-type) {
+    opacity: 0.5;
+    width: 70%;
+  }
+  .single-toggle.selected > :global(svg:last-of-type) {
+    display: unset;
+    opacity: 0.5;
   }
 
   /** mobile **/
@@ -172,14 +206,10 @@
     .panel-container {
       grid-area: map;
     }
-    .view-switcher {
-      display: flex;
-      margin-right: 6px;
-    }
   }
 </style>
 
-<main class="root base-font-size">
+<main class="root base-font-size" class:hiddenPanel={!$isMobileDevice && !desktopShowPanel}>
   <Options className="options-container" levels={levelList} />
   <Search
     className="search-container container-bg container-style"
@@ -193,37 +223,56 @@
       trackEvent('search', 'select', e.detail ? e.detail.id : '');
     }} />
 
-  <div class="view-switcher">
-    <div class="pg-button-group">
+  <div class="view-switcher container-bg">
+    {#if !$isMobileDevice}
       <button
-        aria-pressed={String(mobileShowMap)}
-        class="pg-button map-button"
-        class:selected={mobileShowMap}
+        aria-pressed={String(!desktopShowPanel)}
+        class="pg-button chart-button single-toggle"
+        class:selected={desktopShowPanel}
         on:click={() => {
-          trackEvent('overview', 'show-map', 'true');
-          mobileShowMap = true;
+          trackEvent('overview', 'show-panel', String(!desktopShowPanel));
+          desktopShowPanel = !desktopShowPanel;
         }}
-        title="Switch to Map">
-        <span aria-hidden>Switch to Map</span>
+        title="{desktopShowPanel ? 'Hide' : 'Show'} Line Charts panel">
+        <span aria-hidden>{desktopShowPanel ? 'Hide' : 'Show'} Line Charts panel</span>
         <FaChartLine />
+        <FaBan />
       </button>
-      <button
-        aria-pressed={String(!mobileShowMap)}
-        class="pg-button chart-button"
-        class:selected={!mobileShowMap}
-        on:click={() => {
-          trackEvent('overview', 'show-map', 'false');
-          mobileShowMap = false;
-        }}
-        title="Switch to Line Charts">
-        <span aria-hidden>Switch to Line Charts</span>
-        <FaChartLine />
-      </button>
-    </div>
+    {:else}
+      <div class="pg-button-group">
+        <button
+          aria-pressed={String(mobileShowMap)}
+          class="pg-button map-button"
+          class:selected={mobileShowMap}
+          on:click={() => {
+            trackEvent('overview', 'show-map', 'true');
+            mobileShowMap = true;
+          }}
+          title="Switch to Map">
+          <span aria-hidden>Switch to Map</span>
+          <FaChartLine />
+        </button>
+        <button
+          aria-pressed={String(!mobileShowMap)}
+          class="pg-button chart-button"
+          class:selected={!mobileShowMap}
+          on:click={() => {
+            trackEvent('overview', 'show-map', 'false');
+            mobileShowMap = false;
+          }}
+          title="Switch to Line Charts">
+          <span aria-hidden>Switch to Line Charts</span>
+          <FaChartLine />
+        </button>
+      </div>
+    {/if}
   </div>
 
   <div class="map-container" class:mobileHide={!mobileShowMap}>
-    <MapOverlays {map} mapLoading={loading} legendLoading={loading} />
+    <MapOverlays {map} mapLoading={loading} legendLoading={loading} {zoom} />
+    <div class="mode-container container-bg container-style">
+      <SingleModeToggle mode={modes[1]} />
+    </div>
     <MapBox
       bind:this={map}
       on:loading={(e) => (loading = e.detail)}
@@ -235,6 +284,7 @@
       selection={$currentRegionInfo}
       encoding={$encoding}
       on:ready={() => initialReady()}
+      on:zoom={(e) => (zoom = e.detail)}
       on:updatedEncoding={(e) => updatedEncoding(e.detail)}
       on:select={(e) => {
         selectByFeature(e.detail);
@@ -242,14 +292,14 @@
       }}
       {wrapperClass} />
 
-    {#if detailSensor != null}
+    {#if detailSensor != null && !$isMobileDevice && desktopShowPanel}
       <div class="detail-container container-bg container-style">
         <DetailView sensor={detailSensor} on:close={() => (detailSensor = null)} />
       </div>
     {/if}
   </div>
 
-  {#if !$isMobileDevice || !mobileShowMap}
+  {#if ($isMobileDevice && !mobileShowMap) || (!$isMobileDevice && desktopShowPanel)}
     <div class="panel-container container-bg container-style">
       <div class="panel-scroll-container">
         <SmallMultiplesPanel bind:detail={detailSensor} levels={levelList} />

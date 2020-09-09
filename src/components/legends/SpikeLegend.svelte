@@ -12,13 +12,13 @@
   import { transparent } from '../../util';
   import { generateLabels } from '../MapBox/colors';
 
-  const spikeBase = ENCODING_SPIKE_THEME.baseSize;
   const spikePadding = 2;
 
   export let loading = false;
+  export let zoom = 1.0;
 
-  $: size = ENCODING_SPIKE_THEME.size[$currentLevel] * spikeBase;
-  $: maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel] * spikeBase;
+  $: size = ENCODING_SPIKE_THEME.size[$currentLevel] * zoom;
+  $: maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel] * zoom;
   $: r = generateLabels(
     $stats,
     $currentSensorEntry,
@@ -27,14 +27,14 @@
     $signalCasesOrDeathOptions,
     $isMobileDevice,
   );
-  $: heightScale = $spikeHeightScale.clone().range([0, maxHeight]).domain(r.valueMinMax);
   $: maxPaddingHeight = maxHeight + spikePadding * 2;
 
-  function getSpikePath(value) {
-    if (!heightScale) {
-      return '';
-    }
-    return `M 0 ${heightScale(value)} L ${size} 0 L ${size * 2} ${heightScale(value)}`;
+  let getSpikePath = () => '';
+  $: {
+    const h = $spikeHeightScale;
+    const z = zoom;
+    const s = size;
+    getSpikePath = (value) => `M 0 ${h(value) * z} L ${s} 0 L ${s * 2} ${h(value) * z}`;
   }
 </script>
 
@@ -72,7 +72,7 @@
 <ul class="legend-ticks" class:loading-bg={loading}>
   {#each r.labels as l}
     <li class="legend-direct-tick">
-      <svg width={size * 2 + spikePadding * 2} height={heightScale(l.value) + spikePadding * 2}>
+      <svg width={size * 2 + spikePadding * 2} height={$spikeHeightScale(l.value) * zoom + spikePadding * 2}>
         <g style="transform:translate({spikePadding}px, {spikePadding}px)">
           <path
             d={getSpikePath(l.value)}
@@ -85,7 +85,7 @@
     </li>
   {/each}
   <li class="legend-direct-tick">
-    <svg width={size * 2 + spikePadding * 2} height={heightScale(r.highValue) + spikePadding * 2}>
+    <svg width={size * 2 + spikePadding * 2} height={$spikeHeightScale(r.highValue) * zoom + spikePadding * 2}>
       <g style="transform:translate({spikePadding}px, {spikePadding}px)">
         <path
           d={getSpikePath(r.highValue)}
