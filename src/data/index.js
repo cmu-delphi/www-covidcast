@@ -1,14 +1,5 @@
-import {
-  times,
-  currentDate,
-  yesterday,
-  stats,
-  currentSensor,
-  currentLevel,
-  MAGIC_START_DATE,
-  sensorMap,
-  sensorList,
-} from '../stores';
+import { times, currentDate, stats, currentSensor, currentLevel, MAGIC_START_DATE } from '../stores';
+import { sensorList, sensorMap, levels, swpaLevels, yesterday } from '../stores/constants';
 import { get } from 'svelte/store';
 import { callMetaAPI } from './api';
 
@@ -172,20 +163,23 @@ function loadCountSignal(sEntry, meta, timeMap, statsMap) {
  */
 export function loadMetaData(sensors) {
   const custom = sensors.filter((d) => d.meta).map((d) => d.meta(d.id, d.signal));
-  // const remoteSignals = sensors.filter((d) => !d.meta);
-  // TODO filter when ready
+  const remoteSignals = sensors.filter((d) => !d.meta);
   return Promise.all([
     callMetaAPI(
-      [], // remoteSignals,
+      remoteSignals,
       ['min_time', 'max_time', 'mean_value', 'stdev_value', 'signal', 'geo_type', 'data_source'],
       {
-        // time_types: 'day',
-        // geo_types: levels,
+        time_types: 'day',
+        geo_types: [...new Set([...levels, ...swpaLevels])],
       },
     ),
     ...custom,
   ]).then((metas) => {
     const meta = metas[0];
+    if (!Array.isArray(meta.epidata)) {
+      // bug in the API
+      meta.epidata = [...Object.values(meta.epidata)];
+    }
     meta.epidata.push(...metas.slice(1).flat(2));
     return processMetaData(meta);
   });
