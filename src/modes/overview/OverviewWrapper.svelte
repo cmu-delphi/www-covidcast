@@ -30,6 +30,7 @@
   import FaBan from 'svelte-icons/fa/FaBan.svelte';
   import SingleModeToggle from '../../components/SingleModeToggle.svelte';
   import modes from '..';
+  import { MAP_THEME } from '../../theme';
 
   export let wrapperClass;
   export let regionSearchList;
@@ -79,6 +80,8 @@
   let mobileShowMap = true;
   let desktopShowPanel = true;
   let zoom = 1;
+
+  $: selections = $currentRegionInfo ? [{ info: $currentRegionInfo, color: MAP_THEME.selectedRegionOutline }] : [];
 </script>
 
 <style>
@@ -279,7 +282,7 @@
       level={$currentLevel}
       signalType={$signalType}
       signalOptions={$signalCasesOrDeathOptions}
-      selection={$currentRegionInfo}
+      {selections}
       encoding={$encoding}
       on:ready={() => initialReady()}
       on:zoom={(e) => (zoom = e.detail)}
