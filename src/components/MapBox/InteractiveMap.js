@@ -3,6 +3,7 @@ import { levelMegaCounty } from '../../stores/constants';
 import { L, toFillLayer, toHoverLayer } from './layers';
 import { toBorderSource } from './sources';
 import Tooltip from './Tooltip.svelte';
+import { MAP_THEME } from '../../theme';
 
 export default class InteractiveMap {
   /**
@@ -25,15 +26,13 @@ export default class InteractiveMap {
       className: 'map-popup',
       anchor: 'top',
     });
-    this.clicked = {
-      id: null,
-      level: null,
-      mega: null,
-    };
+    /**
+     * @type {{id: string, level: string, color: string}[]}
+     */
+    this.selection = [];
     this.hovered = {
       id: null,
       level: null,
-      mega: null,
     };
 
     this.tooltipElement = document.createElement('div');
@@ -83,7 +82,7 @@ export default class InteractiveMap {
   _onLevelMouseLeave() {
     this.map.getCanvas().style.cursor = '';
     this.activePopup.remove();
-    this._updateHighlight(this.hovered, null, null);
+    this._updateHoverHighlight(null);
   }
   /**
    * @param {import('mapbox-gl').MapMouseEvent} e
@@ -91,7 +90,7 @@ export default class InteractiveMap {
   _onMegaMouseLeave() {
     this.map.getCanvas().style.cursor = '';
     this.activePopup.remove();
-    this._updateHighlight(this.hovered, null, null);
+    this._updateHoverHighlight(null);
   }
 
   /**
@@ -113,7 +112,7 @@ export default class InteractiveMap {
     }
     // mark handled
     e.preventDefault();
-    this._updateHighlight(this.hovered, feature.id, null, feature.properties.level);
+    this._updateHoverHighlight(feature.id, feature.properties.level);
     this._renderTooltip(e);
   }
 
@@ -132,7 +131,7 @@ export default class InteractiveMap {
 
     // mark handled
     e.preventDefault();
-    this._updateHighlight(this.hovered, null, feature.id);
+    this._updateHoverHighlight(feature.id, feature.properties.level);
     this._renderTooltip(e);
   }
 
@@ -156,7 +155,7 @@ export default class InteractiveMap {
       return;
     }
     e.preventDefault(); // mark handled
-    this.adapter.dispatch('select', feature);
+    this.adapter.dispatch('select', { feature, originalEvent: e.originalEvent });
   }
 
   /**
@@ -172,7 +171,7 @@ export default class InteractiveMap {
       return;
     }
     e.preventDefault(); // mark handled
-    this.adapter.dispatch('select', feature);
+    this.adapter.dispatch('select', { feature, originalEvent: e.originalEvent });
   }
 
   /**
@@ -203,25 +202,21 @@ export default class InteractiveMap {
   }
 
   _updateHoverLayerVisibility() {
-    const visibleLevels = new Set();
-    if (this.clicked.id != null) {
-      visibleLevels.add(this.clicked.level);
-    }
+    const visibleLevels = new Set(this.selection.map((d) => d.level));
     if (this.hovered.id != null) {
       visibleLevels.add(this.hovered.level);
     }
-    for (const level of this.adapter.levels) {
+    const updateLevel = (level) => {
       const visible = this.map.getLayoutProperty(toHoverLayer(level), 'visibility') !== 'none';
       if (visible !== visibleLevels.has(level)) {
         this.map.setLayoutProperty(toHoverLayer(level), 'visibility', visibleLevels.has(level) ? 'visible' : 'none');
       }
+    };
+    for (const level of this.adapter.levels) {
+      updateLevel(level);
     }
     if (this.adapter.hasMegaCountyLevel) {
-      const megaVisible = this.clicked.mega != null || this.hovered.mega != null;
-      const visible = this.map.getLayoutProperty(toHoverLayer(levelMegaCounty.id), 'visibility') !== 'none';
-      if (MouseEvent !== visible) {
-        this.map.setLayoutProperty(toHoverLayer(levelMegaCounty.id), 'visibility', megaVisible ? 'visible' : 'none');
-      }
+      updateLevel(levelMegaCounty.id);
     }
   }
 
@@ -231,52 +226,65 @@ export default class InteractiveMap {
    * @param {string | null} id
    * @param {string | null} mega
    */
-  _updateHighlight(obj, id = null, mega = null, level = this.adapter.level) {
-    const attr = obj === this.clicked ? 'select' : 'hover';
-    const setState = { [attr]: true };
-    const clearState = { [attr]: false };
-
+  _updateHoverHighlight(id = null, level = null) {
+    if (this.hovered.id == id) {
+      return;
+    }
     // match ids
-    if (obj.id !== id) {
-      if (obj.id) {
-        this._updateState(toBorderSource(obj.level), obj.id, clearState);
-      }
-      if (id) {
-        this._updateState(toBorderSource(level), id, setState);
-      }
-      obj.id = id;
-      // store level of selected id
-      obj.level = level;
+    if (this.hovered.id) {
+      this._updateState(toBorderSource(this.hovered.level), this.hovered.id, { hover: false });
     }
-
-    // match mega
-    if (this.adapter.hasMegaCountyLevel) {
-      if (obj.mega !== mega) {
-        if (obj.mega) {
-          this._updateState(toBorderSource(levelMegaCounty.id), obj.mega, clearState);
-        }
-        if (mega) {
-          this._updateState(toBorderSource(levelMegaCounty.id), mega, setState);
-        }
-        obj.mega = mega;
-      }
+    if (id) {
+      this._updateState(toBorderSource(level), id, { hover: true });
     }
+    this.hovered.id = id;
+    this.hovered.level = level;
     this._updateHoverLayerVisibility();
   }
 
   /**
-   *
    * @param {import('../../maps/nameIdInfo').NameInfo | null} selection
    */
   select(selection) {
-    const bak = Object.assign({}, this.clicked);
-    const id = selection != null && selection.level !== levelMegaCounty.id ? Number(selection.id) : null;
-    const megaId = selection != null && selection.level === levelMegaCounty.id ? Number(selection.id) : null;
-    this._updateHighlight(this.clicked, id, megaId, selection != null ? selection.level : this.adapter.level);
+    return this.selectMulti(selection ? [{ info: selection, color: MAP_THEME.selectedRegionOutline }] : [])[0];
+  }
+
+  /**
+   * @param {{info: import('../../maps/nameIdInfo').NameInfo, color: string}[]} selections
+   */
+  selectMulti(selections) {
+    const bak = this.selection.slice();
+
+    for (const old of this.selection) {
+      this._updateState(toBorderSource(old.level), old.id, { select: false });
+    }
+
+    this.selection = selections.map((s) => {
+      const id = Number(s.info.id);
+      this._updateState(toBorderSource(s.info.level), id, { select: s.color });
+      return {
+        id,
+        level: s.info.level,
+        color: s.color,
+      };
+    });
+
+    this._updateHoverLayerVisibility();
     return bak;
   }
 
   forceHover(feature) {
-    this._updateHighlight(this.hovered, feature.id, null, feature.properties.level);
+    this._updateHoverHighlight(feature.id, feature.properties.level);
+  }
+
+  /**
+   * @param {import('../../maps/nameIdInfo').NameInfo | null} selection
+   */
+  isHovered(selection) {
+    if (!selection) {
+      return false;
+    }
+    // == on purpose
+    return selection.id == this.hovered.id && selection.level === this.hovered.level;
   }
 }
