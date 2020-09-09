@@ -62,18 +62,24 @@ function parseData(d, mixinData = {}) {
   return data;
 }
 
-function parseMultipleData(d, signals, mixinData = {}) {
+function deriveCombineKey(mixinData = {}) {
+  let combineKey = (d) => `${d.geo_value}@${d.time_value}`;
+  // part of key
+  if (mixinData.time_value != null) {
+    combineKey = (d) => `${d.geo_value}`;
+  } else if (mixinData.geo_value == null) {
+    combineKey = (d) => `${d.time_value}`;
+  }
+  return combineKey;
+}
+
+function parseMultipleTreeData(d, signals, mixinData = {}) {
   if (d.result < 0 || d.message.includes('no results')) {
     return [];
   }
-  const data = d.epidata || [];
-
-  const bySignal = new Map(signals.map((d) => [d, []]));
-  for (const row of data) {
-    bySignal.get(row.signal).push(row);
-  }
-  const split = signals.map((k) => bySignal.get(k));
-  const combined = combineSignals(split, EPIDATA_CASES_OR_DEATH_VALUES);
+  const tree = d.epidata || [];
+  const split = signals.map((k) => tree[0][k]);
+  const combined = combineSignals(split, EPIDATA_CASES_OR_DEATH_VALUES, deriveCombineKey(mixinData));
   return parseData(
     {
       ...d,
@@ -90,6 +96,7 @@ function parseMultipleSeparateData(dataArr, mixinData = {}) {
   const combined = combineSignals(
     dataArr.map((d) => d.epidata || []),
     EPIDATA_CASES_OR_DEATH_VALUES,
+    deriveCombineKey(mixinData),
   );
   return parseData(
     {
@@ -114,6 +121,14 @@ function fetchData(sensorEntry, level, region, date, mixinValues = {}) {
   }
   const transferFields = computeTransferFields(mixinValues);
   function fetchSeparate() {
+    const extraDataFields = ['value'];
+    // part of key
+    if (mixinValues.time_value == null) {
+      extraDataFields.push(['time_value']);
+    }
+    if (mixinValues.geo_value == null) {
+      extraDataFields.push(['geo_value']);
+    }
     return Promise.all(
       EPIDATA_CASES_OR_DEATH_VALUES.map((k, i) =>
         callAPIEndPoint(
@@ -123,7 +138,7 @@ function fetchData(sensorEntry, level, region, date, mixinValues = {}) {
           level,
           date,
           region,
-          i === 0 ? transferFields : ['value'],
+          i === 0 ? transferFields : extraDataFields,
         ),
       ),
     ).then((d) => parseMultipleSeparateData(d, mixinValues));
@@ -131,17 +146,25 @@ function fetchData(sensorEntry, level, region, date, mixinValues = {}) {
 
   if (sensorEntry.isCasesOrDeath) {
     if (level === 'county' && region === '*') {
-      // around 2k
+      // around 2k each
       return fetchSeparate();
     }
     const signals = EPIDATA_CASES_OR_DEATH_VALUES.map((k) => sensorEntry.casesOrDeathSignals[k]);
-    // TODO separate
-    return callAPIEndPoint(sensorEntry.api, sensorEntry.id, signals.join(','), level, date, region).then((d) => {
+    return callAPIEndPoint(
+      sensorEntry.api,
+      sensorEntry.id,
+      signals.join(','),
+      level,
+      date,
+      region,
+      [...transferFields, 'signal'],
+      'tree',
+    ).then((d) => {
       if (d.result === 2) {
         // need to fetch separately, since too many results
         return fetchSeparate();
       }
-      return parseMultipleData(d, signals, mixinValues);
+      return parseMultipleTreeData(d, signals, mixinValues);
     });
   } else {
     return callAPIEndPoint(

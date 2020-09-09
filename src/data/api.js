@@ -13,7 +13,7 @@ const fetchOptions = process.env.NODE_ENV === 'development' ? { cache: 'force-ca
  * @param {Date | string} date
  * @param {string} region
  */
-export function callAPIEndPoint(endpoint, id, signal, level, date, region, fields) {
+export function callAPIEndPoint(endpoint, id, signal, level, date, region, fields, format = null) {
   if (typeof endpoint === 'function') {
     return Promise.resolve(endpoint(id, signal, level, date, region, fields));
   }
@@ -29,6 +29,9 @@ export function callAPIEndPoint(endpoint, id, signal, level, date, region, field
   url.searchParams.set('geo_value', region);
   if (fields) {
     url.searchParams.set('fields', fields.join(','));
+  }
+  if (format) {
+    url.searchParams.set('format', format);
   }
   return fetch(url.toString(), fetchOptions).then((d) => d.json());
 }

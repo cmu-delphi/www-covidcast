@@ -117,7 +117,6 @@
       $currentRegionInfo && !isMegaRegion
         ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, endDay, false, {
             geo_value: $currentRegionInfo.propertyId,
-            stderr: null,
           }).then(addMissing)
         : [],
     spec: chooseSpec(sensor, startDay, endDay),
