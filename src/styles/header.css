@@ -93,6 +93,9 @@ body.viz-body {
     padding-right: 0.5em;
     align-self: center;
   }
+  .viz-name > h3 {
+    font-size: 1rem;
+  }
 }
 
 .viz-group-link {
