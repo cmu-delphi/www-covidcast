@@ -285,7 +285,7 @@
       on:zoom={(e) => (zoom = e.detail)}
       on:updatedEncoding={(e) => updatedEncoding(e.detail)}
       on:select={(e) => {
-        selectByFeature(e.detail);
+        selectByFeature(e.detail, true);
         trackEvent('map', 'select', e.detail ? e.detail.id : '');
       }}
       {wrapperClass} />

@@ -156,8 +156,7 @@ export default class InteractiveMap {
       return;
     }
     e.preventDefault(); // mark handled
-    const nextValue = this.clicked.id === feature.id ? null : feature.id;
-    this.adapter.dispatch('select', nextValue ? feature : null);
+    this.adapter.dispatch('select', feature);
   }
 
   /**
@@ -173,8 +172,7 @@ export default class InteractiveMap {
       return;
     }
     e.preventDefault(); // mark handled
-    const nextValue = this.clicked.mega === feature.id ? null : feature.id;
-    this.adapter.dispatch('select', nextValue ? feature : null);
+    this.adapter.dispatch('select', feature);
   }
 
   /**
