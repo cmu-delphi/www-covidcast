@@ -68,6 +68,20 @@ function parseMultipleData(d, signals) {
   });
 }
 
+function parseMultipleSeparateData(dataArr) {
+  if (dataArr.length === 0 || dataArr[0].result < 0 || dataArr[0].message.includes('no results')) {
+    return [];
+  }
+  const combined = combineSignals(
+    dataArr.map((d) => d.epidata || []),
+    EPIDATA_CASES_OR_DEATH_VALUES,
+  );
+  return parseData({
+    ...dataArr[0],
+    epidata: combined,
+  });
+}
+
 /**
  * @param {SensorEntry} sensorEntry
  * @param {string} level
@@ -79,11 +93,27 @@ function fetchData(sensorEntry, level, region, date) {
   if (!region) {
     return Promise.resolve([]);
   }
+  function fetchSeparate() {
+    return Promise.all(
+      EPIDATA_CASES_OR_DEATH_VALUES.map((k) =>
+        callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.casesOrDeathSignals[k], level, date, region),
+      ),
+    ).then(parseMultipleSeparateData);
+  }
+
   if (sensorEntry.isCasesOrDeath) {
+    if (level === 'county' && region === '*') {
+      // around 2k
+      return fetchSeparate();
+    }
     const signals = EPIDATA_CASES_OR_DEATH_VALUES.map((k) => sensorEntry.casesOrDeathSignals[k]);
-    return callAPIEndPoint(sensorEntry.api, sensorEntry.id, signals.join(','), level, date, region).then((d) =>
-      parseMultipleData(d, signals),
-    );
+    return callAPIEndPoint(sensorEntry.api, sensorEntry.id, signals.join(','), level, date, region).then((d) => {
+      if (d.result === 2) {
+        // need to fetch separately, since too many results
+        return fetchSeparate();
+      }
+      return parseMultipleData(d, signals);
+    });
   } else {
     return callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.signal, level, date, region).then(parseData);
   }
