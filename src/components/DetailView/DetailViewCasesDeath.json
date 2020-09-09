@@ -25,6 +25,7 @@
           "field": "count",
           "type": "quantitative",
           "axis": {
+            "minExtent": 25,
             "title": " "
           }
         },
@@ -85,7 +86,13 @@
             }
           ],
           "selection": {
-            "highlight": { "type": "single", "empty": "none", "on": "mouseover" }
+            "highlight": {
+              "type": "single",
+              "empty": "none",
+              "on": "mouseover",
+              "clear": "mouseout",
+              "nearest": true
+            }
           },
           "mark": "bar",
           "encoding": {
@@ -116,11 +123,11 @@
       ]
     },
     {
-      "height": 60,
+      "height": 40,
       "encoding": {
         "color": {
           "condition": {
-            "selection": "highlight",
+            "selection": "highlight2",
             "value": "#aaaaaa"
           },
           "value": "#dddddd"
@@ -139,6 +146,8 @@
           "field": "count",
           "type": "quantitative",
           "axis": {
+            "minExtent": 25,
+            "tickCount": 3,
             "title": " "
           }
         },
@@ -184,11 +193,20 @@
             }
           ],
           "selection": {
-            "highlight": { "type": "single", "empty": "none", "on": "mouseover" },
+            "highlight2": {
+              "type": "single",
+              "empty": "none",
+              "nearest": true,
+              "on": "mouseover",
+              "clear": "mouseout"
+            },
             "brush": { "type": "interval", "encodings": ["x"] }
           }
         }
       ]
     }
-  ]
+  ],
+  "config": {
+    "padding": 0
+  }
 }

@@ -1,7 +1,7 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { bounds, loadSources } from '../../maps';
 import { levelMegaCounty, levels } from '../../stores/constants';
-import { ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME, MAP_THEME } from '../../theme';
+import { ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME, MAP_THEME, MISSING_COLOR } from '../../theme';
 import AMapBoxWrapper from './AMapBoxWrapper';
 import { BubbleEncoding, ChoroplethEncoding, SpikeEncoding } from './encodings';
 import { addCityLayers, addStateLabelLayer, L } from './layers';
@@ -32,9 +32,9 @@ export default class USMapBoxWrapper extends AMapBoxWrapper {
     super(dispatch, {
       bounds: bounds.states,
       encodings: [
-        new ChoroplethEncoding(),
-        new BubbleEncoding(ENCODING_BUBBLE_THEME),
-        new SpikeEncoding(ENCODING_SPIKE_THEME),
+        new ChoroplethEncoding(levels),
+        new BubbleEncoding(ENCODING_BUBBLE_THEME, levels),
+        new SpikeEncoding(ENCODING_SPIKE_THEME, levels),
       ],
       level: 'county',
       levels,
@@ -56,11 +56,7 @@ export default class USMapBoxWrapper extends AMapBoxWrapper {
   }
 
   addSources() {
-    return Promise.all([addCitySources(this.map), this.addLevelSources()]).then(() => {
-      for (const enc of this.encodings) {
-        enc.addSources(this.map, this);
-      }
-    });
+    return Promise.all([addCitySources(this.map), this.addLevelSources()]);
   }
 
   addLayers() {
@@ -82,8 +78,9 @@ export default class USMapBoxWrapper extends AMapBoxWrapper {
       source: toBorderSource('state'),
       type: 'fill',
       paint: {
-        'fill-color': MAP_THEME.stateFill,
+        'fill-color': MISSING_COLOR,
         'fill-outline-color': MAP_THEME.stateOutline,
+        'fill-pattern': 'hatching',
       },
     });
 

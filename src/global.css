@@ -23,7 +23,7 @@
 }
 
 /** mobile **/
-@media only screen and (max-height: 800px) {
+@media only screen and (max-height: 600px) {
   /** reserve all space and let the user scroll to the main app**/
 
   #vizbox {
@@ -31,8 +31,8 @@
     flex-basis: 100vh;
   }
   body.viz-body {
-    height: unset;
-    width: unset;
+    height: 100%;
+    width: 100%;
   }
 }
 

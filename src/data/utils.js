@@ -1,5 +1,6 @@
 // combining json with same geolocations but different value properties
 
+import { timeDay } from 'd3-time';
 import { timeParse, timeFormat } from 'd3-time-format';
 
 // json1 value is 7 day average, json2 value is single count
@@ -11,12 +12,17 @@ import { timeParse, timeFormat } from 'd3-time-format';
 export function combineSignals(data, keys) {
   const ref = data[0];
 
-  return ref.map((ref, i) => {
-    keys.forEach((key, j) => {
-      ref[key] = data[j].length > i ? Math.max(0, data[j][i].value) : 0;
-    });
-    return ref;
+  const map = new Map(ref.map((d) => [`${d.geo_value}@${d.time_value}`, d]));
+  data.forEach((rows, i) => {
+    const key = keys[i];
+    for (const d of rows) {
+      const entry = map.get(`${d.geo_value}@${d.time_value}`);
+      if (entry) {
+        entry[key] = d.value;
+      }
+    }
   });
+  return ref;
 }
 
 export function checkWIP(signalName, otherSignal) {
@@ -26,10 +32,11 @@ export function checkWIP(signalName, otherSignal) {
   return otherSignal;
 }
 
-/**
- * @type {(v: string) => Date}
- */
-export const parseAPITime = timeParse('%Y%m%d');
+const parseAPITimeParser = timeParse('%Y%m%d');
+
+export function parseAPITime(v) {
+  return timeDay(parseAPITimeParser(v));
+}
 /**
  * @type {(v: Date) => string}
  */
