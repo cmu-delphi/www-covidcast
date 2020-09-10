@@ -120,8 +120,9 @@ export class CustomLayer {
     gl.uniformMatrix4fv(this._uPos, false, matrix);
     gl.uniform1f(this._uZoom, this.zoom);
 
-    const xToClip = 2 / (gl.canvas.width / window.devicePixelRatio);
-    const yToClip = 2 / (gl.canvas.height / window.devicePixelRatio);
+    const bb = gl.canvas.getBoundingClientRect();
+    const xToClip = 2 / bb.width;
+    const yToClip = 2 / bb.height;
     gl.uniform2f(this._uPixelToClip, xToClip, yToClip);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this._colorAndValueBuffer);
