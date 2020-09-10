@@ -1,6 +1,7 @@
 <script>
   import MapBox from '../../components/MapBox/MapBox.svelte';
   import Options from '../../components/Options.svelte';
+  import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
   import FaChartLine from 'svelte-icons/fa/FaChartLine.svelte';
 
   import {
@@ -100,13 +101,30 @@
     .flat();
 
   function addCompare(info) {
+    if (!$currentRegionInfo) {
+      selectByInfo(info);
+      return;
+    }
+
     compareSelections = [
       ...compareSelections,
       {
         info,
-        color: compareColors.shift() || 'grey',
+        color: compareColors[compareSelections.length] || 'grey',
       },
     ];
+  }
+
+  function removeCompare(info) {
+    const bak = compareSelections.slice();
+    if ($currentRegionInfo && info.id === $currentRegionInfo.id) {
+      selectByInfo(bak.length === 0 ? null : bak[0].info);
+      compareSelections = bak.slice(1).map((old, i) => ({ ...old, color: compareColors[i] || 'grey' }));
+      return;
+    }
+    compareSelections = compareSelections
+      .filter((d) => d.info !== info)
+      .map((old, i) => ({ ...old, color: compareColors[i] || 'grey' }));
   }
 </script>
 
@@ -252,6 +270,16 @@
     padding-right: 0.2em;
   }
 
+  .selection-legend:hover .selection-toolbar {
+    opacity: 1;
+  }
+
+  .selection-toolbar {
+    font-size: 0.7rem;
+    float: right;
+    opacity: 0;
+  }
+
   .selection-container {
     margin-bottom: 6px;
   }
@@ -370,7 +398,9 @@
           pickMapMode = false;
         } else {
           selectByFeature(e.detail.feature, true);
-          trackEvent('map', 'select', e.detail.feature.id);
+          if (e.detail.feature) {
+            trackEvent('map', 'select', e.detail.feature.id);
+          }
         }
       }}
       {wrapperClass} />
@@ -407,7 +437,15 @@
       <div class="selection-container container-bg container-style">
         <ul>
           {#each selections as selection}
-            <li class="selection-legend" style="color: {selection.color}">{selection.info.displayName}</li>
+            <li class="selection-legend" style="color: {selection.color}">
+              <button
+                class="selection-toolbar pg-button"
+                on:click={() => removeCompare(selection.info)}
+                title="Remove selected">
+                <IoIosClose />
+              </button>
+              <span>{selection.info.displayName}</span>
+            </li>
           {/each}
         </ul>
       </div>

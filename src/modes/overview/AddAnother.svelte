@@ -51,6 +51,8 @@
   .root {
     flex: 1 1 0;
     margin-bottom: 6px;
+    display: flex;
+    flex-direction: column;
   }
 
   h4 {
@@ -67,7 +69,16 @@
 
   ol,
   ul {
+    flex: 1 1 0;
     overflow: auto;
+  }
+
+  ul.empty {
+    flex: 0 0 auto;
+  }
+
+  ol {
+    flex: 2 1 0;
   }
 
   li {
@@ -127,7 +138,7 @@
   </button>
 
   <h5>Select from recent locations</h5>
-  <ul>
+  <ul class:empty={possibleRecent.length === 0}>
     {#each possibleRecent as info}
       <li>
         <button class="button" on:click={() => dispatch('add', info)}>{info.displayName}</button>
