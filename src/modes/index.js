@@ -23,12 +23,6 @@ export default [
     component: () => import(/* webpackPrefech: true */ './timelapse/TimeLapse.svelte').then((r) => r.default),
   },
   // {
-  //   id: 'compare',
-  //   label: 'Compare',
-  //   tooltip: 'Switch to Comparison Mode',
-  //   component: () => import(/* webpackPrefech: true */ './compare/Compare.svelte').then((r) => r.default),
-  // },
-  // {
   //   id: 'hotspots',
   //   label: 'Hotspots',
   //   tooltip: 'Switch to Hotspots Mode',

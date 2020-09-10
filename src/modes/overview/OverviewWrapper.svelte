@@ -79,6 +79,7 @@
 
   let mobileShowMap = true;
   let desktopShowPanel = true;
+  let showCompare = false;
   let zoom = 1;
 
   $: selections = $currentRegionInfo ? [{ info: $currentRegionInfo, color: MAP_THEME.selectedRegionOutline }] : [];
@@ -96,6 +97,13 @@
       'map panel panel';
     gap: 6px;
     background: var(--bg);
+  }
+
+  .root.compare {
+    grid-template-columns: 1fr min(25%, 30em) min(25%, 30em);
+    grid-template-areas:
+      'options dummy dummy'
+      'map panel add';
   }
 
   .root > :global(.options-container) {
@@ -116,8 +124,28 @@
 
   .panel-container {
     grid-area: panel;
-    position: relative;
+    display: flex;
+    flex-direction: column;
     margin-right: 6px;
+  }
+
+  .add-container {
+    grid-area: add;
+    display: flex;
+    flex-direction: column;
+    margin-right: 6px;
+  }
+
+  .panel-wrapper {
+    position: relative;
+    flex: 1 1 0;
+  }
+
+  .panel-bottom-wrapper {
+    margin-top: 6px;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: center;
   }
 
   .panel-scroll-container {
@@ -210,64 +238,67 @@
   }
 </style>
 
-<main class="root base-font-size" class:hiddenPanel={!$isMobileDevice && !desktopShowPanel}>
+<main class="root base-font-size" class:hiddenPanel={!$isMobileDevice && !desktopShowPanel} class:compare={showCompare}>
   <Options className="options-container" levels={levelList} />
-  <Search
-    className="search-container container-bg container-style"
-    placeholder="Search for a location..."
-    items={regionSearchList}
-    selectedItem={$currentRegionInfo}
-    labelFieldName="displayName"
-    maxItemsToShowInList="5"
-    on:change={(e) => {
-      selectByInfo(e.detail);
-      trackEvent('search', 'select', e.detail ? e.detail.id : '');
-    }} />
 
-  <div class="view-switcher container-bg">
-    {#if !$isMobileDevice}
-      <button
-        aria-pressed={String(!desktopShowPanel)}
-        class="pg-button chart-button single-toggle"
-        class:selected={desktopShowPanel}
-        on:click={() => {
-          trackEvent('overview', 'show-panel', String(!desktopShowPanel));
-          desktopShowPanel = !desktopShowPanel;
-        }}
-        title="{desktopShowPanel ? 'Hide' : 'Show'} Line Charts panel">
-        <span aria-hidden>{desktopShowPanel ? 'Hide' : 'Show'} Line Charts panel</span>
-        <FaChartLine />
-        <FaBan />
-      </button>
-    {:else}
-      <div class="pg-button-group">
+  {#if !showCompare}
+    <Search
+      className="search-container container-bg container-style"
+      placeholder="Search for a location..."
+      items={regionSearchList}
+      selectedItem={$currentRegionInfo}
+      labelFieldName="displayName"
+      maxItemsToShowInList="5"
+      on:change={(e) => {
+        selectByInfo(e.detail);
+        trackEvent('search', 'select', e.detail ? e.detail.id : '');
+      }} />
+
+    <div class="view-switcher container-bg">
+      {#if !$isMobileDevice}
         <button
-          aria-pressed={String(mobileShowMap)}
-          class="pg-button map-button"
-          class:selected={mobileShowMap}
+          aria-pressed={String(!desktopShowPanel)}
+          class="pg-button chart-button single-toggle"
+          class:selected={desktopShowPanel}
           on:click={() => {
-            trackEvent('overview', 'show-map', 'true');
-            mobileShowMap = true;
+            trackEvent('overview', 'show-panel', String(!desktopShowPanel));
+            desktopShowPanel = !desktopShowPanel;
           }}
-          title="Switch to Map">
-          <span aria-hidden>Switch to Map</span>
+          title="{desktopShowPanel ? 'Hide' : 'Show'} Line Charts panel">
+          <span aria-hidden>{desktopShowPanel ? 'Hide' : 'Show'} Line Charts panel</span>
           <FaChartLine />
+          <FaBan />
         </button>
-        <button
-          aria-pressed={String(!mobileShowMap)}
-          class="pg-button chart-button"
-          class:selected={!mobileShowMap}
-          on:click={() => {
-            trackEvent('overview', 'show-map', 'false');
-            mobileShowMap = false;
-          }}
-          title="Switch to Line Charts">
-          <span aria-hidden>Switch to Line Charts</span>
-          <FaChartLine />
-        </button>
-      </div>
-    {/if}
-  </div>
+      {:else}
+        <div class="pg-button-group">
+          <button
+            aria-pressed={String(mobileShowMap)}
+            class="pg-button map-button"
+            class:selected={mobileShowMap}
+            on:click={() => {
+              trackEvent('overview', 'show-map', 'true');
+              mobileShowMap = true;
+            }}
+            title="Switch to Map">
+            <span aria-hidden>Switch to Map</span>
+            <FaChartLine />
+          </button>
+          <button
+            aria-pressed={String(!mobileShowMap)}
+            class="pg-button chart-button"
+            class:selected={!mobileShowMap}
+            on:click={() => {
+              trackEvent('overview', 'show-map', 'false');
+              mobileShowMap = false;
+            }}
+            title="Switch to Line Charts">
+            <span aria-hidden>Switch to Line Charts</span>
+            <FaChartLine />
+          </button>
+        </div>
+      {/if}
+    </div>
+  {/if}
 
   <div class="map-container" class:mobileHide={!mobileShowMap}>
     <MapOverlays {map} mapLoading={loading} legendLoading={loading} {zoom} />
@@ -301,10 +332,20 @@
   </div>
 
   {#if ($isMobileDevice && !mobileShowMap) || (!$isMobileDevice && desktopShowPanel)}
-    <div class="panel-container container-bg container-style">
-      <div class="panel-scroll-container">
-        <SmallMultiplesPanel bind:detail={detailSensor} levels={levelList} />
+    <div class="panel-container">
+      <div class="panel-wrapper container-bg container-style">
+        <div class="panel-scroll-container">
+          <SmallMultiplesPanel bind:detail={detailSensor} levels={levelList} region={$currentRegionInfo} />
+        </div>
+      </div>
+      <div class="panel-bottom-wrapper container-bg container-style">
+        <button class="pg-button pg-text-button" on:click={() => (showCompare = !showCompare)}>
+          {showCompare ? 'Exit' : 'Open'} compare mode
+        </button>
       </div>
     </div>
+  {/if}
+  {#if showCompare}
+    <div class="add-container container-bg container-style" />
   {/if}
 </main>

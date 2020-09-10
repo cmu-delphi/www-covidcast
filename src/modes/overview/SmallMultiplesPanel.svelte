@@ -1,12 +1,5 @@
 <script>
-  import {
-    sensorList,
-    currentSensor,
-    currentDateObject,
-    currentRegionInfo,
-    smallMultipleTimeSpan,
-    currentDate,
-  } from '../../stores';
+  import { sensorList, currentSensor, currentDateObject, smallMultipleTimeSpan, currentDate } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../../components/Vega.svelte';
@@ -108,16 +101,19 @@
     }
   }
 
-  $: hasRegion = Boolean($currentRegionInfo);
-  $: isMegaRegion = Boolean($currentRegionInfo) && $currentRegionInfo.level === levelMegaCounty.id;
+  /**
+   * @type {import('../../maps').NameInfo | null}
+   */
+  export let region = null;
+
+  $: hasRegion = Boolean(region);
+  $: isMegaRegion = Boolean(region) && region.level === levelMegaCounty.id;
   $: noDataText = hasRegion ? (isMegaRegion ? `Please select a county` : 'No data available') : 'No location selected';
   $: sensorsWithData = sensors.map((sensor) => ({
     sensor,
     data:
-      $currentRegionInfo && !isMegaRegion
-        ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, endDay, false).then(
-            addMissing,
-          )
+      region && !isMegaRegion
+        ? fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false).then(addMissing)
         : [],
     spec: chooseSpec(sensor, startDay, endDay),
   }));
