@@ -7,6 +7,7 @@ import {
   encoding,
   currentMode,
   signalCasesOrDeathOptions,
+  currentCompareSelection,
 } from '.';
 
 export function trackUrl(url) {
@@ -35,4 +36,13 @@ currentMode.subscribe((mode) => trackEvent('mode', 'set', mode.id));
 signalCasesOrDeathOptions.subscribe((r) => {
   trackEvent('signalCasesOrDeathOptions', 'cumulative', String(r.cumulative));
   trackEvent('signalCasesOrDeathOptions', 'ratio', String(r.ratio));
+});
+currentCompareSelection.subscribe((compare) => {
+  if (!compare) {
+    trackEvent('compare', 'set', 'close');
+  } else if (compare.length === 0) {
+    trackEvent('compare', 'set', 'open');
+  } else {
+    trackEvent('compare', 'change', compare.map((d) => d.info.propertyId).join(','));
+  }
 });

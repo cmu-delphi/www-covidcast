@@ -21,6 +21,7 @@
     currentDateObject,
     signalCasesOrDeathOptions,
     isMobileDevice,
+    currentCompareSelection,
   } from '../../stores';
   import Search from '../../components/Search.svelte';
   import SmallMultiplesPanel from './SmallMultiplesPanel.svelte';
@@ -82,20 +83,14 @@
 
   let mobileShowMap = true;
   let desktopShowPanel = true;
-  let showCompare = false;
   let pickMapMode = false;
   let zoom = 1;
 
-  /**
-   * @type {{info: import('../../maps').NameInfo, color: string}[]}
-   */
-  let compareSelections = [];
-
-  let compareColors = selectionColors.slice();
+  $: showCompare = $currentCompareSelection != null;
 
   $: selections = [
     $currentRegionInfo && { info: $currentRegionInfo, color: MAP_THEME.selectedRegionOutline },
-    showCompare && compareSelections,
+    showCompare && $currentCompareSelection,
   ]
     .filter(Boolean)
     .flat();
@@ -106,25 +101,25 @@
       return;
     }
 
-    compareSelections = [
-      ...compareSelections,
+    $currentCompareSelection = [
+      ...$currentCompareSelection,
       {
         info,
-        color: compareColors[compareSelections.length] || 'grey',
+        color: selectionColors[$currentCompareSelection.length] || 'grey',
       },
     ];
   }
 
   function removeCompare(info) {
-    const bak = compareSelections.slice();
+    const bak = $currentCompareSelection.slice();
     if ($currentRegionInfo && info.id === $currentRegionInfo.id) {
       selectByInfo(bak.length === 0 ? null : bak[0].info);
-      compareSelections = bak.slice(1).map((old, i) => ({ ...old, color: compareColors[i] || 'grey' }));
+      $currentCompareSelection = bak.slice(1).map((old, i) => ({ ...old, color: selectionColors[i] || 'grey' }));
       return;
     }
-    compareSelections = compareSelections
+    $currentCompareSelection = $currentCompareSelection
       .filter((d) => d.info !== info)
-      .map((old, i) => ({ ...old, color: compareColors[i] || 'grey' }));
+      .map((old, i) => ({ ...old, color: selectionColors[i] || 'grey' }));
   }
 </script>
 
@@ -420,7 +415,7 @@
         </div>
       </div>
       <div class="panel-bottom-wrapper container-bg container-style">
-        <button class="pg-button pg-text-button" on:click={() => (showCompare = !showCompare)}>
+        <button class="pg-button pg-text-button" on:click={() => currentCompareSelection.set(showCompare ? null : [])}>
           {showCompare ? 'Exit' : 'Open'} compare mode
         </button>
       </div>

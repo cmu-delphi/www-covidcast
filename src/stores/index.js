@@ -17,6 +17,7 @@ export {
   groupedSensorList,
 } from './constants';
 import { timeMonth } from 'd3-time';
+import { selectionColors } from '../theme';
 
 /**
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
@@ -242,3 +243,17 @@ export const isMobileDevice = readable(false, (set) => {
 //     set(r.matches);
 //   });
 // });
+
+// overview compare mode
+
+// null = disable
+// []
+/**
+ * @type {import('svelte/store').Writable<{info: NameInfo, color: string}[] | null>}
+ * */
+export const currentCompareSelection = writable(null, (set) => {
+  const ids = (urlParams.get('compare') || '').split(',').map(getInfoByName).filter(Boolean);
+  if (ids.length > 0) {
+    set(ids.map((info, i) => ({ info, color: selectionColors[i] || 'grey' })));
+  }
+});
