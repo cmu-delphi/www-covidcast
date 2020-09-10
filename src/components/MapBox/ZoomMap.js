@@ -3,11 +3,12 @@ import { LngLatBounds } from 'mapbox-gl';
 import { bounds } from '../../maps';
 
 export default class ZoomMap {
-  constructor() {
+  constructor(onZoom) {
     /**
      * @type {import('mapbox-gl').Map | null}
      */
     this.map = null;
+    this.onZoom = onZoom;
     this.stateBounds = new LngLatBounds(bounds.states);
     this.stateBoundsOptions = {
       padding: 20, //px
@@ -20,6 +21,27 @@ export default class ZoomMap {
       padding: 20, //px
       linear: false,
     };
+  }
+
+  _triggerZoom(paint) {
+    // console.log(this.map.getZoom(), this.stateZoom, this.map.getZoom() / this.stateZoom);
+    const z = this.map.getZoom() / this.stateZoom;
+    this.onZoom(z, paint);
+  }
+
+  setMap(map) {
+    this.map = map;
+
+    this.stateZoom = this.map.getZoom();
+    // console.log(this.stateZoom);
+    this.map.on('zoom', () => {
+      this._triggerZoom();
+    });
+  }
+
+  ready() {
+    this.stateZoom = this.map.getZoom();
+    this._triggerZoom();
   }
 
   getZoom() {
@@ -57,12 +79,9 @@ export default class ZoomMap {
     this.initialZoomView = true;
     this.map.fitBounds(this.stateBounds, this.stateBoundsOptions);
     this.map.once('idle', () => {
-      this.ready();
+      this.stateZoom = this.map.getZoom();
+      this._triggerZoom(true);
     });
-  }
-
-  ready() {
-    this.stateZoom = this.map.getZoom();
   }
 
   resized() {

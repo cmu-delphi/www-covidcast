@@ -43,7 +43,19 @@ export default class MapBoxWrapper {
     this.encoding = this.encodings[0];
     // set a good default value
     this.level = 'county';
-    this.zoom = new ZoomMap();
+
+    const throttled = throttle((z) => this.dispatch('zoom', z), 100);
+    this.zoom = new ZoomMap((z, paint) => {
+      for (const encoding of this.encodings) {
+        if (typeof encoding.onZoom === 'function') {
+          encoding.onZoom(z);
+        }
+      }
+      if (paint) {
+        this.map.triggerRepaint();
+      }
+      throttled(z);
+    });
   }
 
   /**
@@ -64,22 +76,10 @@ export default class MapBoxWrapper {
       touchZoomRotate: true,
       antialias: true,
     });
-    this.zoom.map = this.map;
+    this.zoom.setMap(this.map);
     this.map.touchZoomRotate.disableRotation();
     // this.map.addControl(new AttributionControl({ compact: true }));
     // .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
-
-    const throttled = throttle((z) => this.dispatch('zoom', z), 100);
-
-    this.map.on('zoom', () => {
-      const z = this.map.getZoom() / this.zoom.stateZoom;
-      for (const encoding of this.encodings) {
-        if (typeof encoding.onZoom === 'function') {
-          encoding.onZoom(z * window.devicePixelRatio);
-        }
-      }
-      throttled(z);
-    });
 
     let resolveCallback = null;
 
