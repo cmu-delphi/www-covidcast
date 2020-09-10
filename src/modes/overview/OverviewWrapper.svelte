@@ -30,7 +30,9 @@
   import FaBan from 'svelte-icons/fa/FaBan.svelte';
   import SingleModeToggle from '../../components/SingleModeToggle.svelte';
   import modes from '..';
-  import { MAP_THEME } from '../../theme';
+  import { MAP_THEME, selectionColors } from '../../theme';
+  import AddAnother from './AddAnother.svelte';
+  import { getInfoByName } from '../../maps';
 
   export let wrapperClass;
   export let regionSearchList;
@@ -80,9 +82,32 @@
   let mobileShowMap = true;
   let desktopShowPanel = true;
   let showCompare = false;
+  let pickMapMode = false;
   let zoom = 1;
 
-  $: selections = $currentRegionInfo ? [{ info: $currentRegionInfo, color: MAP_THEME.selectedRegionOutline }] : [];
+  /**
+   * @type {{info: import('../../maps').NameInfo, color: string}[]}
+   */
+  let compareSelections = [];
+
+  let compareColors = selectionColors.slice();
+
+  $: selections = [
+    $currentRegionInfo && { info: $currentRegionInfo, color: MAP_THEME.selectedRegionOutline },
+    showCompare && compareSelections,
+  ]
+    .filter(Boolean)
+    .flat();
+
+  function addCompare(info) {
+    compareSelections = [
+      ...compareSelections,
+      {
+        info,
+        color: compareColors.shift() || 'grey',
+      },
+    ];
+  }
 </script>
 
 <style>
@@ -168,6 +193,10 @@
     flex-direction: column;
   }
 
+  .pick :global(*) {
+    cursor: crosshair !important;
+  }
+
   .view-switcher {
     display: flex;
     margin-right: 6px;
@@ -212,6 +241,11 @@
   .single-toggle.selected > :global(svg:last-of-type) {
     display: unset;
     opacity: 0.5;
+  }
+
+  .selection-legend {
+    border-left: 1em solid grey;
+    list-style-type: none;
   }
 
   /** mobile **/
@@ -300,7 +334,7 @@
     </div>
   {/if}
 
-  <div class="map-container" class:mobileHide={!mobileShowMap}>
+  <div class="map-container" class:mobileHide={!mobileShowMap} class:pick={pickMapMode}>
     <MapOverlays {map} mapLoading={loading} legendLoading={loading} {zoom} />
     <div class="mode-container container-bg container-style">
       <SingleModeToggle mode={modes[1]} />
@@ -319,8 +353,14 @@
       on:zoom={(e) => (zoom = e.detail)}
       on:updatedEncoding={(e) => updatedEncoding(e.detail)}
       on:select={(e) => {
-        selectByFeature(e.detail.feature, true);
-        trackEvent('map', 'select', e.detail.feature.id);
+        if (pickMapMode) {
+          const info = getInfoByName(e.detail.feature.properties.id);
+          addCompare(info);
+          pickMapMode = false;
+        } else {
+          selectByFeature(e.detail.feature, true);
+          trackEvent('map', 'select', e.detail.feature.id);
+        }
       }}
       {wrapperClass} />
 
@@ -335,7 +375,7 @@
     <div class="panel-container">
       <div class="panel-wrapper container-bg container-style">
         <div class="panel-scroll-container">
-          <SmallMultiplesPanel bind:detail={detailSensor} levels={levelList} region={$currentRegionInfo} />
+          <SmallMultiplesPanel bind:detail={detailSensor} levels={levelList} {selections} />
         </div>
       </div>
       <div class="panel-bottom-wrapper container-bg container-style">
@@ -346,6 +386,18 @@
     </div>
   {/if}
   {#if showCompare}
-    <div class="add-container container-bg container-style" />
+    <div class="add-container">
+      <AddAnother {regionSearchList} bind:pickMapMode on:add={(e) => addCompare(e.detail)} {selections}/>
+      <div class="container-bg container-style">
+        <ul>
+          {#each selections as selection}
+            <li class="selection-legend">
+              <span color={selection.color}>■</span>
+              {selection.info.displayName}
+            </li>
+          {/each}
+        </ul>
+      </div>
+    </div>
   {/if}
 </main>

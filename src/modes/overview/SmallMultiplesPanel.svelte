@@ -102,11 +102,13 @@
   }
 
   /**
-   * @type {import('../../maps').NameInfo | null}
+   * @type {{info: import('../../maps').NameInfo, color: string}[]}
    */
-  export let region = null;
+  export let selections = [];
+  $: region = selections.length > 0 ? selections[0].info : null;
 
-  $: hasRegion = Boolean(region);
+  $: hasRegion = selections.length > 0;
+
   $: isMegaRegion = Boolean(region) && region.level === levelMegaCounty.id;
   $: noDataText = hasRegion ? (isMegaRegion ? `Please select a county` : 'No data available') : 'No location selected';
   $: sensorsWithData = sensors.map((sensor) => ({
