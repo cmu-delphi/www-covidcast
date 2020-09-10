@@ -70,7 +70,7 @@
     <MapControls zoom={map ? map.zoom : null} showEncodings loading={mapLoading} />
   </div>
 </div>
-<div class="legend-container base-font-size">
+<div class="legend-container base-font-size" aria-label="map legend">
   <EncodingOptions sensor={$currentSensorEntry} className="container-bg container-style encoding-wrapper" />
   <div class="container-bg container-style">
     {#if $isDirectionSignalType}
