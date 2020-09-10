@@ -141,6 +141,28 @@ export const currentRegion = writable('', (set) => {
 export const currentRegionInfo = derived([currentRegion], ([current]) => getInfoByName(current));
 
 /**
+ * @type {import('svelte/store').Writable<import('../maps').NameInfo[]>}
+ */
+export const recentRegionInfos = writable([]);
+
+// keep track of top 10 recent selections
+currentRegionInfo.subscribe((v) => {
+  if (!v) {
+    return;
+  }
+  const infos = get(recentRegionInfos).slice();
+  const index = infos.indexOf(v);
+  if (index >= 0) {
+    infos.splice(index, 1);
+  }
+  if (infos.length > 10) {
+    infos.shift();
+  }
+  infos.push(v);
+  recentRegionInfos.set(infos);
+});
+
+/**
  *
  * @param {import('../maps/nameIdInfo').NameInfo | null} elem
  */
