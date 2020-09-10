@@ -145,7 +145,10 @@
   <ol class:loading>
     {#each top10Data as row}
       <li>
-        <button class="button" disabled={!row.info} on:click={() => dispatch('add', row.info)}>
+        <button
+          class="button"
+          disabled={!row.info || selections.some((d) => d.info.id === row.info.id)}
+          on:click={() => dispatch('add', row.info)}>
           {row.displayName} ({$currentSensorEntry.formatValue(row.value)})
         </button>
       </li>

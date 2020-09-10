@@ -101,6 +101,18 @@
     }
   }
 
+  function fetchMulti(sensor, selections, startDay, endDay) {
+    return Promise.all(
+      selections.map((s) => {
+        const region = s.info;
+        if (region.level === levelMegaCounty.id) {
+          return [];
+        }
+        return fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false).then(addMissing);
+      }),
+    ).then((rows) => rows.flat());
+  }
+
   /**
    * @type {{info: import('../../maps').NameInfo, color: string}[]}
    */
@@ -108,15 +120,17 @@
   $: region = selections.length > 0 ? selections[0].info : null;
 
   $: hasRegion = selections.length > 0;
+  $: multi = selections.length > 1;
 
   $: isMegaRegion = Boolean(region) && region.level === levelMegaCounty.id;
   $: noDataText = hasRegion ? (isMegaRegion ? `Please select a county` : 'No data available') : 'No location selected';
   $: sensorsWithData = sensors.map((sensor) => ({
     sensor,
-    data:
-      region && !isMegaRegion
-        ? fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false).then(addMissing)
-        : [],
+    data: multi
+      ? fetchMulti(sensor, selections, startDay, endDay)
+      : region && !isMegaRegion
+      ? fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false).then(addMissing)
+      : [],
     spec: chooseSpec(sensor, startDay, endDay),
   }));
 
