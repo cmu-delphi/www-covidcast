@@ -244,8 +244,19 @@
   }
 
   .selection-legend {
-    border-left: 1em solid grey;
     list-style-type: none;
+  }
+  .selection-legend::before {
+    content: '\25FC';
+    margin-left: -1em;
+    padding-right: 0.2em;
+  }
+
+  .selection-container {
+    margin-bottom: 6px;
+  }
+  .selection-container > ul {
+    padding: 0;
   }
 
   /** mobile **/
@@ -387,14 +398,16 @@
   {/if}
   {#if showCompare}
     <div class="add-container">
-      <AddAnother {regionSearchList} bind:pickMapMode on:add={(e) => addCompare(e.detail)} {selections}/>
-      <div class="container-bg container-style">
+      <AddAnother
+        {regionSearchList}
+        bind:pickMapMode
+        on:add={(e) => addCompare(e.detail)}
+        {selections}
+        mapData={data} />
+      <div class="selection-container container-bg container-style">
         <ul>
           {#each selections as selection}
-            <li class="selection-legend">
-              <span color={selection.color}>■</span>
-              {selection.info.displayName}
-            </li>
+            <li class="selection-legend" style="color: {selection.color}">{selection.info.displayName}</li>
           {/each}
         </ul>
       </div>
