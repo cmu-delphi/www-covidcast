@@ -6,16 +6,6 @@ export function isPropSignal(signal) {
   return signal.match(/prop/);
 }
 
-export function getType(signal) {
-  if (isCountSignal(signal)) {
-    return 'count';
-  }
-  if (isPropSignal(signal)) {
-    return 'prop';
-  }
-  return 'other';
-}
-
 export function isDeathSignal(signal) {
   const deathsRegex = /deaths_/;
   return signal.match(deathsRegex);

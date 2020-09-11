@@ -6,7 +6,7 @@
   import specCasesDeath from './DetailViewCasesDeath.json';
   import specStdErr from './DetailViewStdErr.json';
   import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import { merge } from 'lodash-es';
   import { levelMegaCounty, primaryValue } from '../../stores/constants';
   import EncodingOptions from '../EncodingOptions.svelte';
@@ -25,7 +25,9 @@
   $: isMegaRegion = Boolean($currentRegionInfo) && $currentRegionInfo.level === levelMegaCounty.id;
   $: noDataText = hasRegion ? (isMegaRegion ? `Please select a county` : 'No data available') : 'No location selected';
   $: data = $currentRegionInfo
-    ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId).then(addMissing)
+    ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, undefined, undefined, false, {
+        geo_value: $currentRegionInfo.propertyId,
+      }).then(addMissing)
     : [];
 
   $: regularPatch = {
@@ -154,6 +156,14 @@
       dispatch('close');
     }
   }
+
+  let close = null;
+
+  onMount(() => {
+    if (close) {
+      close.focus();
+    }
+  });
 </script>
 
 <style>
@@ -192,6 +202,7 @@
   <h4>{sensor.name} in {$currentRegionInfo ? $currentRegionInfo.displayName : 'Unknown'}</h4>
   <h5>{mapTitle}</h5>
   <button
+    bind:this={close}
     class="pg-button close"
     on:click={() => {
       trackEvent('detail-view', 'close', 'button');

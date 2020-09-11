@@ -288,7 +288,7 @@ export default class AMapBoxWrapper {
     return level;
   }
 
-  updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, stopsMega, scale) {
+  updateOptions(encoding, level, signalType, sensor, sensorType, valueMinMax, stops, stopsMega, scale) {
     level = this.validateLevel(level);
     // changed the visibility of layers
     const oldLevel = this.level;
@@ -326,6 +326,7 @@ export default class AMapBoxWrapper {
     const r = this.encoding.encode(this.map, {
       level,
       signalType,
+      sensorType,
       sensor,
       valueMinMax,
       stops,
@@ -479,7 +480,7 @@ export default class AMapBoxWrapper {
     const defaultFeature = source._data.features.find((d) => d.properties.id === defaultRegion);
     if (defaultFeature && !this.isMissing(defaultFeature)) {
       this.interactive.forceHover(defaultFeature);
-      this.dispatch('select', defaultFeature);
+      this.dispatch('select', { feature: defaultFeature });
       return;
     }
 
@@ -490,6 +491,6 @@ export default class AMapBoxWrapper {
     const index = Math.floor(Math.random() * (viableFeatures.length - 1));
     const randomFeature = viableFeatures[index];
     this.interactive.forceHover(randomFeature);
-    this.dispatch('select', randomFeature);
+    this.dispatch('select', { feature: randomFeature });
   }
 }

@@ -25,7 +25,7 @@
   } from '../../stores';
   import Search from '../../components/Search.svelte';
   import SmallMultiplesPanel from './SmallMultiplesPanel.svelte';
-  import { fetchRegionSlice } from '../../data/fetchData';
+  import { fetchRegionSlice } from '../../data';
   import DetailView from '../../components/DetailView/DetailView.svelte';
   import MapOverlays from '../../components/MapOverlays.svelte';
   import { trackEvent } from '../../stores/ga';
@@ -79,7 +79,9 @@
       currentLevel.set(levelList[0].id);
     }
   }
-  $: data = fetchRegionSlice($currentSensorEntry, $currentLevel, $currentDateObject);
+  $: data = fetchRegionSlice($currentSensorEntry, $currentLevel, $currentDateObject, {
+    stderr: null,
+  });
 
   let mobileShowMap = true;
   let desktopShowPanel = true;

@@ -84,7 +84,9 @@
       dataBuffer.delete(r); // delece since used
       return r;
     }
-    return fetchRegionSlice($currentSensorEntry, $currentLevel, date);
+    return fetchRegionSlice($currentSensorEntry, $currentLevel, date, {
+      stderr: null,
+    });
   }
 
   /**
@@ -101,7 +103,12 @@
       if (dataBuffer.has(key)) {
         continue;
       }
-      dataBuffer.set(key, fetchRegionSlice($currentSensorEntry, $currentLevel, toLoad));
+      dataBuffer.set(
+        key,
+        fetchRegionSlice($currentSensorEntry, $currentLevel, toLoad, {
+          stderr: null,
+        }),
+      );
     }
   }
 
@@ -265,7 +272,7 @@
       <div slot="title">{$currentDateObject.toLocaleDateString()}</div>
     </MapOverlays>
     <div class="mode-container container-bg container-style">
-      <SingleModeToggle mode={modes[0]} label="Back" />
+      <SingleModeToggle mode={modes[0]} label="Back to visualization" />
     </div>
     <MapBox
       bind:this={map}

@@ -23,10 +23,10 @@ export default [
     component: () => import(/* webpackPrefech: true */ './timelapse/TimeLapse.svelte').then((r) => r.default),
   },
   // {
-  //   id: 'hotspots',
-  //   label: 'Hotspots',
-  //   tooltip: 'Switch to Hotspots Mode',
-  //   component: () => import(/* webpackPrefetch: true */ './hotspots/Hotspots.svelte').then((r) => r.default),
+  //   id: 'top10',
+  //   label: 'Top 10',
+  //   tooltip: 'Switch to Top 10 Mode',
+  //   component: () => import(/* webpackPrefetch: true */ './top10/Top10.svelte').then((r) => r.default),
   // },
   // {
   //   id: 'swpa',
