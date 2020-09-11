@@ -59,6 +59,15 @@ function processMetaData(meta) {
   };
 }
 
+function updateTimeMap(key, matchedMeta, timeMap) {
+  timeMap.set(key, [matchedMeta.min_time, matchedMeta.max_time > yesterday ? yesterday : matchedMeta.max_time]);
+}
+function updateStatsMap(key, matchedMeta, statsMap) {
+  statsMap.set(key, {
+    mean: matchedMeta.mean_value,
+    std: matchedMeta.stdev_value,
+  });
+}
 /**
  * @param {import('./fetchData').SensorEntry} sEntry
  */
@@ -68,16 +77,8 @@ function loadRegularSignal(sEntry, meta, timeMap, statsMap) {
   );
 
   if (matchedMeta) {
-    if (matchedMeta.max_time > yesterday) {
-      matchedMeta.max_time = yesterday;
-    }
-
-    timeMap.set(sEntry.key, [matchedMeta.min_time, matchedMeta.max_time]);
-
-    statsMap.set(sEntry.key, {
-      mean: matchedMeta.mean_value,
-      std: matchedMeta.stdev_value,
-    });
+    updateTimeMap(sEntry.key, matchedMeta, timeMap);
+    updateStatsMap(sEntry.key, matchedMeta, statsMap);
     return;
   }
   // If no metadata, use information from sensors
@@ -103,16 +104,8 @@ function loadCountSignal(sEntry, meta, timeMap, statsMap) {
     const matchedMeta = possibleMetaRows.find((d) => d.signal === sEntry.signal && d.geo_type === region);
 
     if (matchedMeta) {
-      if (matchedMeta.max_time > yesterday) {
-        matchedMeta.max_time = yesterday;
-      }
-
-      timeMap.set(sEntry.key, [matchedMeta.min_time, matchedMeta.max_time]);
-
-      statsMap.set(statsKey, {
-        mean: matchedMeta.mean_value,
-        std: matchedMeta.stdev_value,
-      });
+      updateTimeMap(sEntry.key, matchedMeta, timeMap);
+      updateStatsMap(statsKey, matchedMeta, statsMap);
       return;
     }
     // If no metadata, use information from sensors
@@ -142,25 +135,23 @@ function loadCountSignal(sEntry, meta, timeMap, statsMap) {
 
   Object.keys(sEntry.casesOrDeathSignals).map((key) => {
     const signal = sEntry.casesOrDeathSignals[key];
+
+    const matchedMeta = possibleMetaRows.find((d) => d.signal === signal);
+    const statsKey = `${sEntry.key}_${key}`;
+    if (matchedMeta) {
+      updateTimeMap(sEntry.key, matchedMeta, timeMap);
+      updateStatsMap(statsKey, matchedMeta, statsMap);
+    }
+
     // compute stats for each sub signal also
     regions.forEach((region) => {
       const statsKey = toStatsRegionKey(sEntry.key, region) + `_${key}`;
       const matchedMeta = possibleMetaRows.find((d) => d.signal === signal && d.geo_type === region);
 
-      if (!matchedMeta) {
-        return;
+      if (matchedMeta) {
+        updateTimeMap(sEntry.key, matchedMeta, timeMap);
+        updateStatsMap(statsKey, matchedMeta, statsMap);
       }
-
-      if (matchedMeta.max_time > yesterday) {
-        matchedMeta.max_time = yesterday;
-      }
-
-      timeMap.set(sEntry.key, [matchedMeta.min_time, matchedMeta.max_time]);
-
-      statsMap.set(statsKey, {
-        mean: matchedMeta.mean_value,
-        std: matchedMeta.stdev_value,
-      });
     });
   });
 }

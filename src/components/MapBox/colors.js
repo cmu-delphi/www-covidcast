@@ -17,9 +17,10 @@ const TICK_COUNT = 7;
  * @param {import('../../stores/constants').CasesOrDeathOptions} signalOptions
  */
 export function determineMinMax(statsLookup, sensorEntry, level, signalOptions) {
+  let key = sensorEntry.key;
   // Customize min max values for deaths
-  if (sensorEntry.isCount) {
-    let key = sensorEntry.key + '_' + level;
+  if (sensorEntry.getType(signalOptions) === 'count') {
+    key += `_${level}`;
     if (sensorEntry.isCasesOrDeath) {
       key += `_${primaryValue(sensorEntry, signalOptions)}`;
     }
@@ -27,32 +28,35 @@ export function determineMinMax(statsLookup, sensorEntry, level, signalOptions) 
     return [Math.max(MAGIC_MIN_STATS, stats.mean - 3 * stats.std), stats.mean + 3 * stats.std];
   }
 
-  const stats = statsLookup.get(sensorEntry.key);
+  if (sensorEntry.isCasesOrDeath) {
+    key += `_${primaryValue(sensorEntry, signalOptions)}`;
+  }
+  const stats = statsLookup.get(key);
   return [Math.max(0, stats.mean - 3 * stats.std), stats.mean + 3 * stats.std];
 }
 
 /**
- * @param {import('../../stores/constants').SensorEntry} sensorEntry
+ * @param {'prop' | 'count' | 'other'} sensorType
  * @param {'value' || 'direction'} signalType
  * @param {[number, number]} valueMinMax
  */
-export function determineColorScale(valueMinMax, signalType, sensorEntry) {
+export function determineColorScale(valueMinMax, signalType, sensorType) {
   if (signalType === 'value') {
-    return determineValueColorScale(valueMinMax, sensorEntry);
+    return determineValueColorScale(valueMinMax, sensorType);
   }
   // signalType is 'direction'
   return determineDirectionColorScale();
 }
 
 /**
- * @param {import('../../stores/constants').SensorEntry} sensorEntry
+ * @param {'prop' | 'count' | 'other'} sensorType
  * @param {[number, number]} valueMinMax
  */
-function determineValueColorScale(valueMinMax, sensorEntry) {
-  if (sensorEntry.isCount) {
+function determineValueColorScale(valueMinMax, sensorType) {
+  if (sensorType === 'count') {
     return countSignalColorScale(valueMinMax);
   }
-  if (sensorEntry.isProp) {
+  if (sensorType === 'prop') {
     return propSignalColorScale(valueMinMax);
   }
   return regularSignalColorScale(valueMinMax);
@@ -132,11 +136,12 @@ export function splitDomain(min, max, parts) {
 
 /**
  * @param {import('../../stores/constants').SensorEntry} sensorEntry
+ * @param {import('../../stores/constants').CasesOrDeathOptions} signalOptions
  * @param {[number, number]} valueMinMax
  */
-function computeTicks(sensorEntry, valueMinMax, small) {
+function computeTicks(sensorEntry, signalOptions, valueMinMax, small) {
   const numTicks = small ? SMALL_TICK_COUNT : TICK_COUNT;
-  if (sensorEntry.isCount) {
+  if (sensorEntry.getType(signalOptions) === 'count') {
     const min = Math.log10(Math.max(10e-3, valueMinMax[0]));
     const max = Math.log10(Math.max(10e-2, valueMinMax[1]));
     return logspace(min, max, numTicks);
@@ -170,7 +175,7 @@ export function generateLabels(stats, sensorEntry, level, colorScale, signalOpti
     };
   }
 
-  const ticks = computeTicks(sensorEntry, valueMinMax, small);
+  const ticks = computeTicks(sensorEntry, signalOptions, valueMinMax, small);
 
   return {
     low: sensorEntry.formatValue(0), // fixed 0

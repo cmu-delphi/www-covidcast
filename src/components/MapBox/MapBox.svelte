@@ -54,14 +54,15 @@
   function updateEncoding(level, encoding, sensor, signalType, stats, signalOptions) {
     // Get the range for the heatmap.
     const sensorEntry = sensorMap.get(sensor);
+    const sensorType = sensorEntry.getType(signalOptions);
     const valueMinMax = determineMinMax(stats, sensorEntry, level, signalOptions);
-    const { stops, scale } = determineColorScale(valueMinMax, signalType, sensorEntry);
+    const { stops, scale } = determineColorScale(valueMinMax, signalType, sensorType);
     const drawMega = level === 'county';
     const ret = wrapper.updateOptions(
       encoding,
       level,
       signalType,
-      sensor,
+      sensorType,
       valueMinMax,
       stops,
       drawMega && stops,
