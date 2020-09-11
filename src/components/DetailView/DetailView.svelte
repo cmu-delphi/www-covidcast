@@ -1,7 +1,7 @@
 <script>
   import { currentRegionInfo, signalCasesOrDeathOptions, currentDateObject, smallMultipleTimeSpan } from '../../stores';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
-  import Vega from '../vega/Vega.svelte';
+  import Vega from '../Vega.svelte';
   import spec from './DetailView.json';
   import specCasesDeath from './DetailViewCasesDeath.json';
   import specStdErr from './DetailViewStdErr.json';
@@ -10,6 +10,7 @@
   import { merge } from 'lodash-es';
   import { levelMegaCounty, primaryValue } from '../../stores/constants';
   import EncodingOptions from '../EncodingOptions.svelte';
+  import { trackEvent } from '../../stores/ga';
 
   const dispatch = createEventDispatcher();
   /**
@@ -24,7 +25,9 @@
   $: isMegaRegion = Boolean($currentRegionInfo) && $currentRegionInfo.level === levelMegaCounty.id;
   $: noDataText = hasRegion ? (isMegaRegion ? `Please select a county` : 'No data available') : 'No location selected';
   $: data = $currentRegionInfo
-    ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId).then(addMissing)
+    ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, undefined, undefined, false, {
+        geo_value: $currentRegionInfo.propertyId,
+      }).then(addMissing)
     : [];
 
   $: regularPatch = {
@@ -149,6 +152,7 @@
    */
   function onEscCheck(e) {
     if (e.key === 'Escape' || e.key === 'Esc') {
+      trackEvent('detail-view', 'close', 'keyboard');
       dispatch('close');
     }
   }
@@ -189,7 +193,13 @@
 <div class="header">
   <h4>{sensor.name} in {$currentRegionInfo ? $currentRegionInfo.displayName : 'Unknown'}</h4>
   <h5>{mapTitle}</h5>
-  <button class="pg-button close" on:click={() => dispatch('close')} title="Close this detail view">
+  <button
+    class="pg-button close"
+    on:click={() => {
+      trackEvent('detail-view', 'close', 'button');
+      dispatch('close');
+    }}
+    title="Close this detail view">
     <IoIosClose />
   </button>
 </div>

@@ -6,7 +6,6 @@ import {
   currentDate,
   signalType,
   encoding,
-  currentZone,
   signalCasesOrDeathOptions,
 } from '.';
 import { get } from 'svelte/store';
@@ -21,7 +20,6 @@ function updateURIParameters(delta) {
     date: get(currentDate),
     signalType: get(signalType),
     encoding: get(encoding),
-    zone: get(currentZone),
     mode: get(currentMode).id,
     signalC: get(signalCasesOrDeathOptions).cumulative,
     signalR: get(signalCasesOrDeathOptions).ratio,
@@ -71,8 +69,3 @@ signalCasesOrDeathOptions.subscribe((r) =>
 );
 encoding.subscribe((encoding) => updateURIParameters({ encoding }));
 currentMode.subscribe((mode) => updateURIParameters({ mode: mode.id }));
-currentZone.subscribe((zone) =>
-  updateURIParameters({
-    zone,
-  }),
-);

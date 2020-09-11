@@ -1,6 +1,8 @@
 import { formatAPITime, isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data';
+import { interpolateYlOrRd } from 'd3-scale-chromatic';
 import { checkWIP } from '../data/utils';
 import { format } from 'd3-format';
+// import { generateMockSignal, generateMockMeta } from '../data/mock';
 
 export const levelList = [
   {
@@ -28,7 +30,21 @@ export const levelMegaCounty = {
 };
 export const levelsWithMega = levels.concat(levelMegaCounty.id);
 
-const levelById = new Map(levelList.map((l) => [l.id, l]));
+export const swpaLevelList = levelList.concat([
+  {
+    id: 'zip',
+    label: 'Zip Code',
+    labelPlural: 'Zip Codes',
+  },
+  {
+    id: 'neighborhood',
+    label: 'Neighborhood/Municipal',
+    labelPlural: 'Neighborhoods/Municipals',
+  },
+]);
+export const swpaLevels = swpaLevelList.map((l) => l.id);
+
+const levelById = new Map([...levelList, ...swpaLevelList].map((l) => [l.id, l]));
 
 export function getLevelInfo(level) {
   return (
@@ -60,13 +76,15 @@ export function getLevelInfo(level) {
  * @property {string} format
  * @property {(v: number) => string} formatValue
  * @property {string} signal
- * @property {string?} api
+ * @property {string?|() => any[]} api
+ * @property {(() => any[])?} meta
  * @property {(v: number) => string} formatValue
  * @property {boolean} hasStdErr
  * @property {boolean} isCasesOrDeath is cases or death signal
  * @property {boolean} isCount is count signal
  * @property {boolean} isProp is prop signal
  * @property {Record<keyof EpiDataCasesOrDeathValues, string>} casesOrDeathSignals signal to load for cases or death
+ * @property {)(v: number) => string)} colorScale
  */
 
 /**
@@ -147,11 +165,15 @@ export function extendSensorEntry(sensorEntry) {
     isProp: isPropSignal(key),
     isCasesOrDeath,
     casesOrDeathSignals: isCasesOrDeath ? generateCasesOrDeathSignals(signal) : {},
+    colorScale: sensorEntry.colorScale || interpolateYlOrRd,
   });
 }
 
 export const defaultSensorId = 'doctor-visits';
 
+/**
+ * @type {Partial<SensorEntry>[]}
+ */
 const defaultSensors = [
   {
     type: 'public',
@@ -196,6 +218,7 @@ const defaultSensors = [
     yAxis: 'Percentage',
     format: 'percent',
     hasStdErr: false,
+    // colorScale: interpolateBlues,
   },
   {
     type: 'early',
@@ -311,6 +334,19 @@ const defaultSensors = [
     format: 'raw',
     hasStdErr: false,
   },
+  // {
+  //   type: 'other',
+  //   name: 'Mock Signal',
+  //   id: 'mock',
+  //   signal: 'mock',
+  //   levels: ['county', 'state', 'msa', 'neighborhood', 'zip'],
+  //   tooltipText: 'Mock Signal',
+  //   mapTitleText: 'Mock Signal',
+  //   yAxis: 'Mock Signal',
+  //   format: 'percent',
+  //   api: generateMockSignal,
+  //   meta: generateMockMeta,
+  // },
 ];
 
 /**
