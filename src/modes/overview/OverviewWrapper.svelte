@@ -404,7 +404,7 @@
 
     {#if detailSensor != null && !$isMobileDevice && desktopShowPanel}
       <div class="detail-container container-bg container-style">
-        <DetailView sensor={detailSensor} on:close={() => (detailSensor = null)} />
+        <DetailView sensor={detailSensor} {selections} on:close={() => (detailSensor = null)} />
       </div>
     {/if}
   </div>

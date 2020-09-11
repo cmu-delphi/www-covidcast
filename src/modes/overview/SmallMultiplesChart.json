@@ -41,6 +41,7 @@
       }
     },
     "tooltip": [
+      { "field": "displayName", "type": "nominal", "title": "Region" },
       { "field": "value", "type": "quantitative", "title": "Value", "format": ".2f" },
       { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
     ]

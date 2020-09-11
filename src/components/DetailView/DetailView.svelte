@@ -1,5 +1,5 @@
 <script>
-  import { currentRegionInfo, signalCasesOrDeathOptions, currentDateObject, smallMultipleTimeSpan } from '../../stores';
+  import { signalCasesOrDeathOptions, currentDateObject, smallMultipleTimeSpan } from '../../stores';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../Vega.svelte';
   import spec from './DetailView.json';
@@ -21,12 +21,40 @@
   $: mapTitle =
     typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText($signalCasesOrDeathOptions) : sensor.mapTitleText;
 
-  $: hasRegion = Boolean($currentRegionInfo);
-  $: isMegaRegion = Boolean($currentRegionInfo) && $currentRegionInfo.level === levelMegaCounty.id;
+  function fetchMulti(sensor, selections) {
+    return Promise.all(
+      selections.map((s) => {
+        const region = s.info;
+        if (region.level === levelMegaCounty.id) {
+          return [];
+        }
+        return fetchTimeSlice(sensor, region.level, region.propertyId, undefined, undefined, false, {
+          geo_value: region.propertyId,
+        })
+          .then(addMissing)
+          .then((rows) =>
+            rows.map((row) => {
+              row.displayName = region.displayName;
+              return row;
+            }),
+          );
+      }),
+    ).then((rows) => rows.flat());
+  }
+  /**
+   * @type {{info: import('../../maps').NameInfo, color: string}[]}
+   */
+  export let selections = [];
+  $: region = selections.length > 0 ? selections[0].info : null;
+  $: hasRegion = selections.length > 0;
+  $: multi = selections.length > 1;
+  $: isMegaRegion = Boolean(region) && region.level === levelMegaCounty.id;
   $: noDataText = hasRegion ? (isMegaRegion ? `Please select a county` : 'No data available') : 'No location selected';
-  $: data = $currentRegionInfo
-    ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, undefined, undefined, false, {
-        geo_value: $currentRegionInfo.propertyId,
+  $: data = multi
+    ? fetchMulti(sensor, selections)
+    : region && !isMegaRegion
+    ? fetchTimeSlice(sensor, region.level, region.propertyId, undefined, undefined, false, {
+        geo_value: region.propertyId,
       }).then(addMissing)
     : [];
 
@@ -39,12 +67,12 @@
               title: sensor.yAxis || '',
             },
           },
-          tooltip: [{ title: sensor.name }],
+          tooltip: [{}, { title: sensor.name }],
         },
       },
       {
         encoding: {
-          tooltip: [{ title: sensor.name }],
+          tooltip: [{}, { title: sensor.name }],
         },
         layer: [
           {
@@ -68,6 +96,7 @@
             field: primaryValue(sensor, $signalCasesOrDeathOptions).replace('avg', 'count'),
           },
           tooltip: [
+            {},
             { title: sensor.name },
             {},
             { title: `${sensor.name} per 100k` },
@@ -95,7 +124,7 @@
           y: {
             field: primaryValue(sensor, $signalCasesOrDeathOptions).replace('avg', 'count'),
           },
-          tooltip: [{ title: sensor.name }],
+          tooltip: [{}, { title: sensor.name }],
         },
         layer: [
           {},
@@ -129,14 +158,14 @@
                     title: sensor.yAxis || '',
                   },
                 },
-                tooltip: [{ title: sensor.name }],
+                tooltip: [{}, { title: sensor.name }],
               },
             },
             {
               width: size.width - 45,
               height: 40,
               encoding: {
-                tooltip: [{ title: sensor.name }],
+                tooltip: [{}, { title: sensor.name }],
               },
             },
           ],
@@ -199,7 +228,7 @@
 </style>
 
 <div class="header">
-  <h4>{sensor.name} in {$currentRegionInfo ? $currentRegionInfo.displayName : 'Unknown'}</h4>
+  <h4>{sensor.name} in {region ? region.displayName : 'Unknown'}</h4>
   <h5>{mapTitle}</h5>
   <button
     bind:this={close}

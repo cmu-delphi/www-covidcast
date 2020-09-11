@@ -30,6 +30,7 @@
           }
         },
         "tooltip": [
+          { "field": "displayName", "type": "nominal", "title": "Region" },
           { "field": "count", "type": "quantitative", "title": "New Cases", "format": ".2f" },
           { "field": "avg", "type": "quantitative", "title": "7-day average", "format": ".2f" },
           { "field": "countRatio", "type": "quantitative", "title": "New Cases per 100k", "format": ".2f" },
@@ -96,12 +97,19 @@
           },
           "mark": "bar",
           "encoding": {
-            "color": {
+            "opacity": {
               "condition": {
                 "selection": "highlight",
-                "value": "#aaaaaa"
+                "value": 1
               },
-              "value": "#dddddd"
+              "value": 0.4
+            },
+            "color": {
+              "field": "geo_value",
+              "type": "nominal",
+              "scale": {
+                "range": ["grey", "#0F0589", "#16A997", "#A71808", "#CD22B2", "#F58B29"]
+              }
             }
           }
         },
@@ -113,7 +121,7 @@
           },
           "encoding": {
             "color": {
-              "value": "black"
+              "field": "geo_value"
             },
             "y": {
               "field": "avg"
@@ -125,12 +133,12 @@
     {
       "height": 40,
       "encoding": {
-        "color": {
+        "opacity": {
           "condition": {
             "selection": "highlight2",
-            "value": "#aaaaaa"
+            "value": 1
           },
-          "value": "#dddddd"
+          "value": 0.4
         },
         "x": {
           "field": "date_value",
@@ -152,6 +160,7 @@
           }
         },
         "tooltip": [
+          { "field": "displayName", "type": "nominal", "title": "Region" },
           { "field": "count", "type": "quantitative", "title": "New Cases", "format": ".2f" },
           { "field": "avg", "type": "quantitative", "title": "7-day average", "format": ".2f" },
           { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
@@ -186,6 +195,15 @@
           "data": {
             "name": "values"
           },
+          "encoding": {
+            "color": {
+              "field": "geo_value",
+              "type": "nominal",
+              "scale": {
+                "range": ["grey", "#0F0589", "#16A997", "#A71808", "#CD22B2", "#F58B29"]
+              }
+            }
+          },
           "transform": [
             {
               "calculate": "datum.date_value",
@@ -207,6 +225,9 @@
     }
   ],
   "config": {
-    "padding": 0
+    "padding": 0,
+    "legend": {
+      "disable": true
+    }
   }
 }

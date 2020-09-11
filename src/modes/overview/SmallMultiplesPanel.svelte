@@ -110,7 +110,14 @@
         }
         return fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false, {
           geo_value: region.propertyId,
-        }).then(addMissing);
+        })
+          .then(addMissing)
+          .then((rows) =>
+            rows.map((row) => {
+              row.displayName = region.displayName;
+              return row;
+            }),
+          );
       }),
     ).then((rows) => rows.flat());
   }
@@ -133,7 +140,14 @@
       : region && !isMegaRegion
       ? fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false, {
           geo_value: region.propertyId,
-        }).then(addMissing)
+        })
+          .then(addMissing)
+          .then((rows) =>
+            rows.map((row) => {
+              row.displayName = region.displayName;
+              return row;
+            }),
+          )
       : [],
     spec: chooseSpec(sensor, startDay, endDay),
   }));
