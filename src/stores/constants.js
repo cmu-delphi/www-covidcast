@@ -82,7 +82,7 @@ export function getLevelInfo(level) {
  * @property {boolean} hasStdErr
  * @property {boolean} isCasesOrDeath is cases or death signal
  * @property {boolean} isCount is count signal
- * @property {boolean} isProp is prop signal
+ * @property {(options?: CasesOrDeathOptions) => 'prop' | 'count' | 'other')} getType
  * @property {Record<keyof EpiDataCasesOrDeathValues, string>} casesOrDeathSignals signal to load for cases or death
  * @property {)(v: number) => string)} colorScale
  */
@@ -149,6 +149,29 @@ export function primaryValue(sensorEntry, sensorOptions) {
 }
 
 /**
+ * determines the primary value to show or lookup
+ * @param {SensorEntry} sensorEntry
+ * @param {CasesOrDeathOptions} sensorOptions
+ */
+function getType(sensorEntry, sensorOptions) {
+  let signal = sensorEntry.signal;
+  if (sensorEntry.isCasesOrDeath) {
+    if (sensorOptions.cumulative) {
+      signal = sensorEntry.casesOrDeathSignals[sensorOptions.ratio ? 'avgRatioCumulative' : 'avgCumulative'];
+    } else {
+      signal = sensorEntry.casesOrDeathSignals[sensorOptions.ratio ? 'avgRatio' : 'avg'];
+    }
+  }
+  if (isCountSignal(signal)) {
+    return 'count';
+  }
+  if (isPropSignal(signal)) {
+    return 'prop';
+  }
+  return 'other';
+}
+
+/**
  *
  * @param {*} sensorEntry
  */
@@ -162,7 +185,7 @@ export function extendSensorEntry(sensorEntry) {
     tooltipText: sensorEntry.tooltipText || sensorEntry.mapTitleText,
     formatValue: sensorEntry.format === 'percent' ? percentFormatter : isCount ? countFormatter : rawFormatter,
     isCount,
-    isProp: isPropSignal(key),
+    getType: (options) => getType(sensorEntry, options),
     isCasesOrDeath,
     casesOrDeathSignals: isCasesOrDeath ? generateCasesOrDeathSignals(signal) : {},
     colorScale: sensorEntry.colorScale || interpolateYlOrRd,
