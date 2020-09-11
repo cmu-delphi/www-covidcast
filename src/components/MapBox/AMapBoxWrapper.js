@@ -1,23 +1,32 @@
 import geojsonExtent from '@mapbox/geojson-extent';
 import { Map as MapBox } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { defaultRegionOnStartup, levelMegaCounty, levels } from '../../stores/constants';
+import { defaultRegionOnStartup, levelMegaCounty } from '../../stores/constants';
 import { MAP_THEME, MISSING_COLOR } from '../../theme';
 import { MISSING_VALUE, caseHoveredOrSelected, caseSelected, caseMissing } from './encodings/utils';
 import InteractiveMap from './InteractiveMap';
-import { addCityLayers, L } from './layers';
+import { toFillLayer, toHoverLayer } from './layers';
 import style from './mapbox_albers_usa_style.json';
-import { geoJsonSources, S } from './sources';
+import { toBorderSource, toCenterSource } from './sources';
 import ZoomMap from './ZoomMap';
 import { observeResize, unobserveResize } from '../../util';
+import { throttle } from 'lodash-es';
 
-export default class MapBoxWrapper {
+/**
+ * @typedef {object} MapBoxWrapperOptions
+ * @property {import('./encodings').Encoding[]} encodings
+ * @property {number[][]} bounds
+ * @property {string} level
+ * @property {string[]} levels
+ * @property {boolean} hasMegaCountyLevel
+ */
+export default class AMapBoxWrapper {
   /**
    *
    * @param {(type: string, data: any) => void} dispatch
-   * @param {import('./encodings').Encoding[]} encodings
+   * @param {MapBoxWrapperOptions} options
    */
-  constructor(dispatch, encodings) {
+  constructor(dispatch, options) {
     this.dispatch = dispatch;
     /**
      * @type {MapBox | null}
@@ -38,11 +47,13 @@ export default class MapBoxWrapper {
      */
     this.interactive = null;
 
-    this.encodings = encodings;
-    this.encoding = this.encodings[0];
     // set a good default value
-    this.level = 'county';
-    this.zoom = new ZoomMap();
+    this.level = options.level;
+    this.levels = options.levels;
+    this.hasMegaCountyLevel = options.hasMegaCountyLevel;
+    this.encodings = options.encodings;
+    this.encoding = this.encodings[0];
+    this.zoom = new ZoomMap(options.bounds);
   }
 
   /**
@@ -54,19 +65,32 @@ export default class MapBoxWrapper {
       attributionControl: false,
       container,
       style,
-      bounds: this.zoom.stateBounds,
-      fitBounds: this.zoom.stateBoundsOptions,
+      bounds: this.zoom.resetBounds,
+      fitBounds: this.zoom.resetBoundsOptions,
       doubleClickZoom: false,
       dragRotate: false,
       pitchWithRotate: false,
       touchPitch: false,
       touchZoomRotate: true,
+      renderWorldCopies: false,
       antialias: true,
     });
     this.zoom.map = this.map;
     this.map.touchZoomRotate.disableRotation();
     // this.map.addControl(new AttributionControl({ compact: true }));
     // .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+
+    const throttled = throttle((z) => this.dispatch('zoom', z), 100);
+
+    this.map.on('zoom', () => {
+      const z = this.map.getZoom() / this.zoom.stateZoom;
+      for (const encoding of this.encodings) {
+        if (typeof encoding.onZoom === 'function') {
+          encoding.onZoom(z * window.devicePixelRatio);
+        }
+      }
+      throttled(z);
+    });
 
     let resolveCallback = null;
 
@@ -80,15 +104,14 @@ export default class MapBoxWrapper {
     });
 
     this.map.on('load', () => {
+      this.addSprites();
       this.addSources()
         .then(() => {
           this.addLayers();
           this.interactive = new InteractiveMap(this.map, this);
-          this.zoom.showStateLabels(this.level === 'state');
         })
         .then(() => {
-          this.zoom.ready();
-          this.markReady('setup');
+          this._setupReady();
           resolveCallback(this);
         });
     });
@@ -98,6 +121,12 @@ export default class MapBoxWrapper {
     });
 
     return p;
+  }
+
+  _setupReady() {
+    this.zoom.showStateLabels(this.level === 'state');
+    this.zoom.ready();
+    this.markReady('setup');
   }
 
   /**
@@ -161,35 +190,8 @@ export default class MapBoxWrapper {
   }
 
   addSources() {
-    const data = geoJsonSources.then((r) => {
-      const map = this.map;
-      map.addSource(S.cityPoint, {
-        type: 'geojson',
-        data: r.cities,
-      });
-      map.addSource(S[levelMegaCounty.id].border, {
-        type: 'geojson',
-        data: r.mega,
-      });
-      map.addSource(S.zoneOutline, {
-        type: 'geojson',
-        data: r.newZones,
-      });
-      levels.forEach((level) => {
-        map.addSource(S[level].border, {
-          type: 'geojson',
-          data: r[level].border,
-        });
-
-        map.addSource(S[level].center, {
-          type: 'geojson',
-          data: r[level].center,
-        });
-      });
-    });
-
-    const sprites = this.addSprites();
-    return Promise.all([data, sprites]);
+    // hook
+    return Promise.resolve();
   }
 
   animationOptions(prop) {
@@ -204,83 +206,52 @@ export default class MapBoxWrapper {
     };
   }
 
-  addLayers() {
-    const map = this.map;
-    // map.addLayer({
-    //   id: L.county.stroke,
-    //   source: S.county.border,
-    //   type: 'fill',
-    //   paint: {
-    //     'fill-color': MAP_THEME.countyFill,
-    //     'fill-outline-color': MAP_THEME.countyOutline,
-    //     'fill-opacity': 0.4,
-    //     ...this.animationOptions('fill-color'),
-    //   },
-    // });
+  addLevelSource(level, border, center) {
+    this.map.addSource(toBorderSource(level), {
+      type: 'geojson',
+      data: border,
+    });
 
-    // fallback missing layer
-    map.addLayer({
-      id: L.state.stroke,
-      source: S.state.border,
+    this.map.addSource(toCenterSource(level), {
+      type: 'geojson',
+      data: center,
+    });
+  }
+
+  addFillLevelLayer(level) {
+    this.map.addLayer({
+      id: toFillLayer(level),
+      source: toBorderSource(level),
       type: 'fill',
+      layout: {
+        visibility: 'none',
+      },
       paint: {
-        'fill-color': MISSING_COLOR,
-        'fill-outline-color': MAP_THEME.stateOutline,
-        'fill-pattern': 'hatching',
+        'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
+        'fill-color': MAP_THEME.countyFill,
+        'fill-opacity': caseMissing(0, 1),
+        ...this.animationOptions('fill-color'),
       },
     });
+  }
 
-    [levelMegaCounty.id, ...levels].forEach((level) => {
-      map.addLayer({
-        id: L[level].fill,
-        source: S[level].border,
-        type: 'fill',
-        layout: {
-          visibility: 'none',
-        },
-        paint: {
-          'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
-          'fill-color': MAP_THEME.countyFill,
-          'fill-opacity': caseMissing(0, 1),
-          ...this.animationOptions('fill-color'),
-        },
-      });
-    });
-
-    map.addLayer({
-      id: L.zoneOutline,
-      source: S.zoneOutline,
+  addHoverLevelLayer(level) {
+    this.map.addLayer({
+      id: toHoverLayer(level),
+      source: toBorderSource(level),
       type: 'line',
       layout: {
         visibility: 'none',
       },
       paint: {
-        'line-color': MAP_THEME.zoneOutline,
-        'line-width': 2,
-        'line-dasharray': [2, 2],
+        'line-color': caseSelected(MAP_THEME.selectedRegionOutline, MAP_THEME.hoverRegionOutline),
+        'line-width': caseHoveredOrSelected(4, 0),
       },
     });
+  }
 
-    [levelMegaCounty.id, ...levels].forEach((level) => {
-      map.addLayer({
-        id: L[level].hover,
-        source: S[level].border,
-        type: 'line',
-        layout: {
-          visibility: 'none',
-        },
-        paint: {
-          'line-color': caseSelected(MAP_THEME.selectedRegionOutline, MAP_THEME.hoverRegionOutline),
-          'line-width': caseHoveredOrSelected(4, 0),
-        },
-      });
-    });
-
-    this.encodings.forEach((enc) => {
-      enc.addLayers(map, this);
-    });
-
-    addCityLayers(map);
+  addLayers() {
+    // hook
   }
 
   destroy() {
@@ -293,11 +264,23 @@ export default class MapBoxWrapper {
     }
   }
 
-  updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, stopsMega, scale) {
+  validateLevel(level) {
+    if (!this.levels.includes(level)) {
+      return this.levels[0];
+    }
+    return level;
+  }
+
+  updateOptions(encoding, level, signalType, sensor, sensorType, valueMinMax, stops, stopsMega, scale) {
+    level = this.validateLevel(level);
     // changed the visibility of layers
     const oldLevel = this.level;
     this.level = level;
     this.encoding = this.encodings.find((d) => d.id === encoding);
+
+    if (!this.hasMegaCountyLevel) {
+      stopsMega = null;
+    }
 
     if (!this.map || !this.mapSetupReady) {
       return;
@@ -307,19 +290,33 @@ export default class MapBoxWrapper {
       this.zoom.showStateLabels(level === 'state');
     }
 
-    const allEncodingLayers = this.encodings.flatMap((d) => d.layers).concat([L[levelMegaCounty.id].fill]);
+    const allEncodingLayers = this.encodings.flatMap((d) => d.layers);
+    allEncodingLayers.push(...this.levels.map((level) => toFillLayer(level)));
+    if (this.hasMegaCountyLevel) {
+      allEncodingLayers.push(toFillLayer(levelMegaCounty.id));
+    }
     const visibleLayers = new Set(this.encoding.getVisibleLayers(level, signalType));
 
-    if (level === 'county') {
+    if (level === 'county' && this.hasMegaCountyLevel) {
       // draw mega in every encoding
-      visibleLayers.add(L[levelMegaCounty.id].fill);
+      visibleLayers.add(toFillLayer(levelMegaCounty.id));
     }
 
     allEncodingLayers.forEach((layer) => {
       this.map.setLayoutProperty(layer, 'visibility', visibleLayers.has(layer) ? 'visible' : 'none');
     });
 
-    const r = this.encoding.encode(this.map, level, signalType, sensor, valueMinMax, stops, stopsMega, scale);
+    const r = this.encoding.encode(this.map, {
+      level,
+      signalType,
+      sensorType,
+      sensor,
+      valueMinMax,
+      stops,
+      stopsMega,
+      scale,
+      baseZoom: this.zoom.stateZoom,
+    });
 
     this.markReady('encoding');
     return r;
@@ -331,6 +328,7 @@ export default class MapBoxWrapper {
    * @param {Promise<import('../../data/fetchData').EpiDataRow[]>>} data
    */
   updateSources(level, data, primaryValue = 'value') {
+    level = this.validateLevel(level);
     // flag to compare if we still load the same data
     const dataFlag = Math.random().toString(36);
     this._mapDataFlag = dataFlag;
@@ -351,10 +349,10 @@ export default class MapBoxWrapper {
       this.interactive.data = lookup;
 
       if (level === 'county') {
-        this._updateSource(S[levelMegaCounty.id].border, lookup, primaryValue);
+        this._updateSource(toBorderSource(levelMegaCounty.id), lookup, primaryValue);
       }
-      this._updateSource(S[level].border, lookup, primaryValue);
-      this._updateSource(S[level].center, lookup, primaryValue);
+      this._updateSource(toBorderSource(level), lookup, primaryValue);
+      this._updateSource(toCenterSource(level), lookup, primaryValue);
 
       for (const encoding of this.encodings) {
         encoding.updateSources(this.map, level, lookup, primaryValue);
@@ -373,6 +371,7 @@ export default class MapBoxWrapper {
     console.assert(this.map != null);
     const source = this.map.getSource(sourceId);
     if (!source) {
+      console.error('invalid source');
       return;
     }
     const data = source._data; // semi hacky
@@ -423,7 +422,7 @@ export default class MapBoxWrapper {
 
     // fly to
     // should also work for mega counties
-    const source = this.map.getSource(S[selection.level].border);
+    const source = this.map.getSource(toBorderSource(selection.level));
     if (!source) {
       return;
     }
@@ -443,7 +442,7 @@ export default class MapBoxWrapper {
 
   isMissing(feature) {
     const state = this.map.getFeatureState({
-      source: S[feature.properties.level].border,
+      source: toBorderSource(feature.properties.level),
       id: typeof id === 'string' ? Number.parseInt(feature.id, 10) : feature.id,
     });
     return state.value == null || state.value === MISSING_VALUE;
@@ -453,12 +452,12 @@ export default class MapBoxWrapper {
     if (!this.map || !this.mapSetupReady) {
       return;
     }
-    const defaultRegion = defaultRegionOnStartup[this.level];
-    const source = this.map.getSource(S[this.level].border);
+    const source = this.map.getSource(toBorderSource(this.level));
     if (!source) {
       return;
     }
 
+    const defaultRegion = defaultRegionOnStartup[this.level];
     const defaultFeature = source._data.features.find((d) => d.properties.id === defaultRegion);
     if (defaultFeature && !this.isMissing(defaultFeature)) {
       this.interactive.forceHover(defaultFeature);

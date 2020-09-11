@@ -29,13 +29,13 @@
   }
 
   .choropleth {
-    background-image: url('../assets/imgs/choropleth.png');
+    background-image: url('../assets/imgs/choropleth_small.png');
   }
   .bubble {
-    background-image: url('../assets/imgs/bubble.png');
+    background-image: url('../assets/imgs/bubble_small.png');
   }
   .spike {
-    background-image: url('../assets/imgs/spike.png');
+    background-image: url('../assets/imgs/spike_small.png');
   }
 
   .button:focus,

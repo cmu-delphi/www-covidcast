@@ -23,7 +23,7 @@
 }
 
 /** mobile **/
-@media only screen and (max-height: 800px) {
+@media only screen and (max-height: 600px) {
   /** reserve all space and let the user scroll to the main app**/
 
   #vizbox {
@@ -33,6 +33,14 @@
   body.viz-body {
     height: 100%;
     width: 100%;
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  /** main.css thing */
+  body,
+  html {
+    height: 100%;
   }
 }
 
@@ -92,6 +100,7 @@ button.mapboxgl-popup-close-button {
   display: none;
 }
 
+@import './styles/map-container.css';
 @import './styles/pg-button.css';
 @import './styles/loading.css';
 @import './styles/message-overlay.css';

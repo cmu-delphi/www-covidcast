@@ -9,11 +9,12 @@
   } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
-  import Vega from '../../components/vega/Vega.svelte';
+  import Vega from '../../components/Vega.svelte';
   import spec from './SmallMultiplesChart.json';
   import specStdErr from './SmallMultiplesChartStdErr.json';
+  import { trackEvent } from '../../stores/ga';
   import { merge, throttle } from 'lodash-es';
-  import { levelMegaCounty } from '../../stores/constants';
+  import { levelList, levelMegaCounty } from '../../stores/constants';
 
   /**
    * bi-directional binding
@@ -21,7 +22,9 @@
    */
   export let detail = null;
 
-  const sensors = sensorList;
+  export let levels = levelList;
+  $: levelIds = new Set(levels.map((l) => l.id));
+  $: sensors = sensorList.filter((d) => d.levels.some((l) => levelIds.has(l)));
 
   const specPercent = {
     transform: [
@@ -112,9 +115,9 @@
     sensor,
     data:
       $currentRegionInfo && !isMegaRegion
-        ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, endDay, false).then(
-            addMissing,
-          )
+        ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, endDay, false, {
+            geo_value: $currentRegionInfo.propertyId,
+          }).then(addMissing)
         : [],
     spec: chooseSpec(sensor, startDay, endDay),
   }));
@@ -157,6 +160,7 @@
     cursor: pointer;
     text-decoration: underline;
   }
+
   h3:hover,
   li.selected h3 {
     color: var(--red);
@@ -228,7 +232,10 @@
       <div class="header">
         <h3
           title={typeof s.sensor.tooltipText === 'function' ? s.sensor.tooltipText() : s.sensor.tooltipText}
-          on:click={() => currentSensor.set(s.sensor.key)}>
+          on:click={() => {
+            trackEvent('side-panel', 'set-sensor', s.sensor.key);
+            currentSensor.set(s.sensor.key);
+          }}>
           {s.sensor.name}
         </h3>
         <div class="toolbar" class:hidden={!hasRegion}>
@@ -237,6 +244,7 @@
             title="Show as detail view"
             class:active={detail === s.sensor}
             on:click|stopPropagation={() => {
+              trackEvent('side-panel', detail === s.sensor ? 'hide-detail' : 'show-detail', s.sensor.key);
               detail = detail === s.sensor ? null : s.sensor;
             }}>
             <FaSearchPlus />

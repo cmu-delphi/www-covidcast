@@ -6,18 +6,30 @@ import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 /**
  * @typedef {import('../stores/constants').SensorEntry} SensorEntry
  */
+
+// * @property {number} direction
+// * @property {number} issue
+// * @property {number} lag
+// * @property {number | null} sample_size
+
 /**
  * @typedef {object} EpiDataRow
- * @property {number} direction
  * @property {string} geo_value
- * @property {number} issue
- * @property {number} lag
- * @property {number | null} sample_size
- * @property {stderr | null} stderr
+ * @property {number | null} stderr
  * @property {number} time_value
  * @property {Date} date_value the time_value as a Date
  * @property {number} value
+ * @property {string} signal
  */
+
+/**
+ * @param {Partial<EpiDataRow>} mixinValues
+ */
+function computeTransferFields(mixinValues = {}) {
+  const toRemove = Object.keys(mixinValues);
+  const allFields = ['geo_value', 'stderr', 'time_value', 'value'];
+  return allFields.filter((d) => !toRemove.includes(d));
+}
 
 /**
  * @typedef {EpiDataRow & EpiDataCasesOrDeathValues} EpiDataCasesOrDeathRow
@@ -26,13 +38,14 @@ import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 const START_TIME_RANGE = parseAPITime('20100101');
 const END_TIME_RANGE = parseAPITime('20500101');
 
-function parseData(d) {
+function parseData(d, mixinData = {}) {
   if (d.result < 0 || d.message.includes('no results')) {
     return [];
   }
   const data = d.epidata || [];
 
   for (const row of data) {
+    Object.assign(row, mixinData);
     if (row.time_value == null) {
       row.date_value = null;
       continue;
@@ -49,21 +62,49 @@ function parseData(d) {
   return data;
 }
 
-function parseMultipleData(data) {
-  if ((data.length > 0 && data[0].result < 0) || data[0].message.includes('no results')) {
+function deriveCombineKey(mixinData = {}) {
+  let combineKey = (d) => `${d.geo_value}@${d.time_value}`;
+  // part of key
+  if (mixinData.time_value != null) {
+    combineKey = (d) => `${d.geo_value}`;
+  } else if (mixinData.geo_value == null) {
+    combineKey = (d) => `${d.time_value}`;
+  }
+  return combineKey;
+}
+
+function parseMultipleTreeData(d, signals, mixinData = {}) {
+  if (d.result < 0 || d.message.includes('no results')) {
     return [];
   }
-  if (data.length === 0) {
+  const tree = d.epidata || [];
+  const split = signals.map((k) => tree[0][k]);
+  const combined = combineSignals(split, EPIDATA_CASES_OR_DEATH_VALUES, deriveCombineKey(mixinData));
+  return parseData(
+    {
+      ...d,
+      epidata: combined,
+    },
+    mixinData,
+  );
+}
+
+function parseMultipleSeparateData(dataArr, mixinData = {}) {
+  if (dataArr.length === 0 || dataArr[0].result < 0 || dataArr[0].message.includes('no results')) {
     return [];
   }
   const combined = combineSignals(
-    data.map((d) => d.epidata || []),
+    dataArr.map((d) => d.epidata || []),
     EPIDATA_CASES_OR_DEATH_VALUES,
+    deriveCombineKey(mixinData),
   );
-  return parseData({
-    ...data[0],
-    epidata: combined,
-  });
+  return parseData(
+    {
+      ...dataArr[0],
+      epidata: combined,
+    },
+    mixinData,
+  );
 }
 
 /**
@@ -71,20 +112,70 @@ function parseMultipleData(data) {
  * @param {string} level
  * @param {string | undefined} region
  * @param {Date | string} date
+ * @param {Partial<EpiDataRow>} mixinValues
  * @returns {Promise<EpiDataRow[]>}
  */
-function fetchData(sensorEntry, level, region, date) {
+function fetchData(sensorEntry, level, region, date, mixinValues = {}) {
   if (!region) {
     return Promise.resolve([]);
   }
-  if (sensorEntry.isCasesOrDeath) {
+  const transferFields = computeTransferFields(mixinValues);
+  function fetchSeparate() {
+    const extraDataFields = ['value'];
+    // part of key
+    if (mixinValues.time_value == null) {
+      extraDataFields.push(['time_value']);
+    }
+    if (mixinValues.geo_value == null) {
+      extraDataFields.push(['geo_value']);
+    }
     return Promise.all(
-      EPIDATA_CASES_OR_DEATH_VALUES.map((k) =>
-        callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.casesOrDeathSignals[k], level, date, region),
+      EPIDATA_CASES_OR_DEATH_VALUES.map((k, i) =>
+        callAPIEndPoint(
+          sensorEntry.api,
+          sensorEntry.id,
+          sensorEntry.casesOrDeathSignals[k],
+          level,
+          date,
+          region,
+          i === 0 ? transferFields : extraDataFields,
+        ),
       ),
-    ).then(parseMultipleData);
+    ).then((d) => parseMultipleSeparateData(d, mixinValues));
+  }
+
+  if (sensorEntry.isCasesOrDeath) {
+    if (level === 'county' && region === '*') {
+      // around 2k each
+      return fetchSeparate();
+    }
+    const signals = EPIDATA_CASES_OR_DEATH_VALUES.map((k) => sensorEntry.casesOrDeathSignals[k]);
+    return callAPIEndPoint(
+      sensorEntry.api,
+      sensorEntry.id,
+      signals.join(','),
+      level,
+      date,
+      region,
+      [...transferFields, 'signal'],
+      'tree',
+    ).then((d) => {
+      if (d.result === 2) {
+        // need to fetch separately, since too many results
+        return fetchSeparate();
+      }
+      return parseMultipleTreeData(d, signals, mixinValues);
+    });
   } else {
-    return callAPIEndPoint(sensorEntry.api, sensorEntry.id, sensorEntry.signal, level, date, region).then(parseData);
+    return callAPIEndPoint(
+      sensorEntry.api,
+      sensorEntry.id,
+      sensorEntry.signal,
+      level,
+      date,
+      region,
+      transferFields,
+    ).then((rows) => parseData(rows, mixinValues));
   }
 }
 
@@ -93,26 +184,14 @@ function fetchData(sensorEntry, level, region, date) {
  * @param {SensorEntry} sensorEntry
  * @param {string} level
  * @param {string | Date} date
+ * @param {Partial<EpiDataRow>} mixinValues
  * @returns {Promise<EpiDataRow[]>}
  */
-export function fetchRegionSlice(sensorEntry, level, date) {
-  return fetchData(sensorEntry, level, '*', date);
-}
-
-/**
- * @param {SensorEntry} sensorEntry
- * @param {string} level
- * @param {string | undefined} region
- * @param {Date} startDate
- * @param {Date} endDate
- * @returns {Promise<EpiDataRow[]>}
- */
-export function fetchTimeSlice(sensorEntry, level, region, startDate = START_TIME_RANGE, endDate = END_TIME_RANGE) {
-  if (!region) {
-    return Promise.resolve([]);
-  }
-  const timeRange = `${formatAPITime(startDate)}-${formatAPITime(endDate)}`;
-  return fetchData(sensorEntry, level, region, timeRange);
+export function fetchRegionSlice(sensorEntry, level, date, mixinValues = {}) {
+  return fetchData(sensorEntry, level, '*', date, {
+    ...(date instanceof Date ? { time_value: formatAPITime(date) } : {}),
+    ...mixinValues,
+  });
 }
 
 /**
@@ -136,6 +215,49 @@ function createCopy(row, date, sensorEntry) {
     });
   }
   return copy;
+}
+
+/**
+ * @param {SensorEntry} sensorEntry
+ * @param {string} level
+ * @param {string | undefined} region
+ * @param {Date} startDate
+ * @param {Date} endDate
+ * @param {boolean} fitRange
+ * @param {Partial<EpiDataRow>} mixinValues
+ * @returns {Promise<EpiDataRow[]>}
+ */
+export function fetchTimeSlice(
+  sensorEntry,
+  level,
+  region,
+  startDate = START_TIME_RANGE,
+  endDate = END_TIME_RANGE,
+  fitRange = false,
+  mixinValues = {},
+) {
+  if (!region) {
+    return Promise.resolve([]);
+  }
+  const timeRange = `${formatAPITime(startDate)}-${formatAPITime(endDate)}`;
+  const data = fetchData(sensorEntry, level, region, timeRange, mixinValues);
+  if (!fitRange) {
+    return data;
+  }
+  return data.then((r) => {
+    if (r.length === 0) {
+      return r;
+    }
+    if (r[0].date_value != null && r[0].date_value > startDate) {
+      // inject a min
+      r.unshift(createCopy(r[0], startDate, sensorEntry));
+    }
+    if (r[r.length - 1].date_value != null && r[r.length - 1].date_value < endDate) {
+      // inject a max
+      r.push(createCopy(r[r.length - 1], endDate, sensorEntry));
+    }
+    return r;
+  });
 }
 
 /**
@@ -218,6 +340,7 @@ function syncStartEnd(all, sensorOf, startDate, endDate, fitRange = false) {
  * @param {Date} startDate
  * @param {Date} endDate
  * @param {boolean} fitRange
+ * @param {Partial<EpiDataRow>} mixinValues
  * @returns {Promise<EpiDataRow[]>[]}
  */
 export function fetchMultipleTimeSlices(
@@ -227,8 +350,11 @@ export function fetchMultipleTimeSlices(
   startDate = START_TIME_RANGE,
   endDate = END_TIME_RANGE,
   fitRange = false,
+  mixinValues = {},
 ) {
-  const all = sensorEntries.map((entry) => fetchTimeSlice(entry, level, region, startDate, endDate));
+  const all = sensorEntries.map((entry) =>
+    fetchTimeSlice(entry, level, region, startDate, endDate, false, mixinValues),
+  );
   if (sensorEntries.length <= 1) {
     return all;
   }
@@ -243,6 +369,7 @@ export function fetchMultipleTimeSlices(
  * @param {Date} startDate
  * @param {Date} endDate
  * @param {boolean} fitRange
+ * @param {Partial<EpiDataRow>} mixinValues
  * @returns {Promise<EpiDataRow[]>[]}
  */
 export function fetchMultipleRegionsTimeSlices(
@@ -252,8 +379,11 @@ export function fetchMultipleRegionsTimeSlices(
   startDate = START_TIME_RANGE,
   endDate = END_TIME_RANGE,
   fitRange = false,
+  mixinValues = {},
 ) {
-  const all = regions.map((region) => fetchTimeSlice(sensorEntry, level, region, startDate, endDate));
+  const all = regions.map((region) =>
+    fetchTimeSlice(sensorEntry, level, region, startDate, endDate, false, mixinValues),
+  );
   if (regions.length <= 1) {
     return all;
   }

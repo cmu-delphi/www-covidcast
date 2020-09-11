@@ -21,6 +21,7 @@
   import { parseAPITime, formatAPITime } from '../../data';
   import { fetchRegionSlice } from '../../data/fetchData';
   import { trackEvent } from '../../stores/ga';
+  import USMapBoxWrapper from '../../components/MapBox/USMapBoxWrapper';
   import { onMount } from 'svelte';
   import MapOverlays from '../../components/MapOverlays.svelte';
   import modes from '..';
@@ -83,7 +84,9 @@
       dataBuffer.delete(r); // delece since used
       return r;
     }
-    return fetchRegionSlice($currentSensorEntry, $currentLevel, date);
+    return fetchRegionSlice($currentSensorEntry, $currentLevel, date, {
+      stderr: null,
+    });
   }
 
   /**
@@ -100,7 +103,12 @@
       if (dataBuffer.has(key)) {
         continue;
       }
-      dataBuffer.set(key, fetchRegionSlice($currentSensorEntry, $currentLevel, toLoad));
+      dataBuffer.set(
+        key,
+        fetchRegionSlice($currentSensorEntry, $currentLevel, toLoad, {
+          stderr: null,
+        }),
+      );
     }
   }
 
@@ -192,6 +200,7 @@
   $: {
     paramChange($currentSensorEntry, $currentLevel, $signalCasesOrDeathOptions);
   }
+  let zoom = 1.0;
 </script>
 
 <style>
@@ -259,7 +268,7 @@
     min={minDate}
     on:change={(e) => jumpToDate(e.detail)} />
   <div class="map-container">
-    <MapOverlays {map} mapLoading={running || loading} legendLoading={false}>
+    <MapOverlays {map} mapLoading={running || loading} legendLoading={false} {zoom}>
       <div slot="title">{$currentDateObject.toLocaleDateString()}</div>
     </MapOverlays>
     <div class="mode-container container-bg container-style">
@@ -279,6 +288,8 @@
       signalType={$signalType}
       encoding={$encoding}
       signalOptions={$signalCasesOrDeathOptions}
-      on:updatedEncoding={(e) => updatedEncoding(e.detail)} />
+      on:zoom={(e) => (zoom = e.detail)}
+      on:updatedEncoding={(e) => updatedEncoding(e.detail)}
+      wrapperClass={USMapBoxWrapper} />
   </div>
 </main>

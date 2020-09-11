@@ -1,23 +1,21 @@
 <script>
-  import { onMount, onDestroy, createEventDispatcher } from 'svelte';
-  import { stats, sensorMap } from '../../stores';
+  import { createEventDispatcher, onDestroy, onMount } from 'svelte';
+  import { stats } from '../../stores';
   import { determineColorScale, determineMinMax } from './colors';
-  import MapBoxWrapper from './MapBoxWrapper';
-  import { ChoroplethEncoding, BubbleEncoding, SpikeEncoding } from './encodings';
-  import { ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../../theme';
-  import { primaryValue } from '../../stores/constants';
+  import { primaryValue, sensorMap } from '../../stores/constants';
 
+  /**
+   * @type {{new(): import('./AMapBoxWrapper').default}}
+   */
+  export let wrapperClass;
   /**
    * @type {HTMLElement | null}
    */
   let container = null;
 
   const dispatch = createEventDispatcher();
-  const wrapper = new MapBoxWrapper((event, data) => dispatch(event, data), [
-    new ChoroplethEncoding(),
-    new BubbleEncoding(ENCODING_BUBBLE_THEME),
-    new SpikeEncoding(ENCODING_SPIKE_THEME),
-  ]);
+
+  const wrapper = new wrapperClass((event, data) => dispatch(event, data));
 
   export const zoom = wrapper.zoom;
 
@@ -36,8 +34,6 @@
    */
   export let selection = null;
 
-  $: drawMega = level === 'county';
-
   let ready = false;
 
   onMount(() => {
@@ -54,14 +50,16 @@
   function updateEncoding(level, encoding, sensor, signalType, stats, signalOptions) {
     // Get the range for the heatmap.
     const sensorEntry = sensorMap.get(sensor);
+    const sensorType = sensorEntry.getType(signalOptions);
     const valueMinMax = determineMinMax(stats, sensorEntry, level, signalOptions);
-    const { stops, scale } = determineColorScale(valueMinMax, signalType, sensorEntry);
+    const { stops, scale } = determineColorScale(valueMinMax, signalType, sensorEntry, sensorType);
     const drawMega = level === 'county';
     const ret = wrapper.updateOptions(
       encoding,
       level,
       signalType,
       sensor,
+      sensorType,
       valueMinMax,
       stops,
       drawMega && stops,

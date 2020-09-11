@@ -9,14 +9,14 @@ import { timeParse, timeFormat } from 'd3-time-format';
  * @param {import('./fetchData').EpiDataRow[][]} data
  * @param {string[]} keys
  */
-export function combineSignals(data, keys) {
+export function combineSignals(data, keys, toKey = (d) => `${d.geo_value}@${d.time_value}`) {
   const ref = data[0];
 
-  const map = new Map(ref.map((d) => [`${d.geo_value}@${d.time_value}`, d]));
+  const map = new Map(ref.map((d) => [toKey(d), d]));
   data.forEach((rows, i) => {
     const key = keys[i];
     for (const d of rows) {
-      const entry = map.get(`${d.geo_value}@${d.time_value}`);
+      const entry = map.get(toKey(d));
       if (entry) {
         entry[key] = d.value;
       }

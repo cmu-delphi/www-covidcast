@@ -1,13 +1,13 @@
 import { Popup } from 'mapbox-gl';
-import { levelMegaCounty, levels, levelsWithMega } from '../../stores/constants';
-import { L } from './layers';
-import { S } from './sources';
+import { levelMegaCounty } from '../../stores/constants';
+import { L, toFillLayer, toHoverLayer } from './layers';
+import { toBorderSource } from './sources';
 import Tooltip from './Tooltip.svelte';
 
 export default class InteractiveMap {
   /**
    * @param {import('mapbox-gl').Map} map
-   * @param {{readonly encoding: string, readonly level: string, dispatch(type: string, detail: any)}} adapter
+   * @param {{readonly encoding: string, readonly level: string, readonly levels: string[], hasMegaCountyLevel: boolean, dispatch(type: string, detail: any)}} adapter
    */
   constructor(map, adapter) {
     this.adapter = adapter;
@@ -49,20 +49,24 @@ export default class InteractiveMap {
   }
 
   initListeners() {
-    this.map.on('mouseenter', L.state.stroke, this._onMapMouseEnter.bind(this));
-    this.map.on('mouseleave', L.state.stroke, this._onMapMouseLeave.bind(this));
-    this.map.on('mousemove', L.state.stroke, this._onMapMouseMove.bind(this));
+    this.map.on('mouseenter', L.outline, this._onMapMouseEnter.bind(this));
+    this.map.on('mouseleave', L.outline, this._onMapMouseLeave.bind(this));
+    this.map.on('mousemove', L.outline, this._onMapMouseMove.bind(this));
 
-    levels.forEach((level) => {
-      // this.map.on('mouseenter', L[level].fill, this._onLevelMouseEnter.bind(this));
-      this.map.on('mouseleave', L[level].fill, this._onLevelMouseLeave.bind(this));
-      this.map.on('mousemove', L[level].fill, this._onLevelMouseMove.bind(this));
-      this.map.on('click', L[level].fill, this._onLevelMouseClick.bind(this));
+    this.adapter.levels.forEach((level) => {
+      const fillLayer = toFillLayer(level);
+      // this.map.on('mouseenter', fillLayer, this._onLevelMouseEnter.bind(this));
+      this.map.on('mouseleave', fillLayer, this._onLevelMouseLeave.bind(this));
+      this.map.on('mousemove', fillLayer, this._onLevelMouseMove.bind(this));
+      this.map.on('click', fillLayer, this._onLevelMouseClick.bind(this));
     });
-    // this.map.on('mouseenter', L[levelMegaCounty.id].fill, this._onMegaMouseEnter.bind(this));
-    this.map.on('mouseleave', L[levelMegaCounty.id].fill, this._onMegaMouseLeave.bind(this));
-    this.map.on('mousemove', L[levelMegaCounty.id].fill, this._onMegaMouseMove.bind(this));
-    this.map.on('click', L[levelMegaCounty.id].fill, this._onMegaMouseClick.bind(this));
+    if (this.adapter.hasMegaCountyLevel) {
+      const fillLayer = toFillLayer(levelMegaCounty.id);
+      // this.map.on('mouseenter', fillLayer, this._onMegaMouseEnter.bind(this));
+      this.map.on('mouseleave', fillLayer, this._onMegaMouseLeave.bind(this));
+      this.map.on('mousemove', fillLayer, this._onMegaMouseMove.bind(this));
+      this.map.on('click', fillLayer, this._onMegaMouseClick.bind(this));
+    }
   }
 
   get activePopup() {
@@ -202,19 +206,23 @@ export default class InteractiveMap {
 
   _updateHoverLayerVisibility() {
     const visibleLevels = new Set();
-    if (this.clicked.mega != null || this.hovered.mega != null) {
-      visibleLevels.add(levelMegaCounty.id);
-    }
     if (this.clicked.id != null) {
       visibleLevels.add(this.clicked.level);
     }
     if (this.hovered.id != null) {
       visibleLevels.add(this.hovered.level);
     }
-    for (const level of levelsWithMega) {
-      const visible = this.map.getLayoutProperty(L[level].hover, 'visibility') !== 'none';
+    for (const level of this.adapter.levels) {
+      const visible = this.map.getLayoutProperty(toHoverLayer(level), 'visibility') !== 'none';
       if (visible !== visibleLevels.has(level)) {
-        this.map.setLayoutProperty(L[level].hover, 'visibility', visibleLevels.has(level) ? 'visible' : 'none');
+        this.map.setLayoutProperty(toHoverLayer(level), 'visibility', visibleLevels.has(level) ? 'visible' : 'none');
+      }
+    }
+    if (this.adapter.hasMegaCountyLevel) {
+      const megaVisible = this.clicked.mega != null || this.hovered.mega != null;
+      const visible = this.map.getLayoutProperty(toHoverLayer(levelMegaCounty.id), 'visibility') !== 'none';
+      if (MouseEvent !== visible) {
+        this.map.setLayoutProperty(toHoverLayer(levelMegaCounty.id), 'visibility', megaVisible ? 'visible' : 'none');
       }
     }
   }
@@ -233,10 +241,10 @@ export default class InteractiveMap {
     // match ids
     if (obj.id !== id) {
       if (obj.id) {
-        this._updateState(S[obj.level].border, obj.id, clearState);
+        this._updateState(toBorderSource(obj.level), obj.id, clearState);
       }
       if (id) {
-        this._updateState(S[level].border, id, setState);
+        this._updateState(toBorderSource(level), id, setState);
       }
       obj.id = id;
       // store level of selected id
@@ -244,14 +252,16 @@ export default class InteractiveMap {
     }
 
     // match mega
-    if (obj.mega !== mega) {
-      if (obj.mega) {
-        this._updateState(S[levelMegaCounty.id].border, obj.mega, clearState);
+    if (this.adapter.hasMegaCountyLevel) {
+      if (obj.mega !== mega) {
+        if (obj.mega) {
+          this._updateState(toBorderSource(levelMegaCounty.id), obj.mega, clearState);
+        }
+        if (mega) {
+          this._updateState(toBorderSource(levelMegaCounty.id), mega, setState);
+        }
+        obj.mega = mega;
       }
-      if (mega) {
-        this._updateState(S[levelMegaCounty.id].border, mega, setState);
-      }
-      obj.mega = mega;
     }
     this._updateHoverLayerVisibility();
   }
