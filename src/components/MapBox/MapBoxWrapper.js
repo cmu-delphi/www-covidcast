@@ -293,7 +293,7 @@ export default class MapBoxWrapper {
     }
   }
 
-  updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, stopsMega, scale) {
+  updateOptions(encoding, level, signalType, sensorType, valueMinMax, stops, stopsMega, scale) {
     // changed the visibility of layers
     const oldLevel = this.level;
     this.level = level;
@@ -319,7 +319,7 @@ export default class MapBoxWrapper {
       this.map.setLayoutProperty(layer, 'visibility', visibleLayers.has(layer) ? 'visible' : 'none');
     });
 
-    const r = this.encoding.encode(this.map, level, signalType, sensor, valueMinMax, stops, stopsMega, scale);
+    const r = this.encoding.encode(this.map, { level, signalType, sensorType, valueMinMax, stops, stopsMega, scale });
 
     this.markReady('encoding');
     return r;
