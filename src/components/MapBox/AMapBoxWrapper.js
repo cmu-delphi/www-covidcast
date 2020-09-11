@@ -271,7 +271,7 @@ export default class AMapBoxWrapper {
     return level;
   }
 
-  updateOptions(encoding, level, signalType, sensor, valueMinMax, stops, stopsMega, scale) {
+  updateOptions(encoding, level, signalType, sensor, sensorType, valueMinMax, stops, stopsMega, scale) {
     level = this.validateLevel(level);
     // changed the visibility of layers
     const oldLevel = this.level;
@@ -309,6 +309,7 @@ export default class AMapBoxWrapper {
     const r = this.encoding.encode(this.map, {
       level,
       signalType,
+      sensorType,
       sensor,
       valueMinMax,
       stops,
