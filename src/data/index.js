@@ -141,7 +141,6 @@ function loadCountSignal(sEntry, meta, timeMap, statsMap) {
       const matchedMeta = possibleMetaRows.find((d) => d.signal === signal && d.geo_type === region);
 
       if (matchedMeta) {
-        updateTimeMap(sEntry.key, matchedMeta, timeMap);
         updateStatsMap(statsKey, matchedMeta, statsMap);
       }
     });

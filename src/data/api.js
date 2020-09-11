@@ -61,8 +61,19 @@ export function callMetaAPI(sensors, fields, filters) {
   urlGet.searchParams.set('source', data.get('source'));
   data.set('cached', 'true');
   urlGet.searchParams.set('cached', data.get('cached'));
+
+  const signals = sensors
+    .map((d) =>
+      d.isCasesOrDeath
+        ? Object.values(d.casesOrDeathSignals)
+            .map((s) => `${d.id}:${s}`)
+            .join(',')
+        : `${d.id}:${d.signal}`,
+    )
+    .join(',');
+
   if (sensors && sensors.length > 0) {
-    data.set('signals', sensors.map((d) => `${d.id}:${d.signal}`).join(','));
+    data.set('signals', signals);
     urlGet.searchParams.set('signals', data.get('signals'));
   }
   if (fields && fields.length > 0) {
