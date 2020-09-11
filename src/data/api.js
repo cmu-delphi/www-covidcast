@@ -62,17 +62,16 @@ export function callMetaAPI(sensors, fields, filters) {
   data.set('cached', 'true');
   urlGet.searchParams.set('cached', data.get('cached'));
 
-  const signals = sensors
-    .map((d) =>
-      d.isCasesOrDeath
-        ? Object.values(d.casesOrDeathSignals)
-            .map((s) => `${d.id}:${s}`)
-            .join(',')
-        : `${d.id}:${d.signal}`,
-    )
-    .join(',');
-
   if (sensors && sensors.length > 0) {
+    const signals = sensors
+      .map((d) =>
+        d.isCasesOrDeath
+          ? Object.values(d.casesOrDeathSignals)
+              .map((s) => `${d.id}:${s}`)
+              .join(',')
+          : `${d.id}:${d.signal}`,
+      )
+      .join(',');
     data.set('signals', signals);
     urlGet.searchParams.set('signals', data.get('signals'));
   }
@@ -80,7 +79,7 @@ export function callMetaAPI(sensors, fields, filters) {
     data.set('fields', fields.join(','));
     urlGet.searchParams.set('fields', data.get('fields'));
   }
-  Object.entries(filters).forEach((entry) => {
+  Object.entries(filters || {}).forEach((entry) => {
     data.set(entry[0], entry[1]);
     urlGet.searchParams.set(entry[0], entry[1]);
   });

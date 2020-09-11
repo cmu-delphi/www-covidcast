@@ -42,7 +42,9 @@
     csvUrl = url.toString();
   }
 
-  callMetaAPI().then((r) => {
+  callMetaAPI(null, ['min_time', 'max_time', 'signal', 'geo_type', 'data_source'], {
+    time_types: 'day',
+  }).then((r) => {
     loading = false;
 
     const data = new Map();
