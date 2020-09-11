@@ -151,6 +151,7 @@
     right: 0;
     bottom: 0;
     z-index: 1000;
+    display: flex;
   }
 
   .map-button {
