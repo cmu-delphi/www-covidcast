@@ -140,18 +140,13 @@
   <h5>Select from recent locations</h5>
   <ul class:empty={possibleRecent.length === 0}>
     {#each possibleRecent as info}
-      <li>
-        <button class="button" on:click={() => dispatch('add', info)}>{info.displayName}</button>
-      </li>
+      <li><button class="button" on:click={() => dispatch('add', info)}>{info.displayName}</button></li>
     {/each}
     {#if possibleRecent.length === 0}
       <li>No recent locations founds</li>
     {/if}
   </ul>
-  <h5>
-    Select from Top for
-    <span class="current">{$currentSensorEntry.name}</span>
-  </h5>
+  <h5>Select from Top for <span class="current">{$currentSensorEntry.name}</span></h5>
 
   <ol class:loading>
     {#each top10Data as row}
