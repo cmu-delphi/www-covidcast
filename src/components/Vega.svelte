@@ -61,6 +61,11 @@
    */
   export let patchSpec = null;
 
+  /**
+   * @type {import('vega-typings').TooltipHandler}
+   */
+  export let tooltipHandler = undefined;
+
   let size = { width: 300, height: 300 };
   $: updateData(vegaPromise, data);
   $: patchedSpec = patchSpec ? patchSpec(spec, size) : spec;
@@ -154,6 +159,7 @@
     vegaPromise = embed(root, spec, {
       actions: false,
       logLevel: Error,
+      tooltip: tooltipHandler,
       patch: (spec) => {
         spec.signals = spec.signals || [];
         Object.entries(signals).forEach(([key, v]) => {
@@ -202,6 +208,9 @@
   onDestroy(() => {
     if (patchSpec) {
       unobserveResize(root);
+    }
+    if (tooltipHandler && tooltipHandler.destroy) {
+      tooltipHandler.destroy();
     }
     if (vega) {
       vega.finalize();

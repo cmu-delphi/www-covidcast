@@ -15,6 +15,9 @@
   import { trackEvent } from '../../stores/ga';
   import { merge, throttle } from 'lodash-es';
   import { levelList, levelMegaCounty } from '../../stores/constants';
+  import SmallMultipleTooltip from './SmallMultipleTooltip.svelte';
+  import { createVegaTooltipAdapter } from '../../components/tooltipUtils';
+  import { onDestroy } from 'svelte';
 
   /**
    * bi-directional binding
@@ -28,13 +31,6 @@
 
   const specPercent = {
     transform: [
-      {},
-      // {
-      //   calculate: '(datum.value - datum.stderr) / 100',
-      // },
-      // {
-      //   calculate: '(datum.value + datum.stderr) / 100',
-      // },
       {
         calculate: 'datum.value == null ? null : datum.value / 100',
         as: 'pValue',
@@ -51,7 +47,6 @@
   };
   const specPercentStdErr = {
     transform: [
-      {},
       {
         calculate: '(datum.value - datum.stderr) / 100',
       },
@@ -145,6 +140,12 @@
       currentDate.set(item.datum.datum.time_value);
     }
   }
+
+  const { tooltipHandler, destroyHandler } = createVegaTooltipAdapter(SmallMultipleTooltip);
+
+  onDestroy(() => {
+    destroyHandler();
+  });
 </script>
 
 <style>
@@ -271,6 +272,7 @@
           data={s.data}
           spec={s.spec}
           {noDataText}
+          {tooltipHandler}
           signals={{ currentDate: $currentDateObject, highlightTimeValue }}
           signalListeners={['highlight']}
           eventListeners={['click']}
