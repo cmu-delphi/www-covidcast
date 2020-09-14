@@ -293,5 +293,5 @@ covidcast_signal(data_source = "${source ? source.id : ''}", signal = "${signal 
       <input type="hidden" name="geo_type" value={geoType} />
     </form>
   </section>
-  <SingleModeToggle mode={modes[0]} label="Back" />
+  <SingleModeToggle mode={modes[0]} label="Back to Visualization" />
 </div>
