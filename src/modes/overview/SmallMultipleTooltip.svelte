@@ -4,12 +4,22 @@
   const formatTimeWithoutYear = timeFormat('%B %d');
 
   /**
+   * @type {import('../../stores/constants').SensorEntry}
+   */
+  export let sensor;
+
+  export let hidden = false;
+  /**
    * @type {import('../../data').EpiDataRow}
    */
   export let item;
 </script>
 
 <style>
+  .hidden {
+    display: none;
+  }
+
   th,
   td {
     border: none;
@@ -29,7 +39,48 @@
   }
 </style>
 
-<div aria-label="tooltip" class="tooltip">
+<div aria-label="tooltip" class="tooltip" class:hidden>
   <h5>{formatTimeWithoutYear(item.date_value)}</h5>
-  <div>{JSON.stringify(item.value)}</div>
+  <table>
+    <tbody>
+      {#if sensor.isCasesOrDeath}
+        <tr>
+          <th>{sensor.yAxis}</th>
+          <th class="area">Count</th>
+          <th class="area">Ratios per 100,000</th>
+        </tr>
+        <tr>
+          <th>{formatTimeWithoutYear(item.date_value)}</th>
+          <td class="right">{sensor.formatValue(item.count)}</td>
+          <td class="right">{sensor.formatValue(item.countRatio)}</td>
+        </tr>
+        <tr>
+          <th>7-day avg</th>
+          <td class="right">{sensor.formatValue(item.avg)}</td>
+          <td class="right">{sensor.formatValue(item.avgRatio)}</td>
+        </tr>
+        <tr>
+          <th>{formatTimeWithoutYear(item.date_value)} (cumulated)</th>
+          <td class="right">{sensor.formatValue(item.countCumulative)}</td>
+          <td class="right">{sensor.formatValue(item.countRatioCumulative)}</td>
+        </tr>
+        <tr>
+          <th>7-day avg (cumulated)</th>
+          <td class="right">{sensor.formatValue(item.avgCumulative)}</td>
+          <td class="right">{sensor.formatValue(item.avgRatioCumulative)}</td>
+        </tr>
+      {:else}
+        <tr>
+          <th>{sensor.yAxis}</th>
+          <td class="right">{sensor.formatValue(item.value)}</td>
+        </tr>
+        {#if sensor.hasStdErr && item.stderr != null}
+          <tr>
+            <th>Standard Error</th>
+            <td class="right">{item.stderr.toFixed(2)}</td>
+          </tr>
+        {/if}
+      {/if}
+    </tbody>
+  </table>
 </div>

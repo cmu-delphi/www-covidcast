@@ -2,22 +2,18 @@
   import {
     sensorList,
     currentSensor,
-    currentDateObject,
     currentRegionInfo,
     smallMultipleTimeSpan,
     currentDate,
   } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
-  import Vega from '../../components/Vega.svelte';
   import spec from './SmallMultiplesChart.json';
   import specStdErr from './SmallMultiplesChartStdErr.json';
   import { trackEvent } from '../../stores/ga';
   import { merge, throttle } from 'lodash-es';
   import { levelList, levelMegaCounty } from '../../stores/constants';
-  import SmallMultipleTooltip from './SmallMultipleTooltip.svelte';
-  import { createVegaTooltipAdapter } from '../../components/tooltipUtils';
-  import { onDestroy } from 'svelte';
+  import SmallMultiple from './SmallMultiple.svelte';
 
   /**
    * bi-directional binding
@@ -140,12 +136,6 @@
       currentDate.set(item.datum.datum.time_value);
     }
   }
-
-  const { tooltipHandler, destroyHandler } = createVegaTooltipAdapter(SmallMultipleTooltip);
-
-  onDestroy(() => {
-    destroyHandler();
-  });
 </script>
 
 <style>
@@ -204,21 +194,6 @@
     transition: opacity 0.25s ease;
   }
 
-  .single-sensor-chart {
-    height: 4em;
-  }
-
-  .vega-wrapper {
-    position: relative;
-  }
-  .vega-wrapper > :global(*) {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 2px;
-    bottom: 0;
-  }
-
   .hidden {
     display: none;
   }
@@ -267,18 +242,7 @@
           <FaSearchPlus />
         </button>
       </div>
-      <div class="single-sensor-chart vega-wrapper">
-        <Vega
-          data={s.data}
-          spec={s.spec}
-          {noDataText}
-          {tooltipHandler}
-          signals={{ currentDate: $currentDateObject, highlightTimeValue }}
-          signalListeners={['highlight']}
-          eventListeners={['click']}
-          on:click={onClick}
-          on:signal={onHighlight} />
-      </div>
+      <SmallMultiple {s} {noDataText} {highlightTimeValue} {onClick} {onHighlight} />
     </li>
   {/each}
 </ul>

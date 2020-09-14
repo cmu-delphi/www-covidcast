@@ -64,7 +64,7 @@ function resolveDatum(item) {
 /**
  * create a vega tooltip adapter for the given svelte component class
  */
-export function createVegaTooltipAdapter(svelteComponent) {
+export function createVegaTooltipAdapter(svelteComponent, extrasProps = {}) {
   let destroyed = false;
   let tooltip = null;
 
@@ -76,18 +76,26 @@ export function createVegaTooltipAdapter(svelteComponent) {
     // hide tooltip for null, undefined, or empty string values
     if (value == null || value === '') {
       hide();
+      if (tooltip) {
+        tooltip.$set({
+          hidden: true,
+        });
+      }
       return;
     }
 
     update(event.clientX, event.clientY);
     if (tooltip) {
       tooltip.$set({
+        hidden: false,
         item: resolveDatum(item),
       });
     } else {
       tooltip = new svelteComponent({
         target: popper,
         props: {
+          ...extrasProps,
+          hidden: false,
           item: resolveDatum(item),
         },
       });
