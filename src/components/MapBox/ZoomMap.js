@@ -1,6 +1,8 @@
 import { L } from './layers';
 import { LngLatBounds } from 'mapbox-gl';
 
+const SHRINK_FACTOR = 1;
+
 export default class ZoomMap {
   constructor(onZoom, bounds) {
     /**
@@ -19,8 +21,11 @@ export default class ZoomMap {
 
   _triggerZoom(paint) {
     // console.log(this.map.getZoom(), this.stateZoom, this.map.getZoom() / this.stateZoom);
-    const z = this.map.getZoom() / this.stateZoom;
-    this.onZoom(z, paint);
+    const current = this.map.getZoom();
+    const base = this.stateZoom;
+
+    const zoom = Math.pow(2, current - base) * SHRINK_FACTOR;
+    this.onZoom(zoom, paint);
   }
 
   setMap(map) {

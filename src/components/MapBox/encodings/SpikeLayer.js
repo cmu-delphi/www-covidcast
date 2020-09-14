@@ -19,7 +19,7 @@ varying float v_discard;
 void main() {
   vec4 p = u_matrix * vec4(a_pos.xy, 0.0, 1.0);
   if (a_pos.z == 0.0) {
-    p.y += a_colorAndValue.a * u_pixelToClip.y * p.w * u_zoom;
+    p.y -= a_colorAndValue.a * u_pixelToClip.y * p.w * u_zoom;
   } else {
     p.x += a_pos.z * u_size * u_pixelToClip.x * p.w * u_zoom;
   }

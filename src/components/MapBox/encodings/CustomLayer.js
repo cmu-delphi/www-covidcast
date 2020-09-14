@@ -11,10 +11,11 @@ export class CustomLayer {
     this._valueLookup = new Map();
     this._valuePrimaryValue = 'value';
     this._valueToColor = () => MISSING_COLOR;
-    this.zoom = 1;
 
     this._vertexSource = vertexSource;
     this._fragmentSource = fragmentSource;
+    this._map = null;
+    this.zoom = 1;
   }
 
   /**
@@ -43,6 +44,7 @@ export class CustomLayer {
    * @param {WebGLRenderingContext} gl
    */
   onAdd(map, gl) {
+    this._map = map;
     // create a vertex shader
     this._vertexShader = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(this._vertexShader, this._vertexSource);
@@ -104,6 +106,7 @@ export class CustomLayer {
    * @param {WebGLRenderingContext} gl
    */
   onRemove(_map, gl) {
+    this._map = null;
     gl.deleteBuffer(this._centerBuffer);
     gl.deleteBuffer(this._colorAndValueBuffer);
     gl.deleteShader(this._fragmentShader);
@@ -118,12 +121,10 @@ export class CustomLayer {
   _prepareRender(gl, matrix) {
     gl.useProgram(this._program);
     gl.uniformMatrix4fv(this._uPos, false, matrix);
-    gl.uniform1f(this._uZoom, this.zoom);
 
-    const bb = gl.canvas.getBoundingClientRect();
-    const xToClip = 2 / bb.width;
-    const yToClip = 2 / bb.height;
-    gl.uniform2f(this._uPixelToClip, xToClip, yToClip);
+    const transform = this._map.painter.transform;
+    gl.uniform1f(this._uZoom, this.zoom);
+    gl.uniform2f(this._uPixelToClip, transform.pixelsToGLUnits[0], transform.pixelsToGLUnits[1]);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this._colorAndValueBuffer);
     gl.enableVertexAttribArray(this._aColorAndValue);
