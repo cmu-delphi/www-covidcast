@@ -252,7 +252,7 @@
             trackEvent('side-panel', 'set-sensor', s.sensor.key);
             currentSensor.set(s.sensor.key);
           }}>
-          {s.sensor.name}
+          {typeof s.sensor.mapTitleText === 'function' ? s.sensor.mapTitleText() : s.sensor.name}
         </button>
         <button
           class="pg-button toolbar"
