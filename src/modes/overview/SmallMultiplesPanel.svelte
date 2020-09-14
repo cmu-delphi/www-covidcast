@@ -1,11 +1,5 @@
 <script>
-  import {
-    sensorList,
-    currentSensor,
-    currentRegionInfo,
-    smallMultipleTimeSpan,
-    currentDate,
-  } from '../../stores';
+  import { sensorList, currentSensor, currentRegionInfo, smallMultipleTimeSpan, currentDate } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import spec from './SmallMultiplesChart.json';
