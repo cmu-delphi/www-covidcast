@@ -77,7 +77,7 @@
         {#if sensor.hasStdErr && item.stderr != null}
           <tr>
             <th>Standard Error</th>
-            <td class="right">{item.stderr.toFixed(2)}</td>
+            <td class="right">{sensor.formatValue(item.stderr)}</td>
           </tr>
         {/if}
       {/if}
