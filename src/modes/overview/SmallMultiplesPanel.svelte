@@ -61,12 +61,17 @@
   /**
    * @type {import('../../stores/constants').SensorEntry} sensor
    */
-  function chooseSpec(sensor, min, max) {
+  function chooseSpec(sensor, min, max, selections) {
     const time = {
       encoding: {
         x: {
           scale: {
             domain: [min.getTime(), max.getTime()],
+          },
+        },
+        color: {
+          scale: {
+            domain: selections.map((s) => s.info.propertyId),
           },
         },
       },
@@ -141,7 +146,7 @@
             }),
           )
       : [],
-    spec: chooseSpec(sensor, startDay, endDay),
+    spec: chooseSpec(sensor, startDay, endDay, selections),
   }));
 
   let highlightTimeValue = null;

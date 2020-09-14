@@ -67,15 +67,21 @@
             field: primaryValue(sensor, $signalCasesOrDeathOptions),
           },
         },
+        layer: [
+          {
+            encoding: {
+              color: {
+                scale: {
+                  domain: selections.map((s) => s.info.propertyId),
+                },
+              },
+            },
+          },
+        ],
       },
       {
         layer: [
           {
-            encoding: {
-              y: {
-                field: primaryValue(sensor, $signalCasesOrDeathOptions),
-              },
-            },
             selection: {
               brush: {
                 init: {
@@ -99,6 +105,11 @@
         layer: [
           {
             encoding: {
+              color: {
+                scale: {
+                  domain: selections.map((s) => s.info.propertyId),
+                },
+              },
               y: {
                 field: primaryValue(sensor, $signalCasesOrDeathOptions).replace('avg', 'count'),
               },
