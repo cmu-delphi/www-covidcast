@@ -15,7 +15,7 @@
   import { merge, throttle } from 'lodash-es';
   import { levelList, levelMegaCounty } from '../../stores/constants';
   import SmallMultiple from './SmallMultiple.svelte';
-  import IoMdInformation from 'svelte-icons/io/IoMdInformation.svelte';
+  import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
 
   /**
    * bi-directional binding
@@ -242,7 +242,7 @@
               class="pg-button info"
               on:click={() => {
                 currentInfoSensor.set(s.sensor);
-              }}><IoMdInformation /></button>
+              }}><IoMdHelp /></button>
           {/if}
           <button
             class="pg-button"

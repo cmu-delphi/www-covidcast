@@ -1,5 +1,5 @@
 <script>
-  import IoMdInformation from 'svelte-icons/io/IoMdInformation.svelte';
+  import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
   import { currentSensorEntry, currentSensorMapTitle, currentInfoSensor } from '../stores';
 </script>
 
@@ -35,5 +35,5 @@
     class="pg-button pg-button-circle info"
     on:click={() => {
       currentInfoSensor.set($currentSensorEntry);
-    }}><IoMdInformation /></button>
+    }}><IoMdHelp /></button>
 {/if}

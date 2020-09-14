@@ -18,7 +18,7 @@
   import EncodingOptions from '../EncodingOptions.svelte';
   import { trackEvent } from '../../stores/ga';
   import VegaTooltip from './VegaTooltip.svelte';
-  import IoMdInformation from 'svelte-icons/io/IoMdInformation.svelte';
+  import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
 
   const dispatch = createEventDispatcher();
   /**
@@ -208,7 +208,7 @@
         class="pg-button pg-button-circle info"
         on:click={() => {
           currentInfoSensor.set(sensor);
-        }}><IoMdInformation /></button>
+        }}><IoMdHelp /></button>
     {/if}
   </div>
   <button
