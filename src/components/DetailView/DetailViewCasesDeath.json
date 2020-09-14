@@ -28,29 +28,7 @@
             "minExtent": 25,
             "title": " "
           }
-        },
-        "tooltip": [
-          { "field": "displayName", "type": "nominal", "title": "Region" },
-          { "field": "count", "type": "quantitative", "title": "New Cases", "format": ".2f" },
-          { "field": "avg", "type": "quantitative", "title": "7-day average", "format": ".2f" },
-          { "field": "countRatio", "type": "quantitative", "title": "New Cases per 100k", "format": ".2f" },
-          { "field": "avgRatio", "type": "quantitative", "title": "7-day average per 100k", "format": ".2f" },
-          { "field": "countCumulative", "type": "quantitative", "title": "New Cases (cumulated)", "format": ".2f" },
-          { "field": "avgCumulative", "type": "quantitative", "title": "7-day average (cumulated)", "format": ".2f" },
-          {
-            "field": "countRatioCumulative",
-            "type": "quantitative",
-            "title": "New Cases per 100k (cumulated)",
-            "format": ".2f"
-          },
-          {
-            "field": "avgRatioCumulative",
-            "type": "quantitative",
-            "title": "7-day average per 100k (cumulated)",
-            "format": ".2f"
-          },
-          { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
-        ]
+        }
       },
       "layer": [
         {
@@ -80,12 +58,6 @@
           "data": {
             "name": "values"
           },
-          "transform": [
-            {
-              "calculate": "datum.date_value",
-              "as": "title"
-            }
-          ],
           "selection": {
             "highlight": {
               "type": "single",
@@ -158,13 +130,7 @@
             "tickCount": 3,
             "title": " "
           }
-        },
-        "tooltip": [
-          { "field": "displayName", "type": "nominal", "title": "Region" },
-          { "field": "count", "type": "quantitative", "title": "New Cases", "format": ".2f" },
-          { "field": "avg", "type": "quantitative", "title": "7-day average", "format": ".2f" },
-          { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
-        ]
+        }
       },
       "layer": [
         {
@@ -204,12 +170,6 @@
               }
             }
           },
-          "transform": [
-            {
-              "calculate": "datum.date_value",
-              "as": "title"
-            }
-          ],
           "selection": {
             "highlight2": {
               "type": "single",

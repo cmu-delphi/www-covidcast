@@ -1,13 +1,13 @@
 <script>
-  import { sensorList, currentSensor, currentDateObject, smallMultipleTimeSpan, currentDate } from '../../stores';
+  import { sensorList, currentSensor, smallMultipleTimeSpan, currentDate } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
-  import Vega from '../../components/Vega.svelte';
   import spec from './SmallMultiplesChart.json';
   import specStdErr from './SmallMultiplesChartStdErr.json';
   import { trackEvent } from '../../stores/ga';
   import { merge, throttle } from 'lodash-es';
   import { levelList, levelMegaCounty } from '../../stores/constants';
+  import SmallMultiple from './SmallMultiple.svelte';
 
   /**
    * bi-directional binding
@@ -21,13 +21,6 @@
 
   const specPercent = {
     transform: [
-      {},
-      // {
-      //   calculate: '(datum.value - datum.stderr) / 100',
-      // },
-      // {
-      //   calculate: '(datum.value + datum.stderr) / 100',
-      // },
       {
         calculate: 'datum.value == null ? null : datum.value / 100',
         as: 'pValue',
@@ -44,7 +37,6 @@
   };
   const specPercentStdErr = {
     transform: [
-      {},
       {
         calculate: '(datum.value - datum.stderr) / 100',
       },
@@ -233,21 +225,6 @@
     transition: opacity 0.25s ease;
   }
 
-  .single-sensor-chart {
-    height: 4em;
-  }
-
-  .vega-wrapper {
-    position: relative;
-  }
-  .vega-wrapper > :global(*) {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 2px;
-    bottom: 0;
-  }
-
   .hidden {
     display: none;
   }
@@ -282,7 +259,7 @@
             trackEvent('side-panel', 'set-sensor', s.sensor.key);
             currentSensor.set(s.sensor.key);
           }}>
-          {s.sensor.name}
+          {typeof s.sensor.mapTitleText === 'function' ? s.sensor.mapTitleText() : s.sensor.name}
         </button>
         <button
           class="pg-button toolbar"
@@ -296,17 +273,7 @@
           <FaSearchPlus />
         </button>
       </div>
-      <div class="single-sensor-chart vega-wrapper">
-        <Vega
-          data={s.data}
-          spec={s.spec}
-          {noDataText}
-          signals={{ currentDate: $currentDateObject, highlightTimeValue }}
-          signalListeners={['highlight']}
-          eventListeners={['click']}
-          on:click={onClick}
-          on:signal={onHighlight} />
-      </div>
+      <SmallMultiple {s} {noDataText} {highlightTimeValue} {onClick} {onHighlight} />
     </li>
   {/each}
 </ul>
