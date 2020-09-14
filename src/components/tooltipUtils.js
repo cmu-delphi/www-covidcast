@@ -30,6 +30,7 @@ function getOrInitPopper() {
   };
 
   const instance = createPopper(virtualElement, popper, {
+    placement: 'top',
     modifiers: [
       {
         name: 'offset',
@@ -64,9 +65,10 @@ function resolveDatum(item) {
 /**
  * create a vega tooltip adapter for the given svelte component class
  */
-export function createVegaTooltipAdapter(svelteComponent, extrasProps = {}) {
+export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}) {
   let destroyed = false;
   let tooltip = null;
+  let extraProps = initialExtraProps;
 
   const tooltipHandler = (_, event, item, value) => {
     if (destroyed) {
@@ -94,7 +96,7 @@ export function createVegaTooltipAdapter(svelteComponent, extrasProps = {}) {
       tooltip = new svelteComponent({
         target: popper,
         props: {
-          ...extrasProps,
+          ...extraProps,
           hidden: false,
           item: resolveDatum(item),
         },
@@ -102,10 +104,20 @@ export function createVegaTooltipAdapter(svelteComponent, extrasProps = {}) {
     }
   };
 
-  const destroyHandler = () => {
-    tooltip.$destroy();
-    tooltip = null;
+  tooltipHandler.destroy = () => {
+    if (tooltip) {
+      tooltip.$destroy();
+      tooltip = null;
+    }
     destroyed = true;
   };
-  return { tooltipHandler, destroyHandler };
+  tooltipHandler.update = (newExtraProps) => {
+    extraProps = newExtraProps;
+    if (tooltip) {
+      tooltip.$set({
+        ...extraProps,
+      });
+    }
+  };
+  return tooltipHandler;
 }

@@ -1,23 +1,13 @@
 <script>
   import { currentDateObject } from '../../stores';
   import Vega from '../../components/Vega.svelte';
-  import { onDestroy } from 'svelte';
-  import { createVegaTooltipAdapter } from '../../components/tooltipUtils';
-  import SmallMultipleTooltip from './SmallMultipleTooltip.svelte';
+  import VegaTooltip from '../../components/DetailView/VegaTooltip.svelte';
 
   export let s;
   export let noDataText;
   export let highlightTimeValue;
   export let onClick;
   export let onHighlight;
-
-  const { tooltipHandler, destroyHandler } = createVegaTooltipAdapter(SmallMultipleTooltip, {
-    sensor: s.sensor,
-  });
-
-  onDestroy(() => {
-    destroyHandler();
-  });
 </script>
 
 <style>
@@ -42,10 +32,11 @@
     data={s.data}
     spec={s.spec}
     {noDataText}
-    {tooltipHandler}
     signals={{ currentDate: $currentDateObject, highlightTimeValue }}
     signalListeners={['highlight']}
     eventListeners={['click']}
     on:click={onClick}
-    on:signal={onHighlight} />
+    on:signal={onHighlight}
+    tooltip={VegaTooltip}
+    tooltipProps={{ sensor: s.sensor }} />
 </div>

@@ -11,6 +11,7 @@
   import { levelMegaCounty, primaryValue } from '../../stores/constants';
   import EncodingOptions from '../EncodingOptions.svelte';
   import { trackEvent } from '../../stores/ga';
+  import VegaTooltip from './VegaTooltip.svelte';
 
   const dispatch = createEventDispatcher();
   /**
@@ -39,13 +40,9 @@
               title: sensor.yAxis || '',
             },
           },
-          tooltip: [{ title: sensor.name }],
         },
       },
       {
-        encoding: {
-          tooltip: [{ title: sensor.name }],
-        },
         layer: [
           {
             selection: {
@@ -67,15 +64,6 @@
           y: {
             field: primaryValue(sensor, $signalCasesOrDeathOptions).replace('avg', 'count'),
           },
-          tooltip: [
-            { title: sensor.name },
-            {},
-            { title: `${sensor.name} per 100k` },
-            {},
-            { title: `${sensor.name} (cumulated)` },
-            {},
-            { title: `${sensor.name}  per 100k (cumulated)` },
-          ],
         },
         layer: [
           {}, // current date
@@ -95,7 +83,6 @@
           y: {
             field: primaryValue(sensor, $signalCasesOrDeathOptions).replace('avg', 'count'),
           },
-          tooltip: [{ title: sensor.name }],
         },
         layer: [
           {},
@@ -129,15 +116,11 @@
                     title: sensor.yAxis || '',
                   },
                 },
-                tooltip: [{ title: sensor.name }],
               },
             },
             {
               width: size.width - 45,
               height: 40,
-              encoding: {
-                tooltip: [{ title: sensor.name }],
-              },
             },
           ],
         },
@@ -218,7 +201,9 @@
     spec={sensor.isCasesOrDeath ? specCasesDeath : sensor.hasStdErr ? specStdErr : spec}
     {patchSpec}
     {noDataText}
-    signals={{ currentDate: $currentDateObject }} />
+    signals={{ currentDate: $currentDateObject }}
+    tooltip={VegaTooltip}
+    tooltipProps={{ sensor }} />
 </div>
 <div class="encoding">
   <EncodingOptions center {sensor} />
