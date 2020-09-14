@@ -1,26 +1,20 @@
 import { L } from './layers';
 import { LngLatBounds } from 'mapbox-gl';
-import { bounds } from '../../maps';
 
 export default class ZoomMap {
-  constructor(onZoom) {
+  constructor(onZoom, bounds) {
     /**
      * @type {import('mapbox-gl').Map | null}
      */
     this.map = null;
     this.onZoom = onZoom;
-    this.stateBounds = new LngLatBounds(bounds.states);
-    this.stateBoundsOptions = {
+    this.resetBounds = new LngLatBounds(bounds);
+    this.resetBoundsOptions = {
       padding: 20, //px
       linear: false,
     };
     this.stateZoom = 1;
     this.initialZoomView = true;
-    this.zoneBounds = new LngLatBounds(bounds.zones);
-    this.zoneBoundsOptions = {
-      padding: 20, //px
-      linear: false,
-    };
   }
 
   _triggerZoom(paint) {
@@ -77,7 +71,7 @@ export default class ZoomMap {
       return;
     }
     this.initialZoomView = true;
-    this.map.fitBounds(this.stateBounds, this.stateBoundsOptions);
+    this.map.fitBounds(this.resetBounds, this.resetBoundsOptions);
     this.map.once('idle', () => {
       this.stateZoom = this.map.getZoom();
       this._triggerZoom(true);
@@ -89,7 +83,7 @@ export default class ZoomMap {
       return;
     }
     requestAnimationFrame(() => {
-      this.map.fitBounds(this.stateBounds, this.stateBoundsOptions);
+      this.map.fitBounds(this.resetBounds, this.resetBoundsOptions);
     });
   }
 
@@ -97,25 +91,16 @@ export default class ZoomMap {
    * @param {boolean} value
    */
   showStateLabels(value) {
-    if (!this.map) {
+    if (!this.map || !this.map.getLayer(L.stateNames)) {
       return;
     }
-    this.map.setLayoutProperty(L.state.names, 'visibility', value ? 'visible' : 'none');
+    this.map.setLayoutProperty(L.stateNames, 'visibility', value ? 'visible' : 'none');
   }
 
   toggleStateLabels() {
-    if (!this.map) {
+    if (!this.map || !this.map.getLayer(L.stateNames)) {
       return;
     }
-    this.showStateLabels(this.map.getLayoutProperty(L.state.names, 'visibility') !== 'visible');
-  }
-
-  showSWPA() {
-    if (!this.map) {
-      return;
-    }
-    this.initialZoomView = false;
-    this.map.fitBounds(this.zoneBounds, this.zoneBoundsOptions);
-    this.map.setLayoutProperty(L.zoneOutline, 'visibility', 'visible');
+    this.showStateLabels(this.map.getLayoutProperty(L.stateNames, 'visibility') !== 'visible');
   }
 }

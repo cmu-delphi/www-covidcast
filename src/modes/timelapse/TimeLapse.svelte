@@ -21,6 +21,7 @@
   import { parseAPITime, formatAPITime } from '../../data';
   import { fetchRegionSlice } from '../../data/fetchData';
   import { trackEvent } from '../../stores/ga';
+  import USMapBoxWrapper from '../../components/MapBox/USMapBoxWrapper';
   import { onMount } from 'svelte';
   import MapOverlays from '../../components/MapOverlays.svelte';
   import modes from '..';
@@ -83,7 +84,9 @@
       dataBuffer.delete(r); // delece since used
       return r;
     }
-    return fetchRegionSlice($currentSensorEntry, $currentLevel, date);
+    return fetchRegionSlice($currentSensorEntry, $currentLevel, date, {
+      stderr: null,
+    });
   }
 
   /**
@@ -100,7 +103,12 @@
       if (dataBuffer.has(key)) {
         continue;
       }
-      dataBuffer.set(key, fetchRegionSlice($currentSensorEntry, $currentLevel, toLoad));
+      dataBuffer.set(
+        key,
+        fetchRegionSlice($currentSensorEntry, $currentLevel, toLoad, {
+          stderr: null,
+        }),
+      );
     }
   }
 
@@ -281,6 +289,7 @@
       encoding={$encoding}
       signalOptions={$signalCasesOrDeathOptions}
       on:zoom={(e) => (zoom = e.detail)}
-      on:updatedEncoding={(e) => updatedEncoding(e.detail)} />
+      on:updatedEncoding={(e) => updatedEncoding(e.detail)}
+      wrapperClass={USMapBoxWrapper} />
   </div>
 </main>

@@ -1,10 +1,10 @@
 import { writable, derived, get, readable } from 'svelte/store';
 import { LogScale, SqrtScale } from './scales';
 import { scaleSequentialLog } from 'd3-scale';
-import { defaultSensorId, sensorList, sensorMap, yesterdayDate } from './constants';
+import { defaultSensorId, sensorList, sensorMap, yesterdayDate, levels, swpaLevels } from './constants';
 import modes from '../modes';
 import { parseAPITime } from '../data/utils';
-import { regionSearchLookup } from './search';
+import { getInfoByName } from '../maps';
 export {
   defaultRegionOnStartup,
   getLevelInfo,
@@ -17,7 +17,6 @@ export {
   groupedSensorList,
 } from './constants';
 import { timeMonth } from 'd3-time';
-export { regionSearchList } from './search';
 
 /**
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
@@ -59,7 +58,7 @@ export const currentSensorEntry = derived([currentSensor], ([$currentSensor]) =>
 // 'county', 'state', or 'msa'
 export const currentLevel = writable('county', (set) => {
   const level = urlParams.get('level');
-  if (['county', 'state', 'msa'].includes(level)) {
+  if (levels.includes(level) || swpaLevels.includes(level)) {
     set(level);
   }
 });
@@ -139,7 +138,7 @@ export const currentRegion = writable('', (set) => {
 /**
  * current region info (could also be null)
  */
-export const currentRegionInfo = derived([currentRegion, regionSearchLookup], ([current, lookup]) => lookup(current));
+export const currentRegionInfo = derived([currentRegion], ([current]) => getInfoByName(current));
 
 /**
  *
@@ -158,17 +157,8 @@ export function selectByInfo(elem) {
 }
 
 export function selectByFeature(feature) {
-  const lookup = get(regionSearchLookup);
-  selectByInfo(feature ? lookup(feature.properties.id) : null);
+  selectByInfo(feature ? getInfoByName(feature.properties.id) : null);
 }
-
-// currently only supporting 'swpa' - South western Pennsylvania
-export const currentZone = writable('', (set) => {
-  const zone = urlParams.get('zone');
-  if (zone === 'swpa') {
-    set(zone);
-  }
-});
 
 export const colorScale = writable(scaleSequentialLog());
 export const colorStops = writable([]);

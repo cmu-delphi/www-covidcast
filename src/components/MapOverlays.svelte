@@ -1,7 +1,6 @@
 <script>
   import Title from './Title.svelte';
   import MapControls from './MapControls.svelte';
-  import './mapContainer.css';
   import { isDirectionSignalType, encoding, currentSensorEntry } from '../stores';
   import EncodingOptions from './EncodingOptions.svelte';
   import DirectionLegend from './legends/DirectionLegend.svelte';

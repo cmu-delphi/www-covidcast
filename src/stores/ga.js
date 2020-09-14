@@ -5,7 +5,6 @@ import {
   currentDate,
   signalType,
   encoding,
-  currentZone,
   currentMode,
   signalCasesOrDeathOptions,
 } from '.';
@@ -32,7 +31,6 @@ currentRegion.subscribe((region) => trackEvent('region', 'set', region));
 currentDate.subscribe((date) => trackEvent('date', 'set', date));
 signalType.subscribe((signalType) => trackEvent('signalType', 'set', signalType));
 encoding.subscribe((encoding) => trackEvent('encoding', 'set', encoding));
-currentZone.subscribe((zone) => trackEvent('zone', 'set', zone));
 currentMode.subscribe((mode) => trackEvent('mode', 'set', mode.id));
 signalCasesOrDeathOptions.subscribe((r) => {
   trackEvent('signalCasesOrDeathOptions', 'cumulative', String(r.cumulative));

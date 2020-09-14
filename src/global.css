@@ -36,6 +36,14 @@
   }
 }
 
+@media only screen and (max-width: 767px) {
+  /** main.css thing */
+  body,
+  html {
+    height: 100%;
+  }
+}
+
 button.mapboxgl-popup-close-button {
   padding: 2px;
   color: var(--grey);
@@ -92,6 +100,7 @@ button.mapboxgl-popup-close-button {
   display: none;
 }
 
+@import './styles/map-container.css';
 @import './styles/pg-button.css';
 @import './styles/loading.css';
 @import './styles/message-overlay.css';
