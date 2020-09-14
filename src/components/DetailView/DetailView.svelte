@@ -93,31 +93,34 @@
       {
         encoding: {
           y: {
-            field: primaryValue(sensor, $signalCasesOrDeathOptions).replace('avg', 'count'),
+            field: primaryValue(sensor, $signalCasesOrDeathOptions),
           },
         },
         layer: [
-          {}, // current date
-          {}, // bars
           {
-            // average line
             encoding: {
               y: {
-                field: primaryValue(sensor, $signalCasesOrDeathOptions),
+                field: primaryValue(sensor, $signalCasesOrDeathOptions).replace('avg', 'count'),
               },
             },
           },
         ],
       },
       {
-        encoding: {
-          y: {
-            field: primaryValue(sensor, $signalCasesOrDeathOptions).replace('avg', 'count'),
-          },
-        },
         layer: [
-          {},
           {
+            encoding: {
+              y: {
+                field: primaryValue(sensor, $signalCasesOrDeathOptions).replace('avg', 'count'),
+              },
+            },
+          },
+          {
+            encoding: {
+              y: {
+                field: primaryValue(sensor, $signalCasesOrDeathOptions),
+              },
+            },
             selection: {
               brush: {
                 init: {
@@ -159,7 +162,7 @@
       );
   }
 
-  $: patchSpec = generatePatch(regularPatch);
+  $: patchSpec = generatePatch(sensor.isCasesOrDeath ? casesPatch : regularPatch);
 
   /**
    * @param {KeyboardEvent} e

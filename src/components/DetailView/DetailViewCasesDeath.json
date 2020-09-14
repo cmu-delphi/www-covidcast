@@ -34,15 +34,30 @@
         {
           "mark": {
             "type": "line",
-            "interpolate": "monotone"
+            "interpolate": "monotone",
+            "opacity": 0.2
           },
           "encoding": {
+            "y": {
+              "field": "value"
+            },
             "color": {
               "field": "geo_value",
               "type": "nominal",
               "scale": {
                 "range": ["grey", "#0F0589", "#16A997", "#A71808", "#CD22B2", "#F58B29"]
               }
+            }
+          }
+        },
+        {
+          "mark": {
+            "type": "line",
+            "interpolate": "monotone"
+          },
+          "encoding": {
+            "color": {
+              "field": "geo_value"
             }
           }
         },
@@ -132,6 +147,18 @@
         }
       },
       "layer": [
+        {
+          "mark": {
+            "type": "line",
+            "interpolate": "monotone",
+            "opacity": 0.2
+          },
+          "encoding": {
+            "y": {
+              "field": "value"
+            }
+          }
+        },
         {
           "selection": {
             "highlight2": {
