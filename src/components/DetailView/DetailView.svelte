@@ -248,7 +248,7 @@
 </style>
 
 <div class="header">
-  <h4>{sensor.name} in {region ? region.displayName : 'Unknown'}</h4>
+  <h4>{sensor.name} in {hasRegion ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown'}</h4>
   <h5>{mapTitle}</h5>
   <button
     bind:this={close}
