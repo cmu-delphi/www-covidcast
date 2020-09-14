@@ -64,15 +64,18 @@
       {
         encoding: {
           y: {
-            axis: {
-              title: sensor.yAxis || '',
-            },
+            field: primaryValue(sensor, $signalCasesOrDeathOptions),
           },
         },
       },
       {
         layer: [
           {
+            encoding: {
+              y: {
+                field: primaryValue(sensor, $signalCasesOrDeathOptions),
+              },
+            },
             selection: {
               brush: {
                 init: {
@@ -156,7 +159,7 @@
       );
   }
 
-  $: patchSpec = generatePatch(sensor.isCasesOrDeath ? casesPatch : regularPatch);
+  $: patchSpec = generatePatch(regularPatch);
 
   /**
    * @param {KeyboardEvent} e

@@ -22,7 +22,7 @@
           }
         },
         "y": {
-          "field": "count",
+          "field": "value",
           "type": "quantitative",
           "axis": {
             "minExtent": 25,
@@ -31,6 +31,51 @@
         }
       },
       "layer": [
+        {
+          "mark": {
+            "type": "line",
+            "interpolate": "monotone"
+          },
+          "encoding": {
+            "color": {
+              "field": "geo_value",
+              "type": "nominal",
+              "scale": {
+                "range": ["grey", "#0F0589", "#16A997", "#A71808", "#CD22B2", "#F58B29"]
+              }
+            }
+          }
+        },
+        {
+          "selection": {
+            "highlight": {
+              "type": "single",
+              "empty": "none",
+              "nearest": true,
+              "on": "mouseover",
+              "clear": "mouseout"
+            }
+          },
+          "mark": {
+            "type": "circle",
+            "tooltip": true
+          },
+          "encoding": {
+            "color": {
+              "field": "geo_value"
+            }
+          }
+        },
+        {
+          "transform": [
+            {
+              "filter": {
+                "selection": "highlight"
+              }
+            }
+          ],
+          "mark": "rule"
+        },
         {
           "description": "shows the current data injected via a signal, y: null is on purpose to invalidate a global y",
           "data": {
@@ -53,64 +98,18 @@
             },
             "y": null
           }
-        },
-        {
-          "data": {
-            "name": "values"
-          },
-          "selection": {
-            "highlight": {
-              "type": "single",
-              "empty": "none",
-              "on": "mouseover",
-              "clear": "mouseout",
-              "nearest": true
-            }
-          },
-          "mark": "bar",
-          "encoding": {
-            "opacity": {
-              "condition": {
-                "selection": "highlight",
-                "value": 1
-              },
-              "value": 0.4
-            },
-            "color": {
-              "field": "geo_value",
-              "type": "nominal",
-              "scale": {
-                "range": ["grey", "#0F0589", "#16A997", "#A71808", "#CD22B2", "#F58B29"]
-              }
-            }
-          }
-        },
-        {
-          "mark": {
-            "type": "line",
-            "interpolate": "monotone",
-            "tooltip": true
-          },
-          "encoding": {
-            "color": {
-              "field": "geo_value"
-            },
-            "y": {
-              "field": "avg"
-            }
-          }
         }
       ]
     },
     {
       "height": 40,
       "encoding": {
-        "opacity": {
-          "condition": {
-            "selection": "highlight2",
-            "value": 1
-          },
-          "value": 0.4
+        "color": {
+          "field": "geo_value",
+          "type": "nominal",
+          "scale": {
+            "range": ["grey", "#0F0589", "#16A997", "#A71808", "#CD22B2", "#F58B29"]
+          }
         },
         "x": {
           "field": "date_value",
@@ -123,7 +122,7 @@
           }
         },
         "y": {
-          "field": "count",
+          "field": "value",
           "type": "quantitative",
           "axis": {
             "minExtent": 25,
@@ -133,6 +132,32 @@
         }
       },
       "layer": [
+        {
+          "selection": {
+            "highlight2": {
+              "type": "single",
+              "empty": "none",
+              "nearest": true,
+              "on": "mouseover",
+              "clear": "mouseout"
+            },
+            "brush": { "type": "interval", "encodings": ["x"] }
+          },
+          "mark": {
+            "type": "line",
+            "interpolate": "monotone"
+          }
+        },
+        {
+          "transform": [
+            {
+              "filter": {
+                "selection": "highlight2"
+              }
+            }
+          ],
+          "mark": "rule"
+        },
         {
           "description": "shows the current data injected via a signal, y: null is on purpose to invalidate a global y",
           "data": {
@@ -155,37 +180,11 @@
             },
             "y": null
           }
-        },
-        {
-          "mark": "bar",
-          "data": {
-            "name": "values"
-          },
-          "encoding": {
-            "color": {
-              "field": "geo_value",
-              "type": "nominal",
-              "scale": {
-                "range": ["grey", "#0F0589", "#16A997", "#A71808", "#CD22B2", "#F58B29"]
-              }
-            }
-          },
-          "selection": {
-            "highlight2": {
-              "type": "single",
-              "empty": "none",
-              "nearest": true,
-              "on": "mouseover",
-              "clear": "mouseout"
-            },
-            "brush": { "type": "interval", "encodings": ["x"] }
-          }
         }
       ]
     }
   ],
   "config": {
-    "padding": 0,
     "legend": {
       "disable": true
     }
