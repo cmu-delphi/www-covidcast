@@ -30,19 +30,19 @@
     left: 50%;
     transform: translate(-50%, -50%);
     border: none;
-    padding: 1em 0.5em;
+    padding: 0.5em 0.5em;
     max-width: 40em;
     z-index: 5000;
+    clear: both;
   }
 
   .close {
     position: absolute;
-    top: 2px;
-    right: 2px;
+    right: 4px;
+    top: 4px;
   }
 
   .links {
-    margin-top: 1em;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -60,6 +60,11 @@
     list-style-type: none;
     padding: 0;
     display: flex;
+  }
+
+  h2 {
+    margin-right: 40px;
+    padding-top: 0.25em;
   }
 
   .links a {
