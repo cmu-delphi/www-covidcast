@@ -145,6 +145,9 @@
     ],
   };
 
+  const OFFSET_X = 60;
+  const OFFSET_Y = 80;
+
   function generatePatch(title) {
     return (spec, size) =>
       merge(
@@ -153,8 +156,8 @@
         {
           vconcat: [
             {
-              width: size.width - 45,
-              height: size.height - 40 - 70,
+              width: size.width - OFFSET_X,
+              height: size.height - 40 - OFFSET_Y,
               encoding: {
                 y: {
                   axis: {
@@ -164,7 +167,7 @@
               },
             },
             {
-              width: size.width - 45,
+              width: size.width - OFFSET_X,
               height: 40,
             },
           ],
@@ -224,6 +227,24 @@
   .encoding {
     padding-top: 0.5em;
   }
+
+  .legend {
+    font-size: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .legend-avg {
+    margin-right: 0.2em;
+    width: 1.5em;
+    height: 2px;
+    background: grey;
+  }
+  .legend-count {
+    margin-left: 0.5em;
+    opacity: 0.2;
+  }
 </style>
 
 <div class="header">
@@ -250,6 +271,14 @@
     tooltip={VegaTooltip}
     tooltipProps={{ sensor }} />
 </div>
+{#if sensor.isCasesOrDeath}
+  <div class="legend">
+    <div class="legend-avg" />
+    <div>7-day average</div>
+    <div class="legend-avg legend-count" />
+    <div>daily new COVID-19 {sensor.name.toLowerCase()}</div>
+  </div>
+{/if}
 <div class="encoding">
   <EncodingOptions center {sensor} />
 </div>
