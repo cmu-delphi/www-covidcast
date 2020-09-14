@@ -1,7 +1,7 @@
 import { L } from './layers';
 import { LngLatBounds } from 'mapbox-gl';
 
-const SHRINK_FACTOR = 1;
+const SHRINK_FACTOR = Number.parseFloat(new URLSearchParams(location.search).get('shrink') || '1');
 
 export default class ZoomMap {
   constructor(onZoom, bounds) {
