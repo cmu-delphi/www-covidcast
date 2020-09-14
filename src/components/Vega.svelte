@@ -3,6 +3,7 @@
   import embed from 'vega-embed';
   import { Error } from 'vega';
   import { observeResize, unobserveResize } from '../util';
+  import { createVegaTooltipAdapter } from './tooltipUtils';
 
   export let data = Promise.resolve([]);
 
@@ -60,6 +61,19 @@
    * @type {(import('vega-embed').VisualizationSpec, size: {width: number, height: number}) => (import('vega-embed').VisualizationSpec}
    */
   export let patchSpec = null;
+
+  /**
+   * // svelte component
+   */
+  export let tooltip = undefined;
+  export let tooltipProps = {};
+
+  $: tooltipHandler = createVegaTooltipAdapter(tooltip);
+  $: {
+    if (tooltipHandler) {
+      tooltipHandler.update(tooltipProps);
+    }
+  }
 
   let size = { width: 300, height: 300 };
   $: updateData(vegaPromise, data);
@@ -154,6 +168,7 @@
     vegaPromise = embed(root, spec, {
       actions: false,
       logLevel: Error,
+      tooltip: tooltipHandler,
       patch: (spec) => {
         spec.signals = spec.signals || [];
         Object.entries(signals).forEach(([key, v]) => {
@@ -202,6 +217,9 @@
   onDestroy(() => {
     if (patchSpec) {
       unobserveResize(root);
+    }
+    if (tooltipHandler) {
+      tooltipHandler.destroy();
     }
     if (vega) {
       vega.finalize();

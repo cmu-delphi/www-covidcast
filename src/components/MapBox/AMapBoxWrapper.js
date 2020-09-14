@@ -3,7 +3,7 @@ import { Map as MapBox } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { defaultRegionOnStartup, levelMegaCounty } from '../../stores/constants';
 import { MAP_THEME, MISSING_COLOR } from '../../theme';
-import { MISSING_VALUE, caseHoveredOrSelected, caseSelected, caseMissing } from './encodings/utils';
+import { MISSING_VALUE } from './encodings/utils';
 import InteractiveMap from './InteractiveMap';
 import { toFillLayer, toHoverLayer } from './layers';
 import style from './mapbox_albers_usa_style.json';
@@ -229,7 +229,14 @@ export default class AMapBoxWrapper {
       paint: {
         'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
         'fill-color': MAP_THEME.countyFill,
-        'fill-opacity': caseMissing(0, 1),
+        'fill-opacity': [
+          'case',
+          // when missing
+          ['==', ['to-number', ['feature-state', 'value'], MISSING_VALUE], MISSING_VALUE],
+          0,
+          // else interpolate
+          1,
+        ],
         ...this.animationOptions('fill-color'),
       },
     });
@@ -244,8 +251,18 @@ export default class AMapBoxWrapper {
         visibility: 'none',
       },
       paint: {
-        'line-color': caseSelected(MAP_THEME.selectedRegionOutline, MAP_THEME.hoverRegionOutline),
-        'line-width': caseHoveredOrSelected(4, 0),
+        'line-color': [
+          'case',
+          ['to-boolean', ['feature-state', 'select']],
+          ['feature-state', 'select'],
+          MAP_THEME.hoverRegionOutline,
+        ],
+        'line-width': [
+          'case',
+          ['any', ['to-boolean', ['feature-state', 'hover']], ['to-boolean', ['feature-state', 'select']]],
+          4,
+          0,
+        ],
       },
     });
   }
@@ -392,6 +409,16 @@ export default class AMapBoxWrapper {
   }
 
   /**
+   * @param {{info: import('../../maps/nameIdInfo').NameInfo, color: string}[]} selections
+   */
+  selectMulti(selections) {
+    if (!this.map || !this.interactive) {
+      return;
+    }
+    return this.interactive.selectMulti(selections);
+  }
+
+  /**
    *
    * @param {import('../../maps/nameIdInfo').NameInfo | null} selection
    */
@@ -402,21 +429,13 @@ export default class AMapBoxWrapper {
     const oldSelection = this.interactive.select(selection);
 
     // clear selection
-    if ((oldSelection.id != null || oldSelection.mega != null) && !selection) {
+    if (oldSelection != null && !selection) {
       // fly out
       this.zoom.resetZoom();
       return;
     }
 
-    // use == on purpose since it could be a number or string
-    // if no selection or we hover the selection don't fly to
-    if (
-      !selection ||
-      (selection.level !== levelMegaCounty.id &&
-        (this.interactive.hovered.id == selection.id || oldSelection.id == selection.id)) ||
-      (selection.level === levelMegaCounty.id &&
-        (this.interactive.hovered.mega == selection.id || oldSelection.mega == selection.id))
-    ) {
+    if (!selection || this.interactive.isHovered(selection)) {
       return;
     }
 
@@ -461,7 +480,7 @@ export default class AMapBoxWrapper {
     const defaultFeature = source._data.features.find((d) => d.properties.id === defaultRegion);
     if (defaultFeature && !this.isMissing(defaultFeature)) {
       this.interactive.forceHover(defaultFeature);
-      this.dispatch('select', defaultFeature);
+      this.dispatch('select', { feature: defaultFeature });
       return;
     }
 
@@ -472,6 +491,6 @@ export default class AMapBoxWrapper {
     const index = Math.floor(Math.random() * (viableFeatures.length - 1));
     const randomFeature = viableFeatures[index];
     this.interactive.forceHover(randomFeature);
-    this.dispatch('select', randomFeature);
+    this.dispatch('select', { feature: randomFeature });
   }
 }
