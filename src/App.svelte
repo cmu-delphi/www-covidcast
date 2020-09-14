@@ -4,6 +4,7 @@
   import './stores/urlHandler';
   import './stores/ga';
   import { loadMetaData } from './data';
+  import InfoDialog from './components/InfoDialog.svelte';
 
   onMount(() => {
     loadMetaData(sensorList).then(() => {
@@ -30,3 +31,5 @@
     <pre>{error}</pre>
   </div>
 {/await}
+
+<InfoDialog />
