@@ -8,7 +8,7 @@
   import { parseAPITime } from '../../data';
   import { currentSensorEntry, smallMultipleTimeSpan } from '../../stores';
 
-  const CSV_SERVER = 'http://rosmarus.refsmmat.com:5000';
+  const CSV_SERVER = 'https://delphi.cmu.edu/csv';
   const iso = timeFormat('%Y-%m-%d');
 
   let loading = true;
@@ -30,16 +30,6 @@
     if (source && !source.signals.find((d) => d.id === signalValue)) {
       signalValue = source.signals[0].id;
     }
-  }
-
-  $: csvUrl = '';
-  $: {
-    const url = new URL(`${CSV_SERVER}/csv`);
-    url.searchParams.set('signal', signal ? signal.id : '');
-    url.searchParams.set('start_day', iso(startDate));
-    url.searchParams.set('end_day', iso(endDate));
-    url.searchParams.set('geo_type', geoType);
-    csvUrl = url.toString();
   }
 
   callMetaAPI(null, ['min_time', 'max_time', 'signal', 'geo_type', 'data_source'], {
@@ -296,7 +286,7 @@ covidcast_signal(data_source = "${source ? source.id : ''}", signal = "${signal 
         <a href="https://cmu-delphi.github.io/covidcast/covidcastR/">package documentation.</a>
       </p>
     {/if}
-    <form id="form" method="GET" action="{CSV_SERVER}/csv" target="_blank">
+    <form id="form" method="GET" action={CSV_SERVER} download>
       <input type="hidden" name="signal" value={signalValue} />
       <input type="hidden" name="start_day" value={iso(startDate)} />
       <input type="hidden" name="end_day" value={iso(endDate)} />
