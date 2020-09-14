@@ -11,6 +11,7 @@ export class CustomLayer {
     this._valueLookup = new Map();
     this._valuePrimaryValue = 'value';
     this._valueToColor = () => MISSING_COLOR;
+    this._valueToSize = () => 0;
 
     this._vertexSource = vertexSource;
     this._fragmentSource = fragmentSource;
