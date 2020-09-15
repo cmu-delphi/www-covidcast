@@ -8,41 +8,65 @@ uniform vec2 u_pixelToClip;
 uniform float u_zoom;
 
 uniform float u_size;
-uniform vec2 u_jitter;
 
 attribute vec3 a_pos;
 attribute vec4 a_colorAndValue;
 
 varying vec3 v_color;
 varying float v_discard;
+varying vec4 v_data;
 
 void main() {
   vec4 p = u_matrix * vec4(a_pos.xy, 0.0, 1.0);
-  if (a_pos.z == 0.0) {
-    p.y -= a_colorAndValue.a * u_pixelToClip.y * p.w * u_zoom;
-  } else {
-    p.x += a_pos.z * u_size * u_pixelToClip.x * p.w * u_zoom;
-  }
-  p.x += u_jitter.x * u_pixelToClip.x * p.w;
-  p.y += u_jitter.y * u_pixelToClip.y * p.w;
+  float height = (a_colorAndValue.a * u_zoom + 1.0);
+  float shift = a_pos.z * (u_size * u_zoom + 1.0);
+
+  p.y -= (1.0 - abs(a_pos.z)) * height * u_pixelToClip.y * p.w;
+  p.x += shift * u_pixelToClip.x * p.w;
+
   gl_Position = p;
   v_color = a_colorAndValue.rgb / 255.0;
   v_discard = a_colorAndValue.a == 0.0 ? 1.0 : 0.0;
+  float thickness = 1.0;
+  // encode the barycentric coordinate but such that the bottom line is not shown
+  v_data = vec4(-min(shift, 0.0), height, max(shift, 0.0), thickness);
+
 }`;
 
 // create GLSL source for fragment shader
 
 const fragmentSource = `
+#extension GL_OES_standard_derivatives : enable
 precision mediump float;
+uniform float u_device_pixel_ratio;
 uniform float u_opacity;
+
 varying vec3 v_color;
 varying float v_discard;
+varying vec4 v_data;
+
+// This is like
+float aastep (float threshold, float dist) {
+  float afwidth = fwidth(dist) * 0.5;
+  return smoothstep(threshold - afwidth, threshold + afwidth, dist);
+}
 
 void main() {
   if (v_discard == 1.0) {
     discard;
   }
-  gl_FragColor = vec4(v_color * u_opacity, u_opacity);
+  vec3 barycentric = v_data.xyz;
+  float stroke_width = v_data.w;
+
+  // this will be our signed distance for the wireframe edge
+  float d = min(min(barycentric.x, barycentric.y), barycentric.z);
+  // compute the anti-aliased stroke edge
+  float edge = 1.0 - aastep(stroke_width, d);
+
+  vec4 fill_color = vec4(v_color * u_opacity, u_opacity);
+  vec4 stroke_color = vec4(v_color, 1.0);
+
+  gl_FragColor = mix(fill_color, stroke_color, edge);
 }`;
 
 export class SpikeLayer extends CustomLayer {
@@ -80,22 +104,9 @@ export class SpikeLayer extends CustomLayer {
    * @param {WebGLRenderingContext} gl
    */
   onAdd(map, gl) {
+    gl.getExtension('OES_standard_derivatives');
     super.onAdd(map, gl);
     this._uSize = gl.getUniformLocation(this._program, 'u_size');
-    this._uJitter = gl.getUniformLocation(this._program, 'u_jitter');
-
-    this._indexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
-    const data = new Uint16Array(this.featureIds.length * 4); // 2 lines or 4 vertices per feature
-    for (let i = 0; i < this.featureIds.length; i++) {
-      const r = i * 4;
-      const triangleBase = i * 3;
-      data[r] = triangleBase; // first point
-      data[r + 1] = triangleBase + 1; // second point
-      data[r + 2] = triangleBase + 2; // third point
-      data[r + 3] = triangleBase + 1; // second point
-    }
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, gl.STATIC_DRAW);
   }
 
   /**
@@ -116,21 +127,6 @@ export class SpikeLayer extends CustomLayer {
 
     gl.uniform1f(this._uOpacity, ENCODING_SPIKE_THEME.fillOpacity);
     gl.uniform1f(this._uSize, ENCODING_SPIKE_THEME.size[this._level]);
-    gl.uniform2f(this._uJitter, 0, 0);
-
     gl.drawArrays(gl.TRIANGLES, 0, this.featureIds.length * this._verticesPerFeatures);
-    // lines
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
-
-    gl.uniform1f(this._uOpacity, ENCODING_SPIKE_THEME.strokeOpacity * 0.5);
-    gl.uniform2f(this._uJitter, 1, 0);
-    gl.drawElements(gl.LINES, this.featureIds.length * 4, gl.UNSIGNED_SHORT, 0);
-
-    gl.uniform2f(this._uJitter, -1, 0);
-    gl.drawElements(gl.LINES, this.featureIds.length * 4, gl.UNSIGNED_SHORT, 0);
-
-    gl.uniform2f(this._uJitter, 0, 0);
-    gl.uniform1f(this._uOpacity, ENCODING_SPIKE_THEME.strokeOpacity);
-    gl.drawElements(gl.LINES, this.featureIds.length * 4, gl.UNSIGNED_SHORT, 0);
   }
 }

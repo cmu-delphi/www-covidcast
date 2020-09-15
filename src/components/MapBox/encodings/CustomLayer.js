@@ -68,6 +68,7 @@ export class CustomLayer {
     this._uOpacity = gl.getUniformLocation(this._program, 'u_opacity');
     this._uPixelToClip = gl.getUniformLocation(this._program, 'u_pixelToClip');
     this._uZoom = gl.getUniformLocation(this._program, 'u_zoom');
+    this._uDevicePixelRatio = gl.getUniformLocation(this._program, 'u_device_pixel_ratio');
     // create and initialize a WebGLBuffer to store centers
     this._aPos = gl.getAttribLocation(this._program, 'a_pos');
     this._centerBuffer = gl.createBuffer();
@@ -126,6 +127,7 @@ export class CustomLayer {
     const transform = this._map.painter.transform;
     gl.uniform1f(this._uZoom, this.zoom);
     gl.uniform2f(this._uPixelToClip, transform.pixelsToGLUnits[0], transform.pixelsToGLUnits[1]);
+    gl.uniform1f(this._uDevicePixelRatio, window.devicePixelRatio);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this._colorAndValueBuffer);
     gl.enableVertexAttribArray(this._aColorAndValue);
