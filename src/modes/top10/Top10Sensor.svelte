@@ -1,9 +1,12 @@
 <script>
-  import { currentDateObject, yesterdayDate } from '../../stores';
+  import { currentDateObject, signalCasesOrDeathOptions, stats, yesterdayDate } from '../../stores';
   import spec from '../overview/SmallMultiplesChart.json';
   import Vega from '../../components/Vega.svelte';
   import { parseAPITime } from '../../data';
   import { fetchTimeSlice } from '../../data/fetchData';
+  import VegaTooltip from '../../components/DetailView/VegaTooltip.svelte';
+  import { merge } from 'lodash-es';
+  import { determineMinMax } from '../../components/MapBox/colors';
 
   /**
    * @type {string}
@@ -19,6 +22,9 @@
   const startDay = parseAPITime('20200401');
   const finalDay = yesterdayDate;
 
+  export let highlightTimeValue;
+  export let onHighlight;
+
   /**
    * @type {import('../../stores/constants').SensorEntry}
    */
@@ -28,7 +34,21 @@
    */
   export let single;
 
-  $: data = fetchTimeSlice(sensor, level, id, startDay, finalDay, true);
+  $: data = fetchTimeSlice(sensor, level, id, startDay, finalDay, true, {
+    geo_value: id,
+    stderr: null,
+  });
+
+  $: patchedSpec = merge({}, spec, {
+    encoding: {
+      y: {
+        scale: {
+          domain: determineMinMax($stats, sensor, level, $signalCasesOrDeathOptions),
+          clamp: true,
+        },
+      },
+    },
+  });
 </script>
 
 <style>
@@ -64,5 +84,12 @@
   <td class="right">{single && single.value != null ? sensor.formatValue(single.value) : 'Unknown'}</td>
 {/if}
 <td class="chart">
-  <Vega {data} {spec} signals={{ currentDate: $currentDateObject }} />
+  <Vega
+    {data}
+    spec={patchedSpec}
+    signals={{ currentDate: $currentDateObject, highlightTimeValue }}
+    signalListeners={['highlight']}
+    on:signal={onHighlight}
+    tooltip={VegaTooltip}
+    tooltipProps={{ sensor }} />
 </td>
