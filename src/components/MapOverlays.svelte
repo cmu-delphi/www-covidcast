@@ -1,7 +1,6 @@
 <script>
   import Title from './Title.svelte';
   import MapControls from './MapControls.svelte';
-  import './mapContainer.css';
   import { isDirectionSignalType, encoding, currentSensorEntry } from '../stores';
   import EncodingOptions from './EncodingOptions.svelte';
   import DirectionLegend from './legends/DirectionLegend.svelte';
@@ -14,6 +13,7 @@
   export let legendLoading = true;
   export let interactive = true;
   export let downloadHandler = null;
+  export let zoom = 1.0;
 </script>
 
 <style>
@@ -74,19 +74,19 @@
     </div>
   {/if}
 </div>
-<div class="legend-container base-font-size">
+<div class="legend-container base-font-size" aria-label="map legend">
   {#if interactive}
     <EncodingOptions sensor={$currentSensorEntry} className="container-bg container-style encoding-wrapper" />
+    <div class="container-bg container-style">
+      {#if $isDirectionSignalType}
+        <DirectionLegend />
+      {:else if $encoding === 'color'}
+        <ColorLegend loading={legendLoading} />
+      {:else if $encoding === 'bubble'}
+        <BubbleLegend loading={legendLoading} {zoom} />
+      {:else if $encoding === 'spike'}
+        <SpikeLegend loading={legendLoading} {zoom} />
+      {/if}
+    </div>
   {/if}
-  <div class="container-bg container-style">
-    {#if $isDirectionSignalType}
-      <DirectionLegend />
-    {:else if $encoding === 'color'}
-      <ColorLegend loading={legendLoading} />
-    {:else if $encoding === 'bubble'}
-      <BubbleLegend loading={legendLoading} />
-    {:else if $encoding === 'spike'}
-      <SpikeLegend loading={legendLoading} />
-    {/if}
-  </div>
 </div>

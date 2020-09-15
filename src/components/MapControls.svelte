@@ -1,11 +1,10 @@
 <script>
-  import { currentZone, currentLevel, encoding, isValueSignalType, currentSensorEntry } from '../stores';
+  import { currentLevel, encoding, isValueSignalType, currentSensorEntry } from '../stores';
   import IoMdAdd from 'svelte-icons/io/IoMdAdd.svelte';
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
   import IoMdHome from 'svelte-icons/io/IoMdHome.svelte';
   import TiTag from 'svelte-icons/ti/TiTag.svelte';
   import IoIosSave from 'svelte-icons/io/IoIosSave.svelte';
-  import Loading from './Loading.svelte';
   import { trackEvent } from '../stores/ga';
 
   export let className = '';
@@ -39,13 +38,19 @@
   }
 
   .choropleth {
-    background-image: url('../assets/imgs/choropleth.png');
+    background-image: url('../assets/imgs/choropleth_small.png');
   }
   .bubble {
-    background-image: url('../assets/imgs/bubble.png');
+    background-image: url('../assets/imgs/bubble_small.png');
   }
   .spike {
-    background-image: url('../assets/imgs/spike.png');
+    background-image: url('../assets/imgs/spike_small.png');
+  }
+
+  .loader {
+    min-width: 28px;
+    min-height: 28px;
+    overflow: hidden;
   }
 </style>
 
@@ -84,7 +89,7 @@
       aria-label="Show entire map"
       disabled={!zoom}
       on:click={() => {
-        trackEvent('map', 'fitUS');
+        trackEvent('map', 'zoomReset');
         zoom.resetZoom();
       }}>
       <IoMdHome />
@@ -117,22 +122,6 @@
           zoom.toggleStateLabels();
         }}>
         <TiTag />
-      </button>
-    </div>
-  {/if}
-  {#if $currentZone.length > 0}
-    <div>
-      <button
-        class="pg-button"
-        type="button"
-        title="show swpa boundary"
-        aria-label="show swpa boundary"
-        disabled={!zoom}
-        on:click={() => {
-          trackEvent('map', 'fitSWPA');
-          zoom.showSWPA();
-        }}>
-        SWPA
       </button>
     </div>
   {/if}
@@ -173,6 +162,7 @@
       </button>
     </div>
   {/if}
-
-  <Loading {loading} />
+  {#if loading}
+    <div class="loader loading" />
+  {/if}
 </div>

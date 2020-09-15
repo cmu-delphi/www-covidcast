@@ -42,11 +42,21 @@
       rel="stylesheet"
       type="text/css"
     />
+    <link rel="preconnect" href="https://fonts.openmaptiles.org" />
 
     <!-- Google Tag Manager -->
     <script>
       var dataLayer = (window.dataLayer = window.dataLayer || []);
       dataLayer.push({ fireGtm: true });
+
+      // also initialize google analytics
+      window.ga =
+        window.ga ||
+        function () {
+          (ga.q = ga.q || []).push(arguments);
+        };
+      ga.l = +new Date();
+      ga('create', 'UA-9172041-1', 'auto');
     </script>
     <script>
       (function (w, d, s, l, i) {
@@ -97,19 +107,22 @@
             <a class="viz-group-link" href="https://delphi.cmu.edu/" target="_blank" rel="noopener noreferrer"
               >by the Delphi Group</a
             >
-            -
-            <a
-              class="viz-group-link"
-              href="https://delphi.cmu.edu/blog/2020/08/10/hello-world/#our-mission-and-strategy"
-              target="_blank"
-              rel="noopener noreferrer"
-              >Our mission</a
-            >
           </h3>
         </div>
+        <nav class="viz-subnav">
+          <ul>
+            <li>
+              <a href="https://delphi.cmu.edu/blog/2020/08/10/hello-world/#our-mission-and-strategy">Our mission</a>
+            </li>
+            <li><a href="https://covidcast.cmu.edu/methodology.html">Data and methods</a></li>
+            <li><a href="https://covidcast.cmu.edu/surveys.html">Surveys</a></li>
+            <li><a href="https://covidcast.cmu.edu/covid19-response-team.html">Our team</a></li>
+            <li><a href="https://covidcast.cmu.edu/terms-of-use.html">Terms of use</a></li>
+          </ul>
+        </nav>
       </header>
       <main id="vizbox">
-        <div class="ie-banner" style="display: none;">
+        <div class="ie-banner" style="display: none">
           <div>
             Internet Explorer 11 is no longer supported. We encourage you to use a more modern web browser, such as
             Firefox, Chrome, or Safari.
@@ -128,7 +141,7 @@
         </ul>
       </nav>
     </footer>
-    <script src="https://www.cmu.edu/common/standard-v6/js/list.min.js" type="text/javascript"></script>
+    <!-- <script src="https://www.cmu.edu/common/standard-v6/js/list.min.js" type="text/javascript"></script> -->
     <script src="https://www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js" type="text/javascript"></script>
     <script src="https://www.cmu.edu/common/standard-v6/js/main.min.js" type="text/javascript"></script>
   </body>

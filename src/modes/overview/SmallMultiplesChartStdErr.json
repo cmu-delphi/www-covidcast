@@ -9,10 +9,6 @@
   },
   "transform": [
     {
-      "calculate": "datum.date_value",
-      "as": "title"
-    },
-    {
       "calculate": "datum.value == null ? null : datum.value - datum.stderr",
       "as": "value_lower_bound"
     },
@@ -43,12 +39,7 @@
         "tickCount": 3,
         "minExtent": 25
       }
-    },
-    "tooltip": [
-      { "field": "value", "type": "quantitative", "title": "Value", "format": ".2f" },
-      { "field": "stderr", "type": "quantitative", "title": "Standard Error", "format": ".2f" },
-      { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
-    ]
+    }
   },
   "layer": [
     {
@@ -76,10 +67,16 @@
       },
       "encoding": {
         "opacity": {
-          "condition": {
-            "selection": "highlight",
-            "value": 1
-          },
+          "condition": [
+            {
+              "selection": "highlight",
+              "value": 1
+            },
+            {
+              "test": "datum.time_value == highlightTimeValue",
+              "value": 1
+            }
+          ],
           "value": 0
         }
       }
@@ -106,7 +103,12 @@
       "transform": [
         {
           "filter": {
-            "selection": "highlight"
+            "or": [
+              {
+                "selection": "highlight"
+              },
+              "datum.time_value == highlightTimeValue"
+            ]
           }
         }
       ],

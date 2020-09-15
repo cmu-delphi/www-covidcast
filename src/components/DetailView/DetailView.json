@@ -5,12 +5,6 @@
     "contains": "padding",
     "resize": true
   },
-  "transform": [
-    {
-      "calculate": "datum.date_value",
-      "as": "title"
-    }
-  ],
   "vconcat": [
     {
       "width": "container",
@@ -37,11 +31,7 @@
             "minExtent": 25,
             "title": " "
           }
-        },
-        "tooltip": [
-          { "field": "value", "type": "quantitative", "title": "Value", "format": ".2f" },
-          { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
-        ]
+        }
       },
       "layer": [
         {
@@ -124,11 +114,7 @@
             "tickCount": 3,
             "title": " "
           }
-        },
-        "tooltip": [
-          { "field": "value", "type": "quantitative", "title": "Value", "format": ".2f" },
-          { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
-        ]
+        }
       },
       "layer": [
         {

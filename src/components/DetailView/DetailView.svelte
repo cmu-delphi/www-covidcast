@@ -1,17 +1,19 @@
 <script>
   import { currentRegionInfo, signalCasesOrDeathOptions, currentDateObject, smallMultipleTimeSpan } from '../../stores';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
-  import Vega from '../vega/Vega.svelte';
+  import Vega from '../Vega.svelte';
   import spec from './DetailView.json';
   import specCasesDeath from './DetailViewCasesDeath.json';
   import specStdErr from './DetailViewStdErr.json';
   import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import { merge } from 'lodash-es';
   import { levelMegaCounty, primaryValue } from '../../stores/constants';
   import EncodingOptions from '../EncodingOptions.svelte';
   import IoIosSave from 'svelte-icons/io/IoIosSave.svelte';
   import { downloadUrl } from '../../data/screenshot';
+  import { trackEvent } from '../../stores/ga';
+  import VegaTooltip from './VegaTooltip.svelte';
 
   const dispatch = createEventDispatcher();
   /**
@@ -26,7 +28,9 @@
   $: isMegaRegion = Boolean($currentRegionInfo) && $currentRegionInfo.level === levelMegaCounty.id;
   $: noDataText = hasRegion ? (isMegaRegion ? `Please select a county` : 'No data available') : 'No location selected';
   $: data = $currentRegionInfo
-    ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId).then(addMissing)
+    ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, undefined, undefined, false, {
+        geo_value: $currentRegionInfo.propertyId,
+      }).then(addMissing)
     : [];
 
   export let download = false;
@@ -40,13 +44,9 @@
               title: sensor.yAxis || '',
             },
           },
-          tooltip: [{ title: sensor.name }],
         },
       },
       {
-        encoding: {
-          tooltip: [{ title: sensor.name }],
-        },
         layer: [
           {
             selection: {
@@ -68,15 +68,6 @@
           y: {
             field: primaryValue(sensor, $signalCasesOrDeathOptions).replace('avg', 'count'),
           },
-          tooltip: [
-            { title: sensor.name },
-            {},
-            { title: `${sensor.name} per 100k` },
-            {},
-            { title: `${sensor.name} (cumulated)` },
-            {},
-            { title: `${sensor.name}  per 100k (cumulated)` },
-          ],
         },
         layer: [
           {}, // current date
@@ -96,7 +87,6 @@
           y: {
             field: primaryValue(sensor, $signalCasesOrDeathOptions).replace('avg', 'count'),
           },
-          tooltip: [{ title: sensor.name }],
         },
         layer: [
           {},
@@ -130,15 +120,11 @@
                     title: sensor.yAxis || '',
                   },
                 },
-                tooltip: [{ title: sensor.name }],
               },
             },
             {
               width: size.width - 45 - 20,
               height: 40,
-              encoding: {
-                tooltip: [{ title: sensor.name }],
-              },
             },
           ],
         },
@@ -153,6 +139,7 @@
    */
   function onEscCheck(e) {
     if (e.key === 'Escape' || e.key === 'Esc') {
+      trackEvent('detail-view', 'close', 'keyboard');
       dispatch('close');
     }
   }
@@ -167,6 +154,13 @@
       });
     });
   }
+  let close = null;
+
+  onMount(() => {
+    if (close) {
+      close.focus();
+    }
+  });
 </script>
 
 <style>
@@ -212,7 +206,14 @@
       <button class="pg-button" on:click={downloadVega} disabled={!vegaRef} title="Download this view">
         <IoIosSave />
       </button>
-      <button class="pg-button" on:click={() => dispatch('close')} title="Close this detail view">
+      <button
+        bind:this={close}
+        class="pg-button"
+        on:click={() => {
+          trackEvent('detail-view', 'close', 'button');
+          dispatch('close');
+        }}
+        title="Close this detail view">
         <IoIosClose />
       </button>
     </div>
@@ -226,7 +227,9 @@
     {patchSpec}
     {noDataText}
     signals={{ currentDate: $currentDateObject }}
-    on:ready={() => dispatch('ready')} />
+    on:ready={() => dispatch('ready')}
+    tooltip={VegaTooltip}
+    tooltipProps={{ sensor }} />
 </div>
 {#if !download}
   <div class="encoding">

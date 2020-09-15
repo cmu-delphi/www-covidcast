@@ -1,46 +1,10 @@
 import { dsvFormat } from 'd3-dsv';
-import { feature } from 'topojson-client';
-import stateGeoJSON from './processed/state.geojson.json';
-import countyGeoJSON from './processed/county.geojson.json';
-import msaGeoJSON from './processed/msa.geojson.json';
-import zoneGeoJSON from './processed/zone.geojson.json';
+import stateTopoJSON from './processed/state.topojson.json';
+import countyTopoJSON from './processed/county.topojson.json';
+import msaTopoJSON from './processed/msa.topojson.json';
 import citiesRaw from './processed/cities.csv';
+import { generateGeo } from './utils';
 
-function generateGeo(topo, level, arr, additionalProperties = {}) {
-  const byId = new Map(arr.map((s) => [s.id, s]));
-
-  const centers = [];
-  const border = feature(topo, level);
-
-  for (const f of border.features) {
-    const d = byId.get(f.id);
-    const properties = {
-      ...d,
-      id: d.propertyId,
-      ...additionalProperties,
-    };
-
-    f.properties = properties;
-
-    centers.push({
-      type: 'Feature',
-      geometry: {
-        type: 'Point',
-        coordinates: [d.lat, d.long],
-      },
-      id: d.id,
-      properties,
-    });
-  }
-
-  return {
-    center: {
-      type: 'FeatureCollection',
-      features: centers,
-    },
-    border,
-  };
-}
 function deriveMegaGeo(states, level) {
   return {
     type: 'FeatureCollection',
@@ -86,17 +50,15 @@ function citiesGeo() {
  * @param {*} additionalProperties
  */
 export default function load(stateInfo, countyInfo, msaInfo, megaLevel, additionalProperties = {}) {
-  const state = generateGeo(stateGeoJSON, 'state', stateInfo, additionalProperties);
-  const county = generateGeo(countyGeoJSON, 'county', countyInfo, additionalProperties);
-  const msa = generateGeo(msaGeoJSON, 'msa', msaInfo, additionalProperties);
-  const zone = feature(zoneGeoJSON, 'zone');
+  const state = generateGeo(stateTopoJSON, 'state', stateInfo, additionalProperties);
+  const county = generateGeo(countyTopoJSON, 'county', countyInfo, additionalProperties);
+  const msa = generateGeo(msaTopoJSON, 'msa', msaInfo, additionalProperties);
   const mega = deriveMegaGeo(state.border, megaLevel);
   const cities = citiesGeo();
   return {
     state,
     county,
     msa,
-    newZones: zone,
     mega,
     cities,
   };

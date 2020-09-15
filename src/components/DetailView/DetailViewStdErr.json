@@ -13,10 +13,6 @@
     {
       "calculate": "datum.value == null ? null : datum.value + datum.stderr",
       "as": "value_upper_bound"
-    },
-    {
-      "calculate": "datum.date_value",
-      "as": "title"
     }
   ],
   "vconcat": [
@@ -45,12 +41,7 @@
             "minExtent": 25,
             "title": " "
           }
-        },
-        "tooltip": [
-          { "field": "value", "type": "quantitative", "title": "Value", "format": ".2f" },
-          { "field": "stderr", "type": "quantitative", "title": "Standard Error", "format": ".2f" },
-          { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
-        ]
+        }
       },
       "layer": [
         {
@@ -151,12 +142,7 @@
             "tickCount": 3,
             "title": " "
           }
-        },
-        "tooltip": [
-          { "field": "value", "type": "quantitative", "title": "Value", "format": ".2f" },
-          { "field": "stderr", "type": "quantitative", "title": "Standard Error", "format": ".2f" },
-          { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
-        ]
+        }
       },
       "layer": [
         {

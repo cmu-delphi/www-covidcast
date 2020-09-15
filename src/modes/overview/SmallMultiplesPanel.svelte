@@ -1,36 +1,29 @@
 <script>
-  import { sensorList, currentSensor, currentDateObject, currentRegionInfo, smallMultipleTimeSpan } from '../../stores';
+  import { sensorList, currentSensor, currentRegionInfo, smallMultipleTimeSpan, currentDate } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
-  import Vega from '../../components/vega/Vega.svelte';
   import spec from './SmallMultiplesChart.json';
   import specStdErr from './SmallMultiplesChartStdErr.json';
-  import { merge } from 'lodash-es';
-  import { levelMegaCounty } from '../../stores/constants';
   import { createEventDispatcher } from 'svelte';
-  import { setTimeout } from 'timers';
+  import { trackEvent } from '../../stores/ga';
+  import { merge, throttle } from 'lodash-es';
+  import { levelList, levelMegaCounty } from '../../stores/constants';
+  import SmallMultiple from './SmallMultiple.svelte';
 
   const dispatch = createEventDispatcher();
-
   /**
    * bi-directional binding
    * @type {import('../../stores/constants').SensorEntry}
    */
   export let detail = null;
-
   export let download = false;
+  export let levels = levelList;
 
-  const sensors = sensorList;
+  $: levelIds = new Set(levels.map((l) => l.id));
+  $: sensors = sensorList.filter((d) => d.levels.some((l) => levelIds.has(l)));
 
   const specPercent = {
     transform: [
-      {},
-      // {
-      //   calculate: '(datum.value - datum.stderr) / 100',
-      // },
-      // {
-      //   calculate: '(datum.value + datum.stderr) / 100',
-      // },
       {
         calculate: 'datum.value == null ? null : datum.value / 100',
         as: 'pValue',
@@ -47,7 +40,6 @@
   };
   const specPercentStdErr = {
     transform: [
-      {},
       {
         calculate: '(datum.value - datum.stderr) / 100',
       },
@@ -111,9 +103,9 @@
     sensor,
     data:
       $currentRegionInfo && !isMegaRegion
-        ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, endDay, false).then(
-            addMissing,
-          )
+        ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, endDay, false, {
+            geo_value: $currentRegionInfo.propertyId,
+          }).then(addMissing)
         : [],
     spec: chooseSpec(sensor, startDay, endDay),
   }));
@@ -125,6 +117,30 @@
       }, 200);
     });
   }
+
+  let highlightTimeValue = null;
+
+  const throttled = throttle((value) => {
+    highlightTimeValue = value;
+  }, 10);
+
+  function onHighlight(e) {
+    const highlighted = e.detail.value;
+    const id = highlighted && Array.isArray(highlighted._vgsid_) ? highlighted._vgsid_[0] : null;
+
+    if (!id) {
+      throttled(null);
+      return;
+    }
+    const row = e.detail.view.data('data_0').find((d) => d._vgsid_ === id);
+    throttled(row ? row.time_value : null);
+  }
+  function onClick(e) {
+    const item = e.detail.item;
+    if (item && item.isVoronoi) {
+      currentDate.set(item.datum.datum.time_value);
+    }
+  }
 </script>
 
 <style>
@@ -133,22 +149,36 @@
     padding: 0 0 0 0.25em;
   }
 
-  h3 {
-    font-size: 0.88rem;
+  .title-button {
     flex: 1 1 0;
     padding: 0;
     cursor: pointer;
     text-decoration: underline;
+    display: block;
+    background: none;
+    border: none;
+    outline: none !important;
+    text-align: left;
+    color: inherit;
+    font-weight: 700;
+    font-size: 1em;
+    line-height: 1.5em;
+    margin: 0;
   }
-  h3:hover,
-  li.selected h3 {
+
+  .title-button:hover,
+  .title-button:focus,
+  li.selected .title-button {
     color: var(--red);
+  }
+
+  :global(#vizbox) .title-button:focus {
+    box-shadow: unset !important;
   }
 
   .header {
     display: flex;
     padding-bottom: 0.1em;
-    cursor: pointer;
   }
 
   li {
@@ -157,30 +187,16 @@
   }
 
   li:hover .toolbar,
-  li.selected .toolbar {
+  li.selected .toolbar,
+  .toolbar:hover,
+  .toolbar:focus {
     opacity: 1;
   }
 
   .toolbar {
-    display: flex;
     font-size: 0.7rem;
     opacity: 0;
     transition: opacity 0.25s ease;
-  }
-
-  .single-sensor-chart {
-    height: 4em;
-  }
-
-  .vega-wrapper {
-    position: relative;
-  }
-  .vega-wrapper > :global(*) {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
   }
 
   .hidden {
@@ -228,26 +244,29 @@
   {#each sensorsWithData as s}
     <li class:selected={!download && $currentSensor === s.sensor.key}>
       <div class="header">
-        <h3
+        <!-- svelte-ignore a11y-missing-attribute -->
+        <button
+          class="title-button"
           title={typeof s.sensor.tooltipText === 'function' ? s.sensor.tooltipText() : s.sensor.tooltipText}
-          on:click={() => currentSensor.set(s.sensor.key)}>
-          {s.sensor.name}
-        </h3>
-        <div class="toolbar" class:hidden={!hasRegion}>
-          <button
-            class="pg-button"
-            title="Show as detail view"
-            class:active={detail === s.sensor}
-            on:click|stopPropagation={() => {
-              detail = detail === s.sensor ? null : s.sensor;
-            }}>
-            <FaSearchPlus />
-          </button>
-        </div>
+          on:click|preventDefault={() => {
+            trackEvent('side-panel', 'set-sensor', s.sensor.key);
+            currentSensor.set(s.sensor.key);
+          }}>
+          {typeof s.sensor.mapTitleText === 'function' ? s.sensor.mapTitleText() : s.sensor.name}
+        </button>
+        <button
+          class="pg-button toolbar"
+          class:hidden={!hasRegion}
+          title="Show as detail view"
+          class:active={detail === s.sensor}
+          on:click|stopPropagation={() => {
+            trackEvent('side-panel', detail === s.sensor ? 'hide-detail' : 'show-detail', s.sensor.key);
+            detail = detail === s.sensor ? null : s.sensor;
+          }}>
+          <FaSearchPlus />
+        </button>
       </div>
-      <div class="single-sensor-chart vega-wrapper">
-        <Vega data={s.data} spec={s.spec} {noDataText} signals={{ currentDate: $currentDateObject }} />
-      </div>
+      <SmallMultiple {s} {noDataText} {highlightTimeValue} {onClick} {onHighlight} />
     </li>
   {/each}
 </ul>

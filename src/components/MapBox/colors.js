@@ -1,5 +1,4 @@
 import { scaleSequential, scaleSequentialLog } from 'd3-scale';
-import { interpolateYlOrRd } from 'd3-scale-chromatic';
 import logspace from 'compute-logspace';
 import { DIRECTION_THEME, ZERO_COLOR, MISSING_COLOR } from '../../theme';
 import { zip } from '../../util';
@@ -11,15 +10,20 @@ const SMALL_TICK_COUNT = 5;
 const TICK_COUNT = 7;
 
 /**
+ * @typedef {import('../../stores/constants').SensorEntry} SensorEntry
+ */
+
+/**
  * @param {*} statsLookup
- * @param {import('../../stores/constants').SensorEntry} sensorEntry
+ * @param {SensorEntry} sensorEntry
  * @param {string} level
  * @param {import('../../stores/constants').CasesOrDeathOptions} signalOptions
  */
 export function determineMinMax(statsLookup, sensorEntry, level, signalOptions) {
+  let key = sensorEntry.key;
   // Customize min max values for deaths
-  if (sensorEntry.isCount) {
-    let key = sensorEntry.key + '_' + level;
+  if (sensorEntry.getType(signalOptions) === 'count') {
+    key += `_${level}`;
     if (sensorEntry.isCasesOrDeath) {
       key += `_${primaryValue(sensorEntry, signalOptions)}`;
     }
@@ -27,35 +31,40 @@ export function determineMinMax(statsLookup, sensorEntry, level, signalOptions) 
     return [Math.max(MAGIC_MIN_STATS, stats.mean - 3 * stats.std), stats.mean + 3 * stats.std];
   }
 
-  const stats = statsLookup.get(sensorEntry.key);
+  if (sensorEntry.isCasesOrDeath) {
+    key += `_${primaryValue(sensorEntry, signalOptions)}`;
+  }
+  const stats = statsLookup.get(key);
   return [Math.max(0, stats.mean - 3 * stats.std), stats.mean + 3 * stats.std];
 }
 
 /**
- * @param {import('../../stores/constants').SensorEntry} sensorEntry
+ * @param {SensorEntry} sensorEntry
+ * @param {'prop' | 'count' | 'other'} sensorType
  * @param {'value' || 'direction'} signalType
  * @param {[number, number]} valueMinMax
  */
-export function determineColorScale(valueMinMax, signalType, sensorEntry) {
+export function determineColorScale(valueMinMax, signalType, sensorEntry, sensorType) {
   if (signalType === 'value') {
-    return determineValueColorScale(valueMinMax, sensorEntry);
+    return determineValueColorScale(valueMinMax, sensorEntry, sensorType);
   }
   // signalType is 'direction'
   return determineDirectionColorScale();
 }
 
 /**
- * @param {import('../../stores/constants').SensorEntry} sensorEntry
+ * @param {SensorEntry} sensorEntry
+ * @param {'prop' | 'count' | 'other'} sensorType
  * @param {[number, number]} valueMinMax
  */
-function determineValueColorScale(valueMinMax, sensorEntry) {
-  if (sensorEntry.isCount) {
-    return countSignalColorScale(valueMinMax);
+function determineValueColorScale(valueMinMax, sensorEntry, sensorType) {
+  if (sensorType === 'count') {
+    return countSignalColorScale(valueMinMax, sensorEntry);
   }
-  if (sensorEntry.isProp) {
-    return propSignalColorScale(valueMinMax);
+  if (sensorType === 'prop') {
+    return propSignalColorScale(valueMinMax, sensorEntry);
   }
-  return regularSignalColorScale(valueMinMax);
+  return regularSignalColorScale(valueMinMax, sensorEntry);
 }
 
 function determineDirectionColorScale() {
@@ -75,12 +84,16 @@ function determineDirectionColorScale() {
   return { stops, stopsMega };
 }
 
-function regularSignalColorScale(valueMinMax) {
-  const center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2,
-    firstHalfCenter = valueMinMax[0] + (center - valueMinMax[0]) / 2,
-    secondHalfCenter = center + (valueMinMax[1] - center) / 2;
+/**
+ * @param {SensorEntry} sensorEntry
+ * @param {[number, number]} valueMinMax
+ */
+function regularSignalColorScale(valueMinMax, sensorEntry) {
+  const center = valueMinMax[0] + (valueMinMax[1] - valueMinMax[0]) / 2;
+  const firstHalfCenter = valueMinMax[0] + (center - valueMinMax[0]) / 2;
+  const secondHalfCenter = center + (valueMinMax[1] - center) / 2;
 
-  const colorScaleLinear = scaleSequential(interpolateYlOrRd).domain(valueMinMax);
+  const colorScaleLinear = scaleSequential(sensorEntry.colorScale).domain(valueMinMax);
 
   // domainStops5 is used for other cases (prop signals)
   const domainStops5 = [valueMinMax[0], firstHalfCenter, center, secondHalfCenter, valueMinMax[1]];
@@ -91,14 +104,18 @@ function regularSignalColorScale(valueMinMax) {
   return { stops, scale: colorScaleLinear };
 }
 
-function propSignalColorScale(valueMinMax) {
+/**
+ * @param {SensorEntry} sensorEntry
+ * @param {[number, number]} valueMinMax
+ */
+function propSignalColorScale(valueMinMax, sensorEntry) {
   const min = Math.max(valueMinMax[0], 0);
   const max = Math.max(min + 0.01, valueMinMax[1]);
 
   const center = min + (max - min) / 2;
   const firstHalfCenter = min + (center - min) / 2;
   const secondHalfCenter = center + (max - center) / 2;
-  const colorScaleLinear = scaleSequential(interpolateYlOrRd).domain(valueMinMax);
+  const colorScaleLinear = scaleSequential(sensorEntry.colorScale).domain(valueMinMax);
   // domainStops5 is used for other cases (prop signals)
   const domainStops5 = [min, firstHalfCenter, center, secondHalfCenter, max];
   const linearColors5 = domainStops5.map((c) => colorScaleLinear(c).toString());
@@ -107,8 +124,12 @@ function propSignalColorScale(valueMinMax) {
   return { stops, scale: colorScaleLinear };
 }
 
-function countSignalColorScale(valueMinMax) {
-  const colorScaleLog = scaleSequentialLog(interpolateYlOrRd).domain(valueMinMax);
+/**
+ * @param {SensorEntry} sensorEntry
+ * @param {[number, number]} valueMinMax
+ */
+function countSignalColorScale(valueMinMax, sensorEntry) {
+  const colorScaleLog = scaleSequentialLog(sensorEntry.colorScale).domain(valueMinMax);
 
   // domainStops7 is used to determine the colors of regions for count signals.
   const domainStops7 = logspace(Math.log10(valueMinMax[0]), Math.log10(valueMinMax[1]), TICK_COUNT);
@@ -131,12 +152,13 @@ export function splitDomain(min, max, parts) {
 }
 
 /**
- * @param {import('../../stores/constants').SensorEntry} sensorEntry
+ * @param {SensorEntry} sensorEntry
+ * @param {import('../../stores/constants').CasesOrDeathOptions} signalOptions
  * @param {[number, number]} valueMinMax
  */
-function computeTicks(sensorEntry, valueMinMax, small) {
+function computeTicks(sensorEntry, signalOptions, valueMinMax, small) {
   const numTicks = small ? SMALL_TICK_COUNT : TICK_COUNT;
-  if (sensorEntry.isCount) {
+  if (sensorEntry.getType(signalOptions) === 'count') {
     const min = Math.log10(Math.max(10e-3, valueMinMax[0]));
     const max = Math.log10(Math.max(10e-2, valueMinMax[1]));
     return logspace(min, max, numTicks);
@@ -154,7 +176,7 @@ function computeTicks(sensorEntry, valueMinMax, small) {
 
 /**
  * @param {Map<string, any>} stats
- * @param {import('../../stores/constants').SensorEntry} sensorEntry
+ * @param {SensorEntry} sensorEntry
  * @param {string} level
  * @param {((v: number) => string)} colorScale
  * @param {import('../../stores/constants').CasesOrDeathOptions} signalOptions
@@ -170,7 +192,7 @@ export function generateLabels(stats, sensorEntry, level, colorScale, signalOpti
     };
   }
 
-  const ticks = computeTicks(sensorEntry, valueMinMax, small);
+  const ticks = computeTicks(sensorEntry, signalOptions, valueMinMax, small);
 
   return {
     low: sensorEntry.formatValue(0), // fixed 0

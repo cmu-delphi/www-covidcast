@@ -22,10 +22,6 @@ export function transparent(colors, opacity) {
   });
 }
 
-export function pairAdjacent(arr) {
-  return new Array(arr.length - 1).fill(0).map((x, i) => [arr[i], arr[i + 1]]);
-}
-
 /**
  * @type {WeakMap<Element, (size: {width: number, height: number}) => void>}
  */
