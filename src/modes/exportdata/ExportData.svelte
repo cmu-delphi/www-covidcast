@@ -300,7 +300,7 @@ data = covidcast.signal("${source ? source.id : ''}", "${signal ? signal.signal 
       <pre>
         {`library(covidcast)
 
-covidcast_data <- suppressMessages(
+cc_data <- suppressMessages(
 covidcast_signal(data_source = "${source ? source.id : ''}", signal = "${signal ? signal.signal : ''}",
                start_day = "${iso(startDate)}", end_day = "${iso(endDate)}",
                geo_type = "${geoType}")
