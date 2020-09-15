@@ -1,0 +1,5 @@
+.viz-tooltip {
+  transition: unset !important;
+  padding: 8px;
+  z-index: 5000;
+}

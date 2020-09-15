@@ -7,12 +7,6 @@
   "autosize": {
     "resize": true
   },
-  "transform": [
-    {
-      "calculate": "datum.date_value",
-      "as": "title"
-    }
-  ],
   "encoding": {
     "color": {
       "value": "grey"
@@ -35,11 +29,7 @@
         "tickCount": 3,
         "minExtent": 25
       }
-    },
-    "tooltip": [
-      { "field": "value", "type": "quantitative", "title": "Value", "format": ".2f" },
-      { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
-    ]
+    }
   },
   "layer": [
     {

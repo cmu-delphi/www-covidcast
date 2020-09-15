@@ -30,9 +30,9 @@
   export let signalOptions = {};
   export let animationDuration = 0;
   /**
-   * @type {import('../../maps/nameIdInfo').NameInfo | null}
+   * @type {{info: import('../../maps/nameIdInfo').NameInfo, color: string}[]}
    */
-  export let selection = null;
+  export let selections = [];
 
   let ready = false;
 
@@ -50,14 +50,16 @@
   function updateEncoding(level, encoding, sensor, signalType, stats, signalOptions) {
     // Get the range for the heatmap.
     const sensorEntry = sensorMap.get(sensor);
+    const sensorType = sensorEntry.getType(signalOptions);
     const valueMinMax = determineMinMax(stats, sensorEntry, level, signalOptions);
-    const { stops, scale } = determineColorScale(valueMinMax, signalType, sensorEntry);
+    const { stops, scale } = determineColorScale(valueMinMax, signalType, sensorEntry, sensorType);
     const drawMega = level === 'county';
     const ret = wrapper.updateOptions(
       encoding,
       level,
       signalType,
       sensor,
+      sensorType,
       valueMinMax,
       stops,
       drawMega && stops,
@@ -85,7 +87,7 @@
   $: {
     dummyTrack(ready);
     // update selection
-    wrapper.select(selection);
+    wrapper.selectMulti(selections);
   }
 
   function onResize() {

@@ -1,6 +1,5 @@
 import { toFillLayer, toBubbleLayer } from '../layers';
 import { toCenterSource } from '../sources';
-import { getType } from '../../../data/signals';
 import { parseScaleSpec } from '../../../stores/scales';
 import { BubbleLayer } from './BubbleLayer';
 
@@ -36,7 +35,7 @@ export default class BubbleEncoding {
     });
   }
 
-  encode(map, { level, sensor, valueMinMax, scale }) {
+  encode(map, { level, sensorType, valueMinMax, scale }) {
     // constant background
     map.setPaintProperty(toFillLayer(level), 'fill-color', this.theme.countyFill);
 
@@ -45,7 +44,7 @@ export default class BubbleEncoding {
     const minRadius = this.theme.minRadius[level];
     const maxRadius = this.theme.maxRadius[level];
 
-    const radiusScaleTheme = this.theme.radiusScale[getType(sensor)];
+    const radiusScaleTheme = this.theme.radiusScale[sensorType];
 
     const radiusScale = parseScaleSpec(radiusScaleTheme).domain(valueMinMax).range([minRadius, maxRadius]).clamp(true);
 

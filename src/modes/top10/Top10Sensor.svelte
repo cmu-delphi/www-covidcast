@@ -28,7 +28,10 @@
    */
   export let single;
 
-  $: data = fetchTimeSlice(sensor, level, id, startDay, finalDay, true);
+  $: data = fetchTimeSlice(sensor, level, id, startDay, finalDay, true, {
+    geo_value: id,
+    stderr: null,
+  });
 </script>
 
 <style>
