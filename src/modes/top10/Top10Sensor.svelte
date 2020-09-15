@@ -51,6 +51,10 @@
     right: 0;
     bottom: 0;
   }
+
+  td {
+    border: 0;
+  }
 </style>
 
 {#if sensor.isCasesOrDeath}

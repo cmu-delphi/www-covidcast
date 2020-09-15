@@ -196,14 +196,14 @@
     vertical-align: middle;
   }
 
-  tbody button {
+  /* tbody button {
     opacity: 0;
     transition: opacity 0.25s ease;
   }
 
   tr:hover button {
     opacity: 1;
-  }
+  } */
 
   .table th {
     background: white;
@@ -212,10 +212,20 @@
     position: relative;
   }
 
+  td,
+  th {
+    border: 0;
+  }
+
   .table > table {
     border-collapse: collapse;
     width: 100%;
     overflow: unset;
+  }
+
+  table {
+    padding: 1em;
+    font-size: 1.2em;
   }
 
   .right {
@@ -233,22 +243,25 @@
   }
 
   .selected > :global(td) {
-    border: 2px solid var(--red);
+    /* border: 2px solid var(--red); */
+    font-weight: bold;
   }
 
   .sorted::after {
-    content: '▲';
+    content: ' ▲';
+    font-size: 0.5em;
     display: inline-block;
   }
 
   .desc .sorted::after {
-    content: '▼';
+    content: ' ▼';
+    font-size: 0.5em;
   }
 
   .add-column {
-    -moz-appearance: none;
+    /* -moz-appearance: none;
     -webkit-appearance: none;
-    appearance: none;
+    appearance: none; */
     width: 1.4em;
   }
 
@@ -257,6 +270,7 @@
     right: 0.2em;
     top: 0.2em;
     font-size: 0.7rem;
+    width: 3em;
   }
 
   /** mobile **/
@@ -316,7 +330,12 @@
             </th>
           {/each}
           <th rowspan="2">
-            <select aria-label="add column options" bind:value={chosenColumn} class="add-column pg-button">
+            Add column
+            <select
+              aria-label="add column options"
+              bind:value={chosenColumn}
+              class="add-column"
+              style="display: inline-block;">
               <option value="">+</option>
               {#each groupedSensorList as sensorGroup}
                 <optgroup label={sensorGroup.label}>
@@ -333,7 +352,7 @@
             </select>
           </th>
         </tr>
-        <tr>
+        <!-- <tr>
           <th>{$currentDateObject.toLocaleDateString()}</th>
           {#if primary.isCasesOrDeath}
             <th>7-day Average</th>
@@ -346,23 +365,24 @@
             {/if}
             <th>Time Series</th>
           {/each}
-        </tr>
+        </tr> -->
       </thead>
       <tbody>
         {#each sortedRows as row, i}
           <tr class:selected={row.propertyId === $currentRegion}>
             <td>{row.rank}.</td>
-            <td>{row.displayName}</td>
+            <td>
+              {row.displayName}
+              <span style="width: 16px; display: inline-block;" on:click={jumpTo(row)}>
+
+                <IoIosPin title="Show on Map" />
+              </span>
+            </td>
             <td class="right">{row.population != null ? row.population.toLocaleString() : 'Unknown'}</td>
             <Top10Sensor sensor={primary} single={row.primary} id={row.propertyId} level={row.level} />
             {#each otherSensors as s, si}
               <Top10Sensor sensor={s} single={row.others[si]} id={row.propertyId} level={row.level} />
             {/each}
-            <td class="toolbar">
-              <button class="pg-button" title="Show on Map" on:click={jumpTo(row)}>
-                <IoIosPin />
-              </button>
-            </td>
           </tr>
         {/each}
       </tbody>
