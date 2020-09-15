@@ -4,6 +4,7 @@
   import Vega from '../../components/Vega.svelte';
   import { parseAPITime } from '../../data';
   import { fetchTimeSlice } from '../../data/fetchData';
+  import VegaTooltip from '../../components/DetailView/VegaTooltip.svelte';
 
   /**
    * @type {string}
@@ -18,6 +19,9 @@
   // Create a date for today in the API's date format
   const startDay = parseAPITime('20200401');
   const finalDay = yesterdayDate;
+
+  export let highlightTimeValue;
+  export let onHighlight;
 
   /**
    * @type {import('../../stores/constants').SensorEntry}
@@ -63,5 +67,12 @@
   <td class="right">{single && single.value != null ? sensor.formatValue(single.value) : 'Unknown'}</td>
 {/if}
 <td class="chart">
-  <Vega {data} {spec} signals={{ currentDate: $currentDateObject }} />
+  <Vega
+    {data}
+    {spec}
+    signals={{ currentDate: $currentDateObject, highlightTimeValue }}
+    signalListeners={['highlight']}
+    on:signal={onHighlight}
+    tooltip={VegaTooltip}
+    tooltipProps={{ sensor }} />
 </td>

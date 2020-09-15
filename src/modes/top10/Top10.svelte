@@ -17,6 +17,7 @@
   import { getInfoByName, nameInfos } from '../../maps';
   import Top10Sensor from './Top10Sensor.svelte';
   import Search from '../../components/Search.svelte';
+  import { throttle } from 'lodash-es';
   import { levelMegaCounty, groupedSensorList, sensorList } from '../../stores/constants';
 
   /**
@@ -165,6 +166,24 @@
       otherSensors = otherSensors.concat([sensorList.find((d) => d.key === chosenColumn)]);
       chosenColumn = '';
     }
+  }
+
+  let highlightTimeValue = null;
+
+  const throttled = throttle((value) => {
+    highlightTimeValue = value;
+  }, 10);
+
+  function onHighlight(e) {
+    const highlighted = e.detail.value;
+    const id = highlighted && Array.isArray(highlighted._vgsid_) ? highlighted._vgsid_[0] : null;
+
+    if (!id) {
+      throttled(null);
+      return;
+    }
+    const row = e.detail.view.data('data_0').find((d) => d._vgsid_ === id);
+    throttled(row ? row.time_value : null);
   }
 </script>
 
@@ -360,9 +379,21 @@
             <td>{row.rank}.</td>
             <td>{row.displayName}</td>
             <td class="right">{row.population != null ? row.population.toLocaleString() : 'Unknown'}</td>
-            <Top10Sensor sensor={primary} single={row.primary} id={row.propertyId} level={row.level} />
+            <Top10Sensor
+              sensor={primary}
+              single={row.primary}
+              id={row.propertyId}
+              level={row.level}
+              {highlightTimeValue}
+              {onHighlight} />
             {#each otherSensors as s, si}
-              <Top10Sensor sensor={s} single={row.others[si]} id={row.propertyId} level={row.level} />
+              <Top10Sensor
+                sensor={s}
+                single={row.others[si]}
+                id={row.propertyId}
+                level={row.level}
+                {highlightTimeValue}
+                {onHighlight} />
             {/each}
             <td class="toolbar">
               <button class="pg-button" title="Show on Map" on:click={jumpTo(row)}>
