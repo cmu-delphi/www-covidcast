@@ -101,3 +101,4 @@ button.mapboxgl-popup-close-button {
 @import './styles/loading.css';
 @import './styles/message-overlay.css';
 @import './styles/vega.css';
+@import './styles/tooltip.css';

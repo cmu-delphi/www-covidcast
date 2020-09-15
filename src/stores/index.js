@@ -144,8 +144,11 @@ export const currentRegionInfo = derived([currentRegion], ([current]) => getInfo
  *
  * @param {import('../maps/nameIdInfo').NameInfo | null} elem
  */
-export function selectByInfo(elem) {
+export function selectByInfo(elem, reset = false) {
   if (elem === get(currentRegionInfo)) {
+    if (reset) {
+      currentRegion.set('');
+    }
     return;
   }
   if (elem) {
@@ -156,8 +159,8 @@ export function selectByInfo(elem) {
   }
 }
 
-export function selectByFeature(feature) {
-  selectByInfo(feature ? getInfoByName(feature.properties.id) : null);
+export function selectByFeature(feature, reset = false) {
+  selectByInfo(feature ? getInfoByName(feature.properties.id) : null, reset);
 }
 
 export const colorScale = writable(scaleSequentialLog());

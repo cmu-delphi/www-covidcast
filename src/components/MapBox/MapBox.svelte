@@ -30,9 +30,9 @@
   export let signalOptions = {};
   export let animationDuration = 0;
   /**
-   * @type {import('../../maps/nameIdInfo').NameInfo | null}
+   * @type {{info: import('../../maps/nameIdInfo').NameInfo, color: string}[]}
    */
-  export let selection = null;
+  export let selections = [];
 
   let ready = false;
 
@@ -87,7 +87,7 @@
   $: {
     dummyTrack(ready);
     // update selection
-    wrapper.select(selection);
+    wrapper.selectMulti(selections);
   }
 
   function onResize() {
