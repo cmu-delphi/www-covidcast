@@ -15,6 +15,7 @@
   } from '../../stores';
   import MapOverlays from '../../components/MapOverlays.svelte';
   import { fetchRegionSlice } from '../../data/fetchData';
+  import USMapBoxWrapper from '../../components/MapBox/USMapBoxWrapper';
 
   /**
    * @type {MapBox}
@@ -68,5 +69,6 @@
     encoding={$encoding}
     on:ready={() => initialReady()}
     interactive={false}
-    on:updatedEncoding={(e) => updatedEncoding(e.detail)} />
+    on:updatedEncoding={(e) => updatedEncoding(e.detail)}
+    wrapperClass={USMapBoxWrapper} />
 </main>

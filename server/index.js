@@ -20,6 +20,7 @@ const { Cluster } = require('puppeteer-cluster');
     // const base = `file:///${require.resolve('../public/remote.html').replace('\\', '/')}`;
     const base = 'http://localhost:8080/remote.html';
     const url = `${base}?${query}`;
+    // page.on('console', (m) => console.log(m));
     console.log(url);
     await page.goto(url);
     const elem = await page.waitForSelector('[data-screenshot=ready], [data-screenshot=nested] > *', {

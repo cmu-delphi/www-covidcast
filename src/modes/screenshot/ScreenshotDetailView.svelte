@@ -1,7 +1,7 @@
 <script>
   import DetailView from '../../components/DetailView/DetailView.svelte';
 
-  import { currentMode, currentSensorEntry } from '../../stores';
+  import { currentMode, currentSensorEntry, levelList } from '../../stores';
   import SmallMultiplesPanel from '../overview/SmallMultiplesPanel.svelte';
 
   let ready = null;
@@ -28,6 +28,6 @@
   {#if $currentMode.id === 'screenshot-detail'}
     <DetailView sensor={$currentSensorEntry} on:ready={initialReady} download />
   {:else}
-    <SmallMultiplesPanel detail={$currentSensorEntry} on:ready={initialReady} download />
+    <SmallMultiplesPanel detail={$currentSensorEntry} on:ready={initialReady} levels={levelList} download />
   {/if}
 </main>
