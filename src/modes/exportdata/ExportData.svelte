@@ -4,9 +4,10 @@
   import { timeFormat } from 'd3-time-format';
   import { callMetaAPI } from '../../data/api';
   import Datepicker from '../../components/Calendar/Datepicker.svelte';
-  import { getLevelInfo, sensorMap } from '../../stores/constants';
+  import { getLevelInfo, primaryValue, sensorList, sensorMap } from '../../stores/constants';
   import { parseAPITime } from '../../data';
   import { currentSensorEntry, smallMultipleTimeSpan } from '../../stores';
+  import { timeMonth } from 'd3-time';
 
   const CSV_SERVER = 'https://delphi.cmu.edu/csv';
   const iso = timeFormat('%Y-%m-%d');
@@ -19,8 +20,9 @@
   let sourceValue = null;
   let signalValue = null;
   let geoType = 'county';
-  let startDate = $smallMultipleTimeSpan[0];
   let endDate = $smallMultipleTimeSpan[1];
+  // one month in the past
+  let startDate = timeMonth.offset($smallMultipleTimeSpan[1], -1);
 
   let levelList = [];
   $: source = sourceValue ? sources.find((d) => d.id === sourceValue) : null;
@@ -32,6 +34,35 @@
     }
   }
 
+  /**
+   * @type {Map<string, {name: string, tooltipText: string}>}
+   */
+  const lookupMap = new Map(sensorMap);
+  // add the cases death extra ones
+  sensorList
+    .filter((d) => d.isCasesOrDeath)
+    .forEach((entry) => {
+      const add = (cumulative, ratio) => {
+        const options = { cumulative, ratio };
+        const signal = entry.casesOrDeathSignals[primaryValue(entry, options)];
+        const text = entry.mapTitleText(options);
+        const name = `${cumulative ? 'Cumulative ' : ''}${entry.name}${ratio ? ' per 100,000 people' : ''}`;
+        lookupMap.set(`${entry.id}-${signal}`, {
+          name: `${name} (7-day average)`,
+          tooltipText: text,
+        });
+        const countSignal = entry.casesOrDeathSignals[primaryValue(entry, options).replace('avg', 'count')];
+        lookupMap.set(`${entry.id}-${countSignal}`, {
+          name,
+          tooltipText: text.replace(' (7-day average) ', ''),
+        });
+      };
+      add(false, false);
+      add(false, true);
+      add(true, false);
+      add(true, true);
+    });
+
   callMetaAPI(null, ['min_time', 'max_time', 'signal', 'geo_type', 'data_source'], {
     time_types: 'day',
   }).then((r) => {
@@ -41,6 +72,14 @@
     const levels = new Set();
     r.epidata.forEach((entry) => {
       const dataSource = entry.data_source;
+      const id = `${dataSource}:${entry.signal}`;
+      let known = lookupMap.get(`${dataSource}-${entry.signal}`);
+
+      if (!known) {
+        // limit to the one in the map only
+        return;
+      }
+
       if (!data.has(dataSource)) {
         data.set(dataSource, {
           id: dataSource,
@@ -56,9 +95,7 @@
       levels.add(entry.geo_type);
       ds.levels.add(entry.geo_type);
 
-      const id = `${dataSource}:${entry.signal}`;
       if (ds.signals.every((d) => d.id !== id)) {
-        const known = sensorMap.get(`${dataSource}-${entry.signal}`);
         ds.signals.push({
           id,
           signal: entry.signal,
@@ -136,9 +173,8 @@
   <h4>Export Data</h4>
   <p>
     All signals displayed on the COVIDcast map, and numerous other signals, are freely available for download here. You
-    can also access the latest daily through the
-    <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a>
-    .
+    can also access the latest daily through the <a
+      href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a>.
   </p>
   <section>
     <h5>1. Select Signal</h5>
@@ -199,11 +235,10 @@
         {/each}
       </select>
       <p class="description">
-        Each geographic region is identified with a unique identifier, such as FIPS code. See the
-        <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">
+        Each geographic region is identified with a unique identifier, such as FIPS code. See the <a
+          href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">
           geographic coding documentation
-        </a>
-        for details.
+        </a> for details.
       </p>
     </div>
   </section>
@@ -243,11 +278,7 @@
       </button>
     </div>
     {#if currentMode === 'python'}
-      <p>
-        Install
-        <code>covidcast</code>
-        via pip:
-      </p>
+      <p>Install <code>covidcast</code> via pip:</p>
       <pre>pip install covidcast</pre>
       <p>Fetch data:</p>
       <pre>
@@ -259,31 +290,25 @@ data = covidcast.signal("${source ? source.id : ''}", "${signal ? signal.signal 
                     "${geoType}")`}
       </pre>
       <p class="description">
-        For more details and examples, see the
-        <a href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/">package documentation.</a>
+        For more details and examples, see the <a href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/">package
+          documentation.</a>
       </p>
     {:else if currentMode === 'r'}
-      <p>
-        Install
-        <code>covidcast</code>
-        using
-        <a href="https://devtools.r-lib.org/">devtools</a>
-        :
-      </p>
+      <p>Install <code>covidcast</code> using <a href="https://devtools.r-lib.org/">devtools</a> :</p>
       <pre>devtools::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/covidcast")</pre>
       <p>Fetch data:</p>
       <pre>
         {`library(covidcast)
 
-cli <- suppressMessages(
+covidcast_data <- suppressMessages(
 covidcast_signal(data_source = "${source ? source.id : ''}", signal = "${signal ? signal.signal : ''}",
                start_day = "${iso(startDate)}", end_day = "${iso(endDate)}",
                geo_type = "${geoType}")
 )`}
       </pre>
       <p class="description">
-        For more details and examples, see the
-        <a href="https://cmu-delphi.github.io/covidcast/covidcastR/">package documentation.</a>
+        For more details and examples, see the <a href="https://cmu-delphi.github.io/covidcast/covidcastR/">package
+          documentation.</a>
       </p>
     {/if}
     <form id="form" method="GET" action={CSV_SERVER} download>
