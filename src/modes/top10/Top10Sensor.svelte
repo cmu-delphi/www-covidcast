@@ -1,10 +1,12 @@
 <script>
-  import { currentDateObject, yesterdayDate } from '../../stores';
+  import { currentDateObject, signalCasesOrDeathOptions, stats, yesterdayDate } from '../../stores';
   import spec from '../overview/SmallMultiplesChart.json';
   import Vega from '../../components/Vega.svelte';
   import { parseAPITime } from '../../data';
   import { fetchTimeSlice } from '../../data/fetchData';
   import VegaTooltip from '../../components/DetailView/VegaTooltip.svelte';
+  import { merge } from 'lodash-es';
+  import { determineMinMax } from '../../components/MapBox/colors';
 
   /**
    * @type {string}
@@ -35,6 +37,17 @@
   $: data = fetchTimeSlice(sensor, level, id, startDay, finalDay, true, {
     geo_value: id,
     stderr: null,
+  });
+
+  $: patchedSpec = merge({}, spec, {
+    encoding: {
+      y: {
+        scale: {
+          domain: determineMinMax($stats, sensor, level, $signalCasesOrDeathOptions),
+          clamp: true,
+        },
+      },
+    },
   });
 </script>
 
@@ -69,7 +82,7 @@
 <td class="chart">
   <Vega
     {data}
-    {spec}
+    spec={patchedSpec}
     signals={{ currentDate: $currentDateObject, highlightTimeValue }}
     signalListeners={['highlight']}
     on:signal={onHighlight}
