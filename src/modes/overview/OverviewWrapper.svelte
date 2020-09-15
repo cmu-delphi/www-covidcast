@@ -20,6 +20,7 @@
     currentDateObject,
     signalCasesOrDeathOptions,
     isMobileDevice,
+    currentDate,
   } from '../../stores';
   import Search from '../../components/Search.svelte';
   import SmallMultiplesPanel from './SmallMultiplesPanel.svelte';
@@ -31,6 +32,7 @@
   import SingleModeToggle from '../../components/SingleModeToggle.svelte';
   import modes from '..';
   import { MAP_THEME } from '../../theme';
+  import { downloadMap } from '../../data/screenshot';
 
   export let wrapperClass;
   export let regionSearchList;
@@ -84,6 +86,16 @@
   let zoom = 1;
 
   $: selections = $currentRegionInfo ? [{ info: $currentRegionInfo, color: MAP_THEME.selectedRegionOutline }] : [];
+
+  function downloadHandler() {
+    downloadMap({
+      sensor: $currentSensor,
+      level: $currentLevel,
+      date: $currentDate,
+      encoding: $encoding,
+      signalType: $signalType,
+    });
+  }
 </script>
 
 <style>
@@ -272,7 +284,7 @@
   </div>
 
   <div class="map-container" class:mobileHide={!mobileShowMap}>
-    <MapOverlays {map} mapLoading={loading} legendLoading={loading} {zoom} />
+    <MapOverlays {map} mapLoading={loading} legendLoading={loading} {zoom} {downloadHandler} />
     <div class="mode-container container-bg container-style">
       <SingleModeToggle mode={modes[1]} />
     </div>
