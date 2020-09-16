@@ -286,8 +286,8 @@
 import covidcast
 
 data = covidcast.signal("${source ? source.id : ''}", "${signal ? signal.signal : ''}",
-                    date(${startDate.getFullYear()}, ${startDate.getMonth() + 1}, ${startDate.getDate()}), date(${endDate.getFullYear()}, ${endDate.getMonth() + 1}, ${endDate.getDate()}),
-                    "${geoType}")`}
+                        date(${startDate.getFullYear()}, ${startDate.getMonth() + 1}, ${startDate.getDate()}), date(${endDate.getFullYear()}, ${endDate.getMonth() + 1}, ${endDate.getDate()}),
+                        "${geoType}")`}
       </pre>
       <p class="description">
         For more details and examples, see the <a href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/">package
@@ -302,8 +302,8 @@ data = covidcast.signal("${source ? source.id : ''}", "${signal ? signal.signal 
 
 cc_data <- suppressMessages(
 covidcast_signal(data_source = "${source ? source.id : ''}", signal = "${signal ? signal.signal : ''}",
-               start_day = "${iso(startDate)}", end_day = "${iso(endDate)}",
-               geo_type = "${geoType}")
+                 start_day = "${iso(startDate)}", end_day = "${iso(endDate)}",
+                 geo_type = "${geoType}")
 )`}
       </pre>
       <p class="description">
