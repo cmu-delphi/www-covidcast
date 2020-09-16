@@ -36,6 +36,7 @@
     margin: 0 6px;
     display: flex;
     align-items: flex-start;
+    justify-content: center;
   }
 
   /** desktop **/
