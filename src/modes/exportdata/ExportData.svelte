@@ -8,6 +8,8 @@
   import { parseAPITime } from '../../data';
   import { currentSensorEntry, smallMultipleTimeSpan } from '../../stores';
   import { timeMonth } from 'd3-time';
+  import { onMount } from 'svelte';
+  import { trackEvent } from '../../stores/ga';
 
   const CSV_SERVER = 'https://delphi.cmu.edu/csv';
   const iso = timeFormat('%Y-%m-%d');
@@ -113,6 +115,20 @@
   });
 
   let currentMode = 'csv';
+
+  let form = null;
+
+  onMount(() => {
+    if (form) {
+      form.addEventListener('submit', () => {
+        trackEvent(
+          'exportdata',
+          'download',
+          `signal=${signalValue},start_day=${iso(startDate)},end_day=${iso(endDate)},geo_type=${geoType}`,
+        );
+      });
+    }
+  });
 </script>
 
 <style>
@@ -311,7 +327,7 @@ covidcast_signal(data_source = "${source ? source.id : ''}", signal = "${signal 
           documentation.</a>
       </p>
     {/if}
-    <form id="form" method="GET" action={CSV_SERVER} download>
+    <form bind:this={form} id="form" method="GET" action={CSV_SERVER} download>
       <input type="hidden" name="signal" value={signalValue} />
       <input type="hidden" name="start_day" value={iso(startDate)} />
       <input type="hidden" name="end_day" value={iso(endDate)} />
