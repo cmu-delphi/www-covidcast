@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { currentMode, appReady, sensorList } from './stores';
+  import { currentMode, appReady, sensorList, injectModeSwitcher } from './stores';
   import './stores/urlHandler';
   import './stores/ga';
   import { loadMetaData } from './data';
@@ -8,6 +8,7 @@
   onMount(() => {
     loadMetaData(sensorList).then(() => {
       appReady.set(true);
+      injectModeSwitcher();
     });
   });
 

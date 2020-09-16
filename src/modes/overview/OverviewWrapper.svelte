@@ -28,8 +28,6 @@
   import MapOverlays from '../../components/MapOverlays.svelte';
   import { trackEvent } from '../../stores/ga';
   import FaBan from 'svelte-icons/fa/FaBan.svelte';
-  import SingleModeToggle from '../../components/SingleModeToggle.svelte';
-  import modes from '..';
   import { MAP_THEME } from '../../theme';
 
   export let wrapperClass;
@@ -146,14 +144,6 @@
     display: flex;
     margin-right: 6px;
     grid-area: view;
-  }
-
-  .mode-container {
-    position: absolute;
-    margin: 6px;
-    right: 0;
-    bottom: 0;
-    z-index: 1000;
   }
 
   .map-button {
@@ -273,9 +263,6 @@
 
   <div class="map-container" class:mobileHide={!mobileShowMap}>
     <MapOverlays {map} mapLoading={loading} legendLoading={loading} {zoom} />
-    <div class="mode-container container-bg container-style">
-      <SingleModeToggle mode={modes[1]} />
-    </div>
     <MapBox
       bind:this={map}
       on:loading={(e) => (loading = e.detail)}

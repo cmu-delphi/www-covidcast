@@ -208,7 +208,7 @@ currentSensorEntry.subscribe((sensorEntry) => {
 export const isMobileDevice = readable(false, (set) => {
   const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
   set(isMobileQuery.matches);
-  isMobileQuery.addListener((r) => {
+  isMobileQuery.addEventListener('change', (r) => {
     set(r.matches);
   });
 });
@@ -220,3 +220,34 @@ export const isMobileDevice = readable(false, (set) => {
 //     set(r.matches);
 //   });
 // });
+
+/**
+ * checks for all links that are marked as mode switchers and apply the mode directly
+ */
+export function injectModeSwitcher() {
+  const menu = document.querySelector('[data-mode-menu]');
+  if (!menu) {
+    return;
+  }
+  Array.from(menu.querySelectorAll('a[data-mode]')).forEach((elem) => {
+    const mode = modes.find((d) => d.id === elem.dataset.mode);
+    if (mode) {
+      elem.addEventListener('click', (e) => {
+        currentMode.set(mode);
+        e.preventDefault();
+      });
+    }
+  });
+
+  // sync active
+  currentMode.subscribe((value) => {
+    const active = menu.querySelector('li.active');
+    if (active) {
+      active.classList.remove('active');
+    }
+    const newActive = menu.querySelector(`[data-mode="${value.id}"]`);
+    if (newActive) {
+      newActive.parentElement.classList.add('active');
+    }
+  });
+}
