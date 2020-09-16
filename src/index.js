@@ -14,8 +14,6 @@ console.log('running version:', __VERSION__);
 
 export default app;
 
-
-
 // hopefully runs after the main.js thing
 $(() => {
   const nav = document.querySelector('.viz-header > nav[aria-hidden]');
