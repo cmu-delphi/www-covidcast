@@ -28,12 +28,6 @@ export default [
     tooltip: 'Switch to Export Data Mode',
     component: () => import('./exportdata/ExportData.svelte').then((r) => r.default),
   },
-  // {
-  //   id: 'compare',
-  //   label: 'Compare',
-  //   tooltip: 'Switch to Comparison Mode',
-  //   component: () => import(/* webpackPrefech: true */ './compare/Compare.svelte').then((r) => r.default),
-  // },
   {
     id: 'top10',
     label: 'Top 10',
