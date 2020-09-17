@@ -1,5 +1,5 @@
 <script>
-  import { signalCasesOrDeathOptions, currentDateObject, smallMultipleTimeSpan } from '../../stores';
+  import { signalCasesOrDeathOptions, currentDateObject, smallMultipleTimeSpan, currentInfoSensor } from '../../stores';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../Vega.svelte';
   import spec from './DetailView.json';
@@ -12,6 +12,7 @@
   import EncodingOptions from '../EncodingOptions.svelte';
   import { trackEvent } from '../../stores/ga';
   import VegaTooltip from './VegaTooltip.svelte';
+  import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
 
   const dispatch = createEventDispatcher();
   /**
@@ -213,6 +214,10 @@
     bottom: 0;
   }
 
+  h5 {
+    display: inline-block;
+  }
+
   .header {
     position: relative;
   }
@@ -245,11 +250,27 @@
     margin-left: 0.5em;
     opacity: 0.2;
   }
+
+  .info {
+    margin-left: 1em;
+    font-size: 0.7rem;
+    display: inline-block;
+  }
 </style>
 
 <div class="header">
   <h4>{sensor.name} in {hasRegion ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown'}</h4>
-  <h5>{mapTitle}</h5>
+  <div>
+    <h5>{mapTitle}</h5>
+    {#if sensor.longDescription}
+      <button
+        title="Show sensor description"
+        class="pg-button pg-button-circle info"
+        on:click={() => {
+          currentInfoSensor.set(sensor);
+        }}><IoMdHelp /></button>
+    {/if}
+  </div>
   <button
     bind:this={close}
     class="pg-button close"

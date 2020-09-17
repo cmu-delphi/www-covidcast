@@ -67,6 +67,8 @@ export function getLevelInfo(level) {
  * @property {string} key
  * @property {'public' | 'early' | 'late'} type
  * @property {string} name
+ * @property {string?} longDescription
+ * @property {{alt: string, href: string}[]} links
  * @property {string} id
  * @property {string} signal
  * @property {string[]} levels
@@ -189,6 +191,7 @@ export function extendSensorEntry(sensorEntry) {
     isCasesOrDeath,
     casesOrDeathSignals: isCasesOrDeath ? generateCasesOrDeathSignals(signal) : {},
     colorScale: sensorEntry.colorScale || interpolateYlOrRd,
+    links: sensorEntry.links || [],
   });
 }
 
@@ -246,6 +249,23 @@ const defaultSensors = [
   {
     type: 'early',
     name: 'Symptoms (FB)',
+    longDescription: `<p>Each day, Delphi surveys tens of thousands of Facebook users and asks them
+    if they or anyone in their household are currently experiencing symptoms.
+    Based on the survey results, we estimate the percentage of people with COVID-like symptoms.
+    A person has "COVID-like" symptoms if they have a fever, along with either cough,
+    shortness of breath, or difficulty breathing. While many other conditions can cause
+    these symptoms, comparing the rates of COVID-like symptoms across the country can
+    suggest where COVID is most active.</p>`,
+    links: [
+      {
+        href: 'https://delphi.cmu.edu/blog/2020/08/26/covid-19-symptom-surveys-through-facebook/',
+        alt: 'More information',
+      },
+      {
+        href: 'https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html',
+        alt: 'Technical description',
+      },
+    ],
     id: 'fb-survey',
     signal: 'smoothed_cli',
     levels: ['county', 'msa', 'state', 'hrr'],

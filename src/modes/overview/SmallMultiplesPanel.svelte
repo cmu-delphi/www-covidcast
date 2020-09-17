@@ -1,5 +1,5 @@
 <script>
-  import { sensorList, currentSensor, smallMultipleTimeSpan, currentDate } from '../../stores';
+  import { sensorList, currentSensor, smallMultipleTimeSpan, currentDate, currentInfoSensor } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import spec from './SmallMultiplesChart.json';
@@ -8,6 +8,7 @@
   import { merge, throttle } from 'lodash-es';
   import { levelList, levelMegaCounty } from '../../stores/constants';
   import SmallMultiple from './SmallMultiple.svelte';
+  import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
 
   /**
    * bi-directional binding
@@ -217,15 +218,18 @@
     padding: 0;
   }
 
-  li:hover .toolbar,
-  li.selected .toolbar,
-  .toolbar:hover,
-  .toolbar:focus {
+  li:hover .toolbar > button,
+  li.selected .toolbar > button,
+  .toolbar > button:hover,
+  .toolbar > button:focus {
     opacity: 1;
   }
 
   .toolbar {
     font-size: 0.7rem;
+    display: flex;
+  }
+  .toolbar > button {
     opacity: 0;
     transition: opacity 0.25s ease;
   }
@@ -266,17 +270,27 @@
           }}>
           {typeof s.sensor.mapTitleText === 'function' ? s.sensor.mapTitleText() : s.sensor.name}
         </button>
-        <button
-          class="pg-button toolbar"
-          class:hidden={!hasRegion}
-          title="Show as detail view"
-          class:active={detail === s.sensor}
-          on:click|stopPropagation={() => {
-            trackEvent('side-panel', detail === s.sensor ? 'hide-detail' : 'show-detail', s.sensor.key);
-            detail = detail === s.sensor ? null : s.sensor;
-          }}>
-          <FaSearchPlus />
-        </button>
+        <div class="toolbar">
+          {#if s.sensor.longDescription}
+            <button
+              title="Show sensor description"
+              class="pg-button info"
+              on:click={() => {
+                currentInfoSensor.set(s.sensor);
+              }}><IoMdHelp /></button>
+          {/if}
+          <button
+            class="pg-button"
+            class:hidden={!hasRegion}
+            title="Show as detail view"
+            class:active={detail === s.sensor}
+            on:click|stopPropagation={() => {
+              trackEvent('side-panel', detail === s.sensor ? 'hide-detail' : 'show-detail', s.sensor.key);
+              detail = detail === s.sensor ? null : s.sensor;
+            }}>
+            <FaSearchPlus />
+          </button>
+        </div>
       </div>
       <SmallMultiple {s} {noDataText} {highlightTimeValue} {onClick} {onHighlight} />
     </li>

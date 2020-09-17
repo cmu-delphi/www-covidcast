@@ -225,6 +225,11 @@ currentSensorEntry.subscribe((sensorEntry) => {
   }
 });
 
+/**
+ * @type {import('svelte/store').Writable<import('../data').SensorEntry | null>}
+ */
+export const currentInfoSensor = writable(null);
+
 // mobile device detection
 // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
 
