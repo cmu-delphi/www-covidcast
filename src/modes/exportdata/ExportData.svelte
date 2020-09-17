@@ -1,0 +1,338 @@
+<script>
+  import modes from '..';
+  import SingleModeToggle from '../../components/SingleModeToggle.svelte';
+  import { timeFormat } from 'd3-time-format';
+  import { callMetaAPI } from '../../data/api';
+  import Datepicker from '../../components/Calendar/Datepicker.svelte';
+  import { getLevelInfo, primaryValue, sensorList, sensorMap } from '../../stores/constants';
+  import { parseAPITime } from '../../data';
+  import { currentSensorEntry, smallMultipleTimeSpan } from '../../stores';
+  import { timeMonth } from 'd3-time';
+  import { onMount } from 'svelte';
+  import { trackEvent } from '../../stores/ga';
+
+  const CSV_SERVER = 'https://delphi.cmu.edu/csv';
+  const iso = timeFormat('%Y-%m-%d');
+
+  let loading = true;
+  /**
+   * @type {{id: string, name: string, levels: Set<string>, minTime: Date, maxTime: Date, signals: {id: string, name: string, description: string}[]}[]}
+   */
+  let sources = [];
+  let sourceValue = null;
+  let signalValue = null;
+  let geoType = 'county';
+  let endDate = $smallMultipleTimeSpan[1];
+  // one month in the past
+  let startDate = timeMonth.offset($smallMultipleTimeSpan[1], -1);
+
+  let levelList = [];
+  $: source = sourceValue ? sources.find((d) => d.id === sourceValue) : null;
+  $: signal = signalValue && source ? source.signals.find((d) => d.id === signalValue) : null;
+
+  $: {
+    if (source && !source.signals.find((d) => d.id === signalValue)) {
+      signalValue = source.signals[0].id;
+    }
+  }
+
+  /**
+   * @type {Map<string, {name: string, tooltipText: string}>}
+   */
+  const lookupMap = new Map(sensorMap);
+  // add the cases death extra ones
+  sensorList
+    .filter((d) => d.isCasesOrDeath)
+    .forEach((entry) => {
+      const add = (cumulative, ratio) => {
+        const options = { cumulative, ratio };
+        const signal = entry.casesOrDeathSignals[primaryValue(entry, options)];
+        const text = entry.mapTitleText(options);
+        const name = `${cumulative ? 'Cumulative ' : ''}${entry.name}${ratio ? ' per 100,000 people' : ''}`;
+        lookupMap.set(`${entry.id}-${signal}`, {
+          name: `${name} (7-day average)`,
+          tooltipText: text,
+        });
+        const countSignal = entry.casesOrDeathSignals[primaryValue(entry, options).replace('avg', 'count')];
+        lookupMap.set(`${entry.id}-${countSignal}`, {
+          name,
+          tooltipText: text.replace(' (7-day average) ', ''),
+        });
+      };
+      add(false, false);
+      add(false, true);
+      add(true, false);
+      add(true, true);
+    });
+
+  callMetaAPI(null, ['min_time', 'max_time', 'signal', 'geo_type', 'data_source'], {
+    time_types: 'day',
+  }).then((r) => {
+    loading = false;
+
+    const data = new Map();
+    const levels = new Set();
+    r.epidata.forEach((entry) => {
+      const dataSource = entry.data_source;
+      const id = `${dataSource}:${entry.signal}`;
+      let known = lookupMap.get(`${dataSource}-${entry.signal}`);
+
+      if (!known) {
+        // limit to the one in the map only
+        return;
+      }
+
+      if (!data.has(dataSource)) {
+        data.set(dataSource, {
+          id: dataSource,
+          name: dataSource,
+          levels: new Set(),
+          minTime: parseAPITime(entry.min_time),
+          maxTime: parseAPITime(entry.max_time),
+          signals: [],
+        });
+      }
+      const ds = data.get(dataSource);
+
+      levels.add(entry.geo_type);
+      ds.levels.add(entry.geo_type);
+
+      if (ds.signals.every((d) => d.id !== id)) {
+        ds.signals.push({
+          id,
+          signal: entry.signal,
+          name: known ? known.name : entry.signal,
+          description: known ? known.tooltipText : 'no description found',
+        });
+      }
+    });
+
+    sources = Array.from(data.values()).sort((a, b) => a.name.localeCompare(b.name));
+    sourceValue = $currentSensorEntry.id;
+    signalValue = $currentSensorEntry.signal;
+    levelList = [...levels].map(getLevelInfo);
+    geoType = $currentSensorEntry.levels[0];
+  });
+
+  let currentMode = 'csv';
+
+  let form = null;
+
+  onMount(() => {
+    if (form) {
+      form.addEventListener('submit', () => {
+        trackEvent(
+          'exportdata',
+          'download',
+          `signal=${signalValue},start_day=${iso(startDate)},end_day=${iso(endDate)},geo_type=${geoType}`,
+        );
+      });
+    }
+  });
+</script>
+
+<style>
+  .root {
+    flex-grow: 1;
+    padding: 1em;
+  }
+
+  .block {
+    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    padding: 0.2em;
+    width: 20em;
+  }
+
+  .group label {
+    font-weight: bold;
+  }
+
+  .group {
+    display: flex;
+  }
+
+  button {
+    width: auto;
+  }
+
+  section {
+    padding: 1em;
+  }
+
+  pre {
+    padding: 0.2em;
+    background: #efefef;
+  }
+
+  .description {
+    padding: 0;
+    font-size: 80%;
+  }
+
+  form {
+    visibility: hidden;
+  }
+
+  .buttons {
+    display: flex;
+    align-items: center;
+  }
+
+  .buttons > button {
+    min-width: 5em;
+  }
+</style>
+
+<div class="root" class:loading>
+  <h4>Export Data</h4>
+  <p>
+    All signals displayed on the COVIDcast map, and numerous other signals, are freely available for download here. You
+    can also access the latest daily through the <a
+      href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a>.
+  </p>
+  <section>
+    <h5>1. Select Signal</h5>
+    <div class="group">
+      <div class="block">
+        <label for="ds">Data Sources</label>
+        <select id="ds" bind:value={sourceValue} size="8">
+          {#each sources as source}
+            <option value={source.id}>{source.name}</option>
+          {/each}
+        </select>
+      </div>
+      <div class="block">
+        <label for="s">Signals</label>
+        <select id="s" bind:value={signalValue} required size="8">
+          {#if source}
+            {#each source.signals as signal}
+              <option value={signal.id}>{signal.name}</option>
+            {/each}
+          {:else}
+            <option value="">Select a Data Source first</option>
+          {/if}
+        </select>
+      </div>
+      <div class="block">
+        {#if signal}
+          <h6>{signal.name}</h6>
+          <p>{signal.description}</p>
+        {/if}
+      </div>
+    </div>
+  </section>
+  <section>
+    <h5>2. Specify Parameters</h5>
+    <div>
+      <span>Date Range</span>
+      <Datepicker
+        bind:selected={startDate}
+        start={source ? source.minTime : new Date()}
+        end={source ? source.maxTime : new Date()}
+        formattedSelected={iso(startDate)}>
+        <button aria-label="selected start date" class="pg-button" on:>{iso(startDate)}</button>
+      </Datepicker>
+      -
+      <Datepicker
+        bind:selected={endDate}
+        start={source ? source.minTime : new Date()}
+        end={source ? source.maxTime : new Date()}
+        formattedSelected={iso(endDate)}>
+        <button aria-label="selected end date" class="pg-button" on:>{iso(endDate)}</button>
+      </Datepicker>
+    </div>
+    <div>
+      <label for="geo">Geographic Level</label>
+      <select id="geo" bind:value={geoType}>
+        {#each levelList as level}
+          <option value={level.id} disabled={!source || !source.levels.has(level.id)}>{level.labelPlural}</option>
+        {/each}
+      </select>
+      <p class="description">
+        Each geographic region is identified with a unique identifier, such as FIPS code. See the <a
+          href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">
+          geographic coding documentation
+        </a> for details.
+      </p>
+    </div>
+  </section>
+  <section>
+    <h5>3. Get Data</h5>
+    <div class="buttons">
+      <button
+        class="pg-button button"
+        on:click={() => {
+          currentMode = 'csv';
+        }}
+        type="submit"
+        form="form"
+        disabled={!geoType || !signalValue}
+        title="Get in CSV format">
+        CSV
+      </button>
+      <button
+        aria-pressed={String(currentMode === 'python')}
+        class="pg-button button"
+        class:selected={currentMode === 'python'}
+        on:click={() => {
+          currentMode = 'python';
+        }}
+        title="Get Python Code">
+        Python
+      </button>
+      <button
+        aria-pressed={String(currentMode === 'r')}
+        class="pg-button button"
+        class:selected={currentMode === 'r'}
+        on:click={() => {
+          currentMode = 'r';
+        }}
+        title="Get R Code">
+        R
+      </button>
+    </div>
+    {#if currentMode === 'python'}
+      <p>Install <code>covidcast</code> via pip:</p>
+      <pre>pip install covidcast</pre>
+      <p>Fetch data:</p>
+      <pre>
+        {`from datetime import date
+import covidcast
+
+data = covidcast.signal("${source ? source.id : ''}", "${signal ? signal.signal : ''}",
+                        date(${startDate.getFullYear()}, ${startDate.getMonth() + 1}, ${startDate.getDate()}), date(${endDate.getFullYear()}, ${endDate.getMonth() + 1}, ${endDate.getDate()}),
+                        "${geoType}")`}
+      </pre>
+      <p class="description">
+        For more details and examples, see the <a href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/">package
+          documentation.</a>
+      </p>
+    {:else if currentMode === 'r'}
+      <p>Install <code>covidcast</code> using <a href="https://devtools.r-lib.org/">devtools</a> :</p>
+      <pre>devtools::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/covidcast")</pre>
+      <p>Fetch data:</p>
+      <pre>
+        {`library(covidcast)
+
+cc_data <- suppressMessages(
+covidcast_signal(data_source = "${source ? source.id : ''}", signal = "${signal ? signal.signal : ''}",
+                 start_day = "${iso(startDate)}", end_day = "${iso(endDate)}",
+                 geo_type = "${geoType}")
+)`}
+      </pre>
+      <p class="description">
+        For more details and examples, see the <a href="https://cmu-delphi.github.io/covidcast/covidcastR/">package
+          documentation.</a>
+      </p>
+    {/if}
+    <form bind:this={form} id="form" method="GET" action={CSV_SERVER} download>
+      <input type="hidden" name="signal" value={signalValue} />
+      <input type="hidden" name="start_day" value={iso(startDate)} />
+      <input type="hidden" name="end_day" value={iso(endDate)} />
+      <input type="hidden" name="geo_type" value={geoType} />
+    </form>
+  </section>
+  <SingleModeToggle mode={modes[0]} label="Back to Visualization" />
+</div>
