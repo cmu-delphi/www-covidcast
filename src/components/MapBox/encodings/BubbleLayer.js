@@ -81,8 +81,6 @@ export class BubbleLayer extends CustomLayer {
   onAdd(map, gl) {
     super.onAdd(map, gl);
 
-    this._uDevicePixelRatio = gl.getUniformLocation(this._program, 'u_device_pixel_ratio');
-
     this._indexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
     const data = new Uint16Array(this.featureIds.length * 6); // 2 triangles per feature
@@ -118,7 +116,6 @@ export class BubbleLayer extends CustomLayer {
     super._prepareRender(gl, matrix);
 
     gl.uniform1f(this._uOpacity, ENCODING_BUBBLE_THEME.fillOpacity);
-    gl.uniform1f(this._uDevicePixelRatio, window.devicePixelRatio);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
     gl.drawElements(gl.TRIANGLES, this.featureIds.length * 6, gl.UNSIGNED_SHORT, 0);
