@@ -9,7 +9,7 @@ export default class ChoroplethEncoding {
   }
 
   getVisibleLayers(level) {
-    return [toFillLayer(level)];
+    return [toFillLayer(level), level === 'county' && toFillLayer(levelMegaCounty.id)].filter(Boolean);
   }
 
   addLayers() {
