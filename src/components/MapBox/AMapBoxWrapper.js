@@ -319,11 +319,6 @@ export default class AMapBoxWrapper {
     }
     const visibleLayers = new Set(this.encoding.getVisibleLayers(level, signalType));
 
-    if (level === 'county' && this.hasMegaCountyLevel) {
-      // draw mega in every encoding
-      visibleLayers.add(toFillLayer(levelMegaCounty.id));
-    }
-
     allEncodingLayers.forEach((layer) => {
       this.map.setLayoutProperty(layer, 'visibility', visibleLayers.has(layer) ? 'visible' : 'none');
     });
@@ -419,6 +414,11 @@ export default class AMapBoxWrapper {
   selectMulti(selections) {
     if (!this.map || !this.interactive) {
       return;
+    }
+    if (selections.length <= 1) {
+      const bak = this.interactive.selection.slice();
+      this.select(selections.length > 0 ? selections[0].info : null);
+      return bak;
     }
     return this.interactive.selectMulti(selections);
   }
