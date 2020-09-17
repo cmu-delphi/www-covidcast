@@ -47,13 +47,30 @@ export default class AMapBoxWrapper {
      */
     this.interactive = null;
 
-    // set a good default value
     this.level = options.level;
     this.levels = options.levels;
     this.hasMegaCountyLevel = options.hasMegaCountyLevel;
     this.encodings = options.encodings;
     this.encoding = this.encodings[0];
-    this.zoom = new ZoomMap(options.bounds);
+
+    const throttled = throttle((z) => this.dispatch('zoom', z), 100);
+    this.zoom = new ZoomMap((z, paint) => {
+      const maxZoom =
+        typeof this.encoding.getMaxZoom === 'function'
+          ? this.encoding.getMaxZoom(this.level)
+          : Number.POSITIVE_INFINITY;
+      z = Math.min(maxZoom, z);
+
+      for (const encoding of this.encodings) {
+        if (typeof encoding.onZoom === 'function') {
+          encoding.onZoom(z);
+        }
+      }
+      if (paint) {
+        this.map.triggerRepaint();
+      }
+      throttled(z);
+    }, options.bounds);
   }
 
   /**
@@ -75,22 +92,10 @@ export default class AMapBoxWrapper {
       renderWorldCopies: false,
       antialias: true,
     });
-    this.zoom.map = this.map;
+    this.zoom.setMap(this.map);
     this.map.touchZoomRotate.disableRotation();
     // this.map.addControl(new AttributionControl({ compact: true }));
     // .addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
-
-    const throttled = throttle((z) => this.dispatch('zoom', z), 100);
-
-    this.map.on('zoom', () => {
-      const z = this.map.getZoom() / this.zoom.stateZoom;
-      for (const encoding of this.encodings) {
-        if (typeof encoding.onZoom === 'function') {
-          encoding.onZoom(z * window.devicePixelRatio);
-        }
-      }
-      throttled(z);
-    });
 
     let resolveCallback = null;
 
@@ -314,11 +319,6 @@ export default class AMapBoxWrapper {
     }
     const visibleLayers = new Set(this.encoding.getVisibleLayers(level, signalType));
 
-    if (level === 'county' && this.hasMegaCountyLevel) {
-      // draw mega in every encoding
-      visibleLayers.add(toFillLayer(levelMegaCounty.id));
-    }
-
     allEncodingLayers.forEach((layer) => {
       this.map.setLayoutProperty(layer, 'visibility', visibleLayers.has(layer) ? 'visible' : 'none');
     });
@@ -414,6 +414,11 @@ export default class AMapBoxWrapper {
   selectMulti(selections) {
     if (!this.map || !this.interactive) {
       return;
+    }
+    if (selections.length <= 1) {
+      const bak = this.interactive.selection.slice();
+      this.select(selections.length > 0 ? selections[0].info : null);
+      return bak;
     }
     return this.interactive.selectMulti(selections);
   }

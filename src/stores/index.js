@@ -54,6 +54,12 @@ export const currentSensor = writable('', (set) => {
     }
   }
 });
+
+/**
+ * @type {import('svelte/store').Writable<import('../data').SensorEntry | null>}
+ */
+export const currentInfoSensor = writable(null);
+
 export const currentSensorEntry = derived([currentSensor], ([$currentSensor]) => sensorMap.get($currentSensor));
 
 // 'county', 'state', or 'msa'
@@ -200,12 +206,16 @@ currentSensorEntry.subscribe((sensorEntry) => {
     currentLevel.set(sensorEntry.levels[0]);
   }
 
+  if (get(currentInfoSensor)) {
+    // show help, update it
+    currentInfoSensor.set(sensorEntry);
+  }
+
   // if (sensorEntry.type === 'late' && sensorEntry.id !== 'hospital-admissions') {
   //   signalType.set('value');
   // }
 
   if (!sensorEntry.isCasesOrDeath) {
-    encoding.set('color');
     signalCasesOrDeathOptions.set({
       cumulative: false,
       ratio: false,
@@ -224,11 +234,6 @@ currentSensorEntry.subscribe((sensorEntry) => {
     }
   }
 });
-
-/**
- * @type {import('svelte/store').Writable<import('../data').SensorEntry | null>}
- */
-export const currentInfoSensor = writable(null);
 
 // mobile device detection
 // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');

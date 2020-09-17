@@ -1,5 +1,5 @@
 <script>
-  import { currentLevel, encoding, isValueSignalType, currentSensorEntry } from '../stores';
+  import { currentLevel, encoding, isValueSignalType } from '../stores';
   import IoMdAdd from 'svelte-icons/io/IoMdAdd.svelte';
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
   import IoMdHome from 'svelte-icons/io/IoMdHome.svelte';
@@ -108,7 +108,7 @@
       </button>
     </div>
   {/if}
-  {#if showEncodings && $isValueSignalType && $currentSensorEntry.isCasesOrDeath}
+  {#if showEncodings && $isValueSignalType}
     <div class="pg-button-vertical-group">
       <button
         aria-pressed={$encoding === 'color' ? 'true' : 'false'}

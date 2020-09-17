@@ -22,6 +22,12 @@ export default [
     tooltip: 'Switch to Time-lapse Mode',
     component: () => import(/* webpackPrefech: true */ './timelapse/TimeLapse.svelte').then((r) => r.default),
   },
+  {
+    id: 'export',
+    label: 'Export Data',
+    tooltip: 'Switch to Export Data Mode',
+    component: () => import('./exportdata/ExportData.svelte').then((r) => r.default),
+  },
   // {
   //   id: 'top10',
   //   label: 'Top 10',

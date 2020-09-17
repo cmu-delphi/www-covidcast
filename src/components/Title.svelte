@@ -21,6 +21,7 @@
   .info {
     margin-left: 1em;
     font-size: 0.7rem;
+    flex: 0 0 auto;
   }
 </style>
 
