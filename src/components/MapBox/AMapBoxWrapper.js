@@ -314,11 +314,6 @@ export default class AMapBoxWrapper {
     }
     const visibleLayers = new Set(this.encoding.getVisibleLayers(level, signalType));
 
-    if (level === 'county' && this.hasMegaCountyLevel) {
-      // draw mega in every encoding
-      visibleLayers.add(toFillLayer(levelMegaCounty.id));
-    }
-
     allEncodingLayers.forEach((layer) => {
       this.map.setLayoutProperty(layer, 'visibility', visibleLayers.has(layer) ? 'visible' : 'none');
     });

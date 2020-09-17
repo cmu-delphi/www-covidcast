@@ -182,7 +182,6 @@ currentSensorEntry.subscribe((sensorEntry) => {
   // }
 
   if (!sensorEntry.isCasesOrDeath) {
-    encoding.set('color');
     signalCasesOrDeathOptions.set({
       cumulative: false,
       ratio: false,
