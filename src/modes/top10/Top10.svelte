@@ -354,28 +354,29 @@
               </button>
             </th>
           {/each}
-          <th rowspan="2">
-            Add column
-            <select
-              aria-label="add column options"
-              bind:value={chosenColumn}
-              class="add-column"
-              style="display: inline-block;">
-              <option value="">+</option>
-              {#each groupedSensorList as sensorGroup}
-                <optgroup label={sensorGroup.label}>
-                  {#each sensorGroup.sensors as sensor}
-                    <option
-                      disabled={sensor.key === primary.key || otherSensors.includes(sensor)}
-                      title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
-                      value={sensor.key}>
-                      {sensor.name}
-                    </option>
-                  {/each}
-                </optgroup>
-              {/each}
-            </select>
-          </th>
+          {#if otherSensors.length < 1}
+            <th rowspan="2">
+              Add column <select
+                aria-label="add column options"
+                bind:value={chosenColumn}
+                class="add-column"
+                style="display: inline-block;">
+                <option value="">+</option>
+                {#each groupedSensorList as sensorGroup}
+                  <optgroup label={sensorGroup.label}>
+                    {#each sensorGroup.sensors as sensor}
+                      <option
+                        disabled={sensor.key === primary.key || otherSensors.includes(sensor)}
+                        title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
+                        value={sensor.key}>
+                        {sensor.name}
+                      </option>
+                    {/each}
+                  </optgroup>
+                {/each}
+              </select>
+            </th>
+          {/if}
         </tr>
         <!-- <tr>
           <th>{$currentDateObject.toLocaleDateString()}</th>
@@ -399,7 +400,6 @@
             <td>
               {row.displayName}
               <span style="width: 16px; display: inline-block;" on:click={jumpTo(row)}>
-
                 <IoIosPin title="Show on Map" />
               </span>
             </td>
