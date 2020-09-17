@@ -55,6 +55,12 @@ export default class AMapBoxWrapper {
 
     const throttled = throttle((z) => this.dispatch('zoom', z), 100);
     this.zoom = new ZoomMap((z, paint) => {
+      const maxZoom =
+        typeof this.encoding.getMaxZoom === 'function'
+          ? this.encoding.getMaxZoom(this.level)
+          : Number.POSITIVE_INFINITY;
+      z = Math.min(maxZoom, z);
+
       for (const encoding of this.encodings) {
         if (typeof encoding.onZoom === 'function') {
           encoding.onZoom(z);
