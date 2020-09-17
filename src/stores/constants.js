@@ -205,7 +205,7 @@ const defaultSensors = [
     type: 'public',
     name: 'Away from Home 6hr+ (SG)',
     longDescription: `<p>
-    Delphi receives data from <a href="https://docs.safegraph.com/docs/social-distancing-metrics" target="_blank" rel="noopener noreferer">SafeGraph</a>,
+    Delphi receives data from <a href="https://docs.safegraph.com/docs/social-distancing-metrics" target="_blank" rel="noopener noreferrer">SafeGraph</a>,
     which collects anonymized location data
     from mobile phones. Using this data, we calculate the fraction of mobile devices
     that spent between more than 6 hours at a location other than their home during
@@ -229,7 +229,7 @@ const defaultSensors = [
     type: 'public',
     name: 'Away from Home 3-6hr (SG)',
     longDescription: `<p>
-    Delphi receives data from <a href="https://docs.safegraph.com/docs/social-distancing-metrics" target="_blank" rel="noopener noreferer">SafeGraph</a>,
+    Delphi receives data from <a href="https://docs.safegraph.com/docs/social-distancing-metrics" target="_blank" rel="noopener noreferrer">SafeGraph</a>,
     which collects anonymized location data from
     mobile phones. Using this data, we calculate the fraction of mobile devices that
     spent between 3 and 6 hours at a location other than their home during the daytime,
@@ -439,9 +439,9 @@ const defaultSensors = [
     This data shows the number of new confirmed COVID-19 cases per day.
     The maps reflect only cases confirmed by state and local health authorities.
     They are based on confirmed case counts compiled and made public by
-    <a href="https://systems.jhu.edu/research/public-health/ncov/" target="_blank" rel="noopener noreferer">
+    <a href="https://systems.jhu.edu/research/public-health/ncov/" target="_blank" rel="noopener noreferrer">
     a team at Johns Hopkins University</a> and by
-    <a href="https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/" target="_blank" rel="noopener noreferer">USAFacts</a>.
+    <a href="https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/" target="_blank" rel="noopener noreferrer">USAFacts</a>.
     We use Johns Hopkins data for Puerto Rico and report USAFacts data in
     all other locations.
     </p>`,
@@ -485,9 +485,9 @@ const defaultSensors = [
     The maps reflect official figures by state and local health authorities,
     and may not include excess deaths not confirmed as due to COVID-19 by
     health authorities. They are based on confirmed death counts compiled
-    and made public by <a href="https://systems.jhu.edu/research/public-health/ncov/" target="_blank" rel="noopener noreferer">
+    and made public by <a href="https://systems.jhu.edu/research/public-health/ncov/" target="_blank" rel="noopener noreferrer">
     a team at Johns Hopkins University</a> and by
-    <a href="https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/" target="_blank" rel="noopener noreferer">USAFacts</a>.
+    <a href="https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/" target="_blank" rel="noopener noreferrer">USAFacts</a>.
     We use Johns Hopkins data for Puerto Rico and report USAFacts data in all
     other locations.
     </p>`,
