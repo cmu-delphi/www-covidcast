@@ -275,6 +275,7 @@
     <MapOverlays {map} mapLoading={loading} legendLoading={loading} {zoom} />
     <div class="mode-container container-bg container-style">
       <SingleModeToggle mode={modes[1]} />
+      <SingleModeToggle mode={modes[2]} />
     </div>
     <MapBox
       bind:this={map}
