@@ -415,6 +415,11 @@ export default class AMapBoxWrapper {
     if (!this.map || !this.interactive) {
       return;
     }
+    if (selections.length <= 1) {
+      const bak = this.interactive.selection.slice();
+      this.select(selections.length > 0 ? selections[0].info : null);
+      return bak;
+    }
     return this.interactive.selectMulti(selections);
   }
 
