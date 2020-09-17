@@ -12,8 +12,8 @@
 export default [
   {
     id: 'overview',
-    label: 'Overview',
-    tooltip: 'Switch to Overview Mode',
+    label: 'Map Overview',
+    tooltip: 'Switch to the Map Overview',
     component: () => import(/* webpackPreload: true */ './overview/Overview.svelte').then((r) => r.default),
   },
   {

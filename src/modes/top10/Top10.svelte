@@ -19,6 +19,7 @@
   import Search from '../../components/Search.svelte';
   import { throttle } from 'lodash-es';
   import { levelMegaCounty, groupedSensorList, sensorList } from '../../stores/constants';
+  import SingleModeToggle from '../../components/SingleModeToggle.svelte';
 
   /**
    * @typedef {import('../../maps').NameInfo} ValueRow
@@ -326,6 +327,8 @@
     on:change={(e) => selectByInfo(e.detail)} />
 
   <div class="table base-font-size">
+    <SingleModeToggle mode={modes[0]} />
+
     <table>
       <thead class:desc={sortDirectionDesc}>
         <tr>
