@@ -55,10 +55,10 @@
       colorScale.set(info.scale);
     }
     colorStops.set(info.stops);
-    if ($encoding === 'bubble') {
+    if ($encoding === 'bubble' && info.custom) {
       bubbleRadiusScale.set(info.custom);
     }
-    if ($encoding === 'spike') {
+    if ($encoding === 'spike' && info.custom) {
       spikeHeightScale.set(info.custom);
     }
   }
@@ -154,6 +154,7 @@
     right: 0;
     bottom: 0;
     z-index: 1000;
+    display: flex;
   }
 
   .map-button {
@@ -274,6 +275,7 @@
   <div class="map-container" class:mobileHide={!mobileShowMap}>
     <MapOverlays {map} mapLoading={loading} legendLoading={loading} {zoom} />
     <div class="mode-container container-bg container-style">
+      <SingleModeToggle mode={modes[2]} />
       <SingleModeToggle mode={modes[1]} />
       <SingleModeToggle mode={modes[2]} />
     </div>

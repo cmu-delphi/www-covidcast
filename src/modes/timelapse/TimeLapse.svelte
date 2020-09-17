@@ -40,10 +40,10 @@
       colorScale.set(info.scale);
     }
     colorStops.set(info.stops);
-    if ($encoding === 'bubble') {
+    if ($encoding === 'bubble' && info.custom) {
       bubbleRadiusScale.set(info.custom);
     }
-    if ($encoding === 'spike') {
+    if ($encoding === 'spike' && info.custom) {
       spikeHeightScale.set(info.custom);
     }
   }

@@ -27,6 +27,11 @@
   background-color: #ffffff;
 }
 
+.pg-button-circle {
+  height: 2.2em;
+  border-radius: 50%;
+}
+
 .pg-button:disabled {
   background-color: #d3d3d3;
   cursor: not-allowed;

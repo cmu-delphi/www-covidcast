@@ -1,13 +1,15 @@
 import { L } from './layers';
 import { LngLatBounds } from 'mapbox-gl';
 
+let SHRINK_FACTOR = 0.75;
+
 export default class ZoomMap {
-  constructor(bounds) {
+  constructor(onZoom, bounds) {
     /**
      * @type {import('mapbox-gl').Map | null}
      */
     this.map = null;
-    // TODO customize
+    this.onZoom = onZoom;
     this.resetBounds = new LngLatBounds(bounds);
     this.resetBoundsOptions = {
       padding: 20, //px
@@ -15,6 +17,30 @@ export default class ZoomMap {
     };
     this.stateZoom = 1;
     this.initialZoomView = true;
+  }
+
+  _triggerZoom(paint) {
+    // console.log(this.map.getZoom(), this.stateZoom, this.map.getZoom() / this.stateZoom);
+    const current = this.map.getZoom();
+    const base = this.stateZoom;
+
+    const zoom = Math.pow(2, (current - base) * SHRINK_FACTOR);
+    this.onZoom(zoom, paint);
+  }
+
+  setMap(map) {
+    this.map = map;
+
+    this.stateZoom = this.map.getZoom();
+    // console.log(this.stateZoom);
+    this.map.on('zoom', () => {
+      this._triggerZoom();
+    });
+  }
+
+  ready() {
+    this.stateZoom = this.map.getZoom();
+    this._triggerZoom();
   }
 
   getZoom() {
@@ -52,12 +78,9 @@ export default class ZoomMap {
     this.initialZoomView = true;
     this.map.fitBounds(this.resetBounds, this.resetBoundsOptions);
     this.map.once('idle', () => {
-      this.ready();
+      this.stateZoom = this.map.getZoom();
+      this._triggerZoom(true);
     });
-  }
-
-  ready() {
-    this.stateZoom = this.map.getZoom();
   }
 
   resized() {

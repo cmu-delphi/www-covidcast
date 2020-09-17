@@ -3,6 +3,8 @@ import { parseScaleSpec } from '../../../stores/scales';
 import { SpikeLayer } from './SpikeLayer';
 import { toCenterSource } from '../sources';
 
+const MAX_ZOOMED_HEIGHT = 100;
+
 export default class SpikeEncoding {
   constructor(theme, levels) {
     this.id = 'spike';
@@ -23,6 +25,11 @@ export default class SpikeEncoding {
    */
   onZoom(zoom) {
     this.customLayers.forEach((layer) => (layer.zoom = zoom));
+  }
+
+  getMaxZoom(level) {
+    const maxHeight = this.theme.maxHeight[level];
+    return MAX_ZOOMED_HEIGHT / maxHeight;
   }
 
   /**

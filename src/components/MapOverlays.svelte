@@ -34,6 +34,9 @@
     justify-self: center;
     padding: 0.5em 1em;
     margin: 0 6px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
   }
 
   /** desktop **/

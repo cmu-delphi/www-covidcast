@@ -3,6 +3,8 @@ import { toCenterSource } from '../sources';
 import { parseScaleSpec } from '../../../stores/scales';
 import { BubbleLayer } from './BubbleLayer';
 
+const MAX_ZOOMED_RADIUS = 50;
+
 export default class BubbleEncoding {
   constructor(theme, levels) {
     this.id = 'bubble';
@@ -23,6 +25,11 @@ export default class BubbleEncoding {
    */
   onZoom(zoom) {
     this.customLayers.forEach((layer) => (layer.zoom = zoom));
+  }
+
+  getMaxZoom(level) {
+    const maxRadius = this.theme.maxRadius[level];
+    return MAX_ZOOMED_RADIUS / maxRadius;
   }
 
   /**
