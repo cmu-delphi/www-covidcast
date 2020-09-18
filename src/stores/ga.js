@@ -8,6 +8,7 @@ import {
   currentMode,
   signalCasesOrDeathOptions,
   appReady,
+  currentInfoSensor,
 } from '.';
 
 import { debounce } from 'lodash-es';
@@ -82,6 +83,16 @@ appReady.subscribe((v) => {
     }
     trackEvent('signalCasesOrDeathOptions', 'cumulative', String(r.cumulative));
     trackEvent('signalCasesOrDeathOptions', 'ratio', String(r.ratio));
+  });
+  currentInfoSensor.subscribe((r) => {
+    if (initialRun) {
+      return;
+    }
+    if (!r) {
+      trackEvent('help', 'hide-signal');
+    } else {
+      trackEvent('help', 'show-signal', r.key);
+    }
   });
   initialRun = false;
 });
