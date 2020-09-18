@@ -31,7 +31,7 @@
   import { trackEvent } from '../../stores/ga';
   import FaBan from 'svelte-icons/fa/FaBan.svelte';
   import SingleModeToggle from '../../components/SingleModeToggle.svelte';
-  import { modeByID} from '..';
+  import { modeByID } from '..';
   import { MAP_THEME, selectionColors } from '../../theme';
   import AddAnother from './AddAnother.svelte';
   import { getInfoByName } from '../../maps';
