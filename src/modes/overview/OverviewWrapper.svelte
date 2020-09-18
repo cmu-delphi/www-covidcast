@@ -276,6 +276,7 @@
     <MapOverlays {map} mapLoading={loading} legendLoading={loading} {zoom} />
     <div class="mode-container container-bg container-style">
       <SingleModeToggle mode={modeByID.export} />
+      <SingleModeToggle mode={modeByID.top10} />
       <SingleModeToggle mode={modeByID.timelapse} />
     </div>
     <MapBox
