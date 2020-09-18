@@ -24,7 +24,6 @@
   import USMapBoxWrapper from '../../components/MapBox/USMapBoxWrapper';
   import { onMount } from 'svelte';
   import MapOverlays from '../../components/MapOverlays.svelte';
-  import modes from '..';
   import SingleModeToggle from '../../components/SingleModeToggle.svelte';
 
   /**
@@ -272,7 +271,7 @@
       <div slot="title">{$currentDateObject.toLocaleDateString()}</div>
     </MapOverlays>
     <div class="mode-container container-bg container-style">
-      <SingleModeToggle mode={modes[0]} label="Back to visualization" />
+      <SingleModeToggle label="Back to visualization" />
     </div>
     <MapBox
       bind:this={map}

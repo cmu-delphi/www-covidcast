@@ -1,5 +1,4 @@
 <script>
-  import modes from '..';
   import SingleModeToggle from '../../components/SingleModeToggle.svelte';
   import { timeFormat } from 'd3-time-format';
   import { callMetaAPI } from '../../data/api';
@@ -334,5 +333,5 @@ covidcast_signal(data_source = "${source ? source.id : ''}", signal = "${signal 
       <input type="hidden" name="geo_type" value={geoType} />
     </form>
   </section>
-  <SingleModeToggle mode={modes[0]} label="Back to Visualization" />
+  <SingleModeToggle label="Back to Visualization" />
 </div>

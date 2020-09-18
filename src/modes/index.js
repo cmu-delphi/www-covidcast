@@ -9,7 +9,7 @@
 /**
  * @type {Mode[]}
  */
-export default [
+const modes = [
   {
     id: 'overview',
     label: 'Overview',
@@ -47,3 +47,11 @@ export default [
   //   component: () => import(/* webpackPrefetch: true */ './swpa/SWPA.svelte').then((r) => r.default),
   // },
 ];
+
+export default modes;
+
+/**
+ * @type {Record<'overview'|'timelapse'|'top10'|'export', Mode>}
+ */
+export const modeByID = {};
+modes.forEach((mode) => (modeByID[mode.id] = mode));
