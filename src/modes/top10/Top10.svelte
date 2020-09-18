@@ -17,7 +17,9 @@
   import { getInfoByName, nameInfos } from '../../maps';
   import Top10Sensor from './Top10Sensor.svelte';
   import Search from '../../components/Search.svelte';
+  import { throttle } from 'lodash-es';
   import { levelMegaCounty, groupedSensorList, sensorList } from '../../stores/constants';
+  import SingleModeToggle from '../../components/SingleModeToggle.svelte';
 
   /**
    * @typedef {import('../../maps').NameInfo} ValueRow
@@ -166,6 +168,24 @@
       chosenColumn = '';
     }
   }
+
+  let highlightTimeValue = null;
+
+  const throttled = throttle((value) => {
+    highlightTimeValue = value;
+  }, 10);
+
+  function onHighlight(e) {
+    const highlighted = e.detail.value;
+    const id = highlighted && Array.isArray(highlighted._vgsid_) ? highlighted._vgsid_[0] : null;
+
+    if (!id) {
+      throttled(null);
+      return;
+    }
+    const row = e.detail.view.data('data_0').find((d) => d._vgsid_ === id);
+    throttled(row ? row.time_value : null);
+  }
 </script>
 
 <style>
@@ -202,14 +222,14 @@
     vertical-align: middle;
   }
 
-  tbody button {
+  /* tbody button {
     opacity: 0;
     transition: opacity 0.25s ease;
   }
 
   tr:hover button {
     opacity: 1;
-  }
+  } */
 
   .table th {
     background: white;
@@ -218,10 +238,20 @@
     position: relative;
   }
 
+  td,
+  th {
+    border: 0;
+  }
+
   .table > table {
     border-collapse: collapse;
     width: 100%;
     overflow: unset;
+  }
+
+  table {
+    padding: 1em;
+    font-size: 1.2em;
   }
 
   .right {
@@ -239,22 +269,25 @@
   }
 
   .selected > :global(td) {
-    border: 2px solid var(--red);
+    /* border: 2px solid var(--red); */
+    font-weight: bold;
   }
 
   .sorted::after {
-    content: '▲';
+    content: ' ▲';
+    font-size: 0.5em;
     display: inline-block;
   }
 
   .desc .sorted::after {
-    content: '▼';
+    content: ' ▼';
+    font-size: 0.5em;
   }
 
   .add-column {
-    -moz-appearance: none;
+    /* -moz-appearance: none;
     -webkit-appearance: none;
-    appearance: none;
+    appearance: none; */
     width: 1.4em;
   }
 
@@ -263,6 +296,7 @@
     right: 0.2em;
     top: 0.2em;
     font-size: 0.7rem;
+    width: 3em;
   }
 
   /** mobile **/
@@ -293,6 +327,8 @@
     on:change={(e) => selectByInfo(e.detail)} />
 
   <div class="table base-font-size">
+    <SingleModeToggle mode={modes[0]} />
+
     <table>
       <thead class:desc={sortDirectionDesc}>
         <tr>
@@ -321,25 +357,31 @@
               </button>
             </th>
           {/each}
-          <th rowspan="2">
-            <select aria-label="add column options" bind:value={chosenColumn} class="add-column pg-button">
-              <option value="">+</option>
-              {#each groupedSensorList as sensorGroup}
-                <optgroup label={sensorGroup.label}>
-                  {#each sensorGroup.sensors as sensor}
-                    <option
-                      disabled={sensor.key === primary.key || otherSensors.includes(sensor)}
-                      title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
-                      value={sensor.key}>
-                      {sensor.name}
-                    </option>
-                  {/each}
-                </optgroup>
-              {/each}
-            </select>
-          </th>
+          {#if otherSensors.length < 1}
+            <th rowspan="2">
+              Add column <select
+                aria-label="add column options"
+                bind:value={chosenColumn}
+                class="add-column"
+                style="display: inline-block;">
+                <option value="">+</option>
+                {#each groupedSensorList as sensorGroup}
+                  <optgroup label={sensorGroup.label}>
+                    {#each sensorGroup.sensors as sensor}
+                      <option
+                        disabled={sensor.key === primary.key || otherSensors.includes(sensor)}
+                        title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
+                        value={sensor.key}>
+                        {sensor.name}
+                      </option>
+                    {/each}
+                  </optgroup>
+                {/each}
+              </select>
+            </th>
+          {/if}
         </tr>
-        <tr>
+        <!-- <tr>
           <th>{$currentDateObject.toLocaleDateString()}</th>
           {#if primary.isCasesOrDeath}
             <th>7-day Average</th>
@@ -352,23 +394,35 @@
             {/if}
             <th>Time Series</th>
           {/each}
-        </tr>
+        </tr> -->
       </thead>
       <tbody>
         {#each sortedRows as row, i}
           <tr class:selected={row.propertyId === $currentRegion}>
             <td>{row.rank}.</td>
-            <td>{row.displayName}</td>
-            <td class="right">{row.population != null ? row.population.toLocaleString() : 'Unknown'}</td>
-            <Top10Sensor sensor={primary} single={row.primary} id={row.propertyId} level={row.level} />
-            {#each otherSensors as s, si}
-              <Top10Sensor sensor={s} single={row.others[si]} id={row.propertyId} level={row.level} />
-            {/each}
-            <td class="toolbar">
-              <button class="pg-button" title="Show on Map" on:click={jumpTo(row)}>
-                <IoIosPin />
-              </button>
+            <td>
+              {row.displayName}
+              <span style="width: 16px; display: inline-block;" on:click={jumpTo(row)}>
+                <IoIosPin title="Show on Map" />
+              </span>
             </td>
+            <td class="right">{row.population != null ? row.population.toLocaleString() : 'Unknown'}</td>
+            <Top10Sensor
+              sensor={primary}
+              single={row.primary}
+              id={row.propertyId}
+              level={row.level}
+              {highlightTimeValue}
+              {onHighlight} />
+            {#each otherSensors as s, si}
+              <Top10Sensor
+                sensor={s}
+                single={row.others[si]}
+                id={row.propertyId}
+                level={row.level}
+                {highlightTimeValue}
+                {onHighlight} />
+            {/each}
           </tr>
         {/each}
       </tbody>
