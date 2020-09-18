@@ -29,8 +29,8 @@
   import { trackEvent } from '../../stores/ga';
   import FaBan from 'svelte-icons/fa/FaBan.svelte';
   import SingleModeToggle from '../../components/SingleModeToggle.svelte';
-  import modes from '..';
   import { MAP_THEME } from '../../theme';
+  import { modeByID } from '..';
 
   export let wrapperClass;
   export let regionSearchList;
@@ -275,9 +275,9 @@
   <div class="map-container" class:mobileHide={!mobileShowMap}>
     <MapOverlays {map} mapLoading={loading} legendLoading={loading} {zoom} />
     <div class="mode-container container-bg container-style">
-      <SingleModeToggle mode={modes[3]} />
-      <SingleModeToggle mode={modes[2]} />
-      <SingleModeToggle mode={modes[1]} />
+      <SingleModeToggle mode={modeByID.export} />
+      <SingleModeToggle mode={modeByID.top10} />
+      <SingleModeToggle mode={modeByID.timelapse} />
     </div>
     <MapBox
       bind:this={map}
