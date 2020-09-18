@@ -170,6 +170,7 @@
   function onClick(e) {
     const item = e.detail.item;
     if (item && item.isVoronoi) {
+      trackEvent('side-panel', 'set-date', item.datum.datum.time_value);
       currentDate.set(item.datum.datum.time_value);
     }
   }

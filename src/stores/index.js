@@ -2,7 +2,7 @@ import { writable, derived, get, readable } from 'svelte/store';
 import { LogScale, SqrtScale } from './scales';
 import { scaleSequentialLog } from 'd3-scale';
 import { defaultSensorId, sensorList, sensorMap, yesterdayDate, levels, swpaLevels } from './constants';
-import modes from '../modes';
+import modes, { modeByID } from '../modes';
 import { parseAPITime } from '../data/utils';
 import { getInfoByName } from '../maps';
 export {
@@ -34,10 +34,11 @@ export const appReady = writable(false);
 /**
  * @type {import('svelte/store').Writable<import('../routes').Mode>}
  */
-export const currentMode = writable(modes[0], (set) => {
+export const currentMode = writable(modeByID.overview, (set) => {
   const mode = urlParams.get('mode');
-  if (modes.find((d) => d.id === mode)) {
-    set(modes.find((d) => d.id === mode));
+  const nextMode = modes.find((d) => d.id === mode);
+  if (nextMode) {
+    set(nextMode);
   }
 });
 

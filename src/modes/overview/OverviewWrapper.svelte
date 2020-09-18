@@ -31,11 +31,10 @@
   import { trackEvent } from '../../stores/ga';
   import FaBan from 'svelte-icons/fa/FaBan.svelte';
   import SingleModeToggle from '../../components/SingleModeToggle.svelte';
-  import modes from '..';
+  import { modeByID} from '..';
   import { MAP_THEME, selectionColors } from '../../theme';
   import AddAnother from './AddAnother.svelte';
   import { getInfoByName } from '../../maps';
-
   export let wrapperClass;
   export let regionSearchList;
   export let levelList;
@@ -374,8 +373,8 @@
   <div class="map-container" class:mobileHide={!mobileShowMap} class:pick={pickMapMode}>
     <MapOverlays {map} mapLoading={loading} legendLoading={loading} {zoom} />
     <div class="mode-container container-bg container-style">
-      <SingleModeToggle mode={modes[2]} />
-      <SingleModeToggle mode={modes[1]} />
+      <SingleModeToggle mode={modeByID.export} />
+      <SingleModeToggle mode={modeByID.timelapse} />
     </div>
     <MapBox
       bind:this={map}

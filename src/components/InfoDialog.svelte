@@ -1,6 +1,13 @@
 <script>
   import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
-  import { signalCasesOrDeathOptions, currentInfoSensor } from '../stores';
+  import { modeByID } from '../modes';
+  import {
+    signalCasesOrDeathOptions,
+    currentInfoSensor,
+    currentMode,
+    currentSensorEntry,
+    currentSensor,
+  } from '../stores';
 
   let close = null;
 
@@ -20,6 +27,17 @@
     if ($currentInfoSensor && close) {
       close.focus();
     }
+  }
+
+  function exportData(e) {
+    e.preventDefault();
+    // ensure visible sensor is the active one
+    if ($currentSensorEntry.key !== $currentInfoSensor.key) {
+      currentSensor.set($currentInfoSensor.key);
+    }
+    // switch to export mode
+    currentMode.set(modeByID.export);
+    currentInfoSensor.set(null);
   }
 </script>
 
@@ -95,6 +113,9 @@
       {#each $currentInfoSensor.links as link}
         <li><a href={link.href}>{link.alt}</a></li>
       {/each}
+      <li>
+        <a href={`?mode=${modeByID.export.id}&sensor=${$currentInfoSensor.key}`} on:click={exportData}>Export Data</a>
+      </li>
     </ul>
   </div>
 {/if}
