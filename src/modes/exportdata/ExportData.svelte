@@ -121,7 +121,7 @@
     if (form) {
       form.addEventListener('submit', () => {
         trackEvent(
-          'exportdata',
+          'export',
           'download',
           `signal=${signalValue},start_day=${iso(startDate)},end_day=${iso(endDate)},geo_type=${geoType}`,
         );
