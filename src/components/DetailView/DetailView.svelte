@@ -1,11 +1,5 @@
 <script>
-  import {
-    currentRegionInfo,
-    signalCasesOrDeathOptions,
-    currentDateObject,
-    smallMultipleTimeSpan,
-    currentInfoSensor,
-  } from '../../stores';
+  import { signalCasesOrDeathOptions, currentDateObject, smallMultipleTimeSpan, currentInfoSensor } from '../../stores';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../Vega.svelte';
   import spec from './DetailView.json';
@@ -29,12 +23,40 @@
   $: mapTitle =
     typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText($signalCasesOrDeathOptions) : sensor.mapTitleText;
 
-  $: hasRegion = Boolean($currentRegionInfo);
-  $: isMegaRegion = Boolean($currentRegionInfo) && $currentRegionInfo.level === levelMegaCounty.id;
+  function fetchMulti(sensor, selections) {
+    return Promise.all(
+      selections.map((s) => {
+        const region = s.info;
+        if (region.level === levelMegaCounty.id) {
+          return [];
+        }
+        return fetchTimeSlice(sensor, region.level, region.propertyId, undefined, undefined, false, {
+          geo_value: region.propertyId,
+        })
+          .then(addMissing)
+          .then((rows) =>
+            rows.map((row) => {
+              row.displayName = region.displayName;
+              return row;
+            }),
+          );
+      }),
+    ).then((rows) => rows.flat());
+  }
+  /**
+   * @type {{info: import('../../maps').NameInfo, color: string}[]}
+   */
+  export let selections = [];
+  $: region = selections.length > 0 ? selections[0].info : null;
+  $: hasRegion = selections.length > 0;
+  $: multi = selections.length > 1;
+  $: isMegaRegion = Boolean(region) && region.level === levelMegaCounty.id;
   $: noDataText = hasRegion ? (isMegaRegion ? `Please select a county` : 'No data available') : 'No location selected';
-  $: data = $currentRegionInfo
-    ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, undefined, undefined, false, {
-        geo_value: $currentRegionInfo.propertyId,
+  $: data = multi
+    ? fetchMulti(sensor, selections)
+    : region && !isMegaRegion
+    ? fetchTimeSlice(sensor, region.level, region.propertyId, undefined, undefined, false, {
+        geo_value: region.propertyId,
       }).then(addMissing)
     : [];
 
@@ -43,11 +65,20 @@
       {
         encoding: {
           y: {
-            axis: {
-              title: sensor.yAxis || '',
-            },
+            field: primaryValue(sensor, $signalCasesOrDeathOptions),
           },
         },
+        layer: [
+          {
+            encoding: {
+              color: {
+                scale: {
+                  domain: selections.map((s) => s.info.propertyId),
+                },
+              },
+            },
+          },
+        ],
       },
       {
         layer: [
@@ -69,31 +100,39 @@
       {
         encoding: {
           y: {
-            field: primaryValue(sensor, $signalCasesOrDeathOptions).replace('avg', 'count'),
+            field: primaryValue(sensor, $signalCasesOrDeathOptions),
           },
         },
         layer: [
-          {}, // current date
-          {}, // bars
           {
-            // average line
             encoding: {
+              color: {
+                scale: {
+                  domain: selections.map((s) => s.info.propertyId),
+                },
+              },
               y: {
-                field: primaryValue(sensor, $signalCasesOrDeathOptions),
+                field: primaryValue(sensor, $signalCasesOrDeathOptions).replace('avg', 'count'),
               },
             },
           },
         ],
       },
       {
-        encoding: {
-          y: {
-            field: primaryValue(sensor, $signalCasesOrDeathOptions).replace('avg', 'count'),
-          },
-        },
         layer: [
-          {},
           {
+            encoding: {
+              y: {
+                field: primaryValue(sensor, $signalCasesOrDeathOptions).replace('avg', 'count'),
+              },
+            },
+          },
+          {
+            encoding: {
+              y: {
+                field: primaryValue(sensor, $signalCasesOrDeathOptions),
+              },
+            },
             selection: {
               brush: {
                 init: {
@@ -107,6 +146,9 @@
     ],
   };
 
+  const OFFSET_X = 60;
+  const OFFSET_Y = 80;
+
   function generatePatch(title) {
     return (spec, size) =>
       merge(
@@ -115,8 +157,8 @@
         {
           vconcat: [
             {
-              width: size.width - 45,
-              height: size.height - 40 - 70,
+              width: size.width - OFFSET_X,
+              height: size.height - 40 - OFFSET_Y,
               encoding: {
                 y: {
                   axis: {
@@ -126,7 +168,7 @@
               },
             },
             {
-              width: size.width - 45,
+              width: size.width - OFFSET_X,
               height: 40,
             },
           ],
@@ -191,6 +233,24 @@
     padding-top: 0.5em;
   }
 
+  .legend {
+    font-size: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .legend-avg {
+    margin-right: 0.2em;
+    width: 1.5em;
+    height: 2px;
+    background: grey;
+  }
+  .legend-count {
+    margin-left: 0.5em;
+    opacity: 0.2;
+  }
+
   .info {
     margin-left: 1em;
     font-size: 0.7rem;
@@ -199,7 +259,7 @@
 </style>
 
 <div class="header">
-  <h4>{sensor.name} in {$currentRegionInfo ? $currentRegionInfo.displayName : 'Unknown'}</h4>
+  <h4>{sensor.name} in {hasRegion ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown'}</h4>
   <div>
     <h5>{mapTitle}</h5>
     {#if sensor.longDescription}
@@ -232,6 +292,14 @@
     tooltip={VegaTooltip}
     tooltipProps={{ sensor }} />
 </div>
+{#if sensor.isCasesOrDeath}
+  <div class="legend">
+    <div class="legend-avg" />
+    <div>7-day average</div>
+    <div class="legend-avg legend-count" />
+    <div>daily new COVID-19 {sensor.name.toLowerCase()}</div>
+  </div>
+{/if}
 <div class="encoding">
   <EncodingOptions center {sensor} />
 </div>

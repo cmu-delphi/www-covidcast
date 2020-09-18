@@ -7,6 +7,7 @@ import {
   encoding,
   currentMode,
   signalCasesOrDeathOptions,
+  currentCompareSelection,
   appReady,
   currentInfoSensor,
 } from '.';
@@ -94,5 +95,18 @@ appReady.subscribe((v) => {
       trackEvent('help', 'show-signal', r.key);
     }
   });
+  currentCompareSelection.subscribe((compare) => {
+    if (initialRun) {
+      return;
+    }
+    if (!compare) {
+      trackEvent('compare', 'set', 'close');
+    } else if (compare.length === 0) {
+      trackEvent('compare', 'set', 'open');
+    } else {
+      trackEvent('compare', 'change', compare.map((d) => d.info.propertyId).join(','));
+    }
+  });
+
   initialRun = false;
 });

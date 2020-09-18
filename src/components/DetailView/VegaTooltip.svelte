@@ -40,7 +40,7 @@
 </style>
 
 <div aria-label="tooltip" class="tooltip" class:hidden>
-  <h5>{formatTimeWithoutYear(item.date_value)}</h5>
+  <h5>{item.displayName} on {formatTimeWithoutYear(item.date_value)}</h5>
   <table>
     <tbody>
       {#if sensor.isCasesOrDeath}

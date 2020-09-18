@@ -9,7 +9,11 @@
   },
   "encoding": {
     "color": {
-      "value": "grey"
+      "field": "geo_value",
+      "type": "nominal",
+      "scale": {
+        "range": ["grey", "#0F0589", "#16A997", "#A71808", "#CD22B2", "#F58B29"]
+      }
     },
     "x": {
       "field": "date_value",
@@ -109,5 +113,10 @@
         "y": null
       }
     }
-  ]
+  ],
+  "config": {
+    "legend": {
+      "disable": true
+    }
+  }
 }

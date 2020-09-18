@@ -1,12 +1,5 @@
 <script>
-  import {
-    sensorList,
-    currentSensor,
-    currentRegionInfo,
-    smallMultipleTimeSpan,
-    currentDate,
-    currentInfoSensor,
-  } from '../../stores';
+  import { sensorList, currentSensor, smallMultipleTimeSpan, currentDate, currentInfoSensor } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import spec from './SmallMultiplesChart.json';
@@ -69,12 +62,17 @@
   /**
    * @type {import('../../stores/constants').SensorEntry} sensor
    */
-  function chooseSpec(sensor, min, max) {
+  function chooseSpec(sensor, min, max, selections) {
     const time = {
       encoding: {
         x: {
           scale: {
             domain: [min.getTime(), max.getTime()],
+          },
+        },
+        color: {
+          scale: {
+            domain: selections.map((s) => s.info.propertyId),
           },
         },
       },
@@ -101,18 +99,55 @@
     }
   }
 
-  $: hasRegion = Boolean($currentRegionInfo);
-  $: isMegaRegion = Boolean($currentRegionInfo) && $currentRegionInfo.level === levelMegaCounty.id;
+  function fetchMulti(sensor, selections, startDay, endDay) {
+    return Promise.all(
+      selections.map((s) => {
+        const region = s.info;
+        if (region.level === levelMegaCounty.id) {
+          return [];
+        }
+        return fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false, {
+          geo_value: region.propertyId,
+        })
+          .then(addMissing)
+          .then((rows) =>
+            rows.map((row) => {
+              row.displayName = region.displayName;
+              return row;
+            }),
+          );
+      }),
+    ).then((rows) => rows.flat());
+  }
+
+  /**
+   * @type {{info: import('../../maps').NameInfo, color: string}[]}
+   */
+  export let selections = [];
+  $: region = selections.length > 0 ? selections[0].info : null;
+
+  $: hasRegion = selections.length > 0;
+  $: multi = selections.length > 1;
+
+  $: isMegaRegion = Boolean(region) && region.level === levelMegaCounty.id;
   $: noDataText = hasRegion ? (isMegaRegion ? `Please select a county` : 'No data available') : 'No location selected';
   $: sensorsWithData = sensors.map((sensor) => ({
     sensor,
-    data:
-      $currentRegionInfo && !isMegaRegion
-        ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, endDay, false, {
-            geo_value: $currentRegionInfo.propertyId,
-          }).then(addMissing)
-        : [],
-    spec: chooseSpec(sensor, startDay, endDay),
+    data: multi
+      ? fetchMulti(sensor, selections, startDay, endDay)
+      : region && !isMegaRegion
+      ? fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false, {
+          geo_value: region.propertyId,
+        })
+          .then(addMissing)
+          .then((rows) =>
+            rows.map((row) => {
+              row.displayName = region.displayName;
+              return row;
+            }),
+          )
+      : [],
+    spec: chooseSpec(sensor, startDay, endDay, selections),
   }));
 
   let highlightTimeValue = null;

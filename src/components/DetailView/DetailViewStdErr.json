@@ -19,9 +19,6 @@
     {
       "width": "container",
       "encoding": {
-        "color": {
-          "value": "grey"
-        },
         "x": {
           "field": "date_value",
           "type": "temporal",
@@ -48,6 +45,15 @@
           "mark": {
             "type": "line",
             "interpolate": "monotone"
+          },
+          "encoding": {
+            "color": {
+              "field": "geo_value",
+              "type": "nominal",
+              "scale": {
+                "range": ["grey", "#0F0589", "#16A997", "#A71808", "#CD22B2", "#F58B29"]
+              }
+            }
           }
         },
         {
@@ -63,6 +69,11 @@
           "mark": {
             "type": "circle",
             "tooltip": true
+          },
+          "encoding": {
+            "color": {
+              "field": "geo_value"
+            }
           }
         },
         {
@@ -72,7 +83,10 @@
           },
           "encoding": {
             "color": {
-              "value": "rgba(0, 0, 0, 0.1)"
+              "field": "geo_value"
+            },
+            "opacity": {
+              "value": 0.25
             },
             "y": {
               "field": "value_lower_bound",
@@ -121,9 +135,6 @@
     {
       "height": 40,
       "encoding": {
-        "color": {
-          "value": "grey"
-        },
         "x": {
           "field": "date_value",
           "type": "temporal",
@@ -159,6 +170,11 @@
           "mark": {
             "type": "line",
             "interpolate": "monotone"
+          },
+          "encoding": {
+            "color": {
+              "field": "geo_value"
+            }
           }
         },
         {
@@ -168,7 +184,10 @@
           },
           "encoding": {
             "color": {
-              "value": "rgba(0, 0, 0, 0.1)"
+              "field": "geo_value"
+            },
+            "opacity": {
+              "value": 0.25
             },
             "y": {
               "field": "value_lower_bound",
@@ -214,5 +233,10 @@
         }
       ]
     }
-  ]
+  ],
+  "config": {
+    "legend": {
+      "disable": true
+    }
+  }
 }
