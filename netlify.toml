@@ -1,0 +1,8 @@
+[context.production.environment]
+  COVIDCAST_ENDPOINT_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
+
+[context.branch-deploy.environment]
+  COVIDCAST_ENDPOINT_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
+
+[context.deploy-preview.environment]
+  COVIDCAST_ENDPOINT_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
