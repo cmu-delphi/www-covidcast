@@ -289,6 +289,7 @@
     -webkit-appearance: none;
     appearance: none; */
     width: 1.4em;
+    display: inline-block;
   }
 
   .remove-column {
@@ -312,6 +313,14 @@
     .root > :global(.search-container) {
       margin: 0 0 0 6px;
     }
+
+    table {
+      font-size: 1em;
+    }
+
+    .mobileHide {
+      display: none;
+    }
   }
 </style>
 
@@ -327,14 +336,18 @@
     on:change={(e) => selectByInfo(e.detail)} />
 
   <div class="table base-font-size">
-    <SingleModeToggle />
+    <SingleModeToggle hasSpace />
 
     <table>
       <thead class:desc={sortDirectionDesc}>
         <tr>
           <th rowspan="2">#</th>
           <th rowspan="2" class:sorted={sortCriteria === 'name'} on:click={() => sortClick('name')}>Name</th>
-          <th rowspan="2" class:sorted={sortCriteria === 'population'} on:click={() => sortClick('population', true)}>
+          <th
+            rowspan="2"
+            class="mobileHide"
+            class:sorted={sortCriteria === 'population'}
+            on:click={() => sortClick('population', true)}>
             Population
           </th>
           <th
@@ -358,12 +371,8 @@
             </th>
           {/each}
           {#if otherSensors.length < 1}
-            <th rowspan="2">
-              Add column <select
-                aria-label="add column options"
-                bind:value={chosenColumn}
-                class="add-column"
-                style="display: inline-block;">
+            <th rowspan="2" class="mobileHide">
+              Add column <select aria-label="add column options" bind:value={chosenColumn} class="add-column">
                 <option value="">+</option>
                 {#each groupedSensorList as sensorGroup}
                   <optgroup label={sensorGroup.label}>
@@ -406,7 +415,7 @@
                 <IoIosPin title="Show on Map" />
               </span>
             </td>
-            <td class="right">{row.population != null ? row.population.toLocaleString() : 'Unknown'}</td>
+            <td class="right mobileHide">{row.population != null ? row.population.toLocaleString() : 'Unknown'}</td>
             <Top10Sensor
               sensor={primary}
               single={row.primary}
