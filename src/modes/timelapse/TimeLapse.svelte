@@ -24,7 +24,7 @@
   import USMapBoxWrapper from '../../components/MapBox/USMapBoxWrapper';
   import { onMount } from 'svelte';
   import MapOverlays from '../../components/MapOverlays.svelte';
-  import SingleModeToggle from '../../components/SingleModeToggle.svelte';
+  // import SingleModeToggle from '../../components/SingleModeToggle.svelte';
   import ModeNav from '../../components/ModeNav.svelte';
   /**
    * @type {MapBox}
@@ -229,13 +229,13 @@
     position: relative;
   }
 
-  .mode-container {
+  /* .mode-container {
     position: absolute;
     margin: 6px;
     right: 0;
     bottom: 0;
     z-index: 1000;
-  }
+  } */
 
   /** mobile **/
   @media only screen and (max-width: 767px) {
@@ -271,9 +271,9 @@
     <MapOverlays {map} mapLoading={running || loading} legendLoading={false} {zoom}>
       <div slot="title" />
     </MapOverlays>
-    <div class="mode-container container-bg container-style">
+    <!-- <div class="mode-container container-bg container-style">
       <SingleModeToggle label="Back to visualization" />
-    </div>
+    </div> -->
     <MapBox
       bind:this={map}
       on:loading={(e) => {
