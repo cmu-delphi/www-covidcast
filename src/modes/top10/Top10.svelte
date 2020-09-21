@@ -288,7 +288,7 @@
     /* -moz-appearance: none;
     -webkit-appearance: none;
     appearance: none; */
-    width: 1.4em;
+    width: 2.5em;
   }
 
   .remove-column {
@@ -358,7 +358,7 @@
           {/each}
           {#if otherSensors.length < 1}
             <th rowspan="2">
-              Add column <select
+              Add indicator <select
                 aria-label="add column options"
                 bind:value={chosenColumn}
                 class="add-column"
