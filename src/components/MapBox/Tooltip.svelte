@@ -44,6 +44,11 @@
   h5 {
     margin: 0;
     padding: 0;
+    text-align: center;
+  }
+
+  table {
+    margin: 0;
   }
 </style>
 
