@@ -254,6 +254,30 @@
     font-size: 1.2em;
   }
 
+  .go-to-map-pin {
+    width: 16px;
+    display: inline-block;
+  }
+
+  @media only screen and (max-width: 767px) {
+    table {
+      padding: 4px;
+      font-size: 1em;
+    }
+
+    .table-num-column {
+      display: none;
+    }
+
+    .add-column-container {
+      display: none;
+    }
+
+    .go-to-map-pin {
+      display: none;
+    }
+  }
+
   .right {
     text-align: right;
   }
@@ -331,10 +355,10 @@
     <table>
       <thead class:desc={sortDirectionDesc}>
         <tr>
-          <th rowspan="2">#</th>
+          <th class="table-num-column" rowspan="2">#</th>
           <th rowspan="2" class:sorted={sortCriteria === 'name'} on:click={() => sortClick('name')}>Name</th>
           <th rowspan="2" class:sorted={sortCriteria === 'population'} on:click={() => sortClick('population', true)}>
-            Population
+            Pop.
           </th>
           <th
             colspan={primary.isCasesOrDeath ? 3 : 2}
@@ -357,7 +381,7 @@
             </th>
           {/each}
           {#if otherSensors.length < 1}
-            <th rowspan="2">
+            <th class="add-column-container" rowspan="2">
               Add indicator <select
                 aria-label="add column options"
                 bind:value={chosenColumn}
@@ -398,10 +422,10 @@
       <tbody>
         {#each sortedRows as row, i}
           <tr class:selected={row.propertyId === $currentRegion}>
-            <td>{row.rank}.</td>
+            <td class="table-num-column">{row.rank}.</td>
             <td>
               {row.displayName}
-              <span style="width: 16px; display: inline-block;" on:click={jumpTo(row)}>
+              <span class="go-to-map-pin" on:click={jumpTo(row)}>
                 <IoIosPin title="Show on Map" />
               </span>
             </td>
