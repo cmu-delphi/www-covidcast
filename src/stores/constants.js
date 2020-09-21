@@ -400,7 +400,7 @@ const defaultSensors = [
     ],
     id: 'quidel',
     signal: 'covid_ag_smoothed_pct_positive',
-    levels: ['state', 'msa', 'hrr'],
+    levels: ['county', 'msa', 'state', 'hrr'],
     tooltipText: 'Daily test positivity rate for COVID-19 antigens, based on data provided by Quidel, Inc.',
     mapTitleText: 'Daily test positivity rate for COVID-19 antigens',
     yAxis: 'Percentage',
@@ -454,7 +454,7 @@ const defaultSensors = [
     ],
     id: 'indicator-combination',
     signal: 'confirmed_7dav_incidence_num',
-    levels: ['msa', 'county', 'state'],
+    levels: ['county', 'msa', 'state'],
     tooltipText:
       'Daily new confirmed COVID-19 cases (7-day average), based on data reported by USAFacts and Johns Hopkins University',
     mapTitleText: (options) => {
@@ -500,7 +500,7 @@ const defaultSensors = [
     ],
     id: 'indicator-combination',
     signal: 'deaths_7dav_incidence_num',
-    levels: ['msa', 'county', 'state'],
+    levels: ['county', 'msa', 'state'],
     tooltipText:
       'Daily new COVID-19 deaths (7-day average), based on data reported by USAFacts and Johns Hopkins University',
     mapTitleText: (options) => {
