@@ -1,5 +1,5 @@
 <script>
-  import Title from './Title.svelte';
+  // import Title from './Title.svelte';
   import MapControls from './MapControls.svelte';
   import { isDirectionSignalType, encoding, currentSensorEntry } from '../stores';
   import EncodingOptions from './EncodingOptions.svelte';
@@ -32,8 +32,10 @@
     z-index: 1001;
     align-self: flex-start;
     justify-self: center;
-    padding: 0.5em 1em;
-    margin: 0 0.25em;
+    /* padding: 0.5em 1em; */
+    /* margin: 0 0.25em; */
+    margin: 0;
+    padding: 0;
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -67,9 +69,9 @@
 
 <div class="map-top-overlay">
   <div class="title-container">
-    <Title>
+    <!-- <Title>
       <slot name="title" />
-    </Title>
+    </Title> -->
   </div>
   <div class="map-controls-container">
     <MapControls zoom={map ? map.zoom : null} showEncodings loading={mapLoading} />
