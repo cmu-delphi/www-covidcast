@@ -115,7 +115,7 @@ export const EPIDATA_CASES_OR_DEATH_VALUES = [
   'countRatioCumulative',
 ];
 
-const basePercentFormatter = format('.2%');
+const basePercentFormatter = format('.1%');
 const percentFormatter = (v) => basePercentFormatter(v / 100);
 const countFormatter = format(',.1f');
 const rawFormatter = format(',.2f');
