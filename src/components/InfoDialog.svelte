@@ -90,6 +90,17 @@
     font-weight: 700;
     margin: 0.15em 0;
   }
+
+  @media only screen and (max-width: 767px) {
+    .dialog {
+      left: 0;
+      right: 0;
+      top: unset;
+      bottom: 0;
+      transform: unset;
+      max-width: unset;
+    }
+  }
 </style>
 
 {#if $currentInfoSensor}
