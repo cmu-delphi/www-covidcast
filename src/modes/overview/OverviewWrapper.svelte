@@ -306,6 +306,17 @@
       grid-area: map;
     }
   }
+
+  @media only screen and (max-width: 1120px) {
+    .mode-container {
+      left: 0;
+      justify-content: center;
+    }
+
+    .map-container :global(.legend-container) {
+      bottom: calc(1.2em + 28px);
+    }
+  }
 </style>
 
 <main class="root base-font-size" class:hiddenPanel={!$isMobileDevice && !desktopShowPanel} class:compare={showCompare}>
@@ -418,7 +429,7 @@
           <SmallMultiplesPanel bind:detail={detailSensor} levels={levelList} {selections} />
         </div>
       </div>
-      <div class="panel-bottom-wrapper container-bg container-style">
+      <div class="panel-bottom-wrapper container-bg container-style mobileHide">
         <button class="pg-button pg-text-button" on:click={() => currentCompareSelection.set(showCompare ? null : [])}>
           {showCompare ? 'Exit' : 'Open'} compare mode
         </button>

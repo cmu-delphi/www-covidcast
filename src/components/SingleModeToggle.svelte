@@ -10,7 +10,6 @@
   .button {
     width: unset;
     padding: 0.2em 1em;
-    min-width: 7em;
   }
 </style>
 

@@ -39,14 +39,6 @@
     justify-content: center;
   }
 
-  /** desktop **/
-  @media only screen and (min-width: 767px) {
-    .title-container {
-      background-color: unset;
-      box-shadow: none;
-    }
-  }
-
   .legend-container {
     position: absolute;
     margin: 6px;
@@ -60,6 +52,14 @@
 
   .legend-container > :global(.encoding-wrapper) {
     margin-bottom: 6px;
+  }
+
+  /** desktop **/
+  @media only screen and (min-width: 767px) {
+    .title-container {
+      background-color: unset;
+      box-shadow: none;
+    }
   }
 </style>
 
