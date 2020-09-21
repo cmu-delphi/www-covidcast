@@ -168,7 +168,7 @@
     <h5>Select from recent locations</h5>
 
     <ul class:empty={possibleRecent.length === 0}>
-      {#each possibleRecent as info}
+      {#each possibleRecent.reverse() as info}
         <li><button class="button" on:click={() => dispatch('add', info)}>{info.displayName}</button></li>
       {/each}
       {#if possibleRecent.length === 0}
