@@ -44,8 +44,8 @@
   .options {
     position: relative;
     display: flex;
-    max-width: 50em;
-    margin: 0 6px;
+    /* max-width: 50em; */
+    margin: 0.3em;
   }
 
   .option-wrapper {
@@ -102,7 +102,7 @@
       max-width: unset;
     }
     .option-wrapper {
-      padding: 0 2px;
+      padding: 0 0.1em;
       display: flex;
       flex-direction: column;
       align-items: stretch;

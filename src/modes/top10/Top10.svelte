@@ -19,7 +19,7 @@
   import Search from '../../components/Search.svelte';
   import { throttle } from 'lodash-es';
   import { levelMegaCounty, groupedSensorList, sensorList } from '../../stores/constants';
-  import SingleModeToggle from '../../components/SingleModeToggle.svelte';
+  import ModeNav from '../../components/ModeNav.svelte';
 
   /**
    * @typedef {import('../../maps').NameInfo} ValueRow
@@ -198,7 +198,7 @@
     grid-template-areas:
       'options search'
       'table table';
-    gap: 6px;
+    /* gap: 6px; */
   }
 
   .root > :global(.options-container) {
@@ -315,6 +315,7 @@
   }
 </style>
 
+<ModeNav />
 <div class="root">
   <Options className="options-container" />
   <Search
@@ -327,8 +328,6 @@
     on:change={(e) => selectByInfo(e.detail)} />
 
   <div class="table base-font-size">
-    <SingleModeToggle mode={modes[0]} />
-
     <table>
       <thead class:desc={sortDirectionDesc}>
         <tr>

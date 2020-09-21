@@ -2,7 +2,7 @@
   import MapBox from '../../components/MapBox/MapBox.svelte';
   import Options from '../../components/Options.svelte';
   import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
-  import FaChartLine from 'svelte-icons/fa/FaChartLine.svelte';
+  // import FaChartLine from 'svelte-icons/fa/FaChartLine.svelte';
 
   import {
     signalType,
@@ -29,9 +29,11 @@
   import DetailView from '../../components/DetailView/DetailView.svelte';
   import MapOverlays from '../../components/MapOverlays.svelte';
   import { trackEvent } from '../../stores/ga';
-  import FaBan from 'svelte-icons/fa/FaBan.svelte';
-  import SingleModeToggle from '../../components/SingleModeToggle.svelte';
-  import { modeByID } from '..';
+  // import FaBan from 'svelte-icons/fa/FaBan.svelte';
+  // import SingleModeToggle from '../../components/SingleModeToggle.svelte';
+  import ModeNav from '../../components/ModeNav.svelte';
+
+  // import { modeByID } from '..';
   import { MAP_THEME, selectionColors } from '../../theme';
   import AddAnother from './AddAnother.svelte';
   import { getInfoByName } from '../../maps';
@@ -134,8 +136,9 @@
     grid-template-areas:
       'options search view'
       'map panel panel';
-    gap: 6px;
-    background: var(--bg);
+    /* gap: 6px; */
+    /* background: var(--bg); */
+    background-color: white;
   }
 
   .root.compare {
@@ -153,7 +156,7 @@
   .root > :global(.search-container) {
     grid-area: search;
     z-index: 1009;
-    margin: 0;
+    margin: 0.3em;
   }
 
   .map-container {
@@ -198,11 +201,14 @@
 
   .detail-container {
     position: absolute;
-    right: 0;
+    top: 0;
+    left: 0;
     z-index: 1005;
-    width: 100%;
+    /* width: 100%;
     top: 20%;
-    height: 60%;
+    height: 60%; */
+    height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
   }
@@ -211,19 +217,15 @@
     cursor: crosshair !important;
   }
 
-  .view-switcher {
+  /* .view-switcher {
     display: flex;
     margin-right: 6px;
     grid-area: view;
   }
 
   .mode-container {
-    position: absolute;
-    margin: 6px;
-    right: 0;
-    bottom: 0;
-    z-index: 1000;
-    display: flex;
+    text-align: center;
+    margin-top: 0.5em;
   }
 
   .map-button {
@@ -232,11 +234,11 @@
     background-repeat: no-repeat;
     color: transparent;
     background-image: url('../../assets/imgs/choropleth_small.png');
-  }
+  } */
 
-  .chart-button {
+  /* .chart-button {
     color: #8c8c8c;
-  }
+  } */
 
   .hiddenPanel {
     grid-template-areas:
@@ -244,7 +246,7 @@
       'map map map';
   }
 
-  .single-toggle > :global(svg:last-of-type) {
+  /* .single-toggle > :global(svg:last-of-type) {
     display: none;
     position: absolute;
   }
@@ -256,7 +258,7 @@
   .single-toggle.selected > :global(svg:last-of-type) {
     display: unset;
     opacity: 0.5;
-  }
+  } */
 
   .selection-legend {
     list-style-type: none;
@@ -308,6 +310,17 @@
   }
 </style>
 
+<!-- 
+<nav>
+  <div class="mode-container">
+    <SingleModeToggle mode={modeByID.export} />
+    <SingleModeToggle mode={modeByID.top10} />
+    <SingleModeToggle mode={modeByID.timelapse} />
+  </div>
+</nav> -->
+
+<ModeNav />
+
 <main class="root base-font-size" class:hiddenPanel={!$isMobileDevice && !desktopShowPanel} class:compare={showCompare}>
   <Options className="options-container" levels={levelList} />
 
@@ -324,7 +337,7 @@
         trackEvent('search', 'select', e.detail ? e.detail.id : '');
       }} />
 
-    <div class="view-switcher container-bg">
+    <!-- <div class="view-switcher container-bg">
       {#if !$isMobileDevice}
         <button
           aria-pressed={String(!desktopShowPanel)}
@@ -367,16 +380,11 @@
           </button>
         </div>
       {/if}
-    </div>
+    </div> -->
   {/if}
 
   <div class="map-container" class:mobileHide={!mobileShowMap} class:pick={pickMapMode}>
     <MapOverlays {map} mapLoading={loading} legendLoading={loading} {zoom} />
-    <div class="mode-container container-bg container-style">
-      <SingleModeToggle mode={modeByID.export} />
-      <SingleModeToggle mode={modeByID.top10} />
-      <SingleModeToggle mode={modeByID.timelapse} />
-    </div>
     <MapBox
       bind:this={map}
       on:loading={(e) => (loading = e.detail)}
@@ -418,7 +426,7 @@
           <SmallMultiplesPanel bind:detail={detailSensor} levels={levelList} {selections} />
         </div>
       </div>
-      <div class="panel-bottom-wrapper container-bg container-style">
+      <div class="panel-bottom-wrapper">
         <button class="pg-button pg-text-button" on:click={() => currentCompareSelection.set(showCompare ? null : [])}>
           {showCompare ? 'Exit' : 'Open'} compare mode
         </button>
@@ -427,12 +435,6 @@
   {/if}
   {#if showCompare}
     <div class="add-container">
-      <AddAnother
-        {regionSearchList}
-        bind:pickMapMode
-        on:add={(e) => addCompare(e.detail)}
-        {selections}
-        mapData={data} />
       <div class="selection-container container-bg container-style">
         <ul>
           {#each selections as selection}
@@ -448,6 +450,12 @@
           {/each}
         </ul>
       </div>
+      <AddAnother
+        {regionSearchList}
+        bind:pickMapMode
+        on:add={(e) => addCompare(e.detail)}
+        {selections}
+        mapData={data} />
     </div>
   {/if}
 </main>

@@ -56,11 +56,13 @@
   }
 
   h4 {
-    font-size: 1.2em;
+    /* font-size: 1.2em; */
+    text-align: center;
+    margin: 0.5em 0;
   }
 
   h5 {
-    padding: 0.5em 0;
+    /* padding: 0.5em 0; */
   }
 
   .current {
@@ -81,6 +83,11 @@
     flex: 2 1 0;
   }
 
+  ol button,
+  ul button {
+    word-wrap: break-word;
+    text-align: left;
+  }
   li {
     padding: 0;
   }
@@ -103,6 +110,10 @@
     color: inherit;
   }
 
+  #select-on-map button {
+    width: 100%;
+  }
+
   .button:disabled {
     cursor: not-allowed;
   }
@@ -113,12 +124,11 @@
 </style>
 
 <section class="container-bg container-style root">
-  <h4>Add Another...</h4>
+  <h4>Add Another</h4>
 
-  <h5>Search by name</h5>
   <Search
     className="container-bg"
-    placeholder="Search..."
+    placeholder="Search by name..."
     selectedItem={possibleInfos ? null : null}
     items={possibleInfos}
     labelFieldName="displayName"
@@ -129,23 +139,16 @@
       }
     }} />
 
-  <button
-    class="pg-button pg-text-button"
-    class:selected={pickMapMode}
-    aria-pressed={pickMapMode}
-    on:click={() => (pickMapMode = !pickMapMode)}>
-    Select on map
-  </button>
+  <p id="select-on-map">
+    <button
+      class="pg-button pg-text-button"
+      class:selected={pickMapMode}
+      aria-pressed={pickMapMode}
+      on:click={() => (pickMapMode = !pickMapMode)}>
+      Select on map
+    </button>
+  </p>
 
-  <h5>Select from recent locations</h5>
-  <ul class:empty={possibleRecent.length === 0}>
-    {#each possibleRecent as info}
-      <li><button class="button" on:click={() => dispatch('add', info)}>{info.displayName}</button></li>
-    {/each}
-    {#if possibleRecent.length === 0}
-      <li>No recent locations founds</li>
-    {/if}
-  </ul>
   <h5>Select from Top for <span class="current">{$currentSensorEntry.name}</span></h5>
 
   <ol class:loading>
@@ -160,4 +163,17 @@
       </li>
     {/each}
   </ol>
+
+  {#if possibleRecent.length > 0}
+    <h5>Select from recent locations</h5>
+
+    <ul class:empty={possibleRecent.length === 0}>
+      {#each possibleRecent as info}
+        <li><button class="button" on:click={() => dispatch('add', info)}>{info.displayName}</button></li>
+      {/each}
+      {#if possibleRecent.length === 0}
+        <li>No recent locations founds</li>
+      {/if}
+    </ul>
+  {/if}
 </section>
