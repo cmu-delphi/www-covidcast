@@ -3,7 +3,7 @@
   import IoMdAdd from 'svelte-icons/io/IoMdAdd.svelte';
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
   import IoMdHome from 'svelte-icons/io/IoMdHome.svelte';
-  import TiTag from 'svelte-icons/ti/TiTag.svelte';
+  // import TiTag from 'svelte-icons/ti/TiTag.svelte';
   import { trackEvent } from '../stores/ga';
 
   export let className = '';
@@ -93,7 +93,7 @@
     </button>
   </div>
   {#if $currentLevel == 'state'}
-    <div>
+    <!-- <div>
       <button
         class="pg-button"
         type="button"
@@ -106,7 +106,7 @@
         }}>
         <TiTag />
       </button>
-    </div>
+    </div> -->
   {/if}
   {#if showEncodings && $isValueSignalType}
     <div class="pg-button-vertical-group">
