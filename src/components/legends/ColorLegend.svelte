@@ -29,7 +29,7 @@
     display: flex;
     font-size: 80%;
     min-width: 300px;
-    width: 72vw;
+    width: 48vw;
   }
 
   .tick {
