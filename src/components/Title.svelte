@@ -4,11 +4,11 @@
 
 <style>
   .banner {
-    padding-top: 0.5rem;
-    font-size: 2rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 1.65rem;
     line-height: 1em;
-    font-weight: 700;
-    text-align: center;
+    font-weight: 500;
+    /* text-align: center; */
     /* color: #8c8c8c; */
     color: black;
     text-transform: uppercase;
