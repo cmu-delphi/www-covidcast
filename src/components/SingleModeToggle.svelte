@@ -36,6 +36,16 @@
 
     background-color: #ffffff;
   }
+
+  @media only screen and (max-width: 767px) {
+    .mode-button {
+      display: block;
+      width: 100%;
+      border: 0;
+      text-align: left;
+      border-bottom: 1px solid var(--bg);
+    }
+  }
 </style>
 
 <button
