@@ -25,9 +25,11 @@
 <style>
   ul {
     margin: 0;
-    padding: 0 2em 0 0;
+    padding: 0 0 0 0;
     display: flex;
     font-size: 80%;
+    min-width: 300px;
+    width: 72vw;
   }
 
   .tick {
@@ -44,7 +46,10 @@
   }
 
   .tick-last {
-    flex: 1 1 0;
+    /* flex: 1 1 0;
+    width: 0; */
+    /* display: none; */
+    flex: 0.5;
   }
 
   .tick::after {
@@ -77,7 +82,7 @@
   <li class="tick tick-single tick-space" style="background-color: {ZERO_COLOR}" title={r.low}>{r.high}</li>
   {#each r.labels as l}
     <li class="tick" style="background-image: linear-gradient(to right, {l.color}, {l.nextColor})" title={l.label}>
-      x?? {r.high}
+      {r.high}
     </li>
   {/each}
   <li class="tick tick-last" title={r.high} />
