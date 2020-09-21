@@ -202,74 +202,6 @@ export const defaultSensorId = 'doctor-visits';
  */
 const defaultSensors = [
   {
-    type: 'public',
-    name: 'Away from Home 6hr+ (SG)',
-    longDescription: `<p>
-    Delphi receives data from <a href="https://docs.safegraph.com/docs/social-distancing-metrics" target="_blank" rel="noopener noreferrer">SafeGraph</a>,
-    which collects anonymized location data
-    from mobile phones. Using this data, we calculate the fraction of mobile devices
-    that spent between more than 6 hours at a location other than their home during
-    the daytime, an indicator of how mobile people are or whether they are traveling
-    to work or school outside their homes.<p>`,
-    links: [
-      {
-        alt: 'Technical description',
-        href: 'https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/safegraph.html',
-      },
-    ],
-    id: 'safegraph',
-    signal: 'full_time_work_prop',
-    levels: ['county', 'state'],
-    mapTitleText: 'Proportion of people spending 6 hours or more away from home, based on SafeGraph mobility data',
-    yAxis: 'Proportion',
-    format: 'raw',
-    hasStdErr: true,
-  },
-  {
-    type: 'public',
-    name: 'Away from Home 3-6hr (SG)',
-    longDescription: `<p>
-    Delphi receives data from <a href="https://docs.safegraph.com/docs/social-distancing-metrics" target="_blank" rel="noopener noreferrer">SafeGraph</a>,
-    which collects anonymized location data from
-    mobile phones. Using this data, we calculate the fraction of mobile devices that
-    spent between 3 and 6 hours at a location other than their home during the daytime,
-     an indicator of how mobile people are.</p>
-`,
-    links: [
-      {
-        alt: 'Technical description',
-        href: 'https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/safegraph.html',
-      },
-    ],
-    id: 'safegraph',
-    signal: 'part_time_work_prop',
-    levels: ['county', 'state'],
-    mapTitleText: 'Proportion of people spending 3-6 hours away from home, based on SafeGraph mobility data',
-    yAxis: 'Proportion',
-    format: 'raw',
-    hasStdErr: true,
-  },
-  {
-    type: 'public',
-    name: 'Search Trends (Google)',
-    longDescription: `<p>Delphi receives outpatient doctor visits data from our health system partners.
-    Using this data, which is de-identified, Delphi estimates the percentage of daily doctor’s visits in each area
-     that are related to COVID. Note that this can only report on regions and patients whose data is observed by our partners.</p>`,
-    links: [
-      {
-        alt: 'Technical description',
-        href: 'https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/ght.html',
-      },
-    ],
-    id: 'ght',
-    signal: 'smoothed_search',
-    levels: ['msa', 'state', 'hrr', 'dma'],
-    mapTitleText: 'Relative frequency of COVID-related Google searches',
-    yAxis: 'Frequency (arbitrary scale)',
-    format: 'raw',
-    hasStdErr: false,
-  },
-  {
     type: 'early',
     name: 'Doctor Visits',
     longDescription: `<p>Delphi receives outpatient doctor visits data from our health system partners.
@@ -378,6 +310,74 @@ const defaultSensors = [
     yAxis: 'Combined value (arbitrary scale)',
     format: 'raw',
     hasStdErr: true,
+  },
+  {
+    type: 'public',
+    name: 'Away from Home 6hr+ (SG)',
+    longDescription: `<p>
+    Delphi receives data from <a href="https://docs.safegraph.com/docs/social-distancing-metrics" target="_blank" rel="noopener noreferrer">SafeGraph</a>,
+    which collects anonymized location data
+    from mobile phones. Using this data, we calculate the fraction of mobile devices
+    that spent between more than 6 hours at a location other than their home during
+    the daytime, an indicator of how mobile people are or whether they are traveling
+    to work or school outside their homes.<p>`,
+    links: [
+      {
+        alt: 'Technical description',
+        href: 'https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/safegraph.html',
+      },
+    ],
+    id: 'safegraph',
+    signal: 'full_time_work_prop',
+    levels: ['county', 'state'],
+    mapTitleText: 'Proportion of people spending 6 hours or more away from home, based on SafeGraph mobility data',
+    yAxis: 'Proportion',
+    format: 'raw',
+    hasStdErr: true,
+  },
+  {
+    type: 'public',
+    name: 'Away from Home 3-6hr (SG)',
+    longDescription: `<p>
+    Delphi receives data from <a href="https://docs.safegraph.com/docs/social-distancing-metrics" target="_blank" rel="noopener noreferrer">SafeGraph</a>,
+    which collects anonymized location data from
+    mobile phones. Using this data, we calculate the fraction of mobile devices that
+    spent between 3 and 6 hours at a location other than their home during the daytime,
+     an indicator of how mobile people are.</p>
+`,
+    links: [
+      {
+        alt: 'Technical description',
+        href: 'https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/safegraph.html',
+      },
+    ],
+    id: 'safegraph',
+    signal: 'part_time_work_prop',
+    levels: ['county', 'state'],
+    mapTitleText: 'Proportion of people spending 3-6 hours away from home, based on SafeGraph mobility data',
+    yAxis: 'Proportion',
+    format: 'raw',
+    hasStdErr: true,
+  },
+  {
+    type: 'public',
+    name: 'Search Trends (Google)',
+    longDescription: `<p>Delphi receives outpatient doctor visits data from our health system partners.
+    Using this data, which is de-identified, Delphi estimates the percentage of daily doctor’s visits in each area
+     that are related to COVID. Note that this can only report on regions and patients whose data is observed by our partners.</p>`,
+    links: [
+      {
+        alt: 'Technical description',
+        href: 'https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/ght.html',
+      },
+    ],
+    id: 'ght',
+    signal: 'smoothed_search',
+    levels: ['msa', 'state', 'hrr', 'dma'],
+    mapTitleText: 'Relative frequency of COVID-related Google searches',
+    yAxis: 'Frequency (arbitrary scale)',
+    format: 'raw',
+    hasStdErr: false,
   },
   {
     type: 'late',
