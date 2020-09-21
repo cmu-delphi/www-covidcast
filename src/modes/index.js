@@ -1,7 +1,7 @@
 import IoMdDownload from 'svelte-icons/io/IoMdDownload.svelte';
 import IoMdArrowRoundBack from 'svelte-icons/io/IoMdArrowRoundBack.svelte';
 import IoIosTime from 'svelte-icons/io/IoIosTime.svelte';
-import IoMdList from 'svelte-icons/io/IoMdList.svelte';
+import IoMdReorder from 'svelte-icons/io/IoMdReorder.svelte';
 /**
  *
  * @typedef {object} Mode
@@ -40,7 +40,7 @@ const modes = [
   {
     id: 'top10',
     label: 'Top 10',
-    icon: IoMdList,
+    icon: IoMdReorder,
     tooltip: 'Switch to Top 10 Mode',
     component: () => import(/* webpackPrefetch: true */ './top10/Top10.svelte').then((r) => r.default),
   },
