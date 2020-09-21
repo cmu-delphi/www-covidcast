@@ -7,6 +7,7 @@
   import ColorLegend from './legends/ColorLegend.svelte';
   import BubbleLegend from './legends/BubbleLegend.svelte';
   import SpikeLegend from './legends/SpikeLegend.svelte';
+  import { currentSensorMapTitle, currentDateObject } from '../stores';
 
   export let map = null;
   export let mapLoading = true;
@@ -42,6 +43,17 @@
     pointer-events: none;
   }
 
+  .signal-description {
+    /* color: black; */
+    font-weight: bold;
+    margin-bottom: 0.25em;
+  }
+
+  .signal-description small {
+    color: #999;
+    font-weight: normal;
+  }
+
   /** desktop **/
   @media only screen and (min-width: 767px) {
     .title-container {
@@ -68,11 +80,7 @@
 </style>
 
 <div class="map-top-overlay">
-  <div class="title-container">
-    <!-- <Title>
-      <slot name="title" />
-    </Title> -->
-  </div>
+  <div class="title-container" />
   <div class="map-controls-container">
     <MapControls zoom={map ? map.zoom : null} showEncodings loading={mapLoading} />
   </div>
@@ -80,6 +88,10 @@
 <div class="legend-container base-font-size" aria-label="map legend">
   <EncodingOptions sensor={$currentSensorEntry} className="container-bg container-style encoding-wrapper" />
   <div class="container-bg container-style">
+    <div class="signal-description">
+      {$currentSensorMapTitle}
+      <small> {$currentDateObject.toLocaleDateString()} </small>
+    </div>
     {#if $isDirectionSignalType}
       <DirectionLegend />
     {:else if $encoding === 'color'}

@@ -203,6 +203,34 @@ export const defaultSensorId = 'doctor-visits';
 const defaultSensors = [
   {
     type: 'early',
+    name: 'Combined',
+    longDescription: `<p>
+    This data represents a combination of Doctor Visits, Symptoms (Facebook),
+    Symptoms in Community (Facebook), and Search Trends.  It does not include official
+    reports (cases and deaths), hospital admissions, or SafeGraph signals.  We use a
+    rank-1 approximation, from a nonnegative matrix factorization approach, to identify an
+    underlying signal that best reconstructs the indicators.  Higher values of the
+    combined signal correspond to higher values of the other indicators, but the
+    scale (units) of the combination is arbitrary.
+    </p>`,
+    links: [
+      {
+        alt: 'Technical description',
+        href:
+          'https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/indicator-combination.html#statistical-combination-signals',
+      },
+    ],
+    id: 'indicator-combination',
+    signal: 'nmf_day_doc_fbc_fbs_ght',
+    levels: ['county', 'msa', 'state'],
+    tooltipText: 'Combination of COVID-19 indicators available at this geographic level',
+    mapTitleText: 'Combination of COVID-19 indicators',
+    yAxis: 'Combined value (arbitrary scale)',
+    format: 'raw',
+    hasStdErr: true,
+  },
+  {
+    type: 'early',
     name: 'Doctor Visits',
     longDescription: `<p>Delphi receives outpatient doctor visits data from our health system partners.
     Using this data, which is de-identified, Delphi estimates the percentage of daily doctor’s visits in each area
@@ -281,34 +309,6 @@ const defaultSensors = [
       'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
     yAxis: 'Percentage',
     format: 'percent',
-    hasStdErr: true,
-  },
-  {
-    type: 'early',
-    name: 'Combined',
-    longDescription: `<p>
-    This data represents a combination of Doctor Visits, Symptoms (Facebook),
-    Symptoms in Community (Facebook), and Search Trends.  It does not include official
-    reports (cases and deaths), hospital admissions, or SafeGraph signals.  We use a
-    rank-1 approximation, from a nonnegative matrix factorization approach, to identify an
-    underlying signal that best reconstructs the indicators.  Higher values of the
-    combined signal correspond to higher values of the other indicators, but the
-    scale (units) of the combination is arbitrary.
-    </p>`,
-    links: [
-      {
-        alt: 'Technical description',
-        href:
-          'https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/indicator-combination.html#statistical-combination-signals',
-      },
-    ],
-    id: 'indicator-combination',
-    signal: 'nmf_day_doc_fbc_fbs_ght',
-    levels: ['county', 'msa', 'state'],
-    tooltipText: 'Combination of COVID-19 indicators available at this geographic level',
-    mapTitleText: 'Combination of COVID-19 indicators',
-    yAxis: 'Combined value (arbitrary scale)',
-    format: 'raw',
     hasStdErr: true,
   },
   {

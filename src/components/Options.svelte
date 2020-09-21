@@ -12,6 +12,7 @@
   import Datepicker from './Calendar/Datepicker.svelte';
   import { timeFormat } from 'd3-time-format';
   import { formatAPITime, parseAPITime } from '../data';
+  // import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
 
   $: formatTime = $isMobileDevice ? timeFormat('%x') : timeFormat('%B %-d, %Y');
 
