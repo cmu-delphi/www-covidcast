@@ -64,7 +64,7 @@
 </style>
 
 <div class="map-top-overlay">
-  <div class="title-container container-bg">
+  <div class="title-container">
     <Title>
       <slot name="title" />
     </Title>
