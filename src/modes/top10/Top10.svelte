@@ -327,7 +327,7 @@
     on:change={(e) => selectByInfo(e.detail)} />
 
   <div class="table base-font-size">
-    <SingleModeToggle mode={modes[0]} />
+    <SingleModeToggle back />
 
     <table>
       <thead class:desc={sortDirectionDesc}>

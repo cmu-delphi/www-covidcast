@@ -271,7 +271,7 @@
       <div slot="title">{$currentDateObject.toLocaleDateString()}</div>
     </MapOverlays>
     <div class="mode-container container-bg container-style">
-      <SingleModeToggle label="Back to visualization" />
+      <SingleModeToggle back/>
     </div>
     <MapBox
       bind:this={map}

@@ -6,7 +6,7 @@ import { MISSING_VALUE } from './encodings/utils';
 import { primaryValue } from '../../stores/constants';
 
 const MAGIC_MIN_STATS = 0.14;
-const SMALL_TICK_COUNT = 5;
+const SMALL_TICK_COUNT = 3;
 const TICK_COUNT = 7;
 
 /**

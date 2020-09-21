@@ -306,7 +306,7 @@
       grid-area: map;
     }
   }
-
+  /*
   @media only screen and (max-width: 1120px) {
     .mode-container {
       left: 0;
@@ -316,7 +316,7 @@
     .map-container :global(.legend-container) {
       bottom: calc(1.2em + 28px);
     }
-  }
+  } */
 </style>
 
 <main class="root base-font-size" class:hiddenPanel={!$isMobileDevice && !desktopShowPanel} class:compare={showCompare}>

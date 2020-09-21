@@ -15,6 +15,7 @@
   @media only screen and (max-width: 767px) {
     .banner {
       font-size: 1rem;
+      padding: 0;
     }
   }
 
