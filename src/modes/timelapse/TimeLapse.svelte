@@ -25,7 +25,7 @@
   import { onMount } from 'svelte';
   import MapOverlays from '../../components/MapOverlays.svelte';
   import SingleModeToggle from '../../components/SingleModeToggle.svelte';
-
+  import ModeNav from '../../components/ModeNav.svelte';
   /**
    * @type {MapBox}
    */
@@ -256,6 +256,7 @@
   }
 </style>
 
+<ModeNav />
 <main class="root">
   <Options showDate={false} className="options-container" />
   <Player
@@ -268,7 +269,7 @@
     on:change={(e) => jumpToDate(e.detail)} />
   <div class="map-container">
     <MapOverlays {map} mapLoading={running || loading} legendLoading={false} {zoom}>
-      <div slot="title">{$currentDateObject.toLocaleDateString()}</div>
+      <div slot="title" />
     </MapOverlays>
     <div class="mode-container container-bg container-style">
       <SingleModeToggle label="Back to visualization" />

@@ -77,7 +77,7 @@
   <li class="tick tick-single tick-space" style="background-color: {ZERO_COLOR}" title={r.low}>{r.high}</li>
   {#each r.labels as l}
     <li class="tick" style="background-image: linear-gradient(to right, {l.color}, {l.nextColor})" title={l.label}>
-      {r.high}
+      x?? {r.high}
     </li>
   {/each}
   <li class="tick tick-last" title={r.high} />

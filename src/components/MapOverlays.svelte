@@ -33,10 +33,11 @@
     align-self: flex-start;
     justify-self: center;
     padding: 0.5em 1em;
-    margin: 0 6px;
+    margin: 0 0.25em;
     display: flex;
     align-items: flex-start;
     justify-content: center;
+    pointer-events: none;
   }
 
   /** desktop **/
@@ -49,13 +50,14 @@
 
   .legend-container {
     position: absolute;
-    margin: 6px;
+    margin: 0.25em;
     left: 0;
     bottom: 0;
     z-index: 1000;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    max-width: 100%;
   }
 
   .legend-container > :global(.encoding-wrapper) {
