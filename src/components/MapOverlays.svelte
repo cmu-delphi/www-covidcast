@@ -1,13 +1,14 @@
 <script>
   // import Title from './Title.svelte';
   import MapControls from './MapControls.svelte';
-  import { isDirectionSignalType, encoding, currentSensorEntry } from '../stores';
+  import { isDirectionSignalType, encoding, currentSensorEntry, currentInfoSensor } from '../stores';
   import EncodingOptions from './EncodingOptions.svelte';
   import DirectionLegend from './legends/DirectionLegend.svelte';
   import ColorLegend from './legends/ColorLegend.svelte';
   import BubbleLegend from './legends/BubbleLegend.svelte';
   import SpikeLegend from './legends/SpikeLegend.svelte';
   import { currentSensorMapTitle, currentDateObject } from '../stores';
+  import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
 
   export let map = null;
   export let mapLoading = true;
@@ -45,7 +46,7 @@
 
   .signal-description {
     /* color: black; */
-    font-weight: bold;
+    /* font-weight: bold; */
     margin-bottom: 0.25em;
   }
 
@@ -90,8 +91,16 @@
   <div class="container-bg container-style">
     <div class="signal-description">
       {$currentSensorMapTitle}
+      <button
+        title="Show sensor description"
+        style="display: inline-block; width: 1.5em; height: 1.5em;"
+        class="pg-button pg-button-circle info"
+        on:click={() => {
+          currentInfoSensor.set($currentSensorEntry);
+        }}><IoMdHelp /></button>
       <small> {$currentDateObject.toLocaleDateString()} </small>
     </div>
+
     {#if $isDirectionSignalType}
       <DirectionLegend />
     {:else if $encoding === 'color'}
