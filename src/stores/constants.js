@@ -296,6 +296,30 @@ const defaultSensors = [
   },
   {
     type: 'early',
+    name: 'COVID-Related Doctor Visits',
+    longDescription: `<p>Delphi receives from our health system partners aggregated statistics on COVID-related
+    outpatient doctor visits, derived from ICD codes found in insurance claims.
+    Using this dataDelphi estimates the percentage of daily doctor’s visits in each
+    area that are due to COVID-like illnesses. Note that these estimates are based
+    only on visits by patients whose data is accessible to our partners.</p>`,
+    links: [
+      {
+        alt: 'Technical description',
+        href: 'https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/doctor-visits.html',
+      },
+    ],
+    id: 'doctor-visits',
+    signal: 'smoothed_adj_cli',
+    levels: ['county', 'msa', 'state', 'hrr'],
+    mapTitleText: 'Percentage of daily doctor visits that are due to COVID-like symptoms',
+    yAxis: 'Percentage',
+    format: 'percent',
+    hasStdErr: false,
+    // colorScale: interpolateBlues,
+  },
+  {
+    type: 'early',
+
     name: 'COVID-Like Symptoms',
     longDescription: `<p>Every day, Delphi surveys tens of thousands of Facebook users,
     asking a broad set of COVID-related questions, including whether they, or anyone in their household,
