@@ -264,8 +264,12 @@
       padding: 4px;
       font-size: 1em;
     }
-
+    /* 
     .table-num-column {
+      display: none;
+    } */
+
+    .table-pop-column {
       display: none;
     }
 
@@ -357,7 +361,11 @@
         <tr>
           <th class="table-num-column" rowspan="2">#</th>
           <th rowspan="2" class:sorted={sortCriteria === 'name'} on:click={() => sortClick('name')}>Name</th>
-          <th rowspan="2" class:sorted={sortCriteria === 'population'} on:click={() => sortClick('population', true)}>
+          <th
+            class="table-pop-column"
+            rowspan="2"
+            class:sorted={sortCriteria === 'population'}
+            on:click={() => sortClick('population', true)}>
             Pop.
           </th>
           <th
@@ -429,7 +437,9 @@
                 <IoIosPin title="Show on Map" />
               </span>
             </td>
-            <td class="right">{row.population != null ? row.population.toLocaleString() : 'Unknown'}</td>
+            <td class="right table-pop-column">
+              {row.population != null ? row.population.toLocaleString() : 'Unknown'}
+            </td>
             <Top10Sensor
               sensor={primary}
               single={row.primary}
