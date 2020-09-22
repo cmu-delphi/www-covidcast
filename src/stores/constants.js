@@ -177,161 +177,171 @@ export const defaultSensorId = 'doctor-visits';
 
 const defaultSensors = [
   {
-    type: 'public',
-    name: 'Away from Home 6hr+ (SG)',
+    name: 'Away from Home 6hr+',
     id: 'safegraph',
+    tooltipText: 'Proportion of people spending 6 hours or more away from home that day, based on SafeGraph mobility data',
+    mapTitleText: 'Proportion of people spending 6 hours or more away from home that day, based on SafeGraph mobility data',
+    yAxis: 'Proportion',
+    format: 'raw',
     signal: 'full_time_work_prop',
     levels: ['county', 'state'],
-    mapTitleText: 'Proportion of people spending 6 hours or more away from home, based on SafeGraph mobility data',
-    yAxis: 'Proportion',
-    format: 'raw',
+    type: 'public',
     hasStdErr: true,
   },
   {
-    type: 'public',
-    name: 'Away from Home 3-6hr (SG)',
+    name: 'Away from Home 3-6hr',
     id: 'safegraph',
+    tooltipText: 'Proportion of people spending 3-6 hours away from home that day, based on SafeGraph mobility data',
+    mapTitleText: 'Proportion of people spending 3-6 hours away from home that day, based on SafeGraph mobility data',
+    yAxis: 'Proportion',
+    format: 'raw',
     signal: 'part_time_work_prop',
     levels: ['county', 'state'],
-    mapTitleText: 'Proportion of people spending 3-6 hours away from home, based on SafeGraph mobility data',
-    yAxis: 'Proportion',
-    format: 'raw',
+    type: 'public',
     hasStdErr: true,
   },
   {
-    type: 'public',
-    name: 'Search Trends (Google)',
+    name: 'COVID search on Google',
     id: 'ght',
-    signal: 'smoothed_search',
-    levels: ['msa', 'state', 'hrr', 'dma'],
+    tooltipText: 'Relative frequency of COVID-related Google searches',
     mapTitleText: 'Relative frequency of COVID-related Google searches',
     yAxis: 'Frequency (arbitrary scale)',
     format: 'raw',
+    signal: 'smoothed_search',
+    levels: ['msa', 'state', 'hrr', 'dma'],
+    type: 'public',
     hasStdErr: false,
   },
   {
-    type: 'early',
-    name: 'Doctor Visits',
+    name: 'COVID-Related Doctor Visits',
     id: 'doctor-visits',
-    signal: 'smoothed_adj_cli',
-    levels: ['county', 'msa', 'state', 'hrr'],
+    tooltipText: 'Percentage of daily doctor visits that are due to COVID-like symptoms',
     mapTitleText: 'Percentage of daily doctor visits that are due to COVID-like symptoms',
     yAxis: 'Percentage',
     format: 'percent',
+    signal: 'smoothed_adj_cli',
+    levels: ['county', 'msa', 'state', 'hrr'],
+    type: 'early',
     hasStdErr: false,
   },
   {
-    type: 'early',
-    name: 'Symptoms (FB)',
+    name: 'COVID-Like Symptoms',
     id: 'fb-survey',
+    tooltipText: 'Percentage of people with COVID-like symptoms, based on surveys of Facebook users',
+    mapTitleText: 'Percentage of people with COVID-like symptoms, based on surveys of Facebook users',
+    yAxis: 'Percentage',
+    format: 'percent',
     signal: 'smoothed_cli',
     levels: ['county', 'msa', 'state', 'hrr'],
-    mapTitleText: 'Percentage of people with COVID-like symptoms, based on Facebook surveys',
-    yAxis: 'Percentage',
-    format: 'percent',
+    type: 'early',
     hasStdErr: true,
   },
   {
-    type: 'early',
-    name: 'Symptoms in Community (FB)',
+    name: 'COVID-Like Symptoms in Community',
     id: 'fb-survey',
+    tooltipText:
+      'Percentage of people who know someone in their local community with COVID-like symptoms, based on surveys of Facebook users',
+    mapTitleText:
+      'Percentage of people who know someone in their local community with COVID-like symptoms, based on surveys of Facebook users',
+    yAxis: 'Percentage',
+    format: 'percent',
     signal: 'smoothed_hh_cmnty_cli',
     levels: ['county', 'msa', 'state', 'hrr'],
-    mapTitleText:
-      'Percentage of people who know someone in their local community with COVID-like symptoms, based on Facebook surveys',
-    yAxis: 'Percentage',
-    format: 'percent',
+    type: 'early',
     hasStdErr: true,
   },
   {
-    type: 'early',
-    name: 'Combined',
+    name: 'COVID Indicator Combination',
     id: 'indicator-combination',
-    signal: 'nmf_day_doc_fbc_fbs_ght',
-    levels: ['county', 'msa', 'state'],
-    tooltipText: 'Combination of COVID-19 indicators available at this geographic level',
-    mapTitleText: 'Combination of COVID-19 indicators',
+    tooltipText: 'Combination of several COVID-19 indicators available at this geographic level',
+    mapTitleText: 'Combination of several COVID-19 indicators: Doctor Visits, Symptom Surveys, and Google Search Trends',
     yAxis: 'Combined value (arbitrary scale)',
     format: 'raw',
+    signal: 'nmf_day_doc_fbc_fbs_ght',
+    levels: ['county', 'msa', 'state'],
+    type: 'early',
     hasStdErr: true,
   },
   {
-    type: 'late',
-    name: 'COVID-19 Antigen Tests (Quidel)',
+    name: 'COVID Antigen Test Positivity (Quidel)',
     id: 'quidel',
-    signal: 'covid_ag_smoothed_pct_positive',
-    levels: ['state', 'msa', 'hrr'],
-    tooltipText: 'Daily test positivity rate for COVID-19 antigens, based on data provided by Quidel, Inc.',
-    mapTitleText: 'Daily test positivity rate for COVID-19 antigens',
+    tooltipText: 'Positivity rate of COVID-19 antigen tests, based on data provided by Quidel, Inc.',
+    mapTitleText: 'Positivity rate of COVID-19 antigen tests',
     yAxis: 'Percentage',
     format: 'percent',
+    signal: 'covid_ag_smoothed_pct_positive',
+    levels: ['msa', 'state', 'hrr'],
+    type: 'late',
     hasStdErr: true,
   },
   {
-    type: 'late',
-    name: 'Hospital Admissions',
+    name: 'COVID Hospital Admissions',
     id: 'hospital-admissions',
-    signal: 'smoothed_adj_covid19',
-    levels: ['county', 'msa', 'state'],
+    tooltipText: 'Percentage of daily hospital admissions with COVID-19 associated diagnoses',
     mapTitleText: 'Percentage of daily hospital admissions with COVID-19 associated diagnoses',
     yAxis: 'Percentage',
     format: 'percent',
+    signal: 'smoothed_adj_covid19',
+    levels: ['county', 'msa', 'state'],
+    type: 'late',
     hasStdErr: false,
   },
   {
-    type: 'late',
-    name: 'Cases',
+    name: 'COVID Cases',
     id: 'indicator-combination',
-    signal: 'confirmed_7dav_incidence_num',
-    levels: ['msa', 'county', 'state'],
     tooltipText:
-      'Daily new confirmed COVID-19 cases (7-day average), based on data reported by USAFacts and Johns Hopkins University',
+      'Newly reported COVID-19 cases, based on data from USAFacts and Johns Hopkins University',
     mapTitleText: (options) => {
       if (!options) {
-        return 'Daily new COVID-19 cases (7-day average)';
+        return 'Newly reported COVID-19 cases (7-day average)';
       }
       if (options.cumulative) {
         if (options.ratio) {
-          return 'Cumulated daily new COVID-19 cases per 100,000 people (7-day average)';
+          return 'Cumulative reported COVID-19 cases per 100,000 people';
         } else {
-          return 'Cumulated daily new COVID-19 cases (7-day average)';
+          return 'Cumulative reported COVID-19 cases';
         }
-      } else if (options.ratio) {
-        return 'Daily new COVID-19 cases per 100,000 people (7-day average)';
+      }[a] else if (options.ratio) {
+        return 'Newly reported COVID-19 cases per 100,000 people (7-day average)';
       } else {
-        return 'Daily new COVID-19 cases (7-day average)';
+        return 'Newly reported COVID-19 cases (7-day average)';
       }
     },
+
+
     yAxis: 'Cases',
     format: 'raw',
+    signal: 'confirmed_7dav_incidence_num',
+    levels: ['msa', 'county', 'state'],
+    type: 'late',
     hasStdErr: false,
   },
   {
-    type: 'late',
-    name: 'Deaths',
+    name: 'COVID Deaths',
     id: 'indicator-combination',
-    signal: 'deaths_7dav_incidence_num',
-    levels: ['msa', 'county', 'state'],
     tooltipText:
-      'Daily new COVID-19 deaths (7-day average), based on data reported by USAFacts and Johns Hopkins University',
+      'Newly reported COVID-19 deaths, based on data from USAFacts and Johns Hopkins University',
     mapTitleText: (options) => {
       if (!options) {
-        return 'Daily new COVID-19 deaths (7-day average)';
+        return 'Newly reported COVID-19 deaths (7-day average)';
       }
       if (options.cumulative) {
         if (options.ratio) {
-          return 'Cumulated daily new COVID-19 deaths per 100,000 people (7-day average)';
+          return 'Cumulative reported COVID-19 deaths per 100,000 people';
         } else {
-          return 'Cumulated daily new COVID-19 deaths (7-day average)';
-        }
+          return 'Cumulative reported COVID-19 deaths';
+        }[b]
       } else if (options.ratio) {
-        return 'Daily new COVID-19 deaths per 100,000 people (7-day average)';
+        return 'Newly reported COVID-19 deaths per 100,000 people (7-day average)';
       } else {
-        return 'Daily new COVID-19 deaths (7-day average)';
+        return 'Newly reported COVID-19 deaths (7-day average)';
       }
     },
     yAxis: 'Deaths',
     format: 'raw',
+    signal: 'deaths_7dav_incidence_num',
+    levels: ['msa', 'county', 'state'],
+    type: 'late',
     hasStdErr: false,
   },
 ];
