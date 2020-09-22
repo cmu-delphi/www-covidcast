@@ -10,7 +10,6 @@
     selectByInfo,
   } from '../../stores';
   import { fetchRegionSlice } from '../../data/fetchData';
-  // import IoMdAdd from 'svelte-icons/io/IoMdAdd.svelte';
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
   import IoIosPin from 'svelte-icons/io/IoIosPin.svelte';
   import modes from '..';
@@ -222,15 +221,6 @@
     vertical-align: middle;
   }
 
-  /* tbody button {
-    opacity: 0;
-    transition: opacity 0.25s ease;
-  }
-
-  tr:hover button {
-    opacity: 1;
-  } */
-
   .table th {
     background: white;
     text-align: center;
@@ -264,10 +254,6 @@
       padding: 4px;
       font-size: 1em;
     }
-    /* 
-    .table-num-column {
-      display: none;
-    } */
 
     .table-pop-column {
       display: none;
@@ -297,7 +283,6 @@
   }
 
   .selected > :global(td) {
-    /* border: 2px solid var(--red); */
     font-weight: bold;
   }
 
@@ -313,9 +298,6 @@
   }
 
   .add-column {
-    /* -moz-appearance: none;
-    -webkit-appearance: none;
-    appearance: none; */
     width: 2.5em;
   }
 
@@ -412,20 +394,6 @@
             </th>
           {/if}
         </tr>
-        <!-- <tr>
-          <th>{$currentDateObject.toLocaleDateString()}</th>
-          {#if primary.isCasesOrDeath}
-            <th>7-day Average</th>
-          {/if}
-          <th>Time Series</th>
-          {#each otherSensors as s}
-            <th>{$currentDateObject.toLocaleDateString()}</th>
-            {#if s.isCasesOrDeath}
-              <th>7-day Average</th>
-            {/if}
-            <th>Time Series</th>
-          {/each}
-        </tr> -->
       </thead>
       <tbody>
         {#each sortedRows as row, i}

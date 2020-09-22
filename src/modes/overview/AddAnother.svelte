@@ -56,13 +56,8 @@
   }
 
   h4 {
-    /* font-size: 1.2em; */
     text-align: center;
     margin: 0.5em 0;
-  }
-
-  h5 {
-    /* padding: 0.5em 0; */
   }
 
   .current {

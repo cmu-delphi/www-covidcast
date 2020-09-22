@@ -186,14 +186,12 @@
     flex: 1 1 0;
     padding: 0;
     cursor: pointer;
-    /* text-decoration: underline; */
     display: block;
     background: none;
     border: none;
     outline: none !important;
     text-align: left;
     color: inherit;
-    /* font-weight: 700; */
     font-size: 1em;
     line-height: 1.5em;
     margin: 0;
@@ -202,8 +200,6 @@
   .title-button:hover,
   .title-button:focus,
   li.selected .title-button {
-    /* color: var(--red); */
-    /* font-weight: bold; */
     color: black;
   }
 

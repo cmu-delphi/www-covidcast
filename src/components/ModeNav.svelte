@@ -1,16 +1,11 @@
 <script>
   import SingleModeToggle from './SingleModeToggle.svelte';
   import { modeByID } from '../modes';
-
-  // let mode = modeByID.overview;
-  // export let label = mode.label;
 </script>
 
 <style>
   .mode-container {
-    /* text-align: center; */
     margin-left: 0.5em;
-    /* border-bottom: 1px solid #ccc; */
   }
 
   @media only screen and (max-width: 767px) {

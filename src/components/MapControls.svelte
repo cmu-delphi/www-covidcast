@@ -1,9 +1,8 @@
 <script>
-  import { currentLevel, encoding, isValueSignalType } from '../stores';
+  import { encoding, isValueSignalType } from '../stores';
   import IoMdAdd from 'svelte-icons/io/IoMdAdd.svelte';
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
   import IoMdHome from 'svelte-icons/io/IoMdHome.svelte';
-  // import TiTag from 'svelte-icons/ti/TiTag.svelte';
   import { trackEvent } from '../stores/ga';
 
   export let className = '';
@@ -92,22 +91,6 @@
       <IoMdHome />
     </button>
   </div>
-  {#if $currentLevel == 'state'}
-    <!-- <div>
-      <button
-        class="pg-button"
-        type="button"
-        title="Hide state labels"
-        aria-label="Hide state labels"
-        disabled={!zoom}
-        on:click={() => {
-          trackEvent('map', 'toggleStateLabel');
-          zoom.toggleStateLabels();
-        }}>
-        <TiTag />
-      </button>
-    </div> -->
-  {/if}
   {#if showEncodings && $isValueSignalType}
     <div class="pg-button-vertical-group">
       <button

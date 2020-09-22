@@ -34,20 +34,21 @@
     z-index: 1001;
     align-self: flex-start;
     justify-self: center;
-    /* padding: 0.5em 1em; */
-    /* margin: 0 0.25em; */
     font-weight: 600;
     margin: 0;
     padding: 0;
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    /* pointer-events: none; */
+  }
+
+  .title-container button {
+    display: inline-block;
+    width: 1.4em;
+    height: 1.4em;
   }
 
   .signal-description {
-    /* color: black; */
-    /* font-weight: bold; */
     margin-bottom: 0.25em;
   }
 
@@ -80,7 +81,6 @@
   <div class="title-container">
     {$currentSensorMapTitle} &nbsp; <button
       title="Show sensor description"
-      style="display: inline-block; width: 1.4em; height: 1.4em;"
       class="pg-button pg-button-circle info"
       on:click={() => {
         currentInfoSensor.set($currentSensorEntry);
@@ -93,17 +93,7 @@
 <div class="legend-container base-font-size" aria-label="map legend">
   <EncodingOptions sensor={$currentSensorEntry} className="container-bg container-style encoding-wrapper" />
   <div class="container-bg container-style">
-    <div class="signal-description">
-      <!-- {$currentSensorMapTitle}
-      <button
-        title="Show sensor description"
-        style="display: inline-block; width: 1.5em; height: 1.5em;"
-        class="pg-button pg-button-circle info"
-        on:click={() => {
-          currentInfoSensor.set($currentSensorEntry);
-        }}><IoMdHelp /></button>
-      <small> {$currentDateObject.toLocaleDateString()} </small> -->
-    </div>
+    <div class="signal-description" />
 
     {#if $isDirectionSignalType}
       <DirectionLegend />

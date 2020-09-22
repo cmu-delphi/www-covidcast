@@ -46,9 +46,6 @@
   }
 
   .tick-last {
-    /* flex: 1 1 0;
-    width: 0; */
-    /* display: none; */
     flex: 0.5;
   }
 

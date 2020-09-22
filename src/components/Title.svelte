@@ -8,8 +8,6 @@
     font-size: 1.65rem;
     line-height: 1em;
     font-weight: 500;
-    /* text-align: center; */
-    /* color: #8c8c8c; */
     color: black;
     text-transform: uppercase;
     pointer-events: none;
@@ -27,12 +25,3 @@
   <slot />
   <small> {$currentDateObject.toLocaleDateString()} </small>
 </h2>
-
-<!-- {#if $currentSensorEntry && $currentSensorEntry.longDescription}
-  <button
-    title="Show sensor description"
-    class="pg-button pg-button-circle info"
-    on:click={() => {
-      currentInfoSensor.set($currentSensorEntry);
-    }}><IoMdHelp /></button>
-{/if} -->

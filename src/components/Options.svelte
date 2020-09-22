@@ -12,18 +12,13 @@
   import Datepicker from './Calendar/Datepicker.svelte';
   import { timeFormat } from 'd3-time-format';
   import { formatAPITime, parseAPITime } from '../data';
-  // import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
 
   $: formatTime = $isMobileDevice ? timeFormat('%x') : timeFormat('%B %-d, %Y');
 
   export let levels = levelList;
   export let className = '';
   export let showDate = true;
-  // let selectedDate = writable(parseTime($currentDate));
   $: selectedDate = parseAPITime($currentDate);
-  // if ($currentDate !== MAGIC_START_DATE) {
-  //   selectedDate = parseTime($currentDate);
-  // }
   $: start_end_dates = [];
 
   $: if (selectedDate !== undefined) {
@@ -45,7 +40,6 @@
   .options {
     position: relative;
     display: flex;
-    /* max-width: 50em; */
     margin: 0.3em;
   }
 
