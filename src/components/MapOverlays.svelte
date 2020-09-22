@@ -7,7 +7,7 @@
   import ColorLegend from './legends/ColorLegend.svelte';
   import BubbleLegend from './legends/BubbleLegend.svelte';
   import SpikeLegend from './legends/SpikeLegend.svelte';
-  import { currentSensorMapTitle, currentDateObject } from '../stores';
+  import { currentSensorMapTitle } from '../stores';
   import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
 
   export let map = null;
@@ -36,23 +36,19 @@
     justify-self: center;
     /* padding: 0.5em 1em; */
     /* margin: 0 0.25em; */
+    font-weight: 600;
     margin: 0;
     padding: 0;
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    pointer-events: none;
+    /* pointer-events: none; */
   }
 
   .signal-description {
     /* color: black; */
     /* font-weight: bold; */
     margin-bottom: 0.25em;
-  }
-
-  .signal-description small {
-    color: #999;
-    font-weight: normal;
   }
 
   /** desktop **/
@@ -81,7 +77,15 @@
 </style>
 
 <div class="map-top-overlay">
-  <div class="title-container" />
+  <div class="title-container">
+    {$currentSensorMapTitle} &nbsp; <button
+      title="Show sensor description"
+      style="display: inline-block; width: 1.4em; height: 1.4em;"
+      class="pg-button pg-button-circle info"
+      on:click={() => {
+        currentInfoSensor.set($currentSensorEntry);
+      }}><IoMdHelp /></button>
+  </div>
   <div class="map-controls-container">
     <MapControls zoom={map ? map.zoom : null} showEncodings loading={mapLoading} />
   </div>
@@ -90,7 +94,7 @@
   <EncodingOptions sensor={$currentSensorEntry} className="container-bg container-style encoding-wrapper" />
   <div class="container-bg container-style">
     <div class="signal-description">
-      {$currentSensorMapTitle}
+      <!-- {$currentSensorMapTitle}
       <button
         title="Show sensor description"
         style="display: inline-block; width: 1.5em; height: 1.5em;"
@@ -98,7 +102,7 @@
         on:click={() => {
           currentInfoSensor.set($currentSensorEntry);
         }}><IoMdHelp /></button>
-      <small> {$currentDateObject.toLocaleDateString()} </small>
+      <small> {$currentDateObject.toLocaleDateString()} </small> -->
     </div>
 
     {#if $isDirectionSignalType}
