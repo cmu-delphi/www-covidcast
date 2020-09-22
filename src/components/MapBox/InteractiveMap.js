@@ -1,13 +1,14 @@
 import { Popup } from 'mapbox-gl';
-import { levelMegaCounty, levels, levelsWithMega } from '../../stores/constants';
-import { L } from './layers';
-import { S } from './sources';
+import { levelMegaCounty } from '../../stores/constants';
+import { L, toFillLayer, toHoverLayer } from './layers';
+import { toBorderSource } from './sources';
 import Tooltip from './Tooltip.svelte';
+import { MAP_THEME } from '../../theme';
 
 export default class InteractiveMap {
   /**
    * @param {import('mapbox-gl').Map} map
-   * @param {{readonly encoding: string, readonly level: string, dispatch(type: string, detail: any)}} adapter
+   * @param {{readonly encoding: string, readonly level: string, readonly levels: string[], hasMegaCountyLevel: boolean, dispatch(type: string, detail: any)}} adapter
    */
   constructor(map, adapter) {
     this.adapter = adapter;
@@ -25,15 +26,13 @@ export default class InteractiveMap {
       className: 'map-popup',
       anchor: 'top',
     });
-    this.clicked = {
-      id: null,
-      level: null,
-      mega: null,
-    };
+    /**
+     * @type {{id: string, level: string, color: string}[]}
+     */
+    this.selection = [];
     this.hovered = {
       id: null,
       level: null,
-      mega: null,
     };
 
     this.tooltipElement = document.createElement('div');
@@ -49,20 +48,24 @@ export default class InteractiveMap {
   }
 
   initListeners() {
-    this.map.on('mouseenter', L.state.stroke, this._onMapMouseEnter.bind(this));
-    this.map.on('mouseleave', L.state.stroke, this._onMapMouseLeave.bind(this));
-    this.map.on('mousemove', L.state.stroke, this._onMapMouseMove.bind(this));
+    this.map.on('mouseenter', L.outline, this._onMapMouseEnter.bind(this));
+    this.map.on('mouseleave', L.outline, this._onMapMouseLeave.bind(this));
+    this.map.on('mousemove', L.outline, this._onMapMouseMove.bind(this));
 
-    levels.forEach((level) => {
-      // this.map.on('mouseenter', L[level].fill, this._onLevelMouseEnter.bind(this));
-      this.map.on('mouseleave', L[level].fill, this._onLevelMouseLeave.bind(this));
-      this.map.on('mousemove', L[level].fill, this._onLevelMouseMove.bind(this));
-      this.map.on('click', L[level].fill, this._onLevelMouseClick.bind(this));
+    this.adapter.levels.forEach((level) => {
+      const fillLayer = toFillLayer(level);
+      // this.map.on('mouseenter', fillLayer, this._onLevelMouseEnter.bind(this));
+      this.map.on('mouseleave', fillLayer, this._onLevelMouseLeave.bind(this));
+      this.map.on('mousemove', fillLayer, this._onLevelMouseMove.bind(this));
+      this.map.on('click', fillLayer, this._onLevelMouseClick.bind(this));
     });
-    // this.map.on('mouseenter', L[levelMegaCounty.id].fill, this._onMegaMouseEnter.bind(this));
-    this.map.on('mouseleave', L[levelMegaCounty.id].fill, this._onMegaMouseLeave.bind(this));
-    this.map.on('mousemove', L[levelMegaCounty.id].fill, this._onMegaMouseMove.bind(this));
-    this.map.on('click', L[levelMegaCounty.id].fill, this._onMegaMouseClick.bind(this));
+    if (this.adapter.hasMegaCountyLevel) {
+      const fillLayer = toFillLayer(levelMegaCounty.id);
+      // this.map.on('mouseenter', fillLayer, this._onMegaMouseEnter.bind(this));
+      this.map.on('mouseleave', fillLayer, this._onMegaMouseLeave.bind(this));
+      this.map.on('mousemove', fillLayer, this._onMegaMouseMove.bind(this));
+      this.map.on('click', fillLayer, this._onMegaMouseClick.bind(this));
+    }
   }
 
   get activePopup() {
@@ -79,7 +82,7 @@ export default class InteractiveMap {
   _onLevelMouseLeave() {
     this.map.getCanvas().style.cursor = '';
     this.activePopup.remove();
-    this._updateHighlight(this.hovered, null, null);
+    this._updateHoverHighlight(null);
   }
   /**
    * @param {import('mapbox-gl').MapMouseEvent} e
@@ -87,7 +90,7 @@ export default class InteractiveMap {
   _onMegaMouseLeave() {
     this.map.getCanvas().style.cursor = '';
     this.activePopup.remove();
-    this._updateHighlight(this.hovered, null, null);
+    this._updateHoverHighlight(null);
   }
 
   /**
@@ -109,7 +112,7 @@ export default class InteractiveMap {
     }
     // mark handled
     e.preventDefault();
-    this._updateHighlight(this.hovered, feature.id, null, feature.properties.level);
+    this._updateHoverHighlight(feature.id, feature.properties.level);
     this._renderTooltip(e);
   }
 
@@ -128,7 +131,7 @@ export default class InteractiveMap {
 
     // mark handled
     e.preventDefault();
-    this._updateHighlight(this.hovered, null, feature.id);
+    this._updateHoverHighlight(feature.id, feature.properties.level);
     this._renderTooltip(e);
   }
 
@@ -152,8 +155,7 @@ export default class InteractiveMap {
       return;
     }
     e.preventDefault(); // mark handled
-    const nextValue = this.clicked.id === feature.id ? null : feature.id;
-    this.adapter.dispatch('select', nextValue ? feature : null);
+    this.adapter.dispatch('select', { feature, originalEvent: e.originalEvent });
   }
 
   /**
@@ -169,8 +171,7 @@ export default class InteractiveMap {
       return;
     }
     e.preventDefault(); // mark handled
-    const nextValue = this.clicked.mega === feature.id ? null : feature.id;
-    this.adapter.dispatch('select', nextValue ? feature : null);
+    this.adapter.dispatch('select', { feature, originalEvent: e.originalEvent });
   }
 
   /**
@@ -201,21 +202,21 @@ export default class InteractiveMap {
   }
 
   _updateHoverLayerVisibility() {
-    const visibleLevels = new Set();
-    if (this.clicked.mega != null || this.hovered.mega != null) {
-      visibleLevels.add(levelMegaCounty.id);
-    }
-    if (this.clicked.id != null) {
-      visibleLevels.add(this.clicked.level);
-    }
+    const visibleLevels = new Set(this.selection.map((d) => d.level));
     if (this.hovered.id != null) {
       visibleLevels.add(this.hovered.level);
     }
-    for (const level of levelsWithMega) {
-      const visible = this.map.getLayoutProperty(L[level].hover, 'visibility') !== 'none';
+    const updateLevel = (level) => {
+      const visible = this.map.getLayoutProperty(toHoverLayer(level), 'visibility') !== 'none';
       if (visible !== visibleLevels.has(level)) {
-        this.map.setLayoutProperty(L[level].hover, 'visibility', visibleLevels.has(level) ? 'visible' : 'none');
+        this.map.setLayoutProperty(toHoverLayer(level), 'visibility', visibleLevels.has(level) ? 'visible' : 'none');
       }
+    };
+    for (const level of this.adapter.levels) {
+      updateLevel(level);
+    }
+    if (this.adapter.hasMegaCountyLevel) {
+      updateLevel(levelMegaCounty.id);
     }
   }
 
@@ -225,50 +226,65 @@ export default class InteractiveMap {
    * @param {string | null} id
    * @param {string | null} mega
    */
-  _updateHighlight(obj, id = null, mega = null, level = this.adapter.level) {
-    const attr = obj === this.clicked ? 'select' : 'hover';
-    const setState = { [attr]: true };
-    const clearState = { [attr]: false };
-
+  _updateHoverHighlight(id = null, level = null) {
+    if (this.hovered.id == id) {
+      return;
+    }
     // match ids
-    if (obj.id !== id) {
-      if (obj.id) {
-        this._updateState(S[obj.level].border, obj.id, clearState);
-      }
-      if (id) {
-        this._updateState(S[level].border, id, setState);
-      }
-      obj.id = id;
-      // store level of selected id
-      obj.level = level;
+    if (this.hovered.id) {
+      this._updateState(toBorderSource(this.hovered.level), this.hovered.id, { hover: false });
     }
-
-    // match mega
-    if (obj.mega !== mega) {
-      if (obj.mega) {
-        this._updateState(S[levelMegaCounty.id].border, obj.mega, clearState);
-      }
-      if (mega) {
-        this._updateState(S[levelMegaCounty.id].border, mega, setState);
-      }
-      obj.mega = mega;
+    if (id) {
+      this._updateState(toBorderSource(level), id, { hover: true });
     }
+    this.hovered.id = id;
+    this.hovered.level = level;
     this._updateHoverLayerVisibility();
   }
 
   /**
-   *
    * @param {import('../../maps/nameIdInfo').NameInfo | null} selection
    */
   select(selection) {
-    const bak = Object.assign({}, this.clicked);
-    const id = selection != null && selection.level !== levelMegaCounty.id ? Number(selection.id) : null;
-    const megaId = selection != null && selection.level === levelMegaCounty.id ? Number(selection.id) : null;
-    this._updateHighlight(this.clicked, id, megaId, selection != null ? selection.level : this.adapter.level);
+    return this.selectMulti(selection ? [{ info: selection, color: MAP_THEME.selectedRegionOutline }] : [])[0];
+  }
+
+  /**
+   * @param {{info: import('../../maps/nameIdInfo').NameInfo, color: string}[]} selections
+   */
+  selectMulti(selections) {
+    const bak = this.selection.slice();
+
+    for (const old of this.selection) {
+      this._updateState(toBorderSource(old.level), old.id, { select: false });
+    }
+
+    this.selection = selections.map((s) => {
+      const id = Number(s.info.id);
+      this._updateState(toBorderSource(s.info.level), id, { select: s.color });
+      return {
+        id,
+        level: s.info.level,
+        color: s.color,
+      };
+    });
+
+    this._updateHoverLayerVisibility();
     return bak;
   }
 
   forceHover(feature) {
-    this._updateHighlight(this.hovered, feature.id, null, feature.properties.level);
+    this._updateHoverHighlight(feature.id, feature.properties.level);
+  }
+
+  /**
+   * @param {import('../../maps/nameIdInfo').NameInfo | null} selection
+   */
+  isHovered(selection) {
+    if (!selection) {
+      return false;
+    }
+    // == on purpose
+    return selection.id == this.hovered.id && selection.level === this.hovered.level;
   }
 }

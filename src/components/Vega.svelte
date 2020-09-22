@@ -2,7 +2,8 @@
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import embed from 'vega-embed';
   import { Error } from 'vega';
-  import { observeResize, unobserveResize } from '../../util';
+  import { observeResize, unobserveResize } from '../util';
+  import { createVegaTooltipAdapter } from './tooltipUtils';
 
   export let data = Promise.resolve([]);
 
@@ -35,7 +36,17 @@
    * signals to dispatch
    * @types {string[]}
    */
-  let signalListeners = [];
+  export let signalListeners = [];
+  /**
+   * data listeners to dispatch
+   * @types {string[]}
+   */
+  export let dataListeners = [];
+  /**
+   * data listeners to dispatch
+   * @types {string[]}
+   */
+  export let eventListeners = [];
 
   let loading = false;
   let noData = false;
@@ -50,6 +61,19 @@
    * @type {(import('vega-embed').VisualizationSpec, size: {width: number, height: number}) => (import('vega-embed').VisualizationSpec}
    */
   export let patchSpec = null;
+
+  /**
+   * // svelte component
+   */
+  export let tooltip = undefined;
+  export let tooltipProps = {};
+
+  $: tooltipHandler = createVegaTooltipAdapter(tooltip);
+  $: {
+    if (tooltipHandler) {
+      tooltipHandler.update(tooltipProps);
+    }
+  }
 
   let size = { width: 300, height: 300 };
   $: updateData(vegaPromise, data);
@@ -144,6 +168,7 @@
     vegaPromise = embed(root, spec, {
       actions: false,
       logLevel: Error,
+      tooltip: tooltipHandler,
       patch: (spec) => {
         spec.signals = spec.signals || [];
         Object.entries(signals).forEach(([key, v]) => {
@@ -157,7 +182,17 @@
       root.setAttribute('role', 'figure');
       signalListeners.forEach((signal) => {
         r.view.addSignalListener(signal, (name, value) => {
-          dispatch(name, value);
+          dispatch('signal', { name, value, view: r.view });
+        });
+      });
+      dataListeners.forEach((data) => {
+        r.view.addDataListener(data, (name, value) => {
+          dispatch('dataListener', { name, value, view: r.view });
+        });
+      });
+      eventListeners.forEach((type) => {
+        r.view.addEventListener(type, (event, item) => {
+          dispatch(type, { event, item, view: r.view });
         });
       });
       updateData(vegaPromise, data);
@@ -182,6 +217,9 @@
   onDestroy(() => {
     if (patchSpec) {
       unobserveResize(root);
+    }
+    if (tooltipHandler) {
+      tooltipHandler.destroy();
     }
     if (vega) {
       vega.finalize();

@@ -1,6 +1,8 @@
 import { formatAPITime, isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data';
+import { interpolateYlOrRd } from 'd3-scale-chromatic';
 import { checkWIP } from '../data/utils';
 import { format } from 'd3-format';
+// import { generateMockSignal, generateMockMeta } from '../data/mock';
 
 export const levelList = [
   {
@@ -28,14 +30,28 @@ export const levelMegaCounty = {
 };
 export const levelsWithMega = levels.concat(levelMegaCounty.id);
 
-const levelById = new Map(levelList.map((l) => [l.id, l]));
+export const swpaLevelList = levelList.concat([
+  {
+    id: 'zip',
+    label: 'Zip Code',
+    labelPlural: 'Zip Codes',
+  },
+  {
+    id: 'neighborhood',
+    label: 'Neighborhood/Municipal',
+    labelPlural: 'Neighborhoods/Municipals',
+  },
+]);
+export const swpaLevels = swpaLevelList.map((l) => l.id);
+
+const levelById = new Map([...levelList, ...swpaLevelList].map((l) => [l.id, l]));
 
 export function getLevelInfo(level) {
   return (
     levelById.get(level) || {
-      id: '?',
-      label: 'Invalid level',
-      labelPlural: 'Invalid level',
+      id: level,
+      label: level.toUpperCase(),
+      labelPlural: level.toUpperCase(),
     }
   );
 }
@@ -51,6 +67,8 @@ export function getLevelInfo(level) {
  * @property {string} key
  * @property {'public' | 'early' | 'late'} type
  * @property {string} name
+ * @property {string?} longDescription
+ * @property {{alt: string, href: string}[]} links
  * @property {string} id
  * @property {string} signal
  * @property {string[]} levels
@@ -60,13 +78,15 @@ export function getLevelInfo(level) {
  * @property {string} format
  * @property {(v: number) => string} formatValue
  * @property {string} signal
- * @property {string?} api
+ * @property {string?|() => any[]} api
+ * @property {(() => any[])?} meta
  * @property {(v: number) => string} formatValue
  * @property {boolean} hasStdErr
  * @property {boolean} isCasesOrDeath is cases or death signal
  * @property {boolean} isCount is count signal
  * @property {(options?: CasesOrDeathOptions) => 'prop' | 'count' | 'other')} getType
  * @property {Record<keyof EpiDataCasesOrDeathValues, string>} casesOrDeathSignals signal to load for cases or death
+ * @property {)(v: number) => string)} colorScale
  */
 
 /**
@@ -170,11 +190,16 @@ export function extendSensorEntry(sensorEntry) {
     getType: (options) => getType(sensorEntry, options),
     isCasesOrDeath,
     casesOrDeathSignals: isCasesOrDeath ? generateCasesOrDeathSignals(signal) : {},
+    colorScale: sensorEntry.colorScale || interpolateYlOrRd,
+    links: sensorEntry.links || [],
   });
 }
 
 export const defaultSensorId = 'doctor-visits';
 
+/**
+ * @type {Partial<SensorEntry>[]}
+ */
 const defaultSensors = [
   {
     name: 'Away from Home 6hr+',
@@ -223,6 +248,7 @@ const defaultSensors = [
     levels: ['county', 'msa', 'state', 'hrr'],
     type: 'early',
     hasStdErr: false,
+    // colorScale: interpolateBlues,
   },
   {
     name: 'COVID-Like Symptoms',
@@ -307,8 +333,6 @@ const defaultSensors = [
         return 'Newly reported COVID-19 cases (7-day average)';
       }
     },
-
-
     yAxis: 'Cases',
     format: 'raw',
     signal: 'confirmed_7dav_incidence_num',
@@ -344,6 +368,19 @@ const defaultSensors = [
     type: 'late',
     hasStdErr: false,
   },
+  // {
+  //   type: 'other',
+  //   name: 'Mock Signal',
+  //   id: 'mock',
+  //   signal: 'mock',
+  //   levels: ['county', 'state', 'msa', 'neighborhood', 'zip'],
+  //   tooltipText: 'Mock Signal',
+  //   mapTitleText: 'Mock Signal',
+  //   yAxis: 'Mock Signal',
+  //   format: 'percent',
+  //   api: generateMockSignal,
+  //   meta: generateMockMeta,
+  // },
 ];
 
 /**

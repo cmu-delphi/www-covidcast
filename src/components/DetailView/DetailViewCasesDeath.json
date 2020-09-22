@@ -22,36 +22,75 @@
           }
         },
         "y": {
-          "field": "count",
+          "field": "value",
           "type": "quantitative",
           "axis": {
             "minExtent": 25,
             "title": " "
           }
-        },
-        "tooltip": [
-          { "field": "count", "type": "quantitative", "title": "New Cases", "format": ".2f" },
-          { "field": "avg", "type": "quantitative", "title": "7-day average", "format": ".2f" },
-          { "field": "countRatio", "type": "quantitative", "title": "New Cases per 100k", "format": ".2f" },
-          { "field": "avgRatio", "type": "quantitative", "title": "7-day average per 100k", "format": ".2f" },
-          { "field": "countCumulative", "type": "quantitative", "title": "New Cases (cumulated)", "format": ".2f" },
-          { "field": "avgCumulative", "type": "quantitative", "title": "7-day average (cumulated)", "format": ".2f" },
-          {
-            "field": "countRatioCumulative",
-            "type": "quantitative",
-            "title": "New Cases per 100k (cumulated)",
-            "format": ".2f"
-          },
-          {
-            "field": "avgRatioCumulative",
-            "type": "quantitative",
-            "title": "7-day average per 100k (cumulated)",
-            "format": ".2f"
-          },
-          { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
-        ]
+        }
       },
       "layer": [
+        {
+          "mark": {
+            "type": "line",
+            "interpolate": "monotone",
+            "opacity": 0.2
+          },
+          "encoding": {
+            "y": {
+              "field": "value"
+            },
+            "color": {
+              "field": "geo_value",
+              "type": "nominal",
+              "scale": {
+                "range": ["grey", "#0F0589", "#16A997", "#A71808", "#CD22B2", "#F58B29"]
+              }
+            }
+          }
+        },
+        {
+          "mark": {
+            "type": "line",
+            "interpolate": "monotone"
+          },
+          "encoding": {
+            "color": {
+              "field": "geo_value"
+            }
+          }
+        },
+        {
+          "selection": {
+            "highlight": {
+              "type": "single",
+              "empty": "none",
+              "nearest": true,
+              "on": "mouseover",
+              "clear": "mouseout"
+            }
+          },
+          "mark": {
+            "type": "circle",
+            "tooltip": true
+          },
+          "encoding": {
+            "color": {
+              "field": "geo_value"
+            }
+          }
+        },
+        {
+          "transform": [
+            {
+              "filter": {
+                "selection": "highlight"
+              }
+            }
+          ],
+          "mark": "rule"
+        },
         {
           "description": "shows the current data injected via a signal, y: null is on purpose to invalidate a global y",
           "data": {
@@ -74,51 +113,6 @@
             },
             "y": null
           }
-        },
-        {
-          "data": {
-            "name": "values"
-          },
-          "transform": [
-            {
-              "calculate": "datum.date_value",
-              "as": "title"
-            }
-          ],
-          "selection": {
-            "highlight": {
-              "type": "single",
-              "empty": "none",
-              "on": "mouseover",
-              "clear": "mouseout",
-              "nearest": true
-            }
-          },
-          "mark": "bar",
-          "encoding": {
-            "color": {
-              "condition": {
-                "selection": "highlight",
-                "value": "#aaaaaa"
-              },
-              "value": "#dddddd"
-            }
-          }
-        },
-        {
-          "mark": {
-            "type": "line",
-            "interpolate": "monotone",
-            "tooltip": true
-          },
-          "encoding": {
-            "color": {
-              "value": "black"
-            },
-            "y": {
-              "field": "avg"
-            }
-          }
         }
       ]
     },
@@ -126,11 +120,8 @@
       "height": 40,
       "encoding": {
         "color": {
-          "condition": {
-            "selection": "highlight2",
-            "value": "#aaaaaa"
-          },
-          "value": "#dddddd"
+          "field": "geo_value",
+          "type": "nominal"
         },
         "x": {
           "field": "date_value",
@@ -143,21 +134,54 @@
           }
         },
         "y": {
-          "field": "count",
+          "field": "value",
           "type": "quantitative",
           "axis": {
             "minExtent": 25,
             "tickCount": 3,
             "title": " "
           }
-        },
-        "tooltip": [
-          { "field": "count", "type": "quantitative", "title": "New Cases", "format": ".2f" },
-          { "field": "avg", "type": "quantitative", "title": "7-day average", "format": ".2f" },
-          { "field": "title", "type": "temporal", "title": null, "format": "%m/%d", "formatType": "time" }
-        ]
+        }
       },
       "layer": [
+        {
+          "mark": {
+            "type": "line",
+            "interpolate": "monotone",
+            "opacity": 0.2
+          },
+          "encoding": {
+            "y": {
+              "field": "value"
+            }
+          }
+        },
+        {
+          "selection": {
+            "highlight2": {
+              "type": "single",
+              "empty": "none",
+              "nearest": true,
+              "on": "mouseover",
+              "clear": "mouseout"
+            },
+            "brush": { "type": "interval", "encodings": ["x"] }
+          },
+          "mark": {
+            "type": "line",
+            "interpolate": "monotone"
+          }
+        },
+        {
+          "transform": [
+            {
+              "filter": {
+                "selection": "highlight2"
+              }
+            }
+          ],
+          "mark": "rule"
+        },
         {
           "description": "shows the current data injected via a signal, y: null is on purpose to invalidate a global y",
           "data": {
@@ -180,33 +204,13 @@
             },
             "y": null
           }
-        },
-        {
-          "mark": "bar",
-          "data": {
-            "name": "values"
-          },
-          "transform": [
-            {
-              "calculate": "datum.date_value",
-              "as": "title"
-            }
-          ],
-          "selection": {
-            "highlight2": {
-              "type": "single",
-              "empty": "none",
-              "nearest": true,
-              "on": "mouseover",
-              "clear": "mouseout"
-            },
-            "brush": { "type": "interval", "encodings": ["x"] }
-          }
         }
       ]
     }
   ],
   "config": {
-    "padding": 0
+    "legend": {
+      "disable": true
+    }
   }
 }

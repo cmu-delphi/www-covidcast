@@ -1,8 +1,8 @@
 <script>
   import { currentMode } from '../stores';
-  import modes from '../modes';
+  import { modeByID } from '../modes';
 
-  export let mode = modes[0];
+  export let mode = modeByID.overview;
   export let label = mode.label;
 </script>
 

@@ -23,7 +23,7 @@
 }
 
 /** mobile **/
-@media only screen and (max-height: 800px) {
+@media only screen and (max-height: 600px) {
   /** reserve all space and let the user scroll to the main app**/
 
   #vizbox {
@@ -57,10 +57,6 @@ button.mapboxgl-popup-close-button {
   /* border: solid 1px var(--red) !important; */
   z-index: 10000;
   background-color: unset;
-}
-
-.mapboxgl-canvas {
-  min-height: 550px;
 }
 
 .mapboxgl-canvas:focus {
@@ -100,7 +96,9 @@ button.mapboxgl-popup-close-button {
   display: none;
 }
 
+@import './styles/map-container.css';
 @import './styles/pg-button.css';
 @import './styles/loading.css';
 @import './styles/message-overlay.css';
 @import './styles/vega.css';
+@import './styles/tooltip.css';
