@@ -203,7 +203,7 @@ export const defaultSensorId = 'doctor-visits';
 const defaultSensors = [
   {
     type: 'public',
-    name: 'Away from Home 6hr+ (SG)',
+    name: 'Away from Home 6hr+',
     longDescription: `<p>
     Delphi receives data from <a href="https://docs.safegraph.com/docs/social-distancing-metrics" target="_blank" rel="noopener noreferrer">SafeGraph</a>,
     which collects anonymized location data from mobile phones.
@@ -227,7 +227,7 @@ const defaultSensors = [
   },
   {
     type: 'public',
-    name: 'Away from Home 3-6hr (SG)',
+    name: 'Away from Home 3-6hr',
     longDescription: `<p>
     Delphi receives data from <a href="https://docs.safegraph.com/docs/social-distancing-metrics" target="_blank" rel="noopener noreferrer">SafeGraph</a>,
     which collects anonymized location data from mobile phones.
@@ -251,7 +251,7 @@ const defaultSensors = [
   },
   {
     type: 'public',
-    name: 'Search Trends (Google)',
+    name: 'Google Search Trends',
     longDescription: `<p>Using Google Health Trends, Delphi obtains the volume of COVID-related Google searches in each area.
     We use searches for terms related to anosmia (loss of taste or smell),
     since this emerged as an unusual symptom that is indicative of COVID-19.
@@ -273,11 +273,12 @@ const defaultSensors = [
   },
   {
     type: 'early',
-    name: 'Doctor Visits',
-    longDescription: `<p>Delphi receives from our health system partners aggregated statistics on COVID-related outpatient doctor visits,
-    derived from ICD codes found in insurance claims. Using this data, Delphi estimates the percentage of daily doctor’s visits in each area that are due to COVID-like illnesses.
-    Note that these estimates are based only on visits by patients whose data is accessible by our partners.
-     </p>`,
+    name: 'COVID-Related Doctor Visits',
+    longDescription: `<p>Delphi receives from our health system partners aggregated statistics on COVID-related
+    outpatient doctor visits, derived from ICD codes found in insurance claims.
+    Using this dataDelphi estimates the percentage of daily doctor’s visits in each
+    area that are due to COVID-like illnesses. Note that these estimates are based
+    only on visits by patients whose data is accessible to our partners.</p>`,
     links: [
       {
         alt: 'Technical description',
@@ -295,7 +296,7 @@ const defaultSensors = [
   },
   {
     type: 'early',
-    name: 'Symptoms (FB)',
+    name: 'COVID-Like Symptoms',
     longDescription: `<p>Every day, Delphi surveys tens of thousands of Facebook users,
     asking a broad set of COVID-related questions, including whether they, or anyone in their household,
     are currently experiencing symptoms. We also ask questions about well-being and various lockdown measures,
@@ -323,7 +324,7 @@ const defaultSensors = [
   },
   {
     type: 'early',
-    name: 'Symptoms in Community (FB)',
+    name: 'Symptoms in Community',
     longDescription: `<p>
     Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions,
     including whether they, or anyone in their household, are currently experiencing symptoms.
@@ -354,7 +355,7 @@ const defaultSensors = [
   },
   {
     type: 'early',
-    name: 'Combined',
+    name: 'Indicator Combination',
     longDescription: `<p>
     This data represents a combination of Doctor Visits, COVID-Like Symptoms (from the Delphi survey),
     Symptoms in Community (from the Delphi survey), and Search Trends.
@@ -381,7 +382,7 @@ const defaultSensors = [
   },
   {
     type: 'late',
-    name: 'COVID-19 Antigen Tests (Quidel)',
+    name: 'COVID-19 Test Positivity (Quidel)',
     longDescription: `<p>
     Quidel, a national provider of networked lab testing devices, provides us with data from every COVID antigen test
     that they conduct. When a patient (whether at a doctor’s office, clinic, or hospital) has COVID-like symptoms,
@@ -406,7 +407,7 @@ const defaultSensors = [
   },
   {
     type: 'late',
-    name: 'Hospital Admissions',
+    name: 'COVID Hospital Admissions',
     longDescription: `<p>
     Delphi receives de-identified electronic medical records and claims data from our health systems partners.
     Based on diagnostic codes, we calculate the percentage of new hospital admissions each day that are related to COVID-19.
@@ -431,7 +432,7 @@ const defaultSensors = [
     type: 'late',
     name: 'Cases',
     longDescription: `<p>
-    This data shows the number of new reported COVID-19 cases per day.
+    This data shows the number of COVID-19 confirmed cases newly reported each day.
     The maps reflect only cases reported by state and local health authorities.
     They are based on case counts compiled and made public by
     <a href="https://systems.jhu.edu/research/public-health/ncov/" target="_blank" rel="noopener noreferrer">
@@ -477,7 +478,7 @@ const defaultSensors = [
     type: 'late',
     name: 'Deaths',
     longDescription: `<p>
-    This data shows the number of COVID-19 related deaths reported each day.
+    This data shows the number of COVID-19 related deaths newly reported each day.
     The maps reflect official figures by state and local health authorities,
     and may not include excess deaths not confirmed as due to COVID-19 by health authorities.
     They are based on death counts compiled and made public by <a href="https://systems.jhu.edu/research/public-health/ncov/" target="_blank" rel="noopener noreferrer">
