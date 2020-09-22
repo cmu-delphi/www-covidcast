@@ -10,7 +10,6 @@
     selectByInfo,
   } from '../../stores';
   import { fetchRegionSlice } from '../../data/fetchData';
-  // import IoMdAdd from 'svelte-icons/io/IoMdAdd.svelte';
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
   import IoIosPin from 'svelte-icons/io/IoIosPin.svelte';
   import modes from '..';
@@ -19,7 +18,7 @@
   import Search from '../../components/Search.svelte';
   import { throttle } from 'lodash-es';
   import { levelMegaCounty, groupedSensorList, sensorList } from '../../stores/constants';
-  import SingleModeToggle from '../../components/SingleModeToggle.svelte';
+  import ModeNav from '../../components/ModeNav.svelte';
 
   /**
    * @typedef {import('../../maps').NameInfo} ValueRow
@@ -198,7 +197,7 @@
     grid-template-areas:
       'options search'
       'table table';
-    gap: 6px;
+    /* gap: 6px; */
   }
 
   .root > :global(.options-container) {
@@ -221,15 +220,6 @@
   .table :global(td) {
     vertical-align: middle;
   }
-
-  /* tbody button {
-    opacity: 0;
-    transition: opacity 0.25s ease;
-  }
-
-  tr:hover button {
-    opacity: 1;
-  } */
 
   .table th {
     background: white;
@@ -254,6 +244,30 @@
     font-size: 1.2em;
   }
 
+  .go-to-map-pin {
+    width: 16px;
+    display: inline-block;
+  }
+
+  @media only screen and (max-width: 767px) {
+    table {
+      padding: 4px;
+      font-size: 1em;
+    }
+
+    .table-pop-column {
+      display: none;
+    }
+
+    .add-column-container {
+      display: none;
+    }
+
+    .go-to-map-pin {
+      display: none;
+    }
+  }
+
   .right {
     text-align: right;
   }
@@ -269,7 +283,6 @@
   }
 
   .selected > :global(td) {
-    /* border: 2px solid var(--red); */
     font-weight: bold;
   }
 
@@ -285,10 +298,7 @@
   }
 
   .add-column {
-    /* -moz-appearance: none;
-    -webkit-appearance: none;
-    appearance: none; */
-    width: 1.4em;
+    width: 2.5em;
   }
 
   .remove-column {
@@ -315,6 +325,7 @@
   }
 </style>
 
+<ModeNav />
 <div class="root">
   <Options className="options-container" />
   <Search
@@ -327,15 +338,17 @@
     on:change={(e) => selectByInfo(e.detail)} />
 
   <div class="table base-font-size">
-    <SingleModeToggle mode={modes[0]} />
-
     <table>
       <thead class:desc={sortDirectionDesc}>
         <tr>
-          <th rowspan="2">#</th>
+          <th class="table-num-column" rowspan="2">#</th>
           <th rowspan="2" class:sorted={sortCriteria === 'name'} on:click={() => sortClick('name')}>Name</th>
-          <th rowspan="2" class:sorted={sortCriteria === 'population'} on:click={() => sortClick('population', true)}>
-            Population
+          <th
+            class="table-pop-column"
+            rowspan="2"
+            class:sorted={sortCriteria === 'population'}
+            on:click={() => sortClick('population', true)}>
+            Pop.
           </th>
           <th
             colspan={primary.isCasesOrDeath ? 3 : 2}
@@ -358,8 +371,8 @@
             </th>
           {/each}
           {#if otherSensors.length < 1}
-            <th rowspan="2">
-              Add column <select
+            <th class="add-column-container" rowspan="2">
+              Add indicator <select
                 aria-label="add column options"
                 bind:value={chosenColumn}
                 class="add-column"
@@ -381,32 +394,20 @@
             </th>
           {/if}
         </tr>
-        <!-- <tr>
-          <th>{$currentDateObject.toLocaleDateString()}</th>
-          {#if primary.isCasesOrDeath}
-            <th>7-day Average</th>
-          {/if}
-          <th>Time Series</th>
-          {#each otherSensors as s}
-            <th>{$currentDateObject.toLocaleDateString()}</th>
-            {#if s.isCasesOrDeath}
-              <th>7-day Average</th>
-            {/if}
-            <th>Time Series</th>
-          {/each}
-        </tr> -->
       </thead>
       <tbody>
         {#each sortedRows as row, i}
           <tr class:selected={row.propertyId === $currentRegion}>
-            <td>{row.rank}.</td>
+            <td class="table-num-column">{row.rank}.</td>
             <td>
               {row.displayName}
-              <span style="width: 16px; display: inline-block;" on:click={jumpTo(row)}>
+              <span class="go-to-map-pin" on:click={jumpTo(row)}>
                 <IoIosPin title="Show on Map" />
               </span>
             </td>
-            <td class="right">{row.population != null ? row.population.toLocaleString() : 'Unknown'}</td>
+            <td class="right table-pop-column">
+              {row.population != null ? row.population.toLocaleString() : 'Unknown'}
+            </td>
             <Top10Sensor
               sensor={primary}
               single={row.primary}

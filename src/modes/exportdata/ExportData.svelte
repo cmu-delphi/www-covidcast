@@ -1,5 +1,5 @@
 <script>
-  import SingleModeToggle from '../../components/SingleModeToggle.svelte';
+  import ModeNav from '../../components/ModeNav.svelte';
   import { timeFormat } from 'd3-time-format';
   import { callMetaAPI } from '../../data/api';
   import Datepicker from '../../components/Calendar/Datepicker.svelte';
@@ -184,6 +184,8 @@
   }
 </style>
 
+<ModeNav />
+
 <div class="root" class:loading>
   <h4>Export Data</h4>
   <p>
@@ -333,5 +335,4 @@ covidcast_signal(data_source = "${source ? source.id : ''}", signal = "${signal 
       <input type="hidden" name="geo_type" value={geoType} />
     </form>
   </section>
-  <SingleModeToggle label="Back to Visualization" />
 </div>
