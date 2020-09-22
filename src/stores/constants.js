@@ -226,7 +226,7 @@ const defaultSensors = [
     hasStdErr: true,
   },
   {
-    name: 'COVID search on Google',
+    name: 'COVID Searches on Google',
     id: 'ght',
     tooltipText: 'Relative frequency of COVID-related Google searches',
     mapTitleText: 'Relative frequency of COVID-related Google searches',
