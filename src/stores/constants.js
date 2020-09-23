@@ -327,7 +327,7 @@ const defaultSensors = [
         } else {
           return 'Cumulative reported COVID-19 cases';
         }
-      }[a] else if (options.ratio) {
+      } else if (options.ratio) {
         return 'Newly reported COVID-19 cases per 100,000 people (7-day average)';
       } else {
         return 'Newly reported COVID-19 cases (7-day average)';
@@ -354,7 +354,7 @@ const defaultSensors = [
           return 'Cumulative reported COVID-19 deaths per 100,000 people';
         } else {
           return 'Cumulative reported COVID-19 deaths';
-        }[b]
+        }
       } else if (options.ratio) {
         return 'Newly reported COVID-19 deaths per 100,000 people (7-day average)';
       } else {
