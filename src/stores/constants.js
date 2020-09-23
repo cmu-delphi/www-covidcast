@@ -145,7 +145,7 @@ export function primaryValue(sensorEntry, sensorOptions) {
     return 'value';
   }
   if (sensorOptions.cumulative) {
-    return sensorOptions.ratio ? 'avgRatioCumulative' : 'avgCumulative';
+    return sensorOptions.ratio ? 'countRatioCumulative' : 'countCumulative';
   }
   return sensorOptions.ratio ? 'avgRatio' : 'avg';
 }
