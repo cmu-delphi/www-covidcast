@@ -48,7 +48,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     border: none;
-    padding: 0.5em 0.5em;
+    padding: 0.5em 1em;
     max-width: 40em;
     z-index: 5000;
     clear: both;
@@ -88,7 +88,6 @@
   .links a {
     color: rgba(0, 0, 0, 0.65);
     font-weight: 700;
-    margin: 0.15em 0;
   }
 </style>
 

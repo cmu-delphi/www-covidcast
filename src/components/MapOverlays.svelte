@@ -1,12 +1,14 @@
 <script>
-  import Title from './Title.svelte';
+  // import Title from './Title.svelte';
   import MapControls from './MapControls.svelte';
-  import { isDirectionSignalType, encoding, currentSensorEntry } from '../stores';
+  import { isDirectionSignalType, encoding, currentSensorEntry, currentInfoSensor } from '../stores';
   import EncodingOptions from './EncodingOptions.svelte';
   import DirectionLegend from './legends/DirectionLegend.svelte';
   import ColorLegend from './legends/ColorLegend.svelte';
   import BubbleLegend from './legends/BubbleLegend.svelte';
   import SpikeLegend from './legends/SpikeLegend.svelte';
+  import { currentSensorMapTitle } from '../stores';
+  import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
 
   export let map = null;
   export let mapLoading = true;
@@ -32,11 +34,22 @@
     z-index: 1001;
     align-self: flex-start;
     justify-self: center;
-    padding: 0.5em 1em;
-    margin: 0 6px;
+    font-weight: 600;
+    margin: 0;
+    padding: 0;
     display: flex;
     align-items: flex-start;
     justify-content: center;
+  }
+
+  .title-container button {
+    display: inline-block;
+    width: 1.4em;
+    height: 1.4em;
+  }
+
+  .signal-description {
+    margin-bottom: 0.25em;
   }
 
   /** desktop **/
@@ -49,13 +62,14 @@
 
   .legend-container {
     position: absolute;
-    margin: 6px;
+    margin: 0.25em;
     left: 0;
     bottom: 0;
     z-index: 1000;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    max-width: 100%;
   }
 
   .legend-container > :global(.encoding-wrapper) {
@@ -64,10 +78,13 @@
 </style>
 
 <div class="map-top-overlay">
-  <div class="title-container container-bg">
-    <Title>
-      <slot name="title" />
-    </Title>
+  <div class="title-container">
+    {$currentSensorMapTitle} &nbsp; <button
+      title="Show sensor description"
+      class="pg-button pg-button-circle info"
+      on:click={() => {
+        currentInfoSensor.set($currentSensorEntry);
+      }}><IoMdHelp /></button>
   </div>
   <div class="map-controls-container">
     <MapControls zoom={map ? map.zoom : null} showEncodings loading={mapLoading} />
@@ -76,6 +93,8 @@
 <div class="legend-container base-font-size" aria-label="map legend">
   <EncodingOptions sensor={$currentSensorEntry} className="container-bg container-style encoding-wrapper" />
   <div class="container-bg container-style">
+    <div class="signal-description" />
+
     {#if $isDirectionSignalType}
       <DirectionLegend />
     {:else if $encoding === 'color'}

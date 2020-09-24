@@ -145,7 +145,7 @@ export function primaryValue(sensorEntry, sensorOptions) {
     return 'value';
   }
   if (sensorOptions.cumulative) {
-    return sensorOptions.ratio ? 'avgRatioCumulative' : 'avgCumulative';
+    return sensorOptions.ratio ? 'countRatioCumulative' : 'countCumulative';
   }
   return sensorOptions.ratio ? 'avgRatio' : 'avg';
 }
@@ -203,14 +203,14 @@ export const defaultSensorId = 'doctor-visits';
 const defaultSensors = [
   {
     type: 'public',
-    name: 'Away from Home 6hr+ (SG)',
+    name: 'Away from Home 6hr+',
     longDescription: `<p>
     Delphi receives data from <a href="https://docs.safegraph.com/docs/social-distancing-metrics" target="_blank" rel="noopener noreferrer">SafeGraph</a>,
-    which collects anonymized location data
-    from mobile phones. Using this data, we calculate the fraction of mobile devices
-    that spent between more than 6 hours at a location other than their home during
-    the daytime, an indicator of how mobile people are or whether they are traveling
-    to work or school outside their homes.<p>`,
+    which collects anonymized location data from mobile phones.
+    Using this data, we calculate the fraction of mobile devices
+    that spent more than 6 hours at a location other than their home during the daytime.
+    This indicator measures how mobile people are, and ought to reflect whether people are
+    traveling to work or school outside their homes. See also our Away from Home 3-6hr indicator.<p>`,
     links: [
       {
         alt: 'Technical description',
@@ -220,20 +220,21 @@ const defaultSensors = [
     id: 'safegraph',
     signal: 'full_time_work_prop',
     levels: ['county', 'state'],
-    mapTitleText: 'Proportion of people spending 6 hours or more away from home, based on SafeGraph mobility data',
+    mapTitleText:
+      'Proportion of people spending 6 hours or more away from home that day, based on SafeGraph mobility data',
     yAxis: 'Proportion',
     format: 'raw',
     hasStdErr: true,
   },
   {
     type: 'public',
-    name: 'Away from Home 3-6hr (SG)',
+    name: 'Away from Home 3-6hr',
     longDescription: `<p>
     Delphi receives data from <a href="https://docs.safegraph.com/docs/social-distancing-metrics" target="_blank" rel="noopener noreferrer">SafeGraph</a>,
-    which collects anonymized location data from
-    mobile phones. Using this data, we calculate the fraction of mobile devices that
-    spent between 3 and 6 hours at a location other than their home during the daytime,
-     an indicator of how mobile people are.</p>
+    which collects anonymized location data from mobile phones.
+    Using this data, we calculate the fraction of mobile devices that spent between 3 and 6 hours
+    at a location other than their home during the daytime.This indicator measures how mobile people are.
+    See also our Away from Home 6hr+ indicator.</p>
 `,
     links: [
       {
@@ -251,10 +252,12 @@ const defaultSensors = [
   },
   {
     type: 'public',
-    name: 'Search Trends (Google)',
-    longDescription: `<p>Delphi receives outpatient doctor visits data from our health system partners.
-    Using this data, which is de-identified, Delphi estimates the percentage of daily doctor’s visits in each area
-     that are related to COVID. Note that this can only report on regions and patients whose data is observed by our partners.</p>`,
+    name: 'COVID Searches on Google',
+    longDescription: `<p>Using Google Health Trends, Delphi obtains the volume of COVID-related Google searches in each area.
+    We use searches for terms related to anosmia (loss of taste or smell),
+    since this emerged as an unusual symptom that is indicative of COVID-19.
+    These estimates are scaled by each region’s population to enable comparisons across regions.
+    This indicator is available at the state and metro area (but not county) levels.</p>`,
     links: [
       {
         alt: 'Technical description',
@@ -271,11 +274,12 @@ const defaultSensors = [
   },
   {
     type: 'early',
-    name: 'Doctor Visits',
-    longDescription: `<p>Delphi receives outpatient doctor visits data from our health system partners.
-    Using this data, which is de-identified, Delphi estimates the percentage of daily doctor’s visits in each area
-     that are related to COVID. Note that this can only report on regions and patients whose data is observed by our partners.
-     </p>`,
+    name: 'COVID-Related Doctor Visits',
+    longDescription: `<p>Delphi receives from our health system partners aggregated statistics on COVID-related
+    outpatient doctor visits, derived from ICD codes found in insurance claims.
+    Using this dataDelphi estimates the percentage of daily doctor’s visits in each
+    area that are due to COVID-like illnesses. Note that these estimates are based
+    only on visits by patients whose data is accessible to our partners.</p>`,
     links: [
       {
         alt: 'Technical description',
@@ -293,14 +297,14 @@ const defaultSensors = [
   },
   {
     type: 'early',
-    name: 'Symptoms (FB)',
-    longDescription: `<p>Each day, Delphi surveys tens of thousands of Facebook users
-    and asks them if they or anyone in their household are currently experiencing symptoms.
-    Based on the survey results, we estimate the percentage of people with COVID-like
-    symptoms. A person has "COVID-like" symptoms if they have a fever, along with either
-    cough, shortness of breath, or difficulty breathing. While many other conditions
-    can cause these symptoms, comparing the rates of COVID-like symptoms across the
-    country can suggest where COVID is most active.</p>`,
+    name: 'COVID-Like Symptoms',
+    longDescription: `<p>Every day, Delphi surveys tens of thousands of Facebook users,
+    asking a broad set of COVID-related questions, including whether they, or anyone in their household,
+    are currently experiencing symptoms. We also ask questions about well-being and various lockdown measures,
+    including mask wearing. For this signal, we estimate the percentage of people self-reporting COVID-like symptoms.
+    COVID-like symptoms are defined as having fever, along with either cough, shortness of breath, or difficulty breathing.
+    While many other conditions can cause these symptoms, comparing the rates of COVID-like symptoms across the country
+    can suggest where COVID is most active.</p>`,
     links: [
       {
         href: 'https://covidcast.cmu.edu/surveys.html',
@@ -321,16 +325,15 @@ const defaultSensors = [
   },
   {
     type: 'early',
-    name: 'Symptoms in Community (FB)',
+    name: 'COVID-Like Symptoms in Community',
     longDescription: `<p>
-    Each day, Delphi surveys tens of thousands of Facebook users
-    and asks them if they know anyone in their local community who is sick -- with
-    fever and either sore throat, cough, shortness of breath, or difficulty breathing.
-    We also ask whether anyone in their household is currently experiencing COVID-like
-    symptoms. We use these questions to calculate the percentage of people who know
-    someone, in their household or outside it, who is sick. While many conditions can
-    cause these symptoms, not just COVID, comparing the rates across the country can
-    suggest where COVID is most active.
+    Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions,
+    including whether they, or anyone in their household, are currently experiencing symptoms.
+    We also ask them if they know anyone in their local community who is sick with fever and either sore throat,
+    cough, shortness of breath, or difficulty breathing.
+    For this indicator, we calculate the percentage of people who know someone, in their household or outside it, who is sick.
+    While many conditions can cause these symptoms, not just COVID, comparing the rates across the country
+    can suggest where COVID is most active.
     </p>`,
     links: [
       {
@@ -353,15 +356,14 @@ const defaultSensors = [
   },
   {
     type: 'early',
-    name: 'Combined',
+    name: 'COVID Indicator Combination',
     longDescription: `<p>
-    This data represents a combination of Doctor Visits, Symptoms (Facebook),
-    Symptoms in Community (Facebook), and Search Trends.  It does not include official
-    reports (cases and deaths), hospital admissions, or SafeGraph signals.  We use a
-    rank-1 approximation, from a nonnegative matrix factorization approach, to identify an
-    underlying signal that best reconstructs the indicators.  Higher values of the
-    combined signal correspond to higher values of the other indicators, but the
-    scale (units) of the combination is arbitrary.
+    This data represents a combination of Doctor Visits, COVID-Like Symptoms (from the Delphi survey),
+    Symptoms in Community (from the Delphi survey), and Search Trends.
+    It does not include official reports (cases and deaths), hospital admissions, or SafeGraph signals.
+    We use a rank-1 approximation from a nonnegative matrix factorization approach to identify a single
+    underlying signal that best reconstructs the indicators.  Higher values of the combined signal correspond
+    to higher values of the other indicators, but the scale (units) of the combination is arbitrary.
     </p>`,
     links: [
       {
@@ -373,24 +375,22 @@ const defaultSensors = [
     id: 'indicator-combination',
     signal: 'nmf_day_doc_fbc_fbs_ght',
     levels: ['county', 'msa', 'state'],
-    tooltipText: 'Combination of COVID-19 indicators available at this geographic level',
-    mapTitleText: 'Combination of COVID-19 indicators',
+    tooltipText: 'Combination of several COVID-19 indicators available at this geographic level',
+    mapTitleText:
+      'Combination of several COVID-19 indicators: Doctor Visits, Symptom Surveys, and Google Search Trends',
     yAxis: 'Combined value (arbitrary scale)',
     format: 'raw',
     hasStdErr: true,
   },
   {
     type: 'late',
-    name: 'COVID-19 Antigen Tests (Quidel)',
+    name: 'COVID Antigen Test Positivity (Quidel)',
     longDescription: `<p>
-    Quidel, a national provider of networked lab testing devices,
-    provides us with data about all COVID antigen tests they conduct.
-    When a patient (whether at a doctor’s office, clinic, or hospital)
-    has COVID-like symptoms, doctors may order an antigen test, which can
-    detect parts of the virus that are present during an active infection.
-    We report the percentage of COVID antigen tests that are positive. Note
-    that this only reports on Quidel’s antigen tests, not on tests conducted
-    by other providers.
+    Quidel, a national provider of networked lab testing devices, provides us with data from every COVID antigen test
+    that they conduct. When a patient (whether at a doctor’s office, clinic, or hospital) has COVID-like symptoms,
+    doctors may order an antigen test, which can detect parts of the virus that are present during an active infection.
+    We report the percentage of COVID antigen tests that are positive. Note that this signal only includes
+    Quidel’s antigen tests, not those run by competitors.
     </p>`,
     links: [
       {
@@ -400,23 +400,21 @@ const defaultSensors = [
     ],
     id: 'quidel',
     signal: 'covid_ag_smoothed_pct_positive',
-    levels: ['county', 'msa', 'state', 'hrr'],
-    tooltipText: 'Daily test positivity rate for COVID-19 antigens, based on data provided by Quidel, Inc.',
-    mapTitleText: 'Daily test positivity rate for COVID-19 antigens',
+    levels: ['county', 'state', 'msa', 'hrr'],
+    tooltipText: 'Positivity rate of COVID-19 antigen tests, based on data provided by Quidel, Inc.',
+    mapTitleText: 'Positivity rate of COVID-19 antigen tests',
     yAxis: 'Percentage',
     format: 'percent',
     hasStdErr: true,
   },
   {
     type: 'late',
-    name: 'Hospital Admissions',
+    name: 'COVID Hospital Admissions',
     longDescription: `<p>
-    Delphi receives de-identified electronic medical records and claims data
-    from our health systems partners. Based on diagnostic codes, we calculate
-    the percentage of new hospital admissions each day that are related to COVID-19.
-    Note that this can only report on regions and patients whose data is observed
-    by our partners, and reflects new hospital admissions each day, rather than the
-    fraction of all currently hospitalized patients who have COVID-related diagnoses.
+    Delphi receives de-identified electronic medical records and claims data from our health systems partners.
+    Based on diagnostic codes, we calculate the percentage of new hospital admissions each day that are related to COVID-19.
+    Note that this  signal only covers those regions and patients whose data is observed by our partners,
+    and addresses new hospital admissions each day, not all currently hospitalized patients who have COVID-related diagnoses.
     </p>`,
     links: [
       {
@@ -434,16 +432,17 @@ const defaultSensors = [
   },
   {
     type: 'late',
-    name: 'Cases',
+    name: 'COVID Cases',
     longDescription: `<p>
-    This data shows the number of new confirmed COVID-19 cases per day.
-    The maps reflect only cases confirmed by state and local health authorities.
-    They are based on confirmed case counts compiled and made public by
+    This data shows the number of COVID-19 confirmed cases newly reported each day.
+    The maps reflect only cases reported by state and local health authorities.
+    They are based on case counts compiled and made public by
     <a href="https://systems.jhu.edu/research/public-health/ncov/" target="_blank" rel="noopener noreferrer">
     a team at Johns Hopkins University</a> and by
     <a href="https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/" target="_blank" rel="noopener noreferrer">USAFacts</a>.
-    We use Johns Hopkins data for Puerto Rico and report USAFacts data in
-    all other locations.
+    We use Johns Hopkins data for Puerto Rico and report USAFacts data in all other locations.
+    Note that “confirmed cases” covers only those infections that were detected via testing, not all infections.
+    The signal may not be directly comparable across regions with vastly different testing capacity.
     </p>`,
     links: [
       {
@@ -455,22 +454,21 @@ const defaultSensors = [
     id: 'indicator-combination',
     signal: 'confirmed_7dav_incidence_num',
     levels: ['county', 'msa', 'state'],
-    tooltipText:
-      'Daily new confirmed COVID-19 cases (7-day average), based on data reported by USAFacts and Johns Hopkins University',
+    tooltipText: 'Newly reported COVID-19 cases, based on data from USAFacts and Johns Hopkins University',
     mapTitleText: (options) => {
       if (!options) {
-        return 'Daily new COVID-19 cases (7-day average)';
+        return 'Newly reported COVID-19 cases (7-day average)';
       }
       if (options.cumulative) {
         if (options.ratio) {
-          return 'Cumulated daily new COVID-19 cases per 100,000 people (7-day average)';
+          return 'Cumulative reported COVID-19 cases per 100,000 people';
         } else {
-          return 'Cumulated daily new COVID-19 cases (7-day average)';
+          return 'Cumulative reported COVID-19 cases';
         }
       } else if (options.ratio) {
-        return 'Daily new COVID-19 cases per 100,000 people (7-day average)';
+        return 'Newly reported COVID-19 cases per 100,000 people (7-day average)';
       } else {
-        return 'Daily new COVID-19 cases (7-day average)';
+        return 'Newly reported COVID-19 cases (7-day average)';
       }
     },
     yAxis: 'Cases',
@@ -479,17 +477,15 @@ const defaultSensors = [
   },
   {
     type: 'late',
-    name: 'Deaths',
+    name: 'COVID Deaths',
     longDescription: `<p>
-    This data shows the number of COVID-19 related deaths per day.
+    This data shows the number of COVID-19 related deaths newly reported each day.
     The maps reflect official figures by state and local health authorities,
-    and may not include excess deaths not confirmed as due to COVID-19 by
-    health authorities. They are based on confirmed death counts compiled
-    and made public by <a href="https://systems.jhu.edu/research/public-health/ncov/" target="_blank" rel="noopener noreferrer">
-    a team at Johns Hopkins University</a> and by
-    <a href="https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/" target="_blank" rel="noopener noreferrer">USAFacts</a>.
-    We use Johns Hopkins data for Puerto Rico and report USAFacts data in all
-    other locations.
+    and may not include excess deaths not confirmed as due to COVID-19 by health authorities.
+    They are based on death counts compiled and made public by <a href="https://systems.jhu.edu/research/public-health/ncov/" target="_blank" rel="noopener noreferrer">
+    a team at Johns Hopkins University</a>
+     and by <a href="https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/" target="_blank" rel="noopener noreferrer">USAFacts</a>.
+     We use Johns Hopkins data for Puerto Rico and report USAFacts data in all other locations.
     </p>`,
     links: [
       {
@@ -501,22 +497,21 @@ const defaultSensors = [
     id: 'indicator-combination',
     signal: 'deaths_7dav_incidence_num',
     levels: ['county', 'msa', 'state'],
-    tooltipText:
-      'Daily new COVID-19 deaths (7-day average), based on data reported by USAFacts and Johns Hopkins University',
+    tooltipText: 'Newly reported COVID-19 deaths, based on data from USAFacts and Johns Hopkins University',
     mapTitleText: (options) => {
       if (!options) {
-        return 'Daily new COVID-19 deaths (7-day average)';
+        return 'Newly reported COVID-19 deaths (7-day average)';
       }
       if (options.cumulative) {
         if (options.ratio) {
-          return 'Cumulated daily new COVID-19 deaths per 100,000 people (7-day average)';
+          return 'Cumulative reported COVID-19 deaths per 100,000 people';
         } else {
-          return 'Cumulated daily new COVID-19 deaths (7-day average)';
+          return 'Cumulative reported COVID-19 deaths';
         }
       } else if (options.ratio) {
-        return 'Daily new COVID-19 deaths per 100,000 people (7-day average)';
+        return 'Newly reported COVID-19 deaths per 100,000 people (7-day average)';
       } else {
-        return 'Daily new COVID-19 deaths (7-day average)';
+        return 'Newly reported COVID-19 deaths (7-day average)';
       }
     },
     yAxis: 'Deaths',
