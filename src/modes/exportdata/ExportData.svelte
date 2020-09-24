@@ -35,6 +35,12 @@
     }
   }
 
+  $: {
+    if (source && !source.levels.has(geoType)) {
+      // reset to a valid one
+      geoType = Array.from(source.levels)[0];
+    }
+  }
   /**
    * @type {Map<string, {name: string, tooltipText: string}>}
    */
