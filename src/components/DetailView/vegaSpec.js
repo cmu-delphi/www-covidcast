@@ -29,7 +29,7 @@ export const CURRENT_DATE_HIGHLIGHT = {
 /**
  * @type {import('vega-lite/build/src/spec').LayerSpec | import('vega-lite/build/src/spec').UnitSpec}
  */
-const stdErrLayer = {
+export const stdErrLayer = {
   mark: {
     type: 'area',
     interpolate: 'monotone',
@@ -54,7 +54,7 @@ const stdErrLayer = {
 /**
  * @type {import('vega-lite/build/src/transform').Transform[]}
  */
-const stdErrTransform = [
+export const stdErrTransform = [
   {
     calculate: 'datum.value == null ? null : datum.value - datum.stderr',
     as: 'value_lower_bound',
@@ -65,7 +65,7 @@ const stdErrTransform = [
   },
 ];
 
-const xDateEncoding = {
+export const xDateEncoding = {
   field: 'date_value',
   type: 'temporal',
   axis: {
@@ -76,6 +76,25 @@ const xDateEncoding = {
     grid: false,
   },
 };
+
+/**
+ * @param {{info: import('../../maps').NameInfo, color: string}[]} selections
+ */
+export function colorEncoding(selections) {
+  if (!selections) {
+    return {
+      value: 'grey',
+    };
+  }
+  return {
+    field: 'geo_value',
+    type: 'nominal',
+    scale: {
+      domain: selections.map((d) => d.info.propertyId),
+      range: selections.map((d, i) => (i === 0 ? 'grey' : d.color)),
+    },
+  };
+}
 
 /**
  * @param {import('../../data').SensorEntry} sensor
@@ -119,14 +138,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
               interpolate: 'monotone',
             },
             encoding: {
-              color: {
-                field: 'geo_value',
-                type: 'nominal',
-                scale: {
-                  domain: selections.map((d) => d.info.propertyId),
-                  range: selections.map((d) => d.color),
-                },
-              },
+              color: colorEncoding(selections),
             },
           },
           {

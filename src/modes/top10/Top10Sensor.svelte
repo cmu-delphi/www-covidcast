@@ -1,11 +1,11 @@
 <script>
   import { currentDateObject, signalCasesOrDeathOptions, stats, yesterdayDate } from '../../stores';
-  import spec from '../overview/SmallMultiplesChart.json';
+  import { createSpec } from '../overview/vegaSpec';
   import Vega from '../../components/Vega.svelte';
   import { parseAPITime } from '../../data';
   import { fetchTimeSlice } from '../../data/fetchData';
   import VegaTooltip from '../../components/DetailView/VegaTooltip.svelte';
-  import { merge } from 'lodash-es';
+  import merge from 'lodash-es/merge';
   import { determineMinMax } from '../../components/MapBox/colors';
 
   /**
@@ -39,11 +39,12 @@
     stderr: null,
   });
 
-  $: patchedSpec = merge({}, spec, {
+  $: domain = determineMinMax($stats, sensor, level, $signalCasesOrDeathOptions);
+  $: patchedSpec = merge({}, createSpec(sensor, null, null), {
     encoding: {
       y: {
         scale: {
-          domain: determineMinMax($stats, sensor, level, $signalCasesOrDeathOptions),
+          domain: sensor.format === 'percent' ? [domain[0] / 100, domain[1] / 100] : domain,
           clamp: true,
         },
       },
