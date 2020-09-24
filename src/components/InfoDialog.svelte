@@ -52,6 +52,8 @@
     max-width: 40em;
     z-index: 5000;
     clear: both;
+    border: 1px solid var(--grey);
+    box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.35);
   }
 
   .close {
