@@ -28,7 +28,8 @@
     margin-right: 2em;
     padding: 0 0 0 0;
     display: flex;
-    min-width: 48vw;
+    width: 48vw;
+    max-width: 536px;
     font-size: 0.72em;
   }
 
