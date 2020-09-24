@@ -25,11 +25,11 @@
 <style>
   ul {
     margin: 0;
+    margin-right: 2em;
     padding: 0 0 0 0;
     display: flex;
-    font-size: 80%;
-    min-width: 300px;
-    width: 48vw;
+    min-width: 48vw;
+    font-size: 0.72em;
   }
 
   .tick {
