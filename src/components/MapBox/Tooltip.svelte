@@ -50,6 +50,10 @@
   table {
     margin: 0;
   }
+
+  .tooltip {
+    pointer-events: none;
+  }
 </style>
 
 <div aria-label="tooltip" class="tooltip">
