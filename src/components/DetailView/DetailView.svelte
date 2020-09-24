@@ -2,12 +2,9 @@
   import { signalCasesOrDeathOptions, currentDateObject, smallMultipleTimeSpan, currentInfoSensor } from '../../stores';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../Vega.svelte';
-  import spec from './DetailView.json';
-  import specCasesDeath from './DetailViewCasesDeath.json';
-  import specStdErr from './DetailViewStdErr.json';
+  import { createSpec, patchSpec } from './vegaSpec';
   import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
-  import { merge } from 'lodash-es';
   import { levelMegaCounty, primaryValue } from '../../stores/constants';
   import EncodingOptions from '../EncodingOptions.svelte';
   import { trackEvent } from '../../stores/ga';
@@ -60,124 +57,7 @@
       }).then(addMissing)
     : [];
 
-  $: regularPatch = {
-    vconcat: [
-      {
-        encoding: {
-          y: {
-            field: primaryValue(sensor, $signalCasesOrDeathOptions),
-          },
-        },
-        layer: [
-          {
-            encoding: {
-              color: {
-                scale: {
-                  domain: selections.map((s) => s.info.propertyId),
-                },
-              },
-            },
-          },
-        ],
-      },
-      {
-        layer: [
-          {
-            selection: {
-              brush: {
-                init: {
-                  x: [$smallMultipleTimeSpan[0].getTime(), $smallMultipleTimeSpan[1].getTime()],
-                },
-              },
-            },
-          },
-        ],
-      },
-    ],
-  };
-  $: casesPatch = {
-    vconcat: [
-      {
-        encoding: {
-          y: {
-            field: primaryValue(sensor, $signalCasesOrDeathOptions),
-          },
-        },
-        layer: [
-          {
-            encoding: {
-              color: {
-                scale: {
-                  domain: selections.map((s) => s.info.propertyId),
-                },
-              },
-              y: {
-                field: primaryValue(sensor, $signalCasesOrDeathOptions).replace('avg', 'count'),
-              },
-            },
-          },
-        ],
-      },
-      {
-        layer: [
-          {
-            encoding: {
-              y: {
-                field: primaryValue(sensor, $signalCasesOrDeathOptions).replace('avg', 'count'),
-              },
-            },
-          },
-          {
-            encoding: {
-              y: {
-                field: primaryValue(sensor, $signalCasesOrDeathOptions),
-              },
-            },
-            selection: {
-              brush: {
-                init: {
-                  x: [$smallMultipleTimeSpan[0].getTime(), $smallMultipleTimeSpan[1].getTime()],
-                },
-              },
-            },
-          },
-        ],
-      },
-    ],
-  };
-
-  const OFFSET_X = 60;
-  const OFFSET_Y = 80;
-
-  function generatePatch(title) {
-    return (spec, size) =>
-      merge(
-        {},
-        spec,
-        {
-          vconcat: [
-            {
-              width: size.width - OFFSET_X,
-              height: size.height - 40 - OFFSET_Y,
-              encoding: {
-                y: {
-                  axis: {
-                    title: sensor.yAxis || '',
-                  },
-                },
-              },
-            },
-            {
-              width: size.width - OFFSET_X,
-              height: 40,
-            },
-          ],
-        },
-        title,
-      );
-  }
-
-  $: patchSpec = generatePatch(sensor.isCasesOrDeath ? casesPatch : regularPatch);
+  $: spec = createSpec(sensor, primaryValue(sensor, $signalCasesOrDeathOptions), selections, $smallMultipleTimeSpan);
 
   /**
    * @param {KeyboardEvent} e
@@ -285,7 +165,7 @@
 <div class="single-sensor-chart vega-wrapper">
   <Vega
     {data}
-    spec={sensor.isCasesOrDeath ? specCasesDeath : sensor.hasStdErr ? specStdErr : spec}
+    {spec}
     {patchSpec}
     {noDataText}
     signals={{ currentDate: $currentDateObject }}

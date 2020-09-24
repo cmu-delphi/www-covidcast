@@ -2,13 +2,12 @@
   import { sensorList, currentSensor, smallMultipleTimeSpan, currentDate, currentInfoSensor } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
-  import spec from './SmallMultiplesChart.json';
-  import specStdErr from './SmallMultiplesChartStdErr.json';
   import { trackEvent } from '../../stores/ga';
-  import { merge, throttle } from 'lodash-es';
+  import throttle from 'lodash-es/throttle';
   import { levelList, levelMegaCounty } from '../../stores/constants';
   import SmallMultiple from './SmallMultiple.svelte';
   import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
+  import { createSpec } from './vegaSpec';
 
   /**
    * bi-directional binding
@@ -19,72 +18,6 @@
   export let levels = levelList;
   $: levelIds = new Set(levels.map((l) => l.id));
   $: sensors = sensorList.filter((d) => d.levels.some((l) => levelIds.has(l)));
-
-  const specPercent = {
-    transform: [
-      {
-        calculate: 'datum.value == null ? null : datum.value / 100',
-        as: 'pValue',
-      },
-    ],
-    encoding: {
-      y: {
-        field: 'pValue',
-        axis: {
-          format: '.1%',
-        },
-      },
-    },
-  };
-  const specPercentStdErr = {
-    transform: [
-      {
-        calculate: '(datum.value - datum.stderr) / 100',
-      },
-      {
-        calculate: '(datum.value + datum.stderr) / 100',
-      },
-      {
-        calculate: 'datum.value == null ? null : datum.value / 100',
-        as: 'pValue',
-      },
-    ],
-    encoding: {
-      y: {
-        field: 'pValue',
-        axis: {
-          format: '.1%',
-        },
-      },
-    },
-  };
-
-  /**
-   * @type {import('../../stores/constants').SensorEntry} sensor
-   */
-  function chooseSpec(sensor, min, max, selections) {
-    const time = {
-      encoding: {
-        x: {
-          scale: {
-            domain: [min.getTime(), max.getTime()],
-          },
-        },
-        color: {
-          scale: {
-            domain: selections.map((s) => s.info.propertyId),
-          },
-        },
-      },
-    };
-
-    return merge(
-      {},
-      sensor.hasStdErr ? specStdErr : spec,
-      time,
-      sensor.format === 'percent' ? (sensor.hasStdErr ? specPercentStdErr : specPercent) : {},
-    );
-  }
 
   // use local variables with manual setting for better value comparison updates
   let startDay = $smallMultipleTimeSpan[0];
@@ -147,7 +80,7 @@
             }),
           )
       : [],
-    spec: chooseSpec(sensor, startDay, endDay, selections),
+    spec: createSpec(sensor, selections, [startDay, endDay]),
   }));
 
   let highlightTimeValue = null;
