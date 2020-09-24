@@ -115,7 +115,7 @@
             </td>
           </tr>
           <tr>
-            <th>{formatTimeWithoutYear($currentDateObject)} (cumulated)</th>
+            <th>Cumulative {formatTimeWithoutYear($currentDateObject)}</th>
             <td
               class="right"
               style={options.cumulative && !options.ratio ? colorScaleStyle(properties.countCumulative) : ''}>
@@ -128,7 +128,7 @@
             </td>
           </tr>
           <tr>
-            <th>7-day avg (cumulated)</th>
+            <th>Cumulative 7-day avg</th>
             <td
               class="right"
               style={options.cumulative && !options.ratio ? colorScaleStyle(properties.avgCumulative) : ''}>
