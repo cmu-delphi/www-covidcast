@@ -42,7 +42,7 @@
   }
 
   $: primary = $currentSensorEntry;
-  let showTopN = 10;
+  let showTopN = 25;
   let sortCriteria = 'primary';
   let sortDirectionDesc = true;
   /**
@@ -299,6 +299,7 @@
 
   .add-column {
     width: 2.5em;
+    border-radius: 3px;
   }
 
   .remove-column {
@@ -346,6 +347,7 @@
           <th
             class="table-pop-column"
             rowspan="2"
+            title="Population"
             class:sorted={sortCriteria === 'population'}
             on:click={() => sortClick('population', true)}>
             Pop.
@@ -405,7 +407,7 @@
                 <IoIosPin title="Show on Map" />
               </span>
             </td>
-            <td class="right table-pop-column">
+            <td class="right table-pop-column" title="Population">
               {row.population != null ? row.population.toLocaleString() : 'Unknown'}
             </td>
             <Top10Sensor
@@ -433,7 +435,7 @@
             <td
               colspan={3 + (primary.isCasesOrDeath ? 3 : 2) + otherSensors.reduce((acc, s) => (acc + s.isCasesOrDeath ? 3 : 2), 0)}
               class="button-bar">
-              <button on:click={showMore} class="pg-button">Show More</button>
+              <button on:click={showMore} class="pg-button">Show 10 more locations</button>
             </td>
           </tr>
         </tfoot>

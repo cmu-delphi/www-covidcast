@@ -76,13 +76,22 @@
   td {
     border: 0;
   }
+
+  td small {
+    display: block;
+    font-size: 0.5em;
+    color: var(--red);
+  }
 </style>
 
 {#if sensor.isCasesOrDeath}
   <td class="right">{single && single.count != null ? sensor.formatValue(single.count) : 'Unknown'}</td>
   <td class="right">{single && single.avg != null ? sensor.formatValue(single.avg) : 'Unknown'}</td>
 {:else}
-  <td class="right">{single && single.value != null ? sensor.formatValue(single.value) : 'Unknown'}</td>
+  <td class="right">
+    {single && single.value != null ? sensor.formatValue(single.value) : 'Unknown'}
+    <small>{$currentDateObject.toLocaleDateString()}</small>
+  </td>
 {/if}
 <td class="chart">
   <Vega
