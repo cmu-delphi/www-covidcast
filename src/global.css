@@ -1,5 +1,6 @@
 :root {
   --red: #c00;
+  --lightgrey: #ababab;
   --grey: #767676;
   --darkgrey: #333;
   --bg: #f7f7f7;
@@ -52,13 +53,14 @@ button.mapboxgl-popup-close-button {
 #vizbox input,
 #vizbox button,
 #vizbox select {
-  border-bottom: 2px solid transparent;
+  /* border-bottom: 2px solid transparent; */
 }
 #vizbox input:focus,
 #vizbox button:focus,
 #vizbox select:focus {
   border: 0;
   z-index: 10000;
+  background-color: var(--lightgrey);
   border-bottom: 2px solid var(--grey);
 }
 

@@ -259,7 +259,7 @@
     on:change={(e) => jumpToDate(e.detail)} />
   <div class="map-container">
     <MapOverlays {map} mapLoading={running || loading} legendLoading={false} {zoom}>
-      <div slot="title" />
+      <div slot="title">{$currentDateObject.toLocaleDateString()}</div>
     </MapOverlays>
     <MapBox
       bind:this={map}

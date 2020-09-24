@@ -1,14 +1,12 @@
 <script>
-  // import Title from './Title.svelte';
+  import Title from './Title.svelte';
   import MapControls from './MapControls.svelte';
-  import { isDirectionSignalType, encoding, currentSensorEntry, currentInfoSensor } from '../stores';
+  import { isDirectionSignalType, encoding, currentSensorEntry } from '../stores';
   import EncodingOptions from './EncodingOptions.svelte';
   import DirectionLegend from './legends/DirectionLegend.svelte';
   import ColorLegend from './legends/ColorLegend.svelte';
   import BubbleLegend from './legends/BubbleLegend.svelte';
   import SpikeLegend from './legends/SpikeLegend.svelte';
-  import { currentSensorMapTitle } from '../stores';
-  import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
 
   export let map = null;
   export let mapLoading = true;
@@ -41,13 +39,6 @@
     align-items: flex-start;
     justify-content: center;
   }
-
-  .title-container button {
-    display: inline-block;
-    width: 1.4em;
-    height: 1.4em;
-  }
-
   .signal-description {
     margin-bottom: 0.25em;
   }
@@ -79,12 +70,7 @@
 
 <div class="map-top-overlay">
   <div class="title-container">
-    {$currentSensorMapTitle} &nbsp; <button
-      title="Show sensor description"
-      class="pg-button pg-button-circle info"
-      on:click={() => {
-        currentInfoSensor.set($currentSensorEntry);
-      }}><IoMdHelp /></button>
+    <Title />
   </div>
   <div class="map-controls-container">
     <MapControls zoom={map ? map.zoom : null} showEncodings loading={mapLoading} />
