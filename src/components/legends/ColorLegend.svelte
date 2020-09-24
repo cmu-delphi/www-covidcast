@@ -33,6 +33,12 @@
     font-size: 0.72em;
   }
 
+  @media only screen and (max-width: 767px) {
+    ul {
+      width: auto;
+    }
+  }
+
   .tick {
     border-left: 1px solid white;
     margin: 0;
