@@ -2,6 +2,7 @@
   "name": "delphi-hcii-covidcast",
   "version": "1.8.2",
   "private": true,
+  "license": "MIT",
   "description": "",
   "homepage": "https://github.com/cmu-delphi/www-covidcast",
   "bugs": {
