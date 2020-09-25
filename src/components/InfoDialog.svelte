@@ -106,7 +106,9 @@
       {typeof $currentInfoSensor.mapTitleText === 'function' ? $currentInfoSensor.mapTitleText($signalCasesOrDeathOptions) : $currentInfoSensor.mapTitleText}
     </h2>
     <div>
-      {@html $currentInfoSensor.longDescription ?? 'No description available'}
+      <p>
+        {@html $currentInfoSensor.longDescription ?? 'No description available'}
+      </p>
     </div>
     <ul class="links">
       {#each $currentInfoSensor.links as link}
