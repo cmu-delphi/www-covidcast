@@ -267,6 +267,10 @@
   </section>
   <section>
     <h5>3. Get Data</h5>
+    <p>
+      We are happy for you to use this data in products and publications. Please acknowledge us as a source: <cite> Data
+        from Delphi COVIDcast, covidcast.cmu.edu. </cite>
+    </p>
     <div class="buttons">
       <button
         class="pg-button button"
