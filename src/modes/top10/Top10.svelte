@@ -207,7 +207,7 @@
   .root > :global(.search-container) {
     grid-area: search;
     z-index: 1009;
-    margin: 0 6px 6px 0;
+    margin: 0.3em;
   }
 
   .table {
@@ -307,9 +307,6 @@
         'options'
         'search'
         'table';
-    }
-    .root > :global(.search-container) {
-      margin: 0 0 0 6px;
     }
   }
 </style>

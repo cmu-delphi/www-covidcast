@@ -220,6 +220,7 @@
   .root > :global(.player-container) {
     grid-area: player;
     z-index: 1003;
+    margin: 0.3em;
   }
 
   .map-container {
