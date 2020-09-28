@@ -256,9 +256,7 @@
     min={minDate}
     on:change={(e) => jumpToDate(e.detail)} />
   <div class="map-container">
-    <MapOverlays {map} mapLoading={running || loading} legendLoading={false} {zoom}>
-      <div slot="title">{$currentDateObject.toLocaleDateString()}</div>
-    </MapOverlays>
+    <MapOverlays {map} mapLoading={running || loading} legendLoading={false} {zoom} showDate />
     <MapBox
       bind:this={map}
       on:loading={(e) => {

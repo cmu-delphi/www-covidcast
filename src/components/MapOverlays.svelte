@@ -12,6 +12,7 @@
   export let mapLoading = true;
   export let legendLoading = true;
   export let zoom = 1.0;
+  export let showDate = false;
 </script>
 
 <style>
@@ -32,7 +33,6 @@
     z-index: 1001;
     align-self: flex-start;
     justify-self: center;
-    font-weight: 600;
     margin: 0;
     padding: 0;
     display: flex;
@@ -70,7 +70,7 @@
 
 <div class="map-top-overlay">
   <div class="title-container">
-    <Title />
+    <Title {showDate} />
   </div>
   <div class="map-controls-container">
     <MapControls zoom={map ? map.zoom : null} showEncodings loading={mapLoading} />

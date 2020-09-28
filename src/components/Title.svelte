@@ -1,42 +1,37 @@
 <script>
   import { currentSensorMapTitle, currentDateObject, currentInfoSensor, currentSensorEntry } from '../stores';
   import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
+
+  export let showDate = false;
 </script>
 
 <style>
   .banner {
-    font-size: 0.9em;
+    font-size: 12px;
     font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0.2em 1em;
   }
 
   .info {
-    display: inline-block;
-  }
-
-  .banner button {
     width: 1.5em;
     height: 1.5em;
-  }
-
-  .title-date {
-    text-align: center;
-  }
-  /** mobile **/
-  @media only screen and (max-width: 767px) {
-    .banner {
-      /* font-size: 1rem; */
-    }
+    display: inline-block;
   }
 </style>
 
 <h2 class="banner">
-  {$currentSensorMapTitle}
-  <button
-    title="Show sensor description"
-    class="pg-button pg-button-circle info"
-    on:click={() => {
-      currentInfoSensor.set($currentSensorEntry);
-    }}><IoMdHelp /></button>
-  <slot />
-  <div class="title-date">{$currentDateObject.toLocaleDateString()}</div>
+  <span>
+    {$currentSensorMapTitle}
+    <button
+      title="Show sensor description"
+      class="pg-button pg-button-circle info"
+      on:click={() => {
+        currentInfoSensor.set($currentSensorEntry);
+      }}><IoMdHelp /></button>
+  </span>
+  {#if showDate}<span>{$currentDateObject.toLocaleDateString()}</span>{/if}
 </h2>
