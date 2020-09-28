@@ -542,7 +542,7 @@ export const sensorMap = new Map(sensorList.map((s) => [s.key, s]));
 const sensorTypes = [
   {
     id: 'public',
-    label: 'Public Behavior',
+    label: 'Public’s Behavior',
   },
   {
     id: 'early',
