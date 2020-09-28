@@ -217,7 +217,8 @@
   }
 
   .table :global(td) {
-    vertical-align: middle;
+    vertical-align: top;
+    padding-top: 1em;
   }
 
   td,
@@ -328,8 +329,8 @@
     <table>
       <thead>
         <tr>
-          <th rowspan="2">#</th>
-          <th rowspan="2">
+          <th>#</th>
+          <th>
             <Top10SortHint
               label="Name"
               on:click={() => sortClick('name')}
@@ -338,7 +339,7 @@
               Name
             </Top10SortHint>
           </th>
-          <th class="table-pop-column" rowspan="2">
+          <th class="table-pop-column">
             <Top10SortHint
               label="Population"
               on:click={() => sortClick('population')}
@@ -353,7 +354,7 @@
               on:click={() => sortClick('primary', true)}
               sorted={sortCriteria === 'primary'}
               desc={sortDirectionDesc}>
-              {primary.name}
+              {typeof primary.mapTitleText === 'function' ? primary.mapTitleText() : primary.name}
             </Top10SortHint>
           </th>
           {#each otherSensors as s, i}
@@ -363,7 +364,7 @@
                 on:click={() => sortClick(i, true)}
                 sorted={sortCriteria === i}
                 desc={sortDirectionDesc}>
-                {s.name}
+                {typeof s.mapTitleText === 'function' ? s.mapTitleText() : s.name}
                 <button
                   class="pg-button remove-column"
                   title="Remove column"

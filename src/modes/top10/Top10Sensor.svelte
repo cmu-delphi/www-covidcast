@@ -80,20 +80,30 @@
     border: 0;
   }
 
-  td small {
+  .date {
     display: block;
     font-size: 0.5em;
+
+    letter-spacing: 0.025em;
+    line-height: 1em;
     color: var(--red);
   }
 </style>
 
 {#if sensor.isCasesOrDeath}
-  <td class="right">{single && single.count != null ? sensor.formatValue(single.count) : 'Unknown'}</td>
-  <td class="right">{single && single.avg != null ? sensor.formatValue(single.avg) : 'Unknown'}</td>
+  <td class="right">
+    {single && single.count != null ? sensor.formatValue(single.count) : 'Unknown'}
+    <span class="date">{$currentDateObject.toLocaleDateString()}</span>
+  </td>
+  <td class="right">
+    {single && single.avg != null ? sensor.formatValue(single.avg) : 'Unknown'}
+    <span class="date">{$currentDateObject.toLocaleDateString()}</span>
+    <span class="date">(7-day avg)</span>
+  </td>
 {:else}
   <td class="right">
     {single && single.value != null ? sensor.formatValue(single.value) : 'Unknown'}
-    <small>{$currentDateObject.toLocaleDateString()}</small>
+    <span class="date">{$currentDateObject.toLocaleDateString()}</span>
   </td>
 {/if}
 <td class="chart">
