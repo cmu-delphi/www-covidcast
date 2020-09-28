@@ -5,16 +5,17 @@
 
 <style>
   .mode-container {
-    margin-left: 0.5em;
+    padding-left: 0.5em;
+    --frame-color: #dedede;
+    border-bottom: 1px solid var(--frame-color);
   }
 
   .mode-button {
     width: 12%;
     padding: 0.25em 0;
     min-width: 4.2em;
-    margin-right: 0.2em;
+    margin-bottom: -1px;
     line-height: 1;
-    margin: unset;
     box-sizing: border-box;
     color: #333;
     text-align: center;
@@ -29,13 +30,21 @@
     transition-property: background-color;
     transition-timing-function: ease-in-out;
 
-    /* rounded design refresh */
-    border: 1px solid #dedede;
-    border-bottom: 0;
+    border: 1px solid transparent;
+    border-bottom-color: var(--frame-color);
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
 
     background-color: #ffffff;
+  }
+
+  .active,
+  .mode-button:hover,
+  .mode-button:focus,
+  .mode-button:active {
+    border: 1px solid var(--frame-color) !important;
+    border-bottom-color: #ffffff !important;
+    background-color: #ffffff !important;
   }
 
   @media only screen and (max-width: 767px) {
@@ -52,18 +61,17 @@
   }
 </style>
 
-<nav>
-  <div class="mode-container">
-    {#each modes as mode}
-      <button
-        class="mode-button"
-        on:click={() => {
-          currentMode.set(mode);
-        }}
-        title={mode.tooltip}
-        class:hideMobile={mode.id === 'export'}>
-        {mode.label}
-      </button>
-    {/each}
-  </div>
+<nav class="mode-container">
+  {#each modes as mode}
+    <button
+      class="mode-button"
+      class:active={$currentMode.id === mode.id}
+      on:click={() => {
+        currentMode.set(mode);
+      }}
+      title={mode.tooltip}
+      class:hideMobile={mode.id === 'export'}>
+      {mode.label}
+    </button>
+  {/each}
 </nav>
