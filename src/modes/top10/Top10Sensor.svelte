@@ -92,13 +92,13 @@
 
 {#if sensor.isCasesOrDeath}
   <td class="right">
-    {single && single.count != null ? sensor.formatValue(single.count) : 'Unknown'}
+    {single && single.avg != null ? sensor.formatValue(single.avg) : 'Unknown'}
     <span class="date">{$currentDateObject.toLocaleDateString()}</span>
   </td>
   <td class="right">
-    {single && single.avg != null ? sensor.formatValue(single.avg) : 'Unknown'}
+    {single && single.avgCumulative != null ? sensor.formatValue(single.avgCumulative) : 'Unknown'}
     <span class="date">{$currentDateObject.toLocaleDateString()}</span>
-    <span class="date">(7-day avg)</span>
+    <span class="date">(cumulated)</span>
   </td>
 {:else}
   <td class="right">
