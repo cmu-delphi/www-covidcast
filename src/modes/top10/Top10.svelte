@@ -18,7 +18,7 @@
   import Search from '../../components/Search.svelte';
   import { throttle } from 'lodash-es';
   import Top10SortHint from './Top10SortHint.svelte';
-  import { levelMegaCounty, groupedSensorList, sensorList } from '../../stores/constants';
+  import { levelMegaCounty, groupedSensorList, sensorList, primaryValue } from '../../stores/constants';
 
   const SHOW_X_MORE = 10;
   const MAX_OTHER_SENSORS = 1;
@@ -47,6 +47,15 @@
   let showTopN = 10;
   let sortCriteria = 'primary';
   let sortDirectionDesc = true;
+
+  /**
+   * @type {import('../../stores/constants').CasesOrDeathOptions}
+   */
+  const ratioOptions = {
+    cumulative: false,
+    ratio: true,
+  };
+  $: primaryField = primaryValue(primary, ratioOptions);
   /**
    * @type {import('../../stores/constants').SensorEntry[]}
    */
@@ -58,8 +67,8 @@
   function bySortCriteria(sortCriteria) {
     if (sortCriteria === 'primary') {
       return (a, b) => {
-        if (a.primary.value !== b.primary.value) {
-          return a.primary.value < b.primary.value ? -1 : 1;
+        if (a.primary[primaryField] !== b.primary[primaryField]) {
+          return a.primary[primaryField] < b.primary[primaryField] ? -1 : 1;
         }
         return a.displayName.localeCompare(b.displayName);
       };
@@ -184,14 +193,6 @@
     const row = e.detail.view.data('data_0').find((d) => d._vgsid_ === id);
     throttled(row ? row.time_value : null);
   }
-
-  /**
-   * @type {import('../../stores/constants').CasesOrDeathOptions}
-   */
-  const ratioOptions = {
-    cumulative: false,
-    ratio: true,
-  };
 </script>
 
 <style>
