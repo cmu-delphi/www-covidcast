@@ -23,16 +23,16 @@ const modes = [
     component: () => import(/* webpackPrefech: true */ './timelapse/TimeLapse.svelte').then((r) => r.default),
   },
   {
-    id: 'export',
-    label: 'Export Data',
-    tooltip: 'Switch to Export Data Mode',
-    component: () => import('./exportdata/ExportData.svelte').then((r) => r.default),
-  },
-  {
     id: 'top10',
     label: 'Top 10',
     tooltip: 'Switch to Top 10 Mode',
     component: () => import(/* webpackPrefetch: true */ './top10/Top10.svelte').then((r) => r.default),
+  },
+  {
+    id: 'export',
+    label: 'Export Data',
+    tooltip: 'Switch to Export Data Mode',
+    component: () => import('./exportdata/ExportData.svelte').then((r) => r.default),
   },
   // {
   //   id: 'swpa',
