@@ -50,17 +50,12 @@ button.mapboxgl-popup-close-button {
   color: var(--grey);
 }
 
-#vizbox input,
-#vizbox button,
-#vizbox select {
-  /* border-bottom: 2px solid transparent; */
-}
-
 #vizbox button:focus {
   border: 0;
   z-index: 10000;
   background-color: var(--lightgrey);
 }
+
 #vizbox input:focus,
 #vizbox select:focus {
   z-index: 10000;
