@@ -18,7 +18,6 @@
   import Search from '../../components/Search.svelte';
   import { throttle } from 'lodash-es';
   import { levelMegaCounty, groupedSensorList, sensorList } from '../../stores/constants';
-  import ModeNav from '../../components/ModeNav.svelte';
 
   /**
    * @typedef {import('../../maps').NameInfo} ValueRow
@@ -326,7 +325,6 @@
   }
 </style>
 
-<ModeNav />
 <div class="root">
   <Options className="options-container" />
   <Search

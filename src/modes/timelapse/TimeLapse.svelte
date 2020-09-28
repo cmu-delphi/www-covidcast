@@ -24,7 +24,6 @@
   import USMapBoxWrapper from '../../components/MapBox/USMapBoxWrapper';
   import { onMount } from 'svelte';
   import MapOverlays from '../../components/MapOverlays.svelte';
-  import ModeNav from '../../components/ModeNav.svelte';
   /**
    * @type {MapBox}
    */
@@ -246,7 +245,6 @@
   }
 </style>
 
-<ModeNav />
 <main class="root">
   <Options showDate={false} className="options-container" />
   <Player
