@@ -75,6 +75,11 @@ button.mapboxgl-popup-close-button {
 
 .map-popup {
   z-index: 10000;
+  pointer-events: none;
+}
+
+.map-popup > * {
+  pointer-events: none;
 }
 
 .map-popup .mapboxgl-popup-content {
