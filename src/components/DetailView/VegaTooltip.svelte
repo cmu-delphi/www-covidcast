@@ -63,14 +63,9 @@
           <td class="right">{sensor.formatValue(item.avgRatio)}</td>
         </tr>
         <tr>
-          <th>{formatTimeWithoutYear(item.date_value)} (cumulated)</th>
+          <th>{formatTimeWithoutYear(item.date_value)} (cumulative)</th>
           <td class="right">{sensor.formatValue(item.countCumulative)}</td>
           <td class="right">{sensor.formatValue(item.countRatioCumulative)}</td>
-        </tr>
-        <tr>
-          <th>7-day avg (cumulated)</th>
-          <td class="right">{sensor.formatValue(item.avgCumulative)}</td>
-          <td class="right">{sensor.formatValue(item.avgRatioCumulative)}</td>
         </tr>
       {:else}
         <tr>

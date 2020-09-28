@@ -96,9 +96,9 @@
     <span class="date">{$currentDateObject.toLocaleDateString()}</span>
   </td>
   <td class="right">
-    {single && single.avgCumulative != null ? sensor.formatValue(single.avgCumulative) : 'Unknown'}
+    {single && single.countCumulative != null ? sensor.formatValue(single.countCumulative) : 'Unknown'}
     <span class="date">{$currentDateObject.toLocaleDateString()}</span>
-    <span class="date">(cumulated)</span>
+    <span class="date">(cumulative)</span>
   </td>
 {:else}
   <td class="right">
