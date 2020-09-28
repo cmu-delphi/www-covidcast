@@ -19,6 +19,7 @@
   import { throttle } from 'lodash-es';
   import { levelMegaCounty, groupedSensorList, sensorList } from '../../stores/constants';
 
+  const SHOW_X_MORE = 10;
   /**
    * @typedef {import('../../maps').NameInfo} ValueRow
    * @property {import('../../data/fetchData').EpiDataRow} primary
@@ -41,7 +42,7 @@
   }
 
   $: primary = $currentSensorEntry;
-  let showTopN = 25;
+  let showTopN = 10;
   let sortCriteria = 'primary';
   let sortDirectionDesc = true;
   /**
@@ -146,7 +147,7 @@
   }
 
   function showMore() {
-    showTopN = Math.min(rows.length, showTopN + 10);
+    showTopN = Math.min(rows.length, showTopN + SHOW_X_MORE);
   }
 
   function sortClick(prop, defaultSortDesc = false) {
@@ -297,8 +298,11 @@
   }
 
   .add-column {
-    width: 2.5em;
+    max-width: 9em;
     border-radius: 3px;
+    padding: 0;
+    margin: 0;
+    display: inline-block;
   }
 
   .remove-column {
@@ -336,7 +340,7 @@
     maxItemsToShowInList="5"
     on:change={(e) => selectByInfo(e.detail)} />
 
-  <div class="table base-font-size">
+  <div class="table base-font-size" class:loading>
     <table>
       <thead class:desc={sortDirectionDesc}>
         <tr>
@@ -372,12 +376,8 @@
           {/each}
           {#if otherSensors.length < 1}
             <th class="add-column-container" rowspan="2">
-              Add indicator <select
-                aria-label="add column options"
-                bind:value={chosenColumn}
-                class="add-column"
-                style="display: inline-block;">
-                <option value="">+</option>
+              <select aria-label="add column options" bind:value={chosenColumn} class="add-column">
+                <option value="">Add indicator</option>
                 {#each groupedSensorList as sensorGroup}
                   <optgroup label={sensorGroup.label}>
                     {#each sensorGroup.sensors as sensor}
@@ -433,7 +433,7 @@
             <td
               colspan={3 + (primary.isCasesOrDeath ? 3 : 2) + otherSensors.reduce((acc, s) => (acc + s.isCasesOrDeath ? 3 : 2), 0)}
               class="button-bar">
-              <button on:click={showMore} class="pg-button">Show 10 more locations</button>
+              <button on:click={showMore} class="pg-button">Show {SHOW_X_MORE} more locations</button>
             </td>
           </tr>
         </tfoot>
