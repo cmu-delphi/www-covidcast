@@ -221,7 +221,7 @@ const defaultSensors = [
     // prettier-ignore
     longDescription:
       // prettier-ignore
-      `Delphi receives data from ${SafeGraph}, which collects anonymized location data from mobile phones. Using this data, we calculate the fraction of mobile devices that spent more than 6 hours at a location other than their home during the daytime.This indicator measures how mobile people are, and ought to reflect whether people are traveling to work or school outside their homes. See also our Away from Home 3-6hr indicator.`,
+      `Delphi receives data from ${SafeGraph}, which collects anonymized location data from mobile phones. Using this data, we calculate the fraction of mobile devices that spent more than 6 hours at a location other than their home during the daytime. This indicator measures how mobile people are, and ought to reflect whether people are traveling to work or school outside their homes. See also our Away from Home 3-6hr indicator.`,
     links: [
       {
         alt: 'Technical description',
@@ -243,7 +243,7 @@ const defaultSensors = [
     name: 'Away from Home 3-6hr a Day',
     longDescription:
       // prettier-ignore
-      `Delphi receives data from ${SafeGraph}, which collects anonymized location data from mobile phones. Using this data, we calculate the fraction of mobile devices that spent between 3 and 6 hours at a location other than their home during the daytime.This indicator measures how mobile people are. See also our Away from Home 6hr+ indicator.`,
+      `Delphi receives data from ${SafeGraph}, which collects anonymized location data from mobile phones. Using this data, we calculate the fraction of mobile devices that spent between 3 and 6 hours at a location other than their home during the daytime. This indicator measures how mobile people are. See also our Away from Home 6hr+ indicator.`,
     links: [
       {
         alt: 'Technical description',
@@ -362,7 +362,7 @@ const defaultSensors = [
     name: 'COVID Indicator Combination',
     longDescription:
       // prettier-ignore
-      `This data represents a combination of Doctor Visits, COVID-Like Symptoms (from the Delphi survey), COVID-Like Symptoms in Community (from the Delphi survey), and COVID Search on Google.  It does not include official reports (cases and deaths), hospital admissions, or SafeGraph signals.  We use a rank-1 approximation from a nonnegative matrix factorization approach to identify a single underlying signal that best reconstructs the indicators.  Higher values of the combined signal correspond to higher values of the other indicators, but the scale (units) of the combination is arbitrary.`,
+      `This data represents a combination of Doctor Visits, COVID-Like Symptoms (from the Delphi survey), COVID-Like Symptoms in Community (from the Delphi survey), and COVID Search on Google. It does not include official reports (cases and deaths), hospital admissions, or SafeGraph signals. We use a rank-1 approximation from a nonnegative matrix factorization approach to identify a single underlying signal that best reconstructs the indicators.  Higher values of the combined signal correspond to higher values of the other indicators, but the scale (units) of the combination is arbitrary.`,
     links: [
       {
         alt: 'Technical description',
@@ -413,7 +413,7 @@ const defaultSensors = [
     name: 'COVID Hospital Admissions',
     longDescription:
       // prettier-ignore
-      `Delphi receives from our health system partners aggregated statistics on COVID-related hospital admissions, derived from ICD codes found in insurance claims and other medical records.  Using this data, we estimate the percentage of new hospital admissions each day that are related to COVID-19. Note that these estimates are based only on admissions by patients whose data is accessible to our partners,  and address new hospital admissions each day, not all currently hospitalized patients who have COVID-related diagnoses.`,
+      `Delphi receives from our health system partners aggregated statistics on COVID-related hospital admissions, derived from ICD codes found in insurance claims and other medical records. Using this data, we estimate the percentage of new hospital admissions each day that are related to COVID-19. Note that these estimates are based only on admissions by patients whose data is accessible to our partners, and address new hospital admissions each day, not all currently hospitalized patients who have COVID-related diagnoses.`,
     links: [
       {
         alt: 'Technical description',
@@ -435,7 +435,7 @@ const defaultSensors = [
     name: 'COVID Cases',
     longDescription:
       // prettier-ignore
-      `This data shows the number of COVID-19 confirmed cases newly reported each day. It  reflects only cases reported by state and local health authorities. It is based on case counts compiled and made public by ${USAFacts} and by ${aTeamByJohnHopkinsUniversity}. We use Johns Hopkins data for Puerto Rico and report USAFacts data in all other locations. The signal may not be directly comparable across regions with vastly different testing capacity or reporting criteria.`,
+      `This data shows the number of COVID-19 confirmed cases newly reported each day. It reflects only cases reported by state and local health authorities. It is based on case counts compiled and made public by ${USAFacts} and by ${aTeamByJohnHopkinsUniversity}. We use Johns Hopkins data for Puerto Rico and report USAFacts data in all other locations. The signal may not be directly comparable across regions with vastly different testing capacity or reporting criteria.`,
     links: [
       {
         alt: 'Technical description',
@@ -474,7 +474,7 @@ const defaultSensors = [
     name: 'COVID Deaths',
     longDescription:
       // prettier-ignore
-      `This data shows the number of COVID-19 related deaths newly reported each day. It reflects official figures reported by state and local health authorities, and may not include excess deaths not confirmed by health authorities to be due to COVID-19 . The signal is based on death counts compiled and made public by ${USAFacts} and by ${aTeamByJohnHopkinsUniversity}. We use Johns Hopkins data for Puerto Rico and report USAFacts data in all other locations.`,
+      `This data shows the number of COVID-19 related deaths newly reported each day. It reflects official figures reported by state and local health authorities, and may not include excess deaths not confirmed by health authorities to be due to COVID-19. The signal is based on death counts compiled and made public by ${USAFacts} and by ${aTeamByJohnHopkinsUniversity}. We use Johns Hopkins data for Puerto Rico and report USAFacts data in all other locations.`,
     links: [
       {
         alt: 'Technical description',
