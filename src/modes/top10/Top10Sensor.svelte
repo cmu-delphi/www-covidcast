@@ -1,5 +1,5 @@
 <script>
-  import { currentDateObject, signalCasesOrDeathOptions, stats, yesterdayDate } from '../../stores';
+  import { currentDateObject, stats, yesterdayDate } from '../../stores';
   import { createSpec } from '../overview/vegaSpec';
   import Vega from '../../components/Vega.svelte';
   import { parseAPITime } from '../../data';
@@ -8,6 +8,7 @@
   import merge from 'lodash-es/merge';
   import { determineMinMax } from '../../components/MapBox/colors';
   import { MAP_THEME } from '../../theme';
+  import { primaryValue } from '../../stores/constants';
 
   /**
    * @type {import('../../maps').NameInfo}
@@ -37,15 +38,24 @@
    */
   export let single;
 
+  export let ratioOptions;
+
+  $: field = primaryValue(sensor, ratioOptions);
+  $: cumulativeField = primaryValue(sensor, {
+    ...ratioOptions,
+    cumulative: true,
+  });
+
   $: data = fetchTimeSlice(sensor, level, id, startDay, finalDay, true, {
     geo_value: id,
     stderr: null,
   });
 
-  $: domain = determineMinMax($stats, sensor, level, $signalCasesOrDeathOptions);
+  $: domain = determineMinMax($stats, sensor, level, ratioOptions);
   $: patchedSpec = merge({}, createSpec(sensor, [{ info: row, color: MAP_THEME.selectedRegionOutline }], null), {
     encoding: {
       y: {
+        field,
         scale: {
           domain: sensor.format === 'percent' ? [domain[0] / 100, domain[1] / 100] : domain,
           clamp: true,
@@ -92,11 +102,11 @@
 
 {#if sensor.isCasesOrDeath}
   <td class="right">
-    {single && single.avg != null ? sensor.formatValue(single.avg) : 'Unknown'}
+    {single && single[field] != null ? sensor.formatValue(single[field]) : 'Unknown'}
     <span class="date">{$currentDateObject.toLocaleDateString()}</span>
   </td>
   <td class="right">
-    {single && single.countCumulative != null ? sensor.formatValue(single.countCumulative) : 'Unknown'}
+    {single && single[cumulativeField] != null ? sensor.formatValue(single[cumulativeField]) : 'Unknown'}
     <span class="date">{$currentDateObject.toLocaleDateString()}</span>
     <span class="date">(cumulative)</span>
   </td>
