@@ -17,9 +17,11 @@
   import Top10Sensor from './Top10Sensor.svelte';
   import Search from '../../components/Search.svelte';
   import { throttle } from 'lodash-es';
+  import Top10SortHint from './Top10SortHint.svelte';
   import { levelMegaCounty, groupedSensorList, sensorList } from '../../stores/constants';
 
   const SHOW_X_MORE = 10;
+  const MAX_OTHER_SENSORS = 1;
   /**
    * @typedef {import('../../maps').NameInfo} ValueRow
    * @property {import('../../data/fetchData').EpiDataRow} primary
@@ -85,9 +87,6 @@
     }
 
     return (a, b) => {
-      if (a.population !== b.population) {
-        return a.population < b.population ? -1 : 1;
-      }
       return a.displayName.localeCompare(b.displayName);
     };
   }
@@ -221,13 +220,6 @@
     vertical-align: middle;
   }
 
-  .table th {
-    background: white;
-    text-align: center;
-    cursor: pointer;
-    position: relative;
-  }
-
   td,
   th {
     border: 0;
@@ -247,6 +239,10 @@
   .go-to-map-pin {
     width: 16px;
     display: inline-block;
+    cursor: pointer;
+  }
+  .go-to-map-pin:hover {
+    color: black;
   }
 
   @media only screen and (max-width: 767px) {
@@ -286,17 +282,6 @@
     font-weight: bold;
   }
 
-  .sorted::after {
-    content: ' ▲';
-    font-size: 0.5em;
-    display: inline-block;
-  }
-
-  .desc .sorted::after {
-    content: ' ▼';
-    font-size: 0.5em;
-  }
-
   .add-column {
     max-width: 9em;
     border-radius: 3px;
@@ -310,7 +295,6 @@
     right: 0.2em;
     top: 0.2em;
     font-size: 0.7rem;
-    width: 3em;
   }
 
   /** mobile **/
@@ -342,39 +326,54 @@
 
   <div class="table base-font-size" class:loading>
     <table>
-      <thead class:desc={sortDirectionDesc}>
+      <thead>
         <tr>
-          <th class="table-num-column" rowspan="2">#</th>
-          <th rowspan="2" class:sorted={sortCriteria === 'name'} on:click={() => sortClick('name')}>Name</th>
-          <th
-            class="table-pop-column"
-            rowspan="2"
-            title="Population"
-            class:sorted={sortCriteria === 'population'}
-            on:click={() => sortClick('population', true)}>
-            Pop.
+          <th rowspan="2">#</th>
+          <th rowspan="2">
+            <Top10SortHint
+              label="Name"
+              on:click={() => sortClick('name')}
+              sorted={sortCriteria === 'name'}
+              desc={sortDirectionDesc}>
+              Name
+            </Top10SortHint>
           </th>
-          <th
-            colspan={primary.isCasesOrDeath ? 3 : 2}
-            class:sorted={sortCriteria === 'primary'}
-            on:click={() => sortClick('primary', true)}>
-            {primary.name}
+          <th class="table-pop-column" rowspan="2">
+            <Top10SortHint
+              label="Population"
+              on:click={() => sortClick('population')}
+              sorted={sortCriteria === 'population'}
+              desc={sortDirectionDesc}>
+              Pop.
+            </Top10SortHint>
+          </th>
+          <th colspan={primary.isCasesOrDeath ? 3 : 2}>
+            <Top10SortHint
+              label={primary.name}
+              on:click={() => sortClick('primary', true)}
+              sorted={sortCriteria === 'primary'}
+              desc={sortDirectionDesc}>
+              {primary.name}
+            </Top10SortHint>
           </th>
           {#each otherSensors as s, i}
-            <th
-              colspan={s.isCasesOrDeath ? 3 : 2}
-              class:sorted={sortCriteria === i}
-              on:click={() => sortClick(i, true)}>
-              {s.name}
-              <button
-                class="pg-button remove-column"
-                title="Show on Map"
-                on:click={() => (otherSensors = otherSensors.filter((d) => d !== s))}>
-                <IoMdRemove />
-              </button>
+            <th colspan={s.isCasesOrDeath ? 3 : 2}>
+              <Top10SortHint
+                label={s.name}
+                on:click={() => sortClick(i, true)}
+                sorted={sortCriteria === i}
+                desc={sortDirectionDesc}>
+                {s.name}
+                <button
+                  class="pg-button remove-column"
+                  title="Remove column"
+                  on:click={() => (otherSensors = otherSensors.filter((d) => d !== s))}>
+                  <IoMdRemove />
+                </button>
+              </Top10SortHint>
             </th>
           {/each}
-          {#if otherSensors.length < 1}
+          {#if otherSensors.length < MAX_OTHER_SENSORS}
             <th class="add-column-container" rowspan="2">
               <select aria-label="add column options" bind:value={chosenColumn} class="add-column">
                 <option value="">Add indicator</option>
@@ -398,11 +397,11 @@
       <tbody>
         {#each sortedRows as row}
           <tr class:selected={row.propertyId === $currentRegion}>
-            <td class="table-num-column">{row.rank}.</td>
+            <td>{row.rank}.</td>
             <td>
               {row.displayName}
-              <span class="go-to-map-pin" on:click={jumpTo(row)}>
-                <IoIosPin title="Show on Map" />
+              <span class="go-to-map-pin" on:click={jumpTo(row)} title="Show on Map">
+                <IoIosPin />
               </span>
             </td>
             <td class="right table-pop-column" title="Population">
