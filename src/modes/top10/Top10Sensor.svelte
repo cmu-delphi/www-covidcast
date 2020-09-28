@@ -7,11 +7,14 @@
   import VegaTooltip from '../../components/DetailView/VegaTooltip.svelte';
   import merge from 'lodash-es/merge';
   import { determineMinMax } from '../../components/MapBox/colors';
+  import { MAP_THEME } from '../../theme';
 
   /**
-   * @type {string}
+   * @type {import('../../maps').NameInfo}
    */
-  export let id;
+  export let row;
+
+  $: id = row.propertyId;
 
   /**
    * @type {string}
@@ -40,7 +43,7 @@
   });
 
   $: domain = determineMinMax($stats, sensor, level, $signalCasesOrDeathOptions);
-  $: patchedSpec = merge({}, createSpec(sensor, null, null), {
+  $: patchedSpec = merge({}, createSpec(sensor, [{ info: row, color: MAP_THEME.selectedRegionOutline }], null), {
     encoding: {
       y: {
         scale: {
