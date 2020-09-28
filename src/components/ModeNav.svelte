@@ -5,27 +5,7 @@
 
 <style>
   .mode-container {
-    margin: 0;
-    padding: 0;
     margin-left: 0.5em;
-    margin-top: 1em;
-  }
-
-  li {
-    cursor: pointer;
-    color: black;
-    margin: 0;
-    display: inline-block;
-    padding: 0.2em;
-  }
-
-  .active {
-    font-weight: bold;
-  }
-
-  .spacer {
-    width: 3em;
-    cursor: default;
   }
 
   @media only screen and (max-width: 767px) {
@@ -36,28 +16,12 @@
 </style>
 
 <nav>
-  <ul class="mode-container">
-    <li>
-      <SingleModeToggle mode={modeByID.overview} />
-    </li>
-
-    <li>
-      <SingleModeToggle mode={modeByID.timelapse} />
-    </li>
-    <li>
-      <SingleModeToggle mode={modeByID.top10} />
-    </li>
-
-    <li class="hide-mobile">
+  <div class="mode-container">
+    <SingleModeToggle mode={modeByID.overview} />
+    <SingleModeToggle mode={modeByID.timelapse} />
+    <SingleModeToggle mode={modeByID.top10} />
+    <span class="hide-mobile">
       <SingleModeToggle mode={modeByID.export} />
-    </li>
-
-    <li class="spacer" />
-
-    <li><a href="https://delphi.cmu.edu/blog/2020/08/10/hello-world/#our-mission-and-strategy">Our mission</a></li>
-    <li><a href="https://covidcast.cmu.edu/methodology.html">Data and methods</a></li>
-    <li><a href="https://covidcast.cmu.edu/surveys.html">Surveys</a></li>
-    <li><a href="https://covidcast.cmu.edu/covid19-response-team.html">Our team</a></li>
-    <li><a href="https://covidcast.cmu.edu/terms-of-use.html">Terms of use</a></li>
-  </ul>
+    </span>
+  </div>
 </nav>

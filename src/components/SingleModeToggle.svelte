@@ -7,7 +7,7 @@
 </script>
 
 <style>
-  /* .mode-button {
+  .mode-button {
     width: 12%;
     padding: 0.25em 0;
     min-width: 4.2em;
@@ -26,10 +26,10 @@
     transition-delay: 0s;
     transition-duration: 0.15s;
     transition-property: background-color;
-    transition-timing-function: ease-in-out; */
+    transition-timing-function: ease-in-out;
 
-  /* rounded design refresh */
-  /* border: 1px solid #dedede;
+    /* rounded design refresh */
+    border: 1px solid #dedede;
     border-bottom: 0;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
@@ -45,13 +45,14 @@
       text-align: left;
       border-bottom: 1px solid var(--bg);
     }
-  } */
+  }
 </style>
 
-<span
+<button
+  class="mode-button"
   on:click={() => {
     currentMode.set(mode);
   }}
   title={mode.tooltip}>
   {label}
-</span>
+</button>
