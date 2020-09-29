@@ -106,11 +106,9 @@ export function getLevelInfo(level) {
  */
 export const EPIDATA_CASES_OR_DEATH_VALUES = [
   'avg',
-  'avgCumulative',
   'count',
   'countCumulative',
   'avgRatio',
-  'avgRatioCumulative',
   'countRatio',
   'countRatioCumulative',
 ];
@@ -124,12 +122,10 @@ function generateCasesOrDeathSignals(signal) {
   const ratioSignal = signal.replace('_num', '_prop');
   return {
     avg: signal,
-    avgCumulative: checkWIP(signal, signal.replace('incidence', 'cumulative')),
     count: checkWIP(signal, signal.replace('7dav_', '')),
     countCumulative: checkWIP(signal, signal.replace('7dav_incidence', 'cumulative')),
 
     avgRatio: ratioSignal,
-    avgRatioCumulative: checkWIP(ratioSignal, ratioSignal.replace('incidence', 'cumulative')),
     countRatio: checkWIP(ratioSignal, ratioSignal.replace('7dav_', '')),
     countRatioCumulative: checkWIP(ratioSignal, ratioSignal.replace('7dav_incidence', 'cumulative')),
   };
@@ -158,11 +154,8 @@ export function primaryValue(sensorEntry, sensorOptions) {
 function getType(sensorEntry, sensorOptions) {
   let signal = sensorEntry.signal;
   if (sensorEntry.isCasesOrDeath) {
-    if (sensorOptions.cumulative) {
-      signal = sensorEntry.casesOrDeathSignals[sensorOptions.ratio ? 'avgRatioCumulative' : 'avgCumulative'];
-    } else {
-      signal = sensorEntry.casesOrDeathSignals[sensorOptions.ratio ? 'avgRatio' : 'avg'];
-    }
+    const valueKey = primaryValue(sensorEntry, sensorOptions);
+    signal = sensorEntry.casesOrDeathSignals[valueKey];
   }
   if (isCountSignal(signal)) {
     return 'count';

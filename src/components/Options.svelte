@@ -47,6 +47,7 @@
     align-items: center;
     display: flex;
     flex: 1 1 auto;
+    max-width: 390px;
   }
 
   .option-title {

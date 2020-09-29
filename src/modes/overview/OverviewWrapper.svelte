@@ -28,7 +28,6 @@
   import DetailView from '../../components/DetailView/DetailView.svelte';
   import MapOverlays from '../../components/MapOverlays.svelte';
   import { trackEvent } from '../../stores/ga';
-  import ModeNav from '../../components/ModeNav.svelte';
 
   // import { modeByID } from '..';
   import { MAP_THEME, selectionColors } from '../../theme';
@@ -264,8 +263,6 @@
     }
   }
 </style>
-
-<ModeNav />
 
 <main class="root base-font-size" class:hiddenPanel={!$isMobileDevice && !desktopShowPanel} class:compare={showCompare}>
   <Options className="options-container" levels={levelList} />
