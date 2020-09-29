@@ -133,6 +133,9 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
               y: {
                 field: primaryValue,
                 type: 'quantitative',
+                scale: {
+                  domainMin: 0,
+                },
                 axis: {
                   minExtent: 25,
                   title: sensor.yAxis,

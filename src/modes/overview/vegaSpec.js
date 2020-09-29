@@ -73,7 +73,10 @@ export function createSpec(sensor, selections, dateRange, patchedYEncoding = {})
           y: {
             field: yField,
             type: 'quantitative',
-            scale: patchedYEncoding.scale,
+            scale: {
+              domainMin: 0,
+              ...(patchedYEncoding.scale || {}),
+            },
             axis: {
               ...(isPercentage ? { format: '.1%' } : {}),
               title: null,

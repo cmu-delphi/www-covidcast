@@ -5,7 +5,6 @@
   import { parseAPITime } from '../../data';
   import { fetchTimeSlice } from '../../data/fetchData';
   import VegaTooltip from '../../components/DetailView/VegaTooltip.svelte';
-  import merge from 'lodash-es/merge';
   import { determineMinMax } from '../../components/MapBox/colors';
   import { MAP_THEME } from '../../theme';
   import { primaryValue } from '../../stores/constants';
@@ -55,7 +54,8 @@
   $: patchedSpec = createSpec(sensor, [{ info: row, color: MAP_THEME.selectedRegionOutline }], null, {
     field,
     scale: {
-      domain: sensor.format === 'percent' ? [domain[0] / 100, domain[1] / 100] : domain,
+      domainMin: sensor.format === 'percent' ? domain[0] / 100 : domain[0],
+      domainMax: sensor.format === 'percent' ? domain[1] / 100 : domain[1],
       clamp: true,
     },
   });
