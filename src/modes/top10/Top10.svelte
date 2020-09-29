@@ -12,7 +12,7 @@
   import { fetchRegionSlice } from '../../data/fetchData';
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
   import IoIosPin from 'svelte-icons/io/IoIosPin.svelte';
-  import modes from '..';
+  import { modeByID } from '..';
   import { getInfoByName, nameInfos } from '../../maps';
   import Top10Sensor from './Top10Sensor.svelte';
   import Search from '../../components/Search.svelte';
@@ -142,7 +142,7 @@
     .filter((d, i) => i < showTopN || d.propertyId === $currentRegion);
 
   function jumpTo(row) {
-    currentMode.set(modes.find((d) => d.id === 'overview'));
+    currentMode.set(modeByID.overview);
     currentRegion.set(row.id);
   }
 
@@ -396,7 +396,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each sortedRows as row, i}
+        {#each sortedRows as row}
           <tr class:selected={row.propertyId === $currentRegion}>
             <td class="table-num-column">{row.rank}.</td>
             <td>
@@ -411,7 +411,7 @@
             <Top10Sensor
               sensor={primary}
               single={row.primary}
-              id={row.propertyId}
+              {row}
               level={row.level}
               {highlightTimeValue}
               {onHighlight} />
@@ -419,7 +419,7 @@
               <Top10Sensor
                 sensor={s}
                 single={row.others[si]}
-                id={row.propertyId}
+                {row}
                 level={row.level}
                 {highlightTimeValue}
                 {onHighlight} />
