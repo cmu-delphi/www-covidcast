@@ -55,7 +55,7 @@
   $: patchedSpec = merge({}, createSpec(sensor, [{ info: row, color: MAP_THEME.selectedRegionOutline }], null), {
     encoding: {
       y: {
-        field,
+        field: sensor.format === 'percent' ? 'pValue' : field,
         scale: {
           domain: sensor.format === 'percent' ? [domain[0] / 100, domain[1] / 100] : domain,
           clamp: true,
