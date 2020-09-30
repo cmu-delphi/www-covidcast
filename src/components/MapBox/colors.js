@@ -19,7 +19,7 @@ const TICK_COUNT = 7;
  * @param {string} level
  * @param {import('../../stores/constants').CasesOrDeathOptions} signalOptions
  */
-export function determineMinMax(statsLookup, sensorEntry, level, signalOptions) {
+export function determineMinMax(statsLookup, sensorEntry, level, signalOptions, useMax = false) {
   let key = sensorEntry.key;
   // Customize min max values for deaths
   if (sensorEntry.getType(signalOptions) === 'count') {
@@ -28,6 +28,9 @@ export function determineMinMax(statsLookup, sensorEntry, level, signalOptions) 
       key += `_${primaryValue(sensorEntry, signalOptions)}`;
     }
     const stats = statsLookup.get(key);
+    if (useMax) {
+      return [0, stats.max];
+    }
     return [Math.max(MAGIC_MIN_STATS, stats.mean - 3 * stats.std), stats.mean + 3 * stats.std];
   }
 
@@ -35,6 +38,9 @@ export function determineMinMax(statsLookup, sensorEntry, level, signalOptions) 
     key += `_${primaryValue(sensorEntry, signalOptions)}`;
   }
   const stats = statsLookup.get(key);
+  if (useMax) {
+    return [0, stats.max];
+  }
   return [Math.max(0, stats.mean - 3 * stats.std), stats.mean + 3 * stats.std];
 }
 
