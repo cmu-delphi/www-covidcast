@@ -38,6 +38,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
+    margin-top: 2px;
   }
   .signal-description {
     margin-bottom: 0.25em;
@@ -47,6 +48,9 @@
   @media only screen and (min-width: 767px) {
     .title-container {
       box-shadow: none;
+      border: none;
+      border-radius: 0;
+      margin-top: 0;
     }
   }
 
