@@ -51,8 +51,9 @@
   });
 
   $: domain = determineMinMax($stats, sensor, level, ratioOptions);
+
   $: patchedSpec = createSpec(sensor, [{ info: row, color: MAP_THEME.selectedRegionOutline }], null, {
-    field,
+    field: sensor.format === 'percent' ? 'pValue' : field,
     scale: {
       domainMin: sensor.format === 'percent' ? domain[0] / 100 : domain[0],
       domainMax: sensor.format === 'percent' ? domain[1] / 100 : domain[1],
