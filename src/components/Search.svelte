@@ -298,11 +298,14 @@
   .search-button {
     color: #9b9b9b;
     width: 1.4em;
+    height: 1.4em;
+    align-self: center;
     margin: 0;
     padding: 0;
     border: none;
     background: none;
   }
+
   .autocomplete-input {
     flex: 1 1 0;
     width: 100%;
