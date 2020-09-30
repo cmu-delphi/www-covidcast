@@ -20,12 +20,13 @@ const stdErrTransformPercent = [
  * @param {import('../../data').SensorEntry} sensor
  * @param {{info: import('../../maps').NameInfo, color: string}[]} selections
  * @param {?[Date, Date]} dateRange
- * @param {?{}} patchedYEncoding
+ * @param {?{field?: string, domain?: [number, number]}} valuePatch
  */
-export function createSpec(sensor, selections, dateRange, patchedYEncoding = {}) {
+export function createSpec(sensor, selections, dateRange, valuePatch) {
   const isPercentage = sensor.format === 'percent';
-  const yField = patchedYEncoding.field || (isPercentage ? 'pValue' : 'value');
+  const yField = valuePatch && valuePatch.field ? valuePatch.field : isPercentage ? 'pValue' : 'value';
 
+  const scalePercent = isPercentage ? (v) => v / 100 : (v) => v;
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
@@ -74,8 +75,9 @@ export function createSpec(sensor, selections, dateRange, patchedYEncoding = {})
             field: yField,
             type: 'quantitative',
             scale: {
-              domainMin: 0,
-              ...(patchedYEncoding.scale || {}),
+              domainMin: valuePatch && valuePatch.domain ? scalePercent(valuePatch.domain[0]) : 0,
+              domainMax: valuePatch && valuePatch.domain ? scalePercent(valuePatch.domain[1]) : undefined,
+              clamp: true,
             },
             axis: {
               ...(isPercentage ? { format: '.1%' } : {}),
