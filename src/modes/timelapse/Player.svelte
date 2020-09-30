@@ -83,6 +83,7 @@
         density: 4,
         format: formatPip,
       },
+      ariaFormat: formatFull,
     });
     sliderInstance.on('change', (values) => {
       dispatch('change', dayToDate(Number.parseInt(values[0], 10)));
