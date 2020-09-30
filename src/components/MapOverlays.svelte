@@ -38,7 +38,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    margin-top: 2px;
+    margin: 2px 5px;
   }
   .signal-description {
     margin-bottom: 0.25em;
