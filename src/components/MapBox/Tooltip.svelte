@@ -44,6 +44,15 @@
   h5 {
     margin: 0;
     padding: 0;
+    text-align: center;
+  }
+
+  table {
+    margin: 0;
+  }
+
+  .tooltip {
+    pointer-events: none;
   }
 </style>
 
@@ -110,7 +119,7 @@
             </td>
           </tr>
           <tr>
-            <th>{formatTimeWithoutYear($currentDateObject)} (cumulated)</th>
+            <th>Cumulative {formatTimeWithoutYear($currentDateObject)}</th>
             <td
               class="right"
               style={options.cumulative && !options.ratio ? colorScaleStyle(properties.countCumulative) : ''}>
@@ -120,19 +129,6 @@
               class="right"
               style={options.cumulative && options.ratio ? colorScaleStyle(properties.countRatioCumulative) : ''}>
               {$currentSensorEntry.formatValue(properties.countRatioCumulative)}
-            </td>
-          </tr>
-          <tr>
-            <th>7-day avg (cumulated)</th>
-            <td
-              class="right"
-              style={options.cumulative && !options.ratio ? colorScaleStyle(properties.avgCumulative) : ''}>
-              {$currentSensorEntry.formatValue(properties.avgCumulative)}
-            </td>
-            <td
-              class="right"
-              style={options.cumulative && options.ratio ? colorScaleStyle(properties.avgRatioCumulative) : ''}>
-              {$currentSensorEntry.formatValue(properties.avgRatioCumulative)}
             </td>
           </tr>
         {:else}

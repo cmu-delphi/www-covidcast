@@ -1,10 +1,10 @@
 import { writable, derived, get, readable } from 'svelte/store';
 import { LogScale, SqrtScale } from './scales';
 import { scaleSequentialLog } from 'd3-scale';
-import { defaultSensorId, sensorList, sensorMap, yesterdayDate } from './constants';
-import modes from '../modes';
+import { defaultSensorId, sensorList, sensorMap, yesterdayDate, levels, swpaLevels } from './constants';
+import modes, { modeByID } from '../modes';
 import { parseAPITime } from '../data/utils';
-import { regionSearchLookup } from './search';
+import { getInfoByName } from '../maps';
 export {
   defaultRegionOnStartup,
   getLevelInfo,
@@ -17,7 +17,7 @@ export {
   groupedSensorList,
 } from './constants';
 import { timeMonth } from 'd3-time';
-export { regionSearchList } from './search';
+import { selectionColors } from '../theme';
 
 /**
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
@@ -34,10 +34,11 @@ export const appReady = writable(false);
 /**
  * @type {import('svelte/store').Writable<import('../routes').Mode>}
  */
-export const currentMode = writable(modes[0], (set) => {
+export const currentMode = writable(modeByID.overview, (set) => {
   const mode = urlParams.get('mode');
-  if (modes.find((d) => d.id === mode)) {
-    set(modes.find((d) => d.id === mode));
+  const nextMode = modes.find((d) => d.id === mode);
+  if (nextMode) {
+    set(nextMode);
   }
 });
 
@@ -54,12 +55,18 @@ export const currentSensor = writable('', (set) => {
     }
   }
 });
+
+/**
+ * @type {import('svelte/store').Writable<import('../data').SensorEntry | null>}
+ */
+export const currentInfoSensor = writable(null);
+
 export const currentSensorEntry = derived([currentSensor], ([$currentSensor]) => sensorMap.get($currentSensor));
 
 // 'county', 'state', or 'msa'
 export const currentLevel = writable('county', (set) => {
   const level = urlParams.get('level');
-  if (['county', 'state', 'msa'].includes(level)) {
+  if (levels.includes(level) || swpaLevels.includes(level)) {
     set(level);
   }
 });
@@ -139,14 +146,39 @@ export const currentRegion = writable('', (set) => {
 /**
  * current region info (could also be null)
  */
-export const currentRegionInfo = derived([currentRegion, regionSearchLookup], ([current, lookup]) => lookup(current));
+export const currentRegionInfo = derived([currentRegion], ([current]) => getInfoByName(current));
+
+/**
+ * @type {import('svelte/store').Writable<import('../maps').NameInfo[]>}
+ */
+export const recentRegionInfos = writable([]);
+
+// keep track of top 10 recent selections
+currentRegionInfo.subscribe((v) => {
+  if (!v) {
+    return;
+  }
+  const infos = get(recentRegionInfos).slice();
+  const index = infos.indexOf(v);
+  if (index >= 0) {
+    infos.splice(index, 1);
+  }
+  if (infos.length > 10) {
+    infos.shift();
+  }
+  infos.push(v);
+  recentRegionInfos.set(infos);
+});
 
 /**
  *
  * @param {import('../maps/nameIdInfo').NameInfo | null} elem
  */
-export function selectByInfo(elem) {
+export function selectByInfo(elem, reset = false) {
   if (elem === get(currentRegionInfo)) {
+    if (reset) {
+      currentRegion.set('');
+    }
     return;
   }
   if (elem) {
@@ -157,18 +189,9 @@ export function selectByInfo(elem) {
   }
 }
 
-export function selectByFeature(feature) {
-  const lookup = get(regionSearchLookup);
-  selectByInfo(feature ? lookup(feature.properties.id) : null);
+export function selectByFeature(feature, reset = false) {
+  selectByInfo(feature ? getInfoByName(feature.properties.id) : null, reset);
 }
-
-// currently only supporting 'swpa' - South western Pennsylvania
-export const currentZone = writable('', (set) => {
-  const zone = urlParams.get('zone');
-  if (zone === 'swpa') {
-    set(zone);
-  }
-});
 
 export const colorScale = writable(scaleSequentialLog());
 export const colorStops = writable([]);
@@ -184,12 +207,16 @@ currentSensorEntry.subscribe((sensorEntry) => {
     currentLevel.set(sensorEntry.levels[0]);
   }
 
+  if (get(currentInfoSensor)) {
+    // show help, update it
+    currentInfoSensor.set(sensorEntry);
+  }
+
   // if (sensorEntry.type === 'late' && sensorEntry.id !== 'hospital-admissions') {
   //   signalType.set('value');
   // }
 
   if (!sensorEntry.isCasesOrDeath) {
-    encoding.set('color');
     signalCasesOrDeathOptions.set({
       cumulative: false,
       ratio: false,
@@ -227,3 +254,17 @@ export const isMobileDevice = readable(false, (set) => {
 //     set(r.matches);
 //   });
 // });
+
+// overview compare mode
+
+// null = disable
+// []
+/**
+ * @type {import('svelte/store').Writable<{info: NameInfo, color: string}[] | null>}
+ * */
+export const currentCompareSelection = writable(null, (set) => {
+  const ids = (urlParams.get('compare') || '').split(',').map(getInfoByName).filter(Boolean);
+  if (ids.length > 0) {
+    set(ids.map((info, i) => ({ info, color: selectionColors[i] || 'grey' })));
+  }
+});

@@ -311,9 +311,7 @@
     on:closed={registerClose}>
     <div slot="trigger">
       <slot {selected} {formattedSelected}>
-        {#if !trigger}
-          <button class="calendar-button" type="button">{formattedSelected}</button>
-        {/if}
+        {#if !trigger}<button class="calendar-button" type="button">{formattedSelected}</button>{/if}
       </slot>
     </div>
     <div class="calendar">
@@ -328,9 +326,7 @@
         on:monthSelected={(e) => changeMonth(e.detail)}
         on:incrementMonth={(e) => incrementMonth(e.detail)} />
       <div class="legend">
-        {#each sortedDaysOfWeek as day}
-          <span>{day[1]}</span>
-        {/each}
+        {#each sortedDaysOfWeek as day}<span>{day[1]}</span>{/each}
       </div>
       <Month
         {visibleMonth}

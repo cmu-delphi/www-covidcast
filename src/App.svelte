@@ -1,13 +1,14 @@
 <script>
+  import ModeNav from './components/ModeNav.svelte';
   import { onMount } from 'svelte';
-
-  import { currentMode, appReady } from './stores';
+  import { currentMode, appReady, sensorList } from './stores';
   import './stores/urlHandler';
   import './stores/ga';
   import { loadMetaData } from './data';
+  import InfoDialog from './components/InfoDialog.svelte';
 
   onMount(() => {
-    loadMetaData().then(() => {
+    loadMetaData(sensorList).then(() => {
       appReady.set(true);
     });
   });
@@ -21,6 +22,7 @@
   }
 </style>
 
+<ModeNav />
 {#await currentComponent}
   <div class="loader loading" />
 {:then value}
@@ -31,3 +33,5 @@
     <pre>{error}</pre>
   </div>
 {/await}
+
+<InfoDialog />

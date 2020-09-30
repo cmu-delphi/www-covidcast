@@ -1,7 +1,6 @@
 <script>
   import Title from './Title.svelte';
   import MapControls from './MapControls.svelte';
-  import './mapContainer.css';
   import { isDirectionSignalType, encoding, currentSensorEntry } from '../stores';
   import EncodingOptions from './EncodingOptions.svelte';
   import DirectionLegend from './legends/DirectionLegend.svelte';
@@ -12,6 +11,8 @@
   export let map = null;
   export let mapLoading = true;
   export let legendLoading = true;
+  export let zoom = 1.0;
+  export let showDate = false;
 </script>
 
 <style>
@@ -32,8 +33,14 @@
     z-index: 1001;
     align-self: flex-start;
     justify-self: center;
-    padding: 0.5em 1em;
-    margin: 0 6px;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  .signal-description {
+    margin-bottom: 0.25em;
   }
 
   /** desktop **/
@@ -46,13 +53,14 @@
 
   .legend-container {
     position: absolute;
-    margin: 6px;
+    margin: 0.25em;
     left: 0;
     bottom: 0;
     z-index: 1000;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    max-width: 100%;
   }
 
   .legend-container > :global(.encoding-wrapper) {
@@ -61,26 +69,26 @@
 </style>
 
 <div class="map-top-overlay">
-  <div class="title-container container-bg">
-    <Title>
-      <slot name="title" />
-    </Title>
+  <div class="title-container">
+    <Title {showDate} />
   </div>
   <div class="map-controls-container">
     <MapControls zoom={map ? map.zoom : null} showEncodings loading={mapLoading} />
   </div>
 </div>
-<div class="legend-container base-font-size">
+<div class="legend-container base-font-size" aria-label="map legend">
   <EncodingOptions sensor={$currentSensorEntry} className="container-bg container-style encoding-wrapper" />
   <div class="container-bg container-style">
+    <div class="signal-description" />
+
     {#if $isDirectionSignalType}
       <DirectionLegend />
     {:else if $encoding === 'color'}
       <ColorLegend loading={legendLoading} />
     {:else if $encoding === 'bubble'}
-      <BubbleLegend loading={legendLoading} />
+      <BubbleLegend loading={legendLoading} {zoom} />
     {:else if $encoding === 'spike'}
-      <SpikeLegend loading={legendLoading} />
+      <SpikeLegend loading={legendLoading} {zoom} />
     {/if}
   </div>
 </div>

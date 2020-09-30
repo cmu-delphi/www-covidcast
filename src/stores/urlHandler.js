@@ -6,8 +6,8 @@ import {
   currentDate,
   signalType,
   encoding,
-  currentZone,
   signalCasesOrDeathOptions,
+  currentCompareSelection,
 } from '.';
 import { get } from 'svelte/store';
 import { trackUrl } from './ga';
@@ -21,10 +21,10 @@ function updateURIParameters(delta) {
     date: get(currentDate),
     signalType: get(signalType),
     encoding: get(encoding),
-    zone: get(currentZone),
     mode: get(currentMode).id,
     signalC: get(signalCasesOrDeathOptions).cumulative,
     signalR: get(signalCasesOrDeathOptions).ratio,
+    compare: get(currentCompareSelection) ? get(currentCompareSelection).map((d) => d.info.propertyId) : null,
     ...delta, // inject current delta
   };
 
@@ -71,8 +71,6 @@ signalCasesOrDeathOptions.subscribe((r) =>
 );
 encoding.subscribe((encoding) => updateURIParameters({ encoding }));
 currentMode.subscribe((mode) => updateURIParameters({ mode: mode.id }));
-currentZone.subscribe((zone) =>
-  updateURIParameters({
-    zone,
-  }),
+currentCompareSelection.subscribe((value) =>
+  updateURIParameters({ compare: value ? value.map((d) => d.info.propertyId) : null }),
 );

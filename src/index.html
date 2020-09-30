@@ -42,11 +42,21 @@
       rel="stylesheet"
       type="text/css"
     />
+    <link rel="preconnect" href="https://fonts.openmaptiles.org" />
 
     <!-- Google Tag Manager -->
     <script>
       var dataLayer = (window.dataLayer = window.dataLayer || []);
       dataLayer.push({ fireGtm: true });
+
+      // also initialize google analytics
+      window.ga =
+        window.ga ||
+        function () {
+          (ga.q = ga.q || []).push(arguments);
+        };
+      ga.l = +new Date();
+      ga('create', 'UA-9172041-1', 'auto');
     </script>
     <script>
       (function (w, d, s, l, i) {
@@ -112,7 +122,7 @@
         </nav>
       </header>
       <main id="vizbox">
-        <div class="ie-banner" style="display: none;">
+        <div class="ie-banner" style="display: none">
           <div>
             Internet Explorer 11 is no longer supported. We encourage you to use a more modern web browser, such as
             Firefox, Chrome, or Safari.
@@ -131,7 +141,7 @@
         </ul>
       </nav>
     </footer>
-    <script src="https://www.cmu.edu/common/standard-v6/js/list.min.js" type="text/javascript"></script>
+    <!-- <script src="https://www.cmu.edu/common/standard-v6/js/list.min.js" type="text/javascript"></script> -->
     <script src="https://www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js" type="text/javascript"></script>
     <script src="https://www.cmu.edu/common/standard-v6/js/main.min.js" type="text/javascript"></script>
   </body>

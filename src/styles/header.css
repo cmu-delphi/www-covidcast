@@ -14,7 +14,6 @@ body.viz-body {
 }
 
 .viz-name {
-  order: 4;
   margin: 1em 0 0.2em 0;
   padding-top: 0;
   padding-bottom: 0;
@@ -59,8 +58,7 @@ body.viz-body {
 }
 
 .viz-subnav {
-  order: 5;
-  margin-bottom: 1em;
+  /* margin-bottom: 1em; */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -119,4 +117,12 @@ body.viz-body {
 
 footer.viz-footer > nav {
   display: none;
+}
+
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.1em;
+  padding: 0.25em 0;
 }

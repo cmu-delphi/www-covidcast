@@ -13,13 +13,12 @@
   import { timeFormat } from 'd3-time-format';
   import { formatAPITime, parseAPITime } from '../data';
 
+  $: formatTime = $isMobileDevice ? timeFormat('%x') : timeFormat('%B %-d, %Y');
+
+  export let levels = levelList;
   export let className = '';
   export let showDate = true;
-  // let selectedDate = writable(parseTime($currentDate));
   $: selectedDate = parseAPITime($currentDate);
-  // if ($currentDate !== MAGIC_START_DATE) {
-  //   selectedDate = parseTime($currentDate);
-  // }
   $: start_end_dates = [];
 
   $: if (selectedDate !== undefined) {
@@ -28,22 +27,27 @@
   $: if ($times !== null) {
     start_end_dates = $times.get($currentSensor);
   }
-
-  $: formatTime = $isMobileDevice ? timeFormat('%x') : timeFormat('%B %-d, %Y');
+  $: levelIds = new Set(levels.map((l) => l.id));
+  $: filteredSensorGroups = groupedSensorList
+    .map((g) => ({
+      label: g.label,
+      sensors: g.sensors.filter((d) => d.levels.some((l) => levelIds.has(l))),
+    }))
+    .filter((d) => d.sensors.length > 0);
 </script>
 
 <style>
   .options {
     position: relative;
     display: flex;
-    max-width: 50em;
-    margin: 0 6px;
+    margin: 0.3em;
   }
 
   .option-wrapper {
     align-items: center;
     display: flex;
     flex: 1 1 auto;
+    max-width: 390px;
   }
 
   .option-title {
@@ -94,7 +98,7 @@
       max-width: unset;
     }
     .option-wrapper {
-      padding: 0 2px;
+      padding: 0 0.1em;
       display: flex;
       flex-direction: column;
       align-items: stretch;
@@ -111,7 +115,7 @@
       aria-label="indicator options"
       class="indicators base-font-size"
       bind:value={$currentSensor}>
-      {#each groupedSensorList as sensorGroup}
+      {#each filteredSensorGroups as sensorGroup}
         <optgroup label={sensorGroup.label}>
           {#each sensorGroup.sensors as sensor}
             <option
@@ -131,7 +135,7 @@
       aria-label="geographic level"
       class="geo-level base-font-size"
       bind:value={$currentLevel}>
-      {#each levelList as level}
+      {#each levels as level}
         <option value={level.id} disabled={!$currentSensorEntry.levels.includes(level.id)}>{level.labelPlural}</option>
       {/each}
     </select>

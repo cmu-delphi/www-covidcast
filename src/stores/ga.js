@@ -5,19 +5,23 @@ import {
   currentDate,
   signalType,
   encoding,
-  currentZone,
   currentMode,
   signalCasesOrDeathOptions,
+  currentCompareSelection,
+  appReady,
+  currentInfoSensor,
 } from '.';
 
-export function trackUrl(url) {
+import { debounce } from 'lodash-es';
+
+export const trackUrl = debounce((url) => {
   if (!window.ga) {
     return;
   }
   // send an event to google analytics
   window.ga('set', 'page', url);
   window.ga('send', 'pageview');
-}
+}, 250);
 
 export function trackEvent(category, action, label, value) {
   if (!window.ga) {
@@ -26,15 +30,83 @@ export function trackEvent(category, action, label, value) {
   window.ga('send', 'event', category, action, label, value);
 }
 
-currentSensor.subscribe((sensor) => trackEvent('sensor', 'set', sensor));
-currentLevel.subscribe((level) => trackEvent('level', 'set', level));
-currentRegion.subscribe((region) => trackEvent('region', 'set', region));
-currentDate.subscribe((date) => trackEvent('date', 'set', date));
-signalType.subscribe((signalType) => trackEvent('signalType', 'set', signalType));
-encoding.subscribe((encoding) => trackEvent('encoding', 'set', encoding));
-currentZone.subscribe((zone) => trackEvent('zone', 'set', zone));
-currentMode.subscribe((mode) => trackEvent('mode', 'set', mode.id));
-signalCasesOrDeathOptions.subscribe((r) => {
-  trackEvent('signalCasesOrDeathOptions', 'cumulative', String(r.cumulative));
-  trackEvent('signalCasesOrDeathOptions', 'ratio', String(r.ratio));
+appReady.subscribe((v) => {
+  if (!v) {
+    return;
+  }
+  let initialRun = true;
+  currentSensor.subscribe((sensor) => {
+    // since subscribe is run directly with the current value
+    if (initialRun) {
+      return;
+    }
+    trackEvent('sensor', 'set', sensor);
+  });
+  currentLevel.subscribe((level) => {
+    if (initialRun) {
+      return;
+    }
+    trackEvent('level', 'set', level);
+  });
+  currentRegion.subscribe((region) => {
+    if (initialRun) {
+      return;
+    }
+    trackEvent('region', 'set', region);
+  });
+  currentDate.subscribe((date) => {
+    if (initialRun) {
+      return;
+    }
+    trackEvent('date', 'set', date);
+  });
+  signalType.subscribe((signalType) => {
+    if (initialRun) {
+      return;
+    }
+    trackEvent('signalType', 'set', signalType);
+  });
+  encoding.subscribe((encoding) => {
+    if (initialRun) {
+      return;
+    }
+    trackEvent('encoding', 'set', encoding);
+  });
+  currentMode.subscribe((mode) => {
+    if (initialRun) {
+      return;
+    }
+    trackEvent('mode', 'set', mode.id);
+  });
+  signalCasesOrDeathOptions.subscribe((r) => {
+    if (initialRun) {
+      return;
+    }
+    trackEvent('signalCasesOrDeathOptions', 'cumulative', String(r.cumulative));
+    trackEvent('signalCasesOrDeathOptions', 'ratio', String(r.ratio));
+  });
+  currentInfoSensor.subscribe((r) => {
+    if (initialRun) {
+      return;
+    }
+    if (!r) {
+      trackEvent('help', 'hide-signal');
+    } else {
+      trackEvent('help', 'show-signal', r.key);
+    }
+  });
+  currentCompareSelection.subscribe((compare) => {
+    if (initialRun) {
+      return;
+    }
+    if (!compare) {
+      trackEvent('compare', 'set', 'close');
+    } else if (compare.length === 0) {
+      trackEvent('compare', 'set', 'open');
+    } else {
+      trackEvent('compare', 'change', compare.map((d) => d.info.propertyId).join(','));
+    }
+  });
+
+  initialRun = false;
 });

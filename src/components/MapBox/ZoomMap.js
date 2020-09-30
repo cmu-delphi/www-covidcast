@@ -1,25 +1,46 @@
 import { L } from './layers';
 import { LngLatBounds } from 'mapbox-gl';
-import { bounds } from '../../maps';
+
+let SHRINK_FACTOR = 0.75;
 
 export default class ZoomMap {
-  constructor() {
+  constructor(onZoom, bounds) {
     /**
      * @type {import('mapbox-gl').Map | null}
      */
     this.map = null;
-    this.stateBounds = new LngLatBounds(bounds.states);
-    this.stateBoundsOptions = {
+    this.onZoom = onZoom;
+    this.resetBounds = new LngLatBounds(bounds);
+    this.resetBoundsOptions = {
       padding: 20, //px
       linear: false,
     };
     this.stateZoom = 1;
     this.initialZoomView = true;
-    this.zoneBounds = new LngLatBounds(bounds.zones);
-    this.zoneBoundsOptions = {
-      padding: 20, //px
-      linear: false,
-    };
+  }
+
+  _triggerZoom(paint) {
+    // console.log(this.map.getZoom(), this.stateZoom, this.map.getZoom() / this.stateZoom);
+    const current = this.map.getZoom();
+    const base = this.stateZoom;
+
+    const zoom = Math.pow(2, (current - base) * SHRINK_FACTOR);
+    this.onZoom(zoom, paint);
+  }
+
+  setMap(map) {
+    this.map = map;
+
+    this.stateZoom = this.map.getZoom();
+    // console.log(this.stateZoom);
+    this.map.on('zoom', () => {
+      this._triggerZoom();
+    });
+  }
+
+  ready() {
+    this.stateZoom = this.map.getZoom();
+    this._triggerZoom();
   }
 
   getZoom() {
@@ -55,14 +76,11 @@ export default class ZoomMap {
       return;
     }
     this.initialZoomView = true;
-    this.map.fitBounds(this.stateBounds, this.stateBoundsOptions);
+    this.map.fitBounds(this.resetBounds, this.resetBoundsOptions);
     this.map.once('idle', () => {
-      this.ready();
+      this.stateZoom = this.map.getZoom();
+      this._triggerZoom(true);
     });
-  }
-
-  ready() {
-    this.stateZoom = this.map.getZoom();
   }
 
   resized() {
@@ -70,7 +88,7 @@ export default class ZoomMap {
       return;
     }
     requestAnimationFrame(() => {
-      this.map.fitBounds(this.stateBounds, this.stateBoundsOptions);
+      this.map.fitBounds(this.resetBounds, this.resetBoundsOptions);
     });
   }
 
@@ -78,25 +96,16 @@ export default class ZoomMap {
    * @param {boolean} value
    */
   showStateLabels(value) {
-    if (!this.map) {
+    if (!this.map || !this.map.getLayer(L.stateNames)) {
       return;
     }
-    this.map.setLayoutProperty(L.state.names, 'visibility', value ? 'visible' : 'none');
+    this.map.setLayoutProperty(L.stateNames, 'visibility', value ? 'visible' : 'none');
   }
 
   toggleStateLabels() {
-    if (!this.map) {
+    if (!this.map || !this.map.getLayer(L.stateNames)) {
       return;
     }
-    this.showStateLabels(this.map.getLayoutProperty(L.state.names, 'visibility') !== 'visible');
-  }
-
-  showSWPA() {
-    if (!this.map) {
-      return;
-    }
-    this.initialZoomView = false;
-    this.map.fitBounds(this.zoneBounds, this.zoneBoundsOptions);
-    this.map.setLayoutProperty(L.zoneOutline, 'visibility', 'visible');
+    this.showStateLabels(this.map.getLayoutProperty(L.stateNames, 'visibility') !== 'visible');
   }
 }
