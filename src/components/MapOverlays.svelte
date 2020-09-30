@@ -49,8 +49,6 @@
     .title-container {
       box-shadow: none;
       border: none;
-      border-radius: 0;
-      margin-top: 0;
     }
   }
 
