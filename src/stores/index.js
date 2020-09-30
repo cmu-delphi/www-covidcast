@@ -242,8 +242,8 @@ currentSensorEntry.subscribe((sensorEntry) => {
 export const isMobileDevice = readable(false, (set) => {
   const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
   set(isMobileQuery.matches);
-  isMobileQuery.addListener((r) => {
-    set(r.matches);
+  isMobileQuery.addEventListener('change', (evt) => {
+    set(evt.matches);
   });
 });
 
