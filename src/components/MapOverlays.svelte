@@ -68,7 +68,7 @@
 </style>
 
 <div class="map-top-overlay">
-  <div class="title-container">
+  <div class="title-container container-bg">
     <Title {showDate} />
   </div>
   <div class="map-controls-container">
