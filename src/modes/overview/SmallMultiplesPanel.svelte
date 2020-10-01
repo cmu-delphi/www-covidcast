@@ -203,7 +203,7 @@
           {typeof s.sensor.mapTitleText === 'function' ? s.sensor.mapTitleText() : s.sensor.name}
         </button>
         <div class="toolbar">
-          {#if s.sensor.longDescription}
+          {#if s.sensor.description}
             <button
               title="Show sensor description"
               class="pg-button info"

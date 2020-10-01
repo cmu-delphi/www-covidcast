@@ -7,3 +7,4 @@
 *.zip
 .eslintcache
 /public
+src/**/*.generated.json
