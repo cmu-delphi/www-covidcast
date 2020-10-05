@@ -54,7 +54,7 @@
     : region && !isMegaRegion
     ? fetchTimeSlice(sensor, region.level, region.propertyId, undefined, undefined, false, {
         geo_value: region.propertyId,
-      }).then(addMissing)
+      }).then((rows) => addMissing(rows, sensor))
     : [];
 
   $: spec = createSpec(sensor, primaryValue(sensor, $signalCasesOrDeathOptions), selections, $smallMultipleTimeSpan);

@@ -42,7 +42,7 @@
         return fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false, {
           geo_value: region.propertyId,
         })
-          .then(addMissing)
+          .then((rows) => addMissing(rows, sensor))
           .then((rows) =>
             rows.map((row) => {
               row.displayName = region.displayName;
@@ -72,7 +72,7 @@
       ? fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false, {
           geo_value: region.propertyId,
         })
-          .then(addMissing)
+          .then((rows) => addMissing(rows, sensor))
           .then((rows) =>
             rows.map((row) => {
               row.displayName = region.displayName;
