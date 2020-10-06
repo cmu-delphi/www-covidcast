@@ -52,6 +52,8 @@
     max-width: 40em;
     z-index: 5000;
     clear: both;
+    border: 1px solid var(--grey);
+    box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.35);
   }
 
   .close {
@@ -106,7 +108,9 @@
       {typeof $currentInfoSensor.mapTitleText === 'function' ? $currentInfoSensor.mapTitleText($signalCasesOrDeathOptions) : $currentInfoSensor.mapTitleText}
     </h2>
     <div>
-      {@html $currentInfoSensor.longDescription ?? 'No description available'}
+      <p>
+        {@html $currentInfoSensor.longDescription ?? 'No description available'}
+      </p>
     </div>
     <ul class="links">
       {#each $currentInfoSensor.links as link}

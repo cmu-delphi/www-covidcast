@@ -50,6 +50,10 @@
   table {
     margin: 0;
   }
+
+  .tooltip {
+    pointer-events: none;
+  }
 </style>
 
 <div aria-label="tooltip" class="tooltip">
@@ -125,19 +129,6 @@
               class="right"
               style={options.cumulative && options.ratio ? colorScaleStyle(properties.countRatioCumulative) : ''}>
               {$currentSensorEntry.formatValue(properties.countRatioCumulative)}
-            </td>
-          </tr>
-          <tr>
-            <th>Cumulative 7-day avg</th>
-            <td
-              class="right"
-              style={options.cumulative && !options.ratio ? colorScaleStyle(properties.avgCumulative) : ''}>
-              {$currentSensorEntry.formatValue(properties.avgCumulative)}
-            </td>
-            <td
-              class="right"
-              style={options.cumulative && options.ratio ? colorScaleStyle(properties.avgRatioCumulative) : ''}>
-              {$currentSensorEntry.formatValue(properties.avgRatioCumulative)}
             </td>
           </tr>
         {:else}

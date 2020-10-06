@@ -24,7 +24,6 @@
   import USMapBoxWrapper from '../../components/MapBox/USMapBoxWrapper';
   import { onMount } from 'svelte';
   import MapOverlays from '../../components/MapOverlays.svelte';
-  import ModeNav from '../../components/ModeNav.svelte';
   /**
    * @type {MapBox}
    */
@@ -221,6 +220,7 @@
   .root > :global(.player-container) {
     grid-area: player;
     z-index: 1003;
+    margin: 0.3em;
   }
 
   .map-container {
@@ -246,7 +246,6 @@
   }
 </style>
 
-<ModeNav />
 <main class="root">
   <Options showDate={false} className="options-container" />
   <Player
@@ -258,9 +257,7 @@
     min={minDate}
     on:change={(e) => jumpToDate(e.detail)} />
   <div class="map-container">
-    <MapOverlays {map} mapLoading={running || loading} legendLoading={false} {zoom}>
-      <div slot="title" />
-    </MapOverlays>
+    <MapOverlays {map} mapLoading={running || loading} legendLoading={false} {zoom} showDate />
     <MapBox
       bind:this={map}
       on:loading={(e) => {
