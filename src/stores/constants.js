@@ -403,6 +403,31 @@ const defaultSensors = [
   },
   {
     type: 'late',
+    name: 'TEST - COVID Antigen Test Positivity (Quidel)',
+    longDescription:
+      // prettier-ignore
+      `When a patient (whether at a doctor’s office, clinic, or hospital) has COVID-like symptoms, doctors may order an antigen test, which can detect parts of the virus that are present during an active infection. Quidel, a national provider of networked lab testing devices, provides us with data from every COVID antigen test that they conduct. We report the percentage of COVID antigen tests that are positive. Note that this signal only includes Quidel’s antigen tests, not those run by other test providers.`,
+    links: [
+      {
+        alt: 'Technical description',
+        href: 'https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/quidel.html#covid-19-tests',
+      },
+    ],
+    id: 'quidel-staging',
+    signal: 'covid_ag_smoothed_pct_positive',
+    levels: ['state', 'msa', 'hrr'],
+    tooltipText:
+      // prettier-ignore
+      'Positivity rate of COVID-19 antigen tests, based on data provided by Quidel, Inc.',
+    mapTitleText:
+      // prettier-ignore
+      'Positivity rate of COVID-19 antigen tests',
+    yAxis: 'Percentage',
+    format: 'percent',
+    hasStdErr: true,
+  },
+  {
+    type: 'late',
     name: 'COVID Hospital Admissions',
     longDescription:
       // prettier-ignore
