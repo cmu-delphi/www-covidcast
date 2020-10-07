@@ -11,6 +11,7 @@ const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const pkg = require('./package.json');
 
 const devMode = process.env.NODE_ENV !== 'production';
+const hmr = devMode;
 
 module.exports = () => {
   return {
@@ -62,7 +63,7 @@ module.exports = () => {
         },
         {
           test: /\.svelte$/,
-          use: devMode
+          use: hmr
             ? [
                 {
                   loader: 'svelte-loader-hot',
@@ -78,6 +79,7 @@ module.exports = () => {
                 {
                   loader: 'svelte-loader',
                   options: {
+                    dev: devMode,
                     emitCss: true,
                   },
                 },
@@ -89,7 +91,7 @@ module.exports = () => {
             {
               loader: MiniCssExtractPlugin.loader,
               options: {
-                hmr: devMode,
+                hmr,
                 esModule: false,
               },
             },
@@ -119,7 +121,7 @@ module.exports = () => {
       contentBasePublicPath: ['/', '/assets'],
       watchContentBase: true,
       host: 'localhost',
-      hot: true,
+      hot: hmr,
     },
 
     plugins: [
