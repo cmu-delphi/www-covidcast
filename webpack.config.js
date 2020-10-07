@@ -55,24 +55,33 @@ module.exports = () => {
 
     module: {
       rules: [
-        {
+        !devMode && {
           test: /\.m?js$/,
           exclude: /node_modules\/(?!svelte)/,
           use: ['babel-loader'],
         },
         {
           test: /\.svelte$/,
-          use: [
-            'babel-loader',
-            {
-              loader: 'svelte-loader',
-              options: {
-                dev: devMode,
-                hotReload: false,
-                emitCss: true,
-              },
-            },
-          ],
+          use: devMode
+            ? [
+                {
+                  loader: 'svelte-loader-hot',
+                  options: {
+                    dev: true,
+                    hotReload: true,
+                    emitCss: false,
+                  },
+                },
+              ]
+            : [
+                'babel-loader',
+                {
+                  loader: 'svelte-loader',
+                  options: {
+                    emitCss: true,
+                  },
+                },
+              ],
         },
         {
           test: /\.css$/,
@@ -80,7 +89,7 @@ module.exports = () => {
             {
               loader: MiniCssExtractPlugin.loader,
               options: {
-                hmr: false,
+                hmr: devMode,
                 esModule: false,
               },
             },
@@ -102,14 +111,15 @@ module.exports = () => {
           test: /\.(txt|csv|tsv)$/i,
           use: 'raw-loader',
         },
-      ],
+      ].filter(Boolean),
     },
 
     devServer: {
-      contentBase: path.join(__dirname, 'public'),
+      contentBase: [path.join(__dirname, 'public'), path.join(__dirname, 'src/assets')],
+      contentBasePublicPath: ['/', '/assets'],
       watchContentBase: true,
       host: 'localhost',
-      hot: false,
+      hot: true,
     },
 
     plugins: [
