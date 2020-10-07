@@ -60,6 +60,15 @@
     }
     return a < b ? a : b;
   }
+  function maxDate(a, b) {
+    if (!a) {
+      return b;
+    }
+    if (!b) {
+      return a;
+    }
+    return a > b ? a : b;
+  }
   /**
    * @type {Map<string, {name: string, tooltipText: string}>}
    */
@@ -269,7 +278,7 @@
       -
       <Datepicker
         bind:selected={endDate}
-        start={minDate(startDate, source ? source.minTime : new Date())}
+        start={maxDate(startDate, source ? source.minTime : new Date())}
         end={source ? source.maxTime : new Date()}
         formattedSelected={iso(endDate)}>
         <button aria-label="selected end date" class="pg-button" on:>{iso(endDate)}</button>
