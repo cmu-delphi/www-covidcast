@@ -29,6 +29,12 @@ const modes = [
     component: () => import(/* webpackPrefetch: true */ './top10/Top10.svelte').then((r) => r.default),
   },
   {
+    id: 'single',
+    label: 'Single Location',
+    tooltip: 'Switch to Single Location View',
+    component: () => import('./single/SingleLocation.svelte').then((r) => r.default),
+  },
+  {
     id: 'export',
     label: 'Export Data',
     tooltip: 'Switch to Export Data Mode',
