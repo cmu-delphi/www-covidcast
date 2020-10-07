@@ -175,6 +175,7 @@
 
   .group {
     display: flex;
+    flex-wrap: wrap;
   }
 
   button {
@@ -188,6 +189,8 @@
   pre {
     padding: 0.2em;
     background: #efefef;
+    overflow: auto;
+    white-space: pre;
   }
 
   .description {
@@ -206,6 +209,12 @@
 
   .buttons > button {
     min-width: 5em;
+  }
+
+  @media only screen and (max-width: 710px) {
+    .block {
+      width: 100%;
+    }
   }
 </style>
 
