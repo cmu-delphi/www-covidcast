@@ -40,6 +40,16 @@
       geoType = Array.from(source.levels)[0];
     }
   }
+
+  function minDate(a, b) {
+    if (!a) {
+      return b;
+    }
+    if (!b) {
+      return a;
+    }
+    return a < b ? a : b;
+  }
   /**
    * @type {Map<string, {name: string, tooltipText: string}>}
    */
@@ -190,11 +200,10 @@
 </style>
 
 <div class="root" class:loading>
-  <h4>Export Data</h4>
   <p>
-    All signals displayed on the COVIDcast map, and numerous other signals, are freely available for download here. You
-    can also access the latest daily through the <a
-      href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a>.
+    All signals displayed on the COVIDcast map are freely available for download here. You can also access the latest
+    daily through the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a> which also
+    includes numerous other signals.
   </p>
   <section>
     <h5>1. Select Signal</h5>
@@ -234,14 +243,14 @@
       <Datepicker
         bind:selected={startDate}
         start={source ? source.minTime : new Date()}
-        end={source ? source.maxTime : new Date()}
+        end={minDate(endDate, source ? source.maxTime : new Date())}
         formattedSelected={iso(startDate)}>
         <button aria-label="selected start date" class="pg-button" on:>{iso(startDate)}</button>
       </Datepicker>
       -
       <Datepicker
         bind:selected={endDate}
-        start={source ? source.minTime : new Date()}
+        start={minDate(startDate, source ? source.minTime : new Date())}
         end={source ? source.maxTime : new Date()}
         formattedSelected={iso(endDate)}>
         <button aria-label="selected end date" class="pg-button" on:>{iso(endDate)}</button>
