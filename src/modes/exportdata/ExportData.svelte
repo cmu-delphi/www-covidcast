@@ -12,6 +12,16 @@
   const CSV_SERVER = 'https://delphi.cmu.edu/csv';
   const iso = timeFormat('%Y-%m-%d');
 
+  const sourceNameLookup = {
+    'doctor-visits': 'COVID-Related Doctor Visits',
+    'fb-survey': 'Facebook Survey Results',
+    ght: 'Google Search Trends',
+    'hospital-admissions': 'Hospital Admissions',
+    'indicator-combination': 'Delphi Data Sources',
+    quidel: 'Quidel Antigen Tests',
+    safegraph: 'SafeGraph Mobility Data',
+  };
+
   let loading = true;
   /**
    * @type {{id: string, name: string, levels: Set<string>, minTime: Date, maxTime: Date, signals: {id: string, name: string, description: string}[]}[]}
@@ -99,7 +109,7 @@
       if (!data.has(dataSource)) {
         data.set(dataSource, {
           id: dataSource,
-          name: dataSource,
+          name: sourceNameLookup[dataSource] || dataSource,
           levels: new Set(),
           minTime: parseAPITime(entry.min_time),
           maxTime: parseAPITime(entry.max_time),
