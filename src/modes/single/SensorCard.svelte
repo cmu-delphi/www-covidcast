@@ -7,7 +7,10 @@
   import { MAP_THEME } from '../../theme';
   import VegaTooltip from '../../components/DetailView/VegaTooltip.svelte';
   import Vega from '../../components/Vega.svelte';
+  import { timeFormat } from 'd3-time-format';
+  import { formatAPITime, parseAPITime } from '../../data';
 
+  const formatLocal = timeFormat('%x');
   /**
    * @type {import("../../stores/constants").SensorEntry}
    */
@@ -25,6 +28,8 @@
   export let onHighlight;
   export let highlightTimeValue;
 
+  $: highlightDate = highlightTimeValue != null ? parseAPITime(highlightTimeValue) : null;
+
   $: isMegaRegion = Boolean(region) && region.level === levelMegaCounty.id;
   $: noDataText =
     region != null ? (isMegaRegion ? `Please select a county` : 'No data available') : 'No location selected';
@@ -41,6 +46,9 @@
     }
   }
 
+  /**
+   * @type {Promise<import('../../data').EpiDataRow[]> | import('../../data').EpiDataRow[]}
+   */
   $: data =
     region && !isMegaRegion
       ? fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false, {
@@ -59,6 +67,19 @@
     startDay,
     endDay,
   ]);
+
+  /**
+   * @type {number | null}
+   */
+  let value = null;
+
+  $: {
+    const keyDate = formatAPITime(highlightDate ? highlightDate : date);
+    Promise.resolve(data).then((rows) => {
+      const row = rows.find((d) => String(d.time_value) === keyDate);
+      value = row ? row.value : null;
+    });
+  }
 
   let loading = false;
 </script>
@@ -104,6 +125,15 @@
   .info {
     font-size: 0.6rem;
   }
+
+  .key {
+    padding: 0.5em;
+  }
+
+  .key-fact {
+    font-weight: bold;
+    font-size: 120%;
+  }
 </style>
 
 <section class="card container-bg container-style" class:loading>
@@ -119,6 +149,10 @@
           }}><IoMdHelp /></button>
       {/if}
     </div>
+  </div>
+  <div class="key">
+    <span class="key-fact">{value != null ? sensor.formatValue(value) : '?'}</span>
+    <span class="hint">on {formatLocal(highlightDate ? highlightDate : date)}</span>
   </div>
   <main class="vega-wrapper">
     <Vega
