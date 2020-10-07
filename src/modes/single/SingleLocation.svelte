@@ -43,7 +43,7 @@
     position: relative;
   }
 
-  .grid {
+  .card-grid {
     position: absolute;
     left: 0;
     right: 0;
@@ -52,10 +52,18 @@
 
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
   }
 
-  .grid > :global(*) {
+  .card-grid > :global(*) {
     width: 30em;
+  }
+
+  /** mobile **/
+  @media only screen and (max-width: 60em) {
+    .card-grid > :global(*) {
+      width: 50em;
+    }
   }
 
   /** mobile **/
@@ -64,10 +72,10 @@
       align-self: stretch;
       width: unset;
     }
-    .grid {
+    .card-grid {
       display: block;
     }
-    .grid > :global(*) {
+    .card-grid > :global(*) {
       width: unset;
     }
   }
@@ -84,7 +92,7 @@
     on:change={(e) => selectByInfo(e.detail)} />
 
   <div class="grid-wrapper">
-    <div class="grid">
+    <div class="card-grid">
       {#each sensorList as sensor}
         <SensorCard {sensor} date={$currentDateObject} region={$currentRegionInfo} {onHighlight} {highlightTimeValue} />
       {/each}
