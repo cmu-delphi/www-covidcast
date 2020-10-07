@@ -201,6 +201,10 @@ const USAFacts =
   '<a href="https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/" target="_blank" rel="noopener noreferrer">USAFacts</a>';
 
 /**
+ * defines the geo types / levels that are should be used for computing the meta data, the first one has the highest priority and so on
+ */
+export const regularSignalMetaDataGeoTypeCandidates = ['county', 'msa'];
+/**
  * Tooltip/Map Titles and long descriptions should be synced with
  * https://docs.google.com/document/d/1kDqRg8EaI4WQXMaUUbbCGPlsUqEql8kgXCNt6AvMA9I/edit#
  */

@@ -1,5 +1,12 @@
 import { times, currentDate, stats, currentSensor, currentLevel, MAGIC_START_DATE } from '../stores';
-import { sensorList, sensorMap, levels, swpaLevels, yesterday } from '../stores/constants';
+import {
+  sensorList,
+  sensorMap,
+  levels,
+  swpaLevels,
+  yesterday,
+  regularSignalMetaDataGeoTypeCandidates,
+} from '../stores/constants';
 import { get } from 'svelte/store';
 import { callMetaAPI } from './api';
 
@@ -65,9 +72,18 @@ function updateStatsMap(key, matchedMeta, statsMap) {
  * @param {import('./fetchData').SensorEntry} sEntry
  */
 function loadRegularSignal(sEntry, meta, timeMap, statsMap) {
-  const matchedMeta = meta.epidata.find(
-    (d) => d.data_source === sEntry.id && d.signal === sEntry.signal && (!d.time_type || d.time_type === 'day'),
-  );
+  // find the matching meta data by looping through the candidates and fallback to the first one
+  const baseFilter = (d) =>
+    d.data_source === sEntry.id && d.signal === sEntry.signal && (!d.time_type || d.time_type === 'day');
+  const candidates = regularSignalMetaDataGeoTypeCandidates.slice();
+  let matchedMeta = null;
+  while (!matchedMeta && candidates.length > 0) {
+    const geoType = candidates.shift();
+    matchedMeta = meta.epidata.find((d) => baseFilter(d) && d.geo_type === geoType);
+  }
+  if (!matchedMeta) {
+    matchedMeta = meta.epidata.find(baseFilter);
+  }
 
   if (matchedMeta) {
     updateTimeMap(sEntry.key, matchedMeta, timeMap);
