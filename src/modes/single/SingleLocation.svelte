@@ -37,15 +37,6 @@
     align-self: center;
     width: 30em;
   }
-
-  /** mobile **/
-  @media only screen and (max-width: 40em) {
-    .root :global(.search-container) {
-      align-self: stretch;
-      width: unset;
-    }
-  }
-
   .grid-wrapper {
     flex: 1 1 0;
     overflow: auto;
@@ -61,6 +52,24 @@
 
     display: flex;
     flex-wrap: wrap;
+  }
+
+  .grid > :global(*) {
+    width: 30em;
+  }
+
+  /** mobile **/
+  @media only screen and (max-width: 40em) {
+    .root :global(.search-container) {
+      align-self: stretch;
+      width: unset;
+    }
+    .grid {
+      display: block;
+    }
+    .grid > :global(*) {
+      width: unset;
+    }
   }
 </style>
 

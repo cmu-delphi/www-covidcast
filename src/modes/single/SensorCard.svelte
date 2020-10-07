@@ -87,7 +87,6 @@
 <style>
   .card {
     margin: 0.5em;
-    width: 30em;
     display: flex;
     flex-direction: column;
     align-items: center;
