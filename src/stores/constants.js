@@ -406,7 +406,7 @@ const defaultSensors = [
     name: 'COVID Hospital Admissions',
     longDescription:
       // prettier-ignore
-      `Delphi receives from our health system partners aggregated statistics on COVID-related hospital admissions, derived from ICD codes found in insurance claims and other medical records. Using this data, we estimate the percentage of new hospital admissions each day that are related to COVID-19. Note that these estimates are based only on admissions by patients whose data is accessible to our partners, and address new hospital admissions each day, not all currently hospitalized patients who have COVID-related diagnoses.`,
+      `Delphi receives from our health system partners aggregated statistics on COVID-related hospital admissions, derived from ICD codes found in insurance claims. Using this data, we estimate the percentage of new hospital admissions each day that are related to COVID-19. Note that these estimates are based only on admissions by patients whose data is accessible to our partners, and address new hospital admissions each day, not all currently hospitalized patients who have COVID-related diagnoses.`,
     links: [
       {
         alt: 'Technical description',
@@ -414,7 +414,7 @@ const defaultSensors = [
       },
     ],
     id: 'hospital-admissions',
-    signal: 'smoothed_adj_covid19',
+    signal: 'smoothed_adj_covid19_from_claims',
     levels: ['county', 'msa', 'state'],
     mapTitleText:
       // prettier-ignore
