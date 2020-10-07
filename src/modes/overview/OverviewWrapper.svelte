@@ -21,6 +21,7 @@
     signalCasesOrDeathOptions,
     isMobileDevice,
     currentCompareSelection,
+    currentSensorMapTitle,
   } from '../../stores';
   import Search from '../../components/Search.svelte';
   import SmallMultiplesPanel from './SmallMultiplesPanel.svelte';
@@ -308,7 +309,8 @@
           }
         }
       }}
-      {wrapperClass} />
+      {wrapperClass}
+      title={$currentSensorMapTitle} />
 
     {#if detailSensor != null && !$isMobileDevice && desktopShowPanel}
       <div class="detail-container container-bg container-style">
