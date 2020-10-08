@@ -259,7 +259,7 @@ export const isMobileDevice = readable(false, (set) => {
 
 /**
  * @typedef {object} CompareSelection
- * @property {NameInfo} info
+ * @property {import('../maps').NameInfo} info
  * @property {string} color
  * @property {string} displayName;
  */
@@ -278,7 +278,7 @@ export const currentCompareSelection = writable(null, (set) => {
 
 /**
  * add an element to the compare selection
- * @param {NameInfo} info
+ * @param {import('../maps').NameInfo} info
  */
 export function addCompare(info) {
   if (!get(currentRegionInfo)) {

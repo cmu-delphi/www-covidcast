@@ -42,15 +42,17 @@
   $: sensorWithData = prepareSensorData(sensor, selections, startDay, endDay);
 
   /**
-   * @type {number | null}
+   * @type {(number | null)[]}
    */
-  let value = null;
+  let values = selections.map(() => null);
 
   $: {
     const keyDate = formatAPITime(highlightDate ? highlightDate : date);
     Promise.resolve(sensorWithData.data).then((rows) => {
-      const row = rows.find((d) => String(d.time_value) === keyDate);
-      value = row ? row.value : null;
+      values = selections.map((region) => {
+        const row = rows.find((d) => String(d.time_value) === keyDate && d.geo_value === region.info.propertyId);
+        return row ? row.value : null;
+      });
     });
   }
 </script>
@@ -97,12 +99,18 @@
   }
 
   .key {
+    margin: 0;
     padding: 0.5em;
+    border: none;
   }
 
   .key-fact {
     font-weight: bold;
     font-size: 120%;
+  }
+
+  .hint {
+    vertical-align: middle;
   }
 </style>
 
@@ -120,10 +128,26 @@
       {/if}
     </div>
   </div>
-  <div class="key">
-    <span class="key-fact">{value != null ? sensor.formatValue(value) : '?'}</span>
-    <span class="hint">on {formatLocal(highlightDate ? highlightDate : date)}</span>
-  </div>
+  {#if values.length <= 1}
+    <div class="key">
+      <span class="key-fact">{values[0] != null ? sensor.formatValue(values[0]) : '?'}</span>
+      <span class="hint">on {formatLocal(highlightDate ? highlightDate : date)}</span>
+    </div>
+  {:else}
+    <table class="key">
+      <tbody>
+        {#each selections as selection, i}
+          <tr>
+            <td>{selection.displayName}</td>
+            <td class="key-fact">{values[i] != null ? sensor.formatValue(values[i]) : '?'}</td>
+            {#if i === 0}
+              <td class="hint" rowspan={selections.length}>on {formatLocal(highlightDate ? highlightDate : date)}</td>
+            {/if}
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  {/if}
   <main class="vega-wrapper">
     <Vega
       data={sensorWithData.data}

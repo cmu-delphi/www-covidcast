@@ -178,6 +178,9 @@
       },
     });
     vegaPromise.then((r) => {
+      if (!root) {
+        return;
+      }
       vega = r;
       root.setAttribute('role', 'figure');
       signalListeners.forEach((signal) => {

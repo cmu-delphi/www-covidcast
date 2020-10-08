@@ -76,7 +76,7 @@ export function resolveHighlightedTimeValue(e) {
     return null;
   }
   const row = e.detail.view.data('data_0').find((d) => d._vgsid_ === id);
-  row ? row.time_value : null;
+  return row ? row.time_value : null;
 }
 
 export function resolveClickedTimeValue(e) {
