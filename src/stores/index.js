@@ -257,15 +257,22 @@ export const isMobileDevice = readable(false, (set) => {
 
 // overview compare mode
 
+/**
+ * @typedef {object} CompareSelection
+ * @property {NameInfo} info
+ * @property {string} color
+ * @property {string} displayName;
+ */
+
 // null = disable
 // []
 /**
- * @type {import('svelte/store').Writable<{info: NameInfo, color: string}[] | null>}
+ * @type {import('svelte/store').Writable<CompareSelection[] | null>}
  * */
 export const currentCompareSelection = writable(null, (set) => {
   const ids = (urlParams.get('compare') || '').split(',').map(getInfoByName).filter(Boolean);
   if (ids.length > 0) {
-    set(ids.map((info, i) => ({ info, color: selectionColors[i] || 'grey' })));
+    set(ids.map((info, i) => ({ info, displayName: info.displayName, color: selectionColors[i] || 'grey' })));
   }
 });
 
@@ -284,6 +291,7 @@ export function addCompare(info) {
     ...current,
     {
       info,
+      displayName: info.displayName,
       color: selectionColors[current.length] || 'grey',
     },
   ]);
@@ -307,10 +315,15 @@ export function removeCompare(info) {
 }
 
 /**
- * @type {import('svelte/store').Readable<{info: import('../maps').NameInfo, color: string}[]>}
+ * @type {import('svelte/store').Readable<CompareSelection[]>}
  */
-export const currentSelection = derived([currentRegionInfo, currentCompareSelection], ([selection, compareSelection]) =>
-  [selection && { info: selection, color: MAP_THEME.selectedRegionOutline }, compareSelection || []]
-    .filter(Boolean)
-    .flat(),
+export const currentMultiSelection = derived(
+  [currentRegionInfo, currentCompareSelection],
+  ([selection, compareSelection]) =>
+    [
+      selection && { info: selection, color: MAP_THEME.selectedRegionOutline, displayName: selection.displayName },
+      compareSelection || [],
+    ]
+      .filter(Boolean)
+      .flat(),
 );

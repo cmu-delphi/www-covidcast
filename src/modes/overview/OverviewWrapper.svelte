@@ -21,7 +21,7 @@
     signalCasesOrDeathOptions,
     isMobileDevice,
     currentCompareSelection,
-    currentSelection,
+    currentMultiSelection,
     addCompare,
     removeCompare,
   } from '../../stores';
@@ -88,7 +88,7 @@
 
   $: showCompare = $currentCompareSelection != null;
 
-  $: selections = $currentSelection;
+  $: selections = $currentMultiSelection;
 </script>
 
 <style>
