@@ -17,6 +17,7 @@
     }
     return labelFieldName ? item[labelFieldName] : item;
   };
+  export let colorFieldName = undefined;
 
   export let selectFirstIfEmpty = false;
 
@@ -37,14 +38,33 @@
 
   // selected item state
   export let selectedItem = undefined;
-  export let value = undefined;
+  /**
+   * @type {any[]}
+   */
+  export let selectedItems = [];
+  $: multiple = selectedItems.length > 0;
+  export let maxSelections = Number.POSITIVE_INFINITY;
+
   let text;
   let filteredTextLength = 0;
 
   function onSelectedItemChanged() {
-    value = selectedItem;
     text = labelFunction(selectedItem);
-    dispatch('change', selectedItem);
+
+    if (multiple) {
+      if (selectedItem) {
+        dispatch('add', selectedItem);
+      }
+      // reset just temporary
+      selectedItem = null;
+      text = '';
+    } else {
+      dispatch('change', selectedItem);
+    }
+  }
+
+  function removeItem(item) {
+    dispatch('remove', item);
   }
 
   $: selectedItem, onSelectedItemChanged();
@@ -63,14 +83,16 @@
   // view model
   let filteredListItems;
 
-  $: listItems = items.map((item) => ({
-    // keywords representation of the item
-    keywords: labelFunction(item).toLowerCase().trim(),
-    // item label
-    label: labelFunction(item),
-    // store reference to the origial item
-    item,
-  }));
+  $: listItems = items
+    .map((item) => ({
+      // keywords representation of the item
+      keywords: labelFunction(item).toLowerCase().trim(),
+      // item label
+      label: labelFunction(item),
+      // store reference to the origial item
+      item,
+    }))
+    .filter((d) => selectedItems.every((s) => d.label !== labelFunction(s)));
 
   function prepareUserEnteredText(userEnteredText) {
     if (userEnteredText === undefined || userEnteredText === null) {
@@ -370,6 +392,22 @@
   .reset-button {
     z-index: 1;
   }
+
+  .search-tags {
+    font: inherit;
+    color: #333;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .search-tag {
+    padding: 1px;
+    margin: 0 1px;
+    border: 2px solid #999;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+  }
 </style>
 
 <div
@@ -380,28 +418,45 @@
   <button class="search-button" on:click={focusSearch} title="Show Search Field" aria-label="Show Search Field">
     <IoIosSearch />
   </button>
-  <input
-    class="autocomplete-input"
-    {placeholder}
-    {name}
-    {disabled}
-    {title}
-    aria-label={placeholder}
-    bind:this={input}
-    bind:value={text}
-    on:input={onInput}
-    on:focus={onFocus}
-    on:keydown={onKeyDown}
-    on:click={onInputClick}
-    on:keypress={onKeyPress} />
-  <button
-    class="search-button reset-button"
-    class:hidden={!text}
-    on:click={onResetItem}
-    title="Clear Search Field"
-    aria-label="Clear Search Field">
-    <IoIosClose />
-  </button>
+  {#if multiple}
+    <div class="search-tags">
+      {#each selectedItems as selectedItem}
+        <div class="search-tag" style="border-color: {colorFieldName ? selectedItem[colorFieldName] : undefined}">
+          <span>{labelFunction(selectedItem)}</span>
+          <button
+            class="search-button reset-button"
+            on:click={() => removeItem(selectedItem)}
+            title="Remove selectecd item">
+            <IoIosClose />
+          </button>
+        </div>
+      {/each}
+    </div>
+  {/if}
+  {#if !multiple || selectedItems.length < maxSelections}
+    <input
+      class="autocomplete-input"
+      {placeholder}
+      {name}
+      {disabled}
+      {title}
+      aria-label={placeholder}
+      bind:this={input}
+      bind:value={text}
+      on:input={onInput}
+      on:focus={onFocus}
+      on:keydown={onKeyDown}
+      on:click={onInputClick}
+      on:keypress={onKeyPress} />
+    <button
+      class="search-button reset-button"
+      class:hidden={!text}
+      on:click={onResetItem}
+      title="Clear Search Field"
+      aria-label="Clear Search Field">
+      <IoIosClose />
+    </button>
+  {/if}
   <div class="autocomplete-list" class:hidden={!opened} bind:this={list}>
     {#if filteredListItems && filteredListItems.length > 0}
       {#each filteredListItems as listItem, i}
