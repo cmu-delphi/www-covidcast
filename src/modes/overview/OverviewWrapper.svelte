@@ -21,6 +21,9 @@
     signalCasesOrDeathOptions,
     isMobileDevice,
     currentCompareSelection,
+    currentSelection,
+    addCompare,
+    removeCompare,
   } from '../../stores';
   import Search from '../../components/Search.svelte';
   import SmallMultiplesPanel from './SmallMultiplesPanel.svelte';
@@ -28,11 +31,9 @@
   import DetailView from '../../components/DetailView/DetailView.svelte';
   import MapOverlays from '../../components/MapOverlays.svelte';
   import { trackEvent } from '../../stores/ga';
-
-  // import { modeByID } from '..';
-  import { MAP_THEME, selectionColors } from '../../theme';
   import AddAnother from './AddAnother.svelte';
   import { getInfoByName } from '../../maps';
+
   export let wrapperClass;
   export let regionSearchList;
   export let levelList;
@@ -87,39 +88,7 @@
 
   $: showCompare = $currentCompareSelection != null;
 
-  $: selections = [
-    $currentRegionInfo && { info: $currentRegionInfo, color: MAP_THEME.selectedRegionOutline },
-    showCompare && $currentCompareSelection,
-  ]
-    .filter(Boolean)
-    .flat();
-
-  function addCompare(info) {
-    if (!$currentRegionInfo) {
-      selectByInfo(info);
-      return;
-    }
-
-    $currentCompareSelection = [
-      ...$currentCompareSelection,
-      {
-        info,
-        color: selectionColors[$currentCompareSelection.length] || 'grey',
-      },
-    ];
-  }
-
-  function removeCompare(info) {
-    const bak = $currentCompareSelection.slice();
-    if ($currentRegionInfo && info.id === $currentRegionInfo.id) {
-      selectByInfo(bak.length === 0 ? null : bak[0].info);
-      $currentCompareSelection = bak.slice(1).map((old, i) => ({ ...old, color: selectionColors[i] || 'grey' }));
-      return;
-    }
-    $currentCompareSelection = $currentCompareSelection
-      .filter((d) => d.info !== info)
-      .map((old, i) => ({ ...old, color: selectionColors[i] || 'grey' }));
-  }
+  $: selections = $currentSelection;
 </script>
 
 <style>

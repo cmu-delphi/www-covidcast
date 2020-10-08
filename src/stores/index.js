@@ -17,7 +17,7 @@ export {
   groupedSensorList,
 } from './constants';
 import { timeMonth } from 'd3-time';
-import { selectionColors } from '../theme';
+import { MAP_THEME, selectionColors } from '../theme';
 
 /**
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
@@ -268,3 +268,49 @@ export const currentCompareSelection = writable(null, (set) => {
     set(ids.map((info, i) => ({ info, color: selectionColors[i] || 'grey' })));
   }
 });
+
+/**
+ * add an element to the compare selection
+ * @param {NameInfo} info
+ */
+export function addCompare(info) {
+  if (!get(currentRegionInfo)) {
+    selectByInfo(info);
+    return;
+  }
+
+  const current = get(currentCompareSelection);
+  currentCompareSelection.set([
+    ...current,
+    {
+      info,
+      color: selectionColors[current.length] || 'grey',
+    },
+  ]);
+}
+
+/**
+ * removes an element from the compare selection
+ * @param {import('../maps').NameInfo} info
+ */
+export function removeCompare(info) {
+  const selection = get(currentRegionInfo);
+  const bak = (get(currentCompareSelection) || []).slice();
+  if (selection && info.id === selection.id) {
+    selectByInfo(bak.length === 0 ? null : bak[0].info);
+    currentCompareSelection.set(bak.slice(1).map((old, i) => ({ ...old, color: selectionColors[i] || 'grey' })));
+    return;
+  }
+  currentCompareSelection.set(
+    bak.filter((d) => d.info !== info).map((old, i) => ({ ...old, color: selectionColors[i] || 'grey' })),
+  );
+}
+
+/**
+ * @type {import('svelte/store').Readable<{info: import('../maps').NameInfo, color: string}[]>}
+ */
+export const currentSelection = derived([currentRegionInfo, currentCompareSelection], ([selection, compareSelection]) =>
+  [selection && { info: selection, color: MAP_THEME.selectedRegionOutline }, compareSelection || []]
+    .filter(Boolean)
+    .flat(),
+);
