@@ -1,5 +1,6 @@
 :root {
   --red: #c00;
+  --lightgrey: #c6c6c6;
   --grey: #767676;
   --darkgrey: #333;
   --bg: #f7f7f7;
@@ -49,14 +50,17 @@ button.mapboxgl-popup-close-button {
   color: var(--grey);
 }
 
-#vizbox input:focus,
-#vizbox button:focus,
-#vizbox select:focus {
-  outline: var(--red) 1px solid;
-  box-shadow: 0 0 0 4px #fff !important;
-  /* border: solid 1px var(--red) !important; */
+#vizbox button:focus {
+  border: 0;
   z-index: 10000;
-  background-color: unset;
+  background-color: var(--lightgrey);
+}
+
+#vizbox input:focus,
+#vizbox select:focus {
+  z-index: 10000;
+  background-color: var(--lightgrey);
+  box-shadow: 0 2px var(--grey);
 }
 
 .mapboxgl-canvas:focus {
@@ -65,6 +69,11 @@ button.mapboxgl-popup-close-button {
 
 .map-popup {
   z-index: 10000;
+  pointer-events: none;
+}
+
+.map-popup > * {
+  pointer-events: none;
 }
 
 .map-popup .mapboxgl-popup-content {
@@ -84,7 +93,6 @@ button.mapboxgl-popup-close-button {
 
 .mapboxgl-ctrl.mapboxgl-ctrl-group {
   outline: none;
-  /* border: none; */
   border-radius: 3px;
 }
 

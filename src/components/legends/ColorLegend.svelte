@@ -25,9 +25,18 @@
 <style>
   ul {
     margin: 0;
-    padding: 0 2em 0 0;
+    margin-right: 2em;
+    padding: 0 0 0 0;
     display: flex;
-    font-size: 80%;
+    width: 48vw;
+    max-width: 536px;
+    font-size: 0.72em;
+  }
+
+  @media only screen and (max-width: 767px) {
+    ul {
+      width: auto;
+    }
   }
 
   .tick {
@@ -44,7 +53,7 @@
   }
 
   .tick-last {
-    flex: 1 1 0;
+    flex: 0.5;
   }
 
   .tick::after {

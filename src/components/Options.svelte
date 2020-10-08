@@ -18,11 +18,7 @@
   export let levels = levelList;
   export let className = '';
   export let showDate = true;
-  // let selectedDate = writable(parseTime($currentDate));
   $: selectedDate = parseAPITime($currentDate);
-  // if ($currentDate !== MAGIC_START_DATE) {
-  //   selectedDate = parseTime($currentDate);
-  // }
   $: start_end_dates = [];
 
   $: if (selectedDate !== undefined) {
@@ -44,14 +40,14 @@
   .options {
     position: relative;
     display: flex;
-    max-width: 50em;
-    margin: 0 6px;
+    margin: 0.3em;
   }
 
   .option-wrapper {
     align-items: center;
     display: flex;
     flex: 1 1 auto;
+    max-width: 390px;
   }
 
   .option-title {
@@ -102,7 +98,7 @@
       max-width: unset;
     }
     .option-wrapper {
-      padding: 0 2px;
+      padding: 0 0.1em;
       display: flex;
       flex-direction: column;
       align-items: stretch;

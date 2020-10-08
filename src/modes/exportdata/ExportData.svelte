@@ -1,6 +1,4 @@
 <script>
-  import modes from '..';
-  import SingleModeToggle from '../../components/SingleModeToggle.svelte';
   import { timeFormat } from 'd3-time-format';
   import { callMetaAPI } from '../../data/api';
   import Datepicker from '../../components/Calendar/Datepicker.svelte';
@@ -36,6 +34,12 @@
     }
   }
 
+  $: {
+    if (source && !source.levels.has(geoType)) {
+      // reset to a valid one
+      geoType = Array.from(source.levels)[0];
+    }
+  }
   /**
    * @type {Map<string, {name: string, tooltipText: string}>}
    */
@@ -122,7 +126,7 @@
     if (form) {
       form.addEventListener('submit', () => {
         trackEvent(
-          'exportdata',
+          'export',
           'download',
           `signal=${signalValue},start_day=${iso(startDate)},end_day=${iso(endDate)},geo_type=${geoType}`,
         );
@@ -260,6 +264,10 @@
   </section>
   <section>
     <h5>3. Get Data</h5>
+    <p>
+      We are happy for you to use this data in products and publications. Please acknowledge us as a source: <cite> Data
+        from Delphi COVIDcast, covidcast.cmu.edu. </cite>
+    </p>
     <div class="buttons">
       <button
         class="pg-button button"
@@ -334,5 +342,4 @@ covidcast_signal(data_source = "${source ? source.id : ''}", signal = "${signal 
       <input type="hidden" name="geo_type" value={geoType} />
     </form>
   </section>
-  <SingleModeToggle mode={modes[0]} label="Back to Visualization" />
 </div>

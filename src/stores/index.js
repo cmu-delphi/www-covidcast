@@ -2,7 +2,7 @@ import { writable, derived, get, readable } from 'svelte/store';
 import { LogScale, SqrtScale } from './scales';
 import { scaleSequentialLog } from 'd3-scale';
 import { defaultSensorId, sensorList, sensorMap, yesterdayDate, levels, swpaLevels } from './constants';
-import modes from '../modes';
+import modes, { modeByID } from '../modes';
 import { parseAPITime } from '../data/utils';
 import { getInfoByName } from '../maps';
 export {
@@ -17,6 +17,7 @@ export {
   groupedSensorList,
 } from './constants';
 import { timeMonth } from 'd3-time';
+import { selectionColors } from '../theme';
 
 /**
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
@@ -33,10 +34,11 @@ export const appReady = writable(false);
 /**
  * @type {import('svelte/store').Writable<import('../routes').Mode>}
  */
-export const currentMode = writable(modes[0], (set) => {
+export const currentMode = writable(modeByID.overview, (set) => {
   const mode = urlParams.get('mode');
-  if (modes.find((d) => d.id === mode)) {
-    set(modes.find((d) => d.id === mode));
+  const nextMode = modes.find((d) => d.id === mode);
+  if (nextMode) {
+    set(nextMode);
   }
 });
 
@@ -147,6 +149,28 @@ export const currentRegion = writable('', (set) => {
 export const currentRegionInfo = derived([currentRegion], ([current]) => getInfoByName(current));
 
 /**
+ * @type {import('svelte/store').Writable<import('../maps').NameInfo[]>}
+ */
+export const recentRegionInfos = writable([]);
+
+// keep track of top 10 recent selections
+currentRegionInfo.subscribe((v) => {
+  if (!v) {
+    return;
+  }
+  const infos = get(recentRegionInfos).slice();
+  const index = infos.indexOf(v);
+  if (index >= 0) {
+    infos.splice(index, 1);
+  }
+  if (infos.length > 10) {
+    infos.shift();
+  }
+  infos.push(v);
+  recentRegionInfos.set(infos);
+});
+
+/**
  *
  * @param {import('../maps/nameIdInfo').NameInfo | null} elem
  */
@@ -218,8 +242,8 @@ currentSensorEntry.subscribe((sensorEntry) => {
 export const isMobileDevice = readable(false, (set) => {
   const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
   set(isMobileQuery.matches);
-  isMobileQuery.addListener((r) => {
-    set(r.matches);
+  isMobileQuery.addEventListener('change', (evt) => {
+    set(evt.matches);
   });
 });
 
@@ -230,3 +254,17 @@ export const isMobileDevice = readable(false, (set) => {
 //     set(r.matches);
 //   });
 // });
+
+// overview compare mode
+
+// null = disable
+// []
+/**
+ * @type {import('svelte/store').Writable<{info: NameInfo, color: string}[] | null>}
+ * */
+export const currentCompareSelection = writable(null, (set) => {
+  const ids = (urlParams.get('compare') || '').split(',').map(getInfoByName).filter(Boolean);
+  if (ids.length > 0) {
+    set(ids.map((info, i) => ({ info, color: selectionColors[i] || 'grey' })));
+  }
+});

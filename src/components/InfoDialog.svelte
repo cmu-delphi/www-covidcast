@@ -1,6 +1,13 @@
 <script>
   import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
-  import { signalCasesOrDeathOptions, currentInfoSensor } from '../stores';
+  import { modeByID } from '../modes';
+  import {
+    signalCasesOrDeathOptions,
+    currentInfoSensor,
+    currentMode,
+    currentSensorEntry,
+    currentSensor,
+  } from '../stores';
 
   let close = null;
 
@@ -21,6 +28,17 @@
       close.focus();
     }
   }
+
+  function exportData(e) {
+    e.preventDefault();
+    // ensure visible sensor is the active one
+    if ($currentSensorEntry.key !== $currentInfoSensor.key) {
+      currentSensor.set($currentInfoSensor.key);
+    }
+    // switch to export mode
+    currentMode.set(modeByID.export);
+    currentInfoSensor.set(null);
+  }
 </script>
 
 <style>
@@ -30,10 +48,12 @@
     left: 50%;
     transform: translate(-50%, -50%);
     border: none;
-    padding: 0.5em 0.5em;
+    padding: 0.5em 1em;
     max-width: 40em;
     z-index: 5000;
     clear: both;
+    border: 1px solid var(--grey);
+    box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.35);
   }
 
   .close {
@@ -70,7 +90,6 @@
   .links a {
     color: rgba(0, 0, 0, 0.65);
     font-weight: 700;
-    margin: 0.15em 0;
   }
 </style>
 
@@ -89,12 +108,17 @@
       {typeof $currentInfoSensor.mapTitleText === 'function' ? $currentInfoSensor.mapTitleText($signalCasesOrDeathOptions) : $currentInfoSensor.mapTitleText}
     </h2>
     <div>
-      {@html $currentInfoSensor.longDescription ?? 'No description available'}
+      <p>
+        {@html $currentInfoSensor.longDescription ?? 'No description available'}
+      </p>
     </div>
     <ul class="links">
       {#each $currentInfoSensor.links as link}
         <li><a href={link.href}>{link.alt}</a></li>
       {/each}
+      <li>
+        <a href={`?mode=${modeByID.export.id}&sensor=${$currentInfoSensor.key}`} on:click={exportData}>Export Data</a>
+      </li>
     </ul>
   </div>
 {/if}

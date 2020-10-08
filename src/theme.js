@@ -37,6 +37,8 @@ export const MAP_THEME = {
   zoneOutline: 'blue', //'#e0e0e0',
 };
 
+export const selectionColors = ['#0F0589', '#16A997', '#A71808', '#CD22B2', '#F58B29'];
+
 export const ENCODING_BUBBLE_THEME = {
   color: 'transparent',
   countyFill: '#eeeeee',

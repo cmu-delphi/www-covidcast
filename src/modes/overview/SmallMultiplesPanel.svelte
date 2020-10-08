@@ -1,21 +1,13 @@
 <script>
-  import {
-    sensorList,
-    currentSensor,
-    currentRegionInfo,
-    smallMultipleTimeSpan,
-    currentDate,
-    currentInfoSensor,
-  } from '../../stores';
+  import { sensorList, currentSensor, smallMultipleTimeSpan, currentDate, currentInfoSensor } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
-  import spec from './SmallMultiplesChart.json';
-  import specStdErr from './SmallMultiplesChartStdErr.json';
   import { trackEvent } from '../../stores/ga';
-  import { merge, throttle } from 'lodash-es';
+  import throttle from 'lodash-es/throttle';
   import { levelList, levelMegaCounty } from '../../stores/constants';
   import SmallMultiple from './SmallMultiple.svelte';
   import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
+  import { createSpec } from './vegaSpec';
 
   /**
    * bi-directional binding
@@ -26,67 +18,6 @@
   export let levels = levelList;
   $: levelIds = new Set(levels.map((l) => l.id));
   $: sensors = sensorList.filter((d) => d.levels.some((l) => levelIds.has(l)));
-
-  const specPercent = {
-    transform: [
-      {
-        calculate: 'datum.value == null ? null : datum.value / 100',
-        as: 'pValue',
-      },
-    ],
-    encoding: {
-      y: {
-        field: 'pValue',
-        axis: {
-          format: '.1%',
-        },
-      },
-    },
-  };
-  const specPercentStdErr = {
-    transform: [
-      {
-        calculate: '(datum.value - datum.stderr) / 100',
-      },
-      {
-        calculate: '(datum.value + datum.stderr) / 100',
-      },
-      {
-        calculate: 'datum.value == null ? null : datum.value / 100',
-        as: 'pValue',
-      },
-    ],
-    encoding: {
-      y: {
-        field: 'pValue',
-        axis: {
-          format: '.1%',
-        },
-      },
-    },
-  };
-
-  /**
-   * @type {import('../../stores/constants').SensorEntry} sensor
-   */
-  function chooseSpec(sensor, min, max) {
-    const time = {
-      encoding: {
-        x: {
-          scale: {
-            domain: [min.getTime(), max.getTime()],
-          },
-        },
-      },
-    };
-
-    return merge(
-      {},
-      sensor.hasStdErr ? specStdErr : spec,
-      time,
-      sensor.format === 'percent' ? (sensor.hasStdErr ? specPercentStdErr : specPercent) : {},
-    );
-  }
 
   // use local variables with manual setting for better value comparison updates
   let startDay = $smallMultipleTimeSpan[0];
@@ -101,18 +32,55 @@
     }
   }
 
-  $: hasRegion = Boolean($currentRegionInfo);
-  $: isMegaRegion = Boolean($currentRegionInfo) && $currentRegionInfo.level === levelMegaCounty.id;
+  function fetchMulti(sensor, selections, startDay, endDay) {
+    return Promise.all(
+      selections.map((s) => {
+        const region = s.info;
+        if (region.level === levelMegaCounty.id) {
+          return [];
+        }
+        return fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false, {
+          geo_value: region.propertyId,
+        })
+          .then(addMissing)
+          .then((rows) =>
+            rows.map((row) => {
+              row.displayName = region.displayName;
+              return row;
+            }),
+          );
+      }),
+    ).then((rows) => rows.flat());
+  }
+
+  /**
+   * @type {{info: import('../../maps').NameInfo, color: string}[]}
+   */
+  export let selections = [];
+  $: region = selections.length > 0 ? selections[0].info : null;
+
+  $: hasRegion = selections.length > 0;
+  $: multi = selections.length > 1;
+
+  $: isMegaRegion = Boolean(region) && region.level === levelMegaCounty.id;
   $: noDataText = hasRegion ? (isMegaRegion ? `Please select a county` : 'No data available') : 'No location selected';
   $: sensorsWithData = sensors.map((sensor) => ({
     sensor,
-    data:
-      $currentRegionInfo && !isMegaRegion
-        ? fetchTimeSlice(sensor, $currentRegionInfo.level, $currentRegionInfo.propertyId, startDay, endDay, false, {
-            geo_value: $currentRegionInfo.propertyId,
-          }).then(addMissing)
-        : [],
-    spec: chooseSpec(sensor, startDay, endDay),
+    data: multi
+      ? fetchMulti(sensor, selections, startDay, endDay)
+      : region && !isMegaRegion
+      ? fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false, {
+          geo_value: region.propertyId,
+        })
+          .then(addMissing)
+          .then((rows) =>
+            rows.map((row) => {
+              row.displayName = region.displayName;
+              return row;
+            }),
+          )
+      : [],
+    spec: createSpec(sensor, selections, [startDay, endDay]),
   }));
 
   let highlightTimeValue = null;
@@ -135,6 +103,7 @@
   function onClick(e) {
     const item = e.detail.item;
     if (item && item.isVoronoi) {
+      trackEvent('side-panel', 'set-date', item.datum.datum.time_value);
       currentDate.set(item.datum.datum.time_value);
     }
   }
@@ -150,14 +119,12 @@
     flex: 1 1 0;
     padding: 0;
     cursor: pointer;
-    text-decoration: underline;
     display: block;
     background: none;
     border: none;
     outline: none !important;
     text-align: left;
     color: inherit;
-    font-weight: 700;
     font-size: 1em;
     line-height: 1.5em;
     margin: 0;
@@ -166,7 +133,7 @@
   .title-button:hover,
   .title-button:focus,
   li.selected .title-button {
-    color: var(--red);
+    color: black;
   }
 
   :global(#vizbox) .title-button:focus {

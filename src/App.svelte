@@ -1,4 +1,5 @@
 <script>
+  import ModeNav from './components/ModeNav.svelte';
   import { onMount } from 'svelte';
   import { currentMode, appReady, sensorList } from './stores';
   import './stores/urlHandler';
@@ -21,6 +22,7 @@
   }
 </style>
 
+<ModeNav />
 {#await currentComponent}
   <div class="loader loading" />
 {:then value}
