@@ -154,11 +154,24 @@
     })
     .filter((d, i) => i < showTopN || d.propertyId === $currentRegion);
 
-  $: primaryData = sortedRows.map((row) =>
-    fetchTimeSlice(primary, $currentLevel, row.propertyId, startDay, finalDay, true, {
+  const primaryDataCache = new Map();
+  $: {
+    if (primary != null) {
+      // clear cache once the primary changes
+      primaryDataCache.clear();
+    }
+  }
+  $: primaryData = sortedRows.map((row) => {
+    const key = `${row.propertyId}-${primary.key}`;
+    if (primaryDataCache.has(key)) {
+      return primaryDataCache.get(key);
+    }
+    const data = fetchTimeSlice(primary, row.level, row.propertyId, startDay, finalDay, true, {
       geo_value: row.propertyId,
-    }).then((r) => addMissing(r)),
-  );
+    }).then((r) => addMissing(r));
+    primaryDataCache.set(key, data);
+    return data;
+  });
 
   function maxNested(rows) {
     return rows.flat().reduce((acc, v) => Math.max(acc, v.value), 0);
@@ -169,7 +182,7 @@
 
   $: otherDataAndDomain = otherSensors.map((sensor) => {
     const data = sortedRows.map((row) =>
-      fetchTimeSlice(sensor, $currentLevel, row.propertyId, startDay, finalDay, true, {
+      fetchTimeSlice(sensor, row.level, row.propertyId, startDay, finalDay, true, {
         geo_value: row.propertyId,
       }).then((r) => addMissing(r)),
     );
