@@ -1,10 +1,19 @@
 <script>
   import Search from '../../components/Search.svelte';
   import { nameInfos } from '../../maps';
-  import { currentDateObject, currentRegionInfo, selectByInfo } from '../../stores';
+  import {
+    addCompare,
+    currentDateObject,
+    currentRegionInfo,
+    currentMultiSelection,
+    removeCompare,
+    selectByInfo,
+  } from '../../stores';
   import { sensorList } from '../../stores/constants';
   import SensorCard from './SensorCard.svelte';
   import throttle from 'lodash-es/throttle';
+  import { selectionColors } from '../../theme';
+  import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
 
   let highlightTimeValue = null;
 
@@ -13,15 +22,7 @@
   }, 10);
 
   function onHighlight(e) {
-    const highlighted = e.detail.value;
-    const id = highlighted && Array.isArray(highlighted._vgsid_) ? highlighted._vgsid_[0] : null;
-
-    if (!id) {
-      throttled(null);
-      return;
-    }
-    const row = e.detail.view.data('data_0').find((d) => d._vgsid_ === id);
-    throttled(row ? row.time_value : null);
+    throttled(resolveHighlightedTimeValue(e));
   }
 </script>
 
@@ -35,7 +36,7 @@
 
   .root :global(.search-container) {
     align-self: center;
-    width: 30em;
+    width: 60em;
   }
   .grid-wrapper {
     flex: 1 1 0;
@@ -64,14 +65,14 @@
     .card-grid > :global(*) {
       width: 50em;
     }
-  }
-
-  /** mobile **/
-  @media only screen and (max-width: 40em) {
     .root :global(.search-container) {
       align-self: stretch;
       width: unset;
     }
+  }
+
+  /** mobile **/
+  @media only screen and (max-width: 40em) {
     .card-grid {
       display: block;
     }
@@ -84,17 +85,26 @@
 <div class="root base-font-size">
   <Search
     className="search-container container-bg container-style"
-    placeholder="Search for a location..."
+    placeholder={$currentRegionInfo ? 'Compare with...' : 'Search for a location...'}
     items={nameInfos}
-    selectedItem={$currentRegionInfo}
+    selectedItems={$currentMultiSelection}
     labelFieldName="displayName"
     maxItemsToShowInList="5"
+    colorFieldName="color"
+    maxSelections={Math.min(selectionColors.length + 1, 4)}
+    on:add={(e) => addCompare(e.detail)}
+    on:remove={(e) => removeCompare(e.detail.info)}
     on:change={(e) => selectByInfo(e.detail)} />
 
   <div class="grid-wrapper">
     <div class="card-grid">
       {#each sensorList as sensor}
-        <SensorCard {sensor} date={$currentDateObject} region={$currentRegionInfo} {onHighlight} {highlightTimeValue} />
+        <SensorCard
+          {sensor}
+          date={$currentDateObject}
+          selections={$currentMultiSelection}
+          {onHighlight}
+          {highlightTimeValue} />
       {/each}
     </div>
   </div>

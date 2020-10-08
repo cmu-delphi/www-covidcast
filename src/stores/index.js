@@ -286,7 +286,7 @@ export function addCompare(info) {
     return;
   }
 
-  const current = get(currentCompareSelection);
+  const current = get(currentCompareSelection) || [];
   currentCompareSelection.set([
     ...current,
     {

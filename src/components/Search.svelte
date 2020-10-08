@@ -401,7 +401,7 @@
     align-items: center;
   }
   .search-tag {
-    padding: 1px;
+    padding: 1px 1px 1px 3px;
     margin: 0 1px;
     border: 2px solid #999;
     border-radius: 4px;

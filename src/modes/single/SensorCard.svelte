@@ -1,24 +1,17 @@
 <script>
-  import { currentInfoSensor, smallMultipleTimeSpan } from '../../stores';
-  import { addMissing, fetchTimeSlice } from '../../data/fetchData';
-  import { levelMegaCounty } from '../../stores/constants';
+  import { timeFormat } from 'd3-time-format';
   import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
-  import { createSpec } from '../overview/vegaSpec';
-  import { MAP_THEME } from '../../theme';
   import VegaTooltip from '../../components/DetailView/VegaTooltip.svelte';
   import Vega from '../../components/Vega.svelte';
-  import { timeFormat } from 'd3-time-format';
   import { formatAPITime, parseAPITime } from '../../data';
+  import { currentInfoSensor, smallMultipleTimeSpan } from '../../stores';
+  import { prepareSensorData } from '../overview/vegaSpec';
 
   const formatLocal = timeFormat('%x');
   /**
    * @type {import("../../stores/constants").SensorEntry}
    */
   export let sensor;
-  /**
-   * @type {import("../../maps").NameInfo}
-   */
-  export let region;
 
   /**
    * @type {Date}
@@ -29,10 +22,6 @@
   export let highlightTimeValue;
 
   $: highlightDate = highlightTimeValue != null ? parseAPITime(highlightTimeValue) : null;
-
-  $: isMegaRegion = Boolean(region) && region.level === levelMegaCounty.id;
-  $: noDataText =
-    region != null ? (isMegaRegion ? `Please select a county` : 'No data available') : 'No location selected';
 
   // use local variables with manual setting for better value comparison updates
   let startDay = $smallMultipleTimeSpan[0];
@@ -45,28 +34,12 @@
       endDay = $smallMultipleTimeSpan[1];
     }
   }
-
   /**
-   * @type {Promise<import('../../data').EpiDataRow[]> | import('../../data').EpiDataRow[]}
+   * @type {import('../../stores').CompareSelection[]}
    */
-  $: data =
-    region && !isMegaRegion
-      ? fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false, {
-          geo_value: region.propertyId,
-        })
-          .then(addMissing)
-          .then((rows) =>
-            rows.map((row) => {
-              row.displayName = region.displayName;
-              return row;
-            }),
-          )
-      : [];
+  export let selections = [];
 
-  $: spec = createSpec(sensor, region ? [{ info: region, color: MAP_THEME.selectedRegionOutline }] : [], [
-    startDay,
-    endDay,
-  ]);
+  $: sensorWithData = prepareSensorData(sensor, selections, startDay, endDay);
 
   /**
    * @type {number | null}
@@ -75,13 +48,11 @@
 
   $: {
     const keyDate = formatAPITime(highlightDate ? highlightDate : date);
-    Promise.resolve(data).then((rows) => {
+    Promise.resolve(sensorWithData.data).then((rows) => {
       const row = rows.find((d) => String(d.time_value) === keyDate);
       value = row ? row.value : null;
     });
   }
-
-  let loading = false;
 </script>
 
 <style>
@@ -135,7 +106,7 @@
   }
 </style>
 
-<section class="card container-bg container-style" class:loading>
+<section class="card container-bg container-style">
   <div class="header">
     <h4>{typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText() : sensor.name}</h4>
     <div class="toolbar">
@@ -155,9 +126,9 @@
   </div>
   <main class="vega-wrapper">
     <Vega
-      {data}
-      {spec}
-      {noDataText}
+      data={sensorWithData.data}
+      spec={sensorWithData.spec}
+      noDataText={sensorWithData.noDataText}
       signals={{ currentDate: date, highlightTimeValue }}
       signalListeners={['highlight']}
       on:signal={onHighlight}
