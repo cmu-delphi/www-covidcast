@@ -30,8 +30,8 @@ const modes = [
   },
   {
     id: 'single',
-    label: 'Single Location',
-    tooltip: 'Switch to Single Location View',
+    label: 'Region Details',
+    tooltip: 'Switch to Region Details View',
     component: () => import('./single/SingleLocation.svelte').then((r) => r.default),
   },
   {
