@@ -1,5 +1,5 @@
 import { formatAPITime, isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data';
-import { interpolateYlOrRd } from 'd3-scale-chromatic';
+import { interpolateYlOrRd, interpolateYlGnBu } from 'd3-scale-chromatic';
 import { checkWIP } from '../data/utils';
 import { format } from 'd3-format';
 // import { generateMockSignal, generateMockMeta } from '../data/mock';
@@ -252,6 +252,29 @@ const defaultSensors = [
     yAxis: 'Proportion',
     format: 'raw',
     hasStdErr: true,
+  },
+  {
+    type: 'public',
+    name: 'People Wearing Masks',
+    longDescription:
+      // prettier-ignore
+      `Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they, or anyone in their household, are currently experiencing COVID-related symptoms. We also ask them if they wear a mask when they are in public. For this signal, we estimate the percentage of people who wear a mask most or all of the time when they are in public.`,
+    links: [
+      {
+        href: 'https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html',
+        alt: 'Technical description',
+      },
+    ],
+    id: 'fb-survey',
+    signal: 'smoothed_wearing_mask',
+    levels: ['county', 'msa', 'state', 'hrr'],
+    mapTitleText:
+      // prettier-ignore
+      'Percentage of people who wear a mask most or all of the time while in public, based on surveys of Facebook users',
+    yAxis: 'Percentage',
+    format: 'percent',
+    hasStdErr: true,
+    colorScale: interpolateYlGnBu,
   },
   {
     type: 'public',
