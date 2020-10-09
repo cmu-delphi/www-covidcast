@@ -255,6 +255,28 @@ const defaultSensors = [
   },
   {
     type: 'public',
+    name: 'People Wearing Masks',
+    longDescription:
+      // prettier-ignore
+      `Percentage of people who wear a mask most or all of the time while in public, based on surveys of Facebook users.`,
+    links: [
+      {
+        href: 'https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html',
+        alt: 'Technical description',
+      },
+    ],
+    id: 'fb-survey',
+    signal: 'smoothed_wearing_mask',
+    levels: ['county', 'msa', 'state', 'hrr'],
+    mapTitleText:
+      // prettier-ignore
+      'Percentage of people who wear a mask most or all of the time while in public, based on surveys of Facebook users',
+    yAxis: 'Percentage',
+    format: 'percent',
+    hasStdErr: true,
+  },
+  {
+    type: 'public',
     name: 'COVID Searches on Google',
     longDescription:
       // prettier-ignore
