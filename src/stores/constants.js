@@ -258,7 +258,7 @@ const defaultSensors = [
     name: 'People Wearing Masks',
     longDescription:
       // prettier-ignore
-      `Percentage of people who wear a mask most or all of the time while in public, based on surveys of Facebook users.`,
+      `Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they, or anyone in their household, are currently experiencing COVID-related symptoms. We also ask them if they wear a mask when they are in public. For this signal, we estimate the percentage of people who wear a mask most or all of the time when they are in public.`,
     links: [
       {
         href: 'https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html',
