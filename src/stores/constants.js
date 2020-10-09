@@ -1,5 +1,5 @@
 import { formatAPITime, isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data';
-import { interpolateYlOrRd } from 'd3-scale-chromatic';
+import { interpolateYlOrRd, interpolateYlGnBu } from 'd3-scale-chromatic';
 import { checkWIP } from '../data/utils';
 import { format } from 'd3-format';
 // import { generateMockSignal, generateMockMeta } from '../data/mock';
@@ -274,6 +274,7 @@ const defaultSensors = [
     yAxis: 'Percentage',
     format: 'percent',
     hasStdErr: true,
+    colorScale: interpolateYlGnBu,
   },
   {
     type: 'public',
