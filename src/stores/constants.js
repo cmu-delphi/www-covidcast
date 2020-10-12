@@ -1,7 +1,7 @@
 import { formatAPITime, isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data';
-import { interpolateYlOrRd } from 'd3-scale-chromatic';
 import { format } from 'd3-format';
 import descriptions from './descriptions.generated.json';
+import { resolveColorScale } from './colorScales';
 // import { generateMockSignal, generateMockMeta } from '../data/mock';
 
 export const levelList = [
@@ -171,7 +171,7 @@ export function extendSensorEntry(sensorEntry) {
     isCount,
     getType: (options) => getType(sensorEntry, options),
     isCasesOrDeath,
-    colorScale: sensorEntry.colorScale || interpolateYlOrRd,
+    colorScale: resolveColorScale(sensorEntry.colorScale),
     links: sensorEntry.links || [],
     mapTitleText:
       typeof mapTitle === 'string'
