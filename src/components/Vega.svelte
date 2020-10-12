@@ -128,31 +128,17 @@
    * @param {[key: string]: any} signals
    */
   function updateSignals(vegaLoader, signals) {
-    if (!vegaLoader) {
+    if (!vegaLoader || !vega) {
       return;
     }
     if (Object.keys(signals).length === 0) {
       return;
     }
     hasError = false;
-    vegaLoader
-      .then((vega) => {
-        if (vegaLoader !== vegaPromise) {
-          // outside has changed
-          return;
-        }
-        if (!vega) {
-          return;
-        }
-        Object.entries(signals).forEach(([key, v]) => {
-          vega.view.signal(key, v);
-        });
-        vega.view.runAsync();
-      })
-      .catch((error) => {
-        console.error('error while updating signals', error);
-        hasError = true;
-      });
+    Object.entries(signals).forEach(([key, v]) => {
+      vega.view.signal(key, v);
+    });
+    vega.view.runAsync();
   }
 
   function updateSpec(spec) {

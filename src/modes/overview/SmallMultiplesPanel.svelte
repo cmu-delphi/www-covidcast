@@ -44,11 +44,13 @@
 
   const throttled = throttle((value) => {
     highlightTimeValue = value;
-  }, 10);
+  }, 50);
 
   function onHighlight(e) {
     const value = resolveHighlightedTimeValue(e);
-    throttled(value);
+    if (highlightTimeValue !== value) {
+      throttled(value);
+    }
   }
 
   function onClick(e) {

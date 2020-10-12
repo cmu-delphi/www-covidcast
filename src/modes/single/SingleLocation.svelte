@@ -19,10 +19,13 @@
 
   const throttled = throttle((value) => {
     highlightTimeValue = value;
-  }, 10);
+  }, 50);
 
   function onHighlight(e) {
-    throttled(resolveHighlightedTimeValue(e));
+    const value = resolveHighlightedTimeValue(e);
+    if (highlightTimeValue !== value) {
+      throttled(value);
+    }
   }
 </script>
 
