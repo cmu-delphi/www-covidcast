@@ -8,14 +8,15 @@ const yaml = require('js-yaml');
 const marked = require('marked');
 
 // has to be publicly viewable
-const DOC_URL = 'https://docs.google.com/document/d/1RLy4O-gtACVjLEVD_vxyPqvp9nWVhqEjoWAKi68RKpg';
+const DOC_URL =
+  process.env.COVIDCAST_SIGNAL_DOC || 'https://docs.google.com/document/d/1RLy4O-gtACVjLEVD_vxyPqvp9nWVhqEjoWAKi68RKpg';
 
-async function generateDescriptions() {
+async function loadDoc(url) {
   /**
    * download as plain text
    * @type {string}
    */
-  const text = await fetch(`${DOC_URL}/export?format=txt`).then((res) => res.text());
+  const text = await fetch(`${url}/export?format=txt`).then((res) => res.text());
   // console.log(text);
   // find first code block
   const start = text.indexOf('---');
@@ -23,6 +24,11 @@ async function generateDescriptions() {
   // replace * in links
   code = code.replace(/^[*] (.*)$/gm, ' - link: "$1"');
   // console.log(code);
+  return code;
+}
+
+async function generateDescriptions() {
+  const code = (await Promise.all(DOC_URL.split(',').map(loadDoc))).join('\n\n');
 
   const entries = [];
   yaml.safeLoadAll(code, (doc) => {
