@@ -1,11 +1,5 @@
 <script>
-  import {
-    signalCasesOrDeathOptions,
-    currentDateObject,
-    smallMultipleTimeSpan,
-    currentInfoSensor,
-    currentRegionInfo,
-  } from '../../stores';
+  import { signalCasesOrDeathOptions, currentDateObject, smallMultipleTimeSpan, currentInfoSensor } from '../../stores';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../Vega.svelte';
   import { createSpec, patchSpec } from './vegaSpec';
@@ -91,8 +85,9 @@
   function downloadVega() {
     vegaRef.vegaAccessor().then((view) => {
       const pngP = view.toImageURL('png', 2);
+      const filename = hasRegion ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown';
       pngP.then((url) => {
-        downloadUrl(url, `${sensor.name} in ${$currentRegionInfo ? $currentRegionInfo.displayName : 'Unknown'}.png`);
+        downloadUrl(url, `${sensor.name} in ${filename}.png`);
       });
     });
   }
