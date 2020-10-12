@@ -81,6 +81,8 @@
   $: updateSpec(patchedSpec);
   $: updateSignals(vegaPromise, signals);
 
+  export const vegaAccessor = () => vegaPromise.then((v) => v.view);
+
   /**
    * @param {Promise<import('vega-embed').Result> | null} vegaLoader
    * @param {Promise<any[]>} data
