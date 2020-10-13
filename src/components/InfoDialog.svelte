@@ -109,7 +109,7 @@
     </h2>
     <div>
       <p>
-        {@html $currentInfoSensor.description ?? 'No description available'}
+        {@html $currentInfoSensor.description || 'No description available'}
       </p>
     </div>
     <ul class="links">
