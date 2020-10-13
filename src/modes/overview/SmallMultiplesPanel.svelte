@@ -44,7 +44,7 @@
 
   const throttled = throttle((value) => {
     highlightTimeValue = value;
-  }, 50);
+  }, 25);
 
   function onHighlight(e) {
     const value = resolveHighlightedTimeValue(e);
