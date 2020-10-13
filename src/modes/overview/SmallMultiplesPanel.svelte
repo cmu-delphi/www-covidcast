@@ -1,13 +1,12 @@
 <script>
   import { sensorList, currentSensor, smallMultipleTimeSpan, currentDate, currentInfoSensor } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
-  import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import { trackEvent } from '../../stores/ga';
   import throttle from 'lodash-es/throttle';
-  import { levelList, levelMegaCounty } from '../../stores/constants';
+  import { levelList } from '../../stores/constants';
   import SmallMultiple from './SmallMultiple.svelte';
   import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
-  import { createSpec } from './vegaSpec';
+  import { prepareSensorData, resolveClickedTimeValue, resolveHighlightedTimeValue } from './vegaSpec';
 
   /**
    * bi-directional binding
@@ -32,79 +31,33 @@
     }
   }
 
-  function fetchMulti(sensor, selections, startDay, endDay) {
-    return Promise.all(
-      selections.map((s) => {
-        const region = s.info;
-        if (region.level === levelMegaCounty.id) {
-          return [];
-        }
-        return fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false, {
-          geo_value: region.propertyId,
-        })
-          .then((rows) => addMissing(rows, sensor))
-          .then((rows) =>
-            rows.map((row) => {
-              row.displayName = region.displayName;
-              return row;
-            }),
-          );
-      }),
-    ).then((rows) => rows.flat());
-  }
-
   /**
    * @type {{info: import('../../maps').NameInfo, color: string}[]}
    */
   export let selections = [];
-  $: region = selections.length > 0 ? selections[0].info : null;
 
   $: hasRegion = selections.length > 0;
-  $: multi = selections.length > 1;
 
-  $: isMegaRegion = Boolean(region) && region.level === levelMegaCounty.id;
-  $: noDataText = hasRegion ? (isMegaRegion ? `Please select a county` : 'No data available') : 'No location selected';
-  $: sensorsWithData = sensors.map((sensor) => ({
-    sensor,
-    data: multi
-      ? fetchMulti(sensor, selections, startDay, endDay)
-      : region && !isMegaRegion
-      ? fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false, {
-          geo_value: region.propertyId,
-        })
-          .then((rows) => addMissing(rows, sensor))
-          .then((rows) =>
-            rows.map((row) => {
-              row.displayName = region.displayName;
-              return row;
-            }),
-          )
-      : [],
-    spec: createSpec(sensor, selections, [startDay, endDay]),
-  }));
+  $: sensorsWithData = sensors.map((sensor) => prepareSensorData(sensor, selections, startDay, endDay));
 
   let highlightTimeValue = null;
 
   const throttled = throttle((value) => {
     highlightTimeValue = value;
-  }, 10);
+  }, 50);
 
   function onHighlight(e) {
-    const highlighted = e.detail.value;
-    const id = highlighted && Array.isArray(highlighted._vgsid_) ? highlighted._vgsid_[0] : null;
-
-    if (!id) {
-      throttled(null);
-      return;
+    const value = resolveHighlightedTimeValue(e);
+    if (highlightTimeValue !== value) {
+      throttled(value);
     }
-    const row = e.detail.view.data('data_0').find((d) => d._vgsid_ === id);
-    throttled(row ? row.time_value : null);
   }
+
   function onClick(e) {
-    const item = e.detail.item;
-    if (item && item.isVoronoi) {
-      trackEvent('side-panel', 'set-date', item.datum.datum.time_value);
-      currentDate.set(item.datum.datum.time_value);
+    const timeValue = resolveClickedTimeValue(e);
+    if (timeValue) {
+      trackEvent('side-panel', 'set-date', timeValue);
+      currentDate.set(timeValue);
     }
   }
 </script>
@@ -224,7 +177,7 @@
           </button>
         </div>
       </div>
-      <SmallMultiple {s} {noDataText} {highlightTimeValue} {onClick} {onHighlight} />
+      <SmallMultiple {s} {highlightTimeValue} {onClick} {onHighlight} />
     </li>
   {/each}
 </ul>

@@ -48,12 +48,11 @@ export default class BubbleEncoding {
 
     // color scale (color + stroke color)
     // const colorExpression = interpolateValue(stops);
-    const minRadius = this.theme.minRadius[level];
     const maxRadius = this.theme.maxRadius[level];
 
     const radiusScaleTheme = this.theme.radiusScale[sensorType];
 
-    const radiusScale = parseScaleSpec(radiusScaleTheme).domain(valueMinMax).range([minRadius, maxRadius]).clamp(true);
+    const radiusScale = parseScaleSpec(radiusScaleTheme).domain([0, valueMinMax[1]]).range([0, maxRadius]).clamp(true);
 
     this.customLayers.get(level).encode(radiusScale, scale);
     return radiusScale;
