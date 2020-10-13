@@ -52,7 +52,7 @@
         const options = { cumulative, ratio };
         const signal = entry.casesOrDeathSignals[primaryValue(entry, options)];
         const text = entry.mapTitleText(options);
-        const name = `${cumulative ? 'Cumulative ' : ''}${entry.name}${ratio ? ' per 100,000 people' : ''}`;
+        const name = `${cumulative ? 'Cumulative ' : ''}${entry.name}${ratio ? ' (per 100,000 people)' : ''}`;
         lookupMap.set(`${entry.id}-${signal}`, {
           name: `${name} (7-day average)`,
           tooltipText: text,
