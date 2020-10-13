@@ -17,7 +17,7 @@ function fetchMulti(sensor, selections, startDay, endDay) {
       return fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false, {
         geo_value: region.propertyId,
       })
-        .then(addMissing)
+        .then((rows) => addMissing(rows, sensor))
         .then((rows) =>
           rows.map((row) => {
             row.displayName = region.displayName;
@@ -35,7 +35,7 @@ function fetchSingle(sensor, region, startDay, endDay) {
   return fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false, {
     geo_value: region.propertyId,
   })
-    .then(addMissing)
+    .then((rows) => addMissing(rows, sensor))
     .then((rows) =>
       rows.map((row) => {
         row.displayName = region.displayName;
