@@ -162,7 +162,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
               clamp: true,
             },
             axis: {
-              ...(isPercentage ? { format: '.1%' } : {}),
+              ...(isPercentage ? { format: '.1%', formatType: 'cachedNumber' } : {}),
               title: null,
               tickCount: 3,
               minExtent: 25,

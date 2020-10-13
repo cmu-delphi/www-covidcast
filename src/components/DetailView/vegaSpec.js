@@ -13,7 +13,10 @@ export const CURRENT_DATE_HIGHLIGHT = {
       as: 'date_value',
     },
   ],
-  mark: 'rule',
+  mark: {
+    type: 'rule',
+    tooltip: false,
+  },
   encoding: {
     color: {
       value: '#c00',

@@ -4,9 +4,10 @@
   import { Error, expressionFunction } from 'vega';
   import { observeResize, unobserveResize } from '../util';
   import { createVegaTooltipAdapter } from './tooltipUtils';
-  import { cachedTime } from './customVegaFunctions';
+  import { cachedTime, cachedNumber } from './customVegaFunctions';
 
   expressionFunction('cachedTime', cachedTime);
+  expressionFunction('cachedNumber', cachedNumber);
 
   export let data = Promise.resolve([]);
 
