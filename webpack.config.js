@@ -11,6 +11,7 @@ const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const pkg = require('./package.json');
 
 const devMode = process.env.NODE_ENV !== 'production';
+const hmr = devMode;
 
 module.exports = () => {
   return {
@@ -55,24 +56,34 @@ module.exports = () => {
 
     module: {
       rules: [
-        {
+        !devMode && {
           test: /\.m?js$/,
           exclude: /node_modules\/(?!svelte)/,
           use: ['babel-loader'],
         },
         {
           test: /\.svelte$/,
-          use: [
-            'babel-loader',
-            {
-              loader: 'svelte-loader',
-              options: {
-                dev: devMode,
-                hotReload: false,
-                emitCss: true,
-              },
-            },
-          ],
+          use: hmr
+            ? [
+                {
+                  loader: 'svelte-loader-hot',
+                  options: {
+                    dev: true,
+                    hotReload: true,
+                    emitCss: false,
+                  },
+                },
+              ]
+            : [
+                'babel-loader',
+                {
+                  loader: 'svelte-loader',
+                  options: {
+                    dev: devMode,
+                    emitCss: true,
+                  },
+                },
+              ],
         },
         {
           test: /\.css$/,
@@ -80,7 +91,7 @@ module.exports = () => {
             {
               loader: MiniCssExtractPlugin.loader,
               options: {
-                hmr: false,
+                hmr,
                 esModule: false,
               },
             },
@@ -102,14 +113,15 @@ module.exports = () => {
           test: /\.(txt|csv|tsv)$/i,
           use: 'raw-loader',
         },
-      ],
+      ].filter(Boolean),
     },
 
     devServer: {
-      contentBase: path.join(__dirname, 'public'),
+      contentBase: [path.join(__dirname, 'public'), path.join(__dirname, 'src/assets')],
+      contentBasePublicPath: ['/', '/assets'],
       watchContentBase: true,
       host: 'localhost',
-      hot: false,
+      hot: hmr,
     },
 
     plugins: [
