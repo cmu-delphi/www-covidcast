@@ -17,7 +17,7 @@ export {
   groupedSensorList,
 } from './constants';
 import { timeMonth } from 'd3-time';
-import { selectionColors } from '../theme';
+import { MAP_THEME, selectionColors } from '../theme';
 
 /**
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
@@ -242,8 +242,8 @@ currentSensorEntry.subscribe((sensorEntry) => {
 export const isMobileDevice = readable(false, (set) => {
   const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
   set(isMobileQuery.matches);
-  isMobileQuery.addListener((r) => {
-    set(r.matches);
+  isMobileQuery.addEventListener('change', (evt) => {
+    set(evt.matches);
   });
 });
 
@@ -257,14 +257,73 @@ export const isMobileDevice = readable(false, (set) => {
 
 // overview compare mode
 
+/**
+ * @typedef {object} CompareSelection
+ * @property {import('../maps').NameInfo} info
+ * @property {string} color
+ * @property {string} displayName;
+ */
+
 // null = disable
 // []
 /**
- * @type {import('svelte/store').Writable<{info: NameInfo, color: string}[] | null>}
+ * @type {import('svelte/store').Writable<CompareSelection[] | null>}
  * */
 export const currentCompareSelection = writable(null, (set) => {
   const ids = (urlParams.get('compare') || '').split(',').map(getInfoByName).filter(Boolean);
   if (ids.length > 0) {
-    set(ids.map((info, i) => ({ info, color: selectionColors[i] || 'grey' })));
+    set(ids.map((info, i) => ({ info, displayName: info.displayName, color: selectionColors[i] || 'grey' })));
   }
 });
+
+/**
+ * add an element to the compare selection
+ * @param {import('../maps').NameInfo} info
+ */
+export function addCompare(info) {
+  if (!get(currentRegionInfo)) {
+    selectByInfo(info);
+    return;
+  }
+
+  const current = get(currentCompareSelection) || [];
+  currentCompareSelection.set([
+    ...current,
+    {
+      info,
+      displayName: info.displayName,
+      color: selectionColors[current.length] || 'grey',
+    },
+  ]);
+}
+
+/**
+ * removes an element from the compare selection
+ * @param {import('../maps').NameInfo} info
+ */
+export function removeCompare(info) {
+  const selection = get(currentRegionInfo);
+  const bak = (get(currentCompareSelection) || []).slice();
+  if (selection && info.id === selection.id) {
+    selectByInfo(bak.length === 0 ? null : bak[0].info);
+    currentCompareSelection.set(bak.slice(1).map((old, i) => ({ ...old, color: selectionColors[i] || 'grey' })));
+    return;
+  }
+  currentCompareSelection.set(
+    bak.filter((d) => d.info !== info).map((old, i) => ({ ...old, color: selectionColors[i] || 'grey' })),
+  );
+}
+
+/**
+ * @type {import('svelte/store').Readable<CompareSelection[]>}
+ */
+export const currentMultiSelection = derived(
+  [currentRegionInfo, currentCompareSelection],
+  ([selection, compareSelection]) =>
+    [
+      selection && { info: selection, color: MAP_THEME.selectedRegionOutline, displayName: selection.displayName },
+      compareSelection || [],
+    ]
+      .filter(Boolean)
+      .flat(),
+);

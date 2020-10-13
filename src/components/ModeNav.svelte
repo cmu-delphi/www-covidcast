@@ -28,7 +28,7 @@
   }
 
   /** deskop **/
-  @media only screen and (min-width: 768px) {
+  @media only screen and (min-width: 600px) {
     .mode-container {
       border-bottom: 1px solid var(--frame-color);
     }
@@ -52,7 +52,7 @@
     }
   }
 
-  @media only screen and (max-width: 767px) {
+  @media only screen and (max-width: 600px) {
     .mode-button {
       display: block;
       width: 100%;
