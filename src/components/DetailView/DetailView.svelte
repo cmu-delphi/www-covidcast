@@ -10,6 +10,8 @@
   import { trackEvent } from '../../stores/ga';
   import VegaTooltip from './VegaTooltip.svelte';
   import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
+  import IoIosSave from 'svelte-icons/io/IoIosSave.svelte';
+  import { downloadUrl } from '../../data/screenshot';
 
   const dispatch = createEventDispatcher();
   /**
@@ -76,6 +78,19 @@
       close.focus();
     }
   });
+
+  // Reference to the vega chart component.
+  let vegaRef = null;
+
+  function downloadVega() {
+    vegaRef.vegaAccessor().then((view) => {
+      const pngP = view.toImageURL('png', 2);
+      const filename = hasRegion ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown';
+      pngP.then((url) => {
+        downloadUrl(url, `${sensor.name} in ${filename}.png`);
+      });
+    });
+  }
 </script>
 
 <style>
@@ -150,6 +165,13 @@
           currentInfoSensor.set(sensor);
         }}><IoMdHelp /></button>
     {/if}
+    <button
+      title="Download this view"
+      class="pg-button pg-button-circle info"
+      on:click={downloadVega}
+      disabled={!vegaRef}>
+      <IoIosSave />
+    </button>
   </div>
   <button
     bind:this={close}
@@ -164,6 +186,7 @@
 </div>
 <div class="single-sensor-chart vega-wrapper">
   <Vega
+    bind:this={vegaRef}
     {data}
     {spec}
     {patchSpec}
