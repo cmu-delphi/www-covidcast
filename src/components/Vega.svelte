@@ -1,9 +1,12 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import embed from 'vega-embed';
-  import { Error } from 'vega';
+  import { Error, expressionFunction } from 'vega';
   import { observeResize, unobserveResize } from '../util';
   import { createVegaTooltipAdapter } from './tooltipUtils';
+  import { cachedTime } from './customVegaFunctions';
+
+  expressionFunction('cachedTime', cachedTime);
 
   export let data = Promise.resolve([]);
 

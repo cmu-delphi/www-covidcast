@@ -136,7 +136,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
         axis: {
           title: null,
           format: '%m/%d',
-          formatType: 'time',
+          formatType: 'cachedTime',
           tickCount: 'month',
         },
         scale: dateRange
@@ -233,6 +233,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
       CURRENT_DATE_HIGHLIGHT,
     ],
     config: {
+      customFormatTypes: true,
       legend: {
         disable: true,
       },

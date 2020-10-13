@@ -70,7 +70,7 @@ export const xDateEncoding = {
   axis: {
     title: null,
     format: '%m/%d',
-    formatType: 'time',
+    formatType: 'cachedTime',
     tickCount: 'day',
     grid: false,
   },
@@ -253,6 +253,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
       },
     ],
     config: {
+      customFormatTypes: true,
       legend: {
         disable: true,
       },
