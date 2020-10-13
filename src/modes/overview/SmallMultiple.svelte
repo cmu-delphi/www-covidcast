@@ -4,7 +4,6 @@
   import VegaTooltip from '../../components/DetailView/VegaTooltip.svelte';
 
   export let s;
-  export let noDataText;
   export let highlightTimeValue;
   export let onClick;
   export let onHighlight;
@@ -31,7 +30,7 @@
   <Vega
     data={s.data}
     spec={s.spec}
-    {noDataText}
+    noDataText={s.noDataText}
     signals={{ currentDate: $currentDateObject, highlightTimeValue }}
     signalListeners={['highlight']}
     eventListeners={['click']}
