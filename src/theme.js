@@ -47,11 +47,6 @@ export const ENCODING_BUBBLE_THEME = {
   strokeWidthHighlighted: 4,
   fillOpacity: 0.5,
   strokeOpacity: 1,
-  minRadius: {
-    county: 2,
-    msa: 3,
-    state: 6,
-  },
   maxRadius: {
     county: 6,
     msa: 10,
