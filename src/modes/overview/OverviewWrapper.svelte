@@ -251,7 +251,12 @@
   {/if}
 
   <div class="map-container" class:mobileHide={!mobileShowMap} class:pick={pickMapMode}>
-    <MapOverlays {map} mapLoading={loading} legendLoading={loading} {zoom} />
+    <MapOverlays
+      {map}
+      mapLoading={loading}
+      legendLoading={loading}
+      {zoom}
+      summary={{ data, level: $currentLevel, items: regionSearchList }} />
     <MapBox
       bind:this={map}
       on:loading={(e) => (loading = e.detail)}
