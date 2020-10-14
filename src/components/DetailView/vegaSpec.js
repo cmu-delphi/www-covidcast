@@ -73,6 +73,20 @@ export const xDateEncoding = {
     formatType: 'time',
     tickCount: 'day',
     grid: false,
+    labelSeparation: 10, // Should be based on font size.
+  },
+};
+
+const xDateRangeEncoding = {
+  field: 'date_value',
+  type: 'temporal',
+  axis: {
+    title: null,
+    format: '%m/%d',
+    formatType: 'time',
+    tickCount: 'week',
+    grid: false,
+    labelSeparation: 10, // Should be based on font size.
   },
 };
 
@@ -190,11 +204,21 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
       },
       {
         height: 40,
+        view: { cursor: 'col-resize' },
         encoding: {
           color: {
             field: 'geo_value',
           },
-          x: { ...xDateEncoding },
+          x: { ...xDateRangeEncoding },
+          y: {
+            field: primaryValue,
+            type: 'quantitative',
+            axis: {
+              minExtent: 25,
+              tickCount: 3,
+              title: ' ',
+            },
+          },
         },
         layer: [
           {
@@ -212,6 +236,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
                 init: {
                   x: [initialSelection[0].getTime(), initialSelection[1].getTime()],
                 },
+                mark: { cursor: 'move' },
               },
             },
             mark: {
