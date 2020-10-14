@@ -413,7 +413,7 @@ const defaultSensors = [
     ],
     id: 'quidel',
     signal: 'covid_ag_smoothed_pct_positive',
-    levels: ['state', 'msa', 'hrr'],
+    levels: ['county', 'state', 'msa', 'hrr'],
     tooltipText:
       // prettier-ignore
       'Positivity rate of COVID-19 antigen tests, based on data provided by Quidel, Inc.',
