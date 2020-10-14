@@ -86,12 +86,9 @@
 }
 
 .pg-button-vertical-group > .selected,
-.pg-button-group > .selected {
-  background-color: #f2f2f2;
-}
-
+.pg-button-group > .selected,
 .pg-button-group > .selected:focus {
-  background-color: #f2f2f2 !important;
+  background-color: #b9b7b7 !important;
 }
 
 .pg-button-group .pg-button.selected:nth-child(n + 2) {
