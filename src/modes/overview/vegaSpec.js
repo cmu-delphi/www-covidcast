@@ -136,7 +136,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
         axis: {
           title: null,
           format: '%m/%d',
-          formatType: 'time',
+          formatType: 'cachedTime',
           tickCount: 'month',
         },
         scale: dateRange
@@ -147,6 +147,8 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
       },
     },
     layer: [
+      // complicated construct to have proper typings
+      ...(sensor.hasStdErr ? [stdErrLayer] : []),
       {
         mark: {
           type: 'line',
@@ -162,7 +164,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
               clamp: true,
             },
             axis: {
-              ...(isPercentage ? { format: '.1%' } : {}),
+              ...(isPercentage ? { format: '.1%', formatType: 'cachedNumber' } : {}),
               title: null,
               tickCount: 3,
               minExtent: 25,
@@ -176,13 +178,22 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
             type: 'single',
             empty: 'none',
             on: 'mouseover',
-            nearest: true,
+            nearest: false,
             clear: 'mouseout',
           },
         },
+        // use vertical rule for selection, since nearest is a real performance bummer
+        mark: {
+          type: 'rule',
+          strokeWidth: 2.5,
+          color: 'white',
+          opacity: 0.001,
+          tooltip: true,
+        },
+      },
+      {
         mark: {
           type: 'point',
-          tooltip: true,
           radius: 1,
           stroke: null,
           fill: 'grey',
@@ -207,23 +218,24 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
           },
         },
       },
-      // complicated construct to have proper typings
-      ...(sensor.hasStdErr ? [stdErrLayer] : []),
       {
-        transform: [
-          {
-            filter: {
-              or: [
-                {
-                  selection: 'highlight',
-                },
-                'datum.time_value == highlightTimeValue',
-              ],
-            },
-          },
-        ],
-        mark: 'rule',
+        mark: {
+          type: 'rule',
+        },
         encoding: {
+          opacity: {
+            condition: [
+              {
+                selection: 'highlight',
+                value: 1,
+              },
+              {
+                test: 'datum.time_value == highlightTimeValue',
+                value: 1,
+              },
+            ],
+            value: 0,
+          },
           y: {
             field: yField,
             type: 'quantitative',
@@ -233,6 +245,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
       CURRENT_DATE_HIGHLIGHT,
     ],
     config: {
+      customFormatTypes: true,
       legend: {
         disable: true,
       },

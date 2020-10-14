@@ -13,7 +13,10 @@ export const CURRENT_DATE_HIGHLIGHT = {
       as: 'date_value',
     },
   ],
-  mark: 'rule',
+  mark: {
+    type: 'rule',
+    tooltip: false,
+  },
   encoding: {
     color: {
       value: '#c00',
@@ -70,7 +73,7 @@ export const xDateEncoding = {
   axis: {
     title: null,
     format: '%m/%d',
-    formatType: 'time',
+    formatType: 'cachedTime',
     tickCount: 'day',
     grid: false,
     labelSeparation: 10, // Should be based on font size.
@@ -278,6 +281,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
       },
     ],
     config: {
+      customFormatTypes: true,
       legend: {
         disable: true,
       },
