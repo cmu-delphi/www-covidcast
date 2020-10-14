@@ -13,7 +13,10 @@ export const CURRENT_DATE_HIGHLIGHT = {
       as: 'date_value',
     },
   ],
-  mark: 'rule',
+  mark: {
+    type: 'rule',
+    tooltip: false,
+  },
   encoding: {
     color: {
       value: '#c00',
@@ -70,9 +73,23 @@ export const xDateEncoding = {
   axis: {
     title: null,
     format: '%m/%d',
-    formatType: 'time',
+    formatType: 'cachedTime',
     tickCount: 'day',
     grid: false,
+    labelSeparation: 10, // Should be based on font size.
+  },
+};
+
+const xDateRangeEncoding = {
+  field: 'date_value',
+  type: 'temporal',
+  axis: {
+    title: null,
+    format: '%m/%d',
+    formatType: 'time',
+    tickCount: 'week',
+    grid: false,
+    labelSeparation: 10, // Should be based on font size.
   },
 };
 
@@ -190,11 +207,21 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
       },
       {
         height: 40,
+        view: { cursor: 'col-resize' },
         encoding: {
           color: {
             field: 'geo_value',
           },
-          x: { ...xDateEncoding },
+          x: { ...xDateRangeEncoding },
+          y: {
+            field: primaryValue,
+            type: 'quantitative',
+            axis: {
+              minExtent: 25,
+              tickCount: 3,
+              title: ' ',
+            },
+          },
         },
         layer: [
           {
@@ -212,6 +239,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
                 init: {
                   x: [initialSelection[0].getTime(), initialSelection[1].getTime()],
                 },
+                mark: { cursor: 'move' },
               },
             },
             mark: {
@@ -253,6 +281,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
       },
     ],
     config: {
+      customFormatTypes: true,
       legend: {
         disable: true,
       },

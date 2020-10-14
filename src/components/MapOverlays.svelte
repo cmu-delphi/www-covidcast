@@ -7,12 +7,14 @@
   import ColorLegend from './legends/ColorLegend.svelte';
   import BubbleLegend from './legends/BubbleLegend.svelte';
   import SpikeLegend from './legends/SpikeLegend.svelte';
+  import MapSummary from './MapSummary.svelte';
 
   export let map = null;
   export let mapLoading = true;
   export let legendLoading = true;
   export let zoom = 1.0;
   export let showDate = false;
+  export let summary = null;
 </script>
 
 <style>
@@ -38,6 +40,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
+    margin: 2px 5px;
   }
   .signal-description {
     margin-bottom: 0.25em;
@@ -46,8 +49,8 @@
   /** desktop **/
   @media only screen and (min-width: 767px) {
     .title-container {
-      background-color: unset;
       box-shadow: none;
+      border: none;
     }
   }
 
@@ -66,10 +69,18 @@
   .legend-container > :global(.encoding-wrapper) {
     margin-bottom: 6px;
   }
+
+  .summary-container {
+    position: absolute;
+    margin: 0.25em;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+  }
 </style>
 
 <div class="map-top-overlay">
-  <div class="title-container">
+  <div class="title-container container-bg">
     <Title {showDate} />
   </div>
   <div class="map-controls-container">
@@ -91,4 +102,7 @@
       <SpikeLegend loading={legendLoading} {zoom} />
     {/if}
   </div>
+</div>
+<div class="summary-container" aria-label="map data summary">
+  <MapSummary {summary} />
 </div>

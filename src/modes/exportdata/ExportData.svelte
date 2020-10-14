@@ -12,6 +12,16 @@
   const CSV_SERVER = 'https://delphi.cmu.edu/csv';
   const iso = timeFormat('%Y-%m-%d');
 
+  const sourceNameLookup = {
+    'doctor-visits': 'COVID-Related Doctor Visits',
+    'fb-survey': 'Facebook Survey Results',
+    ght: 'Google Search Trends',
+    'hospital-admissions': 'Hospital Admissions',
+    'indicator-combination': 'Delphi Data Sources',
+    quidel: 'Quidel Antigen Tests',
+    safegraph: 'SafeGraph Mobility Data',
+  };
+
   let loading = true;
   /**
    * @type {{id: string, name: string, levels: Set<string>, minTime: Date, maxTime: Date, signals: {id: string, name: string, description: string}[]}[]}
@@ -40,6 +50,25 @@
       geoType = Array.from(source.levels)[0];
     }
   }
+
+  function minDate(a, b) {
+    if (!a) {
+      return b;
+    }
+    if (!b) {
+      return a;
+    }
+    return a < b ? a : b;
+  }
+  function maxDate(a, b) {
+    if (!a) {
+      return b;
+    }
+    if (!b) {
+      return a;
+    }
+    return a > b ? a : b;
+  }
   /**
    * @type {Map<string, {name: string, tooltipText: string}>}
    */
@@ -52,7 +81,7 @@
         const options = { cumulative, ratio };
         const signal = entry.casesOrDeathSignals[primaryValue(entry, options)];
         const text = entry.mapTitleText(options);
-        const name = `${cumulative ? 'Cumulative ' : ''}${entry.name}${ratio ? ' per 100,000 people' : ''}`;
+        const name = `${cumulative ? 'Cumulative ' : ''}${entry.name}${ratio ? ' (per 100,000 people)' : ''}`;
         lookupMap.set(`${entry.id}-${signal}`, {
           name: `${name} (7-day average)`,
           tooltipText: text,
@@ -89,7 +118,7 @@
       if (!data.has(dataSource)) {
         data.set(dataSource, {
           id: dataSource,
-          name: dataSource,
+          name: sourceNameLookup[dataSource] || dataSource,
           levels: new Set(),
           minTime: parseAPITime(entry.min_time),
           maxTime: parseAPITime(entry.max_time),
@@ -155,6 +184,7 @@
 
   .group {
     display: flex;
+    flex-wrap: wrap;
   }
 
   button {
@@ -168,6 +198,8 @@
   pre {
     padding: 0.2em;
     background: #efefef;
+    overflow: auto;
+    white-space: pre;
   }
 
   .description {
@@ -187,14 +219,19 @@
   .buttons > button {
     min-width: 5em;
   }
+
+  @media only screen and (max-width: 710px) {
+    .block {
+      width: 100%;
+    }
+  }
 </style>
 
 <div class="root" class:loading>
-  <h4>Export Data</h4>
   <p>
-    All signals displayed on the COVIDcast map, and numerous other signals, are freely available for download here. You
-    can also access the latest daily through the <a
-      href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a>.
+    All signals displayed on the COVIDcast map are freely available for download here. You can also access the latest
+    daily through the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a> which also
+    includes numerous other signals.
   </p>
   <section>
     <h5>1. Select Signal</h5>
@@ -234,14 +271,14 @@
       <Datepicker
         bind:selected={startDate}
         start={source ? source.minTime : new Date()}
-        end={source ? source.maxTime : new Date()}
+        end={minDate(endDate, source ? source.maxTime : new Date())}
         formattedSelected={iso(startDate)}>
         <button aria-label="selected start date" class="pg-button" on:>{iso(startDate)}</button>
       </Datepicker>
       -
       <Datepicker
         bind:selected={endDate}
-        start={source ? source.minTime : new Date()}
+        start={maxDate(startDate, source ? source.minTime : new Date())}
         end={source ? source.maxTime : new Date()}
         formattedSelected={iso(endDate)}>
         <button aria-label="selected end date" class="pg-button" on:>{iso(endDate)}</button>
