@@ -219,9 +219,6 @@
         'search view'
         'map map';
     }
-    .root > :global(.search-container) {
-      margin: 0 0 0 6px;
-    }
 
     .mobileHide {
       display: none !important;

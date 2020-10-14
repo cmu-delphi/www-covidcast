@@ -40,6 +40,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
+    margin: 2px 5px;
   }
   .signal-description {
     margin-bottom: 0.25em;
@@ -48,8 +49,8 @@
   /** desktop **/
   @media only screen and (min-width: 767px) {
     .title-container {
-      background-color: unset;
       box-shadow: none;
+      border: none;
     }
   }
 
@@ -79,7 +80,7 @@
 </style>
 
 <div class="map-top-overlay">
-  <div class="title-container">
+  <div class="title-container container-bg">
     <Title {showDate} />
   </div>
   <div class="map-controls-container">
