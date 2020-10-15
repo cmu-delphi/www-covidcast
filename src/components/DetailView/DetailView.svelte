@@ -59,7 +59,14 @@
       }).then(addMissing)
     : [];
 
-  $: spec = createSpec(sensor, primaryValue(sensor, $signalCasesOrDeathOptions), selections, $smallMultipleTimeSpan);
+  const title = `${sensor.name} in ${
+    selections.length > 0 ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown'
+  }`;
+
+  $: spec = createSpec(sensor, primaryValue(sensor, $signalCasesOrDeathOptions), selections, $smallMultipleTimeSpan, [
+    title,
+    mapTitle,
+  ]);
 
   /**
    * @param {KeyboardEvent} e
@@ -100,6 +107,7 @@
 
   .vega-wrapper {
     position: relative;
+    top: -25px;
   }
   .vega-wrapper > :global(*) {
     position: absolute;
@@ -115,8 +123,13 @@
 
   .header {
     position: relative;
+    width: 100%;
   }
 
+  .header button {
+    float: right;
+    z-index: 10;
+  }
   .close {
     font-size: 0.88rem;
     position: absolute;
@@ -147,41 +160,36 @@
   }
 
   .info {
-    margin-left: 1em;
     font-size: 0.7rem;
     display: inline-block;
   }
 </style>
 
 <div class="header">
-  <h4>{sensor.name} in {hasRegion ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown'}</h4>
-  <div>
-    <h5>{mapTitle}</h5>
-    {#if sensor.longDescription}
-      <button
-        title="Show sensor description"
-        class="pg-button pg-button-circle info"
-        on:click={() => {
-          currentInfoSensor.set(sensor);
-        }}><IoMdHelp /></button>
-    {/if}
-    <button
-      title="Download this view"
-      class="pg-button pg-button-circle info"
-      on:click={downloadVega}
-      disabled={!vegaRef}>
-      <IoIosSave />
-    </button>
-  </div>
   <button
     bind:this={close}
-    class="pg-button close"
+    class="pg-button pg-button-circle info"
     on:click={() => {
       trackEvent('detail-view', 'close', 'button');
       dispatch('close');
     }}
     title="Close this detail view">
     <IoIosClose />
+  </button>
+  {#if sensor.longDescription}
+    <button
+      title="Show sensor description"
+      class="pg-button pg-button-circle info"
+      on:click={() => {
+        currentInfoSensor.set(sensor);
+      }}><IoMdHelp /></button>
+  {/if}
+  <button
+    title="Download this view"
+    class="pg-button pg-button-circle info"
+    on:click={downloadVega}
+    disabled={!vegaRef}>
+    <IoIosSave />
   </button>
 </div>
 <div class="single-sensor-chart vega-wrapper">
