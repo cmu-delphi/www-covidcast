@@ -123,12 +123,15 @@
 
   .header {
     position: relative;
-    width: 100%;
+  }
+
+  .header .buttons {
+    float: right;
   }
 
   .header button {
-    float: right;
     z-index: 10;
+    margin-left: 1em;
   }
   .close {
     font-size: 0.88rem;
@@ -166,31 +169,33 @@
 </style>
 
 <div class="header">
-  <button
-    bind:this={close}
-    class="pg-button pg-button-circle info"
-    on:click={() => {
-      trackEvent('detail-view', 'close', 'button');
-      dispatch('close');
-    }}
-    title="Close this detail view">
-    <IoIosClose />
-  </button>
-  {#if sensor.longDescription}
+  <div class="buttons">
     <button
-      title="Show sensor description"
+      title="Download this view"
+      class="pg-button pg-button-circle info"
+      on:click={downloadVega}
+      disabled={!vegaRef}>
+      <IoIosSave />
+    </button>
+    {#if sensor.longDescription}
+      <button
+        title="Show sensor description"
+        class="pg-button pg-button-circle info"
+        on:click={() => {
+          currentInfoSensor.set(sensor);
+        }}><IoMdHelp /></button>
+    {/if}
+    <button
+      bind:this={close}
       class="pg-button pg-button-circle info"
       on:click={() => {
-        currentInfoSensor.set(sensor);
-      }}><IoMdHelp /></button>
-  {/if}
-  <button
-    title="Download this view"
-    class="pg-button pg-button-circle info"
-    on:click={downloadVega}
-    disabled={!vegaRef}>
-    <IoIosSave />
-  </button>
+        trackEvent('detail-view', 'close', 'button');
+        dispatch('close');
+      }}
+      title="Close this detail view">
+      <IoIosClose />
+    </button>
+  </div>
 </div>
 <div class="single-sensor-chart vega-wrapper">
   <Vega
