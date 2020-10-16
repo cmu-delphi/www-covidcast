@@ -1,4 +1,5 @@
 import merge from 'lodash-es/merge';
+
 /**
  * @type {import('vega-lite/build/src/spec').LayerSpec | import('vega-lite/build/src/spec').UnitSpec}
  */
@@ -68,24 +69,20 @@ export const xDateEncoding = {
   field: 'date_value',
   type: 'temporal',
   axis: {
+    orient: 'bottom',
+    labels: false,
     title: null,
-    format: '%m/%d',
-    formatType: 'time',
-    tickCount: 'day',
-    grid: false,
-    labelSeparation: 10, // Should be based on font size.
   },
 };
 
 const xDateRangeEncoding = {
-  field: 'date_value',
-  type: 'temporal',
+  ...xDateEncoding,
   axis: {
     title: null,
     format: '%m/%d',
     formatType: 'time',
     tickCount: 'week',
-    grid: false,
+    grid: true,
     labelSeparation: 10, // Should be based on font size.
   },
 };
@@ -136,6 +133,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
             scale: { domain: { selection: 'brush' } },
           },
         },
+        resolve: { axis: { x: 'independent' } },
         layer: [
           {
             mark: {
@@ -144,6 +142,17 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
             },
             encoding: {
               color: colorEncoding(selections),
+              x: {
+                ...xDateEncoding,
+                axis: {
+                  title: null,
+                  format: '%m/%d',
+                  formatType: 'time',
+                  tickCount: 'week',
+                  grid: true,
+                  labelSeparation: 10, // Should be based on font size.
+                },
+              },
               y: {
                 field: primaryValue,
                 type: 'quantitative',
@@ -174,6 +183,19 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
             encoding: {
               color: {
                 field: 'geo_value',
+              },
+              x: {
+                ...xDateEncoding,
+                axis: {
+                  title: null,
+                  orient: 'bottom',
+                  labels: false,
+                  format: '%m/%d',
+                  formatType: 'time',
+                  tickCount: 'day',
+                  grid: false,
+                  labelSeparation: 10, // Should be based on font size.
+                },
               },
               y: {
                 field: primaryValue,
