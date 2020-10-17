@@ -117,8 +117,9 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
     data: { name: 'values' },
     width: 'container',
     height: 'container',
-    padding: 0,
+    padding: { left: 50, top: 4, bottom: 16 },
     autosize: {
+      type: 'none',
       resize: true,
     },
     transform: [
