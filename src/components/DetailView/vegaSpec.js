@@ -81,6 +81,7 @@ export const xDateEncoding = {
 const xDateRangeEncoding = {
   ...xDateEncoding,
   axis: {
+    orient: 'bottom',
     title: null,
     format: '%m/%d',
     formatType: 'time',
@@ -146,15 +147,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
             encoding: {
               color: colorEncoding(selections),
               x: {
-                ...xDateEncoding,
-                axis: {
-                  title: null,
-                  format: '%m/%d',
-                  formatType: 'time',
-                  tickCount: 'week',
-                  grid: true,
-                  labelSeparation: 10, // Should be based on font size.
-                },
+                ...xDateRangeEncoding,
               },
               y: {
                 field: primaryValue,
@@ -188,16 +181,12 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
                 field: 'geo_value',
               },
               x: {
-                ...xDateEncoding,
+                ...xDateRangeEncoding,
                 axis: {
-                  title: null,
-                  orient: 'bottom',
+                  ...xDateRangeEncoding.axis,
                   labels: false,
-                  format: '%m/%d',
-                  formatType: 'time',
-                  tickCount: 'day',
                   grid: false,
-                  labelSeparation: 10, // Should be based on font size.
+                  tickCount: 'day',
                 },
               },
               y: {
