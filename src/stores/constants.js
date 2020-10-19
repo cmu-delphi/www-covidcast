@@ -1,6 +1,7 @@
 import { formatAPITime, isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data';
 import { format } from 'd3-format';
 import descriptions from './descriptions.generated.json';
+import '!file-loader?name=descriptions.raw.txt!./descriptions.raw.txt';
 import { resolveColorScale } from './colorScales';
 // import { generateMockSignal, generateMockMeta } from '../data/mock';
 

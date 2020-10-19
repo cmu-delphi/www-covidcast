@@ -8,3 +8,4 @@
 .eslintcache
 /public
 src/**/*.generated.json
+src/**/descriptions.raw.txt

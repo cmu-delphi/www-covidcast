@@ -30,6 +30,8 @@ async function loadDoc(url) {
 async function generateDescriptions() {
   const code = (await Promise.all(DOC_URL.split(',').map(loadDoc))).join('\n\n');
 
+  fs.writeFileSync('./src/stores/descriptions.raw.txt', code);
+
   const entries = [];
   yaml.safeLoadAll(code, (doc) => {
     const r = {};
