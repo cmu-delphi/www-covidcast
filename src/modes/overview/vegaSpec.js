@@ -115,9 +115,9 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
   const spec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
     data: { name: 'values' },
-    width: 'container',
-    height: 'container',
-    padding: { left: 50, top: 4, bottom: 16 },
+    width: '378',
+    height: '35',
+    padding: { left: 50, top: 4, bottom: 16, right: 2 },
     autosize: {
       type: 'none',
       resize: true,
