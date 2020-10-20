@@ -41,6 +41,9 @@
    * @param {import('../../maps').NameInfo} region
    */
   function computeRelatedRegions(region) {
+    if (!region) {
+      return [];
+    }
     if (region.level !== 'county') {
       return [{ region, label: region.displayName }];
     }
@@ -70,6 +73,9 @@
    * @param {'none' | 'region' | 'date'} related
    */
   function loadData(date, region, related) {
+    if (!date || !region) {
+      return Promise.resolve([]);
+    }
     // collect all data to load
     const signals = sections
       .map((d) => d.questions.map((d) => d.indicators))
@@ -227,7 +233,9 @@
 </style>
 
 <div class="root">
-  <h1>Facebook Survey Results of {$currentRegionInfo.displayName} as of {formatTime(selectedDate)}</h1>
+  <h1>
+    Facebook Survey Results of {$currentRegionInfo ? $currentRegionInfo.displayName : '?'} as of {formatTime(selectedDate)}
+  </h1>
   <div class="split">
     <main>
       {#each sections as section}
@@ -297,7 +305,7 @@
             bind:group={related}
             name="related"
             value="region"
-            disabled={$currentRegionInfo.level !== 'county'} />Related regions</label>
+            disabled={!$currentRegionInfo || $currentRegionInfo.level !== 'county'} />Related regions</label>
         <label><input type="radio" bind:group={related} name="related" value="date" />Previous dates</label>
       </div>
       <div class="filter-group filter-spacer">
