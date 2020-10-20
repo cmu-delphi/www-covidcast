@@ -221,6 +221,13 @@
     }
     return Math.floor(entry.sample_size).toLocaleString();
   }
+  function formatIssueDate(entry) {
+    if (!entry || entry.issue == null) {
+      return '?';
+    }
+    return formatTime(parseAPITime(entry.issue));
+  }
+  formatIssueDate;
 
   $: selectedDate = parseAPITime($currentDate);
   /**
@@ -327,9 +334,11 @@
                     <Vega data={data.then((r) => r.filter((d) => d.signal === indicator.signal))} {spec} />
                   </div>
                   {#await dataLookup}
-                    <div class="info loading">based on ? samples</div>
+                    <div class="info loading">based on ? samples, published ?</div>
                   {:then lookup}
-                    <div class="info">based on {formatSampleSize(lookup.get(indicator.signal))} samples</div>
+                    <div class="info">
+                      based on {formatSampleSize(lookup.get(indicator.signal))} samples, published {formatIssueDate(lookup.get(indicator.signal))}
+                    </div>
                   {/await}
                 </div>
               {/each}
