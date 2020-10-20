@@ -35,6 +35,12 @@ const modes = [
     component: () => import('./single/SingleLocation.svelte').then((r) => r.default),
   },
   {
+    id: 'survey',
+    label: 'Survey Results',
+    tooltip: 'Switch to Survey View',
+    component: () => import('./survey/Survey.svelte').then((r) => r.default),
+  },
+  {
     id: 'export',
     label: 'Export Data',
     tooltip: 'Switch to Export Data Mode',
