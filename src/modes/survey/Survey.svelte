@@ -1,15 +1,21 @@
 <script>
+  import Search from '../../components/Search.svelte';
   import Vega from '../../components/Vega.svelte';
-  import { fetchMultiSignal } from '../../data';
+  import { fetchMultiSignal, formatAPITime, parseAPITime } from '../../data';
+  import { nameInfos } from '../../maps';
+  import { currentDate, currentRegionInfo, selectByInfo, sensorList, times } from '../../stores';
+  import { timeFormat } from 'd3-time-format';
+  import Datepicker from '../../components/Calendar/Datepicker.svelte';
 
-  import { currentRegionInfo, yesterdayDate } from '../../stores';
-
-  const dataSource = 'fb-survey';
+  const formatTime = timeFormat('%B %-d, %Y');
 
   const criteria =
     '<a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#ili-and-cli-indicators">these criteria</a>';
   const community =
     '<a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#estimating-community-cli">community</a>';
+
+  const refSensor = sensorList.find((d) => d.signal === 'smoothed_wearing_mask');
+  const dataSource = refSensor.id;
 
   const sections = [
     {
@@ -104,9 +110,6 @@
       ],
     },
   ];
-
-  const date = yesterdayDate;
-  const region = $currentRegionInfo;
 
   let showErrorBars = false;
 
@@ -207,7 +210,7 @@
     return spec;
   }
 
-  $: data = loadData(date, region);
+  $: data = loadData($currentDate, $currentRegionInfo);
   $: spec = createVegaSpec(showErrorBars);
 
   $: dataLookup = data.then((r) => new Map(r.map((d) => [d.signal, d])));
@@ -217,6 +220,19 @@
       return '?';
     }
     return Math.floor(entry.sample_size).toLocaleString();
+  }
+
+  $: selectedDate = parseAPITime($currentDate);
+  /**
+   * @type {[Date, Date]}
+   */
+  $: startEndDates = [];
+  $: if ($times !== null) {
+    const dates = $times.get(refSensor.key);
+    startEndDates = dates ? dates.map(parseAPITime) : [];
+  }
+  $: if (selectedDate !== undefined) {
+    currentDate.set(formatAPITime(selectedDate));
   }
 </script>
 
@@ -266,10 +282,33 @@
     text-align: right;
     font-size: 75%;
   }
+
+  aside {
+  }
+
+  .filter-group {
+    margin: 1em 0;
+  }
+
+  .filter-calendar > :global(div) {
+    display: block;
+  }
+
+  .calendar {
+    width: 100%;
+  }
+
+  input[type='checkbox'] {
+    margin-right: 0.5em;
+  }
+
+  .filter-options {
+    margin-top: 3em;
+  }
 </style>
 
 <div class="root">
-  <h1>Facebook Survey Results</h1>
+  <h1>Facebook Survey Results of {$currentRegionInfo.displayName} as of {formatTime(selectedDate)}</h1>
   <div class="split">
     <main>
       {#each sections as section}
@@ -300,7 +339,41 @@
       {/each}
     </main>
     <aside>
-      <div><label><input type="checkbox" bind:value={showErrorBars} />Show Error Bars</label></div>
+      <div class="filter-group">
+        <h5>Selected Region</h5>
+        <Search
+          className="search-container container-style container-bg"
+          placeholder="Search Region"
+          items={nameInfos}
+          selectedItem={$currentRegionInfo}
+          labelFieldName="displayName"
+          maxItemsToShowInList="5"
+          on:change={(e) => selectByInfo(e.detail)} />
+      </div>
+      <div class="filter-group filter-calendar">
+        <h5>Selected Date</h5>
+        {#if selectedDate != null && startEndDates.length !== 0}
+          <Datepicker
+            bind:selected={selectedDate}
+            start={startEndDates[0]}
+            end={startEndDates[1]}
+            formattedSelected={formatTime(selectedDate)}>
+            <button
+              aria-label="selected date"
+              class="pg-button pg-text-button base-font-size calendar"
+              on:>{formatTime(selectedDate)}</button>
+          </Datepicker>
+        {:else}
+          <button
+            aria-label="selected date"
+            class="pg-button pg-text-button base-font-size calendar"
+            on:>{formatTime(selectedDate)}</button>
+        {/if}
+      </div>
+      <div class="filter-group filter-options">
+        <h5>Options</h5>
+        <label><input type="checkbox" bind:checked={showErrorBars} />Show Error Bars</label>
+      </div>
     </aside>
   </div>
 </div>
