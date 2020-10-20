@@ -2,216 +2,135 @@
   import Search from '../../components/Search.svelte';
   import Vega from '../../components/Vega.svelte';
   import { fetchMultiSignal, formatAPITime, parseAPITime } from '../../data';
-  import { nameInfos } from '../../maps';
-  import { currentDate, currentRegionInfo, selectByInfo, sensorList, times } from '../../stores';
+  import { nameInfos, getInfoByName } from '../../maps';
+  import { currentDate, currentDateObject, currentRegionInfo, selectByInfo, times } from '../../stores';
   import { timeFormat } from 'd3-time-format';
+  import { timeDay } from 'd3-time';
   import Datepicker from '../../components/Calendar/Datepicker.svelte';
+  import { createVegaSpec } from './vegaSpec';
+  import { dataSource, refSensor, sections } from './sections';
 
   const formatTime = timeFormat('%B %-d, %Y');
-
-  const criteria =
-    '<a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#ili-and-cli-indicators">these criteria</a>';
-  const community =
-    '<a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#estimating-community-cli">community</a>';
-
-  const refSensor = sensorList.find((d) => d.signal === 'smoothed_wearing_mask');
-  const dataSource = refSensor.id;
-
-  const sections = [
-    {
-      section: 'Symptoms (forecast)',
-      questions: [
-        {
-          question:
-            'A1: In the past 24 hours, have you or anyone in your household experienced any of the following ...',
-          indicators: [
-            {
-              name: 'COVID-Like Symptoms',
-              description: `Estimated percentage of people with COVID-like illness based on ${criteria}.`,
-              signal: 'smoothed_cli',
-            },
-            {
-              name: 'Flu-Like Symptoms',
-              description: `Estimated percentage of people with influenza-like illness based on ${criteria}.`,
-              signal: 'smoothed_ili',
-            },
-          ],
-        },
-        {
-          question:
-            'A4: How many additional people in your local community that you know personally are sick (fever, along with at least one other symptom from the list)?',
-          indicators: [
-            {
-              name: 'COVID-Like Symptoms in Community',
-              description: `Estimated percentage of people reporting illness in their local community, see ${community}, including their household.`,
-              signal: 'smoothed_hh_cmnty_cli',
-            },
-            {
-              name: 'COVID-Like Symptoms in Community not including their household',
-              description: `Estimated percentage of people reporting illness in their local community, see ${community}, not including their household.`,
-              signal: 'smoothed_nohh_cmnty_cli',
-            },
-          ],
-        },
-      ],
-    },
-    {
-      section: 'Symptoms (non-forecast)',
-      questions: [
-        {
-          question: 'B8, B10: Have you been tested for coronavirus (COVID-19) in the last 14 days?',
-          indicators: [
-            {
-              name: 'Got Tested for COVID-19',
-              description:
-                'Estimated percentage of people who were tested for COVID-19 in the past 14 days, regardless of their test result.',
-              signal: 'smoothed_tested_14d',
-            },
-          ],
-        },
-        {
-          question: 'B10a: Did this test find that you had coronavirus (COVID-19)?',
-          indicators: [
-            {
-              name: 'Test Positivity Rate',
-              description:
-                'Estimated test positivity rate (percent) among people tested for COVID-19 in the past 14 days.',
-              signal: 'smoothed_tested_positive_14d',
-            },
-          ],
-        },
-        {
-          question: 'B12: Have you wanted to be tested for coronavirus (COVID-19) at any time in the last 14 days?',
-          indicators: [
-            {
-              name: 'Wanted but could not get tested',
-              description:
-                'Estimated percentage of people who wanted to be tested for COVID-19 in the past 14 days, out of people who were not tested in that time.',
-              signal: 'smoothed_wanted_test_14d',
-            },
-          ],
-        },
-      ],
-    },
-    {
-      section: 'Contacts and risk factors',
-      questions: [
-        {
-          question: 'C14: In the past 5 days, how often did you wear a mask when in public?',
-          indicators: [
-            {
-              name: 'People Wearing Masks',
-              description:
-                'Estimated percentage of people who wore a mask most or all of the time while in public in the past 5 days; those not in public in the past 5 days are not counted.',
-              signal: 'smoothed_wearing_mask',
-            },
-          ],
-        },
-      ],
-    },
-  ];
 
   let showErrorBars = false;
 
   /**
    * @param {Date} date
+   */
+  function computeRelatedTimeStamps(date) {
+    return [
+      {
+        date,
+        label: formatTime(date),
+      },
+      {
+        date: timeDay.offset(date, -1),
+        label: 'The day before',
+      },
+      {
+        date: timeDay.offset(date, -7),
+        label: 'A week ago',
+      },
+      {
+        date: timeDay.offset(date, -14),
+        label: 'Two weeks ago',
+      },
+    ];
+  }
+  /**
    * @param {import('../../maps').NameInfo} region
    */
-  function loadData(date, region) {
+  function computeRelatedRegions(region) {
+    if (region.level !== 'county') {
+      return [{ region, label: region.displayName }];
+    }
+    const stateRegion = region.level === 'county' ? getInfoByName(region.state) : null;
+
+    return [
+      { region, label: region.displayName },
+      { region: stateRegion, label: stateRegion.displayName },
+    ];
+  }
+  /**
+   * @param {Date} date
+   * @param {'none' | 'region' | 'date'} related
+   */
+  function computeRelatedGroups(date, region, related) {
+    if (related === 'date') {
+      return computeRelatedTimeStamps(date);
+    }
+    if (related === 'region') {
+      return computeRelatedRegions(region);
+    }
+    return [];
+  }
+  /**
+   * @param {Date} date
+   * @param {import('../../maps').NameInfo} region
+   * @param {'none' | 'region' | 'date'} related
+   */
+  function loadData(date, region, related) {
     // collect all data to load
     const signals = sections
       .map((d) => d.questions.map((d) => d.indicators))
       .flat(2)
       .map((d) => d.signal);
 
-    return fetchMultiSignal(dataSource, signals, date, region, ['issue', 'sample_size']);
+    if (related === 'none') {
+      return fetchMultiSignal(dataSource, signals, date, region, ['issue', 'sample_size']);
+    }
+    if (related === 'region') {
+      const regions = computeRelatedRegions(region);
+      return Promise.all(
+        regions.map((region) => fetchMultiSignal(dataSource, signals, date, region.region, ['issue', 'sample_size'])),
+      ).then((data) => {
+        return regions
+          .map((r, i) => {
+            const rows = data[i];
+            for (const row of rows) {
+              row.group = r.label;
+            }
+            return rows;
+          })
+          .flat();
+      });
+    }
+    if (related === 'date') {
+      const relatedTimeStamps = computeRelatedTimeStamps(date);
+      return fetchMultiSignal(
+        dataSource,
+        signals,
+        relatedTimeStamps.map((d) => d.date),
+        region,
+        ['issue', 'sample_size'],
+      ).then((data) => {
+        const lookup = new Map(relatedTimeStamps.map((d) => [formatAPITime(d.date), d.label]));
+
+        // sort by date
+        data.sort((a, b) => {
+          if (a.time_value !== b.time_value) {
+            return a.time_value < b.time_value ? -1 : 1;
+          }
+          return a.signal.localeCompare(b.signal);
+        });
+        // extend the rows with a 'group' to be used in the vega spec
+
+        for (const row of data) {
+          row.group = lookup.get(row.time_value.toString()) || 'Unknown';
+        }
+        return data;
+      });
+    }
   }
 
   /**
-   * @param {boolean} showErrorBars
+   * @type {'none' | 'region' | 'date'}
    */
-  function createVegaSpec(showErrorBars) {
-    /**
-     * @type {import('vega-lite').TopLevelSpec}
-     */
-    const spec = {
-      $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
-      data: { name: 'values' },
-      width: 'container',
-      height: 'container',
-      padding: 0,
-      autosize: {
-        resize: true,
-      },
-      transform: [
-        {
-          calculate: 'datum.value == null ? null : datum.stderr / 100',
-          as: 'pStdErr',
-        },
-        {
-          calculate: 'datum.value == null ? null : datum.value / 100',
-          as: 'pValue',
-        },
-        {
-          calculate: 'datum.pValue == null ? null : datum.pValue + datum.pStdErr',
-          as: 'pValueAndStdErr',
-        },
-      ],
-      encoding: {
-        x: {
-          field: 'pValue',
-          type: 'quantitative',
-          scale: {
-            domain: [0, 1],
-            clamp: true,
-          },
-          axis: {
-            format: '.1%',
-            title: 'Percentage',
-          },
-        },
-      },
-      layer: [
-        {
-          mark: 'bar',
-        },
-        ...(showErrorBars
-          ? [
-              {
-                mark: 'errorbar',
-                encoding: {
-                  xError: { field: 'pStdErr' },
-                },
-              },
-            ]
-          : []),
-        {
-          mark: {
-            type: 'text',
-            align: 'left',
-            baseline: 'middle',
-            dx: 3,
-          },
-          encoding: {
-            x: {
-              field: showErrorBars ? 'pValueAndStdErr' : 'pValue', // shift by value and stderr
-              type: 'quantitative',
-            },
-            text: {
-              field: 'pValue',
-              type: 'quantitative',
-              format: '.1%',
-            },
-          },
-        },
-      ],
-    };
+  let related = 'none';
 
-    return spec;
-  }
-
-  $: data = loadData($currentDate, $currentRegionInfo);
-  $: spec = createVegaSpec(showErrorBars);
+  $: relatedGroups = computeRelatedGroups($currentDateObject, $currentRegionInfo, related);
+  $: data = loadData($currentDateObject, $currentRegionInfo, related);
+  $: spec = createVegaSpec(showErrorBars, relatedGroups);
 
   $: dataLookup = data.then((r) => new Map(r.map((d) => [d.signal, d])));
 
@@ -227,7 +146,6 @@
     }
     return formatTime(parseAPITime(entry.issue));
   }
-  formatIssueDate;
 
   $: selectedDate = parseAPITime($currentDate);
   /**
@@ -269,16 +187,9 @@
     margin: 0.5em 0;
     padding: 0.2em;
   }
-  .vega-wrapper {
-    position: relative;
-    height: 5em;
-  }
-  .vega-wrapper > :global(*) {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 2px;
-    bottom: 0;
+
+  .indicator :global(.vega-embed) {
+    display: block;
   }
 
   p {
@@ -288,9 +199,6 @@
   .info {
     text-align: right;
     font-size: 75%;
-  }
-
-  aside {
   }
 
   .filter-group {
@@ -305,11 +213,15 @@
     width: 100%;
   }
 
-  input[type='checkbox'] {
+  label {
+    display: block;
+  }
+  input[type='checkbox'],
+  input[type='radio'] {
     margin-right: 0.5em;
   }
 
-  .filter-options {
+  .filter-spacer {
     margin-top: 3em;
   }
 </style>
@@ -330,9 +242,7 @@
                   <p>
                     {@html indicator.description}
                   </p>
-                  <div class="vega-wrapper">
-                    <Vega data={data.then((r) => r.filter((d) => d.signal === indicator.signal))} {spec} />
-                  </div>
+                  <Vega data={data.then((r) => r.filter((d) => d.signal === indicator.signal))} {spec} />
                   {#await dataLookup}
                     <div class="info loading">based on ? samples, published ?</div>
                   {:then lookup}
@@ -379,8 +289,19 @@
             on:>{formatTime(selectedDate)}</button>
         {/if}
       </div>
-      <div class="filter-group filter-options">
-        <h5>Options</h5>
+      <div class="filter-group filter-spacer">
+        <h5>Show Related Results</h5>
+        <label><input type="radio" bind:group={related} name="related" value="none" />None</label>
+        <label><input
+            type="radio"
+            bind:group={related}
+            name="related"
+            value="region"
+            disabled={$currentRegionInfo.level !== 'county'} />Related regions</label>
+        <label><input type="radio" bind:group={related} name="related" value="date" />Previous dates</label>
+      </div>
+      <div class="filter-group filter-spacer">
+        <h5>Advanced</h5>
         <label><input type="checkbox" bind:checked={showErrorBars} />Show Error Bars</label>
       </div>
     </aside>

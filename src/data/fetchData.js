@@ -395,7 +395,7 @@ export function fetchMultipleRegionsTimeSlices(
  * fetches data for a specific data and region for multiple signals in the same data source
  * @param {string} dataSource
  * @param {string[]} signals
- * @param {Date} date
+ * @param {Date | Date[]} date
  * @param {import('../maps').NameInfo} region
  * @param {string[]} extraFields
  * @returns {Promise<EpiDataRow[]>[]}
@@ -403,12 +403,19 @@ export function fetchMultipleRegionsTimeSlices(
 export function fetchMultiSignal(dataSource, signals, date, region, extraFields) {
   const mixinValues = {
     geo_value: region.propertyId,
-    time_value: formatAPITime(date),
   };
+  if (!Array.isArray(date)) {
+    mixinValues.time_value = formatAPITime(date);
+  }
   const transferFields = [...computeTransferFields(mixinValues), ...extraFields];
 
-  return callAPIEndPoint(undefined, dataSource, signals.join(','), region.level, date, region.propertyId, [
-    ...transferFields,
-    'signal',
-  ]).then((rows) => parseData(rows, mixinValues));
+  return callAPIEndPoint(
+    undefined,
+    dataSource,
+    signals.join(','),
+    region.level,
+    Array.isArray(date) ? date.map((d) => formatAPITime(d)).join(',') : date,
+    region.propertyId,
+    [...transferFields, 'signal'],
+  ).then((rows) => parseData(rows, mixinValues));
 }
