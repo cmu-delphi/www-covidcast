@@ -121,7 +121,7 @@
       .flat(2)
       .map((d) => d.signal);
 
-    return fetchMultiSignal(dataSource, signals, date, region);
+    return fetchMultiSignal(dataSource, signals, date, region, ['issue', 'sample_size']);
   }
 
   /**
@@ -209,6 +209,15 @@
 
   $: data = loadData(date, region);
   $: spec = createVegaSpec(showErrorBars);
+
+  $: dataLookup = data.then((r) => new Map(r.map((d) => [d.signal, d])));
+
+  function formatSampleSize(entry) {
+    if (!entry || entry.sample_size == null) {
+      return '?';
+    }
+    return Math.floor(entry.sample_size).toLocaleString();
+  }
 </script>
 
 <style>
@@ -252,6 +261,11 @@
   p {
     padding: 0;
   }
+
+  .info {
+    text-align: right;
+    font-size: 75%;
+  }
 </style>
 
 <div class="root">
@@ -273,6 +287,11 @@
                   <div class="vega-wrapper">
                     <Vega data={data.then((r) => r.filter((d) => d.signal === indicator.signal))} {spec} />
                   </div>
+                  {#await dataLookup}
+                    <div class="info loading">based on ? samples</div>
+                  {:then lookup}
+                    <div class="info">based on {formatSampleSize(lookup.get(indicator.signal))} samples</div>
+                  {/await}
                 </div>
               {/each}
             </div>

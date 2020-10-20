@@ -397,14 +397,15 @@ export function fetchMultipleRegionsTimeSlices(
  * @param {string[]} signals
  * @param {Date} date
  * @param {import('../maps').NameInfo} region
+ * @param {string[]} extraFields
  * @returns {Promise<EpiDataRow[]>[]}
  */
-export function fetchMultiSignal(dataSource, signals, date, region) {
+export function fetchMultiSignal(dataSource, signals, date, region, extraFields) {
   const mixinValues = {
     geo_value: region.propertyId,
     time_value: formatAPITime(date),
   };
-  const transferFields = computeTransferFields(mixinValues);
+  const transferFields = [...computeTransferFields(mixinValues), ...extraFields];
 
   return callAPIEndPoint(undefined, dataSource, signals.join(','), region.level, date, region.propertyId, [
     ...transferFields,
