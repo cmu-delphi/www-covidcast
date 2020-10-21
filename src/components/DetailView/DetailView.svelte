@@ -157,7 +157,7 @@
   <h4>{sensor.name} in {hasRegion ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown'}</h4>
   <div>
     <h5>{mapTitle}</h5>
-    {#if sensor.longDescription}
+    {#if sensor.description}
       <button
         title="Show sensor description"
         class="pg-button pg-button-circle info"

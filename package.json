@@ -13,8 +13,9 @@
     "url": "https://github.com/cmu-delphi/www-covidcast.git"
   },
   "scripts": {
-    "start": "cross-env NODE_ENV=development webpack-dev-server -d --open",
-    "build": "cross-env NODE_ENV=production webpack -p",
+    "gen": "node ./scripts/generateDescriptions.js",
+    "start": "npm run gen && cross-env NODE_ENV=development webpack-dev-server -d --open",
+    "build": "npm run gen && cross-env NODE_ENV=production webpack -p",
     "deploy": "npm run build; gh-pages -d public",
     "zip": "cd public && bestzip ../release.zip *",
     "prettier": "prettier --write \"**/*\"",
@@ -41,8 +42,11 @@
     "html-webpack-harddisk-plugin": "^1.0.2",
     "html-webpack-plugin": "^4.4.1",
     "husky": "^4.3.0",
+    "js-yaml": "^3.14.0",
     "lint-staged": "^10.3.0",
+    "marked": "^1.2.0",
     "mini-css-extract-plugin": "^0.11.2",
+    "node-fetch": "^2.6.1",
     "optimize-css-assets-webpack-plugin": "^5.0.4",
     "prettier": "^2.1.1",
     "prettier-plugin-svelte": "^1.2.1",
