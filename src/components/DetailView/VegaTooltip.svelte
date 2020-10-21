@@ -50,7 +50,7 @@
         <tr>
           <th>{sensor.yAxis}</th>
           <th class="area">Count</th>
-          <th class="area">Ratios per 100,000</th>
+          <th class="area">Ratios (per 100,000)</th>
         </tr>
         <tr>
           <th>{formatTimeWithoutYear(item.date_value)}</th>

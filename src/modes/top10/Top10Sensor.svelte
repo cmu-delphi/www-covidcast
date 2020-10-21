@@ -1,11 +1,8 @@
 <script>
-  import { currentDateObject, stats, yesterdayDate } from '../../stores';
+  import { currentDateObject } from '../../stores';
   import { createSpec } from '../overview/vegaSpec';
   import Vega from '../../components/Vega.svelte';
-  import { parseAPITime } from '../../data';
-  import { fetchTimeSlice } from '../../data/fetchData';
   import VegaTooltip from '../../components/DetailView/VegaTooltip.svelte';
-  import { determineMinMax } from '../../components/MapBox/colors';
   import { MAP_THEME } from '../../theme';
   import { primaryValue } from '../../stores/constants';
 
@@ -13,17 +10,6 @@
    * @type {import('../../maps').NameInfo}
    */
   export let row;
-
-  $: id = row.propertyId;
-
-  /**
-   * @type {string}
-   */
-  export let level;
-
-  // Create a date for today in the API's date format
-  const startDay = parseAPITime('20200401');
-  const finalDay = yesterdayDate;
 
   export let highlightTimeValue;
   export let onHighlight;
@@ -39,23 +25,31 @@
 
   export let ratioOptions;
 
+  export let data = Promise.resolve([]);
+  export let domain = Promise.resolve([0, 100]);
+
   $: field = primaryValue(sensor, ratioOptions);
   $: cumulativeField = primaryValue(sensor, {
     ...ratioOptions,
     cumulative: true,
   });
 
-  $: data = fetchTimeSlice(sensor, level, id, startDay, finalDay, true, {
-    geo_value: id,
-    stderr: null,
-  });
-
-  $: domain = determineMinMax($stats, sensor, level, ratioOptions);
-
   $: patchedSpec = createSpec(sensor, [{ info: row, color: MAP_THEME.selectedRegionOutline }], null, {
     field: sensor.format !== 'percent' ? field : undefined,
-    domain,
+    domain: [0, 100],
   });
+
+  let loading = false;
+  $: {
+    loading = true;
+    domain.then((domainValues) => {
+      patchedSpec = createSpec(sensor, [{ info: row, color: MAP_THEME.selectedRegionOutline }], null, {
+        field: sensor.format !== 'percent' ? field : undefined,
+        domain: domainValues,
+      });
+      loading = false;
+    });
+  }
 </script>
 
 <style>
@@ -109,7 +103,7 @@
     <span class="date">{$currentDateObject.toLocaleDateString()}</span>
   </td>
 {/if}
-<td class="chart">
+<td class="chart" class:loading>
   <Vega
     {data}
     spec={patchedSpec}

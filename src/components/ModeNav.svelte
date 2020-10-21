@@ -61,9 +61,6 @@
       border-bottom: 1px solid var(--bg) !important;
       margin: 0;
     }
-    .hideMobile {
-      display: none;
-    }
 
     .active,
     .mode-button:hover,
@@ -82,8 +79,7 @@
       on:click={() => {
         currentMode.set(mode);
       }}
-      title={mode.tooltip}
-      class:hideMobile={mode.id === 'export'}>
+      title={mode.tooltip}>
       {mode.label}
     </button>
   {/each}

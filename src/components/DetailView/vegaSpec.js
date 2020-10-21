@@ -1,4 +1,5 @@
 import merge from 'lodash-es/merge';
+
 /**
  * @type {import('vega-lite/build/src/spec').LayerSpec | import('vega-lite/build/src/spec').UnitSpec}
  */
@@ -13,7 +14,10 @@ export const CURRENT_DATE_HIGHLIGHT = {
       as: 'date_value',
     },
   ],
-  mark: 'rule',
+  mark: {
+    type: 'rule',
+    tooltip: false,
+  },
   encoding: {
     color: {
       value: '#c00',
@@ -68,11 +72,22 @@ export const xDateEncoding = {
   field: 'date_value',
   type: 'temporal',
   axis: {
+    orient: 'bottom',
+    labels: false,
+    title: null,
+  },
+};
+
+const xDateRangeEncoding = {
+  ...xDateEncoding,
+  axis: {
+    orient: 'bottom',
     title: null,
     format: '%m/%d',
     formatType: 'time',
-    tickCount: 'day',
-    grid: false,
+    tickCount: 'week',
+    grid: true,
+    labelSeparation: 10, // Should be based on font size.
   },
 };
 
@@ -122,6 +137,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
             scale: { domain: { selection: 'brush' } },
           },
         },
+        resolve: { axis: { x: 'independent' } },
         layer: [
           {
             mark: {
@@ -130,6 +146,9 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
             },
             encoding: {
               color: colorEncoding(selections),
+              x: {
+                ...xDateRangeEncoding,
+              },
               y: {
                 field: primaryValue,
                 type: 'quantitative',
@@ -161,6 +180,15 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
               color: {
                 field: 'geo_value',
               },
+              x: {
+                ...xDateRangeEncoding,
+                axis: {
+                  ...xDateRangeEncoding.axis,
+                  labels: false,
+                  grid: false,
+                  tickCount: 'day',
+                },
+              },
               y: {
                 field: primaryValue,
                 type: 'quantitative',
@@ -190,11 +218,21 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
       },
       {
         height: 40,
+        view: { cursor: 'col-resize' },
         encoding: {
           color: {
             field: 'geo_value',
           },
-          x: { ...xDateEncoding },
+          x: { ...xDateRangeEncoding },
+          y: {
+            field: primaryValue,
+            type: 'quantitative',
+            axis: {
+              minExtent: 25,
+              tickCount: 3,
+              title: ' ',
+            },
+          },
         },
         layer: [
           {
@@ -212,6 +250,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
                 init: {
                   x: [initialSelection[0].getTime(), initialSelection[1].getTime()],
                 },
+                mark: { cursor: 'move' },
               },
             },
             mark: {
@@ -253,6 +292,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
       },
     ],
     config: {
+      customFormatTypes: true,
       legend: {
         disable: true,
       },
