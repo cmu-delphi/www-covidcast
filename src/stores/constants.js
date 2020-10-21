@@ -200,6 +200,11 @@ export function extendSensorEntry(sensorEntry) {
 export const defaultSensorId = 'doctor-visits';
 
 /**
+ * defines the geo types / levels that are should be used for computing the meta data, the first one has the highest priority and so on
+ */
+export const regularSignalMetaDataGeoTypeCandidates = ['county', 'msa'];
+
+/**
  * @type {Partial<SensorEntry>[]}
  */
 const defaultSensors = descriptions;
