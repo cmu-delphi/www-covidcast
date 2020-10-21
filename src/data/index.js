@@ -75,15 +75,26 @@ function loadRegularSignal(sEntry, meta, timeMap, statsMap) {
   // find the matching meta data by looping through the candidates and fallback to the first one
   const baseFilter = (d) =>
     d.data_source === sEntry.id && d.signal === sEntry.signal && (!d.time_type || d.time_type === 'day');
-  const candidates = regularSignalMetaDataGeoTypeCandidates.slice();
-  let matchedMeta = null;
-  while (!matchedMeta && candidates.length > 0) {
-    const geoType = candidates.shift();
-    matchedMeta = meta.epidata.find((d) => baseFilter(d) && d.geo_type === geoType);
-  }
-  if (!matchedMeta) {
-    matchedMeta = meta.epidata.find(baseFilter);
-  }
+
+  const byGeoTypePriority = (a, b) => {
+    // sort by geo types but consider their importance for the matching
+    const aIndex = regularSignalMetaDataGeoTypeCandidates.indexOf(a.geo_type);
+    const bIndex = regularSignalMetaDataGeoTypeCandidates.indexOf(b.geo_type);
+    if (aIndex === bIndex) {
+      return a.geo_type.localCompare(b.geo_type);
+    }
+    if (aIndex < 0) {
+      // missing is bigger
+      return 1;
+    }
+    if (bIndex < 0) {
+      return -1;
+    }
+    return aIndex - bIndex;
+  };
+
+  const candidates = meta.epidata.filter(baseFilter).sort(byGeoTypePriority);
+  const matchedMeta = candidates[0];
 
   if (matchedMeta) {
     updateTimeMap(sEntry.key, matchedMeta, timeMap);
