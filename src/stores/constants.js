@@ -4,6 +4,7 @@ import descriptions from './descriptions.generated.json';
 import '!file-loader?name=descriptions.raw.txt!./descriptions.raw.txt';
 import { resolveColorScale } from './colorScales';
 // import { generateMockSignal, generateMockMeta } from '../data/mock';
+import { createRTLiveSignal } from '../data/rtlive';
 
 export const levelList = [
   {
@@ -87,7 +88,7 @@ export function getLevelInfo(level) {
  * @property {boolean} isCount is count signal
  * @property {(options?: CasesOrDeathOptions) => 'prop' | 'count' | 'other')} getType
  * @property {Record<keyof EpiDataCasesOrDeathValues, string>} casesOrDeathSignals signal to load for cases or death
- * @property {)(v: number) => string)} colorScale
+ * @property {((v: number) => string)} colorScale
  */
 
 /**
@@ -219,7 +220,7 @@ export const sensorList = (() => {
   if (sensorsOption) {
     return JSON.parse(decodeURIComponent(sensorsOption)).map(extendSensorEntry);
   } else {
-    return defaultSensors.map(extendSensorEntry);
+    return [...defaultSensors, createRTLiveSignal()].map(extendSensorEntry);
   }
 })();
 
