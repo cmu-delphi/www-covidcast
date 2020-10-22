@@ -153,7 +153,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
                 field: primaryValue,
                 type: 'quantitative',
                 scale: {
-                  domainMin: sensor.isDivergent ? undefined : 0,
+                  domainMin: sensor.isDiverging ? undefined : 0,
                 },
                 axis: {
                   minExtent: 25,

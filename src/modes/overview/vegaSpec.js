@@ -162,7 +162,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
               domainMin:
                 valuePatch && valuePatch.domain
                   ? scalePercent(valuePatch.domain[0])
-                  : sensor.isDivergent
+                  : sensor.isDiverging
                   ? undefined
                   : 0,
               domainMax: valuePatch && valuePatch.domain ? scalePercent(valuePatch.domain[1]) : undefined,

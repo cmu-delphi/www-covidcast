@@ -29,8 +29,8 @@ export function determineMinMax(statsLookup, sensorEntry, level, signalOptions, 
     }
     const stats = statsLookup.get(key);
 
-    if (sensorEntry.isDivergent) {
-      const center = sensorEntry.divergentCenter || 0;
+    if (sensorEntry.isDiverging) {
+      const center = sensorEntry.divergingCenter || 0;
       const maxDistance = Math.max(
         Math.abs(center - (useMax ? stats.min : stats.mean - 3 * stats.std)),
         Math.abs((useMax ? stats.max : stats.mean - 3 * stats.std) - center),
@@ -39,7 +39,7 @@ export function determineMinMax(statsLookup, sensorEntry, level, signalOptions, 
     }
 
     if (useMax) {
-      return [sensorEntry.isDivergent ? stats.min : 0, stats.max];
+      return [sensorEntry.isDiverging ? stats.min : 0, stats.max];
     }
     return [Math.max(MAGIC_MIN_STATS, stats.mean - 3 * stats.std), stats.mean + 3 * stats.std];
   }
@@ -49,8 +49,8 @@ export function determineMinMax(statsLookup, sensorEntry, level, signalOptions, 
   }
   const stats = statsLookup.get(key);
 
-  if (sensorEntry.isDivergent) {
-    const center = sensorEntry.divergentCenter || 0;
+  if (sensorEntry.isDiverging) {
+    const center = sensorEntry.divergingCenter || 0;
     const maxDistance = Math.max(
       Math.abs(center - (useMax ? stats.min : stats.mean - 3 * stats.std)),
       Math.abs((useMax ? stats.max : stats.mean - 3 * stats.std) - center),
@@ -72,7 +72,7 @@ export function determineMinMax(statsLookup, sensorEntry, level, signalOptions, 
  * @param {[number, number]} valueMinMax
  */
 export function determineColorScale(valueMinMax, signalType, sensorEntry, sensorType) {
-  if (sensorEntry.isDivergent) {
+  if (sensorEntry.isDiverging) {
     return divergentColorScale(valueMinMax, sensorEntry);
   }
   if (signalType === 'value') {
@@ -207,7 +207,7 @@ function computeTicks(sensorEntry, signalOptions, valueMinMax, small) {
     const max = Math.log10(Math.max(10e-2, valueMinMax[1]));
     return logspace(min, max, numTicks);
   }
-  if (sensorEntry.isDivergent) {
+  if (sensorEntry.isDiverging) {
     return splitDomain(valueMinMax[0], valueMinMax[1], numTicks);
   }
   // manipulates valueMinMax in place!

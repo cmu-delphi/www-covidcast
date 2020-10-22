@@ -89,8 +89,8 @@ export function getLevelInfo(level) {
  * @property {(options?: CasesOrDeathOptions) => 'prop' | 'count' | 'other')} getType
  * @property {Record<keyof EpiDataCasesOrDeathValues, string>} casesOrDeathSignals signal to load for cases or death
  * @property {((v: number) => string)} colorScale
- * @property {boolean} isDivergent
- * @property {?number} divergentCenter
+ * @property {boolean} isDiverging
+ * @property {?number} divergingCenter
  * @property {number} neutralValue
  */
 
@@ -178,7 +178,7 @@ export function extendSensorEntry(sensorEntry) {
     isCasesOrDeath,
     colorScale: resolveColorScale(sensorEntry.colorScale),
     links: sensorEntry.links || [],
-    isDivergent: typeof sensorEntry.divergentCenter === 'number',
+    isDiverging: typeof sensorEntry.divergingCenter === 'number',
     neutralValue: typeof sensorEntry.neutralValue === 'number' ? sensorEntry.neutralValue : 0,
     mapTitleText:
       typeof mapTitle === 'string'

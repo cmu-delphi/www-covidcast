@@ -24,7 +24,6 @@ const PACKED_URL = 'https://d14wlfuexuxgcm.cloudfront.net/covid/parsed_for_js5_r
  * @param {RTLiveMessagePack} decoded
  */
 function preparePack(decoded) {
-  console.log(decoded);
   const issue = new Date(decoded.last_updated_ts);
   const maxTime = isoParse(decoded.last_r0_date);
 
@@ -135,7 +134,7 @@ export function createRTLiveSignal() {
     yAxis: 'Effective Reproduction Rate',
     type: 'late',
     colorScale: (v) => interpolateRdYlGn(1 - v),
-    divergentCenter: 1,
+    divergingCenter: 1,
     neutralValue: 1,
     api: (...args) => {
       return data.then((r) => r.load(...args));
