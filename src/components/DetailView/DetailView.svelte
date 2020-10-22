@@ -59,7 +59,14 @@
       }).then((rows) => addMissing(rows, sensor))
     : [];
 
-  $: spec = createSpec(sensor, primaryValue(sensor, $signalCasesOrDeathOptions), selections, $smallMultipleTimeSpan);
+  const title = `${sensor.name} in ${
+    selections.length > 0 ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown'
+  }`;
+
+  $: spec = createSpec(sensor, primaryValue(sensor, $signalCasesOrDeathOptions), selections, $smallMultipleTimeSpan, [
+    title,
+    mapTitle,
+  ]);
 
   /**
    * @param {KeyboardEvent} e
@@ -100,6 +107,7 @@
 
   .vega-wrapper {
     position: relative;
+    top: -25px;
   }
   .vega-wrapper > :global(*) {
     position: absolute;
@@ -109,19 +117,17 @@
     bottom: 0;
   }
 
-  h5 {
-    display: inline-block;
-  }
-
   .header {
     position: relative;
   }
 
-  .close {
-    font-size: 0.88rem;
-    position: absolute;
-    right: 0;
-    top: 0;
+  .header .buttons {
+    float: right;
+  }
+
+  .header button {
+    z-index: 10;
+    margin-left: 1em;
   }
 
   .encoding {
@@ -147,17 +153,21 @@
   }
 
   .info {
-    margin-left: 1em;
     font-size: 0.7rem;
     display: inline-block;
   }
 </style>
 
 <div class="header">
-  <h4>{sensor.name} in {hasRegion ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown'}</h4>
-  <div>
-    <h5>{mapTitle}</h5>
-    {#if sensor.description}
+  <div class="buttons">
+    <button
+      title="Download this view"
+      class="pg-button pg-button-circle info"
+      on:click={downloadVega}
+      disabled={!vegaRef}>
+      <IoIosSave />
+    </button>
+    {#if sensor.longDescription}
       <button
         title="Show sensor description"
         class="pg-button pg-button-circle info"
@@ -166,23 +176,16 @@
         }}><IoMdHelp /></button>
     {/if}
     <button
-      title="Download this view"
+      bind:this={close}
       class="pg-button pg-button-circle info"
-      on:click={downloadVega}
-      disabled={!vegaRef}>
-      <IoIosSave />
+      on:click={() => {
+        trackEvent('detail-view', 'close', 'button');
+        dispatch('close');
+      }}
+      title="Close this detail view">
+      <IoIosClose />
     </button>
   </div>
-  <button
-    bind:this={close}
-    class="pg-button close"
-    on:click={() => {
-      trackEvent('detail-view', 'close', 'button');
-      dispatch('close');
-    }}
-    title="Close this detail view">
-    <IoIosClose />
-  </button>
 </div>
 <div class="single-sensor-chart vega-wrapper">
   <Vega

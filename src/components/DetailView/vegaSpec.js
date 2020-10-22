@@ -115,13 +115,22 @@ export function colorEncoding(selections) {
  * @param {string} primaryValue
  * @param {{info: import('../../maps').NameInfo, color: string}[]} selections
  * @param {[Date, Date]} initialSelection
+ * @param {Array<string>} title
  */
-export function createSpec(sensor, primaryValue, selections, initialSelection) {
+export function createSpec(sensor, primaryValue, selections, initialSelection, title) {
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
   const spec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
+    title: {
+      text: title,
+      font: '"Open Sans", Helvetica, sans-serif',
+      fontSize: 14.08,
+      fontWeight: 700,
+      lineHeight: 22,
+      color: '#666',
+    },
     data: { name: 'values' },
     autosize: {
       contains: 'padding',
@@ -325,7 +334,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
 }
 
 const OFFSET_X = 60;
-const OFFSET_Y = 80;
+const OFFSET_Y = 100;
 
 /**
  * patches in the current size
