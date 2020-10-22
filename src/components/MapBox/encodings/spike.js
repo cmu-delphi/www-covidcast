@@ -1,7 +1,7 @@
 import { toFillLayer, toSpikeLayer } from '../layers';
-import { parseScaleSpec } from '../../../stores/scales';
 import { SpikeLayer } from './SpikeLayer';
 import { toCenterSource } from '../sources';
+import { createScale } from './utils';
 
 const MAX_ZOOMED_HEIGHT = 100;
 
@@ -42,15 +42,13 @@ export default class SpikeEncoding {
     });
   }
 
-  encode(map, { level, sensorType, valueMinMax, scale }) {
+  encode(map, { level, sensorType, valueMinMax, scale, sensorEntry }) {
     map.setPaintProperty(toFillLayer(level), 'fill-color', this.theme.countyFill);
 
-    const valueMax = valueMinMax[1];
     const maxHeight = this.theme.maxHeight[level];
-
     const heightScaleTheme = this.theme.heightScale[sensorType];
 
-    const heightScale = parseScaleSpec(heightScaleTheme).range([0, maxHeight]).domain([0, valueMax]).clamp(true);
+    const heightScale = createScale(sensorEntry, valueMinMax, maxHeight, heightScaleTheme);
     this.customLayers.get(level).encode(heightScale, scale);
 
     return heightScale;

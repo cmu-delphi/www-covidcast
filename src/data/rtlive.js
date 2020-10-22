@@ -2,7 +2,7 @@ import { decode } from '@ygoe/msgpack';
 import { isoParse } from 'd3-time-format';
 import { mean, deviation, max, min } from 'd3-array';
 import { formatAPITime } from './utils';
-import { interpolateRdYlGn } from 'd3-scale-chromatic';
+import { interpolateRdBu } from 'd3-scale-chromatic';
 
 const PACKED_URL = 'https://d14wlfuexuxgcm.cloudfront.net/covid/parsed_for_js5_release.pack.gz';
 
@@ -113,7 +113,9 @@ function fetchPack() {
     .then(preparePack);
 }
 
-fetchPack();
+function customColorScale(v) {
+  return interpolateRdBu(1 - v);
+}
 
 export function createRTLiveSignal() {
   let data = null;
@@ -133,7 +135,7 @@ export function createRTLiveSignal() {
     description: `R<sup>t</sup> represents the effective reproduction rate of the virus calculated for each locale. It lets us estimate how many secondary infections are likely to occur from a single infection in a specific area. Values over 1.0 mean we should expect more cases in that area, values under 1.0 mean we should expect fewer.`,
     yAxis: 'Effective Reproduction Rate',
     type: 'late',
-    colorScale: (v) => interpolateRdYlGn(1 - v),
+    colorScale: customColorScale,
     divergingCenter: 1,
     neutralValue: 1,
     api: (...args) => {

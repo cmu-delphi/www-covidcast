@@ -17,14 +17,15 @@ varying vec4 v_data;
 void main() {
   vec4 p = u_matrix * vec4(a_pos.xy, 0.0, 1.0);
 
+  float radius = abs(a_colorAndValue.a);
   vec2 pos = vec2(a_pos.z < 0.0 ? -1.0 : 1.0, abs(a_pos.z) < 2.0 ? -1.0 : 1.0);
-  p.xy += pos * u_pixelToClip * (u_zoom * a_colorAndValue.a + 1.0) * p.w;
+  p.xy += pos * u_pixelToClip * (u_zoom * radius + 1.0) * p.w;
 
   gl_Position = p;
   v_color = a_colorAndValue.rgb / 255.0;
 
-  v_data = vec4(pos, a_colorAndValue.a * u_zoom, 1.0);
-  v_discard = a_colorAndValue.a == 0.0 ? 1.0 : 0.0;
+  v_data = vec4(pos, radius * u_zoom, 1.0);
+  v_discard = radius == 0.0 ? 1.0 : 0.0;
 }`;
 
 // create GLSL source for fragment shader

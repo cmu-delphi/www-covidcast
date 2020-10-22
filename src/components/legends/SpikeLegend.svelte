@@ -27,11 +27,10 @@
     $signalCasesOrDeathOptions,
     $isMobileDevice,
   );
-  $: maxPaddingHeight = maxHeight + spikePadding * 2;
 
   let getSpikePath = () => '';
   $: {
-    const h = $spikeHeightScale;
+    const h = (v) => Math.abs($spikeHeightScale(v));
     const z = zoom;
     const s = size;
     getSpikePath = (value) => `M 0 ${h(value) * z} L ${s} 0 L ${s * 2} ${h(value) * z}`;
@@ -81,7 +80,7 @@
   </li>
   {#each r.labels as l}
     <li class="legend-direct-tick">
-      <svg width={size * 2 + spikePadding * 2} height={$spikeHeightScale(l.value) * zoom + spikePadding * 2}>
+      <svg width={size * 2 + spikePadding * 2} height={Math.abs($spikeHeightScale(l.value)) * zoom + spikePadding * 2}>
         <g style="transform:translate({spikePadding}px, {spikePadding}px)">
           <path
             d={getSpikePath(l.value)}
@@ -94,7 +93,9 @@
     </li>
   {/each}
   <li class="legend-direct-tick">
-    <svg width={size * 2 + spikePadding * 2} height={$spikeHeightScale(r.highValue) * zoom + spikePadding * 2}>
+    <svg
+      width={size * 2 + spikePadding * 2}
+      height={Math.abs($spikeHeightScale(r.highValue)) * zoom + spikePadding * 2}>
       <g style="transform:translate({spikePadding}px, {spikePadding}px)">
         <path
           d={getSpikePath(r.highValue)}

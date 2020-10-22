@@ -83,7 +83,9 @@
     title="NA">
     {r.high}
   </li>
-  <li class="tick tick-single tick-space" style="background-color: {ZERO_COLOR}" title={r.low}>{r.high}</li>
+  {#if !$currentSensorEntry.isDiverging}
+    <li class="tick tick-single tick-space" style="background-color: {ZERO_COLOR}" title={r.low}>{r.high}</li>
+  {/if}
   {#each r.labels as l}
     <li class="tick" style="background-image: linear-gradient(to right, {l.color}, {l.nextColor})" title={l.label}>
       {r.high}

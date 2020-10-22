@@ -78,7 +78,7 @@
       <div class="bubble-wrapper">
         <div
           class="bubble"
-          style="width: {$bubbleRadiusScale(l.value) * 2 * zoom}px; height: {$bubbleRadiusScale(l.value) * 2 * zoom}px;background:
+          style="width: {Math.abs($bubbleRadiusScale(l.value)) * 2 * zoom}px; height: {Math.abs($bubbleRadiusScale(l.value)) * 2 * zoom}px;background:
           {transparent(l.color, ENCODING_BUBBLE_THEME.fillOpacity)};border-color: {l.color}" />
       </div>
       <span>{l.label}</span>
@@ -87,7 +87,7 @@
   <li>
     <div class="bubble-wrapper">
       <div
-        style="width: {$bubbleRadiusScale(r.highValue) * 2 * zoom}px; height: {$bubbleRadiusScale(r.highValue) * 2 * zoom}px;background:
+        style="width: {Math.abs($bubbleRadiusScale(r.highValue)) * 2 * zoom}px; height: {Math.abs($bubbleRadiusScale(r.highValue)) * 2 * zoom}px;background:
         {transparent(r.highColor, ENCODING_BUBBLE_THEME.fillOpacity)};border-color: {r.highColor}"
         class="bubble" />
     </div>

@@ -208,7 +208,7 @@ function computeTicks(sensorEntry, signalOptions, valueMinMax, small) {
     return logspace(min, max, numTicks);
   }
   if (sensorEntry.isDiverging) {
-    return splitDomain(valueMinMax[0], valueMinMax[1], numTicks);
+    return splitDomain(valueMinMax[0], valueMinMax[1], numTicks + 1);
   }
   // manipulates valueMinMax in place!
   if (sensorEntry.format === 'raw') {

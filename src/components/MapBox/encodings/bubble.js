@@ -1,7 +1,7 @@
 import { toFillLayer, toBubbleLayer } from '../layers';
 import { toCenterSource } from '../sources';
-import { parseScaleSpec } from '../../../stores/scales';
 import { BubbleLayer } from './BubbleLayer';
+import { createScale } from './utils';
 
 const MAX_ZOOMED_RADIUS = 50;
 
@@ -42,17 +42,16 @@ export default class BubbleEncoding {
     });
   }
 
-  encode(map, { level, sensorType, valueMinMax, scale }) {
+  encode(map, { level, sensorType, valueMinMax, scale, sensorEntry }) {
     // constant background
     map.setPaintProperty(toFillLayer(level), 'fill-color', this.theme.countyFill);
 
     // color scale (color + stroke color)
     // const colorExpression = interpolateValue(stops);
     const maxRadius = this.theme.maxRadius[level];
-
     const radiusScaleTheme = this.theme.radiusScale[sensorType];
 
-    const radiusScale = parseScaleSpec(radiusScaleTheme).domain([0, valueMinMax[1]]).range([0, maxRadius]).clamp(true);
+    const radiusScale = createScale(sensorEntry, valueMinMax, maxRadius, radiusScaleTheme);
 
     this.customLayers.get(level).encode(radiusScale, scale);
     return radiusScale;

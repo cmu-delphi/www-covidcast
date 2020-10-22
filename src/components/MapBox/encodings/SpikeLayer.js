@@ -18,10 +18,11 @@ varying vec4 v_data;
 
 void main() {
   vec4 p = u_matrix * vec4(a_pos.xy, 0.0, 1.0);
-  float height = (a_colorAndValue.a * u_zoom + 1.0);
+  float flip = a_colorAndValue.a < 0.0 ? -1.0 : 1.0;
+  float height = (abs(a_colorAndValue.a) * u_zoom + 1.0);
   float shift = a_pos.z * (u_size * u_zoom + 1.0);
 
-  p.y -= (1.0 - abs(a_pos.z)) * height * u_pixelToClip.y * p.w;
+  p.y -= (1.0 - abs(a_pos.z)) * height * flip * u_pixelToClip.y * p.w;
   p.x += shift * u_pixelToClip.x * p.w;
 
   gl_Position = p;
