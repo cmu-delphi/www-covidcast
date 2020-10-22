@@ -56,7 +56,7 @@
     : region && !isMegaRegion
     ? fetchTimeSlice(sensor, region.level, region.propertyId, undefined, undefined, false, {
         geo_value: region.propertyId,
-      }).then(addMissing)
+      }).then((rows) => addMissing(rows, sensor))
     : [];
 
   const title = `${sensor.name} in ${

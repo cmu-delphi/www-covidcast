@@ -1,4 +1,5 @@
 import merge from 'lodash-es/merge';
+
 /**
  * @type {import('vega-lite/build/src/spec').LayerSpec | import('vega-lite/build/src/spec').UnitSpec}
  */
@@ -13,7 +14,10 @@ export const CURRENT_DATE_HIGHLIGHT = {
       as: 'date_value',
     },
   ],
-  mark: 'rule',
+  mark: {
+    type: 'rule',
+    tooltip: false,
+  },
   encoding: {
     color: {
       value: '#c00',
@@ -68,24 +72,21 @@ export const xDateEncoding = {
   field: 'date_value',
   type: 'temporal',
   axis: {
+    orient: 'bottom',
+    labels: false,
     title: null,
-    format: '%m/%d',
-    formatType: 'time',
-    tickCount: 'day',
-    grid: false,
-    labelSeparation: 10, // Should be based on font size.
   },
 };
 
 const xDateRangeEncoding = {
-  field: 'date_value',
-  type: 'temporal',
+  ...xDateEncoding,
   axis: {
+    orient: 'bottom',
     title: null,
     format: '%m/%d',
     formatType: 'time',
     tickCount: 'week',
-    grid: false,
+    grid: true,
     labelSeparation: 10, // Should be based on font size.
   },
 };
@@ -145,6 +146,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
             scale: { domain: { selection: 'brush' } },
           },
         },
+        resolve: { axis: { x: 'independent' } },
         layer: [
           {
             mark: {
@@ -153,6 +155,9 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
             },
             encoding: {
               color: colorEncoding(selections),
+              x: {
+                ...xDateRangeEncoding,
+              },
               y: {
                 field: primaryValue,
                 type: 'quantitative',
@@ -183,6 +188,15 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
             encoding: {
               color: {
                 field: 'geo_value',
+              },
+              x: {
+                ...xDateRangeEncoding,
+                axis: {
+                  ...xDateRangeEncoding.axis,
+                  labels: false,
+                  grid: false,
+                  tickCount: 'day',
+                },
               },
               y: {
                 field: primaryValue,
@@ -287,6 +301,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
       },
     ],
     config: {
+      customFormatTypes: true,
       legend: {
         disable: true,
       },

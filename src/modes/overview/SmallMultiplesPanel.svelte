@@ -44,7 +44,7 @@
 
   const throttled = throttle((value) => {
     highlightTimeValue = value;
-  }, 50);
+  }, 25);
 
   function onHighlight(e) {
     const value = resolveHighlightedTimeValue(e);
@@ -156,7 +156,7 @@
           {typeof s.sensor.mapTitleText === 'function' ? s.sensor.mapTitleText() : s.sensor.name}
         </button>
         <div class="toolbar">
-          {#if s.sensor.longDescription}
+          {#if s.sensor.description}
             <button
               title="Show sensor description"
               class="pg-button info"
