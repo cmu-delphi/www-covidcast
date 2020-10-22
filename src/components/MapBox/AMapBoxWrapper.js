@@ -1,7 +1,7 @@
 import geojsonExtent from '@mapbox/geojson-extent';
 import { Map as MapBox } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { defaultRegionOnStartup, levelMegaCounty } from '../../stores/constants';
+import { defaultRegionOnStartup, levelMegaCounty, sensorMap } from '../../stores/constants';
 import { MAP_THEME, MISSING_COLOR } from '../../theme';
 import { MISSING_VALUE } from './encodings/utils';
 import InteractiveMap from './InteractiveMap';
@@ -331,6 +331,7 @@ export default class AMapBoxWrapper {
       signalType,
       sensorType,
       sensor,
+      sensorEntry: sensorMap.get(sensor),
       valueMinMax,
       stops,
       stopsMega,

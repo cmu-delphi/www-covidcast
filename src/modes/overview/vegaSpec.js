@@ -159,7 +159,12 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
             field: yField,
             type: 'quantitative',
             scale: {
-              domainMin: valuePatch && valuePatch.domain ? scalePercent(valuePatch.domain[0]) : 0,
+              domainMin:
+                valuePatch && valuePatch.domain
+                  ? scalePercent(valuePatch.domain[0])
+                  : sensor.isDivergent
+                  ? undefined
+                  : 0,
               domainMax: valuePatch && valuePatch.domain ? scalePercent(valuePatch.domain[1]) : undefined,
               clamp: true,
             },

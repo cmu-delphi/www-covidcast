@@ -64,6 +64,7 @@ function updateTimeMap(key, matchedMeta, timeMap) {
 function updateStatsMap(key, matchedMeta, statsMap) {
   statsMap.set(key, {
     max: matchedMeta.max_value,
+    min: matchedMeta.min_value,
     mean: matchedMeta.mean_value,
     std: matchedMeta.stdev_value,
   });
@@ -106,6 +107,7 @@ function loadRegularSignal(sEntry, meta, timeMap, statsMap) {
   timeMap.set(sEntry.key, [sEntry.minTime, sEntry.maxTime]);
   statsMap.set(sEntry.key, {
     max: sEntry.max,
+    min: sEntry.min,
     mean: sEntry.mean,
     std: sEntry.std,
   });
@@ -189,7 +191,17 @@ export function loadMetaData(sensors) {
   return Promise.all([
     callMetaAPI(
       remoteSignals,
-      ['min_time', 'max_time', 'max_value', 'mean_value', 'stdev_value', 'signal', 'geo_type', 'data_source'],
+      [
+        'min_time',
+        'max_time',
+        'min_value',
+        'max_value',
+        'mean_value',
+        'stdev_value',
+        'signal',
+        'geo_type',
+        'data_source',
+      ],
       {
         time_types: 'day',
         geo_types: [...new Set([...levels, ...swpaLevels])],

@@ -1,4 +1,4 @@
-import { scaleSequential, scaleSequentialLog } from 'd3-scale';
+import { scaleLinear, scaleSequential, scaleSequentialLog } from 'd3-scale';
 import logspace from 'compute-logspace';
 import { DIRECTION_THEME, ZERO_COLOR, MISSING_COLOR } from '../../theme';
 import { zip } from '../../util';
@@ -28,8 +28,18 @@ export function determineMinMax(statsLookup, sensorEntry, level, signalOptions, 
       key += `_${primaryValue(sensorEntry, signalOptions)}`;
     }
     const stats = statsLookup.get(key);
+
+    if (sensorEntry.isDivergent) {
+      const center = sensorEntry.divergentCenter || 0;
+      const maxDistance = Math.max(
+        Math.abs(center - (useMax ? stats.min : stats.mean - 3 * stats.std)),
+        Math.abs((useMax ? stats.max : stats.mean - 3 * stats.std) - center),
+      );
+      return [center - maxDistance, center + maxDistance];
+    }
+
     if (useMax) {
-      return [0, stats.max];
+      return [sensorEntry.isDivergent ? stats.min : 0, stats.max];
     }
     return [Math.max(MAGIC_MIN_STATS, stats.mean - 3 * stats.std), stats.mean + 3 * stats.std];
   }
@@ -38,9 +48,20 @@ export function determineMinMax(statsLookup, sensorEntry, level, signalOptions, 
     key += `_${primaryValue(sensorEntry, signalOptions)}`;
   }
   const stats = statsLookup.get(key);
+
+  if (sensorEntry.isDivergent) {
+    const center = sensorEntry.divergentCenter || 0;
+    const maxDistance = Math.max(
+      Math.abs(center - (useMax ? stats.min : stats.mean - 3 * stats.std)),
+      Math.abs((useMax ? stats.max : stats.mean - 3 * stats.std) - center),
+    );
+    return [center - maxDistance, center + maxDistance];
+  }
+
   if (useMax) {
     return [0, stats.max];
   }
+
   return [Math.max(0, stats.mean - 3 * stats.std), stats.mean + 3 * stats.std];
 }
 
@@ -51,6 +72,9 @@ export function determineMinMax(statsLookup, sensorEntry, level, signalOptions, 
  * @param {[number, number]} valueMinMax
  */
 export function determineColorScale(valueMinMax, signalType, sensorEntry, sensorType) {
+  if (sensorEntry.isDivergent) {
+    return divergentColorScale(valueMinMax, sensorEntry);
+  }
   if (signalType === 'value') {
     return determineValueColorScale(valueMinMax, sensorEntry, sensorType);
   }
@@ -90,6 +114,20 @@ function determineDirectionColorScale() {
   return { stops, stopsMega };
 }
 
+/**
+ * @param {SensorEntry} sensorEntry
+ * @param {[number, number]} valueMinMax
+ */
+function divergentColorScale(valueMinMax, sensorEntry) {
+  const colorScaleLinear = scaleSequential(sensorEntry.colorScale).domain([valueMinMax[0], valueMinMax[1]]);
+
+  const domainStops5 = scaleLinear().domain(colorScaleLinear.domain()).ticks(5);
+
+  const linearColors5 = domainStops5.map((c) => colorScaleLinear(c).toString());
+
+  const stops = zip(domainStops5, linearColors5);
+  return { stops, scale: colorScaleLinear };
+}
 /**
  * @param {SensorEntry} sensorEntry
  * @param {[number, number]} valueMinMax
@@ -169,6 +207,9 @@ function computeTicks(sensorEntry, signalOptions, valueMinMax, small) {
     const max = Math.log10(Math.max(10e-2, valueMinMax[1]));
     return logspace(min, max, numTicks);
   }
+  if (sensorEntry.isDivergent) {
+    return splitDomain(valueMinMax[0], valueMinMax[1], numTicks);
+  }
   // manipulates valueMinMax in place!
   if (sensorEntry.format === 'raw') {
     valueMinMax[0] = Math.max(0, valueMinMax[0]);
@@ -201,8 +242,8 @@ export function generateLabels(stats, sensorEntry, level, colorScale, signalOpti
   const ticks = computeTicks(sensorEntry, signalOptions, valueMinMax, small);
 
   return {
-    low: sensorEntry.formatValue(0), // fixed 0
-    lowValue: 0,
+    low: sensorEntry.formatValue(sensorEntry.neutralValue), // fixed 0
+    lowValue: sensorEntry.neutralValue,
     lowColor: ZERO_COLOR,
     labels: ticks.slice(0, -1).map((tick, i) => ({
       label: sensorEntry.formatValue(tick),

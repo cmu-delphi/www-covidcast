@@ -1,8 +1,8 @@
 import { decode } from '@ygoe/msgpack';
 import { isoParse } from 'd3-time-format';
-import { mean, deviation } from 'd3-array';
-import { formatAPITime, parseAPITime } from './utils';
-import { timeDay } from 'd3-time';
+import { mean, deviation, max, min } from 'd3-array';
+import { formatAPITime } from './utils';
+import { interpolateRdYlGn } from 'd3-scale-chromatic';
 
 const PACKED_URL = 'https://d14wlfuexuxgcm.cloudfront.net/covid/parsed_for_js5_release.pack.gz';
 
@@ -33,6 +33,8 @@ function preparePack(decoded) {
 
   const minTime = flat[0].date;
 
+  const values = flat.map((d) => d.r0);
+
   const meta = {
     data_source: 'rtlive',
     signal: 'r0',
@@ -40,8 +42,10 @@ function preparePack(decoded) {
     max_issue: Number.parseInt(formatAPITime(issue), 10),
     min_time: Number.parseInt(formatAPITime(minTime), 10),
     max_time: Number.parseInt(formatAPITime(maxTime), 10),
-    mean_value: mean(flat, (d) => d.r0),
-    stdev_value: deviation(flat, (d) => d.r0),
+    max_value: max(values),
+    min_value: min(values),
+    mean_value: mean(values),
+    stdev_value: deviation(values),
   };
 
   const perRegion = new Map(
@@ -120,15 +124,19 @@ export function createRTLiveSignal() {
   const signal = {
     id: 'rtlive',
     signal: 'r0',
-    description: 'Test',
+    name: 'Rt.live',
     format: 'raw',
     hasStdErr: false,
     levels: ['state', 'nation'],
-    mapTitleText: 'Test',
-    name: 'Rt.live',
-    tooltipText: 'Test',
+    mapTitleText:
+      'Rt is the average number of people who become infected by an infectious person. If it’s above 1.0, COVID-19 will spread quickly. If it’s below 1.0, infections will slow.',
+    links: [`<a href="https://rt.live/faq">Rt.live FAQ</a>`],
+    description: `R<sup>t</sup> represents the effective reproduction rate of the virus calculated for each locale. It lets us estimate how many secondary infections are likely to occur from a single infection in a specific area. Values over 1.0 mean we should expect more cases in that area, values under 1.0 mean we should expect fewer.`,
     yAxis: 'Effective Reproduction Rate',
     type: 'late',
+    colorScale: (v) => interpolateRdYlGn(1 - v),
+    divergentCenter: 1,
+    neutralValue: 1,
     api: (...args) => {
       return data.then((r) => r.load(...args));
     },
