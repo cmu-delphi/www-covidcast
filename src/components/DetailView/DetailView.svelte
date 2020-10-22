@@ -117,10 +117,6 @@
     bottom: 0;
   }
 
-  h5 {
-    display: inline-block;
-  }
-
   .header {
     position: relative;
   }
@@ -132,12 +128,6 @@
   .header button {
     z-index: 10;
     margin-left: 1em;
-  }
-  .close {
-    font-size: 0.88rem;
-    position: absolute;
-    right: 0;
-    top: 0;
   }
 
   .encoding {
