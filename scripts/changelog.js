@@ -11,6 +11,10 @@ function removeConventionalCommit(name) {
   return name;
 }
 
+function guessIssues(body) {
+  return (body.match(/#(\d+)/gm) || []).map((d) => Number.parseInt(d.slice(1), 10));
+}
+
 async function main() {
   console.log('fetching git log');
   const out = execSync(`git log --oneline --decorate --graph --first-parent --merges origin/main..HEAD`).toString();
@@ -36,6 +40,7 @@ async function main() {
     });
 
     let prTitle = result.data.title.trim();
+    const prBody = result.data.body;
     const labels = result.data.labels.map((l) => l.name);
     if (prTitle.startsWith('fix')) {
       labels.push('bug');
@@ -46,7 +51,13 @@ async function main() {
     }
     prTitle = `${prTitle[0].toUpperCase()}${prTitle.slice(1)}`;
 
-    const text = `- [#${pr}](${result.data.html_url}) ${prTitle}`;
+    const issues = [...new Set(guessIssues(`${prTitle} ${prBody}`))]
+      .sort((a, b) => a - b)
+      .map((issue) => `[#${issue}](https://github.com/cmu-delphi/www-covidcast/issues/${issue})`);
+
+    const text = `- [#${pr}](${result.data.html_url})${
+      issues.length > 0 ? ` (re: ${issues.join(', ')})` : ''
+    } ${prTitle}`;
 
     if (labels.includes('bug') || prTitle.startsWith('fix')) {
       bugfixes.push(text);
@@ -76,7 +87,7 @@ ${others.join('\n')}
   const changelog = resolve(__dirname, '../CHANGELOG.md');
   const old = existsSync(changelog) ? readFileSync(changelog).toString() : '';
 
-  const newChangelog = `${full}${old.length > 0 ? '\n\n' : ''}${old}`;
+  const newChangelog = `${full}${old.length > 0 ? '\n' : ''}${old}`;
   writeFileSync(changelog, newChangelog);
   execSync(`git add ${changelog}`);
 }
