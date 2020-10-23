@@ -5,9 +5,8 @@
   import { nameInfos } from '../../maps';
   import { currentDate, currentDateObject, currentRegionInfo, selectByInfo, times } from '../../stores';
   import Datepicker from '../../components/Calendar/Datepicker.svelte';
-  import { createVegaSpec } from './vegaSpec';
   import { formatTime, refSensor, sections } from './sections';
-  import { computeRelatedGroups, loadSummaryData } from './summary';
+  import { computeRelatedGroups, loadSummaryData, createVegaSpec } from './summary';
 
   let showErrorBars = false;
 
