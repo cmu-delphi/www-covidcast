@@ -1,141 +1,25 @@
 <script>
   import Search from '../../components/Search.svelte';
   import Vega from '../../components/Vega.svelte';
-  import { fetchMultiSignal, formatAPITime, parseAPITime } from '../../data';
-  import { nameInfos, getInfoByName } from '../../maps';
+  import { formatAPITime, parseAPITime } from '../../data';
+  import { nameInfos } from '../../maps';
   import { currentDate, currentDateObject, currentRegionInfo, selectByInfo, times } from '../../stores';
-  import { timeFormat } from 'd3-time-format';
-  import { timeDay } from 'd3-time';
   import Datepicker from '../../components/Calendar/Datepicker.svelte';
   import { createVegaSpec } from './vegaSpec';
-  import { dataSource, refSensor, sections } from './sections';
-
-  const formatTime = timeFormat('%B %-d, %Y');
+  import { formatTime, refSensor, sections } from './sections';
+  import { computeRelatedGroups, loadSummaryData } from './summary';
 
   let showErrorBars = false;
-
-  /**
-   * @param {Date} date
-   */
-  function computeRelatedTimeStamps(date) {
-    return [
-      {
-        date,
-        label: formatTime(date),
-      },
-      {
-        date: timeDay.offset(date, -1),
-        label: 'The day before',
-      },
-      {
-        date: timeDay.offset(date, -7),
-        label: 'A week ago',
-      },
-      {
-        date: timeDay.offset(date, -14),
-        label: 'Two weeks ago',
-      },
-    ];
-  }
-  /**
-   * @param {import('../../maps').NameInfo} region
-   */
-  function computeRelatedRegions(region) {
-    if (!region) {
-      return [];
-    }
-    if (region.level !== 'county') {
-      return [{ region, label: region.displayName }];
-    }
-    const stateRegion = region.level === 'county' ? getInfoByName(region.state) : null;
-
-    return [
-      { region, label: region.displayName },
-      { region: stateRegion, label: stateRegion.displayName },
-    ];
-  }
-  /**
-   * @param {Date} date
-   * @param {'none' | 'region' | 'date'} related
-   */
-  function computeRelatedGroups(date, region, related) {
-    if (related === 'date') {
-      return computeRelatedTimeStamps(date);
-    }
-    if (related === 'region') {
-      return computeRelatedRegions(region);
-    }
-    return [];
-  }
-  /**
-   * @param {Date} date
-   * @param {import('../../maps').NameInfo} region
-   * @param {'none' | 'region' | 'date'} related
-   */
-  function loadData(date, region, related) {
-    if (!date || !region) {
-      return Promise.resolve([]);
-    }
-    // collect all data to load
-    const signals = sections
-      .map((d) => d.questions.map((d) => d.indicators))
-      .flat(2)
-      .map((d) => d.signal);
-
-    if (related === 'none') {
-      return fetchMultiSignal(dataSource, signals, date, region, ['issue', 'sample_size']);
-    }
-    if (related === 'region') {
-      const regions = computeRelatedRegions(region);
-      return Promise.all(
-        regions.map((region) => fetchMultiSignal(dataSource, signals, date, region.region, ['issue', 'sample_size'])),
-      ).then((data) => {
-        return regions
-          .map((r, i) => {
-            const rows = data[i];
-            for (const row of rows) {
-              row.group = r.label;
-            }
-            return rows;
-          })
-          .flat();
-      });
-    }
-    if (related === 'date') {
-      const relatedTimeStamps = computeRelatedTimeStamps(date);
-      return fetchMultiSignal(
-        dataSource,
-        signals,
-        relatedTimeStamps.map((d) => d.date),
-        region,
-        ['issue', 'sample_size'],
-      ).then((data) => {
-        const lookup = new Map(relatedTimeStamps.map((d) => [formatAPITime(d.date), d.label]));
-
-        // sort by date
-        data.sort((a, b) => {
-          if (a.time_value !== b.time_value) {
-            return a.time_value < b.time_value ? -1 : 1;
-          }
-          return a.signal.localeCompare(b.signal);
-        });
-        // extend the rows with a 'group' to be used in the vega spec
-
-        for (const row of data) {
-          row.group = lookup.get(row.time_value.toString()) || 'Unknown';
-        }
-        return data;
-      });
-    }
-  }
 
   /**
    * @type {'none' | 'region' | 'date'}
    */
   let related = 'none';
 
+  let showTimeSeries = false;
+
   $: relatedGroups = computeRelatedGroups($currentDateObject, $currentRegionInfo, related);
-  $: data = loadData($currentDateObject, $currentRegionInfo, related);
+  $: data = !showTimeSeries ? loadSummaryData($currentDateObject, $currentRegionInfo, related) : Promise.resolve([]);
   $: spec = createVegaSpec(showErrorBars, relatedGroups);
 
   $: dataLookup = data.then((r) => new Map(r.map((d) => [d.signal, d])));
@@ -250,14 +134,18 @@
                   <p>
                     {@html indicator.description}
                   </p>
-                  <Vega data={data.then((r) => r.filter((d) => d.signal === indicator.signal))} {spec} />
-                  {#await dataLookup}
-                    <div class="info loading">based on ? samples, published ?</div>
-                  {:then lookup}
-                    <div class="info">
-                      based on {formatSampleSize(lookup.get(indicator.signal))} samples, published {formatIssueDate(lookup.get(indicator.signal))}
-                    </div>
-                  {/await}
+                  {#if showTimeSeries}
+                    <div>Test</div>
+                  {:else}
+                    <Vega data={data.then((r) => r.filter((d) => d.signal === indicator.signal))} {spec} />
+                    {#await dataLookup}
+                      <div class="info loading">based on ? samples, published ?</div>
+                    {:then lookup}
+                      <div class="info">
+                        based on {formatSampleSize(lookup.get(indicator.signal))} samples, published {formatIssueDate(lookup.get(indicator.signal))}
+                      </div>
+                    {/await}
+                  {/if}
                 </div>
               {/each}
             </div>
@@ -277,41 +165,54 @@
           maxItemsToShowInList="5"
           on:change={(e) => selectByInfo(e.detail)} />
       </div>
-      <div class="filter-group filter-calendar">
-        <h5>Selected Date</h5>
-        {#if selectedDate != null && startEndDates.length !== 0}
-          <Datepicker
-            bind:selected={selectedDate}
-            start={startEndDates[0]}
-            end={startEndDates[1]}
-            formattedSelected={formatTime(selectedDate)}>
+      <div class="filter-group">
+        <h5>Mode</h5>
+        <label><input type="radio" bind:group={showTimeSeries} name="vis" value={false} />Summaries</label>
+        <label><input type="radio" bind:group={showTimeSeries} name="vis" value={true} />Time Series</label>
+      </div>
+      {#if showTimeSeries}
+        <div class="filter-group filter-spacer">
+          <h5>Advanced</h5>
+          <label><input type="checkbox" bind:checked={showErrorBars} />Show Error Bands</label>
+        </div>
+      {:else}
+        <div class="filter-group filter-calendar">
+          <h5>Selected Date</h5>
+          {#if selectedDate != null && startEndDates.length !== 0}
+            <Datepicker
+              bind:selected={selectedDate}
+              start={startEndDates[0]}
+              end={startEndDates[1]}
+              formattedSelected={formatTime(selectedDate)}>
+              <button
+                aria-label="selected date"
+                class="pg-button pg-text-button base-font-size calendar"
+                on:>{formatTime(selectedDate)}</button>
+            </Datepicker>
+          {:else}
             <button
               aria-label="selected date"
               class="pg-button pg-text-button base-font-size calendar"
               on:>{formatTime(selectedDate)}</button>
-          </Datepicker>
-        {:else}
-          <button
-            aria-label="selected date"
-            class="pg-button pg-text-button base-font-size calendar"
-            on:>{formatTime(selectedDate)}</button>
-        {/if}
-      </div>
-      <div class="filter-group filter-spacer">
-        <h5>Show Related Results</h5>
-        <label><input type="radio" bind:group={related} name="related" value="none" />None</label>
-        <label><input
-            type="radio"
-            bind:group={related}
-            name="related"
-            value="region"
-            disabled={!$currentRegionInfo || $currentRegionInfo.level !== 'county'} />Related regions</label>
-        <label><input type="radio" bind:group={related} name="related" value="date" />Previous dates</label>
-      </div>
-      <div class="filter-group filter-spacer">
-        <h5>Advanced</h5>
-        <label><input type="checkbox" bind:checked={showErrorBars} />Show Error Bars</label>
-      </div>
+          {/if}
+        </div>
+        <div class="filter-group filter-spacer">
+          <h5>Show Related Results</h5>
+          <label><input type="radio" bind:group={related} name="related" value="none" />None</label>
+          <label><input
+              type="radio"
+              bind:group={related}
+              name="related"
+              value="region"
+              disabled={!$currentRegionInfo || $currentRegionInfo.level !== 'county'} />Related regions</label>
+          <label><input type="radio" bind:group={related} name="related" value="date" disabled={showTimeSeries} />Previous
+            dates</label>
+        </div>
+        <div class="filter-group filter-spacer">
+          <h5>Advanced</h5>
+          <label><input type="checkbox" bind:checked={showErrorBars} />Show Error Bars</label>
+        </div>
+      {/if}
     </aside>
   </div>
 </div>

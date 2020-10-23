@@ -1,4 +1,7 @@
 import { sensorList } from '../../stores';
+import { timeFormat } from 'd3-time-format';
+
+export const formatTime = timeFormat('%B %-d, %Y');
 
 const criteria =
   '<a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#ili-and-cli-indicators">these criteria</a>';
