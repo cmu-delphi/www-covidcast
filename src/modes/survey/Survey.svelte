@@ -7,6 +7,7 @@
   import Datepicker from '../../components/Calendar/Datepicker.svelte';
   import { formatTime, refSensor, sections } from './sections';
   import { computeRelatedGroups, loadSummaryData, createVegaSpec } from './summary';
+  import { createTimeSeriesSpec, loadTimeSeriesData } from './timeSeries';
 
   let showErrorBars = false;
 
@@ -16,12 +17,6 @@
   let related = 'none';
 
   let showTimeSeries = false;
-
-  $: relatedGroups = computeRelatedGroups($currentDateObject, $currentRegionInfo, related);
-  $: data = !showTimeSeries ? loadSummaryData($currentDateObject, $currentRegionInfo, related) : Promise.resolve([]);
-  $: spec = createVegaSpec(showErrorBars, relatedGroups);
-
-  $: dataLookup = data.then((r) => new Map(r.map((d) => [d.signal, d])));
 
   function formatSampleSize(entry) {
     if (!entry || entry.sample_size == null) {
@@ -48,6 +43,15 @@
   $: if (selectedDate !== undefined) {
     currentDate.set(formatAPITime(selectedDate));
   }
+
+  $: relatedGroups = computeRelatedGroups($currentDateObject, $currentRegionInfo, related);
+  $: data = !showTimeSeries ? loadSummaryData($currentDateObject, $currentRegionInfo, related) : Promise.resolve([]);
+  $: spec = createVegaSpec(showErrorBars, relatedGroups);
+
+  $: dataLookup = data.then((r) => new Map(r.map((d) => [d.signal, d])));
+
+  $: timeSeriesData = showTimeSeries ? loadTimeSeriesData($currentRegionInfo, startEndDates) : new Map();
+  $: timeSeriesSpec = createTimeSeriesSpec(showErrorBars, startEndDates);
 </script>
 
 <style>
@@ -134,7 +138,7 @@
                     {@html indicator.description}
                   </p>
                   {#if showTimeSeries}
-                    <div>Test</div>
+                    <Vega data={timeSeriesData.get(indicator.signal) || []} spec={timeSeriesSpec} />
                   {:else}
                     <Vega data={data.then((r) => r.filter((d) => d.signal === indicator.signal))} {spec} />
                     {#await dataLookup}
