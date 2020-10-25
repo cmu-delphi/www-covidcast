@@ -1,5 +1,5 @@
 <script>
-  import { onMount, onDestroy, createEventDispatcher } from 'svelte';
+  import { onMount, onDestroy, createEventDispatcher, afterUpdate } from 'svelte';
   import embed from 'vega-embed';
   import { Error, expressionFunction } from 'vega';
   import { observeResize, unobserveResize } from '../util';
@@ -166,6 +166,34 @@
         Object.entries(signals).forEach(([key, v]) => {
           spec.signals.push({ name: key, value: v });
         });
+        spec.signals.push({
+          name: 'width',
+          on: [
+            {
+              events: { source: 'window', type: 'load' },
+              update: 'containerSize()[0]',
+              force: true,
+            },
+            {
+              events: { source: 'window', type: 'resize' },
+              update: 'containerSize()[0]',
+            },
+          ],
+        });
+        spec.signals.push({
+          name: 'height',
+          on: [
+            {
+              events: { source: 'window', type: 'load' },
+              update: 'containerSize()[1]',
+              force: true,
+            },
+            {
+              events: { source: 'window', type: 'resize' },
+              update: 'containerSize()[1]',
+            },
+          ],
+        });
         return spec;
       },
     });
@@ -206,6 +234,12 @@
       });
     } else {
       updateSpec(spec);
+    }
+  });
+
+  afterUpdate(() => {
+    if (!patchSpec) {
+      window.dispatchEvent(new Event('resize'));
     }
   });
 
