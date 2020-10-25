@@ -178,11 +178,12 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
             type: 'single',
             empty: 'none',
             on: 'mouseover',
-            nearest: false,
+            nearest: true,
+            encodings: ['x'],
             clear: 'mouseout',
           },
         },
-        // use vertical rule for selection, since nearest is a real performance bummer
+        // use vertical rule for selection, since nearest point is a real performance bummer
         mark: {
           type: 'rule',
           strokeWidth: 2.5,
