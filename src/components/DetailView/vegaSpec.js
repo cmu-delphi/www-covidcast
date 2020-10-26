@@ -338,7 +338,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
 }
 
 // Reserve space for titles.
-const OFFSET_Y = 70;
+const OFFSET_Y = 75;
 const RANGE_SELECTOR_HEIGHT = 40;
 
 /**
