@@ -1,0 +1,267 @@
+---
+Name: Away from Home 6hr+ a Day
+Id: safegraph
+Signal: full_time_work_prop
+Type: public
+Levels: [county, state]
+YAxis: Proportion
+Format: raw
+HasStdErr: true
+
+
+MapTitleText: Fraction of people spending 6 hours or more away from home that day, based on SafeGraph mobility data
+
+
+Description: Delphi receives data from [SafeGraph](https://docs.safegraph.com/docs/social-distancing-metrics), which collects anonymized location data from mobile phones. Using this data, we calculate the fraction of mobile devices that spent more than 6 hours at a location other than their home during the daytime.This indicator measures how mobile people are, and ought to reflect whether people are traveling to work or school outside their homes. See also our Away from Home 3-6hr indicator.
+
+
+Links:
+ - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/safegraph.html)"
+---
+Name: Away from Home 3-6hr a Day
+Id: safegraph
+Signal: part_time_work_prop
+Type: public
+Levels: [county, state]
+YAxis: Proportion
+Format: raw
+HasStdErr: true
+
+
+MapTitleText: Fraction of people spending 3-6 hours away from home that day, based on SafeGraph mobility data
+
+
+Description: Delphi receives data from [SafeGraph](https://docs.safegraph.com/docs/social-distancing-metrics), which collects anonymized location data from mobile phones. Using this data, we calculate the fraction of mobile devices that spent between 3 and 6 hours at a location other than their home during the daytime.This indicator measures how mobile people are. See also our Away from Home 6hr+ indicator.
+
+
+Links:
+ - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/safegraph.html)"
+---
+Name: People Wearing Masks
+Id: fb-survey
+Signal: smoothed_wearing_mask
+Type: public
+Levels: [county, msa, state, hrr]
+YAxis: Percentage
+Format: percent
+HasStdErr: true
+ColorScale: interpolateYlGnBu
+
+
+
+
+MapTitleText: Percentage of people who wear a mask most or all of the time while in public, based on surveys of Facebook users
+
+
+Description: Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they, or anyone in their household, are currently experiencing COVID-related symptoms. We also ask them if they wear a mask when they are in public. For this signal, we estimate the percentage of people who wear a mask most or all of the time when they are in public.
+
+
+Links:
+ - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html)"
+---
+Name: COVID Searches on Google 
+Id: ght
+Signal: smoothed_search
+Type: public
+Levels: [msa, state, hrr, dma]
+YAxis: Frequency (arbitrary scale)
+Format: raw
+HasStdErr: false
+
+
+MapTitleText: Relative frequency of COVID-related Google searches
+
+
+Description: Using Google Health Trends, Delphi obtains the fraction of COVID-related Google searches out of all Google searches in each area. We use searches for terms related to anosmia (loss of taste or smell), since this emerged as an unusual symptom that is indicative of COVID-19. This indicator is available at the state and metro area (but not county) levels.  
+
+
+Links:
+ - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/ght.html)"
+---
+Name: COVID-Related Doctor Visits
+Id: doctor-visits
+Signal: smoothed_adj_cli
+Type: early
+Levels: [county, msa, state, hrr]
+YAxis: Percentage
+Format: percent
+HasStdErr: false
+
+
+MapTitleText: Percentage of daily doctor visits that are due to COVID-like symptoms
+
+
+Description: Delphi receives from our health system partners aggregated statistics on COVID-related outpatient doctor visits, derived from ICD codes found in insurance claims. Using this data Delphi estimates the percentage of daily doctor’s visits in each area that are due to COVID-like illness. Note that these estimates are based only on visits by patients whose data is accessible to our partners.
+
+
+Links:
+ - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/doctor-visits.html)"
+---
+Name: COVID-Like Symptoms
+Id: fb-survey
+Signal: smoothed_cli
+Type: early
+Levels: [county, msa, state, hrr]
+YAxis: Percentage
+Format: percent
+HasStdErr: true
+
+
+MapTitleText: Percentage of people with COVID-like symptoms, based on surveys of Facebook users
+
+
+Description: Every day, Delphi surveys tens of thousands of Facebook users, asking a broad set of COVID-related questions, including whether they, or anyone in their household, are currently experiencing COVID-related symptoms. We also ask questions about well-being and various mitigation measures, including mask wearing. For this signal, we estimate the percentage of people self-reporting COVID-like symptoms, defined here as fever along with either cough, shortness of breath, or difficulty breathing. While many other conditions can cause these symptoms, comparing the rates of COVID-like symptoms across the country can suggest where COVID is most active.
+
+
+Links:
+ - link: "[More information](https://covidcast.cmu.edu/surveys.html)"
+ - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html)"
+---
+Name: COVID-Like Symptoms in Community
+Id: fb-survey
+Signal: smoothed_hh_cmnty_cli
+Type: early
+Levels: [county, msa, state, hrr]
+YAxis: Percentage
+Format: percent
+HasStdErr: true
+
+
+MapTitleText: Percentage of people who know someone in their local community with COVID-like symptoms, based on surveys of Facebook users
+
+
+Description: Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they, or anyone in their household, are currently experiencing COVID-related symptoms. We also ask them if they know anyone in their local community who has COVID-like or flu-like symptoms, defined here as fever along with either sore throat, cough, shortness of breath, or difficulty breathing.  For this indicator, we estimate the percentage of people who know someone, in their household or outside it, who has these symptoms. While many conditions can cause these symptoms, not just COVID, comparing the rates across the country can suggest where COVID is most active.
+
+
+Links:
+ - link: "[More information](https://covidcast.cmu.edu/surveys.html)"
+ - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html)"
+---
+Name: COVID Indicator Combination
+Id: indicator-combination
+Signal: nmf_day_doc_fbc_fbs_ght
+Type: early
+Levels: [county, msa, state]
+YAxis: Combined value (arbitrary scale)
+Format: raw
+HasStdErr: false
+
+
+TooltipText: Combination of several COVID-19 indicators available at this geographic level
+
+
+MapTitleText: 'Combination of several COVID-19 indicators: Doctor Visits, Symptoms, Symptoms in Community, and Search on Google'
+
+
+Description: This data represents a combination of Doctor Visits, COVID-Like Symptoms (from the Delphi survey), COVID-Like Symptoms in Community (from the Delphi survey), and COVID Search on Google.  It does not include official reports (cases and deaths), hospital admissions, or SafeGraph signals.  We use a rank-1 approximation from a nonnegative matrix factorization approach to identify a single underlying signal that best reconstructs the indicators.  Higher values of the combined signal correspond to higher values of the other indicators, but the scale (units) of the combination is arbitrary.
+
+
+Links:
+ - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/indicator-combination.html#statistical-combination-signals)"
+---
+Name: COVID Antigen Test Positivity (Quidel)
+Id: quidel
+Signal: covid_ag_smoothed_pct_positive
+Type: late
+Levels: [county, state, msa, hrr]
+YAxis: Percentage
+Format: percent
+HasStdErr: true
+
+
+TooltipText: Positivity rate of COVID-19 antigen tests, based on data provided by Quidel, Inc.
+MapTitleText: Positivity rate of COVID-19 antigen tests
+
+
+Description: When a patient (whether at a doctor’s office, clinic, or hospital) has COVID-like symptoms, doctors may order an antigen test, which can detect parts of the virus that are present during an active infection. Quidel, a national provider of networked lab testing devices, provides us with data from every COVID antigen test that they conduct. We report the percentage of COVID antigen tests that are positive. Note that this signal only includes Quidel’s antigen tests, not those run by other test providers.
+
+
+Links:
+ - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/quidel.html#covid-19-tests)"
+---
+Name: COVID Hospital Admissions
+Id: hospital-admissions
+Signal: smoothed_adj_covid19_from_claims
+Type: late
+Levels: [county, msa, state]
+YAxis: Percentage
+Format: percent
+HasStdErr: false
+
+
+MapTitleText: Percentage of daily hospital admissions with COVID-19 associated diagnoses
+
+
+Description: Delphi receives from our health system partners aggregated statistics on COVID-related hospital admissions, derived from ICD codes found in insurance claims.  Using this data, we estimate the percentage of new hospital admissions each day that are related to COVID-19. Note that these estimates are based only on admissions by patients whose data is accessible to our partners,  and address new hospital admissions each day, not all currently hospitalized patients who have COVID-related diagnoses.
+
+
+Links:
+ - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/hospital-admissions.html)"
+---
+Name: COVID Cases
+Id: indicator-combination
+Signal: confirmed_7dav_incidence_num
+CasesOrDeathSignals:
+ Avg: confirmed_7dav_incidence_num
+ Count: confirmed_incidence_num
+ CountCumulative: confirmed_cumulative_num
+ AvgRatio: confirmed_7dav_incidence_prop
+ CountRatio: confirmed_incidence_prop
+ CountRatioCumulative: confirmed_cumulative_prop
+
+
+Type: late
+Levels: [msa, county, state]
+YAxis: Cases
+Format: raw
+HasStdErr: false
+TooltipText: Newly reported COVID-19 cases, based on data from USAFacts and Johns Hopkins University
+
+
+MapTitleText: 
+ Incidence: Newly reported COVID-19 cases (7-day average)
+ Ratio: Newly reported COVID-19 cases per 100,000 people (7-day average)
+ IncidenceCumulative: Cumulative reported COVID-19 cases
+ RatioCumulative: Cumulative reported COVID-19 cases per 100,000 people
+
+
+Description: This data shows the number of COVID-19 confirmed cases newly reported each day. It  reflects only cases reported by state and local health authorities. It is based on case counts compiled and made public by [USAFacts](https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/) and by [a team at Johns Hopkins University](https://systems.jhu.edu/research/public-health/ncov/). We use Johns Hopkins data for Puerto Rico and report USAFacts data in all other locations. The signal may not be directly comparable across regions with vastly different testing capacity or reporting criteria. 
+
+
+Links:
+ - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/indicator-combination.html#compositional-signals-confirmed-cases-and-deaths)"
+---
+Name: COVID Deaths
+Id: indicator-combination
+Signal: deaths_7dav_incidence_num
+CasesOrDeathSignals:
+ Avg: deaths_7dav_incidence_num
+ Count: deaths_incidence_num
+ CountCumulative: deaths_cumulative_num
+ AvgRatio: deaths_7dav_incidence_prop
+ CountRatio: deaths_incidence_prop
+ CountRatioCumulative: deaths_cumulative_prop
+
+
+Type: late
+Levels: [msa, county, state]
+YAxis: Deaths
+Format: raw
+HasStdErr: false
+
+
+TooltipText: Newly reported COVID-19 deaths, based on data from USAFacts and Johns Hopkins University
+
+
+MapTitleText: 
+ Incidence: Newly reported COVID-19 deaths (7-day average)
+ Ratio: Newly reported COVID-19 deaths per 100,000 people (7-day average)
+ IncidenceCumulative: Cumulative reported COVID-19 deaths
+ RatioCumulative: Cumulative reported COVID-19 deaths per 100,000 people
+
+
+Description: This data shows the number of COVID-19 related deaths newly reported each day. It reflects official figures reported by state and local health authorities, and may not include excess deaths not confirmed by health authorities to be due to COVID-19 . The signal is based on death counts compiled and made public by [USAFacts](https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/) and by [a team at Johns Hopkins University](https://systems.jhu.edu/research/public-health/ncov/). We use Johns Hopkins data for Puerto Rico and report USAFacts data in all other locations.
+
+
+Links:
+ - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/indicator-combination.html#compositional-signals-confirmed-cases-and-deaths)"
