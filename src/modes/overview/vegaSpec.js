@@ -127,6 +127,17 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
         calculate: 'datum.value == null ? null : datum.value / 100',
         as: 'pValue',
       },
+      {
+        // Compute the number of missing values, for before, after, and current values.
+        frame: [-1, 1],
+        window: [
+          {
+            op: 'missing',
+            field: yField,
+            as: 'missing',
+          },
+        ],
+      },
     ],
     encoding: {
       color: colorEncoding(selections),
@@ -159,7 +170,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
             field: yField,
             type: 'quantitative',
             scale: {
-              domainMin: valuePatch && valuePatch.domain ? scalePercent(valuePatch.domain[0]) : 0,
+              domainMin: valuePatch && valuePatch.domain ? scalePercent(valuePatch.domain[0]) : undefined,
               domainMax: valuePatch && valuePatch.domain ? scalePercent(valuePatch.domain[1]) : undefined,
               clamp: true,
             },
@@ -177,9 +188,9 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
           highlight: {
             type: 'single',
             empty: 'none',
-            on: 'mouseover',
             nearest: true,
             encodings: ['x'],
+            on: 'mouseover',
             clear: 'mouseout',
           },
         },
@@ -192,10 +203,11 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
           tooltip: true,
         },
       },
+      // Draw isolated points, with missing data before and after.
       {
         mark: {
           type: 'point',
-          radius: 1,
+          size: 16,
           stroke: null,
           fill: 'grey',
         },
@@ -203,12 +215,8 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
           opacity: {
             condition: [
               {
-                selection: 'highlight',
-                value: 1,
-              },
-              {
-                test: 'datum.time_value == highlightTimeValue',
-                value: 1,
+                test: { field: 'missing', equal: 2 },
+                value: '1',
               },
             ],
             value: 0,

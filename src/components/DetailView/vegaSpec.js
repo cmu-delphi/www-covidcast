@@ -136,7 +136,20 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
       contains: 'padding',
       resize: true,
     },
-    transform: sensor.hasStdErr ? stdErrTransform : [],
+    transform: [
+      ...(sensor.hasStdErr ? stdErrTransform : []),
+      {
+        // Compute the number of missing values, for before, after, and current values.
+        frame: [-1, 1],
+        window: [
+          {
+            op: 'missing',
+            field: primaryValue,
+            as: 'missing',
+          },
+        ],
+      },
+    ],
     vconcat: [
       {
         width: 'container',
@@ -201,6 +214,30 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
                   grid: false,
                   tickCount: 'day',
                 },
+              },
+              y: {
+                field: primaryValue,
+                type: 'quantitative',
+              },
+            },
+          },
+          // Draw isolated points, with missing data before and after.
+          {
+            mark: {
+              type: 'point',
+              size: 16,
+              stroke: null,
+              fill: 'grey',
+            },
+            encoding: {
+              opacity: {
+                condition: [
+                  {
+                    test: { field: 'missing', equal: 2 },
+                    value: '1',
+                  },
+                ],
+                value: 0,
               },
               y: {
                 field: primaryValue,
