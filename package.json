@@ -13,18 +13,21 @@
     "url": "https://github.com/cmu-delphi/www-covidcast.git"
   },
   "scripts": {
-    "start": "cross-env NODE_ENV=development webpack-dev-server -d --open",
-    "build": "cross-env NODE_ENV=production webpack -p",
+    "gen": "node ./scripts/generateDescriptions.js",
+    "start": "npm run gen && cross-env NODE_ENV=development webpack-dev-server -d --open",
+    "build": "npm run gen && cross-env NODE_ENV=production webpack -p",
     "deploy": "npm run build; gh-pages -d public",
     "zip": "cd public && bestzip ../release.zip *",
     "prettier": "prettier --write \"**/*\"",
     "lint": "eslint src --ext .js,.svelte && prettier --check \"**/*\"",
     "lint:fix": "eslint src --ext .js,.svelte --fix && prettier --write \"**/*\"",
-    "release": "release-it --disable-metrics"
+    "release": "release-it --disable-metrics",
+    "changelog": "node ./scripts/changelog.js"
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/preset-env": "^7.11.5",
+    "@octokit/request": "^5.4.9",
     "@turf/boolean-disjoint": "^6.0.2",
     "@turf/centroid": "^6.0.2",
     "babel-loader": "^8.1.0",
@@ -41,8 +44,11 @@
     "html-webpack-harddisk-plugin": "^1.0.2",
     "html-webpack-plugin": "^4.4.1",
     "husky": "^4.3.0",
+    "js-yaml": "^3.14.0",
     "lint-staged": "^10.3.0",
+    "marked": "^1.2.0",
     "mini-css-extract-plugin": "^0.11.2",
+    "node-fetch": "^2.6.1",
     "optimize-css-assets-webpack-plugin": "^5.0.4",
     "prettier": "^2.1.1",
     "prettier-plugin-svelte": "^1.2.1",

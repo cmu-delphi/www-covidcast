@@ -21,6 +21,7 @@
     signalCasesOrDeathOptions,
     isMobileDevice,
     currentCompareSelection,
+    currentSensorMapTitle,
     currentMultiSelection,
     addCompare,
     removeCompare,
@@ -357,7 +358,8 @@
           }
         }
       }}
-      {wrapperClass} />
+      {wrapperClass}
+      title={$currentSensorMapTitle} />
 
     {#if detailSensor != null && !$isMobileDevice && desktopShowPanel}
       <div class="detail-container container-bg container-style">

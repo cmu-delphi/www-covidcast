@@ -37,3 +37,7 @@ TODO what are their geoIds?
 1. Expand and store as `ZipHsaHrr18.csv` in this directory
 
 TODO what are their geoIds?
+
+### Notes
+
+most process results are committed in the repository. An exception is the cb_2019_us_... which is along with the raw data at https://drive.google.com/drive/folders/1YRckPp_27BwAZy6i3fEsH7TBTyYWWope

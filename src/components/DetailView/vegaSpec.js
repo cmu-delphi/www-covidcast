@@ -81,6 +81,7 @@ export const xDateEncoding = {
 const xDateRangeEncoding = {
   ...xDateEncoding,
   axis: {
+    orient: 'bottom',
     title: null,
     format: '%m/%d',
     formatType: 'time',
@@ -114,13 +115,22 @@ export function colorEncoding(selections) {
  * @param {string} primaryValue
  * @param {{info: import('../../maps').NameInfo, color: string}[]} selections
  * @param {[Date, Date]} initialSelection
+ * @param {Array<string>} title
  */
-export function createSpec(sensor, primaryValue, selections, initialSelection) {
+export function createSpec(sensor, primaryValue, selections, initialSelection, title) {
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
   const spec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
+    title: {
+      text: title,
+      font: '"Open Sans", Helvetica, sans-serif',
+      fontSize: 14.08,
+      fontWeight: 700,
+      lineHeight: 22,
+      color: '#666',
+    },
     data: { name: 'values' },
     autosize: {
       type: 'none',
@@ -147,15 +157,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
             encoding: {
               color: colorEncoding(selections),
               x: {
-                ...xDateEncoding,
-                axis: {
-                  title: null,
-                  format: '%m/%d',
-                  formatType: 'time',
-                  tickCount: 'week',
-                  grid: true,
-                  labelSeparation: 10, // Should be based on font size.
-                },
+                ...xDateRangeEncoding,
               },
               y: {
                 field: primaryValue,
@@ -189,16 +191,12 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
                 field: 'geo_value',
               },
               x: {
-                ...xDateEncoding,
+                ...xDateRangeEncoding,
                 axis: {
-                  title: null,
-                  orient: 'bottom',
+                  ...xDateRangeEncoding.axis,
                   labels: false,
-                  format: '%m/%d',
-                  formatType: 'time',
-                  tickCount: 'day',
                   grid: false,
-                  labelSeparation: 10, // Should be based on font size.
+                  tickCount: 'day',
                 },
               },
               y: {
