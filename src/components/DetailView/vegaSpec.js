@@ -1,9 +1,10 @@
 import merge from 'lodash-es/merge';
+
 /**
  * @type {import('vega-lite/build/src/spec').LayerSpec | import('vega-lite/build/src/spec').UnitSpec}
  */
 export const CURRENT_DATE_HIGHLIGHT = {
-  description: 'shows the current data injected via a signal, y: null is on purpose to invalidate a global y',
+  description: 'shows the current data injected via a signal',
   data: {
     values: [{ date_value: null }],
   },
@@ -13,7 +14,10 @@ export const CURRENT_DATE_HIGHLIGHT = {
       as: 'date_value',
     },
   ],
-  mark: 'rule',
+  mark: {
+    type: 'rule',
+    tooltip: false,
+  },
   encoding: {
     color: {
       value: '#c00',
@@ -22,7 +26,6 @@ export const CURRENT_DATE_HIGHLIGHT = {
       field: 'date_value',
       type: 'temporal',
     },
-    y: null,
   },
 };
 
@@ -69,11 +72,22 @@ export const xDateEncoding = {
   field: 'date_value',
   type: 'temporal',
   axis: {
+    orient: 'bottom',
+    labels: false,
+    title: null,
+  },
+};
+
+const xDateRangeEncoding = {
+  ...xDateEncoding,
+  axis: {
+    orient: 'bottom',
     title: null,
     format: '%m/%d',
     formatType: 'time',
-    tickCount: 'day',
-    grid: false,
+    tickCount: 'week',
+    grid: true,
+    labelSeparation: 10, // Should be based on font size.
   },
 };
 
@@ -122,15 +136,8 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
             ...xDateEncoding,
             scale: { domain: { selection: 'brush' } },
           },
-          y: {
-            field: primaryValue,
-            type: 'quantitative',
-            axis: {
-              minExtent: 25,
-              title: sensor.yAxis,
-            },
-          },
         },
+        resolve: { axis: { x: 'independent' } },
         layer: [
           {
             mark: {
@@ -139,6 +146,20 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
             },
             encoding: {
               color: colorEncoding(selections),
+              x: {
+                ...xDateRangeEncoding,
+              },
+              y: {
+                field: primaryValue,
+                type: 'quantitative',
+                scale: {
+                  domainMin: 0,
+                },
+                axis: {
+                  minExtent: 25,
+                  title: sensor.yAxis,
+                },
+              },
             },
           },
           {
@@ -159,6 +180,19 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
               color: {
                 field: 'geo_value',
               },
+              x: {
+                ...xDateRangeEncoding,
+                axis: {
+                  ...xDateRangeEncoding.axis,
+                  labels: false,
+                  grid: false,
+                  tickCount: 'day',
+                },
+              },
+              y: {
+                field: primaryValue,
+                type: 'quantitative',
+              },
             },
           },
           // complicated construct to have proper typings
@@ -172,17 +206,24 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
               },
             ],
             mark: 'rule',
+            encoding: {
+              y: {
+                field: primaryValue,
+                type: 'quantitative',
+              },
+            },
           },
           CURRENT_DATE_HIGHLIGHT,
         ],
       },
       {
         height: 40,
+        view: { cursor: 'col-resize' },
         encoding: {
           color: {
             field: 'geo_value',
           },
-          x: { ...xDateEncoding },
+          x: { ...xDateRangeEncoding },
           y: {
             field: primaryValue,
             type: 'quantitative',
@@ -209,11 +250,23 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
                 init: {
                   x: [initialSelection[0].getTime(), initialSelection[1].getTime()],
                 },
+                mark: { cursor: 'move' },
               },
             },
             mark: {
               type: 'line',
               interpolate: 'monotone',
+            },
+            encoding: {
+              y: {
+                field: primaryValue,
+                type: 'quantitative',
+                axis: {
+                  minExtent: 25,
+                  tickCount: 3,
+                  title: ' ',
+                },
+              },
             },
           },
           // complicated construct to have proper typings
@@ -227,12 +280,19 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
               },
             ],
             mark: 'rule',
+            encoding: {
+              y: {
+                field: primaryValue,
+                type: 'quantitative',
+              },
+            },
           },
           CURRENT_DATE_HIGHLIGHT,
         ],
       },
     ],
     config: {
+      customFormatTypes: true,
       legend: {
         disable: true,
       },
@@ -250,6 +310,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
       encoding: {
         y: {
           field: primaryValue.replace('avg', 'count'),
+          type: 'quantitative',
         },
         color: {
           field: 'geo_value',

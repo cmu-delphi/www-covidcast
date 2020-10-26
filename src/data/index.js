@@ -1,5 +1,12 @@
 import { times, currentDate, stats, currentSensor, currentLevel, MAGIC_START_DATE } from '../stores';
-import { sensorList, sensorMap, levels, swpaLevels, yesterday } from '../stores/constants';
+import {
+  sensorList,
+  sensorMap,
+  levels,
+  swpaLevels,
+  yesterday,
+  regularSignalMetaDataGeoTypeCandidates,
+} from '../stores/constants';
 import { get } from 'svelte/store';
 import { callMetaAPI } from './api';
 
@@ -56,6 +63,7 @@ function updateTimeMap(key, matchedMeta, timeMap) {
 }
 function updateStatsMap(key, matchedMeta, statsMap) {
   statsMap.set(key, {
+    max: matchedMeta.max_value,
     mean: matchedMeta.mean_value,
     std: matchedMeta.stdev_value,
   });
@@ -64,9 +72,29 @@ function updateStatsMap(key, matchedMeta, statsMap) {
  * @param {import('./fetchData').SensorEntry} sEntry
  */
 function loadRegularSignal(sEntry, meta, timeMap, statsMap) {
-  const matchedMeta = meta.epidata.find(
-    (d) => d.data_source === sEntry.id && d.signal === sEntry.signal && (!d.time_type || d.time_type === 'day'),
-  );
+  // find the matching meta data by looping through the candidates and fallback to the first one
+  const baseFilter = (d) =>
+    d.data_source === sEntry.id && d.signal === sEntry.signal && (!d.time_type || d.time_type === 'day');
+
+  const byGeoTypePriority = (a, b) => {
+    // sort by geo types but consider their importance for the matching
+    const aIndex = regularSignalMetaDataGeoTypeCandidates.indexOf(a.geo_type);
+    const bIndex = regularSignalMetaDataGeoTypeCandidates.indexOf(b.geo_type);
+    if (aIndex === bIndex) {
+      return a.geo_type.localCompare(b.geo_type);
+    }
+    if (aIndex < 0) {
+      // missing is bigger
+      return 1;
+    }
+    if (bIndex < 0) {
+      return -1;
+    }
+    return aIndex - bIndex;
+  };
+
+  const candidates = meta.epidata.filter(baseFilter).sort(byGeoTypePriority);
+  const matchedMeta = candidates[0];
 
   if (matchedMeta) {
     updateTimeMap(sEntry.key, matchedMeta, timeMap);
@@ -77,6 +105,7 @@ function loadRegularSignal(sEntry, meta, timeMap, statsMap) {
   // Used for testing new data
   timeMap.set(sEntry.key, [sEntry.minTime, sEntry.maxTime]);
   statsMap.set(sEntry.key, {
+    max: sEntry.max,
     mean: sEntry.mean,
     std: sEntry.std,
   });
@@ -105,16 +134,19 @@ function loadCountSignal(sEntry, meta, timeMap, statsMap) {
     timeMap.set(sEntry.key, [sEntry.minTime, sEntry.maxTime]);
     if (region === 'county') {
       statsMap.set(statsKey, {
+        max: sEntry.county_max,
         mean: sEntry.county_mean,
         std: sEntry.county_std,
       });
     } else if (region === 'msa') {
       statsMap.set(statsKey, {
+        max: sEntry.msa_max,
         mean: sEntry.msa_mean,
         std: sEntry.msa_std,
       });
     } else {
       statsMap.set(statsKey, {
+        max: sEntry.state_max,
         mean: sEntry.state_mean,
         std: sEntry.state_std,
       });
@@ -157,7 +189,7 @@ export function loadMetaData(sensors) {
   return Promise.all([
     callMetaAPI(
       remoteSignals,
-      ['min_time', 'max_time', 'mean_value', 'stdev_value', 'signal', 'geo_type', 'data_source'],
+      ['min_time', 'max_time', 'max_value', 'mean_value', 'stdev_value', 'signal', 'geo_type', 'data_source'],
       {
         time_types: 'day',
         geo_types: [...new Set([...levels, ...swpaLevels])],

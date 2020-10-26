@@ -209,7 +209,7 @@ function createCopy(row, date, sensorEntry) {
     direction: null,
     sample_size: null,
   });
-  if (sensorEntry != null && sensorEntry.isCasesOrDeath) {
+  if ((sensorEntry != null && sensorEntry.isCasesOrDeath) || row[EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined) {
     EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
       copy[key] = null;
     });
@@ -263,8 +263,9 @@ export function fetchTimeSlice(
 /**
  *
  * @param {EpiDataRow[]} rows
+ * @param {SensorEntry} sensor
  */
-export function addMissing(rows) {
+export function addMissing(rows, sensor) {
   if (rows.length < 2) {
     return rows;
   }
@@ -282,7 +283,7 @@ export function addMissing(rows) {
       return base.shift();
     }
     // create an entry
-    return createCopy(template, date);
+    return createCopy(template, date, sensor);
   });
   return imputedRows;
 }

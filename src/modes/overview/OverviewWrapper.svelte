@@ -2,7 +2,7 @@
   import MapBox from '../../components/MapBox/MapBox.svelte';
   import Options from '../../components/Options.svelte';
   import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
-
+  import FaChartLine from 'svelte-icons/fa/FaChartLine.svelte';
   import {
     signalType,
     currentSensor,
@@ -21,6 +21,10 @@
     signalCasesOrDeathOptions,
     isMobileDevice,
     currentCompareSelection,
+    currentSensorMapTitle,
+    currentMultiSelection,
+    addCompare,
+    removeCompare,
   } from '../../stores';
   import Search from '../../components/Search.svelte';
   import SmallMultiplesPanel from './SmallMultiplesPanel.svelte';
@@ -28,11 +32,10 @@
   import DetailView from '../../components/DetailView/DetailView.svelte';
   import MapOverlays from '../../components/MapOverlays.svelte';
   import { trackEvent } from '../../stores/ga';
-
-  // import { modeByID } from '..';
-  import { MAP_THEME, selectionColors } from '../../theme';
+  import FaBan from 'svelte-icons/fa/FaBan.svelte';
   import AddAnother from './AddAnother.svelte';
   import { getInfoByName } from '../../maps';
+
   export let wrapperClass;
   export let regionSearchList;
   export let levelList;
@@ -87,39 +90,7 @@
 
   $: showCompare = $currentCompareSelection != null;
 
-  $: selections = [
-    $currentRegionInfo && { info: $currentRegionInfo, color: MAP_THEME.selectedRegionOutline },
-    showCompare && $currentCompareSelection,
-  ]
-    .filter(Boolean)
-    .flat();
-
-  function addCompare(info) {
-    if (!$currentRegionInfo) {
-      selectByInfo(info);
-      return;
-    }
-
-    $currentCompareSelection = [
-      ...$currentCompareSelection,
-      {
-        info,
-        color: selectionColors[$currentCompareSelection.length] || 'grey',
-      },
-    ];
-  }
-
-  function removeCompare(info) {
-    const bak = $currentCompareSelection.slice();
-    if ($currentRegionInfo && info.id === $currentRegionInfo.id) {
-      selectByInfo(bak.length === 0 ? null : bak[0].info);
-      $currentCompareSelection = bak.slice(1).map((old, i) => ({ ...old, color: selectionColors[i] || 'grey' }));
-      return;
-    }
-    $currentCompareSelection = $currentCompareSelection
-      .filter((d) => d.info !== info)
-      .map((old, i) => ({ ...old, color: selectionColors[i] || 'grey' }));
-  }
+  $: selections = $currentMultiSelection;
 </script>
 
 <style>
@@ -208,10 +179,42 @@
     cursor: crosshair !important;
   }
 
+  .view-switcher {
+    display: flex;
+    margin: 6px;
+    grid-area: view;
+  }
+
+  .map-button {
+    background-size: 80%;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: transparent;
+    background-image: url('../../assets/imgs/choropleth_small.png');
+  }
+
+  .chart-button {
+    color: #8c8c8c;
+  }
+
   .hiddenPanel {
     grid-template-areas:
       'options search view'
       'map map map';
+  }
+
+  .single-toggle > :global(svg:last-of-type) {
+    display: none;
+    position: absolute;
+  }
+
+  .single-toggle.selected > :global(svg:first-of-type) {
+    opacity: 0.5;
+    width: 70%;
+  }
+  .single-toggle.selected > :global(svg:last-of-type) {
+    display: unset;
+    opacity: 0.5;
   }
 
   .selection-legend {
@@ -250,9 +253,6 @@
         'search view'
         'map map';
     }
-    .root > :global(.search-container) {
-      margin: 0 0 0 6px;
-    }
 
     .mobileHide {
       display: none !important;
@@ -279,10 +279,60 @@
         selectByInfo(e.detail);
         trackEvent('search', 'select', e.detail ? e.detail.id : '');
       }} />
+
+    <div class="view-switcher">
+      {#if !$isMobileDevice}
+        <button
+          aria-pressed={String(!desktopShowPanel)}
+          class="pg-button chart-button single-toggle"
+          class:selected={desktopShowPanel}
+          on:click={() => {
+            trackEvent('overview', 'show-panel', String(!desktopShowPanel));
+            desktopShowPanel = !desktopShowPanel;
+          }}
+          title="{desktopShowPanel ? 'Hide' : 'Show'} Line Charts panel">
+          <span aria-hidden>{desktopShowPanel ? 'Hide' : 'Show'} Line Charts panel</span>
+          <FaChartLine />
+          <FaBan />
+        </button>
+      {:else}
+        <div class="pg-button-group">
+          <button
+            aria-pressed={String(mobileShowMap)}
+            class="pg-button map-button"
+            class:selected={mobileShowMap}
+            on:click={() => {
+              trackEvent('overview', 'show-map', 'true');
+              mobileShowMap = true;
+            }}
+            title="Switch to Map">
+            <span aria-hidden>Switch to Map</span>
+            <FaChartLine />
+          </button>
+          <button
+            aria-pressed={String(!mobileShowMap)}
+            class="pg-button chart-button"
+            class:selected={!mobileShowMap}
+            on:click={() => {
+              trackEvent('overview', 'show-map', 'false');
+              mobileShowMap = false;
+            }}
+            title="Switch to Line Charts">
+            <span aria-hidden>Switch to Line Charts</span>
+            <FaChartLine />
+          </button>
+        </div>
+      {/if}
+    </div>
   {/if}
 
   <div class="map-container" class:mobileHide={!mobileShowMap} class:pick={pickMapMode}>
-    <MapOverlays {map} mapLoading={loading} legendLoading={loading} {zoom} />
+    <MapOverlays
+      {map}
+      mapLoading={loading}
+      legendLoading={loading}
+      {zoom}
+      summary={{ data, level: $currentLevel, items: regionSearchList }} />
     <MapBox
       bind:this={map}
       on:loading={(e) => (loading = e.detail)}
@@ -308,7 +358,8 @@
           }
         }
       }}
-      {wrapperClass} />
+      {wrapperClass}
+      title={$currentSensorMapTitle} />
 
     {#if detailSensor != null && !$isMobileDevice && desktopShowPanel}
       <div class="detail-container container-bg container-style">
@@ -324,7 +375,7 @@
           <SmallMultiplesPanel bind:detail={detailSensor} levels={levelList} {selections} />
         </div>
       </div>
-      <div class="panel-bottom-wrapper">
+      <div class="panel-bottom-wrapper mobileHide">
         <button class="pg-button pg-text-button" on:click={() => currentCompareSelection.set(showCompare ? null : [])}>
           {showCompare ? 'Exit' : 'Open'} compare mode
         </button>

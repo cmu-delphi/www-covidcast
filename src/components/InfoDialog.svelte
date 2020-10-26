@@ -87,7 +87,7 @@
     padding-top: 0.25em;
   }
 
-  .links a {
+  .links :global(a) {
     color: rgba(0, 0, 0, 0.65);
     font-weight: 700;
   }
@@ -109,12 +109,14 @@
     </h2>
     <div>
       <p>
-        {@html $currentInfoSensor.longDescription ?? 'No description available'}
+        {@html $currentInfoSensor.description || 'No description available'}
       </p>
     </div>
     <ul class="links">
       {#each $currentInfoSensor.links as link}
-        <li><a href={link.href}>{link.alt}</a></li>
+        <li>
+          {@html link}
+        </li>
       {/each}
       <li>
         <a href={`?mode=${modeByID.export.id}&sensor=${$currentInfoSensor.key}`} on:click={exportData}>Export Data</a>

@@ -1,9 +1,13 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import embed from 'vega-embed';
-  import { Error } from 'vega';
+  import { Error, expressionFunction } from 'vega';
   import { observeResize, unobserveResize } from '../util';
   import { createVegaTooltipAdapter } from './tooltipUtils';
+  import { cachedTime, cachedNumber } from './customVegaFunctions';
+
+  expressionFunction('cachedTime', cachedTime);
+  expressionFunction('cachedNumber', cachedNumber);
 
   export let data = Promise.resolve([]);
 
@@ -81,6 +85,8 @@
   $: updateSpec(patchedSpec);
   $: updateSignals(vegaPromise, signals);
 
+  export const vegaAccessor = () => vegaPromise.then((v) => v.view);
+
   /**
    * @param {Promise<import('vega-embed').Result> | null} vegaLoader
    * @param {Promise<any[]>} data
@@ -128,31 +134,17 @@
    * @param {[key: string]: any} signals
    */
   function updateSignals(vegaLoader, signals) {
-    if (!vegaLoader) {
+    if (!vegaLoader || !vega) {
       return;
     }
     if (Object.keys(signals).length === 0) {
       return;
     }
     hasError = false;
-    vegaLoader
-      .then((vega) => {
-        if (vegaLoader !== vegaPromise) {
-          // outside has changed
-          return;
-        }
-        if (!vega) {
-          return;
-        }
-        Object.entries(signals).forEach(([key, v]) => {
-          vega.view.signal(key, v);
-        });
-        vega.view.runAsync();
-      })
-      .catch((error) => {
-        console.error('error while updating signals', error);
-        hasError = true;
-      });
+    Object.entries(signals).forEach(([key, v]) => {
+      vega.view.signal(key, v);
+    });
+    vega.view.runAsync();
   }
 
   function updateSpec(spec) {
@@ -178,21 +170,24 @@
       },
     });
     vegaPromise.then((r) => {
+      if (!root) {
+        return;
+      }
       vega = r;
       root.setAttribute('role', 'figure');
       signalListeners.forEach((signal) => {
         r.view.addSignalListener(signal, (name, value) => {
-          dispatch('signal', { name, value, view: r.view });
+          dispatch('signal', { name, value, view: r.view, spec });
         });
       });
       dataListeners.forEach((data) => {
         r.view.addDataListener(data, (name, value) => {
-          dispatch('dataListener', { name, value, view: r.view });
+          dispatch('dataListener', { name, value, view: r.view, spec });
         });
       });
       eventListeners.forEach((type) => {
         r.view.addEventListener(type, (event, item) => {
-          dispatch(type, { event, item, view: r.view });
+          dispatch(type, { event, item, view: r.view, spec });
         });
       });
       updateData(vegaPromise, data);
