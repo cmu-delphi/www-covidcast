@@ -123,13 +123,14 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
     $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
     data: { name: 'values' },
     autosize: {
+      type: 'none',
       contains: 'padding',
       resize: true,
     },
+    padding: { left: 40, right: 2, top: 15, bottom: 5 },
     transform: sensor.hasStdErr ? stdErrTransform : [],
     vconcat: [
       {
-        width: 'container',
         encoding: {
           x: {
             ...xDateEncoding,
@@ -229,6 +230,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
       },
       {
         height: 40,
+        padding: { top: 0 },
         view: { cursor: 'col-resize' },
         encoding: {
           color: {
@@ -251,7 +253,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
               highlight2: {
                 type: 'single',
                 empty: 'none',
-                nearest: true,
+                // nearest: true, // causes error about nearest incompatible with line mark.
                 on: 'mouseover',
                 clear: 'mouseout',
               },
@@ -335,8 +337,9 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
   return spec;
 }
 
-const OFFSET_X = 60;
-const OFFSET_Y = 80;
+// Reserve space for titles.
+const OFFSET_Y = 70;
+const RANGE_SELECTOR_HEIGHT = 40;
 
 /**
  * patches in the current size
@@ -347,12 +350,10 @@ export function patchSpec(spec, size) {
   return merge({}, spec, {
     vconcat: [
       {
-        width: size.width - OFFSET_X,
-        height: size.height - 40 - OFFSET_Y,
+        height: size.height - RANGE_SELECTOR_HEIGHT - OFFSET_Y,
       },
       {
-        width: size.width - OFFSET_X,
-        height: 40,
+        height: RANGE_SELECTOR_HEIGHT,
       },
     ],
   });
