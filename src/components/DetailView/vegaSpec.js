@@ -183,10 +183,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
               },
             },
             mark: {
-              type: 'rule',
-              strokeWidth: 2.5,
-              color: 'white',
-              opacity: 0.001,
+              type: 'circle',
               tooltip: true,
             },
             encoding: {
