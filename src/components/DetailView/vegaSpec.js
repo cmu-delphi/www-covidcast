@@ -137,7 +137,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
       contains: 'padding',
       resize: true,
     },
-    padding: { left: 40, right: 2, top: 15, bottom: 5 },
+    padding: { left: 50, right: 2, top: 45, bottom: 5 },
     transform: sensor.hasStdErr ? stdErrTransform : [],
     vconcat: [
       {
@@ -336,7 +336,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
 }
 
 // Reserve space for titles.
-const OFFSET_Y = 75;
+const OFFSET_Y = 110;
 const RANGE_SELECTOR_HEIGHT = 40;
 
 /**
