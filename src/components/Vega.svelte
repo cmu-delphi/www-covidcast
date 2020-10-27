@@ -238,9 +238,7 @@
   });
 
   afterUpdate(() => {
-    if (!patchSpec) {
-      window.dispatchEvent(new Event('resize'));
-    }
+    window.dispatchEvent(new Event('resize'));
   });
 
   onDestroy(() => {
