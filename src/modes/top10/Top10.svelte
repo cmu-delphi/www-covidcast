@@ -19,7 +19,7 @@
   import { throttle } from 'lodash-es';
   import Top10SortHint from './Top10SortHint.svelte';
   import { levelMegaCounty, groupedSensorList, sensorList, primaryValue, yesterdayDate } from '../../stores/constants';
-  import { parseAPITime } from '../../data';
+  import { formatAPITime, parseAPITime } from '../../data';
 
   const SHOW_X_MORE = 10;
   const MAX_OTHER_SENSORS = 1;
@@ -223,16 +223,19 @@
     highlightTimeValue = value;
   }, 10);
 
-  function onHighlight(e) {
+  function resolveHighlightedTimeValue(e) {
     const highlighted = e.detail.value;
-    const id = highlighted && Array.isArray(highlighted._vgsid_) ? highlighted._vgsid_[0] : null;
-
-    if (!id) {
-      throttled(null);
-      return;
+    if (highlighted && Array.isArray(highlighted.date_value) && highlighted.date_value.length > 0) {
+      return Number.parseInt(formatAPITime(highlighted.date_value[0]), 10);
     }
-    const row = e.detail.view.data('data_0').find((d) => d._vgsid_ === id);
-    throttled(row ? row.time_value : null);
+    return null;
+  }
+
+  function onHighlight(e) {
+    const value = resolveHighlightedTimeValue(e);
+    if (highlightTimeValue !== value) {
+      throttled(value);
+    }
   }
 </script>
 
