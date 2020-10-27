@@ -24,11 +24,26 @@ To lint or check for styling, run
 
 `npm run lint`
 
+To run unit test, run
+
+`npm run test`
+
+To run e2e test, run
+
+`npm run build && npm run test:e2e`
+
 To run the development server, run
 
 `npm start`
 
 the website should open automatically.
+
+To run e2e test against the development server, run
+
+`npm start`
+in a separate shell:
+
+`npm run cy:dev`
 
 ### Release Process
 

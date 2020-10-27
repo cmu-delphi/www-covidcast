@@ -12,4 +12,5 @@ module.exports = {
     '\\.css': 'identity-obj-proxy',
     '\\.csv$': '<rootDir>/src/__mocks__/csvMock.js',
   },
+  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/cypress'],
 };

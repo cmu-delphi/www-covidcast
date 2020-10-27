@@ -23,12 +23,16 @@
     "lint:fix": "eslint src --ext .js,.svelte --fix && prettier --write \"**/*\"",
     "release": "release-it --disable-metrics",
     "changelog": "node ./scripts/changelog.js",
-    "test": "jest --passWithNoTests"
+    "test": "jest --passWithNoTests",
+    "test:e2e": "cypress run",
+    "cy:open": "cypress open",
+    "cy:dev": "cypress open --config baseUrl=http://localhost:8080"
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/preset-env": "^7.11.5",
     "@octokit/request": "^5.4.9",
+    "@testing-library/cypress": "^7.0.1",
     "@testing-library/jest-dom": "^5.11.5",
     "@testing-library/svelte": "^3.0.0",
     "@turf/boolean-disjoint": "^6.0.2",
@@ -40,8 +44,10 @@
     "copy-webpack-plugin": "^6.1.0",
     "cross-env": "^7.0.2",
     "css-loader": "^4.3.0",
+    "cypress": "^5.5.0",
     "dirty-reprojectors": "0.0.2",
     "eslint": "^7.9.0",
+    "eslint-plugin-cypress": "^2.11.2",
     "eslint-plugin-svelte3": "^2.7.3",
     "file-loader": "^6.1.0",
     "gh-pages": "^3.1.0",
