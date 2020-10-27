@@ -197,6 +197,7 @@ export function loadMetaData(sensors) {
     ),
     ...custom,
   ]).then((metas) => {
+    console.log(metas);
     const meta = metas[0];
     if (!Array.isArray(meta.epidata)) {
       // bug in the API

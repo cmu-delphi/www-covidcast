@@ -45,6 +45,7 @@
     "cross-env": "^7.0.2",
     "css-loader": "^4.3.0",
     "cypress": "^5.5.0",
+    "cypress-image-snapshot": "^3.1.1",
     "dirty-reprojectors": "0.0.2",
     "eslint": "^7.9.0",
     "eslint-plugin-cypress": "^2.11.2",

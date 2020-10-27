@@ -1,3 +1,5 @@
 {
-  "fileServerFolder": "public"
+  "fileServerFolder": "public",
+  "experimentalNetworkStubbing": true,
+  "chromeWebSecurity": false
 }

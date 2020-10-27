@@ -1,12 +1,21 @@
 /// <reference types="cypress" />
 
-context('Querying', () => {
-  beforeEach(() => {
+describe('hello test', () => {
+  it('smoke test', () => {
     cy.visit('/index.html');
-  });
 
-  it('cy.get() - query DOM elements', () => {
     // https://on.cypress.io/get
+
+    // wait that the map is ready
+    cy.get('.mapboxgl-map[data-ready=ready]');
+
+    cy.get('.viz-name h1').should('contain', 'COVIDcast');
+  });
+  it('smoke mobile test', () => {
+    cy.viewport('iphone-x').visit('/index.html');
+
+    // wait that the map is ready
+    cy.get('.mapboxgl-map[data-ready=ready]');
 
     cy.get('.viz-name h1').should('contain', 'COVIDcast');
   });
