@@ -14,3 +14,5 @@
 /src/maps/raw
 /src/maps/processed
 *.generated.json
+*.txt
+/LICENSE
