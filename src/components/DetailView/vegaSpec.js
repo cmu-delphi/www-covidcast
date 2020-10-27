@@ -227,9 +227,9 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
               type: 'point',
               size: 16,
               stroke: null,
-              fill: 'grey',
             },
             encoding: {
+              fill: colorEncoding(selections),
               opacity: {
                 condition: [
                   {

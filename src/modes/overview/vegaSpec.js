@@ -209,9 +209,9 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
           type: 'point',
           size: 16,
           stroke: null,
-          fill: 'grey',
         },
         encoding: {
+          fill: colorEncoding(selections),
           opacity: {
             condition: [
               {
