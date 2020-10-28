@@ -8,21 +8,27 @@ function dates(minTime, maxTime) {
   const min = parseAPITime(minTime.toString());
   const max = parseAPITime(maxTime.toString());
 
-  return timeDay.range(min, timeDay.offset(max, 1));
+  return timeDay.range(min, timeDay.offset(max, 1)).map((d) => formatAPITime(d));
 }
 
-function generateData(dateRange, isMissing, gen) {
+/**
+ * generates data lookups for the given date and geo values
+ * @param {string[]} dateRange list of dates in api format
+ * @param {string[]} geoValues list of geo values
+ * @param {() => boolean} isMissing generator whether it should be missing
+ * @param {() => number} gen generator for a new value
+ */
+function generateData(dateRange, geoValues, isMissing, gen) {
   // matrix data
-  const byRegion = new Map(states.map((state) => [state, []]));
+  const byRegion = new Map(geoValues.map((state) => [state, []]));
   const byDate = new Map();
   for (const date of dateRange) {
     if (isMissing()) {
       continue;
     }
-    const key = formatAPITime(date);
-    const time_value = Number.parseInt(key, 10);
+    const time_value = Number.parseInt(date, 10);
     const entries = [];
-    for (const geo_value of states) {
+    for (const geo_value of geoValues) {
       if (isMissing()) {
         continue;
       }
@@ -30,41 +36,73 @@ function generateData(dateRange, isMissing, gen) {
       entries.push(entry);
       byRegion.get(geo_value).push(entry);
     }
-    byDate.set(key, entries);
+    byDate.set(date, entries);
   }
   return { byDate, byRegion };
 }
 
 export function visitWithSensor({
+  /**
+   * number of sensors to generate
+   */
   numSensors = 1,
+  /**
+   * first time point
+   */
   minTime = 20200201,
+  /**
+   * last time point
+   */
   maxTime = 20201001,
+  /**
+   * string used to seed the random number generator
+   */
   seed = 'seed',
+  /**
+   * mu for random normal parameterization
+   */
   mu = 2,
+  /**
+   * sigma for random normal parameterization
+   */
   sigma = 1,
+  /**
+   * minimum value of the signal
+   */
   min = 0,
+  /**
+   * maximum value of the signal
+   */
   max = 4,
+  /**
+   * initially selected state
+   */
   region = 'NY',
+  /**
+   * percentage of missing values
+   */
   missing = 0.02,
+  /**
+   * additional query parameters for the first visit
+   */
   query = {},
 } = {}) {
   /**
    * @type {import("../../src/data").SensorEntry[]}
    */
-  const sensors = Array(numSensors)
-    .fill(0)
-    .map((_, i) => ({
-      id: 's',
-      signal: `s${i}`,
-      name: `Test ${i}`,
-      levels: ['state'],
-      description: 'Test',
-      format: 'raw',
-      hasStdErr: false,
-      mapTitleText: 'Test',
-      type: 'public',
-      yAxis: 'Value',
-    }));
+  const sensors = (Array.isArray(numSensors) ? numSensors : Array(numSensors).fill({})).map((mixin, i) => ({
+    id: 's',
+    signal: `s${i}`,
+    name: `Test ${i}`,
+    levels: ['state'],
+    description: 'Test',
+    format: 'raw',
+    hasStdErr: false,
+    mapTitleText: 'Test',
+    type: 'public',
+    yAxis: 'Value',
+    ...mixin,
+  }));
 
   const base = seedrandom(seed);
   const rnd = randomNormal.source(base)(mu, sigma);
@@ -96,7 +134,7 @@ export function visitWithSensor({
   );
 
   for (const sensor of sensors) {
-    const { byDate, byRegion } = generateData(dateRange, isMissing, gen);
+    const { byDate, byRegion } = generateData(dateRange, states, isMissing, gen);
 
     // fake get sensor data
     cy.route2(
