@@ -43,7 +43,7 @@ To run e2e test against the development server, run
 `npm start`
 in a separate shell:
 
-`npm run cy:dev`
+`npm run cy:open`
 
 ### Release Process
 

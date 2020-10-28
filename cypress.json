@@ -2,5 +2,6 @@
   "fileServerFolder": "public",
   "experimentalNetworkStubbing": true,
   "chromeWebSecurity": false,
-  "testFiles": "**/*.spec.*"
+  "testFiles": "**/*.spec.*",
+  "baseUrl": "http://localhost:8080"
 }
