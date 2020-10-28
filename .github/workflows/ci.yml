@@ -23,7 +23,7 @@ jobs:
       - run: npm run test
       - uses: cypress-io/github-action@v2
         with:
-          start: http-server
+          start: npm run serve
       # after the test run completes
       # store videos and any screenshots
       # NOTE: screenshots will be generated only if E2E test failed
