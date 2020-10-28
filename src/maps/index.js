@@ -1,10 +1,10 @@
 import boundsInfo from './processed/bounds.json';
 import { dsvFormat } from 'd3-dsv';
-import stateRaw from './processed/state.csv';
-import msaRaw from './processed/msa.csv';
-import countyRaw from './processed/county.csv';
-// import neighborhoodRaw from './processed/swpa/neighborhood.csv';
-// import zipRaw from './processed/swpa/zip.csv';
+import stateRaw from './processed/state.csv.js';
+import msaRaw from './processed/msa.csv.js';
+import countyRaw from './processed/county.csv.js';
+// import neighborhoodRaw from './processed/swpa/neighborhood.csv.js';
+// import zipRaw from './processed/swpa/zip.csv.js';
 // import swpaFilterInfo from './processed/swpa/filterInfo.json';
 import { levelMegaCounty } from '../stores/constants';
 
