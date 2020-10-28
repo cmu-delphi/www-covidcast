@@ -131,5 +131,5 @@ export function visitWithSensor({
       region,
       ...query,
     },
-  });
+  }).get('body[data-ready=ready]');
 }
