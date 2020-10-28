@@ -6,8 +6,8 @@ import countyRaw from './processed/county.csv.js';
 // import neighborhoodRaw from './processed/swpa/neighborhood.csv.js';
 // import zipRaw from './processed/swpa/zip.csv.js';
 // import swpaFilterInfo from './processed/swpa/filterInfo.json';
-import { levelMegaCounty } from '../stores/constants';
 
+const levelMegaCountyId = 'mega-county';
 /**
  * @typedef {object} NameInfo
  * @property {string} name name for param
@@ -47,7 +47,7 @@ const megaCountyInfo = stateInfo.map((info) => ({
   name: `Rest of ${info.name}`,
   displayName: `Rest of ${info.displayName}`,
   population: null,
-  level: levelMegaCounty.id,
+  level: levelMegaCountyId,
   lat: null,
   long: null,
 }));
@@ -61,7 +61,7 @@ export const bounds = boundsInfo;
 export function loadSources(additionalProperties = {}) {
   // mark to be loaded as fast as possible
   return import(/* webpackPreload: true */ './geo').then((r) =>
-    r.default(stateInfo, countyInfo, msaInfo, levelMegaCounty.id, additionalProperties),
+    r.default(stateInfo, countyInfo, msaInfo, levelMegaCountyId, additionalProperties),
   );
 }
 
