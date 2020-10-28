@@ -44,8 +44,9 @@ export function visitWithSensor({
   sigma = 1,
   min = 0,
   max = 4,
-  focus = 'NY',
+  region = 'NY',
   missing = 0.02,
+  query = {},
 } = {}) {
   /**
    * @type {import("../../src/data").SensorEntry[]}
@@ -127,7 +128,8 @@ export function visitWithSensor({
     url: '/index.html',
     qs: {
       sensors: JSON.stringify(sensors),
-      region: focus,
+      region,
+      ...query,
     },
   });
 }
