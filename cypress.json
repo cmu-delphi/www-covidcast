@@ -1,5 +1,6 @@
 {
   "fileServerFolder": "public",
   "experimentalNetworkStubbing": true,
-  "chromeWebSecurity": false
+  "chromeWebSecurity": false,
+  "testFiles": "**/*.spec.*"
 }
