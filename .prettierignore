@@ -16,3 +16,7 @@
 *.generated.json
 *.txt
 /LICENSE
+*.mp4
+*.log
+*.png
+*.jpg
