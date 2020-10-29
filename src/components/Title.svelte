@@ -33,5 +33,5 @@
         currentInfoSensor.set($currentSensorEntry);
       }}><IoMdHelp /></button>
   </span>
-  {#if showDate}<span>{$currentDateObject.toLocaleDateString()}</span>{/if}
+  {#if showDate}<span data-testid="currentdate">{$currentDateObject.toLocaleDateString()}</span>{/if}
 </h2>

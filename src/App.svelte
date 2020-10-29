@@ -10,6 +10,7 @@
   onMount(() => {
     loadMetaData(sensorList).then(() => {
       appReady.set(true);
+      document.body.dataset.ready = 'ready';
     });
   });
 
