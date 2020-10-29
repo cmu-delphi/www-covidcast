@@ -11,30 +11,19 @@ export function loadTimeSeriesData(region, startEndDates) {
     return new Map();
   }
   // collect all data to load
-  const signals = sections
-    .map((d) => d.questions.map((d) => d.indicators))
-    .flat(2)
-    .map((d) => d.signal);
+  const indicators = sections.map((d) => d.questions.map((d) => d.indicators)).flat(2);
 
   return new Map(
-    signals.map((signal) => {
-      const fakeSensor = {
+    indicators.map((indicator) => {
+      const sensor = indicator.sensor || {
         id: dataSource,
-        signal,
+        signal: indicator.signal,
       };
-      const data = fetchTimeSlice(
-        fakeSensor,
-        region.level,
-        region.propertyId,
-        startEndDates[0],
-        startEndDates[1],
-        false,
-        {
-          geo_value: region.propertyId,
-        },
-      ).then((r) => addMissing(r));
+      const data = fetchTimeSlice(sensor, region.level, region.propertyId, startEndDates[0], startEndDates[1], false, {
+        geo_value: region.propertyId,
+      }).then((r) => addMissing(r));
 
-      return [signal, data];
+      return [indicator.signal, data];
     }),
   );
 }

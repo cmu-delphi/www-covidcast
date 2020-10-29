@@ -22,11 +22,13 @@ export const sections = [
             name: 'COVID-Like Symptoms',
             description: `Estimated percentage of people with COVID-like illness based on ${criteria}.`,
             signal: 'smoothed_cli',
+            sensor: sensorList.find((d) => d.id === dataSource && d.signal === 'smoothed_cli'),
           },
           {
             name: 'Flu-Like Symptoms',
             description: `Estimated percentage of people with influenza-like illness based on ${criteria}.`,
             signal: 'smoothed_ili',
+            sensor: sensorList.find((d) => d.id === dataSource && d.signal === 'smoothed_ili'),
           },
         ],
       },
@@ -38,11 +40,13 @@ export const sections = [
             name: 'COVID-Like Symptoms in Community',
             description: `Estimated percentage of people reporting illness in their local community, see ${community}, including their household.`,
             signal: 'smoothed_hh_cmnty_cli',
+            sensor: sensorList.find((d) => d.id === dataSource && d.signal === 'smoothed_hh_cmnty_cli'),
           },
           {
             name: 'COVID-Like Symptoms in Community not including their household',
             description: `Estimated percentage of people reporting illness in their local community, see ${community}, not including their household.`,
             signal: 'smoothed_nohh_cmnty_cli',
+            sensor: sensorList.find((d) => d.id === dataSource && d.signal === 'smoothed_nohh_cmnty_cli'),
           },
         ],
       },
@@ -59,6 +63,7 @@ export const sections = [
             description:
               'Estimated percentage of people who were tested for COVID-19 in the past 14 days, regardless of their test result.',
             signal: 'smoothed_tested_14d',
+            sensor: sensorList.find((d) => d.id === dataSource && d.signal === 'smoothed_tested_14d'),
           },
         ],
       },
@@ -70,6 +75,7 @@ export const sections = [
             description:
               'Estimated test positivity rate (percent) among people tested for COVID-19 in the past 14 days.',
             signal: 'smoothed_tested_positive_14d',
+            sensor: sensorList.find((d) => d.id === dataSource && d.signal === 'smoothed_tested_positive_14d'),
           },
         ],
       },
@@ -81,6 +87,7 @@ export const sections = [
             description:
               'Estimated percentage of people who wanted to be tested for COVID-19 in the past 14 days, out of people who were not tested in that time.',
             signal: 'smoothed_wanted_test_14d',
+            sensor: sensorList.find((d) => d.id === dataSource && d.signal === 'smoothed_wanted_test_14d'),
           },
         ],
       },
@@ -97,6 +104,7 @@ export const sections = [
             description:
               'Estimated percentage of people who wore a mask most or all of the time while in public in the past 5 days; those not in public in the past 5 days are not counted.',
             signal: 'smoothed_wearing_mask',
+            sensor: sensorList.find((d) => d.id === dataSource && d.signal === 'smoothed_wearing_mask'),
             negated: true,
           },
         ],
