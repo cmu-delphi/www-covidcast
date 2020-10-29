@@ -97,6 +97,7 @@ export const sections = [
             description:
               'Estimated percentage of people who wore a mask most or all of the time while in public in the past 5 days; those not in public in the past 5 days are not counted.',
             signal: 'smoothed_wearing_mask',
+            negated: true,
           },
         ],
       },

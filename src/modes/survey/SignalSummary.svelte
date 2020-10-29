@@ -1,6 +1,7 @@
 <script>
-  import { determineTrend, findDateRow, findMaxRow } from './trend';
+  import { determineTrend, findDateRow, findMaxRow, findMinRow } from './trend';
   import { formatValue, formatDate, formatDelta } from './format';
+  import Vega from '../../components/Vega.svelte';
   /**
    * date to highlight
    * @type {Date}
@@ -12,14 +13,20 @@
    */
   export let data = Promise.resolve([]);
 
+  export let low = false;
+
+  export let spec;
+
   let loading = true;
+  let maxDate = null;
 
   async function deriveData(dataPromise, date) {
     loading = true;
     const data = await dataPromise;
     const dateRow = findDateRow(date, data);
     const trend = determineTrend(date, data, dateRow);
-    const max = findMaxRow(data);
+    const max = low ? findMinRow(data) : findMaxRow(data);
+    maxDate = max ? max.date_value : null;
     loading = false;
 
     return {
@@ -36,6 +43,7 @@
 <style>
   .summary {
     display: flex;
+    align-items: center;
   }
   .block {
     padding: 0.5em;
@@ -43,6 +51,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 10em;
+  }
+
+  .summary :global(.vega-embed) {
+    width: 20em;
   }
 </style>
 
@@ -60,8 +73,9 @@
     </div>
     <div class="block">
       <span> <strong>{s.max ? formatValue(s.max.value) : '?'}</strong> per 1,000 </span>
-      <span>highest value</span>
+      <span>{low ? 'lowest' : 'highest'} value</span>
       <span>on {s.max ? formatDate(s.max.date_value) : '?'}</span>
     </div>
   {/await}
+  <Vega {spec} {data} signals={{ currentDate: date, maxDate }} />
 </div>

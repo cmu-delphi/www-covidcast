@@ -1,11 +1,10 @@
 <script>
   import Search from '../../components/Search.svelte';
-  import Vega from '../../components/Vega.svelte';
   import { formatAPITime, parseAPITime } from '../../data';
   import { nameInfos } from '../../maps';
   import { currentDate, currentRegionInfo, selectByInfo, smallMultipleTimeSpan } from '../../stores';
   import SensorDatePicker from '../../components/SensorDatePicker.svelte';
-  import { formatTime, refSensor, sections } from './sections';
+  import { refSensor, sections } from './sections';
   import { createTimeSeriesSpec, loadTimeSeriesData } from './timeSeries';
   import SignalSummary from './SignalSummary.svelte';
 
@@ -28,7 +27,7 @@
   }
 
   $: timeSeriesData = loadTimeSeriesData($currentRegionInfo, [startDay, endDay]);
-  $: timeSeriesSpec = createTimeSeriesSpec(false, [startDay, endDay]);
+  $: timeSeriesSpec = createTimeSeriesSpec([startDay, endDay]);
 </script>
 
 <style>
@@ -99,7 +98,11 @@
                 <p>
                   {@html indicator.description}
                 </p>
-                <SignalSummary date={selectedDate} data={timeSeriesData.get(indicator.signal)} />
+                <SignalSummary
+                  date={selectedDate}
+                  data={timeSeriesData.get(indicator.signal)}
+                  low={indicator.negated}
+                  spec={timeSeriesSpec} />
               </div>
             {/each}
           </div>

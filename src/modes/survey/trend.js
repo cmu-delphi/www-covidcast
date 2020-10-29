@@ -18,6 +18,23 @@ export function findMaxRow(data) {
   return max;
 }
 
+/**
+ * @param {import("../../data").EpiDataRow[]} data
+ * @returns {import("../../data").EpiDataRow}
+ */
+export function findMinRow(data) {
+  let min = null;
+  for (const row of data) {
+    if (row.value == null) {
+      continue;
+    }
+    if (!min || min.value > row.value) {
+      min = row;
+    }
+  }
+  return min;
+}
+
 function toTimeValue(date) {
   return Number.parseInt(formatAPITime(date), 10);
 }
@@ -55,7 +72,7 @@ export function determineTrend(date, data, dateRow = findDateRow(date, data)) {
 
   if (!dateRow || dateRow.value == null) {
     return {
-      label: 'Unknown',
+      trend: 'Unknown',
       delta: Number.NaN,
       refDate,
       ref: null,
@@ -78,7 +95,7 @@ export function determineTrend(date, data, dateRow = findDateRow(date, data)) {
   if (!refValue) {
     // none found
     return {
-      label: 'Unknown',
+      trend: 'Unknown',
       delta: Number.NaN,
       refDate: refDate,
       ref: null,

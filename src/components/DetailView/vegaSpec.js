@@ -1,33 +1,38 @@
 import merge from 'lodash-es/merge';
 
-/**
- * @type {import('vega-lite/build/src/spec').LayerSpec | import('vega-lite/build/src/spec').UnitSpec}
- */
-export const CURRENT_DATE_HIGHLIGHT = {
-  description: 'shows the current data injected via a signal',
-  data: {
-    values: [{ date_value: null }],
-  },
-  transform: [
-    {
-      calculate: 'toDate(currentDate)',
-      as: 'date_value',
+export function createSignalDateHighlight(signal, color) {
+  /**
+   * @type {import('vega-lite/build/src/spec').LayerSpec | import('vega-lite/build/src/spec').UnitSpec}
+   */
+  const layer = {
+    description: 'shows the current data injected via a signal',
+    data: {
+      values: [{ date_value: null }],
     },
-  ],
-  mark: {
-    type: 'rule',
-    tooltip: false,
-  },
-  encoding: {
-    color: {
-      value: '#c00',
+    transform: [
+      {
+        calculate: `toDate(${signal})`,
+        as: 'date_value',
+      },
+    ],
+    mark: {
+      type: 'rule',
+      tooltip: false,
     },
-    x: {
-      field: 'date_value',
-      type: 'temporal',
+    encoding: {
+      color: {
+        value: color,
+      },
+      x: {
+        field: 'date_value',
+        type: 'temporal',
+      },
     },
-  },
-};
+  };
+  return layer;
+}
+
+export const CURRENT_DATE_HIGHLIGHT = createSignalDateHighlight('currentDate', '#c00');
 
 /**
  * @type {import('vega-lite/build/src/spec').LayerSpec | import('vega-lite/build/src/spec').UnitSpec}

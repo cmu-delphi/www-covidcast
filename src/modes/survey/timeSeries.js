@@ -1,3 +1,4 @@
+import { createSignalDateHighlight, CURRENT_DATE_HIGHLIGHT } from '../../components/DetailView/vegaSpec';
 import { addMissing, fetchTimeSlice } from '../../data';
 import { dataSource, sections } from './sections';
 
@@ -39,10 +40,9 @@ export function loadTimeSeriesData(region, startEndDates) {
 }
 
 /**
- * @param {boolean} showErrorBars
  * @param {[Date, Date]} startEndDates
  */
-export function createTimeSeriesSpec(showErrorBars, startEndDates) {
+export function createTimeSeriesSpec(startEndDates) {
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
@@ -51,71 +51,67 @@ export function createTimeSeriesSpec(showErrorBars, startEndDates) {
     data: { name: 'values' },
     width: 'container',
     height: 50,
-    padding: 0,
+    padding: {
+      left: 40,
+      bottom: 5,
+      top: 5,
+      right: 1,
+    },
     transform: [
-      {
-        calculate: 'datum.value == null ? null : datum.stderr / 100',
-        as: 'pStdErr',
-      },
       {
         calculate: 'datum.value == null ? null : datum.value / 100',
         as: 'pValue',
       },
-      {
-        calculate: 'datum.pValue == null ? null : datum.pValue + datum.pStdErr',
-        as: 'pValueAndStdErr',
-      },
     ],
-    encoding: {
-      x: {
-        field: 'date_value',
-        type: 'temporal',
-        axis: {
-          title: 'Date',
-          format: '%m/%d',
-          formatType: 'time',
-          tickCount: 'day',
-          grid: true,
-          labelSeparation: 10, // Should be based on font size.
-        },
-        scale:
-          startEndDates.length > 0
-            ? {
-                domain: [startEndDates[0].getTime(), startEndDates[1].getTime()],
-              }
-            : {},
-      },
-      y: {
-        field: 'pValue',
-        type: 'quantitative',
-        axis: {
-          format: '.1%',
-          title: 'Percentage',
-          minExtent: 40,
-        },
-      },
-    },
     layer: [
-      ...(showErrorBars
-        ? [
-            {
-              mark: 'errorband',
-              encoding: {
-                yError: { field: 'pStdErr' },
-              },
-            },
-          ]
-        : []),
       {
         mark: {
           type: 'line',
-          point: true,
+          point: false,
+          color: 'grey',
           tooltip: {
             content: 'encoding',
           },
         },
+        encoding: {
+          x: {
+            field: 'date_value',
+            type: 'temporal',
+            title: null,
+            axis: {
+              format: '%m/%d',
+              formatType: 'cachedTime',
+              tickCount: 'month',
+              grid: false,
+              labelSeparation: 10, // Should be based on font size.
+            },
+            scale:
+              startEndDates.length > 0
+                ? {
+                    domain: [startEndDates[0].getTime(), startEndDates[1].getTime()],
+                  }
+                : {},
+          },
+          y: {
+            field: 'pValue',
+            type: 'quantitative',
+            axis: {
+              format: '.1%',
+              title: null,
+              grid: false,
+            },
+          },
+        },
       },
+      createSignalDateHighlight('maxDate', 'gray'),
+      CURRENT_DATE_HIGHLIGHT,
     ],
+    config: {
+      customFormatTypes: true,
+      view: {
+        stroke: false,
+      },
+    },
   };
 
   return spec;
