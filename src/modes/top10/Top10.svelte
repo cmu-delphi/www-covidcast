@@ -178,7 +178,7 @@
   }
 
   // compute local maxima
-  $: primaryDomain = Promise.all(primaryData).then((rows) => [0, maxNested(rows)]);
+  $: primaryDomain = Promise.all(primaryData).then((rows) => [0, maxNested(rows) / 2]);
 
   $: otherDataAndDomain = otherSensors.map((sensor) => {
     const data = sortedRows.map((row) =>
@@ -186,7 +186,7 @@
         geo_value: row.propertyId,
       }).then((r) => addMissing(r)),
     );
-    const domain = Promise.all(data).then((rows) => [0, maxNested(rows)]);
+    const domain = Promise.all(data).then((rows) => [0, maxNested(rows) / 2]);
     return { data, domain };
   });
 
@@ -232,6 +232,11 @@
       return;
     }
     const row = e.detail.view.data('data_0').find((d) => d._vgsid_ === id);
+    // if (row.value == null) {
+    //   highlightTimeValue = null;
+    //   return;
+    // }
+    // console.info('row', row);
     throttled(row ? row.time_value : null);
   }
 </script>

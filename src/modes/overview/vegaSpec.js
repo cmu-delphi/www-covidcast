@@ -76,6 +76,10 @@ export function resolveHighlightedTimeValue(e) {
     return null;
   }
   const row = e.detail.view.data('data_0').find((d) => d._vgsid_ === id);
+  if (row.value == null) {
+    return;
+  }
+  console.info('row', row);
   return row ? row.time_value : null;
 }
 
@@ -107,6 +111,7 @@ const stdErrTransformPercent = [
 export function createSpec(sensor, selections, dateRange, valuePatch) {
   const isPercentage = sensor.format === 'percent';
   const yField = valuePatch && valuePatch.field ? valuePatch.field : isPercentage ? 'pValue' : 'value';
+  const yMax = valuePatch && valuePatch.domain ? valuePatch.domain[1] : 0;
 
   const scalePercent = isPercentage ? (v) => v / 100 : (v) => v;
   /**
@@ -126,6 +131,10 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
       {
         calculate: 'datum.value == null ? null : datum.value / 100',
         as: 'pValue',
+      },
+      {
+        calculate: 'datum.value == null ? false : datum.value > ' + yMax,
+        as: 'clipped',
       },
     ],
     encoding: {
@@ -151,6 +160,35 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
       ...(sensor.hasStdErr ? [stdErrLayer] : []),
       {
         mark: {
+          type: 'text',
+          text: '\u21E1',
+          size: 9,
+          baseline: 'bottom',
+          dy: 2,
+          // stroke: colorEncoding(selections)
+          stroke: 'red',
+        },
+        encoding: {
+          y: {
+            value: scalePercent(yMax),
+            type: 'quantitative',
+          },
+          opacity: {
+            condition: [
+              {
+                test: {
+                  field: 'clipped',
+                  equal: true,
+                },
+                value: 0.2,
+              },
+            ],
+            value: 0,
+          },
+        },
+      },
+      {
+        mark: {
           type: 'line',
           interpolate: 'linear',
         },
@@ -169,6 +207,18 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
               tickCount: 3,
               minExtent: 25,
             },
+          },
+          size: {
+            condition: [
+              {
+                test: {
+                  field: 'clipped',
+                  equal: true,
+                },
+                value: 0,
+              },
+            ],
+            value: 1,
           },
         },
       },
