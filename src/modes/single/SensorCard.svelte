@@ -1,13 +1,12 @@
 <script>
-  import { timeFormat } from 'd3-time-format';
   import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
   import VegaTooltip from '../../components/DetailView/VegaTooltip.svelte';
   import Vega from '../../components/Vega.svelte';
   import { formatAPITime, parseAPITime } from '../../data';
+  import { formatDateLocal } from '../../formats';
   import { currentInfoSensor, smallMultipleTimeSpan } from '../../stores';
   import { prepareSensorData } from '../overview/vegaSpec';
 
-  const formatLocal = timeFormat('%x');
   /**
    * @type {import("../../stores/constants").SensorEntry}
    */
@@ -137,7 +136,7 @@
   {#if values.length <= 1}
     <div class="key">
       <span class="key-fact">{values[0] != null ? sensor.formatValue(values[0]) : '?'}</span>
-      <span class="hint">on {formatLocal(highlightDate ? highlightDate : date)}</span>
+      <span class="hint">on {formatDateLocal(highlightDate ? highlightDate : date)}</span>
     </div>
   {:else}
     <table class="key">
@@ -147,7 +146,9 @@
             <td class="legend" style="--color: {selection.color}">{selection.displayName}</td>
             <td class="key-fact">{values[i] != null ? sensor.formatValue(values[i]) : '?'}</td>
             {#if i === 0}
-              <td class="hint" rowspan={selections.length}>on {formatLocal(highlightDate ? highlightDate : date)}</td>
+              <td class="hint" rowspan={selections.length}>
+                on {formatDateLocal(highlightDate ? highlightDate : date)}
+              </td>
             {/if}
           </tr>
         {/each}

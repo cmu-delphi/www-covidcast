@@ -1,8 +1,5 @@
 <script>
-  import { timeFormat } from 'd3-time-format';
-
-  const formatTimeWithoutYear = timeFormat('%B %d');
-
+  import { formatDateShort } from '../../formats';
   /**
    * @type {import('../../stores/constants').SensorEntry}
    */
@@ -42,7 +39,7 @@
 <div aria-label="tooltip" class="tooltip" class:hidden>
   <h5>
     {#if item.displayName}{item.displayName} on{/if}
-    {formatTimeWithoutYear(item.date_value)}
+    {formatDateShort(item.date_value)}
   </h5>
   <table>
     <tbody>
@@ -53,7 +50,7 @@
           <th class="area">Ratios (per 100,000)</th>
         </tr>
         <tr>
-          <th>{formatTimeWithoutYear(item.date_value)}</th>
+          <th>{formatDateShort(item.date_value)}</th>
           <td class="right">{sensor.formatValue(item.count)}</td>
           <td class="right">{sensor.formatValue(item.countRatio)}</td>
         </tr>
@@ -63,7 +60,7 @@
           <td class="right">{sensor.formatValue(item.avgRatio)}</td>
         </tr>
         <tr>
-          <th>{formatTimeWithoutYear(item.date_value)} (cumulative)</th>
+          <th>{formatDateShort(item.date_value)} (cumulative)</th>
           <td class="right">{sensor.formatValue(item.countCumulative)}</td>
           <td class="right">{sensor.formatValue(item.countRatioCumulative)}</td>
         </tr>

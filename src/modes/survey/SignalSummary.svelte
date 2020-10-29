@@ -1,7 +1,8 @@
 <script>
   import { determineTrend, findDateRow, findMaxRow, findMinRow } from './trend';
-  import { formatValue, formatDate, formatDelta } from './format';
+  import { formatValue, formatDelta } from './format';
   import Vega from '../../components/Vega.svelte';
+  import { formatDateShort } from '../../formats';
   /**
    * date to highlight
    * @type {Date}
@@ -64,17 +65,17 @@
     <div class="block">
       <span> <strong>{s.row ? formatValue(s.row.value) : '?'}</strong> per 1,000 </span>
       <span>people</span>
-      <span>on {formatDate(date)}</span>
+      <span>on {formatDateShort(date)}</span>
     </div>
     <div class="block">
       <strong>{s.trend.trend}</strong>
       <span>{formatDelta(s.trend.delta)} compared </span>
-      <span>to {formatDate(s.trend.refDate)}</span>
+      <span>to {formatDateShort(s.trend.refDate)}</span>
     </div>
     <div class="block">
       <span> <strong>{s.max ? formatValue(s.max.value) : '?'}</strong> per 1,000 </span>
       <span>{low ? 'lowest' : 'highest'} value</span>
-      <span>on {s.max ? formatDate(s.max.date_value) : '?'}</span>
+      <span>on {s.max ? formatDateShort(s.max.date_value) : '?'}</span>
     </div>
   {/await}
   <Vega {spec} {data} signals={{ currentDate: date, maxDate }} />

@@ -4,14 +4,11 @@
   // import { timeMonth } from 'd3-time';
   import noUiSlider from 'nouislider';
   import 'nouislider/distribute/nouislider.css';
-  import { timeFormat } from 'd3-time-format';
+  import { formatDateLocal, formatDateShortNumbers } from '../../formats';
 
   export let className = '';
   const DAY_IN_MS = 24 * 60 * 60 * 1000;
   const dispatch = createEventDispatcher();
-
-  const dateFormatter = timeFormat('%m/%d');
-  const dateFullFormatter = timeFormat('%x');
 
   export let running = false;
   export let value = new Date();
@@ -47,7 +44,7 @@
 
   const formatFull = {
     to: (v) => {
-      return dateFullFormatter(dayToDate(v));
+      return formatDateLocal(dayToDate(v));
     },
     from: (v) => {
       return Number.parseInt(v, 10);
@@ -58,9 +55,9 @@
     to: (v) => {
       const d = dayToDate(v);
       if (d.getTime() === min.getTime() || d.getTime() === max.getTime()) {
-        return dateFullFormatter(d);
+        return formatDateLocal(d);
       }
-      return dateFormatter(d);
+      return formatDateShortNumbers(d);
     },
     from: (v) => {
       return Number.parseInt(v, 10);

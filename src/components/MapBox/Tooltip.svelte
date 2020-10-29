@@ -1,5 +1,6 @@
 <script>
-  import { timeFormat } from 'd3-time-format';
+  import { formatDateShort } from '../../formats';
+
   import {
     currentSensorEntry,
     colorScale,
@@ -15,8 +16,6 @@
   $: value = properties ? properties.value : 0;
 
   $: options = $signalCasesOrDeathOptions;
-
-  const formatTimeWithoutYear = timeFormat('%B %d');
 
   /**
    * @param {number} value
@@ -99,7 +98,7 @@
             <th class="area">Ratios (per 100,000)</th>
           </tr>
           <tr>
-            <th>{formatTimeWithoutYear($currentDateObject)}</th>
+            <th>{formatDateShort($currentDateObject)}</th>
             <td class="right" style={!options.cumulative && !options.ratio ? colorScaleStyle(properties.count) : ''}>
               {$currentSensorEntry.formatValue(properties.count)}
             </td>
@@ -119,7 +118,7 @@
             </td>
           </tr>
           <tr>
-            <th>Cumulative {formatTimeWithoutYear($currentDateObject)}</th>
+            <th>Cumulative {formatDateShort($currentDateObject)}</th>
             <td
               class="right"
               style={options.cumulative && !options.ratio ? colorScaleStyle(properties.countCumulative) : ''}>

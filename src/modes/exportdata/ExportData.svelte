@@ -1,5 +1,4 @@
 <script>
-  import { timeFormat } from 'd3-time-format';
   import { callMetaAPI } from '../../data/api';
   import Datepicker from '../../components/Calendar/Datepicker.svelte';
   import { getLevelInfo, primaryValue, sensorList, sensorMap } from '../../stores/constants';
@@ -8,9 +7,9 @@
   import { timeMonth } from 'd3-time';
   import { onMount } from 'svelte';
   import { trackEvent } from '../../stores/ga';
+  import { formatDateISO } from '../../formats';
 
   const CSV_SERVER = 'https://delphi.cmu.edu/csv';
-  const iso = timeFormat('%Y-%m-%d');
 
   const sourceNameLookup = {
     'doctor-visits': 'COVID-Related Doctor Visits',
@@ -157,7 +156,9 @@
         trackEvent(
           'export',
           'download',
-          `signal=${signalValue},start_day=${iso(startDate)},end_day=${iso(endDate)},geo_type=${geoType}`,
+          `signal=${signalValue},start_day=${formatDateISO(startDate)},end_day=${formatDateISO(
+            endDate,
+          )},geo_type=${geoType}`,
         );
       });
     }
@@ -272,16 +273,16 @@
         bind:selected={startDate}
         start={source ? source.minTime : new Date()}
         end={minDate(endDate, source ? source.maxTime : new Date())}
-        formattedSelected={iso(startDate)}>
-        <button aria-label="selected start date" class="pg-button" on:>{iso(startDate)}</button>
+        formattedSelected={formatDateISO(startDate)}>
+        <button aria-label="selected start date" class="pg-button" on:>{formatDateISO(startDate)}</button>
       </Datepicker>
       -
       <Datepicker
         bind:selected={endDate}
         start={maxDate(startDate, source ? source.minTime : new Date())}
         end={source ? source.maxTime : new Date()}
-        formattedSelected={iso(endDate)}>
-        <button aria-label="selected end date" class="pg-button" on:>{iso(endDate)}</button>
+        formattedSelected={formatDateISO(endDate)}>
+        <button aria-label="selected end date" class="pg-button" on:>{formatDateISO(endDate)}</button>
       </Datepicker>
     </div>
     <div>
@@ -363,7 +364,7 @@ data = covidcast.signal("${source ? source.id : ''}", "${signal ? signal.signal 
 
 cc_data <- suppressMessages(
 covidcast_signal(data_source = "${source ? source.id : ''}", signal = "${signal ? signal.signal : ''}",
-                 start_day = "${iso(startDate)}", end_day = "${iso(endDate)}",
+                 start_day = "${formatDateISO(startDate)}", end_day = "${formatDateISO(endDate)}",
                  geo_type = "${geoType}")
 )`}
       </pre>
@@ -374,8 +375,8 @@ covidcast_signal(data_source = "${source ? source.id : ''}", signal = "${signal 
     {/if}
     <form bind:this={form} id="form" method="GET" action={CSV_SERVER} download>
       <input type="hidden" name="signal" value={signalValue} />
-      <input type="hidden" name="start_day" value={iso(startDate)} />
-      <input type="hidden" name="end_day" value={iso(endDate)} />
+      <input type="hidden" name="start_day" value={formatDateISO(startDate)} />
+      <input type="hidden" name="end_day" value={formatDateISO(endDate)} />
       <input type="hidden" name="geo_type" value={geoType} />
     </form>
   </section>
