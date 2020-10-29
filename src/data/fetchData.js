@@ -25,9 +25,12 @@ import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 /**
  * @param {Partial<EpiDataRow>} mixinValues
  */
-function computeTransferFields(mixinValues = {}) {
+function computeTransferFields(mixinValues = {}, advanced = false) {
   const toRemove = Object.keys(mixinValues);
   const allFields = ['geo_value', 'stderr', 'time_value', 'value'];
+  if (advanced) {
+    allFields.push('issue', 'sample_size');
+  }
   return allFields.filter((d) => !toRemove.includes(d));
 }
 
@@ -113,13 +116,14 @@ function parseMultipleSeparateData(dataArr, mixinData = {}) {
  * @param {string | undefined} region
  * @param {Date | string} date
  * @param {Partial<EpiDataRow>} mixinValues
+ * @param {{advanced?: boolean}} options
  * @returns {Promise<EpiDataRow[]>}
  */
-function fetchData(sensorEntry, level, region, date, mixinValues = {}) {
+function fetchData(sensorEntry, level, region, date, mixinValues = {}, { advanced = false } = {}) {
   if (!region) {
     return Promise.resolve([]);
   }
-  const transferFields = computeTransferFields(mixinValues);
+  const transferFields = computeTransferFields(mixinValues, advanced);
   function fetchSeparate() {
     const extraDataFields = ['value'];
     // part of key
@@ -235,12 +239,13 @@ export function fetchTimeSlice(
   endDate = END_TIME_RANGE,
   fitRange = false,
   mixinValues = {},
+  options = {},
 ) {
   if (!region) {
     return Promise.resolve([]);
   }
   const timeRange = `${formatAPITime(startDate)}-${formatAPITime(endDate)}`;
-  const data = fetchData(sensorEntry, level, region, timeRange, mixinValues);
+  const data = fetchData(sensorEntry, level, region, timeRange, mixinValues, options);
   if (!fitRange) {
     return data;
   }

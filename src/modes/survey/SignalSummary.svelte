@@ -1,6 +1,6 @@
 <script>
   import { determineTrend, findDateRow, findMaxRow, findMinRow } from './trend';
-  import { formatValue, formatDelta } from './format';
+  import { formatValue, formatDelta, formatSampleSize, formatIssueDate, formatStdErr } from './format';
   import Vega from '../../components/Vega.svelte';
   import { formatDateShort } from '../../formats';
   /**
@@ -58,6 +58,11 @@
   .summary :global(.vega-embed) {
     width: 20em;
   }
+
+  .info {
+    font-size: small;
+    text-align: right;
+  }
 </style>
 
 <div class:loading class="summary">
@@ -65,7 +70,7 @@
     <div class="block">
       <span> <strong>{s.row ? formatValue(s.row.value) : '?'}</strong> per 1,000 </span>
       <span>people</span>
-      <span>on {formatDateShort(date)}</span>
+      <span>on {formatDateShort(date)}{#if s.row}<sup>*</sup>{/if}</span>
     </div>
     <div class="block">
       <strong>{s.trend.trend}</strong>
@@ -80,3 +85,12 @@
   {/await}
   <Vega {spec} {data} signals={{ currentDate: date, maxDate }} />
 </div>
+
+{#await summary then s}
+  {#if s.row}
+    <div class="info">
+      <sup>*</sup>based on {formatSampleSize(s.row)} samples with a standard error of {formatStdErr(s.row.stderr)},
+      published {formatIssueDate(s.row)}
+    </div>
+  {/if}
+{/await}

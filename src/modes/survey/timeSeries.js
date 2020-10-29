@@ -18,10 +18,20 @@ export function loadTimeSeriesData(region, startEndDates) {
       const sensor = indicator.sensor || {
         id: dataSource,
         signal: indicator.signal,
+        hasStdErr: true,
       };
-      const data = fetchTimeSlice(sensor, region.level, region.propertyId, startEndDates[0], startEndDates[1], false, {
-        geo_value: region.propertyId,
-      }).then((r) => addMissing(r));
+      const data = fetchTimeSlice(
+        sensor,
+        region.level,
+        region.propertyId,
+        startEndDates[0],
+        startEndDates[1],
+        false,
+        {
+          geo_value: region.propertyId,
+        },
+        { advanced: true },
+      ).then((r) => addMissing(r));
 
       return [indicator.signal, data];
     }),

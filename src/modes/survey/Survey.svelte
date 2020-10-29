@@ -88,6 +88,12 @@
     </div>
   </aside>
   <main>
+    <!-- {#if $currentRegionInfo}
+      <p>
+        <strong>{$currentRegionInfo.displayName}</strong> has a population of {formatPopulation($currentRegionInfo)} and
+        a size of {formatArea($currentRegionInfo)} sq mi.
+      </p>
+    {/if} -->
     {#each sections as section}
       <section>
         <h2>{section.section}</h2>
