@@ -102,7 +102,7 @@
                 </p>
                 <SignalSummary
                   date={selectedDate}
-                  data={timeSeriesData.get(indicator.signal)}
+                  data={timeSeriesData.get(indicator.signal) || []}
                   low={indicator.negated}
                   spec={timeSeriesSpec} />
               </div>
