@@ -20,3 +20,27 @@ export function formatDateISO(date) {
 export function formatDateLocal(date) {
   return !date ? '?' : local(date);
 }
+
+/**
+ *
+ * @param {NameInfo} info
+ */
+export function formatArea(info) {
+  if (!info || typeof info.area !== 'number') {
+    return 'Unknown';
+  }
+  return info.area.toLocaleString(undefined, {
+    maximumFractionDigits: 0,
+  });
+}
+
+/**
+ *
+ * @param {NameInfo} info
+ */
+export function formatPopulation(info) {
+  if (!info || typeof info.population !== 'number') {
+    return 'Unknown';
+  }
+  return info.population.toLocaleString();
+}

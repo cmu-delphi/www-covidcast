@@ -15,6 +15,7 @@ import { levelMegaCounty } from '../stores/constants';
  * @property {string} id param id
  * @property {string} propertyId geojson: feature.property.id
  * @property {number} population
+ * @property {number?} area
  * @property {number} lat center latitude
  * @property {number} long center longitude
  * @property {'state' | 'county' | 'msa'} level
@@ -30,6 +31,7 @@ function parseCSV(csv, level) {
       displayName: r.displayName || r.name,
       propertyId: r.postal || r.id,
       population: r.population === 'NaN' || r.population === '' ? null : Number.parseInt(r.population, 10),
+      area: r.area === 'NaN' || r.area === '' ? null : Number.parseFloat(r.area),
       lat: Number.parseFloat(r.lat),
       long: Number.parseFloat(r.long),
     });
