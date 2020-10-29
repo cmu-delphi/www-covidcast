@@ -33,6 +33,7 @@
 <style>
   .root {
     padding: 1em;
+    max-width: 60em;
   }
 
   section {
@@ -67,6 +68,7 @@
   .sensor-date {
     display: flex;
     align-items: center;
+    padding: 0 1em;
   }
 </style>
 

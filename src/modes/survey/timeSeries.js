@@ -52,15 +52,15 @@ export function createTimeSeriesSpec(startEndDates) {
     width: 'container',
     height: 50,
     padding: {
-      left: 40,
-      bottom: 5,
+      left: 30,
+      bottom: 10,
       top: 5,
       right: 1,
     },
     transform: [
       {
-        calculate: 'datum.value == null ? null : datum.value / 100',
-        as: 'pValue',
+        calculate: 'datum.value == null ? null : datum.value * 10',
+        as: 'kValue',
       },
     ],
     layer: [
@@ -93,10 +93,10 @@ export function createTimeSeriesSpec(startEndDates) {
                 : {},
           },
           y: {
-            field: 'pValue',
+            field: 'kValue',
             type: 'quantitative',
             axis: {
-              format: '.1%',
+              format: '.1d',
               title: null,
               grid: false,
             },

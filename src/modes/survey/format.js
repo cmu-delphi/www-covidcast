@@ -13,5 +13,5 @@ export function formatDate(date) {
 }
 
 export function formatDelta(delta) {
-  return `${delta > 0 ? '+' : delta < 0 ? '-' : ''}${formatValue(delta)}`;
+  return `${delta > 0 ? '+' : ''}${formatValue(delta)}`;
 }

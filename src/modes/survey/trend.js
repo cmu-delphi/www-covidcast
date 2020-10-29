@@ -48,16 +48,16 @@ export function findDateRow(date, data) {
 }
 
 export function toTrendText(delta) {
-  if (delta > 5) {
+  if (delta > 2.5) {
     return 'Increasing quickly';
   }
-  if (delta > 2) {
+  if (delta > 1) {
     return 'Increasing';
   }
-  if (delta < -5) {
+  if (delta < -2.5) {
     return 'Decreasing quickly';
   }
-  if (delta < -2) {
+  if (delta < -1) {
     return 'Decreasing';
   }
   return 'Steady';
