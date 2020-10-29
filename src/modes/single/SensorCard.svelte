@@ -126,11 +126,11 @@
   }
 </style>
 
-<section class="card container-bg container-style">
+<section class="card container-bg container-style" data-testid="sensor-{sensor.key}">
   <div class="header">
     <h4>{typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText() : sensor.name}</h4>
     <div class="toolbar">
-      {#if sensor.longDescription}
+      {#if sensor.description}
         <button
           title="Show sensor description"
           class="pg-button pg-button-circle info"

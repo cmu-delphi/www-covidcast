@@ -1,4 +1,4 @@
-id,municode,name,displayName,type,lat,long,cog,region
+export default `id,municode,name,displayName,type,lat,long,cog,region
 420030405001,,Central Oakland,Central Oakland,neighborhood,40.4406805,-79.9542332,,
 420030404001,,North Oakland,North Oakland,neighborhood,40.4458408,-79.9483932,,
 420030402002,,West Oakland,West Oakland,neighborhood,40.4412437,-79.9626107,,
@@ -216,4 +216,4 @@ id,municode,name,displayName,type,lat,long,cog,region
 003295,920,KILBUCK,Kilbuck Township,township,12.402092238052159,2.829819890470639,Quaker Valley,NH
 003155,821,EAST MCKEESPORT,East McKeesport Borough,borough,12.630945616604079,2.7359950596800644,Turtle Creek Valley,MV
 003420,934,PENN HILLS,Penn Hills Municipality,municipali,12.604904382154348,2.837962425920534,Turtle Creek Valley,ES
-003205,828,FOREST HILLS,Forest Hills Borough,borough,12.591722245722856,2.7731809357765775,Turtle Creek Valley,ES
+003205,828,FOREST HILLS,Forest Hills Borough,borough,12.591722245722856,2.7731809357765775,Turtle Creek Valley,ES`;

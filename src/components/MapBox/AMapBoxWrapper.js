@@ -172,6 +172,7 @@ export default class AMapBoxWrapper {
     // once all are ready
     if (this.mapSetupReady && this.mapEncodingReady && this.mapDataReady) {
       this.dispatch('ready');
+      this.map.getContainer().dataset.ready = 'ready';
     }
   }
 

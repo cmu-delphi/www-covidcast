@@ -143,7 +143,7 @@
 
 <ul class="root">
   {#each sensorsWithData as s}
-    <li class:selected={$currentSensor === s.sensor.key}>
+    <li class:selected={$currentSensor === s.sensor.key} data-testid={s.sensor.key}>
       <div class="header">
         <!-- svelte-ignore a11y-missing-attribute -->
         <button

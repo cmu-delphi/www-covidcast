@@ -309,6 +309,7 @@
     <div class="buttons">
       <button
         class="pg-button button"
+        data-testid="csv"
         on:click={() => {
           currentMode = 'csv';
         }}
@@ -320,6 +321,7 @@
       </button>
       <button
         aria-pressed={String(currentMode === 'python')}
+        data-testid="python"
         class="pg-button button"
         class:selected={currentMode === 'python'}
         on:click={() => {
@@ -331,6 +333,7 @@
       <button
         aria-pressed={String(currentMode === 'r')}
         class="pg-button button"
+        data-testid="r"
         class:selected={currentMode === 'r'}
         on:click={() => {
           currentMode = 'r';
