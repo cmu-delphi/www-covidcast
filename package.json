@@ -21,11 +21,13 @@
     "prettier": "prettier --write \"**/*\"",
     "lint": "eslint src --ext .js,.svelte && prettier --check \"**/*\"",
     "lint:fix": "eslint src --ext .js,.svelte --fix && prettier --write \"**/*\"",
-    "release": "release-it --disable-metrics"
+    "release": "release-it --disable-metrics",
+    "changelog": "node ./scripts/changelog.js"
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/preset-env": "^7.11.5",
+    "@octokit/request": "^5.4.9",
     "@turf/boolean-disjoint": "^6.0.2",
     "@turf/centroid": "^6.0.2",
     "babel-loader": "^8.1.0",

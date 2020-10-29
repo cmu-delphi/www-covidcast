@@ -81,7 +81,7 @@
   }
 
   .vega-wrapper {
-    width: 100%;
+    align-self: stretch;
     flex: 1 1 8em;
     position: relative;
   }
@@ -117,6 +117,13 @@
   .hint {
     vertical-align: middle;
   }
+
+  .key.single .legend {
+    display: none;
+  }
+  .key.single td {
+    border: none;
+  }
 </style>
 
 <section class="card container-bg container-style">
@@ -133,28 +140,19 @@
       {/if}
     </div>
   </div>
-  {#if values.length <= 1}
-    <div class="key">
-      <span class="key-fact">{values[0] != null ? sensor.formatValue(values[0]) : '?'}</span>
-      <span class="hint">on {formatDateLocal(highlightDate ? highlightDate : date)}</span>
-    </div>
-  {:else}
-    <table class="key">
-      <tbody>
-        {#each selections as selection, i}
-          <tr>
-            <td class="legend" style="--color: {selection.color}">{selection.displayName}</td>
-            <td class="key-fact">{values[i] != null ? sensor.formatValue(values[i]) : '?'}</td>
-            {#if i === 0}
-              <td class="hint" rowspan={selections.length}>
-                on {formatDateLocal(highlightDate ? highlightDate : date)}
-              </td>
-            {/if}
-          </tr>
-        {/each}
-      </tbody>
-    </table>
-  {/if}
+  <table class="key" class:single={selections.length === 1}>
+    <tbody>
+      {#each selections as selection, i}
+        <tr>
+          <td class="legend" style="--color: {selection.color}">{selection.displayName}</td>
+          <td class="key-fact">{values[i] != null ? sensor.formatValue(values[i]) : '?'}</td>
+          {#if i === 0}
+            <td class="hint" rowspan={selections.length}>on {formatDateLocal(highlightDate ? highlightDate : date)}</td>
+          {/if}
+        </tr>
+      {/each}
+    </tbody>
+  </table>
   <main class="vega-wrapper">
     <Vega
       data={sensorWithData.data}

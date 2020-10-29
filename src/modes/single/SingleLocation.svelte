@@ -101,7 +101,7 @@
 
   <div class="grid-wrapper">
     <div class="card-grid">
-      {#each sensorList as sensor}
+      {#each sensorList as sensor (sensor.key)}
         <SensorCard
           {sensor}
           date={$currentDateObject}
