@@ -2,4 +2,7 @@
   transition: unset !important;
   padding: 8px;
   z-index: 5000;
+  border: 1px solid gray;
+  border-radius: 4px;
+  opacity: 0.93;
 }
