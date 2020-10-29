@@ -86,6 +86,10 @@ export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}
       return;
     }
 
+    // If the datum value is null, no tooltip is needed.
+    const datum = resolveDatum(item);
+    if (datum.value == null) return;
+
     update(event.clientX, event.clientY);
     if (tooltip) {
       tooltip.$set({
