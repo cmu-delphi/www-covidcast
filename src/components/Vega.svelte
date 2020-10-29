@@ -264,4 +264,6 @@
   class="root"
   class:loading-bg={!hasError && loading}
   class:message-overlay={hasError || (noData && !loading)}
-  data-message={message} />
+  data-message={message}
+  data-testid="vega"
+  data-status={hasError ? 'error' : noData ? 'no-data' : loading ? 'loading' : 'ready'} />

@@ -74,7 +74,7 @@
   }
 </style>
 
-<ul class="legend-ticks" class:loading-bg={loading}>
+<ul class="legend-ticks" class:loading-bg={loading} data-testid="spike-legend">
   <li>
     <div class="na" style="background:repeating-linear-gradient(-45deg, {MISSING_COLOR}, white 30%)" />
     <span>NA</span>

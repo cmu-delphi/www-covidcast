@@ -178,6 +178,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
                 type: 'single',
                 empty: 'none',
                 nearest: true,
+                encodings: ['x'],
                 on: 'mouseover',
                 clear: 'mouseout',
               },
@@ -283,6 +284,16 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
           // complicated construct to have proper typings
           ...(sensor.hasStdErr ? [stdErrLayer] : []),
           {
+            selection: {
+              highlight2: {
+                type: 'single',
+                empty: 'none',
+                nearest: true,
+                encodings: ['x'],
+                on: 'mouseover',
+                clear: 'mouseout',
+              },
+            },
             transform: [
               {
                 filter: {

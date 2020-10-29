@@ -37,6 +37,14 @@ function computeBounds(geojson, scale = 1) {
   );
 }
 
+/**
+ * wraps the csv string to be like a JS module
+ * @param {string} csv
+ */
+function wrapModule(csv) {
+  return `export default \`${csv}\`;`;
+}
+
 async function states(level = 'state') {
   const populationLookup = await generatePopulationLookup();
   const geo = require(`./raw/new_states.json`);
@@ -56,8 +64,8 @@ async function states(level = 'state') {
     };
   });
   fs.writeFileSync(
-    path.resolve(__dirname, `./processed/${level}.csv`),
-    dsvFormat(',').format(infos, ['id', 'postal', 'name', 'population', 'lat', 'long']),
+    path.resolve(__dirname, `./processed/${level}.csv.js`),
+    wrapModule(dsvFormat(',').format(infos, ['id', 'postal', 'name', 'population', 'lat', 'long'])),
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
@@ -104,8 +112,8 @@ function msa(level = 'msa') {
     };
   });
   fs.writeFileSync(
-    path.resolve(__dirname, `./processed/${level}.csv`),
-    dsvFormat(',').format(infos, ['id', 'name', 'population', 'lat', 'long']),
+    path.resolve(__dirname, `./processed/${level}.csv.js`),
+    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'population', 'lat', 'long'])),
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
@@ -180,8 +188,8 @@ async function counties(level = 'county') {
     };
   });
   fs.writeFileSync(
-    path.resolve(__dirname, `./processed/${level}.csv`),
-    dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'population', 'lat', 'long']),
+    path.resolve(__dirname, `./processed/${level}.csv.js`),
+    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'population', 'lat', 'long'])),
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
@@ -200,8 +208,8 @@ function cities() {
     };
   });
   fs.writeFileSync(
-    path.resolve(__dirname, `./processed/cities.csv`),
-    dsvFormat(',').format(infos, ['name', 'population', 'lat', 'long']),
+    path.resolve(__dirname, `./processed/cities.csv.js`),
+    wrapModule(dsvFormat(',').format(infos, ['name', 'population', 'lat', 'long'])),
   );
 }
 
@@ -245,8 +253,10 @@ function neighborhoods() {
   ].filter((d) => d.id);
   // {"FID":1,"NAME":"CHESWICK","TYPE":"BOROUGH","LABEL":"Cheswick Borough","COG":"Allegheny Valley North","SCHOOLD":"Allegheny Valley","CONGDIST":4,"FIPS":13392,"REGION":"NH","ACRES":350.19128417,"SQMI":0.54717391,"MUNICODE":"815","CNTL_ID":"003100","CNTYCOUNCIL":7,"EOC":"NEWCOM","ASSESSORTERRITORY":"East","VALUATIONAREA":"Alle-Kiski Valley","YEARCONVERTED":1966,"GlobalID":"{F29648DC-0D4F-4E35-8F2D-7B465DCFF308}","SHAPE_Length":0.04917208282736798,"SHAPE_Area":0.00015137060470303174}
   fs.writeFileSync(
-    path.resolve(__dirname, `./processed/swpa/neighborhood.csv`),
-    dsvFormat(',').format(infos, ['id', 'municode', 'name', 'displayName', 'type', 'lat', 'long', 'cog', 'region']),
+    path.resolve(__dirname, `./processed/swpa/neighborhood.csv.js`),
+    wrapModule(
+      dsvFormat(',').format(infos, ['id', 'municode', 'name', 'displayName', 'type', 'lat', 'long', 'cog', 'region']),
+    ),
   );
   neighborhoods.features = neighborhoods.features
     .map((d) => ({
@@ -320,8 +330,8 @@ function zipHrr(hrrZone, hrrNum = '357') {
     };
   });
   fs.writeFileSync(
-    path.resolve(__dirname, `./processed/swpa/zip.csv`),
-    dsvFormat(',').format(infos, ['id', 'name', 'lat', 'long']),
+    path.resolve(__dirname, `./processed/swpa/zip.csv.js`),
+    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'lat', 'long'])),
   );
   const geo = topology({ zip: data }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/zip.topojson.json`), JSON.stringify(geo));

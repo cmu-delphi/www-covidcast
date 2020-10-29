@@ -76,6 +76,7 @@
     <button
       class="mode-button"
       class:active={$currentMode.id === mode.id}
+      data-mode={mode.id}
       on:click={() => {
         currentMode.set(mode);
       }}

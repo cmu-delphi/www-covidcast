@@ -4,7 +4,7 @@ import {
   stdErrLayer,
   stdErrTransform,
 } from '../../components/DetailView/vegaSpec';
-import { addMissing, fetchTimeSlice } from '../../data';
+import { addMissing, fetchTimeSlice, formatAPITime } from '../../data';
 import { levelMegaCounty } from '../../stores/constants';
 
 function fetchMulti(sensor, selections, startDay, endDay) {
@@ -70,13 +70,10 @@ export function prepareSensorData(sensor, selections, startDay, endDay) {
 
 export function resolveHighlightedTimeValue(e) {
   const highlighted = e.detail.value;
-  const id = highlighted && Array.isArray(highlighted._vgsid_) ? highlighted._vgsid_[0] : null;
-
-  if (!id) {
-    return null;
+  if (highlighted && Array.isArray(highlighted.date_value) && highlighted.date_value.length > 0) {
+    return Number.parseInt(formatAPITime(highlighted.date_value[0]), 10);
   }
-  const row = e.detail.view.data('data_0').find((d) => d._vgsid_ === id);
-  return row ? row.time_value : null;
+  return null;
 }
 
 export function resolveClickedTimeValue(e) {
@@ -178,11 +175,12 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
             type: 'single',
             empty: 'none',
             on: 'mouseover',
-            nearest: false,
+            nearest: true,
+            encodings: ['x'],
             clear: 'mouseout',
           },
         },
-        // use vertical rule for selection, since nearest is a real performance bummer
+        // use vertical rule for selection, since nearest point is a real performance bummer
         mark: {
           type: 'rule',
           strokeWidth: 2.5,
