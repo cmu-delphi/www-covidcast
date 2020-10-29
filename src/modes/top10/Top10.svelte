@@ -19,7 +19,8 @@
   import { throttle } from 'lodash-es';
   import Top10SortHint from './Top10SortHint.svelte';
   import { levelMegaCounty, groupedSensorList, sensorList, primaryValue, yesterdayDate } from '../../stores/constants';
-  import { formatAPITime, parseAPITime } from '../../data';
+  import { parseAPITime } from '../../data';
+  import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
 
   const SHOW_X_MORE = 10;
   const MAX_OTHER_SENSORS = 1;
@@ -222,14 +223,6 @@
   const throttled = throttle((value) => {
     highlightTimeValue = value;
   }, 10);
-
-  function resolveHighlightedTimeValue(e) {
-    const highlighted = e.detail.value;
-    if (highlighted && Array.isArray(highlighted.date_value) && highlighted.date_value.length > 0) {
-      return Number.parseInt(formatAPITime(highlighted.date_value[0]), 10);
-    }
-    return null;
-  }
 
   function onHighlight(e) {
     const value = resolveHighlightedTimeValue(e);
