@@ -3,66 +3,37 @@
   import Vega from '../../components/Vega.svelte';
   import { formatAPITime, parseAPITime } from '../../data';
   import { nameInfos } from '../../maps';
-  import { currentDate, currentDateObject, currentRegionInfo, selectByInfo, times } from '../../stores';
-  import Datepicker from '../../components/Calendar/Datepicker.svelte';
+  import { currentDate, currentRegionInfo, selectByInfo, smallMultipleTimeSpan } from '../../stores';
+  import SensorDatePicker from '../../components/SensorDatePicker.svelte';
   import { formatTime, refSensor, sections } from './sections';
-  import { computeRelatedGroups, loadSummaryData, createVegaSpec } from './summary';
   import { createTimeSeriesSpec, loadTimeSeriesData } from './timeSeries';
-
-  let showErrorBars = false;
-
-  /**
-   * @type {'none' | 'region' | 'date'}
-   */
-  let related = 'none';
-
-  let showTimeSeries = false;
-
-  function formatSampleSize(entry) {
-    if (!entry || entry.sample_size == null) {
-      return '?';
-    }
-    return Math.floor(entry.sample_size).toLocaleString();
-  }
-  function formatIssueDate(entry) {
-    if (!entry || entry.issue == null) {
-      return '?';
-    }
-    return formatTime(parseAPITime(entry.issue));
-  }
+  import SignalSummary from './SignalSummary.svelte';
 
   $: selectedDate = parseAPITime($currentDate);
-  /**
-   * @type {[Date, Date]}
-   */
-  $: startEndDates = [];
-  $: if ($times !== null) {
-    const dates = $times.get(refSensor.key);
-    startEndDates = dates ? dates.map(parseAPITime) : [];
-  }
   $: if (selectedDate !== undefined) {
     currentDate.set(formatAPITime(selectedDate));
   }
 
-  $: relatedGroups = computeRelatedGroups($currentDateObject, $currentRegionInfo, related);
-  $: data = !showTimeSeries ? loadSummaryData($currentDateObject, $currentRegionInfo, related) : Promise.resolve([]);
-  $: spec = createVegaSpec(showErrorBars, relatedGroups);
+  // use local variables with manual setting for better value comparison updates
+  let startDay = $smallMultipleTimeSpan[0];
+  let endDay = $smallMultipleTimeSpan[1];
 
-  $: dataLookup = data.then((r) => new Map(r.map((d) => [d.signal, d])));
+  $: {
+    if (startDay.getTime() !== $smallMultipleTimeSpan[0].getTime()) {
+      startDay = $smallMultipleTimeSpan[0];
+    }
+    if (endDay.getTime() !== $smallMultipleTimeSpan[1].getTime()) {
+      endDay = $smallMultipleTimeSpan[1];
+    }
+  }
 
-  $: timeSeriesData = showTimeSeries ? loadTimeSeriesData($currentRegionInfo, startEndDates) : new Map();
-  $: timeSeriesSpec = createTimeSeriesSpec(showErrorBars, startEndDates);
+  $: timeSeriesData = loadTimeSeriesData($currentRegionInfo, [startDay, endDay]);
+  $: timeSeriesSpec = createTimeSeriesSpec(false, [startDay, endDay]);
 </script>
 
 <style>
   .root {
     padding: 1em;
-  }
-  .split {
-    display: flex;
-  }
-  .split > main {
-    flex-grow: 1;
   }
 
   section {
@@ -89,133 +60,51 @@
     padding: 0;
   }
 
-  .info {
-    text-align: right;
-    font-size: 75%;
+  aside {
+    display: flex;
+    justify-content: space-evenly;
   }
 
-  .filter-group {
-    margin: 1em 0;
-  }
-
-  .filter-calendar > :global(div) {
-    display: block;
-  }
-
-  .calendar {
-    width: 100%;
-  }
-
-  label {
-    display: block;
-  }
-  input[type='checkbox'],
-  input[type='radio'] {
-    margin-right: 0.5em;
-  }
-
-  .filter-spacer {
-    margin-top: 3em;
+  .sensor-date {
+    display: flex;
+    align-items: center;
   }
 </style>
 
 <div class="root">
-  <h1>
-    Facebook Survey Results of {$currentRegionInfo ? $currentRegionInfo.displayName : '?'} as of {formatTime(selectedDate)}
-  </h1>
-  <div class="split">
-    <main>
-      {#each sections as section}
-        <section>
-          <h2>{section.section}</h2>
-          {#each section.questions as question}
-            <div class="question">
-              <h3>{question.question}</h3>
-              {#each question.indicators as indicator}
-                <div class="indicator">
-                  <h4>{indicator.name}</h4>
-                  <p>
-                    {@html indicator.description}
-                  </p>
-                  {#if showTimeSeries}
-                    <Vega data={timeSeriesData.get(indicator.signal) || []} spec={timeSeriesSpec} />
-                  {:else}
-                    <Vega data={data.then((r) => r.filter((d) => d.signal === indicator.signal))} {spec} />
-                    {#await dataLookup}
-                      <div class="info loading">based on ? samples, published ?</div>
-                    {:then lookup}
-                      <div class="info">
-                        based on {formatSampleSize(lookup.get(indicator.signal))} samples, published {formatIssueDate(lookup.get(indicator.signal))}
-                      </div>
-                    {/await}
-                  {/if}
-                </div>
-              {/each}
-            </div>
-          {/each}
-        </section>
-      {/each}
-    </main>
-    <aside>
-      <div class="filter-group">
-        <h5>Selected Region</h5>
-        <Search
-          className="search-container container-style container-bg"
-          placeholder="Search Region"
-          items={nameInfos}
-          selectedItem={$currentRegionInfo}
-          labelFieldName="displayName"
-          maxItemsToShowInList="5"
-          on:change={(e) => selectByInfo(e.detail)} />
-      </div>
-      <div class="filter-group">
-        <h5>Mode</h5>
-        <label><input type="radio" bind:group={showTimeSeries} name="vis" value={false} />Summaries</label>
-        <label><input type="radio" bind:group={showTimeSeries} name="vis" value={true} />Time Series</label>
-      </div>
-      {#if showTimeSeries}
-        <div class="filter-group filter-spacer">
-          <h5>Advanced</h5>
-          <label><input type="checkbox" bind:checked={showErrorBars} />Show Error Bands</label>
-        </div>
-      {:else}
-        <div class="filter-group filter-calendar">
-          <h5>Selected Date</h5>
-          {#if selectedDate != null && startEndDates.length !== 0}
-            <Datepicker
-              bind:selected={selectedDate}
-              start={startEndDates[0]}
-              end={startEndDates[1]}
-              formattedSelected={formatTime(selectedDate)}>
-              <button
-                aria-label="selected date"
-                class="pg-button pg-text-button base-font-size calendar"
-                on:>{formatTime(selectedDate)}</button>
-            </Datepicker>
-          {:else}
-            <button
-              aria-label="selected date"
-              class="pg-button pg-text-button base-font-size calendar"
-              on:>{formatTime(selectedDate)}</button>
-          {/if}
-        </div>
-        <div class="filter-group filter-spacer">
-          <h5>Show Related Results</h5>
-          <label><input type="radio" bind:group={related} name="related" value="none" />None</label>
-          <label><input
-              type="radio"
-              bind:group={related}
-              name="related"
-              value="region"
-              disabled={!$currentRegionInfo || $currentRegionInfo.level !== 'county'} />Related regions</label>
-          <label><input type="radio" bind:group={related} name="related" value="date" disabled={showTimeSeries} />Previous
-            dates</label>
-        </div>
-        <div class="filter-group filter-spacer">
-          <h5>Advanced</h5>
-          <label><input type="checkbox" bind:checked={showErrorBars} />Show Error Bars</label>
-        </div>
-      {/if}
-    </aside>
-  </div>
+  <h1>Facebook Survey Results</h1>
+  <aside>
+    <Search
+      className="container-bg"
+      placeholder="Search Region"
+      items={nameInfos}
+      selectedItem={$currentRegionInfo}
+      labelFieldName="displayName"
+      maxItemsToShowInList="5"
+      on:change={(e) => selectByInfo(e.detail)} />
+    <div class="sensor-date container-bg">
+      <SensorDatePicker sensor={refSensor} bind:value={selectedDate} />
+    </div>
+  </aside>
+  <main>
+    {#each sections as section}
+      <section>
+        <h2>{section.section}</h2>
+        {#each section.questions as question}
+          <div class="question">
+            <h3>{question.question}</h3>
+            {#each question.indicators as indicator}
+              <div class="indicator">
+                <h4>{indicator.name}</h4>
+                <p>
+                  {@html indicator.description}
+                </p>
+                <SignalSummary date={selectedDate} data={timeSeriesData.get(indicator.signal)} />
+              </div>
+            {/each}
+          </div>
+        {/each}
+      </section>
+    {/each}
+  </main>
 </div>
