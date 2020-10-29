@@ -147,6 +147,10 @@ async function counties(level = 'county') {
   // };
   const geo = require(`./raw/new_counties.json`);
 
+  const stateToPostal = new Map(
+    require(`./raw/state_centers.json`).features.map((f) => [f.properties.STATE, f.properties.POSTAL]),
+  );
+
   // const center = {
   //   type: 'Feature',
   //   geometry: { type: 'Point', coordinates: [-15.707827062813598, -10.343262810086836] },
@@ -172,7 +176,7 @@ async function counties(level = 'county') {
     return {
       id,
       name: props.NAME,
-      displayName: info ? info.display_name : `${props.NAME} County, ${props.LSAD}`,
+      displayName: info ? info.display_name : `${props.NAME} County, ${stateToPostal.get(props.STATE)}`,
       state: props.STATE,
       population: populationLookup.county(id) || Number.parseInt(props.Population, 10),
       lat: center.geometry.coordinates[0],
