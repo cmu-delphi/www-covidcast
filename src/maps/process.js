@@ -208,9 +208,6 @@ async function hrr(level = 'hrr') {
         return !(d[0][0][0] === -26.069579678452456 && d[0][0][1] === 13.509452429458069);
       });
       delete feature.bbox;
-      // also seems to be shifted to the North
-      feature.geometry = transformTranslate(feature, 25, 210, { mutate: true }).geometry;
-      feature.geometry = transformTranslate(feature, 10, 90, { mutate: true }).geometry;
       const center = centerOfMass(feature).geometry.coordinates;
       const props = feature.properties;
       const state = props.hrr_name.split('-')[0].trim();
