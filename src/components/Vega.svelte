@@ -167,39 +167,34 @@
         Object.entries(signals).forEach(([key, v]) => {
           spec.signals.push({ name: key, value: v });
         });
-        const signalNames = spec.signals.map((signal) => signal.name);
-        if (!signalNames['width']) {
-          spec.signals.push({
-            name: 'width',
-            on: [
-              {
-                events: { source: 'window', type: 'load' },
-                update: 'containerSize()[0]',
-                force: true,
-              },
-              {
-                events: { source: 'window', type: 'resize' },
-                update: 'containerSize()[0]',
-              },
-            ],
-          });
-        }
-        if (!signalNames['height']) {
-          spec.signals.push({
-            name: 'height',
-            on: [
-              {
-                events: { source: 'window', type: 'load' },
-                update: 'containerSize()[1]',
-                force: true,
-              },
-              {
-                events: { source: 'window', type: 'resize' },
-                update: 'containerSize()[1]',
-              },
-            ],
-          });
-        }
+        spec.signals.push({
+          name: 'width',
+          on: [
+            {
+              events: { source: 'window', type: 'load' },
+              update: 'containerSize()[0]',
+              force: true,
+            },
+            {
+              events: { source: 'window', type: 'resize' },
+              update: 'containerSize()[0]',
+            },
+          ],
+        });
+        spec.signals.push({
+          name: 'height',
+          on: [
+            {
+              events: { source: 'window', type: 'load' },
+              update: 'containerSize()[1]',
+              force: true,
+            },
+            {
+              events: { source: 'window', type: 'resize' },
+              update: 'containerSize()[1]',
+            },
+          ],
+        });
         return spec;
       },
     });
