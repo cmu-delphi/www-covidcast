@@ -244,7 +244,6 @@
   });
 
   const debouncedResize = debounce(() => {
-    console.info('resize');
     window.dispatchEvent(new Event('resize'));
   }, 250);
 
