@@ -196,6 +196,35 @@ async function counties(level = 'county') {
   return geo;
 }
 
+async function hrr(level = 'hrr') {
+  const geo = require(`./raw/hrr/hrr.reprojected.geo.json`);
+
+  const infos = geo.features.map((feature) => {
+    const id = String(feature.properties.hrr_num);
+    const center = centroid(feature).geometry.coordinates;
+    const props = feature.properties;
+    const state = props.hrr_name.split('-')[0].trim();
+    const name = props.hrr_name.slice(props.hrr_name.indexOf('-') + 1).trim();
+    feature.id = id;
+    feature.properties = {};
+    return {
+      id,
+      name,
+      state,
+      displayName: props.hrr_name,
+      lat: center[0],
+      long: center[1],
+    };
+  });
+  fs.writeFileSync(
+    path.resolve(__dirname, `./processed/${level}.csv.js`),
+    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'lat', 'long'])),
+  );
+  const topo = topology({ [level]: geo }, QUANTIZATION);
+  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
+  return geo;
+}
+
 function cities() {
   const geo = require(`./raw/city_data/cities-reprojected.json`);
   const infos = geo.features.map((feature) => {
@@ -370,10 +399,11 @@ function hrrZone(statesGeo, msaGeo, countiesGeo) {
   const statesGeo = await states();
   const msaGeo = await msa();
   const countiesGeo = await counties();
+  const hrrGeo = await hrr();
   await cities();
 
-  const hrrGeo = await hrrZone(statesGeo, msaGeo, countiesGeo);
-  const zipGeo = await zipHrr(hrrGeo);
+  const hrr357Geo = await hrrZone(statesGeo, msaGeo, countiesGeo);
+  const zipGeo = await zipHrr(hrr357Geo);
   const neighborhoodsGeo = await neighborhoods();
 
   fs.writeFileSync(
@@ -384,6 +414,7 @@ function hrrZone(statesGeo, msaGeo, countiesGeo) {
         msa: computeBounds(msaGeo).toArray(),
         counties: computeBounds(countiesGeo).toArray(),
         hrr: computeBounds(hrrGeo).toArray(),
+        hrr357: computeBounds(hrr357Geo).toArray(),
         neighborhoods: computeBounds(neighborhoodsGeo).toArray(),
         zip: computeBounds(zipGeo).toArray(),
       },
