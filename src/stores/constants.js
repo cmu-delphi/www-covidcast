@@ -265,6 +265,7 @@ export const defaultRegionOnStartup = {
   county: '42003', // Allegheny
   msa: '38300', // Pittsburgh
   state: 'PA', // Pennsylvania
+  hrr: '357', // Pittsburgh
 };
 
 export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);

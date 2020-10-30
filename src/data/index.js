@@ -144,6 +144,12 @@ function loadCountSignal(sEntry, meta, timeMap, statsMap) {
         mean: sEntry.msa_mean,
         std: sEntry.msa_std,
       });
+    } else if (region === 'hrr') {
+      statsMap.set(statsKey, {
+        max: sEntry.hrr_max,
+        mean: sEntry.hrr_mean,
+        std: sEntry.hrr_std,
+      });
     } else {
       statsMap.set(statsKey, {
         max: sEntry.state_max,

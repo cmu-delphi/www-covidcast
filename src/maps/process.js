@@ -4,7 +4,6 @@ const { dsvFormat, csvParse } = require('d3-dsv');
 const fs = require('fs');
 const path = require('path');
 const booleanDisjoint = require('@turf/boolean-disjoint').default;
-const transformTranslate = require('@turf/transform-translate').default;
 const centerOfMass = require('@turf/center-of-mass').default;
 const { topology } = require('topojson-server');
 const geojsonExtent = require('@mapbox/geojson-extent');
@@ -218,7 +217,7 @@ async function hrr(level = 'hrr') {
         id,
         name,
         state,
-        displayName: props.hrr_name,
+        displayName: `${props.hrr_name} (HRR)`,
         lat: center[0],
         long: center[1],
       };
