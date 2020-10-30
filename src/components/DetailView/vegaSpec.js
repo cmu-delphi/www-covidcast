@@ -249,13 +249,6 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
         layer: [
           {
             selection: {
-              highlight2: {
-                type: 'single',
-                empty: 'none',
-                // nearest: true, // causes error about nearest incompatible with line mark.
-                on: 'mouseover',
-                clear: 'mouseout',
-              },
               brush: {
                 type: 'interval',
                 encodings: ['x'],

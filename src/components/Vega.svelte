@@ -5,6 +5,7 @@
   import { observeResize, unobserveResize } from '../util';
   import { createVegaTooltipAdapter } from './tooltipUtils';
   import { cachedTime, cachedNumber } from './customVegaFunctions';
+  import { debounce } from 'lodash-es';
 
   expressionFunction('cachedTime', cachedTime);
   expressionFunction('cachedNumber', cachedNumber);
@@ -166,34 +167,39 @@
         Object.entries(signals).forEach(([key, v]) => {
           spec.signals.push({ name: key, value: v });
         });
-        spec.signals.push({
-          name: 'width',
-          on: [
-            {
-              events: { source: 'window', type: 'load' },
-              update: 'containerSize()[0]',
-              force: true,
-            },
-            {
-              events: { source: 'window', type: 'resize' },
-              update: 'containerSize()[0]',
-            },
-          ],
-        });
-        spec.signals.push({
-          name: 'height',
-          on: [
-            {
-              events: { source: 'window', type: 'load' },
-              update: 'containerSize()[1]',
-              force: true,
-            },
-            {
-              events: { source: 'window', type: 'resize' },
-              update: 'containerSize()[1]',
-            },
-          ],
-        });
+        const signalNames = spec.signals.map((signal) => signal.name);
+        if (!signalNames['width']) {
+          spec.signals.push({
+            name: 'width',
+            on: [
+              {
+                events: { source: 'window', type: 'load' },
+                update: 'containerSize()[0]',
+                force: true,
+              },
+              {
+                events: { source: 'window', type: 'resize' },
+                update: 'containerSize()[0]',
+              },
+            ],
+          });
+        }
+        if (!signalNames['height']) {
+          spec.signals.push({
+            name: 'height',
+            on: [
+              {
+                events: { source: 'window', type: 'load' },
+                update: 'containerSize()[1]',
+                force: true,
+              },
+              {
+                events: { source: 'window', type: 'resize' },
+                update: 'containerSize()[1]',
+              },
+            ],
+          });
+        }
         return spec;
       },
     });
@@ -237,8 +243,13 @@
     }
   });
 
-  afterUpdate(() => {
+  const debouncedResize = debounce(() => {
+    console.info('resize');
     window.dispatchEvent(new Event('resize'));
+  }, 250);
+
+  afterUpdate(() => {
+    debouncedResize();
   });
 
   onDestroy(() => {
