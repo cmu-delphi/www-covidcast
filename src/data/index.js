@@ -81,7 +81,7 @@ function loadRegularSignal(sEntry, meta, timeMap, statsMap) {
     const aIndex = regularSignalMetaDataGeoTypeCandidates.indexOf(a.geo_type);
     const bIndex = regularSignalMetaDataGeoTypeCandidates.indexOf(b.geo_type);
     if (aIndex === bIndex) {
-      return a.geo_type.localCompare(b.geo_type);
+      return a.geo_type.localeCompare(b.geo_type);
     }
     if (aIndex < 0) {
       // missing is bigger

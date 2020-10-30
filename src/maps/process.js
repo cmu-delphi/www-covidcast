@@ -4,7 +4,8 @@ const { dsvFormat, csvParse } = require('d3-dsv');
 const fs = require('fs');
 const path = require('path');
 const booleanDisjoint = require('@turf/boolean-disjoint').default;
-const centroid = require('@turf/centroid').default;
+const transformTranslate = require('@turf/transform-translate').default;
+const centerOfMass = require('@turf/center-of-mass').default;
 const { topology } = require('topojson-server');
 const geojsonExtent = require('@mapbox/geojson-extent');
 const { LngLatBounds, LngLat } = require('mapbox-gl');
@@ -199,27 +200,38 @@ async function counties(level = 'county') {
 async function hrr(level = 'hrr') {
   const geo = require(`./raw/hrr/hrr.reprojected.geo.json`);
 
-  const infos = geo.features.map((feature) => {
-    const id = String(feature.properties.hrr_num);
-    const center = centroid(feature).geometry.coordinates;
-    const props = feature.properties;
-    const state = props.hrr_name.split('-')[0].trim();
-    const name = props.hrr_name.slice(props.hrr_name.indexOf('-') + 1).trim();
-    feature.id = id;
-    feature.properties = {};
-    return {
-      id,
-      name,
-      state,
-      displayName: props.hrr_name,
-      lat: center[0],
-      long: center[1],
-    };
-  });
+  const infos = geo.features
+    .map((feature) => {
+      const id = String(feature.properties.hrr_num);
+      // don't know why but there is this frame
+      feature.geometry.coordinates = feature.geometry.coordinates.filter((d) => {
+        return !(d[0][0][0] === -26.069579678452456 && d[0][0][1] === 13.509452429458069);
+      });
+      delete feature.bbox;
+      // also seems to be shifted to the North
+      feature.geometry = transformTranslate(feature, 25, 210, { mutate: true }).geometry;
+      feature.geometry = transformTranslate(feature, 10, 90, { mutate: true }).geometry;
+      const center = centerOfMass(feature).geometry.coordinates;
+      const props = feature.properties;
+      const state = props.hrr_name.split('-')[0].trim();
+      const name = props.hrr_name.slice(props.hrr_name.indexOf('-') + 1).trim();
+      feature.id = id;
+      feature.properties = {};
+      return {
+        id,
+        name,
+        state,
+        displayName: props.hrr_name,
+        lat: center[0],
+        long: center[1],
+      };
+    })
+    .sort((a, b) => a.id.localeCompare(b.id));
   fs.writeFileSync(
     path.resolve(__dirname, `./processed/${level}.csv.js`),
     wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'lat', 'long'])),
   );
+  // fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.geo.json`), JSON.stringify(geo));
   const topo = topology({ [level]: geo }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
   return geo;
@@ -266,7 +278,7 @@ function neighborhoods() {
     }),
     ...municipal.features.map((feature) => {
       const props = feature.properties;
-      const center = centroid(feature).geometry.coordinates;
+      const center = centerOfMass(feature).geometry.coordinates;
       return {
         id: props.CNTL_ID,
         municode: props.MUNICODE,
@@ -350,7 +362,7 @@ function zipHrr(hrrZone, hrrNum = '357') {
     }
   });
   const infos = data.features.map((feature) => {
-    const center = centroid(feature).geometry.coordinates;
+    const center = centerOfMass(feature).geometry.coordinates;
     return {
       id: feature.id,
       name: feature.id,

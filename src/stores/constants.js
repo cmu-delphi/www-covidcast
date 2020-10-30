@@ -18,6 +18,11 @@ export const levelList = [
     labelPlural: 'Metro Areas',
   },
   {
+    id: 'hrr',
+    label: 'Hospital Referral Region',
+    labelPlural: 'Hospital Referral Regions',
+  },
+  {
     id: 'county',
     label: 'County',
     labelPlural: 'Counties',
