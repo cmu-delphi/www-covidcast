@@ -1,4 +1,5 @@
-import { formatAPITime, isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data';
+import { isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data/signals';
+import { formatAPITime } from '../data/utils';
 import { format } from 'd3-format';
 import descriptions from './descriptions.generated.json';
 import '!file-loader?name=descriptions.raw.txt!./descriptions.raw.txt';

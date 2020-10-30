@@ -1,4 +1,4 @@
-id,name,displayName,state,population,lat,long
+export default `id,name,displayName,state,population,lat,long
 02261,Valdez-Cordova,"Valdez-Cordova County, AK",02,9202,-15.707827062813598,-10.343262810086836
 02158,Kusilvak,"Kusilvak County, AK",02,8314,-18.751015290079515,-10.077829051748006
 02275,Wrangell,"Wrangell County, AK",02,2502,-13.049034693764431,-11.52061015570261
@@ -3219,4 +3219,4 @@ id,name,displayName,state,population,lat,long
 50027,Windsor,"Windsor County, VT",50,55062,17.178807949697056,6.9675115364687725
 51001,Accomack,"Accomack County, VA",51,32316,16.234850309736952,0.7581833808018004
 51005,Alleghany,"Alleghany County, VA",51,14860,12.920412802502616,0.12762129161333152
-51007,Amelia,"Amelia County, VA",51,13145,14.572742759745504,-0.037925537676321695
+51007,Amelia,"Amelia County, VA",51,13145,14.572742759745504,-0.037925537676321695`;
