@@ -136,6 +136,31 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
         calculate: 'datum.value == null ? false : datum.value > ' + yMax,
         as: 'clipped',
       },
+      {
+        calculate: 'datum.value == null ? false : datum.value < ' + yMax,
+        as: 'notClipped',
+      },
+      {
+        calculate: 'datum.clipped ? datum.value : null',
+        as: 'clippedData',
+      },
+      {
+        window: [
+          {
+            op: 'lag',
+            field: 'notClipped',
+            as: 'startClipping',
+          },
+          {
+            op: 'lead',
+            field: 'notClipped',
+            as: 'endClipping',
+          },
+        ],
+      },
+
+      { calculate: '(datum.clipped && datum.startClipping) ? datum.value : null', as: 'startClippedData' },
+      { calculate: '(datum.clipped && datum.endClipping) ? datum.value : null', as: 'endClippedData' },
     ],
     encoding: {
       color: colorEncoding(selections),
@@ -161,29 +186,32 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
       {
         mark: {
           type: 'text',
-          text: '\u21E1',
-          size: 9,
+          text: '\u21BF',
+          size: 12,
           baseline: 'bottom',
-          dy: 2,
-          // stroke: colorEncoding(selections)
+          dy: 3,
           stroke: 'red',
         },
         encoding: {
           y: {
-            value: scalePercent(yMax),
+            field: 'startClippedData',
             type: 'quantitative',
           },
-          opacity: {
-            condition: [
-              {
-                test: {
-                  field: 'clipped',
-                  equal: true,
-                },
-                value: 0.2,
-              },
-            ],
-            value: 0,
+        },
+      },
+      {
+        mark: {
+          type: 'text',
+          text: '\u21C2',
+          size: 12,
+          baseline: 'bottom',
+          dy: 3,
+          stroke: 'red',
+        },
+        encoding: {
+          y: {
+            field: 'endClippedData',
+            type: 'quantitative',
           },
         },
       },
@@ -208,17 +236,22 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
               minExtent: 25,
             },
           },
-          size: {
-            condition: [
-              {
-                test: {
-                  field: 'clipped',
-                  equal: true,
-                },
-                value: 0,
-              },
-            ],
-            value: 1,
+        },
+      },
+      // Draw clipped data differently.
+      {
+        mark: {
+          type: 'line',
+          interpolate: 'linear',
+          stroke: 'red',
+          strokeWidth: 6.5,
+          strokeOpacity: 0.25,
+          yOffset: -3.5,
+        },
+        encoding: {
+          y: {
+            field: 'clippedData',
+            type: 'quantitative',
           },
         },
       },
