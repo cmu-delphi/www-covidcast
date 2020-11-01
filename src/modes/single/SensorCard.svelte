@@ -55,6 +55,21 @@
       });
     });
   }
+
+  /**
+   * @type {(Object|null)[]}
+   */
+  let rowsOfRegions = selections.map(() => null);
+
+  $: {
+    const keyDate = formatAPITime(highlightDate ? highlightDate : date);
+    Promise.resolve(sensorWithData.data).then((rows) => {
+      rowsOfRegions = selections.map((region) => {
+        const row = rows.find((d) => String(d.time_value) === keyDate && d.geo_value === region.info.propertyId);
+        return row ? row : null;
+      });
+    });
+  }
 </script>
 
 <style>
@@ -141,12 +156,52 @@
       {/if}
     </div>
   </div>
+  <!-- <table class="key" class:single={selections.length === 1}>
+    <tbody>
+      {#if sensor.isCasesOrDeath}
+        <tr>
+          <th>{sensor.yAxis}</th>
+          <th class="area">Count</th>
+          <th class="area">Ratios (per 100,000)</th>
+        </tr>
+        <tr>
+          <th>{formatTimeWithoutYear(item.date_value)}</th>
+          <td class="right">{sensor.formatValue(item.count)}</td>
+          <td class="right">{sensor.formatValue(item.countRatio)}</td>
+        </tr>
+        <tr>
+          <th>7-day avg</th>
+          <td class="right">{sensor.formatValue(item.avg)}</td>
+          <td class="right">{sensor.formatValue(item.avgRatio)}</td>
+        </tr>
+        <tr>
+          <th>{formatTimeWithoutYear(item.date_value)} (cumulative)</th>
+          <td class="right">{sensor.formatValue(item.countCumulative)}</td>
+          <td class="right">{sensor.formatValue(item.countRatioCumulative)}</td>
+        </tr>
+      {:else}
+        <tr>
+          <th>{sensor.yAxis}</th>
+          <td class="right">{sensor.formatValue(item.value)}</td>
+        </tr>
+        {#if sensor.hasStdErr && item.stderr != null}
+          <tr>
+            <th>Standard Error</th>
+            <td class="right">{sensor.formatValue(item.stderr)}</td>
+          </tr>
+        {/if}
+      {/if}
+    </tbody>
+  </table> -->
   <table class="key" class:single={selections.length === 1}>
     <tbody>
       {#each selections as selection, i}
         <tr>
           <td class="legend" style="--color: {selection.color}">{selection.displayName}</td>
-          <td class="key-fact">{values[i] != null ? sensor.formatValue(values[i]) : '?'}</td>
+          <td class="key-fact">{rowsOfRegions[i] != null ? sensor.formatValue(rowsOfRegions[i].value) : '?'}</td>
+          {#if sensor.hasStdErr && rowsOfRegions[i].stderr != null}
+            <td>{sensor.formatValue(rowsOfRegions[i].stderr)}</td>
+          {/if}
           {#if i === 0}
             <td class="hint" rowspan={selections.length}>on {formatLocal(highlightDate ? highlightDate : date)}</td>
           {/if}
