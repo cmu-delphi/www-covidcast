@@ -11,7 +11,7 @@
   } from '../../stores';
   import { sensorList } from '../../stores/constants';
   import SensorCard from './SensorCard.svelte';
-  import debounce from 'lodash-es/throttle';
+  import debounce from 'lodash-es/debounce';
   import { selectionColors } from '../../theme';
   import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
 
