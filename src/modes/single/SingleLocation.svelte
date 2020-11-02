@@ -23,7 +23,6 @@
   // achieves that goal, at least most of the time.
   const debouncedHighlightTime = debounce(
     (value) => {
-      console.info('highlighted valuu', value);
       highlightTimeValue = value;
     },
     1,
