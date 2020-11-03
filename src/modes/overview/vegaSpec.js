@@ -79,7 +79,6 @@ export function resolveHighlightedTimeValue(e) {
   if (row.value == null) {
     return;
   }
-  console.info('row', row);
   return row ? row.time_value : null;
 }
 
@@ -120,10 +119,10 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
   const spec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
     data: { name: 'values' },
-    width: 'container',
-    height: 'container',
-    padding: 0,
+    padding: { left: 50, top: 4, bottom: 16, right: 2 },
     autosize: {
+      type: 'none',
+      contains: 'padding',
       resize: true,
     },
     transform: [
@@ -265,11 +264,12 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
             type: 'single',
             empty: 'none',
             on: 'mouseover',
-            nearest: false,
+            nearest: true,
+            encodings: ['x'],
             clear: 'mouseout',
           },
         },
-        // use vertical rule for selection, since nearest is a real performance bummer
+        // use vertical rule for selection, since nearest point is a real performance bummer
         mark: {
           type: 'rule',
           strokeWidth: 2.5,

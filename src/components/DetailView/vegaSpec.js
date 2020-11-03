@@ -133,13 +133,14 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
     },
     data: { name: 'values' },
     autosize: {
+      type: 'none',
       contains: 'padding',
       resize: true,
     },
+    padding: { left: 50, right: 2, top: 45, bottom: 5 },
     transform: sensor.hasStdErr ? stdErrTransform : [],
     vconcat: [
       {
-        width: 'container',
         encoding: {
           x: {
             ...xDateEncoding,
@@ -177,6 +178,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
                 type: 'single',
                 empty: 'none',
                 nearest: true,
+                encodings: ['x'],
                 on: 'mouseover',
                 clear: 'mouseout',
               },
@@ -227,6 +229,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
       },
       {
         height: 40,
+        padding: { top: 0 },
         view: { cursor: 'col-resize' },
         encoding: {
           color: {
@@ -246,13 +249,6 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
         layer: [
           {
             selection: {
-              highlight2: {
-                type: 'single',
-                empty: 'none',
-                nearest: true,
-                on: 'mouseover',
-                clear: 'mouseout',
-              },
               brush: {
                 type: 'interval',
                 encodings: ['x'],
@@ -281,6 +277,16 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
           // complicated construct to have proper typings
           ...(sensor.hasStdErr ? [stdErrLayer] : []),
           {
+            selection: {
+              highlight2: {
+                type: 'single',
+                empty: 'none',
+                nearest: true,
+                encodings: ['x'],
+                on: 'mouseover',
+                clear: 'mouseout',
+              },
+            },
             transform: [
               {
                 filter: {
@@ -333,8 +339,9 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
   return spec;
 }
 
-const OFFSET_X = 60;
-const OFFSET_Y = 100;
+// Reserve space for titles.
+const OFFSET_Y = 110;
+const RANGE_SELECTOR_HEIGHT = 40;
 
 /**
  * patches in the current size
@@ -345,12 +352,10 @@ export function patchSpec(spec, size) {
   return merge({}, spec, {
     vconcat: [
       {
-        width: size.width - OFFSET_X,
-        height: size.height - 40 - OFFSET_Y,
+        height: size.height - RANGE_SELECTOR_HEIGHT - OFFSET_Y,
       },
       {
-        width: size.width - OFFSET_X,
-        height: 40,
+        height: RANGE_SELECTOR_HEIGHT,
       },
     ],
   });

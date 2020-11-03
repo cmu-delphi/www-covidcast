@@ -167,7 +167,7 @@
       disabled={!vegaRef}>
       <IoIosSave />
     </button>
-    {#if sensor.longDescription}
+    {#if sensor.description}
       <button
         title="Show sensor description"
         class="pg-button pg-button-circle info"

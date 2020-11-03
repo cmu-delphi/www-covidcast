@@ -20,6 +20,7 @@
   import Top10SortHint from './Top10SortHint.svelte';
   import { levelMegaCounty, groupedSensorList, sensorList, primaryValue, yesterdayDate } from '../../stores/constants';
   import { parseAPITime } from '../../data';
+  import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
 
   const SHOW_X_MORE = 10;
   const MAX_OTHER_SENSORS = 1;
@@ -224,20 +225,10 @@
   }, 10);
 
   function onHighlight(e) {
-    const highlighted = e.detail.value;
-    const id = highlighted && Array.isArray(highlighted._vgsid_) ? highlighted._vgsid_[0] : null;
-
-    if (!id) {
-      throttled(null);
-      return;
+    const value = resolveHighlightedTimeValue(e);
+    if (highlightTimeValue !== value) {
+      throttled(value);
     }
-    const row = e.detail.view.data('data_0').find((d) => d._vgsid_ === id);
-    // if (row.value == null) {
-    //   highlightTimeValue = null;
-    //   return;
-    // }
-    // console.info('row', row);
-    throttled(row ? row.time_value : null);
   }
 </script>
 
