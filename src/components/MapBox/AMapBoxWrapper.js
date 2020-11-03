@@ -76,8 +76,9 @@ export default class AMapBoxWrapper {
   /**
    *
    * @param {HTMLElement} container
+   * @param {string} title
    */
-  initMap(container) {
+  initMap(container, title) {
     this.map = new MapBox({
       attributionControl: false,
       container,
@@ -125,6 +126,8 @@ export default class AMapBoxWrapper {
       this.map.resize();
     });
 
+    this.setTitle(title);
+
     return p;
   }
 
@@ -169,6 +172,7 @@ export default class AMapBoxWrapper {
     // once all are ready
     if (this.mapSetupReady && this.mapEncodingReady && this.mapDataReady) {
       this.dispatch('ready');
+      this.map.getContainer().dataset.ready = 'ready';
     }
   }
 
@@ -497,5 +501,22 @@ export default class AMapBoxWrapper {
     const randomFeature = viableFeatures[index];
     this.interactive.forceHover(randomFeature);
     this.dispatch('select', { feature: randomFeature });
+  }
+
+  /**
+   *
+   * @param {string} title
+   */
+  setTitle(title) {
+    if (!this.map) {
+      return;
+    }
+    const canvas = this.map.getContainer().querySelector('canvas');
+    if (!canvas) {
+      return;
+    }
+    canvas.setAttribute('role', 'figure');
+    canvas.setAttribute('aria-roledescription', 'visualization');
+    canvas.setAttribute('aria-label', `US Map showing: ${title}`);
   }
 }

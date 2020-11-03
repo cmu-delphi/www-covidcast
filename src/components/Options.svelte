@@ -11,7 +11,11 @@
   } from '../stores';
   import Datepicker from './Calendar/Datepicker.svelte';
   import { timeFormat } from 'd3-time-format';
+  import { timeDay } from 'd3-time';
   import { formatAPITime, parseAPITime } from '../data';
+  import IoIosCalendar from 'svelte-icons/io/IoIosCalendar.svelte';
+  import IoIosArrowBack from 'svelte-icons/io/IoIosArrowBack.svelte';
+  import IoIosArrowForward from 'svelte-icons/io/IoIosArrowForward.svelte';
 
   $: formatTime = $isMobileDevice ? timeFormat('%x') : timeFormat('%B %-d, %Y');
 
@@ -19,13 +23,16 @@
   export let className = '';
   export let showDate = true;
   $: selectedDate = parseAPITime($currentDate);
-  $: start_end_dates = [];
-
+  /**
+   * @type {[Date, Date]}
+   */
+  $: startEndDates = [];
+  $: if ($times !== null) {
+    const dates = $times.get($currentSensor);
+    startEndDates = dates ? dates.map(parseAPITime) : [];
+  }
   $: if (selectedDate !== undefined) {
     currentDate.set(formatAPITime(selectedDate));
-  }
-  $: if ($times !== null) {
-    start_end_dates = $times.get($currentSensor);
   }
   $: levelIds = new Set(levels.map((l) => l.id));
   $: filteredSensorGroups = groupedSensorList
@@ -92,6 +99,16 @@
     margin: 0.25em 0;
   }
 
+  .shortcuts {
+    background-color: #ececec;
+    border: none;
+    color: #111;
+    line-height: 1.3;
+    height: 2.2em;
+    font-size: 80%;
+    margin-left: 0.5em;
+  }
+
   /** mobile **/
   @media only screen and (max-width: 767px) {
     .options {
@@ -103,6 +120,10 @@
       flex-direction: column;
       align-items: stretch;
       justify-content: space-between;
+    }
+
+    .shortcuts {
+      display: none;
     }
   }
 </style>
@@ -143,17 +164,40 @@
   {#if showDate}
     <div class="option-wrapper">
       <span class="option-title">on</span>
-      {#if selectedDate != null && start_end_dates.length !== 0}
+      {#if selectedDate != null && startEndDates.length !== 0}
         <Datepicker
           bind:selected={selectedDate}
-          start={parseAPITime(start_end_dates[0])}
-          end={parseAPITime(start_end_dates[1])}
+          start={startEndDates[0]}
+          end={startEndDates[1]}
           formattedSelected={formatTime(selectedDate)}>
           <button aria-label="selected date" class="calendar base-font-size" on:>{formatTime(selectedDate)}</button>
         </Datepicker>
       {:else}
         <button aria-label="selected date" class="calendar base-font-size" on:>{formatTime(selectedDate)}</button>
       {/if}
+      <div class="shortcuts pg-button-group">
+        <button
+          class="pg-button"
+          disabled={selectedDate == null || startEndDates.length === 0 || selectedDate <= startEndDates[0]}
+          title="Go to the previous day"
+          on:click={() => (selectedDate = timeDay.offset(selectedDate, -1))}>
+          <IoIosArrowBack />
+        </button>
+        <button
+          class="pg-button"
+          disabled={selectedDate == null || startEndDates.length === 0 || selectedDate.valueOf() === startEndDates[1].valueOf()}
+          title="Go to the latest date for which '{$currentSensorEntry.name}' is available"
+          on:click={() => (selectedDate = startEndDates[1])}>
+          <IoIosCalendar />
+        </button>
+        <button
+          class="pg-button"
+          disabled={selectedDate == null || startEndDates.length === 0 || selectedDate >= startEndDates[1]}
+          title="Go to the next day"
+          on:click={() => (selectedDate = timeDay.offset(selectedDate, 1))}>
+          <IoIosArrowForward />
+        </button>
+      </div>
     </div>
   {/if}
 </div>

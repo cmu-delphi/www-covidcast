@@ -1,6 +1,6 @@
 // Node script to process the maps and info and generate an optimized version
 
-const { dsvFormat } = require('d3-dsv');
+const { dsvFormat, csvParse } = require('d3-dsv');
 const fs = require('fs');
 const path = require('path');
 const booleanDisjoint = require('@turf/boolean-disjoint').default;
@@ -8,6 +8,7 @@ const centroid = require('@turf/centroid').default;
 const { topology } = require('topojson-server');
 const geojsonExtent = require('@mapbox/geojson-extent');
 const { LngLatBounds, LngLat } = require('mapbox-gl');
+const fetch = require('node-fetch');
 
 const QUANTIZATION = 1e4;
 
@@ -36,7 +37,16 @@ function computeBounds(geojson, scale = 1) {
   );
 }
 
-function states(level = 'state') {
+/**
+ * wraps the csv string to be like a JS module
+ * @param {string} csv
+ */
+function wrapModule(csv) {
+  return `export default \`${csv}\`;`;
+}
+
+async function states(level = 'state') {
+  const populationLookup = await generatePopulationLookup();
   const geo = require(`./raw/new_states.json`);
 
   const infos = geo.features.map((feature) => {
@@ -48,14 +58,14 @@ function states(level = 'state') {
       id,
       postal: props.POSTAL,
       name: props.NAME,
-      population: Number.parseInt(props.Population, 10),
+      population: populationLookup.state(id) || Number.parseInt(props.Population, 10),
       lat: props.LAT,
       long: props.LONG,
     };
   });
   fs.writeFileSync(
-    path.resolve(__dirname, `./processed/${level}.csv`),
-    dsvFormat(',').format(infos, ['id', 'postal', 'name', 'population', 'lat', 'long']),
+    path.resolve(__dirname, `./processed/${level}.csv.js`),
+    wrapModule(dsvFormat(',').format(infos, ['id', 'postal', 'name', 'population', 'lat', 'long'])),
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
@@ -102,15 +112,30 @@ function msa(level = 'msa') {
     };
   });
   fs.writeFileSync(
-    path.resolve(__dirname, `./processed/${level}.csv`),
-    dsvFormat(',').format(infos, ['id', 'name', 'population', 'lat', 'long']),
+    path.resolve(__dirname, `./processed/${level}.csv.js`),
+    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'population', 'lat', 'long'])),
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
   return geo;
 }
 
-function counties(level = 'county') {
+async function generatePopulationLookup() {
+  const csv = csvParse(
+    await fetch(
+      'https://raw.githubusercontent.com/cmu-delphi/covidcast-indicators/main/_delphi_utils_python/delphi_utils/data/fips_pop.csv',
+    ).then((r) => r.text()),
+  );
+  const populationLookup = new Map(csv.map((r) => [r.fips, Number.parseInt(r.pop, 10)]));
+
+  return {
+    county: (fips) => populationLookup.get(fips),
+    state: (fips) => populationLookup.get(fips + '000'),
+  };
+}
+
+async function counties(level = 'county') {
+  const populationLookup = await generatePopulationLookup();
   //{
   //   "display_name": "Valdez-Cordova County, AK",
   //   "name": "Valdez-Cordova",
@@ -129,6 +154,10 @@ function counties(level = 'county') {
   //   Population: '9202',
   // };
   const geo = require(`./raw/new_counties.json`);
+
+  const stateToPostal = new Map(
+    require(`./raw/state_centers.json`).features.map((f) => [f.properties.STATE, f.properties.POSTAL]),
+  );
 
   // const center = {
   //   type: 'Feature',
@@ -155,16 +184,16 @@ function counties(level = 'county') {
     return {
       id,
       name: props.NAME,
-      displayName: info ? info.display_name : `${props.NAME} County, ${props.LSAD}`,
+      displayName: info ? info.display_name : `${props.NAME} County, ${stateToPostal.get(props.STATE)}`,
       state: props.STATE,
-      population: Number.parseInt(props.Population, 10),
+      population: populationLookup.county(id) || Number.parseInt(props.Population, 10),
       lat: center.geometry.coordinates[0],
       long: center.geometry.coordinates[1],
     };
   });
   fs.writeFileSync(
-    path.resolve(__dirname, `./processed/${level}.csv`),
-    dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'population', 'lat', 'long']),
+    path.resolve(__dirname, `./processed/${level}.csv.js`),
+    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'population', 'lat', 'long'])),
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
@@ -183,8 +212,8 @@ function cities() {
     };
   });
   fs.writeFileSync(
-    path.resolve(__dirname, `./processed/cities.csv`),
-    dsvFormat(',').format(infos, ['name', 'population', 'lat', 'long']),
+    path.resolve(__dirname, `./processed/cities.csv.js`),
+    wrapModule(dsvFormat(',').format(infos, ['name', 'population', 'lat', 'long'])),
   );
 }
 
@@ -228,8 +257,10 @@ function neighborhoods() {
   ].filter((d) => d.id);
   // {"FID":1,"NAME":"CHESWICK","TYPE":"BOROUGH","LABEL":"Cheswick Borough","COG":"Allegheny Valley North","SCHOOLD":"Allegheny Valley","CONGDIST":4,"FIPS":13392,"REGION":"NH","ACRES":350.19128417,"SQMI":0.54717391,"MUNICODE":"815","CNTL_ID":"003100","CNTYCOUNCIL":7,"EOC":"NEWCOM","ASSESSORTERRITORY":"East","VALUATIONAREA":"Alle-Kiski Valley","YEARCONVERTED":1966,"GlobalID":"{F29648DC-0D4F-4E35-8F2D-7B465DCFF308}","SHAPE_Length":0.04917208282736798,"SHAPE_Area":0.00015137060470303174}
   fs.writeFileSync(
-    path.resolve(__dirname, `./processed/swpa/neighborhood.csv`),
-    dsvFormat(',').format(infos, ['id', 'municode', 'name', 'displayName', 'type', 'lat', 'long', 'cog', 'region']),
+    path.resolve(__dirname, `./processed/swpa/neighborhood.csv.js`),
+    wrapModule(
+      dsvFormat(',').format(infos, ['id', 'municode', 'name', 'displayName', 'type', 'lat', 'long', 'cog', 'region']),
+    ),
   );
   neighborhoods.features = neighborhoods.features
     .map((d) => ({
@@ -303,8 +334,8 @@ function zipHrr(hrrZone, hrrNum = '357') {
     };
   });
   fs.writeFileSync(
-    path.resolve(__dirname, `./processed/swpa/zip.csv`),
-    dsvFormat(',').format(infos, ['id', 'name', 'lat', 'long']),
+    path.resolve(__dirname, `./processed/swpa/zip.csv.js`),
+    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'lat', 'long'])),
   );
   const geo = topology({ zip: data }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/zip.topojson.json`), JSON.stringify(geo));
@@ -339,27 +370,29 @@ function hrrZone(statesGeo, msaGeo, countiesGeo) {
   return zone;
 }
 
-const statesGeo = states();
-const msaGeo = msa();
-const countiesGeo = counties();
-cities();
+(async function main() {
+  const statesGeo = await states();
+  const msaGeo = await msa();
+  const countiesGeo = await counties();
+  await cities();
 
-const hrrGeo = hrrZone(statesGeo, msaGeo, countiesGeo);
-const zipGeo = zipHrr(hrrGeo);
-const neighborhoodsGeo = neighborhoods();
+  const hrrGeo = await hrrZone(statesGeo, msaGeo, countiesGeo);
+  const zipGeo = await zipHrr(hrrGeo);
+  const neighborhoodsGeo = await neighborhoods();
 
-fs.writeFileSync(
-  path.resolve(__dirname, `./processed/bounds.json`),
-  JSON.stringify(
-    {
-      states: computeBounds(statesGeo).toArray(),
-      msa: computeBounds(msaGeo).toArray(),
-      counties: computeBounds(countiesGeo).toArray(),
-      hrr: computeBounds(hrrGeo).toArray(),
-      neighborhoods: computeBounds(neighborhoodsGeo).toArray(),
-      zip: computeBounds(zipGeo).toArray(),
-    },
-    null,
-    2,
-  ),
-);
+  fs.writeFileSync(
+    path.resolve(__dirname, `./processed/bounds.json`),
+    JSON.stringify(
+      {
+        states: computeBounds(statesGeo).toArray(),
+        msa: computeBounds(msaGeo).toArray(),
+        counties: computeBounds(countiesGeo).toArray(),
+        hrr: computeBounds(hrrGeo).toArray(),
+        neighborhoods: computeBounds(neighborhoodsGeo).toArray(),
+        zip: computeBounds(zipGeo).toArray(),
+      },
+      null,
+      2,
+    ),
+  );
+})();

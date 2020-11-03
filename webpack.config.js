@@ -58,7 +58,7 @@ module.exports = () => {
       rules: [
         !devMode && {
           test: /\.m?js$/,
-          exclude: /node_modules\/(?!svelte)/,
+          exclude: /node_modules\/(?!(svelte|mapbox-gl)\/)/,
           use: ['babel-loader'],
         },
         {

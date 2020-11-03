@@ -15,6 +15,7 @@
     times,
     currentDate,
     signalCasesOrDeathOptions,
+    currentSensorMapTitle,
   } from '../../stores';
   import Player from './Player.svelte';
   import { timeDay } from 'd3-time';
@@ -205,7 +206,6 @@
     position: relative;
     flex: 1 1 0;
     display: grid;
-    background: var(--bg);
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto 1fr;
     grid-template-areas:
@@ -274,6 +274,7 @@
       signalOptions={$signalCasesOrDeathOptions}
       on:zoom={(e) => (zoom = e.detail)}
       on:updatedEncoding={(e) => updatedEncoding(e.detail)}
-      wrapperClass={USMapBoxWrapper} />
+      wrapperClass={USMapBoxWrapper}
+      title={$currentSensorMapTitle} />
   </div>
 </main>

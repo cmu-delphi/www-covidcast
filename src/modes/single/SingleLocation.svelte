@@ -11,20 +11,28 @@
   } from '../../stores';
   import { sensorList } from '../../stores/constants';
   import SensorCard from './SensorCard.svelte';
-  import throttle from 'lodash-es/throttle';
+  import debounce from 'lodash-es/debounce';
   import { selectionColors } from '../../theme';
   import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
 
   let highlightTimeValue = null;
 
-  const throttled = throttle((value) => {
-    highlightTimeValue = value;
-  }, 50);
+  // Each mouse move across the chart results in a mouseout for previous highlight
+  // date immediately followed by mouseover for the next date, if any.  We need to
+  // ignore the first event unless there is no second.  A very short debounce time
+  // achieves that goal, at least most of the time.
+  const debouncedHighlightTime = debounce(
+    (value) => {
+      highlightTimeValue = value;
+    },
+    1,
+    { leading: false, trailing: true },
+  );
 
   function onHighlight(e) {
     const value = resolveHighlightedTimeValue(e);
     if (highlightTimeValue !== value) {
-      throttled(value);
+      debouncedHighlightTime(value);
     }
   }
 </script>
@@ -101,7 +109,7 @@
 
   <div class="grid-wrapper">
     <div class="card-grid">
-      {#each sensorList as sensor}
+      {#each sensorList as sensor (sensor.key)}
         <SensorCard
           {sensor}
           date={$currentDateObject}

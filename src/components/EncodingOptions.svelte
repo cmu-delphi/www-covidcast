@@ -22,7 +22,7 @@
   }
 
   .button {
-    width: 10em;
+    width: 11em;
     padding: 0.2em 0.5em;
   }
 </style>
@@ -74,7 +74,7 @@
             signalCasesOrDeathOptions.set({ ...$signalCasesOrDeathOptions, ratio: true });
           }
         }}>
-        Ratios per 100,000
+        Ratios (per 100,000)
       </button>
     </div>
     <!-- <div aria-label="display type" class="pg-button-group button-group">

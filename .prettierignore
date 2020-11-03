@@ -13,3 +13,10 @@
 /src/static
 /src/maps/raw
 /src/maps/processed
+*.generated.json
+*.txt
+/LICENSE
+*.mp4
+*.log
+*.png
+*.jpg

@@ -4,7 +4,7 @@ import {
   stdErrLayer,
   stdErrTransform,
 } from '../../components/DetailView/vegaSpec';
-import { addMissing, fetchTimeSlice } from '../../data';
+import { addMissing, fetchTimeSlice, formatAPITime } from '../../data';
 import { levelMegaCounty } from '../../stores/constants';
 
 function fetchMulti(sensor, selections, startDay, endDay) {
@@ -17,7 +17,7 @@ function fetchMulti(sensor, selections, startDay, endDay) {
       return fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false, {
         geo_value: region.propertyId,
       })
-        .then(addMissing)
+        .then((rows) => addMissing(rows, sensor))
         .then((rows) =>
           rows.map((row) => {
             row.displayName = region.displayName;
@@ -35,7 +35,7 @@ function fetchSingle(sensor, region, startDay, endDay) {
   return fetchTimeSlice(sensor, region.level, region.propertyId, startDay, endDay, false, {
     geo_value: region.propertyId,
   })
-    .then(addMissing)
+    .then((rows) => addMissing(rows, sensor))
     .then((rows) =>
       rows.map((row) => {
         row.displayName = region.displayName;
@@ -70,13 +70,10 @@ export function prepareSensorData(sensor, selections, startDay, endDay) {
 
 export function resolveHighlightedTimeValue(e) {
   const highlighted = e.detail.value;
-  const id = highlighted && Array.isArray(highlighted._vgsid_) ? highlighted._vgsid_[0] : null;
-
-  if (!id) {
-    return null;
+  if (highlighted && Array.isArray(highlighted.date_value) && highlighted.date_value.length > 0) {
+    return Number.parseInt(formatAPITime(highlighted.date_value[0]), 10);
   }
-  const row = e.detail.view.data('data_0').find((d) => d._vgsid_ === id);
-  return row ? row.time_value : null;
+  return null;
 }
 
 export function resolveClickedTimeValue(e) {
@@ -115,10 +112,10 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
   const spec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
     data: { name: 'values' },
-    width: 'container',
-    height: 'container',
-    padding: 0,
+    padding: { left: 50, top: 4, bottom: 16, right: 2 },
     autosize: {
+      type: 'none',
+      contains: 'padding',
       resize: true,
     },
     transform: [
@@ -136,7 +133,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
         axis: {
           title: null,
           format: '%m/%d',
-          formatType: 'time',
+          formatType: 'cachedTime',
           tickCount: 'month',
         },
         scale: dateRange
@@ -147,6 +144,8 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
       },
     },
     layer: [
+      // complicated construct to have proper typings
+      ...(sensor.hasStdErr ? [stdErrLayer] : []),
       {
         mark: {
           type: 'line',
@@ -162,7 +161,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
               clamp: true,
             },
             axis: {
-              ...(isPercentage ? { format: '.1%' } : {}),
+              ...(isPercentage ? { format: '.1%', formatType: 'cachedNumber' } : {}),
               title: null,
               tickCount: 3,
               minExtent: 25,
@@ -177,12 +176,22 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
             empty: 'none',
             on: 'mouseover',
             nearest: true,
+            encodings: ['x'],
             clear: 'mouseout',
           },
         },
+        // use vertical rule for selection, since nearest point is a real performance bummer
+        mark: {
+          type: 'rule',
+          strokeWidth: 2.5,
+          color: 'white',
+          opacity: 0.001,
+          tooltip: true,
+        },
+      },
+      {
         mark: {
           type: 'point',
-          tooltip: true,
           radius: 1,
           stroke: null,
           fill: 'grey',
@@ -207,23 +216,24 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
           },
         },
       },
-      // complicated construct to have proper typings
-      ...(sensor.hasStdErr ? [stdErrLayer] : []),
       {
-        transform: [
-          {
-            filter: {
-              or: [
-                {
-                  selection: 'highlight',
-                },
-                'datum.time_value == highlightTimeValue',
-              ],
-            },
-          },
-        ],
-        mark: 'rule',
+        mark: {
+          type: 'rule',
+        },
         encoding: {
+          opacity: {
+            condition: [
+              {
+                selection: 'highlight',
+                value: 1,
+              },
+              {
+                test: 'datum.time_value == highlightTimeValue',
+                value: 1,
+              },
+            ],
+            value: 0,
+          },
           y: {
             field: yField,
             type: 'quantitative',
@@ -233,6 +243,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
       CURRENT_DATE_HIGHLIGHT,
     ],
     config: {
+      customFormatTypes: true,
       legend: {
         disable: true,
       },

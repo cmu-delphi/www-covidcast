@@ -1,5 +1,5 @@
 <script>
-  import { ENCODING_BUBBLE_THEME } from '../../theme';
+  import { ENCODING_BUBBLE_THEME, MISSING_COLOR } from '../../theme';
   import {
     stats,
     currentLevel,
@@ -59,9 +59,20 @@
     max-width: 200px;
     max-height: 200px;
   }
+
+  .na {
+    width: 2em;
+    height: 2em;
+  }
 </style>
 
-<ul class:loading-bg={loading}>
+<ul class:loading-bg={loading} data-testid="bubble-legend">
+  <li>
+    <div class="bubble-wrapper">
+      <div class="na" style="background:repeating-linear-gradient(-45deg, {MISSING_COLOR}, white 30%)" />
+    </div>
+    <span>NA</span>
+  </li>
   {#each r.labels as l}
     <li>
       <div class="bubble-wrapper">

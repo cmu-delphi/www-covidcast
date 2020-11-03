@@ -9,7 +9,7 @@
     currentRegionInfo,
     selectByInfo,
   } from '../../stores';
-  import { fetchRegionSlice } from '../../data/fetchData';
+  import { addMissing, fetchRegionSlice, fetchTimeSlice } from '../../data/fetchData';
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
   import IoIosPin from 'svelte-icons/io/IoIosPin.svelte';
   import { modeByID } from '..';
@@ -18,10 +18,16 @@
   import Search from '../../components/Search.svelte';
   import { throttle } from 'lodash-es';
   import Top10SortHint from './Top10SortHint.svelte';
-  import { levelMegaCounty, groupedSensorList, sensorList, primaryValue } from '../../stores/constants';
+  import { levelMegaCounty, groupedSensorList, sensorList, primaryValue, yesterdayDate } from '../../stores/constants';
+  import { parseAPITime } from '../../data';
+  import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
 
   const SHOW_X_MORE = 10;
   const MAX_OTHER_SENSORS = 1;
+  // Create a date for today in the API's date format
+  const startDay = parseAPITime('20200401');
+  const finalDay = yesterdayDate;
+
   /**
    * @typedef {import('../../maps').NameInfo} ValueRow
    * @property {import('../../data/fetchData').EpiDataRow} primary
@@ -149,6 +155,42 @@
     })
     .filter((d, i) => i < showTopN || d.propertyId === $currentRegion);
 
+  const primaryDataCache = new Map();
+  $: {
+    if (primary != null) {
+      // clear cache once the primary changes
+      primaryDataCache.clear();
+    }
+  }
+  $: primaryData = sortedRows.map((row) => {
+    const key = `${row.propertyId}-${primary.key}`;
+    if (primaryDataCache.has(key)) {
+      return primaryDataCache.get(key);
+    }
+    const data = fetchTimeSlice(primary, row.level, row.propertyId, startDay, finalDay, true, {
+      geo_value: row.propertyId,
+    }).then((r) => addMissing(r));
+    primaryDataCache.set(key, data);
+    return data;
+  });
+
+  function maxNested(rows) {
+    return rows.flat().reduce((acc, v) => Math.max(acc, v.value), 0);
+  }
+
+  // compute local maxima
+  $: primaryDomain = Promise.all(primaryData).then((rows) => [0, maxNested(rows)]);
+
+  $: otherDataAndDomain = otherSensors.map((sensor) => {
+    const data = sortedRows.map((row) =>
+      fetchTimeSlice(sensor, row.level, row.propertyId, startDay, finalDay, true, {
+        geo_value: row.propertyId,
+      }).then((r) => addMissing(r)),
+    );
+    const domain = Promise.all(data).then((rows) => [0, maxNested(rows)]);
+    return { data, domain };
+  });
+
   function jumpTo(row) {
     currentMode.set(modeByID.overview);
     currentRegion.set(row.id);
@@ -183,15 +225,10 @@
   }, 10);
 
   function onHighlight(e) {
-    const highlighted = e.detail.value;
-    const id = highlighted && Array.isArray(highlighted._vgsid_) ? highlighted._vgsid_[0] : null;
-
-    if (!id) {
-      throttled(null);
-      return;
+    const value = resolveHighlightedTimeValue(e);
+    if (highlightTimeValue !== value) {
+      throttled(value);
     }
-    const row = e.detail.view.data('data_0').find((d) => d._vgsid_ === id);
-    throttled(row ? row.time_value : null);
   }
 </script>
 
@@ -402,7 +439,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each sortedRows as row}
+        {#each sortedRows as row, i}
           <tr class:selected={row.propertyId === $currentRegion}>
             <td>{row.rank}.</td>
             <td>
@@ -417,8 +454,9 @@
             <Top10Sensor
               sensor={primary}
               single={row.primary}
+              data={primaryData[i]}
+              domain={primaryDomain}
               {row}
-              level={row.level}
               {highlightTimeValue}
               {ratioOptions}
               {onHighlight} />
@@ -426,8 +464,9 @@
               <Top10Sensor
                 sensor={s}
                 single={row.others[si]}
+                data={otherDataAndDomain[si].data[i]}
+                domain={otherDataAndDomain[si].domain}
                 {row}
-                level={row.level}
                 {highlightTimeValue}
                 {ratioOptions}
                 {onHighlight} />

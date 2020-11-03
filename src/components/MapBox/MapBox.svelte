@@ -29,6 +29,7 @@
   export let signalType = 'value';
   export let signalOptions = {};
   export let animationDuration = 0;
+  export let title = '';
   /**
    * @type {{info: import('../../maps/nameIdInfo').NameInfo, color: string}[]}
    */
@@ -38,7 +39,7 @@
 
   onMount(() => {
     wrapper.animationDuration = animationDuration;
-    wrapper.initMap(container).then(() => {
+    wrapper.initMap(container, title).then(() => {
       ready = true;
     });
   });
@@ -88,6 +89,10 @@
     dummyTrack(ready);
     // update selection
     wrapper.selectMulti(selections);
+  }
+
+  $: {
+    wrapper.setTitle(title);
   }
 
   function onResize() {

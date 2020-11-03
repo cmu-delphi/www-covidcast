@@ -1,5 +1,5 @@
 <script>
-  import { ENCODING_SPIKE_THEME } from '../../theme';
+  import { ENCODING_SPIKE_THEME, MISSING_COLOR } from '../../theme';
   import {
     stats,
     currentLevel,
@@ -67,9 +67,18 @@
     stroke-width: 2px;
     stroke-linecap: round;
   }
+
+  .na {
+    width: 2em;
+    height: 2em;
+  }
 </style>
 
-<ul class="legend-ticks" class:loading-bg={loading}>
+<ul class="legend-ticks" class:loading-bg={loading} data-testid="spike-legend">
+  <li>
+    <div class="na" style="background:repeating-linear-gradient(-45deg, {MISSING_COLOR}, white 30%)" />
+    <span>NA</span>
+  </li>
   {#each r.labels as l}
     <li class="legend-direct-tick">
       <svg width={size * 2 + spikePadding * 2} height={$spikeHeightScale(l.value) * zoom + spikePadding * 2}>

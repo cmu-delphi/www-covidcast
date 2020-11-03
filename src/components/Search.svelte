@@ -81,18 +81,25 @@
   let highlightIndex = -1;
 
   // view model
-  let filteredListItems;
+  let filteredListItems = [];
+  let hiddenFilteredListItems = 0;
 
-  $: listItems = items
-    .map((item) => ({
-      // keywords representation of the item
-      keywords: labelFunction(item).toLowerCase().trim(),
-      // item label
-      label: labelFunction(item),
-      // store reference to the origial item
-      item,
-    }))
-    .filter((d) => selectedItems.every((s) => d.label !== labelFunction(s)));
+  $: listItems = items.map((item) => ({
+    // keywords representation of the item
+    keywords: labelFunction(item).toLowerCase().trim(),
+    // item label
+    label: labelFunction(item),
+    // store reference to the origial item
+    item,
+  }));
+  $: selectedLabelLookup = new Set(selectedItems.map((s) => labelFunction(s)));
+
+  function limitListItems(items) {
+    if (maxItemsToShowInList <= 0 || items.length < maxItemsToShowInList) {
+      return items;
+    }
+    return items.slice(0, maxItemsToShowInList);
+  }
 
   function prepareUserEnteredText(userEnteredText) {
     if (userEnteredText === undefined || userEnteredText === null) {
@@ -111,24 +118,34 @@
     return textFiltered.toLowerCase().trim();
   }
 
+  function resetItems() {
+    const matchingItems =
+      selectedLabelLookup.size > 0 ? listItems.filter((d) => !selectedLabelLookup.has(d.label)) : listItems;
+    filteredListItems = limitListItems(matchingItems);
+    hiddenFilteredListItems = matchingItems.length - filteredListItems.length;
+  }
+
   function search() {
     const textFiltered = prepareUserEnteredText(text);
 
     if (textFiltered === '') {
-      filteredListItems = listItems;
+      resetItems();
       closeIfMinCharsToSearchReached();
       return;
     }
 
     const searchWords = textFiltered.split(' ');
+    const hlfilter = highlightFilter(textFiltered, ['label']);
 
-    const tempFilteredListItems = listItems.filter((listItem) => {
+    const matchingItems = listItems.filter((listItem) => {
       const itemKeywords = listItem.keywords;
-      return searchWords.every((searchWord) => itemKeywords.includes(searchWord));
+      return (
+        searchWords.every((searchWord) => itemKeywords.includes(searchWord)) && !selectedLabelLookup.has(listItem.label)
+      );
     });
 
-    const hlfilter = highlightFilter(textFiltered, ['label']);
-    filteredListItems = tempFilteredListItems.map(hlfilter);
+    filteredListItems = limitListItems(matchingItems).map(hlfilter);
+    hiddenFilteredListItems = matchingItems.length - filteredListItems.length;
     closeIfMinCharsToSearchReached();
   }
 
@@ -234,7 +251,7 @@
   }
 
   function resetListToAllItemsAndOpen() {
-    filteredListItems = listItems;
+    resetItems();
 
     open();
 
@@ -320,11 +337,14 @@
   .search-button {
     color: #9b9b9b;
     width: 1.4em;
+    height: 1.4em;
+    align-self: center;
     margin: 0;
     padding: 0;
     border: none;
     background: none;
   }
+
   .autocomplete-input {
     flex: 1 1 0;
     width: 100%;
@@ -460,23 +480,19 @@
   <div class="autocomplete-list" class:hidden={!opened} bind:this={list}>
     {#if filteredListItems && filteredListItems.length > 0}
       {#each filteredListItems as listItem, i}
-        {#if maxItemsToShowInList <= 0 || i < maxItemsToShowInList}
-          <div
-            class="autocomplete-list-item {i === highlightIndex ? 'selected' : ''}"
-            on:click={() => onListItemClick(listItem)}>
-            {#if listItem.highlighted}
-              {@html listItem.highlighted.label}
-            {:else}
-              {@html listItem.label}
-            {/if}
-          </div>
-        {/if}
+        <div
+          class="autocomplete-list-item {i === highlightIndex ? 'selected' : ''}"
+          on:click={() => onListItemClick(listItem)}>
+          {#if listItem.highlighted}
+            {@html listItem.highlighted.label}
+          {:else}
+            {@html listItem.label}
+          {/if}
+        </div>
       {/each}
 
-      {#if maxItemsToShowInList > 0 && filteredListItems.length > maxItemsToShowInList}
-        <div class="autocomplete-list-item-no-results">
-          ...{filteredListItems.length - maxItemsToShowInList} results not shown
-        </div>
+      {#if hiddenFilteredListItems > 0}
+        <div class="autocomplete-list-item-no-results">...{hiddenFilteredListItems} results not shown</div>
       {/if}
     {:else if noResultsText}
       <div class="autocomplete-list-item-no-results">{noResultsText}</div>

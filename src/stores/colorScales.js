@@ -1,0 +1,93 @@
+import {
+  interpolateYlOrRd,
+  interpolateBlues,
+  interpolateBrBG,
+  interpolateBuGn,
+  interpolateBuPu,
+  interpolateCividis,
+  interpolateCool,
+  interpolateCubehelixDefault,
+  interpolateGnBu,
+  interpolateGreens,
+  interpolateGreys,
+  interpolateInferno,
+  interpolateMagma,
+  interpolateOrRd,
+  interpolateOranges,
+  interpolatePRGn,
+  interpolatePiYG,
+  interpolatePlasma,
+  interpolatePuBu,
+  interpolatePuBuGn,
+  interpolatePuOr,
+  interpolatePuRd,
+  interpolatePurples,
+  interpolateRainbow,
+  interpolateRdBu,
+  interpolateRdGy,
+  interpolateRdPu,
+  interpolateRdYlBu,
+  interpolateRdYlGn,
+  interpolateReds,
+  interpolateSinebow,
+  interpolateSpectral,
+  interpolateTurbo,
+  interpolateViridis,
+  interpolateWarm,
+  interpolateYlGn,
+  interpolateYlGnBu,
+  interpolateYlOrBr,
+} from 'd3-scale-chromatic';
+
+const lookup = {
+  interpolateYlOrRd,
+  interpolateBlues,
+  interpolateBrBG,
+  interpolateBuGn,
+  interpolateBuPu,
+  interpolateCividis,
+  interpolateCool,
+  interpolateCubehelixDefault,
+  interpolateGnBu,
+  interpolateGreens,
+  interpolateGreys,
+  interpolateInferno,
+  interpolateMagma,
+  interpolateOrRd,
+  interpolateOranges,
+  interpolatePRGn,
+  interpolatePiYG,
+  interpolatePlasma,
+  interpolatePuBu,
+  interpolatePuBuGn,
+  interpolatePuOr,
+  interpolatePuRd,
+  interpolatePurples,
+  interpolateRainbow,
+  interpolateRdBu,
+  interpolateRdGy,
+  interpolateRdPu,
+  interpolateRdYlBu,
+  interpolateRdYlGn,
+  interpolateReds,
+  interpolateSinebow,
+  interpolateSpectral,
+  interpolateTurbo,
+  interpolateViridis,
+  interpolateWarm,
+  interpolateYlGn,
+  interpolateYlGnBu,
+  interpolateYlOrBr,
+};
+
+export const DEFAULT_COLOR_SCALE = interpolateYlOrRd;
+
+export function resolveColorScale(colorScale) {
+  if (!colorScale) {
+    return DEFAULT_COLOR_SCALE;
+  }
+  if (typeof colorScale === 'function') {
+    return colorScale;
+  }
+  return lookup[colorScale.toString()] || DEFAULT_COLOR_SCALE;
+}
