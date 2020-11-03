@@ -8,6 +8,8 @@ The current stable `main` version is deployed at https://cmu-delphi-covidcast.ne
 
 The next `dev` version is deployed at https://dev--cmu-delphi-covidcast.netlify.app/.
 
+The experimental signal `staging` version is deployed at https://staging--cmu-delphi-covidcast.netlify.app/.
+
 ## Figma Mock-Ups
 
 Located at: https://www.figma.com/file/CZ3YwWBL2md9j39qdcBfDs/COVIDCast?node-id=0%3A1
