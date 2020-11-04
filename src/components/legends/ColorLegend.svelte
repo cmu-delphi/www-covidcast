@@ -31,6 +31,7 @@
     width: 48vw;
     max-width: 536px;
     font-size: 0.72em;
+    user-select: none;
   }
 
   @media only screen and (max-width: 767px) {

@@ -116,6 +116,7 @@
   .root > :global(.options-container) {
     grid-area: options;
     z-index: 1010;
+    margin-left: 0.25em;
   }
 
   .root > :global(.search-container) {
