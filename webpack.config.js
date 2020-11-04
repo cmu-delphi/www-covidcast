@@ -16,6 +16,7 @@ const hmr = devMode;
 module.exports = () => {
   return {
     entry: {
+      wrapper: './src/wrapper/index.js',
       bundle: './src/index.js',
     },
 
@@ -46,7 +47,7 @@ module.exports = () => {
             enforce: true,
           },
           vendor: {
-            test: /[\\/]node_modules[\\/]/,
+            test: /[\\/]node_modules[\\/](?!(uikit)\/)/,
             name: 'vendors',
             chunks: 'all',
           },
@@ -86,7 +87,7 @@ module.exports = () => {
               ],
         },
         {
-          test: /\.css$/,
+          test: /\.(sass|css|scss)$/i,
           use: [
             {
               loader: MiniCssExtractPlugin.loader,
@@ -96,6 +97,7 @@ module.exports = () => {
               },
             },
             'css-loader',
+            'sass-loader',
           ],
         },
         {
