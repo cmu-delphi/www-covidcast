@@ -56,7 +56,7 @@
 </style>
 
 <div class="container-bg container-style uk-grid-small {className}" data-uk-grid>
-  <div class="uk-width-1-1 uk-width-1-3@m block">
+  <div class="uk-width-1-1 uk-width-1-{showDate ? '3' : '2'}@m block">
     <span class="uk-form-label">Displaying</span>
     <div class="uk-form-controls">
       <select id="option-indicator" aria-label="indicator options" class="uk-select" bind:value={$currentSensor}>
@@ -74,7 +74,7 @@
       </select>
     </div>
   </div>
-  <div class="uk-width-1-1 uk-width-1-3@m block">
+  <div class="uk-width-1-1 uk-width-1-{showDate ? '3' : '2'}@m block">
     <span class="uk-form-label">for</span>
     <div class="uk-form-controls">
       <select id="option-geo-level" aria-label="geographic level" class="uk-select" bind:value={$currentLevel}>

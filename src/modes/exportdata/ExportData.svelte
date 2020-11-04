@@ -170,13 +170,6 @@
     padding: 1em;
   }
 
-  pre {
-    padding: 0.2em;
-    background: #efefef;
-    overflow: auto;
-    white-space: pre;
-  }
-
   .description {
     padding: 0;
     font-size: 80%;
@@ -311,25 +304,25 @@
     </div>
     {#if currentMode === 'python'}
       <p>Install <code>covidcast</code> via pip:</p>
-      <pre>pip install covidcast</pre>
+      <pre><code>pip install covidcast</code></pre>
       <p>Fetch data:</p>
-      <pre>
+      <pre><code>
         {`from datetime import date
 import covidcast
 
 data = covidcast.signal("${source ? source.id : ''}", "${signal ? signal.signal : ''}",
                         date(${startDate.getFullYear()}, ${startDate.getMonth() + 1}, ${startDate.getDate()}), date(${endDate.getFullYear()}, ${endDate.getMonth() + 1}, ${endDate.getDate()}),
                         "${geoType}")`}
-      </pre>
+      </code></pre>
       <p class="description">
         For more details and examples, see the <a href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/">package
           documentation.</a>
       </p>
     {:else if currentMode === 'r'}
       <p>Install <code>covidcast</code> using <a href="https://devtools.r-lib.org/">devtools</a> :</p>
-      <pre>devtools::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/covidcast")</pre>
+      <pre><code>devtools::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/covidcast")</code></pre>
       <p>Fetch data:</p>
-      <pre>
+      <pre><code>
         {`library(covidcast)
 
 cc_data <- suppressMessages(
@@ -337,7 +330,7 @@ covidcast_signal(data_source = "${source ? source.id : ''}", signal = "${signal 
                  start_day = "${iso(startDate)}", end_day = "${iso(endDate)}",
                  geo_type = "${geoType}")
 )`}
-      </pre>
+      </code></pre>
       <p class="description">
         For more details and examples, see the <a href="https://cmu-delphi.github.io/covidcast/covidcastR/">package
           documentation.</a>
