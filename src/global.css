@@ -20,24 +20,6 @@
   flex-direction: column;
 }
 
-button.mapboxgl-popup-close-button {
-  padding: 2px;
-  color: var(--grey);
-}
-
-#vizbox button:focus {
-  border: 0;
-  z-index: 10000;
-  background-color: var(--lightgrey);
-}
-
-#vizbox input:focus,
-#vizbox select:focus {
-  z-index: 10000;
-  background-color: var(--lightgrey);
-  box-shadow: 0 2px var(--grey);
-}
-
 .mapboxgl-canvas:focus {
   outline: none;
 }
