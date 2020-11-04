@@ -170,31 +170,6 @@
     padding: 1em;
   }
 
-  .block {
-    display: inline-block;
-    display: flex;
-    flex-direction: column;
-    padding: 0.2em;
-    width: 20em;
-  }
-
-  .group label {
-    font-weight: bold;
-  }
-
-  .group {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
-  button {
-    width: auto;
-  }
-
-  section {
-    padding: 1em;
-  }
-
   pre {
     padding: 0.2em;
     background: #efefef;
@@ -210,21 +185,6 @@
   form {
     visibility: hidden;
   }
-
-  .buttons {
-    display: flex;
-    align-items: center;
-  }
-
-  .buttons > button {
-    min-width: 5em;
-  }
-
-  @media only screen and (max-width: 710px) {
-    .block {
-      width: 100%;
-    }
-  }
 </style>
 
 <div class="root" class:loading>
@@ -234,80 +194,88 @@
     includes numerous other signals.
   </p>
   <section>
-    <h5>1. Select Signal</h5>
-    <div class="group">
-      <div class="block">
-        <label for="ds">Data Sources</label>
-        <select id="ds" bind:value={sourceValue} size="8">
-          {#each sources as source}
-            <option value={source.id}>{source.name}</option>
-          {/each}
-        </select>
-      </div>
-      <div class="block">
-        <label for="s">Signals</label>
-        <select id="s" bind:value={signalValue} required size="8">
-          {#if source}
-            {#each source.signals as signal}
-              <option value={signal.id}>{signal.name}</option>
+    <h4>1. Select Signal</h4>
+    <div data-uk-grid class="uk-form-stacked">
+      <div class="uk-width-1-3@m uk-width-expand@s">
+        <label for="ds" class="uk-form-label">Data Sources</label>
+        <div class="uk-form-controls">
+          <select id="ds" bind:value={sourceValue} size="8" class="uk-select">
+            {#each sources as source}
+              <option value={source.id}>{source.name}</option>
             {/each}
-          {:else}
-            <option value="">Select a Data Source first</option>
-          {/if}
-        </select>
+          </select>
+        </div>
       </div>
-      <div class="block">
+      <div class="uk-width-1-3@m uk-width-expand@s">
+        <label for="s" class="uk-form-label">Signals</label>
+        <div class="uk-form-controls">
+          <select id="s" bind:value={signalValue} required size="8" class="uk-select">
+            {#if source}
+              {#each source.signals as signal}
+                <option value={signal.id}>{signal.name}</option>
+              {/each}
+            {:else}
+              <option value="">Select a Data Source first</option>
+            {/if}
+          </select>
+        </div>
+      </div>
+      <div class="uk-width-1-3@m uk-width-expand@s">
         {#if signal}
-          <h6>{signal.name}</h6>
-          <p>{signal.description}</p>
+          <span class="uk-form-label">{signal.name}</span>
+          <div class="uk-form-controls-text">{signal.description}</div>
         {/if}
       </div>
     </div>
   </section>
-  <section>
-    <h5>2. Specify Parameters</h5>
+  <section class="uk-form-horizontal">
+    <h4>2. Specify Parameters</h4>
     <div>
-      <span>Date Range</span>
-      <Datepicker
-        bind:selected={startDate}
-        start={source ? source.minTime : new Date()}
-        end={minDate(endDate, source ? source.maxTime : new Date())}
-        formattedSelected={iso(startDate)}>
-        <button aria-label="selected start date" class="pg-button" on:>{iso(startDate)}</button>
-      </Datepicker>
-      -
-      <Datepicker
-        bind:selected={endDate}
-        start={maxDate(startDate, source ? source.minTime : new Date())}
-        end={source ? source.maxTime : new Date()}
-        formattedSelected={iso(endDate)}>
-        <button aria-label="selected end date" class="pg-button" on:>{iso(endDate)}</button>
-      </Datepicker>
+      <span class="uk-form-label">Date Range</span>
+      <div class="uk-form-controls">
+        <Datepicker
+          bind:selected={startDate}
+          start={source ? source.minTime : new Date()}
+          end={minDate(endDate, source ? source.maxTime : new Date())}
+          formattedSelected={iso(startDate)}>
+          <button aria-label="selected start date" class="uk-input" on:>{iso(startDate)}</button>
+        </Datepicker>
+        -
+        <Datepicker
+          bind:selected={endDate}
+          start={maxDate(startDate, source ? source.minTime : new Date())}
+          end={source ? source.maxTime : new Date()}
+          formattedSelected={iso(endDate)}>
+          <button aria-label="selected end date" class="uk-input" on:>{iso(endDate)}</button>
+        </Datepicker>
+      </div>
     </div>
     <div>
-      <label for="geo">Geographic Level</label>
-      <select id="geo" bind:value={geoType}>
-        {#each levelList as level}
-          <option value={level.id} disabled={!source || !source.levels.has(level.id)}>{level.labelPlural}</option>
-        {/each}
-      </select>
-      <p class="description">
-        Each geographic region is identified with a unique identifier, such as FIPS code. See the <a
-          href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">
-          geographic coding documentation
-        </a> for details.
-      </p>
+      <label for="geo" class="uk-form-label">Geographic Level</label>
+      <div class="uk-form-controls">
+        <select id="geo" bind:value={geoType} class="uk-select">
+          {#each levelList as level}
+            <option value={level.id} disabled={!source || !source.levels.has(level.id)}>{level.labelPlural}</option>
+          {/each}
+        </select>
+        <p class="description">
+          Each geographic region is identified with a unique identifier, such as FIPS code. See the <a
+            href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">
+            geographic coding documentation
+          </a> for details.
+        </p>
+      </div>
     </div>
   </section>
   <section>
-    <h5>3. Get Data</h5>
+    <h4>3. Get Data</h4>
     <p>
       We are happy for you to use this data in products and publications. Please acknowledge us as a source: <cite> Data
         from Delphi COVIDcast, covidcast.cmu.edu. </cite>
     </p>
-    <div class="buttons">
+    <div class="uk-button-group">
       <button
-        class="pg-button button"
+        class="uk-button uk-button-default"
         data-testid="csv"
         on:click={() => {
           currentMode = 'csv';
@@ -320,9 +288,9 @@
       </button>
       <button
         aria-pressed={String(currentMode === 'python')}
+        class="uk-button uk-button-default"
         data-testid="python"
-        class="pg-button button"
-        class:selected={currentMode === 'python'}
+        class:uk-active={currentMode === 'python'}
         on:click={() => {
           currentMode = 'python';
         }}
@@ -331,9 +299,9 @@
       </button>
       <button
         aria-pressed={String(currentMode === 'r')}
-        class="pg-button button"
+        class="uk-button uk-button-default"
         data-testid="r"
-        class:selected={currentMode === 'r'}
+        class:uk-active={currentMode === 'r'}
         on:click={() => {
           currentMode = 'r';
         }}
