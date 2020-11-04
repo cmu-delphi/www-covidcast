@@ -90,14 +90,3 @@
 .pg-button-group > .selected:focus {
   background-color: #b9b7b7 !important;
 }
-
-.pg-button-group .pg-button.selected:nth-child(n + 2) {
-}
-
-.pg-button-group .pg-button.selected:nth-last-child(n + 2) {
-}
-
-.pg-button-vertical-group .pg-button.selected:nth-child(n + 2) {
-}
-.pg-button-vertical-group .pg-button.selected:nth-last-child(n + 2) {
-}
