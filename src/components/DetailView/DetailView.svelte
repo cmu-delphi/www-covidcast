@@ -171,6 +171,7 @@
       <button
         title="Show sensor description"
         class="pg-button pg-button-circle info"
+        data-uk-toggle="target: #info-dialog"
         on:click={() => {
           currentInfoSensor.set(sensor);
         }}><IoMdHelp /></button>
