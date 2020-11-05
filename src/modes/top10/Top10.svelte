@@ -174,12 +174,19 @@
     return data;
   });
 
-  function maxNested(rows) {
-    return rows.flat().reduce((acc, v) => Math.max(acc, v.value), 0);
+  // Returns the max value for all rows of all locations.
+  // arrayOfRows is an array of top locations, and for each location, the rows of that location.
+  // field is the name of the field to check.  pValue is auto-replaced with value.
+  function maxNested(arrayOfRows, field) {
+    if (arrayOfRows.length === 0) {
+      return 0;
+    }
+    field = field === 'pValue' ? 'value' : field;
+    return arrayOfRows.flat().reduce((acc, v) => Math.max(acc, v[field] != null ? v[field] : 0), 0);
   }
 
   // compute local maxima
-  $: primaryDomain = Promise.all(primaryData).then((rows) => [0, maxNested(rows)]);
+  $: primaryDomain = Promise.all(primaryData).then((rows) => [0, maxNested(rows, primaryField)]);
 
   $: otherDataAndDomain = otherSensors.map((sensor) => {
     const data = sortedRows.map((row) =>
@@ -187,7 +194,8 @@
         geo_value: row.propertyId,
       }).then((r) => addMissing(r)),
     );
-    const domain = Promise.all(data).then((rows) => [0, maxNested(rows)]);
+    const field = primaryValue(sensor, ratioOptions);
+    const domain = Promise.all(data).then((rows) => [0, maxNested(rows, field)]);
     return { data, domain };
   });
 

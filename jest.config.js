@@ -4,7 +4,7 @@ module.exports = {
     '^.+\\.js$': 'babel-jest',
   },
   // // transform all files including node modules
-  transformIgnorePatterns: ['node_modules/(?!(svelte|svelte-icons)/)'],
+  transformIgnorePatterns: ['node_modules/(?!(svelte|svelte-icons|lodash-es)/)'],
   moduleFileExtensions: ['js', 'svelte'],
   moduleNameMapper: {
     // special module loading
