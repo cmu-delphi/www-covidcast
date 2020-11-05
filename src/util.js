@@ -1,6 +1,6 @@
 import { rgb, hsl } from 'd3-color';
 import ResizeObserver from 'resize-observer-polyfill';
-import { debounce } from 'lodash-es';
+import debounce from 'lodash-es/debounce';
 
 export function getTextColorBasedOnBackground(bgColor) {
   const color = hsl(bgColor);
