@@ -1,11 +1,9 @@
 <script>
   import { sensorList, currentSensor, smallMultipleTimeSpan, currentDate, currentInfoSensor } from '../../stores';
-  import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
   import { trackEvent } from '../../stores/ga';
   import throttle from 'lodash-es/throttle';
   import { levelList } from '../../stores/constants';
   import SmallMultiple from './SmallMultiple.svelte';
-  import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
   import { prepareSensorData, resolveClickedTimeValue, resolveHighlightedTimeValue } from './vegaSpec';
 
   /**
@@ -68,29 +66,12 @@
     padding: 0 0 0 0.25em;
   }
 
-  .title-button {
-    flex: 1 1 0;
-    padding: 0;
-    cursor: pointer;
-    display: block;
-    background: none;
-    border: none;
-    outline: none !important;
-    text-align: left;
-    color: inherit;
-    font-size: 1em;
-    line-height: 1.5em;
-    margin: 0;
+  .grow {
+    flex-grow: 1;
   }
 
-  .title-button:hover,
-  .title-button:focus,
-  li.selected .title-button {
-    color: black;
-  }
-
-  :global(#vizbox) .title-button:focus {
-    box-shadow: unset !important;
+  li.selected .uk-button-text::before {
+    right: 0;
   }
 
   .header {
@@ -147,7 +128,7 @@
       <div class="header">
         <!-- svelte-ignore a11y-missing-attribute -->
         <button
-          class="title-button"
+          class="uk-button uk-button-text"
           title={typeof s.sensor.tooltipText === 'function' ? s.sensor.tooltipText() : s.sensor.tooltipText}
           on:click|preventDefault={() => {
             trackEvent('side-panel', 'set-sensor', s.sensor.key);
@@ -155,27 +136,28 @@
           }}>
           {typeof s.sensor.mapTitleText === 'function' ? s.sensor.mapTitleText() : s.sensor.name}
         </button>
+        <div class="grow" />
         <div class="toolbar">
           {#if s.sensor.description}
             <button
               title="Show sensor description"
-              class="pg-button info"
+              class="uk-icon-button uk-icon-button-small"
               data-uk-toggle="target: #info-dialog"
+              data-uk-icon="icon: question-plain"
               on:click={() => {
                 currentInfoSensor.set(s.sensor);
-              }}><IoMdHelp /></button>
+              }} />
           {/if}
           <button
-            class="pg-button"
+            class="uk-icon-button uk-icon-button-small"
             class:hidden={!hasRegion}
             title="Show as detail view"
-            class:active={detail === s.sensor}
+            class:uk-active={detail === s.sensor}
+            data-uk-icon="icon: search; ratio: 0.8"
             on:click|stopPropagation={() => {
               trackEvent('side-panel', detail === s.sensor ? 'hide-detail' : 'show-detail', s.sensor.key);
               detail = detail === s.sensor ? null : s.sensor;
-            }}>
-            <FaSearchPlus />
-          </button>
+            }} />
         </div>
       </div>
       <SmallMultiple {s} {highlightTimeValue} {onClick} {onHighlight} />

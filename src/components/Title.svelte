@@ -1,6 +1,5 @@
 <script>
   import { currentSensorMapTitle, currentDateObject, currentInfoSensor, currentSensorEntry } from '../stores';
-  import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
 
   export let showDate = false;
 </script>
@@ -17,8 +16,6 @@
   }
 
   .info {
-    width: 1.5em;
-    height: 1.5em;
     display: inline-block;
   }
 </style>
@@ -28,11 +25,12 @@
     {$currentSensorMapTitle}
     <button
       title="Show sensor description"
-      class="pg-button pg-button-circle info"
+      class="uk-icon-button uk-icon-button-small info"
+      data-uk-icon="icon: question-plain"
       data-uk-toggle="target: #info-dialog"
       on:click={() => {
         currentInfoSensor.set($currentSensorEntry);
-      }}><IoMdHelp /></button>
+      }} />
   </span>
   {#if showDate}<span data-testid="currentdate">{$currentDateObject.toLocaleDateString()}</span>{/if}
 </h2>

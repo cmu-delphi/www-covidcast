@@ -30,3 +30,8 @@
   position: relative;
   z-index: 1;
 }
+
+.uk-icon-button-small {
+  width: 20px;
+  height: 20px;
+}

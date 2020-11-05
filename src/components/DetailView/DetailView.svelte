@@ -3,14 +3,11 @@
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../Vega.svelte';
   import { createSpec, patchSpec } from './vegaSpec';
-  import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
   import { levelMegaCounty, primaryValue } from '../../stores/constants';
   import EncodingOptions from '../EncodingOptions.svelte';
   import { trackEvent } from '../../stores/ga';
   import VegaTooltip from './VegaTooltip.svelte';
-  import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
-  import IoIosSave from 'svelte-icons/io/IoIosSave.svelte';
   import { downloadUrl } from '../../data/screenshot';
 
   const dispatch = createEventDispatcher();
@@ -105,9 +102,15 @@
     flex: 1 1 0;
   }
 
+  .buttons {
+    z-index: 10;
+    position: absolute;
+    right: 0.5em;
+    top: 0.5em;
+  }
+
   .vega-wrapper {
     position: relative;
-    top: -25px;
   }
   .vega-wrapper > :global(*) {
     position: absolute;
@@ -115,19 +118,6 @@
     top: 0;
     right: 0;
     bottom: 0;
-  }
-
-  .header {
-    position: relative;
-  }
-
-  .header .buttons {
-    float: right;
-  }
-
-  .header button {
-    z-index: 10;
-    margin-left: 1em;
   }
 
   .encoding {
@@ -151,42 +141,34 @@
     margin-left: 0.5em;
     opacity: 0.2;
   }
-
-  .info {
-    font-size: 0.7rem;
-    display: inline-block;
-  }
 </style>
 
-<div class="header">
-  <div class="buttons">
+<div class="buttons">
+  <button
+    title="Download this view"
+    class="uk-icon-button"
+    data-uk-icon="icon: download"
+    on:click={downloadVega}
+    disabled={!vegaRef} />
+  {#if sensor.description}
     <button
-      title="Download this view"
-      class="pg-button pg-button-circle info"
-      on:click={downloadVega}
-      disabled={!vegaRef}>
-      <IoIosSave />
-    </button>
-    {#if sensor.description}
-      <button
-        title="Show sensor description"
-        class="pg-button pg-button-circle info"
-        data-uk-toggle="target: #info-dialog"
-        on:click={() => {
-          currentInfoSensor.set(sensor);
-        }}><IoMdHelp /></button>
-    {/if}
-    <button
-      bind:this={close}
-      class="pg-button pg-button-circle info"
+      title="Show sensor description"
+      class="uk-icon-button"
+      data-uk-icon="icon: question-plain"
+      data-uk-toggle="target: #info-dialog"
       on:click={() => {
-        trackEvent('detail-view', 'close', 'button');
-        dispatch('close');
-      }}
-      title="Close this detail view">
-      <IoIosClose />
-    </button>
-  </div>
+        currentInfoSensor.set(sensor);
+      }} />
+  {/if}
+  <button
+    bind:this={close}
+    class="uk-icon-button"
+    data-uk-close
+    on:click={() => {
+      trackEvent('detail-view', 'close', 'button');
+      dispatch('close');
+    }}
+    title="Close this detail view" />
 </div>
 <div class="single-sensor-chart vega-wrapper">
   <Vega
