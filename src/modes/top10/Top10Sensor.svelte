@@ -36,7 +36,7 @@
 
   $: patchedSpec = createSpec(sensor, [{ info: row, color: MAP_THEME.selectedRegionOutline }], null, {
     field: sensor.format !== 'percent' ? field : undefined,
-    domain: [0, 100],
+    // domain: [0, 100],  // 100 only makes sense for 100%.
   });
 
   let loading = false;

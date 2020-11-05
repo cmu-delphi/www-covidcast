@@ -4,7 +4,7 @@ import {
   stdErrLayer,
   stdErrTransform,
 } from '../../components/DetailView/vegaSpec';
-import { addMissing, fetchTimeSlice } from '../../data';
+import { addMissing, fetchTimeSlice, formatAPITime } from '../../data';
 import { levelMegaCounty } from '../../stores/constants';
 
 function fetchMulti(sensor, selections, startDay, endDay) {
@@ -70,16 +70,10 @@ export function prepareSensorData(sensor, selections, startDay, endDay) {
 
 export function resolveHighlightedTimeValue(e) {
   const highlighted = e.detail.value;
-  const id = highlighted && Array.isArray(highlighted._vgsid_) ? highlighted._vgsid_[0] : null;
-
-  if (!id) {
-    return null;
+  if (highlighted && Array.isArray(highlighted.date_value) && highlighted.date_value.length > 0) {
+    return Number.parseInt(formatAPITime(highlighted.date_value[0]), 10);
   }
-  const row = e.detail.view.data('data_0').find((d) => d._vgsid_ === id);
-  if (row.value == null) {
-    return;
-  }
-  return row ? row.time_value : null;
+  return null;
 }
 
 export function resolveClickedTimeValue(e) {
@@ -109,17 +103,22 @@ const stdErrTransformPercent = [
  */
 export function createSpec(sensor, selections, dateRange, valuePatch) {
   const isPercentage = sensor.format === 'percent';
-  const yField = valuePatch && valuePatch.field ? valuePatch.field : isPercentage ? 'pValue' : 'value';
-  const yMax = valuePatch && valuePatch.domain ? valuePatch.domain[1] : 0;
-
   const scalePercent = isPercentage ? (v) => v / 100 : (v) => v;
+
+  const clipping = valuePatch && valuePatch.domain ? true : false;
+  const yMax = clipping ? valuePatch.domain[1] : 0;
+  const yMaxScaled = scalePercent(yMax);
+
+  const yField = valuePatch && valuePatch.field ? valuePatch.field : isPercentage ? 'pValue' : 'value';
+  // console.info('yMax', yMax, 'clipping', clipping, 'yField', yField);
+
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
   const spec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
     data: { name: 'values' },
-    padding: { left: 50, top: 4, bottom: 16, right: 2 },
+    padding: { left: 50, top: 9, bottom: 16, right: 2 },
     autosize: {
       type: 'none',
       contains: 'padding',
@@ -132,7 +131,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
         as: 'pValue',
       },
       {
-        calculate: 'datum.value == null ? false : datum.value > ' + yMax,
+        calculate: !clipping + '|| datum.' + yField + ' == null ? false : datum.' + yField + ' > ' + yMaxScaled,
         as: 'clipped',
       },
       {
@@ -148,18 +147,21 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
           {
             op: 'lag',
             field: 'notClipped',
-            as: 'startClipping',
+            as: 'maybeStartClipping',
           },
           {
             op: 'lead',
             field: 'notClipped',
-            as: 'endClipping',
+            as: 'maybeEndClipping',
           },
         ],
       },
 
-      { calculate: '(datum.clipped && datum.startClipping) ? datum.' + yField + ' : null', as: 'startClippedData' },
-      { calculate: '(datum.clipped && datum.endClipping) ? datum.' + yField + ' : null', as: 'endClippedData' },
+      {
+        calculate: '(datum.clipped && datum.maybeStartClipping) ? datum.' + yField + ' : null',
+        as: 'startClippedData',
+      },
+      { calculate: '(datum.clipped && datum.mayeEndClipping) ? datum.' + yField + ' : null', as: 'endClippedData' },
     ],
     resolve: {
       scale: { y: 'shared' },
@@ -196,8 +198,8 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
             field: yField,
             type: 'quantitative',
             scale: {
-              domainMin: valuePatch && valuePatch.domain ? scalePercent(valuePatch.domain[0]) : 0,
-              domainMax: valuePatch && valuePatch.domain ? scalePercent(valuePatch.domain[1]) : undefined,
+              domainMin: clipping ? scalePercent(valuePatch.domain[0]) : 0,
+              domainMax: clipping ? scalePercent(valuePatch.domain[1]) : undefined,
               clamp: true,
             },
             axis: {
@@ -215,9 +217,9 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
           type: 'line',
           interpolate: 'linear',
           stroke: 'red',
-          strokeWidth: 6.5,
+          strokeWidth: 6,
           strokeOpacity: 0.25,
-          yOffset: -3.5,
+          yOffset: -3,
         },
         encoding: {
           y: {
@@ -230,9 +232,9 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
         mark: {
           type: 'text',
           text: '\u21BF',
-          size: 12,
+          size: 11,
           baseline: 'bottom',
-          dy: 3,
+          dy: 2,
           stroke: 'red',
         },
         encoding: {
@@ -246,9 +248,9 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
         mark: {
           type: 'text',
           text: '\u21C2',
-          size: 12,
+          size: 11,
           baseline: 'bottom',
-          dy: 3,
+          dy: 2,
           stroke: 'red',
         },
         encoding: {

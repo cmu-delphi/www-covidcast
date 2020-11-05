@@ -8,6 +8,7 @@
     currentDateObject,
     currentRegionInfo,
     selectByInfo,
+    smallMultipleTimeSpan,
   } from '../../stores';
   import { addMissing, fetchRegionSlice, fetchTimeSlice } from '../../data/fetchData';
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
@@ -174,12 +175,51 @@
     return data;
   });
 
-  function maxNested(rows) {
-    return rows.flat().reduce((acc, v) => Math.max(acc, v.value), 0);
+  // Compute the neighborhood around the current date.
+  const date = $currentDateObject.getTime();
+  const [startDate, endDate] = $smallMultipleTimeSpan;
+  const timespan = endDate.getTime() - startDate.getTime();
+  $: neighborhood = { start: date - timespan / 2, end: date + timespan / 2 };
+  // Shift the neighborhood to be within the smallMultipleTimeSpan.
+  $: {
+    let offset = startDate.getTime() - neighborhood.start;
+    if (offset <= 0) {
+      // neighborhood starts after startDate, so then check endDate
+      offset = endDate.getTime() - neighborhood.end;
+      if (offset >= 0) {
+        // neighborhood ends before endDate, so no offset
+        offset = 0;
+      }
+    }
+    // Apply the offset.
+    neighborhood.start = neighborhood.start + offset;
+    neighborhood.end = neighborhood.end + offset;
+    console.info('start', new Date(neighborhood.start), 'end', new Date(neighborhood.end));
+  }
+
+  // Returns the max value for all rows of all locations.
+  // rowsOfRows is an array for all locations of the rows for each location.
+  function maxNested(rowsOfRows, field) {
+    // console.info('num locations', rowsOfRows.length, 'primaryField', primaryField);
+    if (rowsOfRows.length === 0) {
+      return 0;
+    }
+
+    // Filter rows to only include the neighborhood.
+    const filterInNeighborhood = (rows) =>
+      rows.filter((row) => row.date_value >= neighborhood.start && row.date_value <= neighborhood.end);
+    return rowsOfRows
+      .map(filterInNeighborhood)
+      .flat()
+      .reduce((acc, v) => Math.max(acc, v[field] != null ? v[field] : 0), 0);
   }
 
   // compute local maxima
-  $: primaryDomain = Promise.all(primaryData).then((rows) => [0, maxNested(rows) / 2]);
+  $: primaryDomain = Promise.all(primaryData).then((rows) => {
+    // Field to find max of.  If primaryField is 'pValue', use 'value' instead, since that is assumed.
+    const field = primaryField === 'pValue' ? 'value' : primaryField;
+    return [0, maxNested(rows, field)];
+  });
 
   $: otherDataAndDomain = otherSensors.map((sensor) => {
     const data = sortedRows.map((row) =>
@@ -187,7 +227,11 @@
         geo_value: row.propertyId,
       }).then((r) => addMissing(r)),
     );
-    const domain = Promise.all(data).then((rows) => [0, maxNested(rows) / 2]);
+    let field = primaryValue(sensor, ratioOptions);
+    field = field === 'pValue' ? 'value' : field;
+    const domain = Promise.all(data).then((rows) => {
+      return [0, maxNested(rows, field)];
+    });
     return { data, domain };
   });
 
