@@ -215,11 +215,7 @@
   }
 
   // compute local maxima
-  $: primaryDomain = Promise.all(primaryData).then((rows) => {
-    // Field to find max of.  If primaryField is 'pValue', use 'value' instead, since that is assumed.
-    const field = primaryField === 'pValue' ? 'value' : primaryField;
-    return [0, maxNested(rows, field)];
-  });
+  $: primaryDomain = Promise.all(primaryData).then((rows) => [0, maxNested(rows, primaryField)]);
 
   $: otherDataAndDomain = otherSensors.map((sensor) => {
     const data = sortedRows.map((row) =>
@@ -227,11 +223,8 @@
         geo_value: row.propertyId,
       }).then((r) => addMissing(r)),
     );
-    let field = primaryValue(sensor, ratioOptions);
-    field = field === 'pValue' ? 'value' : field;
-    const domain = Promise.all(data).then((rows) => {
-      return [0, maxNested(rows, field)];
-    });
+    const field = primaryValue(sensor, ratioOptions);
+    const domain = Promise.all(data).then((rows) => [0, maxNested(rows, field)]);
     return { data, domain };
   });
 

@@ -237,10 +237,6 @@
     }
   });
 
-  // const debouncedResize = debounce(() => {
-  //   window.dispatchEvent(new Event('resize'));
-  // }, 250);
-
   afterUpdate(() => {
     debouncedResize();
   });

@@ -1,6 +1,6 @@
 import { rgb, hsl } from 'd3-color';
 import ResizeObserver from 'resize-observer-polyfill';
-import { debounce } from 'lodash-es';
+import debounce from 'lodash-es/debounce';
 
 export function getTextColorBasedOnBackground(bgColor) {
   const color = hsl(bgColor);
@@ -54,19 +54,15 @@ export function unobserveResize(element) {
   observer.unobserve(element);
 }
 
-// {
-//   /* <input type="text" bind:value="inputValue" />
-// oncreate () {
-//   this.observe('inputValue', debounce((inputValue) => {
-//     this.set({ search: inputValue })
-//   }, 250))
-// }, */
-// }
-
+/**
+ * Returns a function that dispatches a resize event
+ * but debounced so that it will only be sent if there
+ * is no previous call within the debounce time, 100ms.
+ */
 export const debouncedResize = debounce(
   () => {
     window.dispatchEvent(new Event('resize'));
   },
-  1,
+  100,
   { leading: false, trailing: true },
 );
