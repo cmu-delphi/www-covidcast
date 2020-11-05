@@ -28,19 +28,21 @@
     padding: 0 4px;
   }
 
-  .encoding-button {
+  .choropleth > :global(svg),
+  .bubble > :global(svg),
+  .spike > :global(svg) {
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
   }
 
-  .choropleth {
+  .choropleth > :global(svg) {
     background-image: url('../assets/imgs/choropleth_small.png');
   }
-  .bubble {
+  .bubble > :global(svg) {
     background-image: url('../assets/imgs/bubble_small.png');
   }
-  .spike {
+  .spike > :global(svg) {
     background-image: url('../assets/imgs/spike_small.png');
   }
 
@@ -93,37 +95,31 @@
     <div class="uk-vertical-button-group">
       <button
         aria-pressed={$encoding === 'color' ? 'true' : 'false'}
-        class="uk-button uk-button-default uk-button-small"
+        class="uk-button uk-button-default uk-button-small choropleth"
         class:uk-active={$encoding === 'color'}
-        data-uk-icon="icon: dummy"
+        data-uk-icon="icon: blank"
         on:click={() => {
           encoding.set('color');
         }}
-        title="Switch to Choropleth">
-        <svg width="20" height="20" viewBox="0 0 20 20" class="encoding-button choropleth" />
-      </button>
+        title="Switch to Choropleth" />
       <button
         aria-pressed={$encoding === 'bubble' ? 'true' : 'false'}
-        class="uk-button uk-button-default uk-button-small"
+        class="uk-button uk-button-default uk-button-small bubble"
         class:uk-active={$encoding === 'bubble'}
-        data-uk-icon="icon: dummy"
+        data-uk-icon="icon: blank"
         on:click={() => {
           encoding.set('bubble');
         }}
-        title="Switch to Bubble Map">
-        <svg width="20" height="20" viewBox="0 0 20 20" class="encoding-button bubble" />
-      </button>
+        title="Switch to Bubble Map" />
       <button
         aria-pressed={$encoding === 'spike' ? 'true' : 'false'}
-        class="uk-button uk-button-default uk-button-small"
+        class="uk-button uk-button-default uk-button-small spike"
         class:uk-active={$encoding === 'spike'}
-        data-uk-icon="icon: dummy"
+        data-uk-icon="icon: blank"
         on:click={() => {
           encoding.set('spike');
         }}
-        title="Switch to Spike Map">
-        <svg width="20" height="20" viewBox="0 0 20 20" class="encoding-button spike" />
-      </button>
+        title="Switch to Spike Map" />
     </div>
   {/if}
   {#if loading}
