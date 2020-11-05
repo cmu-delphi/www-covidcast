@@ -1,7 +1,6 @@
 <script>
   import MapBox from '../../components/MapBox/MapBox.svelte';
   import Options from '../../components/Options.svelte';
-  import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
   import FaChartLine from 'svelte-icons/fa/FaChartLine.svelte';
   import {
     signalType,
@@ -218,15 +217,6 @@
     opacity: 0.5;
   }
 
-  .selection-legend {
-    list-style-type: none;
-  }
-  .selection-legend::before {
-    content: '\25FC';
-    margin-left: -1em;
-    padding-right: 0.2em;
-  }
-
   .selection-legend:hover .selection-toolbar {
     opacity: 1;
   }
@@ -377,7 +367,9 @@
         </div>
       </div>
       <div class="panel-bottom-wrapper mobileHide">
-        <button class="pg-button pg-text-button" on:click={() => currentCompareSelection.set(showCompare ? null : [])}>
+        <button
+          class="uk-button uk-button-default uk-button-small"
+          on:click={() => currentCompareSelection.set(showCompare ? null : [])}>
           {showCompare ? 'Exit' : 'Open'} compare mode
         </button>
       </div>
@@ -386,15 +378,14 @@
   {#if showCompare}
     <div class="add-container">
       <div class="selection-container container-bg container-style">
-        <ul>
+        <ul class="uk-list uk-list-square uk-margin-remove">
           {#each selections as selection}
             <li class="selection-legend" style="color: {selection.color}">
               <button
-                class="selection-toolbar pg-button"
+                class="selection-toolbar uk-icon-button uk-icon-button-small"
                 on:click={() => removeCompare(selection.info)}
-                title="Remove selected">
-                <IoIosClose />
-              </button>
+                data-uk-icon="icon: close; ratio: 0.8"
+                title="Remove selected" />
               <span>{selection.info.displayName}</span>
             </li>
           {/each}
