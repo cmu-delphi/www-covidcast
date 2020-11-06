@@ -126,42 +126,45 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
     transform: [
       ...(sensor.hasStdErr ? (isPercentage ? stdErrTransformPercent : stdErrTransform) : []),
       {
-        calculate: 'datum.value == null ? null : datum.value / 100',
         as: 'pValue',
+        calculate: 'datum.value == null ? null : datum.value / 100',
       },
       {
-        calculate: !clipping + '|| datum.' + yField + ' == null ? false : datum.' + yField + ' > ' + yMaxScaled,
         as: 'clipped',
+        calculate: !clipping + '|| datum.' + yField + ' == null ? false : datum.' + yField + ' > ' + yMaxScaled,
       },
       {
-        calculate: 'datum.clipped == null ? false : !datum.clipped',
         as: 'notClipped',
+        calculate: 'datum.clipped == null ? false : !datum.clipped',
       },
       {
-        calculate: 'datum.clipped ? datum.' + yField + ' : null',
         as: 'clippedData',
+        calculate: 'datum.clipped ? datum.' + yField + ' : null',
       },
       {
         window: [
           {
+            as: 'previousNotClipped',
             op: 'lag',
             field: 'notClipped',
-            as: 'previousNotClipped',
           },
           {
+            as: 'nextNotClipped',
             op: 'lead',
             field: 'notClipped',
-            as: 'nextNotClipped',
             param: 0, // Seems wrong, but perhaps there is an off-by-one error in VegaLite
           },
         ],
       },
 
       {
-        calculate: '(datum.clipped && datum.previousNotClipped) ? datum.' + yField + ' : null',
         as: 'startClippedData',
+        calculate: '(datum.clipped && datum.previousNotClipped) ? datum.' + yField + ' : null',
       },
-      { calculate: '(datum.clipped && datum.nextNotClipped) ? datum.' + yField + ' : null', as: 'endClippedData' },
+      {
+        as: 'endClippedData',
+        calculate: '(datum.clipped && datum.nextNotClipped) ? datum.' + yField + ' : null',
+      },
     ],
     resolve: {
       scale: { y: 'shared' },
