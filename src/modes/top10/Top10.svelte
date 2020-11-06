@@ -10,8 +10,6 @@
     selectByInfo,
   } from '../../stores';
   import { addMissing, fetchRegionSlice, fetchTimeSlice } from '../../data/fetchData';
-  import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
-  import IoIosPin from 'svelte-icons/io/IoIosPin.svelte';
   import { modeByID } from '..';
   import { getInfoByName, nameInfos } from '../../maps';
   import Top10Sensor from './Top10Sensor.svelte';
@@ -253,6 +251,24 @@
     /* gap: 6px; */
   }
 
+  .wrapper {
+    position: relative;
+    grid-area: table;
+  }
+
+  .wrapper > div {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+  }
+
+  .table {
+    width: unset;
+  }
+
   .root > :global(.options-container) {
     grid-area: options;
     z-index: 1010;
@@ -265,63 +281,11 @@
     margin: 0 6px;
   }
 
-  .table {
-    grid-area: table;
-    margin: 0 6px;
-    overflow: auto;
-  }
-
-  .table :global(td) {
-    vertical-align: top;
-    padding-top: 1em;
-  }
-
-  td,
-  th {
-    border: 0;
-  }
-
-  .table > table {
-    border-collapse: collapse;
-    width: 100%;
-    overflow: unset;
-  }
-
-  table {
-    padding: 1em;
-    font-size: 1.2em;
-  }
-
-  .go-to-map-pin {
-    width: 16px;
-    display: inline-block;
-    cursor: pointer;
-  }
-  .go-to-map-pin:hover {
-    color: black;
-  }
-
   @media only screen and (max-width: 767px) {
-    table {
-      padding: 4px;
-      font-size: 1em;
-    }
-
+    .add-column-container,
     .table-pop-column {
       display: none;
     }
-
-    .add-column-container {
-      display: none;
-    }
-
-    .go-to-map-pin {
-      display: none;
-    }
-  }
-
-  .right {
-    text-align: right;
   }
 
   .button-bar {
@@ -334,23 +298,10 @@
     display: inline-block;
   }
 
-  .selected > :global(td) {
-    font-weight: bold;
-  }
-
-  .add-column {
-    max-width: 9em;
-    border-radius: 3px;
-    padding: 0;
-    margin: 0;
-    display: inline-block;
-  }
-
   .remove-column {
     position: absolute;
     right: 0.2em;
     top: 0.2em;
-    font-size: 0.7rem;
   }
 
   /** mobile **/
@@ -378,126 +329,126 @@
       on:change={(e) => selectByInfo(e.detail)} />
   </div>
 
-  <div class="table base-font-size" class:loading>
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>
-            <Top10SortHint
-              label="Name"
-              on:click={() => sortClick('name')}
-              sorted={sortCriteria === 'name'}
-              desc={sortDirectionDesc}>
-              Name
-            </Top10SortHint>
-          </th>
-          <th class="table-pop-column">
-            <Top10SortHint
-              label="Population"
-              on:click={() => sortClick('population')}
-              sorted={sortCriteria === 'population'}
-              desc={sortDirectionDesc}>
-              Pop.
-            </Top10SortHint>
-          </th>
-          <th colspan={primary.isCasesOrDeath ? 3 : 2}>
-            <Top10SortHint
-              label={primary.name}
-              on:click={() => sortClick('primary', true)}
-              sorted={sortCriteria === 'primary'}
-              desc={sortDirectionDesc}>
-              {typeof primary.mapTitleText === 'function' ? primary.mapTitleText(ratioOptions) : primary.name}
-            </Top10SortHint>
-          </th>
-          {#each otherSensors as s, i}
-            <th colspan={s.isCasesOrDeath ? 3 : 2}>
+  <div class="wrapper" class:loading>
+    <div>
+      <table class="table uk-table uk-table-responsive uk-table-divider">
+        <thead>
+          <tr>
+            <th class="uk-table-shrink">#</th>
+            <th class="uk-width-1-3">
               <Top10SortHint
-                label={s.name}
-                on:click={() => sortClick(i, true)}
-                sorted={sortCriteria === i}
+                label="Name"
+                on:click={() => sortClick('name')}
+                sorted={sortCriteria === 'name'}
                 desc={sortDirectionDesc}>
-                {typeof s.mapTitleText === 'function' ? s.mapTitleText(ratioOptions) : s.name}
-                <button
-                  class="pg-button remove-column"
-                  title="Remove column"
-                  on:click={() => (otherSensors = otherSensors.filter((d) => d !== s))}>
-                  <IoMdRemove />
-                </button>
+                Name
               </Top10SortHint>
             </th>
-          {/each}
-          {#if otherSensors.length < MAX_OTHER_SENSORS}
-            <th class="add-column-container" rowspan="2">
-              <select aria-label="add column options" bind:value={chosenColumn} class="add-column">
-                <option value="">Add indicator</option>
-                {#each groupedSensorList as sensorGroup}
-                  <optgroup label={sensorGroup.label}>
-                    {#each sensorGroup.sensors as sensor}
-                      <option
-                        disabled={sensor.key === primary.key || otherSensors.includes(sensor)}
-                        title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
-                        value={sensor.key}>
-                        {sensor.name}
-                      </option>
-                    {/each}
-                  </optgroup>
-                {/each}
-              </select>
+            <th class="uk-table-shrink table-pop-column">
+              <Top10SortHint
+                label="Population"
+                on:click={() => sortClick('population')}
+                sorted={sortCriteria === 'population'}
+                desc={sortDirectionDesc}>
+                Pop.
+              </Top10SortHint>
             </th>
-          {/if}
-        </tr>
-      </thead>
-      <tbody>
-        {#each sortedRows as row, i}
-          <tr class:selected={row.propertyId === $currentRegion}>
-            <td>{row.rank}.</td>
-            <td>
-              {row.displayName}
-              <span class="go-to-map-pin" on:click={jumpTo(row)} title="Show on Map">
-                <IoIosPin />
-              </span>
-            </td>
-            <td class="right table-pop-column" title="Population">
-              {row.population != null ? row.population.toLocaleString() : 'Unknown'}
-            </td>
-            <Top10Sensor
-              sensor={primary}
-              single={row.primary}
-              data={primaryData[i]}
-              domain={primaryDomain}
-              {row}
-              {highlightTimeValue}
-              {ratioOptions}
-              {onHighlight} />
-            {#each otherSensors as s, si}
+            <th class="uk-width-1-3" colspan={primary.isCasesOrDeath ? 3 : 2}>
+              <Top10SortHint
+                label={primary.name}
+                on:click={() => sortClick('primary', true)}
+                sorted={sortCriteria === 'primary'}
+                desc={sortDirectionDesc}>
+                {typeof primary.mapTitleText === 'function' ? primary.mapTitleText(ratioOptions) : primary.name}
+              </Top10SortHint>
+            </th>
+            {#each otherSensors as s, i}
+              <th class="uk-width-1-3" colspan={s.isCasesOrDeath ? 3 : 2}>
+                <Top10SortHint
+                  label={s.name}
+                  on:click={() => sortClick(i, true)}
+                  sorted={sortCriteria === i}
+                  desc={sortDirectionDesc}>
+                  {typeof s.mapTitleText === 'function' ? s.mapTitleText(ratioOptions) : s.name}
+                  <button
+                    class="remove-column"
+                    title="Remove column"
+                    on:click={() => (otherSensors = otherSensors.filter((d) => d !== s))}
+                    data-uk-icon="icon: close" />
+                </Top10SortHint>
+              </th>
+            {/each}
+            {#if otherSensors.length < MAX_OTHER_SENSORS}
+              <th class="uk-table-shrink add-column-container" rowspan="2">
+                <div uk-form-custom="target: true">
+                  <select bind:value={chosenColumn}>
+                    {#each groupedSensorList as sensorGroup}
+                      <optgroup label={sensorGroup.label}>
+                        {#each sensorGroup.sensors as sensor}
+                          <option
+                            disabled={sensor.key === primary.key || otherSensors.includes(sensor)}
+                            title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
+                            value={sensor.key}>
+                            {sensor.name}
+                          </option>
+                        {/each}
+                      </optgroup>
+                    {/each}
+                  </select>
+                  <button type="button" aria-label="add column options" data-uk-icon="icon: plus" />
+                </div>
+              </th>
+            {/if}
+          </tr>
+        </thead>
+        <tbody>
+          {#each sortedRows as row, i}
+            <tr class:uk-active={row.propertyId === $currentRegion}>
+              <td>{row.rank}.</td>
+              <td>
+                <a href="?region={row.propertyId}" on:click|preventDefault={jumpTo(row)} title="Show on Map">
+                  {row.displayName}
+                </a>
+              </td>
+              <td class="table-pop-column" title="Population">
+                {row.population != null ? row.population.toLocaleString() : 'Unknown'}
+              </td>
               <Top10Sensor
-                sensor={s}
-                single={row.others[si]}
-                data={otherDataAndDomain[si].data[i]}
-                domain={otherDataAndDomain[si].domain}
+                sensor={primary}
+                single={row.primary}
+                data={primaryData[i]}
+                domain={primaryDomain}
                 {row}
                 {highlightTimeValue}
                 {ratioOptions}
                 {onHighlight} />
-            {/each}
-          </tr>
-        {/each}
-      </tbody>
-      {#if showTopN < rows.length}
-        <tfoot>
-          <tr>
-            <td
-              colspan={3 + (primary.isCasesOrDeath ? 3 : 2) + otherSensors.reduce((acc, s) => (acc + s.isCasesOrDeath ? 3 : 2), 0)}
-              class="button-bar">
-              {rows.length - sortedRows.length}
-              {rows.length - sortedRows.length > 1 ? 'locations' : 'location'} hidden <button
-                on:click={showMore}
-                class="pg-button">Show {SHOW_X_MORE} more locations</button>
-            </td>
-          </tr>
-        </tfoot>
-      {/if}
-    </table>
+              {#each otherSensors as s, si}
+                <Top10Sensor
+                  sensor={s}
+                  single={row.others[si]}
+                  data={otherDataAndDomain[si].data[i]}
+                  domain={otherDataAndDomain[si].domain}
+                  {row}
+                  {highlightTimeValue}
+                  {ratioOptions}
+                  {onHighlight} />
+              {/each}
+            </tr>
+          {/each}
+        </tbody>
+        {#if showTopN < rows.length}
+          <tfoot>
+            <tr>
+              <td colspan="100" class="button-bar">
+                {rows.length - sortedRows.length}
+                {rows.length - sortedRows.length > 1 ? 'locations' : 'location'} hidden <button
+                  on:click={showMore}
+                  class="uk-button uk-button-default uk-button-small">Show {SHOW_X_MORE} more locations</button>
+              </td>
+            </tr>
+          </tfoot>
+        {/if}
+      </table>
+    </div>
   </div>
 </div>
