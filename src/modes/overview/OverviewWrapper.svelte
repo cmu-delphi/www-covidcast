@@ -113,13 +113,13 @@
   .root > :global(.options-container) {
     grid-area: options;
     z-index: 1010;
-    margin: 0 0.25em;
+    margin: 0 6px;
   }
 
   .search-container {
     grid-area: search;
     z-index: 1009;
-    margin: 0 0.25em;
+    margin: 0 6px;
   }
 
   .map-container {

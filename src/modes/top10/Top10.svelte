@@ -256,12 +256,13 @@
   .root > :global(.options-container) {
     grid-area: options;
     z-index: 1010;
+    margin: 0 6px;
   }
 
   .search-container {
     grid-area: search;
     z-index: 1009;
-    margin: 0.3em;
+    margin: 0 6px;
   }
 
   .table {

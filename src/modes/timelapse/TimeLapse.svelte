@@ -215,11 +215,13 @@
 
   .root > :global(.options-container) {
     grid-area: options;
+    margin: 0 6px;
   }
 
   .root > :global(.player-container) {
     grid-area: player;
     z-index: 1003;
+    margin: 0 6px;
   }
 
   .map-container {
