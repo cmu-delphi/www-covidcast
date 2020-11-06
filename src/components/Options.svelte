@@ -53,6 +53,10 @@
   .block .uk-form-controls {
     flex-grow: 1;
   }
+
+  .shortcuts > button {
+    padding: 0 2px;
+  }
 </style>
 
 <div class="container-bg container-style uk-grid-small {className}" data-uk-grid>
@@ -99,21 +103,21 @@
             <button aria-label="selected date" class="uk-input" on:>{formatTime(selectedDate)}</button>
           </Datepicker>
         {:else}<button aria-label="selected date" class="uk-input" on:>{formatTime(selectedDate)}</button>{/if}
-        <div class="uk-button-group">
+        <div class="uk-button-group shortcuts">
           <button
-            class="uk-button uk-button-default uk-button-small"
+            class="uk-button uk-button-default"
             disabled={selectedDate == null || startEndDates.length === 0 || selectedDate <= startEndDates[0]}
             title="Go to the previous day"
             on:click={() => (selectedDate = timeDay.offset(selectedDate, -1))}
             data-uk-icon="icon: chevron-left" />
           <button
-            class="uk-button uk-button-default uk-button-small"
+            class="uk-button uk-button-default"
             disabled={selectedDate == null || startEndDates.length === 0 || selectedDate.valueOf() === startEndDates[1].valueOf()}
             title="Go to the latest date for which '{$currentSensorEntry.name}' is available"
             on:click={() => (selectedDate = startEndDates[1])}
             data-uk-icon="icon: calendar" />
           <button
-            class="uk-button uk-button-default uk-button-small"
+            class="uk-button uk-button-default"
             disabled={selectedDate == null || startEndDates.length === 0 || selectedDate >= startEndDates[1]}
             title="Go to the next day"
             on:click={() => (selectedDate = timeDay.offset(selectedDate, 1))}
