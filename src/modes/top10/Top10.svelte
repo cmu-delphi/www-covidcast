@@ -111,7 +111,7 @@
   let loading = true;
 
   /**
-   * @type {ValueRow[]}
+   * @type {ValueRow[]} - useless comment
    */
   let rows = [];
   $: {
@@ -177,10 +177,11 @@
 
   // Compute the neighborhood around the current date.
   const date = $currentDateObject.getTime();
+  // smallMultipleTimeSpan is smaller than top-10 timespan.
   const [startDate, endDate] = $smallMultipleTimeSpan;
   const timespan = endDate.getTime() - startDate.getTime();
-  $: neighborhood = { start: date - timespan / 2, end: date + timespan / 2 };
-  // Shift the neighborhood to be within the smallMultipleTimeSpan.
+  $: neighborhood = { start: date - timespan / 3, end: date + timespan / 3 };
+  // Shift the neighborhood to be within the timespan.
   $: {
     let offset = startDate.getTime() - neighborhood.start;
     if (offset <= 0) {
@@ -194,16 +195,16 @@
     // Apply the offset.
     neighborhood.start = neighborhood.start + offset;
     neighborhood.end = neighborhood.end + offset;
-    console.info('start', new Date(neighborhood.start), 'end', new Date(neighborhood.end));
+    // console.info('start', new Date(neighborhood.start), 'end', new Date(neighborhood.end));
   }
 
   // Returns the max value for all rows of all locations.
   // rowsOfRows is an array for all locations of the rows for each location.
   function maxNested(rowsOfRows, field) {
-    // console.info('num locations', rowsOfRows.length, 'primaryField', primaryField);
     if (rowsOfRows.length === 0) {
       return 0;
     }
+    field = field === 'pValue' ? 'value' : field;
 
     // Filter rows to only include the neighborhood.
     const filterInNeighborhood = (rows) =>

@@ -118,7 +118,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
   const spec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
     data: { name: 'values' },
-    padding: { left: 50, top: 9, bottom: 16, right: 2 },
+    padding: { left: 50, top: 6, bottom: 20, right: 2 },
     autosize: {
       type: 'none',
       contains: 'padding',
@@ -147,21 +147,22 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
           {
             op: 'lag',
             field: 'notClipped',
-            as: 'maybeStartClipping',
+            as: 'previousNotClipped',
           },
           {
             op: 'lead',
             field: 'notClipped',
-            as: 'maybeEndClipping',
+            as: 'nextNotClipped',
+            param: 0, // Seems wrong, but perhaps off-by-one error in VegaLite
           },
         ],
       },
 
       {
-        calculate: '(datum.clipped && datum.maybeStartClipping) ? datum.' + yField + ' : null',
+        calculate: '(datum.clipped && datum.previousNotClipped) ? datum.' + yField + ' : null',
         as: 'startClippedData',
       },
-      { calculate: '(datum.clipped && datum.mayeEndClipping) ? datum.' + yField + ' : null', as: 'endClippedData' },
+      { calculate: '(datum.clipped && datum.nextNotClipped) ? datum.' + yField + ' : null', as: 'endClippedData' },
     ],
     resolve: {
       scale: { y: 'shared' },
@@ -191,7 +192,6 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
         mark: {
           type: 'line',
           interpolate: 'linear',
-          clip: true,
         },
         encoding: {
           y: {
@@ -211,7 +211,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
           },
         },
       },
-      // Draw clipped data differently.
+      // Draw clipped data with pale thick line.
       {
         mark: {
           type: 'line',
@@ -231,7 +231,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
       {
         mark: {
           type: 'text',
-          text: '\u21BF',
+          text: '\u21BF', // Upwards harpoon
           size: 11,
           baseline: 'bottom',
           dy: 2,
@@ -247,7 +247,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
       {
         mark: {
           type: 'text',
-          text: '\u21C2',
+          text: '\u21C2', // Downwards harpoon
           size: 11,
           baseline: 'bottom',
           dy: 2,
