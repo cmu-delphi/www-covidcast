@@ -322,6 +322,23 @@
     display: block;
   }
 
+  .search-multiple {
+    display: flex;
+    height: 40px;
+    background: transparent;
+    border: 1px solid #e5e5e5;
+    position: relative;
+  }
+
+  .search-multiple-icon {
+    position: relative;
+    width: 30px;
+  }
+
+  .search-multiple-input {
+    width: unset;
+  }
+
   .hidden {
     display: none;
   }
@@ -330,11 +347,13 @@
     z-index: 1;
     left: unset;
     right: 0;
+    width: 30px;
   }
 
   .search-box-list {
     box-sizing: border-box;
     left: 0;
+    top: 100%;
     min-width: 100%;
     margin-top: 2px;
     padding: 0 2px 6px 40px;
@@ -344,44 +363,22 @@
     color: #999;
   }
 
-  .search-tags {
-    font: inherit;
-    color: #333;
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
   .search-tag {
     padding: 1px 1px 1px 3px;
-    margin: 0 1px;
+    margin: 2px;
     border: 2px solid #999;
-    border-radius: 4px;
     display: flex;
     align-items: center;
   }
 </style>
 
 <div
-  class="{className} uk-search uk-search-default search-box"
-  on:click={onContainerClick}
-  class:empty={!text}
-  class:open={opened}>
-  <span data-uk-search-icon />
-  {#if multiple}
-    <div class="search-tags">
-      {#each selectedItems as selectedItem}
-        <div class="search-tag" style="border-color: {colorFieldName ? selectedItem[colorFieldName] : undefined}">
-          <span>{labelFunction(selectedItem)}</span>
-          <button
-            class=""
-            data-uk-icon="icon: close"
-            on:click={() => removeItem(selectedItem)}
-            title="Remove selectecd item" />
-        </div>
-      {/each}
-    </div>
-  {/if}
-  {#if !multiple || selectedItems.length < maxSelections}
+  class="{className} uk-search search-box"
+  class:uk-search-default={!multiple}
+  class:search-multiple={multiple}
+  on:click={onContainerClick}>
+  {#if !multiple}
+    <span data-uk-search-icon />
     <input
       class="uk-search-input"
       {placeholder}
@@ -399,6 +396,42 @@
     <button
       class="uk-search-icon clear-button"
       class:hidden={!text}
+      on:click={onResetItem}
+      title="Clear Search Field"
+      data-uk-icon="icon: close" />
+  {:else}
+    <span class="uk-search-icon search-multiple-icon" data-uk-icon="icon: search" />
+
+    {#each selectedItems as selectedItem}
+      <div class="search-tag" style="border-color: {colorFieldName ? selectedItem[colorFieldName] : undefined}">
+        <span>{labelFunction(selectedItem)}</span>
+        <button
+          class=""
+          data-uk-icon="icon: close"
+          on:click={() => removeItem(selectedItem)}
+          title="Remove selectecd item" />
+      </div>
+    {/each}
+
+    {#if !multiple || selectedItems.length < maxSelections}
+      <input
+        class="uk-search-input search-multiple-input"
+        {placeholder}
+        {name}
+        {disabled}
+        {title}
+        aria-label={placeholder}
+        bind:this={input}
+        bind:value={text}
+        on:input={onInput}
+        on:focus={onFocus}
+        on:keydown={onKeyDown}
+        on:click={onInputClick}
+        on:keypress={onKeyPress} />
+    {/if}
+    <button
+      class="uk-search-icon clear-button"
+      class:hidden={selectedItems.length === 0}
       on:click={onResetItem}
       title="Clear Search Field"
       data-uk-icon="icon: close" />
