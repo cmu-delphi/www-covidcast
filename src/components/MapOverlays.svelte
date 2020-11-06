@@ -23,7 +23,7 @@
   }
 
   .map-controls-container {
-    margin-right: 0.2em;
+    margin: 0.2em 0.2em 0 0;
     z-index: 1001;
     display: flex;
     align-items: flex-start;
@@ -43,6 +43,7 @@
     margin: 2px 5px;
     background: white;
   }
+
   .signal-description {
     margin-bottom: 0.25em;
   }
