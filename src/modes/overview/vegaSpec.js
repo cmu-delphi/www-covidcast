@@ -104,12 +104,107 @@ const stdErrTransformPercent = [
 export function createSpec(sensor, selections, dateRange, valuePatch) {
   const isPercentage = sensor.format === 'percent';
   const scalePercent = isPercentage ? (v) => v / 100 : (v) => v;
+  const yField = valuePatch && valuePatch.field ? valuePatch.field : isPercentage ? 'pValue' : 'value';
 
   const clipping = valuePatch && valuePatch.domain ? true : false;
   const yMax = clipping ? valuePatch.domain[1] : 0;
   const yMaxScaled = scalePercent(yMax);
 
-  const yField = valuePatch && valuePatch.field ? valuePatch.field : isPercentage ? 'pValue' : 'value';
+  // The clipped region should start and end with clipped values so that the region is completely flat.
+  // So we need to determine whether each value is clipped and, to mark the start and end of the region,
+  // check if the previous and next values are not clipped.
+  //     ###<clipped>###
+  //    /               \
+  const clippingTransforms = [
+    {
+      as: 'clipped',
+      calculate: `${!clipping} || datum.${yField} == null ? false : datum.${yField} >= ${yMaxScaled}`,
+    },
+    {
+      as: 'notClipped',
+      calculate: 'datum.clipped == null ? false : !datum.clipped',
+    },
+    {
+      as: 'clippedData',
+      calculate: `datum.clipped ? datum.${yField} : null`,
+    },
+    {
+      window: [
+        {
+          as: 'previousNotClipped',
+          field: 'notClipped',
+          op: 'lag',
+          param: 1,
+        },
+        {
+          as: 'nextNotClipped',
+          field: 'notClipped',
+          op: 'lead',
+          param: 0, // Seems wrong, but perhaps there is an off-by-one error in VegaLite
+        },
+      ],
+    },
+    {
+      as: 'startClippedData',
+      calculate: `(datum.clipped && datum.previousNotClipped) ? datum.${yField} : null`,
+    },
+    {
+      as: 'endClippedData',
+      calculate: `(datum.clipped && datum.nextNotClipped) ? datum.${yField} : null`,
+    },
+  ];
+
+  const clippingLayers = [
+    // Draw clipped data with pale thick line.
+    {
+      mark: {
+        type: 'line',
+        interpolate: 'linear',
+        stroke: 'red',
+        strokeWidth: 6,
+        strokeOpacity: 0.25,
+        yOffset: -3,
+      },
+      encoding: {
+        y: {
+          field: 'clippedData',
+          type: 'quantitative',
+        },
+      },
+    },
+    {
+      mark: {
+        type: 'text',
+        text: '\u21BF', // Upwards harpoon
+        size: 11,
+        baseline: 'bottom',
+        dy: 2,
+        stroke: 'red',
+      },
+      encoding: {
+        y: {
+          field: 'startClippedData',
+          type: 'quantitative',
+        },
+      },
+    },
+    {
+      mark: {
+        type: 'text',
+        text: '\u21C2', // Downwards harpoon
+        size: 11,
+        baseline: 'bottom',
+        dy: 2,
+        stroke: 'red',
+      },
+      encoding: {
+        y: {
+          field: 'endClippedData',
+          type: 'quantitative',
+        },
+      },
+    },
+  ];
 
   /**
    * @type {import('vega-lite').TopLevelSpec}
@@ -129,42 +224,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
         as: 'pValue',
         calculate: 'datum.value == null ? null : datum.value / 100',
       },
-      {
-        as: 'clipped',
-        calculate: !clipping + '|| datum.' + yField + ' == null ? false : datum.' + yField + ' > ' + yMaxScaled,
-      },
-      {
-        as: 'notClipped',
-        calculate: 'datum.clipped == null ? false : !datum.clipped',
-      },
-      {
-        as: 'clippedData',
-        calculate: 'datum.clipped ? datum.' + yField + ' : null',
-      },
-      {
-        window: [
-          {
-            as: 'previousNotClipped',
-            op: 'lag',
-            field: 'notClipped',
-          },
-          {
-            as: 'nextNotClipped',
-            op: 'lead',
-            field: 'notClipped',
-            param: 0, // Seems wrong, but perhaps there is an off-by-one error in VegaLite
-          },
-        ],
-      },
-
-      {
-        as: 'startClippedData',
-        calculate: '(datum.clipped && datum.previousNotClipped) ? datum.' + yField + ' : null',
-      },
-      {
-        as: 'endClippedData',
-        calculate: '(datum.clipped && datum.nextNotClipped) ? datum.' + yField + ' : null',
-      },
+      ...(clipping ? clippingTransforms : []),
     ],
     resolve: {
       scale: { y: 'shared' },
@@ -203,6 +263,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
               domainMin: clipping ? scalePercent(valuePatch.domain[0]) : 0,
               domainMax: clipping ? scalePercent(valuePatch.domain[1]) : undefined,
               clamp: true,
+              nice: false,
             },
             axis: {
               ...(isPercentage ? { format: '.1%', formatType: 'cachedNumber' } : {}),
@@ -213,55 +274,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
           },
         },
       },
-      // Draw clipped data with pale thick line.
-      {
-        mark: {
-          type: 'line',
-          interpolate: 'linear',
-          stroke: 'red',
-          strokeWidth: 6,
-          strokeOpacity: 0.25,
-          yOffset: -3,
-        },
-        encoding: {
-          y: {
-            field: 'clippedData',
-            type: 'quantitative',
-          },
-        },
-      },
-      {
-        mark: {
-          type: 'text',
-          text: '\u21BF', // Upwards harpoon
-          size: 11,
-          baseline: 'bottom',
-          dy: 2,
-          stroke: 'red',
-        },
-        encoding: {
-          y: {
-            field: 'startClippedData',
-            type: 'quantitative',
-          },
-        },
-      },
-      {
-        mark: {
-          type: 'text',
-          text: '\u21C2', // Downwards harpoon
-          size: 11,
-          baseline: 'bottom',
-          dy: 2,
-          stroke: 'red',
-        },
-        encoding: {
-          y: {
-            field: 'endClippedData',
-            type: 'quantitative',
-          },
-        },
-      },
+      ...(clipping ? clippingLayers : []),
       {
         selection: {
           highlight: {

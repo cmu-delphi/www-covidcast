@@ -175,14 +175,15 @@
     return data;
   });
 
-  // Compute the neighborhood around the current date.
-  const date = $currentDateObject.getTime();
-  // smallMultipleTimeSpan is smaller than top-10 timespan.
-  const [startDate, endDate] = $smallMultipleTimeSpan;
-  const timespan = endDate.getTime() - startDate.getTime();
-  $: neighborhood = { start: date - timespan / 3, end: date + timespan / 3 };
-  // Shift the neighborhood to be within the timespan.
-  $: {
+  $: getNeighborhood = (date, timespan) => {
+    // Compute the neighborhood around the current date.
+    const dateMs = date.getTime();
+    // smallMultipleTimeSpan is smaller than top-10 timespan.
+    const [startDate, endDate] = timespan;
+    const duration = endDate.getTime() - startDate.getTime();
+    const neighborhood = { start: dateMs - duration / 3, end: dateMs + duration / 3 };
+
+    // Shift the neighborhood to be within the timespan.
     let offset = startDate.getTime() - neighborhood.start;
     if (offset <= 0) {
       // neighborhood starts after startDate, so then check endDate
@@ -195,8 +196,10 @@
     // Apply the offset.
     neighborhood.start = neighborhood.start + offset;
     neighborhood.end = neighborhood.end + offset;
-    // console.info('start', new Date(neighborhood.start), 'end', new Date(neighborhood.end));
-  }
+    // console.info('neighborhood',
+    //   new Date(neighborhood.start), new Date(neighborhood.end));
+    return neighborhood;
+  };
 
   // Returns the max value for all rows of all locations.
   // rowsOfRows is an array for all locations of the rows for each location.
@@ -205,6 +208,7 @@
       return 0;
     }
     field = field === 'pValue' ? 'value' : field;
+    const neighborhood = getNeighborhood($currentDateObject, $smallMultipleTimeSpan);
 
     // Filter rows to only include the neighborhood.
     const filterInNeighborhood = (rows) =>
