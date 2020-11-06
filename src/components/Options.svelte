@@ -96,33 +96,34 @@
       <div class="uk-form-controls">
         {#if selectedDate != null && startEndDates.length !== 0}
           <Datepicker
+            className="uk-width-1-1"
             bind:selected={selectedDate}
             start={startEndDates[0]}
             end={startEndDates[1]}
             formattedSelected={formatTime(selectedDate)}>
-            <button aria-label="selected date" class="uk-input" on:>{formatTime(selectedDate)}</button>
+            <button aria-label="selected date" class="uk-input uk-text-nowrap" on:>{formatTime(selectedDate)}</button>
           </Datepicker>
         {:else}<button aria-label="selected date" class="uk-input" on:>{formatTime(selectedDate)}</button>{/if}
-        <div class="uk-button-group shortcuts">
-          <button
-            class="uk-button uk-button-default"
-            disabled={selectedDate == null || startEndDates.length === 0 || selectedDate <= startEndDates[0]}
-            title="Go to the previous day"
-            on:click={() => (selectedDate = timeDay.offset(selectedDate, -1))}
-            data-uk-icon="icon: chevron-left" />
-          <button
-            class="uk-button uk-button-default"
-            disabled={selectedDate == null || startEndDates.length === 0 || selectedDate.valueOf() === startEndDates[1].valueOf()}
-            title="Go to the latest date for which '{$currentSensorEntry.name}' is available"
-            on:click={() => (selectedDate = startEndDates[1])}
-            data-uk-icon="icon: calendar" />
-          <button
-            class="uk-button uk-button-default"
-            disabled={selectedDate == null || startEndDates.length === 0 || selectedDate >= startEndDates[1]}
-            title="Go to the next day"
-            on:click={() => (selectedDate = timeDay.offset(selectedDate, 1))}
-            data-uk-icon="icon: chevron-right" />
-        </div>
+      </div>
+      <div class="uk-button-group shortcuts">
+        <button
+          class="uk-button uk-button-default"
+          disabled={selectedDate == null || startEndDates.length === 0 || selectedDate <= startEndDates[0]}
+          title="Go to the previous day"
+          on:click={() => (selectedDate = timeDay.offset(selectedDate, -1))}
+          data-uk-icon="icon: chevron-left" />
+        <button
+          class="uk-button uk-button-default"
+          disabled={selectedDate == null || startEndDates.length === 0 || selectedDate.valueOf() === startEndDates[1].valueOf()}
+          title="Go to the latest date for which '{$currentSensorEntry.name}' is available"
+          on:click={() => (selectedDate = startEndDates[1])}
+          data-uk-icon="icon: calendar" />
+        <button
+          class="uk-button uk-button-default"
+          disabled={selectedDate == null || startEndDates.length === 0 || selectedDate >= startEndDates[1]}
+          title="Go to the next day"
+          on:click={() => (selectedDate = timeDay.offset(selectedDate, 1))}
+          data-uk-icon="icon: chevron-right" />
       </div>
     </div>
   {/if}

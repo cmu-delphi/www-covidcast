@@ -11,6 +11,7 @@
 
   let popover;
 
+  export let className = '';
   export let start = new Date(1987, 9, 29);
   export let end = new Date(2020, 9, 29);
   export let selected = today;
@@ -301,7 +302,7 @@
   }
 </style>
 
-<div class="datepicker" class:open={isOpen} class:closing={isClosing} style={wrapperStyle}>
+<div class="datepicker {className}" class:open={isOpen} class:closing={isClosing} style={wrapperStyle}>
   <Popover
     bind:this={popover}
     bind:open={isOpen}
