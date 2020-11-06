@@ -258,7 +258,7 @@
     z-index: 1010;
   }
 
-  .root > :global(.search-container) {
+  .search-container {
     grid-area: search;
     z-index: 1009;
     margin: 0.3em;
@@ -367,14 +367,15 @@
 
 <div class="root">
   <Options className="options-container" />
-  <Search
-    className="search-container container-bg container-style"
-    placeholder="Search for a location..."
-    items={nameInfos}
-    selectedItem={$currentRegionInfo}
-    labelFieldName="displayName"
-    maxItemsToShowInList="5"
-    on:change={(e) => selectByInfo(e.detail)} />
+  <div class="search-container container-bg container-style">
+    <Search
+      placeholder="Search for a location..."
+      items={nameInfos}
+      selectedItem={$currentRegionInfo}
+      labelFieldName="displayName"
+      maxItemsToShowInList="5"
+      on:change={(e) => selectByInfo(e.detail)} />
+  </div>
 
   <div class="table base-font-size" class:loading>
     <table>

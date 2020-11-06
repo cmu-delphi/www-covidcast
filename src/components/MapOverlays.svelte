@@ -41,6 +41,7 @@
     align-items: flex-start;
     justify-content: center;
     margin: 2px 5px;
+    background: white;
   }
   .signal-description {
     margin-bottom: 0.25em;
@@ -55,6 +56,7 @@
   }
 
   .legend-container {
+    background: white;
     position: absolute;
     margin: 0.25em;
     left: 0;

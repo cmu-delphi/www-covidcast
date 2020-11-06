@@ -113,13 +113,13 @@
   .root > :global(.options-container) {
     grid-area: options;
     z-index: 1010;
-    margin-left: 0.25em;
+    margin: 0 0.25em;
   }
 
-  .root > :global(.search-container) {
+  .search-container {
     grid-area: search;
     z-index: 1009;
-    margin: 0.3em;
+    margin: 0 0.25em;
   }
 
   .map-container {
@@ -247,17 +247,18 @@
   <Options className="options-container" levels={levelList} />
 
   {#if !showCompare}
-    <Search
-      className="search-container container-bg container-style"
-      placeholder="Search for a location..."
-      items={regionSearchList}
-      selectedItem={$currentRegionInfo}
-      labelFieldName="displayName"
-      maxItemsToShowInList="5"
-      on:change={(e) => {
-        selectByInfo(e.detail);
-        trackEvent('search', 'select', e.detail ? e.detail.id : '');
-      }} />
+    <div class="search-container container-bg container-style">
+      <Search
+        placeholder="Search for a location..."
+        items={regionSearchList}
+        selectedItem={$currentRegionInfo}
+        labelFieldName="displayName"
+        maxItemsToShowInList="5"
+        on:change={(e) => {
+          selectByInfo(e.detail);
+          trackEvent('search', 'select', e.detail ? e.detail.id : '');
+        }} />
+    </div>
 
     <div class="view-switcher">
       {#if !$isMobileDevice}

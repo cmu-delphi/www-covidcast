@@ -1,6 +1,4 @@
 <script>
-  import IoIosSearch from 'svelte-icons/io/IoIosSearch.svelte';
-  import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
   import { createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher();
@@ -316,101 +314,34 @@
       return newI;
     };
   }
-
-  function focusSearch() {
-    if (input) {
-      input.focus();
-    }
-  }
 </script>
 
 <style>
-  .autocomplete {
-    display: flex;
-    position: relative;
-  }
-
-  .autocomplete * {
-    box-sizing: border-box;
-  }
-
-  .search-button {
-    color: #9b9b9b;
-    width: 1.4em;
-    height: 1.4em;
-    align-self: center;
-    margin: 0;
-    padding: 0;
-    border: none;
-    background: none;
-  }
-
-  .autocomplete-input {
-    flex: 1 1 0;
-    width: 100%;
-    position: relative;
-    font: inherit;
-    padding: 5px 6px;
-    /* for cmu style*/
-    margin: 0;
-    color: #111;
-    outline: none;
-    border: none;
-    border-bottom: 1px solid transparent;
-  }
-
-  input.autocomplete-input:focus {
-    outline: none !important;
-    z-index: unset;
-    border-bottom-color: var(--red);
-  }
-
-  .autocomplete-list {
-    position: absolute;
-    z-index: 2000;
-    top: calc(100% - 6px);
-    left: 0;
-    width: 100%;
-    overflow-y: auto;
-    padding: 2px 0 0 1.8em;
-    max-height: calc(15 * (1rem + 10px) + 15px);
-    user-select: none;
-
-    border-bottom-left-radius: 7px;
-    border-bottom-right-radius: 7px;
-    background-color: #ffffff;
-    box-shadow: 0px 4px 4px rgba(151, 151, 151, 0.25);
-  }
-  .autocomplete-list:empty {
-    padding: 0;
-  }
-  .autocomplete-list-item {
-    padding: 5px 15px;
-    color: #333;
-    cursor: pointer;
-    line-height: 1;
-
-    border-radius: 5px;
-    transition: all 0.1s ease-in;
-  }
-
-  .autocomplete-list-item:hover,
-  .autocomplete-list-item.selected {
-    color: #fff;
-    background-color: var(--red);
-  }
-
-  .autocomplete-list-item-no-results {
-    padding: 5px 15px;
-    color: #999;
-    line-height: 1;
+  .search-box {
+    width: unset;
+    display: block;
   }
 
   .hidden {
     display: none;
   }
-  .reset-button {
+
+  .clear-button {
     z-index: 1;
+    left: unset;
+    right: 0;
+  }
+
+  .search-box-list {
+    box-sizing: border-box;
+    left: 0;
+    min-width: 100%;
+    margin-top: 2px;
+    padding: 0 2px 6px 40px;
+  }
+
+  .more-results {
+    color: #999;
   }
 
   .search-tags {
@@ -431,31 +362,28 @@
 </style>
 
 <div
-  class="{className} base-font-size container-style autocomplete"
+  class="{className} uk-search uk-search-default search-box"
   on:click={onContainerClick}
   class:empty={!text}
   class:open={opened}>
-  <button class="search-button" on:click={focusSearch} title="Show Search Field" aria-label="Show Search Field">
-    <IoIosSearch />
-  </button>
+  <span data-uk-search-icon />
   {#if multiple}
     <div class="search-tags">
       {#each selectedItems as selectedItem}
         <div class="search-tag" style="border-color: {colorFieldName ? selectedItem[colorFieldName] : undefined}">
           <span>{labelFunction(selectedItem)}</span>
           <button
-            class="search-button reset-button"
+            class=""
+            data-uk-icon="icon: close"
             on:click={() => removeItem(selectedItem)}
-            title="Remove selectecd item">
-            <IoIosClose />
-          </button>
+            title="Remove selectecd item" />
         </div>
       {/each}
     </div>
   {/if}
   {#if !multiple || selectedItems.length < maxSelections}
     <input
-      class="autocomplete-input"
+      class="uk-search-input"
       {placeholder}
       {name}
       {disabled}
@@ -469,34 +397,38 @@
       on:click={onInputClick}
       on:keypress={onKeyPress} />
     <button
-      class="search-button reset-button"
+      class="uk-search-icon clear-button"
       class:hidden={!text}
       on:click={onResetItem}
       title="Clear Search Field"
-      aria-label="Clear Search Field">
-      <IoIosClose />
-    </button>
+      data-uk-icon="icon: close" />
   {/if}
-  <div class="autocomplete-list" class:hidden={!opened} bind:this={list}>
-    {#if filteredListItems && filteredListItems.length > 0}
-      {#each filteredListItems as listItem, i}
-        <div
-          class="autocomplete-list-item {i === highlightIndex ? 'selected' : ''}"
-          on:click={() => onListItemClick(listItem)}>
-          {#if listItem.highlighted}
-            {@html listItem.highlighted.label}
-          {:else}
-            {@html listItem.label}
-          {/if}
-        </div>
-      {/each}
 
-      {#if hiddenFilteredListItems > 0}
-        <div class="autocomplete-list-item-no-results">...{hiddenFilteredListItems} results not shown</div>
+  <div class="uk-dropdown uk-dropdown-bottom-left search-box-list" class:uk-open={opened} bind:this={list}>
+    <ul class="uk-nav uk-dropdown-nav">
+      {#if filteredListItems && filteredListItems.length > 0}
+        {#each filteredListItems as listItem, i}
+          <li class:uk-active={i === highlightIndex}>
+            <a
+              href="?region={listItem.item ? listItem.item.id : ''}"
+              on:click|preventDefault={() => onListItemClick(listItem)}>
+              {#if listItem.highlighted}
+                {@html listItem.highlighted.label}
+              {:else}
+                {@html listItem.label}
+              {/if}
+            </a>
+          </li>
+        {/each}
+
+        {#if hiddenFilteredListItems > 0}
+          <li class="uk-nav-divider" />
+          <li class="more-results">&hellip; {hiddenFilteredListItems} results not shown</li>
+        {/if}
+      {:else if noResultsText}
+        <li class="uk-nav-header">{noResultsText}</li>
       {/if}
-    {:else if noResultsText}
-      <div class="autocomplete-list-item-no-results">{noResultsText}</div>
-    {/if}
+    </ul>
   </div>
 </div>
 
