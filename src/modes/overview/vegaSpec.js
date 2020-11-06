@@ -110,7 +110,6 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
   const yMaxScaled = scalePercent(yMax);
 
   const yField = valuePatch && valuePatch.field ? valuePatch.field : isPercentage ? 'pValue' : 'value';
-  // console.info('yMax', yMax, 'clipping', clipping, 'yField', yField);
 
   /**
    * @type {import('vega-lite').TopLevelSpec}
@@ -153,7 +152,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
             op: 'lead',
             field: 'notClipped',
             as: 'nextNotClipped',
-            param: 0, // Seems wrong, but perhaps off-by-one error in VegaLite
+            param: 0, // Seems wrong, but perhaps there is an off-by-one error in VegaLite
           },
         ],
       },

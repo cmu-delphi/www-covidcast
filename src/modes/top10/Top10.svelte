@@ -111,7 +111,7 @@
   let loading = true;
 
   /**
-   * @type {ValueRow[]} - useless comment
+   * @type {ValueRow[]}
    */
   let rows = [];
   $: {
