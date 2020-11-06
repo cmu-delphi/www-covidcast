@@ -118,7 +118,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
   const clippingTransforms = [
     {
       as: 'clipped',
-      calculate: `${!clipping} || datum.${yField} == null ? false : datum.${yField} >= ${yMaxScaled}`,
+      calculate: `${!clipping} || datum.${yField} == null ? false : datum.${yField} > ${yMaxScaled}`,
     },
     {
       as: 'notClipped',
@@ -263,7 +263,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
               domainMin: clipping ? scalePercent(valuePatch.domain[0]) : 0,
               domainMax: clipping ? scalePercent(valuePatch.domain[1]) : undefined,
               clamp: true,
-              nice: false,
+              nice: clipping ? false : true, // When clipping, need nice false.
             },
             axis: {
               ...(isPercentage ? { format: '.1%', formatType: 'cachedNumber' } : {}),
