@@ -8,7 +8,6 @@
     currentDateObject,
     currentRegionInfo,
     selectByInfo,
-    smallMultipleTimeSpan,
   } from '../../stores';
   import { addMissing, fetchRegionSlice, fetchTimeSlice } from '../../data/fetchData';
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
@@ -22,6 +21,7 @@
   import { levelMegaCounty, groupedSensorList, sensorList, primaryValue, yesterdayDate } from '../../stores/constants';
   import { parseAPITime } from '../../data';
   import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
+  import { computeNeighborhood } from '../../util';
 
   const SHOW_X_MORE = 10;
   const MAX_OTHER_SENSORS = 1;
@@ -175,31 +175,7 @@
     return data;
   });
 
-  $: getNeighborhood = (date, timespan) => {
-    // Compute the neighborhood around the current date.
-    const dateMs = date.getTime();
-    // smallMultipleTimeSpan is smaller than top-10 timespan.
-    const [startDate, endDate] = timespan;
-    const duration = endDate.getTime() - startDate.getTime();
-    const neighborhood = { start: dateMs - duration / 3, end: dateMs + duration / 3 };
-
-    // Shift the neighborhood to be within the timespan.
-    let offset = startDate.getTime() - neighborhood.start;
-    if (offset <= 0) {
-      // neighborhood starts after startDate, so then check endDate
-      offset = endDate.getTime() - neighborhood.end;
-      if (offset >= 0) {
-        // neighborhood ends before endDate, so no offset
-        offset = 0;
-      }
-    }
-    // Apply the offset.
-    neighborhood.start = neighborhood.start + offset;
-    neighborhood.end = neighborhood.end + offset;
-    // console.info('neighborhood',
-    //   new Date(neighborhood.start), new Date(neighborhood.end));
-    return neighborhood;
-  };
+  $: neighborhood = computeNeighborhood($currentDateObject, startDay, finalDay, (finalDay - startDay) / 2);
 
   // Returns the max value for all rows of all locations.
   // rowsOfRows is an array for all locations of the rows for each location.
@@ -208,7 +184,6 @@
       return 0;
     }
     field = field === 'pValue' ? 'value' : field;
-    const neighborhood = getNeighborhood($currentDateObject, $smallMultipleTimeSpan);
 
     // Filter rows to only include the neighborhood.
     const filterInNeighborhood = (rows) =>
