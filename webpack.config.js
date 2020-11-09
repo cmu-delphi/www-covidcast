@@ -23,7 +23,7 @@ module.exports = () => {
     output: {
       path: path.resolve(__dirname, 'public'),
       filename: '[name].js',
-      chunkFilename: devMode ? '[name].js' : '[name].[chunkhash].js',
+      chunkFilename: '[name].js',
       // publicPath: './',
     },
 
@@ -146,7 +146,7 @@ module.exports = () => {
       new MiniCssExtractPlugin({
         filename: '[name].css',
         ignoreOrder: true,
-        chunkFilename: devMode ? '[name].css' : '[name].[chunkhash].css',
+        chunkFilename: '[name].css',
       }),
     ].filter(Boolean),
   };
