@@ -8,8 +8,6 @@
   import { prepareSensorData } from '../overview/vegaSpec';
 
   const formatLocal = timeFormat('%x');
-  const formatTimeWithoutYear = timeFormat('%B %d');
-
   /**
    * @type {import("../../stores/constants").SensorEntry}
    */
@@ -198,41 +196,16 @@
   <table class="key" class:single={selections.length === 1}>
     <tbody>
       {#each selections as selection, i}
-        {#if sensor.isCasesOrDeath}
-          {#if rowsOfRegions[i]}
-            <tr>
-              <th>{sensor.yAxis}</th>
-              <th class="area">Count</th>
-              <th class="area">Ratios (per 100,000)</th>
-            </tr>
-            <tr>
-              <th>{formatTimeWithoutYear(rowsOfRegions[i].date_value)}</th>
-              <td class="right">{sensor.formatValue(rowsOfRegions[i].count)}</td>
-              <td class="right">{sensor.formatValue(rowsOfRegions[i].countRatio)}</td>
-            </tr>
-            <tr>
-              <th>7-day avg</th>
-              <td class="right">{sensor.formatValue(rowsOfRegions[i].avg)}</td>
-              <td class="right">{sensor.formatValue(rowsOfRegions[i].avgRatio)}</td>
-            </tr>
-            <tr>
-              <th>{formatTimeWithoutYear(rowsOfRegions[i].date_value)} (cumulative)</th>
-              <td class="right">{sensor.formatValue(rowsOfRegions[i].countCumulative)}</td>
-              <td class="right">{sensor.formatValue(rowsOfRegions[i].countRatioCumulative)}</td>
-            </tr>
+        <tr>
+          <td class="legend" style="--color: {selection.color}">{selection.displayName}</td>
+          <td class="key-fact">{rowsOfRegions[i] != null ? sensor.formatValue(rowsOfRegions[i].value) : '?'}</td>
+          {#if sensor.hasStdErr && rowsOfRegions[i].stderr != null}
+            <td>{sensor.formatValue(rowsOfRegions[i].stderr)}</td>
           {/if}
-        {:else}
-          <tr>
-            <td class="legend" style="--color: {selection.color}">{selection.displayName}</td>
-            <td class="key-fact">{rowsOfRegions[i] != null ? sensor.formatValue(rowsOfRegions[i].value) : '?'}</td>
-            {#if sensor.hasStdErr && rowsOfRegions[i] && rowsOfRegions[i].stderr != null}
-              <td>{sensor.formatValue(rowsOfRegions[i].stderr)}</td>
-            {/if}
-            {#if i === 0}
-              <td class="hint" rowspan={selections.length}>on {formatLocal(highlightDate ? highlightDate : date)}</td>
-            {/if}
-          </tr>
-        {/if}
+          {#if i === 0}
+            <td class="hint" rowspan={selections.length}>on {formatLocal(highlightDate ? highlightDate : date)}</td>
+          {/if}
+        </tr>
       {/each}
     </tbody>
   </table>
