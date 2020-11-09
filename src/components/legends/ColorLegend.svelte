@@ -10,8 +10,6 @@
   import { generateLabels } from '../MapBox/colors';
   import { MISSING_COLOR, ZERO_COLOR } from '../../theme';
 
-  export let loading = false;
-
   $: r = generateLabels(
     $stats,
     $currentSensorEntry,
@@ -76,7 +74,7 @@
   }
 </style>
 
-<ul class:loading-bg={loading} data-testid="color-legend">
+<ul data-testid="color-legend">
   <li
     class="tick tick-single"
     style="background:repeating-linear-gradient(-45deg, {MISSING_COLOR}, white 30%)"
