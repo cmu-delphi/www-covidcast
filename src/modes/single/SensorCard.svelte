@@ -1,10 +1,10 @@
 <script>
   import { timeFormat } from 'd3-time-format';
-  import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
   import VegaTooltip from '../../components/DetailView/VegaTooltip.svelte';
+  import InfoDialogButton from '../../components/InfoDialogButton.svelte';
   import Vega from '../../components/Vega.svelte';
   import { formatAPITime, parseAPITime } from '../../data';
-  import { currentInfoSensor, smallMultipleTimeSpan } from '../../stores';
+  import { smallMultipleTimeSpan } from '../../stores';
   import { prepareSensorData } from '../overview/vegaSpec';
 
   const formatLocal = timeFormat('%x');
@@ -64,21 +64,19 @@
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
+    position: relative;
   }
 
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    height: 2.2em;
-  }
-
-  h4 {
-    text-align: center;
+  .uk-card-header {
+    position: relative;
+    align-self: stretch;
   }
 
   .toolbar {
-    margin-left: 0.5em;
+    position: absolute;
+    right: 0.5em;
+    top: 50%;
+    transform: translate(0, -50%);
   }
 
   .vega-wrapper {
@@ -86,16 +84,13 @@
     flex: 1 1 8em;
     position: relative;
   }
+
   .vega-wrapper > :global(*) {
     position: absolute;
     left: 0;
     top: 0;
     right: 2px;
     bottom: 0;
-  }
-
-  .info {
-    font-size: 0.6rem;
   }
 
   .key {
@@ -127,18 +122,13 @@
   }
 </style>
 
-<section class="card container-bg container-style" data-testid="sensor-{sensor.key}">
-  <div class="header">
-    <h4>{typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText() : sensor.name}</h4>
+<section class="uk-card uk-card-body uk-card-default uk-card-small card" data-testid="sensor-{sensor.key}">
+  <div class="uk-card-header">
+    <h3 class="uk-card-title uk-margin-remove-bottom">
+      {typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText() : sensor.name}
+    </h3>
     <div class="toolbar">
-      {#if sensor.description}
-        <button
-          title="Show sensor description"
-          class="pg-button pg-button-circle info"
-          on:click={() => {
-            currentInfoSensor.set(sensor);
-          }}><IoMdHelp /></button>
-      {/if}
+      <InfoDialogButton {sensor} />
     </div>
   </div>
   <table class="key" class:single={selections.length === 1}>
