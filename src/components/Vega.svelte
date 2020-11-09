@@ -105,13 +105,15 @@
           // outside has changed
           return;
         }
-        vega.view.change(
-          'values',
-          vega.view
-            .changeset()
-            .remove(() => true)
-            .insert(d || []),
-        );
+        setTimeout(() => {
+          vega.view.change(
+            'values',
+            vega.view
+              .changeset()
+              .remove(() => true)
+              .insert(d || []),
+          );
+        });
 
         noData = !d || d.length === 0;
         // also update signals along the way
