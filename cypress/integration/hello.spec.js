@@ -7,7 +7,9 @@ describe('hello test', () => {
     // https://on.cypress.io/get
 
     // wait that the map is ready
-    cy.get('.mapboxgl-map[data-ready=ready]');
+    cy.get('.mapboxgl-map[data-ready=ready]', {
+      timeout: 30000,
+    });
 
     cy.get('.banner').should('contain', 'daily doctor visits');
   });
@@ -15,7 +17,9 @@ describe('hello test', () => {
     cy.viewport('iphone-x').visit('/index.html');
 
     // wait that the map is ready
-    cy.get('.mapboxgl-map[data-ready=ready]');
+    cy.get('.mapboxgl-map[data-ready=ready]', {
+      timeout: 30000
+    });
 
     cy.get('.banner').should('contain', 'daily doctor visits');
   });
