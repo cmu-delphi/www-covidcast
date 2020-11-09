@@ -63,7 +63,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
     position: relative;
   }
 
@@ -79,9 +78,13 @@
     transform: translate(0, -50%);
   }
 
+  .grow {
+    flex: 1 1 0;
+  }
+
   .vega-wrapper {
     align-self: stretch;
-    flex: 1 1 8em;
+    flex: 0 0 8em;
     position: relative;
   }
 
@@ -131,6 +134,7 @@
       <InfoDialogButton {sensor} />
     </div>
   </div>
+  <div class="grow" />
   <table class="key" class:single={selections.length === 1}>
     <tbody>
       {#each selections as selection, i}

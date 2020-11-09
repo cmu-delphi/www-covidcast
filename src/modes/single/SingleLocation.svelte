@@ -48,6 +48,7 @@
   .search-container {
     align-self: center;
     width: 60em;
+    margin-bottom: 1em;
   }
 
   .grid-wrapper {
@@ -95,7 +96,7 @@
 </style>
 
 <div class="root base-font-size">
-  <div class="search-container container-bg container-style">
+  <div class="search-container">
     <Search
       placeholder={$currentRegionInfo ? 'Compare with...' : 'Search for a location...'}
       items={nameInfos}
