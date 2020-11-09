@@ -1,9 +1,9 @@
-import stateTopoJSON from './processed/swpa/state.topojson.json';
-import countyTopoJSON from './processed/swpa/county.topojson.json';
-import msaTopoJSON from './processed/swpa/msa.topojson.json';
-import neighborhoodTopoJSON from './processed/swpa/neighborhood.topojson.json';
-import zipTopoJSON from './processed/swpa/zip.topojson.json';
-import hrrTopoJSON from './processed/swpa/hrr.topojson.json';
+import stateTopoJSON from './processed/swpa/state.topojson.js';
+import countyTopoJSON from './processed/swpa/county.topojson.js';
+import msaTopoJSON from './processed/swpa/msa.topojson.js';
+import neighborhoodTopoJSON from './processed/swpa/neighborhood.topojson.js';
+import zipTopoJSON from './processed/swpa/zip.topojson.js';
+import hrrTopoJSON from './processed/swpa/hrr.topojson.js';
 import { generateGeo } from './utils';
 import { feature } from 'topojson-client';
 

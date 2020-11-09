@@ -45,6 +45,10 @@ function wrapModule(csv) {
   return `export default \`${csv}\`;`;
 }
 
+function wrapJSONModule(json) {
+  return `export default ${JSON.stringify(json)};`;
+}
+
 async function states(level = 'state') {
   const populationLookup = await generatePopulationLookup();
   const geo = require(`./raw/new_states.json`);
@@ -68,7 +72,7 @@ async function states(level = 'state') {
     wrapModule(dsvFormat(',').format(infos, ['id', 'postal', 'name', 'population', 'lat', 'long'])),
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
+  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.js`), wrapJSONModule(topo));
   return geo;
 }
 
@@ -116,7 +120,7 @@ function msa(level = 'msa') {
     wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'population', 'lat', 'long'])),
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
+  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.js`), wrapJSONModule(topo));
   return geo;
 }
 
@@ -196,7 +200,7 @@ async function counties(level = 'county') {
     wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'population', 'lat', 'long'])),
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
+  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.js`), wrapJSONModule(topo));
   return geo;
 }
 
@@ -278,7 +282,7 @@ function neighborhoods() {
     .filter((d) => d.id && d.geometry.coordinates.length > 0);
 
   const neighbors = topology({ neighborhood: neighborhoods }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/neighborhood.topojson.json`), JSON.stringify(neighbors));
+  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/neighborhood.topojson.js`), wrapJSONModule(neighbors));
   return neighborhoods;
 }
 
@@ -338,7 +342,7 @@ function zipHrr(hrrZone, hrrNum = '357') {
     wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'lat', 'long'])),
   );
   const geo = topology({ zip: data }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/zip.topojson.json`), JSON.stringify(geo));
+  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/zip.topojson.js`), wrapJSONModule(geo));
   // fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/zip.t.json`), JSON.stringify(data, null, 2));
   return data;
 }
@@ -348,7 +352,7 @@ function hrrZone(statesGeo, msaGeo, countiesGeo) {
   const zone = require(`./raw/swpa/hrr_zone.json`);
   const hrrZone = zone.features[0];
   const topo = topology({ hrr: zone }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/hrr.topojson.json`), JSON.stringify(topo));
+  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/hrr.topojson.js`), wrapJSONModule(topo));
   const filtered = {};
   Object.entries({
     state: statesGeo,
@@ -362,7 +366,7 @@ function hrrZone(statesGeo, msaGeo, countiesGeo) {
       ),
     };
     const topo = topology({ [level]: l }, QUANTIZATION);
-    fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/${level}.topojson.json`), JSON.stringify(topo));
+    fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/${level}.topojson.js`), wrapJSONModule(topo));
     filtered[level] = l.features.map((d) => d.id);
   });
   fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/filterInfo.json`), JSON.stringify(filtered));
