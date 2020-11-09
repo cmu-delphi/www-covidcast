@@ -1,10 +1,11 @@
 <script>
-  import { sensorList, currentSensor, smallMultipleTimeSpan, currentDate, currentInfoSensor } from '../../stores';
+  import { sensorList, currentSensor, smallMultipleTimeSpan, currentDate } from '../../stores';
   import { trackEvent } from '../../stores/ga';
   import throttle from 'lodash-es/throttle';
   import { levelList } from '../../stores/constants';
   import SmallMultiple from './SmallMultiple.svelte';
   import { prepareSensorData, resolveClickedTimeValue, resolveHighlightedTimeValue } from './vegaSpec';
+  import InfoDialogButton from '../../components/InfoDialogButton.svelte';
 
   /**
    * bi-directional binding
@@ -84,10 +85,10 @@
     padding: 0;
   }
 
-  li:hover .toolbar > button,
-  li.selected .toolbar > button,
-  .toolbar > button:hover,
-  .toolbar > button:focus {
+  li:hover .toolbar > :global(button),
+  li.selected .toolbar > :global(button),
+  .toolbar > :global(button):hover,
+  .toolbar > :global(button):focus {
     opacity: 1;
   }
 
@@ -95,7 +96,7 @@
     font-size: 0.7rem;
     display: flex;
   }
-  .toolbar > button {
+  .toolbar > :global(button) {
     opacity: 0;
     transition: opacity 0.25s ease;
   }
@@ -138,16 +139,7 @@
         </button>
         <div class="grow" />
         <div class="toolbar">
-          {#if s.sensor.description}
-            <button
-              title="Show sensor description"
-              class="uk-icon-button uk-icon-button-small"
-              data-uk-toggle="target: #info-dialog"
-              data-uk-icon="icon: question-plain"
-              on:click={() => {
-                currentInfoSensor.set(s.sensor);
-              }} />
-          {/if}
+          <InfoDialogButton sensor={s.sensor} />
           <button
             class="uk-icon-button uk-icon-button-small"
             class:hidden={!hasRegion}

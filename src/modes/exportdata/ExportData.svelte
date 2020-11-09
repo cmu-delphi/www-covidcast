@@ -8,6 +8,7 @@
   import { timeMonth } from 'd3-time';
   import { onMount } from 'svelte';
   import { trackEvent } from '../../stores/ga';
+  import InfoDialogButton from '../../components/InfoDialogButton.svelte';
 
   const CSV_SERVER = 'https://delphi.cmu.edu/csv';
   const iso = timeFormat('%Y-%m-%d');
@@ -134,6 +135,7 @@
         ds.signals.push({
           id,
           signal: entry.signal,
+          sensor: known,
           name: known ? known.name : entry.signal,
           description: known ? known.tooltipText : 'no description found',
         });
@@ -215,7 +217,10 @@
       </div>
       <div class="uk-width-1-3@m uk-width-expand@s">
         {#if signal}
-          <span class="uk-form-label">{signal.name}</span>
+          <span class="uk-form-label">
+            {signal.name}
+            <InfoDialogButton sensor={signal.sensor} />
+          </span>
           <div class="uk-form-controls-text">{signal.description}</div>
         {/if}
       </div>

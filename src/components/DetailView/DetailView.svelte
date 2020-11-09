@@ -1,5 +1,5 @@
 <script>
-  import { signalCasesOrDeathOptions, currentDateObject, smallMultipleTimeSpan, currentInfoSensor } from '../../stores';
+  import { signalCasesOrDeathOptions, currentDateObject, smallMultipleTimeSpan } from '../../stores';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../Vega.svelte';
   import { createSpec, patchSpec } from './vegaSpec';
@@ -9,6 +9,7 @@
   import { trackEvent } from '../../stores/ga';
   import VegaTooltip from './VegaTooltip.svelte';
   import { downloadUrl } from '../../data/screenshot';
+  import InfoDialogButton from '../InfoDialogButton.svelte';
 
   const dispatch = createEventDispatcher();
   /**
@@ -150,16 +151,7 @@
     data-uk-icon="icon: download"
     on:click={downloadVega}
     disabled={!vegaRef} />
-  {#if sensor.description}
-    <button
-      title="Show sensor description"
-      class="uk-icon-button"
-      data-uk-icon="icon: question-plain"
-      data-uk-toggle="target: #info-dialog"
-      on:click={() => {
-        currentInfoSensor.set(sensor);
-      }} />
-  {/if}
+  <InfoDialogButton {sensor} large={true} />
   <button
     bind:this={close}
     class="uk-icon-button"

@@ -171,6 +171,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
+    background: white;
   }
 
   .pick :global(*) {
