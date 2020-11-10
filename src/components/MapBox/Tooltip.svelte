@@ -65,12 +65,14 @@
     <h5>{properties.displayName}</h5>
     <table>
       <tbody>
-        <tr>
-          <th>Population</th>
-          <td class="right">
-            {typeof properties.population == 'number' ? properties.population.toLocaleString() : 'Unknown'}
-          </td>
-        </tr>
+        {#if properties.level !== 'hrr'}
+          <tr>
+            <th>Population</th>
+            <td class="right">
+              {typeof properties.population == 'number' ? properties.population.toLocaleString() : 'Unknown'}
+            </td>
+          </tr>
+        {/if}
         {#if $isDirectionSignalType}
           <tr>
             {#if properties.value === 1}
