@@ -1,5 +1,5 @@
 <script>
-  import { formatArea, formatDateShort, formatPopulation } from '../../formats';
+  import { formatDateShort, formatPopulation } from '../../formats';
 
   import {
     currentSensorEntry,
@@ -67,10 +67,6 @@
         <tr>
           <th>Population</th>
           <td class="right">{formatPopulation(properties)}</td>
-        </tr>
-        <tr>
-          <th>Area</th>
-          <td class="right">{formatArea(properties)}</td>
         </tr>
         {#if $isDirectionSignalType}
           <tr>
