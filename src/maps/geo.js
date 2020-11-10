@@ -2,6 +2,7 @@ import { dsvFormat } from 'd3-dsv';
 import stateTopoJSON from './processed/state.topojson.json';
 import countyTopoJSON from './processed/county.topojson.json';
 import msaTopoJSON from './processed/msa.topojson.json';
+import hrrTopoJSON from './processed/hrr.topojson.json';
 import citiesRaw from './processed/cities.csv.js';
 import { generateGeo } from './utils';
 
@@ -46,19 +47,22 @@ function citiesGeo() {
  * @param {import('.').NameInfo[]} stateInfo
  * @param {import('.').NameInfo[]} countyInfo
  * @param {import('.').NameInfo[]} msaInfo
+ * @param {import('.').NameInfo[]} hrrInfo
  * @param {string} megaLevel
  * @param {*} additionalProperties
  */
-export default function load(stateInfo, countyInfo, msaInfo, megaLevel, additionalProperties = {}) {
+export default function load(stateInfo, countyInfo, msaInfo, hrrInfo, megaLevel, additionalProperties = {}) {
   const state = generateGeo(stateTopoJSON, 'state', stateInfo, additionalProperties);
   const county = generateGeo(countyTopoJSON, 'county', countyInfo, additionalProperties);
   const msa = generateGeo(msaTopoJSON, 'msa', msaInfo, additionalProperties);
+  const hrr = generateGeo(hrrTopoJSON, 'hrr', hrrInfo, additionalProperties);
   const mega = deriveMegaGeo(state.border, megaLevel);
   const cities = citiesGeo();
   return {
     state,
     county,
     msa,
+    hrr,
     mega,
     cities,
   };

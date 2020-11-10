@@ -129,7 +129,10 @@ module.exports = () => {
       new DefinePlugin({
         __VERSION__: JSON.stringify(pkg.version),
       }),
-      new EnvironmentPlugin(['NODE_ENV']),
+      new EnvironmentPlugin({
+        NODE_ENV: 'production',
+        COVIDCAST_ENDPOINT_URL: 'https://api.covidcast.cmu.edu/epidata/api.php',
+      }),
       // new CopyPlugin({
       //   patterns: ['./src/static'],
       // }),
