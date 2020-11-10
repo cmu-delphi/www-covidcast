@@ -345,7 +345,7 @@ export default class AMapBoxWrapper {
 
   /**
    *
-   * @param {'county' | 'state' | 'msa'} level
+   * @param {'county' | 'state' | 'msa' | 'hrr'} level
    * @param {Promise<import('../../data/fetchData').EpiDataRow[]>>} data
    */
   updateSources(level, data, primaryValue = 'value') {

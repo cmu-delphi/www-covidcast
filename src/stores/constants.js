@@ -18,6 +18,11 @@ export const levelList = [
     labelPlural: 'Metro Areas',
   },
   {
+    id: 'hrr',
+    label: 'Hospital Referral Region',
+    labelPlural: 'Hospital Referral Regions',
+  },
+  {
     id: 'county',
     label: 'County',
     labelPlural: 'Counties',
@@ -260,6 +265,7 @@ export const defaultRegionOnStartup = {
   county: '42003', // Allegheny
   msa: '38300', // Pittsburgh
   state: 'PA', // Pennsylvania
+  hrr: '357', // Pittsburgh
 };
 
 export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
