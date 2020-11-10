@@ -206,9 +206,15 @@ async function hrr(level = 'hrr') {
   const infos = geo.features
     .map((feature) => {
       const id = String(feature.properties.hrr_num);
-      // don't know why but there is this frame
+      // due to some unknown error in the re-projection,
+      // frames covering the whole area are created within the geometry
+      // each frame has the same first coordinate pair which is used to filter it out
+      const MAGIC_FRAME_FIST_COORDINATE_PAIR = [-26.069579678452456, 13.509452429458069];
       feature.geometry.coordinates = feature.geometry.coordinates.filter((d) => {
-        return !(d[0][0][0] === -26.069579678452456 && d[0][0][1] === 13.509452429458069);
+        // keep only lists which are not starting with the magic frame pair
+        return !(
+          d[0][0][0] === MAGIC_FRAME_FIST_COORDINATE_PAIR[0] && d[0][0][1] === MAGIC_FRAME_FIST_COORDINATE_PAIR[1]
+        );
       });
       delete feature.bbox;
       const center = centerOfMass(feature).geometry.coordinates;
