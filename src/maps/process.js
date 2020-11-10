@@ -4,7 +4,7 @@ const { dsvFormat, csvParse } = require('d3-dsv');
 const fs = require('fs');
 const path = require('path');
 const booleanDisjoint = require('@turf/boolean-disjoint').default;
-const centroid = require('@turf/centroid').default;
+const centerOfMass = require('@turf/center-of-mass').default;
 const { topology } = require('topojson-server');
 const geojsonExtent = require('@mapbox/geojson-extent');
 const { LngLatBounds, LngLat } = require('mapbox-gl');
@@ -200,6 +200,49 @@ async function counties(level = 'county') {
   return geo;
 }
 
+async function hrr(level = 'hrr') {
+  const geo = require(`./raw/hrr/hrr.reprojected.geo.json`);
+
+  const infos = geo.features
+    .map((feature) => {
+      const id = String(feature.properties.hrr_num);
+      // due to some unknown error in the re-projection,
+      // frames covering the whole area are created within the geometry
+      // each frame has the same first coordinate pair which is used to filter it out
+      const MAGIC_FRAME_FIST_COORDINATE_PAIR = [-26.069579678452456, 13.509452429458069];
+      feature.geometry.coordinates = feature.geometry.coordinates.filter((d) => {
+        // keep only lists which are not starting with the magic frame pair
+        return !(
+          d[0][0][0] === MAGIC_FRAME_FIST_COORDINATE_PAIR[0] && d[0][0][1] === MAGIC_FRAME_FIST_COORDINATE_PAIR[1]
+        );
+      });
+      delete feature.bbox;
+      const center = centerOfMass(feature).geometry.coordinates;
+      const props = feature.properties;
+      const state = props.hrr_name.split('-')[0].trim();
+      const name = props.hrr_name.slice(props.hrr_name.indexOf('-') + 1).trim();
+      feature.id = id;
+      feature.properties = {};
+      return {
+        id,
+        name,
+        state,
+        displayName: `${props.hrr_name} (HRR)`,
+        lat: center[0],
+        long: center[1],
+      };
+    })
+    .sort((a, b) => a.id.localeCompare(b.id));
+  fs.writeFileSync(
+    path.resolve(__dirname, `./processed/${level}.csv.js`),
+    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'lat', 'long'])),
+  );
+  // fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.geo.json`), JSON.stringify(geo));
+  const topo = topology({ [level]: geo }, QUANTIZATION);
+  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
+  return geo;
+}
+
 function cities() {
   const geo = require(`./raw/city_data/cities-reprojected.json`);
   const infos = geo.features.map((feature) => {
@@ -241,7 +284,7 @@ function neighborhoods() {
     }),
     ...municipal.features.map((feature) => {
       const props = feature.properties;
-      const center = centroid(feature).geometry.coordinates;
+      const center = centerOfMass(feature).geometry.coordinates;
       return {
         id: props.CNTL_ID,
         municode: props.MUNICODE,
@@ -325,7 +368,7 @@ function zipHrr(hrrZone, hrrNum = '357') {
     }
   });
   const infos = data.features.map((feature) => {
-    const center = centroid(feature).geometry.coordinates;
+    const center = centerOfMass(feature).geometry.coordinates;
     return {
       id: feature.id,
       name: feature.id,
@@ -374,10 +417,11 @@ function hrrZone(statesGeo, msaGeo, countiesGeo) {
   const statesGeo = await states();
   const msaGeo = await msa();
   const countiesGeo = await counties();
+  const hrrGeo = await hrr();
   await cities();
 
-  const hrrGeo = await hrrZone(statesGeo, msaGeo, countiesGeo);
-  const zipGeo = await zipHrr(hrrGeo);
+  const hrr357Geo = await hrrZone(statesGeo, msaGeo, countiesGeo);
+  const zipGeo = await zipHrr(hrr357Geo);
   const neighborhoodsGeo = await neighborhoods();
 
   fs.writeFileSync(
@@ -388,6 +432,7 @@ function hrrZone(statesGeo, msaGeo, countiesGeo) {
         msa: computeBounds(msaGeo).toArray(),
         counties: computeBounds(countiesGeo).toArray(),
         hrr: computeBounds(hrrGeo).toArray(),
+        hrr357: computeBounds(hrr357Geo).toArray(),
         neighborhoods: computeBounds(neighborhoodsGeo).toArray(),
         zip: computeBounds(zipGeo).toArray(),
       },
