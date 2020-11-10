@@ -243,7 +243,7 @@ async function hrr(level = 'hrr') {
   );
   // fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.geo.json`), JSON.stringify(geo));
   const topo = topology({ [level]: geo }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
+  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.js`), wrapJSONModule(topo));
   return geo;
 }
 
