@@ -70,10 +70,21 @@
     align-items: center;
     padding: 0 1em;
   }
+
+  .description {
+    margin-bottom: 3em;
+  }
 </style>
 
 <div class="root">
-  <h1>Facebook Survey Results</h1>
+  <p class="description">
+    In collaboration with Facebook, along with a consortium of universities and public health officials, the <a
+      href="https://delphi.cmu.edu/">Delphi group</a> at <a href="https://www.cmu.edu/">Carnegie Mellon University</a> conducts
+    research surveys to monitor the spread and impact of the COVID-19 pandemic in the United States. This survey is advertised
+    through Facebook. It has run continuously since early April 2020, and about 70,000 people in the United States participate
+    every day. <a href="https://covidcast.cmu.edu/surveys.html">Read more &hellip;</a>
+  </p>
+
   <aside>
     <Search
       className="container-bg"
@@ -87,6 +98,7 @@
       <SensorDatePicker sensor={refSensor} bind:value={selectedDate} />
     </div>
   </aside>
+
   <main>
     <!-- {#if $currentRegionInfo}
       <p>
