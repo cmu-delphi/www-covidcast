@@ -1,0 +1,21 @@
+<ul>
+    <li>
+        <a title="Share on Facebook" target="_blank"
+            rel="noopener noreferrer" href="https://www.facebook.com/sharer/sharer.php?{{ (querify "u" .Permalink) | safeURL }}">
+            Facebook
+        </a>
+    </li>
+    <li>
+        <a title="Share on Twitter" target="_blank"
+            rel="noopener noreferrer" href="https://twitter.com/share?{{ (querify "text" .Title "url" .Permalink) | safeURL }}">
+            Twitter
+        </a>
+    </li>
+    <li>
+        <a title="Share on LinkedIn" target="_blank"
+            rel="noopener noreferrer"
+            href="https://www.linkedin.com/shareArticle?{{ (querify "mini" "true" "url" .Permalink "title" .Title) | safeURL }}">
+            LinkedIn
+        </a>
+    </li>
+</ul>

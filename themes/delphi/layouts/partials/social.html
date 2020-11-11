@@ -1,0 +1,55 @@
+<div>
+  <ul>
+    {{ if isset .Site.Params "facebook" }}
+    <li>
+      <a
+        href="{{ .Site.Params.Facebook }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Facebook"
+        >Delphi on Facebook</a
+      >
+    </li>
+    {{ end }} {{ if isset .Site.Params "twitter" }}
+    <li>
+      <a
+        href="{{ .Site.Params.Twitter }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Twitter"
+        >Delphi on Twitter</a
+      >
+    </li>
+    {{ end }} {{ if isset .Site.Params "linkedin" }}
+    <li>
+      <a
+        href="{{ .Site.Params.Linkedin }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="LinkedIn"
+        >Delphi on LinkedIn</a
+      >
+    </li>
+    {{ end }} {{ if isset .Site.Params "youtube" }}
+    <li>
+      <a
+        href="{{ .Site.Params.Youtube }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="YouTube"
+        >Delphi Youtube Channel</a
+      >
+    </li>
+    {{ end }} {{ if isset .Site.Params "instagram" }}
+    <li>
+      <a
+        href="{{ .Site.Params.Instagram }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Instagram"
+        >Delphi on Instagram</a
+      >
+    </li>
+    {{ end }}
+  </ul>
+</div>

@@ -1,0 +1,11 @@
+<footer>
+	{{ partial "legal.html" . }}
+	{{ partial "social.html" . }}
+
+	{{ $script := resources.Get "js/main.js" | js.Build | minify | fingerprint -}}
+	<script src="{{ $script.Permalink }}" {{ printf "integrity=%q" $script.Data.Integrity | safeHTMLAttr }}></script>
+  
+  {{ range .Page.Params.scripts }}
+	  <script src="{{ . | absURL }}"></script>
+  {{ end }}
+</footer>

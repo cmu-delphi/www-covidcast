@@ -1,0 +1,10 @@
+
+<section>
+{{ $tools := .Site.GetPage "/indicators" }}
+{{ range sort (where ($tools.Resources.ByType "page") ".Params.category" "eq" (.Get "category")) ".Params.order" }}
+  <article>
+    <h4>{{ .Title }}</h4>
+    {{ .Content }}
+  </article>
+{{ end }}
+</section>

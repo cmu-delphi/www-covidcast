@@ -1,0 +1,9 @@
+<nav class="uk-navbar-container" data-uk-navbar>
+  <div class="uk-navbar-left">
+      <ul class="uk-navbar-nav">
+          {{ range .Site.Menus.main.ByWeight }}
+          <li class="{{ if eq .Identifier "main" }}uk-active{{ end }}"><a href="{{ .URL | relLangURL }}">{{ .Name }}</a></li>
+          {{ end }}
+      </ul>
+  </div>
+</nav>

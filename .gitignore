@@ -13,3 +13,5 @@ src/**/descriptions.raw.txt
 /cypress/screenshots
 *.log
 __diff_output__
+/resources
+/static/bundle

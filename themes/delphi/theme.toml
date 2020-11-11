@@ -1,0 +1,8 @@
+name = "Delphi"
+license = "MIT"
+description = "A Delphi theme based on noteworthy."
+min_version = "0.55.2"
+
+[author]
+    name = "Samuel Gratzl"
+    homepage = "https://github.com/sgratzl"

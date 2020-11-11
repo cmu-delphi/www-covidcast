@@ -1,0 +1,24 @@
+{{ define "main" }}
+<div>
+    {{ if .Date }}
+    <time>{{ .Date.Format "January 2, 2006" }}</time>
+    {{ end }}
+    <h1>{{ .Title }}</h1>
+    {{ if .Params.author }}
+        <span>{{ .Params.author }}</span>
+    {{ end }}
+    {{ partial "share.html" . }}
+    {{ .Content }}
+    {{ template "_internal/disqus.html" . }}
+
+    <div>
+        {{if .Params.tags}}
+        <hr>
+        {{ range .Params.tags }}
+            <a href="{{ "/tags/" | relLangURL }}{{ . | urlize }}">#{{.}}</a>
+        {{ end }}
+      {{ end }}
+    </div>
+
+</div>
+{{end}}

@@ -1,0 +1,26 @@
+{{ define "main" }}
+<div>
+  <!-- All of the site's posts grouped by year -->
+  <h1>Archives</h1>
+  <div>
+    <!-- Group all the post pages from the same year -->
+    {{ $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}
+    {{ range ($pages.GroupByDate "2006") }}
+    <h3>{{ .Key }}</h3>
+    <!-- Display the year -->
+
+    <ul>
+      {{ range (.Pages) }}
+
+      <li>
+        <span>{{ .PublishDate.Format "Jan 2" }}</span>
+        <span>
+          <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+        </span>
+      </li>
+      {{ end }}
+    </ul>
+    {{ end }}
+  </div>
+</div>
+{{ end }}

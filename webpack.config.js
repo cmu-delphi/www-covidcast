@@ -20,10 +20,10 @@ module.exports = () => {
     },
 
     output: {
-      path: path.resolve(__dirname, 'public'),
+      path: path.resolve(__dirname, 'static', 'bundle'),
       filename: '[name].js',
-      chunkFilename: devMode ? '[name].js' : '[name].[chunkhash].js',
-      // publicPath: './',
+      chunkFilename: '[name].js',
+      publicPath: './bundle/',
     },
 
     resolve: {
@@ -117,8 +117,8 @@ module.exports = () => {
     },
 
     devServer: {
-      contentBase: [path.join(__dirname, 'public'), path.join(__dirname, 'src/assets')],
-      contentBasePublicPath: ['/', '/assets'],
+      contentBase: path.join(__dirname, 'public'),
+      contentBasePublicPath: '/',
       watchContentBase: true,
       host: 'localhost',
       hot: hmr,
@@ -140,16 +140,11 @@ module.exports = () => {
         alwaysWriteToDisk: true,
         template: './src/index.html',
       }),
-      new HtmlWebpackPlugin({
-        filename: 'embed.html',
-        alwaysWriteToDisk: true,
-        template: './src/embed.html',
-      }),
       new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({
         filename: '[name].css',
         ignoreOrder: true,
-        chunkFilename: devMode ? '[name].css' : '[name].[chunkhash].css',
+        chunkFilename: '[name].css',
       }),
     ].filter(Boolean),
   };
