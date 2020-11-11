@@ -33,6 +33,6 @@
     {{- end -}}
 
     {{ range .Page.Params.styles }}
-      <link rel="stylesheet" href="{{ . | absURL }}"/>
+      <link rel="stylesheet" href="{{ . | relURL }}"/>
     {{ end }}
 </head>

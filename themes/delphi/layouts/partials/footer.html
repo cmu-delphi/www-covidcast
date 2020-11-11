@@ -6,6 +6,6 @@
 	<script src="{{ $script.Permalink }}" {{ printf "integrity=%q" $script.Data.Integrity | safeHTMLAttr }}></script>
   
   {{ range .Page.Params.scripts }}
-	  <script src="{{ . | absURL }}"></script>
+	  <script src="{{ . | relURL }}"></script>
   {{ end }}
 </footer>

@@ -4,7 +4,7 @@ title = "COVIDcast"
 theme = "delphi"
 googleAnalytics = "UA-88748454-1"
 disqusShortname = ""
-relativeURLs = false
+relativeURLs = true
 ignoreFiles = ["src", "node_modules", ".github", "cypress", "scripts"]
 
 [permalinks]

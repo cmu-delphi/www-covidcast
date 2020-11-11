@@ -30,7 +30,7 @@ To run unit test, run
 
 To run e2e test, run
 
-`npm run build && npm run test:e2e`
+`npm run build:local && npm run test:e2e`
 
 To run the development server, run
 

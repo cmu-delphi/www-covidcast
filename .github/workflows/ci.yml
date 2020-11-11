@@ -19,7 +19,7 @@ jobs:
             ${{ runner.OS }}-node2-
       - run: npm ci
       - run: npm run lint
-      - run: npm run build
+      - run: npm run build:local
       - run: npm run test
       - uses: cypress-io/github-action@v2
         with:

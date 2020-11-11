@@ -1,3 +1,7 @@
+[build]
+publish = "public"
+command = "npm run build:netlify"
+
 [context.production.environment]
   COVIDCAST_ENDPOINT_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
 

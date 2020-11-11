@@ -15,7 +15,10 @@
   "scripts": {
     "gen": "node ./scripts/generateDescriptions.js",
     "start": "npm run gen && concurrently \"hugo -b http://localhost:8080/ -D --watch\" \"cross-env NODE_ENV=development webpack-dev-server -d --open\"",
-    "build": "npm run gen && cross-env NODE_ENV=production webpack -p && hugo --gc --minify",
+    "build:assets": "npm run gen && cross-env NODE_ENV=production webpack -p",
+    "build": "npm run build:assets && hugo --gc --minify",
+    "build:local": "npm run build:assets && hugo -b http://localhost:8080/ --gc --minify",
+    "build:netlify": "npm run build:assets && hugo --gc --minify -b $DEPLOY_PRIME_URL",
     "deploy": "npm run build; gh-pages -d public",
     "zip": "cd public && bestzip ../release.zip *",
     "prettier": "prettier --write \"**/*\"",
@@ -24,7 +27,7 @@
     "release": "release-it --disable-metrics",
     "changelog": "node ./scripts/changelog.js",
     "test": "jest --passWithNoTests",
-    "test:e2e": "concurrently \"http-server\" \"cypress run\"",
+    "test:e2e": "concurrently -k \"http-server\" \"cypress run\"",
     "cy:open": "cypress open",
     "serve": "http-server"
   },
