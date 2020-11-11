@@ -14,6 +14,12 @@
    */
   export let detail = null;
 
+  // $: {
+  //   if (detail && detail.key !== $currentSensor) {
+  //     detail = $currentSensorEntry;
+  //   }
+  // }
+
   export let levels = levelList;
   $: levelIds = new Set(levels.map((l) => l.id));
   $: sensors = sensorList.filter((d) => d.levels.some((l) => levelIds.has(l)));
@@ -172,6 +178,8 @@
             on:click|stopPropagation={() => {
               trackEvent('side-panel', detail === s.sensor ? 'hide-detail' : 'show-detail', s.sensor.key);
               detail = detail === s.sensor ? null : s.sensor;
+              // Also update currentSensor.
+              // $currentSensor = detail ? detail.key : $currentSensor;
             }}>
             <FaSearchPlus />
           </button>
