@@ -3,8 +3,6 @@ const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 // const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
 const { EnvironmentPlugin, DefinePlugin } = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
@@ -133,14 +131,6 @@ module.exports = () => {
         NODE_ENV: 'production',
         COVIDCAST_ENDPOINT_URL: 'https://api.covidcast.cmu.edu/epidata/api.php',
       }),
-      // new CopyPlugin({
-      //   patterns: ['./src/static'],
-      // }),
-      new HtmlWebpackPlugin({
-        alwaysWriteToDisk: true,
-        template: './src/index.html',
-      }),
-      new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({
         filename: '[name].css',
         ignoreOrder: true,

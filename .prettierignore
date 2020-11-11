@@ -20,3 +20,8 @@
 *.log
 *.png
 *.jpg
+*.toml
+/resources
+/layouts
+/themes
+/static/bundle

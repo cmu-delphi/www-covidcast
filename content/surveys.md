@@ -10,7 +10,6 @@ An international version of the survey is conducted by the University of Marylan
 
 **New!** The [Symptom Data Challenge](https://www.symptomchallenge.org/) challenges participants to enable earlier detection and improved situational awareness of the COVID-19 outbreak by using data from these symptom surveys. Submissions are due by Tuesday, October 6th, 2020, and finalists are eligible to win cash prizes. See [the challenge website](https://www.symptomchallenge.org/) for more details.
 
-
 ## What are the surveys for?
 
 The survey asks respondents whether they are experiencing any symptoms, then asks a series of questions designed to help researchers understand the spread of COVID-19 and its effect on people in the United States. These include questions about COVID-19 testing, prior medical conditions, social distancing measures, mental health, demographics, and the economic effects of the pandemic.
@@ -19,13 +18,11 @@ Delphi uses information from the survey as part of its public [COVIDcast map](ht
 
 Because the survey can reach thousands of respondents every day, its questions focus on what the respondents are experiencing right now. This allows us to track how conditions change across the country every day.
 
-
 ## Who is running these surveys?
 
 The surveys are a collaboration between [Delphi](https://delphi.cmu.edu/) at Carnegie Mellon University, numerous universities, and Facebook. Researchers at many institutions are analyzing the survey data and assisting in the survey’s development.
 
 The survey protocol has been reviewed by the Carnegie Mellon University Institutional Review Board. Delphi only publicly releases aggregate data; de-identified individual data is made available to research partners. Our partners are bound by data use agreements to maintain the confidentiality of individual survey responses. Facebook refers its users to the survey, but it does not receive any individual survey data.
-
 
 ## How are the surveys distributed?
 
@@ -35,11 +32,9 @@ The survey participants are sampled from Facebook users, rather than being a ran
 
 To account for the differences between Facebook users and the United States population, Facebook includes a unique identifier when it links users to the survey. Carnegie Mellon collects these identifiers and provides Facebook with a list of identifiers that completed the survey; Facebook then calculates statistical weights indicating how representative each person is of the United States population, based on demographic data known to Facebook. Crucially, Carnegie Mellon cannot use these identifiers to identify specific Facebook users, and Facebook never receives individual survey responses and cannot link them to specific users.
 
-
 ## Where can I see the results?
 
 Our [COVIDcast map](https://covidcast.cmu.edu/) shows basic aggregate survey results, revealing the rate of COVID-like symptoms across the United States, and this data is also freely available for download through the [COVIDcast API](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html). Facebook also publishes [a map](https://covid-survey.dataforgood.fb.com/) based on the United States and international aggregate data.
-
 
 ### Blog posts and presentations
 
@@ -73,7 +68,7 @@ Access to de-identified individual survey responses is available to qualified re
     Senior Director, Media Relations  
     Carnegie Mellon University
 - All other questions:
-   - [Alex Reinhart](mailto:areinhar@stat.cmu.edu)  
-     Assistant Teaching Professor  
-     Department of Statistics & Data Science  
-     Carnegie Mellon University
+  - [Alex Reinhart](mailto:areinhar@stat.cmu.edu)  
+    Assistant Teaching Professor  
+    Department of Statistics & Data Science  
+    Carnegie Mellon University
