@@ -5,7 +5,7 @@ theme = "delphi"
 googleAnalytics = "UA-88748454-1"
 disqusShortname = ""
 relativeURLs = true
-ignoreFiles = ["src", "node_modules", ".github", "cypress", "scripts"]
+ignoreFiles = ["src", "node_modules", ".github", "cypress", "scripts", "static/bundle", "package.json"]
 
 [permalinks]
     post = "/:year/:month/:day/:slug/"

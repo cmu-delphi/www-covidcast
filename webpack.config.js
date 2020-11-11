@@ -21,7 +21,7 @@ module.exports = () => {
       path: path.resolve(__dirname, 'static', 'bundle'),
       filename: '[name].js',
       chunkFilename: '[name].js',
-      publicPath: './bundle/',
+      publicPath: devMode ? 'bundle/' : './bundle/',
     },
 
     resolve: {
@@ -115,9 +115,9 @@ module.exports = () => {
     },
 
     devServer: {
-      contentBase: path.join(__dirname, 'public'),
-      contentBasePublicPath: '/',
-      watchContentBase: true,
+      contentBase: [path.join(__dirname, 'public'), path.join(__dirname, 'src/assets')],
+      contentBasePublicPath: ['/', '/assets'],
+      watchContentBase: false,
       host: 'localhost',
       hot: hmr,
     },
