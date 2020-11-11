@@ -14,6 +14,12 @@ describe('hello test', () => {
   it('smoke mobile test', () => {
     cy.viewport('iphone-x').visit('/index.html');
 
+    cy.on('uncaught:exception', (err) => {
+      if (err.message.includes('ResizeObserver loop limit exceeded')) {
+        return false;
+      }
+    });
+
     // wait that the map is ready
     cy.get('.mapboxgl-map[data-ready=ready]');
 
