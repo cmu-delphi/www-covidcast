@@ -50,6 +50,7 @@ export const ENCODING_BUBBLE_THEME = {
   maxRadius: {
     county: 6,
     msa: 10,
+    hrr: 10,
     state: 20,
   },
   radiusScale: {
@@ -73,11 +74,13 @@ export const ENCODING_SPIKE_THEME = {
   maxHeight: {
     county: 20,
     msa: 40,
+    hrr: 40,
     state: 80,
   },
   size: {
     county: 4,
     msa: 8,
+    hrr: 8,
     state: 16,
   },
   heightScale: {
