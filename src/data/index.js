@@ -93,7 +93,7 @@ function loadRegularSignal(sEntry, meta, timeMap, statsMap) {
     return aIndex - bIndex;
   };
 
-  const candidates = meta.epidata.filter(baseFilter).sort(byGeoTypePriority);
+  const candidates = meta.filter(baseFilter).sort(byGeoTypePriority);
   const matchedMeta = candidates[0];
 
   if (matchedMeta) {
@@ -115,9 +115,7 @@ function loadRegularSignal(sEntry, meta, timeMap, statsMap) {
  * @param {import('./fetchData').SensorEntry} sEntry
  */
 function loadCountSignal(sEntry, meta, timeMap, statsMap) {
-  const possibleMetaRows = meta.epidata.filter(
-    (d) => d.data_source === sEntry.id && (!d.time_type || d.time_type === 'day'),
-  );
+  const possibleMetaRows = meta.filter((d) => d.data_source === sEntry.id && (!d.time_type || d.time_type === 'day'));
 
   sEntry.levels.forEach((region) => {
     const statsKey = toStatsRegionKey(sEntry.key, region);
@@ -184,8 +182,12 @@ function loadCountSignal(sEntry, meta, timeMap, statsMap) {
  * @param {import('../stores/constants').SensorEntry[]} sensors
  */
 export function loadMetaData(sensors) {
-  const custom = sensors.filter((d) => d.meta).map((d) => d.meta(d.id, d.signal));
-  const remoteSignals = sensors.filter((d) => !d.meta);
+  const custom = sensors
+    .filter((d) => !(d.meta == null || typeof d.meta === 'string'))
+    .map((d) => (typeof d.meta === 'function' ? d.meta(d.id, d.signal) : d.meta));
+
+  const remoteSignals = sensors.filter((d) => d.meta == null || typeof d.meta === 'string');
+
   return Promise.all([
     callMetaAPI(
       remoteSignals,
@@ -197,12 +199,7 @@ export function loadMetaData(sensors) {
     ),
     ...custom,
   ]).then((metas) => {
-    const meta = metas[0];
-    if (!Array.isArray(meta.epidata)) {
-      // bug in the API
-      meta.epidata = [...Object.values(meta.epidata)];
-    }
-    meta.epidata.push(...metas.slice(1).flat(2));
+    const meta = metas.flat(2);
     return processMetaData(meta);
   });
 }

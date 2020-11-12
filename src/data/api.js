@@ -48,19 +48,21 @@ export function callAPI(id, signal, level, date, region) {
 }
 
 /**
- *
+ * @param {string | null} endpoint
  * @param {import('.').SensorEntry[]} sensors
  * @param {string[]} fields
  * @param {Record<string, string>} filters
  */
-export function callMetaAPI(sensors, fields, filters) {
-  const url = new URL(ENDPOINT);
-  const urlGet = new URL(ENDPOINT);
+function callMetaAPIImpl(endpoint, sensors, fields, filters) {
+  const url = new URL(endpoint || ENDPOINT);
+  const urlGet = new URL(endpoint || ENDPOINT);
   const data = new FormData();
   data.set('source', 'covidcast_meta');
   urlGet.searchParams.set('source', data.get('source'));
   data.set('cached', 'true');
   urlGet.searchParams.set('cached', data.get('cached'));
+  data.set('format', 'json');
+  urlGet.searchParams.set('format', data.get('format'));
 
   if (sensors && sensors.length > 0) {
     const signals = sensors
@@ -95,4 +97,31 @@ export function callMetaAPI(sensors, fields, filters) {
     method: 'POST',
     body: data,
   }).then((d) => d.json());
+}
+/**
+ *
+ * @param {import('.').SensorEntry[]} sensors
+ * @param {string[]} fields
+ * @param {Record<string, string>} filters
+ */
+export function callMetaAPI(sensors, fields, filters) {
+  // group by api string
+  const map = new Map();
+  for (const sensor of sensors) {
+    const endpoint = sensor.api || ENDPOINT;
+    if (map.has(endpoint)) {
+      map.get(endpoint).push(sensor);
+    } else {
+      map.set(endpoint, [sensor]);
+    }
+  }
+  if (map.size === 1) {
+    const first = Array.from(map.entries())[0];
+    return callMetaAPIImpl(first[0], first[1], fields, filters);
+  }
+  return Promise.all(
+    Array.from(map.entries()).map(([endpoint, groupedSensors]) =>
+      callMetaAPIImpl(endpoint, groupedSensors, fields, filters),
+    ),
+  ).then((metas) => metas.flat());
 }
