@@ -8,6 +8,12 @@
   // the list of items  the user can select from
   export let items;
 
+  /**
+   * custom filter for visible items
+   * @type {(item) => boolean}
+   */
+  export let filterItem = null;
+
   // field of each item that's used for the labels in the list
   export let labelFieldName = undefined;
 
@@ -120,7 +126,9 @@
 
   function resetItems() {
     const matchingItems =
-      selectedLabelLookup.size > 0 ? listItems.filter((d) => !selectedLabelLookup.has(d.label)) : listItems;
+      selectedLabelLookup.size > 0 || filterItem != null
+        ? listItems.filter((d) => !selectedLabelLookup.has(d.label) && (filterItem == null || filterItem(d.item)))
+        : listItems;
     filteredListItems = limitListItems(matchingItems);
     hiddenFilteredListItems = matchingItems.length - filteredListItems.length;
   }
@@ -140,7 +148,9 @@
     const matchingItems = listItems.filter((listItem) => {
       const itemKeywords = listItem.keywords;
       return (
-        searchWords.every((searchWord) => itemKeywords.includes(searchWord)) && !selectedLabelLookup.has(listItem.label)
+        searchWords.every((searchWord) => itemKeywords.includes(searchWord)) &&
+        !selectedLabelLookup.has(listItem.label) &&
+        (filterItem == null || filterItem(listItem.item))
       );
     });
 
