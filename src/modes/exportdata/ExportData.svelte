@@ -4,17 +4,18 @@
   import Datepicker from '../../components/Calendar/Datepicker.svelte';
   import { getLevelInfo, primaryValue, sensorList, sensorMap } from '../../stores/constants';
   import { parseAPITime } from '../../data';
-  import { currentSensorEntry, smallMultipleTimeSpan } from '../../stores';
+  import { currentInfoSensor, currentSensorEntry, smallMultipleTimeSpan } from '../../stores';
   import { timeMonth } from 'd3-time';
   import { onMount } from 'svelte';
   import { trackEvent } from '../../stores/ga';
+  import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
 
   const CSV_SERVER = 'https://delphi.cmu.edu/csv';
   const iso = timeFormat('%Y-%m-%d');
 
   const sourceNameLookup = {
     'doctor-visits': 'COVID-Related Doctor Visits',
-    'fb-survey': 'Facebook Survey Results',
+    'fb-survey': 'Delphi Survey Results',
     ght: 'Google Search Trends',
     'hospital-admissions': 'Hospital Admissions',
     'indicator-combination': 'Delphi Data Sources',
@@ -85,11 +86,13 @@
         lookupMap.set(`${entry.id}-${signal}`, {
           name: `${name} (7-day average)`,
           tooltipText: text,
+          wrappee: entry,
         });
         const countSignal = entry.casesOrDeathSignals[primaryValue(entry, options).replace('avg', 'count')];
         lookupMap.set(`${entry.id}-${countSignal}`, {
           name,
           tooltipText: text.replace(' (7-day average) ', ''),
+          wrappee: entry,
         });
       };
       add(false, false);
@@ -134,6 +137,7 @@
         ds.signals.push({
           id,
           signal: entry.signal,
+          entry: known ? known.wrappee || known : undefined,
           name: known ? known.name : entry.signal,
           description: known ? known.tooltipText : 'no description found',
         });
@@ -216,6 +220,12 @@
     min-width: 5em;
   }
 
+  .info {
+    width: 1.5em;
+    height: 1.5em;
+    display: inline-block;
+  }
+
   @media only screen and (max-width: 710px) {
     .block {
       width: 100%;
@@ -254,7 +264,17 @@
       </div>
       <div class="block">
         {#if signal}
-          <h6>{signal.name}</h6>
+          <h6>
+            {signal.name}
+            {#if signal.entry}
+              <button
+                title="Show sensor description"
+                class="pg-button pg-button-circle info"
+                on:click={() => {
+                  currentInfoSensor.set(signal.entry);
+                }}><IoMdHelp /></button>
+            {/if}
+          </h6>
           <p>{signal.description}</p>
         {/if}
       </div>
