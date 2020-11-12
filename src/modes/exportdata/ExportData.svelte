@@ -207,12 +207,8 @@
     font-size: 80%;
   }
 
-  form {
-    visibility: hidden;
-  }
-
   .buttons {
-    display: flex;
+    display: inline-flex;
     align-items: center;
   }
 
@@ -305,15 +301,14 @@
       We are happy for you to use this data in products and publications. Please acknowledge us as a source: <cite> Data
         from Delphi COVIDcast, covidcast.cmu.edu. </cite>
     </p>
-    <div class="buttons">
+    <div class="pg-button-group buttons">
       <button
         class="pg-button button"
         data-testid="csv"
         on:click={() => {
           currentMode = 'csv';
         }}
-        type="submit"
-        form="form"
+        class:selected={currentMode === 'csv'}
         disabled={!geoType || !signalValue}
         title="Get in CSV format">
         CSV
@@ -341,7 +336,25 @@
         R
       </button>
     </div>
-    {#if currentMode === 'python'}
+    {#if currentMode === 'csv'}
+      <p>Direct link:</p>
+      <form bind:this={form} id="form" method="GET" action={CSV_SERVER} download>
+        <button type="submit" class="pg-button pg-text-button">Download CSV File</button>
+        <input type="hidden" name="signal" value={signalValue} />
+        <input type="hidden" name="start_day" value={iso(startDate)} />
+        <input type="hidden" name="end_day" value={iso(endDate)} />
+        <input type="hidden" name="geo_type" value={geoType} />
+      </form>
+      <p>Manually fetch data:</p>
+      <pre>
+        {`wget --content-disposition "${CSV_SERVER}?signal=${signalValue}&start_day=${iso(startDate)}&end_day=${iso(endDate)}&geo_type=${geoType}"`}
+      </pre>
+      <p class="description">
+        For more details about the API, see the <a href="https://cmu-delphi.github.io/delphi-epidata/">API documentation</a>.
+        A description of the returned data structure can be found at: <a
+          href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html#response">covidcast</a>.
+      </p>
+    {:else if currentMode === 'python'}
       <p>Install <code>covidcast</code> via pip:</p>
       <pre>pip install covidcast</pre>
       <p>Fetch data:</p>
@@ -354,8 +367,10 @@ data = covidcast.signal("${source ? source.id : ''}", "${signal ? signal.signal 
                         "${geoType}")`}
       </pre>
       <p class="description">
-        For more details and examples, see the <a href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/">package
-          documentation.</a>
+        For more details and examples, see the <a
+          href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/">package documentation</a>. A description of
+        the returned data structure can be found at: <a
+          href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/signals.html#covidcast.signal">covidcast.signal</a>.
       </p>
     {:else if currentMode === 'r'}
       <p>Install <code>covidcast</code> using <a href="https://devtools.r-lib.org/">devtools</a> :</p>
@@ -372,14 +387,9 @@ covidcast_signal(data_source = "${source ? source.id : ''}", signal = "${signal 
       </pre>
       <p class="description">
         For more details and examples, see the <a href="https://cmu-delphi.github.io/covidcast/covidcastR/">package
-          documentation.</a>
+          documentation</a>. A description of the returned data structure can be found at: <a
+          href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html#value">covidcast_signal</a>.
       </p>
     {/if}
-    <form bind:this={form} id="form" method="GET" action={CSV_SERVER} download>
-      <input type="hidden" name="signal" value={signalValue} />
-      <input type="hidden" name="start_day" value={iso(startDate)} />
-      <input type="hidden" name="end_day" value={iso(endDate)} />
-      <input type="hidden" name="geo_type" value={geoType} />
-    </form>
   </section>
 </div>
