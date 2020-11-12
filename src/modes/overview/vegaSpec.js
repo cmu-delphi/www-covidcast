@@ -103,16 +103,56 @@ const stdErrTransformPercent = [
  */
 export function createSpec(sensor, selections, dateRange, valuePatch) {
   const isPercentage = sensor.format === 'percent';
+  const scalePercent = isPercentage ? (v) => v / 100 : (v) => v;
   const yField = valuePatch && valuePatch.field ? valuePatch.field : isPercentage ? 'pValue' : 'value';
 
-  const scalePercent = isPercentage ? (v) => v / 100 : (v) => v;
+  const clipping = valuePatch && valuePatch.domain ? true : false;
+  const yMax = clipping ? valuePatch.domain[1] : 0;
+  const yMaxScaled = scalePercent(yMax);
+
+  // The clipped region should start and end with clipped values so that the region is completely flat.
+  //     ###<clipped>###
+  //    /               \
+  const clippingTransforms = [
+    {
+      as: 'clipped',
+      calculate: `${!clipping} || datum.${yField} == null ? false : datum.${yField} > ${yMaxScaled}`,
+    },
+    {
+      as: 'clippedData',
+      calculate: `datum.clipped ? datum.${yField} : null`,
+    },
+  ];
+
+  const clippingLayers = [
+    // Draw clipped data.
+    {
+      mark: {
+        type: 'text',
+        text: '\u2236', // =
+        size: 12,
+        baseline: 'bottom',
+        dx: -0.3,
+        dy: 3.5,
+        stroke: '#FFAAAA',
+        strokeOpacity: 0.5,
+      },
+      encoding: {
+        y: {
+          field: 'clippedData',
+          type: 'quantitative',
+        },
+      },
+    },
+  ];
+
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
   const spec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
     data: { name: 'values' },
-    padding: { left: 50, top: 4, bottom: 16, right: 2 },
+    padding: { left: 50, top: 6, bottom: 20, right: 2 },
     autosize: {
       type: 'none',
       contains: 'padding',
@@ -121,10 +161,14 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
     transform: [
       ...(sensor.hasStdErr ? (isPercentage ? stdErrTransformPercent : stdErrTransform) : []),
       {
-        calculate: 'datum.value == null ? null : datum.value / 100',
         as: 'pValue',
+        calculate: 'datum.value == null ? null : datum.value / 100',
       },
+      ...(clipping ? clippingTransforms : []),
     ],
+    resolve: {
+      scale: { y: 'shared' },
+    },
     encoding: {
       color: colorEncoding(selections),
       x: {
@@ -156,9 +200,10 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
             field: yField,
             type: 'quantitative',
             scale: {
-              domainMin: valuePatch && valuePatch.domain ? scalePercent(valuePatch.domain[0]) : 0,
-              domainMax: valuePatch && valuePatch.domain ? scalePercent(valuePatch.domain[1]) : undefined,
+              domainMin: clipping ? scalePercent(valuePatch.domain[0]) : 0,
+              domainMax: clipping ? scalePercent(valuePatch.domain[1]) : undefined,
               clamp: true,
+              nice: clipping ? false : true, // When clipping, need nice false.
             },
             axis: {
               ...(isPercentage ? { format: '.1%', formatType: 'cachedNumber' } : {}),
@@ -169,6 +214,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
           },
         },
       },
+      ...(clipping ? clippingLayers : []),
       {
         selection: {
           highlight: {

@@ -81,7 +81,7 @@ function loadRegularSignal(sEntry, meta, timeMap, statsMap) {
     const aIndex = regularSignalMetaDataGeoTypeCandidates.indexOf(a.geo_type);
     const bIndex = regularSignalMetaDataGeoTypeCandidates.indexOf(b.geo_type);
     if (aIndex === bIndex) {
-      return a.geo_type.localCompare(b.geo_type);
+      return a.geo_type.localeCompare(b.geo_type);
     }
     if (aIndex < 0) {
       // missing is bigger
@@ -141,6 +141,12 @@ function loadCountSignal(sEntry, meta, timeMap, statsMap) {
         max: sEntry.msa_max,
         mean: sEntry.msa_mean,
         std: sEntry.msa_std,
+      });
+    } else if (region === 'hrr') {
+      statsMap.set(statsKey, {
+        max: sEntry.hrr_max,
+        mean: sEntry.hrr_mean,
+        std: sEntry.hrr_std,
       });
     } else {
       statsMap.set(statsKey, {

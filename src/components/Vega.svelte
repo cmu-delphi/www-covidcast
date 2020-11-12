@@ -2,10 +2,9 @@
   import { onMount, onDestroy, createEventDispatcher, afterUpdate } from 'svelte';
   import embed from 'vega-embed';
   import { Error, expressionFunction } from 'vega';
-  import { observeResize, unobserveResize } from '../util';
+  import { observeResize, unobserveResize, debouncedResize } from '../util';
   import { createVegaTooltipAdapter } from './tooltipUtils';
   import { cachedTime, cachedNumber } from './customVegaFunctions';
-  import { debounce } from 'lodash-es';
 
   expressionFunction('cachedTime', cachedTime);
   expressionFunction('cachedNumber', cachedNumber);
@@ -106,13 +105,15 @@
           // outside has changed
           return;
         }
-        vega.view.change(
-          'values',
-          vega.view
-            .changeset()
-            .remove(() => true)
-            .insert(d || []),
-        );
+        setTimeout(() => {
+          vega.view.change(
+            'values',
+            vega.view
+              .changeset()
+              .remove(() => true)
+              .insert(d || []),
+          );
+        });
 
         noData = !d || d.length === 0;
         // also update signals along the way
@@ -237,10 +238,6 @@
       updateSpec(spec);
     }
   });
-
-  const debouncedResize = debounce(() => {
-    window.dispatchEvent(new Event('resize'));
-  }, 250);
 
   afterUpdate(() => {
     debouncedResize();

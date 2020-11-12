@@ -3,6 +3,7 @@ import { dsvFormat } from 'd3-dsv';
 import stateRaw from './processed/state.csv.js';
 import msaRaw from './processed/msa.csv.js';
 import countyRaw from './processed/county.csv.js';
+import hrrRaw from './processed/hrr.csv.js';
 // import neighborhoodRaw from './processed/swpa/neighborhood.csv.js';
 // import zipRaw from './processed/swpa/zip.csv.js';
 // import swpaFilterInfo from './processed/swpa/filterInfo.json';
@@ -39,6 +40,7 @@ function parseCSV(csv, level) {
 const stateInfo = parseCSV(stateRaw, 'state');
 const msaInfo = parseCSV(msaRaw, 'msa');
 const countyInfo = parseCSV(countyRaw, 'county');
+const hrrInfo = parseCSV(hrrRaw, 'hrr');
 
 // generate mega counties by copying the states
 const megaCountyInfo = stateInfo.map((info) => ({
@@ -53,7 +55,7 @@ const megaCountyInfo = stateInfo.map((info) => ({
 }));
 
 export const nameInfos = stateInfo
-  .concat(msaInfo, countyInfo, megaCountyInfo)
+  .concat(msaInfo, countyInfo, hrrInfo, megaCountyInfo)
   .sort((a, b) => a.displayName.localeCompare(b.displayName));
 
 export const bounds = boundsInfo;
@@ -61,7 +63,7 @@ export const bounds = boundsInfo;
 export function loadSources(additionalProperties = {}) {
   // mark to be loaded as fast as possible
   return import(/* webpackPreload: true */ './geo').then((r) =>
-    r.default(stateInfo, countyInfo, msaInfo, levelMegaCountyId, additionalProperties),
+    r.default(stateInfo, countyInfo, msaInfo, hrrInfo, levelMegaCountyId, additionalProperties),
   );
 }
 

@@ -21,6 +21,7 @@
   import { levelMegaCounty, groupedSensorList, sensorList, primaryValue, yesterdayDate } from '../../stores/constants';
   import { parseAPITime } from '../../data';
   import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
+  import { computeNeighborhood } from '../../util';
 
   const SHOW_X_MORE = 10;
   const MAX_OTHER_SENSORS = 1;
@@ -174,12 +175,27 @@
     return data;
   });
 
-  function maxNested(rows) {
-    return rows.flat().reduce((acc, v) => Math.max(acc, v.value), 0);
+  $: neighborhood = computeNeighborhood($currentDateObject, startDay, finalDay, (finalDay - startDay) / 2);
+
+  // Returns the max value for all rows of all locations.
+  // rowsOfRows is an array for all locations of the rows for each location.
+  function maxNested(rowsOfRows, field) {
+    if (rowsOfRows.length === 0) {
+      return 0;
+    }
+    field = field === 'pValue' ? 'value' : field;
+
+    // Filter rows to only include the neighborhood.
+    const filterInNeighborhood = (rows) =>
+      rows.filter((row) => row.date_value >= neighborhood.start && row.date_value <= neighborhood.end);
+    return rowsOfRows
+      .map(filterInNeighborhood)
+      .flat()
+      .reduce((acc, v) => Math.max(acc, v[field] != null ? v[field] : 0), 0);
   }
 
   // compute local maxima
-  $: primaryDomain = Promise.all(primaryData).then((rows) => [0, maxNested(rows)]);
+  $: primaryDomain = Promise.all(primaryData).then((rows) => [0, maxNested(rows, primaryField)]);
 
   $: otherDataAndDomain = otherSensors.map((sensor) => {
     const data = sortedRows.map((row) =>
@@ -187,7 +203,8 @@
         geo_value: row.propertyId,
       }).then((r) => addMissing(r)),
     );
-    const domain = Promise.all(data).then((rows) => [0, maxNested(rows)]);
+    const field = primaryValue(sensor, ratioOptions);
+    const domain = Promise.all(data).then((rows) => [0, maxNested(rows, field)]);
     return { data, domain };
   });
 
