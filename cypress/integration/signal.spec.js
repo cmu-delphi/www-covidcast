@@ -16,6 +16,12 @@ describe('fake sensor data test', () => {
       .matchImageSnapshot({
         failureThreshold: 0.2,
         failureThresholdType: 'percent',
+        clip: {
+          x: 0,
+          y: 0,
+          width: 422,
+          height: 395,
+        },
         customDiffConfig: {
           threshold: 0.1,
         },

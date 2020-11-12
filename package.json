@@ -27,7 +27,7 @@
     "release": "release-it --disable-metrics",
     "changelog": "node ./scripts/changelog.js",
     "test": "jest --passWithNoTests",
-    "test:e2e": "concurrently -k \"http-server\" \"cypress run\"",
+    "test:e2e": "concurrently -k -s first \"http-server\" \"cypress run\"",
     "cy:open": "cypress open",
     "serve": "http-server"
   },
