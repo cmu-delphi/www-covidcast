@@ -29,7 +29,7 @@
 
 {#if sensor.isCasesOrDeath}
   <div class="root {className}" class:center>
-    <div aria-label="display cumulative or indicence" class="pg-button-group button-group">
+    <div aria-label="display cumulative or incidence" class="pg-button-group button-group">
       <button
         aria-pressed={String(!$signalCasesOrDeathOptions.cumulative)}
         class="pg-button button"

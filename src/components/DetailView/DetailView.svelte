@@ -59,13 +59,11 @@
       }).then((rows) => addMissing(rows, sensor))
     : [];
 
-  const title = `${sensor.name} in ${
-    selections.length > 0 ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown'
-  }`;
+  const location = `in ${selections.length > 0 ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown'}`;
 
   $: spec = createSpec(sensor, primaryValue(sensor, $signalCasesOrDeathOptions), selections, $smallMultipleTimeSpan, [
-    title,
     mapTitle,
+    location,
   ]);
 
   /**
