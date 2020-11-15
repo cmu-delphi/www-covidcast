@@ -118,12 +118,12 @@ export function colorEncoding(selections) {
  * @param {Array<string>} title
  */
 export function createSpec(sensor, primaryValue, selections, initialSelection, title) {
-  const cumulativePrefix =
-    primaryValue === 'countRatioCumulative' || primaryValue === 'countCumulative' ? 'Cumulative ' : '';
-  const ratioSuffix = primaryValue === 'countRatioCumulative' || primaryValue === 'avgRatio' ? ' per 100,000' : '';
-  const yAxisTitle = cumulativePrefix + sensor.yAxis + ratioSuffix;
+  const ratioSuffix =
+    primaryValue === 'countRatioCumulative' || primaryValue === 'avgRatio' ? ' per 100,000 people' : '';
+  const yAxisTitle = sensor.yAxis + ratioSuffix;
 
-  const leftPadding = cumulativePrefix ? 60 : 50;
+  const isCumulative = primaryValue === 'countRatioCumulative' || primaryValue === 'countCumulative';
+  const leftPadding = isCumulative ? 60 : 50;
 
   /**
    * @type {import('vega-lite').TopLevelSpec}
