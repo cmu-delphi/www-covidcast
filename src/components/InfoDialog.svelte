@@ -10,6 +10,7 @@
   } from '../stores';
 
   let close = null;
+  let oldFocus = null;
 
   /**
    * @param {KeyboardEvent} e
@@ -19,13 +20,22 @@
       return;
     }
     if (e.key === 'Escape' || e.key === 'Esc') {
+      restoreFocus();
       currentInfoSensor.set(null);
     }
   }
 
   $: {
     if ($currentInfoSensor && close) {
+      oldFocus = document.activeElement;
       close.focus();
+    }
+  }
+
+  function restoreFocus() {
+    if (oldFocus) {
+      oldFocus.focus();
+      oldFocus = null;
     }
   }
 
@@ -38,6 +48,7 @@
     // switch to export mode
     currentMode.set(modeByID.export);
     currentInfoSensor.set(null);
+    oldFocus = null;
   }
 </script>
 
@@ -99,6 +110,7 @@
       bind:this={close}
       class="pg-button close"
       on:click={() => {
+        restoreFocus();
         currentInfoSensor.set(null);
       }}
       title="Close this popup">
