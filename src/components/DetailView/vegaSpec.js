@@ -145,7 +145,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
       resize: true,
     },
     padding: { left: leftPadding, right: 2, top: 50, bottom: 5 },
-    transform: [...(sensor.hasStdErr ? stdErrTransform : [])],
+    transform: sensor.hasStdErr ? stdErrTransform : [],
     vconcat: [
       {
         encoding: {
