@@ -10,23 +10,6 @@
     currentSensor,
   } from '../stores';
 
-  let close = null;
-  let oldFocus = null;
-
-  $: {
-    if ($currentInfoSensor && close) {
-      oldFocus = document.activeElement;
-      close.focus();
-    }
-  }
-
-  function restoreFocus() {
-    if (oldFocus) {
-      oldFocus.focus();
-      oldFocus = null;
-    }
-  }
-
   function exportData(e) {
     e.preventDefault();
     // ensure visible sensor is the active one
@@ -36,14 +19,12 @@
     // switch to export mode
     currentMode.set(modeByID.export);
     currentInfoSensor.set(null);
-    oldFocus = null;
   }
 
   let dialog;
   onMount(() => {
     UIkit.util.on(dialog, 'hidden', () => {
       // unset upon hidden
-      restoreFocus();
       currentInfoSensor.set(null);
     });
   });
