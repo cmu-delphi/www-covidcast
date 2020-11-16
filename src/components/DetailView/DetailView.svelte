@@ -72,17 +72,27 @@
   function onEscCheck(e) {
     if (e.key === 'Escape' || e.key === 'Esc') {
       trackEvent('detail-view', 'close', 'keyboard');
+      restoreFocus();
       dispatch('close');
     }
   }
 
   let close = null;
+  let oldFocus = null;
 
   onMount(() => {
     if (close) {
+      oldFocus = document.activeElement;
       close.focus();
     }
   });
+
+  function restoreFocus() {
+    if (oldFocus) {
+      oldFocus.focus();
+      oldFocus = null;
+    }
+  }
 
   // Reference to the vega chart component.
   let vegaRef = null;
@@ -158,6 +168,7 @@
     data-uk-close
     on:click={() => {
       trackEvent('detail-view', 'close', 'button');
+      restoreFocus();
       dispatch('close');
     }}
     title="Close this detail view" />

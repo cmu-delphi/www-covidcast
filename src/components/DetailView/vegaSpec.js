@@ -131,7 +131,21 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
       lineHeight: 22,
       color: '#666',
     },
-    data: { name: 'values' },
+    data: {
+      name: 'values',
+      values: initialSelection
+        ? [
+            {
+              date_value: initialSelection[0],
+              value: 0,
+            },
+            {
+              date_value: initialSelection[1],
+              value: 1,
+            },
+          ]
+        : [],
+    },
     autosize: {
       type: 'none',
       contains: 'padding',
@@ -352,7 +366,7 @@ export function patchSpec(spec, size) {
   return merge({}, spec, {
     vconcat: [
       {
-        height: size.height - RANGE_SELECTOR_HEIGHT - OFFSET_Y,
+        height: Math.floor(size.height - RANGE_SELECTOR_HEIGHT - OFFSET_Y),
       },
       {
         height: RANGE_SELECTOR_HEIGHT,
