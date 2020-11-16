@@ -59,10 +59,12 @@
       }).then((rows) => addMissing(rows, sensor))
     : [];
 
-  const location = `in ${selections.length > 0 ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown'}`;
+  $: title = `${sensor.name} in ${
+    selections.length > 0 ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown'
+  }`;
   $: sensorPrimaryValue = primaryValue(sensor, $signalCasesOrDeathOptions);
 
-  $: spec = createSpec(sensor, sensorPrimaryValue, selections, $smallMultipleTimeSpan, [mapTitle, location]);
+  $: spec = createSpec(sensor, sensorPrimaryValue, selections, $smallMultipleTimeSpan, [title, mapTitle]);
 
   $: isCumulative = sensorPrimaryValue === 'countRatioCumulative' || sensorPrimaryValue === 'countCumulative';
 
