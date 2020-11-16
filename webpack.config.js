@@ -24,7 +24,7 @@ module.exports = () => {
       path: path.resolve(__dirname, 'public'),
       filename: '[name].js',
       chunkFilename: '[name].js',
-      publicPath: process.env.DEPLOY_PRIME_URL ? `${process.env.DEPLOY_PRIME_URL}/` : undefined,
+      // publicPath: process.env.DEPLOY_PRIME_URL ? `${process.env.DEPLOY_PRIME_URL}/` : undefined,
     },
 
     resolve: {
