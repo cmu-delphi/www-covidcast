@@ -66,7 +66,7 @@
 
   $: spec = createSpec(sensor, sensorPrimaryValue, selections, $smallMultipleTimeSpan, [title, mapTitle]);
 
-  $: isCumulative = sensorPrimaryValue === 'countRatioCumulative' || sensorPrimaryValue === 'countCumulative';
+  $: isCumulative = $signalCasesOrDeathOptions.cumulative;
 
   /**
    * @param {KeyboardEvent} e
