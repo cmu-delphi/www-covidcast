@@ -95,7 +95,7 @@
     Select on map
   </button>
 
-  <h5>Select from Top for <em>{$currentSensorEntry.name}</em></h5>
+  <h5>Select from Top for <strong>{$currentSensorEntry.name}</strong></h5>
 
   <ol class:loading>
     {#each top10Data as row}
