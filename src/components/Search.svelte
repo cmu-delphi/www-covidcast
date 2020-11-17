@@ -47,8 +47,8 @@
   /**
    * @type {any[]}
    */
-  export let selectedItems = [];
-  $: multiple = selectedItems.length > 0;
+  export let selectedItems = null;
+  $: multiple = selectedItems != null;
   export let maxSelections = Number.POSITIVE_INFINITY;
 
   let text;
@@ -98,7 +98,7 @@
     // store reference to the origial item
     item,
   }));
-  $: selectedLabelLookup = new Set(selectedItems.map((s) => labelFunction(s)));
+  $: selectedLabelLookup = new Set((selectedItems || []).map((s) => labelFunction(s)));
 
   function limitListItems(items) {
     if (maxItemsToShowInList <= 0 || items.length < maxItemsToShowInList) {
@@ -448,7 +448,7 @@
   <button class="search-button" on:click={focusSearch} title="Show Search Field" aria-label="Show Search Field">
     <IoIosSearch />
   </button>
-  {#if multiple}
+  {#if multiple && selectedItems.length > 0}
     <div class="search-tags">
       {#each selectedItems as selectedItem}
         <div class="search-tag" style="border-color: {colorFieldName ? selectedItem[colorFieldName] : undefined}">
