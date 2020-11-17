@@ -74,13 +74,15 @@
     if (event.detail.name !== 'dateRange') {
       return;
     }
-    console.info('onDateRangeChange called', event);
     const dr = event.detail.value && event.detail.value.date_value;
     if (dr && Array.isArray(dr) && dr.length > 0) {
-      const drDates = [new Date(dr[0]), new Date(dr[1])];
-      if (dr[0] !== dateRange[0].getTime() || dr[1] !== dateRange[1].getTime()) {
-        console.info('onDateRange new dates', drDates);
-        dateRange = drDates;
+      console.info('onDateRangeChange', dr);
+      if (
+        (!Number.isNaN(dr[0]) && dr[0] !== dateRange[0].getTime()) ||
+        (!Number.isNaN(dr[1]) && dr[1] !== dateRange[1].getTime())
+      ) {
+        dateRange = [new Date(dr[0]), new Date(dr[1])];
+        console.info('onDateRange new dates', dateRange);
       }
     }
   }
