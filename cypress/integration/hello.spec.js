@@ -9,7 +9,7 @@ describe('hello test', () => {
     // wait that the map is ready
     cy.get('.mapboxgl-map[data-ready=ready]');
 
-    cy.get('.viz-name h1').should('contain', 'COVIDcast');
+    cy.get('.banner').should('contain', 'daily doctor visits');
   });
   it('smoke mobile test', () => {
     cy.viewport('iphone-x').visit('/index.html');
@@ -17,6 +17,6 @@ describe('hello test', () => {
     // wait that the map is ready
     cy.get('.mapboxgl-map[data-ready=ready]');
 
-    cy.get('.viz-name h1').should('contain', 'COVIDcast');
+    cy.get('.banner').should('contain', 'daily doctor visits');
   });
 });
