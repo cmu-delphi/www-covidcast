@@ -8,7 +8,7 @@ export function isPropSignal(signal) {
 
 export function isDeathSignal(signal) {
   const deathsRegex = /deaths_/;
-  return signal.match(deathsRegex);
+  return signal.match(deathsRegex) && !signal.includes('deaths_percent_of_expected');
 }
 
 export function isCasesSignal(signal) {
