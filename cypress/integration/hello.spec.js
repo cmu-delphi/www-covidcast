@@ -24,7 +24,7 @@ describe('hello test', () => {
 
     // wait that the map is ready
     cy.get('.mapboxgl-map[data-ready=ready]', {
-      timeout: 30000
+      timeout: 30000,
     });
 
     cy.get('.banner').should('contain', 'daily doctor visits');
