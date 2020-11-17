@@ -14,7 +14,7 @@
   },
   "scripts": {
     "gen": "node ./scripts/generateDescriptions.js",
-    "start": "npm run gen && cross-env NODE_ENV=development webpack-dev-server -d --open",
+    "start": "npm run gen && cross-env NODE_ENV=development webpack-dev-server -d",
     "build": "npm run gen && cross-env NODE_ENV=production webpack -p",
     "deploy": "npm run build; gh-pages -d public",
     "zip": "cd public && bestzip ../release.zip *",
