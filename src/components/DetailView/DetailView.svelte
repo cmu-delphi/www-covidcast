@@ -59,11 +59,36 @@
       }).then((rows) => addMissing(rows, sensor))
     : [];
 
+  // The currently selected date range, initially defaults to the smallMultipleTimeSpan.
+  // Modified by onDateRangeChange, and fetched via non-reactive getDateRange,
+  // to avoid updating the chart immediately, so it will be used as the initial value the
+  // next time createSpec is called.
+  $: dateRange = $smallMultipleTimeSpan;
+
+  function getDateRange() {
+    return dateRange;
+  }
+
+  function onDateRangeChange(event) {
+    if (event.detail.name !== 'dateRange') {
+      return;
+    }
+    console.info('onDateRangeChange called', event);
+    const dr = event.detail.value && event.detail.value.date_value;
+    if (dr && Array.isArray(dr) && dr.length > 0) {
+      const drDates = [new Date(dr[0]), new Date(dr[1])];
+      if (dr[0] !== dateRange[0].getTime() || dr[1] !== dateRange[1].getTime()) {
+        console.info('onDateRange new dates', drDates);
+        dateRange = drDates;
+      }
+    }
+  }
+
   const title = `${sensor.name} in ${
     selections.length > 0 ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown'
   }`;
 
-  $: spec = createSpec(sensor, primaryValue(sensor, $signalCasesOrDeathOptions), selections, $smallMultipleTimeSpan, [
+  $: spec = createSpec(sensor, primaryValue(sensor, $signalCasesOrDeathOptions), selections, getDateRange(), [
     title,
     mapTitle,
   ]);
@@ -206,6 +231,8 @@
     {patchSpec}
     {noDataText}
     signals={{ currentDate: $currentDateObject }}
+    signalListeners={['dateRange', 'highlight']}
+    on:signal={onDateRangeChange}
     tooltip={VegaTooltip}
     tooltipProps={{ sensor }} />
 </div>
