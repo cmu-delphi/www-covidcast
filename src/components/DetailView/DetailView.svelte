@@ -60,7 +60,7 @@
     : [];
 
   // The currently selected date range, initially defaults to the smallMultipleTimeSpan.
-  // Modified by onDateRangeChange, and fetched via non-reactive getDateRange,
+  // Modified by onDateRangeChange, and fetched via (non-reactive) getDateRange,
   // to avoid updating the chart immediately, so it will be used as the initial value the
   // next time createSpec is called.
   $: dateRange = $smallMultipleTimeSpan;
@@ -70,6 +70,7 @@
   }
 
   function onDateRangeChange(event) {
+    // All signal events are sent to all on:signal handlers (??), so check if this is the right handler.
     if (event.detail.name !== 'dateRange') {
       return;
     }
@@ -231,7 +232,7 @@
     {patchSpec}
     {noDataText}
     signals={{ currentDate: $currentDateObject }}
-    signalListeners={['dateRange', 'highlight']}
+    signalListeners={['dateRange']}
     on:signal={onDateRangeChange}
     tooltip={VegaTooltip}
     tooltipProps={{ sensor }} />
