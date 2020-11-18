@@ -15,7 +15,10 @@
   export let selections = [];
 
   $: possibleInfos = regionSearchList.filter(
-    (d) => d.level !== levelMegaCounty.id && !selections.some((s) => s.info.id === d.id),
+    (d) =>
+      d.level !== levelMegaCounty.id &&
+      !selections.some((s) => s.info.id === d.id) &&
+      (selections.length === 0 || selections.some((s) => s.info.level === d.level)), // filter to same level as selection
   );
 
   $: possibleRecent = $recentRegionInfos.filter((d) => !selections.some((s) => s.info.id === d.id));

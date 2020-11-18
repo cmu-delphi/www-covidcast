@@ -7,16 +7,26 @@ describe('hello test', () => {
     // https://on.cypress.io/get
 
     // wait that the map is ready
-    cy.get('.mapboxgl-map[data-ready=ready]');
+    cy.get('.mapboxgl-map[data-ready=ready]', {
+      timeout: 30000,
+    });
 
-    cy.get('.viz-name h1').should('contain', 'COVIDcast');
+    cy.get('.banner').should('contain', 'daily doctor visits');
   });
   it('smoke mobile test', () => {
     cy.viewport('iphone-x').visit('/index.html');
 
-    // wait that the map is ready
-    cy.get('.mapboxgl-map[data-ready=ready]');
+    cy.on('uncaught:exception', (err) => {
+      if (err.message.includes('ResizeObserver loop limit exceeded')) {
+        return false;
+      }
+    });
 
-    cy.get('.viz-name h1').should('contain', 'COVIDcast');
+    // wait that the map is ready
+    cy.get('.mapboxgl-map[data-ready=ready]', {
+      timeout: 30000,
+    });
+
+    cy.get('.banner').should('contain', 'daily doctor visits');
   });
 });
