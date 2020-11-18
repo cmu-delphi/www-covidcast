@@ -1,11 +1,5 @@
 <script>
-  import {
-    signalCasesOrDeathOptions,
-    currentDateObject,
-    currentInfoSensor,
-    detailViewTimeSpan,
-    smallMultipleTimeSpan,
-  } from '../../stores';
+  import { signalCasesOrDeathOptions, currentDateObject, currentInfoSensor, smallMultipleTimeSpan } from '../../stores';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../Vega.svelte';
   import { createSpec, patchSpec } from './vegaSpec';
@@ -65,17 +59,17 @@
       }).then((rows) => addMissing(rows, sensor))
     : [];
 
-  // The currently selected date range, initially defaults to the smallMultipleTimeSpan.
+  // The currently selected detailViewTimeSpan, initially defaults to the smallMultipleTimeSpan.
   // Modified by onDateRangeChange, and fetched via (non-reactive) getDateRange,
   // to avoid updating the chart immediately, so it will be used as the initial value the
-  // next time createSpec is called.
-  // $: dateRange = dateRange || $smallMultipleTimeSpan;
+  // next time createSpec is called.  Reloading the component will reset to the default.
+  $: detailViewTimeSpan = detailViewTimeSpan || $smallMultipleTimeSpan;
 
   function getDateRange() {
-    if ($detailViewTimeSpan.length === 0) {
-      detailViewTimeSpan.set($smallMultipleTimeSpan);
+    if (detailViewTimeSpan.length === 0) {
+      detailViewTimeSpan = $smallMultipleTimeSpan;
     }
-    return $detailViewTimeSpan;
+    return detailViewTimeSpan;
   }
 
   function onDateRangeChange(event) {
@@ -85,13 +79,11 @@
     }
     const dr = event.detail.value && event.detail.value.date_value;
     if (dr && Array.isArray(dr) && dr.length > 0) {
-      console.info('onDateRangeChange', dr);
       if (
-        (!Number.isNaN(dr[0]) && dr[0] !== $detailViewTimeSpan[0].getTime()) ||
-        (!Number.isNaN(dr[1]) && dr[1] !== $detailViewTimeSpan[1].getTime())
+        (!Number.isNaN(dr[0]) && dr[0] !== detailViewTimeSpan[0].getTime()) ||
+        (!Number.isNaN(dr[1]) && dr[1] !== detailViewTimeSpan[1].getTime())
       ) {
-        detailViewTimeSpan.set([new Date(dr[0]), new Date(dr[1])]);
-        console.info('onDateRangeChange new dates', $detailViewTimeSpan);
+        detailViewTimeSpan = [new Date(dr[0]), new Date(dr[1])];
       }
     }
   }
