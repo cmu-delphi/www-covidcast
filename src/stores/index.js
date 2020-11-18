@@ -133,8 +133,6 @@ export const smallMultipleTimeSpan = derived([currentDateObject], ([date]) => {
   return [min, max];
 });
 
-export const detailViewTimeSpan = writable([]);
-
 // Region GEO_ID for filtering the line chart
 // 42003 - Allegheny; 38300 - Pittsburgh; PA - Pennsylvania.
 export const currentRegion = writable('', (set) => {
