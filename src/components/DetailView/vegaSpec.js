@@ -158,7 +158,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
         encoding: {
           x: {
             ...xDateEncoding,
-            scale: { domain: { selection: 'brush' } },
+            scale: { domain: { selection: 'dateRange' } },
           },
         },
         resolve: { axis: { x: 'independent' } },
@@ -263,7 +263,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
         layer: [
           {
             selection: {
-              brush: {
+              dateRange: {
                 type: 'interval',
                 encodings: ['x'],
                 init: {
