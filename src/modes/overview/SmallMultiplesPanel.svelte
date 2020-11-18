@@ -2,11 +2,10 @@
   import { sensorList, currentSensor, smallMultipleTimeSpan, currentDate, currentInfoSensor } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
   import { trackEvent } from '../../stores/ga';
-  import throttle from 'lodash-es/throttle';
   import { levelList } from '../../stores/constants';
   import SmallMultiple from './SmallMultiple.svelte';
   import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
-  import { prepareSensorData, resolveClickedTimeValue, resolveHighlightedTimeValue } from './vegaSpec';
+  import { prepareSensorData, resolveClickedTimeValue, highlightTimeValue, onHighlight } from './vegaSpec';
 
   /**
    * bi-directional binding
@@ -39,19 +38,6 @@
   $: hasRegion = selections.length > 0;
 
   $: sensorsWithData = sensors.map((sensor) => prepareSensorData(sensor, selections, startDay, endDay));
-
-  let highlightTimeValue = null;
-
-  const throttled = throttle((value) => {
-    highlightTimeValue = value;
-  }, 100);
-
-  function onHighlight(e) {
-    const value = resolveHighlightedTimeValue(e);
-    if (highlightTimeValue !== value) {
-      throttled(value);
-    }
-  }
 
   function onClick(e) {
     const timeValue = resolveClickedTimeValue(e);
