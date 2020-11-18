@@ -88,14 +88,17 @@
     }
   }
 
-  const title = `${sensor.name} in ${
+  $: title = `${sensor.name} in ${
     selections.length > 0 ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown'
   }`;
+  $: sensorPrimaryValue = primaryValue(sensor, $signalCasesOrDeathOptions);
 
   $: spec = createSpec(sensor, primaryValue(sensor, $signalCasesOrDeathOptions), selections, getDateRange(), [
     title,
     mapTitle,
   ]);
+
+  $: isCumulative = $signalCasesOrDeathOptions.cumulative;
 
   /**
    * @param {KeyboardEvent} e
@@ -240,12 +243,12 @@
     tooltip={VegaTooltip}
     tooltipProps={{ sensor }} />
 </div>
-{#if sensor.isCasesOrDeath}
+{#if sensor.isCasesOrDeath && !isCumulative}
   <div class="legend">
     <div class="legend-avg" />
     <div>7-day average</div>
     <div class="legend-avg legend-count" />
-    <div>daily new COVID-19 {sensor.name.toLowerCase()}</div>
+    <div>Raw data</div>
   </div>
 {/if}
 <div class="encoding">
