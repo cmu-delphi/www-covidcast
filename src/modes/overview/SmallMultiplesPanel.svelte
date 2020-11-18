@@ -1,11 +1,18 @@
 <script>
-  import { sensorList, currentSensor, smallMultipleTimeSpan, currentDate, currentInfoSensor } from '../../stores';
+  import {
+    sensorList,
+    currentSensor,
+    smallMultipleTimeSpan,
+    currentDate,
+    currentInfoSensor,
+    highlightTimeValue,
+  } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
   import { trackEvent } from '../../stores/ga';
   import { levelList } from '../../stores/constants';
   import SmallMultiple from './SmallMultiple.svelte';
   import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
-  import { prepareSensorData, resolveClickedTimeValue, highlightTimeValue, onHighlight } from './vegaSpec';
+  import { prepareSensorData, resolveClickedTimeValue, onHighlight } from './vegaSpec';
 
   /**
    * bi-directional binding
@@ -163,7 +170,7 @@
           </button>
         </div>
       </div>
-      <SmallMultiple {s} {highlightTimeValue} {onClick} {onHighlight} />
+      <SmallMultiple {s} highlightTimeValue={$highlightTimeValue} {onClick} {onHighlight} />
     </li>
   {/each}
 </ul>

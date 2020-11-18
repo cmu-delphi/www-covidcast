@@ -12,8 +12,8 @@
   import { sensorList } from '../../stores/constants';
   import SensorCard from './SensorCard.svelte';
   import { selectionColors } from '../../theme';
-  import { onHighlight, highlightTimeValue } from '../overview/vegaSpec';
-
+  import { onHighlight } from '../overview/vegaSpec';
+  import { highlightTimeValue } from '../../stores';
   $: selectedLevels = new Set($currentMultiSelection.map((d) => d.info.level));
   function filterItem(item) {
     return selectedLevels.size === 0 || selectedLevels.has(item.level);
@@ -99,7 +99,7 @@
           date={$currentDateObject}
           selections={$currentMultiSelection}
           {onHighlight}
-          {highlightTimeValue} />
+          highlightTimeValue={$highlightTimeValue} />
       {/each}
     </div>
   </div>

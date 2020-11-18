@@ -6,6 +6,7 @@ import {
 } from '../../components/DetailView/vegaSpec';
 import { addMissing, fetchTimeSlice, formatAPITime } from '../../data';
 import { levelMegaCounty } from '../../stores/constants';
+import { highlightTimeValue } from '../../stores';
 import debounce from 'lodash-es/debounce';
 
 function fetchMulti(sensor, selections, startDay, endDay) {
@@ -77,21 +78,21 @@ export function resolveHighlightedTimeValue(e) {
   return null;
 }
 
-export let highlightTimeValue = null;
-
 // Each mouse move across the chart results in a mouseout for previous highlight
 // date immediately followed by mouseover for the next date, if any.  We need to
 // ignore the first event unless there is no second.  A very short debounce time
 // achieves that goal, at least most of the time.
 const debouncedHighlightTime = debounce(
   (value) => {
-    highlightTimeValue = value;
+    console.info('debouncedHighlightTime', value);
+    highlightTimeValue.set(value);
   },
   1,
   { leading: false, trailing: true },
 );
 
 export function onHighlight(e) {
+  console.info('onHighlight', e);
   const value = resolveHighlightedTimeValue(e);
   if (highlightTimeValue !== value) {
     debouncedHighlightTime(value);
