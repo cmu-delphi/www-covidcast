@@ -84,7 +84,6 @@ export function resolveHighlightedTimeValue(e) {
 // achieves that goal, at least most of the time.
 const debouncedHighlightTime = debounce(
   (value) => {
-    console.info('debouncedHighlightTime', value);
     highlightTimeValue.set(value);
   },
   1,
@@ -92,9 +91,8 @@ const debouncedHighlightTime = debounce(
 );
 
 export function onHighlight(e) {
-  console.info('onHighlight', e);
   const value = resolveHighlightedTimeValue(e);
-  if (highlightTimeValue !== value) {
+  if (value) {
     debouncedHighlightTime(value);
   }
 }
