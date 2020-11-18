@@ -88,7 +88,7 @@
     }
   }
 
-  const title = `${sensor.name} in ${
+  $: title = `${sensor.name} in ${
     selections.length > 0 ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown'
   }`;
   $: sensorPrimaryValue = primaryValue(sensor, $signalCasesOrDeathOptions);
