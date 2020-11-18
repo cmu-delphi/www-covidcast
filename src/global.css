@@ -6,9 +6,6 @@
   --bg: #f7f7f7;
 }
 
-@import './styles/header.css';
-@import './styles/embed.css';
-
 @import './styles/ie11.css';
 
 #vizbox {
@@ -21,28 +18,6 @@
 
   display: flex;
   flex-direction: column;
-}
-
-/** mobile **/
-@media only screen and (max-height: 600px) {
-  /** reserve all space and let the user scroll to the main app**/
-
-  #vizbox {
-    height: 100vh;
-    flex-basis: 100vh;
-  }
-  body.viz-body {
-    height: 100%;
-    width: 100%;
-  }
-}
-
-@media only screen and (max-width: 767px) {
-  /** main.css thing */
-  body,
-  html {
-    height: 100%;
-  }
 }
 
 button.mapboxgl-popup-close-button {
