@@ -16,11 +16,11 @@
   import { getInfoByName, nameInfos } from '../../maps';
   import Top10Sensor from './Top10Sensor.svelte';
   import Search from '../../components/Search.svelte';
-  import { throttle } from 'lodash-es';
   import Top10SortHint from './Top10SortHint.svelte';
   import { levelMegaCounty, groupedSensorList, sensorList, primaryValue, yesterdayDate } from '../../stores/constants';
+  import { highlightTimeValue } from '../../stores';
   import { parseAPITime } from '../../data';
-  import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
+  import { onHighlight } from '../overview/vegaSpec';
   import { computeNeighborhood } from '../../util';
 
   const SHOW_X_MORE = 10;
@@ -232,19 +232,6 @@
     if (chosenColumn) {
       otherSensors = otherSensors.concat([sensorList.find((d) => d.key === chosenColumn)]);
       chosenColumn = '';
-    }
-  }
-
-  let highlightTimeValue = null;
-
-  const throttled = throttle((value) => {
-    highlightTimeValue = value;
-  }, 10);
-
-  function onHighlight(e) {
-    const value = resolveHighlightedTimeValue(e);
-    if (highlightTimeValue !== value) {
-      throttled(value);
     }
   }
 </script>
@@ -474,7 +461,7 @@
               data={primaryData[i]}
               domain={primaryDomain}
               {row}
-              {highlightTimeValue}
+              highlightTimeValue={$highlightTimeValue}
               {ratioOptions}
               {onHighlight} />
             {#each otherSensors as s, si}
@@ -484,7 +471,7 @@
                 data={otherDataAndDomain[si].data[i]}
                 domain={otherDataAndDomain[si].domain}
                 {row}
-                {highlightTimeValue}
+                highlightTimeValue={$highlightTimeValue}
                 {ratioOptions}
                 {onHighlight} />
             {/each}
