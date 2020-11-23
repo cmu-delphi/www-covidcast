@@ -118,6 +118,13 @@ export function colorEncoding(selections) {
  * @param {Array<string>} title
  */
 export function createSpec(sensor, primaryValue, selections, initialSelection, title) {
+  const ratioSuffix =
+    primaryValue === 'countRatioCumulative' || primaryValue === 'avgRatio' ? ' per 100,000 people' : '';
+  const yAxisTitle = sensor.yAxis + ratioSuffix;
+
+  const isCumulative = primaryValue === 'countRatioCumulative' || primaryValue === 'countCumulative';
+  const leftPadding = isCumulative ? 60 : 50;
+
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
@@ -131,20 +138,34 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
       lineHeight: 22,
       color: '#666',
     },
-    data: { name: 'values' },
+    data: {
+      name: 'values',
+      values: initialSelection
+        ? [
+            {
+              date_value: initialSelection[0],
+              value: 0,
+            },
+            {
+              date_value: initialSelection[1],
+              value: 1,
+            },
+          ]
+        : [],
+    },
     autosize: {
       type: 'none',
       contains: 'padding',
       resize: true,
     },
-    padding: { left: 50, right: 2, top: 45, bottom: 5 },
+    padding: { left: leftPadding, right: 2, top: 50, bottom: 5 },
     transform: sensor.hasStdErr ? stdErrTransform : [],
     vconcat: [
       {
         encoding: {
           x: {
             ...xDateEncoding,
-            scale: { domain: { selection: 'brush' } },
+            scale: { domain: { selection: 'dateRange' } },
           },
         },
         resolve: { axis: { x: 'independent' } },
@@ -167,7 +188,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
                 },
                 axis: {
                   minExtent: 25,
-                  title: sensor.yAxis,
+                  title: yAxisTitle,
                 },
               },
             },
@@ -249,7 +270,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
         layer: [
           {
             selection: {
-              brush: {
+              dateRange: {
                 type: 'interval',
                 encodings: ['x'],
                 init: {
@@ -352,7 +373,7 @@ export function patchSpec(spec, size) {
   return merge({}, spec, {
     vconcat: [
       {
-        height: size.height - RANGE_SELECTOR_HEIGHT - OFFSET_Y,
+        height: Math.floor(size.height - RANGE_SELECTOR_HEIGHT - OFFSET_Y),
       },
       {
         height: RANGE_SELECTOR_HEIGHT,
