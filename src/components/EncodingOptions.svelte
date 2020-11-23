@@ -24,7 +24,7 @@
 
 {#if sensor.isCasesOrDeath}
   <div class="root {className}" class:center>
-    <div aria-label="display cumulative or indicence" class="uk-button-group">
+    <div aria-label="display cumulative or new incidents" class="uk-button-group">
       <button
         type="button"
         aria-pressed={String(!$signalCasesOrDeathOptions.cumulative)}
@@ -35,7 +35,7 @@
             signalCasesOrDeathOptions.set({ ...$signalCasesOrDeathOptions, cumulative: false });
           }
         }}>
-        Incidence
+        New
       </button>
       <button
         type="button"

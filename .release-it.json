@@ -1,7 +1,7 @@
 {
   "hooks": {
     "before:init": "npm run lint",
-    "before:release": "npm run build && npm run zip",
+    "before:release": "npm run pack && npm run zip",
     "after:release": "echo Successfully released ${name} v${version}."
   },
   "git": {
@@ -12,6 +12,6 @@
   },
   "github": {
     "release": true,
-    "assets": ["release.zip"]
+    "assets": ["release.zip", "*.tgz"]
   }
 }

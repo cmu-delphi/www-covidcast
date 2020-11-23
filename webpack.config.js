@@ -24,7 +24,7 @@ module.exports = () => {
       path: path.resolve(__dirname, 'public'),
       filename: '[name].js',
       chunkFilename: '[name].js',
-      // publicPath: './',
+      publicPath: devMode ? undefined : './',
     },
 
     resolve: {

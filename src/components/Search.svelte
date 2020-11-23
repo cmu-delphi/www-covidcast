@@ -6,6 +6,12 @@
   // the list of items  the user can select from
   export let items;
 
+  /**
+   * custom filter for visible items
+   * @type {(item) => boolean}
+   */
+  export let filterItem = null;
+
   // field of each item that's used for the labels in the list
   export let labelFieldName = undefined;
 
@@ -39,8 +45,8 @@
   /**
    * @type {any[]}
    */
-  export let selectedItems = [];
-  $: multiple = selectedItems.length > 0;
+  export let selectedItems = null;
+  $: multiple = selectedItems != null;
   export let maxSelections = Number.POSITIVE_INFINITY;
 
   let text;
@@ -90,7 +96,7 @@
     // store reference to the origial item
     item,
   }));
-  $: selectedLabelLookup = new Set(selectedItems.map((s) => labelFunction(s)));
+  $: selectedLabelLookup = new Set((selectedItems || []).map((s) => labelFunction(s)));
 
   function limitListItems(items) {
     if (maxItemsToShowInList <= 0 || items.length < maxItemsToShowInList) {
@@ -118,7 +124,9 @@
 
   function resetItems() {
     const matchingItems =
-      selectedLabelLookup.size > 0 ? listItems.filter((d) => !selectedLabelLookup.has(d.label)) : listItems;
+      selectedLabelLookup.size > 0 || filterItem != null
+        ? listItems.filter((d) => !selectedLabelLookup.has(d.label) && (filterItem == null || filterItem(d.item)))
+        : listItems;
     filteredListItems = limitListItems(matchingItems);
     hiddenFilteredListItems = matchingItems.length - filteredListItems.length;
   }
@@ -138,7 +146,9 @@
     const matchingItems = listItems.filter((listItem) => {
       const itemKeywords = listItem.keywords;
       return (
-        searchWords.every((searchWord) => itemKeywords.includes(searchWord)) && !selectedLabelLookup.has(listItem.label)
+        searchWords.every((searchWord) => itemKeywords.includes(searchWord)) &&
+        !selectedLabelLookup.has(listItem.label) &&
+        (filterItem == null || filterItem(listItem.item))
       );
     });
 

@@ -35,6 +35,11 @@
       debouncedHighlightTime(value);
     }
   }
+
+  $: selectedLevels = new Set($currentMultiSelection.map((d) => d.info.level));
+  function filterItem(item) {
+    return selectedLevels.size === 0 || selectedLevels.has(item.level);
+  }
 </script>
 
 <style>
@@ -104,6 +109,7 @@
       labelFieldName="displayName"
       maxItemsToShowInList="5"
       colorFieldName="color"
+      {filterItem}
       maxSelections={Math.min(selectionColors.length + 1, 4)}
       on:add={(e) => addCompare(e.detail)}
       on:remove={(e) => removeCompare(e.detail.info)}
