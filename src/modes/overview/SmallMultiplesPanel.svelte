@@ -1,10 +1,9 @@
 <script>
-  import { sensorList, currentSensor, smallMultipleTimeSpan, currentDate } from '../../stores';
+  import { sensorList, currentSensor, smallMultipleTimeSpan, currentDate, highlightTimeValue } from '../../stores';
   import { trackEvent } from '../../stores/ga';
-  import throttle from 'lodash-es/throttle';
   import { levelList } from '../../stores/constants';
   import SmallMultiple from './SmallMultiple.svelte';
-  import { prepareSensorData, resolveClickedTimeValue, resolveHighlightedTimeValue } from './vegaSpec';
+  import { prepareSensorData, resolveClickedTimeValue, onHighlight } from './vegaSpec';
   import InfoDialogButton from '../../components/InfoDialogButton.svelte';
 
   /**
@@ -38,19 +37,6 @@
   $: hasRegion = selections.length > 0;
 
   $: sensorsWithData = sensors.map((sensor) => prepareSensorData(sensor, selections, startDay, endDay));
-
-  let highlightTimeValue = null;
-
-  const throttled = throttle((value) => {
-    highlightTimeValue = value;
-  }, 100);
-
-  function onHighlight(e) {
-    const value = resolveHighlightedTimeValue(e);
-    if (highlightTimeValue !== value) {
-      throttled(value);
-    }
-  }
 
   function onClick(e) {
     const timeValue = resolveClickedTimeValue(e);
@@ -152,7 +138,7 @@
             }} />
         </div>
       </div>
-      <SmallMultiple {s} {highlightTimeValue} {onClick} {onHighlight} />
+      <SmallMultiple {s} highlightTimeValue={$highlightTimeValue} {onClick} {onHighlight} />
     </li>
   {/each}
 </ul>

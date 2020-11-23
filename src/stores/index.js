@@ -133,6 +133,11 @@ export const smallMultipleTimeSpan = derived([currentDateObject], ([date]) => {
   return [min, max];
 });
 
+/**
+ * For mouseover highlighting across small multiple charts.
+ */
+export let highlightTimeValue = writable(null);
+
 // Region GEO_ID for filtering the line chart
 // 42003 - Allegheny; 38300 - Pittsburgh; PA - Pennsylvania.
 export const currentRegion = writable('', (set) => {
