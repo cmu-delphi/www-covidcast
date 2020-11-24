@@ -209,48 +209,53 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
       },
     },
     layer: [
-      // complicated construct to have proper typings
-      ...(sensor.hasStdErr ? [stdErrLayer] : []),
       {
-        mark: {
-          type: 'line',
-          interpolate: 'linear',
-        },
-        encoding: {
-          y: {
-            field: yField,
-            type: 'quantitative',
-            scale: {
-              domainMin: clipping ? scalePercent(valuePatch.domain[0]) : 0,
-              domainMax: clipping ? scalePercent(valuePatch.domain[1]) : undefined,
-              clamp: true,
-              nice: clipping ? false : true, // When clipping, need nice false.
+        layer: [
+          // complicated construct to have proper typings
+          ...(sensor.hasStdErr ? [stdErrLayer] : []),
+          {
+            mark: {
+              type: 'line',
+              interpolate: 'linear',
             },
-            axis: {
-              ...(isPercentage ? { format: '.1%', formatType: 'cachedNumber' } : {}),
-              title: null,
-              tickCount: 3,
-              minExtent: 25,
+            encoding: {
+              y: {
+                field: yField,
+                type: 'quantitative',
+                scale: {
+                  domainMin: clipping ? scalePercent(valuePatch.domain[0]) : 0,
+                  domainMax: clipping ? scalePercent(valuePatch.domain[1]) : undefined,
+                  clamp: true,
+                  nice: clipping ? false : true, // When clipping, need nice false.
+                },
+                axis: {
+                  ...(isPercentage ? { format: '.1%', formatType: 'cachedNumber' } : {}),
+                  title: null,
+                  tickCount: 3,
+                  minExtent: 25,
+                },
+              },
             },
           },
-        },
+          ...(clipping ? clippingLayers : []),
+        ],
       },
-      ...(clipping ? clippingLayers : []),
       {
         selection: {
           highlight: {
             type: 'single',
             empty: 'none',
             on: 'mouseover',
-            nearest: true,
-            encodings: ['x'],
             clear: 'mouseout',
+            nearest: true,
+            fields: ['geo_value'],
+            // encodings: ['x'],
           },
         },
         // use vertical rule for selection, since nearest point is a real performance bummer
         mark: {
           type: 'rule',
-          strokeWidth: 2.5,
+          strokeWidth: 0.5,
           color: 'white',
           opacity: 0.001,
           tooltip: true,
@@ -292,7 +297,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
             condition: [
               {
                 selection: 'highlight',
-                value: 1,
+                value: 0.5,
               },
               {
                 test: 'datum.time_value == highlightTimeValue',
@@ -301,10 +306,10 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
             ],
             value: 0,
           },
-          y: {
-            field: yField,
-            type: 'quantitative',
-          },
+          // y: {
+          //   field: yField,
+          //   type: 'quantitative',
+          // },
         },
       },
       CURRENT_DATE_HIGHLIGHT,

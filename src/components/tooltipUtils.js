@@ -57,7 +57,9 @@ function getOrInitPopper() {
 }
 
 function resolveDatum(item) {
+  // console.info('resolveDatum', item);
   if (item && item.datum != null) {
+    // console.info('resolveDatum recurse');
     return resolveDatum(item.datum);
   }
   return item;
