@@ -108,7 +108,7 @@
     margin: 0;
     margin-left: 1em;
     padding: 0.5em;
-    max-width: 50em;
+    max-width: 30em;
   }
 
   .key-fact {
