@@ -71,7 +71,6 @@
     justify-content: space-between;
     align-items: flex-start;
     height: 2.2em;
-    width: 100%;
   }
 
   .header .bounds {
@@ -109,6 +108,7 @@
     margin: 0;
     margin-left: 1em;
     padding: 0.5em;
+    max-width: 50em;
   }
 
   .key-fact {
