@@ -139,7 +139,7 @@
   }
 
   /* Note that for table layout, the exact width doesn't matter, 
-     but the relative proportion between columns does. */
+     but the relative proportion between column widths does. */
   .key .valueCol {
     width: 50px;
   }
@@ -149,15 +149,11 @@
   }
 
   .key.single .locationCol {
-    width: 0;
+    width: 60px;
   }
 
-  .key.single .locationCol {
-    width: 100px;
-  }
-
-  .key .dateCol {
-    width: 50px;
+  .key.single .dateCol {
+    width: 30px;
   }
 </style>
 
