@@ -18,7 +18,7 @@
     'fb-survey': 'Delphi Survey Results',
     ght: 'Google Search Trends',
     'hospital-admissions': 'Hospital Admissions',
-    'indicator-combination': 'Delphi Data Sources',
+    'indicator-combination': 'Cases and Deaths',
     quidel: 'Quidel Antigen Tests',
     safegraph: 'SafeGraph Mobility Data',
   };
@@ -174,6 +174,12 @@
     padding: 1em;
   }
 
+  p {
+    line-height: initial;
+    margin: 0;
+    margin-bottom: 0.5em;
+  }
+
   .block {
     display: inline-block;
     display: flex;
@@ -276,6 +282,12 @@
             {/if}
           </h6>
           <p>{signal.description}</p>
+          {#if signal.entry}
+            <p>
+              See also:
+              {@html signal.entry.links.join(', ')}
+            </p>
+          {/if}
         {/if}
       </div>
     </div>
