@@ -207,6 +207,7 @@
       root.setAttribute('role', 'figure');
       signalListeners.forEach((signal) => {
         r.view.addSignalListener(signal, (name, value) => {
+          console.info('signal', signal, 'name', name, 'value', value);
           dispatch('signal', { name, value, view: r.view, spec });
         });
       });
