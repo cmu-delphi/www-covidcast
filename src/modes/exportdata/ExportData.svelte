@@ -271,14 +271,14 @@
       <Datepicker
         bind:selected={startDate}
         start={source ? source.minTime : new Date()}
-        end={minDate(endDate, source ? source.maxTime : new Date())}
+        end={source ? minDate(endDate, source.maxTime) : endDate}
         formattedSelected={iso(startDate)}>
         <button aria-label="selected start date" class="pg-button" on:>{iso(startDate)}</button>
       </Datepicker>
       -
       <Datepicker
         bind:selected={endDate}
-        start={maxDate(startDate, source ? source.minTime : new Date())}
+        start={source ? maxDate(startDate, source.minTime) : startDate}
         end={source ? source.maxTime : new Date()}
         formattedSelected={iso(endDate)}>
         <button aria-label="selected end date" class="pg-button" on:>{iso(endDate)}</button>
