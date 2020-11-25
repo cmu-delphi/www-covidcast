@@ -81,6 +81,8 @@
 
   h4 {
     text-align: center;
+    font-size: 1.1rem;
+    white-space: nowrap;
   }
 
   .toolbar {
