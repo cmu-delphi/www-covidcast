@@ -226,6 +226,7 @@
   .buttons {
     display: inline-flex;
     align-items: center;
+    margin-top: 1em;
   }
 
   .buttons > button {
@@ -305,14 +306,14 @@
       <Datepicker
         bind:selected={startDate}
         start={signalGroup ? signalGroup.minTime : new Date()}
-        end={minDate(endDate, signalGroup ? signalGroup.maxTime : new Date())}
+        end={signalGroup ? minDate(endDate, signalGroup.maxTime) : endDate}
         formattedSelected={iso(startDate)}>
         <button aria-label="selected start date" class="pg-button" on:>{iso(startDate)}</button>
       </Datepicker>
       -
       <Datepicker
         bind:selected={endDate}
-        start={maxDate(startDate, signalGroup ? signalGroup.minTime : new Date())}
+        start={signalGroup ? maxDate(startDate, signalGroup.minTime) : startDate}
         end={signalGroup ? signalGroup.maxTime : new Date()}
         formattedSelected={iso(endDate)}>
         <button aria-label="selected end date" class="pg-button" on:>{iso(endDate)}</button>
