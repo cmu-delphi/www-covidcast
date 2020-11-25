@@ -13,6 +13,19 @@ const TICK_COUNT = 7;
  * @typedef {import('../../stores/constants').SensorEntry} SensorEntry
  */
 
+const DEFAULT_STATS = { min: 0, max: 100, mean: 50, std: 10 };
+
+function resolveStats(statsLookup, key) {
+  if (!statsLookup || !statsLookup.has(key)) {
+    return DEFAULT_STATS;
+  }
+  const entry = statsLookup.get(key);
+  if ([entry.max, entry.std, entry.mean].some((d) => d == null || Number.isNaN(d))) {
+    console.warn('invalid stats detected for', key);
+    return DEFAULT_STATS;
+  }
+  return entry;
+}
 /**
  * @param {*} statsLookup
  * @param {SensorEntry} sensorEntry
@@ -27,7 +40,7 @@ export function determineMinMax(statsLookup, sensorEntry, level, signalOptions, 
     if (sensorEntry.isCasesOrDeath) {
       key += `_${primaryValue(sensorEntry, signalOptions)}`;
     }
-    const stats = statsLookup.get(key);
+    const stats = resolveStats(statsLookup, key);
     if (useMax) {
       return [0, stats.max];
     }
@@ -37,7 +50,7 @@ export function determineMinMax(statsLookup, sensorEntry, level, signalOptions, 
   if (sensorEntry.isCasesOrDeath) {
     key += `_${primaryValue(sensorEntry, signalOptions)}`;
   }
-  const stats = statsLookup.get(key);
+  const stats = resolveStats(statsLookup, key);
   if (useMax) {
     return [0, stats.max];
   }
