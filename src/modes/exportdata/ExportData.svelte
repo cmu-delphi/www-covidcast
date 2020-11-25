@@ -214,6 +214,7 @@
   .buttons {
     display: flex;
     align-items: center;
+    margin-top: 1em;
   }
 
   .buttons > button {
