@@ -79,6 +79,13 @@
     }
   }
 
+  function clearTooltip() {
+    console.info('clearTooltip');
+    if (tooltipHandler) {
+      tooltipHandler.clear();
+    }
+  }
+
   let size = { width: 300, height: 300 };
   $: updateData(vegaPromise, data);
   $: patchedSpec = patchSpec ? patchSpec(spec, size) : spec;
@@ -207,7 +214,7 @@
       root.setAttribute('role', 'figure');
       signalListeners.forEach((signal) => {
         r.view.addSignalListener(signal, (name, value) => {
-          console.info('signal', signal, 'name', name, 'value', value);
+          // console.info('signal', signal, 'name', name, 'value', value);
           dispatch('signal', { name, value, view: r.view, spec });
         });
       });
@@ -269,4 +276,5 @@
   class:message-overlay={hasError || (noData && !loading)}
   data-message={message}
   data-testid="vega"
-  data-status={hasError ? 'error' : noData ? 'no-data' : loading ? 'loading' : 'ready'} />
+  data-status={hasError ? 'error' : noData ? 'no-data' : loading ? 'loading' : 'ready'}
+  on:mouseout={clearTooltip} />

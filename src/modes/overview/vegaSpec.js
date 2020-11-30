@@ -241,10 +241,11 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
           highlight: {
             type: 'single',
             empty: 'none',
-            on: 'mouseover',
-            clear: { type: 'mouseout', debounce: 10 },
+            on: 'view:mousemove',
+            clear: { merge: [{ type: 'mouseout', debounce: 50 }, { type: 'view:mouseout' }] },
             nearest: false,
             encodings: ['x'],
+            // fields: ['date_value'],
             // fields: ['geo_value'], // highlight whole series
           },
         },
@@ -264,7 +265,10 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
             type: 'single',
             nearest: true,
             on: 'mousemove',
-            // clear: { type: 'mouseout', debounce: 1000 },
+            clear: {
+              merge: [{ type: 'mouseout', debounce: 500 }, { type: 'view:mouseout' }],
+            },
+            // clear: 'mousemove',
             empty: 'none',
           },
         },
