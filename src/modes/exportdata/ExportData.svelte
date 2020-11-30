@@ -9,6 +9,8 @@
   import { onMount } from 'svelte';
   import { trackEvent } from '../../stores/ga';
   import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
+  import Search from '../../components/Search.svelte';
+  import { nameInfos } from '../../maps';
 
   const CSV_SERVER = 'https://delphi.cmu.edu/csv';
   const iso = timeFormat('%Y-%m-%d');
@@ -54,6 +56,18 @@
       geoType = Array.from(signalGroup.levels)[0];
     }
   }
+
+  let geoValuesMode = 'all';
+  let geoValues = [];
+  $: geoItems = nameInfos.filter((d) => d.level === geoType);
+  $: {
+    if (geoItems != null) {
+      geoValues = [];
+      geoValuesMode = geoValuesMode === 'all' || geoItems.length === 0 ? 'all' : 'single';
+    }
+  }
+  $: isAllRegions = geoValuesMode === 'all' || geoValues.length === 0;
+  $: geoIDs = geoValues.map((d) => d.propertyId);
 
   function minDate(a, b) {
     if (!a) {
@@ -172,6 +186,16 @@
       });
     }
   });
+
+  function addRegion(detail) {
+    geoValues = [...geoValues, detail];
+  }
+  function removeRegion(detail) {
+    geoValues = geoValues.filter((d) => d !== detail);
+  }
+  function setRegion(detail) {
+    geoValues = detail ? [detail] : [];
+  }
 </script>
 
 <style>
@@ -239,6 +263,36 @@
     display: inline-block;
   }
 
+  .form-row {
+    display: flex;
+    margin-bottom: 0.5em;
+  }
+
+  .form-row > :first-child {
+    width: 10em;
+    flex-shrink: 0;
+  }
+
+  .region-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .region-row label {
+    margin-right: 0.5em;
+  }
+
+  .region-row :global(.search-container) {
+    padding: 1px;
+    width: 25em;
+    visibility: hidden;
+  }
+
+  .search-visible :global(.search-container) {
+    visibility: unset;
+  }
+
   @media only screen and (max-width: 710px) {
     .block {
       width: 100%;
@@ -301,7 +355,7 @@
   </section>
   <section>
     <h5>2. Specify Parameters</h5>
-    <div>
+    <div class="form-row">
       <span>Date Range</span>
       <Datepicker
         bind:selected={startDate}
@@ -310,7 +364,7 @@
         formattedSelected={iso(startDate)}>
         <button aria-label="selected start date" class="pg-button" on:>{iso(startDate)}</button>
       </Datepicker>
-      -
+      &nbsp;-&nbsp;
       <Datepicker
         bind:selected={endDate}
         start={signalGroup ? maxDate(startDate, signalGroup.minTime) : startDate}
@@ -319,21 +373,51 @@
         <button aria-label="selected end date" class="pg-button" on:>{iso(endDate)}</button>
       </Datepicker>
     </div>
-    <div>
+    <div class="form-row">
       <label for="geo">Geographic Level</label>
-      <select id="geo" bind:value={geoType}>
-        {#each levelList as level}
-          <option value={level.id} disabled={!signalGroup || !signalGroup.levels.has(level.id)}>
-            {level.labelPlural}
-          </option>
-        {/each}
-      </select>
-      <p class="description">
-        Each geographic region is identified with a unique identifier, such as FIPS code. See the <a
-          href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">
-          geographic coding documentation
-        </a> for details.
-      </p>
+      <div>
+        <select id="geo" bind:value={geoType}>
+          {#each levelList as level}
+            <option value={level.id} disabled={!signalGroup || !signalGroup.levels.has(level.id)}>
+              {level.labelPlural}
+            </option>
+          {/each}
+        </select>
+        <p class="description">
+          Each geographic region is identified with a unique identifier, such as FIPS code. See the <a
+            href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">
+            geographic coding documentation
+          </a> for details.
+        </p>
+      </div>
+    </div>
+    <div class="form-row">
+      <label for="region">Region</label>
+      <div>
+        <div>
+          <input type="radio" name="region" value="all" id="region-all" bind:group={geoValuesMode} /><label for="region-all">All</label>
+        </div>
+        <div class="region-row" class:search-visible={geoValuesMode === 'single'}>
+          <input
+            type="radio"
+            name="region"
+            value="single"
+            id="region-single"
+            bind:group={geoValuesMode}
+            disabled={geoItems.length === 0} />
+          <label for="region-single">Specific region(s): </label>
+          <Search
+            className="search-container container-bg"
+            placeholder={'Search for a region...'}
+            items={geoItems}
+            selectedItems={geoValues}
+            labelFieldName="displayName"
+            maxItemsToShowInList="5"
+            on:add={(e) => addRegion(e.detail)}
+            on:remove={(e) => removeRegion(e.detail)}
+            on:change={(e) => setRegion(e.detail)} />
+        </div>
+      </div>
     </div>
   </section>
   <section>
@@ -385,10 +469,11 @@
         <input type="hidden" name="start_day" value={iso(startDate)} />
         <input type="hidden" name="end_day" value={iso(endDate)} />
         <input type="hidden" name="geo_type" value={geoType} />
+        {#if !isAllRegions}<input type="hidden" name="geo_values" value={geoIDs.join(',')} />{/if}
       </form>
       <p>Manually fetch data:</p>
       <pre>
-        {`wget --content-disposition "${CSV_SERVER}?signal=${signalValue}&start_day=${iso(startDate)}&end_day=${iso(endDate)}&geo_type=${geoType}"`}
+        {`wget --content-disposition "${CSV_SERVER}?signal=${signalValue}&start_day=${iso(startDate)}&end_day=${iso(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}"`}
       </pre>
       <p class="description">
         For more details about the API, see the <a href="https://cmu-delphi.github.io/delphi-epidata/">API documentation</a>.
@@ -405,7 +490,7 @@ import covidcast
 
 data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal.signal : ''}",
                         date(${startDate.getFullYear()}, ${startDate.getMonth() + 1}, ${startDate.getDate()}), date(${endDate.getFullYear()}, ${endDate.getMonth() + 1}, ${endDate.getDate()}),
-                        "${geoType}")`}
+                        "${geoType}"${isAllRegions ? '' : `, ["${geoIDs.join('", "')}"]`})`}
       </pre>
       <p class="description">
         For more details and examples, see the <a
@@ -423,7 +508,7 @@ data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal
 cc_data <- suppressMessages(
 covidcast_signal(data_source = "${signal ? signal.dataSource : ''}", signal = "${signal ? signal.signal : ''}",
                  start_day = "${iso(startDate)}", end_day = "${iso(endDate)}",
-                 geo_type = "${geoType}")
+                 geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`})
 )`}
       </pre>
       <p class="description">
