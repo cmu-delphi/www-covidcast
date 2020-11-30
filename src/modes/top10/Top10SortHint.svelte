@@ -8,14 +8,15 @@
 
 <style>
   .root {
-    display: flex;
     cursor: pointer;
-    text-align: center;
-    justify-content: center;
     position: relative;
   }
 
+  .hint-wrapper {
+  }
+
   .hint {
+    display: inline-block;
     width: 1em;
   }
 </style>

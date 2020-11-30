@@ -273,11 +273,10 @@
 
   td,
   th {
-    border: 0;
   }
 
   .table > table {
-    border-collapse: collapse;
+    border-spacing: 1em 0.5em;
     width: 100%;
     overflow: unset;
   }
@@ -285,6 +284,42 @@
   table {
     padding: 1em;
     font-size: 1.2em;
+  }
+
+  table .rank {
+    width: 1em;
+    text-align: right;
+  }
+
+  table .name {
+    width: 20em;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  table .table-pop-column {
+    width: 5em;
+    text-align: right;
+  }
+
+  table th {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  table .main-indicator {
+    width: 30em;
+    text-align: right;
+  }
+
+  table .other-indicator {
+    width: 30em;
+    text-align: right;
+  }
+
+  table .add-column-container {
+    width: 30em;
+    text-align: left;
   }
 
   .go-to-map-pin {
@@ -343,8 +378,8 @@
 
   .remove-column {
     position: absolute;
-    right: 0.2em;
-    top: 0.2em;
+    right: 0;
+    top: -2em;
     font-size: 0.7rem;
   }
 
@@ -376,8 +411,8 @@
     <table>
       <thead>
         <tr>
-          <th>#</th>
-          <th>
+          <th class="rank">#</th>
+          <th class="name">
             <Top10SortHint
               label="Name"
               on:click={() => sortClick('name')}
@@ -395,7 +430,7 @@
               Pop.
             </Top10SortHint>
           </th>
-          <th colspan={primary.isCasesOrDeath ? 3 : 2}>
+          <th class="main-indicator" colspan={primary.isCasesOrDeath ? 3 : 2}>
             <Top10SortHint
               label={primary.name}
               on:click={() => sortClick('primary', true)}
@@ -405,7 +440,7 @@
             </Top10SortHint>
           </th>
           {#each otherSensors as s, i}
-            <th colspan={s.isCasesOrDeath ? 3 : 2}>
+            <th class="other-indicator" colspan={s.isCasesOrDeath ? 3 : 2}>
               <Top10SortHint
                 label={s.name}
                 on:click={() => sortClick(i, true)}
@@ -445,8 +480,8 @@
       <tbody>
         {#each sortedRows as row, i}
           <tr class:selected={row.propertyId === $currentRegion}>
-            <td>{row.rank}.</td>
-            <td>
+            <td class="rank">{row.rank}.</td>
+            <td class="name">
               {row.displayName}
               <span class="go-to-map-pin" on:click={jumpTo(row)} title="Show on Map">
                 <IoIosPin />
