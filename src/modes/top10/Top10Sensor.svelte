@@ -58,7 +58,7 @@
   }
 
   .chart {
-    width: 18em;
+    width: 20em;
     height: 4em;
     position: relative;
     padding: 0;

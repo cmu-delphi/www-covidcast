@@ -292,13 +292,13 @@
   }
 
   table .name {
-    width: 20em;
+    width: 10em;
     text-align: left;
     white-space: nowrap;
   }
 
   table .table-pop-column {
-    width: 5em;
+    width: 7em;
     text-align: right;
   }
 
@@ -308,17 +308,16 @@
   }
 
   table .main-indicator {
-    width: 30em;
+    width: 40em;
     text-align: right;
   }
 
   table .other-indicator {
-    width: 30em;
+    width: 40em;
     text-align: right;
   }
 
   table .add-column-container {
-    width: 30em;
     text-align: left;
   }
 
