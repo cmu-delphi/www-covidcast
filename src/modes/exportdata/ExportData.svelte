@@ -69,6 +69,17 @@
   $: isAllRegions = geoValuesMode === 'all' || geoValues.length === 0;
   $: geoIDs = geoValues.map((d) => d.propertyId);
 
+  let asOfMode = 'latest';
+  let asOfDate = new Date();
+  const asOfStart = new Date(2000, 0, 1);
+  const asOfEnd = new Date(2030, 0, 1);
+  $: {
+    if (asOfMode === 'latest') {
+      asOfDate = new Date();
+    }
+  }
+  $: usesAsOf = asOfMode !== 'latest' && asOfDate instanceof Date;
+
   function minDate(a, b) {
     if (!a) {
       return b;
@@ -195,6 +206,10 @@
   }
   function setRegion(detail) {
     geoValues = detail ? [detail] : [];
+  }
+
+  function pythonDate(date) {
+    return `date(${date.getFullYear()}, ${date.getMonth() + 1}, ${date.getDate()})`;
   }
 </script>
 
@@ -419,6 +434,32 @@
         </div>
       </div>
     </div>
+    <div class="form-row">
+      <label for="as-of">As of</label>
+      <div>
+        <div>
+          <input type="radio" name="as-of" value="latest" id="as-of-latest" bind:group={asOfMode} /><label for="as-of-latest">Latest</label>
+        </div>
+        <div class="region-row">
+          <input type="radio" name="as-of" value="single" id="as-of-single" bind:group={asOfMode} />
+          <label for="as-of-single">Specific date: </label>
+          <Datepicker
+            bind:selected={asOfDate}
+            formattedSelected={asOfDate ? iso(asOfDate) : 'Select date'}
+            start={asOfStart}
+            end={asOfEnd}>
+            <button
+              aria-label="selected as of date"
+              class="pg-button"
+              disabled={asOfMode === 'latest'}
+              on:>{asOfDate ? iso(asOfDate) : 'Select date'}</button>
+          </Datepicker>
+        </div>
+        <p class="description">
+          The <code>as of</code> date allows to fetch only data that was available on or before this date.
+        </p>
+      </div>
+    </div>
   </section>
   <section>
     <h5>3. Get Data</h5>
@@ -470,10 +511,11 @@
         <input type="hidden" name="end_day" value={iso(endDate)} />
         <input type="hidden" name="geo_type" value={geoType} />
         {#if !isAllRegions}<input type="hidden" name="geo_values" value={geoIDs.join(',')} />{/if}
+        {#if usesAsOf}<input type="hidden" name="as_of" value={iso(asOfDate)} />{/if}
       </form>
       <p>Manually fetch data:</p>
       <pre>
-        {`wget --content-disposition "${CSV_SERVER}?signal=${signalValue}&start_day=${iso(startDate)}&end_day=${iso(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}"`}
+        {`wget --content-disposition "${CSV_SERVER}?signal=${signalValue}&start_day=${iso(startDate)}&end_day=${iso(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${iso(asOfDate)}` : ''}"`}
       </pre>
       <p class="description">
         For more details about the API, see the <a href="https://cmu-delphi.github.io/delphi-epidata/">API documentation</a>.
@@ -489,8 +531,8 @@
 import covidcast
 
 data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal.signal : ''}",
-                        date(${startDate.getFullYear()}, ${startDate.getMonth() + 1}, ${startDate.getDate()}), date(${endDate.getFullYear()}, ${endDate.getMonth() + 1}, ${endDate.getDate()}),
-                        "${geoType}"${isAllRegions ? '' : `, ["${geoIDs.join('", "')}"]`})`}
+                        ${pythonDate(startDate)}, ${pythonDate(endDate)},
+                        "${geoType}"${isAllRegions ? '' : `, ["${geoIDs.join('", "')}"]`}${usesAsOf ? `, as_of = ${pythonDate(asOfDate)}` : ''})`}
       </pre>
       <p class="description">
         For more details and examples, see the <a
@@ -508,7 +550,7 @@ data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal
 cc_data <- suppressMessages(
 covidcast_signal(data_source = "${signal ? signal.dataSource : ''}", signal = "${signal ? signal.signal : ''}",
                  start_day = "${iso(startDate)}", end_day = "${iso(endDate)}",
-                 geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`})
+                 geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`}${usesAsOf ? `, as_of = "${iso(asOfDate)}"` : ''})
 )`}
       </pre>
       <p class="description">
