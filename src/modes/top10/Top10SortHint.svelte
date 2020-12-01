@@ -12,9 +12,6 @@
     position: relative;
   }
 
-  .hint-wrapper {
-  }
-
   .hint {
     display: inline-block;
     width: 1em;

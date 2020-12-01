@@ -271,10 +271,6 @@
     padding-top: 1em;
   }
 
-  td,
-  th {
-  }
-
   .table > table {
     border-spacing: 1em 0.5em;
     width: 100%;
