@@ -134,6 +134,28 @@ async function generatePopulationLookup() {
   };
 }
 
+async function generateHRRPopulationLookup() {
+  const lookup = await generatePopulationLookup();
+  const fipsHRR = csvParse(
+    await fetch(
+      'https://raw.githubusercontent.com/cmu-delphi/covidcast-indicators/main/_delphi_utils_python/delphi_utils/data/fips_hrr_table.csv',
+    ).then((r) => r.text()),
+  );
+  const populationHRRLookup = new Map();
+  for (const row of fipsHRR) {
+    const pop = lookup.county(row.fips);
+    if (!pop) {
+      continue;
+    }
+    const value = (populationHRRLookup.get(row.hrr) || 0) + pop * Number.parseFloat(row.weight);
+    populationHRRLookup.set(row.hrr, value);
+  }
+  return {
+    ...lookup,
+    hrr: (hrrID) => populationHRRLookup.get(hrrID),
+  };
+}
+
 async function counties(level = 'county') {
   const populationLookup = await generatePopulationLookup();
   //{
@@ -201,6 +223,7 @@ async function counties(level = 'county') {
 }
 
 async function hrr(level = 'hrr') {
+  const populationLookup = await generateHRRPopulationLookup();
   const geo = require(`./raw/hrr/hrr.reprojected.geo.json`);
 
   const infos = geo.features
@@ -227,6 +250,7 @@ async function hrr(level = 'hrr') {
         id,
         name,
         state,
+        population: populationLookup.hrr(id),
         displayName: `${props.hrr_name} (HRR)`,
         lat: center[0],
         long: center[1],
@@ -235,7 +259,7 @@ async function hrr(level = 'hrr') {
     .sort((a, b) => a.id.localeCompare(b.id));
   fs.writeFileSync(
     path.resolve(__dirname, `./processed/${level}.csv.js`),
-    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'lat', 'long'])),
+    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'population', 'lat', 'long'])),
   );
   // fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.geo.json`), JSON.stringify(geo));
   const topo = topology({ [level]: geo }, QUANTIZATION / 2.5);
