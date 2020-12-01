@@ -7,7 +7,7 @@
   import { smallMultipleTimeSpan } from '../../stores';
   import { prepareSensorData } from '../overview/vegaSpec';
 
-  const formatLocal = timeFormat('%x');
+  const formatLocal = timeFormat('%m/%d/%Y');
   /**
    * @type {import("../../stores/constants").SensorEntry}
    */
@@ -98,13 +98,18 @@
 
   .key {
     margin: 0;
+    margin-left: 1em;
     padding: 0.5em;
-    border: none;
+    max-width: 30em;
+    line-height: 1.1em;
   }
 
   .key-fact {
+    margin-left: 1em;
     font-weight: bold;
     font-size: 120%;
+    text-align: right;
+    padding-right: 1em;
   }
 
   .legend::before {
@@ -114,14 +119,34 @@
   }
 
   .hint {
+    margin-left: 1em;
     vertical-align: middle;
   }
 
   .key.single .legend {
     display: none;
+    width: 0;
   }
   .key.single td {
     border: none;
+  }
+
+  /* Note that for table layout, the exact width doesn't matter, 
+     but the relative proportion between column widths does. */
+  .key .valueCol {
+    width: 50px;
+  }
+
+  .key .dateCol {
+    width: 30px;
+  }
+
+  .key.single .locationCol {
+    width: 60px;
+  }
+
+  .key.single .dateCol {
+    width: 30px;
   }
 </style>
 
@@ -136,10 +161,15 @@
   </div>
   <div class="grow" />
   <table class="key" class:single={selections.length === 1}>
+    <colgroup>
+      <col class="locationCol" />
+      <col class="valueCol" />
+      <col class="dateCol" />
+    </colgroup>
     <tbody>
       {#each selections as selection, i}
         <tr>
-          <td class="legend" style="--color: {selection.color}">{selection.displayName}</td>
+          <td class="legend" style="--color: {i === 0 ? 'grey' : selection.color}">{selection.displayName}</td>
           <td class="key-fact">{values[i] != null ? sensor.formatValue(values[i]) : '?'}</td>
           {#if i === 0}
             <td class="hint" rowspan={selections.length}>on {formatLocal(highlightDate ? highlightDate : date)}</td>

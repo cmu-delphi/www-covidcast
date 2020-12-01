@@ -71,6 +71,8 @@
 
   ol {
     flex: 2 1 0;
+    margin: 0;
+    padding: 0;
   }
 </style>
 

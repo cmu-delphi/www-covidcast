@@ -220,7 +220,7 @@
     margin-bottom: 6px;
   }
   .selection-container > ul {
-    padding: 0;
+    margin: 0;
   }
 
   /** mobile **/
