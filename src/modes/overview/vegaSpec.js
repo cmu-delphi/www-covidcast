@@ -90,8 +90,11 @@ const debouncedHighlightTime = debounce(
   { leading: false, trailing: true },
 );
 
-export function onHighlight(e) {
-  const value = resolveHighlightedTimeValue(e);
+export function onHighlight(event) {
+  if (event.detail.name !== 'highlight') {
+    return;
+  }
+  const value = resolveHighlightedTimeValue(event);
   if (value) {
     debouncedHighlightTime(value);
   }
@@ -209,9 +212,9 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
       },
     },
     layer: [
+      // complicated construct to have proper typings
+      ...(sensor.hasStdErr ? [stdErrLayer] : []),
       {
-        // complicated construct to have proper typings
-        ...(sensor.hasStdErr ? [stdErrLayer] : []),
         mark: {
           type: 'line',
           interpolate: 'linear',
@@ -241,10 +244,13 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
           highlight: {
             type: 'single',
             empty: 'none',
-            on: 'view:mousemove',
-            clear: { merge: [{ type: 'mouseout', debounce: 50 }, { type: 'view:mouseout' }] },
+            on: 'mousemove',
             nearest: false,
             encodings: ['x'],
+            clear: 'mouseout',
+            // clear: { type: 'mouseout', debounce: 50 },
+            // clear: { merge: [{ type: 'mouseout', debounce: 50 }, { type: 'view:mouseout' }] },
+
             // fields: ['date_value'],
             // fields: ['geo_value'], // highlight whole series
           },
@@ -260,18 +266,16 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
       },
       {
         transform: [{ filter: { selection: 'highlight' } }],
-        selection: {
-          nearestPoint: {
-            type: 'single',
-            nearest: true,
-            on: 'mousemove',
-            clear: {
-              merge: [{ type: 'mouseout', debounce: 500 }, { type: 'view:mouseout' }],
-            },
-            // clear: 'mousemove',
-            empty: 'none',
-          },
-        },
+        // selection: {
+        //   nearestPoint: {
+        //     type: 'single',
+        //     nearest: true,
+        //     on: 'mousemove',
+        //     // clear: {  merge: [{ type: 'mouseout', debounce: 500 }, { type: 'view:mouseout' }]  },
+        //     // clear: 'mousemove',
+        //     empty: 'none',
+        //   },
+        // },
         mark: {
           type: 'point',
           radius: 1,
@@ -283,13 +287,14 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
           opacity: {
             condition: [
               {
-                selection: 'nearestPoint',
+                selection: 'highlight',
+                // selection: 'nearestPoint',
                 value: 1,
               },
-              // {
-              //   test: 'datum.time_value == highlightTimeValue',
-              //   value: 1,
-              // },
+              {
+                test: 'datum.time_value == highlightTimeValue',
+                value: 1,
+              },
             ],
             value: 0,
           },

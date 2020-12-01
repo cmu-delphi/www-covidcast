@@ -81,10 +81,11 @@ export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}
     pp = { ...getOrInitPopper() };
     // hide tooltip for null, undefined, or empty string values,
     // or when the item's datum.value is null.
-    const datum = resolveDatum(item);
+    let datum = resolveDatum(item);
     console.info('tooltipHandler datum', datum);
     if (value == null || value === '' || datum.value == null) {
       console.info('tooltipHandler hide');
+      if (!pp.hide) return;
       pp.hide();
       if (tooltip) {
         console.info('tooltipHandler set hidden');
@@ -95,6 +96,7 @@ export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}
       return;
     }
     pp.update(event.clientX, event.clientY);
+    datum = resolveDatum(item);
     if (tooltip) {
       console.info('tooltip exists');
       tooltip.$set({
@@ -116,13 +118,15 @@ export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}
 
   tooltipHandler.clear = () => {
     console.info('tooltipHandler hide');
-    pp.hide();
-    if (tooltip) {
-      console.info('tooltipHandler set hidden');
-      tooltip.$set({
-        hidden: true,
-      });
-    }
+    return;
+    // if (!pp.hide) return;
+    // pp.hide();
+    // if (tooltip) {
+    //   console.info('tooltipHandler set hidden');
+    //   tooltip.$set({
+    //     hidden: true,
+    //   });
+    // }
   };
   tooltipHandler.destroy = () => {
     if (tooltip) {
