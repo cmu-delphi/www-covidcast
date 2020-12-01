@@ -238,7 +238,7 @@ async function hrr(level = 'hrr') {
     wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'lat', 'long'])),
   );
   // fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.geo.json`), JSON.stringify(geo));
-  const topo = topology({ [level]: geo }, QUANTIZATION);
+  const topo = topology({ [level]: geo }, QUANTIZATION / 2.5);
   fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
   return geo;
 }
