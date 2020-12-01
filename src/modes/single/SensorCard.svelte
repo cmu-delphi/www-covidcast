@@ -70,7 +70,7 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    height: 2.2em;
+    height: 1.5em;
   }
 
   .header .bounds {
@@ -81,7 +81,8 @@
 
   h4 {
     text-align: center;
-    font-size: 1.1rem;
+    font-size: 0.89rem;
+    font-weight: bold;
     white-space: nowrap;
   }
 
@@ -111,6 +112,7 @@
     margin-left: 1em;
     padding: 0.5em;
     max-width: 30em;
+    line-height: 1.1em;
   }
 
   .key-fact {
