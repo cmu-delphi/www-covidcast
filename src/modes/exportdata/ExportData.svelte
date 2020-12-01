@@ -184,10 +184,6 @@
     padding: 0;
     font-size: 80%;
   }
-
-  form {
-    visibility: hidden;
-  }
 </style>
 
 <div class="root" class:loading>
@@ -267,7 +263,7 @@
       <div class="uk-form-controls">
         <select id="geo" bind:value={geoType} class="uk-select">
           {#each levelList as level}
-            <option value={level.id} disabled={!signalGroup || !signalGroup.levels.has(level.id)} />
+            <option value={level.id} disabled={!signalGroup || !signalGroup.levels.has(level.id)}>{level.label}</option>
           {/each}
         </select>
         <p class="description">
@@ -292,7 +288,7 @@
         on:click={() => {
           currentMode = 'csv';
         }}
-        class:selected={currentMode === 'csv'}
+        class:uk-active={currentMode === 'csv'}
         disabled={!geoType || !signalValue}
         title="Get in CSV format">
         CSV
@@ -323,7 +319,7 @@
     {#if currentMode === 'csv'}
       <p>Direct link:</p>
       <form bind:this={form} id="form" method="GET" action={CSV_SERVER} download>
-        <button type="submit" class="pg-button pg-text-button">Download CSV File</button>
+        <button type="submit" class="uk-button uk-button-default">Download CSV File</button>
         <input type="hidden" name="signal" value={signalValue} />
         <input type="hidden" name="start_day" value={iso(startDate)} />
         <input type="hidden" name="end_day" value={iso(endDate)} />
