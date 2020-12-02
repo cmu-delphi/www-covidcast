@@ -1,8 +1,8 @@
 import { writable, derived, get, readable } from 'svelte/store';
 import { LogScale, SqrtScale } from './scales';
 import { scaleSequentialLog } from 'd3-scale';
-import { defaultSensorId, sensorList, sensorMap, yesterdayDate, levels, swpaLevels } from './constants';
-import modes, { modeByID } from '../modes';
+import { sensorMap, yesterdayDate, levels, swpaLevels, DEFAULT_SENSOR, DEFAULT_MODE, DEFAULT_LEVEL } from './constants';
+import modes from '../modes';
 import { parseAPITime } from '../data/utils';
 import { getInfoByName } from '../maps';
 export {
@@ -34,7 +34,7 @@ export const appReady = writable(false);
 /**
  * @type {import('svelte/store').Writable<import('../routes').Mode>}
  */
-export const currentMode = writable(modeByID.overview, (set) => {
+export const currentMode = writable(DEFAULT_MODE, (set) => {
   const mode = urlParams.get('mode');
   const nextMode = modes.find((d) => d.id === mode);
   if (nextMode) {
@@ -42,17 +42,10 @@ export const currentMode = writable(modeByID.overview, (set) => {
   }
 });
 
-export const currentSensor = writable('', (set) => {
+export const currentSensor = writable(DEFAULT_SENSOR, (set) => {
   const sensor = urlParams.get('sensor');
   if (sensor && sensorMap.has(sensor)) {
     set(sensor);
-  } else {
-    const defaultSensor = sensorList.find((d) => d.id === defaultSensorId);
-    if (defaultSensor) {
-      set(defaultSensor.key);
-    } else {
-      set(sensorList[0].key);
-    }
   }
 });
 
@@ -64,7 +57,7 @@ export const currentInfoSensor = writable(null);
 export const currentSensorEntry = derived([currentSensor], ([$currentSensor]) => sensorMap.get($currentSensor));
 
 // 'county', 'state', or 'msa'
-export const currentLevel = writable('county', (set) => {
+export const currentLevel = writable(DEFAULT_LEVEL, (set) => {
   const level = urlParams.get('level');
   if (levels.includes(level) || swpaLevels.includes(level)) {
     set(level);
