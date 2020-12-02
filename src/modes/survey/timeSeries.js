@@ -48,13 +48,11 @@ export function createTimeSeriesSpec(startEndDates) {
   const spec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
     data: { name: 'values' },
-    width: 'container',
-    height: 50,
-    padding: {
-      left: 30,
-      bottom: 10,
-      top: 5,
-      right: 1,
+    padding: { left: 50, top: 6, bottom: 20, right: 2 },
+    autosize: {
+      type: 'none',
+      contains: 'padding',
+      resize: true,
     },
     transform: [
       {

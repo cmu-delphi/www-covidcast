@@ -54,6 +54,7 @@
 
   .indicator :global(.vega-embed) {
     display: block;
+    height: 5em;
   }
 
   p {
