@@ -80,7 +80,7 @@ const lookup = {
   interpolateYlOrBr,
 };
 
-const DEFAULT_COLOR_SCALE = interpolateYlOrRd;
+export const DEFAULT_COLOR_SCALE = interpolateYlOrRd;
 
 export function resolveColorScale(colorScale) {
   if (!colorScale) {

@@ -115,26 +115,57 @@ export function colorEncoding(selections) {
  * @param {string} primaryValue
  * @param {{info: import('../../maps').NameInfo, color: string}[]} selections
  * @param {[Date, Date]} initialSelection
+ * @param {Array<string>} title
  */
-export function createSpec(sensor, primaryValue, selections, initialSelection) {
+export function createSpec(sensor, primaryValue, selections, initialSelection, title) {
+  const ratioSuffix =
+    primaryValue === 'countRatioCumulative' || primaryValue === 'avgRatio' ? ' per 100,000 people' : '';
+  const yAxisTitle = sensor.yAxis + ratioSuffix;
+
+  const isCumulative = primaryValue === 'countRatioCumulative' || primaryValue === 'countCumulative';
+  const leftPadding = isCumulative ? 60 : 50;
+
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
   const spec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
-    data: { name: 'values' },
+    title: {
+      text: title,
+      font: '"Open Sans", Helvetica, sans-serif',
+      fontSize: 14.08,
+      fontWeight: 700,
+      lineHeight: 22,
+      color: '#666',
+    },
+    data: {
+      name: 'values',
+      values: initialSelection
+        ? [
+            {
+              date_value: initialSelection[0],
+              value: 0,
+            },
+            {
+              date_value: initialSelection[1],
+              value: 1,
+            },
+          ]
+        : [],
+    },
     autosize: {
+      type: 'none',
       contains: 'padding',
       resize: true,
     },
+    padding: { left: leftPadding, right: 2, top: 50, bottom: 5 },
     transform: sensor.hasStdErr ? stdErrTransform : [],
     vconcat: [
       {
-        width: 'container',
         encoding: {
           x: {
             ...xDateEncoding,
-            scale: { domain: { selection: 'brush' } },
+            scale: { domain: { selection: 'dateRange' } },
           },
         },
         resolve: { axis: { x: 'independent' } },
@@ -157,7 +188,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
                 },
                 axis: {
                   minExtent: 25,
-                  title: sensor.yAxis,
+                  title: yAxisTitle,
                 },
               },
             },
@@ -168,6 +199,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
                 type: 'single',
                 empty: 'none',
                 nearest: true,
+                encodings: ['x'],
                 on: 'mouseover',
                 clear: 'mouseout',
               },
@@ -218,6 +250,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
       },
       {
         height: 40,
+        padding: { top: 0 },
         view: { cursor: 'col-resize' },
         encoding: {
           color: {
@@ -237,14 +270,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
         layer: [
           {
             selection: {
-              highlight2: {
-                type: 'single',
-                empty: 'none',
-                nearest: true,
-                on: 'mouseover',
-                clear: 'mouseout',
-              },
-              brush: {
+              dateRange: {
                 type: 'interval',
                 encodings: ['x'],
                 init: {
@@ -272,6 +298,16 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
           // complicated construct to have proper typings
           ...(sensor.hasStdErr ? [stdErrLayer] : []),
           {
+            selection: {
+              highlight2: {
+                type: 'single',
+                empty: 'none',
+                nearest: true,
+                encodings: ['x'],
+                on: 'mouseover',
+                clear: 'mouseout',
+              },
+            },
             transform: [
               {
                 filter: {
@@ -324,8 +360,9 @@ export function createSpec(sensor, primaryValue, selections, initialSelection) {
   return spec;
 }
 
-const OFFSET_X = 60;
-const OFFSET_Y = 80;
+// Reserve space for titles.
+const OFFSET_Y = 110;
+const RANGE_SELECTOR_HEIGHT = 40;
 
 /**
  * patches in the current size
@@ -336,12 +373,10 @@ export function patchSpec(spec, size) {
   return merge({}, spec, {
     vconcat: [
       {
-        width: size.width - OFFSET_X,
-        height: size.height - 40 - OFFSET_Y,
+        height: Math.floor(size.height - RANGE_SELECTOR_HEIGHT - OFFSET_Y),
       },
       {
-        width: size.width - OFFSET_X,
-        height: 40,
+        height: RANGE_SELECTOR_HEIGHT,
       },
     ],
   });

@@ -88,7 +88,9 @@ export default class ZoomMap {
       return;
     }
     requestAnimationFrame(() => {
-      this.map.fitBounds(this.resetBounds, this.resetBoundsOptions);
+      if (this.map) {
+        this.map.fitBounds(this.resetBounds, this.resetBoundsOptions);
+      }
     });
   }
 

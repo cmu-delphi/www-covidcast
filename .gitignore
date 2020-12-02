@@ -9,3 +9,8 @@
 /public
 src/**/*.generated.json
 src/**/descriptions.raw.txt
+/cypress/videos
+/cypress/screenshots
+*.log
+__diff_output__
+*.tgz

@@ -30,7 +30,7 @@ function getOrInitPopper() {
   };
 
   const instance = createPopper(virtualElement, popper, {
-    placement: 'top',
+    placement: 'top-start',
     modifiers: [
       {
         name: 'offset',
@@ -75,8 +75,10 @@ export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}
       return;
     }
     const { popper, update, hide } = getOrInitPopper();
-    // hide tooltip for null, undefined, or empty string values
-    if (value == null || value === '') {
+    // hide tooltip for null, undefined, or empty string values,
+    // or when the item's datum.value is null.
+    const datum = resolveDatum(item);
+    if (value == null || value === '' || datum.value == null) {
       hide();
       if (tooltip) {
         tooltip.$set({
@@ -85,7 +87,6 @@ export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}
       }
       return;
     }
-
     update(event.clientX, event.clientY);
     if (tooltip) {
       tooltip.$set({

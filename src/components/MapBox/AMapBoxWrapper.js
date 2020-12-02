@@ -172,6 +172,7 @@ export default class AMapBoxWrapper {
     // once all are ready
     if (this.mapSetupReady && this.mapEncodingReady && this.mapDataReady) {
       this.dispatch('ready');
+      this.map.getContainer().dataset.ready = 'ready';
     }
   }
 
@@ -344,7 +345,7 @@ export default class AMapBoxWrapper {
 
   /**
    *
-   * @param {'county' | 'state' | 'msa'} level
+   * @param {'county' | 'state' | 'msa' | 'hrr'} level
    * @param {Promise<import('../../data/fetchData').EpiDataRow[]>>} data
    */
   updateSources(level, data, primaryValue = 'value') {

@@ -11,21 +11,12 @@
   } from '../../stores';
   import { sensorList } from '../../stores/constants';
   import SensorCard from './SensorCard.svelte';
-  import throttle from 'lodash-es/throttle';
   import { selectionColors } from '../../theme';
-  import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
-
-  let highlightTimeValue = null;
-
-  const throttled = throttle((value) => {
-    highlightTimeValue = value;
-  }, 25);
-
-  function onHighlight(e) {
-    const value = resolveHighlightedTimeValue(e);
-    if (highlightTimeValue !== value) {
-      throttled(value);
-    }
+  import { onHighlight } from '../overview/vegaSpec';
+  import { highlightTimeValue } from '../../stores';
+  $: selectedLevels = new Set($currentMultiSelection.map((d) => d.info.level));
+  function filterItem(item) {
+    return selectedLevels.size === 0 || selectedLevels.has(item.level);
   }
 </script>
 
@@ -94,6 +85,7 @@
     labelFieldName="displayName"
     maxItemsToShowInList="5"
     colorFieldName="color"
+    {filterItem}
     maxSelections={Math.min(selectionColors.length + 1, 4)}
     on:add={(e) => addCompare(e.detail)}
     on:remove={(e) => removeCompare(e.detail.info)}
@@ -107,7 +99,7 @@
           date={$currentDateObject}
           selections={$currentMultiSelection}
           {onHighlight}
-          {highlightTimeValue} />
+          highlightTimeValue={$highlightTimeValue} />
       {/each}
     </div>
   </div>

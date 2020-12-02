@@ -16,14 +16,15 @@ const hmr = devMode;
 module.exports = () => {
   return {
     entry: {
+      wrapper: './src/wrapper/index.js',
       bundle: './src/index.js',
     },
 
     output: {
       path: path.resolve(__dirname, 'public'),
       filename: '[name].js',
-      chunkFilename: devMode ? '[name].js' : '[name].[chunkhash].js',
-      // publicPath: './',
+      chunkFilename: '[name].js',
+      publicPath: devMode ? undefined : './',
     },
 
     resolve: {
@@ -46,7 +47,7 @@ module.exports = () => {
             enforce: true,
           },
           vendor: {
-            test: /[\\/]node_modules[\\/]/,
+            test: /[\\/]node_modules[\\/](?!(uikit)\/)/,
             name: 'vendors',
             chunks: 'all',
           },
@@ -58,7 +59,7 @@ module.exports = () => {
       rules: [
         !devMode && {
           test: /\.m?js$/,
-          exclude: /node_modules\/(?!svelte)/,
+          exclude: /node_modules\/(?!(svelte|mapbox-gl)\/)/,
           use: ['babel-loader'],
         },
         {
@@ -86,7 +87,7 @@ module.exports = () => {
               ],
         },
         {
-          test: /\.css$/,
+          test: /\.(sass|css|scss)$/i,
           use: [
             {
               loader: MiniCssExtractPlugin.loader,
@@ -96,6 +97,7 @@ module.exports = () => {
               },
             },
             'css-loader',
+            'sass-loader',
           ],
         },
         {
@@ -129,7 +131,10 @@ module.exports = () => {
       new DefinePlugin({
         __VERSION__: JSON.stringify(pkg.version),
       }),
-      new EnvironmentPlugin(['NODE_ENV']),
+      new EnvironmentPlugin({
+        NODE_ENV: 'production',
+        COVIDCAST_ENDPOINT_URL: 'https://api.covidcast.cmu.edu/epidata/api.php',
+      }),
       // new CopyPlugin({
       //   patterns: ['./src/static'],
       // }),
@@ -137,16 +142,11 @@ module.exports = () => {
         alwaysWriteToDisk: true,
         template: './src/index.html',
       }),
-      new HtmlWebpackPlugin({
-        filename: 'embed.html',
-        alwaysWriteToDisk: true,
-        template: './src/embed.html',
-      }),
       new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({
         filename: '[name].css',
         ignoreOrder: true,
-        chunkFilename: devMode ? '[name].css' : '[name].[chunkhash].css',
+        chunkFilename: '[name].css',
       }),
     ].filter(Boolean),
   };

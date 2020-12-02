@@ -16,10 +16,12 @@
   import { getInfoByName, nameInfos } from '../../maps';
   import Top10Sensor from './Top10Sensor.svelte';
   import Search from '../../components/Search.svelte';
-  import { throttle } from 'lodash-es';
   import Top10SortHint from './Top10SortHint.svelte';
   import { levelMegaCounty, groupedSensorList, sensorList, primaryValue, yesterdayDate } from '../../stores/constants';
+  import { highlightTimeValue } from '../../stores';
   import { parseAPITime } from '../../data';
+  import { onHighlight } from '../overview/vegaSpec';
+  import { computeNeighborhood } from '../../util';
 
   const SHOW_X_MORE = 10;
   const MAX_OTHER_SENSORS = 1;
@@ -173,12 +175,27 @@
     return data;
   });
 
-  function maxNested(rows) {
-    return rows.flat().reduce((acc, v) => Math.max(acc, v.value), 0);
+  $: neighborhood = computeNeighborhood($currentDateObject, startDay, finalDay, (finalDay - startDay) / 2);
+
+  // Returns the max value for all rows of all locations.
+  // rowsOfRows is an array for all locations of the rows for each location.
+  function maxNested(rowsOfRows, field) {
+    if (rowsOfRows.length === 0) {
+      return 0;
+    }
+    field = field === 'pValue' ? 'value' : field;
+
+    // Filter rows to only include the neighborhood.
+    const filterInNeighborhood = (rows) =>
+      rows.filter((row) => row.date_value >= neighborhood.start && row.date_value <= neighborhood.end);
+    return rowsOfRows
+      .map(filterInNeighborhood)
+      .flat()
+      .reduce((acc, v) => Math.max(acc, v[field] != null ? v[field] : 0), 0);
   }
 
   // compute local maxima
-  $: primaryDomain = Promise.all(primaryData).then((rows) => [0, maxNested(rows)]);
+  $: primaryDomain = Promise.all(primaryData).then((rows) => [0, maxNested(rows, primaryField)]);
 
   $: otherDataAndDomain = otherSensors.map((sensor) => {
     const data = sortedRows.map((row) =>
@@ -186,7 +203,8 @@
         geo_value: row.propertyId,
       }).then((r) => addMissing(r)),
     );
-    const domain = Promise.all(data).then((rows) => [0, maxNested(rows)]);
+    const field = primaryValue(sensor, ratioOptions);
+    const domain = Promise.all(data).then((rows) => [0, maxNested(rows, field)]);
     return { data, domain };
   });
 
@@ -215,24 +233,6 @@
       otherSensors = otherSensors.concat([sensorList.find((d) => d.key === chosenColumn)]);
       chosenColumn = '';
     }
-  }
-
-  let highlightTimeValue = null;
-
-  const throttled = throttle((value) => {
-    highlightTimeValue = value;
-  }, 10);
-
-  function onHighlight(e) {
-    const highlighted = e.detail.value;
-    const id = highlighted && Array.isArray(highlighted._vgsid_) ? highlighted._vgsid_[0] : null;
-
-    if (!id) {
-      throttled(null);
-      return;
-    }
-    const row = e.detail.view.data('data_0').find((d) => d._vgsid_ === id);
-    throttled(row ? row.time_value : null);
   }
 </script>
 
@@ -461,7 +461,7 @@
               data={primaryData[i]}
               domain={primaryDomain}
               {row}
-              {highlightTimeValue}
+              highlightTimeValue={$highlightTimeValue}
               {ratioOptions}
               {onHighlight} />
             {#each otherSensors as s, si}
@@ -471,7 +471,7 @@
                 data={otherDataAndDomain[si].data[i]}
                 domain={otherDataAndDomain[si].domain}
                 {row}
-                {highlightTimeValue}
+                highlightTimeValue={$highlightTimeValue}
                 {ratioOptions}
                 {onHighlight} />
             {/each}

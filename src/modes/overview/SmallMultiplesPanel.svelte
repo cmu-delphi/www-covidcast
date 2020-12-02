@@ -1,12 +1,18 @@
 <script>
-  import { sensorList, currentSensor, smallMultipleTimeSpan, currentDate, currentInfoSensor } from '../../stores';
+  import {
+    sensorList,
+    currentSensor,
+    smallMultipleTimeSpan,
+    currentDate,
+    currentInfoSensor,
+    highlightTimeValue,
+  } from '../../stores';
   import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
   import { trackEvent } from '../../stores/ga';
-  import throttle from 'lodash-es/throttle';
   import { levelList } from '../../stores/constants';
   import SmallMultiple from './SmallMultiple.svelte';
   import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
-  import { prepareSensorData, resolveClickedTimeValue, resolveHighlightedTimeValue } from './vegaSpec';
+  import { prepareSensorData, resolveClickedTimeValue, onHighlight } from './vegaSpec';
 
   /**
    * bi-directional binding
@@ -39,19 +45,6 @@
   $: hasRegion = selections.length > 0;
 
   $: sensorsWithData = sensors.map((sensor) => prepareSensorData(sensor, selections, startDay, endDay));
-
-  let highlightTimeValue = null;
-
-  const throttled = throttle((value) => {
-    highlightTimeValue = value;
-  }, 25);
-
-  function onHighlight(e) {
-    const value = resolveHighlightedTimeValue(e);
-    if (highlightTimeValue !== value) {
-      throttled(value);
-    }
-  }
 
   function onClick(e) {
     const timeValue = resolveClickedTimeValue(e);
@@ -143,7 +136,7 @@
 
 <ul class="root">
   {#each sensorsWithData as s}
-    <li class:selected={$currentSensor === s.sensor.key}>
+    <li class:selected={$currentSensor === s.sensor.key} data-testid={s.sensor.key}>
       <div class="header">
         <!-- svelte-ignore a11y-missing-attribute -->
         <button
@@ -177,7 +170,7 @@
           </button>
         </div>
       </div>
-      <SmallMultiple {s} {highlightTimeValue} {onClick} {onHighlight} />
+      <SmallMultiple {s} highlightTimeValue={$highlightTimeValue} {onClick} {onHighlight} />
     </li>
   {/each}
 </ul>

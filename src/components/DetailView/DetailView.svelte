@@ -1,5 +1,5 @@
 <script>
-  import { signalCasesOrDeathOptions, currentDateObject, smallMultipleTimeSpan, currentInfoSensor } from '../../stores';
+  import { signalCasesOrDeathOptions, currentDateObject, currentInfoSensor, smallMultipleTimeSpan } from '../../stores';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../Vega.svelte';
   import { createSpec, patchSpec } from './vegaSpec';
@@ -59,7 +59,46 @@
       }).then((rows) => addMissing(rows, sensor))
     : [];
 
-  $: spec = createSpec(sensor, primaryValue(sensor, $signalCasesOrDeathOptions), selections, $smallMultipleTimeSpan);
+  // The currently selected detailViewTimeSpan, initially defaults to the smallMultipleTimeSpan.
+  // Modified by onDateRangeChange, and fetched via (non-reactive) getDateRange,
+  // to avoid updating the chart immediately, so it will be used as the initial value the
+  // next time createSpec is called.  Reloading the component will reset to the default.
+  $: detailViewTimeSpan = detailViewTimeSpan || $smallMultipleTimeSpan;
+
+  function getDateRange() {
+    if (detailViewTimeSpan.length === 0) {
+      detailViewTimeSpan = $smallMultipleTimeSpan;
+    }
+    return detailViewTimeSpan;
+  }
+
+  function onDateRangeChange(event) {
+    // All signal events are sent to all on:signal handlers (??), so check if this is the right handler.
+    if (event.detail.name !== 'dateRange') {
+      return;
+    }
+    const dr = event.detail.value && event.detail.value.date_value;
+    if (dr && Array.isArray(dr) && dr.length > 0) {
+      if (
+        (!Number.isNaN(dr[0]) && dr[0] !== detailViewTimeSpan[0].getTime()) ||
+        (!Number.isNaN(dr[1]) && dr[1] !== detailViewTimeSpan[1].getTime())
+      ) {
+        detailViewTimeSpan = [new Date(dr[0]), new Date(dr[1])];
+      }
+    }
+  }
+
+  $: title = `${sensor.name} in ${
+    selections.length > 0 ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown'
+  }`;
+  $: sensorPrimaryValue = primaryValue(sensor, $signalCasesOrDeathOptions);
+
+  $: spec = createSpec(sensor, primaryValue(sensor, $signalCasesOrDeathOptions), selections, getDateRange(), [
+    title,
+    mapTitle,
+  ]);
+
+  $: isCumulative = $signalCasesOrDeathOptions.cumulative;
 
   /**
    * @param {KeyboardEvent} e
@@ -67,17 +106,27 @@
   function onEscCheck(e) {
     if (e.key === 'Escape' || e.key === 'Esc') {
       trackEvent('detail-view', 'close', 'keyboard');
+      restoreFocus();
       dispatch('close');
     }
   }
 
   let close = null;
+  let oldFocus = null;
 
   onMount(() => {
     if (close) {
+      oldFocus = document.activeElement;
       close.focus();
     }
   });
+
+  function restoreFocus() {
+    if (oldFocus) {
+      oldFocus.focus();
+      oldFocus = null;
+    }
+  }
 
   // Reference to the vega chart component.
   let vegaRef = null;
@@ -100,6 +149,7 @@
 
   .vega-wrapper {
     position: relative;
+    top: -25px;
   }
   .vega-wrapper > :global(*) {
     position: absolute;
@@ -109,19 +159,17 @@
     bottom: 0;
   }
 
-  h5 {
-    display: inline-block;
-  }
-
   .header {
     position: relative;
   }
 
-  .close {
-    font-size: 0.88rem;
-    position: absolute;
-    right: 0;
-    top: 0;
+  .header .buttons {
+    float: right;
+  }
+
+  .header button {
+    z-index: 10;
+    margin-left: 1em;
   }
 
   .encoding {
@@ -147,16 +195,20 @@
   }
 
   .info {
-    margin-left: 1em;
     font-size: 0.7rem;
     display: inline-block;
   }
 </style>
 
 <div class="header">
-  <h4>{sensor.name} in {hasRegion ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown'}</h4>
-  <div>
-    <h5>{mapTitle}</h5>
+  <div class="buttons">
+    <button
+      title="Download this view"
+      class="pg-button pg-button-circle info"
+      on:click={downloadVega}
+      disabled={!vegaRef}>
+      <IoIosSave />
+    </button>
     {#if sensor.description}
       <button
         title="Show sensor description"
@@ -166,23 +218,17 @@
         }}><IoMdHelp /></button>
     {/if}
     <button
-      title="Download this view"
+      bind:this={close}
       class="pg-button pg-button-circle info"
-      on:click={downloadVega}
-      disabled={!vegaRef}>
-      <IoIosSave />
+      on:click={() => {
+        trackEvent('detail-view', 'close', 'button');
+        restoreFocus();
+        dispatch('close');
+      }}
+      title="Close this detail view">
+      <IoIosClose />
     </button>
   </div>
-  <button
-    bind:this={close}
-    class="pg-button close"
-    on:click={() => {
-      trackEvent('detail-view', 'close', 'button');
-      dispatch('close');
-    }}
-    title="Close this detail view">
-    <IoIosClose />
-  </button>
 </div>
 <div class="single-sensor-chart vega-wrapper">
   <Vega
@@ -192,15 +238,17 @@
     {patchSpec}
     {noDataText}
     signals={{ currentDate: $currentDateObject }}
+    signalListeners={['dateRange']}
+    on:signal={onDateRangeChange}
     tooltip={VegaTooltip}
     tooltipProps={{ sensor }} />
 </div>
-{#if sensor.isCasesOrDeath}
+{#if sensor.isCasesOrDeath && !isCumulative}
   <div class="legend">
     <div class="legend-avg" />
     <div>7-day average</div>
     <div class="legend-avg legend-count" />
-    <div>daily new COVID-19 {sensor.name.toLowerCase()}</div>
+    <div>Raw data</div>
   </div>
 {/if}
 <div class="encoding">

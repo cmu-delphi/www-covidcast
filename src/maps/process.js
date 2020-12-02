@@ -4,7 +4,7 @@ const { dsvFormat, csvParse } = require('d3-dsv');
 const fs = require('fs');
 const path = require('path');
 const booleanDisjoint = require('@turf/boolean-disjoint').default;
-const centroid = require('@turf/centroid').default;
+const centerOfMass = require('@turf/center-of-mass').default;
 const { topology } = require('topojson-server');
 const geojsonExtent = require('@mapbox/geojson-extent');
 const { LngLatBounds, LngLat } = require('mapbox-gl');
@@ -37,6 +37,14 @@ function computeBounds(geojson, scale = 1) {
   );
 }
 
+/**
+ * wraps the csv string to be like a JS module
+ * @param {string} csv
+ */
+function wrapModule(csv) {
+  return `export default \`${csv}\`;`;
+}
+
 async function states(level = 'state') {
   const populationLookup = await generatePopulationLookup();
   const geo = require(`./raw/new_states.json`);
@@ -56,8 +64,8 @@ async function states(level = 'state') {
     };
   });
   fs.writeFileSync(
-    path.resolve(__dirname, `./processed/${level}.csv`),
-    dsvFormat(',').format(infos, ['id', 'postal', 'name', 'population', 'lat', 'long']),
+    path.resolve(__dirname, `./processed/${level}.csv.js`),
+    wrapModule(dsvFormat(',').format(infos, ['id', 'postal', 'name', 'population', 'lat', 'long'])),
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
@@ -104,8 +112,8 @@ function msa(level = 'msa') {
     };
   });
   fs.writeFileSync(
-    path.resolve(__dirname, `./processed/${level}.csv`),
-    dsvFormat(',').format(infos, ['id', 'name', 'population', 'lat', 'long']),
+    path.resolve(__dirname, `./processed/${level}.csv.js`),
+    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'population', 'lat', 'long'])),
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
@@ -147,6 +155,10 @@ async function counties(level = 'county') {
   // };
   const geo = require(`./raw/new_counties.json`);
 
+  const stateToPostal = new Map(
+    require(`./raw/state_centers.json`).features.map((f) => [f.properties.STATE, f.properties.POSTAL]),
+  );
+
   // const center = {
   //   type: 'Feature',
   //   geometry: { type: 'Point', coordinates: [-15.707827062813598, -10.343262810086836] },
@@ -172,7 +184,7 @@ async function counties(level = 'county') {
     return {
       id,
       name: props.NAME,
-      displayName: info ? info.display_name : `${props.NAME} County, ${props.LSAD}`,
+      displayName: info ? info.display_name : `${props.NAME} County, ${stateToPostal.get(props.STATE)}`,
       state: props.STATE,
       population: populationLookup.county(id) || Number.parseInt(props.Population, 10),
       lat: center.geometry.coordinates[0],
@@ -180,9 +192,52 @@ async function counties(level = 'county') {
     };
   });
   fs.writeFileSync(
-    path.resolve(__dirname, `./processed/${level}.csv`),
-    dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'population', 'lat', 'long']),
+    path.resolve(__dirname, `./processed/${level}.csv.js`),
+    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'population', 'lat', 'long'])),
   );
+  const topo = topology({ [level]: geo }, QUANTIZATION);
+  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
+  return geo;
+}
+
+async function hrr(level = 'hrr') {
+  const geo = require(`./raw/hrr/hrr.reprojected.geo.json`);
+
+  const infos = geo.features
+    .map((feature) => {
+      const id = String(feature.properties.hrr_num);
+      // due to some unknown error in the re-projection,
+      // frames covering the whole area are created within the geometry
+      // each frame has the same first coordinate pair which is used to filter it out
+      const MAGIC_FRAME_FIST_COORDINATE_PAIR = [-26.069579678452456, 13.509452429458069];
+      feature.geometry.coordinates = feature.geometry.coordinates.filter((d) => {
+        // keep only lists which are not starting with the magic frame pair
+        return !(
+          d[0][0][0] === MAGIC_FRAME_FIST_COORDINATE_PAIR[0] && d[0][0][1] === MAGIC_FRAME_FIST_COORDINATE_PAIR[1]
+        );
+      });
+      delete feature.bbox;
+      const center = centerOfMass(feature).geometry.coordinates;
+      const props = feature.properties;
+      const state = props.hrr_name.split('-')[0].trim();
+      const name = props.hrr_name.slice(props.hrr_name.indexOf('-') + 1).trim();
+      feature.id = id;
+      feature.properties = {};
+      return {
+        id,
+        name,
+        state,
+        displayName: `${props.hrr_name} (HRR)`,
+        lat: center[0],
+        long: center[1],
+      };
+    })
+    .sort((a, b) => a.id.localeCompare(b.id));
+  fs.writeFileSync(
+    path.resolve(__dirname, `./processed/${level}.csv.js`),
+    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'lat', 'long'])),
+  );
+  // fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.geo.json`), JSON.stringify(geo));
   const topo = topology({ [level]: geo }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
   return geo;
@@ -200,8 +255,8 @@ function cities() {
     };
   });
   fs.writeFileSync(
-    path.resolve(__dirname, `./processed/cities.csv`),
-    dsvFormat(',').format(infos, ['name', 'population', 'lat', 'long']),
+    path.resolve(__dirname, `./processed/cities.csv.js`),
+    wrapModule(dsvFormat(',').format(infos, ['name', 'population', 'lat', 'long'])),
   );
 }
 
@@ -229,7 +284,7 @@ function neighborhoods() {
     }),
     ...municipal.features.map((feature) => {
       const props = feature.properties;
-      const center = centroid(feature).geometry.coordinates;
+      const center = centerOfMass(feature).geometry.coordinates;
       return {
         id: props.CNTL_ID,
         municode: props.MUNICODE,
@@ -245,8 +300,10 @@ function neighborhoods() {
   ].filter((d) => d.id);
   // {"FID":1,"NAME":"CHESWICK","TYPE":"BOROUGH","LABEL":"Cheswick Borough","COG":"Allegheny Valley North","SCHOOLD":"Allegheny Valley","CONGDIST":4,"FIPS":13392,"REGION":"NH","ACRES":350.19128417,"SQMI":0.54717391,"MUNICODE":"815","CNTL_ID":"003100","CNTYCOUNCIL":7,"EOC":"NEWCOM","ASSESSORTERRITORY":"East","VALUATIONAREA":"Alle-Kiski Valley","YEARCONVERTED":1966,"GlobalID":"{F29648DC-0D4F-4E35-8F2D-7B465DCFF308}","SHAPE_Length":0.04917208282736798,"SHAPE_Area":0.00015137060470303174}
   fs.writeFileSync(
-    path.resolve(__dirname, `./processed/swpa/neighborhood.csv`),
-    dsvFormat(',').format(infos, ['id', 'municode', 'name', 'displayName', 'type', 'lat', 'long', 'cog', 'region']),
+    path.resolve(__dirname, `./processed/swpa/neighborhood.csv.js`),
+    wrapModule(
+      dsvFormat(',').format(infos, ['id', 'municode', 'name', 'displayName', 'type', 'lat', 'long', 'cog', 'region']),
+    ),
   );
   neighborhoods.features = neighborhoods.features
     .map((d) => ({
@@ -311,7 +368,7 @@ function zipHrr(hrrZone, hrrNum = '357') {
     }
   });
   const infos = data.features.map((feature) => {
-    const center = centroid(feature).geometry.coordinates;
+    const center = centerOfMass(feature).geometry.coordinates;
     return {
       id: feature.id,
       name: feature.id,
@@ -320,8 +377,8 @@ function zipHrr(hrrZone, hrrNum = '357') {
     };
   });
   fs.writeFileSync(
-    path.resolve(__dirname, `./processed/swpa/zip.csv`),
-    dsvFormat(',').format(infos, ['id', 'name', 'lat', 'long']),
+    path.resolve(__dirname, `./processed/swpa/zip.csv.js`),
+    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'lat', 'long'])),
   );
   const geo = topology({ zip: data }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/zip.topojson.json`), JSON.stringify(geo));
@@ -360,10 +417,11 @@ function hrrZone(statesGeo, msaGeo, countiesGeo) {
   const statesGeo = await states();
   const msaGeo = await msa();
   const countiesGeo = await counties();
+  const hrrGeo = await hrr();
   await cities();
 
-  const hrrGeo = await hrrZone(statesGeo, msaGeo, countiesGeo);
-  const zipGeo = await zipHrr(hrrGeo);
+  const hrr357Geo = await hrrZone(statesGeo, msaGeo, countiesGeo);
+  const zipGeo = await zipHrr(hrr357Geo);
   const neighborhoodsGeo = await neighborhoods();
 
   fs.writeFileSync(
@@ -374,6 +432,7 @@ function hrrZone(statesGeo, msaGeo, countiesGeo) {
         msa: computeBounds(msaGeo).toArray(),
         counties: computeBounds(countiesGeo).toArray(),
         hrr: computeBounds(hrrGeo).toArray(),
+        hrr357: computeBounds(hrr357Geo).toArray(),
         neighborhoods: computeBounds(neighborhoodsGeo).toArray(),
         zip: computeBounds(zipGeo).toArray(),
       },

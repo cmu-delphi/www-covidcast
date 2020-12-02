@@ -186,7 +186,7 @@
         <button
           class="pg-button"
           disabled={selectedDate == null || startEndDates.length === 0 || selectedDate.valueOf() === startEndDates[1].valueOf()}
-          title="Go to the latest date for which '{$currentSensorEntry.name}' is defined"
+          title="Go to the latest date for which '{$currentSensorEntry.name}' is available"
           on:click={() => (selectedDate = startEndDates[1])}>
           <IoIosCalendar />
         </button>

@@ -1,4 +1,5 @@
-import { formatAPITime, isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data';
+import { isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data/signals';
+import { formatAPITime } from '../data/utils';
 import { format } from 'd3-format';
 import descriptions from './descriptions.generated.json';
 import '!file-loader?name=descriptions.raw.txt!./descriptions.raw.txt';
@@ -15,6 +16,11 @@ export const levelList = [
     id: 'msa',
     label: 'Metro Area',
     labelPlural: 'Metro Areas',
+  },
+  {
+    id: 'hrr',
+    label: 'Hospital Referral Region',
+    labelPlural: 'Hospital Referral Regions',
   },
   {
     id: 'county',
@@ -88,6 +94,7 @@ export function getLevelInfo(level) {
  * @property {(options?: CasesOrDeathOptions) => 'prop' | 'count' | 'other')} getType
  * @property {Record<keyof EpiDataCasesOrDeathValues, string>} casesOrDeathSignals signal to load for cases or death
  * @property {)(v: number) => string)} colorScale
+ * @property {string} credits
  */
 
 /**
@@ -168,6 +175,7 @@ export function extendSensorEntry(sensorEntry) {
   return Object.assign(sensorEntry, {
     key,
     tooltipText: sensorEntry.tooltipText || mapTitle,
+    credits: sensorEntry.credits || 'We are happy for you to use this data in products and publications.',
     formatValue: sensorEntry.format === 'percent' ? percentFormatter : isCount ? countFormatter : rawFormatter,
     isCount,
     getType: (options) => getType(sensorEntry, options),
@@ -259,6 +267,7 @@ export const defaultRegionOnStartup = {
   county: '42003', // Allegheny
   msa: '38300', // Pittsburgh
   state: 'PA', // Pennsylvania
+  hrr: '357', // Pittsburgh
 };
 
 export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);

@@ -1,8 +1,8 @@
 <script>
-  import { onMount, onDestroy, createEventDispatcher } from 'svelte';
+  import { onMount, onDestroy, createEventDispatcher, afterUpdate } from 'svelte';
   import embed from 'vega-embed';
   import { Error, expressionFunction } from 'vega';
-  import { observeResize, unobserveResize } from '../util';
+  import { observeResize, unobserveResize, debouncedResize } from '../util';
   import { createVegaTooltipAdapter } from './tooltipUtils';
   import { cachedTime, cachedNumber } from './customVegaFunctions';
 
@@ -105,13 +105,15 @@
           // outside has changed
           return;
         }
-        vega.view.change(
-          'values',
-          vega.view
-            .changeset()
-            .remove(() => true)
-            .insert(d || []),
-        );
+        setTimeout(() => {
+          vega.view.change(
+            'values',
+            vega.view
+              .changeset()
+              .remove(() => true)
+              .insert(d || []),
+          );
+        });
 
         noData = !d || d.length === 0;
         // also update signals along the way
@@ -166,6 +168,34 @@
         Object.entries(signals).forEach(([key, v]) => {
           spec.signals.push({ name: key, value: v });
         });
+        spec.signals.push({
+          name: 'width',
+          on: [
+            {
+              events: { source: 'window', type: 'load' },
+              update: 'containerSize()[0]',
+              force: true,
+            },
+            {
+              events: { source: 'window', type: 'resize' },
+              update: 'containerSize()[0]',
+            },
+          ],
+        });
+        spec.signals.push({
+          name: 'height',
+          on: [
+            {
+              events: { source: 'window', type: 'load' },
+              update: 'containerSize()[1]',
+              force: true,
+            },
+            {
+              events: { source: 'window', type: 'resize' },
+              update: 'containerSize()[1]',
+            },
+          ],
+        });
         return spec;
       },
     });
@@ -209,6 +239,10 @@
     }
   });
 
+  afterUpdate(() => {
+    debouncedResize();
+  });
+
   onDestroy(() => {
     if (patchSpec) {
       unobserveResize(root);
@@ -232,4 +266,6 @@
   class="root"
   class:loading-bg={!hasError && loading}
   class:message-overlay={hasError || (noData && !loading)}
-  data-message={message} />
+  data-message={message}
+  data-testid="vega"
+  data-status={hasError ? 'error' : noData ? 'no-data' : loading ? 'loading' : 'ready'} />

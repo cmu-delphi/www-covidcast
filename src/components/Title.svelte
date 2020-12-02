@@ -14,6 +14,7 @@
     align-items: center;
     text-align: center;
     padding: 0.2em 1em;
+    margin: 0;
   }
 
   .info {
@@ -33,5 +34,5 @@
         currentInfoSensor.set($currentSensorEntry);
       }}><IoMdHelp /></button>
   </span>
-  {#if showDate}<span>{$currentDateObject.toLocaleDateString()}</span>{/if}
+  {#if showDate}<span data-testid="currentdate">{$currentDateObject.toLocaleDateString()}</span>{/if}
 </h2>
