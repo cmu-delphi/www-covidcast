@@ -1,3 +1,4 @@
+import geojsonExtent from '@mapbox/geojson-extent';
 import { L } from './layers';
 import { LngLatBounds } from 'mapbox-gl';
 
@@ -69,6 +70,20 @@ export default class ZoomMap {
     }
     this.initialZoomView = false;
     this.map.zoomOut();
+  }
+
+  focusOn(feature) {
+    if (!feature || !this.map) {
+      return;
+    }
+    this.initialZoomView = false;
+
+    const bounds = geojsonExtent(feature);
+    this.map.fitBounds(bounds, {
+      maxZoom: this.getZoom() * 1.5,
+      linear: false,
+      essential: true,
+    });
   }
 
   resetZoom() {

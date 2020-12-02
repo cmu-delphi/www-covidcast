@@ -1,4 +1,3 @@
-import geojsonExtent from '@mapbox/geojson-extent';
 import { Map as MapBox } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { defaultRegionOnStartup, levelMegaCounty } from '../../stores/constants';
@@ -461,11 +460,7 @@ export default class AMapBoxWrapper {
       return;
     }
     // show in focus
-    this.map.fitBounds(geojsonExtent(feature), {
-      maxZoom: this.zoom.getZoom() * 1.5,
-      linear: false,
-      essential: true,
-    });
+    this.zoom.focusOn(feature);
   }
 
   isMissing(feature) {
