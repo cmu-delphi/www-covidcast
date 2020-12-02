@@ -10,6 +10,7 @@
   } from '../stores';
 
   let close = null;
+  let oldFocus = null;
 
   /**
    * @param {KeyboardEvent} e
@@ -19,13 +20,22 @@
       return;
     }
     if (e.key === 'Escape' || e.key === 'Esc') {
+      restoreFocus();
       currentInfoSensor.set(null);
     }
   }
 
   $: {
     if ($currentInfoSensor && close) {
+      oldFocus = document.activeElement;
       close.focus();
+    }
+  }
+
+  function restoreFocus() {
+    if (oldFocus) {
+      oldFocus.focus();
+      oldFocus = null;
     }
   }
 
@@ -38,6 +48,7 @@
     // switch to export mode
     currentMode.set(modeByID.export);
     currentInfoSensor.set(null);
+    oldFocus = null;
   }
 </script>
 
@@ -69,6 +80,7 @@
     list-style-type: none;
     font-size: 80%;
     line-height: 1.35em;
+    padding: 0;
   }
 
   .links > li:not(:first-of-type)::before {
@@ -80,9 +92,11 @@
     list-style-type: none;
     padding: 0;
     display: flex;
+    margin-right: 1em;
   }
 
   h2 {
+    margin-top: 0;
     margin-right: 40px;
     padding-top: 0.25em;
   }
@@ -99,6 +113,7 @@
       bind:this={close}
       class="pg-button close"
       on:click={() => {
+        restoreFocus();
         currentInfoSensor.set(null);
       }}
       title="Close this popup">
