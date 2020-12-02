@@ -1,11 +1,5 @@
 import { times, currentDate, stats, currentSensor, currentLevel, MAGIC_START_DATE } from '../stores';
-import {
-  sensorList,
-  sensorMap,
-  levels,
-  yesterday,
-  regularSignalMetaDataGeoTypeCandidates,
-} from '../stores/constants';
+import { sensorList, sensorMap, levels, yesterday, regularSignalMetaDataGeoTypeCandidates } from '../stores/constants';
 import { get } from 'svelte/store';
 import { callMetaAPI } from './api';
 
