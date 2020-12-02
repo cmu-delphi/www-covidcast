@@ -283,3 +283,4 @@ export const DEFAULT_SENSOR = (() => {
   }
 })();
 export const DEFAULT_LEVEL = 'county';
+export const DEFAULT_ENCODING = 'color';
