@@ -2,7 +2,6 @@
   import MapBox from '../../components/MapBox/MapBox.svelte';
   import Options from '../../components/Options.svelte';
   import {
-    signalType,
     currentSensor,
     currentLevel,
     encoding,
@@ -269,7 +268,6 @@
       data={currentData}
       sensor={$currentSensor}
       level={$currentLevel}
-      signalType={$signalType}
       encoding={$encoding}
       signalOptions={$signalCasesOrDeathOptions}
       on:zoom={(e) => (zoom = e.detail)}

@@ -9,7 +9,6 @@ import {
   DEFAULT_MODE,
   DEFAULT_SENSOR,
   DEFAULT_ENCODING,
-  swpaLevels,
 } from './constants';
 import modes, { modeByID } from '../modes';
 import { parseAPITime } from '../data/utils';
@@ -68,26 +67,10 @@ export const currentSensorEntry = derived([currentSensor], ([$currentSensor]) =>
 // 'county', 'state', or 'msa'
 export const currentLevel = writable(DEFAULT_LEVEL, (set) => {
   const level = urlParams.get('level');
-  if (levels.includes(level) || swpaLevels.includes(level)) {
+  if (levels.includes(level)) {
     set(level);
   }
 });
-
-// Options are 'direction' and 'value'.
-/**
- * @type {import('svelte/store').Writable<'direction' | 'value'>}
- */
-export const signalType = writable('value');
-// , (set) => {
-//   const signalT = urlParams.get('signalType');
-//   if (signalT === 'direction' || signalT === 'value') {
-//     // set(signalT);
-//     set('value');
-//   }
-// });
-
-export const isValueSignalType = derived([signalType], ([v]) => v === 'value');
-export const isDirectionSignalType = derived([signalType], ([v]) => v === 'direction');
 
 // in case of a death signal whether to show cumulative data
 export const signalCasesOrDeathOptions = writable({
@@ -218,10 +201,6 @@ currentSensorEntry.subscribe((sensorEntry) => {
     // show help, update it
     currentInfoSensor.set(sensorEntry);
   }
-
-  // if (sensorEntry.type === 'late' && sensorEntry.id !== 'hospital-admissions') {
-  //   signalType.set('value');
-  // }
 
   if (!sensorEntry.isCasesOrDeath) {
     signalCasesOrDeathOptions.set({

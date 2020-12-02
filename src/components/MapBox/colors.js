@@ -1,8 +1,7 @@
 import { scaleSequential, scaleSequentialLog } from 'd3-scale';
 import logspace from 'compute-logspace';
-import { DIRECTION_THEME, ZERO_COLOR, MISSING_COLOR } from '../../theme';
+import { ZERO_COLOR } from '../../theme';
 import { zip } from '../../util';
-import { MISSING_VALUE } from './encodings/utils';
 import { primaryValue } from '../../stores/constants';
 
 const MAGIC_MIN_STATS = 0.14;
@@ -60,23 +59,9 @@ export function determineMinMax(statsLookup, sensorEntry, level, signalOptions, 
 /**
  * @param {SensorEntry} sensorEntry
  * @param {'prop' | 'count' | 'other'} sensorType
- * @param {'value' || 'direction'} signalType
  * @param {[number, number]} valueMinMax
  */
-export function determineColorScale(valueMinMax, signalType, sensorEntry, sensorType) {
-  if (signalType === 'value') {
-    return determineValueColorScale(valueMinMax, sensorEntry, sensorType);
-  }
-  // signalType is 'direction'
-  return determineDirectionColorScale();
-}
-
-/**
- * @param {SensorEntry} sensorEntry
- * @param {'prop' | 'count' | 'other'} sensorType
- * @param {[number, number]} valueMinMax
- */
-function determineValueColorScale(valueMinMax, sensorEntry, sensorType) {
+export function determineColorScale(valueMinMax, sensorEntry, sensorType) {
   if (sensorType === 'count') {
     return countSignalColorScale(valueMinMax, sensorEntry);
   }
@@ -84,23 +69,6 @@ function determineValueColorScale(valueMinMax, sensorEntry, sensorType) {
     return propSignalColorScale(valueMinMax, sensorEntry);
   }
   return regularSignalColorScale(valueMinMax, sensorEntry);
-}
-
-function determineDirectionColorScale() {
-  const stops = [
-    [MISSING_VALUE, MISSING_COLOR],
-    [-1, DIRECTION_THEME.decreasing],
-    [0, DIRECTION_THEME.steady],
-    [1, DIRECTION_THEME.increasing],
-  ];
-  const stopsMega = [
-    [MISSING_VALUE, MISSING_COLOR],
-    [-1, DIRECTION_THEME.gradientMinMega],
-    [0, DIRECTION_THEME.gradientMiddleMega],
-    [1, DIRECTION_THEME.gradientMaxMega],
-  ];
-
-  return { stops, stopsMega };
 }
 
 /**
