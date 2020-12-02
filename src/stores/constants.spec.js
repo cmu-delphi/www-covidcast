@@ -1,9 +1,9 @@
 /// <reference types="jest" />
-import { defaultSensorId, EPIDATA_CASES_OR_DEATH_VALUES, getLevelInfo, sensorList } from './constants';
+import { DEFAULT_SENSOR, EPIDATA_CASES_OR_DEATH_VALUES, getLevelInfo, sensorList } from './constants';
 
-describe('defaultSensorId', () => {
+describe('DEFAULT_SENSOR', () => {
   test('matches', () => {
-    expect(defaultSensorId).toBe('doctor-visits');
+    expect(DEFAULT_SENSOR).toBe('doctor-visits-smoothed_adj_cli');
   });
 });
 
