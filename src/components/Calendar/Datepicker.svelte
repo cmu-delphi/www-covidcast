@@ -11,8 +11,8 @@
 
   let popover;
 
-  export let start = new Date(1987, 9, 29);
-  export let end = new Date(2020, 9, 29);
+  export let start = new Date(1987, 0, 1);
+  export let end = new Date(2030, 0, 1);
   export let selected = today;
   export let dateChosen = false;
   export let trigger = null;

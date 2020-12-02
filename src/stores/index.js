@@ -1,7 +1,15 @@
 import { writable, derived, get, readable } from 'svelte/store';
 import { LogScale, SqrtScale } from './scales';
 import { scaleSequentialLog } from 'd3-scale';
-import { defaultSensorId, sensorList, sensorMap, yesterdayDate, levels } from './constants';
+import {
+  sensorMap,
+  yesterdayDate,
+  levels,
+  DEFAULT_LEVEL,
+  DEFAULT_MODE,
+  DEFAULT_SENSOR,
+  DEFAULT_ENCODING,
+} from './constants';
 import modes, { modeByID } from '../modes';
 import { parseAPITime } from '../data/utils';
 import { getInfoByName } from '../maps';
@@ -32,9 +40,9 @@ export const stats = writable(null);
 export const appReady = writable(false);
 
 /**
- * @type {import('svelte/store').Writable<import('../routes').Mode>}
+ * @type {import('svelte/store').Writable<import('../modes').Mode>}
  */
-export const currentMode = writable(modeByID.overview, (set) => {
+export const currentMode = writable(DEFAULT_MODE, (set) => {
   const mode = urlParams.get('mode');
   const nextMode = modes.find((d) => d.id === mode);
   if (nextMode) {
@@ -42,17 +50,10 @@ export const currentMode = writable(modeByID.overview, (set) => {
   }
 });
 
-export const currentSensor = writable('', (set) => {
+export const currentSensor = writable(DEFAULT_SENSOR, (set) => {
   const sensor = urlParams.get('sensor');
   if (sensor && sensorMap.has(sensor)) {
     set(sensor);
-  } else {
-    const defaultSensor = sensorList.find((d) => d.id === defaultSensorId);
-    if (defaultSensor) {
-      set(defaultSensor.key);
-    } else {
-      set(sensorList[0].key);
-    }
   }
 });
 
@@ -64,7 +65,7 @@ export const currentInfoSensor = writable(null);
 export const currentSensorEntry = derived([currentSensor], ([$currentSensor]) => sensorMap.get($currentSensor));
 
 // 'county', 'state', or 'msa'
-export const currentLevel = writable('county', (set) => {
+export const currentLevel = writable(DEFAULT_LEVEL, (set) => {
   const level = urlParams.get('level');
   if (levels.includes(level)) {
     set(level);
@@ -82,7 +83,7 @@ export const currentSensorMapTitle = derived([currentSensorEntry, signalCasesOrD
 );
 
 // Options are 'color', 'bubble', and 'spike'
-export const encoding = writable('color', (set) => {
+export const encoding = writable(DEFAULT_ENCODING, (set) => {
   const encoding = urlParams.get('encoding');
   if (encoding === 'color' || encoding === 'bubble' || encoding === 'spike') {
     set(encoding);
@@ -311,4 +312,38 @@ export const currentMultiSelection = derived(
     ]
       .filter(Boolean)
       .flat(),
+);
+
+export const trackedUrlParams = derived(
+  [
+    currentMode,
+    currentSensor,
+    currentLevel,
+    currentRegion,
+    currentDate,
+    signalCasesOrDeathOptions,
+    encoding,
+    currentCompareSelection,
+  ],
+  ([mode, sensor, level, region, date, signalOptions, encoding, compare]) => {
+    const sensorEntry = sensorMap.get(sensor);
+    const inMapMode = mode === modeByID.overview || mode === modeByID.timelapse;
+
+    // determine parameters based on default value and current mode
+    const params = {
+      mode: mode === DEFAULT_MODE ? null : mode.id,
+      sensor: mode === modeByID.single || sensor === DEFAULT_SENSOR ? null : sensor,
+      level: mode === modeByID.single || mode === modeByID.export || level === DEFAULT_LEVEL ? null : level,
+      region: mode === modeByID.export || mode === modeByID.timelapse || !region ? null : region,
+      date: mode === modeByID.export ? null : date,
+      signalC: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.cumulative,
+      signalR: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.ratio,
+      encoding: !inMapMode || encoding === DEFAULT_ENCODING ? null : encoding,
+      compare:
+        (mode !== modeByID.overview && mode !== modeByID.single) || !compare
+          ? null
+          : compare.map((d) => d.info.propertyId).join(','),
+    };
+    return params;
+  },
 );
