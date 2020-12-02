@@ -9,6 +9,7 @@ import {
   DEFAULT_MODE,
   DEFAULT_SENSOR,
   DEFAULT_ENCODING,
+  swpaLevels,
 } from './constants';
 import modes, { modeByID } from '../modes';
 import { parseAPITime } from '../data/utils';
