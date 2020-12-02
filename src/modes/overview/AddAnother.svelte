@@ -15,7 +15,10 @@
   export let selections = [];
 
   $: possibleInfos = regionSearchList.filter(
-    (d) => d.level !== levelMegaCounty.id && !selections.some((s) => s.info.id === d.id),
+    (d) =>
+      d.level !== levelMegaCounty.id &&
+      !selections.some((s) => s.info.id === d.id) &&
+      (selections.length === 0 || selections.some((s) => s.info.level === d.level)), // filter to same level as selection
   );
 
   $: possibleRecent = $recentRegionInfos.filter((d) => !selections.some((s) => s.info.id === d.id));
@@ -76,6 +79,8 @@
 
   ol {
     flex: 2 1 0;
+    margin: 0;
+    padding: 0;
   }
 
   ol button,
@@ -103,6 +108,7 @@
     margin: 0;
     padding: 0;
     color: inherit;
+    border: none;
   }
 
   #select-on-map button {

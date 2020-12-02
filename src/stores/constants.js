@@ -94,6 +94,7 @@ export function getLevelInfo(level) {
  * @property {(options?: CasesOrDeathOptions) => 'prop' | 'count' | 'other')} getType
  * @property {Record<keyof EpiDataCasesOrDeathValues, string>} casesOrDeathSignals signal to load for cases or death
  * @property {)(v: number) => string)} colorScale
+ * @property {string} credits
  */
 
 /**
@@ -174,6 +175,7 @@ export function extendSensorEntry(sensorEntry) {
   return Object.assign(sensorEntry, {
     key,
     tooltipText: sensorEntry.tooltipText || mapTitle,
+    credits: sensorEntry.credits || 'We are happy for you to use this data in products and publications.',
     formatValue: sensorEntry.format === 'percent' ? percentFormatter : isCount ? countFormatter : rawFormatter,
     isCount,
     getType: (options) => getType(sensorEntry, options),

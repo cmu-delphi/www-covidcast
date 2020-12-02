@@ -3,7 +3,7 @@ import { timeFormat } from 'd3-time-format';
 const short = timeFormat('%B %d');
 const shortNumbers = timeFormat('%m/%d');
 const iso = timeFormat('%Y-%m-%d');
-const local = timeFormat('%x');
+const local = timeFormat('%m/%d/%Y');
 
 export function formatDateShortNumbers(date) {
   return !date ? '?' : shortNumbers(date);

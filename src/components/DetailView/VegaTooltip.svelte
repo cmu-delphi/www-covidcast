@@ -55,7 +55,7 @@
           <td class="right">{sensor.formatValue(item.countRatio)}</td>
         </tr>
         <tr>
-          <th>7-day avg</th>
+          <th>7-day average</th>
           <td class="right">{sensor.formatValue(item.avg)}</td>
           <td class="right">{sensor.formatValue(item.avgRatio)}</td>
         </tr>

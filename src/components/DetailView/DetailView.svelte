@@ -1,5 +1,5 @@
 <script>
-  import { signalCasesOrDeathOptions, currentDateObject, smallMultipleTimeSpan, currentInfoSensor } from '../../stores';
+  import { signalCasesOrDeathOptions, currentDateObject, currentInfoSensor, smallMultipleTimeSpan } from '../../stores';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../Vega.svelte';
   import { createSpec, patchSpec } from './vegaSpec';
@@ -59,14 +59,46 @@
       }).then((rows) => addMissing(rows, sensor))
     : [];
 
-  const title = `${sensor.name} in ${
+  // The currently selected detailViewTimeSpan, initially defaults to the smallMultipleTimeSpan.
+  // Modified by onDateRangeChange, and fetched via (non-reactive) getDateRange,
+  // to avoid updating the chart immediately, so it will be used as the initial value the
+  // next time createSpec is called.  Reloading the component will reset to the default.
+  $: detailViewTimeSpan = detailViewTimeSpan || $smallMultipleTimeSpan;
+
+  function getDateRange() {
+    if (detailViewTimeSpan.length === 0) {
+      detailViewTimeSpan = $smallMultipleTimeSpan;
+    }
+    return detailViewTimeSpan;
+  }
+
+  function onDateRangeChange(event) {
+    // All signal events are sent to all on:signal handlers (??), so check if this is the right handler.
+    if (event.detail.name !== 'dateRange') {
+      return;
+    }
+    const dr = event.detail.value && event.detail.value.date_value;
+    if (dr && Array.isArray(dr) && dr.length > 0) {
+      if (
+        (!Number.isNaN(dr[0]) && dr[0] !== detailViewTimeSpan[0].getTime()) ||
+        (!Number.isNaN(dr[1]) && dr[1] !== detailViewTimeSpan[1].getTime())
+      ) {
+        detailViewTimeSpan = [new Date(dr[0]), new Date(dr[1])];
+      }
+    }
+  }
+
+  $: title = `${sensor.name} in ${
     selections.length > 0 ? selections.map((d) => d.info.displayName).join(', ') : 'Unknown'
   }`;
+  $: sensorPrimaryValue = primaryValue(sensor, $signalCasesOrDeathOptions);
 
-  $: spec = createSpec(sensor, primaryValue(sensor, $signalCasesOrDeathOptions), selections, $smallMultipleTimeSpan, [
+  $: spec = createSpec(sensor, primaryValue(sensor, $signalCasesOrDeathOptions), selections, getDateRange(), [
     title,
     mapTitle,
   ]);
+
+  $: isCumulative = $signalCasesOrDeathOptions.cumulative;
 
   /**
    * @param {KeyboardEvent} e
@@ -74,17 +106,27 @@
   function onEscCheck(e) {
     if (e.key === 'Escape' || e.key === 'Esc') {
       trackEvent('detail-view', 'close', 'keyboard');
+      restoreFocus();
       dispatch('close');
     }
   }
 
   let close = null;
+  let oldFocus = null;
 
   onMount(() => {
     if (close) {
+      oldFocus = document.activeElement;
       close.focus();
     }
   });
+
+  function restoreFocus() {
+    if (oldFocus) {
+      oldFocus.focus();
+      oldFocus = null;
+    }
+  }
 
   // Reference to the vega chart component.
   let vegaRef = null;
@@ -180,6 +222,7 @@
       class="pg-button pg-button-circle info"
       on:click={() => {
         trackEvent('detail-view', 'close', 'button');
+        restoreFocus();
         dispatch('close');
       }}
       title="Close this detail view">
@@ -195,15 +238,17 @@
     {patchSpec}
     {noDataText}
     signals={{ currentDate: $currentDateObject }}
+    signalListeners={['dateRange']}
+    on:signal={onDateRangeChange}
     tooltip={VegaTooltip}
     tooltipProps={{ sensor }} />
 </div>
-{#if sensor.isCasesOrDeath}
+{#if sensor.isCasesOrDeath && !isCumulative}
   <div class="legend">
     <div class="legend-avg" />
     <div>7-day average</div>
     <div class="legend-avg legend-count" />
-    <div>daily new COVID-19 {sensor.name.toLowerCase()}</div>
+    <div>Raw data</div>
   </div>
 {/if}
 <div class="encoding">
