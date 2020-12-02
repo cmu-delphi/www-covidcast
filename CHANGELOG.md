@@ -1,8 +1,8 @@
 # Release 1.11.0
 
-This release changes COVIDcast from a complete site to an embedded component, primarily to the (www-main)[https://github.com/cmu-delphi/www-covidcast] repository. This means that instead of having both covidcast.cmu.edu and delphi.cmu.edu separately, we will now have delphi.cmu.edu and covidcast will live at delphi.cmu.edu/covidcast.
+This release changes COVIDcast from a complete site to an embedded component, primarily to the [www-main](https://github.com/cmu-delphi/www-covidcast) repository. This means that instead of having both covidcast.cmu.edu and delphi.cmu.edu separately, we will now have delphi.cmu.edu and covidcast will live at delphi.cmu.edu/covidcast.
 
-The are only a few changes to the visualization itself, which was why this is marked as 1.11.0 instead of 2.0.
+The are only minor changes to the COVIDcast visualization itself, which was why this is marked as 1.11.0 instead of 2.0.
 
 ## Signal Changes
 
