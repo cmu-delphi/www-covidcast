@@ -1,4 +1,3 @@
-import 'mapbox-gl/dist/mapbox-gl.css';
 import { bounds, loadSources } from '../../maps';
 import { levelMegaCounty, levels } from '../../stores/constants';
 import { ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME, MAP_THEME, MISSING_COLOR } from '../../theme';

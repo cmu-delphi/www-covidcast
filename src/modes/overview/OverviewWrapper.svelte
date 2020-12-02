@@ -1,4 +1,7 @@
 <script>
+  import { levelList } from '../../stores';
+  import USMapBoxWrapper from '../../components/MapBox/USMapBoxWrapper';
+  import { nameInfos } from '../../maps';
   import MapBox from '../../components/MapBox/MapBox.svelte';
   import Options from '../../components/Options.svelte';
   import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
@@ -36,9 +39,8 @@
   import AddAnother from './AddAnother.svelte';
   import { getInfoByName } from '../../maps';
 
-  export let wrapperClass;
-  export let regionSearchList;
-  export let levelList;
+  export let wrapperClass = USMapBoxWrapper;
+  export let regionSearchList = nameInfos;
 
   /**
    * @type {MapBox}
