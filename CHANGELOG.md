@@ -4,6 +4,13 @@ This release changes COVIDcast from a complete site to an embedded component, pr
 
 The are only a few changes to the visualization itself, which was why this is marked as 1.11.0 instead of 2.0.
 
+## Signal Changes
+
+- "COVID Searches on Google" is now "COVID Symptom Searches on Google". For more details see: [`google-symptoms` `sum_anosmia_ageusia_smoothed_search`](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/google-symptoms.html) signal.
+- New "Bar Visits" signal from Safegraph. For more details see: [`safegraph` `bars_visit_num` and `bars_visit_prop`](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/safegraph.html#safegraph-weekly-patterns).
+- New "Restaurant Visits" signal from Safegraph. For more details see: [`safegraph` `restaurants_visit_num` and `restaurants_visit_prop`](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/safegraph.html#safegraph-weekly-patterns)
+- "Away from home" signals replaced by smoothed versions to remove the weekend effect. For more details see: [`safegraph` `full_time_work_prop_7dav` and `part_time_work_prop_7dav`](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/safegraph.html#safegraph-social-distancing-metrics)
+
 ## New features
 
 - [#610](https://github.com/cmu-delphi/www-covidcast/pull/610) (re: [#593](https://github.com/cmu-delphi/www-covidcast/issues/593)) Hospital referal regions now available as a geo type
