@@ -7,7 +7,6 @@ import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
  * @typedef {import('../stores/constants').SensorEntry} SensorEntry
  */
 
-// * @property {number} direction
 // * @property {number} issue
 // * @property {number} lag
 // * @property {number | null} sample_size
@@ -206,7 +205,6 @@ function createCopy(row, date, sensorEntry) {
     time_value: Number.parseInt(formatAPITime(date), 10),
     value: null,
     stderr: null,
-    direction: null,
     sample_size: null,
   });
   if ((sensorEntry != null && sensorEntry.isCasesOrDeath) || row[EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined) {

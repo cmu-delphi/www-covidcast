@@ -4,7 +4,6 @@
   import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
   import FaChartLine from 'svelte-icons/fa/FaChartLine.svelte';
   import {
-    signalType,
     currentSensor,
     currentLevel,
     encoding,
@@ -339,7 +338,6 @@
       {data}
       sensor={$currentSensor}
       level={$currentLevel}
-      signalType={$signalType}
       signalOptions={$signalCasesOrDeathOptions}
       {selections}
       encoding={$encoding}

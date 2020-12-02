@@ -4,7 +4,6 @@ import {
   currentRegion,
   currentMode,
   currentDate,
-  signalType,
   encoding,
   signalCasesOrDeathOptions,
   currentCompareSelection,
@@ -19,7 +18,6 @@ function updateURIParameters(delta) {
     level: get(currentLevel),
     region: get(currentRegion),
     date: get(currentDate),
-    signalType: get(signalType),
     encoding: get(encoding),
     mode: get(currentMode).id,
     signalC: get(signalCasesOrDeathOptions).cumulative,
@@ -58,11 +56,6 @@ currentLevel.subscribe((level) =>
 );
 currentRegion.subscribe((region) => updateURIParameters({ region }));
 currentDate.subscribe((date) => updateURIParameters({ date }));
-signalType.subscribe((signalType) =>
-  updateURIParameters({
-    signalType,
-  }),
-);
 signalCasesOrDeathOptions.subscribe((r) =>
   updateURIParameters({
     signalC: r.cumulative,

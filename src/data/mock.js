@@ -24,7 +24,6 @@ export function generateMockSignal(_id, _signal, level, date, region) {
      */
     const data = [];
 
-    const direction = 0;
     const issue = Number.parseInt(formatAPITime(mockEndDate), 10);
     const lag = 1;
     const sampleSize = null;
@@ -33,7 +32,6 @@ export function generateMockSignal(_id, _signal, level, date, region) {
     const pushEntry = (timeValue, geoValue) => {
       data.push({
         time_value: Number.parseInt(formatAPITime(timeValue), 10),
-        direction,
         issue,
         lag,
         sample_size: sampleSize,

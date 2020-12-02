@@ -3,7 +3,6 @@ import {
   currentLevel,
   currentRegion,
   currentDate,
-  signalType,
   encoding,
   currentMode,
   signalCasesOrDeathOptions,
@@ -59,12 +58,6 @@ appReady.subscribe((v) => {
       return;
     }
     trackEvent('date', 'set', date);
-  });
-  signalType.subscribe((signalType) => {
-    if (initialRun) {
-      return;
-    }
-    trackEvent('signalType', 'set', signalType);
   });
   encoding.subscribe((encoding) => {
     if (initialRun) {

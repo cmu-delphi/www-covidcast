@@ -71,22 +71,6 @@ export const currentLevel = writable('county', (set) => {
   }
 });
 
-// Options are 'direction' and 'value'.
-/**
- * @type {import('svelte/store').Writable<'direction' | 'value'>}
- */
-export const signalType = writable('value');
-// , (set) => {
-//   const signalT = urlParams.get('signalType');
-//   if (signalT === 'direction' || signalT === 'value') {
-//     // set(signalT);
-//     set('value');
-//   }
-// });
-
-export const isValueSignalType = derived([signalType], ([v]) => v === 'value');
-export const isDirectionSignalType = derived([signalType], ([v]) => v === 'direction');
-
 // in case of a death signal whether to show cumulative data
 export const signalCasesOrDeathOptions = writable({
   cumulative: urlParams.has('signalC'),
@@ -216,10 +200,6 @@ currentSensorEntry.subscribe((sensorEntry) => {
     // show help, update it
     currentInfoSensor.set(sensorEntry);
   }
-
-  // if (sensorEntry.type === 'late' && sensorEntry.id !== 'hospital-admissions') {
-  //   signalType.set('value');
-  // }
 
   if (!sensorEntry.isCasesOrDeath) {
     signalCasesOrDeathOptions.set({
