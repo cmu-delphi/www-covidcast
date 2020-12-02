@@ -4,9 +4,6 @@ import stateRaw from './processed/state.csv.js';
 import msaRaw from './processed/msa.csv.js';
 import countyRaw from './processed/county.csv.js';
 import hrrRaw from './processed/hrr.csv.js';
-// import neighborhoodRaw from './processed/swpa/neighborhood.csv.js';
-// import zipRaw from './processed/swpa/zip.csv.js';
-// import swpaFilterInfo from './processed/swpa/filterInfo.json';
 
 const levelMegaCountyId = 'mega-county';
 /**
@@ -67,29 +64,11 @@ export function loadSources(additionalProperties = {}) {
   );
 }
 
-// const swpaNeighborhoodInfo = parseCSV(neighborhoodRaw, 'neighborhood');
-// const swpaStateInfo = stateInfo.filter((d) => swpaFilterInfo.state.includes(d.id));
-// const swpaMsaInfo = msaInfo.filter((d) => swpaFilterInfo.msa.includes(d.id));
-// const swpaCountyInfo = countyInfo.filter((d) => swpaFilterInfo.county.includes(d.id));
-// const swapZipInfo = parseCSV(zipRaw, 'zip');
-
-// export const swpaNameInfos = swpaStateInfo
-//   .concat(swpaMsaInfo, swpaCountyInfo, swpaNeighborhoodInfo, swapZipInfo)
-//   .sort((a, b) => a.displayName.localeCompare(b.displayName));
-
-// export function loadSWPASources(additionalProperties = {}) {
-//   // mark to be loaded as fast as possible
-//   return import('./swpa_geo').then((r) =>
-//     r.default(stateInfo, countyInfo, msaInfo, swpaNeighborhoodInfo, swapZipInfo, additionalProperties),
-//   );
-// }
-
 /**
  * helper to resolve a given id to a name info object
  * @type {Map<string, NameInfo>}
  */
 const infoLookup = new Map();
-// nameInfos.concat(swpaNameInfos).forEach((d) => {
 nameInfos.forEach((d) => {
   const id = String(d.propertyId).toLowerCase();
   if (!infoLookup.has(id)) {
