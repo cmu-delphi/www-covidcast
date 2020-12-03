@@ -1,6 +1,6 @@
-import geojsonExtent from '@mapbox/geojson-extent';
 import { L } from './layers';
 import { LngLatBounds } from 'mapbox-gl';
+import bbox from '@turf/bbox';
 
 let SHRINK_FACTOR = 0.75;
 
@@ -78,7 +78,7 @@ export default class ZoomMap {
     }
     this.initialZoomView = false;
 
-    const bounds = geojsonExtent(feature);
+    const bounds = bbox(feature);
     this.map.fitBounds(bounds, {
       maxZoom: this.getZoom() * 1.5,
       linear: false,
