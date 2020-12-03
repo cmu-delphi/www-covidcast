@@ -389,7 +389,8 @@
       </div>
       <div class="panel-bottom-wrapper mobileHide">
         <button class="pg-button pg-text-button" on:click={() => currentCompareSelection.set(showCompare ? null : [])}>
-          {showCompare ? 'Exit' : 'Open'} compare mode
+          {showCompare ? 'Exit' : 'Open'}
+          compare mode
         </button>
       </div>
     </div>
