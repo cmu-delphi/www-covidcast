@@ -34,6 +34,11 @@
    */
   export let selections = [];
 
+  /**
+   * @type {import('../../maps').NameInfo | null}
+   */
+  export let focusOn = null;
+
   let ready = false;
 
   onMount(() => {
@@ -87,6 +92,11 @@
     dummyTrack(ready);
     // update selection
     wrapper.selectMulti(selections);
+  }
+
+  $: {
+    dummyTrack(ready);
+    wrapper.focusOn(focusOn);
   }
 
   $: {

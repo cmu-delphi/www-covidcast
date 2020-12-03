@@ -92,6 +92,12 @@
   $: showCompare = $currentCompareSelection != null;
 
   $: selections = $currentMultiSelection;
+  /**
+   * the id to focus the map on
+   * only be set when the user searches for something
+   * @type {import('../../maps').NameInfo | null}
+   */
+  let focusOn = null;
 </script>
 
 <style>
@@ -277,7 +283,9 @@
       labelFieldName="displayName"
       maxItemsToShowInList="5"
       on:change={(e) => {
-        selectByInfo(e.detail);
+        if (selectByInfo(e.detail)) {
+          focusOn = e.detail || null;
+        }
         trackEvent('search', 'select', e.detail ? e.detail.id : '');
       }} />
 
@@ -342,11 +350,15 @@
       level={$currentLevel}
       signalOptions={$signalCasesOrDeathOptions}
       {selections}
+      {focusOn}
       encoding={$encoding}
       on:ready={() => initialReady()}
       on:zoom={(e) => (zoom = e.detail)}
       on:updatedEncoding={(e) => updatedEncoding(e.detail)}
       on:select={(e) => {
+        if (focusOn != null) {
+          focusOn = null;
+        }
         if (pickMapMode) {
           const info = getInfoByName(e.detail.feature.properties.id);
           addCompare(info);
@@ -377,8 +389,7 @@
       </div>
       <div class="panel-bottom-wrapper mobileHide">
         <button class="pg-button pg-text-button" on:click={() => currentCompareSelection.set(showCompare ? null : [])}>
-          {showCompare ? 'Exit' : 'Open'}
-          compare mode
+          {showCompare ? 'Exit' : 'Open'} compare mode
         </button>
       </div>
     </div>
