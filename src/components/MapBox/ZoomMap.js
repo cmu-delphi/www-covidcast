@@ -13,7 +13,7 @@ export default class ZoomMap {
     this.onZoom = onZoom;
     this.resetBounds = new LngLatBounds(bounds);
     this.resetBoundsOptions = {
-      padding: 20, //px
+      padding: 30, //px
       linear: false,
     };
     this.stateZoom = 1;

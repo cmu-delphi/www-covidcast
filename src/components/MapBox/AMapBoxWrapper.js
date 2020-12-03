@@ -442,7 +442,6 @@ export default class AMapBoxWrapper {
    * @param {import('../../maps').NameInfo | null} info
    */
   focusOn(info) {
-    console.log(info);
     if (!info || !this.map) {
       return;
     }
