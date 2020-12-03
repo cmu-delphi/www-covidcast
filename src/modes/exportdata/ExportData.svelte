@@ -189,8 +189,9 @@
 <div class="root" class:loading>
   <p>
     All signals displayed on the COVIDcast map are freely available for download here. You can also access the latest
-    daily through the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a> which also
-    includes numerous other signals.
+    daily through the
+    <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a>
+    which also includes numerous other signals.
   </p>
   <section>
     <h4>1. Select Signal</h4>
@@ -267,10 +268,11 @@
           {/each}
         </select>
         <p class="description">
-          Each geographic region is identified with a unique identifier, such as FIPS code. See the <a
-            href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">
+          Each geographic region is identified with a unique identifier, such as FIPS code. See the
+          <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">
             geographic coding documentation
-          </a> for details.
+          </a>
+          for details.
         </p>
       </div>
     </div>
@@ -279,7 +281,8 @@
     <h4>3. Get Data</h4>
     <p>
       {@html signal && signal.entry ? signal.entry.credits : ''}
-      Please acknowledge us as a source: <cite> Data from Delphi COVIDcast, covidcast.cmu.edu. </cite>
+      Please acknowledge us as a source:
+      <cite> Data from Delphi COVIDcast, covidcast.cmu.edu. </cite>
     </p>
     <div class="uk-button-group">
       <button
@@ -330,9 +333,10 @@
         {`wget --content-disposition "${CSV_SERVER}?signal=${signalValue}&start_day=${iso(startDate)}&end_day=${iso(endDate)}&geo_type=${geoType}"`}
       </pre>
       <p class="description">
-        For more details about the API, see the <a href="https://cmu-delphi.github.io/delphi-epidata/">API documentation</a>.
-        A description of the returned data structure can be found at: <a
-          href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html#response">covidcast</a>.
+        For more details about the API, see the
+        <a href="https://cmu-delphi.github.io/delphi-epidata/">API documentation</a>. A description of the returned data
+        structure can be found at:
+        <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html#response">covidcast</a>.
       </p>
     {:else if currentMode === 'python'}
       <p>Install <code>covidcast</code> via pip:</p>
@@ -347,9 +351,10 @@ data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal
                         "${geoType}")`}
       </code></pre>
       <p class="description">
-        For more details and examples, see the <a
-          href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/">package documentation</a>. A description of
-        the returned data structure can be found at: <a
+        For more details and examples, see the
+        <a href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/">package documentation</a>. A description of
+        the returned data structure can be found at:
+        <a
           href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/signals.html#covidcast.signal">covidcast.signal</a>.
       </p>
     {:else if currentMode === 'r'}
@@ -366,8 +371,10 @@ covidcast_signal(data_source = "${signal ? signal.dataSource : ''}", signal = "$
 )`}
       </code></pre>
       <p class="description">
-        For more details and examples, see the <a href="https://cmu-delphi.github.io/covidcast/covidcastR/">package
-          documentation</a>. A description of the returned data structure can be found at: <a
+        For more details and examples, see the
+        <a href="https://cmu-delphi.github.io/covidcast/covidcastR/">package documentation</a>. A description of the
+        returned data structure can be found at:
+        <a
           href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html#value">covidcast_signal</a>.
       </p>
     {/if}

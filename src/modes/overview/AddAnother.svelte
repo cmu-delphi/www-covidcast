@@ -110,7 +110,8 @@
           class="uk-link-text"
           disabled={!row.info || selections.some((d) => d.info.id === row.info.id)}
           on:click|preventDefault={() => dispatch('add', row.info)}>
-          {row.displayName} ({$currentSensorEntry.formatValue(row.value)})
+          {row.displayName}
+          ({$currentSensorEntry.formatValue(row.value)})
         </a>
       </li>
     {/each}

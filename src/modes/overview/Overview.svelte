@@ -352,7 +352,8 @@
         <button
           class="uk-button uk-button-default uk-button-small"
           on:click={() => currentCompareSelection.set(showCompare ? null : [])}>
-          {showCompare ? 'Exit' : 'Open'} compare mode
+          {showCompare ? 'Exit' : 'Open'}
+          compare mode
         </button>
       </div>
     </div>

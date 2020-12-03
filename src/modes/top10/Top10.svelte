@@ -437,9 +437,11 @@
             <tr>
               <td colspan="100" class="button-bar">
                 {rows.length - sortedRows.length}
-                {rows.length - sortedRows.length > 1 ? 'locations' : 'location'} hidden <button
-                  on:click={showMore}
-                  class="uk-button uk-button-default uk-button-small">Show {SHOW_X_MORE} more locations</button>
+                {rows.length - sortedRows.length > 1 ? 'locations' : 'location'}
+                hidden
+                <button on:click={showMore} class="uk-button uk-button-default uk-button-small">Show
+                  {SHOW_X_MORE}
+                  more locations</button>
               </td>
             </tr>
           </tfoot>
