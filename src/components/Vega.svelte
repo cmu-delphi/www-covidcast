@@ -1,8 +1,8 @@
 <script>
-  import { onMount, onDestroy, createEventDispatcher, afterUpdate } from 'svelte';
+  import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import embed from 'vega-embed';
   import { Error, expressionFunction } from 'vega';
-  import { observeResize, unobserveResize, debouncedResize } from '../util';
+  import { observeResize, unobserveResize } from '../util';
   import { createVegaTooltipAdapter } from './tooltipUtils';
   import { cachedTime, cachedNumber } from './customVegaFunctions';
 
@@ -105,15 +105,13 @@
           // outside has changed
           return;
         }
-        setTimeout(() => {
-          vega.view.change(
-            'values',
-            vega.view
-              .changeset()
-              .remove(() => true)
-              .insert(d || []),
-          );
-        });
+        vega.view.change(
+          'values',
+          vega.view
+            .changeset()
+            .remove(() => true)
+            .insert(d || []),
+        );
 
         noData = !d || d.length === 0;
         // also update signals along the way
@@ -121,6 +119,7 @@
           vega.view.signal(key, resetSignalsUponNoData && noData ? null : v);
         });
         vega.view.runAsync();
+
         loading = false;
       })
       .catch((error) => {
@@ -170,12 +169,8 @@
         });
         spec.signals.push({
           name: 'width',
+          init: 'containerSize()[0]',
           on: [
-            {
-              events: { source: 'window', type: 'load' },
-              update: 'containerSize()[0]',
-              force: true,
-            },
             {
               events: { source: 'window', type: 'resize' },
               update: 'containerSize()[0]',
@@ -184,12 +179,8 @@
         });
         spec.signals.push({
           name: 'height',
+          init: 'containerSize()[1]',
           on: [
-            {
-              events: { source: 'window', type: 'load' },
-              update: 'containerSize()[1]',
-              force: true,
-            },
             {
               events: { source: 'window', type: 'resize' },
               update: 'containerSize()[1]',
@@ -229,24 +220,23 @@
   }
 
   onMount(() => {
-    if (patchSpec) {
-      size = root.getBoundingClientRect();
-      observeResize(root, (s) => {
+    size = root.getBoundingClientRect();
+    observeResize(root, (s) => {
+      if (Math.abs(s.width - size.width) > 1 || Math.abs(s.height - size.height) > 1) {
         size = s;
-      });
-    } else {
+        if (!patchSpec && vega) {
+          // trigger a resize within vega
+          vega.view.resize().runAsync();
+        }
+      }
+    });
+    if (!patchSpec) {
       updateSpec(spec);
     }
   });
 
-  afterUpdate(() => {
-    debouncedResize();
-  });
-
   onDestroy(() => {
-    if (patchSpec) {
-      unobserveResize(root);
-    }
+    unobserveResize(root);
     if (tooltipHandler) {
       tooltipHandler.destroy();
     }
