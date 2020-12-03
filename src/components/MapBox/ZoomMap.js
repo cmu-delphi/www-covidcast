@@ -94,6 +94,7 @@ export default class ZoomMap {
     this.map.fitBounds(this.resetBounds, this.resetBoundsOptions);
     this.map.once('idle', () => {
       this.stateZoom = this.map.getZoom();
+      this.map.setMinZoom(this.stateZoom - 1); // limit zoom to one level above the us
       this._triggerZoom(true);
     });
   }

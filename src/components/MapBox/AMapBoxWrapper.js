@@ -91,6 +91,8 @@ export default class AMapBoxWrapper {
       touchZoomRotate: true,
       renderWorldCopies: false,
       antialias: true,
+      maxZoom: 8,
+      minZoom: 1,
     });
     this.zoom.setMap(this.map);
     this.map.touchZoomRotate.disableRotation();
@@ -106,6 +108,9 @@ export default class AMapBoxWrapper {
 
     this.map.on('idle', () => {
       this.dispatch('idle');
+    });
+    this.map.on('zoom', () => {
+      console.log('zoom', this.map.getZoom());
     });
 
     this.map.on('load', () => {
