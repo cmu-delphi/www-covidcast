@@ -76,30 +76,5 @@
         Ratios (per 100,000)
       </button>
     </div>
-    <!-- <div aria-label="display type" class="pg-button-group button-group">
-    <button
-      aria-pressed={$signalType === 'value' ? 'true' : 'false'}
-      class="uk-button uk-button-default"
-      class:selected={$signalType === 'value'}
-      on:click={() => {
-        if ($signalType !== 'value') {
-          signalType.set('value');
-        }
-      }}>
-      {$currentSensorEntry.isCount ? 'Count' : 'Intensity'}
-    </button>
-    <button
-      aria-pressed={$signalType === 'direction' ? 'true' : 'false'}
-      class="uk-button uk-button-default"
-      class:selected={$signalType === 'direction'}
-      on:click={() => {
-        if ($signalType !== 'direction') {
-          signalType.set('direction');
-        }
-      }}
-      disabled>
-      7-day Trend
-    </button>
-  </div> -->
   </div>
 {/if}

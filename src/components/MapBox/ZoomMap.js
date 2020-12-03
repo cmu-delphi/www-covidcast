@@ -1,5 +1,6 @@
 import { L } from './layers';
 import { LngLatBounds } from 'mapbox-gl';
+import bbox from '@turf/bbox';
 
 let SHRINK_FACTOR = 0.75;
 
@@ -69,6 +70,20 @@ export default class ZoomMap {
     }
     this.initialZoomView = false;
     this.map.zoomOut();
+  }
+
+  focusOn(feature) {
+    if (!feature || !this.map) {
+      return;
+    }
+    this.initialZoomView = false;
+
+    const bounds = bbox(feature);
+    this.map.fitBounds(bounds, {
+      maxZoom: this.getZoom() * 1.5,
+      linear: false,
+      essential: true,
+    });
   }
 
   resetZoom() {

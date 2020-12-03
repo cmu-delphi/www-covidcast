@@ -1,9 +1,8 @@
 <script>
   import Title from './Title.svelte';
   import MapControls from './MapControls.svelte';
-  import { isDirectionSignalType, encoding, currentSensorEntry } from '../stores';
+  import { encoding, currentSensorEntry } from '../stores';
   import EncodingOptions from './EncodingOptions.svelte';
-  import DirectionLegend from './legends/DirectionLegend.svelte';
   import ColorLegend from './legends/ColorLegend.svelte';
   import BubbleLegend from './legends/BubbleLegend.svelte';
   import SpikeLegend from './legends/SpikeLegend.svelte';
@@ -89,9 +88,7 @@
 <div class="legend-container base-font-size" aria-label="map legend">
   <EncodingOptions sensor={$currentSensorEntry} className="container-bg container-style encoding-wrapper" />
   <div class="container-bg container-style" class:loading-bg={legendLoading}>
-    {#if $isDirectionSignalType}
-      <DirectionLegend />
-    {:else if $encoding === 'color'}
+    {#if $encoding === 'color'}
       <ColorLegend />
     {:else if $encoding === 'bubble'}
       <BubbleLegend {zoom} />

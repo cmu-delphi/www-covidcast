@@ -1,4 +1,3 @@
-import geojsonExtent from '@mapbox/geojson-extent';
 import { Map as MapBox } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { defaultRegionOnStartup, levelMegaCounty } from '../../stores/constants';
@@ -297,7 +296,7 @@ export default class AMapBoxWrapper {
     return level;
   }
 
-  updateOptions(encoding, level, signalType, sensor, sensorType, valueMinMax, stops, stopsMega, scale) {
+  updateOptions(encoding, level, sensor, sensorType, valueMinMax, stops, stopsMega, scale) {
     level = this.validateLevel(level);
     // changed the visibility of layers
     const oldLevel = this.level;
@@ -321,7 +320,7 @@ export default class AMapBoxWrapper {
     if (this.hasMegaCountyLevel) {
       allEncodingLayers.push(toFillLayer(levelMegaCounty.id));
     }
-    const visibleLayers = new Set(this.encoding.getVisibleLayers(level, signalType));
+    const visibleLayers = new Set(this.encoding.getVisibleLayers(level));
 
     allEncodingLayers.forEach((layer) => {
       this.map.setLayoutProperty(layer, 'visibility', visibleLayers.has(layer) ? 'visible' : 'none');
@@ -329,7 +328,6 @@ export default class AMapBoxWrapper {
 
     const r = this.encoding.encode(this.map, {
       level,
-      signalType,
       sensorType,
       sensor,
       valueMinMax,
@@ -461,11 +459,7 @@ export default class AMapBoxWrapper {
       return;
     }
     // show in focus
-    this.map.fitBounds(geojsonExtent(feature), {
-      maxZoom: this.zoom.getZoom() * 1.5,
-      linear: false,
-      essential: true,
-    });
+    this.zoom.focusOn(feature);
   }
 
   isMissing(feature) {

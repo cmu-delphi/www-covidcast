@@ -26,7 +26,6 @@
   export let sensor = '';
   export let level = 'state';
   export let encoding = 'color';
-  export let signalType = 'value';
   export let signalOptions = {};
   export let animationDuration = 0;
   export let title = '';
@@ -48,17 +47,16 @@
     // dummy function to mark a given argument as tracked
   }
 
-  function updateEncoding(level, encoding, sensor, signalType, stats, signalOptions) {
+  function updateEncoding(level, encoding, sensor, stats, signalOptions) {
     // Get the range for the heatmap.
     const sensorEntry = sensorMap.get(sensor);
     const sensorType = sensorEntry.getType(signalOptions);
     const valueMinMax = determineMinMax(stats, sensorEntry, level, signalOptions);
-    const { stops, scale } = determineColorScale(valueMinMax, signalType, sensorEntry, sensorType);
+    const { stops, scale } = determineColorScale(valueMinMax, sensorEntry, sensorType);
     const drawMega = level === 'county';
     const ret = wrapper.updateOptions(
       encoding,
       level,
-      signalType,
       sensor,
       sensorType,
       valueMinMax,
@@ -67,7 +65,7 @@
       scale,
     );
     dispatch('updatedEncoding', {
-      range: signalType === 'value' ? valueMinMax : [-1, 1],
+      range: valueMinMax,
       custom: ret,
       scale,
       stops,
@@ -82,7 +80,7 @@
     dummyTrack(ready);
     // update encodings upon change
     if ($stats) {
-      updateEncoding(level, encoding, sensor, signalType, $stats, signalOptions);
+      updateEncoding(level, encoding, sensor, $stats, signalOptions);
     }
   }
   $: {

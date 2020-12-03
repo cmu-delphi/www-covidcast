@@ -1,28 +1,3 @@
-const colorDecreasing = 'rgb(86,157,201)'; //''rgb(0,223,252)'//'#badee8';
-const colorSteady = 'rgb(220, 220, 220)'; // 'rgb(249,212,35)' //'#f2df91';
-const colorIncreasing = 'rgb(218,107,87)'; //rgb(255,78,80)' //'#ce0a05';
-
-const colorDecreasingMega = 'rgba(86,157,201,0.5)'; //'#badee8';
-const colorSteadyMega = 'rgba(220, 220, 220,0.5)'; //'#f2df91';
-const colorIncreasingMega = 'rgba(218,107,87, 0.5)'; //'#ce0a05';
-
-export const DIRECTION_THEME = {
-  increasing: colorIncreasing, //color_high,
-  steady: colorSteady, //color_medium,
-  decreasing: colorDecreasing, //color_low,
-  increasingIcon: '&#9650;',
-  steadyIcon: '&#9644;',
-  decreasingIcon: '&#9660;',
-  max: colorIncreasing, //color_high,
-  countMin: 'rgb(242,242,242)',
-  gradientMin: colorDecreasing,
-  gradientMiddle: colorSteady,
-  gradientMax: colorIncreasing,
-  gradientMinMega: colorDecreasingMega,
-  gradientMiddleMega: colorSteadyMega,
-  gradientMaxMega: colorIncreasingMega,
-};
-
 export const MISSING_COLOR = '#eeeeee';
 export const ZERO_COLOR = 'rgb(242,242,242)';
 

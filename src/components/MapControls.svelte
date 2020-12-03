@@ -1,5 +1,5 @@
 <script>
-  import { encoding, isValueSignalType } from '../stores';
+  import { encoding } from '../stores';
   import { trackEvent } from '../stores/ga';
 
   export let className = '';
@@ -91,7 +91,7 @@
         zoom.resetZoom();
       }} />
   </div>
-  {#if showEncodings && $isValueSignalType}
+  {#if showEncodings}
     <div class="uk-vertical-button-group">
       <button
         aria-pressed={$encoding === 'color' ? 'true' : 'false'}

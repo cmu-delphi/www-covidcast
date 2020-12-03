@@ -34,9 +34,9 @@
   let signalGroupValue = null;
   let signalValue = null;
   let geoType = 'county';
-  let endDate = $smallMultipleTimeSpan[1];
+  $: endDate = $smallMultipleTimeSpan[1];
   // one month in the past
-  let startDate = timeMonth.offset($smallMultipleTimeSpan[1], -1);
+  $: startDate = timeMonth.offset($smallMultipleTimeSpan[1], -1);
 
   let levelList = [];
   $: signalGroup = signalGroupValue ? signalGroups.find((d) => d.id === signalGroupValue) : null;
@@ -243,7 +243,7 @@
       <div class="uk-form-controls">
         <Datepicker
           bind:selected={startDate}
-          start={signalGroup ? signalGroup.minTime : new Date()}
+          start={signalGroup ? signalGroup.minTime : minDate(new Date(), startDate)}
           end={signalGroup ? minDate(endDate, signalGroup.maxTime) : endDate}
           formattedSelected={iso(startDate)}>
           <button aria-label="selected start date" class="uk-input" on:>{iso(startDate)}</button>
@@ -252,7 +252,7 @@
         <Datepicker
           bind:selected={endDate}
           start={signalGroup ? maxDate(startDate, signalGroup.minTime) : startDate}
-          end={signalGroup ? signalGroup.maxTime : new Date()}
+          end={signalGroup ? signalGroup.maxTime : maxDate(new Date(), endDate)}
           formattedSelected={iso(endDate)}>
           <button aria-label="selected end date" class="uk-input" on:>{iso(endDate)}</button>
         </Datepicker>
