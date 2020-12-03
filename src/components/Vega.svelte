@@ -222,6 +222,7 @@
   onMount(() => {
     size = root.getBoundingClientRect();
     observeResize(root, (s) => {
+      // check if size has changed by at least one pixel in width or height
       if (Math.abs(s.width - size.width) > 1 || Math.abs(s.height - size.height) > 1) {
         size = s;
         if (!patchSpec && vega) {
@@ -230,6 +231,8 @@
         }
       }
     });
+    // in case of a given patchSpec function, a new spec will be generated when the size changes
+    // So, if patchSpec is not given, we have to update the spec manually
     if (!patchSpec) {
       updateSpec(spec);
     }
