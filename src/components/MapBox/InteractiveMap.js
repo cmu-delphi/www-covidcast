@@ -4,6 +4,7 @@ import { L, toFillLayer, toHoverLayer } from './layers';
 import { toBorderSource } from './sources';
 import Tooltip from './Tooltip.svelte';
 import { MAP_THEME } from '../../theme';
+import { computeMegaCountyPopulation } from '../../maps';
 
 export default class InteractiveMap {
   /**
@@ -192,10 +193,15 @@ export default class InteractiveMap {
         id: feature.properties.id,
         invalid,
       };
+      let megaCountyPopulation = {};
+      if (feature.properties.level === levelMegaCounty.id && this.adapter.hasMegaCountyLevel) {
+        // calculate the population based on the data
+        megaCountyPopulation.population = computeMegaCountyPopulation(feature.properties, this.data);
+      }
       this.tooltip.$set({
         properties: {
           ...feature.properties,
-          // ...megaCountyPopulation,
+          ...megaCountyPopulation,
           ...(this.data.get(feature.properties.id) || {}),
         },
         invalid,
