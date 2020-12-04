@@ -97,19 +97,18 @@ export function computeMegaCountyPopulation(megaCounty, data) {
   if (!state || state.population == null || Number.isNaN(state.population)) {
     return null;
   }
-  let base = state.population;
-  data.forEach((_, key) => {
-    // key is the fips is
-    if (!key.startsWith(state.id) || key === megaCounty.id) {
-      return;
+  const population = Array.from(data.keys()).reduce((population, fips) => {
+    // not in the state or the mega county
+    if (!fips.startsWith(state.id) || fips === megaCounty.id) {
+      return population;
     }
-    const county = getInfoByName(key);
+    const county = getInfoByName(fips);
     if (!county || county.population == null || Number.isNaN(county.population)) {
-      // invalid county, so we cannot compute the rest population
-      return null;
+      // invalid county, so we cannot compute the rest population, keep NaN from now on
+      return Number.NaN;
     }
-    base -= county.population;
-  });
+    return population - county.population;
+  }, state.population);
 
-  return base;
+  return Number.isNaN(population) ? null : population;
 }
