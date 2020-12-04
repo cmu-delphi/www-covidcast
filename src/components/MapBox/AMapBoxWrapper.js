@@ -365,7 +365,7 @@ export default class AMapBoxWrapper {
       });
 
       const lookup = new Map(data.map((d) => [d.geo_value.toUpperCase(), d]));
-      this.interactive.data = lookup;
+      this.interactive.setData(lookup);
 
       if (level === 'county') {
         this._updateSource(toBorderSource(levelMegaCounty.id), lookup, primaryValue);
