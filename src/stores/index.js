@@ -163,13 +163,14 @@ currentRegionInfo.subscribe((v) => {
 /**
  *
  * @param {import('../maps/nameIdInfo').NameInfo | null} elem
+ * @returns {boolean} whether the selection has changed
  */
 export function selectByInfo(elem, reset = false) {
   if (elem === get(currentRegionInfo)) {
     if (reset) {
       currentRegion.set('');
     }
-    return;
+    return reset;
   }
   if (elem) {
     currentRegion.set(elem.propertyId);
@@ -177,10 +178,11 @@ export function selectByInfo(elem, reset = false) {
   } else {
     currentRegion.set('');
   }
+  return true;
 }
 
 export function selectByFeature(feature, reset = false) {
-  selectByInfo(feature ? getInfoByName(feature.properties.id) : null, reset);
+  return selectByInfo(feature ? getInfoByName(feature.properties.id) : null, reset);
 }
 
 export const colorScale = writable(scaleSequentialLog());
