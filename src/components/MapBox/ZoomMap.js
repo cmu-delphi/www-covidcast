@@ -33,6 +33,7 @@ export default class ZoomMap {
     this.map = map;
 
     this.stateZoom = this.map.getZoom();
+    this.map.setMinZoom(this.stateZoom - 1); // limit zoom to one level above the us
     // console.log(this.stateZoom);
     this.map.on('zoom', () => {
       this._triggerZoom();
