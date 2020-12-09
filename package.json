@@ -38,6 +38,7 @@
   "devDependencies": {
     "@babel/core": "^7.12.9",
     "@babel/preset-env": "^7.12.7",
+    "@fortawesome/fontawesome-free": "^5.15.1",
     "@octokit/request": "^5.4.12",
     "@popperjs/core": "^2.5.4",
     "@testing-library/cypress": "^7.0.2",
