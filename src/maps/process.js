@@ -3,7 +3,6 @@
 const { dsvFormat, csvParse } = require('d3-dsv');
 const fs = require('fs');
 const path = require('path');
-const booleanDisjoint = require('@turf/boolean-disjoint').default;
 const centerOfMass = require('@turf/center-of-mass').default;
 const { topology } = require('topojson-server');
 const geojsonExtent = require('@mapbox/geojson-extent');
@@ -135,6 +134,28 @@ async function generatePopulationLookup() {
   };
 }
 
+async function generateHRRPopulationLookup() {
+  const lookup = await generatePopulationLookup();
+  const fipsHRR = csvParse(
+    await fetch(
+      'https://raw.githubusercontent.com/cmu-delphi/covidcast-indicators/main/_delphi_utils_python/delphi_utils/data/fips_hrr_table.csv',
+    ).then((r) => r.text()),
+  );
+  const populationHRRLookup = new Map();
+  for (const row of fipsHRR) {
+    const pop = lookup.county(row.fips);
+    if (!pop) {
+      continue;
+    }
+    const value = (populationHRRLookup.get(row.hrr) || 0) + pop * Number.parseFloat(row.weight);
+    populationHRRLookup.set(row.hrr, value);
+  }
+  return {
+    ...lookup,
+    hrr: (hrrID) => populationHRRLookup.get(hrrID),
+  };
+}
+
 async function counties(level = 'county') {
   const populationLookup = await generatePopulationLookup();
   //{
@@ -205,6 +226,7 @@ async function counties(level = 'county') {
 }
 
 async function hrr(level = 'hrr') {
+  const populationLookup = await generateHRRPopulationLookup();
   const geo = require(`./raw/hrr/hrr.reprojected.geo.json`);
 
   const infos = geo.features
@@ -231,6 +253,7 @@ async function hrr(level = 'hrr') {
         id,
         name,
         state,
+        population: populationLookup.hrr(id),
         displayName: `${props.hrr_name} (HRR)`,
         lat: center[0],
         long: center[1],
@@ -239,10 +262,10 @@ async function hrr(level = 'hrr') {
     .sort((a, b) => a.id.localeCompare(b.id));
   fs.writeFileSync(
     path.resolve(__dirname, `./processed/${level}.csv.js`),
-    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'lat', 'long'])),
+    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'population', 'lat', 'long'])),
   );
   // fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.geo.json`), JSON.stringify(geo));
-  const topo = topology({ [level]: geo }, QUANTIZATION);
+  const topo = topology({ [level]: geo }, QUANTIZATION / 2.5);
   fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
   return geo;
 }
@@ -264,169 +287,12 @@ function cities() {
   );
 }
 
-function neighborhoods() {
-  const neighborhoods = require('./raw/swpa/neighborhoods_reprojected.geo.json');
-  const municipal = require('./raw/swpa/Allegheny_County_Municipal_Boundaries_reprojected.geo.json');
-  municipal.features = municipal.features.filter(
-    (d) => !(d.properties.NAME === 'PITTSBURGH' && d.properties.TYPE === 'CITY'),
-  );
-
-  const infos = [
-    ...neighborhoods.features.map((feature) => {
-      const props = feature.properties;
-      return {
-        id: props.geoid10,
-        municode: null,
-        name: props.hood,
-        displayName: props.hood,
-        type: 'neighborhood',
-        lat: Number.parseFloat(props.intptlat10),
-        long: Number.parseFloat(props.intptlon10),
-        cog: null,
-        region: null,
-      };
-    }),
-    ...municipal.features.map((feature) => {
-      const props = feature.properties;
-      const center = centerOfMass(feature).geometry.coordinates;
-      return {
-        id: props.CNTL_ID,
-        municode: props.MUNICODE,
-        name: props.NAME,
-        displayName: props.LABEL,
-        type: props.TYPE.toLowerCase(),
-        lat: center[0],
-        long: center[1],
-        cog: props.COG,
-        region: props.REGION,
-      };
-    }),
-  ].filter((d) => d.id);
-  // {"FID":1,"NAME":"CHESWICK","TYPE":"BOROUGH","LABEL":"Cheswick Borough","COG":"Allegheny Valley North","SCHOOLD":"Allegheny Valley","CONGDIST":4,"FIPS":13392,"REGION":"NH","ACRES":350.19128417,"SQMI":0.54717391,"MUNICODE":"815","CNTL_ID":"003100","CNTYCOUNCIL":7,"EOC":"NEWCOM","ASSESSORTERRITORY":"East","VALUATIONAREA":"Alle-Kiski Valley","YEARCONVERTED":1966,"GlobalID":"{F29648DC-0D4F-4E35-8F2D-7B465DCFF308}","SHAPE_Length":0.04917208282736798,"SHAPE_Area":0.00015137060470303174}
-  fs.writeFileSync(
-    path.resolve(__dirname, `./processed/swpa/neighborhood.csv.js`),
-    wrapModule(
-      dsvFormat(',').format(infos, ['id', 'municode', 'name', 'displayName', 'type', 'lat', 'long', 'cog', 'region']),
-    ),
-  );
-  neighborhoods.features = neighborhoods.features
-    .map((d) => ({
-      ...d,
-      id: d.properties.geoid10,
-      properties: {},
-    }))
-    .concat(
-      municipal.features.map((d) => ({
-        ...d,
-        id: d.properties.CNTL_ID,
-        properties: {},
-      })),
-    )
-    .filter((d) => d.id && d.geometry.coordinates.length > 0);
-
-  const neighbors = topology({ neighborhood: neighborhoods }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/neighborhood.topojson.json`), JSON.stringify(neighbors));
-  return neighborhoods;
-}
-
-function zipHrr(hrrZone, hrrNum = '357') {
-  const zip = require(`./raw/swpa/cb_2019_us_zcta510_500k.json_reprojected.geo.json`);
-  const mapping = dsvFormat(',').parse(
-    fs.readFileSync(path.resolve(__dirname, './raw/swpa/ZipHsaHrr18.csv')).toString(),
-  );
-  const validZip = new Set(mapping.filter((m) => m.hrrnum === hrrNum).map((d) => d.zipcode18));
-  // something wrong with their shape
-  // validZip.delete('26419');
-  // validZip.delete('26155');
-  // validZip.delete('15701');
-  // validZip.delete('26055');
-  // validZip.delete('16001');
-  // validZip.delete('26039');
-  // validZip.delete('16242');
-  // validZip.delete('15767');
-  // validZip.delete('15825');
-
-  const data = {
-    type: 'FeatureCollection',
-    features: zip.features
-      .filter(
-        (feature) =>
-          validZip.has(String(feature.properties.GEOID10)) &&
-          feature.geometry &&
-          feature.geometry.coordinates.length > 0,
-        // !booleanDisjoint(hrrZone.features[0], feature),
-      )
-      .map((feature) => ({
-        ...feature,
-        id: feature.properties.GEOID10,
-        properties: {},
-      })),
-  };
-
-  data.features.forEach((feature) => {
-    if (feature.bbox[0] < -26) {
-      // some weird box
-      // seems to be in the last box
-      feature.geometry.coordinates.pop();
-      delete feature.bbox;
-    }
-  });
-  const infos = data.features.map((feature) => {
-    const center = centerOfMass(feature).geometry.coordinates;
-    return {
-      id: feature.id,
-      name: feature.id,
-      lat: center[0],
-      long: center[1],
-    };
-  });
-  fs.writeFileSync(
-    path.resolve(__dirname, `./processed/swpa/zip.csv.js`),
-    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'lat', 'long'])),
-  );
-  const geo = topology({ zip: data }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/zip.topojson.json`), JSON.stringify(geo));
-  // fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/zip.t.json`), JSON.stringify(data, null, 2));
-  return data;
-}
-
-function hrrZone(statesGeo, msaGeo, countiesGeo) {
-  // hrr num 357
-  const zone = require(`./raw/swpa/hrr_zone.json`);
-  const hrrZone = zone.features[0];
-  const topo = topology({ hrr: zone }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/hrr.topojson.json`), JSON.stringify(topo));
-  const filtered = {};
-  Object.entries({
-    state: statesGeo,
-    msa: msaGeo,
-    county: countiesGeo,
-  }).forEach(([level, v]) => {
-    const l = {
-      type: 'FeatureCollection',
-      features: v.features.filter(
-        (feature) => feature.geometry.coordinates.length > 0 && !booleanDisjoint(hrrZone, feature),
-      ),
-    };
-    const topo = topology({ [level]: l }, QUANTIZATION);
-    fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/${level}.topojson.json`), JSON.stringify(topo));
-    filtered[level] = l.features.map((d) => d.id);
-  });
-  fs.writeFileSync(path.resolve(__dirname, `./processed/swpa/filterInfo.json`), JSON.stringify(filtered));
-
-  return zone;
-}
-
 (async function main() {
   const statesGeo = await states();
   const msaGeo = await msa();
   const countiesGeo = await counties();
   const hrrGeo = await hrr();
   await cities();
-
-  const hrr357Geo = await hrrZone(statesGeo, msaGeo, countiesGeo);
-  const zipGeo = await zipHrr(hrr357Geo);
-  const neighborhoodsGeo = await neighborhoods();
 
   fs.writeFileSync(
     path.resolve(__dirname, `./processed/bounds.json`),
@@ -436,9 +302,6 @@ function hrrZone(statesGeo, msaGeo, countiesGeo) {
         msa: computeBounds(msaGeo).toArray(),
         counties: computeBounds(countiesGeo).toArray(),
         hrr: computeBounds(hrrGeo).toArray(),
-        hrr357: computeBounds(hrr357Geo).toArray(),
-        neighborhoods: computeBounds(neighborhoodsGeo).toArray(),
-        zip: computeBounds(zipGeo).toArray(),
       },
       null,
       2,

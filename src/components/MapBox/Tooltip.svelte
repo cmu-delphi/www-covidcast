@@ -1,14 +1,7 @@
 <script>
   import { formatDateShort, formatPopulation } from '../../formats';
-
-  import {
-    currentSensorEntry,
-    colorScale,
-    currentDateObject,
-    signalCasesOrDeathOptions,
-    isDirectionSignalType,
-  } from '../../stores';
-  import { DIRECTION_THEME, ZERO_COLOR } from '../../theme';
+  import { currentSensorEntry, colorScale, currentDateObject, signalCasesOrDeathOptions } from '../../stores';
+  import { ZERO_COLOR } from '../../theme';
   import { getTextColorBasedOnBackground } from '../../util';
 
   export let invalid = false;
@@ -68,28 +61,7 @@
           <th>Population</th>
           <td class="right">{formatPopulation(properties)}</td>
         </tr>
-        {#if $isDirectionSignalType}
-          <tr>
-            {#if properties.value === 1}
-              <td colspan="2" style="background-color: {DIRECTION_THEME.increasing}">
-                {@html DIRECTION_THEME.increasingIcon}
-                Increasing
-              </td>
-            {:else if value === 0}
-              <td colspan="2" style="background-color: {DIRECTION_THEME.steady}">
-                {@html DIRECTION_THEME.steadyIcon}
-                Steady
-              </td>
-            {:else if value === -1}
-              <td colspan="2" style="background-color: {DIRECTION_THEME.decreasing}">
-                {@html DIRECTION_THEME.decreasingIcon}
-                Decreasing
-              </td>
-            {:else}
-              <td colspan="2">Unknown</td>
-            {/if}
-          </tr>
-        {:else if $currentSensorEntry.isCasesOrDeath}
+        {#if $currentSensorEntry.isCasesOrDeath}
           <tr>
             <th>{$currentSensorEntry.yAxis}</th>
             <th class="area">Count</th>

@@ -38,6 +38,12 @@ function getOrInitPopper() {
           offset: [0, 8],
         },
       },
+      {
+        name: 'flip',
+        options: {
+          padding: 8,
+        },
+      },
     ],
   });
 

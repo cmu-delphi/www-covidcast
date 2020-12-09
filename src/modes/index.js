@@ -46,18 +46,12 @@ const modes = [
     tooltip: 'Switch to Export Data Mode',
     component: () => import('./exportdata/ExportData.svelte').then((r) => r.default),
   },
-  // {
-  //   id: 'swpa',
-  //   label: 'SWPA',
-  //   tooltip: 'Switch to SWPA Mode',
-  //   component: () => import(/* webpackPrefetch: true */ './swpa/SWPA.svelte').then((r) => r.default),
-  // },
 ];
 
 export default modes;
 
 /**
- * @type {Record<'overview'|'timelapse'|'top10'|'export', Mode>}
+ * @type {Record<'overview'|'timelapse'|'top10'|'export'|'single', Mode>}
  */
 export const modeByID = {};
 modes.forEach((mode) => (modeByID[mode.id] = mode));

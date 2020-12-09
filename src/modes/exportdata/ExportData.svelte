@@ -33,9 +33,9 @@
   let signalGroupValue = null;
   let signalValue = null;
   let geoType = 'county';
-  let endDate = $smallMultipleTimeSpan[1];
+  $: endDate = $smallMultipleTimeSpan[1];
   // one month in the past
-  let startDate = timeMonth.offset($smallMultipleTimeSpan[1], -1);
+  $: startDate = timeMonth.offset($smallMultipleTimeSpan[1], -1);
 
   let levelList = [];
   $: signalGroup = signalGroupValue ? signalGroups.find((d) => d.id === signalGroupValue) : null;
@@ -250,8 +250,9 @@
 <div class="root" class:loading>
   <p>
     All signals displayed on the COVIDcast map are freely available for download here. You can also access the latest
-    daily through the <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a> which also
-    includes numerous other signals.
+    daily through the
+    <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a>
+    which also includes numerous other signals.
   </p>
   <section>
     <h5>1. Select Signal</h5>
@@ -306,7 +307,7 @@
       <span>Date Range</span>
       <Datepicker
         bind:selected={startDate}
-        start={signalGroup ? signalGroup.minTime : new Date()}
+        start={signalGroup ? signalGroup.minTime : minDate(new Date(), startDate)}
         end={signalGroup ? minDate(endDate, signalGroup.maxTime) : endDate}
         formattedSelected={formatDateISO(startDate)}>
         <button aria-label="selected start date" class="pg-button" on:>{formatDateISO(startDate)}</button>
@@ -315,7 +316,7 @@
       <Datepicker
         bind:selected={endDate}
         start={signalGroup ? maxDate(startDate, signalGroup.minTime) : startDate}
-        end={signalGroup ? signalGroup.maxTime : new Date()}
+        end={signalGroup ? signalGroup.maxTime : maxDate(new Date(), endDate)}
         formattedSelected={formatDateISO(endDate)}>
         <button aria-label="selected end date" class="pg-button" on:>{formatDateISO(endDate)}</button>
       </Datepicker>
@@ -330,10 +331,11 @@
         {/each}
       </select>
       <p class="description">
-        Each geographic region is identified with a unique identifier, such as FIPS code. See the <a
-          href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">
+        Each geographic region is identified with a unique identifier, such as FIPS code. See the
+        <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast_geography.html">
           geographic coding documentation
-        </a> for details.
+        </a>
+        for details.
       </p>
     </div>
   </section>
@@ -341,7 +343,8 @@
     <h5>3. Get Data</h5>
     <p>
       {@html signal && signal.entry ? signal.entry.credits : ''}
-      Please acknowledge us as a source: <cite> Data from Delphi COVIDcast, covidcast.cmu.edu. </cite>
+      Please acknowledge us as a source:
+      <cite> Data from Delphi COVIDcast, covidcast.cmu.edu. </cite>
     </p>
     <div class="pg-button-group buttons">
       <button
@@ -392,9 +395,10 @@
         {`wget --content-disposition "${CSV_SERVER}?signal=${signalValue}&start_day=${formatDateISO(startDate)}&end_day=${formatDateISO(endDate)}&geo_type=${geoType}"`}
       </pre>
       <p class="description">
-        For more details about the API, see the <a href="https://cmu-delphi.github.io/delphi-epidata/">API documentation</a>.
-        A description of the returned data structure can be found at: <a
-          href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html#response">covidcast</a>.
+        For more details about the API, see the
+        <a href="https://cmu-delphi.github.io/delphi-epidata/">API documentation</a>. A description of the returned data
+        structure can be found at:
+        <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html#response">covidcast</a>.
       </p>
     {:else if currentMode === 'python'}
       <p>Install <code>covidcast</code> via pip:</p>
@@ -409,9 +413,10 @@ data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal
                         "${geoType}")`}
       </pre>
       <p class="description">
-        For more details and examples, see the <a
-          href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/">package documentation</a>. A description of
-        the returned data structure can be found at: <a
+        For more details and examples, see the
+        <a href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/">package documentation</a>. A description of
+        the returned data structure can be found at:
+        <a
           href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/signals.html#covidcast.signal">covidcast.signal</a>.
       </p>
     {:else if currentMode === 'r'}
@@ -428,8 +433,10 @@ covidcast_signal(data_source = "${signal ? signal.dataSource : ''}", signal = "$
 )`}
       </pre>
       <p class="description">
-        For more details and examples, see the <a href="https://cmu-delphi.github.io/covidcast/covidcastR/">package
-          documentation</a>. A description of the returned data structure can be found at: <a
+        For more details and examples, see the
+        <a href="https://cmu-delphi.github.io/covidcast/covidcastR/">package documentation</a>. A description of the
+        returned data structure can be found at:
+        <a
           href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html#value">covidcast_signal</a>.
       </p>
     {/if}
