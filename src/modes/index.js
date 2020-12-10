@@ -3,6 +3,7 @@ import timelapseIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/
 import top10Icon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/list.svg';
 import singleIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/search-location.svg';
 import exportIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/download.svg';
+import surveyIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/poll.svg';
 
 /**
  * @typedef {object} Mode
@@ -47,6 +48,7 @@ const modes = [
   {
     id: 'survey',
     label: 'Survey Results',
+    icon: surveyIcon,
     tooltip: 'Switch to Survey View',
     component: () => import('./survey/Survey.svelte').then((r) => r.default),
   },
