@@ -3,6 +3,10 @@ import descriptions from './descriptions.generated.json';
 
 export const overviewText = descriptions.overview;
 
+export const factor = 10;
+export const unit = 'people';
+export const unitLong = 'People per every 1,000 people';
+
 /**
  * @typedef {object} Question
  * @property {string} anchor

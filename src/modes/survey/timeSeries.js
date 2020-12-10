@@ -1,5 +1,6 @@
 import { createSignalDateHighlight, CURRENT_DATE_HIGHLIGHT } from '../../components/DetailView/vegaSpec';
 import { addMissing, fetchTimeSlice } from '../../data';
+import { factor } from './questions';
 
 /**
  * @typedef {object} Params
@@ -53,7 +54,7 @@ export function createTimeSeriesSpec(params) {
     },
     transform: [
       {
-        calculate: 'datum.value == null ? null : datum.value * 10',
+        calculate: `datum.value == null ? null : datum.value * ${factor}`,
         as: 'kValue',
       },
     ],

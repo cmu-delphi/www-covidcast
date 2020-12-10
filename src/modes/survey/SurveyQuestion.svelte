@@ -4,8 +4,14 @@
   import fileIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/file.svg';
   import linkIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/link.svg';
   import userEditIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/user-edit.svg';
-
+  import calendarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/regular/calendar.svg';
   import { createTimeSeriesSpec, loadTimeSeriesData } from './timeSeries';
+  import { determineTrend, findDateRow, findMaxRow, findMinRow } from './trend';
+  import { unitLong, unit } from './questions';
+  import { formatDateShortAbbr } from '../../formats';
+  import { formatDelta, formatIssueDate, formatSampleSize, formatStdErr } from './format';
+  import SurveyTrend from './SurveyTrend.svelte';
+  import SurveyValue from './SurveyValue.svelte';
 
   /**
    * question object
@@ -29,16 +35,28 @@
 
   let loading = true;
   let noData = false;
-  $: {
+  let maxDate = null;
+
+  async function deriveData(dataPromise, date) {
     loading = true;
     noData = false;
-    if (data) {
-      data.then((r) => {
-        noData = r.length === 0;
-        loading = false;
-      });
-    }
+    const data = await dataPromise;
+    noData = data.length === 0;
+    const dateRow = findDateRow(date, data);
+    const trend = determineTrend(date, data, dateRow);
+    const max = question.inverted ? findMinRow(data) : findMaxRow(data);
+    maxDate = max ? max.date_value : null;
+    loading = false;
+
+    return {
+      data,
+      row: dateRow,
+      trend,
+      max,
+    };
   }
+
+  $: summary = deriveData(data, date);
 </script>
 
 <style>
@@ -62,6 +80,7 @@
   }
   .question-body > :global(.vega-embed) {
     display: block;
+    height: 7em;
   }
   .question-question-name {
     font-size: 1.25rem;
@@ -70,6 +89,28 @@
   .question-question {
     font-style: italic;
     font-size: 2rem;
+  }
+
+  .question-summary {
+    margin-top: 1em;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .question-summary > div {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.5;
+    margin: 0 2em;
+    text-align: center;
+  }
+  .question-kpi {
+    height: 5rem;
+    display: flex;
+  }
+  .question-unit {
+    height: 4em;
   }
 </style>
 
@@ -101,6 +142,60 @@
       {question.signalName}
       <UIKitHint title={question.signalTooltip} />
     </h4>
-    <Vega {spec} {data} signals={{ currentDate: date, maxDate: null }} />
+    <Vega {spec} {data} signals={{ currentDate: date, maxDate }} />
+    <div class="uk-text-center uk-text-italic">
+      {#await summary then s}
+        {s.row ? `based on ${formatSampleSize(s.row)} samples with a standard error of ${formatStdErr(s.row.stderr)}, published ${formatIssueDate(s.row)}` : ''}
+      {/await}
+    </div>
+    <div class="question-summary">
+      <div>
+        <div class="question-kpi">
+          {#await summary}
+            <SurveyTrend trend={null} />
+          {:then s}
+            <SurveyTrend trend={s.trend ? s.trend.trend : null} />
+          {/await}
+        </div>
+        <div class="uk-text-bold">
+          Historical trend
+          <UIKitHint title="Tracks the varability of signal movenment" />
+        </div>
+        <div class="question-unit">
+          {#await summary}N/A{:then s}{s.trend ? `${formatDelta(s.trend.delta)} ${unit} since` : 'N/A'}{/await}
+        </div>
+        <div class="block-date">
+          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(maxDate)}
+        </div>
+      </div>
+      <div>
+        <div class="question-kpi">
+          {#await summary}
+            N/A
+          {:then s}
+            <SurveyValue value={s.row ? s.row.value : null} />
+          {/await}
+        </div>
+        <div class="uk-text-bold">Current count</div>
+        <div class="question-unit">{unitLong}</div>
+        <div class="block-date">
+          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(date)}
+        </div>
+      </div>
+      <div>
+        <div class="question-kpi">
+          {#await summary}
+            ?
+          {:then s}
+            <SurveyValue value={s.max ? s.max.value : null} />
+          {/await}
+        </div>
+        <div class="uk-text-bold">{question.inverted ? 'Lowest count' : 'Highest count'}</div>
+        <div class="question-unit">{unitLong}</div>
+        <div class="block-date">
+          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(maxDate)}
+        </div>
+      </div>
+    </div>
   </div>
 </article>
