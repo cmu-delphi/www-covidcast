@@ -3,7 +3,7 @@ import { DEFAULT_SENSOR, EPIDATA_CASES_OR_DEATH_VALUES, getLevelInfo, sensorList
 
 describe('DEFAULT_SENSOR', () => {
   test('matches', () => {
-    expect(DEFAULT_SENSOR).toBe('doctor-visits-smoothed_adj_cli');
+    expect(DEFAULT_SENSOR).toBe('chng-doctor-visits-smoothed_adj_outpatient_cli');
   });
 });
 

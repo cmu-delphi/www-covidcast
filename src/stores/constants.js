@@ -260,7 +260,7 @@ export const yesterday = Number.parseInt(formatAPITime(yesterdayDate), 10);
 
 export const DEFAULT_MODE = modeByID.overview;
 export const DEFAULT_SENSOR = (() => {
-  const defaultSensorId = 'doctor-visits';
+  const defaultSensorId = 'smoothed_adj_outpatient_cli';
   const defaultSensor = sensorList.find((d) => d.id === defaultSensorId);
   if (defaultSensor) {
     return defaultSensor.key;
