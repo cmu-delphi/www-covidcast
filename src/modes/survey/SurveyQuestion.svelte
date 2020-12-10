@@ -5,6 +5,7 @@
   import linkIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/link.svg';
   import userEditIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/user-edit.svg';
   import calendarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/regular/calendar.svg';
+  import warningIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
   import { createTimeSeriesSpec, loadTimeSeriesData } from './timeSeries';
   import { determineTrend, findDateRow, findMaxRow, findMinRow } from './trend';
   import { unitLong, unit } from './questions';
@@ -112,6 +113,14 @@
   .question-unit {
     height: 4em;
   }
+
+  .no-data {
+    letter-spacing: 0.75px;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: #f2994a;
+    border-radius: 3px;
+  }
 </style>
 
 <article class:loading class="uk-card uk-card-default uk-card-small question-card">
@@ -129,6 +138,14 @@
     </a>
   </div>
   <div class="uk-card-body question-body">
+    {#if noData}
+      <div class="uk-alert no-data">
+        <span class="inline-svg-icon">
+          {@html warningIcon}
+        </span>
+        not enough data availible
+      </div>
+    {/if}
     <div>
       <div class="question-question-name">
         <span class="inline-svg-icon">
