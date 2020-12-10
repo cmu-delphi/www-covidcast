@@ -4,9 +4,8 @@
   import { nameInfos } from '../../maps';
   import { currentDate, currentRegionInfo, selectByInfo, smallMultipleTimeSpan } from '../../stores';
   import SensorDatePicker from '../../components/SensorDatePicker.svelte';
-  import { refSensor, sections } from './sections';
-  import { createTimeSeriesSpec, loadTimeSeriesData } from './timeSeries';
-  import SignalSummary from './SignalSummary.svelte';
+  import { refSensor, questions, overviewText } from './questions';
+  import SurveyQuestion from './SurveyQuestion.svelte';
 
   $: selectedDate = parseAPITime($currentDate);
   $: if (selectedDate !== undefined) {
@@ -25,65 +24,24 @@
       endDay = $smallMultipleTimeSpan[1];
     }
   }
-
-  $: timeSeriesData = loadTimeSeriesData($currentRegionInfo, [startDay, endDay]);
-  $: timeSeriesSpec = createTimeSeriesSpec([startDay, endDay]);
+  $: params = { region: $currentRegionInfo, startDay, endDay };
 </script>
 
 <style>
-  section {
-    margin: 1em 0;
-    padding: 0.5em;
-    border-bottom: 1px solid lightgray;
-  }
-
-  .question {
-    margin: 0.5em 0;
-    padding: 0.2em;
-  }
-
-  .indicator {
-    margin: 0.5em 0;
-    padding: 0.2em;
-  }
-
-  .indicator :global(.vega-embed) {
-    display: block;
-    height: 5em;
-  }
-
-  p {
-    padding: 0;
-  }
-
-  aside {
-    display: flex;
-    justify-content: space-evenly;
-  }
-
-  .sensor-date {
-    display: flex;
-    align-items: center;
-    padding: 0 1em;
-  }
 </style>
 
-<div class="uk-container content-grid">
-  <div class="grid-3-11">
-    <h2>Overview</h2>
-    <p>
-      In collaboration with Facebook, along with a consortium of universities and public health officials, the
-      <a href="/">Delphi group</a>
-      at
-      <a href="https://www.cmu.edu/">Carnegie Mellon University</a>
-      conducts research surveys to monitor the spread and impact of the COVID-19 pandemic in the United States. This
-      survey is advertised through Facebook. It has run continuously since early April 2020, and about 70,000 people in
-      the United States participate every day.
-      <a href="./surveys.html">Read more &hellip;</a>
-    </p>
-    <h1>Results</h1>
-
-    <aside>
+<div class="uk-container">
+  <div class="content-grid">
+    <div class="grid-3-11">
+      <h4>Overview</h4>
+      <p>
+        {@html overviewText}
+      </p>
+      <h2>Results</h2>
+    </div>
+  </div>
+  <div class="content-grid">
+    <aside class="grid-3-11">
       <Search
         className="container-bg"
         placeholder="Search Region"
@@ -96,37 +54,25 @@
         <SensorDatePicker sensor={refSensor} bind:value={selectedDate} />
       </div>
     </aside>
+  </div>
 
-    <main>
-      <!-- {#if $currentRegionInfo}
-      <p>
-        <strong>{$currentRegionInfo.displayName}</strong> has a population of {formatPopulation($currentRegionInfo)} and
-        a size of {formatArea($currentRegionInfo)} sq mi.
-      </p>
-    {/if} -->
-      {#each sections as section}
-        <section>
-          <h2>{section.section}</h2>
-          {#each section.questions as question}
-            <div class="question">
-              <h3>{question.question}</h3>
-              {#each question.indicators as indicator}
-                <div class="indicator">
-                  <h4>{indicator.name}</h4>
-                  <p>
-                    {@html indicator.description}
-                  </p>
-                  <SignalSummary
-                    date={selectedDate}
-                    data={timeSeriesData.get(indicator.signal) || []}
-                    low={indicator.negated}
-                    spec={timeSeriesSpec} />
-                </div>
-              {/each}
-            </div>
-          {/each}
-        </section>
+  <div class="content-grid">
+    <div class="grid-1-3">
+      <div class="toc-container uk-visible@m">
+        <div uk-sticky="offset: 32;" class="uk-sticky uk-sticky-fixed uk-sticky-below toc">
+          <h5>Outline</h5>
+          <ol uk-scrollspy-nav="closest: li; scroll: true; offset: 100" class="uk-nav uk-nav-default">
+            {#each questions as question}
+              <li><a href={question.anchor}>{question.name}</a></li>
+            {/each}
+          </ol>
+        </div>
+      </div>
+    </div>
+    <div class="grid-3-11">
+      {#each questions as question}
+        <SurveyQuestion {question} date={selectedDate} {params} />
       {/each}
-    </main>
+    </div>
   </div>
 </div>

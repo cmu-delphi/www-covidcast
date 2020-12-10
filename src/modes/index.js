@@ -64,7 +64,7 @@ const modes = [
 export default modes;
 
 /**
- * @type {Record<'overview'|'timelapse'|'top10'|'export'|'single', Mode>}
+ * @type {Record<'overview'|'timelapse'|'top10'|'export'|'single'|'survey', Mode>}
  */
 export const modeByID = {};
 modes.forEach((mode) => (modeByID[mode.id] = mode));

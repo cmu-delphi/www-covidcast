@@ -1,47 +1,44 @@
 import { createSignalDateHighlight, CURRENT_DATE_HIGHLIGHT } from '../../components/DetailView/vegaSpec';
 import { addMissing, fetchTimeSlice } from '../../data';
-import { dataSource, sections } from './sections';
 
 /**
- * @param {import('../../maps').NameInfo} region
- * @param {[Date, Date]} startEndDates
+ * @typedef {object} Params
+ * @property {import('../../maps').NameInfo} region
+ * @property {Date} startDay
+ * @property {Date} endDay
  */
-export function loadTimeSeriesData(region, startEndDates) {
-  if (!region || startEndDates.length === 0) {
-    return new Map();
+/**
+ * @param {import ('./questions').Question} question
+ * @param {Params} params
+ */
+export function loadTimeSeriesData(question, params) {
+  const { region, startDay, endDay } = params;
+  if (!region || !startDay || !endDay) {
+    return null;
   }
-  // collect all data to load
-  const indicators = sections.map((d) => d.questions.map((d) => d.indicators)).flat(2);
-
-  return new Map(
-    indicators.map((indicator) => {
-      const sensor = indicator.sensor || {
-        id: dataSource,
-        signal: indicator.signal,
-        hasStdErr: true,
-      };
-      const data = fetchTimeSlice(
-        sensor,
-        region.level,
-        region.propertyId,
-        startEndDates[0],
-        startEndDates[1],
-        false,
-        {
-          geo_value: region.propertyId,
-        },
-        { advanced: true },
-      ).then((r) => addMissing(r));
-
-      return [indicator.signal, data];
-    }),
-  );
+  const sensor = question.sensor || {
+    id: question.dataSource,
+    signal: question.signal,
+    hasStdErr: true,
+  };
+  return fetchTimeSlice(
+    sensor,
+    region.level,
+    region.propertyId,
+    startDay,
+    endDay,
+    false,
+    {
+      geo_value: region.propertyId,
+    },
+    { advanced: true },
+  ).then((r) => addMissing(r));
 }
 
 /**
- * @param {[Date, Date]} startEndDates
+ * @param {Params} params
  */
-export function createTimeSeriesSpec(startEndDates) {
+export function createTimeSeriesSpec(params) {
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
@@ -83,9 +80,9 @@ export function createTimeSeriesSpec(startEndDates) {
               labelSeparation: 10, // Should be based on font size.
             },
             scale:
-              startEndDates.length > 0
+              params.startDay && params.endDay
                 ? {
-                    domain: [startEndDates[0].getTime(), startEndDates[1].getTime()],
+                    domain: [params.startDay.getTime(), params.endDay.getTime()],
                   }
                 : {},
           },
