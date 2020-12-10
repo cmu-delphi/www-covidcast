@@ -11,6 +11,9 @@ const marked = require('marked');
 const DOC_URL =
   process.env.COVIDCAST_SIGNAL_DOC || 'https://docs.google.com/document/d/1RLy4O-gtACVjLEVD_vxyPqvp9nWVhqEjoWAKi68RKpg';
 
+const SURVEY_DOC_URL =
+  process.env.COVIDCAST_SURVEY_DOC || 'https://docs.google.com/document/d/148mmPJ6wFYdINA5EGW4Q4Tt7zZKR0qPQKMDdalJ7vlA';
+
 async function loadDoc(url) {
   /**
    * download as plain text
@@ -61,6 +64,38 @@ async function generateDescriptions() {
   fs.writeFileSync('./src/stores/descriptions.generated.json', JSON.stringify(entries, null, 2));
 }
 
+async function generateSurveyDescriptions() {
+  const code = (await Promise.all(SURVEY_DOC_URL.split(',').map(loadDoc))).join('\n\n');
+
+  fs.writeFileSync('./src/modes/survey/descriptions.raw.txt', code);
+
+  const parsed = {
+    overview: '',
+    questions: [],
+  };
+
+  let first = true;
+
+  yaml.safeLoadAll(code, (doc) => {
+    const r = {};
+    Object.entries(doc).map(([key, value]) => {
+      const formattedKey = key[0].toLowerCase() + key.slice(1);
+      if (formattedKey === 'description' || formattedKey === 'question' || formattedKey === 'overview') {
+        value = marked.parseInline(value.trim());
+      }
+      r[formattedKey] = value;
+    });
+    if (first) {
+      Object.assign(parsed, r);
+      first = false;
+    } else {
+      parsed.questions.push(r);
+    }
+  });
+  fs.writeFileSync('./src/modes/survey/descriptions.generated.json', JSON.stringify(parsed, null, 2));
+}
+
 if (require.main === module) {
   generateDescriptions();
+  generateSurveyDescriptions();
 }
