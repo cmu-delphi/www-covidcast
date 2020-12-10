@@ -28,6 +28,9 @@
 </script>
 
 <style>
+  .questions {
+    margin-top: 1em;
+  }
 </style>
 
 <div class="uk-container">
@@ -56,14 +59,14 @@
     </aside>
   </div>
 
-  <div class="content-grid">
+  <div class="content-grid questions">
     <div class="grid-1-3">
       <div class="toc-container uk-visible@m">
         <div uk-sticky="offset: 32;" class="uk-sticky uk-sticky-fixed uk-sticky-below toc">
           <h5>Outline</h5>
           <ol uk-scrollspy-nav="closest: li; scroll: true; offset: 100" class="uk-nav uk-nav-default">
             {#each questions as question}
-              <li><a href={question.anchor}>{question.name}</a></li>
+              <li><a href="#{question.anchor}">{question.name}</a></li>
             {/each}
           </ol>
         </div>

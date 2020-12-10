@@ -8,6 +8,8 @@ export const overviewText = descriptions.overview;
  * @property {string} anchor
  * @property {string} dataSource
  * @property {string} signal
+ * @property {string} signalName
+ * @property {string} signalTooltip
  * @property {string} name
  * @property {string} question HTML
  * @property {boolean} inverted
