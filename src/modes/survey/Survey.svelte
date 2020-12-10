@@ -1,17 +1,8 @@
 <script>
-  import Search from '../../components/Search.svelte';
-  import { formatAPITime, parseAPITime } from '../../data';
-  import { nameInfos } from '../../maps';
-  import { currentDate, currentRegionInfo, selectByInfo, smallMultipleTimeSpan } from '../../stores';
-  import SensorDatePicker from '../../components/SensorDatePicker.svelte';
-  import { refSensor, questions, overviewText } from './questions';
+  import { currentRegionInfo, smallMultipleTimeSpan, currentDateObject } from '../../stores';
+  import { questions, overviewText } from './questions';
   import SurveyQuestion from './SurveyQuestion.svelte';
-
-  $: selectedDate = parseAPITime($currentDate);
-  $: if (selectedDate !== undefined) {
-    currentDate.set(formatAPITime(selectedDate));
-  }
-
+  import SurveyParameters from './SurveyParameters.svelte';
   // use local variables with manual setting for better value comparison updates
   let startDay = $smallMultipleTimeSpan[0];
   let endDay = $smallMultipleTimeSpan[1];
@@ -28,13 +19,27 @@
 </script>
 
 <style>
+  .root {
+    position: relative;
+    flex: 1 1 0;
+    overflow: auto;
+  }
   .questions {
     margin-top: 1em;
   }
+  .toc-container {
+    position: sticky;
+    top: 70px;
+    margin-top: 1em;
+  }
+
+  .content-grid {
+    grid-row-gap: 0;
+  }
 </style>
 
-<div class="uk-container">
-  <div class="content-grid">
+<div class="root">
+  <div class="uk-container content-grid">
     <div class="grid-3-11">
       <h4>Overview</h4>
       <p>
@@ -42,27 +47,10 @@
       </p>
       <h2>Results</h2>
     </div>
-  </div>
-  <div class="content-grid">
-    <aside class="grid-3-11">
-      <Search
-        className="container-bg"
-        placeholder="Search Region"
-        items={nameInfos}
-        selectedItem={$currentRegionInfo}
-        labelFieldName="displayName"
-        maxItemsToShowInList="5"
-        on:change={(e) => selectByInfo(e.detail)} />
-      <div class="sensor-date container-bg">
-        <SensorDatePicker sensor={refSensor} bind:value={selectedDate} />
-      </div>
-    </aside>
-  </div>
-
-  <div class="content-grid questions">
+    <SurveyParameters />
     <div class="grid-1-3">
       <div class="toc-container uk-visible@m">
-        <div uk-sticky="offset: 32;" class="uk-sticky uk-sticky-fixed uk-sticky-below toc">
+        <div class="toc">
           <h5>Outline</h5>
           <ol uk-scrollspy-nav="closest: li; scroll: true; offset: 100" class="uk-nav uk-nav-default">
             {#each questions as question}
@@ -72,9 +60,9 @@
         </div>
       </div>
     </div>
-    <div class="grid-3-11">
+    <div class="grid-3-11 questions">
       {#each questions as question}
-        <SurveyQuestion {question} date={selectedDate} {params} />
+        <SurveyQuestion {question} date={$currentDateObject} {params} />
       {/each}
     </div>
   </div>

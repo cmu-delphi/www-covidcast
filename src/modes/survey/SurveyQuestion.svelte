@@ -37,6 +37,7 @@
   let loading = true;
   let noData = false;
   let maxDate = null;
+  let refDate = null;
 
   async function deriveData(dataPromise, date) {
     loading = true;
@@ -47,6 +48,7 @@
     const trend = determineTrend(date, data, dateRow);
     const max = question.inverted ? findMinRow(data) : findMaxRow(data);
     maxDate = max ? max.date_value : null;
+    refDate = trend.refDate;
     loading = false;
 
     return {
@@ -93,7 +95,8 @@
   }
 
   .question-summary {
-    margin-top: 1em;
+    margin-top: 1.5em;
+    margin-bottom: 2em;
     display: flex;
     flex-wrap: wrap;
   }
@@ -159,7 +162,7 @@
       {question.signalName}
       <UIKitHint title={question.signalTooltip} />
     </h4>
-    <Vega {spec} {data} signals={{ currentDate: date, maxDate }} />
+    <Vega {spec} {data} signals={{ currentDate: date, maxDate, refDate }} />
     <div class="uk-text-center uk-text-italic">
       {#await summary then s}
         {s.row ? `based on ${formatSampleSize(s.row)} samples with a standard error of ${formatStdErr(s.row.stderr)}, published ${formatIssueDate(s.row)}` : ''}
@@ -182,7 +185,7 @@
           {#await summary}N/A{:then s}{s.trend ? `${formatDelta(s.trend.delta)} ${unit} since` : 'N/A'}{/await}
         </div>
         <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(maxDate)}
+          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(refDate)}
         </div>
       </div>
       <div>

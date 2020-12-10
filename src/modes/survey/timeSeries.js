@@ -99,6 +99,7 @@ export function createTimeSeriesSpec(params) {
         },
       },
       createSignalDateHighlight('maxDate', 'gray'),
+      createSignalDateHighlight('refDate', 'gray'),
       CURRENT_DATE_HIGHLIGHT,
     ],
     config: {
