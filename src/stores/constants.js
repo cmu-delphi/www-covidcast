@@ -205,8 +205,6 @@ export function extendSensorEntry(sensorEntry) {
   });
 }
 
-export const defaultSensorId = 'doctor-visits';
-
 /**
  * defines the geo types / levels that are should be used for computing the meta data, the first one has the highest priority and so on
  */
@@ -232,6 +230,8 @@ export const sensorList = (() => {
 })();
 
 export const sensorMap = new Map(sensorList.map((s) => [s.key, s]));
+
+export const defaultSensorId = (sensorList.find((d) => d.default) || sensorList[0]).id;
 
 const sensorTypes = [
   {
