@@ -219,6 +219,8 @@ export const sensorList = (() => {
 
 export const sensorMap = new Map(sensorList.map((s) => [s.key, s]));
 
+export const defaultSensorId = (sensorList.find((d) => d.default) || sensorList[0]).id;
+
 const sensorTypes = [
   {
     id: 'public',
