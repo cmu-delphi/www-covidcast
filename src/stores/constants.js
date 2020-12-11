@@ -82,6 +82,7 @@ export function getLevelInfo(level) {
  * @property {Record<keyof EpiDataCasesOrDeathValues, string>} casesOrDeathSignals signal to load for cases or death
  * @property {)(v: number) => string)} colorScale
  * @property {string} credits
+ * @property {boolean?} default whether it should be default signal
  */
 
 /**
@@ -259,14 +260,6 @@ export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
 export const yesterday = Number.parseInt(formatAPITime(yesterdayDate), 10);
 
 export const DEFAULT_MODE = modeByID.overview;
-export const DEFAULT_SENSOR = (() => {
-  const defaultSensorId = 'doctor-visits';
-  const defaultSensor = sensorList.find((d) => d.id === defaultSensorId);
-  if (defaultSensor) {
-    return defaultSensor.key;
-  } else {
-    return sensorList[0].key;
-  }
-})();
+export const DEFAULT_SENSOR = (sensorList.find((d) => d.default) || sensorList[0]).key;
 export const DEFAULT_LEVEL = 'county';
 export const DEFAULT_ENCODING = 'color';
