@@ -4,6 +4,7 @@ import { L, toFillLayer, toHoverLayer } from './layers';
 import { toBorderSource } from './sources';
 import Tooltip from './Tooltip.svelte';
 import { MAP_THEME } from '../../theme';
+import { computeMegaCountyPopulation } from '../../maps';
 
 export default class InteractiveMap {
   /**
@@ -26,6 +27,8 @@ export default class InteractiveMap {
       className: 'map-popup',
       anchor: 'top',
     });
+    // state of the tooltip to avoid too many updates
+    this.tooltipState = null;
     /**
      * @type {{id: string, level: string, color: string}[]}
      */
@@ -47,11 +50,12 @@ export default class InteractiveMap {
     this.initListeners();
   }
 
-  initListeners() {
-    this.map.on('mouseenter', L.outline, this._onMapMouseEnter.bind(this));
-    this.map.on('mouseleave', L.outline, this._onMapMouseLeave.bind(this));
-    this.map.on('mousemove', L.outline, this._onMapMouseMove.bind(this));
+  setData(data) {
+    this.data = data;
+    this.tooltipState = null;
+  }
 
+  initListeners() {
     this.adapter.levels.forEach((level) => {
       const fillLayer = toFillLayer(level);
       // this.map.on('mouseenter', fillLayer, this._onLevelMouseEnter.bind(this));
@@ -66,6 +70,9 @@ export default class InteractiveMap {
       this.map.on('mousemove', fillLayer, this._onMegaMouseMove.bind(this));
       this.map.on('click', fillLayer, this._onMegaMouseClick.bind(this));
     }
+    this.map.on('mouseenter', L.outline, this._onMapMouseEnter.bind(this));
+    this.map.on('mouseleave', L.outline, this._onMapMouseLeave.bind(this));
+    this.map.on('mousemove', L.outline, this._onMapMouseMove.bind(this));
   }
 
   get activePopup() {
@@ -181,13 +188,25 @@ export default class InteractiveMap {
     this.map.getCanvas().style.cursor = 'pointer';
     const feature = e.features[0];
     const popup = this.activePopup;
-    this.tooltip.$set({
-      properties: {
-        ...feature.properties,
-        ...(this.data.get(feature.properties.id) || {}),
-      },
-      invalid,
-    });
+    if (!this.tooltipState || this.tooltipState.id !== feature.properties.id || this.tooltipState.invalid !== invalid) {
+      this.tooltipState = {
+        id: feature.properties.id,
+        invalid,
+      };
+      let megaCountyPopulation = {};
+      if (feature.properties.level === levelMegaCounty.id && this.adapter.hasMegaCountyLevel) {
+        // calculate the population based on the data
+        megaCountyPopulation.population = computeMegaCountyPopulation(feature.properties, this.data);
+      }
+      this.tooltip.$set({
+        properties: {
+          ...feature.properties,
+          ...megaCountyPopulation,
+          ...(this.data.get(feature.properties.id) || {}),
+        },
+        invalid,
+      });
+    }
     popup.setLngLat(e.lngLat).setDOMContent(this.tooltipElement).addTo(this.map);
   }
 

@@ -485,9 +485,9 @@
               colspan={3 + (primary.isCasesOrDeath ? 3 : 2) + otherSensors.reduce((acc, s) => (acc + s.isCasesOrDeath ? 3 : 2), 0)}
               class="button-bar">
               {rows.length - sortedRows.length}
-              {rows.length - sortedRows.length > 1 ? 'locations' : 'location'} hidden <button
-                on:click={showMore}
-                class="pg-button">Show {SHOW_X_MORE} more locations</button>
+              {rows.length - sortedRows.length > 1 ? 'locations' : 'location'}
+              hidden
+              <button on:click={showMore} class="pg-button">Show {SHOW_X_MORE} more locations</button>
             </td>
           </tr>
         </tfoot>

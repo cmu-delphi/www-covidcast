@@ -1,5 +1,5 @@
 <script>
-  import { encoding, isValueSignalType } from '../stores';
+  import { encoding } from '../stores';
   import IoMdAdd from 'svelte-icons/io/IoMdAdd.svelte';
   import IoMdRemove from 'svelte-icons/io/IoMdRemove.svelte';
   import IoMdHome from 'svelte-icons/io/IoMdHome.svelte';
@@ -91,7 +91,7 @@
       <IoMdHome />
     </button>
   </div>
-  {#if showEncodings && $isValueSignalType}
+  {#if showEncodings}
     <div class="pg-button-vertical-group">
       <button
         aria-pressed={$encoding === 'color' ? 'true' : 'false'}

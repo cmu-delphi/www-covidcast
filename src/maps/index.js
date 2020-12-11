@@ -4,9 +4,6 @@ import stateRaw from './processed/state.csv.js';
 import msaRaw from './processed/msa.csv.js';
 import countyRaw from './processed/county.csv.js';
 import hrrRaw from './processed/hrr.csv.js';
-// import neighborhoodRaw from './processed/swpa/neighborhood.csv.js';
-// import zipRaw from './processed/swpa/zip.csv.js';
-// import swpaFilterInfo from './processed/swpa/filterInfo.json';
 
 const levelMegaCountyId = 'mega-county';
 /**
@@ -67,29 +64,11 @@ export function loadSources(additionalProperties = {}) {
   );
 }
 
-// const swpaNeighborhoodInfo = parseCSV(neighborhoodRaw, 'neighborhood');
-// const swpaStateInfo = stateInfo.filter((d) => swpaFilterInfo.state.includes(d.id));
-// const swpaMsaInfo = msaInfo.filter((d) => swpaFilterInfo.msa.includes(d.id));
-// const swpaCountyInfo = countyInfo.filter((d) => swpaFilterInfo.county.includes(d.id));
-// const swapZipInfo = parseCSV(zipRaw, 'zip');
-
-// export const swpaNameInfos = swpaStateInfo
-//   .concat(swpaMsaInfo, swpaCountyInfo, swpaNeighborhoodInfo, swapZipInfo)
-//   .sort((a, b) => a.displayName.localeCompare(b.displayName));
-
-// export function loadSWPASources(additionalProperties = {}) {
-//   // mark to be loaded as fast as possible
-//   return import('./swpa_geo').then((r) =>
-//     r.default(stateInfo, countyInfo, msaInfo, swpaNeighborhoodInfo, swapZipInfo, additionalProperties),
-//   );
-// }
-
 /**
  * helper to resolve a given id to a name info object
  * @type {Map<string, NameInfo>}
  */
 const infoLookup = new Map();
-// nameInfos.concat(swpaNameInfos).forEach((d) => {
 nameInfos.forEach((d) => {
   const id = String(d.propertyId).toLowerCase();
   if (!infoLookup.has(id)) {
@@ -103,4 +82,33 @@ nameInfos.forEach((d) => {
 
 export function getInfoByName(name) {
   return infoLookup.get(String(name).toLowerCase());
+}
+
+/**
+ * computes the population of the mega county as state - defined county populations
+ * @param {NameInfo} megaCounty
+ * @param {Map<string, any>} data
+ */
+export function computeMegaCountyPopulation(megaCounty, data) {
+  if (!megaCounty || !data || megaCounty.level !== levelMegaCountyId) {
+    return null;
+  }
+  const state = getInfoByName(megaCounty.postal);
+  if (!state || state.population == null || Number.isNaN(state.population)) {
+    return null;
+  }
+  const population = Array.from(data.keys()).reduce((population, fips) => {
+    // not in the state or the mega county
+    if (!fips.startsWith(state.id) || fips === megaCounty.id) {
+      return population;
+    }
+    const county = getInfoByName(fips);
+    if (!county || county.population == null || Number.isNaN(county.population)) {
+      // invalid county, so we cannot compute the rest population, keep NaN from now on
+      return Number.NaN;
+    }
+    return population - county.population;
+  }, state.population);
+
+  return Number.isNaN(population) ? null : population;
 }
