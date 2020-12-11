@@ -1,11 +1,5 @@
 /// <reference types="jest" />
-import { DEFAULT_SENSOR, EPIDATA_CASES_OR_DEATH_VALUES, getLevelInfo, sensorList } from './constants';
-
-describe('DEFAULT_SENSOR', () => {
-  test('matches', () => {
-    expect(DEFAULT_SENSOR).toBe('chng-doctor-visits-smoothed_adj_outpatient_cli');
-  });
-});
+import { EPIDATA_CASES_OR_DEATH_VALUES, getLevelInfo, sensorList } from './constants';
 
 describe('sensorList', () => {
   test.each(sensorList.map((d) => [d]))('has structure %s', (sensor) => {
