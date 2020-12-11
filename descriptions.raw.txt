@@ -108,48 +108,28 @@ Credits: We are happy for you to use this data in products and publications unde
 Links:
  - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html)"
 ---
-Name: COVID Symptom Searches on Google 
-Id: google-symptoms
-Signal: sum_anosmia_ageusia_smoothed_search
-Type: public
-Levels: [state, msa, hrr, county]
-YAxis: Scaled search volume (arbitrary scale)
-Format: raw
-HasStdErr: false
- 
-MapTitleText: Google search volume of COVID-related symptom searches
- 
-Description: Using Google Search Trends symptoms data, Delphi obtains the sum of Google search volumes for anosmia (loss of smell) related searches and ageusia (loss of taste) related searches in each area, since these two unusual symptoms emerged as indicative of COVID-19. Note that the sum of two symptom search volumes is not equivalent to the union of anosmia and ageusia related searches. **The estimates are not comparable across regions since the values provided by Google are scaled by region-specific maximum popularity measured at a fixed time point.**
- 
-Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
-
-
-Links:
- - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/google-symptoms.html)"
----
-
-
 Name: COVID-Related Doctor Visits
-Id: doctor-visits
-Signal: smoothed_adj_cli
+Id: chng
+Signal: smoothed_adj_outpatient_cli
 Type: early
 Levels: [county, msa, state, hrr]
 YAxis: Percentage
 Format: percent
 HasStdErr: false
+Default: true
 
 
 MapTitleText: Percentage of daily doctor visits that are due to COVID-like symptoms
 
 
-Description: Delphi receives from our health system partners aggregated statistics on COVID-related outpatient doctor visits, derived from ICD codes found in insurance claims. Using this data Delphi estimates the percentage of daily doctor’s visits in each area that are due to COVID-like illness. Note that these estimates are based only on visits by patients whose data is accessible to our partners.
+Description: Delphi receives from Change Healthcare aggregated statistics on COVID-related outpatient doctor visits, derived from ICD codes found in insurance claims. Using this data Delphi estimates the percentage of daily doctor’s visits in each area that are due to COVID-like illness. Note that these estimates are based only on visits by patients whose data is accessible to Change Healthcare. All Change Healthcare claims data has been de-identified in accordance with HIPAA privacy regulations.
 
 
-Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
+Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution-NonCommercial license.
 
 
 Links:
- - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/doctor-visits.html)"
+ - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/chng.html)"
 ---
 Name: COVID-Like Symptoms
 Id: fb-survey
