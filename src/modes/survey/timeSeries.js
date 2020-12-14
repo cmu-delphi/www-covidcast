@@ -90,6 +90,9 @@ export function createTimeSeriesSpec(params) {
           y: {
             field: 'kValue',
             type: 'quantitative',
+            scale: {
+              zero: false,
+            },
             axis: {
               format: '.1d',
               title: null,

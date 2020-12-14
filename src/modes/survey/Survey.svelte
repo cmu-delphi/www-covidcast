@@ -1,6 +1,6 @@
 <script>
   import { currentRegionInfo, smallMultipleTimeSpan, currentDateObject } from '../../stores';
-  import { questions, overviewText } from './questions';
+  import { questionCategories, overviewText } from './questions';
   import SurveyQuestion from './SurveyQuestion.svelte';
   import SurveyParameters from './SurveyParameters.svelte';
   // use local variables with manual setting for better value comparison updates
@@ -53,16 +53,27 @@
         <div class="toc">
           <h5>Outline</h5>
           <ol uk-scrollspy-nav="closest: li; scroll: true; offset: 100" class="uk-nav uk-nav-default">
-            {#each questions as question}
-              <li><a href="#{question.anchor}">{question.name}</a></li>
+            {#each questionCategories as cat}
+              <li>
+                <a href="#{cat.anchor}">{cat.name}</a>
+                <ul>
+                  {#each cat.questions as q}
+                    <li><a href="#{q.anchor}">{q.name}</a></li>
+                  {/each}
+                </ul>
+              </li>
             {/each}
           </ol>
         </div>
       </div>
     </div>
     <div class="grid-3-11 questions">
-      {#each questions as question}
-        <SurveyQuestion {question} date={$currentDateObject} {params} />
+      {#each questionCategories as cat}
+        <!-- svelte-ignore a11y-missing-content -->
+        <a id={cat.anchor} />
+        {#each cat.questions as question}
+          <SurveyQuestion {question} date={$currentDateObject} {params} />
+        {/each}
       {/each}
     </div>
   </div>

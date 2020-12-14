@@ -128,7 +128,7 @@
 
 <article class:loading class="uk-card uk-card-default uk-card-small question-card">
   <div class="uk-card-header">
-    <h3 class="uk-card-title">{question.name}</h3>
+    <h3 class="uk-card-title">{question.category}</h3>
     <a href={question.learnMoreLink} class="uk-link-muted uk-text-small">
       <span class="inline-svg-icon">
         {@html fileIcon}
@@ -136,8 +136,7 @@
     <a href="#{question.anchor}" id={question.anchor} class="uk-link-muted uk-text-small">
       <span class="inline-svg-icon">
         {@html linkIcon}
-      </span>
-      Share Link
+      </span> Share Link
     </a>
   </div>
   <div class="uk-card-body question-body">
@@ -145,21 +144,19 @@
       <div class="uk-alert no-data">
         <span class="inline-svg-icon">
           {@html warningIcon}
-        </span>
-        not enough data availible
+        </span> not enough data availible
       </div>
     {/if}
     <div>
       <div class="question-question-name">
         <span class="inline-svg-icon">
           {@html userEditIcon}
-        </span>
-        Survey Question
+        </span> Survey Question
       </div>
       <p class="question-question">{question.question}</p>
     </div>
     <h4>
-      {question.signalName}
+      {question.name}
       <UIKitHint title={question.signalTooltip} />
     </h4>
     <Vega {spec} {data} signals={{ currentDate: date, maxDate, refDate }} />
