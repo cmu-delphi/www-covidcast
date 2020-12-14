@@ -1,7 +1,7 @@
 {
   "hooks": {
     "before:init": "npm run lint",
-    "before:release": "npm run pack && npm run zip",
+    "before:release": "npm pack && npm run zip",
     "after:release": "echo Successfully released ${name} v${version}."
   },
   "git": {

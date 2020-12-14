@@ -29,7 +29,7 @@
 
 {#if sensor.isCasesOrDeath}
   <div class="root {className}" class:center>
-    <div aria-label="display cumulative or indicence" class="pg-button-group button-group">
+    <div aria-label="display cumulative or new incidents" class="pg-button-group button-group">
       <button
         aria-pressed={String(!$signalCasesOrDeathOptions.cumulative)}
         class="pg-button button"
@@ -39,7 +39,7 @@
             signalCasesOrDeathOptions.set({ ...$signalCasesOrDeathOptions, cumulative: false });
           }
         }}>
-        Incidence
+        New
       </button>
       <button
         aria-pressed={$signalCasesOrDeathOptions.cumulative}
@@ -77,30 +77,5 @@
         Ratios (per 100,000)
       </button>
     </div>
-    <!-- <div aria-label="display type" class="pg-button-group button-group">
-    <button
-      aria-pressed={$signalType === 'value' ? 'true' : 'false'}
-      class="pg-button button"
-      class:selected={$signalType === 'value'}
-      on:click={() => {
-        if ($signalType !== 'value') {
-          signalType.set('value');
-        }
-      }}>
-      {$currentSensorEntry.isCount ? 'Count' : 'Intensity'}
-    </button>
-    <button
-      aria-pressed={$signalType === 'direction' ? 'true' : 'false'}
-      class="pg-button button"
-      class:selected={$signalType === 'direction'}
-      on:click={() => {
-        if ($signalType !== 'direction') {
-          signalType.set('direction');
-        }
-      }}
-      disabled>
-      7-day Trend
-    </button>
-  </div> -->
   </div>
 {/if}

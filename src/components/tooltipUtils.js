@@ -30,12 +30,18 @@ function getOrInitPopper() {
   };
 
   const instance = createPopper(virtualElement, popper, {
-    placement: 'top',
+    placement: 'top-start',
     modifiers: [
       {
         name: 'offset',
         options: {
           offset: [0, 8],
+        },
+      },
+      {
+        name: 'flip',
+        options: {
+          padding: 8,
         },
       },
     ],

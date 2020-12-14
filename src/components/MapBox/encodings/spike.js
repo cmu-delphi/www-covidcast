@@ -13,10 +13,7 @@ export default class SpikeEncoding {
     this.customLayers = new Map(levels.map((level) => [level, new SpikeLayer(toCenterSource(level), level)]));
   }
 
-  getVisibleLayers(level, signalType) {
-    if (signalType === 'direction') {
-      return [];
-    }
+  getVisibleLayers(level) {
     return [toFillLayer(level), toSpikeLayer(level)];
   }
 

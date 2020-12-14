@@ -79,6 +79,8 @@
 
   ol {
     flex: 2 1 0;
+    margin: 0;
+    padding: 0;
   }
 
   ol button,
@@ -106,6 +108,7 @@
     margin: 0;
     padding: 0;
     color: inherit;
+    border: none;
   }
 
   #select-on-map button {
@@ -156,7 +159,8 @@
           class="button"
           disabled={!row.info || selections.some((d) => d.info.id === row.info.id)}
           on:click={() => dispatch('add', row.info)}>
-          {row.displayName} ({$currentSensorEntry.formatValue(row.value)})
+          {row.displayName}
+          ({$currentSensorEntry.formatValue(row.value)})
         </button>
       </li>
     {/each}

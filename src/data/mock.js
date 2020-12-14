@@ -17,14 +17,13 @@ const rand = randomNormal(mean, std);
  */
 export function generateMockSignal(_id, _signal, level, date, region) {
   return import('../maps').then((r) => {
-    const swpaNameInfos = r.swpaNameInfos;
+    const nameInfos = r.nameInfos;
 
     /**
      * @type {import('./fetchData').EpiDataRow[]}
      */
     const data = [];
 
-    const direction = 0;
     const issue = Number.parseInt(formatAPITime(mockEndDate), 10);
     const lag = 1;
     const sampleSize = null;
@@ -33,7 +32,6 @@ export function generateMockSignal(_id, _signal, level, date, region) {
     const pushEntry = (timeValue, geoValue) => {
       data.push({
         time_value: Number.parseInt(formatAPITime(timeValue), 10),
-        direction,
         issue,
         lag,
         sample_size: sampleSize,
@@ -53,7 +51,7 @@ export function generateMockSignal(_id, _signal, level, date, region) {
     } else {
       // single
       const timeValue = Number.parseInt(date instanceof Date ? formatAPITime(date) : date, 10);
-      const geoValues = swpaNameInfos.filter((d) => d.level === level).map((d) => d.propertyId);
+      const geoValues = nameInfos.filter((d) => d.level === level).map((d) => d.propertyId);
       for (const geoValue of geoValues) {
         pushEntry(timeValue, geoValue);
       }

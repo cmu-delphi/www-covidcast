@@ -14,6 +14,7 @@
     align-items: center;
     text-align: center;
     padding: 0.2em 1em;
+    margin: 0;
   }
 
   .info {

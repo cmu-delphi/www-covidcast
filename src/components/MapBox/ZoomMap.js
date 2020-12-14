@@ -1,5 +1,6 @@
 import { L } from './layers';
 import { LngLatBounds } from 'mapbox-gl';
+import bbox from '@turf/bbox';
 
 let SHRINK_FACTOR = 0.75;
 
@@ -12,7 +13,7 @@ export default class ZoomMap {
     this.onZoom = onZoom;
     this.resetBounds = new LngLatBounds(bounds);
     this.resetBoundsOptions = {
-      padding: 20, //px
+      padding: 30, //px
       linear: false,
     };
     this.stateZoom = 1;
@@ -32,6 +33,7 @@ export default class ZoomMap {
     this.map = map;
 
     this.stateZoom = this.map.getZoom();
+    this.map.setMinZoom(this.stateZoom - 1); // limit zoom to one level above the us
     // console.log(this.stateZoom);
     this.map.on('zoom', () => {
       this._triggerZoom();
@@ -71,6 +73,20 @@ export default class ZoomMap {
     this.map.zoomOut();
   }
 
+  focusOn(feature) {
+    if (!feature || !this.map) {
+      return;
+    }
+    this.initialZoomView = false;
+
+    const bounds = bbox(feature);
+    this.map.fitBounds(bounds, {
+      maxZoom: this.getZoom() * 1.5,
+      linear: false,
+      essential: true,
+    });
+  }
+
   resetZoom() {
     if (!this.map) {
       return;
@@ -79,6 +95,7 @@ export default class ZoomMap {
     this.map.fitBounds(this.resetBounds, this.resetBoundsOptions);
     this.map.once('idle', () => {
       this.stateZoom = this.map.getZoom();
+      this.map.setMinZoom(this.stateZoom - 1); // limit zoom to one level above the us
       this._triggerZoom(true);
     });
   }

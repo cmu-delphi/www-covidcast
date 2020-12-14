@@ -1,11 +1,5 @@
 /// <reference types="jest" />
-import { defaultSensorId, EPIDATA_CASES_OR_DEATH_VALUES, getLevelInfo, sensorList } from './constants';
-
-describe('defaultSensorId', () => {
-  test('matches', () => {
-    expect(defaultSensorId).toBe('doctor-visits');
-  });
-});
+import { EPIDATA_CASES_OR_DEATH_VALUES, getLevelInfo, sensorList } from './constants';
 
 describe('sensorList', () => {
   test.each(sensorList.map((d) => [d]))('has structure %s', (sensor) => {

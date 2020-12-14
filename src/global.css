@@ -14,10 +14,13 @@
   padding: 0;
   position: relative;
   flex: 1 1 0;
-  line-height: 1rem;
 
   display: flex;
   flex-direction: column;
+}
+
+#vizbox p {
+  margin: 0;
 }
 
 button.mapboxgl-popup-close-button {

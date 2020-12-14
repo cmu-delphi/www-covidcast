@@ -80,6 +80,7 @@
     list-style-type: none;
     font-size: 80%;
     line-height: 1.35em;
+    padding: 0;
   }
 
   .links > li:not(:first-of-type)::before {
@@ -91,9 +92,11 @@
     list-style-type: none;
     padding: 0;
     display: flex;
+    margin-right: 1em;
   }
 
   h2 {
+    margin-top: 0;
     margin-right: 40px;
     padding-top: 0.25em;
   }

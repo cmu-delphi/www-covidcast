@@ -92,7 +92,6 @@ module.exports = () => {
             {
               loader: MiniCssExtractPlugin.loader,
               options: {
-                hmr,
                 esModule: false,
               },
             },

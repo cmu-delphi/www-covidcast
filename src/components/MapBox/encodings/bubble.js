@@ -13,10 +13,7 @@ export default class BubbleEncoding {
     this.customLayers = new Map(levels.map((level) => [level, new BubbleLayer(toCenterSource(level), level)]));
   }
 
-  getVisibleLayers(level, signalType) {
-    if (signalType === 'direction') {
-      return [];
-    }
+  getVisibleLayers(level) {
     return [toFillLayer(level), toBubbleLayer(level)];
   }
 

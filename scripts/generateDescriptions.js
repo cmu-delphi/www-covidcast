@@ -37,14 +37,15 @@ async function generateDescriptions() {
     const r = {};
     Object.entries(doc).map(([key, value]) => {
       const formattedKey = key[0].toLowerCase() + key.slice(1);
-      if (formattedKey === 'description') {
+      if (formattedKey === 'description' || formattedKey === 'credits') {
         value = marked.parseInline(value.trim());
       } else if (formattedKey === 'links') {
         // expect an array with an link property
         value = value.map((value) => marked.parseInline(value.link.trim()));
       } else if (
         formattedKey === 'casesOrDeathSignals' ||
-        (formattedKey === 'mapTitleText' && typeof value !== 'string')
+        (formattedKey === 'mapTitleText' && typeof value !== 'string') ||
+        (formattedKey === 'yAxis' && typeof value !== 'string')
       ) {
         // also format nested object
         const sub = {};
