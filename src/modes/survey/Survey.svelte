@@ -56,11 +56,11 @@
             {#each questionCategories as cat}
               <li>
                 <a href="#{cat.anchor}">{cat.name}</a>
-                <ul>
+                <ol class="uk-nav-sub">
                   {#each cat.questions as q}
                     <li><a href="#{q.anchor}">{q.name}</a></li>
                   {/each}
-                </ul>
+                </ol>
               </li>
             {/each}
           </ol>

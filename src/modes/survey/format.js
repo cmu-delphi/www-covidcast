@@ -9,17 +9,17 @@ export function formatValue(value) {
   return value == null || Number.isNaN(value) ? 'N/A' : f(value * factor);
 }
 
-export function formatDelta(delta) {
-  if (delta == null || Number.isNaN(delta)) {
+export function formatTrend(change) {
+  if (change == null || Number.isNaN(change)) {
     return 'N/A';
   }
-  if (delta === 0) {
+  if (change === 0) {
     return 'No change';
   }
-  if (delta < 0) {
-    return `Decreased ${formatValue(delta)}`;
+  if (change < 0) {
+    return `Decreased ${f(Math.abs(change) * 100)}%`;
   }
-  return `Increased ${formatValue(delta)}`;
+  return `Increased ${f(change * 100)}%`;
 }
 export function formatStdErr(stderr) {
   return `±${formatValue(stderr)}`;

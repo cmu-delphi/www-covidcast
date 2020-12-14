@@ -1,5 +1,6 @@
 import { timeDay } from 'd3-time';
 import { formatAPITime } from '../../data';
+import { trendThreshold, trendThresholdQuickly } from './questions';
 
 /**
  * @param {import("../../data").EpiDataRow[]} data
@@ -47,17 +48,21 @@ export function findDateRow(date, data) {
   return data.find((d) => d.time_value === apiDate);
 }
 
-export function toTrendText(delta) {
-  if (delta > 2.5) {
+function toTrend(current, reference) {
+  return (current - reference) / reference;
+}
+
+function toTrendText(change) {
+  if (change >= trendThresholdQuickly) {
     return 'increasing quickly';
   }
-  if (delta > 1) {
+  if (change >= trendThreshold) {
     return 'increasing';
   }
-  if (delta < -2.5) {
+  if (change <= -trendThresholdQuickly) {
     return 'decreasing quickly';
   }
-  if (delta < -1) {
+  if (change <= -trendThreshold) {
     return 'decreasing';
   }
   return 'static';
@@ -73,7 +78,7 @@ export function determineTrend(date, data, dateRow = findDateRow(date, data)) {
   if (!dateRow || dateRow.value == null) {
     return {
       trend: 'Unknown',
-      delta: Number.NaN,
+      change: Number.NaN,
       refDate,
       ref: null,
     };
@@ -96,15 +101,15 @@ export function determineTrend(date, data, dateRow = findDateRow(date, data)) {
     // none found
     return {
       trend: 'Unknown',
-      delta: Number.NaN,
+      change: Number.NaN,
       refDate: refDate,
       ref: null,
     };
   }
-  const delta = dateRow.value - refValue.value;
+  const change = toTrend(dateRow.value, refValue.value);
   return {
-    trend: toTrendText(delta),
-    delta,
+    trend: toTrendText(change),
+    change,
     refDate: refValue.date_value,
     ref: refValue,
   };

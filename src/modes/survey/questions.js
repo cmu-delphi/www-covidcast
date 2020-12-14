@@ -2,9 +2,10 @@ import { sensorList } from '../../stores';
 import descriptions from './descriptions.generated.json';
 
 export const overviewText = descriptions.overview;
+export const trendThreshold = descriptions.trendThreshold;
+export const trendThresholdQuickly = descriptions.trendThresholdQuickly;
 
 export const factor = 10;
-export const unit = 'people';
 export const unitLong = 'People per every 1,000 people';
 
 /**

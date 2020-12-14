@@ -8,9 +8,9 @@
   import warningIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
   import { createTimeSeriesSpec, loadTimeSeriesData } from './timeSeries';
   import { determineTrend, findDateRow, findMaxRow, findMinRow } from './trend';
-  import { unitLong, unit } from './questions';
+  import { unitLong } from './questions';
   import { formatDateShortAbbr } from '../../formats';
-  import { formatDelta, formatIssueDate, formatSampleSize, formatStdErr } from './format';
+  import { formatTrend, formatIssueDate, formatSampleSize, formatStdErr } from './format';
   import SurveyTrend from './SurveyTrend.svelte';
   import SurveyValue from './SurveyValue.svelte';
 
@@ -182,7 +182,7 @@
           <UIKitHint title="Tracks the varability of signal movenment" />
         </div>
         <div class="question-unit">
-          {#await summary}N/A{:then s}{s.trend ? `${formatDelta(s.trend.delta)} ${unit} since` : 'N/A'}{/await}
+          {#await summary}N/A{:then s}{s.trend ? `${formatTrend(s.trend.change)} since` : 'N/A'}{/await}
         </div>
         <div class="block-date">
           <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(refDate)}
