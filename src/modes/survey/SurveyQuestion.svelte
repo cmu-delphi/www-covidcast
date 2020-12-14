@@ -136,7 +136,8 @@
     <a href="#{question.anchor}" id={question.anchor} class="uk-link-muted uk-text-small">
       <span class="inline-svg-icon">
         {@html linkIcon}
-      </span> Share Link
+      </span>
+      Share Link
     </a>
   </div>
   <div class="uk-card-body question-body">
@@ -144,14 +145,16 @@
       <div class="uk-alert no-data">
         <span class="inline-svg-icon">
           {@html warningIcon}
-        </span> not enough data availible
+        </span>
+        not enough data availible
       </div>
     {/if}
     <div>
       <div class="question-question-name">
         <span class="inline-svg-icon">
           {@html userEditIcon}
-        </span> Survey Question
+        </span>
+        Survey Question
       </div>
       <p class="question-question">{question.question}</p>
     </div>
