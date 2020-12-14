@@ -146,7 +146,7 @@
         <span class="inline-svg-icon">
           {@html warningIcon}
         </span>
-        not enough data availible
+        not enough data available
       </div>
     {/if}
     <div>
