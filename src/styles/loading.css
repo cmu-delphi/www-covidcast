@@ -1,6 +1,7 @@
 .loading,
 .loading-bg {
   position: relative;
+  overflow: hidden !important;
 }
 
 .loading-bg::before {

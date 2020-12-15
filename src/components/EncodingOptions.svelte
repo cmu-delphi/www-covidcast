@@ -17,23 +17,19 @@
     align-items: center;
   }
 
-  .button-group {
-    margin: 0.2em;
-  }
-
-  .button {
-    width: 11em;
-    padding: 0.2em 0.5em;
+  button {
+    width: 13em;
   }
 </style>
 
 {#if sensor.isCasesOrDeath}
   <div class="root {className}" class:center>
-    <div aria-label="display cumulative or new incidents" class="pg-button-group button-group">
+    <div aria-label="display cumulative or new incidents" class="uk-button-group">
       <button
+        type="button"
         aria-pressed={String(!$signalCasesOrDeathOptions.cumulative)}
-        class="pg-button button"
-        class:selected={!$signalCasesOrDeathOptions.cumulative}
+        class="uk-button uk-button-default uk-button-small"
+        class:uk-active={!$signalCasesOrDeathOptions.cumulative}
         on:click={() => {
           if ($signalCasesOrDeathOptions.cumulative) {
             signalCasesOrDeathOptions.set({ ...$signalCasesOrDeathOptions, cumulative: false });
@@ -42,9 +38,10 @@
         New
       </button>
       <button
+        type="button"
         aria-pressed={$signalCasesOrDeathOptions.cumulative}
-        class="pg-button button"
-        class:selected={$signalCasesOrDeathOptions.cumulative}
+        class="uk-button uk-button-default uk-button-small"
+        class:uk-active={$signalCasesOrDeathOptions.cumulative}
         on:click={() => {
           if (!$signalCasesOrDeathOptions.cumulative) {
             signalCasesOrDeathOptions.set({ ...$signalCasesOrDeathOptions, cumulative: true });
@@ -53,11 +50,12 @@
         Cumulative
       </button>
     </div>
-    <div aria-label="display counts or ratios per 100,000 people" class="pg-button-group button-group">
+    <div aria-label="display counts or ratios per 100,000 people" class="uk-button-group">
       <button
+        type="button"
         aria-pressed={String(!$signalCasesOrDeathOptions.ratio)}
-        class="pg-button button"
-        class:selected={!$signalCasesOrDeathOptions.ratio}
+        class="uk-button uk-button-default uk-button-small"
+        class:uk-active={!$signalCasesOrDeathOptions.ratio}
         on:click={() => {
           if ($signalCasesOrDeathOptions.ratio) {
             signalCasesOrDeathOptions.set({ ...$signalCasesOrDeathOptions, ratio: false });
@@ -66,9 +64,10 @@
         Counts
       </button>
       <button
+        type="button"
         aria-pressed={String($signalCasesOrDeathOptions.ratio)}
-        class="pg-button button"
-        class:selected={$signalCasesOrDeathOptions.ratio}
+        class="uk-button uk-button-default uk-button-small"
+        class:uk-active={$signalCasesOrDeathOptions.ratio}
         on:click={() => {
           if (!$signalCasesOrDeathOptions.ratio) {
             signalCasesOrDeathOptions.set({ ...$signalCasesOrDeathOptions, ratio: true });

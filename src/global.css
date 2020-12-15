@@ -9,7 +9,6 @@
 @import './styles/ie11.css';
 
 #vizbox {
-  font-family: 'Open Sans', sans-serif;
   margin: 0;
   padding: 0;
   position: relative;
@@ -17,28 +16,6 @@
 
   display: flex;
   flex-direction: column;
-}
-
-#vizbox p {
-  margin: 0;
-}
-
-button.mapboxgl-popup-close-button {
-  padding: 2px;
-  color: var(--grey);
-}
-
-#vizbox button:focus {
-  border: 0;
-  z-index: 10000;
-  background-color: var(--lightgrey);
-}
-
-#vizbox input:focus,
-#vizbox select:focus {
-  z-index: 10000;
-  background-color: var(--lightgrey);
-  box-shadow: 0 2px var(--grey);
 }
 
 .mapboxgl-canvas:focus {
@@ -88,4 +65,4 @@ button.mapboxgl-popup-close-button {
 @import './styles/message-overlay.css';
 @import './styles/vega.css';
 @import './styles/tooltip.css';
-@import './styles/option-picker.css';
+@import './styles/uikit.css';

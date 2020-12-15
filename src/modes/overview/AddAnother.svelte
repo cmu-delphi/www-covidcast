@@ -63,64 +63,16 @@
     margin: 0.5em 0;
   }
 
-  .current {
-    text-decoration: underline;
-  }
-
   ol,
   ul {
     flex: 1 1 0;
     overflow: auto;
   }
 
-  ul.empty {
-    flex: 0 0 auto;
-  }
-
   ol {
     flex: 2 1 0;
     margin: 0;
     padding: 0;
-  }
-
-  ol button,
-  ul button {
-    word-wrap: break-word;
-    text-align: left;
-  }
-  li {
-    padding: 0;
-  }
-
-  ul > li {
-    list-style-position: inherit;
-  }
-
-  ol > li {
-    margin-left: 2em;
-  }
-
-  .button {
-    line-height: 1;
-    cursor: pointer;
-    text-decoration: none;
-    background: none !important;
-    margin: 0;
-    padding: 0;
-    color: inherit;
-    border: none;
-  }
-
-  #select-on-map button {
-    width: 100%;
-  }
-
-  .button:disabled {
-    cursor: not-allowed;
-  }
-
-  .button:focus {
-    outline: none;
   }
 </style>
 
@@ -140,42 +92,42 @@
       }
     }} />
 
-  <p id="select-on-map">
-    <button
-      class="pg-button pg-text-button"
-      class:selected={pickMapMode}
-      aria-pressed={pickMapMode}
-      on:click={() => (pickMapMode = !pickMapMode)}>
-      Select on map
-    </button>
-  </p>
+  <button
+    class="uk-button uk-button-default uk-button-small uk-width-1-1 uk-margin-top"
+    class:selected={pickMapMode}
+    aria-pressed={pickMapMode}
+    on:click={() => (pickMapMode = !pickMapMode)}>
+    Select on map
+  </button>
 
-  <h5>Select from Top for <span class="current">{$currentSensorEntry.name}</span></h5>
+  <h5>Select from Top for <strong>{$currentSensorEntry.name}</strong></h5>
 
   <ol class:loading>
     {#each top10Data as row}
       <li>
-        <button
-          class="button"
+        <a
+          href="?region={row.info ? row.info.propertyId : ''}"
+          class="uk-link-text"
           disabled={!row.info || selections.some((d) => d.info.id === row.info.id)}
-          on:click={() => dispatch('add', row.info)}>
+          on:click|preventDefault={() => dispatch('add', row.info)}>
           {row.displayName}
           ({$currentSensorEntry.formatValue(row.value)})
-        </button>
+        </a>
       </li>
     {/each}
   </ol>
 
   {#if possibleRecent.length > 0}
     <h5>Select from recent locations</h5>
-
-    <ul class:empty={possibleRecent.length === 0}>
+    <ul>
       {#each possibleRecent.reverse() as info}
-        <li><button class="button" on:click={() => dispatch('add', info)}>{info.displayName}</button></li>
+        <li>
+          <a
+            href="?region={info.propertyId}"
+            class="uk-link-text"
+            on:click|preventDefault={() => dispatch('add', info)}>{info.displayName}</a>
+        </li>
       {/each}
-      {#if possibleRecent.length === 0}
-        <li>No recent locations founds</li>
-      {/if}
     </ul>
   {/if}
 </section>

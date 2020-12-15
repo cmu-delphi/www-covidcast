@@ -27,75 +27,54 @@
 </script>
 
 <style>
-  .options {
-    position: relative;
+  .block {
     display: flex;
-    margin: 0.3em;
-  }
-
-  .option-wrapper {
     align-items: center;
-    display: flex;
-    flex: 1 1 auto;
-    max-width: 390px;
   }
 
-  .option-title {
-    margin: 0 5px;
-    color: #444;
+  .block .uk-form-label {
+    margin-right: 1em;
   }
 
-  /** mobile **/
-  @media only screen and (max-width: 767px) {
-    .options {
-      max-width: unset;
-    }
-    .option-wrapper {
-      padding: 0 0.1em;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      justify-content: space-between;
-    }
+  .block .uk-form-controls {
+    flex-grow: 1;
   }
 </style>
 
-<div class="options base-font-size container-bg container-style {className}">
-  <div class="option-wrapper">
-    <span class="option-title">Displaying</span>
-    <select
-      id="option-indicator"
-      aria-label="indicator options"
-      class="option-picker indicators base-font-size"
-      bind:value={$currentSensor}>
-      {#each filteredSensorGroups as sensorGroup}
-        <optgroup label={sensorGroup.label}>
-          {#each sensorGroup.sensors as sensor}
-            <option
-              title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
-              value={sensor.key}>
-              {sensor.name}
-            </option>
-          {/each}
-        </optgroup>
-      {/each}
-    </select>
+<div class="container-bg container-style uk-grid-small {className}" data-uk-grid>
+  <div class="uk-width-1-1 uk-width-1-{showDate ? '3' : '2'}@m block">
+    <span class="uk-form-label">Displaying</span>
+    <div class="uk-form-controls">
+      <select id="option-indicator" aria-label="indicator options" class="uk-select" bind:value={$currentSensor}>
+        {#each filteredSensorGroups as sensorGroup}
+          <optgroup label={sensorGroup.label}>
+            {#each sensorGroup.sensors as sensor}
+              <option
+                title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
+                value={sensor.key}>
+                {sensor.name}
+              </option>
+            {/each}
+          </optgroup>
+        {/each}
+      </select>
+    </div>
   </div>
-  <div class="option-wrapper">
-    <span class="option-title">for</span>
-    <select
-      id="option-geo-level"
-      aria-label="geographic level"
-      class="option-picker geo-level base-font-size"
-      bind:value={$currentLevel}>
-      {#each levels as level}
-        <option value={level.id} disabled={!$currentSensorEntry.levels.includes(level.id)}>{level.labelPlural}</option>
-      {/each}
-    </select>
+  <div class="uk-width-1-1 uk-width-1-{showDate ? '3' : '2'}@m block">
+    <span class="uk-form-label">for</span>
+    <div class="uk-form-controls">
+      <select id="option-geo-level" aria-label="geographic level" class="uk-select" bind:value={$currentLevel}>
+        {#each levels as level}
+          <option value={level.id} disabled={!$currentSensorEntry.levels.includes(level.id)}>
+            {level.labelPlural}
+          </option>
+        {/each}
+      </select>
+    </div>
   </div>
   {#if showDate}
-    <div class="option-wrapper">
-      <span class="option-title">on</span>
+    <div class="uk-width-1-1 uk-width-1-3@m block">
+      <span class="uk-form-label">on</span>
       <SensorDatePicker sensor={$currentSensorEntry} bind:value={selectedDate} />
     </div>
   {/if}

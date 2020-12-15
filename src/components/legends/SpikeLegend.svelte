@@ -14,7 +14,6 @@
 
   const spikePadding = 2;
 
-  export let loading = false;
   export let zoom = 1.0;
 
   $: size = ENCODING_SPIKE_THEME.size[$currentLevel] * zoom;
@@ -74,7 +73,7 @@
   }
 </style>
 
-<ul class="legend-ticks" class:loading-bg={loading} data-testid="spike-legend">
+<ul class="legend-ticks" data-testid="spike-legend">
   <li>
     <div class="na" style="background:repeating-linear-gradient(-45deg, {MISSING_COLOR}, white 30%)" />
     <span>NA</span>

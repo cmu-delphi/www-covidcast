@@ -1,3 +1,10 @@
+# Release 1.11.1
+
+## Signal Changes
+
+- Removed "COVID Symptom Searches on Google" signal.
+- Replaced "COVID-Related Doctor Visits" with new signal from Change Healthcare. For more details see: [`smoothed_outpatient_cli`](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/chng.html)
+
 # Release 1.11.0
 
 This release changes COVIDcast from a complete site to an embedded component, primarily to the [www-main](https://github.com/cmu-delphi/www-covidcast) repository, which serves the Delphi homepage. This means that instead of having both covidcast.cmu.edu and delphi.cmu.edu separately, we will now have delphi.cmu.edu and covidcast will live at delphi.cmu.edu/covidcast.
