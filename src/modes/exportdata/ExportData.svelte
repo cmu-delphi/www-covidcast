@@ -18,6 +18,7 @@
   const CASES_DEATH_SOURCE = 'cases-deaths';
 
   const sourceNameLookup = {
+    chng: 'Change Healthcare',
     'doctor-visits': 'Doctor Visits',
     'fb-survey': 'Delphi Survey Results',
     ght: 'Google Search Trends',
@@ -223,16 +224,24 @@
     padding: 0;
     font-size: 80%;
   }
+
+  .region-row :global(.search-container) {
+    display: inline-flex;
+  }
+
+  .code-block {
+    max-width: calc(100vw - 80px);
+  }
 </style>
 
-<div class="root" class:loading>
+<div class="root uk-container" class:loading>
   <p>
     All signals displayed on the COVIDcast map are freely available for download here. You can also access the latest
     daily through the
     <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a>
     which also includes numerous other signals.
   </p>
-  <section>
+  <section class="uk-margin-top">
     <h4>1. Select Signal</h4>
     <div data-uk-grid class="uk-form-stacked">
       <div class="uk-width-1-3@m uk-width-expand@s">
@@ -276,7 +285,7 @@
       </div>
     </div>
   </section>
-  <section class="uk-form-horizontal">
+  <section class="uk-form-horizontal uk-margin-top">
     <h4>2. Specify Parameters</h4>
     <div>
       <span class="uk-form-label">Date Range</span>
@@ -317,9 +326,9 @@
         </p>
       </div>
     </div>
-    <div class="form-row">
-      <label for="region">Region</label>
-      <div>
+    <div>
+      <label for="region" class="uk-form-label">Region</label>
+      <div class="uk-form-controls">
         <div>
           <input type="radio" name="region" value="all" id="region-all" bind:group={geoValuesMode} /><label
             for="region-all">All</label>
@@ -334,7 +343,7 @@
             disabled={geoItems.length === 0} />
           <label for="region-single">Specific region(s): </label>
           <Search
-            className="search-container container-bg"
+            className="search-container"
             placeholder={'Search for a region...'}
             items={geoItems}
             selectedItems={geoValues}
@@ -346,9 +355,9 @@
         </div>
       </div>
     </div>
-    <div class="form-row">
-      <label for="as-of">As of</label>
-      <div>
+    <div class="uk-margin-top">
+      <label for="as-of" class="uk-form-label">As of</label>
+      <div class="uk-form-controls">
         <div>
           <input type="radio" name="as-of" value="latest" id="as-of-latest" bind:group={asOfMode} /><label
             for="as-of-latest">Latest</label>
@@ -363,7 +372,7 @@
             end={asOfEnd}>
             <button
               aria-label="selected as of date"
-              class="pg-button"
+              class="uk-input"
               disabled={asOfMode === 'latest'}
               on:>{asOfDate ? iso(asOfDate) : 'Select date'}</button>
           </Datepicker>
@@ -376,7 +385,7 @@
       </div>
     </div>
   </section>
-  <section>
+  <section class="uk-margin-top">
     <h4>3. Get Data</h4>
     <p>
       {@html signal && signal.entry ? signal.entry.credits : ''}
@@ -430,9 +439,10 @@
         {#if usesAsOf}<input type="hidden" name="as_of" value={iso(asOfDate)} />{/if}
       </form>
       <p>Manually fetch data:</p>
-      <pre>
+      <pre
+        class="code-block"><code>
         {`wget --content-disposition "${CSV_SERVER}?signal=${signalValue}&start_day=${iso(startDate)}&end_day=${iso(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${iso(asOfDate)}` : ''}"`}
-      </pre>
+      </code></pre>
       <p class="description">
         For more details about the API, see the
         <a href="https://cmu-delphi.github.io/delphi-epidata/">API documentation</a>. A description of the returned data
@@ -443,7 +453,7 @@
       <p>Install <code>covidcast</code> via pip:</p>
       <pre><code>pip install covidcast</code></pre>
       <p>Fetch data:</p>
-      <pre><code>
+      <pre class="code-block"><code>
         {`from datetime import date
 import covidcast
 
@@ -462,7 +472,7 @@ data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal
       <p>Install <code>covidcast</code> using <a href="https://devtools.r-lib.org/">devtools</a> :</p>
       <pre><code>devtools::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/covidcast")</code></pre>
       <p>Fetch data:</p>
-      <pre><code>
+      <pre class="code-block"><code>
         {`library(covidcast)
 
 cc_data <- suppressMessages(
