@@ -1,7 +1,7 @@
 import mapIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/map.svg';
 import timelapseIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/clock.svg';
 import top10Icon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/list.svg';
-import singleIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/search-location.svg';
+import singleIcon from '!raw-loader!../assets/location-solid.svg';
 import exportIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/download.svg';
 
 /**
