@@ -34,7 +34,7 @@ button.mapboxgl-popup-close-button {
   background-color: var(--lightgrey);
 }
 
-#vizbox input:focus,
+#vizbox input:focus:not([type='radio']),
 #vizbox select:focus {
   z-index: 10000;
   background-color: var(--lightgrey);
