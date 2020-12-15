@@ -8,6 +8,8 @@
   import { timeMonth } from 'd3-time';
   import { onMount } from 'svelte';
   import { trackEvent } from '../../stores/ga';
+  import Search from '../../components/Search.svelte';
+  import { nameInfos } from '../../maps';
   import InfoDialogButton from '../../components/InfoDialogButton.svelte';
 
   const CSV_SERVER = 'https://delphi.cmu.edu/csv';
@@ -54,6 +56,29 @@
       geoType = Array.from(signalGroup.levels)[0];
     }
   }
+
+  let geoValuesMode = 'all';
+  let geoValues = [];
+  $: geoItems = nameInfos.filter((d) => d.level === geoType);
+  $: {
+    if (geoItems != null) {
+      geoValues = [];
+      geoValuesMode = geoValuesMode === 'all' || geoItems.length === 0 ? 'all' : 'single';
+    }
+  }
+  $: isAllRegions = geoValuesMode === 'all' || geoValues.length === 0;
+  $: geoIDs = geoValues.map((d) => d.propertyId);
+
+  let asOfMode = 'latest';
+  let asOfDate = new Date();
+  const asOfStart = new Date(2000, 0, 1);
+  const asOfEnd = new Date(2030, 0, 1);
+  $: {
+    if (asOfMode === 'latest') {
+      asOfDate = new Date();
+    }
+  }
+  $: usesAsOf = asOfMode !== 'latest' && asOfDate instanceof Date;
 
   function minDate(a, b) {
     if (!a) {
@@ -172,6 +197,20 @@
       });
     }
   });
+
+  function addRegion(detail) {
+    geoValues = [...geoValues, detail];
+  }
+  function removeRegion(detail) {
+    geoValues = geoValues.filter((d) => d !== detail);
+  }
+  function setRegion(detail) {
+    geoValues = detail ? [detail] : [];
+  }
+
+  function pythonDate(date) {
+    return `date(${date.getFullYear()}, ${date.getMonth() + 1}, ${date.getDate()})`;
+  }
 </script>
 
 <style>
@@ -264,7 +303,9 @@
       <div class="uk-form-controls">
         <select id="geo" bind:value={geoType} class="uk-select">
           {#each levelList as level}
-            <option value={level.id} disabled={!signalGroup || !signalGroup.levels.has(level.id)}>{level.label}</option>
+            <option value={level.id} disabled={!signalGroup || !signalGroup.levels.has(level.id)}>
+              {level.labelPlural}
+            </option>
           {/each}
         </select>
         <p class="description">
@@ -273,6 +314,64 @@
             geographic coding documentation
           </a>
           for details.
+        </p>
+      </div>
+    </div>
+    <div class="form-row">
+      <label for="region">Region</label>
+      <div>
+        <div>
+          <input type="radio" name="region" value="all" id="region-all" bind:group={geoValuesMode} /><label
+            for="region-all">All</label>
+        </div>
+        <div class="region-row" class:search-visible={geoValuesMode === 'single'}>
+          <input
+            type="radio"
+            name="region"
+            value="single"
+            id="region-single"
+            bind:group={geoValuesMode}
+            disabled={geoItems.length === 0} />
+          <label for="region-single">Specific region(s): </label>
+          <Search
+            className="search-container container-bg"
+            placeholder={'Search for a region...'}
+            items={geoItems}
+            selectedItems={geoValues}
+            labelFieldName="displayName"
+            maxItemsToShowInList="5"
+            on:add={(e) => addRegion(e.detail)}
+            on:remove={(e) => removeRegion(e.detail)}
+            on:change={(e) => setRegion(e.detail)} />
+        </div>
+      </div>
+    </div>
+    <div class="form-row">
+      <label for="as-of">As of</label>
+      <div>
+        <div>
+          <input type="radio" name="as-of" value="latest" id="as-of-latest" bind:group={asOfMode} /><label
+            for="as-of-latest">Latest</label>
+        </div>
+        <div class="region-row">
+          <input type="radio" name="as-of" value="single" id="as-of-single" bind:group={asOfMode} />
+          <label for="as-of-single">Specific date: </label>
+          <Datepicker
+            bind:selected={asOfDate}
+            formattedSelected={asOfDate ? iso(asOfDate) : 'Select date'}
+            start={asOfStart}
+            end={asOfEnd}>
+            <button
+              aria-label="selected as of date"
+              class="pg-button"
+              disabled={asOfMode === 'latest'}
+              on:>{asOfDate ? iso(asOfDate) : 'Select date'}</button>
+          </Datepicker>
+        </div>
+        <p class="description">
+          The
+          <code>as of</code>
+          date allows to fetch only data that was available on or before this date.
         </p>
       </div>
     </div>
@@ -327,10 +426,12 @@
         <input type="hidden" name="start_day" value={iso(startDate)} />
         <input type="hidden" name="end_day" value={iso(endDate)} />
         <input type="hidden" name="geo_type" value={geoType} />
+        {#if !isAllRegions}<input type="hidden" name="geo_values" value={geoIDs.join(',')} />{/if}
+        {#if usesAsOf}<input type="hidden" name="as_of" value={iso(asOfDate)} />{/if}
       </form>
       <p>Manually fetch data:</p>
       <pre>
-        {`wget --content-disposition "${CSV_SERVER}?signal=${signalValue}&start_day=${iso(startDate)}&end_day=${iso(endDate)}&geo_type=${geoType}"`}
+        {`wget --content-disposition "${CSV_SERVER}?signal=${signalValue}&start_day=${iso(startDate)}&end_day=${iso(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${iso(asOfDate)}` : ''}"`}
       </pre>
       <p class="description">
         For more details about the API, see the
@@ -347,8 +448,8 @@
 import covidcast
 
 data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal.signal : ''}",
-                        date(${startDate.getFullYear()}, ${startDate.getMonth() + 1}, ${startDate.getDate()}), date(${endDate.getFullYear()}, ${endDate.getMonth() + 1}, ${endDate.getDate()}),
-                        "${geoType}")`}
+                        ${pythonDate(startDate)}, ${pythonDate(endDate)},
+                        "${geoType}"${isAllRegions ? '' : `, ["${geoIDs.join('", "')}"]`}${usesAsOf ? `, as_of = ${pythonDate(asOfDate)}` : ''})`}
       </code></pre>
       <p class="description">
         For more details and examples, see the
@@ -367,7 +468,7 @@ data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal
 cc_data <- suppressMessages(
 covidcast_signal(data_source = "${signal ? signal.dataSource : ''}", signal = "${signal ? signal.signal : ''}",
                  start_day = "${iso(startDate)}", end_day = "${iso(endDate)}",
-                 geo_type = "${geoType}")
+                 geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`}${usesAsOf ? `, as_of = "${iso(asOfDate)}"` : ''})
 )`}
       </code></pre>
       <p class="description">

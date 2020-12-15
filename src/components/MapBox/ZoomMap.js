@@ -13,7 +13,7 @@ export default class ZoomMap {
     this.onZoom = onZoom;
     this.resetBounds = new LngLatBounds(bounds);
     this.resetBoundsOptions = {
-      padding: 20, //px
+      padding: 30, //px
       linear: false,
     };
     this.stateZoom = 1;
@@ -33,6 +33,7 @@ export default class ZoomMap {
     this.map = map;
 
     this.stateZoom = this.map.getZoom();
+    this.map.setMinZoom(this.stateZoom - 1); // limit zoom to one level above the us
     // console.log(this.stateZoom);
     this.map.on('zoom', () => {
       this._triggerZoom();
@@ -94,6 +95,7 @@ export default class ZoomMap {
     this.map.fitBounds(this.resetBounds, this.resetBoundsOptions);
     this.map.once('idle', () => {
       this.stateZoom = this.map.getZoom();
+      this.map.setMinZoom(this.stateZoom - 1); // limit zoom to one level above the us
       this._triggerZoom(true);
     });
   }

@@ -11,3 +11,10 @@
 
 // 4. Import UIkit.
 @import '~uikit/src/scss/uikit-theme.scss';
+
+// Components
+@import './components/font_awesome';
+
+// Layouts
+@import './layout/content';
+@import './layout/layouts';

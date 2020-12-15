@@ -1,0 +1,10 @@
+.inline-svg-icon {
+  display: inline-block;
+  fill: currentColor;
+  width: 1.2em;
+  padding: 0 0.5em 0 0.25em;
+}
+
+.uk-icon-button > .inline-svg-icon {
+  padding: 0;
+}

@@ -83,3 +83,32 @@ nameInfos.forEach((d) => {
 export function getInfoByName(name) {
   return infoLookup.get(String(name).toLowerCase());
 }
+
+/**
+ * computes the population of the mega county as state - defined county populations
+ * @param {NameInfo} megaCounty
+ * @param {Map<string, any>} data
+ */
+export function computeMegaCountyPopulation(megaCounty, data) {
+  if (!megaCounty || !data || megaCounty.level !== levelMegaCountyId) {
+    return null;
+  }
+  const state = getInfoByName(megaCounty.postal);
+  if (!state || state.population == null || Number.isNaN(state.population)) {
+    return null;
+  }
+  const population = Array.from(data.keys()).reduce((population, fips) => {
+    // not in the state or the mega county
+    if (!fips.startsWith(state.id) || fips === megaCounty.id) {
+      return population;
+    }
+    const county = getInfoByName(fips);
+    if (!county || county.population == null || Number.isNaN(county.population)) {
+      // invalid county, so we cannot compute the rest population, keep NaN from now on
+      return Number.NaN;
+    }
+    return population - county.population;
+  }, state.population);
+
+  return Number.isNaN(population) ? null : population;
+}

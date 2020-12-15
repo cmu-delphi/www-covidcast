@@ -91,6 +91,8 @@ export default class AMapBoxWrapper {
       touchZoomRotate: true,
       renderWorldCopies: false,
       antialias: true,
+      maxZoom: 8,
+      minZoom: 1,
     });
     this.zoom.setMap(this.map);
     this.map.touchZoomRotate.disableRotation();
@@ -365,7 +367,7 @@ export default class AMapBoxWrapper {
       });
 
       const lookup = new Map(data.map((d) => [d.geo_value.toUpperCase(), d]));
-      this.interactive.data = lookup;
+      this.interactive.setData(lookup);
 
       if (level === 'county') {
         this._updateSource(toBorderSource(levelMegaCounty.id), lookup, primaryValue);
@@ -433,27 +435,24 @@ export default class AMapBoxWrapper {
     if (!this.map || !this.interactive) {
       return;
     }
-    const oldSelection = this.interactive.select(selection);
+    this.interactive.select(selection);
+  }
 
-    // clear selection
-    if (oldSelection != null && !selection) {
-      // fly out
-      this.zoom.resetZoom();
+  /**
+   * @param {import('../../maps').NameInfo | null} info
+   */
+  focusOn(info) {
+    if (!info || !this.map) {
       return;
     }
-
-    if (!selection || this.interactive.isHovered(selection)) {
-      return;
-    }
-
     // fly to
     // should also work for mega counties
-    const source = this.map.getSource(toBorderSource(selection.level));
+    const source = this.map.getSource(toBorderSource(info.level));
     if (!source) {
       return;
     }
     // hacky
-    const feature = source._data.features.find((d) => d.id === selection.id);
+    const feature = source._data.features.find((d) => d.id === info.id);
 
     if (!feature) {
       return;
@@ -482,7 +481,6 @@ export default class AMapBoxWrapper {
     const defaultRegion = defaultRegionOnStartup[this.level];
     const defaultFeature = source._data.features.find((d) => d.properties.id === defaultRegion);
     if (defaultFeature && !this.isMissing(defaultFeature)) {
-      this.interactive.forceHover(defaultFeature);
       this.dispatch('select', { feature: defaultFeature });
       return;
     }
@@ -493,7 +491,6 @@ export default class AMapBoxWrapper {
     }
     const index = Math.floor(Math.random() * (viableFeatures.length - 1));
     const randomFeature = viableFeatures[index];
-    this.interactive.forceHover(randomFeature);
     this.dispatch('select', { feature: randomFeature });
   }
 
