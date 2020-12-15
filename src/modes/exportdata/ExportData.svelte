@@ -272,7 +272,7 @@
         {#if signal}
           <span class="uk-form-label">
             {signal.name}
-            <InfoDialogButton sensor={signal.sensor} />
+            <InfoDialogButton sensor={signal.entry} />
           </span>
           <div class="uk-form-controls-text">{signal.description}</div>
           {#if signal.entry}
