@@ -1,0 +1,30 @@
+// Font
+$global-font-family: 'Open Sans', Roboto, Arial, sans-serif;
+
+$global-color: #666;
+$menu-active-color: #f03f3f;
+$menu-active-border-width: 2px;
+
+$base-em-color: $global-color;
+
+// Breakpoints:
+$breakpoint-small: 715px;
+$breakpoint-medium: 1000px;
+
+// Navbar
+$navbar-nav-item-padding-horizontal: 0px;
+$navbar-nav-item-height: 35px;
+$navbar-nav-item-color: #505565;
+$navbar-background: none;
+$navbar-dropdown-padding: 10px;
+$navbar-dropdown-nav-item-color: #232735;
+$nav-default-item-active-color: red;
+
+// Breadcrumb
+$breadcrumb-divider-margin-horizontal: 3px;
+
+// Tab
+$tab-item-active-border: $menu-active-color;
+$tab-item-border-width: $menu-active-border-width;
+
+$grid-gap: (32/1440) * 100%;

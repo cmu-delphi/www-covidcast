@@ -1,0 +1,13 @@
+// Site-wide
+.uk-container {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.uk-text-bold-600 {
+  font-weight: 600;
+}
+
+.uk-container [aria-hidden='true'] {
+  display: none;
+}

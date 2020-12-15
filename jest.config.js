@@ -10,6 +10,7 @@ module.exports = {
     // special module loading
     '!file-loader.*': 'identity-obj-proxy',
     '\\.css': 'identity-obj-proxy',
+    '!raw-loader.*': 'identity-obj-proxy',
   },
   testPathIgnorePatterns: ['/node_modules/', '<rootDir>/cypress'],
 };
