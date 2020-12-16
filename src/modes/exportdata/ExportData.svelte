@@ -4,13 +4,13 @@
   import Datepicker from '../../components/Calendar/Datepicker.svelte';
   import { getLevelInfo, primaryValue, sensorList, sensorMap } from '../../stores/constants';
   import { parseAPITime } from '../../data';
-  import { currentInfoSensor, currentSensorEntry, smallMultipleTimeSpan } from '../../stores';
+  import { currentSensorEntry, smallMultipleTimeSpan } from '../../stores';
   import { timeMonth } from 'd3-time';
   import { onMount } from 'svelte';
   import { trackEvent } from '../../stores/ga';
-  import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
   import Search from '../../components/Search.svelte';
   import { nameInfos } from '../../maps';
+  import InfoDialogButton from '../../components/InfoDialogButton.svelte';
 
   const CSV_SERVER = 'https://delphi.cmu.edu/csv';
   const iso = timeFormat('%Y-%m-%d');
@@ -18,6 +18,7 @@
   const CASES_DEATH_SOURCE = 'cases-deaths';
 
   const sourceNameLookup = {
+    chng: 'Change Healthcare',
     'doctor-visits': 'Doctor Visits',
     'fb-survey': 'Delphi Survey Results',
     ght: 'Google Search Trends',
@@ -219,180 +220,97 @@
     padding: 1em;
   }
 
-  p {
-    line-height: initial;
-    margin: 0;
-    margin-bottom: 0.5em;
-  }
-
-  .block {
-    display: inline-block;
-    display: flex;
-    flex-direction: column;
-    padding: 0.2em;
-    width: 20em;
-  }
-
-  .group label {
-    font-weight: bold;
-  }
-
-  .group {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
-  button {
-    width: auto;
-  }
-
-  section {
-    padding: 1em;
-  }
-
-  pre {
-    padding: 0.2em;
-    background: #efefef;
-    overflow: auto;
-    white-space: pre;
-  }
-
   .description {
     padding: 0;
     font-size: 80%;
   }
 
-  .buttons {
-    display: inline-flex;
-    align-items: center;
-    margin-top: 1em;
-  }
-
-  .buttons > button {
-    min-width: 5em;
-  }
-
-  .info {
-    width: 1.5em;
-    height: 1.5em;
-    display: inline-block;
-  }
-
-  .form-row {
-    display: flex;
-    margin-bottom: 0.5em;
-  }
-
-  .form-row > :first-child {
-    width: 10em;
-    flex-shrink: 0;
-  }
-
-  .region-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-
-  .region-row label {
-    margin-right: 0.5em;
-  }
-
   .region-row :global(.search-container) {
-    padding: 1px;
-    width: 25em;
-    visibility: hidden;
+    display: inline-flex;
   }
 
-  .search-visible :global(.search-container) {
-    visibility: unset;
-  }
-
-  @media only screen and (max-width: 710px) {
-    .block {
-      width: 100%;
-    }
+  .code-block {
+    max-width: calc(100vw - 80px);
   }
 </style>
 
-<div class="root" class:loading>
+<div class="root uk-container" class:loading>
   <p>
     All signals displayed on the COVIDcast map are freely available for download here. You can also access the latest
     daily through the
     <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a>
     which also includes numerous other signals.
   </p>
-  <section>
-    <h5>1. Select Signal</h5>
-    <div class="group">
-      <div class="block">
-        <label for="ds">Data Sources</label>
-        <select id="ds" bind:value={signalGroupValue} size="8">
-          {#each signalGroups as group}
-            <option value={group.id}>{group.name}</option>
-          {/each}
-        </select>
-      </div>
-      <div class="block">
-        <label for="s">Signals</label>
-        <select id="s" bind:value={signalValue} required size="8">
-          {#if signalGroup}
-            {#each signalGroup.signals as signal}
-              <option value={signal.id}>{signal.name}</option>
+  <section class="uk-margin-top">
+    <h4>1. Select Signal</h4>
+    <div data-uk-grid class="uk-form-stacked">
+      <div class="uk-width-1-3@m uk-width-expand@s">
+        <label for="ds" class="uk-form-label">Data Sources</label>
+        <div class="uk-form-controls">
+          <select id="ds" bind:value={signalGroupValue} size="8" class="uk-select">
+            {#each signalGroups as group}
+              <option value={group.id}>{group.name}</option>
             {/each}
-          {:else}
-            <option value="">Select a Data Source first</option>
-          {/if}
-        </select>
+          </select>
+        </div>
       </div>
-      <div class="block">
-        {#if signal}
-          <h6>
-            {signal.name}
-            {#if signal.entry}
-              <button
-                title="Show sensor description"
-                class="pg-button pg-button-circle info"
-                on:click={() => {
-                  currentInfoSensor.set(signal.entry);
-                }}><IoMdHelp /></button>
+      <div class="uk-width-1-3@m uk-width-expand@s">
+        <label for="s" class="uk-form-label">Signals</label>
+        <div class="uk-form-controls">
+          <select id="s" bind:value={signalValue} required size="8" class="uk-select">
+            {#if signalGroup}
+              {#each signalGroup.signals as signal}
+                <option value={signal.id}>{signal.name}</option>
+              {/each}
+            {:else}
+              <option value="">Select a Data Source first</option>
             {/if}
-          </h6>
-          <p>{signal.description}</p>
+          </select>
+        </div>
+      </div>
+      <div class="uk-width-1-3@m uk-width-expand@s">
+        {#if signal}
+          <span class="uk-form-label">
+            {signal.name}
+            <InfoDialogButton sensor={signal.entry} />
+          </span>
+          <div class="uk-form-controls-text">{signal.description}</div>
           {#if signal.entry}
-            <p>
+            <div class="uk-form-controls-text">
               See also:
               {@html signal.entry.links.join(', ')}
-            </p>
+            </div>
           {/if}
         {/if}
       </div>
     </div>
   </section>
-  <section>
-    <h5>2. Specify Parameters</h5>
-    <div class="form-row">
-      <span>Date Range</span>
-      <Datepicker
-        bind:selected={startDate}
-        start={signalGroup ? signalGroup.minTime : minDate(new Date(), startDate)}
-        end={signalGroup ? minDate(endDate, signalGroup.maxTime) : endDate}
-        formattedSelected={iso(startDate)}>
-        <button aria-label="selected start date" class="pg-button" on:>{iso(startDate)}</button>
-      </Datepicker>
-      &nbsp;-&nbsp;
-      <Datepicker
-        bind:selected={endDate}
-        start={signalGroup ? maxDate(startDate, signalGroup.minTime) : startDate}
-        end={signalGroup ? signalGroup.maxTime : maxDate(new Date(), endDate)}
-        formattedSelected={iso(endDate)}>
-        <button aria-label="selected end date" class="pg-button" on:>{iso(endDate)}</button>
-      </Datepicker>
+  <section class="uk-form-horizontal uk-margin-top">
+    <h4>2. Specify Parameters</h4>
+    <div>
+      <span class="uk-form-label">Date Range</span>
+      <div class="uk-form-controls">
+        <Datepicker
+          bind:selected={startDate}
+          start={signalGroup ? signalGroup.minTime : minDate(new Date(), startDate)}
+          end={signalGroup ? minDate(endDate, signalGroup.maxTime) : endDate}
+          formattedSelected={iso(startDate)}>
+          <button aria-label="selected start date" class="uk-input" on:>{iso(startDate)}</button>
+        </Datepicker>
+        -
+        <Datepicker
+          bind:selected={endDate}
+          start={signalGroup ? maxDate(startDate, signalGroup.minTime) : startDate}
+          end={signalGroup ? signalGroup.maxTime : maxDate(new Date(), endDate)}
+          formattedSelected={iso(endDate)}>
+          <button aria-label="selected end date" class="uk-input" on:>{iso(endDate)}</button>
+        </Datepicker>
+      </div>
     </div>
-    <div class="form-row">
-      <label for="geo">Geographic Level</label>
-      <div>
-        <select id="geo" bind:value={geoType}>
+    <div>
+      <label for="geo" class="uk-form-label">Geographic Level</label>
+      <div class="uk-form-controls">
+        <select id="geo" bind:value={geoType} class="uk-select">
           {#each levelList as level}
             <option value={level.id} disabled={!signalGroup || !signalGroup.levels.has(level.id)}>
               {level.labelPlural}
@@ -408,9 +326,9 @@
         </p>
       </div>
     </div>
-    <div class="form-row">
-      <label for="region">Region</label>
-      <div>
+    <div>
+      <label for="region" class="uk-form-label">Region</label>
+      <div class="uk-form-controls">
         <div>
           <input type="radio" name="region" value="all" id="region-all" bind:group={geoValuesMode} /><label
             for="region-all">All</label>
@@ -425,7 +343,7 @@
             disabled={geoItems.length === 0} />
           <label for="region-single">Specific region(s): </label>
           <Search
-            className="search-container container-bg"
+            className="search-container"
             placeholder={'Search for a region...'}
             items={geoItems}
             selectedItems={geoValues}
@@ -437,9 +355,9 @@
         </div>
       </div>
     </div>
-    <div class="form-row">
-      <label for="as-of">As of</label>
-      <div>
+    <div class="uk-margin-top">
+      <label for="as-of" class="uk-form-label">As of</label>
+      <div class="uk-form-controls">
         <div>
           <input type="radio" name="as-of" value="latest" id="as-of-latest" bind:group={asOfMode} /><label
             for="as-of-latest">Latest</label>
@@ -454,7 +372,7 @@
             end={asOfEnd}>
             <button
               aria-label="selected as of date"
-              class="pg-button"
+              class="uk-input"
               disabled={asOfMode === 'latest'}
               on:>{asOfDate ? iso(asOfDate) : 'Select date'}</button>
           </Datepicker>
@@ -467,30 +385,30 @@
       </div>
     </div>
   </section>
-  <section>
-    <h5>3. Get Data</h5>
+  <section class="uk-margin-top">
+    <h4>3. Get Data</h4>
     <p>
       {@html signal && signal.entry ? signal.entry.credits : ''}
       Please acknowledge us as a source:
       <cite> Data from Delphi COVIDcast, covidcast.cmu.edu. </cite>
     </p>
-    <div class="pg-button-group buttons">
+    <div class="uk-button-group">
       <button
-        class="pg-button button"
+        class="uk-button uk-button-default"
         data-testid="csv"
         on:click={() => {
           currentMode = 'csv';
         }}
-        class:selected={currentMode === 'csv'}
+        class:uk-active={currentMode === 'csv'}
         disabled={!geoType || !signalValue}
         title="Get in CSV format">
         CSV
       </button>
       <button
         aria-pressed={String(currentMode === 'python')}
+        class="uk-button uk-button-default"
         data-testid="python"
-        class="pg-button button"
-        class:selected={currentMode === 'python'}
+        class:uk-active={currentMode === 'python'}
         on:click={() => {
           currentMode = 'python';
         }}
@@ -499,9 +417,9 @@
       </button>
       <button
         aria-pressed={String(currentMode === 'r')}
-        class="pg-button button"
+        class="uk-button uk-button-default"
         data-testid="r"
-        class:selected={currentMode === 'r'}
+        class:uk-active={currentMode === 'r'}
         on:click={() => {
           currentMode = 'r';
         }}
@@ -512,7 +430,7 @@
     {#if currentMode === 'csv'}
       <p>Direct link:</p>
       <form bind:this={form} id="form" method="GET" action={CSV_SERVER} download>
-        <button type="submit" class="pg-button pg-text-button">Download CSV File</button>
+        <button type="submit" class="uk-button uk-button-default">Download CSV File</button>
         <input type="hidden" name="signal" value={signalValue} />
         <input type="hidden" name="start_day" value={iso(startDate)} />
         <input type="hidden" name="end_day" value={iso(endDate)} />
@@ -521,9 +439,10 @@
         {#if usesAsOf}<input type="hidden" name="as_of" value={iso(asOfDate)} />{/if}
       </form>
       <p>Manually fetch data:</p>
-      <pre>
+      <pre
+        class="code-block"><code>
         {`wget --content-disposition "${CSV_SERVER}?signal=${signalValue}&start_day=${iso(startDate)}&end_day=${iso(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${iso(asOfDate)}` : ''}"`}
-      </pre>
+      </code></pre>
       <p class="description">
         For more details about the API, see the
         <a href="https://cmu-delphi.github.io/delphi-epidata/">API documentation</a>. A description of the returned data
@@ -532,16 +451,16 @@
       </p>
     {:else if currentMode === 'python'}
       <p>Install <code>covidcast</code> via pip:</p>
-      <pre>pip install covidcast</pre>
+      <pre><code>pip install covidcast</code></pre>
       <p>Fetch data:</p>
-      <pre>
+      <pre class="code-block"><code>
         {`from datetime import date
 import covidcast
 
 data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal.signal : ''}",
                         ${pythonDate(startDate)}, ${pythonDate(endDate)},
                         "${geoType}"${isAllRegions ? '' : `, ["${geoIDs.join('", "')}"]`}${usesAsOf ? `, as_of = ${pythonDate(asOfDate)}` : ''})`}
-      </pre>
+      </code></pre>
       <p class="description">
         For more details and examples, see the
         <a href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/">package documentation</a>. A description of
@@ -551,9 +470,9 @@ data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal
       </p>
     {:else if currentMode === 'r'}
       <p>Install <code>covidcast</code> using <a href="https://devtools.r-lib.org/">devtools</a> :</p>
-      <pre>devtools::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/covidcast")</pre>
+      <pre><code>devtools::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/covidcast")</code></pre>
       <p>Fetch data:</p>
-      <pre>
+      <pre class="code-block"><code>
         {`library(covidcast)
 
 cc_data <- suppressMessages(
@@ -561,7 +480,7 @@ covidcast_signal(data_source = "${signal ? signal.dataSource : ''}", signal = "$
                  start_day = "${iso(startDate)}", end_day = "${iso(endDate)}",
                  geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`}${usesAsOf ? `, as_of = "${iso(asOfDate)}"` : ''})
 )`}
-      </pre>
+      </code></pre>
       <p class="description">
         For more details and examples, see the
         <a href="https://cmu-delphi.github.io/covidcast/covidcastR/">package documentation</a>. A description of the

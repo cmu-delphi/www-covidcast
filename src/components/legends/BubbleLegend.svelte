@@ -12,7 +12,6 @@
   import { transparent } from '../../util';
   import { generateLabels } from '../MapBox/colors';
 
-  export let loading = false;
   export let zoom = 1.0;
 
   $: r = generateLabels(
@@ -66,7 +65,7 @@
   }
 </style>
 
-<ul class:loading-bg={loading} data-testid="bubble-legend">
+<ul data-testid="bubble-legend">
   <li>
     <div class="bubble-wrapper">
       <div class="na" style="background:repeating-linear-gradient(-45deg, {MISSING_COLOR}, white 30%)" />
