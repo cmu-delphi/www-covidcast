@@ -1,8 +1,9 @@
 <script>
   import { currentRegionInfo, smallMultipleTimeSpan, currentDateObject } from '../../stores';
-  import { questionCategories, overviewText } from './questions';
+  import { questionCategories } from './questions';
   import SurveyQuestion from './SurveyQuestion.svelte';
   import SurveyParameters from './SurveyParameters.svelte';
+  import Overview from './Overview.svelte';
   // use local variables with manual setting for better value comparison updates
   let startDay = $smallMultipleTimeSpan[0];
   let endDay = $smallMultipleTimeSpan[1];
@@ -41,10 +42,7 @@
 <div class="root">
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <h4>Overview</h4>
-      <p>
-        {@html overviewText}
-      </p>
+      <Overview />
       <h2>Results</h2>
     </div>
     <SurveyParameters />

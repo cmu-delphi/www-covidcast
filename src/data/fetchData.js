@@ -37,8 +37,8 @@ function computeTransferFields(mixinValues = {}, advanced = false) {
  * @typedef {EpiDataRow & EpiDataCasesOrDeathValues} EpiDataCasesOrDeathRow
  */
 
-const START_TIME_RANGE = parseAPITime('20100101');
-const END_TIME_RANGE = parseAPITime('20500101');
+export const START_TIME_RANGE = parseAPITime('20100101');
+export const END_TIME_RANGE = parseAPITime('20500101');
 
 function parseData(d, mixinData = {}) {
   if (d.result < 0 || d.message.includes('no results')) {
@@ -180,6 +180,30 @@ function fetchData(sensorEntry, level, region, date, mixinValues = {}, { advance
       transferFields,
     ).then((rows) => parseData(rows, mixinValues));
   }
+}
+
+export async function fetchSampleSizesNationSummary(sensorEntry) {
+  /**
+   * @type {EpiDataRow[]}
+   */
+  const data = await callAPIEndPoint(
+    sensorEntry.api,
+    sensorEntry.id,
+    sensorEntry.signal,
+    'nation',
+    `${formatAPITime(START_TIME_RANGE)}-${formatAPITime(END_TIME_RANGE)}`,
+    'us',
+    ['time_value', 'sample_size'],
+  ).then((r) => parseData(r, {}));
+
+  const sum = data.reduce((acc, v) => (v.sample_size != null ? acc + v.sample_size : acc), 0);
+  return {
+    // parse data produces sorted by date
+    minDate: data.length > 0 ? data[0].date_value : null,
+    maxDate: data.length > 0 ? data[data.length - 1].date_value : null,
+    totalSampleSize: sum,
+    averageSampleSize: sum / data.length,
+  };
 }
 
 /**
