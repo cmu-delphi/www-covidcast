@@ -47,7 +47,7 @@
       Participants daily
       {#await data then d}
         <UiKitHint
-          title="Between {formatDateShort(d.minDate)} and {formatDateShort(d.maxDate)} around {formatNumber(d.averageSampleSize)} people participated on average daily in the survey" />
+          title="Between {formatDateShort(d.minDate)} and {formatDateShort(d.maxDate)} around {formatNumber(d.averageSampleSize)} people participated on average daily in this survey." />
       {/await}
     </div>
   </div>
@@ -56,10 +56,10 @@
       {#await data}N/A{:then d}{formatNumber(d.totalSampleSize)}{/await}
     </div>
     <div>
-      Participants total
+      Survey responses total
       {#await data then d}
         <UiKitHint
-          title="Between {formatDateShort(d.minDate)} and {formatDateShort(d.maxDate)} around {formatNumber(d.totalSampleSize)} people participated in the survey" />
+          title="Between {formatDateShort(d.minDate)} and {formatDateShort(d.maxDate)} around {formatNumber(d.totalSampleSize)} responses were collected in this survey." />
       {/await}
     </div>
   </div>
