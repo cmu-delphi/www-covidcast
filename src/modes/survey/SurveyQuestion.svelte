@@ -13,6 +13,7 @@
   import { formatTrend, formatIssueDate, formatSampleSize, formatStdErr } from './format';
   import SurveyTrend from './SurveyTrend.svelte';
   import SurveyValue from './SurveyValue.svelte';
+  import SurveyTooltip from './SurveyTooltip.svelte';
 
   /**
    * question object
@@ -162,7 +163,12 @@
       {question.name}
       <UIKitHint title={question.signalTooltip} />
     </h4>
-    <Vega {spec} {data} signals={{ currentDate: date, maxDate, refDate }} />
+    <Vega
+      {spec}
+      {data}
+      signals={{ currentDate: date, maxDate, refDate }}
+      tooltip={SurveyTooltip}
+      tooltipProps={{ question }} />
     <div class="uk-text-center uk-text-italic">
       {#await summary then s}
         {s.row ? `based on ${formatSampleSize(s.row)} samples with a standard error of ${formatStdErr(s.row.stderr)}, published ${formatIssueDate(s.row)}` : ''}

@@ -64,9 +64,6 @@ export function createTimeSeriesSpec(params) {
           type: 'line',
           point: false,
           color: 'grey',
-          tooltip: {
-            content: 'encoding',
-          },
         },
         encoding: {
           x: {
@@ -95,9 +92,68 @@ export function createTimeSeriesSpec(params) {
             },
             axis: {
               format: '.1d',
-              title: null,
+              title: 'of 1,000 people',
+              titleFontWeight: 'normal',
               grid: false,
             },
+          },
+        },
+      },
+      {
+        selection: {
+          highlight: {
+            type: 'single',
+            empty: 'none',
+            on: 'mouseover',
+            nearest: true,
+            encodings: ['x'],
+            clear: 'mouseout',
+          },
+        },
+        mark: {
+          type: 'point',
+          radius: 1,
+          stroke: null,
+          fill: 'grey',
+          tooltip: true,
+        },
+        encoding: {
+          opacity: {
+            condition: {
+              selection: 'highlight',
+              value: 1,
+            },
+            value: 0,
+          },
+          x: {
+            field: 'date_value',
+            type: 'temporal',
+          },
+          y: {
+            field: 'kValue',
+            type: 'quantitative',
+          },
+        },
+      },
+      {
+        mark: {
+          type: 'rule',
+        },
+        encoding: {
+          opacity: {
+            condition: {
+              selection: 'highlight',
+              value: 1,
+            },
+            value: 0,
+          },
+          x: {
+            field: 'date_value',
+            type: 'temporal',
+          },
+          y: {
+            field: 'kValue',
+            type: 'quantitative',
           },
         },
       },
