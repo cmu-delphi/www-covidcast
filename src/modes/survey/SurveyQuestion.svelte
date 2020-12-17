@@ -157,7 +157,9 @@
         </span>
         Survey Question
       </div>
-      <p class="question-question">{question.question}</p>
+      <p class="question-question">
+        {@html question.question}
+      </p>
     </div>
     <h4>
       {question.name}
