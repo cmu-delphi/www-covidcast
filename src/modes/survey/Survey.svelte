@@ -37,6 +37,14 @@
   .content-grid {
     grid-row-gap: 0;
   }
+
+  .toc {
+    padding: 24px 6px 24px 24px;
+  }
+
+  .toc .uk-nav-sub {
+    padding-left: 5px;
+  }
 </style>
 
 <div class="root">
