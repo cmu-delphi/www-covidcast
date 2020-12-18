@@ -64,6 +64,4 @@
     </div>
   </div>
 </div>
-<p>
-  {@html overviewText}
-</p>
+{@html overviewText}

@@ -80,7 +80,9 @@ async function generateSurveyDescriptions() {
     const r = {};
     Object.entries(doc).map(([key, value]) => {
       const formattedKey = key[0].toLowerCase() + key.slice(1);
-      if (formattedKey === 'description' || formattedKey === 'question' || formattedKey === 'overview') {
+      if (formattedKey === 'overview') {
+        value = marked.parse(value.trim());
+      } else if (formattedKey === 'description' || formattedKey === 'question') {
         value = marked.parseInline(value.trim());
       }
       r[formattedKey] = value;
