@@ -10,7 +10,7 @@
   import { determineTrend, findDateRow, findMaxRow, findMinRow } from './trend';
   import { unitLong } from './questions';
   import { formatDateShortAbbr } from '../../formats';
-  import { formatTrend, formatIssueDate, formatSampleSize, formatStdErr } from './format';
+  import { formatTrend, formatSampleSize, formatStdErr } from './format';
   import SurveyTrend from './SurveyTrend.svelte';
   import SurveyValue from './SurveyValue.svelte';
   import SurveyTooltip from './SurveyTooltip.svelte';
@@ -61,6 +61,14 @@
   }
 
   $: summary = deriveData(data, date);
+
+  function showShareLink() {
+    const fullUrl = new URL(location.href);
+    fullUrl.hash = `#${question.anchor}`;
+    window.UIkit.modal.alert(`
+    <p>Use the following link to jump directly to this question:</p>
+    <a href="${fullUrl}">${fullUrl}</a>`);
+  }
 </script>
 
 <style>
@@ -134,7 +142,11 @@
       <span class="inline-svg-icon">
         {@html fileIcon}
       </span>Learn More</a>
-    <a href="#{question.anchor}" id={question.anchor} class="uk-link-muted uk-text-small">
+    <a
+      href="#{question.anchor}"
+      id={question.anchor}
+      class="uk-link-muted uk-text-small"
+      on:click|preventDefault={showShareLink}>
       <span class="inline-svg-icon">
         {@html linkIcon}
       </span>
