@@ -16,6 +16,10 @@
     list-style: decimal;
   }
 
+  li li {
+    list-style: lower-latin;
+  }
+
   .uk-nav-default > li.uk-active > a {
     color: unset;
     font-weight: 600;
