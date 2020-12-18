@@ -43,14 +43,14 @@
   async function deriveData(dataPromise, date) {
     loading = true;
     noData = false;
-    const data = await dataPromise;
+    const data = (await dataPromise) || [];
+    loading = false;
     noData = data.length === 0;
     const dateRow = findDateRow(date, data);
     const trend = determineTrend(date, data, dateRow);
     const max = question.inverted ? findMinRow(data) : findMaxRow(data);
     maxDate = max ? max.date_value : null;
     refDate = trend.refDate;
-    loading = false;
 
     return {
       data,
@@ -173,7 +173,7 @@
       tooltipProps={{ question }} />
     <div class="uk-text-center uk-text-italic">
       {#await summary then s}
-        {s.row ? `based on ${formatSampleSize(s.row)} samples with a standard error of ${formatStdErr(s.row.stderr)}, published ${formatIssueDate(s.row)}` : ''}
+        {s.row ? `based on ${formatSampleSize(s.row)} survey responses with a standard error of ${formatStdErr(s.row.stderr)}, as of ${formatIssueDate(s.row)}` : ''}
       {/await}
     </div>
     <div class="question-summary">
