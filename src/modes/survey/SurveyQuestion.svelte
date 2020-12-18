@@ -3,7 +3,7 @@
   import UIKitHint from '../../components/UIKitHint.svelte';
   import fileIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/file.svg';
   import linkIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/link.svg';
-  import userEditIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/user-edit.svg';
+  // import userEditIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/user-edit.svg';
   import calendarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/regular/calendar.svg';
   import warningIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
   import { createTimeSeriesSpec, loadTimeSeriesData } from './timeSeries';
@@ -163,12 +163,6 @@
       </div>
     {/if}
     <div>
-      <div class="question-question-name">
-        <span class="inline-svg-icon">
-          {@html userEditIcon}
-        </span>
-        Survey Question
-      </div>
       <p class="question-question">
         {@html question.question}
       </p>
