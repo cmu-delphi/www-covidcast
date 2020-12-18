@@ -14,6 +14,7 @@
   import SurveyTrend from './SurveyTrend.svelte';
   import SurveyValue from './SurveyValue.svelte';
   import SurveyTooltip from './SurveyTooltip.svelte';
+  import ShapeIcon from '../../components/ShapeIcon.svelte';
 
   /**
    * question object
@@ -93,10 +94,6 @@
   .question-body > :global(.vega-embed) {
     display: block;
     height: 7em;
-  }
-  .question-question-name {
-    font-size: 1.25rem;
-    font-style: italic;
   }
   .question-question {
     font-style: italic;
@@ -210,7 +207,10 @@
             <SurveyValue value={s.row ? s.row.value : null} />
           {/await}
         </div>
-        <div class="uk-text-bold">Current count</div>
+        <div class="uk-text-bold">
+          Current count
+          <ShapeIcon shape="circle" color="#c00" />
+        </div>
         <div class="question-unit">{unitLong}</div>
         <div class="block-date">
           <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(date)}
@@ -224,7 +224,10 @@
             <SurveyValue value={s.max ? s.max.value : null} />
           {/await}
         </div>
-        <div class="uk-text-bold">{question.inverted ? 'Lowest count' : 'Highest count'}</div>
+        <div class="uk-text-bold">
+          {question.inverted ? 'Lowest count' : 'Highest count'}
+          <ShapeIcon shape="diamond" color="gray" />
+        </div>
         <div class="question-unit">{unitLong}</div>
         <div class="block-date">
           <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(maxDate)}

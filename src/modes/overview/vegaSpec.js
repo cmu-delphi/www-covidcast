@@ -1,6 +1,5 @@
 import {
   colorEncoding,
-  CURRENT_DATE_HIGHLIGHT,
   stdErrLayer,
   stdErrTransform,
 } from '../../components/DetailView/vegaSpec';
@@ -8,6 +7,7 @@ import { addMissing, fetchTimeSlice, formatAPITime } from '../../data';
 import { levelMegaCounty } from '../../stores/constants';
 import { highlightTimeValue } from '../../stores';
 import debounce from 'lodash-es/debounce';
+import { CURRENT_DATE_HIGHLIGHT } from '../../components/vegaSpecUtils';
 
 function fetchMulti(sensor, selections, startDay, endDay) {
   return Promise.all(

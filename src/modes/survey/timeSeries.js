@@ -1,4 +1,9 @@
-import { createSignalDateHighlight, CURRENT_DATE_HIGHLIGHT } from '../../components/DetailView/vegaSpec';
+import {
+  createSignalDateHighlight,
+  createSignalPointHighlight,
+  CURRENT_DATE_HIGHLIGHT,
+  CURRENT_DATE_ICON_HIGHLIGHT,
+} from '../../components/vegaSpecUtils';
 import { addMissing, fetchTimeSlice } from '../../data';
 import { factor } from './questions';
 
@@ -46,7 +51,7 @@ export function createTimeSeriesSpec(params) {
   const spec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
     data: { name: 'values' },
-    padding: { left: 50, top: 6, bottom: 20, right: 2 },
+    padding: { left: 50, top: 15, bottom: 20, right: 2 },
     autosize: {
       type: 'none',
       contains: 'padding',
@@ -157,9 +162,48 @@ export function createTimeSeriesSpec(params) {
           },
         },
       },
+      {
+        data: {
+          values: [{ date_value: null, date_value2: null }],
+        },
+        transform: [
+          {
+            calculate: `toDate(refDate)`,
+            as: 'date_value',
+          },
+          {
+            calculate: `toDate(currentDate)`,
+            as: 'date_value2',
+          },
+        ],
+        mark: {
+          type: 'rect',
+          fill: 'gray',
+          opacity: 0.05,
+          tooltip: false,
+        },
+        encoding: {
+          y: {
+            value: 0,
+          },
+          y2: {
+            value: 'height',
+          },
+          x: {
+            field: 'date_value',
+            type: 'temporal',
+          },
+          x2: {
+            field: 'date_value2',
+          },
+        },
+      },
       createSignalDateHighlight('maxDate', 'gray'),
+      createSignalPointHighlight('maxDate', 'diamond', 'gray'),
       createSignalDateHighlight('refDate', 'gray'),
+      // createSignalPointHighlight('refDate', 'triangle-right', 'gray'),
       CURRENT_DATE_HIGHLIGHT,
+      CURRENT_DATE_ICON_HIGHLIGHT,
     ],
     config: {
       customFormatTypes: true,
