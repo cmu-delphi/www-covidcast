@@ -1,8 +1,4 @@
-import {
-  colorEncoding,
-  stdErrLayer,
-  stdErrTransform,
-} from '../../components/DetailView/vegaSpec';
+import { colorEncoding, stdErrLayer, stdErrTransform } from '../../components/DetailView/vegaSpec';
 import { addMissing, fetchTimeSlice, formatAPITime } from '../../data';
 import { levelMegaCounty } from '../../stores/constants';
 import { highlightTimeValue } from '../../stores';
