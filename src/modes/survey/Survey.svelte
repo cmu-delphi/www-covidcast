@@ -4,7 +4,7 @@
   import SurveyQuestion from './SurveyQuestion.svelte';
   import SurveyParameters from './SurveyParameters.svelte';
   import Overview from './Overview.svelte';
-import { nationInfo } from '../../maps';
+  import { nationInfo } from '../../maps';
   // use local variables with manual setting for better value comparison updates
   let startDay = $smallMultipleTimeSpan[0];
   let endDay = $smallMultipleTimeSpan[1];
