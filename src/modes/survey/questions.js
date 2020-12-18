@@ -5,6 +5,7 @@ export const overviewText = descriptions.overview;
 export const trendThreshold = descriptions.trendThreshold;
 export const trendThresholdQuickly = descriptions.trendThresholdQuickly;
 export const referenceRawNationSignal = descriptions.referenceRawNationSignal;
+export const visibleLevels = descriptions.levels;
 
 export const factor = 10;
 export const unitLong = 'People per every 1,000 people';

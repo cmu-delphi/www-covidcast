@@ -3,9 +3,10 @@
   import { formatAPITime, parseAPITime } from '../../data';
   import { nameInfos } from '../../maps';
   import { currentDate, currentRegionInfo, selectByInfo } from '../../stores';
-  import { refSensor } from './questions';
+  import { refSensor, visibleLevels } from './questions';
   import SensorDatePicker2 from '../../components/SensorDatePicker2.svelte';
 
+  const filteredInfos = nameInfos.filter((d) => visibleLevels.includes(d.level));
   $: selectedDate = parseAPITime($currentDate);
   $: if (selectedDate !== undefined) {
     currentDate.set(formatAPITime(selectedDate));
@@ -42,7 +43,7 @@
   <Search
     className="survey-search"
     placeholder="Search Region"
-    items={nameInfos}
+    items={filteredInfos}
     selectedItem={$currentRegionInfo}
     labelFieldName="displayName"
     maxItemsToShowInList="5"
