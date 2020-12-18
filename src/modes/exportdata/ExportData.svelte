@@ -11,6 +11,7 @@
   import { nameInfos } from '../../maps';
   import { formatDateISO } from '../../formats';
   import InfoDialogButton from '../../components/InfoDialogButton.svelte';
+  import { questionCategories, refSensor } from '../../modes/survey/questions';
 
   const CSV_SERVER = 'https://delphi.cmu.edu/csv';
 
@@ -128,6 +129,21 @@
       add(true, false);
       add(true, true);
     });
+  // add the survey questions one
+  questionCategories.forEach((cat) => {
+    cat.questions.forEach((question) => {
+      const key = `${question.dataSource}-${question.signal}`;
+      if (lookupMap.has(key)) {
+        return;
+      }
+      lookupMap.set(key, {
+        name: question.name,
+        tooltipText: question.signalTooltip,
+        wrappee: refSensor,
+        fake: true,
+      });
+    });
+  });
 
   callMetaAPI(null, ['min_time', 'max_time', 'signal', 'geo_type', 'data_source'], {
     time_types: 'day',
@@ -168,7 +184,7 @@
           id,
           signal: entry.signal,
           dataSource: entry.data_source,
-          entry: sensorEntry,
+          entry: known.fake ? null : sensorEntry,
           name: known ? known.name : entry.signal,
           description: known ? known.tooltipText : 'no description found',
         });

@@ -208,8 +208,8 @@
           {/await}
         </div>
         <div class="uk-text-bold">
-          Current count
           <ShapeIcon shape="circle" color="#c00" />
+          Current count
         </div>
         <div class="question-unit">{unitLong}</div>
         <div class="block-date">
@@ -225,8 +225,8 @@
           {/await}
         </div>
         <div class="uk-text-bold">
-          {question.inverted ? 'Lowest count' : 'Highest count'}
           <ShapeIcon shape="diamond" color="gray" />
+          {question.inverted ? 'Lowest count' : 'Highest count'}
         </div>
         <div class="question-unit">{unitLong}</div>
         <div class="block-date">
