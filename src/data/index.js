@@ -1,12 +1,5 @@
 import { times, currentDate, stats, currentSensor, currentLevel, MAGIC_START_DATE } from '../stores';
-import {
-  sensorList,
-  sensorMap,
-  levels,
-  swpaLevels,
-  yesterday,
-  regularSignalMetaDataGeoTypeCandidates,
-} from '../stores/constants';
+import { sensorList, sensorMap, levels, yesterday, regularSignalMetaDataGeoTypeCandidates } from '../stores/constants';
 import { get } from 'svelte/store';
 import { callMetaAPI } from './api';
 
@@ -200,7 +193,7 @@ export function loadMetaData(sensors) {
       ['min_time', 'max_time', 'max_value', 'mean_value', 'stdev_value', 'signal', 'geo_type', 'data_source'],
       {
         time_types: 'day',
-        geo_types: [...new Set([...levels, ...swpaLevels])],
+        geo_types: [...new Set(levels)],
       },
     ),
     ...custom,

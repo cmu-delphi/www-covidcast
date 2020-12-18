@@ -4,6 +4,7 @@ import { format } from 'd3-format';
 import descriptions from './descriptions.generated.json';
 import '!file-loader?name=descriptions.raw.txt!./descriptions.raw.txt';
 import { resolveColorScale } from './colorScales';
+import { modeByID } from '../modes';
 // import { generateMockSignal, generateMockMeta } from '../data/mock';
 
 export const levelList = [
@@ -37,21 +38,7 @@ export const levelMegaCounty = {
 };
 export const levelsWithMega = levels.concat(levelMegaCounty.id);
 
-export const swpaLevelList = levelList.concat([
-  {
-    id: 'zip',
-    label: 'Zip Code',
-    labelPlural: 'Zip Codes',
-  },
-  {
-    id: 'neighborhood',
-    label: 'Neighborhood/Municipal',
-    labelPlural: 'Neighborhoods/Municipals',
-  },
-]);
-export const swpaLevels = swpaLevelList.map((l) => l.id);
-
-const levelById = new Map([...levelList, ...swpaLevelList].map((l) => [l.id, l]));
+const levelById = new Map(levelList.map((l) => [l.id, l]));
 
 export function getLevelInfo(level) {
   return (
@@ -95,6 +82,7 @@ export function getLevelInfo(level) {
  * @property {Record<keyof EpiDataCasesOrDeathValues, string>} casesOrDeathSignals signal to load for cases or death
  * @property {)(v: number) => string)} colorScale
  * @property {string} credits
+ * @property {boolean?} default whether it should be default signal
  */
 
 /**
@@ -205,8 +193,6 @@ export function extendSensorEntry(sensorEntry) {
   });
 }
 
-export const defaultSensorId = 'doctor-visits';
-
 /**
  * defines the geo types / levels that are should be used for computing the meta data, the first one has the highest priority and so on
  */
@@ -272,3 +258,8 @@ export const defaultRegionOnStartup = {
 
 export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
 export const yesterday = Number.parseInt(formatAPITime(yesterdayDate), 10);
+
+export const DEFAULT_MODE = modeByID.overview;
+export const DEFAULT_SENSOR = (sensorList.find((d) => d.default) || sensorList[0]).key;
+export const DEFAULT_LEVEL = 'county';
+export const DEFAULT_ENCODING = 'color';

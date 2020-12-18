@@ -2,7 +2,6 @@
   import MapBox from '../../components/MapBox/MapBox.svelte';
   import Options from '../../components/Options.svelte';
   import {
-    signalType,
     currentSensor,
     currentLevel,
     encoding,
@@ -215,12 +214,13 @@
 
   .root > :global(.options-container) {
     grid-area: options;
+    margin: 0 6px;
   }
 
   .root > :global(.player-container) {
     grid-area: player;
     z-index: 1003;
-    margin: 0.3em;
+    margin: 0 6px;
   }
 
   .map-container {
@@ -269,7 +269,6 @@
       data={currentData}
       sensor={$currentSensor}
       level={$currentLevel}
-      signalType={$signalType}
       encoding={$encoding}
       signalOptions={$signalCasesOrDeathOptions}
       on:zoom={(e) => (zoom = e.detail)}

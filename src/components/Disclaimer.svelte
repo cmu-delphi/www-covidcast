@@ -22,8 +22,9 @@
 {#if show}
   <div class="disclaimer" data-uk-alert>
     <a class="uk-alert-close" data-uk-close href="./" on:click|preventDefault={hide}><span
-        aria-hidden="true">Close</span></a> The content of the COVIDcast site and Epidata API are provided on an AS-IS, AS-AVAILABLE
-    basis and are not intended for diagnostic or treatment purposes, or for guidance on any type of travel. Please refer
-    to the <a href="./terms-of-use">Terms of Use</a>.
+        aria-hidden="true">Close</span></a>
+    The content of the COVIDcast site and Epidata API are provided on an AS-IS, AS-AVAILABLE basis and are not intended
+    for diagnostic or treatment purposes, or for guidance on any type of travel. Please refer to the
+    <a href="./terms-of-use">Terms of Use</a>.
   </div>
 {/if}

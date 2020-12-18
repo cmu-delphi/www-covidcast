@@ -125,7 +125,6 @@
 
 <style>
   .player {
-    margin: 0 6px;
     max-width: 50em;
     display: flex;
     align-items: center;

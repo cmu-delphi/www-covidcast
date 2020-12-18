@@ -13,9 +13,6 @@
   import { timeFormat } from 'd3-time-format';
   import { timeDay } from 'd3-time';
   import { formatAPITime, parseAPITime } from '../data';
-  import IoIosCalendar from 'svelte-icons/io/IoIosCalendar.svelte';
-  import IoIosArrowBack from 'svelte-icons/io/IoIosArrowBack.svelte';
-  import IoIosArrowForward from 'svelte-icons/io/IoIosArrowForward.svelte';
 
   $: formatTime = $isMobileDevice ? timeFormat('%x') : timeFormat('%B %-d, %Y');
 
@@ -44,159 +41,89 @@
 </script>
 
 <style>
-  .options {
-    position: relative;
+  .block {
     display: flex;
-    margin: 0.3em;
-  }
-
-  .option-wrapper {
     align-items: center;
-    display: flex;
-    flex: 1 1 auto;
-    max-width: 390px;
   }
 
-  .option-title {
-    margin: 0 5px;
-    color: #444;
+  .block .uk-form-label {
+    margin-right: 1em;
   }
 
-  select,
-  .calendar {
-    background-color: #ececec;
-    border-radius: 5px;
-    border: none;
-    color: #111;
-    line-height: 1.3;
-    padding: 0.4em 0.6em;
-    width: 100%;
-    min-width: 0;
-
-    -moz-appearance: none;
-    -webkit-appearance: none;
-    appearance: none;
-
-    transition: all 0.1s ease-in;
-    flex: 1 1 auto;
-    white-space: nowrap;
-
-    padding-right: 1.7em;
-
-    background-image: linear-gradient(45deg, transparent 50%, gray 50%),
-      linear-gradient(135deg, gray 50%, transparent 50%);
-    background-position: calc(100% - 15px) calc(0.85em + 0px), calc(100% - 10px) calc(0.85em + 0px);
-    background-size: 5px 5px, 5px 5px;
-    background-repeat: no-repeat;
+  .block .uk-form-controls {
+    flex-grow: 1;
   }
 
-  .calendar:hover,
-  select:hover {
-    background-color: #dcdcdc;
-  }
-
-  :global(.datepicker) {
-    margin: 0.25em 0;
-  }
-
-  .shortcuts {
-    background-color: #ececec;
-    border: none;
-    color: #111;
-    line-height: 1.3;
-    height: 2.2em;
-    font-size: 80%;
-    margin-left: 0.5em;
-  }
-
-  /** mobile **/
-  @media only screen and (max-width: 767px) {
-    .options {
-      max-width: unset;
-    }
-    .option-wrapper {
-      padding: 0 0.1em;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      justify-content: space-between;
-    }
-
-    .shortcuts {
-      display: none;
-    }
+  .shortcuts > button {
+    padding: 0 2px;
   }
 </style>
 
-<div class="options base-font-size container-bg container-style {className}">
-  <div class="option-wrapper">
-    <span class="option-title">Displaying</span>
-    <select
-      id="option-indicator"
-      aria-label="indicator options"
-      class="indicators base-font-size"
-      bind:value={$currentSensor}>
-      {#each filteredSensorGroups as sensorGroup}
-        <optgroup label={sensorGroup.label}>
-          {#each sensorGroup.sensors as sensor}
-            <option
-              title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
-              value={sensor.key}>
-              {sensor.name}
-            </option>
-          {/each}
-        </optgroup>
-      {/each}
-    </select>
+<div class="container-bg container-style uk-grid-small {className}" data-uk-grid>
+  <div class="uk-width-1-1 uk-width-1-{showDate ? '3' : '2'}@m block">
+    <span class="uk-form-label">Displaying</span>
+    <div class="uk-form-controls">
+      <select id="option-indicator" aria-label="indicator options" class="uk-select" bind:value={$currentSensor}>
+        {#each filteredSensorGroups as sensorGroup}
+          <optgroup label={sensorGroup.label}>
+            {#each sensorGroup.sensors as sensor}
+              <option
+                title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
+                value={sensor.key}>
+                {sensor.name}
+              </option>
+            {/each}
+          </optgroup>
+        {/each}
+      </select>
+    </div>
   </div>
-  <div class="option-wrapper">
-    <span class="option-title">for</span>
-    <select
-      id="option-geo-level"
-      aria-label="geographic level"
-      class="geo-level base-font-size"
-      bind:value={$currentLevel}>
-      {#each levels as level}
-        <option value={level.id} disabled={!$currentSensorEntry.levels.includes(level.id)}>{level.labelPlural}</option>
-      {/each}
-    </select>
+  <div class="uk-width-1-1 uk-width-1-{showDate ? '3' : '2'}@m block">
+    <span class="uk-form-label">for</span>
+    <div class="uk-form-controls">
+      <select id="option-geo-level" aria-label="geographic level" class="uk-select" bind:value={$currentLevel}>
+        {#each levels as level}
+          <option value={level.id} disabled={!$currentSensorEntry.levels.includes(level.id)}>
+            {level.labelPlural}
+          </option>
+        {/each}
+      </select>
+    </div>
   </div>
   {#if showDate}
-    <div class="option-wrapper">
-      <span class="option-title">on</span>
-      {#if selectedDate != null && startEndDates.length !== 0}
-        <Datepicker
-          bind:selected={selectedDate}
-          start={startEndDates[0]}
-          end={startEndDates[1]}
-          formattedSelected={formatTime(selectedDate)}>
-          <button aria-label="selected date" class="calendar base-font-size" on:>{formatTime(selectedDate)}</button>
-        </Datepicker>
-      {:else}
-        <button aria-label="selected date" class="calendar base-font-size" on:>{formatTime(selectedDate)}</button>
-      {/if}
-      <div class="shortcuts pg-button-group">
+    <div class="uk-width-1-1 uk-width-1-3@m block">
+      <span class="uk-form-label">on</span>
+      <div class="uk-form-controls">
+        {#if selectedDate != null && startEndDates.length !== 0}
+          <Datepicker
+            className="uk-width-1-1"
+            bind:selected={selectedDate}
+            start={startEndDates[0]}
+            end={startEndDates[1]}
+            formattedSelected={formatTime(selectedDate)}>
+            <button aria-label="selected date" class="uk-input uk-text-nowrap" on:>{formatTime(selectedDate)}</button>
+          </Datepicker>
+        {:else}<button aria-label="selected date" class="uk-input" on:>{formatTime(selectedDate)}</button>{/if}
+      </div>
+      <div class="uk-button-group shortcuts">
         <button
-          class="pg-button"
+          class="uk-button uk-button-default"
           disabled={selectedDate == null || startEndDates.length === 0 || selectedDate <= startEndDates[0]}
           title="Go to the previous day"
-          on:click={() => (selectedDate = timeDay.offset(selectedDate, -1))}>
-          <IoIosArrowBack />
-        </button>
+          on:click={() => (selectedDate = timeDay.offset(selectedDate, -1))}
+          data-uk-icon="icon: chevron-left" />
         <button
-          class="pg-button"
+          class="uk-button uk-button-default"
           disabled={selectedDate == null || startEndDates.length === 0 || selectedDate.valueOf() === startEndDates[1].valueOf()}
           title="Go to the latest date for which '{$currentSensorEntry.name}' is available"
-          on:click={() => (selectedDate = startEndDates[1])}>
-          <IoIosCalendar />
-        </button>
+          on:click={() => (selectedDate = startEndDates[1])}
+          data-uk-icon="icon: calendar" />
         <button
-          class="pg-button"
+          class="uk-button uk-button-default"
           disabled={selectedDate == null || startEndDates.length === 0 || selectedDate >= startEndDates[1]}
           title="Go to the next day"
-          on:click={() => (selectedDate = timeDay.offset(selectedDate, 1))}>
-          <IoIosArrowForward />
-        </button>
+          on:click={() => (selectedDate = timeDay.offset(selectedDate, 1))}
+          data-uk-icon="icon: chevron-right" />
       </div>
     </div>
   {/if}

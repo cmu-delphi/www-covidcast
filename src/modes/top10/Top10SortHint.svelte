@@ -1,6 +1,4 @@
 <script>
-  import IoMdArrowDropup from 'svelte-icons/io/IoMdArrowDropup.svelte';
-  import IoMdArrowDropdown from 'svelte-icons/io/IoMdArrowDropdown.svelte';
   export let desc = false;
   export let sorted = false;
   export let label = '';
@@ -16,19 +14,12 @@
   }
 
   .hint {
-    width: 1em;
+    align-items: center;
+    display: flex;
   }
 </style>
 
 <span class="root" on:click title="{label}: click to sort">
-  <span class="hint">
-    {#if sorted}
-      {#if desc}
-        <IoMdArrowDropdown />
-      {:else}
-        <IoMdArrowDropup />
-      {/if}
-    {/if}
-  </span>
+  <span class="hint" data-uk-icon={sorted ? (desc ? 'triangle-down' : 'triangle-up') : null} />
   <slot />
 </span>
