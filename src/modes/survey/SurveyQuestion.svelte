@@ -173,7 +173,7 @@
       tooltipProps={{ question }} />
     <div class="uk-text-center uk-text-italic">
       {#await summary then s}
-        {s.row ? `based on ${formatSampleSize(s.row)} survey responses with a standard error of ${formatStdErr(s.row.stderr)}, as of ${formatIssueDate(s.row)}` : ''}
+        {s.row ? `based on ${formatSampleSize(s.row)} survey responses with a standard error of ${formatStdErr(s.row.stderr)}` : ''}
       {/await}
     </div>
     <div class="question-summary">

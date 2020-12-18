@@ -4,6 +4,7 @@
   import SurveyQuestion from './SurveyQuestion.svelte';
   import SurveyParameters from './SurveyParameters.svelte';
   import Overview from './Overview.svelte';
+import { nationInfo } from '../../maps';
   // use local variables with manual setting for better value comparison updates
   let startDay = $smallMultipleTimeSpan[0];
   let endDay = $smallMultipleTimeSpan[1];
@@ -16,7 +17,7 @@
       endDay = $smallMultipleTimeSpan[1];
     }
   }
-  $: params = { region: $currentRegionInfo, startDay, endDay };
+  $: params = { region: $currentRegionInfo || nationInfo, startDay, endDay };
 </script>
 
 <style>

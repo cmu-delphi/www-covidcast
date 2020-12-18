@@ -16,7 +16,7 @@ const levelMegaCountyId = 'mega-county';
  * @property {number?} area
  * @property {number} lat center latitude
  * @property {number} long center longitude
- * @property {'state' | 'county' | 'msa'} level
+ * @property {'state' | 'county' | 'msa' | 'hrr' | 'nation'} level
  */
 
 function parseCSV(csv, level) {
@@ -52,6 +52,21 @@ const megaCountyInfo = stateInfo.map((info) => ({
   lat: null,
   long: null,
 }));
+
+/**
+ * @type {NameInfo}
+ */
+export const nationInfo = {
+  level: 'nation',
+  name: 'US',
+  id: 'us',
+  displayName: 'US - Whole Nation',
+  propertyId: 'us',
+  long: stateInfo.find((d) => d.propertyId === 'DC').long,
+  lat: stateInfo.find((d) => d.propertyId === 'DC').lat,
+  area: stateInfo.reduce((acc, v) => acc + v.area, 0),
+  population: stateInfo.reduce((acc, v) => acc + v.population, 0),
+};
 
 export const nameInfos = stateInfo
   .concat(msaInfo, countyInfo, hrrInfo, megaCountyInfo)

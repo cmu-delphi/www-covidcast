@@ -1,12 +1,13 @@
 <script>
   import Search from '../../components/Search.svelte';
   import { formatAPITime, parseAPITime } from '../../data';
-  import { nameInfos } from '../../maps';
+  import { nameInfos, nationInfo } from '../../maps';
   import { currentDate, currentRegionInfo, selectByInfo } from '../../stores';
   import { refSensor, visibleLevels } from './questions';
   import SensorDatePicker2 from '../../components/SensorDatePicker2.svelte';
 
   const filteredInfos = nameInfos.filter((d) => visibleLevels.includes(d.level));
+  filteredInfos.unshift(nationInfo);
   $: selectedDate = parseAPITime($currentDate);
   $: if (selectedDate !== undefined) {
     currentDate.set(formatAPITime(selectedDate));
@@ -44,9 +45,9 @@
     className="survey-search"
     placeholder="Search Region"
     items={filteredInfos}
-    selectedItem={$currentRegionInfo}
+    selectedItem={$currentRegionInfo || nationInfo}
     labelFieldName="displayName"
     maxItemsToShowInList="5"
-    on:change={(e) => selectByInfo(e.detail)} />
+    on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)} />
   <SensorDatePicker2 className="survey-date" bind:value={selectedDate} sensor={refSensor} />
 </aside>
