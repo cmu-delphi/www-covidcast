@@ -72,13 +72,14 @@ function deriveCombineKey(mixinData = {}) {
   return combineKey;
 }
 
-function parseMultipleTreeData(d, signals, mixinData = {}) {
+function parseMultipleTreeData(d, signals, defaultSignalIndex, mixinData = {}) {
   if (d.result < 0 || d.message.includes('no results')) {
     return [];
   }
   const tree = d.epidata || [];
   const split = signals.map((k) => tree[0][k]);
-  const combined = combineSignals(split, EPIDATA_CASES_OR_DEATH_VALUES, deriveCombineKey(mixinData));
+  const ref = split[defaultSignalIndex];
+  const combined = combineSignals(split, ref, EPIDATA_CASES_OR_DEATH_VALUES, deriveCombineKey(mixinData));
   return parseData(
     {
       ...d,
@@ -88,15 +89,13 @@ function parseMultipleTreeData(d, signals, mixinData = {}) {
   );
 }
 
-function parseMultipleSeparateData(dataArr, mixinData = {}) {
+function parseMultipleSeparateData(dataArr, defaultSignalIndex, mixinData = {}) {
   if (dataArr.length === 0 || dataArr[0].result < 0 || dataArr[0].message.includes('no results')) {
     return [];
   }
-  const combined = combineSignals(
-    dataArr.map((d) => d.epidata || []),
-    EPIDATA_CASES_OR_DEATH_VALUES,
-    deriveCombineKey(mixinData),
-  );
+  const data = dataArr.map((d) => d.epidata || []);
+  const ref = data[defaultSignalIndex];
+  const combined = combineSignals(data, ref, EPIDATA_CASES_OR_DEATH_VALUES, deriveCombineKey(mixinData));
   return parseData(
     {
       ...dataArr[0],
@@ -119,7 +118,7 @@ function fetchData(sensorEntry, level, region, date, mixinValues = {}) {
     return Promise.resolve([]);
   }
   const transferFields = computeTransferFields(mixinValues);
-  function fetchSeparate() {
+  function fetchSeparate(defaultSignalIndex) {
     const extraDataFields = ['value'];
     // part of key
     if (mixinValues.time_value == null) {
@@ -140,15 +139,18 @@ function fetchData(sensorEntry, level, region, date, mixinValues = {}) {
           i === 0 ? transferFields : extraDataFields,
         ),
       ),
-    ).then((d) => parseMultipleSeparateData(d, mixinValues));
+    ).then((d) => parseMultipleSeparateData(d, defaultSignalIndex, mixinValues));
   }
 
   if (sensorEntry.isCasesOrDeath) {
+    const signals = EPIDATA_CASES_OR_DEATH_VALUES.map((k) => sensorEntry.casesOrDeathSignals[k]);
+    const defaultSignal = sensorEntry.signal;
+    const defaultSignalIndex = signals.indexOf(defaultSignal);
+
     if (level === 'county' && region === '*') {
       // around 2k each
-      return fetchSeparate();
+      return fetchSeparate(defaultSignalIndex);
     }
-    const signals = EPIDATA_CASES_OR_DEATH_VALUES.map((k) => sensorEntry.casesOrDeathSignals[k]);
     return callAPIEndPoint(
       sensorEntry.api,
       sensorEntry.id,
@@ -161,9 +163,9 @@ function fetchData(sensorEntry, level, region, date, mixinValues = {}) {
     ).then((d) => {
       if (d.result === 2) {
         // need to fetch separately, since too many results
-        return fetchSeparate();
+        return fetchSeparate(defaultSignalIndex);
       }
-      return parseMultipleTreeData(d, signals, mixinValues);
+      return parseMultipleTreeData(d, signals, defaultSignalIndex, mixinValues);
     });
   } else {
     return callAPIEndPoint(

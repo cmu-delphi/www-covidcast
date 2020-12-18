@@ -53,7 +53,7 @@ export function getLevelInfo(level) {
 /**
  * @typedef {object} CasesOrDeathOptions
  * @property {boolean} cumulative
- * @property {boolean} ratio
+ * @property {boolean} incidence
  */
 
 /**
@@ -68,6 +68,7 @@ export function getLevelInfo(level) {
  * @property {string[]} levels
  * @property {string | ((options?: CasesOrDeathOptions) => string)} tooltipText
  * @property {string | ((options?: CasesOrDeathOptions) => string)} mapTitleText
+ * @property {string} plotTitleText
  * @property {string} yAxis
  * @property {string} format
  * @property {(v: number) => string} formatValue
@@ -124,9 +125,9 @@ export function primaryValue(sensorEntry, sensorOptions) {
     return 'value';
   }
   if (sensorOptions.cumulative) {
-    return sensorOptions.ratio ? 'countRatioCumulative' : 'countCumulative';
+    return sensorOptions.incidence ? 'countCumulative' : 'countRatioCumulative';
   }
-  return sensorOptions.ratio ? 'avgRatio' : 'avg';
+  return sensorOptions.incidence ? 'avg' : 'avgRatio';
 }
 
 /**
@@ -164,30 +165,32 @@ export function extendSensorEntry(sensorEntry) {
     key,
     tooltipText: sensorEntry.tooltipText || mapTitle,
     credits: sensorEntry.credits || 'We are happy for you to use this data in products and publications.',
-    formatValue: sensorEntry.format === 'percent' ? percentFormatter : isCount ? countFormatter : rawFormatter,
+    formatValue:
+      sensorEntry.format === 'percent' ? percentFormatter : isCount || isCasesOrDeath ? countFormatter : rawFormatter,
     isCount,
     getType: (options) => getType(sensorEntry, options),
     isCasesOrDeath,
     colorScale: resolveColorScale(sensorEntry.colorScale),
     links: sensorEntry.links || [],
+    plotTitleText: sensorEntry.plotTitleText || sensorEntry.name,
     mapTitleText:
       typeof mapTitle === 'string'
         ? mapTitle
         : (options) => {
             // generate lookup function
             if (!options) {
-              return mapTitle.incidence;
+              return mapTitle[primaryValue(sensorEntry, {})];
             }
             if (options.cumulative) {
-              if (options.ratio) {
-                return mapTitle.ratioCumulative;
-              } else {
+              if (options.incidence) {
                 return mapTitle.incidenceCumulative;
+              } else {
+                return mapTitle.ratioCumulative;
               }
-            } else if (options.ratio) {
-              return mapTitle.ratio;
-            } else {
+            } else if (options.incidence) {
               return mapTitle.incidence;
+            } else {
+              return mapTitle.ratio;
             }
           },
   });
