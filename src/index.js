@@ -1,4 +1,5 @@
 /*global __VERSION__*/
+import './publicPath';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import './global.css';
