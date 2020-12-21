@@ -54,8 +54,15 @@ const defaultValues = (() => {
 
   const compareIds = (urlParams.get('compare') || '').split(',').map(getInfoByName).filter(Boolean);
 
+  const modeFromPath = () => {
+    const pathName = window.location.pathname;
+    // last path segment, e.g. /test/a -> a, /test/b/ -> b
+    return pathName.split('/').filter(Boolean).reverse(0)[0];
+  };
+  const mode = urlParams.get('mode') || modeFromPath();
+
   return {
-    mode: modes.find((d) => d.id === urlParams.get('mode')) || DEFAULT_MODE,
+    mode: modes.find((d) => d.id === mode) || DEFAULT_MODE,
     sensor: sensor && sensorMap.has(sensor) ? sensor : DEFAULT_SENSOR,
     level: levels.includes(level) ? level : DEFAULT_LEVEL,
     signalCasesOrDeathOptions: {
@@ -330,7 +337,6 @@ export const trackedUrlParams = derived(
 
     // determine parameters based on default value and current mode
     const params = {
-      mode: mode === DEFAULT_MODE ? null : mode.id,
       sensor: mode === modeByID.single || sensor === DEFAULT_SENSOR ? null : sensor,
       level: mode === modeByID.single || mode === modeByID.export || level === DEFAULT_LEVEL ? null : level,
       region: mode === modeByID.export || mode === modeByID.timelapse || !region ? null : region,
@@ -343,6 +349,9 @@ export const trackedUrlParams = derived(
           ? null
           : compare.map((d) => d.info.propertyId).join(','),
     };
-    return params;
+    return {
+      path: mode === DEFAULT_MODE ? `` : `${mode.id}/`,
+      params,
+    };
   },
 );
