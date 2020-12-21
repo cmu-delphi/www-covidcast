@@ -231,7 +231,9 @@ currentSensorEntry.subscribe((sensorEntry) => {
 // mobile device detection
 // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
 
-const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
+const isMobileQuery = window.matchMedia
+  ? window.matchMedia('only screen and (max-width: 767px)')
+  : { matches: false, addEventListener: () => undefined };
 export const isMobileDevice = readable(isMobileQuery.matches, (set) => {
   if (typeof isMobileQuery.addEventListener === 'function') {
     isMobileQuery.addEventListener('change', (evt) => {
