@@ -61,14 +61,7 @@
           <h5>Outline</h5>
           <ol uk-scrollspy-nav="closest: li; scroll: true; offset: 100" class="uk-nav uk-nav-default">
             {#each questionCategories as cat}
-              <li>
-                <a href="#{cat.anchor}">{cat.name}</a>
-                <ol class="uk-nav-sub">
-                  {#each cat.questions as q}
-                    <li><a href="#{q.anchor}">{q.name}</a></li>
-                  {/each}
-                </ol>
-              </li>
+              <li><a href="#{cat.anchor}">{cat.name}</a></li>
             {/each}
           </ol>
         </div>
