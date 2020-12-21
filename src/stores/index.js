@@ -73,9 +73,12 @@ export const currentLevel = writable(DEFAULT_LEVEL, (set) => {
 });
 
 // in case of a death signal whether to show cumulative data
+/**
+ * @type {import('svelte/store').Writable<import('./constants').CasesOrDeathOptions>}
+ */
 export const signalCasesOrDeathOptions = writable({
   cumulative: urlParams.has('signalC'),
-  ratio: urlParams.has('signalR'),
+  incidence: urlParams.has('signalI'),
 });
 
 export const currentSensorMapTitle = derived([currentSensorEntry, signalCasesOrDeathOptions], ([sensor, options]) =>
@@ -207,7 +210,7 @@ currentSensorEntry.subscribe((sensorEntry) => {
   if (!sensorEntry.isCasesOrDeath) {
     signalCasesOrDeathOptions.set({
       cumulative: false,
-      ratio: false,
+      incidence: false,
     });
   }
 
@@ -230,9 +233,16 @@ currentSensorEntry.subscribe((sensorEntry) => {
 export const isMobileDevice = readable(false, (set) => {
   const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
   set(isMobileQuery.matches);
-  isMobileQuery.addEventListener('change', (evt) => {
-    set(evt.matches);
-  });
+  if (typeof isMobileQuery.addEventListener === 'function') {
+    isMobileQuery.addEventListener('change', (evt) => {
+      set(evt.matches);
+    });
+  } else {
+    // deprecated but other version is not supported in Safari 13
+    isMobileQuery.addListener((e) => {
+      set(e.matches);
+    });
+  }
 });
 
 // export const isPortraitDevice = readable(false, (set) => {
@@ -342,7 +352,7 @@ export const trackedUrlParams = derived(
       region: mode === modeByID.export || mode === modeByID.timelapse || !region ? null : region,
       date: mode === modeByID.export ? null : date,
       signalC: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.cumulative,
-      signalR: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.ratio,
+      signalI: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.incidence,
       encoding: !inMapMode || encoding === DEFAULT_ENCODING ? null : encoding,
       compare:
         (mode !== modeByID.overview && mode !== modeByID.single) || !compare

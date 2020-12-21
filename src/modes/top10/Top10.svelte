@@ -58,7 +58,7 @@
    */
   const ratioOptions = {
     cumulative: false,
-    ratio: true,
+    incidence: false,
   };
   $: primaryField = primaryValue(primary, ratioOptions);
   /**
@@ -355,7 +355,7 @@
                 on:click={() => sortClick('primary', true)}
                 sorted={sortCriteria === 'primary'}
                 desc={sortDirectionDesc}>
-                {typeof primary.mapTitleText === 'function' ? primary.mapTitleText(ratioOptions) : primary.name}
+                {primary.plotTitleText}
               </Top10SortHint>
             </th>
             {#each otherSensors as s, i}
@@ -365,7 +365,7 @@
                   on:click={() => sortClick(i, true)}
                   sorted={sortCriteria === i}
                   desc={sortDirectionDesc}>
-                  {typeof s.mapTitleText === 'function' ? s.mapTitleText(ratioOptions) : s.name}
+                  {primary.plotTitleText}
                   <button
                     class="remove-column"
                     title="Remove column"

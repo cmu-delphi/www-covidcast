@@ -62,14 +62,14 @@
     data-uk-icon="icon: chevron-left" />
   <button
     class="uk-button uk-button-default"
-    disabled={value == null || startEndDates.length === 0 || value.valueOf() === startEndDates[1].valueOf()}
-    title="Go to the latest date for which '{sensor.name}' is available"
-    on:click={() => (value = startEndDates[1])}
-    data-uk-icon="icon: calendar" />
-  <button
-    class="uk-button uk-button-default"
     disabled={value == null || startEndDates.length === 0 || value >= startEndDates[1]}
     title="Go to the next day"
     on:click={() => (value = timeDay.offset(value, 1))}
     data-uk-icon="icon: chevron-right" />
+  <button
+    class="uk-button uk-button-default"
+    disabled={value == null || startEndDates.length === 0 || value.valueOf() === startEndDates[1].valueOf()}
+    title="Go to the latest date for which '{sensor.name}' is available"
+    on:click={() => (value = startEndDates[1])}
+    data-uk-icon="icon: chevron-right-end" />
 </div>

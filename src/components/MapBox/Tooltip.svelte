@@ -69,21 +69,23 @@
           </tr>
           <tr>
             <th>{formatDateShort($currentDateObject)}</th>
-            <td class="right" style={!options.cumulative && !options.ratio ? colorScaleStyle(properties.count) : ''}>
+            <td class="right" style={!options.cumulative && options.incidence ? colorScaleStyle(properties.count) : ''}>
               {$currentSensorEntry.formatValue(properties.count)}
             </td>
             <td
               class="right"
-              style={!options.cumulative && options.ratio ? colorScaleStyle(properties.countRatio) : ''}>
+              style={!options.cumulative && !options.incidence ? colorScaleStyle(properties.countRatio) : ''}>
               {$currentSensorEntry.formatValue(properties.countRatio)}
             </td>
           </tr>
           <tr>
             <th>7-day avg</th>
-            <td class="right" style={!options.cumulative && !options.ratio ? colorScaleStyle(properties.avg) : ''}>
+            <td class="right" style={!options.cumulative && options.incidence ? colorScaleStyle(properties.avg) : ''}>
               {$currentSensorEntry.formatValue(properties.avg)}
             </td>
-            <td class="right" style={!options.cumulative && options.ratio ? colorScaleStyle(properties.avgRatio) : ''}>
+            <td
+              class="right"
+              style={!options.cumulative && !options.incidence ? colorScaleStyle(properties.avgRatio) : ''}>
               {$currentSensorEntry.formatValue(properties.avgRatio)}
             </td>
           </tr>
@@ -91,12 +93,12 @@
             <th>Cumulative {formatDateShort($currentDateObject)}</th>
             <td
               class="right"
-              style={options.cumulative && !options.ratio ? colorScaleStyle(properties.countCumulative) : ''}>
+              style={options.cumulative && options.incidence ? colorScaleStyle(properties.countCumulative) : ''}>
               {$currentSensorEntry.formatValue(properties.countCumulative)}
             </td>
             <td
               class="right"
-              style={options.cumulative && options.ratio ? colorScaleStyle(properties.countRatioCumulative) : ''}>
+              style={options.cumulative && !options.incidence ? colorScaleStyle(properties.countRatioCumulative) : ''}>
               {$currentSensorEntry.formatValue(properties.countRatioCumulative)}
             </td>
           </tr>
