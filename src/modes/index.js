@@ -22,21 +22,21 @@ const modes = [
     label: 'Map Overview',
     icon: mapIcon,
     tooltip: 'Switch to the Map Overview',
-    component: () => import(/* webpackPreload: true */ './overview/Overview.svelte').then((r) => r.default),
+    component: () => import('./overview/Overview.svelte').then((r) => r.default),
   },
   {
     id: 'timelapse',
     label: 'Timelapse',
     icon: timelapseIcon,
     tooltip: 'Switch to Timelapse Mode',
-    component: () => import(/* webpackPrefech: true */ './timelapse/TimeLapse.svelte').then((r) => r.default),
+    component: () => import('./timelapse/TimeLapse.svelte').then((r) => r.default),
   },
   {
     id: 'top10',
     label: 'Top 10',
     icon: top10Icon,
     tooltip: 'Switch to Top 10 Mode',
-    component: () => import(/* webpackPrefetch: true */ './top10/Top10.svelte').then((r) => r.default),
+    component: () => import('./top10/Top10.svelte').then((r) => r.default),
   },
   {
     id: 'single',
@@ -46,7 +46,7 @@ const modes = [
     component: () => import('./single/SingleLocation.svelte').then((r) => r.default),
   },
   {
-    id: 'survey',
+    id: 'survey-results',
     label: 'Survey Results',
     icon: surveyIcon,
     tooltip: 'Switch to Survey View',

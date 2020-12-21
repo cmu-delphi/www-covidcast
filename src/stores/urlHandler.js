@@ -7,15 +7,17 @@ export function updateURIParameters(state) {
   const params = new URLSearchParams(window.location.search);
 
   // update params with state
-  Object.keys(state).forEach((key) => {
-    const v = state[key];
+  Object.keys(state.params).forEach((key) => {
+    const v = state.params[key];
     if (v) {
       params.set(key, v);
     } else {
       params.delete(key);
     }
   });
-  window.history.replaceState(state, document.title, `?${params.toString()}`);
+  const path = `${window.DELPHI_COVIDCAST_PAGE || '/'}${state.path}`;
+  const query = params.toString();
+  window.history.replaceState(state, document.title, `${path}${query.length > 0 ? '?' : ''}${query}`);
 }
 
 trackedUrlParams.subscribe(throttle(updateURIParameters, 250));
