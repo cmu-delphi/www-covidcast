@@ -233,9 +233,16 @@ currentSensorEntry.subscribe((sensorEntry) => {
 export const isMobileDevice = readable(false, (set) => {
   const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
   set(isMobileQuery.matches);
-  isMobileQuery.addEventListener('change', (evt) => {
-    set(evt.matches);
-  });
+  if (typeof isMobileQuery.addEventListener === 'function') {
+    isMobileQuery.addEventListener('change', (evt) => {
+      set(evt.matches);
+    });
+  } else {
+    // deprecated but other version is not supported in Safari 13
+    isMobileQuery.addListener((e) => {
+      set(e.matches);
+    });
+  }
 });
 
 // export const isPortraitDevice = readable(false, (set) => {
