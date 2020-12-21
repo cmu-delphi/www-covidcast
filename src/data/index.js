@@ -17,7 +17,7 @@ function processMetaData(meta) {
 
   sensorList.forEach((sEntry) => {
     // need to change mean / std for counts
-    if (sEntry.isCount) {
+    if (sEntry.isCount || sEntry.isCasesOrDeath) {
       loadCountSignal(sEntry, meta, timeMap, statsMap);
     } else {
       loadRegularSignal(sEntry, meta, timeMap, statsMap);

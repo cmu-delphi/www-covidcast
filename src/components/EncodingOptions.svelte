@@ -53,27 +53,27 @@
     <div aria-label="display counts or ratios per 100,000 people" class="uk-button-group">
       <button
         type="button"
-        aria-pressed={String(!$signalCasesOrDeathOptions.ratio)}
+        aria-pressed={String(!$signalCasesOrDeathOptions.incidence)}
         class="uk-button uk-button-default uk-button-small"
-        class:uk-active={!$signalCasesOrDeathOptions.ratio}
+        class:uk-active={!$signalCasesOrDeathOptions.incidence}
         on:click={() => {
-          if ($signalCasesOrDeathOptions.ratio) {
-            signalCasesOrDeathOptions.set({ ...$signalCasesOrDeathOptions, ratio: false });
-          }
-        }}>
-        Counts
-      </button>
-      <button
-        type="button"
-        aria-pressed={String($signalCasesOrDeathOptions.ratio)}
-        class="uk-button uk-button-default uk-button-small"
-        class:uk-active={$signalCasesOrDeathOptions.ratio}
-        on:click={() => {
-          if (!$signalCasesOrDeathOptions.ratio) {
-            signalCasesOrDeathOptions.set({ ...$signalCasesOrDeathOptions, ratio: true });
+          if ($signalCasesOrDeathOptions.incidence) {
+            signalCasesOrDeathOptions.set({ ...$signalCasesOrDeathOptions, incidence: false });
           }
         }}>
         Ratios (per 100,000)
+      </button>
+      <button
+        type="button"
+        aria-pressed={String($signalCasesOrDeathOptions.incidence)}
+        class="uk-button uk-button-default uk-button-small"
+        class:uk-active={$signalCasesOrDeathOptions.incidence}
+        on:click={() => {
+          if (!$signalCasesOrDeathOptions.incidence) {
+            signalCasesOrDeathOptions.set({ ...$signalCasesOrDeathOptions, incidence: true });
+          }
+        }}>
+        Counts
       </button>
     </div>
   </div>

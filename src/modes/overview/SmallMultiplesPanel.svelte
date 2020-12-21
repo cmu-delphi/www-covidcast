@@ -121,7 +121,7 @@
             trackEvent('side-panel', 'set-sensor', s.sensor.key);
             currentSensor.set(s.sensor.key);
           }}>
-          {typeof s.sensor.mapTitleText === 'function' ? s.sensor.mapTitleText() : s.sensor.name}
+          {s.sensor.plotTitleText}
         </button>
         <div class="grow" />
         <div class="toolbar">

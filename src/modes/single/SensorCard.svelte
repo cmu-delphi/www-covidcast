@@ -152,9 +152,7 @@
 
 <section class="uk-card uk-card-body uk-card-default uk-card-small card" data-testid="sensor-{sensor.key}">
   <div class="uk-card-header">
-    <h3 class="uk-card-title uk-margin-remove-bottom">
-      {typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText() : sensor.name}
-    </h3>
+    <h3 class="uk-card-title uk-margin-remove-bottom">{sensor.plotTitleText}</h3>
     <div class="toolbar">
       <InfoDialogButton {sensor} />
     </div>
