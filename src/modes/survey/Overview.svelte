@@ -28,6 +28,7 @@
   .summary-stats {
     display: flex;
     align-items: flex-start;
+    flex-wrap: wrap;
   }
   .summary-stats > div {
     margin-right: 2em;

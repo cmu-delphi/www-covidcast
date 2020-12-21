@@ -20,10 +20,19 @@
     top: -1px;
     background: white;
     z-index: 100;
-    display: flex;
     padding-bottom: 0.5em;
     display: flex;
     box-shadow: 0 0 0 18px white; /* to hide box-shadow from cards */
+  }
+
+  @media only screen and (max-width: 715px) {
+    .parameters {
+      display: block;
+      padding-bottom: 0;
+    }
+    .parameters > :global(*) {
+      margin-bottom: 0.5em;
+    }
   }
 
   .parameters :global(.survey-search) {

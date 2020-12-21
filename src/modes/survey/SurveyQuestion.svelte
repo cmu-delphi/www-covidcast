@@ -105,6 +105,7 @@
     margin-bottom: 2em;
     display: flex;
     flex-wrap: wrap;
+    justify-content: space-evenly;
   }
   .question-summary > div {
     flex: 1 1 0;
@@ -112,15 +113,19 @@
     flex-direction: column;
     align-items: center;
     line-height: 1.5;
-    margin: 0 2em;
+    margin: 0 0.25em;
     text-align: center;
   }
   .question-kpi {
     height: 5rem;
     display: flex;
   }
+  .question-kpi-title {
+    white-space: nowrap;
+  }
   .question-unit {
-    height: 4em;
+    flex-grow: 1;
+    margin-bottom: 0.5em;
   }
 
   .no-data {
@@ -130,24 +135,35 @@
     background: #f2994a;
     border-radius: 3px;
   }
+
+  @media only screen and (max-width: 715px) {
+    .header-link-text {
+      display: none;
+    }
+
+    .question-summary > div {
+      margin: 0 1em;
+    }
+  }
 </style>
 
 <article class:loading class="uk-card uk-card-default uk-card-small question-card">
   <div class="uk-card-header">
     <h3 class="uk-card-title">{question.category}</h3>
-    <a href={question.learnMoreLink} class="uk-link-muted uk-text-small">
+    <a href={question.learnMoreLink} class="uk-link-muted uk-text-small" title="Learn More">
       <span class="inline-svg-icon">
         {@html fileIcon}
-      </span>Learn More</a>
+      </span><span class="header-link-text">Learn More</span></a>
     <a
       href="#{question.anchor}"
       id={question.anchor}
       class="uk-link-muted uk-text-small"
-      on:click|preventDefault={showShareLink}>
+      on:click|preventDefault={showShareLink}
+      title="Share Link">
       <span class="inline-svg-icon">
         {@html linkIcon}
       </span>
-      Share Link
+      <span class="header-link-text"> Share Link </span>
     </a>
   </div>
   <div class="uk-card-body question-body">
@@ -188,8 +204,8 @@
             <SurveyTrend trend={s.trend ? s.trend.trend : null} />
           {/await}
         </div>
-        <div class="uk-text-bold">
-          Historical trend
+        <div class="uk-text-bold question-kpi-title">
+          7-day trend
           <UIKitHint title="Tracks the varability of signal movenment" />
         </div>
         <div class="question-unit">
@@ -207,7 +223,7 @@
             <SurveyValue value={s.row ? s.row.value : null} />
           {/await}
         </div>
-        <div class="uk-text-bold">
+        <div class="uk-text-bold question-kpi-title">
           <ShapeIcon shape="circle" color="#c00" />
           Current count
         </div>
@@ -224,7 +240,7 @@
             <SurveyValue value={s.max ? s.max.value : null} />
           {/await}
         </div>
-        <div class="uk-text-bold">
+        <div class="uk-text-bold question-kpi-title">
           <ShapeIcon shape="diamond" color="gray" />
           {question.inverted ? 'Lowest count' : 'Highest count'}
         </div>
