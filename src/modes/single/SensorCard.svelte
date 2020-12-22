@@ -1,10 +1,10 @@
 <script>
   import { timeFormat } from 'd3-time-format';
-  import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
   import VegaTooltip from '../../components/DetailView/VegaTooltip.svelte';
+  import InfoDialogButton from '../../components/InfoDialogButton.svelte';
   import Vega from '../../components/Vega.svelte';
   import { formatAPITime, parseAPITime } from '../../data';
-  import { currentInfoSensor, smallMultipleTimeSpan } from '../../stores';
+  import { smallMultipleTimeSpan } from '../../stores';
   import { prepareSensorData } from '../overview/vegaSpec';
 
   const formatLocal = timeFormat('%m/%d/%Y');
@@ -62,49 +62,38 @@
     margin: 0.5em;
     display: flex;
     flex-direction: column;
-    align-items: left;
-    justify-content: space-between;
+    align-items: center;
+    position: relative;
   }
 
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    height: 1.5em;
-  }
-
-  .header .bounds {
-    margin: 0 1em;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-
-  h4 {
-    text-align: center;
-    font-size: 0.89rem;
-    font-weight: bold;
-    white-space: nowrap;
+  .uk-card-header {
+    position: relative;
+    align-self: stretch;
   }
 
   .toolbar {
-    margin-left: 0.5em;
+    position: absolute;
+    right: 0.5em;
+    top: 50%;
+    transform: translate(0, -50%);
+  }
+
+  .grow {
+    flex: 1 1 0;
   }
 
   .vega-wrapper {
     align-self: stretch;
-    flex: 1 1 8em;
+    flex: 0 0 8em;
     position: relative;
   }
+
   .vega-wrapper > :global(*) {
     position: absolute;
     left: 0;
     top: 0;
     right: 2px;
     bottom: 0;
-  }
-
-  .info {
-    font-size: 0.6rem;
   }
 
   .key {
@@ -161,22 +150,14 @@
   }
 </style>
 
-<section class="card container-bg container-style" data-testid="sensor-{sensor.key}">
-  <div class="header">
-    <div class="bounds">
-      <h4>{typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText() : sensor.name}</h4>
-    </div>
+<section class="uk-card uk-card-body uk-card-default uk-card-small card" data-testid="sensor-{sensor.key}">
+  <div class="uk-card-header">
+    <h3 class="uk-card-title uk-margin-remove-bottom">{sensor.plotTitleText}</h3>
     <div class="toolbar">
-      {#if sensor.description}
-        <button
-          title="Show sensor description"
-          class="pg-button pg-button-circle info"
-          on:click={() => {
-            currentInfoSensor.set(sensor);
-          }}><IoMdHelp /></button>
-      {/if}
+      <InfoDialogButton {sensor} />
     </div>
   </div>
+  <div class="grow" />
   <table class="key" class:single={selections.length === 1}>
     <colgroup>
       <col class="locationCol" />

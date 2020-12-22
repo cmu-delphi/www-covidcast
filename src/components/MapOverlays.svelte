@@ -22,7 +22,7 @@
   }
 
   .map-controls-container {
-    margin-right: 0.2em;
+    margin: 0.2em 0.2em 0 0;
     z-index: 1001;
     display: flex;
     align-items: flex-start;
@@ -40,9 +40,7 @@
     align-items: flex-start;
     justify-content: center;
     margin: 2px 5px;
-  }
-  .signal-description {
-    margin-bottom: 0.25em;
+    background: white;
   }
 
   /** desktop **/
@@ -54,6 +52,7 @@
   }
 
   .legend-container {
+    background: white;
     position: absolute;
     margin: 0.25em;
     left: 0;
@@ -88,15 +87,13 @@
 </div>
 <div class="legend-container base-font-size" aria-label="map legend">
   <EncodingOptions sensor={$currentSensorEntry} className="container-bg container-style encoding-wrapper" />
-  <div class="container-bg container-style">
-    <div class="signal-description" />
-
+  <div class="container-bg container-style" class:loading-bg={legendLoading}>
     {#if $encoding === 'color'}
-      <ColorLegend loading={legendLoading} />
+      <ColorLegend />
     {:else if $encoding === 'bubble'}
-      <BubbleLegend loading={legendLoading} {zoom} />
+      <BubbleLegend {zoom} />
     {:else if $encoding === 'spike'}
-      <SpikeLegend loading={legendLoading} {zoom} />
+      <SpikeLegend {zoom} />
     {/if}
   </div>
 </div>

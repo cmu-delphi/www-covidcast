@@ -4,8 +4,6 @@
   import { nameInfos } from '../../maps';
   import MapBox from '../../components/MapBox/MapBox.svelte';
   import Options from '../../components/Options.svelte';
-  import IoIosClose from 'svelte-icons/io/IoIosClose.svelte';
-  import FaChartLine from 'svelte-icons/fa/FaChartLine.svelte';
   import {
     currentSensor,
     currentLevel,
@@ -34,7 +32,6 @@
   import DetailView from '../../components/DetailView/DetailView.svelte';
   import MapOverlays from '../../components/MapOverlays.svelte';
   import { trackEvent } from '../../stores/ga';
-  import FaBan from 'svelte-icons/fa/FaBan.svelte';
   import AddAnother from './AddAnother.svelte';
   import { getInfoByName } from '../../maps';
 
@@ -123,12 +120,13 @@
   .root > :global(.options-container) {
     grid-area: options;
     z-index: 1010;
+    margin: 0 6px;
   }
 
-  .root > :global(.search-container) {
+  .search-container {
     grid-area: search;
     z-index: 1009;
-    margin: 0.3em;
+    margin: 0 6px;
   }
 
   .map-container {
@@ -180,6 +178,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
+    background: white;
   }
 
   .pick :global(*) {
@@ -193,44 +192,25 @@
   }
 
   .map-button {
-    background-size: 80%;
+    padding: 0 4px;
+  }
+
+  .map-button > :global(svg) {
+    background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
-    color: transparent;
     background-image: url('../../assets/imgs/choropleth_small.png');
   }
 
   .chart-button {
     color: #8c8c8c;
+    padding: 0 4px;
   }
 
   .hiddenPanel {
     grid-template-areas:
       'options search view'
       'map map map';
-  }
-
-  .single-toggle > :global(svg:last-of-type) {
-    display: none;
-    position: absolute;
-  }
-
-  .single-toggle.selected > :global(svg:first-of-type) {
-    opacity: 0.5;
-    width: 70%;
-  }
-  .single-toggle.selected > :global(svg:last-of-type) {
-    display: unset;
-    opacity: 0.5;
-  }
-
-  .selection-legend {
-    list-style-type: none;
-  }
-  .selection-legend::before {
-    content: '\25FC';
-    margin-left: -1em;
-    padding-right: 0.2em;
   }
 
   .selection-legend:hover .selection-toolbar {
@@ -275,61 +255,54 @@
   <Options className="options-container" levels={levelList} />
 
   {#if !showCompare}
-    <Search
-      className="search-container container-bg container-style"
-      placeholder="Search for a location..."
-      items={regionSearchList}
-      selectedItem={$currentRegionInfo}
-      labelFieldName="displayName"
-      maxItemsToShowInList="5"
-      on:change={(e) => {
-        if (selectByInfo(e.detail)) {
-          focusOn = e.detail || null;
-        }
-        trackEvent('search', 'select', e.detail ? e.detail.id : '');
-      }} />
+    <div class="search-container container-bg container-style">
+      <Search
+        placeholder="Search for a location..."
+        items={regionSearchList}
+        selectedItem={$currentRegionInfo}
+        labelFieldName="displayName"
+        maxItemsToShowInList="5"
+        on:change={(e) => {
+          if (selectByInfo(e.detail)) {
+            focusOn = e.detail || null;
+          }
+          trackEvent('search', 'select', e.detail ? e.detail.id : '');
+        }} />
+    </div>
 
     <div class="view-switcher">
       {#if !$isMobileDevice}
         <button
           aria-pressed={String(!desktopShowPanel)}
-          class="pg-button chart-button single-toggle"
-          class:selected={desktopShowPanel}
+          class="uk-button uk-button-default chart-button single-toggle"
           on:click={() => {
             trackEvent('overview', 'show-panel', String(!desktopShowPanel));
             desktopShowPanel = !desktopShowPanel;
           }}
-          title="{desktopShowPanel ? 'Hide' : 'Show'} Line Charts panel">
-          <span aria-hidden>{desktopShowPanel ? 'Hide' : 'Show'} Line Charts panel</span>
-          <FaChartLine />
-          <FaBan />
-        </button>
+          title="{desktopShowPanel ? 'Hide' : 'Show'} Line Charts panel"
+          data-uk-icon="icon: {desktopShowPanel ? 'chart-line-ban' : 'chart-line'}" />
       {:else}
-        <div class="pg-button-group">
+        <div class="uk-button-group">
           <button
             aria-pressed={String(mobileShowMap)}
-            class="pg-button map-button"
-            class:selected={mobileShowMap}
+            class="uk-button uk-button-default map-button"
+            class:uk-active={mobileShowMap}
             on:click={() => {
               trackEvent('overview', 'show-map', 'true');
               mobileShowMap = true;
             }}
-            title="Switch to Map">
-            <span aria-hidden>Switch to Map</span>
-            <FaChartLine />
-          </button>
+            title="Switch to Map"
+            data-uk-icon="icon: blank" />
           <button
             aria-pressed={String(!mobileShowMap)}
-            class="pg-button chart-button"
-            class:selected={!mobileShowMap}
+            class="uk-button uk-button-default chart-button"
+            class:uk-active={!mobileShowMap}
             on:click={() => {
               trackEvent('overview', 'show-map', 'false');
               mobileShowMap = false;
             }}
-            title="Switch to Line Charts">
-            <span aria-hidden>Switch to Line Charts</span>
-            <FaChartLine />
-          </button>
+            title="Switch to Line Charts"
+            data-uk-icon="icon: chart-line" />
         </div>
       {/if}
     </div>
@@ -388,7 +361,9 @@
         </div>
       </div>
       <div class="panel-bottom-wrapper mobileHide">
-        <button class="pg-button pg-text-button" on:click={() => currentCompareSelection.set(showCompare ? null : [])}>
+        <button
+          class="uk-button uk-button-default uk-button-small"
+          on:click={() => currentCompareSelection.set(showCompare ? null : [])}>
           {showCompare ? 'Exit' : 'Open'}
           compare mode
         </button>
@@ -398,15 +373,14 @@
   {#if showCompare}
     <div class="add-container">
       <div class="selection-container container-bg container-style">
-        <ul>
+        <ul class="uk-list uk-list-square uk-margin-remove">
           {#each selections as selection}
             <li class="selection-legend" style="color: {selection.color}">
               <button
-                class="selection-toolbar pg-button"
+                class="selection-toolbar uk-icon-button uk-icon-button-small"
                 on:click={() => removeCompare(selection.info)}
-                title="Remove selected">
-                <IoIosClose />
-              </button>
+                data-uk-icon="icon: close; ratio: 0.8"
+                title="Remove selected" />
               <span>{selection.info.displayName}</span>
             </li>
           {/each}

@@ -28,10 +28,12 @@
     flex-direction: column;
   }
 
-  .root :global(.search-container) {
+  .search-container {
     align-self: center;
     width: 60em;
+    margin-bottom: 1em;
   }
+
   .grid-wrapper {
     flex: 1 1 0;
     overflow: auto;
@@ -59,7 +61,7 @@
     .card-grid > :global(*) {
       width: 50em;
     }
-    .root :global(.search-container) {
+    .search-container {
       align-self: stretch;
       width: unset;
     }
@@ -77,19 +79,20 @@
 </style>
 
 <div class="root base-font-size">
-  <Search
-    className="search-container container-bg container-style"
-    placeholder={$currentRegionInfo ? 'Compare with...' : 'Search for a location...'}
-    items={nameInfos}
-    selectedItems={$currentMultiSelection}
-    labelFieldName="displayName"
-    maxItemsToShowInList="5"
-    colorFieldName="color"
-    {filterItem}
-    maxSelections={Math.min(selectionColors.length + 1, 4)}
-    on:add={(e) => addCompare(e.detail)}
-    on:remove={(e) => removeCompare(e.detail.info)}
-    on:change={(e) => selectByInfo(e.detail)} />
+  <div class="search-container">
+    <Search
+      placeholder={$currentRegionInfo ? 'Compare with...' : 'Search for a location...'}
+      items={nameInfos}
+      selectedItems={$currentMultiSelection}
+      labelFieldName="displayName"
+      maxItemsToShowInList="5"
+      colorFieldName="color"
+      {filterItem}
+      maxSelections={Math.min(selectionColors.length + 1, 4)}
+      on:add={(e) => addCompare(e.detail)}
+      on:remove={(e) => removeCompare(e.detail.info)}
+      on:change={(e) => selectByInfo(e.detail)} />
+  </div>
 
   <div class="grid-wrapper">
     <div class="card-grid">

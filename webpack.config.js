@@ -24,7 +24,6 @@ module.exports = () => {
       path: path.resolve(__dirname, 'public'),
       filename: '[name].js',
       chunkFilename: '[name].js',
-      publicPath: devMode ? undefined : './',
     },
 
     resolve: {
@@ -137,10 +136,37 @@ module.exports = () => {
       // new CopyPlugin({
       //   patterns: ['./src/static'],
       // }),
+
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
+        title: 'COVIDCast',
         template: './src/index.html',
       }),
+      new HtmlWebpackPlugin({
+        alwaysWriteToDisk: true,
+        title: 'COVIDCast Timelapse',
+        template: './src/index.html',
+        filename: 'timelapse/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        alwaysWriteToDisk: true,
+        title: 'COVIDCast Top 10',
+        template: './src/index.html',
+        filename: 'top10/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        alwaysWriteToDisk: true,
+        title: 'COVIDCast Region Details',
+        template: './src/index.html',
+        filename: 'single/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        alwaysWriteToDisk: true,
+        title: 'COVIDCast Export Data',
+        template: './src/index.html',
+        filename: 'export/index.html',
+      }),
+
       new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({
         filename: '[name].css',

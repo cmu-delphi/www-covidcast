@@ -76,7 +76,7 @@ appReady.subscribe((v) => {
       return;
     }
     trackEvent('signalCasesOrDeathOptions', 'cumulative', String(r.cumulative));
-    trackEvent('signalCasesOrDeathOptions', 'ratio', String(r.ratio));
+    trackEvent('signalCasesOrDeathOptions', 'ratio', String(!r.incidence));
   });
   currentInfoSensor.subscribe((r) => {
     if (initialRun) {

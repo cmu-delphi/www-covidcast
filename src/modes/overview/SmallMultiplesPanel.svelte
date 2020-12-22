@@ -1,18 +1,10 @@
 <script>
-  import {
-    sensorList,
-    currentSensor,
-    smallMultipleTimeSpan,
-    currentDate,
-    currentInfoSensor,
-    highlightTimeValue,
-  } from '../../stores';
-  import FaSearchPlus from 'svelte-icons/fa/FaSearchPlus.svelte';
+  import { sensorList, currentSensor, smallMultipleTimeSpan, currentDate, highlightTimeValue } from '../../stores';
   import { trackEvent } from '../../stores/ga';
   import { levelList } from '../../stores/constants';
   import SmallMultiple from './SmallMultiple.svelte';
-  import IoMdHelp from 'svelte-icons/io/IoMdHelp.svelte';
   import { prepareSensorData, resolveClickedTimeValue, onHighlight } from './vegaSpec';
+  import InfoDialogButton from '../../components/InfoDialogButton.svelte';
 
   /**
    * bi-directional binding
@@ -61,29 +53,12 @@
     padding: 0 0 0 0.25em;
   }
 
-  .title-button {
-    flex: 1 1 0;
-    padding: 0;
-    cursor: pointer;
-    display: block;
-    background: none;
-    border: none;
-    outline: none !important;
-    text-align: left;
-    color: inherit;
-    font-size: 1em;
-    line-height: 1.5em;
-    margin: 0;
+  .grow {
+    flex-grow: 1;
   }
 
-  .title-button:hover,
-  .title-button:focus,
-  li.selected .title-button {
-    color: black;
-  }
-
-  :global(#vizbox) .title-button:focus {
-    box-shadow: unset !important;
+  li.selected .uk-button-text::before {
+    right: 0;
   }
 
   .header {
@@ -96,10 +71,10 @@
     padding: 0;
   }
 
-  li:hover .toolbar > button,
-  li.selected .toolbar > button,
-  .toolbar > button:hover,
-  .toolbar > button:focus {
+  li:hover .toolbar > :global(button),
+  li.selected .toolbar > :global(button),
+  .toolbar > :global(button):hover,
+  .toolbar > :global(button):focus {
     opacity: 1;
   }
 
@@ -107,7 +82,7 @@
     font-size: 0.7rem;
     display: flex;
   }
-  .toolbar > button {
+  .toolbar > :global(button) {
     opacity: 0;
     transition: opacity 0.25s ease;
   }
@@ -140,34 +115,27 @@
       <div class="header">
         <!-- svelte-ignore a11y-missing-attribute -->
         <button
-          class="title-button"
+          class="uk-button uk-button-text"
           title={typeof s.sensor.tooltipText === 'function' ? s.sensor.tooltipText() : s.sensor.tooltipText}
           on:click|preventDefault={() => {
             trackEvent('side-panel', 'set-sensor', s.sensor.key);
             currentSensor.set(s.sensor.key);
           }}>
-          {typeof s.sensor.mapTitleText === 'function' ? s.sensor.mapTitleText() : s.sensor.name}
+          {s.sensor.plotTitleText}
         </button>
+        <div class="grow" />
         <div class="toolbar">
-          {#if s.sensor.description}
-            <button
-              title="Show sensor description"
-              class="pg-button info"
-              on:click={() => {
-                currentInfoSensor.set(s.sensor);
-              }}><IoMdHelp /></button>
-          {/if}
+          <InfoDialogButton sensor={s.sensor} />
           <button
-            class="pg-button"
+            class="uk-icon-button uk-icon-button-small"
             class:hidden={!hasRegion}
             title="Show as detail view"
-            class:active={detail === s.sensor}
+            class:uk-active={detail === s.sensor}
+            data-uk-icon="icon: search; ratio: 0.8"
             on:click|stopPropagation={() => {
               trackEvent('side-panel', detail === s.sensor ? 'hide-detail' : 'show-detail', s.sensor.key);
               detail = detail === s.sensor ? null : s.sensor;
-            }}>
-            <FaSearchPlus />
-          </button>
+            }} />
         </div>
       </div>
       <SmallMultiple {s} highlightTimeValue={$highlightTimeValue} {onClick} {onHighlight} />
