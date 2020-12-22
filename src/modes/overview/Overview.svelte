@@ -126,7 +126,7 @@
   .search-container {
     grid-area: search;
     z-index: 1009;
-    margin: 0 6px;
+    margin: 0 6px 0 0;
   }
 
   .map-container {
@@ -138,7 +138,7 @@
     grid-area: panel;
     display: flex;
     flex-direction: column;
-    margin-right: 6px;
+    margin: 6px 6px 0 0;
   }
 
   .add-container {
@@ -187,7 +187,7 @@
 
   .view-switcher {
     display: flex;
-    margin: 6px;
+    margin-right: 6px;
     grid-area: view;
   }
 
@@ -247,6 +247,10 @@
 
     .panel-container {
       grid-area: map;
+    }
+
+    .search-container {
+      margin: 6px;
     }
   }
 </style>
