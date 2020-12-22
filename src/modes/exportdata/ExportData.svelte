@@ -1,5 +1,4 @@
 <script>
-  import { timeFormat } from 'd3-time-format';
   import { callMetaAPI } from '../../data/api';
   import Datepicker from '../../components/Calendar/Datepicker.svelte';
   import { getLevelInfo, primaryValue, sensorList, sensorMap } from '../../stores/constants';
@@ -10,10 +9,11 @@
   import { trackEvent } from '../../stores/ga';
   import Search from '../../components/Search.svelte';
   import { nameInfos } from '../../maps';
+  import { formatDateISO } from '../../formats';
   import InfoDialogButton from '../../components/InfoDialogButton.svelte';
+  import { questionCategories, refSensor } from '../../modes/survey/questions';
 
   const CSV_SERVER = 'https://delphi.cmu.edu/csv';
-  const iso = timeFormat('%Y-%m-%d');
 
   const CASES_DEATH_SOURCE = 'cases-deaths';
 
@@ -129,6 +129,21 @@
       add(true, false);
       add(true, true);
     });
+  // add the survey questions one
+  questionCategories.forEach((cat) => {
+    cat.questions.forEach((question) => {
+      const key = `${question.dataSource}-${question.signal}`;
+      if (lookupMap.has(key)) {
+        return;
+      }
+      lookupMap.set(key, {
+        name: question.name,
+        tooltipText: question.signalTooltip,
+        wrappee: refSensor,
+        fake: true,
+      });
+    });
+  });
 
   callMetaAPI(null, ['min_time', 'max_time', 'signal', 'geo_type', 'data_source'], {
     time_types: 'day',
@@ -169,7 +184,7 @@
           id,
           signal: entry.signal,
           dataSource: entry.data_source,
-          entry: sensorEntry,
+          entry: known.fake ? null : sensorEntry,
           name: known ? known.name : entry.signal,
           description: known ? known.tooltipText : 'no description found',
         });
@@ -193,7 +208,9 @@
         trackEvent(
           'export',
           'download',
-          `signal=${signalValue},start_day=${iso(startDate)},end_day=${iso(endDate)},geo_type=${geoType}`,
+          `signal=${signalValue},start_day=${formatDateISO(startDate)},end_day=${formatDateISO(
+            endDate,
+          )},geo_type=${geoType}`,
         );
       });
     }
@@ -294,16 +311,16 @@
           bind:selected={startDate}
           start={signalGroup ? signalGroup.minTime : minDate(new Date(), startDate)}
           end={signalGroup ? minDate(endDate, signalGroup.maxTime) : endDate}
-          formattedSelected={iso(startDate)}>
-          <button aria-label="selected start date" class="uk-input" on:>{iso(startDate)}</button>
+          formattedSelected={formatDateISO(startDate)}>
+          <button aria-label="selected start date" class="uk-input" on:>{formatDateISO(startDate)}</button>
         </Datepicker>
         -
         <Datepicker
           bind:selected={endDate}
           start={signalGroup ? maxDate(startDate, signalGroup.minTime) : startDate}
           end={signalGroup ? signalGroup.maxTime : maxDate(new Date(), endDate)}
-          formattedSelected={iso(endDate)}>
-          <button aria-label="selected end date" class="uk-input" on:>{iso(endDate)}</button>
+          formattedSelected={formatDateISO(endDate)}>
+          <button aria-label="selected end date" class="uk-input" on:>{formatDateISO(endDate)}</button>
         </Datepicker>
       </div>
     </div>
@@ -367,14 +384,14 @@
           <label for="as-of-single">Specific date: </label>
           <Datepicker
             bind:selected={asOfDate}
-            formattedSelected={asOfDate ? iso(asOfDate) : 'Select date'}
+            formattedSelected={asOfDate ? formatDateISO(asOfDate) : 'Select date'}
             start={asOfStart}
             end={asOfEnd}>
             <button
               aria-label="selected as of date"
               class="uk-input"
               disabled={asOfMode === 'latest'}
-              on:>{asOfDate ? iso(asOfDate) : 'Select date'}</button>
+              on:>{asOfDate ? formatDateISO(asOfDate) : 'Select date'}</button>
           </Datepicker>
         </div>
         <p class="description">
@@ -432,16 +449,16 @@
       <form bind:this={form} id="form" method="GET" action={CSV_SERVER} download>
         <button type="submit" class="uk-button uk-button-default">Download CSV File</button>
         <input type="hidden" name="signal" value={signalValue} />
-        <input type="hidden" name="start_day" value={iso(startDate)} />
-        <input type="hidden" name="end_day" value={iso(endDate)} />
+        <input type="hidden" name="start_day" value={formatDateISO(startDate)} />
+        <input type="hidden" name="end_day" value={formatDateISO(endDate)} />
         <input type="hidden" name="geo_type" value={geoType} />
         {#if !isAllRegions}<input type="hidden" name="geo_values" value={geoIDs.join(',')} />{/if}
-        {#if usesAsOf}<input type="hidden" name="as_of" value={iso(asOfDate)} />{/if}
+        {#if usesAsOf}<input type="hidden" name="as_of" value={formatDateISO(asOfDate)} />{/if}
       </form>
       <p>Manually fetch data:</p>
       <pre
         class="code-block"><code>
-        {`wget --content-disposition "${CSV_SERVER}?signal=${signalValue}&start_day=${iso(startDate)}&end_day=${iso(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${iso(asOfDate)}` : ''}"`}
+        {`wget --content-disposition "${CSV_SERVER}?signal=${signalValue}&start_day=${formatDateISO(startDate)}&end_day=${formatDateISO(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${formatDateISO(asOfDate)}` : ''}"`}
       </code></pre>
       <p class="description">
         For more details about the API, see the
@@ -477,8 +494,8 @@ data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal
 
 cc_data <- suppressMessages(
 covidcast_signal(data_source = "${signal ? signal.dataSource : ''}", signal = "${signal ? signal.signal : ''}",
-                 start_day = "${iso(startDate)}", end_day = "${iso(endDate)}",
-                 geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`}${usesAsOf ? `, as_of = "${iso(asOfDate)}"` : ''})
+                 start_day = "${formatDateISO(startDate)}", end_day = "${formatDateISO(endDate)}",
+                 geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`}${usesAsOf ? `, as_of = "${formatDateISO(asOfDate)}"` : ''})
 )`}
       </code></pre>
       <p class="description">

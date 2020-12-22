@@ -3,6 +3,7 @@ import timelapseIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/
 import top10Icon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/list.svg';
 import singleIcon from '!raw-loader!../assets/location-solid.svg';
 import exportIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/download.svg';
+import surveyIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/poll.svg';
 
 /**
  * @typedef {object} Mode
@@ -45,6 +46,13 @@ const modes = [
     component: () => import('./single/SingleLocation.svelte').then((r) => r.default),
   },
   {
+    id: 'survey-results',
+    label: 'Survey Results',
+    icon: surveyIcon,
+    tooltip: 'Switch to Survey View',
+    component: () => import('./survey/Survey.svelte').then((r) => r.default),
+  },
+  {
     id: 'export',
     label: 'Export Data',
     icon: exportIcon,
@@ -56,7 +64,7 @@ const modes = [
 export default modes;
 
 /**
- * @type {Record<'overview'|'timelapse'|'top10'|'export'|'single', Mode>}
+ * @type {Record<'overview'|'timelapse'|'top10'|'export'|'single'|'survey', Mode>}
  */
 export const modeByID = {};
 modes.forEach((mode) => (modeByID[mode.id] = mode));

@@ -58,13 +58,14 @@ async function states(level = 'state') {
       postal: props.POSTAL,
       name: props.NAME,
       population: populationLookup.state(id) || Number.parseInt(props.Population, 10),
+      area: props.CENSUSAREA,
       lat: props.LAT,
       long: props.LONG,
     };
   });
   fs.writeFileSync(
     path.resolve(__dirname, `./processed/${level}.csv.js`),
-    wrapModule(dsvFormat(',').format(infos, ['id', 'postal', 'name', 'population', 'lat', 'long'])),
+    wrapModule(dsvFormat(',').format(infos, ['id', 'postal', 'name', 'population', 'area', 'lat', 'long'])),
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
@@ -208,13 +209,16 @@ async function counties(level = 'county') {
       displayName: info ? info.display_name : `${props.NAME} County, ${stateToPostal.get(props.STATE)}`,
       state: props.STATE,
       population: populationLookup.county(id) || Number.parseInt(props.Population, 10),
+      area: props.CENSUSAREA,
       lat: center.geometry.coordinates[0],
       long: center.geometry.coordinates[1],
     };
   });
   fs.writeFileSync(
     path.resolve(__dirname, `./processed/${level}.csv.js`),
-    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'population', 'lat', 'long'])),
+    wrapModule(
+      dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'population', 'area', 'lat', 'long']),
+    ),
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));

@@ -1,5 +1,5 @@
 <script>
-  import { timeFormat } from 'd3-time-format';
+  import { formatDateShort, formatPopulation } from '../../formats';
   import { currentSensorEntry, colorScale, currentDateObject, signalCasesOrDeathOptions } from '../../stores';
   import { ZERO_COLOR } from '../../theme';
   import { getTextColorBasedOnBackground } from '../../util';
@@ -9,8 +9,6 @@
   $: value = properties ? properties.value : 0;
 
   $: options = $signalCasesOrDeathOptions;
-
-  const formatTimeWithoutYear = timeFormat('%B %d');
 
   /**
    * @param {number} value
@@ -61,9 +59,7 @@
       <tbody>
         <tr>
           <th>Population</th>
-          <td class="right">
-            {typeof properties.population == 'number' ? properties.population.toLocaleString() : 'Unknown'}
-          </td>
+          <td class="right">{formatPopulation(properties)}</td>
         </tr>
         {#if $currentSensorEntry.isCasesOrDeath}
           <tr>
@@ -72,7 +68,7 @@
             <th class="area">Ratios (per 100,000)</th>
           </tr>
           <tr>
-            <th>{formatTimeWithoutYear($currentDateObject)}</th>
+            <th>{formatDateShort($currentDateObject)}</th>
             <td class="right" style={!options.cumulative && options.incidence ? colorScaleStyle(properties.count) : ''}>
               {$currentSensorEntry.formatValue(properties.count)}
             </td>
@@ -94,7 +90,7 @@
             </td>
           </tr>
           <tr>
-            <th>Cumulative {formatTimeWithoutYear($currentDateObject)}</th>
+            <th>Cumulative {formatDateShort($currentDateObject)}</th>
             <td
               class="right"
               style={options.cumulative && options.incidence ? colorScaleStyle(properties.countCumulative) : ''}>

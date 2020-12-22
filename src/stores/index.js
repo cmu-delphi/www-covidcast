@@ -339,8 +339,11 @@ export const trackedUrlParams = derived(
 
     // determine parameters based on default value and current mode
     const params = {
-      sensor: mode === modeByID.single || sensor === DEFAULT_SENSOR ? null : sensor,
-      level: mode === modeByID.single || mode === modeByID.export || level === DEFAULT_LEVEL ? null : level,
+      sensor: mode === modeByID.single || mode === modeByID.survey || sensor === DEFAULT_SENSOR ? null : sensor,
+      level:
+        mode === modeByID.single || mode === modeByID.export || mode === modeByID.survey || level === DEFAULT_LEVEL
+          ? null
+          : level,
       region: mode === modeByID.export || mode === modeByID.timelapse || !region ? null : region,
       date: mode === modeByID.export ? null : date,
       signalC: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.cumulative,
