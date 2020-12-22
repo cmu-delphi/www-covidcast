@@ -8,7 +8,7 @@
   import warningIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
   import { createTimeSeriesSpec, loadTimeSeriesData } from './timeSeries';
   import { determineTrend, findDateRow, findMaxRow, findMinRow } from './trend';
-  import { unitLong } from './questions';
+
   import { formatDateShortAbbr } from '../../formats';
   import { formatTrend, formatSampleSize, formatStdErr } from './format';
   import SurveyTrend from './SurveyTrend.svelte';
@@ -227,7 +227,7 @@
           <ShapeIcon shape="circle" color="#c00" />
           Current count
         </div>
-        <div class="question-unit">{unitLong}</div>
+        <div class="question-unit">{question.unit}</div>
         <div class="block-date">
           <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(date)}
         </div>
@@ -244,7 +244,7 @@
           <ShapeIcon shape="diamond" color="gray" />
           {question.inverted ? 'Lowest count' : 'Highest count'}
         </div>
-        <div class="question-unit">{unitLong}</div>
+        <div class="question-unit">{question.unit}</div>
         <div class="block-date">
           <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(maxDate)}
         </div>

@@ -8,7 +8,6 @@ export const referenceRawNationSignal = descriptions.referenceRawNationSignal;
 export const visibleLevels = descriptions.levels;
 
 export const factor = 10;
-export const unitLong = 'People per every 1,000 people';
 
 /**
  * @typedef {object} Question
@@ -23,6 +22,7 @@ export const unitLong = 'People per every 1,000 people';
  * @property {string[]} levels
  * @property {string} signal
  * @property {string} learnMoreLink
+ * @property {string} unit
  * @property {import("../../data").SensorEntry?} sensor matching sensor entry
  */
 
@@ -39,6 +39,7 @@ const questions = descriptions.questions.map((question) => ({
   levels: descriptions.levels,
   sensor: sensorList.find((d) => d.id === descriptions.dataSource && d.signal === question.signal),
   anchor: toAnchor(question.name),
+  unit: question.unit || descriptions.unit,
 }));
 
 /**
