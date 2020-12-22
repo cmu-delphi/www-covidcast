@@ -1,7 +1,6 @@
 <script>
   import { formatDateShort } from '../../formats';
   import { formatValue } from './format';
-  import { unitLong } from './questions';
 
   /**
    * @type {import('./questions').Question}
@@ -45,7 +44,7 @@
       </tr>
       <tr>
         <th>Value</th>
-        <td class="right">{formatValue(item.value)} {unitLong}</td>
+        <td class="right">{formatValue(item.value)} {question.unit}</td>
       </tr>
     </tbody>
   </table>
