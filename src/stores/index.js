@@ -1,7 +1,15 @@
 import { writable, derived, get, readable } from 'svelte/store';
 import { LogScale, SqrtScale } from './scales';
 import { scaleSequentialLog } from 'd3-scale';
-import { defaultSensorId, sensorList, sensorMap, yesterdayDate, levels, swpaLevels } from './constants';
+import {
+  sensorMap,
+  yesterdayDate,
+  levels,
+  DEFAULT_LEVEL,
+  DEFAULT_MODE,
+  DEFAULT_SENSOR,
+  DEFAULT_ENCODING,
+} from './constants';
 import modes, { modeByID } from '../modes';
 import { parseAPITime } from '../data/utils';
 import { getInfoByName } from '../maps';
@@ -22,100 +30,87 @@ import { MAP_THEME, selectionColors } from '../theme';
 /**
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
  */
-
-const queryString = window.location.search;
-const urlParams = new URLSearchParams(queryString);
-
 export const times = writable(null);
 export const stats = writable(null);
 
 export const appReady = writable(false);
 
 /**
- * @type {import('svelte/store').Writable<import('../routes').Mode>}
+ * magic date that will be replaced by the latest date
  */
-export const currentMode = writable(modeByID.overview, (set) => {
-  const mode = urlParams.get('mode');
-  const nextMode = modes.find((d) => d.id === mode);
-  if (nextMode) {
-    set(nextMode);
-  }
-});
+export const MAGIC_START_DATE = '20200701';
 
-export const currentSensor = writable('', (set) => {
+/**
+ * resolve the default values based on the
+ */
+const defaultValues = (() => {
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+
   const sensor = urlParams.get('sensor');
-  if (sensor && sensorMap.has(sensor)) {
-    set(sensor);
-  } else {
-    const defaultSensor = sensorList.find((d) => d.id === defaultSensorId);
-    if (defaultSensor) {
-      set(defaultSensor.key);
-    } else {
-      set(sensorList[0].key);
-    }
-  }
-});
+  const level = urlParams.get('level');
+  const encoding = urlParams.get('encoding');
+  const date = urlParams.get('date');
+
+  const compareIds = (urlParams.get('compare') || '').split(',').map(getInfoByName).filter(Boolean);
+
+  const modeFromPath = () => {
+    const pathName = window.location.pathname;
+    // last path segment, e.g. /test/a -> a, /test/b/ -> b
+    return pathName.split('/').filter(Boolean).reverse(0)[0];
+  };
+  const mode = urlParams.get('mode') || modeFromPath();
+
+  return {
+    mode: modes.find((d) => d.id === mode) || DEFAULT_MODE,
+    sensor: sensor && sensorMap.has(sensor) ? sensor : DEFAULT_SENSOR,
+    level: levels.includes(level) ? level : DEFAULT_LEVEL,
+    signalCasesOrDeathOptions: {
+      cumulative: urlParams.has('signalC'),
+      incidence: urlParams.has('signalI'),
+    },
+    encoding: encoding === 'color' || encoding === 'bubble' || encoding === 'spike' ? encoding : DEFAULT_ENCODING,
+    date: /\d{8}/.test(date) ? date : MAGIC_START_DATE,
+    region: urlParams.get('region') || '',
+    compare:
+      compareIds.length > 0
+        ? compareIds.map((info, i) => ({ info, displayName: info.displayName, color: selectionColors[i] || 'grey' }))
+        : null,
+  };
+})();
+
+/**
+ * @type {import('svelte/store').Writable<import('../modes').Mode>}
+ */
+export const currentMode = writable(defaultValues.mode);
+
+export const currentSensor = writable(defaultValues.sensor);
+export const currentSensorEntry = derived([currentSensor], ([$currentSensor]) => sensorMap.get($currentSensor));
 
 /**
  * @type {import('svelte/store').Writable<import('../data').SensorEntry | null>}
  */
 export const currentInfoSensor = writable(null);
 
-export const currentSensorEntry = derived([currentSensor], ([$currentSensor]) => sensorMap.get($currentSensor));
-
 // 'county', 'state', or 'msa'
-export const currentLevel = writable('county', (set) => {
-  const level = urlParams.get('level');
-  if (levels.includes(level) || swpaLevels.includes(level)) {
-    set(level);
-  }
-});
-
-// Options are 'direction' and 'value'.
-/**
- * @type {import('svelte/store').Writable<'direction' | 'value'>}
- */
-export const signalType = writable('value');
-// , (set) => {
-//   const signalT = urlParams.get('signalType');
-//   if (signalT === 'direction' || signalT === 'value') {
-//     // set(signalT);
-//     set('value');
-//   }
-// });
-
-export const isValueSignalType = derived([signalType], ([v]) => v === 'value');
-export const isDirectionSignalType = derived([signalType], ([v]) => v === 'direction');
+export const currentLevel = writable(defaultValues.level);
 
 // in case of a death signal whether to show cumulative data
-export const signalCasesOrDeathOptions = writable({
-  cumulative: urlParams.has('signalC'),
-  ratio: urlParams.has('signalR'),
-});
+/**
+ * @type {import('svelte/store').Writable<import('./constants').CasesOrDeathOptions>}
+ */
+export const signalCasesOrDeathOptions = writable(defaultValues.signalCasesOrDeathOptions);
 
 export const currentSensorMapTitle = derived([currentSensorEntry, signalCasesOrDeathOptions], ([sensor, options]) =>
   typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText(options) : sensor.mapTitleText,
 );
 
-// Options are 'color', 'bubble', and 'spike'
-export const encoding = writable('color', (set) => {
-  const encoding = urlParams.get('encoding');
-  if (encoding === 'color' || encoding === 'bubble' || encoding === 'spike') {
-    set(encoding);
-  }
-});
-
 /**
- * magic date that will be replaced by the latest date
+ * @type {import('svelte/store').Writable<'color' | 'spike' | 'bubble'>}
  */
-export const MAGIC_START_DATE = '20200701';
-export const currentDate = writable(MAGIC_START_DATE, (set) => {
-  const date = urlParams.get('date');
-  if (/\d{8}/.test(date)) {
-    set(date);
-  }
-});
+export const encoding = writable(defaultValues.encoding);
 
+export const currentDate = writable(defaultValues.date);
 /**
  * current date as a Date object
  */
@@ -140,13 +135,7 @@ export let highlightTimeValue = writable(null);
 
 // Region GEO_ID for filtering the line chart
 // 42003 - Allegheny; 38300 - Pittsburgh; PA - Pennsylvania.
-export const currentRegion = writable('', (set) => {
-  const region = urlParams.get('region');
-  // TODO validation
-  if (region) {
-    set(region);
-  }
-});
+export const currentRegion = writable(defaultValues.region);
 
 /**
  * current region info (could also be null)
@@ -178,13 +167,14 @@ currentRegionInfo.subscribe((v) => {
 /**
  *
  * @param {import('../maps/nameIdInfo').NameInfo | null} elem
+ * @returns {boolean} whether the selection has changed
  */
 export function selectByInfo(elem, reset = false) {
   if (elem === get(currentRegionInfo)) {
     if (reset) {
       currentRegion.set('');
     }
-    return;
+    return reset;
   }
   if (elem) {
     currentRegion.set(elem.propertyId);
@@ -192,10 +182,11 @@ export function selectByInfo(elem, reset = false) {
   } else {
     currentRegion.set('');
   }
+  return true;
 }
 
 export function selectByFeature(feature, reset = false) {
-  selectByInfo(feature ? getInfoByName(feature.properties.id) : null, reset);
+  return selectByInfo(feature ? getInfoByName(feature.properties.id) : null, reset);
 }
 
 export const colorScale = writable(scaleSequentialLog());
@@ -217,14 +208,10 @@ currentSensorEntry.subscribe((sensorEntry) => {
     currentInfoSensor.set(sensorEntry);
   }
 
-  // if (sensorEntry.type === 'late' && sensorEntry.id !== 'hospital-admissions') {
-  //   signalType.set('value');
-  // }
-
   if (!sensorEntry.isCasesOrDeath) {
     signalCasesOrDeathOptions.set({
       cumulative: false,
-      ratio: false,
+      incidence: false,
     });
   }
 
@@ -244,12 +231,20 @@ currentSensorEntry.subscribe((sensorEntry) => {
 // mobile device detection
 // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
 
-export const isMobileDevice = readable(false, (set) => {
-  const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
-  set(isMobileQuery.matches);
-  isMobileQuery.addEventListener('change', (evt) => {
-    set(evt.matches);
-  });
+const isMobileQuery = window.matchMedia
+  ? window.matchMedia('only screen and (max-width: 767px)')
+  : { matches: false, addEventListener: () => undefined };
+export const isMobileDevice = readable(isMobileQuery.matches, (set) => {
+  if (typeof isMobileQuery.addEventListener === 'function') {
+    isMobileQuery.addEventListener('change', (evt) => {
+      set(evt.matches);
+    });
+  } else {
+    // deprecated but other version is not supported in Safari 13
+    isMobileQuery.addListener((e) => {
+      set(e.matches);
+    });
+  }
 });
 
 // export const isPortraitDevice = readable(false, (set) => {
@@ -269,17 +264,11 @@ export const isMobileDevice = readable(false, (set) => {
  * @property {string} displayName;
  */
 
-// null = disable
-// []
 /**
+ * null = disable
  * @type {import('svelte/store').Writable<CompareSelection[] | null>}
  * */
-export const currentCompareSelection = writable(null, (set) => {
-  const ids = (urlParams.get('compare') || '').split(',').map(getInfoByName).filter(Boolean);
-  if (ids.length > 0) {
-    set(ids.map((info, i) => ({ info, displayName: info.displayName, color: selectionColors[i] || 'grey' })));
-  }
-});
+export const currentCompareSelection = writable(defaultValues.compare);
 
 /**
  * add an element to the compare selection
@@ -331,4 +320,43 @@ export const currentMultiSelection = derived(
     ]
       .filter(Boolean)
       .flat(),
+);
+
+export const trackedUrlParams = derived(
+  [
+    currentMode,
+    currentSensor,
+    currentLevel,
+    currentRegion,
+    currentDate,
+    signalCasesOrDeathOptions,
+    encoding,
+    currentCompareSelection,
+  ],
+  ([mode, sensor, level, region, date, signalOptions, encoding, compare]) => {
+    const sensorEntry = sensorMap.get(sensor);
+    const inMapMode = mode === modeByID.overview || mode === modeByID.timelapse;
+
+    // determine parameters based on default value and current mode
+    const params = {
+      sensor: mode === modeByID.single || mode === modeByID.survey || sensor === DEFAULT_SENSOR ? null : sensor,
+      level:
+        mode === modeByID.single || mode === modeByID.export || mode === modeByID.survey || level === DEFAULT_LEVEL
+          ? null
+          : level,
+      region: mode === modeByID.export || mode === modeByID.timelapse || !region ? null : region,
+      date: mode === modeByID.export ? null : date,
+      signalC: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.cumulative,
+      signalI: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.incidence,
+      encoding: !inMapMode || encoding === DEFAULT_ENCODING ? null : encoding,
+      compare:
+        (mode !== modeByID.overview && mode !== modeByID.single) || !compare
+          ? null
+          : compare.map((d) => d.info.propertyId).join(','),
+    };
+    return {
+      path: mode === DEFAULT_MODE ? `` : `${mode.id}/`,
+      params,
+    };
+  },
 );

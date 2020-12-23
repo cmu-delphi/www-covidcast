@@ -1,3 +1,10 @@
+import mapIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/map.svg';
+import timelapseIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/clock.svg';
+import top10Icon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/list.svg';
+import singleIcon from '!raw-loader!../assets/location-solid.svg';
+import exportIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/download.svg';
+import surveyIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/poll.svg';
+
 /**
  * @typedef {object} Mode
  * @property {string} id
@@ -13,45 +20,51 @@ const modes = [
   {
     id: 'overview',
     label: 'Map Overview',
+    icon: mapIcon,
     tooltip: 'Switch to the Map Overview',
-    component: () => import(/* webpackPreload: true */ './overview/Overview.svelte').then((r) => r.default),
+    component: () => import('./overview/Overview.svelte').then((r) => r.default),
   },
   {
     id: 'timelapse',
     label: 'Timelapse',
+    icon: timelapseIcon,
     tooltip: 'Switch to Timelapse Mode',
-    component: () => import(/* webpackPrefech: true */ './timelapse/TimeLapse.svelte').then((r) => r.default),
+    component: () => import('./timelapse/TimeLapse.svelte').then((r) => r.default),
   },
   {
     id: 'top10',
     label: 'Top 10',
+    icon: top10Icon,
     tooltip: 'Switch to Top 10 Mode',
-    component: () => import(/* webpackPrefetch: true */ './top10/Top10.svelte').then((r) => r.default),
+    component: () => import('./top10/Top10.svelte').then((r) => r.default),
   },
   {
     id: 'single',
     label: 'Region Details',
+    icon: singleIcon,
     tooltip: 'Switch to Region Details View',
     component: () => import('./single/SingleLocation.svelte').then((r) => r.default),
   },
   {
+    id: 'survey-results',
+    label: 'Survey Results',
+    icon: surveyIcon,
+    tooltip: 'Switch to Survey View',
+    component: () => import('./survey/Survey.svelte').then((r) => r.default),
+  },
+  {
     id: 'export',
     label: 'Export Data',
+    icon: exportIcon,
     tooltip: 'Switch to Export Data Mode',
     component: () => import('./exportdata/ExportData.svelte').then((r) => r.default),
   },
-  // {
-  //   id: 'swpa',
-  //   label: 'SWPA',
-  //   tooltip: 'Switch to SWPA Mode',
-  //   component: () => import(/* webpackPrefetch: true */ './swpa/SWPA.svelte').then((r) => r.default),
-  // },
 ];
 
 export default modes;
 
 /**
- * @type {Record<'overview'|'timelapse'|'top10'|'export', Mode>}
+ * @type {Record<'overview'|'timelapse'|'top10'|'export'|'single'|'survey', Mode>}
  */
 export const modeByID = {};
 modes.forEach((mode) => (modeByID[mode.id] = mode));

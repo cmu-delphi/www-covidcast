@@ -1,76 +1,23 @@
-import {
-  currentSensor,
-  currentLevel,
-  currentRegion,
-  currentMode,
-  currentDate,
-  signalType,
-  encoding,
-  signalCasesOrDeathOptions,
-  currentCompareSelection,
-} from '.';
-import { get } from 'svelte/store';
-import { trackUrl } from './ga';
+import { trackedUrlParams } from '.';
+import throttle from 'lodash-es/throttle';
 
 // Constantly keep the URL parameters updated with the current state.
-function updateURIParameters(delta) {
-  const state = {
-    sensor: get(currentSensor),
-    level: get(currentLevel),
-    region: get(currentRegion),
-    date: get(currentDate),
-    signalType: get(signalType),
-    encoding: get(encoding),
-    mode: get(currentMode).id,
-    signalC: get(signalCasesOrDeathOptions).cumulative,
-    signalR: get(signalCasesOrDeathOptions).ratio,
-    compare: get(currentCompareSelection) ? get(currentCompareSelection).map((d) => d.info.propertyId) : null,
-    ...delta, // inject current delta
-  };
-
+export function updateURIParameters(state) {
   // just update the current state
   const params = new URLSearchParams(window.location.search);
 
   // update params with state
-  Object.keys(state).forEach((key) => {
-    const v = state[key];
+  Object.keys(state.params).forEach((key) => {
+    const v = state.params[key];
     if (v) {
       params.set(key, v);
     } else {
       params.delete(key);
     }
   });
-  window.history.replaceState(state, document.title, `?${params.toString()}`);
-
-  trackUrl(`?${params.toString()}`);
+  const path = `${window.DELPHI_COVIDCAST_PAGE || '/'}${state.path}`;
+  const query = params.toString();
+  window.history.replaceState(state, document.title, `${path}${query.length > 0 ? '?' : ''}${query}`);
 }
 
-// Keep the URL updated with the current state
-currentSensor.subscribe((sensor) =>
-  updateURIParameters({
-    sensor,
-  }),
-);
-currentLevel.subscribe((level) =>
-  updateURIParameters({
-    level,
-  }),
-);
-currentRegion.subscribe((region) => updateURIParameters({ region }));
-currentDate.subscribe((date) => updateURIParameters({ date }));
-signalType.subscribe((signalType) =>
-  updateURIParameters({
-    signalType,
-  }),
-);
-signalCasesOrDeathOptions.subscribe((r) =>
-  updateURIParameters({
-    signalC: r.cumulative,
-    signalR: r.ratio,
-  }),
-);
-encoding.subscribe((encoding) => updateURIParameters({ encoding }));
-currentMode.subscribe((mode) => updateURIParameters({ mode: mode.id }));
-currentCompareSelection.subscribe((value) =>
-  updateURIParameters({ compare: value ? value.map((d) => d.info.propertyId) : null }),
-);
+trackedUrlParams.subscribe(throttle(updateURIParameters, 250));

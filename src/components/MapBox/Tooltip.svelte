@@ -1,13 +1,7 @@
 <script>
-  import { timeFormat } from 'd3-time-format';
-  import {
-    currentSensorEntry,
-    colorScale,
-    currentDateObject,
-    signalCasesOrDeathOptions,
-    isDirectionSignalType,
-  } from '../../stores';
-  import { DIRECTION_THEME, ZERO_COLOR } from '../../theme';
+  import { formatDateShort, formatPopulation } from '../../formats';
+  import { currentSensorEntry, colorScale, currentDateObject, signalCasesOrDeathOptions } from '../../stores';
+  import { ZERO_COLOR } from '../../theme';
   import { getTextColorBasedOnBackground } from '../../util';
 
   export let invalid = false;
@@ -15,8 +9,6 @@
   $: value = properties ? properties.value : 0;
 
   $: options = $signalCasesOrDeathOptions;
-
-  const formatTimeWithoutYear = timeFormat('%B %d');
 
   /**
    * @param {number} value
@@ -67,67 +59,46 @@
       <tbody>
         <tr>
           <th>Population</th>
-          <td class="right">
-            {typeof properties.population == 'number' ? properties.population.toLocaleString() : 'Unknown'}
-          </td>
+          <td class="right">{formatPopulation(properties)}</td>
         </tr>
-        {#if $isDirectionSignalType}
-          <tr>
-            {#if properties.value === 1}
-              <td colspan="2" style="background-color: {DIRECTION_THEME.increasing}">
-                {@html DIRECTION_THEME.increasingIcon}
-                Increasing
-              </td>
-            {:else if value === 0}
-              <td colspan="2" style="background-color: {DIRECTION_THEME.steady}">
-                {@html DIRECTION_THEME.steadyIcon}
-                Steady
-              </td>
-            {:else if value === -1}
-              <td colspan="2" style="background-color: {DIRECTION_THEME.decreasing}">
-                {@html DIRECTION_THEME.decreasingIcon}
-                Decreasing
-              </td>
-            {:else}
-              <td colspan="2">Unknown</td>
-            {/if}
-          </tr>
-        {:else if $currentSensorEntry.isCasesOrDeath}
+        {#if $currentSensorEntry.isCasesOrDeath}
           <tr>
             <th>{$currentSensorEntry.yAxis}</th>
             <th class="area">Count</th>
             <th class="area">Ratios (per 100,000)</th>
           </tr>
           <tr>
-            <th>{formatTimeWithoutYear($currentDateObject)}</th>
-            <td class="right" style={!options.cumulative && !options.ratio ? colorScaleStyle(properties.count) : ''}>
+            <th>{formatDateShort($currentDateObject)}</th>
+            <td class="right" style={!options.cumulative && options.incidence ? colorScaleStyle(properties.count) : ''}>
               {$currentSensorEntry.formatValue(properties.count)}
             </td>
             <td
               class="right"
-              style={!options.cumulative && options.ratio ? colorScaleStyle(properties.countRatio) : ''}>
+              style={!options.cumulative && !options.incidence ? colorScaleStyle(properties.countRatio) : ''}>
               {$currentSensorEntry.formatValue(properties.countRatio)}
             </td>
           </tr>
           <tr>
             <th>7-day avg</th>
-            <td class="right" style={!options.cumulative && !options.ratio ? colorScaleStyle(properties.avg) : ''}>
+            <td class="right" style={!options.cumulative && options.incidence ? colorScaleStyle(properties.avg) : ''}>
               {$currentSensorEntry.formatValue(properties.avg)}
             </td>
-            <td class="right" style={!options.cumulative && options.ratio ? colorScaleStyle(properties.avgRatio) : ''}>
+            <td
+              class="right"
+              style={!options.cumulative && !options.incidence ? colorScaleStyle(properties.avgRatio) : ''}>
               {$currentSensorEntry.formatValue(properties.avgRatio)}
             </td>
           </tr>
           <tr>
-            <th>Cumulative {formatTimeWithoutYear($currentDateObject)}</th>
+            <th>Cumulative {formatDateShort($currentDateObject)}</th>
             <td
               class="right"
-              style={options.cumulative && !options.ratio ? colorScaleStyle(properties.countCumulative) : ''}>
+              style={options.cumulative && options.incidence ? colorScaleStyle(properties.countCumulative) : ''}>
               {$currentSensorEntry.formatValue(properties.countCumulative)}
             </td>
             <td
               class="right"
-              style={options.cumulative && options.ratio ? colorScaleStyle(properties.countRatioCumulative) : ''}>
+              style={options.cumulative && !options.incidence ? colorScaleStyle(properties.countRatioCumulative) : ''}>
               {$currentSensorEntry.formatValue(properties.countRatioCumulative)}
             </td>
           </tr>

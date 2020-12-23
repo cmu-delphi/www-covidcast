@@ -1,9 +1,8 @@
 <script>
   import Title from './Title.svelte';
   import MapControls from './MapControls.svelte';
-  import { isDirectionSignalType, encoding, currentSensorEntry } from '../stores';
+  import { encoding, currentSensorEntry } from '../stores';
   import EncodingOptions from './EncodingOptions.svelte';
-  import DirectionLegend from './legends/DirectionLegend.svelte';
   import ColorLegend from './legends/ColorLegend.svelte';
   import BubbleLegend from './legends/BubbleLegend.svelte';
   import SpikeLegend from './legends/SpikeLegend.svelte';
@@ -23,7 +22,7 @@
   }
 
   .map-controls-container {
-    margin-right: 0.2em;
+    margin: 0;
     z-index: 1001;
     display: flex;
     align-items: flex-start;
@@ -40,10 +39,6 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    margin: 2px 5px;
-  }
-  .signal-description {
-    margin-bottom: 0.25em;
   }
 
   /** desktop **/
@@ -52,9 +47,14 @@
       box-shadow: none;
       border: none;
     }
+
+    .map-controls-container {
+      margin: 6px 6px 0 0;
+    }
   }
 
   .legend-container {
+    background: white;
     position: absolute;
     margin: 0.25em;
     left: 0;
@@ -89,17 +89,13 @@
 </div>
 <div class="legend-container base-font-size" aria-label="map legend">
   <EncodingOptions sensor={$currentSensorEntry} className="container-bg container-style encoding-wrapper" />
-  <div class="container-bg container-style">
-    <div class="signal-description" />
-
-    {#if $isDirectionSignalType}
-      <DirectionLegend />
-    {:else if $encoding === 'color'}
-      <ColorLegend loading={legendLoading} />
+  <div class="container-bg container-style" class:loading-bg={legendLoading}>
+    {#if $encoding === 'color'}
+      <ColorLegend />
     {:else if $encoding === 'bubble'}
-      <BubbleLegend loading={legendLoading} {zoom} />
+      <BubbleLegend {zoom} />
     {:else if $encoding === 'spike'}
-      <SpikeLegend loading={legendLoading} {zoom} />
+      <SpikeLegend {zoom} />
     {/if}
   </div>
 </div>

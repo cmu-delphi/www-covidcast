@@ -73,10 +73,6 @@
     bottom: 0;
   }
 
-  td {
-    border: 0;
-  }
-
   .date {
     display: block;
     font-size: 0.5em;

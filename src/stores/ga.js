@@ -3,7 +3,6 @@ import {
   currentLevel,
   currentRegion,
   currentDate,
-  signalType,
   encoding,
   currentMode,
   signalCasesOrDeathOptions,
@@ -60,12 +59,6 @@ appReady.subscribe((v) => {
     }
     trackEvent('date', 'set', date);
   });
-  signalType.subscribe((signalType) => {
-    if (initialRun) {
-      return;
-    }
-    trackEvent('signalType', 'set', signalType);
-  });
   encoding.subscribe((encoding) => {
     if (initialRun) {
       return;
@@ -83,7 +76,7 @@ appReady.subscribe((v) => {
       return;
     }
     trackEvent('signalCasesOrDeathOptions', 'cumulative', String(r.cumulative));
-    trackEvent('signalCasesOrDeathOptions', 'ratio', String(r.ratio));
+    trackEvent('signalCasesOrDeathOptions', 'ratio', String(!r.incidence));
   });
   currentInfoSensor.subscribe((r) => {
     if (initialRun) {
