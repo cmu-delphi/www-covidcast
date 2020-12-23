@@ -34,4 +34,4 @@ OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
 
-/*! nouislider - 14.6.1 - 8/17/2020 */
+/*! nouislider - 14.6.3 - 11/19/2020 */

@@ -249,7 +249,7 @@ Links:
 ---
 Name: COVID Cases
 Id: indicator-combination
-Signal: confirmed_7dav_incidence_num
+Signal: confirmed_7dav_incidence_prop
 CasesOrDeathSignals:
  Avg: confirmed_7dav_incidence_num
  Count: confirmed_incidence_num
@@ -264,7 +264,8 @@ Levels: [msa, county, state, hrr]
 YAxis: Cases
 Format: raw
 HasStdErr: false
-TooltipText: Newly reported COVID-19 cases, based on data from USAFacts and Johns Hopkins University
+TooltipText: Newly reported COVID-19 cases per 100,000 people, based on data from USAFacts and Johns Hopkins University
+PlotTitleText: Newly reported COVID-19 cases per 100,000 people
 
 
 MapTitleText: 
@@ -285,7 +286,7 @@ Links:
 ---
 Name: COVID Deaths
 Id: indicator-combination
-Signal: deaths_7dav_incidence_num
+Signal: deaths_7dav_incidence_prop
 CasesOrDeathSignals:
  Avg: deaths_7dav_incidence_num
  Count: deaths_incidence_num
@@ -302,7 +303,8 @@ Format: raw
 HasStdErr: false
 
 
-TooltipText: Newly reported COVID-19 deaths, based on data from USAFacts and Johns Hopkins University
+TooltipText: Newly reported COVID-19 deaths per 100,000 people, based on data from USAFacts and Johns Hopkins University
+PlotTitleText: Newly reported COVID-19 deaths per 100,000 people
 
 
 MapTitleText: 
