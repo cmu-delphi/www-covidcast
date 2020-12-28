@@ -6,7 +6,7 @@ if (!modeList) {
   // create a dummy one
   document.body.insertAdjacentHTML(
     'afterbegin',
-    `<div class="uk-visible@s covidcast-modes">
+    `<div class="covidcast-modes">
   <div class="uk-container uk-margin-remove-vertical">
     <ul class="uk-tab">
         ${modes
