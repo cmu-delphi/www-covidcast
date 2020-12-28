@@ -10,8 +10,8 @@ if (!modeList) {
   <div class="uk-container uk-margin-remove-vertical">
     <ul class="uk-tab">
         ${modes
-          .map((d) => `<li data-mode="${d.id}" class="covidcast-mode"><a href="/${d.id}">${d.label}</li>`)
-          .join(',')}
+          .map((d) => `<li data-mode="${d.id}" class="covidcast-mode"><a href="/${d.id}">${d.label}</a></li>`)
+          .join('')}
     </ul>
   </div>
 </div>`,
