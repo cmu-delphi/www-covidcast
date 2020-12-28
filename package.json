@@ -21,6 +21,7 @@
     "process-geo": "node ./src/maps/process.js",
     "start": "npm run gen && cross-env NODE_ENV=development webpack-dev-server -d --open",
     "build": "npm run gen && cross-env NODE_ENV=production webpack -p",
+    "watch": "cross-env NODE_ENV=development webpack --mode development -w",
     "deploy": "npm run build; gh-pages -d public",
     "zip": "cd public && bestzip ../release.zip *",
     "prettier": "prettier --write \"**/*\"",
