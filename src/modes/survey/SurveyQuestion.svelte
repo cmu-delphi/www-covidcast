@@ -137,6 +137,10 @@
   }
 
   @media only screen and (max-width: 715px) {
+    .question-question {
+      font-size: 1.15rem;
+    }
+
     .header-link-text {
       display: none;
     }
