@@ -1,5 +1,13 @@
 # Release 1.12.0
 
+Bugfix release for improved mobile experience
+
+## Bug-fixes
+
+- [#700](https://github.com/cmu-delphi/www-covidcast/pull/700) Improve mobile experience
+
+# Release 1.12.0
+
 This release introduces the new National COVID Survey Dashboard showing aggregated survey results. In addition, the overall style of COVIDCast has been adapted to the new website.
 
 ## New Features
