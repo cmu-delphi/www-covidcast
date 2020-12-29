@@ -1,4 +1,4 @@
-# Release 1.12.0
+# Release 1.12.1
 
 Bugfix release for improved mobile experience
 
