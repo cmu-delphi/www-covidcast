@@ -21,3 +21,5 @@
 *.png
 *.jpg
 *.toml
+*.tgz
+*.zip
