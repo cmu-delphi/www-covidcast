@@ -14,12 +14,16 @@
   },
   "main": "public/bundle.js",
   "files": [
-    "public"
+    "public/**.js",
+    "public/**.txt",
+    "public/**.css"
   ],
   "scripts": {
+    "clean": "rimraf \"*.zip\" \"*.tgz\" public",
     "gen": "node ./scripts/generateDescriptions.js",
     "process-geo": "node ./src/maps/process.js",
     "start": "npm run gen && cross-env NODE_ENV=development webpack-dev-server -d --open",
+    "prebuild": "npm run clean",
     "build": "npm run gen && cross-env NODE_ENV=production webpack -p",
     "watch": "cross-env NODE_ENV=development webpack --mode development -w",
     "deploy": "npm run build; gh-pages -d public",

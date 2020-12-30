@@ -22,8 +22,8 @@ module.exports = () => {
 
     output: {
       path: path.resolve(__dirname, 'public'),
-      filename: '[name].js',
-      chunkFilename: '[name].js',
+      filename: '[name].[contenthash].js',
+      chunkFilename: '[name].[contenthash].js',
     },
 
     resolve: {
@@ -175,9 +175,9 @@ module.exports = () => {
 
       new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({
-        filename: '[name].css',
+        filename: '[name].[contenthash].css',
         ignoreOrder: true,
-        chunkFilename: '[name].css',
+        chunkFilename: '[name].[contenthash].css',
       }),
     ].filter(Boolean),
   };
