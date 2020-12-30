@@ -139,36 +139,36 @@ module.exports = () => {
 
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
-        title: 'COVIDCast',
+        title: 'COVIDcast',
         template: './src/index.html',
       }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
-        title: 'COVIDCast Timelapse',
+        title: 'COVIDcast Timelapse',
         template: './src/index.html',
         filename: 'timelapse/index.html',
       }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
-        title: 'COVIDCast Top 10',
+        title: 'COVIDcast Top 10',
         template: './src/index.html',
         filename: 'top10/index.html',
       }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
-        title: 'COVIDCast Region Details',
+        title: 'COVIDcast Region Details',
         template: './src/index.html',
         filename: 'single/index.html',
       }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
-        title: 'COVIDCast Export Data',
+        title: 'COVIDcast Export Data',
         template: './src/index.html',
         filename: 'export/index.html',
       }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
-        title: 'COVIDCast Survey Results',
+        title: 'COVIDcast Survey Results',
         template: './src/index.html',
         filename: 'survey-results/index.html',
       }),
