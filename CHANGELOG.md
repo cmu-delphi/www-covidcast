@@ -8,7 +8,7 @@ Bugfix release for improved mobile experience
 
 # Release 1.12.0
 
-This release introduces the new National COVID Survey Dashboard showing aggregated survey results. In addition, the overall style of COVIDCast has been adapted to the new website.
+This release introduces the new National COVID Survey Dashboard showing aggregated survey results. In addition, the overall style of COVIDcast has been adapted to the new website.
 
 ## New Features
 
