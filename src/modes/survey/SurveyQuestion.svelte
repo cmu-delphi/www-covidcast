@@ -210,7 +210,7 @@
         </div>
         <div class="uk-text-bold question-kpi-title">
           7-day trend
-          <UIKitHint title="Tracks the varability of signal movenment" />
+          <UIKitHint title="Tracks the variability of signal movenment" />
         </div>
         <div class="question-unit">
           {#await summary}N/A{:then s}{s.trend ? `${formatTrend(s.trend.change)} since` : 'N/A'}{/await}
