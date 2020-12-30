@@ -1,5 +1,6 @@
 import { sensorList } from '../../stores';
 import descriptions from './descriptions.generated.json';
+import '!file-loader?name=surveyquestions.raw.txt!./descriptions.raw.txt';
 
 export const overviewText = descriptions.overview;
 export const trendThreshold = descriptions.trendThreshold;
