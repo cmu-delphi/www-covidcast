@@ -16,7 +16,8 @@
   "files": [
     "public/**.js",
     "public/**.txt",
-    "public/**.css"
+    "public/**.css",
+    "!public/wrapper.*"
   ],
   "scripts": {
     "clean": "rimraf \"*.zip\" \"*.tgz\" public",
