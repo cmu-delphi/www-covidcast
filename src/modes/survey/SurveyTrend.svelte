@@ -18,20 +18,20 @@
   $: {
     if (!trend) {
       trendIcon = questionCircleIcon;
-      trendInfo = 'Historcal trend remains consistent';
+      trendInfo = 'Historical trend remains consistent';
     } else if (trend.startsWith('inc')) {
       trendIcon = longArrowUpIcon;
-      trendInfo = `Historcal trend is ${trend}`;
+      trendInfo = `Historical trend is ${trend}`;
       isGood = inverted;
       isBad = !inverted;
     } else if (trend.startsWith('dec')) {
       trendIcon = longArrowDownIcon;
-      trendInfo = `Historcal trend is ${trend}`;
+      trendInfo = `Historical trend is ${trend}`;
       isGood = inverted;
       isBad = !inverted;
     } else {
       trendIcon = longArrowRightIcon;
-      trendInfo = 'Historcal trend remains consistent';
+      trendInfo = 'Historical trend remains consistent';
     }
   }
 </script>

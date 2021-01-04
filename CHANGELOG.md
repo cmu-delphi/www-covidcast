@@ -1,5 +1,21 @@
 # Release 1.12.1
 
+Bugfix release for changed signal
+
+## Signal Changes
+
+- Reverted "COVID-Related Doctor Visits" signal
+
+## Bug-fixes
+
+- [#703](https://github.com/cmu-delphi/www-covidcast/pull/703) rename COVIDCast to COVIDcast
+
+## Others
+
+- [#704](https://github.com/cmu-delphi/www-covidcast/pull/704) Unique bundle names
+
+# Release 1.12.1
+
 Bugfix release for improved mobile experience
 
 ## Bug-fixes
@@ -8,7 +24,7 @@ Bugfix release for improved mobile experience
 
 # Release 1.12.0
 
-This release introduces the new National COVID Survey Dashboard showing aggregated survey results. In addition, the overall style of COVIDCast has been adapted to the new website.
+This release introduces the new National COVID Survey Dashboard showing aggregated survey results. In addition, the overall style of COVIDcast has been adapted to the new website.
 
 ## New Features
 

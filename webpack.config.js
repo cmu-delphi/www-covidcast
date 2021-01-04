@@ -22,8 +22,8 @@ module.exports = () => {
 
     output: {
       path: path.resolve(__dirname, 'public'),
-      filename: '[name].js',
-      chunkFilename: '[name].js',
+      filename: devMode ? '[name].js' : '[name].[contenthash].js',
+      chunkFilename: devMode ? '[name].js' : '[name].[contenthash].js',
     },
 
     resolve: {
@@ -139,45 +139,45 @@ module.exports = () => {
 
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
-        title: 'COVIDCast',
+        title: 'COVIDcast',
         template: './src/index.html',
       }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
-        title: 'COVIDCast Timelapse',
+        title: 'COVIDcast Timelapse',
         template: './src/index.html',
         filename: 'timelapse/index.html',
       }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
-        title: 'COVIDCast Top 10',
+        title: 'COVIDcast Top 10',
         template: './src/index.html',
         filename: 'top10/index.html',
       }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
-        title: 'COVIDCast Region Details',
+        title: 'COVIDcast Region Details',
         template: './src/index.html',
         filename: 'single/index.html',
       }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
-        title: 'COVIDCast Export Data',
+        title: 'COVIDcast Export Data',
         template: './src/index.html',
         filename: 'export/index.html',
       }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
-        title: 'COVIDCast Survey Results',
+        title: 'COVIDcast Survey Results',
         template: './src/index.html',
         filename: 'survey-results/index.html',
       }),
 
       new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({
-        filename: '[name].css',
+        filename: devMode ? '[name].css' : '[name].[contenthash].css',
         ignoreOrder: true,
-        chunkFilename: '[name].css',
+        chunkFilename: devMode ? '[name].css' : '[name].[contenthash].css',
       }),
     ].filter(Boolean),
   };

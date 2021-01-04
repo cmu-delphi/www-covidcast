@@ -1,4 +1,4 @@
-# Contributing to COVIDCast
+# Contributing to COVIDcast
 
 ## Branches
 
