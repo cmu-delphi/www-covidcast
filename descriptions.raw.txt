@@ -56,7 +56,7 @@ HasStdErr: false
  
 MapTitleText: Daily number of visits to bars per 100,000 people, based on SafeGraph’s Weekly Patterns dataset
  
-Description: Delphi receives data from [SafeGraph](https://docs.safegraph.com/docs/weekly-patterns), which collects weekly insights on Places of Interest (POI) using anonymized location data from mobile phones. We select locations that qualify as "Drinking Places (alcoholic beverages)" from all the [core places](https://docs.safegraph.com/v4.0/docs/places-manual#section-core-places), then count the number of visits and normalize by population size. 
+Description: Delphi receives data from [SafeGraph](https://docs.safegraph.com/docs/weekly-patterns), which collects weekly insights on Points of Interest (POI) using anonymized location data from mobile phones. We select locations that qualify as "Drinking Places (alcoholic beverages)" from all the [core places](https://docs.safegraph.com/v4.0/docs/places-manual#section-core-places), then count the number of visits and normalize by population size. Note that these counts only include people whose visits are tracked because they are in SafeGraph’s panel; they do not include all bar visits by everyone in the population.
 
 
 Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
@@ -75,7 +75,7 @@ HasStdErr: false
  
 MapTitleText: Daily number of visits to restaurants per 100,000 people, based on SafeGraph’s Weekly Patterns dataset
  
-Description: Delphi receives data from [SafeGraph](https://docs.safegraph.com/docs/weekly-patterns), which collects weekly insights on Places of Interest (POI) using anonymized location data from mobile phones. We select locations that qualify as "Full-Service Restaurants" from all the [core places]( https://docs.safegraph.com/v4.0/docs/places-manual#section-core-places), then count the number of visits and normalize by population size.
+Description: Delphi receives data from [SafeGraph](https://docs.safegraph.com/docs/weekly-patterns), which collects weekly insights on Points of Interest (POI) using anonymized location data from mobile phones. We select locations that qualify as "Full-Service Restaurants" from all the [core places]( https://docs.safegraph.com/v4.0/docs/places-manual#section-core-places), then count the number of visits and normalize by population size. Note that these counts only include people whose visits are tracked because they are in SafeGraph’s panel; they do not include all restaurant visits by everyone in the population.
 
 
 Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
@@ -96,10 +96,10 @@ ColorScale: interpolateYlGnBu
 
 
 
-MapTitleText: Percentage of people who report wearing a mask most or all of the time while in public, based on surveys of Facebook users
+MapTitleText: Percentage of people who say they wear a mask most or all of the time while in public, based on surveys of Facebook users
 
 
-Description: Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they, or anyone in their household, are currently experiencing COVID-related symptoms. We also ask them if they wear a mask when they are in public. For this signal, we estimate the percentage of people who wear a mask most or all of the time when they are in public.
+Description: Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they, or anyone in their household, are currently experiencing COVID-related symptoms. We also ask them if they wear a mask when they are in public. For this signal, we estimate the percentage of people who say they wear a mask most or all of the time when they are in public.
 
 
 Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
@@ -107,10 +107,11 @@ Credits: We are happy for you to use this data in products and publications unde
 
 Links:
  - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html)"
+ - link: "[Interpreting mask use in context](https://delphi.cmu.edu/blog/2020/12/13/are-masks-widely-used-in-public/)"
 ---
 Name: COVID-Related Doctor Visits
-Id: chng
-Signal: smoothed_adj_outpatient_cli
+Id: doctor-visits
+Signal: smoothed_adj_cli
 Type: early
 Levels: [county, msa, state, hrr]
 YAxis: Percentage
@@ -122,14 +123,14 @@ Default: true
 MapTitleText: Percentage of daily doctor visits that are due to COVID-like symptoms
 
 
-Description: Delphi receives from Change Healthcare aggregated statistics on COVID-related outpatient doctor visits, derived from ICD codes found in insurance claims. Using this data Delphi estimates the percentage of daily doctor’s visits in each area that are due to COVID-like illness. Note that these estimates are based only on visits by patients whose data is accessible to Change Healthcare. All Change Healthcare claims data has been de-identified in accordance with HIPAA privacy regulations.
+Description: Delphi receives from our health system partners aggregated statistics on COVID-related outpatient doctor visits, derived from ICD codes found in insurance claims. Using this data Delphi estimates the percentage of daily doctor’s visits in each area that are due to COVID-like illness. Note that these estimates are based only on visits by patients whose data is accessible to our partners.
 
 
-Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution-NonCommercial license.
+Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
 
 
 Links:
- - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/chng.html)"
+ - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/doctor-visits.html)"
 ---
 Name: COVID-Like Symptoms
 Id: fb-survey
