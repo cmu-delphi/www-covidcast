@@ -1,4 +1,4 @@
-import boundsInfo from './processed/bounds.json';
+import boundsInfo from './processed/bounds.js';
 import { dsvFormat } from 'd3-dsv';
 import stateRaw from './processed/state.csv.js';
 import msaRaw from './processed/msa.csv.js';

@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const centerOfMass = require('@turf/center-of-mass').default;
 const { topology } = require('topojson-server');
-const geojsonExtent = require('@mapbox/geojson-extent');
+const bbox = require('@turf/bbox').default;
 const { LngLatBounds, LngLat } = require('mapbox-gl');
 const fetch = require('node-fetch');
 
@@ -15,7 +15,7 @@ const data = require('./raw/name_id_info.json');
 const rows = data.all;
 
 function computeBounds(geojson, scale = 1) {
-  const bounds = geojsonExtent(geojson);
+  const bounds = bbox(geojson);
 
   const mapglBounds = new LngLatBounds(new LngLat(bounds[0], bounds[1]), new LngLat(bounds[2], bounds[3]));
 
@@ -41,7 +41,11 @@ function computeBounds(geojson, scale = 1) {
  * @param {string} csv
  */
 function wrapModule(csv) {
-  return `export default \`${csv}\`;`;
+  return `export default \`${csv}\`;\n`;
+}
+
+function wrapJSONModule(json) {
+  return `export default ${JSON.stringify(json)};\n`;
 }
 
 async function states(level = 'state') {
@@ -68,7 +72,7 @@ async function states(level = 'state') {
     wrapModule(dsvFormat(',').format(infos, ['id', 'postal', 'name', 'population', 'area', 'lat', 'long'])),
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
+  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.js`), wrapJSONModule(topo));
   return geo;
 }
 
@@ -116,7 +120,7 @@ function msa(level = 'msa') {
     wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'population', 'lat', 'long'])),
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
+  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.js`), wrapJSONModule(topo));
   return geo;
 }
 
@@ -221,7 +225,7 @@ async function counties(level = 'county') {
     ),
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
+  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.js`), wrapJSONModule(topo));
   return geo;
 }
 
@@ -266,7 +270,7 @@ async function hrr(level = 'hrr') {
   );
   // fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.geo.json`), JSON.stringify(geo));
   const topo = topology({ [level]: geo }, QUANTIZATION / 2.5);
-  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
+  fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.js`), wrapJSONModule(topo));
   return geo;
 }
 
@@ -295,8 +299,8 @@ function cities() {
   await cities();
 
   fs.writeFileSync(
-    path.resolve(__dirname, `./processed/bounds.json`),
-    JSON.stringify(
+    path.resolve(__dirname, `./processed/bounds.js`),
+    wrapJSONModule(
       {
         states: computeBounds(statesGeo).toArray(),
         msa: computeBounds(msaGeo).toArray(),
