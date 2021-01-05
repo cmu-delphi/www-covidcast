@@ -1,6 +1,6 @@
 <script>
   import { levelList } from '../../stores';
-  import { nameInfos } from '../../maps';
+  import { nameInfos, infosByLevel } from '../../maps';
   import MapContainer from '../../components/MapContainer.svelte';
   import Options from '../../components/Options.svelte';
   import {
@@ -274,7 +274,7 @@
     <MapContainer
       mapLoading={loading}
       legendLoading={loading}
-      summary={{ data, level: $currentLevel, items: nameInfos }}
+      summary={{ data, level: $currentLevel, items: infosByLevel[$currentLevel] || [] }}
       on:loading={(e) => (loading = e.detail)}
       {data}
       {selections}

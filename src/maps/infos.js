@@ -66,6 +66,9 @@ export const countyInfo = parseCSV(countyRaw, 'county', (county) => `${county.na
 export const hrrInfo = parseCSV(hrrRaw, 'hrr', (hrr) => `${hrr.state} - ${hrr.name} (HRR)`);
 
 // generate mega counties by copying the states
+/**
+ * @type {NameInfo[]}
+ */
 const megaCountyInfo = stateInfo.map((info) => ({
   id: info.id + '000',
   propertyId: info.id + '000',
@@ -77,9 +80,20 @@ const megaCountyInfo = stateInfo.map((info) => ({
   long: null,
 }));
 
-export const nameInfos = stateInfo
-  .concat(msaInfo, countyInfo, hrrInfo, megaCountyInfo)
-  .sort((a, b) => a.displayName.localeCompare(b.displayName));
+function sortByDisplayName(a, b) {
+  return a.displayName.localeCompare(b.displayName);
+}
+
+export const infosByLevel = {
+  nation: [nationInfo],
+  state: stateInfo.sort(sortByDisplayName),
+  msa: msaInfo.sort(sortByDisplayName),
+  county: countyInfo.sort(sortByDisplayName),
+  hrr: hrrInfo.sort(sortByDisplayName),
+  [levelMegaCountyId]: megaCountyInfo.sort(sortByDisplayName),
+};
+
+export const nameInfos = stateInfo.concat(msaInfo, countyInfo, hrrInfo, megaCountyInfo).sort(sortByDisplayName);
 
 /**
  * helper to resolve a given id to a name info object
