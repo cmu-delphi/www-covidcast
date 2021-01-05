@@ -1,4 +1,3 @@
-import boundsInfo from './processed/bounds.js';
 import { dsvFormat } from 'd3-dsv';
 import stateRaw from './processed/state.csv.js';
 import msaRaw from './processed/msa.csv.js';
@@ -81,8 +80,6 @@ const megaCountyInfo = stateInfo.map((info) => ({
 export const nameInfos = stateInfo
   .concat(msaInfo, countyInfo, hrrInfo, megaCountyInfo)
   .sort((a, b) => a.displayName.localeCompare(b.displayName));
-
-export const bounds = boundsInfo;
 
 /**
  * helper to resolve a given id to a name info object
