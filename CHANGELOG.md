@@ -1,5 +1,21 @@
 # Release 1.12.1
 
+Bugfix release for changed signal
+
+## Signal Changes
+
+- Reverted "COVID-Related Doctor Visits" signal
+
+## Bug-fixes
+
+- [#703](https://github.com/cmu-delphi/www-covidcast/pull/703) rename COVIDCast to COVIDcast
+
+## Others
+
+- [#704](https://github.com/cmu-delphi/www-covidcast/pull/704) Unique bundle names
+
+# Release 1.12.1
+
 Bugfix release for improved mobile experience
 
 ## Bug-fixes
