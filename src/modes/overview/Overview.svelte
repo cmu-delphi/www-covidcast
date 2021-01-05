@@ -35,9 +35,6 @@
   import AddAnother from './AddAnother.svelte';
   import { getInfoByName } from '../../maps';
 
-  export let wrapperClass = USMapBoxWrapper;
-  export let regionSearchList = nameInfos;
-
   /**
    * @type {MapBox}
    */
@@ -262,7 +259,7 @@
     <div class="search-container container-bg container-style">
       <Search
         placeholder="Search for a location..."
-        items={regionSearchList}
+        items={nameInfos}
         selectedItem={$currentRegionInfo}
         labelFieldName="displayName"
         maxItemsToShowInList="5"
@@ -318,7 +315,7 @@
       mapLoading={loading}
       legendLoading={loading}
       {zoom}
-      summary={{ data, level: $currentLevel, items: regionSearchList }} />
+      summary={{ data, level: $currentLevel, items: nameInfos }} />
     <MapBox
       bind:this={map}
       on:loading={(e) => (loading = e.detail)}
@@ -347,7 +344,7 @@
           }
         }
       }}
-      {wrapperClass}
+      wrapperClass={USMapBoxWrapper}
       title={$currentSensorMapTitle} />
 
     {#if detailSensor != null && !$isMobileDevice && desktopShowPanel}
@@ -391,7 +388,7 @@
         </ul>
       </div>
       <AddAnother
-        {regionSearchList}
+        regionSearchList={nameInfos}
         bind:pickMapMode
         on:add={(e) => addCompare(e.detail)}
         {selections}
