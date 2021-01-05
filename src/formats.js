@@ -30,19 +30,6 @@ export function formatDateLocal(date) {
  *
  * @param {NameInfo} info
  */
-export function formatArea(info) {
-  if (!info || typeof info.area !== 'number') {
-    return 'Unknown';
-  }
-  return info.area.toLocaleString(undefined, {
-    maximumFractionDigits: 0,
-  });
-}
-
-/**
- *
- * @param {NameInfo} info
- */
 export function formatPopulation(info) {
   if (!info || typeof info.population !== 'number') {
     return 'Unknown';

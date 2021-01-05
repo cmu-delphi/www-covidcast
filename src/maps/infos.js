@@ -12,28 +12,23 @@ export const levelMegaCountyId = 'mega-county';
  * @property {string} id param id
  * @property {string} propertyId geojson: feature.property.id
  * @property {number} population
- * @property {number?} area
- * @property {number} lat center latitude
- * @property {number} long center longitude
  * @property {'state' | 'county' | 'msa' | 'hrr' | 'nation'} level
  */
 
-function parseCSV(csv, level, deriveDisplayName = (d) => d.name) {
+function parseCSV(csv, level, deriveDisplayName = (d) => d.name, extras = () => undefined) {
   /**
    * @type {NameInfo[]}
    */
-  const r = dsvFormat(',').parse(csv, (d) => {
+  const r = dsvFormat(';').parse(csv, (d) => {
     Object.assign(d, {
       level,
       propertyId: d.postal || d.id,
       population: d.population === 'NaN' || d.population === '' ? null : Number.parseInt(d.population, 10),
-      area: d.area === 'NaN' || d.area === '' ? null : Number.parseFloat(d.area),
-      lat: Number.parseFloat(d.lat),
-      long: Number.parseFloat(d.long),
     });
-    if (!d.displayName) {
+    if (!d.displayName || d.displayName === 'X') {
       d.displayName = deriveDisplayName(d);
     }
+    extras(d);
     return d;
   });
   return r;
@@ -55,14 +50,19 @@ export const nationInfo = {
   id: 'us',
   displayName: 'US - Whole Nation',
   propertyId: 'us',
-  long: stateInfo.find((d) => d.propertyId === 'DC').long,
-  lat: stateInfo.find((d) => d.propertyId === 'DC').lat,
-  area: stateInfo.reduce((acc, v) => acc + v.area, 0),
   population: stateInfo.reduce((acc, v) => acc + v.population, 0),
 };
 
 export const msaInfo = parseCSV(msaRaw, 'msa');
-export const countyInfo = parseCSV(countyRaw, 'county', (county) => `${county.name} County, ${county.state}`);
+export const countyInfo = parseCSV(
+  countyRaw,
+  'county',
+  (county) =>
+    `${county.name}${county.displayName !== 'X' ? ' County' : ''}, ${stateLookup.get(county.id.slice(0, 2)).postal}`,
+  (county) => {
+    county.state = stateLookup.get(county.id.slice(0, 2)).postal;
+  },
+);
 export const hrrInfo = parseCSV(hrrRaw, 'hrr', (hrr) => `${hrr.state} - ${hrr.name} (HRR)`);
 
 // generate mega counties by copying the states
