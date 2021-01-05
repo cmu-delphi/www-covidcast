@@ -12,30 +12,28 @@ const modes = [
   {
     id: 'overview',
     label: 'Map Overview',
-    component: () =>
-      import(/* webpackChunkName: 'mode-overview' */ './overview/Overview.svelte').then((r) => r.default),
+    component: () => import(/* webpackChunkName: 'm-overview' */ './overview/Overview.svelte').then((r) => r.default),
   },
   {
     id: 'timelapse',
     label: 'Timelapse',
     component: () =>
-      import(/* webpackChunkName: 'mode-timelapse' */ './timelapse/TimeLapse.svelte').then((r) => r.default),
+      import(/* webpackChunkName: 'm-timelapse' */ './timelapse/TimeLapse.svelte').then((r) => r.default),
   },
   {
     id: 'top10',
     label: 'Top 10',
-    component: () => import(/* webpackChunkName: 'mode-top10' */ './top10/Top10.svelte').then((r) => r.default),
+    component: () => import(/* webpackChunkName: 'm-top10' */ './top10/Top10.svelte').then((r) => r.default),
   },
   {
     id: 'single',
     label: 'Region Details',
-    component: () =>
-      import(/* webpackChunkName: 'mode-single' */ './single/SingleLocation.svelte').then((r) => r.default),
+    component: () => import(/* webpackChunkName: 'm-single' */ './single/SingleLocation.svelte').then((r) => r.default),
   },
   {
     id: 'survey-results',
     label: 'Survey Results',
-    component: () => import(/* webpackChunkName: 'mode-survey' */ './survey/Survey.svelte').then((r) => r.default),
+    component: () => import(/* webpackChunkName: 'm-survey' */ './survey/Survey.svelte').then((r) => r.default),
   },
   {
     id: 'export',

@@ -37,6 +37,9 @@ module.exports = () => {
     optimization: {
       minimizer: [new OptimizeCSSAssetsPlugin(), new TerserPlugin()],
       splitChunks: {
+        minChunks: 2,
+        maxInitialRequests: 4,
+        maxAsyncRequests: 6,
         cacheGroups: {
           // no splitting of css files
           styles: {
@@ -44,11 +47,6 @@ module.exports = () => {
             test: /\.css$/,
             chunks: 'all',
             enforce: true,
-          },
-          vendor: {
-            test: /[\\/]node_modules[\\/](?!(uikit)\/)/,
-            name: 'vendors',
-            chunks: 'all',
           },
         },
       },
@@ -58,7 +56,7 @@ module.exports = () => {
       rules: [
         !devMode && {
           test: /\.m?js$/,
-          exclude: /node_modules\/(?!(svelte|mapbox-gl)\/)/,
+          exclude: /node_modules[\\/](?!(svelte|mapbox-gl)[\\/])/,
           use: ['babel-loader'],
         },
         {
