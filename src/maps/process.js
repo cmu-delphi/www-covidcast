@@ -207,11 +207,13 @@ async function counties(level = 'county') {
     feature.properties = {};
     const center = centerById.get(id);
     const info = infoById.get(id);
+    const state = stateToPostal.get(props.STATE);
+    const displayName = `${props.NAME} County, ${state}`;
     return {
       id,
       name: props.NAME,
-      displayName: info ? info.display_name : `${props.NAME} County, ${stateToPostal.get(props.STATE)}`,
-      state: props.STATE,
+      displayName: info && info.display_name !== displayName ? info.display_name : null,
+      state,
       population: populationLookup.county(id) || Number.parseInt(props.Population, 10),
       area: props.CENSUSAREA,
       lat: center.geometry.coordinates[0],
@@ -258,7 +260,6 @@ async function hrr(level = 'hrr') {
         name,
         state,
         population: populationLookup.hrr(id),
-        displayName: `${props.hrr_name} (HRR)`,
         lat: center[0],
         long: center[1],
       };
@@ -266,7 +267,7 @@ async function hrr(level = 'hrr') {
     .sort((a, b) => a.id.localeCompare(b.id));
   fs.writeFileSync(
     path.resolve(__dirname, `./processed/${level}.csv.js`),
-    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'displayName', 'state', 'population', 'lat', 'long'])),
+    wrapModule(dsvFormat(',').format(infos, ['id', 'name', 'state', 'population', 'lat', 'long'])),
   );
   // fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.geo.json`), JSON.stringify(geo));
   const topo = topology({ [level]: geo }, QUANTIZATION / 2.5);
