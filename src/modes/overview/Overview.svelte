@@ -1,27 +1,17 @@
 <script>
   import { levelList } from '../../stores';
-  import USMapBoxWrapper from '../../components/MapBox/USMapBoxWrapper';
-  import { nameInfos } from '../../maps';
-  import MapBox from '../../components/MapBox/MapBox.svelte';
+  import { nameInfos, infosByLevel } from '../../maps';
+  import MapContainer from '../../components/MapContainer.svelte';
   import Options from '../../components/Options.svelte';
   import {
-    currentSensor,
-    currentLevel,
-    encoding,
-    colorScale,
-    colorStops,
-    bubbleRadiusScale,
-    spikeHeightScale,
     currentRegionInfo,
-    currentRegion,
+    currentLevel,
     selectByInfo,
     selectByFeature,
     currentSensorEntry,
     currentDateObject,
-    signalCasesOrDeathOptions,
     isMobileDevice,
     currentCompareSelection,
-    currentSensorMapTitle,
     currentMultiSelection,
     addCompare,
     removeCompare,
@@ -30,40 +20,9 @@
   import SmallMultiplesPanel from './SmallMultiplesPanel.svelte';
   import { fetchRegionSlice } from '../../data';
   import DetailView from '../../components/DetailView/DetailView.svelte';
-  import MapOverlays from '../../components/MapOverlays.svelte';
   import { trackEvent } from '../../stores/ga';
   import AddAnother from './AddAnother.svelte';
   import { getInfoByName } from '../../maps';
-
-  export let wrapperClass = USMapBoxWrapper;
-  export let regionSearchList = nameInfos;
-
-  /**
-   * @type {MapBox}
-   */
-  let map;
-
-  function initialReady() {
-    if (!$currentRegion) {
-      map.selectRandom();
-    }
-  }
-
-  function updatedEncoding(info) {
-    if (!info) {
-      return;
-    }
-    if (info.scale) {
-      colorScale.set(info.scale);
-    }
-    colorStops.set(info.stops);
-    if ($encoding === 'bubble' && info.custom) {
-      bubbleRadiusScale.set(info.custom);
-    }
-    if ($encoding === 'spike' && info.custom) {
-      spikeHeightScale.set(info.custom);
-    }
-  }
 
   /**
    * @type {import('../../data/fetchData').SensorEntry | null}
@@ -84,7 +43,6 @@
   let mobileShowMap = true;
   let desktopShowPanel = true;
   let pickMapMode = false;
-  let zoom = 1;
 
   $: showCompare = $currentCompareSelection != null;
 
@@ -262,7 +220,7 @@
     <div class="search-container container-bg container-style">
       <Search
         placeholder="Search for a location..."
-        items={regionSearchList}
+        items={nameInfos}
         selectedItem={$currentRegionInfo}
         labelFieldName="displayName"
         maxItemsToShowInList="5"
@@ -313,25 +271,15 @@
   {/if}
 
   <div class="map-container" class:mobileHide={!mobileShowMap} class:pick={pickMapMode}>
-    <MapOverlays
-      {map}
+    <MapContainer
       mapLoading={loading}
       legendLoading={loading}
-      {zoom}
-      summary={{ data, level: $currentLevel, items: regionSearchList }} />
-    <MapBox
-      bind:this={map}
+      summary={{ data, level: $currentLevel, items: infosByLevel[$currentLevel] || [] }}
       on:loading={(e) => (loading = e.detail)}
       {data}
-      sensor={$currentSensor}
-      level={$currentLevel}
-      signalOptions={$signalCasesOrDeathOptions}
       {selections}
       {focusOn}
-      encoding={$encoding}
-      on:ready={() => initialReady()}
-      on:zoom={(e) => (zoom = e.detail)}
-      on:updatedEncoding={(e) => updatedEncoding(e.detail)}
+      selectRandomOnReady
       on:select={(e) => {
         if (focusOn != null) {
           focusOn = null;
@@ -346,9 +294,7 @@
             trackEvent('map', 'select', e.detail.feature.id);
           }
         }
-      }}
-      {wrapperClass}
-      title={$currentSensorMapTitle} />
+      }} />
 
     {#if detailSensor != null && !$isMobileDevice && desktopShowPanel}
       <div class="detail-container container-bg container-style">
@@ -391,7 +337,7 @@
         </ul>
       </div>
       <AddAnother
-        {regionSearchList}
+        regionSearchList={nameInfos}
         bind:pickMapMode
         on:add={(e) => addCompare(e.detail)}
         {selections}

@@ -12,6 +12,7 @@ export function generateGeo(topo, level, arr, additionalProperties = {}) {
       ...d,
       id: d.propertyId,
       ...additionalProperties,
+      ...(f.properties || {}),
     };
 
     f.properties = properties;
@@ -20,7 +21,7 @@ export function generateGeo(topo, level, arr, additionalProperties = {}) {
       type: 'Feature',
       geometry: {
         type: 'Point',
-        coordinates: [d.lat, d.long],
+        coordinates: [properties.lat, properties.long],
       },
       id: d.id,
       properties,
