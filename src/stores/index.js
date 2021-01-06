@@ -235,6 +235,18 @@ currentSensorEntry.subscribe((sensorEntry) => {
   }
 });
 
+currentMode.subscribe((mode) => {
+  if (mode === modeByID['survey-results']) {
+    // change sensor and date to the latest one within the survey
+    currentSensor.set(DEFAULT_SURVEY_SENSOR);
+    const timesMap = get(times);
+    if (timesMap != null) {
+      const entry = timesMap.get(DEFAULT_SURVEY_SENSOR);
+      currentDate.set(entry[1]); // max
+    }
+  }
+});
+
 // mobile device detection
 // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
 
