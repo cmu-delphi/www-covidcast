@@ -8,6 +8,7 @@ import {
   DEFAULT_LEVEL,
   DEFAULT_MODE,
   DEFAULT_SENSOR,
+  DEFAULT_SURVEY_SENSOR,
   DEFAULT_ENCODING,
 } from './constants';
 import modes, { modeByID } from '../modes';
@@ -61,9 +62,15 @@ const defaultValues = (() => {
   };
   const mode = urlParams.get('mode') || modeFromPath();
 
+  const modeObj = modes.find((d) => d.id === mode) || DEFAULT_MODE;
   return {
-    mode: modes.find((d) => d.id === mode) || DEFAULT_MODE,
-    sensor: sensor && sensorMap.has(sensor) ? sensor : DEFAULT_SENSOR,
+    mode: modeObj,
+    sensor:
+      sensor && sensorMap.has(sensor)
+        ? sensor
+        : modeObj === modeByID['survey-results']
+        ? DEFAULT_SURVEY_SENSOR
+        : DEFAULT_SENSOR,
     level: levels.includes(level) ? level : DEFAULT_LEVEL,
     signalCasesOrDeathOptions: {
       cumulative: urlParams.has('signalC'),
@@ -228,6 +235,18 @@ currentSensorEntry.subscribe((sensorEntry) => {
   }
 });
 
+currentMode.subscribe((mode) => {
+  if (mode === modeByID['survey-results']) {
+    // change sensor and date to the latest one within the survey
+    currentSensor.set(DEFAULT_SURVEY_SENSOR);
+    const timesMap = get(times);
+    if (timesMap != null) {
+      const entry = timesMap.get(DEFAULT_SURVEY_SENSOR);
+      currentDate.set(entry[1]); // max
+    }
+  }
+});
+
 // mobile device detection
 // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
 
@@ -339,9 +358,13 @@ export const trackedUrlParams = derived(
 
     // determine parameters based on default value and current mode
     const params = {
-      sensor: mode === modeByID.single || mode === modeByID.survey || sensor === DEFAULT_SENSOR ? null : sensor,
+      sensor:
+        mode === modeByID.single || mode === modeByID['survey-results'] || sensor === DEFAULT_SENSOR ? null : sensor,
       level:
-        mode === modeByID.single || mode === modeByID.export || mode === modeByID.survey || level === DEFAULT_LEVEL
+        mode === modeByID.single ||
+        mode === modeByID.export ||
+        mode === modeByID['survey-results'] ||
+        level === DEFAULT_LEVEL
           ? null
           : level,
       region: mode === modeByID.export || mode === modeByID.timelapse || !region ? null : region,
