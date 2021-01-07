@@ -86,8 +86,10 @@ export default class USMapBoxWrapper extends AMapBoxWrapper {
 
     this.addFillLevelLayer(levelMegaCounty.id);
     this.levels.forEach((level) => {
-      this.addFillLevelLayer(level);
+      this.addFillLevelLayer(level, level !== 'county');
     });
+    this.addBorderLevelLayer('state'); // for county
+
     this.addHoverLevelLayer(levelMegaCounty.id);
     this.levels.forEach((level) => {
       this.addHoverLevelLayer(level);

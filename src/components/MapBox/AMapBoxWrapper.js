@@ -4,7 +4,7 @@ import { defaultRegionOnStartup, levelMegaCounty } from '../../stores/constants'
 import { MAP_THEME, MISSING_COLOR } from '../../theme';
 import { MISSING_VALUE } from './encodings/utils';
 import InteractiveMap from './InteractiveMap';
-import { toFillLayer, toHoverLayer } from './layers';
+import { toBorderLayer, toFillLayer, toHoverLayer } from './layers';
 import style from './mapbox_albers_usa_style.json';
 import { toBorderSource, toCenterSource } from './sources';
 import ZoomMap from './ZoomMap';
@@ -228,7 +228,7 @@ export default class AMapBoxWrapper {
     });
   }
 
-  addFillLevelLayer(level) {
+  addFillLevelLayer(level, border = true) {
     this.map.addLayer({
       id: toFillLayer(level),
       source: toBorderSource(level),
@@ -237,7 +237,6 @@ export default class AMapBoxWrapper {
         visibility: 'none',
       },
       paint: {
-        'fill-outline-color': MAP_THEME.countyOutlineWhenFilled,
         'fill-color': MAP_THEME.countyFill,
         'fill-opacity': [
           'case',
@@ -248,6 +247,22 @@ export default class AMapBoxWrapper {
           1,
         ],
         ...this.animationOptions('fill-color'),
+        ...(border ? { 'fill-outline-color': MAP_THEME.countyOutlineWhenFilled } : {}),
+      },
+    });
+  }
+
+  addBorderLevelLayer(level) {
+    this.map.addLayer({
+      id: toBorderLayer(level),
+      source: toBorderSource(level),
+      type: 'line',
+      layout: {
+        visibility: 'none',
+      },
+      paint: {
+        'line-color': MAP_THEME.countyOutlineWhenFilled,
+        'line-width': 1,
       },
     });
   }
