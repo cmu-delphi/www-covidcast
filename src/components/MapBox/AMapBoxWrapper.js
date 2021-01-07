@@ -313,6 +313,15 @@ export default class AMapBoxWrapper {
     return level;
   }
 
+  getAllEncodingLayers() {
+    const allEncodingLayers = this.encodings.flatMap((d) => d.layers);
+    allEncodingLayers.push(...this.levels.map((level) => toFillLayer(level)));
+    if (this.hasMegaCountyLevel) {
+      allEncodingLayers.push(toFillLayer(levelMegaCounty.id));
+    }
+    return allEncodingLayers;
+  }
+
   updateOptions(encoding, level, sensor, sensorType, valueMinMax, stops, stopsMega, scale) {
     level = this.validateLevel(level);
     // changed the visibility of layers
@@ -332,11 +341,7 @@ export default class AMapBoxWrapper {
       this.zoom.showStateLabels(level === 'state');
     }
 
-    const allEncodingLayers = this.encodings.flatMap((d) => d.layers);
-    allEncodingLayers.push(...this.levels.map((level) => toFillLayer(level)));
-    if (this.hasMegaCountyLevel) {
-      allEncodingLayers.push(toFillLayer(levelMegaCounty.id));
-    }
+    const allEncodingLayers = this.getAllEncodingLayers();
     const visibleLayers = new Set(this.encoding.getVisibleLayers(level));
 
     allEncodingLayers.forEach((layer) => {
