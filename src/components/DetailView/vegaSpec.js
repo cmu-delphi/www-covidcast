@@ -6,7 +6,11 @@ import merge from 'lodash-es/merge';
 export const CURRENT_DATE_HIGHLIGHT = {
   description: 'shows the current data injected via a signal',
   data: {
-    values: [{ date_value: null }],
+    values: [
+      {
+        date_value: null,
+      },
+    ],
   },
   transform: [
     {
@@ -171,6 +175,40 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
         resolve: { axis: { x: 'independent' } },
         layer: [
           {
+            selection: {
+              range: {
+                type: 'interval',
+                nearest: true,
+                empty: 'none',
+                encodings: ['x'],
+                mark: {
+                  type: 'rect',
+                  fillOpacity: 0.05,
+                  stroke: 'green',
+                  strokeOpacity: 0.01,
+                  strokeWidth: 3,
+                  cursor: 'move',
+                },
+              },
+            },
+            mark: {
+              type: 'point',
+            },
+            encoding: {
+              x: { ...xDateRangeEncoding },
+              y: {
+                field: primaryValue,
+                type: 'quantitative',
+                axis: {
+                  minExtent: 25,
+                  tickCount: 3,
+                  title: ' ',
+                },
+              },
+            },
+          },
+
+          {
             mark: {
               type: 'line',
               interpolate: 'monotone',
@@ -210,7 +248,22 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
             },
             encoding: {
               color: {
+                condition: [
+                  {
+                    selection: 'range',
+                    value: 'red',
+                  },
+                ],
                 field: 'geo_value',
+              },
+              fillOpacity: {
+                condition: [
+                  {
+                    selection: 'range',
+                    value: 0.8,
+                  },
+                ],
+                value: 0.5,
               },
               x: {
                 ...xDateRangeEncoding,
@@ -227,8 +280,10 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
               },
             },
           },
+
           // complicated construct to have proper typings
           ...(sensor.hasStdErr ? [stdErrLayer] : []),
+
           {
             transform: [
               {
@@ -237,7 +292,190 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
                 },
               },
             ],
-            mark: 'rule',
+            mark: {
+              type: 'rule',
+              strokeOpacity: 0.3,
+            },
+            encoding: {
+              y: {
+                field: primaryValue,
+                type: 'quantitative',
+              },
+            },
+          },
+
+          {
+            transform: [
+              {
+                filter: {
+                  selection: 'range',
+                },
+              },
+              {
+                joinaggregate: [
+                  {
+                    op: 'min',
+                    field: 'date_value',
+                    as: 'left',
+                  },
+                  {
+                    op: 'max',
+                    field: 'date_value',
+                    as: 'right',
+                  },
+                  // The argmin and argmax values accumulate, unfortunately.
+                  // Otherwise, we could use in encoding with: { field: `min_datum['${primaryValue}']` },
+                  // {
+                  //   op: 'argmin',
+                  //   field: 'date_value',
+                  //   as: 'min_datum',
+                  // },
+                  // {
+                  //   op: 'argmax',
+                  //   field: 'date_value',
+                  //   as: 'max_datum',
+                  // },
+                ],
+              },
+            ],
+
+            layer: [
+              {
+                mark: {
+                  type: 'rect',
+                  fill: 'red',
+                  fillOpacity: 0.05,
+                  strokeWidth: 2,
+                  stroke: 'black',
+                  opacity: 0.5,
+                  strokeOpacity: 1,
+                },
+                encoding: {
+                  x: {
+                    field: 'left',
+                    type: 'temporal',
+                  },
+                  x2: {
+                    field: 'right',
+                    type: 'temporal',
+                  },
+                  y: {
+                    aggregate: { argmin: 'date_value' },
+                    field: primaryValue,
+                    type: 'quantitative',
+                  },
+                  y2: {
+                    aggregate: { argmax: 'date_value' },
+                    field: primaryValue,
+                    type: 'quantitative',
+                  },
+                },
+              },
+              // These marks accumulate.
+              // {
+              //   mark: { type: 'rule', opacity: 0.1, size: 3 },
+              //   encoding: {
+              //     x: { field: 'left' },
+              //   },
+              // },
+              // {
+              //   mark: { type: 'rule', opacity: 0.1, size: 3 },
+              //   encoding: {
+              //     x: { field: 'right' },
+              //   },
+              // },
+              {
+                mark: { type: 'rule', stroke: 'green', opacity: 0.1, size: 3 },
+                encoding: {
+                  x: null,
+                  y: {
+                    aggregate: { argmin: 'date_value' },
+                    field: primaryValue,
+                    type: 'quantitative',
+                  },
+                },
+              },
+              {
+                mark: { type: 'rule', stroke: 'green', opacity: 0.1, size: 3 },
+                encoding: {
+                  x: null,
+                  y: {
+                    aggregate: { argmax: 'date_value' },
+                    field: primaryValue,
+                    type: 'quantitative',
+                  },
+                },
+              },
+              {
+                // transform: [
+                //   {
+                //     // Using this accumulates values
+                //     joinaggregate: [
+                //       {
+                //         op: 'argmin',
+                //         field: 'date_value',
+                //         as: 'leftData',
+                //       },
+                //     ],
+                //   },
+                // ],
+                mark: {
+                  type: 'text',
+                  fontSize: 14,
+                  dx: -40,
+                  dy: -18,
+                },
+                encoding: {
+                  x: {
+                    field: 'left',
+                  },
+                  y: {
+                    aggregate: { argmin: 'date_value' },
+                    field: primaryValue,
+                    type: 'quantitative',
+                  },
+                  text: {
+                    aggregate: { argmin: 'date_value' },
+                    field: primaryValue,
+                  },
+                },
+              },
+              {
+                mark: {
+                  type: 'text',
+                  fontSize: 14,
+                  dx: 40,
+                  dy: 18,
+                },
+                encoding: {
+                  x: {
+                    field: 'right',
+                  },
+                  y: {
+                    aggregate: { argmax: 'date_value' },
+                    field: primaryValue,
+                    type: 'quantitative',
+                  },
+                  text: {
+                    aggregate: { argmax: 'date_value' },
+                    field: primaryValue,
+                  },
+                },
+              },
+            ],
+          },
+          {
+            transform: [
+              {
+                filter: {
+                  selection: 'highlight',
+                },
+              },
+            ],
+            mark: {
+              type: 'rule',
+              strokeOpacity: 0.3,
+            },
             encoding: {
               y: {
                 field: primaryValue,

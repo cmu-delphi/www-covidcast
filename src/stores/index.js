@@ -116,6 +116,12 @@ export const currentDate = writable(defaultValues.date);
  */
 export const currentDateObject = derived([currentDate], ([date]) => (!date ? null : parseAPITime(date)));
 
+export const endDate = writable(defaultValues.date);
+/**
+ * end date as a Date object
+ */
+export const endDateObject = derived([endDate], ([date]) => (!date ? null : parseAPITime(date)));
+
 export const smallMultipleTimeSpan = derived([currentDateObject], ([date]) => {
   if (!date) {
     return [timeMonth.offset(yesterdayDate, -4), yesterdayDate];

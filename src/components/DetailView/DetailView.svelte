@@ -1,5 +1,5 @@
 <script>
-  import { signalCasesOrDeathOptions, currentDateObject, smallMultipleTimeSpan } from '../../stores';
+  import { signalCasesOrDeathOptions, currentDateObject, endDateObject, smallMultipleTimeSpan } from '../../stores';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../Vega.svelte';
   import { createSpec, patchSpec } from './vegaSpec';
@@ -10,6 +10,8 @@
   import VegaTooltip from './VegaTooltip.svelte';
   import { downloadUrl } from '../../data/screenshot';
   import InfoDialogButton from '../InfoDialogButton.svelte';
+
+  import { currentDate, endDate } from '../../stores';
 
   const dispatch = createEventDispatcher();
   /**
@@ -138,6 +140,28 @@
       });
     });
   }
+
+  function onClick(e) {
+    const timeValue = resolveClickedTimeValue(e);
+    console.info('click event', e);
+
+    if (timeValue) {
+      if (e.detail.event.shiftKey) {
+        endDate.set(timeValue);
+      } else {
+        trackEvent('side-panel', 'set-date', timeValue);
+        currentDate.set(timeValue);
+      }
+    }
+  }
+
+  function resolveClickedTimeValue(e) {
+    const item = e.detail.item;
+    if (item && item.isVoronoi) {
+      return item.datum.datum.time_value;
+    }
+    return null;
+  }
 </script>
 
 <style>
@@ -212,8 +236,10 @@
     {spec}
     {patchSpec}
     {noDataText}
-    signals={{ currentDate: $currentDateObject }}
+    signals={{ currentDate: $currentDateObject, endDate: $endDateObject }}
     signalListeners={['dateRange']}
+    eventListeners={['click']}
+    on:click={onClick}
     on:signal={onDateRangeChange}
     tooltip={VegaTooltip}
     tooltipProps={{ sensor }} />

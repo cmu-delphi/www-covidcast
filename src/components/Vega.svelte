@@ -159,15 +159,52 @@
     vega = null;
     hasError = false;
     vegaPromise = embed(root, spec, {
-      actions: false,
+      actions: { editor: true },
       logLevel: Error,
       tooltip: tooltipHandler,
+
+      // patch: (spec) => {
+      //   spec.signals = spec.signals || [];
+      //   Object.entries(signals).forEach(([key, v]) => {
+      //     spec.signals.push({ name: key, value: v });
+      //   });
+      //   spec.signals.push({
+      //     name: 'width',
+      //     init: 'containerSize()[0]',
+      //     on: [
+      //       {
+      //         events: { source: 'window', type: 'resize' },
+      //         update: 'containerSize()[0]',
+      //       },
+      //     ],
+      //   });
+      //   spec.signals.push({
+      //     name: 'height',
+      //     init: 'containerSize()[1]',
+      //     on: [
+      //       {
+      //         events: { source: 'window', type: 'resize' },
+      //         update: 'containerSize()[1]',
+      //       },
+      //     ],
+      //   });
+      //   return spec;
+      // },
+
       patch: (spec) => {
         spec.signals = spec.signals || [];
-        Object.entries(signals).forEach(([key, v]) => {
-          spec.signals.push({ name: key, value: v });
+        const signalsMap = {};
+        spec.signals.forEach((sig) => {
+          console.info('existing spec signal', sig);
+          signalsMap[sig.name] = sig;
         });
-        spec.signals.push({
+
+        // This 'signals' is the exported, injected signals.
+        Object.entries(signals).forEach(([key, v]) => {
+          console.info('global signals signal', key, v);
+          signalsMap[key] = { name: key, value: v };
+        });
+        signalsMap['width'] = {
           name: 'width',
           init: 'containerSize()[0]',
           on: [
@@ -176,8 +213,8 @@
               update: 'containerSize()[0]',
             },
           ],
-        });
-        spec.signals.push({
+        };
+        signalsMap['height'] = {
           name: 'height',
           init: 'containerSize()[1]',
           on: [
@@ -186,10 +223,13 @@
               update: 'containerSize()[1]',
             },
           ],
-        });
+        };
+        spec.signals = Object.values(signalsMap);
+        console.info('spec.signals', spec.signals);
         return spec;
       },
     });
+
     vegaPromise.then((r) => {
       if (!root) {
         return;
