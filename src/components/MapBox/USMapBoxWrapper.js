@@ -1,4 +1,5 @@
-import { bounds, loadSources } from '../../maps';
+import { loadSources } from '../../maps';
+import bounds from '../../maps/processed/bounds.json';
 import { levelMegaCounty, levels } from '../../stores/constants';
 import { ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME, MAP_THEME, MISSING_COLOR } from '../../theme';
 import AMapBoxWrapper from './AMapBoxWrapper';

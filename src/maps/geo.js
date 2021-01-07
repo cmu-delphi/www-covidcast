@@ -27,7 +27,7 @@ function deriveMegaGeo(states, level) {
 function citiesGeo() {
   return {
     type: 'FeatureCollection',
-    features: dsvFormat(',').parse(citiesRaw, (r) => ({
+    features: dsvFormat(';').parse(citiesRaw, (r) => ({
       type: 'Feature',
       geometry: {
         type: 'Point',

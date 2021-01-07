@@ -7,14 +7,15 @@
 
 <style>
   .banner {
-    font-size: 12px;
+    font-size: 1rem;
     font-weight: bold;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 0.2em 1em;
     margin: 0;
+    padding: 6px 1em;
+    background: white;
   }
 
   .banner :global(.info) {

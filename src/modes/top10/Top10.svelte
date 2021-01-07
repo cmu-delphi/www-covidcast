@@ -20,6 +20,7 @@
   import { parseAPITime } from '../../data';
   import { onHighlight } from '../overview/vegaSpec';
   import { computeNeighborhood } from '../../util';
+  import InfoDialogButton from '../../components/InfoDialogButton.svelte';
 
   const SHOW_X_MORE = 10;
   const MAX_OTHER_SENSORS = 1;
@@ -300,6 +301,11 @@
     top: 0.2em;
   }
 
+  .wrapper :global(.info) {
+    margin-left: 0.5em;
+    display: inline-block;
+  }
+
   /** mobile **/
   @media only screen and (max-width: 767px) {
     .root {
@@ -356,6 +362,7 @@
                 sorted={sortCriteria === 'primary'}
                 desc={sortDirectionDesc}>
                 {primary.plotTitleText}
+                <InfoDialogButton sensor={primary} className="info" />
               </Top10SortHint>
             </th>
             {#each otherSensors as s, i}
@@ -366,6 +373,7 @@
                   sorted={sortCriteria === i}
                   desc={sortDirectionDesc}>
                   {primary.plotTitleText}
+                  <InfoDialogButton sensor={s} className="info" />
                   <button
                     class="remove-column"
                     title="Remove column"

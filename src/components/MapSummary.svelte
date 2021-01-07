@@ -3,7 +3,7 @@
 
   export let summary = null;
 
-  $: total = summary ? summary.items.reduce((acc, d) => acc + (d.level === summary.level ? 1 : 0), 0) : 0;
+  $: total = summary && summary.items ? summary.items.length : 0;
 
   $: info = getLevelInfo(summary ? summary.level : 'county');
 

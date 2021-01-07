@@ -24,9 +24,12 @@ import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 /**
  * @param {Partial<EpiDataRow>} mixinValues
  */
-function computeTransferFields(mixinValues = {}) {
+function computeTransferFields(mixinValues = {}, advanced = false) {
   const toRemove = Object.keys(mixinValues);
   const allFields = ['geo_value', 'stderr', 'time_value', 'value'];
+  if (advanced) {
+    allFields.push('issue', 'sample_size');
+  }
   return allFields.filter((d) => !toRemove.includes(d));
 }
 
@@ -34,8 +37,8 @@ function computeTransferFields(mixinValues = {}) {
  * @typedef {EpiDataRow & EpiDataCasesOrDeathValues} EpiDataCasesOrDeathRow
  */
 
-const START_TIME_RANGE = parseAPITime('20100101');
-const END_TIME_RANGE = parseAPITime('20500101');
+export const START_TIME_RANGE = parseAPITime('20100101');
+export const END_TIME_RANGE = parseAPITime('20500101');
 
 function parseData(d, mixinData = {}) {
   if (d.result < 0 || d.message.includes('no results')) {
@@ -111,13 +114,14 @@ function parseMultipleSeparateData(dataArr, defaultSignalIndex, mixinData = {}) 
  * @param {string | undefined} region
  * @param {Date | string} date
  * @param {Partial<EpiDataRow>} mixinValues
+ * @param {{advanced?: boolean}} options
  * @returns {Promise<EpiDataRow[]>}
  */
-function fetchData(sensorEntry, level, region, date, mixinValues = {}) {
+function fetchData(sensorEntry, level, region, date, mixinValues = {}, { advanced = false } = {}) {
   if (!region) {
     return Promise.resolve([]);
   }
-  const transferFields = computeTransferFields(mixinValues);
+  const transferFields = computeTransferFields(mixinValues, advanced);
   function fetchSeparate(defaultSignalIndex) {
     const extraDataFields = ['value'];
     // part of key
@@ -180,6 +184,30 @@ function fetchData(sensorEntry, level, region, date, mixinValues = {}) {
   }
 }
 
+export async function fetchSampleSizesNationSummary(sensorEntry) {
+  /**
+   * @type {EpiDataRow[]}
+   */
+  const data = await callAPIEndPoint(
+    sensorEntry.api,
+    sensorEntry.id,
+    sensorEntry.signal,
+    'nation',
+    `${formatAPITime(START_TIME_RANGE)}-${formatAPITime(END_TIME_RANGE)}`,
+    'us',
+    ['time_value', 'sample_size'],
+  ).then((r) => parseData(r, {}));
+
+  const sum = data.reduce((acc, v) => (v.sample_size != null ? acc + v.sample_size : acc), 0);
+  return {
+    // parse data produces sorted by date
+    minDate: data.length > 0 ? data[0].date_value : null,
+    maxDate: data.length > 0 ? data[data.length - 1].date_value : null,
+    totalSampleSize: sum,
+    averageSampleSize: sum / data.length,
+  };
+}
+
 /**
  *
  * @param {SensorEntry} sensorEntry
@@ -235,12 +263,13 @@ export function fetchTimeSlice(
   endDate = END_TIME_RANGE,
   fitRange = false,
   mixinValues = {},
+  options = {},
 ) {
   if (!region) {
     return Promise.resolve([]);
   }
   const timeRange = `${formatAPITime(startDate)}-${formatAPITime(endDate)}`;
-  const data = fetchData(sensorEntry, level, region, timeRange, mixinValues);
+  const data = fetchData(sensorEntry, level, region, timeRange, mixinValues, options);
   if (!fitRange) {
     return data;
   }
@@ -389,4 +418,33 @@ export function fetchMultipleRegionsTimeSlices(
     return all;
   }
   return syncStartEnd(all, () => sensorEntry, startDate, endDate, fitRange);
+}
+
+/**
+ * fetches data for a specific data and region for multiple signals in the same data source
+ * @param {string} dataSource
+ * @param {string[]} signals
+ * @param {Date | Date[]} date
+ * @param {import('../maps').NameInfo} region
+ * @param {string[]} extraFields
+ * @returns {Promise<EpiDataRow[]>[]}
+ */
+export function fetchMultiSignal(dataSource, signals, date, region, extraFields) {
+  const mixinValues = {
+    geo_value: region.propertyId,
+  };
+  if (!Array.isArray(date)) {
+    mixinValues.time_value = formatAPITime(date);
+  }
+  const transferFields = [...computeTransferFields(mixinValues), ...extraFields];
+
+  return callAPIEndPoint(
+    undefined,
+    dataSource,
+    signals.join(','),
+    region.level,
+    Array.isArray(date) ? date.map((d) => formatAPITime(d)).join(',') : date,
+    region.propertyId,
+    [...transferFields, 'signal'],
+  ).then((rows) => parseData(rows, mixinValues));
 }
