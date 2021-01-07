@@ -1,13 +1,7 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
-  import embed from 'vega-embed';
-  import { Error, expressionFunction } from 'vega';
   import { observeResize, unobserveResize } from '../util';
   import { createVegaTooltipAdapter } from './tooltipUtils';
-  import { cachedTime, cachedNumber } from './customVegaFunctions';
-
-  expressionFunction('cachedTime', cachedTime);
-  expressionFunction('cachedNumber', cachedNumber);
 
   export let data = Promise.resolve([]);
 
@@ -158,38 +152,41 @@
     }
     vega = null;
     hasError = false;
-    vegaPromise = embed(root, spec, {
-      actions: false,
-      logLevel: Error,
-      tooltip: tooltipHandler,
-      patch: (spec) => {
-        spec.signals = spec.signals || [];
-        Object.entries(signals).forEach(([key, v]) => {
-          spec.signals.push({ name: key, value: v });
-        });
-        spec.signals.push({
-          name: 'width',
-          init: 'containerSize()[0]',
-          on: [
-            {
-              events: { source: 'window', type: 'resize' },
-              update: 'containerSize()[0]',
-            },
-          ],
-        });
-        spec.signals.push({
-          name: 'height',
-          init: 'containerSize()[1]',
-          on: [
-            {
-              events: { source: 'window', type: 'resize' },
-              update: 'containerSize()[1]',
-            },
-          ],
-        });
-        return spec;
-      },
-    });
+    const patch = (spec) => {
+      spec.signals = spec.signals || [];
+      Object.entries(signals).forEach(([key, v]) => {
+        spec.signals.push({ name: key, value: v });
+      });
+      spec.signals.push({
+        name: 'width',
+        init: 'containerSize()[0]',
+        on: [
+          {
+            events: { source: 'window', type: 'resize' },
+            update: 'containerSize()[0]',
+          },
+        ],
+      });
+      spec.signals.push({
+        name: 'height',
+        init: 'containerSize()[1]',
+        on: [
+          {
+            events: { source: 'window', type: 'resize' },
+            update: 'containerSize()[1]',
+          },
+        ],
+      });
+      return spec;
+    };
+    vegaPromise = import(/* webpackChunkName: 'vegafactory' */ './vegaFactory').then((m) =>
+      m.default(root, spec, {
+        actions: false,
+        logLevel: Error,
+        tooltip: tooltipHandler,
+        patch,
+      }),
+    );
     vegaPromise.then((r) => {
       if (!root) {
         return;
@@ -256,7 +253,7 @@
 
 <div
   bind:this={root}
-  class="root"
+  class="root vega-embed"
   class:loading-bg={!hasError && loading}
   class:message-overlay={hasError || (noData && !loading)}
   data-message={message}

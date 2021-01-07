@@ -22,9 +22,8 @@ module.exports = () => {
 
     output: {
       path: path.resolve(__dirname, 'public'),
-      filename: '[name].js',
-      chunkFilename: '[name].js',
-      publicPath: devMode ? undefined : './',
+      filename: devMode ? '[name].js' : '[name].[contenthash].js',
+      chunkFilename: devMode ? '[name].js' : '[name].[contenthash].js',
     },
 
     resolve: {
@@ -38,6 +37,9 @@ module.exports = () => {
     optimization: {
       minimizer: [new OptimizeCSSAssetsPlugin(), new TerserPlugin()],
       splitChunks: {
+        minChunks: 2,
+        maxInitialRequests: 4,
+        maxAsyncRequests: 6,
         cacheGroups: {
           // no splitting of css files
           styles: {
@@ -45,11 +47,6 @@ module.exports = () => {
             test: /\.css$/,
             chunks: 'all',
             enforce: true,
-          },
-          vendor: {
-            test: /[\\/]node_modules[\\/](?!(uikit)\/)/,
-            name: 'vendors',
-            chunks: 'all',
           },
         },
       },
@@ -59,7 +56,7 @@ module.exports = () => {
       rules: [
         !devMode && {
           test: /\.m?js$/,
-          exclude: /node_modules\/(?!(svelte|mapbox-gl)\/)/,
+          exclude: /node_modules[\\/](?!(svelte|mapbox-gl)[\\/])/,
           use: ['babel-loader'],
         },
         {
@@ -137,15 +134,48 @@ module.exports = () => {
       // new CopyPlugin({
       //   patterns: ['./src/static'],
       // }),
+
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
+        title: 'COVIDcast',
         template: './src/index.html',
       }),
+      new HtmlWebpackPlugin({
+        alwaysWriteToDisk: true,
+        title: 'COVIDcast Timelapse',
+        template: './src/index.html',
+        filename: 'timelapse/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        alwaysWriteToDisk: true,
+        title: 'COVIDcast Top 10',
+        template: './src/index.html',
+        filename: 'top10/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        alwaysWriteToDisk: true,
+        title: 'COVIDcast Region Details',
+        template: './src/index.html',
+        filename: 'single/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        alwaysWriteToDisk: true,
+        title: 'COVIDcast Export Data',
+        template: './src/index.html',
+        filename: 'export/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        alwaysWriteToDisk: true,
+        title: 'COVIDcast Survey Results',
+        template: './src/index.html',
+        filename: 'survey-results/index.html',
+      }),
+
       new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({
-        filename: '[name].css',
+        filename: devMode ? '[name].css' : '[name].[contenthash].css',
         ignoreOrder: true,
-        chunkFilename: '[name].css',
+        chunkFilename: devMode ? '[name].css' : '[name].[contenthash].css',
       }),
     ].filter(Boolean),
   };

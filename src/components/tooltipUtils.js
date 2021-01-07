@@ -72,6 +72,9 @@ function resolveDatum(item) {
  * create a vega tooltip adapter for the given svelte component class
  */
 export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}) {
+  if (!svelteComponent) {
+    return undefined;
+  }
   let destroyed = false;
   let tooltip = null;
   let extraProps = initialExtraProps;

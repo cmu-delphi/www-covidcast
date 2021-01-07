@@ -8,6 +8,7 @@ import {
   DEFAULT_LEVEL,
   DEFAULT_MODE,
   DEFAULT_SENSOR,
+  DEFAULT_SURVEY_SENSOR,
   DEFAULT_ENCODING,
 } from './constants';
 import modes, { modeByID } from '../modes';
@@ -30,77 +31,93 @@ import { MAP_THEME, selectionColors } from '../theme';
 /**
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
  */
-
-const queryString = window.location.search;
-const urlParams = new URLSearchParams(queryString);
-
 export const times = writable(null);
 export const stats = writable(null);
 
 export const appReady = writable(false);
 
 /**
+ * magic date that will be replaced by the latest date
+ */
+export const MAGIC_START_DATE = '20200701';
+
+/**
+ * resolve the default values based on the
+ */
+const defaultValues = (() => {
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+
+  const sensor = urlParams.get('sensor');
+  const level = urlParams.get('level');
+  const encoding = urlParams.get('encoding');
+  const date = urlParams.get('date');
+
+  const compareIds = (urlParams.get('compare') || '').split(',').map(getInfoByName).filter(Boolean);
+
+  const modeFromPath = () => {
+    const pathName = window.location.pathname;
+    // last path segment, e.g. /test/a -> a, /test/b/ -> b
+    return pathName.split('/').filter(Boolean).reverse(0)[0];
+  };
+  const mode = urlParams.get('mode') || modeFromPath();
+
+  const modeObj = modes.find((d) => d.id === mode) || DEFAULT_MODE;
+  return {
+    mode: modeObj,
+    sensor:
+      sensor && sensorMap.has(sensor)
+        ? sensor
+        : modeObj === modeByID['survey-results']
+        ? DEFAULT_SURVEY_SENSOR
+        : DEFAULT_SENSOR,
+    level: levels.includes(level) ? level : DEFAULT_LEVEL,
+    signalCasesOrDeathOptions: {
+      cumulative: urlParams.has('signalC'),
+      incidence: urlParams.has('signalI'),
+    },
+    encoding: encoding === 'color' || encoding === 'bubble' || encoding === 'spike' ? encoding : DEFAULT_ENCODING,
+    date: /\d{8}/.test(date) ? date : MAGIC_START_DATE,
+    region: urlParams.get('region') || '',
+    compare:
+      compareIds.length > 0
+        ? compareIds.map((info, i) => ({ info, displayName: info.displayName, color: selectionColors[i] || 'grey' }))
+        : null,
+  };
+})();
+
+/**
  * @type {import('svelte/store').Writable<import('../modes').Mode>}
  */
-export const currentMode = writable(DEFAULT_MODE, (set) => {
-  const mode = urlParams.get('mode');
-  const nextMode = modes.find((d) => d.id === mode);
-  if (nextMode) {
-    set(nextMode);
-  }
-});
+export const currentMode = writable(defaultValues.mode);
 
-export const currentSensor = writable(DEFAULT_SENSOR, (set) => {
-  const sensor = urlParams.get('sensor');
-  if (sensor && sensorMap.has(sensor)) {
-    set(sensor);
-  }
-});
+export const currentSensor = writable(defaultValues.sensor);
+export const currentSensorEntry = derived([currentSensor], ([$currentSensor]) => sensorMap.get($currentSensor));
 
 /**
  * @type {import('svelte/store').Writable<import('../data').SensorEntry | null>}
  */
 export const currentInfoSensor = writable(null);
 
-export const currentSensorEntry = derived([currentSensor], ([$currentSensor]) => sensorMap.get($currentSensor));
-
 // 'county', 'state', or 'msa'
-export const currentLevel = writable(DEFAULT_LEVEL, (set) => {
-  const level = urlParams.get('level');
-  if (levels.includes(level)) {
-    set(level);
-  }
-});
+export const currentLevel = writable(defaultValues.level);
 
 // in case of a death signal whether to show cumulative data
-export const signalCasesOrDeathOptions = writable({
-  cumulative: urlParams.has('signalC'),
-  ratio: urlParams.has('signalR'),
-});
+/**
+ * @type {import('svelte/store').Writable<import('./constants').CasesOrDeathOptions>}
+ */
+export const signalCasesOrDeathOptions = writable(defaultValues.signalCasesOrDeathOptions);
 
 export const currentSensorMapTitle = derived([currentSensorEntry, signalCasesOrDeathOptions], ([sensor, options]) =>
   typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText(options) : sensor.mapTitleText,
 );
 
-// Options are 'color', 'bubble', and 'spike'
-export const encoding = writable(DEFAULT_ENCODING, (set) => {
-  const encoding = urlParams.get('encoding');
-  if (encoding === 'color' || encoding === 'bubble' || encoding === 'spike') {
-    set(encoding);
-  }
-});
-
 /**
- * magic date that will be replaced by the latest date
+ * @type {import('svelte/store').Writable<'color' | 'spike' | 'bubble'>}
  */
-export const MAGIC_START_DATE = '20200701';
-export const currentDate = writable(MAGIC_START_DATE, (set) => {
-  const date = urlParams.get('date');
-  if (/\d{8}/.test(date)) {
-    set(date);
-  }
-});
+export const encoding = writable(defaultValues.encoding);
 
+export const currentDate = writable(defaultValues.date);
 /**
  * current date as a Date object
  */
@@ -125,13 +142,7 @@ export let highlightTimeValue = writable(null);
 
 // Region GEO_ID for filtering the line chart
 // 42003 - Allegheny; 38300 - Pittsburgh; PA - Pennsylvania.
-export const currentRegion = writable('', (set) => {
-  const region = urlParams.get('region');
-  // TODO validation
-  if (region) {
-    set(region);
-  }
-});
+export const currentRegion = writable(defaultValues.region);
 
 /**
  * current region info (could also be null)
@@ -207,7 +218,7 @@ currentSensorEntry.subscribe((sensorEntry) => {
   if (!sensorEntry.isCasesOrDeath) {
     signalCasesOrDeathOptions.set({
       cumulative: false,
-      ratio: false,
+      incidence: false,
     });
   }
 
@@ -224,15 +235,35 @@ currentSensorEntry.subscribe((sensorEntry) => {
   }
 });
 
+currentMode.subscribe((mode) => {
+  if (mode === modeByID['survey-results']) {
+    // change sensor and date to the latest one within the survey
+    currentSensor.set(DEFAULT_SURVEY_SENSOR);
+    const timesMap = get(times);
+    if (timesMap != null) {
+      const entry = timesMap.get(DEFAULT_SURVEY_SENSOR);
+      currentDate.set(entry[1]); // max
+    }
+  }
+});
+
 // mobile device detection
 // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
 
-export const isMobileDevice = readable(false, (set) => {
-  const isMobileQuery = window.matchMedia('only screen and (max-width: 767px)');
-  set(isMobileQuery.matches);
-  isMobileQuery.addEventListener('change', (evt) => {
-    set(evt.matches);
-  });
+const isMobileQuery = window.matchMedia
+  ? window.matchMedia('only screen and (max-width: 767px)')
+  : { matches: false, addEventListener: () => undefined };
+export const isMobileDevice = readable(isMobileQuery.matches, (set) => {
+  if (typeof isMobileQuery.addEventListener === 'function') {
+    isMobileQuery.addEventListener('change', (evt) => {
+      set(evt.matches);
+    });
+  } else {
+    // deprecated but other version is not supported in Safari 13
+    isMobileQuery.addListener((e) => {
+      set(e.matches);
+    });
+  }
 });
 
 // export const isPortraitDevice = readable(false, (set) => {
@@ -252,17 +283,11 @@ export const isMobileDevice = readable(false, (set) => {
  * @property {string} displayName;
  */
 
-// null = disable
-// []
 /**
+ * null = disable
  * @type {import('svelte/store').Writable<CompareSelection[] | null>}
  * */
-export const currentCompareSelection = writable(null, (set) => {
-  const ids = (urlParams.get('compare') || '').split(',').map(getInfoByName).filter(Boolean);
-  if (ids.length > 0) {
-    set(ids.map((info, i) => ({ info, displayName: info.displayName, color: selectionColors[i] || 'grey' })));
-  }
-});
+export const currentCompareSelection = writable(defaultValues.compare);
 
 /**
  * add an element to the compare selection
@@ -333,19 +358,28 @@ export const trackedUrlParams = derived(
 
     // determine parameters based on default value and current mode
     const params = {
-      mode: mode === DEFAULT_MODE ? null : mode.id,
-      sensor: mode === modeByID.single || sensor === DEFAULT_SENSOR ? null : sensor,
-      level: mode === modeByID.single || mode === modeByID.export || level === DEFAULT_LEVEL ? null : level,
+      sensor:
+        mode === modeByID.single || mode === modeByID['survey-results'] || sensor === DEFAULT_SENSOR ? null : sensor,
+      level:
+        mode === modeByID.single ||
+        mode === modeByID.export ||
+        mode === modeByID['survey-results'] ||
+        level === DEFAULT_LEVEL
+          ? null
+          : level,
       region: mode === modeByID.export || mode === modeByID.timelapse || !region ? null : region,
       date: mode === modeByID.export ? null : date,
       signalC: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.cumulative,
-      signalR: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.ratio,
+      signalI: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.incidence,
       encoding: !inMapMode || encoding === DEFAULT_ENCODING ? null : encoding,
       compare:
         (mode !== modeByID.overview && mode !== modeByID.single) || !compare
           ? null
           : compare.map((d) => d.info.propertyId).join(','),
     };
-    return params;
+    return {
+      path: mode === DEFAULT_MODE ? `` : `${mode.id}/`,
+      params,
+    };
   },
 );

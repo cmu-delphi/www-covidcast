@@ -1,5 +1,4 @@
 import { L } from './layers';
-import { LngLatBounds } from 'mapbox-gl';
 import bbox from '@turf/bbox';
 
 let SHRINK_FACTOR = 0.75;
@@ -11,7 +10,7 @@ export default class ZoomMap {
      */
     this.map = null;
     this.onZoom = onZoom;
-    this.resetBounds = new LngLatBounds(bounds);
+    this.resetBounds = bounds;
     this.resetBoundsOptions = {
       padding: 30, //px
       linear: false,

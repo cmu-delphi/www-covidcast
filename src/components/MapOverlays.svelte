@@ -22,7 +22,7 @@
   }
 
   .map-controls-container {
-    margin: 0.2em 0.2em 0 0;
+    margin: 0;
     z-index: 1001;
     display: flex;
     align-items: flex-start;
@@ -39,8 +39,6 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    margin: 2px 5px;
-    background: white;
   }
 
   /** desktop **/
@@ -48,6 +46,10 @@
     .title-container {
       box-shadow: none;
       border: none;
+    }
+
+    .map-controls-container {
+      margin: 6px 6px 0 0;
     }
   }
 

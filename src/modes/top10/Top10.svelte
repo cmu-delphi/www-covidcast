@@ -20,6 +20,7 @@
   import { parseAPITime } from '../../data';
   import { onHighlight } from '../overview/vegaSpec';
   import { computeNeighborhood } from '../../util';
+  import InfoDialogButton from '../../components/InfoDialogButton.svelte';
 
   const SHOW_X_MORE = 10;
   const MAX_OTHER_SENSORS = 1;
@@ -58,7 +59,7 @@
    */
   const ratioOptions = {
     cumulative: false,
-    ratio: true,
+    incidence: false,
   };
   $: primaryField = primaryValue(primary, ratioOptions);
   /**
@@ -300,6 +301,11 @@
     top: 0.2em;
   }
 
+  .wrapper :global(.info) {
+    margin-left: 0.5em;
+    display: inline-block;
+  }
+
   /** mobile **/
   @media only screen and (max-width: 767px) {
     .root {
@@ -355,7 +361,8 @@
                 on:click={() => sortClick('primary', true)}
                 sorted={sortCriteria === 'primary'}
                 desc={sortDirectionDesc}>
-                {typeof primary.mapTitleText === 'function' ? primary.mapTitleText(ratioOptions) : primary.name}
+                {primary.plotTitleText}
+                <InfoDialogButton sensor={primary} className="info" />
               </Top10SortHint>
             </th>
             {#each otherSensors as s, i}
@@ -365,7 +372,8 @@
                   on:click={() => sortClick(i, true)}
                   sorted={sortCriteria === i}
                   desc={sortDirectionDesc}>
-                  {typeof s.mapTitleText === 'function' ? s.mapTitleText(ratioOptions) : s.name}
+                  {primary.plotTitleText}
+                  <InfoDialogButton sensor={s} className="info" />
                   <button
                     class="remove-column"
                     title="Remove column"
