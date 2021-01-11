@@ -32,19 +32,26 @@
 
   /**
    * signals to dispatch
-   * @types {string[]}
+   * @type {string[]}
    */
   export let signalListeners = [];
   /**
    * data listeners to dispatch
-   * @types {string[]}
+   * @type {string[]}
    */
   export let dataListeners = [];
   /**
    * data listeners to dispatch
-   * @types {string[]}
+   * @type {string[]}
    */
   export let eventListeners = [];
+
+  /**
+   * if >= 0 enables scroll-spy behavior to lazy render the vega plot upon visibility
+   * the number represents the offset argument of UIkit.scrollspy
+   * @type {number}
+   */
+  export let scrollSpy = -1;
 
   let loading = false;
   let noData = false;
@@ -216,7 +223,9 @@
     });
   }
 
-  onMount(() => {
+  let scrollSpyHandler = null;
+
+  function initVegaContainer() {
     size = root.getBoundingClientRect();
     observeResize(root, (s) => {
       // check if size has changed by at least one pixel in width or height
@@ -233,10 +242,32 @@
     if (!patchSpec) {
       updateSpec(spec);
     }
+  }
+
+  onMount(() => {
+    if (scrollSpy >= 0) {
+      // use a scroll spy to find out whether we are visible
+      // eslint-disable-next-line no-undef
+      UIkit.scrollspy(root, {
+        offset: scrollSpy,
+      });
+      const handler = () => {
+        initVegaContainer();
+        root.removeEventListener('inview', handler); // once
+      };
+      root.addEventListener('inview', handler);
+    } else {
+      initVegaContainer();
+    }
   });
 
   onDestroy(() => {
     unobserveResize(root);
+
+    if (scrollSpyHandler) {
+      scrollSpyHandler.$destroy();
+      scrollSpyHandler = null;
+    }
     if (tooltipHandler) {
       tooltipHandler.destroy();
     }
