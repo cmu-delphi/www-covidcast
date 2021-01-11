@@ -20,7 +20,7 @@
   }
 
   .root > div {
-    margin-bottom: 0.2em;
+    margin-bottom: 6px;
   }
 
   .uk-button {

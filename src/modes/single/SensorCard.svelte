@@ -1,13 +1,12 @@
 <script>
-  import { timeFormat } from 'd3-time-format';
   import VegaTooltip from '../../components/DetailView/VegaTooltip.svelte';
   import InfoDialogButton from '../../components/InfoDialogButton.svelte';
   import Vega from '../../components/Vega.svelte';
   import { formatAPITime, parseAPITime } from '../../data';
+  import { formatDateLocal } from '../../formats';
   import { smallMultipleTimeSpan } from '../../stores';
   import { prepareSensorData } from '../overview/vegaSpec';
 
-  const formatLocal = timeFormat('%m/%d/%Y');
   /**
    * @type {import("../../stores/constants").SensorEntry}
    */
@@ -170,7 +169,7 @@
           <td class="legend" style="--color: {i === 0 ? 'grey' : selection.color}">{selection.displayName}</td>
           <td class="key-fact">{values[i] != null ? sensor.formatValue(values[i]) : '?'}</td>
           {#if i === 0}
-            <td class="hint" rowspan={selections.length}>on {formatLocal(highlightDate ? highlightDate : date)}</td>
+            <td class="hint" rowspan={selections.length}>on {formatDateLocal(highlightDate ? highlightDate : date)}</td>
           {/if}
         </tr>
       {/each}
