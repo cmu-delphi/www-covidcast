@@ -175,40 +175,6 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
         resolve: { axis: { x: 'independent' } },
         layer: [
           {
-            selection: {
-              range: {
-                type: 'interval',
-                nearest: true,
-                empty: 'none',
-                encodings: ['x'],
-                mark: {
-                  type: 'rect',
-                  fillOpacity: 0.05,
-                  stroke: 'green',
-                  strokeOpacity: 0.01,
-                  strokeWidth: 3,
-                  cursor: 'move',
-                },
-              },
-            },
-            mark: {
-              type: 'point',
-            },
-            encoding: {
-              x: { ...xDateRangeEncoding },
-              y: {
-                field: primaryValue,
-                type: 'quantitative',
-                axis: {
-                  minExtent: 25,
-                  tickCount: 3,
-                  title: ' ',
-                },
-              },
-            },
-          },
-
-          {
             mark: {
               type: 'line',
               interpolate: 'monotone',
@@ -280,6 +246,40 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
               },
             },
           },
+          {
+            selection: {
+              range: {
+                type: 'interval',
+                nearest: true,
+                empty: 'none',
+                // clear: 'mouseup',
+                encodings: ['x'],
+                mark: {
+                  type: 'rect',
+                  fillOpacity: 0.05,
+                  stroke: 'green',
+                  strokeOpacity: 0.01,
+                  strokeWidth: 3,
+                  cursor: 'move',
+                },
+              },
+            },
+            mark: {
+              type: 'point',
+            },
+            encoding: {
+              x: { ...xDateRangeEncoding },
+              y: {
+                field: primaryValue,
+                type: 'quantitative',
+                axis: {
+                  minExtent: 25,
+                  tickCount: 3,
+                  title: ' ',
+                },
+              },
+            },
+          },
 
           // complicated construct to have proper typings
           ...(sensor.hasStdErr ? [stdErrLayer] : []),
@@ -308,35 +308,46 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
             transform: [
               {
                 filter: {
-                  selection: 'range',
+                  or: [
+                    {
+                      selection: 'range',
+                    },
+                    // {
+                    //   and: ['isValid(datum.left)', 'datum.left <= datum.date_value', 'datum.right >= datum.date_value'],
+                    // },
+                  ],
                 },
               },
+
               {
-                joinaggregate: [
+                aggregate: [
                   {
-                    op: 'min',
+                    op: 'argmin',
                     field: 'date_value',
-                    as: 'left',
+                    as: 'leftmost',
                   },
                   {
-                    op: 'max',
+                    op: 'argmax',
                     field: 'date_value',
-                    as: 'right',
+                    as: 'rightmost',
                   },
-                  // The argmin and argmax values accumulate, unfortunately.
-                  // Otherwise, we could use in encoding with: { field: `min_datum['${primaryValue}']` },
-                  // {
-                  //   op: 'argmin',
-                  //   field: 'date_value',
-                  //   as: 'min_datum',
-                  // },
-                  // {
-                  //   op: 'argmax',
-                  //   field: 'date_value',
-                  //   as: 'max_datum',
-                  // },
                 ],
               },
+              {
+                window: [
+                  { field: 'leftmost', op: 'last_value', as: 'leftmost' },
+                  { field: 'rightmost', op: 'last_value', as: 'rightmost' },
+                ],
+              },
+              { calculate: `datum.leftmost.date_value`, as: 'left' },
+              { calculate: `datum.rightmost.date_value`, as: 'right' },
+              { calculate: `datum.leftmost.${primaryValue}`, as: 'left_value' },
+              { calculate: `datum.rightmost.${primaryValue}`, as: 'right_value' },
+              { calculate: `datum.left_value < datum.right_value`, as: 'increasing' },
+              { calculate: `max(datum.left_value, datum.right_value)`, as: 'top' },
+              { calculate: `min(datum.left_value, datum.right_value)`, as: 'bottom' },
+              { calculate: 'datum.top - datum.bottom', as: 'diff_value' },
+              { calculate: 'datum.bottom + datum.diff_value / 2', as: 'mid_value' },
             ],
 
             layer: [
@@ -360,38 +371,30 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
                     type: 'temporal',
                   },
                   y: {
-                    aggregate: { argmin: 'date_value' },
-                    field: primaryValue,
+                    field: 'top',
                     type: 'quantitative',
                   },
                   y2: {
-                    aggregate: { argmax: 'date_value' },
-                    field: primaryValue,
+                    field: 'bottom',
                     type: 'quantitative',
                   },
                 },
               },
-              // These marks accumulate.
-              // {
-              //   mark: { type: 'rule', opacity: 0.1, size: 3 },
-              //   encoding: {
-              //     x: { field: 'left' },
-              //   },
-              // },
-              // {
-              //   mark: { type: 'rule', opacity: 0.1, size: 3 },
-              //   encoding: {
-              //     x: { field: 'right' },
-              //   },
-              // },
               {
-                mark: { type: 'rule', stroke: 'green', opacity: 0.1, size: 3 },
+                mark: { type: 'rule', strokeWidth: 2 },
                 encoding: {
-                  x: null,
-                  y: {
-                    aggregate: { argmin: 'date_value' },
-                    field: primaryValue,
-                    type: 'quantitative',
+                  x: { field: 'left' },
+                  x2: { field: 'right' },
+                  y: { field: 'left_value', type: 'quantitative' },
+                  y2: { field: 'right_value', type: 'quantitative' },
+                  color: {
+                    condition: [
+                      {
+                        test: 'datum.increasing',
+                        value: 'red',
+                      },
+                    ],
+                    value: 'green',
                   },
                 },
               },
@@ -400,70 +403,96 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
                 encoding: {
                   x: null,
                   y: {
-                    aggregate: { argmax: 'date_value' },
-                    field: primaryValue,
+                    field: 'top',
                     type: 'quantitative',
                   },
                 },
               },
               {
-                // transform: [
-                //   {
-                //     // Using this accumulates values
-                //     joinaggregate: [
-                //       {
-                //         op: 'argmin',
-                //         field: 'date_value',
-                //         as: 'leftData',
-                //       },
-                //     ],
-                //   },
-                // ],
+                mark: { type: 'rule', stroke: 'green', opacity: 0.1, size: 3 },
+                encoding: {
+                  x: null,
+                  y: {
+                    field: 'bottom',
+                    type: 'quantitative',
+                  },
+                },
+              },
+              {
                 mark: {
                   type: 'text',
                   fontSize: 14,
-                  dx: -40,
-                  dy: -18,
+                  dx: -60,
                 },
                 encoding: {
                   x: {
                     field: 'left',
                   },
                   y: {
-                    aggregate: { argmin: 'date_value' },
-                    field: primaryValue,
+                    field: 'mid_value',
                     type: 'quantitative',
                   },
                   text: {
-                    aggregate: { argmin: 'date_value' },
-                    field: primaryValue,
+                    field: 'diff_value',
+                    format: '-.2f',
                   },
                 },
               },
               {
                 mark: {
-                  type: 'text',
-                  fontSize: 14,
-                  dx: 40,
-                  dy: 18,
+                  type: 'rule',
+                  xOffset: -40,
+                  strokeWidth: 3,
+                  opacity: 1,
+                  color: { expr: 'datum.increasing ? "red" : "green"' },
                 },
                 encoding: {
-                  x: {
-                    field: 'right',
-                  },
+                  x: { field: 'left' },
                   y: {
-                    aggregate: { argmax: 'date_value' },
-                    field: primaryValue,
+                    field: 'top',
                     type: 'quantitative',
                   },
-                  text: {
-                    aggregate: { argmax: 'date_value' },
-                    field: primaryValue,
+                  y2: {
+                    field: 'bottom',
+                    type: 'quantitative',
                   },
+                },
+              },
+              {
+                mark: {
+                  type: 'point',
+                  shape: 'triangle',
+                  angle: 0,
+                  size: 100,
+                  xOffset: -40,
+                  yOffset: 6,
+                  color: { expr: 'datum.increasing ? "red" : "green"' },
+                  filled: true,
+                },
+                encoding: {
+                  x: { field: 'left' },
+                  y: { field: 'top', type: 'quantitative' },
+                },
+              },
+              {
+                mark: {
+                  type: 'point',
+                  shape: 'triangle',
+                  angle: 180,
+                  size: 100,
+                  xOffset: -40,
+                  yOffset: -6,
+                  color: { expr: 'datum.increasing ? "red" : "green"' },
+                  filled: true,
+                },
+                encoding: {
+                  x: { field: 'left' },
+                  y: { field: 'bottom', type: 'quantitative' },
                 },
               },
             ],
           },
+
           {
             transform: [
               {
