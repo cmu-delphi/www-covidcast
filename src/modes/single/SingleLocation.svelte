@@ -14,9 +14,27 @@
   import { selectionColors } from '../../theme';
   import { onHighlight } from '../overview/vegaSpec';
   import { highlightTimeValue } from '../../stores';
+  import getRelatedCounties from '../../maps/related';
+
   $: selectedLevels = new Set($currentMultiSelection.map((d) => d.info.level));
+
   function filterItem(item) {
     return selectedLevels.size === 0 || selectedLevels.has(item.level);
+  }
+
+  $: relatedCounties = new Set($currentMultiSelection.map((d) => getRelatedCounties(d.info).map((d) => d.id)).flat());
+
+  function sortItem(itemA, itemB) {
+    // sort related counties first
+    const isRelatedA = relatedCounties.has(itemA.id);
+    const isRelatedB = relatedCounties.has(itemB.id);
+    if (isRelatedA && !isRelatedB) {
+      return -1;
+    }
+    if (isRelatedB && !isRelatedA) {
+      return 1;
+    }
+    return itemA.displayName.localeCompare(itemB.displayName);
   }
 </script>
 
@@ -87,6 +105,7 @@
       labelFieldName="displayName"
       maxItemsToShowInList="5"
       colorFieldName="color"
+      {sortItem}
       {filterItem}
       maxSelections={Math.min(selectionColors.length + 1, 4)}
       on:add={(e) => addCompare(e.detail)}
