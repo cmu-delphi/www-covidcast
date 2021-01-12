@@ -109,6 +109,29 @@ Links:
  - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html)"
  - link: "[Interpreting mask use in context](https://delphi.cmu.edu/blog/2020/12/13/are-masks-widely-used-in-public/)"
 ---
+Name: Vaccine Acceptance
+Id: fb-survey
+Signal: smoothed_accept_covid_vaccine
+Type: public
+Levels: [county, msa, state, hrr]
+YAxis: Percentage
+Format: percent
+HasStdErr: true
+ColorScale: interpolateYlGnBu
+
+
+MapTitleText: Percentage of people who would definitely or probably choose to receive a COVID vaccine if it were offered to them today, based on surveys of Facebook users
+
+
+Description: Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they would choose to be vaccinated if they were offered a COVID vaccine today. For this signal, we estimate the percentage of people who would “definitely” or “probably” choose to be vaccinated if a COVID vaccine were offered to them. Beginning January 6, 2021, this question is only asked to respondents who have not yet received a COVID vaccine.
+
+
+Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
+
+
+Links:
+ - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#vaccination-indicators)"
+---
 Name: COVID-Related Doctor Visits
 Id: doctor-visits
 Signal: smoothed_adj_cli
