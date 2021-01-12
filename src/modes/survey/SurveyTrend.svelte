@@ -27,8 +27,8 @@
     } else if (trend.startsWith('dec')) {
       trendIcon = longArrowDownIcon;
       trendInfo = `Historical trend is ${trend}`;
-      isGood = inverted;
-      isBad = !inverted;
+      isGood = !inverted;
+      isBad = inverted;
     } else {
       trendIcon = longArrowRightIcon;
       trendInfo = 'Historical trend remains consistent';
