@@ -1,3 +1,18 @@
+# Release 1.12.3
+
+## Signal Changes
+
+- Add "Vaccine Acceptance" signal to map and survey dashboard
+
+## New Features
+
+- [#709](https://github.com/cmu-delphi/www-covidcast/pull/709), [#710](https://github.com/cmu-delphi/www-covidcast/pull/710), [#708](https://github.com/cmu-delphi/www-covidcast/pull/708) Improve loading performance especially for the survey dashboard
+- [#712](https://github.com/cmu-delphi/www-covidcast/pull/712) Improve map style
+
+## Bug-fixes
+
+- [#713](https://github.com/cmu-delphi/www-covidcast/pull/713) fix trend color for decreasing trends
+
 # Release 1.12.1
 
 Bugfix release for changed signal
