@@ -191,6 +191,7 @@
     <Vega
       {spec}
       {data}
+      scrollSpy={100}
       signals={{ currentDate: date, maxDate, refDate }}
       tooltip={SurveyTooltip}
       tooltipProps={{ question }} />

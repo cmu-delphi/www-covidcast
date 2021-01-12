@@ -8,7 +8,7 @@
   import { onMount } from 'svelte';
   import { trackEvent } from '../../stores/ga';
   import Search from '../../components/Search.svelte';
-  import { nameInfos } from '../../maps';
+  import { infosByLevel } from '../../maps';
   import { formatDateISO } from '../../formats';
   import InfoDialogButton from '../../components/InfoDialogButton.svelte';
   import { questionCategories, refSensor } from '../../modes/survey/questions';
@@ -60,7 +60,7 @@
 
   let geoValuesMode = 'all';
   let geoValues = [];
-  $: geoItems = nameInfos.filter((d) => d.level === geoType);
+  $: geoItems = infosByLevel[geoType] || [];
   $: {
     if (geoItems != null) {
       geoValues = [];

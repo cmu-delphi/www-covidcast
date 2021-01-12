@@ -1,13 +1,7 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
-  import embed from 'vega-embed';
-  import { Error, expressionFunction } from 'vega';
   import { observeResize, unobserveResize } from '../util';
   import { createVegaTooltipAdapter } from './tooltipUtils';
-  import { cachedTime, cachedNumber } from './customVegaFunctions';
-
-  expressionFunction('cachedTime', cachedTime);
-  expressionFunction('cachedNumber', cachedNumber);
 
   export let data = Promise.resolve([]);
 
@@ -38,19 +32,26 @@
 
   /**
    * signals to dispatch
-   * @types {string[]}
+   * @type {string[]}
    */
   export let signalListeners = [];
   /**
    * data listeners to dispatch
-   * @types {string[]}
+   * @type {string[]}
    */
   export let dataListeners = [];
   /**
    * data listeners to dispatch
-   * @types {string[]}
+   * @type {string[]}
    */
   export let eventListeners = [];
+
+  /**
+   * if >= 0 enables scroll-spy behavior to lazy render the vega plot upon visibility
+   * the number represents the offset argument of UIkit.scrollspy
+   * @type {number}
+   */
+  export let scrollSpy = -1;
 
   let loading = false;
   let noData = false;
@@ -158,38 +159,41 @@
     }
     vega = null;
     hasError = false;
-    vegaPromise = embed(root, spec, {
-      actions: false,
-      logLevel: Error,
-      tooltip: tooltipHandler,
-      patch: (spec) => {
-        spec.signals = spec.signals || [];
-        Object.entries(signals).forEach(([key, v]) => {
-          spec.signals.push({ name: key, value: v });
-        });
-        spec.signals.push({
-          name: 'width',
-          init: 'containerSize()[0]',
-          on: [
-            {
-              events: { source: 'window', type: 'resize' },
-              update: 'containerSize()[0]',
-            },
-          ],
-        });
-        spec.signals.push({
-          name: 'height',
-          init: 'containerSize()[1]',
-          on: [
-            {
-              events: { source: 'window', type: 'resize' },
-              update: 'containerSize()[1]',
-            },
-          ],
-        });
-        return spec;
-      },
-    });
+    const patch = (spec) => {
+      spec.signals = spec.signals || [];
+      Object.entries(signals).forEach(([key, v]) => {
+        spec.signals.push({ name: key, value: v });
+      });
+      spec.signals.push({
+        name: 'width',
+        init: 'containerSize()[0]',
+        on: [
+          {
+            events: { source: 'window', type: 'resize' },
+            update: 'containerSize()[0]',
+          },
+        ],
+      });
+      spec.signals.push({
+        name: 'height',
+        init: 'containerSize()[1]',
+        on: [
+          {
+            events: { source: 'window', type: 'resize' },
+            update: 'containerSize()[1]',
+          },
+        ],
+      });
+      return spec;
+    };
+    vegaPromise = import(/* webpackChunkName: 'vegafactory' */ './vegaFactory').then((m) =>
+      m.default(root, spec, {
+        actions: false,
+        logLevel: Error,
+        tooltip: tooltipHandler,
+        patch,
+      }),
+    );
     vegaPromise.then((r) => {
       if (!root) {
         return;
@@ -219,7 +223,9 @@
     });
   }
 
-  onMount(() => {
+  let scrollSpyHandler = null;
+
+  function initVegaContainer() {
     size = root.getBoundingClientRect();
     observeResize(root, (s) => {
       // check if size has changed by at least one pixel in width or height
@@ -236,10 +242,32 @@
     if (!patchSpec) {
       updateSpec(spec);
     }
+  }
+
+  onMount(() => {
+    if (scrollSpy >= 0) {
+      // use a scroll spy to find out whether we are visible
+      // eslint-disable-next-line no-undef
+      UIkit.scrollspy(root, {
+        offset: scrollSpy,
+      });
+      const handler = () => {
+        initVegaContainer();
+        root.removeEventListener('inview', handler); // once
+      };
+      root.addEventListener('inview', handler);
+    } else {
+      initVegaContainer();
+    }
   });
 
   onDestroy(() => {
     unobserveResize(root);
+
+    if (scrollSpyHandler) {
+      scrollSpyHandler.$destroy();
+      scrollSpyHandler = null;
+    }
     if (tooltipHandler) {
       tooltipHandler.destroy();
     }
@@ -256,7 +284,7 @@
 
 <div
   bind:this={root}
-  class="root"
+  class="root vega-embed"
   class:loading-bg={!hasError && loading}
   class:message-overlay={hasError || (noData && !loading)}
   data-message={message}
