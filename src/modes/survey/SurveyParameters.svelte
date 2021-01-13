@@ -21,7 +21,7 @@
     background: #fafafc;
     border-top: 1px solid #d3d4d8;
     border-bottom: 1px solid #d3d4d8;
-    z-index: 100;
+    z-index: 120;
   }
 
   .uk-container {
