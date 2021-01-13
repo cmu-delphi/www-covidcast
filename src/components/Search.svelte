@@ -49,6 +49,11 @@
   $: multiple = selectedItems != null;
   export let maxSelections = Number.POSITIVE_INFINITY;
 
+  /**
+   * select the whole text upon clicking into the input box
+   */
+  export let selectOnClick = false;
+
   let text;
   let filteredTextLength = 0;
 
@@ -243,6 +248,10 @@
 
   function onInputClick() {
     resetListToAllItemsAndOpen();
+
+    if (selectOnClick) {
+      input.select();
+    }
   }
 
   function onEsc(e) {

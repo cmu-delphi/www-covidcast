@@ -22,7 +22,6 @@
     border-top: 1px solid #d3d4d8;
     border-bottom: 1px solid #d3d4d8;
     z-index: 100;
-    padding-bottom: 0.5em;
   }
 
   .uk-container {
@@ -72,6 +71,7 @@
         selectedItem={$currentRegionInfo || nationInfo}
         labelFieldName="displayName"
         maxItemsToShowInList="5"
+        selectOnClick
         on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)} />
       <SensorDatePicker2 className="survey-date" bind:value={selectedDate} sensor={refSensor} />
     </div>
