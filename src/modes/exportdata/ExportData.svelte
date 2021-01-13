@@ -37,9 +37,16 @@
   let signalGroupValue = null;
   let signalValue = null;
   let geoType = 'county';
-  $: endDate = $smallMultipleTimeSpan[1];
-  // one month in the past
-  $: startDate = timeMonth.offset($smallMultipleTimeSpan[1], -1);
+
+  let endDate = new Date();
+  let startDate = new Date();
+
+  function initDate(defaultEndDate) {
+    endDate = defaultEndDate;
+    // one month in the past
+    startDate = timeMonth.offset(defaultEndDate, -1);
+  }
+  $: initDate($smallMultipleTimeSpan[1]);
 
   let levelList = [];
   $: signalGroup = signalGroupValue ? signalGroups.find((d) => d.id === signalGroupValue) : null;
@@ -81,24 +88,6 @@
   }
   $: usesAsOf = asOfMode !== 'latest' && asOfDate instanceof Date;
 
-  function minDate(a, b) {
-    if (!a) {
-      return b;
-    }
-    if (!b) {
-      return a;
-    }
-    return a < b ? a : b;
-  }
-  function maxDate(a, b) {
-    if (!a) {
-      return b;
-    }
-    if (!b) {
-      return a;
-    }
-    return a > b ? a : b;
-  }
   /**
    * @type {Map<string, {name: string, tooltipText: string}>}
    */
@@ -229,6 +218,8 @@
   function pythonDate(date) {
     return `date(${date.getFullYear()}, ${date.getMonth() + 1}, ${date.getDate()})`;
   }
+
+  $: dateRange = signalGroup || { minTime: timeMonth(new Date(), -1), maxTime: timeMonth(new Date(), 1) };
 </script>
 
 <style>
@@ -309,16 +300,16 @@
       <div class="uk-form-controls">
         <Datepicker
           bind:selected={startDate}
-          start={signalGroup ? signalGroup.minTime : minDate(new Date(), startDate)}
-          end={signalGroup ? minDate(endDate, signalGroup.maxTime) : endDate}
+          start={dateRange.minTime}
+          end={dateRange.maxTime}
           formattedSelected={formatDateISO(startDate)}>
           <button aria-label="selected start date" class="uk-input" on:>{formatDateISO(startDate)}</button>
         </Datepicker>
         -
         <Datepicker
           bind:selected={endDate}
-          start={signalGroup ? maxDate(startDate, signalGroup.minTime) : startDate}
-          end={signalGroup ? signalGroup.maxTime : maxDate(new Date(), endDate)}
+          start={dateRange.minTime}
+          end={dateRange.maxTime}
           formattedSelected={formatDateISO(endDate)}>
           <button aria-label="selected end date" class="uk-input" on:>{formatDateISO(endDate)}</button>
         </Datepicker>
