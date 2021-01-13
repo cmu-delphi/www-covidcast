@@ -47,6 +47,7 @@
     font-weight: 600;
     padding: 13px;
     line-height: 1;
+    white-space: nowrap;
   }
 
   .arrow-button {
@@ -59,10 +60,10 @@
   }
 
   .arrow-left {
-    margin-right: 2em;
+    margin-right: 10px; /* 36 - 13*2 */
   }
   .arrow-right {
-    margin-left: 2em;
+    margin-left: 10px; /* 36 - 13*2 */
   }
 
   .picker-button {
