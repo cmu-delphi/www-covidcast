@@ -15,14 +15,23 @@
 </script>
 
 <style>
-  .parameters {
+  .parameter-container {
     position: sticky;
-    top: -1px;
-    background: white;
+    top: 0px;
+    background: #fafafc;
+    border-top: 1px solid #d3d4d8;
+    border-bottom: 1px solid #d3d4d8;
     z-index: 100;
     padding-bottom: 0.5em;
+  }
+
+  .uk-container {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  .parameters {
     display: flex;
-    box-shadow: 0 0 0 18px white; /* to hide box-shadow from cards */
   }
 
   @media only screen and (max-width: 715px) {
@@ -36,12 +45,16 @@
   }
 
   .parameters :global(.survey-search) {
-    background: #f0f1f3;
+    background: white;
     flex: 2 1 auto;
   }
   .parameters :global(.survey-search input) {
-    background: #f0f1f3;
+    background: white;
+    font-weight: 600;
     letter-spacing: 3px;
+    height: 60px;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
 
   .parameters :global(.survey-date) {
@@ -49,14 +62,18 @@
   }
 </style>
 
-<aside class="grid-3-11 parameters">
-  <Search
-    className="survey-search"
-    placeholder="Search Region"
-    items={filteredInfos}
-    selectedItem={$currentRegionInfo || nationInfo}
-    labelFieldName="displayName"
-    maxItemsToShowInList="5"
-    on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)} />
-  <SensorDatePicker2 className="survey-date" bind:value={selectedDate} sensor={refSensor} />
-</aside>
+<div class="parameter-container">
+  <div class="content-grid uk-container">
+    <div class="grid-3-11 parameters">
+      <Search
+        className="survey-search"
+        placeholder="Search Region"
+        items={filteredInfos}
+        selectedItem={$currentRegionInfo || nationInfo}
+        labelFieldName="displayName"
+        maxItemsToShowInList="5"
+        on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)} />
+      <SensorDatePicker2 className="survey-date" bind:value={selectedDate} sensor={refSensor} />
+    </div>
+  </div>
+</div>

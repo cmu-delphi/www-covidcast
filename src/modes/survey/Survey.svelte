@@ -31,7 +31,7 @@
   }
   .toc-container {
     position: sticky;
-    top: 70px;
+    top: 100px;
     margin-top: 1em;
   }
 
@@ -45,16 +45,16 @@
 </style>
 
 <div class="root">
+  <SurveyParameters />
   <div class="uk-container content-grid">
     <div class="grid-3-11">
       <Overview />
       <h2>Results</h2>
     </div>
-    <SurveyParameters />
     <div class="grid-1-3">
       <div class="toc-container uk-visible@m">
         <div class="toc">
-          <h5>Outline</h5>
+          <h5>Survey questions</h5>
           <ol uk-scrollspy-nav="closest: li; scroll: true; offset: 100" class="uk-nav uk-nav-default">
             {#each questionCategories as cat}
               <li><a href="#{cat.anchor}">{cat.name}</a></li>

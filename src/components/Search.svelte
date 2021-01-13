@@ -388,7 +388,7 @@
   class:search-multiple={multiple}
   on:click={onContainerClick}>
   {#if !multiple}
-    <span data-uk-search-icon />
+    <span class="uk-search-icon" data-uk-icon="icon: search" />
     <input
       class="uk-search-input"
       {placeholder}
