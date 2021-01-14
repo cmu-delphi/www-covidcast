@@ -140,8 +140,39 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
             scale: { domain: { selection: 'dateRange' } },
           },
         },
-        resolve: { axis: { x: 'independent' } },
+        // resolve: { axis: { x: 'independent' } },
         layer: [
+          {
+            selection: {
+              dateRange: {
+                type: 'interval',
+                encodings: ['x'],
+                on: '[mousedown[!event.shiftKey], window:mouseup] > window:mousemove!',
+                translate: '[mousedown[!event.shiftKey], window:mouseup] > window:mousemove!',
+                zoom: 'wheel![!event.shiftKey && !event.ctrlKey]',
+                init: {
+                  x: [initialSelection[0].getTime(), initialSelection[1].getTime()],
+                },
+                mark: { cursor: 'move', fillOpacity: 0 },
+                bind: 'scales',
+              },
+            },
+            mark: {
+              type: 'line',
+              interpolate: 'monotone',
+            },
+            encoding: {
+              y: {
+                field: primaryValue,
+                type: 'quantitative',
+                // axis: {
+                //   minExtent: 25,
+                //   tickCount: 3,
+                //   title: ' ',
+                // },
+              },
+            },
+          },
           {
             mark: {
               type: 'line',
@@ -182,21 +213,21 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
             },
             encoding: {
               color: {
-                condition: [
-                  {
-                    selection: 'range',
-                    value: 'red',
-                  },
-                ],
+                // condition: [
+                //   {
+                //     selection: 'range',
+                //     value: 'red',
+                //   },
+                // ],
                 field: 'geo_value',
               },
               fillOpacity: {
-                condition: [
-                  {
-                    selection: 'range',
-                    value: 0.8,
-                  },
-                ],
+                // condition: [
+                //   {
+                //     selection: 'range',
+                //     value: 0.8,
+                //   },
+                // ],
                 value: 0.5,
               },
               x: {
@@ -214,12 +245,16 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
               },
             },
           },
+
           {
             selection: {
               range: {
                 type: 'interval',
                 nearest: true,
                 empty: 'none',
+                on: '[mousedown[event.shiftKey], window:mouseup] > window:mousemove!',
+                translate: '[mousedown[event.shiftKey], window:mouseup] > window:mousemove!',
+                zoom: 'rect:wheel!',
                 // clear: 'mouseup',
                 encodings: ['x'],
                 mark: {
@@ -301,12 +336,12 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
                   },
                 ],
               },
-              {
-                window: [
-                  { field: 'leftmost', op: 'last_value', as: 'leftmost' },
-                  { field: 'rightmost', op: 'last_value', as: 'rightmost' },
-                ],
-              },
+              // {
+              //   window: [
+              //     { field: 'leftmost', op: 'last_value', as: 'leftmost' },
+              //     { field: 'rightmost', op: 'last_value', as: 'rightmost' },
+              //   ],
+              // },
               { calculate: `datum.leftmost.date_value`, as: 'left' },
               { calculate: `datum.rightmost.date_value`, as: 'right' },
               { calculate: `datum.leftmost.${primaryValue}`, as: 'left_value' },
@@ -363,6 +398,32 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
                       },
                     ],
                     value: 'green',
+                  },
+                },
+              },
+              {
+                // selection: {
+                //   leftEdge: {
+                //     type: 'single',
+                //     mark: { type: 'rule'},
+                //   }
+                // },
+                mark: { type: 'rule', stroke: 'green', opacity: 0.1, size: 3 },
+                encoding: {
+                  y: null,
+                  x: {
+                    field: 'left',
+                    type: 'temporal',
+                  },
+                },
+              },
+              {
+                mark: { type: 'rule', stroke: 'green', opacity: 0.1, size: 3 },
+                encoding: {
+                  y: null,
+                  x: {
+                    field: 'right',
+                    type: 'temporal',
                   },
                 },
               },
@@ -505,7 +566,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
         layer: [
           {
             selection: {
-              dateRange: {
+              dateRange2: {
                 type: 'interval',
                 encodings: ['x'],
                 init: {
