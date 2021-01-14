@@ -5,6 +5,7 @@ const shortAbbr = timeFormat('%b %d');
 const shortNumbers = timeFormat('%m/%d');
 const iso = timeFormat('%Y-%m-%d');
 const local = timeFormat('%m/%d/%Y');
+const shortAbbrNth = timeFormat('%b %-d');
 
 export function formatDateShortNumbers(date) {
   return !date ? '?' : shortNumbers(date);
@@ -16,6 +17,28 @@ export function formatDateShort(date) {
 
 export function formatDateShortAbbr(date) {
   return !date ? '?' : shortAbbr(date);
+}
+
+function nth(d) {
+  // based on https://stackoverflow.com/questions/15397372/javascript-new-date-ordinal-st-nd-rd-th
+  if (d > 3 && d < 21) return 'th';
+  switch (d % 10) {
+    case 1:
+      return 'st';
+    case 2:
+      return 'nd';
+    case 3:
+      return 'rd';
+    default:
+      return 'th';
+  }
+}
+
+/**
+ * @param {Date} date
+ */
+export function formatDateShortOrdinal(date) {
+  return !date ? '?' : shortAbbrNth(date) + nth(date.getDate());
 }
 
 export function formatDateISO(date) {
