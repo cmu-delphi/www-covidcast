@@ -182,7 +182,7 @@
 
     signalGroups = Array.from(signalGroupMap.values()).sort((a, b) => a.name.localeCompare(b.name));
     signalGroupValue = $currentSensorEntry.isCasesOrDeath ? CASES_DEATH_SOURCE : $currentSensorEntry.id;
-    signalValue = $currentSensorEntry.signal;
+    signalValue = `${$currentSensorEntry.id}:${$currentSensorEntry.signal}`;
     levelList = [...levels].map(getLevelInfo);
     geoType = $currentSensorEntry.levels[0];
   });
