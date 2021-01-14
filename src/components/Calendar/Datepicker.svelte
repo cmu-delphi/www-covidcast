@@ -84,10 +84,19 @@
 
   let monthIndex = 0;
   $: {
-    monthIndex = 0;
+    monthIndex = -1;
     for (let i = 0; i < months.length; i += 1) {
       if (months[i].month === month && months[i].year === year) {
         monthIndex = i;
+      }
+    }
+    if (monthIndex < 0) {
+      // date out of range, select the first or last one
+      if (year < months[0].year || (year === months[0].year && month < months[0].month)) {
+        monthIndex = 0;
+      } else {
+        // has to be larger than the last otherwise we would have an hit
+        monthIndex = months.length - 1;
       }
     }
   }
