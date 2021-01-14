@@ -29,51 +29,27 @@
     margin-bottom: 10px;
   }
 
-  .parameters {
-    display: flex;
-  }
-
   @media only screen and (max-width: 715px) {
     .parameters {
-      display: block;
       padding-bottom: 0;
     }
     .parameters > :global(*) {
       margin-bottom: 0.5em;
     }
   }
-
-  .parameters :global(.survey-search) {
-    background: white;
-    flex: 2 1 auto;
-  }
-  .parameters :global(.survey-search input) {
-    background: white;
-    font-weight: 600;
-    letter-spacing: 3px;
-    height: 60px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-
-  .parameters :global(.survey-date) {
-    flex: 1 1 auto;
-  }
 </style>
 
 <div class="parameter-container">
-  <div class="content-grid uk-container">
-    <div class="grid-3-11 parameters">
-      <Search
-        className="survey-search"
-        placeholder="Search Region"
-        items={filteredInfos}
-        selectedItem={$currentRegionInfo || nationInfo}
-        labelFieldName="displayName"
-        maxItemsToShowInList="5"
-        selectOnClick
-        on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)} />
-      <SensorDatePicker2 className="survey-date" bind:value={selectedDate} sensor={refSensor} />
-    </div>
+  <div class="content-grid uk-container parameters">
+    <Search
+      className="survey-search grid-3-8"
+      modern
+      placeholder="Search Region"
+      items={filteredInfos}
+      selectedItem={$currentRegionInfo || nationInfo}
+      labelFieldName="displayName"
+      maxItemsToShowInList="5"
+      on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)} />
+    <SensorDatePicker2 className="survey-date grid-8-11" bind:value={selectedDate} sensor={refSensor} />
   </div>
 </div>
