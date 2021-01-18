@@ -80,6 +80,9 @@ function parseMultipleTreeData(d, signals, defaultSignalIndex, mixinData = {}) {
     return [];
   }
   const tree = d.epidata || [];
+  if (tree.length === 0 || (Array.isArray(tree[0]) && tree[0].length === 0)) {
+    return parseData({ ...d, epidata: [] }, mixinData);
+  }
   const split = signals.map((k) => tree[0][k]);
   const ref = split[defaultSignalIndex];
   const combined = combineSignals(split, ref, EPIDATA_CASES_OR_DEATH_VALUES, deriveCombineKey(mixinData));
