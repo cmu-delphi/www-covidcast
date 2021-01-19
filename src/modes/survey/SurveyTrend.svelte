@@ -22,9 +22,9 @@
   function trendExplaination(trend) {
     return `The value on ${formatDateShortOrdinal(trend.current.date_value)} (${formatValue(
       trend.current.value,
-    )}) has changed ${formatTrendChange(trend.change, true)} compared to ${formatDateShortOrdinal(trend.refDate)} (${formatValue(
-      trend.ref.value,
-    )}), which is classified as: <br/><br/> ${trend.trendReason}`;
+    )}) has changed ${formatTrendChange(trend.change, true)} compared to ${formatDateShortOrdinal(
+      trend.refDate,
+    )} (${formatValue(trend.ref.value)}), which is classified as: <br/><br/> ${trend.trendReason}`;
   }
 
   $: {
@@ -72,10 +72,10 @@
     background: #eb5757;
     color: white;
   }
-  .root[data-trend^="inc"] .inline-svg-icon :global(svg) {
+  .root[data-trend^='inc'] .inline-svg-icon :global(svg) {
     transform: rotate(-90deg);
   }
-  .root[data-trend^="dec"] .inline-svg-icon :global(svg) {
+  .root[data-trend^='dec'] .inline-svg-icon :global(svg) {
     transform: rotate(90deg);
   }
 

@@ -419,6 +419,7 @@
   @media only screen and (max-width: 715px) {
     .uk-search-input.modern {
       letter-spacing: initial;
+      font-size: 0.85rem;
     }
   }
 </style>

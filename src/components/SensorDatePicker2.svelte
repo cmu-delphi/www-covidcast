@@ -88,10 +88,12 @@
     margin-right: 0.5em;
   }
 
-  
   @media only screen and (max-width: 715px) {
     .arrow-button {
       display: none;
+    }
+    .selected-date {
+      letter-spacing: initial;
     }
   }
 </style>

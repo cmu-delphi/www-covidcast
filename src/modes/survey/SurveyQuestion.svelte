@@ -15,7 +15,7 @@
   import SurveyValue from './SurveyValue.svelte';
   import SurveyTooltip from './SurveyTooltip.svelte';
   import ShapeIcon from '../../components/ShapeIcon.svelte';
-import { isMobileDevice } from '../../stores';
+  import { isMobileDevice } from '../../stores';
 
   /**
    * question object
@@ -172,7 +172,9 @@ import { isMobileDevice } from '../../stores';
       font-weight: normal;
     }
 
-    .block-date, .question-kpi-title, .question-unit {
+    .block-date,
+    .question-kpi-title,
+    .question-unit {
       font-size: 0.8rem;
     }
 
@@ -249,7 +251,11 @@ import { isMobileDevice } from '../../stores';
           <UIKitHint title="Tracks the variability of signal movenment" />
         </div>
         <div class="question-unit">
-          {#await summary}N/A{:then s}{s.trend ? `${formatTrend(s.trend.change)} since ${formatDateShortOrdinal(refDate)}` : 'N/A'}{/await}
+          {#await summary}
+            N/A
+          {:then s}
+            {s.trend ? `${formatTrend(s.trend.change)} since ${formatDateShortOrdinal(refDate)}` : 'N/A'}
+          {/await}
         </div>
       </div>
       <div>
