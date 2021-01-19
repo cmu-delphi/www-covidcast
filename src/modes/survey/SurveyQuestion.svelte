@@ -9,7 +9,7 @@
   import { createTimeSeriesSpec, loadTimeSeriesData } from './timeSeries';
   import { determineTrend, findDateRow, findMaxRow, findMinRow } from './trend';
 
-  import { formatDateShortAbbr } from '../../formats';
+  import { formatDateShortOrdinal } from '../../formats';
   import { formatTrend, formatSampleSize, formatStdErr } from './format';
   import SurveyTrend from './SurveyTrend.svelte';
   import SurveyValue from './SurveyValue.svelte';
@@ -114,21 +114,33 @@
     align-items: center;
     line-height: 1.5;
     margin: 0 0.25em;
+    max-width: 11em;
     text-align: center;
   }
 
   .question-kpi {
     height: 5rem;
     display: flex;
+    margin-bottom: 0.5em;
+  }
+
+  .question-kpi-trend {
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .block-date {
+    margin: 0.5em 0;
   }
 
   .question-kpi-title {
+    margin: 0.5em 0;
     white-space: nowrap;
   }
 
   .question-unit {
     flex-grow: 1;
-    margin-bottom: 0.5em;
+    margin: 0.5em 0;
   }
 
   .no-data {
@@ -212,7 +224,7 @@
     </div>
     <div class="question-summary">
       <div>
-        <div class="question-kpi">
+        <div class="question-kpi question-kpi-trend">
           {#await summary}
             <SurveyTrend trend={null} />
           {:then s}
@@ -220,32 +232,15 @@
           {/await}
         </div>
         <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(refDate)}
+          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortOrdinal(refDate)}
         </div>
         <div class="uk-text-bold question-kpi-title">
           7-day trend
           <UIKitHint title="Tracks the variability of signal movenment" />
         </div>
         <div class="question-unit">
-          {#await summary}N/A{:then s}{s.trend ? `${formatTrend(s.trend.change)} since ${formatDateShortAbbr(refDate)}` : 'N/A'}{/await}
+          {#await summary}N/A{:then s}{s.trend ? `${formatTrend(s.trend.change)} since ${formatDateShortOrdinal(refDate)}` : 'N/A'}{/await}
         </div>
-      </div>
-      <div>
-        <div class="question-kpi">
-          {#await summary}
-            N/A
-          {:then s}
-            <SurveyValue value={s.row ? s.row.value : null} />
-          {/await}
-        </div>
-        <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(date)}
-        </div>
-        <div class="uk-text-bold question-kpi-title">
-          <ShapeIcon shape="circle" color="#c00" />
-          Current count
-        </div>
-        <div class="question-unit">{question.unit}</div>
       </div>
       <div>
         <div class="question-kpi">
@@ -256,11 +251,28 @@
           {/await}
         </div>
         <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(maxDate)}
+          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortOrdinal(maxDate)}
         </div>
         <div class="uk-text-bold question-kpi-title">
           <ShapeIcon shape="diamond" color="gray" />
           {question.inverted ? 'Lowest count' : 'Highest count'}
+        </div>
+        <div class="question-unit">{question.unit}</div>
+      </div>
+      <div>
+        <div class="question-kpi">
+          {#await summary}
+            N/A
+          {:then s}
+            <SurveyValue value={s.row ? s.row.value : null} />
+          {/await}
+        </div>
+        <div class="block-date">
+          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortOrdinal(date)}
+        </div>
+        <div class="uk-text-bold question-kpi-title">
+          <ShapeIcon shape="circle" color="#c00" />
+          Selected count
         </div>
         <div class="question-unit">{question.unit}</div>
       </div>
