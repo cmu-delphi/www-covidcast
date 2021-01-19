@@ -3,7 +3,9 @@ Overview: |
   In collaboration with Facebook Data for Good, along with a consortium of universities and public health officials, the Delphi Group at Carnegie Mellon University conducts research surveys to monitor the spread and impact of the COVID-19 pandemic in the United States. This survey is advertised through Facebook. It has run continuously since early April 2020. [More about the survey...](https://delphi.cmu.edu/covidcast/surveys)
 
 
-  This dashboard provides summary results from selected survey questions. **Note:** The question text below is simplified for this dashboard. The [full survey text is available](https://cmu-delphi.github.io/delphi-epidata/symptom-survey/coding.html), and [researchers can request access](https://cmu-delphi.github.io/delphi-epidata/symptom-survey/data-access.html) to the survey data.
+  This dashboard provides summary results from selected survey questions. **Note:** The question text below is simplified for this dashboard.
+FullSurveyLink: https://cmu-delphi.github.io/delphi-epidata/symptom-survey/coding.html
+DataAccessLink: https://cmu-delphi.github.io/delphi-epidata/symptom-survey/data-access.html
 DataSource: fb-survey
 Levels: [county, msa, state]
 TrendThreshold: 0.1 # increasing if ((current / a week ago) - 1) >= threshold
