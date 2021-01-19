@@ -9,12 +9,13 @@
   import { createTimeSeriesSpec, loadTimeSeriesData } from './timeSeries';
   import { determineTrend, findDateRow, findMaxRow, findMinRow } from './trend';
 
-  import { formatDateShortAbbr } from '../../formats';
+  import { formatDateShortOrdinal } from '../../formats';
   import { formatTrend, formatSampleSize, formatStdErr } from './format';
   import SurveyTrend from './SurveyTrend.svelte';
   import SurveyValue from './SurveyValue.svelte';
   import SurveyTooltip from './SurveyTooltip.svelte';
   import ShapeIcon from '../../components/ShapeIcon.svelte';
+  import { isMobileDevice } from '../../stores';
 
   /**
    * question object
@@ -102,11 +103,11 @@
 
   .question-summary {
     margin-top: 1.5em;
-    margin-bottom: 2em;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
   }
+
   .question-summary > div {
     flex: 1 1 0;
     display: flex;
@@ -114,18 +115,33 @@
     align-items: center;
     line-height: 1.5;
     margin: 0 0.25em;
+    max-width: 11em;
     text-align: center;
   }
+
   .question-kpi {
     height: 5rem;
     display: flex;
+    margin-bottom: 0.5em;
   }
+
+  .question-kpi-trend {
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .block-date {
+    margin: 0.5em 0;
+  }
+
   .question-kpi-title {
+    margin: 0.5em 0;
     white-space: nowrap;
   }
+
   .question-unit {
     flex-grow: 1;
-    margin-bottom: 0.5em;
+    margin: 0.5em 0;
   }
 
   .no-data {
@@ -139,14 +155,32 @@
   @media only screen and (max-width: 715px) {
     .question-question {
       font-size: 1.15rem;
+      line-height: 1.5rem;
+      font-weight: 600;
+      font-style: normal;
     }
 
     .header-link-text {
       display: none;
     }
 
-    .question-summary > div {
-      margin: 0 1em;
+    .question-kpi {
+      height: 3rem;
+    }
+
+    .question-kpi-title {
+      font-weight: normal;
+    }
+
+    .block-date,
+    .question-kpi-title,
+    .question-unit {
+      font-size: 0.8rem;
+    }
+
+    .chart-details {
+      font-size: 0.75rem;
+      font-style: normal;
     }
   }
 </style>
@@ -195,46 +229,33 @@
       signals={{ currentDate: date, maxDate, refDate }}
       tooltip={SurveyTooltip}
       tooltipProps={{ question }} />
-    <div class="uk-text-center uk-text-italic">
+    <div class="uk-text-center uk-text-italic chart-details">
       {#await summary then s}
         {s.row ? `based on ${formatSampleSize(s.row)} survey responses with a standard error of ${formatStdErr(s.row.stderr)}` : ''}
       {/await}
     </div>
     <div class="question-summary">
       <div>
-        <div class="question-kpi">
+        <div class="question-kpi question-kpi-trend">
           {#await summary}
             <SurveyTrend trend={null} />
           {:then s}
-            <SurveyTrend trend={s.trend ? s.trend.trend : null} />
+            <SurveyTrend trend={s.trend} />
           {/await}
+        </div>
+        <div class="block-date">
+          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortOrdinal(refDate)}
         </div>
         <div class="uk-text-bold question-kpi-title">
           7-day trend
           <UIKitHint title="Tracks the variability of signal movenment" />
         </div>
         <div class="question-unit">
-          {#await summary}N/A{:then s}{s.trend ? `${formatTrend(s.trend.change)} since` : 'N/A'}{/await}
-        </div>
-        <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(refDate)}
-        </div>
-      </div>
-      <div>
-        <div class="question-kpi">
           {#await summary}
             N/A
           {:then s}
-            <SurveyValue value={s.row ? s.row.value : null} />
+            {s.trend ? `${formatTrend(s.trend.change)} since ${formatDateShortOrdinal(refDate)}` : 'N/A'}
           {/await}
-        </div>
-        <div class="uk-text-bold question-kpi-title">
-          <ShapeIcon shape="circle" color="#c00" />
-          Current count
-        </div>
-        <div class="question-unit">{question.unit}</div>
-        <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(date)}
         </div>
       </div>
       <div>
@@ -245,14 +266,33 @@
             <SurveyValue value={s.max ? s.max.value : null} />
           {/await}
         </div>
+        <div class="block-date">
+          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortOrdinal(maxDate)}
+        </div>
         <div class="uk-text-bold question-kpi-title">
           <ShapeIcon shape="diamond" color="gray" />
-          {question.inverted ? 'Lowest count' : 'Highest count'}
+          {question.inverted ? 'Lowest' : 'Highest'}
+          {#if !$isMobileDevice}count{/if}
         </div>
         <div class="question-unit">{question.unit}</div>
-        <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(maxDate)}
+      </div>
+      <div>
+        <div class="question-kpi">
+          {#await summary}
+            N/A
+          {:then s}
+            <SurveyValue value={s.row ? s.row.value : null} />
+          {/await}
         </div>
+        <div class="block-date">
+          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortOrdinal(date)}
+        </div>
+        <div class="uk-text-bold question-kpi-title">
+          <ShapeIcon shape="circle" color="#c00" />
+          Selected
+          {#if !$isMobileDevice}count{/if}
+        </div>
+        <div class="question-unit">{question.unit}</div>
       </div>
     </div>
   </div>

@@ -4,7 +4,7 @@
   import arrowRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-circle-right.svg';
   import calendarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/calendar.svg';
   import { parseAPITime } from '../data';
-  import { times } from '../stores';
+  import { isMobileDevice, times } from '../stores';
   import { formatDateShortOrdinal } from '../formats';
   import { timeDay } from 'd3-time';
 
@@ -87,6 +87,15 @@
     display: inline-block;
     margin-right: 0.5em;
   }
+
+  @media only screen and (max-width: 715px) {
+    .arrow-button {
+      display: none;
+    }
+    .selected-date {
+      letter-spacing: initial;
+    }
+  }
 </style>
 
 <div class="date-picker {className}">
@@ -107,14 +116,16 @@
         <span class="selected-date-icon">
           {@html calendarIcon}
         </span>
-        <span>{formatDateShortOrdinal(value)}</span></button>
+        <span>{formatDateShortOrdinal(value, !$isMobileDevice)}</span>
+      </button>
     </Datepicker>
   {:else}
     <button aria-label="selected date" class="selected-date picker-button" disabled>
       <span class="inline-svg-icon">
         {@html calendarIcon}
       </span>
-      <span>{formatDateShortOrdinal(value)}</span></button>
+      <span>{formatDateShortOrdinal(value, !$isMobileDevice)}</span>
+    </button>
   {/if}
   <button
     class="arrow-button picker-button arrow-right"

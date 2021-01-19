@@ -37,8 +37,8 @@ function nth(d) {
 /**
  * @param {Date} date
  */
-export function formatDateShortOrdinal(date) {
-  return !date ? '?' : shortAbbrNth(date) + nth(date.getDate());
+export function formatDateShortOrdinal(date, suffix = true) {
+  return !date ? '?' : shortAbbrNth(date) + (suffix ? nth(date.getDate()) : '');
 }
 
 export function formatDateISO(date) {
