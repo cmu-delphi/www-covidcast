@@ -102,11 +102,11 @@
 
   .question-summary {
     margin-top: 1.5em;
-    margin-bottom: 2em;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
   }
+
   .question-summary > div {
     flex: 1 1 0;
     display: flex;
@@ -116,13 +116,16 @@
     margin: 0 0.25em;
     text-align: center;
   }
+
   .question-kpi {
     height: 5rem;
     display: flex;
   }
+
   .question-kpi-title {
     white-space: nowrap;
   }
+
   .question-unit {
     flex-grow: 1;
     margin-bottom: 0.5em;
@@ -139,6 +142,9 @@
   @media only screen and (max-width: 715px) {
     .question-question {
       font-size: 1.15rem;
+      line-height: 1.5rem;
+      font-weight: 600;
+      font-style: normal;
     }
 
     .header-link-text {
@@ -147,6 +153,10 @@
 
     .question-summary > div {
       margin: 0 1em;
+    }
+
+    .chart-details {
+      font-size: 0.75rem;
     }
   }
 </style>
@@ -195,7 +205,7 @@
       signals={{ currentDate: date, maxDate, refDate }}
       tooltip={SurveyTooltip}
       tooltipProps={{ question }} />
-    <div class="uk-text-center uk-text-italic">
+    <div class="uk-text-center uk-text-italic chart-details">
       {#await summary then s}
         {s.row ? `based on ${formatSampleSize(s.row)} survey responses with a standard error of ${formatStdErr(s.row.stderr)}` : ''}
       {/await}
@@ -206,18 +216,18 @@
           {#await summary}
             <SurveyTrend trend={null} />
           {:then s}
-            <SurveyTrend trend={s.trend ? s.trend.trend : null} />
+            <SurveyTrend trend={s.trend} />
           {/await}
+        </div>
+        <div class="block-date">
+          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(refDate)}
         </div>
         <div class="uk-text-bold question-kpi-title">
           7-day trend
           <UIKitHint title="Tracks the variability of signal movenment" />
         </div>
         <div class="question-unit">
-          {#await summary}N/A{:then s}{s.trend ? `${formatTrend(s.trend.change)} since` : 'N/A'}{/await}
-        </div>
-        <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(refDate)}
+          {#await summary}N/A{:then s}{s.trend ? `${formatTrend(s.trend.change)} since ${formatDateShortAbbr(refDate)}` : 'N/A'}{/await}
         </div>
       </div>
       <div>
@@ -228,14 +238,14 @@
             <SurveyValue value={s.row ? s.row.value : null} />
           {/await}
         </div>
+        <div class="block-date">
+          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(date)}
+        </div>
         <div class="uk-text-bold question-kpi-title">
           <ShapeIcon shape="circle" color="#c00" />
           Current count
         </div>
         <div class="question-unit">{question.unit}</div>
-        <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(date)}
-        </div>
       </div>
       <div>
         <div class="question-kpi">
@@ -245,14 +255,14 @@
             <SurveyValue value={s.max ? s.max.value : null} />
           {/await}
         </div>
+        <div class="block-date">
+          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(maxDate)}
+        </div>
         <div class="uk-text-bold question-kpi-title">
           <ShapeIcon shape="diamond" color="gray" />
           {question.inverted ? 'Lowest count' : 'Highest count'}
         </div>
         <div class="question-unit">{question.unit}</div>
-        <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(maxDate)}
-        </div>
       </div>
     </div>
   </div>
