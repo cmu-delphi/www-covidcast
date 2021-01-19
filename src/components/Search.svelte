@@ -49,6 +49,11 @@
   $: multiple = selectedItems != null;
   export let maxSelections = Number.POSITIVE_INFINITY;
 
+  /**
+   * enable modern styling
+   */
+  export let modern = false;
+
   let text;
   let filteredTextLength = 0;
 
@@ -243,6 +248,11 @@
 
   function onInputClick() {
     resetListToAllItemsAndOpen();
+
+    if (modern) {
+      // select the whole field upon click
+      input.select();
+    }
   }
 
   function onEsc(e) {
@@ -380,17 +390,51 @@
     display: flex;
     align-items: center;
   }
+
+  /* modern styles for survey dashboard */
+  .search-box.modern {
+    background: white;
+    flex: 2 1 auto;
+  }
+  .search-icon.modern {
+    left: 10px;
+  }
+  .clear-button.modern {
+    right: 10px;
+  }
+  .uk-search-input.modern {
+    background: white;
+    font-weight: 600;
+    letter-spacing: 3px;
+    height: 64px;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    padding-left: 50px !important;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-radius: 3px;
+    border: 1px solid #d3d4d8;
+  }
+
+  @media only screen and (max-width: 715px) {
+    .uk-search-input.modern {
+      letter-spacing: initial;
+      font-size: 0.85rem;
+    }
+  }
 </style>
 
 <div
   class="{className} uk-search search-box"
   class:uk-search-default={!multiple}
   class:search-multiple={multiple}
+  class:modern
   on:click={onContainerClick}>
   {#if !multiple}
-    <span data-uk-search-icon />
+    <span class="uk-search-icon search-icon" class:modern data-uk-icon="icon: search" />
     <input
       class="uk-search-input"
+      class:modern
       {placeholder}
       {name}
       {disabled}
@@ -406,11 +450,12 @@
     <button
       class="uk-search-icon clear-button"
       class:hidden={!text}
+      class:modern
       on:click={onResetItem}
       title="Clear Search Field"
       data-uk-icon="icon: close" />
   {:else}
-    <span class="uk-search-icon search-multiple-icon" data-uk-icon="icon: search" />
+    <span class="uk-search-icon search-multiple-icon search-icon" data-uk-icon="icon: search" class:modern />
 
     {#each selectedItems as selectedItem}
       <div class="search-tag" style="border-color: {colorFieldName ? selectedItem[colorFieldName] : undefined}">
@@ -426,6 +471,7 @@
     {#if !multiple || selectedItems.length < maxSelections}
       <input
         class="uk-search-input search-multiple-input"
+        class:modern
         {placeholder}
         {name}
         {disabled}
@@ -441,6 +487,7 @@
     {/if}
     <button
       class="uk-search-icon clear-button"
+      class:modern
       class:hidden={selectedItems.length === 0}
       on:click={onResetItem}
       title="Clear Search Field"

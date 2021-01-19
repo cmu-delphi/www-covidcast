@@ -15,48 +15,46 @@
 </script>
 
 <style>
-  .parameters {
+  .parameter-container {
     position: sticky;
-    top: -1px;
-    background: white;
-    z-index: 100;
-    padding-bottom: 0.5em;
-    display: flex;
-    box-shadow: 0 0 0 18px white; /* to hide box-shadow from cards */
+    top: 0px;
+    background: #fafafc;
+    border-top: 1px solid #d3d4d8;
+    border-bottom: 1px solid #d3d4d8;
+    z-index: 120;
+  }
+
+  .parameters {
+    margin-top: 10px;
+    margin-bottom: 10px;
   }
 
   @media only screen and (max-width: 715px) {
     .parameters {
-      display: block;
       padding-bottom: 0;
+      display: flex;
     }
-    .parameters > :global(*) {
-      margin-bottom: 0.5em;
+    .parameters > :global(.survey-search) {
+      flex-grow: 4;
     }
-  }
-
-  .parameters :global(.survey-search) {
-    background: #f0f1f3;
-    flex: 2 1 auto;
-  }
-  .parameters :global(.survey-search input) {
-    background: #f0f1f3;
-    letter-spacing: 3px;
-  }
-
-  .parameters :global(.survey-date) {
-    flex: 1 1 auto;
+    .parameters > :global(.survey-date) {
+      flex-grow: 1;
+    }
   }
 </style>
 
-<aside class="grid-3-11 parameters">
-  <Search
-    className="survey-search"
-    placeholder="Search Region"
-    items={filteredInfos}
-    selectedItem={$currentRegionInfo || nationInfo}
-    labelFieldName="displayName"
-    maxItemsToShowInList="5"
-    on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)} />
-  <SensorDatePicker2 className="survey-date" bind:value={selectedDate} sensor={refSensor} />
-</aside>
+<div class="parameter-container">
+  <div class="uk-container content-grid parameters">
+    <Search
+      className="survey-search grid-3-8"
+      modern
+      placeholder="Search Region"
+      items={filteredInfos}
+      selectedItem={$currentRegionInfo || nationInfo}
+      labelFieldName="displayName"
+      maxItemsToShowInList="5"
+      on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)} />
+    <SensorDatePicker2 className="survey-date grid-8-11" bind:value={selectedDate} sensor={refSensor} />
+  </div>
+  <slot />
+</div>

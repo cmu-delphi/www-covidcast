@@ -56,7 +56,7 @@
         encoding.set('color');
       }}
       title="Switch to Choropleth">
-      <span aria-hidden>Switch to Choropleth</span>
+      <span aria-hidden="false">Switch to Choropleth</span>
     </button>
     <button
       aria-pressed={$encoding === 'bubble' ? 'true' : 'false'}
@@ -66,7 +66,7 @@
         encoding.set('bubble');
       }}
       title="Switch to Bubble Map">
-      <span aria-hidden>Switch to Bubble Map</span>
+      <span aria-hidden="false">Switch to Bubble Map</span>
     </button>
     <button
       aria-pressed={$encoding === 'spike' ? 'true' : 'false'}
@@ -76,7 +76,7 @@
         encoding.set('spike');
       }}
       title="Switch to Spike Map">
-      <span aria-hidden>Switch to Spike Map</span>
+      <span aria-hidden="false">Switch to Spike Map</span>
     </button>
   </div>
 </div>

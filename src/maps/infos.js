@@ -48,7 +48,7 @@ export const nationInfo = {
   level: 'nation',
   name: 'US',
   id: 'us',
-  displayName: 'US - Whole Nation',
+  displayName: 'United States',
   propertyId: 'us',
   population: stateInfo.reduce((acc, v) => acc + v.population, 0),
 };

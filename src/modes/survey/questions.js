@@ -3,6 +3,8 @@ import descriptions from './descriptions.generated.json';
 import '!file-loader?name=surveyquestions.raw.txt!./descriptions.raw.txt';
 
 export const overviewText = descriptions.overview;
+export const surveyFullTextLink = descriptions.fullSurveyLink;
+export const dataAccessLink = descriptions.dataAccessLink;
 export const trendThreshold = descriptions.trendThreshold;
 export const trendThresholdQuickly = descriptions.trendThresholdQuickly;
 export const referenceRawNationSignal = descriptions.referenceRawNationSignal;

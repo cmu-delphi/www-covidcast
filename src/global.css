@@ -55,7 +55,7 @@
   font-size: 0.88rem;
 }
 
-#vizbox [aria-hidden] {
+#vizbox [aria-hidden='false'] {
   display: none;
 }
 
@@ -66,3 +66,10 @@
 @import './styles/vega.css';
 @import './styles/tooltip.css';
 @import './styles/uikit.css';
+
+.grid-3-8 {
+  grid-column: 3 / 8;
+}
+.grid-8-11 {
+  grid-column: 8 / 11;
+}

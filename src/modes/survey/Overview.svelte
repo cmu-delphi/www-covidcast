@@ -1,6 +1,6 @@
 <script>
   import { fetchSampleSizesNationSummary } from '../../data';
-  import { overviewText, referenceRawNationSignal, refSensor } from './questions';
+  import { overviewText, referenceRawNationSignal, refSensor, dataAccessLink, surveyFullTextLink } from './questions';
   import UiKitHint from '../../components/UIKitHint.svelte';
   import { formatDateShort } from '../../formats';
 
@@ -36,6 +36,34 @@
   .summary-stats-number {
     font-size: 2.75rem;
   }
+
+  .summary-button-bar {
+    display: flex;
+    justify-content: flex-start;
+    text-align: center;
+  }
+
+  .summary-button-bar > div {
+    flex: 1 1 0;
+  }
+
+  .summary-button-bar .uk-button {
+    display: block;
+  }
+
+  .summary-button-bar-desc {
+    font-size: 0.9rem;
+  }
+
+  @media only screen and (max-width: 715px) {
+    .summary-button-bar {
+      display: block;
+    }
+
+    .summary-button-bar > div {
+      margin-bottom: 0.5em;
+    }
+  }
 </style>
 
 <h4>Survey Overview</h4>
@@ -66,3 +94,10 @@
   </div>
 </div>
 {@html overviewText}
+<div class="summary-button-bar">
+  <div><a class="uk-button uk-button-default uk-button-delphi" href={surveyFullTextLink}>View full survey</a></div>
+  <div>
+    <a class="uk-button uk-button-default uk-button-delphi" href={dataAccessLink}>Request access to data</a>
+    <div class="summary-button-bar-desc">Access for researchers only at this time</div>
+  </div>
+</div>

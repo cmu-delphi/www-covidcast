@@ -1,5 +1,6 @@
 import { timeDay } from 'd3-time';
 import { formatAPITime } from '../../data';
+import { formatTrendChange } from './format';
 import { trendThreshold, trendThresholdQuickly } from './questions';
 
 /**
@@ -54,19 +55,30 @@ function toTrend(current, reference) {
 
 function toTrendText(change) {
   if (change >= trendThresholdQuickly) {
-    return 'increasing quickly';
+    return ['increasing quickly', `Increasing Quickly (>= ${formatTrendChange(trendThresholdQuickly)})`];
   }
   if (change >= trendThreshold) {
-    return 'increasing';
+    return ['increasing', `Increasing (>= ${formatTrendChange(trendThreshold)})`];
   }
   if (change <= -trendThresholdQuickly) {
-    return 'decreasing quickly';
+    return ['decreasing quickly', `Decreasing Quickly (<= ${formatTrendChange(-trendThresholdQuickly)})`];
   }
   if (change <= -trendThreshold) {
-    return 'decreasing';
+    return ['decreasing', `Decreasing (<= ${formatTrendChange(trendThreshold)})`];
   }
-  return 'static';
+  return ['static', `Static (${formatTrendChange(-trendThreshold)} <= v <= ${formatTrendChange(trendThreshold)})`];
 }
+
+/**
+ * @typedef {object} Trend
+ * @property {string} trend
+ * @property {string} trendReason
+ * @property {number} change
+ * @property {Date} refDate
+ * @property {EpiDataRow} ref
+ * @property {EpiDataRow} current
+ */
+
 /**
  *
  * @param {Date} date
@@ -78,6 +90,7 @@ export function determineTrend(date, data, dateRow = findDateRow(date, data)) {
   if (!dateRow || dateRow.value == null) {
     return {
       trend: 'Unknown',
+      trendReason: 'Unknown',
       change: Number.NaN,
       refDate,
       ref: null,
@@ -101,15 +114,20 @@ export function determineTrend(date, data, dateRow = findDateRow(date, data)) {
     // none found
     return {
       trend: 'Unknown',
+      trendReason: 'Unknown',
       change: Number.NaN,
+      current: dateRow,
       refDate: refDate,
       ref: null,
     };
   }
   const change = toTrend(dateRow.value, refValue.value);
+  const [trendText, trendReason] = toTrendText(change);
   return {
-    trend: toTrendText(change),
+    trend: trendText,
+    trendReason,
     change,
+    current: dateRow,
     refDate: refValue.date_value,
     ref: refValue,
   };
