@@ -1,3 +1,17 @@
+# Release 1.12.4
+
+This release improves the UX of the survey dashboard for both desktop and mobile experience.
+
+## New Features
+
+- [#724](https://github.com/cmu-delphi/www-covidcast/pull/724), [#717](https://github.com/cmu-delphi/www-covidcast/pull/717) Survey dashboards improvements
+
+
+## Bug-fixes
+
+- [#719](https://github.com/cmu-delphi/www-covidcast/pull/719) (re: [#718](https://github.com/cmu-delphi/www-covidcast/issues/718)) fix Export Data bug
+
+
 # Release 1.12.3
 
 ## Signal Changes
