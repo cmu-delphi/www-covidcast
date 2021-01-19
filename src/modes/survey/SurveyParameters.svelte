@@ -24,7 +24,7 @@
     z-index: 120;
   }
 
-  .uk-container {
+  .parameters {
     margin-top: 10px;
     margin-bottom: 10px;
   }
@@ -32,15 +32,19 @@
   @media only screen and (max-width: 715px) {
     .parameters {
       padding-bottom: 0;
+      display: flex;
     }
-    .parameters > :global(*) {
-      margin-bottom: 0.5em;
+    .parameters > :global(.survey-search) {
+      flex-grow: 4;
+    }
+    .parameters > :global(.survey-date) {
+      flex-grow: 1;
     }
   }
 </style>
 
 <div class="parameter-container">
-  <div class="content-grid uk-container parameters">
+  <div class="uk-container content-grid parameters">
     <Search
       className="survey-search grid-3-8"
       modern

@@ -59,6 +59,10 @@
     .summary-button-bar {
       display: block;
     }
+
+    .summary-button-bar > div {
+      margin-bottom: 0.5em;
+    }
   }
 </style>
 

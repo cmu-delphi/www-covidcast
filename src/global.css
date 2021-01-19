@@ -55,7 +55,7 @@
   font-size: 0.88rem;
 }
 
-#vizbox [aria-hidden] {
+#vizbox [aria-hidden="false"] {
   display: none;
 }
 

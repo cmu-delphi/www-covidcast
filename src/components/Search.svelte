@@ -415,6 +415,12 @@
     border-radius: 3px;
     border: 1px solid #d3d4d8;
   }
+
+  @media only screen and (max-width: 715px) {
+    .uk-search-input.modern {
+      letter-spacing: initial;
+    }
+  }
 </style>
 
 <div

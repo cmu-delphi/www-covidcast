@@ -15,6 +15,7 @@
   import SurveyValue from './SurveyValue.svelte';
   import SurveyTooltip from './SurveyTooltip.svelte';
   import ShapeIcon from '../../components/ShapeIcon.svelte';
+import { isMobileDevice } from '../../stores';
 
   /**
    * question object
@@ -163,12 +164,21 @@
       display: none;
     }
 
-    .question-summary > div {
-      margin: 0 1em;
+    .question-kpi {
+      height: 3rem;
+    }
+
+    .question-kpi-title {
+      font-weight: normal;
+    }
+
+    .block-date, .question-kpi-title, .question-unit {
+      font-size: 0.8rem;
     }
 
     .chart-details {
       font-size: 0.75rem;
+      font-style: normal;
     }
   }
 </style>
@@ -255,7 +265,8 @@
         </div>
         <div class="uk-text-bold question-kpi-title">
           <ShapeIcon shape="diamond" color="gray" />
-          {question.inverted ? 'Lowest count' : 'Highest count'}
+          {question.inverted ? 'Lowest' : 'Highest'}
+          {#if !$isMobileDevice}count{/if}
         </div>
         <div class="question-unit">{question.unit}</div>
       </div>
@@ -272,7 +283,8 @@
         </div>
         <div class="uk-text-bold question-kpi-title">
           <ShapeIcon shape="circle" color="#c00" />
-          Selected count
+          Selected
+          {#if !$isMobileDevice}count{/if}
         </div>
         <div class="question-unit">{question.unit}</div>
       </div>
