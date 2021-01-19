@@ -9,11 +9,14 @@ export function formatValue(value) {
   return value == null || Number.isNaN(value) ? 'N/A' : f(value * factor);
 }
 
-export function formatTrendChange(change, enforcePlusSign = false) {
+export function formatTrendChange(change, enforceSign = false) {
   if (change == null || Number.isNaN(change)) {
     return 'N/A';
   }
-  return `${enforcePlusSign && change > 0 ? '+' : ''}${f(Math.abs(change) * 100)}%`;
+  if (enforceSign) {
+    return `${change > 0 ? '+' : ''}${f(change * 100)}%`;
+  }
+  return `${f(Math.abs(change) * 100)}%`;
 }
 
 export function formatTrend(change) {
