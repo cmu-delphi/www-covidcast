@@ -5,6 +5,7 @@
   import SurveyParameters from './SurveyParameters.svelte';
   import Overview from './Overview.svelte';
   import { nationInfo } from '../../maps';
+  import MobileSurveyToc from './MobileSurveyToc.svelte';
   // use local variables with manual setting for better value comparison updates
   let startDay = $smallMultipleTimeSpan[0];
   let endDay = $smallMultipleTimeSpan[1];
@@ -45,7 +46,9 @@
 </style>
 
 <div class="root">
-  <SurveyParameters />
+  <SurveyParameters>
+    <MobileSurveyToc />
+  </SurveyParameters>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
       <Overview />
