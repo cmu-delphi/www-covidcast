@@ -143,20 +143,20 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
         // resolve: { axis: { x: 'independent' } },
         layer: [
           {
-            selection: {
-              dateRange: {
-                type: 'interval',
-                encodings: ['x'],
-                on: '[mousedown[!event.shiftKey], window:mouseup] > window:mousemove!',
-                translate: '[mousedown[!event.shiftKey], window:mouseup] > window:mousemove!',
-                zoom: 'wheel![!event.shiftKey && !event.ctrlKey]',
-                init: {
-                  x: [initialSelection[0].getTime(), initialSelection[1].getTime()],
-                },
-                mark: { cursor: 'move', fillOpacity: 0 },
-                bind: 'scales',
-              },
-            },
+            // selection: {
+            //   dateRange2: {
+            //     type: 'interval',
+            //     encodings: ['x'],
+            //     on: '[mousedown[!event.shiftKey], window:mouseup] > window:mousemove!',
+            //     translate: '[mousedown[!event.shiftKey], window:mouseup] > window:mousemove!',
+            //     zoom: 'wheel![!event.shiftKey && !event.ctrlKey]',
+            //     init: {
+            //       x: [initialSelection[0].getTime(), initialSelection[1].getTime()],
+            //     },
+            //     mark: { cursor: 'move', fillOpacity: 0 },
+            //     bind: 'scales',
+            //   },
+            // },
             mark: {
               type: 'line',
               interpolate: 'monotone',
@@ -252,17 +252,17 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
                 type: 'interval',
                 nearest: true,
                 empty: 'none',
-                on: '[mousedown[event.shiftKey], window:mouseup] > window:mousemove!',
-                translate: '[mousedown[event.shiftKey], window:mouseup] > window:mousemove!',
-                zoom: 'rect:wheel!',
+                // on: '[mousedown[event.shiftKey], window:mouseup] > window:mousemove!',
+                // translate: '[mousedown[event.shiftKey], window:mouseup] > window:mousemove!',
+                // zoom: 'wheel![event.shiftKey || event.ctrlKey]',
                 // clear: 'mouseup',
                 encodings: ['x'],
                 mark: {
                   type: 'rect',
-                  fillOpacity: 0.05,
-                  stroke: 'green',
-                  strokeOpacity: 0.01,
-                  strokeWidth: 3,
+                  fillOpacity: 0.01,
+                  // stroke: 'green',
+                  // strokeOpacity: 0.01,
+                  // strokeWidth: 3,
                   cursor: 'move',
                 },
               },
@@ -306,7 +306,26 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
               },
             },
           },
-
+          {
+            transform: [
+              {
+                filter: {
+                  or: [
+                    {
+                      selection: 'range',
+                    },
+                  ],
+                },
+              },
+            ],
+            mark: { type: 'area', opacity: 0.3 },
+            encoding: {
+              y: {
+                field: primaryValue,
+                type: 'quantitative',
+              },
+            },
+          },
           {
             transform: [
               {
@@ -342,93 +361,98 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
               //     { field: 'rightmost', op: 'last_value', as: 'rightmost' },
               //   ],
               // },
-              { calculate: `datum.leftmost.date_value`, as: 'left' },
-              { calculate: `datum.rightmost.date_value`, as: 'right' },
-              { calculate: `datum.leftmost.${primaryValue}`, as: 'left_value' },
-              { calculate: `datum.rightmost.${primaryValue}`, as: 'right_value' },
-              { calculate: `datum.left_value < datum.right_value`, as: 'increasing' },
-              { calculate: `max(datum.left_value, datum.right_value)`, as: 'top' },
-              { calculate: `min(datum.left_value, datum.right_value)`, as: 'bottom' },
-              { calculate: 'datum.top - datum.bottom', as: 'diff_value' },
-              { calculate: 'datum.bottom + datum.diff_value / 2', as: 'mid_value' },
+              { as: 'left', calculate: `datum.leftmost.date_value` },
+              { as: 'right', calculate: `datum.rightmost.date_value` },
+              {
+                as: 'mid_date',
+                calculate: 'time(datum.right)/2 + time(datum.left)/2',
+              },
+              { as: 'left_value', calculate: `datum.leftmost.${primaryValue}` },
+              { as: 'right_value', calculate: `datum.rightmost.${primaryValue}` },
+              { as: 'increasing', calculate: `datum.left_value < datum.right_value` },
+              { as: 'top', calculate: `max(datum.left_value, datum.right_value)` },
+              { as: 'bottom', calculate: `min(datum.left_value, datum.right_value)` },
+              { as: 'arrowheadPoint', calculate: 'datum.increasing ? datum.top : datum.bottom' },
+              { as: 'diff_value', calculate: 'datum.top - datum.bottom' },
+              { as: 'mid_value', calculate: 'datum.bottom + datum.diff_value / 2' },
             ],
 
             layer: [
+              // // Bounding rectangle
+              // {
+              //   mark: {
+              //     type: 'rect',
+              //     fill: 'red',
+              //     fillOpacity: 0.05,
+              //     strokeWidth: 2,
+              //     stroke: 'black',
+              //     opacity: 0.5,
+              //     strokeOpacity: 1,
+              //   },
+              //   encoding: {
+              //     x: {
+              //       field: 'left',
+              //       type: 'temporal',
+              //     },
+              //     x2: {
+              //       field: 'right',
+              //       type: 'temporal',
+              //     },
+              //     y: {
+              //       field: 'top',
+              //       type: 'quantitative',
+              //     },
+              //     y2: {
+              //       field: 'bottom',
+              //       type: 'quantitative',
+              //     },
+              //   },
+              // },
+
+              // // Diagonal rule
+              // {
+              //   mark: { type: 'rule', strokeWidth: 2 },
+              //   encoding: {
+              //     x: { field: 'left' },
+              //     x2: { field: 'right' },
+              //     y: { field: 'left_value', type: 'quantitative' },
+              //     y2: { field: 'right_value', type: 'quantitative' },
+              //     color: {
+              //       condition: [
+              //         {
+              //           test: 'datum.increasing',
+              //           value: 'red',
+              //         },
+              //       ],
+              //       value: 'green',
+              //     },
+              //   },
+              // },
+
+              // // Bounding rules
+              // {
+              //   mark: { type: 'rule', stroke: 'gray', opacity: 0.5, size: 3 },
+              //   encoding: {
+              //     y: { field: 'left_value', type: 'quantitative' },
+              //     y2: 0,
+              //     x: {
+              //       field: 'left',
+              //       type: 'temporal',
+              //     },
+              //   },
+              // },
+              // {
+              //   mark: { type: 'rule', stroke: 'gray', opacity: 0.5, size: 3 },
+              //   encoding: {
+              //     y: { field: 'right_value', type: 'quantitative' },
+              //     x: {
+              //       field: 'right',
+              //       type: 'temporal',
+              //     },
+              //   },
+              // },
               {
-                mark: {
-                  type: 'rect',
-                  fill: 'red',
-                  fillOpacity: 0.05,
-                  strokeWidth: 2,
-                  stroke: 'black',
-                  opacity: 0.5,
-                  strokeOpacity: 1,
-                },
-                encoding: {
-                  x: {
-                    field: 'left',
-                    type: 'temporal',
-                  },
-                  x2: {
-                    field: 'right',
-                    type: 'temporal',
-                  },
-                  y: {
-                    field: 'top',
-                    type: 'quantitative',
-                  },
-                  y2: {
-                    field: 'bottom',
-                    type: 'quantitative',
-                  },
-                },
-              },
-              {
-                mark: { type: 'rule', strokeWidth: 2 },
-                encoding: {
-                  x: { field: 'left' },
-                  x2: { field: 'right' },
-                  y: { field: 'left_value', type: 'quantitative' },
-                  y2: { field: 'right_value', type: 'quantitative' },
-                  color: {
-                    condition: [
-                      {
-                        test: 'datum.increasing',
-                        value: 'red',
-                      },
-                    ],
-                    value: 'green',
-                  },
-                },
-              },
-              {
-                // selection: {
-                //   leftEdge: {
-                //     type: 'single',
-                //     mark: { type: 'rule'},
-                //   }
-                // },
-                mark: { type: 'rule', stroke: 'green', opacity: 0.1, size: 3 },
-                encoding: {
-                  y: null,
-                  x: {
-                    field: 'left',
-                    type: 'temporal',
-                  },
-                },
-              },
-              {
-                mark: { type: 'rule', stroke: 'green', opacity: 0.1, size: 3 },
-                encoding: {
-                  y: null,
-                  x: {
-                    field: 'right',
-                    type: 'temporal',
-                  },
-                },
-              },
-              {
-                mark: { type: 'rule', stroke: 'green', opacity: 0.1, size: 3 },
+                mark: { type: 'rule', stroke: 'black', opacity: 0.5, size: 1 },
                 encoding: {
                   x: null,
                   y: {
@@ -438,7 +462,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
                 },
               },
               {
-                mark: { type: 'rule', stroke: 'green', opacity: 0.1, size: 3 },
+                mark: { type: 'rule', stroke: 'black', opacity: 0.5, size: 1 },
                 encoding: {
                   x: null,
                   y: {
@@ -451,11 +475,11 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
                 mark: {
                   type: 'text',
                   fontSize: 14,
-                  dx: -60,
+                  dx: -20,
                 },
                 encoding: {
                   x: {
-                    field: 'left',
+                    field: 'mid_date',
                   },
                   y: {
                     field: 'mid_value',
@@ -470,13 +494,12 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
               {
                 mark: {
                   type: 'rule',
-                  xOffset: -40,
-                  strokeWidth: 3,
-                  opacity: 1,
+                  strokeWidth: 1,
+                  opacity: 0.9,
                   color: { expr: 'datum.increasing ? "red" : "green"' },
                 },
                 encoding: {
-                  x: { field: 'left' },
+                  x: { field: 'mid_date', type: 'temporal' },
                   y: {
                     field: 'top',
                     type: 'quantitative',
@@ -487,36 +510,42 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
                   },
                 },
               },
+              // Arrowheads
+              // {
+              //   mark: {
+              //     type: 'point',
+              //     shape: 'triangle',
+              //     angle: 0,
+              //     size: 100,
+              //     xOffset: -40,
+              //     yOffset: 6,
+              //     color: { expr: 'datum.increasing ? "red" : "green"' },
+              //     opacity: { expr: 'datum.increasing ? 1 : 0' },
+              //     filled: true,
+              //   },
+              //   encoding: {
+              //     x: { field: 'mid_date' },
+              //     y: { field: 'top', type: 'quantitative' },
+              //   },
+              // },
               {
                 mark: {
                   type: 'point',
                   shape: 'triangle',
-                  angle: 0,
+                  angle: { expr: 'datum.increasing ? 0 : 180' },
                   size: 100,
-                  xOffset: -40,
-                  yOffset: 6,
+                  yOffset: { expr: 'datum.increasing ? 6 : -6' },
                   color: { expr: 'datum.increasing ? "red" : "green"' },
+                  opacity: 0.9,
+                  fillOpacity: 0.8,
                   filled: true,
                 },
                 encoding: {
-                  x: { field: 'left' },
-                  y: { field: 'top', type: 'quantitative' },
-                },
-              },
-              {
-                mark: {
-                  type: 'point',
-                  shape: 'triangle',
-                  angle: 180,
-                  size: 100,
-                  xOffset: -40,
-                  yOffset: -6,
-                  color: { expr: 'datum.increasing ? "red" : "green"' },
-                  filled: true,
-                },
-                encoding: {
-                  x: { field: 'left' },
-                  y: { field: 'bottom', type: 'quantitative' },
+                  x: { field: 'mid_date' },
+                  y: {
+                    field: 'arrowheadPoint',
+                    type: 'quantitative',
+                  },
                 },
               },
             ],
@@ -566,7 +595,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
         layer: [
           {
             selection: {
-              dateRange2: {
+              dateRange: {
                 type: 'interval',
                 encodings: ['x'],
                 init: {
