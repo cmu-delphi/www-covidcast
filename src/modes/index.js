@@ -41,12 +41,17 @@ const modes = [
     component: () =>
       import(/* webpackChunkName: 'mode-export' */ './exportdata/ExportData.svelte').then((r) => r.default),
   },
+  {
+    id: 'lab',
+    label: 'Lab',
+    component: () => import(/* webpackChunkName: 'mode-lab' */ './lab/Lab.svelte').then((r) => r.default),
+  },
 ];
 
 export default modes;
 
 /**
- * @type {Record<'overview'|'timelapse'|'top10'|'export'|'single'|'survey-results', Mode>}
+ * @type {Record<'overview'|'timelapse'|'top10'|'export'|'single'|'survey-results'|'lab', Mode>}
  */
 export const modeByID = {};
 modes.forEach((mode) => (modeByID[mode.id] = mode));

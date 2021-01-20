@@ -170,6 +170,12 @@ module.exports = () => {
         template: './src/index.html',
         filename: 'survey-results/index.html',
       }),
+      new HtmlWebpackPlugin({
+        alwaysWriteToDisk: true,
+        title: 'COVIDcast Lab',
+        template: './src/index.html',
+        filename: 'lab/index.html',
+      }),
 
       new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({
