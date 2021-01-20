@@ -23,13 +23,6 @@ export function combineSignals(data, ref, keys, toKey = (d) => `${d.geo_value}@$
   return ref;
 }
 
-export function checkWIP(signalName, otherSignal) {
-  if (signalName.match(/wip/)) {
-    return 'wip_' + otherSignal.replace('incidence', 'incid');
-  }
-  return otherSignal;
-}
-
 const parseAPITimeParser = timeParse('%Y%m%d');
 
 export function parseAPITime(v) {
