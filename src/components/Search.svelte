@@ -416,7 +416,7 @@
     border: 1px solid #d3d4d8;
   }
 
-  @media only screen and (max-width: 715px) {
+  @media only screen and (max-width: 1000px) {
     .uk-search-input.modern {
       letter-spacing: initial;
       font-size: 0.85rem;
