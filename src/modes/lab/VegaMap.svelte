@@ -177,7 +177,7 @@
         type: 'geoshape',
         color: 'transparent',
         stroke: '#eaeaea',
-        strokeWidth: 1.1
+        strokeWidth: 1.1,
       },
     };
     return layer;
@@ -302,16 +302,18 @@
       },
     };
     if (level === 'nation') {
-      spec.layer.push(genLevelLayer(level, infos, [
-        {
-          calculate: JSON.stringify(fixId),
-          as: 'id',
-        },
-      ]));
+      spec.layer.push(
+        genLevelLayer(level, infos, [
+          {
+            calculate: JSON.stringify(fixId),
+            as: 'id',
+          },
+        ]),
+      );
     } else {
       spec.datasets.nation = nationJSON;
       spec.layer.push(genMissingLayer());
- 
+
       if (level === 'county') {
         spec.datasets.state = stateJSON;
         spec.layer.push(genMegaLayer());

@@ -13,6 +13,7 @@
 /src/static
 /src/maps/raw
 /src/maps/processed
+/src/modes/lab/maps2
 *.generated.json
 *.txt
 /LICENSE
