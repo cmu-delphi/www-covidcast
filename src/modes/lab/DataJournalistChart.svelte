@@ -1,17 +1,19 @@
 <script>
   import { timeDay } from 'd3-time';
-import Tooltip from '../../components/MapBox/Tooltip.svelte';
+// import Tooltip from '../../components/MapBox/Tooltip.svelte';
   import Vega from '../../components/Vega.svelte';
-  import { addMissing, fetchTimeSlice } from '../../data';
-  import { defaultRegionOnStartup, sensorList } from '../../stores/constants';
+  // import { addMissing, fetchTimeSlice } from '../../data';
+  // import { defaultRegionOnStartup, sensorList } from '../../stores/constants';
   import {sequenceGen} from './seq';
 
-  const sensor = sensorList.find((d) => d.isCasesOrDeath);
-  /**
+  // const sensor = sensorList.find((d) => d.isCasesOrDeath);
+
+  function genSpec(smartPadding = true) {
+    /**
    * @type {import('vega-lite').TopLevelSpec}
    */
   const spec = {
-    title: sensor.name,
+    title: 'Random',
     height: 300,
     padding: {
       left: 100,
@@ -52,11 +54,11 @@ import Tooltip from '../../components/MapBox/Tooltip.svelte';
           round: true,
           zero: false,
           domainMin: null,
-          padding: {
+          padding: smartPadding ? {
             // in case the values are close to 0 .. no padding otherwise some padding
             // if range.min < 10 && range.range > 30 ? 0 : 20
             expr: `customObjChecks(customExtent(data("values"), "value"), ['min', '<', 10], ['range', '>', 30]) ? 0 : 20`
-          },
+          } : 0,
         },
       },
     },
@@ -91,6 +93,12 @@ import Tooltip from '../../components/MapBox/Tooltip.svelte';
       },
     },
   };
+  return spec;
+  }
+
+  const spec = genSpec(true);
+  const specNoPadding = genSpec(false);
+  specNoPadding.title = 'No Padding';
 
   function gen(min, max, seed) {
     const seq = sequenceGen(min, max, seed);
@@ -107,7 +115,7 @@ import Tooltip from '../../components/MapBox/Tooltip.svelte';
   const dataWide = gen(0, 100);
   const dataWide2 = gen(0, 100, "x");
   const dataLowBand = gen(3, 8);
-  const dataMidBand = gen(30, 60);
+  const dataMidBand = gen(0, 60);
   const dataHighBand = gen(87, 92);
 </script>
 
@@ -117,8 +125,13 @@ import Tooltip from '../../components/MapBox/Tooltip.svelte';
 <h2>Data Journalist Chart</h2>
 
 <Vega {spec} data={dataWide} />
+<Vega spec={specNoPadding} data={dataWide} />
 <Vega {spec} data={dataWide2} />
+<Vega spec={specNoPadding}  data={dataWide2} />
 <Vega {spec} data={dataLowBand} />
+<Vega spec={specNoPadding}  data={dataLowBand} />
 <Vega {spec} data={dataMidBand} />
+<Vega spec={specNoPadding}  data={dataMidBand} />
 <Vega {spec} data={dataHighBand} />
+<Vega spec={specNoPadding} data={dataHighBand} />
 
