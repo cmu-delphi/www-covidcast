@@ -166,14 +166,20 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
             },
           },
           {
+            transform: [
+              // Only highlight the 0th location, rather than randomly picking one of them.
+              {
+                filter: `datum.geo_value == '${selections[0].info.propertyId}'`,
+              },
+            ],
             selection: {
               highlight: {
                 type: 'single',
                 empty: 'none',
                 nearest: true,
                 encodings: ['x'],
-                on: 'mouseover',
-                clear: 'mouseout',
+                on: 'mousedown',
+                clear: 'dblclick',
               },
             },
             mark: {
@@ -199,8 +205,81 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
               },
             },
           },
-          // complicated construct to have proper typings
+
+          // Other end of range selection.  Doesn't work, unfortunately.
+          // {
+          //   transform: [
+          //     // Only highlight the 0th location, rather than randomly picking one of them.
+          //     {
+          //       filter: `datum.geo_value == '${selections[0].info.propertyId}'`,
+          //     },
+          //   ],
+          //   selection: {
+          //     otherDate: {
+          //       type: 'single',
+          //       empty: 'none',
+          //       nearest: true,
+          //       encodings: ['x'],
+          //       on: 'click',
+          //       //clear: 'dblclick',
+          //     },
+          //   },
+          //   mark: {
+          //     type: 'circle',
+          //     tooltip: true,
+          //   },
+          //   encoding: {
+          //     color: {
+          //       field: 'geo_value',
+          //     },
+          //     x: {
+          //       ...xDateRangeEncoding,
+          //     },
+          //     y: {
+          //       field: primaryValue,
+          //       type: 'quantitative',
+          //     },
+          //   },
+          // },
+
+          // Range selector within main chart area
+          // {
+          //   selection: {
+          //     range: {
+          //       type: 'interval',
+          //       nearest: true,
+          //       empty: 'none',
+
+          //       encodings: ['x'],
+          //       mark: {
+          //         type: 'rect',
+          //         fillOpacity: 0.01,
+          //         cursor: 'move',
+          //         // strokeOpacity: 0,
+          //       },
+          //     },
+          //   },
+          //   mark: {
+          //     type: 'point',
+          //   },
+          //   encoding: {
+          //     x: { ...xDateRangeEncoding },
+          //     y: {
+          //       field: primaryValue,
+          //       type: 'quantitative',
+          //       axis: {
+          //         minExtent: 25,
+          //         tickCount: 3,
+          //         title: ' ',
+          //       },
+          //     },
+          //   },
+          // },
+
+          // Insert 'error bar', if the data includes it.
+          // Using complicated construct to have proper typings.
           ...(sensor.hasStdErr ? [stdErrLayer] : []),
+
           {
             transform: [
               {
@@ -217,9 +296,182 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
               },
             },
           },
+
+          // // Show area under data within range selection.
+          {
+            transform: [
+              {
+                filter: `datum.geo_value == '${selections[0].info.propertyId}'`,
+              },
+              // { as: 'end', calculate: 'isValid(otherDate.date_value) ? otherDate.date_value : highlight.date_value' },
+              { as: 'end', calculate: 'highlight.date_value' },
+              { as: 'left', calculate: 'min(toDate(currentDate), datum.end)' },
+              { as: 'right', calculate: 'max(toDate(currentDate), datum.end)' },
+              {
+                filter: 'datum.left <= datum.date_value && datum.date_value <= datum.right',
+              },
+            ],
+            mark: { type: 'area', opacity: 0.1 },
+            encoding: {
+              y: {
+                field: primaryValue,
+                type: 'quantitative',
+              },
+            },
+          },
+
+          // {
+          //   transform: [
+          //     {
+          //       filter: {
+          //         selection: 'range',
+          //       },
+          //     },
+
+          //     {
+          //       aggregate: [
+          //         {
+          //           op: 'argmin',
+          //           field: 'date_value',
+          //           as: 'leftmost',
+          //         },
+          //         {
+          //           op: 'argmax',
+          //           field: 'date_value',
+          //           as: 'rightmost',
+          //         },
+          //       ],
+          //     },
+          //     { as: 'left', calculate: `datum.leftmost.date_value` },
+          //     { as: 'right', calculate: `datum.rightmost.date_value` },
+          //     {
+          //       as: 'mid_date',
+          //       calculate: 'time(datum.right)/2 + time(datum.left)/2',
+          //     },
+          //     { as: 'left_value', calculate: `datum.leftmost.${primaryValue}` },
+          //     { as: 'right_value', calculate: `datum.rightmost.${primaryValue}` },
+          //     { as: 'increasing', calculate: `datum.left_value < datum.right_value` },
+          //     { as: 'top', calculate: `max(datum.left_value, datum.right_value)` },
+          //     { as: 'bottom', calculate: `min(datum.left_value, datum.right_value)` },
+          //     { as: 'arrowheadPoint', calculate: 'datum.increasing ? datum.top : datum.bottom' },
+          //     { as: 'diff_value', calculate: 'datum.top - datum.bottom' },
+          //     { as: 'mid_value', calculate: 'datum.bottom + datum.diff_value / 2' },
+          //   ],
+
+          //   layer: [
+          //     // Bounding rules
+          //     {
+          //       mark: { type: 'rule', stroke: 'black', opacity: 0.5, size: 1 },
+          //       encoding: {
+          //         x: null,
+          //         y: {
+          //           field: 'top',
+          //           type: 'quantitative',
+          //         },
+          //       },
+          //     },
+          //     {
+          //       mark: { type: 'rule', stroke: 'black', opacity: 0.5, size: 1 },
+          //       encoding: {
+          //         x: null,
+          //         y: {
+          //           field: 'bottom',
+          //           type: 'quantitative',
+          //         },
+          //       },
+          //     },
+
+          //     // Range value difference label, at mid-point.
+          //     {
+          //       mark: {
+          //         type: 'text',
+          //         fontSize: 14,
+          //         dx: -20,
+          //       },
+          //       encoding: {
+          //         x: {
+          //           field: 'mid_date',
+          //         },
+          //         y: {
+          //           field: 'mid_value',
+          //           type: 'quantitative',
+          //         },
+          //         text: {
+          //           field: 'diff_value',
+          //           format: '-.2f',
+          //         },
+          //       },
+          //     },
+
+          //     // Rule for arrow.
+          //     {
+          //       mark: {
+          //         type: 'rule',
+          //         strokeWidth: 1,
+          //         opacity: 0.9,
+          //         color: { expr: 'datum.increasing ? "red" : "green"' },
+          //       },
+          //       encoding: {
+          //         x: { field: 'mid_date', type: 'temporal' },
+          //         y: {
+          //           field: 'top',
+          //           type: 'quantitative',
+          //         },
+          //         y2: {
+          //           field: 'bottom',
+          //           type: 'quantitative',
+          //         },
+          //       },
+          //     },
+          //     // Arrowhead
+          //     {
+          //       mark: {
+          //         type: 'point',
+          //         shape: 'triangle',
+          //         angle: { expr: 'datum.increasing ? 0 : 180' },
+          //         size: 100,
+          //         yOffset: { expr: 'datum.increasing ? 6 : -6' },
+          //         color: { expr: 'datum.increasing ? "red" : "green"' },
+          //         opacity: 0.9,
+          //         fillOpacity: 0.8,
+          //         filled: true,
+          //       },
+          //       encoding: {
+          //         x: { field: 'mid_date' },
+          //         y: {
+          //           field: 'arrowheadPoint',
+          //           type: 'quantitative',
+          //         },
+          //       },
+          //     },
+          //   ],
+          // },
+
+          // // Hover over data point, for tooltip.
+          // {
+          //   transform: [
+          //     {
+          //       filter: {
+          //         selection: 'highlight',
+          //       },
+          //     },
+          //   ],
+          //   mark: {
+          //     type: 'rule',
+          //     strokeOpacity: 0.3,
+          //   },
+          //   encoding: {
+          //     y: {
+          //       field: primaryValue,
+          //       type: 'quantitative',
+          //     },
+          //   },
+          // },
+
           CURRENT_DATE_HIGHLIGHT,
         ],
       },
+
       {
         height: 40,
         padding: { top: 0 },
