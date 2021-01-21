@@ -26,7 +26,7 @@
 
   .mobile-survey-container {
     border-top: 1px solid #d3d4d8;
-    background: white;    
+    background: white;
   }
 
   .toc-button-container {
@@ -64,7 +64,7 @@
     .mobile-survey-container {
       display: grid;
     }
-      /* padding-left: 30px;
+    /* padding-left: 30px;
       padding-right: 30px;
     } */
   }
