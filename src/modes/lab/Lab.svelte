@@ -1,9 +1,8 @@
 <script>
-  import DataJournalistChart from './DataJournalistChart.svelte';
-
+  import VegaMap from './VegaMap.svelte';
 </script>
 
 <style>
 </style>
 
-<DataJournalistChart />
+<VegaMap />

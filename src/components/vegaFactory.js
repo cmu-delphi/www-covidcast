@@ -1,7 +1,32 @@
 import { timeFormat } from 'd3-time-format';
 import { format } from 'd3-format';
 import embed from 'vega-embed';
-import { Error, expressionFunction } from 'vega';
+import { Error, expressionFunction, projection } from 'vega';
+import { geoAlbersUsaTerritories } from 'geo-albers-usa-territories';
+import { fitExtent, fitSize, fitWidth, fitHeight } from 'd3-geo/src/projection/fit.js';
+
+function patchedAlbersUsaTerritories() {
+  // see https://github.com/stamen/geo-albers-usa-territories/pull/8/files
+  const r = geoAlbersUsaTerritories();
+  r.fitExtent = function (extent, object) {
+    return fitExtent(r, extent, object);
+  };
+
+  r.fitSize = function (size, object) {
+    return fitSize(r, size, object);
+  };
+
+  r.fitWidth = function (width, object) {
+    return fitWidth(r, width, object);
+  };
+
+  r.fitHeight = function (height, object) {
+    return fitHeight(r, height, object);
+  };
+  return r;
+}
+
+projection('albersUsaTerritories', patchedAlbersUsaTerritories);
 
 const cache = new Map();
 
@@ -28,6 +53,7 @@ export function cachedNumber(datum, params) {
 expressionFunction('cachedTime', cachedTime);
 expressionFunction('cachedNumber', cachedNumber);
 
+
 /**
  * @param {string | HTMLElement} root
  * @param {import('vega-embed').VisualizationSpec | string} spec
@@ -43,27 +69,27 @@ export default function createVega(root, spec, options) {
 }
 
 /**
- * 
- * @param {any[]} array 
- * @param {string} field 
+ *
+ * @param {any[]} array
+ * @param {string} field
  */
 function customMap(array, field) {
-  return array.map((d) => d != null ? d[field] : null);
+  return array.map((d) => (d != null ? d[field] : null));
 }
 
 /**
- * 
- * @param {any[]} array 
- * @param {string} field 
+ *
+ * @param {any[]} array
+ * @param {string} field
  */
 function customFilter(array, field, value) {
   return array.filter((d) => d != null && d[field] === value);
 }
 
 /**
- * 
- * @param {any[]} array 
- * @param {string} field 
+ *
+ * @param {any[]} array
+ * @param {string} field
  */
 function customReduce(array, field, reduceFunction, initialValue) {
   return array.reduce((acc, d) => reduceFunction(acc, d != null ? d[field] : null), initialValue);
@@ -78,7 +104,7 @@ function customExtent(arr, field) {
     return {
       min: null,
       max: null,
-      range: 0
+      range: 0,
     };
   }
   let min = Number.POSITIVE_INFINITY;
@@ -93,7 +119,9 @@ function customExtent(arr, field) {
   }
 
   return {
-    min, max, range: max - min,
+    min,
+    max,
+    range: max - min,
   };
 }
 expressionFunction('customExtent', customExtent);
@@ -105,11 +133,16 @@ function customObjChecks(obj, ...conditions) {
   return conditions.every(([field, op, value]) => {
     const v = obj != null ? obj[field] : null;
     switch (op) {
-      case '==': return v == value;
-      case '<': return v < value;
-      case '>': return v > value;
-      case '>=': return v >= value;
-      case '<=': return v <= value;
+      case '==':
+        return v == value;
+      case '<':
+        return v < value;
+      case '>':
+        return v > value;
+      case '>=':
+        return v >= value;
+      case '<=':
+        return v <= value;
       default:
         return v === value;
     }
