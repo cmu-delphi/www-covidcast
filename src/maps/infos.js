@@ -69,7 +69,7 @@ export const hrrInfo = parseCSV(hrrRaw, 'hrr', (hrr) => `${hrr.state} - ${hrr.na
 /**
  * @type {NameInfo[]}
  */
-const megaCountyInfo = stateInfo.map((info) => ({
+export const megaCountyInfo = stateInfo.map((info) => ({
   id: info.id + '000',
   propertyId: info.id + '000',
   name: `Rest of ${info.name}`,

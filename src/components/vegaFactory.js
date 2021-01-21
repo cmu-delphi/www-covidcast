@@ -53,7 +53,6 @@ export function cachedNumber(datum, params) {
 expressionFunction('cachedTime', cachedTime);
 expressionFunction('cachedNumber', cachedNumber);
 
-
 /**
  * @param {string | HTMLElement} root
  * @param {import('vega-embed').VisualizationSpec | string} spec
