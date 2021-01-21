@@ -1,7 +1,8 @@
 <script>
+  import { timeDay } from 'd3-time';
   import Vega from '../../components/Vega.svelte';
-import { addMissing, fetchTimeSlice } from '../../data';
-import { defaultRegionOnStartup, sensorList } from '../../stores/constants';
+  import { addMissing, fetchTimeSlice } from '../../data';
+  import { defaultRegionOnStartup, sensorList } from '../../stores/constants';
 
   const sensor = sensorList.find((d) => d.isCasesOrDeath);
   /**
@@ -9,7 +10,7 @@ import { defaultRegionOnStartup, sensorList } from '../../stores/constants';
    */
   const spec = {
     title: sensor.name,
-    height: 500,
+    height: 300,
     padding: {
       left: 100,
       bottom: 20,
@@ -17,7 +18,7 @@ import { defaultRegionOnStartup, sensorList } from '../../stores/constants';
       right: 10,
     },
     data: {
-      name: 'values'
+      name: 'values',
     },
     mark: {
       type: 'line',
@@ -31,8 +32,13 @@ import { defaultRegionOnStartup, sensorList } from '../../stores/constants';
           title: null,
           grid: false,
           format: '%b %d',
-          formatType: 'time'
-        }
+          formatType: 'time',
+          labelFontSize: 14,
+          tickCount: {
+            interval: 'day',
+          },
+        },
+        scale: {},
       },
       y: {
         field: 'value',
@@ -41,13 +47,16 @@ import { defaultRegionOnStartup, sensorList } from '../../stores/constants';
           grid: true,
           title: null,
           domain: false,
+          tickCount: 5,
+          labelFontSize: 14,
         },
         scale: {
           round: true,
           zero: false,
-          padding: 50,
-        }
-      }
+          // domainMin: 0,
+          // padding: 50,
+        },
+      },
     },
     config: {
       view: {
@@ -56,17 +65,28 @@ import { defaultRegionOnStartup, sensorList } from '../../stores/constants';
       axis: {
         // labelFont: 20,
         // tickMinStep: 10,
-
       },
       title: {
-        align: 'left',
         anchor: 'start',
         fontWeight: 'normal',
-        fontSize: 32
-      }
-    }
+        fontSize: 32,
+      },
+    },
   };
-  const data = fetchTimeSlice(sensor, 'county', defaultRegionOnStartup.county, new Date(2020, 12-1, 24)).then((r) => addMissing(r, sensor));
+
+  function rnd(min, max) {
+    const v = Math.random();
+    return min + v * (max - min);
+  }
+
+  function gen() {
+    return timeDay.range(new Date(2020, 12 - 1, 1), new Date(), 1).map((date_value) => ({
+      date_value,
+      value: rnd(840, 880),
+    }));
+  }
+
+  const data = gen();
 </script>
 
 <style>
