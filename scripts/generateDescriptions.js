@@ -46,7 +46,8 @@ function compare(current, fileName) {
     console.warn(`current text is empty, indicating a downloading error`, fileName);
     return true;
   }
-  const stored = fs.readFileSync(fileName).toString();
+  current = current.replace(/\r?\n/g, '\n');
+  const stored = fs.readFileSync(fileName).toString().replace(/\r?\n/g, '\n');
   if (stored !== current) {
     console.error(
       `file ${fileName} is out of date and needs to be synced. Open a new PR and commit the output of "npm run gen"`,
