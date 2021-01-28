@@ -43,13 +43,17 @@ function compare(current, fileName) {
     process.exit(1);
   }
   if (!current) {
-    console.warn(`current text is empty, indicator a downloading error`, fileName);
+    console.warn(`current text is empty, indicating a downloading error`, fileName);
     return true;
   }
   const stored = fs.readFileSync(fileName).toString();
   if (stored !== current) {
-    console.error(`file ${fileName} and downloaded version, doesn't match -> forgotten to run "npm run gen"?`);
+    console.error(
+      `file ${fileName} is out of date and needs to be synced. Open a new PR and commit the output of "npm run gen"`,
+    );
     process.exit(1);
+  } else {
+    console.log(`file ${fileName} matches the downloaded file`);
   }
 }
 
