@@ -224,30 +224,30 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
           },
         },
       },
-      {
-        mark: {
-          type: 'line',
-          interpolate: 'linear',
-        },
-        encoding: {
-          y: {
-            field: yField,
-            type: 'quantitative',
-            scale: {
-              domainMin: clipping ? scalePercent(valuePatch.domain[0]) : 0,
-              domainMax: clipping ? scalePercent(valuePatch.domain[1]) : undefined,
-              clamp: true,
-              nice: clipping ? false : true, // When clipping, need nice false.
-            },
-            axis: {
-              ...(isPercentage ? { format: '.1%', formatType: 'cachedNumber' } : {}),
-              title: null,
-              tickCount: 3,
-              minExtent: 25,
-            },
-          },
-        },
-      },
+      // {
+      //   mark: {
+      //     type: 'line',
+      //     interpolate: 'linear',
+      //   },
+      //   encoding: {
+      //     y: {
+      //       field: yField,
+      //       type: 'quantitative',
+      //       scale: {
+      //         domainMin: clipping ? scalePercent(valuePatch.domain[0]) : 0,
+      //         domainMax: clipping ? scalePercent(valuePatch.domain[1]) : undefined,
+      //         clamp: true,
+      //         nice: clipping ? false : true, // When clipping, need nice false.
+      //       },
+      //       axis: {
+      //         ...(isPercentage ? { format: '.1%', formatType: 'cachedNumber' } : {}),
+      //         title: null,
+      //         tickCount: 3,
+      //         minExtent: 25,
+      //       },
+      //     },
+      //   },
+      // },
 
       ...(clipping ? clippingLayers : []),
       {
@@ -282,11 +282,11 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
             condition: [
               {
                 selection: 'highlight',
-                value: 1,
+                value: 0,
               },
               {
                 test: 'datum.time_value == highlightTimeValue',
-                value: 1,
+                value: 0,
               },
             ],
             value: 0,
@@ -294,6 +294,11 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
           y: {
             field: yField,
             type: 'quantitative',
+            axis: {
+              title: null,
+              format: '',
+              tickCount: 0,
+            },
           },
         },
       },
