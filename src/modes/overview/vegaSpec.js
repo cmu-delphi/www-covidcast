@@ -209,6 +209,23 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
       ...(sensor.hasStdErr ? [stdErrLayer] : []),
       {
         mark: {
+          type: 'rule',
+          size: 3.5, // should be proportional to total width.
+          opacity: 0.8,
+        },
+        encoding: {
+          x: {
+            field: 'date_value',
+          },
+          color: {
+            field: yField,
+            type: 'quantitative',
+            scale: { scheme: 'yelloworangebrown' },
+          },
+        },
+      },
+      {
+        mark: {
           type: 'line',
           interpolate: 'linear',
         },
@@ -231,6 +248,7 @@ export function createSpec(sensor, selections, dateRange, valuePatch) {
           },
         },
       },
+
       ...(clipping ? clippingLayers : []),
       {
         selection: {
