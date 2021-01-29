@@ -6,7 +6,8 @@ import { CURRENT_DATE_HIGHLIGHT } from '../vegaSpecUtils';
  */
 export const stdErrLayer = {
   mark: {
-    type: 'area',
+    type: 'bar',
+    width: 2,
     interpolate: 'monotone',
   },
   encoding: {
@@ -14,7 +15,7 @@ export const stdErrLayer = {
       field: 'geo_value',
     },
     opacity: {
-      value: 0.25,
+      value: 0.4,
     },
     y: {
       field: 'value_lower_bound',
@@ -144,6 +145,42 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
         layer: [
           {
             mark: {
+              type: 'bar',
+              interpolate: 'monotone',
+              opacity: 0.3,
+            },
+            encoding: {
+              color: colorEncoding(selections),
+              x: {
+                ...xDateRangeEncoding,
+              },
+              y: {
+                field: primaryValue,
+                type: 'quantitative',
+                scale: {
+                  domainMin: 0,
+                },
+                axis: {
+                  minExtent: 25,
+                  title: yAxisTitle,
+                },
+              },
+            },
+          },
+          {
+            transform: [
+              {
+                window: [
+                  {
+                    field: primaryValue,
+                    op: 'mean',
+                    as: 'rolling_mean',
+                  },
+                ],
+                frame: [7, 0],
+              },
+            ],
+            mark: {
               type: 'line',
               interpolate: 'monotone',
             },
@@ -153,7 +190,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
                 ...xDateRangeEncoding,
               },
               y: {
-                field: primaryValue,
+                field: 'rolling_mean',
                 type: 'quantitative',
                 scale: {
                   domainMin: 0,
@@ -178,6 +215,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
             },
             mark: {
               type: 'circle',
+              opacity: 0.1,
               tooltip: true,
             },
             encoding: {
