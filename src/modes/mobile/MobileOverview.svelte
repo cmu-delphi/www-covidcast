@@ -39,7 +39,7 @@
   <SurveyParameters sensor={$currentSensorEntry} items={nameInfos} defaultItem={nationInfo}/>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <h2>Test</h2>
+      <h2>Overview</h2>
     </div>
     <div class="grid-3-11 details">
       <SignalTable {params} />
