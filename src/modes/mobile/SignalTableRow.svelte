@@ -2,10 +2,11 @@
   import { addMissing, fetchTimeSlice } from '../../data';
   import { findDateRow } from './utils';
   import { currentDateObject } from '../../stores';
-  import { formatValue } from '../../formats';
+  import { primaryValue } from '../../stores/constants';
+  import Heatmap1D from './Heatmap1D.svelte';
 
   /**
-   * @type {import("../../components/MapBox/colors").SensorEntry}
+   * @type {import('../../stores/constants').SensorEntry}
    */
   export let sensor;
 
@@ -45,20 +46,25 @@
 
   $: data = loadData(sensor, params);
   $: currentRow = findCurrentRow(data, $currentDateObject);
+
+  $: valueKey = primaryValue(sensor, {});
+  $: incidenceKey = primaryValue(sensor, {incidence: true});
 </script>
 
 <style>
-  
+
 </style>
 
 <tr>
   <td>{sensor.name}</td>
   <td class="uk-text-right">
-    {#await currentRow}?{:then row}{row ? formatValue(row.value) : 'N/A'}{/await}
+    {#await currentRow}?{:then row}{row ? sensor.formatValue(row[valueKey]) : 'N/A'}{/await}
   </td>
   <td class="uk-text-right">
-    {#await currentRow}?{:then row}{row ? formatValue(row.value) : 'N/A'}{/await}
+    {#if sensor.isCasesOrDeath}
+      {#await currentRow}?{:then row}{row ? sensor.formatValue(row[incidenceKey]) : 'N/A'}{/await}
+    {/if}
   <td>
-    TODO
+    <Heatmap1D {data} {sensor} level={params.region.level}/>
   </td>
 </tr>
