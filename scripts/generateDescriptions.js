@@ -34,7 +34,8 @@ async function loadDoc(url) {
   // replace * in links
   code = code.replace(/^[*] (.*)$/gm, ' - link: "$1"');
   // console.log(code);
-  return code;
+  // unify line endings
+  return code.replace(/\r?\n/g, '\n');
 }
 
 function compare(current, fileName) {
@@ -46,7 +47,6 @@ function compare(current, fileName) {
     console.warn(`current text is empty, indicating a downloading error`, fileName);
     return true;
   }
-  current = current.replace(/\r?\n/g, '\n');
   const stored = fs.readFileSync(fileName).toString().replace(/\r?\n/g, '\n');
   if (stored !== current) {
     console.error(
