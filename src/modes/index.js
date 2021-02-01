@@ -15,6 +15,11 @@ const modes = [
     component: () => import(/* webpackChunkName: 'm-overview' */ './overview/Overview.svelte').then((r) => r.default),
   },
   {
+    id: 'mobile',
+    label: 'Mobile Overview',
+    component: () => import(/* webpackChunkName: 'm-mobile' */ './mobile/MobileOverview.svelte').then((r) => r.default),
+  },
+  {
     id: 'timelapse',
     label: 'Timelapse',
     component: () =>
@@ -46,7 +51,7 @@ const modes = [
 export default modes;
 
 /**
- * @type {Record<'overview'|'timelapse'|'top10'|'export'|'single'|'survey-results', Mode>}
+ * @type {Record<'overview'|'timelapse'|'top10'|'export'|'single'|'survey-results'|'mobile', Mode>}
  */
 export const modeByID = {};
 modes.forEach((mode) => (modeByID[mode.id] = mode));
