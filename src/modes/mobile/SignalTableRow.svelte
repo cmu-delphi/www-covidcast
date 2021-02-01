@@ -1,9 +1,10 @@
 <script>
   import { addMissing, fetchTimeSlice } from '../../data';
-  import { findDateRow } from './utils';
+  import { aggregateByWeek, findDateRow } from './utils';
   import { currentDateObject } from '../../stores';
   import { primaryValue } from '../../stores/constants';
   import Heatmap1D from './Heatmap1D.svelte';
+  import {timeFormat} from 'd3-time-format';
 
   /**
    * @type {import('../../stores/constants').SensorEntry}
@@ -46,9 +47,12 @@
 
   $: data = loadData(sensor, params);
   $: currentRow = findCurrentRow(data, $currentDateObject);
+  $: byWeek = data ? data.then((rows) => aggregateByWeek(rows, sensor.isCasesOrDeath)) : null;
 
   $: valueKey = primaryValue(sensor, {});
   $: incidenceKey = primaryValue(sensor, {incidence: true});
+
+  const weekFormatter = timeFormat("%Y %V");
 </script>
 
 <style>
@@ -65,6 +69,6 @@
       {#await currentRow}?{:then row}{row ? sensor.formatValue(row[incidenceKey]) : 'N/A'}{/await}
     {/if}
   <td>
-    <Heatmap1D {data} {sensor} level={params.region.level}/>
+    <Heatmap1D data={byWeek} {sensor} level={params.region.level} dateFormatter={weekFormatter}/>
   </td>
 </tr>

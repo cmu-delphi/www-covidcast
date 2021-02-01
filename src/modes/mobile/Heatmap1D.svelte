@@ -20,6 +20,8 @@
    */
   export let level;
 
+  export let dateFormatter = formatDateShortOrdinal;
+
   $: valueKey = primaryValue(sensor, {});
 
   function resolveColorScale(sensor, stats, level) {
@@ -50,7 +52,7 @@
    * @param {import("../../data").EpiDataRow} row
    */
   function tooltip(row, valueKey) {
-    return `${sensor.formatValue(row[valueKey])} (${formatDateShortOrdinal(row.date_value)})`;
+    return `${sensor.formatValue(row[valueKey])} (${dateFormatter(row.date_value)})`;
   }
 </script>
 
