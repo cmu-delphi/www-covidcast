@@ -18,7 +18,6 @@
     }
   }
   $: params = { region: $currentRegionInfo || nationInfo, startDay, endDay };
-
 </script>
 
 <style>
@@ -36,7 +35,7 @@
 </style>
 
 <div class="root">
-  <SurveyParameters sensor={$currentSensorEntry} items={nameInfos} defaultItem={nationInfo}/>
+  <SurveyParameters sensor={$currentSensorEntry} items={nameInfos} defaultItem={nationInfo} />
   <div class="uk-container content-grid">
     <div class="grid-3-11">
       <h2>Overview</h2>

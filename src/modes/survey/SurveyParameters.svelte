@@ -57,12 +57,12 @@
       className="survey-search grid-3-8"
       modern
       placeholder="Search Region"
-      items={items}
+      {items}
       selectedItem={$currentRegionInfo || defaultItem}
       labelFieldName="displayName"
       maxItemsToShowInList="5"
       on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)} />
-    <SensorDatePicker2 className="survey-date grid-8-11" bind:value={selectedDate} sensor={sensor} />
+    <SensorDatePicker2 className="survey-date grid-8-11" bind:value={selectedDate} {sensor} />
   </div>
   <slot />
 </div>

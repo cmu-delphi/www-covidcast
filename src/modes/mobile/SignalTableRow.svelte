@@ -4,7 +4,7 @@
   import { currentDateObject } from '../../stores';
   import { primaryValue } from '../../stores/constants';
   import Heatmap1D from './Heatmap1D.svelte';
-  import {timeFormat} from 'd3-time-format';
+  import { timeFormat } from 'd3-time-format';
 
   /**
    * @type {import('../../stores/constants').SensorEntry}
@@ -50,13 +50,12 @@
   $: byWeek = data ? data.then((rows) => aggregateByWeek(rows, sensor.isCasesOrDeath)) : null;
 
   $: valueKey = primaryValue(sensor, {});
-  $: incidenceKey = primaryValue(sensor, {incidence: true});
+  $: incidenceKey = primaryValue(sensor, { incidence: true });
 
-  const weekFormatter = timeFormat("%Y %V");
+  const weekFormatter = timeFormat('%Y %V');
 </script>
 
 <style>
-
 </style>
 
 <tr>
@@ -68,7 +67,8 @@
     {#if sensor.isCasesOrDeath}
       {#await currentRow}?{:then row}{row ? sensor.formatValue(row[incidenceKey]) : 'N/A'}{/await}
     {/if}
+  </td>
   <td>
-    <Heatmap1D data={byWeek} {sensor} level={params.region.level} dateFormatter={weekFormatter}/>
+    <Heatmap1D data={byWeek} {sensor} level={params.region.level} dateFormatter={weekFormatter} />
   </td>
 </tr>

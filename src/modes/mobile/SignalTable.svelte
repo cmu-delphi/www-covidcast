@@ -1,6 +1,6 @@
 <script>
   import { groupedSensorList } from '../../stores/constants';
-  import {currentSensorEntry} from '../../stores';
+  import { currentSensorEntry } from '../../stores';
   import SignalTableRow from './SignalTableRow.svelte';
   import HeatmapLegend from './HeatmapLegend.svelte';
 

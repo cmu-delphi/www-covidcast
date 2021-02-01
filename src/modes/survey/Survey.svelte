@@ -20,7 +20,6 @@
   }
   $: params = { region: $currentRegionInfo || nationInfo, startDay, endDay };
 
-
   const filteredInfos = nameInfos.filter((d) => visibleLevels.includes(d.level));
   filteredInfos.unshift(nationInfo);
 </script>

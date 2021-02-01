@@ -8,7 +8,6 @@ import { timeWeek } from 'd3-time';
  * @property {Date} endDay
  */
 
-
 function toTimeValue(date) {
   return Number.parseInt(formatAPITime(date), 10);
 }
