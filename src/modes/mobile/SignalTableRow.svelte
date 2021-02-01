@@ -1,5 +1,5 @@
 <script>
-  import { addMissing, fetchTimeSlice } from '../../data';
+  import { fetchTimeSlice } from '../../data';
   import { aggregateByWeek, findDateRow } from './utils';
   import { currentDateObject } from '../../stores';
   import { primaryValue } from '../../stores/constants';
@@ -31,14 +31,12 @@
       {
         geo_value: params.region.propertyId,
       },
-    )
-      .then((rows) => addMissing(rows, sensor))
-      .then((rows) =>
-        rows.map((row) => {
-          row.displayName = params.region.displayName;
-          return row;
-        }),
-      );
+    ).then((rows) =>
+      rows.map((row) => {
+        row.displayName = params.region.displayName;
+        return row;
+      }),
+    );
   }
 
   function findCurrentRow(data, date) {
@@ -47,7 +45,7 @@
 
   $: data = loadData(sensor, params);
   $: currentRow = findCurrentRow(data, $currentDateObject);
-  $: byWeek = data ? data.then((rows) => aggregateByWeek(rows, sensor.isCasesOrDeath)) : null;
+  $: byWeek = data ? data.then((rows) => aggregateByWeek(rows, sensor, params.startDay, params.endDay)) : null;
 
   $: valueKey = primaryValue(sensor, {});
   $: incidenceKey = primaryValue(sensor, { incidence: true });

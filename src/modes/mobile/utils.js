@@ -43,27 +43,35 @@ function averageDayValue(obj, prop = 'value') {
 /**
  * @param {import("../../data").EpiDataRow[]} data
  */
-export function aggregateByWeek(data, isCasesOrDeath = false) {
-  const byWeek = [];
-  let current = null;
-  // assume sorted
-  for (const row of data) {
-    const week = timeWeek(row.date_value);
-    if (current === null || current.week_value < week) {
-      current = Object.assign({}, row, {
-        week_value: week,
-        days: [row],
-      });
-      averageDayValue(current, 'value');
-      if (isCasesOrDeath) {
-        for (const key of EPIDATA_CASES_OR_DEATH_VALUES) {
-          averageDayValue(current, key);
-        }
-      }
-      byWeek.push(current);
-    } else {
-      current.days.push(row);
-    }
+export function aggregateByWeek(data, sensor, startDay, endDay) {
+  if (data.length === 0) {
+    return [];
   }
-  return byWeek;
+  const template = data[0];
+  const stack = data.slice().reverse();
+  return timeWeek.range(timeWeek.floor(startDay), timeWeek.floor(endDay)).map((week) => {
+    const current = Object.assign({}, template, {
+      date_value: week,
+      week_value: week,
+      days: [],
+    });
+    averageDayValue(current, 'value');
+    if (sensor.isCasesOrDeath) {
+      for (const key of EPIDATA_CASES_OR_DEATH_VALUES) {
+        averageDayValue(current, key);
+      }
+    }
+    while (stack.length > 0) {
+      const entry = stack.pop();
+      const entryWeek = timeWeek(entry.date_value);
+      if (entryWeek <= week) {
+        current.days.push(entry);
+      } else {
+        // part of next one, push back
+        stack.push(entry);
+        break;
+      }
+    }
+    return current;
+  });
 }
