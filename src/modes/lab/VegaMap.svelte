@@ -2,7 +2,13 @@
   import Vega from '../../components/Vega.svelte';
   import { fetchRegionSlice } from '../../data';
   import { DEFAULT_SURVEY_SENSOR, sensorMap } from '../../stores/constants';
-  import {generateNationSpec, generateStateSpec, generateCountySpec, generateMSASpec, generateHRRSpec} from './mapSpec';
+  import {
+    generateNationSpec,
+    generateStateSpec,
+    generateCountySpec,
+    generateMSASpec,
+    generateHRRSpec,
+  } from './mapSpec';
 
   const sensor = sensorMap.get(DEFAULT_SURVEY_SENSOR);
 

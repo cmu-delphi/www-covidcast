@@ -7,7 +7,7 @@
   import { CURRENT_DATE_HIGHLIGHT } from '../../components/vegaSpecUtils';
   import { currentDate, currentDateObject, stats } from '../../stores';
   import { formatDateShortOrdinal } from '../../formats';
-import { determineMinMax } from '../../components/MapBox/colors';
+  import { determineMinMax } from '../../components/MapBox/colors';
 
   const sensor = sensorMap.get(DEFAULT_SURVEY_SENSOR);
 
@@ -15,7 +15,7 @@ import { determineMinMax } from '../../components/MapBox/colors';
     const stateSpec = generateStateSpec(`${sensor.name} - States`);
     stateSpec.height = 400;
     stateSpec.title = null;
-    const scale = stateSpec.layer[stateSpec.layer.length -1].encoding.color.scale;
+    const scale = stateSpec.layer[stateSpec.layer.length - 1].encoding.color.scale;
     scale.domain = determineMinMax(stats, sensor, 'state', {}, false);
     return stateSpec;
   }
@@ -34,7 +34,7 @@ import { determineMinMax } from '../../components/MapBox/colors';
 
   function resolveClickedTimeValue(e) {
     let item = e.detail.item;
-    while(item && item.datum) {
+    while (item && item.datum) {
       item = item.datum;
     }
     return item ? item.time_value : null;

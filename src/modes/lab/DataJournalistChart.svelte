@@ -5,7 +5,7 @@
   // import { addMissing, fetchTimeSlice } from '../../data';
   // import { defaultRegionOnStartup, sensorList } from '../../stores/constants';
   import { sequenceGen } from './seq';
-  import {generateLineChartSpec} from './lineSpec';
+  import { generateLineChartSpec } from './lineSpec';
 
   // const sensor = sensorList.find((d) => d.isCasesOrDeath);
 
