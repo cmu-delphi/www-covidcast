@@ -1,6 +1,10 @@
 <script>
   const experiments = [
     {
+      name: 'LineAndMap',
+      component: () => import('./LineAndMap.svelte').then((r) => r.default),
+    },
+    {
       name: 'VegaMap',
       component: () => import('./VegaMap.svelte').then((r) => r.default),
     },

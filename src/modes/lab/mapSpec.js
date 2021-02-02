@@ -263,7 +263,7 @@ function genLevelLayer(level, infos, extraTransform = []) {
   return layer;
 }
 
-export function genBaseSpec(title, level, topoJSON) {
+function genBaseSpec(title, level, topoJSON) {
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
