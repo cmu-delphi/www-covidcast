@@ -54,7 +54,6 @@
   }
 
   .legend-container {
-    background: white;
     position: absolute;
     margin: 0.25em;
     left: 0;
@@ -68,6 +67,11 @@
 
   .legend-container > :global(.encoding-wrapper) {
     margin-bottom: 6px;
+    background: white;
+  }
+
+  .legend-scale {
+    background: white;
   }
 
   .summary-container {
@@ -89,7 +93,7 @@
 </div>
 <div class="legend-container base-font-size" aria-label="map legend">
   <EncodingOptions sensor={$currentSensorEntry} className="container-bg container-style encoding-wrapper" />
-  <div class="container-bg container-style" class:loading-bg={legendLoading}>
+  <div class="container-bg container-style legend-scale" class:loading-bg={legendLoading}>
     {#if $encoding === 'color'}
       <ColorLegend />
     {:else if $encoding === 'bubble'}

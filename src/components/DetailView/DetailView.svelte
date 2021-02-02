@@ -8,8 +8,8 @@
   import EncodingOptions from '../EncodingOptions.svelte';
   import { trackEvent } from '../../stores/ga';
   import VegaTooltip from './VegaTooltip.svelte';
-  import { downloadUrl } from '../../data/screenshot';
   import InfoDialogButton from '../InfoDialogButton.svelte';
+  import { downloadUrl } from '../../util';
 
   const dispatch = createEventDispatcher();
   /**
