@@ -229,7 +229,7 @@ function genLevelLayer(level, infos, extraTransform = []) {
         scale: {
           // domainMin: 0,
           // domainMax: 149,
-          scheme: 'yelloworangered',
+          scheme: 'yellowgreenblue',
           clamp: true,
         },
         legend: {
