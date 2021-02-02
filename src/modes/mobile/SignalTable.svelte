@@ -64,3 +64,27 @@
     </tbody>
   {/each}
 </table>
+
+<table>
+  <thead>
+    <tr>
+      <th class="mobile-th"><span>Measurement</span></th>
+      <th class="mobile-th uk-text-right"><span>Daily avg Last 7 days</span></th>
+      <th class="mobile-th uk-text-right"><span>per 100k</span></th>
+      <th class="mobile-th uk-text-right">
+        <span>weekly cases per capita</span>
+        <HeatmapLegend sensor={$currentSensorEntry} level={params.region.level} />
+      </th>
+    </tr>
+  </thead>
+  {#each groupedSensorList as group}
+    <tbody>
+      <tr class="row-group">
+        <th class="mobile-h3" colspan="4">{group.label}</th>
+      </tr>
+      {#each group.sensors as sensor}
+        <SignalTableRow {sensor} {params} sparklines />
+      {/each}
+    </tbody>
+  {/each}
+</table>
