@@ -35,7 +35,8 @@ function getOrInitPopper() {
       {
         name: 'offset',
         options: {
-          offset: [0, 8],
+          // Compute the offset from the placement.
+          offset: ({ placement }) => (placement.endsWith('start') ? [8, 8] : [-8, 8]),
         },
       },
       {

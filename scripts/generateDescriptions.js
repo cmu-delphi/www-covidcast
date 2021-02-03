@@ -7,6 +7,9 @@ const fs = require('fs');
 const yaml = require('js-yaml');
 const marked = require('marked');
 
+const isCheckMode = process.argv.includes('--check');
+const isFallBackMode = process.argv.includes('--fallback');
+
 // has to be publicly viewable
 const DOC_URL =
   process.env.COVIDCAST_SIGNAL_DOC || 'https://docs.google.com/document/d/1RLy4O-gtACVjLEVD_vxyPqvp9nWVhqEjoWAKi68RKpg';
@@ -20,6 +23,10 @@ async function loadDoc(url) {
    * @type {string}
    */
   const text = await fetch(`${url}/export?format=txt`).then((res) => res.text());
+  if (text.startsWith('<!DOCTYPE html>')) {
+    console.warn(`${url}: expecting a text file, got a HTML file`);
+    return '';
+  }
   // console.log(text);
   // find first code block
   const start = text.indexOf('---');
@@ -30,11 +37,45 @@ async function loadDoc(url) {
   return code;
 }
 
-async function generateDescriptions() {
-  const code = (await Promise.all(DOC_URL.split(',').map(loadDoc))).join('\n\n');
+function compare(current, fileName) {
+  if (!fs.existsSync(fileName)) {
+    console.error(`file ${fileName} doesn't exit`);
+    process.exit(1);
+  }
+  if (!current) {
+    console.warn(`current text is empty, indicating a downloading error`, fileName);
+    return true;
+  }
+  current = current.replace(/\r?\n/g, '\n');
+  const stored = fs.readFileSync(fileName).toString().replace(/\r?\n/g, '\n');
+  if (stored !== current) {
+    console.error(
+      `file ${fileName} is out of date and needs to be synced. Open a new PR and commit the output of "npm run gen"`,
+    );
+    process.exit(1);
+  } else {
+    console.log(`file ${fileName} matches the downloaded file`);
+  }
+}
 
-  fs.writeFileSync('./src/stores/descriptions.raw.txt', code);
+async function handleFile(docUrl, fileName, converter) {
+  const code = (await Promise.all(docUrl.split(',').map(loadDoc))).join('\n\n');
+  if (isCheckMode) {
+    return compare(code, fileName);
+  }
+  if (!code && isFallBackMode && fs.existsSync(fileName)) {
+    converter(fs.readFileSync(fileName).toString());
+    return;
+  }
+  if (!code) {
+    console.error('failed to download file', fileName);
+    process.exit(1);
+  }
+  fs.writeFileSync(fileName, code);
+  converter(code);
+}
 
+function convertDescriptions(code) {
   const entries = [];
   yaml.safeLoadAll(code, (doc) => {
     const r = {};
@@ -64,11 +105,11 @@ async function generateDescriptions() {
   fs.writeFileSync('./src/stores/descriptions.generated.json', JSON.stringify(entries, null, 2));
 }
 
-async function generateSurveyDescriptions() {
-  const code = (await Promise.all(SURVEY_DOC_URL.split(',').map(loadDoc))).join('\n\n');
+function generateDescriptions() {
+  return handleFile(DOC_URL, './src/stores/descriptions.raw.txt', convertDescriptions);
+}
 
-  fs.writeFileSync('./src/modes/survey/descriptions.raw.txt', code);
-
+function convertSurveyDescriptions(code) {
   const parsed = {
     overview: '',
     questions: [],
@@ -95,6 +136,10 @@ async function generateSurveyDescriptions() {
     }
   });
   fs.writeFileSync('./src/modes/survey/descriptions.generated.json', JSON.stringify(parsed, null, 2));
+}
+
+function generateSurveyDescriptions() {
+  return handleFile(SURVEY_DOC_URL, './src/modes/survey/descriptions.raw.txt', convertSurveyDescriptions);
 }
 
 if (require.main === module) {
