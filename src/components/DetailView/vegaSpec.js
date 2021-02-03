@@ -5,9 +5,27 @@ import { CURRENT_DATE_HIGHLIGHT } from '../vegaSpecUtils';
  * @type {import('vega-lite/build/src/spec').LayerSpec | import('vega-lite/build/src/spec').UnitSpec}
  */
 export const stdErrLayer = {
+  transform: [
+    {
+      // 7-day moving average
+      window: [
+        {
+          field: 'value_lower_bound',
+          op: 'mean',
+          as: 'sma_lower_bound',
+        },
+        {
+          field: 'value_upper_bound',
+          op: 'mean',
+          as: 'sma_upper_bound',
+        },
+      ],
+      frame: [-6, 0],
+    },
+  ],
   mark: {
-    type: 'bar',
-    width: 2,
+    type: 'area',
+    // width: 2,
     interpolate: 'monotone',
   },
   encoding: {
@@ -18,11 +36,11 @@ export const stdErrLayer = {
       value: 0.4,
     },
     y: {
-      field: 'value_lower_bound',
+      field: 'sma_lower_bound',
       type: 'quantitative',
     },
     y2: {
-      field: 'value_upper_bound',
+      field: 'sma_upper_bound',
     },
   },
 };
@@ -170,15 +188,38 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
           {
             transform: [
               {
+                // 7-day moving average
                 window: [
                   {
                     field: primaryValue,
                     op: 'mean',
-                    as: 'rolling_mean',
+                    as: 'sma',
                   },
                 ],
-                frame: [7, 0],
+                frame: [-6, 0],
               },
+              // {
+              //   window: [
+              //     {
+              //       field: primaryValue,
+              //       op: 'lag',
+              //       as: 'sma',
+              //     },
+              //   ],
+              // },
+              // {
+              //   calculate: `isValid(datum.${primaryValue}) ? datum.${primaryValue} * 0.25 + datum.previousEma * 0.75 : null`,
+              //   as: 'ema',
+              // },
+              // {
+              //   window: [
+              //     {
+              //       field: 'ema',
+              //       op: 'lag',
+              //       as: 'previousEma',
+              //     },
+              //   ],
+              // },
             ],
             mark: {
               type: 'line',
@@ -190,7 +231,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
                 ...xDateRangeEncoding,
               },
               y: {
-                field: 'rolling_mean',
+                field: 'sma',
                 type: 'quantitative',
                 scale: {
                   domainMin: 0,
@@ -215,7 +256,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
             },
             mark: {
               type: 'circle',
-              opacity: 0.1,
+              opacity: 0.05,
               tooltip: true,
             },
             encoding: {
