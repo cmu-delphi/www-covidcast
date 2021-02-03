@@ -164,8 +164,9 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
           {
             mark: {
               type: 'bar',
-              interpolate: 'monotone',
-              opacity: 0.3,
+              width: 1.5,
+              // interpolate: 'monotone',
+              opacity: 0.15,
             },
             encoding: {
               color: colorEncoding(selections),
@@ -256,7 +257,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
             },
             mark: {
               type: 'circle',
-              opacity: 0.05,
+              opacity: 0.25,
               tooltip: true,
             },
             encoding: {
