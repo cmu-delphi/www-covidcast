@@ -276,6 +276,11 @@ function genBaseSpec(title, level, topoJSON) {
       top: 10,
       right: 10,
     },
+    autosize: {
+      type: 'none',
+      contains: 'padding',
+      resize: true,
+    },
     projection: {
       type: 'albersUsaTerritories',
     },
