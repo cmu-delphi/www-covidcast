@@ -143,3 +143,11 @@ export function computeMegaCountyPopulation(megaCounty, data) {
 
   return Number.isNaN(population) ? null : population;
 }
+
+/**
+ * returns the counties of a state
+ * @param {NameInfo} state 
+ */
+export function getCountiesOfState(state) {
+  return countyInfo.filter((d) => d.id.slice(0, 2) === state.id);
+}

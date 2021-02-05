@@ -120,7 +120,7 @@ function parseMultipleSeparateData(dataArr, defaultSignalIndex, mixinData = {}) 
  * @param {{advanced?: boolean}} options
  * @returns {Promise<EpiDataRow[]>}
  */
-function fetchData(sensorEntry, level, region, date, mixinValues = {}, { advanced = false } = {}) {
+export function fetchData(sensorEntry, level, region, date, mixinValues = {}, { advanced = false } = {}) {
   if (!region) {
     return Promise.resolve([]);
   }
