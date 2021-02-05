@@ -69,6 +69,16 @@ function resolveDatum(item) {
   }
   return item;
 }
+
+function updateProps(component, props) {
+  const p = { ...props };
+  Object.entries(props).forEach(([prop, v]) => {
+    if (component.$$.props[prop] != null && component.$$.ctx[component.$$.props[prop]] === v) {
+      delete p[prop];
+    }
+  });
+  component.$set(p);
+}
 /**
  * create a vega tooltip adapter for the given svelte component class
  */
@@ -92,7 +102,7 @@ export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}
     if (value == null || value === '' || datum.value == null) {
       hide();
       if (tooltip) {
-        tooltip.$set({
+        updateProps(tooltip, {
           hidden: true,
           view,
         });
@@ -101,7 +111,7 @@ export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}
     }
     update(event.clientX, event.clientY);
     if (tooltip) {
-      tooltip.$set({
+      updateProps(tooltip, {
         hidden: false,
         item: resolveDatum(item),
         view,
