@@ -99,6 +99,9 @@ export function generateLineChartSpec(title, smartPadding = true, initDate = nul
               selection: 'highlight',
             },
           },
+          {
+            sample: 1,
+          },
         ],
         mark: 'rule',
       },
@@ -108,6 +111,9 @@ export function generateLineChartSpec(title, smartPadding = true, initDate = nul
             filter: {
               selection: 'highlight',
             },
+          },
+          {
+            sample: 1,
           },
         ],
         mark: {

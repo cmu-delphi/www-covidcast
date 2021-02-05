@@ -16,6 +16,10 @@
       name: 'DataJournalistChart',
       component: () => import('./DataJournalistChart.svelte').then((r) => r.default),
     },
+    {
+      name: 'County Related',
+      component: () => import('./CountyRelated.svelte').then((r) => r.default),
+    },
   ];
 
   let selected = Number.parseInt(new URL(window.location.href).searchParams.get('lab') || '0', 10);
