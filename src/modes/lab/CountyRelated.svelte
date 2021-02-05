@@ -19,19 +19,19 @@
     field: 'displayName',
     type: 'nominal',
     legend: {
-      symbolType: "stroke",
+      symbolType: 'stroke',
       symbolStrokeWidth: {
         expr: `datum.label === "${county.displayName}" ? 3 : 1`,
-      }
-    }
+      },
+    },
   };
   spec.layer[0].encoding.strokeWidth = {
     condition: {
       test: `datum.displayName === "${county.displayName}"`,
-      value: 3
+      value: 3,
     },
-    value: 1
-  }
+    value: 1,
+  };
   spec.layer[1].encoding.color = {
     field: 'displayName',
     type: 'nominal',
@@ -100,6 +100,9 @@
 
 <h2>{county.displayName} - {sensor.name}</h2>
 
-Related Counties: {getRelatedCounties(county).map((d) => d.displayName).join(', ')}
+Related Counties:
+{getRelatedCounties(county)
+  .map((d) => d.displayName)
+  .join(', ')}
 
 <Vega {spec} {data} />
