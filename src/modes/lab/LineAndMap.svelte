@@ -4,10 +4,11 @@
   import { DEFAULT_SURVEY_SENSOR, sensorMap } from '../../stores/constants';
   import { generateStateSpec } from './mapSpec';
   import { generateLineChartSpec } from './lineSpec';
-  import { CURRENT_DATE_HIGHLIGHT } from '../../components/vegaSpecUtils';
   import { currentDate, currentDateObject, stats } from '../../stores';
   import { formatDateShortOrdinal } from '../../formats';
+  import debounce from 'lodash-es/debounce';
   import { determineMinMax } from '../../components/MapBox/colors';
+import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
 
   const sensor = sensorMap.get(DEFAULT_SURVEY_SENSOR);
 
@@ -22,28 +23,33 @@
 
   $: stateSpec = genMapSpec($stats, sensor);
 
-  const lineSpec = generateLineChartSpec(`${sensor.name} - US`, true);
+  const lineSpec = generateLineChartSpec(`${sensor.name} - US`, true, $currentDateObject);
   // lineSpec.padding.left = 50;
   lineSpec.height = 150;
   lineSpec.title = null;
-  lineSpec.layer.push(CURRENT_DATE_HIGHLIGHT);
 
   const nationData = fetchTimeSlice(sensor, 'nation', 'us').then((r) => addMissing(r, sensor));
 
   $: stateData = fetchRegionSlice(sensor, 'state', $currentDateObject);
 
-  function resolveClickedTimeValue(e) {
-    let item = e.detail.item;
-    while (item && item.datum) {
-      item = item.datum;
-    }
-    return item ? item.time_value : null;
+  const lazyUpdate = debounce((value) => {
+    currentDate.set(value);
+  }, 1000);
+
+  function patchSignal(current) {
+    // patches the highlight signal, 
+    // see current.on[0].update
+    const updateCode = current.on[0].update;
+    current.on[0].update = `patchPickedItem(event) && item().${updateCode.replace(/ datum/, ' item().datum')}`;
+    return current;
   }
 
-  function onClick(e) {
-    const timeValue = resolveClickedTimeValue(e);
-    if (timeValue) {
-      currentDate.set(timeValue);
+  function onSignal(event) {
+    if (event.detail.name === 'highlight') {
+      const date = resolveHighlightedTimeValue(event);
+      if (date) {
+        lazyUpdate(date);
+      }
     }
   }
 </script>
@@ -61,8 +67,8 @@
   <Vega
     spec={lineSpec}
     data={nationData}
-    signals={{ currentDate: $currentDateObject }}
-    eventListeners={['click']}
-    on:click={onClick} />
+    signalListeners={["highlight"]}
+    signals={{ highlight_tuple: patchSignal }}
+    on:signal={onSignal} />
   <Vega spec={stateSpec} data={stateData} />
 </div>

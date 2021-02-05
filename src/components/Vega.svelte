@@ -163,14 +163,14 @@
       spec.signals = spec.signals || [];
       Object.entries(signals).forEach(([key, v]) => {
         const obj = {name: key};
+        const existing = spec.signals.find((d) => d.name === key);
         if (v == null || ['string', 'number', 'boolean'].includes(typeof v) || v instanceof Date || Array.isArray(v)) {
           // assume it is a value
           obj.value = v;
         } else {
           // mixing the whole object
-          Object.assign(obj, v);
+          Object.assign(obj, typeof v === 'function' ? v(existing) : v);
         }
-        const existing = spec.signals.find((d) => d.name === key);
         if (existing) {
           Object.assign(existing, obj);
         } else {

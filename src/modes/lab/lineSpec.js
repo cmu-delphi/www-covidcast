@@ -1,11 +1,11 @@
-export function generateLineChartSpec(title, smartPadding = true) {
+export function generateLineChartSpec(title, smartPadding = true, initDate = null) {
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
   const spec = {
     title,
     height: 300,
-    padding: { left: 50, top: 6, bottom: 20, right: 2 },
+    padding: { left: 50, top: 16, bottom: 20, right: 2 },
     autosize: {
       type: 'none',
       contains: 'padding',
@@ -68,16 +68,21 @@ export function generateLineChartSpec(title, smartPadding = true) {
           highlight: {
             type: 'single',
             empty: 'none',
-            on: 'mouseover',
+            init: initDate
+              ? {
+                  x: initDate,
+                }
+              : undefined,
+            on: 'click, [mousedown, window:mouseup] > mousemove, [touchstart, touchend] > touchmove',
             nearest: true,
+            clear: false,
             encodings: ['x'],
-            clear: 'mouseout',
           },
         },
         mark: {
           type: 'point',
           stroke: null,
-          fill: 'steelblue',
+          opacity: 0,
           tooltip: true,
         },
         encoding: {
@@ -88,22 +93,43 @@ export function generateLineChartSpec(title, smartPadding = true) {
         },
       },
       {
+        transform: [
+          {
+            filter: {
+              selection: 'highlight',
+            },
+          },
+        ],
+        mark: 'rule',
+      },
+      {
+        transform: [
+          {
+            filter: {
+              selection: 'highlight',
+            },
+          },
+        ],
         mark: {
-          type: 'rule',
+          type: 'text',
+          align: {
+            // auto align based on remaining space
+            expr:
+              "(width - scale('x', datum.date_value)) < 40 ? 'right' : (scale('x', datum.date_value)) > 40 ? 'center' : 'left'",
+          },
+          baseline: 'bottom',
+          format: '%b %d',
+          formatType: 'cachedTime',
+          fontSize: 14,
+          dy: -1,
         },
         encoding: {
-          opacity: {
-            condition: [
-              {
-                selection: 'highlight',
-                value: 1,
-              },
-            ],
-            value: 0,
+          text: {
+            field: 'date_value',
+            type: 'temporal',
           },
           y: {
-            field: 'value',
-            type: 'quantitative',
+            value: 0,
           },
         },
       },

@@ -149,3 +149,18 @@ function customObjChecks(obj, ...conditions) {
 }
 
 expressionFunction('customObjChecks', customObjChecks);
+
+
+/**
+ * patches the given event and updates the picked item if needed
+ * @param {MouseEvent} event 
+ */
+function patchPickedItem(event) {
+  if (event.type === 'touchmove' || event.type === 'touchend') {
+    // manually resolve, see https://github.com/vega/vega/issues/3065
+    event.item = event.vega.view()._handler.pickEvent(event.changedTouches[0]);
+    event.vega.item = () => event.item;
+  }
+  return event.item;
+}
+expressionFunction('patchPickedItem', patchPickedItem);
