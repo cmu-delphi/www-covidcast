@@ -8,7 +8,7 @@
   import { formatDateShortOrdinal } from '../../formats';
   import debounce from 'lodash-es/debounce';
   import { determineMinMax } from '../../components/MapBox/colors';
-import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
+  import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
 
   const sensor = sensorMap.get(DEFAULT_SURVEY_SENSOR);
 
@@ -37,7 +37,7 @@ import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
   }, 1000);
 
   function patchSignal(current) {
-    // patches the highlight signal, 
+    // patches the highlight signal,
     // see current.on[0].update
     const updateCode = current.on[0].update;
     current.on[0].update = `patchPickedItem(event) && item().${updateCode.replace(/ datum/, ' item().datum')}`;
@@ -67,7 +67,7 @@ import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
   <Vega
     spec={lineSpec}
     data={nationData}
-    signalListeners={["highlight"]}
+    signalListeners={['highlight']}
     signals={{ highlight_tuple: patchSignal }}
     on:signal={onSignal} />
   <Vega spec={stateSpec} data={stateData} />

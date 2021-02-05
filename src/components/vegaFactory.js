@@ -150,10 +150,9 @@ function customObjChecks(obj, ...conditions) {
 
 expressionFunction('customObjChecks', customObjChecks);
 
-
 /**
  * patches the given event and updates the picked item if needed
- * @param {MouseEvent} event 
+ * @param {MouseEvent} event
  */
 function patchPickedItem(event) {
   if (event.type === 'touchmove' || event.type === 'touchend') {
