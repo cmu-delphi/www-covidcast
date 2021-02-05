@@ -1,0 +1,1 @@
+raw file from: https://www2.census.gov/geo/docs/reference/county_adjacency.txt

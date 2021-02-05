@@ -157,6 +157,50 @@ async function generateHRRPopulationLookup() {
   };
 }
 
+async function generateRelatedCounties() {
+  const csv = dsvFormat('\t').parseRows(
+    fs.readFileSync(path.join(__dirname, 'raw/adjacency/county_adjacency.txt')).toString(),
+  );
+
+  const r = new Map();
+  let active = [];
+  for (const row of csv) {
+    const newCounty = row[0];
+    if (newCounty) {
+      active = [];
+      r.set(row[1], active);
+    }
+    if (row[3]) {
+      active.push(row[3]);
+    }
+  }
+
+  function removeCommonPrefix(related, id) {
+    let start = 0;
+    while (related[start] === id[start] && start < related.length) {
+      start++;
+    }
+    return related.slice(start);
+  }
+
+  const data = Array.from(r.entries()).map(([key, related]) => {
+    // encode related skipping similar characters from the id
+    return {
+      id: key,
+      related: related
+        .filter((d) => d !== key)
+        .map((d) => removeCommonPrefix(d, key))
+        .join(','),
+    };
+  });
+  fs.writeFileSync(
+    path.resolve(__dirname, `./processed/related_counties.csv.js`),
+    wrapModule(dsvFormat(';').format(data, ['id', 'related'])),
+  );
+
+  return r;
+}
+
 async function counties(level = 'county') {
   const populationLookup = await generatePopulationLookup();
   //{
@@ -196,7 +240,6 @@ async function counties(level = 'county') {
   // };
   const centers = require(`./raw/county_centers.json`).features;
   const centerById = new Map(centers.map((d) => [d.properties.id, d]));
-
   const infos = geo.features.map((feature) => {
     const id = feature.properties.GEO_ID.slice(-5);
     const props = feature.properties;
@@ -229,6 +272,7 @@ async function counties(level = 'county') {
   );
   const topo = topology({ [level]: geo }, QUANTIZATION);
   fs.writeFileSync(path.resolve(__dirname, `./processed/${level}.topojson.json`), JSON.stringify(topo));
+
   return geo;
 }
 
@@ -300,6 +344,7 @@ function cities() {
   const countiesGeo = await counties();
   const hrrGeo = await hrr();
   await cities();
+  await generateRelatedCounties();
 
   fs.writeFileSync(
     path.resolve(__dirname, `./processed/bounds.json`),

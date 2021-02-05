@@ -12,6 +12,12 @@
    */
   export let filterItem = null;
 
+  /**
+   * custom sorter for items
+   * @type {(itemA, itemB) => number}
+   */
+  export let sortItem = null;
+
   // field of each item that's used for the labels in the list
   export let labelFieldName = undefined;
 
@@ -104,6 +110,9 @@
   $: selectedLabelLookup = new Set((selectedItems || []).map((s) => labelFunction(s)));
 
   function limitListItems(items) {
+    if (sortItem) {
+      items = items.slice().sort((a, b) => sortItem(a.item, b.item));
+    }
     if (maxItemsToShowInList <= 0 || items.length < maxItemsToShowInList) {
       return items;
     }
