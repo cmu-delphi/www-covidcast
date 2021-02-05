@@ -26,7 +26,11 @@ export function callAPIEndPoint(endpoint, id, signal, level, date, region, field
   url.searchParams.set('geo_type', level === levelMegaCounty.id ? 'county' : level);
   url.searchParams.set('time_values', date instanceof Date ? formatAPITime(date) : date);
   url.searchParams.set('time_type', 'day');
-  url.searchParams.set('geo_value', region);
+  if (region.includes(',')) {
+    url.searchParams.set('geo_values', region);
+  } else {
+    url.searchParams.set('geo_value', region);
+  }
   if (fields) {
     url.searchParams.set('fields', fields.join(','));
   }

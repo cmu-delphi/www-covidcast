@@ -5,16 +5,16 @@ import nationJSON from './maps2/nation.json';
 import stateJSON from './maps2/state.json';
 import msaJSON from './maps2/msa.json';
 
-function genMissingLayer() {
+function genMissingLayer(missingLevel = 'nation') {
   /**
    * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
    */
   const layer = {
     data: {
-      name: 'nation',
+      name: missingLevel,
       format: {
         type: 'topojson',
-        feature: 'nation',
+        feature: missingLevel,
       },
     },
     mark: {
@@ -177,7 +177,7 @@ function genStateBorderLayer() {
   return layer;
 }
 
-function genLevelLayer(level, infos, extraTransform = []) {
+function genLevelLayer(level, infos, strokeWidth = 1) {
   /**
    * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
    */
@@ -190,13 +190,12 @@ function genLevelLayer(level, infos, extraTransform = []) {
       },
     },
     transform: [
-      ...extraTransform,
       {
         lookup: 'id',
         from: {
           data: { values: infos },
           key: 'id',
-          fields: ['propertyId', 'displayName', 'population'],
+          fields: ['propertyId', 'displayName', 'population', 'state'],
         },
       },
       {
@@ -248,7 +247,7 @@ function genLevelLayer(level, infos, extraTransform = []) {
       },
       strokeWidth: {
         condition: { selection: 'hover', value: 2 },
-        value: level === 'county' ? 0 : 1,
+        value: strokeWidth,
       },
     },
     selection: {
@@ -351,17 +350,18 @@ export function generateNationSpec(title) {
 
   const spec = genBaseSpec(title, level, topoJSON);
 
-  spec.layer.push(
-    genLevelLayer(level, infos, [
-      {
-        calculate: JSON.stringify('us'),
-        as: 'id',
-      },
-    ]),
-  );
+  spec.layer.push(genLevelLayer(level, infos));
+  spec.layer[spec.layer.length - 1].transform.unshift({
+    calculate: JSON.stringify('us'),
+    as: 'id',
+  });
   return spec;
 }
 
+/**
+ * generates a map of counties
+ * @param {string} title
+ */
 export function generateCountySpec(title) {
   const level = 'county';
   const topoJSON = countyJSON;
@@ -373,7 +373,40 @@ export function generateCountySpec(title) {
   spec.layer.push(genMissingLayer());
   spec.datasets.state = stateJSON;
   spec.layer.push(genMegaLayer(megaCountyInfo));
-  spec.layer.push(genLevelLayer(level, infos));
+  spec.layer.push(genLevelLayer(level, infos, 0));
   spec.layer.push(genStateBorderLayer());
+  return spec;
+}
+
+/**
+ * generates a map of counties for a specific state
+ * @param {string} title
+ * @param {import('../../maps').NameInfo} state
+ */
+export function generateCountyOfStateSpec(title, state) {
+  const level = 'county';
+  const topoJSON = countyJSON;
+  const infos = countyInfo;
+
+  const spec = genBaseSpec(title, level, topoJSON);
+
+  /**
+   * @type {import('vega-lite/build/src/transform').Transform}
+   */
+  const isCalifornia = {
+    filter: `lower(datum.id) == '${state.id}'`,
+  };
+  /**
+   * @type {import('vega-lite/build/src/transform').Transform}
+   */
+  const isCaliforniaCounty = {
+    filter: `slice(lower(datum.id), 0, 2) == '${state.id}'`,
+  };
+
+  spec.datasets.state = stateJSON;
+  spec.layer.push(genMegaLayer(megaCountyInfo));
+  spec.layer[spec.layer.length - 1].transform.unshift(isCalifornia);
+  spec.layer.push(genLevelLayer(level, infos, 1));
+  spec.layer[spec.layer.length - 1].transform.unshift(isCaliforniaCounty);
   return spec;
 }

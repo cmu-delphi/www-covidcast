@@ -5,6 +5,10 @@
       component: () => import('./LineAndMap.svelte').then((r) => r.default),
     },
     {
+      name: 'State Map',
+      component: () => import('./StateMap.svelte').then((r) => r.default),
+    },
+    {
       name: 'VegaMap',
       component: () => import('./VegaMap.svelte').then((r) => r.default),
     },

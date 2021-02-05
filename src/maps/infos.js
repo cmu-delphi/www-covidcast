@@ -146,7 +146,7 @@ export function computeMegaCountyPopulation(megaCounty, data) {
 
 /**
  * returns the counties of a state
- * @param {NameInfo} state 
+ * @param {NameInfo} state
  */
 export function getCountiesOfState(state) {
   return countyInfo.filter((d) => d.id.slice(0, 2) === state.id);
