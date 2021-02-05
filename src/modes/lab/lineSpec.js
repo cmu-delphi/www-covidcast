@@ -81,7 +81,7 @@ export function generateLineChartSpec(title, smartPadding = true, initDate = nul
         },
         mark: {
           type: 'point',
-          tooltip: false,
+          tooltip: true,
         },
         encoding: {
           y: {

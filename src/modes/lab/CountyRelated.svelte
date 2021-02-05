@@ -5,6 +5,7 @@
   import getRelatedCounties from '../../maps/related';
   import { currentDateObject } from '../../stores';
   import { defaultRegionOnStartup, DEFAULT_SURVEY_SENSOR, sensorMap } from '../../stores/constants';
+  import VegaTooltip from './VegaTooltip.svelte';
 
   import { generateLineChartSpec } from './lineSpec';
 
@@ -111,4 +112,4 @@ Related Counties:
   .map((d) => d.displayName)
   .join(', ')}
 
-<Vega {spec} {data} />
+<Vega {spec} {data} tooltip={VegaTooltip} />
