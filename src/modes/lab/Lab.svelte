@@ -18,8 +18,14 @@
     },
   ];
 
-  let selected = 0;
+  let selected = Number.parseInt(new URL(window.location.href).searchParams.get('lab') || '0', 10);
   $: currentComponent = experiments[selected].component();
+
+  $: {
+    const u = new URL(window.location.href);
+    u.searchParams.set('lab', selected);
+    history.replaceState(null, null, u.href);
+  }
 </script>
 
 <style>
