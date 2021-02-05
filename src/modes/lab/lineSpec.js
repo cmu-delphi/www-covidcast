@@ -81,14 +81,19 @@ export function generateLineChartSpec(title, smartPadding = true, initDate = nul
         },
         mark: {
           type: 'point',
-          stroke: null,
-          opacity: 0,
-          tooltip: true,
+          tooltip: false,
         },
         encoding: {
           y: {
             field: 'value',
             type: 'quantitative',
+          },
+          opacity: {
+            condition: {
+              selection: 'highlight',
+              value: 1,
+            },
+            value: 0,
           },
         },
       },
@@ -124,8 +129,6 @@ export function generateLineChartSpec(title, smartPadding = true, initDate = nul
               "(width - scale('x', datum.date_value)) < 40 ? 'right' : (scale('x', datum.date_value)) > 40 ? 'center' : 'left'",
           },
           baseline: 'bottom',
-          format: '%b %d',
-          formatType: 'cachedTime',
           fontSize: 14,
           dy: -1,
         },
@@ -133,9 +136,46 @@ export function generateLineChartSpec(title, smartPadding = true, initDate = nul
           text: {
             field: 'date_value',
             type: 'temporal',
+            format: '%b %d',
+            formatType: 'cachedTime',
           },
           y: {
             value: 0,
+          },
+        },
+      },
+      {
+        transform: [
+          {
+            filter: {
+              selection: 'highlight',
+            },
+          },
+        ],
+        mark: {
+          type: 'text',
+          align: {
+            // auto align based on remaining space
+            expr: "(width - scale('x', datum.date_value)) < 40 ? 'right' : 'left'",
+          },
+          baseline: 'bottom',
+          fontSize: 14,
+          dx: {
+            // auto align based on remaining space
+            expr: "(width - scale('x', datum.date_value)) < 40 ? -2 : 2",
+          },
+          dy: -2,
+        },
+        encoding: {
+          text: {
+            field: 'value',
+            type: 'quantitative',
+            format: '.1f',
+            formatType: 'cachedNumber',
+          },
+          y: {
+            field: 'value',
+            type: 'quantitative',
           },
         },
       },
