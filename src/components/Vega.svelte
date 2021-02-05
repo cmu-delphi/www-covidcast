@@ -162,7 +162,20 @@
     const patch = (spec) => {
       spec.signals = spec.signals || [];
       Object.entries(signals).forEach(([key, v]) => {
-        spec.signals.push({ name: key, value: v });
+        const obj = {name: key};
+        if (v == null || ['string', 'number', 'boolean'].includes(typeof v) || v instanceof Date || Array.isArray(v)) {
+          // assume it is a value
+          obj.value = v;
+        } else {
+          // mixing the whole object
+          Object.assign(obj, v);
+        }
+        const existing = spec.signals.find((d) => d.name === key);
+        if (existing) {
+          Object.assign(existing, obj);
+        } else {
+          spec.signals.push(obj);
+        }
       });
       spec.signals.push({
         name: 'width',
@@ -188,7 +201,7 @@
     };
     vegaPromise = import(/* webpackChunkName: 'vegafactory' */ './vegaFactory').then((m) =>
       m.default(root, spec, {
-        actions: false,
+        actions: true,
         logLevel: Error,
         tooltip: tooltipHandler,
         patch,
