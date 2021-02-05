@@ -11,14 +11,23 @@
   const sensor = sensorMap.get(DEFAULT_SURVEY_SENSOR);
 
   const county = getInfoByName(defaultRegionOnStartup.county);
+  const related = getRelatedCounties(county);
+  const state = getInfoByName(county.state);
+  const nation = nationInfo;
 
   const spec = generateLineChartSpec('Random', true, $currentDateObject);
   spec.title = null;
-  spec.padding.right = 150;
+  spec.padding.bottom = 50;
   spec.layer[0].encoding.color = {
     field: 'displayName',
     type: 'nominal',
+    scale: {
+      domain: [county.displayName, 'Related Counties', state.displayName, nation.displayName],
+    },
     legend: {
+      direction: 'horizontal',
+      orient: 'bottom',
+      title: null,
       symbolType: 'stroke',
       symbolStrokeWidth: {
         expr: `datum.label === "${county.displayName}" ? 3 : 1`,
@@ -40,10 +49,7 @@
   const start = new Date(2020, 12 - 1, 1);
   const end = new Date();
 
-  function loadData(county) {
-    const related = getRelatedCounties(county);
-    const state = getInfoByName(county.state);
-    const nation = nationInfo;
+  function loadData() {
     const countyData = fetchTimeSlice(sensor, 'county', county.propertyId, start, end, false, {
       displayName: county.displayName,
     }).then((r) => addMissing(r, sensor));

@@ -5,7 +5,7 @@ export function generateLineChartSpec(title, smartPadding = true, initDate = nul
   const spec = {
     title,
     height: 300,
-    padding: { left: 50, top: 16, bottom: 20, right: 2 },
+    padding: { left: 50, top: 16, bottom: 20, right: 10 },
     autosize: {
       type: 'none',
       contains: 'padding',
