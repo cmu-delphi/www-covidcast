@@ -1,6 +1,6 @@
 <script>
   import { addMissing, fetchTimeSlice } from '../../data';
-  import { findDateRow } from './utils';
+  import { findDateRow, guessSensorColor } from './utils';
   import { primaryValue } from '../../stores/constants';
   import { generateSparkLine } from '../../specs/lineSpec';
   import Vega from '../../components/Vega.svelte';
@@ -39,7 +39,7 @@
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
-  $: spec = generateSparkLine({ valueField: valueKey });
+  $: spec = generateSparkLine({ valueField: valueKey, color: guessSensorColor(sensor) });
 </script>
 
 <style>
