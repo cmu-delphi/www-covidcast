@@ -19,7 +19,7 @@ export function findDateRow(date, data) {
 }
 
 /**
- * @param {import('../../stores/constants').SensorEntry} sensor 
+ * @param {import('../../stores/constants').SensorEntry} sensor
  */
 export function guessSensorColor(sensor) {
   if (sensor.colorScaleId === 'interpolateYlGnBu') {

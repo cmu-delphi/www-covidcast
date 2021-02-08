@@ -6,6 +6,10 @@
   import Vega from '../../components/Vega.svelte';
   import { timeWeek } from 'd3-time';
   import SparkLineTooltip from './SparkLineTooltip.svelte';
+  import HistoryLineChart from './HistoryLineChart.svelte';
+  import circleIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/circle.svg';
+  import chevronUpIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-up.svg';
+  import externalLinkAltIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/external-link-alt.svg';
 
   /**
    * @type {import('../../stores/constants').SensorEntry}
@@ -40,18 +44,139 @@
    * @type {import('vega-lite').TopLevelSpec}
    */
   $: spec = generateSparkLine({ valueField: valueKey, color: guessSensorColor(sensor) });
+
+  let open = false;
 </script>
 
 <style>
+  .chart-line {
+    position: relative;
+  }
+  .chart-line > :global(*) {
+    width: 100%;
+    height: 150px;
+  }
+
+  .popup-container {
+    padding: 0;
+  }
+
+  .popup {
+    border: 1px solid #232735;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    background: #232735;
+    color: white;
+  }
+  .popup-body {
+    border-radius: 4px 4px;
+    margin: 2px;
+    padding: 1em;
+    background: white;
+    color: initial;
+  }
+  .popup-header {
+    padding: 13px;
+    font-weight: 700;
+    display: flex;
+  }
+  .popup-title {
+    flex-grow: 1;
+  }
+  .popup-button {
+    border: none;
+    background: none;
+    font-weight: inherit;
+    text-transform: uppercase;
+    color: inherit;
+  }
+
+  .popup-table {
+    margin: 2em 0;
+    border-collapse: collapse;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    width: 100%;
+  }
+
+  .popup-table > tr > * {
+    padding: 0.5rem 4px;
+    vertical-align: top;
+  }
+
+  .popup-table > tr:not(:last-of-type) {
+    border-bottom: 1px solid #f0f1f3;
+  }
+
+  .popup-table-value {
+    font-weight: 600;
+    text-align: right;
+  }
 </style>
 
 <tr>
-  <td>{sensor.name}</td>
-  <td class="uk-text-right">TODO</td>
-  <td class="uk-text-right">
-    {#await currentRow}?{:then row}{row ? sensor.formatValue(row[valueKey]) : 'N/A'}{/await}
-  </td>
-  <td>
-    <Vega {spec} {data} tooltip={SparkLineTooltip} tooltipProps={{ sensor }} />
-  </td>
+  {#if !open}
+    <td on:click={() => (open = true)}>{sensor.name}</td>
+    <td class="uk-text-right">TODO</td>
+    <td class="uk-text-right">
+      {#await currentRow}?{:then row}{row ? sensor.formatValue(row[valueKey]) : 'N/A'}{/await}
+    </td>
+    <td>
+      <Vega {spec} {data} tooltip={SparkLineTooltip} tooltipProps={{ sensor }} />
+    </td>
+  {:else}
+    <td colspan="4" class="popup-container">
+      <div class="popup">
+        <header class="popup-header">
+          <span class="inline-svg-icon" style="color: {guessSensorColor(sensor)}">
+            {@html circleIcon}
+          </span>
+          <span class="popup-title">{sensor.name}</span>
+          <button class="popup-button" on:click={() => (open = false)}>
+            <span class="inline-svg-icon">
+              {@html chevronUpIcon}
+            </span>
+            Close
+          </button>
+        </header>
+        <div class="popup-body">
+          <div class="chart-line">
+            <HistoryLineChart {params} {sensor} />
+          </div>
+          <table class="popup-table">
+            <tr>
+              <td>Last 7 day trend</td>
+              <td class="popup-table-value">TODO</td>
+            </tr>
+            <tr>
+              <td>Last 7 day avg</td>
+              <td class="popup-table-value">
+                {#await currentRow}?{:then row}{row ? sensor.formatValue(row[valueKey]) : 'N/A'}{/await}
+              </td>
+            </tr>
+            <tr>
+              <td>Peak 7 day period</td>
+              <td class="popup-table-value">TODO</td>
+            </tr>
+            <tr>
+              <td>Record high</td>
+              <td class="popup-table-value">TODO</td>
+            </tr>
+            <tr>
+              <td>Record low</td>
+              <td class="popup-table-value">TODO</td>
+            </tr>
+          </table>
+          <div class="uk-text-center">
+            <button class="popup-button">
+              <span class="inline-svg-icon">
+                {@html externalLinkAltIcon}
+              </span>
+              Advanced Chart
+            </button>
+          </div>
+        </div>
+      </div>
+    </td>
+  {/if}
 </tr>
