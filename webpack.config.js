@@ -31,7 +31,7 @@ module.exports = () => {
         svelte: path.resolve('node_modules', 'svelte'),
       },
       extensions: ['.mjs', '.js', '.svelte'],
-      mainFields: ['svelte', 'browser', 'module', 'main'],
+      mainFields: ['svelte', 'module', 'browser', 'main'],
     },
 
     optimization: {
@@ -57,7 +57,15 @@ module.exports = () => {
         !devMode && {
           test: /\.m?js$/,
           exclude: /node_modules[\\/](?!(svelte|mapbox-gl)[\\/])/,
-          use: ['babel-loader'],
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                cacheDirectory: true,
+                cacheCompression: false,
+              },
+            },
+          ],
         },
         {
           test: /\.svelte$/,
@@ -73,7 +81,13 @@ module.exports = () => {
                 },
               ]
             : [
-                'babel-loader',
+                {
+                  loader: 'babel-loader',
+                  options: {
+                    cacheDirectory: true,
+                    cacheCompression: false,
+                  },
+                },
                 {
                   loader: 'svelte-loader',
                   options: {
@@ -145,6 +159,12 @@ module.exports = () => {
         title: 'COVIDcast',
         template: './src/index.html',
         filename: 'mobile/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        alwaysWriteToDisk: true,
+        title: 'COVIDcast Signal Details',
+        template: './src/index.html',
+        filename: 'mobile-signal/index.html',
       }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
