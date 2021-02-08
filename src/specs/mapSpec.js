@@ -13,7 +13,6 @@ const EPIDATA_ROW_KEYS = ['geo_value', 'value', 'date_value', 'time_value', 'std
 );
 const NAME_INFO_KEYS = ['propertyId', 'displayName', 'population', 'state'];
 
-
 function genMissingLayer(missingLevel = 'nation') {
   /**
    * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}

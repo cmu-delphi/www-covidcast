@@ -1,30 +1,16 @@
 <script>
   import { nameInfos, nationInfo } from '../../maps';
-  import { currentRegionInfo, smallMultipleTimeSpan, currentSensorEntry, currentDateObject } from '../../stores';
+  import { currentRegionInfo, currentSensorEntry, currentDateObject } from '../../stores';
   import SurveyParameters from '../survey/SurveyParameters.svelte';
   import SignalTable from './SignalTable.svelte';
   import Overview from './Overview.svelte';
   import { toTimeValue } from './utils';
   import './common.css';
 
-  // use local variables with manual setting for better value comparison updates
-  let startDay = $smallMultipleTimeSpan[0];
-  let endDay = $smallMultipleTimeSpan[1];
-
-  $: {
-    if (startDay.getTime() !== $smallMultipleTimeSpan[0].getTime()) {
-      startDay = $smallMultipleTimeSpan[0];
-    }
-    if (endDay.getTime() !== $smallMultipleTimeSpan[1].getTime()) {
-      endDay = $smallMultipleTimeSpan[1];
-    }
-  }
-  $: params = { 
-    region: $currentRegionInfo || nationInfo, 
-    startDay, 
-    endDay,
+  $: params = {
+    region: $currentRegionInfo || nationInfo,
     date: $currentDateObject,
-    timeValue: toTimeValue($currentDateObject)
+    timeValue: toTimeValue($currentDateObject),
   };
 </script>
 

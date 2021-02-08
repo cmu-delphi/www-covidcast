@@ -45,9 +45,7 @@
       <th class="mobile-th"><span>Measurement</span></th>
       <th class="mobile-th uk-text-right"><span>Change Last 7 days</span></th>
       <th class="mobile-th uk-text-right"><span>per 100k</span></th>
-      <th class="mobile-th uk-text-right">
-        <span>historical trend</span>
-      </th>
+      <th class="mobile-th uk-text-right"><span>historical trend</span></th>
     </tr>
   </thead>
   {#each groupedSensorList as group}

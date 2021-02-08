@@ -2,8 +2,8 @@ import { formatAPITime } from '../../data';
 /**
  * @typedef {object} Params
  * @property {import('../../maps').NameInfo} region
- * @property {Date} startDay
- * @property {Date} endDay
+ * @property {Date} date
+ * @property {number} timeValue
  */
 
 export function toTimeValue(date) {

@@ -26,10 +26,16 @@
   function genSpec(stats, sensor, region) {
     const options = {
       height: 400,
-      domain: determineMinMax(stats, sensor, region.level === 'state' || region.level === 'county' ? 'county' : 'state', {}, false),
+      domain: determineMinMax(
+        stats,
+        sensor,
+        region.level === 'state' || region.level === 'county' ? 'county' : 'state',
+        {},
+        false,
+      ),
       legendTitle: sensor.isCasesOrDeath ? `${sensor.yAxis} per 100,000` : sensor.yAxis,
       scheme: sensor.colorScaleId === 'interpolateYlGrBl' ? 'yellowgreenblue' : 'yelloworangered',
-    }
+    };
     if (region.level === 'state') {
       return generateCountiesOfStateSpec(region, options);
     }
@@ -66,4 +72,4 @@
   $: data = loadData(sensor, params);
 </script>
 
-<Vega {className} {spec} {data} tooltip={RegionMapTooltip} />
+<Vega {className} {spec} {data} tooltip={RegionMapTooltip} tooltipProps={{ sensor }} />

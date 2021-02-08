@@ -1,9 +1,11 @@
 <script>
-  import { fetchTimeSlice } from '../../data';
+  import { addMissing, fetchTimeSlice } from '../../data';
   import { findDateRow } from './utils';
-  import { currentDateObject } from '../../stores';
   import { primaryValue } from '../../stores/constants';
-  import Sparklines from './Sparklines.svelte';
+  import { generateSparkLine } from '../../specs/lineSpec';
+  import Vega from '../../components/Vega.svelte';
+  import { timeWeek } from 'd3-time';
+  import SparkLineTooltip from './SparkLineTooltip.svelte';
 
   /**
    * @type {import('../../stores/constants').SensorEntry}
@@ -16,26 +18,15 @@
   export let params;
 
   function loadData(sensor, params) {
-    const { region, startDay, endDay } = params;
-    if (!region || !startDay || !endDay) {
+    const { region, date } = params;
+    if (!region || !date) {
       return null;
     }
-    return fetchTimeSlice(
-      sensor,
-      params.region.level,
-      params.region.propertyId,
-      params.startDay,
-      params.endDay,
-      false,
-      {
-        geo_value: params.region.propertyId,
-      },
-    ).then((rows) =>
-      rows.map((row) => {
-        row.displayName = params.region.displayName;
-        return row;
-      }),
-    );
+    const startDate = timeWeek.offset(params.date, -4);
+    return fetchTimeSlice(sensor, params.region.level, params.region.propertyId, startDate, date, true, {
+      displayName: params.region.displayName,
+      geo_value: params.region.propertyId,
+    }).then((rows) => addMissing(rows, sensor));
   }
 
   function findCurrentRow(data, date) {
@@ -43,9 +34,12 @@
   }
 
   $: data = loadData(sensor, params);
-  $: currentRow = findCurrentRow(data, $currentDateObject);
+  $: currentRow = findCurrentRow(data, params.date);
   $: valueKey = primaryValue(sensor, {});
-  $: incidenceKey = primaryValue(sensor, { incidence: true });
+  /**
+   * @type {import('vega-lite').TopLevelSpec}
+   */
+  $: spec = generateSparkLine({ valueField: valueKey });
 </script>
 
 <style>
@@ -53,15 +47,11 @@
 
 <tr>
   <td>{sensor.name}</td>
+  <td class="uk-text-right">TODO</td>
   <td class="uk-text-right">
     {#await currentRow}?{:then row}{row ? sensor.formatValue(row[valueKey]) : 'N/A'}{/await}
   </td>
-  <td class="uk-text-right">
-    {#if sensor.isCasesOrDeath}
-      {#await currentRow}?{:then row}{row ? sensor.formatValue(row[incidenceKey]) : 'N/A'}{/await}
-    {/if}
-  </td>
   <td>
-    <Sparklines {data} {sensor} />
+    <Vega {spec} {data} tooltip={SparkLineTooltip} tooltipProps={{ sensor }} />
   </td>
 </tr>

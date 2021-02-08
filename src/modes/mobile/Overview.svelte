@@ -43,7 +43,8 @@
     font-size: 2.75rem;
   }
 
-  .chart-map, .chart-line {
+  .chart-map,
+  .chart-line {
     position: relative;
   }
   .chart-map > :global(*) {

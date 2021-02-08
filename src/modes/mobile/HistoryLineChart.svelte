@@ -24,7 +24,7 @@
    * @param {Date} date
    */
   function genSpec(region, date, height) {
-    const options = { 
+    const options = {
       initialDate: date,
       height,
     };

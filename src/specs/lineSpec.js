@@ -103,7 +103,8 @@ export function generateLineChartSpec({ height = 300, initialDate = null, valueF
         },
         mark: {
           type: 'point',
-          stroke: MAP_THEME.selectedRegionOutline,
+          fill: MAP_THEME.selectedRegionOutline,
+          stroke: null,
           tooltip: true,
         },
         encoding: {
@@ -239,6 +240,100 @@ export function generateCompareLineSpec(compare, { compareField = 'displayName',
   spec.layer[1].encoding.color = {
     field: compareField,
     type: 'nominal',
+  };
+  return spec;
+}
+
+export function generateSparkLine({ valueField = 'value', domain = null }) {
+  /**
+   * @type {import('vega-lite').TopLevelSpec}
+   */
+  const spec = {
+    $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
+    data: { name: 'values' },
+    height: 30,
+    padding: { left: 2, top: 2, bottom: 2, right: 2 },
+    autosize: {
+      type: 'none',
+      contains: 'padding',
+      resize: true,
+    },
+    encoding: {
+      x: {
+        field: 'date_value',
+        type: 'temporal',
+        scale: {
+          domain,
+        },
+        axis: {
+          title: null,
+          grid: true,
+          format: '%b %d',
+          formatType: 'cachedTime',
+          gridDash: [4, 4],
+          labels: false,
+          ticks: false,
+          domain: false,
+          tickCount: {
+            interval: 'week',
+          },
+        },
+      },
+      y: {
+        field: valueField,
+        type: 'quantitative',
+        scale: {
+          zero: 0,
+        },
+        axis: null,
+      },
+    },
+    layer: [
+      {
+        mark: {
+          type: 'line',
+          color: MAP_THEME.selectedRegionOutline,
+          point: false,
+          interpolate: 'linear',
+        },
+      },
+      {
+        mark: {
+          type: 'point',
+          fill: MAP_THEME.selectedRegionOutline,
+          stroke: null,
+          tooltip: true,
+        },
+        encoding: {
+          opacity: {
+            condition: {
+              selection: 'highlight',
+              value: 1,
+            },
+            value: 0,
+          },
+        },
+        selection: {
+          highlight: {
+            type: 'single',
+            empty: 'none',
+            on: 'click, mousemove, [touchstart, touchend] > touchmove',
+            nearest: true,
+            clear: 'view:mouseout',
+            encodings: ['x'],
+          },
+        },
+      },
+    ],
+    config: {
+      customFormatTypes: true,
+      view: {
+        stroke: null,
+      },
+      legend: {
+        disable: true,
+      },
+    },
   };
   return spec;
 }

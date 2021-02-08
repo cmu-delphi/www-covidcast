@@ -32,10 +32,10 @@
 </style>
 
 <div aria-label="tooltip" class="tooltip" class:hidden>
-  <h5>{item.displayName}</h5>
+  <h5>{formatDateShort(item.date_value)}</h5>
   <table>
     <tr>
-      <th>{formatDateShort(item.date_value)}</th>
+      <th>{item.displayName}</th>
       <td>{sensor.formatValue(item.value)}</td>
     </tr>
   </table>
