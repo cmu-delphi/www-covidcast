@@ -1,13 +1,12 @@
 <script>
   import Vega from '../../components/Vega.svelte';
-  import { addMissing, fetchTimeSlice } from '../../data';
+  import { addMissing, fetchTimeSlice, averageByDate } from '../../data';
   import { getInfoByName, nationInfo } from '../../maps';
   import getRelatedCounties from '../../maps/related';
   import { currentDateObject } from '../../stores';
   import { defaultRegionOnStartup, DEFAULT_SURVEY_SENSOR, sensorMap } from '../../stores/constants';
   import VegaTooltip from './VegaTooltip.svelte';
   import { generateCompareLineSpec, signalPatches } from '../../specs/lineSpec';
-
 
   const sensor = sensorMap.get(DEFAULT_SURVEY_SENSOR);
 
@@ -16,7 +15,10 @@
   const state = getInfoByName(county.state);
   const nation = nationInfo;
 
-  const spec = generateCompareLineSpec([county.displayName, 'Related Counties', state.displayName, nation.displayName], {initialDate: $currentDateObject });
+  const spec = generateCompareLineSpec(
+    [county.displayName, 'Related Counties', state.displayName, nation.displayName],
+    { initialDate: $currentDateObject },
+  );
 
   const start = new Date(2020, 12 - 1, 1);
   const end = new Date();
@@ -37,27 +39,7 @@
         displayName: 'Related Counties',
       },
     )
-      .then((r) => {
-        // average by date
-        const byDate = new Map();
-        for (const row of r) {
-          const key = row.time_value;
-          if (byDate.has(key)) {
-            byDate.get(key).push(row);
-          } else {
-            byDate.set(key, [row]);
-          }
-        }
-        return Array.from(byDate.values())
-          .map((rows) => {
-            const base = rows[0];
-            return {
-              ...base,
-              value: rows.reduce((acc, v) => acc + v.value, 0) / rows.length,
-            };
-          })
-          .sort((a, b) => a.time_value - b.time_value);
-      })
+      .then((r) => averageByDate(r, sensor))
       .then((r) => addMissing(r, sensor));
 
     const nationData = fetchTimeSlice(sensor, nation.level, [nation.propertyId], start, end, false, {
@@ -83,4 +65,4 @@ Related Counties:
   .map((d) => d.displayName)
   .join(', ')}
 
-<Vega {spec} {data} tooltip={VegaTooltip} signals={signalPatches}/>
+<Vega {spec} {data} tooltip={VegaTooltip} signals={signalPatches} />

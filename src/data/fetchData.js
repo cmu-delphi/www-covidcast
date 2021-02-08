@@ -293,9 +293,10 @@ export function fetchTimeSlice(
 }
 
 /**
- *
+ * add missing rows per date within this given date rows
  * @param {EpiDataRow[]} rows
  * @param {SensorEntry} sensor
+ * @returns {EpiDataRow[]}
  */
 export function addMissing(rows, sensor) {
   if (rows.length < 2) {
@@ -318,4 +319,46 @@ export function addMissing(rows, sensor) {
     return createCopy(template, date, sensor);
   });
   return imputedRows;
+}
+
+function avg(rows, field) {
+  const sum = rows.reduce((acc, v) => acc + v[field], 0);
+  if (sum == null || Number.isNaN(sum)) {
+    return null;
+  }
+  return sum / rows.length;
+}
+/**
+ * group by date and averages its values
+ * @param {EpiDataRow[]} rows
+ * @param {SensorEntry} sensor
+ * @returns {EpiDataRow[]}
+ */
+export function averageByDate(rows, sensor) {
+  // average by date
+  const byDate = new Map();
+  for (const row of rows) {
+    const key = row.time_value;
+    if (byDate.has(key)) {
+      byDate.get(key).push(row);
+    } else {
+      byDate.set(key, [row]);
+    }
+  }
+  return Array.from(byDate.values())
+    .map((rows) => {
+      const r = {
+        ...rows[0],
+        value: avg(rows, 'value'),
+        stderr: avg(rows, 'stderr'),
+        sample_size: avg(rows, 'sample_size'),
+      };
+      if ((sensor != null && sensor.isCasesOrDeath) || rows[0][EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined) {
+        EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
+          r[key] = avg(rows, key);
+        });
+      }
+      return r;
+    })
+    .sort((a, b) => a.time_value - b.time_value);
 }

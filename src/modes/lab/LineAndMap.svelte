@@ -13,7 +13,7 @@
   const sensor = sensorMap.get(DEFAULT_SURVEY_SENSOR);
 
   function genMapSpec(stats, sensor) {
-    const stateSpec = generateStateSpec({height: 400});
+    const stateSpec = generateStateSpec({ height: 400 });
     const scale = stateSpec.layer[stateSpec.layer.length - 2].encoding.color.scale;
     scale.domain = determineMinMax(stats, sensor, 'state', {}, false);
     return stateSpec;
@@ -21,7 +21,7 @@
 
   $: stateSpec = genMapSpec($stats, sensor);
 
-  const lineSpec = generateLineChartSpec({height: 150, initialDate: $currentDateObject});
+  const lineSpec = generateLineChartSpec({ height: 150, initialDate: $currentDateObject });
 
   const nationData = fetchTimeSlice(sensor, 'nation', 'us').then((r) => addMissing(r, sensor));
 
