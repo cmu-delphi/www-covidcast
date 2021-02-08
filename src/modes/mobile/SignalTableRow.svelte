@@ -1,10 +1,8 @@
 <script>
   import { fetchTimeSlice } from '../../data';
-  import { aggregateByWeek, findDateRow } from './utils';
+  import { findDateRow } from './utils';
   import { currentDateObject } from '../../stores';
   import { primaryValue } from '../../stores/constants';
-  import Heatmap1D from './Heatmap1D.svelte';
-  import { timeFormat } from 'd3-time-format';
   import Sparklines from './Sparklines.svelte';
 
   /**
@@ -16,8 +14,6 @@
    * @type {import("../utils").Params}
    */
   export let params;
-
-  export let sparklines = false;
 
   function loadData(sensor, params) {
     const { region, startDay, endDay } = params;
@@ -48,12 +44,8 @@
 
   $: data = loadData(sensor, params);
   $: currentRow = findCurrentRow(data, $currentDateObject);
-  $: byWeek = data ? data.then((rows) => aggregateByWeek(rows, sensor, params.startDay, params.endDay)) : null;
-
   $: valueKey = primaryValue(sensor, {});
   $: incidenceKey = primaryValue(sensor, { incidence: true });
-
-  const weekFormatter = timeFormat('%Y %V');
 </script>
 
 <style>
@@ -70,10 +62,6 @@
     {/if}
   </td>
   <td>
-    {#if sparklines}
-      <Sparklines {data} {sensor} />
-    {:else}
-      <Heatmap1D data={byWeek} {sensor} level={params.region.level} dateFormatter={weekFormatter} />
-    {/if}
+    <Sparklines {data} {sensor} />
   </td>
 </tr>
