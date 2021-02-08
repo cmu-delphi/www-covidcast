@@ -13,10 +13,9 @@
   const sensor = sensorMap.get(DEFAULT_SURVEY_SENSOR);
 
   function genMapSpec(stats, sensor) {
-    const stateSpec = generateStateSpec(`${sensor.name} - States`);
+    const stateSpec = generateStateSpec();
     stateSpec.height = 400;
-    stateSpec.title = null;
-    const scale = stateSpec.layer[stateSpec.layer.length - 1].encoding.color.scale;
+    const scale = stateSpec.layer[stateSpec.layer.length - 2].encoding.color.scale;
     scale.domain = determineMinMax(stats, sensor, 'state', {}, false);
     return stateSpec;
   }

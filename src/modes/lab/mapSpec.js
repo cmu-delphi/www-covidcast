@@ -140,6 +140,7 @@ function genMegaLayer(infos) {
     mark: {
       type: 'geoshape',
       stroke: null,
+      tooltip: { content: 'data' },
     },
     encoding: {
       color: {
@@ -151,11 +152,18 @@ function genMegaLayer(infos) {
         type: 'quantitative',
       },
     },
+    selection: {
+      hoverMega: {
+        type: 'single',
+        on: 'mouseover',
+        empty: 'none',
+      },
+    },
   };
   return layer;
 }
 
-function genStateBorderLayer() {
+function genMegaBorderLayer() {
   /**
    * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
    */
@@ -169,21 +177,170 @@ function genStateBorderLayer() {
     },
     mark: {
       type: 'geoshape',
-      color: 'transparent',
+      fill: null,
       stroke: '#eaeaea',
       strokeWidth: 1.1,
+      tooltip: false,
+    },
+    encoding: {
+      key: {
+        field: 'id',
+      },
     },
   };
   return layer;
 }
 
-function genLevelLayer(level, infos, strokeWidth = 1) {
+function genMegaHoverLayer() {
   /**
    * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
    */
   const layer = {
     data: {
-      name: level,
+      name: 'state',
+      format: {
+        type: 'topojson',
+        feature: 'state',
+      },
+    },
+    mark: {
+      type: 'geoshape',
+      fill: null,
+      stroke: '#ff7f00',
+      strokeWidth: 2,
+      opacity: 0,
+      tooltip: false,
+    },
+    encoding: {
+      key: {
+        field: 'id',
+      },
+      opacity: {
+        // more performant
+        condition: {
+          selection: 'hoverMega',
+          value: 1,
+        },
+        value: 0,
+      },
+    },
+  };
+  return layer;
+}
+
+function genLevelLayer(strokeWidth = 1) {
+  /**
+   * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
+   */
+  const layer = {
+    mark: {
+      type: 'geoshape',
+      stroke: '#eaeaea',
+      strokeWidth,
+      tooltip: { content: 'data' },
+    },
+    encoding: {
+      key: {
+        field: 'id',
+      },
+      color: {
+        condition: {
+          test: 'datum.value === 0',
+          value: 'rgb(242,242,242)',
+        },
+        field: 'value',
+        type: 'quantitative',
+        scale: {
+          // domainMin: 0,
+          // domainMax: 149,
+          scheme: 'yellowgreenblue',
+          clamp: true,
+        },
+        legend: {
+          orient: 'right',
+          Align: 'center',
+          FontWeight: 'normal',
+          Orient: 'left',
+          title: 'of 100 people',
+          labelLimit: 30,
+          tickMinStep: 0.1,
+        },
+      },
+    },
+    selection: {
+      hover: {
+        type: 'single',
+        on: 'mouseover',
+        empty: 'none',
+        fields: ['geo_value'],
+      },
+    },
+  };
+  return layer;
+}
+
+function genLevelHoverLayer() {
+  /**
+   * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
+   */
+  const layer = {
+    mark: {
+      type: 'geoshape',
+      stroke: '#ff7f00',
+      strokeWidth: 2,
+      opacity: 0,
+      fill: null,
+      tooltip: false,
+    },
+    // transform: [
+    //   {
+    //     filter: {
+    //       selection: 'hover'
+    //     }
+    //   }
+    // ],
+    encoding: {
+      key: {
+        field: 'id',
+      },
+      opacity: {
+        // more performant
+        condition: {
+          selection: 'hover',
+          value: 1,
+        },
+        value: 0,
+      },
+    },
+  };
+  return layer;
+}
+
+function genBaseSpec(level, topoJSON, infos) {
+  /**
+   * @type {import('vega-lite').TopLevelSpec}
+   */
+  const spec = {
+    height: 300,
+    padding: {
+      left: 10,
+      bottom: 10,
+      top: 10,
+      right: 10,
+    },
+    autosize: {
+      type: 'none',
+      contains: 'padding',
+      resize: true,
+    },
+    projection: {
+      type: 'albersUsaTerritories',
+    },
+    datasets: {
+      values: [],
+    },
+    data: {
+      values: topoJSON,
       format: {
         type: 'topojson',
         feature: level,
@@ -211,205 +368,127 @@ function genLevelLayer(level, infos, strokeWidth = 1) {
         },
       },
     ],
-    mark: {
-      type: 'geoshape',
-      stroke: '#eaeaea',
-      opacity: 1,
-      tooltip: { content: 'data' },
-    },
-    encoding: {
-      key: {
-        field: 'id',
-      },
-      color: {
-        condition: {
-          test: 'datum.value === 0',
-          value: 'rgb(242,242,242)',
-        },
-        field: 'value',
-        type: 'quantitative',
-        scale: {
-          // domainMin: 0,
-          // domainMax: 149,
-          scheme: 'yellowgreenblue',
-          clamp: true,
-        },
-        legend: {
-          orient: 'right',
-          titleAlign: 'center',
-          titleFontWeight: 'normal',
-          titleOrient: 'left',
-          title: 'of 100 people',
-          labelLimit: 30,
-          tickMinStep: 0.1,
-        },
-      },
-      stroke: {
-        condition: { selection: 'hover', value: '#ff7f00' },
-        value: '#eaeaea',
-      },
-      strokeWidth: {
-        condition: { selection: 'hover', value: 2 },
-        value: strokeWidth,
-      },
-    },
-    selection: {
-      hover: {
-        type: 'single',
-        on: 'mouseover',
-        empty: 'none',
-        fields: ['geo_value'],
-      },
-    },
-  };
-  return layer;
-}
-
-function genBaseSpec(title, level, topoJSON) {
-  /**
-   * @type {import('vega-lite').TopLevelSpec}
-   */
-  const spec = {
-    title: title,
-    height: 300,
-    padding: {
-      left: 10,
-      bottom: 10,
-      top: 10,
-      right: 10,
-    },
-    autosize: {
-      type: 'none',
-      contains: 'padding',
-      resize: true,
-    },
-    projection: {
-      type: 'albersUsaTerritories',
-    },
-    datasets: {
-      values: [],
-      [level]: topoJSON,
-    },
     layer: [],
     config: {
       view: {
         stroke: null,
       },
-      title: {
-        anchor: 'start',
-        fontWeight: 'normal',
-        fontSize: 32,
-      },
     },
   };
   return spec;
 }
 
-export function generateHRRSpec(title) {
+export function generateHRRSpec() {
   const level = 'hrr';
   const topoJSON = hrrJSON;
   const infos = hrrInfo;
 
-  const spec = genBaseSpec(title, level, topoJSON);
+  const spec = genBaseSpec(level, topoJSON, infos);
   spec.datasets.nation = nationJSON;
   spec.layer.push(genMissingLayer());
 
-  spec.layer.push(genLevelLayer(level, infos));
+  spec.layer.push(genLevelLayer());
+  spec.layer.push(genLevelHoverLayer());
   return spec;
 }
 
-export function generateStateSpec(title) {
+export function generateStateSpec() {
   const level = 'state';
   const topoJSON = stateJSON;
   const infos = stateInfo;
 
-  const spec = genBaseSpec(title, level, topoJSON);
+  const spec = genBaseSpec(level, topoJSON, infos);
   spec.datasets.nation = nationJSON;
   spec.layer.push(genMissingLayer());
 
   // state, msa
-  spec.layer.push(genLevelLayer(level, infos));
+  spec.layer.push(genLevelLayer());
+  spec.layer.push(genLevelHoverLayer());
   return spec;
 }
 
-export function generateMSASpec(title) {
+export function generateMSASpec() {
   const level = 'msa';
   const topoJSON = msaJSON;
   const infos = msaInfo;
 
-  const spec = genBaseSpec(title, level, topoJSON);
+  const spec = genBaseSpec(level, topoJSON, infos);
   spec.datasets.nation = nationJSON;
   spec.layer.push(genMissingLayer());
 
   // state, msa
-  spec.layer.push(genLevelLayer(level, infos));
+  spec.layer.push(genLevelLayer());
+  spec.layer.push(genLevelHoverLayer());
   return spec;
 }
 
-export function generateNationSpec(title) {
+export function generateNationSpec() {
   const level = 'nation';
   const topoJSON = nationJSON;
   const infos = [nationInfo];
 
-  const spec = genBaseSpec(title, level, topoJSON);
-
-  spec.layer.push(genLevelLayer(level, infos));
-  spec.layer[spec.layer.length - 1].transform.unshift({
+  const spec = genBaseSpec(level, topoJSON, infos);
+  spec.transform.unshift({
     calculate: JSON.stringify('us'),
     as: 'id',
   });
+
+  spec.layer.push(genLevelLayer());
+  spec.layer.push(genLevelHoverLayer());
   return spec;
 }
 
 /**
  * generates a map of counties
- * @param {string} title
  */
-export function generateCountySpec(title) {
+export function generateCountySpec() {
   const level = 'county';
   const topoJSON = countyJSON;
   const infos = countyInfo;
 
-  const spec = genBaseSpec(title, level, topoJSON);
+  const spec = genBaseSpec(level, topoJSON, infos);
 
   spec.datasets.nation = nationJSON;
   spec.layer.push(genMissingLayer());
   spec.datasets.state = stateJSON;
   spec.layer.push(genMegaLayer(megaCountyInfo));
-  spec.layer.push(genLevelLayer(level, infos, 0));
-  spec.layer.push(genStateBorderLayer());
+  spec.layer.push(genLevelLayer(0));
+  spec.layer.push(genMegaBorderLayer());
+  spec.layer.push(genMegaHoverLayer());
+  spec.layer.push(genLevelHoverLayer());
   return spec;
 }
 
 /**
  * generates a map of counties for a specific state
- * @param {string} title
+ * @param {string} 
  * @param {import('../../maps').NameInfo} state
  */
-export function generateCountyOfStateSpec(title, state) {
+export function generateCountyOfStateSpec(state) {
   const level = 'county';
   const topoJSON = countyJSON;
   const infos = countyInfo;
 
-  const spec = genBaseSpec(title, level, topoJSON);
+  const spec = genBaseSpec(level, topoJSON, infos);
 
   /**
    * @type {import('vega-lite/build/src/transform').Transform}
    */
-  const isCalifornia = {
+  const isState = {
     filter: `lower(datum.id) == '${state.id}'`,
   };
   /**
    * @type {import('vega-lite/build/src/transform').Transform}
    */
-  const isCaliforniaCounty = {
+  const isCountyOfState = {
     filter: `slice(lower(datum.id), 0, 2) == '${state.id}'`,
   };
+  spec.transform.unshift(isCountyOfState);
 
   spec.datasets.state = stateJSON;
   spec.layer.push(genMegaLayer(megaCountyInfo));
-  spec.layer[spec.layer.length - 1].transform.unshift(isCalifornia);
-  spec.layer.push(genLevelLayer(level, infos, 1));
-  spec.layer[spec.layer.length - 1].transform.unshift(isCaliforniaCounty);
+  spec.layer[spec.layer.length - 1].transform.unshift(isState);
+  spec.layer.push(genLevelLayer());
+  spec.layer.push(genLevelHoverLayer());
   return spec;
 }

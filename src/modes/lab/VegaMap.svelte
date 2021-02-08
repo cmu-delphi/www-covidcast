@@ -12,11 +12,11 @@
 
   const sensor = sensorMap.get(DEFAULT_SURVEY_SENSOR);
 
-  const nationSpec = generateNationSpec(`${sensor.name} - US`);
-  const stateSpec = generateStateSpec(`${sensor.name} - US`);
-  const countySpec = generateCountySpec(`${sensor.name} - US`);
-  const msaSpec = generateMSASpec(`${sensor.name} - US`);
-  const hrrSpec = generateHRRSpec(`${sensor.name} - US`);
+  const nationSpec = generateNationSpec();
+  const stateSpec = generateStateSpec();
+  const countySpec = generateCountySpec();
+  const msaSpec = generateMSASpec();
+  const hrrSpec = generateHRRSpec();
 
   const nationData = fetchRegionSlice(sensor, 'nation', new Date(2021, 1 - 1, 15));
   const stateData = fetchRegionSlice(sensor, 'state', new Date(2021, 1 - 1, 15));
