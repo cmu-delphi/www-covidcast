@@ -1,3 +1,5 @@
+import { MAP_THEME, selectionColors } from '../theme';
+
 export function patchHighlightTuple(current) {
   // patches the highlight signal,
   // see current.on[0].update
@@ -60,6 +62,7 @@ export function generateLineChartSpec({ height = 300, initialDate = null, valueF
       {
         mark: {
           type: 'line',
+          stroke: MAP_THEME.selectedRegionOutline,
           point: false,
         },
         encoding: {
@@ -100,6 +103,7 @@ export function generateLineChartSpec({ height = 300, initialDate = null, valueF
         },
         mark: {
           type: 'point',
+          stroke: MAP_THEME.selectedRegionOutline,
           tooltip: true,
         },
         encoding: {
@@ -213,6 +217,7 @@ export function generateCompareLineSpec(compare, { compareField = 'displayName',
     type: 'nominal',
     scale: {
       domain: compare,
+      range: selectionColors,
     },
     legend: {
       direction: 'horizontal',
