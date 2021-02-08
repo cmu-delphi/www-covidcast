@@ -30,9 +30,7 @@
 <div class="root">
   <SurveyParameters sensor={$currentSensorEntry} items={nameInfos} defaultItem={nationInfo} />
   <div class="uk-container content-grid">
-    <div class="grid-3-11">
-      {$currentSensorEntry.name}
-    </div>
+    <div class="grid-3-11">{$currentSensorEntry.name}</div>
     <div class="grid-3-11 details">
       <GeoTable {params} sensor={$currentSensorEntry} />
     </div>
