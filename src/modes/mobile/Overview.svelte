@@ -31,6 +31,9 @@
 </script>
 
 <style>
+  p {
+    font-size: 0.875rem;
+  }
   .summary-stats {
     display: flex;
     align-items: flex-start;
