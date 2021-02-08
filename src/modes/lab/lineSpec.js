@@ -1,3 +1,11 @@
+export function patchHighlightTuple(current) {
+  // patches the highlight signal,
+  // see current.on[0].update
+  const updateCode = current.on[0].update;
+  current.on[0].update = `patchPickedItem(event) && item().${updateCode.replace(/ datum/, ' item().datum')}`;
+  return current;
+}
+
 export function generateLineChartSpec(title, smartPadding = true, initDate = null) {
   /**
    * @type {import('vega-lite').TopLevelSpec}
