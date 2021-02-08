@@ -218,6 +218,9 @@ function genLevelLayer(level, infos, strokeWidth = 1) {
       tooltip: { content: 'data' },
     },
     encoding: {
+      key: {
+        field: 'id',
+      },
       color: {
         condition: {
           test: 'datum.value === 0',
