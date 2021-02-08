@@ -273,6 +273,7 @@ function genLevelLayer({ strokeWidth = 1, scheme = 'yellowgreenblue', domain = u
           tickMinStep: 0.1,
           titleOrient: 'left',
           title: legendTitle,
+          titleFontWeight: 'normal',
         },
       },
     },

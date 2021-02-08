@@ -3,6 +3,7 @@
   import { fetchData } from '../../data';
   import { formatDateLocal, formatDateShort } from '../../formats';
   import { sensorList, times } from '../../stores';
+  import HistoryLineChart from './HistoryLineChart.svelte';
   import RegionMap from './RegionMap.svelte';
 
   /**
@@ -42,11 +43,16 @@
     font-size: 2.75rem;
   }
 
-  .chart {
+  .chart-map, .chart-line {
     position: relative;
   }
-  .chart > :global(*) {
+  .chart-map > :global(*) {
     width: 100%;
+    height: 300px;
+  }
+  .chart-line > :global(*) {
+    width: 100%;
+    height: 150px;
   }
 
   .trend {
@@ -85,7 +91,7 @@
   </div>
 </div>
 
-<div class="chart">
+<div class="chart-map">
   <RegionMap {params} sensor={casesSensor} />
 </div>
 
@@ -102,21 +108,21 @@
   {formatDateShort(params.date)}.
 </p>
 
-<div class="chart">TODO line chart of cases</div>
-<div class="trend">
-  [percent] [trend] in cases
+<div class="chart-line">
+  <HistoryLineChart {params} sensor={casesSensor} />
 </div>
+<div class="trend">[percent] [trend] in cases</div>
 <p>
   Over the past week, there has been an
-  <strong>average of {#await casesData}N/A{:then d}{d ? formatNumber(d.avg) : 'N/A'}{/await} cases per day</strong>, a
+  <strong>average of
+    {#await casesData}N/A{:then d}{d ? formatNumber(d.avg) : 'N/A'}{/await}
+    cases per day</strong>, a
   <strong>[trend] of [xx] percent</strong>
   from average two weeks earlier.
 </p>
 
 <div class="chart">TODO line chart of vaccines</div>
-<div class="trend">
-  [percent] [trend] in vaccines administered
-</div>
+<div class="trend">[percent] [trend] in vaccines administered</div>
 
 <p><strong>[00] vaccines</strong> were administered in the past 7 days.</p>
 <p>

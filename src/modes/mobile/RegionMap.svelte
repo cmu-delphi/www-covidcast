@@ -23,7 +23,7 @@
    * @param {import('../../stores/constants').SensorEntry} sensor
    * @param {import('../../maps').NameInfo} region
    */
-  function genMapSpec(stats, sensor, region) {
+  function genSpec(stats, sensor, region) {
     const options = {
       height: 400,
       domain: determineMinMax(stats, sensor, region.level === 'state' || region.level === 'county' ? 'county' : 'state', {}, false),
@@ -62,11 +62,8 @@
     });
   }
 
-  $: spec = genMapSpec($stats, sensor, params.region);
+  $: spec = genSpec($stats, sensor, params.region);
   $: data = loadData(sensor, params);
 </script>
-
-<style>
-</style>
 
 <Vega {className} {spec} {data} tooltip={RegionMapTooltip} />
