@@ -3,6 +3,7 @@
   import { currentRegionInfo, smallMultipleTimeSpan, currentSensorEntry } from '../../stores';
   import SurveyParameters from '../survey/SurveyParameters.svelte';
   import SignalTable from './SignalTable.svelte';
+  import Overview from './Overview.svelte';
   import './common.css';
 
   // use local variables with manual setting for better value comparison updates
@@ -38,7 +39,7 @@
   <SurveyParameters sensor={$currentSensorEntry} items={nameInfos} defaultItem={nationInfo} />
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <h2>Overview</h2>
+      <Overview {params} />
     </div>
     <div class="grid-3-11 details">
       <SignalTable {params} />
