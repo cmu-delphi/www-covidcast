@@ -64,7 +64,7 @@ export function generateLineChartSpec({ height = 300, initialDate = null, valueF
       {
         mark: {
           type: 'line',
-          stroke: COLOR,
+          color: COLOR,
           point: false,
         },
         encoding: {
@@ -105,7 +105,7 @@ export function generateLineChartSpec({ height = 300, initialDate = null, valueF
         },
         mark: {
           type: 'point',
-          fill: COLOR,
+          color: COLOR,
           stroke: null,
           tooltip: true,
         },

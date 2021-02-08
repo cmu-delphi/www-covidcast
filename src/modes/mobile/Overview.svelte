@@ -108,7 +108,7 @@
   <strong>
     {#await casesData}N/A{:then d}{d ? formatNumber(d.count) : 'N/A'}{/await}
     new cases</strong>
-  wree reported in the United states on
+  wree reported in {params.region.displayName} on
   {formatDateShort(params.date)}.
 </p>
 
