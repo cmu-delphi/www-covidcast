@@ -1,0 +1,27 @@
+.mobile-h2 {
+  margin-top: 4px;
+  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 2rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.mobile-h3 {
+  text-align: left;
+  margin-top: 4px;
+  font-weight: normal;
+  font-size: 1rem;
+  line-height: 2rem;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+}
+
+.mobile-th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  text-transform: uppercase;
+  vertical-align: top;
+}

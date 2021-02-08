@@ -1,4 +1,5 @@
 import { timeFormat } from 'd3-time-format';
+import { format } from 'd3-format';
 
 const short = timeFormat('%B %d');
 const shortAbbr = timeFormat('%b %d');
@@ -58,4 +59,10 @@ export function formatPopulation(info) {
     return 'Unknown';
   }
   return info.population.toLocaleString();
+}
+
+const f = format('.1f');
+
+export function formatValue(value) {
+  return value == null || Number.isNaN(value) ? 'N/A' : f(value);
 }

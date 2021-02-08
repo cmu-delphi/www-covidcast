@@ -142,6 +142,12 @@ module.exports = () => {
       }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
+        title: 'COVIDcast',
+        template: './src/index.html',
+        filename: 'mobile/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        alwaysWriteToDisk: true,
         title: 'COVIDcast Timelapse',
         template: './src/index.html',
         filename: 'timelapse/index.html',
