@@ -3,7 +3,7 @@
   import { fetchData, formatAPITime } from '../../data';
   import { getInfoByName, getCountiesOfState } from '../../maps';
   import { DEFAULT_SURVEY_SENSOR, sensorMap } from '../../stores/constants';
-  import { generateCountyOfStateSpec } from '../../specs/mapSpec';
+  import { generateCountiesOfStateSpec } from '../../specs/mapSpec';
 
   const sensor = sensorMap.get(DEFAULT_SURVEY_SENSOR);
   const date = new Date(2021, 1 - 1, 15);
@@ -11,7 +11,7 @@
   function generateState(stateId) {
     const state = getInfoByName(stateId);
     const counties = getCountiesOfState(state);
-    const spec = generateCountyOfStateSpec(state);
+    const spec = generateCountiesOfStateSpec(state);
     const data = fetchData(sensor, 'county', `${state.id}000,${counties.map((d) => d.id).join(',')}`, date, {
       time_value: formatAPITime(date),
     });

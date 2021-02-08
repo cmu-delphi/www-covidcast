@@ -82,6 +82,7 @@ export function getLevelInfo(level) {
  * @property {(options?: CasesOrDeathOptions) => 'prop' | 'count' | 'other')} getType
  * @property {Record<keyof EpiDataCasesOrDeathValues, string>} casesOrDeathSignals signal to load for cases or death
  * @property {)(v: number) => string)} colorScale
+ * @property {string} colorScaleId
  * @property {string} credits
  * @property {boolean?} default whether it should be default signal
  */
@@ -170,6 +171,7 @@ export function extendSensorEntry(sensorEntry) {
     isCount,
     getType: (options) => getType(sensorEntry, options),
     isCasesOrDeath,
+    colorScaleId: sensorEntry.colorScale || 'interpolateYlOrRd',
     colorScale: resolveColorScale(sensorEntry.colorScale),
     links: sensorEntry.links || [],
     plotTitleText: sensorEntry.plotTitleText || sensorEntry.name,

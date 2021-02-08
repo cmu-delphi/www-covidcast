@@ -1,11 +1,10 @@
 <script>
-import UiKitHint from "../../components/UIKitHint.svelte";
-import { fetchData } from "../../data";
-import { formatDateShort } from "../../formats";
-import { currentDate, currentDateObject, sensorList, times } from "../../stores";
+  import UiKitHint from '../../components/UIKitHint.svelte';
+  import { fetchData } from '../../data';
+  import { formatDateLocal } from '../../formats';
+  import { sensorList, times } from '../../stores';
 
-
-   /**
+  /**
    * @type {import("../utils").Params}
    */
   export let params;
@@ -15,15 +14,14 @@ import { currentDate, currentDateObject, sensorList, times } from "../../stores"
 
   $: minMaxDate = $times.get(casesSensor.key);
 
-  $: casesData = fetchData(casesSensor, params.region.level, params.region.propertyId, $currentDateObject, {
+  $: casesData = fetchData(casesSensor, params.region.level, params.region.propertyId, params.date, {
     geo_value: params.region.propertyId,
-    time_value: Number.parseInt($currentDate, 10)
+    time_value: params.timeValue,
   }).then((r) => r[0]);
-  $: deathData = fetchData(deathSensor, params.region.level, params.region.propertyId, $currentDateObject, {
+  $: deathData = fetchData(deathSensor, params.region.level, params.region.propertyId, params.date, {
     geo_value: params.region.propertyId,
-    time_value: Number.parseInt($currentDate, 10)
+    time_value: params.timeValue,
   }).then((r) => r[0]);
-
 
   function formatNumber(v) {
     return v == null ? 'N/A' : v.toLocaleString();
@@ -46,9 +44,7 @@ import { currentDate, currentDateObject, sensorList, times } from "../../stores"
 
 <h2>Overview</h2>
 
-<p>
-  Our COVID-19 data is compromized of [000] data sources that update on a daily basis.
-</p>
+<p>Our COVID-19 data is compromized of [000] data sources that update on a daily basis.</p>
 
 <div class="summary-stats">
   <div>
@@ -59,7 +55,7 @@ import { currentDate, currentDateObject, sensorList, times } from "../../stores"
       Total Cases
       {#await casesData then d}
         <UiKitHint
-          title="Between {formatDateShort(minMaxDate[0])} and {formatDateShort(minMaxDate[1])} around {formatNumber(d.countCumulative)} people were reported having COVID-19." />
+          title="Between {formatDateLocal(minMaxDate[0])} and {formatDateLocal(minMaxDate[1])} around {formatNumber(d.countCumulative)} people were reported having COVID-19." />
       {/await}
     </div>
   </div>
@@ -71,7 +67,7 @@ import { currentDate, currentDateObject, sensorList, times } from "../../stores"
       Total Deaths
       {#await deathData then d}
         <UiKitHint
-          title="Between {formatDateShort(minMaxDate[0])} and {formatDateShort(minMaxDate[1])} around {formatNumber(d.countCumulative)} people died because of COVID-19" />
+          title="Between {formatDateLocal(minMaxDate[0])} and {formatDateLocal(minMaxDate[1])} around {formatNumber(d.countCumulative)} people died because of COVID-19" />
       {/await}
     </div>
   </div>

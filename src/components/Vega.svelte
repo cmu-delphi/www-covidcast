@@ -7,6 +7,8 @@
 
   const dispatch = createEventDispatcher();
 
+  export let className = '';
+
   /**
    * @type {import('vega-embed').VisualizationSpec}
    */
@@ -297,7 +299,7 @@
 
 <div
   bind:this={root}
-  class="root vega-embed"
+  class="root vega-embed {className}"
   class:loading-bg={!hasError && loading}
   class:message-overlay={hasError || (noData && !loading)}
   data-message={message}

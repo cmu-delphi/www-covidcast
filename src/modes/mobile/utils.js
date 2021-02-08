@@ -6,7 +6,7 @@ import { formatAPITime } from '../../data';
  * @property {Date} endDay
  */
 
-function toTimeValue(date) {
+export function toTimeValue(date) {
   return Number.parseInt(formatAPITime(date), 10);
 }
 /**

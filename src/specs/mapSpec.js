@@ -4,6 +4,14 @@ import hrrJSON from './shapefiles/hrr.json';
 import nationJSON from './shapefiles/nation.json';
 import stateJSON from './shapefiles/state.json';
 import msaJSON from './shapefiles/msa.json';
+import getRelatedCounties from '../maps/related';
+import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
+
+const EPIDATA_ROW_KEYS = ['geo_value', 'value', 'date_value', 'time_value', 'stderr', 'sample_size'].concat(
+  EPIDATA_CASES_OR_DEATH_VALUES,
+);
+const NAME_INFO_KEYS = ['propertyId', 'displayName', 'population', 'state'];
+
 
 function genMissingLayer(missingLevel = 'nation') {
   /**
@@ -121,7 +129,7 @@ function genMegaLayer(infos) {
         from: {
           data: { values: infos },
           key: 'id',
-          fields: ['propertyId', 'displayName', 'population'],
+          fields: NAME_INFO_KEYS,
         },
       },
       {
@@ -133,7 +141,7 @@ function genMegaLayer(infos) {
         from: {
           data: { name: 'values' },
           key: 'geo_value',
-          fields: ['geo_value', 'value'],
+          fields: EPIDATA_ROW_KEYS,
         },
       },
     ],
@@ -228,7 +236,7 @@ function genMegaHoverLayer() {
   return layer;
 }
 
-function genLevelLayer(strokeWidth = 1) {
+function genLevelLayer({ strokeWidth = 1, scheme = 'yellowgreenblue', domain = undefined, legendTitle = null } = {}) {
   /**
    * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
    */
@@ -251,19 +259,20 @@ function genLevelLayer(strokeWidth = 1) {
         field: 'value',
         type: 'quantitative',
         scale: {
+          domain,
           // domainMin: 0,
           // domainMax: 149,
-          scheme: 'yellowgreenblue',
+          scheme,
           clamp: true,
         },
         legend: {
           orient: 'right',
-          Align: 'center',
-          FontWeight: 'normal',
-          Orient: 'left',
-          title: 'of 100 people',
+          align: 'center',
+          fontWeight: 'normal',
           labelLimit: 30,
           tickMinStep: 0.1,
+          titleOrient: 'left',
+          title: legendTitle,
         },
       },
     },
@@ -326,7 +335,7 @@ function genBaseSpec(level, topoJSON, infos, { height = 300 }) {
       left: 10,
       bottom: 10,
       top: 10,
-      right: 10,
+      right: 100,
     },
     autosize: {
       type: 'none',
@@ -352,7 +361,7 @@ function genBaseSpec(level, topoJSON, infos, { height = 300 }) {
         from: {
           data: { values: infos },
           key: 'id',
-          fields: ['propertyId', 'displayName', 'population', 'state'],
+          fields: NAME_INFO_KEYS,
         },
       },
       {
@@ -364,7 +373,7 @@ function genBaseSpec(level, topoJSON, infos, { height = 300 }) {
         from: {
           data: { name: 'values' },
           key: 'geo_value',
-          fields: ['geo_value', 'value'],
+          fields: EPIDATA_ROW_KEYS,
         },
       },
     ],
@@ -387,7 +396,7 @@ export function generateHRRSpec(options = {}) {
   spec.datasets.nation = nationJSON;
   spec.layer.push(genMissingLayer());
 
-  spec.layer.push(genLevelLayer());
+  spec.layer.push(genLevelLayer(options));
   spec.layer.push(genLevelHoverLayer());
   return spec;
 }
@@ -402,7 +411,7 @@ export function generateStateSpec(options = {}) {
   spec.layer.push(genMissingLayer());
 
   // state, msa
-  spec.layer.push(genLevelLayer());
+  spec.layer.push(genLevelLayer(options));
   spec.layer.push(genLevelHoverLayer());
   return spec;
 }
@@ -417,7 +426,7 @@ export function generateMSASpec(options = {}) {
   spec.layer.push(genMissingLayer());
 
   // state, msa
-  spec.layer.push(genLevelLayer());
+  spec.layer.push(genLevelLayer(options));
   spec.layer.push(genLevelHoverLayer());
   return spec;
 }
@@ -433,7 +442,7 @@ export function generateNationSpec(options = {}) {
     as: 'id',
   });
 
-  spec.layer.push(genLevelLayer());
+  spec.layer.push(genLevelLayer(options));
   spec.layer.push(genLevelHoverLayer());
   return spec;
 }
@@ -452,7 +461,7 @@ export function generateCountySpec(options = {}) {
   spec.layer.push(genMissingLayer());
   spec.datasets.state = stateJSON;
   spec.layer.push(genMegaLayer(megaCountyInfo));
-  spec.layer.push(genLevelLayer(0));
+  spec.layer.push(genLevelLayer({ ...options, strokeWidth: 0 }));
   spec.layer.push(genMegaBorderLayer());
   spec.layer.push(genMegaHoverLayer());
   spec.layer.push(genLevelHoverLayer());
@@ -461,10 +470,9 @@ export function generateCountySpec(options = {}) {
 
 /**
  * generates a map of counties for a specific state
- * @param {string}
  * @param {import('../maps').NameInfo} state
  */
-export function generateCountyOfStateSpec(state, options = {}) {
+export function generateCountiesOfStateSpec(state, options = {}) {
   const level = 'county';
   const topoJSON = countyJSON;
   const infos = countyInfo;
@@ -488,7 +496,43 @@ export function generateCountyOfStateSpec(state, options = {}) {
   spec.datasets.state = stateJSON;
   spec.layer.push(genMegaLayer(megaCountyInfo));
   spec.layer[spec.layer.length - 1].transform.unshift(isState);
-  spec.layer.push(genLevelLayer());
+  spec.layer.push(genLevelLayer(options));
   spec.layer.push(genLevelHoverLayer());
+  return spec;
+}
+
+/**
+ * generates a map of the county and its related counties
+ * @param {import('../maps').NameInfo} county
+ */
+export function generateRelatedCountySpec(county, options = {}) {
+  const level = 'county';
+  const topoJSON = countyJSON;
+  const infos = countyInfo;
+
+  const spec = genBaseSpec(level, topoJSON, infos, options);
+  const related = getRelatedCounties(county);
+
+  /**
+   * @type {import('vega-lite/build/src/transform').Transform}
+   */
+  const isRelevantCounty = {
+    filter: [county, ...related].map((d) => `datum.id === '${d.id}'`).join(' || '),
+  };
+  spec.transform.unshift(isRelevantCounty);
+  spec.layer.push(genLevelLayer(options));
+  spec.layer.push(genLevelHoverLayer());
+  // highlight the selected one
+  spec.layer[spec.layer.length - 1].encoding.opacity.condition = {
+    test: {
+      or: [
+        {
+          selection: 'hover',
+        },
+        `datum.id === '${county.id}'`,
+      ],
+    },
+    value: 1,
+  };
   return spec;
 }
