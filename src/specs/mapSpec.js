@@ -1,9 +1,9 @@
-import { countyInfo, hrrInfo, megaCountyInfo, nationInfo, stateInfo, msaInfo } from '../../maps';
-import countyJSON from './maps2/county.json';
-import hrrJSON from './maps2/hrr.json';
-import nationJSON from './maps2/nation.json';
-import stateJSON from './maps2/state.json';
-import msaJSON from './maps2/msa.json';
+import { countyInfo, hrrInfo, megaCountyInfo, nationInfo, stateInfo, msaInfo } from '../maps';
+import countyJSON from './shapefiles/county.json';
+import hrrJSON from './shapefiles/hrr.json';
+import nationJSON from './shapefiles/nation.json';
+import stateJSON from './shapefiles/state.json';
+import msaJSON from './shapefiles/msa.json';
 
 function genMissingLayer(missingLevel = 'nation') {
   /**
@@ -316,12 +316,12 @@ function genLevelHoverLayer() {
   return layer;
 }
 
-function genBaseSpec(level, topoJSON, infos) {
+function genBaseSpec(level, topoJSON, infos, { height = 300 }) {
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
   const spec = {
-    height: 300,
+    height,
     padding: {
       left: 10,
       bottom: 10,
@@ -378,12 +378,12 @@ function genBaseSpec(level, topoJSON, infos) {
   return spec;
 }
 
-export function generateHRRSpec() {
+export function generateHRRSpec(options = {}) {
   const level = 'hrr';
   const topoJSON = hrrJSON;
   const infos = hrrInfo;
 
-  const spec = genBaseSpec(level, topoJSON, infos);
+  const spec = genBaseSpec(level, topoJSON, infos, options);
   spec.datasets.nation = nationJSON;
   spec.layer.push(genMissingLayer());
 
@@ -392,12 +392,12 @@ export function generateHRRSpec() {
   return spec;
 }
 
-export function generateStateSpec() {
+export function generateStateSpec(options = {}) {
   const level = 'state';
   const topoJSON = stateJSON;
   const infos = stateInfo;
 
-  const spec = genBaseSpec(level, topoJSON, infos);
+  const spec = genBaseSpec(level, topoJSON, infos, options);
   spec.datasets.nation = nationJSON;
   spec.layer.push(genMissingLayer());
 
@@ -407,12 +407,12 @@ export function generateStateSpec() {
   return spec;
 }
 
-export function generateMSASpec() {
+export function generateMSASpec(options = {}) {
   const level = 'msa';
   const topoJSON = msaJSON;
   const infos = msaInfo;
 
-  const spec = genBaseSpec(level, topoJSON, infos);
+  const spec = genBaseSpec(level, topoJSON, infos, options);
   spec.datasets.nation = nationJSON;
   spec.layer.push(genMissingLayer());
 
@@ -422,12 +422,12 @@ export function generateMSASpec() {
   return spec;
 }
 
-export function generateNationSpec() {
+export function generateNationSpec(options = {}) {
   const level = 'nation';
   const topoJSON = nationJSON;
   const infos = [nationInfo];
 
-  const spec = genBaseSpec(level, topoJSON, infos);
+  const spec = genBaseSpec(level, topoJSON, infos, options);
   spec.transform.unshift({
     calculate: JSON.stringify('us'),
     as: 'id',
@@ -441,12 +441,12 @@ export function generateNationSpec() {
 /**
  * generates a map of counties
  */
-export function generateCountySpec() {
+export function generateCountySpec(options = {}) {
   const level = 'county';
   const topoJSON = countyJSON;
   const infos = countyInfo;
 
-  const spec = genBaseSpec(level, topoJSON, infos);
+  const spec = genBaseSpec(level, topoJSON, infos, options);
 
   spec.datasets.nation = nationJSON;
   spec.layer.push(genMissingLayer());
@@ -461,15 +461,15 @@ export function generateCountySpec() {
 
 /**
  * generates a map of counties for a specific state
- * @param {string} 
- * @param {import('../../maps').NameInfo} state
+ * @param {string}
+ * @param {import('../maps').NameInfo} state
  */
-export function generateCountyOfStateSpec(state) {
+export function generateCountyOfStateSpec(state, options = {}) {
   const level = 'county';
   const topoJSON = countyJSON;
   const infos = countyInfo;
 
-  const spec = genBaseSpec(level, topoJSON, infos);
+  const spec = genBaseSpec(level, topoJSON, infos, options);
 
   /**
    * @type {import('vega-lite/build/src/transform').Transform}

@@ -13,10 +13,6 @@
       component: () => import('./VegaMap.svelte').then((r) => r.default),
     },
     {
-      name: 'DataJournalistChart',
-      component: () => import('./DataJournalistChart.svelte').then((r) => r.default),
-    },
-    {
       name: 'County Related',
       component: () => import('./CountyRelated.svelte').then((r) => r.default),
     },

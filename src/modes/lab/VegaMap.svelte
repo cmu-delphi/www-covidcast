@@ -8,7 +8,7 @@
     generateCountySpec,
     generateMSASpec,
     generateHRRSpec,
-  } from './mapSpec';
+  } from '../../specs/mapSpec';
 
   const sensor = sensorMap.get(DEFAULT_SURVEY_SENSOR);
 

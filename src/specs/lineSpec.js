@@ -6,13 +6,30 @@ export function patchHighlightTuple(current) {
   return current;
 }
 
-export function generateLineChartSpec(title, smartPadding = true, initDate = null) {
+export const signalPatches = {
+  highlight_tuple: patchHighlightTuple,
+};
+
+function smartPadding(valueField = 'value') {
+  return {
+    // in case the values are close to 0 .. no padding otherwise some padding
+    // if range.min < 10 && range.range > 30 ? 0 : 20
+    expr: `customObjChecks(customExtent(data("values"), "${valueField}"), ['min', '<', 10], ['range', '>', 30]) ? 0 : 20`,
+  };
+}
+
+const AUTO_ALIGN = {
+  // auto align based on remaining space
+  expr:
+    "(width - scale('x', datum.date_value)) < 40 ? 'right' : (scale('x', datum.date_value)) > 40 ? 'center' : 'left'",
+};
+
+export function generateLineChartSpec({ height = 300, initialDate = null, valueField = 'value' } = {}) {
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
   const spec = {
-    title,
-    height: 300,
+    height,
     padding: { left: 50, top: 16, bottom: 20, right: 10 },
     autosize: {
       type: 'none',
@@ -47,7 +64,7 @@ export function generateLineChartSpec(title, smartPadding = true, initDate = nul
         },
         encoding: {
           y: {
-            field: 'value',
+            field: valueField,
             type: 'quantitative',
             axis: {
               grid: true,
@@ -60,13 +77,7 @@ export function generateLineChartSpec(title, smartPadding = true, initDate = nul
               round: true,
               zero: false,
               domainMin: null,
-              padding: smartPadding
-                ? {
-                    // in case the values are close to 0 .. no padding otherwise some padding
-                    // if range.min < 10 && range.range > 30 ? 0 : 20
-                    expr: `customObjChecks(customExtent(data("values"), "value"), ['min', '<', 10], ['range', '>', 30]) ? 0 : 20`,
-                  }
-                : 0,
+              padding: smartPadding(valueField),
             },
           },
         },
@@ -76,9 +87,9 @@ export function generateLineChartSpec(title, smartPadding = true, initDate = nul
           highlight: {
             type: 'single',
             empty: 'none',
-            init: initDate
+            init: initialDate
               ? {
-                  x: initDate,
+                  x: initialDate,
                 }
               : undefined,
             on: 'click, [mousedown, window:mouseup] > mousemove, [touchstart, touchend] > touchmove',
@@ -93,7 +104,7 @@ export function generateLineChartSpec(title, smartPadding = true, initDate = nul
         },
         encoding: {
           y: {
-            field: 'value',
+            field: valueField,
             type: 'quantitative',
           },
           opacity: {
@@ -131,11 +142,7 @@ export function generateLineChartSpec(title, smartPadding = true, initDate = nul
         ],
         mark: {
           type: 'text',
-          align: {
-            // auto align based on remaining space
-            expr:
-              "(width - scale('x', datum.date_value)) < 40 ? 'right' : (scale('x', datum.date_value)) > 40 ? 'center' : 'left'",
-          },
+          align: AUTO_ALIGN,
           baseline: 'bottom',
           fontSize: 14,
           dy: -1,
@@ -176,13 +183,13 @@ export function generateLineChartSpec(title, smartPadding = true, initDate = nul
         },
         encoding: {
           text: {
-            field: 'value',
+            field: valueField,
             type: 'quantitative',
             format: '.1f',
             formatType: 'cachedNumber',
           },
           y: {
-            field: 'value',
+            field: valueField,
             type: 'quantitative',
           },
         },
@@ -193,16 +200,40 @@ export function generateLineChartSpec(title, smartPadding = true, initDate = nul
       view: {
         stroke: null,
       },
-      axis: {
-        // labelFont: 20,
-        // tickMinStep: 10,
-      },
-      title: {
-        anchor: 'start',
-        fontWeight: 'normal',
-        fontSize: 32,
+    },
+  };
+  return spec;
+}
+
+export function generateCompareLineSpec(compare, { compareField = 'displayName', ...options } = {}) {
+  const spec = generateLineChartSpec(options);
+  spec.padding.bottom = 50;
+  spec.layer[0].encoding.color = {
+    field: compareField,
+    type: 'nominal',
+    scale: {
+      domain: compare,
+    },
+    legend: {
+      direction: 'horizontal',
+      orient: 'bottom',
+      title: null,
+      symbolType: 'stroke',
+      symbolStrokeWidth: {
+        expr: `datum.label === "${compare[0]}" ? 3 : 1`,
       },
     },
+  };
+  spec.layer[0].encoding.strokeWidth = {
+    condition: {
+      test: `datum['${compareField}'] === "${compare[0]}"`,
+      value: 3,
+    },
+    value: 1,
+  };
+  spec.layer[1].encoding.color = {
+    field: compareField,
+    type: 'nominal',
   };
   return spec;
 }
