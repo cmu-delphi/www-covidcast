@@ -1,8 +1,9 @@
 <script>
   import UiKitHint from '../../components/UIKitHint.svelte';
   import { fetchData } from '../../data';
-  import { formatDateLocal } from '../../formats';
+  import { formatDateLocal, formatDateShort } from '../../formats';
   import { sensorList, times } from '../../stores';
+  import RegionMap from './RegionMap.svelte';
 
   /**
    * @type {import("../utils").Params}
@@ -40,6 +41,17 @@
   .summary-stats-number {
     font-size: 2.75rem;
   }
+
+  .chart {
+    position: relative;
+  }
+  .chart > :global(*) {
+    width: 100%;
+  }
+
+  .trend {
+    text-align: center;
+  }
 </style>
 
 <h2>Overview</h2>
@@ -72,3 +84,45 @@
     </div>
   </div>
 </div>
+
+<div class="chart">
+  <RegionMap {params} sensor={casesSensor} />
+</div>
+
+<p>
+  At least
+  <strong>
+    {#await deathData}N/A{:then d}{d ? formatNumber(d.count) : 'N/A'}{/await}
+    new coronavirus deaths</strong>
+  and
+  <strong>
+    {#await casesData}N/A{:then d}{d ? formatNumber(d.count) : 'N/A'}{/await}
+    new cases</strong>
+  wree reported in the United states on
+  {formatDateShort(params.date)}.
+</p>
+
+<div class="chart">TODO line chart of cases</div>
+<div class="trend">
+  [percent] [trend] in cases
+</div>
+<p>
+  Over the past week, there has been an
+  <strong>average of {#await casesData}N/A{:then d}{d ? formatNumber(d.avg) : 'N/A'}{/await} cases per day</strong>, a
+  <strong>[trend] of [xx] percent</strong>
+  from average two weeks earlier.
+</p>
+
+<div class="chart">TODO line chart of vaccines</div>
+<div class="trend">
+  [percent] [trend] in vaccines administered
+</div>
+
+<p><strong>[00] vaccines</strong> were administered in the past 7 days.</p>
+<p>
+  <strong>[name of county and state]</strong>
+  are leading with
+  <strong>[xx]</strong>
+  vaccines administered in the
+  <strong>past 7 days</strong>.
+</p>

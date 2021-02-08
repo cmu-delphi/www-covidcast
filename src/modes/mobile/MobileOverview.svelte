@@ -1,10 +1,9 @@
 <script>
   import { nameInfos, nationInfo } from '../../maps';
-  import { currentRegionInfo, smallMultipleTimeSpan, currentSensorEntry, currentDateObject, sensorList } from '../../stores';
+  import { currentRegionInfo, smallMultipleTimeSpan, currentSensorEntry, currentDateObject } from '../../stores';
   import SurveyParameters from '../survey/SurveyParameters.svelte';
   import SignalTable from './SignalTable.svelte';
   import Overview from './Overview.svelte';
-  import RegionMap from './RegionMap.svelte';
   import { toTimeValue } from './utils';
   import './common.css';
 
@@ -27,8 +26,6 @@
     date: $currentDateObject,
     timeValue: toTimeValue($currentDateObject)
   };
-
-  const casesSensor = sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Cases'));
 </script>
 
 <style>
@@ -51,7 +48,6 @@
     <div class="grid-3-11">
       <Overview {params} />
     </div>
-    <RegionMap {params} sensor={casesSensor} className="grid-3-11"/>
     <div class="grid-3-11 details">
       <SignalTable {params} />
     </div>
