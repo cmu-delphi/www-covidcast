@@ -1,4 +1,6 @@
-import { MAP_THEME, selectionColors } from '../theme';
+import { selectionColors } from '../theme';
+
+const COLOR = '#666666';
 
 export function patchHighlightTuple(current) {
   // patches the highlight signal,
@@ -62,7 +64,7 @@ export function generateLineChartSpec({ height = 300, initialDate = null, valueF
       {
         mark: {
           type: 'line',
-          stroke: MAP_THEME.selectedRegionOutline,
+          stroke: COLOR,
           point: false,
         },
         encoding: {
@@ -103,7 +105,7 @@ export function generateLineChartSpec({ height = 300, initialDate = null, valueF
         },
         mark: {
           type: 'point',
-          fill: MAP_THEME.selectedRegionOutline,
+          fill: COLOR,
           stroke: null,
           tooltip: true,
         },
@@ -132,7 +134,10 @@ export function generateLineChartSpec({ height = 300, initialDate = null, valueF
             sample: 1,
           },
         ],
-        mark: 'rule',
+        mark: {
+          type: 'rule',
+          stroke: COLOR,
+        },
       },
       {
         transform: [
@@ -148,6 +153,7 @@ export function generateLineChartSpec({ height = 300, initialDate = null, valueF
         mark: {
           type: 'text',
           align: AUTO_ALIGN,
+          color: COLOR,
           baseline: 'bottom',
           fontSize: 14,
           dy: -1,
@@ -174,6 +180,7 @@ export function generateLineChartSpec({ height = 300, initialDate = null, valueF
         ],
         mark: {
           type: 'text',
+          color: COLOR,
           align: {
             // auto align based on remaining space
             expr: "(width - scale('x', datum.date_value)) < 40 ? 'right' : 'left'",
@@ -218,7 +225,7 @@ export function generateCompareLineSpec(compare, { compareField = 'displayName',
     type: 'nominal',
     scale: {
       domain: compare,
-      range: selectionColors,
+      range: [COLOR, ...selectionColors],
     },
     legend: {
       direction: 'horizontal',
@@ -292,7 +299,7 @@ export function generateSparkLine({ valueField = 'value', domain = null }) {
       {
         mark: {
           type: 'line',
-          color: MAP_THEME.selectedRegionOutline,
+          color: COLOR,
           point: false,
           interpolate: 'linear',
         },
@@ -300,7 +307,7 @@ export function generateSparkLine({ valueField = 'value', domain = null }) {
       {
         mark: {
           type: 'point',
-          fill: MAP_THEME.selectedRegionOutline,
+          fill: COLOR,
           stroke: null,
           tooltip: true,
         },
