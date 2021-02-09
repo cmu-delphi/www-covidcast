@@ -5,6 +5,7 @@
   import { currentDateObject } from '../../stores';
   import { defaultRegionOnStartup, sensorList } from '../../stores/constants';
   import { generateDistributionLineSpec, generateDistributionLineSpec2, signalPatches } from '../../specs/lineSpec';
+  import VegaTooltip from './VegaTooltip.svelte';
 
   const sensor = Object.assign(
     {},
@@ -34,5 +35,5 @@
 
 <h2>{state.displayName} - {sensor.name}</h2>
 
-<Vega {spec} {data} signals={signalPatches} />
-<Vega spec={spec2} {data} signals={signalPatches} />
+<Vega {spec} {data} signals={signalPatches} tooltip={VegaTooltip} tooltipProps={{ prop: 'geo_value' }} />
+<Vega spec={spec2} {data} signals={signalPatches} tooltip={VegaTooltip} tooltipProps={{ prop: 'geo_value' }} />

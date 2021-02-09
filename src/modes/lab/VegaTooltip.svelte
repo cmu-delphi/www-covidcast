@@ -7,6 +7,8 @@
    */
   export let item;
 
+  export let prop = 'displayName';
+
   /**
    * @type {View}
    */
@@ -19,7 +21,25 @@
           maximumFractionDigits: 1,
         });
   }
-  $: items = item && view ? view.data('values').filter((d) => d.time_value === item.time_value) : [];
+  $: items =
+    item && view
+      ? view
+          .data('values')
+          .filter((d) => d.time_value === item.time_value)
+          .sort((a, b) => a[prop].localeCompare(b[prop]))
+      : [];
+
+  function splitInGroups(items, len) {
+    const groups = Array(len)
+      .fill(0)
+      .map(() => []);
+    for (let i = 0; i < items.length; i++) {
+      groups[i % len].push(items[i]);
+    }
+    return groups;
+  }
+
+  $: itemGroups = items.length < 8 ? items.map((i) => [i]) : splitInGroups(items, 8);
 </script>
 
 <style>
@@ -43,10 +63,12 @@
 <div aria-label="tooltip" class="tooltip" class:hidden>
   <h5>{formatDateShort(item.date_value)}</h5>
   <table>
-    {#each items as i}
+    {#each itemGroups as g}
       <tr>
-        <th>{i.displayName}</th>
-        <td>{f(i.value)}</td>
+        {#each g as i}
+          <th>{i[prop]}</th>
+          <td>{f(i.value)}</td>
+        {/each}
       </tr>
     {/each}
   </table>
