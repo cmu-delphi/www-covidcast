@@ -4,7 +4,7 @@
   import { getInfoByName } from '../../maps';
   import { currentDateObject } from '../../stores';
   import { defaultRegionOnStartup, sensorList } from '../../stores/constants';
-  import { generateDistributionLineSpec, signalPatches } from '../../specs/lineSpec';
+  import { generateDistributionLineSpec, generateDistributionLineSpec2, signalPatches } from '../../specs/lineSpec';
 
   const sensor = Object.assign(
     {},
@@ -17,6 +17,7 @@
   const state = getInfoByName(defaultRegionOnStartup.state);
 
   const spec = generateDistributionLineSpec(state, { initialDate: $currentDateObject });
+  const spec2 = generateDistributionLineSpec2(state, { initialDate: $currentDateObject });
 
   const start = new Date(2020, 11 - 1, 1);
   const end = new Date();
@@ -34,3 +35,4 @@
 <h2>{state.displayName} - {sensor.name}</h2>
 
 <Vega {spec} {data} signals={signalPatches} />
+<Vega spec={spec2} {data} signals={signalPatches} />

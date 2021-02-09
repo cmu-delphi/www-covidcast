@@ -504,3 +504,47 @@ export function generateDistributionLineSpec(state, options = {}) {
   );
   return spec;
 }
+
+/**
+ *
+ * @param {import('../maps').NameInfo} state
+ */
+export function generateDistributionLineSpec2(state, options = {}) {
+  const spec = generateLineChartSpec(options);
+  spec.padding.bottom = 50;
+  spec.layer[0].encoding.color = {
+    condition: {
+      test: `datum.geo_value == '${state.propertyId.toLowerCase()}'`,
+      value: selectionColors[0],
+    },
+    value: COLOR,
+  };
+  spec.layer[0].encoding.detail = {
+    field: 'geo_value',
+  };
+  spec.layer[0].encoding.opacity = {
+    condition: {
+      test: `datum.geo_value == '${state.propertyId.toLowerCase()}'`,
+      value: 1,
+    },
+    value: 0.1,
+  };
+  spec.layer[0].encoding.strokeWidth = {
+    condition: {
+      test: `datum.geo_value == '${state.propertyId.toLowerCase()}'`,
+      value: 3,
+    },
+    value: 2,
+  };
+  spec.layer[1].encoding.color = {
+    condition: {
+      test: `datum.geo_value == '${state.propertyId.toLowerCase()}'`,
+      value: selectionColors[0],
+    },
+    value: COLOR,
+  };
+  spec.layer[1].encoding.detail = {
+    field: 'geo_value',
+  };
+  return spec;
+}
