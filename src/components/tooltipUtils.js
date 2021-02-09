@@ -80,10 +80,11 @@ export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}
   let tooltip = null;
   let extraProps = initialExtraProps;
 
-  const tooltipHandler = (_, event, item, value) => {
+  function tooltipHandler(_, event, item, value) {
     if (destroyed) {
       return;
     }
+    const view = this;
     const { popper, update, hide } = getOrInitPopper();
     // hide tooltip for null, undefined, or empty string values,
     // or when the item's datum.value is null.
@@ -93,6 +94,7 @@ export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}
       if (tooltip) {
         tooltip.$set({
           hidden: true,
+          view,
         });
       }
       return;
@@ -102,6 +104,7 @@ export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}
       tooltip.$set({
         hidden: false,
         item: resolveDatum(item),
+        view,
       });
     } else {
       tooltip = new svelteComponent({
@@ -110,10 +113,11 @@ export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}
           ...extraProps,
           hidden: false,
           item: resolveDatum(item),
+          view,
         },
       });
     }
-  };
+  }
 
   tooltipHandler.destroy = () => {
     if (tooltip) {

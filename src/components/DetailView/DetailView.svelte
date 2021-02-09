@@ -10,12 +10,15 @@
   import VegaTooltip from './VegaTooltip.svelte';
   import InfoDialogButton from '../InfoDialogButton.svelte';
   import { downloadUrl } from '../../util';
+  import { formatAPITime } from '../../../src/data/utils';
 
   const dispatch = createEventDispatcher();
   /**
    * @type {import('../../data/fetchData').SensorEntry}
    */
   export let sensor;
+
+  $: currentDateItem = formatAPITime($currentDateObject);
 
   $: mapTitle =
     typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText($signalCasesOrDeathOptions) : sensor.mapTitleText;
@@ -216,7 +219,7 @@
     signalListeners={['dateRange']}
     on:signal={onDateRangeChange}
     tooltip={VegaTooltip}
-    tooltipProps={{ sensor }} />
+    tooltipProps={{ sensor, currentDateItem }} />
 </div>
 {#if sensor.isCasesOrDeath && !isCumulative}
   <div class="legend">
