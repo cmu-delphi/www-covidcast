@@ -50,7 +50,8 @@
 </script>
 
 <style>
-  .chart-line, .chart-map {
+  .chart-line,
+  .chart-map {
     position: relative;
   }
   .chart-line > :global(*) {
