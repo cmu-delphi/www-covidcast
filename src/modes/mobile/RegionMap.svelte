@@ -34,7 +34,7 @@
         false,
       ),
       legendTitle: sensor.isCasesOrDeath ? `${sensor.yAxis} per 100,000` : sensor.yAxis,
-      scheme: sensor.colorScaleId === 'interpolateYlGrBl' ? 'yellowgreenblue' : 'yelloworangered',
+      scheme: sensor.colorScaleId === 'interpolateYlGnBu' ? 'yellowgreenblue' : 'yelloworangered',
     };
     if (region.level === 'state') {
       return generateCountiesOfStateSpec(region, options);

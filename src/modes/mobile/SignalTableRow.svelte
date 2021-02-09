@@ -7,6 +7,7 @@
   import { timeWeek } from 'd3-time';
   import SparkLineTooltip from './SparkLineTooltip.svelte';
   import HistoryLineChart from './HistoryLineChart.svelte';
+  import RegionMap from './RegionMap.svelte';
   import circleIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/circle.svg';
   import chevronUpIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-up.svg';
   import externalLinkAltIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/external-link-alt.svg';
@@ -49,12 +50,16 @@
 </script>
 
 <style>
-  .chart-line {
+  .chart-line, .chart-map {
     position: relative;
   }
   .chart-line > :global(*) {
     width: 100%;
     height: 150px;
+  }
+  .chart-map > :global(*) {
+    width: 100%;
+    height: 300px;
   }
 
   .popup-container {
@@ -140,6 +145,9 @@
           </button>
         </header>
         <div class="popup-body">
+          <div class="chart-map">
+            <RegionMap {params} {sensor} />
+          </div>
           <div class="chart-line">
             <HistoryLineChart {params} {sensor} />
           </div>
