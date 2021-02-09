@@ -137,6 +137,7 @@ export const smallMultipleTimeSpan = derived([currentDateObject], ([date]) => {
 
 /**
  * For mouseover highlighting across small multiple charts.
+ * Formatted as '%Y%m%d'. See formatAPITime.
  */
 export let highlightTimeValue = writable(null);
 

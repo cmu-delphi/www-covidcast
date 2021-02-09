@@ -1,5 +1,10 @@
 <script>
-  import { signalCasesOrDeathOptions, currentDateObject, smallMultipleTimeSpan } from '../../stores';
+  import {
+    signalCasesOrDeathOptions,
+    currentDateObject,
+    smallMultipleTimeSpan,
+    highlightTimeValue,
+  } from '../../stores';
   import { addMissing, fetchTimeSlice } from '../../data/fetchData';
   import Vega from '../Vega.svelte';
   import { createSpec, patchSpec } from './vegaSpec';
@@ -10,6 +15,7 @@
   import VegaTooltip from './VegaTooltip.svelte';
   import InfoDialogButton from '../InfoDialogButton.svelte';
   import { downloadUrl } from '../../util';
+  import { parseAPITime } from '../../../src/data/utils';
   import { formatAPITime } from '../../../src/data/utils';
 
   const dispatch = createEventDispatcher();
@@ -215,8 +221,8 @@
     {spec}
     {patchSpec}
     {noDataText}
-    signals={{ currentDate: $currentDateObject }}
-    signalListeners={['dateRange']}
+    signals={{ currentDate: $currentDateObject, highlightTimeValue }}
+    signalListeners={['dateRange', 'highlight']}
     on:signal={onDateRangeChange}
     tooltip={VegaTooltip}
     tooltipProps={{ sensor, currentDateItem }} />
@@ -232,4 +238,13 @@
 <div class="encoding">
   <EncodingOptions center {sensor} />
 </div>
+
+<div>
+  Date range details Current Date:
+  {$currentDateObject}
+  <br />
+  Hightlight Time:
+  {parseAPITime($highlightTimeValue)}
+</div>
+
 <svelte:window on:keydown={onEscCheck} />

@@ -199,7 +199,7 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
               },
             },
           },
-          // complicated construct to have proper typings
+          // Insert 'error bar', if the data includes it.
           ...(sensor.hasStdErr ? [stdErrLayer] : []),
           {
             transform: [
@@ -217,6 +217,30 @@ export function createSpec(sensor, primaryValue, selections, initialSelection, t
               },
             },
           },
+
+          // // Show area under data within range selection.
+          // {
+          //   transform: [
+          //     {
+          //       filter: `datum.geo_value == '${selections[0].info.propertyId}'`,
+          //     },
+          //     // { as: 'end', calculate: 'isValid(otherDate.date_value) ? otherDate.date_value : highlight.date_value' },
+          //     { as: 'endDate', calculate: 'highlight.date_value' },
+          //     { as: 'left', calculate: 'min(toDate(currentDate), datum.endDate)' },
+          //     { as: 'right', calculate: 'max(toDate(currentDate), datum.endDate)' },
+          //     {
+          //       filter: 'datum.left <= datum.date_value && datum.date_value <= datum.right',
+          //     },
+          //   ],
+          //   mark: { type: 'area', opacity: 0.1 },
+          //   encoding: {
+          //     y: {
+          //       field: primaryValue,
+          //       type: 'quantitative',
+          //     },
+          //   },
+          // },
+
           CURRENT_DATE_HIGHLIGHT,
         ],
       },
