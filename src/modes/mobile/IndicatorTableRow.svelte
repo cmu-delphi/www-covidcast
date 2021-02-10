@@ -11,6 +11,7 @@
   import circleIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/circle.svg';
   import chevronUpIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-up.svg';
   import externalLinkAltIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/external-link-alt.svg';
+  import plusCircleIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/plus-circle.svg';
 
   /**
    * @type {import('../../stores/constants').SensorEntry}
@@ -122,7 +123,14 @@
 
 <tr>
   {#if !open}
-    <td on:click={() => (open = true)}>{sensor.name}</td>
+    <td>
+      <a href="#{sensor.key}" class="uk-link-text" on:click|preventDefault={() => (open = true)}>
+        <span class="inline-svg-icon">
+          {@html plusCircleIcon}
+        </span>
+        {sensor.name}
+      </a>
+    </td>
     <td class="uk-text-right">TODO</td>
     <td class="uk-text-right">
       {#await currentRow}?{:then row}{row ? sensor.formatValue(row[valueKey]) : 'N/A'}{/await}
