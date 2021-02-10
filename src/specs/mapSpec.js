@@ -541,7 +541,7 @@ export function generateRelatedCountySpec(county, options = {}) {
 }
 
 export function generateStateTileSpec(options = {}) {
-  const level = 'tiles';
+  const level = 'state';
   const topoJSON = stateTilesJSON;
   const infos = stateInfo;
 
