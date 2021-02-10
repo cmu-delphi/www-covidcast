@@ -5,6 +5,7 @@ import nationJSON from './shapefiles/nation.json';
 import stateJSON from './shapefiles/state.json';
 import msaJSON from './shapefiles/msa.json';
 import stateTilesJSON from './tilegrams/state.topo.json';
+import nationTilesJSON from './tilegrams/nation.topo.json';
 import getRelatedCounties from '../maps/related';
 import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 import { MAP_THEME, MISSING_COLOR, ZERO_COLOR } from '../theme';
@@ -549,6 +550,8 @@ export function generateStateTileSpec(options = {}) {
     type: 'identity',
     reflectY: true,
   };
+  spec.datasets.nation = nationTilesJSON;
+  spec.layer.push(genMissingLayer());
   // state, msa
   spec.layer.push(genLevelLayer(options));
   spec.layer.push(genLevelHoverLayer());
