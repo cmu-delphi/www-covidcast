@@ -1,6 +1,6 @@
 <script>
   import { groupedSensorList } from '../../stores/constants';
-  import SignalTableRow from './SignalTableRow.svelte';
+  import IndicatorTableRow from './IndicatorTableRow.svelte';
 
   /**
    * @type {import("../utils").Params}
@@ -37,12 +37,12 @@
   }
 </style>
 
-<h2 class="mobile-h2">COVID-19 Signals</h2>
+<h2 class="mobile-h2">COVID-19 Indicators</h2>
 
 <table>
   <thead>
     <tr>
-      <th class="mobile-th"><span>Measurement</span></th>
+      <th class="mobile-th"><span>Indicator</span></th>
       <th class="mobile-th uk-text-right"><span>Change Last 7 days</span></th>
       <th class="mobile-th uk-text-right"><span>per 100k</span></th>
       <th class="mobile-th uk-text-right"><span>historical trend</span></th>
@@ -54,7 +54,7 @@
         <th class="mobile-h3" colspan="4">{group.label}</th>
       </tr>
       {#each group.sensors as sensor}
-        <SignalTableRow {sensor} {params} />
+        <IndicatorTableRow {sensor} {params} />
       {/each}
     </tbody>
   {/each}

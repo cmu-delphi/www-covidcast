@@ -2,7 +2,7 @@
   import { nameInfos, nationInfo } from '../../maps';
   import { currentRegionInfo, currentSensorEntry, currentDateObject } from '../../stores';
   import SurveyParameters from '../survey/SurveyParameters.svelte';
-  import SignalTable from './SignalTable.svelte';
+  import IndicatorTable from './IndicatorTable.svelte';
   import Overview from './Overview.svelte';
   import { toTimeValue } from './utils';
   import './common.css';
@@ -35,7 +35,7 @@
       <Overview {params} />
     </div>
     <div class="grid-3-11 details">
-      <SignalTable {params} />
+      <IndicatorTable {params} />
     </div>
   </div>
 </div>
