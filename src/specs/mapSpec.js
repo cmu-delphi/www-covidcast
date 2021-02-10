@@ -4,6 +4,7 @@ import hrrJSON from './shapefiles/hrr.json';
 import nationJSON from './shapefiles/nation.json';
 import stateJSON from './shapefiles/state.json';
 import msaJSON from './shapefiles/msa.json';
+import stateTilesJSON from './tilegrams/state.topo.json';
 import getRelatedCounties from '../maps/related';
 import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 import { MAP_THEME, MISSING_COLOR, ZERO_COLOR } from '../theme';
@@ -367,10 +368,10 @@ function genBaseSpec(level, topoJSON, infos, { height = 300 }) {
       },
       {
         calculate: 'lower(datum.propertyId)',
-        as: 'propertyId',
+        as: 'propertyId_l',
       },
       {
-        lookup: 'propertyId',
+        lookup: 'propertyId_l',
         from: {
           data: { name: 'values' },
           key: 'geo_value',
@@ -535,5 +536,49 @@ export function generateRelatedCountySpec(county, options = {}) {
     },
     value: 1,
   };
+  return spec;
+}
+
+export function generateStateTileSpec(options = {}) {
+  const level = 'tiles';
+  const topoJSON = stateTilesJSON;
+  const infos = stateInfo;
+
+  const spec = genBaseSpec(level, topoJSON, infos, options);
+  spec.projection = {
+    type: 'identity',
+    reflectY: true,
+  };
+  // state, msa
+  spec.layer.push(genLevelLayer(options));
+  spec.layer.push(genLevelHoverLayer());
+  /**
+   * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
+   */
+  const layer = {
+    mark: {
+      type: 'text',
+      align: 'center',
+      baseline: 'middle',
+    },
+    encoding: {
+      key: {
+        field: 'id',
+      },
+      longitude: {
+        field: 'properties.lon',
+        type: 'quantitative',
+      },
+      latitude: {
+        field: 'properties.lat',
+        type: 'quantitative',
+      },
+      text: {
+        field: 'propertyId',
+        type: 'nominal',
+      },
+    },
+  };
+  spec.layer.push(layer);
   return spec;
 }
