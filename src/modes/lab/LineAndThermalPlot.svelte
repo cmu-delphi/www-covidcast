@@ -1,11 +1,10 @@
 <script>
   import { timeWeek } from 'd3-time';
-  import debounce from 'lodash-es/debounce';
   import Vega from '../../components/Vega.svelte';
   import { addMissing, fetchData, fetchTimeSlice, formatAPITime } from '../../data';
   import { stateInfo } from '../../maps';
   import { generateLineChartSpec, signalPatches } from '../../specs/lineSpec';
-  import { currentDate, currentDateObject } from '../../stores';
+  import { currentDateObject } from '../../stores';
   import { sensorList } from '../../stores/constants';
   import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
 
@@ -52,10 +51,6 @@
         {
           calculate: '(datum.value / datum.a_week_ago - 1)',
           as: 'trend',
-        },
-        {
-          calculate: '1 + currentTime - datum.time_value',
-          as: 'age',
         },
       ],
 
@@ -302,28 +297,25 @@
 
   const lineSpec = generateLineChartSpec({ height: 150, initialDate: $currentDateObject });
 
-  const start = timeWeek.offset($currentDateObject, -4);
+  const start = timeWeek.offset($currentDateObject, -8);
   const casesData = fetchTimeSlice(sensor, 'nation', 'us', start, $currentDateObject).then((r) =>
     addMissing(r, sensor),
   );
   // const masksData = fetchTimeSlice(masks, 'nation', 'us').then((r) => addMissing(r, cases));
 
   function loadGapMinderData(date) {
-    const start = timeWeek.offset(date, -4);
     return fetchData(sensor, 'state', '*', `${formatAPITime(start)}-${formatAPITime(date)}`);
   }
 
   const data = loadGapMinderData($currentDateObject);
 
-  const lazyUpdate = debounce((value) => {
-    currentDate.set(value);
-  }, 1);
+  let currentDate = Number.parseInt(formatAPITime($currentDateObject));
 
   function onSignal(event) {
     if (event.detail.name === 'highlight') {
       const date = resolveHighlightedTimeValue(event);
-      if (date) {
-        lazyUpdate(date);
+      if (date !== currentDate) {
+        currentDate = date;
       }
     }
   }
@@ -344,9 +336,5 @@
   <h2>{sensor.name} ThermalPlot</h2>
   <Vega spec={lineSpec} data={casesData} signalListeners={['highlight']} signals={signalPatches} on:signal={onSignal} />
   <h3>ThermalPlot: value vs. trend (percentage change to last week)</h3>
-  <Vega
-    spec={thermalPlotSpec}
-    {data}
-    className="gapminder"
-    signals={{ currentTime: Number.parseInt($currentDate, 10) }} />
+  <Vega spec={thermalPlotSpec} {data} className="gapminder" signals={{ currentTime: currentDate }} />
 </div>
