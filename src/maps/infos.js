@@ -12,6 +12,8 @@ export const levelMegaCountyId = 'mega-county';
  * @property {string} id param id
  * @property {string} propertyId geojson: feature.property.id
  * @property {number} population
+ * @property {string?} region just for state
+ * @property {string?} state just for county
  * @property {'state' | 'county' | 'msa' | 'hrr' | 'nation'} level
  */
 
@@ -39,6 +41,19 @@ const stateLookup = new Map();
 stateInfo.forEach((state) => {
   stateLookup.set(state.id.toLowerCase(), state);
   stateLookup.set(state.propertyId.toLowerCase(), state);
+});
+
+const stateClasses = {
+  West: ['WY', 'ID', 'MT', 'UT', 'AK', 'NM', 'CO', 'NV', 'AZ', 'OR', 'WA', 'CA', 'HI'],
+  Midwest: ['SD', 'ND', 'IA', 'NE', 'MO', 'WI', 'KS', 'MN', 'IL', 'OH', 'MI', 'IN'],
+  Northeast: ['PA', 'ME', 'NH', 'NJ', 'NY', 'VT', 'MA', 'RI', 'CT', 'DE'],
+  South: ['OK', 'TN', 'AL', 'WV', 'AR', 'KY', 'TX', 'GA', 'SC', 'NC', 'LA', 'FL', 'VA', 'MD', 'DC', 'PR', 'MS'],
+};
+
+Object.entries(stateClasses).forEach(([key, value]) => {
+  for (const v of value) {
+    stateLookup.get(v.toLowerCase()).region = key;
+  }
 });
 
 /**

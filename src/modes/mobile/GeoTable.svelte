@@ -209,7 +209,12 @@
   <tbody>
     {#each sortedRegions as region}
       <tr>
-        <td><a href="?region={region.propertyId}" class="uk-link-text" on:click={() => params.setRegion(region)}>{region.displayName}</a></td>
+        <td>
+          <a
+            href="?region={region.propertyId}"
+            class="uk-link-text"
+            on:click={() => params.setRegion(region)}>{region.displayName}</a>
+        </td>
         <td class="uk-text-right">TODO</td>
         <td class="uk-text-right">{region.value == null ? 'N/A' : sensor.formatValue(region.value)}</td>
         <td>
