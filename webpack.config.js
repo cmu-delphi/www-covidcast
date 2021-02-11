@@ -162,9 +162,9 @@ module.exports = () => {
       }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
-        title: 'COVIDcast Signal Details',
+        title: 'COVIDcast Indicator Details',
         template: './src/index.html',
-        filename: 'mobile-signal/index.html',
+        filename: 'mobile-indicator/index.html',
       }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,

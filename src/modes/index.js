@@ -20,10 +20,10 @@ const modes = [
     component: () => import(/* webpackChunkName: 'm-mobile' */ './mobile/MobileOverview.svelte').then((r) => r.default),
   },
   {
-    id: 'mobile-signal',
-    label: 'Mobile Signal',
+    id: 'mobile-indicator',
+    label: 'Mobile Indicator',
     component: () =>
-      import(/* webpackChunkName: 'm-mobile-signal' */ './mobile-signal/MobileSignalOverview.svelte').then(
+      import(/* webpackChunkName: 'm-mobile-indicator' */ './mobile-indicator/MobileIndicatorOverview.svelte').then(
         (r) => r.default,
       ),
   },
@@ -64,7 +64,7 @@ const modes = [
 export default modes;
 
 /**
- * @type {Record<'overview'|'timelapse'|'top10'|'export'|'single'|'survey-results'|'lab'|'mobile'|'mobile-signal', Mode>}
+ * @type {Record<'overview'|'timelapse'|'top10'|'export'|'single'|'survey-results'|'lab'|'mobile'|'mobile-indicator', Mode>}
  */
 export const modeByID = {};
 modes.forEach((mode) => (modeByID[mode.id] = mode));
