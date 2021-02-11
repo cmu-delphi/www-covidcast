@@ -54,7 +54,7 @@
           as: 'trend',
         },
         {
-          calculate: '1 + 10*(dayofyear(toDate(currentDate)) - dayofyear(toDate(datum.date_value)))',
+          calculate: '1 + currentTime - datum.time_value',
           as: 'age',
         },
       ],
@@ -75,7 +75,7 @@
         {
           transform: [
             {
-              filter: 'toNumber(datum.date_value) == toNumber(currentDate)',
+              filter: 'datum.time_value == currentTime',
             },
             {
               quantile: 'value',
@@ -158,6 +158,7 @@
             x: {
               field: 'value',
               type: 'quantitative',
+              sort: null,
               axis: {
                 grid: true,
                 title: null,
@@ -175,6 +176,7 @@
             y: {
               field: 'trend',
               type: 'quantitative',
+              sort: null,
               axis: {
                 grid: true,
                 title: null,
@@ -195,7 +197,7 @@
               selection: {
                 highlight: {
                   type: 'single',
-                  on: 'mouseover',
+                  on: 'click',
                   empty: 'none',
                   fields: ['propertyId'],
                 },
@@ -207,7 +209,7 @@
               encoding: {
                 size: {
                   condition: {
-                    test: 'toNumber(datum.date_value) != toNumber(currentDate)',
+                    test: 'datum.time_value != currentTime',
                     value: 20,
                   },
                   field: 'population',
@@ -221,19 +223,18 @@
                   type: 'nominal',
                 },
                 opacity: {
-                  field: 'age',
-                  type: 'quantitative',
-                  scale: {
-                    type: 'log',
-                    range: [1, 0],
+                  condition: {
+                    test: {
+                      or: [
+                        {
+                          selection: 'highlight',
+                        },
+                        'datum.time_value == currentTime',
+                      ],
+                    },
+                    value: 1,
                   },
-                  legend: null,
-                  // condition: [
-                  //   {
-                  //     test: 'toNumber(datum.date_value) == toNumber(currentDate)',
-                  //     value: 1,
-                  //   },
-                  // ],
+                  value: 0.1,
                 },
               },
             },
@@ -257,7 +258,7 @@
                   //   range: [0, 1]
                   // }
                   condition: {
-                    test: 'toNumber(datum.date_value) == toNumber(currentDate)',
+                    test: 'datum.time_value == currentTime',
                     value: 1,
                   },
                   value: 0,
@@ -301,7 +302,10 @@
 
   const lineSpec = generateLineChartSpec({ height: 150, initialDate: $currentDateObject });
 
-  const casesData = fetchTimeSlice(sensor, 'nation', 'us').then((r) => addMissing(r, sensor));
+  const start = timeWeek.offset($currentDateObject, -4);
+  const casesData = fetchTimeSlice(sensor, 'nation', 'us', start, $currentDateObject).then((r) =>
+    addMissing(r, sensor),
+  );
   // const masksData = fetchTimeSlice(masks, 'nation', 'us').then((r) => addMissing(r, cases));
 
   function loadGapMinderData(date) {
@@ -309,11 +313,11 @@
     return fetchData(sensor, 'state', '*', `${formatAPITime(start)}-${formatAPITime(date)}`);
   }
 
-  $: data = loadGapMinderData($currentDateObject);
+  const data = loadGapMinderData($currentDateObject);
 
   const lazyUpdate = debounce((value) => {
     currentDate.set(value);
-  }, 1000);
+  }, 1);
 
   function onSignal(event) {
     if (event.detail.name === 'highlight') {
@@ -340,5 +344,9 @@
   <h2>{sensor.name} ThermalPlot</h2>
   <Vega spec={lineSpec} data={casesData} signalListeners={['highlight']} signals={signalPatches} on:signal={onSignal} />
   <h3>ThermalPlot: value vs. trend (percentage change to last week)</h3>
-  <Vega spec={thermalPlotSpec} {data} className="gapminder" signals={{ currentDate: $currentDateObject }} />
+  <Vega
+    spec={thermalPlotSpec}
+    {data}
+    className="gapminder"
+    signals={{ currentTime: Number.parseInt($currentDate, 10) }} />
 </div>
