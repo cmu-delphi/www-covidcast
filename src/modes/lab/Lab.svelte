@@ -28,6 +28,10 @@
       name: 'LineAndGapMinder',
       component: () => import('./LineAndGapMinder.svelte').then((r) => r.default),
     },
+    {
+      name: 'LineAndThermalPlot',
+      component: () => import('./LineAndThermalPlot.svelte').then((r) => r.default),
+    },
   ];
 
   let selected = Number.parseInt(new URL(window.location.href).searchParams.get('lab') || '0', 10);
