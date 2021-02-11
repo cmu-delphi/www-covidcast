@@ -24,6 +24,10 @@
       name: 'LineAndTileMap',
       component: () => import('./LineAndTileMap.svelte').then((r) => r.default),
     },
+    {
+      name: 'LineAndGapMinder',
+      component: () => import('./LineAndGapMinder.svelte').then((r) => r.default),
+    },
   ];
 
   let selected = Number.parseInt(new URL(window.location.href).searchParams.get('lab') || '0', 10);
