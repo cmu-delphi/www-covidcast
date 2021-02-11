@@ -13,7 +13,7 @@ export function combineSignals(data, ref, keys, toKey = (d) => `${d.geo_value}@$
   const map = new Map(ref.map((d) => [toKey(d), d]));
   data.forEach((rows, i) => {
     const key = keys[i];
-    for (const d of rows) {
+    for (const d of rows || []) {
       const entry = map.get(toKey(d));
       if (entry) {
         entry[key] = d.value;

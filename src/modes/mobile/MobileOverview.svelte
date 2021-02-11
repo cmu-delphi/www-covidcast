@@ -1,6 +1,6 @@
 <script>
   import { nameInfos, nationInfo } from '../../maps';
-  import { currentRegionInfo, currentSensorEntry, currentDateObject } from '../../stores';
+  import { currentRegionInfo, currentRegion, currentSensorEntry, currentDateObject } from '../../stores';
   import SurveyParameters from '../survey/SurveyParameters.svelte';
   import IndicatorTable from './IndicatorTable.svelte';
   import Overview from './Overview.svelte';
@@ -11,6 +11,9 @@
     region: $currentRegionInfo || nationInfo,
     date: $currentDateObject,
     timeValue: toTimeValue($currentDateObject),
+    setRegion: (region) => {
+      currentRegion.set(region.propertyId);
+    },
   };
 </script>
 

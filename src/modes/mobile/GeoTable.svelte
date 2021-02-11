@@ -1,6 +1,6 @@
 <script>
   import { getCountiesOfState, getInfoByName, stateInfo } from '../../maps';
-  import { fetchData } from '../../data/fetchData';
+  import { fetchData, fetchTimeSlice, addMissing } from '../../data/fetchData';
   import getRelatedCounties from '../../maps/related';
   import { guessSensorColor } from './utils';
   import { primaryValue } from '../../stores/constants';
@@ -8,6 +8,7 @@
   import Vega from '../../components/Vega.svelte';
   import SparkLineTooltip from './SparkLineTooltip.svelte';
   import SortColumnIndicator from './SortColumnIndicator.svelte';
+  import { timeWeek } from 'd3-time';
 
   /**
    * @type {import("../utils").Params}
@@ -27,7 +28,7 @@
       return getCountiesOfState(region);
     }
     if (region.level === 'county') {
-      return getRelatedCounties(region);
+      return [region, ...getRelatedCounties(region)];
     }
     return stateInfo;
   }
@@ -37,12 +38,12 @@
    */
   function determineTitle(region) {
     if (region.level === 'state') {
-      return {title: `Counties of ${region.displayName}`, unit: 'County'};
+      return { title: `Counties of ${region.displayName}`, unit: 'County' };
     }
     if (region.level === 'county') {
-      return {title: `Neighboring Counties`, unit: 'County'};
+      return { title: `Neighboring Counties`, unit: 'County' };
     }
-    return {title: 'US States', unit: 'State'};
+    return { title: 'US States', unit: 'State' };
   }
 
   /**
@@ -59,10 +60,7 @@
       });
     }
     if (params.region.level === 'county') {
-      const state = getInfoByName(params.region.state);
-      const geo = getCountiesOfState(state)
-        .map((d) => d.propertyId)
-        .join(',');
+      const geo = [params.region, ...getRelatedCounties(params.region)].map((d) => d.propertyId).join(',');
 
       return fetchData(sensor, 'county', geo, params.date, {
         time_value: params.timeValue,
@@ -124,6 +122,21 @@
    * @type {import('vega-lite').TopLevelSpec}
    */
   $: spec = generateSparkLine({ valueField: valueKey, color: guessSensorColor(sensor) });
+
+  function loadRegionData(sensor, regions, date) {
+    const startDate = timeWeek.offset(date, -4);
+    return new Map(
+      regions.map((region) => [
+        region.propertyId,
+        fetchTimeSlice(sensor, region.level, region.propertyId, startDate, date, true, {
+          displayName: region.displayName,
+          geo_value: region.propertyId,
+        }).then((rows) => addMissing(rows, sensor)),
+      ]),
+    );
+  }
+
+  $: regionData = loadRegionData(sensor, regions, params.date);
 </script>
 
 <style>
@@ -152,7 +165,7 @@
 
   .sort-indicator {
     text-align: right;
-    background: #FAFAFC;
+    background: #fafafc;
   }
 </style>
 
@@ -161,12 +174,8 @@
 <table>
   <thead>
     <tr>
-      <th class="mobile-th">
-        {title.unit}
-      </th>
-      <th class="mobile-th uk-text-right">
-        Change Last 7 days
-      </th>
+      <th class="mobile-th">{title.unit}</th>
+      <th class="mobile-th uk-text-right">Change Last 7 days</th>
       <th class="mobile-th uk-text-right">
         {#if sensor.isCasesSignal}per 100k{:else if sensor.format === 'percent'}Percentage{:else}Value{/if}
       </th>
@@ -174,34 +183,42 @@
     </tr>
     <tr>
       <th class="sort-indicator uk-text-center">
-        <SortColumnIndicator label={title.unit}
+        <SortColumnIndicator
+          label={title.unit}
           on:click={(e) => sortClick('name', e.detail || false)}
           sorted={sortCriteria === 'name'}
           desc={sortDirectionDesc} />
       </th>
-      <th class="sort-indicator">        
-        <SortColumnIndicator label="Change Last 7 days"
+      <th class="sort-indicator">
+        <SortColumnIndicator
+          label="Change Last 7 days"
           on:click={(e) => sortClick('trend', e.detail || false)}
           sorted={sortCriteria === 'trend'}
           desc={sortDirectionDesc} />
       </th>
-      <th class="sort-indicator">        
-        <SortColumnIndicator label="Value"
+      <th class="sort-indicator">
+        <SortColumnIndicator
+          label="Value"
           on:click={(e) => sortClick('value', e.detail || false)}
           sorted={sortCriteria === 'value'}
           desc={sortDirectionDesc} />
       </th>
-      <th class="sort-indicator"></th>
+      <th class="sort-indicator" />
     </tr>
   </thead>
   <tbody>
     {#each sortedRegions as region}
       <tr>
-        <td>{region.displayName}</td>
+        <td><a href="?region={region.propertyId}" class="uk-link-text" on:click={() => params.setRegion(region)}>{region.displayName}</a></td>
         <td class="uk-text-right">TODO</td>
         <td class="uk-text-right">{region.value == null ? 'N/A' : sensor.formatValue(region.value)}</td>
         <td>
-          <Vega {spec} data={[]} tooltip={SparkLineTooltip} tooltipProps={{ sensor }} signals={{currentDate: params.date}}/>
+          <Vega
+            {spec}
+            data={regionData.get(region.propertyId) || []}
+            tooltip={SparkLineTooltip}
+            tooltipProps={{ sensor }}
+            signals={{ currentDate: params.date }} />
         </td>
       </tr>
     {/each}

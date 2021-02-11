@@ -30,10 +30,10 @@
     if (!region || !date) {
       return null;
     }
-    const startDate = timeWeek.offset(params.date, -4);
-    return fetchTimeSlice(sensor, params.region.level, params.region.propertyId, startDate, date, true, {
-      displayName: params.region.displayName,
-      geo_value: params.region.propertyId,
+    const startDate = timeWeek.offset(date, -4);
+    return fetchTimeSlice(sensor, region.level, region.propertyId, startDate, date, true, {
+      displayName: region.displayName,
+      geo_value: region.propertyId,
     }).then((rows) => addMissing(rows, sensor));
   }
 
@@ -139,7 +139,7 @@
       {#await currentRow}?{:then row}{row ? sensor.formatValue(row[valueKey]) : 'N/A'}{/await}
     </td>
     <td>
-      <Vega {spec} {data} tooltip={SparkLineTooltip} tooltipProps={{ sensor }} signals={{currentDate: params.date}}/>
+      <Vega {spec} {data} tooltip={SparkLineTooltip} tooltipProps={{ sensor }} signals={{ currentDate: params.date }} />
     </td>
   {:else}
     <td colspan="4" class="popup-container">
@@ -190,7 +190,7 @@
           {#if showNeighbors}
             <GeoTable {sensor} {params} />
             <div class="uk-text-center">
-              <button class="popup-button" on:click={() => showNeighbors = false}>
+              <button class="popup-button" on:click={() => (showNeighbors = false)}>
                 <span class="inline-svg-icon">
                   {@html chevronUpIcon}
                 </span>
@@ -198,14 +198,14 @@
               </button>
             </div>
           {:else}
-          <div class="uk-text-center">
-            <button class="popup-button" on:click={() => showNeighbors = true}>
-              <span class="inline-svg-icon">
-                {@html chevronDownIcon}
-              </span>
-              Neighboring Areas
-            </button>
-          </div>
+            <div class="uk-text-center">
+              <button class="popup-button" on:click={() => (showNeighbors = true)}>
+                <span class="inline-svg-icon">
+                  {@html chevronDownIcon}
+                </span>
+                Neighboring Areas
+              </button>
+            </div>
           {/if}
         </div>
       </div>
