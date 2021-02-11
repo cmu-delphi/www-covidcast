@@ -1,7 +1,13 @@
 <script>
   import { getCountiesOfState, getInfoByName, stateInfo } from '../../maps';
   import { fetchData } from '../../data/fetchData';
-  import Top10SortHint from '../top10/Top10SortHint.svelte';
+  import getRelatedCounties from '../../maps/related';
+  import { guessSensorColor } from './utils';
+  import { primaryValue } from '../../stores/constants';
+  import { generateSparkLine } from '../../specs/lineSpec';
+  import Vega from '../../components/Vega.svelte';
+  import SparkLineTooltip from './SparkLineTooltip.svelte';
+  import SortColumnIndicator from './SortColumnIndicator.svelte';
 
   /**
    * @type {import("../utils").Params}
@@ -21,10 +27,22 @@
       return getCountiesOfState(region);
     }
     if (region.level === 'county') {
-      const state = getInfoByName(region.state);
-      return getCountiesOfState(state);
+      return getRelatedCounties(region);
     }
     return stateInfo;
+  }
+
+  /**
+   * @param {import('../../maps').NameInfo} region
+   */
+  function determineTitle(region) {
+    if (region.level === 'state') {
+      return {title: `Counties of ${region.displayName}`, unit: 'County'};
+    }
+    if (region.level === 'county') {
+      return {title: `Neighboring Counties`, unit: 'County'};
+    }
+    return {title: 'US States', unit: 'State'};
   }
 
   /**
@@ -83,7 +101,9 @@
 
   $: comparator = applyDirection(bySortCriteria(sortCriteria), sortDirectionDesc);
 
+  $: title = determineTitle(params.region);
   $: regions = determineRegions(params.region);
+
   let sortedRegions = [];
 
   $: loadedData = loadData(sensor, params).then((rows) =>
@@ -99,6 +119,11 @@
       sortedRegions = rows.sort(comparator);
     });
   }
+  $: valueKey = primaryValue(sensor, {});
+  /**
+   * @type {import('vega-lite').TopLevelSpec}
+   */
+  $: spec = generateSparkLine({ valueField: valueKey, color: guessSensorColor(sensor) });
 </script>
 
 <style>
@@ -124,41 +149,49 @@
   tbody > tr:not(:last-of-type) {
     border-bottom: 1px solid #f0f1f3;
   }
+
+  .sort-indicator {
+    text-align: right;
+    background: #FAFAFC;
+  }
 </style>
 
-<h2 class="mobile-h2">{sensor.name}</h2>
+<h2 class="mobile-h2">{title.title}</h2>
 
 <table>
   <thead>
     <tr>
       <th class="mobile-th">
-        <Top10SortHint
-          label="Region"
-          on:click={() => sortClick('displayName')}
-          sorted={sortCriteria === 'displayName'}
-          desc={sortDirectionDesc}>
-          Region
-        </Top10SortHint>
+        {title.unit}
       </th>
       <th class="mobile-th uk-text-right">
-        <Top10SortHint
-          label="Change Last 7 days"
-          on:click={() => sortClick('trend')}
-          sorted={sortCriteria === 'trend'}
-          desc={sortDirectionDesc}>
-          Change Last 7 days
-        </Top10SortHint>
+        Change Last 7 days
       </th>
       <th class="mobile-th uk-text-right">
-        <Top10SortHint
-          label="Value"
-          on:click={() => sortClick('value')}
-          sorted={sortCriteria === 'value'}
-          desc={sortDirectionDesc}>
-          {#if sensor.isCasesSignal}per 100k{:else if sensor.format === 'percent'}Percentage{:else}Value{/if}
-        </Top10SortHint>
+        {#if sensor.isCasesSignal}per 100k{:else if sensor.format === 'percent'}Percentage{:else}Value{/if}
       </th>
       <th class="mobile-th uk-text-right"><span>historical trend</span></th>
+    </tr>
+    <tr>
+      <th class="sort-indicator uk-text-center">
+        <SortColumnIndicator label={title.unit}
+          on:click={(e) => sortClick('name', e.detail || false)}
+          sorted={sortCriteria === 'name'}
+          desc={sortDirectionDesc} />
+      </th>
+      <th class="sort-indicator">        
+        <SortColumnIndicator label="Change Last 7 days"
+          on:click={(e) => sortClick('trend', e.detail || false)}
+          sorted={sortCriteria === 'trend'}
+          desc={sortDirectionDesc} />
+      </th>
+      <th class="sort-indicator">        
+        <SortColumnIndicator label="Value"
+          on:click={(e) => sortClick('value', e.detail || false)}
+          sorted={sortCriteria === 'value'}
+          desc={sortDirectionDesc} />
+      </th>
+      <th class="sort-indicator"></th>
     </tr>
   </thead>
   <tbody>
@@ -167,7 +200,9 @@
         <td>{region.displayName}</td>
         <td class="uk-text-right">TODO</td>
         <td class="uk-text-right">{region.value == null ? 'N/A' : sensor.formatValue(region.value)}</td>
-        <td>TODO</td>
+        <td>
+          <Vega {spec} data={[]} tooltip={SparkLineTooltip} tooltipProps={{ sensor }} signals={{currentDate: params.date}}/>
+        </td>
       </tr>
     {/each}
   </tbody>

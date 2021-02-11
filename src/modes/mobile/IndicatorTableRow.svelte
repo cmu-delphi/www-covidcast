@@ -8,9 +8,11 @@
   import SparkLineTooltip from './SparkLineTooltip.svelte';
   import HistoryLineChart from './HistoryLineChart.svelte';
   import RegionMap from './RegionMap.svelte';
+  import GeoTable from './GeoTable.svelte';
   import circleIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/circle.svg';
   import eyeHideIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/eye-slash.svg';
-  import externalLinkAltIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/external-link-alt.svg';
+  import chevronDownIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-down.svg';
+  import chevronUpIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-up.svg';
   import plusCircleIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/plus-circle.svg';
 
   /**
@@ -47,6 +49,7 @@
    */
   $: spec = generateSparkLine({ valueField: valueKey, color: guessSensorColor(sensor) });
 
+  let showNeighbors = false;
   let open = false;
 </script>
 
@@ -80,7 +83,7 @@
     margin: 2px;
     padding: 1em;
     background: white;
-    color: initial;
+    color: #666;
   }
   .popup-header {
     padding: 13px;
@@ -136,7 +139,7 @@
       {#await currentRow}?{:then row}{row ? sensor.formatValue(row[valueKey]) : 'N/A'}{/await}
     </td>
     <td>
-      <Vega {spec} {data} tooltip={SparkLineTooltip} tooltipProps={{ sensor }} />
+      <Vega {spec} {data} tooltip={SparkLineTooltip} tooltipProps={{ sensor }} signals={{currentDate: params.date}}/>
     </td>
   {:else}
     <td colspan="4" class="popup-container">
@@ -184,14 +187,26 @@
               <td class="popup-table-value">TODO</td>
             </tr>
           </table>
+          {#if showNeighbors}
+            <GeoTable {sensor} {params} />
+            <div class="uk-text-center">
+              <button class="popup-button" on:click={() => showNeighbors = false}>
+                <span class="inline-svg-icon">
+                  {@html chevronUpIcon}
+                </span>
+                Hide
+              </button>
+            </div>
+          {:else}
           <div class="uk-text-center">
-            <button class="popup-button">
+            <button class="popup-button" on:click={() => showNeighbors = true}>
               <span class="inline-svg-icon">
-                {@html externalLinkAltIcon}
+                {@html chevronDownIcon}
               </span>
-              Advanced Chart
+              Neighboring Areas
             </button>
           </div>
+          {/if}
         </div>
       </div>
     </td>

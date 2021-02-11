@@ -1,3 +1,4 @@
+import { CURRENT_DATE_HIGHLIGHT } from '../components/vegaSpecUtils';
 import { selectionColors } from '../theme';
 
 const COLOR = '#666666';
@@ -286,22 +287,25 @@ export function generateSparkLine({ valueField = 'value', domain = null, color =
           },
         },
       },
-      y: {
-        field: valueField,
-        type: 'quantitative',
-        scale: {
-          zero: 0,
-        },
-        axis: null,
-      },
     },
     layer: [
+      CURRENT_DATE_HIGHLIGHT,
       {
         mark: {
           type: 'line',
           color,
           point: false,
           interpolate: 'linear',
+        },
+        encoding: {
+          y: {
+            field: valueField,
+            type: 'quantitative',
+            scale: {
+              zero: 0,
+            },
+            axis: null,
+          },
         },
       },
       {
@@ -312,6 +316,10 @@ export function generateSparkLine({ valueField = 'value', domain = null, color =
           tooltip: true,
         },
         encoding: {
+          y: {
+            field: valueField,
+            type: 'quantitative',
+          },
           opacity: {
             condition: {
               selection: 'highlight',
