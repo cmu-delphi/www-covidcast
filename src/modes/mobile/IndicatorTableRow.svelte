@@ -9,7 +9,7 @@
   import HistoryLineChart from './HistoryLineChart.svelte';
   import RegionMap from './RegionMap.svelte';
   import circleIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/circle.svg';
-  import chevronUpIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-up.svg';
+  import eyeHideIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/eye-slash.svg';
   import externalLinkAltIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/external-link-alt.svg';
   import plusCircleIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/plus-circle.svg';
 
@@ -148,9 +148,9 @@
           <span class="popup-title">{sensor.name}</span>
           <button class="popup-button" on:click={() => (open = false)}>
             <span class="inline-svg-icon">
-              {@html chevronUpIcon}
+              {@html eyeHideIcon}
             </span>
-            Close
+            Hide
           </button>
         </header>
         <div class="popup-body">
