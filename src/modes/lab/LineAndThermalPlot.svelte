@@ -247,7 +247,7 @@
               },
               encoding: {
                 text: {
-                  field: 'displayName',
+                  field: 'propertyId',
                 },
                 opacity: {
                   // field: 'date_value',
@@ -257,14 +257,7 @@
                   //   range: [0, 1]
                   // }
                   condition: {
-                    test: {
-                      and: [
-                        {
-                          selection: 'highlight',
-                        },
-                        'toNumber(datum.date_value) == toNumber(currentDate)',
-                      ],
-                    },
+                    test: 'toNumber(datum.date_value) == toNumber(currentDate)',
                     value: 1,
                   },
                   value: 0,
