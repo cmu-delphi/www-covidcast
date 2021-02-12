@@ -9,9 +9,10 @@
   import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
 
   const sensor = sensorList.find((d) => d.signal === 'smoothed_wearing_mask' && d.id === 'fb-survey');
+  // const sensor = sensorList.find((d) => d.signal === 'smoothed_cli' && d.id === 'fb-survey');
   // const sensor = sensorList.find((d) => d.isCasesOrDeath);
 
-  function thermalPlot() {
+  function thermalPlot(yField = 'change', offset = 1) {
     /**
      * @type {import('vega-lite').TopLevelSpec}
      */
@@ -39,23 +40,43 @@
           },
         },
         {
+          // clamp in [0, 100] range
+          calculate: 'min(max(datum.value, 0), 100)',
+          as: 'value',
+        },
+        {
+          // impute missing by forwarding the one from the previous day
+          impute: 'value',
+          key: 'time_value',
+          groupby: ['propertyId'],
+          frame: [-1, 0],
+          method: 'min',
+        },
+        {
+          // caculate the value a week ago
           window: [
             {
               op: 'first_value',
               field: 'value',
-              as: 'a_week_ago',
+              as: `x${offset}day_ago`,
             },
           ],
-          frame: [-5, 0],
+          sort: ['time_value'],
+          frame: [-offset, 0],
           groupby: ['propertyId'],
         },
         {
-          calculate: '(datum.value / datum.a_week_ago - 1)',
+          calculate: `datum.value / datum.x${offset}day_ago - 1`,
           as: 'trend',
+        },
+        {
+          calculate: `datum.value - datum.x${offset}day_ago`,
+          as: 'change',
         },
       ],
 
       layer: [
+        // horizontal 0 hint
         {
           mark: {
             type: 'rule',
@@ -68,6 +89,7 @@
             },
           },
         },
+        // vertical hints
         {
           transform: [
             {
@@ -149,6 +171,7 @@
             },
           },
         },
+
         {
           encoding: {
             x: {
@@ -166,25 +189,29 @@
               scale: {
                 round: true,
                 zero: false,
-                domainMin: null,
+                // for cases
+                // domainMin: 0,
+                // domainMax: 150,
+                clamp: true,
               },
             },
             y: {
-              field: 'trend',
+              field: yField,
               type: 'quantitative',
               sort: null,
               axis: {
                 grid: true,
                 title: null,
                 domain: false,
-                format: '+.1p',
+                format: yField === 'trend' ? '+.1p' : '.1f',
                 tickCount: 5,
                 labelFontSize: 14,
               },
               scale: {
                 round: true,
                 zero: false,
-                domainMin: null,
+                // domainMin: -1,
+                // domainMax: 1,
               },
             },
           },
@@ -199,6 +226,7 @@
                     propertyId: $currentRegionInfo.propertyId.toUpperCase(),
                   },
                   fields: ['propertyId'],
+                  nearest: true,
                 },
               },
               mark: {
@@ -225,16 +253,20 @@
                 opacity: {
                   // highlighted -> highlight = 1, current date = 0.5 else 0.1
                   // not highlighted -> current date = 1 else 0.1
-                  condition: [{
-                    selection: 'highlight',
-                    value: 1,
-                  }, {
-                    test: 'datum.time_value == currentTime && highlight.propertyId != null',
-                    value: 0.5,
-                  }, {
-                    test: 'datum.time_value == currentTime',
-                    value: 1,
-                  }],
+                  condition: [
+                    {
+                      selection: 'highlight',
+                      value: 1,
+                    },
+                    {
+                      test: 'datum.time_value == currentTime && highlight.propertyId != null',
+                      value: 0.5,
+                    },
+                    {
+                      test: 'datum.time_value == currentTime',
+                      value: 1,
+                    },
+                  ],
                   value: 0.1,
                 },
               },
@@ -251,26 +283,30 @@
                 text: {
                   field: 'propertyId',
                 },
-                opacity:{
+                opacity: {
                   // highlighted -> highlightd & current date = 1, current date = 1 else 0.5
                   // not highlighted -> current date = 1 else 0
-                  condition: [{
-                    test: {
-                      and: [
-                        {
-                          selection: 'highlight',
-                        },
-                        'datum.time_value == currentTime'
-                      ],
+                  condition: [
+                    {
+                      test: {
+                        and: [
+                          {
+                            selection: 'highlight',
+                          },
+                          'datum.time_value == currentTime',
+                        ],
+                      },
+                      value: 1,
                     },
-                    value: 1,
-                  }, {
-                    test: 'datum.time_value == currentTime && highlight.propertyId != null',
-                    value: 0.5,
-                  }, {
-                    test: 'datum.time_value == currentTime',
-                    value: 1,
-                  }],
+                    {
+                      test: 'datum.time_value == currentTime && highlight.propertyId != null',
+                      value: 0.5,
+                    },
+                    {
+                      test: 'datum.time_value == currentTime',
+                      value: 1,
+                    },
+                  ],
                   value: 0,
                 },
               },
@@ -308,8 +344,6 @@
     return spec;
   }
 
-  $: thermalPlotSpec = thermalPlot();
-
   const lineSpec = generateLineChartSpec({ height: 150, initialDate: $currentDateObject });
 
   const start = timeWeek.offset($currentDateObject, -8);
@@ -319,7 +353,14 @@
   // const masksData = fetchTimeSlice(masks, 'nation', 'us').then((r) => addMissing(r, cases));
 
   function loadGapMinderData(date) {
-    return fetchData(sensor, 'state', '*', `${formatAPITime(start)}-${formatAPITime(date)}`);
+    return fetchData(
+      sensor,
+      'state',
+      '*',
+      `${formatAPITime(start)}-${formatAPITime(date)}`,
+      {},
+      { multiValues: false },
+    );
   }
 
   const data = loadGapMinderData($currentDateObject);
@@ -334,6 +375,10 @@
       }
     }
   }
+
+  let mode = 'change:1';
+
+  $: thermalPlotSpec = thermalPlot(mode.split(':')[0], Number.parseInt(mode.split(':')[1], 10));
 </script>
 
 <style>
@@ -350,6 +395,11 @@
 <div class="uk-container root">
   <h2>{sensor.name} ThermalPlot</h2>
   <Vega spec={lineSpec} data={casesData} signalListeners={['highlight']} signals={signalPatches} on:signal={onSignal} />
-  <h3>ThermalPlot: value vs. trend (percentage change to last week)</h3>
+  <h3>ThermalPlot</h3>
+  <select bind:value={mode}>
+    <option value="change:1">value vs. change (value - day before value)</option>
+    <option value="trend:1">value vs. trend ((value - day before value) / (day before value))</option>
+    <option value="trend:7">value vs. trend ((value - week before value) / (week before value))</option>
+  </select>
   <Vega spec={thermalPlotSpec} {data} className="gapminder" signals={{ currentTime: currentDate }} />
 </div>

@@ -120,7 +120,14 @@ function parseMultipleSeparateData(dataArr, defaultSignalIndex, mixinData = {}) 
  * @param {{advanced?: boolean}} options
  * @returns {Promise<EpiDataRow[]>}
  */
-export function fetchData(sensorEntry, level, region, date, mixinValues = {}, { advanced = false } = {}) {
+export function fetchData(
+  sensorEntry,
+  level,
+  region,
+  date,
+  mixinValues = {},
+  { advanced = false, multiValues = true } = {},
+) {
   if (!region) {
     return Promise.resolve([]);
   }
@@ -149,7 +156,7 @@ export function fetchData(sensorEntry, level, region, date, mixinValues = {}, { 
     ).then((d) => parseMultipleSeparateData(d, defaultSignalIndex, mixinValues));
   }
 
-  if (sensorEntry.isCasesOrDeath) {
+  if (sensorEntry.isCasesOrDeath && multiValues) {
     const signals = EPIDATA_CASES_OR_DEATH_VALUES.map((k) => sensorEntry.casesOrDeathSignals[k]);
     const defaultSignal = sensorEntry.signal;
     const defaultSignalIndex = signals.indexOf(defaultSignal);
