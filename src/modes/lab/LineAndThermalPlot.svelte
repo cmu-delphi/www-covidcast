@@ -4,11 +4,12 @@
   import { addMissing, fetchData, fetchTimeSlice, formatAPITime } from '../../data';
   import { stateInfo } from '../../maps';
   import { generateLineChartSpec, signalPatches } from '../../specs/lineSpec';
-  import { currentDateObject } from '../../stores';
+  import { currentDateObject, currentRegionInfo } from '../../stores';
   import { sensorList } from '../../stores/constants';
   import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
 
   const sensor = sensorList.find((d) => d.signal === 'smoothed_wearing_mask' && d.id === 'fb-survey');
+  // const sensor = sensorList.find((d) => d.isCasesOrDeath);
 
   function thermalPlot() {
     /**
@@ -194,6 +195,9 @@
                   type: 'single',
                   on: 'click',
                   empty: 'none',
+                  init: {
+                    propertyId: $currentRegionInfo.propertyId.toUpperCase(),
+                  },
                   fields: ['propertyId'],
                 },
               },
@@ -203,6 +207,7 @@
               },
               encoding: {
                 size: {
+                  // not the current, fixed size
                   condition: {
                     test: 'datum.time_value != currentTime',
                     value: 20,
@@ -218,17 +223,18 @@
                   type: 'nominal',
                 },
                 opacity: {
-                  condition: {
-                    test: {
-                      or: [
-                        {
-                          selection: 'highlight',
-                        },
-                        'datum.time_value == currentTime',
-                      ],
-                    },
+                  // highlighted -> highlight = 1, current date = 0.5 else 0.1
+                  // not highlighted -> current date = 1 else 0.1
+                  condition: [{
+                    selection: 'highlight',
                     value: 1,
-                  },
+                  }, {
+                    test: 'datum.time_value == currentTime && highlight.propertyId != null',
+                    value: 0.5,
+                  }, {
+                    test: 'datum.time_value == currentTime',
+                    value: 1,
+                  }],
                   value: 0.1,
                 },
               },
@@ -245,17 +251,26 @@
                 text: {
                   field: 'propertyId',
                 },
-                opacity: {
-                  // field: 'date_value',
-                  // type: 'temporal',
-                  // scale: {
-                  //   type: 'pow',
-                  //   range: [0, 1]
-                  // }
-                  condition: {
+                opacity:{
+                  // highlighted -> highlightd & current date = 1, current date = 1 else 0.5
+                  // not highlighted -> current date = 1 else 0
+                  condition: [{
+                    test: {
+                      and: [
+                        {
+                          selection: 'highlight',
+                        },
+                        'datum.time_value == currentTime'
+                      ],
+                    },
+                    value: 1,
+                  }, {
+                    test: 'datum.time_value == currentTime && highlight.propertyId != null',
+                    value: 0.5,
+                  }, {
                     test: 'datum.time_value == currentTime',
                     value: 1,
-                  },
+                  }],
                   value: 0,
                 },
               },
