@@ -203,6 +203,8 @@
     };
     vegaPromise = import(/* webpackChunkName: 'vegafactory' */ './vegaFactory').then((m) =>
       m.default(root, spec, {
+        // actions: true,
+        // logLevel: Error,
         actions: false,
         logLevel: Error,
         tooltip: tooltipHandler,

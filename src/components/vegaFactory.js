@@ -163,3 +163,43 @@ function patchPickedItem(event) {
   return event.item;
 }
 expressionFunction('patchPickedItem', patchPickedItem);
+
+/**
+ * computes padding such that the chart are is centered and squared for the given parameters
+ * @param {[number, number]} container size
+ * @param {any[]} x scale domain
+ * @param {any[]} domainY
+ * @param {{left: number, top: number, right: number, bottom: number}} basePadding
+ * @param {number} paddingXOuter
+ * @param {number} paddingYOuter
+ * @param {number} factorX
+ * @param {number} factorY
+ */
+function paddingSquareCenter(
+  [width, height],
+  domainX,
+  domainY,
+  basePadding,
+  paddingXOuter,
+  paddingYOuter,
+  factorX,
+  factorY,
+) {
+  const wBase = width - basePadding.left - basePadding.right;
+  const hBase = height - basePadding.top - basePadding.bottom;
+  const domainXW = domainX.length + paddingXOuter * 2;
+  const domainYW = domainY.length + paddingYOuter * 2;
+  const stepX = wBase / domainXW / factorX;
+  const stepY = hBase / domainYW / factorY;
+  const step = Math.min(stepX, stepY);
+  const wPadded = domainXW * step * factorX;
+  const hPadded = domainYW * step * factorY;
+
+  return {
+    left: basePadding.left + (wBase - wPadded) / 2,
+    right: basePadding.right + (wBase - wPadded) / 2,
+    top: basePadding.top + (hBase - hPadded) / 2,
+    bottom: basePadding.bottom + (hBase - hPadded) / 2,
+  };
+}
+expressionFunction('paddingSquareCenter', paddingSquareCenter);
