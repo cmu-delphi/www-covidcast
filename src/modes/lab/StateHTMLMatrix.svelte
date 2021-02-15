@@ -64,7 +64,7 @@
     background: #eee;
     border-radius: 2px;
     /* border-width: 0 1px; */
-    margin-bottom: 29%;
+    margin-bottom: 28.5%;
   }
   .cell::before,
   .cell::after {
@@ -76,6 +76,7 @@
     height: 100%;
     border: inherit;
     background: inherit;
+    box-shadow: inherit;
   }
   .cell::before {
     transform: rotate(60deg);
@@ -88,13 +89,14 @@
     position: absolute;
     z-index: 1;
     left: 0;
-    top: -29%;
-    bottom: -29%;
+    top: -50%;
+    bottom: -50%;
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-around;
+    clip-path: polygon(0% 25%, 50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%);
   }
 
   .vega-wrapper {
