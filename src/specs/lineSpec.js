@@ -261,6 +261,7 @@ export function generateSparkLine({ valueField = 'value', domain = null, color =
     data: { name: 'values' },
     height: 30,
     padding: { left: 2, top: 2, bottom: 2, right: 2 },
+    background: null,
     autosize: {
       type: 'none',
       contains: 'padding',
