@@ -88,7 +88,14 @@
   $: updateSpec(patchedSpec);
   $: updateSignals(vegaPromise, signals);
 
+  /**
+   * @type (() => Promise<import('vega-typings').View>)
+   */
   export const vegaAccessor = () => vegaPromise.then((v) => v.view);
+  /**
+   * @type (() => import('vega-typings').View | null)
+   */
+  export const vegaDirectAccessor = () => (vega ? vega.view : null);
 
   /**
    * @param {Promise<import('vega-embed').Result> | null} vegaLoader

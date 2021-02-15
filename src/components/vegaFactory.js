@@ -67,7 +67,6 @@ export default function createVega(root, spec, options) {
   });
 }
 
-
 function customExtent(arr, field) {
   if (arr.length === 0) {
     return {

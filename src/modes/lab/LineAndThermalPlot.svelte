@@ -1,11 +1,12 @@
 <script>
-  import { timeWeek } from 'd3-time';
+  import { timeDay, timeWeek } from 'd3-time';
   import Vega from '../../components/Vega.svelte';
-  import { addMissing, fetchData, fetchTimeSlice, formatAPITime } from '../../data';
+  import { addMissing, fetchData, fetchTimeSlice, formatAPITime, parseAPITime } from '../../data';
   import { stateInfo } from '../../maps';
   import { generateLineChartSpec, signalPatches } from '../../specs/lineSpec';
   import { currentDateObject, currentRegionInfo } from '../../stores';
   import { sensorList } from '../../stores/constants';
+  import { toTimeValue } from '../mobile/utils';
   import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
 
   const sensor = sensorList.find((d) => d.signal === 'smoothed_wearing_mask' && d.id === 'fb-survey');
@@ -93,7 +94,7 @@
         {
           transform: [
             {
-              filter: 'datum.time_value == currentTime',
+              filter: 'datum.time_value == t.i1',
             },
             {
               quantile: 'value',
@@ -173,6 +174,12 @@
         },
 
         {
+          mark: {
+            type: 'circle',
+            // tooltip: { content: 'data' },
+            opacity: 0.1,
+            size: 20,
+          },
           encoding: {
             x: {
               field: 'value',
@@ -214,7 +221,37 @@
                 // domainMax: 1,
               },
             },
+            color: {
+              field: 'region',
+              type: 'nominal',
+              legend: {
+                symbolOpacity: 1,
+              },
+            },
           },
+        },
+
+        {
+          transform: [
+            {
+              aggregate: [
+                {
+                  op: 'values',
+                  as: 'values',
+                },
+                {
+                  op: 'min',
+                  field: 'population',
+                  as: 'population',
+                },
+              ],
+              groupby: ['propertyId', 'region'],
+            },
+            {
+              calculate: `array2object(datum.values, 'time_value')`,
+              as: 'vs',
+            },
+          ],
           layer: [
             {
               selection: {
@@ -226,48 +263,30 @@
                     propertyId: $currentRegionInfo.propertyId.toUpperCase(),
                   },
                   fields: ['propertyId'],
-                  nearest: true,
+                  nearest: false,
                 },
               },
               mark: {
                 type: 'circle',
                 tooltip: { content: 'data' },
+                x: {
+                  expr: `lerp([scale('x', datum.vs[t.i0].value), scale('x', datum.vs[t.i1].value)], t.t)`,
+                },
+                y: {
+                  expr: `lerp([scale('y', datum.vs[t.i0].${yField}), scale('y', datum.vs[t.i1].${yField})], t.t)`,
+                },
               },
               encoding: {
+                color: {
+                  field: 'region',
+                  type: 'nominal',
+                },
                 size: {
-                  // not the current, fixed size
-                  condition: {
-                    test: 'datum.time_value != currentTime',
-                    value: 20,
-                  },
                   field: 'population',
                   type: 'quantitative',
                   scale: {
                     type: 'log',
                   },
-                },
-                color: {
-                  field: 'region',
-                  type: 'nominal',
-                },
-                opacity: {
-                  // highlighted -> highlight = 1, current date = 0.5 else 0.1
-                  // not highlighted -> current date = 1 else 0.1
-                  condition: [
-                    {
-                      selection: 'highlight',
-                      value: 1,
-                    },
-                    {
-                      test: 'datum.time_value == currentTime && highlight.propertyId != null',
-                      value: 0.5,
-                    },
-                    {
-                      test: 'datum.time_value == currentTime',
-                      value: 1,
-                    },
-                  ],
-                  value: 0.1,
                 },
               },
             },
@@ -278,60 +297,50 @@
                 dy: -5,
                 align: 'left',
                 baseline: 'bottom',
+                x: {
+                  expr: `lerp([scale('x', datum.vs[t.i0].value), scale('x', datum.vs[t.i1].value)], t.t)`,
+                },
+                y: {
+                  expr: `lerp([scale('y', datum.vs[t.i0].${yField}), scale('y', datum.vs[t.i1].${yField})], t.t)`,
+                },
               },
               encoding: {
                 text: {
                   field: 'propertyId',
                 },
-                opacity: {
-                  // highlighted -> highlightd & current date = 1, current date = 1 else 0.5
-                  // not highlighted -> current date = 1 else 0
-                  condition: [
-                    {
-                      test: {
-                        and: [
-                          {
-                            selection: 'highlight',
-                          },
-                          'datum.time_value == currentTime',
-                        ],
-                      },
-                      value: 1,
-                    },
-                    {
-                      test: 'datum.time_value == currentTime && highlight.propertyId != null',
-                      value: 0.5,
-                    },
-                    {
-                      test: 'datum.time_value == currentTime',
-                      value: 1,
-                    },
-                  ],
-                  value: 0,
-                },
-              },
-            },
-            {
-              transform: [
-                {
-                  filter: {
-                    selection: 'highlight',
-                  },
-                },
-              ],
-              mark: {
-                type: 'line',
-                opacity: 0.5,
-                point: false,
-              },
-              encoding: {
-                color: {
-                  field: 'region',
-                  type: 'nominal',
-                },
               },
             },
           ],
+        },
+        {
+          transform: [
+            {
+              filter: {
+                selection: 'highlight',
+              },
+            },
+          ],
+          mark: {
+            type: 'line',
+            opacity: 0.5,
+            point: true,
+          },
+          encoding: {
+            x: {
+              field: 'value',
+              type: 'quantitative',
+              sort: null,
+            },
+            y: {
+              field: yField,
+              type: 'quantitative',
+              sort: null,
+            },
+            color: {
+              field: 'region',
+              type: 'nominal',
+            },
+          },
         },
       ],
       config: {
@@ -365,13 +374,23 @@
 
   const data = loadGapMinderData($currentDateObject);
 
-  let currentDate = Number.parseInt(formatAPITime($currentDateObject));
+  let currentDate = toTimeValue($currentDateObject);
+  let t = {
+    i0: currentDate,
+    i1: currentDate,
+    t: 1,
+  };
 
   function onSignal(event) {
-    if (event.detail.name === 'highlight') {
+    if (event.detail.name === 'highlight' && !play) {
       const date = resolveHighlightedTimeValue(event);
       if (date !== currentDate) {
         currentDate = date;
+        t = {
+          i0: currentDate,
+          i1: currentDate,
+          t: 1,
+        };
       }
     }
   }
@@ -379,6 +398,72 @@
   let mode = 'change:1';
 
   $: thermalPlotSpec = thermalPlot(mode.split(':')[0], Number.parseInt(mode.split(':')[1], 10));
+
+  const duration = 500;
+  const step = duration / 20;
+
+  let play = false;
+
+  /**
+   * @type {Vega}
+   */
+  let vegaLine = null;
+  /**
+   * @type {Vega}
+   */
+  let vegaThermalPlot = null;
+
+  function tickAnimation(time, t) {
+    const ti = {
+      ...t,
+      t: time / duration,
+    };
+
+    const view = vegaThermalPlot.vegaDirectAccessor();
+    if (view) {
+      view.signal('t', ti);
+      view.runAsync();
+    }
+
+    const next = time + step;
+    if (next >= duration) {
+      setTimeout(tickTime, step);
+    } else {
+      setTimeout(tickAnimation, step, next, t);
+    }
+  }
+
+  function tickTime() {
+    const next = timeDay.offset(parseAPITime(currentDate), 1);
+    if (next < $currentDateObject && play) {
+      currentDate = toTimeValue(next);
+      t = {
+        i0: currentDate,
+        i1: toTimeValue(timeDay.offset(parseAPITime(currentDate), 1)),
+        t: 0,
+      };
+      /**
+       * @type {import('vega-typings').View}
+       */
+      const view = vegaLine.vegaDirectAccessor();
+      if (view) {
+        view.signal('highlight_tuple', {
+          unit: 'layer_1',
+          fields: view.signal('highlight_tuple_fields'),
+          values: [next.getTime()],
+        });
+        view.runAsync();
+      }
+
+      setTimeout(tickAnimation, step, step, t);
+    }
+  }
+
+  $: {
+    if (play) {
+      tickTime();
+    }
+  }
 </script>
 
 <style>
@@ -394,12 +479,22 @@
 
 <div class="uk-container root">
   <h2>{sensor.name} ThermalPlot</h2>
-  <Vega spec={lineSpec} data={casesData} signalListeners={['highlight']} signals={signalPatches} on:signal={onSignal} />
+  <Vega
+    bind:this={vegaLine}
+    spec={lineSpec}
+    data={casesData}
+    signalListeners={['highlight']}
+    signals={signalPatches}
+    on:signal={onSignal} />
   <h3>ThermalPlot</h3>
   <select bind:value={mode}>
     <option value="change:1">value vs. change (value - day before value)</option>
     <option value="trend:1">value vs. trend ((value - day before value) / (day before value))</option>
     <option value="trend:7">value vs. trend ((value - week before value) / (week before value))</option>
   </select>
-  <Vega spec={thermalPlotSpec} {data} className="gapminder" signals={{ currentTime: currentDate }} />
+  <button
+    on:click={() => {
+      play = !play;
+    }}>{play ? 'Stop' : 'Play'}</button>
+  <Vega bind:this={vegaThermalPlot} spec={thermalPlotSpec} {data} className="gapminder" signals={{ t }} />
 </div>
