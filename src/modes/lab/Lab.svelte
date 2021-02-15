@@ -36,6 +36,10 @@
       name: 'StateMatrix',
       component: () => import('./StateMatrix.svelte').then((r) => r.default),
     },
+    {
+      name: 'StateHTMLMatrix',
+      component: () => import('./StateHTMLMatrix.svelte').then((r) => r.default),
+    },
   ];
 
   let selected = Number.parseInt(new URL(window.location.href).searchParams.get('lab') || '0', 10);
