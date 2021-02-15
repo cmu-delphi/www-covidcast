@@ -119,7 +119,9 @@
         noData = !d || d.length === 0;
         // also update signals along the way
         Object.entries(signals).forEach(([key, v]) => {
-          vega.view.signal(key, resetSignalsUponNoData && noData ? null : v);
+          if (typeof v !== 'function') {
+            vega.view.signal(key, resetSignalsUponNoData && noData ? null : v);
+          }
         });
         vega.view.runAsync();
 
@@ -146,7 +148,9 @@
     }
     hasError = false;
     Object.entries(signals).forEach(([key, v]) => {
-      vega.view.signal(key, v);
+      if (typeof v !== 'function') {
+        vega.view.signal(key, v);
+      }
     });
     vega.view.runAsync();
   }
@@ -203,10 +207,6 @@
     };
     vegaPromise = import(/* webpackChunkName: 'vegafactory' */ './vegaFactory').then((m) =>
       m.default(root, spec, {
-        // actions: true,
-        // logLevel: Error,
-        actions: false,
-        logLevel: Error,
         tooltip: tooltipHandler,
         patch,
       }),

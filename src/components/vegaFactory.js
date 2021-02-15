@@ -67,36 +67,6 @@ export default function createVega(root, spec, options) {
   });
 }
 
-/**
- *
- * @param {any[]} array
- * @param {string} field
- */
-function customMap(array, field) {
-  return array.map((d) => (d != null ? d[field] : null));
-}
-
-/**
- *
- * @param {any[]} array
- * @param {string} field
- */
-function customFilter(array, field, value) {
-  return array.filter((d) => d != null && d[field] === value);
-}
-
-/**
- *
- * @param {any[]} array
- * @param {string} field
- */
-function customReduce(array, field, reduceFunction, initialValue) {
-  return array.reduce((acc, d) => reduceFunction(acc, d != null ? d[field] : null), initialValue);
-}
-
-expressionFunction('customMap', customMap);
-expressionFunction('customFilter', customFilter);
-expressionFunction('customReduce', customReduce);
 
 function customExtent(arr, field) {
   if (arr.length === 0) {
@@ -203,3 +173,12 @@ function paddingSquareCenter(
   };
 }
 expressionFunction('paddingSquareCenter', paddingSquareCenter);
+
+function array2object(arr, key) {
+  const r = {};
+  for (const v of arr) {
+    r[v[key]] = v;
+  }
+  return r;
+}
+expressionFunction('array2object', array2object);
