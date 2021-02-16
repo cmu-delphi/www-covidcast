@@ -8,7 +8,7 @@
 
   export let border = 0;
 
-  $: isDefined = x>=0 && y>=0;
+  $: isDefined = x >= 0 && y >= 0;
 </script>
 
 <style>
@@ -23,7 +23,7 @@
     grid-row-end: span 1;
   }
 
-/*
+  /*
   .hexgrid__cell_pos {
     /* column 2x + shift in odd rows
     grid-column-start: calc(1 + var(--col) * 2 + var(--col) % 2);
@@ -41,7 +41,7 @@
     /* hexagon shape */
     clip-path: polygon(0% 25%, 50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%);
     box-sizing: border-box;
-  
+
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -55,9 +55,10 @@
     border-bottom-width: 0 !important;
   }
 
-  .hexgrid_cell__border::before, .hexgrid_cell__border::after { 
-    z-index: -1;   
-    content: "";
+  .hexgrid_cell__border::before,
+  .hexgrid_cell__border::after {
+    z-index: -1;
+    content: '';
     left: calc(-1 * var(--border-size));
     top: 0;
     right: calc(-1 * var(--border-size));
@@ -67,7 +68,7 @@
     box-sizing: inherit;
     border-radius: inherit;
   }
-  
+
   .hexgrid_cell__border::before {
     transform: rotate(-60deg);
   }
@@ -76,8 +77,14 @@
   }
 </style>
 
-<div class="hexgrid_cell {classNameOuter}" style={isDefined ? `grid-column-start: ${1 + x*2 + y % 2}; grid-row-start: ${y + 1}`: ''}>
-  <div class="hexgrid_cell_content {className}" class:hexgrid_cell__border={border !== 0} style="--border: {border}; {style}" on:click >
+<div
+  class="hexgrid_cell {classNameOuter}"
+  style={isDefined ? `grid-column-start: ${1 + x * 2 + (y % 2)}; grid-row-start: ${y + 1}` : ''}>
+  <div
+    class="hexgrid_cell_content {className}"
+    class:hexgrid_cell__border={border !== 0}
+    style="--border-size: {border}; {style}"
+    on:click>
     <slot />
   </div>
 </div>

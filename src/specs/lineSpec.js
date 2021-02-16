@@ -326,8 +326,8 @@ export function generateSparkLine({ valueField = 'value', domain = null, color =
                   {
                     selection: 'highlight',
                   },
-                  "toNumber(datum.date_value) == toNumber(currentDate)"
-                ]
+                  'toNumber(datum.date_value) == toNumber(currentDate)',
+                ],
               },
               value: 1,
             },
