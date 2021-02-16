@@ -1,8 +1,8 @@
 <script>
   import { addMissing, fetchData, formatAPITime } from '../../data';
-  import { sensorList } from '../../stores/constants';
+  import { sensorList, sensorMap } from '../../stores/constants';
   import { state2TileCell } from '../../specs/matrixSpec';
-  import { currentDateObject, stats } from '../../stores';
+  import { currentDateObject, stats, currentRegion, currentRegionInfo } from '../../stores';
   import { formatDateShortOrdinal } from '../../formats';
   import { generateSparkLine } from '../../specs/lineSpec';
   import { timeWeek } from 'd3-time';
@@ -11,6 +11,9 @@
   import { determineColorScale, determineMinMax } from '../../components/MapBox/colors';
   import HexGrid from './components/HexGrid.svelte';
   import HexGridCell from './components/HexGridCell.svelte';
+  import RegionHexGridCell from './components/RegionHexGridCell.svelte';
+  import SensorHexGridCell from './components/SensorHexGridCell.svelte';
+import { toTimeValue } from '../mobile/utils';
 
   const sensor = sensorList.find((d) => d.isCasesOrDeath);
 
@@ -45,6 +48,12 @@
   $: colorScale = determineColorScale(determineMinMax($stats, sensor, 'state', {}), sensor, 'prop').scale;
 
   const maxColumn = state2TileCell.reduce((acc, v) => Math.max(acc, v.x), 0) + 1;
+
+  $: params = {
+    date: $currentDateObject,
+    timeValue: toTimeValue($currentDateObject),
+    region: $currentRegionInfo
+  };
 </script>
 
 <style>
@@ -54,7 +63,8 @@
     margin: 0;
   }
 
-  .title, .value {
+  .title,
+  .value {
     font-size: 80%;
   }
 
@@ -64,6 +74,18 @@
   .root :global(.message-overlay)::after {
     padding: 0;
   }
+
+  .root :global(.state-cell) {
+    cursor: pointer;
+  }
+
+  .root :global(.state-cell:hover),
+  .root :global(.state-cell.selected) {
+    filter: drop-shadow(0 0 2px #ccc);
+  }
+  .root :global(.state-cell.selected) {
+    filter: drop-shadow(0 0 2px #888);
+  }
 </style>
 
 <div class="uk-container root">
@@ -71,13 +93,13 @@
   <HexGrid columns={maxColumn} style="gap: 2px">
     {#each stateData as tile}
       {#await tile.value}
-        <HexGridCell x={tile.x} y={tile.y} className="loading">
+        <HexGridCell x={tile.x} y={tile.y} classNameOuter="state-cell {$currentRegion === tile.propertyId ? 'selected' : ''}" className="loading">
           <span class="title">{tile.propertyId}</span>
           <div class="vega-wrapper" />
           <span class="value"> ? </span>
         </HexGridCell>
       {:then v}
-        <HexGridCell x={tile.x} y={tile.y} style="background-color: {colorScale(v)}">
+        <HexGridCell x={tile.x} y={tile.y} classNameOuter="state-cell {$currentRegion === tile.propertyId ? 'selected' : ''}" style="background-color: {colorScale(v)};" on:click={() => currentRegion.set(tile.propertyId)}>
           <span class="title">{tile.propertyId}</span>
           <div class="vega-wrapper">
             <Vega {spec} data={tile.values} signals={{ currentDate: $currentDateObject }} noDataText="?" />
@@ -87,4 +109,17 @@
       {/await}
     {/each}
   </HexGrid>
+
+  <h3>Details {$currentRegionInfo.displayName}</h3>
+  <div class="content-grid">
+    <HexGrid className="grid-3-11" columns={3} style="gap: 2px" fit>
+      <RegionHexGridCell x={1} y={2} style="background: white" {params} border="2px"/>
+      <SensorHexGridCell x={0} y={1} style="background: white" {params} border="2px" sensor={sensorMap.get('fb-survey-smoothed_wearing_mask')} />
+      <SensorHexGridCell x={1} y={1} style="background: white" {params} border="2px" sensor={sensorMap.get('fb-survey-smoothed_cli')} />
+      <SensorHexGridCell x={2} y={2} style="background: white" {params} border="2px" sensor={sensorMap.get('hospital-admissions-smoothed_adj_covid19_from_claims')} />
+      <SensorHexGridCell x={0} y={3} style="background: white" {params} border="2px" sensor={sensorMap.get('indicator-combination-deaths_7dav_incidence_prop')} />
+      <SensorHexGridCell x={1} y={3} style="background: white" {params} border="2px" sensor={sensorMap.get('indicator-combination-confirmed_7dav_incidence_prop')} />
+      <SensorHexGridCell x={0} y={2} style="background: white" {params} border="2px" sensor={sensorMap.get('fb-survey-smoothed_covid_vaccinated_or_accept')} />
+    </HexGrid>
+  </div>
 </div>
