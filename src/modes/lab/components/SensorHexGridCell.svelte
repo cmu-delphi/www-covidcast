@@ -26,7 +26,9 @@
       height,
     };
     // nation
-    return generateLineChartSpec(options);
+    const spec = generateLineChartSpec(options);
+    spec.padding = { left: 35, top: 18, bottom: 20, right: 5 };
+    return spec;
   }
 
   /**
@@ -35,7 +37,7 @@
    */
   function loadData(sensor, params) {
     const region = params.region;
-    return fetchTimeSlice(sensor, region.level, region.propertyId, undefined, undefined, false, {
+    return fetchTimeSlice(sensor, region.level, region.propertyId, new Date(2020, 10 - 1, 1), params.date, true, {
       displayName: region.displayName,
     }).then((r) => addMissing(r, sensor));
   }
@@ -96,6 +98,7 @@
   }
   h5 {
     margin: 0;
+    margin-top: 0.5em;
     font-size: 1.5rem;
   }
 </style>
