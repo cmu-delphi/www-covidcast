@@ -38,7 +38,7 @@
 
 <HexGridCell {x} {y} {style} {className} border="2px" on:click>
   <div class="content">
-    <span>      
+    <span>
       <span class="inline-svg-icon">
         {@html childIcon}
       </span>
