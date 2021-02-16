@@ -153,9 +153,9 @@
         x={2}
         y={2}
         {params}
-        sensor={hospital}
+        sensor={cases}
         on:click={() => {
-          sensor = hospital;
+          sensor = cases;
         }} />
       <SensorHexGridCell
         x={0}
@@ -169,9 +169,9 @@
         x={1}
         y={3}
         {params}
-        sensor={cases}
+        sensor={hospital}
         on:click={() => {
-          sensor = cases;
+          sensor = hospital;
         }} />
       <SensorHexGridCell
         x={0}
