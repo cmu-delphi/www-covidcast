@@ -5,14 +5,16 @@
 
   export let rowHint = 0;
   export let shadow = false;
+  export let fit = false;
 </script>
 <style>
   .hexgrid {
     --columns: 10;
     --active-columns: var(--columns);
+    --pad: 0;
     display: grid;
     gap: 10px;
-    grid-template-columns: repeat(calc(2 * var(--active-columns, 10) + 1), 1fr);
+    grid-template-columns: repeat(calc(2 * var(--active-columns, 10) + var(--pad)), 1fr);
   }
 
   .shadow {
@@ -59,7 +61,7 @@
   }
 </style>
 
-<div class="hexgrid {className}" class:shadow style="--columns: {columns}; {style}">
+<div class="hexgrid {className}" class:shadow style="--columns: {columns}; --pad: {fit ? 0 : 1}; {style}" on:>
   {#each Array(rowHint).fill(0) as _,i}
     <div class="hexgrid__auto_filler" style="--row: {i}" />
     <div class="hexgrid__auto_filler_right" style="--row: {i}" />
