@@ -105,7 +105,10 @@
   </div>
   <div class="summary-button-bar">
     <div>
-      <a class="uk-button uk-button-default uk-button-delphi" href="?mode=mobile" on:click|preventDefault={switchMode}>
+      <a
+        class="uk-button uk-button-default uk-button-delphi"
+        href="?mode=mobile"
+        on:click|preventDefault={() => switchMode()}>
         <span class="inline-svg-icon">
           {@html arrowRightIcon}
         </span>
