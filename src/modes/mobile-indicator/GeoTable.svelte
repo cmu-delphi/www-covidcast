@@ -2,7 +2,6 @@
   import { getCountiesOfState, getInfoByName, stateInfo } from '../../maps';
   import { fetchData, fetchTimeSlice, addMissing } from '../../data/fetchData';
   import getRelatedCounties from '../../maps/related';
-  import { guessSensorColor } from '../mobile/utils';
   import { primaryValue } from '../../stores/constants';
   import { generateSparkLine } from '../../specs/lineSpec';
   import Vega from '../../components/Vega.svelte';
@@ -120,7 +119,7 @@
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
-  $: spec = generateSparkLine({ valueField: valueKey, color: guessSensorColor(sensor) });
+  $: spec = generateSparkLine({ valueField: valueKey });
 
   function loadRegionData(sensor, regions, date) {
     const startDate = timeWeek.offset(date, -4);

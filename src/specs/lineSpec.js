@@ -34,7 +34,7 @@ export function generateLineChartSpec({ height = 300, initialDate = null, valueF
    */
   const spec = {
     height,
-    padding: { left: 65, top: 16, bottom: 20, right: 10 },
+    padding: { left: 35, top: 16, bottom: 20, right: 10 },
     autosize: {
       type: 'none',
       contains: 'padding',

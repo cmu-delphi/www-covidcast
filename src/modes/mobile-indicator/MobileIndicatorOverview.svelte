@@ -3,7 +3,7 @@
   import { currentRegionInfo, currentSensorEntry, currentDateObject } from '../../stores';
   import SurveyParameters from '../survey/SurveyParameters.svelte';
   import GeoTable from './GeoTable.svelte';
-  import { findDateRow, guessSensorColor, toTimeValue } from '../mobile/utils';
+  import { findDateRow, toTimeValue } from '../mobile/utils';
   import '../mobile/common.css';
   import { addMissing, fetchTimeSlice } from '../../data';
   import { timeWeek } from 'd3-time';
@@ -11,7 +11,6 @@
   import { generateSparkLine } from '../../specs/lineSpec';
   import RegionMap from '../mobile/RegionMap.svelte';
   import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
-  import circleIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/circle.svg';
   import chevronDownIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-down.svg';
   import chevronUpIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-up.svg';
 
@@ -44,7 +43,7 @@
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
-  $: spec = generateSparkLine({ valueField: valueKey, color: guessSensorColor(sensor) });
+  $: spec = generateSparkLine({ valueField: valueKey });
 
   let showNeighbors = false;
 </script>
@@ -103,12 +102,7 @@
   <SurveyParameters {sensor} items={nameInfos} defaultItem={nationInfo} />
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <h2>
-        <span class="inline-svg-icon" style="color: {guessSensorColor(sensor)}">
-          {@html circleIcon}
-        </span>
-        {sensor.name}
-      </h2>
+      <h2>{sensor.name}</h2>
       <div class="chart-map">
         <RegionMap {params} {sensor} />
       </div>
