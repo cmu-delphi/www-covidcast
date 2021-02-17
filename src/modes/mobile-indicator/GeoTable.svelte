@@ -2,11 +2,11 @@
   import { getCountiesOfState, getInfoByName, stateInfo } from '../../maps';
   import { fetchData, fetchTimeSlice, addMissing } from '../../data/fetchData';
   import getRelatedCounties from '../../maps/related';
-  import { guessSensorColor } from './utils';
+  import { guessSensorColor } from '../mobile/utils';
   import { primaryValue } from '../../stores/constants';
   import { generateSparkLine } from '../../specs/lineSpec';
   import Vega from '../../components/Vega.svelte';
-  import SparkLineTooltip from './SparkLineTooltip.svelte';
+  import SparkLineTooltip from '../mobile/SparkLineTooltip.svelte';
   import SortColumnIndicator from './SortColumnIndicator.svelte';
   import { timeWeek } from 'd3-time';
 
