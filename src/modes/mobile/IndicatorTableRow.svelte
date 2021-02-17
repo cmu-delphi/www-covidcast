@@ -6,7 +6,7 @@
   import Vega from '../../components/Vega.svelte';
   import { timeWeek } from 'd3-time';
   import SparkLineTooltip from './SparkLineTooltip.svelte';
-  import plusCircleIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/plus-circle.svg';
+  import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
   import { currentMode, currentSensor } from '../../stores';
   import { modeByID } from '..';
 
@@ -53,9 +53,6 @@
 <tr>
   <td>
     <a href="?mode=mobile-indicator&sensor={sensor.key}" class="uk-link-text" on:click|preventDefault={switchMode}>
-      <span class="inline-svg-icon">
-        {@html plusCircleIcon}
-      </span>
       {sensor.name}
     </a>
   </td>
@@ -65,5 +62,12 @@
   </td>
   <td>
     <Vega {spec} {data} tooltip={SparkLineTooltip} tooltipProps={{ sensor }} signals={{ currentDate: params.date }} />
+  </td>
+  <td>
+    <a href="?mode=mobile-indicator&sensor={sensor.key}" class="uk-link-text" on:click|preventDefault={switchMode}>
+      <span class="inline-svg-icon">
+        {@html chevronRightIcon}
+      </span>
+    </a>
   </td>
 </tr>
