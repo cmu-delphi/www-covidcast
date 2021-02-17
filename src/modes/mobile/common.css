@@ -25,3 +25,30 @@
   text-transform: uppercase;
   vertical-align: top;
 }
+
+.mobile-table {
+  border-collapse: collapse;
+}
+.mobile-table > thead > tr {
+  border-bottom: 1px solid #f0f1f3;
+}
+.mobile-table > thead > tr > th {
+  padding: 0.75rem 4px;
+}
+.mobile-table > tbody {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.mobile-table > tbody > tr > td {
+  padding: 0.75rem 4px;
+  vertical-align: middle;
+}
+
+.mobile-table > tbody > tr:not(:last-of-type) {
+  border-bottom: 1px solid #f0f1f3;
+}
+
+.mobile-table > .sort-indicator {
+  text-align: right;
+  background: #fafafc;
+}

@@ -9,6 +9,7 @@
   import SparkLineTooltip from '../mobile/SparkLineTooltip.svelte';
   import SortColumnIndicator from './SortColumnIndicator.svelte';
   import { timeWeek } from 'd3-time';
+  import { fitRange } from '../../data';
 
   /**
    * @type {import("../utils").Params}
@@ -52,15 +53,13 @@
    */
   function loadData(sensor, params) {
     if (params.region.level === 'state') {
-      const geo = getCountiesOfState(params.region)
-        .map((d) => d.propertyId)
-        .join(',');
+      const geo = getCountiesOfState(params.region).map((d) => d.propertyId);
       return fetchData(sensor, 'county', geo, params.date, {
         time_value: params.timeValue,
       });
     }
     if (params.region.level === 'county') {
-      const geo = [params.region, ...getRelatedCounties(params.region)].map((d) => d.propertyId).join(',');
+      const geo = [params.region, ...getRelatedCounties(params.region)].map((d) => d.propertyId);
 
       return fetchData(sensor, 'county', geo, params.date, {
         time_value: params.timeValue,
@@ -125,6 +124,29 @@
 
   function loadRegionData(sensor, regions, date) {
     const startDate = timeWeek.offset(date, -4);
+    if (regions.length * 28 < 3600) {
+      // load all at once
+      const data = fetchData(
+        sensor,
+        regions[0].level,
+        regions === stateInfo ? '*' : regions.map((d) => d.propertyId),
+        [startDate, date],
+        {},
+        { multiValues: false },
+      );
+      return new Map(
+        regions.map((region) => [
+          region.propertyId,
+          data.then((rows) => {
+            let byRegion = rows.filter((d) => d.geo_value.toUpperCase() === region.propertyId.toUpperCase());
+            for (const row of byRegion) {
+              row.displayName = region.displayName;
+            }
+            return addMissing(fitRange(byRegion, sensor, startDate, date), sensor);
+          }),
+        ]),
+      );
+    }
     return new Map(
       regions.map((region) => [
         region.propertyId,
@@ -140,38 +162,11 @@
 </script>
 
 <style>
-  table {
-    border-collapse: collapse;
-  }
-  thead > tr {
-    border-bottom: 1px solid #f0f1f3;
-  }
-  thead > tr > th {
-    padding: 0.75rem 4px;
-  }
-  tbody {
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-  }
-
-  tbody > tr > td {
-    padding: 0.75rem 4px;
-    vertical-align: top;
-  }
-
-  tbody > tr:not(:last-of-type) {
-    border-bottom: 1px solid #f0f1f3;
-  }
-
-  .sort-indicator {
-    text-align: right;
-    background: #fafafc;
-  }
 </style>
 
 <h2 class="mobile-h2">{title.title}</h2>
 
-<table>
+<table class="mobile-table">
   <thead>
     <tr>
       <th class="mobile-th">{title.unit}</th>

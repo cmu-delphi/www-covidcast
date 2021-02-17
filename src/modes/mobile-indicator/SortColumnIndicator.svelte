@@ -19,8 +19,10 @@
     color: inherit;
     opacity: 0.8;
     padding: 0;
+    cursor: pointer;
   }
 
+  .sort-indicator:hover,
   .sort-indicator[disabled] {
     opacity: 1;
   }
