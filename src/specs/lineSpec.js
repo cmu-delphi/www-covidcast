@@ -251,7 +251,7 @@ export function generateCompareLineSpec(compare, { compareField = 'displayName',
   return spec;
 }
 
-export function generateSparkLine({ valueField = 'value', domain = null, color = COLOR }) {
+export function generateSparkLine({ valueField = 'value', domain = null, color = COLOR } = {}) {
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */

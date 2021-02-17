@@ -2,7 +2,6 @@
   import { getCountiesOfState, getInfoByName, stateInfo } from '../../maps';
   import { fetchData, fetchTimeSlice, addMissing } from '../../data/fetchData';
   import getRelatedCounties from '../../maps/related';
-  import { primaryValue } from '../../stores/constants';
   import { generateSparkLine } from '../../specs/lineSpec';
   import Vega from '../../components/Vega.svelte';
   import SparkLineTooltip from '../mobile/SparkLineTooltip.svelte';
@@ -51,6 +50,9 @@
    * @param {import("../utils").Params} params
    */
   function loadData(sensor, params) {
+    if (!params.date || !params.region) {
+      return Promise.resolve([]);
+    }
     if (params.region.level === 'state') {
       const geo = getCountiesOfState(params.region).map((d) => d.propertyId);
       return fetchData(sensor, 'county', geo, params.date, {
@@ -70,7 +72,7 @@
   }
 
   let sortCriteria = 'displayName';
-  let sortDirectionDesc = true;
+  let sortDirectionDesc = false;
 
   function applyDirection(comparator, sortDirectionDesc) {
     return sortDirectionDesc ? (a, b) => -comparator(a, b) : comparator;
@@ -115,13 +117,15 @@
       sortedRegions = rows.sort(comparator);
     });
   }
-  $: valueKey = primaryValue(sensor, {});
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
-  $: spec = generateSparkLine({ valueField: valueKey });
+  $: spec = generateSparkLine();
 
   function loadRegionData(sensor, regions, date) {
+    if (!date || !regions || regions.length === 0) {
+      return new Map();
+    }
     const startDate = timeWeek.offset(date, -4);
     if (regions.length * 28 < 3600) {
       // load all at once
@@ -207,7 +211,7 @@
           <a
             href="?region={region.propertyId}"
             class="uk-link-text"
-            on:click={() => params.setRegion(region)}>{region.displayName}</a>
+            on:click|preventDefault={() => params.setRegion(region)}>{region.displayName}</a>
         </td>
         <td class="uk-text-right">TODO</td>
         <td class="uk-text-right">{region.value == null ? 'N/A' : sensor.formatValue(region.value)}</td>

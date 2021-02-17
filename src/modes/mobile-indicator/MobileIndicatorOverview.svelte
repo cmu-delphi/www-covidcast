@@ -1,6 +1,6 @@
 <script>
   import { nameInfos, nationInfo } from '../../maps';
-  import { currentRegionInfo, currentSensorEntry, currentDateObject } from '../../stores';
+  import { currentRegionInfo, currentSensorEntry, currentDateObject, currentRegion } from '../../stores';
   import SurveyParameters from '../survey/SurveyParameters.svelte';
   import GeoTable from './GeoTable.svelte';
   import { findDateRow, toTimeValue } from '../mobile/utils';
@@ -18,6 +18,9 @@
     region: $currentRegionInfo || nationInfo,
     date: $currentDateObject,
     timeValue: toTimeValue($currentDateObject),
+    setRegion: (region) => {
+      currentRegion.set(region.propertyId);
+    },
   };
   $: sensor = $currentSensorEntry;
 
