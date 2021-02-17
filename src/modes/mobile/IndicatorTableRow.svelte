@@ -50,11 +50,25 @@
   }
 </script>
 
+<style>
+  .sensor-name {
+    display: block;
+  }
+
+  .source {
+    font-size: 10px;
+  }
+</style>
+
 <tr>
   <td>
-    <a href="?mode=mobile-indicator&sensor={sensor.key}" class="uk-link-text" on:click|preventDefault={switchMode}>
+    <a
+      href="?mode=mobile-indicator&sensor={sensor.key}"
+      class="uk-link-text sensor-name"
+      on:click|preventDefault={switchMode}>
       {sensor.name}
     </a>
+    <span class="source">Source: <strong>{sensor.id}</strong></span>
   </td>
   <td class="uk-text-right">TODO</td>
   <td class="uk-text-right">
