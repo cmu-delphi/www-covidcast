@@ -158,6 +158,12 @@ module.exports = () => {
         alwaysWriteToDisk: true,
         title: 'COVIDcast',
         template: './src/index.html',
+        filename: 'landing/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        alwaysWriteToDisk: true,
+        title: 'COVIDcast',
+        template: './src/index.html',
         filename: 'mobile/index.html',
       }),
       new HtmlWebpackPlugin({

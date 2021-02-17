@@ -15,6 +15,11 @@ const modes = [
     component: () => import(/* webpackChunkName: 'm-overview' */ './overview/Overview.svelte').then((r) => r.default),
   },
   {
+    id: 'landing',
+    label: 'Mobile Landing',
+    component: () => import(/* webpackChunkName: 'm-landing' */ './landing/Landing.svelte').then((r) => r.default),
+  },
+  {
     id: 'mobile',
     label: 'Mobile Overview',
     component: () => import(/* webpackChunkName: 'm-mobile' */ './mobile/MobileOverview.svelte').then((r) => r.default),
@@ -64,7 +69,7 @@ const modes = [
 export default modes;
 
 /**
- * @type {Record<'overview'|'timelapse'|'top10'|'export'|'single'|'survey-results'|'lab'|'mobile'|'mobile-indicator', Mode>}
+ * @type {Record<'overview'|'timelapse'|'top10'|'export'|'single'|'survey-results'|'lab'|'mobile'|'mobile-indicator'|'landing', Mode>}
  */
 export const modeByID = {};
 modes.forEach((mode) => (modeByID[mode.id] = mode));

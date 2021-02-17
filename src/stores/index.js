@@ -150,10 +150,20 @@ export const currentRegion = writable(defaultValues.region);
  */
 export const currentRegionInfo = derived([currentRegion], ([current]) => getInfoByName(current));
 
+function deriveRecent() {
+  if (!window.localStorage) {
+    return [];
+  }
+  const item = window.localStorage.getItem('recent') || '';
+  return item
+    .split(',')
+    .filter(Boolean)
+    .map((d) => getInfoByName(d));
+}
 /**
  * @type {import('svelte/store').Writable<import('../maps').NameInfo[]>}
  */
-export const recentRegionInfos = writable([]);
+export const recentRegionInfos = writable(deriveRecent());
 
 // keep track of top 10 recent selections
 currentRegionInfo.subscribe((v) => {
@@ -168,8 +178,12 @@ currentRegionInfo.subscribe((v) => {
   if (infos.length > 10) {
     infos.shift();
   }
-  infos.push(v);
+  infos.unshift(v);
   recentRegionInfos.set(infos);
+
+  if (window.localStorage) {
+    window.localStorage.setItem('recent', infos.map((d) => d.propertyId).join(','));
+  }
 });
 
 /**

@@ -66,8 +66,6 @@
 
 <h2>Overview</h2>
 
-<p>Our COVID-19 data is compromized of [000] data sources that update on a daily basis.</p>
-
 <div class="summary-stats">
   <div>
     <div class="summary-stats-number">
