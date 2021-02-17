@@ -261,7 +261,7 @@ function createCopy(row, date, sensorEntry) {
  * @param {string | undefined} region
  * @param {Date} startDate
  * @param {Date} endDate
- * @param {boolean} fitRange
+ * @param {boolean} fitDateRange
  * @param {Partial<EpiDataRow>} mixinValues
  * @returns {Promise<EpiDataRow[]>}
  */
@@ -271,7 +271,7 @@ export function fetchTimeSlice(
   region,
   startDate = START_TIME_RANGE,
   endDate = END_TIME_RANGE,
-  fitRange = false,
+  fitDateRange = false,
   mixinValues = {},
   options = {},
 ) {
@@ -280,7 +280,7 @@ export function fetchTimeSlice(
   }
   const timeRange = `${formatAPITime(startDate)}-${formatAPITime(endDate)}`;
   const data = fetchData(sensorEntry, level, region, timeRange, mixinValues, options);
-  if (!fitRange) {
+  if (!fitDateRange) {
     return data;
   }
   return data.then((r) => fitRange(r, sensorEntry, startDate, endDate));
