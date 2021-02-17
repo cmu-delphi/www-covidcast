@@ -283,20 +283,30 @@ export function fetchTimeSlice(
   if (!fitRange) {
     return data;
   }
-  return data.then((r) => {
-    if (r.length === 0) {
-      return r;
-    }
-    if (r[0].date_value != null && r[0].date_value > startDate) {
-      // inject a min
-      r.unshift(createCopy(r[0], startDate, sensorEntry));
-    }
-    if (r[r.length - 1].date_value != null && r[r.length - 1].date_value < endDate) {
-      // inject a max
-      r.push(createCopy(r[r.length - 1], endDate, sensorEntry));
-    }
-    return r;
-  });
+  return data.then((r) => fitRange(r, sensorEntry, startDate, endDate));
+}
+
+/**
+ * fit the data to be in the start/end date range
+ * @param {EpiDataRow[]} rows
+ * @param {SensorEntry} sensor
+ * @param {Date} startDate
+ * @param {Date} endDate
+ * @returns {EpiDataRow[]}
+ */
+export function fitRange(rows, sensor, startDate, endDate) {
+  if (rows.length === 0) {
+    return rows;
+  }
+  if (rows[0].date_value != null && rows[0].date_value > startDate) {
+    // inject a min
+    rows.unshift(createCopy(rows[0], startDate, sensor));
+  }
+  if (rows[rows.length - 1].date_value != null && rows[rows.length - 1].date_value < endDate) {
+    // inject a max
+    rows.push(createCopy(rows[rows.length - 1], endDate, sensor));
+  }
+  return rows;
 }
 
 /**
