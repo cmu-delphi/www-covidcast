@@ -17,6 +17,7 @@
   import { prepareSensorData } from '../overview/vegaSpec';
   import { smallMultipleTimeSpan } from '../../stores';
   import Vega from '../../components/Vega.svelte';
+  import { groupedSensorList } from '../../stores/constants';
 
   $: selectedLevels = new Set($currentMultiSelection.map((d) => d.info.level));
   function filterItem(item) {
@@ -35,6 +36,21 @@
     }
   }
   let selections = $currentMultiSelection;
+
+  /**
+   * @type {import('../../stores/constants').SensorEntry[]}
+   */
+  let otherSensors = [];
+
+  let chosenColumn = '';
+
+  $: {
+    if (chosenColumn) {
+      otherSensors = otherSensors.concat([sensorList.find((d) => d.key === chosenColumn)]);
+      chosenColumn = '';
+      console.info('otherSensors', otherSensors);
+    }
+  }
 
   function loadAllSignalData(sensorPromises) {
     // for each time_value, merge data values across sensors.
@@ -63,7 +79,9 @@
     });
   }
 
-  $: sensorListData = sensorList.slice(0, 4).map((sensor) => prepareSensorData(sensor, selections, startDay, endDay));
+  // $: sensorListData = sensorList.slice(0, 4).map((sensor) => prepareSensorData(sensor, selections, startDay, endDay));
+  $: sensorListData = otherSensors.map((sensor) => prepareSensorData(sensor, selections, startDay, endDay));
+
   $: sensorDataPromises = sensorListData.map((sensorData) => sensorData.data);
   $: sensorMatrixData = loadAllSignalData(sensorDataPromises);
 
@@ -73,47 +91,51 @@
     $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
 
     // autosize: {
-    //   type: 'none',
+    //   type: 'fixed',
     //   contains: 'padding',
     //   resize: true,
     // },
-    // padding: { left: 20, right: 2, top: 50, bottom: 5 },
-    width: 500,
-    height: 800,
+    padding: { left: 20, right: 40, top: 20, bottom: 50 },
+    // width: 500,
+    // height: 800,
 
     data: { name: 'values' },
 
+    // vconcat: [
+    //   {
     repeat: vegaRepeatSpec,
     spec: {
+      height: 200,
+      width: 200,
       mark: 'point',
-      // Selection for pan and zoom
-      // selection: {
-      //   brush: {
-      //     type: 'interval',
-      //     resolve: 'union',
-      //     on: '[mousedown[event.shiftKey], window:mouseup] > window:mousemove!',
-      //     translate: '[mousedown[event.shiftKey], window:mouseup] > window:mousemove!',
-      //     zoom: 'wheel![event.shiftKey]',
-      //   },
-      //   grid: {
-      //     type: 'interval',
-      //     resolve: 'global',
-      //     bind: 'scales',
-      //     translate: '[mousedown[!event.shiftKey], window:mouseup] > window:mousemove!',
-      //     zoom: 'wheel![!event.shiftKey]',
-      //   },
-      // },
+
       selection: {
         brush: {
           type: 'interval',
         },
       },
       encoding: {
-        x: { field: { repeat: 'column' }, type: 'quantitative', axis: { minExtent: 20 } },
+        x: {
+          field: { repeat: 'column' },
+          type: 'quantitative',
+          // axis: { minExtent: 20 },
+          // axis: null,
+          axis: {
+            title: null,
+            minExtent: 10,
+            maxExtent: 0,
+          },
+        },
         y: {
           field: { repeat: 'row' },
           type: 'quantitative',
-          axis: { minExtent: 30 },
+          // axis: { minExtent: 30 },
+          // axis: null,
+          axis: {
+            title: null,
+            minExtent: 10,
+            maxExtent: 0,
+          },
         },
         color: {
           condition: {
@@ -125,6 +147,8 @@
         },
       },
     },
+    //   },
+    // ],
   };
 </script>
 
@@ -143,6 +167,12 @@
     margin-bottom: 1em;
   }
 
+  .add-column-container {
+    min-width: 40px;
+  }
+  .add-sensor-button-wrapper {
+    min-width: 40px;
+  }
   .grid-wrapper {
     flex: 1 1 0;
     overflow: auto;
@@ -204,6 +234,26 @@
 </style>
 
 <div class="root base-font-size">
+  <div class="uk-table-shrink add-column-container">
+    <div class="add-sensor-button-wrapper" uk-form-custom="target: true">
+      <select bind:value={chosenColumn}>
+        {#each groupedSensorList as sensorGroup}
+          <optgroup label={sensorGroup.label}>
+            {#each sensorGroup.sensors as sensor}
+              <option
+                disabled={otherSensors.includes(sensor)}
+                title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
+                value={sensor.key}>
+                {sensor.name}
+              </option>
+            {/each}
+          </optgroup>
+        {/each}
+      </select>
+      <button type="button" aria-label="add column options" data-uk-icon="icon: plus" />
+    </div>
+  </div>
+
   <div class="search-container">
     <Search
       placeholder={$currentRegionInfo ? 'Compare with...' : 'Search for a location...'}
@@ -217,6 +267,7 @@
       on:add={(e) => addCompare(e.detail)}
       on:remove={(e) => removeCompare(e.detail.info)}
       on:change={(e) => selectByInfo(e.detail)} />
+
     <Vega data={Promise.resolve(sensorMatrixData)} spec={splomSpec} />
   </div>
 </div>
