@@ -41,11 +41,8 @@ export const appReady = writable(false);
  */
 export const MAGIC_START_DATE = '20200701';
 
-/**
- * resolve the default values based on the
- */
-const defaultValues = (() => {
-  const queryString = window.location.search;
+function deriveFromPath(url) {
+  const queryString = url.search;
   const urlParams = new URLSearchParams(queryString);
 
   const sensor = urlParams.get('sensor');
@@ -56,7 +53,7 @@ const defaultValues = (() => {
   const compareIds = (urlParams.get('compare') || '').split(',').map(getInfoByName).filter(Boolean);
 
   const modeFromPath = () => {
-    const pathName = window.location.pathname;
+    const pathName = url.pathname;
     // last path segment, e.g. /test/a -> a, /test/b/ -> b
     return pathName.split('/').filter(Boolean).reverse(0)[0];
   };
@@ -84,7 +81,11 @@ const defaultValues = (() => {
         ? compareIds.map((info, i) => ({ info, displayName: info.displayName, color: selectionColors[i] || 'grey' }))
         : null,
   };
-})();
+}
+/**
+ * resolve the default values based on the
+ */
+const defaultValues = deriveFromPath(window.location);
 
 /**
  * @type {import('svelte/store').Writable<import('../modes').Mode>}
@@ -380,6 +381,43 @@ export const trackedUrlParams = derived(
     return {
       path: mode === DEFAULT_MODE ? `` : `${mode.id}/`,
       params,
+      state: {
+        mode: mode.id,
+        ...params,
+      },
     };
   },
 );
+
+export function loadFromUrlState(state) {
+  if (state.mode !== get(currentMode)) {
+    currentMode.set(modeByID[state.mode]);
+  }
+  if (state.sensor != null && state.sensor !== get(currentSensor)) {
+    currentSensor.set(state.sensor);
+  }
+  if (state.level != null && state.level !== get(currentLevel)) {
+    currentLevel.set(state.level);
+  }
+  if (state.region != null && state.region !== get(currentRegion)) {
+    currentRegion.set(state.region);
+  }
+  if (state.date != null && state.date !== get(currentDate)) {
+    currentDate.set(state.date);
+  }
+  if (state.encoding != null && state.encoding !== get(encoding)) {
+    encoding.set(state.encoding);
+  }
+  if (state.signalC || state.signalI) {
+    signalCasesOrDeathOptions.set({
+      cumulative: state.signalC != null,
+      incidence: state.signalI != null,
+    });
+  }
+  if (state.compare) {
+    const compareIds = state.compare.split(',').map(getInfoByName).filter(Boolean);
+    currentCompareSelection.set(
+      compareIds.map((info, i) => ({ info, displayName: info.displayName, color: selectionColors[i] || 'grey' })),
+    );
+  }
+}

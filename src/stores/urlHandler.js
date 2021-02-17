@@ -1,4 +1,4 @@
-import { trackedUrlParams } from '.';
+import { loadFromUrlState, trackedUrlParams } from '.';
 import throttle from 'lodash-es/throttle';
 
 // Constantly keep the URL parameters updated with the current state.
@@ -17,7 +17,35 @@ export function updateURIParameters(state) {
   });
   const path = `${window.DELPHI_COVIDCAST_PAGE || '/'}${state.path}`;
   const query = params.toString();
-  window.history.replaceState(state, document.title, `${path}${query.length > 0 ? '?' : ''}${query}`);
+  const url = `${path}${query.length > 0 ? '?' : ''}${query}`;
+
+  // update only if the state has changed
+  const old = window.history.state || {};
+  const deltaState = { ...state.state };
+  // compute only the new changes
+  Object.keys(state.state).forEach((key) => {
+    if (old[key] === deltaState[key]) {
+      delete deltaState[key];
+    }
+  });
+  const changedStateKeys = Object.keys(deltaState);
+  if (changedStateKeys.length === 0) {
+    // no change
+    return;
+  }
+  // TODO what changes should trigger a history change
+  const pushState = changedStateKeys.includes('mode');
+  if (pushState) {
+    window.history.pushState(state.state, document.title, url);
+  } else {
+    window.history.replaceState(state.state, document.title, url);
+  }
 }
 
 trackedUrlParams.subscribe(throttle(updateURIParameters, 250));
+
+window.addEventListener('popstate', (e) => {
+  if (e.state && e.state.mode) {
+    loadFromUrlState(e.state);
+  }
+});
