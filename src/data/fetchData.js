@@ -24,11 +24,14 @@ import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 /**
  * @param {Partial<EpiDataRow>} mixinValues
  */
-function computeTransferFields(mixinValues = {}, advanced = false) {
+function computeTransferFields(mixinValues = {}, advanced = false, transferSignal = false) {
   const toRemove = Object.keys(mixinValues);
   const allFields = ['geo_value', 'stderr', 'time_value', 'value'];
   if (advanced) {
     allFields.push('issue', 'sample_size');
+  }
+  if (transferSignal) {
+    allFields.push('signal');
   }
   return allFields.filter((d) => !toRemove.includes(d));
 }
@@ -126,12 +129,12 @@ export function fetchData(
   region,
   date,
   mixinValues = {},
-  { advanced = false, multiValues = true } = {},
+  { advanced = false, multiValues = true, transferSignal = false } = {},
 ) {
   if (!region) {
     return Promise.resolve([]);
   }
-  const transferFields = computeTransferFields(mixinValues, advanced);
+  const transferFields = computeTransferFields(mixinValues, advanced, transferSignal);
   function fetchSeparate(defaultSignalIndex) {
     const extraDataFields = ['value'];
     // part of key

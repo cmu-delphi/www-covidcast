@@ -1,5 +1,5 @@
 <script>
-  import { factor } from './questions';
+  export let factor = 1;
   /**
    * @type {number}
    */
@@ -38,5 +38,5 @@
   }
 </style>
 
-<span class="text">{base}</span>
+<span class="text">{base.toLocaleString()}</span>
 {#if hasFraction}<span class="fraction"> {`.${fraction}`} </span>{/if}

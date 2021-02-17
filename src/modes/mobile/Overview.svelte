@@ -1,10 +1,9 @@
 <script>
-  import UiKitHint from '../../components/UIKitHint.svelte';
   import { fetchData } from '../../data';
-  import { formatDateLocal, formatDateShort } from '../../formats';
-  import { sensorList, times } from '../../stores';
-  import HistoryLineChart from './HistoryLineChart.svelte';
+  import { formatDateShort } from '../../formats';
+  import { sensorList, sensorMap } from '../../stores';
   import RegionMap from './RegionMap.svelte';
+  import SurveyValue from '../survey/SurveyValue.svelte';
 
   /**
    * @type {import("../utils").Params}
@@ -13,8 +12,6 @@
 
   const casesSensor = sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Cases'));
   const deathSensor = sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Deaths'));
-
-  $: minMaxDate = $times.get(casesSensor.key);
 
   $: casesData = fetchData(casesSensor, params.region.level, params.region.propertyId, params.date, {
     geo_value: params.region.propertyId,
@@ -28,68 +25,92 @@
   function formatNumber(v) {
     return v == null ? 'N/A' : v.toLocaleString();
   }
+
+  function loadHighlightSensors(date, region) {
+    const highlights = [
+      sensorMap.get('fb-survey-smoothed_wearing_mask'),
+      sensorMap.get('fb-survey-smoothed_cli'),
+      sensorMap.get('fb-survey-smoothed_covid_vaccinated_or_accept'),
+    ].filter(Boolean);
+    const data = fetchData(
+      {
+        ...highlights[0],
+        signal: highlights.map((d) => d.signal).join(','),
+      },
+      region.level,
+      region.propertyId,
+      date,
+      {},
+      {
+        transferSignal: true,
+      },
+    );
+    return highlights.map((h) => ({
+      sensor: h,
+      value: data.then((rows) => rows.filter((d) => d.signal === h.signal)[0]),
+    }));
+  }
+
+  $: highlightSurveySensors = loadHighlightSensors(params.date, params.region);
 </script>
 
 <style>
+  .fancy-header {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 2rem;
+    letter-spacing: 10%;
+  }
+  .fancy-header span {
+    text-transform: uppercase;
+    font-weight: 300;
+  }
   p {
     font-size: 0.875rem;
   }
   .summary-stats {
     display: flex;
     align-items: flex-start;
-    flex-wrap: wrap;
   }
   .summary-stats > div {
     margin-right: 2em;
   }
-  .summary-stats-number {
-    font-size: 2.75rem;
-  }
 
-  .chart-map,
-  .chart-line {
+  .chart-map {
     position: relative;
   }
   .chart-map > :global(*) {
     width: 100%;
     height: 300px;
   }
-  .chart-line > :global(*) {
-    width: 100%;
-    height: 150px;
-  }
-
-  .trend {
-    text-align: center;
-  }
 </style>
 
-<h2>Overview</h2>
+<h2 class="fancy-header">COVIDcast <span>Indicators</span></h2>
+
+<p>On <strong>average</strong> over the <strong>last 7 days</strong> there have been</p>
 
 <div class="summary-stats">
   <div>
-    <div class="summary-stats-number">
-      {#await casesData}N/A{:then d}{d ? formatNumber(d.countCumulative) : 'N/A'}{/await}
-    </div>
     <div>
-      Total Cases
-      {#await casesData then d}
-        <UiKitHint
-          title="Between {formatDateLocal(minMaxDate[0])} and {formatDateLocal(minMaxDate[1])} around {formatNumber(d.countCumulative)} people were reported having COVID-19." />
+      {#await casesData}
+        N/A
+      {:then d}
+        <SurveyValue value={d ? d.value : null} />
       {/await}
     </div>
+    <div><strong>Total cases</strong> per 100,000 people</div>
+    <div>TODO</div>
   </div>
   <div>
-    <div class="summary-stats-number">
-      {#await deathData}N/A{:then d}{d ? formatNumber(d.countCumulative) : 'N/A'}{/await}
-    </div>
     <div>
-      Total Deaths
-      {#await deathData then d}
-        <UiKitHint
-          title="Between {formatDateLocal(minMaxDate[0])} and {formatDateLocal(minMaxDate[1])} around {formatNumber(d.countCumulative)} people died because of COVID-19" />
+      {#await deathData}
+        N/A
+      {:then d}
+        <SurveyValue value={d ? d.value : null} />
       {/await}
     </div>
+    <div><strong>Total deaths</strong> per 100,000 people</div>
+    <div>TODO</div>
   </div>
 </div>
 
@@ -106,33 +127,23 @@
   <strong>
     {#await casesData}N/A{:then d}{d ? formatNumber(d.count) : 'N/A'}{/await}
     new cases</strong>
-  wree reported in
+  were reported in
   {params.region.displayName}
   on
   {formatDateShort(params.date)}.
 </p>
 
-<div class="chart-line">
-  <HistoryLineChart {params} sensor={casesSensor} />
-</div>
-<div class="trend">[percent] [trend] in cases</div>
-<p>
-  Over the past week, there has been an
-  <strong>average of
-    {#await casesData}N/A{:then d}{d ? formatNumber(d.avg) : 'N/A'}{/await}
-    cases per day</strong>, a
-  <strong>[trend] of [xx] percent</strong>
-  from average two weeks earlier.
-</p>
-
-<div class="chart">TODO line chart of vaccines</div>
-<div class="trend">[percent] [trend] in vaccines administered</div>
-
-<p><strong>[00] vaccines</strong> were administered in the past 7 days.</p>
-<p>
-  <strong>[name of county and state]</strong>
-  are leading with
-  <strong>[xx]</strong>
-  vaccines administered in the
-  <strong>past 7 days</strong>.
-</p>
+{#each highlightSurveySensors as s}
+  <h4>{s.sensor.name}</h4>
+  <div>TODO</div>
+  <div>
+    <div>
+      {#await s.value}
+        N/A
+      {:then d}
+        <SurveyValue value={d ? d.value : null} factor={10} />
+      {/await}
+    </div>
+    <div>per 1,000 people</div>
+  </div>
+{/each}

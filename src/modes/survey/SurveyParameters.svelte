@@ -11,6 +11,8 @@
 
   export let defaultItem = null;
 
+  export let placeholder = 'Search Region';
+
   /**
    * @type {import('../../maps').NameInfo[]}
    */
@@ -56,7 +58,7 @@
     <Search
       className="survey-search grid-3-8"
       modern
-      placeholder="Search Region"
+      {placeholder}
       {items}
       selectedItem={$currentRegionInfo || defaultItem}
       labelFieldName="displayName"

@@ -1,5 +1,5 @@
 <script>
-  import { nameInfos, nationInfo } from '../../maps';
+  import { countyInfo, nationInfo, stateInfo } from '../../maps';
   import { currentRegionInfo, currentRegion, currentSensorEntry, currentDateObject } from '../../stores';
   import SurveyParameters from '../survey/SurveyParameters.svelte';
   import IndicatorTable from './IndicatorTable.svelte';
@@ -32,7 +32,10 @@
 </style>
 
 <div class="root">
-  <SurveyParameters sensor={$currentSensorEntry} items={nameInfos} defaultItem={nationInfo} />
+  <SurveyParameters
+    sensor={$currentSensorEntry}
+    items={stateInfo.concat(countyInfo)}
+    placeholder="Search by State or County" />
   <div class="uk-container content-grid">
     <div class="grid-3-11">
       <Overview {params} />

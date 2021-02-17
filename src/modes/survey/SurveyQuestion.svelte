@@ -16,6 +16,7 @@
   import SurveyTooltip from './SurveyTooltip.svelte';
   import ShapeIcon from '../../components/ShapeIcon.svelte';
   import { isMobileDevice } from '../../stores';
+  import { factor } from './questions';
 
   /**
    * question object
@@ -263,7 +264,7 @@
           {#await summary}
             ?
           {:then s}
-            <SurveyValue value={s.max ? s.max.value : null} />
+            <SurveyValue value={s.max ? s.max.value : null} {factor} />
           {/await}
         </div>
         <div class="block-date">
@@ -281,7 +282,7 @@
           {#await summary}
             N/A
           {:then s}
-            <SurveyValue value={s.row ? s.row.value : null} />
+            <SurveyValue value={s.row ? s.row.value : null} {factor} />
           {/await}
         </div>
         <div class="block-date">
