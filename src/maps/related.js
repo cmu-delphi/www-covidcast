@@ -7,13 +7,12 @@ dsvFormat(';')
   .parse(relatedCountiesRaw)
   .forEach((row) => {
     const id = row.id;
-    lookup.set(
-      row.id,
-      row.related.split(',').map((related) => {
-        // TOTAL length of id, if less then they are in common
-        return id.slice(0, id.length - related.length) + related;
-      }),
-    );
+    const ids = row.related.split(',').map((related) => {
+      // TOTAL length of id, if less then they are in common
+      return id.slice(0, id.length - related.length) + related;
+      // consider renames
+    });
+    lookup.set(row.id, ids);
   });
 
 /**

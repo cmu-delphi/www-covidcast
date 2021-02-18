@@ -126,8 +126,19 @@ nameInfos.forEach((d) => {
   }
 });
 
+for (const alias of [
+  ['02270', '02158'],
+  ['46113', '46102'],
+]) {
+  infoLookup.set(alias[0], getInfoByName(alias[1]));
+}
+
 export function getInfoByName(name) {
-  return infoLookup.get(String(name).toLowerCase());
+  const r = infoLookup.get(String(name).toLowerCase());
+  if (!r) {
+    console.warn('unknown', name);
+  }
+  return r;
 }
 
 /**
