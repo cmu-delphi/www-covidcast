@@ -8,7 +8,6 @@
   import { addMissing, fetchTimeSlice } from '../../data';
   import { timeWeek } from 'd3-time';
   import { primaryValue } from '../../stores/constants';
-  import { generateSparkLine } from '../../specs/lineSpec';
   import RegionMap from '../mobile/RegionMap.svelte';
   import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
   import chevronDownIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-down.svg';
@@ -43,10 +42,6 @@
   $: data = loadData(sensor, params);
   $: currentRow = findCurrentRow(data, params.date);
   $: valueKey = primaryValue(sensor, {});
-  /**
-   * @type {import('vega-lite').TopLevelSpec}
-   */
-  $: spec = generateSparkLine({ valueField: valueKey });
 
   let showNeighbors = false;
 </script>
@@ -154,7 +149,10 @@
             <span class="inline-svg-icon">
               {@html chevronDownIcon}
             </span>
-            Neighboring Areas
+            {#if params.region.level === 'state'}
+              Counties of
+              {params.region.displayName}
+            {:else if params.region.level === 'county'}Neighboring Counties{:else}US States{/if}
           </button>
         </div>
       {/if}
