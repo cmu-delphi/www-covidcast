@@ -261,14 +261,21 @@ function genLevelLayer({ strokeWidth = 1, scheme = 'yellowgreenblue', domain = u
           clamp: true,
         },
         legend: {
-          orient: 'right',
-          align: 'center',
+          orient: 'none',
+          direction: 'horizontal',
+          legendX: {
+            expr: 'width - 160',
+          },
+          legendY: {
+            expr: 'height + 10',
+          },
           fontWeight: 'normal',
+          titleAnchor: 'end',
           labelLimit: 30,
           tickMinStep: 0.1,
-          titleOrient: 'left',
           title: legendTitle,
           titleFontWeight: 'normal',
+          gradientLength: 150,
         },
       },
     },
@@ -329,9 +336,9 @@ function genBaseSpec(level, topoJSON, infos, { height = 300 }) {
     height,
     padding: {
       left: 10,
-      bottom: 10,
+      bottom: 60,
       top: 10,
-      right: 100,
+      right: 10,
     },
     autosize: {
       type: 'none',
