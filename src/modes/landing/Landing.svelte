@@ -1,7 +1,7 @@
 <script>
   import Search from '../../components/Search.svelte';
   import { countyInfo, stateInfo } from '../../maps';
-  import { currentMode, groupedSensorList, recentRegionInfos, selectByInfo } from '../../stores';
+  import { currentMode, currentRegionInfo, groupedSensorList, recentRegionInfos, selectByInfo } from '../../stores';
   import flagUSAIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/flag-usa.svg';
   import arrowRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-circle-right.svg';
   import { modeByID } from '..';
@@ -70,7 +70,7 @@
   .chips {
     display: flex;
     flex-wrap: wrap;
-    margin: 1em 0;
+    margin: 0.5em 0;
   }
   .chips:empty {
     margin: 0;
@@ -79,7 +79,7 @@
     border-radius: 17px;
     padding: 4px 12px;
     background: #f0f1f3;
-    margin: 0 2px;
+    margin: 0.25em 2px;
   }
   .chip:hover,
   .chip:focus {
@@ -96,6 +96,7 @@
       modern="small"
       placeholder="Search for state or county"
       items={stateInfo.concat(countyInfo)}
+      selectedItem={$currentRegionInfo}
       labelFieldName="displayName"
       maxItemsToShowInList="5"
       on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)} />
