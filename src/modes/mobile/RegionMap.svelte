@@ -51,21 +51,28 @@
    * @param {import("../utils").Params} params
    */
   function loadData(sensor, params) {
+    const fetchImpl = (level, geo) =>
+      fetchData(
+        sensor,
+        level,
+        geo,
+        params.date,
+        {
+          time_value: params.timeValue,
+        },
+        {
+          multiValues: false,
+        },
+      );
     if (params.region.level === 'state') {
       const counties = getCountiesOfState(params.region);
-      return fetchData(sensor, 'county', `${params.region.id}000,${counties.map((d) => d.id).join(',')}`, params.date, {
-        time_value: params.timeValue,
-      });
+      return fetchImpl('county', `${params.region.id}000,${counties.map((d) => d.id).join(',')}`);
     }
     if (params.region.level === 'county') {
       const related = getRelatedCounties(params.region);
-      return fetchData(sensor, 'county', `${params.region.id},${related.map((d) => d.id).join(',')}`, params.date, {
-        time_value: params.timeValue,
-      });
+      return fetchImpl('county', `${params.region.id},${related.map((d) => d.id).join(',')}`);
     }
-    return fetchData(sensor, 'state', '*', params.date, {
-      time_value: params.timeValue,
-    });
+    return fetchImpl('state', '*');
   }
 
   $: spec = genSpec($stats, sensor, params.region);
