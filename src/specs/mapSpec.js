@@ -1,11 +1,4 @@
 import { countyInfo, hrrInfo, megaCountyInfo, nationInfo, stateInfo, msaInfo } from '../maps';
-import countyJSON from './shapefiles/county.json';
-import hrrJSON from './shapefiles/hrr.json';
-import nationJSON from './shapefiles/nation.json';
-import stateJSON from './shapefiles/state.json';
-import msaJSON from './shapefiles/msa.json';
-import stateTilesJSON from './tilegrams/state.topo.json';
-import nationTilesJSON from './tilegrams/nation.topo.json';
 import getRelatedCounties from '../maps/related';
 import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 import { MAP_THEME, MISSING_COLOR, ZERO_COLOR } from '../theme';
@@ -350,9 +343,10 @@ function genBaseSpec(level, topoJSON, infos, { height = 300 }) {
     },
     datasets: {
       values: [],
+      [level]: topoJSON,
     },
     data: {
-      values: topoJSON,
+      name: level,
       format: {
         type: 'topojson',
         feature: level,
@@ -390,13 +384,35 @@ function genBaseSpec(level, topoJSON, infos, { height = 300 }) {
   return spec;
 }
 
+function countyJSON() {
+  return import(/* webpackChunkName: 'shape-county' */ './shapefiles/county.json').then((r) => r.default);
+}
+function hrrJSON() {
+  return import(/* webpackChunkName: 'shape-hrr' */ './shapefiles/hrr.json').then((r) => r.default);
+}
+function nationJSON() {
+  return import(/* webpackChunkName: 'shape-nation' */ './shapefiles/nation.json').then((r) => r.default);
+}
+function stateJSON() {
+  return import(/* webpackChunkName: 'shape-state' */ './shapefiles/state.json').then((r) => r.default);
+}
+function msaJSON() {
+  return import(/* webpackChunkName: 'shape-msa' */ './shapefiles/msa.json').then((r) => r.default);
+}
+function stateTilesJSON() {
+  return import(/* webpackChunkName: 'tile-state' */ './tilegrams/state.topo.json').then((r) => r.default);
+}
+function nationTilesJSON() {
+  return import(/* webpackChunkName: 'tile-nation' */ './tilegrams/nation.topo.json').then((r) => r.default);
+}
+
 export function generateHRRSpec(options = {}) {
   const level = 'hrr';
-  const topoJSON = hrrJSON;
+  const topoJSON = hrrJSON();
   const infos = hrrInfo;
 
   const spec = genBaseSpec(level, topoJSON, infos, options);
-  spec.datasets.nation = nationJSON;
+  spec.datasets.nation = nationJSON();
   spec.layer.push(genMissingLayer());
 
   spec.layer.push(genLevelLayer(options));
@@ -406,11 +422,11 @@ export function generateHRRSpec(options = {}) {
 
 export function generateStateSpec(options = {}) {
   const level = 'state';
-  const topoJSON = stateJSON;
+  const topoJSON = stateJSON();
   const infos = stateInfo;
 
   const spec = genBaseSpec(level, topoJSON, infos, options);
-  spec.datasets.nation = nationJSON;
+  spec.datasets.nation = nationJSON();
   spec.layer.push(genMissingLayer());
 
   // state, msa
@@ -421,11 +437,11 @@ export function generateStateSpec(options = {}) {
 
 export function generateMSASpec(options = {}) {
   const level = 'msa';
-  const topoJSON = msaJSON;
+  const topoJSON = msaJSON();
   const infos = msaInfo;
 
   const spec = genBaseSpec(level, topoJSON, infos, options);
-  spec.datasets.nation = nationJSON;
+  spec.datasets.nation = nationJSON();
   spec.layer.push(genMissingLayer());
 
   // state, msa
@@ -436,7 +452,7 @@ export function generateMSASpec(options = {}) {
 
 export function generateNationSpec(options = {}) {
   const level = 'nation';
-  const topoJSON = nationJSON;
+  const topoJSON = nationJSON();
   const infos = [nationInfo];
 
   const spec = genBaseSpec(level, topoJSON, infos, options);
@@ -455,14 +471,14 @@ export function generateNationSpec(options = {}) {
  */
 export function generateCountySpec(options = {}) {
   const level = 'county';
-  const topoJSON = countyJSON;
+  const topoJSON = countyJSON();
   const infos = countyInfo;
 
   const spec = genBaseSpec(level, topoJSON, infos, options);
 
-  spec.datasets.nation = nationJSON;
+  spec.datasets.nation = nationJSON();
   spec.layer.push(genMissingLayer());
-  spec.datasets.state = stateJSON;
+  spec.datasets.state = stateJSON();
   spec.layer.push(genMegaLayer(megaCountyInfo));
   spec.layer.push(genLevelLayer({ ...options, strokeWidth: 0 }));
   spec.layer.push(genMegaBorderLayer());
@@ -477,7 +493,7 @@ export function generateCountySpec(options = {}) {
  */
 export function generateCountiesOfStateSpec(state, options = {}) {
   const level = 'county';
-  const topoJSON = countyJSON;
+  const topoJSON = countyJSON();
   const infos = countyInfo;
 
   const spec = genBaseSpec(level, topoJSON, infos, options);
@@ -496,7 +512,7 @@ export function generateCountiesOfStateSpec(state, options = {}) {
   };
   spec.transform.unshift(isCountyOfState);
 
-  spec.datasets.state = stateJSON;
+  spec.datasets.state = stateJSON();
   spec.layer.push(genMegaLayer(megaCountyInfo));
   spec.layer[spec.layer.length - 1].transform.unshift(isState);
   spec.layer.push(genLevelLayer(options));
@@ -510,7 +526,7 @@ export function generateCountiesOfStateSpec(state, options = {}) {
  */
 export function generateRelatedCountySpec(county, options = {}) {
   const level = 'county';
-  const topoJSON = countyJSON;
+  const topoJSON = countyJSON();
   const infos = countyInfo;
 
   const spec = genBaseSpec(level, topoJSON, infos, options);
@@ -542,7 +558,7 @@ export function generateRelatedCountySpec(county, options = {}) {
 
 export function generateStateTileSpec(options = {}) {
   const level = 'state';
-  const topoJSON = stateTilesJSON;
+  const topoJSON = stateTilesJSON();
   const infos = stateInfo;
 
   const spec = genBaseSpec(level, topoJSON, infos, options);
@@ -550,7 +566,7 @@ export function generateStateTileSpec(options = {}) {
     type: 'identity',
     reflectY: true,
   };
-  spec.datasets.nation = nationTilesJSON;
+  spec.datasets.nation = nationTilesJSON();
   spec.layer.push(genMissingLayer());
   // state, msa
   spec.layer.push(genLevelLayer(options));
