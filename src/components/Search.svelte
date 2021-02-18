@@ -424,6 +424,12 @@
     border-radius: 3px;
     border: 1px solid #d3d4d8;
   }
+  .uk-search-input.modern__small {
+    height: 52px;
+    padding-left: 50px !important;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
 
   @media only screen and (max-width: 1000px) {
     .uk-search-input.modern {
@@ -444,6 +450,7 @@
     <input
       class="uk-search-input"
       class:modern
+      class:modern__small={modern === 'small'}
       {placeholder}
       {name}
       {disabled}
@@ -481,6 +488,7 @@
       <input
         class="uk-search-input search-multiple-input"
         class:modern
+        class:modern__small={modern === 'small'}
         {placeholder}
         {name}
         {disabled}

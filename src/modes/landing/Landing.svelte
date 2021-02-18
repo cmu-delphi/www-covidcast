@@ -33,11 +33,12 @@
 
   .summary-button-bar > div {
     flex: 1 1 0;
+    margin: 0 1em;
   }
 
   .summary-button-bar .uk-button {
     display: block;
-    text-transform: center;
+    text-transform: uppercase;
   }
 
   @media only screen and (max-width: 715px) {
@@ -46,7 +47,7 @@
     }
 
     .summary-button-bar > div {
-      margin-bottom: 0.5em;
+      margin: 0 0 1em 0;
     }
   }
 
@@ -69,15 +70,15 @@
   .chips {
     display: flex;
     flex-wrap: wrap;
-    margin: 0.5em 0;
+    margin: 1em 0;
   }
   .chips:empty {
     margin: 0;
   }
   .chip {
-    border-radius: 3px;
-    border: 1px solid #d3d4d8;
-    padding: 2px 0.5em;
+    border-radius: 17px;
+    padding: 4px 12px;
+    background: #f0f1f3;
     margin: 0 2px;
   }
   .chip:hover,
@@ -92,7 +93,7 @@
     <p>Explore COVID-19 indicators nearby</p>
 
     <Search
-      modern
+      modern="small"
       placeholder="Search for state or county"
       items={stateInfo.concat(countyInfo)}
       labelFieldName="displayName"
@@ -123,13 +124,13 @@
       </div>
       <div>
         <a
-          class="uk-button uk-button-default uk-button-delphi"
+          class="uk-button uk-button-default uk-button-delphi uk-button-delphi__secondary"
           href="?mode=mobile"
           on:click|preventDefault={() => switchMode(null)}>
           <span class="inline-svg-icon">
             {@html flagUSAIcon}
           </span>
-          View United States
+          National Overview
         </a>
       </div>
     </div>

@@ -46,3 +46,8 @@
   text-transform: none;
   transition: all 0.25s ease;
 }
+
+.uk-button-delphi__secondary {
+  background: #f0f1f3;
+  color: inherit;
+}
