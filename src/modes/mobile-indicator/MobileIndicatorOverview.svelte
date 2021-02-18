@@ -10,8 +10,6 @@
   import { primaryValue } from '../../stores/constants';
   import RegionMap from '../mobile/RegionMap.svelte';
   import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
-  import chevronDownIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-down.svg';
-  import chevronUpIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-up.svg';
   import chevronLeftIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-left.svg';
   import { modeByID } from '..';
 
@@ -45,8 +43,6 @@
   $: currentRow = findCurrentRow(data, params.date);
   $: valueKey = primaryValue(sensor, {});
 
-  let showNeighbors = false;
-
   function switchMode() {
     currentMode.set(modeByID.mobile);
   }
@@ -70,13 +66,6 @@
   .chart-map > :global(*) {
     width: 100%;
     height: 300px;
-  }
-  .popup-button {
-    border: none;
-    background: none;
-    font-weight: inherit;
-    text-transform: uppercase;
-    color: inherit;
   }
 
   .popup-table {
@@ -145,30 +134,6 @@
         </tr>
       </table>
     </div>
-    <div class="grid-3-11">
-      {#if showNeighbors}
-        <GeoTable {sensor} {params} />
-        <div class="uk-text-center">
-          <button class="popup-button" on:click={() => (showNeighbors = false)}>
-            <span class="inline-svg-icon">
-              {@html chevronUpIcon}
-            </span>
-            Hide
-          </button>
-        </div>
-      {:else}
-        <div class="uk-text-center">
-          <button class="popup-button" on:click={() => (showNeighbors = true)}>
-            <span class="inline-svg-icon">
-              {@html chevronDownIcon}
-            </span>
-            {#if params.region.level === 'state'}
-              Counties of
-              {params.region.displayName}
-            {:else if params.region.level === 'county'}Neighboring Counties{:else}US States{/if}
-          </button>
-        </div>
-      {/if}
-    </div>
+    <GeoTable {sensor} {params} />
   </div>
 </div>
