@@ -1,6 +1,6 @@
 <script>
   import { nameInfos, nationInfo } from '../../maps';
-  import { currentRegionInfo, currentSensorEntry, currentDateObject, currentRegion } from '../../stores';
+  import { currentRegionInfo, currentSensorEntry, currentDateObject, currentRegion, currentMode } from '../../stores';
   import SurveyParameters from '../survey/SurveyParameters.svelte';
   import GeoTable from './GeoTable.svelte';
   import { findDateRow, toTimeValue } from '../mobile/utils';
@@ -12,6 +12,8 @@
   import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
   import chevronDownIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-down.svg';
   import chevronUpIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-up.svg';
+  import chevronLeftIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-left.svg';
+  import { modeByID } from '..';
 
   $: params = {
     region: $currentRegionInfo || nationInfo,
@@ -44,6 +46,10 @@
   $: valueKey = primaryValue(sensor, {});
 
   let showNeighbors = false;
+
+  function switchMode() {
+    currentMode.set(modeByID.mobile);
+  }
 </script>
 
 <style>
@@ -100,7 +106,14 @@
   <SurveyParameters {sensor} items={nameInfos} defaultItem={nationInfo} />
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <h2>{sensor.name}</h2>
+      <h2>
+        <a href="?mode=mobile" class="uk-link-text" on:click|preventDefault={switchMode}>
+          <span class="inline-svg-icon">
+            {@html chevronLeftIcon}
+          </span>
+        </a>
+        {sensor.name}
+      </h2>
       <div class="chart-map">
         <RegionMap {params} {sensor} />
       </div>
