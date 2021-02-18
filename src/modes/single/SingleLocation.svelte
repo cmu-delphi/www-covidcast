@@ -87,55 +87,53 @@
 
   $: vegaRepeatSpec = { row: [], column: [] };
 
-  $: splomSpec = {
-    $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
-
-    // autosize: {
-    //   type: 'fixed',
-    //   contains: 'padding',
-    //   resize: true,
-    // },
-    padding: { left: 20, right: 40, top: 20, bottom: 50 },
-    // width: 500,
-    // height: 800,
-
-    data: { name: 'values' },
-
-    // vconcat: [
-    //   {
-    repeat: vegaRepeatSpec,
-    spec: {
-      height: 200,
-      width: 200,
-      mark: 'point',
+  function makeMatrixCellSpec(row, column, options) {
+    let xBin = {};
+    let yAggregate = null;
+    if (options.histogram) {
+      xBin = { bin: true };
+      yAggregate = { aggregate: 'count' };
+    }
+    const chartSpec = {
+      // height: 200,
+      // width: 200,
+      // title: { text: options.xtitle, orient: 'left', color: 'black' },
+      // facet: {
+      //   field: 'title whatever',
+      //   type: 'ordinal',
+      // },
+      // spec: {
+      mark: options.histogram ? 'bar' : 'point',
 
       selection: {
         brush: {
           type: 'interval',
+          mark: { cursor: 'move' },
         },
       },
       encoding: {
         x: {
-          field: { repeat: 'column' },
+          field: column,
           type: 'quantitative',
+          ...xBin,
           // axis: { minExtent: 20 },
           // axis: null,
-          axis: {
-            title: null,
-            minExtent: 10,
-            maxExtent: 0,
-          },
+          // axis: {
+          //   title: null,
+          //   // minExtent: 10,
+          //   // maxExtent: 0,
+          // },
         },
-        y: {
-          field: { repeat: 'row' },
+        y: yAggregate || {
+          field: row,
           type: 'quantitative',
           // axis: { minExtent: 30 },
           // axis: null,
-          axis: {
-            title: null,
-            minExtent: 10,
-            maxExtent: 0,
-          },
+          // axis: {
+          //   title: null,
+          //   // minExtent: 10,
+          //   // maxExtent: 0,
+          // },
         },
         color: {
           condition: {
@@ -146,9 +144,122 @@
           value: 'grey',
         },
       },
-    },
+      // },
+    };
+    let spec = chartSpec;
+    // if (options.xtitle) {
+    //   spec = {
+    //     vconcat: [
+    //       chartSpec,
+    //       // {
+    //       //   mark: {
+    //       //     type: 'text',
+    //       //     text: options.xtitle,
+    //       //   },
+    //       //   encoding: {
+    //       //     text: {
+    //       //       value: options.xtitle,
+    //       //     },
+    //       //     x: { value: 0 },
+    //       //     Y: { value: 0 },
+    //       //   },
+    //       // },
+    //     ],
+    //   };
+    // }
+    return spec;
+  }
+
+  $: matrixSpec = [];
+  $: {
+    // const numRows = vegaRepeatSpec.row.length;
+    // const numCols = vegaRepeatSpec.column.length;
+    matrixSpec = {
+      columns: vegaRepeatSpec.column.length,
+      hconcat: [
+        ...vegaRepeatSpec.row
+          .map((r) => {
+            // const rowTitle = rowIndex == numRows - 1 ? r.row : '';
+            return [
+              ...vegaRepeatSpec.column.map((c) => {
+                // const colTitle = colIndex == numCols - 1 ? r.column : '';
+                return makeMatrixCellSpec(r, c, { histogram: r == c }); // ytitle: colTitle, xtitle: rowTitle
+              }),
+              // {
+              //   title: 'testing',
+              //   mark: {
+              //     type: 'text',
+              //     text: 'mark title',
+              //   },
+              // },
+            ].flat();
+          })
+          .flat(),
+      ],
+    };
+    console.info('matrix', matrixSpec);
+  }
+
+  $: splomSpec = {
+    $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
+    title: 'correlations',
+    // autosize: {
+    //   type: 'fixed',
+    //   contains: 'padding',
+    //   resize: true,
+    // },
+    padding: { left: 50, right: 40, top: 50, bottom: 50 },
+    // width: 500,
+    // height: 800,
+
+    data: { name: 'values' },
+    ...matrixSpec,
+    // vconcat: [
+    //   {
+    // repeat: vegaRepeatSpec,
+    // spec: {
+    //   height: 200,
+    //   width: 200,
+    //   mark: 'point',
+
+    //   selection: {
+    //     brush: {
+    //       type: 'interval',
+    //     },
     //   },
-    // ],
+    //   encoding: {
+    //     x: {
+    //       field: { repeat: 'column' },
+    //       type: 'quantitative',
+    //       // axis: { minExtent: 20 },
+    //       // axis: null,
+    //       axis: {
+    //         title: null,
+    //         minExtent: 10,
+    //         maxExtent: 0,
+    //       },
+    //     },
+    //     y: {
+    //       field: { repeat: 'row' },
+    //       type: 'quantitative',
+    //       // axis: { minExtent: 30 },
+    //       // axis: null,
+    //       axis: {
+    //         title: null,
+    //         minExtent: 10,
+    //         maxExtent: 0,
+    //       },
+    //     },
+    //     color: {
+    //       condition: {
+    //         selection: 'brush',
+    //         field: 'brush',
+    //         type: 'nominal',
+    //       },
+    //       value: 'grey',
+    //     },
+    //   },
+    // },
   };
 </script>
 
@@ -250,7 +361,7 @@
           </optgroup>
         {/each}
       </select>
-      <button type="button" aria-label="add column options" data-uk-icon="icon: plus" />
+      <button type="button" aria-label="add column options">Add Sensor</button>
     </div>
   </div>
 
