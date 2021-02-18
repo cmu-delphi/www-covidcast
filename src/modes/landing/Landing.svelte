@@ -1,9 +1,8 @@
 <script>
   import Search from '../../components/Search.svelte';
-  import { countyInfo, stateInfo } from '../../maps';
+  import { countyInfo, nationInfo, stateInfo } from '../../maps';
   import { currentMode, currentRegionInfo, groupedSensorList, recentRegionInfos, selectByInfo } from '../../stores';
   import flagUSAIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/flag-usa.svg';
-  import arrowRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-circle-right.svg';
   import { modeByID } from '..';
   import { questions } from '../survey/questions';
 
@@ -25,29 +24,15 @@
     font-weight: 700;
   }
 
-  .summary-button-bar {
+  .button-wrapper {
     display: flex;
-    justify-content: flex-start;
-    text-align: center;
-  }
-
-  .summary-button-bar > div {
-    flex: 1 1 0;
-    margin: 0 1em;
-  }
-
-  .summary-button-bar .uk-button {
-    display: block;
-    text-transform: uppercase;
+    flex-direction: column;
+    align-items: center;
   }
 
   @media only screen and (max-width: 715px) {
-    .summary-button-bar {
-      display: block;
-    }
-
-    .summary-button-bar > div {
-      margin: 0 0 1em 0;
+    .button-wrapper {
+      align-items: stretch;
     }
   }
 
@@ -95,11 +80,11 @@
     <Search
       modern="small"
       placeholder="Search for state or county"
-      items={stateInfo.concat(countyInfo)}
+      items={[nationInfo, ...stateInfo, ...countyInfo]}
       selectedItem={$currentRegionInfo}
       labelFieldName="displayName"
       maxItemsToShowInList="5"
-      on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)} />
+      on:change={(e) => switchMode(e.detail && e.detail.level === 'nation' ? null : e.detail)} />
 
     <div class="chips">
       {#each $recentRegionInfos.slice(0, 3) as region}
@@ -111,29 +96,16 @@
         </a>
       {/each}
     </div>
-    <div class="summary-button-bar">
-      <div>
-        <a
-          class="uk-button uk-button-default uk-button-delphi"
-          href="?mode=mobile"
-          on:click|preventDefault={() => switchMode()}>
-          <span class="inline-svg-icon">
-            {@html arrowRightIcon}
-          </span>
-          Continue
-        </a>
-      </div>
-      <div>
-        <a
-          class="uk-button uk-button-default uk-button-delphi uk-button-delphi__secondary"
-          href="?mode=mobile"
-          on:click|preventDefault={() => switchMode(null)}>
-          <span class="inline-svg-icon">
-            {@html flagUSAIcon}
-          </span>
-          National Overview
-        </a>
-      </div>
+    <div class="button-wrapper">
+      <a
+        class="uk-button uk-button-default uk-button-delphi"
+        href="?mode=mobile"
+        on:click|preventDefault={() => switchMode(null)}>
+        <span class="inline-svg-icon">
+          {@html flagUSAIcon}
+        </span>
+        National Overview
+      </a>
     </div>
 
     <p>
