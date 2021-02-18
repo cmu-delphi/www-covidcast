@@ -53,22 +53,30 @@
     if (!params.date || !params.region) {
       return Promise.resolve([]);
     }
+    function fetchImpl(level, geo) {
+      return fetchData(
+        sensor,
+        level,
+        geo,
+        params.date,
+        {
+          time_value: params.timeValue,
+        },
+        {
+          multiValues: false,
+        },
+      );
+    }
     if (params.region.level === 'state') {
       const geo = getCountiesOfState(params.region).map((d) => d.propertyId);
-      return fetchData(sensor, 'county', geo, params.date, {
-        time_value: params.timeValue,
-      });
+      return fetchImpl('county', geo);
     }
     if (params.region.level === 'county') {
       const geo = [params.region, ...getRelatedCounties(params.region)].map((d) => d.propertyId);
 
-      return fetchData(sensor, 'county', geo, params.date, {
-        time_value: params.timeValue,
-      });
+      return fetchImpl('county', geo);
     }
-    return fetchData(sensor, 'state', '*', params.date, {
-      time_value: params.timeValue,
-    });
+    return fetchImpl('state', '*');
   }
 
   let sortCriteria = 'displayName';

@@ -1,7 +1,6 @@
 <script>
   import { addMissing, fetchTimeSlice } from '../../data';
   import { findDateRow } from './utils';
-  import { primaryValue } from '../../stores/constants';
   import { generateSparkLine } from '../../specs/lineSpec';
   import Vega from '../../components/Vega.svelte';
   import { timeWeek } from 'd3-time';
@@ -26,10 +25,21 @@
       return null;
     }
     const startDate = timeWeek.offset(date, -4);
-    return fetchTimeSlice(sensor, region.level, region.propertyId, startDate, date, true, {
-      displayName: region.displayName,
-      geo_value: region.propertyId,
-    }).then((rows) => addMissing(rows, sensor));
+    return fetchTimeSlice(
+      sensor,
+      region.level,
+      region.propertyId,
+      startDate,
+      date,
+      true,
+      {
+        displayName: region.displayName,
+        geo_value: region.propertyId,
+      },
+      {
+        multiValues: false,
+      },
+    ).then((rows) => addMissing(rows, sensor));
   }
 
   function findCurrentRow(data, date) {
@@ -38,11 +48,10 @@
 
   $: data = loadData(sensor, params);
   $: currentRow = findCurrentRow(data, params.date);
-  $: valueKey = primaryValue(sensor, {});
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
-  $: spec = generateSparkLine({ valueField: valueKey });
+  $: spec = generateSparkLine();
 
   function switchMode() {
     currentSensor.set(sensor.key);
@@ -72,7 +81,7 @@
   </td>
   <td class="uk-text-right">TODO</td>
   <td class="uk-text-right">
-    {#await currentRow}?{:then row}{row ? sensor.formatValue(row[valueKey]) : 'N/A'}{/await}
+    {#await currentRow}?{:then row}{row ? sensor.formatValue(row.value) : 'N/A'}{/await}
   </td>
   <td>
     <Vega {spec} {data} tooltip={SparkLineTooltip} tooltipProps={{ sensor }} signals={{ currentDate: params.date }} />
