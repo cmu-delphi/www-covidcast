@@ -181,3 +181,5 @@ function array2object(arr, key) {
   return r;
 }
 expressionFunction('array2object', array2object);
+
+expressionFunction('customInFilter', (arr, prop, values) => arr.filter((d) => values.includes(d[prop])));

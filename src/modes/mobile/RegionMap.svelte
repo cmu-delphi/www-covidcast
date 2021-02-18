@@ -3,7 +3,6 @@
   import Vega from '../../components/Vega.svelte';
   import { fetchData } from '../../data';
   import { getCountiesOfState } from '../../maps';
-  import getRelatedCounties from '../../maps/related';
   import { generateCountiesOfStateSpec, generateRelatedCountySpec, generateStateSpec } from '../../specs/mapSpec';
   import { stats } from '../../stores';
   import RegionMapTooltip from './RegionMapTooltip.svelte';
@@ -69,8 +68,7 @@
       return fetchImpl('county', `${params.region.id}000,${counties.map((d) => d.id).join(',')}`);
     }
     if (params.region.level === 'county') {
-      const related = getRelatedCounties(params.region);
-      return fetchImpl('county', `${params.region.id},${related.map((d) => d.id).join(',')}`);
+      return fetchImpl('county', '*');
     }
     return fetchImpl('state', '*');
   }

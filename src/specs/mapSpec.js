@@ -537,16 +537,24 @@ export function generateRelatedCountySpec(county, options = {}) {
   const infos = countyInfo;
 
   const spec = genBaseSpec(level, topoJSON, infos, options);
-  const related = getRelatedCounties(county);
 
-  /**
-   * @type {import('vega-lite/build/src/transform').Transform}
-   */
-  const isRelevantCounty = {
-    filter: [county, ...related].map((d) => `datum.id === '${d.id}'`).join(' || '),
+  const related = getRelatedCounties(county);
+  spec.projection.fit = {
+    signal: `customInFilter(data('county'), 'id', ${JSON.stringify(related.map((d) => d.id))})`,
   };
-  spec.transform.unshift(isRelevantCounty);
-  spec.layer.push(genLevelLayer(options));
+  // /**
+  //  * @type {import('vega-lite/build/src/transform').Transform}
+  //  */
+  // const isRelevantCounty = {
+  //   filter: [county, ...related].map((d) => `datum.id === '${d.id}'`).join(' || '),
+  // };
+  spec.datasets.nation = nationJSON();
+  spec.layer.push(genMissingLayer());
+  spec.datasets.state = stateJSON();
+  spec.layer.push(genMegaLayer(megaCountyInfo));
+  spec.layer.push(genLevelLayer({ ...options, strokeWidth: 0 }));
+  spec.layer.push(genMegaBorderLayer());
+  spec.layer.push(genMegaHoverLayer());
   spec.layer.push(genLevelHoverLayer());
   // highlight the selected one
   spec.layer[spec.layer.length - 1].encoding.opacity.condition = {
