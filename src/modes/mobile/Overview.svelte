@@ -59,18 +59,34 @@
     font-size: 18px;
     font-weight: 600;
     line-height: 2rem;
-    letter-spacing: 10%;
+    letter-spacing: 0.05em;
+    margin: 0.5em 0;
   }
   .fancy-header span {
     text-transform: uppercase;
     font-weight: 300;
   }
+
+  h3 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-align: center;
+    margin: 0.6em 0;
+  }
+
+  h4 {
+    margin: 0;
+    font-size: 0.65rem;
+    text-align: center;
+  }
+
   p {
     font-size: 0.875rem;
   }
   .summary-stats {
     display: flex;
     align-items: flex-start;
+    font-size: 0.75rem;
   }
   .summary-stats > div {
     margin-right: 2em;
@@ -114,10 +130,22 @@
   </div>
 </div>
 
+<hr />
+
+<h3>
+  COVID-19 Cases
+  {#if params.region.level === 'nation'}
+    by state
+  {:else if params.region.level === 'state'}in {params.region.displayName}{:else}around {params.region.displayName}{/if}
+</h3>
+<h4>{casesSensor.mapTitleText({})}</h4>
 <div class="chart-map">
   <RegionMap {params} sensor={casesSensor} />
 </div>
 
+<hr />
+
+<h2 class="fancy-header"><span>Overall</span></h2>
 <p>
   At least
   <strong>
@@ -132,6 +160,10 @@
   on
   {formatDateShort(params.date)}.
 </p>
+
+<hr />
+
+<h2 class="fancy-header">KEY <span>Indicators</span></h2>
 
 {#each highlightSurveySensors as s}
   <h4>{s.sensor.name}</h4>

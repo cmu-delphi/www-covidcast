@@ -413,29 +413,22 @@
   }
   .uk-search-input.modern {
     background: white;
-    font-weight: 600;
-    letter-spacing: 3px;
-    height: 64px;
-    font-size: 1rem;
-    line-height: 1.5rem;
+    font-weight: 400;
+    height: 50px;
+    font-size: 0.75rem;
+    line-height: 1rem;
     padding-left: 50px !important;
     padding-top: 10px;
     padding-bottom: 10px;
     border-radius: 3px;
     border: 1px solid #d3d4d8;
   }
+
   .uk-search-input.modern__small {
     height: 52px;
     padding-left: 50px !important;
     padding-top: 4px;
     padding-bottom: 4px;
-  }
-
-  @media only screen and (max-width: 1000px) {
-    .uk-search-input.modern {
-      letter-spacing: initial;
-      font-size: 0.85rem;
-    }
   }
 </style>
 

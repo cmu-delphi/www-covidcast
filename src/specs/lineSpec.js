@@ -1,3 +1,4 @@
+import { CURRENT_DATE_HIGHLIGHT } from '../components/vegaSpecUtils';
 import { selectionColors } from '../theme';
 
 const COLOR = '#666666';
@@ -289,6 +290,7 @@ export function generateSparkLine({ valueField = 'value', domain = null, color =
       },
     },
     layer: [
+      CURRENT_DATE_HIGHLIGHT,
       {
         mark: {
           type: 'line',
@@ -321,14 +323,7 @@ export function generateSparkLine({ valueField = 'value', domain = null, color =
           },
           opacity: {
             condition: {
-              test: {
-                or: [
-                  {
-                    selection: 'highlight',
-                  },
-                  'toNumber(datum.date_value) == toNumber(currentDate)',
-                ],
-              },
+              selection: 'highlight',
               value: 1,
             },
             value: 0,

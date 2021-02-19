@@ -4,7 +4,7 @@
   import arrowRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-circle-right.svg';
   import calendarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/calendar.svg';
   import { parseAPITime } from '../data';
-  import { isMobileDevice, times } from '../stores';
+  import { times } from '../stores';
   import { formatDateShortOrdinal } from '../formats';
   import { timeDay } from 'd3-time';
 
@@ -43,7 +43,7 @@
     border: none;
     letter-spacing: 3px;
     background: none;
-    font-size: 1rem;
+    font-size: 0.875rem;
     font-weight: 600;
     padding: 13px;
     line-height: 1;
@@ -116,7 +116,7 @@
         <span class="selected-date-icon">
           {@html calendarIcon}
         </span>
-        <span>{formatDateShortOrdinal(value, !$isMobileDevice)}</span>
+        <span>{formatDateShortOrdinal(value)}</span>
       </button>
     </Datepicker>
   {:else}
@@ -124,7 +124,7 @@
       <span class="inline-svg-icon">
         {@html calendarIcon}
       </span>
-      <span>{formatDateShortOrdinal(value, !$isMobileDevice)}</span>
+      <span>{formatDateShortOrdinal(value)}</span>
     </button>
   {/if}
   <button

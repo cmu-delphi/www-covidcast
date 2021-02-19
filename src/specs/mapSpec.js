@@ -231,7 +231,7 @@ function genMegaHoverLayer() {
   return layer;
 }
 
-function genLevelLayer({ strokeWidth = 1, scheme = 'yellowgreenblue', domain = undefined, legendTitle = null } = {}) {
+function genLevelLayer({ strokeWidth = 1, scheme = 'yellowgreenblue', domain = undefined } = {}) {
   /**
    * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
    */
@@ -261,21 +261,22 @@ function genLevelLayer({ strokeWidth = 1, scheme = 'yellowgreenblue', domain = u
           clamp: true,
         },
         legend: {
+          title: null,
           orient: 'none',
           direction: 'horizontal',
           legendX: {
-            expr: 'width - 160',
+            expr: '(width / 2) - 10 - 150',
           },
           legendY: {
-            expr: 'height + 10',
+            expr: 'height + 20',
           },
           fontWeight: 'normal',
           titleAnchor: 'end',
           labelLimit: 30,
           tickMinStep: 0.1,
-          title: legendTitle,
           titleFontWeight: 'normal',
-          gradientLength: 150,
+          gradientLength: 300,
+          gradientThickness: 8,
         },
       },
     },
@@ -336,7 +337,7 @@ function genBaseSpec(level, topoJSON, infos, { height = 300 }) {
     height,
     padding: {
       left: 10,
-      bottom: 60,
+      bottom: 40,
       top: 10,
       right: 10,
     },

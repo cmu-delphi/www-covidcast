@@ -35,8 +35,8 @@
   }
 
   .parameters {
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 6px;
+    margin-bottom: 6px;
   }
 
   @media only screen and (max-width: 715px) {
