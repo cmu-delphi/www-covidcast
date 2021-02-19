@@ -80,7 +80,7 @@
 
 <hr />
 <div class="chart-map">
-  <RegionMap {params} />
+  <RegionMap {params} sensor={params.sensor} />
 </div>
 
 <h2 class="mobile-fancy-header">Performance</h2>

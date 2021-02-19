@@ -13,6 +13,11 @@
   export let params;
 
   /**
+   * @type {import('../../stores/constants').SensorEntry}
+   */
+  export let sensor;
+
+  /**
    * @param {import('../../stores/constants').SensorEntry} sensor
    * @param {import('../../maps').NameInfo} region
    */
@@ -58,8 +63,8 @@
     return params.fetchMultiRegions(sensor, 'state', '*');
   }
 
-  $: spec = genSpec($stats, params.sensor, params.region);
-  $: data = loadData(params.sensor, params);
+  $: spec = genSpec($stats, sensor, params.region);
+  $: data = loadData(sensor, params);
 </script>
 
 <Vega {className} {spec} {data} tooltip={RegionMapTooltip} tooltipProps={{ sensor: params.sensor }} />

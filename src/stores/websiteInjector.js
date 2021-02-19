@@ -1,22 +1,10 @@
 import { currentMode } from '.';
-import modes, { modeByID } from '../modes';
+import { modeByID } from '../modes';
 
-let modeList = document.querySelector('.covidcast-modes');
+let modeList = document.querySelector('.nav-container');
 if (!modeList) {
   // create a dummy one
-  document.body.insertAdjacentHTML(
-    'afterbegin',
-    `<div class="covidcast-modes">
-  <div class="uk-container uk-margin-remove-vertical">
-    <ul class="uk-tab">
-        ${modes
-          .map((d) => `<li data-mode="${d.id}" class="covidcast-mode"><a href="/${d.id}">${d.label}</a></li>`)
-          .join('')}
-    </ul>
-  </div>
-</div>`,
-  );
-  modeList = document.querySelector('.covidcast-modes');
+  modeList = document.createElement('div');
 }
 
 // inject shortcut handling
