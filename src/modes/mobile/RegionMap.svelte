@@ -53,7 +53,7 @@
       );
     }
     if (params.region.level === 'county') {
-      return params.fetchMultiRegions('county', '*');
+      return params.fetchMultiRegions(sensor, 'county', '*');
     }
     return params.fetchMultiRegions(sensor, 'state', '*');
   }
