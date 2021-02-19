@@ -217,7 +217,7 @@
       </tr>
     {/each}
   </tbody>
-  {#if !showAll}
+  {#if !showAll && regions.length > 10}
     <tfoot>
       <tr>
         <td colspan="5" class="uk-text-center">
