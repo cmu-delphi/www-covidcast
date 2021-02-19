@@ -25,6 +25,7 @@
   }
 
   .button-wrapper {
+    margin-top: 0.5em;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -55,7 +56,7 @@
   .chips {
     display: flex;
     flex-wrap: wrap;
-    margin: 0.5em 0;
+    margin-top: 0.5em;
   }
   .chips:empty {
     margin: 0;

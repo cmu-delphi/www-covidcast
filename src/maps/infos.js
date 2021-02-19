@@ -134,6 +134,9 @@ for (const alias of [
 }
 
 export function getInfoByName(name) {
+  if (!name) {
+    return null;
+  }
   const r = infoLookup.get(String(name).toLowerCase());
   if (!r) {
     console.warn('unknown', name);

@@ -10,6 +10,7 @@ import {
   DEFAULT_SENSOR,
   DEFAULT_SURVEY_SENSOR,
   DEFAULT_ENCODING,
+  defaultRegionOnStartup,
 } from './constants';
 import modes, { modeByID } from '../modes';
 import { parseAPITime } from '../data/utils';
@@ -155,6 +156,9 @@ function deriveRecent() {
     return [];
   }
   const item = window.localStorage.getItem('recent') || '';
+  if (!item) {
+    return [getInfoByName(defaultRegionOnStartup.state), getInfoByName(defaultRegionOnStartup.county)];
+  }
   return item
     .split(',')
     .filter(Boolean)
