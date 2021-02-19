@@ -8,6 +8,7 @@
   import SortColumnIndicator from './SortColumnIndicator.svelte';
   import { timeWeek } from 'd3-time';
   import { fitRange } from '../../data';
+  import chevronDownIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-down.svg';
 
   /**
    * @type {import("../utils").Params}
@@ -119,10 +120,12 @@
     }),
   );
 
+  let showAll = false;
+
   $: {
     sortedRegions = regions.slice();
     loadedData.then((rows) => {
-      sortedRegions = rows.sort(comparator);
+      sortedRegions = rows.sort(comparator).slice(0, showAll ? -1 : 10);
     });
   }
   /**
@@ -231,4 +234,22 @@
       </tr>
     {/each}
   </tbody>
+  {#if !showAll}
+    <tfoot>
+      <tr>
+        <td colspan="5" class="uk-text-center">
+          <button
+            class="uk-button uk-button-default uk-button-delphi uk-button-delphi__secondary"
+            on:click={() => (showAll = true)}>
+            <span class="inline-svg-icon">
+              {@html chevronDownIcon}
+            </span>
+            Show remaining
+            {(regions.length - 10).toLocaleString()}
+            regions
+          </button>
+        </td>
+      </tr>
+    </tfoot>
+  {/if}
 </table>

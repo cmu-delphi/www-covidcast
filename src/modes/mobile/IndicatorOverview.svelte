@@ -1,24 +1,20 @@
 <script>
-  import { nationInfo } from '../../maps';
-  import { currentRegionInfo, currentSensorEntry, currentDateObject, currentRegion, currentMode } from '../../stores';
-  import { findDateRow, toTimeValue } from './utils';
+  import { findDateRow } from './utils';
   import { addMissing, fetchTimeSlice } from '../../data';
   import { timeWeek } from 'd3-time';
   import { primaryValue } from '../../stores/constants';
   import RegionMap from './RegionMap.svelte';
   import HistoryLineChart from './HistoryLineChart.svelte';
-  import chevronLeftIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-left.svg';
-  import { modeByID } from '..';
 
-  $: params = {
-    region: $currentRegionInfo || nationInfo,
-    date: $currentDateObject,
-    timeValue: toTimeValue($currentDateObject),
-    setRegion: (region) => {
-      currentRegion.set(region.propertyId);
-    },
-  };
-  $: sensor = $currentSensorEntry;
+  /**
+   * @type {import("../utils").Params}
+   */
+  export let params;
+
+  /**
+   * @type {import('../../stores/constants').SensorEntry}
+   */
+  export let sensor;
 
   function loadData(sensor, params) {
     const { region, date } = params;
@@ -39,10 +35,6 @@
   $: data = loadData(sensor, params);
   $: currentRow = findCurrentRow(data, params.date);
   $: valueKey = primaryValue(sensor, {});
-
-  function switchMode() {
-    currentMode.set(modeByID.mobile);
-  }
 </script>
 
 <style>
@@ -59,7 +51,7 @@
     height: 300px;
   }
 
-  .popup-table {
+  .indicator-table {
     margin: 2em 0;
     border-collapse: collapse;
     font-size: 0.75rem;
@@ -67,62 +59,70 @@
     width: 100%;
   }
 
-  .popup-table > tr > * {
+  .indicator-table > tr > * {
     padding: 0.5rem 4px;
     vertical-align: top;
   }
 
-  .popup-table > tr:not(:last-of-type) {
+  .indicator-table > tr:not(:last-of-type) {
     border-bottom: 1px solid #f0f1f3;
   }
 
-  .popup-table-value {
+  .indicator-table-value {
     font-weight: 600;
     text-align: right;
   }
+
+  .desc {
+    font-size: 0.875rem;
+  }
 </style>
 
-<h2 class="mobile-fancy-header">
-  <a href="?mode=mobile" class="uk-link-text" on:click|preventDefault={switchMode}>
-    <span class="inline-svg-icon">
-      {@html chevronLeftIcon}
-    </span>
-  </a>
-  {sensor.name}
-</h2>
+<h2 class="mobile-fancy-header">INDICATOR <span>Details</span></h2>
+
+TODO dropdown
 
 <hr />
 <div class="chart-map">
   <RegionMap {params} {sensor} />
 </div>
 
-<hr />
+<h2 class="mobile-fancy-header">Performance</h2>
+
 <div class="chart-line">
   <HistoryLineChart {params} {sensor} />
 </div>
 <hr />
 
-<table class="popup-table">
+<table class="indicator-table">
   <tr>
     <td>Last 7 day trend</td>
-    <td class="popup-table-value">TODO</td>
+    <td class="indicator-table-value">TODO</td>
   </tr>
   <tr>
     <td>Last 7 day avg</td>
-    <td class="popup-table-value">
+    <td class="indicator-table-value">
       {#await currentRow}?{:then row}{row ? sensor.formatValue(row[valueKey]) : 'N/A'}{/await}
     </td>
   </tr>
   <tr>
     <td>Peak 7 day period</td>
-    <td class="popup-table-value">TODO</td>
+    <td class="indicator-table-value">TODO</td>
   </tr>
   <tr>
     <td>Record high</td>
-    <td class="popup-table-value">TODO</td>
+    <td class="indicator-table-value">TODO</td>
   </tr>
   <tr>
     <td>Record low</td>
-    <td class="popup-table-value">TODO</td>
+    <td class="indicator-table-value">TODO</td>
   </tr>
 </table>
+
+{#if sensor.description}
+  <h2 class="mobile-fancy-header">About this indicator</h2>
+
+  <div class="desc">
+    {@html sensor.description}
+  </div>
+{/if}

@@ -168,7 +168,11 @@
     }
     if (vegaPromise) {
       // cleanup old
-      vegaPromise.then((r) => r.finalize());
+      vegaPromise.then((r) => {
+        if (r) {
+          r.finalize();
+        }
+      });
     }
     vega = null;
     hasError = false;
@@ -218,6 +222,9 @@
       spec,
       ...specDatasetsEntries.map((d) => d[1]),
     ]).then(([m, spec, ...ds]) => {
+      if (!root) {
+        return null;
+      }
       // patch in the spec defined datasets with their loaded values
       specDatasetsEntries.forEach((entry, i) => {
         spec.datasets[entry[0]] = ds[i];
@@ -309,7 +316,11 @@
       vega = null;
       vegaPromise = null;
     } else if (vegaPromise) {
-      vegaPromise.then((r) => r.finalize());
+      vegaPromise.then((r) => {
+        if (r) {
+          r.finalize();
+        }
+      });
       vegaPromise = null;
     }
   });
