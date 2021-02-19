@@ -5,6 +5,7 @@
   import { primaryValue } from '../../stores/constants';
   import RegionMap from './RegionMap.svelte';
   import HistoryLineChart from './HistoryLineChart.svelte';
+  import IndicatorDropdown from './IndicatorDropdown.svelte';
 
   /**
    * @type {import("../utils").Params}
@@ -80,7 +81,7 @@
 
 <h2 class="mobile-fancy-header">INDICATOR <span>Details</span></h2>
 
-TODO dropdown
+<IndicatorDropdown {sensor} />
 
 <hr />
 <div class="chart-map">
