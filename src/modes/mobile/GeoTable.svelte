@@ -16,11 +16,6 @@
   export let params;
 
   /**
-   * @type {import('../../stores/constants').SensorEntry}
-   */
-  export let sensor;
-
-  /**
    * @param {import('../../maps').NameInfo} region
    */
   function determineRegions(region) {
@@ -50,34 +45,20 @@
    * @param {import('../../stores/constants').SensorEntry} sensor
    * @param {import("../utils").Params} params
    */
-  function loadData(sensor, params) {
-    if (!params.date || !params.region) {
+  function loadData(params) {
+    if (!params.sensor || !params.date || !params.region) {
       return Promise.resolve([]);
-    }
-    function fetchImpl(level, geo) {
-      return fetchData(
-        sensor,
-        level,
-        geo,
-        params.date,
-        {
-          time_value: params.timeValue,
-        },
-        {
-          multiValues: false,
-        },
-      );
     }
     if (params.region.level === 'state') {
       const geo = getCountiesOfState(params.region).map((d) => d.propertyId);
-      return fetchImpl('county', geo);
+      return params.fetchMultiRegions(params.sensor, 'county', geo);
     }
     if (params.region.level === 'county') {
       const geo = [params.region, ...getRelatedCounties(params.region)].map((d) => d.propertyId);
 
-      return fetchImpl('county', geo);
+      return params.fetchMultiRegions(params.sensor, 'county', geo);
     }
-    return fetchImpl('state', '*');
+    return params.fetchMultiRegions(params.sensor, 'state', '*');
   }
 
   let sortCriteria = 'displayName';
@@ -113,7 +94,7 @@
 
   let sortedRegions = [];
 
-  $: loadedData = loadData(sensor, params).then((rows) =>
+  $: loadedData = loadData(params).then((rows) =>
     rows.map((row) => {
       const info = getInfoByName(row.geo_value);
       return Object.assign({}, info, row);
@@ -172,7 +153,7 @@
     );
   }
 
-  $: regionData = loadRegionData(sensor, regions, params.date);
+  $: regionData = loadRegionData(params.sensor, regions, params.date);
 </script>
 
 <h2 class="mobile-fancy-header">{title.title}</h2>
@@ -183,7 +164,9 @@
       <th class="mobile-th">{title.unit}</th>
       <th class="mobile-th uk-text-right">Change Last 7 days</th>
       <th class="mobile-th uk-text-right">
-        {#if sensor.isCasesSignal}per 100k{:else if sensor.format === 'percent'}Percentage{:else}Value{/if}
+        {#if params.sensor.isCasesSignal}
+          per 100k
+        {:else if params.sensor.format === 'percent'}Percentage{:else}Value{/if}
       </th>
       <th class="mobile-th uk-text-right"><span>historical trend</span></th>
     </tr>
@@ -222,13 +205,13 @@
             on:click|preventDefault={() => params.setRegion(region)}>{region.displayName}</a>
         </td>
         <td class="uk-text-right">TODO</td>
-        <td class="uk-text-right">{region.value == null ? 'N/A' : sensor.formatValue(region.value)}</td>
+        <td class="uk-text-right">{region.value == null ? 'N/A' : params.sensor.formatValue(region.value)}</td>
         <td>
           <Vega
             {spec}
             data={regionData.get(region.propertyId) || []}
             tooltip={SparkLineTooltip}
-            tooltipProps={{ sensor }}
+            tooltipProps={{ sensor: params.sensor }}
             signals={{ currentDate: params.date }} />
         </td>
       </tr>

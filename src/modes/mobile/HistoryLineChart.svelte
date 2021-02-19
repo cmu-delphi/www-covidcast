@@ -15,11 +15,6 @@
   export let params;
 
   /**
-   * @type {import('../../stores/constants').SensorEntry}
-   */
-  export let sensor;
-
-  /**
    * @param {import('../../maps').NameInfo} region
    * @param {Date} date
    */
@@ -53,11 +48,15 @@
     const selfData = fetchTimeSlice(sensor, region.level, region.propertyId, undefined, undefined, false, {
       displayName: region.displayName,
     }).then((r) => addMissing(r, sensor));
-    const nationData = fetchTimeSlice(sensor, nationInfo.level, [nationInfo.propertyId], undefined, undefined, false, {
-      displayName: nationInfo.displayName,
-    }).then((r) => addMissing(r, sensor));
 
-    const data = [selfData, nationData];
+    const data = [selfData];
+    if (params.region.level !== 'nation') {
+      data.push(
+        fetchTimeSlice(sensor, nationInfo.level, [nationInfo.propertyId], undefined, undefined, false, {
+          displayName: nationInfo.displayName,
+        }).then((r) => addMissing(r, sensor)),
+      );
+    }
 
     if (params.region.level === 'county') {
       const state = getInfoByName(region.state);
@@ -86,7 +85,7 @@
   }
 
   $: spec = genSpec(params.region, params.date, height);
-  $: data = loadData(sensor, params);
+  $: data = loadData(params.sensor, params);
 </script>
 
 <Vega {className} {spec} {data} tooltip={HistoryLineTooltip} signals={signalPatches} />

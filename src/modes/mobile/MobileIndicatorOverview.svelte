@@ -19,10 +19,10 @@
   }
 </style>
 
-<MobileWrapper let:params let:sensor>
-  <IndicatorOverview {sensor} {params} />
+<MobileWrapper let:params>
+  <IndicatorOverview {params} />
   <hr />
-  <GeoTable {sensor} {params} />
+  <GeoTable {params} />
 
   <button class="uk-button uk-button-default uk-button-delphi back" on:click={switchMode}>
     <span class="inline-svg-icon">

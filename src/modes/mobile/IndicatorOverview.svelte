@@ -12,11 +12,6 @@
    */
   export let params;
 
-  /**
-   * @type {import('../../stores/constants').SensorEntry}
-   */
-  export let sensor;
-
   function loadData(sensor, params) {
     const { region, date } = params;
     if (!region || !date) {
@@ -33,9 +28,9 @@
     return data ? data.then((rows) => findDateRow(date, rows)) : null;
   }
 
-  $: data = loadData(sensor, params);
+  $: data = loadData(params.sensor, params);
   $: currentRow = findCurrentRow(data, params.date);
-  $: valueKey = primaryValue(sensor, {});
+  $: valueKey = primaryValue(params.sensor, {});
 </script>
 
 <style>
@@ -81,17 +76,17 @@
 
 <h2 class="mobile-fancy-header">INDICATOR <span>Details</span></h2>
 
-<IndicatorDropdown {sensor} />
+<IndicatorDropdown sensor={params.sensor} />
 
 <hr />
 <div class="chart-map">
-  <RegionMap {params} {sensor} />
+  <RegionMap {params} />
 </div>
 
 <h2 class="mobile-fancy-header">Performance</h2>
 
 <div class="chart-line">
-  <HistoryLineChart {params} {sensor} />
+  <HistoryLineChart {params} />
 </div>
 <hr />
 
@@ -103,7 +98,7 @@
   <tr>
     <td>Last 7 day avg</td>
     <td class="indicator-table-value">
-      {#await currentRow}?{:then row}{row ? sensor.formatValue(row[valueKey]) : 'N/A'}{/await}
+      {#await currentRow}?{:then row}{row ? params.sensor.formatValue(row[valueKey]) : 'N/A'}{/await}
     </td>
   </tr>
   <tr>
@@ -120,10 +115,10 @@
   </tr>
 </table>
 
-{#if sensor.description}
+{#if params.sensor.description}
   <h2 class="mobile-fancy-header">About this indicator</h2>
 
   <div class="desc">
-    {@html sensor.description}
+    {@html params.sensor.description}
   </div>
 {/if}

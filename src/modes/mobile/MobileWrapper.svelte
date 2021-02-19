@@ -1,19 +1,10 @@
 <script>
-  import { nationInfo } from '../../maps';
-  import { currentRegionInfo, currentRegion, currentSensorEntry, currentDateObject } from '../../stores';
+  import { currentRegionInfo, currentSensorEntry, currentDateObject } from '../../stores';
   import MobileParameters from './MobileParameters.svelte';
-  import { toTimeValue } from './utils';
   import './common.css';
+  import { asParams } from './utils';
 
-  $: sensor = $currentSensorEntry;
-  $: params = {
-    region: $currentRegionInfo || nationInfo,
-    date: $currentDateObject,
-    timeValue: toTimeValue($currentDateObject),
-    setRegion: (region) => {
-      currentRegion.set(region.propertyId);
-    },
-  };
+  $: params = asParams($currentSensorEntry, $currentRegionInfo, $currentDateObject);
 </script>
 
 <style>
@@ -25,10 +16,10 @@
 </style>
 
 <div class="root">
-  <MobileParameters {sensor} />
+  <MobileParameters sensor={params.sensor} />
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <slot {params} {sensor} />
+      <slot {params} />
     </div>
   </div>
 </div>

@@ -1,7 +1,6 @@
 <script>
   import { determineMinMax } from '../../components/MapBox/colors';
   import Vega from '../../components/Vega.svelte';
-  import { fetchData } from '../../data';
   import { getCountiesOfState } from '../../maps';
   import { generateCountiesOfStateSpec, generateRelatedCountySpec, generateStateSpec } from '../../specs/mapSpec';
   import { stats } from '../../stores';
@@ -12,11 +11,6 @@
    * @type {import("../utils").Params}
    */
   export let params;
-
-  /**
-   * @type {import('../../stores/constants').SensorEntry}
-   */
-  export let sensor;
 
   /**
    * @param {import('../../stores/constants').SensorEntry} sensor
@@ -50,31 +44,22 @@
    * @param {import("../utils").Params} params
    */
   function loadData(sensor, params) {
-    const fetchImpl = (level, geo) =>
-      fetchData(
-        sensor,
-        level,
-        geo,
-        params.date,
-        {
-          time_value: params.timeValue,
-        },
-        {
-          multiValues: false,
-        },
-      );
     if (params.region.level === 'state') {
       const counties = getCountiesOfState(params.region);
-      return fetchImpl('county', `${params.region.id}000,${counties.map((d) => d.id).join(',')}`);
+      return params.fetchMultiRegions(
+        sensor,
+        'county',
+        `${params.region.id}000,${counties.map((d) => d.id).join(',')}`,
+      );
     }
     if (params.region.level === 'county') {
-      return fetchImpl('county', '*');
+      return params.fetchMultiRegions('county', '*');
     }
-    return fetchImpl('state', '*');
+    return params.fetchMultiRegions(sensor, 'state', '*');
   }
 
-  $: spec = genSpec($stats, sensor, params.region);
-  $: data = loadData(sensor, params);
+  $: spec = genSpec($stats, params.sensor, params.region);
+  $: data = loadData(params.sensor, params);
 </script>
 
-<Vega {className} {spec} {data} tooltip={RegionMapTooltip} tooltipProps={{ sensor }} />
+<Vega {className} {spec} {data} tooltip={RegionMapTooltip} tooltipProps={{ sensor: params.sensor }} />
