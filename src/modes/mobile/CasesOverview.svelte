@@ -1,7 +1,7 @@
 <script>
   import { fetchData } from '../../data';
   import { formatDateShort } from '../../formats';
-  import { sensorList, sensorMap } from '../../stores';
+  import { sensorList } from '../../stores';
   import RegionMap from './RegionMap.svelte';
   import SurveyValue from '../survey/SurveyValue.svelte';
 
@@ -25,48 +25,9 @@
   function formatNumber(v) {
     return v == null ? 'N/A' : v.toLocaleString();
   }
-
-  function loadHighlightSensors(date, region) {
-    const highlights = [
-      sensorMap.get('fb-survey-smoothed_wearing_mask'),
-      sensorMap.get('fb-survey-smoothed_cli'),
-      sensorMap.get('fb-survey-smoothed_covid_vaccinated_or_accept'),
-    ].filter(Boolean);
-    const data = fetchData(
-      {
-        ...highlights[0],
-        signal: highlights.map((d) => d.signal).join(','),
-      },
-      region.level,
-      region.propertyId,
-      date,
-      {},
-      {
-        transferSignal: true,
-      },
-    );
-    return highlights.map((h) => ({
-      sensor: h,
-      value: data.then((rows) => rows.filter((d) => d.signal === h.signal)[0]),
-    }));
-  }
-
-  $: highlightSurveySensors = loadHighlightSensors(params.date, params.region);
 </script>
 
 <style>
-  .fancy-header {
-    font-size: 18px;
-    font-weight: 600;
-    line-height: 2rem;
-    letter-spacing: 0.05em;
-    margin: 0.5em 0;
-  }
-  .fancy-header span {
-    text-transform: uppercase;
-    font-weight: 300;
-  }
-
   h3 {
     font-size: 0.875rem;
     font-weight: 600;
@@ -101,7 +62,7 @@
   }
 </style>
 
-<h2 class="fancy-header">COVIDcast <span>Indicators</span></h2>
+<h2 class="mobile-fancy-header">COVIDcast <span>Indicators</span></h2>
 
 <p>On <strong>average</strong> over the <strong>last 7 days</strong> there have been</p>
 
@@ -145,7 +106,8 @@
 
 <hr />
 
-<h2 class="fancy-header"><span>Overall</span></h2>
+<h2 class="mobile-fancy-header"><span>Overall</span></h2>
+
 <p>
   At least
   <strong>
@@ -160,22 +122,3 @@
   on
   {formatDateShort(params.date)}.
 </p>
-
-<hr />
-
-<h2 class="fancy-header">KEY <span>Indicators</span></h2>
-
-{#each highlightSurveySensors as s}
-  <h4>{s.sensor.name}</h4>
-  <div>TODO</div>
-  <div>
-    <div>
-      {#await s.value}
-        N/A
-      {:then d}
-        <SurveyValue value={d ? d.value : null} factor={10} />
-      {/await}
-    </div>
-    <div>per 1,000 people</div>
-  </div>
-{/each}

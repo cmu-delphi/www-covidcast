@@ -7,13 +7,7 @@
   export let params;
 </script>
 
-<style>
-  tbody > .row-group {
-    border-bottom: none;
-  }
-</style>
-
-<h2 class="mobile-h2">COVID-19 Indicators</h2>
+<h2 class="mobile-fancy-header">COVID-19 <span>Indicators</span></h2>
 
 <table class="mobile-table">
   <thead>

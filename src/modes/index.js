@@ -28,7 +28,7 @@ const modes = [
     id: 'mobile-indicator',
     label: 'Mobile Indicator',
     component: () =>
-      import(/* webpackChunkName: 'm-mobile-indicator' */ './mobile-indicator/MobileIndicatorOverview.svelte').then(
+      import(/* webpackChunkName: 'm-mobile-indicator' */ './mobile/MobileIndicatorOverview.svelte').then(
         (r) => r.default,
       ),
   },

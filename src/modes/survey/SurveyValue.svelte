@@ -17,12 +17,12 @@
     font-size: 4rem;
     line-height: 1;
     align-self: flex-end;
-    font-weight: 700;
+    font-weight: 600;
   }
   .fraction {
     font-size: 2rem;
     line-height: 1;
-    font-weight: 700;
+    font-weight: 600;
     margin-bottom: 0.25rem;
     align-self: flex-end;
   }

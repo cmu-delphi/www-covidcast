@@ -4,7 +4,7 @@
   import getRelatedCounties from '../../maps/related';
   import { generateSparkLine } from '../../specs/lineSpec';
   import Vega from '../../components/Vega.svelte';
-  import SparkLineTooltip from '../mobile/SparkLineTooltip.svelte';
+  import SparkLineTooltip from './SparkLineTooltip.svelte';
   import SortColumnIndicator from './SortColumnIndicator.svelte';
   import { timeWeek } from 'd3-time';
   import { fitRange } from '../../data';
@@ -172,10 +172,7 @@
   $: regionData = loadRegionData(sensor, regions, params.date);
 </script>
 
-<style>
-</style>
-
-<h2 class="mobile-h2">{title.title}</h2>
+<h2 class="mobile-fancy-header">{title.title}</h2>
 
 <table class="mobile-table">
   <thead>

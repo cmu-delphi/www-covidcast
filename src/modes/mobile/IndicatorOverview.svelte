@@ -1,15 +1,12 @@
 <script>
-  import { nameInfos, nationInfo } from '../../maps';
+  import { nationInfo } from '../../maps';
   import { currentRegionInfo, currentSensorEntry, currentDateObject, currentRegion, currentMode } from '../../stores';
-  import SurveyParameters from '../survey/SurveyParameters.svelte';
-  import GeoTable from './GeoTable.svelte';
-  import { findDateRow, toTimeValue } from '../mobile/utils';
-  import '../mobile/common.css';
+  import { findDateRow, toTimeValue } from './utils';
   import { addMissing, fetchTimeSlice } from '../../data';
   import { timeWeek } from 'd3-time';
   import { primaryValue } from '../../stores/constants';
-  import RegionMap from '../mobile/RegionMap.svelte';
-  import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
+  import RegionMap from './RegionMap.svelte';
+  import HistoryLineChart from './HistoryLineChart.svelte';
   import chevronLeftIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-left.svg';
   import { modeByID } from '..';
 
@@ -49,12 +46,6 @@
 </script>
 
 <style>
-  .root {
-    position: relative;
-    flex: 1 1 0;
-    overflow: auto;
-  }
-
   .chart-line,
   .chart-map {
     position: relative;
@@ -91,49 +82,47 @@
   }
 </style>
 
-<div class="root">
-  <SurveyParameters {sensor} items={nameInfos} defaultItem={nationInfo} />
-  <div class="uk-container content-grid">
-    <div class="grid-3-11">
-      <h2>
-        <a href="?mode=mobile" class="uk-link-text" on:click|preventDefault={switchMode}>
-          <span class="inline-svg-icon">
-            {@html chevronLeftIcon}
-          </span>
-        </a>
-        {sensor.name}
-      </h2>
-      <div class="chart-map">
-        <RegionMap {params} {sensor} />
-      </div>
-      <div class="chart-line">
-        <HistoryLineChart {params} {sensor} />
-      </div>
-      <table class="popup-table">
-        <tr>
-          <td>Last 7 day trend</td>
-          <td class="popup-table-value">TODO</td>
-        </tr>
-        <tr>
-          <td>Last 7 day avg</td>
-          <td class="popup-table-value">
-            {#await currentRow}?{:then row}{row ? sensor.formatValue(row[valueKey]) : 'N/A'}{/await}
-          </td>
-        </tr>
-        <tr>
-          <td>Peak 7 day period</td>
-          <td class="popup-table-value">TODO</td>
-        </tr>
-        <tr>
-          <td>Record high</td>
-          <td class="popup-table-value">TODO</td>
-        </tr>
-        <tr>
-          <td>Record low</td>
-          <td class="popup-table-value">TODO</td>
-        </tr>
-      </table>
-    </div>
-    <GeoTable {sensor} {params} />
-  </div>
+<h2 class="mobile-fancy-header">
+  <a href="?mode=mobile" class="uk-link-text" on:click|preventDefault={switchMode}>
+    <span class="inline-svg-icon">
+      {@html chevronLeftIcon}
+    </span>
+  </a>
+  {sensor.name}
+</h2>
+
+<hr />
+<div class="chart-map">
+  <RegionMap {params} {sensor} />
 </div>
+
+<hr />
+<div class="chart-line">
+  <HistoryLineChart {params} {sensor} />
+</div>
+<hr />
+
+<table class="popup-table">
+  <tr>
+    <td>Last 7 day trend</td>
+    <td class="popup-table-value">TODO</td>
+  </tr>
+  <tr>
+    <td>Last 7 day avg</td>
+    <td class="popup-table-value">
+      {#await currentRow}?{:then row}{row ? sensor.formatValue(row[valueKey]) : 'N/A'}{/await}
+    </td>
+  </tr>
+  <tr>
+    <td>Peak 7 day period</td>
+    <td class="popup-table-value">TODO</td>
+  </tr>
+  <tr>
+    <td>Record high</td>
+    <td class="popup-table-value">TODO</td>
+  </tr>
+  <tr>
+    <td>Record low</td>
+    <td class="popup-table-value">TODO</td>
+  </tr>
+</table>
