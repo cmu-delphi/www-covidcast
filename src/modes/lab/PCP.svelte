@@ -3,7 +3,7 @@
   import { fetchRegionSlice } from '../../data';
   import { currentDateObject, sensorMap } from '../../stores';
   import { combineSignals } from '../../data/utils';
-  import { stateInfo } from '../../maps';
+  import { countyInfo, stateInfo } from '../../maps';
   import { onMount } from 'svelte';
 
   const masks = sensorMap.get('fb-survey-smoothed_wearing_mask');
@@ -15,18 +15,47 @@
 
   const NAME_INFO_KEYS = ['propertyId', 'displayName', 'population', 'state'];
 
-  function loadData(entries, date) {
-    return Promise.all(entries.map((d) => fetchRegionSlice(d[1], 'state', date))).then((rows) => {
+  function loadData(entries, date, level) {
+    return Promise.all(entries.map((d) => fetchRegionSlice(d.signal, level, date))).then((rows) => {
       return combineSignals(
         rows,
         rows[0],
-        entries.map((d) => d[0]),
+        entries.map((d) => d.name),
       );
     });
   }
 
-  function generatePCPSpec(entries) {
-    function asScale(field, i) {
+  const entries = [
+    {
+      name: 'vaccine',
+      signal: vaccine,
+    },
+    {
+      name: 'masks',
+      signal: masks,
+    },
+    {
+      name: 'cli',
+      signal: cli,
+    },
+    {
+      name: 'cases',
+      signal: cases,
+    },
+    {
+      name: 'hospital',
+      signal: hospital,
+    },
+    {
+      name: 'deaths',
+      signal: deaths,
+    },
+  ];
+
+  let reversedSet = [];
+
+  function generatePCPSpec(entries, level, reversedSet) {
+    function asScale(entry, i) {
       /**
        * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
        */
@@ -36,10 +65,11 @@
           x: { value: 0 },
           opacity: { value: 0 },
           y: {
-            field,
+            field: entry.name,
             type: 'quantitative',
             scale: {
               zero: false,
+              reverse: reversedSet.includes(entry.name),
             },
             axis: {
               grid: false,
@@ -84,22 +114,22 @@
         {
           lookup: 'id',
           from: {
-            data: { values: stateInfo },
+            data: { values: level === 'county' ? countyInfo : stateInfo },
             key: 'propertyId',
             fields: NAME_INFO_KEYS,
           },
         },
       ],
       layer: [
-        ...entries.map((d, i) => asScale(d[0], i)),
+        ...entries.map((d, i) => asScale(d, i)),
         {
           transform: [
             {
-              calculate: JSON.stringify(entries.map((d) => d[0])),
+              calculate: JSON.stringify(entries.map((d) => d.name)),
               as: 'x',
             },
             {
-              calculate: `[${entries.map((d, i) => `height - scale('layer_${i}_y', datum.${d[0]})`).join(', ')}]`,
+              calculate: `[${entries.map((d, i) => `height - scale('layer_${i}_y', datum.${d.name})`).join(', ')}]`,
               as: 'y',
             },
             {
@@ -134,7 +164,7 @@
               scale: {
                 type: 'point',
                 padding: 0,
-                domain: entries.map((d) => d[0]),
+                domain: entries.map((d) => d.name),
               },
               axis: null,
             },
@@ -162,11 +192,10 @@
     return spec;
   }
 
-  const entries = Object.entries({ masks, cli, cases, hospital, deaths, vaccine });
-
+  let level = 'state';
   let sortedEntries = entries;
-  $: spec = generatePCPSpec(sortedEntries);
-  $: data = loadData(entries, $currentDateObject);
+  $: spec = generatePCPSpec(sortedEntries, level, reversedSet);
+  $: data = loadData(entries, $currentDateObject, level);
 
   let ref = null;
 
@@ -218,11 +247,20 @@
 <div class="uk-container">
   <h2>Parallel Coordinates Plot of States</h2>
 
+  <div>
+    Granuarlity:
+    <label><input type="radio" value="state" name="level" bind:group={level} />State</label>
+    <label><input type="radio" value="county" name="level" bind:group={level} />County</label>
+  </div>
+
   <p>Drag the axis label chips to reorder:</p>
 
   <div data-uk-sortable class="c" bind:this={ref}>
     {#each entries as entry, i}
-      <div class="s" data-i={i}>{entry[1].name}</div>
+      <div class="s" data-i={i}>
+        {entry.signal.name}
+        <label><input type="checkbox" name="reverse" bind:group={reversedSet} value={entry.name} />Reverse</label>
+      </div>
     {/each}
   </div>
   <Vega {spec} {data} signalListeners={['highlight']} on:signal={onSignal} />
@@ -237,10 +275,10 @@
       </tr>
     </thead>
     <tbody>
-      {#each entries as entry, i}
+      {#each entries as entry}
         <tr>
-          <td>{entry[1].name}</td>
-          <td>{highlighted ? entry[1].formatValue(highlighted[entry[0]]) : ''}</td>
+          <td>{entry.signal.name}</td>
+          <td>{highlighted ? entry.signal.formatValue(highlighted[entry.name]) : ''}</td>
         </tr>
       {/each}
     </tbody>
