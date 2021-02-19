@@ -40,6 +40,10 @@
       name: 'StateHTMLMatrix',
       component: () => import('./StateHTMLMatrix.svelte').then((r) => r.default),
     },
+    {
+      name: 'Parallel Coodinates Plot',
+      component: () => import('./PCP.svelte').then((r) => r.default),
+    },
   ];
 
   let selected = Number.parseInt(new URL(window.location.href).searchParams.get('lab') || '0', 10);
