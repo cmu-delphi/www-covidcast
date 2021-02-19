@@ -39,7 +39,7 @@
   font-size: 0.875rem;
   line-height: 1.25rem;
 }
-.mobile-table > tbody > tr > td {
+.mobile-table > tbody > tr:not(.addon) > td {
   padding: 0.75rem 4px;
   vertical-align: middle;
 }
@@ -53,8 +53,15 @@
   background: #fafafc;
 }
 
-.mobile-table > tbody > .row-group {
+.mobile-table > tbody > tr.row-group,
+.mobile-table > tbody > tr.has-addon {
   border-bottom: none;
+}
+.mobile-table > tbody > tr.has-addon > td {
+  padding-bottom: 0.1rem;
+}
+.mobile-table > tbody > tr.addon > td {
+  padding: 0 4px 0.75rem 4px;
 }
 
 .mobile-fancy-header {

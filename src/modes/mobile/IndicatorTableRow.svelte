@@ -60,24 +60,22 @@
 </script>
 
 <style>
-  .sensor-name {
-    display: block;
-  }
-
   .source {
     font-size: 10px;
   }
+
+  .details-link {
+    width: 6px;
+    display: inline-block;
+    fill: currentColor;
+  }
 </style>
 
-<tr>
+<tr class="has-addon">
   <td>
-    <a
-      href="?mode=mobile-indicator&sensor={sensor.key}"
-      class="uk-link-text sensor-name"
-      on:click|preventDefault={switchMode}>
+    <a href="?mode=mobile-indicator&sensor={sensor.key}" class="uk-link-text" on:click|preventDefault={switchMode}>
       {sensor.name}
     </a>
-    <span class="source">Source: <strong>{sensor.id}</strong></span>
   </td>
   <td class="uk-text-right">TODO</td>
   <td class="uk-text-right">
@@ -87,10 +85,14 @@
     <Vega {spec} {data} tooltip={SparkLineTooltip} tooltipProps={{ sensor }} signals={{ currentDate: params.date }} />
   </td>
   <td>
-    <a href="?mode=mobile-indicator&sensor={sensor.key}" class="uk-link-text" on:click|preventDefault={switchMode}>
-      <span class="inline-svg-icon">
-        {@html chevronRightIcon}
-      </span>
+    <a
+      href="?mode=mobile-indicator&sensor={sensor.key}"
+      class="uk-link-text details-link"
+      on:click|preventDefault={switchMode}>
+      {@html chevronRightIcon}
     </a>
   </td>
+</tr>
+<tr class="addon">
+  <td colspan="5" class="source">Source: <strong>{sensor.id}</strong></td>
 </tr>
