@@ -10,7 +10,10 @@ const EPIDATA_ROW_KEYS = ['geo_value', 'value', 'date_value', 'time_value', 'std
 
 const missingStopCount = 70;
 const missingGradient = {
-  y2: 1,
+  // x1: 0,
+  // y1: 0,
+  // y2: 1,
+  // x2: 2,
   gradient: 'linear',
   stops: Array(missingStopCount + 1)
     .fill(0)
