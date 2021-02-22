@@ -1,3 +1,14 @@
+.mobile-root {
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  color: #232735;
+  position: relative;
+}
+
+.mobile-root p {
+  font-size: 0.875rem;
+}
+
 .mobile-h2 {
   margin-top: 4px;
   font-weight: 600;
@@ -74,4 +85,19 @@
 .mobile-fancy-header span {
   text-transform: uppercase;
   font-weight: 300;
+}
+
+.chart-150,
+.chart-300 {
+  position: relative;
+}
+
+.chart-150 > * {
+  width: 100%;
+  height: 150px;
+}
+
+.chart-300 > * {
+  width: 100%;
+  height: 300px;
 }

@@ -9,6 +9,7 @@
   import { timeWeek } from 'd3-time';
   import { fitRange } from '../../data';
   import chevronDownIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-down.svg';
+  import FancyHeader from './FancyHeader.svelte';
 
   /**
    * @type {import("../utils").Params}
@@ -156,7 +157,7 @@
   $: regionData = loadRegionData(params.sensor, regions, params.date);
 </script>
 
-<h2 class="mobile-fancy-header">{title.title}</h2>
+<FancyHeader>{title.title}</FancyHeader>
 
 <table class="mobile-table">
   <thead>

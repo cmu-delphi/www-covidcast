@@ -4,6 +4,7 @@
   import { sensorList } from '../../stores';
   import RegionMap from './RegionMap.svelte';
   import SurveyValue from '../survey/SurveyValue.svelte';
+  import FancyHeader from './FancyHeader.svelte';
 
   /**
    * @type {import("../utils").Params}
@@ -41,9 +42,6 @@
     text-align: center;
   }
 
-  p {
-    font-size: 0.875rem;
-  }
   .summary-stats {
     display: flex;
     align-items: flex-start;
@@ -52,17 +50,9 @@
   .summary-stats > div {
     margin-right: 2em;
   }
-
-  .chart-map {
-    position: relative;
-  }
-  .chart-map > :global(*) {
-    width: 100%;
-    height: 300px;
-  }
 </style>
 
-<h2 class="mobile-fancy-header">COVIDcast <span>Indicators</span></h2>
+<FancyHeader sub="Indicators">COVIDcast</FancyHeader>
 
 <p>On <strong>average</strong> over the <strong>last 7 days</strong> there have been</p>
 
@@ -99,14 +89,16 @@
     by state
   {:else if params.region.level === 'state'}in {params.region.displayName}{:else}around {params.region.displayName}{/if}
 </h3>
+
 <h4>{casesSensor.mapTitleText({})}</h4>
-<div class="chart-map">
+
+<div class="chart-300">
   <RegionMap {params} sensor={casesSensor} />
 </div>
 
 <hr />
 
-<h2 class="mobile-fancy-header"><span>Overall</span></h2>
+<FancyHeader sub="Overall" />
 
 <p>
   At least

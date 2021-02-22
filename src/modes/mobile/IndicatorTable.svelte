@@ -1,13 +1,14 @@
 <script>
   import { groupedSensorList } from '../../stores/constants';
   import IndicatorTableRow from './IndicatorTableRow.svelte';
+  import FancyHeader from './FancyHeader.svelte';
   /**
    * @type {import("../utils").Params}
    */
   export let params;
 </script>
 
-<h2 class="mobile-fancy-header">COVID-19 <span>Indicators</span></h2>
+<FancyHeader sub="Indicators">COVID-19</FancyHeader>
 
 <table class="mobile-table">
   <thead>

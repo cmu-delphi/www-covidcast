@@ -2,6 +2,7 @@
   import { fetchData } from '../../data';
   import { sensorMap } from '../../stores';
   import SurveyValue from '../survey/SurveyValue.svelte';
+  import FancyHeader from './FancyHeader.svelte';
 
   /**
    * @type {import("../utils").Params}
@@ -60,7 +61,7 @@
   }
 </style>
 
-<h2 class="mobile-fancy-header">KEY <span>Indicators</span></h2>
+<FancyHeader sub="Indicators">KEY</FancyHeader>
 
 <div class="highlights">
   {#each highlightSurveySensors as s}

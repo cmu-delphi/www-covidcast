@@ -6,6 +6,7 @@
   import RegionMap from './RegionMap.svelte';
   import HistoryLineChart from './HistoryLineChart.svelte';
   import IndicatorDropdown from './IndicatorDropdown.svelte';
+  import FancyHeader from './FancyHeader.svelte';
 
   /**
    * @type {import("../utils").Params}
@@ -34,19 +35,6 @@
 </script>
 
 <style>
-  .chart-line,
-  .chart-map {
-    position: relative;
-  }
-  .chart-line > :global(*) {
-    width: 100%;
-    height: 150px;
-  }
-  .chart-map > :global(*) {
-    width: 100%;
-    height: 300px;
-  }
-
   .indicator-table {
     margin: 2em 0;
     border-collapse: collapse;
@@ -74,18 +62,18 @@
   }
 </style>
 
-<h2 class="mobile-fancy-header">INDICATOR <span>Details</span></h2>
+<FancyHeader sub="Details">INDICATOR</FancyHeader>
 
 <IndicatorDropdown sensor={params.sensor} />
 
 <hr />
-<div class="chart-map">
+<div class="chart-300">
   <RegionMap {params} sensor={params.sensor} />
 </div>
 
-<h2 class="mobile-fancy-header">Performance</h2>
+<FancyHeader>Performance</FancyHeader>
 
-<div class="chart-line">
+<div class="chart-150">
   <HistoryLineChart {params} />
 </div>
 <hr />
@@ -116,7 +104,7 @@
 </table>
 
 {#if params.sensor.description}
-  <h2 class="mobile-fancy-header">About this indicator</h2>
+  <FancyHeader>About this indicator</FancyHeader>
 
   <div class="desc">
     {@html params.sensor.description}
