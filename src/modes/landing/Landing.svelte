@@ -13,6 +13,12 @@
     }
     currentMode.set(modeByID.overview);
   }
+  /**
+   * @param {import('../../maps').NameInfo} d
+   */
+  function combineKeywords(d) {
+    return `${d.id} ${d.displayName}`;
+  }
 </script>
 
 <style>
@@ -90,6 +96,7 @@
       items={[nationInfo, ...stateInfo, ...countyInfo]}
       selectedItem={$currentRegionInfo}
       labelFieldName="displayName"
+      keywordFunction={combineKeywords}
       maxItemsToShowInList="5"
       on:change={(e) => switchMode(e.detail && e.detail.level === 'nation' ? null : e.detail)} />
 

@@ -94,7 +94,7 @@ function genMegaLayer(withStates = null) {
   return layer;
 }
 
-function genStateBorderLayer() {
+function genStateBorderLayer({ strokeWidth = 1.1 }) {
   /**
    * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
    */
@@ -110,7 +110,7 @@ function genStateBorderLayer() {
       type: 'geoshape',
       fill: null,
       stroke: MAP_THEME.stateOutline,
-      strokeWidth: 1.1,
+      strokeWidth,
       tooltip: false,
     },
     encoding: {
@@ -472,8 +472,8 @@ export function generateRelatedCountySpec(county, options = {}) {
   spec.layer.push(genMissingLayer());
   spec.datasets.state = stateJSON();
   spec.layer.push(genMegaLayer());
-  spec.layer.push(genLevelLayer({ ...options, strokeWidth: 0 }));
-  spec.layer.push(genStateBorderLayer());
+  spec.layer.push(genLevelLayer(options));
+  spec.layer.push(genStateBorderLayer({ strokeWidth: 2 }));
   spec.layer.push(genMegaHoverLayer());
   spec.layer.push(genLevelHoverLayer());
   // highlight the selected one
