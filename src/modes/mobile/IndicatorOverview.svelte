@@ -1,7 +1,6 @@
 <script>
-  import { findDateRow } from './utils';
+  import { computeSparklineTimeFrame, findDateRow } from './utils';
   import { addMissing, fetchTimeSlice } from '../../data';
-  import { timeWeek } from 'd3-time';
   import { primaryValue } from '../../stores/constants';
   import RegionMap from './RegionMap.svelte';
   import HistoryLineChart from './HistoryLineChart.svelte';
@@ -19,8 +18,8 @@
     if (!region || !date) {
       return null;
     }
-    const startDate = timeWeek.offset(date, -4);
-    return fetchTimeSlice(sensor, region.level, region.propertyId, startDate, date, true, {
+    const { min, max } = computeSparklineTimeFrame(date, sensor);
+    return fetchTimeSlice(sensor, region.level, region.propertyId, min, max, true, {
       displayName: region.displayName,
       geo_value: region.propertyId,
     }).then((rows) => addMissing(rows, sensor));

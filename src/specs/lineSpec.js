@@ -264,6 +264,7 @@ export function createSignalDateLabelHighlight() {
         type: 'text',
         dy: 5,
         baseline: 'top',
+        align: 'right',
         y: {
           expr: 'height',
         },
@@ -272,12 +273,12 @@ export function createSignalDateLabelHighlight() {
         x: {
           field: 'date_value',
           type: 'temporal',
-          format: '%b %d',
-          formatType: 'cachedTime',
         },
         text: {
           field: 'date_value',
           type: 'temporal',
+          format: '%-m/%-d',
+          formatType: 'cachedTime',
         },
       },
     },

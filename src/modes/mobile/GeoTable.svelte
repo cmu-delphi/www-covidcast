@@ -6,11 +6,11 @@
   import Vega from '../../components/Vega.svelte';
   import SparkLineTooltip from './SparkLineTooltip.svelte';
   import SortColumnIndicator from './SortColumnIndicator.svelte';
-  import { timeWeek } from 'd3-time';
   import { fitRange } from '../../data';
   import chevronDownIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-down.svg';
   import FancyHeader from './FancyHeader.svelte';
   import TrendIndicator from './TrendIndicator.svelte';
+  import { computeSparklineTimeFrame } from './utils';
 
   /**
    * @type {import("../utils").Params}
@@ -120,14 +120,14 @@
     if (!date || !regions || regions.length === 0) {
       return new Map();
     }
-    const startDate = timeWeek.offset(date, -4);
-    if (regions.length * 28 < 3600) {
+    const { min, max, difference } = computeSparklineTimeFrame(date, sensor);
+    if (regions.length * difference < 3600) {
       // load all at once
       const data = fetchData(
         sensor,
         regions[0].level,
         regions === stateInfo ? '*' : regions.map((d) => d.propertyId),
-        [startDate, date],
+        [min, max],
         {},
         { multiValues: false },
       );
@@ -139,7 +139,7 @@
             for (const row of byRegion) {
               row.displayName = region.displayName;
             }
-            return addMissing(fitRange(byRegion, sensor, startDate, date), sensor);
+            return addMissing(fitRange(byRegion, sensor, min, max), sensor);
           }),
         ]),
       );
@@ -147,7 +147,7 @@
     return new Map(
       regions.map((region) => [
         region.propertyId,
-        fetchTimeSlice(sensor, region.level, region.propertyId, startDate, date, true, {
+        fetchTimeSlice(sensor, region.level, region.propertyId, min, max, true, {
           displayName: region.displayName,
           geo_value: region.propertyId,
         }).then((rows) => addMissing(rows, sensor)),

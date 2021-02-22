@@ -1,9 +1,8 @@
 <script>
   import { addMissing, fetchTimeSlice } from '../../data';
-  import { findDateRow } from './utils';
+  import { computeSparklineTimeFrame, findDateRow } from './utils';
   import { generateSparkLine } from '../../specs/lineSpec';
   import Vega from '../../components/Vega.svelte';
-  import { timeWeek } from 'd3-time';
   import SparkLineTooltip from './SparkLineTooltip.svelte';
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
   import { currentMode, currentSensor } from '../../stores';
@@ -25,13 +24,13 @@
     if (!region || !date) {
       return null;
     }
-    const startDate = timeWeek.offset(date, -4);
+    const { min, max } = computeSparklineTimeFrame(date, sensor);
     return fetchTimeSlice(
       sensor,
       region.level,
       region.propertyId,
-      startDate,
-      date,
+      min,
+      max,
       true,
       {
         displayName: region.displayName,
