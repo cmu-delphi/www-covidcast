@@ -7,14 +7,7 @@
   $: params = asParams($currentSensorEntry, $currentRegionInfo, $currentDateObject);
 </script>
 
-<style>
-  .root {
-    flex: 1 1 0;
-    overflow: auto;
-  }
-</style>
-
-<div class="root mobile-root">
+<div class="mobile-root">
   <MobileParameters sensor={params.sensor} />
   <div class="uk-container content-grid">
     <div class="grid-3-11">

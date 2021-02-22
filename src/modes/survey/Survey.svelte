@@ -28,7 +28,6 @@
   .root {
     position: relative;
     flex: 1 1 0;
-    overflow: auto;
   }
   .questions {
     margin-top: 1em;
