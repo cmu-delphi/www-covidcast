@@ -252,15 +252,56 @@ export function generateCompareLineSpec(compare, { compareField = 'displayName',
   return spec;
 }
 
-export function generateSparkLine({ valueField = 'value', domain = null, color = COLOR } = {}) {
+export function createSignalDateLabelHighlight() {
+  const layer = Object.assign({}, CURRENT_DATE_HIGHLIGHT);
+  layer.layer = [
+    {
+      mark: layer.mark,
+      encoding: layer.encoding,
+    },
+    {
+      mark: {
+        type: 'text',
+        dy: 5,
+        baseline: 'top',
+        y: {
+          expr: 'height',
+        },
+      },
+      encoding: {
+        x: {
+          field: 'date_value',
+          type: 'temporal',
+          format: '%b %d',
+          formatType: 'cachedTime',
+        },
+        text: {
+          field: 'date_value',
+          type: 'temporal',
+        },
+      },
+    },
+  ];
+  delete layer.mark;
+  delete layer.encoding;
+  return layer;
+}
+
+export function generateSparkLine({
+  valueField = 'value',
+  domain = null,
+  color = COLOR,
+  highlightDate = false,
+  height = 30,
+} = {}) {
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
   const spec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
     data: { name: 'values' },
-    height: 30,
-    padding: { left: 2, top: 2, bottom: 2, right: 2 },
+    height,
+    padding: { left: 2, top: 2, bottom: highlightDate ? 20 : 2, right: 2 },
     background: null,
     autosize: {
       type: 'none',
@@ -290,7 +331,7 @@ export function generateSparkLine({ valueField = 'value', domain = null, color =
       },
     },
     layer: [
-      CURRENT_DATE_HIGHLIGHT,
+      highlightDate ? createSignalDateLabelHighlight() : CURRENT_DATE_HIGHLIGHT,
       {
         mark: {
           type: 'line',

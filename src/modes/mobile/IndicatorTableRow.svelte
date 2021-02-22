@@ -52,7 +52,7 @@
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
-  $: spec = generateSparkLine();
+  $: spec = generateSparkLine({ highlightDate: true });
 
   function switchMode() {
     currentSensor.set(sensor.key);
@@ -63,6 +63,14 @@
 <style>
   .source {
     font-size: 10px;
+  }
+
+  .sparkline {
+    padding: 4px;
+  }
+
+  .sparkline > :global(*) {
+    height: 4em;
   }
 
   .details-link {
@@ -84,7 +92,7 @@
   <td class="uk-text-right">
     {#await currentRow}?{:then row}{row ? sensor.formatValue(row.value) : 'N/A'}{/await}
   </td>
-  <td>
+  <td rowspan="2" class="sparkline">
     <Vega {spec} {data} tooltip={SparkLineTooltip} tooltipProps={{ sensor }} signals={{ currentDate: params.date }} />
   </td>
   <td>
@@ -97,5 +105,5 @@
   </td>
 </tr>
 <tr class="addon">
-  <td colspan="5" class="source">Source: <strong>{sensor.id}</strong></td>
+  <td colspan="3" class="source">Source: <strong>{sensor.id}</strong></td>
 </tr>

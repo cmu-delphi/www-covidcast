@@ -55,7 +55,8 @@
   vertical-align: middle;
 }
 
-.mobile-table > tbody > tr:not(:last-of-type) {
+.mobile-table > tbody > tr:not(:last-of-type),
+.mobile-table > tbody > tr:not(:nth-last-child(2)) td[rowspan] {
   border-bottom: 1px solid #f0f1f3;
 }
 

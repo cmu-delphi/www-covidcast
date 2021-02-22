@@ -114,7 +114,7 @@
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
-  $: spec = generateSparkLine();
+  $: spec = generateSparkLine({ highlightDate: true });
 
   function loadRegionData(sensor, regions, date) {
     if (!date || !regions || regions.length === 0) {
@@ -157,6 +157,16 @@
 
   $: regionData = loadRegionData(params.sensor, regions, params.date);
 </script>
+
+<style>
+  .sparkline {
+    padding: 0.75rem 4px 1px 4px !important;
+  }
+
+  .sparkline > :global(*) {
+    height: 3em;
+  }
+</style>
 
 <FancyHeader>{title.title}</FancyHeader>
 
@@ -210,7 +220,7 @@
           <TrendIndicator trend={null} />
         </td>
         <td class="uk-text-right">{region.value == null ? 'N/A' : params.sensor.formatValue(region.value)}</td>
-        <td>
+        <td class="sparkline">
           <Vega
             {spec}
             data={regionData.get(region.propertyId) || []}
