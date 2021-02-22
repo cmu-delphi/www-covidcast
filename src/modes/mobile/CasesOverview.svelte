@@ -5,6 +5,7 @@
   import RegionMap from './RegionMap.svelte';
   import SurveyValue from '../survey/SurveyValue.svelte';
   import FancyHeader from './FancyHeader.svelte';
+  import TrendIndicator from './TrendIndicator.svelte';
 
   /**
    * @type {import("../utils").Params}
@@ -66,7 +67,9 @@
       {/await}
     </div>
     <div><strong>Total cases</strong> per 100,000 people</div>
-    <div>TODO</div>
+    <div>
+      <TrendIndicator trend={null} long />
+    </div>
   </div>
   <div>
     <div>
@@ -77,7 +80,9 @@
       {/await}
     </div>
     <div><strong>Total deaths</strong> per 100,000 people</div>
-    <div>TODO</div>
+    <div>
+      <TrendIndicator trend={null} long />
+    </div>
   </div>
 </div>
 

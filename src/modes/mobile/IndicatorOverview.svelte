@@ -7,6 +7,7 @@
   import HistoryLineChart from './HistoryLineChart.svelte';
   import IndicatorDropdown from './IndicatorDropdown.svelte';
   import FancyHeader from './FancyHeader.svelte';
+  import TrendIndicator from './TrendIndicator.svelte';
 
   /**
    * @type {import("../utils").Params}
@@ -81,7 +82,9 @@
 <table class="indicator-table">
   <tr>
     <td>Last 7 day trend</td>
-    <td class="indicator-table-value">TODO</td>
+    <td class="indicator-table-value">
+      <TrendIndicator trend={null} />
+    </td>
   </tr>
   <tr>
     <td>Last 7 day avg</td>

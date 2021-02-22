@@ -8,6 +8,7 @@
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
   import { currentMode, currentSensor } from '../../stores';
   import { modeByID } from '..';
+  import TrendIndicator from './TrendIndicator.svelte';
 
   /**
    * @type {import('../../stores/constants').SensorEntry}
@@ -77,7 +78,9 @@
       {sensor.name}
     </a>
   </td>
-  <td class="uk-text-right">TODO</td>
+  <td class="uk-text-right">
+    <TrendIndicator trend={null} />
+  </td>
   <td class="uk-text-right">
     {#await currentRow}?{:then row}{row ? sensor.formatValue(row.value) : 'N/A'}{/await}
   </td>

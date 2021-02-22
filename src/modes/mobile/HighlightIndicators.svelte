@@ -3,6 +3,7 @@
   import { sensorMap } from '../../stores';
   import SurveyValue from '../survey/SurveyValue.svelte';
   import FancyHeader from './FancyHeader.svelte';
+  import TrendIndicator from './TrendIndicator.svelte';
 
   /**
    * @type {import("../utils").Params}
@@ -67,7 +68,7 @@
   {#each highlightSurveySensors as s}
     <div>
       <h3 class="highlight">{s.sensor.name}</h3>
-      <div>TODO</div>
+      <TrendIndicator trend={null} trendClass="?" long />
       <div>
         {#await s.value}
           N/A

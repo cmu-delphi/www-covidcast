@@ -10,6 +10,7 @@
   import { fitRange } from '../../data';
   import chevronDownIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-down.svg';
   import FancyHeader from './FancyHeader.svelte';
+  import TrendIndicator from './TrendIndicator.svelte';
 
   /**
    * @type {import("../utils").Params}
@@ -205,7 +206,9 @@
             class="uk-link-text"
             on:click|preventDefault={() => params.setRegion(region)}>{region.displayName}</a>
         </td>
-        <td class="uk-text-right">TODO</td>
+        <td class="uk-text-right">
+          <TrendIndicator trend={null} />
+        </td>
         <td class="uk-text-right">{region.value == null ? 'N/A' : params.sensor.formatValue(region.value)}</td>
         <td>
           <Vega

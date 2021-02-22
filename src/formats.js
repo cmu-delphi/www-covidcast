@@ -62,7 +62,12 @@ export function formatPopulation(info) {
 }
 
 const f = format('.1f');
+const formatP = format('.1p');
 
 export function formatValue(value) {
   return value == null || Number.isNaN(value) ? 'N/A' : f(value);
+}
+
+export function formatPercentage(value) {
+  return value == null || Number.isNaN(value) ? 'N/A' : formatP(value);
 }
