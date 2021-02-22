@@ -1,8 +1,7 @@
 <script>
   import { timeDay, timeWeek } from 'd3-time';
   import Vega from '../../components/Vega.svelte';
-  import { addMissing, fetchData, fetchTimeSlice, formatAPITime, parseAPITime } from '../../data';
-  import { stateInfo } from '../../maps';
+  import { addMissing, addNameInfos, fetchData, fetchTimeSlice, formatAPITime, parseAPITime } from '../../data';
   import { generateLineChartSpec, signalPatches } from '../../specs/lineSpec';
   import { currentDateObject, currentRegionInfo } from '../../stores';
   import { sensorList } from '../../stores/constants';
@@ -28,18 +27,6 @@
         name: 'values',
       },
       transform: [
-        {
-          calculate: 'upper(datum.geo_value)',
-          as: 'propertyId',
-        },
-        {
-          lookup: 'propertyId',
-          from: {
-            data: { values: stateInfo },
-            key: 'propertyId',
-            fields: ['displayName', 'population', 'region'],
-          },
-        },
         {
           // clamp in [0, 100] range
           calculate: 'min(max(datum.value, 0), 100)',
@@ -245,11 +232,15 @@
                   as: 'population',
                 },
               ],
-              groupby: ['propertyId', 'region'],
+              groupby: ['propertyId'],
             },
             {
               calculate: `array2object(datum.values, 'time_value')`,
               as: 'vs',
+            },
+            {
+              calculate: `datum.values[0].region`,
+              as: 'region',
             },
           ],
           layer: [
@@ -259,9 +250,11 @@
                   type: 'single',
                   on: 'click',
                   empty: 'none',
-                  init: {
-                    propertyId: $currentRegionInfo.propertyId.toUpperCase(),
-                  },
+                  init: $currentRegionInfo
+                    ? {
+                        propertyId: $currentRegionInfo.propertyId.toUpperCase(),
+                      }
+                    : null,
                   fields: ['propertyId'],
                   nearest: false,
                 },
@@ -270,10 +263,10 @@
                 type: 'circle',
                 tooltip: { content: 'data' },
                 x: {
-                  expr: `lerp([scale('x', datum.vs[t.i0].value), scale('x', datum.vs[t.i1].value)], t.t)`,
+                  expr: `lerp([scale('x', (datum.vs[t.i0] || {}).value), scale('x', (datum.vs[t.i1] || {}).value)], t.t)`,
                 },
                 y: {
-                  expr: `lerp([scale('y', datum.vs[t.i0].${yField}), scale('y', datum.vs[t.i1].${yField})], t.t)`,
+                  expr: `lerp([scale('y', (datum.vs[t.i0] || {}).${yField}), scale('y', (datum.vs[t.i1] || {}).${yField})], t.t)`,
                 },
               },
               encoding: {
@@ -298,10 +291,10 @@
                 align: 'left',
                 baseline: 'bottom',
                 x: {
-                  expr: `lerp([scale('x', datum.vs[t.i0].value), scale('x', datum.vs[t.i1].value)], t.t)`,
+                  expr: `lerp([scale('x', warn(datum.propertyId, datum.vs[t.i0] || {}).value), scale('x', (datum.vs[t.i1] || {}).value)], t.t)`,
                 },
                 y: {
-                  expr: `lerp([scale('y', datum.vs[t.i0].${yField}), scale('y', datum.vs[t.i1].${yField})], t.t)`,
+                  expr: `lerp([scale('y', (datum.vs[t.i0] || {}).${yField}), scale('y', (datum.vs[t.i1] || {}).${yField})], t.t)`,
                 },
               },
               encoding: {
@@ -369,7 +362,7 @@
       `${formatAPITime(start)}-${formatAPITime(date)}`,
       {},
       { multiValues: false },
-    );
+    ).then(addNameInfos);
   }
 
   const data = loadGapMinderData($currentDateObject);

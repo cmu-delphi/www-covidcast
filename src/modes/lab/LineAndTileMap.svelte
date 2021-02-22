@@ -1,6 +1,6 @@
 <script>
   import Vega from '../../components/Vega.svelte';
-  import { fetchRegionSlice, fetchTimeSlice, addMissing } from '../../data';
+  import { fetchRegionSlice, fetchTimeSlice, addMissing, addNameInfos } from '../../data';
   import { DEFAULT_SURVEY_SENSOR, sensorMap } from '../../stores/constants';
   import { generateStateTileSpec } from '../../specs/mapSpec';
   import { generateLineChartSpec, signalPatches } from '../../specs/lineSpec';
@@ -25,7 +25,7 @@
 
   const nationData = fetchTimeSlice(sensor, 'nation', 'us').then((r) => addMissing(r, sensor));
 
-  $: stateData = fetchRegionSlice(sensor, 'state', $currentDateObject);
+  $: stateData = fetchRegionSlice(sensor, 'state', $currentDateObject).then(addNameInfos);
 
   const lazyUpdate = debounce((value) => {
     currentDate.set(value);

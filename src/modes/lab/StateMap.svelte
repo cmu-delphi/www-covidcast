@@ -1,6 +1,6 @@
 <script>
   import Vega from '../../components/Vega.svelte';
-  import { fetchData, formatAPITime } from '../../data';
+  import { addNameInfos, fetchData, formatAPITime } from '../../data';
   import { getInfoByName, getCountiesOfState } from '../../maps';
   import { DEFAULT_SURVEY_SENSOR, sensorMap } from '../../stores/constants';
   import { generateCountiesOfStateSpec } from '../../specs/mapSpec';
@@ -14,7 +14,7 @@
     const spec = generateCountiesOfStateSpec(state);
     const data = fetchData(sensor, 'county', `${state.id}000,${counties.map((d) => d.id).join(',')}`, date, {
       time_value: formatAPITime(date),
-    });
+    }).then(addNameInfos);
     return { state, spec, data };
   }
 

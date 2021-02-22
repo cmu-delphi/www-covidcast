@@ -59,7 +59,7 @@
   $: params = {
     date: $currentDateObject,
     timeValue: toTimeValue($currentDateObject),
-    region: $currentRegionInfo,
+    region: $currentRegionInfo || getInfoByName('ca'),
   };
 </script>
 
@@ -106,7 +106,7 @@
         <HexGridCell
           x={tile.x}
           y={tile.y}
-          classNameOuter="state-cell {$currentRegion === tile.propertyId ? 'selected' : ''}"
+          classNameOuter="state-cell {params.region.propertyId === tile.propertyId ? 'selected' : ''}"
           className="loading">
           <span class="title">{tile.propertyId}</span>
           <div class="vega-wrapper" />
@@ -116,7 +116,7 @@
         <HexGridCell
           x={tile.x}
           y={tile.y}
-          classNameOuter="state-cell {$currentRegion === tile.propertyId ? 'selected' : ''}"
+          classNameOuter="state-cell {params.region.propertyId === tile.propertyId ? 'selected' : ''}"
           style="background-color: {colorScale(v)};"
           on:click={() => currentRegion.set(tile.propertyId)}>
           <span class="title">{tile.propertyId}</span>
@@ -129,7 +129,7 @@
     {/each}
   </HexGrid>
 
-  <h3>Details {$currentRegionInfo.displayName}</h3>
+  <h3>Details {params.region.displayName}</h3>
   <div class="content-grid">
     <HexGrid className="grid-3-11" columns={3} style="gap: 2px" fit>
       <RegionHexGridCell x={1} y={2} {params} />

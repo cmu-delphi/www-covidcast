@@ -2,6 +2,7 @@ import { timeDay, timeWeek } from 'd3-time';
 import { addNameInfos, fetchData, formatAPITime } from '../../data';
 import { nationInfo } from '../../maps';
 import { currentRegion, yesterdayDate } from '../../stores';
+
 /**
  * @typedef {object} Params
  * @property {import('../../maps').NameInfo} region
