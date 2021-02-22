@@ -1,10 +1,11 @@
 <script>
   import Vega from '../../components/Vega.svelte';
-  import { fetchRegionSlice } from '../../data';
+  import { addNameInfos, fetchRegionSlice } from '../../data';
   import { currentDateObject, sensorMap } from '../../stores';
   import { combineSignals } from '../../data/utils';
-  import { countyInfo, stateInfo } from '../../maps';
   import { onMount } from 'svelte';
+  import Search from '../../components/Search.svelte';
+  import { countyInfo, stateInfo } from '../../maps';
 
   const masks = sensorMap.get('fb-survey-smoothed_wearing_mask');
   const cli = sensorMap.get('fb-survey-smoothed_cli');
@@ -13,16 +14,16 @@
   const cases = sensorMap.get('indicator-combination-confirmed_7dav_incidence_prop');
   const vaccine = sensorMap.get('fb-survey-smoothed_covid_vaccinated_or_accept');
 
-  const NAME_INFO_KEYS = ['propertyId', 'displayName', 'population', 'state'];
-
   function loadData(entries, date, level) {
-    return Promise.all(entries.map((d) => fetchRegionSlice(d.signal, level, date))).then((rows) => {
-      return combineSignals(
-        rows,
-        rows[0],
-        entries.map((d) => d.name),
-      );
-    });
+    return Promise.all(entries.map((d) => fetchRegionSlice(d.signal, level, date)))
+      .then((rows) => {
+        return combineSignals(
+          rows,
+          rows[0],
+          entries.map((d) => d.name),
+        );
+      })
+      .then(addNameInfos);
   }
 
   const entries = [
@@ -83,7 +84,7 @@
                   : 0,
             },
           },
-          detail: { field: 'geo_value' },
+          detail: { field: 'id' },
         },
       };
       return layer;
@@ -96,7 +97,7 @@
       height: 500,
       padding: {
         left: 40,
-        right: 40,
+        right: 40 + 60,
         top: 5,
         bottom: 5,
       },
@@ -106,20 +107,6 @@
         resize: true,
       },
       data: { name: 'values', values: [] },
-      transform: [
-        {
-          calculate: 'upper(datum.geo_value)',
-          as: 'id',
-        },
-        {
-          lookup: 'id',
-          from: {
-            data: { values: level === 'county' ? countyInfo : stateInfo },
-            key: 'propertyId',
-            fields: NAME_INFO_KEYS,
-          },
-        },
-      ],
       layer: [
         ...entries.map((d, i) => asScale(d, i)),
         {
@@ -138,7 +125,7 @@
           ],
           mark: {
             type: 'line',
-            point: true,
+            point: false,
           },
 
           selection: {
@@ -146,7 +133,7 @@
               type: 'single',
               on: 'mouseover, click',
               empty: 'none',
-              fields: ['geo_value'],
+              fields: ['id'],
             },
           },
           encoding: {
@@ -155,7 +142,7 @@
                 selection: 'highlight',
                 value: 1,
               },
-              value: 0.1,
+              value: level === 'state' ? 0.25 : 0.1,
             },
             x: {
               sort: null,
@@ -173,7 +160,11 @@
               type: 'quantitative',
               axis: null,
             },
-            detail: { field: 'geo_value' },
+            detail: { field: 'id' },
+            color: {
+              field: 'region',
+              type: 'nominal',
+            },
           },
         },
       ],
@@ -210,9 +201,43 @@
 
   function onSignal(e) {
     if (e.detail.name === 'highlight') {
-      const geoValue = (e.detail.value.geo_value || [])[0];
-      highlighted = geoValue ? e.detail.view.data('data_0').find((d) => d.geo_value === geoValue) : null;
+      const id = (e.detail.value.id || [])[0];
+      highlighted = id ? e.detail.view.data('values').find((d) => d.id === id) : null;
     }
+  }
+
+  /**
+   * @param {import('../../maps').NameInfo} d
+   */
+  function combineKeywords(d) {
+    return `${d.id} ${d.displayName}`;
+  }
+
+  /**
+   * @type {Vega}
+   */
+  let vega = null;
+
+  function onHighlight(info) {
+    /**
+     * @type {import('vega-typings').View}
+     */
+    const view = vega.vegaDirectAccessor();
+    if (!view) {
+      return;
+    }
+    highlighted = info ? view.data('values').find((d) => d.id === info.id) : null;
+    view.signal(
+      'highlight_tuple',
+      info
+        ? {
+            unit: 'layer_1',
+            fields: view.signal('highlight_tuple_fields'),
+            values: [info.id],
+          }
+        : null,
+    );
+    view.runAsync();
   }
 </script>
 
@@ -226,6 +251,7 @@
     border: 1px solid #efefef;
     border-radius: 5px;
     cursor: grab;
+    margin-right: 60px;
     padding: 2px 5px;
     flex: 1 1 0;
     text-align: center;
@@ -246,12 +272,21 @@
 
 <div class="uk-container">
   <h2>Parallel Coordinates Plot of States</h2>
-
   <div>
     Granuarlity:
     <label><input type="radio" value="state" name="level" bind:group={level} />State</label>
     <label><input type="radio" value="county" name="level" bind:group={level} />County</label>
   </div>
+
+  <Search
+    modern="small"
+    placeholder="Search for {level}"
+    items={level === 'state' ? stateInfo : countyInfo}
+    selectedItem={level === 'state' ? null : null}
+    labelFieldName="displayName"
+    keywordFunction={combineKeywords}
+    maxItemsToShowInList="5"
+    on:change={(e) => onHighlight(e.detail)} />
 
   <p>Drag the axis label chips to reorder:</p>
 
@@ -263,7 +298,7 @@
       </div>
     {/each}
   </div>
-  <Vega {spec} {data} signalListeners={['highlight']} on:signal={onSignal} />
+  <Vega bind:this={vega} {spec} {data} signalListeners={['highlight']} on:signal={onSignal} />
 
   <h3 class="uk-margin-remove-top">Selected Item</h3>
   <table class="uk-table  uk-table-small">

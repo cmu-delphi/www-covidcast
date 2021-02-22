@@ -12,7 +12,7 @@ export const levelMegaCountyId = 'mega-county';
  * @property {string} id param id
  * @property {string} propertyId geojson: feature.property.id
  * @property {number} population
- * @property {string?} region just for state
+ * @property {string?} region just for state and county
  * @property {string?} state just for county
  * @property {'state' | 'county' | 'msa' | 'hrr' | 'nation'} level
  */
@@ -75,7 +75,9 @@ export const countyInfo = parseCSV(
   (county) =>
     `${county.name}${county.displayName !== 'X' ? ' County' : ''}, ${stateLookup.get(county.id.slice(0, 2)).postal}`,
   (county) => {
-    county.state = stateLookup.get(county.id.slice(0, 2)).postal;
+    const state = stateLookup.get(county.id.slice(0, 2));
+    county.state = state.postal;
+    county.region = state.region;
   },
 );
 export const hrrInfo = parseCSV(hrrRaw, 'hrr', (hrr) => `${hrr.state} - ${hrr.name} (HRR)`);
@@ -91,6 +93,7 @@ export const megaCountyInfo = stateInfo.map((info) => ({
   displayName: `Rest of ${info.displayName}`,
   population: null,
   level: levelMegaCountyId,
+  region: info.region,
   lat: null,
   long: null,
 }));
