@@ -6,7 +6,7 @@
   import { onMount } from 'svelte';
   import Search from '../../components/Search.svelte';
   import { countyInfo, stateInfo } from '../../maps';
-  import { determineMinMax } from '../../components/MapBox/colors';
+  import { resolveStats, resolveStatsKey } from '../../components/MapBox/colors';
 
   const masks = sensorMap.get('fb-survey-smoothed_wearing_mask');
   const cli = sensorMap.get('fb-survey-smoothed_cli');
@@ -24,46 +24,54 @@
           entries.map((d) => d.name),
         );
       })
-      .then(addNameInfos);
+      .then(addNameInfos)
+      .then((rows) => {
+        // add a mean line
+        const meanEntry = {
+          id: 'mean',
+          region: 'Mean V.',
+          displayName: 'Mean from Metadata',
+        };
+        entries.forEach((entry) => {
+          meanEntry[entry.name] = entry.mean;
+        });
+        rows.push(meanEntry);
+        return rows;
+      });
+  }
+
+  function determineDomain(name, sensorEntry, level, statsLookup) {
+    const key = resolveStatsKey(sensorEntry, level, {});
+    const stats = resolveStats(statsLookup, key);
+
+    return {
+      name,
+      signal: sensorEntry,
+      domain: [stats.mean - 3 * stats.std, stats.mean + 3 * stats.std],
+      mean: stats.mean,
+    };
   }
 
   let level = 'state';
   let domain = 'auto';
 
-  $: entries = [
-    {
-      name: 'vaccine',
-      signal: vaccine,
-      domain: determineMinMax($stats, vaccine, level, {}, false),
-    },
-    {
-      name: 'masks',
-      signal: masks,
-      domain: determineMinMax($stats, masks, level, {}, false),
-    },
-    {
-      name: 'cli',
-      signal: cli,
-      domain: determineMinMax($stats, cli, level, {}, false),
-    },
-    {
-      name: 'cases',
-      signal: cases,
-      domain: determineMinMax($stats, cases, level, {}, false),
-    },
-    {
-      name: 'hospital',
-      signal: hospital,
-      domain: determineMinMax($stats, hospital, level, {}, false),
-    },
-    {
-      name: 'deaths',
-      signal: deaths,
-      domain: determineMinMax($stats, deaths, level, {}, false),
-    },
-  ];
-
+  $: entries = Object.entries({ vaccine, masks, cli, cases, hospital, deaths }).map(([name, signal]) =>
+    determineDomain(name, signal, level, $stats),
+  );
   let reversedSet = [];
+
+  function deriveDomain(domain, entry) {
+    if (domain == 'defined') {
+      return { domain: entry.domain, zero: false, nice: false, clamp: true };
+    }
+    if (domain === 'auto') {
+      return { zero: false };
+    }
+    if (entry.signal.format === 'percent') {
+      return { domain: [0, 100] };
+    }
+    return {};
+  }
 
   function generatePCPSpec(entries, level, reversedSet, domain) {
     function asScale(entry, i) {
@@ -79,8 +87,7 @@
             field: entry.name,
             type: 'quantitative',
             scale: {
-              zero: false,
-              domain: domain === 'defined' ? entry.domain : undefined,
+              ...deriveDomain(domain, entry),
               reverse: reversedSet.includes(entry.name),
             },
             axis: {
@@ -150,10 +157,31 @@
           encoding: {
             opacity: {
               condition: {
-                selection: 'highlight',
+                test: {
+                  or: [
+                    {
+                      selection: 'highlight',
+                    },
+                    'datum.id === "mean"',
+                  ],
+                },
                 value: 1,
               },
               value: level === 'state' ? 0.25 : 0.1,
+            },
+            strokeWidth: {
+              condition: {
+                test: {
+                  or: [
+                    {
+                      selection: 'highlight',
+                    },
+                    'datum.id === "mean"',
+                  ],
+                },
+                value: 3,
+              },
+              value: 1,
             },
             x: {
               sort: null,
@@ -290,7 +318,8 @@
   <div>
     Domain:
     <label><input type="radio" value="auto" name="domain" bind:group={domain} />Auto</label>
-    <label><input type="radio" value="defined" name="domain" bind:group={domain} />Defined as in Map</label>
+    <label><input type="radio" value="defined" name="domain" bind:group={domain} />mean +/- 3 * stdev (like in map)</label>
+    <label><input type="radio" value="logic" name="domain" bind:group={domain} />Full Percentages, start at Zero</label>
   </div>
 
   <Search
