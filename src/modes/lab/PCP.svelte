@@ -1,11 +1,12 @@
 <script>
   import Vega from '../../components/Vega.svelte';
   import { addNameInfos, fetchRegionSlice } from '../../data';
-  import { currentDateObject, sensorMap } from '../../stores';
+  import { currentDateObject, sensorMap, stats } from '../../stores';
   import { combineSignals } from '../../data/utils';
   import { onMount } from 'svelte';
   import Search from '../../components/Search.svelte';
   import { countyInfo, stateInfo } from '../../maps';
+  import { determineMinMax } from '../../components/MapBox/colors';
 
   const masks = sensorMap.get('fb-survey-smoothed_wearing_mask');
   const cli = sensorMap.get('fb-survey-smoothed_cli');
@@ -26,36 +27,45 @@
       .then(addNameInfos);
   }
 
-  const entries = [
+  let level = 'state';
+  let domain = 'auto';
+
+  $: entries = [
     {
       name: 'vaccine',
       signal: vaccine,
+      domain: determineMinMax($stats, vaccine, level, {}, false),
     },
     {
       name: 'masks',
       signal: masks,
+      domain: determineMinMax($stats, masks, level, {}, false),
     },
     {
       name: 'cli',
       signal: cli,
+      domain: determineMinMax($stats, cli, level, {}, false),
     },
     {
       name: 'cases',
       signal: cases,
+      domain: determineMinMax($stats, cases, level, {}, false),
     },
     {
       name: 'hospital',
       signal: hospital,
+      domain: determineMinMax($stats, hospital, level, {}, false),
     },
     {
       name: 'deaths',
       signal: deaths,
+      domain: determineMinMax($stats, deaths, level, {}, false),
     },
   ];
 
   let reversedSet = [];
 
-  function generatePCPSpec(entries, level, reversedSet) {
+  function generatePCPSpec(entries, level, reversedSet, domain) {
     function asScale(entry, i) {
       /**
        * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
@@ -70,6 +80,7 @@
             type: 'quantitative',
             scale: {
               zero: false,
+              domain: domain === 'defined' ? entry.domain : undefined,
               reverse: reversedSet.includes(entry.name),
             },
             axis: {
@@ -183,9 +194,8 @@
     return spec;
   }
 
-  let level = 'state';
-  let sortedEntries = entries;
-  $: spec = generatePCPSpec(sortedEntries, level, reversedSet);
+  $: sortedEntries = entries;
+  $: spec = generatePCPSpec(sortedEntries, level, reversedSet, domain);
   $: data = loadData(entries, $currentDateObject, level);
 
   let ref = null;
@@ -276,6 +286,11 @@
     Granuarlity:
     <label><input type="radio" value="state" name="level" bind:group={level} />State</label>
     <label><input type="radio" value="county" name="level" bind:group={level} />County</label>
+  </div>
+  <div>
+    Domain:
+    <label><input type="radio" value="auto" name="domain" bind:group={domain} />Auto</label>
+    <label><input type="radio" value="defined" name="domain" bind:group={domain} />Defined as in Map</label>
   </div>
 
   <Search
