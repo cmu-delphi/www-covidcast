@@ -27,6 +27,7 @@
     }
     return labelFieldName ? item[labelFieldName] : item;
   };
+  export let keywordFunction = labelFunction;
   export let colorFieldName = undefined;
 
   export let selectFirstIfEmpty = false;
@@ -101,7 +102,7 @@
 
   $: listItems = items.map((item) => ({
     // keywords representation of the item
-    keywords: labelFunction(item).toLowerCase().trim(),
+    keywords: keywordFunction(item).toLowerCase().trim(),
     // item label
     label: labelFunction(item),
     // store reference to the origial item
