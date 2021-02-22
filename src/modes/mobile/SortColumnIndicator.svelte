@@ -17,7 +17,7 @@
     font-weight: inherit;
     text-transform: uppercase;
     color: inherit;
-    opacity: 0.8;
+    opacity: 0.4;
     padding: 0;
     cursor: pointer;
   }

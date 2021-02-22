@@ -43,6 +43,25 @@
     return { title: 'US States', unit: 'State' };
   }
 
+  function addMissingGeo(geo) {
+    return (rows) => {
+      if (rows.length >= geo.length) {
+        return rows;
+      }
+      const existing = new Set(rows.map((r) => r.id));
+      const missing = geo.filter((d) => !existing.has(d.id));
+      for (const m of missing) {
+        rows.push({
+          geo_value: m.propertyId,
+          value: null,
+          stderr: null,
+          ...m,
+        });
+      }
+      return rows;
+    };
+  }
+
   /**
    * @param {import('../../stores/constants').SensorEntry} sensor
    * @param {import("../utils").Params} params
@@ -52,13 +71,25 @@
       return Promise.resolve([]);
     }
     if (params.region.level === 'state') {
-      const geo = getCountiesOfState(params.region).map((d) => d.propertyId);
-      return params.fetchMultiRegions(params.sensor, 'county', geo);
+      const geo = getCountiesOfState(params.region);
+      return params
+        .fetchMultiRegions(
+          params.sensor,
+          'county',
+          geo.map((d) => d.propertyId),
+        )
+        .then(addMissingGeo(geo));
     }
     if (params.region.level === 'county') {
-      const geo = [params.region, ...getRelatedCounties(params.region)].map((d) => d.propertyId);
+      const geo = [params.region, ...getRelatedCounties(params.region)];
 
-      return params.fetchMultiRegions(params.sensor, 'county', geo);
+      return params
+        .fetchMultiRegions(
+          params.sensor,
+          'county',
+          geo.map((d) => d.propertyId),
+        )
+        .then(addMissingGeo(geo));
     }
     return params.fetchMultiRegions(params.sensor, 'state', '*');
   }
@@ -66,17 +97,21 @@
   let sortCriteria = 'displayName';
   let sortDirectionDesc = false;
 
-  function applyDirection(comparator, sortDirectionDesc) {
-    return sortDirectionDesc ? (a, b) => -comparator(a, b) : comparator;
-  }
-  function bySortCriteria(sortCriteria) {
+  function bySortCriteria(sortCriteria, sortDirectionDesc) {
+    const less = sortDirectionDesc ? 1 : -1;
     return (a, b) => {
       const av = a[sortCriteria];
       const bv = b[sortCriteria];
-      if (av !== bv) {
-        return av < bv ? -1 : 1;
+      if ((av == null) !== (bv == null)) {
+        return av == null ? 1 : -1;
       }
-      return a.displayName.localeCompare(b.displayName);
+      if (av !== bv) {
+        return av < bv ? less : -less;
+      }
+      if (a.displayName !== b.displayName) {
+        return a.displayName < b.displayName ? less : -less;
+      }
+      return 0;
     };
   }
 
@@ -89,7 +124,7 @@
     sortDirectionDesc = defaultSortDesc;
   }
 
-  $: comparator = applyDirection(bySortCriteria(sortCriteria), sortDirectionDesc);
+  $: comparator = bySortCriteria(sortCriteria, sortDirectionDesc);
 
   $: title = determineTitle(params.region);
   $: regions = determineRegions(params.region);
@@ -115,7 +150,7 @@
     if (!date || !regions || regions.length === 0) {
       return new Map();
     }
-    const { min, max, difference } = computeSparklineTimeFrame(date, sensor);
+    const { min, max, difference } = computeSparklineTimeFrame(date);
     if (regions.length * difference < 3600) {
       // load all at once
       const data = fetchData(
@@ -226,7 +261,7 @@
       </tr>
     {/each}
   </tbody>
-  {#if !showAll && regions.length > 10}
+  {#if !showAll && sortedRegions.length > 10}
     <tfoot>
       <tr>
         <td colspan="5" class="uk-text-center">
@@ -237,7 +272,7 @@
               {@html chevronDownIcon}
             </span>
             Show remaining
-            {(regions.length - 10).toLocaleString()}
+            {(sortedRegions.length - 10).toLocaleString()}
             regions
           </button>
         </td>

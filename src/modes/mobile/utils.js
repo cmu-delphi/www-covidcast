@@ -1,8 +1,7 @@
 import { timeDay, timeWeek } from 'd3-time';
-import { addNameInfos, fetchData, formatAPITime, parseAPITime } from '../../data';
+import { addNameInfos, fetchData, formatAPITime } from '../../data';
 import { nationInfo } from '../../maps';
-import { currentRegion, times, yesterdayDate } from '../../stores';
-import { get } from 'svelte/store';
+import { currentRegion, yesterdayDate } from '../../stores';
 /**
  * @typedef {object} Params
  * @property {import('../../maps').NameInfo} region
@@ -60,24 +59,12 @@ export function asParams(sensor, region, date) {
   };
 }
 
-function maxSensorDate(sensor) {
-  const t = get(times);
-  if (!t) {
-    return yesterdayDate;
-  }
-  const m = t.get(sensor.key);
-  if (!m) {
-    return yesterdayDate;
-  }
-  return parseAPITime(m[1]);
-}
-
 /**
  * @param {Date} date
  */
-export function computeSparklineTimeFrame(date, sensor) {
+export function computeSparklineTimeFrame(date) {
   let max = timeWeek.offset(date, 2);
-  const maxDate = sensor ? maxSensorDate(sensor) : yesterdayDate;
+  const maxDate = yesterdayDate;
   if (max > maxDate) {
     max = maxDate;
   }

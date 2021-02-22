@@ -18,7 +18,7 @@
     if (!region || !date) {
       return null;
     }
-    const { min, max } = computeSparklineTimeFrame(date, sensor);
+    const { min, max } = computeSparklineTimeFrame(date);
     return fetchTimeSlice(sensor, region.level, region.propertyId, min, max, true, {
       displayName: region.displayName,
       geo_value: region.propertyId,
