@@ -19,6 +19,16 @@
     font-size: 0.875rem;
     line-height: 1.5rem;
   }
+
+  .landing-banner {
+    background: url('/assets/imgs/landing-banner.png');
+    background-position: top left;
+    background-size: 100% 20px;
+    background-repeat: no-repeat;
+    margin-top: 0;
+    padding-top: 40px;
+  }
+
   h2 {
     font-size: 0.875rem;
     font-weight: 700;
@@ -73,7 +83,7 @@
   }
 </style>
 
-<div class="uk-container content-grid root">
+<div class="uk-container content-grid root landing-banner">
   <div class="grid-3-11">
     <h2>Welcome to COVIDcast</h2>
     <p>Explore COVID-19 indicators nearby</p>
