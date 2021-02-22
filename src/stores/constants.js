@@ -264,7 +264,7 @@ export const defaultRegionOnStartup = {
 export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
 export const yesterday = Number.parseInt(formatAPITime(yesterdayDate), 10);
 
-export const DEFAULT_MODE = modeByID.overview;
+export const DEFAULT_MODE = modeByID.landing;
 export const DEFAULT_SENSOR = (sensorList.find((d) => d.default) || sensorList[0]).key;
 /**
  * default sensor in case the initial mode is survey-results

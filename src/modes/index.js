@@ -10,27 +10,26 @@
  */
 const modes = [
   {
-    id: 'overview',
-    label: 'Map Overview',
-    component: () => import(/* webpackChunkName: 'm-overview' */ './overview/Overview.svelte').then((r) => r.default),
-  },
-  {
     id: 'landing',
-    label: 'Mobile Landing',
+    label: 'About',
     component: () => import(/* webpackChunkName: 'm-landing' */ './landing/Landing.svelte').then((r) => r.default),
   },
   {
-    id: 'mobile',
-    label: 'Mobile Overview',
-    component: () => import(/* webpackChunkName: 'm-mobile' */ './mobile/MobileOverview.svelte').then((r) => r.default),
+    id: 'overview',
+    label: 'Overview',
+    component: () =>
+      import(/* webpackChunkName: 'm-overview' */ './mobile/MobileOverview.svelte').then((r) => r.default),
   },
   {
-    id: 'mobile-indicator',
-    label: 'Mobile Indicator',
+    id: 'indicator',
+    label: 'Indicator Details',
     component: () =>
-      import(/* webpackChunkName: 'm-mobile-indicator' */ './mobile/MobileIndicatorOverview.svelte').then(
-        (r) => r.default,
-      ),
+      import(/* webpackChunkName: 'm-indicator' */ './mobile/MobileIndicatorOverview.svelte').then((r) => r.default),
+  },
+  {
+    id: 'old',
+    label: 'Old Overview',
+    component: () => import(/* webpackChunkName: 'm-old' */ './overview/Overview.svelte').then((r) => r.default),
   },
   {
     id: 'timelapse',
@@ -69,7 +68,7 @@ const modes = [
 export default modes;
 
 /**
- * @type {Record<'overview'|'timelapse'|'top10'|'export'|'single'|'survey-results'|'lab'|'mobile'|'mobile-indicator'|'landing', Mode>}
+ * @type {Record<'overview'|'timelapse'|'top10'|'export'|'single'|'survey-results'|'lab'|'old'|'indicator'|'landing', Mode>}
  */
 export const modeByID = {};
 modes.forEach((mode) => (modeByID[mode.id] = mode));

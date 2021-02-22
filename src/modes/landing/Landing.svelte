@@ -11,7 +11,7 @@
     if (region !== undefined) {
       selectByInfo(region);
     }
-    currentMode.set(modeByID.mobile);
+    currentMode.set(modeByID.overview);
   }
 </script>
 

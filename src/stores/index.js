@@ -373,7 +373,7 @@ export const trackedUrlParams = derived(
   ],
   ([mode, sensor, level, region, date, signalOptions, encoding, compare]) => {
     const sensorEntry = sensorMap.get(sensor);
-    const inMapMode = mode === modeByID.overview || mode === modeByID.timelapse;
+    const inMapMode = mode === modeByID.old || mode === modeByID.timelapse;
 
     // determine parameters based on default value and current mode
     const params = {
@@ -392,7 +392,7 @@ export const trackedUrlParams = derived(
       signalI: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.incidence,
       encoding: !inMapMode || encoding === DEFAULT_ENCODING ? null : encoding,
       compare:
-        (mode !== modeByID.overview && mode !== modeByID.single) || !compare
+        (mode !== modeByID.old && mode !== modeByID.single) || !compare
           ? null
           : compare.map((d) => d.info.propertyId).join(','),
     };

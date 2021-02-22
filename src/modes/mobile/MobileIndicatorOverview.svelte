@@ -7,7 +7,7 @@
   import { modeByID } from '..';
 
   function switchMode() {
-    currentMode.set(modeByID.mobile);
+    currentMode.set(modeByID.overview);
   }
 </script>
 

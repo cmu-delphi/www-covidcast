@@ -55,7 +55,7 @@
 
   function switchMode() {
     currentSensor.set(sensor.key);
-    currentMode.set(modeByID['mobile-indicator']);
+    currentMode.set(modeByID.indicator);
   }
 </script>
 
@@ -81,7 +81,7 @@
 
 <tr class="has-addon">
   <td>
-    <a href="?mode=mobile-indicator&sensor={sensor.key}" class="uk-link-text" on:click|preventDefault={switchMode}>
+    <a href="?mode=indicator&sensor={sensor.key}" class="uk-link-text" on:click|preventDefault={switchMode}>
       {sensor.name}
     </a>
   </td>
@@ -96,7 +96,7 @@
   </td>
   <td>
     <a
-      href="?mode=mobile-indicator&sensor={sensor.key}"
+      href="?mode=indicator&sensor={sensor.key}"
       class="uk-link-text details-link"
       on:click|preventDefault={switchMode}>
       {@html chevronRightIcon}
