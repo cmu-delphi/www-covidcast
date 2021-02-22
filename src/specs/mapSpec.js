@@ -1,12 +1,21 @@
-import { countyInfo, hrrInfo, megaCountyInfo, nationInfo, stateInfo, msaInfo } from '../maps';
 import getRelatedCounties from '../maps/related';
 import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 import { MAP_THEME, MISSING_COLOR, ZERO_COLOR } from '../theme';
 
+const NAME_INFO_KEYS = ['propertyId', 'displayName', 'population', 'state'];
 const EPIDATA_ROW_KEYS = ['geo_value', 'value', 'date_value', 'time_value', 'stderr', 'sample_size'].concat(
   EPIDATA_CASES_OR_DEATH_VALUES,
+  NAME_INFO_KEYS,
 );
-const NAME_INFO_KEYS = ['propertyId', 'displayName', 'population', 'state'];
+
+const missingStopCount = 70;
+const missingGradient = {
+  y2: 1,
+  gradient: 'linear',
+  stops: Array(missingStopCount + 1)
+    .fill(0)
+    .map((_, i) => ({ offset: i / missingStopCount, color: i % 2 === 0 ? MISSING_COLOR : 'white' })),
+};
 
 function genMissingLayer(missingLevel = 'nation') {
   /**
@@ -23,89 +32,13 @@ function genMissingLayer(missingLevel = 'nation') {
     mark: {
       type: 'geoshape',
       stroke: '#eaeaea',
-      color: {
-        y2: 1,
-        gradient: 'linear',
-        stops: [
-          { offset: 0, color: MISSING_COLOR },
-          { offset: 0.014285714285714285, color: 'white' },
-          { offset: 0.02857142857142857, color: MISSING_COLOR },
-          { offset: 0.04285714285714286, color: 'white' },
-          { offset: 0.05714285714285714, color: MISSING_COLOR },
-          { offset: 0.07142857142857142, color: 'white' },
-          { offset: 0.08571428571428572, color: MISSING_COLOR },
-          { offset: 0.1, color: 'white' },
-          { offset: 0.11428571428571428, color: MISSING_COLOR },
-          { offset: 0.12857142857142856, color: 'white' },
-          { offset: 0.14285714285714285, color: MISSING_COLOR },
-          { offset: 0.15714285714285714, color: 'white' },
-          { offset: 0.17142857142857143, color: MISSING_COLOR },
-          { offset: 0.18571428571428572, color: 'white' },
-          { offset: 0.2, color: MISSING_COLOR },
-          { offset: 0.21428571428571427, color: 'white' },
-          { offset: 0.22857142857142856, color: MISSING_COLOR },
-          { offset: 0.24285714285714285, color: 'white' },
-          { offset: 0.2571428571428571, color: MISSING_COLOR },
-          { offset: 0.2714285714285714, color: 'white' },
-          { offset: 0.2857142857142857, color: MISSING_COLOR },
-          { offset: 0.3, color: 'white' },
-          { offset: 0.3142857142857143, color: MISSING_COLOR },
-          { offset: 0.32857142857142857, color: 'white' },
-          { offset: 0.34285714285714286, color: MISSING_COLOR },
-          { offset: 0.35714285714285715, color: 'white' },
-          { offset: 0.37142857142857144, color: MISSING_COLOR },
-          { offset: 0.38571428571428573, color: 'white' },
-          { offset: 0.4, color: MISSING_COLOR },
-          { offset: 0.4142857142857143, color: 'white' },
-          { offset: 0.42857142857142855, color: MISSING_COLOR },
-          { offset: 0.44285714285714284, color: 'white' },
-          { offset: 0.45714285714285713, color: MISSING_COLOR },
-          { offset: 0.4714285714285714, color: 'white' },
-          { offset: 0.4857142857142857, color: MISSING_COLOR },
-          { offset: 0.5, color: 'white' },
-          { offset: 0.5142857142857142, color: MISSING_COLOR },
-          { offset: 0.5285714285714286, color: 'white' },
-          { offset: 0.5428571428571428, color: MISSING_COLOR },
-          { offset: 0.5571428571428572, color: 'white' },
-          { offset: 0.5714285714285714, color: MISSING_COLOR },
-          { offset: 0.5857142857142857, color: 'white' },
-          { offset: 0.6, color: MISSING_COLOR },
-          { offset: 0.6142857142857143, color: 'white' },
-          { offset: 0.6285714285714286, color: MISSING_COLOR },
-          { offset: 0.6428571428571429, color: 'white' },
-          { offset: 0.6571428571428571, color: MISSING_COLOR },
-          { offset: 0.6714285714285714, color: 'white' },
-          { offset: 0.6857142857142857, color: MISSING_COLOR },
-          { offset: 0.7, color: 'white' },
-          { offset: 0.7142857142857143, color: MISSING_COLOR },
-          { offset: 0.7285714285714285, color: 'white' },
-          { offset: 0.7428571428571429, color: MISSING_COLOR },
-          { offset: 0.7571428571428571, color: 'white' },
-          { offset: 0.7714285714285715, color: MISSING_COLOR },
-          { offset: 0.7857142857142857, color: 'white' },
-          { offset: 0.8, color: MISSING_COLOR },
-          { offset: 0.8142857142857143, color: 'white' },
-          { offset: 0.8285714285714286, color: MISSING_COLOR },
-          { offset: 0.8428571428571429, color: 'white' },
-          { offset: 0.8571428571428571, color: MISSING_COLOR },
-          { offset: 0.8714285714285714, color: 'white' },
-          { offset: 0.8857142857142857, color: MISSING_COLOR },
-          { offset: 0.9, color: 'white' },
-          { offset: 0.9142857142857143, color: MISSING_COLOR },
-          { offset: 0.9285714285714286, color: 'white' },
-          { offset: 0.9428571428571428, color: MISSING_COLOR },
-          { offset: 0.9571428571428572, color: 'white' },
-          { offset: 0.9714285714285714, color: MISSING_COLOR },
-          { offset: 0.9857142857142858, color: 'white' },
-          { offset: 1, color: MISSING_COLOR },
-        ],
-      },
+      color: missingGradient,
     },
   };
   return layer;
 }
 
-function genMegaLayer(infos) {
+function genMegaLayer() {
   /**
    * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
    */
@@ -121,18 +54,6 @@ function genMegaLayer(infos) {
       { calculate: "datum.id + '000'", as: 'id' },
       {
         lookup: 'id',
-        from: {
-          data: { values: infos },
-          key: 'id',
-          fields: NAME_INFO_KEYS,
-        },
-      },
-      {
-        calculate: 'lower(datum.propertyId)',
-        as: 'propertyId',
-      },
-      {
-        lookup: 'propertyId',
         from: {
           data: { name: 'values' },
           key: 'geo_value',
@@ -329,7 +250,7 @@ function genLevelHoverLayer() {
   return layer;
 }
 
-function genBaseSpec(level, topoJSON, infos, { height = 300 }) {
+function genBaseSpec(level, topoJSON, { height = 300 }) {
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
@@ -364,20 +285,8 @@ function genBaseSpec(level, topoJSON, infos, { height = 300 }) {
       {
         lookup: 'id',
         from: {
-          data: { values: infos },
-          key: 'id',
-          fields: NAME_INFO_KEYS,
-        },
-      },
-      {
-        calculate: 'lower(datum.propertyId)',
-        as: 'propertyId_l',
-      },
-      {
-        lookup: 'propertyId_l',
-        from: {
           data: { name: 'values' },
-          key: 'geo_value',
+          key: 'id',
           fields: EPIDATA_ROW_KEYS,
         },
       },
@@ -417,9 +326,7 @@ function nationTilesJSON() {
 export function generateHRRSpec(options = {}) {
   const level = 'hrr';
   const topoJSON = hrrJSON();
-  const infos = hrrInfo;
-
-  const spec = genBaseSpec(level, topoJSON, infos, options);
+  const spec = genBaseSpec(level, topoJSON, options);
   spec.datasets.nation = nationJSON();
   spec.layer.push(genMissingLayer());
 
@@ -431,9 +338,8 @@ export function generateHRRSpec(options = {}) {
 export function generateStateSpec(options = {}) {
   const level = 'state';
   const topoJSON = stateJSON();
-  const infos = stateInfo;
 
-  const spec = genBaseSpec(level, topoJSON, infos, options);
+  const spec = genBaseSpec(level, topoJSON, options);
   spec.datasets.nation = nationJSON();
   spec.layer.push(genMissingLayer());
 
@@ -446,9 +352,8 @@ export function generateStateSpec(options = {}) {
 export function generateMSASpec(options = {}) {
   const level = 'msa';
   const topoJSON = msaJSON();
-  const infos = msaInfo;
 
-  const spec = genBaseSpec(level, topoJSON, infos, options);
+  const spec = genBaseSpec(level, topoJSON, options);
   spec.datasets.nation = nationJSON();
   spec.layer.push(genMissingLayer());
 
@@ -461,9 +366,8 @@ export function generateMSASpec(options = {}) {
 export function generateNationSpec(options = {}) {
   const level = 'nation';
   const topoJSON = nationJSON();
-  const infos = [nationInfo];
 
-  const spec = genBaseSpec(level, topoJSON, infos, options);
+  const spec = genBaseSpec(level, topoJSON, options);
   spec.transform.unshift({
     calculate: JSON.stringify('us'),
     as: 'id',
@@ -480,14 +384,13 @@ export function generateNationSpec(options = {}) {
 export function generateCountySpec(options = {}) {
   const level = 'county';
   const topoJSON = countyJSON();
-  const infos = countyInfo;
 
-  const spec = genBaseSpec(level, topoJSON, infos, options);
+  const spec = genBaseSpec(level, topoJSON, options);
 
   spec.datasets.nation = nationJSON();
   spec.layer.push(genMissingLayer());
   spec.datasets.state = stateJSON();
-  spec.layer.push(genMegaLayer(megaCountyInfo));
+  spec.layer.push(genMegaLayer());
   spec.layer.push(genLevelLayer({ ...options, strokeWidth: 0 }));
   spec.layer.push(genMegaBorderLayer());
   spec.layer.push(genMegaHoverLayer());
@@ -502,9 +405,8 @@ export function generateCountySpec(options = {}) {
 export function generateCountiesOfStateSpec(state, options = {}) {
   const level = 'county';
   const topoJSON = countyJSON();
-  const infos = countyInfo;
 
-  const spec = genBaseSpec(level, topoJSON, infos, options);
+  const spec = genBaseSpec(level, topoJSON, options);
 
   /**
    * @type {import('vega-lite/build/src/transform').Transform}
@@ -521,7 +423,7 @@ export function generateCountiesOfStateSpec(state, options = {}) {
   spec.transform.unshift(isCountyOfState);
 
   spec.datasets.state = stateJSON();
-  spec.layer.push(genMegaLayer(megaCountyInfo));
+  spec.layer.push(genMegaLayer());
   spec.layer[spec.layer.length - 1].transform.unshift(isState);
   spec.layer.push(genLevelLayer(options));
   spec.layer.push(genLevelHoverLayer());
@@ -535,9 +437,8 @@ export function generateCountiesOfStateSpec(state, options = {}) {
 export function generateRelatedCountySpec(county, options = {}) {
   const level = 'county';
   const topoJSON = countyJSON();
-  const infos = countyInfo;
 
-  const spec = genBaseSpec(level, topoJSON, infos, options);
+  const spec = genBaseSpec(level, topoJSON, options);
 
   const related = getRelatedCounties(county);
   spec.projection.fit = {
@@ -552,7 +453,7 @@ export function generateRelatedCountySpec(county, options = {}) {
   spec.datasets.nation = nationJSON();
   spec.layer.push(genMissingLayer());
   spec.datasets.state = stateJSON();
-  spec.layer.push(genMegaLayer(megaCountyInfo));
+  spec.layer.push(genMegaLayer());
   spec.layer.push(genLevelLayer({ ...options, strokeWidth: 0 }));
   spec.layer.push(genMegaBorderLayer());
   spec.layer.push(genMegaHoverLayer());
@@ -575,9 +476,8 @@ export function generateRelatedCountySpec(county, options = {}) {
 export function generateStateTileSpec(options = {}) {
   const level = 'state';
   const topoJSON = stateTilesJSON();
-  const infos = stateInfo;
 
-  const spec = genBaseSpec(level, topoJSON, infos, options);
+  const spec = genBaseSpec(level, topoJSON, options);
   spec.projection = {
     type: 'identity',
     reflectY: true,

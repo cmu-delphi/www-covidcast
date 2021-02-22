@@ -46,14 +46,14 @@
   function loadData(sensor, params) {
     const region = params.region;
     const selfData = fetchTimeSlice(sensor, region.level, region.propertyId, undefined, undefined, false, {
-      displayName: region.displayName,
+      ...region,
     }).then((r) => addMissing(r, sensor));
 
     const data = [selfData];
     if (params.region.level !== 'nation') {
       data.push(
         fetchTimeSlice(sensor, nationInfo.level, [nationInfo.propertyId], undefined, undefined, false, {
-          displayName: nationInfo.displayName,
+          ...nationInfo,
         }).then((r) => addMissing(r, sensor)),
       );
     }
@@ -61,7 +61,7 @@
     if (params.region.level === 'county') {
       const state = getInfoByName(region.state);
       const stateData = fetchTimeSlice(sensor, state.level, [state.propertyId], undefined, undefined, false, {
-        displayName: state.displayName,
+        ...state,
       }).then((r) => addMissing(r, sensor));
 
       const related = getRelatedCounties(region);

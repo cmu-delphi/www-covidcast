@@ -2,6 +2,7 @@ import { callAPIEndPoint } from './api';
 import { timeDay } from 'd3-time';
 import { parseAPITime, formatAPITime, combineSignals } from './utils';
 import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
+import { getInfoByName } from '../maps';
 
 /**
  * @typedef {import('../stores/constants').SensorEntry} SensorEntry
@@ -339,6 +340,13 @@ export function addMissing(rows, sensor) {
     return createCopy(template, date, sensor);
   });
   return imputedRows;
+}
+
+export function addNameInfos(rows) {
+  for (const row of rows) {
+    Object.assign(row, getInfoByName(row.geo_value));
+  }
+  return rows;
 }
 
 function avg(rows, field) {

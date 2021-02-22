@@ -51,11 +51,13 @@
   function loadData(sensor, params) {
     if (params.region.level === 'state') {
       const counties = getCountiesOfState(params.region);
-      return params.fetchMultiRegions(
+      const countyData = params.fetchMultiRegions(
         sensor,
         'county',
         `${params.region.id}000,${counties.map((d) => d.id).join(',')}`,
       );
+      const stateData = params.fetchMultiRegions(sensor, 'state', '*');
+      return Promise.all([countyData, stateData]).then((r) => r.flat());
     }
     if (params.region.level === 'county') {
       return params.fetchMultiRegions(sensor, 'county', '*');

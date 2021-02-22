@@ -1,5 +1,5 @@
 <script>
-  import { getCountiesOfState, getInfoByName, stateInfo } from '../../maps';
+  import { getCountiesOfState, stateInfo } from '../../maps';
   import { fetchData, fetchTimeSlice, addMissing } from '../../data/fetchData';
   import getRelatedCounties from '../../maps/related';
   import { generateSparkLine } from '../../specs/lineSpec';
@@ -96,12 +96,7 @@
 
   let sortedRegions = [];
 
-  $: loadedData = loadData(params).then((rows) =>
-    rows.map((row) => {
-      const info = getInfoByName(row.geo_value);
-      return Object.assign({}, info, row);
-    }),
-  );
+  $: loadedData = loadData(params);
 
   let showAll = false;
 

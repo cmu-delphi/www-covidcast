@@ -115,7 +115,7 @@ export const nameInfos = stateInfo.concat(msaInfo, countyInfo, hrrInfo, megaCoun
  * @type {Map<string, NameInfo>}
  */
 const infoLookup = new Map();
-nameInfos.forEach((d) => {
+function addInfo(d) {
   const id = String(d.propertyId).toLowerCase();
   if (!infoLookup.has(id)) {
     infoLookup.set(id, d);
@@ -124,7 +124,9 @@ nameInfos.forEach((d) => {
   if (!infoLookup.has(key)) {
     infoLookup.set(key, d);
   }
-});
+}
+nameInfos.forEach(addInfo);
+addInfo(nationInfo);
 
 for (const alias of [
   ['02270', '02158'],

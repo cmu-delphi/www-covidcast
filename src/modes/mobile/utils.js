@@ -1,5 +1,5 @@
 import { timeDay, timeWeek } from 'd3-time';
-import { fetchData, formatAPITime, parseAPITime } from '../../data';
+import { addNameInfos, fetchData, formatAPITime, parseAPITime } from '../../data';
 import { nationInfo } from '../../maps';
 import { currentRegion, times, yesterdayDate } from '../../stores';
 import { get } from 'svelte/store';
@@ -51,7 +51,7 @@ export function asParams(sensor, region, date) {
         {
           multiValues: false,
         },
-      );
+      ).then(addNameInfos);
       if (sensor === sensorToLoad) {
         cache.set(key, r);
       }
