@@ -85,7 +85,7 @@
   <td rowspan="2" class="sparkline">
     <Vega {spec} {data} tooltip={SparkLineTooltip} tooltipProps={{ sensor }} signals={{ currentDate: date.value }} />
   </td>
-  <td>
+  <td rowspan="2">
     <a
       href="?mode=indicator&sensor={sensor.value.key}"
       class="uk-link-text details-link"

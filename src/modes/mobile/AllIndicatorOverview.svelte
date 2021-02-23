@@ -54,7 +54,7 @@
   }
 </script>
 
-<FancyHeader>Overall</FancyHeader>
+<FancyHeader>OVERALL</FancyHeader>
 
 <p>
   {#await trendSummary}
