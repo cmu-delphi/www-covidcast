@@ -29,7 +29,7 @@ const AUTO_ALIGN = {
     "(width - scale('x', datum.date_value)) < 40 ? 'right' : (scale('x', datum.date_value)) > 40 ? 'center' : 'left'",
 };
 
-export function generateLineChartSpec({ height = 300, initialDate = null, valueField = 'value' } = {}) {
+export function generateLineChartSpec({ height = 300, initialDate = null, valueField = 'value', zero = false } = {}) {
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
@@ -81,9 +81,9 @@ export function generateLineChartSpec({ height = 300, initialDate = null, valueF
             },
             scale: {
               round: true,
-              zero: false,
+              zero,
               domainMin: null,
-              padding: smartPadding(valueField),
+              padding: zero ? undefined : smartPadding(valueField),
             },
           },
         },

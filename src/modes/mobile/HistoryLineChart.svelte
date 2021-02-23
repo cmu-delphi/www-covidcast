@@ -26,10 +26,11 @@
    * @param {import('../../maps').NameInfo} region
    * @param {Date} date
    */
-  function genSpec(region, date, height) {
+  function genSpec(region, date, height, zero) {
     const options = {
       initialDate: date,
       height,
+      zero,
     };
     if (region.level === 'state') {
       // state vs nation
@@ -80,8 +81,12 @@
     return Promise.all(data).then((rows) => rows.flat());
   }
 
-  $: spec = genSpec(region.value, date.value, height);
+  let zoom = false;
+
+  $: spec = genSpec(region.value, date.value, height, !zoom);
   $: data = loadData(sensor, region, date);
 </script>
 
 <Vega {className} {spec} {data} tooltip={HistoryLineTooltip} signals={signalPatches} />
+
+<label><input type="checkbox" bind:checked={zoom} />Zoom Y-axis</label>
