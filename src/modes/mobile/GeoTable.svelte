@@ -217,7 +217,7 @@
       </tr>
     {/each}
   </tbody>
-  {#if !showAll && sortedRegions.length > 10}
+  {#if !showAll && regions.length > 10}
     <tfoot>
       <tr>
         <td colspan="5" class="uk-text-center">
@@ -228,7 +228,7 @@
               {@html chevronDownIcon}
             </span>
             Show remaining
-            {(sortedRegions.length - 10).toLocaleString()}
+            {(regions.length - 10).toLocaleString()}
             regions
           </button>
         </td>
