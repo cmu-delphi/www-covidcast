@@ -26,9 +26,9 @@
       trends.forEach((trend, i) => {
         const inv = isInverted(sensorList[i]);
         if (trend.isIncreasing) {
-          (inv ? negative : positive).push(sensorList[i]);
-        } else if (trend.isDecreasing) {
           (!inv ? negative : positive).push(sensorList[i]);
+        } else if (trend.isDecreasing) {
+          (inv ? negative : positive).push(sensorList[i]);
         }
       });
       return { positive, negative };
