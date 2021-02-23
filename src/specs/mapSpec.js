@@ -192,11 +192,13 @@ function genLevelLayer({ strokeWidth = 1, scheme = 'yellowgreenblue', domain = u
           title: null,
           orient: 'none',
           direction: 'horizontal',
+          fillColor: 'white',
+          padding: 5,
           legendX: {
             expr: '(width / 2) - 10 - 150',
           },
           legendY: {
-            expr: 'height + 20',
+            expr: 'height + 12',
           },
           fontWeight: 'normal',
           titleAnchor: 'end',
