@@ -25,5 +25,5 @@ export default function getRelatedCounties(info) {
   if (!related) {
     return [];
   }
-  return related.map((d) => getInfoByName(d));
+  return related.map((d) => getInfoByName(d)).filter(Boolean);
 }

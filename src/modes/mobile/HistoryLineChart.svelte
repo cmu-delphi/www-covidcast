@@ -68,7 +68,7 @@
       const stateData = sensor.fetchTimeSeries(state);
       const related = getRelatedCounties(region.value);
       const relatedData = sensor
-        .fetchMultiTimeSeries('county', related.map((d) => d.propertyId).join(','))
+        .fetchMultiTimeSeries(related)
         .then((r) =>
           averageByDate(r, sensor, {
             displayName: 'Related Counties',

@@ -50,7 +50,7 @@
   }
 </style>
 
-<FancyHeader sub="Indicators">KEY</FancyHeader>
+<FancyHeader sub="Indicators">Key</FancyHeader>
 
 <div class="highlights">
   {#each highlightSurveySensors as s}

@@ -1,16 +1,17 @@
 <script>
   import { getCountiesOfState, stateInfo } from '../../maps';
-  import { fetchData, fetchTimeSlice, addMissing } from '../../data/fetchData';
   import getRelatedCounties from '../../maps/related';
   import { generateSparkLine } from '../../specs/lineSpec';
   import Vega from '../../components/Vega.svelte';
   import SparkLineTooltip from './SparkLineTooltip.svelte';
   import SortColumnIndicator from './SortColumnIndicator.svelte';
-  import { fitRange } from '../../data';
   import chevronDownIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-down.svg';
   import FancyHeader from './FancyHeader.svelte';
   import TrendIndicator from './TrendIndicator.svelte';
   import { currentRegion } from '../../stores';
+  import { formatDateShortNumbers } from '../../formats';
+  import { groupByRegion, extractSparkLine } from '../../stores/params';
+  import { determineTrend } from '../../stores/trend';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -43,31 +44,12 @@
    */
   function determineTitle(region) {
     if (region.level === 'state') {
-      return { title: `Counties of ${region.displayName}`, unit: 'County' };
+      return { title: `${region.displayName} Counties`, unit: 'County' };
     }
     if (region.level === 'county') {
       return { title: `Neighboring Counties`, unit: 'County' };
     }
     return { title: 'US States', unit: 'State' };
-  }
-
-  function addMissingGeo(geo) {
-    return (rows) => {
-      if (rows.length >= geo.length) {
-        return rows;
-      }
-      const existing = new Set(rows.map((r) => r.id));
-      const missing = geo.filter((d) => !existing.has(d.id));
-      for (const m of missing) {
-        rows.push({
-          geo_value: m.propertyId,
-          value: null,
-          stderr: null,
-          ...m,
-        });
-      }
-      return rows;
-    };
   }
 
   /**
@@ -79,28 +61,30 @@
     if (!sensor.value || !date.value || !region.value) {
       return Promise.resolve([]);
     }
+    function loadImpl(regions) {
+      return sensor.fetchMultiTimeSeries(regions).then((data) => {
+        const groups = groupByRegion(data);
+        return regions.map((region) => {
+          const data = groups.get(region.propertyId) || [];
+          const trend = determineTrend(date.value, data);
+          return {
+            ...region,
+            trendObj: trend,
+            trend: trend.change,
+            value: trend.current ? trend.current.value : null,
+            data: data.length > 0 ? extractSparkLine(data, date.sparkLine, sensor.value) : [],
+          };
+        });
+      });
+    }
     if (region.level === 'state') {
-      const geo = getCountiesOfState(region.value);
-      return date
-        .fetchMultiRegions(
-          sensor.value,
-          'county',
-          geo.map((d) => d.propertyId),
-        )
-        .then(addMissingGeo(geo));
+      return loadImpl(getCountiesOfState(region.value));
     }
     if (region.level === 'county') {
       const geo = [region.value, ...getRelatedCounties(region.value)];
-
-      return date
-        .fetchMultiRegions(
-          sensor.value,
-          'county',
-          geo.map((d) => d.propertyId),
-        )
-        .then(addMissingGeo(geo));
+      return loadImpl(geo);
     }
-    return date.fetchMultiRegions(sensor.value, 'state', '*');
+    return loadImpl(stateInfo);
   }
 
   let sortCriteria = 'displayName';
@@ -154,53 +138,6 @@
    * @type {import('vega-lite').TopLevelSpec}
    */
   $: spec = generateSparkLine({ highlightDate: true });
-
-  /**
-   * @param {import("../../stores/params").SensorParam} sensor
-   * @param {import("../../stores/params").DateParam} date
-   * @param {import("../../stores/params").Region[]} region
-   */
-  function loadRegionData(sensor, date, regions) {
-    if (!date.value || !regions || regions.length === 0) {
-      return new Map();
-    }
-    const { min, max, difference } = date.sparkLine;
-    // TODO
-    if (regions.length * difference < 3600) {
-      // load all at once
-      const data = fetchData(
-        sensor.value,
-        regions[0].level,
-        regions === stateInfo ? '*' : regions.map((d) => d.propertyId),
-        [min, max],
-        {},
-        { multiValues: false },
-      );
-      return new Map(
-        regions.map((region) => [
-          region.propertyId,
-          data.then((rows) => {
-            let byRegion = rows.filter((d) => d.geo_value.toUpperCase() === region.propertyId.toUpperCase());
-            for (const row of byRegion) {
-              row.displayName = region.displayName;
-            }
-            return addMissing(fitRange(byRegion, sensor.value, min, max), sensor.value);
-          }),
-        ]),
-      );
-    }
-    return new Map(
-      regions.map((region) => [
-        region.propertyId,
-        fetchTimeSlice(sensor.value, region.level, region.propertyId, min, max, true, {
-          displayName: region.displayName,
-          geo_value: region.propertyId,
-        }).then((rows) => addMissing(rows, sensor.value)),
-      ]),
-    );
-  }
-
-  $: regionData = loadRegionData(sensor, date, regions);
 </script>
 
 <style>
@@ -219,31 +156,37 @@
   <thead>
     <tr>
       <th class="mobile-th">{title.unit}</th>
-      <th class="mobile-th uk-text-right">Change Last 7 days</th>
+      <th class="mobile-th">Change Last 7 days</th>
       <th class="mobile-th uk-text-right">
         {#if sensor.isCasesSignal}per 100k{:else if sensor.isPercentage}Percentage{:else}Value{/if}
       </th>
-      <th class="mobile-th uk-text-right"><span>historical trend</span></th>
+      <th class="mobile-th uk-text-right">
+        <span>historical trend</span>
+        <div class="mobile-th-range">
+          <span> {formatDateShortNumbers(date.sparkLine.min)} </span>
+          <span> {formatDateShortNumbers(date.sparkLine.max)} </span>
+        </div>
+      </th>
     </tr>
     <tr>
       <th class="sort-indicator uk-text-center">
         <SortColumnIndicator
           label={title.unit}
-          on:click={(e) => sortClick('name', e.detail || false)}
-          sorted={sortCriteria === 'name'}
+          on:click={() => sortClick('displayName')}
+          sorted={sortCriteria === 'displayName'}
           desc={sortDirectionDesc} />
       </th>
       <th class="sort-indicator">
         <SortColumnIndicator
           label="Change Last 7 days"
-          on:click={(e) => sortClick('trend', e.detail || false)}
+          on:click={() => sortClick('trend')}
           sorted={sortCriteria === 'trend'}
           desc={sortDirectionDesc} />
       </th>
       <th class="sort-indicator">
         <SortColumnIndicator
           label="Value"
-          on:click={(e) => sortClick('value', e.detail || false)}
+          on:click={() => sortClick('value')}
           sorted={sortCriteria === 'value'}
           desc={sortDirectionDesc} />
       </th>
@@ -259,14 +202,14 @@
             class="uk-link-text"
             on:click|preventDefault={() => currentRegion.set(region.propertyId)}>{region.displayName}</a>
         </td>
-        <td class="uk-text-right">
-          <TrendIndicator trend={null} {sensor} />
+        <td>
+          <TrendIndicator trend={region.trendObj} {sensor} />
         </td>
         <td class="uk-text-right">{region.value == null ? 'N/A' : sensor.value.formatValue(region.value)}</td>
         <td class="sparkline">
           <Vega
             {spec}
-            data={regionData.get(region.propertyId) || []}
+            data={region.data}
             tooltip={SparkLineTooltip}
             tooltipProps={{ sensor: sensor.value }}
             signals={{ currentDate: date.value }} />

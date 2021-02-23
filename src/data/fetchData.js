@@ -350,11 +350,19 @@ export function addNameInfos(rows) {
 }
 
 function avg(rows, field) {
-  const sum = rows.reduce((acc, v) => acc + v[field], 0);
-  if (sum == null || Number.isNaN(sum)) {
+  let valid = 0;
+  const sum = rows.reduce((acc, v) => {
+    const vi = v[field];
+    if (vi == null || Number.isNaN(vi)) {
+      return acc;
+    }
+    valid++;
+    return acc + vi;
+  }, 0);
+  if (sum == null || Number.isNaN(sum) || valid === 0) {
     return null;
   }
-  return sum / rows.length;
+  return sum / valid;
 }
 /**
  * group by date and averages its values

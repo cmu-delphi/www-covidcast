@@ -23,7 +23,7 @@
   }
 
   .sort-indicator:hover,
-  .sort-indicator[disabled] {
+  .sort-indicator.active {
     opacity: 1;
   }
 </style>
@@ -31,16 +31,13 @@
 <span>
   <button
     class="inline-svg-icon sort-indicator"
-    disabled={sorted && !desc}
-    on:click={() => dispatch('click', false)}
-    title="Sort {label} ascending">
-    {@html chevronUpIcon}
-  </button>
-  <button
-    class="inline-svg-icon sort-indicator"
-    disabled={sorted && desc}
-    on:click={() => dispatch('click', true)}
-    title="Sort {label} descending">
-    {@html chevronDownIcon}
+    class:active={sorted}
+    on:click={() => dispatch('click')}
+    title="Sort {label} {desc ? 'ascending' : 'descending'}">
+    {#if sorted && desc}
+      {@html chevronDownIcon}
+    {:else}
+      {@html chevronUpIcon}
+    {/if}
   </button>
 </span>

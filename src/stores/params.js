@@ -1,5 +1,13 @@
 import { timeDay, timeWeek } from 'd3-time';
-import { addNameInfos, END_TIME_RANGE, fetchData, formatAPITime, START_TIME_RANGE, addMissing } from '../data';
+import {
+  addNameInfos,
+  END_TIME_RANGE,
+  fetchData,
+  formatAPITime,
+  START_TIME_RANGE,
+  addMissing,
+  fitRange,
+} from '../data';
 import { nationInfo } from '../maps';
 import { currentDate, currentRegion, yesterdayDate, currentSensor, sensorList } from '.';
 import { determineTrend } from './trend';
@@ -99,7 +107,7 @@ export function createDateParam(date) {
  * @property {boolean} isInverted
  * @property {(date: Sensor) => void} set
  * @property {(region: Region) => Promise<EpiDataRow[]>} fetchTimeSeries
- * @property {(level: string, geo: string | string[]) => Promise<EpiDataRow[]>} fetchMultiTimeSeries
+ * @property {(regions: Region[]) => Promise<EpiDataRow[]>} fetchMultiTimeSeries
  */
 
 /**
@@ -146,21 +154,43 @@ export function createSensorParam(sensor) {
       cache.set(key, r);
       return r;
     },
-    fetchMultiTimeSeries(level, geo) {
+    fetchMultiTimeSeries(regions) {
+      if (regions.length === 0) {
+        return Promise.resolve([]);
+      }
+      // heuristic of we can fetch with one:
+      const level = regions[0].level;
+      const geo = regions.map((d) => d.propertyId).join(',');
       const key = `${level}:${geo}`;
       if (cache.has(key)) {
         return cache.get(key);
       }
-      const r = fetchData(
-        sensor,
-        level,
-        geo,
-        `${formatAPITime(START_TIME_RANGE)}-${formatAPITime(END_TIME_RANGE)}`,
-        {},
-        {
-          multiValues: false,
-        },
-      ).then(addNameInfos);
+      const dateRange = `${formatAPITime(START_TIME_RANGE)}-${formatAPITime(END_TIME_RANGE)}`;
+      // assuming data starts around february
+      const expectedDays = timeDay.count(new Date(2020, 2 - 1, 1), new Date());
+      const maxDataRows = 3600;
+
+      const batchSize = Math.floor(maxDataRows / expectedDays);
+      // console.log(batchSize);
+      const data = [];
+      for (let i = 0; i < regions.length; i += batchSize) {
+        const slice = regions.slice(i, Math.min(regions.length - 1, i + batchSize));
+        data.push(
+          fetchData(
+            sensor,
+            level,
+            slice.map((d) => d.propertyId).join(','),
+            dateRange,
+            {},
+            {
+              multiValues: false,
+            },
+          ),
+        );
+      }
+      const r = Promise.all(data)
+        .then((rows) => rows.flat())
+        .then(addNameInfos);
       cache.set(key, r);
       return r;
     },
@@ -177,6 +207,34 @@ export const DEATHS = createSensorParam(sensorList.find((d) => d.isCasesOrDeath 
  * @property {(sensor: Sensor, sparkLine: {min: Date, max: Date}) => Promise<EpiDataRow[]>} fetchSparkLine
  * @property {(sensor: Sensor, date: Date) => Promise<import('./trend').Trend>} fetchTrend
  */
+
+/**
+ * @param {EpiDataRow[]} data
+ * @param {{min: Date, max: Date}} sparkLine
+ * @param {Sensor} sensor
+ * @returns {EpiDataRow[]}
+ */
+export function extractSparkLine(data, sparkLine, sensor) {
+  const sub = data.filter((d) => d.date_value >= sparkLine.min && d.date_value <= sparkLine.max);
+  return fitRange(addMissing(sub, sensor), sensor, sparkLine.min, sparkLine.max);
+}
+
+/**
+ * @param {(EpiDataRow & {propertyId: string})[]} data
+ * @returns {Map<string, EpiDataRow>}
+ */
+export function groupByRegion(data) {
+  const map = new Map();
+  for (const row of data) {
+    const geo = map.get(row.propertyId);
+    if (geo) {
+      geo.push(row);
+    } else {
+      map.set(row.propertyId, [row]);
+    }
+  }
+  return map;
+}
 
 /**
  * @param {Region} region
@@ -227,9 +285,7 @@ export function createRegionParam(region) {
       if (cache.has(key)) {
         return cache.get(key);
       }
-      const rows = this.fetchTimeSeries(sensor).then((rows) =>
-        rows.filter((d) => d.date_value >= sparkLine.min && d.date_value <= sparkLine.max),
-      );
+      const rows = this.fetchTimeSeries(sensor).then((rows) => extractSparkLine(rows, sparkLine, sensor));
       cache.set(key, rows);
       return rows;
     },

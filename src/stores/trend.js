@@ -47,7 +47,15 @@ export function findDateRow(date, data) {
 }
 
 function toTrend(current, reference, min) {
-  return (current - min) / (reference - min) - 1;
+  const nRef = reference - min;
+  const nCur = current - min;
+  if (nCur === nRef) {
+    return 0;
+  }
+  if (nRef === 0) {
+    return 1;
+  }
+  return nCur / nRef - 1;
 }
 
 function toTrendText(change) {

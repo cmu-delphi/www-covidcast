@@ -74,7 +74,7 @@ TODO
 </table>
 
 {#if sensor.value.description}
-  <FancyHeader>About this indicator</FancyHeader>
+  <FancyHeader normal>About this indicator</FancyHeader>
 
   <div class="desc">
     {@html sensor.value.description}

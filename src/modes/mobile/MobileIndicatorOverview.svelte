@@ -24,7 +24,7 @@
 </style>
 
 <MobileWrapper let:sensor let:region let:date>
-  <FancyHeader sub="Details">INDICATOR</FancyHeader>
+  <FancyHeader sub="Details">Indicator</FancyHeader>
 
   <IndicatorDropdown {sensor} />
 

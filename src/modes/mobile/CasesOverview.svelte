@@ -43,7 +43,7 @@
   }
 </style>
 
-<FancyHeader sub="Indicators">COVIDcast</FancyHeader>
+<FancyHeader sub="Indicators" normal>COVIDcast</FancyHeader>
 
 <p>On <strong>average</strong> over the <strong>last 7 days</strong> there have been</p>
 
