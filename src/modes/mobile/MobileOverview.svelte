@@ -5,10 +5,10 @@
   import HighlightIndicators from './HighlightIndicators.svelte';
 </script>
 
-<MobileWrapper let:params>
-  <CasesOverview {params} />
+<MobileWrapper let:date let:region>
+  <CasesOverview {date} {region} />
   <hr />
-  <HighlightIndicators {params} />
+  <HighlightIndicators {date} {region} />
   <hr />
-  <IndicatorTable {params} />
+  <IndicatorTable {date} {region} />
 </MobileWrapper>

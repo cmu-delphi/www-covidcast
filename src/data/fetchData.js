@@ -362,7 +362,7 @@ function avg(rows, field) {
  * @param {SensorEntry} sensor
  * @returns {EpiDataRow[]}
  */
-export function averageByDate(rows, sensor) {
+export function averageByDate(rows, sensor, mixin = {}) {
   // average by date
   const byDate = new Map();
   for (const row of rows) {
@@ -377,6 +377,7 @@ export function averageByDate(rows, sensor) {
     .map((rows) => {
       const r = {
         ...rows[0],
+        ...mixin,
         value: avg(rows, 'value'),
         stderr: avg(rows, 'stderr'),
         sample_size: avg(rows, 'sample_size'),

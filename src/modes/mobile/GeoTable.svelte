@@ -10,15 +10,23 @@
   import chevronDownIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-down.svg';
   import FancyHeader from './FancyHeader.svelte';
   import TrendIndicator from './TrendIndicator.svelte';
-  import { computeSparklineTimeFrame } from './utils';
+  import { currentRegion } from '../../stores';
 
   /**
-   * @type {import("../utils").Params}
+   * @type {import("../../stores/params").DateParam}
    */
-  export let params;
+  export let date;
+  /**
+   * @type {import("../../stores/params").RegionParam}
+   */
+  export let region;
+  /**
+   * @type {import("../../stores/params").SensorParam}
+   */
+  export let sensor;
 
   /**
-   * @param {import('../../maps').NameInfo} region
+   * @param {import("../../stores/params").Region} region
    */
   function determineRegions(region) {
     if (region.level === 'state') {
@@ -31,7 +39,7 @@
   }
 
   /**
-   * @param {import('../../maps').NameInfo} region
+   * @param {import("../../stores/params").Region} region
    */
   function determineTitle(region) {
     if (region.level === 'state') {
@@ -63,35 +71,36 @@
   }
 
   /**
-   * @param {import('../../stores/constants').SensorEntry} sensor
-   * @param {import("../utils").Params} params
+   * @param {import("../../stores/params").SensorParam} sensor
+   * @param {import("../../stores/params").DateParam} date
+   * @param {import("../../stores/params").RegionParam} region
    */
-  function loadData(params) {
-    if (!params.sensor || !params.date || !params.region) {
+  function loadData(sensor, date, region) {
+    if (!sensor.value || !date.value || !region.value) {
       return Promise.resolve([]);
     }
-    if (params.region.level === 'state') {
-      const geo = getCountiesOfState(params.region);
-      return params
+    if (region.level === 'state') {
+      const geo = getCountiesOfState(region.value);
+      return date
         .fetchMultiRegions(
-          params.sensor,
+          sensor.value,
           'county',
           geo.map((d) => d.propertyId),
         )
         .then(addMissingGeo(geo));
     }
-    if (params.region.level === 'county') {
-      const geo = [params.region, ...getRelatedCounties(params.region)];
+    if (region.level === 'county') {
+      const geo = [region.value, ...getRelatedCounties(region.value)];
 
-      return params
+      return date
         .fetchMultiRegions(
-          params.sensor,
+          sensor.value,
           'county',
           geo.map((d) => d.propertyId),
         )
         .then(addMissingGeo(geo));
     }
-    return params.fetchMultiRegions(params.sensor, 'state', '*');
+    return date.fetchMultiRegions(sensor.value, 'state', '*');
   }
 
   let sortCriteria = 'displayName';
@@ -126,12 +135,12 @@
 
   $: comparator = bySortCriteria(sortCriteria, sortDirectionDesc);
 
-  $: title = determineTitle(params.region);
-  $: regions = determineRegions(params.region);
+  $: title = determineTitle(region.value);
+  $: regions = determineRegions(region.value);
 
   let sortedRegions = [];
 
-  $: loadedData = loadData(params);
+  $: loadedData = loadData(sensor, date, region);
 
   let showAll = false;
 
@@ -146,15 +155,21 @@
    */
   $: spec = generateSparkLine({ highlightDate: true });
 
-  function loadRegionData(sensor, regions, date) {
-    if (!date || !regions || regions.length === 0) {
+  /**
+   * @param {import("../../stores/params").SensorParam} sensor
+   * @param {import("../../stores/params").DateParam} date
+   * @param {import("../../stores/params").Region[]} region
+   */
+  function loadRegionData(sensor, date, regions) {
+    if (!date.value || !regions || regions.length === 0) {
       return new Map();
     }
-    const { min, max, difference } = computeSparklineTimeFrame(date);
+    const { min, max, difference } = date.sparkLine;
+    // TODO
     if (regions.length * difference < 3600) {
       // load all at once
       const data = fetchData(
-        sensor,
+        sensor.value,
         regions[0].level,
         regions === stateInfo ? '*' : regions.map((d) => d.propertyId),
         [min, max],
@@ -169,7 +184,7 @@
             for (const row of byRegion) {
               row.displayName = region.displayName;
             }
-            return addMissing(fitRange(byRegion, sensor, min, max), sensor);
+            return addMissing(fitRange(byRegion, sensor.value, min, max), sensor.value);
           }),
         ]),
       );
@@ -177,15 +192,15 @@
     return new Map(
       regions.map((region) => [
         region.propertyId,
-        fetchTimeSlice(sensor, region.level, region.propertyId, min, max, true, {
+        fetchTimeSlice(sensor.value, region.level, region.propertyId, min, max, true, {
           displayName: region.displayName,
           geo_value: region.propertyId,
-        }).then((rows) => addMissing(rows, sensor)),
+        }).then((rows) => addMissing(rows, sensor.value)),
       ]),
     );
   }
 
-  $: regionData = loadRegionData(params.sensor, regions, params.date);
+  $: regionData = loadRegionData(sensor, date, regions);
 </script>
 
 <style>
@@ -206,9 +221,7 @@
       <th class="mobile-th">{title.unit}</th>
       <th class="mobile-th uk-text-right">Change Last 7 days</th>
       <th class="mobile-th uk-text-right">
-        {#if params.sensor.isCasesSignal}
-          per 100k
-        {:else if params.sensor.format === 'percent'}Percentage{:else}Value{/if}
+        {#if sensor.isCasesSignal}per 100k{:else if sensor.isPercentage}Percentage{:else}Value{/if}
       </th>
       <th class="mobile-th uk-text-right"><span>historical trend</span></th>
     </tr>
@@ -244,19 +257,19 @@
           <a
             href="?region={region.propertyId}"
             class="uk-link-text"
-            on:click|preventDefault={() => params.setRegion(region)}>{region.displayName}</a>
+            on:click|preventDefault={() => currentRegion.set(region.propertyId)}>{region.displayName}</a>
         </td>
         <td class="uk-text-right">
           <TrendIndicator trend={null} />
         </td>
-        <td class="uk-text-right">{region.value == null ? 'N/A' : params.sensor.formatValue(region.value)}</td>
+        <td class="uk-text-right">{region.value == null ? 'N/A' : sensor.value.formatValue(region.value)}</td>
         <td class="sparkline">
           <Vega
             {spec}
             data={regionData.get(region.propertyId) || []}
             tooltip={SparkLineTooltip}
-            tooltipProps={{ sensor: params.sensor }}
-            signals={{ currentDate: params.date }} />
+            tooltipProps={{ sensor: sensor.value }}
+            signals={{ currentDate: date.value }} />
         </td>
       </tr>
     {/each}

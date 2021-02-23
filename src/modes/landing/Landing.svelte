@@ -68,7 +68,7 @@
   .chips {
     display: flex;
     flex-wrap: wrap;
-    margin-top: 0.5em;
+    margin: 1em 0;
   }
   .chips:empty {
     margin: 0;

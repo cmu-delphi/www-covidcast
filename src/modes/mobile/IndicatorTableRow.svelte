@@ -1,6 +1,4 @@
 <script>
-  import { addMissing, fetchTimeSlice } from '../../data';
-  import { computeSparklineTimeFrame, findDateRow } from './utils';
   import { generateSparkLine } from '../../specs/lineSpec';
   import Vega from '../../components/Vega.svelte';
   import SparkLineTooltip from './SparkLineTooltip.svelte';
@@ -15,46 +13,35 @@
   export let sensor;
 
   /**
-   * @type {import("../utils").Params}
+   * @type {import("../../stores/params").DateParam}
    */
-  export let params;
+  export let date;
+  /**
+   * @type {import("../../stores/params").RegionParam}
+   */
+  export let region;
 
-  function loadData(sensor, params) {
-    const { region, date } = params;
-    if (!region || !date) {
+  /**
+   * @param {import("../../stores/params").SensorParam} sensor
+   * @param {import("../../stores/params").DateParam} date
+   * @param {import("../../stores/params").RegionParam} region
+   */
+  function loadSparkLine(sensor, date, region) {
+    if (!region.value || !date.value) {
       return null;
     }
-    const { min, max } = computeSparklineTimeFrame(date);
-    return fetchTimeSlice(
-      sensor,
-      region.level,
-      region.propertyId,
-      min,
-      max,
-      true,
-      {
-        displayName: region.displayName,
-        geo_value: region.propertyId,
-      },
-      {
-        multiValues: false,
-      },
-    ).then((rows) => addMissing(rows, sensor));
+    return region.fetchSparkLine(sensor.value, date.sparkLine);
   }
 
-  function findCurrentRow(data, date) {
-    return data ? data.then((rows) => findDateRow(date, rows)) : null;
-  }
-
-  $: data = loadData(sensor, params);
-  $: currentRow = findCurrentRow(data, params.date);
+  $: data = loadSparkLine(sensor, region, date);
+  $: trend = region.fetchTrend(sensor.value, date.value);
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
   $: spec = generateSparkLine({ highlightDate: true });
 
   function switchMode() {
-    currentSensor.set(sensor.key);
+    currentSensor.set(sensor.value.key);
     currentMode.set(modeByID.indicator);
   }
 </script>
@@ -81,22 +68,26 @@
 
 <tr class="has-addon">
   <td>
-    <a href="?mode=indicator&sensor={sensor.key}" class="uk-link-text" on:click|preventDefault={switchMode}>
-      {sensor.name}
+    <a href="?mode=indicator&sensor={sensor.value.key}" class="uk-link-text" on:click|preventDefault={switchMode}>
+      {sensor.value.name}
     </a>
   </td>
   <td class="uk-text-right">
-    <TrendIndicator trend={null} />
+    {#await trend}
+      <TrendIndicator trend={null} long {sensor} />
+    {:then d}
+      <TrendIndicator trend={d} long {sensor} />
+    {/await}>
   </td>
   <td class="uk-text-right">
-    {#await currentRow}?{:then row}{row ? sensor.formatValue(row.value) : 'N/A'}{/await}
+    {#await trend}?{:then t}{t && t.current ? sensor.value.formatValue(t.current.value) : 'N/A'}{/await}
   </td>
   <td rowspan="2" class="sparkline">
-    <Vega {spec} {data} tooltip={SparkLineTooltip} tooltipProps={{ sensor }} signals={{ currentDate: params.date }} />
+    <Vega {spec} {data} tooltip={SparkLineTooltip} tooltipProps={{ sensor }} signals={{ currentDate: date.value }} />
   </td>
   <td>
     <a
-      href="?mode=indicator&sensor={sensor.key}"
+      href="?mode=indicator&sensor={sensor.value.key}"
       class="uk-link-text details-link"
       on:click|preventDefault={switchMode}>
       {@html chevronRightIcon}
@@ -104,5 +95,5 @@
   </td>
 </tr>
 <tr class="addon">
-  <td colspan="3" class="source">Source: <strong>{sensor.id}</strong></td>
+  <td colspan="3" class="source">Source: <strong>{sensor.value.id}</strong></td>
 </tr>

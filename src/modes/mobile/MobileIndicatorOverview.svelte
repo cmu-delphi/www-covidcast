@@ -1,5 +1,9 @@
 <script>
   import MobileWrapper from './MobileWrapper.svelte';
+  import FancyHeader from './FancyHeader.svelte';
+  import RegionMap from './RegionMap.svelte';
+  import HistoryLineChart from './HistoryLineChart.svelte';
+  import IndicatorDropdown from './IndicatorDropdown.svelte';
   import GeoTable from './GeoTable.svelte';
   import IndicatorOverview from './IndicatorOverview.svelte';
   import chevronLeftIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-left.svg';
@@ -19,10 +23,27 @@
   }
 </style>
 
-<MobileWrapper let:params>
-  <IndicatorOverview {params} />
+<MobileWrapper let:sensor let:region let:date>
+  <FancyHeader sub="Details">INDICATOR</FancyHeader>
+
+  <IndicatorDropdown {sensor} />
+
   <hr />
-  <GeoTable {params} />
+
+  <div class="chart-250">
+    <RegionMap {sensor} {date} {region} />
+  </div>
+
+  <FancyHeader>Performance</FancyHeader>
+
+  <div class="chart-150">
+    <HistoryLineChart {sensor} {date} {region} />
+  </div>
+
+  <hr />
+  <IndicatorOverview {sensor} {date} {region} />
+  <hr />
+  <GeoTable {sensor} {region} {date} />
 
   <button class="uk-button uk-button-default uk-button-delphi back" on:click={switchMode}>
     <span class="inline-svg-icon">

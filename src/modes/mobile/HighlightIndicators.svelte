@@ -1,40 +1,28 @@
 <script>
-  import { fetchData } from '../../data';
   import { sensorMap } from '../../stores';
   import SurveyValue from '../survey/SurveyValue.svelte';
   import FancyHeader from './FancyHeader.svelte';
   import TrendIndicator from './TrendIndicator.svelte';
+  import { asSensorParam } from '../../stores/params';
 
   /**
-   * @type {import("../utils").Params}
+   * @type {import("../../stores/params").DateParam}
    */
-  export let params;
+  export let date;
+  /**
+   * @type {import("../../stores/params").RegionParam}
+   */
+  export let region;
 
-  function loadHighlightSensors(date, region) {
-    const highlights = [
-      sensorMap.get('fb-survey-smoothed_hh_cmnty_cli'),
-      sensorMap.get('fb-survey-smoothed_covid_vaccinated_or_accept'),
-    ].filter(Boolean);
-    const data = fetchData(
-      {
-        ...highlights[0],
-        signal: highlights.map((d) => d.signal).join(','),
-      },
-      region.level,
-      region.propertyId,
-      date,
-      {},
-      {
-        transferSignal: true,
-      },
-    );
-    return highlights.map((h) => ({
-      sensor: h,
-      value: data.then((rows) => rows.filter((d) => d.signal === h.signal)[0]),
-    }));
-  }
+  const highlights = [
+    sensorMap.get('fb-survey-smoothed_hh_cmnty_cli'),
+    sensorMap.get('fb-survey-smoothed_covid_vaccinated_or_accept'),
+  ].filter(Boolean);
 
-  $: highlightSurveySensors = loadHighlightSensors(params.date, params.region);
+  $: highlightSurveySensors = highlights.map((h) => ({
+    sensor: asSensorParam(h),
+    trend: region.fetchTrend(h, date.value),
+  }));
 </script>
 
 <style>
@@ -67,13 +55,17 @@
 <div class="highlights">
   {#each highlightSurveySensors as s}
     <div>
-      <h3 class="highlight">{s.sensor.name}</h3>
-      <TrendIndicator trend={null} trendClass="?" long />
+      <h3 class="highlight">{s.sensor.value.name}</h3>
+      {#await s.trend}
+        <TrendIndicator trend={null} long sensor={s.sensor} />
+      {:then d}
+        <TrendIndicator trend={d} long sensor={s.sensor} />
+      {/await}>
       <div>
-        {#await s.value}
+        {#await s.trend}
           N/A
         {:then d}
-          <SurveyValue value={d ? d.value : null} factor={10} />
+          <SurveyValue value={d && d.current ? d.current.value : null} factor={10} />
         {/await}
       </div>
       <div class="unit">per 1,000 people</div>

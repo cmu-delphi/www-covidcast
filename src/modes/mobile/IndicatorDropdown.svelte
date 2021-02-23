@@ -1,18 +1,18 @@
 <script>
-  import { currentSensor, groupedSensorList } from '../../stores';
+  import { groupedSensorList } from '../../stores';
   import caretDownIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/caret-down.svg';
 
   /**
-   * @type {import('../../stores/constants').SensorEntry}
+   * @type {import("../../stores/params").SensorParam}
    */
   export let sensor;
 
   let open = false;
 
-  function switchSensor(sensor) {
+  function switchSensor(newSensor) {
     open = false;
     // debounce
-    setTimeout(() => currentSensor.set(sensor.key), 10);
+    setTimeout(() => sensor.set(newSensor), 10);
   }
 </script>
 

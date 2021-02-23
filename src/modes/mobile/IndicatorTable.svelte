@@ -2,10 +2,15 @@
   import { groupedSensorList } from '../../stores/constants';
   import IndicatorTableRow from './IndicatorTableRow.svelte';
   import FancyHeader from './FancyHeader.svelte';
+  import { asSensorParam } from '../../stores/params';
   /**
-   * @type {import("../utils").Params}
+   * @type {import("../../stores/params").DateParam}
    */
-  export let params;
+  export let date;
+  /**
+   * @type {import("../../stores/params").RegionParam}
+   */
+  export let region;
 </script>
 
 <FancyHeader sub="Indicators">COVID-19</FancyHeader>
@@ -26,7 +31,7 @@
         <th class="mobile-h3" colspan="5">{group.label}</th>
       </tr>
       {#each group.sensors as sensor}
-        <IndicatorTableRow {sensor} {params} />
+        <IndicatorTableRow sensor={asSensorParam(sensor)} {date} {region} />
       {/each}
     </tbody>
   {/each}

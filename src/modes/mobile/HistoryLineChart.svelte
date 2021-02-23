@@ -1,6 +1,6 @@
 <script>
   import Vega from '../../components/Vega.svelte';
-  import { addMissing, fetchTimeSlice, averageByDate } from '../../data';
+  import { addMissing, averageByDate } from '../../data';
   import { getInfoByName, nationInfo } from '../../maps';
   import getRelatedCounties from '../../maps/related';
   import HistoryLineTooltip from './HistoryLineTooltip.svelte';
@@ -10,9 +10,17 @@
 
   export let className = '';
   /**
-   * @type {import("../utils").Params}
+   * @type {import("../../stores/params").DateParam}
    */
-  export let params;
+  export let date;
+  /**
+   * @type {import("../../stores/params").RegionParam}
+   */
+  export let region;
+  /**
+   * @type {import("../../stores/params").SensorParam}
+   */
+  export let sensor;
 
   /**
    * @param {import('../../maps').NameInfo} region
@@ -40,52 +48,40 @@
   }
 
   /**
-   * @param {import('../../stores/constants').SensorEntry} sensor
-   * @param {import("../utils").Params} params
+   * @param {import("../../stores/params").SensorParam} sensor
+   * @param {import("../../stores/params").DateParam} date
+   * @param {import("../../stores/params").RegionParam} region
    */
-  function loadData(sensor, params) {
-    const region = params.region;
-    const selfData = fetchTimeSlice(sensor, region.level, region.propertyId, undefined, undefined, false, {
-      ...region,
-    }).then((r) => addMissing(r, sensor));
+  function loadData(sensor, region, date) {
+    if (!region.value || !date.value) {
+      return null;
+    }
+    const selfData = region.fetchTimeSeries(sensor.value);
 
     const data = [selfData];
-    if (params.region.level !== 'nation') {
-      data.push(
-        fetchTimeSlice(sensor, nationInfo.level, [nationInfo.propertyId], undefined, undefined, false, {
-          ...nationInfo,
-        }).then((r) => addMissing(r, sensor)),
-      );
+    if (region.level !== 'nation') {
+      data.push(sensor.fetchTimeSeries(nationInfo));
     }
 
-    if (params.region.level === 'county') {
+    if (region.level === 'county') {
       const state = getInfoByName(region.state);
-      const stateData = fetchTimeSlice(sensor, state.level, [state.propertyId], undefined, undefined, false, {
-        ...state,
-      }).then((r) => addMissing(r, sensor));
-
-      const related = getRelatedCounties(region);
-      const relatedData = fetchTimeSlice(
-        sensor,
-        'county',
-        related.map((d) => d.propertyId).join(','),
-        undefined,
-        undefined,
-        false,
-        {
-          displayName: 'Related Counties',
-        },
-      )
-        .then((r) => averageByDate(r, sensor))
+      const stateData = sensor.fetchTimeSeries(state);
+      const related = getRelatedCounties(region.value);
+      const relatedData = sensor
+        .fetchMultiTimeSeries('county', related.map((d) => d.propertyId).join(','))
+        .then((r) =>
+          averageByDate(r, sensor, {
+            displayName: 'Related Counties',
+          }),
+        )
         .then((r) => addMissing(r, sensor));
-
       data.push(stateData, relatedData);
     }
     return Promise.all(data).then((rows) => rows.flat());
   }
 
-  $: spec = genSpec(params.region, params.date, height);
-  $: data = loadData(params.sensor, params);
+  $: spec = genSpec(region.value, date.value, height);
+  $: data = loadData(sensor, region, date);
 </script>
 
 <Vega {className} {spec} {data} tooltip={HistoryLineTooltip} signals={signalPatches} />

@@ -8,66 +8,72 @@
 
   export let className = '';
   /**
-   * @type {import("../utils").Params}
+   * @type {import("../../stores/params").DateParam}
    */
-  export let params;
-
+  export let date;
   /**
-   * @type {import('../../stores/constants').SensorEntry}
+   * @type {import("../../stores/params").RegionParam}
+   */
+  export let region;
+  /**
+   * @type {import("../../stores/params").SensorParam}
    */
   export let sensor;
 
+  export let height = 300;
+
   /**
-   * @param {import('../../stores/constants').SensorEntry} sensor
-   * @param {import('../../maps').NameInfo} region
+   * @param {import("../../stores/params").SensorParam} sensor
+   * @param {import("../../stores/params").RegionParam} region
    */
-  function genSpec(stats, sensor, region) {
+  function genSpec(stats, sensor, region, height) {
     const options = {
-      height: 400,
+      height,
       domain: determineMinMax(
         stats,
-        sensor,
+        sensor.value,
         region.level === 'state' || region.level === 'county' ? 'county' : 'state',
         {},
         false,
       ),
-      legendTitle: sensor.isCasesOrDeath ? `${sensor.yAxis} per 100,000` : sensor.yAxis,
+      legendTitle: sensor.isCasesOrDeath ? `${sensor.value.yAxis} per 100,000` : sensor.value.yAxis,
       withStates: true,
-      scheme: sensor.colorScaleId === 'interpolateYlGnBu' ? 'yellowgreenblue' : 'yelloworangered',
+      scheme: sensor.isInverted ? 'yellowgreenblue' : 'yelloworangered',
     };
     if (region.level === 'state') {
-      return generateCountiesOfStateSpec(region, options);
+      return generateCountiesOfStateSpec(region.value, options);
     }
     if (region.level === 'county') {
-      return generateRelatedCountySpec(region, options);
+      return generateRelatedCountySpec(region.value, options);
     }
     // state
     return generateStateSpec(options);
   }
 
   /**
-   * @param {import('../../stores/constants').SensorEntry} sensor
-   * @param {import("../utils").Params} params
+   * @param {import("../../stores/params").SensorParam} sensor
+   * @param {import("../../stores/params").DateParam} date
+   * @param {import("../../stores/params").RegionParam} region
    */
-  function loadData(sensor, params) {
-    if (params.region.level === 'state') {
-      const counties = getCountiesOfState(params.region);
-      const countyData = params.fetchMultiRegions(
-        sensor,
+  function loadData(sensor, date, region) {
+    if (region.level === 'state') {
+      const counties = getCountiesOfState(region.value);
+      const countyData = date.fetchMultiRegions(
+        sensor.value,
         'county',
-        `${params.region.id}000,${counties.map((d) => d.id).join(',')}`,
+        `${region.id}000,${counties.map((d) => d.id).join(',')}`,
       );
-      const stateData = params.fetchMultiRegions(sensor, 'state', '*');
+      const stateData = date.fetchMultiRegions(sensor.value, 'state', '*');
       return Promise.all([countyData, stateData]).then((r) => r.flat());
     }
-    if (params.region.level === 'county') {
-      return params.fetchMultiRegions(sensor, 'county', '*');
+    if (region.level === 'county') {
+      return date.fetchMultiRegions(sensor.value, 'county', '*');
     }
-    return params.fetchMultiRegions(sensor, 'state', '*');
+    return date.fetchMultiRegions(sensor.value, 'state', '*');
   }
 
-  $: spec = genSpec($stats, sensor, params.region);
-  $: data = loadData(sensor, params);
+  $: spec = genSpec($stats, sensor, region, height);
+  $: data = loadData(sensor, date, region);
 </script>
 
-<Vega {className} {spec} {data} tooltip={RegionMapTooltip} tooltipProps={{ sensor: params.sensor }} />
+<Vega {className} {spec} {data} tooltip={RegionMapTooltip} tooltipProps={{ sensor: sensor.value }} />

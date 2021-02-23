@@ -1,37 +1,22 @@
 <script>
-  import { computeSparklineTimeFrame, findDateRow } from './utils';
-  import { addMissing, fetchTimeSlice } from '../../data';
-  import { primaryValue } from '../../stores/constants';
-  import RegionMap from './RegionMap.svelte';
-  import HistoryLineChart from './HistoryLineChart.svelte';
-  import IndicatorDropdown from './IndicatorDropdown.svelte';
   import FancyHeader from './FancyHeader.svelte';
   import TrendIndicator from './TrendIndicator.svelte';
 
   /**
-   * @type {import("../utils").Params}
+   * @type {import('../../stores/constants').SensorEntry}
    */
-  export let params;
+  export let sensor;
 
-  function loadData(sensor, params) {
-    const { region, date } = params;
-    if (!region || !date) {
-      return null;
-    }
-    const { min, max } = computeSparklineTimeFrame(date);
-    return fetchTimeSlice(sensor, region.level, region.propertyId, min, max, true, {
-      displayName: region.displayName,
-      geo_value: region.propertyId,
-    }).then((rows) => addMissing(rows, sensor));
-  }
+  /**
+   * @type {import("../../stores/params").DateParam}
+   */
+  export let date;
+  /**
+   * @type {import("../../stores/params").RegionParam}
+   */
+  export let region;
 
-  function findCurrentRow(data, date) {
-    return data ? data.then((rows) => findDateRow(date, rows)) : null;
-  }
-
-  $: data = loadData(params.sensor, params);
-  $: currentRow = findCurrentRow(data, params.date);
-  $: valueKey = primaryValue(params.sensor, {});
+  $: trend = region.fetchTrend(sensor.value, date.value);
 </script>
 
 <style>
@@ -62,53 +47,36 @@
   }
 </style>
 
-<FancyHeader sub="Details">INDICATOR</FancyHeader>
-
-<IndicatorDropdown sensor={params.sensor} />
-
-<hr />
-<div class="chart-300">
-  <RegionMap {params} sensor={params.sensor} />
-</div>
-
-<FancyHeader>Performance</FancyHeader>
-
-<div class="chart-150">
-  <HistoryLineChart {params} />
-</div>
-<hr />
-
+TODO
 <table class="indicator-table">
   <tr>
     <td>Last 7 day trend</td>
     <td class="indicator-table-value">
-      <TrendIndicator trend={null} />
+      {#await trend}
+        <TrendIndicator trend={null} long {sensor} />
+      {:then d}
+        <TrendIndicator trend={d} long {sensor} />
+      {/await}>
     </td>
   </tr>
   <tr>
     <td>Last 7 day avg</td>
     <td class="indicator-table-value">
-      {#await currentRow}?{:then row}{row ? params.sensor.formatValue(row[valueKey]) : 'N/A'}{/await}
+      {#await trend}N/A{:then d}{d && d.current ? sensor.value.formatValue(d.current.value) : 'N/A'}{/await}>
     </td>
   </tr>
   <tr>
-    <td>Peak 7 day period</td>
-    <td class="indicator-table-value">TODO</td>
-  </tr>
-  <tr>
     <td>Record high</td>
-    <td class="indicator-table-value">TODO</td>
-  </tr>
-  <tr>
-    <td>Record low</td>
-    <td class="indicator-table-value">TODO</td>
+    <td class="indicator-table-value">
+      {#await trend}N/A{:then d}{d && d.max ? sensor.value.formatValue(d.max.value) : 'N/A'}{/await}
+    </td>
   </tr>
 </table>
 
-{#if params.sensor.description}
+{#if sensor.value.description}
   <FancyHeader>About this indicator</FancyHeader>
 
   <div class="desc">
-    {@html params.sensor.description}
+    {@html sensor.value.description}
   </div>
 {/if}

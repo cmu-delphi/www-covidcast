@@ -6,30 +6,32 @@
   import { formatPercentage } from '../../formats';
 
   /**
-   * @type {number}
+   * @type {import('./trend').Trend}
    */
-  export let trend = null;
-  export let trendClass = 'steady';
-  export let inverted = false;
+  export let trend;
+  /**
+   * @type {import("../../stores/params").SensorParam}
+   */
+  export let sensor;
   export let long = false;
 
   let trendIcon = null;
   let isGood = false;
   let isBad = false;
 
-  $: value = formatPercentage(trend);
+  $: value = formatPercentage(trend ? trend.change : null);
 
   $: {
-    if (trend == null || !trendClass) {
+    if (!trend || trend.trend === 'Unknown') {
       trendIcon = Unknown;
-    } else if (trendClass.startsWith('inc')) {
+    } else if (trend.trend.startsWith('inc')) {
       trendIcon = Up;
-      isGood = inverted;
-      isBad = !inverted;
-    } else if (trendClass.startsWith('dec')) {
+      isGood = sensor.isInverted;
+      isBad = !sensor.isInverted;
+    } else if (trend.trend.startsWith('dec')) {
       trendIcon = Down;
-      isGood = !inverted;
-      isBad = inverted;
+      isGood = !sensor.isInverted;
+      isBad = sensor.isInverted;
     } else {
       trendIcon = Steady;
       isGood = false;
@@ -64,7 +66,7 @@
       {@html trendIcon}
     </span>
     {value}
-    {#if trend != null}{trendClass}{/if}
+    {#if trend != null}{trend.trend}{/if}
   </div>
 {:else}
   <div class="trend-indicator" class:isGood class:isBad>

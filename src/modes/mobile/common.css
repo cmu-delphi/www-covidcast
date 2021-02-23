@@ -6,8 +6,13 @@
   position: relative;
 }
 
+.mobile-root > .uk-container {
+  margin-top: 5px;
+}
+
 .mobile-root p {
   font-size: 0.875rem;
+  margin-top: 5px;
 }
 
 .mobile-h2 {
@@ -102,4 +107,9 @@
 .chart-300 > * {
   width: 100%;
   height: 300px;
+}
+
+.chart-250 > * {
+  width: 100%;
+  height: 250px;
 }
