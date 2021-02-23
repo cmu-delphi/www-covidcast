@@ -15,7 +15,7 @@
   // import { onHighlight } from '../overview/vegaSpec';
   // import { highlightTimeValue } from '../../stores';
   import { prepareSensorData } from '../overview/vegaSpec';
-  import { smallMultipleTimeSpan } from '../../stores';
+  import { currentSensorEntry, smallMultipleTimeSpan } from '../../stores';
   import Vega from '../../components/Vega.svelte';
   import { groupedSensorList } from '../../stores/constants';
 
@@ -23,7 +23,6 @@
   function filterItem(item) {
     return selectedLevels.size === 0 || selectedLevels.has(item.level);
   }
-
   // use local variables with manual setting for better value comparison updates
   let startDay = $smallMultipleTimeSpan[0];
   let endDay = $smallMultipleTimeSpan[1];
@@ -36,26 +35,28 @@
     }
   }
   let selections = $currentMultiSelection;
-
   /**
    * @type {import('../../stores/constants').SensorEntry[]}
    */
-  let otherSensors = [];
+  let otherSensors = [$currentSensorEntry];
+  // $: primary = $currentSensorEntry;
+  // $: {
+  //   otherSensors.push(primary);
+  // }
 
-  let chosenColumn = '';
-
+  let chosenColumn = ''; // Sensor chosen by user from menu.
   $: {
     if (chosenColumn) {
-      otherSensors = otherSensors.concat([sensorList.find((d) => d.key === chosenColumn)]);
+      const chosenSensor = sensorList.find((d) => d.key === chosenColumn);
+      otherSensors = otherSensors.concat([chosenSensor]);
       chosenColumn = '';
       console.info('otherSensors', otherSensors);
     }
   }
-
   function loadAllSignalData(sensorPromises) {
     // for each time_value, merge data values across sensors.
     const sensorDateMap = {};
-    const sensorKeysMap = {};
+    const sensorKeysMap = {}; // map from sensor key to sensor.
     return Promise.all(sensorPromises).then((sensorsDataRows) => {
       console.info('sensorsDataRows', sensorsDataRows);
       sensorsDataRows.forEach((sensorRows, index) => {
@@ -66,33 +67,34 @@
           if (!sensorDateMap[time_value_key]) {
             sensorDateMap[time_value_key] = { ...row };
           }
-          sensorKeysMap[sensorData.sensor.key] = true;
-          sensorDateMap[time_value_key][sensorData.sensor.key] = row.value;
+          const sensorKey = sensorData.sensor.key;
+          sensorKeysMap[sensorKey] = sensorData.sensor;
+          sensorDateMap[time_value_key][sensorKey] = row.value;
         });
       });
+      console.info('sensorKeysMap', sensorKeysMap);
       console.info('sensorDateMap', sensorDateMap);
+      const sensors = Object.values(sensorKeysMap);
       vegaRepeatSpec = {
-        row: Object.keys(sensorKeysMap),
-        column: Object.keys(sensorKeysMap).reverse(),
+        rows: sensors,
+        columns: sensors, // .reverse(),
       };
       return Object.values(sensorDateMap);
     });
   }
-
   // $: sensorListData = sensorList.slice(0, 4).map((sensor) => prepareSensorData(sensor, selections, startDay, endDay));
   $: sensorListData = otherSensors.map((sensor) => prepareSensorData(sensor, selections, startDay, endDay));
-
   $: sensorDataPromises = sensorListData.map((sensorData) => sensorData.data);
   $: sensorMatrixData = loadAllSignalData(sensorDataPromises);
+  $: vegaRepeatSpec = { rows: [], columnc: [] };
 
-  $: vegaRepeatSpec = { row: [], column: [] };
-
+  // row and column are field names as keys.
   function makeMatrixCellSpec(row, column, options) {
     let xBin = {};
     let yAggregate = null;
     if (options.histogram) {
       xBin = { bin: true };
-      yAggregate = { aggregate: 'count' };
+      yAggregate = { aggregate: 'count', title: 'Count' };
     }
     const chartSpec = {
       // height: 200,
@@ -104,16 +106,16 @@
       // },
       // spec: {
       mark: options.histogram ? 'bar' : 'point',
-
-      selection: {
-        brush: {
-          type: 'interval',
-          mark: { cursor: 'move' },
-        },
-      },
+      // selection: {
+      //   brush: {
+      //     type: 'interval',
+      //     mark: { cursor: 'move' },
+      //   },
+      // },
       encoding: {
         x: {
           field: column,
+          title: options.xtitle,
           type: 'quantitative',
           ...xBin,
           // axis: { minExtent: 20 },
@@ -126,6 +128,7 @@
         },
         y: yAggregate || {
           field: row,
+          title: options.ytitle,
           type: 'quantitative',
           // axis: { minExtent: 30 },
           // axis: null,
@@ -135,14 +138,14 @@
           //   // maxExtent: 0,
           // },
         },
-        color: {
-          condition: {
-            selection: 'brush',
-            field: 'brush',
-            type: 'nominal',
-          },
-          value: 'grey',
-        },
+        // color: {
+        //   // condition: {
+        //   //   selection: 'brush',
+        //   //   field: 'brush',
+        //   //   type: 'nominal',
+        //   // },
+        //   // value: 'grey',
+        // },
       },
       // },
     };
@@ -169,22 +172,24 @@
     // }
     return spec;
   }
-
   $: matrixSpec = [];
   $: {
-    // const numRows = vegaRepeatSpec.row.length;
-    // const numCols = vegaRepeatSpec.column.length;
+    // const numRows = vegaRepeatSpec.rows.length;
+    // const numCols = vegaRepeatSpec.columns.length;
     matrixSpec = {
-      columns: vegaRepeatSpec.column.length,
-      hconcat: [
-        ...vegaRepeatSpec.row
+      columns: 1, // vegaRepeatSpec.columns.length,
+      concat: [
+        ...vegaRepeatSpec.rows
           .map((r) => {
             // const rowTitle = rowIndex == numRows - 1 ? r.row : '';
+            const c = vegaRepeatSpec.columns[0];
+            // const colTitle = colIndex == numCols - 1 ? c.name : '';
             return [
-              ...vegaRepeatSpec.column.map((c) => {
-                // const colTitle = colIndex == numCols - 1 ? r.column : '';
-                return makeMatrixCellSpec(r, c, { histogram: r == c }); // ytitle: colTitle, xtitle: rowTitle
-              }),
+              ...[makeMatrixCellSpec(r.key, c.key, { histogram: r == c, xtitle: r.name, ytitle: c.name })],
+              // ...vegaRepeatSpec.columns.map((c) => {
+
+              //   return makeMatrixCellSpec(r, c, { histogram: r == c });
+              // }),
               // {
               //   title: 'testing',
               //   mark: {
@@ -199,10 +204,9 @@
     };
     console.info('matrix', matrixSpec);
   }
-
   $: splomSpec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
-    title: 'correlations',
+    // title: 'correlations',
     // autosize: {
     //   type: 'fixed',
     //   contains: 'padding',
@@ -211,7 +215,6 @@
     padding: { left: 50, right: 40, top: 50, bottom: 50 },
     // width: 500,
     // height: 800,
-
     data: { name: 'values' },
     ...matrixSpec,
     // vconcat: [
@@ -221,7 +224,6 @@
     //   height: 200,
     //   width: 200,
     //   mark: 'point',
-
     //   selection: {
     //     brush: {
     //       type: 'interval',
@@ -361,7 +363,7 @@
           </optgroup>
         {/each}
       </select>
-      <button type="button" aria-label="add column options">Add Sensor</button>
+      <button type="button" aria-label="add column options">Add Indicator</button>
     </div>
   </div>
 
