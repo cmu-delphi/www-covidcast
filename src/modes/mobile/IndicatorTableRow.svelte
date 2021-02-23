@@ -83,7 +83,12 @@
     {#await trend}?{:then t}{t && t.current ? sensor.value.formatValue(t.current.value) : 'N/A'}{/await}
   </td>
   <td rowspan="2" class="sparkline">
-    <Vega {spec} {data} tooltip={SparkLineTooltip} tooltipProps={{ sensor }} signals={{ currentDate: date.value }} />
+    <Vega
+      {spec}
+      {data}
+      tooltip={SparkLineTooltip}
+      tooltipProps={{ sensor: sensor.value }}
+      signals={{ currentDate: date.value }} />
   </td>
   <td rowspan="2">
     <a
