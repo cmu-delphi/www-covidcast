@@ -15,13 +15,13 @@ export const signalPatches = {
   highlight_tuple: patchHighlightTuple,
 };
 
-function smartPadding(valueField = 'value') {
-  return {
-    // in case the values are close to 0 .. no padding otherwise some padding
-    // if range.min < 10 && range.range > 30 ? 0 : 20
-    expr: `customObjChecks(customExtent(data("values"), "${valueField}"), ['min', '<', 10], ['range', '>', 30]) ? 0 : 20`,
-  };
-}
+// function smartPadding(valueField = 'value') {
+//   return {
+//     // in case the values are close to 0 .. no padding otherwise some padding
+//     // if range.min < 10 && range.range > 30 ? 0 : 20
+//     expr: `customObjChecks(customExtent(data("values"), "${valueField}"), ['min', '<', 10], ['range', '>', 30]) ? 0 : 20`,
+//   };
+// }
 
 const AUTO_ALIGN = {
   // auto align based on remaining space
@@ -83,7 +83,7 @@ export function generateLineChartSpec({ height = 300, initialDate = null, valueF
               round: true,
               zero,
               domainMin: null,
-              padding: zero ? undefined : smartPadding(valueField),
+              // padding: zero ? undefined : smartPadding(valueField),
             },
           },
         },
