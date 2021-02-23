@@ -44,6 +44,7 @@
   .trend-indicator {
     font-weight: 600;
     white-space: nowrap;
+    display: inline-flex;
   }
   .icon {
     color: #f0f1f3;
@@ -51,7 +52,7 @@
     display: inline-flex;
   }
   .icon > :global(svg) {
-    height: 1em;
+    height: 2em;
     fill: currentColor;
   }
   .isGood {

@@ -43,8 +43,10 @@
 
 <style>
   .icon-wrapper {
+    margin-top: 1em;
     position: relative;
   }
+
   .icon-wrapper > span {
     position: absolute;
     left: 0;
