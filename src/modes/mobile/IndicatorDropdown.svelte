@@ -66,7 +66,7 @@
 
 <div class="dropdown-container" class:open on:click|stopPropagation={() => undefined}>
   <button type="button" class="trigger" on:click={() => (open = !open)}>
-    <div>{sensor.name}</div>
+    <div>{sensor.value.name}</div>
     <span class="inline-svg-icon">
       {@html caretDownIcon}
     </span>

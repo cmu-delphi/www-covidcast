@@ -2,7 +2,9 @@
   import { groupedSensorList } from '../../stores/constants';
   import IndicatorTableRow from './IndicatorTableRow.svelte';
   import FancyHeader from './FancyHeader.svelte';
-  import { asSensorParam } from '../../stores/params';
+  import { createSensorParam } from '../../stores/params';
+  import { formatDateShortNumbers } from '../../formats';
+
   /**
    * @type {import("../../stores/params").DateParam}
    */
@@ -20,8 +22,14 @@
     <tr>
       <th class="mobile-th"><span>Indicator</span></th>
       <th class="mobile-th uk-text-right"><span>Change Last 7 days</span></th>
-      <th class="mobile-th uk-text-right"><span>per 100k</span></th>
-      <th class="mobile-th uk-text-right"><span>historical trend</span></th>
+      <th class="mobile-th uk-text-right"><span>Value</span></th>
+      <th class="mobile-th uk-text-right">
+        <span>historical trend</span>
+        <div class="mobile-th-range">
+          <span> {formatDateShortNumbers(date.sparkLine.min)} </span>
+          <span> {formatDateShortNumbers(date.sparkLine.max)} </span>
+        </div>
+      </th>
       <th class="mobile-th" />
     </tr>
   </thead>
@@ -31,7 +39,7 @@
         <th class="mobile-h3" colspan="5">{group.label}</th>
       </tr>
       {#each group.sensors as sensor}
-        <IndicatorTableRow sensor={asSensorParam(sensor)} {date} {region} />
+        <IndicatorTableRow sensor={createSensorParam(sensor)} {date} {region} />
       {/each}
     </tbody>
   {/each}

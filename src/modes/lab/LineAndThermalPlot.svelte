@@ -5,7 +5,7 @@
   import { generateLineChartSpec, signalPatches } from '../../specs/lineSpec';
   import { currentDateObject, currentRegionInfo } from '../../stores';
   import { sensorList } from '../../stores/constants';
-  import { toTimeValue } from '../mobile/utils';
+  import { toTimeValue } from '../../stores/params';
   import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
 
   const sensor = sensorList.find((d) => d.signal === 'smoothed_wearing_mask' && d.id === 'fb-survey');

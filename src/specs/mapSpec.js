@@ -94,7 +94,7 @@ function genMegaLayer(withStates = null) {
   return layer;
 }
 
-function genStateBorderLayer({ strokeWidth = 1.1 }) {
+function genStateBorderLayer({ strokeWidth = 1.1 } = {}) {
   /**
    * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
    */

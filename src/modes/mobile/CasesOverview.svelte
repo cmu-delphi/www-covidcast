@@ -1,5 +1,4 @@
 <script>
-  import { formatDateShort } from '../../formats';
   import RegionMap from './RegionMap.svelte';
   import SurveyValue from '../survey/SurveyValue.svelte';
   import FancyHeader from './FancyHeader.svelte';
@@ -16,13 +15,7 @@
   export let region;
 
   $: casesTrend = region.fetchTrend(CASES.value, date.value);
-  $: casesDateData = date.fetchRegion(CASES.value, region.value);
   $: deathTrend = region.fetchTrend(DEATHS.value, date.value);
-  $: deathDateData = date.fetchRegion(DEATHS.value, region.value);
-
-  function formatNumber(v) {
-    return v == null ? 'N/A' : v.toLocaleString();
-  }
 </script>
 
 <style>
@@ -35,6 +28,7 @@
 
   h4 {
     margin: 0;
+    margin-bottom: 1em;
     font-size: 0.65rem;
     text-align: center;
   }
@@ -68,7 +62,7 @@
         <TrendIndicator trend={null} long sensor={CASES} />
       {:then d}
         <TrendIndicator trend={d} long sensor={CASES} />
-      {/await}>
+      {/await}
     </div>
   </div>
   <div>
@@ -99,27 +93,8 @@
   {:else if region.level === 'state'}in {region.displayName}{:else}around {region.displayName}{/if}
 </h3>
 
-<h4>{CASES.mapTitleText({})}</h4>
+<h4>{CASES.value.mapTitleText({})}</h4>
 
 <div class="chart-250">
   <RegionMap {region} {date} sensor={CASES} height={250} />
 </div>
-
-<hr />
-
-<FancyHeader sub="Overall" />
-
-<p>
-  At least
-  <strong>
-    {#await deathDateData}N/A{:then d}{d ? formatNumber(d.count) : 'N/A'}{/await}
-    new coronavirus deaths</strong>
-  and
-  <strong>
-    {#await casesDateData}N/A{:then d}{d ? formatNumber(d.count) : 'N/A'}{/await}
-    new cases</strong>
-  were reported in
-  {region.displayName}
-  on
-  {formatDateShort(date.value)}.
-</p>

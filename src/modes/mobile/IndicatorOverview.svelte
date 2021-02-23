@@ -53,16 +53,16 @@ TODO
     <td>Last 7 day trend</td>
     <td class="indicator-table-value">
       {#await trend}
-        <TrendIndicator trend={null} long {sensor} />
+        <TrendIndicator trend={null} {sensor} />
       {:then d}
-        <TrendIndicator trend={d} long {sensor} />
-      {/await}>
+        <TrendIndicator trend={d} {sensor} />
+      {/await}
     </td>
   </tr>
   <tr>
     <td>Last 7 day avg</td>
     <td class="indicator-table-value">
-      {#await trend}N/A{:then d}{d && d.current ? sensor.value.formatValue(d.current.value) : 'N/A'}{/await}>
+      {#await trend}N/A{:then d}{d && d.current ? sensor.value.formatValue(d.current.value) : 'N/A'}{/await}
     </td>
   </tr>
   <tr>

@@ -52,10 +52,10 @@ function toTrend(current, reference, min) {
 
 function toTrendText(change) {
   if (change >= trendThreshold) {
-    return ['increased', `Increasing (>= ${formatTrendChange(trendThreshold)})`];
+    return ['increase', `Increasing (>= ${formatTrendChange(trendThreshold)})`];
   }
   if (change <= -trendThreshold) {
-    return ['decreased', `Decreasing (<= ${formatTrendChange(trendThreshold)})`];
+    return ['decrease', `Decreasing (<= ${formatTrendChange(trendThreshold)})`];
   }
   return ['static', `Static (${formatTrendChange(-trendThreshold)} <= v <= ${formatTrendChange(trendThreshold)})`];
 }
@@ -63,6 +63,10 @@ function toTrendText(change) {
 /**
  * @typedef {object} Trend
  * @property {string} trend
+ * @property {boolean} isIncreasing
+ * @property {boolean} isDecreasing
+ * @property {boolean} isStatic
+ * @property {boolean} isUnknown
  * @property {string} trendReason
  * @property {number} change
  * @property {Date} refDate
@@ -73,6 +77,10 @@ function toTrendText(change) {
 
 export const UNKNOWN_TREND = {
   trend: 'Unknown',
+  isIncreasing: false,
+  isStatic: false,
+  isDecreasing: false,
+  isUnknown: true,
   trendReason: 'Unknown',
   change: Number.NaN,
   refDate: new Date(),
@@ -122,6 +130,10 @@ export function determineTrend(date, data, dateRow = findDateRow(date, data)) {
   const [trendText, trendReason] = toTrendText(change);
   return {
     trend: trendText,
+    isIncreasing: trendText.startsWith('inc'),
+    isStatic: trendText === 'static',
+    isDecreasing: trendText.startsWith('dec'),
+    isUnknown: false,
     trendReason,
     change,
     refDate: refValue.date_value,

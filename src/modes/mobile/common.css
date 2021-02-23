@@ -43,6 +43,25 @@
   vertical-align: top;
 }
 
+.mobile-th-range {
+  position: relative;
+  margin-top: 5px;
+  padding: 2px 2px 0 2px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.mobile-th-range::before {
+  content: '';
+  border: 1px solid currentColor;
+  border-bottom-width: 0;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 3px;
+}
+
 .mobile-table {
   border-collapse: collapse;
 }

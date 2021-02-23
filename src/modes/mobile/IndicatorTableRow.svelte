@@ -33,7 +33,7 @@
     return region.fetchSparkLine(sensor.value, date.sparkLine);
   }
 
-  $: data = loadSparkLine(sensor, region, date);
+  $: data = loadSparkLine(sensor, date, region);
   $: trend = region.fetchTrend(sensor.value, date.value);
   /**
    * @type {import('vega-lite').TopLevelSpec}
@@ -72,12 +72,12 @@
       {sensor.value.name}
     </a>
   </td>
-  <td class="uk-text-right">
+  <td>
     {#await trend}
-      <TrendIndicator trend={null} long {sensor} />
+      <TrendIndicator trend={null} {sensor} />
     {:then d}
-      <TrendIndicator trend={d} long {sensor} />
-    {/await}>
+      <TrendIndicator trend={d} {sensor} />
+    {/await}
   </td>
   <td class="uk-text-right">
     {#await trend}?{:then t}{t && t.current ? sensor.value.formatValue(t.current.value) : 'N/A'}{/await}
@@ -95,5 +95,5 @@
   </td>
 </tr>
 <tr class="addon">
-  <td colspan="3" class="source">Source: <strong>{sensor.value.id}</strong></td>
+  <td colspan="3" class="source">Source: {sensor.value.id}</td>
 </tr>

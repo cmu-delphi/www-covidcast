@@ -37,7 +37,7 @@ function computeSparklineTimeFrame(date) {
  * @property {number} timeValue
  * @property {{min: Date, max: Date, difference: number}} sparkLine
  * @property {(date: Date) => void} set
- * @property {(sensor: Sensor, level: string, geo: string | string[]) => Promise<EpiDataRow[]>} fetchRegions
+ * @property {(sensor: Sensor, level: string, geo: string | string[]) => Promise<EpiDataRow[]>} fetchMultiRegions
  * @property {(sensor: Sensor, region: Region)) => Promise<EpiDataRow>} fetchRegion
  */
 
@@ -68,7 +68,7 @@ export function createDateParam(date) {
       cache.set(key, r);
       return r;
     },
-    fetchRegions(sensor, level, geo) {
+    fetchMultiRegions(sensor, level, geo) {
       const key = `${sensor.key}:${level}:${geo}`;
       if (cache.has(key)) {
         return cache.get(key);
@@ -103,6 +103,14 @@ export function createDateParam(date) {
  */
 
 /**
+ *
+ * @param {Sensor} sensor
+ */
+export function isInverted(sensor) {
+  return sensor.colorScaleId === 'interpolateYlGnBu';
+}
+
+/**
  * @param {Sensor} sensor
  * @returns {SensorParam}
  */
@@ -112,7 +120,7 @@ export function createSensorParam(sensor) {
     value: sensor,
     isCasesOrDeath: sensor.isCasesOrDeath,
     isPercentage: sensor.format == 'percent',
-    isInverted: sensor.colorScaleId === 'interpolateYlGnBu',
+    isInverted: isInverted(sensor),
     set: (sensor) => {
       currentSensor.set(sensor.key);
     },

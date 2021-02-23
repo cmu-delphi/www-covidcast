@@ -13,7 +13,7 @@
   import HexGridCell from './components/HexGridCell.svelte';
   import RegionHexGridCell from './components/RegionHexGridCell.svelte';
   import SensorHexGridCell from './components/SensorHexGridCell.svelte';
-  import { toTimeValue } from '../mobile/utils';
+  import { toTimeValue } from '../../stores/params';
 
   let sensor = sensorList.find((d) => d.isCasesOrDeath);
 

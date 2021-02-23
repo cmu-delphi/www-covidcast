@@ -3,7 +3,7 @@ import { format } from 'd3-format';
 
 const short = timeFormat('%B %d');
 const shortAbbr = timeFormat('%b %d');
-const shortNumbers = timeFormat('%m/%d');
+const shortNumbers = timeFormat('%-m/%d');
 const iso = timeFormat('%Y-%m-%d');
 const local = timeFormat('%m/%d/%Y');
 const shortAbbrNth = timeFormat('%b %-d');

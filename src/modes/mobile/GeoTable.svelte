@@ -260,7 +260,7 @@
             on:click|preventDefault={() => currentRegion.set(region.propertyId)}>{region.displayName}</a>
         </td>
         <td class="uk-text-right">
-          <TrendIndicator trend={null} />
+          <TrendIndicator trend={null} {sensor} />
         </td>
         <td class="uk-text-right">{region.value == null ? 'N/A' : sensor.value.formatValue(region.value)}</td>
         <td class="sparkline">
