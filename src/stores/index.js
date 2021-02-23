@@ -378,7 +378,13 @@ export const trackedUrlParams = derived(
     // determine parameters based on default value and current mode
     const params = {
       sensor:
-        mode === modeByID.single || mode === modeByID['survey-results'] || sensor === DEFAULT_SENSOR ? null : sensor,
+        mode === modeByID.landing ||
+        mode === modeByID.overview ||
+        mode === modeByID.single ||
+        mode === modeByID['survey-results'] ||
+        sensor === DEFAULT_SENSOR
+          ? null
+          : sensor,
       level:
         mode === modeByID.single ||
         mode === modeByID.export ||

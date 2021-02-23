@@ -129,7 +129,7 @@
   let showAll = false;
 
   $: {
-    sortedRegions = regions.slice();
+    sortedRegions = regions.slice(0, showAll ? -1 : 10);
     loadedData.then((rows) => {
       sortedRegions = rows.sort(comparator).slice(0, showAll ? -1 : 10);
     });
