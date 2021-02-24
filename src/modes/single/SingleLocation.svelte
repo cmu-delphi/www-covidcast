@@ -155,7 +155,7 @@
             ],
             mark: {
               type: 'trail',
-              opacity: 0.5,
+              opacity: 0.7,
               color: 'gray',
             },
             encoding: {
@@ -186,7 +186,7 @@
           .map((r) => {
             const c = vegaRepeatSpec.columns[0];
             return [
-              ...[makeMatrixCellSpec(r.key, c.key, { histogram: r == c, xtitle: r.name, ytitle: c.name })],
+              ...[makeMatrixCellSpec(r.key, c.key, { histogram: r == c, xtitle: c.name, ytitle: r.name })],
             ].flat();
           })
           .flat(),
