@@ -100,11 +100,7 @@
       // height: 200,
       // width: 200,
       // title: { text: options.xtitle, orient: 'left', color: 'black' },
-      // facet: {
-      //   field: 'title whatever',
-      //   type: 'ordinal',
-      // },
-      // spec: {
+
       mark: options.histogram ? 'bar' : 'point',
       // selection: {
       //   brush: {
@@ -118,58 +114,65 @@
           title: options.xtitle,
           type: 'quantitative',
           ...xBin,
-          // axis: { minExtent: 20 },
-          // axis: null,
-          // axis: {
-          //   title: null,
-          //   // minExtent: 10,
-          //   // maxExtent: 0,
-          // },
         },
         y: yAggregate || {
           field: row,
           title: options.ytitle,
           type: 'quantitative',
-          // axis: { minExtent: 30 },
-          // axis: null,
-          // axis: {
-          //   title: null,
-          //   // minExtent: 10,
-          //   // maxExtent: 0,
-          // },
         },
-        // color: {
-        //   // condition: {
-        //   //   selection: 'brush',
-        //   //   field: 'brush',
-        //   //   type: 'nominal',
-        //   // },
-        //   // value: 'grey',
-        // },
       },
-      // },
     };
     let spec = chartSpec;
-    // if (options.xtitle) {
-    //   spec = {
-    //     vconcat: [
-    //       chartSpec,
-    //       // {
-    //       //   mark: {
-    //       //     type: 'text',
-    //       //     text: options.xtitle,
-    //       //   },
-    //       //   encoding: {
-    //       //     text: {
-    //       //       value: options.xtitle,
-    //       //     },
-    //       //     x: { value: 0 },
-    //       //     Y: { value: 0 },
-    //       //   },
-    //       // },
-    //     ],
-    //   };
-    // }
+    if (!options.histogram) {
+      spec = {
+        // width: 200,
+        // height: 200,
+        layer: [
+          {
+            transform: [
+              {
+                window: [
+                  {
+                    op: 'mean',
+                    field: column,
+                    type: 'quantitative',
+                    as: 'xmean',
+                  },
+                ],
+                frame: [-6, 0],
+              },
+              {
+                window: [
+                  {
+                    op: 'mean',
+                    field: row,
+                    type: 'quantitative',
+                    as: 'ymean',
+                  },
+                ],
+                frame: [-6, 0],
+              },
+            ],
+            mark: {
+              type: 'trail',
+              opacity: 0.5,
+              color: 'gray',
+            },
+            encoding: {
+              x: { field: 'xmean', type: 'quantitative', sort: null },
+              y: { field: 'ymean', type: 'quantitative', sort: null },
+              // color: { field: 'date_value', type: 'temporal',         scale:  },
+              size: {
+                field: 'date_value',
+                type: 'temporal',
+                scale: { range: [0, 6] },
+              },
+            },
+          },
+          chartSpec,
+        ],
+      };
+    }
     return spec;
   }
   $: matrixSpec = [];
@@ -181,22 +184,9 @@
       concat: [
         ...vegaRepeatSpec.rows
           .map((r) => {
-            // const rowTitle = rowIndex == numRows - 1 ? r.row : '';
             const c = vegaRepeatSpec.columns[0];
-            // const colTitle = colIndex == numCols - 1 ? c.name : '';
             return [
               ...[makeMatrixCellSpec(r.key, c.key, { histogram: r == c, xtitle: r.name, ytitle: c.name })],
-              // ...vegaRepeatSpec.columns.map((c) => {
-
-              //   return makeMatrixCellSpec(r, c, { histogram: r == c });
-              // }),
-              // {
-              //   title: 'testing',
-              //   mark: {
-              //     type: 'text',
-              //     text: 'mark title',
-              //   },
-              // },
             ].flat();
           })
           .flat(),
@@ -213,55 +203,10 @@
     //   resize: true,
     // },
     padding: { left: 50, right: 40, top: 50, bottom: 50 },
-    // width: 500,
-    // height: 800,
+    width: 500,
+    height: 900,
     data: { name: 'values' },
     ...matrixSpec,
-    // vconcat: [
-    //   {
-    // repeat: vegaRepeatSpec,
-    // spec: {
-    //   height: 200,
-    //   width: 200,
-    //   mark: 'point',
-    //   selection: {
-    //     brush: {
-    //       type: 'interval',
-    //     },
-    //   },
-    //   encoding: {
-    //     x: {
-    //       field: { repeat: 'column' },
-    //       type: 'quantitative',
-    //       // axis: { minExtent: 20 },
-    //       // axis: null,
-    //       axis: {
-    //         title: null,
-    //         minExtent: 10,
-    //         maxExtent: 0,
-    //       },
-    //     },
-    //     y: {
-    //       field: { repeat: 'row' },
-    //       type: 'quantitative',
-    //       // axis: { minExtent: 30 },
-    //       // axis: null,
-    //       axis: {
-    //         title: null,
-    //         minExtent: 10,
-    //         maxExtent: 0,
-    //       },
-    //     },
-    //     color: {
-    //       condition: {
-    //         selection: 'brush',
-    //         field: 'brush',
-    //         type: 'nominal',
-    //       },
-    //       value: 'grey',
-    //     },
-    //   },
-    // },
   };
 </script>
 
