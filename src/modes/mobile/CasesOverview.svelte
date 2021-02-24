@@ -32,12 +32,6 @@
     font-size: 0.65rem;
     text-align: center;
   }
-
-  .summary-stats {
-    display: flex;
-    align-items: flex-start;
-    font-size: 0.75rem;
-  }
 </style>
 
 <FancyHeader sub="Indicators" normal>COVIDcast</FancyHeader>

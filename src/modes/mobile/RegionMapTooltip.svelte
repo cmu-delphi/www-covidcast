@@ -1,5 +1,6 @@
 <script>
   import { formatDateShort } from '../../formats';
+  import { levelMegaCounty } from '../../stores/constants';
 
   export let hidden = false;
   /**
@@ -47,7 +48,7 @@
   on:touchstart|stopPropagation={() => undefined}
   on:mousedown|stopPropagation={() => undefined}>
   <h5>
-    {#if regionSetter}
+    {#if regionSetter && item.level !== levelMegaCounty.id}
       <a class="uk-link-muted" href="?region={item.propertyId}" on:click|preventDefault={changeRegion}>
         {item.displayName}
       </a>
