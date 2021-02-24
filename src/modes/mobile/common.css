@@ -15,6 +15,11 @@
   margin-top: 5px;
 }
 
+.mobile-map {
+  border: 1px solid #f0f1f3;
+  border-radius: 3px;
+}
+
 .mobile-h2 {
   margin-top: 4px;
   font-weight: 600;

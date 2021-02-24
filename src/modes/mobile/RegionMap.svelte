@@ -77,7 +77,7 @@
 </script>
 
 <Vega
-  {className}
+  className="mobile-map {className}"
   {spec}
   {data}
   tooltip={RegionMapTooltip}
