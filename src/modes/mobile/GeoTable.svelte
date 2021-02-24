@@ -1,5 +1,5 @@
 <script>
-  import { getCountiesOfState, stateInfo } from '../../maps';
+  import { getCountiesOfState, getStateOfCounty, nationInfo, stateInfo } from '../../maps';
   import getRelatedCounties from '../../maps/related';
   import { generateSparkLine } from '../../specs/lineSpec';
   import Vega from '../../components/Vega.svelte';
@@ -8,7 +8,6 @@
   import chevronDownIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-down.svg';
   import FancyHeader from './FancyHeader.svelte';
   import TrendIndicator from './TrendIndicator.svelte';
-  import { currentRegion } from '../../stores';
   import { formatDateShortNumbers } from '../../formats';
   import { groupByRegion, extractSparkLine } from '../../stores/params';
   import { determineTrend } from '../../stores/trend';
@@ -31,12 +30,12 @@
    */
   function determineRegions(region) {
     if (region.level === 'state') {
-      return getCountiesOfState(region);
+      return [nationInfo, region, ...getCountiesOfState(region)];
     }
     if (region.level === 'county') {
-      return [region, ...getRelatedCounties(region)];
+      return [nationInfo, getStateOfCounty(region), region, ...getRelatedCounties(region)];
     }
-    return stateInfo;
+    return [nationInfo, ...stateInfo];
   }
 
   /**
@@ -61,37 +60,73 @@
     if (!sensor.value || !date.value || !region.value) {
       return Promise.resolve([]);
     }
+    function toGeoTableRow(r, data, important = false) {
+      const trend = determineTrend(date.value, data);
+      return {
+        ...r,
+        important,
+        trendObj: trend,
+        trend: trend.change,
+        value: trend.current ? trend.current.value : null,
+        data: data.length > 0 ? extractSparkLine(data, date.sparkLine, sensor.value) : [],
+      };
+    }
     function loadImpl(regions) {
       return sensor.fetchMultiTimeSeries(regions, date.timeFrame).then((data) => {
         const groups = groupByRegion(data);
         return regions.map((region) => {
           const data = groups.get(region.propertyId) || [];
-          const trend = determineTrend(date.value, data);
-          return {
-            ...region,
-            trendObj: trend,
-            trend: trend.change,
-            value: trend.current ? trend.current.value : null,
-            data: data.length > 0 ? extractSparkLine(data, date.sparkLine, sensor.value) : [],
-          };
+          return toGeoTableRow(region, data);
         });
       });
     }
+    function loadSingle(r, important = false) {
+      if (r.id === region.id) {
+        // use cached
+        return region.fetchTimeSeries(sensor.value, date.timeFrame).then((rows) => toGeoTableRow(r, rows, important));
+      }
+      return sensor.fetchTimeSeries(r, date.timeFrame).then((rows) => toGeoTableRow(r, rows, important));
+    }
+
     if (region.level === 'state') {
-      return loadImpl(getCountiesOfState(region.value));
+      return Promise.all([
+        loadSingle(nationInfo, true),
+        loadSingle(region.value, true),
+        loadImpl(getCountiesOfState(region.value)),
+      ]).then((r) => r.flat());
     }
     if (region.level === 'county') {
-      const geo = [region.value, ...getRelatedCounties(region.value)];
-      return loadImpl(geo);
+      return Promise.all([
+        loadSingle(nationInfo, true),
+        loadSingle(getStateOfCounty(region.value), true),
+        loadSingle(region.value),
+        loadImpl(getRelatedCounties(region.value)),
+      ]).then((r) => r.flat());
     }
-    return loadImpl(stateInfo);
+    return Promise.all([loadSingle(nationInfo, true), loadImpl(stateInfo)]).then((r) => r.flat());
   }
 
-  let sortCriteria = 'displayName';
+  let sortCriteria = 'smart';
   let sortDirectionDesc = false;
 
   function bySortCriteria(sortCriteria, sortDirectionDesc) {
     const less = sortDirectionDesc ? 1 : -1;
+    if (sortCriteria === 'smart') {
+      return (a, b) => {
+        if (a.important && b.important) {
+          // state vs nation
+          return a.level === 'nation' ? -1 : 1;
+        }
+        if (a.important !== b.important) {
+          return a.importnat ? -1 : 1;
+        }
+        if (a.displayName !== b.displayName) {
+          return a.displayName < b.displayName ? less : -less;
+        }
+        return 0;
+      };
+    }
+
     return (a, b) => {
       const av = a[sortCriteria];
       const bv = b[sortCriteria];
@@ -148,6 +183,11 @@
   .sparkline > :global(*) {
     height: 3em;
   }
+
+  .important {
+    font-weight: 700;
+    text-transform: uppercase;
+  }
 </style>
 
 <FancyHeader>{title.title}</FancyHeader>
@@ -158,7 +198,7 @@
       <th class="mobile-th mobile-th-blue">{title.unit}</th>
       <th class="mobile-th mobile-th-blue">Change Last 7 days</th>
       <th class="mobile-th uk-text-right mobile-th-blue">
-        {#if sensor.isCasesSignal}per 100k{:else if sensor.isPercentage}Percentage{:else}Value{/if}
+        {#if sensor.isCasesSignal}per 100k{:else if sensor.isPercentage}%{:else}Value{/if}
       </th>
       <th class="mobile-th uk-text-right mobile-th-blue">
         <span>historical trend</span>
@@ -172,8 +212,8 @@
       <th class="sort-indicator uk-text-center">
         <SortColumnIndicator
           label={title.unit}
-          on:click={() => sortClick('displayName')}
-          sorted={sortCriteria === 'displayName'}
+          on:click={() => sortClick('smart')}
+          sorted={sortCriteria === 'smart'}
           desc={sortDirectionDesc} />
       </th>
       <th class="sort-indicator">
@@ -194,22 +234,22 @@
     </tr>
   </thead>
   <tbody>
-    {#each sortedRegions as region}
+    {#each sortedRegions as r}
       <tr>
-        <td>
+        <td class:important={r.important}>
           <a
-            href="?region={region.propertyId}"
+            href="?region={r.propertyId}"
             class="uk-link-text"
-            on:click|preventDefault={() => currentRegion.set(region.propertyId)}>{region.displayName}</a>
+            on:click|preventDefault={() => region.set(r)}>{r.displayName}</a>
         </td>
         <td>
-          <TrendIndicator trend={region.trendObj} {sensor} />
+          <TrendIndicator trend={r.trendObj} {sensor} />
         </td>
-        <td class="uk-text-right">{region.value == null ? 'N/A' : sensor.value.formatValue(region.value)}</td>
+        <td class="uk-text-right">{r.value == null ? 'N/A' : sensor.value.formatValue(r.value)}</td>
         <td class="sparkline">
           <Vega
             {spec}
-            data={region.data}
+            data={r.data}
             tooltip={SparkLineTooltip}
             tooltipProps={{ sensor: sensor.value }}
             signals={{ currentDate: date.value }} />
