@@ -16,7 +16,6 @@
   export let regionSetter = null;
 
   function changeRegion() {
-    console.log('x');
     if (regionSetter) {
       regionSetter(item);
     }

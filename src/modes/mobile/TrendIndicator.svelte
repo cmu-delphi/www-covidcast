@@ -3,7 +3,6 @@
   import Up from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/caret-square-up.svg';
   import Steady from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/caret-square-right.svg';
   import Unknown from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/minus-square.svg';
-  import { formatTrendChange } from '../../stores/trend';
   import UiKitHint from '../../components/UIKitHint.svelte';
 
   /**
@@ -20,7 +19,10 @@
   let isGood = false;
   let isBad = false;
 
-  $: value = formatTrendChange(trend ? trend.change : null, true);
+  $: value =
+    trend && trend.delta != null && !Number.isNaN(trend.delta)
+      ? `${trend.delta > 0 ? '+' : ''}${sensor.value.formatValue(trend.delta)}`
+      : 'N/A';
 
   $: {
     if (!trend || trend.isUnknown) {
@@ -77,6 +79,8 @@
   <span>
     {#if long && trend != null}
       {trend.trend}
+      ({value})
+
       <UiKitHint title={trend.trendReason} />
     {:else}{value}{/if}
   </span>
