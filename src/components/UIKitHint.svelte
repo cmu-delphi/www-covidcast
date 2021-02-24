@@ -7,6 +7,7 @@
 
 <style>
   .title {
+    color: initial;
     width: 12px;
     padding: 0;
     margin-left: 5px;

@@ -4,6 +4,7 @@
   import Steady from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/caret-square-right.svg';
   import Unknown from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/minus-square.svg';
   import { formatTrendChange } from '../../stores/trend';
+  import UiKitHint from '../../components/UIKitHint.svelte';
 
   /**
    * @type {import('./trend').Trend}
@@ -45,15 +46,21 @@
     font-weight: 600;
     white-space: nowrap;
     display: inline-flex;
+    align-items: center;
   }
   .icon {
     color: #f0f1f3;
     margin-right: 0.25em;
-    display: inline-flex;
+    flex: 0 0 auto;
   }
   .icon > :global(svg) {
-    height: 2em;
+    width: 1.2em;
+    height: 1.2em;
     fill: currentColor;
+  }
+  .icon.long > :global(svg) {
+    width: 2em;
+    height: 2em;
   }
   .isGood {
     color: #27ae60;
@@ -63,21 +70,15 @@
   }
 </style>
 
-{#if long}
-  <div class="trend-indicator">
-    <span class="icon" class:isGood class:isBad>
-      {@html trendIcon}
-    </span>
-    <span>
-      {value}
-      {#if trend != null}{trend.trend}{/if}
-    </span>
-  </div>
-{:else}
-  <div class="trend-indicator" class:isGood class:isBad>
-    <span class="icon" class:isGood class:isBad>
-      {@html trendIcon}
-    </span>
+<div class="trend-indicator" class:isGood={long && isGood} class:isBad={long && isBad}>
+  <span class="icon" class:isGood class:isBad class:long>
+    {@html trendIcon}
+  </span>
+  <span>
     {value}
-  </div>
-{/if}
+    {#if long && trend != null}
+      {trend.trend}
+      <UiKitHint title={trend.trendReason} />
+    {/if}
+  </span>
+</div>
