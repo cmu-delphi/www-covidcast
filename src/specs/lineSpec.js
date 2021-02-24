@@ -171,42 +171,6 @@ export function generateLineChartSpec({ height = 300, initialDate = null, valueF
           },
         },
       },
-      {
-        transform: [
-          {
-            filter: {
-              selection: 'highlight',
-            },
-          },
-        ],
-        mark: {
-          type: 'text',
-          color: COLOR,
-          align: {
-            // auto align based on remaining space
-            expr: "(width - scale('x', datum.date_value)) < 40 ? 'right' : 'left'",
-          },
-          baseline: 'bottom',
-          fontSize: 14,
-          dx: {
-            // auto align based on remaining space
-            expr: "(width - scale('x', datum.date_value)) < 40 ? -2 : 2",
-          },
-          dy: -2,
-        },
-        encoding: {
-          text: {
-            field: valueField,
-            type: 'quantitative',
-            format: '.1f',
-            formatType: 'cachedNumber',
-          },
-          y: {
-            field: valueField,
-            type: 'quantitative',
-          },
-        },
-      },
     ],
     config: {
       customFormatTypes: true,
