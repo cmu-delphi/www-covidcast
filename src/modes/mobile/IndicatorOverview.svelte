@@ -28,32 +28,8 @@
   $: unit = sensor.isPercentage ? '% of pop.' : sensor.isCasesOrDeath ? 'per 100k people' : '?';
 </script>
 
-<style>
-  .indicator-table {
-    margin: 2em 0;
-    border-collapse: collapse;
-    font-size: 0.75rem;
-    line-height: 1rem;
-    width: 100%;
-  }
-
-  .indicator-table > tr > * {
-    padding: 0.5rem 4px;
-    vertical-align: top;
-  }
-
-  .indicator-table > tr:not(:last-of-type) {
-    border-bottom: 1px solid #f0f1f3;
-  }
-
-  .indicator-table-value {
-    font-weight: 600;
-    text-align: right;
-  }
-</style>
-
 <p>Over the <strong>last 7 days</strong> there have been</p>
-<p />
+
 <div class="mobile-two-col">
   <div>
     {#await trend}
