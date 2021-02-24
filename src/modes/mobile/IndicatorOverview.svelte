@@ -82,14 +82,25 @@
     <div class="sub">{unit}</div>
   </div>
   <div>
-    <h3>Record high</h3>
-    <div>
-      {#await trend}
-        N/A
-      {:then d}
-        <SurveyValue value={d && d.max ? d.max.value : null} factor={1} />
-      {/await}
-    </div>
+    {#if sensor.isInverted}
+      <h3>Record low</h3>
+      <div>
+        {#await trend}
+          N/A
+        {:then d}
+          <SurveyValue value={d && d.min ? d.min.value : null} factor={1} />
+        {/await}
+      </div>
+    {:else}
+      <h3>Record high</h3>
+      <div>
+        {#await trend}
+          N/A
+        {:then d}
+          <SurveyValue value={d && d.max ? d.max.value : null} factor={1} />
+        {/await}
+      </div>
+    {/if}
     <div class="sub">{unit}</div>
   </div>
 </div>
