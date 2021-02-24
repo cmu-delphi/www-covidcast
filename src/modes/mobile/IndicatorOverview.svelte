@@ -16,7 +16,7 @@
    */
   export let region;
 
-  $: trend = region.fetchTrend(sensor.value, date.value);
+  $: trend = region.fetchTrend(sensor.value, date.timeFrame, date.value);
 </script>
 
 <style>

@@ -20,19 +20,21 @@
     if (!date.value || !region.value) {
       return Promise.resolve(null);
     }
-    return Promise.all(sensorList.map((sensor) => region.fetchTrend(sensor, date.value))).then((trends) => {
-      const positive = [];
-      const negative = [];
-      trends.forEach((trend, i) => {
-        const inv = isInverted(sensorList[i]);
-        if (trend.isIncreasing) {
-          (!inv ? negative : positive).push(sensorList[i]);
-        } else if (trend.isDecreasing) {
-          (inv ? negative : positive).push(sensorList[i]);
-        }
-      });
-      return { positive, negative };
-    });
+    return Promise.all(sensorList.map((sensor) => region.fetchTrend(sensor, date.timeFrame, date.value))).then(
+      (trends) => {
+        const positive = [];
+        const negative = [];
+        trends.forEach((trend, i) => {
+          const inv = isInverted(sensorList[i]);
+          if (trend.isIncreasing) {
+            (!inv ? negative : positive).push(sensorList[i]);
+          } else if (trend.isDecreasing) {
+            (inv ? negative : positive).push(sensorList[i]);
+          }
+        });
+        return { positive, negative };
+      },
+    );
   }
 
   $: trendSummary = generateTrendSummary(date, region);

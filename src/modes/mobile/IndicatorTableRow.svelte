@@ -30,11 +30,11 @@
     if (!region.value || !date.value) {
       return null;
     }
-    return region.fetchSparkLine(sensor.value, date.sparkLine);
+    return region.fetchSparkLine(sensor.value, date.timeFrame, date.sparkLine);
   }
 
   $: data = loadSparkLine(sensor, date, region);
-  $: trend = region.fetchTrend(sensor.value, date.value);
+  $: trend = region.fetchTrend(sensor.value, date.timeFrame, date.value);
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */

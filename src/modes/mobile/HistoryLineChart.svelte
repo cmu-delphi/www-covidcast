@@ -57,19 +57,19 @@
     if (!region.value || !date.value) {
       return null;
     }
-    const selfData = region.fetchTimeSeries(sensor.value);
+    const selfData = region.fetchTimeSeries(sensor.value, date.timeFrame);
 
     const data = [selfData];
     if (region.level !== 'nation') {
-      data.push(sensor.fetchTimeSeries(nationInfo));
+      data.push(sensor.fetchTimeSeries(nationInfo, date.timeFrame));
     }
 
     if (region.level === 'county') {
       const state = getInfoByName(region.state);
-      const stateData = sensor.fetchTimeSeries(state);
+      const stateData = sensor.fetchTimeSeries(state, date.timeFrame);
       const related = getRelatedCounties(region.value);
       const relatedData = sensor
-        .fetchMultiTimeSeries(related)
+        .fetchMultiTimeSeries(related, date.timeFrame)
         .then((r) =>
           averageByDate(r, sensor, {
             displayName: 'Related Counties',

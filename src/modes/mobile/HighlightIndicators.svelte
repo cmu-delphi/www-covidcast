@@ -21,7 +21,7 @@
 
   $: highlightSurveySensors = highlights.map((h) => ({
     sensor: createSensorParam(h),
-    trend: region.fetchTrend(h, date.value),
+    trend: region.fetchTrend(h, date.timeFrame, date.value),
   }));
 </script>
 

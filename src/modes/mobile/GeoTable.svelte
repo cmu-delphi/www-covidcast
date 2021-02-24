@@ -62,7 +62,7 @@
       return Promise.resolve([]);
     }
     function loadImpl(regions) {
-      return sensor.fetchMultiTimeSeries(regions).then((data) => {
+      return sensor.fetchMultiTimeSeries(regions, date.timeFrame).then((data) => {
         const groups = groupByRegion(data);
         return regions.map((region) => {
           const data = groups.get(region.propertyId) || [];
