@@ -76,4 +76,9 @@
   $: data = loadData(sensor, date, region);
 </script>
 
-<Vega {className} {spec} {data} tooltip={RegionMapTooltip} tooltipProps={{ sensor: sensor.value }} />
+<Vega
+  {className}
+  {spec}
+  {data}
+  tooltip={RegionMapTooltip}
+  tooltipProps={{ sensor: sensor.value, regionSetter: region.set }} />

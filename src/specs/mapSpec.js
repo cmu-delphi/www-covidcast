@@ -213,7 +213,7 @@ function genLevelLayer({ strokeWidth = 1, scheme = 'yellowgreenblue', domain = u
     selection: {
       hover: {
         type: 'single',
-        on: 'mouseover',
+        on: 'mouseover, click',
         empty: 'none',
         fields: ['geo_value'],
       },
