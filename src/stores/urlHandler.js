@@ -34,7 +34,8 @@ export function updateURIParameters(state) {
     return;
   }
   // TODO what changes should trigger a history change
-  const pushState = changedStateKeys.includes('mode');
+  const pushState =
+    changedStateKeys.includes('mode') || (state.mode === 'overview' && changedStateKeys.includes('region'));
   if (pushState) {
     window.history.pushState(state.state, document.title, url);
   } else {
