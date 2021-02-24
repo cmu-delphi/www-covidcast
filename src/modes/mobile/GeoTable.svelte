@@ -184,14 +184,6 @@
 </script>
 
 <style>
-  .sparkline {
-    padding: 0.75rem 4px 1px 4px !important;
-  }
-
-  .sparkline > :global(*) {
-    height: 3em;
-  }
-
   .important {
     font-weight: 600;
   }
@@ -253,13 +245,15 @@
           <TrendIndicator trend={r.trendObj} {sensor} />
         </td>
         <td class="uk-text-right">{r.value == null ? 'N/A' : sensor.value.formatValue(r.value)}</td>
-        <td class="sparkline">
-          <Vega
-            {spec}
-            data={r.data}
-            tooltip={SparkLineTooltip}
-            tooltipProps={{ sensor: sensor.value }}
-            signals={{ currentDate: date.value }} />
+        <td>
+          <div class="mobile-table-chart mobile-table-chart-small">
+            <Vega
+              {spec}
+              data={r.data}
+              tooltip={SparkLineTooltip}
+              tooltipProps={{ sensor: sensor.value }}
+              signals={{ currentDate: date.value }} />
+          </div>
         </td>
       </tr>
     {/each}

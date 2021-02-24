@@ -88,6 +88,7 @@
 
 .mobile-table {
   border-collapse: collapse;
+  width: 100%;
 }
 .mobile-table > thead > tr {
   border-bottom: 1px solid #f0f1f3;
@@ -123,6 +124,25 @@
 }
 .mobile-table > tbody > tr.addon > td {
   padding: 0 4px 0.75rem 4px;
+}
+
+.mobile-table-chart {
+  margin: 4px;
+  position: relative;
+  height: 4em;
+}
+
+.mobile-table-chart-small {
+  margin: 0.75rem 4px 1px 4px !important;
+  height: 3em;
+}
+
+.mobile-table-chart > .vega-embed {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .mobile-fancy-header {

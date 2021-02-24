@@ -51,14 +51,6 @@
     font-size: 10px;
   }
 
-  .sparkline {
-    padding: 4px;
-  }
-
-  .sparkline > :global(*) {
-    height: 4em;
-  }
-
   .details-link {
     width: 6px;
     display: inline-block;
@@ -82,13 +74,15 @@
   <td class="uk-text-right">
     {#await trend}?{:then t}{t && t.current ? sensor.value.formatValue(t.current.value) : 'N/A'}{/await}
   </td>
-  <td rowspan="2" class="sparkline">
-    <Vega
-      {spec}
-      {data}
-      tooltip={SparkLineTooltip}
-      tooltipProps={{ sensor: sensor.value }}
-      signals={{ currentDate: date.value }} />
+  <td rowspan="2">
+    <div class="mobile-table-chart">
+      <Vega
+        {spec}
+        {data}
+        tooltip={SparkLineTooltip}
+        tooltipProps={{ sensor: sensor.value }}
+        signals={{ currentDate: date.value }} />
+    </div>
   </td>
   <td rowspan="2">
     <a
