@@ -185,8 +185,7 @@
   }
 
   .important {
-    font-weight: 700;
-    text-transform: uppercase;
+    font-weight: 600;
   }
 </style>
 

@@ -25,37 +25,12 @@
   }));
 </script>
 
-<style>
-  .highlights {
-    display: flex;
-  }
-
-  .highlights > div {
-    flex: 1 1 0;
-    display: flex;
-    flex-direction: column;
-  }
-
-  h3.highlight {
-    font-size: 0.875rem;
-    margin: 0.6em 0;
-    text-align: left;
-    font-weight: normal;
-    flex-grow: 1;
-    line-height: 1.5rem;
-  }
-
-  .unit {
-    font-size: 0.75rem;
-  }
-</style>
-
 <FancyHeader sub="Indicators">Key</FancyHeader>
 
-<div class="highlights">
+<div class="mobile-two-col">
   {#each highlightSurveySensors as s}
     <div>
-      <h3 class="highlight">{s.sensor.value.name}</h3>
+      <h3>{s.sensor.value.name}</h3>
       {#await s.trend}
         <TrendIndicator trend={null} long sensor={s.sensor} />
       {:then d}
@@ -68,7 +43,7 @@
           <SurveyValue value={d && d.current ? d.current.value : null} factor={10} />
         {/await}
       </div>
-      <div class="unit">per 1,000 people</div>
+      <div class="sub">per 1,000 people</div>
     </div>
   {/each}
 </div>

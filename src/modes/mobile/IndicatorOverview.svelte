@@ -1,5 +1,10 @@
 <script>
-  import FancyHeader from './FancyHeader.svelte';
+  import Vega from '../../components/Vega.svelte';
+
+  import { generateSparkLine } from '../../specs/lineSpec';
+  import SurveyValue from '../survey/SurveyValue.svelte';
+  import SparkLineTooltip from './SparkLineTooltip.svelte';
+
   import TrendIndicator from './TrendIndicator.svelte';
 
   /**
@@ -17,6 +22,10 @@
   export let region;
 
   $: trend = region.fetchTrend(sensor.value, date.timeFrame, date.value);
+  $: sparkline = region.fetchSparkLine(sensor.value, date.timeFrame, date.sparkLine);
+  const spec = generateSparkLine({ highlightDate: true });
+
+  $: unit = sensor.isPercentage ? '% of pop.' : sensor.isCasesOrDeath ? 'per 100k people' : '?';
 </script>
 
 <style>
@@ -41,42 +50,46 @@
     font-weight: 600;
     text-align: right;
   }
-
-  .desc {
-    font-size: 0.875rem;
-  }
 </style>
 
-TODO
-<table class="indicator-table">
-  <tr>
-    <td>Last 7 day trend</td>
-    <td class="indicator-table-value">
-      {#await trend}
-        <TrendIndicator trend={null} {sensor} />
-      {:then d}
-        <TrendIndicator trend={d} {sensor} />
-      {/await}
-    </td>
-  </tr>
-  <tr>
-    <td>Last 7 day avg</td>
-    <td class="indicator-table-value">
-      {#await trend}N/A{:then d}{d && d.current ? sensor.value.formatValue(d.current.value) : 'N/A'}{/await}
-    </td>
-  </tr>
-  <tr>
-    <td>Record high</td>
-    <td class="indicator-table-value">
-      {#await trend}N/A{:then d}{d && d.max ? sensor.value.formatValue(d.max.value) : 'N/A'}{/await}
-    </td>
-  </tr>
-</table>
-
-{#if sensor.value.description}
-  <FancyHeader normal>About this indicator</FancyHeader>
-
-  <div class="desc">
-    {@html sensor.value.description}
+<p>Over the <strong>last 7 days</strong> there have been</p>
+<p />
+<div class="mobile-two-col">
+  <div>
+    {#await trend}
+      <TrendIndicator trend={null} long {sensor} />
+    {:then d}
+      <TrendIndicator trend={d} long {sensor} />
+    {/await}
   </div>
-{/if}
+  <div class="chart-50">
+    <Vega
+      {spec}
+      data={sparkline}
+      tooltip={SparkLineTooltip}
+      tooltipProps={{ sensor: sensor.value }}
+      signals={{ currentDate: date.value }} />
+  </div>
+  <div>
+    <h3>Last 7 day average</h3>
+    <div>
+      {#await trend}
+        N/A
+      {:then d}
+        <SurveyValue value={d && d.current ? d.current.value : null} factor={1} />
+      {/await}
+    </div>
+    <div class="sub">{unit}</div>
+  </div>
+  <div>
+    <h3>Record high</h3>
+    <div>
+      {#await trend}
+        N/A
+      {:then d}
+        <SurveyValue value={d && d.max ? d.max.value : null} factor={1} />
+      {/await}
+    </div>
+    <div class="sub">{unit}</div>
+  </div>
+</div>

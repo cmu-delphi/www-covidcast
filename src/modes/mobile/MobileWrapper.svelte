@@ -11,9 +11,5 @@
 
 <div class="mobile-root">
   <MobileParameters sensor={sensor.value} />
-  <div class="uk-container content-grid">
-    <div class="grid-3-11">
-      <slot {sensor} {date} {region} />
-    </div>
-  </div>
+  <slot {sensor} {date} {region} />
 </div>

@@ -9,6 +9,8 @@
   import chevronLeftIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-left.svg';
   import { currentMode } from '../../stores';
   import { modeByID } from '..';
+  import IndicatorAbout from './IndicatorAbout.svelte';
+  import RegionOverview from './RegionOverview.svelte';
 
   function switchMode() {
     currentMode.set(modeByID.overview);
@@ -16,39 +18,70 @@
 </script>
 
 <style>
+  .header-line {
+    text-align: center;
+    position: relative;
+  }
+  .header-line h2 {
+    line-height: 1;
+    padding: 18px 0.5em 15px 0.5em;
+    margin: 0;
+    font-weight: 300;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .header-line h2 span {
+    font-weight: 600;
+  }
+
   .back {
-    margin-top: 2rem;
-    display: block;
-    width: 100%;
+    position: absolute;
+    left: 1em;
+    top: 0;
+    height: 100%;
+    width: 0.7em;
+    display: flex;
+    align-items: center;
+    border: none;
+    background: none;
+    margin: 0;
+    padding: 0;
+    color: #56ccf2;
   }
 </style>
 
 <MobileWrapper let:sensor let:region let:date>
-  <FancyHeader sub="Details">Indicator</FancyHeader>
-
-  <IndicatorDropdown {sensor} />
-
-  <hr />
-
-  <div class="chart-250">
-    <RegionMap {sensor} {date} {region} />
+  <div class="uk-container content-grid mobile-invert-header">
+    <div class="grid-3-11 header-line">
+      <button class="back inline-svg-icon" on:click={switchMode}>
+        {@html chevronLeftIcon}
+      </button>
+      <h2>Indicator <span>Details</span></h2>
+    </div>
   </div>
+  <div class="uk-container content-grid">
+    <div class="grid-3-11">
+      <IndicatorDropdown {sensor} />
+      <IndicatorOverview {sensor} {date} {region} />
+      <RegionOverview {region} />
 
-  <FancyHeader>Performance</FancyHeader>
+      <FancyHeader sub="Map">Indicator</FancyHeader>
+      <div class="chart-250">
+        <RegionMap {sensor} {date} {region} />
+      </div>
 
-  <div class="chart-150">
-    <HistoryLineChart {sensor} {date} {region} />
+      <FancyHeader>Performance</FancyHeader>
+
+      <div class="chart-150">
+        <HistoryLineChart {sensor} {date} {region} />
+      </div>
+    </div>
   </div>
-
-  <hr />
-  <IndicatorOverview {sensor} {date} {region} />
-  <hr />
-  <GeoTable {sensor} {region} {date} />
-
-  <button class="uk-button uk-button-default uk-button-delphi back" on:click={switchMode}>
-    <span class="inline-svg-icon">
-      {@html chevronLeftIcon}
-    </span>
-    Indicator Table
-  </button>
+  <IndicatorAbout {sensor} />
+  <div class="uk-container content-grid">
+    <div class="grid-3-11">
+      <GeoTable {sensor} {region} {date} />
+    </div>
+  </div>
 </MobileWrapper>

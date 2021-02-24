@@ -7,11 +7,15 @@
 </script>
 
 <MobileWrapper let:date let:region>
-  <CasesOverview {date} {region} />
-  <hr />
-  <AllIndicatorOverview {date} {region} />
-  <hr />
-  <HighlightIndicators {date} {region} />
-  <hr />
-  <IndicatorTable {date} {region} />
+  <div class="uk-container content-grid">
+    <div class="grid-3-11">
+      <CasesOverview {date} {region} />
+      <hr />
+      <AllIndicatorOverview {date} {region} />
+      <hr />
+      <HighlightIndicators {date} {region} />
+      <hr />
+      <IndicatorTable {date} {region} />
+    </div>
+  </div>
 </MobileWrapper>

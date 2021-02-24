@@ -77,6 +77,7 @@ function toTrendText(change) {
  * @property {boolean} isUnknown
  * @property {string} trendReason
  * @property {number} change
+ * @property {number} delta
  * @property {Date} refDate
  * @property {EpiDataRow} ref
  * @property {EpiDataRow} current
@@ -91,6 +92,7 @@ export const UNKNOWN_TREND = {
   isUnknown: true,
   trendReason: 'Unknown',
   change: Number.NaN,
+  delta: Number.NaN,
   refDate: new Date(),
   ref: null,
   min: null,
@@ -144,6 +146,7 @@ export function determineTrend(date, data, dateRow = findDateRow(date, data)) {
     isUnknown: false,
     trendReason,
     change,
+    delta: dateRow.value - refValue.value,
     refDate: refValue.date_value,
     current: dateRow,
     ref: refValue,

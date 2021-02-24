@@ -34,6 +34,25 @@
   text-transform: uppercase;
 }
 
+.mobile-root > .uk-container.mobile-invert-header {
+  background: #232735;
+  color: white;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.mobile-root > .uk-container.mobile-invert {
+  background: #232735;
+  color: white;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.mobile-invert-header h2,
+.mobile-invert h2 {
+  color: inherit;
+}
+
 .mobile-th {
   text-align: left;
   font-weight: 600;
@@ -119,7 +138,8 @@
 }
 
 .chart-150,
-.chart-300 {
+.chart-300,
+.chart-50 {
   position: relative;
 }
 
@@ -136,4 +156,36 @@
 .chart-250 > * {
   width: 100%;
   height: 250px;
+}
+
+.chart-50 > * {
+  width: 100%;
+  height: 50px;
+}
+
+.mobile-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-flow: row;
+  column-gap: 1em;
+  row-gap: 0.5em;
+  font-size: 0.75rem;
+}
+
+.mobile-two-col > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-two-col h3 {
+  font-size: 0.875rem;
+  margin: 0.6em 0;
+  text-align: left;
+  font-weight: normal;
+  flex-grow: 1;
+  line-height: 1.5rem;
+}
+
+.mobile-two-col .sub {
+  font-size: 0.75rem;
 }

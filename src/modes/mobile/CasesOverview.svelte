@@ -38,16 +38,13 @@
     align-items: flex-start;
     font-size: 0.75rem;
   }
-  .summary-stats > div {
-    margin-right: 2em;
-  }
 </style>
 
 <FancyHeader sub="Indicators" normal>COVIDcast</FancyHeader>
 
 <p>On <strong>average</strong> over the <strong>last 7 days</strong> there have been</p>
 
-<div class="summary-stats">
+<div class="mobile-two-col">
   <div>
     <div>
       {#await casesTrend}

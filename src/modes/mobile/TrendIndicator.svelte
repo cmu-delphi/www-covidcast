@@ -75,10 +75,9 @@
     {@html trendIcon}
   </span>
   <span>
-    {value}
     {#if long && trend != null}
       {trend.trend}
       <UiKitHint title={trend.trendReason} />
-    {/if}
+    {:else}{value}{/if}
   </span>
 </div>
