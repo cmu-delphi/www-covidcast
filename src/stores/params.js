@@ -218,7 +218,7 @@ export const DEATHS = createSensorParam(sensorList.find((d) => d.isCasesOrDeath 
 /**
  * @typedef {Region} RegionParam
  * @property {Region} value
- * @property {(Region) => void} set
+ * @property {(region: Region, scrollTop?: boolean) => void} set
  * @property {(sensor: Sensor, timeFrame: {range: string}) => Promise<EpiDataRow[]>} fetchTimeSeries
  * @property {(sensor: Sensor, sparkLine: {min: Date, max: Date}) => Promise<EpiDataRow[]>} fetchSparkLine
  * @property {(sensor: Sensor, timeFrame: {range: string}, date: Date) => Promise<import('./trend').Trend>} fetchTrend
@@ -262,8 +262,14 @@ export function createRegionParam(region) {
   return {
     ...region,
     value: region,
-    set: (region) => {
+    set: (region, scrollTop) => {
       currentRegion.set(region.propertyId);
+      if (scrollTop) {
+        window.scrollTo({
+          top: 0,
+          behavior: 'auto',
+        });
+      }
     },
     fetchTimeSeries(sensor, timeFrame) {
       const key = `${sensor.key}:${timeFrame.range}`;

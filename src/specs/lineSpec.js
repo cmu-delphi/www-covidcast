@@ -1,7 +1,7 @@
 import { CURRENT_DATE_HIGHLIGHT } from '../components/vegaSpecUtils';
 import { selectionColors } from '../theme';
 
-const COLOR = '#666666';
+export const COLOR = '#666666';
 
 export function patchHighlightTuple(current) {
   // patches the highlight signal,
@@ -9,6 +9,14 @@ export function patchHighlightTuple(current) {
   const updateCode = current.on[0].update;
   current.on[0].update = `patchPickedItem(event) && item().${updateCode.replace(/ datum/, ' item().datum')}`;
   return current;
+}
+
+export function resolveHighlightedDate(e) {
+  const highlighted = e.detail.value;
+  if (highlighted && Array.isArray(highlighted.date_value) && highlighted.date_value.length > 0) {
+    return new Date(highlighted.date_value[0]);
+  }
+  return null;
 }
 
 export const signalPatches = {
@@ -135,41 +143,35 @@ export function generateLineChartSpec({ height = 300, initialDate = null, valueF
             sample: 1,
           },
         ],
-        mark: {
-          type: 'rule',
-          stroke: COLOR,
-        },
-      },
-      {
-        transform: [
+        layer: [
           {
-            filter: {
-              selection: 'highlight',
+            mark: {
+              type: 'rule',
+              stroke: COLOR,
             },
           },
           {
-            sample: 1,
+            mark: {
+              type: 'text',
+              align: AUTO_ALIGN,
+              color: COLOR,
+              baseline: 'bottom',
+              fontSize: 14,
+              dy: -1,
+            },
+            encoding: {
+              text: {
+                field: 'date_value',
+                type: 'temporal',
+                format: '%b %d',
+                formatType: 'cachedTime',
+              },
+              y: {
+                value: 0,
+              },
+            },
           },
         ],
-        mark: {
-          type: 'text',
-          align: AUTO_ALIGN,
-          color: COLOR,
-          baseline: 'bottom',
-          fontSize: 14,
-          dy: -1,
-        },
-        encoding: {
-          text: {
-            field: 'date_value',
-            type: 'temporal',
-            format: '%b %d',
-            formatType: 'cachedTime',
-          },
-          y: {
-            value: 0,
-          },
-        },
       },
     ],
     config: {
@@ -184,7 +186,6 @@ export function generateLineChartSpec({ height = 300, initialDate = null, valueF
 
 export function generateCompareLineSpec(compare, { compareField = 'displayName', ...options } = {}) {
   const spec = generateLineChartSpec(options);
-  spec.padding.bottom = 50;
   spec.layer[0].encoding.color = {
     field: compareField,
     type: 'nominal',
@@ -192,15 +193,7 @@ export function generateCompareLineSpec(compare, { compareField = 'displayName',
       domain: compare,
       range: [COLOR, ...selectionColors],
     },
-    legend: {
-      direction: 'horizontal',
-      orient: 'bottom',
-      title: null,
-      symbolType: 'stroke',
-      symbolStrokeWidth: {
-        expr: `datum.label === "${compare[0]}" ? 3 : 1`,
-      },
-    },
+    legend: null,
   };
   spec.layer[0].encoding.strokeWidth = {
     condition: {

@@ -173,14 +173,6 @@
    * @type {import('vega-lite').TopLevelSpec}
    */
   $: spec = generateSparkLine({ highlightDate: true });
-
-  function changeRegion(r) {
-    region.set(r);
-    window.scrollTo({
-      top: 0,
-      behavior: 'auto',
-    });
-  }
 </script>
 
 <style>
@@ -239,7 +231,7 @@
           <a
             href="?region={r.propertyId}"
             class="uk-link-text"
-            on:click|preventDefault={() => changeRegion(r)}>{r.displayName}</a>
+            on:click|preventDefault={() => region.set(r, true)}>{r.displayName}</a>
         </td>
         <td>
           <TrendIndicator trend={r.trendObj} {sensor} />

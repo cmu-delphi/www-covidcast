@@ -168,22 +168,22 @@
   position: relative;
 }
 
-.chart-150 > * {
+.chart-150 > .vega-embed {
   width: 100%;
   height: 150px;
 }
 
-.chart-300 > * {
+.chart-300 > .vega-embed {
   width: 100%;
   height: 300px;
 }
 
-.chart-250 > * {
+.chart-250 > .vega-embed {
   width: 100%;
   height: 250px;
 }
 
-.chart-50 > * {
+.chart-50 > .vega-embed {
   width: 100%;
   height: 50px;
 }
