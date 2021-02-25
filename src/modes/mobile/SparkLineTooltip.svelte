@@ -1,5 +1,5 @@
 <script>
-  import { formatDateShort } from '../../formats';
+  import { formatDateShortWeekdayAbbr } from '../../formats';
 
   export let hidden = false;
   /**
@@ -32,7 +32,7 @@
 </style>
 
 <div aria-label="tooltip" class="tooltip" class:hidden>
-  <h5>{formatDateShort(item.date_value)}</h5>
+  <h5>{formatDateShortWeekdayAbbr(item.date_value)}</h5>
   <table>
     <tr>
       <th>{item.displayName}</th>

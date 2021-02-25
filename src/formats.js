@@ -7,6 +7,7 @@ const shortNumbers = timeFormat('%-m/%d');
 const iso = timeFormat('%Y-%m-%d');
 const local = timeFormat('%m/%d/%Y');
 const shortAbbrNth = timeFormat('%b %-d');
+const shortWeekdayAbbr = timeFormat('%a %b %-d');
 
 export function formatDateShortNumbers(date) {
   return !date ? '?' : shortNumbers(date);
@@ -18,6 +19,10 @@ export function formatDateShort(date) {
 
 export function formatDateShortAbbr(date) {
   return !date ? '?' : shortAbbr(date);
+}
+
+export function formatDateShortWeekdayAbbr(date) {
+  return !date ? '?' : shortWeekdayAbbr(date);
 }
 
 function nth(d) {

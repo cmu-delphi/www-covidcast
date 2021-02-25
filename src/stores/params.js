@@ -359,13 +359,13 @@ export class DateParam {
 
 export class SensorParam {
   /**
-   * @param {SensorEntry} sensor
+   * @param {Sensor} sensor
    */
   constructor(sensor) {
     this.key = sensor.key;
     this.value = sensor;
     this.isCasesOrDeath = sensor.isCasesOrDeath;
-    this.isPercentage = sensor.format == 'percent';
+    this.isPercentage = sensor.format == 'percent' || sensor.signal.includes('_prop');
     this.isInverted = isInverted(sensor);
   }
 
@@ -377,7 +377,7 @@ export class SensorParam {
   }
 
   /**
-   * @param {SensorEntry} date
+   * @param {Sensor} date
    */
   set(sensor) {
     currentSensor.set(sensor.key);

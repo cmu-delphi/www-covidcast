@@ -65,7 +65,7 @@ export function generateLineChartSpec({
         axis: {
           title: null,
           grid: false,
-          format: '%b %d',
+          format: '%a %b %d',
           formatType: 'cachedTime',
           labelFontSize: 14,
           // tickCount: {
@@ -171,7 +171,7 @@ export function generateLineChartSpec({
               text: {
                 field: 'date_value',
                 type: 'temporal',
-                format: '%b %d',
+                format: '%a %b %d',
                 formatType: 'cachedTime',
               },
               y: {

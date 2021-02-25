@@ -1,5 +1,5 @@
 <script>
-  import { formatDateShort } from '../../formats';
+  import { formatDateShortWeekdayAbbr } from '../../formats';
   import { levelMegaCounty } from '../../stores/constants';
 
   export let hidden = false;
@@ -55,7 +55,7 @@
   </h5>
   <table>
     <tr>
-      <th>{formatDateShort(item.date_value)}</th>
+      <th>{formatDateShortWeekdayAbbr(item.date_value)}</th>
       <td>{sensor.formatValue(item.value)}</td>
     </tr>
   </table>
