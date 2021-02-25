@@ -35,6 +35,12 @@ class TimeFrame {
     this.max = max;
     this.difference = timeDay.count(min, max);
     this.range = `${formatAPITime(min)}-${formatAPITime(max)}`;
+    /**
+     * @param {EpiDataRow} row
+     */
+    this.filter = (row) => {
+      return row.date_value >= this.min && row.date_value <= this.max;
+    };
   }
 
   /**
@@ -51,13 +57,6 @@ class TimeFrame {
     }
     const min = offset(max, -offsetFactor);
     return new TimeFrame(min, max);
-  }
-
-  /**
-   * @param {EpiDataRow} row
-   */
-  filter(row) {
-    return row.date_value >= this.min && row.date_value <= this.max;
   }
 }
 
@@ -227,7 +226,7 @@ export class SensorParam {
       const slice = regions.slice(i, Math.min(regions.length - 1, i + batchSize));
       data.push(
         fetchData(
-          this.sensor,
+          this.value,
           level,
           slice.map((d) => d.propertyId).join(','),
           timeFrame.range,
@@ -352,13 +351,12 @@ export class RegionParam {
 
 /**
  * @param {EpiDataRow[]} data
- * @param {{min: Date, max: Date}} sparkLine
+ * @param {TimeFrame} sparkLine
  * @param {Sensor} sensor
  * @returns {EpiDataRow[]}
  */
 export function extractSparkLine(data, sparkLine, sensor) {
-  const sub = data.filter((d) => d.date_value >= sparkLine.min && d.date_value <= sparkLine.max);
-  return fitRange(addMissing(sub, sensor), sensor, sparkLine.min, sparkLine.max);
+  return fitRange(addMissing(data.filter(sparkLine.filter), sensor), sensor, sparkLine.min, sparkLine.max);
 }
 
 /**

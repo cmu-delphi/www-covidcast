@@ -289,6 +289,42 @@ export function generateSparkLine({
       },
     },
     layer: [
+      {
+        transform: [
+          {
+            aggregate: [
+              {
+                op: 'min',
+                field: 'date_value',
+                as: 'date_value_min',
+              },
+              {
+                op: 'max',
+                field: 'date_value',
+                as: 'date_value_max',
+              },
+            ],
+          },
+          {
+            calculate: '[datum.date_value_min, datum.date_value_max]',
+            as: 'date_value',
+          },
+          {
+            flatten: ['date_value'],
+          },
+        ],
+        mark: {
+          type: 'rule',
+          tooltip: false,
+          color,
+        },
+        encoding: {
+          x: {
+            field: 'date_value',
+            type: 'temporal',
+          },
+        },
+      },
       highlightDate ? createSignalDateLabelHighlight() : CURRENT_DATE_HIGHLIGHT,
       {
         mark: {
