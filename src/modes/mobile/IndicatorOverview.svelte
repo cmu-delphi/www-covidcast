@@ -1,5 +1,6 @@
 <script>
   import Vega from '../../components/Vega.svelte';
+  import { formatDateShortNumbers } from '../../formats';
 
   import { generateSparkLine } from '../../specs/lineSpec';
   import SurveyValue from '../survey/SurveyValue.svelte';
@@ -28,10 +29,19 @@
   $: minMax = fetcher.fetchGlobalMinMax(sensor, region);
   $: trend = fetcher.fetchWindowTrend(sensor, region, date);
   $: sparkline = fetcher.fetchSparkLine(sensor, region, date);
-  $: spec = generateSparkLine({ highlightDate: true, domain: date.sparkLineTimeFrame.domain });
+  $: spec = generateSparkLine({ domain: date.sparkLineTimeFrame.domain });
 
   $: unit = sensor.isPercentage ? '% of pop.' : sensor.isCasesOrDeath ? 'per 100k people' : '?';
 </script>
+
+<style>
+  .date-range {
+    padding: 0 2px;
+    display: flex;
+    justify-content: space-between;
+    line-height: 1;
+  }
+</style>
 
 <p>Over the <strong>last 7 days</strong> there have been</p>
 
@@ -43,13 +53,19 @@
       <TrendIndicator trend={d} long {sensor} />
     {/await}
   </div>
-  <div class="chart-50">
-    <Vega
-      {spec}
-      data={sparkline}
-      tooltip={SparkLineTooltip}
-      tooltipProps={{ sensor: sensor.value }}
-      signals={{ currentDate: date.value }} />
+  <div>
+    <div class="chart-50">
+      <Vega
+        {spec}
+        data={sparkline}
+        tooltip={SparkLineTooltip}
+        tooltipProps={{ sensor: sensor.value }}
+        signals={{ currentDate: date.value }} />
+    </div>
+    <div class="date-range">
+      <span> {formatDateShortNumbers(date.sparkLineTimeFrame.min)} </span>
+      <span> {formatDateShortNumbers(date.sparkLineTimeFrame.max)} </span>
+    </div>
   </div>
   <div>
     <h3>Last 7 day average</h3>
