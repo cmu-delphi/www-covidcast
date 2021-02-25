@@ -20,7 +20,7 @@ export function formatTrendChange(change, enforceSign = false) {
  * @param {import("../../data").EpiDataRow[]} data
  * @returns {[import("../../data").EpiDataRow, import("../../data").EpiDataRow]}
  */
-function findMinMaxRow(data) {
+export function findMinMaxRow(data) {
   let min = null;
   let max = null;
   for (const row of data) {
@@ -34,7 +34,7 @@ function findMinMaxRow(data) {
       max = row;
     }
   }
-  return [min, max];
+  return { min, max };
 }
 
 /**
@@ -69,7 +69,7 @@ function toTrendText(change) {
 }
 
 /**
- * @typedef {object} Trend
+ * @typedef {object} TrendInfo
  * @property {string} trend
  * @property {boolean} isIncreasing
  * @property {boolean} isDecreasing
@@ -78,11 +78,33 @@ function toTrendText(change) {
  * @property {string} trendReason
  * @property {number} change
  * @property {number} delta
+ */
+
+/**
+ * @typedef {TrendInfo} Trend
  * @property {Date} refDate
  * @property {EpiDataRow} ref
  * @property {EpiDataRow} current
  * @property {EpiDataRow} min
+ * @property {EpiDataRow} max
+ * @property {TrendInfo} minTrend
+ * @property {TrendInfo} maxTrend
  */
+
+function computeTrend(ref, current, min) {
+  const change = toTrend(current, ref, min);
+  const [trendText, trendReason] = toTrendText(change);
+  return {
+    trend: trendText,
+    isIncreasing: trendText.startsWith('inc'),
+    isSteady: trendText === 'steady',
+    isDecreasing: trendText.startsWith('dec'),
+    isUnknown: false,
+    trendReason,
+    change,
+    delta: current - ref,
+  };
+}
 
 export const UNKNOWN_TREND = {
   trend: 'Unknown',
@@ -102,7 +124,8 @@ export const UNKNOWN_TREND = {
  * @param {Date} date
  * @param {import("../../data").EpiDataRow[]} data
  */
-export function determineTrend(date, data, dateRow = findDateRow(date, data)) {
+export function determineTrend(date, data) {
+  const dateRow = findDateRow(date, data);
   const refDate = timeDay.offset(date, -7);
 
   if (!dateRow || dateRow.value == null) {
@@ -125,7 +148,7 @@ export function determineTrend(date, data, dateRow = findDateRow(date, data)) {
       return acc;
     }, null);
   }
-  const [min, max] = findMinMaxRow(data);
+  const { min, max } = findMinMaxRow(data);
   if (!refValue) {
     // none found
     return {
@@ -136,21 +159,14 @@ export function determineTrend(date, data, dateRow = findDateRow(date, data)) {
       max,
     };
   }
-  const change = toTrend(dateRow.value, refValue.value, min.value);
-  const [trendText, trendReason] = toTrendText(change);
   return {
-    trend: trendText,
-    isIncreasing: trendText.startsWith('inc'),
-    isSteady: trendText === 'steady',
-    isDecreasing: trendText.startsWith('dec'),
-    isUnknown: false,
-    trendReason,
-    change,
-    delta: dateRow.value - refValue.value,
-    refDate: refValue.date_value,
-    current: dateRow,
+    ...computeTrend(refValue.value, dateRow.value, min.value),
+    refDate: refDate,
     ref: refValue,
+    current: dateRow,
     min,
     max,
+    minTrend: computeTrend(min.value, dateRow.value, min.value),
+    maxTrend: computeTrend(max.value, dateRow.value, min.value),
   };
 }

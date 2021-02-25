@@ -25,6 +25,7 @@
    */
   export let fetcher;
 
+  $: minMax = fetcher.fetchGlobalMinMax(sensor, region);
   $: trend = fetcher.fetchWindowTrend(sensor, region, date);
   $: sparkline = fetcher.fetchSparkLine(sensor, region, date);
   $: spec = generateSparkLine({ highlightDate: true, domain: date.sparkLineTimeFrame.domain });
@@ -65,7 +66,7 @@
     {#if sensor.isInverted}
       <h3>Record low</h3>
       <div>
-        {#await trend}
+        {#await minMax}
           N/A
         {:then d}
           <SurveyValue value={d && d.min ? d.min.value : null} factor={1} />
@@ -74,7 +75,7 @@
     {:else}
       <h3>Record high</h3>
       <div>
-        {#await trend}
+        {#await minMax}
           N/A
         {:then d}
           <SurveyValue value={d && d.max ? d.max.value : null} factor={1} />
