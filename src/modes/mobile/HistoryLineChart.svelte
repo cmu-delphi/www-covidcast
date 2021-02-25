@@ -89,7 +89,7 @@
 
     if (region.level === 'county') {
       const state = getInfoByName(region.state);
-      const stateData = fetcher.fetchTimeSeries(sensor, state, date.windowTimeFrame);
+      const stateData = fetcher.fetch1Sensor1RegionNDates(sensor, state, date.windowTimeFrame);
       const related = getRelatedCounties(region.value);
       const relatedData = fetcher
         .fetch1SensorNRegionsNDates(sensor, related, date.windowTimeFrame)
