@@ -20,6 +20,10 @@
    * @type {import("../../stores/params").RegionParam}
    */
   export let region;
+  /**
+   * @type {import("../../stores/params").DataFetcher}
+   */
+  export let fetcher;
 
   /**
    * @param {import("../../stores/params").SensorParam} sensor
@@ -30,11 +34,11 @@
     if (!region.value || !date.value) {
       return null;
     }
-    return region.fetchSparkLine(sensor, date.timeFrame, date.sparkLineTimeFrame);
+    return fetcher.fetchSparkLine(sensor, region, date);
   }
 
   $: data = loadSparkLine(sensor, date, region);
-  $: trend = region.fetchTrend(sensor, date.timeFrame, date);
+  $: trend = fetcher.fetchWindowTrend(sensor, region, date);
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */

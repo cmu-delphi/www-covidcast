@@ -14,6 +14,10 @@
    * @type {import("../../stores/params").RegionParam}
    */
   export let region;
+  /**
+   * @type {import("../../stores/params").DataFetcher}
+   */
+  export let fetcher;
 
   function computeDataSources() {
     const map = new Map();
@@ -110,7 +114,7 @@
         </tr>
         {#each group.sensors as sensor}
           {#if !selectedDatasource || selectedDatasource === 'all' || selectedDatasource === sensor.id}
-            <IndicatorTableRow sensor={new SensorParam(sensor)} {date} {region} />
+            <IndicatorTableRow sensor={new SensorParam(sensor)} {date} {region} {fetcher} />
           {/if}
         {/each}
       </tbody>
