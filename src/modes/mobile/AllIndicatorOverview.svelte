@@ -11,6 +11,10 @@
    * @type {import("../../stores/params").RegionParam}
    */
   export let region;
+  /**
+   * @type {import("../../stores/params").DataFetcher}
+   */
+  export let fetcher;
 
   /**
    * @param {import("../../stores/params").DateParam} date
@@ -20,7 +24,7 @@
     if (!date.value || !region.value) {
       return Promise.resolve(null);
     }
-    return Promise.all(sensorList.map((sensor) => region.fetchTrend(sensor, date.timeFrame, date))).then((trends) => {
+    return Promise.all(sensorList.map((sensor) => fetcher.fetchWindowTrend(sensor, region, date))).then((trends) => {
       const positive = [];
       const negative = [];
       trends.forEach((trend, i) => {

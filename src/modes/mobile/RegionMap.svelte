@@ -19,6 +19,10 @@
    * @type {import("../../stores/params").SensorParam}
    */
   export let sensor;
+  /**
+   * @type {import("../../stores/params").DataFetcher}
+   */
+  export let fetcher;
 
   export let height = 300;
 
@@ -57,18 +61,19 @@
   function loadData(sensor, date, region) {
     if (region.level === 'state') {
       const counties = getCountiesOfState(region.value);
-      const countyData = date.fetchMultiRegions(
+      const countyData = fetcher.fetch1SensorNRegions1Date(
         sensor,
         'county',
         `${region.id}000,${counties.map((d) => d.id).join(',')}`,
+        date,
       );
-      const stateData = date.fetchMultiRegions(sensor, 'state', '*');
+      const stateData = fetcher.fetch1SensorNRegions1Date(sensor, 'state', '*', date);
       return Promise.all([countyData, stateData]).then((r) => r.flat());
     }
     if (region.level === 'county') {
-      return date.fetchMultiRegions(sensor, 'county', '*');
+      return fetcher.fetch1SensorNRegions1Date(sensor, 'county', '*', date);
     }
-    return date.fetchMultiRegions(sensor, 'state', '*');
+    return fetcher.fetch1SensorNRegions1Date(sensor, 'state', '*', date);
   }
 
   $: spec = genSpec($stats, sensor, region, height);

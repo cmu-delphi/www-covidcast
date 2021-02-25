@@ -95,8 +95,8 @@
       <th class="mobile-th uk-text-right">
         <span>historical trend</span>
         <div class="mobile-th-range">
-          <span> {formatDateShortNumbers(date.sparkLine.min)} </span>
-          <span> {formatDateShortNumbers(date.sparkLine.max)} </span>
+          <span> {formatDateShortNumbers(date.sparkLineTimeFrame.min)} </span>
+          <span> {formatDateShortNumbers(date.sparkLineTimeFrame.max)} </span>
         </div>
       </th>
       <th class="mobile-th" />

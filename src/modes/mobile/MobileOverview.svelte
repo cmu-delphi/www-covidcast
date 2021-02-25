@@ -6,16 +6,16 @@
   import AllIndicatorOverview from './AllIndicatorOverview.svelte';
 </script>
 
-<MobileWrapper let:date let:region>
+<MobileWrapper let:date let:region let:fetcher>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <CasesOverview {date} {region} />
+      <CasesOverview {date} {region} {fetcher} />
       <hr />
-      <AllIndicatorOverview {date} {region} />
+      <AllIndicatorOverview {date} {region} {fetcher} />
       <hr />
-      <HighlightIndicators {date} {region} />
+      <HighlightIndicators {date} {region} {fetcher} />
       <hr />
-      <IndicatorTable {date} {region} />
+      <IndicatorTable {date} {region} {fetcher} />
     </div>
   </div>
 </MobileWrapper>

@@ -30,7 +30,7 @@
     if (!region.value || !date.value) {
       return null;
     }
-    return region.fetchSparkLine(sensor, date.timeFrame, date.sparkLine);
+    return region.fetchSparkLine(sensor, date.timeFrame, date.sparkLineTimeFrame);
   }
 
   $: data = loadSparkLine(sensor, date, region);
@@ -38,7 +38,7 @@
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
-  $: spec = generateSparkLine({ highlightDate: true });
+  $: spec = generateSparkLine({ highlightDate: true, domain: date.sparkLineTimeFrame.domain });
 
   function switchMode() {
     sensor.set(sensor.value);

@@ -20,10 +20,14 @@
    * @type {import("../../stores/params").RegionParam}
    */
   export let region;
+  /**
+   * @type {import("../../stores/params").DataFetcher}
+   */
+  export let fetcher;
 
-  $: trend = region.fetchTrend(sensor, date.timeFrame, date);
-  $: sparkline = region.fetchSparkLine(sensor, date.timeFrame, date.sparkLine);
-  const spec = generateSparkLine({ highlightDate: true });
+  $: trend = fetcher.fetchWindowTrend(sensor, region, date);
+  $: sparkline = fetcher.fetchSparkLine(sensor, region, date);
+  $: spec = generateSparkLine({ highlightDate: true, domain: date.sparkLineTimeFrame.domain });
 
   $: unit = sensor.isPercentage ? '% of pop.' : sensor.isCasesOrDeath ? 'per 100k people' : '?';
 </script>

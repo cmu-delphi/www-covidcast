@@ -13,6 +13,10 @@
    * @type {import("../../stores/params").RegionParam}
    */
   export let region;
+  /**
+   * @type {import("../../stores/params").DataFetcher}
+   */
+  export let fetcher;
 
   const highlights = [
     sensorMap.get('fb-survey-smoothed_hh_cmnty_cli'),
@@ -21,7 +25,7 @@
 
   $: highlightSurveySensors = highlights.map((h) => ({
     sensor: new SensorParam(h),
-    trend: region.fetchTrend(h, date.timeFrame, date),
+    trend: fetcher.fetchWindowTrend(h, region, date),
   }));
 </script>
 

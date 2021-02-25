@@ -24,6 +24,10 @@
    * @type {import("../../stores/params").SensorParam}
    */
   export let sensor;
+  /**
+   * @type {import("../../stores/params").DataFetcher}
+   */
+  export let fetcher;
 
   /**
    * @param {import("../../stores/params").Region} region
@@ -68,11 +72,11 @@
         trendObj: trend,
         trend: trend.change,
         value: trend.current ? trend.current.value : null,
-        data: data.length > 0 ? extractSparkLine(data, date.sparkLine, sensor.value) : [],
+        data: data.length > 0 ? extractSparkLine(data, date.sparkLineTimeFrame, sensor.value) : [],
       };
     }
     function loadImpl(regions) {
-      return sensor.fetchMultiTimeSeries(regions, date.timeFrame).then((data) => {
+      return fetcher.fetch1SensorNRegionsNDates(sensor, regions, date.windowTimeFrame).then((data) => {
         const groups = groupByRegion(data);
         return regions.map((region) => {
           const data = groups.get(region.propertyId) || [];
@@ -81,11 +85,9 @@
       });
     }
     function loadSingle(r, important = false) {
-      if (r.id === region.id) {
-        // use cached
-        return region.fetchTimeSeries(sensor, date.timeFrame).then((rows) => toGeoTableRow(r, rows, important));
-      }
-      return sensor.fetchTimeSeries(r, date.timeFrame).then((rows) => toGeoTableRow(r, rows, important));
+      return fetcher
+        .fetch1Sensor1RegionNDates(sensor, r, date.windowTimeFrame)
+        .then((rows) => toGeoTableRow(r, rows, important));
     }
 
     if (region.level === 'state') {
@@ -172,7 +174,7 @@
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
-  $: spec = generateSparkLine({ highlightDate: true });
+  $: spec = generateSparkLine({ highlightDate: true, domain: date.sparkLineTimeFrame.domain });
 </script>
 
 <style>
@@ -194,8 +196,8 @@
       <th class="mobile-th uk-text-right mobile-th-blue">
         <span>historical trend</span>
         <div class="mobile-th-range">
-          <span> {formatDateShortNumbers(date.sparkLine.min)} </span>
-          <span> {formatDateShortNumbers(date.sparkLine.max)} </span>
+          <span> {formatDateShortNumbers(date.sparkLineTimeFrame.min)} </span>
+          <span> {formatDateShortNumbers(date.sparkLineTimeFrame.max)} </span>
         </div>
       </th>
     </tr>

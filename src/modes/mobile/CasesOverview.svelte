@@ -13,9 +13,13 @@
    * @type {import("../../stores/params").RegionParam}
    */
   export let region;
+  /**
+   * @type {import("../../stores/params").DataFetcher}
+   */
+  export let fetcher;
 
-  $: casesTrend = region.fetchTrend(CASES, date.timeFrame, date);
-  $: deathTrend = region.fetchTrend(DEATHS, date.timeFrame, date);
+  $: casesTrend = fetcher.fetchWindowTrend(CASES, region, date);
+  $: deathTrend = fetcher.fetchWindowTrend(DEATHS, region, date);
 </script>
 
 <style>

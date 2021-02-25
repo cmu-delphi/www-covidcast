@@ -51,7 +51,7 @@
   }
 </style>
 
-<MobileWrapper let:sensor let:region let:date>
+<MobileWrapper let:sensor let:region let:date let:fetcher>
   <div class="uk-container content-grid mobile-invert-header">
     <div class="grid-3-11 header-line">
       <button class="back inline-svg-icon" on:click={switchMode}>
@@ -63,25 +63,25 @@
   <div class="uk-container content-grid">
     <div class="grid-3-11">
       <IndicatorDropdown {sensor} />
-      <IndicatorOverview {sensor} {date} {region} />
+      <IndicatorOverview {sensor} {date} {region} {fetcher} />
       <RegionOverview {region} />
 
       <FancyHeader sub="Map">Indicator</FancyHeader>
       <div class="chart-250">
-        <RegionMap {sensor} {date} {region} />
+        <RegionMap {sensor} {date} {region} {fetcher} />
       </div>
 
       <FancyHeader>Performance</FancyHeader>
 
       <div class="chart-150">
-        <HistoryLineChart {sensor} {date} {region} />
+        <HistoryLineChart {sensor} {date} {region} {fetcher} />
       </div>
     </div>
   </div>
   <IndicatorAbout {sensor} />
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <GeoTable {sensor} {region} {date} />
+      <GeoTable {sensor} {region} {date} {fetcher} />
     </div>
   </div>
 </MobileWrapper>

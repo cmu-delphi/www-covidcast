@@ -29,6 +29,10 @@
    * @type {import("../../stores/params").SensorParam}
    */
   export let sensor;
+  /**
+   * @type {import("../../stores/params").DataFetcher}
+   */
+  export let fetcher;
 
   /**
    * @type {import("../../stores/params").Region}
@@ -64,7 +68,7 @@
       );
     }
     // nation
-    return generateLineChartSpec({ initialDate: date });
+    return generateLineChartSpec(options);
   }
 
   /**
@@ -76,19 +80,19 @@
     if (!region.value || !date.value) {
       return null;
     }
-    const selfData = region.fetchTimeSeries(sensor, date.timeFrame);
+    const selfData = fetcher.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame);
 
     const data = [selfData];
     if (region.level !== 'nation') {
-      data.push(sensor.fetchTimeSeries(nationInfo, date.timeFrame));
+      data.push(fetcher.fetch1Sensor1RegionNDates(sensor, nationInfo, date.windowTimeFrame));
     }
 
     if (region.level === 'county') {
       const state = getInfoByName(region.state);
-      const stateData = sensor.fetchTimeSeries(state, date.timeFrame);
+      const stateData = fetcher.fetchTimeSeries(sensor, state, date.windowTimeFrame);
       const related = getRelatedCounties(region.value);
-      const relatedData = sensor
-        .fetchMultiTimeSeries(related, date.timeFrame)
+      const relatedData = fetcher
+        .fetch1SensorNRegionsNDates(sensor, related, date.windowTimeFrame)
         .then((r) => averageByDate(r, sensor, related))
         .then((r) => addMissing(r, sensor));
       data.push(stateData, relatedData);
@@ -135,7 +139,7 @@
     if (!row) {
       return 'N/A';
     }
-    return sensor.value.formatValue(row.value);
+    return sensor.formatValue(row.value);
   }
 </script>
 

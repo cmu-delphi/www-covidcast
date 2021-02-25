@@ -37,7 +37,13 @@ const AUTO_ALIGN = {
     "(width - scale('x', datum.date_value)) < 40 ? 'right' : (scale('x', datum.date_value)) > 40 ? 'center' : 'left'",
 };
 
-export function generateLineChartSpec({ height = 300, initialDate = null, valueField = 'value', zero = false } = {}) {
+export function generateLineChartSpec({
+  height = 300,
+  domain,
+  initialDate = null,
+  valueField = 'value',
+  zero = false,
+} = {}) {
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
@@ -66,7 +72,9 @@ export function generateLineChartSpec({ height = 300, initialDate = null, valueF
           //   interval: 'day',
           // },
         },
-        scale: {},
+        scale: {
+          domain,
+        },
       },
     },
     layer: [
@@ -290,29 +298,37 @@ export function generateSparkLine({
     },
     layer: [
       {
-        transform: [
-          {
-            aggregate: [
-              {
-                op: 'min',
-                field: 'date_value',
-                as: 'date_value_min',
+        ...(domain
+          ? {
+              data: {
+                values: [{ date_value: domain[0] }, { date_value: domain[1] }],
               },
-              {
-                op: 'max',
-                field: 'date_value',
-                as: 'date_value_max',
-              },
-            ],
-          },
-          {
-            calculate: '[datum.date_value_min, datum.date_value_max]',
-            as: 'date_value',
-          },
-          {
-            flatten: ['date_value'],
-          },
-        ],
+            }
+          : {
+              transform: [
+                {
+                  aggregate: [
+                    {
+                      op: 'min',
+                      field: 'date_value',
+                      as: 'date_value_min',
+                    },
+                    {
+                      op: 'max',
+                      field: 'date_value',
+                      as: 'date_value_max',
+                    },
+                  ],
+                },
+                {
+                  calculate: '[datum.date_value_min, datum.date_value_max]',
+                  as: 'date_value',
+                },
+                {
+                  flatten: ['date_value'],
+                },
+              ],
+            }),
         mark: {
           type: 'rule',
           tooltip: false,
