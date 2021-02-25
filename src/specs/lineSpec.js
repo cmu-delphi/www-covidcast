@@ -68,6 +68,7 @@ export function generateLineChartSpec({
           format: '%a %b %d',
           formatType: 'cachedTime',
           labelFontSize: 14,
+          labelOverlap: true,
           tickCount: {
             interval: 'week',
           },

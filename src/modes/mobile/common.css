@@ -74,7 +74,7 @@
 .mobile-th-range {
   color: initial;
   position: relative;
-  margin-top: 5px;
+  margin: 5px 4px 0 4px;
   padding: 2px 2px 0 2px;
   display: flex;
   justify-content: space-between;
