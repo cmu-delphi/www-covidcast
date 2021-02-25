@@ -10,11 +10,11 @@
 </script>
 
 {#if region.level === 'state'}
-  <FancyHeader normal>{region.value.displayName} state meta data</FancyHeader>
+  <FancyHeader normal>{region.displayName} state meta data</FancyHeader>
   <div class="mobile-two-col">
     <div>
       <h3>State population</h3>
-      <div>{formatPopulation(region)}</div>
+      <div>{formatPopulation(region.value)}</div>
     </div>
     <div>
       <h3>Counties</h3>
@@ -32,11 +32,11 @@
     </div>
   </div>
 {:else if region.level === 'county'}
-  <FancyHeader normal>{region.value.displayName} meta data</FancyHeader>
+  <FancyHeader normal>{region.displayName} meta data</FancyHeader>
   <div class="mobile-two-col">
     <div>
       <h3>County population</h3>
-      <div>{formatPopulation(region)}</div>
+      <div>{formatPopulation(region.value)}</div>
     </div>
   </div>
 {/if}

@@ -83,7 +83,7 @@
     function loadSingle(r, important = false) {
       if (r.id === region.id) {
         // use cached
-        return region.fetchTimeSeries(sensor.value, date.timeFrame).then((rows) => toGeoTableRow(r, rows, important));
+        return region.fetchTimeSeries(sensor, date.timeFrame).then((rows) => toGeoTableRow(r, rows, important));
       }
       return sensor.fetchTimeSeries(r, date.timeFrame).then((rows) => toGeoTableRow(r, rows, important));
     }

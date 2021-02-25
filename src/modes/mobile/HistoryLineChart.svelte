@@ -76,7 +76,7 @@
     if (!region.value || !date.value) {
       return null;
     }
-    const selfData = region.fetchTimeSeries(sensor.value, date.timeFrame);
+    const selfData = region.fetchTimeSeries(sensor, date.timeFrame);
 
     const data = [selfData];
     if (region.level !== 'nation') {

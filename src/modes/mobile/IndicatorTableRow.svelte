@@ -3,12 +3,12 @@
   import Vega from '../../components/Vega.svelte';
   import SparkLineTooltip from './SparkLineTooltip.svelte';
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
-  import { currentMode, currentSensor } from '../../stores';
+  import { currentMode } from '../../stores';
   import { modeByID } from '..';
   import TrendIndicator from './TrendIndicator.svelte';
 
   /**
-   * @type {import('../../stores/constants').SensorEntry}
+   * @type {import("../../stores/params").SensorParam}
    */
   export let sensor;
 
@@ -30,18 +30,18 @@
     if (!region.value || !date.value) {
       return null;
     }
-    return region.fetchSparkLine(sensor.value, date.timeFrame, date.sparkLine);
+    return region.fetchSparkLine(sensor, date.timeFrame, date.sparkLine);
   }
 
   $: data = loadSparkLine(sensor, date, region);
-  $: trend = region.fetchTrend(sensor.value, date.timeFrame, date.value);
+  $: trend = region.fetchTrend(sensor, date.timeFrame, date);
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
   $: spec = generateSparkLine({ highlightDate: true });
 
   function switchMode() {
-    currentSensor.set(sensor.value.key);
+    sensor.set(sensor.value);
     currentMode.set(modeByID.indicator);
   }
 </script>
@@ -60,7 +60,7 @@
 
 <tr class="has-addon">
   <td>
-    <a href="?mode=indicator&sensor={sensor.value.key}" class="uk-link-text" on:click|preventDefault={switchMode}>
+    <a href="?mode=indicator&sensor={sensor.key}" class="uk-link-text" on:click|preventDefault={switchMode}>
       {sensor.value.name}
     </a>
   </td>
@@ -72,7 +72,7 @@
     {/await}
   </td>
   <td class="uk-text-right">
-    {#await trend}?{:then t}{t && t.current ? sensor.value.formatValue(t.current.value) : 'N/A'}{/await}
+    {#await trend}?{:then t}{t && t.current ? sensor.formatValue(t.current.value) : 'N/A'}{/await}
   </td>
   <td rowspan="2">
     <div class="mobile-table-chart">

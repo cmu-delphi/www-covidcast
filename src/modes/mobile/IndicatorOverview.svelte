@@ -21,8 +21,8 @@
    */
   export let region;
 
-  $: trend = region.fetchTrend(sensor.value, date.timeFrame, date.value);
-  $: sparkline = region.fetchSparkLine(sensor.value, date.timeFrame, date.sparkLine);
+  $: trend = region.fetchTrend(sensor, date.timeFrame, date);
+  $: sparkline = region.fetchSparkLine(sensor, date.timeFrame, date.sparkLine);
   const spec = generateSparkLine({ highlightDate: true });
 
   $: unit = sensor.isPercentage ? '% of pop.' : sensor.isCasesOrDeath ? 'per 100k people' : '?';

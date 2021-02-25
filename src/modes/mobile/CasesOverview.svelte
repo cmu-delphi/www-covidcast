@@ -14,8 +14,8 @@
    */
   export let region;
 
-  $: casesTrend = region.fetchTrend(CASES.value, date.timeFrame, date.value);
-  $: deathTrend = region.fetchTrend(DEATHS.value, date.timeFrame, date.value);
+  $: casesTrend = region.fetchTrend(CASES, date.timeFrame, date);
+  $: deathTrend = region.fetchTrend(DEATHS, date.timeFrame, date);
 </script>
 
 <style>

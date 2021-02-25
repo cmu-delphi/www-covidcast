@@ -36,7 +36,6 @@
         {},
         false,
       ),
-      legendTitle: sensor.isCasesOrDeath ? `${sensor.value.yAxis} per 100,000` : sensor.value.yAxis,
       withStates: true,
       scheme: sensor.isInverted ? 'yellowgreenblue' : 'yelloworangered',
     };
@@ -59,17 +58,17 @@
     if (region.level === 'state') {
       const counties = getCountiesOfState(region.value);
       const countyData = date.fetchMultiRegions(
-        sensor.value,
+        sensor,
         'county',
         `${region.id}000,${counties.map((d) => d.id).join(',')}`,
       );
-      const stateData = date.fetchMultiRegions(sensor.value, 'state', '*');
+      const stateData = date.fetchMultiRegions(sensor, 'state', '*');
       return Promise.all([countyData, stateData]).then((r) => r.flat());
     }
     if (region.level === 'county') {
-      return date.fetchMultiRegions(sensor.value, 'county', '*');
+      return date.fetchMultiRegions(sensor, 'county', '*');
     }
-    return date.fetchMultiRegions(sensor.value, 'state', '*');
+    return date.fetchMultiRegions(sensor, 'state', '*');
   }
 
   $: spec = genSpec($stats, sensor, region, height);

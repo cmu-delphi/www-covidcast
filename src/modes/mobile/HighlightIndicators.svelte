@@ -3,7 +3,7 @@
   import SurveyValue from '../survey/SurveyValue.svelte';
   import FancyHeader from './FancyHeader.svelte';
   import TrendIndicator from './TrendIndicator.svelte';
-  import { createSensorParam } from '../../stores/params';
+  import { SensorParam } from '../../stores/params';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -20,8 +20,8 @@
   ].filter(Boolean);
 
   $: highlightSurveySensors = highlights.map((h) => ({
-    sensor: createSensorParam(h),
-    trend: region.fetchTrend(h, date.timeFrame, date.value),
+    sensor: new SensorParam(h),
+    trend: region.fetchTrend(h, date.timeFrame, date),
   }));
 </script>
 

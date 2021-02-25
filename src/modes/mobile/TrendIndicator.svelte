@@ -1,8 +1,8 @@
 <script>
-  import Down from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/caret-square-down.svg';
-  import Up from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/caret-square-up.svg';
-  import Steady from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/caret-square-right.svg';
-  import Unknown from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/minus-square.svg';
+  import Down from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-down.svg';
+  import Up from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-up.svg';
+  import Steady from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-right.svg';
+  import Unknown from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
   import UiKitHint from '../../components/UIKitHint.svelte';
 
   /**
@@ -21,7 +21,7 @@
 
   $: value =
     trend && trend.delta != null && !Number.isNaN(trend.delta)
-      ? `${trend.delta > 0 ? '+' : ''}${sensor.value.formatValue(trend.delta)}`
+      ? `${trend.delta > 0 ? '+' : ''}${sensor.formatValue(trend.delta)}`
       : 'N/A';
 
   $: {

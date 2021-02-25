@@ -2,7 +2,7 @@
   import { groupedSensorList, sensorList } from '../../stores/constants';
   import IndicatorTableRow from './IndicatorTableRow.svelte';
   import FancyHeader from './FancyHeader.svelte';
-  import { createSensorParam } from '../../stores/params';
+  import { SensorParam } from '../../stores/params';
   import { formatDateShortNumbers } from '../../formats';
   import filterIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/filter.svg';
 
@@ -110,7 +110,7 @@
         </tr>
         {#each group.sensors as sensor}
           {#if !selectedDatasource || selectedDatasource === 'all' || selectedDatasource === sensor.id}
-            <IndicatorTableRow sensor={createSensorParam(sensor)} {date} {region} />
+            <IndicatorTableRow sensor={new SensorParam(sensor)} {date} {region} />
           {/if}
         {/each}
       </tbody>

@@ -1,12 +1,12 @@
 <script>
   import { currentRegionInfo, currentSensorEntry, currentDateObject } from '../../stores';
   import MobileParameters from './MobileParameters.svelte';
-  import { createSensorParam, createDateParam, createRegionParam } from '../../stores/params';
+  import { SensorParam, DateParam, RegionParam } from '../../stores/params';
   import './common.css';
 
-  $: sensor = createSensorParam($currentSensorEntry);
-  $: date = createDateParam($currentDateObject);
-  $: region = createRegionParam($currentRegionInfo);
+  $: sensor = new SensorParam($currentSensorEntry);
+  $: date = new DateParam($currentDateObject);
+  $: region = new RegionParam($currentRegionInfo);
 </script>
 
 <div class="mobile-root">
