@@ -49,7 +49,7 @@ export function generateLineChartSpec({
    */
   const spec = {
     height,
-    padding: { left: 42, top: 16, bottom: 20, right: 10 },
+    padding: { left: 42, top: 16, bottom: 20, right: 15 },
     autosize: {
       type: 'none',
       contains: 'padding',
@@ -68,9 +68,9 @@ export function generateLineChartSpec({
           format: '%a %b %d',
           formatType: 'cachedTime',
           labelFontSize: 14,
-          // tickCount: {
-          //   interval: 'day',
-          // },
+          tickCount: {
+            interval: 'week',
+          },
         },
         scale: {
           domain,
