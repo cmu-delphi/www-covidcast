@@ -31,11 +31,13 @@
   {#each highlightSurveySensors as s}
     <div>
       <h3>{s.sensor.value.name}</h3>
-      {#await s.trend}
-        <TrendIndicator trend={null} long sensor={s.sensor} />
-      {:then d}
-        <TrendIndicator trend={d} long sensor={s.sensor} />
-      {/await}
+      <div>
+        {#await s.trend}
+          <TrendIndicator trend={null} long sensor={s.sensor} />
+        {:then d}
+          <TrendIndicator trend={d} long sensor={s.sensor} />
+        {/await}
+      </div>
       <div>
         {#await s.trend}
           N/A

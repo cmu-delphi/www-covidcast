@@ -66,9 +66,9 @@
   </td>
   <td>
     {#await trend}
-      <TrendIndicator trend={null} {sensor} />
+      <TrendIndicator trend={null} {sensor} block />
     {:then d}
-      <TrendIndicator trend={d} {sensor} />
+      <TrendIndicator trend={d} {sensor} block />
     {/await}
   </td>
   <td class="uk-text-right">

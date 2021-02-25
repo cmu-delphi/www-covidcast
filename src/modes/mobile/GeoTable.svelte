@@ -234,7 +234,7 @@
             on:click|preventDefault={() => region.set(r, true)}>{r.displayName}</a>
         </td>
         <td>
-          <TrendIndicator trend={r.trendObj} {sensor} />
+          <TrendIndicator trend={r.trendObj} {sensor} block />
         </td>
         <td class="uk-text-right">{r.value == null ? 'N/A' : sensor.value.formatValue(r.value)}</td>
         <td>
