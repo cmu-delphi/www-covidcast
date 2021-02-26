@@ -1,8 +1,8 @@
 <script>
   import Vega from '../../components/Vega.svelte';
-  import { formatDateShortNumbers } from '../../formats';
-
+  import { formatDateShortNumbers, formatDateShortWeekdayAbbr } from '../../formats';
   import { generateSparkLine } from '../../specs/lineSpec';
+  import { WINDOW_SIZE } from '../../stores/params';
   import SurveyValue from '../survey/SurveyValue.svelte';
   import SparkLineTooltip from './SparkLineTooltip.svelte';
 
@@ -26,15 +26,31 @@
    */
   export let fetcher;
 
-  $: minMax = fetcher.fetchGlobalMinMax(sensor, region);
+  $: globalTrend = fetcher.fetchGlobalTrend(sensor, region, date);
   $: trend = fetcher.fetchWindowTrend(sensor, region, date);
   $: sparkline = fetcher.fetchSparkLine(sensor, region, date);
   $: spec = generateSparkLine({ domain: date.sparkLineTimeFrame.domain });
 
-  $: unit = sensor.isPercentage ? '% of pop.' : sensor.isCasesOrDeath ? 'per 100k people' : '?';
+  function trendAlternative(trend) {
+    if (!trend || trend.isUnknown) {
+      return '?';
+    }
+    const value = sensor.formatValue(trend.delta);
+    if (trend.isBetter) {
+      return `better by ${value}`;
+    }
+    if (trend.isWorse) {
+      return `worse by ${value}`;
+    }
+    return `around the same with ${value}`;
+  }
 </script>
 
 <style>
+  p {
+    margin-top: 1em;
+  }
+
   .date-range {
     padding: 0 2px;
     display: flex;
@@ -43,15 +59,18 @@
   }
 </style>
 
-<p>Over the <strong>last 7 days</strong> there have been</p>
+<p>On {formatDateShortWeekdayAbbr(date.value, true)} the number of people:</p>
 
 <div class="mobile-two-col">
   <div>
-    {#await trend}
-      <TrendIndicator trend={null} long {sensor} />
-    {:then d}
-      <TrendIndicator trend={d} long {sensor} />
-    {/await}
+    <div>
+      {#await trend}
+        N/A
+      {:then d}
+        <SurveyValue value={d && d.current ? d.current.value : null} digits={sensor.isPercentage ? 2 : 1} />
+      {/await}
+    </div>
+    <div class="sub">{sensor.unit}</div>
   </div>
   <div>
     <div class="chart-50">
@@ -67,37 +86,27 @@
       <span> {formatDateShortNumbers(date.sparkLineTimeFrame.max)} </span>
     </div>
   </div>
-  <div>
-    <h3>Last 7 day average</h3>
-    <div>
-      {#await trend}
-        N/A
-      {:then d}
-        <SurveyValue value={d && d.current ? d.current.value : null} factor={1} />
-      {/await}
-    </div>
-    <div class="sub">{unit}</div>
-  </div>
-  <div>
-    {#if sensor.isInverted}
-      <h3>Record low</h3>
-      <div>
-        {#await minMax}
-          N/A
-        {:then d}
-          <SurveyValue value={d && d.min ? d.min.value : null} factor={1} />
-        {/await}
-      </div>
-    {:else}
-      <h3>Record high</h3>
-      <div>
-        {#await minMax}
-          N/A
-        {:then d}
-          <SurveyValue value={d && d.max ? d.max.value : null} factor={1} />
-        {/await}
-      </div>
-    {/if}
-    <div class="sub">{unit}</div>
-  </div>
 </div>
+
+<p>Compared to the previous week that results in:</p>
+<div>
+  {#await trend}
+    <TrendIndicator trend={null} long {sensor} />
+  {:then d}
+    <TrendIndicator trend={d} long {sensor} />
+  {/await}
+</div>
+
+<p>
+  {#await globalTrend then d}
+    On
+    {formatDateShortWeekdayAbbr(date.value, true)}
+    <strong>{sensor.value.name}</strong>
+    was
+    <strong>{trendAlternative(d.worstTrend)}</strong>
+    compared to the
+    <strong>{WINDOW_SIZE} month worst value of {sensor.formatValue(d.worst ? d.worst.value : null)}</strong>
+    on
+    <strong>{formatDateShortWeekdayAbbr(d.worstDate, true)}</strong>.
+  {/await}
+</p>

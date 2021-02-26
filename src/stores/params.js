@@ -4,6 +4,7 @@ import { nationInfo } from '../maps';
 import { currentDate, currentRegion, yesterdayDate, currentSensor, sensorList } from '.';
 import { determineTrend, findMinMaxRow } from './trend';
 import { determineMinMax } from '../components/MapBox/colors';
+import { formatPercentage } from '../formats';
 
 /**
  * @typedef {import('./constants').SensorEntry} Sensor
@@ -17,6 +18,9 @@ import { determineMinMax } from '../components/MapBox/colors';
 /**
  * @typedef {import('./trend').Trend} Trend
  */
+
+export const WINDOW_SIZE = 4; // months;
+export const SPARKLINE_SIZE = 4; // weeks;
 
 /**
  * @param {Date} date
@@ -289,7 +293,7 @@ export class DataFetcher {
       return this.cache.get(key);
     }
     const trend = this.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame).then((rows) =>
-      determineTrend(date.value, rows),
+      determineTrend(date.value, rows, sensor.isInverted),
     );
     this.cache.set(key, trend);
     return trend;
@@ -310,7 +314,7 @@ export class DataFetcher {
       return this.cache.get(key);
     }
     const trend = this.fetch1Sensor1RegionNDates(sensor, region, ALL_TIME_FRAME).then((rows) =>
-      determineTrend(date, rows),
+      determineTrend(date, rows, sensor.isInverted),
     );
     this.cache.set(key, trend);
     return trend;
@@ -349,8 +353,8 @@ export class DateParam {
     if (entry) {
       this.sensorTimeFrame = new TimeFrame(parseAPITime(entry[0]), parseAPITime(entry[1]));
     }
-    this.sparkLineTimeFrame = TimeFrame.compute(date, timeWeek.offset, 4, this.sensorTimeFrame.max);
-    this.windowTimeFrame = TimeFrame.compute(date, timeMonth.offset, 4, this.sensorTimeFrame.max);
+    this.sparkLineTimeFrame = TimeFrame.compute(date, timeWeek.offset, SPARKLINE_SIZE, this.sensorTimeFrame.max);
+    this.windowTimeFrame = TimeFrame.compute(date, timeMonth.offset, WINDOW_SIZE, this.sensorTimeFrame.max);
   }
 
   /**
@@ -374,18 +378,14 @@ export class SensorParam {
    */
   constructor(sensor) {
     this.key = sensor.key;
+    this.name = sensor.name;
     this.value = sensor;
     this.isCasesOrDeath = sensor.isCasesOrDeath;
-    this.isPercentage = sensor.format == 'percent' || sensor.signal.includes('_prop');
-    this.isInverted = isInverted(sensor);
     this.factor = sensorFactor(sensor);
-  }
-
-  formatValue(value) {
-    if (value == null || Number.isNaN(value)) {
-      return 'N/A';
-    }
-    return this.value.formatValue(value);
+    this.isPercentage = sensor.format == 'percent' || this.factor > 1;
+    this.isInverted = isInverted(sensor);
+    this.formatValue = this.isPercentage ? formatPercentage : sensor.formatValue;
+    this.unit = this.isPercentage ? '% of pop.' : this.isCasesOrDeath ? 'per 100k people' : '';
   }
 
   /**

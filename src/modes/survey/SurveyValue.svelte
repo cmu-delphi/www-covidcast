@@ -5,11 +5,14 @@
    */
   export let value = null;
 
+  export let digits = 1;
+
   $: scaled = value != null && !Number.isNaN(value) ? value * factor : null;
 
   $: hasFraction = scaled != null && Math.floor(scaled) !== scaled;
   $: base = scaled == null ? 'N/A' : Math.floor(scaled);
-  $: fraction = hasFraction ? Math.round(scaled * 10) % 10 : 0;
+  $: digitsPow = Math.pow(10, digits);
+  $: fraction = hasFraction ? Math.round(scaled * digitsPow) % digitsPow : 0;
 </script>
 
 <style>

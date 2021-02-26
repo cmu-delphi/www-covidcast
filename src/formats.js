@@ -21,8 +21,8 @@ export function formatDateShortAbbr(date) {
   return !date ? '?' : shortAbbr(date);
 }
 
-export function formatDateShortWeekdayAbbr(date) {
-  return !date ? '?' : shortWeekdayAbbr(date);
+export function formatDateShortWeekdayAbbr(date, nthSuffix = false) {
+  return !date ? '?' : shortWeekdayAbbr(date) + (nthSuffix ? nth(date.getDate()) : '');
 }
 
 function nth(d) {
@@ -66,13 +66,29 @@ export function formatPopulation(info) {
   return info.population.toLocaleString();
 }
 
-const f = format('.1f');
-const formatP = format('.1p');
+const f = format(',.1f');
+const basePercentFormatter = format('.2%');
+const rawFormatter = format(',.2f');
 
-export function formatValue(value) {
-  return value == null || Number.isNaN(value) ? 'N/A' : f(value);
+/**
+ * @param {number} value
+ * @param {boolean} enforceSign
+ */
+function sign(value, enforceSign) {
+  return enforceSign && value > 0 ? '+' : '';
 }
 
-export function formatPercentage(value) {
-  return value == null || Number.isNaN(value) ? 'N/A' : formatP(value);
+export function formatValue(value, enforceSign = false) {
+  return value == null || Number.isNaN(value) ? 'N/A' : `${sign(value, enforceSign)}${f(value)}`;
+}
+export function formatPercentage(value, enforceSign = false) {
+  return value == null || Number.isNaN(value)
+    ? 'N/A'
+    : `${sign(value, enforceSign)}${basePercentFormatter(value / 100)}`;
+}
+export function formatFraction(value, enforceSign = false) {
+  return value == null || Number.isNaN(value) ? 'N/A' : `${sign(value, enforceSign)}${basePercentFormatter(value)}`;
+}
+export function formatRawValue(value, enforceSign = false) {
+  return value == null || Number.isNaN(value) ? 'N/A' : `${sign(value, enforceSign)}${rawFormatter(value)}`;
 }

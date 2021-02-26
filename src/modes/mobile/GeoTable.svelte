@@ -65,7 +65,7 @@
       return Promise.resolve([]);
     }
     function toGeoTableRow(r, data, important = false) {
-      const trend = determineTrend(date.value, data);
+      const trend = determineTrend(date.value, data, sensor.isInverted);
       return {
         ...r,
         important,

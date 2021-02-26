@@ -1,20 +1,8 @@
 import { timeDay } from 'd3-time';
-import { format } from 'd3-format';
+import { formatFraction } from '../formats';
 import { toTimeValue } from './params';
 
 const trendThreshold = 0.1;
-
-const f = format('.1f');
-
-export function formatTrendChange(change, enforceSign = false) {
-  if (change == null || Number.isNaN(change)) {
-    return 'N/A';
-  }
-  if (enforceSign) {
-    return `${change > 0 ? '+' : ''}${f(change * 100)}%`;
-  }
-  return `${f(Math.abs(change) * 100)}%`;
-}
 
 /**
  * @param {import("../../data").EpiDataRow[]} data
@@ -60,12 +48,12 @@ function toTrend(current, reference, min) {
 
 function toTrendText(change) {
   if (change >= trendThreshold) {
-    return ['increase', `Increasing (>= ${formatTrendChange(trendThreshold)})`];
+    return ['increasing', `Increasing (>= ${formatFraction(trendThreshold)})`];
   }
   if (change <= -trendThreshold) {
-    return ['decrease', `Decreasing (<= ${formatTrendChange(trendThreshold)})`];
+    return ['decreasing', `Decreasing (<= ${formatFraction(trendThreshold)})`];
   }
-  return ['steady', `Steady (${formatTrendChange(-trendThreshold)} <= v <= ${formatTrendChange(trendThreshold)})`];
+  return ['steady', `Steady (${formatFraction(-trendThreshold)} <= v <= ${formatFraction(trendThreshold)})`];
 }
 
 /**
@@ -75,6 +63,8 @@ function toTrendText(change) {
  * @property {boolean} isDecreasing
  * @property {boolean} isSteady
  * @property {boolean} isUnknown
+ * @property {boolean} isBetter increasing or decreasing based on the inverted state
+ * @property {boolean} isWorse increasing or decreasing based on the inverted state
  * @property {string} trendReason
  * @property {number} change
  * @property {number} delta
@@ -86,19 +76,28 @@ function toTrendText(change) {
  * @property {EpiDataRow} ref
  * @property {EpiDataRow} current
  * @property {EpiDataRow} min
+ * @property {Date} minDate
  * @property {EpiDataRow} max
+ * @property {Date} maxDate
+ * @property {EpiDataRow} worst
+ * @property {Date} worstDate
  * @property {TrendInfo} minTrend
  * @property {TrendInfo} maxTrend
+ * @property {TrendInfo} worstTrend
  */
 
-function computeTrend(ref, current, min) {
+function computeTrend(ref, current, min, isInverted) {
   const change = toTrend(current, ref, min);
   const [trendText, trendReason] = toTrendText(change);
+  const inc = trendText.startsWith('inc');
+  const dec = trendText.startsWith('dec');
   return {
     trend: trendText,
-    isIncreasing: trendText.startsWith('inc'),
-    isSteady: trendText === 'steady',
-    isDecreasing: trendText.startsWith('dec'),
+    isIncreasing: inc,
+    isSteady: trendText.startsWith('steady'),
+    isDecreasing: dec,
+    isBetter: (isInverted && inc) || (!isInverted && dec),
+    isWorse: (isInverted && dec) || (!isInverted && inc),
     isUnknown: false,
     trendReason,
     change,
@@ -118,22 +117,42 @@ export const UNKNOWN_TREND = {
   refDate: new Date(),
   ref: null,
   min: null,
+  max: null,
+  minDate: null,
+  maxDate: null,
+  worst: null,
+  worstDate: null,
 };
 /**
  *
  * @param {Date} date
  * @param {import("../../data").EpiDataRow[]} data
  */
-export function determineTrend(date, data) {
+export function determineTrend(date, data, isInverted = false) {
+  const { min, max } = findMinMaxRow(data);
   const dateRow = findDateRow(date, data);
   const refDate = timeDay.offset(date, -7);
 
+  const worst = isInverted ? min : max;
+  const trend = {
+    ...UNKNOWN_TREND,
+    refDate,
+    min,
+    minDate: min ? min.date_value : null,
+    max,
+    maxDate: max ? max.date_value : null,
+    worst,
+    worstDate: worst ? worst.date_value : null,
+  };
+
   if (!dateRow || dateRow.value == null) {
-    return {
-      ...UNKNOWN_TREND,
-      refDate,
-    };
+    return trend;
   }
+  trend.current = dateRow;
+  trend.minTrend = computeTrend(min.value, dateRow.value, min.value, isInverted);
+  trend.maxTrend = computeTrend(max.value, dateRow.value, min.value, isInverted);
+  trend.worstTrend = isInverted ? trend.minTrend : trend.maxTrend;
+
   let refValue = findDateRow(refDate, data);
   if (!refValue) {
     // try the closest before
@@ -148,25 +167,13 @@ export function determineTrend(date, data) {
       return acc;
     }, null);
   }
-  const { min, max } = findMinMaxRow(data);
   if (!refValue) {
     // none found
-    return {
-      ...UNKNOWN_TREND,
-      current: dateRow,
-      refDate: refDate,
-      min,
-      max,
-    };
+    return trend;
   }
   return {
-    ...computeTrend(refValue.value, dateRow.value, min.value),
-    refDate: refDate,
+    ...trend,
+    ...computeTrend(refValue.value, dateRow.value, min.value, isInverted),
     ref: refValue,
-    current: dateRow,
-    min,
-    max,
-    minTrend: computeTrend(min.value, dateRow.value, min.value),
-    maxTrend: computeTrend(max.value, dateRow.value, min.value),
   };
 }

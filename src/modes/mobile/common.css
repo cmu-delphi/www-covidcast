@@ -11,8 +11,8 @@
 }
 
 .mobile-root p {
-  font-size: 0.875rem;
-  margin-top: 5px;
+  font-size: 1rem;
+  margin: 5px 0;
 }
 
 .mobile-map {
@@ -203,10 +203,10 @@
 }
 
 .mobile-two-col h3 {
-  font-size: 0.875rem;
+  font-size: 1.125rem;
   margin: 0.6em 0;
   text-align: left;
-  font-weight: normal;
+  font-weight: 600;
   flex-grow: 1;
   line-height: 1.5rem;
 }

@@ -4,6 +4,7 @@
   import FancyHeader from './FancyHeader.svelte';
   import TrendIndicator from './TrendIndicator.svelte';
   import { SensorParam } from '../../stores/params';
+  import { formatDateShortWeekdayAbbr } from '../../formats';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -31,10 +32,29 @@
 
 <FancyHeader sub="Indicators">Key</FancyHeader>
 
+<p>On {formatDateShortWeekdayAbbr(date.value)} the 7 day averages are:</p>
+
 <div class="mobile-two-col">
   {#each highlightSurveySensors as s}
     <div>
-      <h3><i>{s.sensor.value.name}</i></h3>
+      <h3>{s.sensor.name}</h3>
+      <div>
+        {#await s.trend}
+          N/A
+        {:then d}
+          <SurveyValue value={d && d.current ? d.current.value : null} digits={2} />
+        {/await}
+      </div>
+      <div class="sub">{s.sensor.unit}</div>
+    </div>
+  {/each}
+</div>
+
+<p>Compared to the previous week that results in:</p>
+
+<div class="mobile-two-col">
+  {#each highlightSurveySensors as s}
+    <div>
       <div>
         {#await s.trend}
           <TrendIndicator trend={null} long sensor={s.sensor} />
@@ -42,14 +62,6 @@
           <TrendIndicator trend={d} long sensor={s.sensor} />
         {/await}
       </div>
-      <div>
-        {#await s.trend}
-          N/A
-        {:then d}
-          <SurveyValue value={d && d.current ? d.current.value : null} factor={10} />
-        {/await}
-      </div>
-      <div class="sub">per 1,000 people</div>
     </div>
   {/each}
 </div>

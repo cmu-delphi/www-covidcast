@@ -4,6 +4,7 @@
   import FancyHeader from './FancyHeader.svelte';
   import TrendIndicator from './TrendIndicator.svelte';
   import { CASES, DEATHS } from '../../stores/params';
+  import { formatDateShortWeekdayAbbr } from '../../formats';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -23,27 +24,27 @@
 </script>
 
 <style>
-  h3 {
-    font-size: 0.875rem;
+  h3.header {
+    font-size: 1.125rem;
     font-weight: 600;
     text-align: center;
     margin: 0.6em 0;
   }
-
-  h4 {
+  h4.header {
     margin: 0;
     margin-bottom: 1em;
-    font-size: 0.65rem;
+    font-size: 0.875rem;
     text-align: center;
   }
 </style>
 
 <FancyHeader sub="Indicators" normal>COVIDcast</FancyHeader>
 
-<p>On <strong>average</strong> over the <strong>last 7 days</strong> there have been</p>
+<p>On {formatDateShortWeekdayAbbr(date.value)} the 7 day averages are:</p>
 
 <div class="mobile-two-col">
   <div>
+    <h3>Cases</h3>
     <div>
       {#await casesTrend}
         N/A
@@ -51,7 +52,26 @@
         <SurveyValue value={d && d.current ? d.current.value : null} />
       {/await}
     </div>
-    <div><strong>Total cases</strong> per 100,000 people</div>
+    <div class="sub">per 100,000 people</div>
+  </div>
+  <div>
+    <h3>Deaths</h3>
+    <div>
+      {#await deathTrend}
+        N/A
+      {:then d}
+        <SurveyValue value={d && d.current ? d.current.value : null} />
+      {/await}
+    </div>
+    <div class="sub">per 100,000 people</div>
+  </div>
+</div>
+
+<p>Compared to the previous week that results in:</p>
+
+<div class="mobile-two-col">
+  <div>
+    <h3>Cases</h3>
     <div>
       {#await casesTrend}
         <TrendIndicator trend={null} long sensor={CASES} />
@@ -61,14 +81,7 @@
     </div>
   </div>
   <div>
-    <div>
-      {#await deathTrend}
-        N/A
-      {:then d}
-        <SurveyValue value={d && d.current ? d.current.value : null} />
-      {/await}
-    </div>
-    <div><strong>Total deaths</strong> per 100,000 people</div>
+    <h3>Deaths</h3>
     <div>
       {#await deathTrend}
         <TrendIndicator trend={null} long sensor={DEATHS} />
@@ -81,14 +94,8 @@
 
 <hr />
 
-<h3>
-  COVID-19 Cases
-  {#if region.level === 'nation'}
-    by state
-  {:else if region.level === 'state'}in {region.displayName}{:else}around {region.displayName}{/if}
-</h3>
-
-<h4>{CASES.value.mapTitleText({})}</h4>
+<h3 class="header">COVID-19 Cases by state</h3>
+<h4 class="header">{CASES.value.mapTitleText()}</h4>
 
 <div class="chart-250">
   <RegionMap {region} {date} sensor={CASES} {fetcher} height={250} />

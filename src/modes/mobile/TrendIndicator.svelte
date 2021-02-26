@@ -15,10 +15,7 @@
   export let sensor;
   export let long = false;
 
-  $: value =
-    trend && trend.delta != null && !Number.isNaN(trend.delta)
-      ? `${trend.delta > 0 ? '+' : ''}${sensor.formatValue(trend.delta)}`
-      : 'N/A';
+  $: value = sensor.formatValue(trend ? trend.delta : null, true);
 
   $: isGood = trend && ((trend.isIncreasing && sensor.isInverted) || (trend.isDecreasing && !sensor.isInverted));
   $: isBad = trend && ((trend.isIncreasing && !sensor.isInverted) || (trend.isDecreasing && sensor.isInverted));
@@ -49,8 +46,8 @@
   .long {
     font-size: 0.875rem;
     text-transform: uppercase;
-    padding: 6px 10px;
-    margin: 4px 1px;
+    padding: 6px 6px;
+    margin: 4px 0;
     border-radius: 4px;
     background: var(--color);
     color: var(--text);
@@ -58,16 +55,19 @@
   .block {
     display: flex;
   }
-  .trend {
-    font-weight: bold;
+  .trend-text {
     margin-right: 0.5em;
+  }
+  .trend-value {
+    font-size: 0.75rem;
+    font-weight: 700;
   }
   .icon {
     margin-right: 0.25em;
     flex: 0 0 auto;
   }
   .icon > :global(svg) {
-    width: 1.2em;
+    width: 0.85em;
     fill: currentColor;
   }
   .short > .icon {
@@ -92,7 +92,7 @@
     {@html trendIcon}
   </span>
   {#if long && trend != null}
-    <span class="trend"> {trend.trend} </span>
-    <span> ({value}) </span>
-  {:else}<span>{value}</span>{/if}
+    <span class="trend-text"> {trend.trend} </span>
+    <span class="trend-value">{value}</span>
+  {:else}<span class="trend-value">{value}</span>{/if}
 </div>

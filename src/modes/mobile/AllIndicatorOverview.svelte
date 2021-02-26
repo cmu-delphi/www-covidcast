@@ -49,16 +49,16 @@
       return 'None are getting worse.';
     }
     if (worse.length === 1) {
-      return `<i>${worse[0].name}</i> is getting worse.`;
+      return `"${worse[0].name}" is getting worse.`;
     }
     return `${worse
       .slice(0, worse.length - 1)
-      .map((d) => `<i>${d.name}</i>`)
-      .join(', ')}, and <i>${worse[worse.length - 1].name}</i> are getting worse.`;
+      .map((d) => `"${d.name}"`)
+      .join(', ')}, and "${worse[worse.length - 1].name}" are getting worse.`;
   }
 </script>
 
-<FancyHeader>Overall</FancyHeader>
+<FancyHeader sub="Overall" />
 
 <p>
   {#await trendSummary}
@@ -70,6 +70,6 @@
     <strong>{d ? d.positive.length : 'N/A'} of {sensorList.length} indicators</strong>
     are trending in a
     <strong>positive direction.</strong>
-    {@html worse(d ? d.negative : null)}
+    {worse(d ? d.negative : null)}
   {/await}
 </p>

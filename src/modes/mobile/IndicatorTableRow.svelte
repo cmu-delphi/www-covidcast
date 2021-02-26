@@ -76,7 +76,7 @@
     {/await}
   </td>
   <td class="uk-text-right">
-    {#await trend}?{:then t}{t && t.current ? sensor.formatValue(t.current.value) : 'N/A'}{/await}
+    {#await trend}?{:then t}{sensor.formatValue(t && t.current ? t.current.value : null)}{/await}
   </td>
   <td rowspan="2">
     <div class="mobile-table-chart">
@@ -98,5 +98,8 @@
   </td>
 </tr>
 <tr class="addon">
-  <td colspan="3" class="source">Source: {sensor.value.id}</td>
+  <td colspan="2" class="source">Source: {sensor.value.id}</td>
+  <td class="source uk-text-right">
+    {#if sensor.isCasesOrDeath}per&nbsp;100k{/if}
+  </td>
 </tr>
