@@ -42,11 +42,11 @@ const modes = [
   //   label: 'Top 10',
   //   component: () => import(/* webpackChunkName: 'm-top10' */ './top10/Top10.svelte').then((r) => r.default),
   // },
-  {
-    id: 'single',
-    label: 'Region Details',
-    component: () => import(/* webpackChunkName: 'm-single' */ './single/SingleLocation.svelte').then((r) => r.default),
-  },
+  // {
+  //   id: 'single',
+  //   label: 'Region Details',
+  //   component: () => import(/* webpackChunkName: 'm-single' */ './single/SingleLocation.svelte').then((r) => r.default),
+  // },
   {
     id: 'survey-results',
     label: 'Survey Results',
@@ -55,8 +55,7 @@ const modes = [
   {
     id: 'export',
     label: 'Export Data',
-    component: () =>
-      import(/* webpackChunkName: 'mode-export' */ './exportdata/ExportData.svelte').then((r) => r.default),
+    component: () => import(/* webpackChunkName: 'm-export' */ './exportdata/ExportData.svelte').then((r) => r.default),
   },
   // {
   //   id: 'lab',

@@ -313,36 +313,36 @@ function genBaseSpec(level, topoJSON, { height = 300 }) {
 function countyJSON() {
   return import(/* webpackChunkName: 'shape-county' */ './shapefiles/county.json').then((r) => r.default);
 }
-function hrrJSON() {
-  return import(/* webpackChunkName: 'shape-hrr' */ './shapefiles/hrr.json').then((r) => r.default);
-}
+// function hrrJSON() {
+//   return import(/* webpackChunkName: 'shape-hrr' */ './shapefiles/hrr.json').then((r) => r.default);
+// }
 function nationJSON() {
   return import(/* webpackChunkName: 'shape-nation' */ './shapefiles/nation.json').then((r) => r.default);
 }
 function stateJSON() {
   return import(/* webpackChunkName: 'shape-state' */ './shapefiles/state.json').then((r) => r.default);
 }
-function msaJSON() {
-  return import(/* webpackChunkName: 'shape-msa' */ './shapefiles/msa.json').then((r) => r.default);
-}
-function stateTilesJSON() {
-  return import(/* webpackChunkName: 'tile-state' */ './tilegrams/state.topo.json').then((r) => r.default);
-}
-function nationTilesJSON() {
-  return import(/* webpackChunkName: 'tile-nation' */ './tilegrams/nation.topo.json').then((r) => r.default);
-}
+// function msaJSON() {
+//   return import(/* webpackChunkName: 'shape-msa' */ './shapefiles/msa.json').then((r) => r.default);
+// }
+// function stateTilesJSON() {
+//   return import(/* webpackChunkName: 'tile-state' */ './tilegrams/state.topo.json').then((r) => r.default);
+// }
+// function nationTilesJSON() {
+//   return import(/* webpackChunkName: 'tile-nation' */ './tilegrams/nation.topo.json').then((r) => r.default);
+// }
 
-export function generateHRRSpec(options = {}) {
-  const level = 'hrr';
-  const topoJSON = hrrJSON();
-  const spec = genBaseSpec(level, topoJSON, options);
-  spec.datasets.nation = nationJSON();
-  spec.layer.push(genMissingLayer());
+// export function generateHRRSpec(options = {}) {
+//   const level = 'hrr';
+//   const topoJSON = hrrJSON();
+//   const spec = genBaseSpec(level, topoJSON, options);
+//   spec.datasets.nation = nationJSON();
+//   spec.layer.push(genMissingLayer());
 
-  spec.layer.push(genLevelLayer(options));
-  spec.layer.push(genLevelHoverLayer());
-  return spec;
-}
+//   spec.layer.push(genLevelLayer(options));
+//   spec.layer.push(genLevelHoverLayer());
+//   return spec;
+// }
 
 export function generateStateSpec(options = {}) {
   const level = 'state';
@@ -358,19 +358,19 @@ export function generateStateSpec(options = {}) {
   return spec;
 }
 
-export function generateMSASpec(options = {}) {
-  const level = 'msa';
-  const topoJSON = msaJSON();
+// export function generateMSASpec(options = {}) {
+//   const level = 'msa';
+//   const topoJSON = msaJSON();
 
-  const spec = genBaseSpec(level, topoJSON, options);
-  spec.datasets.nation = nationJSON();
-  spec.layer.push(genMissingLayer());
+//   const spec = genBaseSpec(level, topoJSON, options);
+//   spec.datasets.nation = nationJSON();
+//   spec.layer.push(genMissingLayer());
 
-  // state, msa
-  spec.layer.push(genLevelLayer(options));
-  spec.layer.push(genLevelHoverLayer());
-  return spec;
-}
+//   // state, msa
+//   spec.layer.push(genLevelLayer(options));
+//   spec.layer.push(genLevelHoverLayer());
+//   return spec;
+// }
 
 export function generateNationSpec(options = {}) {
   const level = 'nation';
@@ -493,47 +493,47 @@ export function generateRelatedCountySpec(county, options = {}) {
   return spec;
 }
 
-export function generateStateTileSpec(options = {}) {
-  const level = 'state';
-  const topoJSON = stateTilesJSON();
+// export function generateStateTileSpec(options = {}) {
+//   const level = 'state';
+//   const topoJSON = stateTilesJSON();
 
-  const spec = genBaseSpec(level, topoJSON, options);
-  spec.projection = {
-    type: 'identity',
-    reflectY: true,
-  };
-  spec.datasets.nation = nationTilesJSON();
-  spec.layer.push(genMissingLayer());
-  // state, msa
-  spec.layer.push(genLevelLayer(options));
-  spec.layer.push(genLevelHoverLayer());
-  /**
-   * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
-   */
-  const layer = {
-    mark: {
-      type: 'text',
-      align: 'center',
-      baseline: 'middle',
-    },
-    encoding: {
-      key: {
-        field: 'id',
-      },
-      longitude: {
-        field: 'properties.lon',
-        type: 'quantitative',
-      },
-      latitude: {
-        field: 'properties.lat',
-        type: 'quantitative',
-      },
-      text: {
-        field: 'propertyId',
-        type: 'nominal',
-      },
-    },
-  };
-  spec.layer.push(layer);
-  return spec;
-}
+//   const spec = genBaseSpec(level, topoJSON, options);
+//   spec.projection = {
+//     type: 'identity',
+//     reflectY: true,
+//   };
+//   spec.datasets.nation = nationTilesJSON();
+//   spec.layer.push(genMissingLayer());
+//   // state, msa
+//   spec.layer.push(genLevelLayer(options));
+//   spec.layer.push(genLevelHoverLayer());
+//   /**
+//    * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
+//    */
+//   const layer = {
+//     mark: {
+//       type: 'text',
+//       align: 'center',
+//       baseline: 'middle',
+//     },
+//     encoding: {
+//       key: {
+//         field: 'id',
+//       },
+//       longitude: {
+//         field: 'properties.lon',
+//         type: 'quantitative',
+//       },
+//       latitude: {
+//         field: 'properties.lat',
+//         type: 'quantitative',
+//       },
+//       text: {
+//         field: 'propertyId',
+//         type: 'nominal',
+//       },
+//     },
+//   };
+//   spec.layer.push(layer);
+//   return spec;
+// }
