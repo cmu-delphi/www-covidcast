@@ -1,11 +1,13 @@
 import { timeFormat } from 'd3-time-format';
+import { format } from 'd3-format';
 
 const short = timeFormat('%B %d');
 const shortAbbr = timeFormat('%b %d');
-const shortNumbers = timeFormat('%m/%d');
+const shortNumbers = timeFormat('%-m/%d');
 const iso = timeFormat('%Y-%m-%d');
 const local = timeFormat('%m/%d/%Y');
 const shortAbbrNth = timeFormat('%b %-d');
+const shortWeekdayAbbr = timeFormat('%a %b %-d');
 
 export function formatDateShortNumbers(date) {
   return !date ? '?' : shortNumbers(date);
@@ -17,6 +19,10 @@ export function formatDateShort(date) {
 
 export function formatDateShortAbbr(date) {
   return !date ? '?' : shortAbbr(date);
+}
+
+export function formatDateShortWeekdayAbbr(date, nthSuffix = false) {
+  return !date ? '?' : shortWeekdayAbbr(date) + (nthSuffix ? nth(date.getDate()) : '');
 }
 
 function nth(d) {
@@ -58,4 +64,31 @@ export function formatPopulation(info) {
     return 'Unknown';
   }
   return info.population.toLocaleString();
+}
+
+const f = format(',.1f');
+const basePercentFormatter = format('.2%');
+const rawFormatter = format(',.2f');
+
+/**
+ * @param {number} value
+ * @param {boolean} enforceSign
+ */
+function sign(value, enforceSign) {
+  return enforceSign && value > 0 ? '+' : '';
+}
+
+export function formatValue(value, enforceSign = false) {
+  return value == null || Number.isNaN(value) ? 'N/A' : `${sign(value, enforceSign)}${f(value)}`;
+}
+export function formatPercentage(value, enforceSign = false) {
+  return value == null || Number.isNaN(value)
+    ? 'N/A'
+    : `${sign(value, enforceSign)}${basePercentFormatter(value / 100)}`;
+}
+export function formatFraction(value, enforceSign = false) {
+  return value == null || Number.isNaN(value) ? 'N/A' : `${sign(value, enforceSign)}${basePercentFormatter(value)}`;
+}
+export function formatRawValue(value, enforceSign = false) {
+  return value == null || Number.isNaN(value) ? 'N/A' : `${sign(value, enforceSign)}${rawFormatter(value)}`;
 }

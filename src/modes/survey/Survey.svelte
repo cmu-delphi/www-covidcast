@@ -1,10 +1,10 @@
 <script>
   import { currentRegionInfo, smallMultipleTimeSpan, currentDateObject } from '../../stores';
-  import { questionCategories } from './questions';
+  import { questionCategories, visibleLevels, refSensor } from './questions';
   import SurveyQuestion from './SurveyQuestion.svelte';
   import SurveyParameters from './SurveyParameters.svelte';
   import Overview from './Overview.svelte';
-  import { nationInfo } from '../../maps';
+  import { nationInfo, nameInfos } from '../../maps';
   import MobileSurveyToc from './MobileSurveyToc.svelte';
   // use local variables with manual setting for better value comparison updates
   let startDay = $smallMultipleTimeSpan[0];
@@ -19,13 +19,15 @@
     }
   }
   $: params = { region: $currentRegionInfo || nationInfo, startDay, endDay };
+
+  const filteredInfos = nameInfos.filter((d) => visibleLevels.includes(d.level));
+  filteredInfos.unshift(nationInfo);
 </script>
 
 <style>
   .root {
     position: relative;
     flex: 1 1 0;
-    overflow: auto;
   }
   .questions {
     margin-top: 1em;
@@ -46,7 +48,7 @@
 </style>
 
 <div class="root">
-  <SurveyParameters>
+  <SurveyParameters sensor={refSensor} items={filteredInfos} defaultItem={nationInfo}>
     <MobileSurveyToc />
   </SurveyParameters>
   <div class="uk-container content-grid">

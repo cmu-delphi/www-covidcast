@@ -1,0 +1,223 @@
+.mobile-root {
+  flex: 1 1 0;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  color: #232735;
+  position: relative;
+}
+
+.mobile-root > .uk-container {
+  margin-top: 5px;
+}
+
+.mobile-root p {
+  font-size: 1rem;
+  margin: 5px 0;
+}
+
+.mobile-map {
+  border: 1px solid #f0f1f3;
+  border-radius: 3px;
+}
+
+.mobile-h2 {
+  margin-top: 4px;
+  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 2rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.mobile-h3 {
+  text-align: left;
+  margin-top: 4px;
+  font-weight: normal;
+  font-size: 1rem;
+  line-height: 2rem;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+}
+
+.mobile-root > .uk-container.mobile-invert-header {
+  background: #232735;
+  color: white;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.mobile-root > .uk-container.mobile-invert {
+  background: #232735;
+  color: white;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.mobile-invert-header h2,
+.mobile-invert h2 {
+  color: inherit;
+}
+
+.mobile-th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  text-transform: uppercase;
+  vertical-align: top;
+}
+
+.mobile-th-blue {
+  color: #096dd9;
+}
+
+.mobile-th-range {
+  color: initial;
+  position: relative;
+  margin: 5px 4px 0 4px;
+  padding: 2px 2px 0 2px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.mobile-th-range::before {
+  content: '';
+  border: 1px solid currentColor;
+  border-bottom-width: 0;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 3px;
+}
+
+.mobile-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.mobile-table > thead > tr {
+  border-bottom: 1px solid #f0f1f3;
+}
+.mobile-table > thead > tr > th {
+  padding: 0.75rem 4px;
+}
+.mobile-table > tbody {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.mobile-table > tbody > tr:not(.addon) > td {
+  padding: 0.75rem 4px;
+  vertical-align: middle;
+}
+
+.mobile-table > tbody > tr:not(:last-of-type),
+.mobile-table > tbody > tr:not(:nth-last-child(2)) td[rowspan] {
+  border-bottom: 1px solid #f0f1f3;
+}
+
+.mobile-table .important {
+  font-weight: 600;
+}
+.mobile-table > tbody > tr.important {
+  border-bottom: 2px solid #d3d4d8;
+}
+
+.mobile-table > .sort-indicator {
+  text-align: right;
+  background: #fafafc;
+}
+
+.mobile-table > tbody > tr.row-group,
+.mobile-table > tbody > tr.has-addon {
+  border-bottom: none;
+}
+.mobile-table > tbody > tr.has-addon > td {
+  padding-bottom: 0.1rem;
+}
+.mobile-table > tbody > tr.addon > td {
+  padding: 0 4px 0.75rem 4px;
+}
+
+.mobile-table-chart {
+  margin: 4px;
+  position: relative;
+  height: 4em;
+}
+
+.mobile-table-chart-small {
+  margin: 0.75rem 4px 1px 4px !important;
+  height: 3em;
+}
+
+.mobile-table-chart > .vega-embed {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.mobile-fancy-header {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 2rem;
+  letter-spacing: 0.05em;
+  margin: 0.5em 0 0 0;
+}
+.mobile-fancy-header span {
+  text-transform: uppercase;
+  font-weight: 300;
+}
+
+.chart-150,
+.chart-300,
+.chart-50 {
+  position: relative;
+}
+
+.chart-150 > .vega-embed {
+  width: 100%;
+  height: 150px;
+}
+
+.chart-300 > .vega-embed {
+  width: 100%;
+  height: 300px;
+}
+
+.chart-250 > .vega-embed {
+  width: 100%;
+  height: 250px;
+}
+
+.chart-50 > .vega-embed {
+  width: 100%;
+  height: 50px;
+}
+
+.mobile-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-flow: row;
+  column-gap: 1em;
+  row-gap: 0.5em;
+  font-size: 0.75rem;
+}
+
+.mobile-kpi {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-kpi h3 {
+  font-size: 1.125rem;
+  margin: 0.6em 0;
+  text-align: left;
+  font-weight: 600;
+  flex-grow: 1;
+  line-height: 1.5rem;
+}
+
+.mobile-kpi .sub {
+  font-size: 0.75rem;
+}

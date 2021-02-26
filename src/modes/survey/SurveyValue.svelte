@@ -1,15 +1,18 @@
 <script>
-  import { factor } from './questions';
+  export let factor = 1;
   /**
    * @type {number}
    */
   export let value = null;
 
+  export let digits = 1;
+
   $: scaled = value != null && !Number.isNaN(value) ? value * factor : null;
 
-  $: hasFraction = scaled != null && Math.floor(scaled) !== scaled;
+  $: hasFraction = scaled != null && digits > 0 && Math.floor(scaled) !== scaled;
   $: base = scaled == null ? 'N/A' : Math.floor(scaled);
-  $: fraction = hasFraction ? Math.round(scaled * 10) % 10 : 0;
+  $: digitsPow = Math.pow(10, digits);
+  $: fraction = hasFraction ? Math.round(scaled * digitsPow) % digitsPow : 0;
 </script>
 
 <style>
@@ -17,14 +20,15 @@
     font-size: 4rem;
     line-height: 1;
     align-self: flex-end;
-    font-weight: 700;
+    font-weight: 600;
   }
   .fraction {
     font-size: 2rem;
     line-height: 1;
-    font-weight: 700;
+    font-weight: 600;
     margin-bottom: 0.25rem;
     align-self: flex-end;
+    margin-left: -0.25em;
   }
 
   @media only screen and (max-width: 715px) {
@@ -38,5 +42,5 @@
   }
 </style>
 
-<span class="text">{base}</span>
+<span class="text">{base.toLocaleString()}</span>
 {#if hasFraction}<span class="fraction"> {`.${fraction}`} </span>{/if}

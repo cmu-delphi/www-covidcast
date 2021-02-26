@@ -14,7 +14,24 @@ const TICK_COUNT = 7;
 
 const DEFAULT_STATS = { min: 0, max: 100, mean: 50, std: 10 };
 
-function resolveStats(statsLookup, key) {
+export function resolveStatsKey(sensorEntry, level, signalOptions = {}) {
+  let key = sensorEntry.key;
+  // Customize min max values for deaths
+  if (sensorEntry.getType(signalOptions) === 'count') {
+    key += `_${level}`;
+    if (sensorEntry.isCasesOrDeath) {
+      key += `_${primaryValue(sensorEntry, signalOptions)}`;
+    }
+    return key;
+  }
+
+  if (sensorEntry.isCasesOrDeath) {
+    key += `_${primaryValue(sensorEntry, signalOptions)}`;
+  }
+  return key;
+}
+
+export function resolveStats(statsLookup, key) {
   if (!statsLookup || !statsLookup.has(key)) {
     return DEFAULT_STATS;
   }
@@ -31,7 +48,14 @@ function resolveStats(statsLookup, key) {
  * @param {string} level
  * @param {import('../../stores/constants').CasesOrDeathOptions} signalOptions
  */
-export function determineMinMax(statsLookup, sensorEntry, level, signalOptions, useMax = false) {
+export function determineMinMax(
+  statsLookup,
+  sensorEntry,
+  level,
+  signalOptions,
+  useMax = false,
+  enforceZeroLike = true,
+) {
   let key = sensorEntry.key;
   // Customize min max values for deaths
   if (sensorEntry.getType(signalOptions) === 'count') {
@@ -43,7 +67,10 @@ export function determineMinMax(statsLookup, sensorEntry, level, signalOptions, 
     if (useMax) {
       return [0, stats.max];
     }
-    return [Math.max(MAGIC_MIN_STATS, stats.mean - 3 * stats.std), stats.mean + 3 * stats.std];
+    return [
+      Math.max(enforceZeroLike ? MAGIC_MIN_STATS : Number.NEGATIVE_INFINITY, stats.mean - 3 * stats.std),
+      stats.mean + 3 * stats.std,
+    ];
   }
 
   if (sensorEntry.isCasesOrDeath) {
@@ -53,7 +80,10 @@ export function determineMinMax(statsLookup, sensorEntry, level, signalOptions, 
   if (useMax) {
     return [0, stats.max];
   }
-  return [Math.max(0, stats.mean - 3 * stats.std), stats.mean + 3 * stats.std];
+  return [
+    Math.max(enforceZeroLike ? 0 : Number.NEGATIVE_INFINITY, stats.mean - 3 * stats.std),
+    stats.mean + 3 * stats.std,
+  ];
 }
 
 /**

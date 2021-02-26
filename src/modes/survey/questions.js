@@ -36,7 +36,7 @@ function toAnchor(value) {
 /**
  * @type {Question[]}
  */
-const questions = descriptions.questions.map((question) => ({
+export const questions = descriptions.questions.map((question) => ({
   ...question,
   dataSource: descriptions.dataSource,
   levels: descriptions.levels,

@@ -57,7 +57,11 @@ function getOrInitPopper() {
     instance.update();
   };
   const hide = () => {
-    popper.style.display = 'none';
+    if (popper.style.display !== 'none') {
+      popper.style.display = 'none';
+      return true;
+    }
+    return false;
   };
   tooltip = { instance, popper, update, hide };
   return { instance, popper, update, hide };
@@ -68,6 +72,30 @@ function resolveDatum(item) {
     return resolveDatum(item.datum);
   }
   return item;
+}
+
+function updateProps(component, props) {
+  const p = { ...props };
+  Object.entries(props).forEach(([prop, v]) => {
+    if (component.$$.props[prop] != null && component.$$.ctx[component.$$.props[prop]] === v) {
+      delete p[prop];
+    }
+  });
+  component.$set(p);
+}
+
+/**
+ * checks whether the reason for the hide is that the user is moving into the tooltip
+ * @param {MouseEvent} event
+ */
+function isClickingTooltip(event) {
+  if (!event || !event.relatedTarget) {
+    return false;
+  }
+  return (
+    typeof event.relatedTarget.matches === 'function' &&
+    (event.relatedTarget.matches('.viz-tooltip') || event.relatedTarget.closest('.viz-tooltip') != null)
+  );
 }
 /**
  * create a vega tooltip adapter for the given svelte component class
@@ -80,28 +108,34 @@ export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}
   let tooltip = null;
   let extraProps = initialExtraProps;
 
-  const tooltipHandler = (_, event, item, value) => {
+  function tooltipHandler(_, event, item, value) {
     if (destroyed) {
       return;
     }
+    const view = this;
     const { popper, update, hide } = getOrInitPopper();
     // hide tooltip for null, undefined, or empty string values,
     // or when the item's datum.value is null.
     const datum = resolveDatum(item);
     if (value == null || value === '' || datum.value == null) {
-      hide();
-      if (tooltip) {
-        tooltip.$set({
+      if (isClickingTooltip(event)) {
+        // ignore
+        return;
+      }
+      if (hide() && tooltip) {
+        updateProps(tooltip, {
           hidden: true,
+          view,
         });
       }
       return;
     }
     update(event.clientX, event.clientY);
     if (tooltip) {
-      tooltip.$set({
+      updateProps(tooltip, {
         hidden: false,
         item: resolveDatum(item),
+        view,
       });
     } else {
       tooltip = new svelteComponent({
@@ -110,10 +144,11 @@ export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}
           ...extraProps,
           hidden: false,
           item: resolveDatum(item),
+          view,
         },
       });
     }
-  };
+  }
 
   tooltipHandler.destroy = () => {
     if (tooltip) {
