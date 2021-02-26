@@ -31,17 +31,17 @@ const modes = [
     label: 'Old Overview',
     component: () => import(/* webpackChunkName: 'm-old' */ './overview/Overview.svelte').then((r) => r.default),
   },
-  {
-    id: 'timelapse',
-    label: 'Timelapse',
-    component: () =>
-      import(/* webpackChunkName: 'm-timelapse' */ './timelapse/TimeLapse.svelte').then((r) => r.default),
-  },
-  {
-    id: 'top10',
-    label: 'Top 10',
-    component: () => import(/* webpackChunkName: 'm-top10' */ './top10/Top10.svelte').then((r) => r.default),
-  },
+  // {
+  //   id: 'timelapse',
+  //   label: 'Timelapse',
+  //   component: () =>
+  //     import(/* webpackChunkName: 'm-timelapse' */ './timelapse/TimeLapse.svelte').then((r) => r.default),
+  // },
+  // {
+  //   id: 'top10',
+  //   label: 'Top 10',
+  //   component: () => import(/* webpackChunkName: 'm-top10' */ './top10/Top10.svelte').then((r) => r.default),
+  // },
   {
     id: 'single',
     label: 'Region Details',
@@ -58,11 +58,11 @@ const modes = [
     component: () =>
       import(/* webpackChunkName: 'mode-export' */ './exportdata/ExportData.svelte').then((r) => r.default),
   },
-  {
-    id: 'lab',
-    label: 'Lab',
-    component: () => import(/* webpackChunkName: 'mode-lab' */ './lab/Lab.svelte').then((r) => r.default),
-  },
+  // {
+  //   id: 'lab',
+  //   label: 'Lab',
+  //   component: () => import(/* webpackChunkName: 'mode-lab' */ './lab/Lab.svelte').then((r) => r.default),
+  // },
 ];
 
 export default modes;
