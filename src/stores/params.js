@@ -391,8 +391,14 @@ export class SensorParam {
   /**
    * @param {Sensor} date
    */
-  set(sensor) {
+  set(sensor, scrollTop = false) {
     currentSensor.set(sensor.key);
+    if (scrollTop) {
+      window.scrollTo({
+        top: 0,
+        behavior: 'auto',
+      });
+    }
   }
 
   /**

@@ -115,6 +115,13 @@
   border-bottom: 1px solid #f0f1f3;
 }
 
+.mobile-table .important {
+  font-weight: 600;
+}
+.mobile-table > tbody > tr.important {
+  border-bottom: 2px solid #d3d4d8;
+}
+
 .mobile-table > .sort-indicator {
   text-align: right;
   background: #fafafc;
@@ -197,12 +204,12 @@
   font-size: 0.75rem;
 }
 
-.mobile-two-col > div {
+.mobile-kpi {
   display: flex;
   flex-direction: column;
 }
 
-.mobile-two-col h3 {
+.mobile-kpi h3 {
   font-size: 1.125rem;
   margin: 0.6em 0;
   text-align: left;
@@ -211,6 +218,6 @@
   line-height: 1.5rem;
 }
 
-.mobile-two-col .sub {
+.mobile-kpi .sub {
   font-size: 0.75rem;
 }

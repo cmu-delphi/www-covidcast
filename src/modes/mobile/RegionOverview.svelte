@@ -1,7 +1,5 @@
 <script>
-  import { formatPopulation } from '../../formats';
-  import { getCountiesOfState } from '../../maps';
-  import FancyHeader from './FancyHeader.svelte';
+  import SurveyValue from '../survey/SurveyValue.svelte';
 
   /**
    * @type {import("../../stores/params").RegionParam}
@@ -9,34 +7,10 @@
   export let region;
 </script>
 
-{#if region.level === 'state'}
-  <FancyHeader normal>{region.displayName} state meta data</FancyHeader>
-  <div class="mobile-two-col">
-    <div>
-      <h3>State population</h3>
-      <div>{formatPopulation(region.value)}</div>
-    </div>
-    <div>
-      <h3>Counties</h3>
-      <div>{getCountiesOfState(region.value).length}</div>
-    </div>
-    <div>
-      <h3>Hospitals</h3>
-      <div>?</div>
-    </div>
-    <div>
-      <h3>Largest County</h3>
-      <div>
-        {getCountiesOfState(region.value).reduce((acc, v) => (acc === null || acc.population < v.population ? v : acc), null).displayName}
-      </div>
-    </div>
+<div class="mobile-kpi">
+  <div>{region.displayName} population</div>
+  <div>
+    <SurveyValue value={Math.round(region.value.population / 1000) * 1000} digits={0} />
   </div>
-{:else if region.level === 'county'}
-  <FancyHeader normal>{region.displayName} meta data</FancyHeader>
-  <div class="mobile-two-col">
-    <div>
-      <h3>County population</h3>
-      <div>{formatPopulation(region.value)}</div>
-    </div>
-  </div>
-{/if}
+  <div class="sub">people</div>
+</div>

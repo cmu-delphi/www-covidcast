@@ -36,7 +36,7 @@
 
 <div class="mobile-two-col">
   {#each highlightSurveySensors as s}
-    <div>
+    <div class="mobile-kpi">
       <h3>{s.sensor.name}</h3>
       <div>
         {#await s.trend}
@@ -54,7 +54,7 @@
 
 <div class="mobile-two-col">
   {#each highlightSurveySensors as s}
-    <div>
+    <div class="mobile-kpi">
       <div>
         {#await s.trend}
           <TrendIndicator trend={null} long sensor={s.sensor} />

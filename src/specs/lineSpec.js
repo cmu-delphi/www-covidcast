@@ -49,7 +49,7 @@ export function generateLineChartSpec({
    */
   const spec = {
     height,
-    padding: { left: 42, top: 16, bottom: 20, right: 15 },
+    padding: { left: 42, top: 20, bottom: 20, right: 15 },
     autosize: {
       type: 'none',
       contains: 'padding',
@@ -65,7 +65,7 @@ export function generateLineChartSpec({
         axis: {
           title: null,
           grid: false,
-          format: '%a %b %d',
+          format: '%m/%d',
           formatType: 'cachedTime',
           labelFontSize: 14,
           labelOverlap: true,
@@ -157,6 +157,8 @@ export function generateLineChartSpec({
             mark: {
               type: 'rule',
               stroke: COLOR,
+              strokeDash: [2, 4],
+              y: -4,
             },
           },
           {
@@ -165,8 +167,8 @@ export function generateLineChartSpec({
               align: AUTO_ALIGN,
               color: COLOR,
               baseline: 'bottom',
-              fontSize: 14,
-              dy: -1,
+              fontSize: 16,
+              dy: -3,
             },
             encoding: {
               text: {
@@ -218,7 +220,7 @@ export function generateCompareLineSpec(compare, { compareField = 'displayName',
   return spec;
 }
 
-export function createSignalDateLabelHighlight() {
+export function createSignalDateLabelHighlight(topPosition = false) {
   const layer = Object.assign({}, CURRENT_DATE_HIGHLIGHT);
   layer.layer = [
     {
@@ -228,12 +230,14 @@ export function createSignalDateLabelHighlight() {
     {
       mark: {
         type: 'text',
-        dy: 5,
-        baseline: 'top',
+        baseline: topPosition ? 'bottom' : 'top',
         align: 'right',
-        y: {
-          expr: 'height',
-        },
+        dy: topPosition ? -5 : 5,
+        y: topPosition
+          ? 0
+          : {
+              expr: 'height',
+            },
       },
       encoding: {
         x: {
@@ -259,6 +263,7 @@ export function generateSparkLine({
   domain = null,
   color = COLOR,
   highlightDate = false,
+  highlightStartEnd = true,
   height = 30,
 } = {}) {
   /**
@@ -268,7 +273,12 @@ export function generateSparkLine({
     $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
     data: { name: 'values' },
     height,
-    padding: { left: 2, top: 2, bottom: highlightDate ? 20 : 2, right: 2 },
+    padding: {
+      left: 2,
+      top: highlightDate === 'top' ? 20 : 2,
+      bottom: highlightDate && highlightDate !== 'top' ? 20 : 2,
+      right: 2,
+    },
     background: null,
     autosize: {
       type: 'none',
@@ -285,7 +295,7 @@ export function generateSparkLine({
         axis: {
           title: null,
           grid: true,
-          format: '%b %d',
+          format: '%m/%d',
           formatType: 'cachedTime',
           gridDash: [4, 4],
           labels: false,
@@ -298,51 +308,7 @@ export function generateSparkLine({
       },
     },
     layer: [
-      {
-        ...(domain
-          ? {
-              data: {
-                values: [{ date_value: domain[0] }, { date_value: domain[1] }],
-              },
-            }
-          : {
-              transform: [
-                {
-                  aggregate: [
-                    {
-                      op: 'min',
-                      field: 'date_value',
-                      as: 'date_value_min',
-                    },
-                    {
-                      op: 'max',
-                      field: 'date_value',
-                      as: 'date_value_max',
-                    },
-                  ],
-                },
-                {
-                  calculate: '[datum.date_value_min, datum.date_value_max]',
-                  as: 'date_value',
-                },
-                {
-                  flatten: ['date_value'],
-                },
-              ],
-            }),
-        mark: {
-          type: 'rule',
-          tooltip: false,
-          color,
-        },
-        encoding: {
-          x: {
-            field: 'date_value',
-            type: 'temporal',
-          },
-        },
-      },
-      highlightDate ? createSignalDateLabelHighlight() : CURRENT_DATE_HIGHLIGHT,
+      highlightDate ? createSignalDateLabelHighlight(highlightDate === 'top') : CURRENT_DATE_HIGHLIGHT,
       {
         mark: {
           type: 'line',
@@ -403,6 +369,54 @@ export function generateSparkLine({
       },
     },
   };
+
+  if (highlightStartEnd) {
+    if (domain) {
+      spec.layer.unshift({
+        data: {
+          values: [{ date_value: domain[0] }, { date_value: domain[1] }],
+        },
+
+        mark: {
+          type: 'rule',
+          tooltip: false,
+          color,
+        },
+        encoding: {
+          x: {
+            field: 'date_value',
+            type: 'temporal',
+          },
+        },
+      });
+    } else {
+      spec.layer.unshift({
+        transform: [
+          {
+            aggregate: [
+              {
+                op: 'min',
+                field: 'date_value',
+                as: 'date_value_min',
+              },
+              {
+                op: 'max',
+                field: 'date_value',
+                as: 'date_value_max',
+              },
+            ],
+          },
+          {
+            calculate: '[datum.date_value_min, datum.date_value_max]',
+            as: 'date_value',
+          },
+          {
+            flatten: ['date_value'],
+          },
+        ],
+      });
+    }
+  }
   return spec;
 }
 

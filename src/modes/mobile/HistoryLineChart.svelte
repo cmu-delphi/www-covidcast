@@ -13,6 +13,7 @@
   } from '../../specs/lineSpec';
   import { selectionColors } from '../../theme';
   import { toTimeValue } from '../../stores/params';
+  import Toggle from './Toggle.svelte';
 
   export let height = 150;
 
@@ -145,25 +146,29 @@
 
 <style>
   .legend {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     line-height: 1.25;
   }
   .legend-elem {
     border-radius: 5px;
-    padding: 4px 12px 4px 24px;
-    background: #f0f1f3;
+    padding: 12px 12px 12px 36px;
+    border: 1px solid #f0f1f3;
     position: relative;
   }
   .legend-symbol {
     width: 12px;
     position: absolute;
-    left: 4px;
+    left: 12px;
     top: 50%;
     height: 1px;
     transform: translateY(-50%);
+    background: var(--color);
   }
   .legend-symbol.thick {
     height: 3px;
+  }
+  .legend-value {
+    font-weight: 600;
   }
 </style>
 
@@ -176,19 +181,20 @@
   signalListeners={['highlight']}
   on:signal={onSignal} />
 
-<label><input type="checkbox" bind:checked={zoom} />Zoom Y-axis</label>
+<Toggle bind:checked={zoom}>Zoom Y-axis</Toggle>
 
-<div class="mobile-two-col legend">
+<div class="{regions.length > 1 ? 'mobile-two-col' : ''} legend">
   {#each regions as r, i}
-    <div class="legend-elem">
-      <div class="legend-symbol" class:thick={r.id === region.id} style="background-color: {colors[i]}" />
+    <div class="legend-elem" style="--color: {colors[i]}">
+      <div class="legend-symbol" class:thick={r.id === region.id} />
       <div>
         {#if r.id !== region.id && r.id !== 'related'}
           <a href="?region={r.propertyId}" on:click|preventDefault={() => region.set(r, true)}> {r.displayName} </a>
         {:else}{r.displayName}{/if}
       </div>
-      <div>
+      <div class="legend-value">
         {#await data then d}{findValue(r, d, highlightDate)}{/await}
+        {#if sensor.isCasesOrDeath}{sensor.unit}{/if}
       </div>
     </div>
   {/each}

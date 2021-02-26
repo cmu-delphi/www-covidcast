@@ -45,7 +45,7 @@
   $: spec = generateSparkLine({ highlightDate: true, domain: date.sparkLineTimeFrame.domain });
 
   function switchMode() {
-    sensor.set(sensor.value);
+    sensor.set(sensor.value, true);
     currentMode.set(modeByID.indicator);
   }
 </script>

@@ -43,7 +43,7 @@
 <p>On {formatDateShortWeekdayAbbr(date.value)} the 7 day averages are:</p>
 
 <div class="mobile-two-col">
-  <div>
+  <div class="mobile-kpi">
     <h3>Cases</h3>
     <div>
       {#await casesTrend}
@@ -54,7 +54,7 @@
     </div>
     <div class="sub">per 100,000 people</div>
   </div>
-  <div>
+  <div class="mobile-kpi">
     <h3>Deaths</h3>
     <div>
       {#await deathTrend}
@@ -70,7 +70,7 @@
 <p>Compared to the previous week that results in:</p>
 
 <div class="mobile-two-col">
-  <div>
+  <div class="mobile-kpi">
     <h3>Cases</h3>
     <div>
       {#await casesTrend}
@@ -80,7 +80,7 @@
       {/await}
     </div>
   </div>
-  <div>
+  <div class="mobile-kpi">
     <h3>Deaths</h3>
     <div>
       {#await deathTrend}

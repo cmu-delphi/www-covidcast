@@ -5,7 +5,6 @@
   import Vega from '../../components/Vega.svelte';
   import SparkLineTooltip from './SparkLineTooltip.svelte';
   import SortColumnIndicator from './SortColumnIndicator.svelte';
-  import chevronDownIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-down.svg';
   import FancyHeader from './FancyHeader.svelte';
   import TrendIndicator from './TrendIndicator.svelte';
   import { formatDateShortNumbers } from '../../formats';
@@ -70,7 +69,8 @@
         ...r,
         important,
         trendObj: trend,
-        trend: trend.change,
+        delta: trend.delta,
+        change: trend.change,
         value: trend.current ? trend.current.value : null,
         data: data.length > 0 ? extractSparkLine(data, date.sparkLineTimeFrame, sensor.value) : [],
       };
@@ -108,28 +108,19 @@
     return Promise.all([loadSingle(nationInfo, true), loadImpl(stateInfo)]).then((r) => r.flat());
   }
 
-  let sortCriteria = 'smart';
+  let sortCriteria = 'displayName';
   let sortDirectionDesc = false;
 
   function bySortCriteria(sortCriteria, sortDirectionDesc) {
     const less = sortDirectionDesc ? 1 : -1;
-    if (sortCriteria === 'smart') {
-      return (a, b) => {
-        if (a.important && b.important) {
-          // state vs nation
-          return a.level === 'nation' ? -1 : 1;
-        }
-        if (a.important !== b.important) {
-          return a.importnat ? -1 : 1;
-        }
-        if (a.displayName !== b.displayName) {
-          return a.displayName < b.displayName ? less : -less;
-        }
-        return 0;
-      };
-    }
-
     return (a, b) => {
+      if (a.important && b.important) {
+        // state vs nation
+        return a.level === 'nation' ? -1 : 1;
+      }
+      if (a.important !== b.important) {
+        return a.important ? -1 : 1;
+      }
       const av = a[sortCriteria];
       const bv = b[sortCriteria];
       if ((av == null) !== (bv == null)) {
@@ -177,12 +168,6 @@
   $: spec = generateSparkLine({ highlightDate: true, domain: date.sparkLineTimeFrame.domain });
 </script>
 
-<style>
-  .important {
-    font-weight: 600;
-  }
-</style>
-
 <FancyHeader>{title.title}</FancyHeader>
 
 <table class="mobile-table">
@@ -205,8 +190,8 @@
       <th class="sort-indicator uk-text-center">
         <SortColumnIndicator
           label={title.unit}
-          on:click={() => sortClick('smart')}
-          sorted={sortCriteria === 'smart'}
+          on:click={() => sortClick('displayName')}
+          sorted={sortCriteria === 'displayName'}
           desc={sortDirectionDesc} />
       </th>
       <th class="sort-indicator">
@@ -228,8 +213,8 @@
   </thead>
   <tbody>
     {#each sortedRegions as r}
-      <tr>
-        <td class:important={r.important}>
+      <tr class:important={r.important}>
+        <td>
           <a
             href="?region={r.propertyId}"
             class="uk-link-text"
@@ -256,15 +241,9 @@
     <tfoot>
       <tr>
         <td colspan="5" class="uk-text-center">
-          <button
-            class="uk-button uk-button-default uk-button-delphi uk-button-delphi__secondary"
-            on:click={() => (showAll = true)}>
-            <span class="inline-svg-icon">
-              {@html chevronDownIcon}
-            </span>
-            Show remaining
-            {(regions.length - 10).toLocaleString()}
-            regions
+          <button class="uk-button uk-button-text" on:click={() => (showAll = true)}>
+            Show All ({regions.length - 10}
+            remaining)
           </button>
         </td>
       </tr>

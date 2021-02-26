@@ -29,7 +29,11 @@
   $: globalTrend = fetcher.fetchGlobalTrend(sensor, region, date);
   $: trend = fetcher.fetchWindowTrend(sensor, region, date);
   $: sparkline = fetcher.fetchSparkLine(sensor, region, date);
-  $: spec = generateSparkLine({ domain: date.sparkLineTimeFrame.domain });
+  $: spec = generateSparkLine({
+    domain: date.sparkLineTimeFrame.domain,
+    highlightDate: 'top',
+    highlightStartEnd: false,
+  });
 
   function trendAlternative(trend) {
     if (!trend || trend.isUnknown) {
@@ -48,7 +52,7 @@
 
 <style>
   p {
-    margin-top: 1em;
+    margin: 1em 0;
   }
 
   .date-range {
@@ -56,13 +60,14 @@
     display: flex;
     justify-content: space-between;
     line-height: 1;
+    font-size: 0.75rem;
   }
 </style>
 
-<p>On {formatDateShortWeekdayAbbr(date.value, true)} the number of people:</p>
+<p class="p-start">On {formatDateShortWeekdayAbbr(date.value, true)} the number of people:</p>
 
 <div class="mobile-two-col">
-  <div>
+  <div class="mobile-kpi">
     <div>
       {#await trend}
         N/A
@@ -88,7 +93,8 @@
   </div>
 </div>
 
-<p>Compared to the previous week that results in:</p>
+<p class="p-start">Compared to the previous week that means:</p>
+
 <div>
   {#await trend}
     <TrendIndicator trend={null} long {sensor} />
