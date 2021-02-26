@@ -50,7 +50,7 @@
   {/each}
 </div>
 
-<p>Compared to the previous week that results in:</p>
+<p>Compared to the previous week that means:</p>
 
 <div class="mobile-two-col">
   {#each highlightSurveySensors as s}
