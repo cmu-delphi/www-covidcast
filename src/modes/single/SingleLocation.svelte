@@ -100,7 +100,25 @@
       // height: 200,
       // width: 200,
       // title: { text: options.xtitle, orient: 'left', color: 'black' },
-
+      params: [{ name: 'lag', value: 0, bind: { input: 'range', min: 0, max: 20, step: 1 } }],
+      transform: [
+        {
+          window: [
+            {
+              op: 'lag',
+              param: 0,
+              field: column,
+              as: 'x',
+            },
+            {
+              op: 'lag',
+              param: 0,
+              field: row,
+              as: 'y',
+            },
+          ],
+        },
+      ],
       mark: options.histogram ? 'bar' : 'point',
       // selection: {
       //   brush: {
@@ -110,13 +128,13 @@
       // },
       encoding: {
         x: {
-          field: column,
+          field: 'x',
           title: options.xtitle,
           type: 'quantitative',
           ...xBin,
         },
         y: yAggregate || {
-          field: row,
+          field: 'y',
           title: options.ytitle,
           type: 'quantitative',
         },
@@ -128,13 +146,15 @@
         // width: 200,
         // height: 200,
         layer: [
+          chartSpec,
+
           {
             transform: [
               {
                 window: [
                   {
                     op: 'mean',
-                    field: column,
+                    field: 'x',
                     type: 'quantitative',
                     as: 'xmean',
                   },
@@ -145,7 +165,7 @@
                 window: [
                   {
                     op: 'mean',
-                    field: row,
+                    field: 'y',
                     type: 'quantitative',
                     as: 'ymean',
                   },
@@ -169,7 +189,6 @@
               },
             },
           },
-          chartSpec,
         ],
       };
     }
@@ -206,6 +225,7 @@
     width: 500,
     height: 900,
     data: { name: 'values' },
+
     ...matrixSpec,
   };
 </script>
