@@ -64,11 +64,12 @@ export function generateLineChartSpec({
         type: 'temporal',
         axis: {
           title: null,
-          grid: false,
           format: '%m/%d',
           formatType: 'cachedTime',
           labelFontSize: 14,
           labelOverlap: true,
+          grid: true,
+          gridDash: [4, 4],
           tickCount: {
             interval: 'week',
           },
@@ -294,9 +295,9 @@ export function generateSparkLine({
         },
         axis: {
           title: null,
-          grid: true,
           format: '%m/%d',
           formatType: 'cachedTime',
+          grid: true,
           gridDash: [4, 4],
           labels: false,
           ticks: false,
