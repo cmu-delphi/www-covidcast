@@ -34,7 +34,7 @@
 <div class="mobile-two-col">
   {#each highlightSurveySensors as s}
     <div>
-      <h3>{s.sensor.value.name}</h3>
+      <h3><i>{s.sensor.value.name}</i></h3>
       <div>
         {#await s.trend}
           <TrendIndicator trend={null} long sensor={s.sensor} />

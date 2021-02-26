@@ -3,6 +3,7 @@ import { addNameInfos, fetchData, formatAPITime, addMissing, fitRange, parseAPIT
 import { nationInfo } from '../maps';
 import { currentDate, currentRegion, yesterdayDate, currentSensor, sensorList } from '.';
 import { determineTrend, findMinMaxRow } from './trend';
+import { determineMinMax } from '../components/MapBox/colors';
 
 /**
  * @typedef {import('./constants').SensorEntry} Sensor
@@ -154,6 +155,7 @@ export class DataFetcher {
       },
       {
         multiValues: false,
+        factor: sensorFactor(sensor),
       },
     ).then(addNameInfos);
     this.cache.set(key, r);
@@ -194,6 +196,7 @@ export class DataFetcher {
       },
       {
         multiValues: false,
+        factor: sensorFactor(sensor),
       },
     )
       .then(addNameInfos)
@@ -236,6 +239,7 @@ export class DataFetcher {
           {},
           {
             multiValues: false,
+            factor: sensorFactor(sensor),
           },
         ),
       );
@@ -357,6 +361,13 @@ export class DateParam {
   }
 }
 
+/**
+ * @param {Sensor} sensor
+ */
+function sensorFactor(sensor) {
+  return sensor.yAxis.startsWith('Fraction') ? 100 : 1;
+}
+
 export class SensorParam {
   /**
    * @param {Sensor} sensor
@@ -367,6 +378,7 @@ export class SensorParam {
     this.isCasesOrDeath = sensor.isCasesOrDeath;
     this.isPercentage = sensor.format == 'percent' || sensor.signal.includes('_prop');
     this.isInverted = isInverted(sensor);
+    this.factor = sensorFactor(sensor);
   }
 
   formatValue(value) {
@@ -381,6 +393,21 @@ export class SensorParam {
    */
   set(sensor) {
     currentSensor.set(sensor.key);
+  }
+
+  /**
+   * @param {Map<string, any>} stats
+   * @param {Region} region
+   */
+  domain(stats, region) {
+    const domain = determineMinMax(
+      stats,
+      this.value,
+      region.level === 'state' || region.level === 'county' ? 'county' : 'state',
+      {},
+      false,
+    );
+    return [domain[0] * this.factor, domain[1] * this.factor];
   }
 }
 

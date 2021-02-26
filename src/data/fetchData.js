@@ -44,7 +44,7 @@ function computeTransferFields(mixinValues = {}, advanced = false, transferSigna
 export const START_TIME_RANGE = parseAPITime('20100101');
 export const END_TIME_RANGE = parseAPITime('20500101');
 
-function parseData(d, mixinData = {}) {
+function parseData(d, mixinData = {}, factor = 1) {
   if (d.result < 0 || d.message.includes('no results')) {
     return [];
   }
@@ -57,6 +57,7 @@ function parseData(d, mixinData = {}) {
       continue;
     }
     row.date_value = parseAPITime(row.time_value.toString());
+    row.value = row.value * factor;
   }
   // sort by date
   data.sort((a, b) => {
@@ -79,39 +80,41 @@ function deriveCombineKey(mixinData = {}) {
   return combineKey;
 }
 
-function parseMultipleTreeData(d, signals, defaultSignalIndex, mixinData = {}) {
+function parseMultipleTreeData(d, signals, defaultSignalIndex, mixinData = {}, factor = 1) {
   if (d.result < 0 || d.message.includes('no results')) {
     return [];
   }
   const tree = d.epidata || [];
   if (tree.length === 0 || (Array.isArray(tree[0]) && tree[0].length === 0)) {
-    return parseData({ ...d, epidata: [] }, mixinData);
+    return parseData({ ...d, epidata: [] }, mixinData, factor);
   }
   const split = signals.map((k) => tree[0][k]);
   const ref = split[defaultSignalIndex];
-  const combined = combineSignals(split, ref, EPIDATA_CASES_OR_DEATH_VALUES, deriveCombineKey(mixinData));
+  const combined = combineSignals(split, ref, EPIDATA_CASES_OR_DEATH_VALUES, deriveCombineKey(mixinData), factor);
   return parseData(
     {
       ...d,
       epidata: combined,
     },
     mixinData,
+    factor,
   );
 }
 
-function parseMultipleSeparateData(dataArr, defaultSignalIndex, mixinData = {}) {
+function parseMultipleSeparateData(dataArr, defaultSignalIndex, mixinData = {}, factor = 1) {
   if (dataArr.length === 0 || dataArr[0].result < 0 || dataArr[0].message.includes('no results')) {
     return [];
   }
   const data = dataArr.map((d) => d.epidata || []);
   const ref = data[defaultSignalIndex];
-  const combined = combineSignals(data, ref, EPIDATA_CASES_OR_DEATH_VALUES, deriveCombineKey(mixinData));
+  const combined = combineSignals(data, ref, EPIDATA_CASES_OR_DEATH_VALUES, deriveCombineKey(mixinData), factor);
   return parseData(
     {
       ...dataArr[0],
       epidata: combined,
     },
     mixinData,
+    factor,
   );
 }
 
@@ -130,7 +133,7 @@ export function fetchData(
   region,
   date,
   mixinValues = {},
-  { advanced = false, multiValues = true, transferSignal = false } = {},
+  { advanced = false, multiValues = true, transferSignal = false, factor = 1 } = {},
 ) {
   if (!region) {
     return Promise.resolve([]);
@@ -157,7 +160,7 @@ export function fetchData(
           i === 0 ? transferFields : extraDataFields,
         ),
       ),
-    ).then((d) => parseMultipleSeparateData(d, defaultSignalIndex, mixinValues));
+    ).then((d) => parseMultipleSeparateData(d, defaultSignalIndex, mixinValues, factor));
   }
 
   if (sensorEntry.isCasesOrDeath && multiValues) {
@@ -183,7 +186,7 @@ export function fetchData(
         // need to fetch separately, since too many results
         return fetchSeparate(defaultSignalIndex);
       }
-      return parseMultipleTreeData(d, signals, defaultSignalIndex, mixinValues);
+      return parseMultipleTreeData(d, signals, defaultSignalIndex, mixinValues, factor);
     });
   } else {
     return callAPIEndPoint(
@@ -194,7 +197,7 @@ export function fetchData(
       date,
       region,
       transferFields,
-    ).then((rows) => parseData(rows, mixinValues));
+    ).then((rows) => parseData(rows, mixinValues, factor));
   }
 }
 

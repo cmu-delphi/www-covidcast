@@ -1,5 +1,4 @@
 <script>
-  import { determineMinMax } from '../../components/MapBox/colors';
   import Vega from '../../components/Vega.svelte';
   import { getCountiesOfState } from '../../maps';
   import { generateCountiesOfStateSpec, generateRelatedCountySpec, generateStateSpec } from '../../specs/mapSpec';
@@ -33,13 +32,7 @@
   function genSpec(stats, sensor, region, height) {
     const options = {
       height,
-      domain: determineMinMax(
-        stats,
-        sensor.value,
-        region.level === 'state' || region.level === 'county' ? 'county' : 'state',
-        {},
-        false,
-      ),
+      domain: sensor.domain(stats, region),
       withStates: true,
       scheme: sensor.isInverted ? 'yellowgreenblue' : 'yelloworangered',
     };
