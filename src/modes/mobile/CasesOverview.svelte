@@ -1,7 +1,6 @@
 <script>
   import RegionMap from './RegionMap.svelte';
   import SurveyValue from '../survey/SurveyValue.svelte';
-  import FancyHeader from './FancyHeader.svelte';
   import TrendIndicator from './TrendIndicator.svelte';
   import { CASES, DEATHS } from '../../stores/params';
   import { formatDateShortWeekdayAbbr } from '../../formats';
@@ -38,8 +37,6 @@
   }
 </style>
 
-<FancyHeader sub="Indicators" normal>COVIDcast</FancyHeader>
-
 <p>On {formatDateShortWeekdayAbbr(date.value)} the 7 day averages are:</p>
 
 <div class="mobile-two-col">
@@ -47,7 +44,7 @@
     <h3>Cases</h3>
     <div>
       {#await casesTrend}
-        N/A
+        <SurveyValue value={null} />
       {:then d}
         <SurveyValue value={d && d.current ? d.current.value : null} />
       {/await}
@@ -58,7 +55,7 @@
     <h3>Deaths</h3>
     <div>
       {#await deathTrend}
-        N/A
+        <SurveyValue value={null} />
       {:then d}
         <SurveyValue value={d && d.current ? d.current.value : null} />
       {/await}
@@ -67,7 +64,7 @@
   </div>
 </div>
 
-<p>Compared to the previous week that results in:</p>
+<p>Compared to the previous week that means:</p>
 
 <div class="mobile-two-col">
   <div class="mobile-kpi">

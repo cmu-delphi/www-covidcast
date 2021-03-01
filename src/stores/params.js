@@ -293,7 +293,7 @@ export class DataFetcher {
       return this.cache.get(key);
     }
     const trend = this.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame).then((rows) =>
-      determineTrend(date.value, rows, sensor.isInverted),
+      determineTrend(date.value, rows, isInverted(sensor)),
     );
     this.cache.set(key, trend);
     return trend;
@@ -314,7 +314,7 @@ export class DataFetcher {
       return this.cache.get(key);
     }
     const trend = this.fetch1Sensor1RegionNDates(sensor, region, ALL_TIME_FRAME).then((rows) =>
-      determineTrend(date, rows, sensor.isInverted),
+      determineTrend(date, rows, isInverted(sensor)),
     );
     this.cache.set(key, trend);
     return trend;
