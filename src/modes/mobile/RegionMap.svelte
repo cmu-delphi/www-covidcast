@@ -1,9 +1,15 @@
 <script>
   import Vega from '../../components/Vega.svelte';
   import { getCountiesOfState } from '../../maps';
-  import { generateCountiesOfStateSpec, generateRelatedCountySpec, generateStateSpec } from '../../specs/mapSpec';
+  import {
+    generateCountiesOfStateSpec,
+    generateRelatedCountySpec,
+    generateStateSpec,
+    generateCountySpec,
+  } from '../../specs/mapSpec';
   import { stats } from '../../stores';
   import RegionMapTooltip from './RegionMapTooltip.svelte';
+  import Toggle from './Toggle.svelte';
 
   export let className = '';
   /**
@@ -25,11 +31,13 @@
 
   export let height = 300;
 
+  let showCounties = false;
+
   /**
    * @param {import("../../stores/params").SensorParam} sensor
    * @param {import("../../stores/params").RegionParam} region
    */
-  function genSpec(stats, sensor, region, height) {
+  function genSpec(stats, sensor, region, height, showCounties) {
     const options = {
       height,
       domain: sensor.domain(stats, region),
@@ -43,6 +51,9 @@
       return generateRelatedCountySpec(region.value, options);
     }
     // state
+    if (showCounties) {
+      return generateCountySpec(options);
+    }
     return generateStateSpec(options);
   }
 
@@ -51,7 +62,7 @@
    * @param {import("../../stores/params").DateParam} date
    * @param {import("../../stores/params").RegionParam} region
    */
-  function loadData(sensor, date, region) {
+  function loadData(sensor, date, showCounties) {
     if (region.level === 'state') {
       const counties = getCountiesOfState(region.value);
       const countyData = fetcher.fetch1SensorNRegions1Date(
@@ -63,14 +74,14 @@
       const stateData = fetcher.fetch1SensorNRegions1Date(sensor, 'state', '*', date);
       return Promise.all([countyData, stateData]).then((r) => r.flat());
     }
-    if (region.level === 'county') {
+    if (region.level === 'county' || showCounties) {
       return fetcher.fetch1SensorNRegions1Date(sensor, 'county', '*', date);
     }
     return fetcher.fetch1SensorNRegions1Date(sensor, 'state', '*', date);
   }
 
-  $: spec = genSpec($stats, sensor, region, height);
-  $: data = loadData(sensor, date, region);
+  $: spec = genSpec($stats, sensor, region, height, showCounties);
+  $: data = loadData(sensor, date, showCounties);
 </script>
 
 <Vega
@@ -79,3 +90,7 @@
   {data}
   tooltip={RegionMapTooltip}
   tooltipProps={{ sensor: sensor.value, regionSetter: region.set }} />
+
+{#if region.level === 'nation'}
+  <Toggle bind:checked={showCounties}>Show US Counties</Toggle>
+{/if}
