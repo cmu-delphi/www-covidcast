@@ -1,3 +1,14 @@
+# Release 1.12.9
+
+## Signal Changes
+
+- Replaced "Vaccine Acceptance" with signal including both already received the vaccine and definitely or probably choose to get vaccinated.
+- Replaced "COVID-Related Doctor Visits" with new signal from Change Healthcare. For more details see: [`smoothed_outpatient_cli`](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/chng.html)
+
+## New Features
+
+- [#730](https://github.com/cmu-delphi/www-covidcast/pull/730) (re: [#729](https://github.com/cmu-delphi/www-covidcast/issues/729)) Mobile survey toc on medium devices
+
 # Release 1.12.4
 
 This release improves the UX of the survey dashboard for both desktop and mobile experience.
