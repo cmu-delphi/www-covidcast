@@ -8,6 +8,9 @@
 <style>
   .toggle {
     position: relative;
+    cursor: pointer;
+    padding: 1em 0;
+    display: inline-block;
   }
   .toggle > input {
     visibility: hidden;
@@ -19,7 +22,7 @@
     width: 1.2em;
     height: 100%;
     display: none;
-    color: #bfbfbf;
+    fill: #c4c4c4;
   }
   .toggle > :global(svg:last-of-type) {
     display: inline-block;
