@@ -1,7 +1,6 @@
 <script>
   import RegionMap from './RegionMap.svelte';
   import SurveyValue from '../survey/SurveyValue.svelte';
-  import FancyHeader from './FancyHeader.svelte';
   import TrendIndicator from './TrendIndicator.svelte';
   import { CASES, DEATHS } from '../../stores/params';
   import { formatDateShortWeekdayAbbr } from '../../formats';
@@ -37,8 +36,6 @@
     text-align: center;
   }
 </style>
-
-<FancyHeader sub="Indicators" normal>COVIDcast</FancyHeader>
 
 <p>On {formatDateShortWeekdayAbbr(date.value)} the 7 day averages are:</p>
 

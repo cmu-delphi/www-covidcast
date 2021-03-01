@@ -61,12 +61,14 @@
 </style>
 
 <div class="parameter-container">
+  <slot name="title" />
   <div class="uk-container content-grid parameters">
     <Search
       className="survey-search grid-3-8"
       modern
       {placeholder}
       {items}
+      icon="location"
       selectedItem={$currentRegionInfo || defaultItem}
       labelFieldName="displayName"
       keywordFunction={combineKeywords}

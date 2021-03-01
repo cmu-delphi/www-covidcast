@@ -47,6 +47,8 @@
   // add the title to the HTML input
   export let title = undefined;
 
+  export let icon = 'search';
+
   // selected item state
   export let selectedItem = undefined;
   /**
@@ -407,10 +409,10 @@
     flex: 2 1 auto;
   }
   .search-icon.modern {
-    left: 10px;
+    left: 0;
   }
   .clear-button.modern {
-    right: 10px;
+    right: 0;
   }
   .uk-search-input.modern {
     background: white;
@@ -418,7 +420,7 @@
     height: 50px;
     font-size: 0.75rem;
     line-height: 1rem;
-    padding-left: 50px !important;
+    padding-left: 35px !important;
     padding-top: 10px;
     padding-bottom: 10px;
     border-radius: 3px;
@@ -440,7 +442,7 @@
   class:modern
   on:click={onContainerClick}>
   {#if !multiple}
-    <span class="uk-search-icon search-icon" class:modern data-uk-icon="icon: search" />
+    <span class="uk-search-icon search-icon" class:modern data-uk-icon="icon: {icon}" />
     <input
       class="uk-search-input"
       class:modern
@@ -465,7 +467,7 @@
       title="Clear Search Field"
       data-uk-icon="icon: close" />
   {:else}
-    <span class="uk-search-icon search-multiple-icon search-icon" data-uk-icon="icon: search" class:modern />
+    <span class="uk-search-icon search-multiple-icon search-icon" data-uk-icon="icon: {icon}" class:modern />
 
     {#each selectedItems as selectedItem}
       <div class="search-tag" style="border-color: {colorFieldName ? selectedItem[colorFieldName] : undefined}">
