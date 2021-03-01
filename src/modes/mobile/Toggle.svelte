@@ -9,6 +9,8 @@
   .toggle {
     position: relative;
     cursor: pointer;
+    padding: 1em 0;
+    display: inline-block;
   }
   .toggle > input {
     visibility: hidden;

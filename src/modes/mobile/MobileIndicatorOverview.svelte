@@ -53,9 +53,9 @@
         <RegionMap {sensor} {date} {region} {fetcher} />
       </div>
 
-      <FancyHeader>Performance</FancyHeader>
+      <FancyHeader sub="Chart">Indicator</FancyHeader>
 
-      <div class="chart-150">
+      <div class="chart-250">
         <HistoryLineChart {sensor} {date} {region} {fetcher} />
       </div>
     </div>

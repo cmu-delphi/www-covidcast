@@ -1,5 +1,7 @@
 import { CURRENT_DATE_HIGHLIGHT } from '../components/vegaSpecUtils';
-import { selectionColors } from '../theme';
+
+// dark2
+export const MULTI_COLORS = ['#1B9E77', '#D95F02', '#7570B3', '#E7298A', '#66A61E', '#E6AB02', '#A6761D'];
 
 export const COLOR = '#666666';
 
@@ -203,16 +205,9 @@ export function generateCompareLineSpec(compare, { compareField = 'displayName',
     type: 'nominal',
     scale: {
       domain: compare,
-      range: [COLOR, ...selectionColors],
+      range: MULTI_COLORS,
     },
     legend: null,
-  };
-  spec.layer[0].encoding.strokeWidth = {
-    condition: {
-      test: `datum['${compareField}'] === "${compare[0]}"`,
-      value: 3,
-    },
-    value: 1,
   };
   spec.layer[1].encoding.color = {
     field: compareField,
@@ -484,7 +479,7 @@ export function generateDistributionLineSpec(state, options = {}) {
     type: 'nominal',
     scale: {
       domain: [state.propertyId.toLowerCase(), 'us'],
-      range: [selectionColors[0], COLOR],
+      range: [MULTI_COLORS[0], COLOR],
     },
     legend: {
       direction: 'horizontal',
@@ -591,7 +586,7 @@ export function generateDistributionLineSpec2(state, options = {}) {
   spec.layer[0].encoding.color = {
     condition: {
       test: `datum.geo_value == '${state.propertyId.toLowerCase()}'`,
-      value: selectionColors[0],
+      value: MULTI_COLORS[0],
     },
     value: COLOR,
   };
@@ -615,7 +610,7 @@ export function generateDistributionLineSpec2(state, options = {}) {
   spec.layer[1].encoding.color = {
     condition: {
       test: `datum.geo_value == '${state.propertyId.toLowerCase()}'`,
-      value: selectionColors[0],
+      value: MULTI_COLORS[0],
     },
     value: COLOR,
   };
