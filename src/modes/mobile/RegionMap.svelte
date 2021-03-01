@@ -40,7 +40,12 @@
   function genSpec(stats, sensor, region, height, showCounties) {
     const options = {
       height,
-      domain: sensor.domain(stats, region),
+      domain: sensor.domain(
+        stats,
+        region.level === 'state' || region.level === 'county' || (region.level === 'nation' && showCounties)
+          ? 'county'
+          : 'state',
+      ),
       withStates: true,
       scheme: sensor.isInverted ? 'yellowgreenblue' : 'yelloworangered',
     };

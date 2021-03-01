@@ -403,16 +403,10 @@ export class SensorParam {
 
   /**
    * @param {Map<string, any>} stats
-   * @param {Region} region
+   * @param {string} level
    */
-  domain(stats, region) {
-    const domain = determineMinMax(
-      stats,
-      this.value,
-      region.level === 'state' || region.level === 'county' ? 'county' : 'state',
-      {},
-      false,
-    );
+  domain(stats, level) {
+    const domain = determineMinMax(stats, this.value, level, {}, false);
     return [domain[0] * this.factor, domain[1] * this.factor];
   }
 }
