@@ -84,9 +84,6 @@
     const selfData = fetcher.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame);
 
     const data = [selfData];
-    if (region.level !== 'nation') {
-      data.push(fetcher.fetch1Sensor1RegionNDates(sensor, nationInfo, date.windowTimeFrame));
-    }
 
     if (region.level === 'county') {
       const state = getInfoByName(region.state);
@@ -96,9 +93,12 @@
         .fetch1SensorNRegionsNDates(sensor, relatedCounties, date.windowTimeFrame)
         .then((r) => averageByDate(r, sensor, relatedInfo))
         .then((r) => addMissing(r, sensor));
-      data.push(stateData, relatedData);
+      data.push(relatedData, stateData);
     }
-    return Promise.all(data).then((rows) => rows.flat());
+    if (region.level !== 'nation') {
+      data.push(fetcher.fetch1Sensor1RegionNDates(sensor, nationInfo, date.windowTimeFrame));
+    }
+    return Promise.all(data).then((rows) => rows.reverse().flat());
   }
 
   let zoom = false;
