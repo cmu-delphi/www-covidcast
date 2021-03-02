@@ -1,6 +1,6 @@
 <script>
   import Vega from '../../components/Vega.svelte';
-  import { formatDateShortNumbers, formatDateShortWeekdayAbbr } from '../../formats';
+  import { formatDateShortNumbers, formatDateShortWeekdayAbbr, formatDateYearWeekdayAbbr } from '../../formats';
   import { generateSparkLine } from '../../specs/lineSpec';
   import { WINDOW_SIZE } from '../../stores/params';
   import SurveyValue from '../survey/SurveyValue.svelte';
@@ -26,7 +26,6 @@
    */
   export let fetcher;
 
-  $: globalTrend = fetcher.fetchGlobalTrend(sensor, region, date);
   $: trend = fetcher.fetchWindowTrend(sensor, region, date);
   $: sparkline = fetcher.fetchSparkLine(sensor, region, date);
   $: spec = generateSparkLine({
@@ -104,15 +103,29 @@
 </div>
 
 <p>
-  {#await globalTrend then d}
-    On
-    {formatDateShortWeekdayAbbr(date.value, true)}
-    <strong>{sensor.value.name}</strong>
-    was
-    <strong>{trendAlternative(d.worstTrend)}</strong>
-    compared to the
-    <strong>{WINDOW_SIZE} month worst value of {sensor.formatValue(d.worst ? d.worst.value : null)}</strong>
-    on
-    <strong>{formatDateShortWeekdayAbbr(d.worstDate, true)}</strong>.
+  {#await trend then d}
+    {#if +date.value === +d.worstDate}
+      On
+      {formatDateShortWeekdayAbbr(date.value, true)}
+      <strong>{sensor.value.name}</strong>
+      was the
+      {WINDOW_SIZE}
+      month
+      <strong>worst</strong>
+      value compared to
+      <strong>best value of {sensor.formatValue(d.best ? d.best.value : null)}</strong>
+      on
+      <strong>{formatDateYearWeekdayAbbr(d.bestDate, true)}</strong>.
+    {:else}
+      On
+      {formatDateShortWeekdayAbbr(date.value, true)}
+      <strong>{sensor.value.name}</strong>
+      was
+      <strong>{trendAlternative(d.worstTrend)}</strong>
+      compared to the
+      <strong>{WINDOW_SIZE} month worst value of {sensor.formatValue(d.worst ? d.worst.value : null)}</strong>
+      on
+      <strong>{formatDateYearWeekdayAbbr(d.worstDate, true)}</strong>.
+    {/if}
   {/await}
 </p>
