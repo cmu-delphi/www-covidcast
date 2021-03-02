@@ -5,15 +5,16 @@
   import getRelatedCounties from '../../maps/related';
   import HistoryLineTooltip from './HistoryLineTooltip.svelte';
   import {
-    COLOR,
     generateCompareLineSpec,
     generateLineChartSpec,
     resolveHighlightedDate,
+    generateLineAndBarSpec,
     signalPatches,
     MULTI_COLORS,
   } from '../../specs/lineSpec';
   import { toTimeValue } from '../../stores/params';
   import Toggle from './Toggle.svelte';
+  import { combineSignals } from '../../data/utils';
 
   export let height = 250;
 
@@ -46,16 +47,23 @@
     propertyId: 'related',
     displayName: 'Related Counties',
   };
+
+  $: highlightDate = date.value;
+
   /**
    * @param {import('../../maps').NameInfo} region
    * @param {Date} date
    */
-  function genSpec(region, date, height, zero) {
+  function genSpec(region, date, height, zero, singleRaw) {
     const options = {
-      initialDate: date,
+      initialDate: highlightDate || date,
       height,
+      color: MULTI_COLORS[0],
       zero,
     };
+    if (singleRaw) {
+      return generateLineAndBarSpec(options);
+    }
     if (region.level === 'state') {
       // state vs nation
       return generateCompareLineSpec([region.displayName, nationInfo.displayName], options);
@@ -101,12 +109,22 @@
     return Promise.all(data).then((rows) => rows.flat());
   }
 
-  let zoom = false;
+  /**
+   * @param {import("../../stores/params").SensorParam} sensor
+   * @param {import("../../stores/params").DateParam} date
+   * @param {import("../../stores/params").RegionParam} region
+   */
+  function loadSingleData(sensor, region, date) {
+    if (!region.value || !date.value) {
+      return null;
+    }
+    const selfData = fetcher.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame);
+    const rawData = fetcher.fetch1Sensor1RegionNDates(sensor.rawValue, region, date.windowTimeFrame);
 
-  $: spec = genSpec(region.value, date.value, height, !zoom);
-  $: data = loadData(sensor, region, date);
-
-  $: highlightDate = date.value;
+    return Promise.all([selfData, rawData]).then((data) => {
+      return combineSignals(data, data[0], ['smoothed', 'raw']);
+    });
+  }
 
   function onSignal(event) {
     if (event.detail.name === 'highlight') {
@@ -128,8 +146,13 @@
     return [region];
   }
 
-  $: regions = resolveRegions(region.value);
-  $: colors = regions.length > 0 ? MULTI_COLORS : [COLOR];
+  let zoom = false;
+  let singleRaw = false;
+
+  $: spec = genSpec(region.value, date.value, height, !zoom, singleRaw && sensor.rawValue != null);
+  $: data =
+    singleRaw && sensor.rawValue != null ? loadSingleData(sensor, region, date) : loadData(sensor, region, date);
+  $: regions = singleRaw && sensor.rawValue != null ? [region.value] : resolveRegions(region.value);
 
   function findValue(region, data, date) {
     if (!date) {
@@ -140,7 +163,11 @@
     if (!row) {
       return 'N/A';
     }
-    return sensor.formatValue(row.value);
+    const value = sensor.formatValue(row.value);
+    if (!singleRaw) {
+      return value;
+    }
+    return `${value} (raw: ${sensor.formatValue(row.raw)})`;
   }
 </script>
 
@@ -172,11 +199,16 @@
   signalListeners={['highlight']}
   on:signal={onSignal} />
 
-<Toggle bind:checked={zoom}>Zoom Y-axis</Toggle>
+<div>
+  <Toggle bind:checked={zoom}>Zoom Y-axis</Toggle>
+  {#if sensor.rawValue != null}
+    <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
+  {/if}
+</div>
 
-<div class="{regions.length > 1 ? 'mobile-two-col' : ''} legend">
+<div class="{!(singleRaw && sensor.rawValue != null) && regions.length > 1 ? 'mobile-two-col' : ''} legend">
   {#each regions as r, i}
-    <div class="legend-elem" style="--color: {colors[i]}">
+    <div class="legend-elem" style="--color: {MULTI_COLORS[i]}">
       <div>
         <span class="legend-symbol">●</span>
         <span>
