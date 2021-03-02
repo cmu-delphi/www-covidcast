@@ -1,6 +1,6 @@
 <script>
   import Vega from '../../components/Vega.svelte';
-  import { formatDateShortNumbers, formatDateShortWeekdayAbbr } from '../../formats';
+  import { formatDateShortNumbers, formatDateShortWeekdayAbbr, formatDateYearWeekdayAbbr } from '../../formats';
   import { generateSparkLine } from '../../specs/lineSpec';
   import { WINDOW_SIZE } from '../../stores/params';
   import SurveyValue from '../survey/SurveyValue.svelte';
@@ -26,7 +26,6 @@
    */
   export let fetcher;
 
-  $: globalTrend = fetcher.fetchGlobalTrend(sensor, region, date);
   $: trend = fetcher.fetchWindowTrend(sensor, region, date);
   $: sparkline = fetcher.fetchSparkLine(sensor, region, date);
   $: spec = generateSparkLine({
@@ -104,7 +103,7 @@
 </div>
 
 <p>
-  {#await globalTrend then d}
+  {#await trend then d}
     {#if +date.value === +d.worstDate}
       On
       {formatDateShortWeekdayAbbr(date.value, true)}
@@ -114,7 +113,7 @@
       month worst value compared to
       <strong>best value of {sensor.formatValue(d.best ? d.best.value : null)}</strong>
       on
-      <strong>{formatDateShortWeekdayAbbr(d.bestDate, true)}</strong>.
+      <strong>{formatDateYearWeekdayAbbr(d.bestDate, true)}</strong>.
     {:else}
       On
       {formatDateShortWeekdayAbbr(date.value, true)}
@@ -124,7 +123,7 @@
       compared to the
       <strong>{WINDOW_SIZE} month worst value of {sensor.formatValue(d.worst ? d.worst.value : null)}</strong>
       on
-      <strong>{formatDateShortWeekdayAbbr(d.worstDate, true)}</strong>.
+      <strong>{formatDateYearWeekdayAbbr(d.worstDate, true)}</strong>.
     {/if}
   {/await}
 </p>
