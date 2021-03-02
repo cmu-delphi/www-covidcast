@@ -105,14 +105,26 @@
 
 <p>
   {#await globalTrend then d}
-    On
-    {formatDateShortWeekdayAbbr(date.value, true)}
-    <strong>{sensor.value.name}</strong>
-    was
-    <strong>{trendAlternative(d.worstTrend)}</strong>
-    compared to the
-    <strong>{WINDOW_SIZE} month worst value of {sensor.formatValue(d.worst ? d.worst.value : null)}</strong>
-    on
-    <strong>{formatDateShortWeekdayAbbr(d.worstDate, true)}</strong>.
+    {#if +date.value === +d.worstDate}
+      On
+      {formatDateShortWeekdayAbbr(date.value, true)}
+      <strong>{sensor.value.name}</strong>
+      was the
+      {WINDOW_SIZE}
+      month worst value compared to
+      <strong>best value of {sensor.formatValue(d.best ? d.best.value : null)}</strong>
+      on
+      <strong>{formatDateShortWeekdayAbbr(d.bestDate, true)}</strong>.
+    {:else}
+      On
+      {formatDateShortWeekdayAbbr(date.value, true)}
+      <strong>{sensor.value.name}</strong>
+      was
+      <strong>{trendAlternative(d.worstTrend)}</strong>
+      compared to the
+      <strong>{WINDOW_SIZE} month worst value of {sensor.formatValue(d.worst ? d.worst.value : null)}</strong>
+      on
+      <strong>{formatDateShortWeekdayAbbr(d.worstDate, true)}</strong>.
+    {/if}
   {/await}
 </p>
