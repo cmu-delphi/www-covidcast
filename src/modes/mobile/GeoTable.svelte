@@ -113,6 +113,11 @@
 
   function bySortCriteria(sortCriteria, sortDirectionDesc) {
     const less = sortDirectionDesc ? 1 : -1;
+
+    function clean(a) {
+      // normalize NaN to null
+      return typeof a === 'number' && Number.isNaN(a) ? null : a;
+    }
     return (a, b) => {
       if (a.important && b.important) {
         // state vs nation
@@ -121,8 +126,8 @@
       if (a.important !== b.important) {
         return a.important ? -1 : 1;
       }
-      const av = a[sortCriteria];
-      const bv = b[sortCriteria];
+      const av = clean(a[sortCriteria]);
+      const bv = clean(b[sortCriteria]);
       if ((av == null) !== (bv == null)) {
         return av == null ? 1 : -1;
       }
@@ -197,8 +202,8 @@
       <th class="sort-indicator">
         <SortColumnIndicator
           label="Change Last 7 days"
-          on:click={() => sortClick('trend')}
-          sorted={sortCriteria === 'trend'}
+          on:click={() => sortClick('delta')}
+          sorted={sortCriteria === 'delta'}
           desc={sortDirectionDesc} />
       </th>
       <th class="sort-indicator">

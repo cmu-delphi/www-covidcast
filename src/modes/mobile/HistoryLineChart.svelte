@@ -38,7 +38,7 @@
   /**
    * @type {import("../../stores/params").Region}
    */
-  const related = {
+  const relatedInfo = {
     id: 'related',
     level: 'county',
     name: 'Related Counties',
@@ -64,7 +64,7 @@
       // county vs related vs state vs nation
       const state = getInfoByName(region.state);
       return generateCompareLineSpec(
-        [region.displayName, related.displayName, state.displayName, nationInfo.displayName],
+        [region.displayName, relatedInfo.displayName, state.displayName, nationInfo.displayName],
         options,
       );
     }
@@ -91,10 +91,10 @@
     if (region.level === 'county') {
       const state = getInfoByName(region.state);
       const stateData = fetcher.fetch1Sensor1RegionNDates(sensor, state, date.windowTimeFrame);
-      const related = getRelatedCounties(region.value);
+      const relatedCounties = getRelatedCounties(region.value);
       const relatedData = fetcher
-        .fetch1SensorNRegionsNDates(sensor, related, date.windowTimeFrame)
-        .then((r) => averageByDate(r, sensor, related))
+        .fetch1SensorNRegionsNDates(sensor, relatedCounties, date.windowTimeFrame)
+        .then((r) => averageByDate(r, sensor, relatedInfo))
         .then((r) => addMissing(r, sensor));
       data.push(stateData, relatedData);
     }
@@ -123,7 +123,7 @@
     if (region.level === 'county') {
       // county vs related vs state vs nation
       const state = getInfoByName(region.state);
-      return [region, related, state, nationInfo];
+      return [region, relatedInfo, state, nationInfo];
     }
     return [region];
   }
