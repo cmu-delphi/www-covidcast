@@ -170,7 +170,6 @@ module.exports = () => {
         template: './src/index.html',
         filename: 'survey-results/index.html',
       }),
-
       new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({
         filename: devMode ? '[name].css' : '[name].[contenthash].css',

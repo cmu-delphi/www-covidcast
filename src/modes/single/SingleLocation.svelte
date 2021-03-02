@@ -3,26 +3,128 @@
   import { nameInfos } from '../../maps';
   import {
     addCompare,
-    // currentDateObject,
+    currentDateObject,
     currentRegionInfo,
     currentMultiSelection,
     removeCompare,
     selectByInfo,
   } from '../../stores';
+  // import { get } from 'svelte/store';
   import { sensorList } from '../../stores/constants';
-  // import SensorCard from './SensorCard.svelte';
-  import { selectionColors } from '../../theme';
-  // import { onHighlight } from '../overview/vegaSpec';
-  // import { highlightTimeValue } from '../../stores';
-  import { prepareSensorData } from '../overview/vegaSpec';
-  import { currentSensorEntry, smallMultipleTimeSpan } from '../../stores';
-  import Vega from '../../components/Vega.svelte';
   import { groupedSensorList } from '../../stores/constants';
+
+  // import SensorCard from './SensorCard.svelte';
+  import IndicatorCompare from './IndicatorCompare.svelte';
+  import { selectionColors } from '../../theme';
+  import { onHighlight, prepareSensorData } from '../overview/vegaSpec';
+  import { highlightTimeValue, smallMultipleTimeSpan } from '../../stores';
+  // import { formatAPITime, parseAPITime } from '../../data';
 
   $: selectedLevels = new Set($currentMultiSelection.map((d) => d.info.level));
   function filterItem(item) {
     return selectedLevels.size === 0 || selectedLevels.has(item.level);
   }
+
+  // /**
+  //  * @type {import('../../stores/constants').SensorEntry[]}
+  //  */
+  // let otherSensors = sensorList; // [$currentSensorEntry];
+
+  // $: highlightDate = highlightTimeValue != null ? parseAPITime(highlightTimeValue) : null;
+
+  // // use local variables with manual setting for better value comparison updates
+  // let startDay = $smallMultipleTimeSpan[0];
+  // let endDay = $smallMultipleTimeSpan[1];
+  // $: {
+  //   if (startDay.getTime() !== $smallMultipleTimeSpan[0].getTime()) {
+  //     startDay = $smallMultipleTimeSpan[0];
+  //   }
+  //   if (endDay.getTime() !== $smallMultipleTimeSpan[1].getTime()) {
+  //     endDay = $smallMultipleTimeSpan[1];
+  //   }
+  // }
+  // /**
+  //  * @type {import('../../stores').CompareSelection[]}
+  //  */
+  // export let selections = [];
+
+  // // $: sensorWithData = prepareSensorData(sensor, selections, startDay, endDay);
+
+  // // Indicator chosen by user from menu.
+  // let chosenColumn = '';
+  // $: {
+  //   if (chosenColumn) {
+  //     const chosenSensor = sensorList.find((d) => d.key === chosenColumn);
+  //     otherSensors = otherSensors.concat([chosenSensor]);
+  //     chosenColumn = '';
+  //     console.info('otherSensors', otherSensors);
+  //   }
+  // }
+
+  // function loadAllSignalData(sensorPromises) {
+  //   // for each time_value, merge data values across sensors.
+  //   const sensorDateMap = {};
+  //   const sensorKeysMap = {}; // map from sensor key to sensor.
+  //   return Promise.all(sensorPromises).then((sensorsDataRows) => {
+  //     console.info('sensorsDataRows', sensorsDataRows);
+  //     sensorsDataRows.forEach((sensorRows, index) => {
+  //       const sensorData = sensorListData[index];
+  //       console.info('index', index, 'sensorData', sensorData, 'sensorRows', sensorRows);
+  //       sensorRows.forEach((row) => {
+  //         const time_value_key = String(row.time_value);
+  //         if (!sensorDateMap[time_value_key]) {
+  //           sensorDateMap[time_value_key] = { ...row };
+  //         }
+  //         const sensorKey = sensorData.sensor.key;
+  //         sensorKeysMap[sensorKey] = sensorData.sensor;
+  //         sensorDateMap[time_value_key][sensorKey] = row.value;
+  //       });
+  //     });
+  //     console.info('sensorKeysMap', sensorKeysMap);
+  //     console.info('sensorDateMap', sensorDateMap);
+  //     // const sensors = Object.values(sensorKeysMap);
+  //     // vegaRepeatSpec = {
+  //     //   rows: sensors,
+  //     //   columns: sensors, // .reverse(),
+  //     // };
+  //     return Object.values(sensorDateMap);
+  //   });
+  // }
+
+  // function resolveData(sensor) {
+  //   let sensorWithData = prepareSensorData(sensor, selections, startDay, endDay);
+
+  //   /**
+  //    * @type {(number | null)[]}
+  //    */
+  //   let values = selections.map(() => null);
+
+  //   let date = get(currentDateObject);
+
+  //   const keyDate = formatAPITime(highlightDate ? highlightDate : date);
+  //   if (!sensorWithData) {
+  //     console.error('no sensorWithData');
+  //   }
+  //   Promise.resolve(sensorWithData.data).then((rows) => {
+  //     values = selections.map((region) => {
+  //       const row = rows.find((d) => String(d.time_value) === keyDate && d.geo_value === region.info.propertyId);
+  //       return row ? row.value : null;
+  //     });
+  //   });
+  // }
+
+  // // $: sensorListData = sensorList.slice(0, 4).map((sensor) => prepareSensorData(sensor, selections, startDay, endDay));
+  // // $: sensorListData = otherSensors.map((sensor) => prepareSensorData(sensor, selections, startDay, endDay));
+  // $: sensorListData = otherSensors.map((sensor) => resolveData(sensor));
+  // $: sensorDataPromises = sensorListData.map((sensorData) => {
+  //   if (!sensorData) {
+  //     console.error('no sensorData');
+  //     return null;
+  //   }
+  //   return sensorData.data;
+  // });
+  // $: sensorMatrixData = loadAllSignalData(sensorDataPromises);
+
   // use local variables with manual setting for better value comparison updates
   let startDay = $smallMultipleTimeSpan[0];
   let endDay = $smallMultipleTimeSpan[1];
@@ -38,12 +140,11 @@
   /**
    * @type {import('../../stores/constants').SensorEntry[]}
    */
-  let otherSensors = [$currentSensorEntry];
+  let otherSensors = sensorList; //[$currentSensorEntry];
   // $: primary = $currentSensorEntry;
   // $: {
   //   otherSensors.push(primary);
   // }
-
   let chosenColumn = ''; // Sensor chosen by user from menu.
   $: {
     if (chosenColumn) {
@@ -87,147 +188,6 @@
   $: sensorDataPromises = sensorListData.map((sensorData) => sensorData.data);
   $: sensorMatrixData = loadAllSignalData(sensorDataPromises);
   $: vegaRepeatSpec = { rows: [], columnc: [] };
-
-  // row and column are field names as keys.
-  function makeMatrixCellSpec(row, column, options) {
-    let xBin = {};
-    let yAggregate = null;
-    if (options.histogram) {
-      xBin = { bin: true };
-      yAggregate = { aggregate: 'count', title: 'Count' };
-    }
-    const chartSpec = {
-      // height: 200,
-      // width: 200,
-      // title: { text: options.xtitle, orient: 'left', color: 'black' },
-      params: [{ name: 'lag', value: 0, bind: { input: 'range', min: 0, max: 20, step: 1 } }],
-      transform: [
-        {
-          window: [
-            {
-              op: 'lag',
-              param: 0,
-              field: column,
-              as: 'x',
-            },
-            {
-              op: 'lag',
-              param: 0,
-              field: row,
-              as: 'y',
-            },
-          ],
-        },
-      ],
-      mark: options.histogram ? 'bar' : 'point',
-      // selection: {
-      //   brush: {
-      //     type: 'interval',
-      //     mark: { cursor: 'move' },
-      //   },
-      // },
-      encoding: {
-        x: {
-          field: 'x',
-          title: options.xtitle,
-          type: 'quantitative',
-          ...xBin,
-        },
-        y: yAggregate || {
-          field: 'y',
-          title: options.ytitle,
-          type: 'quantitative',
-        },
-      },
-    };
-    let spec = chartSpec;
-    if (!options.histogram) {
-      spec = {
-        // width: 200,
-        // height: 200,
-        layer: [
-          chartSpec,
-
-          {
-            transform: [
-              {
-                window: [
-                  {
-                    op: 'mean',
-                    field: 'x',
-                    type: 'quantitative',
-                    as: 'xmean',
-                  },
-                ],
-                frame: [-6, 0],
-              },
-              {
-                window: [
-                  {
-                    op: 'mean',
-                    field: 'y',
-                    type: 'quantitative',
-                    as: 'ymean',
-                  },
-                ],
-                frame: [-6, 0],
-              },
-            ],
-            mark: {
-              type: 'trail',
-              opacity: 0.7,
-              color: 'gray',
-            },
-            encoding: {
-              x: { field: 'xmean', type: 'quantitative', sort: null },
-              y: { field: 'ymean', type: 'quantitative', sort: null },
-              // color: { field: 'date_value', type: 'temporal',         scale:  },
-              size: {
-                field: 'date_value',
-                type: 'temporal',
-                scale: { range: [0, 6] },
-              },
-            },
-          },
-        ],
-      };
-    }
-    return spec;
-  }
-  $: matrixSpec = [];
-  $: {
-    // const numRows = vegaRepeatSpec.rows.length;
-    // const numCols = vegaRepeatSpec.columns.length;
-    matrixSpec = {
-      columns: 1, // vegaRepeatSpec.columns.length,
-      concat: [
-        ...vegaRepeatSpec.rows
-          .map((r) => {
-            const c = vegaRepeatSpec.columns[0];
-            return [
-              ...[makeMatrixCellSpec(r.key, c.key, { histogram: r == c, xtitle: c.name, ytitle: r.name })],
-            ].flat();
-          })
-          .flat(),
-      ],
-    };
-    console.info('matrix', matrixSpec);
-  }
-  $: splomSpec = {
-    $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
-    // title: 'correlations',
-    // autosize: {
-    //   type: 'fixed',
-    //   contains: 'padding',
-    //   resize: true,
-    // },
-    padding: { left: 50, right: 40, top: 50, bottom: 50 },
-    width: 500,
-    height: 900,
-    data: { name: 'values' },
-
-    ...matrixSpec,
-  };
 </script>
 
 <style>
@@ -240,11 +200,9 @@
 
   .search-container {
     align-self: center;
-    width: 100%;
-    height: 100%;
+    width: 60em;
     margin-bottom: 1em;
   }
-
   .add-column-container {
     min-width: 40px;
   }
@@ -293,22 +251,6 @@
       width: unset;
     }
   }
-
-  .wide-card-grid {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .wide-card-grid > :global(*) {
-    width: 400px;
-  }
 </style>
 
 <div class="root base-font-size">
@@ -345,7 +287,21 @@
       on:add={(e) => addCompare(e.detail)}
       on:remove={(e) => removeCompare(e.detail.info)}
       on:change={(e) => selectByInfo(e.detail)} />
+  </div>
 
-    <Vega data={Promise.resolve(sensorMatrixData)} spec={splomSpec} />
+  <div class="grid-wrapper">
+    <div class="card-grid">
+      <table style="width:50%">
+        {#each otherSensors as sensor (sensor.key)}
+          <IndicatorCompare
+            {sensorMatrixData}
+            {sensor}
+            date={$currentDateObject}
+            selections={$currentMultiSelection}
+            {onHighlight}
+            highlightTimeValue={$highlightTimeValue} />
+        {/each}
+      </table>
+    </div>
   </div>
 </div>
