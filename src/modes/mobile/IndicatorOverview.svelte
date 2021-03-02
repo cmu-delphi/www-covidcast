@@ -110,7 +110,9 @@
       <strong>{sensor.value.name}</strong>
       was the
       {WINDOW_SIZE}
-      month worst value compared to
+      month
+      <strong>worst</strong>
+      value compared to
       <strong>best value of {sensor.formatValue(d.best ? d.best.value : null)}</strong>
       on
       <strong>{formatDateYearWeekdayAbbr(d.bestDate, true)}</strong>.
