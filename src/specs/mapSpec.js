@@ -325,12 +325,12 @@ function stateJSON() {
 // function msaJSON() {
 //   return import(/* webpackChunkName: 'shape-msa' */ './shapefiles/msa.json').then((r) => r.default);
 // }
-// function stateTilesJSON() {
-//   return import(/* webpackChunkName: 'tile-state' */ './tilegrams/state.topo.json').then((r) => r.default);
-// }
-// function nationTilesJSON() {
-//   return import(/* webpackChunkName: 'tile-nation' */ './tilegrams/nation.topo.json').then((r) => r.default);
-// }
+function stateTilesJSON() {
+  return import(/* webpackChunkName: 'tile-state' */ './tilegrams/state.topo.json').then((r) => r.default);
+}
+function nationTilesJSON() {
+  return import(/* webpackChunkName: 'tile-nation' */ './tilegrams/nation.topo.json').then((r) => r.default);
+}
 
 // export function generateHRRSpec(options = {}) {
 //   const level = 'hrr';
@@ -431,11 +431,11 @@ export function generateCountiesOfStateSpec(state, { withStates = false, ...opti
   };
   spec.transform.unshift(isCountyOfState);
 
-  spec.datasets.nation = nationJSON();
-  spec.layer.push(genMissingLayer());
   spec.datasets.state = stateJSON();
 
   if (withStates) {
+    spec.datasets.nation = nationJSON();
+    spec.layer.push(genMissingLayer());
     spec.projection.fit = {
       signal: `customInFilter(data('state'), 'id', ["${state.id}"])`,
     };
@@ -495,47 +495,47 @@ export function generateRelatedCountySpec(county, options = {}) {
   return spec;
 }
 
-// export function generateStateTileSpec(options = {}) {
-//   const level = 'state';
-//   const topoJSON = stateTilesJSON();
+export function generateStateTileSpec(options = {}) {
+  const level = 'state';
+  const topoJSON = stateTilesJSON();
 
-//   const spec = genBaseSpec(level, topoJSON, options);
-//   spec.projection = {
-//     type: 'identity',
-//     reflectY: true,
-//   };
-//   spec.datasets.nation = nationTilesJSON();
-//   spec.layer.push(genMissingLayer());
-//   // state, msa
-//   spec.layer.push(genLevelLayer(options));
-//   spec.layer.push(genLevelHoverLayer());
-//   /**
-//    * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
-//    */
-//   const layer = {
-//     mark: {
-//       type: 'text',
-//       align: 'center',
-//       baseline: 'middle',
-//     },
-//     encoding: {
-//       key: {
-//         field: 'id',
-//       },
-//       longitude: {
-//         field: 'properties.lon',
-//         type: 'quantitative',
-//       },
-//       latitude: {
-//         field: 'properties.lat',
-//         type: 'quantitative',
-//       },
-//       text: {
-//         field: 'propertyId',
-//         type: 'nominal',
-//       },
-//     },
-//   };
-//   spec.layer.push(layer);
-//   return spec;
-// }
+  const spec = genBaseSpec(level, topoJSON, options);
+  spec.projection = {
+    type: 'identity',
+    reflectY: true,
+  };
+  spec.datasets.nation = nationTilesJSON();
+  spec.layer.push(genMissingLayer());
+  // state, msa
+  spec.layer.push(genLevelLayer(options));
+  spec.layer.push(genLevelHoverLayer());
+  /**
+   * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
+   */
+  const layer = {
+    mark: {
+      type: 'text',
+      align: 'center',
+      baseline: 'middle',
+    },
+    encoding: {
+      key: {
+        field: 'id',
+      },
+      longitude: {
+        field: 'properties.lon',
+        type: 'quantitative',
+      },
+      latitude: {
+        field: 'properties.lat',
+        type: 'quantitative',
+      },
+      text: {
+        field: 'propertyId',
+        type: 'nominal',
+      },
+    },
+  };
+  spec.layer.push(layer);
+  return spec;
+}
