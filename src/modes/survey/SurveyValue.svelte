@@ -28,7 +28,7 @@
     font-weight: 600;
     margin-bottom: 0.25rem;
     align-self: flex-end;
-    margin-left: -0.25em;
+    margin-left: -0.15em;
   }
 
   @media only screen and (max-width: 715px) {

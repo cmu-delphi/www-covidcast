@@ -40,7 +40,7 @@
       <h3>{s.sensor.name}</h3>
       <div>
         {#await s.trend}
-          N/A
+          <SurveyValue value={null} />
         {:then d}
           <SurveyValue value={d && d.current ? d.current.value : null} digits={2} />
         {/await}
@@ -50,7 +50,7 @@
   {/each}
 </div>
 
-<p>Compared to the previous week that results in:</p>
+<p>Compared to the previous week that means:</p>
 
 <div class="mobile-two-col">
   {#each highlightSurveySensors as s}

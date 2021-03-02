@@ -58,6 +58,39 @@
   color: inherit;
 }
 
+.mobile-header-line {
+  text-align: center;
+  position: relative;
+  margin: 16px 0.5em 10px 0.5em;
+}
+
+.mobile-header-line h2 {
+  line-height: 1;
+  margin: 0;
+  font-weight: 300;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+}
+
+.mobile-header-line h2 span {
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.mobile-back {
+  position: absolute;
+  left: 1em;
+  top: 0;
+  height: 100%;
+  width: 0.7em;
+  display: flex;
+  align-items: center;
+  border: none;
+  background: none;
+  margin: 0;
+  padding: 0;
+}
+
 .mobile-th {
   text-align: left;
   font-weight: 600;

@@ -1,5 +1,4 @@
 <script>
-  import MobileWrapper from './MobileWrapper.svelte';
   import FancyHeader from './FancyHeader.svelte';
   import RegionMap from './RegionMap.svelte';
   import HistoryLineChart from './HistoryLineChart.svelte';
@@ -11,58 +10,41 @@
   import { modeByID } from '..';
   import IndicatorAbout from './IndicatorAbout.svelte';
   import RegionOverview from './RegionOverview.svelte';
+  import { countyInfo, nationInfo, stateInfo } from '../../maps';
+  import SurveyParameters from '../survey/SurveyParameters.svelte';
+  import { currentRegionInfo, currentSensorEntry, currentDateObject, times } from '../../stores';
+  import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
+  import './common.css';
+
+  $: sensor = new SensorParam($currentSensorEntry, $times);
+  $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
+  $: region = new RegionParam($currentRegionInfo);
+
+  const items = [nationInfo, ...stateInfo, ...countyInfo];
+
+  const fetcher = new DataFetcher();
+  $: {
+    // reactive update
+    fetcher.invalidate(sensor, region, date);
+  }
 
   function switchMode() {
     currentMode.set(modeByID.overview);
   }
 </script>
 
-<style>
-  .header-line {
-    text-align: center;
-    position: relative;
-  }
-  .header-line h2 {
-    line-height: 1;
-    padding: 18px 0.5em 15px 0.5em;
-    margin: 0;
-    font-weight: 300;
-    font-size: 0.875rem;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-  .header-line h2 span {
-    font-weight: 600;
-  }
-
-  .back {
-    position: absolute;
-    left: 1em;
-    top: 0;
-    height: 100%;
-    width: 0.7em;
-    display: flex;
-    align-items: center;
-    border: none;
-    background: none;
-    margin: 0;
-    padding: 0;
-    color: #56ccf2;
-  }
-</style>
-
-<MobileWrapper let:sensor let:region let:date let:fetcher>
-  <div class="uk-container content-grid mobile-invert-header">
-    <div class="grid-3-11 header-line">
-      <button class="back inline-svg-icon" on:click={switchMode}>
+<div class="mobile-root">
+  <SurveyParameters sensor={sensor.value} {items} placeholder="Search by State or County">
+    <div class="grid-3-11 mobile-header-line" slot="title">
+      <button class="mobile-back inline-svg-icon" on:click={switchMode}>
         {@html chevronLeftIcon}
       </button>
-      <h2>Indicator <span>Details</span></h2>
+      <h2>INDICATOR <span>Details</span></h2>
     </div>
-  </div>
+    <IndicatorDropdown {sensor} />
+  </SurveyParameters>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <IndicatorDropdown {sensor} />
       <IndicatorOverview {sensor} {date} {region} {fetcher} />
       <RegionOverview {region} />
 
@@ -71,9 +53,9 @@
         <RegionMap {sensor} {date} {region} {fetcher} />
       </div>
 
-      <FancyHeader>Performance</FancyHeader>
+      <FancyHeader sub="Chart">Indicator</FancyHeader>
 
-      <div class="chart-150">
+      <div class="chart-250">
         <HistoryLineChart {sensor} {date} {region} {fetcher} />
       </div>
     </div>
@@ -84,4 +66,4 @@
       <GeoTable {sensor} {region} {date} {fetcher} />
     </div>
   </div>
-</MobileWrapper>
+</div>
