@@ -372,6 +372,24 @@ function sensorFactor(sensor) {
   return sensor.yAxis.startsWith('Fraction') ? 100 : 1;
 }
 
+/**
+ * @param {Sensor} sensor
+ */
+function deriveRawSignal(sensor) {
+  if (sensor.rawSignal !== undefined) {
+    return sensor.rawSignal;
+  }
+
+  if (
+    ['chng', 'doctor-visits', 'hospital-admissions'].includes(sensor.id) ||
+    (sensor.id === 'fb-survey' && !(sensor.signal.endsWith('_cli') || sensor.signal.endsWith('_ili')))
+  ) {
+    return null;
+  }
+  // guess the raw name by replacing common patterns
+  return sensor.signal.replace('smoothed_', 'raw_').replace('_7dav', '');
+}
+
 export class SensorParam {
   /**
    * @param {Sensor} sensor
@@ -386,6 +404,18 @@ export class SensorParam {
     this.isInverted = isInverted(sensor);
     this.formatValue = this.isPercentage ? formatPercentage : sensor.formatValue;
     this.unit = this.isPercentage ? '% of pop.' : this.isCasesOrDeath ? 'per 100k people' : '';
+    const rawSignal = deriveRawSignal(sensor);
+    /**
+     * @type {Sensor | null}
+     */
+    this.rawValue =
+      rawSignal && rawSignal !== sensor.signal
+        ? {
+            ...sensor,
+            key: `${sensor.id}:${rawSignal}`,
+            signal: rawSignal,
+          }
+        : null;
   }
 
   /**
@@ -403,16 +433,10 @@ export class SensorParam {
 
   /**
    * @param {Map<string, any>} stats
-   * @param {Region} region
+   * @param {string} level
    */
-  domain(stats, region) {
-    const domain = determineMinMax(
-      stats,
-      this.value,
-      region.level === 'state' || region.level === 'county' ? 'county' : 'state',
-      {},
-      false,
-    );
+  domain(stats, level) {
+    const domain = determineMinMax(stats, this.value, level, {}, false);
     return [domain[0] * this.factor, domain[1] * this.factor];
   }
 }
