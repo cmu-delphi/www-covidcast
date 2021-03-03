@@ -1,36 +1,6 @@
-import { format } from 'd3-format';
 import { parseAPITime } from '../../data';
-import { formatDateShort } from '../../formats';
-import { factor } from './questions';
+import { formatDateShort, formatValue } from '../../formats';
 
-const f = format('.1f');
-
-export function formatValue(value) {
-  return value == null || Number.isNaN(value) ? 'N/A' : f(value * factor);
-}
-
-export function formatTrendChange(change, enforceSign = false) {
-  if (change == null || Number.isNaN(change)) {
-    return 'N/A';
-  }
-  if (enforceSign) {
-    return `${change > 0 ? '+' : ''}${f(change * 100)}%`;
-  }
-  return `${f(Math.abs(change) * 100)}%`;
-}
-
-export function formatTrend(change) {
-  if (change == null || Number.isNaN(change)) {
-    return 'N/A';
-  }
-  if (change === 0) {
-    return 'No change';
-  }
-  if (change < 0) {
-    return `Decreased ${formatTrendChange(change)}`;
-  }
-  return `Increased ${formatTrendChange(change)}`;
-}
 export function formatStdErr(stderr) {
   return `±${formatValue(stderr)}`;
 }

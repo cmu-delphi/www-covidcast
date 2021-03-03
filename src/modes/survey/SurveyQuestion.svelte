@@ -1,69 +1,86 @@
 <script>
-  import Vega from '../../components/Vega.svelte';
+  // import Vega from '../../components/Vega.svelte';
   import UIKitHint from '../../components/UIKitHint.svelte';
   import fileIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/file.svg';
   import linkIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/link.svg';
   // import userEditIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/user-edit.svg';
   import calendarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/regular/calendar.svg';
   import warningIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
-  import { createTimeSeriesSpec, loadTimeSeriesData } from './timeSeries';
-  import { determineTrend, findDateRow, findMaxRow, findMinRow } from './trend';
+  // import { createTimeSeriesSpec, loadTimeSeriesData } from './timeSeries';
+  // import { determineTrend, findDateRow, findMaxRow, findMinRow } from './trend';
 
   import { formatDateShortOrdinal } from '../../formats';
-  import { formatTrend, formatSampleSize, formatStdErr } from './format';
-  import SurveyTrend from './SurveyTrend.svelte';
+  import { formatSampleSize, formatStdErr } from './format';
   import SurveyValue from './SurveyValue.svelte';
-  import SurveyTooltip from './SurveyTooltip.svelte';
+  // import SurveyTooltip from './SurveyTooltip.svelte';
   import ShapeIcon from '../../components/ShapeIcon.svelte';
   import { isMobileDevice } from '../../stores';
-  import { factor } from './questions';
+  import TrendIndicator from '../mobile/TrendIndicator.svelte';
+  import SensorUnit from '../mobile/SensorUnit.svelte';
 
   /**
    * question object
    * @type {import('./questions').Question}
    */
   export let question;
-
   /**
-   * date to highlight
-   * @type {Date}
+   * @type {import("../../stores/params").DateParam}
    */
   export let date;
-
   /**
-   * @type {import('./timeSeries').Params}
+   * @type {import("../../stores/params").RegionParam}
    */
-  export let params;
+  export let region;
+  /**
+   * @type {import("../../stores/params").DataFetcher}
+   */
+  export let fetcher;
 
-  $: data = loadTimeSeriesData(question, params);
-  $: spec = createTimeSeriesSpec(params);
+  $: sensor = question.sensorParam;
 
-  let loading = true;
+  // $: data = loadTimeSeriesData(question, region, date);
+  // $: spec = createTimeSeriesSpec(params);
+
+  // let loading = true;
+  // let noData = false;
+  // let maxDate = null;
+  // let refDate = null;
+
+  // async function deriveData(dataPromise, date) {
+  //   loading = true;
+  //   noData = false;
+  //   const data = (await dataPromise) || [];
+  //   loading = false;
+  //   noData = data.length === 0;
+  //   const dateRow = findDateRow(date, data);
+  //   const trend = determineTrend(date, data, dateRow);
+  //   const max = question.inverted ? findMinRow(data) : findMaxRow(data);
+  //   maxDate = max ? max.date_value : null;
+  //   refDate = trend.refDate;
+
+  //   return {
+  //     data,
+  //     row: dateRow,
+  //     trend,
+  //     max,
+  //   };
+  // }
+
+  // $: summary = deriveData(data, date);
+
+  $: dateRow = fetcher.fetch1Sensor1Region1DateDetails(sensor, region, date);
+  $: trend = fetcher.fetchWindowTrend(sensor, region, date);
+
+  let loading = false;
   let noData = false;
-  let maxDate = null;
-  let refDate = null;
-
-  async function deriveData(dataPromise, date) {
-    loading = true;
+  $: {
     noData = false;
-    const data = (await dataPromise) || [];
-    loading = false;
-    noData = data.length === 0;
-    const dateRow = findDateRow(date, data);
-    const trend = determineTrend(date, data, dateRow);
-    const max = question.inverted ? findMinRow(data) : findMaxRow(data);
-    maxDate = max ? max.date_value : null;
-    refDate = trend.refDate;
-
-    return {
-      data,
-      row: dateRow,
-      trend,
-      max,
-    };
+    loading = true;
+    trend.then((t) => {
+      loading = false;
+      noData = t.min == null; // no min found no data at all
+    });
   }
-
-  $: summary = deriveData(data, date);
 
   function showShareLink() {
     const fullUrl = new URL(location.href);
@@ -223,28 +240,42 @@
       {question.name}
       <UIKitHint title={question.signalTooltip} />
     </h4>
-    <Vega
+    <!-- <Vega
       {spec}
       {data}
       scrollSpy={100}
       signals={{ currentDate: date, maxDate, refDate }}
       tooltip={SurveyTooltip}
-      tooltipProps={{ question }} />
+      tooltipProps={{ question, sensor }} /> -->
     <div class="uk-text-center uk-text-italic chart-details">
-      {#await summary then s}
-        {s.row ? `based on ${formatSampleSize(s.row)} survey responses with a standard error of ${formatStdErr(s.row.stderr)}` : ''}
+      {#await dateRow then s}
+        {s ? `based on ${formatSampleSize(s)} survey responses with a standard error of ${formatStdErr(s.stderr)}` : ''}
       {/await}
+    </div>
+
+    <div class="mobile-two-col">
+      <div class="mobile-kpi">
+        <div>
+          {#await trend}
+            <SurveyValue value={null} />
+          {:then d}
+            <SurveyValue value={d && d.current ? d.current.value : null} digits={sensor.isPercentage ? 2 : 1} />
+          {/await}
+        </div>
+        <!-- <h3>{s.sensor.name}</h3>
+        <div class="sub">{s.sensor.unit}</div> -->
+      </div>
     </div>
     <div class="question-summary">
       <div>
         <div class="question-kpi question-kpi-trend">
-          {#await summary}
-            <SurveyTrend trend={null} />
+          {#await trend}
+            <TrendIndicator trend={null} {sensor} />
           {:then s}
-            <SurveyTrend trend={s.trend} />
+            <TrendIndicator trend={s.trend} {sensor} />
           {/await}
         </div>
-        <div class="block-date">
+        <!-- <div class="block-date">
           <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortOrdinal(refDate)}
         </div>
         <div class="uk-text-bold question-kpi-title">
@@ -252,48 +283,52 @@
           <UIKitHint title="Tracks the variability of signal movenment" />
         </div>
         <div class="question-unit">
-          {#await summary}
+          {#await trend}
             N/A
           {:then s}
             {s.trend ? `${formatTrend(s.trend.change)} since ${formatDateShortOrdinal(refDate)}` : 'N/A'}
           {/await}
-        </div>
+        </div> -->
       </div>
       <div>
         <div class="question-kpi">
-          {#await summary}
+          {#await trend}
             ?
           {:then s}
-            <SurveyValue value={s.max ? s.max.value : null} {factor} />
+            <SurveyValue value={s.best ? s.best.value : null} />
           {/await}
         </div>
-        <div class="block-date">
+        <!-- <div class="block-date">
           <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortOrdinal(maxDate)}
-        </div>
+        </div>-->
         <div class="uk-text-bold question-kpi-title">
           <ShapeIcon shape="diamond" color="gray" />
-          {question.inverted ? 'Lowest' : 'Highest'}
+          {sensor.isInverted ? 'Lowest' : 'Highest'}
           {#if !$isMobileDevice}count{/if}
         </div>
-        <div class="question-unit">{question.unit}</div>
+        <div class="question-unit">
+          <SensorUnit {sensor} />
+        </div>
       </div>
       <div>
         <div class="question-kpi">
-          {#await summary}
+          {#await trend}
             N/A
           {:then s}
-            <SurveyValue value={s.row ? s.row.value : null} {factor} />
+            <SurveyValue value={s.current ? s.current.value : null} />
           {/await}
         </div>
         <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortOrdinal(date)}
+          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortOrdinal(date.value)}
         </div>
         <div class="uk-text-bold question-kpi-title">
           <ShapeIcon shape="circle" color="#c00" />
           Selected
           {#if !$isMobileDevice}count{/if}
         </div>
-        <div class="question-unit">{question.unit}</div>
+        <div class="question-unit">
+          <SensorUnit {sensor} />
+        </div>
       </div>
     </div>
   </div>

@@ -23,6 +23,7 @@ export const visibleLevels = descriptions.levels;
  * @property {string} learnMoreLink
  * @property {string} unit
  * @property {import("../../data").SensorEntry?} sensor matching sensor entry
+ * @property {import("../../stores/params").SensorParam} sensorParam question as param
  */
 
 function toAnchor(value) {
@@ -63,12 +64,9 @@ export const refSensor = questions.some((d) => d.sensor != null)
   ? questions.find((d) => d.sensor != null).sensor
   : sensorList.find((d) => d.id === 'fb-survey');
 
-/**
- * @param {Question} question
- * @return {import('../../stores/params').SensorParam}
- */
-export function questionAsSensorParam(question) {
-  const base = new SensorParam(
+for (const question of questions) {
+  // inject the sensorParam
+  question.sensorParam = new SensorParam(
     question.sensor || {
       ...refSensor,
       signal: question.signal,
@@ -77,5 +75,4 @@ export function questionAsSensorParam(question) {
       isInverted: question.inverted,
     },
   );
-  return base;
 }

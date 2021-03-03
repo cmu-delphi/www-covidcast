@@ -1,6 +1,6 @@
 <script>
   import { formatDateShort } from '../../formats';
-  import { formatValue } from './format';
+  import SensorValue from '../mobile/SensorValue.svelte';
 
   /**
    * @type {import('./questions').Question}
@@ -12,6 +12,10 @@
    * @type {import('../../data').EpiDataRow}
    */
   export let item;
+  /**
+   * @type {import('../../stores/params').SensorParam}
+   */
+  export let sensor;
 </script>
 
 <style>
@@ -44,7 +48,9 @@
       </tr>
       <tr>
         <th>Value</th>
-        <td class="right">{formatValue(item.value)} {question.unit}</td>
+        <td class="right">
+          <SensorValue {sensor} value={item.value} />
+        </td>
       </tr>
     </tbody>
   </table>
