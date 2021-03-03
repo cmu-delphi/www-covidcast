@@ -8,15 +8,15 @@
   import warningIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
   // import { createTimeSeriesSpec, loadTimeSeriesData } from './timeSeries';
   // import { determineTrend, findDateRow, findMaxRow, findMinRow } from './trend';
-
+  import { isMobileDevice } from '../../stores';
   import { formatDateShortOrdinal } from '../../formats';
   import { formatSampleSize, formatStdErr } from './format';
   import SurveyValue from './SurveyValue.svelte';
   // import SurveyTooltip from './SurveyTooltip.svelte';
   import ShapeIcon from '../../components/ShapeIcon.svelte';
-  import { isMobileDevice } from '../../stores';
   import TrendIndicator from '../mobile/TrendIndicator.svelte';
   import SensorUnit from '../mobile/SensorUnit.svelte';
+  import TrendTextSummary from '../mobile/TrendTextSummary.svelte';
 
   /**
    * question object
@@ -119,49 +119,6 @@
     font-size: 2rem;
   }
 
-  .question-summary {
-    margin-top: 1.5em;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
-  }
-
-  .question-summary > div {
-    flex: 1 1 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    line-height: 1.5;
-    margin: 0 0.25em;
-    max-width: 11em;
-    text-align: center;
-  }
-
-  .question-kpi {
-    height: 5rem;
-    display: flex;
-    margin-bottom: 0.5em;
-  }
-
-  .question-kpi-trend {
-    flex-direction: column;
-    justify-content: flex-end;
-  }
-
-  .block-date {
-    margin: 0.5em 0;
-  }
-
-  .question-kpi-title {
-    margin: 0.5em 0;
-    white-space: nowrap;
-  }
-
-  .question-unit {
-    flex-grow: 1;
-    margin: 0.5em 0;
-  }
-
   .no-data {
     letter-spacing: 0.75px;
     text-transform: uppercase;
@@ -180,20 +137,6 @@
 
     .header-link-text {
       display: none;
-    }
-
-    .question-kpi {
-      height: 3rem;
-    }
-
-    .question-kpi-title {
-      font-weight: normal;
-    }
-
-    .block-date,
-    .question-kpi-title,
-    .question-unit {
-      font-size: 0.8rem;
     }
 
     .chart-details {
@@ -255,6 +198,11 @@
 
     <div class="mobile-two-col">
       <div class="mobile-kpi">
+        <h3>
+          <ShapeIcon shape="circle" color="#c00" />
+          Selected
+          {#if !$isMobileDevice}count{/if}
+        </h3>
         <div>
           {#await trend}
             <SurveyValue value={null} />
@@ -262,74 +210,46 @@
             <SurveyValue value={d && d.current ? d.current.value : null} digits={sensor.isPercentage ? 2 : 1} />
           {/await}
         </div>
-        <!-- <h3>{s.sensor.name}</h3>
-        <div class="sub">{s.sensor.unit}</div> -->
+        <div class="sub">
+          <SensorUnit {sensor} long />
+        </div>
+        <div>
+          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortOrdinal(date.value)}
+        </div>
       </div>
-    </div>
-    <div class="question-summary">
-      <div>
-        <div class="question-kpi question-kpi-trend">
-          {#await trend}
-            <TrendIndicator trend={null} {sensor} />
-          {:then s}
-            <TrendIndicator trend={s.trend} {sensor} />
-          {/await}
-        </div>
-        <!-- <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortOrdinal(refDate)}
-        </div>
-        <div class="uk-text-bold question-kpi-title">
-          7-day trend
-          <UIKitHint title="Tracks the variability of signal movenment" />
-        </div>
-        <div class="question-unit">
-          {#await trend}
-            N/A
-          {:then s}
-            {s.trend ? `${formatTrend(s.trend.change)} since ${formatDateShortOrdinal(refDate)}` : 'N/A'}
-          {/await}
-        </div> -->
-      </div>
-      <div>
-        <div class="question-kpi">
-          {#await trend}
-            ?
-          {:then s}
-            <SurveyValue value={s.best ? s.best.value : null} />
-          {/await}
-        </div>
-        <!-- <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortOrdinal(maxDate)}
-        </div>-->
-        <div class="uk-text-bold question-kpi-title">
+      <div class="mobile-kpi">
+        <h3>
           <ShapeIcon shape="diamond" color="gray" />
           {sensor.isInverted ? 'Lowest' : 'Highest'}
           {#if !$isMobileDevice}count{/if}
-        </div>
-        <div class="question-unit">
-          <SensorUnit {sensor} />
-        </div>
-      </div>
-      <div>
-        <div class="question-kpi">
+        </h3>
+        <div>
           {#await trend}
-            N/A
-          {:then s}
-            <SurveyValue value={s.current ? s.current.value : null} />
+            <SurveyValue value={null} />
+          {:then d}
+            <SurveyValue value={d && d.worst ? d.worst.value : null} digits={sensor.isPercentage ? 2 : 1} />
           {/await}
         </div>
-        <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortOrdinal(date.value)}
+        <div class="sub">
+          <SensorUnit {sensor} long />
         </div>
-        <div class="uk-text-bold question-kpi-title">
-          <ShapeIcon shape="circle" color="#c00" />
-          Selected
-          {#if !$isMobileDevice}count{/if}
-        </div>
-        <div class="question-unit">
-          <SensorUnit {sensor} />
+        <div>
+          <span class="inline-svg-icon">{@html calendarIcon}</span>
+          {#await trend}{formatDateShortOrdinal(null)}{:then d}{formatDateShortOrdinal(d.worstDate)}{/await}
         </div>
       </div>
     </div>
+
+    <p>Compared to the previous week that means:</p>
+
+    <div>
+      {#await trend}
+        <TrendIndicator trend={null} long {sensor} />
+      {:then d}
+        <TrendIndicator trend={d} long {sensor} />
+      {/await}
+    </div>
+
+    <TrendTextSummary {sensor} {date} {trend} />
   </div>
 </article>

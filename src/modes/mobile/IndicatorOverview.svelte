@@ -1,15 +1,13 @@
 <script>
   import Vega from '../../components/Vega.svelte';
-  import { formatDateShortNumbers, formatDateShortWeekdayAbbr, formatDateYearWeekdayAbbr } from '../../formats';
+  import { formatDateShortNumbers, formatDateShortWeekdayAbbr } from '../../formats';
   import { generateSparkLine } from '../../specs/lineSpec';
-  import { WINDOW_SIZE } from '../../stores/params';
   import SurveyValue from '../survey/SurveyValue.svelte';
   import SensorUnit from './SensorUnit.svelte';
-  import SensorValue from './SensorValue.svelte';
   import SparkLineTooltip from './SparkLineTooltip.svelte';
 
   import TrendIndicator from './TrendIndicator.svelte';
-  import TrendText from './TrendText.svelte';
+  import TrendTextSummary from './TrendTextSummary.svelte';
 
   /**
    * @type {import('../../stores/constants').SensorEntry}
@@ -93,35 +91,4 @@
   {/await}
 </div>
 
-<p>
-  {#await trend then d}
-    {#if +date.value === +d.worstDate}
-      On
-      {formatDateShortWeekdayAbbr(date.value, true)}
-      <strong>{sensor.value.name}</strong>
-      was the
-      {WINDOW_SIZE}
-      month
-      <strong>worst</strong>
-      value compared to
-      <strong>best value of
-        <SensorValue {sensor} value={d.best ? d.best.value : null} /></strong>
-      on
-      <strong>{formatDateYearWeekdayAbbr(d.bestDate, true)}</strong>.
-    {:else}
-      On
-      {formatDateShortWeekdayAbbr(date.value, true)}
-      <strong>{sensor.value.name}</strong>
-      was
-      <strong>
-        <TrendText {sensor} trend={d.worstTrend} />
-      </strong>
-      compared to the
-      <strong>{WINDOW_SIZE}
-        month worst value of
-        <SensorValue {sensor} value={d.worst ? d.worst.value : null} /></strong>
-      on
-      <strong>{formatDateYearWeekdayAbbr(d.worstDate, true)}</strong>.
-    {/if}
-  {/await}
-</p>
+<TrendTextSummary {sensor} {date} {trend} />
