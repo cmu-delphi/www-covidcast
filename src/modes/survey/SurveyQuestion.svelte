@@ -3,11 +3,11 @@
   import fileIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/file.svg';
   import linkIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/link.svg';
   import warningIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
-  import { formatSampleSize, formatStdErr } from './format';
   import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
   import FancyHeader from '../mobile/FancyHeader.svelte';
   import IndicatorOverview from '../mobile/IndicatorOverview.svelte';
-  import { formatDateShortWeekdayAbbr, formatDateYearWeekdayAbbr } from '../../formats';
+  import { formatDateShortWeekdayAbbr } from '../../formats';
+  import IndicatorStatsLine from '../mobile/IndicatorStatsLine.svelte';
 
   /**
    * question object
@@ -99,12 +99,6 @@
     .header-link-text {
       display: none;
     }
-
-    .chart-details {
-      font-size: 0.75rem;
-      line-height: 1.5;
-      margin-top: 1em;
-    }
   }
 </style>
 
@@ -158,10 +152,6 @@
       <HistoryLineChart {sensor} {date} {region} {fetcher} />
     </div>
 
-    <p class="uk-text-italic chart-details">
-      {#await dateRow then s}
-        {s ? `The 7-day average of ${formatDateYearWeekdayAbbr(s.date_value)} is based on ${formatSampleSize(s)} survey responses with a standard error of ${formatStdErr(s.stderr)}.` : ''}
-      {/await}
-    </p>
+    <IndicatorStatsLine {sensor} {date} {region} {fetcher} />
   </div>
 </article>
