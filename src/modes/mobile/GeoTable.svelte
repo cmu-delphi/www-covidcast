@@ -10,6 +10,8 @@
   import { formatDateShortNumbers } from '../../formats';
   import { groupByRegion, extractSparkLine } from '../../stores/params';
   import { determineTrend } from '../../stores/trend';
+  import SensorValue from './SensorValue.svelte';
+  import SensorUnit from './SensorUnit.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -181,7 +183,7 @@
       <th class="mobile-th mobile-th-blue">{title.unit}</th>
       <th class="mobile-th mobile-th-blue">Change Last 7 days</th>
       <th class="mobile-th uk-text-right mobile-th-blue">
-        {#if sensor.isCasesSignal}per 100k{:else if sensor.isPercentage}%{:else}Value{/if}
+        <SensorUnit {sensor} force />
       </th>
       <th class="mobile-th uk-text-right mobile-th-blue">
         <span>historical trend</span>
@@ -228,14 +230,16 @@
         <td>
           <TrendIndicator trend={r.trendObj} {sensor} block />
         </td>
-        <td class="uk-text-right">{r.value == null ? 'N/A' : sensor.value.formatValue(r.value)}</td>
+        <td class="uk-text-right">
+          <SensorValue {sensor} value={r.value} />
+        </td>
         <td>
           <div class="mobile-table-chart mobile-table-chart-small">
             <Vega
               {spec}
               data={r.data}
               tooltip={SparkLineTooltip}
-              tooltipProps={{ sensor: sensor.value }}
+              tooltipProps={{ sensor }}
               signals={{ currentDate: date.value }} />
           </div>
         </td>
