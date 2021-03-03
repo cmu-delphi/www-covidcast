@@ -1,6 +1,7 @@
 <script>
   import { formatDateShortWeekdayAbbr } from '../../formats';
   import { levelMegaCounty } from '../../stores/constants';
+  import SensorValue from './SensorValue.svelte';
 
   export let hidden = false;
   /**
@@ -9,7 +10,7 @@
   export let item;
 
   /**
-   * @type {import('../../stores/params').SensorEntry}
+   * @type {import('../../stores/params').SensorParam}
    */
   export let sensor;
 
@@ -56,7 +57,9 @@
   <table>
     <tr>
       <th>{formatDateShortWeekdayAbbr(item.date_value)}</th>
-      <td>{sensor.formatValue(item.value)}</td>
+      <td>
+        <SensorValue {sensor} value={item.value} />
+      </td>
     </tr>
   </table>
 </div>

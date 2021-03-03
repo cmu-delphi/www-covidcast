@@ -15,6 +15,7 @@
   import { toTimeValue } from '../../stores/params';
   import Toggle from './Toggle.svelte';
   import { combineSignals } from '../../data/utils';
+  import SensorValue from './SensorValue.svelte';
 
   export let height = 250;
 
@@ -92,9 +93,6 @@
     const selfData = fetcher.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame);
 
     const data = [selfData];
-    if (region.level !== 'nation') {
-      data.push(fetcher.fetch1Sensor1RegionNDates(sensor, nationInfo, date.windowTimeFrame));
-    }
 
     if (region.level === 'county') {
       const state = getInfoByName(region.state);
@@ -104,9 +102,12 @@
         .fetch1SensorNRegionsNDates(sensor, relatedCounties, date.windowTimeFrame)
         .then((r) => averageByDate(r, sensor, relatedInfo))
         .then((r) => addMissing(r, sensor));
-      data.push(stateData, relatedData);
+      data.push(relatedData, stateData);
     }
-    return Promise.all(data).then((rows) => rows.flat());
+    if (region.level !== 'nation') {
+      data.push(fetcher.fetch1Sensor1RegionNDates(sensor, nationInfo, date.windowTimeFrame));
+    }
+    return Promise.all(data).then((rows) => rows.reverse().flat());
   }
 
   /**
@@ -156,18 +157,14 @@
 
   function findValue(region, data, date) {
     if (!date) {
-      return 'N/A';
+      return null;
     }
     const time = toTimeValue(date);
     const row = data.find((d) => d.id === region.id && d.time_value === time);
     if (!row) {
-      return 'N/A';
+      return null;
     }
-    const value = sensor.formatValue(row.value);
-    if (!singleRaw) {
-      return value;
-    }
-    return `${value} (raw: ${sensor.formatValue(row.raw)})`;
+    return row.value;
   }
 </script>
 
@@ -195,6 +192,7 @@
   {spec}
   {data}
   tooltip={HistoryLineTooltip}
+  tooltipProps={{ sensor }}
   signals={signalPatches}
   signalListeners={['highlight']}
   on:signal={onSignal} />
@@ -218,8 +216,11 @@
         </span>
       </div>
       <div>
-        {#await data then d}<span class="legend-value">{findValue(r, d, highlightDate)}</span>{/await}
-        {#if sensor.isCasesOrDeath}{sensor.unit}{/if}
+        {#await data then d}
+          <span class="legend-value">
+            <SensorValue {sensor} value={findValue(r, d, highlightDate)} />
+          </span>
+        {/await}
       </div>
     </div>
   {/each}
