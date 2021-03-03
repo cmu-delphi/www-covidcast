@@ -101,10 +101,22 @@ const rawFormatter = format(',.2f');
 
 /**
  * @param {number} value
+ * @param {(v: number) => number} formatter
  * @param {boolean} enforceSign
+ * @param {number} factor
  */
-function sign(value, enforceSign) {
-  return enforceSign && value > 0 ? '+' : '';
+function sign(value, formatter, enforceSign, factor = 1) {
+  if (value == null || Number.isNaN(value)) {
+    return 'N/A';
+  }
+  const v = formatter(value * factor);
+  if (!enforceSign || v.startsWith('-') || v.startsWith('−')) {
+    return v;
+  }
+  if (v === formatter(0)) {
+    return `±${v}`;
+  }
+  return `+${v}`;
 }
 
 /**
@@ -112,28 +124,26 @@ function sign(value, enforceSign) {
  * @param {boolean} enforceSign
  */
 export function formatValue(value, enforceSign = false) {
-  return value == null || Number.isNaN(value) ? 'N/A' : `${sign(value, enforceSign)}${f(value)}`;
+  return sign(value, f, enforceSign);
 }
 /**
  * @param {number} value
  * @param {boolean} enforceSign
  */
 export function formatPercentage(value, enforceSign = false) {
-  return value == null || Number.isNaN(value)
-    ? 'N/A'
-    : `${sign(value, enforceSign)}${basePercentFormatter(value / 100)}`;
+  return sign(value, basePercentFormatter, enforceSign, 1 / 100);
 }
 /**
  * @param {number} value
  * @param {boolean} enforceSign
  */
 export function formatFraction(value, enforceSign = false) {
-  return value == null || Number.isNaN(value) ? 'N/A' : `${sign(value, enforceSign)}${basePercentFormatter(value)}`;
+  return sign(value, basePercentFormatter, enforceSign);
 }
 /**
  * @param {number} value
  * @param {boolean} enforceSign
  */
 export function formatRawValue(value, enforceSign = false) {
-  return value == null || Number.isNaN(value) ? 'N/A' : `${sign(value, enforceSign)}${rawFormatter(value)}`;
+  return sign(value, rawFormatter, enforceSign);
 }

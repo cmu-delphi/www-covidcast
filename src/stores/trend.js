@@ -51,7 +51,7 @@ function toTrendText(change) {
     return ['increasing', `Increasing (>= ${formatFraction(trendThreshold)})`];
   }
   if (change <= -trendThreshold) {
-    return ['decreasing', `Decreasing (<= ${formatFraction(trendThreshold)})`];
+    return ['decreasing', `Decreasing (<= ${formatFraction(-trendThreshold)})`];
   }
   return ['steady', `Steady (${formatFraction(-trendThreshold)} <= v <= ${formatFraction(trendThreshold)})`];
 }
