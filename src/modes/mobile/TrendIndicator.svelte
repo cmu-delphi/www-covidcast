@@ -4,6 +4,8 @@
   import Steady from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-right.svg';
   import Unknown from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
   import SensorValue from './SensorValue.svelte';
+  import UiKitHint from '../../components/UIKitHint.svelte';
+  import { formatDateShortWeekdayAbbr, formatFraction } from '../../formats';
 
   export let block = false;
   /**
@@ -15,6 +17,7 @@
    */
   export let sensor;
   export let long = false;
+  export let explain = false;
 
   let trendIcon = null;
   $: {
@@ -27,6 +30,25 @@
     } else {
       trendIcon = Steady;
     }
+  }
+
+  /**
+   * @type {import("../../stores/params").Trend}
+   */
+  function trendExplaination(trend) {
+    if (!trend || trend.isUnknown) {
+      return 'Historical trend is unknown';
+    }
+    const reason = `The value on ${formatDateShortWeekdayAbbr(trend.current.date_value)} (${sensor.formatValue(
+      trend.current.value,
+    )}) has changed Δ ${formatFraction(trend.change, true)} compared to ${formatDateShortWeekdayAbbr(
+      trend.refDate,
+    )} (${sensor.formatValue(trend.ref.value)}), which is classified as: <br/><br/> ${trend.trendReason}`;
+
+    if (trend.isSteady) {
+      return `Historical trend remains consistent: <br/> ${reason}`;
+    }
+    return `Historical trend is ${trend.trend}: <br/> ${reason}`;
   }
 </script>
 
@@ -72,11 +94,11 @@
     --color: #2f80ed;
     --text: white;
   }
-  .isGood {
+  .isBetter {
     --color: #27ae60;
     --text: white;
   }
-  .isBad {
+  .isWorse {
     --color: #eb5757;
     --text: white;
   }
@@ -86,8 +108,8 @@
   class="trend-indicator"
   class:long
   class:short={!long}
-  class:isGood={trend && trend.isGood}
-  class:isBad={trend && trend.isBad}
+  class:isBetter={trend && trend.isBetter}
+  class:isWorse={trend && trend.isWorse}
   class:isSteady={trend && trend.isSteady}
   class:block>
   <span class="icon">
@@ -97,4 +119,7 @@
   <span class="trend-value">
     <SensorValue {sensor} value={trend ? trend.delta : null} enforceSign />
   </span>
+  {#if explain}
+    <UiKitHint title={trendExplaination(trend)} />
+  {/if}
 </div>
