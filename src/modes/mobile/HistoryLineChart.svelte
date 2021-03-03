@@ -187,6 +187,8 @@
   }
 </style>
 
+<p>Click on the chart to select a different date.</p>
+
 <Vega
   {className}
   {spec}

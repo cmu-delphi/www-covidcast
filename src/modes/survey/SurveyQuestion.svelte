@@ -1,22 +1,17 @@
 <script>
-  // import Vega from '../../components/Vega.svelte';
   import UIKitHint from '../../components/UIKitHint.svelte';
   import fileIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/file.svg';
   import linkIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/link.svg';
-  // import userEditIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/user-edit.svg';
   import calendarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/regular/calendar.svg';
   import warningIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
-  // import { createTimeSeriesSpec, loadTimeSeriesData } from './timeSeries';
-  // import { determineTrend, findDateRow, findMaxRow, findMinRow } from './trend';
   import { isMobileDevice } from '../../stores';
-  import { formatDateShortOrdinal } from '../../formats';
+  import { formatDateShortWeekdayAbbr, formatDateYearWeekdayAbbr } from '../../formats';
   import { formatSampleSize, formatStdErr } from './format';
   import SurveyValue from './SurveyValue.svelte';
-  // import SurveyTooltip from './SurveyTooltip.svelte';
-  import ShapeIcon from '../../components/ShapeIcon.svelte';
   import TrendIndicator from '../mobile/TrendIndicator.svelte';
   import SensorUnit from '../mobile/SensorUnit.svelte';
   import TrendTextSummary from '../mobile/TrendTextSummary.svelte';
+  import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
 
   /**
    * question object
@@ -183,23 +178,14 @@
       {question.name}
       <UIKitHint title={question.signalTooltip} />
     </h4>
-    <!-- <Vega
-      {spec}
-      {data}
-      scrollSpy={100}
-      signals={{ currentDate: date, maxDate, refDate }}
-      tooltip={SurveyTooltip}
-      tooltipProps={{ question, sensor }} /> -->
-    <div class="uk-text-center uk-text-italic chart-details">
-      {#await dateRow then s}
-        {s ? `based on ${formatSampleSize(s)} survey responses with a standard error of ${formatStdErr(s.stderr)}` : ''}
-      {/await}
+
+    <div class="chart-250">
+      <HistoryLineChart {sensor} {date} {region} {fetcher} />
     </div>
 
     <div class="mobile-two-col">
       <div class="mobile-kpi">
         <h3>
-          <ShapeIcon shape="circle" color="#c00" />
           Selected
           {#if !$isMobileDevice}count{/if}
         </h3>
@@ -214,12 +200,11 @@
           <SensorUnit {sensor} long />
         </div>
         <div>
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortOrdinal(date.value)}
+          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortWeekdayAbbr(date.value)}
         </div>
       </div>
       <div class="mobile-kpi">
         <h3>
-          <ShapeIcon shape="diamond" color="gray" />
           {sensor.isInverted ? 'Lowest' : 'Highest'}
           {#if !$isMobileDevice}count{/if}
         </h3>
@@ -235,7 +220,7 @@
         </div>
         <div>
           <span class="inline-svg-icon">{@html calendarIcon}</span>
-          {#await trend}{formatDateShortOrdinal(null)}{:then d}{formatDateShortOrdinal(d.worstDate)}{/await}
+          {#await trend}{formatDateYearWeekdayAbbr(null)}{:then d}{formatDateYearWeekdayAbbr(d.worstDate)}{/await}
         </div>
       </div>
     </div>
@@ -251,5 +236,11 @@
     </div>
 
     <TrendTextSummary {sensor} {date} {trend} />
+
+    <div class="uk-text-center uk-text-italic chart-details">
+      {#await dateRow then s}
+        {s ? `based on ${formatSampleSize(s)} survey responses with a standard error of ${formatStdErr(s.stderr)}` : ''}
+      {/await}
+    </div>
   </div>
 </article>

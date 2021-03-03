@@ -71,7 +71,7 @@ for (const question of questions) {
       ...refSensor,
       signal: question.signal,
       key: `${question.dataSource}:${question.signal}`,
-      name: question.signal,
+      name: question.name,
       isInverted: question.inverted,
     },
   );

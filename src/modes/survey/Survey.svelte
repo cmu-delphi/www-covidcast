@@ -7,6 +7,7 @@
   import { nationInfo, nameInfos, getStateOfCounty } from '../../maps';
   import MobileSurveyToc from './MobileSurveyToc.svelte';
   import { DataFetcher, DateParam, RegionParam, SensorParam } from '../../stores/params';
+  import getRelatedCounties from '../../maps/related';
 
   $: sensor = new SensorParam(refSensor, $times);
   $: date = new DateParam($currentDateObject, refSensor, $times);
@@ -44,6 +45,12 @@
       fetcher.fetchNSensor1RegionNDates(
         questions.map((d) => d.sensorParam),
         getStateOfCounty(region.value),
+        date.windowTimeFrame,
+      );
+      // related regions
+      fetcher.fetchNSensorNRegionNDates(
+        questions.map((d) => d.sensorParam),
+        getRelatedCounties(region.value),
         date.windowTimeFrame,
       );
     }
