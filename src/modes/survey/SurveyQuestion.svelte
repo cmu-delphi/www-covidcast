@@ -2,16 +2,12 @@
   import UIKitHint from '../../components/UIKitHint.svelte';
   import fileIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/file.svg';
   import linkIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/link.svg';
-  import calendarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/regular/calendar.svg';
   import warningIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
-  import { isMobileDevice } from '../../stores';
-  import { formatDateShortWeekdayAbbr, formatDateYearWeekdayAbbr } from '../../formats';
   import { formatSampleSize, formatStdErr } from './format';
-  import SurveyValue from './SurveyValue.svelte';
-  import TrendIndicator from '../mobile/TrendIndicator.svelte';
-  import SensorUnit from '../mobile/SensorUnit.svelte';
-  import TrendTextSummary from '../mobile/TrendTextSummary.svelte';
   import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
+  import FancyHeader from '../mobile/FancyHeader.svelte';
+  import IndicatorOverview from '../mobile/IndicatorOverview.svelte';
+  import { formatDateShortWeekdayAbbr, formatDateYearWeekdayAbbr } from '../../formats';
 
   /**
    * question object
@@ -32,36 +28,6 @@
   export let fetcher;
 
   $: sensor = question.sensorParam;
-
-  // $: data = loadTimeSeriesData(question, region, date);
-  // $: spec = createTimeSeriesSpec(params);
-
-  // let loading = true;
-  // let noData = false;
-  // let maxDate = null;
-  // let refDate = null;
-
-  // async function deriveData(dataPromise, date) {
-  //   loading = true;
-  //   noData = false;
-  //   const data = (await dataPromise) || [];
-  //   loading = false;
-  //   noData = data.length === 0;
-  //   const dateRow = findDateRow(date, data);
-  //   const trend = determineTrend(date, data, dateRow);
-  //   const max = question.inverted ? findMinRow(data) : findMaxRow(data);
-  //   maxDate = max ? max.date_value : null;
-  //   refDate = trend.refDate;
-
-  //   return {
-  //     data,
-  //     row: dateRow,
-  //     trend,
-  //     max,
-  //   };
-  // }
-
-  // $: summary = deriveData(data, date);
 
   $: dateRow = fetcher.fetch1Sensor1Region1DateDetails(sensor, region, date);
   $: trend = fetcher.fetchWindowTrend(sensor, region, date);
@@ -136,7 +102,8 @@
 
     .chart-details {
       font-size: 0.75rem;
-      font-style: normal;
+      line-height: 1.5;
+      margin-top: 1em;
     }
   }
 </style>
@@ -174,73 +141,27 @@
         {@html question.question}
       </p>
     </div>
-    <h4>
-      {question.name}
+
+    <p>
+      On
+      {formatDateShortWeekdayAbbr(date.value)}
+      the 7 day average of
+      <strong>{sensor.name}</strong>
       <UIKitHint title={question.signalTooltip} />
-    </h4>
+      was:
+    </p>
+    <IndicatorOverview {sensor} {date} {region} {fetcher} />
+
+    <FancyHeader sub="History">Indicator</FancyHeader>
 
     <div class="chart-250">
       <HistoryLineChart {sensor} {date} {region} {fetcher} />
     </div>
 
-    <div class="mobile-two-col">
-      <div class="mobile-kpi">
-        <h3>
-          Selected
-          {#if !$isMobileDevice}count{/if}
-        </h3>
-        <div>
-          {#await trend}
-            <SurveyValue value={null} />
-          {:then d}
-            <SurveyValue value={d && d.current ? d.current.value : null} digits={sensor.isPercentage ? 2 : 1} />
-          {/await}
-        </div>
-        <div class="sub">
-          <SensorUnit {sensor} long />
-        </div>
-        <div>
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortWeekdayAbbr(date.value)}
-        </div>
-      </div>
-      <div class="mobile-kpi">
-        <h3>
-          {sensor.isInverted ? 'Lowest' : 'Highest'}
-          {#if !$isMobileDevice}count{/if}
-        </h3>
-        <div>
-          {#await trend}
-            <SurveyValue value={null} />
-          {:then d}
-            <SurveyValue value={d && d.worst ? d.worst.value : null} digits={sensor.isPercentage ? 2 : 1} />
-          {/await}
-        </div>
-        <div class="sub">
-          <SensorUnit {sensor} long />
-        </div>
-        <div>
-          <span class="inline-svg-icon">{@html calendarIcon}</span>
-          {#await trend}{formatDateYearWeekdayAbbr(null)}{:then d}{formatDateYearWeekdayAbbr(d.worstDate)}{/await}
-        </div>
-      </div>
-    </div>
-
-    <p>Compared to the previous week that means:</p>
-
-    <div>
-      {#await trend}
-        <TrendIndicator trend={null} long {sensor} />
-      {:then d}
-        <TrendIndicator trend={d} long {sensor} />
-      {/await}
-    </div>
-
-    <TrendTextSummary {sensor} {date} {trend} />
-
-    <div class="uk-text-center uk-text-italic chart-details">
+    <p class="uk-text-italic chart-details">
       {#await dateRow then s}
-        {s ? `based on ${formatSampleSize(s)} survey responses with a standard error of ${formatStdErr(s.stderr)}` : ''}
+        {s ? `The 7-day average of ${formatDateYearWeekdayAbbr(s.date_value)} is based on ${formatSampleSize(s)} survey responses with a standard error of ${formatStdErr(s.stderr)}.` : ''}
       {/await}
-    </div>
+    </p>
   </div>
 </article>

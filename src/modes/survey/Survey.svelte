@@ -64,6 +64,8 @@
   .root {
     position: relative;
     flex: 1 1 0;
+    font-size: 0.875rem;
+    line-height: 1.5rem;
   }
   .questions {
     margin-top: 1em;

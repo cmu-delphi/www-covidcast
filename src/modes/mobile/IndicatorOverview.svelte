@@ -1,6 +1,6 @@
 <script>
   import Vega from '../../components/Vega.svelte';
-  import { formatDateShortNumbers, formatDateShortWeekdayAbbr } from '../../formats';
+  import { formatDateShortNumbers } from '../../formats';
   import { generateSparkLine } from '../../specs/lineSpec';
   import SurveyValue from '../survey/SurveyValue.svelte';
   import SensorUnit from './SensorUnit.svelte';
@@ -49,8 +49,6 @@
     font-size: 0.75rem;
   }
 </style>
-
-<p class="p-start">On {formatDateShortWeekdayAbbr(date.value, true)} the number of people:</p>
 
 <div class="mobile-two-col">
   <div class="mobile-kpi">
