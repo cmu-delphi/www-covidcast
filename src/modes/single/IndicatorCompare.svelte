@@ -115,6 +115,8 @@
     //   yAggregate = { aggregate: 'count', title: 'Count' };
     // }
     const lag = options.lag || 0;
+    const width = options.width || 100;
+    const height = options.height || 100;
     const chartSpec = {
       // height: 200,
       // width: 200,
@@ -137,6 +139,8 @@
       //     ],
       //   },
       // ],
+      width: width,
+      height: height,
       mark: {
         type: 'point', // options.histogram ? 'bar' : 'point',
         opacity: 0.2,
@@ -168,8 +172,8 @@
     spec = {
       // width: 200,
       // height: 200,
-      width: 100,
-      height: 100,
+      width: width,
+      height: height,
       title: lag != 0 ? `Lag: ${lag}` : '',
       transform: [
         {
@@ -192,6 +196,50 @@
       layer: [
         chartSpec,
 
+        {
+          transform: [
+            {
+              regression: 'x',
+              on: 'y',
+            },
+          ],
+          mark: { type: 'line', color: 'firebrick' },
+          encoding: {
+            x: {
+              field: 'x',
+              // title: options.xtitle,
+              title: null,
+              type: 'quantitative',
+              ...xBin,
+            },
+            y: yAggregate || {
+              field: 'y',
+              // title: options.ytitle,
+              title: null,
+              type: 'quantitative',
+            },
+          },
+        },
+        {
+          transform: [
+            {
+              regression: 'x',
+              on: 'y',
+              params: true,
+            },
+            { calculate: "'R²: '+format(datum.rSquared, '.2f')", as: 'R2' },
+          ],
+          mark: {
+            type: 'text',
+            color: 'firebrick',
+            x: 'width',
+            align: 'right',
+            y: -5,
+          },
+          encoding: {
+            text: { type: 'nominal', field: 'R2' },
+          },
+        },
         {
           transform: [
             {
@@ -242,7 +290,7 @@
 
   $: matrixSpec = [];
 
-  function updateMatrixSpec(vegaRepeatSpec, lag = 0) {
+  function updateMatrixSpec(vegaRepeatSpec, lag = 0, width = 100, height = 100) {
     // const numRows = vegaRepeatSpec.rows.length;
     // const numCols = vegaRepeatSpec.columns.length;
 
@@ -255,13 +303,15 @@
               histogram: r == c, // obsolete
               xtitle: c.name,
               ytitle: r.name,
-              lag: lag,
+              lag,
+              width,
+              height,
             }),
           ],
         ].flat();
       })
       .flat();
-    matrixSpec = {
+    let matrixSpec = {
       columns: 1, // vegaRepeatSpec.columns.length,
       concat: [specs[1]],
     };
@@ -286,7 +336,7 @@
       //   contains: 'padding',
       //   resize: true,
       // },
-      padding: { left: 50, right: 40, top: 50, bottom: 50 },
+      padding: 20,
       width: 30,
       height: 30,
       data: { name: 'values' },
@@ -419,19 +469,6 @@
       </colgroup>
       <tbody>
         <!-- Need tbody to size the container table and its td?
-        {#each selections as selection, i}
-          
-             <tr>
-              <td class="legend" style="--color: {i === 0 ? 'grey' : selection.color}">{selection.displayName}</td>
-            <td class="key-fact">{values[i] != null ? sensor.formatValue(values[i]) : '?'}</td>
-             {#if i === 0}
-              <td class="hint" rowspan={selections.length}>
-                on
-                {formatDateLocal(highlightDate ? highlightDate : date)}
-              </td>
-            {/if}
-          </tr> 
-        {/each}
         -->
       </tbody>
     </table>
@@ -442,16 +479,18 @@
 {#if showLags}
   <tr>
     <td>
-      {#each [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7] as lag}
-        <Vega data={Promise.resolve(sensorMatrixData)} spec={makeSplomSpec(updateMatrixSpec(vegaRepeatSpec, lag))} />
+      {#each [-14, -7, -4, -3, -2, -1, 0, 1, 2, 3, 4, 7, 14] as lag}
+        <Vega
+          data={Promise.resolve(sensorMatrixData)}
+          spec={makeSplomSpec(updateMatrixSpec(vegaRepeatSpec, lag, 50, 50))} />
         <input checked={showLag === lag} on:change={onChangeLag} type="radio" name="lagDetails" value={lag} />
       {/each}
     </td>
-    <td style="width: 100px; height: 100px;">
+    <td style="width: 200px; height: 100px;">
       {#if showLag}
         <Vega
           data={Promise.resolve(sensorMatrixData)}
-          spec={makeSplomSpec(updateMatrixSpec(vegaRepeatSpec, showLag))} />
+          spec={makeSplomSpec(updateMatrixSpec(vegaRepeatSpec, showLag, 200, 200))} />
       {/if}
     </td>
   </tr>

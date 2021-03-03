@@ -11,7 +11,7 @@
   } from '../../stores';
   // import { get } from 'svelte/store';
   import { sensorList } from '../../stores/constants';
-  import { groupedSensorList } from '../../stores/constants';
+  // import { groupedSensorList } from '../../stores/constants';
 
   // import SensorCard from './SensorCard.svelte';
   import IndicatorCompare from './IndicatorCompare.svelte';
@@ -254,7 +254,7 @@
 </style>
 
 <div class="root base-font-size">
-  <div class="uk-table-shrink add-column-container">
+  <!-- <div class="uk-table-shrink add-column-container">
     <div class="add-sensor-button-wrapper" uk-form-custom="target: true">
       <select bind:value={chosenColumn}>
         {#each groupedSensorList as sensorGroup}
@@ -272,7 +272,7 @@
       </select>
       <button type="button" aria-label="add column options">Add Indicator</button>
     </div>
-  </div>
+  </div> -->
 
   <div class="search-container">
     <Search
