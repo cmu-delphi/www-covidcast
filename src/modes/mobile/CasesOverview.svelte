@@ -4,6 +4,7 @@
   import TrendIndicator from './TrendIndicator.svelte';
   import { CASES, DEATHS } from '../../stores/params';
   import { formatDateShortWeekdayAbbr } from '../../formats';
+  import SensorUnit from './SensorUnit.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -49,7 +50,9 @@
         <SurveyValue value={d && d.current ? d.current.value : null} />
       {/await}
     </div>
-    <div class="sub">per 100,000 people</div>
+    <div class="sub">
+      <SensorUnit sensor={CASES} long />
+    </div>
   </div>
   <div class="mobile-kpi">
     <h3>Deaths</h3>
@@ -60,7 +63,9 @@
         <SurveyValue value={d && d.current ? d.current.value : null} />
       {/await}
     </div>
-    <div class="sub">per 100,000 people</div>
+    <div class="sub">
+      <SensorUnit sensor={CASES} long />
+    </div>
   </div>
 </div>
 
