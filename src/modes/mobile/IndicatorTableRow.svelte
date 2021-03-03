@@ -6,6 +6,7 @@
   import { currentMode } from '../../stores';
   import { modeByID } from '..';
   import TrendIndicator from './TrendIndicator.svelte';
+  import SensorValue from './SensorValue.svelte';
 
   /**
    * @type {import("../../stores/params").SensorParam}
@@ -76,7 +77,11 @@
     {/await}
   </td>
   <td class="uk-text-right">
-    {#await trend}?{:then t}{sensor.formatValue(t && t.current ? t.current.value : null)}{/await}
+    {#await trend}
+      ?
+    {:then t}
+      <SensorValue {sensor} value={t && t.current ? t.current.value : null} />
+    {/await}
   </td>
   <td rowspan="2">
     <div class="mobile-table-chart">
@@ -84,7 +89,7 @@
         {spec}
         {data}
         tooltip={SparkLineTooltip}
-        tooltipProps={{ sensor: sensor.value }}
+        tooltipProps={{ sensor: sensor }}
         signals={{ currentDate: date.value }} />
     </div>
   </td>
@@ -99,7 +104,4 @@
 </tr>
 <tr class="addon">
   <td colspan="2" class="source">Source: {sensor.dataSource}</td>
-  <td class="source uk-text-right">
-    {#if sensor.isCasesOrDeath}per&nbsp;100k{/if}
-  </td>
 </tr>

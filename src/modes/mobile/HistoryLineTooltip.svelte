@@ -1,5 +1,6 @@
 <script>
   import { formatDateShortWeekdayAbbr } from '../../formats';
+  import SensorValue from './SensorValue.svelte';
 
   export let hidden = false;
   /**
@@ -12,13 +13,11 @@
    */
   export let view;
 
-  function f(v) {
-    return v == null
-      ? 'N/A'
-      : v.toLocaleString(undefined, {
-          maximumFractionDigits: 1,
-        });
-  }
+  /**
+   * @type {import('../../stores/params').SensorParam}
+   */
+  export let sensor;
+
   $: items = item && view ? view.data('values').filter((d) => d.time_value === item.time_value) : [];
 </script>
 
@@ -46,7 +45,9 @@
     {#each items as i}
       <tr>
         <th>{i.displayName}</th>
-        <td>{f(i.value)}</td>
+        <td>
+          <SensorValue {sensor} value={i.value} />
+        </td>
       </tr>
     {/each}
   </table>

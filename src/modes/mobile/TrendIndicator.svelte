@@ -3,6 +3,7 @@
   import Up from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-up.svg';
   import Steady from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-right.svg';
   import Unknown from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
+  import SensorValue from './SensorValue.svelte';
 
   export let block = false;
   /**
@@ -14,12 +15,6 @@
    */
   export let sensor;
   export let long = false;
-
-  $: value = sensor.formatValue(trend ? trend.delta : null, true);
-
-  $: isGood = trend && ((trend.isIncreasing && sensor.isInverted) || (trend.isDecreasing && !sensor.isInverted));
-  $: isBad = trend && ((trend.isIncreasing && !sensor.isInverted) || (trend.isDecreasing && sensor.isInverted));
-  $: isSteady = trend && trend.isSteady;
 
   let trendIcon = null;
   $: {
@@ -87,12 +82,19 @@
   }
 </style>
 
-<div class="trend-indicator" class:long class:short={!long} class:isGood class:isBad class:isSteady class:block>
+<div
+  class="trend-indicator"
+  class:long
+  class:short={!long}
+  class:isGood={trend && trend.isGood}
+  class:isBad={trend && trend.isBad}
+  class:isSteady={trend && trend.isSteady}
+  class:block>
   <span class="icon">
     {@html trendIcon}
   </span>
-  {#if long && trend != null}
-    <span class="trend-text"> {trend.trend} </span>
-    <span class="trend-value">{value}</span>
-  {:else}<span class="trend-value">{value}</span>{/if}
+  {#if long && trend != null}<span class="trend-text"> {trend.trend} </span>{/if}
+  <span class="trend-value">
+    <SensorValue {sensor} value={trend ? trend.delta : null} enforceSign />
+  </span>
 </div>

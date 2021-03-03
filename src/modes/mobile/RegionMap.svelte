@@ -78,4 +78,4 @@
   {spec}
   {data}
   tooltip={RegionMapTooltip}
-  tooltipProps={{ sensor: sensor.value, regionSetter: region.set }} />
+  tooltipProps={{ sensor, regionSetter: region.set }} />

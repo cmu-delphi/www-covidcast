@@ -4,9 +4,12 @@
   import { generateSparkLine } from '../../specs/lineSpec';
   import { WINDOW_SIZE } from '../../stores/params';
   import SurveyValue from '../survey/SurveyValue.svelte';
+  import SensorUnit from './SensorUnit.svelte';
+  import SensorValue from './SensorValue.svelte';
   import SparkLineTooltip from './SparkLineTooltip.svelte';
 
   import TrendIndicator from './TrendIndicator.svelte';
+  import TrendText from './TrendText.svelte';
 
   /**
    * @type {import('../../stores/constants').SensorEntry}
@@ -33,20 +36,6 @@
     highlightDate: 'top',
     highlightStartEnd: false,
   });
-
-  function trendAlternative(trend) {
-    if (!trend || trend.isUnknown) {
-      return '?';
-    }
-    const value = sensor.formatValue(trend.delta);
-    if (trend.isBetter) {
-      return `better by ${value}`;
-    }
-    if (trend.isWorse) {
-      return `worse by ${value}`;
-    }
-    return `around the same with ${value}`;
-  }
 </script>
 
 <style>
@@ -74,7 +63,9 @@
         <SurveyValue value={d && d.current ? d.current.value : null} digits={sensor.isPercentage ? 2 : 1} />
       {/await}
     </div>
-    <div class="sub">{sensor.unit}</div>
+    <div class="sub">
+      <SensorUnit {sensor} long />
+    </div>
   </div>
   <div>
     <div class="chart-50">
@@ -82,7 +73,7 @@
         {spec}
         data={sparkline}
         tooltip={SparkLineTooltip}
-        tooltipProps={{ sensor: sensor.value }}
+        tooltipProps={{ sensor: sensor }}
         signals={{ currentDate: date.value }} />
     </div>
     <div class="date-range">
@@ -113,7 +104,8 @@
       month
       <strong>worst</strong>
       value compared to
-      <strong>best value of {sensor.formatValue(d.best ? d.best.value : null)}</strong>
+      <strong>best value of
+        <SensorValue {sensor} value={d.best ? d.best.value : null} /></strong>
       on
       <strong>{formatDateYearWeekdayAbbr(d.bestDate, true)}</strong>.
     {:else}
@@ -121,9 +113,13 @@
       {formatDateShortWeekdayAbbr(date.value, true)}
       <strong>{sensor.value.name}</strong>
       was
-      <strong>{trendAlternative(d.worstTrend)}</strong>
+      <strong>
+        <TrendText {sensor} trend={d.worstTrend} />
+      </strong>
       compared to the
-      <strong>{WINDOW_SIZE} month worst value of {sensor.formatValue(d.worst ? d.worst.value : null)}</strong>
+      <strong>{WINDOW_SIZE}
+        month worst value of
+        <SensorValue {sensor} value={d.worst ? d.worst.value : null} /></strong>
       on
       <strong>{formatDateYearWeekdayAbbr(d.worstDate, true)}</strong>.
     {/if}
