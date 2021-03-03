@@ -5,6 +5,7 @@
   import TrendIndicator from './TrendIndicator.svelte';
   import { SensorParam } from '../../stores/params';
   import { formatDateShortWeekdayAbbr } from '../../formats';
+  import SensorUnit from './SensorUnit.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -45,7 +46,9 @@
           <SurveyValue value={d && d.current ? d.current.value : null} digits={2} />
         {/await}
       </div>
-      <div class="sub">{s.sensor.unit}</div>
+      <div class="sub">
+        <SensorUnit sensor={s.sensor} long />
+      </div>
     </div>
   {/each}
 </div>

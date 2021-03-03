@@ -387,7 +387,6 @@ export class SensorParam {
       this.isCasesOrDeath || sensor.signal === 'bars_visit_prop' || sensor.signal === 'restaurants_visit_prop';
     this.isInverted = isInverted(sensor);
     this.formatValue = this.isPercentage ? formatPercentage : sensor.formatValue;
-    this.unit = this.isPercentage ? '% of pop.' : this.isPer100K ? 'per 100k people' : '';
   }
 
   /**
