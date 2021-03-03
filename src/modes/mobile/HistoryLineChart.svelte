@@ -14,6 +14,7 @@
   } from '../../specs/lineSpec';
   import { toTimeValue } from '../../stores/params';
   import Toggle from './Toggle.svelte';
+  import SensorValue from './SensorValue.svelte';
 
   export let height = 250;
 
@@ -133,14 +134,14 @@
 
   function findValue(region, data, date) {
     if (!date) {
-      return 'N/A';
+      return null;
     }
     const time = toTimeValue(date);
     const row = data.find((d) => d.id === region.id && d.time_value === time);
     if (!row) {
-      return 'N/A';
+      return null;
     }
-    return sensor.formatValue(row.value);
+    return row.value;
   }
 </script>
 
@@ -168,6 +169,7 @@
   {spec}
   {data}
   tooltip={HistoryLineTooltip}
+  tooltipProps={{ sensor }}
   signals={signalPatches}
   signalListeners={['highlight']}
   on:signal={onSignal} />
@@ -186,8 +188,11 @@
         </span>
       </div>
       <div>
-        {#await data then d}<span class="legend-value">{findValue(r, d, highlightDate)}</span>{/await}
-        {#if sensor.isCasesOrDeath}{sensor.unit}{/if}
+        {#await data then d}
+          <span class="legend-value">
+            <SensorValue {sensor} value={findValue(r, d, highlightDate)} />
+          </span>
+        {/await}
       </div>
     </div>
   {/each}
