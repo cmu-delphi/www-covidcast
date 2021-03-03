@@ -40,8 +40,10 @@ const AUTO_ALIGN = {
 };
 
 export function generateLineChartSpec({
+  width = 800,
   height = 300,
   domain,
+  color = COLOR,
   initialDate = null,
   valueField = 'value',
   zero = false,
@@ -50,6 +52,7 @@ export function generateLineChartSpec({
    * @type {import('vega-lite').TopLevelSpec}
    */
   const spec = {
+    width,
     height,
     padding: { left: 42, top: 20, bottom: 20, right: 15 },
     autosize: {
@@ -85,7 +88,7 @@ export function generateLineChartSpec({
       {
         mark: {
           type: 'line',
-          color: COLOR,
+          color,
           point: false,
         },
         encoding: {
@@ -126,7 +129,7 @@ export function generateLineChartSpec({
         },
         mark: {
           type: 'point',
-          color: COLOR,
+          color,
           stroke: null,
           tooltip: true,
         },
@@ -213,6 +216,24 @@ export function generateCompareLineSpec(compare, { compareField = 'displayName',
     field: compareField,
     type: 'nominal',
   };
+  return spec;
+}
+
+export function generateLineAndBarSpec(options = {}) {
+  const spec = generateLineChartSpec(options);
+  /**
+   * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
+   */
+  const point = spec.layer[1];
+  point.mark = {
+    type: 'bar',
+    color: MULTI_COLORS[0],
+    width: {
+      expr: `floor(width / customCountDays(domain('x')[0], domain('x')[1]))`,
+    },
+  };
+  point.encoding.y.field = 'raw';
+  point.encoding.opacity.value = 0.2;
   return spec;
 }
 

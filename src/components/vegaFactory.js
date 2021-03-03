@@ -4,6 +4,7 @@ import embed from 'vega-embed';
 import { Error, expressionFunction, projection } from 'vega';
 import { geoAlbersUsaTerritories } from 'geo-albers-usa-territories';
 import { fitExtent, fitSize, fitWidth, fitHeight } from 'd3-geo/src/projection/fit.js';
+import { timeDay } from 'd3-time';
 
 function patchedAlbersUsaTerritories() {
   // see https://github.com/stamen/geo-albers-usa-territories/pull/8/files
@@ -183,3 +184,5 @@ function array2object(arr, key) {
 expressionFunction('array2object', array2object);
 
 expressionFunction('customInFilter', (arr, prop, values) => arr.filter((d) => values.includes(d[prop])));
+
+expressionFunction('customCountDays', (d1, d2) => timeDay.count(d1, d2));
