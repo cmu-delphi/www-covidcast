@@ -450,7 +450,7 @@ export class SensorParam {
  * @param {Sensor} sensor
  */
 export function isInverted(sensor) {
-  return sensor.colorScaleId === 'interpolateYlGnBu';
+  return sensor.isInverted || sensor.colorScaleId === 'interpolateYlGnBu';
 }
 
 export const CASES = new SensorParam(sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Cases')));
