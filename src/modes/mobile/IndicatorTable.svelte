@@ -5,6 +5,7 @@
   import { SensorParam } from '../../stores/params';
   import { formatDateShortNumbers } from '../../formats';
   import filterIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/filter.svg';
+  import { CASES_DEATH_SOURCE, getDataSource } from '../../stores/dataSourceLookup';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -22,16 +23,19 @@
   function computeDataSources() {
     const map = new Map();
     for (const sensor of sensorList) {
-      const e = map.get(sensor.id);
+      const ds = getDataSource(sensor);
+      const e = map.get(ds);
       if (e) {
-        e.push(sensor);
+        e.sensors.push(sensor);
       } else {
-        map.set(sensor.id, [sensor]);
+        map.set(ds, {
+          name: sensor.isCasesOrDeath ? CASES_DEATH_SOURCE : sensor.id,
+          label: ds,
+          sensors: [sensor],
+        });
       }
     }
-    return Array.from(map)
-      .map((d) => ({ name: d[0], sensors: d[1] }))
-      .sort((a, b) => a.name.localeCompare(b.name));
+    return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
   }
 
   const dataSources = computeDataSources();
@@ -42,6 +46,15 @@
     if (selectedDatasource === 'all') {
       selectedDatasource = '';
     }
+  }
+
+  function matchDataSource(sensor, selected) {
+    return (
+      selected === '' ||
+      selected === 'all' ||
+      (sensor.isCasesOrDeath && selected === CASES_DEATH_SOURCE) ||
+      (!sensor.isCasesOrDeath && sensor.id === selected)
+    );
   }
 </script>
 
@@ -83,9 +96,11 @@
   </span>
   <select class="uk-select" bind:value={selectedDatasource}>
     <option value="" disabled hidden>Filter by</option>
-    {#each dataSources as ds}
-      <option value={ds.name}>{ds.name} ({ds.sensors.length})</option>
-    {/each}
+    <optgroup label="Data Sources">
+      {#each dataSources as ds}
+        <option value={ds.name}>{ds.label} ({ds.sensors.length})</option>
+      {/each}
+    </optgroup>
     <option value="all">All Indicators ({sensorList.length})</option>
   </select>
 </div>
@@ -107,13 +122,15 @@
     </tr>
   </thead>
   {#each groupedSensorList as group}
-    {#if !selectedDatasource || selectedDatasource === 'all' || group.sensors.some((d) => d.id === selectedDatasource)}
+    {#if !selectedDatasource || selectedDatasource === 'all' || group.sensors.some((d) =>
+        matchDataSource(d, selectedDatasource),
+      )}
       <tbody>
         <tr class="row-group">
           <th class="mobile-h3" colspan="5">{group.label}</th>
         </tr>
         {#each group.sensors as sensor}
-          {#if !selectedDatasource || selectedDatasource === 'all' || selectedDatasource === sensor.id}
+          {#if matchDataSource(sensor, selectedDatasource)}
             <IndicatorTableRow sensor={new SensorParam(sensor)} {date} {region} {fetcher} />
           {/if}
         {/each}

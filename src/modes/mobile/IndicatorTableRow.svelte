@@ -98,7 +98,7 @@
   </td>
 </tr>
 <tr class="addon">
-  <td colspan="2" class="source">Source: {sensor.value.id}</td>
+  <td colspan="2" class="source">Source: {sensor.dataSource}</td>
   <td class="source uk-text-right">
     {#if sensor.isCasesOrDeath}per&nbsp;100k{/if}
   </td>
