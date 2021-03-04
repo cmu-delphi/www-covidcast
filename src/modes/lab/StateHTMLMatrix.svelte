@@ -9,8 +9,8 @@
   import Vega from '../../components/Vega.svelte';
   import { getInfoByName } from '../../maps';
   import { determineColorScale, determineMinMax } from '../../components/MapBox/colors';
-  import HexGrid from './components/HexGrid.svelte';
-  import HexGridCell from './components/HexGridCell.svelte';
+  import HexGrid from '../mobile/components/HexGrid.svelte';
+  import HexGridCell from '../mobile/components/HexGridCell.svelte';
   import RegionHexGridCell from './components/RegionHexGridCell.svelte';
   import SensorHexGridCell from './components/SensorHexGridCell.svelte';
   import { toTimeValue } from '../../stores/params';

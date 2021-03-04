@@ -2,7 +2,7 @@ import getRelatedCounties from '../maps/related';
 import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 import { MAP_THEME, MISSING_COLOR, ZERO_COLOR } from '../theme';
 
-const NAME_INFO_KEYS = ['propertyId', 'displayName', 'population', 'state'];
+const NAME_INFO_KEYS = ['propertyId', 'displayName', 'population', 'state', 'level'];
 const EPIDATA_ROW_KEYS = ['geo_value', 'value', 'date_value', 'time_value', 'stderr', 'sample_size'].concat(
   EPIDATA_CASES_OR_DEATH_VALUES,
   NAME_INFO_KEYS,
@@ -88,6 +88,7 @@ function genMegaLayer(withStates = null) {
         type: 'single',
         on: 'mouseover',
         empty: 'none',
+        fields: ['geo_value'],
       },
     },
   };
@@ -122,7 +123,7 @@ function genStateBorderLayer({ strokeWidth = 1.1 } = {}) {
   return layer;
 }
 
-function genMegaHoverLayer() {
+function genMegaHoverLayer(alsoOnCounties = false) {
   /**
    * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
    */
@@ -148,10 +149,22 @@ function genMegaHoverLayer() {
       },
       opacity: {
         // more performant
-        condition: {
-          selection: 'hoverMega',
-          value: 1,
-        },
+        condition: alsoOnCounties
+          ? {
+              test: {
+                or: [
+                  {
+                    selection: 'hoverMega',
+                  },
+                  'hover && hover.geo_value && hover.geo_value[0] && slice(hover.geo_value[0], 0, 2) === slice(datum.id, 0, 2)',
+                ],
+              },
+              value: 1,
+            }
+          : {
+              selection: 'hoverMega',
+              value: 1,
+            },
         value: 0,
       },
     },
@@ -222,7 +235,7 @@ function genLevelLayer({ strokeWidth = 1, scheme = 'yellowgreenblue', domain = u
   return layer;
 }
 
-function genLevelHoverLayer() {
+function genLevelHoverLayer({ strokeWidth = 3 } = {}) {
   /**
    * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
    */
@@ -230,7 +243,7 @@ function genLevelHoverLayer() {
     mark: {
       type: 'geoshape',
       stroke: MAP_THEME.hoverRegionOutline,
-      strokeWidth: 3,
+      strokeWidth,
       opacity: 0,
       fill: null,
       tooltip: false,
@@ -390,7 +403,7 @@ export function generateNationSpec(options = {}) {
 /**
  * generates a map of counties
  */
-export function generateCountySpec(options = {}) {
+export function generateStateMapWithCountyDataSpec(options = {}) {
   const level = 'county';
   const topoJSON = countyJSON();
 
@@ -402,8 +415,8 @@ export function generateCountySpec(options = {}) {
   spec.layer.push(genMegaLayer());
   spec.layer.push(genLevelLayer({ ...options, strokeWidth: 0 }));
   spec.layer.push(genStateBorderLayer());
-  spec.layer.push(genMegaHoverLayer());
-  spec.layer.push(genLevelHoverLayer());
+  spec.layer.push(genMegaHoverLayer(true));
+  spec.layer.push(genLevelHoverLayer({ strokeWidth: 1 }));
   return spec;
 }
 

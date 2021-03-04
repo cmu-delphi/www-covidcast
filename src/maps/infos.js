@@ -94,6 +94,7 @@ export const megaCountyInfo = stateInfo.map((info) => ({
   population: null,
   level: levelMegaCountyId,
   region: info.region,
+  state: info.id,
   lat: null,
   long: null,
 }));

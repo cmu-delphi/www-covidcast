@@ -6,6 +6,8 @@
   export let x = -1;
   export let y = -1;
 
+  export let tooltip = null;
+
   export let border = 0;
 
   $: isDefined = x >= 0 && y >= 0;
@@ -45,7 +47,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-around;
+    justify-content: center;
   }
 
   .hexgrid_cell__border {
@@ -82,6 +84,7 @@
   style={isDefined ? `grid-column-start: ${1 + x * 2 + (y % 2)}; grid-row-start: ${y + 1}` : ''}>
   <div
     class="hexgrid_cell_content {className}"
+    data-uk-tooltip={tooltip ? `title: ${tooltip}; pos: top` : undefined}
     class:hexgrid_cell__border={border !== 0}
     style="--border-size: {border}; {style}"
     on:click>
