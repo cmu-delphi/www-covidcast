@@ -5,6 +5,7 @@ import { currentDate, currentRegion, yesterdayDate, currentSensor, sensorList } 
 import { determineTrend } from './trend';
 import { determineColorScale, determineMinMax } from '../components/MapBox/colors';
 import { formatPercentage } from '../formats';
+import { getDataSource } from './dataSourceLookup';
 
 /**
  * @typedef {import('./constants').SensorEntry} Sensor
@@ -426,6 +427,7 @@ export class SensorParam {
     this.isInverted = isInverted(sensor);
     this.formatValue = this.isPercentage ? formatPercentage : sensor.formatValue;
     this.unit = this.isPercentage ? '% of pop.' : this.isPer100K ? 'per 100k people' : '';
+    this.dataSource = getDataSource(sensor);
     const rawSignal = deriveRawSignal(sensor);
     /**
      * @type {Sensor | null}

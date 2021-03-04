@@ -12,22 +12,9 @@
   import { formatDateISO } from '../../formats';
   import InfoDialogButton from '../../components/InfoDialogButton.svelte';
   import { questionCategories, refSensor } from '../../modes/survey/questions';
+  import { CASES_DEATH_SOURCE, getDataSource } from '../../stores/dataSourceLookup';
 
   const CSV_SERVER = 'https://delphi.cmu.edu/csv';
-
-  const CASES_DEATH_SOURCE = 'cases-deaths';
-
-  const sourceNameLookup = {
-    chng: 'Change Healthcare',
-    'doctor-visits': 'Doctor Visits',
-    'fb-survey': 'Delphi Survey Results',
-    ght: 'Google Search Trends',
-    'hospital-admissions': 'Hospital Admissions',
-    [CASES_DEATH_SOURCE]: 'Public Health Reports',
-    'indicator-combination': 'COVID Indicator Combination',
-    quidel: 'Quidel Antigen Tests',
-    safegraph: 'SafeGraph Mobility Data',
-  };
 
   let loading = true;
   /**
@@ -156,7 +143,7 @@
       if (!signalGroupMap.has(signalGroup)) {
         signalGroupMap.set(signalGroup, {
           id: signalGroup,
-          name: sourceNameLookup[signalGroup] || signalGroup,
+          name: getDataSource(signalGroup),
           levels: new Set(),
           minTime: parseAPITime(entry.min_time),
           maxTime: parseAPITime(entry.max_time),
