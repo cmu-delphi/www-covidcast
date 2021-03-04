@@ -173,6 +173,11 @@
   function highlight(r) {
     highlightRegion = r ? r.id : null;
   }
+
+  $: {
+    // auto update
+    highlightRegion = region.value.id;
+  }
 </script>
 
 <style>
