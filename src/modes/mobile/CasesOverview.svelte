@@ -4,6 +4,7 @@
   import TrendIndicator from './TrendIndicator.svelte';
   import { CASES, DEATHS } from '../../stores/params';
   import { formatDateShortWeekdayAbbr } from '../../formats';
+  import HistoryLineChart from './HistoryLineChart.svelte';
   import SensorUnit from './SensorUnit.svelte';
 
   /**
@@ -101,4 +102,8 @@
 
 <div class="chart-250">
   <RegionMap {region} {date} sensor={CASES} {fetcher} height={250} />
+</div>
+
+<div class="chart-250">
+  <HistoryLineChart sensor={CASES} {date} {region} {fetcher} />
 </div>
