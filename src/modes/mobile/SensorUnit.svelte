@@ -7,19 +7,6 @@
   export let force = false;
 </script>
 
-<style>
-  .per100k {
-    display: inline-flex;
-    flex-direction: column;
-    text-align: center;
-    transform: translateY(-40%);
-  }
-  .per100k > span {
-    font-size: 50%;
-    line-height: 1;
-  }
-</style>
-
 {#if long && sensor.isPercentage}
   % of pop.
 {:else if long && sensor.isPer100K}

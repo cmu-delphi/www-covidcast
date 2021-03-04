@@ -3,9 +3,10 @@ import { addNameInfos, fetchData, formatAPITime, addMissing, fitRange, parseAPIT
 import { nationInfo } from '../maps';
 import { currentDate, currentRegion, yesterdayDate, currentSensor, sensorList } from '.';
 import { determineTrend } from './trend';
-import { determineColorScale, determineMinMax } from '../components/MapBox/colors';
+import { determineMinMax } from '../components/MapBox/colors';
 import { formatPercentage } from '../formats';
 import { getDataSource } from './dataSourceLookup';
+import { scaleSequential } from 'd3-scale';
 
 /**
  * @typedef {import('./constants').SensorEntry} Sensor
@@ -426,7 +427,9 @@ export class SensorParam {
       this.isCasesOrDeath || sensor.signal === 'bars_visit_prop' || sensor.signal === 'restaurants_visit_prop';
     this.isInverted = isInverted(sensor);
     this.formatValue = this.isPercentage ? formatPercentage : sensor.formatValue;
-    this.unit = this.isPercentage ? '% of pop.' : this.isPer100K ? 'per 100k people' : '';
+    this.unit = this.isPercentage ? '% of pop.' : this.isPer100K ? 'per 100,000 people' : '';
+    this.unitHTML = this.isPer100K ? `<span class="per100k"><span>PER</span><span>100K</span></span>` : '';
+
     this.dataSource = getDataSource(sensor);
     const rawSignal = deriveRawSignal(sensor);
     /**
@@ -461,17 +464,25 @@ export class SensorParam {
    */
   domain(stats, level) {
     const domain = determineMinMax(stats, this.value, level, {}, false);
-    return [domain[0] * this.factor, domain[1] * this.factor];
+    const scaled = [domain[0] * this.factor, domain[1] * this.factor];
+    if (this.isPercentage) {
+      scaled[0] = Math.max(0, scaled[0]);
+      scaled[1] = Math.min(100, scaled[1]);
+    } else if (this.isPer100K) {
+      scaled[0] = Math.max(0, scaled[0]);
+      scaled[1] = Math.min(100000, scaled[1]);
+    }
+    return scaled;
   }
 
   /**
    * @param {Map<string, any>} stats
-   * @param {Region} region
+   * @param {string} level
    * @returns {(v: number) => string}
    */
-  createColorScale(stats, region) {
-    const domain = this.domain(stats, region);
-    return determineColorScale(domain, this.value, 'prop').scale;
+  createColorScale(stats, level) {
+    const domain = this.domain(stats, level);
+    return scaleSequential(this.value.colorScale).domain(domain);
   }
 }
 

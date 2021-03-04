@@ -10,6 +10,7 @@
   import Vega from '../../components/Vega.svelte';
   import SensorValue from './SensorValue.svelte';
   import { MISSING_COLOR } from '../../theme';
+  import ColorLegend from './components/ColorLegend.svelte';
 
   export let className = '';
   /**
@@ -75,7 +76,7 @@
     interactive: false,
     domain: date.sparkLineTimeFrame.domain,
   });
-  $: colorScale = sensor.createColorScale($stats, region);
+  $: colorScale = sensor.createColorScale($stats, region.level);
 
   const maxColumn = state2TileCell.reduce((acc, v) => Math.max(acc, v.x), 0) + 1;
 </script>
@@ -107,7 +108,7 @@
 </style>
 
 <div class="root {className}" class:loading>
-  <HexGrid columns={maxColumn} style="gap: 2px" className="vega-embed">
+  <HexGrid columns={maxColumn} style="gap: 2px; margin-bottom: 1rem;">
     {#each tileData as tile}
       {#await tile.value}
         <HexGridCell
@@ -115,13 +116,16 @@
           y={tile.y}
           classNameOuter="state-cell {region.propertyId === tile.propertyId ? 'selected' : ''}">
           <span class="title">{tile.propertyId}</span>
-          <div class="vega-wrapper" />
-          <span class="value"> ? </span>
+          {#if !$isMobileDevice}
+            <div class="vega-wrapper" />
+            <span class="value"> ? </span>
+          {/if}
         </HexGridCell>
       {:then v}
         <HexGridCell
           x={tile.x}
           y={tile.y}
+          tooltip={v && v != null ? `${sensor.formatValue(v.value)} ${sensor.unitHTML}` : 'N/A'}
           classNameOuter="state-cell {region.propertyId === tile.propertyId ? 'selected' : ''}"
           style="{sensor.isInverted && v && v.value != null ? 'color: white;' : ''} background-color: {v && v.value != null ? colorScale(v.value) : MISSING_COLOR};"
           on:click={() => region.set(tile.region)}>
@@ -134,10 +138,11 @@
                 signals={{ currentDate: date.value }}
                 noDataText="?" />
             </div>
+            <span class="value"><SensorValue {sensor} value={v ? v.value : null} /></span>
           {/if}
-          <span class="value"><SensorValue {sensor} value={v ? v.value : null} /></span>
         </HexGridCell>
       {/await}
     {/each}
   </HexGrid>
+  <ColorLegend {sensor} level="state" />
 </div>
