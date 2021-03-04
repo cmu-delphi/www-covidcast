@@ -6,6 +6,9 @@
   import { modeByID } from '..';
   import { questions } from '../survey/questions';
   import '../mobile/common.css';
+  import FancyHeader from '../mobile/FancyHeader.svelte';
+  import SurveyValue from '../survey/SurveyValue.svelte';
+  import SurveyStats from '../survey/SurveyStats.svelte';
 
   function switchMode(region) {
     if (region !== undefined) {
@@ -32,8 +35,17 @@
   }
 
   h2 {
+    margin-top: 2.75rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  p {
+    margin: 1.5rem 0;
     font-size: 0.875rem;
-    font-weight: 700;
+    text-align: center;
+    font-weight: normal;
   }
 
   .button-wrapper {
@@ -41,34 +53,28 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    font-weight: 600;
   }
 
-  @media only screen and (max-width: 715px) {
+  @media only screen and (max-width: 1050px) {
+    h2 {
+      font-size: 2rem;
+    }
     .button-wrapper {
       align-items: stretch;
     }
   }
-
-  .highlights {
-    vertical-align: bottom;
-  }
-
-  .highlights th {
-    text-align: right;
-    padding: 0.5em 1em;
-  }
-
-  .highlights h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    line-height: 1.5rem;
-    margin: 0;
+  @media only screen and (max-width: 400px) {
+    h2 {
+      font-size: 1.5rem;
+    }
   }
 
   .chips {
     display: flex;
     flex-wrap: wrap;
     margin: 1em 0;
+    justify-content: center;
   }
   .chips:empty {
     margin: 0;
@@ -86,7 +92,7 @@
 </style>
 
 <div class="uk-container content-grid root mobile-root landing-banner">
-  <div class="grid-3-11">
+  <div class="grid-4-10">
     <h2>Welcome to COVIDcast</h2>
     <p>Explore COVID-19 indicators nearby</p>
 
@@ -128,22 +134,28 @@
       deaths.
     </p>
 
-    <table class="highlights">
-      <tr>
-        <th>
-          <h3>{questions.length}</h3>
-        </th>
-        <td>Survey Indicators</td>
-      </tr>
+    <FancyHeader sub="stats" center>Indicator</FancyHeader>
+
+    <div class="mobile-two-col uk-text-center mobile-two-col__highlight">
+      <div class="mobile-kpi">
+        <div>
+          <SurveyValue value={questions.length} digits={0} />
+        </div>
+        <div class="subheader">Survey Indicators</div>
+      </div>
       {#each groupedSensorList as group}
-        <tr>
-          <th>
-            <h3>{group.sensors.length}</h3>
-          </th>
-          <td>{group.label}{group.label.endsWith('Indicators') ? '' : ' Indicators'}</td>
-        </tr>
+        <div class="mobile-kpi">
+          <div>
+            <SurveyValue value={group.sensors.length} digits={0} />
+          </div>
+          <div class="subheader">{group.label}{group.label.endsWith('Indicators') ? '' : ' Indicators'}</div>
+        </div>
       {/each}
-    </table>
+    </div>
+
+    <FancyHeader sub="Audience" center>Survey</FancyHeader>
+
+    <SurveyStats className="uk-text-center mobile-two-col__highlight" />
 
     <p>In collaboration with Facebook, Google, Change Healthcare, and Quidel.</p>
   </div>

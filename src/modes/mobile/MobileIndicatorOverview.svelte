@@ -51,9 +51,7 @@
       <RegionOverview {region} />
 
       <FancyHeader sub="Map">Indicator</FancyHeader>
-      <div class="chart-250">
-        <RegionMap {sensor} {date} {region} {fetcher} />
-      </div>
+      <RegionMap {sensor} {date} {region} {fetcher} />
 
       <FancyHeader sub="Chart">Indicator</FancyHeader>
 

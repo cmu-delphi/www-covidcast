@@ -79,7 +79,7 @@
   </div>
 </div>
 
-<p class="p-start">Compared to the previous week that means:</p>
+<p>Compared to the previous week that means:</p>
 
 <div>
   {#await trend}

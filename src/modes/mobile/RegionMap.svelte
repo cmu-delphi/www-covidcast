@@ -89,13 +89,9 @@
   $: data = loadData(sensor, date, showCounties);
 </script>
 
-<Vega
-  className="mobile-map {className}"
-  {spec}
-  {data}
-  tooltip={RegionMapTooltip}
-  tooltipProps={{ sensor, regionSetter: region.set }} />
-
+<div class="chart-aspect-4-3">
+  <Vega {className} {spec} {data} tooltip={RegionMapTooltip} tooltipProps={{ sensor, regionSetter: region.set }} />
+</div>
 {#if region.level === 'nation'}
   <Toggle bind:checked={showCounties}>Show US Counties</Toggle>
 {/if}

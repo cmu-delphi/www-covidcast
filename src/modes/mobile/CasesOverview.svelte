@@ -101,7 +101,7 @@
 <h4 class="header">{CASES.value.mapTitleText()}</h4>
 
 <div class="chart-250">
-  <RegionMap {region} {date} sensor={CASES} {fetcher} height={250} />
+  <RegionMap {region} {date} sensor={CASES} {fetcher} />
 </div>
 
 <div class="chart-250">
