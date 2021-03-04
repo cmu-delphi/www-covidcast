@@ -1,5 +1,4 @@
 <script>
-  import RegionMap from './RegionMap.svelte';
   import SurveyValue from '../survey/SurveyValue.svelte';
   import TrendIndicator from './TrendIndicator.svelte';
   import { CASES, DEATHS } from '../../stores/params';
@@ -22,21 +21,6 @@
   $: casesTrend = fetcher.fetchWindowTrend(CASES, region, date);
   $: deathTrend = fetcher.fetchWindowTrend(DEATHS, region, date);
 </script>
-
-<style>
-  h3.header {
-    font-size: 1.125rem;
-    font-weight: 600;
-    text-align: center;
-    margin: 0.6em 0;
-  }
-  h4.header {
-    margin: 0;
-    margin-bottom: 1em;
-    font-size: 0.875rem;
-    text-align: center;
-  }
-</style>
 
 <p>On {formatDateShortWeekdayAbbr(date.value)} the 7 day averages are:</p>
 
@@ -93,10 +77,3 @@
     </div>
   </div>
 </div>
-
-<hr />
-
-<h3 class="header">COVID-19 Cases by state</h3>
-<h4 class="header">{CASES.value.mapTitleText()}</h4>
-
-<RegionMap {region} {date} sensor={CASES} {fetcher} />

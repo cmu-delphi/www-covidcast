@@ -3,7 +3,7 @@ import { addNameInfos, fetchData, formatAPITime, addMissing, fitRange, parseAPIT
 import { nationInfo } from '../maps';
 import { currentDate, currentRegion, yesterdayDate, currentSensor, sensorList } from '.';
 import { determineTrend } from './trend';
-import { determineMinMax } from '../components/MapBox/colors';
+import { determineColorScale, determineMinMax } from '../components/MapBox/colors';
 import { formatPercentage } from '../formats';
 
 /**
@@ -211,11 +211,12 @@ export class DataFetcher {
 
   /**
    * @param {Sensor|SensorParam} sensor
-   * @param {Region[]} region
+   * @param {Region[]} regions
    * @param {TimeFrame} timeFrame
+   * @param {boolean} isAll whether it should load all regions (used for performance)
    * @return {Promise<EpiDataRow[]>}
    */
-  fetch1SensorNRegionsNDates(sensor, regions, timeFrame) {
+  fetch1SensorNRegionsNDates(sensor, regions, timeFrame, isAll = false) {
     if (regions.length === 0) {
       return Promise.resolve([]);
     }
@@ -230,6 +231,25 @@ export class DataFetcher {
     const maxDataRows = 3600;
 
     const batchSize = Math.floor(maxDataRows / expectedDays);
+
+    if (batchSize >= regions.length) {
+      const r = fetchData(
+        sensor,
+        level,
+        isAll ? '*' : regions.map((d) => d.propertyId).join(','),
+        timeFrame.range,
+        {},
+        {
+          multiValues: false,
+          factor: sensorFactor(sensor),
+        },
+      ).then(addNameInfos);
+      // no missing
+      this.cache.set(key, r);
+      return r;
+    }
+
+    // load in batches
     // console.log(batchSize);
     const data = [];
     for (let i = 0; i < regions.length; i += batchSize) {
@@ -416,6 +436,16 @@ export class SensorParam {
       false,
     );
     return [domain[0] * this.factor, domain[1] * this.factor];
+  }
+
+  /**
+   * @param {Map<string, any>} stats
+   * @param {Region} region
+   * @returns {(v: number) => string}
+   */
+  createColorScale(stats, region) {
+    const domain = this.domain(stats, region);
+    return determineColorScale(domain, this.value, 'prop').scale;
   }
 }
 

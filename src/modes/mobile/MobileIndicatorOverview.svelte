@@ -49,8 +49,11 @@
       <RegionOverview {region} />
 
       <FancyHeader sub="Map">Indicator</FancyHeader>
+    </div>
+    <div class="grid-2-12">
       <RegionMap {sensor} {date} {region} {fetcher} />
-
+    </div>
+    <div class="grid-3-11">
       <FancyHeader sub="Chart">Indicator</FancyHeader>
 
       <div class="chart-250">

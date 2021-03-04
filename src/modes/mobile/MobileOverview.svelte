@@ -6,8 +6,9 @@
   import { countyInfo, nationInfo, stateInfo } from '../../maps';
   import SurveyParameters from '../survey/SurveyParameters.svelte';
   import { currentRegionInfo, currentSensorEntry, currentDateObject, times } from '../../stores';
-  import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
+  import { SensorParam, DateParam, RegionParam, DataFetcher, CASES } from '../../stores/params';
   import './common.css';
+  import RegionHexMap from './RegionHexMap.svelte';
 
   $: sensor = new SensorParam($currentSensorEntry, $times);
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
@@ -22,6 +23,21 @@
   }
 </script>
 
+<style>
+  h3.header {
+    font-size: 1.125rem;
+    font-weight: 600;
+    text-align: center;
+    margin: 0.6em 0;
+  }
+  h4.header {
+    margin: 0;
+    margin-bottom: 1em;
+    font-size: 0.875rem;
+    text-align: center;
+  }
+</style>
+
 <div class="mobile-root">
   <SurveyParameters sensor={sensor.value} {items} placeholder="Search by State or County">
     <div class="grid-3-11 mobile-header-line" slot="title">
@@ -31,6 +47,15 @@
   <div class="uk-container content-grid">
     <div class="grid-3-11">
       <CasesOverview {date} {region} {fetcher} />
+      <hr />
+    </div>
+    <div class="grid-2-12">
+      <h3 class="header">COVID-19 Cases by state</h3>
+      <h4 class="header">{CASES.value.mapTitleText()}</h4>
+      <!-- <RegionMap {region} {date} sensor={CASES} {fetcher} /> -->
+      <RegionHexMap {region} {date} sensor={CASES} {fetcher} />
+    </div>
+    <div class="grid-3-11">
       <hr />
       <AllIndicatorOverview {date} {region} {fetcher} />
       <hr />

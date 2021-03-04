@@ -70,6 +70,9 @@
 .grid-4-10 {
   grid-column: 4 / 10;
 }
+.grid-2-12 {
+  grid-column: 2 / 12;
+}
 .grid-3-8 {
   grid-column: 3 / 8;
 }
