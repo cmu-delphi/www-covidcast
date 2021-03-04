@@ -31,6 +31,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-bottom: 1em;
   }
   .gradient {
     background-position: top;
