@@ -2,6 +2,7 @@
   import FancyHeader from './FancyHeader.svelte';
   import { sensorList } from '../../stores';
   import { isInverted } from '../../stores/params';
+  import { formatDateShortWeekdayAbbr } from '../../formats';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -27,15 +28,18 @@
     return Promise.all(sensorList.map((sensor) => fetcher.fetchWindowTrend(sensor, region, date))).then((trends) => {
       const positive = [];
       const negative = [];
+      const unknown = [];
       trends.forEach((trend, i) => {
         const inv = isInverted(sensorList[i]);
         if (trend.isIncreasing) {
           (!inv ? negative : positive).push(sensorList[i]);
         } else if (trend.isDecreasing) {
           (inv ? negative : positive).push(sensorList[i]);
+        } else {
+          unknown.push(sensorList[i]);
         }
       });
-      return { positive, negative };
+      return { positive, negative, unknown };
     });
   }
 
@@ -63,13 +67,20 @@
 <p>
   {#await trendSummary}
     <strong>N/A of {sensorList.length} indicators</strong>
-    are trending in a
-    <strong>positive direction.</strong>
+    are
+    <strong>getting better.</strong>
     {worse(null)}
   {:then d}
     <strong>{d ? d.positive.length : 'N/A'} of {sensorList.length} indicators</strong>
-    are trending in a
-    <strong>positive direction.</strong>
+    are
+    <strong>getting better.</strong>
     {worse(d ? d.negative : null)}
+    {#if d && d.unknown.length > 0}
+      <strong>{d ? d.unknown.length : 'N/A'} of {sensorList.length} indicators</strong>
+      are
+      <strong>not available</strong>
+      for
+      {formatDateShortWeekdayAbbr(date.value)}.
+    {/if}
   {/await}
 </p>

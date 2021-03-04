@@ -431,6 +431,8 @@ export function generateCountiesOfStateSpec(state, { withStates = false, ...opti
   };
   spec.transform.unshift(isCountyOfState);
 
+  spec.datasets.nation = nationJSON();
+  spec.layer.push(genMissingLayer());
   spec.datasets.state = stateJSON();
 
   if (withStates) {

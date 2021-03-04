@@ -4,6 +4,7 @@
   import TrendIndicator from './TrendIndicator.svelte';
   import { CASES, DEATHS } from '../../stores/params';
   import { formatDateShortWeekdayAbbr } from '../../formats';
+  import HistoryLineChart from './HistoryLineChart.svelte';
   import SensorUnit from './SensorUnit.svelte';
 
   /**
@@ -99,4 +100,10 @@
 <h3 class="header">COVID-19 Cases by state</h3>
 <h4 class="header">{CASES.value.mapTitleText()}</h4>
 
-<RegionMap {region} {date} sensor={CASES} {fetcher} />
+<div class="chart-250">
+  <RegionMap {region} {date} sensor={CASES} {fetcher} />
+</div>
+
+<div class="chart-250">
+  <HistoryLineChart sensor={CASES} {date} {region} {fetcher} />
+</div>
