@@ -9,6 +9,7 @@
   import { groupByRegion } from '../../stores/params';
   import Vega from '../../components/Vega.svelte';
   import SensorValue from './SensorValue.svelte';
+  import { MISSING_COLOR } from '../../theme';
 
   export let className = '';
   /**
@@ -57,7 +58,11 @@
 
   $: tileData = loadData(sensor, date, $isMobileDevice);
   $: spec = generateSparkLine({
-    color: sensor.isInverted ? 'white' : undefined,
+    highlightDate: false,
+    domain: date.sparkLineTimeFrame.domain,
+  });
+  $: invertedSpec = generateSparkLine({
+    color: 'white',
     highlightDate: false,
     domain: date.sparkLineTimeFrame.domain,
   });
@@ -71,10 +76,6 @@
   .value {
     font-size: 0.65rem;
     line-height: 1;
-  }
-
-  .inverted {
-    color: white;
   }
 
   .vega-wrapper {
@@ -96,7 +97,7 @@
   }
 </style>
 
-<div class="root {className}" class:inverted={sensor.isInverted}>
+<div class="root {className}">
   <HexGrid columns={maxColumn} style="gap: 2px" className="vega-embed">
     {#each tileData as tile}
       {#await tile.value}
@@ -114,12 +115,16 @@
           x={tile.x}
           y={tile.y}
           classNameOuter="state-cell {region.propertyId === tile.propertyId ? 'selected' : ''}"
-          style="background-color: {colorScale(v ? v.value : null) || null};"
+          style="{sensor.isInverted && v && v.value != null ? 'color: white;' : ''} background-color: {v && v.value != null ? colorScale(v.value) : MISSING_COLOR};"
           on:click={() => region.set(tile.region)}>
           <span class="title">{tile.propertyId}</span>
           {#if !$isMobileDevice}
             <div class="vega-wrapper">
-              <Vega {spec} data={tile.sparkLine} signals={{ currentDate: date.value }} noDataText="?" />
+              <Vega
+                spec={sensor.isInverted && v && v.value != null ? invertedSpec : spec}
+                data={tile.sparkLine}
+                signals={{ currentDate: date.value }}
+                noDataText="?" />
             </div>
           {/if}
           <span class="value"><SensorValue {sensor} value={v ? v.value : null} /></span>
