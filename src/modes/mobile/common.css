@@ -11,13 +11,14 @@
 }
 
 .mobile-root p {
-  font-size: 1rem;
-  margin: 5px 0;
+  font-size: 0.875rem;
+  margin: 0.875em 0;
 }
 
-.mobile-map {
-  border: 1px solid #f0f1f3;
-  border-radius: 3px;
+@media only screen and (min-width: 750px) {
+  .mobile-root p {
+    font-size: 1rem;
+  }
 }
 
 .mobile-h2 {
@@ -61,7 +62,7 @@
 .mobile-header-line {
   text-align: center;
   position: relative;
-  margin: 16px 0.5em 10px 0.5em;
+  margin: 1rem 0.5em;
 }
 
 .mobile-header-line h2 {
@@ -75,6 +76,12 @@
 .mobile-header-line h2 span {
   font-weight: 600;
   text-transform: uppercase;
+}
+
+@media only screen and (min-width: 750px) {
+  .mobile-header-line h2 {
+    font-size: 1.125rem;
+  }
 }
 
 .mobile-back {
@@ -190,20 +197,9 @@
   height: 100%;
 }
 
-.chart-150,
-.chart-300,
+.chart-250,
 .chart-50 {
   position: relative;
-}
-
-.chart-150 > .vega-embed {
-  width: 100%;
-  height: 150px;
-}
-
-.chart-300 > .vega-embed {
-  width: 100%;
-  height: 300px;
 }
 
 .chart-250 > .vega-embed {
@@ -214,6 +210,19 @@
 .chart-50 > .vega-embed {
   width: 100%;
   height: 50px;
+}
+
+.chart-aspect-4-3 {
+  position: relative;
+  padding-top: 75%;
+}
+
+.chart-aspect-4-3 > .vega-embed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .mobile-two-col {

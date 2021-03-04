@@ -99,6 +99,4 @@
 <h3 class="header">COVID-19 Cases by state</h3>
 <h4 class="header">{CASES.value.mapTitleText()}</h4>
 
-<div class="chart-250">
-  <RegionMap {region} {date} sensor={CASES} {fetcher} height={250} />
-</div>
+<RegionMap {region} {date} sensor={CASES} {fetcher} />
