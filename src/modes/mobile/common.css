@@ -190,18 +190,6 @@
   height: 100%;
 }
 
-.mobile-fancy-header {
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 2rem;
-  letter-spacing: 0.05em;
-  margin: 0.5em 0 0 0;
-}
-.mobile-fancy-header span {
-  text-transform: uppercase;
-  font-weight: 300;
-}
-
 .chart-150,
 .chart-300,
 .chart-50 {
@@ -237,6 +225,12 @@
   font-size: 0.75rem;
 }
 
+.mobile-two-col__highlight {
+  padding: 2rem;
+  column-gap: 3em;
+  row-gap: 2rem;
+}
+
 .mobile-kpi {
   display: flex;
   flex-direction: column;
@@ -245,7 +239,6 @@
 .mobile-kpi h3 {
   font-size: 1.125rem;
   margin: 0.6em 0;
-  text-align: left;
   font-weight: 600;
   flex-grow: 1;
   line-height: 1.5rem;
@@ -253,4 +246,17 @@
 
 .mobile-kpi .sub {
   font-size: 0.75rem;
+}
+
+.mobile-kpi .subheader {
+  font-size: 0.875rem;
+  margin: 0 0.6em;
+  flex-grow: 1;
+  line-height: 1.5rem;
+}
+
+@media only screen and (min-width: 750px) {
+  .mobile-kpi .subheader {
+    font-weight: 600;
+  }
 }
