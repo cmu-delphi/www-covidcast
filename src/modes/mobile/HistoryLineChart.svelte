@@ -191,7 +191,7 @@
     box-shadow: 0 0 2px 0 rgb(var(--color));
   }
   .legend-symbol {
-    color: var(--color);
+    color: rgb(var(--color));
   }
   .legend-value {
     font-weight: 600;
