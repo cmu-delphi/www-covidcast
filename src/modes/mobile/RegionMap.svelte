@@ -5,7 +5,6 @@
   import { stats } from '../../stores';
   import RegionMapTooltip from './RegionMapTooltip.svelte';
 
-  export let className = '';
   /**
    * @type {import("../../stores/params").DateParam}
    */
@@ -71,8 +70,15 @@
 
   $: spec = genSpec($stats, sensor, region, height);
   $: data = loadData(sensor, date, region);
+
+  $: showsUS = region.level === 'nation';
 </script>
 
-<div class="chart-aspect-4-3">
-  <Vega {className} {spec} {data} tooltip={RegionMapTooltip} tooltipProps={{ sensor, regionSetter: region.set }} />
+<div class={showsUS ? 'chart-aspect-4-3' : 'chart-250'}>
+  <Vega
+    className={showsUS ? '' : 'mobile-map'}
+    {spec}
+    {data}
+    tooltip={RegionMapTooltip}
+    tooltipProps={{ sensor, regionSetter: region.set }} />
 </div>
