@@ -7,7 +7,7 @@
     generateStateSpec,
     generateCountySpec,
   } from '../../specs/mapSpec';
-  import { stats } from '../../stores';
+  import { isMobileDevice, stats } from '../../stores';
   import RegionMapTooltip from './RegionMapTooltip.svelte';
   import Toggle from './Toggle.svelte';
 
@@ -31,7 +31,7 @@
 
   export let height = 300;
 
-  let showCounties = false;
+  let showCounties = !$isMobileDevice;
 
   /**
    * @param {import("../../stores/params").SensorParam} sensor
@@ -97,5 +97,5 @@
   tooltipProps={{ sensor, regionSetter: region.set }} />
 
 {#if region.level === 'nation'}
-  <Toggle bind:checked={showCounties}>Show US Counties</Toggle>
+  <Toggle bind:checked={showCounties}><span slot="before">Show US States</span> Show US Counties</Toggle>
 {/if}
