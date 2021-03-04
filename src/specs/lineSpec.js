@@ -1,7 +1,16 @@
 import { CURRENT_DATE_HIGHLIGHT } from '../components/vegaSpecUtils';
 
 // dark2
-export const MULTI_COLORS = ['#1B9E77', '#D95F02', '#7570B3', '#E7298A', '#66A61E', '#E6AB02', '#A6761D'];
+// has to be the rgb notation to create a pure version out of it for CSS variables manipulation
+export const MULTI_COLORS = [
+  'rgb(27, 158, 119)',
+  'rgb(217, 95, 2)',
+  'rgb(117, 112, 179)',
+  'rgb(231, 41, 138)',
+  'rgb(102, 166, 30)',
+  'rgb(230, 171, 2)',
+  'rgb(166, 118, 29)',
+];
 
 export const COLOR = '#666666';
 
@@ -47,6 +56,7 @@ export function generateLineChartSpec({
   initialDate = null,
   valueField = 'value',
   zero = false,
+  highlightRegion = false,
 } = {}) {
   /**
    * @type {import('vega-lite').TopLevelSpec}
@@ -109,6 +119,15 @@ export function generateLineChartSpec({
               // padding: zero ? undefined : smartPadding(valueField),
             },
           },
+          opacity: highlightRegion
+            ? {
+                condition: {
+                  test: 'highlightRegion != null && highlightRegion !== datum.id',
+                  value: 0.1,
+                },
+                value: 1,
+              }
+            : {},
         },
       },
       {

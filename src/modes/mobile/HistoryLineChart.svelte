@@ -61,6 +61,7 @@
       height,
       color: MULTI_COLORS[0],
       zero,
+      highlightRegion: true,
     };
     if (singleRaw) {
       return generateLineAndBarSpec(options);
@@ -182,12 +183,12 @@
   .legend-elem {
     border-radius: 5px;
     padding: 8px;
-    border: 1px solid var(--color);
+    border: 1px solid rgb(var(--color));
     position: relative;
-    background: var(--color);
+    background: rgba(var(--color), 0.05);
   }
   .legend-elem:hover {
-    box-shadow: 0 0 2px 0 var(--color);
+    box-shadow: 0 0 2px 0 rgb(var(--color));
   }
   .legend-symbol {
     color: var(--color);
@@ -218,7 +219,7 @@
   {#each regions as r, i}
     <div
       class="legend-elem"
-      style="--color: {MULTI_COLORS[i]}"
+      style="--color: {MULTI_COLORS[i].replace(/rgb\((.*)\)/, '$1')}"
       on:mouseenter={() => highlight(r)}
       on:mouseleave={() => highlight(null)}>
       <div>
