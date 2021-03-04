@@ -7,15 +7,17 @@
 
 <style>
   .toggle {
-    position: relative;
     cursor: pointer;
     padding: 1em 0;
     display: inline-block;
   }
-  .toggle > input {
+  .toggle-wrapper {
+    position: relative;
+  }
+  .toggle-wrapper > input {
     visibility: hidden;
   }
-  .toggle > :global(svg) {
+  .toggle-wrapper > :global(svg) {
     position: absolute;
     left: 0;
     top: 0;
@@ -24,21 +26,25 @@
     display: none;
     fill: #c4c4c4;
   }
-  .toggle > :global(svg:last-of-type) {
+  .toggle-wrapper > :global(svg:last-of-type) {
     display: inline-block;
   }
-  .toggle.checked > :global(svg:last-of-type) {
+  .toggle-wrapper.checked > :global(svg:last-of-type) {
     display: none;
   }
-  .toggle.checked > :global(svg:first-of-type) {
+  .toggle-wrapper.checked > :global(svg:first-of-type) {
     display: inline-block;
   }
 </style>
 
-<label class="toggle" class:checked>
-  <input type="checkbox" bind:checked />
-  {@html toggleOnIcon}
-  {@html toggleOffIcon}
+<!-- svelte-ignore a11y-label-has-associated-control -->
+<label class="toggle">
+  <slot name="before" />
+  <span class="toggle-wrapper" class:checked>
+    <input type="checkbox" bind:checked />
+    {@html toggleOnIcon}
+    {@html toggleOffIcon}
+  </span>
   <span>
     <slot />
   </span>

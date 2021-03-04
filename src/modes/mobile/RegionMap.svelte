@@ -1,17 +1,10 @@
 <script>
   import Vega from '../../components/Vega.svelte';
   import { getCountiesOfState } from '../../maps';
-  import {
-    generateCountiesOfStateSpec,
-    generateRelatedCountySpec,
-    generateStateSpec,
-    generateCountySpec,
-  } from '../../specs/mapSpec';
+  import { generateCountiesOfStateSpec, generateRelatedCountySpec, generateStateSpec } from '../../specs/mapSpec';
   import { stats } from '../../stores';
   import RegionMapTooltip from './RegionMapTooltip.svelte';
-  import Toggle from './Toggle.svelte';
 
-  export let className = '';
   /**
    * @type {import("../../stores/params").DateParam}
    */
@@ -29,23 +22,13 @@
    */
   export let fetcher;
 
-  export let height = 300;
-
-  let showCounties = false;
-
   /**
    * @param {import("../../stores/params").SensorParam} sensor
    * @param {import("../../stores/params").RegionParam} region
    */
-  function genSpec(stats, sensor, region, height, showCounties) {
+  function genSpec(stats, sensor, region) {
     const options = {
-      height,
-      domain: sensor.domain(
-        stats,
-        region.level === 'state' || region.level === 'county' || (region.level === 'nation' && showCounties)
-          ? 'county'
-          : 'state',
-      ),
+      domain: sensor.domain(stats, region.level === 'state' || region.level === 'county' ? 'county' : 'state'),
       withStates: true,
       scheme: sensor.isInverted ? 'yellowgreenblue' : 'yelloworangered',
     };
@@ -56,9 +39,6 @@
       return generateRelatedCountySpec(region.value, options);
     }
     // state
-    if (showCounties) {
-      return generateCountySpec(options);
-    }
     return generateStateSpec(options);
   }
 
@@ -67,7 +47,7 @@
    * @param {import("../../stores/params").DateParam} date
    * @param {import("../../stores/params").RegionParam} region
    */
-  function loadData(sensor, date, showCounties) {
+  function loadData(sensor, date) {
     if (region.level === 'state') {
       const counties = getCountiesOfState(region.value);
       const countyData = fetcher.fetch1SensorNRegions1Date(
@@ -79,19 +59,23 @@
       const stateData = fetcher.fetch1SensorNRegions1Date(sensor, 'state', '*', date);
       return Promise.all([countyData, stateData]).then((r) => r.flat());
     }
-    if (region.level === 'county' || showCounties) {
+    if (region.level === 'county') {
       return fetcher.fetch1SensorNRegions1Date(sensor, 'county', '*', date);
     }
     return fetcher.fetch1SensorNRegions1Date(sensor, 'state', '*', date);
   }
 
-  $: spec = genSpec($stats, sensor, region, height, showCounties);
-  $: data = loadData(sensor, date, showCounties);
+  $: spec = genSpec($stats, sensor, region);
+  $: data = loadData(sensor, date);
+
+  $: showsUS = region.level === 'nation';
 </script>
 
-<div class="chart-aspect-4-3">
-  <Vega {className} {spec} {data} tooltip={RegionMapTooltip} tooltipProps={{ sensor, regionSetter: region.set }} />
+<div class={showsUS ? 'chart-aspect-4-3' : 'chart-250'}>
+  <Vega
+    className={showsUS ? '' : 'mobile-map'}
+    {spec}
+    {data}
+    tooltip={RegionMapTooltip}
+    tooltipProps={{ sensor, regionSetter: region.set }} />
 </div>
-{#if region.level === 'nation'}
-  <Toggle bind:checked={showCounties}>Show US Counties</Toggle>
-{/if}

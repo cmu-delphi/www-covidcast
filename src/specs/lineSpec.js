@@ -300,6 +300,7 @@ export function generateSparkLine({
   color = COLOR,
   highlightDate = false,
   highlightStartEnd = true,
+  interactive = true,
   height = 30,
 } = {}) {
   /**
@@ -363,37 +364,41 @@ export function generateSparkLine({
           },
         },
       },
-      {
-        mark: {
-          type: 'point',
-          fill: color,
-          stroke: null,
-          tooltip: true,
-        },
-        encoding: {
-          y: {
-            field: valueField,
-            type: 'quantitative',
-          },
-          opacity: {
-            condition: {
-              selection: 'highlight',
-              value: 1,
+      ...(interactive
+        ? [
+            {
+              mark: {
+                type: 'point',
+                fill: color,
+                stroke: null,
+                tooltip: true,
+              },
+              encoding: {
+                y: {
+                  field: valueField,
+                  type: 'quantitative',
+                },
+                opacity: {
+                  condition: {
+                    selection: 'highlight',
+                    value: 1,
+                  },
+                  value: 0,
+                },
+              },
+              selection: {
+                highlight: {
+                  type: 'single',
+                  empty: 'none',
+                  on: 'click, mousemove, [touchstart, touchend] > touchmove',
+                  nearest: true,
+                  clear: 'view:mouseout',
+                  encodings: ['x'],
+                },
+              },
             },
-            value: 0,
-          },
-        },
-        selection: {
-          highlight: {
-            type: 'single',
-            empty: 'none',
-            on: 'click, mousemove, [touchstart, touchend] > touchmove',
-            nearest: true,
-            clear: 'view:mouseout',
-            encodings: ['x'],
-          },
-        },
-      },
+          ]
+        : []),
     ],
     config: {
       customFormatTypes: true,

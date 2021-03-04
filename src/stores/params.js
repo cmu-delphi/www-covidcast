@@ -6,6 +6,7 @@ import { determineTrend } from './trend';
 import { determineMinMax } from '../components/MapBox/colors';
 import { formatPercentage } from '../formats';
 import { getDataSource } from './dataSourceLookup';
+import { scaleSequential } from 'd3-scale';
 
 /**
  * @typedef {import('./constants').SensorEntry} Sensor
@@ -358,11 +359,12 @@ export class DataFetcher {
 
   /**
    * @param {Sensor|SensorParam} sensor
-   * @param {Region[]} region
+   * @param {Region[]} regions
    * @param {TimeFrame} timeFrame
+   * @param {boolean} isAll whether it should load all regions (used for performance)
    * @return {Promise<EpiDataRow[]>}
    */
-  fetch1SensorNRegionsNDates(sensor, regions, timeFrame) {
+  fetch1SensorNRegionsNDates(sensor, regions, timeFrame, isAll = false) {
     if (regions.length === 0) {
       return Promise.resolve([]);
     }
@@ -376,6 +378,25 @@ export class DataFetcher {
     const expectedDays = timeFrame.difference;
 
     const batchSize = Math.floor(MAX_DATA_ROWS / expectedDays);
+
+    if (batchSize >= regions.length) {
+      const r = fetchData(
+        sensor,
+        level,
+        isAll ? '*' : regions.map((d) => d.propertyId).join(','),
+        timeFrame.range,
+        {},
+        {
+          multiValues: false,
+          factor: sensorFactor(sensor),
+        },
+      ).then(addNameInfos);
+      // no missing
+      this.cache.set(key, r);
+      return r;
+    }
+
+    // load in batches
     // console.log(batchSize);
     const data = [];
     for (let i = 0; i < regions.length; i += batchSize) {
@@ -633,6 +654,9 @@ export class SensorParam {
       this.isCasesOrDeath || sensor.signal === 'bars_visit_prop' || sensor.signal === 'restaurants_visit_prop';
     this.isInverted = isInverted(sensor);
     this.formatValue = this.isPercentage ? formatPercentage : sensor.formatValue;
+    this.unit = this.isPercentage ? '% of pop.' : this.isPer100K ? 'per 100,000 people' : '';
+    this.unitHTML = this.isPer100K ? `<span class="per100k"><span>PER</span><span>100K</span></span>` : '';
+
     this.dataSource = getDataSource(sensor);
     const rawSignal = deriveRawSignal(sensor);
     /**
@@ -667,7 +691,25 @@ export class SensorParam {
    */
   domain(stats, level) {
     const domain = determineMinMax(stats, this.value, level, {}, false);
-    return [domain[0] * this.factor, domain[1] * this.factor];
+    const scaled = [domain[0] * this.factor, domain[1] * this.factor];
+    if (this.isPercentage) {
+      scaled[0] = Math.max(0, scaled[0]);
+      scaled[1] = Math.min(100, scaled[1]);
+    } else if (this.isPer100K) {
+      scaled[0] = Math.max(0, scaled[0]);
+      scaled[1] = Math.min(100000, scaled[1]);
+    }
+    return scaled;
+  }
+
+  /**
+   * @param {Map<string, any>} stats
+   * @param {string} level
+   * @returns {(v: number) => string}
+   */
+  createColorScale(stats, level) {
+    const domain = this.domain(stats, level);
+    return scaleSequential(this.value.colorScale).domain(domain);
   }
 }
 
