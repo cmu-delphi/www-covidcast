@@ -1,6 +1,6 @@
 <script>
   import FancyHeader from './FancyHeader.svelte';
-  import RegionMap from './RegionMap.svelte';
+  import RegionMapWrapper from './RegionMapWrapper.svelte';
   import HistoryLineChart from './HistoryLineChart.svelte';
   import IndicatorDropdown from './IndicatorDropdown.svelte';
   import GeoTable from './GeoTable.svelte';
@@ -51,7 +51,7 @@
       <FancyHeader sub="Map">Indicator</FancyHeader>
     </div>
     <div class="grid-2-12">
-      <RegionMap {sensor} {date} {region} {fetcher} />
+      <RegionMapWrapper {sensor} {date} {region} {fetcher} />
     </div>
     <div class="grid-3-11">
       <FancyHeader sub="Chart">Indicator</FancyHeader>

@@ -56,7 +56,11 @@
   }
 
   $: tileData = loadData(sensor, date, $isMobileDevice);
-  $: spec = generateSparkLine({ highlightDate: false, domain: date.sparkLineTimeFrame.domain });
+  $: spec = generateSparkLine({
+    color: sensor.isInverted ? 'white' : undefined,
+    highlightDate: false,
+    domain: date.sparkLineTimeFrame.domain,
+  });
   $: colorScale = sensor.createColorScale($stats, region);
 
   const maxColumn = state2TileCell.reduce((acc, v) => Math.max(acc, v.x), 0) + 1;
@@ -67,6 +71,10 @@
   .value {
     font-size: 0.65rem;
     line-height: 1;
+  }
+
+  .inverted {
+    color: white;
   }
 
   .vega-wrapper {
@@ -88,7 +96,7 @@
   }
 </style>
 
-<div class="root {className}">
+<div class="root {className}" class:inverted={sensor.isInverted}>
   <HexGrid columns={maxColumn} style="gap: 2px" className="vega-embed">
     {#each tileData as tile}
       {#await tile.value}
@@ -106,7 +114,7 @@
           x={tile.x}
           y={tile.y}
           classNameOuter="state-cell {region.propertyId === tile.propertyId ? 'selected' : ''}"
-          style="background-color: {colorScale(v ? v.value : null)};"
+          style="background-color: {colorScale(v ? v.value : null) || null};"
           on:click={() => region.set(tile.region)}>
           <span class="title">{tile.propertyId}</span>
           {#if !$isMobileDevice}

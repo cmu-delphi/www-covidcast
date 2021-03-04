@@ -8,7 +8,9 @@
   import { currentRegionInfo, currentSensorEntry, currentDateObject, times } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher, CASES } from '../../stores/params';
   import './common.css';
-  import RegionHexMap from './RegionHexMap.svelte';
+  import RegionMapWrapper from './RegionMapWrapper.svelte';
+  import FancyHeader from './FancyHeader.svelte';
+  import HistoryLineChart from './HistoryLineChart.svelte';
 
   $: sensor = new SensorParam($currentSensorEntry, $times);
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
@@ -52,10 +54,13 @@
     <div class="grid-2-12">
       <h3 class="header">COVID-19 Cases by state</h3>
       <h4 class="header">{CASES.value.mapTitleText()}</h4>
-      <!-- <RegionMap {region} {date} sensor={CASES} {fetcher} /> -->
-      <RegionHexMap {region} {date} sensor={CASES} {fetcher} />
+      <RegionMapWrapper {region} {date} sensor={CASES} {fetcher} />
     </div>
     <div class="grid-3-11">
+      <FancyHeader sub="Chart">Indicator</FancyHeader>
+      <div class="chart-250">
+        <HistoryLineChart sensor={CASES} {date} {region} {fetcher} />
+      </div>
       <hr />
       <AllIndicatorOverview {date} {region} {fetcher} />
       <hr />
