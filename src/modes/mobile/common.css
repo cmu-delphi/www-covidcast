@@ -10,6 +10,10 @@
   margin-top: 5px;
 }
 
+.mobile-root > .content-grid {
+  row-gap: 1rem;
+}
+
 .mobile-root p {
   font-size: 0.875rem;
   margin: 0.875em 0;
