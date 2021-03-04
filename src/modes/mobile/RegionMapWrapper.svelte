@@ -1,5 +1,5 @@
 <script>
-  import { isMobileDevice } from '../../stores';
+  import RegionCountyMap from './RegionCountyMap.svelte';
   import RegionHexMap from './RegionHexMap.svelte';
   import RegionMap from './RegionMap.svelte';
   import Toggle from './Toggle.svelte';
@@ -24,7 +24,7 @@
   let showCounties = false;
 </script>
 
-{#if region.level === 'nation' && !$isMobileDevice}
+{#if region.level === 'nation'}
   <div class="grid-3-11">
     <Toggle bind:checked={showCounties}>
       <span slot="before">Show US States as Beehive Grid</span>
@@ -33,18 +33,13 @@
   </div>
   <div class="grid-2-12">
     {#if showCounties}
-      <RegionMap {region} {date} {sensor} {fetcher} {showCounties} />
+      <RegionCountyMap {region} {date} {sensor} {fetcher} />
     {:else}
       <RegionHexMap {region} {date} {sensor} {fetcher} />
     {/if}
   </div>
 {:else}
-  {#if region.level === 'nation'}
-    <div class="grid-3-11">
-      <Toggle bind:checked={showCounties}><span slot="before">Show US States</span> Show US Counties</Toggle>
-    </div>
-  {/if}
   <div class="grid-2-12">
-    <RegionMap {region} {date} {sensor} {fetcher} {showCounties} />
+    <RegionMap {region} {date} {sensor} {fetcher} />
   </div>
 {/if}
