@@ -52,7 +52,7 @@
   }
 </style>
 
-<p class="p-start">On {formatDateShortWeekdayAbbr(date.value, true)} the number of people:</p>
+<p>On {formatDateShortWeekdayAbbr(date.value, true)} the number of people:</p>
 
 <div class="mobile-two-col">
   <div class="mobile-kpi">
@@ -83,7 +83,7 @@
   </div>
 </div>
 
-<p class="p-start">Compared to the previous week that means:</p>
+<p>Compared to the previous week that means:</p>
 
 <div>
   {#await trend}

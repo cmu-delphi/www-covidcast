@@ -1,13 +1,13 @@
 <script>
   export let sub = null;
   export let normal = false;
+  export let center = false;
 </script>
 
 <style>
-  .mobile-fancy-header {
-    font-size: 18px;
-    font-weight: 600;
-    line-height: 2rem;
+  h2.mobile-fancy-header {
+    font-weight: 300;
+    font-size: 1.125rem;
     letter-spacing: 0.05em;
     margin: 0.5em 0 0 0;
     text-transform: uppercase;
@@ -16,14 +16,23 @@
   .normal {
     text-transform: none;
   }
+  .center {
+    text-align: center;
+  }
 
-  .mobile-fancy-header span {
+  h2.mobile-fancy-header span {
     text-transform: uppercase;
-    font-weight: 300;
+    font-weight: 600;
+  }
+
+  @media only screen and (min-width: 1050px) {
+    h2.mobile-fancy-header {
+      font-size: 1.5rem;
+    }
   }
 </style>
 
-<h2 class="mobile-fancy-header" class:normal>
+<h2 class="mobile-fancy-header" class:normal class:center>
   <slot />
   {#if sub}<span>{sub}</span>{/if}
 </h2>
