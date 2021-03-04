@@ -29,17 +29,24 @@
    */
   export let fetcher;
 
+  let loading = false;
   /**
    * @param {import("../../stores/params").SensorParam} sensor
    * @param {import("../../stores/params").DateParam} date
    */
   function loadData(sensor, date, isMobile) {
+    loading = true;
     const dateData = fetcher.fetch1SensorNRegions1Date(sensor, 'state', '*', date).then((rows) => groupByRegion(rows));
     const sparkLines = !isMobile
       ? fetcher
           .fetch1SensorNRegionsNDates(sensor, stateInfo, date.sparkLineTimeFrame, true)
           .then((rows) => groupByRegion(rows))
       : null;
+
+    Promise.all([dateData, sparkLines]).then(() => {
+      loading = false;
+    });
+
     return state2TileCell.map((tile) => {
       const d = getInfoByName(tile.id);
       const value = dateData.then((lookup) => (lookup.get(d.propertyId) || [])[0]);
@@ -59,11 +66,13 @@
   $: tileData = loadData(sensor, date, $isMobileDevice);
   $: spec = generateSparkLine({
     highlightDate: false,
+    interactive: false,
     domain: date.sparkLineTimeFrame.domain,
   });
   $: invertedSpec = generateSparkLine({
     color: 'white',
     highlightDate: false,
+    interactive: false,
     domain: date.sparkLineTimeFrame.domain,
   });
   $: colorScale = sensor.createColorScale($stats, region);
@@ -97,15 +106,14 @@
   }
 </style>
 
-<div class="root {className}">
+<div class="root {className}" class:loading>
   <HexGrid columns={maxColumn} style="gap: 2px" className="vega-embed">
     {#each tileData as tile}
       {#await tile.value}
         <HexGridCell
           x={tile.x}
           y={tile.y}
-          classNameOuter="state-cell {region.propertyId === tile.propertyId ? 'selected' : ''}"
-          className="loading">
+          classNameOuter="state-cell {region.propertyId === tile.propertyId ? 'selected' : ''}">
           <span class="title">{tile.propertyId}</span>
           <div class="vega-wrapper" />
           <span class="value"> ? </span>
