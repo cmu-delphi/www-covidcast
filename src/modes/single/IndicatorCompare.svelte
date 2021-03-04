@@ -1,6 +1,6 @@
 <script>
   // import VegaTooltip from '../../components/DetailView/VegaTooltip.svelte';
-  import InfoDialogButton from '../../components/InfoDialogButton.svelte';
+
   import Vega from '../../components/Vega.svelte';
   import { formatAPITime, parseAPITime } from '../../data';
   // import { formatDateLocal } from '../../formats';
@@ -14,6 +14,9 @@
   export let sensor;
 
   export let sensorMatrixData;
+  export let lag = 0;
+
+  export let options = {};
 
   /**
    * @type {Date}
@@ -107,7 +110,8 @@
   // $: sensorMatrixData = loadAllSignalData(sensorDataPromises);
 
   // row and column are field names as keys.
-  function makeMatrixCellSpec(row, column, options) {
+  function makeMatrixCellSpec(row, column, options = {}) {
+    console.info('makeMatrixCellSpec options', options);
     let xBin = {};
     let yAggregate = null;
     // if (options.histogram) {
@@ -117,6 +121,7 @@
     const lag = options.lag || 0;
     const width = options.width || 100;
     const height = options.height || 100;
+    console.info('width', width, 'height', height);
     const chartSpec = {
       // height: 200,
       // width: 200,
@@ -290,7 +295,7 @@
 
   $: matrixSpec = [];
 
-  function updateMatrixSpec(vegaRepeatSpec, lag = 0, width = 100, height = 100) {
+  function updateMatrixSpec(vegaRepeatSpec, lag = 0) {
     // const numRows = vegaRepeatSpec.rows.length;
     // const numCols = vegaRepeatSpec.columns.length;
 
@@ -304,8 +309,9 @@
               xtitle: c.name,
               ytitle: r.name,
               lag,
-              width,
-              height,
+              // width,
+              // height,
+              ...options,
             }),
           ],
         ].flat();
@@ -322,7 +328,7 @@
   $: vegaRepeatSpec = { rows: otherSensors, columns: otherSensors };
 
   $: {
-    matrixSpec = updateMatrixSpec(vegaRepeatSpec);
+    matrixSpec = updateMatrixSpec(vegaRepeatSpec, lag);
   }
 
   $: splomSpec = makeSplomSpec(matrixSpec);
@@ -337,19 +343,12 @@
       //   resize: true,
       // },
       padding: 20,
-      width: 30,
-      height: 30,
+      // width: 30,
+      // height: 30,
       data: { name: 'values' },
 
       ...matrixSpec,
     };
-  }
-
-  let showLags = false;
-  let showLag = 0;
-
-  function onChangeLag(event) {
-    showLag = event.currentTarget.value;
   }
 </script>
 
@@ -447,51 +446,6 @@
   }
 </style>
 
-<tr>
-  <td>
-    <div class="uk-card-header">
-      <h3 class="uk-card-title uk-margin-remove-bottom">{sensor.plotTitleText}</h3>
-      <div class="toolbar">
-        <InfoDialogButton {sensor} />
-      </div>
-    </div>
-  </td>
-
-  <td>
-    <main class="vega-wrapper">
-      <Vega data={Promise.resolve(sensorMatrixData)} spec={splomSpec} />
-    </main>
-    <table style="visibility:invisible" class="key" class:single={selections.length === 1}>
-      <colgroup>
-        <col class="locationCol" />
-        <col class="valueCol" />
-        <col class="dateCol" />
-      </colgroup>
-      <tbody>
-        <!-- Need tbody to size the container table and its td?
-        -->
-      </tbody>
-    </table>
-  </td>
-  <td><input id="showLags" type="checkbox" bind:checked={showLags} />Lags</td>
-</tr>
-
-{#if showLags}
-  <tr>
-    <td>
-      {#each [-14, -7, -4, -3, -2, -1, 0, 1, 2, 3, 4, 7, 14] as lag}
-        <Vega
-          data={Promise.resolve(sensorMatrixData)}
-          spec={makeSplomSpec(updateMatrixSpec(vegaRepeatSpec, lag, 50, 50))} />
-        <input checked={showLag === lag} on:change={onChangeLag} type="radio" name="lagDetails" value={lag} />
-      {/each}
-    </td>
-    <td style="width: 200px; height: 100px;">
-      {#if showLag}
-        <Vega
-          data={Promise.resolve(sensorMatrixData)}
-          spec={makeSplomSpec(updateMatrixSpec(vegaRepeatSpec, showLag, 200, 200))} />
-      {/if}
-    </td>
-  </tr>
-{/if}
+<div class="root" on:click>
+  <Vega data={Promise.resolve(sensorMatrixData)} spec={splomSpec} />
+</div>
