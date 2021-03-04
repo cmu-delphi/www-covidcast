@@ -71,13 +71,11 @@
     flex-grow: 1;
     margin: 0;
   }
-  .question-body > :global(.vega-embed) {
-    display: block;
-    height: 7em;
-  }
+
   .question-question {
     font-style: italic;
     font-size: 2rem;
+    line-height: 2.5rem;
   }
 
   .no-data {
