@@ -21,12 +21,12 @@
 
   function changeRegion() {
     if (regionSetter) {
-      regionSetter(item);
+      regionSetter(item, true);
     }
   }
   function changeRegionToState() {
     if (regionSetter) {
-      regionSetter(state);
+      regionSetter(state, true);
     }
   }
 </script>

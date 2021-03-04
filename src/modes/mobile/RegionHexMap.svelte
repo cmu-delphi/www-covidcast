@@ -128,7 +128,7 @@
           tooltip={v && v != null ? `${sensor.formatValue(v.value)} ${sensor.unitHTML}` : 'N/A'}
           classNameOuter="state-cell {region.propertyId === tile.propertyId ? 'selected' : ''}"
           style="{sensor.isInverted && v && v.value != null ? 'color: white;' : ''} background-color: {v && v.value != null ? colorScale(v.value) : MISSING_COLOR};"
-          on:click={() => region.set(tile.region)}>
+          on:click={() => region.set(tile.region, true)}>
           <span class="title">{tile.propertyId}</span>
           {#if !$isMobileDevice}
             <div class="vega-wrapper">

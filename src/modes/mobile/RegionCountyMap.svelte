@@ -1,7 +1,8 @@
 <script>
   import Vega from '../../components/Vega.svelte';
-  import { generateCountySpec } from '../../specs/mapSpec';
-  import { stats } from '../../stores';
+  import { getStateOfCounty } from '../../maps';
+  import { generateStateMapWithCountyDataSpec } from '../../specs/mapSpec';
+  import { isMobileDevice, stats } from '../../stores';
   import RegionMapTooltip from './RegionMapTooltip.svelte';
 
   /**
@@ -21,13 +22,27 @@
    */
   export let fetcher;
 
-  $: spec = generateCountySpec({
+  $: spec = generateStateMapWithCountyDataSpec({
     domain: sensor.domain($stats, 'county'),
     scheme: sensor.isInverted ? 'yellowgreenblue' : 'yelloworangered',
   });
   $: data = fetcher.fetch1SensorNRegions1Date(sensor, 'county', '*', date);
+
+  function onClickHandler(evt) {
+    const item = evt.detail.item;
+    if ($isMobileDevice || !item || !item.datum || !item.datum.propertyId) {
+      return; // no click on mobile
+    }
+    region.set(getStateOfCounty(item.datum), true);
+  }
 </script>
 
 <div class="chart-aspect-4-3">
-  <Vega {spec} {data} tooltip={RegionMapTooltip} tooltipProps={{ sensor, regionSetter: region.set }} />
+  <Vega
+    {spec}
+    {data}
+    tooltip={RegionMapTooltip}
+    tooltipProps={{ sensor, regionSetter: region.set }}
+    on:click={onClickHandler}
+    eventListeners={['click']} />
 </div>
