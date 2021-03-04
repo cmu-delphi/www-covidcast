@@ -40,13 +40,13 @@
   /**
    * @type {import("../../stores/params").Region}
    */
-  const relatedInfo = {
+  const neighboringInfo = {
     id: 'related',
     level: 'county',
-    name: 'Related Counties',
+    name: 'Neighboring Counties',
     population: null,
     propertyId: 'related',
-    displayName: 'Related Counties',
+    displayName: 'Neighboring Counties',
   };
 
   $: highlightDate = date.value;
@@ -73,7 +73,7 @@
       // county vs related vs state vs nation
       const state = getInfoByName(region.state);
       return generateCompareLineSpec(
-        [region.displayName, relatedInfo.displayName, state.displayName, nationInfo.displayName],
+        [region.displayName, neighboringInfo.displayName, state.displayName, nationInfo.displayName],
         options,
       );
     }
@@ -100,7 +100,7 @@
       const relatedCounties = getRelatedCounties(region.value);
       const relatedData = fetcher
         .fetch1SensorNRegionsNDates(sensor, relatedCounties, date.windowTimeFrame)
-        .then((r) => averageByDate(r, sensor, relatedInfo))
+        .then((r) => averageByDate(r, sensor, neighboringInfo))
         .then((r) => addMissing(r, sensor));
       data.push(relatedData, stateData);
     }
@@ -142,7 +142,7 @@
     if (region.level === 'county') {
       // county vs related vs state vs nation
       const state = getInfoByName(region.state);
-      return [region, relatedInfo, state, nationInfo];
+      return [region, neighboringInfo, state, nationInfo];
     }
     return [region];
   }
@@ -166,6 +166,12 @@
     }
     return row.value;
   }
+
+  let highlightRegion = null;
+
+  function highlight(r) {
+    highlightRegion = r ? r.id : null;
+  }
 </script>
 
 <style>
@@ -178,6 +184,10 @@
     padding: 8px;
     border: 1px solid var(--color);
     position: relative;
+    background: var(--color);
+  }
+  .legend-elem:hover {
+    box-shadow: 0 0 2px 0 var(--color);
   }
   .legend-symbol {
     color: var(--color);
@@ -193,7 +203,7 @@
   {data}
   tooltip={HistoryLineTooltip}
   tooltipProps={{ sensor }}
-  signals={signalPatches}
+  signals={{ ...signalPatches, highlightRegion }}
   signalListeners={['highlight']}
   on:signal={onSignal} />
 
@@ -206,7 +216,11 @@
 
 <div class="{!(singleRaw && sensor.rawValue != null) && regions.length > 1 ? 'mobile-two-col' : ''} legend">
   {#each regions as r, i}
-    <div class="legend-elem" style="--color: {MULTI_COLORS[i]}">
+    <div
+      class="legend-elem"
+      style="--color: {MULTI_COLORS[i]}"
+      on:mouseenter={() => highlight(r)}
+      on:mouseleave={() => highlight(null)}>
       <div>
         <span class="legend-symbol">●</span>
         <span>
