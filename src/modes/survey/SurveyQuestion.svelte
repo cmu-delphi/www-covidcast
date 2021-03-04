@@ -4,7 +4,6 @@
   import linkIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/link.svg';
   import warningIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
   import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
-  import FancyHeader from '../mobile/FancyHeader.svelte';
   import IndicatorOverview from '../mobile/IndicatorOverview.svelte';
   import { formatDateShortWeekdayAbbr } from '../../formats';
   import IndicatorStatsLine from '../mobile/IndicatorStatsLine.svelte';
@@ -150,8 +149,6 @@
       was:
     </p>
     <IndicatorOverview {sensor} {date} {region} {fetcher} />
-
-    <FancyHeader sub="History">Indicator</FancyHeader>
 
     <hr />
     <h3 class="header">{sensor.name} ({sensor.unit})</h3>
