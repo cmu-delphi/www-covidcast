@@ -414,7 +414,7 @@ export const trackedUrlParams = derived(
 );
 
 export function loadFromUrlState(state) {
-  if (state.mode !== get(currentMode)) {
+  if (state.mode !== get(currentMode).id) {
     currentMode.set(modeByID[state.mode]);
   }
   if (state.sensor != null && state.sensor !== get(currentSensor)) {
