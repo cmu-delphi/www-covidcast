@@ -50,12 +50,10 @@
     <div class="grid-3-11">
       <CasesOverview {date} {region} {fetcher} />
       <hr />
-    </div>
-    <div class="grid-2-12">
       <h3 class="header">COVID-19 Cases by state</h3>
       <h4 class="header">{CASES.value.mapTitleText()}</h4>
-      <RegionMapWrapper {region} {date} sensor={CASES} {fetcher} />
     </div>
+    <RegionMapWrapper {region} {date} sensor={CASES} {fetcher} />
     <div class="grid-3-11">
       <FancyHeader sub="Chart">Indicator</FancyHeader>
       <div class="chart-250">
