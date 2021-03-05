@@ -120,7 +120,7 @@
 </style>
 
 <div class="root {className}" class:loading>
-  <HexGrid columns={maxColumn} style="gap: 2px; margin-bottom: 1rem;">
+  <HexGrid columns={maxColumn} style="gap: 2px; margin-bottom: 2rem;">
     {#each tileData as tile}
       {#await tile.value}
         <HexGridCell

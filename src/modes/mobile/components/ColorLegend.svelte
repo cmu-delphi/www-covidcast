@@ -52,7 +52,7 @@
     content: attr(data-tick);
     position: absolute;
     left: 50%;
-    top: 0;
+    top: 2px;
     transform: translateX(-50%);
   }
 </style>

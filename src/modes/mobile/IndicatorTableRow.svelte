@@ -52,10 +52,6 @@
 </script>
 
 <style>
-  .source {
-    font-size: 10px;
-  }
-
   .details-link {
     width: 6px;
     display: inline-block;
@@ -103,5 +99,5 @@
   </td>
 </tr>
 <tr class="addon">
-  <td colspan="2" class="source">Source: {sensor.dataSource}</td>
+  <td colspan="2">Source: {sensor.dataSource}</td>
 </tr>

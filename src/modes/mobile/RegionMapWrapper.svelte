@@ -26,11 +26,13 @@
 
 {#if region.level === 'nation'}
   <div class="grid-3-11">
-    <p>Click on a state to show this region</p>
-    <Toggle bind:checked={showCounties}>
-      <span slot="before">Show US States as Beehive Grid</span>
-      Show US Counties as Choropleth Map
-    </Toggle>
+    <p class="uk-text-center">
+      Click on a state to show this region
+      <Toggle bind:checked={showCounties}>
+        <span slot="before">Show US States as Beehive Grid</span>
+        Show US Counties as Choropleth Map
+      </Toggle>
+    </p>
   </div>
   <div class="grid-2-12">
     {#if showCounties}

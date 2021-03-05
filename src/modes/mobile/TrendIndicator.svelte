@@ -59,7 +59,6 @@
     align-items: center;
     --color: #f0f1f3;
     --text: currentColor;
-    font-size: 0.75rem;
   }
   .long {
     font-size: 0.875rem;

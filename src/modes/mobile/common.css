@@ -149,6 +149,19 @@
   font-size: 0.875rem;
   line-height: 1.25rem;
 }
+.mobile-table .addon {
+  font-size: 0.75rem;
+}
+
+@media only screen and (min-width: 750px) {
+  .mobile-table > tbody {
+    font-size: 1rem;
+  }
+  .mobile-table .addon {
+    font-size: 0.875rem;
+  }
+}
+
 .mobile-table > tbody > tr:not(.addon) > td {
   padding: 0.75rem 4px;
   vertical-align: middle;
