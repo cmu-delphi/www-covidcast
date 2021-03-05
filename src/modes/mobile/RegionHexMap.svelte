@@ -11,6 +11,7 @@
   import SensorValue from './SensorValue.svelte';
   import { MISSING_COLOR } from '../../theme';
   import ColorLegend from './components/ColorLegend.svelte';
+  import { hsl } from 'd3-color';
 
   export let className = '';
   /**
@@ -79,6 +80,17 @@
   $: colorScale = sensor.createColorScale($stats, region.level);
 
   const maxColumn = state2TileCell.reduce((acc, v) => Math.max(acc, v.x), 0) + 1;
+
+  function isInvertedColor(v) {
+    const color = v && v.value != null ? colorScale(v.value) : MISSING_COLOR;
+    return hsl(color).l < 0.5;
+  }
+
+  function style(v) {
+    const color = v && v.value != null ? colorScale(v.value) : MISSING_COLOR;
+    const white = hsl(color).l < 0.5;
+    return `background-color: ${color}${white ? '; color: white;' : ''}`;
+  }
 </script>
 
 <style>
@@ -127,13 +139,13 @@
           y={tile.y}
           tooltip={v && v != null ? `${sensor.formatValue(v.value)} ${sensor.unitHTML}` : 'N/A'}
           classNameOuter="state-cell {region.propertyId === tile.propertyId ? 'selected' : ''}"
-          style="{sensor.isInverted && v && v.value != null ? 'color: white;' : ''} background-color: {v && v.value != null ? colorScale(v.value) : MISSING_COLOR};"
+          style={style(v)}
           on:click={() => region.set(tile.region, true)}>
           <span class="title">{tile.propertyId}</span>
           {#if !$isMobileDevice}
             <div class="vega-wrapper">
               <Vega
-                spec={sensor.isInverted && v && v.value != null ? invertedSpec : spec}
+                spec={isInvertedColor(v) ? invertedSpec : spec}
                 data={tile.sparkLine}
                 signals={{ currentDate: date.value }}
                 noDataText="?" />
