@@ -38,6 +38,12 @@
     font-size: 0.875rem;
     text-align: center;
   }
+
+  @media only screen and (min-width: 750px) {
+    h3.header {
+      font-size: 1.5rem;
+    }
+  }
 </style>
 
 <div class="mobile-root">
