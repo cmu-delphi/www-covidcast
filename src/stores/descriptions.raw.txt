@@ -133,8 +133,8 @@ Links:
  - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#vaccination-indicators)"
 ---
 Name: COVID-Related Doctor Visits
-Id: chng
-Signal: smoothed_adj_outpatient_cli
+Id: doctor-visits
+Signal: smoothed_adj_cli
 Type: early
 Levels: [county, msa, state, hrr]
 YAxis: Percentage
@@ -146,14 +146,14 @@ Default: true
 MapTitleText: Percentage of daily doctor visits that are due to COVID-like symptoms
 
 
-Description: Delphi receives from Change Healthcare aggregated statistics on COVID-related outpatient doctor visits, derived from ICD codes found in insurance claims. Using this data Delphi estimates the percentage of daily doctor’s visits in each area that are due to COVID-like illness. Note that these estimates are based only on visits by patients whose data is accessible to Change Healthcare. All Change Healthcare claims data has been de-identified in accordance with HIPAA privacy regulations.
+Description: Delphi receives from our health system partners aggregated statistics on COVID-related outpatient doctor visits, derived from ICD codes found in insurance claims. Using this data Delphi estimates the percentage of daily doctor’s visits in each area that are due to COVID-like illness. Note that these estimates are based only on visits by patients whose data is accessible to our partners.
 
 
-Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution-NonCommercial license.
+Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
 
 
 Links:
- - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/chng.html)"
+ - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/doctor-visits.html)"
 ---
 Name: COVID-Like Symptoms
 Id: fb-survey
