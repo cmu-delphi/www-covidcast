@@ -1,3 +1,7 @@
+# Release 2.0.0
+
+This release introduces the new mobile-first based COVIDcast website with a fresh new design.
+
 # Release 1.12.4
 
 This release improves the UX of the survey dashboard for both desktop and mobile experience.
