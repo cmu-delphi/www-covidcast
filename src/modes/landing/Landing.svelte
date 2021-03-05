@@ -24,7 +24,7 @@
   }
 
   function switchDashboard() {
-    currentMode.set(modeByID['survey-results'].id);
+    currentMode.set(modeByID['survey-results']);
   }
 </script>
 
