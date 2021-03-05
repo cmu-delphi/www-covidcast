@@ -31,6 +31,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-bottom: 1em;
   }
   .gradient {
     background-position: top;
@@ -51,7 +52,7 @@
     content: attr(data-tick);
     position: absolute;
     left: 50%;
-    top: 0;
+    top: 2px;
     transform: translateX(-50%);
   }
 </style>

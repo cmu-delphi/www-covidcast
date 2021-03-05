@@ -9,7 +9,7 @@
 
   export let block = false;
   /**
-   * @type {import("../../stores/params").Trend}
+   * @type {import("../../stores/trend").TrendInfo}
    */
   export let trend;
   /**
@@ -39,7 +39,7 @@
     if (!trend || trend.isUnknown) {
       return 'Historical trend is unknown';
     }
-    const reason = `The value on ${formatDateShortWeekdayAbbr(trend.current.date_value)} (${sensor.formatValue(
+    const reason = `The value on ${formatDateShortWeekdayAbbr(trend.currentDate)} (${sensor.formatValue(
       trend.current.value,
     )}) has changed Δ ${formatFraction(trend.change, true)} compared to ${formatDateShortWeekdayAbbr(
       trend.refDate,
@@ -73,10 +73,10 @@
     display: flex;
   }
   .trend-text {
+    flex-grow: 1;
     margin-right: 0.5em;
   }
   .trend-value {
-    font-size: 0.75rem;
     font-weight: 700;
   }
   .icon {
@@ -115,10 +115,18 @@
   <span class="icon">
     {@html trendIcon}
   </span>
-  {#if long && trend != null}<span class="trend-text"> {trend.trend} </span>{/if}
-  <span class="trend-value">
-    <SensorValue {sensor} value={trend ? trend.delta : null} enforceSign />
-  </span>
+  {#if long}
+    <span class="trend-text"> {trend != null ? trend.trend : 'Unknown'} </span>
+    {#if trend != null && !trend.isUnknown}
+      <span class="trend-value">
+        <SensorValue {sensor} value={trend.delta} enforceSign />
+      </span>
+    {/if}
+  {:else}
+    <span class="trend-value">
+      <SensorValue {sensor} value={trend ? trend.delta : null} enforceSign />
+    </span>
+  {/if}
   {#if explain}
     <UiKitHint title={trendExplaination(trend)} />
   {/if}

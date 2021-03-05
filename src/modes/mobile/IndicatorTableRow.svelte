@@ -52,10 +52,6 @@
 </script>
 
 <style>
-  .source {
-    font-size: 10px;
-  }
-
   .details-link {
     width: 6px;
     display: inline-block;
@@ -90,7 +86,8 @@
         {data}
         tooltip={SparkLineTooltip}
         tooltipProps={{ sensor: sensor }}
-        signals={{ currentDate: date.value }} />
+        signals={{ currentDate: date.value }}
+        noDataText="N/A" />
     </div>
   </td>
   <td rowspan="2">
@@ -103,5 +100,5 @@
   </td>
 </tr>
 <tr class="addon">
-  <td colspan="2" class="source">Source: {sensor.dataSource}</td>
+  <td colspan="3">Source: {sensor.dataSource}</td>
 </tr>

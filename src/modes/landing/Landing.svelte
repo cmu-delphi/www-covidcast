@@ -22,6 +22,10 @@
   function combineKeywords(d) {
     return `${d.id} ${d.displayName}`;
   }
+
+  function switchDashboard() {
+    currentMode.set(modeByID['survey-results'].id);
+  }
 </script>
 
 <style>
@@ -89,6 +93,14 @@
   .chip:focus {
     background: #eee;
   }
+
+  .link-link {
+    font-size: 0.75rem;
+    display: block;
+    text-align: center;
+    margin-top: 0.5em;
+    text-decoration: underline;
+  }
 </style>
 
 <div class="uk-container content-grid root mobile-root landing-banner">
@@ -135,6 +147,7 @@
     </p>
 
     <FancyHeader sub="stats" center>Indicator</FancyHeader>
+    <a href="https://cmu-delphi.github.io/delphi-epidata/" class="link-link uk-link-text">Explore our API</a>
 
     <div class="mobile-two-col uk-text-center mobile-two-col__highlight">
       <div class="mobile-kpi">
@@ -154,6 +167,8 @@
     </div>
 
     <FancyHeader sub="Audience" center>Survey</FancyHeader>
+    <a href="?mode=survey-results" on:click|preventDefault={switchDashboard} class="link-link uk-link-text">Go to survey
+      dashboard</a>
 
     <SurveyStats className="uk-text-center mobile-two-col__highlight" />
 

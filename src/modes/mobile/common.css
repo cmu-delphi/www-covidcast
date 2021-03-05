@@ -149,6 +149,19 @@
   font-size: 0.875rem;
   line-height: 1.25rem;
 }
+.mobile-table .addon {
+  font-size: 0.75rem;
+}
+
+@media only screen and (min-width: 750px) {
+  .mobile-table > tbody {
+    font-size: 1rem;
+  }
+  .mobile-table .addon {
+    font-size: 0.875rem;
+  }
+}
+
 .mobile-table > tbody > tr:not(.addon) > td {
   padding: 0.75rem 4px;
   vertical-align: middle;
@@ -199,6 +212,11 @@
   top: 0;
   width: 100%;
   height: 100%;
+}
+
+.mobile-table-chart .message-overlay::after {
+  padding: 0;
+  height: 75%;
 }
 
 .chart-250,

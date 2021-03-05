@@ -38,6 +38,12 @@
     font-size: 0.875rem;
     text-align: center;
   }
+
+  @media only screen and (min-width: 750px) {
+    h3.header {
+      font-size: 1.5rem;
+    }
+  }
 </style>
 
 <div class="mobile-root">
@@ -55,6 +61,7 @@
     </div>
     <RegionMapWrapper {region} {date} sensor={CASES} {fetcher} />
     <div class="grid-3-11">
+      <hr />
       <FancyHeader sub="Chart">Indicator</FancyHeader>
       <div class="chart-250">
         <HistoryLineChart sensor={CASES} {date} {region} {fetcher} />

@@ -14,8 +14,8 @@
   } from '../../specs/lineSpec';
   import { toTimeValue } from '../../stores/params';
   import Toggle from './Toggle.svelte';
-  import { combineSignals } from '../../data/utils';
   import SensorValue from './SensorValue.svelte';
+  import { combineSignals } from '../../data/utils';
 
   export let height = 250;
 
@@ -156,7 +156,7 @@
     singleRaw && sensor.rawValue != null ? loadSingleData(sensor, region, date) : loadData(sensor, region, date);
   $: regions = singleRaw && sensor.rawValue != null ? [region.value] : resolveRegions(region.value);
 
-  function findValue(region, data, date) {
+  function findValue(region, data, date, prop = 'value') {
     if (!date) {
       return null;
     }
@@ -165,7 +165,7 @@
     if (!row) {
       return null;
     }
-    return row.value;
+    return row[prop];
   }
 
   let highlightRegion = null;
@@ -203,6 +203,8 @@
   }
 </style>
 
+<p>Click on the chart to select a different date.</p>
+
 <Vega
   {className}
   {spec}
@@ -239,6 +241,10 @@
         {#await data then d}
           <span class="legend-value">
             <SensorValue {sensor} value={findValue(r, d, highlightDate)} />
+            {#if singleRaw && sensor.rawValue != null}
+              (raw:
+              <SensorValue {sensor} value={findValue(r, d, highlightDate, 'raw')} />)
+            {/if}
           </span>
         {/await}
       </div>
