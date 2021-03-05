@@ -103,7 +103,7 @@
   .vega-wrapper {
     margin: 0 2px;
   }
-  .root :global(.message-overlay)::after {
+  .vega-wrapper :global(.message-overlay)::after {
     padding: 0;
   }
 
@@ -148,7 +148,7 @@
                 spec={isInvertedColor(v) ? invertedSpec : spec}
                 data={tile.sparkLine}
                 signals={{ currentDate: date.value }}
-                noDataText="?" />
+                noDataText="N/A" />
             </div>
             <span class="value"><SensorValue {sensor} value={v ? v.value : null} /></span>
           {/if}

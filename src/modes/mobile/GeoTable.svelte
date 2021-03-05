@@ -240,7 +240,8 @@
               data={r.data}
               tooltip={SparkLineTooltip}
               tooltipProps={{ sensor }}
-              signals={{ currentDate: date.value }} />
+              signals={{ currentDate: date.value }}
+              noDataText="N/A" />
           </div>
         </td>
       </tr>

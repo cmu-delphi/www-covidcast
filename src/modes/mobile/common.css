@@ -214,6 +214,11 @@
   height: 100%;
 }
 
+.mobile-table-chart .message-overlay::after {
+  padding: 0;
+  height: 75%;
+}
+
 .chart-250,
 .chart-50 {
   position: relative;
