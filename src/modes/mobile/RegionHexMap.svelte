@@ -165,7 +165,7 @@
       {/await}
     {/each}
   </HexGrid>
-  <ColorLegend {sensor} level="state">
+  <ColorLegend {sensor} level="state" gradientLength={$isMobileDevice ? 250 : 280}>
     <DownloadMenu fileName="{sensor.name}_US_States_{formatDateISO(date.value)}" data={dumpData} absolutePos {sensor} />
   </ColorLegend>
 </div>

@@ -27,7 +27,7 @@
       type: mimeType,
     });
     const url = URL.createObjectURL(blob);
-    downloadUrl(url, `${fileName}.${extension}`);
+    downloadUrl(url, `COVIDcast_${fileName}.${extension}`);
     URL.revokeObjectURL(url);
   }
 
@@ -53,7 +53,7 @@
         (view) => view.toImageURL('png', 2),
       )
       .then((url) => {
-        downloadUrl(url, `${fileName}.png`);
+        downloadUrl(url, `COVIDcast_${fileName}.png`);
       });
   }
   function defaultPrepareRow(row) {
