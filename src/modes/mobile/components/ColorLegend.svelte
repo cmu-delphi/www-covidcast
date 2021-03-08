@@ -6,7 +6,7 @@
    */
   export let sensor;
 
-  export let gradientLength = 300;
+  export let gradientLength = 280;
   export let gradientThickness = 8;
 
   export let level = 'state';

@@ -1,8 +1,10 @@
 <script>
   import Vega from '../../components/Vega.svelte';
+  import { formatDateISO } from '../../formats';
   import { getCountiesOfState } from '../../maps';
   import { generateCountiesOfStateSpec, generateRelatedCountySpec, generateStateSpec } from '../../specs/mapSpec';
   import { stats } from '../../stores';
+  import DownloadMenu from './components/DownloadMenu.svelte';
   import RegionMapTooltip from './RegionMapTooltip.svelte';
 
   /**
@@ -65,17 +67,31 @@
     return fetcher.fetch1SensorNRegions1Date(sensor, 'state', '*', date);
   }
 
+  function generateFileName(sensor, date, region) {
+    let regionName = region.level === 'nation' ? 'US States' : 'US Counties';
+    if (region.level === 'state') {
+      regionName = `${region.displayName} Counties`;
+    }
+    return `${sensor.name}_${regionName}_${formatDateISO(date.value)}`;
+  }
+
   $: spec = genSpec($stats, sensor, region);
   $: data = loadData(sensor, date);
 
   $: showsUS = region.level === 'nation';
+
+  $: fileName = generateFileName(sensor, date, region);
+
+  let vegaRef = null;
 </script>
 
 <div class={showsUS ? 'chart-aspect-4-3' : 'chart-250'}>
   <Vega
+    bind:this={vegaRef}
     className={showsUS ? '' : 'mobile-map'}
     {spec}
     {data}
     tooltip={RegionMapTooltip}
     tooltipProps={{ sensor, regionSetter: region.set }} />
+  <DownloadMenu {vegaRef} {data} {sensor} absolutePos {fileName} />
 </div>

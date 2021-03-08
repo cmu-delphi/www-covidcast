@@ -18,6 +18,8 @@
 
   export let raw = false;
 
+  export let absolutePos = false;
+
   // TODO how about title, credits ->
 
   function downloadString(string, mimeType, extension) {
@@ -63,6 +65,7 @@
         r.indicatorName = sensor.name;
       }
       r.regionId = row.propertyId;
+      r.regionLevel = row.level;
       r.regionName = row.displayName;
       r.date = formatDateISO(row.date_value);
       r.value = row.value;
@@ -96,9 +99,18 @@
   }
 </script>
 
+<style>
+  .absolutePos {
+    position: absolute;
+    right: 0;
+    bottom: 2px;
+    z-index: 1;
+  }
+</style>
+
 {#if vegaRef || data}
-  <button class="uk-icon-button" type="button" uk-icon="download" />
-  <div data-uk-dropdown>
+  <button class="uk-icon-button" class:absolutePos type="button" uk-icon="download" />
+  <div data-uk-dropdown="pos: bottom-right">
     <ul class="uk-nav uk-dropdown-nav">
       {#if vegaRef}
         <li class="uk-nav-header">Download Chart</li>

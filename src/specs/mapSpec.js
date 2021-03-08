@@ -208,7 +208,7 @@ function genLevelLayer({ strokeWidth = 1, scheme = 'yellowgreenblue', domain = u
           fillColor: 'white',
           padding: 5,
           legendX: {
-            expr: '(width / 2) - 10 - 150',
+            expr: '(width / 2) - 10 - 140',
           },
           legendY: {
             expr: 'height + 12',
@@ -218,7 +218,7 @@ function genLevelLayer({ strokeWidth = 1, scheme = 'yellowgreenblue', domain = u
           labelLimit: 30,
           tickMinStep: 0.1,
           titleFontWeight: 'normal',
-          gradientLength: 300,
+          gradientLength: 280,
           gradientThickness: 8,
         },
       },
