@@ -3,7 +3,7 @@ Name: At Away Location 6hr+
 Id: safegraph
 Signal: full_time_work_prop_7dav
 Type: public
-Levels: [county, state]
+Levels: [county, state, nation]
 YAxis: Fraction of population
 Format: raw
 HasStdErr: true
@@ -25,7 +25,7 @@ Name: At Away Location 3-6hr
 Id: safegraph
 Signal: part_time_work_prop_7dav
 Type: public
-Levels: [county, state]
+Levels: [county, state, nation]
 YAxis: Fraction of population
 Format: raw
 HasStdErr: true
@@ -49,7 +49,7 @@ Name: Bar Visits
 Id: safegraph
 Signal: bars_visit_prop
 Type: public
-Levels: [county, msa, state, hrr]
+Levels: [county, msa, state, hrr, nation]
 YAxis: Visits per 100,000 people
 Format: raw
 HasStdErr: false
@@ -68,7 +68,7 @@ Name: Restaurant Visits
 Id: safegraph
 Signal: restaurants_visit_prop
 Type: public
-Levels: [county, msa, state, hrr]
+Levels: [county, msa, state, hrr, nation]
 YAxis: Visits per 100,000 people
 Format: raw
 HasStdErr: false
@@ -87,7 +87,7 @@ Name: People Wearing Masks
 Id: fb-survey
 Signal: smoothed_wearing_mask
 Type: public
-Levels: [county, msa, state, hrr]
+Levels: [county, msa, state, hrr, nation]
 YAxis: Percentage
 Format: percent
 HasStdErr: true
@@ -111,19 +111,19 @@ Links:
 ---
 Name: Vaccine Acceptance
 Id: fb-survey
-Signal: smoothed_accept_covid_vaccine
+Signal: smoothed_covid_vaccinated_or_accept
 Type: public
-Levels: [county, msa, state, hrr]
+Levels: [county, msa, state, hrr, nation]
 YAxis: Percentage
 Format: percent
 HasStdErr: true
 ColorScale: interpolateYlGnBu
 
 
-MapTitleText: Percentage of people who would definitely or probably choose to receive a COVID vaccine if it were offered to them today, based on surveys of Facebook users
+MapTitleText: Percentage of people who either have already received a COVID vaccine or would definitely or probably choose to receive one if it were offered to them today, based on surveys of Facebook users
 
 
-Description: Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they would choose to be vaccinated if they were offered a COVID vaccine today. For this signal, we estimate the percentage of people who would “definitely” or “probably” choose to be vaccinated if a COVID vaccine were offered to them. Beginning January 6, 2021, this question is only asked to respondents who have not yet received a COVID vaccine.
+Description: Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they have received a COVID vaccine or would choose to be vaccinated if they were offered a COVID vaccine today. For this signal, we estimate the percentage of people who either (a) say they have already received a COVID vaccine or (b) would “definitely” or “probably” choose to be vaccinated if a COVID vaccine were offered to them.
 
 
 Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
@@ -159,7 +159,7 @@ Name: COVID-Like Symptoms
 Id: fb-survey
 Signal: smoothed_cli
 Type: early
-Levels: [county, msa, state, hrr]
+Levels: [county, msa, state, hrr, nation]
 YAxis: Percentage
 Format: percent
 HasStdErr: true
@@ -182,7 +182,7 @@ Name: COVID-Like Symptoms in Community
 Id: fb-survey
 Signal: smoothed_hh_cmnty_cli
 Type: early
-Levels: [county, msa, state, hrr]
+Levels: [county, msa, state, hrr, nation]
 YAxis: Percentage
 Format: percent
 HasStdErr: true
@@ -253,7 +253,7 @@ Name: COVID Hospital Admissions
 Id: hospital-admissions
 Signal: smoothed_adj_covid19_from_claims
 Type: late
-Levels: [county, msa, state, hrr]
+Levels: [county, msa, state, hrr, nation]
 YAxis: Percentage
 Format: percent
 HasStdErr: false
@@ -284,7 +284,7 @@ CasesOrDeathSignals:
 
 
 Type: late
-Levels: [msa, county, state, hrr]
+Levels: [msa, county, state, hrr, nation]
 YAxis: Cases
 Format: raw
 HasStdErr: false
@@ -321,7 +321,7 @@ CasesOrDeathSignals:
 
 
 Type: late
-Levels: [msa, county, state, hrr]
+Levels: [msa, county, state, hrr, nation]
 YAxis: Deaths
 Format: raw
 HasStdErr: false

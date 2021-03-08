@@ -67,9 +67,9 @@ LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals
 Name: COVID Vaccine Acceptance
 Category: Vaccines
 Question: |
-  If a vaccine to prevent COVID-19 were offered to you today, would you **definitely** or **probably** choose to get vaccinated?
-Signal: smoothed_accept_covid_vaccine
-SignalTooltip: Estimated proportion of respondents who say that they definitely or probably would get vaccinated if a COVID vaccine were offered to them today.
+  Have you already received a COVID vaccine, or if a vaccine were offered to you today, would you **definitely** or **probably** choose to get vaccinated?
+Signal: smoothed_covid_vaccinated_or_accept
+SignalTooltip: Estimated proportion of respondents who say that they either have already been vaccinated, or definitely or probably would get vaccinated if a COVID vaccine were offered to them today.
 Inverted: true
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#vaccination-indicators
 
