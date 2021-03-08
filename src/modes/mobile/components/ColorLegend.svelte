@@ -32,6 +32,7 @@
     flex-direction: column;
     align-items: center;
     margin-bottom: 1em;
+    position: relative;
   }
   .gradient {
     background-position: top;
@@ -65,4 +66,5 @@
       <div class="tick" data-tick={sensor.formatValue(tick)} />
     {/each}
   </div>
+  <slot />
 </div>
