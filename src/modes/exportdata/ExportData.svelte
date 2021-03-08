@@ -435,9 +435,11 @@
       </form>
       <p>Manually fetch data:</p>
       <pre
-        class="code-block"><code>
+        class="code-block">
+        <code>
         {`wget --content-disposition "${CSV_SERVER}?signal=${signalValue}&start_day=${formatDateISO(startDate)}&end_day=${formatDateISO(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${formatDateISO(asOfDate)}` : ''}"`}
-      </code></pre>
+      </code>
+    </pre>
       <p class="description">
         For more details about the API, see the
         <a href="https://cmu-delphi.github.io/delphi-epidata/">API documentation</a>. A description of the returned data
@@ -446,16 +448,18 @@
       </p>
     {:else if currentMode === 'python'}
       <p>Install <code>covidcast</code> via pip:</p>
-      <pre><code>pip install covidcast</code></pre>
+      <pre class="code-block"><code>pip install covidcast</code></pre>
       <p>Fetch data:</p>
-      <pre class="code-block"><code>
+      <pre class="code-block">
+        <code>
         {`from datetime import date
 import covidcast
 
 data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal.signal : ''}",
                         ${pythonDate(startDate)}, ${pythonDate(endDate)},
                         "${geoType}"${isAllRegions ? '' : `, ["${geoIDs.join('", "')}"]`}${usesAsOf ? `, as_of = ${pythonDate(asOfDate)}` : ''})`}
-      </code></pre>
+      </code>
+    </pre>
       <p class="description">
         For more details and examples, see the
         <a href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/">package documentation</a>. A description of
@@ -465,9 +469,13 @@ data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal
       </p>
     {:else if currentMode === 'r'}
       <p>Install <code>covidcast</code> using <a href="https://devtools.r-lib.org/">devtools</a> :</p>
-      <pre><code>devtools::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/covidcast")</code></pre>
+      <pre
+        class="code-block">
+        <code>devtools::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/covidcast")</code>
+      </pre>
       <p>Fetch data:</p>
-      <pre class="code-block"><code>
+      <pre class="code-block">
+        <code>
         {`library(covidcast)
 
 cc_data <- suppressMessages(
@@ -475,7 +483,8 @@ covidcast_signal(data_source = "${signal ? signal.dataSource : ''}", signal = "$
                  start_day = "${formatDateISO(startDate)}", end_day = "${formatDateISO(endDate)}",
                  geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`}${usesAsOf ? `, as_of = "${formatDateISO(asOfDate)}"` : ''})
 )`}
-      </code></pre>
+      </code>
+    </pre>
       <p class="description">
         For more details and examples, see the
         <a href="https://cmu-delphi.github.io/covidcast/covidcastR/">package documentation</a>. A description of the
