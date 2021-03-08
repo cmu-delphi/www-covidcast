@@ -56,25 +56,30 @@
         downloadUrl(url, `${fileName}.png`);
       });
   }
-  function prepareData(rows) {
-    return rows.map((row) => {
-      const r = {};
-      if (sensor) {
-        r.indicatorDataSource = sensor.value.id;
-        r.indicatorId = sensor.value.signal;
-        r.indicatorName = sensor.name;
-      }
-      r.regionId = row.propertyId;
-      r.regionLevel = row.level;
-      r.regionName = row.displayName;
-      r.date = formatDateISO(row.date_value);
-      r.value = row.value;
-      if (raw) {
-        r.raw = row.raw;
-      }
-      return r;
-    });
+  function defaultPrepareRow(row) {
+    const r = {};
+    if (sensor) {
+      r.indicatorDataSource = sensor.value.id;
+      r.indicatorId = sensor.value.signal;
+      r.indicatorName = sensor.name;
+    }
+    r.regionId = row.propertyId;
+    r.regionLevel = row.level;
+    r.regionName = row.displayName;
+    r.date = formatDateISO(row.date_value);
+    r.value = row.value;
+    if (raw) {
+      r.raw = row.raw;
+    }
+    return r;
   }
+
+  export let prepareRow = defaultPrepareRow;
+
+  function prepareData(rows) {
+    return rows.map(prepareRow);
+  }
+
   function downloadCSV() {
     if (!data) {
       return;
