@@ -346,13 +346,13 @@
               {/each}
             </table>
           </td>
-          <td style="width:50px; height:50px vertical-align: top">
+          <td style="width:100px; vertical-align: top">
             {#if showLagsForSensor}
               <h4>Lags of {showLagsForSensor.name}</h4>
               <table style="width:100%">
                 {#each [-28, -21, -14, -7, -4, -1, 0, 1, 4, 7, 14, 21, 28] as lag}
                   <tr>
-                    <td style="width: 50px; height: 50px">
+                    <td style="width: 100px; height: 100px">
                       <IndicatorCompare
                         {sensorMatrixData}
                         sensor={showLagsForSensor}

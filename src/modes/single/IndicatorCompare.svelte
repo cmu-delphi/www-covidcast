@@ -72,7 +72,7 @@
       const chosenSensor = sensorList.find((d) => d.key === chosenColumn);
       otherSensors = otherSensors.concat([chosenSensor]);
       chosenColumn = '';
-      console.info('otherSensors', otherSensors);
+      // console.info('otherSensors', otherSensors);
     }
   }
   // function loadAllSignalData(sensorPromises) {
@@ -111,7 +111,7 @@
 
   // row and column are field names as keys.
   function makeMatrixCellSpec(row, column, options = {}) {
-    console.info('makeMatrixCellSpec options', options);
+    // console.info('makeMatrixCellSpec options', options);
     let xBin = {};
     let yAggregate = null;
     // if (options.histogram) {
@@ -121,7 +121,7 @@
     const lag = options.lag || 0;
     const width = options.width || 100;
     const height = options.height || 100;
-    console.info('width', width, 'height', height);
+    // console.info('width', width, 'height', height);
     const chartSpec = {
       // height: 200,
       // width: 200,
@@ -335,7 +335,7 @@
       columns: 1, // vegaRepeatSpec.columns.length,
       concat: [specs[1]],
     };
-    console.info('matrix', matrixSpec);
+    // console.info('matrix', matrixSpec);
     return matrixSpec;
   }
 
