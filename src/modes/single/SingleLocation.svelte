@@ -27,106 +27,6 @@
     return selectedLevels.size === 0 || selectedLevels.has(item.level);
   }
 
-  // /**
-  //  * @type {import('../../stores/constants').SensorEntry[]}
-  //  */
-  // let otherSensors = sensorList; // [$currentSensorEntry];
-
-  // $: highlightDate = highlightTimeValue != null ? parseAPITime(highlightTimeValue) : null;
-
-  // // use local variables with manual setting for better value comparison updates
-  // let startDay = $smallMultipleTimeSpan[0];
-  // let endDay = $smallMultipleTimeSpan[1];
-  // $: {
-  //   if (startDay.getTime() !== $smallMultipleTimeSpan[0].getTime()) {
-  //     startDay = $smallMultipleTimeSpan[0];
-  //   }
-  //   if (endDay.getTime() !== $smallMultipleTimeSpan[1].getTime()) {
-  //     endDay = $smallMultipleTimeSpan[1];
-  //   }
-  // }
-  // /**
-  //  * @type {import('../../stores').CompareSelection[]}
-  //  */
-  // export let selections = [];
-
-  // // $: sensorWithData = prepareSensorData(sensor, selections, startDay, endDay);
-
-  // // Indicator chosen by user from menu.
-  // let chosenColumn = '';
-  // $: {
-  //   if (chosenColumn) {
-  //     const chosenSensor = sensorList.find((d) => d.key === chosenColumn);
-  //     otherSensors = otherSensors.concat([chosenSensor]);
-  //     chosenColumn = '';
-  //     console.info('otherSensors', otherSensors);
-  //   }
-  // }
-
-  // function loadAllSignalData(sensorPromises) {
-  //   // for each time_value, merge data values across sensors.
-  //   const sensorDateMap = {};
-  //   const sensorKeysMap = {}; // map from sensor key to sensor.
-  //   return Promise.all(sensorPromises).then((sensorsDataRows) => {
-  //     console.info('sensorsDataRows', sensorsDataRows);
-  //     sensorsDataRows.forEach((sensorRows, index) => {
-  //       const sensorData = sensorListData[index];
-  //       console.info('index', index, 'sensorData', sensorData, 'sensorRows', sensorRows);
-  //       sensorRows.forEach((row) => {
-  //         const time_value_key = String(row.time_value);
-  //         if (!sensorDateMap[time_value_key]) {
-  //           sensorDateMap[time_value_key] = { ...row };
-  //         }
-  //         const sensorKey = sensorData.sensor.key;
-  //         sensorKeysMap[sensorKey] = sensorData.sensor;
-  //         sensorDateMap[time_value_key][sensorKey] = row.value;
-  //       });
-  //     });
-  //     console.info('sensorKeysMap', sensorKeysMap);
-  //     console.info('sensorDateMap', sensorDateMap);
-  //     // const sensors = Object.values(sensorKeysMap);
-  //     // vegaRepeatSpec = {
-  //     //   rows: sensors,
-  //     //   columns: sensors, // .reverse(),
-  //     // };
-  //     return Object.values(sensorDateMap);
-  //   });
-  // }
-
-  // function resolveData(sensor) {
-  //   let sensorWithData = prepareSensorData(sensor, selections, startDay, endDay);
-
-  //   /**
-  //    * @type {(number | null)[]}
-  //    */
-  //   let values = selections.map(() => null);
-
-  //   let date = get(currentDateObject);
-
-  //   const keyDate = formatAPITime(highlightDate ? highlightDate : date);
-  //   if (!sensorWithData) {
-  //     console.error('no sensorWithData');
-  //   }
-  //   Promise.resolve(sensorWithData.data).then((rows) => {
-  //     values = selections.map((region) => {
-  //       const row = rows.find((d) => String(d.time_value) === keyDate && d.geo_value === region.info.propertyId);
-  //       return row ? row.value : null;
-  //     });
-  //   });
-  // }
-
-  // // $: sensorListData = sensorList.slice(0, 4).map((sensor) => prepareSensorData(sensor, selections, startDay, endDay));
-  // // $: sensorListData = otherSensors.map((sensor) => prepareSensorData(sensor, selections, startDay, endDay));
-  // $: sensorListData = otherSensors.map((sensor) => resolveData(sensor));
-  // $: sensorDataPromises = sensorListData.map((sensorData) => {
-  //   if (!sensorData) {
-  //     console.error('no sensorData');
-  //     return null;
-  //   }
-  //   return sensorData.data;
-  // });
-  // $: sensorMatrixData = loadAllSignalData(sensorDataPromises);
-
   // use local variables with manual setting for better value comparison updates
   let startDay = $smallMultipleTimeSpan[0];
   let endDay = $smallMultipleTimeSpan[1];
@@ -278,26 +178,6 @@
 </style>
 
 <div class="root base-font-size">
-  <!-- <div class="uk-table-shrink add-column-container">
-    <div class="add-sensor-button-wrapper" uk-form-custom="target: true">
-      <select bind:value={chosenColumn}>
-        {#each groupedSensorList as sensorGroup}
-          <optgroup label={sensorGroup.label}>
-            {#each sensorGroup.sensors as sensor}
-              <option
-                disabled={otherSensors.includes(sensor)}
-                title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
-                value={sensor.key}>
-                {sensor.name}
-              </option>
-            {/each}
-          </optgroup>
-        {/each}
-      </select>
-      <button type="button" aria-label="add column options">Add Indicator</button>
-    </div>
-  </div> -->
-
   <div class="search-container">
     <Search
       placeholder={$currentRegionInfo ? 'Compare with...' : 'Search for a location...'}
@@ -317,7 +197,7 @@
     <div class="card-grid">
       <table style="width: 100%">
         <tr>
-          <td style="width:50%; vertical-align: top">
+          <td style="width:40%; vertical-align: top">
             <table>
               {#each otherSensors as sensor (sensor.key)}
                 <tr>
@@ -332,7 +212,7 @@
                     </div>
                   </td>
 
-                  <td style="height: 50px">
+                  <td style="width: 100px; height: 100px">
                     <IndicatorCompare
                       {sensorMatrixData}
                       {sensor}
@@ -348,7 +228,7 @@
           </td>
           <td style="width:100px; vertical-align: top">
             {#if showLagsForSensor}
-              <h4>Lags of {showLagsForSensor.name}</h4>
+              <h4>Lags with {showLagsForSensor.name}</h4>
               <table style="width:100%">
                 {#each [-28, -21, -14, -7, -4, -1, 0, 1, 4, 7, 14, 21, 28] as lag}
                   <tr>

@@ -75,87 +75,25 @@
       // console.info('otherSensors', otherSensors);
     }
   }
-  // function loadAllSignalData(sensorPromises) {
-  //   // for each time_value, merge data values across sensors.
-  //   const sensorDateMap = {};
-  //   const sensorKeysMap = {}; // map from sensor key to sensor.
-  //   return Promise.all(sensorPromises).then((sensorsDataRows) => {
-  //     console.info('sensorsDataRows', sensorsDataRows);
-  //     sensorsDataRows.forEach((sensorRows, index) => {
-  //       const sensorData = sensorListData[index];
-  //       console.info('index', index, 'sensorData', sensorData, 'sensorRows', sensorRows);
-  //       sensorRows.forEach((row) => {
-  //         const time_value_key = String(row.time_value);
-  //         if (!sensorDateMap[time_value_key]) {
-  //           sensorDateMap[time_value_key] = { ...row };
-  //         }
-  //         const sensorKey = sensorData.sensor.key;
-  //         sensorKeysMap[sensorKey] = sensorData.sensor;
-  //         sensorDateMap[time_value_key][sensorKey] = row.value;
-  //       });
-  //     });
-  //     console.info('sensorKeysMap', sensorKeysMap);
-  //     console.info('sensorDateMap', sensorDateMap);
-  //     const sensors = Object.values(sensorKeysMap);
-  //     vegaRepeatSpec = {
-  //       rows: sensors,
-  //       columns: sensors, // .reverse(),
-  //     };
-  //     return Object.values(sensorDateMap);
-  //   });
-  // }
-  // $: sensorListData = sensorList.slice(0, 4).map((sensor) => prepareSensorData(sensor, selections, startDay, endDay));
-  // $: sensorListData = otherSensors.map((sensor) => prepareSensorData(sensor, selections, startDay, endDay));
-  // $: sensorDataPromises = sensorListData.map((sensorData) => sensorData.data);
-  // $: sensorMatrixData = loadAllSignalData(sensorDataPromises);
 
   // row and column are field names as keys.
   function makeMatrixCellSpec(row, column, options = {}) {
     // console.info('makeMatrixCellSpec options', options);
     let xBin = {};
     let yAggregate = null;
-    // if (options.histogram) {
-    //   xBin = { bin: true };
-    //   yAggregate = { aggregate: 'count', title: 'Count' };
-    // }
+
     const lag = options.lag || 0;
     const width = options.width || 100;
     const height = options.height || 100;
     // console.info('width', width, 'height', height);
     const chartSpec = {
-      // height: 200,
-      // width: 200,
-      // title: { text: options.xtitle, orient: 'left', color: 'black' },
-      // transform: [
-      //   {
-      //     window: [
-      //       {
-      //         op: 'lag',
-      //         param: 0,
-      //         field: column,
-      //         as: 'x',
-      //       },
-      //       {
-      //         op: 'lag',
-      //         param: 0,
-      //         field: row,
-      //         as: 'y',
-      //       },
-      //     ],
-      //   },
-      // ],
       width: width,
       height: height,
       mark: {
         type: 'point', // options.histogram ? 'bar' : 'point',
         opacity: 0.2,
       },
-      // selection: {
-      //   brush: {
-      //     type: 'interval',
-      //     mark: { cursor: 'move' },
-      //   },
-      // },
+
       encoding: {
         x: {
           field: 'x',
@@ -177,10 +115,7 @@
       },
     };
     let spec = chartSpec;
-    //if (!options.histogram) {
     spec = {
-      // width: 200,
-      // height: 200,
       width: width,
       height: height,
       title: lag != 0 ? `Lag: ${lag} days` : '',
@@ -285,15 +220,11 @@
           encoding: {
             x: {
               field: 'x',
-              // title: options.xtitle,
-              // title: null,
               type: 'quantitative',
               ...xBin,
             },
             y: yAggregate || {
               field: 'y',
-              // title: options.ytitle,
-              // title: null,
               type: 'quantitative',
               scale: {
                 domainMin: undefined,
@@ -302,7 +233,6 @@
           },
         },
       ],
-      //    };
     };
     return spec;
   }
@@ -310,9 +240,6 @@
   $: matrixSpec = [];
 
   function updateMatrixSpec(vegaRepeatSpec, lag = 0) {
-    // const numRows = vegaRepeatSpec.rows.length;
-    // const numCols = vegaRepeatSpec.columns.length;
-
     const specs = vegaRepeatSpec.rows
       .map((r) => {
         const c = vegaRepeatSpec.columns[0];
@@ -323,8 +250,6 @@
               xtitle: r.name,
               ytitle: c.name,
               lag,
-              // width,
-              // height,
               ...options,
             }),
           ],
@@ -350,15 +275,7 @@
   function makeSplomSpec(matrixSpec) {
     return {
       $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
-      // title: 'correlations',
-      // autosize: {
-      //   type: 'fixed',
-      //   contains: 'padding',
-      //   resize: true,
-      // },
       padding: 10,
-      // width: 30,
-      // height: 30,
       data: { name: 'values' },
 
       ...matrixSpec,
