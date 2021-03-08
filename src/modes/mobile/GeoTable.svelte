@@ -86,7 +86,7 @@
           date: formatDateISO(date.value),
           value: trend.current ? trend.current.value : '',
           trend: trend.trend,
-          delta: trend.delta == null ? '' : trend.delta,
+          delta: trend.delta == null || Number.isNaN(trend.delta) ? '' : trend.delta,
           refDate: formatDateISO(trend.refDate),
           refValue: trend.ref ? trend.ref.value : '',
         },
