@@ -317,20 +317,22 @@
     <div class="card-grid">
       <table style="width: 100%">
         <tr>
-          <td style="width:50%">
+          <td style="width:50%; vertical-align: top">
             <table>
               {#each otherSensors as sensor (sensor.key)}
                 <tr>
                   <td>
                     <div class="uk-card-header">
-                      <h3 class="uk-card-title uk-margin-remove-bottom">{sensor.plotTitleText}</h3>
-                      <div class="toolbar">
-                        <InfoDialogButton {sensor} />
-                      </div>
+                      <h3 class="uk-card-title uk-margin-remove-bottom" style="font-size: 1rem">
+                        {sensor.plotTitleText}
+                        <div class="toolbar">
+                          <InfoDialogButton {sensor} />
+                        </div>
+                      </h3>
                     </div>
                   </td>
 
-                  <td>
+                  <td style="height: 50px">
                     <IndicatorCompare
                       {sensorMatrixData}
                       {sensor}
@@ -344,12 +346,13 @@
               {/each}
             </table>
           </td>
-          <td style="width:100px; valign: top">
+          <td style="width:50px; height:50px vertical-align: top">
             {#if showLagsForSensor}
+              <h4>Lags of {showLagsForSensor.name}</h4>
               <table style="width:100%">
-                {#each [-14, -7, -4, -3, -2, -1, 0, 1, 2, 3, 4, 7, 14] as lag}
+                {#each [-28, -21, -14, -7, -4, -1, 0, 1, 4, 7, 14, 21, 28] as lag}
                   <tr>
-                    <td>
+                    <td style="width: 50px; height: 50px">
                       <IndicatorCompare
                         {sensorMatrixData}
                         sensor={showLagsForSensor}
@@ -366,7 +369,7 @@
               </table>
             {/if}
           </td>
-          <td style="width: 400px; height: 400px;">
+          <td style="width: 400px; height: 400px; vertical-align: top">
             {#if showLagDetailsForSensor}
               <IndicatorCompare
                 {sensorMatrixData}

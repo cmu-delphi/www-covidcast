@@ -159,16 +159,20 @@
       encoding: {
         x: {
           field: 'x',
-          // title: options.xtitle,
-          title: null,
+          title: options.xtitle,
+          // title: null,
           type: 'quantitative',
           ...xBin,
         },
         y: yAggregate || {
           field: 'y',
-          // title: options.ytitle,
-          title: null,
+          title: options.ytitle,
+          // title: null,
           type: 'quantitative',
+          scale: {
+            domainMin: undefined,
+            domainMax: undefined,
+          },
         },
       },
     };
@@ -179,20 +183,20 @@
       // height: 200,
       width: width,
       height: height,
-      title: lag != 0 ? `Lag: ${lag}` : '',
+      title: lag != 0 ? `Lag: ${lag} days` : '',
       transform: [
         {
           window: [
             {
               op: 'lag',
               param: lag >= 0 ? lag : 0,
-              field: column,
+              field: row,
               as: 'x',
             },
             {
               op: 'lag',
               param: lag <= 0 ? -lag : 0,
-              field: row,
+              field: column,
               as: 'y',
             },
           ],
@@ -201,30 +205,6 @@
       layer: [
         chartSpec,
 
-        {
-          transform: [
-            {
-              regression: 'x',
-              on: 'y',
-            },
-          ],
-          mark: { type: 'line', color: 'firebrick' },
-          encoding: {
-            x: {
-              field: 'x',
-              // title: options.xtitle,
-              title: null,
-              type: 'quantitative',
-              ...xBin,
-            },
-            y: yAggregate || {
-              field: 'y',
-              // title: options.ytitle,
-              title: null,
-              type: 'quantitative',
-            },
-          },
-        },
         {
           transform: [
             {
@@ -277,13 +257,47 @@
           },
           encoding: {
             x: { field: 'xmean', type: 'quantitative', sort: null },
-            y: { field: 'ymean', type: 'quantitative', sort: null },
+            y: {
+              field: 'ymean',
+              type: 'quantitative',
+              sort: null,
+              scale: {
+                domainMin: undefined,
+              },
+            },
             // color: { field: 'date_value', type: 'temporal',         scale:  },
             size: {
               field: 'date_value',
               type: 'temporal',
               scale: { range: [0, 6] },
               legend: null,
+            },
+          },
+        },
+        {
+          transform: [
+            {
+              regression: 'x',
+              on: 'y',
+            },
+          ],
+          mark: { type: 'line', color: 'firebrick' },
+          encoding: {
+            x: {
+              field: 'x',
+              // title: options.xtitle,
+              // title: null,
+              type: 'quantitative',
+              ...xBin,
+            },
+            y: yAggregate || {
+              field: 'y',
+              // title: options.ytitle,
+              // title: null,
+              type: 'quantitative',
+              scale: {
+                domainMin: undefined,
+              },
             },
           },
         },
@@ -306,8 +320,8 @@
           ...[
             makeMatrixCellSpec(r.key, c.key, {
               histogram: r == c, // obsolete
-              xtitle: c.name,
-              ytitle: r.name,
+              xtitle: r.name,
+              ytitle: c.name,
               lag,
               // width,
               // height,
@@ -342,7 +356,7 @@
       //   contains: 'padding',
       //   resize: true,
       // },
-      padding: 20,
+      padding: 10,
       // width: 30,
       // height: 30,
       data: { name: 'values' },
@@ -446,6 +460,6 @@
   }
 </style>
 
-<div class="root" on:click>
+<div class="root" on:click style="height:100%;">
   <Vega data={Promise.resolve(sensorMatrixData)} spec={splomSpec} />
 </div>
