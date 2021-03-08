@@ -4,8 +4,8 @@
   import arrowRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-circle-right.svg';
   import calendarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/calendar.svg';
   import { parseAPITime } from '../data';
-  import { isMobileDevice, times } from '../stores';
-  import { formatDateShortOrdinal } from '../formats';
+  import { times } from '../stores';
+  import { formatDateShortWeekdayAbbr } from '../formats';
   import { timeDay } from 'd3-time';
 
   /**
@@ -43,7 +43,7 @@
     border: none;
     letter-spacing: 3px;
     background: none;
-    font-size: 1rem;
+    font-size: 0.875rem;
     font-weight: 600;
     padding: 13px;
     line-height: 1;
@@ -51,6 +51,7 @@
   }
 
   .arrow-button {
+    flex: 0 0 auto;
     box-sizing: content-box;
     background: none;
     border: none;
@@ -92,8 +93,12 @@
     .arrow-button {
       display: none;
     }
+    .selected-date-icon {
+      width: 12px;
+    }
     .selected-date {
       letter-spacing: initial;
+      font-size: 0.75rem;
     }
   }
 </style>
@@ -111,12 +116,12 @@
       bind:selected={value}
       start={startEndDates[0]}
       end={startEndDates[1]}
-      formattedSelected={formatDateShortOrdinal(value)}>
+      formattedSelected={formatDateShortWeekdayAbbr(value)}>
       <button aria-label="selected date" class="selected-date picker-button" on:>
         <span class="selected-date-icon">
           {@html calendarIcon}
         </span>
-        <span>{formatDateShortOrdinal(value, !$isMobileDevice)}</span>
+        <span>{formatDateShortWeekdayAbbr(value)}</span>
       </button>
     </Datepicker>
   {:else}
@@ -124,7 +129,7 @@
       <span class="inline-svg-icon">
         {@html calendarIcon}
       </span>
-      <span>{formatDateShortOrdinal(value, !$isMobileDevice)}</span>
+      <span>{formatDateShortWeekdayAbbr(value)}</span>
     </button>
   {/if}
   <button

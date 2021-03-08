@@ -12,6 +12,12 @@
    */
   export let filterItem = null;
 
+  /**
+   * custom sorter for items
+   * @type {(itemA, itemB) => number}
+   */
+  export let sortItem = null;
+
   // field of each item that's used for the labels in the list
   export let labelFieldName = undefined;
 
@@ -21,6 +27,7 @@
     }
     return labelFieldName ? item[labelFieldName] : item;
   };
+  export let keywordFunction = labelFunction;
   export let colorFieldName = undefined;
 
   export let selectFirstIfEmpty = false;
@@ -39,6 +46,8 @@
   export let disabled = false;
   // add the title to the HTML input
   export let title = undefined;
+
+  export let icon = 'search';
 
   // selected item state
   export let selectedItem = undefined;
@@ -95,7 +104,7 @@
 
   $: listItems = items.map((item) => ({
     // keywords representation of the item
-    keywords: labelFunction(item).toLowerCase().trim(),
+    keywords: keywordFunction(item).toLowerCase().trim(),
     // item label
     label: labelFunction(item),
     // store reference to the origial item
@@ -104,6 +113,9 @@
   $: selectedLabelLookup = new Set((selectedItems || []).map((s) => labelFunction(s)));
 
   function limitListItems(items) {
+    if (sortItem) {
+      items = items.slice().sort((a, b) => sortItem(a.item, b.item));
+    }
     if (maxItemsToShowInList <= 0 || items.length < maxItemsToShowInList) {
       return items;
     }
@@ -397,30 +409,29 @@
     flex: 2 1 auto;
   }
   .search-icon.modern {
-    left: 10px;
+    left: 0;
   }
   .clear-button.modern {
-    right: 10px;
+    right: 0;
   }
   .uk-search-input.modern {
     background: white;
-    font-weight: 600;
-    letter-spacing: 3px;
-    height: 64px;
-    font-size: 1rem;
-    line-height: 1.5rem;
-    padding-left: 50px !important;
+    font-weight: 400;
+    height: 50px;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    padding-left: 35px !important;
     padding-top: 10px;
     padding-bottom: 10px;
     border-radius: 3px;
     border: 1px solid #d3d4d8;
   }
 
-  @media only screen and (max-width: 715px) {
-    .uk-search-input.modern {
-      letter-spacing: initial;
-      font-size: 0.85rem;
-    }
+  .uk-search-input.modern__small {
+    height: 52px;
+    padding-left: 50px !important;
+    padding-top: 4px;
+    padding-bottom: 4px;
   }
 </style>
 
@@ -431,10 +442,11 @@
   class:modern
   on:click={onContainerClick}>
   {#if !multiple}
-    <span class="uk-search-icon search-icon" class:modern data-uk-icon="icon: search" />
+    <span class="uk-search-icon search-icon" class:modern data-uk-icon="icon: {icon}" />
     <input
       class="uk-search-input"
       class:modern
+      class:modern__small={modern === 'small'}
       {placeholder}
       {name}
       {disabled}
@@ -455,7 +467,7 @@
       title="Clear Search Field"
       data-uk-icon="icon: close" />
   {:else}
-    <span class="uk-search-icon search-multiple-icon search-icon" data-uk-icon="icon: search" class:modern />
+    <span class="uk-search-icon search-multiple-icon search-icon" data-uk-icon="icon: {icon}" class:modern />
 
     {#each selectedItems as selectedItem}
       <div class="search-tag" style="border-color: {colorFieldName ? selectedItem[colorFieldName] : undefined}">
@@ -472,6 +484,7 @@
       <input
         class="uk-search-input search-multiple-input"
         class:modern
+        class:modern__small={modern === 'small'}
         {placeholder}
         {name}
         {disabled}

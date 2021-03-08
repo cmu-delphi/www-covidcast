@@ -6,12 +6,43 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title><%= htmlWebpackPlugin.options.title %></title>
     <link
-      href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,300,700,700italic&display=swap"
+      href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,300,600,600italic,700,700italic&display=swap"
       rel="stylesheet"
       type="text/css"
     />
   </head>
   <body style="margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh">
+    <nav class="nav-container" style="box-shadow: 0 3px 5px -1px rgb(0 0 0 / 15%)">
+      <div class="uk-navbar-container uk-navbar uk-float-right" data-uk-navbar="offset: 0" style="margin: 15px">
+        <ul class="uk-navbar-nav nav-burger">
+          <li>
+            <a class="uk-navbar-toggle nav-toggle" href="" uk-icon="menu" title="Toggle Menu" aria-expanded="true"></a>
+            <div
+              class="nav-mobile uk-dropdown uk-dropdown-stack"
+              uk-dropdown="mode: click;"
+              style="right: 0; left: unset"
+            >
+              <ul class="uk-nav uk-navbar-dropdown-nav">
+                <li data-mode="overview" class="nav-dropdown-child"><a href="/">Overview</a></li>
+                <li data-mode="landing" class="nav-dropdown-child"><a href="/landing">Landing</a></li>
+                <li data-mode="indicator" class="nav-dropdown-child">
+                  <a href="/indicator">Indicator Details</a>
+                </li>
+                <li data-mode="old" class="nav-dropdown-child"><a href="/old">Map Overview</a></li>
+                <li data-mode="timelapse" class="nav-dropdown-child"><a href="/timelapse">Timelapse</a></li>
+                <li data-mode="top10" class="nav-dropdown-child"><a href="/top10">Top 10</a></li>
+                <li data-mode="single" class="nav-dropdown-child"><a href="/single">Single Region</a></li>
+                <li data-mode="survey-results" class="nav-dropdown-child">
+                  <a href="/survey-results">Survey Results</a>
+                </li>
+                <li data-mode="export" class="nav-dropdown-child"><a href="/export">Export Data</a></li>
+                <li data-mode="lab" class="nav-dropdown-child"><a href="/lab">Lab</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
     <main id="vizbox">
       <div class="ie-banner" style="display: none">
         <div>

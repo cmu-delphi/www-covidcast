@@ -1,16 +1,33 @@
 <script>
   import Search from '../../components/Search.svelte';
   import { formatAPITime, parseAPITime } from '../../data';
-  import { nameInfos, nationInfo } from '../../maps';
   import { currentDate, currentRegionInfo, selectByInfo } from '../../stores';
-  import { refSensor, visibleLevels } from './questions';
   import SensorDatePicker2 from '../../components/SensorDatePicker2.svelte';
 
-  const filteredInfos = nameInfos.filter((d) => visibleLevels.includes(d.level));
-  filteredInfos.unshift(nationInfo);
+  /**
+   * @type {import('../../components/MapBox/colors').SensorEntry}
+   */
+  export let sensor;
+
+  export let defaultItem = null;
+
+  export let placeholder = 'Search Region';
+
+  /**
+   * @type {import('../../maps').NameInfo[]}
+   */
+  export let items;
+
   $: selectedDate = parseAPITime($currentDate);
   $: if (selectedDate !== undefined) {
     currentDate.set(formatAPITime(selectedDate));
+  }
+
+  /**
+   * @param {import('../../maps').NameInfo} d
+   */
+  function combineKeywords(d) {
+    return `${d.id} ${d.displayName}`;
   }
 </script>
 
@@ -25,8 +42,8 @@
   }
 
   .parameters {
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 6px;
+    margin-bottom: 6px;
   }
 
   @media only screen and (max-width: 715px) {
@@ -44,17 +61,20 @@
 </style>
 
 <div class="parameter-container">
+  <slot name="title" />
   <div class="uk-container content-grid parameters">
     <Search
       className="survey-search grid-3-8"
       modern
-      placeholder="Search Region"
-      items={filteredInfos}
-      selectedItem={$currentRegionInfo || nationInfo}
+      {placeholder}
+      {items}
+      icon="location"
+      selectedItem={$currentRegionInfo || defaultItem}
       labelFieldName="displayName"
+      keywordFunction={combineKeywords}
       maxItemsToShowInList="5"
       on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)} />
-    <SensorDatePicker2 className="survey-date grid-8-11" bind:value={selectedDate} sensor={refSensor} />
+    <SensorDatePicker2 className="survey-date grid-8-11" bind:value={selectedDate} {sensor} />
   </div>
   <slot />
 </div>

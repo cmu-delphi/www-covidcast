@@ -1,31 +1,71 @@
 <script>
-  import { currentRegionInfo, smallMultipleTimeSpan, currentDateObject } from '../../stores';
-  import { questionCategories } from './questions';
+  import { currentDateObject, currentRegionInfo, times } from '../../stores';
+  import { questionCategories, visibleLevels, refSensor, questions } from './questions';
   import SurveyQuestion from './SurveyQuestion.svelte';
   import SurveyParameters from './SurveyParameters.svelte';
   import Overview from './Overview.svelte';
-  import { nationInfo } from '../../maps';
+  import { nationInfo, nameInfos, getStateOfCounty } from '../../maps';
   import MobileSurveyToc from './MobileSurveyToc.svelte';
-  // use local variables with manual setting for better value comparison updates
-  let startDay = $smallMultipleTimeSpan[0];
-  let endDay = $smallMultipleTimeSpan[1];
+  import { DataFetcher, DateParam, RegionParam, SensorParam } from '../../stores/params';
+  import getRelatedCounties from '../../maps/related';
 
+  $: sensor = new SensorParam(refSensor, $times);
+  $: date = new DateParam($currentDateObject, refSensor, $times);
+  $: region = new RegionParam($currentRegionInfo);
+
+  const fetcher = new DataFetcher();
   $: {
-    if (startDay.getTime() !== $smallMultipleTimeSpan[0].getTime()) {
-      startDay = $smallMultipleTimeSpan[0];
+    // reactive update
+    fetcher.invalidate(sensor, region, date);
+
+    // prefetch all data that is likely needed
+    // itself
+    fetcher.fetchNSensor1RegionNDates(
+      questions.map((d) => d.sensorParam),
+      region,
+      date.windowTimeFrame,
+    );
+    // fetch self details (sample size)
+    fetcher.fetchNSensor1Region1DateDetails(
+      questions.map((d) => d.sensorParam),
+      region,
+      date,
+    );
+
+    if (region.level !== 'nation') {
+      // nation
+      fetcher.fetchNSensor1RegionNDates(
+        questions.map((d) => d.sensorParam),
+        nationInfo,
+        date.windowTimeFrame,
+      );
     }
-    if (endDay.getTime() !== $smallMultipleTimeSpan[1].getTime()) {
-      endDay = $smallMultipleTimeSpan[1];
+    if (region.level === 'county') {
+      // state
+      fetcher.fetchNSensor1RegionNDates(
+        questions.map((d) => d.sensorParam),
+        getStateOfCounty(region.value),
+        date.windowTimeFrame,
+      );
+      // related regions
+      fetcher.fetchNSensorNRegionNDates(
+        questions.map((d) => d.sensorParam),
+        getRelatedCounties(region.value),
+        date.windowTimeFrame,
+      );
     }
   }
-  $: params = { region: $currentRegionInfo || nationInfo, startDay, endDay };
+
+  const filteredInfos = nameInfos.filter((d) => visibleLevels.includes(d.level));
+  filteredInfos.unshift(nationInfo);
 </script>
 
 <style>
   .root {
     position: relative;
     flex: 1 1 0;
-    overflow: auto;
+    font-size: 0.875rem;
+    line-height: 1.5rem;
   }
   .questions {
     margin-top: 1em;
@@ -46,13 +86,15 @@
 </style>
 
 <div class="root">
-  <SurveyParameters>
+  <SurveyParameters sensor={refSensor} items={filteredInfos} defaultItem={nationInfo}>
+    <div class="grid-3-11 mobile-header-line" slot="title">
+      <h2>Delphi Survey <span>Results</span></h2>
+    </div>
     <MobileSurveyToc />
   </SurveyParameters>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
       <Overview />
-      <h2>Results</h2>
     </div>
     <div class="grid-1-3">
       <div class="toc-container uk-visible@m">
@@ -71,7 +113,7 @@
         <!-- svelte-ignore a11y-missing-content -->
         <a id={cat.anchor} />
         {#each cat.questions as question}
-          <SurveyQuestion {question} date={$currentDateObject} {params} />
+          <SurveyQuestion {question} {region} {date} {fetcher} />
         {/each}
       {/each}
     </div>

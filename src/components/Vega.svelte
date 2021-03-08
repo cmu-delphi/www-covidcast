@@ -7,8 +7,10 @@
 
   const dispatch = createEventDispatcher();
 
+  export let className = '';
+
   /**
-   * @type {import('vega-embed').VisualizationSpec}
+   * @type {import('vega-embed').VisualizationSpec | Promise<import('vega-embed').VisualizationSpec>}
    */
   export let spec;
 
@@ -86,7 +88,14 @@
   $: updateSpec(patchedSpec);
   $: updateSignals(vegaPromise, signals);
 
+  /**
+   * @type (() => Promise<import('vega-typings').View>)
+   */
   export const vegaAccessor = () => vegaPromise.then((v) => v.view);
+  /**
+   * @type (() => import('vega-typings').View | null)
+   */
+  export const vegaDirectAccessor = () => (vega ? vega.view : null);
 
   /**
    * @param {Promise<import('vega-embed').Result> | null} vegaLoader
@@ -117,7 +126,9 @@
         noData = !d || d.length === 0;
         // also update signals along the way
         Object.entries(signals).forEach(([key, v]) => {
-          vega.view.signal(key, resetSignalsUponNoData && noData ? null : v);
+          if (typeof v !== 'function') {
+            vega.view.signal(key, resetSignalsUponNoData && noData ? null : v);
+          }
         });
         vega.view.runAsync();
 
@@ -144,7 +155,9 @@
     }
     hasError = false;
     Object.entries(signals).forEach(([key, v]) => {
-      vega.view.signal(key, v);
+      if (typeof v !== 'function') {
+        vega.view.signal(key, v);
+      }
     });
     vega.view.runAsync();
   }
@@ -155,14 +168,31 @@
     }
     if (vegaPromise) {
       // cleanup old
-      vegaPromise.then((r) => r.finalize());
+      vegaPromise.then((r) => {
+        if (r) {
+          r.finalize();
+        }
+      });
     }
     vega = null;
     hasError = false;
     const patch = (spec) => {
       spec.signals = spec.signals || [];
       Object.entries(signals).forEach(([key, v]) => {
-        spec.signals.push({ name: key, value: v });
+        const obj = { name: key };
+        const existing = spec.signals.find((d) => d.name === key);
+        if (v == null || ['string', 'number', 'boolean'].includes(typeof v) || v instanceof Date || Array.isArray(v)) {
+          // assume it is a value
+          obj.value = v;
+        } else {
+          // mixing the whole object
+          Object.assign(obj, typeof v === 'function' ? v(existing) : v);
+        }
+        if (existing) {
+          Object.assign(existing, obj);
+        } else {
+          spec.signals.push(obj);
+        }
       });
       spec.signals.push({
         name: 'width',
@@ -186,14 +216,24 @@
       });
       return spec;
     };
-    vegaPromise = import(/* webpackChunkName: 'vegafactory' */ './vegaFactory').then((m) =>
-      m.default(root, spec, {
-        actions: false,
-        logLevel: Error,
+    const specDatasetsEntries = Object.entries(spec.datasets || {});
+    vegaPromise = Promise.all([
+      import(/* webpackChunkName: 'vegafactory' */ './vegaFactory'),
+      spec,
+      ...specDatasetsEntries.map((d) => d[1]),
+    ]).then(([m, spec, ...ds]) => {
+      if (!root) {
+        return null;
+      }
+      // patch in the spec defined datasets with their loaded values
+      specDatasetsEntries.forEach((entry, i) => {
+        spec.datasets[entry[0]] = ds[i];
+      });
+      return m.default(root, spec, {
         tooltip: tooltipHandler,
         patch,
-      }),
-    );
+      });
+    });
     vegaPromise.then((r) => {
       if (!root) {
         return;
@@ -202,17 +242,17 @@
       root.setAttribute('role', 'figure');
       signalListeners.forEach((signal) => {
         r.view.addSignalListener(signal, (name, value) => {
-          dispatch('signal', { name, value, view: r.view, spec });
+          dispatch('signal', { name, value, view: r.view, spec: r.spec });
         });
       });
       dataListeners.forEach((data) => {
         r.view.addDataListener(data, (name, value) => {
-          dispatch('dataListener', { name, value, view: r.view, spec });
+          dispatch('dataListener', { name, value, view: r.view, spec: r.spec });
         });
       });
       eventListeners.forEach((type) => {
         r.view.addEventListener(type, (event, item) => {
-          dispatch(type, { event, item, view: r.view, spec });
+          dispatch(type, { event, item, view: r.view, spec: r.spec });
         });
       });
       updateData(vegaPromise, data);
@@ -276,7 +316,11 @@
       vega = null;
       vegaPromise = null;
     } else if (vegaPromise) {
-      vegaPromise.then((r) => r.finalize());
+      vegaPromise.then((r) => {
+        if (r) {
+          r.finalize();
+        }
+      });
       vegaPromise = null;
     }
   });
@@ -284,7 +328,7 @@
 
 <div
   bind:this={root}
-  class="root vega-embed"
+  class="root vega-embed {className}"
   class:loading-bg={!hasError && loading}
   class:message-overlay={hasError || (noData && !loading)}
   data-message={message}

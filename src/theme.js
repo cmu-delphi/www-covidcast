@@ -9,7 +9,6 @@ export const MAP_THEME = {
   countyFill: '#eeeeee', //'#e4dac4', // missing value
   countyOutline: '#ffffff', //'#e0e0e0',
   countyOutlineWhenFilled: '#ffffff', //'#616161',
-  zoneOutline: 'blue', //'#e0e0e0',
 };
 
 export const selectionColors = ['#0F0589', '#16A997', '#A71808', '#CD22B2', '#F58B29'];

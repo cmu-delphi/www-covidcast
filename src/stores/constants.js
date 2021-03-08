@@ -1,10 +1,10 @@
 import { isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data/signals';
 import { formatAPITime } from '../data/utils';
-import { format } from 'd3-format';
 import descriptions from './descriptions.generated.json';
 import '!file-loader?name=descriptions.raw.txt!./descriptions.raw.txt';
 import { resolveColorScale } from './colorScales';
 import { modeByID } from '../modes';
+import { formatRawValue, formatValue, formatPercentage } from '../formats';
 // import { generateMockSignal, generateMockMeta } from '../data/mock';
 
 export const levelList = [
@@ -71,17 +71,17 @@ export function getLevelInfo(level) {
  * @property {string} plotTitleText
  * @property {string} yAxis
  * @property {string} format
- * @property {(v: number) => string} formatValue
+ * @property {(v: number, enforceSign?: boolean) => string} formatValue
  * @property {string} signal
  * @property {string?|() => any[]} api
  * @property {(() => any[])?} meta
- * @property {(v: number) => string} formatValue
  * @property {boolean} hasStdErr
  * @property {boolean} isCasesOrDeath is cases or death signal
  * @property {boolean} isCount is count signal
  * @property {(options?: CasesOrDeathOptions) => 'prop' | 'count' | 'other')} getType
  * @property {Record<keyof EpiDataCasesOrDeathValues, string>} casesOrDeathSignals signal to load for cases or death
  * @property {)(v: number) => string)} colorScale
+ * @property {string} colorScaleId
  * @property {string} credits
  * @property {boolean?} default whether it should be default signal
  */
@@ -109,11 +109,6 @@ export const EPIDATA_CASES_OR_DEATH_VALUES = [
   'countRatio',
   'countRatioCumulative',
 ];
-
-const basePercentFormatter = format('.2%');
-const percentFormatter = (v) => basePercentFormatter(v / 100);
-const countFormatter = format(',.1f');
-const rawFormatter = format(',.2f');
 
 /**
  * determines the primary value to show or lookup
@@ -166,10 +161,11 @@ export function extendSensorEntry(sensorEntry) {
     tooltipText: sensorEntry.tooltipText || mapTitle,
     credits: sensorEntry.credits || 'We are happy for you to use this data in products and publications.',
     formatValue:
-      sensorEntry.format === 'percent' ? percentFormatter : isCount || isCasesOrDeath ? countFormatter : rawFormatter,
+      sensorEntry.format === 'percent' ? formatPercentage : isCount || isCasesOrDeath ? formatValue : formatRawValue,
     isCount,
     getType: (options) => getType(sensorEntry, options),
     isCasesOrDeath,
+    colorScaleId: sensorEntry.colorScale || 'interpolateYlOrRd',
     colorScale: resolveColorScale(sensorEntry.colorScale),
     links: sensorEntry.links || [],
     plotTitleText: sensorEntry.plotTitleText || sensorEntry.name,
@@ -178,16 +174,13 @@ export function extendSensorEntry(sensorEntry) {
         ? mapTitle
         : (options) => {
             // generate lookup function
-            if (!options) {
-              return mapTitle[primaryValue(sensorEntry, {})];
-            }
-            if (options.cumulative) {
+            if (options && options.cumulative) {
               if (options.incidence) {
                 return mapTitle.incidenceCumulative;
               } else {
                 return mapTitle.ratioCumulative;
               }
-            } else if (options.incidence) {
+            } else if (options && options.incidence) {
               return mapTitle.incidence;
             } else {
               return mapTitle.ratio;
@@ -262,7 +255,7 @@ export const defaultRegionOnStartup = {
 export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
 export const yesterday = Number.parseInt(formatAPITime(yesterdayDate), 10);
 
-export const DEFAULT_MODE = modeByID.overview;
+export const DEFAULT_MODE = modeByID.landing;
 export const DEFAULT_SENSOR = (sensorList.find((d) => d.default) || sensorList[0]).key;
 /**
  * default sensor in case the initial mode is survey-results

@@ -13,5 +13,6 @@ const app = new App({
 });
 
 console.log('running version:', __VERSION__);
+window.COVIDCAST_VERSION = __VERSION__;
 
 export default app;

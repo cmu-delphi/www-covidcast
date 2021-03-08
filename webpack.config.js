@@ -24,6 +24,7 @@ module.exports = () => {
       path: path.resolve(__dirname, 'public'),
       filename: devMode ? '[name].js' : '[name].[contenthash].js',
       chunkFilename: devMode ? '[name].js' : '[name].[contenthash].js',
+      publicPath: hmr ? '/' : undefined,
     },
 
     resolve: {
@@ -31,7 +32,7 @@ module.exports = () => {
         svelte: path.resolve('node_modules', 'svelte'),
       },
       extensions: ['.mjs', '.js', '.svelte'],
-      mainFields: ['svelte', 'browser', 'module', 'main'],
+      mainFields: ['svelte', 'module', 'browser', 'main'],
     },
 
     optimization: {
@@ -57,7 +58,15 @@ module.exports = () => {
         !devMode && {
           test: /\.m?js$/,
           exclude: /node_modules[\\/](?!(svelte|mapbox-gl)[\\/])/,
-          use: ['babel-loader'],
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                cacheDirectory: true,
+                cacheCompression: false,
+              },
+            },
+          ],
         },
         {
           test: /\.svelte$/,
@@ -73,7 +82,13 @@ module.exports = () => {
                 },
               ]
             : [
-                'babel-loader',
+                {
+                  loader: 'babel-loader',
+                  options: {
+                    cacheDirectory: true,
+                    cacheCompression: false,
+                  },
+                },
                 {
                   loader: 'svelte-loader',
                   options: {
@@ -142,22 +157,46 @@ module.exports = () => {
       }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
-        title: 'COVIDcast Timelapse',
+        title: 'COVIDcast',
         template: './src/index.html',
-        filename: 'timelapse/index.html',
+        filename: 'landing/index.html',
       }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
-        title: 'COVIDcast Top 10',
+        title: 'COVIDcast',
         template: './src/index.html',
-        filename: 'top10/index.html',
+        filename: 'overview/index.html',
       }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
-        title: 'COVIDcast Region Details',
+        title: 'COVIDcast Indicator Details',
         template: './src/index.html',
-        filename: 'single/index.html',
+        filename: 'indicator/index.html',
       }),
+      new HtmlWebpackPlugin({
+        alwaysWriteToDisk: true,
+        title: 'COVIDcast',
+        template: './src/index.html',
+        filename: 'old/index.html',
+      }),
+      // new HtmlWebpackPlugin({
+      //   alwaysWriteToDisk: true,
+      //   title: 'COVIDcast Timelapse',
+      //   template: './src/index.html',
+      //   filename: 'timelapse/index.html',
+      // }),
+      // new HtmlWebpackPlugin({
+      //   alwaysWriteToDisk: true,
+      //   title: 'COVIDcast Top 10',
+      //   template: './src/index.html',
+      //   filename: 'top10/index.html',
+      // }),
+      // new HtmlWebpackPlugin({
+      //   alwaysWriteToDisk: true,
+      //   title: 'COVIDcast Region Details',
+      //   template: './src/index.html',
+      //   filename: 'single/index.html',
+      // }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
         title: 'COVIDcast Export Data',
@@ -170,6 +209,12 @@ module.exports = () => {
         template: './src/index.html',
         filename: 'survey-results/index.html',
       }),
+      // new HtmlWebpackPlugin({
+      //   alwaysWriteToDisk: true,
+      //   title: 'COVIDcast Lab',
+      //   template: './src/index.html',
+      //   filename: 'lab/index.html',
+      // }),
 
       new HtmlWebpackHarddiskPlugin(),
       new MiniCssExtractPlugin({

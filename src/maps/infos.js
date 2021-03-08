@@ -12,6 +12,8 @@ export const levelMegaCountyId = 'mega-county';
  * @property {string} id param id
  * @property {string} propertyId geojson: feature.property.id
  * @property {number} population
+ * @property {string?} region just for state and county
+ * @property {string?} state just for county
  * @property {'state' | 'county' | 'msa' | 'hrr' | 'nation'} level
  */
 
@@ -41,6 +43,19 @@ stateInfo.forEach((state) => {
   stateLookup.set(state.propertyId.toLowerCase(), state);
 });
 
+const stateClasses = {
+  West: ['WY', 'ID', 'MT', 'UT', 'AK', 'NM', 'CO', 'NV', 'AZ', 'OR', 'WA', 'CA', 'HI'],
+  Midwest: ['SD', 'ND', 'IA', 'NE', 'MO', 'WI', 'KS', 'MN', 'IL', 'OH', 'MI', 'IN'],
+  Northeast: ['PA', 'ME', 'NH', 'NJ', 'NY', 'VT', 'MA', 'RI', 'CT', 'DE'],
+  South: ['OK', 'TN', 'AL', 'WV', 'AR', 'KY', 'TX', 'GA', 'SC', 'NC', 'LA', 'FL', 'VA', 'MD', 'DC', 'PR', 'MS'],
+};
+
+Object.entries(stateClasses).forEach(([key, value]) => {
+  for (const v of value) {
+    stateLookup.get(v.toLowerCase()).region = key;
+  }
+});
+
 /**
  * @type {NameInfo}
  */
@@ -60,7 +75,9 @@ export const countyInfo = parseCSV(
   (county) =>
     `${county.name}${county.displayName !== 'X' ? ' County' : ''}, ${stateLookup.get(county.id.slice(0, 2)).postal}`,
   (county) => {
-    county.state = stateLookup.get(county.id.slice(0, 2)).postal;
+    const state = stateLookup.get(county.id.slice(0, 2));
+    county.state = state.postal;
+    county.region = state.region;
   },
 );
 export const hrrInfo = parseCSV(hrrRaw, 'hrr', (hrr) => `${hrr.state} - ${hrr.name} (HRR)`);
@@ -69,13 +86,15 @@ export const hrrInfo = parseCSV(hrrRaw, 'hrr', (hrr) => `${hrr.state} - ${hrr.na
 /**
  * @type {NameInfo[]}
  */
-const megaCountyInfo = stateInfo.map((info) => ({
+export const megaCountyInfo = stateInfo.map((info) => ({
   id: info.id + '000',
   propertyId: info.id + '000',
   name: `Rest of ${info.name}`,
   displayName: `Rest of ${info.displayName}`,
   population: null,
   level: levelMegaCountyId,
+  region: info.region,
+  state: info.id,
   lat: null,
   long: null,
 }));
@@ -100,7 +119,7 @@ export const nameInfos = stateInfo.concat(msaInfo, countyInfo, hrrInfo, megaCoun
  * @type {Map<string, NameInfo>}
  */
 const infoLookup = new Map();
-nameInfos.forEach((d) => {
+function addInfo(d) {
   const id = String(d.propertyId).toLowerCase();
   if (!infoLookup.has(id)) {
     infoLookup.set(id, d);
@@ -109,10 +128,26 @@ nameInfos.forEach((d) => {
   if (!infoLookup.has(key)) {
     infoLookup.set(key, d);
   }
-});
+}
+nameInfos.forEach(addInfo);
+addInfo(nationInfo);
+
+for (const alias of [
+  ['02270', '02158'],
+  ['46113', '46102'],
+]) {
+  infoLookup.set(alias[0], getInfoByName(alias[1]));
+}
 
 export function getInfoByName(name) {
-  return infoLookup.get(String(name).toLowerCase());
+  if (!name) {
+    return null;
+  }
+  const r = infoLookup.get(String(name).toLowerCase());
+  if (!r) {
+    console.warn('unknown', name);
+  }
+  return r;
 }
 
 /**
@@ -142,4 +177,19 @@ export function computeMegaCountyPopulation(megaCounty, data) {
   }, state.population);
 
   return Number.isNaN(population) ? null : population;
+}
+
+/**
+ * returns the counties of a state
+ * @param {NameInfo} state
+ */
+export function getCountiesOfState(state) {
+  return countyInfo.filter((d) => d.id.slice(0, 2) === state.id);
+}
+/**
+ * returns the state of a county
+ * @param {NameInfo} county
+ */
+export function getStateOfCounty(county) {
+  return getInfoByName(county.state);
 }

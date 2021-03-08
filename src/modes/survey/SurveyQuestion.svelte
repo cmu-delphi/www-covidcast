@@ -1,68 +1,46 @@
 <script>
-  import Vega from '../../components/Vega.svelte';
   import UIKitHint from '../../components/UIKitHint.svelte';
   import fileIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/file.svg';
   import linkIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/link.svg';
-  // import userEditIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/user-edit.svg';
-  import calendarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/regular/calendar.svg';
   import warningIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
-  import { createTimeSeriesSpec, loadTimeSeriesData } from './timeSeries';
-  import { determineTrend, findDateRow, findMaxRow, findMinRow } from './trend';
-
-  import { formatDateShortOrdinal } from '../../formats';
-  import { formatTrend, formatSampleSize, formatStdErr } from './format';
-  import SurveyTrend from './SurveyTrend.svelte';
-  import SurveyValue from './SurveyValue.svelte';
-  import SurveyTooltip from './SurveyTooltip.svelte';
-  import ShapeIcon from '../../components/ShapeIcon.svelte';
-  import { isMobileDevice } from '../../stores';
+  import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
+  import IndicatorOverview from '../mobile/IndicatorOverview.svelte';
+  import { formatDateShortWeekdayAbbr } from '../../formats';
+  import IndicatorStatsLine from '../mobile/IndicatorStatsLine.svelte';
 
   /**
    * question object
    * @type {import('./questions').Question}
    */
   export let question;
-
   /**
-   * date to highlight
-   * @type {Date}
+   * @type {import("../../stores/params").DateParam}
    */
   export let date;
-
   /**
-   * @type {import('./timeSeries').Params}
+   * @type {import("../../stores/params").RegionParam}
    */
-  export let params;
+  export let region;
+  /**
+   * @type {import("../../stores/params").DataFetcher}
+   */
+  export let fetcher;
 
-  $: data = loadTimeSeriesData(question, params);
-  $: spec = createTimeSeriesSpec(params);
+  $: sensor = question.sensorParam;
 
-  let loading = true;
+  $: dateRow = fetcher.fetch1Sensor1Region1DateDetails(sensor, region, date);
+  $: trend = fetcher.fetchWindowTrend(sensor, region, date);
+
+  let loading = false;
   let noData = false;
-  let maxDate = null;
-  let refDate = null;
-
-  async function deriveData(dataPromise, date) {
-    loading = true;
+  $: {
     noData = false;
-    const data = (await dataPromise) || [];
-    loading = false;
-    noData = data.length === 0;
-    const dateRow = findDateRow(date, data);
-    const trend = determineTrend(date, data, dateRow);
-    const max = question.inverted ? findMinRow(data) : findMaxRow(data);
-    maxDate = max ? max.date_value : null;
-    refDate = trend.refDate;
-
-    return {
-      data,
-      row: dateRow,
-      trend,
-      max,
-    };
+    loading = true;
+    trend.then((t) => {
+      loading = false;
+      noData = t.min == null; // no min found no data at all
+    });
   }
-
-  $: summary = deriveData(data, date);
 
   function showShareLink() {
     const fullUrl = new URL(location.href);
@@ -85,6 +63,13 @@
     align-items: center;
   }
 
+  h3.header {
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    margin: 0.6em 0;
+  }
+
   .uk-card-header > a {
     margin-left: 1em;
   }
@@ -92,56 +77,11 @@
     flex-grow: 1;
     margin: 0;
   }
-  .question-body > :global(.vega-embed) {
-    display: block;
-    height: 7em;
-  }
+
   .question-question {
     font-style: italic;
     font-size: 2rem;
-  }
-
-  .question-summary {
-    margin-top: 1.5em;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
-  }
-
-  .question-summary > div {
-    flex: 1 1 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    line-height: 1.5;
-    margin: 0 0.25em;
-    max-width: 11em;
-    text-align: center;
-  }
-
-  .question-kpi {
-    height: 5rem;
-    display: flex;
-    margin-bottom: 0.5em;
-  }
-
-  .question-kpi-trend {
-    flex-direction: column;
-    justify-content: flex-end;
-  }
-
-  .block-date {
-    margin: 0.5em 0;
-  }
-
-  .question-kpi-title {
-    margin: 0.5em 0;
-    white-space: nowrap;
-  }
-
-  .question-unit {
-    flex-grow: 1;
-    margin: 0.5em 0;
+    line-height: 2.5rem;
   }
 
   .no-data {
@@ -162,25 +102,6 @@
 
     .header-link-text {
       display: none;
-    }
-
-    .question-kpi {
-      height: 3rem;
-    }
-
-    .question-kpi-title {
-      font-weight: normal;
-    }
-
-    .block-date,
-    .question-kpi-title,
-    .question-unit {
-      font-size: 0.8rem;
-    }
-
-    .chart-details {
-      font-size: 0.75rem;
-      font-style: normal;
     }
   }
 </style>
@@ -218,82 +139,24 @@
         {@html question.question}
       </p>
     </div>
-    <h4>
-      {question.name}
+
+    <p>
+      On
+      {formatDateShortWeekdayAbbr(date.value)}
+      the 7 day average of
+      <strong>{sensor.name}</strong>
       <UIKitHint title={question.signalTooltip} />
-    </h4>
-    <Vega
-      {spec}
-      {data}
-      scrollSpy={100}
-      signals={{ currentDate: date, maxDate, refDate }}
-      tooltip={SurveyTooltip}
-      tooltipProps={{ question }} />
-    <div class="uk-text-center uk-text-italic chart-details">
-      {#await summary then s}
-        {s.row ? `based on ${formatSampleSize(s.row)} survey responses with a standard error of ${formatStdErr(s.row.stderr)}` : ''}
-      {/await}
+      was:
+    </p>
+    <IndicatorOverview {sensor} {date} {region} {fetcher} />
+
+    <hr />
+    <h3 class="header">{sensor.name} ({sensor.unit})</h3>
+
+    <div class="chart-250">
+      <HistoryLineChart {sensor} {date} {region} {fetcher} />
     </div>
-    <div class="question-summary">
-      <div>
-        <div class="question-kpi question-kpi-trend">
-          {#await summary}
-            <SurveyTrend trend={null} />
-          {:then s}
-            <SurveyTrend trend={s.trend} />
-          {/await}
-        </div>
-        <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortOrdinal(refDate)}
-        </div>
-        <div class="uk-text-bold question-kpi-title">
-          7-day trend
-          <UIKitHint title="Tracks the variability of signal movenment" />
-        </div>
-        <div class="question-unit">
-          {#await summary}
-            N/A
-          {:then s}
-            {s.trend ? `${formatTrend(s.trend.change)} since ${formatDateShortOrdinal(refDate)}` : 'N/A'}
-          {/await}
-        </div>
-      </div>
-      <div>
-        <div class="question-kpi">
-          {#await summary}
-            ?
-          {:then s}
-            <SurveyValue value={s.max ? s.max.value : null} />
-          {/await}
-        </div>
-        <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortOrdinal(maxDate)}
-        </div>
-        <div class="uk-text-bold question-kpi-title">
-          <ShapeIcon shape="diamond" color="gray" />
-          {question.inverted ? 'Lowest' : 'Highest'}
-          {#if !$isMobileDevice}count{/if}
-        </div>
-        <div class="question-unit">{question.unit}</div>
-      </div>
-      <div>
-        <div class="question-kpi">
-          {#await summary}
-            N/A
-          {:then s}
-            <SurveyValue value={s.row ? s.row.value : null} />
-          {/await}
-        </div>
-        <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortOrdinal(date)}
-        </div>
-        <div class="uk-text-bold question-kpi-title">
-          <ShapeIcon shape="circle" color="#c00" />
-          Selected
-          {#if !$isMobileDevice}count{/if}
-        </div>
-        <div class="question-unit">{question.unit}</div>
-      </div>
-    </div>
+
+    <IndicatorStatsLine {sensor} {date} {region} {fetcher} />
   </div>
 </article>
