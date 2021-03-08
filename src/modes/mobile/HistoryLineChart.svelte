@@ -16,6 +16,8 @@
   import Toggle from './Toggle.svelte';
   import SensorValue from './SensorValue.svelte';
   import { combineSignals } from '../../data/utils';
+  import DownloadMenu from './components/DownloadMenu.svelte';
+  import { formatDateISO } from '../../formats';
 
   export let height = 250;
 
@@ -41,11 +43,11 @@
    * @type {import("../../stores/params").Region}
    */
   const neighboringInfo = {
-    id: 'related',
+    id: 'neighboring',
     level: 'county',
     name: 'Neighboring Counties',
     population: null,
-    propertyId: 'related',
+    propertyId: 'neighboring',
     displayName: 'Neighboring Counties',
   };
 
@@ -147,14 +149,30 @@
     }
     return [region];
   }
+  /**
+   * @param {import("../../stores/params").SensorParam} sensor
+   * @param {import("../../stores/params").Region[]} region
+   * @param {import("../../stores/params").DateParam} date
+   */
+  function generateFileName(sensor, regions, date, raw) {
+    const regionName = regions.map((region) => `${region.propertyId}-${region.displayName}`).join(',');
+    let suffix = '';
+    if (raw) {
+      suffix = '_RawVsSmoothed';
+    }
+    return `${sensor.name}_${regionName}_${formatDateISO(date.windowTimeFrame.min)}-${formatDateISO(
+      date.windowTimeFrame.max,
+    )}${suffix}`;
+  }
 
   let zoom = false;
   let singleRaw = false;
 
-  $: spec = genSpec(region.value, date.value, height, !zoom, singleRaw && sensor.rawValue != null);
-  $: data =
-    singleRaw && sensor.rawValue != null ? loadSingleData(sensor, region, date) : loadData(sensor, region, date);
-  $: regions = singleRaw && sensor.rawValue != null ? [region.value] : resolveRegions(region.value);
+  $: raw = singleRaw && sensor.rawValue != null;
+  $: spec = genSpec(region.value, date.value, height, !zoom, raw);
+  $: data = raw ? loadSingleData(sensor, region, date) : loadData(sensor, region, date);
+  $: regions = raw ? [region.value] : resolveRegions(region.value);
+  $: fileName = generateFileName(sensor, regions, date, raw);
 
   function findValue(region, data, date, prop = 'value') {
     if (!date) {
@@ -178,6 +196,8 @@
     // auto update
     highlightRegion = region.value.id;
   }
+
+  let vegaRef = null;
 </script>
 
 <style>
@@ -191,21 +211,36 @@
     border: 1px solid rgb(var(--color));
     position: relative;
     background: rgba(var(--color), 0.05);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 0.25em;
   }
-  .legend-elem:hover {
+  .legend-elem:hover,
+  .legend-elem.selected {
     box-shadow: 0 0 2px 0 rgb(var(--color));
   }
   .legend-symbol {
     color: rgb(var(--color));
+    grid-row-end: span 2;
   }
   .legend-value {
     font-weight: 600;
+  }
+
+  .buttons {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .spacer {
+    flex: 1 1 0;
   }
 </style>
 
 <p>Click on the chart to select a different date.</p>
 
 <Vega
+  bind:this={vegaRef}
   {className}
   {spec}
   {data}
@@ -215,11 +250,13 @@
   signalListeners={['highlight']}
   on:signal={onSignal} />
 
-<div>
+<div class="buttons">
   <Toggle bind:checked={zoom}>Zoom Y-axis</Toggle>
   {#if sensor.rawValue != null}
     <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
   {/if}
+  <div class="spacer" />
+  <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} />
 </div>
 
 <div class="{!(singleRaw && sensor.rawValue != null) && regions.length > 1 ? 'mobile-two-col' : ''} legend">
@@ -227,12 +264,13 @@
     <div
       class="legend-elem"
       style="--color: {MULTI_COLORS[i].replace(/rgb\((.*)\)/, '$1')}"
+      class:selected={highlightRegion === r.id}
       on:mouseenter={() => highlight(r)}
       on:mouseleave={() => highlight(null)}>
+      <span class="legend-symbol">●</span>
       <div>
-        <span class="legend-symbol">●</span>
         <span>
-          {#if r.id !== region.id && r.id !== 'related'}
+          {#if r.id !== region.id && r.id !== neighboringInfo.id}
             <a href="?region={r.propertyId}" on:click|preventDefault={() => region.set(r, true)}> {r.displayName} </a>
           {:else}{r.displayName}{/if}
         </span>
