@@ -2,7 +2,7 @@
   import FancyHeader from './FancyHeader.svelte';
   import { sensorList } from '../../stores';
   import { isInverted } from '../../stores/params';
-  import { formatDateShortWeekdayAbbr } from '../../formats';
+  import { formatDateYearWeekdayAbbr } from '../../formats';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -80,7 +80,7 @@
       are
       <strong>not available</strong>
       for
-      {formatDateShortWeekdayAbbr(date.value)}.
+      {formatDateYearWeekdayAbbr(date.value)}.
     {/if}
   {/await}
 </p>

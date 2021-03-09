@@ -1,5 +1,5 @@
 <script>
-  import { formatDateShortWeekdayAbbr, formatDateYearWeekdayAbbr } from '../../formats';
+  import { formatDateWeekday, formatDateYearWeekdayAbbr } from '../../formats';
   import { WINDOW_SIZE } from '../../stores/params';
   import SensorValue from './SensorValue.svelte';
   import TrendText from './TrendText.svelte';
@@ -22,7 +22,7 @@
   {#await trend then d}
     {#if +date.value === +d.worstDate}
       On
-      {formatDateShortWeekdayAbbr(date.value, true)}
+      {formatDateWeekday(date.value, true)}
       <strong>{sensor.value.name}</strong>
       was the
       {WINDOW_SIZE}
@@ -35,7 +35,7 @@
       <strong>{formatDateYearWeekdayAbbr(d.bestDate, true)}</strong>.
     {:else}
       On
-      {formatDateShortWeekdayAbbr(date.value, true)}
+      {formatDateWeekday(date.value, true)}
       <strong>{sensor.value.name}</strong>
       was
       <strong>

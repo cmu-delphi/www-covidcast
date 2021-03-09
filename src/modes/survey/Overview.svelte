@@ -89,6 +89,8 @@
 {@html overviewText}
 
 <div class="summary-button-bar">
-  <div><a class="uk-button uk-button-default uk-button-delphi" href={surveyFullTextLink}>View full survey</a></div>
+  <div>
+    <a class="uk-button uk-button-default uk-button-delphi" href={surveyFullTextLink}>See original survey questions</a>
+  </div>
   <div><a class="uk-button uk-button-default uk-button-delphi" href={dataAccessLink}>Download aggregate data</a></div>
 </div>
