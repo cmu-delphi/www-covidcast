@@ -1,9 +1,20 @@
 /**
+ * @type {import('vega').Config}
+ */
+export const commonConfig = {
+  customFormatTypes: true,
+  font: '"Open Sans", Roboto, Arial, sans-serif',
+  view: {
+    stroke: null,
+  },
+};
+
+/**
  *
  * @param {string} credits
  * @returns
  */
-export function genCreditsLayer() {
+export function genCreditsLayer({ shift = 40 } = {}) {
   /**
    * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
    */
@@ -22,26 +33,27 @@ export function genCreditsLayer() {
           align: 'right',
           fill: 'white',
           x: {
-            expr: 'width-100',
+            expr: 'width',
           },
-          width: 100,
+          width: 200,
           y: {
-            expr: 'height-30',
+            expr: `height + ${shift} - 5`,
           },
-          height: 30,
+          height: 15,
         },
       },
       {
         mark: {
           type: 'text',
           align: 'right',
+          baseline: 'bottom',
           x: {
             expr: 'width',
           },
           y: {
-            expr: 'height',
+            expr: `height + ${shift}`,
           },
-          text: 'Data from Delphi COVIDcast, covidcast.cmu.edu',
+          text: 'Delphi Group, delphi.cmu.edu/covidcast',
         },
       },
     ],

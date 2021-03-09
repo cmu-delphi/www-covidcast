@@ -1,7 +1,7 @@
 import getRelatedCounties from '../maps/related';
 import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 import { MAP_THEME, MISSING_COLOR, ZERO_COLOR } from '../theme';
-import { genCreditsLayer } from './commonSpec';
+import { genCreditsLayer, commonConfig } from './commonSpec';
 
 const NAME_INFO_KEYS = ['propertyId', 'displayName', 'population', 'state', 'level'];
 const EPIDATA_ROW_KEYS = ['geo_value', 'value', 'date_value', 'time_value', 'stderr', 'sample_size'].concat(
@@ -281,7 +281,7 @@ function genBaseSpec(level, topoJSON, { height = 300 }) {
     height,
     padding: {
       left: 10,
-      bottom: 40,
+      bottom: 55,
       top: 10,
       right: 10,
     },
@@ -315,11 +315,7 @@ function genBaseSpec(level, topoJSON, { height = 300 }) {
       },
     ],
     layer: [],
-    config: {
-      view: {
-        stroke: null,
-      },
-    },
+    config: commonConfig,
   };
   return spec;
 }
@@ -368,7 +364,7 @@ export function generateStateSpec(options = {}) {
 
   // state, msa
   spec.layer.push(genLevelLayer(options));
-  spec.layer.push(genCreditsLayer());
+  spec.layer.push(genCreditsLayer({ shift: 55 }));
   spec.layer.push(genLevelHoverLayer());
   return spec;
 }
@@ -398,7 +394,7 @@ export function generateNationSpec(options = {}) {
   });
 
   spec.layer.push(genLevelLayer(options));
-  spec.layer.push(genCreditsLayer());
+  spec.layer.push(genCreditsLayer({ shift: 55 }));
   spec.layer.push(genLevelHoverLayer());
   return spec;
 }
@@ -417,7 +413,7 @@ export function generateStateMapWithCountyDataSpec(options = {}) {
   spec.datasets.state = stateJSON();
   spec.layer.push(genMegaLayer());
   spec.layer.push(genLevelLayer({ ...options, strokeWidth: 0 }));
-  spec.layer.push(genCreditsLayer());
+  spec.layer.push(genCreditsLayer({ shift: 55 }));
   spec.layer.push(genStateBorderLayer());
   spec.layer.push(genMegaHoverLayer(true));
   spec.layer.push(genLevelHoverLayer({ strokeWidth: 1 }));
@@ -462,7 +458,7 @@ export function generateCountiesOfStateSpec(state, { withStates = false, ...opti
     spec.layer[spec.layer.length - 1].transform.unshift(isState);
   }
   spec.layer.push(genLevelLayer(options));
-  spec.layer.push(genCreditsLayer());
+  spec.layer.push(genCreditsLayer({ shift: 55 }));
   if (withStates) {
     spec.layer.push(genStateBorderLayer());
   }
@@ -496,7 +492,7 @@ export function generateRelatedCountySpec(county, options = {}) {
   spec.layer.push(genMegaLayer());
   spec.layer.push(genLevelLayer(options));
   spec.layer.push(genStateBorderLayer({ strokeWidth: 2 }));
-  spec.layer.push(genCreditsLayer());
+  spec.layer.push(genCreditsLayer({ shift: 55 }));
   spec.layer.push(genMegaHoverLayer());
   spec.layer.push(genLevelHoverLayer());
   // highlight the selected one

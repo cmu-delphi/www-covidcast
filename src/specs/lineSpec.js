@@ -1,4 +1,5 @@
 import { CURRENT_DATE_HIGHLIGHT } from '../components/vegaSpecUtils';
+import { commonConfig, genCreditsLayer } from './commonSpec';
 
 // dark2
 // has to be the rgb notation to create a pure version out of it for CSS variables manipulation
@@ -68,7 +69,7 @@ export function generateLineChartSpec({
   const spec = {
     width,
     height,
-    padding: { left: 42, top: 20, bottom: 20, right: 15 },
+    padding: { left: 42, top: 20, bottom: 40, right: 15 },
     autosize: {
       type: 'none',
       contains: 'padding',
@@ -76,28 +77,6 @@ export function generateLineChartSpec({
     },
     data: {
       name: 'values',
-    },
-    encoding: {
-      x: {
-        field: 'date_value',
-        type: 'temporal',
-        axis: {
-          title: null,
-          format: '%m/%d',
-          formatType: 'cachedTime',
-          labelExpr: labelYear,
-          labelFontSize: 14,
-          labelOverlap: true,
-          grid: true,
-          gridDash: [4, 4],
-          tickCount: {
-            interval: 'week',
-          },
-        },
-        scale: {
-          domain,
-        },
-      },
     },
     layer: [
       {
@@ -107,6 +86,26 @@ export function generateLineChartSpec({
           point: false,
         },
         encoding: {
+          x: {
+            field: 'date_value',
+            type: 'temporal',
+            axis: {
+              title: null,
+              format: '%m/%d',
+              formatType: 'cachedTime',
+              labelExpr: labelYear,
+              labelFontSize: 14,
+              labelOverlap: true,
+              grid: true,
+              gridDash: [4, 4],
+              tickCount: {
+                interval: 'week',
+              },
+            },
+            scale: {
+              domain,
+            },
+          },
           y: {
             field: valueField,
             type: 'quantitative',
@@ -145,7 +144,7 @@ export function generateLineChartSpec({
                   x: initialDate,
                 }
               : undefined,
-            on: 'click, [mousedown, window:mouseup] > mousemove, [touchstart, touchend] > touchmove',
+            on: 'click, mousemove, [touchstart, touchend] > touchmove',
             nearest: true,
             clear: false,
             encodings: ['x'],
@@ -155,9 +154,13 @@ export function generateLineChartSpec({
           type: 'point',
           color,
           stroke: null,
-          tooltip: true,
+          tooltip: false,
         },
         encoding: {
+          x: {
+            field: 'date_value',
+            type: 'temporal',
+          },
           y: {
             field: valueField,
             type: 'quantitative',
@@ -171,6 +174,7 @@ export function generateLineChartSpec({
           },
         },
       },
+      genCreditsLayer(),
       {
         transform: [
           {
@@ -182,6 +186,12 @@ export function generateLineChartSpec({
             sample: 1,
           },
         ],
+        encoding: {
+          x: {
+            field: 'date_value',
+            type: 'temporal',
+          },
+        },
         layer: [
           {
             mark: {
@@ -215,12 +225,7 @@ export function generateLineChartSpec({
         ],
       },
     ],
-    config: {
-      customFormatTypes: true,
-      view: {
-        stroke: null,
-      },
-    },
+    config: commonConfig,
   };
   return spec;
 }
@@ -406,10 +411,7 @@ export function generateSparkLine({
         : []),
     ],
     config: {
-      customFormatTypes: true,
-      view: {
-        stroke: null,
-      },
+      ...commonConfig,
       legend: {
         disable: true,
       },
