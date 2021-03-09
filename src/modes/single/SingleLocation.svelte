@@ -6,11 +6,13 @@
     currentDateObject,
     currentRegionInfo,
     currentMultiSelection,
+    currentSensorEntry,
     removeCompare,
     selectByInfo,
   } from '../../stores';
   // import { get } from 'svelte/store';
   import { sensorList } from '../../stores/constants';
+  import SensorCard from './SensorCard.svelte';
   // import { groupedSensorList } from '../../stores/constants';
 
   import InfoDialogButton from '../../components/InfoDialogButton.svelte';
@@ -20,6 +22,7 @@
   import { selectionColors } from '../../theme';
   import { onHighlight, prepareSensorData } from '../overview/vegaSpec';
   import { highlightTimeValue, smallMultipleTimeSpan } from '../../stores';
+  // import { assembleParameterSignals } from 'vega-lite/build/src/parameter';
   // import { formatAPITime, parseAPITime } from '../../data';
 
   $: selectedLevels = new Set($currentMultiSelection.map((d) => d.info.level));
@@ -93,25 +96,25 @@
 
   $: showLagsForSensor = null;
 
-  function onShowLags(sensor) {
+  function onShowLagDetails(sensor) {
     showLagsForSensor = null;
     // Need a timeout in order to update the lags list.
     // TODO: figure out how to avoid this timeout.
     setTimeout(() => {
-      showLagsForSensor = sensor;
-      showLagDetailsForSensor = null;
-      console.info('onShowLags', sensor);
+      // showLagsForSensor = sensor;
+      showLagDetailsForSensor = sensor;
+      console.info('onShowLagDetails', sensor);
     }, 500);
   }
 
   $: showLagDetailsForSensor = null;
   $: sensorDetailsLag = 0;
 
-  function onShowLagDetails(sensor, lag) {
-    showLagDetailsForSensor = sensor;
-    sensorDetailsLag = lag;
-    console.info('onShowLagDetails', sensor, lag);
-  }
+  // function onShowLagDetails(sensor, lag) {
+  //   showLagDetailsForSensor = sensor;
+  //   sensorDetailsLag = lag;
+  //   console.info('onShowLagDetails', sensor, lag);
+  // }
 </script>
 
 <style>
@@ -197,7 +200,7 @@
     <div class="card-grid">
       <table style="width: 100%">
         <tr>
-          <td style="width:40%; vertical-align: top">
+          <td style="width:40%; vertical-align: top" rowspan="3">
             <table>
               {#each otherSensors as sensor (sensor.key)}
                 <tr>
@@ -216,7 +219,7 @@
                     <IndicatorCompare
                       {sensorMatrixData}
                       {sensor}
-                      on:click={onShowLags(sensor)}
+                      on:click={onShowLagDetails(sensor, 0)}
                       date={$currentDateObject}
                       selections={$currentMultiSelection}
                       {onHighlight}
@@ -226,7 +229,7 @@
               {/each}
             </table>
           </td>
-          <td style="width:100px; vertical-align: top">
+          <!-- <td style="width:100px; vertical-align: top">
             {#if showLagsForSensor}
               <h4>Lags with {showLagsForSensor.name}</h4>
               <table style="width:100%">
@@ -242,26 +245,46 @@
                         selections={$currentMultiSelection}
                         {onHighlight}
                         highlightTimeValue={$highlightTimeValue} />
-                      <!-- spec={makeSplomSpec(updateMatrixSpec(vegaRepeatSpec, lag, 50, 50))}  -->
                     </td>
                   </tr>
                 {/each}
               </table>
             {/if}
-          </td>
+          </td> -->
           <td style="width: 400px; height: 400px; vertical-align: top">
             {#if showLagDetailsForSensor}
+              Lag:
+              <input
+                type="range"
+                min="-28"
+                max="28"
+                step="1"
+                value="0"
+                on:change={(e) => {
+                  console.info('change lag', e);
+                  sensorDetailsLag = e.target.value;
+                }} />
               <IndicatorCompare
                 {sensorMatrixData}
                 sensor={showLagDetailsForSensor}
                 lag={sensorDetailsLag}
                 options={{ width: 400, height: 400 }}
-                on:click={onShowLagDetails(showLagsForSensor, sensorDetailsLag)}
                 date={$currentDateObject}
                 selections={$currentMultiSelection}
                 {onHighlight}
                 highlightTimeValue={$highlightTimeValue} />
-              <!-- spec={makeSplomSpec(updateMatrixSpec(vegaRepeatSpec, showLag, 200, 200))} -->
+              <SensorCard
+                sensor={$currentSensorEntry}
+                date={$currentDateObject}
+                selections={$currentMultiSelection}
+                {onHighlight}
+                highlightTimeValue={$highlightTimeValue} />
+              <SensorCard
+                sensor={showLagDetailsForSensor}
+                date={$currentDateObject}
+                selections={$currentMultiSelection}
+                {onHighlight}
+                highlightTimeValue={$highlightTimeValue} />
             {/if}
           </td>
         </tr>

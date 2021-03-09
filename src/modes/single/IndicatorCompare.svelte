@@ -377,6 +377,6 @@
   }
 </style>
 
-<div class="root" on:click style="height:100%;">
+<div class="root" on:click>
   <Vega data={Promise.resolve(sensorMatrixData)} spec={splomSpec} />
 </div>
