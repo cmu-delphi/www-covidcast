@@ -58,6 +58,10 @@ export function generateLineChartSpec({
   zero = false,
   highlightRegion = false,
 } = {}) {
+  // logic to automatically add the year for week 1 and first date
+  const labelYear = `datum.label + (week(datum.value) === 1 ${
+    domain ? `|| abs(week(datum.value) - week(toDate(${domain[0]}))) <= 1` : ''
+  } ? '/' + year(datum.value) : '')`;
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
@@ -81,6 +85,7 @@ export function generateLineChartSpec({
           title: null,
           format: '%m/%d',
           formatType: 'cachedTime',
+          labelExpr: labelYear,
           labelFontSize: 14,
           labelOverlap: true,
           grid: true,
