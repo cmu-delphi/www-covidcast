@@ -117,6 +117,8 @@ export function generateLineChartSpec({
     title: {
       text: title,
       subtitle: subTitle,
+      align: 'left',
+      anchor: 'start',
     },
     data: {
       name: 'values',

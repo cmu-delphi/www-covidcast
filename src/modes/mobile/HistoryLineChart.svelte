@@ -18,6 +18,7 @@
   import { combineSignals } from '../../data/utils';
   import DownloadMenu from './components/DownloadMenu.svelte';
   import { formatDateISO } from '../../formats';
+  import { isMobileDevice } from '../../stores';
 
   export let height = 250;
 
@@ -58,7 +59,7 @@
    * @param {import('../../stores/params').RegionParam} region
    * @param {import('../../stores/params').DateParam} date
    */
-  function genSpec(sensor, region, date, height, zero, singleRaw) {
+  function genSpec(sensor, region, date, height, zero, singleRaw, isMobile) {
     const options = {
       initialDate: highlightDate || date.value,
       height,
@@ -71,6 +72,9 @@
       highlightRegion: true,
       isPercentage: sensor.isPercentage,
     };
+    if (!isMobile || options.title.reduce((acc, v) => acc + v.length, 0) < 35) {
+      options.title = options.title.join(' '); // single title line
+    }
     if (singleRaw) {
       return generateLineAndBarSpec(options);
     }
@@ -175,7 +179,7 @@
   let singleRaw = false;
 
   $: raw = singleRaw && sensor.rawValue != null;
-  $: spec = genSpec(sensor, region, date, height, !zoom, raw);
+  $: spec = genSpec(sensor, region, date, height, !zoom, raw, $isMobileDevice);
   $: data = raw ? loadSingleData(sensor, region, date) : loadData(sensor, region, date);
   $: regions = raw ? [region.value] : resolveRegions(region.value);
   $: fileName = generateFileName(sensor, regions, date, raw);
