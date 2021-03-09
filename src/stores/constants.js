@@ -257,11 +257,12 @@ export const yesterday = Number.parseInt(formatAPITime(yesterdayDate), 10);
 
 export const DEFAULT_MODE = modeByID.landing;
 export const DEFAULT_SENSOR = (sensorList.find((d) => d.default) || sensorList[0]).key;
+
 /**
  * default sensor in case the initial mode is survey-results
  */
-export const DEFAULT_SURVEY_SENSOR = sensorList.find((d) => d.id === 'fb-survey')
-  ? sensorList.find((d) => d.id === 'fb-survey').key
-  : DEFAULT_SENSOR;
+export const DEFAULT_SURVEY_SENSOR = (
+  sensorList.find((d) => d.id === 'fb-survey' && d.signal.includes('cli')) || { key: DEFAULT_SENSOR }
+).key;
 export const DEFAULT_LEVEL = 'county';
 export const DEFAULT_ENCODING = 'color';
