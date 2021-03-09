@@ -1,5 +1,5 @@
-import { times, currentDate, stats, currentSensor, currentLevel, MAGIC_START_DATE } from '../stores';
-import { sensorList, sensorMap, levels, yesterday, regularSignalMetaDataGeoTypeCandidates } from '../stores/constants';
+import { times, currentDate, stats, currentSensor, MAGIC_START_DATE } from '../stores';
+import { sensorList, levels, yesterday, regularSignalMetaDataGeoTypeCandidates } from '../stores/constants';
 import { get } from 'svelte/store';
 import { callMetaAPI } from './api';
 
@@ -29,13 +29,7 @@ function processMetaData(meta) {
   times.set(timeMap);
 
   // validate level and date data
-
-  let l = get(currentLevel);
   const sensor = get(currentSensor);
-  if (!sensorMap.get(sensor).levels.includes(l)) {
-    l = sensorMap.get(sensor).levels[0];
-    currentLevel.set(l);
-  }
 
   let date = get(currentDate);
   // Magic number of default date - if no URL params, use max date
@@ -46,7 +40,6 @@ function processMetaData(meta) {
   }
 
   return {
-    level: l,
     date,
   };
 }
@@ -150,31 +143,6 @@ function loadCountSignal(sEntry, meta, timeMap, statsMap) {
         std: sEntry.state_std,
       });
     }
-  });
-
-  if (!sEntry.isCasesOrDeath) {
-    return;
-  }
-
-  Object.keys(sEntry.casesOrDeathSignals).map((key) => {
-    const signal = sEntry.casesOrDeathSignals[key];
-
-    const matchedMeta = possibleMetaRows.find((d) => d.signal === signal);
-    const statsKey = `${sEntry.key}_${key}`;
-    if (matchedMeta) {
-      updateTimeMap(sEntry.key, matchedMeta, timeMap);
-      updateStatsMap(statsKey, matchedMeta, statsMap);
-    }
-
-    // compute stats for each sub signal also
-    sEntry.levels.forEach((region) => {
-      const statsKey = toStatsRegionKey(sEntry.key, region) + `_${key}`;
-      const matchedMeta = possibleMetaRows.find((d) => d.signal === signal && d.geo_type === region);
-
-      if (matchedMeta) {
-        updateStatsMap(statsKey, matchedMeta, statsMap);
-      }
-    });
   });
 }
 

@@ -183,17 +183,6 @@ export class DataFetcher {
     if (this.cache.has(key)) {
       return this.cache.get(key);
     }
-    // if (
-    //   timeFrame.range !== ALL_TIME_FRAME.range &&
-    //   region.id === this.primaryRegionId &&
-    //   sensor.key === this.primarySensorKey
-    // ) {
-    //   // fetch all history for the primary one
-    //   const rows = this.fetch1Sensor1RegionNDates(sensor, region, ALL_TIME_FRAME);
-    //   const r = rows.then((rows) => rows.filter(timeFrame.filter));
-    //   this.cache.set(key, r);
-    //   return r;
-    // }
     const r = fetchData(
       sensor,
       region.level,
@@ -547,44 +536,6 @@ export class DataFetcher {
     // use cached version
     return sensors.map((sensor) => this.fetch1Sensor1Region1DateDetails(sensor, region, date));
   }
-
-  // /**
-  //  * @param {Sensor|SensorParam} sensor
-  //  * @param {Region|RegionParam} region
-  //  * @param {Date | DateParam} date
-  //  * @return {Promise<Trend>}
-  //  */
-  // fetchGlobalTrend(sensor, region, date) {
-  //   sensor = sensor instanceof SensorParam ? sensor.value : sensor;
-  //   region = region instanceof RegionParam ? region.value : region;
-  //   date = date instanceof DateParam ? date.value : date;
-  //   const key = this.toWindowKey(sensor, region, ALL_TIME_FRAME, `${date.timeValue}:trend`);
-  //   if (this.cache.has(key)) {
-  //     return this.cache.get(key);
-  //   }
-  //   const trend = this.fetch1Sensor1RegionNDates(sensor, region, ALL_TIME_FRAME).then((rows) =>
-  //     determineTrend(date, rows, isInverted(sensor)),
-  //   );
-  //   this.cache.set(key, trend);
-  //   return trend;
-  // }
-
-  // /**
-  //  * @param {Sensor|SensorParam} sensor
-  //  * @param {Region|RegionParam} region
-  //  * @return {Promise<Trend>}
-  //  */
-  // fetchGlobalMinMax(sensor, region) {
-  //   sensor = sensor instanceof SensorParam ? sensor.value : sensor;
-  //   region = region instanceof RegionParam ? region.value : region;
-  //   const key = this.toWindowKey(sensor, region, ALL_TIME_FRAME, 'minmax');
-  //   if (this.cache.has(key)) {
-  //     return this.cache.get(key);
-  //   }
-  //   const trend = this.fetch1Sensor1RegionNDates(sensor, region, ALL_TIME_FRAME).then((rows) => findMinMaxRow(rows));
-  //   this.cache.set(key, trend);
-  //   return trend;
-  // }
 }
 
 export class DateParam {

@@ -1,50 +1,5 @@
 <script>
-  const experiments = [
-    {
-      name: 'LineAndMap',
-      component: () => import('./LineAndMap.svelte').then((r) => r.default),
-    },
-    {
-      name: 'State Map',
-      component: () => import('./StateMap.svelte').then((r) => r.default),
-    },
-    {
-      name: 'VegaMap',
-      component: () => import('./VegaMap.svelte').then((r) => r.default),
-    },
-    {
-      name: 'County Related',
-      component: () => import('./CountyRelated.svelte').then((r) => r.default),
-    },
-    {
-      name: 'State Distribution',
-      component: () => import('./StateDistribution.svelte').then((r) => r.default),
-    },
-    {
-      name: 'LineAndTileMap',
-      component: () => import('./LineAndTileMap.svelte').then((r) => r.default),
-    },
-    {
-      name: 'LineAndGapMinder',
-      component: () => import('./LineAndGapMinder.svelte').then((r) => r.default),
-    },
-    {
-      name: 'LineAndThermalPlot',
-      component: () => import('./LineAndThermalPlot.svelte').then((r) => r.default),
-    },
-    {
-      name: 'StateMatrix',
-      component: () => import('./StateMatrix.svelte').then((r) => r.default),
-    },
-    {
-      name: 'StateHTMLMatrix',
-      component: () => import('./StateHTMLMatrix.svelte').then((r) => r.default),
-    },
-    {
-      name: 'Parallel Coodinates Plot',
-      component: () => import('./PCP.svelte').then((r) => r.default),
-    },
-  ];
+  const experiments = [];
 
   let selected = Number.parseInt(new URL(window.location.href).searchParams.get('lab') || '0', 10);
   $: currentComponent = experiments[selected].component();

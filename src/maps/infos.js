@@ -2,7 +2,6 @@ import { dsvFormat } from 'd3-dsv';
 import stateRaw from './processed/state.csv.js';
 import msaRaw from './processed/msa.csv.js';
 import countyRaw from './processed/county.csv.js';
-import hrrRaw from './processed/hrr.csv.js';
 
 export const levelMegaCountyId = 'mega-county';
 /**
@@ -80,8 +79,6 @@ export const countyInfo = parseCSV(
     county.region = state.region;
   },
 );
-export const hrrInfo = parseCSV(hrrRaw, 'hrr', (hrr) => `${hrr.state} - ${hrr.name} (HRR)`);
-
 // generate mega counties by copying the states
 /**
  * @type {NameInfo[]}
@@ -108,11 +105,10 @@ export const infosByLevel = {
   state: stateInfo.sort(sortByDisplayName),
   msa: msaInfo.sort(sortByDisplayName),
   county: countyInfo.sort(sortByDisplayName),
-  hrr: hrrInfo.sort(sortByDisplayName),
   [levelMegaCountyId]: megaCountyInfo.sort(sortByDisplayName),
 };
 
-export const nameInfos = stateInfo.concat(msaInfo, countyInfo, hrrInfo, megaCountyInfo).sort(sortByDisplayName);
+export const nameInfos = stateInfo.concat(msaInfo, countyInfo, megaCountyInfo).sort(sortByDisplayName);
 
 /**
  * helper to resolve a given id to a name info object

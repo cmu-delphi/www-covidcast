@@ -1,7 +1,6 @@
 import { callAPIEndPoint } from './api';
 import { timeDay } from 'd3-time';
-import { parseAPITime, formatAPITime, combineSignals } from './utils';
-import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
+import { parseAPITime, formatAPITime } from './utils';
 import { getInfoByName } from '../maps';
 
 /**
@@ -69,55 +68,6 @@ function parseData(d, mixinData = {}, factor = 1) {
   return data;
 }
 
-function deriveCombineKey(mixinData = {}) {
-  let combineKey = (d) => `${d.geo_value}@${d.time_value}`;
-  // part of key
-  if (mixinData.time_value != null) {
-    combineKey = (d) => `${d.geo_value}`;
-  } else if (mixinData.geo_value == null) {
-    combineKey = (d) => `${d.time_value}`;
-  }
-  return combineKey;
-}
-
-function parseMultipleTreeData(d, signals, defaultSignalIndex, mixinData = {}, factor = 1) {
-  if (d.result < 0 || d.message.includes('no results')) {
-    return [];
-  }
-  const tree = d.epidata || [];
-  if (tree.length === 0 || (Array.isArray(tree[0]) && tree[0].length === 0)) {
-    return parseData({ ...d, epidata: [] }, mixinData, factor);
-  }
-  const split = signals.map((k) => tree[0][k]);
-  const ref = split[defaultSignalIndex];
-  const combined = combineSignals(split, ref, EPIDATA_CASES_OR_DEATH_VALUES, deriveCombineKey(mixinData), factor);
-  return parseData(
-    {
-      ...d,
-      epidata: combined,
-    },
-    mixinData,
-    factor,
-  );
-}
-
-function parseMultipleSeparateData(dataArr, defaultSignalIndex, mixinData = {}, factor = 1) {
-  if (dataArr.length === 0 || dataArr[0].result < 0 || dataArr[0].message.includes('no results')) {
-    return [];
-  }
-  const data = dataArr.map((d) => d.epidata || []);
-  const ref = data[defaultSignalIndex];
-  const combined = combineSignals(data, ref, EPIDATA_CASES_OR_DEATH_VALUES, deriveCombineKey(mixinData), factor);
-  return parseData(
-    {
-      ...dataArr[0],
-      epidata: combined,
-    },
-    mixinData,
-    factor,
-  );
-}
-
 /**
  * @param {SensorEntry} sensorEntry
  * @param {string} level
@@ -133,72 +83,22 @@ export function fetchData(
   region,
   date,
   mixinValues = {},
-  { advanced = false, multiValues = true, transferSignal = false, factor = 1 } = {},
+  { advanced = false, transferSignal = false, factor = 1 } = {},
 ) {
   if (!region) {
     return Promise.resolve([]);
   }
   const transferFields = computeTransferFields(mixinValues, advanced, transferSignal);
-  function fetchSeparate(defaultSignalIndex) {
-    const extraDataFields = ['value'];
-    // part of key
-    if (mixinValues.time_value == null) {
-      extraDataFields.push(['time_value']);
-    }
-    if (mixinValues.geo_value == null) {
-      extraDataFields.push(['geo_value']);
-    }
-    return Promise.all(
-      EPIDATA_CASES_OR_DEATH_VALUES.map((k, i) =>
-        callAPIEndPoint(
-          sensorEntry.api,
-          sensorEntry.id,
-          sensorEntry.casesOrDeathSignals[k],
-          level,
-          date,
-          region,
-          i === 0 ? transferFields : extraDataFields,
-        ),
-      ),
-    ).then((d) => parseMultipleSeparateData(d, defaultSignalIndex, mixinValues, factor));
-  }
 
-  if (sensorEntry.isCasesOrDeath && multiValues) {
-    const signals = EPIDATA_CASES_OR_DEATH_VALUES.map((k) => sensorEntry.casesOrDeathSignals[k]);
-    const defaultSignal = sensorEntry.signal;
-    const defaultSignalIndex = signals.indexOf(defaultSignal);
-
-    if (level === 'county' && region === '*') {
-      // around 2k each
-      return fetchSeparate(defaultSignalIndex);
-    }
-    return callAPIEndPoint(
-      sensorEntry.api,
-      sensorEntry.id,
-      signals.join(','),
-      level,
-      date,
-      region,
-      [...transferFields, 'signal'],
-      'tree',
-    ).then((d) => {
-      if (d.result === 2) {
-        // need to fetch separately, since too many results
-        return fetchSeparate(defaultSignalIndex);
-      }
-      return parseMultipleTreeData(d, signals, defaultSignalIndex, mixinValues, factor);
-    });
-  } else {
-    return callAPIEndPoint(
-      sensorEntry.api,
-      sensorEntry.id,
-      sensorEntry.signal,
-      level,
-      date,
-      region,
-      transferFields,
-    ).then((rows) => parseData(rows, mixinValues, factor));
-  }
+  return callAPIEndPoint(
+    sensorEntry.api,
+    sensorEntry.id,
+    sensorEntry.signal,
+    level,
+    date,
+    region,
+    transferFields,
+  ).then((rows) => parseData(rows, mixinValues, factor));
 }
 
 export async function fetchSampleSizesNationSummary(sensorEntry) {
@@ -227,26 +127,10 @@ export async function fetchSampleSizesNationSummary(sensorEntry) {
 
 /**
  *
- * @param {SensorEntry} sensorEntry
- * @param {string} level
- * @param {string | Date} date
- * @param {Partial<EpiDataRow>} mixinValues
- * @returns {Promise<EpiDataRow[]>}
- */
-export function fetchRegionSlice(sensorEntry, level, date, mixinValues = {}) {
-  return fetchData(sensorEntry, level, '*', date, {
-    ...(date instanceof Date ? { time_value: formatAPITime(date) } : {}),
-    ...mixinValues,
-  });
-}
-
-/**
- *
  * @param {EpiDataRow} row
  * @param {Date} date
- * @param {SensorEntry} sensorEntry
  */
-function createCopy(row, date, sensorEntry) {
+function createCopy(row, date) {
   const copy = Object.assign({}, row, {
     date_value: date,
     time_value: Number.parseInt(formatAPITime(date), 10),
@@ -254,43 +138,7 @@ function createCopy(row, date, sensorEntry) {
     stderr: null,
     sample_size: null,
   });
-  if ((sensorEntry != null && sensorEntry.isCasesOrDeath) || row[EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined) {
-    EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
-      copy[key] = null;
-    });
-  }
   return copy;
-}
-
-/**
- * @param {SensorEntry} sensorEntry
- * @param {string} level
- * @param {string | undefined} region
- * @param {Date} startDate
- * @param {Date} endDate
- * @param {boolean} fitDateRange
- * @param {Partial<EpiDataRow>} mixinValues
- * @returns {Promise<EpiDataRow[]>}
- */
-export function fetchTimeSlice(
-  sensorEntry,
-  level,
-  region,
-  startDate = START_TIME_RANGE,
-  endDate = END_TIME_RANGE,
-  fitDateRange = false,
-  mixinValues = {},
-  options = {},
-) {
-  if (!region) {
-    return Promise.resolve([]);
-  }
-  const timeRange = `${formatAPITime(startDate)}-${formatAPITime(endDate)}`;
-  const data = fetchData(sensorEntry, level, region, timeRange, mixinValues, options);
-  if (!fitDateRange) {
-    return data;
-  }
-  return data.then((r) => fitRange(r, sensorEntry, startDate, endDate));
 }
 
 /**
@@ -307,11 +155,11 @@ export function fitRange(rows, sensor, startDate, endDate) {
   }
   if (rows[0].date_value != null && rows[0].date_value > startDate) {
     // inject a min
-    rows.unshift(createCopy(rows[0], startDate, sensor));
+    rows.unshift(createCopy(rows[0], startDate));
   }
   if (rows[rows.length - 1].date_value != null && rows[rows.length - 1].date_value < endDate) {
     // inject a max
-    rows.push(createCopy(rows[rows.length - 1], endDate, sensor));
+    rows.push(createCopy(rows[rows.length - 1], endDate));
   }
   return rows;
 }
@@ -319,10 +167,9 @@ export function fitRange(rows, sensor, startDate, endDate) {
 /**
  * add missing rows per date within this given date rows
  * @param {EpiDataRow[]} rows
- * @param {SensorEntry} sensor
  * @returns {EpiDataRow[]}
  */
-export function addMissing(rows, sensor) {
+export function addMissing(rows) {
   if (rows.length < 2) {
     return rows;
   }
@@ -340,7 +187,7 @@ export function addMissing(rows, sensor) {
       return base.shift();
     }
     // create an entry
-    return createCopy(template, date, sensor);
+    return createCopy(template, date);
   });
   return imputedRows;
 }
@@ -393,11 +240,6 @@ export function averageByDate(rows, sensor, mixin = {}) {
         stderr: avg(rows, 'stderr'),
         sample_size: avg(rows, 'sample_size'),
       };
-      if ((sensor != null && sensor.isCasesOrDeath) || rows[0][EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined) {
-        EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
-          r[key] = avg(rows, key);
-        });
-      }
       return r;
     })
     .sort((a, b) => a.time_value - b.time_value);

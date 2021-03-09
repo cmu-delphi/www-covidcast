@@ -175,30 +175,6 @@ module.exports = () => {
       }),
       new HtmlWebpackPlugin({
         alwaysWriteToDisk: true,
-        title: 'COVIDcast',
-        template: './src/index.html',
-        filename: 'old/index.html',
-      }),
-      // new HtmlWebpackPlugin({
-      //   alwaysWriteToDisk: true,
-      //   title: 'COVIDcast Timelapse',
-      //   template: './src/index.html',
-      //   filename: 'timelapse/index.html',
-      // }),
-      // new HtmlWebpackPlugin({
-      //   alwaysWriteToDisk: true,
-      //   title: 'COVIDcast Top 10',
-      //   template: './src/index.html',
-      //   filename: 'top10/index.html',
-      // }),
-      // new HtmlWebpackPlugin({
-      //   alwaysWriteToDisk: true,
-      //   title: 'COVIDcast Region Details',
-      //   template: './src/index.html',
-      //   filename: 'single/index.html',
-      // }),
-      new HtmlWebpackPlugin({
-        alwaysWriteToDisk: true,
         title: 'COVIDcast Export Data',
         template: './src/index.html',
         filename: 'export/index.html',

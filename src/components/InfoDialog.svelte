@@ -2,13 +2,7 @@
   /*global UIkit*/
   import { onMount } from 'svelte';
   import { modeByID } from '../modes';
-  import {
-    signalCasesOrDeathOptions,
-    currentInfoSensor,
-    currentMode,
-    currentSensorEntry,
-    currentSensor,
-  } from '../stores';
+  import { currentInfoSensor, currentMode, currentSensorEntry, currentSensor } from '../stores';
 
   function exportData(e) {
     e.preventDefault();
@@ -39,7 +33,7 @@
     <div class="uk-modal-header">
       <h2 class="uk-modal-title">
         {#if $currentInfoSensor}
-          {typeof $currentInfoSensor.mapTitleText === 'function' ? $currentInfoSensor.mapTitleText($signalCasesOrDeathOptions) : $currentInfoSensor.mapTitleText}
+          {typeof $currentInfoSensor.mapTitleText === 'function' ? $currentInfoSensor.mapTitleText({}) : $currentInfoSensor.mapTitleText}
         {:else}No Sensor selected{/if}
       </h2>
     </div>

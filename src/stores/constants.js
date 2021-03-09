@@ -263,5 +263,3 @@ export const DEFAULT_SENSOR = (sensorList.find((d) => d.default) || sensorList[0
 export const DEFAULT_SURVEY_SENSOR = sensorList.find((d) => d.id === 'fb-survey')
   ? sensorList.find((d) => d.id === 'fb-survey').key
   : DEFAULT_SENSOR;
-export const DEFAULT_LEVEL = 'county';
-export const DEFAULT_ENCODING = 'color';

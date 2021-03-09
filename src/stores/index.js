@@ -1,15 +1,10 @@
 import { writable, derived, get, readable } from 'svelte/store';
-import { LogScale, SqrtScale } from './scales';
-import { scaleSequentialLog } from 'd3-scale';
 import {
   sensorMap,
   yesterdayDate,
-  levels,
-  DEFAULT_LEVEL,
   DEFAULT_MODE,
   DEFAULT_SENSOR,
   DEFAULT_SURVEY_SENSOR,
-  DEFAULT_ENCODING,
   defaultRegionOnStartup,
 } from './constants';
 import modes, { modeByID } from '../modes';
@@ -27,7 +22,6 @@ export {
   groupedSensorList,
 } from './constants';
 import { timeMonth } from 'd3-time';
-import { MAP_THEME, selectionColors } from '../theme';
 
 /**
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
@@ -47,11 +41,7 @@ function deriveFromPath(url) {
   const urlParams = new URLSearchParams(queryString);
 
   const sensor = urlParams.get('sensor');
-  const level = urlParams.get('level');
-  const encoding = urlParams.get('encoding');
   const date = urlParams.get('date');
-
-  const compareIds = (urlParams.get('compare') || '').split(',').map(getInfoByName).filter(Boolean);
 
   const modeFromPath = () => {
     const pathName = url.pathname;
@@ -69,18 +59,8 @@ function deriveFromPath(url) {
         : modeObj === modeByID['survey-results']
         ? DEFAULT_SURVEY_SENSOR
         : DEFAULT_SENSOR,
-    level: levels.includes(level) ? level : DEFAULT_LEVEL,
-    signalCasesOrDeathOptions: {
-      cumulative: urlParams.has('signalC'),
-      incidence: urlParams.has('signalI'),
-    },
-    encoding: encoding === 'color' || encoding === 'bubble' || encoding === 'spike' ? encoding : DEFAULT_ENCODING,
     date: /\d{8}/.test(date) ? date : MAGIC_START_DATE,
     region: urlParams.get('region') || '',
-    compare:
-      compareIds.length > 0
-        ? compareIds.map((info, i) => ({ info, displayName: info.displayName, color: selectionColors[i] || 'grey' }))
-        : null,
   };
 }
 /**
@@ -101,24 +81,6 @@ export const currentSensorEntry = derived([currentSensor], ([$currentSensor]) =>
  */
 export const currentInfoSensor = writable(null);
 
-// 'county', 'state', or 'msa'
-export const currentLevel = writable(defaultValues.level);
-
-// in case of a death signal whether to show cumulative data
-/**
- * @type {import('svelte/store').Writable<import('./constants').CasesOrDeathOptions>}
- */
-export const signalCasesOrDeathOptions = writable(defaultValues.signalCasesOrDeathOptions);
-
-export const currentSensorMapTitle = derived([currentSensorEntry, signalCasesOrDeathOptions], ([sensor, options]) =>
-  typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText(options) : sensor.mapTitleText,
-);
-
-/**
- * @type {import('svelte/store').Writable<'color' | 'spike' | 'bubble'>}
- */
-export const encoding = writable(defaultValues.encoding);
-
 export const currentDate = writable(defaultValues.date);
 /**
  * current date as a Date object
@@ -136,11 +98,6 @@ export const smallMultipleTimeSpan = derived([currentDateObject], ([date]) => {
   const min = timeMonth.offset(max, -4);
   return [min, max];
 });
-
-/**
- * For mouseover highlighting across small multiple charts.
- */
-export let highlightTimeValue = writable(null);
 
 // Region GEO_ID for filtering the line chart
 // 42003 - Allegheny; 38300 - Pittsburgh; PA - Pennsylvania.
@@ -211,36 +168,12 @@ export function selectByInfo(elem, reset = false) {
   return true;
 }
 
-export function selectByFeature(feature, reset = false) {
-  return selectByInfo(feature ? getInfoByName(feature.properties.id) : null, reset);
-}
-
-export const colorScale = writable(scaleSequentialLog());
-export const colorStops = writable([]);
-export const bubbleRadiusScale = writable(LogScale());
-export const spikeHeightScale = writable(SqrtScale());
-
 // validate if sensor and other parameter matches
 currentSensorEntry.subscribe((sensorEntry) => {
-  // check level
-  const level = get(currentLevel);
-
-  if (!sensorEntry.levels.includes(level)) {
-    currentLevel.set(sensorEntry.levels[0]);
-  }
-
   if (get(currentInfoSensor)) {
     // show help, update it
     currentInfoSensor.set(sensorEntry);
   }
-
-  if (!sensorEntry.isCasesOrDeath) {
-    signalCasesOrDeathOptions.set({
-      cumulative: false,
-      incidence: false,
-    });
-  }
-
   // clamp to time span
   const timesMap = get(times);
   if (timesMap != null) {
@@ -285,14 +218,6 @@ export const isMobileDevice = readable(isMobileQuery.matches, (set) => {
   }
 });
 
-// export const isPortraitDevice = readable(false, (set) => {
-//   const isPortraitQuery = window.matchMedia('only screen and (orientation: portrait)');
-//   set(isPortraitQuery.matches);
-//   isPortraitQuery.addListener((r) => {
-//     set(r.matches);
-//   });
-// });
-
 // overview compare mode
 
 /**
@@ -302,105 +227,14 @@ export const isMobileDevice = readable(isMobileQuery.matches, (set) => {
  * @property {string} displayName;
  */
 
-/**
- * null = disable
- * @type {import('svelte/store').Writable<CompareSelection[] | null>}
- * */
-export const currentCompareSelection = writable(defaultValues.compare);
-
-/**
- * add an element to the compare selection
- * @param {import('../maps').NameInfo} info
- */
-export function addCompare(info) {
-  if (!get(currentRegionInfo)) {
-    selectByInfo(info);
-    return;
-  }
-
-  const current = get(currentCompareSelection) || [];
-  currentCompareSelection.set([
-    ...current,
-    {
-      info,
-      displayName: info.displayName,
-      color: selectionColors[current.length] || 'grey',
-    },
-  ]);
-}
-
-/**
- * removes an element from the compare selection
- * @param {import('../maps').NameInfo} info
- */
-export function removeCompare(info) {
-  const selection = get(currentRegionInfo);
-  const bak = (get(currentCompareSelection) || []).slice();
-  if (selection && info.id === selection.id) {
-    selectByInfo(bak.length === 0 ? null : bak[0].info);
-    currentCompareSelection.set(bak.slice(1).map((old, i) => ({ ...old, color: selectionColors[i] || 'grey' })));
-    return;
-  }
-  currentCompareSelection.set(
-    bak.filter((d) => d.info !== info).map((old, i) => ({ ...old, color: selectionColors[i] || 'grey' })),
-  );
-}
-
-/**
- * @type {import('svelte/store').Readable<CompareSelection[]>}
- */
-export const currentMultiSelection = derived(
-  [currentRegionInfo, currentCompareSelection],
-  ([selection, compareSelection]) =>
-    [
-      selection && { info: selection, color: MAP_THEME.selectedRegionOutline, displayName: selection.displayName },
-      compareSelection || [],
-    ]
-      .filter(Boolean)
-      .flat(),
-);
-
 export const trackedUrlParams = derived(
-  [
-    currentMode,
-    currentSensor,
-    currentLevel,
-    currentRegion,
-    currentDate,
-    signalCasesOrDeathOptions,
-    encoding,
-    currentCompareSelection,
-  ],
-  ([mode, sensor, level, region, date, signalOptions, encoding, compare]) => {
-    const sensorEntry = sensorMap.get(sensor);
-    const inMapMode = mode === modeByID.old || mode === modeByID.timelapse;
-
+  [currentMode, currentSensor, currentRegion, currentDate],
+  ([mode, sensor, region, date]) => {
     // determine parameters based on default value and current mode
     const params = {
-      sensor:
-        mode === modeByID.landing ||
-        mode === modeByID.overview ||
-        mode === modeByID.single ||
-        mode === modeByID['survey-results'] ||
-        sensor === DEFAULT_SENSOR
-          ? null
-          : sensor,
-      level:
-        mode === modeByID.single ||
-        mode === modeByID.export ||
-        mode === modeByID['survey-results'] ||
-        level === DEFAULT_LEVEL
-          ? null
-          : level,
-      region: mode === modeByID.export || mode === modeByID.timelapse || !region ? null : region,
+      sensor: mode === modeByID.landing || sensor === DEFAULT_SENSOR ? null : sensor,
+      region: mode === modeByID.export ? null : region,
       date: mode === modeByID.export || mode === modeByID.landing ? null : date,
-      signalC: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.cumulative,
-      signalI: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.incidence,
-      encoding: !inMapMode || encoding === DEFAULT_ENCODING ? null : encoding,
-      compare:
-        (mode !== modeByID.old && mode !== modeByID.single) || !compare
-          ? null
-          : compare.map((d) => d.info.propertyId).join(','),
     };
     return {
       path: mode === DEFAULT_MODE ? `` : `${mode.id}/`,
@@ -420,28 +254,10 @@ export function loadFromUrlState(state) {
   if (state.sensor != null && state.sensor !== get(currentSensor)) {
     currentSensor.set(state.sensor);
   }
-  if (state.level != null && state.level !== get(currentLevel)) {
-    currentLevel.set(state.level);
-  }
   if (state.region != null && state.region !== get(currentRegion)) {
     currentRegion.set(state.region);
   }
   if (state.date != null && state.date !== get(currentDate)) {
     currentDate.set(state.date);
-  }
-  if (state.encoding != null && state.encoding !== get(encoding)) {
-    encoding.set(state.encoding);
-  }
-  if (state.signalC || state.signalI) {
-    signalCasesOrDeathOptions.set({
-      cumulative: state.signalC != null,
-      incidence: state.signalI != null,
-    });
-  }
-  if (state.compare) {
-    const compareIds = state.compare.split(',').map(getInfoByName).filter(Boolean);
-    currentCompareSelection.set(
-      compareIds.map((info, i) => ({ info, displayName: info.displayName, color: selectionColors[i] || 'grey' })),
-    );
   }
 }
