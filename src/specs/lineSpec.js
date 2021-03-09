@@ -52,7 +52,9 @@ const AUTO_ALIGN = {
 export function generateLineChartSpec({
   width = 800,
   height = 300,
+  xTitle = null,
   domain,
+  title = null,
   color = COLOR,
   initialDate = null,
   valueField = 'value',
@@ -69,11 +71,14 @@ export function generateLineChartSpec({
   const spec = {
     width,
     height,
-    padding: { left: 42, top: 20, bottom: 40, right: 15 },
+    padding: { left: 42, top: title ? 50 : 20, bottom: 55, right: 15 },
     autosize: {
       type: 'none',
       contains: 'padding',
       resize: true,
+    },
+    title: {
+      text: title,
     },
     data: {
       name: 'values',
@@ -90,7 +95,8 @@ export function generateLineChartSpec({
             field: 'date_value',
             type: 'temporal',
             axis: {
-              title: null,
+              title: xTitle,
+              titleFontWeight: 'normal',
               format: '%m/%d',
               formatType: 'cachedTime',
               labelExpr: labelYear,

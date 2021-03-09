@@ -52,16 +52,19 @@
   $: highlightDate = date.value;
 
   /**
-   * @param {import('../../maps').NameInfo} region
+   * @param {import('../../stores/params').SensorParam} sensor
+   * @param {import('../../stores/params').RegionParam} region
    * @param {import('../../stores/params').DateParam} date
    */
-  function genSpec(region, date, height, zero, singleRaw) {
+  function genSpec(sensor, region, date, height, zero, singleRaw) {
     const options = {
       initialDate: highlightDate || date.value,
       height,
       color: MULTI_COLORS[0],
       domain: date.windowTimeFrame.domain,
       zero,
+      xTitle: sensor.xAxis,
+      title: sensor.description,
       highlightRegion: true,
     };
     if (singleRaw) {
@@ -152,7 +155,7 @@
   let zoom = false;
   let singleRaw = false;
 
-  $: spec = genSpec(region.value, date, height, !zoom, singleRaw && sensor.rawValue != null);
+  $: spec = genSpec(sensor, region, date, height, !zoom, singleRaw && sensor.rawValue != null);
   $: data =
     singleRaw && sensor.rawValue != null ? loadSingleData(sensor, region, date) : loadData(sensor, region, date);
   $: regions = singleRaw && sensor.rawValue != null ? [region.value] : resolveRegions(region.value);

@@ -4,6 +4,10 @@
 export const commonConfig = {
   customFormatTypes: true,
   font: '"Open Sans", Roboto, Arial, sans-serif',
+  title: {
+    fontSize: 16,
+    fontWeight: 'normal',
+  },
   view: {
     stroke: null,
   },
@@ -14,7 +18,7 @@ export const commonConfig = {
  * @param {string} credits
  * @returns
  */
-export function genCreditsLayer({ shift = 40 } = {}) {
+export function genCreditsLayer({ shift = 55 } = {}) {
   /**
    * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
    */
@@ -31,6 +35,7 @@ export function genCreditsLayer({ shift = 40 } = {}) {
         mark: {
           type: 'rect',
           align: 'right',
+          fontSize: 10,
           fill: 'white',
           x: {
             expr: 'width',

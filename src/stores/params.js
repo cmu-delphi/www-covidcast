@@ -656,8 +656,11 @@ export class SensorParam {
     this.formatValue = this.isPercentage ? formatPercentage : sensor.formatValue;
     this.unit = this.isPercentage ? '% of pop.' : this.isPer100K ? 'per 100,000 people' : '';
     this.unitHTML = this.isPer100K ? `<span class="per100k"><span>PER</span><span>100K</span></span>` : '';
+    this.yAxis = sensor.yAxis;
+    this.xAxis = sensor.xAxis || (this.isCasesOrDeath ? 'Reported Date' : 'Date');
 
     this.dataSource = getDataSource(sensor);
+
     const rawSignal = deriveRawSignal(sensor);
     /**
      * @type {Sensor | null}
