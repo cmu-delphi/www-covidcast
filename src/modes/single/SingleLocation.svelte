@@ -97,18 +97,25 @@
   $: showLagsForSensor = null;
 
   function onShowLagDetails(sensor) {
-    showLagsForSensor = null;
-    // Need a timeout in order to update the lags list.
+    showLagDetailsForSensor = null;
+    // Need a timeout in order to update the showLagDetailsForSensor
     // TODO: figure out how to avoid this timeout.
     setTimeout(() => {
       // showLagsForSensor = sensor;
       showLagDetailsForSensor = sensor;
       console.info('onShowLagDetails', sensor);
-    }, 500);
+    }, 250);
   }
 
   $: showLagDetailsForSensor = null;
   $: sensorDetailsLag = 0;
+
+  $: currentSensorDate = new Date(
+    $currentDateObject.getTime() + 3600 * 24 * (sensorDetailsLag >= 0 ? sensorDetailsLag : 0),
+  );
+  $: compareSensorDate = new Date(
+    $currentDateObject.getTime() + 3600 * 24 * (sensorDetailsLag <= 0 ? -sensorDetailsLag : 0),
+  );
 
   // function onShowLagDetails(sensor, lag) {
   //   showLagDetailsForSensor = sensor;
@@ -229,28 +236,6 @@
               {/each}
             </table>
           </td>
-          <!-- <td style="width:100px; vertical-align: top">
-            {#if showLagsForSensor}
-              <h4>Lags with {showLagsForSensor.name}</h4>
-              <table style="width:100%">
-                {#each [-28, -21, -14, -7, -4, -1, 0, 1, 4, 7, 14, 21, 28] as lag}
-                  <tr>
-                    <td style="width: 100px; height: 100px">
-                      <IndicatorCompare
-                        {sensorMatrixData}
-                        sensor={showLagsForSensor}
-                        {lag}
-                        on:click={onShowLagDetails(showLagsForSensor, lag)}
-                        date={$currentDateObject}
-                        selections={$currentMultiSelection}
-                        {onHighlight}
-                        highlightTimeValue={$highlightTimeValue} />
-                    </td>
-                  </tr>
-                {/each}
-              </table>
-            {/if}
-          </td> -->
           <td style="width: 400px; height: 400px; vertical-align: top">
             {#if showLagDetailsForSensor}
               Lag:
@@ -268,11 +253,12 @@
                 {sensorMatrixData}
                 sensor={showLagDetailsForSensor}
                 lag={sensorDetailsLag}
-                options={{ width: 400, height: 400 }}
+                options={{ width: 400, height: 400, sizeLegend: true }}
                 date={$currentDateObject}
                 selections={$currentMultiSelection}
                 {onHighlight}
                 highlightTimeValue={$highlightTimeValue} />
+              <!-- date={currentSensorDate} -->
               <SensorCard
                 sensor={$currentSensorEntry}
                 date={$currentDateObject}
@@ -281,7 +267,7 @@
                 highlightTimeValue={$highlightTimeValue} />
               <SensorCard
                 sensor={showLagDetailsForSensor}
-                date={$currentDateObject}
+                date={compareSensorDate}
                 selections={$currentMultiSelection}
                 {onHighlight}
                 highlightTimeValue={$highlightTimeValue} />

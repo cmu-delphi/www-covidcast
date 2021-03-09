@@ -85,33 +85,71 @@
     const lag = options.lag || 0;
     const width = options.width || 100;
     const height = options.height || 100;
+    const sizeLegend = options.sizeLegend || null;
+
     // console.info('width', width, 'height', height);
     const chartSpec = {
       width: width,
       height: height,
+      //       transform: [
+      //   {
+      //     calculate: `toDate(date)`,
+      //     as: 'date_value',
+      //   },
+      // ],
       mark: {
         type: 'point', // options.histogram ? 'bar' : 'point',
-        opacity: 0.2,
+        tooltip: true,
+      },
+      selection: {
+        highlight: {
+          type: 'single',
+          empty: 'none',
+          on: 'mouseover',
+          nearest: true,
+          clear: 'mouseout',
+        },
       },
 
       encoding: {
         x: {
           field: 'x',
           title: options.xtitle,
-          // title: null,
           type: 'quantitative',
           ...xBin,
         },
         y: yAggregate || {
           field: 'y',
           title: options.ytitle,
-          // title: null,
           type: 'quantitative',
           scale: {
             domainMin: undefined,
             domainMax: undefined,
           },
         },
+        opacity: {
+          condition: [
+            {
+              selection: 'highlight',
+              value: 1,
+            },
+            {
+              test: 'datum.time_value == highlightTimeValue',
+              value: 1,
+            },
+          ],
+          value: 0.2,
+        },
+        //     color: {
+        //       condition: [
+
+        //       ],
+        //       data: {
+        //   values: [{ date_value: null }],
+        // },
+
+        //       value: 'blue'
+        //     }
       },
     };
     let spec = chartSpec;
@@ -125,8 +163,21 @@
             {
               op: 'lag',
               param: lag >= 0 ? lag : 0,
+              field: 'date_value',
+              as: 'x_date',
+            },
+            {
+              op: 'lag',
+              param: lag >= 0 ? lag : 0,
               field: row,
               as: 'x',
+            },
+
+            {
+              op: 'lag',
+              param: lag <= 0 ? -lag : 0,
+              field: 'date_value',
+              as: 'y_date',
             },
             {
               op: 'lag',
@@ -205,7 +256,7 @@
               field: 'date_value',
               type: 'temporal',
               scale: { range: [0, 6] },
-              legend: null,
+              legend: sizeLegend,
             },
           },
         },
@@ -378,5 +429,10 @@
 </style>
 
 <div class="root" on:click>
-  <Vega data={Promise.resolve(sensorMatrixData)} spec={splomSpec} />
+  <Vega
+    data={Promise.resolve(sensorMatrixData)}
+    spec={splomSpec}
+    signals={{ currentDate: date, highlightTimeValue }}
+    signalListeners={['highlight']}
+    on:signal={onHighlight} />
 </div>
