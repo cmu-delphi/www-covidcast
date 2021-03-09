@@ -247,8 +247,6 @@
   }
 </style>
 
-<p>Click on the chart to select a different date.</p>
-
 <Vega
   bind:this={vegaRef}
   {className}
