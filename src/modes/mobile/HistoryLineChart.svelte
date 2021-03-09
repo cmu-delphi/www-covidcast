@@ -14,6 +14,7 @@
   } from '../../specs/lineSpec';
   import { toTimeValue } from '../../stores/params';
   import Toggle from './Toggle.svelte';
+  import SensorValue from './SensorValue.svelte';
   import { combineSignals } from '../../data/utils';
 
   export let height = 250;
@@ -39,13 +40,13 @@
   /**
    * @type {import("../../stores/params").Region}
    */
-  const relatedInfo = {
+  const neighboringInfo = {
     id: 'related',
     level: 'county',
-    name: 'Related Counties',
+    name: 'Neighboring Counties',
     population: null,
     propertyId: 'related',
-    displayName: 'Related Counties',
+    displayName: 'Neighboring Counties',
   };
 
   $: highlightDate = date.value;
@@ -60,6 +61,7 @@
       height,
       color: MULTI_COLORS[0],
       zero,
+      highlightRegion: true,
     };
     if (singleRaw) {
       return generateLineAndBarSpec(options);
@@ -72,7 +74,7 @@
       // county vs related vs state vs nation
       const state = getInfoByName(region.state);
       return generateCompareLineSpec(
-        [region.displayName, relatedInfo.displayName, state.displayName, nationInfo.displayName],
+        [region.displayName, neighboringInfo.displayName, state.displayName, nationInfo.displayName],
         options,
       );
     }
@@ -92,9 +94,6 @@
     const selfData = fetcher.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame);
 
     const data = [selfData];
-    if (region.level !== 'nation') {
-      data.push(fetcher.fetch1Sensor1RegionNDates(sensor, nationInfo, date.windowTimeFrame));
-    }
 
     if (region.level === 'county') {
       const state = getInfoByName(region.state);
@@ -102,11 +101,14 @@
       const relatedCounties = getRelatedCounties(region.value);
       const relatedData = fetcher
         .fetch1SensorNRegionsNDates(sensor, relatedCounties, date.windowTimeFrame)
-        .then((r) => averageByDate(r, sensor, relatedInfo))
+        .then((r) => averageByDate(r, sensor, neighboringInfo))
         .then((r) => addMissing(r, sensor));
-      data.push(stateData, relatedData);
+      data.push(relatedData, stateData);
     }
-    return Promise.all(data).then((rows) => rows.flat());
+    if (region.level !== 'nation') {
+      data.push(fetcher.fetch1Sensor1RegionNDates(sensor, nationInfo, date.windowTimeFrame));
+    }
+    return Promise.all(data).then((rows) => rows.reverse().flat());
   }
 
   /**
@@ -141,7 +143,7 @@
     if (region.level === 'county') {
       // county vs related vs state vs nation
       const state = getInfoByName(region.state);
-      return [region, relatedInfo, state, nationInfo];
+      return [region, neighboringInfo, state, nationInfo];
     }
     return [region];
   }
@@ -154,20 +156,27 @@
     singleRaw && sensor.rawValue != null ? loadSingleData(sensor, region, date) : loadData(sensor, region, date);
   $: regions = singleRaw && sensor.rawValue != null ? [region.value] : resolveRegions(region.value);
 
-  function findValue(region, data, date) {
+  function findValue(region, data, date, prop = 'value') {
     if (!date) {
-      return 'N/A';
+      return null;
     }
     const time = toTimeValue(date);
     const row = data.find((d) => d.id === region.id && d.time_value === time);
     if (!row) {
-      return 'N/A';
+      return null;
     }
-    const value = sensor.formatValue(row.value);
-    if (!singleRaw) {
-      return value;
-    }
-    return `${value} (raw: ${sensor.formatValue(row.raw)})`;
+    return row[prop];
+  }
+
+  let highlightRegion = null;
+
+  function highlight(r) {
+    highlightRegion = r ? r.id : null;
+  }
+
+  $: {
+    // auto update
+    highlightRegion = region.value.id;
   }
 </script>
 
@@ -179,23 +188,30 @@
   .legend-elem {
     border-radius: 5px;
     padding: 8px;
-    border: 1px solid var(--color);
+    border: 1px solid rgb(var(--color));
     position: relative;
+    background: rgba(var(--color), 0.05);
+  }
+  .legend-elem:hover {
+    box-shadow: 0 0 2px 0 rgb(var(--color));
   }
   .legend-symbol {
-    color: var(--color);
+    color: rgb(var(--color));
   }
   .legend-value {
     font-weight: 600;
   }
 </style>
 
+<p>Click on the chart to select a different date.</p>
+
 <Vega
   {className}
   {spec}
   {data}
   tooltip={HistoryLineTooltip}
-  signals={signalPatches}
+  tooltipProps={{ sensor }}
+  signals={{ ...signalPatches, highlightRegion }}
   signalListeners={['highlight']}
   on:signal={onSignal} />
 
@@ -208,7 +224,11 @@
 
 <div class="{!(singleRaw && sensor.rawValue != null) && regions.length > 1 ? 'mobile-two-col' : ''} legend">
   {#each regions as r, i}
-    <div class="legend-elem" style="--color: {MULTI_COLORS[i]}">
+    <div
+      class="legend-elem"
+      style="--color: {MULTI_COLORS[i].replace(/rgb\((.*)\)/, '$1')}"
+      on:mouseenter={() => highlight(r)}
+      on:mouseleave={() => highlight(null)}>
       <div>
         <span class="legend-symbol">●</span>
         <span>
@@ -218,8 +238,15 @@
         </span>
       </div>
       <div>
-        {#await data then d}<span class="legend-value">{findValue(r, d, highlightDate)}</span>{/await}
-        {#if sensor.isCasesOrDeath}{sensor.unit}{/if}
+        {#await data then d}
+          <span class="legend-value">
+            <SensorValue {sensor} value={findValue(r, d, highlightDate)} />
+            {#if singleRaw && sensor.rawValue != null}
+              (raw:
+              <SensorValue {sensor} value={findValue(r, d, highlightDate, 'raw')} />)
+            {/if}
+          </span>
+        {/await}
       </div>
     </div>
   {/each}

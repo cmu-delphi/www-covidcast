@@ -1,6 +1,6 @@
 <script>
   import FancyHeader from './FancyHeader.svelte';
-  import RegionMap from './RegionMap.svelte';
+  import RegionMapWrapper from './RegionMapWrapper.svelte';
   import HistoryLineChart from './HistoryLineChart.svelte';
   import IndicatorDropdown from './IndicatorDropdown.svelte';
   import GeoTable from './GeoTable.svelte';
@@ -15,6 +15,7 @@
   import { currentRegionInfo, currentSensorEntry, currentDateObject, times } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
   import './common.css';
+  import { formatDateShortWeekdayAbbr } from '../../formats';
 
   $: sensor = new SensorParam($currentSensorEntry, $times);
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
@@ -45,14 +46,14 @@
   </SurveyParameters>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
+      <p>On {formatDateShortWeekdayAbbr(date.value)} the 7 day average was:</p>
       <IndicatorOverview {sensor} {date} {region} {fetcher} />
       <RegionOverview {region} />
 
       <FancyHeader sub="Map">Indicator</FancyHeader>
-      <div class="chart-250">
-        <RegionMap {sensor} {date} {region} {fetcher} />
-      </div>
-
+    </div>
+    <RegionMapWrapper {sensor} {date} {region} {fetcher} />
+    <div class="grid-3-11">
       <FancyHeader sub="Chart">Indicator</FancyHeader>
 
       <div class="chart-250">

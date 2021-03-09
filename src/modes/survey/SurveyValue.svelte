@@ -17,27 +17,27 @@
 
 <style>
   .text {
-    font-size: 4rem;
+    font-size: 1.5rem;
     line-height: 1;
     align-self: flex-end;
     font-weight: 600;
   }
   .fraction {
-    font-size: 2rem;
+    font-size: 1rem;
+    margin-bottom: 0.125rem;
     line-height: 1;
     font-weight: 600;
-    margin-bottom: 0.25rem;
     align-self: flex-end;
     margin-left: -0.15em;
   }
 
-  @media only screen and (max-width: 715px) {
+  @media only screen and (min-width: 750px) {
     .text {
       font-size: 2rem;
     }
     .fraction {
-      font-size: 1rem;
-      margin-bottom: 0.125rem;
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
     }
   }
 </style>

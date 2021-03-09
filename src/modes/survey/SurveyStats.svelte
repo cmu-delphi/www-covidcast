@@ -1,9 +1,11 @@
 <script>
   import { fetchSampleSizesNationSummary } from '../../data';
-  import { overviewText, referenceRawNationSignal, refSensor, dataAccessLink, surveyFullTextLink } from './questions';
+  import { referenceRawNationSignal, refSensor } from './questions';
   import UiKitHint from '../../components/UIKitHint.svelte';
   import { formatDateShort } from '../../formats';
   import SurveyValue from './SurveyValue.svelte';
+
+  export let className = '';
 
   function fetchOverview() {
     const sensor = {
@@ -25,37 +27,7 @@
   }
 </script>
 
-<style>
-  .summary-button-bar {
-    display: flex;
-    justify-content: flex-start;
-    text-align: center;
-  }
-
-  .summary-button-bar > div {
-    flex: 1 1 0;
-  }
-
-  .summary-button-bar .uk-button {
-    display: block;
-  }
-
-  .summary-button-bar-desc {
-    font-size: 0.9rem;
-  }
-
-  @media only screen and (max-width: 715px) {
-    .summary-button-bar {
-      display: block;
-    }
-
-    .summary-button-bar > div {
-      margin-bottom: 0.5em;
-    }
-  }
-</style>
-
-<div class="mobile-two-col">
+<div class="mobile-two-col {className}">
   <div class="mobile-kpi">
     <div>
       {#await data}
@@ -64,8 +36,8 @@
         <SurveyValue value={round(d.averageSampleSize)} />
       {/await}
     </div>
-    <div class="sub">
-      Participants daily
+    <div class="subheader">
+      Daily survey participants
       {#await data then d}
         <UiKitHint
           title="Between {formatDateShort(d.minDate)} and {formatDateShort(d.maxDate)} around {round(d.averageSampleSize).toLocaleString()} people participated on average daily in this survey." />
@@ -80,22 +52,12 @@
         <SurveyValue value={round(d.totalSampleSize)} />
       {/await}
     </div>
-    <div class="sub">
-      Survey responses total
+    <div class="subheader">
+      Total survey responses
       {#await data then d}
         <UiKitHint
           title="Between {formatDateShort(d.minDate)} and {formatDateShort(d.maxDate)} around {round(d.totalSampleSize).toLocaleString()} responses were collected in this survey." />
       {/await}
     </div>
-  </div>
-</div>
-
-{@html overviewText}
-
-<div class="summary-button-bar">
-  <div><a class="uk-button uk-button-default uk-button-delphi" href={surveyFullTextLink}>View full survey</a></div>
-  <div>
-    <a class="uk-button uk-button-default uk-button-delphi" href={dataAccessLink}>Request access to data</a>
-    <div class="summary-button-bar-desc">Access for researchers only at this time</div>
   </div>
 </div>

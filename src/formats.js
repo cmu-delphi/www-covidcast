@@ -9,22 +9,45 @@ const local = timeFormat('%m/%d/%Y');
 const shortAbbrNth = timeFormat('%b %-d');
 const shortWeekdayAbbr = timeFormat('%a, %b %-d');
 
+/**
+ * @param {Date | null} date
+ */
 export function formatDateShortNumbers(date) {
   return !date ? '?' : shortNumbers(date);
 }
 
+/**
+ * @param {Date | null} date
+ */
 export function formatDateShort(date) {
   return !date ? '?' : short(date);
 }
 
+/**
+ * @param {Date | null} date
+ */
 export function formatDateShortAbbr(date) {
   return !date ? '?' : shortAbbr(date);
 }
 
+/**
+ * @param {Date | null} date
+ * @param {boolean} nthSuffix
+ */
 export function formatDateShortWeekdayAbbr(date, nthSuffix = false) {
   return !date ? '?' : shortWeekdayAbbr(date) + (nthSuffix ? nth(date.getDate()) : '');
 }
+/**
+ * @param {Date | null} date
+ * @param {boolean} nthSuffix
+ */
+export function formatDateYearWeekdayAbbr(date, nthSuffix = false) {
+  return !date ? '?' : formatDateShortWeekdayAbbr(date, nthSuffix) + ` ${date.getFullYear()}`;
+}
 
+/**
+ * @param {number} d
+ */
 function nth(d) {
   // based on https://stackoverflow.com/questions/15397372/javascript-new-date-ordinal-st-nd-rd-th
   if (d > 3 && d < 21) return 'th';
@@ -41,22 +64,28 @@ function nth(d) {
 }
 
 /**
- * @param {Date} date
+ * @param {Date | null} date
+ * @param {boolean} nthSuffix
  */
-export function formatDateShortOrdinal(date, suffix = true) {
-  return !date ? '?' : shortAbbrNth(date) + (suffix ? nth(date.getDate()) : '');
+export function formatDateShortOrdinal(date, nthSuffix = true) {
+  return !date ? '?' : shortAbbrNth(date) + (nthSuffix ? nth(date.getDate()) : '');
 }
 
+/**
+ * @param {Date | null} date
+ */
 export function formatDateISO(date) {
   return !date ? '?' : iso(date);
 }
 
+/**
+ * @param {Date | null} date
+ */
 export function formatDateLocal(date) {
   return !date ? '?' : local(date);
 }
 
 /**
- *
  * @param {NameInfo} info
  */
 export function formatPopulation(info) {
@@ -72,23 +101,49 @@ const rawFormatter = format(',.2f');
 
 /**
  * @param {number} value
+ * @param {(v: number) => number} formatter
  * @param {boolean} enforceSign
+ * @param {number} factor
  */
-function sign(value, enforceSign) {
-  return enforceSign && value > 0 ? '+' : '';
+function sign(value, formatter, enforceSign, factor = 1) {
+  if (value == null || Number.isNaN(value)) {
+    return 'N/A';
+  }
+  const v = formatter(value * factor);
+  if (!enforceSign || v.startsWith('-') || v.startsWith('−')) {
+    return v;
+  }
+  if (v === formatter(0)) {
+    return `±${v}`;
+  }
+  return `+${v}`;
 }
 
+/**
+ * @param {number} value
+ * @param {boolean} enforceSign
+ */
 export function formatValue(value, enforceSign = false) {
-  return value == null || Number.isNaN(value) ? 'N/A' : `${sign(value, enforceSign)}${f(value)}`;
+  return sign(value, f, enforceSign);
 }
+/**
+ * @param {number} value
+ * @param {boolean} enforceSign
+ */
 export function formatPercentage(value, enforceSign = false) {
-  return value == null || Number.isNaN(value)
-    ? 'N/A'
-    : `${sign(value, enforceSign)}${basePercentFormatter(value / 100)}`;
+  return sign(value, basePercentFormatter, enforceSign, 1 / 100);
 }
+/**
+ * @param {number} value
+ * @param {boolean} enforceSign
+ */
 export function formatFraction(value, enforceSign = false) {
-  return value == null || Number.isNaN(value) ? 'N/A' : `${sign(value, enforceSign)}${basePercentFormatter(value)}`;
+  return sign(value, basePercentFormatter, enforceSign);
 }
+/**
+ * @param {number} value
+ * @param {boolean} enforceSign
+ */
 export function formatRawValue(value, enforceSign = false) {
-  return value == null || Number.isNaN(value) ? 'N/A' : `${sign(value, enforceSign)}${rawFormatter(value)}`;
+  return sign(value, rawFormatter, enforceSign);
 }

@@ -7,10 +7,11 @@
 
 <style>
   .title {
-    color: initial;
+    color: inherit;
     width: 12px;
     padding: 0;
     margin-left: 5px;
+    flex: 0 0 auto;
   }
 </style>
 

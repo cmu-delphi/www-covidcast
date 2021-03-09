@@ -1,12 +1,13 @@
 <script>
   import Vega from '../../components/Vega.svelte';
-  import { formatDateShortNumbers, formatDateShortWeekdayAbbr } from '../../formats';
+  import { formatDateShortNumbers } from '../../formats';
   import { generateSparkLine } from '../../specs/lineSpec';
-  import { WINDOW_SIZE } from '../../stores/params';
   import SurveyValue from '../survey/SurveyValue.svelte';
+  import SensorUnit from './SensorUnit.svelte';
   import SparkLineTooltip from './SparkLineTooltip.svelte';
 
   import TrendIndicator from './TrendIndicator.svelte';
+  import TrendTextSummary from './TrendTextSummary.svelte';
 
   /**
    * @type {import('../../stores/constants').SensorEntry}
@@ -26,7 +27,6 @@
    */
   export let fetcher;
 
-  $: globalTrend = fetcher.fetchGlobalTrend(sensor, region, date);
   $: trend = fetcher.fetchWindowTrend(sensor, region, date);
   $: sparkline = fetcher.fetchSparkLine(sensor, region, date);
   $: spec = generateSparkLine({
@@ -34,20 +34,6 @@
     highlightDate: 'top',
     highlightStartEnd: false,
   });
-
-  function trendAlternative(trend) {
-    if (!trend || trend.isUnknown) {
-      return '?';
-    }
-    const value = sensor.formatValue(trend.delta);
-    if (trend.isBetter) {
-      return `better by ${value}`;
-    }
-    if (trend.isWorse) {
-      return `worse by ${value}`;
-    }
-    return `around the same with ${value}`;
-  }
 </script>
 
 <style>
@@ -64,8 +50,6 @@
   }
 </style>
 
-<p class="p-start">On {formatDateShortWeekdayAbbr(date.value, true)} the number of people:</p>
-
 <div class="mobile-two-col">
   <div class="mobile-kpi">
     <div>
@@ -75,7 +59,9 @@
         <SurveyValue value={d && d.current ? d.current.value : null} digits={sensor.isPercentage ? 2 : 1} />
       {/await}
     </div>
-    <div class="sub">{sensor.unit}</div>
+    <div class="sub">
+      <SensorUnit {sensor} long />
+    </div>
   </div>
   <div>
     <div class="chart-50">
@@ -83,7 +69,7 @@
         {spec}
         data={sparkline}
         tooltip={SparkLineTooltip}
-        tooltipProps={{ sensor: sensor.value }}
+        tooltipProps={{ sensor: sensor }}
         signals={{ currentDate: date.value }} />
     </div>
     <div class="date-range">
@@ -93,7 +79,7 @@
   </div>
 </div>
 
-<p class="p-start">Compared to the previous week that means:</p>
+<p>Compared to the previous week that means:</p>
 
 <div>
   {#await trend}
@@ -103,16 +89,4 @@
   {/await}
 </div>
 
-<p>
-  {#await globalTrend then d}
-    On
-    {formatDateShortWeekdayAbbr(date.value, true)}
-    <strong>{sensor.value.name}</strong>
-    was
-    <strong>{trendAlternative(d.worstTrend)}</strong>
-    compared to the
-    <strong>{WINDOW_SIZE} month worst value of {sensor.formatValue(d.worst ? d.worst.value : null)}</strong>
-    on
-    <strong>{formatDateShortWeekdayAbbr(d.worstDate, true)}</strong>.
-  {/await}
-</p>
+<TrendTextSummary {sensor} {date} {trend} />

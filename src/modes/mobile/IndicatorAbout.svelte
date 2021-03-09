@@ -19,6 +19,8 @@
 
       <div class="desc">
         {@html sensor.value.description}
+
+        <p>Source: {sensor.dataSource}</p>
       </div>
     </div>
   </div>

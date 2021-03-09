@@ -1,6 +1,8 @@
 <script>
   import { formatDateShortWeekdayAbbr } from '../../formats';
   import { levelMegaCounty } from '../../stores/constants';
+  import { getStateOfCounty } from '../../maps';
+  import SensorValue from './SensorValue.svelte';
 
   export let hidden = false;
   /**
@@ -9,15 +11,22 @@
   export let item;
 
   /**
-   * @type {import('../../stores/params').SensorEntry}
+   * @type {import('../../stores/params').SensorParam}
    */
   export let sensor;
 
   export let regionSetter = null;
 
+  $: state = item.level === 'state' ? item : getStateOfCounty(item);
+
   function changeRegion() {
     if (regionSetter) {
-      regionSetter(item);
+      regionSetter(item, true);
+    }
+  }
+  function changeRegionToState() {
+    if (regionSetter) {
+      regionSetter(state, true);
     }
   }
 </script>
@@ -54,9 +63,21 @@
     {:else}{item.displayName}{/if}
   </h5>
   <table>
+    {#if item.level !== 'state'}
+      <tr>
+        <th>State</th>
+        <td>
+          <a class="uk-link-muted" href="?region={state.propertyId}" on:click|preventDefault={changeRegionToState}>
+            {state.displayName}
+          </a>
+        </td>
+      </tr>
+    {/if}
     <tr>
       <th>{formatDateShortWeekdayAbbr(item.date_value)}</th>
-      <td>{sensor.formatValue(item.value)}</td>
+      <td>
+        <SensorValue {sensor} value={item.value} />
+      </td>
     </tr>
   </table>
 </div>
