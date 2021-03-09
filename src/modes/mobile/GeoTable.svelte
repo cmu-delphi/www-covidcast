@@ -180,12 +180,12 @@
 <table class="mobile-table">
   <thead>
     <tr>
-      <th class="mobile-th mobile-th-blue">{title.unit}</th>
-      <th class="mobile-th mobile-th-blue">Change Last 7 days</th>
-      <th class="mobile-th uk-text-right mobile-th-blue">
+      <th class="mobile-th">{title.unit}</th>
+      <th class="mobile-th">Change Last 7 days</th>
+      <th class="mobile-th uk-text-right">
         <SensorUnit {sensor} force />
       </th>
-      <th class="mobile-th uk-text-right mobile-th-blue">
+      <th class="mobile-th uk-text-right">
         <span>historical trend</span>
         <div class="mobile-th-range">
           <span> {formatDateShortNumbers(date.sparkLineTimeFrame.min)} </span>
