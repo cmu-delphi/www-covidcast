@@ -13,7 +13,7 @@
 </style>
 
 {#if sensor.value.description}
-  <div class="uk-container content-grid mobile-invert">
+  <div class="uk-container content-grid">
     <div class="grid-3-11">
       <FancyHeader normal>About this indicator</FancyHeader>
 
