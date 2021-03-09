@@ -3,7 +3,7 @@
   import childIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/child.svg';
   import calendarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/calendar.svg';
 
-  import HexGridCell from './HexGridCell.svelte';
+  import HexGridCell from '../../mobile/components/HexGridCell.svelte';
   /**
    * @type {import('../mobile/utils').Params}
    */

@@ -5,18 +5,6 @@
       component: () => import('./LineAndMap.svelte').then((r) => r.default),
     },
     {
-      name: 'State Map',
-      component: () => import('./StateMap.svelte').then((r) => r.default),
-    },
-    {
-      name: 'VegaMap',
-      component: () => import('./VegaMap.svelte').then((r) => r.default),
-    },
-    {
-      name: 'County Related',
-      component: () => import('./CountyRelated.svelte').then((r) => r.default),
-    },
-    {
       name: 'State Distribution',
       component: () => import('./StateDistribution.svelte').then((r) => r.default),
     },
