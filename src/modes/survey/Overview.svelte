@@ -40,10 +40,6 @@
     display: block;
   }
 
-  .summary-button-bar-desc {
-    font-size: 0.9rem;
-  }
-
   @media only screen and (max-width: 715px) {
     .summary-button-bar {
       display: block;
@@ -94,8 +90,5 @@
 
 <div class="summary-button-bar">
   <div><a class="uk-button uk-button-default uk-button-delphi" href={surveyFullTextLink}>View full survey</a></div>
-  <div>
-    <a class="uk-button uk-button-default uk-button-delphi" href={dataAccessLink}>Request access to data</a>
-    <div class="summary-button-bar-desc">Access for researchers only at this time</div>
-  </div>
+  <div><a class="uk-button uk-button-default uk-button-delphi" href={dataAccessLink}>Download aggregate data</a></div>
 </div>
