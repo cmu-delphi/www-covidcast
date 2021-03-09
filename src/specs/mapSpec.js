@@ -1,7 +1,7 @@
 import getRelatedCounties from '../maps/related';
 import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 import { MAP_THEME, MISSING_COLOR, ZERO_COLOR } from '../theme';
-import { genCreditsLayer, commonConfig } from './commonSpec';
+import { commonConfig, CREDIT } from './commonSpec';
 
 const NAME_INFO_KEYS = ['propertyId', 'displayName', 'population', 'state', 'level'];
 const EPIDATA_ROW_KEYS = ['geo_value', 'value', 'date_value', 'time_value', 'stderr', 'sample_size'].concat(
@@ -20,6 +20,55 @@ const missingGradient = {
     .fill(0)
     .map((_, i) => ({ offset: i / missingStopCount, color: i % 2 === 0 ? MISSING_COLOR : 'white' })),
 };
+
+function genCreditsLayer({ shift = 55 } = {}) {
+  /**
+   * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
+   */
+  const layer = {
+    data: {
+      values: [
+        {
+          text: '',
+        },
+      ],
+    },
+    layer: [
+      {
+        mark: {
+          type: 'rect',
+          fontSize: 10,
+          fill: 'white',
+          align: 'left',
+          baseline: 'top',
+          x: -10,
+          width: {
+            expr: '20 + width',
+          },
+          y: {
+            expr: `height + 10`,
+          },
+          height: 50,
+        },
+      },
+      {
+        mark: {
+          type: 'text',
+          align: 'right',
+          baseline: 'bottom',
+          x: {
+            expr: 'width',
+          },
+          y: {
+            expr: `height + ${shift}`,
+          },
+          text: CREDIT,
+        },
+      },
+    ],
+  };
+  return layer;
+}
 
 function genMissingLayer(missingLevel = 'nation') {
   /**

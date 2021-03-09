@@ -66,8 +66,10 @@
       domain: date.windowTimeFrame.domain,
       zero,
       xTitle: sensor.xAxis,
-      title: sensor.description,
+      title: [sensor.name, `in ${region.displayName}`],
+      subTitle: sensor.unit,
       highlightRegion: true,
+      isPercentage: sensor.isPercentage,
     };
     if (singleRaw) {
       return generateLineAndBarSpec(options);

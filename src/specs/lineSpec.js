@@ -1,5 +1,5 @@
 import { CURRENT_DATE_HIGHLIGHT } from '../components/vegaSpecUtils';
-import { commonConfig, genCreditsLayer } from './commonSpec';
+import { commonConfig, CREDIT } from './commonSpec';
 
 // dark2
 // has to be the rgb notation to create a pure version out of it for CSS variables manipulation
@@ -49,14 +49,44 @@ const AUTO_ALIGN = {
     "(width - scale('x', datum.date_value)) < 40 ? 'right' : (scale('x', datum.date_value)) > 40 ? 'center' : 'left'",
 };
 
+function genCreditsLayer({ shift = 55 } = {}) {
+  /**
+   * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
+   */
+  const layer = {
+    data: {
+      values: [
+        {
+          text: '',
+        },
+      ],
+    },
+    mark: {
+      type: 'text',
+      align: 'right',
+      baseline: 'bottom',
+      x: {
+        expr: 'width',
+      },
+      y: {
+        expr: `height + ${shift}`,
+      },
+      text: CREDIT,
+    },
+  };
+  return layer;
+}
+
 export function generateLineChartSpec({
   width = 800,
   height = 300,
   xTitle = null,
   domain,
   title = null,
+  subTitle = null,
   color = COLOR,
   initialDate = null,
+  isPercentage = false,
   valueField = 'value',
   zero = false,
   highlightRegion = false,
@@ -65,13 +95,20 @@ export function generateLineChartSpec({
   const labelYear = `datum.label + (week(datum.value) === 1 ${
     domain ? `|| abs(week(datum.value) - week(toDate(${domain[0]}))) <= 1` : ''
   } ? '/' + year(datum.value) : '')`;
+  let topOffset = 20;
+  if (title) {
+    topOffset += 22 * (Array.isArray(title) ? title.length : 1);
+  }
+  if (subTitle) {
+    topOffset += 10;
+  }
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
   const spec = {
     width,
     height,
-    padding: { left: 42, top: title ? 50 : 20, bottom: 55, right: 15 },
+    padding: { left: 42, top: topOffset, bottom: 55, right: 15 },
     autosize: {
       type: 'none',
       contains: 'padding',
@@ -79,6 +116,7 @@ export function generateLineChartSpec({
     },
     title: {
       text: title,
+      subtitle: subTitle,
     },
     data: {
       name: 'values',
@@ -121,6 +159,7 @@ export function generateLineChartSpec({
               domain: false,
               tickCount: 5,
               labelFontSize: 14,
+              labelExpr: isPercentage ? `datum.label + '%'` : undefined,
             },
             scale: {
               round: true,

@@ -56,7 +56,7 @@
     <div class="grid-3-11">
       <FancyHeader sub="Chart">Indicator</FancyHeader>
 
-      <div class="chart-250">
+      <div class="chart-300">
         <HistoryLineChart {sensor} {date} {region} {fetcher} />
       </div>
     </div>
