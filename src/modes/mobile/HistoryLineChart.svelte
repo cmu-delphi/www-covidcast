@@ -220,7 +220,7 @@
   on:signal={onSignal} />
 
 <div>
-  <Toggle bind:checked={zoom}>Zoom Y-axis</Toggle>
+  <Toggle bind:checked={zoom}>Rescale Y-axis</Toggle>
   {#if sensor.rawValue != null}
     <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
   {/if}
