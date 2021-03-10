@@ -69,6 +69,12 @@
   margin: 1rem 0.5em;
 }
 
+.mobile-header-line-bg {
+  background: #fafafc;
+  border-top: 1px solid #d3d4d8;
+  border-bottom: 1px solid #d3d4d8;
+}
+
 .mobile-header-line h2 {
   line-height: 1;
   margin: 0;
