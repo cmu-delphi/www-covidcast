@@ -30,7 +30,7 @@
   }
 
   function switchMode() {
-    currentMode.set(modeByID.overview);
+    currentMode.set(modeByID.summary);
   }
 </script>
 

@@ -14,7 +14,7 @@
     if (region !== undefined) {
       selectByInfo(region);
     }
-    currentMode.set(modeByID.overview);
+    currentMode.set(modeByID.summary);
   }
   /**
    * @param {import('../../maps').NameInfo} d
@@ -136,7 +136,7 @@
         <span class="inline-svg-icon">
           {@html flagUSAIcon}
         </span>
-        U.S. National Overview
+        U.S. National Summary
       </a>
     </div>
 
