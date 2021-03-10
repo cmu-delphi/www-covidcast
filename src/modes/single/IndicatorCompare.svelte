@@ -99,8 +99,12 @@
       // ],
       mark: {
         type: 'point', // options.histogram ? 'bar' : 'point',
-        tooltip: true,
+        tooltip: true, // debug: { content: 'data' },
       },
+      transform: [
+        { as: 'x_title', calculate: `"${options.xtitle} (" + timeFormat(datum.x_date, "%b %d") + "): " + datum.x` },
+        { as: 'y_title', calculate: `"${options.ytitle} (" + timeFormat(datum.y_date, "%b %d") + "): " + datum.y` },
+      ],
       selection: {
         highlight: {
           type: 'single',
@@ -114,19 +118,39 @@
       encoding: {
         x: {
           field: 'x',
-          title: options.xtitle,
+          title: options.axisTitles ? options.xtitle : '',
           type: 'quantitative',
           ...xBin,
         },
         y: yAggregate || {
           field: 'y',
-          title: options.ytitle,
+          title: options.axisTitles ? options.ytitle : '',
           type: 'quantitative',
           scale: {
             domainMin: undefined,
             domainMax: undefined,
           },
         },
+        tooltip: [
+          {
+            field: 'x_title',
+            title: ' ',
+          },
+          // {
+          //   field: 'x',
+          //   type: 'quantitative',
+          //   title: options.xtitle,
+          // },
+          {
+            field: 'y_title',
+            title: '  ', // must be unique?
+          },
+          // {
+          //   field: 'y',
+          //   type: 'quantitative',
+          //   title: options.ytitle,
+          // },
+        ],
         opacity: {
           condition: [
             {
@@ -298,6 +322,7 @@
           ...[
             makeMatrixCellSpec(r.key, c.key, {
               histogram: r == c, // obsolete
+              axisTitles: true,
               xtitle: r.name,
               ytitle: c.name,
               lag,

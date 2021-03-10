@@ -209,6 +209,10 @@
         <tr>
           <td style="width:40%; vertical-align: top" rowspan="3">
             <table>
+              <tr>
+                <th />
+                <th>{$currentSensorEntry.name}</th>
+              </tr>
               {#each otherSensors as sensor (sensor.key)}
                 <tr>
                   <td>
@@ -226,6 +230,7 @@
                     <IndicatorCompare
                       {sensorMatrixData}
                       {sensor}
+                      options={{ axisTitles: false }}
                       on:click={onShowLagDetails(sensor, 0)}
                       date={$currentDateObject}
                       selections={$currentMultiSelection}
