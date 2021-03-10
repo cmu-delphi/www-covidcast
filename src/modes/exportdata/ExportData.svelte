@@ -53,13 +53,17 @@
     }
   }
 
+  function guessMode(itemLength) {
+    return geoValuesMode === 'all' || itemLength === 0 ? 'all' : 'single';
+  }
+
   let geoValuesMode = 'all';
   let geoValues = [];
   $: geoItems = infosByLevel[geoType] || [];
   $: {
     if (geoItems != null) {
       geoValues = [];
-      geoValuesMode = geoValuesMode === 'all' || geoItems.length === 0 ? 'all' : 'single';
+      geoValuesMode = guessMode(geoItems.length);
     }
   }
   $: isAllRegions = geoValuesMode === 'all' || geoValues.length === 0;
@@ -200,12 +204,18 @@
 
   function addRegion(detail) {
     geoValues = [...geoValues, detail];
+    if (detail && geoValuesMode != 'single') {
+      geoValuesMode = 'single';
+    }
   }
   function removeRegion(detail) {
     geoValues = geoValues.filter((d) => d !== detail);
   }
   function setRegion(detail) {
     geoValues = detail ? [detail] : [];
+    if (detail && geoValuesMode != 'single') {
+      geoValuesMode = 'single';
+    }
   }
 
   function pythonDate(date) {
