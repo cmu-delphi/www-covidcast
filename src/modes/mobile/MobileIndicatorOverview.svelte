@@ -15,7 +15,7 @@
   import { currentRegionInfo, currentSensorEntry, currentDateObject, times } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
   import './common.css';
-  import { formatDateShortWeekdayAbbr } from '../../formats';
+  import { formatDateWeekday } from '../../formats';
 
   $: sensor = new SensorParam($currentSensorEntry, $times);
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
@@ -46,7 +46,7 @@
   </SurveyParameters>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <p>On {formatDateShortWeekdayAbbr(date.value)} the 7 day average was:</p>
+      <p>On {formatDateWeekday(date.value)}, the 7-day averages were:</p>
       <IndicatorOverview {sensor} {date} {region} {fetcher} />
       <RegionOverview {region} />
 

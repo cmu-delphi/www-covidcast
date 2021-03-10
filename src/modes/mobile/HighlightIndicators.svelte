@@ -4,7 +4,7 @@
   import FancyHeader from './FancyHeader.svelte';
   import TrendIndicator from './TrendIndicator.svelte';
   import { SensorParam } from '../../stores/params';
-  import { formatDateShortWeekdayAbbr } from '../../formats';
+  import { formatDateWeekday } from '../../formats';
   import SensorUnit from './SensorUnit.svelte';
 
   /**
@@ -33,7 +33,7 @@
 
 <FancyHeader sub="Indicators">Key</FancyHeader>
 
-<p>On {formatDateShortWeekdayAbbr(date.value)} the 7 day averages are:</p>
+<p>On {formatDateWeekday(date.value)}, the 7-day averages were:</p>
 
 <div class="mobile-two-col">
   {#each highlightSurveySensors as s}

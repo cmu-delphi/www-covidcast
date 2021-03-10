@@ -44,25 +44,6 @@
   text-transform: uppercase;
 }
 
-.mobile-root > .uk-container.mobile-invert-header {
-  background: #232735;
-  color: white;
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-.mobile-root > .uk-container.mobile-invert {
-  background: #232735;
-  color: white;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-}
-
-.mobile-invert-header h2,
-.mobile-invert h2 {
-  color: inherit;
-}
-
 .mobile-header-line {
   text-align: center;
   position: relative;
@@ -109,10 +90,6 @@
   line-height: 1rem;
   text-transform: uppercase;
   vertical-align: top;
-}
-
-.mobile-th-blue {
-  color: #096dd9;
 }
 
 .mobile-th-range {

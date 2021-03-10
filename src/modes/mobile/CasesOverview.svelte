@@ -2,7 +2,7 @@
   import SurveyValue from '../survey/SurveyValue.svelte';
   import TrendIndicator from './TrendIndicator.svelte';
   import { CASES, DEATHS } from '../../stores/params';
-  import { formatDateShortWeekdayAbbr } from '../../formats';
+  import { formatDateWeekday } from '../../formats';
   import SensorUnit from './SensorUnit.svelte';
 
   /**
@@ -22,7 +22,7 @@
   $: deathTrend = fetcher.fetchWindowTrend(DEATHS, region, date);
 </script>
 
-<p>On {formatDateShortWeekdayAbbr(date.value)} the 7 day averages are:</p>
+<p>On {formatDateWeekday(date.value)}, the 7-day averages were:</p>
 
 <div class="mobile-two-col">
   <div class="mobile-kpi">

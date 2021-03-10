@@ -57,7 +57,7 @@
       <CasesOverview {date} {region} {fetcher} />
       <hr />
       <h3 class="header">COVID-19 Cases by state</h3>
-      <h4 class="header">{CASES.value.mapTitleText()}</h4>
+      <h4 class="header">{CASES.description}</h4>
     </div>
     <RegionMapWrapper {region} {date} sensor={CASES} {fetcher} />
     <div class="grid-3-11">
