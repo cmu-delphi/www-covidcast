@@ -41,6 +41,7 @@
     bottom: -50%;
     right: 0;
     /* hexagon shape */
+    -webkit-clip-path: polygon(0% 25%, 50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%);
     clip-path: polygon(0% 25%, 50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%);
     box-sizing: border-box;
 

@@ -2,7 +2,7 @@
   import { fetchSampleSizesNationSummary } from '../../data';
   import { referenceRawNationSignal, refSensor } from './questions';
   import UiKitHint from '../../components/UIKitHint.svelte';
-  import { formatDateShort } from '../../formats';
+  import { formatDateLocal } from '../../formats';
   import SurveyValue from './SurveyValue.svelte';
 
   export let className = '';
@@ -40,7 +40,7 @@
       Daily survey participants
       {#await data then d}
         <UiKitHint
-          title="Between {formatDateShort(d.minDate)} and {formatDateShort(d.maxDate)} around {round(d.averageSampleSize).toLocaleString()} people participated on average daily in this survey." />
+          title="Between {formatDateLocal(d.minDate)} and {formatDateLocal(d.maxDate)} around {round(d.averageSampleSize).toLocaleString()} people participated on average daily in this survey." />
       {/await}
     </div>
   </div>
@@ -56,7 +56,7 @@
       Total survey responses
       {#await data then d}
         <UiKitHint
-          title="Between {formatDateShort(d.minDate)} and {formatDateShort(d.maxDate)} around {round(d.totalSampleSize).toLocaleString()} responses were collected in this survey." />
+          title="Between {formatDateLocal(d.minDate)} and {formatDateLocal(d.maxDate)} around {round(d.totalSampleSize).toLocaleString()} responses were collected in this survey." />
       {/await}
     </div>
   </div>

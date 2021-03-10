@@ -401,7 +401,7 @@
         <p>
           We provide our data as a direct link to a CSV file or you can use our Python and R packages. Please
           acknowledge us as a source:
-          <cite> Data from Delphi COVIDcast, covidcast.cmu.edu. </cite>
+          <cite> Data from Delphi COVIDcast, delphi.cmu.edu/covidcast/ </cite>
         </p>
 
         <h3 class="mobile-h3 uk-margin-top">CSV File</h3>
