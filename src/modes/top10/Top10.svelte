@@ -208,7 +208,7 @@
   });
 
   function jumpTo(row) {
-    currentMode.set(modeByID.old);
+    currentMode.set(modeByID.classic);
     currentRegion.set(row.id);
   }
 
