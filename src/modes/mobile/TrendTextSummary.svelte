@@ -1,5 +1,5 @@
 <script>
-  import { formatDateShortWeekdayAbbr, formatDateYearWeekdayAbbr } from '../../formats';
+  import { formatDateWeekday, formatDateYearWeekdayAbbr } from '../../formats';
   import { WINDOW_SIZE } from '../../stores/params';
   import SensorValue from './SensorValue.svelte';
   import TrendText from './TrendText.svelte';
@@ -20,9 +20,12 @@
 
 <p>
   {#await trend then d}
-    {#if +date.value === +d.worstDate}
+    {#if d.isUnknown}
+      We don't have data on the historical context for this indicator on
+      {formatDateWeekday(date.value, true)}.
+    {:else if +date.value === +d.worstDate}
       On
-      {formatDateShortWeekdayAbbr(date.value, true)}
+      {formatDateWeekday(date.value, true)}
       <strong>{sensor.value.name}</strong>
       was the
       {WINDOW_SIZE}
@@ -35,7 +38,7 @@
       <strong>{formatDateYearWeekdayAbbr(d.bestDate, true)}</strong>.
     {:else}
       On
-      {formatDateShortWeekdayAbbr(date.value, true)}
+      {formatDateWeekday(date.value, true)}
       <strong>{sensor.value.name}</strong>
       was
       <strong>

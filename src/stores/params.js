@@ -646,6 +646,7 @@ export class SensorParam {
   constructor(sensor) {
     this.key = sensor.key;
     this.name = sensor.name;
+    this.description = typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText({}) : sensor.mapTitleText;
     this.value = sensor;
     this.isCasesOrDeath = sensor.isCasesOrDeath;
     this.factor = sensorFactor(sensor);

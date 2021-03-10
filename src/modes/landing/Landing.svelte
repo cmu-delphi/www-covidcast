@@ -24,7 +24,7 @@
   }
 
   function switchDashboard() {
-    currentMode.set(modeByID['survey-results'].id);
+    currentMode.set(modeByID['survey-results']);
   }
 </script>
 
@@ -106,7 +106,7 @@
 <div class="uk-container content-grid root mobile-root landing-banner">
   <div class="grid-4-10">
     <h2>Welcome to COVIDcast</h2>
-    <p>Explore COVID-19 indicators nearby</p>
+    <p>Explore real-time COVID-19 indicators in any county, state or across the U.S.</p>
 
     <Search
       modern="small"
@@ -136,17 +136,16 @@
         <span class="inline-svg-icon">
           {@html flagUSAIcon}
         </span>
-        National Overview
+        U.S. National Overview
       </a>
     </div>
 
     <p>
-      COVIDcast provides real-time county-level indicators in the United States. Our indicators include our national
-      COVID survey, public experience, attitude, behavior, doctor's visits, hospital admissions, tests, cases and
-      deaths.
+      Our indicators include our national COVID survey, public experience, attitude, behavior, doctor's visits, hospital
+      admissions, tests, cases and deaths.
     </p>
 
-    <FancyHeader sub="stats" center>Indicator</FancyHeader>
+    <FancyHeader sub="Indicators" center>COVID-19</FancyHeader>
     <a href="https://cmu-delphi.github.io/delphi-epidata/" class="link-link uk-link-text">Explore our API</a>
 
     <div class="mobile-two-col uk-text-center mobile-two-col__highlight">
@@ -166,7 +165,7 @@
       {/each}
     </div>
 
-    <FancyHeader sub="Audience" center>Survey</FancyHeader>
+    <FancyHeader sub="Pandemic Survey via Facebook" center>Delphi</FancyHeader>
     <a href="?mode=survey-results" on:click|preventDefault={switchDashboard} class="link-link uk-link-text">Go to survey
       dashboard</a>
 

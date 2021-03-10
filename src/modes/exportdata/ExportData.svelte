@@ -385,7 +385,7 @@
     <p>
       {@html signal && signal.entry ? signal.entry.credits : ''}
       Please acknowledge us as a source:
-      <cite> Data from Delphi COVIDcast, covidcast.cmu.edu. </cite>
+      <cite> Data from Delphi COVIDcast, delphi.cmu.edu/covidcast/ </cite>
     </p>
     <div class="uk-button-group">
       <button

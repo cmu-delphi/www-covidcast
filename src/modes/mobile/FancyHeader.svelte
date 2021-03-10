@@ -9,7 +9,7 @@
     font-weight: 300;
     font-size: 1.125rem;
     letter-spacing: 0.05em;
-    margin: 0.5em 0 0 0;
+    margin: 0.5em 0;
     text-transform: uppercase;
   }
 

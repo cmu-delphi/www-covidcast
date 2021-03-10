@@ -8,6 +8,7 @@ const iso = timeFormat('%Y-%m-%d');
 const local = timeFormat('%m/%d/%Y');
 const shortAbbrNth = timeFormat('%b %-d');
 const shortWeekdayAbbr = timeFormat('%a, %b %-d');
+const weekday = timeFormat('%A, %B %-d');
 
 /**
  * @param {Date | null} date
@@ -36,6 +37,13 @@ export function formatDateShortAbbr(date) {
  */
 export function formatDateShortWeekdayAbbr(date, nthSuffix = false) {
   return !date ? '?' : shortWeekdayAbbr(date) + (nthSuffix ? nth(date.getDate()) : '');
+}
+/**
+ * @param {Date | null} date
+ * @param {boolean} nthSuffix
+ */
+export function formatDateWeekday(date, nthSuffix = false) {
+  return !date ? '?' : weekday(date) + (nthSuffix ? nth(date.getDate()) : '');
 }
 /**
  * @param {Date | null} date

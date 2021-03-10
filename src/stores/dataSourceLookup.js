@@ -3,7 +3,7 @@ export const CASES_DEATH_SOURCE = 'cases-deaths';
 const sourceNameLookup = {
   chng: 'Change Healthcare',
   'doctor-visits': 'Doctor Visits',
-  'fb-survey': 'Delphi Survey Results',
+  'fb-survey': 'Delphi Pandemic Survey via Facebook',
   ght: 'Google Search Trends',
   'hospital-admissions': 'Hospital Admissions',
   [CASES_DEATH_SOURCE]: 'Public Health Reports',
