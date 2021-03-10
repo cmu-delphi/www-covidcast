@@ -80,7 +80,7 @@
             sparkLine: fetcher.fetchSparkLine(sensor, region, date),
             trend: fetcher.fetchWindowTrend(sensor, region, date),
             switchMode: () => {
-              sensor.set(s.value, true);
+              sensor.set(s, true);
               currentMode.set(modeByID.indicator);
             },
           };

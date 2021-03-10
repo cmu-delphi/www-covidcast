@@ -63,7 +63,7 @@
     <div class="grid-3-11">
       <hr />
       <FancyHeader sub="Chart">Indicator</FancyHeader>
-      <div class="chart-250">
+      <div class="chart-300">
         <HistoryLineChart sensor={CASES} {date} {region} {fetcher} />
       </div>
       <hr />

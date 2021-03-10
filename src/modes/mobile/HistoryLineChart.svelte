@@ -18,6 +18,7 @@
   import { combineSignals } from '../../data/utils';
   import DownloadMenu from './components/DownloadMenu.svelte';
   import { formatDateISO } from '../../formats';
+  import { isMobileDevice } from '../../stores';
 
   export let height = 250;
 
@@ -54,17 +55,26 @@
   $: highlightDate = date.value;
 
   /**
-   * @param {import('../../maps').NameInfo} region
-   * @param {Date} date
+   * @param {import('../../stores/params').SensorParam} sensor
+   * @param {import('../../stores/params').RegionParam} region
+   * @param {import('../../stores/params').DateParam} date
    */
-  function genSpec(region, date, height, zero, singleRaw) {
+  function genSpec(sensor, region, date, height, zero, singleRaw, isMobile) {
     const options = {
-      initialDate: highlightDate || date,
+      initialDate: highlightDate || date.value,
       height,
       color: MULTI_COLORS[0],
+      domain: date.windowTimeFrame.domain,
       zero,
+      xTitle: sensor.xAxis,
+      title: [sensor.name, `in ${region.displayName}`],
+      subTitle: sensor.unit,
       highlightRegion: true,
+      isPercentage: sensor.isPercentage,
     };
+    if (!isMobile || options.title.reduce((acc, v) => acc + v.length, 0) < 35) {
+      options.title = options.title.join(' '); // single title line
+    }
     if (singleRaw) {
       return generateLineAndBarSpec(options);
     }
@@ -169,7 +179,7 @@
   let singleRaw = false;
 
   $: raw = singleRaw && sensor.rawValue != null;
-  $: spec = genSpec(region.value, date.value, height, !zoom, raw);
+  $: spec = genSpec(sensor, region, date, height, !zoom, raw, $isMobileDevice);
   $: data = raw ? loadSingleData(sensor, region, date) : loadData(sensor, region, date);
   $: regions = raw ? [region.value] : resolveRegions(region.value);
   $: fileName = generateFileName(sensor, regions, date, raw);
@@ -236,8 +246,6 @@
     flex: 1 1 0;
   }
 </style>
-
-<p>Click on the chart to select a different date.</p>
 
 <Vega
   bind:this={vegaRef}
