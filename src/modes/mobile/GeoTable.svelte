@@ -11,7 +11,6 @@
   import { groupByRegion, extractSparkLine } from '../../stores/params';
   import { determineTrend } from '../../stores/trend';
   import SensorValue from './SensorValue.svelte';
-  import SensorUnit from './SensorUnit.svelte';
   import DownloadMenu from './components/DownloadMenu.svelte';
 
   /**
@@ -213,7 +212,7 @@
       <th class="mobile-th">{title.unit}</th>
       <th class="mobile-th">Change Last 7 days</th>
       <th class="mobile-th uk-text-right">
-        <SensorUnit {sensor} force />
+        {@html sensor.unitHTML}
       </th>
       <th class="mobile-th uk-text-right">
         <span>historical trend</span>
@@ -258,7 +257,7 @@
             on:click|preventDefault={() => region.set(r, true)}>{r.displayName}</a>
         </td>
         <td>
-          <TrendIndicator trend={r.trendObj} {sensor} block />
+          <TrendIndicator trend={r.trendObj} block />
         </td>
         <td class="uk-text-right">
           <SensorValue {sensor} value={r.value} />

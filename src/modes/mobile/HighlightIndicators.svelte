@@ -60,9 +60,9 @@
     <div class="mobile-kpi">
       <div>
         {#await s.trend}
-          <TrendIndicator trend={null} long sensor={s.sensor} />
+          <TrendIndicator trend={null} long />
         {:then d}
-          <TrendIndicator trend={d} long sensor={s.sensor} />
+          <TrendIndicator trend={d} long />
         {/await}
       </div>
     </div>

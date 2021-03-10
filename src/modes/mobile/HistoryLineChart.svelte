@@ -70,7 +70,6 @@
       title: [sensor.name, `in ${region.displayName}`],
       subTitle: sensor.unit,
       highlightRegion: true,
-      isPercentage: sensor.isPercentage,
     };
     if (!isMobile || options.title.reduce((acc, v) => acc + v.length, 0) < 35) {
       options.title = options.title.join(' '); // single title line

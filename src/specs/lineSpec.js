@@ -86,7 +86,6 @@ export function generateLineChartSpec({
   subTitle = null,
   color = COLOR,
   initialDate = null,
-  isPercentage = false,
   valueField = 'value',
   zero = false,
   highlightRegion = false,
@@ -161,7 +160,6 @@ export function generateLineChartSpec({
               domain: false,
               tickCount: 5,
               labelFontSize: 14,
-              labelExpr: isPercentage ? `datum.label + '%'` : undefined,
             },
             scale: {
               round: true,
