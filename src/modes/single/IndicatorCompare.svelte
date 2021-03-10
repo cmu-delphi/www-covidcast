@@ -280,7 +280,11 @@
               field: 'date_value',
               type: 'temporal',
               scale: { range: [0, 6] },
-              legend: sizeLegend,
+              legend: sizeLegend
+                ? {
+                    // orient: 'bottom',
+                  }
+                : null,
             },
           },
         },
@@ -351,7 +355,7 @@
   function makeSplomSpec(matrixSpec) {
     return {
       $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
-      padding: 10,
+      padding: { left: 10, right: 50, top: 10, bottom: 10 },
       data: { name: 'values' },
 
       ...matrixSpec,

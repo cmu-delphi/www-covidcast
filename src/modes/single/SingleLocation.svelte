@@ -241,7 +241,7 @@
               {/each}
             </table>
           </td>
-          <td style="width: 400px; height: 400px; vertical-align: top">
+          <td style="width: 500px; height: 400px; vertical-align: top">
             {#if showLagDetailsForSensor}
               Lag:
               <input
@@ -250,7 +250,7 @@
                 max="28"
                 step="1"
                 value="0"
-                on:change={(e) => {
+                on:mousemove={(e) => {
                   console.info('change lag', e);
                   sensorDetailsLag = e.target.value;
                 }} />
