@@ -211,9 +211,7 @@
     <tr>
       <th class="mobile-th">{title.unit}</th>
       <th class="mobile-th">Change Last 7 days</th>
-      <th class="mobile-th uk-text-right">
-        {@html sensor.unitHTML}
-      </th>
+      <th class="mobile-th uk-text-right">{sensor.unitShort}</th>
       <th class="mobile-th uk-text-right">
         <span>historical trend</span>
         <div class="mobile-th-range">

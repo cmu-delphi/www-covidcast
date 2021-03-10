@@ -656,6 +656,7 @@ export class SensorParam {
     this.isInverted = isInverted(sensor);
     this.formatValue = formatValue;
     this.unit = this.isPercentage ? 'per 100 people' : this.isPer100K ? 'per 100,000 people' : '';
+    this.unitShort = this.isPer100K ? 'per 100k' : 'per 100';
     this.unitHTML = this.isPer100K ? `<span class="per100k"><span>PER</span><span>100K</span></span>` : 'per 100';
     this.yAxis = sensor.yAxis;
     this.xAxis = sensor.xAxis || (this.isCasesOrDeath ? 'Reported Date' : 'Date');
