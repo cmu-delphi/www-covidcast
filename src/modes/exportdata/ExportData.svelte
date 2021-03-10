@@ -182,8 +182,6 @@
     geoType = $currentSensorEntry.levels[0];
   });
 
-  let currentMode = 'csv';
-
   let form = null;
 
   onMount(() => {
@@ -293,7 +291,7 @@
         {/if}
       </section>
 
-      <section class="uk-form-horizontal uk-margin-top">
+      <section class="uk-form-horizontal uk-margin-large-top">
         <FancyHeader sub="Parameters" normal>2. Specify</FancyHeader>
         <p>Customize the date range and pick a geographic level to download data for</p>
         <div>
@@ -395,48 +393,19 @@
         </div>
       </section>
 
-      <section class="uk-margin-top">
+      <section class="uk-margin-large-top">
         <FancyHeader sub="Data" normal>3. Get</FancyHeader>
         <p>
           {@html signal && signal.entry ? signal.entry.credits : ''}
         </p>
-        <p>Please acknowledge us as a source: <cite> Data from Delphi COVIDcast, covidcast.cmu.edu. </cite></p>
-        <div class="uk-button-group">
-          <button
-            class="uk-button uk-button-default"
-            data-testid="csv"
-            on:click={() => {
-              currentMode = 'csv';
-            }}
-            class:uk-active={currentMode === 'csv'}
-            disabled={!geoType || !signalValue}
-            title="Get in CSV format">
-            CSV
-          </button>
-          <button
-            aria-pressed={String(currentMode === 'python')}
-            class="uk-button uk-button-default"
-            data-testid="python"
-            class:uk-active={currentMode === 'python'}
-            on:click={() => {
-              currentMode = 'python';
-            }}
-            title="Get Python Code">
-            Python
-          </button>
-          <button
-            aria-pressed={String(currentMode === 'r')}
-            class="uk-button uk-button-default"
-            data-testid="r"
-            class:uk-active={currentMode === 'r'}
-            on:click={() => {
-              currentMode = 'r';
-            }}
-            title="Get R Code">
-            R
-          </button>
-        </div>
-        {#if currentMode === 'csv'}
+        <p>
+          We provide our data as a direct link to a CSV file or you can use our Python and R packages. Please
+          acknowledge us as a source:
+          <cite> Data from Delphi COVIDcast, covidcast.cmu.edu. </cite>
+        </p>
+
+        <h3 class="mobile-h3 uk-margin-top">CSV File</h3>
+        <div>
           <p>Direct link:</p>
           <form bind:this={form} id="form" method="GET" action={CSV_SERVER} download>
             <button type="submit" class="uk-button uk-button-default">Download CSV File</button>
@@ -458,7 +427,9 @@
             data structure can be found at:
             <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html#response">covidcast</a>.
           </p>
-        {:else if currentMode === 'python'}
+        </div>
+        <div>
+          <h3 class="mobile-h3 uk-margin-top">Python Package</h3>
           <p>Install <code>covidcast</code> via pip:</p>
           <pre><code>pip install covidcast</code></pre>
           <p>Fetch data:</p>
@@ -477,7 +448,9 @@ data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal
             <a
               href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/signals.html#covidcast.signal">covidcast.signal</a>.
           </p>
-        {:else if currentMode === 'r'}
+        </div>
+        <div>
+          <h3 class="mobile-h3 uk-margin-top">R Package</h3>
           <p>Install <code>covidcast</code> using <a href="https://devtools.r-lib.org/">devtools</a> :</p>
           <pre><code>devtools::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/covidcast")</code></pre>
           <p>Fetch data:</p>
@@ -497,7 +470,7 @@ covidcast_signal(data_source = "${signal ? signal.dataSource : ''}", signal = "$
             <a
               href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html#value">covidcast_signal</a>.
           </p>
-        {/if}
+        </div>
       </section>
     </div>
   </div>
