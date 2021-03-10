@@ -441,7 +441,7 @@
         <div>
           <h3 class="mobile-h3 uk-margin-top">Python Package</h3>
           <p>Install <code>covidcast</code> via pip:</p>
-          <pre><code>pip install covidcast</code></pre>
+          <pre class="code-block"><code>pip install covidcast</code></pre>
           <p>Fetch data:</p>
           <pre class="code-block"><code>
         {`from datetime import date
@@ -462,7 +462,8 @@ data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal
         <div>
           <h3 class="mobile-h3 uk-margin-top">R Package</h3>
           <p>Install <code>covidcast</code> using <a href="https://devtools.r-lib.org/">devtools</a> :</p>
-          <pre><code>devtools::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/covidcast")</code></pre>
+          <pre
+            class="code-block"><code>devtools::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/covidcast")</code></pre>
           <p>Fetch data:</p>
           <pre class="code-block"><code>
         {`library(covidcast)

@@ -12,6 +12,8 @@
   import { MISSING_COLOR } from '../../theme';
   import ColorLegend from './components/ColorLegend.svelte';
   import { hsl } from 'd3-color';
+  import DownloadMenu from './components/DownloadMenu.svelte';
+  import { formatDateISO } from '../../formats';
 
   export let className = '';
   /**
@@ -61,6 +63,12 @@
         region: d,
         sparkLine,
         value,
+        dump:
+          sparkLine ||
+          value.then((vs) => ({
+            ...d,
+            ...(vs || {}),
+          })),
       };
     });
   }
@@ -78,6 +86,7 @@
     domain: date.sparkLineTimeFrame.domain,
   });
   $: colorScale = sensor.createColorScale($stats, region.level);
+  $: dumpData = Promise.all(tileData.map((d) => d.dump)).then((rows) => rows.flat());
 
   const maxColumn = state2TileCell.reduce((acc, v) => Math.max(acc, v.x), 0) + 1;
 
@@ -156,5 +165,7 @@
       {/await}
     {/each}
   </HexGrid>
-  <ColorLegend {sensor} level="state" />
+  <ColorLegend {sensor} level="state" gradientLength={$isMobileDevice ? 250 : 280}>
+    <DownloadMenu fileName="{sensor.name}_US_States_{formatDateISO(date.value)}" data={dumpData} absolutePos {sensor} />
+  </ColorLegend>
 </div>
