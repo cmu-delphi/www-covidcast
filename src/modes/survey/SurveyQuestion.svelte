@@ -63,13 +63,6 @@
     align-items: center;
   }
 
-  h3.header {
-    font-size: 1rem;
-    font-weight: 600;
-    text-align: center;
-    margin: 0.6em 0;
-  }
-
   .uk-card-header > a {
     margin-left: 1em;
   }
@@ -151,9 +144,7 @@
     <IndicatorOverview {sensor} {date} {region} {fetcher} />
 
     <hr />
-    <h3 class="header">{sensor.name} ({sensor.unit})</h3>
-
-    <div class="chart-250">
+    <div class="chart-300">
       <HistoryLineChart {sensor} {date} {region} {fetcher} />
     </div>
 

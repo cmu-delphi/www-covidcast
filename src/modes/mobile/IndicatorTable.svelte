@@ -1,11 +1,19 @@
 <script>
   import { groupedSensorList, sensorList } from '../../stores/constants';
-  import IndicatorTableRow from './IndicatorTableRow.svelte';
   import FancyHeader from './FancyHeader.svelte';
   import { SensorParam } from '../../stores/params';
-  import { formatDateShortNumbers } from '../../formats';
+  import { formatDateISO, formatDateShortNumbers } from '../../formats';
   import filterIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/filter.svg';
   import { CASES_DEATH_SOURCE, getDataSource } from '../../stores/dataSourceLookup';
+  import { currentMode } from '../../stores';
+  import { modeByID } from '..';
+  import TrendIndicator from './TrendIndicator.svelte';
+  import Vega from '../../components/Vega.svelte';
+  import SparkLineTooltip from './SparkLineTooltip.svelte';
+  import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
+  import { generateSparkLine } from '../../specs/lineSpec';
+  import SensorValue from './SensorValue.svelte';
+  import DownloadMenu from './components/DownloadMenu.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -56,6 +64,62 @@
       (!sensor.isCasesOrDeath && sensor.id === selected)
     );
   }
+  /**
+   * @param {import("../../stores/params").SensorParam} sensor
+   * @param {import("../../stores/params").DateParam} date
+   * @param {import("../../stores/params").RegionParam} region
+   */
+  function loadData(region, date) {
+    return groupedSensorList.map((group) => {
+      return {
+        ...group,
+        sensors: group.sensors.map((s) => {
+          const sensor = new SensorParam(s);
+          return {
+            sensor,
+            sparkLine: fetcher.fetchSparkLine(sensor, region, date),
+            trend: fetcher.fetchWindowTrend(sensor, region, date),
+            switchMode: () => {
+              sensor.set(s, true);
+              currentMode.set(modeByID.indicator);
+            },
+          };
+        }),
+      };
+    });
+  }
+
+  function generateDumpData(loadedData, date, region) {
+    const sensors = loadedData.map((d) => d.sensors).flat();
+    return Promise.all(sensors.map((d) => d.trend)).then((trends) =>
+      trends.map((trend, i) => {
+        const sensor = sensors[i].sensor;
+        return {
+          indicatorDataSource: sensor.value.id,
+          indicatorId: sensor.value.signal,
+          indicatorName: sensor.name,
+          regionId: region.propertyId,
+          regionLevel: region.level,
+          regionName: region.displayName,
+          date: formatDateISO(date.value),
+          value: trend.current ? trend.current.value : '',
+          trend: trend.trend,
+          delta: trend.delta == null || Number.isNaN(trend.delta) ? '' : trend.delta,
+          refDate: formatDateISO(trend.refDate),
+          refValue: trend.ref ? trend.ref.value : '',
+        };
+      }),
+    );
+  }
+
+  /**
+   * @type {import('vega-lite').TopLevelSpec}
+   */
+  $: spec = generateSparkLine({ highlightDate: true, domain: date.sparkLineTimeFrame.domain });
+
+  $: loadedData = loadData(region, date);
+  $: dumpData = generateDumpData(loadedData, date, region);
+  $: fileName = `Overview_${region.propertyId}-${region.displayName}_${formatDateISO(date.value)}`;
 </script>
 
 <style>
@@ -84,9 +148,18 @@
     border-radius: 3px;
     border: 1px solid #d3d4d8;
   }
+
+  .details-link {
+    width: 6px;
+    display: inline-block;
+    fill: currentColor;
+  }
 </style>
 
-<FancyHeader sub="Indicators">COVID-19</FancyHeader>
+<div class="uk-position-relative">
+  <FancyHeader sub="Indicators">COVID-19</FancyHeader>
+  <DownloadMenu {fileName} data={dumpData} absolutePos prepareRow={(row) => row} />
+</div>
 
 <div class="icon-wrapper">
   <span>
@@ -121,7 +194,7 @@
       <th class="mobile-th" />
     </tr>
   </thead>
-  {#each groupedSensorList as group}
+  {#each loadedData as group}
     {#if !selectedDatasource || selectedDatasource === 'all' || group.sensors.some((d) =>
         matchDataSource(d, selectedDatasource),
       )}
@@ -129,9 +202,54 @@
         <tr class="row-group">
           <th class="mobile-h3" colspan="5">{group.label}</th>
         </tr>
-        {#each group.sensors as sensor}
-          {#if matchDataSource(sensor, selectedDatasource)}
-            <IndicatorTableRow sensor={new SensorParam(sensor)} {date} {region} {fetcher} />
+        {#each group.sensors as entry}
+          {#if matchDataSource(entry.sensor, selectedDatasource)}
+            <tr class="has-addon">
+              <td>
+                <a
+                  href="?mode=indicator&sensor={entry.sensor.key}"
+                  class="uk-link-text"
+                  on:click|preventDefault={entry.switchMode}>
+                  {entry.sensor.name}
+                </a>
+              </td>
+              <td>
+                {#await entry.trend}
+                  <TrendIndicator trend={null} sensor={entry.sensor} block />
+                {:then d}
+                  <TrendIndicator trend={d} sensor={entry.sensor} block />
+                {/await}
+              </td>
+              <td class="uk-text-right">
+                {#await entry.trend}
+                  ?
+                {:then t}
+                  <SensorValue sensor={entry.sensor} value={t && t.current ? t.current.value : null} />
+                {/await}
+              </td>
+              <td rowspan="2">
+                <div class="mobile-table-chart">
+                  <Vega
+                    {spec}
+                    data={entry.sparkLine}
+                    tooltip={SparkLineTooltip}
+                    tooltipProps={{ sensor: entry.sensor }}
+                    signals={{ currentDate: date.value }}
+                    noDataText="N/A" />
+                </div>
+              </td>
+              <td rowspan="2">
+                <a
+                  href="?mode=indicator&sensor={entry.sensor.key}"
+                  class="uk-link-text details-link"
+                  on:click|preventDefault={entry.switchMode}>
+                  {@html chevronRightIcon}
+                </a>
+              </td>
+            </tr>
+            <tr class="addon">
+              <td colspan="3">Source: {entry.sensor.dataSource}</td>
+            </tr>
           {/if}
         {/each}
       </tbody>
