@@ -2,11 +2,9 @@ import { timeFormat } from 'd3-time-format';
 import { format } from 'd3-format';
 
 const short = timeFormat('%B %d');
-const shortAbbr = timeFormat('%b %d');
 const shortNumbers = timeFormat('%-m/%d');
 const iso = timeFormat('%Y-%m-%d');
 const local = timeFormat('%m/%d/%Y');
-const shortAbbrNth = timeFormat('%b %-d');
 const shortWeekdayAbbr = timeFormat('%a, %b %-d');
 const weekday = timeFormat('%A, %B %-d');
 
@@ -22,13 +20,6 @@ export function formatDateShortNumbers(date) {
  */
 export function formatDateShort(date) {
   return !date ? '?' : short(date);
-}
-
-/**
- * @param {Date | null} date
- */
-export function formatDateShortAbbr(date) {
-  return !date ? '?' : shortAbbr(date);
 }
 
 /**
@@ -73,14 +64,6 @@ function nth(d) {
 
 /**
  * @param {Date | null} date
- * @param {boolean} nthSuffix
- */
-export function formatDateShortOrdinal(date, nthSuffix = true) {
-  return !date ? '?' : shortAbbrNth(date) + (nthSuffix ? nth(date.getDate()) : '');
-}
-
-/**
- * @param {Date | null} date
  */
 export function formatDateISO(date) {
   return !date ? '?' : iso(date);
@@ -91,16 +74,6 @@ export function formatDateISO(date) {
  */
 export function formatDateLocal(date) {
   return !date ? '?' : local(date);
-}
-
-/**
- * @param {NameInfo} info
- */
-export function formatPopulation(info) {
-  if (!info || typeof info.population !== 'number') {
-    return 'Unknown';
-  }
-  return info.population.toLocaleString();
 }
 
 const f = format(',.1f');
