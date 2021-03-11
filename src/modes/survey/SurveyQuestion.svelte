@@ -27,8 +27,6 @@
   export let fetcher;
 
   $: sensor = question.sensorParam;
-
-  $: dateRow = fetcher.fetch1Sensor1Region1DateDetails(sensor, region, date);
   $: trend = fetcher.fetchWindowTrend(sensor, region, date);
 
   let loading = false;
@@ -45,9 +43,11 @@
   function showShareLink() {
     const fullUrl = new URL(location.href);
     fullUrl.hash = `#${question.anchor}`;
+    const t = document.createElement('div');
+    t.textContent = fullUrl;
     window.UIkit.modal.alert(`
     <p>Use the following link to jump directly to this question:</p>
-    <a href="${fullUrl}">${fullUrl}</a>`);
+    <a href="${fullUrl}">${t.innerHTML}</a>`);
   }
 </script>
 
