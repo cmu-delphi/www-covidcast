@@ -29,6 +29,10 @@
     fetcher.invalidate(sensor, region, date);
   }
 
+  $: {
+    document.title = `COVIDcast | ${sensor.name} Indicator Details`;
+  }
+
   function switchMode() {
     currentMode.set(modeByID.summary);
   }
@@ -40,7 +44,7 @@
       <button class="mobile-back inline-svg-icon" on:click={switchMode}>
         {@html chevronLeftIcon}
       </button>
-      <h2>INDICATOR <span>Details</span></h2>
+      <h2>{sensor.name.toUpperCase()} <span>INDICATOR Details</span></h2>
     </div>
     <IndicatorDropdown {sensor} />
   </SurveyParameters>
@@ -50,11 +54,11 @@
       <IndicatorOverview {sensor} {date} {region} {fetcher} />
       <RegionOverview {region} />
 
-      <FancyHeader sub="Map">Indicator</FancyHeader>
+      <FancyHeader invert sub="Map">{sensor.name}</FancyHeader>
     </div>
     <RegionMapWrapper {sensor} {date} {region} {fetcher} />
     <div class="grid-3-11">
-      <FancyHeader sub="Chart">Indicator</FancyHeader>
+      <FancyHeader invert sub="Chart">{sensor.name}</FancyHeader>
 
       <div class="chart-300">
         <HistoryLineChart {sensor} {date} {region} {fetcher} />

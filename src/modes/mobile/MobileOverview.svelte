@@ -62,7 +62,7 @@
     <RegionMapWrapper {region} {date} sensor={CASES} {fetcher} />
     <div class="grid-3-11">
       <hr />
-      <FancyHeader sub="Chart">Indicator</FancyHeader>
+      <FancyHeader invert sub="Chart">{CASES.name}</FancyHeader>
       <div class="chart-300">
         <HistoryLineChart sensor={CASES} {date} {region} {fetcher} />
       </div>

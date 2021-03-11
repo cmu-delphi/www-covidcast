@@ -20,7 +20,7 @@
 {#if sensor.value.description}
   <div class="uk-container content-grid">
     <div class="grid-3-11 mobile-invert">
-      <h3 class="mobile-h3">About this indicator</h3>
+      <h3 class="mobile-h3">About {sensor.name}</h3>
 
       <div class="desc">
         {@html sensor.value.description}
