@@ -35,7 +35,7 @@
 </script>
 
 <div class="mobile-root">
-  <SurveyParameters sensor={sensor.value} {items} placeholder="Search by State or County">
+  <SurveyParameters sensor={sensor.value} {items} defaultItem={nationInfo} placeholder="Search by State or County">
     <div class="grid-3-11 mobile-header-line" slot="title">
       <button class="mobile-back inline-svg-icon" on:click={switchMode}>
         {@html chevronLeftIcon}
