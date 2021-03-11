@@ -36,20 +36,6 @@
   });
 </script>
 
-<style>
-  p {
-    margin: 1em 0;
-  }
-
-  .date-range {
-    padding: 0 2px;
-    display: flex;
-    justify-content: space-between;
-    line-height: 1;
-    font-size: 0.75rem;
-  }
-</style>
-
 <div class="mobile-two-col">
   <div class="mobile-kpi">
     <div>
@@ -70,7 +56,8 @@
         data={sparkline}
         tooltip={SparkLineTooltip}
         tooltipProps={{ sensor: sensor }}
-        signals={{ currentDate: date.value }} />
+        signals={{ currentDate: date.value }}
+      />
     </div>
     <div class="date-range">
       <span> {formatDateShortNumbers(date.sparkLineTimeFrame.min)} </span>
@@ -90,3 +77,17 @@
 </div>
 
 <TrendTextSummary {sensor} {date} {trend} />
+
+<style>
+  p {
+    margin: 1em 0;
+  }
+
+  .date-range {
+    padding: 0 2px;
+    display: flex;
+    justify-content: space-between;
+    line-height: 1;
+    font-size: 0.75rem;
+  }
+</style>

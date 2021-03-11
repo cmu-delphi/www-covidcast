@@ -40,7 +40,10 @@
       Daily survey participants
       {#await data then d}
         <UiKitHint
-          title="Between {formatDateLocal(d.minDate)} and {formatDateLocal(d.maxDate)} around {round(d.averageSampleSize).toLocaleString()} people participated on average daily in this survey." />
+          title="Between {formatDateLocal(d.minDate)} and {formatDateLocal(d.maxDate)} around {round(
+            d.averageSampleSize,
+          ).toLocaleString()} people participated on average daily in this survey."
+        />
       {/await}
     </div>
   </div>
@@ -56,7 +59,10 @@
       Total survey responses
       {#await data then d}
         <UiKitHint
-          title="Between {formatDateLocal(d.minDate)} and {formatDateLocal(d.maxDate)} around {round(d.totalSampleSize).toLocaleString()} responses were collected in this survey." />
+          title="Between {formatDateLocal(d.minDate)} and {formatDateLocal(d.maxDate)} around {round(
+            d.totalSampleSize,
+          ).toLocaleString()} responses were collected in this survey."
+        />
       {/await}
     </div>
   </div>

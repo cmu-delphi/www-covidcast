@@ -3,6 +3,13 @@
   export let checked = false;
 </script>
 
+<label class="toggle" class:checked>
+  <slot name="before" />
+  <input type="checkbox" bind:checked />
+  {@html toggleOnIcon}
+  <slot />
+</label>
+
 <style>
   .toggle {
     cursor: pointer;
@@ -26,10 +33,3 @@
     transform: scale(1, 1);
   }
 </style>
-
-<label class="toggle" class:checked>
-  <slot name="before" />
-  <input type="checkbox" bind:checked />
-  {@html toggleOnIcon}
-  <slot />
-</label>

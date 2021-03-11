@@ -149,6 +149,16 @@
   }
 </script>
 
+<div class="uk-container root">
+  <h2>Masks vs Cases</h2>
+  <!-- <h3>Masks</h3>
+  <Vega spec={lineSpec} data={masksData} signalListeners={['highlight']} signals={signalPatches} on:signal={onSignal} /> -->
+  <h3>Cases (count)</h3>
+  <Vega spec={lineSpec} data={casesData} signalListeners={['highlight']} signals={signalPatches} on:signal={onSignal} />
+  <h3>Masks (percentage) vs Cases (per 100k)</h3>
+  <Vega spec={gapMinderSpec} {data} className="gapminder" />
+</div>
+
 <style>
   .root {
     display: flex;
@@ -159,13 +169,3 @@
     height: 500px;
   }
 </style>
-
-<div class="uk-container root">
-  <h2>Masks vs Cases</h2>
-  <!-- <h3>Masks</h3>
-  <Vega spec={lineSpec} data={masksData} signalListeners={['highlight']} signals={signalPatches} on:signal={onSignal} /> -->
-  <h3>Cases (count)</h3>
-  <Vega spec={lineSpec} data={casesData} signalListeners={['highlight']} signals={signalPatches} on:signal={onSignal} />
-  <h3>Masks (percentage) vs Cases (per 100k)</h3>
-  <Vega spec={gapMinderSpec} {data} className="gapminder" />
-</div>

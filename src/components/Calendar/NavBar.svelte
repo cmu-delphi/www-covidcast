@@ -45,6 +45,30 @@
   }
 </script>
 
+<div class="cal-title">
+  <div class="heading-section">
+    <div class="control" class:enabled={canDecrementMonth} on:click={() => dispatch('incrementMonth', -1)}>
+      <i class="arrow left" />
+    </div>
+    <div class="label" on:click={toggleMonthSelectorOpen}>{monthsOfYear[month][0]} {year}</div>
+    <div class="control" class:enabled={canIncrementMonth} on:click={() => dispatch('incrementMonth', 1)}>
+      <i class="arrow right" />
+    </div>
+  </div>
+  <div class="month-selector" class:open={monthSelectorOpen}>
+    {#each availableMonths as monthDefinition, index}
+      <div
+        class="month-selector--month"
+        class:selected={index === month}
+        class:selectable={monthDefinition.selectable}
+        on:click={(e) => monthSelected(e, { m: monthDefinition, i: index })}
+      >
+        <span>{monthDefinition.abbrev}</span>
+      </div>
+    {/each}
+  </div>
+</div>
+
 <style>
   .heading-section {
     font-size: 20px;
@@ -140,26 +164,3 @@
     -webkit-transform: rotate(135deg);
   }
 </style>
-
-<div class="cal-title">
-  <div class="heading-section">
-    <div class="control" class:enabled={canDecrementMonth} on:click={() => dispatch('incrementMonth', -1)}>
-      <i class="arrow left" />
-    </div>
-    <div class="label" on:click={toggleMonthSelectorOpen}>{monthsOfYear[month][0]} {year}</div>
-    <div class="control" class:enabled={canIncrementMonth} on:click={() => dispatch('incrementMonth', 1)}>
-      <i class="arrow right" />
-    </div>
-  </div>
-  <div class="month-selector" class:open={monthSelectorOpen}>
-    {#each availableMonths as monthDefinition, index}
-      <div
-        class="month-selector--month"
-        class:selected={index === month}
-        class:selectable={monthDefinition.selectable}
-        on:click={(e) => monthSelected(e, { m: monthDefinition, i: index })}>
-        <span>{monthDefinition.abbrev}</span>
-      </div>
-    {/each}
-  </div>
-</div>

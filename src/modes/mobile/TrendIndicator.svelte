@@ -26,6 +26,26 @@
   }
 </script>
 
+<div
+  class="trend-indicator"
+  class:long
+  class:short={!long}
+  class:isBetter={trend && trend.isBetter}
+  class:isWorse={trend && trend.isWorse}
+  class:isSteady={trend && trend.isSteady}
+  class:block
+>
+  <span class="icon">
+    {@html trendIcon}
+  </span>
+  {#if long}
+    <span class="trend-text"> {trend != null ? trend.trend : 'Unknown'} </span>
+    {#if trend != null && !trend.isUnknown}
+      <span class="trend-value"> {formatFraction(trend ? trend.fractionChange : null, true)} </span>
+    {/if}
+  {:else}<span class="trend-value"> {formatFraction(trend ? trend.fractionChange : null, true)} </span>{/if}
+</div>
+
 <style>
   .trend-indicator {
     white-space: nowrap;
@@ -77,22 +97,3 @@
     --text: white;
   }
 </style>
-
-<div
-  class="trend-indicator"
-  class:long
-  class:short={!long}
-  class:isBetter={trend && trend.isBetter}
-  class:isWorse={trend && trend.isWorse}
-  class:isSteady={trend && trend.isSteady}
-  class:block>
-  <span class="icon">
-    {@html trendIcon}
-  </span>
-  {#if long}
-    <span class="trend-text"> {trend != null ? trend.trend : 'Unknown'} </span>
-    {#if trend != null && !trend.isUnknown}
-      <span class="trend-value"> {formatFraction(trend ? trend.fractionChange : null, true)} </span>
-    {/if}
-  {:else}<span class="trend-value"> {formatFraction(trend ? trend.fractionChange : null, true)} </span>{/if}
-</div>

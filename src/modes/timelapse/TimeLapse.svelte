@@ -170,6 +170,33 @@
   }
 </script>
 
+<main class="root">
+  <Options showDate={false} className="options-container" />
+  <Player
+    className="player-container"
+    {running}
+    on:toggle={toggleRunning}
+    value={$currentDateObject}
+    max={maxDate}
+    min={minDate}
+    on:change={(e) => jumpToDate(e.detail)}
+  />
+  <div class="map-container">
+    <MapContainer
+      mapLoading={running || loading}
+      legendLoading={false}
+      showDate
+      on:loading={(e) => {
+        loading = e.detail;
+        if (!e.detail) {
+          mapLoadedResolver();
+        }
+      }}
+      data={currentData}
+    />
+  </div>
+</main>
+
 <style>
   .root {
     position: relative;
@@ -215,28 +242,3 @@
     }
   }
 </style>
-
-<main class="root">
-  <Options showDate={false} className="options-container" />
-  <Player
-    className="player-container"
-    {running}
-    on:toggle={toggleRunning}
-    value={$currentDateObject}
-    max={maxDate}
-    min={minDate}
-    on:change={(e) => jumpToDate(e.detail)} />
-  <div class="map-container">
-    <MapContainer
-      mapLoading={running || loading}
-      legendLoading={false}
-      showDate
-      on:loading={(e) => {
-        loading = e.detail;
-        if (!e.detail) {
-          mapLoadedResolver();
-        }
-      }}
-      data={currentData} />
-  </div>
-</main>

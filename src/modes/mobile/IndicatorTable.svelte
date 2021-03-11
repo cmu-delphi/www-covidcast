@@ -122,40 +122,6 @@
   $: fileName = `Overview_${region.propertyId}-${region.displayName}_${formatDateISO(date.value)}`;
 </script>
 
-<style>
-  .icon-wrapper {
-    margin-top: 1em;
-    position: relative;
-  }
-
-  .icon-wrapper > span {
-    position: absolute;
-    left: 0;
-    width: 40px;
-    top: 0;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: #d3d4d8;
-  }
-
-  .icon-wrapper .uk-select {
-    padding-left: 50px !important;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    border-radius: 3px;
-    border: 1px solid #d3d4d8;
-  }
-
-  .details-link {
-    width: 6px;
-    display: inline-block;
-    fill: currentColor;
-  }
-</style>
-
 <div class="uk-position-relative">
   <FancyHeader sub="Indicators">COVID-19</FancyHeader>
   <DownloadMenu {fileName} data={dumpData} absolutePos prepareRow={(row) => row} />
@@ -209,7 +175,8 @@
                 <a
                   href="?mode=indicator&sensor={entry.sensor.key}"
                   class="uk-link-text"
-                  on:click|preventDefault={entry.switchMode}>
+                  on:click|preventDefault={entry.switchMode}
+                >
                   {entry.sensor.name}
                 </a>
               </td>
@@ -235,14 +202,16 @@
                     tooltip={SparkLineTooltip}
                     tooltipProps={{ sensor: entry.sensor }}
                     signals={{ currentDate: date.value }}
-                    noDataText="N/A" />
+                    noDataText="N/A"
+                  />
                 </div>
               </td>
               <td rowspan="2">
                 <a
                   href="?mode=indicator&sensor={entry.sensor.key}"
                   class="uk-link-text details-link"
-                  on:click|preventDefault={entry.switchMode}>
+                  on:click|preventDefault={entry.switchMode}
+                >
                   {@html chevronRightIcon}
                 </a>
               </td>
@@ -256,3 +225,37 @@
     {/if}
   {/each}
 </table>
+
+<style>
+  .icon-wrapper {
+    margin-top: 1em;
+    position: relative;
+  }
+
+  .icon-wrapper > span {
+    position: absolute;
+    left: 0;
+    width: 40px;
+    top: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #d3d4d8;
+  }
+
+  .icon-wrapper .uk-select {
+    padding-left: 50px !important;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 3px;
+    border: 1px solid #d3d4d8;
+  }
+
+  .details-link {
+    width: 6px;
+    display: inline-block;
+    fill: currentColor;
+  }
+</style>

@@ -25,17 +25,6 @@
   // fetch counties and mega county
 </script>
 
-<style>
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-  h3 {
-    margin-top: 0;
-    text-align: center;
-  }
-</style>
-
 <h2>State Maps</h2>
 
 <div class="grid">
@@ -46,3 +35,14 @@
   <Vega spec={ny.spec} data={ny.data} />
   <Vega spec={pa.spec} data={pa.data} />
 </div>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  h3 {
+    margin-top: 0;
+    text-align: center;
+  }
+</style>

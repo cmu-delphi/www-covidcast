@@ -9,6 +9,21 @@
   export let onHighlight;
 </script>
 
+<div class="single-sensor-chart vega-wrapper">
+  <Vega
+    data={s.data}
+    spec={s.spec}
+    noDataText={s.noDataText}
+    signals={{ currentDate: $currentDateObject, highlightTimeValue }}
+    signalListeners={['highlight']}
+    eventListeners={['click']}
+    on:click={onClick}
+    on:signal={onHighlight}
+    tooltip={VegaTooltip}
+    tooltipProps={{ sensor: s.sensor }}
+  />
+</div>
+
 <style>
   .single-sensor-chart {
     height: 4em;
@@ -25,17 +40,3 @@
     bottom: 0;
   }
 </style>
-
-<div class="single-sensor-chart vega-wrapper">
-  <Vega
-    data={s.data}
-    spec={s.spec}
-    noDataText={s.noDataText}
-    signals={{ currentDate: $currentDateObject, highlightTimeValue }}
-    signalListeners={['highlight']}
-    eventListeners={['click']}
-    on:click={onClick}
-    on:signal={onHighlight}
-    tooltip={VegaTooltip}
-    tooltipProps={{ sensor: s.sensor }} />
-</div>

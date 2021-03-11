@@ -112,6 +112,9 @@
   });
 </script>
 
+<div class="map-wrapper" bind:this={container} />
+<svelte:window on:resize={onResize} />
+
 <style>
   .map-wrapper {
     position: absolute;
@@ -121,6 +124,3 @@
     bottom: 0;
   }
 </style>
-
-<div class="map-wrapper" bind:this={container} />
-<svelte:window on:resize={onResize} />

@@ -60,31 +60,6 @@
   filteredInfos.unshift(nationInfo);
 </script>
 
-<style>
-  .root {
-    position: relative;
-    flex: 1 1 0;
-    font-size: 0.875rem;
-    line-height: 1.5rem;
-  }
-  .questions {
-    margin-top: 1em;
-  }
-  .toc-container {
-    position: sticky;
-    top: 100px;
-    margin-top: 1em;
-  }
-
-  .content-grid {
-    grid-row-gap: 0;
-  }
-
-  .toc {
-    padding: 24px 6px 24px 24px;
-  }
-</style>
-
 <div class="root">
   <SurveyParameters sensor={refSensor} items={filteredInfos} defaultItem={nationInfo}>
     <div class="grid-3-11 mobile-header-line" slot="title">
@@ -119,3 +94,28 @@
     </div>
   </div>
 </div>
+
+<style>
+  .root {
+    position: relative;
+    flex: 1 1 0;
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+  .questions {
+    margin-top: 1em;
+  }
+  .toc-container {
+    position: sticky;
+    top: 100px;
+    margin-top: 1em;
+  }
+
+  .content-grid {
+    grid-row-gap: 0;
+  }
+
+  .toc {
+    padding: 24px 6px 24px 24px;
+  }
+</style>

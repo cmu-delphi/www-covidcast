@@ -40,6 +40,16 @@
   }
 </script>
 
+<p class="stats-line">
+  {#await dateRow then s}
+    {s
+      ? `The 7-day average of "${sensor.name}" on ${formatDateLocal(s.date_value)} is based on ${formatSampleSize(
+          s,
+        )} samples with a standard error of ${formatStdErr(s.stderr)}. It was published on ${formatIssueDate(s)}.`
+      : ''}
+  {/await}
+</p>
+
 <style>
   .stats-line {
     font-style: italic;
@@ -48,9 +58,3 @@
     margin-top: 1em;
   }
 </style>
-
-<p class="stats-line">
-  {#await dateRow then s}
-    {s ? `The 7-day average of "${sensor.name}" on ${formatDateLocal(s.date_value)} is based on ${formatSampleSize(s)} samples with a standard error of ${formatStdErr(s.stderr)}. It was published on ${formatIssueDate(s)}.` : ''}
-  {/await}
-</p>

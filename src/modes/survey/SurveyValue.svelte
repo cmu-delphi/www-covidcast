@@ -15,6 +15,9 @@
   $: fraction = hasFraction ? Math.round(scaled * digitsPow) % digitsPow : 0;
 </script>
 
+<span class="text">{base.toLocaleString()}</span>
+{#if hasFraction}<span class="fraction"> {`.${fraction}`} </span>{/if}
+
 <style>
   .text {
     font-size: 1.5rem;
@@ -41,6 +44,3 @@
     }
   }
 </style>
-
-<span class="text">{base.toLocaleString()}</span>
-{#if hasFraction}<span class="fraction"> {`.${fraction}`} </span>{/if}

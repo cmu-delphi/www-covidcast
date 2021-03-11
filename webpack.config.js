@@ -4,7 +4,6 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 // const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
 const { EnvironmentPlugin, DefinePlugin } = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
@@ -15,6 +14,7 @@ const hmr = devMode;
 
 module.exports = () => {
   return {
+    target: devMode ? 'web' : undefined,
     entry: {
       wrapper: './src/wrapper/index.js',
       bundle: './src/index.js',
@@ -70,43 +70,44 @@ module.exports = () => {
         },
         {
           test: /\.svelte$/,
-          use: hmr
-            ? [
-                {
-                  loader: 'svelte-loader-hot',
-                  options: {
-                    dev: true,
-                    hotReload: true,
-                    emitCss: false,
-                  },
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                cacheDirectory: true,
+                cacheCompression: false,
+              },
+            },
+            {
+              loader: 'svelte-loader',
+              options: {
+                compilerOptions: {
+                  dev: devMode,
                 },
-              ]
-            : [
-                {
-                  loader: 'babel-loader',
-                  options: {
-                    cacheDirectory: true,
-                    cacheCompression: false,
-                  },
-                },
-                {
-                  loader: 'svelte-loader',
-                  options: {
-                    dev: devMode,
-                    emitCss: true,
-                  },
-                },
-              ],
+                hotReload: hmr,
+                emitCss: !devMode,
+              },
+            },
+          ].slice(hmr ? 1 : 0),
+        },
+        {
+          // required to prevent errors from Svelte on Webpack 5+, omit on Webpack 4
+          test: /node_modules\/svelte\/.*\.mjs$/,
+          resolve: {
+            fullySpecified: false,
+          },
         },
         {
           test: /\.(sass|css|scss)$/i,
           use: [
-            {
-              loader: MiniCssExtractPlugin.loader,
-              options: {
-                esModule: false,
-              },
-            },
+            devMode
+              ? 'style-loader'
+              : {
+                  loader: MiniCssExtractPlugin.loader,
+                  options: {
+                    esModule: false,
+                  },
+                },
             'css-loader',
             'sass-loader',
           ],
@@ -143,85 +144,68 @@ module.exports = () => {
         __VERSION__: JSON.stringify(pkg.version),
       }),
       new EnvironmentPlugin({
-        NODE_ENV: 'production',
         COVIDCAST_ENDPOINT_URL: 'https://api.covidcast.cmu.edu/epidata/api.php',
       }),
-      // new CopyPlugin({
-      //   patterns: ['./src/static'],
-      // }),
-
       new HtmlWebpackPlugin({
-        alwaysWriteToDisk: true,
         title: 'COVIDcast',
         template: './src/index.html',
       }),
       new HtmlWebpackPlugin({
-        alwaysWriteToDisk: true,
         title: 'COVIDcast',
         template: './src/index.html',
         filename: 'landing/index.html',
       }),
       new HtmlWebpackPlugin({
-        alwaysWriteToDisk: true,
         title: 'COVIDcast',
         template: './src/index.html',
         filename: 'summary/index.html',
       }),
       new HtmlWebpackPlugin({
-        alwaysWriteToDisk: true,
         title: 'COVIDcast Indicator Details',
         template: './src/index.html',
         filename: 'indicator/index.html',
       }),
       new HtmlWebpackPlugin({
-        alwaysWriteToDisk: true,
         title: 'COVIDcast',
         template: './src/index.html',
         filename: 'classic/index.html',
       }),
       // new HtmlWebpackPlugin({
-      //   alwaysWriteToDisk: true,
       //   title: 'COVIDcast Timelapse',
       //   template: './src/index.html',
       //   filename: 'timelapse/index.html',
       // }),
       // new HtmlWebpackPlugin({
-      //   alwaysWriteToDisk: true,
       //   title: 'COVIDcast Top 10',
       //   template: './src/index.html',
       //   filename: 'top10/index.html',
       // }),
       // new HtmlWebpackPlugin({
-      //   alwaysWriteToDisk: true,
       //   title: 'COVIDcast Region Details',
       //   template: './src/index.html',
       //   filename: 'single/index.html',
       // }),
       new HtmlWebpackPlugin({
-        alwaysWriteToDisk: true,
         title: 'COVIDcast Export Data',
         template: './src/index.html',
         filename: 'export/index.html',
       }),
       new HtmlWebpackPlugin({
-        alwaysWriteToDisk: true,
         title: 'COVIDcast Survey Results',
         template: './src/index.html',
         filename: 'survey-results/index.html',
       }),
       // new HtmlWebpackPlugin({
-      //   alwaysWriteToDisk: true,
       //   title: 'COVIDcast Lab',
       //   template: './src/index.html',
       //   filename: 'lab/index.html',
       // }),
-
-      new HtmlWebpackHarddiskPlugin(),
-      new MiniCssExtractPlugin({
-        filename: devMode ? '[name].css' : '[name].[contenthash].css',
-        ignoreOrder: true,
-        chunkFilename: devMode ? '[name].css' : '[name].[contenthash].css',
-      }),
+      !devMode &&
+        new MiniCssExtractPlugin({
+          filename: devMode ? '[name].css' : '[name].[contenthash].css',
+          ignoreOrder: true,
+          chunkFilename: devMode ? '[name].css' : '[name].[contenthash].css',
+        }),
     ].filter(Boolean),
   };
 };

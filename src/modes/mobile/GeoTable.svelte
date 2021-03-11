@@ -226,21 +226,24 @@
           label={title.unit}
           on:click={() => sortClick('displayName')}
           sorted={sortCriteria === 'displayName'}
-          desc={sortDirectionDesc} />
+          desc={sortDirectionDesc}
+        />
       </th>
       <th class="sort-indicator">
         <SortColumnIndicator
           label="Change Last 7 days"
           on:click={() => sortClick('delta')}
           sorted={sortCriteria === 'delta'}
-          desc={sortDirectionDesc} />
+          desc={sortDirectionDesc}
+        />
       </th>
       <th class="sort-indicator">
         <SortColumnIndicator
           label="Value"
           on:click={() => sortClick('value')}
           sorted={sortCriteria === 'value'}
-          desc={sortDirectionDesc} />
+          desc={sortDirectionDesc}
+        />
       </th>
       <th class="sort-indicator" />
     </tr>
@@ -249,10 +252,9 @@
     {#each sortedRegions as r}
       <tr class:important={r.important}>
         <td>
-          <a
-            href="?region={r.propertyId}"
-            class="uk-link-text"
-            on:click|preventDefault={() => region.set(r, true)}>{r.displayName}</a>
+          <a href="?region={r.propertyId}" class="uk-link-text" on:click|preventDefault={() => region.set(r, true)}
+            >{r.displayName}</a
+          >
         </td>
         <td>
           <TrendIndicator trend={r.trendObj} block />
@@ -268,7 +270,8 @@
               tooltip={SparkLineTooltip}
               tooltipProps={{ sensor }}
               signals={{ currentDate: date.value }}
-              noDataText="N/A" />
+              noDataText="N/A"
+            />
           </div>
         </td>
       </tr>

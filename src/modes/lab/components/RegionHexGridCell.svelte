@@ -16,6 +16,24 @@
   export let y = -1;
 </script>
 
+<HexGridCell {x} {y} {style} {className} border="2px" on:click>
+  <div class="content">
+    <span>
+      <span class="inline-svg-icon">
+        {@html childIcon}
+      </span>
+      {formatPopulation(params.region)}
+    </span>
+    <h3>{params.region.displayName}</h3>
+    <span>
+      <span class="inline-svg-icon">
+        {@html calendarIcon}
+      </span>
+      {formatDateShort(params.date)}
+    </span>
+  </div>
+</HexGridCell>
+
 <style>
   .content {
     display: flex;
@@ -35,21 +53,3 @@
     align-items: center;
   }
 </style>
-
-<HexGridCell {x} {y} {style} {className} border="2px" on:click>
-  <div class="content">
-    <span>
-      <span class="inline-svg-icon">
-        {@html childIcon}
-      </span>
-      {formatPopulation(params.region)}
-    </span>
-    <h3>{params.region.displayName}</h3>
-    <span>
-      <span class="inline-svg-icon">
-        {@html calendarIcon}
-      </span>
-      {formatDateShort(params.date)}
-    </span>
-  </div>
-</HexGridCell>

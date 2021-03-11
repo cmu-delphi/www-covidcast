@@ -9,7 +9,7 @@ function getOrInitPopper() {
     return tooltip;
   }
   const popper = document.createElement('div');
-  popper.classList.add('viz-tooltip', 'mapboxgl-popup-content', 'mapboxgl-map');
+  popper.classList.add('viz-tooltip');
   document.body.appendChild(popper);
 
   let bb = {

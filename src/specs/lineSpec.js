@@ -51,7 +51,7 @@ const AUTO_ALIGN = {
 
 function genCreditsLayer({ shift = 55 } = {}) {
   /**
-   * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
+   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
    */
   const layer = {
     data: {
@@ -105,6 +105,7 @@ export function generateLineChartSpec({
    * @type {import('vega-lite').TopLevelSpec}
    */
   const spec = {
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     width,
     height,
     padding: { left: 42, top: topOffset, bottom: 55, right: 15 },
@@ -180,21 +181,23 @@ export function generateLineChartSpec({
         },
       },
       {
-        selection: {
-          highlight: {
-            type: 'single',
-            empty: 'none',
-            init: initialDate
+        params: [
+          {
+            name: 'highlight',
+            select: {
+              type: 'point',
+              on: 'click, mousemove, [touchstart, touchend] > touchmove',
+              nearest: true,
+              clear: false,
+              encodings: ['x'],
+            },
+            value: initialDate
               ? {
                   x: initialDate,
                 }
               : undefined,
-            on: 'click, mousemove, [touchstart, touchend] > touchmove',
-            nearest: true,
-            clear: false,
-            encodings: ['x'],
           },
-        },
+        ],
         mark: {
           type: 'point',
           color,
@@ -212,7 +215,8 @@ export function generateLineChartSpec({
           },
           opacity: {
             condition: {
-              selection: 'highlight',
+              param: 'highlight',
+              empty: false,
               value: 1,
             },
             value: 0,
@@ -224,7 +228,8 @@ export function generateLineChartSpec({
         transform: [
           {
             filter: {
-              selection: 'highlight',
+              param: 'highlight',
+              empty: false,
             },
           },
           {
@@ -296,7 +301,7 @@ export function generateCompareLineSpec(compare, { compareField = 'displayName',
 export function generateLineAndBarSpec(options = {}) {
   const spec = generateLineChartSpec(options);
   /**
-   * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
+   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
    */
   const point = spec.layer[1];
   point.mark = {
@@ -362,7 +367,7 @@ export function generateSparkLine({
    * @type {import('vega-lite').TopLevelSpec}
    */
   const spec = {
-    $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: { name: 'values' },
     height,
     padding: {
@@ -435,22 +440,25 @@ export function generateSparkLine({
                 },
                 opacity: {
                   condition: {
-                    selection: 'highlight',
+                    param: 'highlight',
+                    empty: false,
                     value: 1,
                   },
                   value: 0,
                 },
               },
-              selection: {
-                highlight: {
-                  type: 'single',
-                  empty: 'none',
-                  on: 'click, mousemove, [touchstart, touchend] > touchmove',
-                  nearest: true,
-                  clear: 'view:mouseout',
-                  encodings: ['x'],
+              params: [
+                {
+                  name: 'highlight',
+                  select: {
+                    type: 'point',
+                    on: 'click, mousemove, [touchstart, touchend] > touchmove',
+                    nearest: true,
+                    clear: 'view:mouseout',
+                    encodings: ['x'],
+                  },
                 },
-              },
+              ],
             },
           ]
         : []),
