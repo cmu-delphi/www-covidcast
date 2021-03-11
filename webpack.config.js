@@ -5,7 +5,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
-const { EnvironmentPlugin, DefinePlugin } = require('webpack');
+const { EnvironmentPlugin, DefinePlugin, HotModuleReplacementPlugin } = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const pkg = require('./package.json');
@@ -70,33 +70,32 @@ module.exports = () => {
         },
         {
           test: /\.svelte$/,
-          use: hmr
-            ? [
-                {
-                  loader: 'svelte-loader-hot',
-                  options: {
-                    dev: true,
-                    hotReload: true,
-                    emitCss: false,
-                  },
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                cacheDirectory: true,
+                cacheCompression: false,
+              },
+            },
+            {
+              loader: 'svelte-loader',
+              options: {
+                compilerOptions: {
+                  dev: devMode,
                 },
-              ]
-            : [
-                {
-                  loader: 'babel-loader',
-                  options: {
-                    cacheDirectory: true,
-                    cacheCompression: false,
-                  },
-                },
-                {
-                  loader: 'svelte-loader',
-                  options: {
-                    dev: devMode,
-                    emitCss: true,
-                  },
-                },
-              ],
+                hotReload: hmr,
+                emitCss: true,
+              },
+            },
+          ].slice(hmr ? 1 : 0),
+        },
+        {
+          // required to prevent errors from Svelte on Webpack 5+, omit on Webpack 4
+          test: /node_modules\/svelte\/.*\.mjs$/,
+          resolve: {
+            fullySpecified: false,
+          },
         },
         {
           test: /\.(sass|css|scss)$/i,
@@ -139,6 +138,7 @@ module.exports = () => {
 
     plugins: [
       devMode ? null : new CleanWebpackPlugin(),
+      hmr && new HotModuleReplacementPlugin(),
       new DefinePlugin({
         __VERSION__: JSON.stringify(pkg.version),
       }),
