@@ -2,6 +2,7 @@
   export let sub = null;
   export let normal = false;
   export let center = false;
+  export let invert = false;
 </script>
 
 <style>
@@ -20,7 +21,15 @@
     text-align: center;
   }
 
-  h2.mobile-fancy-header span {
+  h2.mobile-fancy-header.invert {
+    font-weight: 600;
+  }
+  h2.mobile-fancy-header.invert span {
+    text-transform: uppercase;
+    font-weight: 300;
+  }
+
+  h2.mobile-fancy-header:not(.invert) span {
     text-transform: uppercase;
     font-weight: 600;
   }
@@ -32,7 +41,7 @@
   }
 </style>
 
-<h2 class="mobile-fancy-header" class:normal class:center>
+<h2 class="mobile-fancy-header" class:normal class:center class:invert>
   <slot />
   {#if sub}<span>{sub}</span>{/if}
 </h2>
