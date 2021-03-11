@@ -59,7 +59,7 @@
 
   let geoValuesMode = 'all';
   let geoValues = [];
-  $: geoItems = [...infosByLevel[geoType] || [], ...(geoType === 'county' ? infosByLevel.state : [])];
+  $: geoItems = [...(infosByLevel[geoType] || []), ...(geoType === 'county' ? infosByLevel.state : [])];
   $: {
     if (geoItems != null) {
       geoValues = [];
@@ -69,7 +69,9 @@
   function flatIds(geoValues) {
     if (geoType === 'county') {
       // flatten states to its counties
-      return geoValues.map((d) => d.level === 'state' ? getCountiesOfState(d).map((d) => d.propertyId) : d.propertyId).flat();
+      return geoValues
+        .map((d) => (d.level === 'state' ? getCountiesOfState(d).map((d) => d.propertyId) : d.propertyId))
+        .flat();
     } else {
       return geoValues.map((d) => d.propertyId);
     }
