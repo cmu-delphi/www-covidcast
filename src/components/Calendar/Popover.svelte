@@ -101,6 +101,26 @@
   };
 </script>
 
+<svelte:window bind:innerWidth={w} />
+<div class="sc-popover" bind:this={popover}>
+  <div class="trigger" on:click={doOpen} bind:this={triggerContainer}>
+    <slot name="trigger" />
+  </div>
+  <div
+    class="contents-wrapper"
+    class:visible={open}
+    class:shrink
+    style="transform: translate(-50%,-50%) translate({translateX}px, {translateY}px)"
+    bind:this={contentsWrapper}
+  >
+    <div class="contents" bind:this={contentsAnimated}>
+      <div class="contents-inner">
+        <slot />
+      </div>
+    </div>
+  </div>
+</div>
+
 <style>
   .sc-popover {
     position: relative;
@@ -187,22 +207,3 @@
     }
   }
 </style>
-
-<svelte:window bind:innerWidth={w} />
-<div class="sc-popover" bind:this={popover}>
-  <div class="trigger" on:click={doOpen} bind:this={triggerContainer}>
-    <slot name="trigger" />
-  </div>
-  <div
-    class="contents-wrapper"
-    class:visible={open}
-    class:shrink
-    style="transform: translate(-50%,-50%) translate({translateX}px, {translateY}px)"
-    bind:this={contentsWrapper}>
-    <div class="contents" bind:this={contentsAnimated}>
-      <div class="contents-inner">
-        <slot />
-      </div>
-    </div>
-  </div>
-</div>

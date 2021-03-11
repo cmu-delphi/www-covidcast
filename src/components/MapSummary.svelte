@@ -33,6 +33,16 @@
   }
 </script>
 
+<div
+  class="root base-font-size container-style"
+  class:hidden={!summary || !summary.data}
+  class:loading-bg={loading}
+  data-testid="coverage"
+  title={`Showing data for ${valid} ${info.labelPlural} out of ${total} ${info.labelPlural} (${percent(valid)}%)`}
+>
+  {percent(valid)}% Coverage
+</div>
+
 <style>
   .root {
     font-size: 0.7rem;
@@ -41,12 +51,3 @@
     display: none;
   }
 </style>
-
-<div
-  class="root base-font-size container-style"
-  class:hidden={!summary || !summary.data}
-  class:loading-bg={loading}
-  data-testid="coverage"
-  title={`Showing data for ${valid} ${info.labelPlural} out of ${total} ${info.labelPlural} (${percent(valid)}%)`}>
-  {percent(valid)}% Coverage
-</div>

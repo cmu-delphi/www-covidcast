@@ -26,6 +26,21 @@
   }
 </script>
 
+<div class="legend">
+  <div
+    class="gradient"
+    style="width: {gradientLength}px; background-image: {gradient(
+      scale,
+      gradientLength,
+    )}; padding-top: {gradientThickness}px; background-size: 100% {gradientThickness}px"
+  >
+    {#each scale.ticks(5) as tick}
+      <div class="tick" data-tick={sensor.formatValue(tick)} />
+    {/each}
+  </div>
+  <slot />
+</div>
+
 <style>
   .legend {
     display: flex;
@@ -57,14 +72,3 @@
     transform: translateX(-50%);
   }
 </style>
-
-<div class="legend">
-  <div
-    class="gradient"
-    style="width: {gradientLength}px; background-image: {gradient(scale, gradientLength)}; padding-top: {gradientThickness}px; background-size: 100% {gradientThickness}px">
-    {#each scale.ticks(5) as tick}
-      <div class="tick" data-tick={sensor.formatValue(tick)} />
-    {/each}
-  </div>
-  <slot />
-</div>

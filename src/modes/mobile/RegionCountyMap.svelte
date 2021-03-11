@@ -49,11 +49,13 @@
     tooltip={RegionMapTooltip}
     tooltipProps={{ sensor, regionSetter: region.set }}
     on:click={onClickHandler}
-    eventListeners={['click']} />
+    eventListeners={['click']}
+  />
   <DownloadMenu
     {vegaRef}
     {data}
     {sensor}
     absolutePos
-    fileName="{sensor.name}_US Counties_{formatDateISO(date.value)}" />
+    fileName="{sensor.name}_US Counties_{formatDateISO(date.value)}"
+  />
 </div>

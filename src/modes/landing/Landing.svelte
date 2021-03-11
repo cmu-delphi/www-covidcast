@@ -28,6 +28,82 @@
   }
 </script>
 
+<div class="uk-container content-grid root mobile-root landing-banner">
+  <div class="grid-4-10">
+    <h2>Welcome to COVIDcast</h2>
+    <p>Explore real-time COVID-19 indicators in any county, state or across the U.S.</p>
+
+    <Search
+      modern="small"
+      placeholder="Search for state or county"
+      items={[nationInfo, ...stateInfo, ...countyInfo]}
+      selectedItem={$currentRegionInfo}
+      labelFieldName="displayName"
+      keywordFunction={combineKeywords}
+      maxItemsToShowInList="5"
+      on:change={(e) => switchMode(e.detail && e.detail.level === 'nation' ? null : e.detail)}
+    />
+
+    <div class="chips">
+      {#each $recentRegionInfos.slice(0, 3) as region}
+        <a
+          class="chip uk-link-text uk-link-toggle"
+          href="?mode=mobile&region={region.propertyId}"
+          on:click|preventDefault={() => switchMode(region)}
+        >
+          {region.displayName}
+        </a>
+      {/each}
+    </div>
+    <div class="button-wrapper">
+      <a
+        class="uk-button uk-button-default uk-button-delphi uk-button-delphi__secondary uk-text-uppercase"
+        href="?mode=mobile"
+        on:click|preventDefault={() => switchMode(null)}
+      >
+        <span class="inline-svg-icon">
+          {@html flagUSAIcon}
+        </span>
+        U.S. National Summary
+      </a>
+    </div>
+
+    <p>
+      Our indicators include our national COVID survey, public experience, attitude, behavior, doctor's visits, hospital
+      admissions, tests, cases and deaths.
+    </p>
+
+    <FancyHeader sub="Indicators" center>COVID-19</FancyHeader>
+    <a href="https://cmu-delphi.github.io/delphi-epidata/" class="link-link uk-link-text">Explore our API</a>
+
+    <div class="mobile-two-col uk-text-center mobile-two-col__highlight">
+      <div class="mobile-kpi">
+        <div>
+          <SurveyValue value={questions.length} digits={0} />
+        </div>
+        <div class="subheader">Survey Indicators</div>
+      </div>
+      {#each groupedSensorList as group}
+        <div class="mobile-kpi">
+          <div>
+            <SurveyValue value={group.sensors.length} digits={0} />
+          </div>
+          <div class="subheader">{group.label}{group.label.endsWith('Indicators') ? '' : ' Indicators'}</div>
+        </div>
+      {/each}
+    </div>
+
+    <FancyHeader sub="Pandemic Survey via Facebook" center>Delphi</FancyHeader>
+    <a href="?mode=survey-results" on:click|preventDefault={switchDashboard} class="link-link uk-link-text"
+      >Go to survey dashboard</a
+    >
+
+    <SurveyStats className="uk-text-center mobile-two-col__highlight" />
+
+    <p>In collaboration with Facebook, Google, Change Healthcare, and Quidel.</p>
+  </div>
+</div>
+
 <style>
   .landing-banner {
     background: url('../../assets/imgs/landing-banner.png');
@@ -102,75 +178,3 @@
     text-decoration: underline;
   }
 </style>
-
-<div class="uk-container content-grid root mobile-root landing-banner">
-  <div class="grid-4-10">
-    <h2>Welcome to COVIDcast</h2>
-    <p>Explore real-time COVID-19 indicators in any county, state or across the U.S.</p>
-
-    <Search
-      modern="small"
-      placeholder="Search for state or county"
-      items={[nationInfo, ...stateInfo, ...countyInfo]}
-      selectedItem={$currentRegionInfo}
-      labelFieldName="displayName"
-      keywordFunction={combineKeywords}
-      maxItemsToShowInList="5"
-      on:change={(e) => switchMode(e.detail && e.detail.level === 'nation' ? null : e.detail)} />
-
-    <div class="chips">
-      {#each $recentRegionInfos.slice(0, 3) as region}
-        <a
-          class="chip uk-link-text uk-link-toggle"
-          href="?mode=mobile&region={region.propertyId}"
-          on:click|preventDefault={() => switchMode(region)}>
-          {region.displayName}
-        </a>
-      {/each}
-    </div>
-    <div class="button-wrapper">
-      <a
-        class="uk-button uk-button-default uk-button-delphi uk-button-delphi__secondary uk-text-uppercase"
-        href="?mode=mobile"
-        on:click|preventDefault={() => switchMode(null)}>
-        <span class="inline-svg-icon">
-          {@html flagUSAIcon}
-        </span>
-        U.S. National Summary
-      </a>
-    </div>
-
-    <p>
-      Our indicators include our national COVID survey, public experience, attitude, behavior, doctor's visits, hospital
-      admissions, tests, cases and deaths.
-    </p>
-
-    <FancyHeader sub="Indicators" center>COVID-19</FancyHeader>
-    <a href="https://cmu-delphi.github.io/delphi-epidata/" class="link-link uk-link-text">Explore our API</a>
-
-    <div class="mobile-two-col uk-text-center mobile-two-col__highlight">
-      <div class="mobile-kpi">
-        <div>
-          <SurveyValue value={questions.length} digits={0} />
-        </div>
-        <div class="subheader">Survey Indicators</div>
-      </div>
-      {#each groupedSensorList as group}
-        <div class="mobile-kpi">
-          <div>
-            <SurveyValue value={group.sensors.length} digits={0} />
-          </div>
-          <div class="subheader">{group.label}{group.label.endsWith('Indicators') ? '' : ' Indicators'}</div>
-        </div>
-      {/each}
-    </div>
-
-    <FancyHeader sub="Pandemic Survey via Facebook" center>Delphi</FancyHeader>
-    <a href="?mode=survey-results" on:click|preventDefault={switchDashboard} class="link-link uk-link-text">Go to survey
-      dashboard</a>
-
-    <SurveyStats className="uk-text-center mobile-two-col__highlight" />
-
-    <p>In collaboration with Facebook, Google, Change Healthcare, and Quidel.</p>
-  </div>
-</div>

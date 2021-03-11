@@ -52,6 +52,35 @@
   }
 </script>
 
+<div
+  class="trend-indicator"
+  class:long
+  class:short={!long}
+  class:isBetter={trend && trend.isBetter}
+  class:isWorse={trend && trend.isWorse}
+  class:isSteady={trend && trend.isSteady}
+  class:block
+>
+  <span class="icon">
+    {@html trendIcon}
+  </span>
+  {#if long}
+    <span class="trend-text"> {trend != null ? trend.trend : 'Unknown'} </span>
+    {#if trend != null && !trend.isUnknown}
+      <span class="trend-value">
+        <SensorValue {sensor} value={trend.delta} enforceSign />
+      </span>
+    {/if}
+  {:else}
+    <span class="trend-value">
+      <SensorValue {sensor} value={trend ? trend.delta : null} enforceSign />
+    </span>
+  {/if}
+  {#if explain}
+    <UiKitHint title={trendExplaination(trend)} />
+  {/if}
+</div>
+
 <style>
   .trend-indicator {
     white-space: nowrap;
@@ -103,31 +132,3 @@
     --text: white;
   }
 </style>
-
-<div
-  class="trend-indicator"
-  class:long
-  class:short={!long}
-  class:isBetter={trend && trend.isBetter}
-  class:isWorse={trend && trend.isWorse}
-  class:isSteady={trend && trend.isSteady}
-  class:block>
-  <span class="icon">
-    {@html trendIcon}
-  </span>
-  {#if long}
-    <span class="trend-text"> {trend != null ? trend.trend : 'Unknown'} </span>
-    {#if trend != null && !trend.isUnknown}
-      <span class="trend-value">
-        <SensorValue {sensor} value={trend.delta} enforceSign />
-      </span>
-    {/if}
-  {:else}
-    <span class="trend-value">
-      <SensorValue {sensor} value={trend ? trend.delta : null} enforceSign />
-    </span>
-  {/if}
-  {#if explain}
-    <UiKitHint title={trendExplaination(trend)} />
-  {/if}
-</div>

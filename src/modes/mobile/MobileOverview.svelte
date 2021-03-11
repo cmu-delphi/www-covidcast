@@ -25,27 +25,6 @@
   }
 </script>
 
-<style>
-  h3.header {
-    font-size: 1.125rem;
-    font-weight: 600;
-    text-align: center;
-    margin: 0.6em 0;
-  }
-  h4.header {
-    margin: 0;
-    margin-bottom: 1em;
-    font-size: 0.875rem;
-    text-align: center;
-  }
-
-  @media only screen and (min-width: 750px) {
-    h3.header {
-      font-size: 1.5rem;
-    }
-  }
-</style>
-
 <div class="mobile-root">
   <SurveyParameters sensor={sensor.value} {items} placeholder="Search by State or County">
     <div class="grid-3-11 mobile-header-line" slot="title">
@@ -75,3 +54,24 @@
     </div>
   </div>
 </div>
+
+<style>
+  h3.header {
+    font-size: 1.125rem;
+    font-weight: 600;
+    text-align: center;
+    margin: 0.6em 0;
+  }
+  h4.header {
+    margin: 0;
+    margin-bottom: 1em;
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+  @media only screen and (min-width: 750px) {
+    h3.header {
+      font-size: 1.5rem;
+    }
+  }
+</style>

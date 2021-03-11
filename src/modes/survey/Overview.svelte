@@ -25,6 +25,56 @@
   }
 </script>
 
+<div class="mobile-two-col">
+  <div class="mobile-kpi">
+    <div>
+      {#await data}
+        <SurveyValue value={null} />
+      {:then d}
+        <SurveyValue value={round(d.averageSampleSize)} />
+      {/await}
+    </div>
+    <div class="sub">
+      Participants daily
+      {#await data then d}
+        <UiKitHint
+          title="Between {formatDateShort(d.minDate)} and {formatDateShort(d.maxDate)} around {round(
+            d.averageSampleSize,
+          ).toLocaleString()} people participated on average daily in this survey."
+        />
+      {/await}
+    </div>
+  </div>
+  <div class="mobile-kpi">
+    <div>
+      {#await data}
+        <SurveyValue value={null} />
+      {:then d}
+        <SurveyValue value={round(d.totalSampleSize)} />
+      {/await}
+    </div>
+    <div class="sub">
+      Survey responses total
+      {#await data then d}
+        <UiKitHint
+          title="Between {formatDateShort(d.minDate)} and {formatDateShort(d.maxDate)} around {round(
+            d.totalSampleSize,
+          ).toLocaleString()} responses were collected in this survey."
+        />
+      {/await}
+    </div>
+  </div>
+</div>
+
+{@html overviewText}
+
+<div class="summary-button-bar">
+  <div>
+    <a class="uk-button uk-button-default uk-button-delphi" href={surveyFullTextLink}>See original survey questions</a>
+  </div>
+  <div><a class="uk-button uk-button-default uk-button-delphi" href={dataAccessLink}>Download aggregate data</a></div>
+</div>
+
 <style>
   .summary-button-bar {
     display: flex;
@@ -50,47 +100,3 @@
     }
   }
 </style>
-
-<div class="mobile-two-col">
-  <div class="mobile-kpi">
-    <div>
-      {#await data}
-        <SurveyValue value={null} />
-      {:then d}
-        <SurveyValue value={round(d.averageSampleSize)} />
-      {/await}
-    </div>
-    <div class="sub">
-      Participants daily
-      {#await data then d}
-        <UiKitHint
-          title="Between {formatDateShort(d.minDate)} and {formatDateShort(d.maxDate)} around {round(d.averageSampleSize).toLocaleString()} people participated on average daily in this survey." />
-      {/await}
-    </div>
-  </div>
-  <div class="mobile-kpi">
-    <div>
-      {#await data}
-        <SurveyValue value={null} />
-      {:then d}
-        <SurveyValue value={round(d.totalSampleSize)} />
-      {/await}
-    </div>
-    <div class="sub">
-      Survey responses total
-      {#await data then d}
-        <UiKitHint
-          title="Between {formatDateShort(d.minDate)} and {formatDateShort(d.maxDate)} around {round(d.totalSampleSize).toLocaleString()} responses were collected in this survey." />
-      {/await}
-    </div>
-  </div>
-</div>
-
-{@html overviewText}
-
-<div class="summary-button-bar">
-  <div>
-    <a class="uk-button uk-button-default uk-button-delphi" href={surveyFullTextLink}>See original survey questions</a>
-  </div>
-  <div><a class="uk-button uk-button-default uk-button-delphi" href={dataAccessLink}>Download aggregate data</a></div>
-</div>

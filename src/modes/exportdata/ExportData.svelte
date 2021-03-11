@@ -225,21 +225,6 @@
   $: dateRange = signalGroup || { minTime: timeMonth(new Date(), -1), maxTime: timeMonth(new Date(), 1) };
 </script>
 
-<style>
-  .description {
-    padding: 0;
-    font-size: 80%;
-  }
-
-  .region-row :global(.search-container) {
-    display: inline-flex;
-  }
-
-  .code-block {
-    max-width: calc(100vw - 80px);
-  }
-</style>
-
 <div class="mobile-root">
   <div class="mobile-header-line-bg">
     <div class="mobile-header-line">
@@ -311,7 +296,8 @@
               bind:selected={startDate}
               start={dateRange.minTime}
               end={dateRange.maxTime}
-              formattedSelected={formatDateISO(startDate)}>
+              formattedSelected={formatDateISO(startDate)}
+            >
               <button aria-label="selected start date" class="uk-input" on:>{formatDateISO(startDate)}</button>
             </Datepicker>
             -
@@ -319,7 +305,8 @@
               bind:selected={endDate}
               start={dateRange.minTime}
               end={dateRange.maxTime}
-              formattedSelected={formatDateISO(endDate)}>
+              formattedSelected={formatDateISO(endDate)}
+            >
               <button aria-label="selected end date" class="uk-input" on:>{formatDateISO(endDate)}</button>
             </Datepicker>
           </div>
@@ -348,7 +335,8 @@
           <div class="uk-form-controls">
             <div>
               <input type="radio" name="region" value="all" id="region-all" bind:group={geoValuesMode} /><label
-                for="region-all">All</label>
+                for="region-all">All</label
+              >
             </div>
             <div class="region-row" class:search-visible={geoValuesMode === 'single'}>
               <input
@@ -357,7 +345,8 @@
                 value="single"
                 id="region-single"
                 bind:group={geoValuesMode}
-                disabled={geoItems.length === 0} />
+                disabled={geoItems.length === 0}
+              />
               <label for="region-single">Specific region(s): </label>
               <Search
                 className="search-container"
@@ -368,7 +357,8 @@
                 maxItemsToShowInList="5"
                 on:add={(e) => addRegion(e.detail)}
                 on:remove={(e) => removeRegion(e.detail)}
-                on:change={(e) => setRegion(e.detail)} />
+                on:change={(e) => setRegion(e.detail)}
+              />
             </div>
           </div>
         </div>
@@ -377,7 +367,8 @@
           <div class="uk-form-controls">
             <div>
               <input type="radio" name="as-of" value="latest" id="as-of-latest" bind:group={asOfMode} /><label
-                for="as-of-latest">Latest</label>
+                for="as-of-latest">Latest</label
+              >
             </div>
             <div class="region-row">
               <input type="radio" name="as-of" value="single" id="as-of-single" bind:group={asOfMode} />
@@ -386,12 +377,11 @@
                 bind:selected={asOfDate}
                 formattedSelected={asOfDate ? formatDateISO(asOfDate) : 'Select date'}
                 start={asOfStart}
-                end={asOfEnd}>
-                <button
-                  aria-label="selected as of date"
-                  class="uk-input"
-                  disabled={asOfMode === 'latest'}
-                  on:>{asOfDate ? formatDateISO(asOfDate) : 'Select date'}</button>
+                end={asOfEnd}
+              >
+                <button aria-label="selected as of date" class="uk-input" disabled={asOfMode === 'latest'} on:
+                  >{asOfDate ? formatDateISO(asOfDate) : 'Select date'}</button
+                >
               </Datepicker>
             </div>
             <p class="description">
@@ -443,7 +433,8 @@
           <p>Install <code>covidcast</code> via pip:</p>
           <pre class="code-block"><code>pip install covidcast</code></pre>
           <p>Fetch data:</p>
-          <pre class="code-block"><code>
+          <pre
+            class="code-block"><code>
         {`from datetime import date
 import covidcast
 
@@ -455,8 +446,9 @@ data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal
             For more details and examples, see the
             <a href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/">package documentation</a>. A description
             of the returned data structure can be found at:
-            <a
-              href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/signals.html#covidcast.signal">covidcast.signal</a>.
+            <a href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/signals.html#covidcast.signal"
+              >covidcast.signal</a
+            >.
           </p>
         </div>
         <div>
@@ -465,7 +457,8 @@ data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal
           <pre
             class="code-block"><code>devtools::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/covidcast")</code></pre>
           <p>Fetch data:</p>
-          <pre class="code-block"><code>
+          <pre
+            class="code-block"><code>
         {`library(covidcast)
 
 cc_data <- suppressMessages(
@@ -478,11 +471,27 @@ covidcast_signal(data_source = "${signal ? signal.dataSource : ''}", signal = "$
             For more details and examples, see the
             <a href="https://cmu-delphi.github.io/covidcast/covidcastR/">package documentation</a>. A description of the
             returned data structure can be found at:
-            <a
-              href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html#value">covidcast_signal</a>.
+            <a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html#value"
+              >covidcast_signal</a
+            >.
           </p>
         </div>
       </section>
     </div>
   </div>
 </div>
+
+<style>
+  .description {
+    padding: 0;
+    font-size: 80%;
+  }
+
+  .region-row :global(.search-container) {
+    display: inline-flex;
+  }
+
+  .code-block {
+    max-width: calc(100vw - 80px);
+  }
+</style>

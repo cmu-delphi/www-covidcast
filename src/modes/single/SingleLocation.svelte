@@ -38,6 +38,39 @@
   }
 </script>
 
+<div class="root base-font-size">
+  <div class="search-container">
+    <Search
+      placeholder={$currentRegionInfo ? 'Compare with...' : 'Search for a location...'}
+      items={nameInfos}
+      selectedItems={$currentMultiSelection}
+      labelFieldName="displayName"
+      maxItemsToShowInList="5"
+      colorFieldName="color"
+      {sortItem}
+      {filterItem}
+      maxSelections={Math.min(selectionColors.length + 1, 4)}
+      on:add={(e) => addCompare(e.detail)}
+      on:remove={(e) => removeCompare(e.detail.info)}
+      on:change={(e) => selectByInfo(e.detail)}
+    />
+  </div>
+
+  <div class="grid-wrapper">
+    <div class="card-grid">
+      {#each sensorList as sensor (sensor.key)}
+        <SensorCard
+          {sensor}
+          date={$currentDateObject}
+          selections={$currentMultiSelection}
+          {onHighlight}
+          highlightTimeValue={$highlightTimeValue}
+        />
+      {/each}
+    </div>
+  </div>
+</div>
+
 <style>
   .root {
     flex: 1 1 0;
@@ -95,34 +128,3 @@
     }
   }
 </style>
-
-<div class="root base-font-size">
-  <div class="search-container">
-    <Search
-      placeholder={$currentRegionInfo ? 'Compare with...' : 'Search for a location...'}
-      items={nameInfos}
-      selectedItems={$currentMultiSelection}
-      labelFieldName="displayName"
-      maxItemsToShowInList="5"
-      colorFieldName="color"
-      {sortItem}
-      {filterItem}
-      maxSelections={Math.min(selectionColors.length + 1, 4)}
-      on:add={(e) => addCompare(e.detail)}
-      on:remove={(e) => removeCompare(e.detail.info)}
-      on:change={(e) => selectByInfo(e.detail)} />
-  </div>
-
-  <div class="grid-wrapper">
-    <div class="card-grid">
-      {#each sensorList as sensor (sensor.key)}
-        <SensorCard
-          {sensor}
-          date={$currentDateObject}
-          selections={$currentMultiSelection}
-          {onHighlight}
-          highlightTimeValue={$highlightTimeValue} />
-      {/each}
-    </div>
-  </div>
-</div>

@@ -47,6 +47,42 @@
   }
 </script>
 
+<ul class="root">
+  {#each sensorsWithData as s}
+    <li class:selected={$currentSensor === s.sensor.key} data-testid={s.sensor.key}>
+      <div class="header">
+        <!-- svelte-ignore a11y-missing-attribute -->
+        <button
+          class="uk-button uk-button-text"
+          title={typeof s.sensor.tooltipText === 'function' ? s.sensor.tooltipText() : s.sensor.tooltipText}
+          on:click|preventDefault={() => {
+            trackEvent('side-panel', 'set-sensor', s.sensor.key);
+            currentSensor.set(s.sensor.key);
+          }}
+        >
+          {s.sensor.plotTitleText}
+        </button>
+        <div class="grow" />
+        <div class="toolbar">
+          <InfoDialogButton sensor={s.sensor} />
+          <button
+            class="uk-icon-button uk-icon-button-small"
+            class:hidden={!hasRegion}
+            title="Show as detail view"
+            class:uk-active={detail === s.sensor}
+            data-uk-icon="icon: search; ratio: 0.8"
+            on:click|stopPropagation={() => {
+              trackEvent('side-panel', detail === s.sensor ? 'hide-detail' : 'show-detail', s.sensor.key);
+              detail = detail === s.sensor ? null : s.sensor;
+            }}
+          />
+        </div>
+      </div>
+      <SmallMultiple {s} highlightTimeValue={$highlightTimeValue} {onClick} {onHighlight} />
+    </li>
+  {/each}
+</ul>
+
 <style>
   ul {
     list-style-type: none;
@@ -108,37 +144,3 @@
     }
   }
 </style>
-
-<ul class="root">
-  {#each sensorsWithData as s}
-    <li class:selected={$currentSensor === s.sensor.key} data-testid={s.sensor.key}>
-      <div class="header">
-        <!-- svelte-ignore a11y-missing-attribute -->
-        <button
-          class="uk-button uk-button-text"
-          title={typeof s.sensor.tooltipText === 'function' ? s.sensor.tooltipText() : s.sensor.tooltipText}
-          on:click|preventDefault={() => {
-            trackEvent('side-panel', 'set-sensor', s.sensor.key);
-            currentSensor.set(s.sensor.key);
-          }}>
-          {s.sensor.plotTitleText}
-        </button>
-        <div class="grow" />
-        <div class="toolbar">
-          <InfoDialogButton sensor={s.sensor} />
-          <button
-            class="uk-icon-button uk-icon-button-small"
-            class:hidden={!hasRegion}
-            title="Show as detail view"
-            class:uk-active={detail === s.sensor}
-            data-uk-icon="icon: search; ratio: 0.8"
-            on:click|stopPropagation={() => {
-              trackEvent('side-panel', detail === s.sensor ? 'hide-detail' : 'show-detail', s.sensor.key);
-              detail = detail === s.sensor ? null : s.sensor;
-            }} />
-        </div>
-      </div>
-      <SmallMultiple {s} highlightTimeValue={$highlightTimeValue} {onClick} {onHighlight} />
-    </li>
-  {/each}
-</ul>

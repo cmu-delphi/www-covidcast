@@ -55,6 +55,22 @@
   $: value = findRow(data, params.date);
 </script>
 
+<HexGridCell {x} {y} border="2px">
+  <div class="root">
+    <header on:click>
+      <h4>{sensor.name}</h4>
+    </header>
+    <main>
+      <Vega {spec} {data} />
+    </main>
+    <footer>
+      <h5>
+        {#await value then v}{sensor.formatValue(v)}{/await}
+      </h5>
+    </footer>
+  </div>
+</HexGridCell>
+
 <style>
   .root {
     display: flex;
@@ -102,19 +118,3 @@
     font-size: 1.5rem;
   }
 </style>
-
-<HexGridCell {x} {y} border="2px">
-  <div class="root">
-    <header on:click>
-      <h4>{sensor.name}</h4>
-    </header>
-    <main>
-      <Vega {spec} {data} />
-    </main>
-    <footer>
-      <h5>
-        {#await value then v}{sensor.formatValue(v)}{/await}
-      </h5>
-    </footer>
-  </div>
-</HexGridCell>

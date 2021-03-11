@@ -279,35 +279,6 @@
   }
 </script>
 
-<style>
-  .c {
-    display: flex;
-    justify-content: space-between;
-  }
-  .s {
-    font-size: 10px;
-    border: 1px solid #efefef;
-    border-radius: 5px;
-    cursor: grab;
-    margin-right: 60px;
-    padding: 2px 5px;
-    flex: 1 1 0;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .s:hover {
-    background: #efefef;
-  }
-
-  .uk-container > :global(.vega-embed) {
-    display: block;
-    margin: 0 10px;
-  }
-</style>
-
 <div class="uk-container">
   <h2>Parallel Coordinates Plot of States</h2>
   <div>
@@ -318,7 +289,9 @@
   <div>
     Domain:
     <label><input type="radio" value="auto" name="domain" bind:group={domain} />Auto</label>
-    <label><input type="radio" value="defined" name="domain" bind:group={domain} />mean +/- 3 * stdev (like in map)</label>
+    <label
+      ><input type="radio" value="defined" name="domain" bind:group={domain} />mean +/- 3 * stdev (like in map)</label
+    >
     <label><input type="radio" value="logic" name="domain" bind:group={domain} />Full Percentages, start at Zero</label>
   </div>
 
@@ -330,7 +303,8 @@
     labelFieldName="displayName"
     keywordFunction={combineKeywords}
     maxItemsToShowInList="5"
-    on:change={(e) => onHighlight(e.detail)} />
+    on:change={(e) => onHighlight(e.detail)}
+  />
 
   <p>Drag the axis label chips to reorder:</p>
 
@@ -363,3 +337,32 @@
     </tbody>
   </table>
 </div>
+
+<style>
+  .c {
+    display: flex;
+    justify-content: space-between;
+  }
+  .s {
+    font-size: 10px;
+    border: 1px solid #efefef;
+    border-radius: 5px;
+    cursor: grab;
+    margin-right: 60px;
+    padding: 2px 5px;
+    flex: 1 1 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .s:hover {
+    background: #efefef;
+  }
+
+  .uk-container > :global(.vega-embed) {
+    display: block;
+    margin: 0 10px;
+  }
+</style>

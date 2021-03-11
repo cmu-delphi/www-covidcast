@@ -31,6 +31,47 @@
   }
 </script>
 
+<div class="date-picker {className}">
+  <button
+    class="arrow-button picker-button arrow-left"
+    title="Go to the previous day"
+    disabled={value == null || startEndDates.length === 0 || value <= startEndDates[0]}
+    on:click={() => (value = timeDay.offset(value, -1))}
+  >
+    {@html arrowLeftIcon}
+  </button>
+  {#if value != null && startEndDates.length !== 0}
+    <Datepicker
+      bind:selected={value}
+      start={startEndDates[0]}
+      end={startEndDates[1]}
+      formattedSelected={formatDateShortWeekdayAbbr(value)}
+    >
+      <button aria-label="selected date" class="selected-date picker-button" on:>
+        <span class="selected-date-icon">
+          {@html calendarIcon}
+        </span>
+        <span>{formatDateShortWeekdayAbbr(value)}</span>
+      </button>
+    </Datepicker>
+  {:else}
+    <button aria-label="selected date" class="selected-date picker-button" disabled>
+      <span class="inline-svg-icon">
+        {@html calendarIcon}
+      </span>
+      <span>{formatDateShortWeekdayAbbr(value)}</span>
+    </button>
+  {/if}
+  <button
+    class="arrow-button picker-button arrow-right"
+    title="Go to the next day"
+    disabled={value == null || startEndDates.length === 0 || value >= startEndDates[1]}
+    on:click={() => (value = timeDay.offset(value, 1))}
+  >
+    {@html arrowRightIcon}
+  </button>
+</div>
+
 <style>
   .date-picker {
     display: flex;
@@ -102,41 +143,3 @@
     }
   }
 </style>
-
-<div class="date-picker {className}">
-  <button
-    class="arrow-button picker-button arrow-left"
-    title="Go to the previous day"
-    disabled={value == null || startEndDates.length === 0 || value <= startEndDates[0]}
-    on:click={() => (value = timeDay.offset(value, -1))}>
-    {@html arrowLeftIcon}
-  </button>
-  {#if value != null && startEndDates.length !== 0}
-    <Datepicker
-      bind:selected={value}
-      start={startEndDates[0]}
-      end={startEndDates[1]}
-      formattedSelected={formatDateShortWeekdayAbbr(value)}>
-      <button aria-label="selected date" class="selected-date picker-button" on:>
-        <span class="selected-date-icon">
-          {@html calendarIcon}
-        </span>
-        <span>{formatDateShortWeekdayAbbr(value)}</span>
-      </button>
-    </Datepicker>
-  {:else}
-    <button aria-label="selected date" class="selected-date picker-button" disabled>
-      <span class="inline-svg-icon">
-        {@html calendarIcon}
-      </span>
-      <span>{formatDateShortWeekdayAbbr(value)}</span>
-    </button>
-  {/if}
-  <button
-    class="arrow-button picker-button arrow-right"
-    title="Go to the next day"
-    disabled={value == null || startEndDates.length === 0 || value >= startEndDates[1]}
-    on:click={() => (value = timeDay.offset(value, 1))}>
-    {@html arrowRightIcon}
-  </button>
-</div>

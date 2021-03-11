@@ -21,6 +21,20 @@
   $: items = item && view ? view.data('values').filter((d) => d.time_value === item.time_value) : [];
 </script>
 
+<div aria-label="tooltip" class="tooltip" class:hidden>
+  <h5>{formatDateShortWeekdayAbbr(item.date_value)}</h5>
+  <table>
+    {#each items as i}
+      <tr>
+        <th>{i.displayName}</th>
+        <td>
+          <SensorValue {sensor} value={i.value} />
+        </td>
+      </tr>
+    {/each}
+  </table>
+</div>
+
 <style>
   .hidden {
     display: none;
@@ -38,17 +52,3 @@
     text-align: right;
   }
 </style>
-
-<div aria-label="tooltip" class="tooltip" class:hidden>
-  <h5>{formatDateShortWeekdayAbbr(item.date_value)}</h5>
-  <table>
-    {#each items as i}
-      <tr>
-        <th>{i.displayName}</th>
-        <td>
-          <SensorValue {sensor} value={i.value} />
-        </td>
-      </tr>
-    {/each}
-  </table>
-</div>

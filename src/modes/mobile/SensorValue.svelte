@@ -8,12 +8,12 @@
   export let enforceSign = false;
 </script>
 
-<style>
-</style>
-
 {#if value == null || Number.isNaN(value)}
   N/A
 {:else}
   {sensor.formatValue(value, enforceSign)}
   <SensorUnit {sensor} />
 {/if}
+
+<style>
+</style>

@@ -104,15 +104,6 @@
   }
 </script>
 
-<style>
-  .absolutePos {
-    position: absolute;
-    right: 0;
-    bottom: 2px;
-    z-index: 1;
-  }
-</style>
-
 {#if vegaRef || data}
   <button class="uk-icon-button" class:absolutePos type="button" uk-icon="download" />
   <div data-uk-dropdown="pos: bottom-right">
@@ -130,3 +121,12 @@
     </ul>
   </div>
 {/if}
+
+<style>
+  .absolutePos {
+    position: absolute;
+    right: 0;
+    bottom: 2px;
+    z-index: 1;
+  }
+</style>

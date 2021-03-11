@@ -56,9 +56,6 @@
   }
 </script>
 
-<style>
-</style>
-
 Experiments:
 <select bind:value={selected}>
   {#each experiments as ex, i}
@@ -76,3 +73,6 @@ Experiments:
     <pre>{error}</pre>
   </div>
 {/await}
+
+<style>
+</style>
