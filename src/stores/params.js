@@ -90,9 +90,10 @@ export class DataFetcher {
    */
   toDateKey(sensor, region, date, suffix = '') {
     const s = this.primarySensorKey === sensor.key ? 'SENSOR' : sensor.key;
-    const r = this.primaryRegionId === region.id ? 'REGION' : `${region.level}-${region.id}`;
+    const r =
+      this.primaryRegionId === region.id && region.level !== 'nation' ? 'REGION' : `${region.level}-${region.id}`;
     const d = this.primaryTimeValue === date.timeValue ? 'DATE' : date.timeValue;
-    return `${s}:${r}:${d}${suffix ? ':' : ''}${suffix}`;
+    return `${s}@${r}@${d}${suffix ? '@' : ''}${suffix}`;
   }
 
   /**
@@ -102,9 +103,10 @@ export class DataFetcher {
    */
   toWindowKey(sensor, region, timeFrame, suffix = '') {
     const s = this.primarySensorKey === sensor.key ? 'SENSOR' : sensor.key;
-    const r = this.primaryRegionId === region.id ? 'REGION' : `${region.level}-${region.id}`;
+    const r =
+      this.primaryRegionId === region.id && region.level !== 'nation' ? 'REGION' : `${region.level}-${region.id}`;
     const d = this.primaryWindowRange === timeFrame.range ? 'WINDOW' : timeFrame.range;
-    return `${s}:${r}:${d}${suffix ? ':' : ''}${suffix}`;
+    return `${s}@${r}@${d}${suffix ? '@' : ''}${suffix}`;
   }
 
   /**
@@ -125,7 +127,7 @@ export class DataFetcher {
       return; // no invalidation needed
     }
     Array.from(this.cache.keys()).forEach((key) => {
-      const parts = key.split(':');
+      const parts = key.split('@');
       if (
         (hasSensorChanged && parts[0] === 'SENSOR') ||
         (hasRegionChanged && parts[1] === 'REGION') ||

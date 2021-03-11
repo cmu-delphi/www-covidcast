@@ -189,7 +189,7 @@ LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals
 ---
 
 
-Name: Worried About Becoming Ill
+Name: Worried About Becoming Sick
 Category: Mental Health
 Question: |
   Do you feel **very or somewhat worried** about becoming seriously ill from COVID-19?
@@ -248,7 +248,7 @@ LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals
 Name: Wanted a Test
 Category: Testing
 Question: |
-  In the past 14 days, did you want a COVID-19 test but did not receive one?
+  In the past 14 days, did you want a COVID-19 test but not receive one?
 Signal: smoothed_wanted_test_14d
 SignalTooltip: Estimated proportion of people who wanted to be tested for COVID-19 in the past 14 days, out of people who were not tested in that time
 Unit: per every 1,000 people who were not tested

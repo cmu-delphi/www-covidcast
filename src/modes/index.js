@@ -11,12 +11,12 @@
 const modes = [
   {
     id: 'landing',
-    label: 'About',
+    label: 'COVIDcast Overview',
     component: () => import(/* webpackChunkName: 'm-landing' */ './landing/Landing.svelte').then((r) => r.default),
   },
   {
-    id: 'overview',
-    label: 'Overview',
+    id: 'summary',
+    label: 'Location Summary',
     component: () =>
       import(/* webpackChunkName: 'm-overview' */ './mobile/MobileOverview.svelte').then((r) => r.default),
   },
@@ -46,7 +46,7 @@ const modes = [
 export default modes;
 
 /**
- * @type {Record<'overview'|'export'|'survey-results'|'lab'|'indicator'|'landing', Mode>}
+ * @type {Record<'summary'|'export'|'survey-results'|'lab'|'indicator'|'landing', Mode>}
  */
 export const modeByID = {};
 modes.forEach((mode) => (modeByID[mode.id] = mode));

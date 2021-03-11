@@ -47,9 +47,9 @@
 </style>
 
 <div class="mobile-root">
-  <SurveyParameters sensor={sensor.value} {items} placeholder="Search by State or County">
+  <SurveyParameters sensor={sensor.value} {items} defaultItem={nationInfo} placeholder="Search by State or County">
     <div class="grid-3-11 mobile-header-line" slot="title">
-      <h2>COVIDcast <span>Overview</span></h2>
+      <h2>LOCATION <span>Summary</span></h2>
     </div>
   </SurveyParameters>
   <div class="uk-container content-grid">
@@ -62,7 +62,7 @@
     <RegionMapWrapper {region} {date} sensor={CASES} {fetcher} />
     <div class="grid-3-11">
       <hr />
-      <FancyHeader sub="Chart">Indicator</FancyHeader>
+      <FancyHeader invert sub="Chart">{CASES.name}</FancyHeader>
       <div class="chart-300">
         <HistoryLineChart sensor={CASES} {date} {region} {fetcher} />
       </div>
