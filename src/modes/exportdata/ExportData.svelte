@@ -8,7 +8,7 @@
   import { onMount } from 'svelte';
   import { trackEvent } from '../../stores/ga';
   import Search from '../../components/Search.svelte';
-  import { infosByLevel } from '../../maps';
+  import { getCountiesOfState, infosByLevel } from '../../maps';
   import { formatDateISO } from '../../formats';
   import { questionCategories, refSensor } from '../../modes/survey/questions';
   import { CASES_DEATH_SOURCE, getDataSource } from '../../stores/dataSourceLookup';
@@ -59,15 +59,25 @@
 
   let geoValuesMode = 'all';
   let geoValues = [];
-  $: geoItems = infosByLevel[geoType] || [];
+  $: geoItems = [...(infosByLevel[geoType] || []), ...(geoType === 'county' ? infosByLevel.state : [])];
   $: {
     if (geoItems != null) {
       geoValues = [];
       geoValuesMode = guessMode(geoItems.length);
     }
   }
+  function flatIds(geoValues) {
+    if (geoType === 'county') {
+      // flatten states to its counties
+      return geoValues
+        .map((d) => (d.level === 'state' ? getCountiesOfState(d).map((d) => d.propertyId) : d.propertyId))
+        .flat();
+    } else {
+      return geoValues.map((d) => d.propertyId);
+    }
+  }
   $: isAllRegions = geoValuesMode === 'all' || geoValues.length === 0;
-  $: geoIDs = geoValues.map((d) => d.propertyId);
+  $: geoIDs = flatIds(geoValues);
 
   let asOfMode = 'latest';
   let asOfDate = new Date();
