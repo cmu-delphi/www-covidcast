@@ -91,15 +91,9 @@
     const chartSpec = {
       width: width,
       height: height,
-      //       transform: [
-      //   {
-      //     calculate: `toDate(date)`,
-      //     as: 'date_value',
-      //   },
-      // ],
       mark: {
-        type: 'point', // options.histogram ? 'bar' : 'point',
-        tooltip: true, // debug: { content: 'data' },
+        type: 'point',
+        tooltip: true,
       },
       transform: [
         { as: 'x_title', calculate: `"${options.xtitle} (" + timeFormat(datum.x_date, "%b %d") + "): " + datum.x` },
@@ -164,16 +158,6 @@
           ],
           value: 0.2,
         },
-        //     color: {
-        //       condition: [
-
-        //       ],
-        //       data: {
-        //   values: [{ date_value: null }],
-        // },
-
-        //       value: 'blue'
-        //     }
       },
     };
     let spec = chartSpec;
@@ -260,33 +244,27 @@
               frame: [-6, 0],
             },
           ],
-          mark: {
-            type: 'trail',
-            opacity: 0.7,
-            color: 'gray',
-          },
-          encoding: {
-            x: { field: 'xmean', type: 'quantitative', sort: null },
-            y: {
-              field: 'ymean',
-              type: 'quantitative',
-              sort: null,
-              scale: {
-                domainMin: undefined,
+          layer: [
+            {
+              transform: [
+                { window: [{ op: 'lag', param: 1, field: 'xmean', as: 'nextx' }] },
+                { window: [{ op: 'lag', param: 1, field: 'ymean', as: 'nexty' }] },
+              ],
+              mark: { type: 'rule', color: 'gray', opacity: 0.7 },
+              encoding: {
+                x2: { field: 'xmean', type: 'quantitative' },
+                y2: { field: 'ymean', type: 'quantitative' },
+                x: { field: 'nextx', type: 'quantitative' },
+                y: { field: 'nexty', type: 'quantitative' },
+                size: {
+                  field: 'date_value',
+                  type: 'temporal',
+                  scale: { range: [0, 6] },
+                  legend: sizeLegend ? {} : null,
+                },
               },
             },
-            // color: { field: 'date_value', type: 'temporal',         scale:  },
-            size: {
-              field: 'date_value',
-              type: 'temporal',
-              scale: { range: [0, 6] },
-              legend: sizeLegend
-                ? {
-                    // orient: 'bottom',
-                  }
-                : null,
-            },
-          },
+          ],
         },
         {
           transform: [
