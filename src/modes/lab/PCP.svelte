@@ -76,7 +76,7 @@
   function generatePCPSpec(entries, level, reversedSet, domain) {
     function asScale(entry, i) {
       /**
-       * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
+       * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
        */
       const layer = {
         mark: 'rule',
