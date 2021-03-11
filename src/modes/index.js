@@ -28,7 +28,7 @@ const modes = [
   },
   {
     id: 'classic',
-    label: 'Classic COVIDCast',
+    label: 'Classic COVIDcast',
     component: () => import(/* webpackChunkName: 'm-old' */ './overview/Overview.svelte').then((r) => r.default),
   },
   // {
