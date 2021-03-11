@@ -5,7 +5,7 @@
   import SensorDatePicker2 from '../../components/SensorDatePicker2.svelte';
 
   /**
-   * @type {import('../../components/MapBox/colors').SensorEntry}
+   * @type {import('../../stores/params').Sensor}
    */
   export let sensor;
 

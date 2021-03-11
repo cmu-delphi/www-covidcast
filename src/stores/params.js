@@ -3,10 +3,11 @@ import { addNameInfos, fetchData, formatAPITime, addMissing, fitRange, parseAPIT
 import { nationInfo } from '../maps';
 import { currentDate, currentRegion, yesterdayDate, currentSensor, sensorList } from '.';
 import { determineTrend } from './trend';
-import { determineMinMax } from '../components/MapBox/colors';
+import { determineMinMax } from './stats';
 import { formatPercentage } from '../formats';
 import { getDataSource } from './dataSourceLookup';
 import { scaleSequential } from 'd3-scale';
+import { interpolateYlGnBu, interpolateYlOrRd } from 'd3-scale-chromatic';
 
 /**
  * @typedef {import('./constants').SensorEntry} Sensor
@@ -666,7 +667,7 @@ export class SensorParam {
    */
   createColorScale(stats, level) {
     const domain = this.domain(stats, level);
-    return scaleSequential(this.value.colorScale).domain(domain);
+    return scaleSequential(this.isInverted ? interpolateYlGnBu : interpolateYlOrRd).domain(domain);
   }
 }
 
@@ -675,7 +676,7 @@ export class SensorParam {
  * @param {Sensor} sensor
  */
 export function isInverted(sensor) {
-  return sensor.isInverted || sensor.colorScaleId === 'interpolateYlGnBu';
+  return sensor.isInverted || sensor.colorScale === 'interpolateYlGnBu';
 }
 
 export const CASES = new SensorParam(sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Cases')));

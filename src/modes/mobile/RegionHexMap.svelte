@@ -9,7 +9,7 @@
   import { groupByRegion } from '../../stores/params';
   import Vega from '../../components/Vega.svelte';
   import SensorValue from './SensorValue.svelte';
-  import { MISSING_COLOR } from '../../theme';
+  import { MISSING_COLOR } from '../../specs/mapSpec';
   import ColorLegend from './components/ColorLegend.svelte';
   import { hsl } from 'd3-color';
   import DownloadMenu from './components/DownloadMenu.svelte';

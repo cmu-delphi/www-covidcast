@@ -2,7 +2,6 @@ import { isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../da
 import { formatAPITime } from '../data/utils';
 import descriptions from './descriptions.generated.json';
 import '!file-loader?name=descriptions.raw.txt!./descriptions.raw.txt';
-import { resolveColorScale } from './colorScales';
 import { modeByID } from '../modes';
 import { formatRawValue, formatValue, formatPercentage } from '../formats';
 // import { generateMockSignal, generateMockMeta } from '../data/mock';
@@ -80,8 +79,7 @@ export function getLevelInfo(level) {
  * @property {boolean} isCount is count signal
  * @property {(options?: CasesOrDeathOptions) => 'prop' | 'count' | 'other')} getType
  * @property {Record<keyof EpiDataCasesOrDeathValues, string>} casesOrDeathSignals signal to load for cases or death
- * @property {)(v: number) => string)} colorScale
- * @property {string} colorScaleId
+ * @property {string} colorScale
  * @property {string} credits
  * @property {boolean?} default whether it should be default signal
  */
@@ -165,8 +163,7 @@ export function extendSensorEntry(sensorEntry) {
     isCount,
     getType: (options) => getType(sensorEntry, options),
     isCasesOrDeath,
-    colorScaleId: sensorEntry.colorScale || 'interpolateYlOrRd',
-    colorScale: resolveColorScale(sensorEntry.colorScale),
+    colorScale: sensorEntry.colorScale || 'interpolateYlOrRd',
     links: sensorEntry.links || [],
     plotTitleText: sensorEntry.plotTitleText || sensorEntry.name,
     mapTitleText:

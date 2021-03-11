@@ -1,9 +1,9 @@
-import { primaryValue } from '../../stores/constants';
+import { primaryValue } from './constants';
 
 const MAGIC_MIN_STATS = 0.14;
 
 /**
- * @typedef {import('../../stores/constants').SensorEntry} SensorEntry
+ * @typedef {import('./constants').SensorEntry} SensorEntry
  */
 
 const DEFAULT_STATS = { min: 0, max: 100, mean: 50, std: 10 };

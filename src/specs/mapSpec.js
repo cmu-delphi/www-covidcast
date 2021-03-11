@@ -1,7 +1,14 @@
 import getRelatedCounties from '../maps/related';
 import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
-import { MAP_THEME, MISSING_COLOR, ZERO_COLOR } from '../theme';
 import { commonConfig, CREDIT } from './commonSpec';
+
+export const MISSING_COLOR = '#eeeeee';
+const ZERO_COLOR = 'rgb(242,242,242)';
+
+const MAP_THEME = {
+  hoverRegionOutline: '#cccccc',
+  stateOutline: '#ffffff',
+};
 
 const NAME_INFO_KEYS = ['propertyId', 'displayName', 'population', 'state', 'level'];
 const EPIDATA_ROW_KEYS = ['geo_value', 'value', 'date_value', 'time_value', 'stderr', 'sample_size'].concat(

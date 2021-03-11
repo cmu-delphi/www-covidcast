@@ -5,7 +5,6 @@
   import './stores/ga';
   import './stores/websiteInjector';
   import { loadMetaData } from './data';
-  import InfoDialog from './components/InfoDialog.svelte';
   import Disclaimer from './components/Disclaimer.svelte';
 
   onMount(() => {
@@ -35,4 +34,3 @@
   </div>
 {/await}
 <Disclaimer />
-<InfoDialog />
