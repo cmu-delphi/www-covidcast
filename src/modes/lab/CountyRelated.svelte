@@ -55,9 +55,6 @@
   const data = loadData(county);
 </script>
 
-<style>
-</style>
-
 <h2>{county.displayName} - {sensor.name}</h2>
 
 Related Counties:
@@ -66,3 +63,6 @@ Related Counties:
   .join(', ')}
 
 <Vega {spec} {data} tooltip={VegaTooltip} signals={signalPatches} />
+
+<style>
+</style>

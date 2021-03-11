@@ -50,6 +50,64 @@
   }
 </script>
 
+<section class="container-bg container-style root">
+  <h4>Add Another</h4>
+
+  <Search
+    className="container-bg"
+    placeholder="Search by name..."
+    selectedItem={possibleInfos ? null : null}
+    items={possibleInfos}
+    labelFieldName="displayName"
+    maxItemsToShowInList="5"
+    on:change={(e) => {
+      if (e.detail) {
+        dispatch('add', e.detail);
+      }
+    }}
+  />
+
+  <button
+    class="uk-button uk-button-default uk-button-small uk-width-1-1 uk-margin-top"
+    class:selected={pickMapMode}
+    aria-pressed={pickMapMode}
+    on:click={() => (pickMapMode = !pickMapMode)}
+  >
+    Select on map
+  </button>
+
+  <h5>Select from Top for <strong>{$currentSensorEntry.name}</strong></h5>
+
+  <ol class:loading>
+    {#each top10Data as row}
+      <li>
+        <a
+          href="?region={row.info ? row.info.propertyId : ''}"
+          class="uk-link-text"
+          disabled={!row.info || selections.some((d) => d.info.id === row.info.id)}
+          on:click|preventDefault={() => dispatch('add', row.info)}
+        >
+          {row.displayName}
+          ({$currentSensorEntry.formatValue(row.value)})
+        </a>
+      </li>
+    {/each}
+  </ol>
+
+  {#if possibleRecent.length > 0}
+    <h5>Select from recent locations</h5>
+    <ul>
+      {#each possibleRecent.reverse() as info}
+        <li>
+          <a href="?region={info.propertyId}" class="uk-link-text" on:click|preventDefault={() => dispatch('add', info)}
+            >{info.displayName}</a
+          >
+        </li>
+      {/each}
+    </ul>
+  {/if}
+</section>
+
 <style>
   .root {
     flex: 1 1 0;
@@ -75,59 +133,3 @@
     padding: 0;
   }
 </style>
-
-<section class="container-bg container-style root">
-  <h4>Add Another</h4>
-
-  <Search
-    className="container-bg"
-    placeholder="Search by name..."
-    selectedItem={possibleInfos ? null : null}
-    items={possibleInfos}
-    labelFieldName="displayName"
-    maxItemsToShowInList="5"
-    on:change={(e) => {
-      if (e.detail) {
-        dispatch('add', e.detail);
-      }
-    }} />
-
-  <button
-    class="uk-button uk-button-default uk-button-small uk-width-1-1 uk-margin-top"
-    class:selected={pickMapMode}
-    aria-pressed={pickMapMode}
-    on:click={() => (pickMapMode = !pickMapMode)}>
-    Select on map
-  </button>
-
-  <h5>Select from Top for <strong>{$currentSensorEntry.name}</strong></h5>
-
-  <ol class:loading>
-    {#each top10Data as row}
-      <li>
-        <a
-          href="?region={row.info ? row.info.propertyId : ''}"
-          class="uk-link-text"
-          disabled={!row.info || selections.some((d) => d.info.id === row.info.id)}
-          on:click|preventDefault={() => dispatch('add', row.info)}>
-          {row.displayName}
-          ({$currentSensorEntry.formatValue(row.value)})
-        </a>
-      </li>
-    {/each}
-  </ol>
-
-  {#if possibleRecent.length > 0}
-    <h5>Select from recent locations</h5>
-    <ul>
-      {#each possibleRecent.reverse() as info}
-        <li>
-          <a
-            href="?region={info.propertyId}"
-            class="uk-link-text"
-            on:click|preventDefault={() => dispatch('add', info)}>{info.displayName}</a>
-        </li>
-      {/each}
-    </ul>
-  {/if}
-</section>

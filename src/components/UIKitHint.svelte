@@ -5,6 +5,10 @@
   export let pos = 'right';
 </script>
 
+<span uk-tooltip="title: {title}; pos: {pos}" class="title inline-svg-icon">
+  {@html infoCircleIcon}
+</span>
+
 <style>
   .title {
     color: inherit;
@@ -14,7 +18,3 @@
     flex: 0 0 auto;
   }
 </style>
-
-<span uk-tooltip="title: {title}; pos: {pos}" class="title inline-svg-icon">
-  {@html infoCircleIcon}
-</span>

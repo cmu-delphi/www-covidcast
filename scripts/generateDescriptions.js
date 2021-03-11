@@ -76,8 +76,7 @@ async function handleFile(docUrl, fileName, converter) {
 }
 
 function convertDescriptions(code) {
-  const entries = [];
-  yaml.safeLoadAll(code, (doc) => {
+  const entries = yaml.loadAll(code).map((doc) => {
     const r = {};
     Object.entries(doc).map(([key, value]) => {
       const formattedKey = key[0].toLowerCase() + key.slice(1);
@@ -100,7 +99,7 @@ function convertDescriptions(code) {
       }
       r[formattedKey] = value;
     });
-    entries.push(r);
+    return r;
   });
   fs.writeFileSync('./src/stores/descriptions.generated.json', JSON.stringify(entries, null, 2));
 }
@@ -115,9 +114,9 @@ function convertSurveyDescriptions(code) {
     questions: [],
   };
 
-  let first = true;
+  const [overview, ...rest] = yaml.loadAll(code);
 
-  yaml.safeLoadAll(code, (doc) => {
+  function parseDoc(doc) {
     const r = {};
     Object.entries(doc).map(([key, value]) => {
       const formattedKey = key[0].toLowerCase() + key.slice(1);
@@ -128,13 +127,12 @@ function convertSurveyDescriptions(code) {
       }
       r[formattedKey] = value;
     });
-    if (first) {
-      Object.assign(parsed, r);
-      first = false;
-    } else {
-      parsed.questions.push(r);
-    }
-  });
+    return r;
+  }
+  Object.assign(parsed, parseDoc(overview));
+  for (const doc of rest) {
+    parsed.questions.push(parseDoc(doc));
+  }
   fs.writeFileSync('./src/modes/survey/descriptions.generated.json', JSON.stringify(parsed, null, 2));
 }
 

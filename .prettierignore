@@ -4,7 +4,7 @@
 .browserslistrc
 .gitattributes
 .prettierignore
-/old_maps
+/.husky
 *.ico
 *.png
 *.svg

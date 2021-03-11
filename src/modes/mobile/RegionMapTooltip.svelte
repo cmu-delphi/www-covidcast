@@ -31,30 +31,13 @@
   }
 </script>
 
-<style>
-  .hidden {
-    display: none;
-  }
-
-  h5 {
-    margin: 0;
-    padding: 0;
-  }
-
-  th {
-    text-align: left;
-  }
-  td {
-    text-align: right;
-  }
-</style>
-
 <div
   aria-label="tooltip"
   class="tooltip"
   class:hidden
   on:touchstart|stopPropagation={() => undefined}
-  on:mousedown|stopPropagation={() => undefined}>
+  on:mousedown|stopPropagation={() => undefined}
+>
   <h5>
     {#if regionSetter && item.level !== levelMegaCounty.id}
       <a class="uk-link-muted" href="?region={item.propertyId}" on:click|preventDefault={changeRegion}>
@@ -81,3 +64,21 @@
     </tr>
   </table>
 </div>
+
+<style>
+  .hidden {
+    display: none;
+  }
+
+  h5 {
+    margin: 0;
+    padding: 0;
+  }
+
+  th {
+    text-align: left;
+  }
+  td {
+    text-align: right;
+  }
+</style>

@@ -1,6 +1,5 @@
 import { sensorList } from '../../stores';
 import descriptions from './descriptions.generated.json';
-import '!file-loader?name=surveyquestions.raw.txt!./descriptions.raw.txt';
 import { SensorParam } from '../../stores/params';
 
 export const overviewText = descriptions.overview;

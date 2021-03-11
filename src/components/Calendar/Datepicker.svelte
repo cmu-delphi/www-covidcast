@@ -253,6 +253,47 @@
   }
 </script>
 
+<div class="datepicker {className}" class:open={isOpen} class:closing={isClosing} style={wrapperStyle}>
+  <Popover
+    bind:this={popover}
+    bind:open={isOpen}
+    bind:shrink={isClosing}
+    {trigger}
+    on:opened={registerOpen}
+    on:closed={registerClose}
+  >
+    <div slot="trigger">
+      <slot {selected} {formattedSelected}>
+        {#if !trigger}<button class="calendar-button" type="button">{formattedSelected}</button>{/if}
+      </slot>
+    </div>
+    <div class="calendar">
+      <NavBar
+        {month}
+        {year}
+        {canIncrementMonth}
+        {canDecrementMonth}
+        {start}
+        {end}
+        {monthsOfYear}
+        on:monthSelected={(e) => changeMonth(e.detail)}
+        on:incrementMonth={(e) => incrementMonth(e.detail)}
+      />
+      <div class="legend">
+        {#each sortedDaysOfWeek as day}<span>{day[1]}</span>{/each}
+      </div>
+      <Month
+        {visibleMonth}
+        {selected}
+        {highlighted}
+        {shouldShakeDate}
+        id={visibleMonthId}
+        on:dateSelected={(e) => registerSelection(e.detail)}
+      />
+    </div>
+  </Popover>
+</div>
+
 <style>
   .datepicker {
     display: inline-block;
@@ -310,41 +351,3 @@
     text-align: center;
   }
 </style>
-
-<div class="datepicker {className}" class:open={isOpen} class:closing={isClosing} style={wrapperStyle}>
-  <Popover
-    bind:this={popover}
-    bind:open={isOpen}
-    bind:shrink={isClosing}
-    {trigger}
-    on:opened={registerOpen}
-    on:closed={registerClose}>
-    <div slot="trigger">
-      <slot {selected} {formattedSelected}>
-        {#if !trigger}<button class="calendar-button" type="button">{formattedSelected}</button>{/if}
-      </slot>
-    </div>
-    <div class="calendar">
-      <NavBar
-        {month}
-        {year}
-        {canIncrementMonth}
-        {canDecrementMonth}
-        {start}
-        {end}
-        {monthsOfYear}
-        on:monthSelected={(e) => changeMonth(e.detail)}
-        on:incrementMonth={(e) => incrementMonth(e.detail)} />
-      <div class="legend">
-        {#each sortedDaysOfWeek as day}<span>{day[1]}</span>{/each}
-      </div>
-      <Month
-        {visibleMonth}
-        {selected}
-        {highlighted}
-        {shouldShakeDate}
-        id={visibleMonthId}
-        on:dateSelected={(e) => registerSelection(e.detail)} />
-    </div>
-  </Popover>
-</div>

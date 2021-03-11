@@ -12,6 +12,29 @@
   export let direction;
 </script>
 
+<div class="week" in:fly|local={{ x: direction * 50, duration: 180, delay: 90 }} out:fade|local={{ duration: 180 }}>
+  {#each days as day}
+    <div
+      class="day"
+      class:outside-month={!day.partOfMonth}
+      class:is-today={day.isToday}
+      class:is-disabled={!day.selectable}
+    >
+      <button
+        class="day--label"
+        class:selected={areDatesEquivalent(day.date, selected)}
+        class:highlighted={areDatesEquivalent(day.date, highlighted)}
+        class:shake-date={shouldShakeDate && areDatesEquivalent(day.date, shouldShakeDate)}
+        class:disabled={!day.selectable}
+        type="button"
+        on:click={() => dispatch('dateSelected', day.date)}
+      >
+        {day.date.getDate()}
+      </button>
+    </div>
+  {/each}
+</div>
+
 <style>
   .week {
     padding: 0;
@@ -138,24 +161,3 @@
     }
   }
 </style>
-
-<div class="week" in:fly|local={{ x: direction * 50, duration: 180, delay: 90 }} out:fade|local={{ duration: 180 }}>
-  {#each days as day}
-    <div
-      class="day"
-      class:outside-month={!day.partOfMonth}
-      class:is-today={day.isToday}
-      class:is-disabled={!day.selectable}>
-      <button
-        class="day--label"
-        class:selected={areDatesEquivalent(day.date, selected)}
-        class:highlighted={areDatesEquivalent(day.date, highlighted)}
-        class:shake-date={shouldShakeDate && areDatesEquivalent(day.date, shouldShakeDate)}
-        class:disabled={!day.selectable}
-        type="button"
-        on:click={() => dispatch('dateSelected', day.date)}>
-        {day.date.getDate()}
-      </button>
-    </div>
-  {/each}
-</div>

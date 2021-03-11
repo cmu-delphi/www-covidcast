@@ -30,10 +30,10 @@
   const data = loadData();
 </script>
 
-<style>
-</style>
-
 <h2>{state.displayName} - {sensor.name}</h2>
 
 <Vega {spec} {data} signals={signalPatches} tooltip={VegaTooltip} tooltipProps={{ prop: 'geo_value' }} />
 <Vega spec={spec2} {data} signals={signalPatches} tooltip={VegaTooltip} tooltipProps={{ prop: 'geo_value' }} />
+
+<style>
+</style>

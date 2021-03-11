@@ -25,13 +25,6 @@
   const hrrData = fetchRegionSlice(sensor, 'hrr', new Date(2021, 1 - 1, 15));
 </script>
 
-<style>
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-</style>
-
 <h2>Vega State Map</h2>
 
 <div class="grid">
@@ -41,3 +34,10 @@
   <Vega spec={msaSpec} data={msaData} />
   <Vega spec={hrrSpec} data={hrrData} />
 </div>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+</style>
