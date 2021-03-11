@@ -5,6 +5,11 @@
   export let invert = false;
 </script>
 
+<h2 class="mobile-fancy-header" class:normal class:center class:invert>
+  <slot />
+  {#if sub}<span>{sub}</span>{/if}
+</h2>
+
 <style>
   h2.mobile-fancy-header {
     font-weight: 300;
@@ -40,8 +45,3 @@
     }
   }
 </style>
-
-<h2 class="mobile-fancy-header" class:normal class:center class:invert>
-  <slot />
-  {#if sub}<span>{sub}</span>{/if}
-</h2>

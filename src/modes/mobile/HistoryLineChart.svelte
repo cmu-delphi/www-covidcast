@@ -210,6 +210,59 @@
   let vegaRef = null;
 </script>
 
+<Vega
+  bind:this={vegaRef}
+  {className}
+  {spec}
+  {data}
+  tooltip={HistoryLineTooltip}
+  tooltipProps={{ sensor }}
+  signals={{ ...signalPatches, highlightRegion }}
+  signalListeners={['highlight']}
+  on:signal={onSignal}
+/>
+
+<div class="buttons">
+  <Toggle bind:checked={zoom}>Rescale Y-axis</Toggle>
+  {#if sensor.rawValue != null}
+    <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
+  {/if}
+  <div class="spacer" />
+  <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} />
+</div>
+
+<div class="{!(singleRaw && sensor.rawValue != null) && regions.length > 1 ? 'mobile-two-col' : ''} legend">
+  {#each regions as r, i}
+    <div
+      class="legend-elem"
+      style="--color: {MULTI_COLORS[i].replace(/rgb\((.*)\)/, '$1')}"
+      class:selected={highlightRegion === r.id}
+      on:mouseenter={() => highlight(r)}
+      on:mouseleave={() => highlight(null)}
+    >
+      <span class="legend-symbol">●</span>
+      <div>
+        <span>
+          {#if r.id !== region.id && r.id !== neighboringInfo.id}
+            <a href="?region={r.propertyId}" on:click|preventDefault={() => region.set(r, true)}> {r.displayName} </a>
+          {:else}{r.displayName}{/if}
+        </span>
+      </div>
+      <div>
+        {#await data then d}
+          <span class="legend-value">
+            <SensorValue {sensor} value={findValue(r, d, highlightDate)} />
+            {#if singleRaw && sensor.rawValue != null}
+              (raw:
+              <SensorValue {sensor} value={findValue(r, d, highlightDate, 'raw')} />)
+            {/if}
+          </span>
+        {/await}
+      </div>
+    </div>
+  {/each}
+</div>
+
 <style>
   .legend {
     font-size: 0.875rem;
@@ -246,54 +299,3 @@
     flex: 1 1 0;
   }
 </style>
-
-<Vega
-  bind:this={vegaRef}
-  {className}
-  {spec}
-  {data}
-  tooltip={HistoryLineTooltip}
-  tooltipProps={{ sensor }}
-  signals={{ ...signalPatches, highlightRegion }}
-  signalListeners={['highlight']}
-  on:signal={onSignal} />
-
-<div class="buttons">
-  <Toggle bind:checked={zoom}>Rescale Y-axis</Toggle>
-  {#if sensor.rawValue != null}
-    <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
-  {/if}
-  <div class="spacer" />
-  <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} />
-</div>
-
-<div class="{!(singleRaw && sensor.rawValue != null) && regions.length > 1 ? 'mobile-two-col' : ''} legend">
-  {#each regions as r, i}
-    <div
-      class="legend-elem"
-      style="--color: {MULTI_COLORS[i].replace(/rgb\((.*)\)/, '$1')}"
-      class:selected={highlightRegion === r.id}
-      on:mouseenter={() => highlight(r)}
-      on:mouseleave={() => highlight(null)}>
-      <span class="legend-symbol">●</span>
-      <div>
-        <span>
-          {#if r.id !== region.id && r.id !== neighboringInfo.id}
-            <a href="?region={r.propertyId}" on:click|preventDefault={() => region.set(r, true)}> {r.displayName} </a>
-          {:else}{r.displayName}{/if}
-        </span>
-      </div>
-      <div>
-        {#await data then d}
-          <span class="legend-value">
-            <SensorValue {sensor} value={findValue(r, d, highlightDate)} />
-            {#if singleRaw && sensor.rawValue != null}
-              (raw:
-              <SensorValue {sensor} value={findValue(r, d, highlightDate, 'raw')} />)
-            {/if}
-          </span>
-        {/await}
-      </div>
-    </div>
-  {/each}
-</div>

@@ -5,18 +5,6 @@
   export let sensor;
 </script>
 
-<style>
-  .desc {
-    font-size: 0.875rem;
-  }
-
-  .mobile-invert {
-    background: #f0f1f3;
-    border-radius: 3px;
-    padding: 1.5rem;
-  }
-</style>
-
 {#if sensor.value.description}
   <div class="uk-container content-grid">
     <div class="grid-3-11 mobile-invert">
@@ -29,3 +17,15 @@
     </div>
   </div>
 {/if}
+
+<style>
+  .desc {
+    font-size: 0.875rem;
+  }
+
+  .mobile-invert {
+    background: #f0f1f3;
+    border-radius: 3px;
+    padding: 1.5rem;
+  }
+</style>

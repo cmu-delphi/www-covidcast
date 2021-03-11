@@ -17,6 +17,45 @@
   }
 </script>
 
+<div class="uk-container content-grid parameters">
+  <div class="dropdown-container grid-3-11" class:open on:click|stopPropagation={() => undefined}>
+    <button type="button" class="trigger" on:click={() => (open = !open)}>
+      <span class="inline-svg-icon search-icon">
+        {@html searchIcon}
+      </span>
+      {sensor.value.name}
+      <span class="inline-svg-icon down-icon">
+        {@html caretDownIcon}
+      </span>
+    </button>
+    <ul class="content">
+      {#each groupedSensorList as group}
+        <li>
+          <div class="mobile-h3">{group.label}</div>
+          <ul>
+            {#each group.sensors as sensor}
+              <li>
+                <a
+                  class="uk-text-muted"
+                  href="?sensor={sensor.key}"
+                  on:click|preventDefault={() => switchSensor(sensor)}>{sensor.name}</a
+                >
+              </li>
+            {/each}
+          </ul>
+        </li>
+      {/each}
+    </ul>
+  </div>
+</div>
+<svelte:window
+  on:click={() => {
+    if (open) {
+      open = false;
+    }
+  }}
+/>
+
 <style>
   .parameters {
     margin-top: 6px;
@@ -84,40 +123,3 @@
     display: block;
   }
 </style>
-
-<div class="uk-container content-grid parameters">
-  <div class="dropdown-container grid-3-11" class:open on:click|stopPropagation={() => undefined}>
-    <button type="button" class="trigger" on:click={() => (open = !open)}>
-      <span class="inline-svg-icon search-icon">
-        {@html searchIcon}
-      </span>
-      {sensor.value.name}
-      <span class="inline-svg-icon down-icon">
-        {@html caretDownIcon}
-      </span>
-    </button>
-    <ul class="content">
-      {#each groupedSensorList as group}
-        <li>
-          <div class="mobile-h3">{group.label}</div>
-          <ul>
-            {#each group.sensors as sensor}
-              <li>
-                <a
-                  class="uk-text-muted"
-                  href="?sensor={sensor.key}"
-                  on:click|preventDefault={() => switchSensor(sensor)}>{sensor.name}</a>
-              </li>
-            {/each}
-          </ul>
-        </li>
-      {/each}
-    </ul>
-  </div>
-</div>
-<svelte:window
-  on:click={() => {
-    if (open) {
-      open = false;
-    }
-  }} />

@@ -10,6 +10,21 @@
   export let desc = false;
 </script>
 
+<span>
+  <button
+    class="inline-svg-icon sort-indicator"
+    class:active={sorted}
+    on:click={() => dispatch('click')}
+    title="Sort {label} {desc ? 'ascending' : 'descending'}"
+  >
+    {#if sorted && desc}
+      {@html chevronDownIcon}
+    {:else}
+      {@html chevronUpIcon}
+    {/if}
+  </button>
+</span>
+
 <style>
   .sort-indicator {
     border: none;
@@ -27,17 +42,3 @@
     opacity: 1;
   }
 </style>
-
-<span>
-  <button
-    class="inline-svg-icon sort-indicator"
-    class:active={sorted}
-    on:click={() => dispatch('click')}
-    title="Sort {label} {desc ? 'ascending' : 'descending'}">
-    {#if sorted && desc}
-      {@html chevronDownIcon}
-    {:else}
-      {@html chevronUpIcon}
-    {/if}
-  </button>
-</span>

@@ -8,6 +8,15 @@
   export let fit = false;
 </script>
 
+<div class="hexgrid {className}" class:shadow style="--columns: {columns}; --pad: {fit ? 0 : 1}; {style}" on:>
+  {#each Array(rowHint).fill(0) as _, i}
+    <div class="hexgrid__auto_filler" style="--row: {i}" />
+    <div class="hexgrid__auto_filler_right" style="--row: {i}" />
+  {/each}
+
+  <slot />
+</div>
+
 <style>
   .hexgrid {
     --columns: 10;
@@ -61,12 +70,3 @@
     }
   }
 </style>
-
-<div class="hexgrid {className}" class:shadow style="--columns: {columns}; --pad: {fit ? 0 : 1}; {style}" on:>
-  {#each Array(rowHint).fill(0) as _, i}
-    <div class="hexgrid__auto_filler" style="--row: {i}" />
-    <div class="hexgrid__auto_filler_right" style="--row: {i}" />
-  {/each}
-
-  <slot />
-</div>

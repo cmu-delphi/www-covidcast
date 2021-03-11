@@ -30,7 +30,7 @@ const missingGradient = {
 
 function genCreditsLayer({ shift = 55 } = {}) {
   /**
-   * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
+   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
    */
   const layer = {
     data: {
@@ -79,7 +79,7 @@ function genCreditsLayer({ shift = 55 } = {}) {
 
 function genMissingLayer(missingLevel = 'nation') {
   /**
-   * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
+   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
    */
   const layer = {
     data: {
@@ -100,7 +100,7 @@ function genMissingLayer(missingLevel = 'nation') {
 
 function genMegaLayer(withStates = null) {
   /**
-   * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
+   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
    */
   const layer = {
     data: {
@@ -140,21 +140,13 @@ function genMegaLayer(withStates = null) {
         type: 'quantitative',
       },
     },
-    selection: {
-      hoverMega: {
-        type: 'single',
-        on: 'mouseover',
-        empty: 'none',
-        fields: ['geo_value'],
-      },
-    },
   };
   return layer;
 }
 
 function genStateBorderLayer({ strokeWidth = 1.1 } = {}) {
   /**
-   * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
+   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
    */
   const layer = {
     data: {
@@ -182,7 +174,7 @@ function genStateBorderLayer({ strokeWidth = 1.1 } = {}) {
 
 function genMegaHoverLayer(alsoOnCounties = false) {
   /**
-   * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
+   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
    */
   const layer = {
     data: {
@@ -211,7 +203,8 @@ function genMegaHoverLayer(alsoOnCounties = false) {
               test: {
                 or: [
                   {
-                    selection: 'hoverMega',
+                    param: 'hover',
+                    empty: false,
                   },
                   'hover && hover.geo_value && hover.geo_value[0] && slice(hover.geo_value[0], 0, 2) === slice(datum.id, 0, 2)',
                 ],
@@ -219,7 +212,8 @@ function genMegaHoverLayer(alsoOnCounties = false) {
               value: 1,
             }
           : {
-              selection: 'hoverMega',
+              param: 'hover',
+              empty: false,
               value: 1,
             },
         value: 0,
@@ -231,7 +225,7 @@ function genMegaHoverLayer(alsoOnCounties = false) {
 
 function genLevelLayer({ strokeWidth = 1, scheme = 'yellowgreenblue', domain = undefined } = {}) {
   /**
-   * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
+   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
    */
   const layer = {
     mark: {
@@ -280,21 +274,23 @@ function genLevelLayer({ strokeWidth = 1, scheme = 'yellowgreenblue', domain = u
         },
       },
     },
-    selection: {
-      hover: {
-        type: 'single',
-        on: 'mouseover, click',
-        empty: 'none',
-        fields: ['geo_value'],
+    params: [
+      {
+        name: 'hover',
+        select: {
+          type: 'point',
+          on: 'mouseover, click',
+          fields: ['geo_value'],
+        },
       },
-    },
+    ],
   };
   return layer;
 }
 
 function genLevelHoverLayer({ strokeWidth = 3 } = {}) {
   /**
-   * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
+   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
    */
   const layer = {
     mark: {
@@ -305,13 +301,6 @@ function genLevelHoverLayer({ strokeWidth = 3 } = {}) {
       fill: null,
       tooltip: false,
     },
-    // transform: [
-    //   {
-    //     filter: {
-    //       selection: 'hover'
-    //     }
-    //   }
-    // ],
     encoding: {
       key: {
         field: 'id',
@@ -319,7 +308,8 @@ function genLevelHoverLayer({ strokeWidth = 3 } = {}) {
       opacity: {
         // more performant
         condition: {
-          selection: 'hover',
+          param: 'hover',
+          empty: false,
           value: 1,
         },
         value: 0,
@@ -334,6 +324,7 @@ function genBaseSpec(level, topoJSON, { height = 300 }) {
    * @type {import('vega-lite').TopLevelSpec}
    */
   const spec = {
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     height,
     padding: {
       left: 10,
@@ -502,7 +493,8 @@ export function generateRelatedCountySpec(county, options = {}) {
     test: {
       or: [
         {
-          selection: 'hover',
+          param: 'hover',
+          empty: false,
         },
         `datum.id === '${county.id}'`,
       ],

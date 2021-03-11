@@ -1,7 +1,6 @@
 import { isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data/signals';
 import { formatAPITime } from '../data/utils';
 import descriptions from './descriptions.generated.json';
-import '!file-loader?name=descriptions.raw.txt!./descriptions.raw.txt';
 import { modeByID } from '../modes';
 import { formatRawValue, formatValue, formatPercentage } from '../formats';
 // import { generateMockSignal, generateMockMeta } from '../data/mock';

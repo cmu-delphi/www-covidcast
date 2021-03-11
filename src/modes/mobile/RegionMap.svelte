@@ -92,6 +92,7 @@
     {spec}
     {data}
     tooltip={RegionMapTooltip}
-    tooltipProps={{ sensor, regionSetter: region.set }} />
+    tooltipProps={{ sensor, regionSetter: region.set }}
+  />
   <DownloadMenu {vegaRef} {data} {sensor} absolutePos {fileName} />
 </div>
