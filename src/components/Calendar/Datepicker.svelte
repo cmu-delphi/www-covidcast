@@ -12,6 +12,7 @@
   let popover;
 
   export let className = '';
+  export let offset = 0;
   export let start = new Date(1987, 0, 1);
   export let end = new Date(2030, 0, 1);
   export let selected = today;
@@ -71,7 +72,6 @@
   let year = today.getFullYear();
 
   let isOpen = false;
-  let isClosing = false;
 
   today.setHours(0, 0, 0, 0);
 
@@ -253,15 +253,8 @@
   }
 </script>
 
-<div class="datepicker {className}" class:open={isOpen} class:closing={isClosing} style={wrapperStyle}>
-  <Popover
-    bind:this={popover}
-    bind:open={isOpen}
-    bind:shrink={isClosing}
-    {trigger}
-    on:opened={registerOpen}
-    on:closed={registerClose}
-  >
+<div class="datepicker {className}" class:open={isOpen} style={wrapperStyle}>
+  <Popover bind:this={popover} bind:open={isOpen} {trigger} on:opened={registerOpen} on:closed={registerClose} {offset}>
     <div slot="trigger">
       <slot {selected} {formattedSelected}>
         {#if !trigger}<button class="calendar-button" type="button">{formattedSelected}</button>{/if}
@@ -326,14 +319,14 @@
     position: relative;
     overflow: hidden;
     user-select: none;
-    width: 100vw;
+    width: calc(100vw - 10px);
     padding: 10px;
     padding-top: 0;
+    height: auto;
   }
 
   @media (min-width: 480px) {
     .calendar {
-      height: auto;
       width: 280px;
       max-width: 100%;
     }

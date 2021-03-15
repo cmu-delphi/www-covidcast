@@ -42,6 +42,7 @@
   </button>
   {#if value != null && startEndDates.length !== 0}
     <Datepicker
+      offset={11}
       bind:selected={value}
       start={startEndDates[0]}
       end={startEndDates[1]}
