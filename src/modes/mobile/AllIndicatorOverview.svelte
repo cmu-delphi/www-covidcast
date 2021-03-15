@@ -3,6 +3,7 @@
   import { sensorList } from '../../stores';
   import { isInverted } from '../../stores/params';
   import { formatDateYearWeekdayAbbr } from '../../formats';
+  import AllIndicatorsText from './AllIndicatorsText.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -44,22 +45,6 @@
   }
 
   $: trendSummary = generateTrendSummary(date, region);
-
-  function worse(worse) {
-    if (!worse) {
-      return 'N/A are getting worse.';
-    }
-    if (worse.length === 0) {
-      return 'None are getting worse.';
-    }
-    if (worse.length === 1) {
-      return `"${worse[0].name}" is getting worse.`;
-    }
-    return `${worse
-      .slice(0, worse.length - 1)
-      .map((d) => `"${d.name}"`)
-      .join(', ')}, and "${worse[worse.length - 1].name}" are getting worse.`;
-  }
 </script>
 
 <FancyHeader sub="Summary">Indicators</FancyHeader>
@@ -69,12 +54,12 @@
     <strong>N/A of {sensorList.length} indicators</strong>
     are
     <strong>getting better.</strong>
-    {worse(null)}
+    <AllIndicatorsText sensors={null} />
   {:then d}
     <strong>{d ? d.positive.length : 'N/A'} of {sensorList.length} indicators</strong>
     are
     <strong>getting better.</strong>
-    {worse(d ? d.negative : null)}
+    <AllIndicatorsText sensors={d ? d.negative : null} />
     {#if d && d.unknown.length > 0}
       <strong>{d ? d.unknown.length : 'N/A'} of {sensorList.length} indicators</strong>
       are
