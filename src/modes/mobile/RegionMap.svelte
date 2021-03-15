@@ -3,7 +3,7 @@
   import { formatDateISO } from '../../formats';
   import { getCountiesOfState } from '../../maps';
   import { generateCountiesOfStateSpec, generateRelatedCountySpec, generateStateSpec } from '../../specs/mapSpec';
-  import { stats } from '../../stores';
+  import { stats, isMobileDevice } from '../../stores';
   import DownloadMenu from './components/DownloadMenu.svelte';
   import RegionMapTooltip from './RegionMapTooltip.svelte';
 
@@ -83,6 +83,14 @@
   $: fileName = generateFileName(sensor, date, region);
 
   let vegaRef = null;
+
+  function onClickHandler(evt) {
+    const item = evt.detail.item;
+    if ($isMobileDevice || !item || !item.datum || !item.datum.propertyId) {
+      return; // no click on mobile
+    }
+    region.set(item.datum, true);
+  }
 </script>
 
 <div class={showsUS ? 'chart-aspect-4-3' : 'chart-250'}>
@@ -93,6 +101,8 @@
     {data}
     tooltip={RegionMapTooltip}
     tooltipProps={{ sensor, regionSetter: region.set }}
+    on:click={onClickHandler}
+    eventListeners={['click']}
   />
   <DownloadMenu {vegaRef} {data} {sensor} absolutePos {fileName} />
 </div>
