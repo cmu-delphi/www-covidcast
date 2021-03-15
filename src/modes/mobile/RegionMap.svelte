@@ -93,7 +93,7 @@
   }
 </script>
 
-<div class={showsUS ? 'chart-aspect-4-3' : 'chart-250'}>
+<div class="chart-aspect-4-3">
   <Vega
     bind:this={vegaRef}
     className={showsUS ? '' : 'mobile-map'}

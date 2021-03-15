@@ -55,9 +55,7 @@
       <RegionOverview {region} />
 
       <FancyHeader invert sub="Map">{sensor.name}</FancyHeader>
-    </div>
-    <RegionMapWrapper {sensor} {date} {region} {fetcher} />
-    <div class="grid-3-11">
+      <RegionMapWrapper {sensor} {date} {region} {fetcher} />
       <FancyHeader invert sub="Chart">{sensor.name}</FancyHeader>
 
       <div class="chart-300">
