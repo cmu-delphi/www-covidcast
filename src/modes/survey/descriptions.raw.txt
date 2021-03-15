@@ -8,10 +8,7 @@ FullSurveyLink: https://cmu-delphi.github.io/delphi-epidata/symptom-survey/codin
 DataAccessLink: https://cmu-delphi.github.io/delphi-epidata/symptom-survey/data-access.html
 DataSource: fb-survey
 Levels: [county, msa, state]
-TrendThreshold: 0.1 # increasing if ((current / a week ago) - 1) >= threshold
-TrendThresholdQuickly: 0.25 # quickly increasing if … >= thresholdQuickly
 ReferenceRawNationSignal: raw_cli
-Unit: People per every 1,000 people
 ---
 Name: COVID-Like Symptoms
 Category: Symptoms
@@ -41,11 +38,19 @@ LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals
 Name: Self-Reported Mask Use
 Category: Mask Use
 Question: |
-  In the past 5 days, did you wear a mask **most or all of the time** in public?
-Signal: smoothed_wearing_mask
-SignalTooltip: Estimated proportion of people who wore a mask for most or all of the time while in public in the past 5 days; those not in public in the past 5 days are not counted.
+  In the past 7 days, did you wear a mask **most or all of the time** in public?
+Signal: smoothed_wearing_mask_7d
+SignalTooltip: Estimated proportion of people who wore a mask for most or all of the time while in public in the past 7 days; those not in public in the past 7 days are not counted.
 Inverted: true
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#behavior-indicators
+OldRevisions:
+ -  Changed: 2021-02-08
+    ChangedWithWave: 8
+    Signal: smoothed_wearing_mask
+    SignalTooltip: Estimated proportion of people who wore a mask for most or all of the time while in public in the past 5 days; those not in public in the past 5 days are not counted.
+    Change: The new revision changed the number of days from 5 to 7, unifying the time range with other questions in this survey.
+
+
 
 
 
@@ -122,11 +127,17 @@ LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals
 Name: Visited Restaurant, Bar, or Cafe
 Category: Social Distancing
 Question: |
-  In the past 24 hours, did you go to a bar, restaurant, or cafe?
-Signal: smoothed_restaurant_1d
-SignalTooltip: Estimated proportion of respondents who went to a “bar, restaurant, or cafe” in the past 24 hours 
+  In the past 24 hours, did you have a meal or drink indoors at a bar, restaurant, or cafe?
+Signal: smoothed_restaurant_indoors_1d
+SignalTooltip: Estimated proportion of respondents who had a meal or drink indoors at a “bar, restaurant, or cafe” in the past 24 hours 
 Inverted: false
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#behavior-indicators
+OldRevisions:
+  - Changed: 2021-03-02
+    ChangedWithWave: 10
+    Signal: smoothed_restaurant_1d
+    SignalTooltip: Estimated proportion of respondents who went to a “bar, restaurant, or cafe” in the past 24 hours
+    Change: The new revision is limiting to indoors activities only while this revision wasn’t specifying whether the activity was indoors or outdoors.
 
 
 ---

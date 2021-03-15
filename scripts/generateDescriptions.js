@@ -124,6 +124,16 @@ function convertSurveyDescriptions(code) {
         value = marked.parse(value.trim());
       } else if (formattedKey === 'description' || formattedKey === 'question') {
         value = marked.parseInline(value.trim());
+      } else if (formattedKey === 'oldRevisions') {
+        // also format nested object
+        const arr = value.map((entry) => {
+          const sub = {};
+          Object.entries(entry).forEach(([k, v]) => {
+            sub[k[0].toLowerCase() + k.slice(1)] = v;
+          });
+          return sub;
+        });
+        value = arr;
       }
       r[formattedKey] = value;
     });

@@ -1,12 +1,23 @@
 import { sensorList } from '../../stores';
 import descriptions from './descriptions.generated.json';
 import { SensorParam } from '../../stores/params';
+import { isoParse } from 'd3-time-format';
 
 export const overviewText = descriptions.overview;
 export const surveyFullTextLink = descriptions.fullSurveyLink;
 export const dataAccessLink = descriptions.dataAccessLink;
 export const referenceRawNationSignal = descriptions.referenceRawNationSignal;
 export const visibleLevels = descriptions.levels;
+
+/**
+ * @typedef {object} Revision
+ * @param {number} wave
+ * @param {Date} changed
+ * @param {string} signal
+ * @param {string} signalTooltip
+ * @param {string} change
+ * @property {import("../../stores/params").SensorParam} sensorParam question as param
+ */
 
 /**
  * @typedef {object} Question
@@ -20,15 +31,25 @@ export const visibleLevels = descriptions.levels;
  * @property {boolean} inverted
  * @property {string[]} levels
  * @property {string} learnMoreLink
- * @property {string} unit
  * @property {import("../../data").SensorEntry?} sensor matching sensor entry
  * @property {import("../../stores/params").SensorParam} sensorParam question as param
+ * @property {Revision[]?} oldRevisions
  */
 
 function toAnchor(value) {
   return value.toLowerCase().replace(/\s/g, '-');
 }
 
+/**
+ *
+ * @param {Revision} revision
+ */
+function parseRevision(revision) {
+  return {
+    ...revision,
+    changed: isoParse(revision.changed),
+  };
+}
 /**
  * @type {Question[]}
  */
@@ -38,7 +59,7 @@ export const questions = descriptions.questions.map((question) => ({
   levels: descriptions.levels,
   sensor: sensorList.find((d) => d.id === descriptions.dataSource && d.signal === question.signal),
   anchor: toAnchor(question.name),
-  unit: question.unit || descriptions.unit,
+  oldRevisions: question.oldRevisions ? question.oldRevisions.map(parseRevision) : null,
 }));
 
 /**
@@ -74,4 +95,13 @@ for (const question of questions) {
       isInverted: question.inverted,
     },
   );
+  if (question.oldRevisions) {
+    question.oldRevisions.forEach((rev) => {
+      rev.sensorParam = new SensorParam({
+        ...question.sensorParam.value,
+        signal: rev.signal,
+        key: `${question.sensorParam.key}:${rev.signal}`,
+      });
+    });
+  }
 }
