@@ -77,6 +77,62 @@ function genCreditsLayer({ shift = 55 } = {}) {
   return layer;
 }
 
+export function genInvalidStartRangeLayer(date) {
+  /**
+   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
+   */
+  const layer = {
+    data: {
+      values: [
+        {
+          date_value: date.getTime(),
+        },
+      ],
+    },
+    mark: {
+      type: 'rect',
+      color: '#fafafa',
+      opacity: 0.8,
+    },
+    encoding: {
+      x: {
+        field: 'date_value',
+        type: 'temporal',
+      },
+    },
+  };
+  return layer;
+}
+export function genInvalidEndRangeLayer(date) {
+  /**
+   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
+   */
+  const layer = {
+    data: {
+      values: [
+        {
+          date_value: date.getTime(),
+        },
+      ],
+    },
+    mark: {
+      type: 'rect',
+      x2: {
+        expr: `range('x')[1]`,
+      },
+      color: '#fafafa',
+      opacity: 0.8,
+    },
+    encoding: {
+      x: {
+        field: 'date_value',
+        type: 'temporal',
+      },
+    },
+  };
+  return layer;
+}
+
 export function generateLineChartSpec({
   width = 800,
   height = 300,

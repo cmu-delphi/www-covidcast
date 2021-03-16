@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-import { formatDateLocal } from '../../formats';
+  import { formatDateLocal } from '../../formats';
   import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
   /**
    * @type {import('./questions').Revision}
@@ -41,18 +41,26 @@ import { formatDateLocal } from '../../formats';
 <details bind:this={el} bind:open>
   <summary>
     <h4>
-      {revision.addedInWave.name} ({formatDateLocal(revision.addedInWave.published)}) - {revision.changedInWave.name} ({formatDateLocal(revision.changedInWave.published)})
+      {revision.addedInWave.name} ({formatDateLocal(revision.addedInWave.published)}) - {revision.changedInWave.name} ({formatDateLocal(
+        revision.changedInWave.published,
+      )})
     </h4>
   </summary>
   <p>
     {@html revision.change}
 
-    Details are described in the <a href={revision.changedInWave.link}>Wave {revision.changedInWave.name}</a> revision
-    log.
+    Details are described in the <a href={revision.changedInWave.link}>{revision.changedInWave.name}</a> revision log.
   </p>
   {#if open}
     <div class="chart-300">
-      <HistoryLineChart {sensor} {date} {region} {fetcher} />
+      <HistoryLineChart
+        {sensor}
+        {date}
+        {region}
+        {fetcher}
+        starts={revision.addedInWave.published}
+        ends={revision.changedInWave.published}
+      />
     </div>
   {/if}
 </details>

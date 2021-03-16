@@ -42,7 +42,6 @@ export const waves = descriptions.waves.reduce((waves, wave, i) => {
   return waves;
 }, []);
 
-
 /**
  * @typedef {object} Revision
  * @property {string} change

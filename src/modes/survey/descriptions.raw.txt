@@ -108,7 +108,7 @@ Name: Went to Work or School
 Category: Social Distancing
 Question: |
   In the past 24 hours, did you work or go to school indoors outside the place where you are currently staying?
-Signal: smoothed_work_outside_indoors_home_1d
+Signal: smoothed_work_outside_home_indoors_1d
 SignalTooltip: Estimated percentage of respondents who worked or went to school indoors and outside their home in the past 24 hours.
 Inverted: false
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#behavior-indicators
