@@ -88,7 +88,7 @@ module.exports = () => {
                 emitCss: !devMode,
               },
             },
-          ].slice(hmr ? 1 : 0),
+          ].slice(devMode ? 1 : 0),
         },
         {
           // required to prevent errors from Svelte on Webpack 5+, omit on Webpack 4
@@ -202,9 +202,9 @@ module.exports = () => {
       // }),
       !devMode &&
         new MiniCssExtractPlugin({
-          filename: devMode ? '[name].css' : '[name].[contenthash].css',
+          filename: '[name].[contenthash].css',
           ignoreOrder: true,
-          chunkFilename: devMode ? '[name].css' : '[name].[contenthash].css',
+          chunkFilename: '[name].[contenthash].css',
         }),
     ].filter(Boolean),
   };
