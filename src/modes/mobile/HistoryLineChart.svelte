@@ -41,6 +41,11 @@
   export let fetcher;
 
   /**
+   * @type {Date|null}
+   */
+  export let starts = null;
+
+  /**
    * @type {import("../../stores/params").Region}
    */
   const neighboringInfo = {

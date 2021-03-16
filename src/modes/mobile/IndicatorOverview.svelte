@@ -76,7 +76,9 @@
   {/await}
 </div>
 
-<TrendTextSummary {sensor} {date} {trend} />
+<TrendTextSummary {sensor} {date} {trend}>
+  <slot />
+</TrendTextSummary>
 
 <style>
   p {

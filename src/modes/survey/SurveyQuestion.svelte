@@ -5,7 +5,7 @@
   import warningIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
   import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
   import IndicatorOverview from '../mobile/IndicatorOverview.svelte';
-  import { formatDateShortWeekdayAbbr } from '../../formats';
+  import { formatDateYearWeekdayAbbr } from '../../formats';
   import IndicatorStatsLine from '../mobile/IndicatorStatsLine.svelte';
   import IndicatorRevisions from './IndicatorRevisions.svelte';
 
@@ -90,17 +90,19 @@
 
     <p>
       On
-      {formatDateShortWeekdayAbbr(date.value)}
+      {formatDateYearWeekdayAbbr(date.value, true)}
       the 7 day average of
       <strong>{sensor.name}</strong>
       <UIKitHint title={question.signalTooltip} inline />
       was:
     </p>
-    <IndicatorOverview {sensor} {date} {region} {fetcher} />
+    <IndicatorOverview {sensor} {date} {region} {fetcher}>
+      The indicator <strong>{sensor.name}</strong> was added in <a href={question.addedInWave.link}>{question.addedInWave.name}</a> of the Delphi survey published on {formatDateYearWeekdayAbbr(question.addedInWave.published, true)}.
+    </IndicatorOverview>
 
     <hr />
     <div class="chart-300">
-      <HistoryLineChart {sensor} {date} {region} {fetcher} />
+      <HistoryLineChart {sensor} {date} {region} {fetcher} starts={question.addedInWave.published}/>
     </div>
 
     <IndicatorStatsLine {sensor} {date} {region} {fetcher} />

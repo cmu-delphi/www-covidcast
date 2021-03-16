@@ -1,8 +1,7 @@
 <script>
   import { onMount } from 'svelte';
+import { formatDateLocal } from '../../formats';
   import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
-  import { formatDateLocal } from '../../formats';
-  import { waveLink } from './questions';
   /**
    * @type {import('./questions').Revision}
    */
@@ -42,13 +41,13 @@
 <details bind:this={el} bind:open>
   <summary>
     <h4>
-      before Wave {revision.changedWithWave} (collected till {formatDateLocal(revision.changedOn)})
+      {revision.addedInWave.name} ({formatDateLocal(revision.addedInWave.published)}) - {revision.changedInWave.name} ({formatDateLocal(revision.changedInWave.published)})
     </h4>
   </summary>
   <p>
     {@html revision.change}
 
-    Details are described in the <a href={waveLink(revision.changedWithWave)}>Wave {revision.changedWithWave}</a> revision
+    Details are described in the <a href={revision.changedInWave.link}>Wave {revision.changedInWave.name}</a> revision
     log.
   </p>
   {#if open}
@@ -62,5 +61,6 @@
   h4 {
     display: inline-block;
     margin: 0;
+    cursor: pointer;
   }
 </style>
