@@ -127,7 +127,7 @@
       {/if}
       <li class="uk-nav-divider" />
       <li>
-        <a href="?mode={modeByID.export.id}&sensor={sensor.key}" on:click|preventDefault={exportData}
+        <a href="?mode={modeByID.export.id}" on:click|preventDefault={exportData}
           >Advanced Data Export</a
         >
       </li>
