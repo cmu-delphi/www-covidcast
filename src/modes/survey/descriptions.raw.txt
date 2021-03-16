@@ -44,11 +44,10 @@ SignalTooltip: Estimated proportion of people who wore a mask for most or all of
 Inverted: true
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#behavior-indicators
 OldRevisions:
- -  Changed: 2021-02-08
+ -  ChangedOn: 2021-02-08
     ChangedWithWave: 8
-    Signal: smoothed_wearing_mask
-    SignalTooltip: Estimated proportion of people who wore a mask for most or all of the time while in public in the past 5 days; those not in public in the past 5 days are not counted.
     Change: The new revision changed the number of days from 5 to 7, unifying the time range with other questions in this survey.
+    Signal: smoothed_wearing_mask
 
 
 
@@ -133,11 +132,10 @@ SignalTooltip: Estimated proportion of respondents who had a meal or drink indoo
 Inverted: false
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#behavior-indicators
 OldRevisions:
-  - Changed: 2021-03-02
+  - ChangedOn: 2021-03-02
     ChangedWithWave: 10
-    Signal: smoothed_restaurant_1d
-    SignalTooltip: Estimated proportion of respondents who went to a “bar, restaurant, or cafe” in the past 24 hours
     Change: The new revision is limiting to indoors activities only while this revision wasn’t specifying whether the activity was indoors or outdoors.
+    Signal: smoothed_restaurant_1d
 
 
 ---

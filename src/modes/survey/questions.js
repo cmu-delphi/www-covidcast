@@ -9,10 +9,14 @@ export const dataAccessLink = descriptions.dataAccessLink;
 export const referenceRawNationSignal = descriptions.referenceRawNationSignal;
 export const visibleLevels = descriptions.levels;
 
+export function waveLink(wave) {
+  return `https://cmu-delphi.github.io/delphi-epidata/symptom-survey/coding.html#wave-${wave}`;
+}
+
 /**
  * @typedef {object} Revision
- * @param {number} wave
- * @param {Date} changed
+ * @param {number} changedWithWave
+ * @param {Date} changedOn
  * @param {string} signal
  * @param {string} signalTooltip
  * @param {string} change
@@ -47,7 +51,7 @@ function toAnchor(value) {
 function parseRevision(revision) {
   return {
     ...revision,
-    changed: isoParse(revision.changed),
+    changedOn: isoParse(revision.changedOn),
   };
 }
 /**

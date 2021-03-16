@@ -7,6 +7,7 @@
   import IndicatorOverview from '../mobile/IndicatorOverview.svelte';
   import { formatDateShortWeekdayAbbr } from '../../formats';
   import IndicatorStatsLine from '../mobile/IndicatorStatsLine.svelte';
+  import IndicatorRevisions from './IndicatorRevisions.svelte';
 
   /**
    * question object
@@ -103,6 +104,10 @@
     </div>
 
     <IndicatorStatsLine {sensor} {date} {region} {fetcher} />
+
+    {#if question.oldRevisions}
+      <IndicatorRevisions {question} {date} {region} {fetcher} />
+    {/if}
   </div>
 </article>
 

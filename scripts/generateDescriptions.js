@@ -9,6 +9,7 @@ const marked = require('marked');
 
 const isCheckMode = process.argv.includes('--check');
 const isFallBackMode = process.argv.includes('--fallback');
+const isLocalOnlyMode = process.argv.includes('--localOnly');
 
 // has to be publicly viewable
 const DOC_URL =
@@ -59,11 +60,11 @@ function compare(current, fileName) {
 }
 
 async function handleFile(docUrl, fileName, converter) {
-  const code = (await Promise.all(docUrl.split(',').map(loadDoc))).join('\n\n');
+  const code = isLocalOnlyMode ? null : (await Promise.all(docUrl.split(',').map(loadDoc))).join('\n\n');
   if (isCheckMode) {
     return compare(code, fileName);
   }
-  if (!code && isFallBackMode && fs.existsSync(fileName)) {
+  if (!code && (isFallBackMode || isLocalOnlyMode) && fs.existsSync(fileName)) {
     converter(fs.readFileSync(fileName).toString());
     return;
   }

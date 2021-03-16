@@ -23,6 +23,7 @@
     "clean": "rimraf \"*.zip\" \"*.tgz\" public",
     "gen": "node ./scripts/generateDescriptions.js",
     "gen:check": "npm run gen -- --check",
+    "gen:local": "npm run gen -- --localOnly",
     "gen:fallback": "npm run gen -- --fallback",
     "process-geo": "node ./src/maps/process.js",
     "start": "npm run gen:fallback && cross-env NODE_ENV=development webpack serve --mode development --hot --devtool eval-cheap-module-source-map",
