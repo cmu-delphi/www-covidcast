@@ -131,7 +131,7 @@ AddedInWave: 10
 OldRevisions:
  - Change: The new revision is limiting to indoors activities only while this revision wasn’t specifying whether the activity was indoors or outdoors.
    AddedInWave: 4
-   Signal: smoothed_spend_time_1d
+   Signal: smoothed_spent_time_1d
 
 
 

@@ -11,8 +11,7 @@
     generateLineAndBarSpec,
     signalPatches,
     MULTI_COLORS,
-    genInvalidStartRangeLayer,
-    genInvalidEndRangeLayer,
+    genDateHighlight,
   } from '../../specs/lineSpec';
   import { toTimeValue } from '../../stores/params';
   import Toggle from './Toggle.svelte';
@@ -188,12 +187,10 @@
 
   function injectRanges(spec, date) {
     if (starts && starts > date.windowTimeFrame.min) {
-      spec.layer.unshift(
-        genInvalidStartRangeLayer(starts > date.windowTimeFrame.max ? date.windowTimeFrame.max : starts),
-      );
+      spec.layer.unshift(genDateHighlight(starts > date.windowTimeFrame.max ? date.windowTimeFrame.max : starts));
     }
     if (ends && ends < date.windowTimeFrame.max) {
-      spec.layer.unshift(genInvalidEndRangeLayer(ends < date.windowTimeFrame.min ? date.windowTimeFrame.min : ends));
+      spec.layer.unshift(genDateHighlight(ends < date.windowTimeFrame.min ? date.windowTimeFrame.min : ends));
     }
     return spec;
   }
