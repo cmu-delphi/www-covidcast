@@ -182,9 +182,9 @@
               </td>
               <td>
                 {#await entry.trend}
-                  <TrendIndicator trend={null} sensor={entry.sensor} block />
+                  <TrendIndicator trend={null} block />
                 {:then d}
-                  <TrendIndicator trend={d} sensor={entry.sensor} block />
+                  <TrendIndicator trend={d} block />
                 {/await}
               </td>
               <td class="uk-text-right">
