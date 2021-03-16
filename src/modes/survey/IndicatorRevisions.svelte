@@ -22,5 +22,5 @@
 
 <FancyHeader sub="Revisions">Previous</FancyHeader>
 {#each question.oldRevisions as revision, i}
-  <IndicatorRevision {revision} {date} {region} {fetcher} open={i === 0} />
+  <IndicatorRevision {revision} {date} {region} {fetcher} />
 {/each}
