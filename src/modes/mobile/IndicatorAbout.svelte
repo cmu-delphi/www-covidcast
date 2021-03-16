@@ -1,8 +1,16 @@
 <script>
+  import { modeByID } from '..';
+  import { currentMode } from '../../stores';
   /**
    * @type {import('../../stores/constants').SensorEntry}
    */
   export let sensor;
+
+  function exportData() {
+    sensor.set(sensor.value);
+    // switch to export mode
+    currentMode.set(modeByID.export);
+  }
 </script>
 
 {#if sensor.value.description}
@@ -14,6 +22,23 @@
         {@html sensor.value.description}
       </div>
       <p class="desc">Source: {sensor.dataSource}</p>
+      <p class="desc uk-margin-remove-bottom">
+        More information
+        {#if sensor.value.links}
+          <ul class="uk-margin-remove">
+            {#each sensor.value.links as link}
+              <li>
+                {@html link}
+              </li>
+            {/each}
+            <li>
+              <a href={`?mode=${modeByID.export.id}&sensor=${sensor.key}`} on:click|preventDefault={exportData}
+                >Export Data</a
+              >
+            </li>
+          </ul>
+        {/if}
+      </p>
     </div>
   </div>
 {/if}

@@ -44,7 +44,7 @@
       <button class="mobile-back inline-svg-icon" on:click={switchMode}>
         {@html chevronLeftIcon}
       </button>
-      <h2>{sensor.name.toUpperCase()} <span>INDICATOR Details</span></h2>
+      <h2>INDICATOR <span>Details</span></h2>
     </div>
     <IndicatorDropdown {sensor} />
   </SurveyParameters>
@@ -55,9 +55,7 @@
       <RegionOverview {region} />
 
       <FancyHeader invert sub="Map">{sensor.name}</FancyHeader>
-    </div>
-    <RegionMapWrapper {sensor} {date} {region} {fetcher} />
-    <div class="grid-3-11">
+      <RegionMapWrapper {sensor} {date} {region} {fetcher} />
       <FancyHeader invert sub="Chart">{sensor.name}</FancyHeader>
 
       <div class="chart-300">

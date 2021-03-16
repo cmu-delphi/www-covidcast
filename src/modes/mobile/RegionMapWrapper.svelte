@@ -25,24 +25,18 @@
 </script>
 
 {#if region.level === 'nation'}
-  <div class="grid-3-11">
-    <p class="uk-text-center">
-      Click on a state to show this region
-      <Toggle bind:checked={showCounties}>
-        <span slot="before">Show US States as Beehive Grid</span>
-        Show US Counties as Choropleth Map
-      </Toggle>
-    </p>
-  </div>
-  <div class="grid-2-12">
-    {#if showCounties}
-      <RegionCountyMap {region} {date} {sensor} {fetcher} />
-    {:else}
-      <RegionHexMap {region} {date} {sensor} {fetcher} />
-    {/if}
-  </div>
+  <p class="uk-text-center">
+    Click on a state to show this region
+    <Toggle bind:checked={showCounties}>
+      <span slot="before">Show US States as Beehive Grid</span>
+      Show US Counties as Choropleth Map
+    </Toggle>
+  </p>
+  {#if showCounties}
+    <RegionCountyMap {region} {date} {sensor} {fetcher} />
+  {:else}
+    <RegionHexMap {region} {date} {sensor} {fetcher} />
+  {/if}
 {:else}
-  <div class="grid-2-12">
-    <RegionMap {region} {date} {sensor} {fetcher} />
-  </div>
+  <RegionMap {region} {date} {sensor} {fetcher} />
 {/if}

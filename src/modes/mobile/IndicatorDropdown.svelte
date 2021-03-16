@@ -1,7 +1,6 @@
 <script>
   import { groupedSensorList } from '../../stores';
   import caretDownIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/caret-down.svg';
-  import searchIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/search.svg';
 
   /**
    * @type {import("../../stores/params").SensorParam}
@@ -20,9 +19,6 @@
 <div class="uk-container content-grid parameters">
   <div class="dropdown-container grid-3-11" class:open on:click|stopPropagation={() => undefined}>
     <button type="button" class="trigger" on:click={() => (open = !open)}>
-      <span class="inline-svg-icon search-icon">
-        {@html searchIcon}
-      </span>
       {sensor.value.name}
       <span class="inline-svg-icon down-icon">
         {@html caretDownIcon}
@@ -70,18 +66,17 @@
     position: relative;
     background: white;
     text-align: left;
-    font-weight: 400;
+    font-weight: 600;
     height: 50px;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     line-height: 1rem;
-    padding: 10px 6px 10px 35px;
+    padding: 10px 6px 10px 24px;
     border: 1px solid #d3d4d8;
     color: #666;
     border-radius: 4px;
   }
 
-  .down-icon,
-  .search-icon {
+  .down-icon {
     font-size: 80%;
     fill: #999;
     position: absolute;
@@ -94,8 +89,7 @@
     align-items: center;
   }
 
-  .down-icon > :global(svg),
-  .search-icon > :global(svg) {
+  .down-icon > :global(svg) {
     width: 20px;
     height: 20px;
   }
