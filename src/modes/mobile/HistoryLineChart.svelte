@@ -9,7 +9,7 @@
     generateLineChartSpec,
     resolveHighlightedDate,
     generateLineAndBarSpec,
-    signalPatches,
+    resetOnClearHighlighTuple,
     MULTI_COLORS,
   } from '../../specs/lineSpec';
   import { toTimeValue } from '../../stores/params';
@@ -217,7 +217,7 @@
   {data}
   tooltip={HistoryLineTooltip}
   tooltipProps={{ sensor }}
-  signals={{ ...signalPatches, highlightRegion }}
+  signals={{ highlight_tuple: resetOnClearHighlighTuple(date.value), highlightRegion }}
   signalListeners={['highlight']}
   on:signal={onSignal}
 />
