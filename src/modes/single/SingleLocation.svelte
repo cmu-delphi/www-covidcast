@@ -230,7 +230,7 @@
                     <IndicatorCompare
                       {sensorMatrixData}
                       {sensor}
-                      options={{ axisTitles: false }}
+                      options={{ axisTitles: false, showTitle: false, ticks: false, tickLabels: false }}
                       on:click={onShowLagDetails(sensor, 0)}
                       date={$currentDateObject}
                       selections={$currentMultiSelection}
@@ -243,27 +243,54 @@
           </td>
           <td style="width: 500px; height: 400px; vertical-align: top">
             {#if showLagDetailsForSensor}
-              Lag:
-              <input
-                type="range"
-                min="-28"
-                max="28"
-                step="1"
-                value="0"
-                on:mousemove={(e) => {
-                  console.info('change lag', e);
-                  sensorDetailsLag = e.target.value;
-                }} />
               <IndicatorCompare
                 {sensorMatrixData}
                 sensor={showLagDetailsForSensor}
-                lag={sensorDetailsLag}
-                options={{ width: 400, height: 400, sizeLegend: true }}
                 date={$currentDateObject}
+                lag={sensorDetailsLag}
+                options={{ width: 400, height: 400, sizeLegend: true, showTooltips: true, showRSquared: true }}
                 selections={$currentMultiSelection}
                 {onHighlight}
                 highlightTimeValue={$highlightTimeValue} />
-              <!-- date={currentSensorDate} -->
+              <table>
+                <tr>
+                  <td>Lag:</td>
+                  <td>
+                    <input
+                      type="range"
+                      min="-28"
+                      max="28"
+                      step="1"
+                      value="0"
+                      on:mousemove={(e) => {
+                        sensorDetailsLag = e.target.value;
+                      }}
+                      on:click={(e) => {
+                        sensorDetailsLag = e.target.value;
+                      }}
+                      style="width: 500px;" />
+                    <table style="width: 500px; height: 50px">
+                      <tr>
+                        {#each [-28, -21, -14, -7, 0, 7, 14, 21, 28] as lag}
+                          <td style="width: 50px; height: 50px">
+                            <IndicatorCompare
+                              {sensorMatrixData}
+                              sensor={showLagDetailsForSensor}
+                              date={$currentDateObject}
+                              {lag}
+                              on:click={() => (sensorDetailsLag = lag)}
+                              options={{ width: 50, height: 50, padding: 0, sizeLegend: false, showTitle: false, axisTitles: false, ticks: false, tickLabels: false, showTooltips: false }}
+                              selections={$currentMultiSelection}
+                              {onHighlight}
+                              highlightTimeValue={$highlightTimeValue} />
+                          </td>
+                        {/each}
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
               <SensorCard
                 sensor={$currentSensorEntry}
                 date={$currentDateObject}

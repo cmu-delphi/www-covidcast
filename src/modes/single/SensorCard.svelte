@@ -16,21 +16,27 @@
    * @type {Date}
    */
   export let date;
+  export let lag = 0;
 
   export let onHighlight;
   export let highlightTimeValue;
 
   $: highlightDate = highlightTimeValue != null ? parseAPITime(highlightTimeValue) : null;
+  let lagMS = 3600 * 24 * lag;
 
   // use local variables with manual setting for better value comparison updates
-  let startDay = $smallMultipleTimeSpan[0];
-  let endDay = $smallMultipleTimeSpan[1];
+  let startDay = new Date($smallMultipleTimeSpan[0].getTime() - lagMS);
+  let endDay = new Date($smallMultipleTimeSpan[1].getTime() - lagMS);
+
+  $: newStartDay = new Date($smallMultipleTimeSpan[0].getTime() - lagMS);
+  $: newEndDay = new Date($smallMultipleTimeSpan[1].getTime() - lagMS);
+
   $: {
-    if (startDay.getTime() !== $smallMultipleTimeSpan[0].getTime()) {
-      startDay = $smallMultipleTimeSpan[0];
+    if (startDay.getTime() !== newStartDay.getTime()) {
+      startDay = newStartDay;
     }
-    if (endDay.getTime() !== $smallMultipleTimeSpan[1].getTime()) {
-      endDay = $smallMultipleTimeSpan[1];
+    if (endDay.getTime() !== newEndDay.getTime()) {
+      endDay = newEndDay;
     }
   }
   /**

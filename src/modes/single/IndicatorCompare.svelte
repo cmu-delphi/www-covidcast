@@ -78,10 +78,7 @@
 
   // row and column are field names as keys.
   function makeMatrixCellSpec(row, column, options = {}) {
-    // console.info('makeMatrixCellSpec options', options);
-    let xBin = {};
-    let yAggregate = null;
-
+    console.info('makeMatrixCellSpec options', options);
     const lag = options.lag || 0;
     const width = options.width || 100;
     const height = options.height || 100;
@@ -91,9 +88,10 @@
     const chartSpec = {
       width: width,
       height: height,
+      padding: options.padding != null ? options.padding : null,
       mark: {
         type: 'point',
-        tooltip: true,
+        tooltip: options.showTooltips,
       },
       transform: [
         { as: 'x_title', calculate: `"${options.xtitle} (" + timeFormat(datum.x_date, "%b %d") + "): " + datum.x` },
@@ -114,9 +112,9 @@
           field: 'x',
           title: options.axisTitles ? options.xtitle : '',
           type: 'quantitative',
-          ...xBin,
+          axis: { ticks: options.ticks, labels: options.tickLabels },
         },
-        y: yAggregate || {
+        y: {
           field: 'y',
           title: options.axisTitles ? options.ytitle : '',
           type: 'quantitative',
@@ -124,27 +122,30 @@
             domainMin: undefined,
             domainMax: undefined,
           },
+          axis: { ticks: options.ticks, labels: options.tickLabels },
         },
-        tooltip: [
-          {
-            field: 'x_title',
-            title: ' ',
-          },
-          // {
-          //   field: 'x',
-          //   type: 'quantitative',
-          //   title: options.xtitle,
-          // },
-          {
-            field: 'y_title',
-            title: '  ', // must be unique?
-          },
-          // {
-          //   field: 'y',
-          //   type: 'quantitative',
-          //   title: options.ytitle,
-          // },
-        ],
+        tooltip: options.showTooltips
+          ? [
+              {
+                field: 'x_title',
+                title: ' ',
+              },
+              // {
+              //   field: 'x',
+              //   type: 'quantitative',
+              //   title: options.xtitle,
+              // },
+              {
+                field: 'y_title',
+                title: '  ', // must be unique?
+              },
+              // {
+              //   field: 'y',
+              //   type: 'quantitative',
+              //   title: options.ytitle,
+              // },
+            ]
+          : false,
         opacity: {
           condition: [
             {
@@ -164,7 +165,8 @@
     spec = {
       width: width,
       height: height,
-      title: lag != 0 ? `Lag: ${lag} days` : '',
+      padding: options.padding != null ? options.padding : null,
+      title: options.showTitle ? `Lag: ${lag} days` : '',
       transform: [
         {
           window: [
@@ -180,7 +182,6 @@
               field: row,
               as: 'x',
             },
-
             {
               op: 'lag',
               param: lag <= 0 ? -lag : 0,
@@ -199,26 +200,31 @@
       layer: [
         chartSpec,
 
-        {
-          transform: [
-            {
-              regression: 'x',
-              on: 'y',
-              params: true,
-            },
-            { calculate: "'R²: '+format(datum.rSquared, '.2f')", as: 'R2' },
-          ],
-          mark: {
-            type: 'text',
-            color: 'firebrick',
-            x: 'width',
-            align: 'right',
-            y: -5,
-          },
-          encoding: {
-            text: { type: 'nominal', field: 'R2' },
-          },
-        },
+        ...(options.showRSquared
+          ? [
+              {
+                transform: [
+                  {
+                    regression: 'x',
+                    on: 'y',
+                    params: true,
+                  },
+                  { calculate: "'R²: '+format(datum.rSquared, '.2f')", as: 'R2' },
+                ],
+                mark: {
+                  type: 'text',
+                  color: 'firebrick',
+                  x: 'width',
+                  align: 'right',
+                  y: -5,
+                },
+                encoding: {
+                  text: { type: 'nominal', field: 'R2' },
+                },
+              },
+            ]
+          : []),
+
         {
           transform: [
             {
@@ -252,10 +258,10 @@
               ],
               mark: { type: 'rule', color: 'gray', opacity: 0.7 },
               encoding: {
-                x2: { field: 'xmean', type: 'quantitative' },
-                y2: { field: 'ymean', type: 'quantitative' },
                 x: { field: 'nextx', type: 'quantitative' },
                 y: { field: 'nexty', type: 'quantitative' },
+                x2: { field: 'xmean', type: 'quantitative' },
+                y2: { field: 'ymean', type: 'quantitative' },
                 size: {
                   field: 'date_value',
                   type: 'temporal',
@@ -278,9 +284,8 @@
             x: {
               field: 'x',
               type: 'quantitative',
-              ...xBin,
             },
-            y: yAggregate || {
+            y: {
               field: 'y',
               type: 'quantitative',
               scale: {
@@ -304,10 +309,15 @@
           ...[
             makeMatrixCellSpec(r.key, c.key, {
               histogram: r == c, // obsolete
+              showTitle: true,
               axisTitles: true,
+              ticks: false,
+              tickLabels: true,
               xtitle: r.name,
               ytitle: c.name,
               lag,
+              showTooltips: false,
+              showRSquared: false,
               ...options,
             }),
           ],
@@ -333,7 +343,7 @@
   function makeSplomSpec(matrixSpec) {
     return {
       $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
-      padding: { left: 10, right: 50, top: 10, bottom: 10 },
+      padding: options.padding != null ? options.padding : { left: 10, right: 50, top: 10, bottom: 10 },
       data: { name: 'values' },
 
       ...matrixSpec,
