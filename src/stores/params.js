@@ -682,7 +682,9 @@ export class SensorParam {
    * @param {Sensor} date
    */
   set(sensor, scrollTop = false) {
-    currentSensor.set(sensor.key);
+    if (sensor) {
+      currentSensor.set(sensor.key);
+    }
     if (scrollTop) {
       window.scrollTo({
         top: 0,
