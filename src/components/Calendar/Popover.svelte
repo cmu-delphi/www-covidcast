@@ -46,7 +46,6 @@
     }
     await tick();
     let rect = contentsWrapper.getBoundingClientRect();
-    console.log(rect.left, document.body.clientWidth, rect.right, translateX);
     return {
       top: rect.top + -1 * translateY + offset,
       bottom: window.innerHeight - rect.bottom + translateY + offset,
@@ -59,7 +58,6 @@
     let dist = await getDistanceToEdges();
     let x;
     let y;
-    console.log(dist);
     if (dist.top < 0) {
       y = Math.abs(dist.top);
     } else if (dist.bottom < 0) {
