@@ -156,7 +156,7 @@ Name: Attended Large Event
 Category: Social Distancing
 Question: |
   In the past 24 hours, did you attend an indoor event with more than 10 people?
-Signal: smoothed_large_event_1d
+Signal: smoothed_large_event_indoors_1d
 SignalTooltip: Estimated percentage of respondents who “attended an indoor event with more than 10 people” in the past 24 hours 
 Inverted: false
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#behavior-indicators
@@ -172,7 +172,7 @@ OldRevisions:
 Name: Traveled Out of State
 Category: Social Distancing
 Question: |
-  In the past 5 days, have you traveled outside of your state?
+  In the past 7 days, have you traveled outside of your state?
 Signal: smoothed_travel_outside_state_7d
 SignalTooltip: Estimated proportion of respondents who report traveling outside their state in the past 7 days.
 Inverted: false
