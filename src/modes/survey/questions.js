@@ -1,12 +1,55 @@
 import { sensorList } from '../../stores';
 import descriptions from './descriptions.generated.json';
 import { SensorParam } from '../../stores/params';
+import { isoParse } from 'd3-time-format';
 
 export const overviewText = descriptions.overview;
 export const surveyFullTextLink = descriptions.fullSurveyLink;
 export const dataAccessLink = descriptions.dataAccessLink;
 export const referenceRawNationSignal = descriptions.referenceRawNationSignal;
 export const visibleLevels = descriptions.levels;
+
+export function waveLink(wave) {
+  return `https://cmu-delphi.github.io/delphi-epidata/symptom-survey/coding.html#wave-${wave}`;
+}
+
+/**
+ * @typedef {object} Wave
+ * @property {string} name
+ * @property {number} wave
+ * @property {Date} published
+ * @property {string} link
+ * @property {Wave?} next
+ * @property {Wave?} previous
+ */
+
+/**
+ * @type {Wave[]}
+ */
+export const waves = descriptions.waves.reduce((waves, wave, i) => {
+  const date = isoParse(wave);
+  const waveObj = {
+    name: `Wave ${i + 1}`,
+    wave: i + 1,
+    published: date,
+    previous: waves[i - 1],
+    link: waveLink(i + 1),
+  };
+  if (waveObj.previous) {
+    waveObj.previous.next = waveObj;
+  }
+  waves.push(waveObj);
+  return waves;
+}, []);
+
+/**
+ * @typedef {object} Revision
+ * @property {string} change
+ * @property {Wave} changedInWave
+ * @property {Wave} addedInWave
+ * @property {string} signal
+ * @property {import("../../stores/params").SensorParam} sensorParam question as param
+ */
 
 /**
  * @typedef {object} Question
@@ -20,15 +63,34 @@ export const visibleLevels = descriptions.levels;
  * @property {boolean} inverted
  * @property {string[]} levels
  * @property {string} learnMoreLink
- * @property {string} unit
  * @property {import("../../data").SensorEntry?} sensor matching sensor entry
  * @property {import("../../stores/params").SensorParam} sensorParam question as param
+ * @property {Revision[]?} oldRevisions
+ * @property {Wave} addedInWave
  */
 
 function toAnchor(value) {
   return value.toLowerCase().replace(/\s/g, '-');
 }
 
+function parseRevisions(revisions, latestAddedInWave) {
+  if (!revisions) {
+    return null;
+  }
+  // revision are reversed in time so temporary revert the order
+  return revisions
+    .slice()
+    .reverse()
+    .reduce((acc, v) => {
+      acc.push({
+        ...v,
+        changedInWave: acc.length === 0 ? waves[latestAddedInWave - 1] : acc[acc.length - 1].addedInWave,
+        addedInWave: waves[v.addedInWave - 1],
+      });
+      return acc;
+    }, [])
+    .reverse();
+}
 /**
  * @type {Question[]}
  */
@@ -38,7 +100,8 @@ export const questions = descriptions.questions.map((question) => ({
   levels: descriptions.levels,
   sensor: sensorList.find((d) => d.id === descriptions.dataSource && d.signal === question.signal),
   anchor: toAnchor(question.name),
-  unit: question.unit || descriptions.unit,
+  addedInWave: waves[question.addedInWave - 1],
+  oldRevisions: parseRevisions(question.oldRevisions, question.addedInWave),
 }));
 
 /**
@@ -74,4 +137,13 @@ for (const question of questions) {
       isInverted: question.inverted,
     },
   );
+  if (question.oldRevisions) {
+    question.oldRevisions.forEach((rev) => {
+      rev.sensorParam = new SensorParam({
+        ...question.sensorParam.value,
+        signal: rev.signal,
+        key: `${question.sensorParam.key}:${rev.signal}`,
+      });
+    });
+  }
 }

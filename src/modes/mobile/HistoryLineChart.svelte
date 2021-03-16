@@ -11,6 +11,7 @@
     generateLineAndBarSpec,
     resetOnClearHighlighTuple,
     MULTI_COLORS,
+    genDateHighlight,
   } from '../../specs/lineSpec';
   import { toTimeValue } from '../../stores/params';
   import Toggle from './Toggle.svelte';
@@ -39,6 +40,15 @@
    * @type {import("../../stores/params").DataFetcher}
    */
   export let fetcher;
+
+  /**
+   * @type {Date|null}
+   */
+  export let starts = null;
+  /**
+   * @type {Date|null}
+   */
+  export let ends = null;
 
   /**
    * @type {import("../../stores/params").Region}
@@ -175,11 +185,21 @@
     )}${suffix}`;
   }
 
+  function injectRanges(spec, date) {
+    if (starts && starts > date.windowTimeFrame.min) {
+      spec.layer.unshift(genDateHighlight(starts > date.windowTimeFrame.max ? date.windowTimeFrame.max : starts));
+    }
+    if (ends && ends < date.windowTimeFrame.max) {
+      spec.layer.unshift(genDateHighlight(ends < date.windowTimeFrame.min ? date.windowTimeFrame.min : ends));
+    }
+    return spec;
+  }
+
   let zoom = false;
   let singleRaw = false;
 
   $: raw = singleRaw && sensor.rawValue != null;
-  $: spec = genSpec(sensor, region, date, height, !zoom, raw, $isMobileDevice);
+  $: spec = injectRanges(genSpec(sensor, region, date, height, !zoom, raw, $isMobileDevice), date);
   $: data = raw ? loadSingleData(sensor, region, date) : loadData(sensor, region, date);
   $: regions = raw ? [region.value] : resolveRegions(region.value);
   $: fileName = generateFileName(sensor, regions, date, raw);

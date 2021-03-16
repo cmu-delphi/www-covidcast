@@ -19,6 +19,7 @@
 </script>
 
 <p>
+  <slot />
   {#await trend then d}
     {#if d.isUnknown}
       We don't have data on the historical context for this indicator on

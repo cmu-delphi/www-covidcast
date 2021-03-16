@@ -87,6 +87,35 @@ function genCreditsLayer({ shift = 55 } = {}) {
   return layer;
 }
 
+export function genDateHighlight(date, color = 'lightgrey') {
+  /**
+   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
+   */
+  const layer = {
+    data: {
+      values: [
+        {
+          date_value: date.getTime(),
+        },
+      ],
+    },
+    mark: {
+      type: 'rule',
+      tooltip: false,
+    },
+    encoding: {
+      color: {
+        value: color,
+      },
+      x: {
+        field: 'date_value',
+        type: 'temporal',
+      },
+    },
+  };
+  return layer;
+}
+
 export function generateLineChartSpec({
   width = 800,
   height = 300,
