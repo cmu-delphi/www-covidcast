@@ -201,31 +201,6 @@ Links:
  - link: "[More information](https://covidcast.cmu.edu/surveys.html)"
  - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html)"
 ---
-Name: COVID Indicator Combination
-Id: indicator-combination
-Signal: nmf_day_doc_fbc_fbs_ght
-Type: early
-Levels: [county, msa, state]
-YAxis: Combined value (arbitrary scale)
-Format: raw
-HasStdErr: false
-
-
-TooltipText: Combination of several COVID-19 indicators available at this geographic level
-
-
-MapTitleText: 'Combination of several COVID-19 indicators: Doctor Visits, Symptoms, Symptoms in Community, and Search on Google'
-
-
-Description: This data represents a combination of Doctor Visits, COVID-Like Symptoms (from the Delphi survey), COVID-Like Symptoms in Community (from the Delphi survey), and COVID Search on Google.  It does not include official reports (cases and deaths), hospital admissions, or SafeGraph signals.  We use a rank-1 approximation from a nonnegative matrix factorization approach to identify a single underlying signal that best reconstructs the indicators.  Higher values of the combined signal correspond to higher values of the other indicators, but the scale (units) of the combination is arbitrary.
-
-
-Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
-
-
-Links:
- - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/indicator-combination.html#statistical-combination-signals)"
----
 Name: COVID Antigen Test Positivity (Quidel)
 Id: quidel
 Signal: covid_ag_smoothed_pct_positive
