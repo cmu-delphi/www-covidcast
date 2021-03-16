@@ -23,6 +23,16 @@ export function patchHighlightTuple(current) {
   return current;
 }
 
+export function resetOnClearHighlighTuple(date) {
+  return (current) => {
+    patchHighlightTuple(current);
+    const match = /(unit:.*values: )\[/.exec(current.on[0].update);
+    const prefix = match ? match[0] : 'unit: "layer_1", fields: highlight_tuple_fields, values: [';
+    current.on[1].update = `{${prefix}${date.getTime()}]}`;
+    return current;
+  };
+}
+
 export function resolveHighlightedDate(e) {
   const highlighted = e.detail.value;
   if (highlighted && Array.isArray(highlighted.date_value) && highlighted.date_value.length > 0) {
@@ -219,7 +229,7 @@ export function generateLineChartSpec({
               type: 'point',
               on: 'click, mousemove, [touchstart, touchend] > touchmove',
               nearest: true,
-              clear: false,
+              clear: 'view:mouseout',
               encodings: ['x'],
             },
             value: initialDate
