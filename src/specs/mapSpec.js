@@ -492,6 +492,10 @@ export function generateCountiesOfStateSpec(state, { withStates = false, ...opti
     spec.projection.fit = {
       signal: `customInFilter(data('state'), 'id', ["${state.id}"])`,
     };
+    spec.projection.extent = {
+      // fit to match 60% in the center
+      signal: `[[width * 0.2, height * 0.2], [width* 0.8, height * 0.8]]`,
+    };
     spec.layer.push(genMegaLayer(state.id));
   } else {
     spec.layer.push(genMegaLayer());
@@ -519,6 +523,10 @@ export function generateRelatedCountySpec(county, options = {}) {
   const related = getRelatedCounties(county);
   spec.projection.fit = {
     signal: `customInFilter(data('county'), 'id', ${JSON.stringify(related.map((d) => d.id))})`,
+  };
+  spec.projection.extent = {
+    // fit to match 60% in the center
+    signal: `[[width * 0.2, height * 0.2], [width* 0.8, height * 0.8]]`,
   };
   // /**
   //  * @type {import('vega-lite/build/src/transform').Transform}
