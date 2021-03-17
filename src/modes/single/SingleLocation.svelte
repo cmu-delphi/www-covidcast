@@ -230,7 +230,7 @@
                     <IndicatorCompare
                       {sensorMatrixData}
                       {sensor}
-                      options={{ axisTitles: false, showTitle: false, ticks: false, tickLabels: false }}
+                      options={{ padding: 0, axisTitles: false, showTitle: false, ticks: false, tickLabels: false }}
                       on:click={onShowLagDetails(sensor, 0)}
                       date={$currentDateObject}
                       selections={$currentMultiSelection}
@@ -279,7 +279,7 @@
                               date={$currentDateObject}
                               {lag}
                               on:click={() => (sensorDetailsLag = lag)}
-                              options={{ width: 50, height: 50, padding: 0, sizeLegend: false, showTitle: false, axisTitles: false, ticks: false, tickLabels: false, showTooltips: false }}
+                              options={{ width: 50, height: 50, padding: { top: 12, left: 0, right: 0 }, sizeLegend: false, showTitle: false, axisTitles: false, ticks: false, tickLabels: false, showTooltips: false, showRSquared: true }}
                               selections={$currentMultiSelection}
                               {onHighlight}
                               highlightTimeValue={$highlightTimeValue} />

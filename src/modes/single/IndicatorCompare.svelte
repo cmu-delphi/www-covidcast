@@ -214,9 +214,10 @@
                 mark: {
                   type: 'text',
                   color: 'firebrick',
-                  x: 'width',
                   align: 'right',
+                  x: 'width',
                   y: -5,
+                  size: 14,
                 },
                 encoding: {
                   text: { type: 'nominal', field: 'R2' },
@@ -270,29 +271,60 @@
                 },
               },
             },
-          ],
-        },
-        {
-          transform: [
             {
-              regression: 'x',
-              on: 'y',
-            },
-          ],
-          mark: { type: 'line', color: 'firebrick' },
-          encoding: {
-            x: {
-              field: 'x',
-              type: 'quantitative',
-            },
-            y: {
-              field: 'y',
-              type: 'quantitative',
-              scale: {
-                domainMin: undefined,
+              transform: [
+                {
+                  regression: 'x',
+                  on: 'y',
+                  // params: true,
+                },
+                // { calculate: 'datum.rSquared * 100', as: 'r2' },
+              ],
+              mark: {
+                type: 'line',
+                strokeWidth: 2,
+                color: 'firebrick',
+                // color: {
+                //   expr: 'scale'
+                //   // field: 'r2',
+                //   // round: false,
+                //   // type: 'quantitative',
+                //   // scale: { scheme: 'orangered' },
+                // },
+              },
+              encoding: {
+                x: {
+                  field: 'x',
+                  type: 'quantitative',
+                },
+                y: {
+                  field: 'y',
+                  type: 'quantitative',
+                  scale: {
+                    domainMin: undefined,
+                  },
+                },
+                // opacity: {
+                //   field: 'r2',
+                //   round: false,
+                //   type: 'quantitative',
+                //   //scale: { domain: [0, 1] },
+                // },
+                // color: {
+                //   field: 'r2',
+                //   round: false,
+                //   type: 'quantitative',
+                //   scale: { scheme: 'orangered' },
+                // },
+                // color: {
+                //   field: 'rSquared',
+                //   round: false,
+                //   type: 'quantitative',
+                //   scale: { scheme: 'orangered' },
+                // },
               },
             },
-          },
+          ],
         },
       ],
     };
