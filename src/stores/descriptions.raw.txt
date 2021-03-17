@@ -102,7 +102,7 @@ Links:
 ---
 Name: People Wearing Masks
 Id: fb-survey
-Signal: smoothed_wearing_mask_7d
+Signal: smoothed_wearing_mask
 RawSignal: null
 Type: public
 Levels: [county, msa, state, hrr, nation]
@@ -113,6 +113,7 @@ Unit: per 100 people
 IsInverted: true
 Is7DayAverage: true
 HasStdErr: true
+Highlight: [landing]
 
 
 
@@ -120,7 +121,7 @@ HasStdErr: true
 MapTitleText: Percentage of people who say they wear a mask most or all of the time while in public, based on surveys of Facebook users
 
 
-Description: Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they, or anyone in their household, are currently experiencing COVID-related symptoms. We also ask them if they wear a mask when they are in public. For this signal, we estimate the percentage of people who say they wear a mask most or all of the time when they are in public. The signal has changed in [Wave 10](https://cmu-delphi.github.io/delphi-epidata/symptom-survey/coding.html#wave-10) of the survey, unifying the timespan to 7 days from previously 5 days.
+Description: Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they, or anyone in their household, are currently experiencing COVID-related symptoms. We also ask them if they wear a mask when they are in public. For this signal, we estimate the percentage of people who say they wear a mask most or all of the time when they are in public.
 
 
 Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
@@ -129,7 +130,6 @@ Credits: We are happy for you to use this data in products and publications unde
 Links:
  - "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html)"
  - "[Interpreting mask use in context](https://delphi.cmu.edu/blog/2020/12/13/are-masks-widely-used-in-public/)"
- - "[Wave 10 Revision Updates](https://cmu-delphi.github.io/delphi-epidata/symptom-survey/coding.html#wave-10)."
 ---
 Name: Vaccine Acceptance
 Id: fb-survey
@@ -158,30 +158,6 @@ Credits: We are happy for you to use this data in products and publications unde
 
 Links:
  - "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#vaccination-indicators)"
----
-Name: COVID Symptom Searches on Google 
-Id: google_symptoms
-Signal: sum_anosmia_ageusia_smoothed_search
-RawSignal: sum_anosmia_ageusia_raw_search
-Type: public
-Levels: [state, msa, hrr, county]
-XAxis: Date
-YAxis: Scaled search volume (arbitrary scale)
-Format: raw
-Unit: Scaled search volume
-IsInverted: false
-Is7DayAverage: true
-HasStdErr: false
- 
-MapTitleText: Google search volume of COVID-related symptom searches
- 
-Description: Using Google Symptoms Searches, Delphi obtains the sum of Google search volumes for anosmia (loss of smell) related searches and ageusia (loss of taste) related searches in each area, since they emerged as unusual symptoms that are indicative of COVID-19. Note that the sum of two symptom search volumes is not equivalent to the union of anosmia and ageusia related searches. According to Google, the estimates are not comparable across regions since the values are normalized by population and scaled by region-specific maximum popularity at a particular time point.
- 
-Credits: We are happy for you to use this data in products and publications under Google's [Terms of Service](https://policies.google.com/terms).
-
-
-Links:
- - "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/google-symptoms.html)"
 ---
 Name: COVID-Related Doctor Visits
 Id: doctor-visits
