@@ -33,7 +33,7 @@ async function loadDoc(url) {
   const start = text.indexOf('---');
   let code = text.slice(start).trim();
   // replace * in links
-  code = code.replace(/^[*] (.*)$/gm, ' - link: "$1"');
+  code = code.replace(/^[*] (.*)$/gm, ' - "$1"');
   // console.log(code);
   // unify line endings
   return code.replace(/\r?\n/g, '\n');
@@ -109,7 +109,7 @@ function convertDescriptions(code) {
     return parseObject(doc, {
       description: parseMarkdownInline,
       credits: parseMarkdownInline,
-      links: (v) => v.map((d) => parseMarkdownInline(d.link)),
+      links: (v) => v.map((d) => parseMarkdownInline(d)),
       yAxis: parseNestedOrString,
       casesOrDeathSignals: parseNestedOrString,
       mapTitleText: parseNestedOrString,
@@ -137,6 +137,7 @@ function convertSurveyDescriptions(code) {
       question: parseMarkdownInline,
       oldRevisions: parseArray,
       change: parseMarkdownInline,
+      links: (v) => v.map((d) => parseMarkdownInline(d)),
     });
   }
   Object.assign(parsed, parseDoc(overview));
