@@ -69,8 +69,16 @@
     </div>
 
     <p>
-      Our indicators include our national COVID survey, public experience, attitude, behavior, doctor's visits, hospital
-      admissions, tests, cases and deaths.
+      COVIDcast gathers data from dozens of sources and produces a set of indicators which can inform our reasoning
+      about the pandemic. Indicators are produced from these raw data by extracting a metric of interest, tracking
+      revisions, and applying additional processing like reducing noise, adjusting temporal focus, or enabling more
+      direct comparisons.
+    </p>
+    <p>
+      Our most useful indicators are visualized in this site, but for the full set, please <a
+        href="https://cmu-delphi.github.io/delphi-epidata/"
+        class="uk-link-text">visit our API</a
+      >.
     </p>
 
     <FancyHeader sub="Indicators" center>COVID-19</FancyHeader>
@@ -170,11 +178,14 @@
     background: #eee;
   }
 
+  .uk-link-text {
+    text-decoration: underline;
+  }
+
   .link-link {
     font-size: 0.75rem;
     display: block;
     text-align: center;
     margin-top: 0.5em;
-    text-decoration: underline;
   }
 </style>
