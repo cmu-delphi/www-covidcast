@@ -2,6 +2,8 @@
   import { downloadUrl } from '../../../util';
   import { csvFormat } from 'd3-dsv';
   import { formatDateISO } from '../../../formats';
+  import { modeByID } from '../../';
+  import { currentMode, sensorList } from '../../../stores';
 
   export let fileName = 'chart';
   /**
@@ -19,8 +21,6 @@
   export let raw = false;
 
   export let absolutePos = false;
-
-  // TODO how about title, credits ->
 
   function downloadString(string, mimeType, extension) {
     const blob = new Blob([string], {
@@ -102,6 +102,13 @@
         downloadString(JSON.stringify(rows, null, 2), 'application/json', 'json');
       });
   }
+
+  function exportData() {
+    const knownOne = sensorList.find((d) => d.key == sensor.key);
+    sensor.set(knownOne, true);
+    // switch to export mode
+    currentMode.set(modeByID.export);
+  }
 </script>
 
 {#if vegaRef || data}
@@ -118,6 +125,10 @@
         <li><a href="?" on:click|preventDefault={downloadJSON}>Save as JSON</a></li>
         <li><a href="?" on:click|preventDefault={downloadCSV}>Save as CSV</a></li>
       {/if}
+      <li class="uk-nav-divider" />
+      <li>
+        <a href="?mode={modeByID.export.id}" on:click|preventDefault={exportData}>Advanced Data Export</a>
+      </li>
     </ul>
   </div>
 {/if}
