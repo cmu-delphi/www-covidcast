@@ -30,7 +30,11 @@
 
 <FancyHeader sub="Indicators">Key</FancyHeader>
 
-<p>On {formatDateWeekday(date.value)}, the {highlightSensors.length > 0 ? highlightSensors[0].sensor.valueUnit : 'value'}s were:</p>
+<p>
+  On {formatDateWeekday(date.value)}, the {highlightSensors.length > 0
+    ? highlightSensors[0].sensor.valueUnit
+    : 'value'}s were:
+</p>
 
 <div class="mobile-two-col">
   {#each highlightSensors as s}
