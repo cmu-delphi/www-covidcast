@@ -11,7 +11,7 @@
 
   /**
    * question object
-   * @type {import('./questions').Question}
+   * @type {import('../../stores/questions').Question}
    */
   export let question;
   /**

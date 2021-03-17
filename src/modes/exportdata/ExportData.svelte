@@ -10,7 +10,7 @@
   import Search from '../../components/Search.svelte';
   import { getCountiesOfState, infosByLevel } from '../../maps';
   import { formatDateISO } from '../../formats';
-  import { questions } from '../../modes/survey/questions';
+  import { questions } from '../../stores/questions';
   import { DateParam } from '../../stores/params';
   import FancyHeader from '../mobile/FancyHeader.svelte';
 

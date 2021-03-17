@@ -1,6 +1,6 @@
 <script>
   import { fetchSampleSizesNationSummary } from '../../data';
-  import { overviewText, referenceRawNationSignal, refSensor, dataAccessLink, surveyFullTextLink } from './questions';
+  import { overviewText, referenceRawNationSignal, refSensor, dataAccessLink, surveyFullTextLink } from '../../stores/questions';
   import UiKitHint from '../../components/UIKitHint.svelte';
   import { formatDateShort } from '../../formats';
   import SurveyValue from './SurveyValue.svelte';

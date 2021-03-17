@@ -1,6 +1,6 @@
-import { sensorList } from '../../stores';
-import descriptions from './descriptions.generated.json';
-import { SensorParam } from '../../stores/params';
+import { sensorList } from './constants';
+import descriptions from './questions.generated.json';
+import { SensorParam } from './params';
 import { isoParse } from 'd3-time-format';
 
 export const overviewText = descriptions.overview;

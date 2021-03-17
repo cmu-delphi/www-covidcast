@@ -3,7 +3,7 @@
   import { formatDateLocal } from '../../formats';
   import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
   /**
-   * @type {import('./questions').Revision}
+   * @type {import('../../stores/questions').Revision}
    */
   export let revision;
 

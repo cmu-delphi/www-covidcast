@@ -144,11 +144,11 @@ function convertSurveyDescriptions(code) {
   for (const doc of rest) {
     parsed.questions.push(parseDoc(doc));
   }
-  fs.writeFileSync('./src/modes/survey/descriptions.generated.json', JSON.stringify(parsed, null, 2));
+  fs.writeFileSync('./src/stores/questions.generated.json', JSON.stringify(parsed, null, 2));
 }
 
 function generateSurveyDescriptions() {
-  return handleFile(SURVEY_DOC_URL, './src/modes/survey/descriptions.raw.txt', convertSurveyDescriptions);
+  return handleFile(SURVEY_DOC_URL, './src/stores/questions.raw.txt', convertSurveyDescriptions);
 }
 
 if (require.main === module) {

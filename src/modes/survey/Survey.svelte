@@ -1,6 +1,6 @@
 <script>
   import { currentDateObject, currentRegionInfo, times } from '../../stores';
-  import { questionCategories, visibleLevels, refSensor, questions } from './questions';
+  import { questionCategories, visibleLevels, refSensor, questions } from '../../stores/questions';
   import SurveyQuestion from './SurveyQuestion.svelte';
   import SurveyParameters from './SurveyParameters.svelte';
   import Overview from './Overview.svelte';
