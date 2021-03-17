@@ -656,6 +656,8 @@ export class SensorParam {
     this.isPer100K =
       this.isCasesOrDeath || sensor.signal === 'bars_visit_prop' || sensor.signal === 'restaurants_visit_prop';
     this.isInverted = isInverted(sensor);
+    this.is7DayAverage = is7DayAverage(sensor);
+    this.valueUnit = this.is7DayAverage ? '7-day average' : 'value';
     this.formatValue = formatValue;
     this.unit = this.isPercentage ? 'per 100 people' : this.isPer100K ? 'per 100,000 people' : '';
     this.unitShort = this.isPer100K ? 'per 100k' : 'per 100';
@@ -726,6 +728,14 @@ export class SensorParam {
  */
 export function isInverted(sensor) {
   return sensor.isInverted || sensor.colorScaleId === 'interpolateYlGnBu';
+}
+
+/**
+ *
+ * @param {Sensor} sensor
+ */
+export function is7DayAverage(sensor) {
+  return sensor.signal.includes('7dav') || sensor.signal.startsWith('smoothed_');
 }
 
 export const CASES = new SensorParam(sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Cases')));

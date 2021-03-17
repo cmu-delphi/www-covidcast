@@ -33,7 +33,7 @@
 
 <FancyHeader sub="Indicators">Key</FancyHeader>
 
-<p>On {formatDateWeekday(date.value)}, the 7-day averages were:</p>
+<p>On {formatDateWeekday(date.value)}, the {highlightSurveySensors[0].sensor.valueUnit}s were:</p>
 
 <div class="mobile-two-col">
   {#each highlightSurveySensors as s}
