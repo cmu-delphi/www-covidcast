@@ -86,6 +86,7 @@ Links:
 Name: People Wearing Masks
 Id: fb-survey
 Signal: smoothed_wearing_mask
+RawSignal: null
 Type: public
 Levels: [county, msa, state, hrr, nation]
 YAxis: Percentage
@@ -175,7 +176,7 @@ Credits: We are happy for you to use this data in products and publications unde
 
 
 Links:
- - link: "[Survey details](https://delphi.cmu.edu/covidcast/surveys/"
+ - link: "[Survey details](https://delphi.cmu.edu/covidcast/surveys/)"
  - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html)"
 ---
 Name: COVID-Like Symptoms in Community
