@@ -22,7 +22,7 @@
   $: deathTrend = fetcher.fetchWindowTrend(DEATHS, region, date);
 </script>
 
-<p>On {formatDateWeekday(date.value)}, the {CASES.is7DayAverage ? '7-day average' : 'value'}s were:</p>
+<p>On {formatDateWeekday(date.value)}, the {CASES.valueUnit}s were:</p>
 
 <div class="mobile-two-col">
   <div class="mobile-kpi">

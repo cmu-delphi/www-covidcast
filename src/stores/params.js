@@ -633,6 +633,7 @@ export class SensorParam {
     this.isPer100K = sensor.format === 'per100k';
     this.isInverted = sensor.isInverted;
     this.is7DayAverage = sensor.is7DayAverage;
+    this.valueUnit = this.is7DayAverage ? '7-day average' : 'value';
     this.formatValue = formatValue;
     this.unit = sensor.unit;
     this.unitShort = this.isPer100K ? 'per 100k' : this.isPercentage ? 'per 100' : this.unit;
