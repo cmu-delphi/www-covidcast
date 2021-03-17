@@ -187,7 +187,7 @@
                   <TrendIndicator trend={d} block />
                 {/await}
               </td>
-              <td class="uk-text-right">
+              <td class="uk-text-right table-value">
                 {#await entry.trend}
                   ?
                 {:then t}
@@ -257,5 +257,10 @@
     width: 6px;
     display: inline-block;
     fill: currentColor;
+  }
+
+  .table-value {
+    white-space: nowrap;
+    font-weight: 700;
   }
 </style>

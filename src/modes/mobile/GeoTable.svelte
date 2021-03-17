@@ -259,7 +259,7 @@
         <td>
           <TrendIndicator trend={r.trendObj} block />
         </td>
-        <td class="uk-text-right">
+        <td class="uk-text-right table-value">
           <SensorValue {sensor} value={r.value} />
         </td>
         <td>
@@ -290,3 +290,10 @@
     </tfoot>
   {/if}
 </table>
+
+<style>
+  .table-value {
+    white-space: nowrap;
+    font-weight: 700;
+  }
+</style>
