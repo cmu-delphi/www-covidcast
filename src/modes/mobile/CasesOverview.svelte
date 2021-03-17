@@ -60,9 +60,9 @@
     <h3>Cases</h3>
     <div>
       {#await casesTrend}
-        <TrendIndicator trend={null} long sensor={CASES} />
+        <TrendIndicator trend={null} long />
       {:then d}
-        <TrendIndicator trend={d} long sensor={CASES} />
+        <TrendIndicator trend={d} long />
       {/await}
     </div>
   </div>
@@ -70,9 +70,9 @@
     <h3>Deaths</h3>
     <div>
       {#await deathTrend}
-        <TrendIndicator trend={null} long sensor={DEATHS} />
+        <TrendIndicator trend={null} long />
       {:then d}
-        <TrendIndicator trend={d} long sensor={DEATHS} />
+        <TrendIndicator trend={d} long />
       {/await}
     </div>
   </div>
