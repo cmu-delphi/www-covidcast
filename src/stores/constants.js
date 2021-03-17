@@ -120,7 +120,7 @@ export function ensureSensorStructure(sensor) {
     type: 'public',
     dataSourceName: getDataSource(sensor),
     levels: ['state'],
-    description: 'No description available',
+    description: sensor.signalTooltip || 'No description available',
     signalTooltip: sensor.tooltipText || 'No description available',
     colorScale: isInverted ? interpolateYlGnBu : interpolateYlOrRd,
 
@@ -146,7 +146,7 @@ export function ensureSensorStructure(sensor) {
     full.rawSensor = {
       ...full,
       key: `${sensor.id}-${rawSignal}`,
-      name: full.name.replace('(7-day average)', ''),
+      name: `${full.name.replace('(7-day average)', '')} (Raw)`,
       description: full.description.replace('(7-day average)', ''),
       signal: rawSignal,
       is7DayAverage: false,
@@ -276,17 +276,14 @@ export function extendSensorEntry(sensorEntry) {
     // create a casesOrDeathSensor
     full.casesOrDeathSensors = {};
     const add = (cumulative, ratio) => {
-      const options = { cumulative, ratio };
+      const options = { cumulative, incidence: !ratio };
       const subKey = primaryValue(full, options);
-      const subCountKey = primaryValue(full, options).replace('avg', 'count');
       const signal = full.casesOrDeathSignals[subKey];
-      const rawSignal = full.casesOrDeathSignals[subCountKey];
       const name = `${cumulative ? 'Cumulative ' : ''}${full.name}${ratio ? ' (per 100,000 people)' : ''}`;
       full.casesOrDeathSensors[subKey] = ensureSensorStructure({
-        name: `${name} (7-day average)`,
+        name: `${name} ${!cumulative ? '(7-day average)' : ''}`,
         id: full.id,
         signal,
-        rawSignal,
         type: full.type,
         levels: full.levels,
         xAxis: full.xAxis,
@@ -300,6 +297,11 @@ export function extendSensorEntry(sensorEntry) {
         links: full.links,
         credits: full.credits,
       });
+      const subCountKey = primaryValue(full, options).replace('avg', 'count');
+      const countSignal = full.casesOrDeathSignals[subCountKey];
+      if (countSignal && countSignal !== signal) {
+        console.log('TODO');
+      }
     };
     add(false, false);
     add(false, true);

@@ -234,7 +234,7 @@ Credits: We are happy for you to use this data in products and publications unde
 
 
 Links:
- - "[Survey details](https://delphi.cmu.edu/covidcast/surveys/"
+ - "[Survey details](https://delphi.cmu.edu/covidcast/surveys/)"
  - "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html)"
 ---
 Name: COVID-Like Symptoms in Community

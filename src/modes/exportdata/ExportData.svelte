@@ -98,6 +98,9 @@
     if (sensor.isCasesOrDeath) {
       Object.values(sensor.casesOrDeathSensors).forEach((sensor) => {
         lookupMap.set(sensor.key, sensor);
+        if (sensor.rawSensor) {
+          lookupMap.set(sensor.rawSensor.key, sensor.rawSensor);
+        }
       });
     }
     lookupMap.set(sensor.key, sensor);
@@ -140,7 +143,7 @@
           levels: new Set(),
           minTime: parseAPITime(entry.min_time),
           maxTime: parseAPITime(entry.max_time),
-          signals: [],
+          sensors: [],
         });
       }
       const ds = signalGroupMap.get(signalGroup);
@@ -148,12 +151,15 @@
       levels.add(entry.geo_type);
       ds.levels.add(entry.geo_type);
 
-      if (ds.signals.every((d) => d.key !== key)) {
-        ds.signals.push(sensor);
+      if (ds.sensors.every((d) => d.key !== key)) {
+        ds.sensors.push(sensor);
       }
     });
 
     sensorGroups = Array.from(signalGroupMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+    for(const sensorGroup of sensorGroups) {
+      sensorGroup.sensors.sort((a, b) => a.name.localeCompare(b.name));
+    }
     sensorGroupValue = $currentSensorEntry.dataSourceName;
     sensorValue = $currentSensorEntry.key;
     levelList = [...levels].map(getLevelInfo);
@@ -233,8 +239,8 @@
             <div class="uk-form-controls">
               <select id="s" bind:value={sensorValue} required size="8" class="uk-select">
                 {#if sensorGroup}
-                  {#each sensorGroup.signals as signal}
-                    <option value={signal.key}>{signal.name}</option>
+                  {#each sensorGroup.sensors as sensor}
+                    <option value={sensor.key}>{sensor.name}</option>
                   {/each}
                 {:else}
                   <option value="">Select a Data Source first</option>
