@@ -1,4 +1,4 @@
-import { isCasesSignal, isDeathSignal } from '../data';
+import { isCasesSignal, isDeathSignal } from '../data/signals';
 
 export const CASES_DEATH_SOURCE = 'cases-deaths';
 
