@@ -22,7 +22,7 @@
   <div class="loader loading" />
 {:then value}
   <svelte:component this={value} />
-  {:catch error}
+{:catch error}
   <div class="loader">
     Error loading current mode
     <pre>{error}</pre>
