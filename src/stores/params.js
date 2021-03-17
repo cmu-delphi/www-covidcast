@@ -637,7 +637,11 @@ export class SensorParam {
     this.formatValue = formatValue;
     this.unit = sensor.unit;
     this.unitShort = this.isPer100K ? 'per 100k' : this.isPercentage ? 'per 100' : this.unit;
-    this.unitHTML = this.isPer100K ? `<span class="per100k"><span>PER</span><span>100K</span></span>` : this.unitShort;
+    this.unitHTML = this.isPer100K
+      ? `<span class="per100k"><span>PER</span><span>100K</span></span>`
+      : this.isPercentage
+      ? `<span class="per100">/100</span>`
+      : this.unitShort;
     this.xAxis = sensor.xAxis;
     this.yAxis = sensor.yAxis;
   }
