@@ -8,12 +8,10 @@
   export let className = '';
 
   function fetchOverview() {
-    const sensor = {
-      ...refSensor,
+    return fetchSampleSizesNationSummary({
+      id: refSensor.id,
       signal: referenceRawNationSignal,
-    };
-
-    return fetchSampleSizesNationSummary(sensor);
+    });
   }
 
   const data = fetchOverview();

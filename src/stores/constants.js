@@ -146,6 +146,8 @@ export function ensureSensorStructure(sensor) {
     full.rawSensor = {
       ...full,
       key: `${sensor.id}-${rawSignal}`,
+      name: full.name.replace('(7-day average)', ''),
+      description: full.description.replace('(7-day average)', ''),
       signal: rawSignal,
       is7DayAverage: false,
       rawSensor: null,
@@ -276,21 +278,27 @@ export function extendSensorEntry(sensorEntry) {
     const add = (cumulative, ratio) => {
       const options = { cumulative, ratio };
       const subKey = primaryValue(full, options);
+      const subCountKey = primaryValue(full, options).replace('avg', 'count');
       const signal = full.casesOrDeathSignals[subKey];
-      const text = full.description;
+      const rawSignal = full.casesOrDeathSignals[subCountKey];
       const name = `${cumulative ? 'Cumulative ' : ''}${full.name}${ratio ? ' (per 100,000 people)' : ''}`;
       full.casesOrDeathSensors[subKey] = ensureSensorStructure({
         name: `${name} (7-day average)`,
-        description: text,
+        id: full.id,
+        signal,
+        rawSignal,
+        type: full.type,
+        levels: full.levels,
+        xAxis: full.xAxis,
+        format: ratio ? 'per100k' : 'raw',
+        unit: ratio ? 'per 100,000 people' : 'people',
+        isInverted: false,
+        is7DayAverage: true,
+        hasStdErr: full.hasStdErr,
+        signalTooltip: full.mapTitleText(options),
+        description: full.description,
         links: full.links,
-      });
-      const subCountKey = primaryValue(full, options).replace('avg', 'count');
-      const countSignal = full.casesOrDeathSignals[subCountKey];
-      lookupMap.set(`${entry.id}-${countSignal}`, {
-        name,
-        description: text.replace(' (7-day average) ', ''),
-        links: entry.links,
-        wrappee: entry,
+        credits: full.credits,
       });
     };
     add(false, false);
