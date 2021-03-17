@@ -139,10 +139,7 @@ function deriveSensor(question) {
     is7DayAverage: descriptions.is7DayAverage,
     hasStdErr: descriptions.hasStdErr,
     credits: descriptions.credits,
-    links: [
-      `<a href="https://covidcast.cmu.edu/surveys.html">More information</a>`,
-      ...(descriptions.links || [])
-    ],
+    links: [`<a href="https://covidcast.cmu.edu/surveys.html">More information</a>`, ...(descriptions.links || [])],
     ...question,
   });
 }
@@ -160,7 +157,7 @@ function deriveRevisionSensor(sensor, rev) {
 }
 
 for (const question of questions) {
-  // inject the sensorParam  
+  // inject the sensorParam
   question.sensor = question.sensor || deriveSensor(question);
   question.sensorParam = new SensorParam(question.sensor);
   if (question.oldRevisions) {

@@ -400,7 +400,10 @@ export function averageByDate(rows, dataSensor, mixin = {}) {
         stderr: avg(rows, 'stderr'),
         sample_size: avg(rows, 'sample_size'),
       };
-      if ((dataSensor != null && dataSensor.isCasesOrDeath) || rows[0][EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined) {
+      if (
+        (dataSensor != null && dataSensor.isCasesOrDeath) ||
+        rows[0][EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined
+      ) {
         EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
           r[key] = avg(rows, key);
         });

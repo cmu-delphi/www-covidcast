@@ -1,5 +1,5 @@
 <script>
-  import { sensorMap } from '../../stores';
+  import { sensorList } from '../../stores';
   import SurveyValue from '../survey/SurveyValue.svelte';
   import FancyHeader from './FancyHeader.svelte';
   import TrendIndicator from './TrendIndicator.svelte';
@@ -20,12 +20,9 @@
    */
   export let fetcher;
 
-  const highlights = [
-    sensorMap.get('fb-survey-smoothed_hh_cmnty_cli'),
-    sensorMap.get('fb-survey-smoothed_covid_vaccinated_or_accept'),
-  ].filter(Boolean);
+  const highlights = sensorList.filter((d) => d.highlight && d.highlight.includes('location'));
 
-  $: highlightSurveySensors = highlights.map((h) => ({
+  $: highlightSensors = highlights.map((h) => ({
     sensor: new SensorParam(h),
     trend: fetcher.fetchWindowTrend(h, region, date),
   }));
@@ -33,10 +30,10 @@
 
 <FancyHeader sub="Indicators">Key</FancyHeader>
 
-<p>On {formatDateWeekday(date.value)}, the {highlightSurveySensors[0].sensor.valueUnit}s were:</p>
+<p>On {formatDateWeekday(date.value)}, the {highlightSensors.length > 0 ? highlightSensors[0].sensor.valueUnit : 'value'}s were:</p>
 
 <div class="mobile-two-col">
-  {#each highlightSurveySensors as s}
+  {#each highlightSensors as s}
     <div class="mobile-kpi">
       <h3>{s.sensor.name}</h3>
       <div>
@@ -56,7 +53,7 @@
 <p>Compared to the previous week that means:</p>
 
 <div class="mobile-two-col">
-  {#each highlightSurveySensors as s}
+  {#each highlightSensors as s}
     <div class="mobile-kpi">
       <div>
         {#await s.trend}

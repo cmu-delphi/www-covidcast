@@ -11,6 +11,7 @@ Format: fraction
 IsInverted: false
 Is7DayAverage: true
 HasStdErr: true
+Highlight: [landing]
 
 
 MapTitleText: 7-day trailing average of fraction of people spending 6 hours or more between 8am-6pm, in one location away from their home, based on SafeGraph mobility data
@@ -143,6 +144,7 @@ Unit: per 100 people
 IsInverted: true
 Is7DayAverage: true
 HasStdErr: true
+Highlight: [landing, location]
 
 
 MapTitleText: Percentage of people who either have already received a COVID vaccine or would definitely or probably choose to receive one if it were offered to them today, based on surveys of Facebook users
@@ -194,7 +196,7 @@ Unit: per 100 people
 IsInverted: false
 Is7DayAverage: true
 HasStdErr: false
-Default: true
+Highlight: [landing, default]
 
 
 MapTitleText: Percentage of daily doctor visits that are due to COVID-like symptoms
@@ -250,6 +252,7 @@ Unit: per 100 people
 IsInverted: false
 Is7DayAverage: true
 HasStdErr: true
+Highlight: [landing, location]
 
 
 MapTitleText: Percentage of people who know someone in their local community with COVID-like symptoms, based on surveys of Facebook users
@@ -278,6 +281,7 @@ Unit: per 100 people
 IsInverted: false
 Is7DayAverage: true
 HasStdErr: true
+Highlight: [landing]
 
 
 TooltipText: Positivity rate of COVID-19 antigen tests, based on data provided by Quidel, Inc.
@@ -306,6 +310,7 @@ Unit: per 100 people
 IsInverted: false
 Is7DayAverage: true
 HasStdErr: false
+Highlight: [landing]
 
 
 MapTitleText: Percentage of daily hospital admissions with COVID-19 associated diagnoses
@@ -342,6 +347,7 @@ Unit: per 100,000 people
 IsInverted: false
 Is7DayAverage: true
 HasStdErr: false
+Highlight: [landing]
 TooltipText: Newly reported COVID-19 cases per 100,000 people, based on data from USAFacts and Johns Hopkins University
 PlotTitleText: Newly reported COVID-19 cases per 100,000 people
 
@@ -384,6 +390,7 @@ Unit: per 100,000 people
 IsInverted: false
 Is7DayAverage: true
 HasStdErr: false
+Highlight: [landing]
 
 
 TooltipText: Newly reported COVID-19 deaths per 100,000 people, based on data from USAFacts and Johns Hopkins University

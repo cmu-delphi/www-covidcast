@@ -157,7 +157,7 @@
     });
 
     sensorGroups = Array.from(signalGroupMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-    for(const sensorGroup of sensorGroups) {
+    for (const sensorGroup of sensorGroups) {
       sensorGroup.sensors.sort((a, b) => a.name.localeCompare(b.name));
     }
     sensorGroupValue = $currentSensorEntry.dataSourceName;
@@ -174,9 +174,9 @@
         trackEvent(
           'export',
           'download',
-          `signal=${sensor ? `${sensor.id}:${sensor.signal}` : ''},start_day=${formatDateISO(startDate)},end_day=${formatDateISO(
-            endDate,
-          )},geo_type=${geoType}`,
+          `signal=${sensor ? `${sensor.id}:${sensor.signal}` : ''},start_day=${formatDateISO(
+            startDate,
+          )},end_day=${formatDateISO(endDate)},geo_type=${geoType}`,
         );
       });
     }

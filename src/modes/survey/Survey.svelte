@@ -22,39 +22,19 @@
     const sensors = questions.map((d) => d.sensorParam);
     // prefetch all data that is likely needed
     // itself
-    fetcher.fetchNSensor1RegionNDates(
-      sensors,
-      region,
-      date.windowTimeFrame,
-    );
+    fetcher.fetchNSensor1RegionNDates(sensors, region, date.windowTimeFrame);
     // fetch self details (sample size)
-    fetcher.fetchNSensor1Region1DateDetails(
-      sensors,
-      region,
-      date,
-    );
+    fetcher.fetchNSensor1Region1DateDetails(sensors, region, date);
 
     if (region.level !== 'nation') {
       // nation
-      fetcher.fetchNSensor1RegionNDates(
-        sensors,
-        nationInfo,
-        date.windowTimeFrame,
-      );
+      fetcher.fetchNSensor1RegionNDates(sensors, nationInfo, date.windowTimeFrame);
     }
     if (region.level === 'county') {
       // state
-      fetcher.fetchNSensor1RegionNDates(
-        sensors,
-        getStateOfCounty(region.value),
-        date.windowTimeFrame,
-      );
+      fetcher.fetchNSensor1RegionNDates(sensors, getStateOfCounty(region.value), date.windowTimeFrame);
       // related regions
-      fetcher.fetchNSensorNRegionNDates(
-        sensors,
-        getRelatedCounties(region.value),
-        date.windowTimeFrame,
-      );
+      fetcher.fetchNSensorNRegionNDates(sensors, getRelatedCounties(region.value), date.windowTimeFrame);
     }
   }
 

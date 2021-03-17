@@ -63,7 +63,7 @@ export function getLevelInfo(level) {
  * @property {string} signal signal
  * @property {string=} rawSignal raw signal in case of a 7day average
  * @property {Sensor=} rawSensor raw sensor in case of a 7day average
- * 
+ *
  * @property {string} name signal name
  * @property {string} dataSourceName data source name
  * @property {'public' | 'early' | 'late'} type
@@ -71,10 +71,10 @@ export function getLevelInfo(level) {
  * @property {string?} description HTML long text description
  * @property {string} signalTooltip short text description
  * @property {(v: number) => string)} colorScale
- * 
+ *
  * @property {string[]} links more information links
  * @property {string} credits credit text
- * 
+ *
  * @property {'raw' | 'per100k' | 'percent' | 'fraction'} format
  * @property {string} xAxis x axis date title
  * @property {string} yAxis y axis value title
@@ -86,12 +86,12 @@ export function getLevelInfo(level) {
  */
 
 /**
- * @param {Partial<Sensor>} sensor 
+ * @param {Partial<Sensor>} sensor
  * @returns {Sensor}
  */
 export function ensureSensorStructure(sensor) {
   const key = `${sensor.id}-${sensor.signal}`;
-  
+
   const isInverted = sensor.isInverted || false;
   const format = sensor.format || 'raw';
 
@@ -99,7 +99,7 @@ export function ensureSensorStructure(sensor) {
     raw: formatRawValue,
     fraction: formatRawValue,
     percent: formatPercentage,
-    per100k: formatValue
+    per100k: formatValue,
   };
   const yAxis = {
     raw: 'arbitrary scale',
@@ -165,7 +165,7 @@ export function ensureSensorStructure(sensor) {
  * @property {(options?: CasesOrDeathOptions) => 'prop' | 'count' | 'other')} getType
  * @property {Record<keyof EpiDataCasesOrDeathValues, string>} casesOrDeathSignals signal to load for cases or death
  * @property {Record<keyof EpiDataCasesOrDeathValues, Sensor>} casesOrDeathSensors
- * 
+ *
  * @property {boolean?} default whether it should be default signal
  * @property {string | ((options?: CasesOrDeathOptions) => string)} tooltipText
  * @property {string | ((options?: CasesOrDeathOptions) => string)} mapTitleText
@@ -233,7 +233,6 @@ function getType(sensorEntry, sensorOptions) {
   }
   return 'other';
 }
-
 
 /**
  *
@@ -307,7 +306,7 @@ export function extendSensorEntry(sensorEntry) {
     add(false, true);
     add(true, false);
   }
-  return full;  
+  return full;
 }
 
 /**
@@ -377,7 +376,8 @@ export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
 export const yesterday = Number.parseInt(formatAPITime(yesterdayDate), 10);
 
 export const DEFAULT_MODE = modeByID.landing;
-export const DEFAULT_SENSOR = (sensorList.find((d) => d.default) || sensorList[0]).key;
+export const DEFAULT_SENSOR = (sensorList.find((d) => d.highlight && d.highlight.includes('default')) || sensorList[0])
+  .key;
 
 /**
  * default sensor in case the initial mode is survey-results
