@@ -261,7 +261,7 @@
                       min="-28"
                       max="28"
                       step="1"
-                      value="0"
+                      value={sensorDetailsLag}
                       on:mousemove={(e) => {
                         sensorDetailsLag = e.target.value;
                       }}
