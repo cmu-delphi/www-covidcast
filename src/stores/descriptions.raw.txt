@@ -175,7 +175,7 @@ Credits: We are happy for you to use this data in products and publications unde
 
 
 Links:
- - link: "[More information](https://covidcast.cmu.edu/surveys.html)"
+ - link: "[Survey details](https://delphi.cmu.edu/covidcast/surveys/"
  - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html)"
 ---
 Name: COVID-Like Symptoms in Community
@@ -198,7 +198,7 @@ Credits: We are happy for you to use this data in products and publications unde
 
 
 Links:
- - link: "[More information](https://covidcast.cmu.edu/surveys.html)"
+ - link: "[Survey details](https://delphi.cmu.edu/covidcast/surveys/)"
  - link: "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html)"
 ---
 Name: COVID Antigen Test Positivity (Quidel)
