@@ -18,7 +18,6 @@ Question: |
   In the past 24 hours, have you or anyone in your household experienced a fever, along with cough, shortness of breath, or difficulty breathing?
 Signal: smoothed_cli
 SignalTooltip: Estimated proportion of people with COVID-like illness.
-Inverted: false
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#ili-and-cli-indicators
 AddedInWave: 1
 ---
