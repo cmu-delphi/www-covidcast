@@ -48,6 +48,7 @@ export const waves = descriptions.waves.reduce((waves, wave, i) => {
  * @property {Wave} changedInWave
  * @property {Wave} addedInWave
  * @property {string} signal
+ * @property {import("../../stores/params").Sensor} sensor matching sensor
  * @property {import("../../stores/params").SensorParam} sensorParam question as param
  */
 
@@ -60,12 +61,10 @@ export const waves = descriptions.waves.reduce((waves, wave, i) => {
  * @property {Wave} addedInWave
  * @property {Revision[]?} oldRevisions
  *
- * @property {string} dataSource
  * @property {string} name
  * @property {string} signal
- * @property {import("../../stores/constants").SensorEntry} sensor matching sensor entry
- * @property {import("../../stores/params").SensorParam} sensorParam question as param
- 
+ * @property {import("../../stores/params").Sensor} sensor matching sensor
+ * @property {import("../../stores/params").SensorParam} sensorParam matching sensor param
  */
 
 function toAnchor(value) {
@@ -148,3 +147,12 @@ for (const question of questions) {
     });
   }
 }
+
+
+      name: question.name,
+      description: question.signalTooltip,
+      wrappee: refSensor,
+      links: [
+        `<a href="https://covidcast.cmu.edu/surveys.html">More information</a>`,
+        `<a href="${question.learnMoreLink}">Technical description<a>`,
+      ],

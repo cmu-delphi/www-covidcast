@@ -4,6 +4,7 @@ import descriptions from './descriptions.generated.json';
 import { modeByID } from '../modes';
 import { formatRawValue, formatValue, formatPercentage } from '../formats';
 import { interpolateYlGnBu, interpolateYlOrRd } from 'd3-scale-chromatic';
+import { getDataSource } from './dataSourceLookup';
 // import { generateMockSignal, generateMockMeta } from '../data/mock';
 
 export const levelList = [
@@ -61,8 +62,10 @@ export function getLevelInfo(level) {
  * @property {string} id data source
  * @property {string} signal signal
  * @property {string=} rawSignal raw signal in case of a 7day average
+ * @property {Sensor=} rawSensor raw sensor in case of a 7day average
  * 
  * @property {string} name signal name
+ * @property {string} dataSourceName data source name
  * @property {'public' | 'early' | 'late'} type
  * @property {('msa' | 'state' | 'county' | 'hrr' | 'nation' | 'hss')[]} levels levels for which this signal is available
  * @property {string?} description HTML long text description
@@ -110,11 +113,12 @@ export function ensureSensorStructure(sensor) {
     per100k: 'per 100,000 people',
     fraction: 'Fraction of population',
   };
-  const rawSignal = sensor.rawSignal === 'null' ? null : sensor.rawSignal;
+  const rawSignal = sensor.rawSignal === 'null' || sensor.rawSignal === sensor.signal ? null : sensor.rawSignal;
 
-  return Object.assign(sensor, {
+  const full = Object.assign(sensor, {
     key,
     type: 'public',
+    dataSourceName: getDataSource(sensor),
     levels: ['state'],
     description: 'No description available',
     signalTooltip: sensor.tooltipText || 'No description available',
@@ -136,6 +140,20 @@ export function ensureSensorStructure(sensor) {
     ...sensor,
     rawSignal,
   });
+
+  if (rawSignal) {
+    // create a raw version
+    full.rawSensor = {
+      ...full,
+      key: `${sensor.id}-${rawSignal}`,
+      signal: rawSignal,
+      is7DayAverage: false,
+      rawSensor: null,
+      rawSignal: null,
+    };
+  }
+
+  return full;
 }
 
 /**
@@ -144,6 +162,7 @@ export function ensureSensorStructure(sensor) {
  * @property {boolean} isCount is count signal
  * @property {(options?: CasesOrDeathOptions) => 'prop' | 'count' | 'other')} getType
  * @property {Record<keyof EpiDataCasesOrDeathValues, string>} casesOrDeathSignals signal to load for cases or death
+ * @property {Record<keyof EpiDataCasesOrDeathValues, Sensor>} casesOrDeathSensors
  * 
  * @property {boolean?} default whether it should be default signal
  * @property {string | ((options?: CasesOrDeathOptions) => string)} tooltipText
@@ -225,10 +244,10 @@ export function extendSensorEntry(sensorEntry) {
 
   const mapTitle = sensorEntry.mapTitleText;
 
-  return Object.assign(ensureSensorStructure(sensorEntry), {
+  const full = Object.assign(ensureSensorStructure(sensorEntry), {
     key,
     tooltipText: sensorEntry.tooltipText || mapTitle,
-    
+
     isCount,
     getType: (options) => getType(sensorEntry, options),
     isCasesOrDeath,
@@ -251,6 +270,34 @@ export function extendSensorEntry(sensorEntry) {
             }
           },
   });
+  if (isCasesOrDeath) {
+    // create a casesOrDeathSensor
+    full.casesOrDeathSensors = {};
+    const add = (cumulative, ratio) => {
+      const options = { cumulative, ratio };
+      const subKey = primaryValue(full, options);
+      const signal = full.casesOrDeathSignals[subKey];
+      const text = full.description;
+      const name = `${cumulative ? 'Cumulative ' : ''}${full.name}${ratio ? ' (per 100,000 people)' : ''}`;
+      full.casesOrDeathSensors[subKey] = ensureSensorStructure({
+        name: `${name} (7-day average)`,
+        description: text,
+        links: full.links,
+      });
+      const subCountKey = primaryValue(full, options).replace('avg', 'count');
+      const countSignal = full.casesOrDeathSignals[subCountKey];
+      lookupMap.set(`${entry.id}-${countSignal}`, {
+        name,
+        description: text.replace(' (7-day average) ', ''),
+        links: entry.links,
+        wrappee: entry,
+      });
+    };
+    add(false, false);
+    add(false, true);
+    add(true, false);
+  }
+  return full;  
 }
 
 /**

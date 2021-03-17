@@ -1,7 +1,7 @@
 <script>
   import { callMetaAPI } from '../../data/api';
   import Datepicker from '../../components/Calendar/Datepicker.svelte';
-  import { getLevelInfo, primaryValue, sensorList, sensorMap } from '../../stores/constants';
+  import { getLevelInfo, sensorList } from '../../stores/constants';
   import { parseAPITime } from '../../data';
   import { currentDateObject, currentSensorEntry } from '../../stores';
   import { timeMonth } from 'd3-time';
@@ -10,8 +10,7 @@
   import Search from '../../components/Search.svelte';
   import { getCountiesOfState, infosByLevel } from '../../maps';
   import { formatDateISO } from '../../formats';
-  import { questionCategories, refSensor } from '../../modes/survey/questions';
-  import { CASES_DEATH_SOURCE, getDataSource } from '../../stores/dataSourceLookup';
+  import { questions } from '../../modes/survey/questions';
   import { DateParam } from '../../stores/params';
   import FancyHeader from '../mobile/FancyHeader.svelte';
 
@@ -19,11 +18,11 @@
 
   let loading = true;
   /**
-   * @type {{id: string, name: string, levels: Set<string>, minTime: Date, maxTime: Date, signals: {id: string, dataSource: string, signal: string, name: string, description: string}[]}[]}
+   * @type {{id: string, name: string, levels: Set<string>, minTime: Date, maxTime: Date, sensors: (import('../../stores/constants').Sensor)[]}[]}
    */
-  let signalGroups = [];
-  let signalGroupValue = null;
-  let signalValue = null;
+  let sensorGroups = [];
+  let sensorGroupValue = null;
+  let sensorValue = null;
   let geoType = 'county';
 
   let endDate = new Date();
@@ -37,19 +36,19 @@
   $: initDate($currentDateObject);
 
   let levelList = [];
-  $: signalGroup = signalGroupValue ? signalGroups.find((d) => d.id === signalGroupValue) : null;
-  $: signal = signalValue && signalGroup ? signalGroup.signals.find((d) => d.id === signalValue) : null;
+  $: sensorGroup = sensorGroupValue ? sensorGroups.find((d) => d.id === sensorGroupValue) : null;
+  $: sensor = sensorValue && sensorGroup ? sensorGroup.sensors.find((d) => d.key === sensorValue) : null;
 
   $: {
-    if (signalGroup && !signalGroup.signals.find((d) => d.id === signalValue)) {
-      signalValue = signalGroup.signals[0].id;
+    if (sensorGroup && !sensorGroup.sensors.find((d) => d.key === sensorValue)) {
+      sensorValue = sensorGroup.sensors[0].key;
     }
   }
 
   $: {
-    if (signalGroup && !signalGroup.levels.has(geoType)) {
+    if (sensorGroup && !sensorGroup.levels.has(geoType)) {
       // reset to a valid one
-      geoType = Array.from(signalGroup.levels)[0];
+      geoType = Array.from(sensorGroup.levels)[0];
     }
   }
 
@@ -91,55 +90,30 @@
   $: usesAsOf = asOfMode !== 'latest' && asOfDate instanceof Date;
 
   /**
-   * @type {Map<string, {name: string, tooltipText: string}>}
+   * @type {Map<string, import('../../stores/constants').Sensor>}
    */
-  const lookupMap = new Map(sensorMap);
-  // add the cases death extra ones
-  sensorList
-    .filter((d) => d.isCasesOrDeath)
-    .forEach((entry) => {
-      const add = (cumulative, ratio) => {
-        const options = { cumulative, ratio };
-        const signal = entry.casesOrDeathSignals[primaryValue(entry, options)];
-        const text = entry.description;
-        const name = `${cumulative ? 'Cumulative ' : ''}${entry.name}${ratio ? ' (per 100,000 people)' : ''}`;
-        lookupMap.set(`${entry.id}-${signal}`, {
-          name: `${name} (7-day average)`,
-          description: text,
-          links: entry.links,
-          wrappee: entry,
-        });
-        const countSignal = entry.casesOrDeathSignals[primaryValue(entry, options).replace('avg', 'count')];
-        lookupMap.set(`${entry.id}-${countSignal}`, {
-          name,
-          description: text.replace(' (7-day average) ', ''),
-          links: entry.links,
-          wrappee: entry,
-        });
-      };
-      add(false, false);
-      add(false, true);
-      add(true, false);
-      add(true, true);
-    });
-  // add the survey questions one
-  questionCategories.forEach((cat) => {
-    cat.questions.forEach((question) => {
-      const key = `${question.dataSource}-${question.signal}`;
-      if (lookupMap.has(key)) {
-        return;
-      }
-      lookupMap.set(key, {
-        name: question.name,
-        description: question.signalTooltip,
-        wrappee: refSensor,
-        links: [
-          `<a href="https://covidcast.cmu.edu/surveys.html">More information</a>`,
-          `<a href="${question.learnMoreLink}">Technical description<a>`,
-        ],
-        fake: true,
+  const lookupMap = new Map();
+  // create a flat list of all that is used
+  sensorList.forEach((sensor) => {
+    if (sensor.isCasesOrDeath) {
+      Object.values(sensor.casesOrDeathSensors).forEach((sensor) => {
+        lookupMap.set(sensor.key, sensor);
       });
-    });
+    }
+    lookupMap.set(sensor.key, sensor);
+    if (sensor.rawSensor) {
+      lookupMap.set(sensor.rawSensor.key, sensor.rawSensor);
+    }
+  });
+  // add the survey questions one
+  questions.forEach((question) => {
+    const sensor = question.sensor;
+    if (!lookupMap.has(sensor.key)) {
+      lookupMap.set(sensor.key, sensor);
+    }
+    if (sensor.rawSensor && !lookupMap.has(sensor.rawSensor.key)) {
+      lookupMap.set(sensor.rawSensor.key, sensor.rawSensor);
+    }
   });
 
   callMetaAPI(null, ['min_time', 'max_time', 'signal', 'geo_type', 'data_source'], {
@@ -151,20 +125,18 @@
     const levels = new Set();
     r.epidata.forEach((entry) => {
       const dataSource = entry.data_source;
-      const id = `${dataSource}:${entry.signal}`;
-      const known = lookupMap.get(`${dataSource}-${entry.signal}`);
+      const key = `${dataSource}-${entry.signal}`;
+      const sensor = lookupMap.get(key);
 
-      if (!known) {
+      if (!sensor) {
         // limit to the one in the map only
         return;
       }
-      const sensorEntry = known.wrappee || known;
-
-      const signalGroup = sensorEntry.isCasesOrDeath ? CASES_DEATH_SOURCE : dataSource;
+      const signalGroup = sensor.dataSourceName;
       if (!signalGroupMap.has(signalGroup)) {
         signalGroupMap.set(signalGroup, {
           id: signalGroup,
-          name: getDataSource(signalGroup),
+          name: signalGroup,
           levels: new Set(),
           minTime: parseAPITime(entry.min_time),
           maxTime: parseAPITime(entry.max_time),
@@ -176,22 +148,14 @@
       levels.add(entry.geo_type);
       ds.levels.add(entry.geo_type);
 
-      if (ds.signals.every((d) => d.id !== id)) {
-        ds.signals.push({
-          id,
-          signal: entry.signal,
-          dataSource: entry.data_source,
-          entry: known.fake ? null : sensorEntry,
-          name: known ? known.name : entry.signal,
-          description: known ? known.description : 'No description found',
-          links: known ? known.links : [],
-        });
+      if (ds.signals.every((d) => d.key !== key)) {
+        ds.signals.push(sensor);
       }
     });
 
-    signalGroups = Array.from(signalGroupMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-    signalGroupValue = $currentSensorEntry.isCasesOrDeath ? CASES_DEATH_SOURCE : $currentSensorEntry.id;
-    signalValue = `${$currentSensorEntry.id}:${$currentSensorEntry.signal}`;
+    sensorGroups = Array.from(signalGroupMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+    sensorGroupValue = $currentSensorEntry.dataSourceName;
+    sensorValue = $currentSensorEntry.key;
     levelList = [...levels].map(getLevelInfo);
     geoType = $currentSensorEntry.levels[0];
   });
@@ -204,7 +168,7 @@
         trackEvent(
           'export',
           'download',
-          `signal=${signalValue},start_day=${formatDateISO(startDate)},end_day=${formatDateISO(
+          `signal=${sensor ? `${sensor.id}:${sensor.signal}` : ''},start_day=${formatDateISO(startDate)},end_day=${formatDateISO(
             endDate,
           )},geo_type=${geoType}`,
         );
@@ -232,7 +196,7 @@
     return `date(${date.getFullYear()}, ${date.getMonth() + 1}, ${date.getDate()})`;
   }
 
-  $: dateRange = signalGroup || { minTime: timeMonth(new Date(), -1), maxTime: timeMonth(new Date(), 1) };
+  $: dateRange = sensorGroup || { minTime: timeMonth(new Date(), -1), maxTime: timeMonth(new Date(), 1) };
 </script>
 
 <div class="mobile-root">
@@ -257,8 +221,8 @@
           <div class="uk-width-1-2@m uk-width-expand@s">
             <label for="ds" class="uk-form-label">Data Sources</label>
             <div class="uk-form-controls">
-              <select id="ds" bind:value={signalGroupValue} size="8" class="uk-select">
-                {#each signalGroups as group}
+              <select id="ds" bind:value={sensorGroupValue} size="8" class="uk-select">
+                {#each sensorGroups as group}
                   <option value={group.id}>{group.name}</option>
                 {/each}
               </select>
@@ -267,10 +231,10 @@
           <div class="uk-width-1-2@m uk-width-expand@s">
             <label for="s" class="uk-form-label">Signals</label>
             <div class="uk-form-controls">
-              <select id="s" bind:value={signalValue} required size="8" class="uk-select">
-                {#if signalGroup}
-                  {#each signalGroup.signals as signal}
-                    <option value={signal.id}>{signal.name}</option>
+              <select id="s" bind:value={sensorValue} required size="8" class="uk-select">
+                {#if sensorGroup}
+                  {#each sensorGroup.signals as signal}
+                    <option value={signal.key}>{signal.name}</option>
                   {/each}
                 {:else}
                   <option value="">Select a Data Source first</option>
@@ -280,14 +244,14 @@
           </div>
         </div>
 
-        {#if signal}
-          <h3 class="mobile-h3 uk-margin-top">{signal.name}</h3>
+        {#if sensor}
+          <h3 class="mobile-h3 uk-margin-top">{sensor.name}</h3>
           <p>
-            {@html signal.description}
+            {@html sensor.description}
           </p>
           <p>See also:</p>
           <ul>
-            {#each signal.links as link}
+            {#each sensor.links as link}
               <li>
                 {@html link}
               </li>
@@ -326,7 +290,7 @@
           <div class="uk-form-controls">
             <select id="geo" bind:value={geoType} class="uk-select">
               {#each levelList as level}
-                <option value={level.id} disabled={!signalGroup || !signalGroup.levels.has(level.id)}>
+                <option value={level.id} disabled={!sensorGroup || !sensorGroup.levels.has(level.id)}>
                   {level.labelPlural}
                 </option>
               {/each}
@@ -406,7 +370,7 @@
       <section class="uk-margin-large-top">
         <FancyHeader sub="Data" normal>3. Get</FancyHeader>
         <p>
-          {@html signal && signal.entry ? signal.entry.credits : ''}
+          {@html sensor && sensor.entry ? sensor.entry.credits : ''}
         </p>
         <p>
           We provide our data as a direct link to a CSV file or you can use our Python and R packages. Please
@@ -419,7 +383,7 @@
           <p>Direct link:</p>
           <form bind:this={form} id="form" method="GET" action={CSV_SERVER} download>
             <button type="submit" class="uk-button uk-button-default">Download CSV File</button>
-            <input type="hidden" name="signal" value={signalValue} />
+            <input type="hidden" name="signal" value={sensor ? `${sensor.id}:${sensor.signal}` : ''} />
             <input type="hidden" name="start_day" value={formatDateISO(startDate)} />
             <input type="hidden" name="end_day" value={formatDateISO(endDate)} />
             <input type="hidden" name="geo_type" value={geoType} />
@@ -429,7 +393,7 @@
           <p>Manually fetch data:</p>
           <pre
             class="code-block"><code>
-        {`wget --content-disposition "${CSV_SERVER}?signal=${signalValue}&start_day=${formatDateISO(startDate)}&end_day=${formatDateISO(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${formatDateISO(asOfDate)}` : ''}"`}
+        {`wget --content-disposition "${CSV_SERVER}?signal=${sensor ? `${sensor.id}:${sensor.signal}` : ''}&start_day=${formatDateISO(startDate)}&end_day=${formatDateISO(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${formatDateISO(asOfDate)}` : ''}"`}
       </code></pre>
           <p class="description">
             For more details about the API, see the
@@ -448,7 +412,7 @@
         {`from datetime import date
 import covidcast
 
-data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal.signal : ''}",
+data = covidcast.signal("${sensor ? sensor.id : ''}", "${sensor ? sensor.signal : ''}",
                         ${pythonDate(startDate)}, ${pythonDate(endDate)},
                         "${geoType}"${isAllRegions ? '' : `, ["${geoIDs.join('", "')}"]`}${usesAsOf ? `, as_of = ${pythonDate(asOfDate)}` : ''})`}
       </code></pre>
@@ -472,7 +436,7 @@ data = covidcast.signal("${signal ? signal.dataSource : ''}", "${signal ? signal
         {`library(covidcast)
 
 cc_data <- suppressMessages(
-covidcast_signal(data_source = "${signal ? signal.dataSource : ''}", signal = "${signal ? signal.signal : ''}",
+covidcast_signal(data_source = "${sensor ? sensor.id : ''}", signal = "${sensor ? sensor.signal : ''}",
                  start_day = "${formatDateISO(startDate)}", end_day = "${formatDateISO(endDate)}",
                  geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`}${usesAsOf ? `, as_of = "${formatDateISO(asOfDate)}"` : ''})
 )`}

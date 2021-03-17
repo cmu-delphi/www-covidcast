@@ -5,7 +5,6 @@ import { currentDate, currentRegion, yesterdayDate, currentSensor, sensorList } 
 import { determineTrend } from './trend';
 import { determineMinMax } from '../components/MapBox/colors';
 import { formatValue } from '../formats';
-import { getDataSource } from './dataSourceLookup';
 import { scaleSequential } from 'd3-scale';
 
 /**
@@ -626,6 +625,7 @@ export class SensorParam {
     this.description = typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText({}) : sensor.mapTitleText;
     this.signalTooltip = sensor.signalTooltip;
     this.value = sensor;
+    this.rawValue = sensor.rawSensor;
     this.isCasesOrDeath = sensor.isCasesOrDeath || false;
     // fractions as percentages here
     this.factor = sensor.format === 'fraction' ? 100 : 1;
@@ -640,20 +640,6 @@ export class SensorParam {
     this.unitHTML = this.isPer100K ? `<span class="per100k"><span>PER</span><span>100K</span></span>` : this.unitShort;
     this.xAxis = sensor.xAxis;
     this.yAxis = sensor.yAxis;
-
-    this.dataSource = getDataSource(sensor);
-
-    /**
-     * @type {Sensor | null}
-     */
-    this.rawValue =
-      sensor.rawSignal && sensor.rawSignal !== sensor.signal
-        ? {
-            ...sensor,
-            key: `${sensor.id}:${sensor.rawSignal}`,
-            signal: sensor.rawSignal,
-          }
-        : null;
   }
 
   /**
