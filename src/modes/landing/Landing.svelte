@@ -4,7 +4,7 @@
   import { currentMode, currentRegionInfo, groupedSensorList, recentRegionInfos, selectByInfo } from '../../stores';
   import flagUSAIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/flag-usa.svg';
   import { modeByID } from '..';
-  import { questions } from '../survey/questions';
+  import { questions } from '../../stores/questions';
   import '../mobile/common.css';
   import FancyHeader from '../mobile/FancyHeader.svelte';
   import SurveyValue from '../survey/SurveyValue.svelte';

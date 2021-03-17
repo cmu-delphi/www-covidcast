@@ -3,7 +3,7 @@
   import IndicatorRevision from './IndicatorRevision.svelte';
 
   /**
-   * @type {import('./questions').Question}
+   * @type {import('../../stores/questions').Question}
    */
   export let question;
   /**
@@ -21,6 +21,6 @@
 </script>
 
 <FancyHeader sub="Revisions">Previous</FancyHeader>
-{#each question.oldRevisions as revision, i}
+{#each question.oldRevisions as revision}
   <IndicatorRevision {revision} {date} {region} {fetcher} />
 {/each}

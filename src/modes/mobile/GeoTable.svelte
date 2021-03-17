@@ -177,10 +177,13 @@
 
   let showAll = false;
 
+  let loading = true;
   $: {
+    loading = true;
     sortedRegions = regions.slice(0, showAll ? -1 : 10);
     loadedData.then((rows) => {
       sortedRegions = rows.sort(comparator).slice(0, showAll ? -1 : 10);
+      loading = false;
     });
   }
   /**
@@ -206,7 +209,7 @@
   <DownloadMenu {fileName} data={loadedData} absolutePos prepareRow={(row) => row.dump} />
 </div>
 
-<table class="mobile-table">
+<table class="mobile-table" class:loading>
   <thead>
     <tr>
       <th class="mobile-th">{title.unit}</th>

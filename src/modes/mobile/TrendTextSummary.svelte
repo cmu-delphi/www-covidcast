@@ -45,7 +45,7 @@
       <strong>{sensor.value.name}</strong>
       was
       <strong>
-        <TrendText {sensor} trend={d.worstTrend} />
+        <TrendText trend={d.worstTrend} />
       </strong>
       compared to the
       <strong

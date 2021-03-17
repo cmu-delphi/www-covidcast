@@ -1,7 +1,6 @@
 <script>
   import FancyHeader from './FancyHeader.svelte';
   import { sensorList } from '../../stores';
-  import { isInverted } from '../../stores/params';
   import { formatDateYearWeekdayAbbr } from '../../formats';
   import AllIndicatorsText from './AllIndicatorsText.svelte';
 
@@ -31,7 +30,7 @@
       const negative = [];
       const unknown = [];
       trends.forEach((trend, i) => {
-        const inv = isInverted(sensorList[i]);
+        const inv = sensorList[i].isInverted;
         if (trend.isIncreasing) {
           (!inv ? negative : positive).push(sensorList[i]);
         } else if (trend.isDecreasing) {

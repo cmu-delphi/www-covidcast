@@ -2,7 +2,7 @@
   import { modeByID } from '..';
   import { currentMode } from '../../stores';
   /**
-   * @type {import('../../stores/constants').SensorEntry}
+   * @type {import('../../stores/params').SensorParam}
    */
   export let sensor;
 
@@ -21,7 +21,7 @@
       <div class="desc">
         {@html sensor.value.description}
       </div>
-      <p class="desc">Source: {sensor.dataSource}</p>
+      <p class="desc">Source: {sensor.value.dataSourceName}</p>
       <p class="desc uk-margin-remove-bottom">
         More information
         {#if sensor.value.links}
