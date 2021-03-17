@@ -9,7 +9,7 @@ import { getDataSource } from './dataSourceLookup';
 import { scaleSequential } from 'd3-scale';
 
 /**
- * @typedef {import('./constants').SensorEntry} Sensor
+ * @typedef {import('./constants').Sensor} Sensor
  */
 /**
  * @typedef {import('../maps').NameInfo} Region
@@ -165,7 +165,7 @@ export class DataFetcher {
       },
       {
         multiValues: false,
-        factor: sensorFactor(sensor),
+        factor: sensor.format === 'fraction' ? 100 : 1,
       },
     ).then(addNameInfos);
     this.cache.set(key, r);
@@ -206,7 +206,7 @@ export class DataFetcher {
       },
       {
         multiValues: false,
-        factor: sensorFactor(sensor),
+        factor: sensor.format === 'fraction' ? 100 : 1,
       },
     )
       .then(addNameInfos)
@@ -249,7 +249,7 @@ export class DataFetcher {
           {
             multiValues: false,
             transferSignal: true,
-            factor: sensorFactor(sliceSensor),
+            factor: sliceSensor.format === 'fraction' ? 100 : 1,
           },
         ).then(addNameInfos);
         for (const s of slice) {
@@ -309,7 +309,7 @@ export class DataFetcher {
               {},
               {
                 multiValues: false,
-                factor: sensorFactor(sliceSensor),
+                factor: sliceSensor.format === 'fraction' ? 100 : 1,
                 transferSignal: true,
               },
             ),
@@ -341,7 +341,7 @@ export class DataFetcher {
             {
               multiValues: false,
               transferSignal: true,
-              factor: sensorFactor(sliceSensor),
+              factor: sliceSensor.format === 'fraction' ? 100 : 1,
             },
           ).then(addNameInfos);
           for (const s of slice) {
@@ -390,7 +390,7 @@ export class DataFetcher {
         {},
         {
           multiValues: false,
-          factor: sensorFactor(sensor),
+          factor: sensor.format === 'fraction' ? 100 : 1,
         },
       ).then(addNameInfos);
       // no missing
@@ -412,7 +412,7 @@ export class DataFetcher {
           {},
           {
             multiValues: false,
-            factor: sensorFactor(sensor),
+            factor: sensor.format === 'fraction' ? 100 : 1,
           },
         ),
       );
@@ -462,7 +462,7 @@ export class DataFetcher {
       return this.cache.get(key);
     }
     const trend = this.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame).then((rows) =>
-      determineTrend(date.value, rows, isInverted(sensor)),
+      determineTrend(date.value, rows, sensor.isInverted),
     );
     this.cache.set(key, trend);
     return trend;
@@ -494,7 +494,7 @@ export class DataFetcher {
       {
         multiValues: false,
         advanced: true,
-        factor: sensorFactor(sensor),
+        factor: sensor.format === 'fraction' ? 100 : 1,
       },
     )
       .then(addNameInfos)
@@ -536,7 +536,7 @@ export class DataFetcher {
           multiValues: false,
           advanced: true,
           transferSignal: true,
-          factor: sensorFactor(sliceSensor),
+          factor: sliceSensor.format === 'fraction' ? 100 : 1,
         },
       ).then(addNameInfos);
       for (const s of missingDataSensors) {
@@ -592,8 +592,8 @@ export class DataFetcher {
 export class DateParam {
   /**
    * @param {Date} date
-   * @param {Sensor?} sensor
-   * @param {Map<string, [number, number]>?} timeLookup
+   * @param {Sensor=} sensor
+   * @param {Map<string, [number, number]>=} timeLookup
    */
   constructor(date, sensor, timeLookup) {
     this.timeValue = toTimeValue(date);
@@ -616,31 +616,6 @@ export class DateParam {
   }
 }
 
-/**
- * @param {Sensor} sensor
- */
-function sensorFactor(sensor) {
-  return sensor.yAxis.startsWith('Fraction') ? 100 : 1;
-}
-
-/**
- * @param {Sensor} sensor
- */
-function deriveRawSignal(sensor) {
-  if (sensor.rawSignal !== undefined) {
-    return sensor.rawSignal;
-  }
-
-  if (
-    ['chng', 'doctor-visits', 'hospital-admissions'].includes(sensor.id) ||
-    (sensor.id === 'fb-survey' && !(sensor.signal.endsWith('_cli') || sensor.signal.endsWith('_ili')))
-  ) {
-    return null;
-  }
-  // guess the raw name by replacing common patterns
-  return sensor.signal.replace('smoothed_', 'raw_').replace('_7dav', '');
-}
-
 export class SensorParam {
   /**
    * @param {Sensor} sensor
@@ -649,32 +624,33 @@ export class SensorParam {
     this.key = sensor.key;
     this.name = sensor.name;
     this.description = typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText({}) : sensor.mapTitleText;
+    this.signalTooltip = sensor.signalTooltip;
     this.value = sensor;
-    this.isCasesOrDeath = sensor.isCasesOrDeath;
-    this.factor = sensorFactor(sensor);
-    this.isPercentage = sensor.format == 'percent' || this.factor > 1;
-    this.isPer100K =
-      this.isCasesOrDeath || sensor.signal === 'bars_visit_prop' || sensor.signal === 'restaurants_visit_prop';
-    this.isInverted = isInverted(sensor);
+    this.isCasesOrDeath = sensor.isCasesOrDeath || false;
+    // fractions as percentages here
+    this.factor = sensor.format === 'fraction' ? 100 : 1;
+    this.isPercentage = sensor.format == 'percent' || sensor.format === 'fraction';
+    this.isPer100K = sensor.format === 'per100k';
+    this.isInverted = sensor.isInverted;
+    this.is7DayAverage = sensor.is7DayAverage;
     this.formatValue = formatValue;
-    this.unit = this.isPercentage ? 'per 100 people' : this.isPer100K ? 'per 100,000 people' : '';
-    this.unitShort = this.isPer100K ? 'per 100k' : 'per 100';
-    this.unitHTML = this.isPer100K ? `<span class="per100k"><span>PER</span><span>100K</span></span>` : 'per 100';
+    this.unit = sensor.unit;
+    this.unitShort = this.isPer100K ? 'per 100k' : this.isPercentage ? 'per 100' : this.unit;
+    this.unitHTML = this.isPer100K ? `<span class="per100k"><span>PER</span><span>100K</span></span>` : this.unitShort;
+    this.xAxis = sensor.xAxis;
     this.yAxis = sensor.yAxis;
-    this.xAxis = sensor.xAxis || (this.isCasesOrDeath ? 'Reported Date' : 'Date');
 
     this.dataSource = getDataSource(sensor);
 
-    const rawSignal = deriveRawSignal(sensor);
     /**
      * @type {Sensor | null}
      */
     this.rawValue =
-      rawSignal && rawSignal !== sensor.signal
+      sensor.rawSignal && sensor.rawSignal !== sensor.signal
         ? {
             ...sensor,
-            key: `${sensor.id}:${rawSignal}`,
-            signal: rawSignal,
+            key: `${sensor.id}:${sensor.rawSignal}`,
+            signal: sensor.rawSignal,
           }
         : null;
   }
@@ -718,14 +694,6 @@ export class SensorParam {
     const domain = this.domain(stats, level);
     return scaleSequential(this.value.colorScale).domain(domain);
   }
-}
-
-/**
- *
- * @param {Sensor} sensor
- */
-export function isInverted(sensor) {
-  return sensor.isInverted || sensor.colorScaleId === 'interpolateYlGnBu';
 }
 
 export const CASES = new SensorParam(sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Cases')));

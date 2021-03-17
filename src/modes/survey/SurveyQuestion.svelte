@@ -93,7 +93,7 @@
       {formatDateYearWeekdayAbbr(date.value, true)}
       the 7 day average of
       <strong>{sensor.name}</strong>
-      <UIKitHint title={question.signalTooltip} inline />
+      <UIKitHint title={sensor.signalTooltip} inline />
       was:
     </p>
     <IndicatorOverview {sensor} {date} {region} {fetcher}>

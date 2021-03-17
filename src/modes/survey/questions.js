@@ -55,18 +55,17 @@ export const waves = descriptions.waves.reduce((waves, wave, i) => {
  * @typedef {object} Question
  * @property {string} category
  * @property {string} anchor
- * @property {string} dataSource
- * @property {string} signal
- * @property {string} signalTooltip
- * @property {string} name
  * @property {string} question HTML
- * @property {boolean} inverted
- * @property {string[]} levels
  * @property {string} learnMoreLink
- * @property {import("../../data").SensorEntry?} sensor matching sensor entry
- * @property {import("../../stores/params").SensorParam} sensorParam question as param
- * @property {Revision[]?} oldRevisions
  * @property {Wave} addedInWave
+ * @property {Revision[]?} oldRevisions
+ *
+ * @property {string} dataSource
+ * @property {string} name
+ * @property {string} signal
+ * @property {import("../../stores/constants").SensorEntry} sensor matching sensor entry
+ * @property {import("../../stores/params").SensorParam} sensorParam question as param
+ 
  */
 
 function toAnchor(value) {
@@ -95,10 +94,11 @@ function parseRevisions(revisions, latestAddedInWave) {
  * @type {Question[]}
  */
 export const questions = descriptions.questions.map((question) => ({
+  // TODO
   ...question,
-  dataSource: descriptions.dataSource,
+  id: descriptions.id,
   levels: descriptions.levels,
-  sensor: sensorList.find((d) => d.id === descriptions.dataSource && d.signal === question.signal),
+  sensor: sensorList.find((d) => d.id === descriptions.id && d.signal === question.signal),
   anchor: toAnchor(question.name),
   addedInWave: waves[question.addedInWave - 1],
   oldRevisions: parseRevisions(question.oldRevisions, question.addedInWave),
@@ -128,6 +128,7 @@ export const refSensor = questions.some((d) => d.sensor != null)
 
 for (const question of questions) {
   // inject the sensorParam
+  // TODO
   question.sensorParam = new SensorParam(
     question.sensor || {
       ...refSensor,

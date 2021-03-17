@@ -2,7 +2,7 @@
   import { scaleLinear } from 'd3-scale';
   import { stats } from '../../../stores';
   /**
-   * @type {import('../../../stores/constants').SensorEntry}
+   * @type {import('../../../stores/params').SensorParam}
    */
   export let sensor;
 

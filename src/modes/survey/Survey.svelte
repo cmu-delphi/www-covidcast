@@ -19,16 +19,17 @@
     // reactive update
     fetcher.invalidate(sensor, region, date);
 
+    const sensors = questions.map((d) => d.sensorParam);
     // prefetch all data that is likely needed
     // itself
     fetcher.fetchNSensor1RegionNDates(
-      questions.map((d) => d.sensorParam),
+      sensors,
       region,
       date.windowTimeFrame,
     );
     // fetch self details (sample size)
     fetcher.fetchNSensor1Region1DateDetails(
-      questions.map((d) => d.sensorParam),
+      sensors,
       region,
       date,
     );
@@ -36,7 +37,7 @@
     if (region.level !== 'nation') {
       // nation
       fetcher.fetchNSensor1RegionNDates(
-        questions.map((d) => d.sensorParam),
+        sensors,
         nationInfo,
         date.windowTimeFrame,
       );
@@ -44,13 +45,13 @@
     if (region.level === 'county') {
       // state
       fetcher.fetchNSensor1RegionNDates(
-        questions.map((d) => d.sensorParam),
+        sensors,
         getStateOfCounty(region.value),
         date.windowTimeFrame,
       );
       // related regions
       fetcher.fetchNSensorNRegionNDates(
-        questions.map((d) => d.sensorParam),
+        sensors,
         getRelatedCounties(region.value),
         date.windowTimeFrame,
       );

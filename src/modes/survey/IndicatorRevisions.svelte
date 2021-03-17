@@ -21,6 +21,6 @@
 </script>
 
 <FancyHeader sub="Revisions">Previous</FancyHeader>
-{#each question.oldRevisions as revision, i}
+{#each question.oldRevisions as revision}
   <IndicatorRevision {revision} {date} {region} {fetcher} />
 {/each}

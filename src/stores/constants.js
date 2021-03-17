@@ -1,9 +1,9 @@
 import { isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data/signals';
 import { formatAPITime } from '../data/utils';
 import descriptions from './descriptions.generated.json';
-import { resolveColorScale } from './colorScales';
 import { modeByID } from '../modes';
 import { formatRawValue, formatValue, formatPercentage } from '../formats';
+import { interpolateYlGnBu, interpolateYlOrRd } from 'd3-scale-chromatic';
 // import { generateMockSignal, generateMockMeta } from '../data/mock';
 
 export const levelList = [
@@ -56,33 +56,102 @@ export function getLevelInfo(level) {
  */
 
 /**
- * @typedef {object} SensorEntry
- * @property {string} key
+ * @typedef {object} Sensor
+ * @property {string} key id:signal
+ * @property {string} id data source
+ * @property {string} signal signal
+ * @property {string=} rawSignal raw signal in case of a 7day average
+ * 
+ * @property {string} name signal name
  * @property {'public' | 'early' | 'late'} type
- * @property {string} name
- * @property {string?} description
- * @property {string[]} links
- * @property {string} id
- * @property {string} signal
- * @property {string[]} levels
- * @property {string | ((options?: CasesOrDeathOptions) => string)} tooltipText
- * @property {string | ((options?: CasesOrDeathOptions) => string)} mapTitleText
- * @property {string} plotTitleText
- * @property {string} yAxis
- * @property {string} format
- * @property {(v: number, enforceSign?: boolean) => string} formatValue
- * @property {string} signal
- * @property {string?|() => any[]} api
- * @property {(() => any[])?} meta
+ * @property {('msa' | 'state' | 'county' | 'hrr' | 'nation' | 'hss')[]} levels levels for which this signal is available
+ * @property {string?} description HTML long text description
+ * @property {string} signalTooltip short text description
+ * @property {(v: number) => string)} colorScale
+ * 
+ * @property {string[]} links more information links
+ * @property {string} credits credit text
+ * 
+ * @property {'raw' | 'per100k' | 'percent' | 'fraction'} format
+ * @property {string} xAxis x axis date title
+ * @property {string} yAxis y axis value title
+ * @property {string} unit y axis value unit long
+ * @property {boolean} isInverted
+ * @property {boolean} is7DayAverage
  * @property {boolean} hasStdErr
+ * @property {(v: number, enforceSign?: boolean) => string} formatValue
+ */
+
+/**
+ * @param {Partial<Sensor>} sensor 
+ * @returns {Sensor}
+ */
+export function ensureSensorStructure(sensor) {
+  const key = `${sensor.id}-${sensor.signal}`;
+  
+  const isInverted = sensor.isInverted || false;
+  const format = sensor.format || 'raw';
+
+  const formatter = {
+    raw: formatRawValue,
+    fraction: formatRawValue,
+    percent: formatPercentage,
+    per100k: formatValue
+  };
+  const yAxis = {
+    raw: 'arbitrary scale',
+    percent: 'Percentage',
+    per100k: 'per 100,000 people',
+    fraction: 'Fraction of population',
+  };
+  const unit = {
+    raw: 'arbitrary scale',
+    percent: 'per 100 people',
+    per100k: 'per 100,000 people',
+    fraction: 'Fraction of population',
+  };
+  const rawSignal = sensor.rawSignal === 'null' ? null : sensor.rawSignal;
+
+  return Object.assign(sensor, {
+    key,
+    type: 'public',
+    levels: ['state'],
+    description: 'No description available',
+    signalTooltip: sensor.tooltipText || 'No description available',
+    colorScale: isInverted ? interpolateYlGnBu : interpolateYlOrRd,
+
+    links: [],
+    credits: 'We are happy for you to use this data in products and publications.',
+
+    format,
+    xAxis: 'Date',
+    yAxis: yAxis[format] || yAxis.raw,
+    unit: unit[format] || unit.raw,
+    isInverted,
+    is7DayAverage: false,
+    hasStdErr: false,
+    formatValue: formatter[format] || formatter.raw,
+
+    // keep the original values
+    ...sensor,
+    rawSignal,
+  });
+}
+
+/**
+ * @typedef {object} OldSensor
  * @property {boolean} isCasesOrDeath is cases or death signal
  * @property {boolean} isCount is count signal
  * @property {(options?: CasesOrDeathOptions) => 'prop' | 'count' | 'other')} getType
  * @property {Record<keyof EpiDataCasesOrDeathValues, string>} casesOrDeathSignals signal to load for cases or death
- * @property {)(v: number) => string)} colorScale
- * @property {string} colorScaleId
- * @property {string} credits
+ * 
  * @property {boolean?} default whether it should be default signal
+ * @property {string | ((options?: CasesOrDeathOptions) => string)} tooltipText
+ * @property {string | ((options?: CasesOrDeathOptions) => string)} mapTitleText
+ * @property {string} plotTitleText
+ */
+/**
+ * @typedef {Sensor & OldSensor} SensorEntry
  */
 
 /**
@@ -144,6 +213,7 @@ function getType(sensorEntry, sensorOptions) {
   return 'other';
 }
 
+
 /**
  *
  * @param {*} sensorEntry
@@ -155,18 +225,13 @@ export function extendSensorEntry(sensorEntry) {
 
   const mapTitle = sensorEntry.mapTitleText;
 
-  return Object.assign(sensorEntry, {
+  return Object.assign(ensureSensorStructure(sensorEntry), {
     key,
     tooltipText: sensorEntry.tooltipText || mapTitle,
-    credits: sensorEntry.credits || 'We are happy for you to use this data in products and publications.',
-    formatValue:
-      sensorEntry.format === 'percent' ? formatPercentage : isCount || isCasesOrDeath ? formatValue : formatRawValue,
+    
     isCount,
     getType: (options) => getType(sensorEntry, options),
     isCasesOrDeath,
-    colorScaleId: sensorEntry.colorScale || 'interpolateYlOrRd',
-    colorScale: resolveColorScale(sensorEntry.colorScale),
-    links: sensorEntry.links || [],
     plotTitleText: sensorEntry.plotTitleText || sensorEntry.name,
     mapTitleText:
       typeof mapTitle === 'string'
