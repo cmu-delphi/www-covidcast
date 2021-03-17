@@ -1,3 +1,5 @@
+import { isCasesSignal, isDeathSignal } from '../data/signals';
+
 export const CASES_DEATH_SOURCE = 'cases-deaths';
 
 const sourceNameLookup = {
@@ -13,13 +15,13 @@ const sourceNameLookup = {
 };
 
 /**
- * @param {import('./constants').SensorEntry | string} dataSource
+ * @param {import('./constants').Sensor | string} sensor
  */
 export function getDataSource(sensor) {
   if (typeof sensor === 'string') {
     return sourceNameLookup[sensor] || sensor;
   }
-  if (sensor.isCasesOrDeath) {
+  if (isCasesSignal(sensor.signal) || isDeathSignal(sensor.signal)) {
     return sourceNameLookup[CASES_DEATH_SOURCE];
   }
   return sourceNameLookup[sensor.id] || sensor.id;

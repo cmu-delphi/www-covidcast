@@ -35,7 +35,7 @@
       value compared to
       <strong
         >best value of
-        <SensorValue {sensor} value={d.best ? d.best.value : null} /></strong
+        <SensorValue {sensor} value={d.best ? d.best.value : null} medium /></strong
       >
       on
       <strong>{formatDateYearWeekdayAbbr(d.bestDate, true)}</strong>.
@@ -45,13 +45,13 @@
       <strong>{sensor.value.name}</strong>
       was
       <strong>
-        <TrendText {sensor} trend={d.worstTrend} />
+        <TrendText trend={d.worstTrend} />
       </strong>
       compared to the
       <strong
         >{WINDOW_SIZE}
         month worst value of
-        <SensorValue {sensor} value={d.worst ? d.worst.value : null} /></strong
+        <SensorValue {sensor} value={d.worst ? d.worst.value : null} medium /></strong
       >
       on
       <strong>{formatDateYearWeekdayAbbr(d.worstDate, true)}</strong>.

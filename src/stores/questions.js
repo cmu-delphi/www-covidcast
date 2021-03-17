@@ -1,6 +1,6 @@
-import { sensorList } from '../../stores';
-import descriptions from './descriptions.generated.json';
-import { SensorParam } from '../../stores/params';
+import { ensureSensorStructure, sensorList } from './constants';
+import descriptions from './questions.generated.json';
+import { SensorParam } from './params';
 import { isoParse } from 'd3-time-format';
 
 export const overviewText = descriptions.overview;
@@ -48,6 +48,7 @@ export const waves = descriptions.waves.reduce((waves, wave, i) => {
  * @property {Wave} changedInWave
  * @property {Wave} addedInWave
  * @property {string} signal
+ * @property {import("../../stores/params").Sensor} sensor matching sensor
  * @property {import("../../stores/params").SensorParam} sensorParam question as param
  */
 
@@ -55,18 +56,15 @@ export const waves = descriptions.waves.reduce((waves, wave, i) => {
  * @typedef {object} Question
  * @property {string} category
  * @property {string} anchor
- * @property {string} dataSource
- * @property {string} signal
- * @property {string} signalTooltip
- * @property {string} name
  * @property {string} question HTML
- * @property {boolean} inverted
- * @property {string[]} levels
  * @property {string} learnMoreLink
- * @property {import("../../data").SensorEntry?} sensor matching sensor entry
- * @property {import("../../stores/params").SensorParam} sensorParam question as param
- * @property {Revision[]?} oldRevisions
  * @property {Wave} addedInWave
+ * @property {Revision[]?} oldRevisions
+ *
+ * @property {string} name
+ * @property {string} signal
+ * @property {import("../../stores/params").Sensor} sensor matching sensor
+ * @property {import("../../stores/params").SensorParam} sensorParam matching sensor param
  */
 
 function toAnchor(value) {
@@ -96,9 +94,7 @@ function parseRevisions(revisions, latestAddedInWave) {
  */
 export const questions = descriptions.questions.map((question) => ({
   ...question,
-  dataSource: descriptions.dataSource,
-  levels: descriptions.levels,
-  sensor: sensorList.find((d) => d.id === descriptions.dataSource && d.signal === question.signal),
+  sensor: sensorList.find((d) => d.id === descriptions.id && d.signal === question.signal),
   anchor: toAnchor(question.name),
   addedInWave: waves[question.addedInWave - 1],
   oldRevisions: parseRevisions(question.oldRevisions, question.addedInWave),
@@ -126,24 +122,48 @@ export const refSensor = questions.some((d) => d.sensor != null)
   ? questions.find((d) => d.sensor != null).sensor
   : sensorList.find((d) => d.id === 'fb-survey');
 
+/**
+ * @param {Question} question
+ */
+function deriveSensor(question) {
+  return ensureSensorStructure({
+    id: descriptions.id,
+    rawSignal: descriptions.rawSignal,
+    type: descriptions.type,
+    levels: descriptions.levels,
+    xAxis: descriptions.xAxis,
+    yAxis: descriptions.yAxis,
+    format: descriptions.format,
+    unit: descriptions.unit,
+    isInverted: descriptions.isInverted,
+    is7DayAverage: descriptions.is7DayAverage,
+    hasStdErr: descriptions.hasStdErr,
+    credits: descriptions.credits,
+    links: [`<a href="https://covidcast.cmu.edu/surveys.html">More information</a>`, ...(descriptions.links || [])],
+    ...question,
+  });
+}
+
+/**
+ * @param {import('./constants').Sensor} sensor
+ * @param {Revision} rev
+ */
+function deriveRevisionSensor(sensor, rev) {
+  return ensureSensorStructure({
+    ...sensor,
+    signal: rev.signal,
+    rawSignal: rev.rawSignal,
+  });
+}
+
 for (const question of questions) {
   // inject the sensorParam
-  question.sensorParam = new SensorParam(
-    question.sensor || {
-      ...refSensor,
-      signal: question.signal,
-      key: `${question.dataSource}:${question.signal}`,
-      name: question.name,
-      isInverted: question.inverted,
-    },
-  );
+  question.sensor = question.sensor || deriveSensor(question);
+  question.sensorParam = new SensorParam(question.sensor);
   if (question.oldRevisions) {
     question.oldRevisions.forEach((rev) => {
-      rev.sensorParam = new SensorParam({
-        ...question.sensorParam.value,
-        signal: rev.signal,
-        key: `${question.sensorParam.key}:${rev.signal}`,
-      });
+      rev.sensor = deriveRevisionSensor(question.sensor, rev);
+      rev.sensorParam = new SensorParam(rev.sensor);
     });
   }
 }

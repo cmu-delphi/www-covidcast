@@ -28,7 +28,7 @@
       <tr>
         <th>{i.displayName}</th>
         <td>
-          <SensorValue {sensor} value={i.value} />
+          <SensorValue {sensor} value={i.value} medium />
         </td>
       </tr>
     {/each}

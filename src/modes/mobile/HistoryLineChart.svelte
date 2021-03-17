@@ -270,10 +270,10 @@
       <div>
         {#await data then d}
           <span class="legend-value">
-            <SensorValue {sensor} value={findValue(r, d, highlightDate)} />
+            <SensorValue {sensor} value={findValue(r, d, highlightDate)} medium />
             {#if singleRaw && sensor.rawValue != null}
               (raw:
-              <SensorValue {sensor} value={findValue(r, d, highlightDate, 'raw')} />)
+              <SensorValue {sensor} value={findValue(r, d, highlightDate, 'raw')} medium />)
             {/if}
           </span>
         {/await}

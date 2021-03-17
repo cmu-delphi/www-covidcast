@@ -1,7 +1,7 @@
 <script>
   import questionCircleIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/question-circle.svg';
   import arrowDownIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-down.svg';
-  import { questionCategories } from './questions';
+  import { questionCategories } from '../../stores/questions';
 </script>
 
 <div class="mobile-survey-toc">
