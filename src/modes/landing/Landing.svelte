@@ -1,13 +1,7 @@
 <script>
   import Search from '../../components/Search.svelte';
   import { countyInfo, nationInfo, stateInfo } from '../../maps';
-  import {
-    currentMode,
-    currentRegionInfo,
-    groupedSensorList,
-    recentRegionInfos,
-    selectByInfo,
-  } from '../../stores';
+  import { currentMode, currentRegionInfo, groupedSensorList, recentRegionInfos, selectByInfo } from '../../stores';
   import flagUSAIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/flag-usa.svg';
   import { modeByID } from '..';
   import { questionCategories } from '../../stores/questions';
@@ -86,8 +80,7 @@
       </p>
       <p>
         Our most useful indicators are visualized in this site, but for the full set, please <a
-          href="https://cmu-delphi.github.io/delphi-epidata/"
-          >visit our API</a
+          href="https://cmu-delphi.github.io/delphi-epidata/">visit our API</a
         >.
       </p>
 
@@ -104,7 +97,12 @@
 
       <ul>
         {#each questionCategories as cat}
-          <li><a href="?mode={modeByID['survey-results'].id}#{cat.anchor}" on:click|preventDefault={() => switchSurvey(cat)}>{cat.name}</a></li>
+          <li>
+            <a
+              href="?mode={modeByID['survey-results'].id}#{cat.anchor}"
+              on:click|preventDefault={() => switchSurvey(cat)}>{cat.name}</a
+            >
+          </li>
         {/each}
       </ul>
 
