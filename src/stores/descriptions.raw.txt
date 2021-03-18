@@ -298,7 +298,7 @@ Credits: We are happy for you to use this data in products and publications unde
 Links:
  - "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/quidel.html#covid-19-tests)"
 ---
-Name: COVID Hospital Admissions
+Name: Claims-Based COVID Hospital Admissions
 Id: hospital-admissions
 Signal: smoothed_adj_covid19_from_claims
 RawSignal: null
