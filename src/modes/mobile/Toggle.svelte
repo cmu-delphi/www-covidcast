@@ -24,7 +24,7 @@
   }
   input + :global(svg) {
     margin-left: -1.4em;
-    width: 3em;
+    width: 2.5em;
     margin-right: 0.4em;
     display: inline-block;
     fill: #c4c4c4;
@@ -34,5 +34,11 @@
   input:checked + :global(svg) {
     fill: #1890ff;
     transform: scale(1, 1);
+  }
+
+  @media only screen and (min-width: 750px) {
+    input + :global(svg) {
+      width: 3em;
+    }
   }
 </style>

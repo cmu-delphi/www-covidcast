@@ -5,12 +5,15 @@
   import AllIndicatorOverview from './AllIndicatorOverview.svelte';
   import { countyInfo, nationInfo, stateInfo } from '../../maps';
   import SurveyParameters from '../survey/SurveyParameters.svelte';
-  import { currentRegionInfo, currentSensorEntry, currentDateObject, times } from '../../stores';
+  import { currentRegionInfo, currentSensorEntry, currentDateObject, times, getScrollToAnchor } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher, CASES } from '../../stores/params';
   import './common.css';
   import RegionMapWrapper from './RegionMapWrapper.svelte';
   import FancyHeader from './FancyHeader.svelte';
   import HistoryLineChart from './HistoryLineChart.svelte';
+  import { afterUpdate } from 'svelte';
+  import { scrollIntoView } from '../../util';
+  import { modeByID } from '..';
 
   $: sensor = new SensorParam($currentSensorEntry, $times);
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
@@ -23,6 +26,10 @@
     // reactive update
     fetcher.invalidate(sensor, region, date);
   }
+
+  afterUpdate(() => {
+    scrollIntoView(getScrollToAnchor(modeByID.summary));
+  });
 </script>
 
 <div class="mobile-root">

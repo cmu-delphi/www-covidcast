@@ -1,7 +1,7 @@
 <script>
   import Search from '../../components/Search.svelte';
   import { countyInfo, nationInfo, stateInfo } from '../../maps';
-  import { currentMode, currentRegionInfo, groupedSensorList, recentRegionInfos, selectByInfo } from '../../stores';
+  import { currentRegionInfo, groupedSensorList, recentRegionInfos, selectByInfo, switchToMode } from '../../stores';
   import flagUSAIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/flag-usa.svg';
   import { modeByID } from '..';
   import { questionCategories } from '../../stores/questions';
@@ -9,13 +9,12 @@
   import FancyHeader from '../mobile/FancyHeader.svelte';
   import SurveyStats from '../survey/SurveyStats.svelte';
   import SensorGroup from './SensorGroup.svelte';
-  import { scrollIntoView } from '../../util';
 
   function switchMode(region) {
     if (region !== undefined) {
       selectByInfo(region);
     }
-    currentMode.set(modeByID.summary);
+    switchToMode(modeByID.summary);
   }
   /**
    * @param {import('../../maps').NameInfo} d
@@ -25,8 +24,7 @@
   }
 
   function switchSurvey(cat) {
-    currentMode.set(modeByID['survey-results']);
-    scrollIntoView(cat.anchor);
+    switchToMode(modeByID['survey-results'], cat.anchor);
   }
 </script>
 
