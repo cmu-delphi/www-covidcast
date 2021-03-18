@@ -207,7 +207,7 @@
     <div class="card-grid">
       <table style="width: 100%">
         <tr>
-          <td style="width:40%; vertical-align: top" rowspan="3">
+          <td style="width:30%; vertical-align: top" rowspan="3">
             <table>
               <tr>
                 <th />
@@ -216,7 +216,7 @@
               {#each otherSensors as sensor (sensor.key)}
                 <tr>
                   <td>
-                    <div class="uk-card-header">
+                    <div style="padding: 0" class="uk-card-header">
                       <h3 class="uk-card-title uk-margin-remove-bottom" style="font-size: 1rem">
                         {sensor.plotTitleText}
                         <div class="toolbar">
@@ -226,11 +226,11 @@
                     </div>
                   </td>
 
-                  <td style="width: 100px; height: 100px">
+                  <td style="width: 70px; height: 70px">
                     <IndicatorCompare
                       {sensorMatrixData}
                       {sensor}
-                      options={{ padding: 0, axisTitles: false, showTitle: false, ticks: false, tickLabels: false }}
+                      options={{ height: 70, padding: 0, axisTitles: false, showTitle: false, ticks: false, tickLabels: false }}
                       on:click={onShowLagDetails(sensor, 0)}
                       date={$currentDateObject}
                       selections={$currentMultiSelection}
@@ -241,7 +241,7 @@
               {/each}
             </table>
           </td>
-          <td style="width: 500px; height: 400px; vertical-align: top">
+          <td style="padding-left: 2em; width: 500px; height: 400px; vertical-align: top">
             {#if showLagDetailsForSensor}
               <IndicatorCompare
                 {sensorMatrixData}
