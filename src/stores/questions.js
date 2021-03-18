@@ -151,6 +151,7 @@ function deriveSensor(question) {
 function deriveRevisionSensor(sensor, rev) {
   return ensureSensorStructure({
     ...sensor,
+    key: `${sensor.id}:${rev.signal}`,
     signal: rev.signal,
     rawSignal: rev.rawSignal,
   });
