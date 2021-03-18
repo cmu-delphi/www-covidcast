@@ -12,6 +12,7 @@ const sourceNameLookup = {
   'indicator-combination': 'COVID Indicator Combination',
   quidel: 'Quidel Antigen Tests',
   safegraph: 'SafeGraph Mobility Data',
+  google_symptoms: 'Google Symptoms Searches',
 };
 
 /**
