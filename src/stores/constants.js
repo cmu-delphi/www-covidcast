@@ -44,8 +44,8 @@ export function getLevelInfo(level) {
   return (
     levelById.get(level) || {
       id: level,
-      label: level.toUpperCase(),
-      labelPlural: level.toUpperCase(),
+      label: level.slice(0, 1).toUpperCase() + level.slice(1),
+      labelPlural: level.slice(0, 1).toUpperCase() + level.slice(1),
     }
   );
 }

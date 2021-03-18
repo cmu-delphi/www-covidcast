@@ -4,6 +4,7 @@
   import { CASES, DEATHS } from '../../stores/params';
   import { formatDateWeekday } from '../../formats';
   import SensorUnit from './SensorUnit.svelte';
+  import IndicatorWarning from './IndicatorWarning.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -21,6 +22,8 @@
   $: casesTrend = fetcher.fetchWindowTrend(CASES, region, date);
   $: deathTrend = fetcher.fetchWindowTrend(DEATHS, region, date);
 </script>
+
+<IndicatorWarning sensor={CASES} {date} {region} />
 
 <p>On {formatDateWeekday(date.value)}, the {CASES.valueUnit}s were:</p>
 
