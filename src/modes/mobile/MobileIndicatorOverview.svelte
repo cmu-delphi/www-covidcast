@@ -54,11 +54,11 @@
       <p>On {formatDateWeekday(date.value)}, the {sensor.valueUnit} was:</p>
       <IndicatorOverview {sensor} {date} {region} {fetcher} />
       <RegionOverview {region} />
-
+      <hr />
       <FancyHeader invert sub="Map" anchor="map">{sensor.name}</FancyHeader>
       <RegionMapWrapper {sensor} {date} {region} {fetcher} />
+      <hr />
       <FancyHeader invert sub="Chart" anchor="chart">{sensor.name}</FancyHeader>
-
       <div class="chart-300">
         <HistoryLineChart {sensor} {date} {region} {fetcher} />
       </div>
@@ -67,6 +67,7 @@
   <IndicatorAbout {sensor} />
   <div class="uk-container content-grid">
     <div class="grid-3-11">
+      <hr />
       <GeoTable {sensor} {region} {date} {fetcher} />
     </div>
   </div>

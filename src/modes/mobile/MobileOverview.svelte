@@ -37,7 +37,7 @@
       <CasesOverview {date} {region} {fetcher} />
       <hr />
       <h3 class="header">COVID-19 Cases by state</h3>
-      <h4 class="header">{CASES.description}</h4>
+      <h4 class="header">{@html CASES.description}</h4>
       <RegionMapWrapper {region} {date} sensor={CASES} {fetcher} />
       <hr />
       <FancyHeader invert sub="Chart" anchor="chart">{CASES.name}</FancyHeader>

@@ -254,7 +254,7 @@ export function extendSensorEntry(sensorEntry) {
     isCasesOrDeath,
     plotTitleText: sensorEntry.plotTitleText || sensorEntry.name,
     mapTitleText:
-      typeof mapTitle === 'string'
+      typeof mapTitle === 'string' || typeof mapTitle === 'function'
         ? mapTitle
         : (options) => {
             // generate lookup function
