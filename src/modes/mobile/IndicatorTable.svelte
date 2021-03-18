@@ -4,7 +4,7 @@
   import { SensorParam } from '../../stores/params';
   import { formatDateISO, formatDateShortNumbers } from '../../formats';
   import filterIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/filter.svg';
-  import { CASES_DEATH_SOURCE, getDataSource } from '../../stores/dataSourceLookup';
+  import { CASES_DEATH_SOURCE } from '../../stores/dataSourceLookup';
   import { currentMode } from '../../stores';
   import { modeByID } from '..';
   import TrendIndicator from './TrendIndicator.svelte';
@@ -31,7 +31,7 @@
   function computeDataSources() {
     const map = new Map();
     for (const sensor of sensorList) {
-      const ds = getDataSource(sensor);
+      const ds = sensor.dataSourceName;
       const e = map.get(ds);
       if (e) {
         e.sensors.push(sensor);
@@ -182,12 +182,12 @@
               </td>
               <td>
                 {#await entry.trend}
-                  <TrendIndicator trend={null} sensor={entry.sensor} block />
+                  <TrendIndicator trend={null} block />
                 {:then d}
-                  <TrendIndicator trend={d} sensor={entry.sensor} block />
+                  <TrendIndicator trend={d} block />
                 {/await}
               </td>
-              <td class="uk-text-right">
+              <td class="uk-text-right table-value">
                 {#await entry.trend}
                   ?
                 {:then t}
@@ -217,7 +217,7 @@
               </td>
             </tr>
             <tr class="addon">
-              <td colspan="3">Source: {entry.sensor.dataSource}</td>
+              <td colspan="3">Source: {entry.sensor.value.dataSourceName}</td>
             </tr>
           {/if}
         {/each}
@@ -257,5 +257,10 @@
     width: 6px;
     display: inline-block;
     fill: currentColor;
+  }
+
+  .table-value {
+    white-space: nowrap;
+    font-weight: 700;
   }
 </style>

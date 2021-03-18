@@ -1,6 +1,6 @@
 <script>
   import { currentDateObject, currentRegionInfo, times } from '../../stores';
-  import { questionCategories, visibleLevels, refSensor, questions } from './questions';
+  import { questionCategories, visibleLevels, refSensor, questions } from '../../stores/questions';
   import SurveyQuestion from './SurveyQuestion.svelte';
   import SurveyParameters from './SurveyParameters.svelte';
   import Overview from './Overview.svelte';
@@ -19,41 +19,22 @@
     // reactive update
     fetcher.invalidate(sensor, region, date);
 
+    const sensors = questions.map((d) => d.sensorParam);
     // prefetch all data that is likely needed
     // itself
-    fetcher.fetchNSensor1RegionNDates(
-      questions.map((d) => d.sensorParam),
-      region,
-      date.windowTimeFrame,
-    );
+    fetcher.fetchNSensor1RegionNDates(sensors, region, date.windowTimeFrame);
     // fetch self details (sample size)
-    fetcher.fetchNSensor1Region1DateDetails(
-      questions.map((d) => d.sensorParam),
-      region,
-      date,
-    );
+    fetcher.fetchNSensor1Region1DateDetails(sensors, region, date);
 
     if (region.level !== 'nation') {
       // nation
-      fetcher.fetchNSensor1RegionNDates(
-        questions.map((d) => d.sensorParam),
-        nationInfo,
-        date.windowTimeFrame,
-      );
+      fetcher.fetchNSensor1RegionNDates(sensors, nationInfo, date.windowTimeFrame);
     }
     if (region.level === 'county') {
       // state
-      fetcher.fetchNSensor1RegionNDates(
-        questions.map((d) => d.sensorParam),
-        getStateOfCounty(region.value),
-        date.windowTimeFrame,
-      );
+      fetcher.fetchNSensor1RegionNDates(sensors, getStateOfCounty(region.value), date.windowTimeFrame);
       // related regions
-      fetcher.fetchNSensorNRegionNDates(
-        questions.map((d) => d.sensorParam),
-        getRelatedCounties(region.value),
-        date.windowTimeFrame,
-      );
+      fetcher.fetchNSensorNRegionNDates(sensors, getRelatedCounties(region.value), date.windowTimeFrame);
     }
   }
 

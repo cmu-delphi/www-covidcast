@@ -70,7 +70,8 @@ function toTrendText(change) {
  * @property {boolean} isBetter increasing or decreasing based on the inverted state
  * @property {boolean} isWorse increasing or decreasing based on the inverted state
  * @property {string} trendReason
- * @property {number} change
+ * @property {number} change normalized change used to compute the trend
+ * @property {number} fractionChange non-normalized changed
  * @property {number} delta
  */
 
@@ -106,6 +107,8 @@ function computeTrend(ref, current, min, isInverted) {
     trendReason,
     change,
     delta: current.value - ref.value,
+    // non normalized change
+    fractionChange: ref.value === current.value ? 0 : ref.value === 0 ? 1 : current.value / ref.value - 1,
     ref,
     current,
     refDate: ref.date_value,

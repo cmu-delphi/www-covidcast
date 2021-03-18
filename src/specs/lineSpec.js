@@ -23,6 +23,16 @@ export function patchHighlightTuple(current) {
   return current;
 }
 
+export function resetOnClearHighlighTuple(date) {
+  return (current) => {
+    patchHighlightTuple(current);
+    const match = /(unit:.*values: )\[/.exec(current.on[0].update);
+    const prefix = match ? match[0] : 'unit: "layer_1", fields: highlight_tuple_fields, values: [';
+    current.on[1].update = `{${prefix}${date.getTime()}]}`;
+    return current;
+  };
+}
+
 export function resolveHighlightedDate(e) {
   const highlighted = e.detail.value;
   if (highlighted && Array.isArray(highlighted.date_value) && highlighted.date_value.length > 0) {
@@ -77,6 +87,35 @@ function genCreditsLayer({ shift = 55 } = {}) {
   return layer;
 }
 
+export function genDateHighlight(date, color = 'lightgrey') {
+  /**
+   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
+   */
+  const layer = {
+    data: {
+      values: [
+        {
+          date_value: date.getTime(),
+        },
+      ],
+    },
+    mark: {
+      type: 'rule',
+      tooltip: false,
+    },
+    encoding: {
+      color: {
+        value: color,
+      },
+      x: {
+        field: 'date_value',
+        type: 'temporal',
+      },
+    },
+  };
+  return layer;
+}
+
 export function generateLineChartSpec({
   width = 800,
   height = 300,
@@ -86,7 +125,6 @@ export function generateLineChartSpec({
   subTitle = null,
   color = COLOR,
   initialDate = null,
-  isPercentage = false,
   valueField = 'value',
   zero = false,
   highlightRegion = false,
@@ -162,7 +200,6 @@ export function generateLineChartSpec({
               domain: false,
               tickCount: 5,
               labelFontSize: 14,
-              labelExpr: isPercentage ? `datum.label + '%'` : undefined,
             },
             scale: {
               round: true,
@@ -190,7 +227,7 @@ export function generateLineChartSpec({
               type: 'point',
               on: 'click, mousemove, [touchstart, touchend] > touchmove',
               nearest: true,
-              clear: false,
+              clear: 'view:mouseout',
               encodings: ['x'],
             },
             value: initialDate

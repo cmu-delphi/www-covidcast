@@ -59,19 +59,19 @@ export function callAPI(id, signal, level, date, region) {
 
 /**
  *
- * @param {import('.').SensorEntry[]} sensors
+ * @param {import('.').DataSensor[]} dataSignals
  * @param {string[]} fields
  * @param {Record<string, string>} filters
  */
-export function callMetaAPI(sensors, fields, filters) {
+export function callMetaAPI(dataSignals, fields, filters) {
   const url = new URL(ENDPOINT);
   const urlGet = new URL(ENDPOINT);
   const data = new FormData();
   data.set('source', 'covidcast_meta');
   urlGet.searchParams.set('source', data.get('source'));
 
-  if (sensors && sensors.length > 0) {
-    const signals = sensors
+  if (dataSignals && dataSignals.length > 0) {
+    const signals = dataSignals
       .map((d) =>
         d.isCasesOrDeath
           ? Object.values(d.casesOrDeathSignals)

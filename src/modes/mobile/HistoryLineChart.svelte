@@ -9,8 +9,9 @@
     generateLineChartSpec,
     resolveHighlightedDate,
     generateLineAndBarSpec,
-    signalPatches,
+    resetOnClearHighlighTuple,
     MULTI_COLORS,
+    genDateHighlight,
   } from '../../specs/lineSpec';
   import { toTimeValue } from '../../stores/params';
   import Toggle from './Toggle.svelte';
@@ -39,6 +40,15 @@
    * @type {import("../../stores/params").DataFetcher}
    */
   export let fetcher;
+
+  /**
+   * @type {Date|null}
+   */
+  export let starts = null;
+  /**
+   * @type {Date|null}
+   */
+  export let ends = null;
 
   /**
    * @type {import("../../stores/params").Region}
@@ -70,7 +80,6 @@
       title: [sensor.name, `in ${region.displayName}`],
       subTitle: sensor.unit,
       highlightRegion: true,
-      isPercentage: sensor.isPercentage,
     };
     if (!isMobile || options.title.reduce((acc, v) => acc + v.length, 0) < 35) {
       options.title = options.title.join(' '); // single title line
@@ -175,11 +184,21 @@
     )}${suffix}`;
   }
 
+  function injectRanges(spec, date) {
+    if (starts && starts > date.windowTimeFrame.min) {
+      spec.layer.unshift(genDateHighlight(starts > date.windowTimeFrame.max ? date.windowTimeFrame.max : starts));
+    }
+    if (ends && ends < date.windowTimeFrame.max) {
+      spec.layer.unshift(genDateHighlight(ends < date.windowTimeFrame.min ? date.windowTimeFrame.min : ends));
+    }
+    return spec;
+  }
+
   let zoom = false;
   let singleRaw = false;
 
   $: raw = singleRaw && sensor.rawValue != null;
-  $: spec = genSpec(sensor, region, date, height, !zoom, raw, $isMobileDevice);
+  $: spec = injectRanges(genSpec(sensor, region, date, height, !zoom, raw, $isMobileDevice), date);
   $: data = raw ? loadSingleData(sensor, region, date) : loadData(sensor, region, date);
   $: regions = raw ? [region.value] : resolveRegions(region.value);
   $: fileName = generateFileName(sensor, regions, date, raw);
@@ -217,7 +236,7 @@
   {data}
   tooltip={HistoryLineTooltip}
   tooltipProps={{ sensor }}
-  signals={{ ...signalPatches, highlightRegion }}
+  signals={{ highlight_tuple: resetOnClearHighlighTuple(date.value), highlightRegion }}
   signalListeners={['highlight']}
   on:signal={onSignal}
 />
@@ -251,10 +270,10 @@
       <div>
         {#await data then d}
           <span class="legend-value">
-            <SensorValue {sensor} value={findValue(r, d, highlightDate)} />
+            <SensorValue {sensor} value={findValue(r, d, highlightDate)} medium />
             {#if singleRaw && sensor.rawValue != null}
               (raw:
-              <SensorValue {sensor} value={findValue(r, d, highlightDate, 'raw')} />)
+              <SensorValue {sensor} value={findValue(r, d, highlightDate, 'raw')} medium />)
             {/if}
           </span>
         {/await}

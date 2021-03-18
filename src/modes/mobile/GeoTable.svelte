@@ -11,7 +11,6 @@
   import { groupByRegion, extractSparkLine } from '../../stores/params';
   import { determineTrend } from '../../stores/trend';
   import SensorValue from './SensorValue.svelte';
-  import SensorUnit from './SensorUnit.svelte';
   import DownloadMenu from './components/DownloadMenu.svelte';
 
   /**
@@ -178,10 +177,13 @@
 
   let showAll = false;
 
+  let loading = true;
   $: {
+    loading = true;
     sortedRegions = regions.slice(0, showAll ? -1 : 10);
     loadedData.then((rows) => {
       sortedRegions = rows.sort(comparator).slice(0, showAll ? -1 : 10);
+      loading = false;
     });
   }
   /**
@@ -207,14 +209,12 @@
   <DownloadMenu {fileName} data={loadedData} absolutePos prepareRow={(row) => row.dump} />
 </div>
 
-<table class="mobile-table">
+<table class="mobile-table" class:loading>
   <thead>
     <tr>
       <th class="mobile-th">{title.unit}</th>
       <th class="mobile-th">Change Last 7 days</th>
-      <th class="mobile-th uk-text-right">
-        <SensorUnit {sensor} force />
-      </th>
+      <th class="mobile-th uk-text-right">{sensor.unitShort}</th>
       <th class="mobile-th uk-text-right">
         <span>historical trend</span>
         <div class="mobile-th-range">
@@ -260,9 +260,9 @@
           >
         </td>
         <td>
-          <TrendIndicator trend={r.trendObj} {sensor} block />
+          <TrendIndicator trend={r.trendObj} block />
         </td>
-        <td class="uk-text-right">
+        <td class="uk-text-right table-value">
           <SensorValue {sensor} value={r.value} />
         </td>
         <td>
@@ -293,3 +293,10 @@
     </tfoot>
   {/if}
 </table>
+
+<style>
+  .table-value {
+    white-space: nowrap;
+    font-weight: 700;
+  }
+</style>

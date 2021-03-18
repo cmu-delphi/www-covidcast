@@ -70,13 +70,15 @@
 
 <div>
   {#await trend}
-    <TrendIndicator trend={null} long {sensor} />
+    <TrendIndicator trend={null} long />
   {:then d}
-    <TrendIndicator trend={d} long {sensor} />
+    <TrendIndicator trend={d} long />
   {/await}
 </div>
 
-<TrendTextSummary {sensor} {date} {trend} />
+<TrendTextSummary {sensor} {date} {trend}>
+  <slot />
+</TrendTextSummary>
 
 <style>
   p {

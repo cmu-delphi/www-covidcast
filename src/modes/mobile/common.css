@@ -292,3 +292,8 @@
   font-size: 50%;
   line-height: 1;
 }
+.per100 {
+  display: inline-block;
+  font-size: 50%;
+  line-height: 1;
+}

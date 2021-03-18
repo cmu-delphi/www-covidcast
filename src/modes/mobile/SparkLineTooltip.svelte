@@ -20,7 +20,7 @@
     <tr>
       <th>{item.displayName}</th>
       <td>
-        <SensorValue {sensor} value={item.value} />
+        <SensorValue {sensor} value={item.value} medium />
       </td>
     </tr>
   </table>

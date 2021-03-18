@@ -28,11 +28,12 @@
 <div class="mobile-root">
   <SurveyParameters sensor={sensor.value} {items} defaultItem={nationInfo} placeholder="Search by State or County">
     <div class="grid-3-11 mobile-header-line" slot="title">
-      <h2>LOCATION <span>Summary</span></h2>
+      <h2>Explore a <span>Location</span></h2>
     </div>
   </SurveyParameters>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
+      <FancyHeader invert>{region.displayName}</FancyHeader>
       <CasesOverview {date} {region} {fetcher} />
       <hr />
       <h3 class="header">COVID-19 Cases by state</h3>
