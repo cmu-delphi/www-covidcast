@@ -37,7 +37,7 @@
 </p>
 
 <div class="mobile-two-col">
-  {#each highlightSensors as s}
+  {#each highlightSensors as s(s.sensor.key)}
     <div class="mobile-kpi">
       <h3>{s.sensor.name}</h3>
       <div>
@@ -57,7 +57,7 @@
 <p>Compared to the previous week that means:</p>
 
 <div class="mobile-two-col">
-  {#each highlightSensors as s}
+  {#each highlightSensors as s(s.sensor.key)}
     <div class="mobile-kpi">
       <div>
         {#await s.trend}

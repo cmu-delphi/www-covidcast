@@ -104,7 +104,7 @@
 
 <div class="root {className}" class:loading>
   <HexGrid columns={maxColumn} style="gap: 2px; margin-bottom: 2rem;">
-    {#each tileData as tile}
+    {#each tileData as tile(tile.propertyId)}
       {#await tile.value}
         <HexGridCell
           x={tile.x}
