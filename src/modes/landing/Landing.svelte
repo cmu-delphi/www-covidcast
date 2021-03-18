@@ -71,6 +71,7 @@
     </div>
 
     <div class="block">
+      <hr />
       <FancyHeader sub="Indicators" center>COVID-19</FancyHeader>
       <p>
         COVIDcast gathers data from dozens of sources and produces a set of indicators which can inform our reasoning
@@ -92,6 +93,7 @@
     </div>
 
     <div class="block">
+      <hr />
       <FancyHeader sub="Pandemic Survey via Facebook" center>Delphi</FancyHeader>
       <p>The U.S. Pandemic Survey offers insights into public sentiment on:</p>
 
