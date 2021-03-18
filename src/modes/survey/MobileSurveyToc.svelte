@@ -23,7 +23,7 @@
         <ul class="survey-nav uk-nav uk-navbar-dropdown-nav">
           {#each questionCategories as cat, i}
             <li class="nav-dropdown-parent">
-              <a href="#{cat.anchor}" data-uk-scroll="offset: 130">{i + 1}. {cat.name}</a>
+              <a href="#{cat.anchor}" data-uk-scroll>{i + 1}. {cat.name}</a>
             </li>
           {/each}
         </ul>

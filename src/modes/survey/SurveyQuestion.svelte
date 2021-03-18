@@ -27,6 +27,8 @@
    */
   export let fetcher;
 
+  export let anchor = null;
+
   $: sensor = question.sensorParam;
   $: trend = fetcher.fetchWindowTrend(sensor, region, date);
 
@@ -53,6 +55,9 @@
 </script>
 
 <article class:loading class="uk-card uk-card-default uk-card-small question-card">
+  {#if anchor}
+    <a href="#{anchor}" id={anchor} class="anchor"><span aria-hidden="true">Anchor</span></a>
+  {/if}
   <a href="#{question.anchor}" id={question.anchor} class="anchor"><span aria-hidden="true">Anchor</span></a>
   <div class="uk-card-header">
     <h3 class="uk-card-title">{question.category}</h3>
