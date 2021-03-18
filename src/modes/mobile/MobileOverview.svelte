@@ -33,6 +33,7 @@
   </SurveyParameters>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
+      <FancyHeader invert>{region.displayName}</FancyHeader>
       <CasesOverview {date} {region} {fetcher} />
       <hr />
       <h3 class="header">COVID-19 Cases by state</h3>
