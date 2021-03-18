@@ -173,7 +173,7 @@
             <tr class="has-addon">
               <td>
                 <a
-                  href="?mode=indicator&sensor={entry.sensor.key}"
+                  href="../indicator?sensor={entry.sensor.key}"
                   class="uk-link-text"
                   on:click|preventDefault={entry.switchMode}
                 >
@@ -208,7 +208,7 @@
               </td>
               <td rowspan="2">
                 <a
-                  href="?mode=indicator&sensor={entry.sensor.key}"
+                  href="../indicator?sensor={entry.sensor.key}"
                   class="uk-link-text details-link"
                   on:click|preventDefault={entry.switchMode}
                 >

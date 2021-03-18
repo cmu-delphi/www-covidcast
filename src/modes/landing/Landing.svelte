@@ -48,7 +48,7 @@
       {#each $recentRegionInfos.slice(0, 3) as region}
         <a
           class="chip uk-link-text uk-link-toggle"
-          href="?mode=mobile&region={region.propertyId}"
+          href="./{modeByID.summary.id}?region={region.propertyId}"
           on:click|preventDefault={() => switchMode(region)}
         >
           {region.displayName}
@@ -58,7 +58,7 @@
     <div class="button-wrapper">
       <a
         class="uk-button uk-button-default uk-button-delphi uk-button-delphi__secondary uk-text-uppercase"
-        href="?mode=mobile"
+        href="./{modeByID.summary.id}"
         on:click|preventDefault={() => switchMode(null)}
       >
         <span class="inline-svg-icon">
@@ -95,12 +95,12 @@
       <FancyHeader sub="Pandemic Survey via Facebook" center>Delphi</FancyHeader>
       <p>
         The U.S. Pandemic Survey offers insights into public sentiment on:
-        {#each questionCategories as cat, i}
-          {i === questionCategories.length - 1 ? ' and' : i > 0 ? ',' : ''}
-          <a href="?mode={modeByID['survey-results'].id}#{cat.anchor}" on:click|preventDefault={switchSurvey}
-            >{cat.name}</a
-          >
-        {/each}
+        <a href="./{modeByID['survey-results'].id}" on:click|preventDefault={switchSurvey}>
+          {#each questionCategories as cat, i}
+            {i === questionCategories.length - 1 ? ' and' : i > 0 ? ',' : ''}
+            {cat.name}
+          {/each}
+        </a>
       </p>
 
       <SurveyStats className="uk-text-center mobile-two-col__highlight" />
