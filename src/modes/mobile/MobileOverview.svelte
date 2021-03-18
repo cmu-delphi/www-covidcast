@@ -40,7 +40,7 @@
       <h4 class="header">{CASES.description}</h4>
       <RegionMapWrapper {region} {date} sensor={CASES} {fetcher} />
       <hr />
-      <FancyHeader invert sub="Chart">{CASES.name}</FancyHeader>
+      <FancyHeader invert sub="Chart" anchor="chart">{CASES.name}</FancyHeader>
       <div class="chart-300">
         <HistoryLineChart sensor={CASES} {date} {region} {fetcher} />
       </div>

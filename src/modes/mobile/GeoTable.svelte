@@ -205,7 +205,7 @@
 </script>
 
 <div class="uk-position-relative">
-  <FancyHeader>{title.title}</FancyHeader>
+  <FancyHeader anchor="table">{title.title}</FancyHeader>
   <DownloadMenu {fileName} data={loadedData} absolutePos prepareRow={(row) => row.dump} />
 </div>
 
