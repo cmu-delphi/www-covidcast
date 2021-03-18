@@ -95,18 +95,15 @@
     <div class="block">
       <hr />
       <FancyHeader sub="Pandemic Survey via Facebook" center>Delphi</FancyHeader>
-      <p>The U.S. Pandemic Survey offers insights into public sentiment on:</p>
-
-      <ul>
-        {#each questionCategories as cat}
-          <li>
-            <a
-              href="?mode={modeByID['survey-results'].id}#{cat.anchor}"
-              on:click|preventDefault={() => switchSurvey(cat)}>{cat.name}</a
-            >
-          </li>
+      <p>
+        The U.S. Pandemic Survey offers insights into public sentiment on:
+        {#each questionCategories as cat, i}
+          {i === questionCategories.length - 1 ? ' and' : i > 0 ? ',' : ''}
+          <a href="?mode={modeByID['survey-results'].id}#{cat.anchor}" on:click|preventDefault={() => switchSurvey(cat)}
+            >{cat.name}</a
+          >
         {/each}
-      </ul>
+      </p>
 
       <SurveyStats className="uk-text-center mobile-two-col__highlight" />
     </div>
