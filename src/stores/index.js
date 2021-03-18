@@ -413,6 +413,16 @@ export const trackedUrlParams = derived(
   },
 );
 
+export function getScrollToAnchor(mode) {
+  const anchor = mode.anchor;
+  delete mode.anchor;
+  return anchor;
+}
+export function switchToMode(mode, anchor) {
+  mode.anchor = anchor;
+  currentMode.set(mode);
+}
+
 export function loadFromUrlState(state) {
   if (state.mode !== get(currentMode).id) {
     currentMode.set(modeByID[state.mode]);

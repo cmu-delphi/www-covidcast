@@ -1,10 +1,13 @@
 <script>
   import toggleOnIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/toggle-on.svg';
+
+  export let className = '';
   export let checked = false;
+  export let before = '';
 </script>
 
-<label class="toggle" class:checked>
-  <slot name="before" />
+<label class="toggle {className}" class:checked>
+  {before}
   <input type="checkbox" bind:checked />
   {@html toggleOnIcon}
   <slot />
@@ -21,7 +24,7 @@
   }
   input + :global(svg) {
     margin-left: -1.4em;
-    width: 3em;
+    width: 2.5em;
     margin-right: 0.4em;
     display: inline-block;
     fill: #c4c4c4;
@@ -31,5 +34,11 @@
   input:checked + :global(svg) {
     fill: #1890ff;
     transform: scale(1, 1);
+  }
+
+  @media only screen and (min-width: 750px) {
+    input + :global(svg) {
+      width: 3em;
+    }
   }
 </style>

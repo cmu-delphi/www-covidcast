@@ -254,7 +254,7 @@ export function extendSensorEntry(sensorEntry) {
     isCasesOrDeath,
     plotTitleText: sensorEntry.plotTitleText || sensorEntry.name,
     mapTitleText:
-      typeof mapTitle === 'string'
+      typeof mapTitle === 'string' || typeof mapTitle === 'function'
         ? mapTitle
         : (options) => {
             // generate lookup function
@@ -296,11 +296,6 @@ export function extendSensorEntry(sensorEntry) {
         links: full.links,
         credits: full.credits,
       });
-      const subCountKey = primaryValue(full, options).replace('avg', 'count');
-      const countSignal = full.casesOrDeathSignals[subCountKey];
-      if (countSignal && countSignal !== signal) {
-        console.log('TODO');
-      }
     };
     add(false, false);
     add(false, true);

@@ -6,7 +6,7 @@
   import GeoTable from './GeoTable.svelte';
   import IndicatorOverview from './IndicatorOverview.svelte';
   import chevronLeftIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-left.svg';
-  import { currentMode } from '../../stores';
+  import { currentMode, getScrollToAnchor } from '../../stores';
   import { modeByID } from '..';
   import IndicatorAbout from './IndicatorAbout.svelte';
   import RegionOverview from './RegionOverview.svelte';
@@ -16,6 +16,8 @@
   import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
   import './common.css';
   import { formatDateWeekday } from '../../formats';
+  import { afterUpdate } from 'svelte';
+  import { scrollIntoView } from '../../util';
 
   $: sensor = new SensorParam($currentSensorEntry, $times);
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
@@ -36,6 +38,9 @@
   function switchMode() {
     currentMode.set(modeByID.summary);
   }
+  afterUpdate(() => {
+    scrollIntoView(getScrollToAnchor(modeByID.summary));
+  });
 </script>
 
 <div class="mobile-root">
@@ -54,11 +59,11 @@
       <p>On {formatDateWeekday(date.value)}, the {sensor.valueUnit} was:</p>
       <IndicatorOverview {sensor} {date} {region} {fetcher} />
       <RegionOverview {region} />
-
-      <FancyHeader invert sub="Map">{sensor.name}</FancyHeader>
+      <hr />
+      <FancyHeader invert sub="Map" anchor="map">{sensor.name}</FancyHeader>
       <RegionMapWrapper {sensor} {date} {region} {fetcher} />
-      <FancyHeader invert sub="Chart">{sensor.name}</FancyHeader>
-
+      <hr />
+      <FancyHeader invert sub="Chart" anchor="chart">{sensor.name}</FancyHeader>
       <div class="chart-300">
         <HistoryLineChart {sensor} {date} {region} {fetcher} />
       </div>
@@ -67,6 +72,7 @@
   <IndicatorAbout {sensor} />
   <div class="uk-container content-grid">
     <div class="grid-3-11">
+      <hr />
       <GeoTable {sensor} {region} {date} {fetcher} />
     </div>
   </div>

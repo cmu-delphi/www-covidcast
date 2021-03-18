@@ -46,7 +46,7 @@
   $: trendSummary = generateTrendSummary(date, region);
 </script>
 
-<FancyHeader sub="Summary">Indicators</FancyHeader>
+<FancyHeader sub="Summary" anchor="indicators">Indicators</FancyHeader>
 
 <p>
   {#await trendSummary}

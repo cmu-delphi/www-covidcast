@@ -127,7 +127,7 @@
       {/if}
       <li class="uk-nav-divider" />
       <li>
-        <a href="?mode={modeByID.export.id}" on:click|preventDefault={exportData}>Advanced Data Export</a>
+        <a href="../{modeByID.export.id}" on:click|preventDefault={exportData}>Advanced Data Export</a>
       </li>
     </ul>
   </div>

@@ -70,5 +70,12 @@
     display: inline-block;
     margin: 0;
     cursor: pointer;
+    font-size: 0.875rem;
+  }
+
+  @media only screen and (min-width: 1050px) {
+    h4 {
+      font-size: 1.25rem;
+    }
   }
 </style>

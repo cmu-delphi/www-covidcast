@@ -205,7 +205,7 @@
 </script>
 
 <div class="uk-position-relative">
-  <FancyHeader>{title.title}</FancyHeader>
+  <FancyHeader anchor="table">{title.title}</FancyHeader>
   <DownloadMenu {fileName} data={loadedData} absolutePos prepareRow={(row) => row.dump} />
 </div>
 
@@ -252,7 +252,7 @@
     </tr>
   </thead>
   <tbody>
-    {#each sortedRegions as r}
+    {#each sortedRegions as r (r.propertyId)}
       <tr class:important={r.important}>
         <td>
           <a href="?region={r.propertyId}" class="uk-link-text" on:click|preventDefault={() => region.set(r, true)}

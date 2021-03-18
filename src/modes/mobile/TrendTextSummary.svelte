@@ -5,7 +5,7 @@
   import TrendText from './TrendText.svelte';
 
   /**
-   * @type {import("../../stores/params").Trend}
+   * @type {Promise<import("../../stores/params").Trend>}
    */
   export let trend;
   /**
@@ -16,11 +16,25 @@
    * @type {import("../../stores/params").DateParam}
    */
   export let date;
+
+  let loading = false;
+
+  $: {
+    if (trend) {
+      loading = true;
+      trend.then(() => {
+        loading = false;
+      });
+    }
+  }
 </script>
 
-<p>
+<p class:loading>
   <slot />
-  {#await trend then d}
+  {#await trend}
+    We don't have data on the historical context for this indicator on
+    {formatDateWeekday(date.value, true)}.
+  {:then d}
     {#if d.isUnknown}
       We don't have data on the historical context for this indicator on
       {formatDateWeekday(date.value, true)}.

@@ -29,7 +29,7 @@
   <div class="mobile-kpi">
     <div>
       {#await data}
-        <SurveyValue value={null} />
+        <SurveyValue value={null} loading />
       {:then d}
         <SurveyValue value={round(d.averageSampleSize)} />
       {/await}
@@ -48,7 +48,7 @@
   <div class="mobile-kpi">
     <div>
       {#await data}
-        <SurveyValue value={null} />
+        <SurveyValue value={null} loading />
       {:then d}
         <SurveyValue value={round(d.totalSampleSize)} />
       {/await}

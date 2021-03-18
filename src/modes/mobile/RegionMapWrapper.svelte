@@ -25,13 +25,12 @@
 </script>
 
 {#if region.level === 'nation'}
-  <p class="uk-text-center">
-    Click on a state to show this region
-    <Toggle bind:checked={showCounties}>
-      <span slot="before">Show US States as Beehive Grid</span>
+  <p class="uk-text-center">Click on a state to show this region</p>
+  <div class="toggle-center-wrapper">
+    <Toggle bind:checked={showCounties} before="Show US States as Beehive Grid">
       Show US Counties as Choropleth Map
     </Toggle>
-  </p>
+  </div>
   {#if showCounties}
     <RegionCountyMap {region} {date} {sensor} {fetcher} />
   {:else}
@@ -40,3 +39,17 @@
 {:else}
   <RegionMap {region} {date} {sensor} {fetcher} />
 {/if}
+
+<style>
+  .toggle-center-wrapper > :global(*) {
+    display: flex;
+    padding-top: 0;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+  }
+  .toggle-center-wrapper > :global(* > svg) {
+    margin-left: -0.4em;
+    margin-right: 1.4em;
+  }
+</style>

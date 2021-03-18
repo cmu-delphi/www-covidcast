@@ -32,7 +32,7 @@
               </li>
             {/each}
             <li>
-              <a href={`?mode=${modeByID.export.id}&sensor=${sensor.key}`} on:click|preventDefault={exportData}
+              <a href={`../${modeByID.export.id}?sensor=${sensor.key}`} on:click|preventDefault={exportData}
                 >Export Data</a
               >
             </li>

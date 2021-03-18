@@ -61,7 +61,7 @@
       selected === '' ||
       selected === 'all' ||
       (sensor.isCasesOrDeath && selected === CASES_DEATH_SOURCE) ||
-      (!sensor.isCasesOrDeath && sensor.id === selected)
+      (!sensor.isCasesOrDeath && sensor.value.id === selected)
     );
   }
   /**
@@ -160,20 +160,20 @@
       <th class="mobile-th" />
     </tr>
   </thead>
-  {#each loadedData as group}
+  {#each loadedData as group (group.label)}
     {#if !selectedDatasource || selectedDatasource === 'all' || group.sensors.some((d) =>
-        matchDataSource(d, selectedDatasource),
+        matchDataSource(d.sensor, selectedDatasource),
       )}
       <tbody>
         <tr class="row-group">
           <th class="mobile-h3" colspan="5">{group.label}</th>
         </tr>
-        {#each group.sensors as entry}
+        {#each group.sensors as entry (entry.sensor.key)}
           {#if matchDataSource(entry.sensor, selectedDatasource)}
             <tr class="has-addon">
               <td>
                 <a
-                  href="?mode=indicator&sensor={entry.sensor.key}"
+                  href="../indicator?sensor={entry.sensor.key}"
                   class="uk-link-text"
                   on:click|preventDefault={entry.switchMode}
                 >
@@ -208,7 +208,7 @@
               </td>
               <td rowspan="2">
                 <a
-                  href="?mode=indicator&sensor={entry.sensor.key}"
+                  href="../indicator?sensor={entry.sensor.key}"
                   class="uk-link-text details-link"
                   on:click|preventDefault={entry.switchMode}
                 >

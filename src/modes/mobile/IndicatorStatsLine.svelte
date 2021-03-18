@@ -19,7 +19,17 @@
    */
   export let fetcher;
 
+  let loading = false;
   $: dateRow = fetcher.fetch1Sensor1Region1DateDetails(sensor, region, date);
+
+  $: {
+    if (dateRow) {
+      loading = true;
+      dateRow.then(() => {
+        loading = false;
+      });
+    }
+  }
 
   function formatStdErr(stderr) {
     return `±${formatValue(stderr)}`;
@@ -40,13 +50,15 @@
   }
 </script>
 
-<p class="stats-line">
-  {#await dateRow then s}
-    {s
-      ? `The ${sensor.valueUnit} of "${sensor.name}" on ${formatDateLocal(s.date_value)} is based on ${formatSampleSize(
-          s,
-        )} samples with a standard error of ${formatStdErr(s.stderr)}. It was published on ${formatIssueDate(s)}.`
-      : ''}
+<p class="stats-line" class:loading>
+  {#await dateRow}
+    The {sensor.valueUnit} of "{sensor.name}" on {formatDateLocal(date.value)} is based on N/A samples with a standard error
+    of N/A. It was published on N/A.
+  {:then s}
+    {#if s}
+      The {sensor.valueUnit} of "{sensor.name}" on {formatDateLocal(s.date_value)} is based on {formatSampleSize(s)} samples
+      with a standard error of {formatStdErr(s.stderr)}. It was published on {formatIssueDate(s)}.
+    {/if}
   {/await}
 </p>
 

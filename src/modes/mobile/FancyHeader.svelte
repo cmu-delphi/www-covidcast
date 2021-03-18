@@ -3,9 +3,13 @@
   export let normal = false;
   export let center = false;
   export let invert = false;
+  export let anchor = null;
 </script>
 
 <h2 class="mobile-fancy-header" class:normal class:center class:invert>
+  {#if anchor}
+    <a href="#{anchor}" id={anchor} class="anchor"><span aria-hidden="true">Anchor</span></a>
+  {/if}
   <slot />
   {#if sub}<span>{sub}</span>{/if}
 </h2>
@@ -17,6 +21,7 @@
     letter-spacing: 0.05em;
     margin: 0.5em 0;
     text-transform: uppercase;
+    position: relative;
   }
 
   .normal {
@@ -43,5 +48,12 @@
     h2.mobile-fancy-header {
       font-size: 1.5rem;
     }
+  }
+
+  .anchor {
+    /** move anchor such that scrolling won't overlap with the sticky parameters */
+    position: absolute;
+    top: -160px;
+    display: inline-block;
   }
 </style>

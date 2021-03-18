@@ -1,5 +1,5 @@
 <script>
-  import { currentDateObject, currentRegionInfo, times } from '../../stores';
+  import { currentDateObject, currentRegionInfo, times, getScrollToAnchor } from '../../stores';
   import { questionCategories, visibleLevels, refSensor, questions } from '../../stores/questions';
   import SurveyQuestion from './SurveyQuestion.svelte';
   import SurveyParameters from './SurveyParameters.svelte';
@@ -9,6 +9,8 @@
   import { DataFetcher, DateParam, RegionParam, SensorParam } from '../../stores/params';
   import getRelatedCounties from '../../maps/related';
   import '../mobile/common.css';
+  import { modeByID } from '..';
+  import { scrollIntoView } from '../../util';
 
   $: sensor = new SensorParam(refSensor, $times);
   $: date = new DateParam($currentDateObject, refSensor, $times);
@@ -22,7 +24,7 @@
     const sensors = questions.map((d) => d.sensorParam);
     // prefetch all data that is likely needed
     // itself
-    fetcher.fetchNSensor1RegionNDates(sensors, region, date.windowTimeFrame);
+    const loaded = fetcher.fetchNSensor1RegionNDates(sensors, region, date.windowTimeFrame);
     // fetch self details (sample size)
     fetcher.fetchNSensor1Region1DateDetails(sensors, region, date);
 
@@ -36,6 +38,10 @@
       // related regions
       fetcher.fetchNSensorNRegionNDates(sensors, getRelatedCounties(region.value), date.windowTimeFrame);
     }
+
+    Promise.all(loaded).then(() => {
+      scrollIntoView(getScrollToAnchor(modeByID['survey-results']));
+    });
   }
 
   const filteredInfos = nameInfos.filter((d) => visibleLevels.includes(d.level));
@@ -57,8 +63,8 @@
       <div class="toc-container uk-visible@m">
         <div class="toc">
           <h5>Survey questions</h5>
-          <ol uk-scrollspy-nav="closest: li; scroll: true; offset: 100" class="uk-nav uk-nav-default">
-            {#each questionCategories as cat}
+          <ol uk-scrollspy-nav="closest: li; scroll: true;" class="uk-nav uk-nav-default">
+            {#each questionCategories as cat (cat.name)}
               <li><a href="#{cat.anchor}">{cat.name}</a></li>
             {/each}
           </ol>
@@ -66,11 +72,9 @@
       </div>
     </div>
     <div class="grid-3-11 questions">
-      {#each questionCategories as cat}
-        <!-- svelte-ignore a11y-missing-content -->
-        <a id={cat.anchor} />
-        {#each cat.questions as question}
-          <SurveyQuestion {question} {region} {date} {fetcher} />
+      {#each questionCategories as cat (cat.name)}
+        {#each cat.questions as question, i}
+          <SurveyQuestion {question} {region} {date} {fetcher} anchor={i === 0 ? cat.anchor : null} />
         {/each}
       {/each}
     </div>
