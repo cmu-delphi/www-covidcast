@@ -1,6 +1,6 @@
 <script>
   import toggleOnIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/toggle-on.svg';
-  
+
   export let className = '';
   export let checked = false;
   export let before = '';
