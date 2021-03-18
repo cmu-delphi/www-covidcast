@@ -58,7 +58,7 @@
         <div class="toc">
           <h5>Survey questions</h5>
           <ol uk-scrollspy-nav="closest: li; scroll: true; offset: 100" class="uk-nav uk-nav-default">
-            {#each questionCategories as cat(cat.name)}
+            {#each questionCategories as cat (cat.name)}
               <li><a href="#{cat.anchor}">{cat.name}</a></li>
             {/each}
           </ol>
@@ -66,7 +66,7 @@
       </div>
     </div>
     <div class="grid-3-11 questions">
-      {#each questionCategories as cat(cat.name)}
+      {#each questionCategories as cat (cat.name)}
         {#each cat.questions as question, i}
           <SurveyQuestion {question} {region} {date} {fetcher} anchor={i === 0 ? cat.anchor : null} />
         {/each}

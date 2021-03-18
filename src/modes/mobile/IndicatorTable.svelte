@@ -160,7 +160,7 @@
       <th class="mobile-th" />
     </tr>
   </thead>
-  {#each loadedData as group(group.label)}
+  {#each loadedData as group (group.label)}
     {#if !selectedDatasource || selectedDatasource === 'all' || group.sensors.some((d) =>
         matchDataSource(d.sensor, selectedDatasource),
       )}
@@ -168,7 +168,7 @@
         <tr class="row-group">
           <th class="mobile-h3" colspan="5">{group.label}</th>
         </tr>
-        {#each group.sensors as entry(entry.sensor.key)}
+        {#each group.sensors as entry (entry.sensor.key)}
           {#if matchDataSource(entry.sensor, selectedDatasource)}
             <tr class="has-addon">
               <td>

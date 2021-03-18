@@ -252,7 +252,7 @@
     </tr>
   </thead>
   <tbody>
-    {#each sortedRegions as r(r.propertyId)}
+    {#each sortedRegions as r (r.propertyId)}
       <tr class:important={r.important}>
         <td>
           <a href="?region={r.propertyId}" class="uk-link-text" on:click|preventDefault={() => region.set(r, true)}
