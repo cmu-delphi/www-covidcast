@@ -267,7 +267,14 @@
                   field: 'date_value',
                   type: 'temporal',
                   scale: { range: [0, 6] },
-                  legend: sizeLegend ? {} : null,
+                  legend: sizeLegend
+                    ? {
+                        symbolType: 'square',
+                        symbolStrokeWidth: 3,
+                        symbolFillColor: 'gray',
+                        title: 'Date trail',
+                      }
+                    : null,
                 },
               },
             },
