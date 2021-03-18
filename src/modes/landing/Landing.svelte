@@ -23,8 +23,8 @@
     return `${d.id} ${d.displayName}`;
   }
 
-  function switchSurvey(cat) {
-    switchToMode(modeByID['survey-results'], cat.anchor);
+  function switchSurvey() {
+    switchToMode(modeByID['survey-results']);
   }
 </script>
 
@@ -97,7 +97,7 @@
         The U.S. Pandemic Survey offers insights into public sentiment on:
         {#each questionCategories as cat, i}
           {i === questionCategories.length - 1 ? ' and' : i > 0 ? ',' : ''}
-          <a href="?mode={modeByID['survey-results'].id}#{cat.anchor}" on:click|preventDefault={() => switchSurvey(cat)}
+          <a href="?mode={modeByID['survey-results'].id}#{cat.anchor}" on:click|preventDefault={switchSurvey}
             >{cat.name}</a
           >
         {/each}
