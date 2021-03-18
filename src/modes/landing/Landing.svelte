@@ -91,7 +91,7 @@
         >.
       </p>
 
-      <ul>
+      <ul class="sensors">
         {#each groupedSensorList as group}
           <SensorGroup {group} />
         {/each}
@@ -136,6 +136,11 @@
     margin: 1.5rem 0;
     font-size: 0.875rem;
     font-weight: normal;
+    text-align: justify;
+  }
+
+  ul.sensors > :global(li) {
+    padding: 0.25em 0;
   }
 
   .button-wrapper {
@@ -147,7 +152,7 @@
   }
 
   .block {
-    margin: 2em 0 1em 0;
+    margin: 3em 0 1em 0;
   }
 
   @media only screen and (max-width: 1050px) {
