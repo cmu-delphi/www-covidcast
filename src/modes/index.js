@@ -62,12 +62,18 @@ const modes = [
   //   label: 'Lab',
   //   component: () => import(/* webpackChunkName: 'mode-lab' */ './lab/Lab.svelte').then((r) => r.default),
   // },
+  {
+    id: 'signal-dashboard',
+    label: 'Signal Dashboard',
+    component: () =>
+      import(/* webpackChunkName: 'm-dashboard' */ './dashboard/SignalDashboard.svelte').then((r) => r.default),
+  },
 ];
 
 export default modes;
 
 /**
- * @type {Record<'summary'|'timelapse'|'top10'|'export'|'single'|'survey-results'|'lab'|'classic'|'indicator'|'landing', Mode>}
+ * @type {Record<'summary'|'timelapse'|'top10'|'export'|'single'|'survey-results'|'lab'|'classic'|'indicator'|'landing'|'signal-dashboard', Mode>}
  */
 export const modeByID = {};
 modes.forEach((mode) => (modeByID[mode.id] = mode));
