@@ -61,7 +61,7 @@
       selected === '' ||
       selected === 'all' ||
       (sensor.isCasesOrDeath && selected === CASES_DEATH_SOURCE) ||
-      (!sensor.isCasesOrDeath && sensor.id === selected)
+      (!sensor.isCasesOrDeath && sensor.value.id === selected)
     );
   }
   /**
@@ -162,7 +162,7 @@
   </thead>
   {#each loadedData as group(group.label)}
     {#if !selectedDatasource || selectedDatasource === 'all' || group.sensors.some((d) =>
-        matchDataSource(d, selectedDatasource),
+        matchDataSource(d.sensor, selectedDatasource),
       )}
       <tbody>
         <tr class="row-group">
