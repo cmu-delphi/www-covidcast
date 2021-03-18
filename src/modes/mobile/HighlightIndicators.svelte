@@ -42,7 +42,7 @@
       <h3>{s.sensor.name}</h3>
       <div>
         {#await s.trend}
-          <SurveyValue value={null} />
+          <SurveyValue value={null} loading />
         {:then d}
           <SurveyValue value={d && d.current ? d.current.value : null} digits={2} />
         {/await}

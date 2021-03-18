@@ -7,6 +7,8 @@
 
   export let digits = 1;
 
+  export let loading = false;
+
   $: scaled = value != null && !Number.isNaN(value) ? value * factor : null;
 
   $: hasFraction = scaled != null && digits > 0 && Math.floor(scaled) !== scaled;
@@ -15,7 +17,7 @@
   $: fraction = hasFraction ? Math.round(scaled * digitsPow) % digitsPow : 0;
 </script>
 
-<span class="text">{base.toLocaleString()}</span>
+<span class="text" class:loading>{base.toLocaleString()}</span>
 {#if hasFraction}<span class="fraction"> {`.${fraction}`} </span>{/if}
 
 <style>

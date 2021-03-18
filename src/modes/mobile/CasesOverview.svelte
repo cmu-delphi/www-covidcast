@@ -29,7 +29,7 @@
     <h3>Cases</h3>
     <div>
       {#await casesTrend}
-        <SurveyValue value={null} />
+        <SurveyValue value={null} loading />
       {:then d}
         <SurveyValue value={d && d.current ? d.current.value : null} />
       {/await}
@@ -42,7 +42,7 @@
     <h3>Deaths</h3>
     <div>
       {#await deathTrend}
-        <SurveyValue value={null} />
+        <SurveyValue value={null} loading />
       {:then d}
         <SurveyValue value={d && d.current ? d.current.value : null} />
       {/await}

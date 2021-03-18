@@ -40,7 +40,7 @@
   <div class="mobile-kpi">
     <div>
       {#await trend}
-        <SurveyValue value={null} />
+        <SurveyValue value={null} loading />
       {:then d}
         <SurveyValue value={d && d.current ? d.current.value : null} digits={sensor.isPercentage ? 2 : 1} />
       {/await}
