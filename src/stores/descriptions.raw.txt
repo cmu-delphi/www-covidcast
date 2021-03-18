@@ -161,7 +161,7 @@ Links:
  - "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#vaccination-indicators)"
 ---
 Name: COVID Symptom Searches on Google 
-Id: google_symptoms
+Id: google-symptoms
 Signal: sum_anosmia_ageusia_smoothed_search
 RawSignal: sum_anosmia_ageusia_raw_search
 Type: public
@@ -169,7 +169,7 @@ Levels: [state, msa, hrr, county]
 XAxis: Date
 YAxis: Scaled search volume (arbitrary scale)
 Format: raw
-Unit: Scaled search volume
+Unit: scaled search volume
 IsInverted: false
 Is7DayAverage: true
 HasStdErr: false
@@ -317,7 +317,7 @@ Highlight: [landing]
 MapTitleText: Percentage of daily hospital admissions with COVID-19 associated diagnoses
 
 
-Description: Delphi receives from our health system partners aggregated statistics on COVID-related hospital admissions, derived from ICD codes found in insurance claims.  Using this data, we estimate the percentage of new hospital admissions each day that are related to COVID-19. Note that these estimates are based only on admissions by patients whose data is accessible to our partners,  and address new hospital admissions each day, not all currently hospitalized patients who have COVID-related diagnoses.
+Description: Delphi receives from our health system partners aggregated statistics on COVID-related hospital admissions, derived from ICD codes found in insurance claims.  Using this data, we estimate the percentage of new hospital admissions each day that are related to COVID-19. Note that these estimates are based only on admissions by patients whose data is accessible to our partners, and address new hospital admissions each day, not all currently hospitalized patients who have COVID-related diagnoses.
 
 
 Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.

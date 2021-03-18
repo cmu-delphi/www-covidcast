@@ -642,7 +642,7 @@ export class SensorParam {
       ? `<span class="per100k"><span>PER</span><span>100K</span></span>`
       : this.isPercentage
       ? `<span class="per100">/100</span>`
-      : this.unitShort;
+      : '';
     this.xAxis = sensor.xAxis;
     this.yAxis = sensor.yAxis;
   }
