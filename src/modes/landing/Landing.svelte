@@ -1,14 +1,21 @@
 <script>
   import Search from '../../components/Search.svelte';
   import { countyInfo, nationInfo, stateInfo } from '../../maps';
-  import { currentMode, currentRegionInfo, groupedSensorList, recentRegionInfos, selectByInfo } from '../../stores';
+  import {
+    currentMode,
+    currentRegionInfo,
+    groupedSensorList,
+    recentRegionInfos,
+    selectByInfo,
+  } from '../../stores';
   import flagUSAIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/flag-usa.svg';
   import { modeByID } from '..';
-  import { questions } from '../../stores/questions';
+  import { questionCategories } from '../../stores/questions';
   import '../mobile/common.css';
   import FancyHeader from '../mobile/FancyHeader.svelte';
-  import SurveyValue from '../survey/SurveyValue.svelte';
   import SurveyStats from '../survey/SurveyStats.svelte';
+  import SensorGroup from './SensorGroup.svelte';
+  import { scrollIntoView } from '../../util';
 
   function switchMode(region) {
     if (region !== undefined) {
@@ -23,8 +30,9 @@
     return `${d.id} ${d.displayName}`;
   }
 
-  function switchDashboard() {
+  function switchSurvey(cat) {
     currentMode.set(modeByID['survey-results']);
+    scrollIntoView(cat.anchor);
   }
 </script>
 
@@ -68,47 +76,42 @@
       </a>
     </div>
 
-    <p>
-      COVIDcast gathers data from dozens of sources and produces a set of indicators which can inform our reasoning
-      about the pandemic. Indicators are produced from these raw data by extracting a metric of interest, tracking
-      revisions, and applying additional processing like reducing noise, adjusting temporal focus, or enabling more
-      direct comparisons.
-    </p>
-    <p>
-      Our most useful indicators are visualized in this site, but for the full set, please <a
-        href="https://cmu-delphi.github.io/delphi-epidata/"
-        class="uk-link-text">visit our API</a
-      >.
-    </p>
+    <div class="block">
+      <FancyHeader sub="Indicators" center>COVID-19</FancyHeader>
+      <p>
+        COVIDcast gathers data from dozens of sources and produces a set of indicators which can inform our reasoning
+        about the pandemic. Indicators are produced from these raw data by extracting a metric of interest, tracking
+        revisions, and applying additional processing like reducing noise, adjusting temporal focus, or enabling more
+        direct comparisons.
+      </p>
+      <p>
+        Our most useful indicators are visualized in this site, but for the full set, please <a
+          href="https://cmu-delphi.github.io/delphi-epidata/"
+          >visit our API</a
+        >.
+      </p>
 
-    <FancyHeader sub="Indicators" center>COVID-19</FancyHeader>
-    <a href="https://cmu-delphi.github.io/delphi-epidata/" class="link-link uk-link-text">Explore our API</a>
-
-    <div class="mobile-two-col uk-text-center mobile-two-col__highlight">
-      <div class="mobile-kpi">
-        <div>
-          <SurveyValue value={questions.length} digits={0} />
-        </div>
-        <div class="subheader">Survey Indicators</div>
-      </div>
-      {#each groupedSensorList as group}
-        <div class="mobile-kpi">
-          <div>
-            <SurveyValue value={group.sensors.length} digits={0} />
-          </div>
-          <div class="subheader">{group.label}{group.label.endsWith('Indicators') ? '' : ' Indicators'}</div>
-        </div>
-      {/each}
+      <ul>
+        {#each groupedSensorList as group}
+          <SensorGroup {group} />
+        {/each}
+      </ul>
     </div>
 
-    <FancyHeader sub="Pandemic Survey via Facebook" center>Delphi</FancyHeader>
-    <a href="?mode=survey-results" on:click|preventDefault={switchDashboard} class="link-link uk-link-text"
-      >Go to survey dashboard</a
-    >
+    <div class="block">
+      <FancyHeader sub="Pandemic Survey via Facebook" center>Delphi</FancyHeader>
+      <p>The U.S. Pandemic Survey offers insights into public sentiment on:</p>
 
-    <SurveyStats className="uk-text-center mobile-two-col__highlight" />
+      <ul>
+        {#each questionCategories as cat}
+          <li><a href="?mode={modeByID['survey-results'].id}#{cat.anchor}" on:click|preventDefault={() => switchSurvey(cat)}>{cat.name}</a></li>
+        {/each}
+      </ul>
 
-    <p>In collaboration with Facebook, Google, Change Healthcare, and Quidel.</p>
+      <SurveyStats className="uk-text-center mobile-two-col__highlight" />
+    </div>
+
+    <p>In collaboration with Facebook, Google.org, Change Healthcare, and Quidel.</p>
   </div>
 </div>
 
@@ -132,7 +135,6 @@
   p {
     margin: 1.5rem 0;
     font-size: 0.875rem;
-    text-align: center;
     font-weight: normal;
   }
 
@@ -142,6 +144,10 @@
     flex-direction: column;
     align-items: center;
     font-weight: 600;
+  }
+
+  .block {
+    margin: 2em 0 1em 0;
   }
 
   @media only screen and (max-width: 1050px) {
@@ -176,16 +182,5 @@
   .chip:hover,
   .chip:focus {
     background: #eee;
-  }
-
-  .uk-link-text {
-    text-decoration: underline;
-  }
-
-  .link-link {
-    font-size: 0.75rem;
-    display: block;
-    text-align: center;
-    margin-top: 0.5em;
   }
 </style>

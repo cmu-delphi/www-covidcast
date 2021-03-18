@@ -6,6 +6,7 @@ import { determineTrend } from './trend';
 import { determineMinMax } from '../components/MapBox/colors';
 import { formatValue } from '../formats';
 import { scaleSequential } from 'd3-scale';
+import { scrollToTop } from '../util';
 
 /**
  * @typedef {import('./constants').Sensor} Sensor
@@ -654,10 +655,7 @@ export class SensorParam {
       currentSensor.set(sensor.key);
     }
     if (scrollTop) {
-      window.scrollTo({
-        top: 0,
-        behavior: 'auto',
-      });
+      scrollToTop();
     }
   }
 
@@ -713,10 +711,7 @@ export class RegionParam {
   set(region, scrollTop = false) {
     currentRegion.set(region.propertyId);
     if (scrollTop) {
-      window.scrollTo({
-        top: 0,
-        behavior: 'auto',
-      });
+      scrollToTop();
     }
   }
 }

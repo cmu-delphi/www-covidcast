@@ -97,3 +97,28 @@ export function downloadUrl(url, name) {
   a.click();
   a.remove();
 }
+
+export function scrollToTop() {
+  window.scrollTo({
+    top: 0,
+    behavior: 'auto',
+  });
+}
+
+/**
+ * looks for the given id and scrolls into view
+ * @param {string} id
+ * @param {number} tries
+ * @param {number} timeout
+ */
+export function scrollIntoView(id, tries = 3, timeout = 500) {
+  function scrollImpl(remainingTries) {
+    const elem = document.querySelector(`#${id}`);
+    if (elem) {
+      elem.scrollIntoView();
+    } else if (remainingTries > 0) {
+      setTimeout(scrollImpl, timeout, remainingTries - 1);
+    }
+  }
+  setTimeout(scrollImpl, timeout, tries);
+}

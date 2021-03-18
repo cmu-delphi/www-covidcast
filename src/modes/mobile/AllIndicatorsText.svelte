@@ -1,16 +1,15 @@
 <script>
   import { currentMode, currentSensor } from '../../stores';
   import { modeByID } from '../';
+  import { scrollToTop } from '../../util';
+
   export let sensors = [];
   export let what = 'getting worse';
 
   function switchSensor(e) {
     currentMode.set(modeByID.indicator);
     currentSensor.set(e.currentTarget.dataset.key);
-    window.scrollTo({
-      top: 0,
-      behavior: 'auto',
-    });
+    scrollToTop();
   }
 </script>
 
