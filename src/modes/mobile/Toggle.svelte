@@ -1,10 +1,13 @@
 <script>
   import toggleOnIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/toggle-on.svg';
+  
+  export let className = '';
   export let checked = false;
+  export let before = '';
 </script>
 
-<label class="toggle" class:checked>
-  <slot name="before" />
+<label class="toggle {className}" class:checked>
+  {before}
   <input type="checkbox" bind:checked />
   {@html toggleOnIcon}
   <slot />
