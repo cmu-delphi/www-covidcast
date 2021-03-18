@@ -67,8 +67,7 @@
     </div>
     <div class="grid-3-11 questions">
       {#each questionCategories as cat}
-        <!-- svelte-ignore a11y-missing-content -->
-        <a id={cat.anchor} />
+        <a href="#{cat.anchor}" id={cat.anchor} class="anchor"><span aria-hidden="true">Anchor</span></a>
         {#each cat.questions as question}
           <SurveyQuestion {question} {region} {date} {fetcher} />
         {/each}
@@ -99,5 +98,11 @@
 
   .toc {
     padding: 24px 6px 24px 24px;
+  }
+  .anchor {
+    /** move anchor such that scrolling won't overlap with the sticky parameters */
+    position: absolute;
+    top: -160px;
+    display: inline-block;
   }
 </style>
