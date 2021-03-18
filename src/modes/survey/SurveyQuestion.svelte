@@ -53,6 +53,7 @@
 </script>
 
 <article class:loading class="uk-card uk-card-default uk-card-small question-card">
+  <a href="#{question.anchor}" id={question.anchor} class="anchor"><span aria-hidden="true">Anchor</span></a>
   <div class="uk-card-header">
     <h3 class="uk-card-title">{question.category}</h3>
     <a href={question.learnMoreLink} class="uk-link-muted uk-text-small" title="Learn More">
@@ -62,7 +63,6 @@
     >
     <a
       href="#{question.anchor}"
-      id={question.anchor}
       class="uk-link-muted uk-text-small"
       on:click|preventDefault={showShareLink}
       title="Share Link"
@@ -147,6 +147,13 @@
     color: #ffffff;
     background: #f2994a;
     border-radius: 3px;
+  }
+
+  .anchor {
+    /** move anchor such that scrolling won't overlap with the sticky parameters */
+    position: absolute;
+    top: -160px;
+    display: inline-block;
   }
 
   @media only screen and (max-width: 715px) {

@@ -111,10 +111,10 @@ export function scrollToTop() {
  * @param {number} tries
  * @param {number} timeout
  */
-export function scrollIntoView(id, tries = 3, timeout = 500) {
+export function scrollIntoView(id, tries = 8, timeout = 500) {
   function scrollImpl(remainingTries) {
     const elem = document.querySelector(`#${id}`);
-    if (elem) {
+    if (elem && elem.getBoundingClientRect().y > 0) {
       elem.scrollIntoView();
     } else if (remainingTries > 0) {
       setTimeout(scrollImpl, timeout, remainingTries - 1);

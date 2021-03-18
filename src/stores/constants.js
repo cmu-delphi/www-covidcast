@@ -296,11 +296,6 @@ export function extendSensorEntry(sensorEntry) {
         links: full.links,
         credits: full.credits,
       });
-      const subCountKey = primaryValue(full, options).replace('avg', 'count');
-      const countSignal = full.casesOrDeathSignals[subCountKey];
-      if (countSignal && countSignal !== signal) {
-        console.log('TODO');
-      }
     };
     add(false, false);
     add(false, true);
