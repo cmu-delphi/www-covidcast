@@ -6,7 +6,10 @@
     currentDateObject,
     currentRegionInfo,
     currentMultiSelection,
+    currentSensor,
     currentSensorEntry,
+    groupedSensorList,
+    levelList,
     removeCompare,
     selectByInfo,
   } from '../../stores';
@@ -25,6 +28,13 @@
   // import { assembleParameterSignals } from 'vega-lite/build/src/parameter';
   // import { formatAPITime, parseAPITime } from '../../data';
 
+  $: levelIds = new Set(levelList.map((l) => l.id));
+  $: filteredSensorGroups = groupedSensorList
+    .map((g) => ({
+      label: g.label,
+      sensors: g.sensors.filter((d) => d.levels.some((l) => levelIds.has(l))),
+    }))
+    .filter((d) => d.sensors.length > 0);
   $: selectedLevels = new Set($currentMultiSelection.map((d) => d.info.level));
   function filterItem(item) {
     return selectedLevels.size === 0 || selectedLevels.has(item.level);
@@ -50,6 +60,8 @@
   // $: {
   //   otherSensors.push(primary);
   // }
+
+  // Need the following to avoid auto-selecting one indicator to compare with.
   let chosenColumn = ''; // Sensor chosen by user from menu.
   $: {
     if (chosenColumn) {
@@ -59,6 +71,7 @@
       console.info('otherSensors', otherSensors);
     }
   }
+
   function loadAllSignalData(sensorPromises) {
     // for each time_value, merge data values across sensors.
     const sensorDateMap = {};
@@ -143,6 +156,13 @@
   .add-sensor-button-wrapper {
     min-width: 40px;
   }
+  .block .uk-form-label {
+    margin-right: 1em;
+  }
+
+  .block .uk-form-controls {
+    flex-grow: 1;
+  }
   .grid-wrapper {
     flex: 1 1 0;
     overflow: auto;
@@ -188,19 +208,38 @@
 </style>
 
 <div class="root base-font-size">
-  <div class="search-container">
-    <Search
-      placeholder={$currentRegionInfo ? 'Compare with...' : 'Search for a location...'}
-      items={nameInfos}
-      selectedItems={$currentMultiSelection}
-      labelFieldName="displayName"
-      maxItemsToShowInList="5"
-      colorFieldName="color"
-      {filterItem}
-      maxSelections={Math.min(selectionColors.length + 1, 4)}
-      on:add={(e) => addCompare(e.detail)}
-      on:remove={(e) => removeCompare(e.detail.info)}
-      on:change={(e) => selectByInfo(e.detail)} />
+  <div class="block">
+    <span class="uk-form-label">Correlations with:</span>
+    <div class="uk-form-controls" style="display:inline-block;">
+      <select id="option-indicator" aria-label="indicator options" class="uk-select" bind:value={$currentSensor}>
+        {#each filteredSensorGroups as sensorGroup}
+          <optgroup label={sensorGroup.label}>
+            {#each sensorGroup.sensors as sensor}
+              <option
+                title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
+                value={sensor.key}>
+                {sensor.name}
+              </option>
+            {/each}
+          </optgroup>
+        {/each}
+      </select>
+    </div>
+
+    <div class="search-container block" style="display: inline-block; width:50em;">
+      <Search
+        placeholder={$currentRegionInfo ? 'Compare with...' : 'Search for a location...'}
+        items={nameInfos}
+        selectedItems={$currentMultiSelection}
+        labelFieldName="displayName"
+        maxItemsToShowInList="5"
+        colorFieldName="color"
+        {filterItem}
+        maxSelections={Math.min(selectionColors.length + 1, 4)}
+        on:add={(e) => addCompare(e.detail)}
+        on:remove={(e) => removeCompare(e.detail.info)}
+        on:change={(e) => selectByInfo(e.detail)} />
+    </div>
   </div>
 
   <div class="grid-wrapper">
@@ -209,10 +248,6 @@
         <tr>
           <td style="width:30%; vertical-align: top" rowspan="3">
             <table>
-              <tr>
-                <th />
-                <th>{$currentSensorEntry.name}</th>
-              </tr>
               {#each otherSensors as sensor (sensor.key)}
                 <tr>
                   <td>

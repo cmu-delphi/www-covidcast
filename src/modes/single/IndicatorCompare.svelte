@@ -64,7 +64,7 @@
   /**
    * @type {import('../../stores/constants').SensorEntry[]}
    */
-  let otherSensors = [sensor, $currentSensorEntry];
+  $: otherSensors = [sensor, $currentSensorEntry];
 
   let chosenColumn = ''; // Sensor chosen by user from menu.
   $: {
