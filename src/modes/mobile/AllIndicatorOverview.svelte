@@ -1,8 +1,8 @@
 <script>
   import FancyHeader from './FancyHeader.svelte';
   import { sensorList } from '../../stores';
-  import { isInverted } from '../../stores/params';
-  import { formatDateShortWeekdayAbbr } from '../../formats';
+  import { formatDateYearWeekdayAbbr } from '../../formats';
+  import AllIndicatorsText from './AllIndicatorsText.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -30,7 +30,7 @@
       const negative = [];
       const unknown = [];
       trends.forEach((trend, i) => {
-        const inv = isInverted(sensorList[i]);
+        const inv = sensorList[i].isInverted;
         if (trend.isIncreasing) {
           (!inv ? negative : positive).push(sensorList[i]);
         } else if (trend.isDecreasing) {
@@ -44,43 +44,27 @@
   }
 
   $: trendSummary = generateTrendSummary(date, region);
-
-  function worse(worse) {
-    if (!worse) {
-      return 'N/A are getting worse.';
-    }
-    if (worse.length === 0) {
-      return 'None are getting worse.';
-    }
-    if (worse.length === 1) {
-      return `"${worse[0].name}" is getting worse.`;
-    }
-    return `${worse
-      .slice(0, worse.length - 1)
-      .map((d) => `"${d.name}"`)
-      .join(', ')}, and "${worse[worse.length - 1].name}" are getting worse.`;
-  }
 </script>
 
-<FancyHeader sub="Overall">Indicators</FancyHeader>
+<FancyHeader sub="Summary" anchor="indicators">Indicators</FancyHeader>
 
 <p>
   {#await trendSummary}
     <strong>N/A of {sensorList.length} indicators</strong>
     are
     <strong>getting better.</strong>
-    {worse(null)}
+    <AllIndicatorsText sensors={null} />
   {:then d}
     <strong>{d ? d.positive.length : 'N/A'} of {sensorList.length} indicators</strong>
     are
     <strong>getting better.</strong>
-    {worse(d ? d.negative : null)}
+    <AllIndicatorsText sensors={d ? d.negative : null} />
     {#if d && d.unknown.length > 0}
       <strong>{d ? d.unknown.length : 'N/A'} of {sensorList.length} indicators</strong>
       are
       <strong>not available</strong>
       for
-      {formatDateShortWeekdayAbbr(date.value)}.
+      {formatDateYearWeekdayAbbr(date.value)}.
     {/if}
   {/await}
 </p>

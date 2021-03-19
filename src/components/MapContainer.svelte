@@ -80,4 +80,5 @@
   on:select={(e) => dispatch('select', e.detail)}
   on:ready={initialReady}
   wrapperClass={USMapBoxWrapper}
-  title={$currentSensorMapTitle} />
+  title={$currentSensorMapTitle}
+/>

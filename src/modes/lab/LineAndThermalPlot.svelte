@@ -459,6 +459,30 @@
   }
 </script>
 
+<div class="uk-container root">
+  <h2>{sensor.name} ThermalPlot</h2>
+  <Vega
+    bind:this={vegaLine}
+    spec={lineSpec}
+    data={casesData}
+    signalListeners={['highlight']}
+    signals={signalPatches}
+    on:signal={onSignal}
+  />
+  <h3>ThermalPlot</h3>
+  <select bind:value={mode}>
+    <option value="change:1">value vs. change (value - day before value)</option>
+    <option value="trend:1">value vs. trend ((value - day before value) / (day before value))</option>
+    <option value="trend:7">value vs. trend ((value - week before value) / (week before value))</option>
+  </select>
+  <button
+    on:click={() => {
+      play = !play;
+    }}>{play ? 'Stop' : 'Play'}</button
+  >
+  <Vega bind:this={vegaThermalPlot} spec={thermalPlotSpec} {data} className="gapminder" signals={{ t }} />
+</div>
+
 <style>
   .root {
     display: flex;
@@ -469,25 +493,3 @@
     height: 500px;
   }
 </style>
-
-<div class="uk-container root">
-  <h2>{sensor.name} ThermalPlot</h2>
-  <Vega
-    bind:this={vegaLine}
-    spec={lineSpec}
-    data={casesData}
-    signalListeners={['highlight']}
-    signals={signalPatches}
-    on:signal={onSignal} />
-  <h3>ThermalPlot</h3>
-  <select bind:value={mode}>
-    <option value="change:1">value vs. change (value - day before value)</option>
-    <option value="trend:1">value vs. trend ((value - day before value) / (day before value))</option>
-    <option value="trend:7">value vs. trend ((value - week before value) / (week before value))</option>
-  </select>
-  <button
-    on:click={() => {
-      play = !play;
-    }}>{play ? 'Stop' : 'Play'}</button>
-  <Vega bind:this={vegaThermalPlot} spec={thermalPlotSpec} {data} className="gapminder" signals={{ t }} />
-</div>

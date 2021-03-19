@@ -42,6 +42,20 @@
   $: itemGroups = items.length < 8 ? items.map((i) => [i]) : splitInGroups(items, 8);
 </script>
 
+<div aria-label="tooltip" class="tooltip" class:hidden>
+  <h5>{formatDateShort(item.date_value)}</h5>
+  <table>
+    {#each itemGroups as g}
+      <tr>
+        {#each g as i}
+          <th>{i[prop]}</th>
+          <td>{f(i.value)}</td>
+        {/each}
+      </tr>
+    {/each}
+  </table>
+</div>
+
 <style>
   .hidden {
     display: none;
@@ -59,17 +73,3 @@
     text-align: right;
   }
 </style>
-
-<div aria-label="tooltip" class="tooltip" class:hidden>
-  <h5>{formatDateShort(item.date_value)}</h5>
-  <table>
-    {#each itemGroups as g}
-      <tr>
-        {#each g as i}
-          <th>{i[prop]}</th>
-          <td>{f(i.value)}</td>
-        {/each}
-      </tr>
-    {/each}
-  </table>
-</div>

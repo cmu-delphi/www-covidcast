@@ -3,21 +3,14 @@
   import Up from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-up.svg';
   import Steady from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-right.svg';
   import Unknown from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
-  import SensorValue from './SensorValue.svelte';
-  import UiKitHint from '../../components/UIKitHint.svelte';
-  import { formatDateShortWeekdayAbbr, formatFraction } from '../../formats';
+  import { formatFraction } from '../../formats';
 
   export let block = false;
   /**
    * @type {import("../../stores/trend").TrendInfo}
    */
   export let trend;
-  /**
-   * @type {import("../../stores/params").SensorParam}
-   */
-  export let sensor;
   export let long = false;
-  export let explain = false;
 
   let trendIcon = null;
   $: {
@@ -31,26 +24,27 @@
       trendIcon = Steady;
     }
   }
-
-  /**
-   * @type {import("../../stores/params").Trend}
-   */
-  function trendExplaination(trend) {
-    if (!trend || trend.isUnknown) {
-      return 'Historical trend is unknown';
-    }
-    const reason = `The value on ${formatDateShortWeekdayAbbr(trend.currentDate)} (${sensor.formatValue(
-      trend.current.value,
-    )}) has changed Δ ${formatFraction(trend.change, true)} compared to ${formatDateShortWeekdayAbbr(
-      trend.refDate,
-    )} (${sensor.formatValue(trend.ref.value)}), which is classified as: <br/><br/> ${trend.trendReason}`;
-
-    if (trend.isSteady) {
-      return `Historical trend remains consistent: <br/> ${reason}`;
-    }
-    return `Historical trend is ${trend.trend}: <br/> ${reason}`;
-  }
 </script>
+
+<div
+  class="trend-indicator"
+  class:long
+  class:short={!long}
+  class:isBetter={trend && trend.isBetter}
+  class:isWorse={trend && trend.isWorse}
+  class:isSteady={trend && trend.isSteady}
+  class:block
+>
+  <span class="icon">
+    {@html trendIcon}
+  </span>
+  {#if long}
+    <span class="trend-text"> {trend != null ? trend.trend : 'Unknown'} </span>
+    {#if trend != null && !trend.isUnknown}
+      <span class="trend-value"> {formatFraction(trend ? trend.fractionChange : null, true)} </span>
+    {/if}
+  {:else}<span class="trend-value"> {formatFraction(trend ? trend.fractionChange : null, true)} </span>{/if}
+</div>
 
 <style>
   .trend-indicator {
@@ -103,31 +97,3 @@
     --text: white;
   }
 </style>
-
-<div
-  class="trend-indicator"
-  class:long
-  class:short={!long}
-  class:isBetter={trend && trend.isBetter}
-  class:isWorse={trend && trend.isWorse}
-  class:isSteady={trend && trend.isSteady}
-  class:block>
-  <span class="icon">
-    {@html trendIcon}
-  </span>
-  {#if long}
-    <span class="trend-text"> {trend != null ? trend.trend : 'Unknown'} </span>
-    {#if trend != null && !trend.isUnknown}
-      <span class="trend-value">
-        <SensorValue {sensor} value={trend.delta} enforceSign />
-      </span>
-    {/if}
-  {:else}
-    <span class="trend-value">
-      <SensorValue {sensor} value={trend ? trend.delta : null} enforceSign />
-    </span>
-  {/if}
-  {#if explain}
-    <UiKitHint title={trendExplaination(trend)} />
-  {/if}
-</div>

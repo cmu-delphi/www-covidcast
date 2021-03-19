@@ -5,7 +5,11 @@ import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 import { getInfoByName } from '../maps';
 
 /**
- * @typedef {import('../stores/constants').SensorEntry} SensorEntry
+ * @typedef {object} DataSensor
+ * @property {string} id
+ * @property {string} signal
+ * @property {boolean=} isCasesOrDeath
+ * @property {Record<string, string>=} casesOrDeathSignals
  */
 
 // * @property {number} issue
@@ -119,7 +123,7 @@ function parseMultipleSeparateData(dataArr, defaultSignalIndex, mixinData = {}, 
 }
 
 /**
- * @param {SensorEntry} sensorEntry
+ * @param {DataSensor} dataSensor
  * @param {string} level
  * @param {string | undefined} region
  * @param {Date | string} date
@@ -128,7 +132,7 @@ function parseMultipleSeparateData(dataArr, defaultSignalIndex, mixinData = {}, 
  * @returns {Promise<EpiDataRow[]>}
  */
 export function fetchData(
-  sensorEntry,
+  dataSensor,
   level,
   region,
   date,
@@ -151,9 +155,9 @@ export function fetchData(
     return Promise.all(
       EPIDATA_CASES_OR_DEATH_VALUES.map((k, i) =>
         callAPIEndPoint(
-          sensorEntry.api,
-          sensorEntry.id,
-          sensorEntry.casesOrDeathSignals[k],
+          dataSensor.api,
+          dataSensor.id,
+          dataSensor.casesOrDeathSignals[k],
           level,
           date,
           region,
@@ -163,9 +167,9 @@ export function fetchData(
     ).then((d) => parseMultipleSeparateData(d, defaultSignalIndex, mixinValues, factor));
   }
 
-  if (sensorEntry.isCasesOrDeath && multiValues) {
-    const signals = EPIDATA_CASES_OR_DEATH_VALUES.map((k) => sensorEntry.casesOrDeathSignals[k]);
-    const defaultSignal = sensorEntry.signal;
+  if (dataSensor.isCasesOrDeath && multiValues) {
+    const signals = EPIDATA_CASES_OR_DEATH_VALUES.map((k) => dataSensor.casesOrDeathSignals[k]);
+    const defaultSignal = dataSensor.signal;
     const defaultSignalIndex = signals.indexOf(defaultSignal);
 
     if (level === 'county' && region === '*') {
@@ -173,8 +177,8 @@ export function fetchData(
       return fetchSeparate(defaultSignalIndex);
     }
     return callAPIEndPoint(
-      sensorEntry.api,
-      sensorEntry.id,
+      dataSensor.api,
+      dataSensor.id,
       signals.join(','),
       level,
       date,
@@ -190,9 +194,9 @@ export function fetchData(
     });
   } else {
     return callAPIEndPoint(
-      sensorEntry.api,
-      sensorEntry.id,
-      sensorEntry.signal,
+      dataSensor.api,
+      dataSensor.id,
+      dataSensor.signal,
       level,
       date,
       region,
@@ -201,14 +205,17 @@ export function fetchData(
   }
 }
 
-export async function fetchSampleSizesNationSummary(sensorEntry) {
+/**
+ * @param {DataSensor} dataSensor
+ */
+export async function fetchSampleSizesNationSummary(dataSensor) {
   /**
    * @type {EpiDataRow[]}
    */
   const data = await callAPIEndPoint(
-    sensorEntry.api,
-    sensorEntry.id,
-    sensorEntry.signal,
+    dataSensor.api,
+    dataSensor.id,
+    dataSensor.signal,
     'nation',
     `${formatAPITime(START_TIME_RANGE)}-${formatAPITime(END_TIME_RANGE)}`,
     'us',
@@ -227,14 +234,14 @@ export async function fetchSampleSizesNationSummary(sensorEntry) {
 
 /**
  *
- * @param {SensorEntry} sensorEntry
+ * @param {DataSensor} dataSensor
  * @param {string} level
  * @param {string | Date} date
  * @param {Partial<EpiDataRow>} mixinValues
  * @returns {Promise<EpiDataRow[]>}
  */
-export function fetchRegionSlice(sensorEntry, level, date, mixinValues = {}) {
-  return fetchData(sensorEntry, level, '*', date, {
+export function fetchRegionSlice(dataSensor, level, date, mixinValues = {}) {
+  return fetchData(dataSensor, level, '*', date, {
     ...(date instanceof Date ? { time_value: formatAPITime(date) } : {}),
     ...mixinValues,
   });
@@ -244,9 +251,9 @@ export function fetchRegionSlice(sensorEntry, level, date, mixinValues = {}) {
  *
  * @param {EpiDataRow} row
  * @param {Date} date
- * @param {SensorEntry} sensorEntry
+ * @param {DataSensor} dataSensor
  */
-function createCopy(row, date, sensorEntry) {
+function createCopy(row, date, dataSensor) {
   const copy = Object.assign({}, row, {
     date_value: date,
     time_value: Number.parseInt(formatAPITime(date), 10),
@@ -254,7 +261,7 @@ function createCopy(row, date, sensorEntry) {
     stderr: null,
     sample_size: null,
   });
-  if ((sensorEntry != null && sensorEntry.isCasesOrDeath) || row[EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined) {
+  if ((dataSensor != null && dataSensor.isCasesOrDeath) || row[EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined) {
     EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
       copy[key] = null;
     });
@@ -263,7 +270,7 @@ function createCopy(row, date, sensorEntry) {
 }
 
 /**
- * @param {SensorEntry} sensorEntry
+ * @param {DataSensor} dataSensor
  * @param {string} level
  * @param {string | undefined} region
  * @param {Date} startDate
@@ -273,7 +280,7 @@ function createCopy(row, date, sensorEntry) {
  * @returns {Promise<EpiDataRow[]>}
  */
 export function fetchTimeSlice(
-  sensorEntry,
+  dataSensor,
   level,
   region,
   startDate = START_TIME_RANGE,
@@ -286,32 +293,32 @@ export function fetchTimeSlice(
     return Promise.resolve([]);
   }
   const timeRange = `${formatAPITime(startDate)}-${formatAPITime(endDate)}`;
-  const data = fetchData(sensorEntry, level, region, timeRange, mixinValues, options);
+  const data = fetchData(dataSensor, level, region, timeRange, mixinValues, options);
   if (!fitDateRange) {
     return data;
   }
-  return data.then((r) => fitRange(r, sensorEntry, startDate, endDate));
+  return data.then((r) => fitRange(r, dataSensor, startDate, endDate));
 }
 
 /**
  * fit the data to be in the start/end date range
  * @param {EpiDataRow[]} rows
- * @param {SensorEntry} sensor
+ * @param {DataSensor} dataSensor
  * @param {Date} startDate
  * @param {Date} endDate
  * @returns {EpiDataRow[]}
  */
-export function fitRange(rows, sensor, startDate, endDate) {
+export function fitRange(rows, dataSensor, startDate, endDate) {
   if (rows.length === 0) {
     return rows;
   }
   if (rows[0].date_value != null && rows[0].date_value > startDate) {
     // inject a min
-    rows.unshift(createCopy(rows[0], startDate, sensor));
+    rows.unshift(createCopy(rows[0], startDate, dataSensor));
   }
   if (rows[rows.length - 1].date_value != null && rows[rows.length - 1].date_value < endDate) {
     // inject a max
-    rows.push(createCopy(rows[rows.length - 1], endDate, sensor));
+    rows.push(createCopy(rows[rows.length - 1], endDate, dataSensor));
   }
   return rows;
 }
@@ -319,10 +326,10 @@ export function fitRange(rows, sensor, startDate, endDate) {
 /**
  * add missing rows per date within this given date rows
  * @param {EpiDataRow[]} rows
- * @param {SensorEntry} sensor
+ * @param {DataSensor} dataSensor
  * @returns {EpiDataRow[]}
  */
-export function addMissing(rows, sensor) {
+export function addMissing(rows, dataSensor) {
   if (rows.length < 2) {
     return rows;
   }
@@ -340,7 +347,7 @@ export function addMissing(rows, sensor) {
       return base.shift();
     }
     // create an entry
-    return createCopy(template, date, sensor);
+    return createCopy(template, date, dataSensor);
   });
   return imputedRows;
 }
@@ -370,10 +377,10 @@ function avg(rows, field) {
 /**
  * group by date and averages its values
  * @param {EpiDataRow[]} rows
- * @param {SensorEntry} sensor
+ * @param {DataSensor} dataSensor
  * @returns {EpiDataRow[]}
  */
-export function averageByDate(rows, sensor, mixin = {}) {
+export function averageByDate(rows, dataSensor, mixin = {}) {
   // average by date
   const byDate = new Map();
   for (const row of rows) {
@@ -393,7 +400,10 @@ export function averageByDate(rows, sensor, mixin = {}) {
         stderr: avg(rows, 'stderr'),
         sample_size: avg(rows, 'sample_size'),
       };
-      if ((sensor != null && sensor.isCasesOrDeath) || rows[0][EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined) {
+      if (
+        (dataSensor != null && dataSensor.isCasesOrDeath) ||
+        rows[0][EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined
+      ) {
         EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
           r[key] = avg(rows, key);
         });

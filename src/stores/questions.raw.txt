@@ -6,24 +6,41 @@ Overview: |
   This dashboard provides summary results from selected survey questions. **Note:** The question text below is simplified for this dashboard.
 FullSurveyLink: https://cmu-delphi.github.io/delphi-epidata/symptom-survey/coding.html
 DataAccessLink: https://cmu-delphi.github.io/delphi-epidata/symptom-survey/data-access.html
-DataSource: fb-survey
-Levels: [county, msa, state]
-TrendThreshold: 0.1 # increasing if ((current / a week ago) - 1) >= threshold
-TrendThresholdQuickly: 0.25 # quickly increasing if … >= thresholdQuickly
 ReferenceRawNationSignal: raw_cli
-Unit: People per every 1,000 people
+Waves: [2020-04-06, 2020-04-15, 2020-05-21, 2020-09-08, 2020-11-24, 2020-12-19, 2021-01-12, 2021-02-08, 2021-03-02, 2021-03-02]
+
+
+# common properties for all questions
+Id: fb-survey
+RawSignal: null
+Type: public
+Levels: [county, msa, state]
+XAxis: Date
+YAxis: Percentage
+Format: percent
+Unit: per 100 people
+IsInverted: false
+Is7DayAverage: true
+HasStdErr: true
+
+
+Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
+
+
+Links:
+ - "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html)"
+
+
 ---
 Name: COVID-Like Symptoms
 Category: Symptoms
-ToCName: 
 Question: |
   In the past 24 hours, have you or anyone in your household experienced a fever, along with cough, shortness of breath, or difficulty breathing?
 Signal: smoothed_cli
+RawSignal: raw_cli
 SignalTooltip: Estimated proportion of people with COVID-like illness.
-Inverted: false
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#ili-and-cli-indicators
-
-
+AddedInWave: 1
 ---
 
 
@@ -32,24 +49,27 @@ Category: Symptoms
 Question: |
   Do you personally know someone in your local community who has COVID-like symptoms?
 Signal: smoothed_hh_cmnty_cli
+RawSignal: raw_hh_cmnty_cli
 SignalTooltip: Estimated proportion of people who know someone who is sick in their local community.
-Inverted: false
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#ili-and-cli-indicators
+AddedInWave: 1
 
 
 ---
 Name: Self-Reported Mask Use
 Category: Mask Use
 Question: |
-  In the past 5 days, did you wear a mask **most or all of the time** in public?
-Signal: smoothed_wearing_mask
-SignalTooltip: Estimated proportion of people who wore a mask for most or all of the time while in public in the past 5 days; those not in public in the past 5 days are not counted.
-Inverted: true
+  In the past 7 days, did you wear a mask **most or all of the time** in public?
+Signal: smoothed_wearing_mask_7d
+SignalTooltip: Estimated proportion of people who wore a mask for most or all of the time while in public in the past 7 days; those not in public in the past 7 days are not counted.
+IsInverted: true
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#behavior-indicators
-
-
-
-
+AddedInWave: 8
+OldRevisions:
+ - Change: This version asked about the past 5 days instead of 7. This was changed in Wave 8 to match other questions in this survey.
+   Signal: smoothed_wearing_mask
+   AddedInWave: 4
+ 
 ---
 Name: Other People Wearing Masks
 Category: Mask Use
@@ -57,10 +77,9 @@ Question: |
   In the past 7 days, when you were in public places where social distancing is not possible, did **most or all other people** wear masks?
 Signal: smoothed_others_masked
 SignalTooltip: Estimated proportion of respondents who say that most or all other people wear masks when they are in public and social distancing is not possible.
-Inverted: true
+IsInverted: true
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#behavior-indicators
-
-
+AddedInWave: 5
 ---
 
 
@@ -70,19 +89,24 @@ Question: |
   Have you already received a COVID vaccine, or if a vaccine were offered to you today, would you **definitely** or **probably** choose to get vaccinated?
 Signal: smoothed_covid_vaccinated_or_accept
 SignalTooltip: Estimated proportion of respondents who say that they either have already been vaccinated, or definitely or probably would get vaccinated if a COVID vaccine were offered to them today.
-Inverted: true
+IsInverted: true
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#vaccination-indicators
+AddedInWave: 6
 
 
 ---
 Name: Went to Essential Store
 Category: Social Distancing
 Question: |
-  In the past 24 hours, did you go to a market, grocery store, or pharmacy?
-Signal: smoothed_shop_1d
-SignalTooltip: Estimated proportion of respondents who went to a “market, grocery store, or pharmacy” in the past 24 hours
-Inverted: false
+  In the past 24 hours, did you go to an indoor market, grocery store, or pharmacy?
+Signal: smoothed_shop_indoors_1d
+SignalTooltip: Estimated percentage of respondents who went to an “indoor market, grocery store, or pharmacy” in the past 24 hours
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#behavior-indicators
+AddedInWave: 10
+OldRevisions:
+ -  Change: This version did not include “indoor” in the prompt. Wave 10 changed this item to focus on indoor activities.
+    Signal: smoothed_shop_1d
+    AddedInWave: 4
 
 
 ---
@@ -92,42 +116,53 @@ Question: |
   In the past 24 hours, did you use public transit?
 Signal: smoothed_public_transit_1d
 SignalTooltip: Estimated proportion of respondents who “used public transit” in the past 24 hours
-Inverted: false
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#behavior-indicators
+AddedInWave: 4
 
 
 ---
 Name: Went to Work or School
 Category: Social Distancing
 Question: |
-  In the past 24 hours, did you go to work or school outside the place where you are currently staying?
-Signal: smoothed_work_outside_home_1d
-SignalTooltip: Estimated proportion of respondents who worked or went to school outside their home in the past 24 hours.
-Inverted: false
+  In the past 24 hours, did you work or go to school indoors outside the place where you are currently staying?
+Signal: smoothed_work_outside_home_indoors_1d
+SignalTooltip: Estimated percentage of respondents who worked or went to school indoors and outside their home in the past 24 hours.
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#behavior-indicators
-
+AddedInWave: 10
+OldRevisions:
+ - Change: This version did not include “indoors” in the prompt. Wave 10 changed this item to focus on indoor work and school.
+   Signal: smoothed_work_outside_home_1d
+   AddedInWave: 4
 
 ---
 Name: Spent Time with Others
 Category: Social Distancing
 Question: |
-  In the past 24 hours, did you spend time with someone who isn’t currently staying with you?
-Signal: smoothed_spent_time_1d
-SignalTooltip: Estimated proportion of respondents who “spent time with someone who isn’t currently staying with you” in the past 24 hours
-Inverted: false
+  In the past 24 hours, did you spend time indoors with someone who isn’t currently staying with you?
+Signal: smoothed_spent_time_indoors_1d
+SignalTooltip: Estimated percentage of respondents who “spent time indoors with someone who isn’t currently staying with you” in the past 24 hours 
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#behavior-indicators
+AddedInWave: 10
+OldRevisions:
+ - Change: This version did not include “indoors” in the prompt. Wave 10 changed this item to focus on indoor activities.
+   Signal: smoothed_spent_time_1d
+   AddedInWave: 4
+  
 
 
 ---
 Name: Visited Restaurant, Bar, or Cafe
 Category: Social Distancing
 Question: |
-  In the past 24 hours, did you go to a bar, restaurant, or cafe?
-Signal: smoothed_restaurant_1d
-SignalTooltip: Estimated proportion of respondents who went to a “bar, restaurant, or cafe” in the past 24 hours 
-Inverted: false
+  In the past 24 hours, did you have a meal or drink indoors at a bar, restaurant, or cafe?
+Signal: smoothed_restaurant_indoors_1d
+SignalTooltip: Estimated proportion of respondents who had a meal or drink indoors at a “bar, restaurant, or cafe” in the past 24 hours 
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#behavior-indicators
-
+AddedInWave: 10
+OldRevisions:
+ - Change: This version did not include “indoors” in the prompt. Wave 10 changed this item to focus on drinking and dining indoors, rather than take-out or outdoor dining.
+   AddedInWave: 4
+   Signal: smoothed_restaurant_1d
 
 ---
 
@@ -135,68 +170,93 @@ LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals
 Name: Attended Large Event
 Category: Social Distancing
 Question: |
-  In the past 24 hours, did you attend an event with more than 10 people?
-Signal: smoothed_large_event_1d
-SignalTooltip: Estimated proportion of respondents who “attended an event with more than 10 people” in the past 24 hours
-Inverted: false
+  In the past 24 hours, did you attend an indoor event with more than 10 people?
+Signal: smoothed_large_event_indoors_1d
+SignalTooltip: Estimated percentage of respondents who “attended an indoor event with more than 10 people” in the past 24 hours 
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#behavior-indicators
+AddedInWave: 10
+OldRevisions:
+ - Change: This version did not include “indoors” in the prompt. Wave 10 changed this item to focus on indoor events.
+   AddedInWave: 4
+   Signal: smoothed_large_event_1d
+
 
 
 ---
 Name: Traveled Out of State
 Category: Social Distancing
 Question: |
-  In the past 5 days, have you traveled outside of your state?
-Signal: smoothed_travel_outside_state_5d
-SignalTooltip: Estimated proportion of respondents who report traveling outside their state in the past 5 days.
-Inverted: false
+  In the past 7 days, have you traveled outside of your state?
+Signal: smoothed_travel_outside_state_7d
+SignalTooltip: Estimated proportion of respondents who report traveling outside their state in the past 7 days.
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#behavior-indicators
+AddedInWave: 10
+OldRevisions:
+ - Change: This version asked about the past 5 days, rather than 7. This was changed in Wave 10 to be consistent with other items on the survey.
+   Signal: smoothed_travel_outside_state_5d
+   AddedInWave: 1
+ 
+
+
 
 
 ---
 Name: Felt Anxious
 Category: Mental Health
 Question: |
-  In the past 5 days, did you feel anxious **most or all of the time**?
-Signal: smoothed_anxious_5d
-SignalTooltip: Estimated proportion of respondents who reported feeling “nervous, anxious, or on edge” for most or all of the past 5 days
-Inverted: false
+  In the past 7 days, did you feel anxious **most or all of the time**?
+Signal: smoothed_anxious_7d
+SignalTooltip: Estimated proportion of respondents who reported feeling “nervous, anxious, or on edge” for most or all of the past 7 days
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#mental-health-indicators
+AddedInWave: 10
+OldRevisions:
+ - Change: This version asked about the past 5 days, rather than 7. This was changed in Wave 10 to be consistent with other items on the survey.
+   Signal: smoothed_anxious_5d
+   AddedInWave: 4
+ 
 
 
 ---
 Name: Felt Depressed
 Category: Mental Health
 Question: |
-  In the past 5 days, did you feel depressed **most or all of the time**?
-Signal: smoothed_depressed_5d
-SignalTooltip: Estimated proportion of respondents who reported feeling depressed for most or all of the past 5 days
-Inverted: false
+  In the past 7 days, did you feel depressed **most or all of the time**?
+Signal: smoothed_depressed_7d
+SignalTooltip: Estimated proportion of respondents who reported feeling depressed for most or all of the past 7 days
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#mental-health-indicators
+AddedInWave: 10
+OldRevisions:
+ - Change: This version asked about the past 5 days, rather than 7. This was changed in Wave 10 to be consistent with other items on the survey.
+   Signal: smoothed_depressed_5d
+   AddedInWave: 4
 
 
 ---
 Name: Felt Isolated
 Category: Mental Health
 Question: |
-  In the past 5 days, did you feel isolated **most or all of the time**?
-Signal: smoothed_felt_isolated_5d
-SignalTooltip: Estimated proportion of respondents who reported feeling “isolated from others” for most or all of the past 5 days
-Inverted: false
+  In the past 7 days, did you feel isolated **most or all of the time**?
+Signal: smoothed_felt_isolated_7d
+SignalTooltip: Estimated proportion of respondents who reported feeling “isolated from others” for most or all of the past 7 days
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#mental-health-indicators
+AddedInWave: 10
+OldRevisions:
+ - Change: This version asked about the past 5 days, rather than 7. This was changed in Wave 10 to be consistent with other items on the survey.
+   Signal: smoothed_felt_isolated_7d
+   AddedInWave: 4
 
 
 ---
 
 
-Name: Worried About Becoming Ill
+Name: Worried About Becoming Sick
 Category: Mental Health
 Question: |
   Do you feel **very or somewhat worried** about becoming seriously ill from COVID-19?
 Signal: smoothed_worried_become_ill
 SignalTooltip: Estimated proportion of respondents who reported feeling very or somewhat worried that “you or someone in your immediate family might become seriously ill from COVID-19”
-Inverted: false
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#mental-health-indicators
+AddedInWave: 4
 
 
 
@@ -210,8 +270,8 @@ Question: |
   Do you feel **very or somewhat worried** about your household’s finances for the next month?
 Signal: smoothed_worried_finances
 SignalTooltip: Estimated proportion of respondents who report being very or somewhat worried about their “household’s finances for the next month”
-Inverted: false
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#mental-health-indicators
+AddedInWave: 4
 
 
 
@@ -225,8 +285,8 @@ Question: |
   In the past 14 days, did you get tested for COVID-19?
 Signal: smoothed_tested_14d
 SignalTooltip: Estimated proportion of people who were tested for COVID-19 in the past 14 days, regardless of their test result
-Inverted: false
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#testing-indicators
+AddedInWave: 4
 
 
 ---
@@ -238,8 +298,8 @@ Question: |
   If you were tested for COVID-19 in the past 14 days, was the test positive?
 Signal: smoothed_tested_positive_14d
 SignalTooltip: Estimated test positivity rate (out of 1,000) among people tested for COVID-19 in the past 14 days
-Inverted: false
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#testing-indicators
+AddedInWave: 4
 
 
 ---
@@ -248,9 +308,9 @@ LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals
 Name: Wanted a Test
 Category: Testing
 Question: |
-  In the past 14 days, did you want a COVID-19 test but did not receive one?
+  In the past 14 days, did you want a COVID-19 test but not receive one?
 Signal: smoothed_wanted_test_14d
 SignalTooltip: Estimated proportion of people who wanted to be tested for COVID-19 in the past 14 days, out of people who were not tested in that time
-Unit: per every 1,000 people who were not tested
-Inverted: false
+Unit: per 100 people who were not tested
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#testing-indicators
+AddedInWave: 4

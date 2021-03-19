@@ -18,5 +18,6 @@
     data-uk-icon="icon: question-plain"
     on:click|stopPropagation={() => {
       currentInfoSensor.set(sensor);
-    }} />
+    }}
+  />
 {/if}

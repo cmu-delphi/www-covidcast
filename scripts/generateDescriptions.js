@@ -9,6 +9,7 @@ const marked = require('marked');
 
 const isCheckMode = process.argv.includes('--check');
 const isFallBackMode = process.argv.includes('--fallback');
+const isLocalOnlyMode = process.argv.includes('--localOnly');
 
 // has to be publicly viewable
 const DOC_URL =
@@ -32,7 +33,7 @@ async function loadDoc(url) {
   const start = text.indexOf('---');
   let code = text.slice(start).trim();
   // replace * in links
-  code = code.replace(/^[*] (.*)$/gm, ' - link: "$1"');
+  code = code.replace(/^[*] (.*)$/gm, ' - "$1"');
   // console.log(code);
   // unify line endings
   return code.replace(/\r?\n/g, '\n');
@@ -59,11 +60,11 @@ function compare(current, fileName) {
 }
 
 async function handleFile(docUrl, fileName, converter) {
-  const code = (await Promise.all(docUrl.split(',').map(loadDoc))).join('\n\n');
+  const code = isLocalOnlyMode ? null : (await Promise.all(docUrl.split(',').map(loadDoc))).join('\n\n');
   if (isCheckMode) {
     return compare(code, fileName);
   }
-  if (!code && isFallBackMode && fs.existsSync(fileName)) {
+  if (!code && (isFallBackMode || isLocalOnlyMode) && fs.existsSync(fileName)) {
     converter(fs.readFileSync(fileName).toString());
     return;
   }
@@ -75,32 +76,44 @@ async function handleFile(docUrl, fileName, converter) {
   converter(code);
 }
 
+function parseObject(obj, processors = {}) {
+  const r = {};
+  Object.entries(obj).map(([key, value]) => {
+    const formattedKey = key[0].toLowerCase() + key.slice(1);
+    if (typeof processors[formattedKey] === 'function') {
+      value = processors[formattedKey](value, formattedKey, processors);
+    }
+    r[formattedKey] = value;
+  });
+  return r;
+}
+
+function parseMarkdown(value) {
+  return marked.parse(value.trim());
+}
+function parseMarkdownInline(value) {
+  return marked.parseInline(value.trim());
+}
+function parseNestedOrString(value, _key, processors) {
+  if (typeof value === 'string') {
+    return value;
+  }
+  return parseObject(value, processors);
+}
+function parseArray(value, _key, processors) {
+  return value.map((v) => parseObject(v, processors));
+}
+
 function convertDescriptions(code) {
-  const entries = [];
-  yaml.safeLoadAll(code, (doc) => {
-    const r = {};
-    Object.entries(doc).map(([key, value]) => {
-      const formattedKey = key[0].toLowerCase() + key.slice(1);
-      if (formattedKey === 'description' || formattedKey === 'credits') {
-        value = marked.parseInline(value.trim());
-      } else if (formattedKey === 'links') {
-        // expect an array with an link property
-        value = value.map((value) => marked.parseInline(value.link.trim()));
-      } else if (
-        formattedKey === 'casesOrDeathSignals' ||
-        (formattedKey === 'mapTitleText' && typeof value !== 'string') ||
-        (formattedKey === 'yAxis' && typeof value !== 'string')
-      ) {
-        // also format nested object
-        const sub = {};
-        Object.entries(value).forEach(([k, v]) => {
-          sub[k[0].toLowerCase() + k.slice(1)] = v;
-        });
-        value = sub;
-      }
-      r[formattedKey] = value;
+  const entries = yaml.loadAll(code).map((doc) => {
+    return parseObject(doc, {
+      description: parseMarkdownInline,
+      credits: parseMarkdownInline,
+      links: (v) => v.map((d) => parseMarkdownInline(d)),
+      yAxis: parseNestedOrString,
+      casesOrDeathSignals: parseNestedOrString,
+      mapTitleText: parseNestedOrString,
     });
-    entries.push(r);
   });
   fs.writeFileSync('./src/stores/descriptions.generated.json', JSON.stringify(entries, null, 2));
 }
@@ -115,31 +128,27 @@ function convertSurveyDescriptions(code) {
     questions: [],
   };
 
-  let first = true;
+  const [overview, ...rest] = yaml.loadAll(code);
 
-  yaml.safeLoadAll(code, (doc) => {
-    const r = {};
-    Object.entries(doc).map(([key, value]) => {
-      const formattedKey = key[0].toLowerCase() + key.slice(1);
-      if (formattedKey === 'overview') {
-        value = marked.parse(value.trim());
-      } else if (formattedKey === 'description' || formattedKey === 'question') {
-        value = marked.parseInline(value.trim());
-      }
-      r[formattedKey] = value;
+  function parseDoc(doc) {
+    return parseObject(doc, {
+      overview: parseMarkdown,
+      description: parseMarkdownInline,
+      question: parseMarkdownInline,
+      oldRevisions: parseArray,
+      change: parseMarkdownInline,
+      links: (v) => v.map((d) => parseMarkdownInline(d)),
     });
-    if (first) {
-      Object.assign(parsed, r);
-      first = false;
-    } else {
-      parsed.questions.push(r);
-    }
-  });
-  fs.writeFileSync('./src/modes/survey/descriptions.generated.json', JSON.stringify(parsed, null, 2));
+  }
+  Object.assign(parsed, parseDoc(overview));
+  for (const doc of rest) {
+    parsed.questions.push(parseDoc(doc));
+  }
+  fs.writeFileSync('./src/stores/questions.generated.json', JSON.stringify(parsed, null, 2));
 }
 
 function generateSurveyDescriptions() {
-  return handleFile(SURVEY_DOC_URL, './src/modes/survey/descriptions.raw.txt', convertSurveyDescriptions);
+  return handleFile(SURVEY_DOC_URL, './src/stores/questions.raw.txt', convertSurveyDescriptions);
 }
 
 if (require.main === module) {

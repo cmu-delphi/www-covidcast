@@ -24,6 +24,47 @@
   );
 </script>
 
+<ul data-testid="bubble-legend">
+  <li>
+    <div class="bubble-wrapper">
+      <div class="na" style="background:repeating-linear-gradient(-45deg, {MISSING_COLOR}, white 30%)" />
+    </div>
+    <span>NA</span>
+  </li>
+  {#each r.labels as l}
+    <li>
+      <div class="bubble-wrapper">
+        <div
+          class="bubble"
+          style="width: {$bubbleRadiusScale(l.value) * 2 * zoom}px; height: {$bubbleRadiusScale(l.value) *
+            2 *
+            zoom}px;background:
+          {transparent(
+            l.color,
+            ENCODING_BUBBLE_THEME.fillOpacity,
+          )};border-color: {l.color}"
+        />
+      </div>
+      <span>{l.label}</span>
+    </li>
+  {/each}
+  <li>
+    <div class="bubble-wrapper">
+      <div
+        style="width: {$bubbleRadiusScale(r.highValue) * 2 * zoom}px; height: {$bubbleRadiusScale(r.highValue) *
+          2 *
+          zoom}px;background:
+        {transparent(
+          r.highColor,
+          ENCODING_BUBBLE_THEME.fillOpacity,
+        )};border-color: {r.highColor}"
+        class="bubble"
+      />
+    </div>
+    <span>{r.high}</span>
+  </li>
+</ul>
+
 <style>
   ul {
     margin: 0;
@@ -64,32 +105,3 @@
     height: 2em;
   }
 </style>
-
-<ul data-testid="bubble-legend">
-  <li>
-    <div class="bubble-wrapper">
-      <div class="na" style="background:repeating-linear-gradient(-45deg, {MISSING_COLOR}, white 30%)" />
-    </div>
-    <span>NA</span>
-  </li>
-  {#each r.labels as l}
-    <li>
-      <div class="bubble-wrapper">
-        <div
-          class="bubble"
-          style="width: {$bubbleRadiusScale(l.value) * 2 * zoom}px; height: {$bubbleRadiusScale(l.value) * 2 * zoom}px;background:
-          {transparent(l.color, ENCODING_BUBBLE_THEME.fillOpacity)};border-color: {l.color}" />
-      </div>
-      <span>{l.label}</span>
-    </li>
-  {/each}
-  <li>
-    <div class="bubble-wrapper">
-      <div
-        style="width: {$bubbleRadiusScale(r.highValue) * 2 * zoom}px; height: {$bubbleRadiusScale(r.highValue) * 2 * zoom}px;background:
-        {transparent(r.highColor, ENCODING_BUBBLE_THEME.fillOpacity)};border-color: {r.highColor}"
-        class="bubble" />
-    </div>
-    <span>{r.high}</span>
-  </li>
-</ul>

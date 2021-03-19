@@ -63,6 +63,104 @@
   };
 </script>
 
+<div class="uk-container root">
+  <h2>{sensor.name} as of {formatDateShortOrdinal($currentDateObject)}</h2>
+  <p>
+    {@html sensor.description}
+  </p>
+  <HexGrid columns={maxColumn} style="gap: 2px">
+    {#each stateData as tile}
+      {#await tile.value}
+        <HexGridCell
+          x={tile.x}
+          y={tile.y}
+          classNameOuter="state-cell {params.region.propertyId === tile.propertyId ? 'selected' : ''}"
+          className="loading"
+        >
+          <span class="title">{tile.propertyId}</span>
+          <div class="vega-wrapper" />
+          <span class="value"> ? </span>
+        </HexGridCell>
+      {:then v}
+        <HexGridCell
+          x={tile.x}
+          y={tile.y}
+          classNameOuter="state-cell {params.region.propertyId === tile.propertyId ? 'selected' : ''}"
+          style="background-color: {colorScale(v)};"
+          on:click={() => currentRegion.set(tile.propertyId)}
+        >
+          <span class="title">{tile.propertyId}</span>
+          <div class="vega-wrapper">
+            <Vega {spec} data={tile.values} signals={{ currentDate: $currentDateObject }} noDataText="?" />
+          </div>
+          <span class="value"> {sensor.formatValue(v)} </span>
+        </HexGridCell>
+      {/await}
+    {/each}
+  </HexGrid>
+
+  <h3>Details {params.region.displayName}</h3>
+  <div class="content-grid">
+    <HexGrid className="grid-3-11" columns={3} style="gap: 2px" fit>
+      <RegionHexGridCell x={1} y={2} {params} />
+      <SensorHexGridCell
+        x={0}
+        y={1}
+        {params}
+        sensor={masks}
+        on:click={() => {
+          sensor = masks;
+        }}
+      />
+      <SensorHexGridCell
+        x={1}
+        y={1}
+        {params}
+        sensor={cli}
+        on:click={() => {
+          sensor = cli;
+        }}
+      />
+      <SensorHexGridCell
+        x={2}
+        y={2}
+        {params}
+        sensor={cases}
+        on:click={() => {
+          sensor = cases;
+        }}
+      />
+      <SensorHexGridCell
+        x={0}
+        y={3}
+        {params}
+        sensor={deaths}
+        on:click={() => {
+          sensor = deaths;
+        }}
+      />
+      <SensorHexGridCell
+        x={1}
+        y={3}
+        {params}
+        sensor={hospital}
+        on:click={() => {
+          sensor = hospital;
+        }}
+      />
+      <SensorHexGridCell
+        x={0}
+        y={2}
+        {params}
+        sensor={vaccine}
+        on:click={() => {
+          sensor = vaccine;
+        }}
+      />
+    </HexGrid>
+  </div>
+</div>
+
 <style>
   .root {
     display: flex;
@@ -94,93 +192,3 @@
     filter: drop-shadow(0 0 2px #888);
   }
 </style>
-
-<div class="uk-container root">
-  <h2>{sensor.name} as of {formatDateShortOrdinal($currentDateObject)}</h2>
-  <p>
-    {@html sensor.description}
-  </p>
-  <HexGrid columns={maxColumn} style="gap: 2px">
-    {#each stateData as tile}
-      {#await tile.value}
-        <HexGridCell
-          x={tile.x}
-          y={tile.y}
-          classNameOuter="state-cell {params.region.propertyId === tile.propertyId ? 'selected' : ''}"
-          className="loading">
-          <span class="title">{tile.propertyId}</span>
-          <div class="vega-wrapper" />
-          <span class="value"> ? </span>
-        </HexGridCell>
-      {:then v}
-        <HexGridCell
-          x={tile.x}
-          y={tile.y}
-          classNameOuter="state-cell {params.region.propertyId === tile.propertyId ? 'selected' : ''}"
-          style="background-color: {colorScale(v)};"
-          on:click={() => currentRegion.set(tile.propertyId)}>
-          <span class="title">{tile.propertyId}</span>
-          <div class="vega-wrapper">
-            <Vega {spec} data={tile.values} signals={{ currentDate: $currentDateObject }} noDataText="?" />
-          </div>
-          <span class="value"> {sensor.formatValue(v)} </span>
-        </HexGridCell>
-      {/await}
-    {/each}
-  </HexGrid>
-
-  <h3>Details {params.region.displayName}</h3>
-  <div class="content-grid">
-    <HexGrid className="grid-3-11" columns={3} style="gap: 2px" fit>
-      <RegionHexGridCell x={1} y={2} {params} />
-      <SensorHexGridCell
-        x={0}
-        y={1}
-        {params}
-        sensor={masks}
-        on:click={() => {
-          sensor = masks;
-        }} />
-      <SensorHexGridCell
-        x={1}
-        y={1}
-        {params}
-        sensor={cli}
-        on:click={() => {
-          sensor = cli;
-        }} />
-      <SensorHexGridCell
-        x={2}
-        y={2}
-        {params}
-        sensor={cases}
-        on:click={() => {
-          sensor = cases;
-        }} />
-      <SensorHexGridCell
-        x={0}
-        y={3}
-        {params}
-        sensor={deaths}
-        on:click={() => {
-          sensor = deaths;
-        }} />
-      <SensorHexGridCell
-        x={1}
-        y={3}
-        {params}
-        sensor={hospital}
-        on:click={() => {
-          sensor = hospital;
-        }} />
-      <SensorHexGridCell
-        x={0}
-        y={2}
-        {params}
-        sensor={vaccine}
-        on:click={() => {
-          sensor = vaccine;
-        }} />
-    </HexGrid>
-  </div>
-</div>

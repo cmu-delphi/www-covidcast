@@ -52,6 +52,34 @@
   }
 </script>
 
+{#if sensor.isCasesOrDeath}
+  <td class="right">
+    {single && single[field] != null ? sensor.formatValue(single[field]) : 'Unknown'}
+    <span class="date">{$currentDateObject.toLocaleDateString()}</span>
+  </td>
+  <td class="right">
+    {single && single[cumulativeField] != null ? sensor.formatValue(single[cumulativeField]) : 'Unknown'}
+    <span class="date">{$currentDateObject.toLocaleDateString()}</span>
+    <span class="date">(cumulative)</span>
+  </td>
+{:else}
+  <td class="right">
+    {single && single.value != null ? sensor.formatValue(single.value) : 'Unknown'}
+    <span class="date">{$currentDateObject.toLocaleDateString()}</span>
+  </td>
+{/if}
+<td class="chart" class:loading>
+  <Vega
+    {data}
+    spec={patchedSpec}
+    signals={{ currentDate: $currentDateObject, highlightTimeValue }}
+    signalListeners={['highlight']}
+    on:signal={onHighlight}
+    tooltip={VegaTooltip}
+    tooltipProps={{ sensor }}
+  />
+</td>
+
 <style>
   .right {
     text-align: right;
@@ -82,30 +110,3 @@
     color: var(--red);
   }
 </style>
-
-{#if sensor.isCasesOrDeath}
-  <td class="right">
-    {single && single[field] != null ? sensor.formatValue(single[field]) : 'Unknown'}
-    <span class="date">{$currentDateObject.toLocaleDateString()}</span>
-  </td>
-  <td class="right">
-    {single && single[cumulativeField] != null ? sensor.formatValue(single[cumulativeField]) : 'Unknown'}
-    <span class="date">{$currentDateObject.toLocaleDateString()}</span>
-    <span class="date">(cumulative)</span>
-  </td>
-{:else}
-  <td class="right">
-    {single && single.value != null ? sensor.formatValue(single.value) : 'Unknown'}
-    <span class="date">{$currentDateObject.toLocaleDateString()}</span>
-  </td>
-{/if}
-<td class="chart" class:loading>
-  <Vega
-    {data}
-    spec={patchedSpec}
-    signals={{ currentDate: $currentDateObject, highlightTimeValue }}
-    signalListeners={['highlight']}
-    on:signal={onHighlight}
-    tooltip={VegaTooltip}
-    tooltipProps={{ sensor }} />
-</td>

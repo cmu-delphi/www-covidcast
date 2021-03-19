@@ -44,29 +44,16 @@
   text-transform: uppercase;
 }
 
-.mobile-root > .uk-container.mobile-invert-header {
-  background: #232735;
-  color: white;
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-.mobile-root > .uk-container.mobile-invert {
-  background: #232735;
-  color: white;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-}
-
-.mobile-invert-header h2,
-.mobile-invert h2 {
-  color: inherit;
-}
-
 .mobile-header-line {
   text-align: center;
   position: relative;
   margin: 1rem 0.5em;
+}
+
+.mobile-header-line-bg {
+  background: #fafafc;
+  border-top: 1px solid #d3d4d8;
+  border-bottom: 1px solid #d3d4d8;
 }
 
 .mobile-header-line h2 {
@@ -109,10 +96,6 @@
   line-height: 1rem;
   text-transform: uppercase;
   vertical-align: top;
-}
-
-.mobile-th-blue {
-  color: #096dd9;
 }
 
 .mobile-th-range {
@@ -219,14 +202,14 @@
   height: 75%;
 }
 
-.chart-250,
+.chart-300,
 .chart-50 {
   position: relative;
 }
 
-.chart-250 > .vega-embed {
+.chart-300 > .vega-embed {
   width: 100%;
-  height: 250px;
+  height: 300px;
 }
 
 .chart-50 > .vega-embed {
@@ -236,7 +219,8 @@
 
 .chart-aspect-4-3 {
   position: relative;
-  padding-top: calc(60% + 30px);
+  /** padding for legend **/
+  padding-top: calc(60% + 50px);
 }
 
 .chart-aspect-4-3 > .vega-embed {
@@ -305,6 +289,11 @@
   transform: translateY(-40%);
 }
 .per100k > span {
+  font-size: 50%;
+  line-height: 1;
+}
+.per100 {
+  display: inline-block;
   font-size: 50%;
   line-height: 1;
 }

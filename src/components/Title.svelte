@@ -5,6 +5,14 @@
   export let showDate = false;
 </script>
 
+<h2 class="banner">
+  <span>
+    {$currentSensorMapTitle}
+    <InfoDialogButton sensor={$currentSensorEntry} className="info" />
+  </span>
+  {#if showDate}<span data-testid="currentdate">{$currentDateObject.toLocaleDateString()}</span>{/if}
+</h2>
+
 <style>
   .banner {
     font-size: 1rem;
@@ -22,11 +30,3 @@
     display: inline-block;
   }
 </style>
-
-<h2 class="banner">
-  <span>
-    {$currentSensorMapTitle}
-    <InfoDialogButton sensor={$currentSensorEntry} className="info" />
-  </span>
-  {#if showDate}<span data-testid="currentdate">{$currentDateObject.toLocaleDateString()}</span>{/if}
-</h2>

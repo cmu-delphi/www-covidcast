@@ -17,6 +17,11 @@
   $: stateData = fetchRegionSlice(sensor, 'state', $currentDateObject);
 </script>
 
+<div class="uk-container root">
+  <h2>{sensor.name} as of {formatDateShortOrdinal($currentDateObject)}</h2>
+  <Vega spec={stateSpec} data={stateData} className="embed" />
+</div>
+
 <style>
   .root {
     display: flex;
@@ -29,8 +34,3 @@
 
   } */
 </style>
-
-<div class="uk-container root">
-  <h2>{sensor.name} as of {formatDateShortOrdinal($currentDateObject)}</h2>
-  <Vega spec={stateSpec} data={stateData} className="embed" />
-</div>

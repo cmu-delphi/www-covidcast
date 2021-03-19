@@ -3,7 +3,12 @@
 
   export let title = '';
   export let pos = 'right';
+  export let inline = false;
 </script>
+
+<span uk-tooltip="title: {title}; pos: {pos}" class="title inline-svg-icon" class:inline>
+  {@html infoCircleIcon}
+</span>
 
 <style>
   .title {
@@ -13,8 +18,9 @@
     margin-left: 5px;
     flex: 0 0 auto;
   }
-</style>
 
-<span uk-tooltip="title: {title}; pos: {pos}" class="title inline-svg-icon">
-  {@html infoCircleIcon}
-</span>
+  .inline {
+    margin-left: 0;
+    margin-right: 5px;
+  }
+</style>

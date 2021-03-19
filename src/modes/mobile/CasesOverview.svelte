@@ -2,7 +2,7 @@
   import SurveyValue from '../survey/SurveyValue.svelte';
   import TrendIndicator from './TrendIndicator.svelte';
   import { CASES, DEATHS } from '../../stores/params';
-  import { formatDateShortWeekdayAbbr } from '../../formats';
+  import { formatDateWeekday } from '../../formats';
   import SensorUnit from './SensorUnit.svelte';
 
   /**
@@ -22,14 +22,14 @@
   $: deathTrend = fetcher.fetchWindowTrend(DEATHS, region, date);
 </script>
 
-<p>On {formatDateShortWeekdayAbbr(date.value)} the 7 day averages are:</p>
+<p>On {formatDateWeekday(date.value)}, the {CASES.valueUnit}s were:</p>
 
 <div class="mobile-two-col">
   <div class="mobile-kpi">
     <h3>Cases</h3>
     <div>
       {#await casesTrend}
-        <SurveyValue value={null} />
+        <SurveyValue value={null} loading />
       {:then d}
         <SurveyValue value={d && d.current ? d.current.value : null} />
       {/await}
@@ -42,7 +42,7 @@
     <h3>Deaths</h3>
     <div>
       {#await deathTrend}
-        <SurveyValue value={null} />
+        <SurveyValue value={null} loading />
       {:then d}
         <SurveyValue value={d && d.current ? d.current.value : null} />
       {/await}
@@ -60,9 +60,9 @@
     <h3>Cases</h3>
     <div>
       {#await casesTrend}
-        <TrendIndicator trend={null} long sensor={CASES} />
+        <TrendIndicator trend={null} long />
       {:then d}
-        <TrendIndicator trend={d} long sensor={CASES} />
+        <TrendIndicator trend={d} long />
       {/await}
     </div>
   </div>
@@ -70,9 +70,9 @@
     <h3>Deaths</h3>
     <div>
       {#await deathTrend}
-        <TrendIndicator trend={null} long sensor={DEATHS} />
+        <TrendIndicator trend={null} long />
       {:then d}
-        <TrendIndicator trend={d} long sensor={DEATHS} />
+        <TrendIndicator trend={d} long />
       {/await}
     </div>
   </div>

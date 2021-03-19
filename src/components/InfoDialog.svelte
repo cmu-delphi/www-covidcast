@@ -30,16 +30,15 @@
   });
 </script>
 
-<style>
-</style>
-
 <div id="info-dialog" data-uk-modal bind:this={dialog}>
   <div class="uk-modal-dialog uk-margin-auto-vertical" data-uk-overflow-auto>
     <button class="uk-modal-close-default" type="button" data-uk-close title="Close this popup" />
     <div class="uk-modal-header">
       <h2 class="uk-modal-title">
         {#if $currentInfoSensor}
-          {typeof $currentInfoSensor.mapTitleText === 'function' ? $currentInfoSensor.mapTitleText($signalCasesOrDeathOptions) : $currentInfoSensor.mapTitleText}
+          {typeof $currentInfoSensor.mapTitleText === 'function'
+            ? $currentInfoSensor.mapTitleText($signalCasesOrDeathOptions)
+            : $currentInfoSensor.mapTitleText}
         {:else}No Sensor selected{/if}
       </h2>
     </div>
@@ -59,10 +58,15 @@
             </li>
           {/each}
           <li>
-            <a href={`?mode=${modeByID.export.id}&sensor=${$currentInfoSensor.key}`} on:click={exportData}>Export Data</a>
+            <a href={`?mode=${modeByID.export.id}&sensor=${$currentInfoSensor.key}`} on:click={exportData}
+              >Export Data</a
+            >
           </li>
         {/if}
       </ul>
     </div>
   </div>
 </div>
+
+<style>
+</style>

@@ -7,11 +7,11 @@
   import SortColumnIndicator from './SortColumnIndicator.svelte';
   import FancyHeader from './FancyHeader.svelte';
   import TrendIndicator from './TrendIndicator.svelte';
-  import { formatDateShortNumbers } from '../../formats';
+  import { formatDateISO, formatDateShortNumbers } from '../../formats';
   import { groupByRegion, extractSparkLine } from '../../stores/params';
   import { determineTrend } from '../../stores/trend';
   import SensorValue from './SensorValue.svelte';
-  import SensorUnit from './SensorUnit.svelte';
+  import DownloadMenu from './components/DownloadMenu.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -75,6 +75,20 @@
         change: trend.change,
         value: trend.current ? trend.current.value : null,
         data: data.length > 0 ? extractSparkLine(data, date.sparkLineTimeFrame, sensor.value) : [],
+        dump: {
+          indicatorDataSource: sensor.value.id,
+          indicatorId: sensor.value.signal,
+          indicatorName: sensor.name,
+          regionId: r.propertyId,
+          regionLevel: r.level,
+          regionName: r.displayName,
+          date: formatDateISO(date.value),
+          value: trend.current ? trend.current.value : '',
+          trend: trend.trend,
+          delta: trend.delta == null || Number.isNaN(trend.delta) ? '' : trend.delta,
+          refDate: formatDateISO(trend.refDate),
+          refValue: trend.ref ? trend.ref.value : '',
+        },
       };
     }
     function loadImpl(regions) {
@@ -163,29 +177,45 @@
 
   let showAll = false;
 
+  let loading = true;
   $: {
+    loading = true;
     sortedRegions = regions.slice(0, showAll ? -1 : 10);
     loadedData.then((rows) => {
       sortedRegions = rows.sort(comparator).slice(0, showAll ? -1 : 10);
+      loading = false;
     });
   }
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
   $: spec = generateSparkLine({ highlightDate: true, domain: date.sparkLineTimeFrame.domain });
+
+  function generateFileName(sensor, region, date) {
+    let regionName = 'US States';
+    if (region.level === 'state') {
+      regionName = `${region.displayName} Counties`;
+    } else if (region.level === 'county') {
+      regionName = `${region.displayName} Neighboring Counties`;
+    }
+    return `${sensor.name}_${regionName}_${formatDateISO(date.value)}_Trends`;
+  }
+
+  $: fileName = generateFileName(sensor, region, date);
 </script>
 
-<FancyHeader>{title.title}</FancyHeader>
+<div class="uk-position-relative">
+  <FancyHeader anchor="table">{title.title}</FancyHeader>
+  <DownloadMenu {fileName} data={loadedData} absolutePos prepareRow={(row) => row.dump} />
+</div>
 
-<table class="mobile-table">
+<table class="mobile-table" class:loading>
   <thead>
     <tr>
-      <th class="mobile-th mobile-th-blue">{title.unit}</th>
-      <th class="mobile-th mobile-th-blue">Change Last 7 days</th>
-      <th class="mobile-th uk-text-right mobile-th-blue">
-        <SensorUnit {sensor} force />
-      </th>
-      <th class="mobile-th uk-text-right mobile-th-blue">
+      <th class="mobile-th">{title.unit}</th>
+      <th class="mobile-th">Change Last 7 days</th>
+      <th class="mobile-th uk-text-right">{sensor.unitShort}</th>
+      <th class="mobile-th uk-text-right">
         <span>historical trend</span>
         <div class="mobile-th-range">
           <span> {formatDateShortNumbers(date.sparkLineTimeFrame.min)} </span>
@@ -199,38 +229,40 @@
           label={title.unit}
           on:click={() => sortClick('displayName')}
           sorted={sortCriteria === 'displayName'}
-          desc={sortDirectionDesc} />
+          desc={sortDirectionDesc}
+        />
       </th>
       <th class="sort-indicator">
         <SortColumnIndicator
           label="Change Last 7 days"
           on:click={() => sortClick('delta')}
           sorted={sortCriteria === 'delta'}
-          desc={sortDirectionDesc} />
+          desc={sortDirectionDesc}
+        />
       </th>
       <th class="sort-indicator">
         <SortColumnIndicator
           label="Value"
           on:click={() => sortClick('value')}
           sorted={sortCriteria === 'value'}
-          desc={sortDirectionDesc} />
+          desc={sortDirectionDesc}
+        />
       </th>
       <th class="sort-indicator" />
     </tr>
   </thead>
   <tbody>
-    {#each sortedRegions as r}
+    {#each sortedRegions as r (r.propertyId)}
       <tr class:important={r.important}>
         <td>
-          <a
-            href="?region={r.propertyId}"
-            class="uk-link-text"
-            on:click|preventDefault={() => region.set(r, true)}>{r.displayName}</a>
+          <a href="?region={r.propertyId}" class="uk-link-text" on:click|preventDefault={() => region.set(r, true)}
+            >{r.displayName}</a
+          >
         </td>
         <td>
-          <TrendIndicator trend={r.trendObj} {sensor} block />
+          <TrendIndicator trend={r.trendObj} block />
         </td>
-        <td class="uk-text-right">
+        <td class="uk-text-right table-value">
           <SensorValue {sensor} value={r.value} />
         </td>
         <td>
@@ -241,7 +273,8 @@
               tooltip={SparkLineTooltip}
               tooltipProps={{ sensor }}
               signals={{ currentDate: date.value }}
-              noDataText="N/A" />
+              noDataText="N/A"
+            />
           </div>
         </td>
       </tr>
@@ -260,3 +293,10 @@
     </tfoot>
   {/if}
 </table>
+
+<style>
+  .table-value {
+    white-space: nowrap;
+    font-weight: 700;
+  }
+</style>

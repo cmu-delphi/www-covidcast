@@ -1,4 +1,5 @@
 import { CURRENT_DATE_HIGHLIGHT } from '../components/vegaSpecUtils';
+import { commonConfig, CREDIT } from './commonSpec';
 
 // dark2
 // has to be the rgb notation to create a pure version out of it for CSS variables manipulation
@@ -20,6 +21,16 @@ export function patchHighlightTuple(current) {
   const updateCode = current.on[0].update;
   current.on[0].update = `patchPickedItem(event) && item().${updateCode.replace(/ datum/, ' item().datum')}`;
   return current;
+}
+
+export function resetOnClearHighlighTuple(date) {
+  return (current) => {
+    patchHighlightTuple(current);
+    const match = /(unit:.*values: )\[/.exec(current.on[0].update);
+    const prefix = match ? match[0] : 'unit: "layer_1", fields: highlight_tuple_fields, values: [';
+    current.on[1].update = `{${prefix}${date.getTime()}]}`;
+    return current;
+  };
 }
 
 export function resolveHighlightedDate(e) {
@@ -48,51 +59,108 @@ const AUTO_ALIGN = {
     "(width - scale('x', datum.date_value)) < 40 ? 'right' : (scale('x', datum.date_value)) > 40 ? 'center' : 'left'",
 };
 
+function genCreditsLayer({ shift = 55 } = {}) {
+  /**
+   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
+   */
+  const layer = {
+    data: {
+      values: [
+        {
+          text: '',
+        },
+      ],
+    },
+    mark: {
+      type: 'text',
+      align: 'right',
+      baseline: 'bottom',
+      x: {
+        expr: 'width',
+      },
+      y: {
+        expr: `height + ${shift}`,
+      },
+      text: CREDIT,
+    },
+  };
+  return layer;
+}
+
+export function genDateHighlight(date, color = 'lightgrey') {
+  /**
+   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
+   */
+  const layer = {
+    data: {
+      values: [
+        {
+          date_value: date.getTime(),
+        },
+      ],
+    },
+    mark: {
+      type: 'rule',
+      tooltip: false,
+    },
+    encoding: {
+      color: {
+        value: color,
+      },
+      x: {
+        field: 'date_value',
+        type: 'temporal',
+      },
+    },
+  };
+  return layer;
+}
+
 export function generateLineChartSpec({
   width = 800,
   height = 300,
+  xTitle = null,
   domain,
+  title = null,
+  subTitle = null,
   color = COLOR,
   initialDate = null,
   valueField = 'value',
   zero = false,
   highlightRegion = false,
 } = {}) {
+  // logic to automatically add the year for week 1 and first date
+  const labelYear = `datum.label + (week(datum.value) === 1 ${
+    domain ? `|| abs(week(datum.value) - week(toDate(${domain[0]}))) <= 1` : ''
+  } ? '/' + year(datum.value) : '')`;
+  let topOffset = 20;
+  if (title) {
+    topOffset += 22 * (Array.isArray(title) ? title.length : 1);
+  }
+  if (subTitle) {
+    topOffset += 10;
+  }
   /**
    * @type {import('vega-lite').TopLevelSpec}
    */
   const spec = {
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     width,
     height,
-    padding: { left: 42, top: 20, bottom: 20, right: 15 },
+    padding: { left: 42, top: topOffset, bottom: 55, right: 15 },
     autosize: {
       type: 'none',
       contains: 'padding',
       resize: true,
     },
+    title: {
+      text: title,
+      subtitle: subTitle,
+      align: 'left',
+      anchor: 'start',
+    },
     data: {
       name: 'values',
-    },
-    encoding: {
-      x: {
-        field: 'date_value',
-        type: 'temporal',
-        axis: {
-          title: null,
-          format: '%m/%d',
-          formatType: 'cachedTime',
-          labelFontSize: 14,
-          labelOverlap: true,
-          grid: true,
-          gridDash: [4, 4],
-          tickCount: {
-            interval: 'week',
-          },
-        },
-        scale: {
-          domain,
-        },
-      },
     },
     layer: [
       {
@@ -102,6 +170,27 @@ export function generateLineChartSpec({
           point: false,
         },
         encoding: {
+          x: {
+            field: 'date_value',
+            type: 'temporal',
+            axis: {
+              title: xTitle,
+              titleFontWeight: 'normal',
+              format: '%m/%d',
+              formatType: 'cachedTime',
+              labelExpr: labelYear,
+              labelFontSize: 14,
+              labelOverlap: true,
+              grid: true,
+              gridDash: [4, 4],
+              tickCount: {
+                interval: 'week',
+              },
+            },
+            scale: {
+              domain,
+            },
+          },
           y: {
             field: valueField,
             type: 'quantitative',
@@ -131,52 +220,67 @@ export function generateLineChartSpec({
         },
       },
       {
-        selection: {
-          highlight: {
-            type: 'single',
-            empty: 'none',
-            init: initialDate
+        params: [
+          {
+            name: 'highlight',
+            select: {
+              type: 'point',
+              on: 'click, mousemove, [touchstart, touchend] > touchmove',
+              nearest: true,
+              clear: 'view:mouseout',
+              encodings: ['x'],
+            },
+            value: initialDate
               ? {
                   x: initialDate,
                 }
               : undefined,
-            on: 'click, [mousedown, window:mouseup] > mousemove, [touchstart, touchend] > touchmove',
-            nearest: true,
-            clear: false,
-            encodings: ['x'],
           },
-        },
+        ],
         mark: {
           type: 'point',
           color,
           stroke: null,
-          tooltip: true,
+          tooltip: false,
         },
         encoding: {
+          x: {
+            field: 'date_value',
+            type: 'temporal',
+          },
           y: {
             field: valueField,
             type: 'quantitative',
           },
           opacity: {
             condition: {
-              selection: 'highlight',
+              param: 'highlight',
+              empty: false,
               value: 1,
             },
             value: 0,
           },
         },
       },
+      genCreditsLayer(),
       {
         transform: [
           {
             filter: {
-              selection: 'highlight',
+              param: 'highlight',
+              empty: false,
             },
           },
           {
             sample: 1,
           },
         ],
+        encoding: {
+          x: {
+            field: 'date_value',
+            type: 'temporal',
+          },
+        },
         layer: [
           {
             mark: {
@@ -210,12 +314,7 @@ export function generateLineChartSpec({
         ],
       },
     ],
-    config: {
-      customFormatTypes: true,
-      view: {
-        stroke: null,
-      },
-    },
+    config: commonConfig,
   };
   return spec;
 }
@@ -241,7 +340,7 @@ export function generateCompareLineSpec(compare, { compareField = 'displayName',
 export function generateLineAndBarSpec(options = {}) {
   const spec = generateLineChartSpec(options);
   /**
-   * @type {import('vega-lite/build/src/spec').UnitSpec | import('vega-lite/build/src/spec').LayerSpec}
+   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
    */
   const point = spec.layer[1];
   point.mark = {
@@ -307,7 +406,7 @@ export function generateSparkLine({
    * @type {import('vega-lite').TopLevelSpec}
    */
   const spec = {
-    $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: { name: 'values' },
     height,
     padding: {
@@ -380,31 +479,31 @@ export function generateSparkLine({
                 },
                 opacity: {
                   condition: {
-                    selection: 'highlight',
+                    param: 'highlight',
+                    empty: false,
                     value: 1,
                   },
                   value: 0,
                 },
               },
-              selection: {
-                highlight: {
-                  type: 'single',
-                  empty: 'none',
-                  on: 'click, mousemove, [touchstart, touchend] > touchmove',
-                  nearest: true,
-                  clear: 'view:mouseout',
-                  encodings: ['x'],
+              params: [
+                {
+                  name: 'highlight',
+                  select: {
+                    type: 'point',
+                    on: 'click, mousemove, [touchstart, touchend] > touchmove',
+                    nearest: true,
+                    clear: 'view:mouseout',
+                    encodings: ['x'],
+                  },
                 },
-              },
+              ],
             },
           ]
         : []),
     ],
     config: {
-      customFormatTypes: true,
-      view: {
-        stroke: null,
-      },
+      ...commonConfig,
       legend: {
         disable: true,
       },

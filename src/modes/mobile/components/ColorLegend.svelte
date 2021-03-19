@@ -2,11 +2,11 @@
   import { scaleLinear } from 'd3-scale';
   import { stats } from '../../../stores';
   /**
-   * @type {import('../../../stores/constants').SensorEntry}
+   * @type {import('../../../stores/params').SensorParam}
    */
   export let sensor;
 
-  export let gradientLength = 300;
+  export let gradientLength = 280;
   export let gradientThickness = 8;
 
   export let level = 'state';
@@ -26,12 +26,28 @@
   }
 </script>
 
+<div class="legend">
+  <div
+    class="gradient"
+    style="width: {gradientLength}px; background-image: {gradient(
+      scale,
+      gradientLength,
+    )}; padding-top: {gradientThickness}px; background-size: 100% {gradientThickness}px"
+  >
+    {#each scale.ticks(5) as tick}
+      <div class="tick" data-tick={sensor.formatValue(tick)} />
+    {/each}
+  </div>
+  <slot />
+</div>
+
 <style>
   .legend {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-bottom: 1em;
+    position: relative;
   }
   .gradient {
     background-position: top;
@@ -56,13 +72,3 @@
     transform: translateX(-50%);
   }
 </style>
-
-<div class="legend">
-  <div
-    class="gradient"
-    style="width: {gradientLength}px; background-image: {gradient(scale, gradientLength)}; padding-top: {gradientThickness}px; background-size: 100% {gradientThickness}px">
-    {#each scale.ticks(5) as tick}
-      <div class="tick" data-tick={sensor.formatValue(tick)} />
-    {/each}
-  </div>
-</div>
