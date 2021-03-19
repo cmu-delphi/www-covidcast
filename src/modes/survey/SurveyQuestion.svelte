@@ -56,9 +56,9 @@
 
 <article class:loading class="uk-card uk-card-default uk-card-small question-card">
   {#if anchor}
-    <a href="#{anchor}" id={anchor} class="anchor"><span aria-hidden="true">Anchor</span></a>
+    <a href="#{anchor}" id={anchor} class="anchor"><span>Anchor</span></a>
   {/if}
-  <a href="#{question.anchor}" id={question.anchor} class="anchor"><span aria-hidden="true">Anchor</span></a>
+  <a href="#{question.anchor}" id={question.anchor} class="anchor"><span>Anchor</span></a>
   <div class="uk-card-header">
     <h3 class="uk-card-title">{question.category}</h3>
     <a href={question.learnMoreLink} class="uk-link-muted uk-text-small" title="Learn More">
@@ -159,6 +159,10 @@
     position: absolute;
     top: -160px;
     display: inline-block;
+  }
+
+  .anchor > span {
+    display: none;
   }
 
   @media only screen and (max-width: 715px) {
