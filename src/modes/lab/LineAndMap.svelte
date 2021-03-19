@@ -41,14 +41,6 @@
   }
 </script>
 
-<style>
-  .root {
-    display: flex;
-    flex-direction: column;
-    margin: 0;
-  }
-</style>
-
 <div class="uk-container root">
   <h2>{sensor.name} as of {formatDateShortOrdinal($currentDateObject)}</h2>
   <Vega
@@ -56,6 +48,15 @@
     data={nationData}
     signalListeners={['highlight']}
     signals={signalPatches}
-    on:signal={onSignal} />
+    on:signal={onSignal}
+  />
   <Vega spec={stateSpec} data={stateData} />
 </div>
+
+<style>
+  .root {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+  }
+</style>

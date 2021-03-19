@@ -120,6 +120,27 @@
   }
 </script>
 
+<div class="player container-bg container-style base-font-size {className}">
+  <button
+    bind:this={playButton}
+    aria-pressed={running ? 'true' : 'false'}
+    title={running ? 'Stop timeline to a specific date' : 'Play timeline to see how data changes over time'}
+    class="play-button"
+    on:click={toggleRunning}
+  >
+    {#if running}
+      <IoMdPause />
+    {:else}
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svelte-c8tyih">
+        <path d="M140 52v408l320-204L140 52z" />
+      </svg>
+    {/if}
+  </button>
+  <div bind:this={sliderElement} class="slider" />
+</div>
+
+<svelte:window on:keydown={onSpacePress} />
+
 <style>
   .player {
     max-width: 50em;
@@ -196,23 +217,3 @@
     display: none;
   }
 </style>
-
-<div class="player container-bg container-style base-font-size {className}">
-  <button
-    bind:this={playButton}
-    aria-pressed={running ? 'true' : 'false'}
-    title={running ? 'Stop timeline to a specific date' : 'Play timeline to see how data changes over time'}
-    class="play-button"
-    on:click={toggleRunning}>
-    {#if running}
-      <IoMdPause />
-    {:else}
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svelte-c8tyih">
-        <path d="M140 52v408l320-204L140 52z" />
-      </svg>
-    {/if}
-  </button>
-  <div bind:this={sliderElement} class="slider" />
-</div>
-
-<svelte:window on:keydown={onSpacePress} />

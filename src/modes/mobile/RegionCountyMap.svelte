@@ -1,8 +1,10 @@
 <script>
   import Vega from '../../components/Vega.svelte';
+  import { formatDateISO } from '../../formats';
   import { getStateOfCounty } from '../../maps';
   import { generateStateMapWithCountyDataSpec } from '../../specs/mapSpec';
   import { isMobileDevice, stats } from '../../stores';
+  import DownloadMenu from './components/DownloadMenu.svelte';
   import RegionMapTooltip from './RegionMapTooltip.svelte';
 
   /**
@@ -35,14 +37,25 @@
     }
     region.set(getStateOfCounty(item.datum), true);
   }
+
+  let vegaRef = null;
 </script>
 
 <div class="chart-aspect-4-3">
   <Vega
+    bind:this={vegaRef}
     {spec}
     {data}
     tooltip={RegionMapTooltip}
     tooltipProps={{ sensor, regionSetter: region.set }}
     on:click={onClickHandler}
-    eventListeners={['click']} />
+    eventListeners={['click']}
+  />
+  <DownloadMenu
+    {vegaRef}
+    {data}
+    {sensor}
+    absolutePos
+    fileName="{sensor.name}_US Counties_{formatDateISO(date.value)}"
+  />
 </div>

@@ -26,21 +26,6 @@
     .filter((d) => d.sensors.length > 0);
 </script>
 
-<style>
-  .block {
-    display: flex;
-    align-items: center;
-  }
-
-  .block .uk-form-label {
-    margin-right: 1em;
-  }
-
-  .block .uk-form-controls {
-    flex-grow: 1;
-  }
-</style>
-
 <div class="container-bg container-style uk-grid-small {className}" data-uk-grid>
   <div class="uk-width-1-1 uk-width-1-{showDate ? '3' : '2'}@m block">
     <span class="uk-form-label">Displaying</span>
@@ -51,7 +36,8 @@
             {#each sensorGroup.sensors as sensor}
               <option
                 title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
-                value={sensor.key}>
+                value={sensor.key}
+              >
                 {sensor.name}
               </option>
             {/each}
@@ -79,3 +65,18 @@
     </div>
   {/if}
 </div>
+
+<style>
+  .block {
+    display: flex;
+    align-items: center;
+  }
+
+  .block .uk-form-label {
+    margin-right: 1em;
+  }
+
+  .block .uk-form-controls {
+    flex-grow: 1;
+  }
+</style>

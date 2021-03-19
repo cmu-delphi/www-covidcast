@@ -5,12 +5,15 @@
   import AllIndicatorOverview from './AllIndicatorOverview.svelte';
   import { countyInfo, nationInfo, stateInfo } from '../../maps';
   import SurveyParameters from '../survey/SurveyParameters.svelte';
-  import { currentRegionInfo, currentSensorEntry, currentDateObject, times } from '../../stores';
+  import { currentRegionInfo, currentSensorEntry, currentDateObject, times, getScrollToAnchor } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher, CASES } from '../../stores/params';
   import './common.css';
   import RegionMapWrapper from './RegionMapWrapper.svelte';
   import FancyHeader from './FancyHeader.svelte';
   import HistoryLineChart from './HistoryLineChart.svelte';
+  import { afterUpdate } from 'svelte';
+  import { scrollIntoView } from '../../util';
+  import { modeByID } from '..';
 
   $: sensor = new SensorParam($currentSensorEntry, $times);
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
@@ -23,7 +26,40 @@
     // reactive update
     fetcher.invalidate(sensor, region, date);
   }
+
+  afterUpdate(() => {
+    scrollIntoView(getScrollToAnchor(modeByID.summary));
+  });
 </script>
+
+<div class="mobile-root">
+  <SurveyParameters sensor={sensor.value} {items} defaultItem={nationInfo} placeholder="Search by State or County">
+    <div class="grid-3-11 mobile-header-line" slot="title">
+      <h2>Explore a <span>Location</span></h2>
+    </div>
+  </SurveyParameters>
+  <div class="uk-container content-grid">
+    <div class="grid-3-11">
+      <FancyHeader invert>{region.displayName}</FancyHeader>
+      <CasesOverview {date} {region} {fetcher} />
+      <hr />
+      <h3 class="header">COVID-19 Cases by state</h3>
+      <h4 class="header">{@html CASES.description}</h4>
+      <RegionMapWrapper {region} {date} sensor={CASES} {fetcher} />
+      <hr />
+      <FancyHeader invert sub="Chart" anchor="chart">{CASES.name}</FancyHeader>
+      <div class="chart-300">
+        <HistoryLineChart sensor={CASES} {date} {region} {fetcher} />
+      </div>
+      <hr />
+      <AllIndicatorOverview {date} {region} {fetcher} />
+      <hr />
+      <HighlightIndicators {date} {region} {fetcher} />
+      <hr />
+      <IndicatorTable {date} {region} {fetcher} />
+    </div>
+  </div>
+</div>
 
 <style>
   h3.header {
@@ -45,33 +81,3 @@
     }
   }
 </style>
-
-<div class="mobile-root">
-  <SurveyParameters sensor={sensor.value} {items} placeholder="Search by State or County">
-    <div class="grid-3-11 mobile-header-line" slot="title">
-      <h2>COVIDcast <span>Overview</span></h2>
-    </div>
-  </SurveyParameters>
-  <div class="uk-container content-grid">
-    <div class="grid-3-11">
-      <CasesOverview {date} {region} {fetcher} />
-      <hr />
-      <h3 class="header">COVID-19 Cases by state</h3>
-      <h4 class="header">{CASES.value.mapTitleText()}</h4>
-    </div>
-    <RegionMapWrapper {region} {date} sensor={CASES} {fetcher} />
-    <div class="grid-3-11">
-      <hr />
-      <FancyHeader sub="Chart">Indicator</FancyHeader>
-      <div class="chart-250">
-        <HistoryLineChart sensor={CASES} {date} {region} {fetcher} />
-      </div>
-      <hr />
-      <AllIndicatorOverview {date} {region} {fetcher} />
-      <hr />
-      <HighlightIndicators {date} {region} {fetcher} />
-      <hr />
-      <IndicatorTable {date} {region} {fetcher} />
-    </div>
-  </div>
-</div>

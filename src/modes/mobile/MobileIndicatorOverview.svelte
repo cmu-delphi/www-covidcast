@@ -6,7 +6,7 @@
   import GeoTable from './GeoTable.svelte';
   import IndicatorOverview from './IndicatorOverview.svelte';
   import chevronLeftIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-left.svg';
-  import { currentMode } from '../../stores';
+  import { currentMode, getScrollToAnchor } from '../../stores';
   import { modeByID } from '..';
   import IndicatorAbout from './IndicatorAbout.svelte';
   import RegionOverview from './RegionOverview.svelte';
@@ -15,7 +15,9 @@
   import { currentRegionInfo, currentSensorEntry, currentDateObject, times } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
   import './common.css';
-  import { formatDateShortWeekdayAbbr } from '../../formats';
+  import { formatDateWeekday } from '../../formats';
+  import { afterUpdate } from 'svelte';
+  import { scrollIntoView } from '../../util';
 
   $: sensor = new SensorParam($currentSensorEntry, $times);
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
@@ -29,34 +31,40 @@
     fetcher.invalidate(sensor, region, date);
   }
 
-  function switchMode() {
-    currentMode.set(modeByID.overview);
+  $: {
+    document.title = `COVIDcast | ${sensor.name} Indicator Details`;
   }
+
+  function switchMode() {
+    currentMode.set(modeByID.summary);
+  }
+  afterUpdate(() => {
+    scrollIntoView(getScrollToAnchor(modeByID.summary));
+  });
 </script>
 
 <div class="mobile-root">
-  <SurveyParameters sensor={sensor.value} {items} placeholder="Search by State or County">
+  <SurveyParameters sensor={sensor.value} {items} defaultItem={nationInfo} placeholder="Search by State or County">
     <div class="grid-3-11 mobile-header-line" slot="title">
       <button class="mobile-back inline-svg-icon" on:click={switchMode}>
         {@html chevronLeftIcon}
       </button>
-      <h2>INDICATOR <span>Details</span></h2>
+      <h2>Explore an <span>Indicator</span></h2>
     </div>
     <IndicatorDropdown {sensor} />
   </SurveyParameters>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <p>On {formatDateShortWeekdayAbbr(date.value)} the 7 day average was:</p>
+      <FancyHeader invert sub="Summary">{sensor.name}</FancyHeader>
+      <p>On {formatDateWeekday(date.value)}, the {sensor.valueUnit} was:</p>
       <IndicatorOverview {sensor} {date} {region} {fetcher} />
       <RegionOverview {region} />
-
-      <FancyHeader sub="Map">Indicator</FancyHeader>
-    </div>
-    <RegionMapWrapper {sensor} {date} {region} {fetcher} />
-    <div class="grid-3-11">
-      <FancyHeader sub="Chart">Indicator</FancyHeader>
-
-      <div class="chart-250">
+      <hr />
+      <FancyHeader invert sub="Map" anchor="map">{sensor.name}</FancyHeader>
+      <RegionMapWrapper {sensor} {date} {region} {fetcher} />
+      <hr />
+      <FancyHeader invert sub="Chart" anchor="chart">{sensor.name}</FancyHeader>
+      <div class="chart-300">
         <HistoryLineChart {sensor} {date} {region} {fetcher} />
       </div>
     </div>
@@ -64,6 +72,7 @@
   <IndicatorAbout {sensor} />
   <div class="uk-container content-grid">
     <div class="grid-3-11">
+      <hr />
       <GeoTable {sensor} {region} {date} {fetcher} />
     </div>
   </div>

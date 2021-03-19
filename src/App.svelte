@@ -18,12 +18,6 @@
   $: currentComponent = $currentMode.component();
 </script>
 
-<style>
-  .loader {
-    flex-grow: 1;
-  }
-</style>
-
 {#await currentComponent}
   <div class="loader loading" />
 {:then value}
@@ -36,3 +30,9 @@
 {/await}
 <Disclaimer />
 <InfoDialog />
+
+<style>
+  .loader {
+    flex-grow: 1;
+  }
+</style>

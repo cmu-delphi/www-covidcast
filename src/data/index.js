@@ -2,6 +2,8 @@ import { times, currentDate, stats, currentSensor, currentLevel, MAGIC_START_DAT
 import { sensorList, sensorMap, levels, yesterday, regularSignalMetaDataGeoTypeCandidates } from '../stores/constants';
 import { get } from 'svelte/store';
 import { callMetaAPI } from './api';
+import { parseAPITime, formatAPITime } from './utils';
+import { timeDay } from 'd3-time';
 
 export * from './signals';
 export * from './fetchData';
@@ -41,7 +43,7 @@ function processMetaData(meta) {
   // Magic number of default date - if no URL params, use max date
   // available
   if (date === MAGIC_START_DATE) {
-    date = timeMap.get(sensor)[1];
+    date = formatAPITime(timeDay.offset(parseAPITime(timeMap.get(sensor)[1]), -2));
     currentDate.set(date);
   }
 

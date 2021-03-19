@@ -14,6 +14,18 @@
   export let sensor;
 </script>
 
+<div aria-label="tooltip" class="tooltip" class:hidden>
+  <h5>{formatDateShortWeekdayAbbr(item.date_value)}</h5>
+  <table>
+    <tr>
+      <th>{item.displayName}</th>
+      <td>
+        <SensorValue {sensor} value={item.value} medium />
+      </td>
+    </tr>
+  </table>
+</div>
+
 <style>
   .hidden {
     display: none;
@@ -31,15 +43,3 @@
     text-align: right;
   }
 </style>
-
-<div aria-label="tooltip" class="tooltip" class:hidden>
-  <h5>{formatDateShortWeekdayAbbr(item.date_value)}</h5>
-  <table>
-    <tr>
-      <th>{item.displayName}</th>
-      <td>
-        <SensorValue {sensor} value={item.value} />
-      </td>
-    </tr>
-  </table>
-</div>

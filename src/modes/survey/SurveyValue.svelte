@@ -7,13 +7,18 @@
 
   export let digits = 1;
 
+  export let loading = false;
+
   $: scaled = value != null && !Number.isNaN(value) ? value * factor : null;
 
-  $: hasFraction = scaled != null && digits > 0 && Math.floor(scaled) !== scaled;
-  $: base = scaled == null ? 'N/A' : Math.floor(scaled);
+  $: hasFraction = loading || (scaled != null && digits > 0 && Math.floor(scaled) !== scaled);
+  $: base = loading ? '00' : scaled == null ? 'N/A' : Math.floor(scaled);
   $: digitsPow = Math.pow(10, digits);
-  $: fraction = hasFraction ? Math.round(scaled * digitsPow) % digitsPow : 0;
+  $: fraction = !loading && hasFraction ? Math.round(scaled * digitsPow) % digitsPow : 0;
 </script>
+
+<span class="text" class:loading>{base.toLocaleString()}</span>
+{#if hasFraction}<span class="fraction"> {`.${fraction}`} </span>{/if}
 
 <style>
   .text {
@@ -41,6 +46,3 @@
     }
   }
 </style>
-
-<span class="text">{base.toLocaleString()}</span>
-{#if hasFraction}<span class="fraction"> {`.${fraction}`} </span>{/if}

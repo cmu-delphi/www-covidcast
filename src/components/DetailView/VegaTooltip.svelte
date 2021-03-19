@@ -12,30 +12,6 @@
   export let item;
 </script>
 
-<style>
-  .hidden {
-    display: none;
-  }
-
-  th,
-  td {
-    border: none;
-  }
-
-  .right {
-    text-align: right;
-  }
-
-  .area {
-    text-align: center;
-  }
-
-  h5 {
-    margin: 0;
-    padding: 0;
-  }
-</style>
-
 <div aria-label="tooltip" class="tooltip" class:hidden>
   <h5>
     {#if item.displayName}{item.displayName} on{/if}
@@ -79,3 +55,27 @@
     </tbody>
   </table>
 </div>
+
+<style>
+  .hidden {
+    display: none;
+  }
+
+  th,
+  td {
+    border: none;
+  }
+
+  .right {
+    text-align: right;
+  }
+
+  .area {
+    text-align: center;
+  }
+
+  h5 {
+    margin: 0;
+    padding: 0;
+  }
+</style>

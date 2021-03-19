@@ -5,12 +5,13 @@
   import warningIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
   import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
   import IndicatorOverview from '../mobile/IndicatorOverview.svelte';
-  import { formatDateShortWeekdayAbbr } from '../../formats';
+  import { formatDateYearWeekdayAbbr } from '../../formats';
   import IndicatorStatsLine from '../mobile/IndicatorStatsLine.svelte';
+  import IndicatorRevisions from './IndicatorRevisions.svelte';
 
   /**
    * question object
-   * @type {import('./questions').Question}
+   * @type {import('../../stores/questions').Question}
    */
   export let question;
   /**
@@ -26,9 +27,9 @@
    */
   export let fetcher;
 
-  $: sensor = question.sensorParam;
+  export let anchor = null;
 
-  $: dateRow = fetcher.fetch1Sensor1Region1DateDetails(sensor, region, date);
+  $: sensor = question.sensorParam;
   $: trend = fetcher.fetchWindowTrend(sensor, region, date);
 
   let loading = false;
@@ -45,11 +46,79 @@
   function showShareLink() {
     const fullUrl = new URL(location.href);
     fullUrl.hash = `#${question.anchor}`;
+    const t = document.createElement('div');
+    t.textContent = fullUrl;
     window.UIkit.modal.alert(`
     <p>Use the following link to jump directly to this question:</p>
-    <a href="${fullUrl}">${fullUrl}</a>`);
+    <a href="${fullUrl}">${t.innerHTML}</a>`);
   }
 </script>
+
+<article class:loading class="uk-card uk-card-default uk-card-small question-card">
+  {#if anchor}
+    <a href="#{anchor}" id={anchor} class="anchor"><span>Anchor</span></a>
+  {/if}
+  <a href="#{question.anchor}" id={question.anchor} class="anchor"><span>Anchor</span></a>
+  <div class="uk-card-header">
+    <h3 class="uk-card-title">{question.category}</h3>
+    <a href={question.learnMoreLink} class="uk-link-muted uk-text-small" title="Learn More">
+      <span class="inline-svg-icon">
+        {@html fileIcon}
+      </span><span class="header-link-text">Learn More</span></a
+    >
+    <a
+      href="#{question.anchor}"
+      class="uk-link-muted uk-text-small"
+      on:click|preventDefault={showShareLink}
+      title="Share Link"
+    >
+      <span class="inline-svg-icon">
+        {@html linkIcon}
+      </span>
+      <span class="header-link-text"> Share Link </span>
+    </a>
+  </div>
+  <div class="uk-card-body question-body">
+    {#if noData}
+      <div class="uk-alert no-data">
+        <span class="inline-svg-icon">
+          {@html warningIcon}
+        </span>
+        not enough data available
+      </div>
+    {/if}
+    <div>
+      <p class="question-question">
+        {@html question.question}
+      </p>
+    </div>
+
+    <p>
+      On
+      {formatDateYearWeekdayAbbr(date.value, true)}
+      the 7 day average of
+      <strong>{sensor.name}</strong>
+      <UIKitHint title={sensor.signalTooltip} inline />
+      was:
+    </p>
+    <IndicatorOverview {sensor} {date} {region} {fetcher}>
+      The indicator <strong>{sensor.name}</strong> was added in
+      <a href={question.addedInWave.link}>{question.addedInWave.name}</a>
+      of the Delphi survey published on {formatDateYearWeekdayAbbr(question.addedInWave.published, true)}.
+    </IndicatorOverview>
+
+    <hr />
+    <div class="chart-300">
+      <HistoryLineChart {sensor} {date} {region} {fetcher} starts={question.addedInWave.published} />
+    </div>
+
+    <IndicatorStatsLine {sensor} {date} {region} {fetcher} />
+
+    {#if question.oldRevisions}
+      <IndicatorRevisions {question} {date} {region} {fetcher} />
+    {/if}
+  </div>
+</article>
 
 <style>
   .question-card {
@@ -61,13 +130,6 @@
     border-radius: 8px 8px 0 0;
     display: flex;
     align-items: center;
-  }
-
-  h3.header {
-    font-size: 1rem;
-    font-weight: 600;
-    text-align: center;
-    margin: 0.6em 0;
   }
 
   .uk-card-header > a {
@@ -92,6 +154,17 @@
     border-radius: 3px;
   }
 
+  .anchor {
+    /** move anchor such that scrolling won't overlap with the sticky parameters */
+    position: absolute;
+    top: -160px;
+    display: inline-block;
+  }
+
+  .anchor > span {
+    display: none;
+  }
+
   @media only screen and (max-width: 715px) {
     .question-question {
       font-size: 1.15rem;
@@ -105,58 +178,3 @@
     }
   }
 </style>
-
-<article class:loading class="uk-card uk-card-default uk-card-small question-card">
-  <div class="uk-card-header">
-    <h3 class="uk-card-title">{question.category}</h3>
-    <a href={question.learnMoreLink} class="uk-link-muted uk-text-small" title="Learn More">
-      <span class="inline-svg-icon">
-        {@html fileIcon}
-      </span><span class="header-link-text">Learn More</span></a>
-    <a
-      href="#{question.anchor}"
-      id={question.anchor}
-      class="uk-link-muted uk-text-small"
-      on:click|preventDefault={showShareLink}
-      title="Share Link">
-      <span class="inline-svg-icon">
-        {@html linkIcon}
-      </span>
-      <span class="header-link-text"> Share Link </span>
-    </a>
-  </div>
-  <div class="uk-card-body question-body">
-    {#if noData}
-      <div class="uk-alert no-data">
-        <span class="inline-svg-icon">
-          {@html warningIcon}
-        </span>
-        not enough data available
-      </div>
-    {/if}
-    <div>
-      <p class="question-question">
-        {@html question.question}
-      </p>
-    </div>
-
-    <p>
-      On
-      {formatDateShortWeekdayAbbr(date.value)}
-      the 7 day average of
-      <strong>{sensor.name}</strong>
-      <UIKitHint title={question.signalTooltip} />
-      was:
-    </p>
-    <IndicatorOverview {sensor} {date} {region} {fetcher} />
-
-    <hr />
-    <h3 class="header">{sensor.name} ({sensor.unit})</h3>
-
-    <div class="chart-250">
-      <HistoryLineChart {sensor} {date} {region} {fetcher} />
-    </div>
-
-    <IndicatorStatsLine {sensor} {date} {region} {fetcher} />
-  </div>
-</article>

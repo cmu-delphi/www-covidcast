@@ -208,7 +208,7 @@
   });
 
   function jumpTo(row) {
-    currentMode.set(modeByID.old);
+    currentMode.set(modeByID.classic);
     currentRegion.set(row.id);
   }
 
@@ -234,6 +234,157 @@
     }
   }
 </script>
+
+<div class="root">
+  <Options className="options-container" />
+  <div class="search-container container-bg container-style">
+    <Search
+      placeholder="Search for a location..."
+      items={nameInfos}
+      selectedItem={$currentRegionInfo}
+      labelFieldName="displayName"
+      maxItemsToShowInList="5"
+      on:change={(e) => selectByInfo(e.detail)}
+    />
+  </div>
+
+  <div class="wrapper" class:loading>
+    <div>
+      <table class="table uk-table uk-table-responsive uk-table-divider">
+        <thead>
+          <tr>
+            <th class="uk-table-shrink">#</th>
+            <th class="uk-width-1-3">
+              <Top10SortHint
+                label="Name"
+                on:click={() => sortClick('name')}
+                sorted={sortCriteria === 'name'}
+                desc={sortDirectionDesc}
+              >
+                Name
+              </Top10SortHint>
+            </th>
+            <th class="uk-table-shrink table-pop-column">
+              <Top10SortHint
+                label="Population"
+                on:click={() => sortClick('population')}
+                sorted={sortCriteria === 'population'}
+                desc={sortDirectionDesc}
+              >
+                Pop.
+              </Top10SortHint>
+            </th>
+            <th class="uk-width-1-3" colspan={primary.isCasesOrDeath ? 3 : 2}>
+              <Top10SortHint
+                label={primary.name}
+                on:click={() => sortClick('primary', true)}
+                sorted={sortCriteria === 'primary'}
+                desc={sortDirectionDesc}
+              >
+                {primary.plotTitleText}
+                <InfoDialogButton sensor={primary} className="info" />
+              </Top10SortHint>
+            </th>
+            {#each otherSensors as s, i}
+              <th class="uk-width-1-3" colspan={s.isCasesOrDeath ? 3 : 2}>
+                <Top10SortHint
+                  label={s.name}
+                  on:click={() => sortClick(i, true)}
+                  sorted={sortCriteria === i}
+                  desc={sortDirectionDesc}
+                >
+                  {primary.plotTitleText}
+                  <InfoDialogButton sensor={s} className="info" />
+                  <button
+                    class="remove-column"
+                    title="Remove column"
+                    on:click={() => (otherSensors = otherSensors.filter((d) => d !== s))}
+                    data-uk-icon="icon: close"
+                  />
+                </Top10SortHint>
+              </th>
+            {/each}
+            {#if otherSensors.length < MAX_OTHER_SENSORS}
+              <th class="uk-table-shrink add-column-container" rowspan="2">
+                <div uk-form-custom="target: true">
+                  <select bind:value={chosenColumn}>
+                    {#each groupedSensorList as sensorGroup}
+                      <optgroup label={sensorGroup.label}>
+                        {#each sensorGroup.sensors as sensor}
+                          <option
+                            disabled={sensor.key === primary.key || otherSensors.includes(sensor)}
+                            title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
+                            value={sensor.key}
+                          >
+                            {sensor.name}
+                          </option>
+                        {/each}
+                      </optgroup>
+                    {/each}
+                  </select>
+                  <button type="button" aria-label="add column options" data-uk-icon="icon: plus" />
+                </div>
+              </th>
+            {/if}
+          </tr>
+        </thead>
+        <tbody>
+          {#each sortedRows as row, i}
+            <tr class:uk-active={row.propertyId === $currentRegion}>
+              <td>{row.rank}.</td>
+              <td>
+                <a href="?region={row.propertyId}" on:click|preventDefault={jumpTo(row)} title="Show on Map">
+                  {row.displayName}
+                </a>
+              </td>
+              <td class="table-pop-column" title="Population">
+                {row.population != null ? row.population.toLocaleString() : 'Unknown'}
+              </td>
+              <Top10Sensor
+                sensor={primary}
+                single={row.primary}
+                data={primaryData[i]}
+                domain={primaryDomain}
+                {row}
+                highlightTimeValue={$highlightTimeValue}
+                {ratioOptions}
+                {onHighlight}
+              />
+              {#each otherSensors as s, si}
+                <Top10Sensor
+                  sensor={s}
+                  single={row.others[si]}
+                  data={otherDataAndDomain[si].data[i]}
+                  domain={otherDataAndDomain[si].domain}
+                  {row}
+                  highlightTimeValue={$highlightTimeValue}
+                  {ratioOptions}
+                  {onHighlight}
+                />
+              {/each}
+            </tr>
+          {/each}
+        </tbody>
+        {#if showTopN < rows.length}
+          <tfoot>
+            <tr>
+              <td colspan="100" class="button-bar">
+                {rows.length - sortedRows.length}
+                {rows.length - sortedRows.length > 1 ? 'locations' : 'location'}
+                hidden
+                <button on:click={showMore} class="uk-button uk-button-default uk-button-small"
+                  >Show
+                  {SHOW_X_MORE}
+                  more locations</button
+                >
+              </td>
+            </tr>
+          </tfoot>
+        {/if}
+      </table>
+    </div>
+  </div>
+</div>
 
 <style>
   .root {
@@ -318,143 +469,3 @@
     }
   }
 </style>
-
-<div class="root">
-  <Options className="options-container" />
-  <div class="search-container container-bg container-style">
-    <Search
-      placeholder="Search for a location..."
-      items={nameInfos}
-      selectedItem={$currentRegionInfo}
-      labelFieldName="displayName"
-      maxItemsToShowInList="5"
-      on:change={(e) => selectByInfo(e.detail)} />
-  </div>
-
-  <div class="wrapper" class:loading>
-    <div>
-      <table class="table uk-table uk-table-responsive uk-table-divider">
-        <thead>
-          <tr>
-            <th class="uk-table-shrink">#</th>
-            <th class="uk-width-1-3">
-              <Top10SortHint
-                label="Name"
-                on:click={() => sortClick('name')}
-                sorted={sortCriteria === 'name'}
-                desc={sortDirectionDesc}>
-                Name
-              </Top10SortHint>
-            </th>
-            <th class="uk-table-shrink table-pop-column">
-              <Top10SortHint
-                label="Population"
-                on:click={() => sortClick('population')}
-                sorted={sortCriteria === 'population'}
-                desc={sortDirectionDesc}>
-                Pop.
-              </Top10SortHint>
-            </th>
-            <th class="uk-width-1-3" colspan={primary.isCasesOrDeath ? 3 : 2}>
-              <Top10SortHint
-                label={primary.name}
-                on:click={() => sortClick('primary', true)}
-                sorted={sortCriteria === 'primary'}
-                desc={sortDirectionDesc}>
-                {primary.plotTitleText}
-                <InfoDialogButton sensor={primary} className="info" />
-              </Top10SortHint>
-            </th>
-            {#each otherSensors as s, i}
-              <th class="uk-width-1-3" colspan={s.isCasesOrDeath ? 3 : 2}>
-                <Top10SortHint
-                  label={s.name}
-                  on:click={() => sortClick(i, true)}
-                  sorted={sortCriteria === i}
-                  desc={sortDirectionDesc}>
-                  {primary.plotTitleText}
-                  <InfoDialogButton sensor={s} className="info" />
-                  <button
-                    class="remove-column"
-                    title="Remove column"
-                    on:click={() => (otherSensors = otherSensors.filter((d) => d !== s))}
-                    data-uk-icon="icon: close" />
-                </Top10SortHint>
-              </th>
-            {/each}
-            {#if otherSensors.length < MAX_OTHER_SENSORS}
-              <th class="uk-table-shrink add-column-container" rowspan="2">
-                <div uk-form-custom="target: true">
-                  <select bind:value={chosenColumn}>
-                    {#each groupedSensorList as sensorGroup}
-                      <optgroup label={sensorGroup.label}>
-                        {#each sensorGroup.sensors as sensor}
-                          <option
-                            disabled={sensor.key === primary.key || otherSensors.includes(sensor)}
-                            title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
-                            value={sensor.key}>
-                            {sensor.name}
-                          </option>
-                        {/each}
-                      </optgroup>
-                    {/each}
-                  </select>
-                  <button type="button" aria-label="add column options" data-uk-icon="icon: plus" />
-                </div>
-              </th>
-            {/if}
-          </tr>
-        </thead>
-        <tbody>
-          {#each sortedRows as row, i}
-            <tr class:uk-active={row.propertyId === $currentRegion}>
-              <td>{row.rank}.</td>
-              <td>
-                <a href="?region={row.propertyId}" on:click|preventDefault={jumpTo(row)} title="Show on Map">
-                  {row.displayName}
-                </a>
-              </td>
-              <td class="table-pop-column" title="Population">
-                {row.population != null ? row.population.toLocaleString() : 'Unknown'}
-              </td>
-              <Top10Sensor
-                sensor={primary}
-                single={row.primary}
-                data={primaryData[i]}
-                domain={primaryDomain}
-                {row}
-                highlightTimeValue={$highlightTimeValue}
-                {ratioOptions}
-                {onHighlight} />
-              {#each otherSensors as s, si}
-                <Top10Sensor
-                  sensor={s}
-                  single={row.others[si]}
-                  data={otherDataAndDomain[si].data[i]}
-                  domain={otherDataAndDomain[si].domain}
-                  {row}
-                  highlightTimeValue={$highlightTimeValue}
-                  {ratioOptions}
-                  {onHighlight} />
-              {/each}
-            </tr>
-          {/each}
-        </tbody>
-        {#if showTopN < rows.length}
-          <tfoot>
-            <tr>
-              <td colspan="100" class="button-bar">
-                {rows.length - sortedRows.length}
-                {rows.length - sortedRows.length > 1 ? 'locations' : 'location'}
-                hidden
-                <button on:click={showMore} class="uk-button uk-button-default uk-button-small">Show
-                  {SHOW_X_MORE}
-                  more locations</button>
-              </td>
-            </tr>
-          </tfoot>
-        {/if}
-      </table>
-    </div>
-  </div>
-</div>

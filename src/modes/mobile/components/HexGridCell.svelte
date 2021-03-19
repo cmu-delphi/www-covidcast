@@ -13,6 +13,21 @@
   $: isDefined = x >= 0 && y >= 0;
 </script>
 
+<div
+  class="hexgrid_cell {classNameOuter}"
+  style={isDefined ? `grid-column-start: ${1 + x * 2 + (y % 2)}; grid-row-start: ${y + 1}` : ''}
+>
+  <div
+    class="hexgrid_cell_content {className}"
+    data-uk-tooltip={tooltip ? `title: ${tooltip}; pos: top` : undefined}
+    class:hexgrid_cell__border={border !== 0}
+    style="--border-size: {border}; {style}"
+    on:click
+  >
+    <slot />
+  </div>
+</div>
+
 <style>
   .hexgrid_cell {
     /* get right aspect ratio */
@@ -41,6 +56,7 @@
     bottom: -50%;
     right: 0;
     /* hexagon shape */
+    -webkit-clip-path: polygon(0% 25%, 50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%);
     clip-path: polygon(0% 25%, 50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%);
     box-sizing: border-box;
 
@@ -78,16 +94,3 @@
     transform: rotate(60deg);
   }
 </style>
-
-<div
-  class="hexgrid_cell {classNameOuter}"
-  style={isDefined ? `grid-column-start: ${1 + x * 2 + (y % 2)}; grid-row-start: ${y + 1}` : ''}>
-  <div
-    class="hexgrid_cell_content {className}"
-    data-uk-tooltip={tooltip ? `title: ${tooltip}; pos: top` : undefined}
-    class:hexgrid_cell__border={border !== 0}
-    style="--border-size: {border}; {style}"
-    on:click>
-    <slot />
-  </div>
-</div>
