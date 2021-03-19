@@ -5,12 +5,30 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { EnvironmentPlugin, DefinePlugin } = require('webpack');
-const TerserPlugin = require('terser-webpack-plugin');
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const pkg = require('./package.json');
 
 const devMode = process.env.NODE_ENV !== 'production';
 const hmr = devMode;
+
+// see https://webpack.js.org/plugins/mini-css-extract-plugin/#extracting-all-css-in-a-single-file
+function recursiveIssuer(m, c) {
+  const issuer = c.moduleGraph.getIssuer(m);
+  // For webpack@4 issuer = m.issuer
+
+  if (issuer) {
+    return recursiveIssuer(issuer, c);
+  }
+
+  const chunks = c.chunkGraph.getModuleChunks(m);
+  // For webpack@4 chunks = m._chunks
+
+  for (const chunk of chunks) {
+    return chunk.name;
+  }
+
+  return false;
+}
 
 module.exports = () => {
   return {
@@ -36,16 +54,20 @@ module.exports = () => {
     },
 
     optimization: {
-      minimizer: [new OptimizeCSSAssetsPlugin(), new TerserPlugin()],
+      minimizer: [
+        // For webpack@5 you can use the `...` syntax to extend existing minimizers (i.e. `terser-webpack-plugin`), uncomment the next line
+        `...`,
+        new CssMinimizerPlugin(),
+      ],
       splitChunks: {
-        minChunks: 2,
-        maxInitialRequests: 4,
-        maxAsyncRequests: 6,
         cacheGroups: {
-          // no splitting of css files
           styles: {
             name: 'styles',
-            test: /\.css$/,
+            type: 'css/mini-extract',
+            test: (m, c, entry = 'bundle') => m.constructor.name === 'CssModule' && recursiveIssuer(m, c) === entry,
+
+            // For webpack@4
+            // test: /\.css$/,
             chunks: 'all',
             enforce: true,
           },
@@ -105,7 +127,7 @@ module.exports = () => {
               : {
                   loader: MiniCssExtractPlugin.loader,
                   options: {
-                    esModule: false,
+                    // esModule: false,
                   },
                 },
             'css-loader',
