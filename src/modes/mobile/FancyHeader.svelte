@@ -8,7 +8,7 @@
 
 <h2 class="mobile-fancy-header" class:normal class:center class:invert>
   {#if anchor}
-    <a href="#{anchor}" id={anchor} class="anchor"><span aria-hidden="true">Anchor</span></a>
+    <a href="#{anchor}" id={anchor} class="anchor"><span>Anchor</span></a>
   {/if}
   <slot />
   {#if sub}<span>{sub}</span>{/if}
@@ -55,5 +55,8 @@
     position: absolute;
     top: -160px;
     display: inline-block;
+  }
+  .anchor > span {
+    display: none;
   }
 </style>
