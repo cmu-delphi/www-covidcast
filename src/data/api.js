@@ -63,7 +63,7 @@ export function callAPI(id, signal, level, date, region) {
  * @param {string[]} fields
  * @param {Record<string, string>} filters
  */
-export function callMetaAPI(dataSignals, fields, filters) {
+function callMetaAPIImpl(dataSignals, fields, filters) {
   const url = new URL(ENDPOINT);
   const urlGet = new URL(ENDPOINT);
   const data = new FormData();
@@ -104,9 +104,10 @@ export function callMetaAPI(dataSignals, fields, filters) {
     body: data,
   }).then((d) => d.json());
 }
+
 /**
  *
- * @param {import('.').SensorEntry[]} sensors
+ * @param {import('.').DataSensor[]} dataSignals
  * @param {string[]} fields
  * @param {Record<string, string>} filters
  */
