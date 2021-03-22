@@ -2693,6 +2693,13 @@ export function getIndicatorCoverages() {
 export function getAvailableCounties(signal, date) {
   const time = formatAPITime(date);
   return getIndicatorCoverages().then((rows) =>
-    rows.filter((row) => row.signal === signal.name && row.time_value === time),
+    // right signal, right date, a county and not a mega county
+    rows.filter(
+      (row) =>
+        row.signal === signal.name &&
+        row.time_value === time &&
+        row.geo_type === 'county' &&
+        row.geo_value.slice(2) !== '000',
+    ),
   );
 }

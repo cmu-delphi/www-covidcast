@@ -3,11 +3,18 @@
   import KPI from '../survey/KPI.svelte';
   import SignalCountyMap from './SignalCountyMap.svelte';
   import FancyHeader from '../mobile/FancyHeader.svelte';
+  import { getAvailableCounties } from '../../data/indicatorInfo';
+  import SurveyValue from '../survey/SurveyValue.svelte';
+  import { countyInfo } from '../../maps';
 
   /**
    * @type {import('../../data/indicatorInfo').IndicatorStatus}
    */
   export let signal;
+
+  $: data = getAvailableCounties(signal, signal.latest_data_date);
+
+  $: coverage = data.then((rows) => rows.length / countyInfo.length);
 </script>
 
 <article class="uk-card uk-card-default uk-card-small question-card">
@@ -17,22 +24,26 @@
   </div>
   <div class="uk-card-body question-body">
     <div class="mobile-two-col">
-      <div class="mobile-kpi">
-        <div>
-          <KPI text={formatDateISO(signal.latest_issue_date)} />
-        </div>
-        <div class="sub">latest issue date</div>
-      </div>
       <div>
         <div>
           <KPI text={formatDateISO(signal.latest_data_date)} />
         </div>
         <div class="sub">latest data date</div>
       </div>
+      <div class="mobile-kpi">
+        <div>
+          {#await coverage}
+            <SurveyValue value={null} loading />
+          {:then coverage}
+            <SurveyValue value={coverage} factor={100} />
+          {/await}
+        </div>
+        <div class="sub">% of counties available</div>
+      </div>
     </div>
 
     <FancyHeader invert sub="Map ({formatDateISO(signal.latest_data_date)})">Coverage</FancyHeader>
-    <SignalCountyMap {signal} date={signal.latest_data_date} />
+    <SignalCountyMap {signal} date={signal.latest_data_date} {data} />
   </div>
 </article>
 

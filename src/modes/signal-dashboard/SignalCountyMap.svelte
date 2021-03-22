@@ -3,7 +3,6 @@
   import { formatDateISO } from '../../formats';
   import { generateStateMapWithCountyBinaryDataSpec } from '../../specs/mapSpec';
   import DownloadMenu from '../mobile/components/DownloadMenu.svelte';
-  import { getAvailableCounties } from '../../data/indicatorInfo';
 
   /**
    * @type {{name: string}}
@@ -14,8 +13,9 @@
    */
   export let date;
 
-  $: spec = generateStateMapWithCountyBinaryDataSpec();
-  $: data = getAvailableCounties(signal, date);
+  export let data;
+
+  const spec = generateStateMapWithCountyBinaryDataSpec();
 
   let vegaRef = null;
 </script>
