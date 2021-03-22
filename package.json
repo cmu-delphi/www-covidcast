@@ -40,7 +40,7 @@
     "test:e2e": "concurrently \"http-server\" \"cypress run\"",
     "cy:open": "cypress open",
     "serve": "http-server",
-    "prepare": "echo 'dummy prepare since prepack has no dev dependencies'",
+    "prepare": "husky install",
     "prepack": "npm run build"
   },
   "devDependencies": {

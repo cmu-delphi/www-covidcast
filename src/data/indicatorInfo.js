@@ -2666,9 +2666,9 @@ const signalDashboardCoverageResponse = [
   { name: 'Quidel', date: '2021-02-27', geo_type: 'county', geo_value: '53007' },
   { name: 'Quidel', date: '2021-02-27', geo_type: 'county', geo_value: '55025' },
 ].map((r) => {
-    r.date = isoParse(r.date);
-    return r;
-  });
+  r.date = isoParse(r.date);
+  return r;
+});
 /**
  * From: //epidata/api.php?source=signal_dashboard_coverage
  * @returns {Promise<IndicatorCoverage[]>}
