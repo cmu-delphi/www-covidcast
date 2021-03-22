@@ -44,11 +44,13 @@
   let startDay = $smallMultipleTimeSpan[0];
   let endDay = $smallMultipleTimeSpan[1];
   $: {
-    if (startDay.getTime() !== $smallMultipleTimeSpan[0].getTime()) {
-      startDay = $smallMultipleTimeSpan[0];
+    const startMS = $smallMultipleTimeSpan[0].getTime() - 28 * 24 * 3600 * 1000;
+    if (startDay.getTime() !== startMS) {
+      startDay = new Date(startMS);
     }
-    if (endDay.getTime() !== $smallMultipleTimeSpan[1].getTime()) {
-      endDay = $smallMultipleTimeSpan[1];
+    const endMS = $smallMultipleTimeSpan[1].getTime() + 28 * 24 * 3600 * 1000;
+    if (endDay.getTime() !== endMS) {
+      endDay = new Date(endMS);
     }
   }
   let selections = $currentMultiSelection;
@@ -329,12 +331,14 @@
               <SensorCard
                 sensor={$currentSensorEntry}
                 date={$currentDateObject}
+                lag={sensorDetailsLag / 2}
                 selections={$currentMultiSelection}
                 {onHighlight}
                 highlightTimeValue={$highlightTimeValue} />
               <SensorCard
                 sensor={showLagDetailsForSensor}
                 date={compareSensorDate}
+                lag={-sensorDetailsLag / 2}
                 selections={$currentMultiSelection}
                 {onHighlight}
                 highlightTimeValue={$highlightTimeValue} />
