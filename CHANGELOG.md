@@ -1,3 +1,11 @@
+# Release 2.0.1
+
+Bug-fix release
+
+## Bug-fixes
+
+- [#848](https://github.com/cmu-delphi/www-covidcast/pull/848) (re: [#845](https://github.com/cmu-delphi/www-covidcast/issues/845), [#846](https://github.com/cmu-delphi/www-covidcast/issues/846), [#847](https://github.com/cmu-delphi/www-covidcast/issues/847)) Reset highlight region in line chart
+
 # Release 2.0.0
 
 This release introduces the new mobile-first based COVIDcast website with a fresh new design.
