@@ -66,7 +66,7 @@ const modes = [
     id: 'signal-dashboard',
     label: 'Signal Dashboard',
     component: () =>
-      import(/* webpackChunkName: 'm-dashboard' */ './dashboard/SignalDashboard.svelte').then((r) => r.default),
+      import(/* webpackChunkName: 'm-dashboard' */ './signal-dashboard/SignalDashboard.svelte').then((r) => r.default),
   },
 ];
 
