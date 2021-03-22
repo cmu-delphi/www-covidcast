@@ -218,7 +218,7 @@
   let highlightRegion = null;
 
   function highlight(r) {
-    highlightRegion = r ? r.id : null;
+    highlightRegion = r ? r.id : region.value.id;
   }
 
   $: {

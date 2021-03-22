@@ -48,15 +48,33 @@ function getOrInitPopper() {
     ],
   });
 
-  const update = (x = 0, y = 0, width = 0, height = 0) => {
+  const update = (id, x = 0, y = 0) => {
     bb.x = x;
     bb.y = y;
-    bb.width = width;
-    bb.height = height;
+    bb.width = 0;
+    bb.height = 0;
     popper.style.display = '';
+    const currentlyActive = popper.dataset.active;
+    if (currentlyActive !== id) {
+      // hide the old content
+      const old = currentlyActive ? popper.querySelector(`[data-id="${currentlyActive}"]`) : null;
+      if (old) {
+        old.setAttribute('hidden', '');
+      }
+      popper.dataset.active = id;
+    }
     instance.update();
   };
   const hide = () => {
+    const currentlyActive = popper.dataset.active;
+    if (currentlyActive) {
+      // hide the old content
+      const old = popper.querySelector(`[data-id="${currentlyActive}"]`);
+      if (old) {
+        old.setAttribute('hidden', '');
+      }
+      popper.dataset.active = ''; // hide active one
+    }
     if (popper.style.display !== 'none') {
       popper.style.display = 'none';
       return true;
@@ -105,8 +123,17 @@ export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}
     return undefined;
   }
   let destroyed = false;
+  /**
+   * @type {import('svelte').SvelteComponent | null}
+   */
   let tooltip = null;
+  /**
+   * @type {HTMLElement | null}
+   */
+  let tooltipElem = null;
   let extraProps = initialExtraProps;
+  // unique id for each tooltip content
+  const uniqueID = Math.random().toString().substr(2, 8);
 
   function tooltipHandler(_, event, item, value) {
     if (destroyed) {
@@ -122,7 +149,7 @@ export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}
         // ignore
         return;
       }
-      if (hide() && tooltip) {
+      if (hide(uniqueID) && tooltip) {
         updateProps(tooltip, {
           hidden: true,
           view,
@@ -130,16 +157,20 @@ export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}
       }
       return;
     }
-    update(event.clientX, event.clientY);
+    update(uniqueID, event.clientX, event.clientY);
     if (tooltip) {
+      tooltipElem.removeAttribute('hidden');
       updateProps(tooltip, {
         hidden: false,
         item: resolveDatum(item),
         view,
       });
     } else {
+      tooltipElem = popper.ownerDocument.createElement('div');
+      tooltipElem.dataset.id = uniqueID;
+      popper.appendChild(tooltipElem);
       tooltip = new svelteComponent({
-        target: popper,
+        target: tooltipElem,
         props: {
           ...extraProps,
           hidden: false,
@@ -155,6 +186,12 @@ export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}
       tooltip.$destroy();
       tooltip = null;
     }
+    if (tooltipElem) {
+      tooltipElem.remove();
+      tooltipElem = null;
+    }
+    const { hide } = getOrInitPopper();
+    hide(uniqueID);
     destroyed = true;
   };
   tooltipHandler.update = (newExtraProps) => {
