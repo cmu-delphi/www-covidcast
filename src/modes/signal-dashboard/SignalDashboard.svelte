@@ -1,5 +1,5 @@
 <script>
-  import FancyHeader from '../mobile/FancyHeader.svelte';
+  import SignalStatusTable from './SignalStatusTable.svelte';
   import '../mobile/common.css';
 </script>
 
@@ -11,8 +11,7 @@
   </div>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <FancyHeader sub="Dashboard">Signal</FancyHeader>
-      <p>TODO</p>
+      <SignalStatusTable />
     </div>
   </div>
 </div>

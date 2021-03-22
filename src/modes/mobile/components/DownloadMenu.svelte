@@ -22,6 +22,8 @@
 
   export let absolutePos = false;
 
+  export let advanced = true;
+
   function downloadString(string, mimeType, extension) {
     const blob = new Blob([string], {
       type: mimeType,
@@ -125,10 +127,12 @@
         <li><a href="?" on:click|preventDefault={downloadJSON}>Save as JSON</a></li>
         <li><a href="?" on:click|preventDefault={downloadCSV}>Save as CSV</a></li>
       {/if}
-      <li class="uk-nav-divider" />
-      <li>
-        <a href="../{modeByID.export.id}" on:click|preventDefault={exportData}>Advanced Data Export</a>
-      </li>
+      {#if advanced}
+        <li class="uk-nav-divider" />
+        <li>
+          <a href="../{modeByID.export.id}" on:click|preventDefault={exportData}>Advanced Data Export</a>
+        </li>
+      {/if}
     </ul>
   </div>
 {/if}
