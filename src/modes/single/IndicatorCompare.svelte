@@ -93,10 +93,7 @@
         type: 'point',
         tooltip: options.showTooltips,
       },
-      transform: [
-        { as: 'x_title', calculate: `"${options.xtitle} (" + timeFormat(datum.x_date, "%b %d") + "): " + datum.x` },
-        { as: 'y_title', calculate: `"${options.ytitle} (" + timeFormat(datum.y_date, "%b %d") + "): " + datum.y` },
-      ],
+
       selection: {
         highlight: {
           type: 'single',
@@ -112,13 +109,22 @@
           field: 'x',
           title: options.axisTitles ? options.xtitle : '',
           type: 'quantitative',
-          axis: { ticks: options.ticks, labels: options.tickLabels },
+          scale: {
+            zero: false,
+            domainMin: null,
+            domainMax: null,
+          },
+          axis: {
+            ticks: options.ticks,
+            labels: options.tickLabels,
+          },
         },
         y: {
           field: 'y',
           title: options.axisTitles ? options.ytitle : '',
           type: 'quantitative',
           scale: {
+            zero: false,
             domainMin: undefined,
             domainMax: undefined,
           },
@@ -161,6 +167,7 @@
         },
       },
     };
+
     let spec = chartSpec;
     spec = {
       width: width,
@@ -196,6 +203,8 @@
             },
           ],
         },
+        { as: 'x_title', calculate: `"${options.xtitle} (" + timeFormat(datum.x_date, "%b %d") + "): " + datum.x` },
+        { as: 'y_title', calculate: `"${options.ytitle} (" + timeFormat(datum.y_date, "%b %d") + "): " + datum.y` },
       ],
       layer: [
         chartSpec,
@@ -252,17 +261,66 @@
             },
           ],
           layer: [
+            // Draw hairs for the snake: interesting, but mostly just adds noise.
+            // {
+            //   mark: {
+            //     type: 'rule',
+            //     opacity: 0.2,
+            //   },
+            //   encoding: {
+            //     x: { field: 'x', type: 'quantitative' },
+            //     y: { field: 'y', type: 'quantitative' },
+            //     x2: { field: 'xmean', type: 'quantitative' },
+            //     y2: { field: 'ymean', type: 'quantitative' },
+            //   },
+            // },
+
+            // Draw the "snake" line, a 7-day moving average of the points.
             {
+              // Get next (or previous?) point along mean, to draw rule.
               transform: [
                 { window: [{ op: 'lag', param: 1, field: 'xmean', as: 'nextx' }] },
                 { window: [{ op: 'lag', param: 1, field: 'ymean', as: 'nexty' }] },
               ],
-              mark: { type: 'rule', color: 'gray', opacity: 0.7 },
+              mark: {
+                type: 'rule',
+                color: 'gray',
+                opacity: 0.7,
+              },
+              selection: {
+                highlightSnake: {
+                  type: 'single',
+                  empty: 'none',
+                  on: 'mouseover',
+                  clear: 'mouseout',
+                },
+              },
               encoding: {
-                x: { field: 'nextx', type: 'quantitative' },
-                y: { field: 'nexty', type: 'quantitative' },
-                x2: { field: 'xmean', type: 'quantitative' },
-                y2: { field: 'ymean', type: 'quantitative' },
+                x2: { field: 'nextx', type: 'quantitative' },
+                y2: { field: 'nexty', type: 'quantitative' },
+                x: { field: 'xmean', type: 'quantitative' },
+                y: { field: 'ymean', type: 'quantitative' },
+                tooltip: options.showTooltips
+                  ? [
+                      {
+                        field: 'x_title',
+                        title: ' ',
+                      },
+                      {
+                        field: 'y_title',
+                        title: '  ', // must be unique?
+                      },
+                    ]
+                  : false,
+                opacity: {
+                  condition: [
+                    {
+                      selection: 'highlightSnake',
+                      value: 1,
+                    },
+                  ],
+                  value: 0.7,
+                },
                 size: {
                   field: 'date_value',
                   type: 'temporal',
@@ -272,12 +330,14 @@
                         symbolType: 'square',
                         symbolStrokeWidth: 3,
                         symbolFillColor: 'gray',
-                        title: 'Date trail',
+                        title: 'Date',
                       }
                     : null,
                 },
               },
             },
+
+            // Draw the linear regression line.
             {
               transform: [
                 {
@@ -298,17 +358,23 @@
                 //   // type: 'quantitative',
                 //   // scale: { scheme: 'orangered' },
                 // },
+                tooltip: true,
               },
               encoding: {
                 x: {
                   field: 'x',
                   type: 'quantitative',
+                  scale: {
+                    domainMin: undefined,
+                    domainMax: undefined,
+                  },
                 },
                 y: {
                   field: 'y',
                   type: 'quantitative',
                   scale: {
                     domainMin: undefined,
+                    domainMax: undefined,
                   },
                 },
                 // opacity: {
