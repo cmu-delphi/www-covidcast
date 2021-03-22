@@ -4,7 +4,7 @@ import { levelMegaCounty, levels } from '../../stores/constants';
 import { ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME, MAP_THEME, MISSING_COLOR } from '../../theme';
 import AMapBoxWrapper from './AMapBoxWrapper';
 import { BubbleEncoding, ChoroplethEncoding, SpikeEncoding } from './encodings';
-import { addCityLayers, addStateLabelLayer, L } from './layers';
+import { addCityLayers, addStateLabelLayer, L, toBorderLayer } from './layers';
 import { toBorderSource, S } from './sources';
 
 const geoJsonSources = loadSources();
@@ -86,8 +86,10 @@ export default class USMapBoxWrapper extends AMapBoxWrapper {
 
     this.addFillLevelLayer(levelMegaCounty.id);
     this.levels.forEach((level) => {
-      this.addFillLevelLayer(level);
+      this.addFillLevelLayer(level, level !== 'county');
     });
+    this.addBorderLevelLayer('state'); // for county
+
     this.addHoverLevelLayer(levelMegaCounty.id);
     this.levels.forEach((level) => {
       this.addHoverLevelLayer(level);
@@ -99,5 +101,11 @@ export default class USMapBoxWrapper extends AMapBoxWrapper {
 
     addCityLayers(map);
     addStateLabelLayer(map);
+  }
+
+  getAllEncodingLayers() {
+    const r = super.getAllEncodingLayers();
+    r.push(toBorderLayer('state'));
+    return r;
   }
 }

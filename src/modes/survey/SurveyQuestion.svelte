@@ -1,169 +1,77 @@
 <script>
-  import Vega from '../../components/Vega.svelte';
   import UIKitHint from '../../components/UIKitHint.svelte';
   import fileIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/file.svg';
   import linkIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/link.svg';
-  // import userEditIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/user-edit.svg';
-  import calendarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/regular/calendar.svg';
   import warningIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
-  import { createTimeSeriesSpec, loadTimeSeriesData } from './timeSeries';
-  import { determineTrend, findDateRow, findMaxRow, findMinRow } from './trend';
-
-  import { formatDateShortAbbr } from '../../formats';
-  import { formatTrend, formatSampleSize, formatStdErr } from './format';
-  import SurveyTrend from './SurveyTrend.svelte';
-  import SurveyValue from './SurveyValue.svelte';
-  import SurveyTooltip from './SurveyTooltip.svelte';
-  import ShapeIcon from '../../components/ShapeIcon.svelte';
+  import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
+  import IndicatorOverview from '../mobile/IndicatorOverview.svelte';
+  import { formatDateYearWeekdayAbbr } from '../../formats';
+  import IndicatorStatsLine from '../mobile/IndicatorStatsLine.svelte';
+  import IndicatorRevisions from './IndicatorRevisions.svelte';
 
   /**
    * question object
-   * @type {import('./questions').Question}
+   * @type {import('../../stores/questions').Question}
    */
   export let question;
-
   /**
-   * date to highlight
-   * @type {Date}
+   * @type {import("../../stores/params").DateParam}
    */
   export let date;
-
   /**
-   * @type {import('./timeSeries').Params}
+   * @type {import("../../stores/params").RegionParam}
    */
-  export let params;
+  export let region;
+  /**
+   * @type {import("../../stores/params").DataFetcher}
+   */
+  export let fetcher;
 
-  $: data = loadTimeSeriesData(question, params);
-  $: spec = createTimeSeriesSpec(params);
+  export let anchor = null;
 
-  let loading = true;
+  $: sensor = question.sensorParam;
+  $: trend = fetcher.fetchWindowTrend(sensor, region, date);
+
+  let loading = false;
   let noData = false;
-  let maxDate = null;
-  let refDate = null;
-
-  async function deriveData(dataPromise, date) {
-    loading = true;
+  $: {
     noData = false;
-    const data = (await dataPromise) || [];
-    loading = false;
-    noData = data.length === 0;
-    const dateRow = findDateRow(date, data);
-    const trend = determineTrend(date, data, dateRow);
-    const max = question.inverted ? findMinRow(data) : findMaxRow(data);
-    maxDate = max ? max.date_value : null;
-    refDate = trend.refDate;
-
-    return {
-      data,
-      row: dateRow,
-      trend,
-      max,
-    };
+    loading = true;
+    trend.then((t) => {
+      loading = false;
+      noData = t.min == null; // no min found no data at all
+    });
   }
-
-  $: summary = deriveData(data, date);
 
   function showShareLink() {
     const fullUrl = new URL(location.href);
     fullUrl.hash = `#${question.anchor}`;
+    const t = document.createElement('div');
+    t.textContent = fullUrl;
     window.UIkit.modal.alert(`
     <p>Use the following link to jump directly to this question:</p>
-    <a href="${fullUrl}">${fullUrl}</a>`);
+    <a href="${fullUrl}">${t.innerHTML}</a>`);
   }
 </script>
 
-<style>
-  .question-card {
-    margin-bottom: 2em;
-    border-radius: 8px;
-  }
-  .uk-card-header {
-    background: #f2f2f2;
-    border-radius: 8px 8px 0 0;
-    display: flex;
-    align-items: center;
-  }
-
-  .uk-card-header > a {
-    margin-left: 1em;
-  }
-  .uk-card-title {
-    flex-grow: 1;
-    margin: 0;
-  }
-  .question-body > :global(.vega-embed) {
-    display: block;
-    height: 7em;
-  }
-  .question-question {
-    font-style: italic;
-    font-size: 2rem;
-  }
-
-  .question-summary {
-    margin-top: 1.5em;
-    margin-bottom: 2em;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
-  }
-  .question-summary > div {
-    flex: 1 1 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    line-height: 1.5;
-    margin: 0 0.25em;
-    text-align: center;
-  }
-  .question-kpi {
-    height: 5rem;
-    display: flex;
-  }
-  .question-kpi-title {
-    white-space: nowrap;
-  }
-  .question-unit {
-    flex-grow: 1;
-    margin-bottom: 0.5em;
-  }
-
-  .no-data {
-    letter-spacing: 0.75px;
-    text-transform: uppercase;
-    color: #ffffff;
-    background: #f2994a;
-    border-radius: 3px;
-  }
-
-  @media only screen and (max-width: 715px) {
-    .question-question {
-      font-size: 1.15rem;
-    }
-
-    .header-link-text {
-      display: none;
-    }
-
-    .question-summary > div {
-      margin: 0 1em;
-    }
-  }
-</style>
-
 <article class:loading class="uk-card uk-card-default uk-card-small question-card">
+  {#if anchor}
+    <a href="#{anchor}" id={anchor} class="anchor"><span>Anchor</span></a>
+  {/if}
+  <a href="#{question.anchor}" id={question.anchor} class="anchor"><span>Anchor</span></a>
   <div class="uk-card-header">
     <h3 class="uk-card-title">{question.category}</h3>
     <a href={question.learnMoreLink} class="uk-link-muted uk-text-small" title="Learn More">
       <span class="inline-svg-icon">
         {@html fileIcon}
-      </span><span class="header-link-text">Learn More</span></a>
+      </span><span class="header-link-text">Learn More</span></a
+    >
     <a
       href="#{question.anchor}"
-      id={question.anchor}
       class="uk-link-muted uk-text-small"
       on:click|preventDefault={showShareLink}
-      title="Share Link">
+      title="Share Link"
+    >
       <span class="inline-svg-icon">
         {@html linkIcon}
       </span>
@@ -184,75 +92,89 @@
         {@html question.question}
       </p>
     </div>
-    <h4>
-      {question.name}
-      <UIKitHint title={question.signalTooltip} />
-    </h4>
-    <Vega
-      {spec}
-      {data}
-      signals={{ currentDate: date, maxDate, refDate }}
-      tooltip={SurveyTooltip}
-      tooltipProps={{ question }} />
-    <div class="uk-text-center uk-text-italic">
-      {#await summary then s}
-        {s.row ? `based on ${formatSampleSize(s.row)} survey responses with a standard error of ${formatStdErr(s.row.stderr)}` : ''}
-      {/await}
+
+    <p>
+      On
+      {formatDateYearWeekdayAbbr(date.value, true)}
+      the 7 day average of
+      <strong>{sensor.name}</strong>
+      <UIKitHint title={sensor.signalTooltip} inline />
+      was:
+    </p>
+    <IndicatorOverview {sensor} {date} {region} {fetcher}>
+      The indicator <strong>{sensor.name}</strong> was added in
+      <a href={question.addedInWave.link}>{question.addedInWave.name}</a>
+      of the Delphi survey published on {formatDateYearWeekdayAbbr(question.addedInWave.published, true)}.
+    </IndicatorOverview>
+
+    <hr />
+    <div class="chart-300">
+      <HistoryLineChart {sensor} {date} {region} {fetcher} starts={question.addedInWave.published} />
     </div>
-    <div class="question-summary">
-      <div>
-        <div class="question-kpi">
-          {#await summary}
-            <SurveyTrend trend={null} />
-          {:then s}
-            <SurveyTrend trend={s.trend ? s.trend.trend : null} />
-          {/await}
-        </div>
-        <div class="uk-text-bold question-kpi-title">
-          7-day trend
-          <UIKitHint title="Tracks the variability of signal movenment" />
-        </div>
-        <div class="question-unit">
-          {#await summary}N/A{:then s}{s.trend ? `${formatTrend(s.trend.change)} since` : 'N/A'}{/await}
-        </div>
-        <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(refDate)}
-        </div>
-      </div>
-      <div>
-        <div class="question-kpi">
-          {#await summary}
-            N/A
-          {:then s}
-            <SurveyValue value={s.row ? s.row.value : null} />
-          {/await}
-        </div>
-        <div class="uk-text-bold question-kpi-title">
-          <ShapeIcon shape="circle" color="#c00" />
-          Current count
-        </div>
-        <div class="question-unit">{question.unit}</div>
-        <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(date)}
-        </div>
-      </div>
-      <div>
-        <div class="question-kpi">
-          {#await summary}
-            ?
-          {:then s}
-            <SurveyValue value={s.max ? s.max.value : null} />
-          {/await}
-        </div>
-        <div class="uk-text-bold question-kpi-title">
-          <ShapeIcon shape="diamond" color="gray" />
-          {question.inverted ? 'Lowest count' : 'Highest count'}
-        </div>
-        <div class="question-unit">{question.unit}</div>
-        <div class="block-date">
-          <span class="inline-svg-icon">{@html calendarIcon}</span>{formatDateShortAbbr(maxDate)}
-        </div>
-      </div>
-    </div>
+
+    <IndicatorStatsLine {sensor} {date} {region} {fetcher} />
+
+    {#if question.oldRevisions}
+      <IndicatorRevisions {question} {date} {region} {fetcher} />
+    {/if}
   </div>
 </article>
+
+<style>
+  .question-card {
+    margin-bottom: 2em;
+    border-radius: 8px;
+  }
+  .uk-card-header {
+    background: #f2f2f2;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .uk-card-header > a {
+    margin-left: 1em;
+  }
+  .uk-card-title {
+    flex-grow: 1;
+    margin: 0;
+  }
+
+  .question-question {
+    font-style: italic;
+    font-size: 2rem;
+    line-height: 2.5rem;
+  }
+
+  .no-data {
+    letter-spacing: 0.75px;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: #f2994a;
+    border-radius: 3px;
+  }
+
+  .anchor {
+    /** move anchor such that scrolling won't overlap with the sticky parameters */
+    position: absolute;
+    top: -160px;
+    display: inline-block;
+  }
+
+  .anchor > span {
+    display: none;
+  }
+
+  @media only screen and (max-width: 715px) {
+    .question-question {
+      font-size: 1.15rem;
+      line-height: 1.5rem;
+      font-weight: 600;
+      font-style: normal;
+    }
+
+    .header-link-text {
+      display: none;
+    }
+  }
+</style>

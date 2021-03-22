@@ -16,6 +16,12 @@
   }
 </script>
 
+<div class="month-container">
+  {#each visibleMonth.weeks as week (week.id)}
+    <Week days={week.days} {selected} {highlighted} {shouldShakeDate} {direction} on:dateSelected />
+  {/each}
+</div>
+
 <style>
   .month-container {
     width: 100%;
@@ -25,9 +31,3 @@
     -ms-grid-rows: 1fr;
   }
 </style>
-
-<div class="month-container">
-  {#each visibleMonth.weeks as week (week.id)}
-    <Week days={week.days} {selected} {highlighted} {shouldShakeDate} {direction} on:dateSelected />
-  {/each}
-</div>

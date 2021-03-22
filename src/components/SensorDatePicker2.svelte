@@ -5,7 +5,7 @@
   import calendarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/calendar.svg';
   import { parseAPITime } from '../data';
   import { times } from '../stores';
-  import { formatDateShortAbbr } from '../formats';
+  import { formatDateShortWeekdayAbbr } from '../formats';
   import { timeDay } from 'd3-time';
 
   /**
@@ -31,6 +31,48 @@
   }
 </script>
 
+<div class="date-picker {className}">
+  <button
+    class="arrow-button picker-button arrow-left"
+    title="Go to the previous day"
+    disabled={value == null || startEndDates.length === 0 || value <= startEndDates[0]}
+    on:click={() => (value = timeDay.offset(value, -1))}
+  >
+    {@html arrowLeftIcon}
+  </button>
+  {#if value != null && startEndDates.length !== 0}
+    <Datepicker
+      offset={11}
+      bind:selected={value}
+      start={startEndDates[0]}
+      end={startEndDates[1]}
+      formattedSelected={formatDateShortWeekdayAbbr(value)}
+    >
+      <button aria-label="selected date" class="selected-date picker-button" on:>
+        <span class="selected-date-icon">
+          {@html calendarIcon}
+        </span>
+        <span>{formatDateShortWeekdayAbbr(value)}</span>
+      </button>
+    </Datepicker>
+  {:else}
+    <button aria-label="selected date" class="selected-date picker-button" disabled>
+      <span class="inline-svg-icon">
+        {@html calendarIcon}
+      </span>
+      <span>{formatDateShortWeekdayAbbr(value)}</span>
+    </button>
+  {/if}
+  <button
+    class="arrow-button picker-button arrow-right"
+    title="Go to the next day"
+    disabled={value == null || startEndDates.length === 0 || value >= startEndDates[1]}
+    on:click={() => (value = timeDay.offset(value, 1))}
+  >
+    {@html arrowRightIcon}
+  </button>
+</div>
+
 <style>
   .date-picker {
     display: flex;
@@ -43,54 +85,62 @@
     border: none;
     letter-spacing: 3px;
     background: none;
-    font-size: 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 13px;
+    line-height: 1;
+    white-space: nowrap;
   }
-  .arrow {
+
+  .arrow-button {
+    flex: 0 0 auto;
+    box-sizing: content-box;
     background: none;
     border: none;
-    width: 1.2em;
-    padding: 0;
-    margin: 0;
-  }
-  .wide {
-    margin-right: 2em;
+    padding: 13px;
+    width: 14px;
+    height: 15px;
   }
 
-  .arrow[disabled] {
-    opacity: 0.5;
+  .arrow-left {
+    margin-right: 10px; /* 36 - 13*2 */
+  }
+  .arrow-right {
+    margin-left: 10px; /* 36 - 13*2 */
+  }
+
+  .picker-button {
+    border-radius: 20px;
+  }
+
+  .picker-button:hover,
+  .picker-button:focus,
+  .picker-button:active {
+    outline: none !important;
+    border: none !important;
+    background: rgba(211, 212, 216, 0.25);
+  }
+
+  .picker-button[disabled] {
     cursor: not-allowed;
   }
-</style>
 
-<div class="date-picker {className}">
-  <button
-    class="arrow wide"
-    disabled={value == null || startEndDates.length === 0 || value.valueOf() === startEndDates[1].valueOf()}
-    title="Go to the latest date for which data is available"
-    on:click={() => (value = startEndDates[1])}>
-    {@html calendarIcon}
-  </button>
-  <button
-    class="arrow"
-    title="Go to the previous day"
-    disabled={value == null || startEndDates.length === 0 || value <= startEndDates[0]}
-    on:click={() => (value = timeDay.offset(value, -1))}>
-    {@html arrowLeftIcon}
-  </button>
-  {#if value != null && startEndDates.length !== 0}
-    <Datepicker
-      bind:selected={value}
-      start={startEndDates[0]}
-      end={startEndDates[1]}
-      formattedSelected={formatDateShortAbbr(value)}>
-      <button aria-label="selected date" class="selected-date" on:>{formatDateShortAbbr(value)}</button>
-    </Datepicker>
-  {:else}<button aria-label="selected date" class="selected-date" disabled>{formatDateShortAbbr(value)}</button>{/if}
-  <button
-    class="arrow"
-    title="Go to the next day"
-    disabled={value == null || startEndDates.length === 0 || value >= startEndDates[1]}
-    on:click={() => (value = timeDay.offset(value, 1))}>
-    {@html arrowRightIcon}
-  </button>
-</div>
+  .selected-date-icon {
+    width: 14px;
+    display: inline-block;
+    margin-right: 0.5em;
+  }
+
+  @media only screen and (max-width: 715px) {
+    .arrow-button {
+      display: none;
+    }
+    .selected-date-icon {
+      width: 12px;
+    }
+    .selected-date {
+      letter-spacing: initial;
+      font-size: 0.75rem;
+    }
+  }
+</style>

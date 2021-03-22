@@ -19,6 +19,8 @@
   "[yaml]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "eslint.enable": true,
+  "[svelte]": {
+    "editor.defaultFormatter": "svelte.svelte-vscode"
+  },
   "eslint.validate": ["javascript", "svelte"]
 }

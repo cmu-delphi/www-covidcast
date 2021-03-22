@@ -1,3 +1,34 @@
+# Release 2.0.0
+
+This release introduces the new mobile-first based COVIDcast website with a fresh new design.
+
+# Release 1.12.4
+
+This release improves the UX of the survey dashboard for both desktop and mobile experience.
+
+## New Features
+
+- [#724](https://github.com/cmu-delphi/www-covidcast/pull/724), [#717](https://github.com/cmu-delphi/www-covidcast/pull/717) Survey dashboards improvements
+
+## Bug-fixes
+
+- [#719](https://github.com/cmu-delphi/www-covidcast/pull/719) (re: [#718](https://github.com/cmu-delphi/www-covidcast/issues/718)) fix Export Data bug
+
+# Release 1.12.3
+
+## Signal Changes
+
+- Add "Vaccine Acceptance" signal to map and survey dashboard
+
+## New Features
+
+- [#709](https://github.com/cmu-delphi/www-covidcast/pull/709), [#710](https://github.com/cmu-delphi/www-covidcast/pull/710), [#708](https://github.com/cmu-delphi/www-covidcast/pull/708) Improve loading performance especially for the survey dashboard
+- [#712](https://github.com/cmu-delphi/www-covidcast/pull/712) Improve map style
+
+## Bug-fixes
+
+- [#713](https://github.com/cmu-delphi/www-covidcast/pull/713) fix trend color for decreasing trends
+
 # Release 1.12.1
 
 Bugfix release for changed signal

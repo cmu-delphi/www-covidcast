@@ -14,6 +14,12 @@
   $: path = paths[shape] || paths.circle;
 </script>
 
+<span class="shape-icon">
+  <svg viewBox="0 0 2 2" style="fill: {color}">
+    <path d={path} />
+  </svg>
+</span>
+
 <style>
   .shape-icon {
     display: inline-flex;
@@ -25,9 +31,3 @@
     width: 0.5em;
   }
 </style>
-
-<span class="shape-icon">
-  <svg viewBox="0 0 2 2" style="fill: {color}">
-    <path d={path} />
-  </svg>
-</span>

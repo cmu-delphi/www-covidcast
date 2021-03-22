@@ -12,6 +12,12 @@
    */
   export let filterItem = null;
 
+  /**
+   * custom sorter for items
+   * @type {(itemA, itemB) => number}
+   */
+  export let sortItem = null;
+
   // field of each item that's used for the labels in the list
   export let labelFieldName = undefined;
 
@@ -21,6 +27,7 @@
     }
     return labelFieldName ? item[labelFieldName] : item;
   };
+  export let keywordFunction = labelFunction;
   export let colorFieldName = undefined;
 
   export let selectFirstIfEmpty = false;
@@ -40,6 +47,8 @@
   // add the title to the HTML input
   export let title = undefined;
 
+  export let icon = 'search';
+
   // selected item state
   export let selectedItem = undefined;
   /**
@@ -48,6 +57,11 @@
   export let selectedItems = null;
   $: multiple = selectedItems != null;
   export let maxSelections = Number.POSITIVE_INFINITY;
+
+  /**
+   * enable modern styling
+   */
+  export let modern = false;
 
   let text;
   let filteredTextLength = 0;
@@ -90,7 +104,7 @@
 
   $: listItems = items.map((item) => ({
     // keywords representation of the item
-    keywords: labelFunction(item).toLowerCase().trim(),
+    keywords: keywordFunction(item).toLowerCase().trim(),
     // item label
     label: labelFunction(item),
     // store reference to the origial item
@@ -99,6 +113,9 @@
   $: selectedLabelLookup = new Set((selectedItems || []).map((s) => labelFunction(s)));
 
   function limitListItems(items) {
+    if (sortItem) {
+      items = items.slice().sort((a, b) => sortItem(a.item, b.item));
+    }
     if (maxItemsToShowInList <= 0 || items.length < maxItemsToShowInList) {
       return items;
     }
@@ -243,6 +260,11 @@
 
   function onInputClick() {
     resetListToAllItemsAndOpen();
+
+    if (modern) {
+      // select the whole field upon click
+      input.select();
+    }
   }
 
   function onEsc(e) {
@@ -326,6 +348,115 @@
   }
 </script>
 
+<div
+  class="{className} uk-search search-box"
+  class:uk-search-default={!multiple}
+  class:search-multiple={multiple}
+  class:modern
+  on:click={onContainerClick}
+>
+  {#if !multiple}
+    <span class="uk-search-icon search-icon" class:modern data-uk-icon="icon: {icon}" />
+    <input
+      class="uk-search-input"
+      class:modern
+      class:modern__small={modern === 'small'}
+      {placeholder}
+      {name}
+      {disabled}
+      {title}
+      aria-label={placeholder}
+      bind:this={input}
+      bind:value={text}
+      on:input={onInput}
+      on:focus={onFocus}
+      on:keydown={onKeyDown}
+      on:click={onInputClick}
+      on:keypress={onKeyPress}
+    />
+    <button
+      class="uk-search-icon clear-button"
+      class:hidden={!text}
+      class:modern
+      on:click={onResetItem}
+      title="Clear Search Field"
+      data-uk-icon="icon: close"
+    />
+  {:else}
+    <span class="uk-search-icon search-multiple-icon search-icon" data-uk-icon="icon: {icon}" class:modern />
+
+    {#each selectedItems as selectedItem}
+      <div class="search-tag" style="border-color: {colorFieldName ? selectedItem[colorFieldName] : undefined}">
+        <span>{labelFunction(selectedItem)}</span>
+        <button
+          class=""
+          data-uk-icon="icon: close"
+          on:click={() => removeItem(selectedItem)}
+          title="Remove selectecd item"
+        />
+      </div>
+    {/each}
+
+    {#if !multiple || selectedItems.length < maxSelections}
+      <input
+        class="uk-search-input search-multiple-input"
+        class:modern
+        class:modern__small={modern === 'small'}
+        {placeholder}
+        {name}
+        {disabled}
+        {title}
+        aria-label={placeholder}
+        bind:this={input}
+        bind:value={text}
+        on:input={onInput}
+        on:focus={onFocus}
+        on:keydown={onKeyDown}
+        on:click={onInputClick}
+        on:keypress={onKeyPress}
+      />
+    {/if}
+    <button
+      class="uk-search-icon clear-button"
+      class:modern
+      class:hidden={selectedItems.length === 0}
+      on:click={onResetItem}
+      title="Clear Search Field"
+      data-uk-icon="icon: close"
+    />
+  {/if}
+
+  <div class="uk-dropdown uk-dropdown-bottom-left search-box-list" class:uk-open={opened} bind:this={list}>
+    <ul class="uk-nav uk-dropdown-nav">
+      {#if filteredListItems && filteredListItems.length > 0}
+        {#each filteredListItems as listItem, i}
+          <li class:uk-active={i === highlightIndex}>
+            <a
+              href="?region={listItem.item ? listItem.item.id : ''}"
+              on:click|preventDefault={() => onListItemClick(listItem)}
+            >
+              {#if listItem.highlighted}
+                {@html listItem.highlighted.label}
+              {:else}
+                {@html listItem.label}
+              {/if}
+            </a>
+          </li>
+        {/each}
+
+        {#if hiddenFilteredListItems > 0}
+          <li class="uk-nav-divider" />
+          <li class="more-results">&hellip; {hiddenFilteredListItems} results not shown</li>
+        {/if}
+      {:else if noResultsText}
+        <li class="uk-nav-header">{noResultsText}</li>
+      {/if}
+    </ul>
+  </div>
+</div>
+
+<svelte:window on:click={onDocumentClick} />
+
 <style>
   .search-box {
     width: unset;
@@ -380,99 +511,35 @@
     display: flex;
     align-items: center;
   }
+
+  /* modern styles for survey dashboard */
+  .search-box.modern {
+    background: white;
+    flex: 2 1 auto;
+  }
+  .search-icon.modern {
+    left: 0;
+  }
+  .clear-button.modern {
+    right: 0;
+  }
+  .uk-search-input.modern {
+    background: white;
+    font-weight: 400;
+    height: 50px;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    padding-left: 35px !important;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-radius: 3px;
+    border: 1px solid #d3d4d8;
+  }
+
+  .uk-search-input.modern__small {
+    height: 52px;
+    padding-left: 50px !important;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
 </style>
-
-<div
-  class="{className} uk-search search-box"
-  class:uk-search-default={!multiple}
-  class:search-multiple={multiple}
-  on:click={onContainerClick}>
-  {#if !multiple}
-    <span data-uk-search-icon />
-    <input
-      class="uk-search-input"
-      {placeholder}
-      {name}
-      {disabled}
-      {title}
-      aria-label={placeholder}
-      bind:this={input}
-      bind:value={text}
-      on:input={onInput}
-      on:focus={onFocus}
-      on:keydown={onKeyDown}
-      on:click={onInputClick}
-      on:keypress={onKeyPress} />
-    <button
-      class="uk-search-icon clear-button"
-      class:hidden={!text}
-      on:click={onResetItem}
-      title="Clear Search Field"
-      data-uk-icon="icon: close" />
-  {:else}
-    <span class="uk-search-icon search-multiple-icon" data-uk-icon="icon: search" />
-
-    {#each selectedItems as selectedItem}
-      <div class="search-tag" style="border-color: {colorFieldName ? selectedItem[colorFieldName] : undefined}">
-        <span>{labelFunction(selectedItem)}</span>
-        <button
-          class=""
-          data-uk-icon="icon: close"
-          on:click={() => removeItem(selectedItem)}
-          title="Remove selectecd item" />
-      </div>
-    {/each}
-
-    {#if !multiple || selectedItems.length < maxSelections}
-      <input
-        class="uk-search-input search-multiple-input"
-        {placeholder}
-        {name}
-        {disabled}
-        {title}
-        aria-label={placeholder}
-        bind:this={input}
-        bind:value={text}
-        on:input={onInput}
-        on:focus={onFocus}
-        on:keydown={onKeyDown}
-        on:click={onInputClick}
-        on:keypress={onKeyPress} />
-    {/if}
-    <button
-      class="uk-search-icon clear-button"
-      class:hidden={selectedItems.length === 0}
-      on:click={onResetItem}
-      title="Clear Search Field"
-      data-uk-icon="icon: close" />
-  {/if}
-
-  <div class="uk-dropdown uk-dropdown-bottom-left search-box-list" class:uk-open={opened} bind:this={list}>
-    <ul class="uk-nav uk-dropdown-nav">
-      {#if filteredListItems && filteredListItems.length > 0}
-        {#each filteredListItems as listItem, i}
-          <li class:uk-active={i === highlightIndex}>
-            <a
-              href="?region={listItem.item ? listItem.item.id : ''}"
-              on:click|preventDefault={() => onListItemClick(listItem)}>
-              {#if listItem.highlighted}
-                {@html listItem.highlighted.label}
-              {:else}
-                {@html listItem.label}
-              {/if}
-            </a>
-          </li>
-        {/each}
-
-        {#if hiddenFilteredListItems > 0}
-          <li class="uk-nav-divider" />
-          <li class="more-results">&hellip; {hiddenFilteredListItems} results not shown</li>
-        {/if}
-      {:else if noResultsText}
-        <li class="uk-nav-header">{noResultsText}</li>
-      {/if}
-    </ul>
-  </div>
-</div>
-
-<svelte:window on:click={onDocumentClick} />

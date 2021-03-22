@@ -8,8 +8,8 @@
   import EncodingOptions from '../EncodingOptions.svelte';
   import { trackEvent } from '../../stores/ga';
   import VegaTooltip from './VegaTooltip.svelte';
-  import { downloadUrl } from '../../data/screenshot';
   import InfoDialogButton from '../InfoDialogButton.svelte';
+  import { downloadUrl } from '../../util';
 
   const dispatch = createEventDispatcher();
   /**
@@ -140,6 +140,54 @@
   }
 </script>
 
+<div class="buttons">
+  <button
+    title="Download this view"
+    class="uk-icon-button"
+    data-uk-icon="icon: download"
+    on:click={downloadVega}
+    disabled={!vegaRef}
+  />
+  <InfoDialogButton {sensor} large={true} />
+  <button
+    bind:this={close}
+    class="uk-icon-button"
+    data-uk-close
+    on:click={() => {
+      trackEvent('detail-view', 'close', 'button');
+      restoreFocus();
+      dispatch('close');
+    }}
+    title="Close this detail view"
+  />
+</div>
+<div class="single-sensor-chart vega-wrapper">
+  <Vega
+    bind:this={vegaRef}
+    {data}
+    {spec}
+    {patchSpec}
+    {noDataText}
+    signals={{ currentDate: $currentDateObject }}
+    signalListeners={['dateRange']}
+    on:signal={onDateRangeChange}
+    tooltip={VegaTooltip}
+    tooltipProps={{ sensor }}
+  />
+</div>
+{#if sensor.isCasesOrDeath && !isCumulative}
+  <div class="legend">
+    <div class="legend-avg" />
+    <div>7-day average</div>
+    <div class="legend-avg legend-count" />
+    <div>Raw data</div>
+  </div>
+{/if}
+<div class="encoding">
+  <EncodingOptions center {sensor} />
+</div>
+<svelte:window on:keydown={onEscCheck} />
+
 <style>
   .single-sensor-chart {
     flex: 1 1 0;
@@ -185,48 +233,3 @@
     opacity: 0.2;
   }
 </style>
-
-<div class="buttons">
-  <button
-    title="Download this view"
-    class="uk-icon-button"
-    data-uk-icon="icon: download"
-    on:click={downloadVega}
-    disabled={!vegaRef} />
-  <InfoDialogButton {sensor} large={true} />
-  <button
-    bind:this={close}
-    class="uk-icon-button"
-    data-uk-close
-    on:click={() => {
-      trackEvent('detail-view', 'close', 'button');
-      restoreFocus();
-      dispatch('close');
-    }}
-    title="Close this detail view" />
-</div>
-<div class="single-sensor-chart vega-wrapper">
-  <Vega
-    bind:this={vegaRef}
-    {data}
-    {spec}
-    {patchSpec}
-    {noDataText}
-    signals={{ currentDate: $currentDateObject }}
-    signalListeners={['dateRange']}
-    on:signal={onDateRangeChange}
-    tooltip={VegaTooltip}
-    tooltipProps={{ sensor }} />
-</div>
-{#if sensor.isCasesOrDeath && !isCumulative}
-  <div class="legend">
-    <div class="legend-avg" />
-    <div>7-day average</div>
-    <div class="legend-avg legend-count" />
-    <div>Raw data</div>
-  </div>
-{/if}
-<div class="encoding">
-  <EncodingOptions center {sensor} />
-</div>
-<svelte:window on:keydown={onEscCheck} />

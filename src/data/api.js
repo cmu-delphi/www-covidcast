@@ -10,8 +10,8 @@ const fetchOptions = process.env.NODE_ENV === 'development' ? { cache: 'force-ca
  * @param {string} id
  * @param {string} signal
  * @param {string} level
- * @param {Date | string} date
- * @param {string} region
+ * @param {Date | string | [Date, Date]} date
+ * @param {string|string[]} region
  */
 export function callAPIEndPoint(endpoint, id, signal, level, date, region, fields, format = null) {
   if (typeof endpoint === 'function') {
@@ -19,14 +19,24 @@ export function callAPIEndPoint(endpoint, id, signal, level, date, region, field
   }
   const url = new URL(endpoint || ENDPOINT);
   url.searchParams.set('source', 'covidcast');
-  url.searchParams.set('cached', 'true');
   url.searchParams.set('data_source', id);
   url.searchParams.set('signal', signal);
   // mega counties are stored as counties
   url.searchParams.set('geo_type', level === levelMegaCounty.id ? 'county' : level);
-  url.searchParams.set('time_values', date instanceof Date ? formatAPITime(date) : date);
+  url.searchParams.set(
+    'time_values',
+    date instanceof Date
+      ? formatAPITime(date)
+      : Array.isArray(date)
+      ? `${formatAPITime(date[0])}-${formatAPITime(date[1])}`
+      : date,
+  );
   url.searchParams.set('time_type', 'day');
-  url.searchParams.set('geo_value', region);
+  if (Array.isArray(region) || region.includes(',')) {
+    url.searchParams.set('geo_values', Array.isArray(region) ? region.join(',') : region);
+  } else {
+    url.searchParams.set('geo_value', region);
+  }
   if (fields) {
     url.searchParams.set('fields', fields.join(','));
   }
@@ -48,24 +58,20 @@ export function callAPI(id, signal, level, date, region) {
 }
 
 /**
- * @param {string | null} endpoint
- * @param {import('.').SensorEntry[]} sensors
+ *
+ * @param {import('.').DataSensor[]} dataSignals
  * @param {string[]} fields
  * @param {Record<string, string>} filters
  */
-function callMetaAPIImpl(endpoint, sensors, fields, filters) {
-  const url = new URL(endpoint || ENDPOINT);
-  const urlGet = new URL(endpoint || ENDPOINT);
+export function callMetaAPI(dataSignals, fields, filters) {
+  const url = new URL(ENDPOINT);
+  const urlGet = new URL(ENDPOINT);
   const data = new FormData();
   data.set('source', 'covidcast_meta');
   urlGet.searchParams.set('source', data.get('source'));
-  data.set('cached', 'true');
-  urlGet.searchParams.set('cached', data.get('cached'));
-  data.set('format', 'json');
-  urlGet.searchParams.set('format', data.get('format'));
 
-  if (sensors && sensors.length > 0) {
-    const signals = sensors
+  if (dataSignals && dataSignals.length > 0) {
+    const signals = dataSignals
       .map((d) =>
         d.isCasesOrDeath
           ? Object.values(d.casesOrDeathSignals)
