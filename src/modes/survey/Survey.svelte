@@ -53,7 +53,13 @@
     <div class="grid-3-11 mobile-header-line" slot="title">
       <h2>Delphi Survey <span>Results</span></h2>
     </div>
-    <MobileSurveyToc />
+    <MobileSurveyToc>
+      {#each questionCategories as cat, i}
+        <li class="nav-dropdown-parent">
+          <a href="#{cat.anchor}" data-uk-scroll>{i + 1}. {cat.name}</a>
+        </li>
+      {/each}
+    </MobileSurveyToc>
   </SurveyParameters>
   <div class="uk-container content-grid">
     <div class="grid-3-11">

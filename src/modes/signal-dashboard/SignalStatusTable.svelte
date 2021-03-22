@@ -6,6 +6,11 @@
   import { getIndicatorStatuses } from '../../data/indicatorInfo';
   import { timeDay } from 'd3-time';
 
+  /**
+   * @type {Date}
+   */
+  export let date;
+
   let sortCriteria = 'name';
   let sortDirectionDesc = false;
 
@@ -43,14 +48,20 @@
 
   $: comparator = bySortCriteria(sortCriteria, sortDirectionDesc);
 
-  const today = new Date();
-  const loadedData = getIndicatorStatuses().then((rows) =>
-    rows.map((r) => ({
-      ...r,
-      lag: timeDay.count(today, r.latest_data_date),
-    })),
-  );
+  /**
+   *
+   * @param {Date}date
+   */
+  function loadData(date) {
+    return getIndicatorStatuses().then((rows) =>
+      rows.map((r) => ({
+        ...r,
+        lag: timeDay.count(date, r.latest_data_date),
+      })),
+    );
+  }
 
+  $: loadedData = loadData(date);
   let sortedData = [];
   let loading = true;
   $: {
@@ -66,7 +77,7 @@
 <div class="uk-position-relative">
   <FancyHeader anchor="table" sub="Status">Signal</FancyHeader>
   <DownloadMenu
-    fileName="signal_status_as_of_{formatDateISO(today)}"
+    fileName="signal_status_as_of_{formatDateISO(date)}"
     data={loadedData}
     absolutePos
     prepareRow={(row) => row}

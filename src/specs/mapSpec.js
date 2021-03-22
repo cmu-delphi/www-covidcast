@@ -461,6 +461,36 @@ export function generateStateMapWithCountyDataSpec(options = {}) {
 }
 
 /**
+ * generates a map of counties
+ */
+export function generateStateMapWithCountyBinaryDataSpec(options = {}) {
+  const level = 'county';
+  const topoJSON = countyJSON();
+
+  const spec = genBaseSpec(level, topoJSON, options);
+
+  spec.datasets.nation = nationJSON();
+  const missing = genMissingLayer();
+  missing.mark.color = MISSING_COLOR;
+  spec.layer.push(missing);
+  spec.datasets.state = stateJSON();
+  const counties = genLevelLayer({ ...options, strokeWidth: 0 });
+  counties.mark.tooltip = false;
+  counties.encoding.color = {
+    condition: {
+      test: 'datum.value != null',
+      value: 'steelblue',
+    },
+    value: null,
+  };
+  spec.layer.push(counties);
+  spec.layer.push(genStateBorderLayer());
+  spec.layer.push(genLevelHoverLayer({ strokeWidth: 1 }));
+  spec.layer.push(genCreditsLayer());
+  return spec;
+}
+
+/**
  * generates a map of counties for a specific state
  * @param {import('../maps').NameInfo} state
  */

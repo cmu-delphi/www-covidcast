@@ -1,6 +1,8 @@
 // Indicator Info: aka The Signal Dashboard API
 
 import { isoParse } from 'd3-time-format';
+import { getInfoByName } from '../maps';
+import { formatAPITime } from './utils';
 
 /**
  * @typedef {object} IndicatorStatus
@@ -28,8 +30,9 @@ export function getIndicatorStatuses() {
 
 /**
  * @typedef {object} IndicatorCoverage
- * @property {string} name
- * @property {Date} date
+ * @property {string} signal
+ * @property {string} time_value
+ * @property {Date} date_value
  * @property {string} geo_type
  * @property {string} geo_value
  */
@@ -2666,13 +2669,30 @@ const signalDashboardCoverageResponse = [
   { name: 'Quidel', date: '2021-02-27', geo_type: 'county', geo_value: '53007' },
   { name: 'Quidel', date: '2021-02-27', geo_type: 'county', geo_value: '55025' },
 ].map((r) => {
-  r.date = isoParse(r.date);
+  r.signal = r.name;
+  r.date_value = isoParse(r.date);
+  r.time_value = formatAPITime(r.date_value);
+  r.value = 1;
+  Object.assign(r, getInfoByName(r.geo_value));
   return r;
 });
 /**
  * From: //epidata/api.php?source=signal_dashboard_coverage
- * @returns {Promise<IndicatorCoverage[]>}
+ * @returns {Promise<import('.').EpiDataRow[]>}
  */
 export function getIndicatorCoverages() {
   return Promise.resolve(signalDashboardCoverageResponse);
+}
+
+/**
+ *
+ * @param {{name: string}} signal
+ * @param {Date} date
+ * @returns {Promise<import('.').EpiDataRow[]>}
+ */
+export function getAvailableCounties(signal, date) {
+  const time = formatAPITime(date);
+  return getIndicatorCoverages().then((rows) =>
+    rows.filter((row) => row.signal === signal.name && row.time_value === time),
+  );
 }

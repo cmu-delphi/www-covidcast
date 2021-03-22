@@ -1,7 +1,8 @@
 <script>
   import questionCircleIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/question-circle.svg';
   import arrowDownIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-down.svg';
-  import { questionCategories } from '../../stores/questions';
+
+  export let name = 'Survey Questions';
 </script>
 
 <div class="mobile-survey-toc">
@@ -11,7 +12,7 @@
         <span class="inline-svg-icon">
           {@html questionCircleIcon}
         </span>
-        <span class="grow">Survey Questions</span>
+        <span class="grow">{name}</span>
         <span class="inline-svg-icon">
           {@html arrowDownIcon}
         </span>
@@ -21,11 +22,7 @@
         uk-dropdown="mode: click; offset: 0; position: bottom-left;"
       >
         <ul class="survey-nav uk-nav uk-navbar-dropdown-nav">
-          {#each questionCategories as cat, i}
-            <li class="nav-dropdown-parent">
-              <a href="#{cat.anchor}" data-uk-scroll>{i + 1}. {cat.name}</a>
-            </li>
-          {/each}
+          <slot />
         </ul>
       </div>
     </div>
@@ -46,7 +43,7 @@
     padding: 0;
     width: 100%;
   }
-  .survey-nav li {
+  .survey-nav :global(li) {
     border-top: 1px solid #d2d2d2;
     font-weight: 400;
     padding: 20px 0 20px 40px;
