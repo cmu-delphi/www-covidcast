@@ -63,9 +63,9 @@ export function callAPI(id, signal, level, date, region) {
  * @param {string[]} fields
  * @param {Record<string, string>} filters
  */
-function callMetaAPIImpl(dataSignals, fields, filters) {
-  const url = new URL(ENDPOINT);
-  const urlGet = new URL(ENDPOINT);
+function callMetaAPIImpl(endpoint, dataSignals, fields, filters) {
+  const url = new URL(endpoint || ENDPOINT);
+  const urlGet = new URL(endpoint || ENDPOINT);
   const data = new FormData();
   data.set('source', 'covidcast_meta');
   urlGet.searchParams.set('source', data.get('source'));
