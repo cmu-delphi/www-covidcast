@@ -120,13 +120,20 @@ export const nameInfos = stateInfo.concat(msaInfo, countyInfo, hrrInfo, megaCoun
  */
 const infoLookup = new Map();
 function addInfo(d) {
+  const levelPrefix = d.level + ':';
   const id = String(d.propertyId).toLowerCase();
   if (!infoLookup.has(id)) {
     infoLookup.set(id, d);
   }
+  if (!infoLookup.has(levelPrefix + id)) {
+    infoLookup.set(levelPrefix + id, d);
+  }
   const key = String(d.id).toLowerCase();
   if (!infoLookup.has(key)) {
     infoLookup.set(key, d);
+  }
+  if (!infoLookup.has(levelPrefix + key)) {
+    infoLookup.set(levelPrefix + key, d);
   }
 }
 nameInfos.forEach(addInfo);
@@ -139,13 +146,14 @@ for (const alias of [
   infoLookup.set(alias[0], getInfoByName(alias[1]));
 }
 
-export function getInfoByName(name) {
+export function getInfoByName(name, level = null) {
   if (!name) {
     return null;
   }
-  const r = infoLookup.get(String(name).toLowerCase());
+  const key = (level != null ? `${level}:` : '') + String(name).toLowerCase();
+  const r = infoLookup.get(key);
   if (!r) {
-    console.warn('unknown', name);
+    console.warn('unknown', name, level);
   }
   return r;
 }
