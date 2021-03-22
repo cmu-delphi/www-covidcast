@@ -25,6 +25,7 @@
     "gen:check": "npm run gen -- --check",
     "gen:local": "npm run gen -- --localOnly",
     "gen:fallback": "npm run gen -- --fallback",
+    "gen:staging": "cross-env \"COVIDCAST_SIGNAL_DOC=https://docs.google.com/document/d/1RLy4O-gtACVjLEVD_vxyPqvp9nWVhqEjoWAKi68RKpg,https://docs.google.com/document/d/1Yi_ueKvASwyzm6ZJEcrStk5qVIKz94N2yEHlklfnEig\" npm run gen -- --check",
     "process-geo": "node ./src/maps/process.js",
     "start": "npm run gen:fallback && cross-env NODE_ENV=development webpack serve --mode development --hot --devtool eval-cheap-module-source-map",
     "prebuild": "npm run clean",
