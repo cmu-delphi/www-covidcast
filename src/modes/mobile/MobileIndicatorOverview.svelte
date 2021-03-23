@@ -56,7 +56,7 @@
   </SurveyParameters>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <IndicatorAnnotations {date} {region} {sensor} />
+      <IndicatorAnnotations {date} {region} {sensor} sparkLine />
       <FancyHeader invert sub="Summary">{sensor.name}</FancyHeader>
       <p>On {formatDateWeekday(date.value)}, the {sensor.valueUnit} was:</p>
       <IndicatorOverview {sensor} {date} {region} {fetcher} />
