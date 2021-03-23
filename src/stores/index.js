@@ -461,6 +461,9 @@ export function loadFromUrlState(state) {
  * @type {import('svelte/store').Writable<import('../data/annotations').AnnotationManager>}
  */
 export const annotationManager = writable(new AnnotationManager());
-fetchAnnotations().then((annotations) => {
-  annotationManager.set(new AnnotationManager(annotations));
-});
+
+export function loadAnnotations() {
+  fetchAnnotations().then((annotations) => {
+    annotationManager.set(new AnnotationManager(annotations));
+  });
+}
