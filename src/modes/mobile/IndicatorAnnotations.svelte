@@ -54,11 +54,13 @@
 {#each annotations as annotation}
   <div class="uk-alert uk-alert-warning">
     <h5 class="alert-header">
-      {formatDateISO(annotation.dates[0])} - {formatDateISO(annotation.dates[1])}
-      <span class="inline-svg-icon">
-        {@html warningIcon}
-      </span>
-      {annotation.problem}
+      <div class="text">
+        <span class="inline-svg-icon">
+          {@html warningIcon}
+        </span>
+        {annotation.problem}
+      </div>
+      <div class="date">{formatDateISO(annotation.dates[0])} - {formatDateISO(annotation.dates[1])}</div>
     </h5>
     <p>
       {annotation.explanation}
@@ -67,8 +69,25 @@
 {/each}
 
 <style>
+  .uk-alert-warning {
+    color: #d46b08;
+  }
   .alert-header {
     font-weight: 600;
     margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    white-space: nowrap;
+  }
+
+  .text {
+    flex-grow: 1;
+  }
+
+  @media only screen and (max-width: 767px) {
+    .alert-header {
+      display: block;
+      text-align: center;
+    }
   }
 </style>

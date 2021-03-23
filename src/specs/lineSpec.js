@@ -140,7 +140,7 @@ export function genAnnotationLayer(annotations, dataDomain) {
           type: 'rect',
           tooltip: false,
           opacity: 0.1,
-          color: '#faa05a',
+          color: '#D46B08',
         },
         encoding: {
           x: {
@@ -156,10 +156,13 @@ export function genAnnotationLayer(annotations, dataDomain) {
       {
         mark: {
           type: 'text',
-          color: '#faa05a',
-          text: {
-            expr: `'⚠ (' + (datum.index + 1) + ')'`,
-          },
+          color: '#D46B08',
+          text:
+            annotations.length > 1
+              ? {
+                  expr: `'⚠ (' + (datum.index + 1) + ')'`,
+                }
+              : '⚠',
           baseline: 'top',
           align: 'left',
           dx: 2,
