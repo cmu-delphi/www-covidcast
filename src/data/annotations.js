@@ -1,6 +1,7 @@
 import { parseAPITime } from './utils';
 import { csvParse } from 'd3-dsv';
 import { timeDay } from 'd3-time';
+import { fetchOptions } from './api';
 
 const ANNOTATION_SHEET = process.env.COVIDCAST_ANNOTATION_SHEET;
 const ANNOTATION_DRAFTS = process.env.COVIDCAST_ANNOTATION_DRAFTS === 'true';
@@ -106,7 +107,7 @@ export class Annotation {
       this.regions.some(
         (annotatedRegion) =>
           annotatedRegion.level == matchRegion.level &&
-          (annotatedRegion.ids === '*' || annotatedRegion.ids.has(matchRegion.propertyId)),
+          (annotatedRegion.ids === '*' || annotatedRegion.ids.has(matchRegion.propertyId.toLowerCase())),
       ),
     );
   }
@@ -134,7 +135,7 @@ export class Annotation {
    */
   inDateRange(start, end) {
     // not outside of the range, so at least a partial overlap
-    return !(end < this.dates[1] || start > this.dates[0]);
+    return !(end < this.dates[0] || start > this.dates[1]);
   }
 }
 
@@ -142,7 +143,7 @@ export class Annotation {
  * @returns {Promise<Annotation[]>}
  */
 export function fetchAnnotations() {
-  return fetch(ANNOTATION_SHEET)
+  return fetch(ANNOTATION_SHEET, fetchOptions)
     .then((r) => r.text())
     .then((csv) => {
       return csvParse(csv)
@@ -189,7 +190,9 @@ export class AnnotationManager {
    * @param {Date} date
    */
   getRegionAnnotations(region, date) {
-    return this.annotations.filter((d) => d.matchRegion(region) && d.matchDate(date)).sort(sortByDate);
+    return this.annotations
+      .filter((d) => region != null && d.matchRegion(region) && date != null && d.matchDate(date))
+      .sort(sortByDate);
   }
   /**
    * @param {{id: string, signal: string}} sensor
@@ -198,7 +201,15 @@ export class AnnotationManager {
    */
   getAnnotations(sensor, region, date) {
     return this.annotations
-      .filter((d) => d.matchSensor(sensor) && d.matchRegion(region) && d.matchDate(date))
+      .filter(
+        (d) =>
+          sensor != null &&
+          d.matchSensor(sensor) &&
+          region != null &&
+          d.matchRegion(region) &&
+          date != null &&
+          d.matchDate(date),
+      )
       .sort(sortByDate);
   }
   /**
@@ -209,7 +220,14 @@ export class AnnotationManager {
    */
   getWindowAnnotations(sensor, region, dateStart, dateEnd) {
     return this.annotations
-      .filter((d) => d.matchSensor(sensor) && d.matchRegion(region) && d.inDateRange(dateStart, dateEnd))
+      .filter(
+        (d) =>
+          sensor != null &&
+          d.matchSensor(sensor) &&
+          region != null &&
+          d.matchRegion(region) &&
+          d.inDateRange(dateStart, dateEnd),
+      )
       .sort(sortByDate);
   }
 }
