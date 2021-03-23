@@ -116,6 +116,70 @@ export function genDateHighlight(date, color = 'lightgrey') {
   return layer;
 }
 
+/**
+ *
+ * @param {import('../data/annotations').Annotation[]} annotations
+ * @param {{min: Date, max: Date}} dataDomain
+ * @returns
+ */
+export function genAnnotationLayer(annotations, dataDomain) {
+  /**
+   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
+   */
+  const layer = {
+    data: {
+      values: annotations.map((a, i) => ({
+        index: i,
+        start: a.dates[0] < dataDomain.min ? dataDomain.min : a.dates[0],
+        end: a.dates[1] > dataDomain.max ? dataDomain.max : a.dates[1],
+      })),
+    },
+    layer: [
+      {
+        mark: {
+          type: 'rect',
+          tooltip: false,
+          opacity: 0.1,
+          color: '#faa05a',
+        },
+        encoding: {
+          x: {
+            field: 'start',
+            type: 'temporal',
+          },
+          x2: {
+            field: 'end',
+            type: 'temporal',
+          },
+        },
+      },
+      {
+        mark: {
+          type: 'text',
+          color: '#faa05a',
+          text: {
+            expr: `'⚠ (' + (datum.index + 1) + ')'`,
+          },
+          baseline: 'top',
+          align: 'left',
+          dx: 2,
+          dy: 2,
+        },
+        encoding: {
+          x: {
+            field: 'start',
+            type: 'temporal',
+          },
+          y: {
+            value: 0,
+          },
+        },
+      },
+    ],
+  };
+  return layer;
+}
+
 export function generateLineChartSpec({
   width = 800,
   height = 300,
