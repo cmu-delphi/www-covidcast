@@ -20,6 +20,7 @@
   import DownloadMenu from './components/DownloadMenu.svelte';
   import { formatDateISO } from '../../formats';
   import { isMobileDevice } from '../../stores';
+  import IndicatorAnnotations from './IndicatorAnnotations.svelte';
 
   export let height = 250;
 
@@ -281,6 +282,8 @@
     </div>
   {/each}
 </div>
+
+<IndicatorAnnotations {sensor} {regions} {date} range="window" />
 
 <style>
   .legend {

@@ -98,10 +98,17 @@ export class Annotation {
   }
 
   /**
-   * @param {import('../maps').NameInfo} region
+   * @param {import('../maps').NameInfo | import('../maps').NameInfo[]} region
    */
   matchRegion(region) {
-    return this.regions.some((r) => r.level == region.level && (r.ids === '*' || r.ids.has(r.propertyId)));
+    const regionToMatch = Array.isArray(region) ? region : [region];
+    return regionToMatch.some((matchRegion) =>
+      this.regions.some(
+        (annotatedRegion) =>
+          annotatedRegion.level == matchRegion.level &&
+          (annotatedRegion.ids === '*' || annotatedRegion.ids.has(matchRegion.propertyId)),
+      ),
+    );
   }
 
   /**
@@ -153,6 +160,22 @@ export function fetchAnnotations() {
     });
 }
 
+function compareDate(a, b) {
+  return a < b ? -1 : a > b ? 1 : 0;
+}
+/**
+ *
+ * @param {Annotation} annotationA
+ * @param {Annotation} annotationB
+ */
+function sortByDate(annotationA, annotationB) {
+  const start = compareDate(annotationA.dates[0], annotationB.dates[1]);
+  if (start === 0) {
+    return compareDate(annotationA.dates[1], annotationB.dates[1]);
+  }
+  return start;
+}
+
 export class AnnotationManager {
   /**
    * @param {Annotation[]} annotations
@@ -162,29 +185,31 @@ export class AnnotationManager {
   }
 
   /**
-   * @param {import('../maps').NameInfo} region
+   * @param {import('../maps').NameInfo | import('../maps').NameInfo[]} region
    * @param {Date} date
    */
   getRegionAnnotations(region, date) {
-    return this.annotations.filter((d) => d.matchRegion(region) && d.matchDate(date));
+    return this.annotations.filter((d) => d.matchRegion(region) && d.matchDate(date)).sort(sortByDate);
   }
   /**
    * @param {{id: string, signal: string}} sensor
-   * @param {import('../maps').NameInfo} region
+   * @param {import('../maps').NameInfo | import('../maps').NameInfo[]} region
    * @param {Date} date
    */
   getAnnotations(sensor, region, date) {
-    return this.annotations.filter((d) => d.matchSensor(sensor) && d.matchRegion(region) && d.matchDate(date));
+    return this.annotations
+      .filter((d) => d.matchSensor(sensor) && d.matchRegion(region) && d.matchDate(date))
+      .sort(sortByDate);
   }
   /**
    * @param {{id: string, signal: string}} sensor
-   * @param {import('../maps').NameInfo} region
+   * @param {import('../maps').NameInfo | import('../maps').NameInfo[]} region
    * @param {Date} dateStart
    * @param {Date} dateEnd
    */
   getWindowAnnotations(sensor, region, dateStart, dateEnd) {
-    return this.annotations.filter(
-      (d) => d.matchSensor(sensor) && d.matchRegion(region) && d.inDateRange(dateStart, dateEnd),
-    );
+    return this.annotations
+      .filter((d) => d.matchSensor(sensor) && d.matchRegion(region) && d.inDateRange(dateStart, dateEnd))
+      .sort(sortByDate);
   }
 }

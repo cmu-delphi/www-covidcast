@@ -23,7 +23,7 @@
   $: deathTrend = fetcher.fetchWindowTrend(DEATHS, region, date);
 </script>
 
-<IndicatorAnnotations {date} {region} sensor={CASES} sparkLine />
+<IndicatorAnnotations {date} {region} sensor={CASES} range="sparkLine" />
 
 <p>On {formatDateWeekday(date.value)}, the {CASES.valueUnit}s were:</p>
 

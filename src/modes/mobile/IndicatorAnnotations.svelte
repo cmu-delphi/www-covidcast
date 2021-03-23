@@ -14,38 +14,39 @@
   /**
    * @type {import("../../stores/params").RegionParam}
    */
-  export let region;
+  export let region = null;
+  /**
+   * @type {import("../../stores/params").Region[]}
+   */
+  export let regions = [];
 
   /**
    * when enabled it will show annotation within the sparkline date range
+   * @type {'date' | 'window' | 'sparkLine'}
    */
-  export let sparkLine = false;
-  /**
-   * when enabled it will show annotation within the window date range
-   */
-  export let window = false;
+  export let range = 'date';
 
   /**
    * @type {import('../../data/annotations').Annotation[]}
    */
   let annotations = [];
   $: {
-    if (window) {
+    if (range === 'sparkLine') {
       annotations = $annotationManager.getWindowAnnotations(
         sensor.value,
-        region.value,
+        region ? region.value : regions,
         date.sparkLineTimeFrame.min,
         date.sparkLineTimeFrame.max,
       );
-    } else if (sparkLine) {
+    } else if (range === 'window') {
       annotations = $annotationManager.getWindowAnnotations(
         sensor.value,
-        region.value,
+        region ? region.value : regions,
         date.windowTimeFrame.min,
         date.windowTimeFrame.max,
       );
     } else {
-      annotations = $annotationManager.getAnnotations(sensor.value, region.value, date.value);
+      annotations = $annotationManager.getAnnotations(sensor.value, region ? region.value : regions, date.value);
     }
   }
 </script>
