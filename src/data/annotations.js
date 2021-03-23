@@ -67,8 +67,8 @@ function parseRegions(regions) {
     .map((d) => {
       const match = d.match(/(.*)\((.*)\)/);
       if (match) {
-        const level = match.groups(1);
-        const ids = match.groups(2).trim();
+        const level = match[1];
+        const ids = match[2].trim();
         if (ids === '*') {
           return { level, ids: '*' };
         }
@@ -132,9 +132,7 @@ export class Annotation {
  * @returns {Promise<Annotation[]>}
  */
 export function fetchAnnotations() {
-  return fetch({
-    url: ANNOTATION_SHEET,
-  })
+  return fetch(ANNOTATION_SHEET)
     .then((r) => r.text())
     .then((csv) => {
       return csvParse(csv).map((row) => new Annotation(row));
