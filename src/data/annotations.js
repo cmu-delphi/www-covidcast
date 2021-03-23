@@ -3,6 +3,7 @@ import { csvParse } from 'd3-dsv';
 import { timeDay } from 'd3-time';
 
 const ANNOTATION_SHEET = process.env.COVIDCAST_ANNOTATION_SHEET;
+const ANNOTATION_DRAFTS = process.env.COVIDCAST_ANNOTATION_DRAFTS === 'true';
 
 /**
  * @typedef {object} RawAnnotation
@@ -89,7 +90,7 @@ export class Annotation {
   constructor(raw) {
     this.problem = raw.problem;
     this.explanation = raw.explanation;
-    this.source = raw.source;
+    this.source = raw.source.trim();
     this.signals = parseSignals(raw.signals);
     this.dates = parseDates(raw.dates);
     this.regions = parseRegions(raw.regions);
@@ -107,7 +108,9 @@ export class Annotation {
    * @param {{id: string, signal: string}} sensor
    */
   matchSensor(sensor) {
-    return this.source === sensor.id && (this.signals === '*' || this.signals.has(sensor.signal));
+    return (
+      (this.source === '*' || this.source === sensor.id) && (this.signals === '*' || this.signals.has(sensor.signal))
+    );
   }
 
   /**
@@ -135,7 +138,14 @@ export function fetchAnnotations() {
   return fetch(ANNOTATION_SHEET)
     .then((r) => r.text())
     .then((csv) => {
-      return csvParse(csv).map((row) => new Annotation(row));
+      return csvParse(csv)
+        .filter((d) => {
+          if (!d.problem) {
+            return false;
+          }
+          return ANNOTATION_DRAFTS || d.published === 'TRUE';
+        })
+        .map((row) => new Annotation(row));
     })
     .catch((error) => {
       console.error('cannot fetch annotations', error);
