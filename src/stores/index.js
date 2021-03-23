@@ -28,6 +28,7 @@ export {
 } from './constants';
 import { timeMonth } from 'd3-time';
 import { MAP_THEME, selectionColors } from '../theme';
+import { AnnotationManager, fetchAnnotations } from '../data';
 
 /**
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
@@ -455,3 +456,12 @@ export function loadFromUrlState(state) {
     );
   }
 }
+
+/**
+ * @type {import('svelte/store').Readable<import('../data/annotations').AnnotationManager>}
+ */
+export const annotationManager = readable(new AnnotationManager(), (set) => {
+  fetchAnnotations().then((annotations) => {
+    set(new AnnotationManager(annotations));
+  });
+});
