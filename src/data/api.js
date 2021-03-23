@@ -104,3 +104,13 @@ export function callMetaAPI(dataSignals, fields, filters) {
     body: data,
   }).then((d) => d.json());
 }
+
+/**
+ *
+ * @returns
+ */
+export function callSignalAPI() {
+  const url = new URL(ENDPOINT);
+  url.searchParams.set('source', 'signal_dashboard_status');
+  return fetch(url.toString(), fetchOptions).then((d) => d.json());
+}
