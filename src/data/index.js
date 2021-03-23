@@ -8,6 +8,7 @@ import { timeDay } from 'd3-time';
 export * from './signals';
 export * from './fetchData';
 export { formatAPITime, parseAPITime } from './utils';
+export * from './annotations';
 
 function toStatsRegionKey(sensorKey, region) {
   return sensorKey + '_' + region;

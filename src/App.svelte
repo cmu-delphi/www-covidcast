@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { currentMode, appReady, sensorList } from './stores';
+  import { currentMode, appReady, sensorList, loadAnnotations } from './stores';
   import './stores/urlHandler';
   import './stores/ga';
   import './stores/websiteInjector';
@@ -9,7 +9,7 @@
   import Disclaimer from './components/Disclaimer.svelte';
 
   onMount(() => {
-    loadMetaData(sensorList).then(() => {
+    Promise.all([loadMetaData(sensorList), loadAnnotations()]).then(() => {
       appReady.set(true);
       document.body.dataset.ready = 'ready';
     });
