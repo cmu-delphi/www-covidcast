@@ -1,6 +1,7 @@
 import { timeDay } from 'd3-time';
 import { getIndicatorStatuses } from '../../data/indicatorInfo';
 import { countyInfo } from '../../maps';
+import { TimeFrame } from '../../stores/params';
 
 /**
  * @typedef {import('../../data/indicatorInfo').IndicatorStatus} ExtendedStatus
@@ -43,7 +44,7 @@ export function determineDomain(data) {
   let min = Number.POSITIVE_INFINITY;
   let max = Number.NEGATIVE_INFINITY;
   if (data.length === 0) {
-    return [new Date(), new Date()];
+    return new TimeFrame(timeDay.offset(new Date(), -1), timeDay.floor(new Date()));
   }
   for (const row of data) {
     for (const coverage of row.coverage.county || []) {
@@ -56,5 +57,5 @@ export function determineDomain(data) {
       }
     }
   }
-  return [min, max];
+  return new TimeFrame(new Date(min), new Date(max));
 }

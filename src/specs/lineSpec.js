@@ -33,10 +33,10 @@ export function resetOnClearHighlighTuple(date) {
   };
 }
 
-export function resolveHighlightedDate(e) {
+export function resolveHighlightedDate(e, dateField = 'date_value') {
   const highlighted = e.detail.value;
-  if (highlighted && Array.isArray(highlighted.date_value) && highlighted.date_value.length > 0) {
-    return new Date(highlighted.date_value[0]);
+  if (highlighted && Array.isArray(highlighted[dateField]) && highlighted[dateField].length > 0) {
+    return new Date(highlighted[dateField][0]);
   }
   return null;
 }
@@ -53,11 +53,12 @@ export const signalPatches = {
 //   };
 // }
 
-const AUTO_ALIGN = {
-  // auto align based on remaining space
-  expr:
-    "(width - scale('x', datum.date_value)) < 40 ? 'right' : (scale('x', datum.date_value)) > 40 ? 'center' : 'left'",
-};
+function autoAlign(dateField = 'date_value') {
+  return {
+    // auto align based on remaining space
+    expr: `(width - scale('x', datum.${dateField})) < 40 ? 'right' : (scale('x', datum.${dateField})) > 40 ? 'center' : 'left'`,
+  };
+}
 
 function genCreditsLayer({ shift = 55 } = {}) {
   /**
@@ -192,9 +193,11 @@ export function generateLineChartSpec({
   subTitle = null,
   color = COLOR,
   initialDate = null,
+  dateField = 'date_value',
   valueField = 'value',
   zero = false,
   highlightRegion = false,
+  reactOnMouseMove = true,
 } = {}) {
   // logic to automatically add the year for week 1 and first date
   const labelYear = `datum.label + (week(datum.value) === 1 ${
@@ -238,7 +241,7 @@ export function generateLineChartSpec({
         },
         encoding: {
           x: {
-            field: 'date_value',
+            field: dateField,
             type: 'temporal',
             axis: {
               title: xTitle,
@@ -292,7 +295,7 @@ export function generateLineChartSpec({
             name: 'highlight',
             select: {
               type: 'point',
-              on: 'click, mousemove, [touchstart, touchend] > touchmove',
+              on: `click${reactOnMouseMove ? ', mousemove' : ''}, [touchstart, touchend] > touchmove`,
               nearest: true,
               clear: 'view:mouseout',
               encodings: ['x'],
@@ -312,7 +315,7 @@ export function generateLineChartSpec({
         },
         encoding: {
           x: {
-            field: 'date_value',
+            field: dateField,
             type: 'temporal',
           },
           y: {
@@ -344,7 +347,7 @@ export function generateLineChartSpec({
         ],
         encoding: {
           x: {
-            field: 'date_value',
+            field: dateField,
             type: 'temporal',
           },
         },
@@ -360,7 +363,7 @@ export function generateLineChartSpec({
           {
             mark: {
               type: 'text',
-              align: AUTO_ALIGN,
+              align: autoAlign(dateField),
               color: COLOR,
               baseline: 'bottom',
               fontSize: 16,
@@ -368,7 +371,7 @@ export function generateLineChartSpec({
             },
             encoding: {
               text: {
-                field: 'date_value',
+                field: dateField,
                 type: 'temporal',
                 format: '%a %b %d',
                 formatType: 'cachedTime',

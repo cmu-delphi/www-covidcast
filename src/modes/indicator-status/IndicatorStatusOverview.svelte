@@ -9,6 +9,9 @@
 
   $: data = loadData(date);
 
+  /**
+   * @type {import('../../stores/params').TimeFrame}
+   */
   let domain = determineDomain([]);
   /**
    * @type {import('./data').ExtendedStatus[]}
@@ -68,7 +71,7 @@
           }
         }}
       />
-      <IndicatorStatus signal={selected} />
+      <IndicatorStatus {domain} signal={selected} />
     {:else}
       <div class="grid-3-11">
         <IndicatorStatusTable {data} {date} on:select={switchToDetails} {domain} />

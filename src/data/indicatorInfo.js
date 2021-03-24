@@ -5,11 +5,13 @@ import { callSignalAPI } from './api';
 import { fetchData } from './fetchData';
 import { isoParse } from 'd3-time-format';
 import { addNameInfos } from '.';
+import { countyInfo } from '../maps';
 
 /**
  * @typedef {object} Coverage
  * @property {Date} date
  * @property {number} count
+ * @property {number} fraction // fraction
  */
 
 /**
@@ -37,6 +39,7 @@ export function getIndicatorStatuses() {
       Object.values(row.coverage).forEach((level) => {
         for (const row of level) {
           row.date = isoParse(row.date.toString());
+          row.fraction = row.count / countyInfo.length;
         }
       });
     }

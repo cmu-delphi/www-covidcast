@@ -5,12 +5,21 @@
   import FancyHeader from '../mobile/FancyHeader.svelte';
   import { getAvailableCounties } from '../../data/indicatorInfo';
   import SurveyValue from '../survey/SurveyValue.svelte';
+  import IndicatorCoverageChart from './IndicatorCoverageChart.svelte';
+
   /**
    * @type {import('../../data/indicatorInfo').IndicatorStatus}
    */
   export let signal;
 
-  $: data = getAvailableCounties(signal, signal.latest_time_value);
+  /**
+   * @type {import('../../stores/params').TimeFrame}
+   */
+  export let domain;
+
+  $: pickedDate = signal.latest_time_value;
+
+  $: data = getAvailableCounties(signal, pickedDate);
 </script>
 
 <div class="grid-3-11 uk-margin-top">
@@ -29,11 +38,20 @@
     </div>
   </div>
 
-  <FancyHeader invert sub="Chart">Coverage</FancyHeader>
-  <!-- <IndicatorCoverageChart {signal} date={signal.latest_time_value} /> -->
+  <FancyHeader invert sub="Coverage">{signal ? signal.name : '?'}</FancyHeader>
+  <IndicatorCoverageChart
+    {signal}
+    {domain}
+    on:highlight={(e) => {
+      const nextDate = e.detail || signal.latest_time_value;
+      if (nextDate != pickedDate) {
+        pickedDate = nextDate;
+      }
+    }}
+  />
 
-  <FancyHeader invert sub="Map ({formatDateISO(signal.latest_time_value)})">Coverage</FancyHeader>
+  <FancyHeader invert sub="Map ({formatDateISO(pickedDate)})">{signal ? signal.name : '?'}</FancyHeader>
 </div>
 <div class="grid-2-12">
-  <IndicatorCountyMap {signal} date={signal.latest_time_value} {data} />
+  <IndicatorCountyMap {signal} date={pickedDate} {data} />
 </div>

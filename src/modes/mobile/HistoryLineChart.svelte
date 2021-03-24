@@ -21,7 +21,7 @@
   import DownloadMenu from './components/DownloadMenu.svelte';
   import { formatDateISO } from '../../formats';
   import { annotationManager, isMobileDevice } from '../../stores';
-  import IndicatorAnnotations from './IndicatorAnnotations.svelte';
+  import IndicatorAnnotation from './IndicatorAnnotation.svelte';
 
   export let height = 250;
 
@@ -293,7 +293,9 @@
   {/each}
 </div>
 
-<IndicatorAnnotations {sensor} {regions} {date} range="window" />
+{#each annotations as annotation}
+  <IndicatorAnnotation {annotation} />
+{/each}
 
 <style>
   .legend {

@@ -56,7 +56,7 @@
    */
   export let data = Promise.resolve([]);
   /**
-   * @type {[Date, Date]}
+   * @type {import('../../stores/params').TimeFrame}
    */
   export let domain;
 
@@ -77,7 +77,7 @@
   $: spec = generateSparkLine({
     dateField: 'date',
     valueField: 'count',
-    domain,
+    domain: domain.domain,
     highlightDate: null,
     highlightStartEnd: false,
   });
@@ -111,8 +111,8 @@
       <th class="mobile-th uk-text-right">
         <span>Coverage</span>
         <div class="mobile-th-range">
-          <span> {formatDateShortNumbers(new Date(domain[0]))} </span>
-          <span> {formatDateShortNumbers(new Date(domain[1]))} </span>
+          <span> {formatDateShortNumbers(domain.min)} </span>
+          <span> {formatDateShortNumbers(domain.max)} </span>
         </div>
       </th>
       <th />
