@@ -63,6 +63,13 @@ async function states(level = 'state') {
       population: populationLookup.state(id) || Number.parseInt(props.Population, 10),
     };
   });
+  const extras = dsvFormat(';').parse(fs.readFileSync(path.join(__dirname, 'raw/territory/state.csv')).toString());
+  for (const row of extras) {
+    if (!row.population) {
+      row.population = populationLookup.state(row.id);
+    }
+    infos.push(row);
+  }
   fs.writeFileSync(
     path.resolve(__dirname, `./processed/${level}.csv.js`),
     wrapModule(dsvFormat(';').format(infos, ['id', 'postal', 'name', 'population'])),
@@ -266,6 +273,14 @@ async function counties(level = 'county') {
       population: populationLookup.county(id) || Number.parseInt(props.Population, 10),
     };
   });
+
+  const extras = dsvFormat(';').parse(fs.readFileSync(path.join(__dirname, 'raw/territory/county.csv')).toString());
+  for (const row of extras) {
+    if (!row.population) {
+      row.population = populationLookup.state(row.id);
+    }
+    infos.push(row);
+  }
   fs.writeFileSync(
     path.resolve(__dirname, `./processed/${level}.csv.js`),
     wrapModule(dsvFormat(';').format(infos, ['id', 'name', 'population', 'displayName'])),
