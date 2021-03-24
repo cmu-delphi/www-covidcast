@@ -1,10 +1,6 @@
 <script>
-  // import VegaTooltip from '../../components/DetailView/VegaTooltip.svelte';
-
   import Vega from '../../components/Vega.svelte';
   import { formatAPITime, parseAPITime } from '../../data';
-  // import { formatDateLocal } from '../../formats';
-  import { sensorList } from '../../stores/constants';
   import { currentSensorEntry, smallMultipleTimeSpan } from '../../stores';
   import { prepareSensorData } from '../overview/vegaSpec';
 
@@ -61,23 +57,7 @@
     });
   }
 
-  /**
-   * @type {import('../../stores/constants').SensorEntry[]}
-   */
-  $: otherSensors = [sensor, $currentSensorEntry];
-
-  let chosenColumn = ''; // Sensor chosen by user from menu.
-  $: {
-    if (chosenColumn) {
-      const chosenSensor = sensorList.find((d) => d.key === chosenColumn);
-      otherSensors = otherSensors.concat([chosenSensor]);
-      chosenColumn = '';
-      // console.info('otherSensors', otherSensors);
-    }
-  }
-
-  function makeMatrixCellSpec(xKey, yKey, options = {}) {
-    console.info('makeMatrixCellSpec options', options);
+  function makeIndicatorCompareSpec(xKey, yKey, options = {}) {
     const lag = options.lag || 0;
     const width = options.width || 100;
     const height = options.height || 100;
@@ -313,9 +293,7 @@
                 {
                   regression: 'x',
                   on: 'y',
-                  // params: true,
                 },
-                // { calculate: 'datum.rSquared * 100', as: 'r2' },
               ],
               mark: {
                 type: 'line',
@@ -349,54 +327,35 @@
     return spec;
   }
 
-  $: matrixSpec = [];
-
-  function updateMatrixSpec(vegaRepeatSpec, lag = 0) {
-    const specs = vegaRepeatSpec.rows
-      .map((r) => {
-        const c = vegaRepeatSpec.columns[0];
-        return [
-          ...[
-            makeMatrixCellSpec(r.key, c.key, {
-              histogram: r == c, // obsolete
-              showTitle: true,
-              axisTitles: true,
-              ticks: false,
-              tickLabels: true,
-              xtitle: r.name,
-              ytitle: c.name,
-              lag,
-              showTooltips: false,
-              showRSquared: false,
-              ...options,
-            }),
-          ],
-        ].flat();
-      })
-      .flat();
-    let matrixSpec = {
-      columns: 1, // vegaRepeatSpec.columns.length,
-      concat: [specs[1]],
-    };
-    // console.info('matrix', matrixSpec);
-    return matrixSpec;
+  function updateIndicatorCompareSpec(lag = 0) {
+    const xIndicator = $currentSensorEntry;
+    const yIndicator = sensor;
+    return makeIndicatorCompareSpec(xIndicator.key, yIndicator.key, {
+      showTitle: true,
+      axisTitles: true,
+      ticks: false,
+      tickLabels: true,
+      xtitle: xIndicator.name,
+      ytitle: yIndicator.name,
+      lag,
+      showTooltips: false,
+      showRSquared: false,
+      ...options,
+    });
   }
 
-  $: vegaRepeatSpec = { rows: otherSensors, columns: otherSensors };
+  $: indicatorCompareSpec = topLevelIndicatorCompareSpec(lag);
 
-  $: {
-    matrixSpec = updateMatrixSpec(vegaRepeatSpec, lag);
-  }
-
-  $: splomSpec = makeSplomSpec(matrixSpec);
-
-  function makeSplomSpec(matrixSpec) {
+  function topLevelIndicatorCompareSpec(lag) {
     return {
       $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
       padding: options.padding != null ? options.padding : { left: 10, right: 50, top: 10, bottom: 10 },
       data: { name: 'values' },
 
-      ...matrixSpec,
+      ...{
+        columns: 1,
+        concat: [updateIndicatorCompareSpec(lag)],
+      },
     };
   }
 </script>
@@ -498,7 +457,7 @@
 <div class="root" on:click>
   <Vega
     data={Promise.resolve(sensorMatrixData)}
-    spec={splomSpec}
+    spec={indicatorCompareSpec}
     signals={{ currentDate: date, highlightTimeValue }}
     signalListeners={['highlight']}
     on:signal={onHighlight} />
