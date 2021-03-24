@@ -1,21 +1,21 @@
 <script>
-  import SignalStatusTable from './SignalStatusTable.svelte';
+  import IndicatorStatusTable from './IndicatorStatusTable.svelte';
   import '../mobile/common.css';
   import { getIndicatorStatuses } from '../../data/indicatorInfo';
   import MobileSurveyToc from '../survey/MobileSurveyToc.svelte';
-  import SignalStatus from './SignalStatus.svelte';
+  import IndicatorStatus from './IndicatorStatus.svelte';
 
-  const signals = getIndicatorStatuses();
+  const statuses = getIndicatorStatuses();
   const date = new Date();
 </script>
 
 <div class="root">
   <div class="mobile-header-line-bg">
     <div class="mobile-header-line">
-      <h2>Signal <span>Dashboard</span></h2>
+      <h2>Indicator Status<span>Overview</span></h2>
     </div>
-    <MobileSurveyToc name="Signals">
-      {#await signals then s}
+    <MobileSurveyToc name="Indicator">
+      {#await statuses then s}
         {#each s as signal, i}
           <li class="nav-dropdown-parent">
             <a href="#{signal.name}" data-uk-scroll>{i + 1}. {signal.name}</a>
@@ -26,14 +26,14 @@
   </div>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <SignalStatusTable {date} />
+      <IndicatorStatusTable {date} />
     </div>
     <div class="grid-1-3">
       <div class="toc-container uk-visible@m">
         <div class="toc">
-          <h5>Signals</h5>
+          <h5>Indicators</h5>
           <ol uk-scrollspy-nav="closest: li; scroll: true;" class="uk-nav uk-nav-default">
-            {#await signals then s}
+            {#await statuses then s}
               {#each s as signal (signal.name)}
                 <li><a href="#{signal.name}">{signal.name}</a></li>
               {/each}
@@ -43,9 +43,9 @@
       </div>
     </div>
     <div class="grid-3-11 questions">
-      {#await signals then s}
+      {#await statuses then s}
         {#each s as signal (signal.name)}
-          <SignalStatus {signal} {date} />
+          <IndicatorStatus {signal} {date} />
         {/each}
       {/await}
     </div>

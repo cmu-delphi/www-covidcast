@@ -218,9 +218,9 @@ module.exports = () => {
         filename: 'survey-results/index.html',
       }),
       new HtmlWebpackPlugin({
-        title: 'COVIDcast Signal Dashboard',
+        title: 'COVIDcast Indicator Status Overview',
         template: './src/index.html',
-        filename: 'signal-dashboard/index.html',
+        filename: 'indicator-status/index.html',
       }),
       // new HtmlWebpackPlugin({
       //   title: 'COVIDcast Lab',

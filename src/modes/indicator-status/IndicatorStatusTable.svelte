@@ -56,7 +56,7 @@
     return getIndicatorStatuses().then((rows) =>
       rows.map((r) => ({
         ...r,
-        lag: timeDay.count(date, r.latest_data_date),
+        lag: timeDay.count(date, r.latest_time_value),
       })),
     );
   }
@@ -88,7 +88,7 @@
 <table class="mobile-table" class:loading>
   <thead>
     <tr>
-      <th class="mobile-th">Signal Name</th>
+      <th class="mobile-th">Indicator</th>
       <th class="mobile-th uk-text-right">Latest Issue</th>
       <th class="mobile-th uk-text-right">Latest Data Available</th>
       <th class="mobile-th uk-text-right">Lag to Today</th>
@@ -97,24 +97,24 @@
       <th class="sort-indicator uk-text-center">
         <SortColumnIndicator
           label="Name"
-          on:click={() => sortClick('displayName')}
-          sorted={sortCriteria === 'displayName'}
+          on:click={() => sortClick('name')}
+          sorted={sortCriteria === 'name'}
           desc={sortDirectionDesc}
         />
       </th>
       <th class="sort-indicator">
         <SortColumnIndicator
           label="Latest Issue Date"
-          on:click={() => sortClick('latest_issue_date')}
-          sorted={sortCriteria === 'latest_issue_date'}
+          on:click={() => sortClick('latest_issue')}
+          sorted={sortCriteria === 'latest_issue'}
           desc={sortDirectionDesc}
         />
       </th>
       <th class="sort-indicator">
         <SortColumnIndicator
           label="Latest Data Date"
-          on:click={() => sortClick('latest_data_date')}
-          sorted={sortCriteria === 'latest_data_date'}
+          on:click={() => sortClick('latest_time_value')}
+          sorted={sortCriteria === 'latest_time_value'}
           desc={sortDirectionDesc}
         />
       </th>
@@ -135,10 +135,10 @@
           {r.name}
         </td>
         <td class="uk-text-right">
-          {formatDateISO(r.latest_issue_date)}
+          {formatDateISO(r.latest_issue)}
         </td>
         <td class="uk-text-right">
-          {formatDateISO(r.latest_data_date)}
+          {formatDateISO(r.latest_time_value)}
         </td>
         <td class="uk-text-right">
           {r.lag.toLocaleString()} days

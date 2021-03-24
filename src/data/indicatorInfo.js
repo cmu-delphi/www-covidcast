@@ -32,6 +32,11 @@ export function getIndicatorStatuses() {
     for (const row of data) {
       row.latest_issue = parseAPITime(row.latest_issue.toString());
       row.latest_time_value = parseAPITime(row.latest_time_value.toString());
+      Object.values(row.coverage).forEach((level) => {
+        for (const row of level) {
+          row.date = parseAPITime(row.date.toString());
+        }
+      });
     }
     return data;
   });

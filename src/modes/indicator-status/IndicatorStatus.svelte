@@ -1,7 +1,7 @@
 <script>
   import { formatDateISO } from '../../formats';
   import KPI from '../survey/KPI.svelte';
-  import SignalCountyMap from './SignalCountyMap.svelte';
+  import IndicatorCountyMap from './IndicatorCountyMap.svelte';
   import FancyHeader from '../mobile/FancyHeader.svelte';
   import { getAvailableCounties } from '../../data/indicatorInfo';
   import SurveyValue from '../survey/SurveyValue.svelte';
@@ -26,7 +26,7 @@
     <div class="mobile-two-col">
       <div>
         <div>
-          <KPI text={formatDateISO(signal.latest_data_date)} />
+          <KPI text={formatDateISO(signal.latest_time_value)} />
         </div>
         <div class="sub">latest data date</div>
       </div>
@@ -42,8 +42,8 @@
       </div>
     </div>
 
-    <FancyHeader invert sub="Map ({formatDateISO(signal.latest_data_date)})">Coverage</FancyHeader>
-    <SignalCountyMap {signal} date={signal.latest_data_date} {data} />
+    <FancyHeader invert sub="Map ({formatDateISO(signal.latest_time_value)})">Coverage</FancyHeader>
+    <IndicatorCountyMap {signal} date={signal.latest_time_value} {data} />
   </div>
 </article>
 
