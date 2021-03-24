@@ -1,8 +1,10 @@
 // Indicator Info: aka The Signal Dashboard API
 
-import { formatAPITime, parseAPITime } from './utils';
+import { formatAPITime } from './utils';
 import { callSignalAPI } from './api';
 import { fetchData } from './fetchData';
+import { isoParse } from 'd3-time-format';
+import { addNameInfos } from '.';
 
 /**
  * @typedef {object} Coverage
@@ -30,11 +32,11 @@ export function getIndicatorStatuses() {
     }
     const data = d.epidata || [];
     for (const row of data) {
-      row.latest_issue = parseAPITime(row.latest_issue.toString());
-      row.latest_time_value = parseAPITime(row.latest_time_value.toString());
+      row.latest_issue = isoParse(row.latest_issue.toString());
+      row.latest_time_value = isoParse(row.latest_time_value.toString());
       Object.values(row.coverage).forEach((level) => {
         for (const row of level) {
-          row.date = parseAPITime(row.date.toString());
+          row.date = isoParse(row.date.toString());
         }
       });
     }
@@ -46,7 +48,7 @@ export function getIndicatorStatuses() {
  *
  * @param {IndicatorStatus} indicator
  * @param {Date} date
- * @returns {Promise<import('.').EpiDataRow[]>}
+ * @returns {Promise<(import('.').EpiDataRow & import('../maps').NameInfo)[]>}
  */
 export function getAvailableCounties(indicator, date) {
   return fetchData(
@@ -61,5 +63,5 @@ export function getAvailableCounties(indicator, date) {
     {
       multi_values: false,
     },
-  );
+  ).then((rows) => addNameInfos(rows).filter((d) => d.level === 'county'));
 }

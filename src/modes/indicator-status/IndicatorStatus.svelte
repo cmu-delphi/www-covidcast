@@ -12,7 +12,7 @@
    */
   export let signal;
 
-  $: data = getAvailableCounties(signal, signal.latest_data_date);
+  $: data = getAvailableCounties(signal, signal.latest_time_value);
 
   $: coverage = data.then((rows) => rows.length / countyInfo.length);
 </script>

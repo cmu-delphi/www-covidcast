@@ -45,7 +45,7 @@
     <div class="grid-3-11 questions">
       {#await statuses then s}
         {#each s as signal (signal.name)}
-          <IndicatorStatus {signal} {date} />
+          <IndicatorStatus {signal} />
         {/each}
       {/await}
     </div>
