@@ -205,7 +205,7 @@
   $: regions = raw ? [region.value] : resolveRegions(region.value);
   $: annotations = $annotationManager.getWindowAnnotations(
     sensor.value,
-    region ? region.value : regions,
+    regions,
     date.windowTimeFrame.min,
     date.windowTimeFrame.max,
   );
