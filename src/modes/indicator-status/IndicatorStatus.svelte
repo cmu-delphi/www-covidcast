@@ -5,68 +5,35 @@
   import FancyHeader from '../mobile/FancyHeader.svelte';
   import { getAvailableCounties } from '../../data/indicatorInfo';
   import SurveyValue from '../survey/SurveyValue.svelte';
-  import { countyInfo } from '../../maps';
-
   /**
    * @type {import('../../data/indicatorInfo').IndicatorStatus}
    */
   export let signal;
 
   $: data = getAvailableCounties(signal, signal.latest_time_value);
-
-  $: coverage = data.then((rows) => rows.length / countyInfo.length);
 </script>
 
-<article class="uk-card uk-card-default uk-card-small question-card">
-  <a href="#{signal.name}" id={signal.name} class="anchor"><span>Anchor</span></a>
-  <div class="uk-card-header">
-    <h3 class="uk-card-title">{signal.name}</h3>
-  </div>
-  <div class="uk-card-body question-body">
-    <div class="mobile-two-col">
+<div class="grid-3-11">
+  <div class="mobile-two-col">
+    <div>
       <div>
-        <div>
-          <KPI text={formatDateISO(signal.latest_time_value)} />
-        </div>
-        <div class="sub">latest data date</div>
+        <KPI text={formatDateISO(signal.latest_time_value)} />
       </div>
-      <div class="mobile-kpi">
-        <div>
-          {#await coverage}
-            <SurveyValue value={null} loading />
-          {:then coverage}
-            <SurveyValue value={coverage} factor={100} />
-          {/await}
-        </div>
-        <div class="sub">% of counties available</div>
-      </div>
+      <div class="sub">latest data date</div>
     </div>
-
-    <FancyHeader invert sub="Map ({formatDateISO(signal.latest_time_value)})">Coverage</FancyHeader>
-    <IndicatorCountyMap {signal} date={signal.latest_time_value} {data} />
+    <div class="mobile-kpi">
+      <div>
+        <SurveyValue value={signal ? signal.latest_coverage : null} factor={100} />
+      </div>
+      <div class="sub">% of counties available</div>
+    </div>
   </div>
-</article>
 
-<style>
-  .question-card {
-    margin-bottom: 2em;
-    border-radius: 8px;
-  }
-  .uk-card-header {
-    background: #f2f2f2;
-    border-radius: 8px 8px 0 0;
-    display: flex;
-    align-items: center;
-  }
+  <FancyHeader invert sub="Chart">Coverage</FancyHeader>
+  <!-- <IndicatorCoverageChart {signal} date={signal.latest_time_value} /> -->
 
-  .anchor {
-    /** move anchor such that scrolling won't overlap with the sticky parameters */
-    position: absolute;
-    top: -160px;
-    display: inline-block;
-  }
-
-  .anchor > span {
-    display: none;
-  }
-</style>
+  <FancyHeader invert sub="Map ({formatDateISO(signal.latest_time_value)})">Coverage</FancyHeader>
+</div>
+<div class="grid-2-12">
+  <IndicatorCountyMap {signal} date={signal.latest_time_value} {data} />
+</div>

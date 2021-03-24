@@ -1,54 +1,66 @@
 <script>
   import IndicatorStatusTable from './IndicatorStatusTable.svelte';
   import '../mobile/common.css';
-  import { getIndicatorStatuses } from '../../data/indicatorInfo';
-  import MobileSurveyToc from '../survey/MobileSurveyToc.svelte';
   import IndicatorStatus from './IndicatorStatus.svelte';
+  import { loadData, determineDomain } from './data';
+  import IndicatorStatusDropdown from './IndicatorStatusDropdown.svelte';
 
-  const statuses = getIndicatorStatuses();
   const date = new Date();
+
+  $: data = loadData(date);
+
+  let domain = determineDomain([]);
+  /**
+   * @type {import('./data').ExtendedStatus[]}
+   */
+  let loadedData = [];
+
+  $: {
+    loadedData = [];
+    domain = determineDomain([]);
+    data.then((rows) => {
+      loadedData = rows;
+      domain = determineDomain(rows);
+    });
+  }
+
+  /**
+   * @type {import('./data').ExtendedStatus | null}
+   */
+  let selected = null;
+
+  function switchToDetails(e) {
+    selected = e.detail;
+  }
 </script>
 
 <div class="root">
   <div class="mobile-header-line-bg">
     <div class="mobile-header-line">
-      <h2>Indicator Status<span>Overview</span></h2>
+      <h2>Indicator Status <span>Overview</span></h2>
     </div>
-    <MobileSurveyToc name="Indicator">
-      {#await statuses then s}
-        {#each s as signal, i}
-          <li class="nav-dropdown-parent">
-            <a href="#{signal.name}" data-uk-scroll>{i + 1}. {signal.name}</a>
-          </li>
-        {/each}
-      {/await}
-    </MobileSurveyToc>
   </div>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <IndicatorStatusTable {date} />
+      <ul class="uk-tab uk-child-width-expand">
+        <li class:uk-active={selected == null}>
+          <a href="#overview" on:click={() => (selected = null)}>Overview</a>
+        </li>
+        <li class:uk-active={selected != null}>
+          <a href="#details" on:click={() => (selected = loadedData[0])}>Individual</a>
+        </li>
+      </ul>
     </div>
-    <div class="grid-1-3">
-      <div class="toc-container uk-visible@m">
-        <div class="toc">
-          <h5>Indicators</h5>
-          <ol uk-scrollspy-nav="closest: li; scroll: true;" class="uk-nav uk-nav-default">
-            {#await statuses then s}
-              {#each s as signal (signal.name)}
-                <li><a href="#{signal.name}">{signal.name}</a></li>
-              {/each}
-            {/await}
-          </ol>
-        </div>
+    {#if selected}
+      <div class="grid-3-11">
+        <IndicatorStatusDropdown bind:selected {data} />
       </div>
-    </div>
-    <div class="grid-3-11 questions">
-      {#await statuses then s}
-        {#each s as signal (signal.name)}
-          <IndicatorStatus {signal} />
-        {/each}
-      {/await}
-    </div>
+      <IndicatorStatus signal={selected} />
+    {:else}
+      <div class="grid-3-11">
+        <IndicatorStatusTable {data} {date} on:select={switchToDetails} {domain} />
+      </div>
+    {/if}
   </div>
 </div>
 
@@ -59,20 +71,7 @@
     font-size: 0.875rem;
     line-height: 1.5rem;
   }
-  .questions {
-    margin-top: 1em;
-  }
-  .toc-container {
-    position: sticky;
-    top: 100px;
-    margin-top: 1em;
-  }
-
   .content-grid {
     grid-row-gap: 0;
-  }
-
-  .toc {
-    padding: 24px 6px 24px 24px;
   }
 </style>

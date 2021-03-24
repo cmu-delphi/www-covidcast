@@ -1,13 +1,14 @@
 <script>
   import SortColumnIndicator from '../mobile/SortColumnIndicator.svelte';
   import FancyHeader from '../mobile/FancyHeader.svelte';
-  import { formatDateISO, formatDateShortNumbers } from '../../formats';
+  import { formatDateISO, formatDateShortNumbers, formatFraction } from '../../formats';
   import DownloadMenu from '../mobile/components/DownloadMenu.svelte';
-  import { getIndicatorStatuses } from '../../data/indicatorInfo';
-  import { timeDay } from 'd3-time';
   import Vega from '../../components/Vega.svelte';
   import { generateSparkLine } from '../../specs/lineSpec';
+  import { createEventDispatcher } from 'svelte';
+  import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
 
+  const dispatch = createEventDispatcher();
   /**
    * @type {Date}
    */
@@ -51,55 +52,28 @@
   $: comparator = bySortCriteria(sortCriteria, sortDirectionDesc);
 
   /**
-   *
-   * @param {Date}date
-   * @returns {Promise<(import('../../data/indicatorInfo').IndicatorStatus & {lag: number})[]>}
+   * @type {Promise<import('./data').ExtendedStatus[]>}
    */
-  function loadData(date) {
-    return getIndicatorStatuses().then((rows) =>
-      rows.map((r) => ({
-        ...r,
-        lag: timeDay.count(r.latest_time_value, date),
-      })),
-    );
-  }
-
-  $: loadedData = loadData(date);
+  export let data = Promise.resolve([]);
   /**
-   * @type {(import('../../data/indicatorInfo').IndicatorStatus & {lag: number})[]}
+   * @type {[Date, Date]}
+   */
+  export let domain;
+
+  /**
+   * @type {import('./data').ExtendedStatus[]}
    */
   let sortedData = [];
   let loading = true;
   $: {
     loading = true;
     sortedData = [];
-    loadedData.then((rows) => {
+    data.then((rows) => {
       sortedData = rows.slice().sort(comparator);
       loading = false;
     });
   }
 
-  function determineDomain(data) {
-    let min = Number.POSITIVE_INFINITY;
-    let max = Number.NEGATIVE_INFINITY;
-    if (data.length === 0) {
-      return [new Date(), new Date()];
-    }
-    for (const row of data) {
-      for (const coverage of row.coverage.county || []) {
-        const d = coverage.date.getTime();
-        if (d < min) {
-          min = d;
-        }
-        if (d > max) {
-          max = d;
-        }
-      }
-    }
-    return [min, max];
-  }
-
-  $: domain = determineDomain(sortedData);
   $: spec = generateSparkLine({
     dateField: 'date',
     valueField: 'count',
@@ -110,12 +84,18 @@
 </script>
 
 <div class="uk-position-relative">
-  <FancyHeader anchor="table" sub="Status">Signal</FancyHeader>
+  <FancyHeader>Summary</FancyHeader>
   <DownloadMenu
-    fileName="signal_status_as_of_{formatDateISO(date)}"
-    data={loadedData}
+    fileName="indicator_status_as_of_{formatDateISO(date)}"
+    {data}
     absolutePos
-    prepareRow={(row) => row}
+    prepareRow={(row) => ({
+      name: row.name,
+      latest_issue: row.latest_issue,
+      latest_time_value: row.latest_time_value,
+      latest_coverage: row.latest_coverage,
+      latest_lag: row.latest_lag,
+    })}
     advanced={false}
   />
 </div>
@@ -127,6 +107,7 @@
       <th class="mobile-th uk-text-right">Latest Issue</th>
       <th class="mobile-th uk-text-right">Latest Data Available</th>
       <th class="mobile-th uk-text-right">Lag to Today</th>
+      <th class="mobile-th uk-text-right">Latest Coverage</th>
       <th class="mobile-th uk-text-right">
         <span>Coverage</span>
         <div class="mobile-th-range">
@@ -134,6 +115,7 @@
           <span> {formatDateShortNumbers(new Date(domain[1]))} </span>
         </div>
       </th>
+      <th />
     </tr>
     <tr>
       <th class="sort-indicator uk-text-center">
@@ -163,11 +145,20 @@
       <th class="sort-indicator">
         <SortColumnIndicator
           label="Lag"
-          on:click={() => sortClick('lag')}
-          sorted={sortCriteria === 'lag'}
+          on:click={() => sortClick('latest_lag')}
+          sorted={sortCriteria === 'latest_lag'}
           desc={sortDirectionDesc}
         />
       </th>
+      <th class="sort-indicator">
+        <SortColumnIndicator
+          label="Latest Coverage"
+          on:click={() => sortClick('latest_coverage')}
+          sorted={sortCriteria === 'latest_coverage'}
+          desc={sortDirectionDesc}
+        />
+      </th>
+      <th class="sort-indicator" />
       <th class="sort-indicator" />
     </tr>
   </thead>
@@ -175,7 +166,7 @@
     {#each sortedData as r (r.name)}
       <tr>
         <td>
-          {r.name}
+          <a href="#{r.name}" on:click|preventDefault={() => dispatch('select', r)}>{r.name}</a>
         </td>
         <td class="uk-text-right">
           {formatDateISO(r.latest_issue)}
@@ -184,14 +175,30 @@
           {formatDateISO(r.latest_time_value)}
         </td>
         <td class="uk-text-right">
-          {r.lag.toLocaleString()} days
+          {r.latest_lag.toLocaleString()} days
+        </td>
+        <td class="uk-text-right">
+          {formatFraction(r.latest_coverage)}
         </td>
         <td>
           <div class="mobile-table-chart mobile-table-chart-small">
             <Vega {spec} data={r.coverage.county || []} noDataText="N/A" />
           </div>
         </td>
+        <td>
+          <a href="#{r.name}" class="uk-link-text details-link" on:click|preventDefault={() => dispatch('select', r)}>
+            {@html chevronRightIcon}
+          </a>
+        </td>
       </tr>
     {/each}
   </tbody>
 </table>
+
+<style>
+  .details-link {
+    width: 6px;
+    display: inline-block;
+    fill: currentColor;
+  }
+</style>
