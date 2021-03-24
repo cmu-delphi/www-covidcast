@@ -5,6 +5,7 @@
   import { prepareSensorData } from '../overview/vegaSpec';
 
   /**
+   * The sensor being compared to the currentSensorEntry.
    * @type {import("../../stores/constants").SensorEntry}
    */
   export let sensor;

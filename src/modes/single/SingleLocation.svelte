@@ -13,20 +13,16 @@
     removeCompare,
     selectByInfo,
   } from '../../stores';
-  // import { get } from 'svelte/store';
+
   import { sensorList } from '../../stores/constants';
   import SensorCard from './SensorCard.svelte';
-  // import { groupedSensorList } from '../../stores/constants';
 
   import InfoDialogButton from '../../components/InfoDialogButton.svelte';
 
-  // import SensorCard from './SensorCard.svelte';
   import IndicatorCompare from './IndicatorCompare.svelte';
   import { selectionColors } from '../../theme';
   import { onHighlight, prepareSensorData } from '../overview/vegaSpec';
   import { highlightTimeValue, smallMultipleTimeSpan } from '../../stores';
-  // import { assembleParameterSignals } from 'vega-lite/build/src/parameter';
-  // import { formatAPITime, parseAPITime } from '../../data';
 
   $: levelIds = new Set(levelList.map((l) => l.id));
   $: filteredSensorGroups = groupedSensorList
@@ -57,11 +53,7 @@
   /**
    * @type {import('../../stores/constants').SensorEntry[]}
    */
-  let otherSensors = sensorList; //[$currentSensorEntry];
-  // $: primary = $currentSensorEntry;
-  // $: {
-  //   otherSensors.push(primary);
-  // }
+  let otherSensors = sensorList;
 
   // Need the following to avoid auto-selecting one indicator to compare with.
   let chosenColumn = ''; // Sensor chosen by user from menu.
@@ -70,7 +62,7 @@
       const chosenSensor = sensorList.find((d) => d.key === chosenColumn);
       otherSensors = otherSensors.concat([chosenSensor]);
       chosenColumn = '';
-      console.info('otherSensors', otherSensors);
+      // console.info('otherSensors', otherSensors);
     }
   }
 
@@ -79,10 +71,10 @@
     const sensorDateMap = {};
     const sensorKeysMap = {}; // map from sensor key to sensor.
     return Promise.all(sensorPromises).then((sensorsDataRows) => {
-      console.info('sensorsDataRows', sensorsDataRows);
+      // console.info('sensorsDataRows', sensorsDataRows);
       sensorsDataRows.forEach((sensorRows, index) => {
         const sensorData = sensorListData[index];
-        console.info('index', index, 'sensorData', sensorData, 'sensorRows', sensorRows);
+        // console.info('index', index, 'sensorData', sensorData, 'sensorRows', sensorRows);
         sensorRows.forEach((row) => {
           const time_value_key = String(row.time_value);
           if (!sensorDateMap[time_value_key]) {
@@ -93,21 +85,16 @@
           sensorDateMap[time_value_key][sensorKey] = row.value;
         });
       });
-      console.info('sensorKeysMap', sensorKeysMap);
-      console.info('sensorDateMap', sensorDateMap);
-      const sensors = Object.values(sensorKeysMap);
-      vegaRepeatSpec = {
-        rows: sensors,
-        columns: sensors, // .reverse(),
-      };
+      // console.info('sensorKeysMap', sensorKeysMap);
+      // console.info('sensorDateMap', sensorDateMap);
+      // const sensors = Object.values(sensorKeysMap);
       return Object.values(sensorDateMap);
     });
   }
-  // $: sensorListData = sensorList.slice(0, 4).map((sensor) => prepareSensorData(sensor, selections, startDay, endDay));
+
   $: sensorListData = otherSensors.map((sensor) => prepareSensorData(sensor, selections, startDay, endDay));
   $: sensorDataPromises = sensorListData.map((sensorData) => sensorData.data);
   $: sensorMatrixData = loadAllSignalData(sensorDataPromises);
-  $: vegaRepeatSpec = { rows: [], columnc: [] };
 
   $: showLagsForSensor = null;
 
@@ -118,7 +105,6 @@
     setTimeout(() => {
       // showLagsForSensor = sensor;
       showLagDetailsForSensor = sensor;
-      console.info('onShowLagDetails', sensor);
     }, 250);
   }
 
@@ -131,12 +117,6 @@
   $: compareSensorDate = new Date(
     $currentDateObject.getTime() + 3600 * 24 * (sensorDetailsLag <= 0 ? -sensorDetailsLag : 0),
   );
-
-  // function onShowLagDetails(sensor, lag) {
-  //   showLagDetailsForSensor = sensor;
-  //   sensorDetailsLag = lag;
-  //   console.info('onShowLagDetails', sensor, lag);
-  // }
 </script>
 
 <style>
