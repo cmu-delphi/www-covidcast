@@ -76,100 +76,14 @@
     }
   }
 
-  // row and column are field names as keys.
-  function makeMatrixCellSpec(row, column, options = {}) {
+  function makeMatrixCellSpec(xKey, yKey, options = {}) {
     console.info('makeMatrixCellSpec options', options);
     const lag = options.lag || 0;
     const width = options.width || 100;
     const height = options.height || 100;
     const sizeLegend = options.sizeLegend || null;
 
-    // console.info('width', width, 'height', height);
-    const chartSpec = {
-      width: width,
-      height: height,
-      padding: options.padding != null ? options.padding : null,
-      mark: {
-        type: 'point',
-        tooltip: options.showTooltips,
-      },
-
-      selection: {
-        highlight: {
-          type: 'single',
-          empty: 'none',
-          on: 'mouseover',
-          nearest: true,
-          clear: 'mouseout',
-        },
-      },
-
-      encoding: {
-        x: {
-          field: 'x',
-          title: options.axisTitles ? options.xtitle : '',
-          type: 'quantitative',
-          scale: {
-            zero: false,
-            domainMin: null,
-            domainMax: null,
-          },
-          axis: {
-            ticks: options.ticks,
-            labels: options.tickLabels,
-          },
-        },
-        y: {
-          field: 'y',
-          title: options.axisTitles ? options.ytitle : '',
-          type: 'quantitative',
-          scale: {
-            zero: false,
-            domainMin: undefined,
-            domainMax: undefined,
-          },
-          axis: { ticks: options.ticks, labels: options.tickLabels },
-        },
-        tooltip: options.showTooltips
-          ? [
-              {
-                field: 'x_title',
-                title: ' ',
-              },
-              // {
-              //   field: 'x',
-              //   type: 'quantitative',
-              //   title: options.xtitle,
-              // },
-              {
-                field: 'y_title',
-                title: '  ', // must be unique?
-              },
-              // {
-              //   field: 'y',
-              //   type: 'quantitative',
-              //   title: options.ytitle,
-              // },
-            ]
-          : false,
-        opacity: {
-          condition: [
-            {
-              selection: 'highlight',
-              value: 1,
-            },
-            {
-              test: 'datum.time_value == highlightTimeValue',
-              value: 1,
-            },
-          ],
-          value: 0.2,
-        },
-      },
-    };
-
-    let spec = chartSpec;
-    spec = {
+    let spec = {
       width: width,
       height: height,
       padding: options.padding != null ? options.padding : null,
@@ -186,7 +100,7 @@
             {
               op: 'lag',
               param: lag >= 0 ? lag : 0,
-              field: row,
+              field: xKey,
               as: 'x',
             },
             {
@@ -198,7 +112,7 @@
             {
               op: 'lag',
               param: lag <= 0 ? -lag : 0,
-              field: column,
+              field: yKey,
               as: 'y',
             },
           ],
@@ -207,7 +121,77 @@
         { as: 'y_title', calculate: `"${options.ytitle} (" + timeFormat(datum.y_date, "%b %d") + "): " + datum.y` },
       ],
       layer: [
-        chartSpec,
+        {
+          width: width,
+          height: height,
+          padding: options.padding != null ? options.padding : null,
+          mark: {
+            type: 'point',
+          },
+
+          selection: {
+            highlight: {
+              type: 'single',
+              empty: 'none',
+              on: 'mouseover',
+              nearest: true,
+              clear: 'mouseout',
+            },
+          },
+
+          encoding: {
+            x: {
+              field: 'x',
+              title: options.axisTitles ? options.xtitle : '',
+              type: 'quantitative',
+              scale: {
+                zero: false,
+                domainMin: null,
+                domainMax: null,
+              },
+              axis: {
+                ticks: options.ticks,
+                labels: options.tickLabels,
+              },
+            },
+            y: {
+              field: 'y',
+              title: options.axisTitles ? options.ytitle : '',
+              type: 'quantitative',
+              scale: {
+                zero: false,
+                domainMin: undefined,
+                domainMax: undefined,
+              },
+              axis: { ticks: options.ticks, labels: options.tickLabels },
+            },
+            tooltip: options.showTooltips
+              ? [
+                  {
+                    field: 'x_title',
+                    title: ' ',
+                  },
+                  {
+                    field: 'y_title',
+                    title: '  ', // must be unique?
+                  },
+                ]
+              : false,
+            opacity: {
+              condition: [
+                {
+                  selection: 'highlight',
+                  value: 1,
+                },
+                {
+                  test: 'datum.time_value == highlightTimeValue',
+                  value: 1,
+                },
+              ],
+              value: 0.2,
+            },
+          },
+        },
 
         ...(options.showRSquared
           ? [
@@ -261,20 +245,6 @@
             },
           ],
           layer: [
-            // Draw hairs for the snake: interesting, but mostly just adds noise.
-            // {
-            //   mark: {
-            //     type: 'rule',
-            //     opacity: 0.2,
-            //   },
-            //   encoding: {
-            //     x: { field: 'x', type: 'quantitative' },
-            //     y: { field: 'y', type: 'quantitative' },
-            //     x2: { field: 'xmean', type: 'quantitative' },
-            //     y2: { field: 'ymean', type: 'quantitative' },
-            //   },
-            // },
-
             // Draw the "snake" line, a 7-day moving average of the points.
             {
               // Get next (or previous?) point along mean, to draw rule.
@@ -312,14 +282,14 @@
                       },
                     ]
                   : false,
-                opacity: {
+                color: {
                   condition: [
                     {
                       selection: 'highlightSnake',
-                      value: 1,
+                      value: 'blue',
                     },
                   ],
-                  value: 0.7,
+                  value: 'gray',
                 },
                 size: {
                   field: 'date_value',
@@ -351,13 +321,6 @@
                 type: 'line',
                 strokeWidth: 2,
                 color: 'firebrick',
-                // color: {
-                //   expr: 'scale'
-                //   // field: 'r2',
-                //   // round: false,
-                //   // type: 'quantitative',
-                //   // scale: { scheme: 'orangered' },
-                // },
                 tooltip: true,
               },
               encoding: {
@@ -377,24 +340,6 @@
                     domainMax: undefined,
                   },
                 },
-                // opacity: {
-                //   field: 'r2',
-                //   round: false,
-                //   type: 'quantitative',
-                //   //scale: { domain: [0, 1] },
-                // },
-                // color: {
-                //   field: 'r2',
-                //   round: false,
-                //   type: 'quantitative',
-                //   scale: { scheme: 'orangered' },
-                // },
-                // color: {
-                //   field: 'rSquared',
-                //   round: false,
-                //   type: 'quantitative',
-                //   scale: { scheme: 'orangered' },
-                // },
               },
             },
           ],

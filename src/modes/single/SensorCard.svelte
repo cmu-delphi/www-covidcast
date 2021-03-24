@@ -22,14 +22,14 @@
   export let highlightTimeValue;
 
   $: lagMS = 1000 * 3600 * 24 * lag;
-  $: highlightDate = highlightTimeValue != null ? new Date(parseAPITime(highlightTimeValue).getTime() - lagMS) : null;
+  $: highlightDate = highlightTimeValue != null ? new Date(parseAPITime(highlightTimeValue).getTime() + lagMS) : null;
 
   // use local variables with manual setting for better value comparison updates
-  $: startDay = new Date($smallMultipleTimeSpan[0].getTime() - lagMS);
-  $: endDay = new Date($smallMultipleTimeSpan[1].getTime() - lagMS);
+  $: startDay = new Date($smallMultipleTimeSpan[0].getTime() + lagMS);
+  $: endDay = new Date($smallMultipleTimeSpan[1].getTime() + lagMS);
 
-  $: newStartDay = new Date($smallMultipleTimeSpan[0].getTime() - lagMS);
-  $: newEndDay = new Date($smallMultipleTimeSpan[1].getTime() - lagMS);
+  $: newStartDay = new Date($smallMultipleTimeSpan[0].getTime() + lagMS);
+  $: newEndDay = new Date($smallMultipleTimeSpan[1].getTime() + lagMS);
 
   $: {
     if (startDay.getTime() !== newStartDay.getTime()) {

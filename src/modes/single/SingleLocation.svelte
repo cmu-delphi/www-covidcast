@@ -331,14 +331,14 @@
               <SensorCard
                 sensor={$currentSensorEntry}
                 date={$currentDateObject}
-                lag={sensorDetailsLag / 2}
+                lag={-sensorDetailsLag / 2}
                 selections={$currentMultiSelection}
                 {onHighlight}
                 highlightTimeValue={$highlightTimeValue} />
               <SensorCard
                 sensor={showLagDetailsForSensor}
                 date={compareSensorDate}
-                lag={-sensorDetailsLag / 2}
+                lag={sensorDetailsLag / 2}
                 selections={$currentMultiSelection}
                 {onHighlight}
                 highlightTimeValue={$highlightTimeValue} />
