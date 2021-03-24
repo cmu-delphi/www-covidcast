@@ -1,10 +1,12 @@
 <script>
   import SortColumnIndicator from '../mobile/SortColumnIndicator.svelte';
   import FancyHeader from '../mobile/FancyHeader.svelte';
-  import { formatDateISO } from '../../formats';
+  import { formatDateISO, formatDateShortNumbers } from '../../formats';
   import DownloadMenu from '../mobile/components/DownloadMenu.svelte';
   import { getIndicatorStatuses } from '../../data/indicatorInfo';
   import { timeDay } from 'd3-time';
+  import Vega from '../../components/Vega.svelte';
+  import { generateSparkLine } from '../../specs/lineSpec';
 
   /**
    * @type {Date}
@@ -51,17 +53,21 @@
   /**
    *
    * @param {Date}date
+   * @returns {Promise<(import('../../data/indicatorInfo').IndicatorStatus & {lag: number})[]>}
    */
   function loadData(date) {
     return getIndicatorStatuses().then((rows) =>
       rows.map((r) => ({
         ...r,
-        lag: timeDay.count(date, r.latest_time_value),
+        lag: timeDay.count(r.latest_time_value, date),
       })),
     );
   }
 
   $: loadedData = loadData(date);
+  /**
+   * @type {(import('../../data/indicatorInfo').IndicatorStatus & {lag: number})[]}
+   */
   let sortedData = [];
   let loading = true;
   $: {
@@ -72,6 +78,35 @@
       loading = false;
     });
   }
+
+  function determineDomain(data) {
+    let min = Number.POSITIVE_INFINITY;
+    let max = Number.NEGATIVE_INFINITY;
+    if (data.length === 0) {
+      return [new Date(), new Date()];
+    }
+    for (const row of data) {
+      for (const coverage of row.coverage.county || []) {
+        const d = coverage.date.getTime();
+        if (d < min) {
+          min = d;
+        }
+        if (d > max) {
+          max = d;
+        }
+      }
+    }
+    return [min, max];
+  }
+
+  $: domain = determineDomain(sortedData);
+  $: spec = generateSparkLine({
+    dateField: 'date',
+    valueField: 'count',
+    domain,
+    highlightDate: null,
+    highlightStartEnd: false,
+  });
 </script>
 
 <div class="uk-position-relative">
@@ -92,6 +127,13 @@
       <th class="mobile-th uk-text-right">Latest Issue</th>
       <th class="mobile-th uk-text-right">Latest Data Available</th>
       <th class="mobile-th uk-text-right">Lag to Today</th>
+      <th class="mobile-th uk-text-right">
+        <span>Coverage</span>
+        <div class="mobile-th-range">
+          <span> {formatDateShortNumbers(new Date(domain[0]))} </span>
+          <span> {formatDateShortNumbers(new Date(domain[1]))} </span>
+        </div>
+      </th>
     </tr>
     <tr>
       <th class="sort-indicator uk-text-center">
@@ -126,6 +168,7 @@
           desc={sortDirectionDesc}
         />
       </th>
+      <th class="sort-indicator" />
     </tr>
   </thead>
   <tbody>
@@ -142,6 +185,11 @@
         </td>
         <td class="uk-text-right">
           {r.lag.toLocaleString()} days
+        </td>
+        <td>
+          <div class="mobile-table-chart mobile-table-chart-small">
+            <Vega {spec} data={r.coverage.county || []} noDataText="N/A" />
+          </div>
         </td>
       </tr>
     {/each}

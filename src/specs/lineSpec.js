@@ -461,6 +461,7 @@ export function createSignalDateLabelHighlight(topPosition = false) {
 }
 
 export function generateSparkLine({
+  dateField = 'date_value',
   valueField = 'value',
   domain = null,
   color = COLOR,
@@ -490,7 +491,7 @@ export function generateSparkLine({
     },
     encoding: {
       x: {
-        field: 'date_value',
+        field: dateField,
         type: 'temporal',
         scale: {
           domain,
@@ -511,7 +512,11 @@ export function generateSparkLine({
       },
     },
     layer: [
-      highlightDate ? createSignalDateLabelHighlight(highlightDate === 'top') : CURRENT_DATE_HIGHLIGHT,
+      highlightDate
+        ? createSignalDateLabelHighlight(highlightDate === 'top')
+        : highlightDate === null
+        ? null
+        : CURRENT_DATE_HIGHLIGHT,
       {
         mark: {
           type: 'line',
@@ -530,45 +535,41 @@ export function generateSparkLine({
           },
         },
       },
-      ...(interactive
-        ? [
-            {
-              mark: {
-                type: 'point',
-                fill: color,
-                stroke: null,
-                tooltip: true,
-              },
-              encoding: {
-                y: {
-                  field: valueField,
-                  type: 'quantitative',
-                },
-                opacity: {
-                  condition: {
-                    param: 'highlight',
-                    empty: false,
-                    value: 1,
-                  },
-                  value: 0,
-                },
-              },
-              params: [
-                {
-                  name: 'highlight',
-                  select: {
-                    type: 'point',
-                    on: 'click, mousemove, [touchstart, touchend] > touchmove',
-                    nearest: true,
-                    clear: 'view:mouseout',
-                    encodings: ['x'],
-                  },
-                },
-              ],
+      interactive && {
+        mark: {
+          type: 'point',
+          fill: color,
+          stroke: null,
+          tooltip: true,
+        },
+        encoding: {
+          y: {
+            field: valueField,
+            type: 'quantitative',
+          },
+          opacity: {
+            condition: {
+              param: 'highlight',
+              empty: false,
+              value: 1,
             },
-          ]
-        : []),
-    ],
+            value: 0,
+          },
+        },
+        params: [
+          {
+            name: 'highlight',
+            select: {
+              type: 'point',
+              on: 'click, mousemove, [touchstart, touchend] > touchmove',
+              nearest: true,
+              clear: 'view:mouseout',
+              encodings: ['x'],
+            },
+          },
+        ],
+      },
+    ].filter(Boolean),
     config: {
       ...commonConfig,
       legend: {
@@ -581,7 +582,7 @@ export function generateSparkLine({
     if (domain) {
       spec.layer.unshift({
         data: {
-          values: [{ date_value: domain[0] }, { date_value: domain[1] }],
+          values: [{ [dateField]: domain[0] }, { [dateField]: domain[1] }],
         },
 
         mark: {
@@ -591,7 +592,7 @@ export function generateSparkLine({
         },
         encoding: {
           x: {
-            field: 'date_value',
+            field: dateField,
             type: 'temporal',
           },
         },
@@ -603,22 +604,22 @@ export function generateSparkLine({
             aggregate: [
               {
                 op: 'min',
-                field: 'date_value',
+                field: dateField,
                 as: 'date_value_min',
               },
               {
                 op: 'max',
-                field: 'date_value',
+                field: dateField,
                 as: 'date_value_max',
               },
             ],
           },
           {
             calculate: '[datum.date_value_min, datum.date_value_max]',
-            as: 'date_value',
+            as: dateField,
           },
           {
-            flatten: ['date_value'],
+            flatten: [dateField],
           },
         ],
       });
