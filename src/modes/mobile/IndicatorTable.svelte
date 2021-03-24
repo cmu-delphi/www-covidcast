@@ -14,6 +14,7 @@
   import { generateSparkLine } from '../../specs/lineSpec';
   import SensorValue from './SensorValue.svelte';
   import DownloadMenu from './components/DownloadMenu.svelte';
+  import IndicatorAnnotations from './IndicatorAnnotations.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -172,6 +173,14 @@
           {#if matchDataSource(entry.sensor, selectedDatasource)}
             <tr class="has-addon">
               <td>
+                <IndicatorAnnotations
+                  asHint
+                  sensor={entry.sensor}
+                  {region}
+                  {date}
+                  range="sparkLine"
+                  className="mobile-row-annotation"
+                />
                 <a
                   href="../indicator?sensor={entry.sensor.key}"
                   class="uk-link-text"

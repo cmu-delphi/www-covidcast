@@ -18,6 +18,7 @@
   import { formatDateWeekday } from '../../formats';
   import { afterUpdate } from 'svelte';
   import { scrollIntoView } from '../../util';
+  import IndicatorAnnotations from './IndicatorAnnotations.svelte';
 
   $: sensor = new SensorParam($currentSensorEntry, $times);
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
@@ -55,6 +56,7 @@
   </SurveyParameters>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
+      <IndicatorAnnotations {date} {region} {sensor} range="sparkLine" />
       <FancyHeader invert sub="Summary">{sensor.name}</FancyHeader>
       <p>On {formatDateWeekday(date.value)}, the {sensor.valueUnit} was:</p>
       <IndicatorOverview {sensor} {date} {region} {fetcher} />

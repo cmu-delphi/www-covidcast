@@ -3,10 +3,13 @@
 
 [context.branch-deploy.environment]
   COVIDCAST_ENDPOINT_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
+  COVIDCAST_ANNOTATION_DRAFTS = "true"
 
 [context.deploy-preview.environment]
   COVIDCAST_ENDPOINT_URL = "https://api.covidcast.cmu.edu/epidata/api.php"
+  COVIDCAST_ANNOTATION_DRAFTS = "true"
 
 [context.staging.environment]
   COVIDCAST_ENDPOINT_URL = "https://api-staging.delphi.cmu.edu/epidata/api.php"
   COVIDCAST_SIGNAL_DOC = "https://docs.google.com/document/d/1RLy4O-gtACVjLEVD_vxyPqvp9nWVhqEjoWAKi68RKpg,https://docs.google.com/document/d/1Yi_ueKvASwyzm6ZJEcrStk5qVIKz94N2yEHlklfnEig"
+  COVIDCAST_ANNOTATION_DRAFTS = "true"

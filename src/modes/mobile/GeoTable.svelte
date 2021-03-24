@@ -12,6 +12,7 @@
   import { determineTrend } from '../../stores/trend';
   import SensorValue from './SensorValue.svelte';
   import DownloadMenu from './components/DownloadMenu.svelte';
+  import IndicatorAnnotations from './IndicatorAnnotations.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -255,6 +256,7 @@
     {#each sortedRegions as r (r.propertyId)}
       <tr class:important={r.important}>
         <td>
+          <IndicatorAnnotations asHint {sensor} region={r} {date} range="sparkLine" className="mobile-row-annotation" />
           <a href="?region={r.propertyId}" class="uk-link-text" on:click|preventDefault={() => region.set(r, true)}
             >{r.displayName}</a
           >

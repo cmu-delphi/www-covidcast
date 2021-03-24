@@ -3,7 +3,7 @@ import { levelMegaCounty } from '../stores/constants';
 
 const ENDPOINT = process.env.COVIDCAST_ENDPOINT_URL;
 
-const fetchOptions = process.env.NODE_ENV === 'development' ? { cache: 'force-cache' } : {};
+export const fetchOptions = process.env.NODE_ENV === 'development' ? { cache: 'force-cache' } : {};
 
 /**
  * @param {string | (id: string, signal: string, level: string, date: Date | string, region: string) => any} endpoint
