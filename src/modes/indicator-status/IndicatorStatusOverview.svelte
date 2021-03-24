@@ -3,7 +3,7 @@
   import '../mobile/common.css';
   import IndicatorStatus from './IndicatorStatus.svelte';
   import { loadData, determineDomain } from './data';
-  import IndicatorStatusDropdown from './IndicatorStatusDropdown.svelte';
+  import Search from '../../components/Search.svelte';
 
   const date = new Date();
 
@@ -52,9 +52,22 @@
       </ul>
     </div>
     {#if selected}
-      <div class="grid-3-11">
-        <IndicatorStatusDropdown bind:selected {data} />
-      </div>
+      <Search
+        className="grid-3-11"
+        modern
+        placeholder="Select Indicator"
+        items={loadedData}
+        icon="search"
+        selectedItem={selected}
+        labelFieldName="name"
+        maxItemsToShowInList="5"
+        on:change={(e) => {
+          const newIndicator = e.detail ? loadedData.find((d) => d.name === e.detail.name) : null;
+          if (newIndicator !== selected) {
+            selected = newIndicator;
+          }
+        }}
+      />
       <IndicatorStatus signal={selected} />
     {:else}
       <div class="grid-3-11">

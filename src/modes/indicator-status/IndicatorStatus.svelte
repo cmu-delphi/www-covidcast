@@ -13,7 +13,7 @@
   $: data = getAvailableCounties(signal, signal.latest_time_value);
 </script>
 
-<div class="grid-3-11">
+<div class="grid-3-11 uk-margin-top">
   <div class="mobile-two-col">
     <div>
       <div>
