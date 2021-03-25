@@ -8,7 +8,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
         with:
-          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-key: ${{ secrets.CMU_DELPHI_DEPLOY_MACHINE_SSH }}
       - uses: actions/setup-node@v2
         with:
           node-version: '14.x'
