@@ -264,13 +264,17 @@
                     ]
                   : false,
                 color: {
+                  field: 'date_value',
+                  type: 'temporal',
+                  scale: {
+                    scheme: 'blues',
+                  },
                   condition: [
                     {
                       selection: 'highlightSnake',
-                      value: 'blue',
+                      value: 'black',
                     },
                   ],
-                  value: 'gray',
                 },
                 size: {
                   field: 'date_value',
