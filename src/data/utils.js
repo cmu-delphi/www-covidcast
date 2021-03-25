@@ -64,9 +64,7 @@ export function generateCorrelationMetrics(response, explanatory) {
   let zipped_values = response_values.map((x, i) => {
     return [explanatory_values[i], x];
   });
-  console.log(zipped_values);
   let model = linear(zipped_values);
-  console.log(JSON.stringify(model));
   return {
     r2At0: model.r2,
     lagAtMaxR2: 0,

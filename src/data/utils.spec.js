@@ -1,9 +1,5 @@
 import { formatAPITime, parseAPITime, generateCorrelationMetrics } from './utils';
-import { callAPIEndPoint } from './api';
-import { enableFetchMocks } from 'jest-fetch-mock';
-import fetchMocks from 'jest-fetch-mock';
-
-enableFetchMocks();
+import { cliTestData, deathsTestData } from './testData';
 
 describe('formatAPITime', () => {
   test('matches api format', () => {
@@ -30,29 +26,11 @@ describe('parseAPITime', () => {
 
 describe('correlationMetrics', () => {
   test('simple', async () => {
-    fetchMocks.dontMock();
-    let deaths = await callAPIEndPoint(
-      'https://api.covidcast.cmu.edu/epidata/api.php',
-      'indicator-combination',
-      'deaths_7dav_incidence_prop',
-      'county',
-      [new Date('2020-10-30'), new Date('2021-03-21')],
-      '42003',
-    );
-    let cli = await callAPIEndPoint(
-      'https://api.covidcast.cmu.edu/epidata/api.php',
-      'fb-survey',
-      'smoothed_hh_cmnty_cli',
-      'county',
-      [new Date('2020-10-30'), new Date('2021-03-21')],
-      '42003',
-    );
-
     let metrics = {
       r2At0: 0.43,
-      lagAtMaxR2: 0,
+      lagAtMaxR2: 20,
       r2AtMaxR2: 0.43,
     };
-    expect(generateCorrelationMetrics(deaths.epidata, cli.epidata)).toEqual(metrics);
+    expect(generateCorrelationMetrics(deathsTestData, cliTestData)).toEqual(metrics);
   });
 });
