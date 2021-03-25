@@ -1,0 +1,35 @@
+name: Update Google Docs Data
+on:
+  workflow_dispatch:
+jobs:
+  create_release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm # npm cache files are stored in `~/.npm` on Linux/macOS
+          key: ${{ runner.OS }}-node2-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node2-
+      - run: npm ci
+      - name: Update Docs
+        run: npm run gen
+      - name: Create pull request into main
+        uses: peter-evans/create-pull-request@v3
+        with:
+          branch: bot/update-docs
+          commit-message: 'chore: update docs'
+          title: Update Google Docs Meta Data
+          labels: chore
+          reviewers: krivard,sgratzl
+          assignees: sgratzl
+          body: |
+            Updating Google Docs Meta Data
