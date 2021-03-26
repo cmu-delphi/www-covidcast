@@ -2,6 +2,7 @@
   import { sensorList } from '../../stores';
   import Search from '../../components/Search.svelte';
   import FancyHeader from './FancyHeader.svelte';
+  import IndicatorCorrelationChart from './IndicatorCorrelationChart.svelte';
   import IndicatorCorrelationDetails from './IndicatorCorrelationDetails.svelte';
 
   /**
@@ -28,8 +29,39 @@
 
   $: otherSensors = sensorList.filter((d) => d.key !== sensor.key);
 
+  $: primary = sensor.value;
   $: primaryData = fetcher.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame);
-  $: secondaryData = selected ? fetcher.fetch1Sensor1RegionNDates(selected, region, date.windowTimeFrame) : null;
+  $: secondary = selected;
+  $: secondaryData = secondary ? fetcher.fetch1Sensor1RegionNDates(secondary, region, date.windowTimeFrame) : null;
+
+  $: sensorListData = sensorList.map((sensor) =>
+    fetcher.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame),
+  );
+
+  $: sensorDataPromises = sensorListData.map((sensorData) => sensorData);
+  $: sensorCorrelationData = loadAllSensorsData(sensorDataPromises);
+
+  function loadAllSensorsData(sensorPromises) {
+    // for each time_value, merge data values across sensors.
+    const sensorDateMap = {};
+    const sensorKeysMap = {}; // map from sensor key to sensor.
+    return Promise.all(sensorPromises).then((allSensorsData) => {
+      allSensorsData.forEach((sensorRows, index) => {
+        const sensor = sensorList[index];
+        sensorRows.forEach((row) => {
+          const time_value_key = String(row.time_value);
+          if (!sensorDateMap[time_value_key]) {
+            sensorDateMap[time_value_key] = { ...row };
+          }
+          const sensorKey = sensor.key;
+          sensorKeysMap[sensorKey] = sensor;
+          sensorDateMap[time_value_key][sensorKey] = row.value;
+        });
+      });
+      // console.info('sensorDateMap', sensorDateMap);
+      return Object.values(sensorDateMap);
+    });
+  }
 </script>
 
 <FancyHeader sub="Correlation">{sensor.name}</FancyHeader>
@@ -58,6 +90,14 @@
               {sensor.name}
             </a>
           </td>
+          <td style="width: 70px; height: 70px">
+            <IndicatorCorrelationChart
+              {sensorCorrelationData}
+              {primary}
+              secondary={sensor}
+              options={{ height: 70, padding: 0, axisTitles: false, showTitle: false, ticks: false, tickLabels: false }}
+              on:click={() => (selected = sensor)} />
+          </td>
         </tr>
       {/each}
     </tbody>
@@ -80,10 +120,6 @@
       }
     }} />
   {#await Promise.all([primaryData, secondaryData]) then data}
-    <IndicatorCorrelationDetails
-      primary={sensor.value}
-      secondary={selected}
-      primaryData={data[0]}
-      secondaryData={data[1]} />
+    <IndicatorCorrelationDetails {primary} secondary={selected} primaryData={data[0]} secondaryData={data[1]} />
   {/await}
 {/if}
