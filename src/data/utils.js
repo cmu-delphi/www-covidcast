@@ -49,7 +49,10 @@ export const formatAPITime = timeFormat('%Y%m%d');
  */
 
 /**
- * For lags between 0 and 28 lag b backwards with respect to a, and generate r2 for each lag.
+ * Generates R^2 metrics for lags between -28 and 28 days.
+ *
+ * For lags between 0 and 28 lag b backwards with respect to a.  For -28 to -1 lag a with
+ * respect to b.
  *
  * For each lag, the input is a window of length(a)-28, such that the number of values at
  * each lag is the same.
@@ -61,12 +64,18 @@ function generateLags(a, b) {
   let lag = 28;
   let lags = [];
   let aWindow = a.slice(lag);
+  let bWindow = b.slice(lag);
 
-  for (let i = 0; i < lag; i++) {
-    let bWindow = b.slice(lag - i, b.length - i);
-    let zipped_values = zip(aWindow, bWindow);
-    let model = linear(zipped_values);
+  for (let i = 0; i <= lag; i++) {
+    let bLag = b.slice(lag - i, b.length - i);
+    let model = linear(zip(aWindow, bLag));
     lags.push({ lag: i, r2: model.r2 });
+  }
+
+  for (let i = 1; i <= lag; i++) {
+    let aLag = a.slice(lag - i, b.length - i);
+    let model = linear(zip(aLag, bWindow));
+    lags.push({ lag: -1 * i, r2: model.r2 });
   }
   return lags;
 }
@@ -83,6 +92,8 @@ function zip(a, b) {
 }
 
 /**
+ * Compute 28-day correlation metrics for a response variable given an explanatory variable.
+ *
  * @param {import('./fetchData').EpiDataRow[]} response
  * @param {import('./fetchData').EpiDataRow[]} explanatory
  * @param {CorrelationMetric} metric
@@ -95,8 +106,7 @@ export function generateCorrelationMetrics(response, explanatory) {
     return row.value;
   });
 
-  let zipped_values = zip(response_values, explanatory_values);
-  let model = linear(zipped_values);
+  let model = linear(zip(response_values, explanatory_values));
   let lags = generateLags(response_values, explanatory_values);
   let max = lags.reduce((acc, i) => {
     return i.r2 > acc.r2 ? i : acc;
