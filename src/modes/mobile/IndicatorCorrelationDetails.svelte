@@ -50,16 +50,12 @@
 </script>
 
 <div>
-  {primary.name}
-  ({primaryData.length}) -
-  {secondary.name}
-  ({secondaryData.length})
-
   <IndicatorCorrelationChart
     {sensorCorrelationData}
-    sensor={secondary}
+    {primary}
+    {secondary}
     lag={sensorDetailsLag}
-    options={{ width: 400, height: 400, sizeLegend: true, showTooltips: true, showRSquared: true }} />
+    options={{ title: `${secondary.name} correlated with ${primary.name} lagged by ${sensorDetailsLag} days`, width: 400, height: 400, padding: { top: 20, left: 20, bottom: 20, right: 50 }, sizeLegend: true, showTooltips: true, showRSquared: true }} />
 
   <table>
     <tr>
@@ -84,10 +80,11 @@
               <td style="width: 50px; height: 50px">
                 <IndicatorCorrelationChart
                   {sensorCorrelationData}
-                  sensor={secondary}
+                  {primary}
+                  {secondary}
                   {lag}
                   on:click={() => (sensorDetailsLag = lag)}
-                  options={{ width: 50, height: 50, padding: { top: 12, left: 0, right: 0 }, sizeLegend: false, showTitle: false, axisTitles: false, ticks: false, tickLabels: false, showTooltips: false, showRSquared: true }} />
+                  options={{ width: 50, height: 50, padding: { top: 12, left: 0, right: 0 }, sizeLegend: false, axisTitles: false, ticks: false, tickLabels: false, showTooltips: false, showRSquared: true }} />
               </td>
             {/each}
           </tr>

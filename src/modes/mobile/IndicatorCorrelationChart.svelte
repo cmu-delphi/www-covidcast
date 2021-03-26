@@ -1,52 +1,67 @@
 <script>
   import Vega from '../../components/Vega.svelte';
-  import { formatAPITime, parseAPITime } from '../../data';
-  import { currentSensorEntry, smallMultipleTimeSpan } from '../../stores';
-  import { prepareSensorData } from '../overview/vegaSpec';
+  // import { formatAPITime, parseAPITime } from '../../data';
+  // import { smallMultipleTimeSpan } from '../../stores';
+  // import { prepareSensorData } from '../overview/vegaSpec';
+
   /**
-   * The sensor being compared to the currentSensorEntry.
+   * The "context" sensor, was currentSensorEntry.
    * @type {import("../../stores/constants").SensorEntry}
    */
-  export let sensor;
+  export let primary;
+  /**
+   * The sensor being compared to the primary.
+   * @type {import("../../stores/constants").SensorEntry}
+   */
+  export let secondary;
+
+  /**
+   * The data input to the chart.
+   */
   export let sensorCorrelationData;
+
+  /**
+   * Days of lag
+   */
   export let lag = 0;
+
   export let options = {};
-  /**
-   * @type {Date}
-   */
-  export let date;
-  export let onHighlight;
-  export let highlightTimeValue;
-  $: highlightDate = highlightTimeValue != null ? parseAPITime(highlightTimeValue) : null;
-  // use local variables with manual setting for better value comparison updates
-  let startDay = $smallMultipleTimeSpan[0];
-  let endDay = $smallMultipleTimeSpan[1];
-  $: {
-    if (startDay.getTime() !== $smallMultipleTimeSpan[0].getTime()) {
-      startDay = $smallMultipleTimeSpan[0];
-    }
-    if (endDay.getTime() !== $smallMultipleTimeSpan[1].getTime()) {
-      endDay = $smallMultipleTimeSpan[1];
-    }
-  }
-  /**
-   * @type {import('../../stores').CompareSelection[]}
-   */
-  export let selections = [];
-  $: sensorWithData = prepareSensorData(sensor, selections, startDay, endDay);
-  /**
-   * @type {(number | null)[]}
-   */
-  let values = selections.map(() => null);
-  $: {
-    const keyDate = formatAPITime(highlightDate ? highlightDate : date);
-    Promise.resolve(sensorWithData.data).then((rows) => {
-      values = selections.map((region) => {
-        const row = rows.find((d) => String(d.time_value) === keyDate && d.geo_value === region.info.propertyId);
-        return row ? row.value : null;
-      });
-    });
-  }
+  // /**
+  //  * @type {Date}
+  //  */
+  // export let date;
+  // export let onHighlight;
+  // export let highlightTimeValue;
+  // $: highlightDate = highlightTimeValue != null ? parseAPITime(highlightTimeValue) : null;
+  // // use local variables with manual setting for better value comparison updates
+  // let startDay = $smallMultipleTimeSpan[0];
+  // let endDay = $smallMultipleTimeSpan[1];
+  // $: {
+  //   if (startDay.getTime() !== $smallMultipleTimeSpan[0].getTime()) {
+  //     startDay = $smallMultipleTimeSpan[0];
+  //   }
+  //   if (endDay.getTime() !== $smallMultipleTimeSpan[1].getTime()) {
+  //     endDay = $smallMultipleTimeSpan[1];
+  //   }
+  // }
+  // /**
+  //  * @type {import('../../stores').CompareSelection[]}
+  //  */
+  // export let selections = [];
+  // $: sensorWithData = prepareSensorData(secondary, selections, startDay, endDay);
+  // /**
+  //  * @type {(number | null)[]}
+  //  */
+  // let values = selections.map(() => null);
+  // $: {
+  //   const keyDate = formatAPITime(highlightDate ? highlightDate : date);
+  //   Promise.resolve(sensorWithData.data).then((rows) => {
+  //     values = selections.map((region) => {
+  //       const row = rows.find((d) => String(d.time_value) === keyDate && d.geo_value === region.info.propertyId);
+  //       return row ? row.value : null;
+  //     });
+  //   });
+  // }
   function makeIndicatorCompareSpec(xKey, yKey, options = {}) {
     const lag = options.lag || 0;
     const width = options.width || 100;
@@ -56,7 +71,7 @@
       width: width,
       height: height,
       padding: options.padding != null ? options.padding : null,
-      title: options.showTitle ? `Lag: ${lag} days` : '',
+      title: options.title || '',
       transform: [
         {
           window: [
@@ -144,19 +159,19 @@
                   },
                 ]
               : false,
-            opacity: {
-              condition: [
-                {
-                  selection: 'highlight',
-                  value: 1,
-                },
-                {
-                  test: 'datum.time_value == highlightTimeValue',
-                  value: 1,
-                },
-              ],
-              value: 0.2,
-            },
+            // opacity: {
+            //   condition: [
+            //     {
+            //       selection: 'highlight',
+            //       value: 1,
+            //     },
+            //     {
+            //       test: 'datum.time_value == highlightTimeValue',
+            //       value: 1,
+            //     },
+            //   ],
+            //   value: 0.2,
+            // },
           },
         },
         ...(options.showRSquared
@@ -315,8 +330,8 @@
     return spec;
   }
   function updateIndicatorCompareSpec(lag = 0) {
-    const xIndicator = $currentSensorEntry;
-    const yIndicator = sensor;
+    const xIndicator = secondary;
+    const yIndicator = primary;
     return makeIndicatorCompareSpec(xIndicator.key, yIndicator.key, {
       showTitle: true,
       axisTitles: true,
@@ -345,10 +360,5 @@
 </script>
 
 <div class="root" on:click>
-  <Vega
-    data={Promise.resolve(sensorCorrelationData)}
-    spec={indicatorCompareSpec}
-    signals={{ currentDate: date, highlightTimeValue }}
-    signalListeners={['highlight']}
-    on:signal={onHighlight} />
+  <Vega data={Promise.resolve(sensorCorrelationData)} spec={indicatorCompareSpec} />
 </div>
