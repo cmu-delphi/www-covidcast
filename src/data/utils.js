@@ -91,7 +91,7 @@ function generateLags(a, b) {
  * Do a pair-wise combination of the elements from a and b arrays.
  * @param {number[]} a
  * @param {number[]} b
- * @returns {number[]}
+ * @returns {[number, number][]}
  */
 function zip(a, b) {
   return a.map((x, i) => {
