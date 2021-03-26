@@ -242,7 +242,7 @@ LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals
 AddedInWave: 10
 OldRevisions:
  - Change: This version asked about the past 5 days, rather than 7. This was changed in Wave 10 to be consistent with other items on the survey.
-   Signal: smoothed_felt_isolated_7d
+   Signal: smoothed_felt_isolated_5d
    AddedInWave: 4
 
 
