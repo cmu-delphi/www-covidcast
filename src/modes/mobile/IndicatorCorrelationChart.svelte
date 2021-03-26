@@ -334,7 +334,7 @@
   function topLevelIndicatorCompareSpec(lag) {
     return {
       $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
-      padding: options.padding != null ? options.padding : { left: 10, right: 50, top: 10, bottom: 10 },
+      padding: options.padding != null ? options.padding : { left: 20, right: 50, top: 10, bottom: 10 },
       data: { name: 'values' },
       ...{
         columns: 1,

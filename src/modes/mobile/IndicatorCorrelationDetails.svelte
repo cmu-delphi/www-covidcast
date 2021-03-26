@@ -45,6 +45,8 @@
     // console.info('sensorDateMap', sensorDateMap);
     return Object.values(sensorDateMap);
   }
+
+  $: sensorDetailsLag = 0;
 </script>
 
 <div>
@@ -56,6 +58,41 @@
   <IndicatorCorrelationChart
     {sensorCorrelationData}
     sensor={secondary}
-    lag="0"
+    lag={sensorDetailsLag}
     options={{ width: 400, height: 400, sizeLegend: true, showTooltips: true, showRSquared: true }} />
+
+  <table>
+    <tr>
+      <td>Lag:</td>
+      <td>
+        <input
+          type="range"
+          min="-28"
+          max="28"
+          step="1"
+          value={sensorDetailsLag}
+          on:mousemove={(e) => {
+            sensorDetailsLag = e.target.value;
+          }}
+          on:click={(e) => {
+            sensorDetailsLag = e.target.value;
+          }}
+          style="width: 500px;" />
+        <table style="width: 500px; height: 50px">
+          <tr>
+            {#each [-28, -21, -14, -7, 0, 7, 14, 21, 28] as lag}
+              <td style="width: 50px; height: 50px">
+                <IndicatorCorrelationChart
+                  {sensorCorrelationData}
+                  sensor={secondary}
+                  {lag}
+                  on:click={() => (sensorDetailsLag = lag)}
+                  options={{ width: 50, height: 50, padding: { top: 12, left: 0, right: 0 }, sizeLegend: false, showTitle: false, axisTitles: false, ticks: false, tickLabels: false, showTooltips: false, showRSquared: true }} />
+              </td>
+            {/each}
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </div>
