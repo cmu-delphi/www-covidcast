@@ -1,5 +1,5 @@
 <script>
-  import { downloadUrl } from '../../../util';
+  import { downloadUrl, scrollToTop } from '../../../util';
   import { csvFormat } from 'd3-dsv';
   import { formatDateISO } from '../../../formats';
   import { modeByID } from '../../';
@@ -104,10 +104,15 @@
   }
 
   function exportData() {
-    const knownOne = sensorList.find((d) => d.key == sensor.key);
-    sensor.set(knownOne, true);
     // switch to export mode
     currentMode.set(modeByID.export);
+
+    const knownOne = sensor ? sensorList.find((d) => d.key == sensor.key) : null;
+    if (knownOne) {
+      sensor.set(knownOne, true);
+    } else {
+      scrollToTop();
+    }
   }
 </script>
 
