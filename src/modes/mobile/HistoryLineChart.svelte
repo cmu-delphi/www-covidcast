@@ -22,6 +22,7 @@
   import { formatDateISO } from '../../formats';
   import { annotationManager, isMobileDevice } from '../../stores';
   import IndicatorAnnotation from './IndicatorAnnotation.svelte';
+  import IndicatorAnnotations from './IndicatorAnnotations.svelte';
 
   export let height = 250;
 
