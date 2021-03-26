@@ -35,9 +35,7 @@
 <FancyHeader sub="Correlation">{sensor.name}</FancyHeader>
 
 <ul class="uk-tab uk-child-width-expand">
-  <li class:uk-active={selected == null}>
-    <a href="#overview" on:click={() => (selected = null)}>Overview</a>
-  </li>
+  <li class:uk-active={selected == null}><a href="#overview" on:click={() => (selected = null)}>Overview</a></li>
   <li class:uk-active={selected != null}>
     <a href="#details" on:click={() => (selected = otherSensors[0])}>Individual</a>
   </li>
@@ -56,8 +54,7 @@
             <a
               href="../indicator?sensor={sensor.key}"
               class="uk-link-text"
-              on:click|preventDefault={() => (selected = sensor)}
-            >
+              on:click|preventDefault={() => (selected = sensor)}>
               {sensor.name}
             </a>
           </td>
@@ -81,14 +78,12 @@
       if (newIndicator !== selected) {
         selected = newIndicator;
       }
-    }}
-  />
+    }} />
   {#await Promise.all([primaryData, secondaryData]) then data}
     <IndicatorCorrelationDetails
       primary={sensor.value}
       secondary={selected}
       primaryData={data[0]}
-      secondaryData={data[1]}
-    />
+      secondaryData={data[1]} />
   {/await}
 {/if}
