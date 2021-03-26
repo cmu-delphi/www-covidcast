@@ -4,6 +4,7 @@ import { formatAPITime } from './utils';
 import { callSignalAPI } from './api';
 import { fetchData } from './fetchData';
 import { isoParse } from 'd3-time-format';
+import { timeDay } from 'd3-time';
 import { addNameInfos } from '.';
 import { countyInfo } from '../maps';
 
@@ -34,11 +35,11 @@ export function getIndicatorStatuses() {
     }
     const data = d.epidata || [];
     for (const row of data) {
-      row.latest_issue = isoParse(row.latest_issue.toString());
-      row.latest_time_value = isoParse(row.latest_time_value.toString());
+      row.latest_issue = timeDay(isoParse(row.latest_issue.toString()));
+      row.latest_time_value = timeDay(isoParse(row.latest_time_value.toString()));
       Object.values(row.coverage).forEach((level) => {
         for (const row of level) {
-          row.date = isoParse(row.date.toString());
+          row.date = timeDay(isoParse(row.date.toString()));
           row.fraction = row.count / countyInfo.length;
         }
       });

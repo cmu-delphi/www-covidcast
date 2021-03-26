@@ -195,9 +195,15 @@ export function generateLineChartSpec({
   initialDate = null,
   dateField = 'date_value',
   valueField = 'value',
+  valueFormat = null,
+  valueDomain = null,
   zero = false,
   highlightRegion = false,
   reactOnMouseMove = true,
+  paddingLeft = 42,
+  tickCount = {
+    interval: 'week',
+  },
 } = {}) {
   // logic to automatically add the year for week 1 and first date
   const labelYear = `datum.label + (week(datum.value) === 1 ${
@@ -217,7 +223,7 @@ export function generateLineChartSpec({
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     width,
     height,
-    padding: { left: 42, top: topOffset, bottom: 55, right: 15 },
+    padding: { left: paddingLeft, top: topOffset, bottom: 55, right: 15 },
     autosize: {
       type: 'none',
       contains: 'padding',
@@ -253,9 +259,7 @@ export function generateLineChartSpec({
               labelOverlap: true,
               grid: true,
               gridDash: [4, 4],
-              tickCount: {
-                interval: 'week',
-              },
+              tickCount,
             },
             scale: {
               domain,
@@ -270,11 +274,13 @@ export function generateLineChartSpec({
               domain: false,
               tickCount: 5,
               labelFontSize: 14,
+              format: valueFormat,
             },
             scale: {
               round: true,
               zero,
               domainMin: null,
+              domain: valueDomain,
               // padding: zero ? undefined : smartPadding(valueField),
             },
           },
@@ -472,6 +478,8 @@ export function generateSparkLine({
   highlightStartEnd = true,
   interactive = true,
   height = 30,
+  zero = false,
+  valueDomain = null,
 } = {}) {
   /**
    * @type {import('vega-lite').TopLevelSpec}
@@ -532,7 +540,8 @@ export function generateSparkLine({
             field: valueField,
             type: 'quantitative',
             scale: {
-              zero: 0,
+              zero,
+              domain: valueDomain,
             },
             axis: null,
           },

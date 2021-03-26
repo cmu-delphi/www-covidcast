@@ -13,6 +13,7 @@
   import { createEventDispatcher } from 'svelte';
   import IndicatorAnnotation from '../mobile/IndicatorAnnotation.svelte';
   import { timeDay } from 'd3-time';
+  import DownloadMenu from '../mobile/components/DownloadMenu.svelte';
 
   const dispatch = createEventDispatcher();
   /**
@@ -49,6 +50,11 @@
       xTitle: 'Date',
       title: `County Coverage of ${signal.name} Indicator`,
       subTitle: 'Fraction of Counties',
+      valueFormat: '.1%',
+      paddingLeft: 60,
+      tickCount: {
+        interval: 'day',
+      },
     };
     return generateLineChartSpec(options);
   }
@@ -97,7 +103,7 @@
 <div class="buttons">
   <Toggle bind:checked={zoom}>Rescale Y-axis</Toggle>
   <div class="spacer" />
-  <!-- TODO <DownloadMenu {fileName} {vegaRef} {data}  /> -->
+  <DownloadMenu fileName="{signal.name}_coverage" {vegaRef} {data} prepareRow={(row) => row} />
 </div>
 
 {#each annotations as annotation}

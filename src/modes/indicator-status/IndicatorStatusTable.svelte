@@ -76,10 +76,12 @@
 
   $: spec = generateSparkLine({
     dateField: 'date',
-    valueField: 'count',
+    valueField: 'fraction',
     domain: domain.domain,
     highlightDate: null,
     highlightStartEnd: false,
+    // zero: true,
+    // valueDomain: [0, 1]
   });
 </script>
 
