@@ -16,13 +16,37 @@
   export let summary = null;
 </script>
 
+<div class="map-top-overlay">
+  <div class="title-container container-bg">
+    <Title {showDate} />
+  </div>
+  <div class="map-controls-container">
+    <MapControls zoom={map ? map.zoom : null} showEncodings loading={mapLoading} />
+  </div>
+</div>
+<div class="legend-container base-font-size" aria-label="map legend">
+  <EncodingOptions sensor={$currentSensorEntry} className="container-bg container-style encoding-wrapper" />
+  <div class="container-bg container-style legend-scale" class:loading-bg={legendLoading}>
+    {#if $encoding === 'color'}
+      <ColorLegend />
+    {:else if $encoding === 'bubble'}
+      <BubbleLegend {zoom} />
+    {:else if $encoding === 'spike'}
+      <SpikeLegend {zoom} />
+    {/if}
+  </div>
+</div>
+<div class="summary-container" aria-label="map data summary">
+  <MapSummary {summary} />
+</div>
+
 <style>
   .map-top-overlay {
     display: flex;
   }
 
   .map-controls-container {
-    margin: 0.2em 0.2em 0 0;
+    margin: 0;
     z-index: 1001;
     display: flex;
     align-items: flex-start;
@@ -39,8 +63,6 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    margin: 2px 5px;
-    background: white;
   }
 
   /** desktop **/
@@ -49,10 +71,13 @@
       box-shadow: none;
       border: none;
     }
+
+    .map-controls-container {
+      margin: 6px 6px 0 0;
+    }
   }
 
   .legend-container {
-    background: white;
     position: absolute;
     margin: 0.25em;
     left: 0;
@@ -66,6 +91,11 @@
 
   .legend-container > :global(.encoding-wrapper) {
     margin-bottom: 6px;
+    background: white;
+  }
+
+  .legend-scale {
+    background: white;
   }
 
   .summary-container {
@@ -76,27 +106,3 @@
     z-index: 1000;
   }
 </style>
-
-<div class="map-top-overlay">
-  <div class="title-container container-bg">
-    <Title {showDate} />
-  </div>
-  <div class="map-controls-container">
-    <MapControls zoom={map ? map.zoom : null} showEncodings loading={mapLoading} />
-  </div>
-</div>
-<div class="legend-container base-font-size" aria-label="map legend">
-  <EncodingOptions sensor={$currentSensorEntry} className="container-bg container-style encoding-wrapper" />
-  <div class="container-bg container-style" class:loading-bg={legendLoading}>
-    {#if $encoding === 'color'}
-      <ColorLegend />
-    {:else if $encoding === 'bubble'}
-      <BubbleLegend {zoom} />
-    {:else if $encoding === 'spike'}
-      <SpikeLegend {zoom} />
-    {/if}
-  </div>
-</div>
-<div class="summary-container" aria-label="map data summary">
-  <MapSummary {summary} />
-</div>

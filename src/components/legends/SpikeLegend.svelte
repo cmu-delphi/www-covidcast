@@ -37,6 +37,41 @@
   }
 </script>
 
+<ul class="legend-ticks" data-testid="spike-legend">
+  <li>
+    <div class="na" style="background:repeating-linear-gradient(-45deg, {MISSING_COLOR}, white 30%)" />
+    <span>NA</span>
+  </li>
+  {#each r.labels as l}
+    <li class="legend-direct-tick">
+      <svg width={size * 2 + spikePadding * 2} height={$spikeHeightScale(l.value) * zoom + spikePadding * 2}>
+        <g style="transform:translate({spikePadding}px, {spikePadding}px)">
+          <path
+            d={getSpikePath(l.value)}
+            class="spike"
+            fill={transparent(l.color, ENCODING_SPIKE_THEME.fillOpacity)}
+            stroke={transparent(l.color, ENCODING_SPIKE_THEME.strokeOpacity)}
+          />
+        </g>
+      </svg>
+      <span>{l.label}</span>
+    </li>
+  {/each}
+  <li class="legend-direct-tick">
+    <svg width={size * 2 + spikePadding * 2} height={$spikeHeightScale(r.highValue) * zoom + spikePadding * 2}>
+      <g style="transform:translate({spikePadding}px, {spikePadding}px)">
+        <path
+          d={getSpikePath(r.highValue)}
+          class="spike"
+          fill={transparent(r.highColor, ENCODING_SPIKE_THEME.fillOpacity)}
+          stroke={transparent(r.highColor, ENCODING_SPIKE_THEME.strokeOpacity)}
+        />
+      </g>
+    </svg>
+    <span>{r.high}</span>
+  </li>
+</ul>
+
 <style>
   ul {
     margin: 0;
@@ -72,36 +107,3 @@
     height: 2em;
   }
 </style>
-
-<ul class="legend-ticks" data-testid="spike-legend">
-  <li>
-    <div class="na" style="background:repeating-linear-gradient(-45deg, {MISSING_COLOR}, white 30%)" />
-    <span>NA</span>
-  </li>
-  {#each r.labels as l}
-    <li class="legend-direct-tick">
-      <svg width={size * 2 + spikePadding * 2} height={$spikeHeightScale(l.value) * zoom + spikePadding * 2}>
-        <g style="transform:translate({spikePadding}px, {spikePadding}px)">
-          <path
-            d={getSpikePath(l.value)}
-            class="spike"
-            fill={transparent(l.color, ENCODING_SPIKE_THEME.fillOpacity)}
-            stroke={transparent(l.color, ENCODING_SPIKE_THEME.strokeOpacity)} />
-        </g>
-      </svg>
-      <span>{l.label}</span>
-    </li>
-  {/each}
-  <li class="legend-direct-tick">
-    <svg width={size * 2 + spikePadding * 2} height={$spikeHeightScale(r.highValue) * zoom + spikePadding * 2}>
-      <g style="transform:translate({spikePadding}px, {spikePadding}px)">
-        <path
-          d={getSpikePath(r.highValue)}
-          class="spike"
-          fill={transparent(r.highColor, ENCODING_SPIKE_THEME.fillOpacity)}
-          stroke={transparent(r.highColor, ENCODING_SPIKE_THEME.strokeOpacity)} />
-      </g>
-    </svg>
-    <span>{r.high}</span>
-  </li>
-</ul>

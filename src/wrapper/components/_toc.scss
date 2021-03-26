@@ -1,0 +1,27 @@
+.toc-container {
+  margin-top: 2em;
+
+  h5 {
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+}
+
+.toc {
+  background: #f5f5f5;
+  border-radius: 5px;
+  padding: 24px;
+
+  li {
+    list-style: decimal;
+  }
+
+  li li {
+    list-style: lower-latin;
+  }
+
+  .uk-nav-default > li.uk-active > a {
+    color: unset;
+    font-weight: 600;
+  }
+}

@@ -85,3 +85,44 @@ export function unobserveResize(element) {
   observerListeners.delete(element);
   observer.unobserve(element);
 }
+
+export function downloadUrl(url, name) {
+  const a = document.createElement('a');
+  a.download = name;
+  a.href = url;
+  a.style.position = 'absolute';
+  a.style.left = '-10000px';
+  a.style.top = '-10000px';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+export function scrollToTop() {
+  window.scrollTo({
+    top: 0,
+    behavior: 'auto',
+  });
+}
+
+/**
+ * looks for the given id and scrolls into view
+ * @param {string} id
+ * @param {number} tries
+ * @param {number} timeout
+ */
+export function scrollIntoView(id, tries = 8, timeout = 500) {
+  if (!id) {
+    return;
+  }
+  function scrollImpl(remainingTries) {
+    const elem = document.querySelector(`#${id}`);
+    if (elem && elem.getBoundingClientRect().y > 0) {
+      elem.scrollIntoView();
+      console.log('scroll');
+    } else if (remainingTries > 0) {
+      setTimeout(scrollImpl, timeout, remainingTries - 1);
+    }
+  }
+  setTimeout(scrollImpl, timeout, tries);
+}

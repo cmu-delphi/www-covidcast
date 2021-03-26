@@ -1,14 +1,7 @@
-import mapIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/map.svg';
-import timelapseIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/clock.svg';
-import top10Icon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/list.svg';
-import singleIcon from '!raw-loader!../assets/location-solid.svg';
-import exportIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/download.svg';
-
 /**
  * @typedef {object} Mode
  * @property {string} id
  * @property {string} label
- * @property {string} tooltip
  * @property {Promise<any>} component
  */
 
@@ -17,46 +10,64 @@ import exportIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/dow
  */
 const modes = [
   {
-    id: 'overview',
-    label: 'Map Overview',
-    icon: mapIcon,
-    tooltip: 'Switch to the Map Overview',
-    component: () => import('./overview/Overview.svelte').then((r) => r.default),
+    id: 'landing',
+    label: 'COVIDcast Overview',
+    component: () => import(/* webpackChunkName: 'm-landing' */ './landing/Landing.svelte').then((r) => r.default),
   },
   {
-    id: 'timelapse',
-    label: 'Timelapse',
-    icon: timelapseIcon,
-    tooltip: 'Switch to Timelapse Mode',
-    component: () => import('./timelapse/TimeLapse.svelte').then((r) => r.default),
+    id: 'summary',
+    label: 'Location Summary',
+    component: () =>
+      import(/* webpackChunkName: 'm-overview' */ './mobile/MobileOverview.svelte').then((r) => r.default),
   },
   {
-    id: 'top10',
-    label: 'Top 10',
-    icon: top10Icon,
-    tooltip: 'Switch to Top 10 Mode',
-    component: () => import('./top10/Top10.svelte').then((r) => r.default),
+    id: 'indicator',
+    label: 'Indicator Details',
+    component: () =>
+      import(/* webpackChunkName: 'm-indicator' */ './mobile/MobileIndicatorOverview.svelte').then((r) => r.default),
   },
   {
-    id: 'single',
-    label: 'Region Details',
-    icon: singleIcon,
-    tooltip: 'Switch to Region Details View',
-    component: () => import('./single/SingleLocation.svelte').then((r) => r.default),
+    id: 'classic',
+    label: 'Classic COVIDcast',
+    component: () => import(/* webpackChunkName: 'm-old' */ './overview/Overview.svelte').then((r) => r.default),
+  },
+  // {
+  //   id: 'timelapse',
+  //   label: 'Timelapse',
+  //   component: () =>
+  //     import(/* webpackChunkName: 'm-timelapse' */ './timelapse/TimeLapse.svelte').then((r) => r.default),
+  // },
+  // {
+  //   id: 'top10',
+  //   label: 'Top 10',
+  //   component: () => import(/* webpackChunkName: 'm-top10' */ './top10/Top10.svelte').then((r) => r.default),
+  // },
+  // {
+  //   id: 'single',
+  //   label: 'Region Details',
+  //   component: () => import(/* webpackChunkName: 'm-single' */ './single/SingleLocation.svelte').then((r) => r.default),
+  // },
+  {
+    id: 'survey-results',
+    label: 'Survey Results',
+    component: () => import(/* webpackChunkName: 'm-survey' */ './survey/Survey.svelte').then((r) => r.default),
   },
   {
     id: 'export',
     label: 'Export Data',
-    icon: exportIcon,
-    tooltip: 'Switch to Export Data Mode',
-    component: () => import('./exportdata/ExportData.svelte').then((r) => r.default),
+    component: () => import(/* webpackChunkName: 'm-export' */ './exportdata/ExportData.svelte').then((r) => r.default),
   },
+  // {
+  //   id: 'lab',
+  //   label: 'Lab',
+  //   component: () => import(/* webpackChunkName: 'mode-lab' */ './lab/Lab.svelte').then((r) => r.default),
+  // },
 ];
 
 export default modes;
 
 /**
- * @type {Record<'overview'|'timelapse'|'top10'|'export'|'single', Mode>}
+ * @type {Record<'summary'|'timelapse'|'top10'|'export'|'single'|'survey-results'|'lab'|'classic'|'indicator'|'landing', Mode>}
  */
 export const modeByID = {};
 modes.forEach((mode) => (modeByID[mode.id] = mode));

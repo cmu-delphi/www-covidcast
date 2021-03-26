@@ -1,27 +1,17 @@
 <script>
   import { levelList } from '../../stores';
-  import USMapBoxWrapper from '../../components/MapBox/USMapBoxWrapper';
-  import { nameInfos } from '../../maps';
-  import MapBox from '../../components/MapBox/MapBox.svelte';
+  import { nameInfos, infosByLevel } from '../../maps';
+  import MapContainer from '../../components/MapContainer.svelte';
   import Options from '../../components/Options.svelte';
   import {
-    currentSensor,
-    currentLevel,
-    encoding,
-    colorScale,
-    colorStops,
-    bubbleRadiusScale,
-    spikeHeightScale,
     currentRegionInfo,
-    currentRegion,
+    currentLevel,
     selectByInfo,
     selectByFeature,
     currentSensorEntry,
     currentDateObject,
-    signalCasesOrDeathOptions,
     isMobileDevice,
     currentCompareSelection,
-    currentSensorMapTitle,
     currentMultiSelection,
     addCompare,
     removeCompare,
@@ -30,40 +20,9 @@
   import SmallMultiplesPanel from './SmallMultiplesPanel.svelte';
   import { fetchRegionSlice } from '../../data';
   import DetailView from '../../components/DetailView/DetailView.svelte';
-  import MapOverlays from '../../components/MapOverlays.svelte';
   import { trackEvent } from '../../stores/ga';
   import AddAnother from './AddAnother.svelte';
   import { getInfoByName } from '../../maps';
-
-  export let wrapperClass = USMapBoxWrapper;
-  export let regionSearchList = nameInfos;
-
-  /**
-   * @type {MapBox}
-   */
-  let map;
-
-  function initialReady() {
-    if (!$currentRegion) {
-      map.selectRandom();
-    }
-  }
-
-  function updatedEncoding(info) {
-    if (!info) {
-      return;
-    }
-    if (info.scale) {
-      colorScale.set(info.scale);
-    }
-    colorStops.set(info.stops);
-    if ($encoding === 'bubble' && info.custom) {
-      bubbleRadiusScale.set(info.custom);
-    }
-    if ($encoding === 'spike' && info.custom) {
-      spikeHeightScale.set(info.custom);
-    }
-  }
 
   /**
    * @type {import('../../data/fetchData').SensorEntry | null}
@@ -84,7 +43,6 @@
   let mobileShowMap = true;
   let desktopShowPanel = true;
   let pickMapMode = false;
-  let zoom = 1;
 
   $: showCompare = $currentCompareSelection != null;
 
@@ -96,6 +54,147 @@
    */
   let focusOn = null;
 </script>
+
+<main class="root base-font-size" class:hiddenPanel={!$isMobileDevice && !desktopShowPanel} class:compare={showCompare}>
+  <Options className="options-container" levels={levelList} />
+
+  {#if !showCompare}
+    <div class="search-container container-bg container-style">
+      <Search
+        placeholder="Search for a location..."
+        items={nameInfos}
+        selectedItem={$currentRegionInfo}
+        labelFieldName="displayName"
+        maxItemsToShowInList="5"
+        on:change={(e) => {
+          if (selectByInfo(e.detail)) {
+            focusOn = e.detail || null;
+          }
+          trackEvent('search', 'select', e.detail ? e.detail.id : '');
+        }}
+      />
+    </div>
+
+    <div class="view-switcher">
+      {#if !$isMobileDevice}
+        <button
+          aria-pressed={String(!desktopShowPanel)}
+          class="uk-button uk-button-default chart-button single-toggle"
+          on:click={() => {
+            trackEvent('overview', 'show-panel', String(!desktopShowPanel));
+            desktopShowPanel = !desktopShowPanel;
+          }}
+          title="{desktopShowPanel ? 'Hide' : 'Show'} Line Charts panel"
+          data-uk-icon="icon: {desktopShowPanel ? 'chart-line-ban' : 'chart-line'}"
+        />
+      {:else}
+        <div class="uk-button-group">
+          <button
+            aria-pressed={String(mobileShowMap)}
+            class="uk-button uk-button-default map-button"
+            class:uk-active={mobileShowMap}
+            on:click={() => {
+              trackEvent('overview', 'show-map', 'true');
+              mobileShowMap = true;
+            }}
+            title="Switch to Map"
+            data-uk-icon="icon: blank"
+          />
+          <button
+            aria-pressed={String(!mobileShowMap)}
+            class="uk-button uk-button-default chart-button"
+            class:uk-active={!mobileShowMap}
+            on:click={() => {
+              trackEvent('overview', 'show-map', 'false');
+              mobileShowMap = false;
+            }}
+            title="Switch to Line Charts"
+            data-uk-icon="icon: chart-line"
+          />
+        </div>
+      {/if}
+    </div>
+  {/if}
+
+  <div class="map-container" class:mobileHide={!mobileShowMap} class:pick={pickMapMode}>
+    <MapContainer
+      mapLoading={loading}
+      legendLoading={loading}
+      summary={{ data, level: $currentLevel, items: infosByLevel[$currentLevel] || [] }}
+      on:loading={(e) => (loading = e.detail)}
+      {data}
+      {selections}
+      {focusOn}
+      selectRandomOnReady
+      on:select={(e) => {
+        if (focusOn != null) {
+          focusOn = null;
+        }
+        if (pickMapMode) {
+          const info = getInfoByName(e.detail.feature.properties.id);
+          addCompare(info);
+          pickMapMode = false;
+        } else {
+          selectByFeature(e.detail.feature, true);
+          if (e.detail.feature) {
+            trackEvent('map', 'select', e.detail.feature.id);
+          }
+        }
+      }}
+    />
+
+    {#if detailSensor != null && !$isMobileDevice && desktopShowPanel}
+      <div class="detail-container container-bg container-style">
+        <DetailView sensor={detailSensor} {selections} on:close={() => (detailSensor = null)} />
+      </div>
+    {/if}
+  </div>
+
+  {#if ($isMobileDevice && !mobileShowMap) || (!$isMobileDevice && desktopShowPanel)}
+    <div class="panel-container">
+      <div class="panel-wrapper container-bg container-style">
+        <div class="panel-scroll-container">
+          <SmallMultiplesPanel bind:detail={detailSensor} levels={levelList} {selections} />
+        </div>
+      </div>
+      <div class="panel-bottom-wrapper mobileHide">
+        <button
+          class="uk-button uk-button-default uk-button-small"
+          on:click={() => currentCompareSelection.set(showCompare ? null : [])}
+        >
+          {showCompare ? 'Exit' : 'Open'}
+          compare mode
+        </button>
+      </div>
+    </div>
+  {/if}
+  {#if showCompare}
+    <div class="add-container">
+      <div class="selection-container container-bg container-style">
+        <ul class="uk-list uk-list-square uk-margin-remove">
+          {#each selections as selection}
+            <li class="selection-legend" style="color: {selection.color}">
+              <button
+                class="selection-toolbar uk-icon-button uk-icon-button-small"
+                on:click={() => removeCompare(selection.info)}
+                data-uk-icon="icon: close; ratio: 0.8"
+                title="Remove selected"
+              />
+              <span>{selection.info.displayName}</span>
+            </li>
+          {/each}
+        </ul>
+      </div>
+      <AddAnother
+        regionSearchList={nameInfos}
+        bind:pickMapMode
+        on:add={(e) => addCompare(e.detail)}
+        {selections}
+        mapData={data}
+      />
+    </div>
+  {/if}
+</main>
 
 <style>
   .root {
@@ -126,7 +225,7 @@
   .search-container {
     grid-area: search;
     z-index: 1009;
-    margin: 0 6px;
+    margin: 0 6px 0 0;
   }
 
   .map-container {
@@ -138,7 +237,7 @@
     grid-area: panel;
     display: flex;
     flex-direction: column;
-    margin-right: 6px;
+    margin: 6px 6px 0 0;
   }
 
   .add-container {
@@ -187,7 +286,7 @@
 
   .view-switcher {
     display: flex;
-    margin: 6px;
+    margin-right: 6px;
     grid-area: view;
   }
 
@@ -248,150 +347,9 @@
     .panel-container {
       grid-area: map;
     }
+
+    .search-container {
+      margin: 6px;
+    }
   }
 </style>
-
-<main class="root base-font-size" class:hiddenPanel={!$isMobileDevice && !desktopShowPanel} class:compare={showCompare}>
-  <Options className="options-container" levels={levelList} />
-
-  {#if !showCompare}
-    <div class="search-container container-bg container-style">
-      <Search
-        placeholder="Search for a location..."
-        items={regionSearchList}
-        selectedItem={$currentRegionInfo}
-        labelFieldName="displayName"
-        maxItemsToShowInList="5"
-        on:change={(e) => {
-          if (selectByInfo(e.detail)) {
-            focusOn = e.detail || null;
-          }
-          trackEvent('search', 'select', e.detail ? e.detail.id : '');
-        }} />
-    </div>
-
-    <div class="view-switcher">
-      {#if !$isMobileDevice}
-        <button
-          aria-pressed={String(!desktopShowPanel)}
-          class="uk-button uk-button-default chart-button single-toggle"
-          on:click={() => {
-            trackEvent('overview', 'show-panel', String(!desktopShowPanel));
-            desktopShowPanel = !desktopShowPanel;
-          }}
-          title="{desktopShowPanel ? 'Hide' : 'Show'} Line Charts panel"
-          data-uk-icon="icon: {desktopShowPanel ? 'chart-line-ban' : 'chart-line'}" />
-      {:else}
-        <div class="uk-button-group">
-          <button
-            aria-pressed={String(mobileShowMap)}
-            class="uk-button uk-button-default map-button"
-            class:uk-active={mobileShowMap}
-            on:click={() => {
-              trackEvent('overview', 'show-map', 'true');
-              mobileShowMap = true;
-            }}
-            title="Switch to Map"
-            data-uk-icon="icon: blank" />
-          <button
-            aria-pressed={String(!mobileShowMap)}
-            class="uk-button uk-button-default chart-button"
-            class:uk-active={!mobileShowMap}
-            on:click={() => {
-              trackEvent('overview', 'show-map', 'false');
-              mobileShowMap = false;
-            }}
-            title="Switch to Line Charts"
-            data-uk-icon="icon: chart-line" />
-        </div>
-      {/if}
-    </div>
-  {/if}
-
-  <div class="map-container" class:mobileHide={!mobileShowMap} class:pick={pickMapMode}>
-    <MapOverlays
-      {map}
-      mapLoading={loading}
-      legendLoading={loading}
-      {zoom}
-      summary={{ data, level: $currentLevel, items: regionSearchList }} />
-    <MapBox
-      bind:this={map}
-      on:loading={(e) => (loading = e.detail)}
-      {data}
-      sensor={$currentSensor}
-      level={$currentLevel}
-      signalOptions={$signalCasesOrDeathOptions}
-      {selections}
-      {focusOn}
-      encoding={$encoding}
-      on:ready={() => initialReady()}
-      on:zoom={(e) => (zoom = e.detail)}
-      on:updatedEncoding={(e) => updatedEncoding(e.detail)}
-      on:select={(e) => {
-        if (focusOn != null) {
-          focusOn = null;
-        }
-        if (pickMapMode) {
-          const info = getInfoByName(e.detail.feature.properties.id);
-          addCompare(info);
-          pickMapMode = false;
-        } else {
-          selectByFeature(e.detail.feature, true);
-          if (e.detail.feature) {
-            trackEvent('map', 'select', e.detail.feature.id);
-          }
-        }
-      }}
-      {wrapperClass}
-      title={$currentSensorMapTitle} />
-
-    {#if detailSensor != null && !$isMobileDevice && desktopShowPanel}
-      <div class="detail-container container-bg container-style">
-        <DetailView sensor={detailSensor} {selections} on:close={() => (detailSensor = null)} />
-      </div>
-    {/if}
-  </div>
-
-  {#if ($isMobileDevice && !mobileShowMap) || (!$isMobileDevice && desktopShowPanel)}
-    <div class="panel-container">
-      <div class="panel-wrapper container-bg container-style">
-        <div class="panel-scroll-container">
-          <SmallMultiplesPanel bind:detail={detailSensor} levels={levelList} {selections} />
-        </div>
-      </div>
-      <div class="panel-bottom-wrapper mobileHide">
-        <button
-          class="uk-button uk-button-default uk-button-small"
-          on:click={() => currentCompareSelection.set(showCompare ? null : [])}>
-          {showCompare ? 'Exit' : 'Open'}
-          compare mode
-        </button>
-      </div>
-    </div>
-  {/if}
-  {#if showCompare}
-    <div class="add-container">
-      <div class="selection-container container-bg container-style">
-        <ul class="uk-list uk-list-square uk-margin-remove">
-          {#each selections as selection}
-            <li class="selection-legend" style="color: {selection.color}">
-              <button
-                class="selection-toolbar uk-icon-button uk-icon-button-small"
-                on:click={() => removeCompare(selection.info)}
-                data-uk-icon="icon: close; ratio: 0.8"
-                title="Remove selected" />
-              <span>{selection.info.displayName}</span>
-            </li>
-          {/each}
-        </ul>
-      </div>
-      <AddAnother
-        {regionSearchList}
-        bind:pickMapMode
-        on:add={(e) => addCompare(e.detail)}
-        {selections}
-        mapData={data} />
-    </div>
-  {/if}
-</main>

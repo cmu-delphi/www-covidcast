@@ -1,3 +1,91 @@
+# Release 2.0.1
+
+Bug-fix release
+
+## Bug-fixes
+
+- [#848](https://github.com/cmu-delphi/www-covidcast/pull/848) (re: [#845](https://github.com/cmu-delphi/www-covidcast/issues/845), [#846](https://github.com/cmu-delphi/www-covidcast/issues/846), [#847](https://github.com/cmu-delphi/www-covidcast/issues/847)) Reset highlight region in line chart
+
+# Release 2.0.0
+
+This release introduces the new mobile-first based COVIDcast website with a fresh new design.
+
+# Release 1.12.4
+
+This release improves the UX of the survey dashboard for both desktop and mobile experience.
+
+## New Features
+
+- [#724](https://github.com/cmu-delphi/www-covidcast/pull/724), [#717](https://github.com/cmu-delphi/www-covidcast/pull/717) Survey dashboards improvements
+
+## Bug-fixes
+
+- [#719](https://github.com/cmu-delphi/www-covidcast/pull/719) (re: [#718](https://github.com/cmu-delphi/www-covidcast/issues/718)) fix Export Data bug
+
+# Release 1.12.3
+
+## Signal Changes
+
+- Add "Vaccine Acceptance" signal to map and survey dashboard
+
+## New Features
+
+- [#709](https://github.com/cmu-delphi/www-covidcast/pull/709), [#710](https://github.com/cmu-delphi/www-covidcast/pull/710), [#708](https://github.com/cmu-delphi/www-covidcast/pull/708) Improve loading performance especially for the survey dashboard
+- [#712](https://github.com/cmu-delphi/www-covidcast/pull/712) Improve map style
+
+## Bug-fixes
+
+- [#713](https://github.com/cmu-delphi/www-covidcast/pull/713) fix trend color for decreasing trends
+
+# Release 1.12.1
+
+Bugfix release for changed signal
+
+## Signal Changes
+
+- Reverted "COVID-Related Doctor Visits" signal
+
+## Bug-fixes
+
+- [#703](https://github.com/cmu-delphi/www-covidcast/pull/703) rename COVIDCast to COVIDcast
+
+## Others
+
+- [#704](https://github.com/cmu-delphi/www-covidcast/pull/704) Unique bundle names
+
+# Release 1.12.1
+
+Bugfix release for improved mobile experience
+
+## Bug-fixes
+
+- [#700](https://github.com/cmu-delphi/www-covidcast/pull/700) Improve mobile experience
+
+# Release 1.12.0
+
+This release introduces the new National COVID Survey Dashboard showing aggregated survey results. In addition, the overall style of COVIDcast has been adapted to the new website.
+
+## New Features
+
+- [#600](https://github.com/cmu-delphi/www-covidcast/pull/600) National COVID Survey Dashboard
+- [#688](https://github.com/cmu-delphi/www-covidcast/pull/688) (re: [#536](https://github.com/cmu-delphi/www-covidcast/issues/536)) Default ratio cases/deaths
+- [#616](https://github.com/cmu-delphi/www-covidcast/pull/616), [#678](https://github.com/cmu-delphi/www-covidcast/pull/678) UIKit Adaptations
+- [#692](https://github.com/cmu-delphi/www-covidcast/pull/692), [#671](https://github.com/cmu-delphi/www-covidcast/pull/671) (re: [#651](https://github.com/cmu-delphi/www-covidcast/issues/651)) Simplify URL parameters
+- [#677](https://github.com/cmu-delphi/www-covidcast/pull/677) (re: [#632](https://github.com/cmu-delphi/www-covidcast/issues/632)) Compute mega counties (`Rest of ...`) population on the fly
+- [#658](https://github.com/cmu-delphi/www-covidcast/pull/658) (re: [#485](https://github.com/cmu-delphi/www-covidcast/issues/485), [#639](https://github.com/cmu-delphi/www-covidcast/issues/639)) Additional export options
+
+## Improvements
+
+- [#689](https://github.com/cmu-delphi/www-covidcast/pull/689) (re: [#687](https://github.com/cmu-delphi/www-covidcast/issues/687)) Change date shortcuts
+- [#676](https://github.com/cmu-delphi/www-covidcast/pull/676) Improve Map Selection UX
+- [#659](https://github.com/cmu-delphi/www-covidcast/pull/659) (re: [#656](https://github.com/cmu-delphi/www-covidcast/issues/656)) Shrink card header font size, adjust spacing.
+
+## Bug-fixes
+
+- [#690](https://github.com/cmu-delphi/www-covidcast/pull/690) (re: [#686](https://github.com/cmu-delphi/www-covidcast/issues/686)) Add special case for old safari
+- [#674](https://github.com/cmu-delphi/www-covidcast/pull/674) Refactor: use vega resize method
+- [#666](https://github.com/cmu-delphi/www-covidcast/pull/666) (re: [#664](https://github.com/cmu-delphi/www-covidcast/issues/664), [#665](https://github.com/cmu-delphi/www-covidcast/issues/665)) Add HRR Population data and fix Orlando bug
+
 # Release 1.11.1
 
 ## Signal Changes

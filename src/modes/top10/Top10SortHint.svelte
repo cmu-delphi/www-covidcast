@@ -4,6 +4,11 @@
   export let label = '';
 </script>
 
+<span class="root" on:click title="{label}: click to sort">
+  <span class="hint" data-uk-icon={sorted ? (desc ? 'triangle-down' : 'triangle-up') : null} />
+  <slot />
+</span>
+
 <style>
   .root {
     display: flex;
@@ -18,8 +23,3 @@
     display: flex;
   }
 </style>
-
-<span class="root" on:click title="{label}: click to sort">
-  <span class="hint" data-uk-icon={sorted ? (desc ? 'triangle-down' : 'triangle-up') : null} />
-  <slot />
-</span>

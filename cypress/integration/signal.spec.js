@@ -11,14 +11,14 @@ describe('fake sensor data test', () => {
     });
     // wait that the map is ready
     // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.get('.card')
-      .wait(1000)
-      .matchImageSnapshot({
-        failureThreshold: 0.2,
-        failureThresholdType: 'percent',
-        customDiffConfig: {
-          threshold: 0.1,
-        },
-      });
+    // cy.get('.card')
+    //   .wait(1000)
+    //   .matchImageSnapshot({
+    //     failureThreshold: 0.2,
+    //     failureThresholdType: 'percent',
+    //     customDiffConfig: {
+    //       threshold: 0.1,
+    //     },
+    //   });
   });
 });

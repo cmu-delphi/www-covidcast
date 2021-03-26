@@ -1,49 +1,20 @@
 <script>
-  import MapBox from '../../components/MapBox/MapBox.svelte';
   import Options from '../../components/Options.svelte';
   import {
-    currentSensor,
     currentLevel,
-    encoding,
-    colorScale,
-    colorStops,
-    bubbleRadiusScale,
-    spikeHeightScale,
     currentDateObject,
     currentSensorEntry,
     times,
     currentDate,
     signalCasesOrDeathOptions,
-    currentSensorMapTitle,
   } from '../../stores';
   import Player from './Player.svelte';
   import { timeDay } from 'd3-time';
   import { parseAPITime, formatAPITime } from '../../data';
   import { fetchRegionSlice } from '../../data/fetchData';
   import { trackEvent } from '../../stores/ga';
-  import USMapBoxWrapper from '../../components/MapBox/USMapBoxWrapper';
   import { onMount } from 'svelte';
-  import MapOverlays from '../../components/MapOverlays.svelte';
-  /**
-   * @type {MapBox}
-   */
-  let map;
-
-  function updatedEncoding(info) {
-    if (!info) {
-      return;
-    }
-    if (info.scale) {
-      colorScale.set(info.scale);
-    }
-    colorStops.set(info.stops);
-    if ($encoding === 'bubble' && info.custom) {
-      bubbleRadiusScale.set(info.custom);
-    }
-    if ($encoding === 'spike' && info.custom) {
-      spikeHeightScale.set(info.custom);
-    }
-  }
+  import MapContainer from '../../components/MapContainer.svelte';
 
   const FRAME_RATE = 250; // ms
   const MAX_BUFFER_CACHE = 7;
@@ -197,8 +168,34 @@
   $: {
     paramChange($currentSensorEntry, $currentLevel, $signalCasesOrDeathOptions);
   }
-  let zoom = 1.0;
 </script>
+
+<main class="root">
+  <Options showDate={false} className="options-container" />
+  <Player
+    className="player-container"
+    {running}
+    on:toggle={toggleRunning}
+    value={$currentDateObject}
+    max={maxDate}
+    min={minDate}
+    on:change={(e) => jumpToDate(e.detail)}
+  />
+  <div class="map-container">
+    <MapContainer
+      mapLoading={running || loading}
+      legendLoading={false}
+      showDate
+      on:loading={(e) => {
+        loading = e.detail;
+        if (!e.detail) {
+          mapLoadedResolver();
+        }
+      }}
+      data={currentData}
+    />
+  </div>
+</main>
 
 <style>
   .root {
@@ -245,35 +242,3 @@
     }
   }
 </style>
-
-<main class="root">
-  <Options showDate={false} className="options-container" />
-  <Player
-    className="player-container"
-    {running}
-    on:toggle={toggleRunning}
-    value={$currentDateObject}
-    max={maxDate}
-    min={minDate}
-    on:change={(e) => jumpToDate(e.detail)} />
-  <div class="map-container">
-    <MapOverlays {map} mapLoading={running || loading} legendLoading={false} {zoom} showDate />
-    <MapBox
-      bind:this={map}
-      on:loading={(e) => {
-        loading = e.detail;
-        if (!e.detail) {
-          mapLoadedResolver();
-        }
-      }}
-      data={currentData}
-      sensor={$currentSensor}
-      level={$currentLevel}
-      encoding={$encoding}
-      signalOptions={$signalCasesOrDeathOptions}
-      on:zoom={(e) => (zoom = e.detail)}
-      on:updatedEncoding={(e) => updatedEncoding(e.detail)}
-      wrapperClass={USMapBoxWrapper}
-      title={$currentSensorMapTitle} />
-  </div>
-</main>

@@ -48,6 +48,12 @@ export function getMonths(start, end, selectableCallback = null, weekStart = 0) 
     months.push(getCalendarPage(date.getMonth(), date.getFullYear(), dayPropsHandler, weekStart));
     date.setMonth(date.getMonth() + 1);
   }
+
+  if (months.length === 0) {
+    // return at least one month
+    months.push(getCalendarPage(start.getMonth(), start.getFullYear(), dayPropsHandler, weekStart));
+  }
+
   return months;
 }
 

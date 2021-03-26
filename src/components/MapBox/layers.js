@@ -25,6 +25,9 @@ export function toBubbleLayer(level) {
 export function toSpikeLayer(level) {
   return `${level}-spike`;
 }
+export function toBorderLayer(level) {
+  return `${level}-border`;
+}
 
 export const L = {
   outline: 'state-stroke',

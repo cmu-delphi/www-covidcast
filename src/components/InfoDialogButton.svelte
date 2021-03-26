@@ -16,7 +16,8 @@
     class:uk-icon-button-small={!large}
     data-uk-toggle="target: #info-dialog"
     data-uk-icon="icon: question-plain"
-    on:click={() => {
+    on:click|stopPropagation={() => {
       currentInfoSensor.set(sensor);
-    }} />
+    }}
+  />
 {/if}

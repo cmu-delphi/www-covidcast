@@ -3,31 +3,17 @@
     currentSensor,
     currentLevel,
     currentDate,
-    times,
     levelList,
     currentSensorEntry,
     groupedSensorList,
-    isMobileDevice,
   } from '../stores';
-  import Datepicker from './Calendar/Datepicker.svelte';
-  import { timeFormat } from 'd3-time-format';
-  import { timeDay } from 'd3-time';
   import { formatAPITime, parseAPITime } from '../data';
-
-  $: formatTime = $isMobileDevice ? timeFormat('%x') : timeFormat('%B %-d, %Y');
+  import SensorDatePicker from './SensorDatePicker.svelte';
 
   export let levels = levelList;
   export let className = '';
   export let showDate = true;
   $: selectedDate = parseAPITime($currentDate);
-  /**
-   * @type {[Date, Date]}
-   */
-  $: startEndDates = [];
-  $: if ($times !== null) {
-    const dates = $times.get($currentSensor);
-    startEndDates = dates ? dates.map(parseAPITime) : [];
-  }
   $: if (selectedDate !== undefined) {
     currentDate.set(formatAPITime(selectedDate));
   }
@@ -40,25 +26,6 @@
     .filter((d) => d.sensors.length > 0);
 </script>
 
-<style>
-  .block {
-    display: flex;
-    align-items: center;
-  }
-
-  .block .uk-form-label {
-    margin-right: 1em;
-  }
-
-  .block .uk-form-controls {
-    flex-grow: 1;
-  }
-
-  .shortcuts > button {
-    padding: 0 2px;
-  }
-</style>
-
 <div class="container-bg container-style uk-grid-small {className}" data-uk-grid>
   <div class="uk-width-1-1 uk-width-1-{showDate ? '3' : '2'}@m block">
     <span class="uk-form-label">Displaying</span>
@@ -69,7 +36,8 @@
             {#each sensorGroup.sensors as sensor}
               <option
                 title={typeof sensor.tooltipText === 'function' ? sensor.tooltipText() : sensor.tooltipText}
-                value={sensor.key}>
+                value={sensor.key}
+              >
                 {sensor.name}
               </option>
             {/each}
@@ -93,38 +61,22 @@
   {#if showDate}
     <div class="uk-width-1-1 uk-width-1-3@m block">
       <span class="uk-form-label">on</span>
-      <div class="uk-form-controls">
-        {#if selectedDate != null && startEndDates.length !== 0}
-          <Datepicker
-            className="uk-width-1-1"
-            bind:selected={selectedDate}
-            start={startEndDates[0]}
-            end={startEndDates[1]}
-            formattedSelected={formatTime(selectedDate)}>
-            <button aria-label="selected date" class="uk-input uk-text-nowrap" on:>{formatTime(selectedDate)}</button>
-          </Datepicker>
-        {:else}<button aria-label="selected date" class="uk-input" on:>{formatTime(selectedDate)}</button>{/if}
-      </div>
-      <div class="uk-button-group shortcuts">
-        <button
-          class="uk-button uk-button-default"
-          disabled={selectedDate == null || startEndDates.length === 0 || selectedDate <= startEndDates[0]}
-          title="Go to the previous day"
-          on:click={() => (selectedDate = timeDay.offset(selectedDate, -1))}
-          data-uk-icon="icon: chevron-left" />
-        <button
-          class="uk-button uk-button-default"
-          disabled={selectedDate == null || startEndDates.length === 0 || selectedDate >= startEndDates[1]}
-          title="Go to the next day"
-          on:click={() => (selectedDate = timeDay.offset(selectedDate, 1))}
-          data-uk-icon="icon: chevron-right" />
-        <button
-          class="uk-button uk-button-default"
-          disabled={selectedDate == null || startEndDates.length === 0 || selectedDate.valueOf() === startEndDates[1].valueOf()}
-          title="Go to the latest date for which '{$currentSensorEntry.name}' is available"
-          on:click={() => (selectedDate = startEndDates[1])}
-          data-uk-icon="icon: chevron-right-end" />
-      </div>
+      <SensorDatePicker sensor={$currentSensorEntry} bind:value={selectedDate} />
     </div>
   {/if}
 </div>
+
+<style>
+  .block {
+    display: flex;
+    align-items: center;
+  }
+
+  .block .uk-form-label {
+    margin-right: 1em;
+  }
+
+  .block .uk-form-controls {
+    flex-grow: 1;
+  }
+</style>

@@ -1,13 +1,12 @@
 <script>
-  import { timeFormat } from 'd3-time-format';
   import VegaTooltip from '../../components/DetailView/VegaTooltip.svelte';
   import InfoDialogButton from '../../components/InfoDialogButton.svelte';
   import Vega from '../../components/Vega.svelte';
   import { formatAPITime, parseAPITime } from '../../data';
+  import { formatDateLocal } from '../../formats';
   import { smallMultipleTimeSpan } from '../../stores';
   import { prepareSensorData } from '../overview/vegaSpec';
 
-  const formatLocal = timeFormat('%m/%d/%Y');
   /**
    * @type {import("../../stores/constants").SensorEntry}
    */
@@ -56,6 +55,46 @@
     });
   }
 </script>
+
+<section class="uk-card uk-card-body uk-card-default uk-card-small card" data-testid="sensor-{sensor.key}">
+  <div class="uk-card-header">
+    <h3 class="uk-card-title uk-margin-remove-bottom">{sensor.plotTitleText}</h3>
+    <div class="toolbar">
+      <InfoDialogButton {sensor} />
+    </div>
+  </div>
+  <div class="grow" />
+  <table class="key" class:single={selections.length === 1}>
+    <colgroup>
+      <col class="locationCol" />
+      <col class="valueCol" />
+      <col class="dateCol" />
+    </colgroup>
+    <tbody>
+      {#each selections as selection, i}
+        <tr>
+          <td class="legend" style="--color: {i === 0 ? 'grey' : selection.color}">{selection.displayName}</td>
+          <td class="key-fact">{values[i] != null ? sensor.formatValue(values[i]) : '?'}</td>
+          {#if i === 0}
+            <td class="hint" rowspan={selections.length}>on {formatDateLocal(highlightDate ? highlightDate : date)}</td>
+          {/if}
+        </tr>
+      {/each}
+    </tbody>
+  </table>
+  <main class="vega-wrapper">
+    <Vega
+      data={sensorWithData.data}
+      spec={sensorWithData.spec}
+      noDataText={sensorWithData.noDataText}
+      signals={{ currentDate: date, highlightTimeValue }}
+      signalListeners={['highlight']}
+      on:signal={onHighlight}
+      tooltip={VegaTooltip}
+      tooltipProps={{ sensor }}
+    />
+  </main>
+</section>
 
 <style>
   .card {
@@ -149,42 +188,3 @@
     width: 30px;
   }
 </style>
-
-<section class="uk-card uk-card-body uk-card-default uk-card-small card" data-testid="sensor-{sensor.key}">
-  <div class="uk-card-header">
-    <h3 class="uk-card-title uk-margin-remove-bottom">{sensor.plotTitleText}</h3>
-    <div class="toolbar">
-      <InfoDialogButton {sensor} />
-    </div>
-  </div>
-  <div class="grow" />
-  <table class="key" class:single={selections.length === 1}>
-    <colgroup>
-      <col class="locationCol" />
-      <col class="valueCol" />
-      <col class="dateCol" />
-    </colgroup>
-    <tbody>
-      {#each selections as selection, i}
-        <tr>
-          <td class="legend" style="--color: {i === 0 ? 'grey' : selection.color}">{selection.displayName}</td>
-          <td class="key-fact">{values[i] != null ? sensor.formatValue(values[i]) : '?'}</td>
-          {#if i === 0}
-            <td class="hint" rowspan={selections.length}>on {formatLocal(highlightDate ? highlightDate : date)}</td>
-          {/if}
-        </tr>
-      {/each}
-    </tbody>
-  </table>
-  <main class="vega-wrapper">
-    <Vega
-      data={sensorWithData.data}
-      spec={sensorWithData.spec}
-      noDataText={sensorWithData.noDataText}
-      signals={{ currentDate: date, highlightTimeValue }}
-      signalListeners={['highlight']}
-      on:signal={onHighlight}
-      tooltip={VegaTooltip}
-      tooltipProps={{ sensor }} />
-  </main>
-</section>

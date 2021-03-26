@@ -1,15 +1,15 @@
 <script>
-  import ModeNav from './components/ModeNav.svelte';
   import { onMount } from 'svelte';
-  import { currentMode, appReady, sensorList } from './stores';
+  import { currentMode, appReady, sensorList, loadAnnotations } from './stores';
   import './stores/urlHandler';
   import './stores/ga';
+  import './stores/websiteInjector';
   import { loadMetaData } from './data';
   import InfoDialog from './components/InfoDialog.svelte';
   import Disclaimer from './components/Disclaimer.svelte';
 
   onMount(() => {
-    loadMetaData(sensorList).then(() => {
+    Promise.all([loadMetaData(sensorList), loadAnnotations()]).then(() => {
       appReady.set(true);
       document.body.dataset.ready = 'ready';
     });
@@ -18,13 +18,6 @@
   $: currentComponent = $currentMode.component();
 </script>
 
-<style>
-  .loader {
-    flex-grow: 1;
-  }
-</style>
-
-<ModeNav />
 {#await currentComponent}
   <div class="loader loading" />
 {:then value}
@@ -37,3 +30,9 @@
 {/await}
 <Disclaimer />
 <InfoDialog />
+
+<style>
+  .loader {
+    flex-grow: 1;
+  }
+</style>

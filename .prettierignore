@@ -4,7 +4,7 @@
 .browserslistrc
 .gitattributes
 .prettierignore
-/old_maps
+/.husky
 *.ico
 *.png
 *.svg
@@ -13,6 +13,8 @@
 /src/static
 /src/maps/raw
 /src/maps/processed
+/src/specs/shapefiles
+/src/specs/tilegrams
 *.generated.json
 *.txt
 /LICENSE
@@ -21,3 +23,5 @@
 *.png
 *.jpg
 *.toml
+*.tgz
+*.zip

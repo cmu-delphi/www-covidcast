@@ -1,4 +1,4 @@
-import { toFillLayer } from '../layers';
+import { toBorderLayer, toFillLayer } from '../layers';
 import { levelMegaCounty } from '../../../stores/constants';
 import { interpolateValue } from './utils';
 
@@ -9,7 +9,11 @@ export default class ChoroplethEncoding {
   }
 
   getVisibleLayers(level) {
-    return [toFillLayer(level), level === 'county' && toFillLayer(levelMegaCounty.id)].filter(Boolean);
+    return [
+      toFillLayer(level),
+      level === 'county' && toFillLayer(levelMegaCounty.id),
+      level === 'county' && toBorderLayer('state'),
+    ].filter(Boolean);
   }
 
   addLayers() {
