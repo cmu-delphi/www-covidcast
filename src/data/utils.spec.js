@@ -1,5 +1,5 @@
 import { formatAPITime, parseAPITime, generateCorrelationMetrics } from './utils';
-import { cliTestData, deathsTestData } from './test/testData';
+import { cliTestData, deathsTestData } from './__test__/testData';
 
 describe('formatAPITime', () => {
   test('matches api format', () => {
