@@ -41,11 +41,17 @@ export function parseAPITime(v) {
 export const formatAPITime = timeFormat('%Y%m%d');
 
 /**
+ * @typedef {object} Lag
+ * @property {number} lag
+ * @property {number} r2
+ */
+
+/**
  * @typedef {object} CorrelationMetric
  * @property {number} r2At0
  * @property {number} lagAtMaxR2
  * @property {number} r2AtMaxR2
- * @property {[[number,number]]} lags
+ * @property {Lag[]} lags
  */
 
 /**
@@ -57,24 +63,25 @@ export const formatAPITime = timeFormat('%Y%m%d');
  * For each lag, the input is a window of length(a)-28, such that the number of values at
  * each lag is the same.
  *
- * @param {Number[]} a
- * @param {Number[]} b
+ * @param {number[]} a
+ * @param {number[]} b
+ * @returns {Lag[]}
  */
 function generateLags(a, b) {
-  let lag = 28;
-  let lags = [];
-  let aWindow = a.slice(lag);
-  let bWindow = b.slice(lag);
+  const lag = 28;
+  const lags = [];
+  const aWindow = a.slice(lag);
+  const bWindow = b.slice(lag);
 
   for (let i = 0; i <= lag; i++) {
-    let bLag = b.slice(lag - i, b.length - i);
-    let model = linear(zip(aWindow, bLag));
+    const bLag = b.slice(lag - i, b.length - i);
+    const model = linear(zip(aWindow, bLag));
     lags.push({ lag: i, r2: model.r2 });
   }
 
   for (let i = 1; i <= lag; i++) {
-    let aLag = a.slice(lag - i, b.length - i);
-    let model = linear(zip(aLag, bWindow));
+    const aLag = a.slice(lag - i, b.length - i);
+    const model = linear(zip(aLag, bWindow));
     lags.push({ lag: -1 * i, r2: model.r2 });
   }
   return lags;
@@ -82,8 +89,9 @@ function generateLags(a, b) {
 
 /**
  * Do a pair-wise combination of the elements from a and b arrays.
- * @param {Number[]} a
- * @param {Number[]} b
+ * @param {number[]} a
+ * @param {number[]} b
+ * @returns {number[]}
  */
 function zip(a, b) {
   return a.map((x, i) => {
@@ -96,19 +104,15 @@ function zip(a, b) {
  *
  * @param {import('./fetchData').EpiDataRow[]} response
  * @param {import('./fetchData').EpiDataRow[]} explanatory
- * @param {CorrelationMetric} metric
+ * @returns {CorrelationMetric}
  */
 export function generateCorrelationMetrics(response, explanatory) {
-  let response_values = response.map((row) => {
-    return row.value;
-  });
-  let explanatory_values = explanatory.map((row) => {
-    return row.value;
-  });
+  const response_values = response.map((row) => row.value);
+  const explanatory_values = explanatory.map((row) => row.value);
 
-  let model = linear(zip(response_values, explanatory_values));
-  let lags = generateLags(response_values, explanatory_values);
-  let max = lags.reduce((acc, i) => {
+  const model = linear(zip(response_values, explanatory_values));
+  const lags = generateLags(response_values, explanatory_values);
+  const max = lags.reduce((acc, i) => {
     return i.r2 > acc.r2 ? i : acc;
   });
 
