@@ -34,11 +34,9 @@
   $: secondary = selected;
   $: secondaryData = secondary ? fetcher.fetch1Sensor1RegionNDates(secondary, region, date.windowTimeFrame) : null;
 
-  $: sensorListData = sensorList.map((sensor) =>
+  $: sensorDataPromises = sensorList.map((sensor) =>
     fetcher.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame),
   );
-
-  $: sensorDataPromises = sensorListData.map((sensorData) => sensorData);
   $: sensorCorrelationData = loadAllSensorsData(sensorDataPromises);
 
   function loadAllSensorsData(sensorPromises) {
