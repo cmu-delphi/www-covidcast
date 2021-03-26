@@ -159,19 +159,19 @@
                   },
                 ]
               : false,
-            // opacity: {
-            //   condition: [
-            //     {
-            //       selection: 'highlight',
-            //       value: 1,
-            //     },
-            //     {
-            //       test: 'datum.time_value == highlightTimeValue',
-            //       value: 1,
-            //     },
-            //   ],
-            //   value: 0.2,
-            // },
+            opacity: {
+              condition: [
+                {
+                  selection: 'highlight',
+                  value: 1,
+                },
+                // {
+                //   test: 'datum.time_value == highlightTimeValue',
+                //   value: 1,
+                // },
+              ],
+              value: 0.2,
+            },
           },
         },
         ...(options.showRSquared
