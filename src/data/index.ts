@@ -10,7 +10,7 @@ export * from './fetchData';
 export { formatAPITime, parseAPITime } from './utils';
 export * from './annotations';
 
-function toStatsRegionKey(sensorKey, region) {
+function toStatsRegionKey(sensorKey: string, region: string) {
   return sensorKey + '_' + region;
 }
 

@@ -3,6 +3,8 @@
 import { timeDay } from 'd3-time';
 import { timeParse, timeFormat } from 'd3-time-format';
 import { linear } from 'regression';
+import { zip } from '../util';
+import type { EpiDataRow } from './fetchData';
 
 // json1 value is 7 day average, json2 value is single count
 /**
@@ -10,49 +12,48 @@ import { linear } from 'regression';
  * @param {import('./fetchData').EpiDataRow[][]} data
  * @param {string[]} keys
  */
-export function combineSignals(
-  data,
-  ref,
-  keys,
-  toKey = (d) => `${String(d.geo_value).toLowerCase()}@${d.time_value}`,
+export function combineSignals<T extends Record<string, number>>(
+  data: EpiDataRow[][],
+  ref: EpiDataRow[],
+  keys: (keyof T)[],
+  toKey = (d: EpiDataRow): string => `${String(d.geo_value).toLowerCase()}@${d.time_value}`,
   factor = 1,
-) {
+): (EpiDataRow & T)[] {
   const map = new Map(ref.map((d) => [toKey(d), d]));
   data.forEach((rows, i) => {
     const key = keys[i];
     for (const d of rows || []) {
-      const entry = map.get(toKey(d));
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+      const entry = map.get(toKey(d)) as unknown as Record<string, number>;
       if (entry) {
-        entry[key] = d.value * factor;
+        entry[key as string] = d.value * factor;
       }
     }
   });
-  return ref;
+  return ref as (EpiDataRow & T)[];
 }
 
 const parseAPITimeParser = timeParse('%Y%m%d');
 
-export function parseAPITime(v) {
-  return timeDay(parseAPITimeParser(v));
+export function parseAPITime(v: number | string): Date {
+  return timeDay(parseAPITimeParser(String(v))!);
 }
 /**
  * @type {(v: Date) => string}
  */
 export const formatAPITime = timeFormat('%Y%m%d');
 
-/**
- * @typedef {object} Lag
- * @property {number} lag
- * @property {number} r2
- */
+export interface Lag {
+  lag: number;
+  r2: number;
+}
 
-/**
- * @typedef {object} CorrelationMetric
- * @property {number} r2At0
- * @property {number} lagAtMaxR2
- * @property {number} r2AtMaxR2
- * @property {Lag[]} lags
- */
+export interface CorrelationMetric {
+  r2At0: number;
+  lagAtMaxR2: number;
+  r2AtMaxR2: number;
+  lags: Lag[];
+}
 
 /**
  * Generates R^2 metrics for lags between -28 and 28 days.
@@ -63,13 +64,10 @@ export const formatAPITime = timeFormat('%Y%m%d');
  * For each lag, the input is a window of length(a)-28, such that the number of values at
  * each lag is the same.
  *
- * @param {number[]} a
- * @param {number[]} b
- * @returns {Lag[]}
  */
-function generateLags(a, b) {
+function generateLags(a: number[], b: number[]): Lag[] {
   const lag = 28;
-  const lags = [];
+  const lags: Lag[] = [];
   const aWindow = a.slice(lag);
   const bWindow = b.slice(lag);
 
@@ -88,25 +86,10 @@ function generateLags(a, b) {
 }
 
 /**
- * Do a pair-wise combination of the elements from a and b arrays.
- * @param {number[]} a
- * @param {number[]} b
- * @returns {[number, number][]}
- */
-function zip(a, b) {
-  return a.map((x, i) => {
-    return [x, b[i]];
-  });
-}
-
-/**
  * Compute 28-day correlation metrics for a response variable given an explanatory variable.
  *
- * @param {import('./fetchData').EpiDataRow[]} response
- * @param {import('./fetchData').EpiDataRow[]} explanatory
- * @returns {CorrelationMetric}
  */
-export function generateCorrelationMetrics(response, explanatory) {
+export function generateCorrelationMetrics(response: EpiDataRow[], explanatory: EpiDataRow[]): CorrelationMetric {
   const response_values = response.map((row) => row.value);
   const explanatory_values = explanatory.map((row) => row.value);
 

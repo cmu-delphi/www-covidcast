@@ -2,38 +2,34 @@
 
 import { formatAPITime } from './utils';
 import { callSignalAPI } from './api';
-import { fetchData } from './fetchData';
+import { EpiDataRow, fetchData } from './fetchData';
 import { isoParse } from 'd3-time-format';
 import { timeDay } from 'd3-time';
 import { addNameInfos } from '.';
 import { countyInfo } from '../maps';
+import type { NameInfo } from '../maps/interfaces';
 
-/**
- * @typedef {object} Coverage
- * @property {Date} date
- * @property {number} count
- * @property {number} fraction // fraction
- */
+export interface Coverage {
+  date: Date;
+  count: number;
+  fraction: number;
+}
 
-/**
- * @typedef {object} IndicatorStatus
- * @property {string} name
- * @property {string} source
- * @property {string} covidcast_signal
- * @property {Date} latest_issue
- * @property {Date} latest_time_value
- * @property {Record<'county', Coverage[]>} coverage
- */
+export interface IndicatorStatus {
+  name: string;
+  source: string;
+  covidcast_signal: string;
+  latest_issue: Date;
+  latest_time_value: Date;
+  coverage: Record<'county', Coverage[]>;
+}
 
-/**
- * @returns {Promise<IndicatorStatus[]>}
- */
-export function getIndicatorStatuses() {
-  return callSignalAPI().then((d) => {
+export function getIndicatorStatuses(): Promise<IndicatorStatus[]> {
+  return callSignalAPI<Record<keyof IndicatorStatus, string>>().then((d) => {
     if (d.result < 0 || d.message.includes('no results')) {
       return [];
     }
-    const data = d.epidata || [];
+    const data = ((d.epidata ?? []) as unknown) as IndicatorStatus[];
     for (const row of data) {
       row.latest_issue = timeDay(isoParse(row.latest_issue.toString()));
       row.latest_time_value = timeDay(isoParse(row.latest_time_value.toString()));
@@ -48,13 +44,7 @@ export function getIndicatorStatuses() {
   });
 }
 
-/**
- *
- * @param {IndicatorStatus} indicator
- * @param {Date} date
- * @returns {Promise<(import('.').EpiDataRow & import('../maps').NameInfo)[]>}
- */
-export function getAvailableCounties(indicator, date) {
+export function getAvailableCounties(indicator: IndicatorStatus, date: Date): Promise<(EpiDataRow & NameInfo)[]> {
   return fetchData(
     {
       id: indicator.source,
@@ -63,9 +53,9 @@ export function getAvailableCounties(indicator, date) {
     'county',
     '*',
     date,
-    { time_value: formatAPITime(date) },
+    { time_value: Number.parseInt(formatAPITime(date), 10) },
     {
-      multi_values: false,
+      multiValues: false,
     },
   ).then((rows) => addNameInfos(rows).filter((d) => d.level === 'county'));
 }

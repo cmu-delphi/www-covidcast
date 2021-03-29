@@ -1,8 +1,9 @@
 import { isCasesSignal, isDeathSignal } from '../data/signals';
+import type { Sensor } from './constants';
 
 export const CASES_DEATH_SOURCE = 'cases-deaths';
 
-const sourceNameLookup = {
+const sourceNameLookup: Record<string, string> = {
   chng: 'Change Healthcare',
   'doctor-visits': 'Doctor Visits',
   'fb-survey': 'Delphi Pandemic Survey via Facebook',
@@ -15,10 +16,7 @@ const sourceNameLookup = {
   'google-symptoms': 'Google Symptoms Searches',
 };
 
-/**
- * @param {import('./constants').Sensor | string} sensor
- */
-export function getDataSource(sensor) {
+export function getDataSource(sensor: { id: string, signal: string } | Sensor): string {
   if (typeof sensor === 'string') {
     return sourceNameLookup[sensor] || sensor;
   }

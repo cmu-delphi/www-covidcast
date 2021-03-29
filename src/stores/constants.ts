@@ -5,9 +5,16 @@ import { modeByID } from '../modes';
 import { formatRawValue, formatValue, formatPercentage } from '../formats';
 import { interpolateYlGnBu, interpolateYlOrRd } from 'd3-scale-chromatic';
 import { getDataSource } from './dataSourceLookup';
+import type { RegionLevel } from '../maps/interfaces';
 // import { generateMockSignal, generateMockMeta } from '../data/mock';
 
-export const levelList = [
+export interface LevelInfo {
+  id: RegionLevel;
+  label: string;
+  labelPlural: string;
+}
+
+export const levelList: LevelInfo[] = [
   {
     id: 'state',
     label: 'State',
@@ -29,67 +36,62 @@ export const levelList = [
     labelPlural: 'Counties',
   },
 ];
-export const levels = levelList.map((l) => l.id);
+export const levels: RegionLevel[] = levelList.map((l) => l.id);
 
-export const levelMegaCounty = {
+export const levelMegaCounty: LevelInfo = {
   id: 'mega-county',
   label: 'Mega County',
   labelPlural: 'Mega Counties',
 };
 export const levelsWithMega = levels.concat(levelMegaCounty.id);
 
-const levelById = new Map(levelList.map((l) => [l.id, l]));
+const levelById = new Map<string, LevelInfo>(levelList.map((l) => [l.id, l]));
 
-export function getLevelInfo(level) {
+export function getLevelInfo(level: string): LevelInfo {
   return (
     levelById.get(level) || {
-      id: level,
+      id: level as RegionLevel,
       label: level.toUpperCase(),
       labelPlural: level.toUpperCase(),
     }
   );
 }
 
-/**
- * @typedef {object} CasesOrDeathOptions
- * @property {boolean} cumulative
- * @property {boolean} incidence
- */
+export interface CasesOrDeathOptions {
+  cumulative: boolean;
+  incidence: boolean;
+}
 
-/**
- * @typedef {object} Sensor
- * @property {string} key id:signal
- * @property {string} id data source
- * @property {string} signal signal
- * @property {string=} rawSignal raw signal in case of a 7day average
- * @property {Sensor=} rawSensor raw sensor in case of a 7day average
- *
- * @property {string} name signal name
- * @property {string} dataSourceName data source name
- * @property {'public' | 'early' | 'late'} type
- * @property {('msa' | 'state' | 'county' | 'hrr' | 'nation' | 'hss')[]} levels levels for which this signal is available
- * @property {string?} description HTML long text description
- * @property {string} signalTooltip short text description
- * @property {(v: number) => string)} colorScale
- *
- * @property {string[]} links more information links
- * @property {string} credits credit text
- *
- * @property {'raw' | 'per100k' | 'percent' | 'fraction'} format
- * @property {string} xAxis x axis date title
- * @property {string} yAxis y axis value title
- * @property {string} unit y axis value unit long
- * @property {boolean} isInverted
- * @property {boolean} is7DayAverage
- * @property {boolean} hasStdErr
- * @property {(v: number, enforceSign?: boolean) => string} formatValue
- */
+export interface Sensor {
+  key: string; // id:signal
+  id: string; // data source
+  signal: string;
+  rawSignal?: string; // raw signal in case of a 7day average
+  rawSensor?: Sensor; // raw signal in case of a 7day average
 
-/**
- * @param {Partial<Sensor>} sensor
- * @returns {Sensor}
- */
-export function ensureSensorStructure(sensor) {
+  name: string; // signal name
+  dataSourceName: string;
+  type: 'public' | 'early' | 'late';
+  levels: RegionLevel[];
+  description?: string; // HTML long text description
+  signalTooltip: string; // short text description
+  colorScale(v: number): string;
+
+  links: string[]; // more information links
+  credits?: string; // credit text
+
+  format: 'raw' | 'per100k' | 'percent' | 'fraction';
+  xAxis: string; // x axis title
+  yAxis: string; // y axis value unit long
+  isInverted: boolean;
+  is7DayAverage: boolean;
+  hasStdErr: boolean;
+  formatValue(v: number, enforceSign?: boolean): string;
+
+  highlight?: string[];
+}
+
+export function ensureSensorStructure(sensor: Partial<Sensor> & { id: string, signal: string, tooltipText?: string }): Sensor {
   const key = `${sensor.id}-${sensor.signal}`;
 
   const isInverted = sensor.isInverted || false;
@@ -155,42 +157,19 @@ export function ensureSensorStructure(sensor) {
     };
   }
 
-  return full;
+  return full as Sensor;
 }
 
-/**
- * @typedef {object} OldSensor
- * @property {boolean} isCasesOrDeath is cases or death signal
- * @property {boolean} isCount is count signal
- * @property {(options?: CasesOrDeathOptions) => 'prop' | 'count' | 'other')} getType
- * @property {Record<keyof EpiDataCasesOrDeathValues, string>} casesOrDeathSignals signal to load for cases or death
- * @property {Record<keyof EpiDataCasesOrDeathValues, Sensor>} casesOrDeathSensors
- *
- * @property {boolean?} default whether it should be default signal
- * @property {string | ((options?: CasesOrDeathOptions) => string)} tooltipText
- * @property {string | ((options?: CasesOrDeathOptions) => string)} mapTitleText
- * @property {string} plotTitleText
- */
-/**
- * @typedef {Sensor & OldSensor} SensorEntry
- */
+export interface EpiDataCasesOrDeathValues {
+  avg: number;
+  count: number;
+  countCumulative: number;
+  avgRatio: number;
+  countRatio: number;
+  countRatioCumulative: number;
+}
 
-/**
- * @typedef {object} EpiDataCasesOrDeathValues
- * @property {number} avg
- * @property {number} count
- * @property {number} avgCumulative
- * @property {number} countCumulative
- * @property {number} avgRatio
- * @property {number} countRatio
- * @property {number} avgRatioCumulative
- * @property {number} countRatioCumulative
- */
-
-/**
- * @type {(keyof EpiDataCasesOrDeathValues)[]}
- */
-export const EPIDATA_CASES_OR_DEATH_VALUES = [
+export const EPIDATA_CASES_OR_DEATH_VALUES: (keyof EpiDataCasesOrDeathValues)[] = [
   'avg',
   'count',
   'countCumulative',
@@ -199,12 +178,25 @@ export const EPIDATA_CASES_OR_DEATH_VALUES = [
   'countRatioCumulative',
 ];
 
+export interface OldSensor {
+  isCasesOrDeath: boolean; // is cases or death signal
+  isCount: boolean; // is count signal
+  getType(options?: CasesOrDeathOptions): 'prop' | 'count' | 'other';
+
+  casesOrDeathSignals?: Record<keyof EpiDataCasesOrDeathValues, string>;
+  casesOrDeathSensors?: Record<keyof EpiDataCasesOrDeathValues, Sensor>;
+  default?: boolean; // whether it should be default signal
+  tooltipText: string | ((options?: CasesOrDeathOptions) => string);
+  mapTitleText: string | ((options?: CasesOrDeathOptions) => string);
+  plotTitleText: string;
+}
+
+export declare type SensorEntry = Sensor & OldSensor;
+
 /**
  * determines the primary value to show or lookup
- * @param {SensorEntry} sensorEntry
- * @param {CasesOrDeathOptions} sensorOptions
  */
-export function primaryValue(sensorEntry, sensorOptions) {
+export function primaryValue(sensorEntry: SensorEntry, sensorOptions: CasesOrDeathOptions): 'value' | keyof EpiDataCasesOrDeathValues {
   if (!sensorEntry.isCasesOrDeath) {
     return 'value';
   }
@@ -216,14 +208,12 @@ export function primaryValue(sensorEntry, sensorOptions) {
 
 /**
  * determines the primary value to show or lookup
- * @param {SensorEntry} sensorEntry
- * @param {CasesOrDeathOptions} sensorOptions
  */
-function getType(sensorEntry, sensorOptions) {
+function getType(sensorEntry: SensorEntry, sensorOptions: CasesOrDeathOptions) {
   let signal = sensorEntry.signal;
   if (sensorEntry.isCasesOrDeath) {
-    const valueKey = primaryValue(sensorEntry, sensorOptions);
-    signal = sensorEntry.casesOrDeathSignals[valueKey];
+    const valueKey = primaryValue(sensorEntry, sensorOptions) as keyof EpiDataCasesOrDeathValues;
+    signal = sensorEntry.casesOrDeathSignals?.[valueKey] ?? sensorEntry.signal;
   }
   if (isCountSignal(signal)) {
     return 'count';
@@ -234,11 +224,7 @@ function getType(sensorEntry, sensorOptions) {
   return 'other';
 }
 
-/**
- *
- * @param {*} sensorEntry
- */
-export function extendSensorEntry(sensorEntry) {
+export function extendSensorEntry(sensorEntry: Partial<SensorEntry> & { id: string; signal: string }): SensorEntry {
   const key = `${sensorEntry.id}-${sensorEntry.signal}`;
   const isCasesOrDeath = isCasesSignal(key) || isDeathSignal(key);
   const isCount = isCountSignal(key);
@@ -250,26 +236,26 @@ export function extendSensorEntry(sensorEntry) {
     tooltipText: sensorEntry.tooltipText || mapTitle,
 
     isCount,
-    getType: (options) => getType(sensorEntry, options),
+    getType: (options: CasesOrDeathOptions) => getType(sensorEntry, options),
     isCasesOrDeath,
     plotTitleText: sensorEntry.plotTitleText || sensorEntry.name,
     mapTitleText:
       typeof mapTitle === 'string' || typeof mapTitle === 'function'
         ? mapTitle
-        : (options) => {
-            // generate lookup function
-            if (options && options.cumulative) {
-              if (options.incidence) {
-                return mapTitle.incidenceCumulative;
-              } else {
-                return mapTitle.ratioCumulative;
-              }
-            } else if (options && options.incidence) {
-              return mapTitle.incidence;
+        : (options: CasesOrDeathOptions) => {
+          // generate lookup function
+          if (options && options.cumulative) {
+            if (options.incidence) {
+              return mapTitle.incidenceCumulative;
             } else {
-              return mapTitle.ratio;
+              return mapTitle.ratioCumulative;
             }
-          },
+          } else if (options && options.incidence) {
+            return mapTitle.incidence;
+          } else {
+            return mapTitle.ratio;
+          }
+        },
   });
   if (isCasesOrDeath) {
     // create a casesOrDeathSensor
@@ -304,31 +290,27 @@ export function extendSensorEntry(sensorEntry) {
   return full;
 }
 
-/**
- * defines the geo types / levels that are should be used for computing the meta data, the first one has the highest priority and so on
- */
-export const regularSignalMetaDataGeoTypeCandidates = ['county', 'msa'];
 
 /**
  * @type {Partial<SensorEntry>[]}
  */
-const defaultSensors = descriptions;
+const defaultSensors = descriptions as unknown as Partial<SensorEntry>[];
 
 /**
  * @type {SensorEntry[]}
  */
-export const sensorList = (() => {
+export const sensorList: SensorEntry[] = (() => {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   const sensorsOption = urlParams.get('sensors');
   if (sensorsOption) {
-    return JSON.parse(decodeURIComponent(sensorsOption)).map(extendSensorEntry);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (JSON.parse(decodeURIComponent(sensorsOption)) as any[]).map((d) => extendSensorEntry(d));
   } else {
     return defaultSensors.map(extendSensorEntry);
   }
 })();
 
-export const sensorMap = new Map(sensorList.map((s) => [s.key, s]));
 
 const sensorTypes = [
   {

@@ -2,28 +2,25 @@ import { parseAPITime } from './utils';
 import { csvParse } from 'd3-dsv';
 import { timeDay } from 'd3-time';
 import { fetchOptions } from './api';
+import type { NameInfo, RegionLevel } from '../maps/interfaces';
 
 const ANNOTATION_SHEET = process.env.COVIDCAST_ANNOTATION_SHEET;
 const ANNOTATION_DRAFTS = process.env.COVIDCAST_ANNOTATION_DRAFTS === 'true';
 
-/**
- * @typedef {object} RawAnnotation
- * @property {string} problem
- * @property {string} explanation
- * @property {string} source
- * @property {string} signals * or a comma separated list "*"|(ID{\s*";"\s*ID}*)
- * @property {string} dates YYYYMMDD-YYYYMMDD
- * @property {string} regions semicolor separated key value: e.g. GROUP("*"|(ID{","\s*ID}*)){\s*","\s*GROUP("*"|(ID{","\s*ID}*))}
- * @property {string} 'see also'
- */
+export interface RawAnnotation {
+  problem: string;
+  explanation: string;
+  source: string;
+  signals: string; // * or a comma separated list "*"|(ID{\s*";"\s*ID}*)
+  dates: string; // YYYYMMDD-YYYYMMDD
+  regions: string; //semicolor separated key value: e.g. GROUP("*"|(ID{","\s*ID}*)){\s*","\s*GROUP("*"|(ID{","\s*ID}*))}
+  reference?: string;
+}
 
-/**
- * @param {string} signals
- * @returns {'*' | Set<string>}
- */
-function parseSignals(signals) {
+
+function parseSignals(signals: string) {
   if (!signals) {
-    return [];
+    return new Set<string>();
   }
   const trimmed = signals.trim();
   if (trimmed === '*') {
@@ -37,11 +34,8 @@ function parseSignals(signals) {
   );
 }
 
-/**
- * @param {string} dates
- * @returns {[Date, Date]}
- */
-function parseDates(dates) {
+
+function parseDates(dates: string): [Date, Date] {
   if (!dates) {
     return [new Date(), new Date()];
   }
@@ -54,11 +48,8 @@ function parseDates(dates) {
   }
   return [dateParts[0], timeDay.floor(timeDay.offset(dateParts[1], 1))];
 }
-/**
- * @param {string} regions
- * @returns {{level: string, ids: '*' | Set<string>}[]}
- */
-function parseRegions(regions) {
+
+function parseRegions(regions: string): { level: RegionLevel, ids: '*' | Set<string> }[] {
   if (!regions) {
     return [];
   }
@@ -67,12 +58,12 @@ function parseRegions(regions) {
     .split(';')
     .map((d) => d.trim())
     .map((d) => {
-      const match = d.match(/(.*)\((.*)\)/);
+      const match = /(.*)\((.*)\)/.exec(d);
       if (match) {
-        const level = match[1];
+        const level = match[1] as RegionLevel;
         const ids = match[2].trim();
         if (ids === '*') {
-          return { level, ids: '*' };
+          return { level, ids: '*' as const };
         }
         return {
           level,
@@ -85,23 +76,28 @@ function parseRegions(regions) {
 }
 
 export class Annotation {
-  /**
-   * @param {RawAnnotation} raw
-   */
-  constructor(raw) {
+  readonly problem: string;
+  readonly explanation: string;
+  readonly source: string;
+  readonly signals: '*' | Set<string>;
+  readonly dates: [Date, Date];
+  readonly regions: { level: RegionLevel, ids: '*' | Set<string> }[];
+  readonly reference?: string;
+
+  constructor(raw: RawAnnotation) {
     this.problem = raw.problem;
     this.explanation = raw.explanation;
     this.source = raw.source.trim();
     this.signals = parseSignals(raw.signals);
     this.dates = parseDates(raw.dates);
     this.regions = parseRegions(raw.regions);
-    this.see_also = raw['see also'];
+    this.reference = raw.reference;
   }
 
   /**
    * @param {import('../maps').NameInfo | import('../maps').NameInfo[]} region
    */
-  matchRegion(region) {
+  matchRegion(region: NameInfo | NameInfo[]): boolean {
     const regionToMatch = Array.isArray(region) ? region : [region];
     return regionToMatch.some((matchRegion) =>
       this.regions.some(
@@ -112,37 +108,24 @@ export class Annotation {
     );
   }
 
-  /**
-   * @param {{id: string, signal: string}} sensor
-   */
-  matchSensor(sensor) {
+  matchSensor(sensor: { id: string, signal: string }): boolean {
     return (
       (this.source === '*' || this.source === sensor.id) && (this.signals === '*' || this.signals.has(sensor.signal))
     );
   }
 
-  /**
-   * @param {Date} date
-   */
-  matchDate(date) {
+  matchDate(date: Date): boolean {
     return date >= this.dates[0] && date < this.dates[1];
   }
 
-  /**
-   *
-   * @param {Date} start
-   * @param {Date} end
-   */
-  inDateRange(start, end) {
+  inDateRange(start: Date, end: Date): boolean {
     // not outside of the range, so at least a partial overlap
     return !(end < this.dates[0] || start > this.dates[1]);
   }
 }
 
-/**
- * @returns {Promise<Annotation[]>}
- */
-export function fetchAnnotations() {
+
+export function fetchAnnotations(): Promise<Annotation[]> {
   return fetch(ANNOTATION_SHEET, fetchOptions)
     .then((r) => r.text())
     .then((csv) => {
@@ -153,7 +136,7 @@ export function fetchAnnotations() {
           }
           return ANNOTATION_DRAFTS || d.published === 'TRUE';
         })
-        .map((row) => new Annotation(row));
+        .map((row) => new Annotation((row as unknown) as RawAnnotation));
     })
     .catch((error) => {
       console.error('cannot fetch annotations', error);
@@ -161,15 +144,11 @@ export function fetchAnnotations() {
     });
 }
 
-function compareDate(a, b) {
+function compareDate(a: Date, b: Date) {
   return a < b ? -1 : a > b ? 1 : 0;
 }
-/**
- *
- * @param {Annotation} annotationA
- * @param {Annotation} annotationB
- */
-function sortByDate(annotationA, annotationB) {
+
+function sortByDate(annotationA: Annotation, annotationB: Annotation) {
   const start = compareDate(annotationA.dates[0], annotationB.dates[1]);
   if (start === 0) {
     return compareDate(annotationA.dates[1], annotationB.dates[1]);
@@ -178,28 +157,16 @@ function sortByDate(annotationA, annotationB) {
 }
 
 export class AnnotationManager {
-  /**
-   * @param {Annotation[]} annotations
-   */
-  constructor(annotations = []) {
-    this.annotations = annotations;
+  constructor(public readonly annotations: Annotation[] = []) {
   }
 
-  /**
-   * @param {import('../maps').NameInfo | import('../maps').NameInfo[]} region
-   * @param {Date} date
-   */
-  getRegionAnnotations(region, date) {
+  getRegionAnnotations(region: NameInfo | NameInfo[], date: Date): Annotation[] {
     return this.annotations
       .filter((d) => region != null && d.matchRegion(region) && date != null && d.matchDate(date))
       .sort(sortByDate);
   }
-  /**
-   * @param {{id: string, signal: string}} sensor
-   * @param {import('../maps').NameInfo | import('../maps').NameInfo[]} region
-   * @param {Date} date
-   */
-  getAnnotations(sensor, region, date) {
+
+  getAnnotations(sensor: { id: string, signal: string }, region: NameInfo | NameInfo[], date: Date): Annotation[] {
     return this.annotations
       .filter(
         (d) =>
@@ -212,13 +179,8 @@ export class AnnotationManager {
       )
       .sort(sortByDate);
   }
-  /**
-   * @param {{id: string, signal: string}} sensor
-   * @param {import('../maps').NameInfo | import('../maps').NameInfo[]} region
-   * @param {Date} dateStart
-   * @param {Date} dateEnd
-   */
-  getWindowAnnotations(sensor, region, dateStart, dateEnd) {
+
+  getWindowAnnotations(sensor: { id: string, signal: string }, region: NameInfo | NameInfo[], dateStart: Date, dateEnd: Date): Annotation[] {
     return this.annotations
       .filter(
         (d) =>

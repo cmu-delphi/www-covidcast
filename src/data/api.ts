@@ -1,22 +1,18 @@
 import { formatAPITime } from './utils';
 import { levelMegaCounty } from '../stores/constants';
+import type { DataSensor } from './fetchData';
 
 const ENDPOINT = process.env.COVIDCAST_ENDPOINT_URL;
 
-export const fetchOptions = process.env.NODE_ENV === 'development' ? { cache: 'force-cache' } : {};
+export const fetchOptions: RequestInit = process.env.NODE_ENV === 'development' ? { cache: 'force-cache' } : {};
 
-/**
- * @param {string | (id: string, signal: string, level: string, date: Date | string, region: string) => any} endpoint
- * @param {string} id
- * @param {string} signal
- * @param {string} level
- * @param {Date | string | [Date, Date]} date
- * @param {string|string[]} region
- */
-export function callAPIEndPoint(endpoint, id, signal, level, date, region, fields, format = null) {
-  if (typeof endpoint === 'function') {
-    return Promise.resolve(endpoint(id, signal, level, date, region, fields));
-  }
+export interface EpiDataResponse<T = Record<string, unknown>> {
+  result?: number;
+  message: string;
+  epidata: T[];
+}
+
+export function callAPIEndPoint<T = Record<string, unknown>>(endpoint: string, id: string, signal: string, level: string, date: Date | [Date, Date] | string, region: string | readonly string[], fields?: readonly string[], format: string | null = null): Promise<EpiDataResponse<T>> {
   const url = new URL(endpoint || ENDPOINT);
   url.searchParams.set('endpoint', 'covidcast');
   url.searchParams.set('data_source', id);
@@ -28,14 +24,14 @@ export function callAPIEndPoint(endpoint, id, signal, level, date, region, field
     date instanceof Date
       ? formatAPITime(date)
       : Array.isArray(date)
-      ? `${formatAPITime(date[0])}-${formatAPITime(date[1])}`
-      : date,
+        ? `${formatAPITime(date[0])}-${formatAPITime(date[1])}`
+        : date,
   );
   url.searchParams.set('time_type', 'day');
   if (Array.isArray(region) || region.includes(',')) {
-    url.searchParams.set('geo_values', Array.isArray(region) ? region.join(',') : region);
+    url.searchParams.set('geo_values', Array.isArray(region) ? region.join(',') : (region as string));
   } else {
-    url.searchParams.set('geo_value', region);
+    url.searchParams.set('geo_value', region as string);
   }
   if (fields) {
     url.searchParams.set('fields', fields.join(','));
@@ -43,7 +39,7 @@ export function callAPIEndPoint(endpoint, id, signal, level, date, region, field
   if (format) {
     url.searchParams.set('format', format);
   }
-  return fetch(url.toString(), fetchOptions).then((d) => d.json());
+  return fetch(url.toString(), fetchOptions).then((d) => (d.json() as unknown) as Promise<T>);
 }
 
 /**
@@ -53,39 +49,35 @@ export function callAPIEndPoint(endpoint, id, signal, level, date, region, field
  * @param {Date | string} date
  * @param {string} region
  */
-export function callAPI(id, signal, level, date, region) {
+export function callAPI<T = Record<string, unknown>>(id: string, signal: string, level: string, date: Date | [Date, Date] | string, region: string | readonly string[]): Promise<EpiDataResponse<T>> {
   return callAPIEndPoint(ENDPOINT, id, signal, level, date, region);
 }
 
 /**
- *
- * @param {import('.').DataSensor[]} dataSignals
- * @param {string[]} fields
- * @param {Record<string, string>} filters
  */
-export function callMetaAPI(dataSignals, fields, filters) {
+export function callMetaAPI<T = Record<string, unknown>>(dataSignals: DataSensor[], fields: string[], filters: Record<string, string>): Promise<EpiDataResponse<T>> {
   const url = new URL(ENDPOINT);
   const urlGet = new URL(ENDPOINT);
   const data = new FormData();
   data.set('endpoint', 'covidcast_meta');
-  urlGet.searchParams.set('endpoint', data.get('endpoint'));
+  urlGet.searchParams.set('endpoint', data.get('endpoint') as string);
 
   if (dataSignals && dataSignals.length > 0) {
     const signals = dataSignals
       .map((d) =>
         d.isCasesOrDeath
           ? Object.values(d.casesOrDeathSignals)
-              .map((s) => `${d.id}:${s}`)
-              .join(',')
+            .map((s) => `${d.id}:${s}`)
+            .join(',')
           : `${d.id}:${d.signal}`,
       )
       .join(',');
     data.set('signals', signals);
-    urlGet.searchParams.set('signals', data.get('signals'));
+    urlGet.searchParams.set('signals', data.get('signals') as string);
   }
   if (fields && fields.length > 0) {
     data.set('fields', fields.join(','));
-    urlGet.searchParams.set('fields', data.get('fields'));
+    urlGet.searchParams.set('fields', data.get('fields') as string);
   }
   Object.entries(filters || {}).forEach((entry) => {
     data.set(entry[0], entry[1]);
@@ -109,7 +101,7 @@ export function callMetaAPI(dataSignals, fields, filters) {
  *
  * @returns
  */
-export function callSignalAPI() {
+export function callSignalAPI<T = Record<string, unknown>>(): Promise<EpiDataResponse<T>> {
   const url = new URL(ENDPOINT);
   url.searchParams.set('source', 'signal_dashboard_status');
   return fetch(url.toString(), fetchOptions).then((d) => d.json());

@@ -25,13 +25,13 @@ describe('parseAPITime', () => {
 });
 
 describe('correlationMetrics', () => {
-  test('Deaths vs. CLI correlations should equal what was published in the blog post', async () => {
-    let expected_metrics = {
+  test('Deaths vs. CLI correlations should equal what was published in the blog post', () => {
+    const expected_metrics = {
       r2At0: 0.43,
       lagAtMaxR2: 20,
       r2AtMaxR2: 0.81,
     };
-    let actual_metrics = generateCorrelationMetrics(deathsTestData, cliTestData);
+    const actual_metrics = generateCorrelationMetrics(deathsTestData, cliTestData);
     expect(actual_metrics.r2At0).toEqual(expected_metrics.r2At0);
     expect(actual_metrics.lagAtMaxR2).toEqual(expected_metrics.lagAtMaxR2);
     expect(actual_metrics.r2AtMaxR2).toEqual(expected_metrics.r2AtMaxR2);
