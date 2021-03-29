@@ -21,6 +21,7 @@
   ],
   "scripts": {
     "clean": "rimraf \"*.zip\" \"*.tgz\" public",
+    "compile": "tsc -p tsconfig.json --noEmit",
     "gen": "node ./scripts/generateDescriptions.js",
     "gen:check": "npm run gen -- --check",
     "gen:local": "npm run gen -- --localOnly",
@@ -57,6 +58,10 @@
     "@turf/dissolve": "^6.3.0",
     "@turf/intersect": "^6.3.0",
     "@turf/meta": "^6.3.0",
+    "@types/d3-color": "^2.0.1",
+    "@types/d3-dsv": "^2.0.1",
+    "@types/d3-format": "^2.0.0",
+    "@types/d3-time-format": "^3.0.0",
     "@types/jest": "^26.0.22",
     "@types/lodash-es": "^4.17.4",
     "@typescript-eslint/eslint-plugin": "^4.20.0",

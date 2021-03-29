@@ -1,3 +1,4 @@
+/// <reference types="jest" />
 import { getTextColorBasedOnBackground, zip } from './util';
 import { rgb } from 'd3-color';
 

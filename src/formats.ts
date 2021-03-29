@@ -10,53 +10,31 @@ const shortAbbrNth = timeFormat('%b %-d');
 const shortWeekdayAbbr = timeFormat('%a, %b %-d');
 const weekday = timeFormat('%A, %B %-d');
 
-/**
- * @param {Date | null} date
- */
-export function formatDateShortNumbers(date) {
+export function formatDateShortNumbers(date?: Date): string {
   return !date ? '?' : shortNumbers(date);
 }
 
-/**
- * @param {Date | null} date
- */
-export function formatDateShort(date) {
+export function formatDateShort(date?: Date): string {
   return !date ? '?' : short(date);
 }
 
-/**
- * @param {Date | null} date
- */
-export function formatDateShortAbbr(date) {
+export function formatDateShortAbbr(date?: Date): string {
   return !date ? '?' : shortAbbr(date);
 }
 
-/**
- * @param {Date | null} date
- * @param {boolean} nthSuffix
- */
-export function formatDateShortWeekdayAbbr(date, nthSuffix = false) {
+export function formatDateShortWeekdayAbbr(date?: Date, nthSuffix = false): string {
   return !date ? '?' : shortWeekdayAbbr(date) + (nthSuffix ? nth(date.getDate()) : '');
 }
-/**
- * @param {Date | null} date
- * @param {boolean} nthSuffix
- */
-export function formatDateWeekday(date, nthSuffix = false) {
+
+export function formatDateWeekday(date?: Date, nthSuffix = false): string {
   return !date ? '?' : weekday(date) + (nthSuffix ? nth(date.getDate()) : '');
 }
-/**
- * @param {Date | null} date
- * @param {boolean} nthSuffix
- */
-export function formatDateYearWeekdayAbbr(date, nthSuffix = false) {
+
+export function formatDateYearWeekdayAbbr(date?: Date, nthSuffix = false): string {
   return !date ? '?' : formatDateShortWeekdayAbbr(date, nthSuffix) + ` ${date.getFullYear()}`;
 }
 
-/**
- * @param {number} d
- */
-function nth(d) {
+function nth(d: number) {
   // based on https://stackoverflow.com/questions/15397372/javascript-new-date-ordinal-st-nd-rd-th
   if (d > 3 && d < 21) return 'th';
   switch (d % 10) {
@@ -71,32 +49,20 @@ function nth(d) {
   }
 }
 
-/**
- * @param {Date | null} date
- * @param {boolean} nthSuffix
- */
-export function formatDateShortOrdinal(date, nthSuffix = true) {
+export function formatDateShortOrdinal(date?: Date, nthSuffix = true): string {
   return !date ? '?' : shortAbbrNth(date) + (nthSuffix ? nth(date.getDate()) : '');
 }
 
-/**
- * @param {Date | null} date
- */
-export function formatDateISO(date) {
+export function formatDateISO(date?: Date): string {
   return !date ? '?' : iso(date);
 }
 
-/**
- * @param {Date | null} date
- */
-export function formatDateLocal(date) {
+export function formatDateLocal(date?: Date): string {
   return !date ? '?' : local(date);
 }
 
-/**
- * @param {NameInfo} info
- */
-export function formatPopulation(info) {
+
+export function formatPopulation(info: { population?: number }): string {
   if (!info || typeof info.population !== 'number') {
     return 'Unknown';
   }
@@ -107,13 +73,7 @@ const f = format(',.1f');
 const basePercentFormatter = format('.2%');
 const rawFormatter = format(',.2f');
 
-/**
- * @param {number} value
- * @param {(v: number) => number} formatter
- * @param {boolean} enforceSign
- * @param {number} factor
- */
-function sign(value, formatter, enforceSign, factor = 1) {
+function sign(value: number | null | undefined, formatter: (v: number) => string, enforceSign: boolean, factor = 1): string {
   if (value == null || Number.isNaN(value)) {
     return 'N/A';
   }
@@ -127,31 +87,15 @@ function sign(value, formatter, enforceSign, factor = 1) {
   return `+${v}`;
 }
 
-/**
- * @param {number} value
- * @param {boolean} enforceSign
- */
-export function formatValue(value, enforceSign = false) {
+export function formatValue(value?: number, enforceSign = false): string {
   return sign(value, f, enforceSign);
 }
-/**
- * @param {number} value
- * @param {boolean} enforceSign
- */
-export function formatPercentage(value, enforceSign = false) {
+export function formatPercentage(value?: number, enforceSign = false): string {
   return sign(value, basePercentFormatter, enforceSign, 1 / 100);
 }
-/**
- * @param {number} value
- * @param {boolean} enforceSign
- */
-export function formatFraction(value, enforceSign = false) {
+export function formatFraction(value?: number, enforceSign = false): string {
   return sign(value, basePercentFormatter, enforceSign);
 }
-/**
- * @param {number} value
- * @param {boolean} enforceSign
- */
-export function formatRawValue(value, enforceSign = false) {
+export function formatRawValue(value?: number, enforceSign = false): string {
   return sign(value, rawFormatter, enforceSign);
 }
