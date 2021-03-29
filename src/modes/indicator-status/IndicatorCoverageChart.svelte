@@ -4,7 +4,7 @@
   import {
     generateLineChartSpec,
     resolveHighlightedDate,
-    resetOnClearHighlighTuple,
+    patchHighlightTuple,
     MULTI_COLORS,
     genAnnotationLayer,
   } from '../../specs/lineSpec';
@@ -52,6 +52,8 @@
       subTitle: 'Fraction of Counties',
       valueFormat: '.1%',
       paddingLeft: 60,
+      clearHighlight: false,
+      reactOnMouseMove: false,
       tickCount: {
         interval: 'day',
       },
@@ -95,7 +97,7 @@
   bind:this={vegaRef}
   {spec}
   {data}
-  signals={{ highlight_tuple: resetOnClearHighlighTuple(signal.latest_time_value) }}
+  signals={{ highlight_tuple: patchHighlightTuple }}
   signalListeners={['highlight']}
   on:signal={onSignal}
 />

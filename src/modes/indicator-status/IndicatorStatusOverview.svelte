@@ -50,7 +50,7 @@
           <a href="#overview" on:click={() => (selected = null)}>Overview</a>
         </li>
         <li class:uk-active={selected != null}>
-          <a href="#details" on:click={() => (selected = loadedData[0])}>Individual</a>
+          <a href="#details" on:click={() => (selected = loadedData[0])}>Single Indicator</a>
         </li>
       </ul>
     </div>

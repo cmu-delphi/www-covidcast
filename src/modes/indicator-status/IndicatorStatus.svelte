@@ -28,16 +28,29 @@
       <div>
         <KPI text={formatDateISO(signal.latest_time_value)} />
       </div>
-      <div class="sub">latest data date</div>
+      <div class="sub">Latest Data Available</div>
+    </div>
+    <div>
+      <div>
+        <KPI text="{signal.latest_lag.toLocaleString()} days" />
+      </div>
+      <div class="sub">Lag to Today</div>
     </div>
     <div class="mobile-kpi">
       <div>
-        <SurveyValue value={signal ? signal.latest_coverage : null} factor={100} />
+        <KPI text={formatDateISO(signal.latest_issue)} />
       </div>
-      <div class="sub">% of counties available</div>
+      <div class="sub">Latest Issue</div>
+    </div>
+    <div class="mobile-kpi">
+      <div>
+        <SurveyValue value={signal.latest_coverage} factor={100} />
+      </div>
+      <div class="sub">% of Counties Available</div>
     </div>
   </div>
 
+  <hr />
   <FancyHeader invert sub="Coverage">{signal ? signal.name : '?'}</FancyHeader>
   <IndicatorCoverageChart
     {signal}
@@ -50,6 +63,7 @@
     }}
   />
 
+  <hr />
   <FancyHeader invert sub="Map ({formatDateISO(pickedDate)})">{signal ? signal.name : '?'}</FancyHeader>
 </div>
 <div class="grid-2-12">

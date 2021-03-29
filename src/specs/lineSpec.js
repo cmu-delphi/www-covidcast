@@ -200,6 +200,7 @@ export function generateLineChartSpec({
   zero = false,
   highlightRegion = false,
   reactOnMouseMove = true,
+  clearHighlight = true,
   paddingLeft = 42,
   tickCount = {
     interval: 'week',
@@ -303,7 +304,7 @@ export function generateLineChartSpec({
               type: 'point',
               on: `click${reactOnMouseMove ? ', mousemove' : ''}, [touchstart, touchend] > touchmove`,
               nearest: true,
-              clear: 'view:mouseout',
+              clear: clearHighlight ? 'view:mouseout' : false,
               encodings: ['x'],
             },
             value: initialDate
