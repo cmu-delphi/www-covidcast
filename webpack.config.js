@@ -7,6 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { EnvironmentPlugin, DefinePlugin } = require('webpack');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const pkg = require('./package.json');
+const { preprocess } = require('./svelte.config');
 
 const devMode = process.env.NODE_ENV !== 'production';
 const hmr = devMode;
@@ -103,12 +104,28 @@ module.exports = () => {
             {
               loader: 'svelte-loader',
               options: {
+                preprocess,
                 compilerOptions: {
                   dev: devMode,
                 },
                 hotReload: hmr,
                 emitCss: !devMode,
               },
+            },
+          ].slice(devMode ? 1 : 0),
+        },
+        {
+          test: /\.tsx?$/,
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                cacheDirectory: true,
+                cacheCompression: false,
+              },
+            },
+            {
+              loader: 'ts-loader',
             },
           ].slice(devMode ? 1 : 0),
         },

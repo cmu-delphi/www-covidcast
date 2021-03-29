@@ -1,9 +1,18 @@
 /* eslint-env node */
 module.exports = {
-  extends: ['eslint:recommended'],
+  plugins: ['@typescript-eslint', 'svelte3'],
+  extends: [
+    'eslint:recommended',
+    // 'plugin:@typescript-eslint/recommended',
+    // 'plugin:@typescript-eslint/recommended-requiring-type-checking',
+  ],
+  parser: '@typescript-eslint/parser', // add the TypeScript parser
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: 'module',
+    tsconfigRootDir: __dirname,
+    project: ['./tsconfig.eslint.json'],
+    extraFileExtensions: ['.svelte'],
   },
   env: {
     node: true,
@@ -11,7 +20,6 @@ module.exports = {
     browser: true,
     jest: true,
   },
-  plugins: ['svelte3'],
   overrides: [
     {
       // see https://github.com/sveltejs/eslint-plugin-svelte3/blob/master/OTHER_PLUGINS.md
@@ -24,8 +32,17 @@ module.exports = {
         'import/no-unresolved': 'off',
       },
     },
+    {
+      files: ['*.ts'],
+      extends: [
+        'eslint:recommended',
+        'plugin:@typescript-eslint/recommended',
+        'plugin:@typescript-eslint/recommended-requiring-type-checking',
+      ],
+    },
   ],
   settings: {
+    'svelte3/typescript': require('typescript'), // pass the TypeScript package to the Svelte plugin
     // ...
   },
 };
