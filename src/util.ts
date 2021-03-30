@@ -30,7 +30,12 @@ export function transparent(colors: string | readonly string[], opacity: number)
  *
  * @param duration of neighborhood, in milliseconds
  */
-export function computeNeighborhood(date: Date, startDate: Date, endDate: Date, duration?: number): { start: number, end: number } {
+export function computeNeighborhood(
+  date: Date,
+  startDate: Date,
+  endDate: Date,
+  duration?: number,
+): { start: number; end: number } {
   if (duration == null) {
     duration = endDate.valueOf() - startDate.valueOf();
   }
@@ -53,7 +58,10 @@ export function computeNeighborhood(date: Date, startDate: Date, endDate: Date, 
   return neighborhood;
 }
 
-const observerListeners = new WeakMap<HTMLElement, (size: { width: number, height: number }, entry: ResizeObserverEntry) => void>();
+const observerListeners = new WeakMap<
+  HTMLElement,
+  (size: { width: number; height: number }, entry: ResizeObserverEntry) => void
+>();
 const observer = new ResizeObserver((entries: ResizeObserverEntry[]) => {
   for (const entry of entries) {
     const listener = observerListeners.get(entry.target as HTMLElement);
@@ -63,7 +71,10 @@ const observer = new ResizeObserver((entries: ResizeObserverEntry[]) => {
   }
 });
 
-export function observeResize(element: HTMLElement, listener: (size: { width: number, height: number }, entry: ResizeObserverEntry) => void): void {
+export function observeResize(
+  element: HTMLElement,
+  listener: (size: { width: number; height: number }, entry: ResizeObserverEntry) => void,
+): void {
   observerListeners.set(element, listener);
   observer.observe(element);
 }

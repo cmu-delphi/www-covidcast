@@ -8,5 +8,5 @@ export interface NameInfo {
   population?: number;
   region?: string; // just for state and county
   state?: string; // just for county
-  level: RegionLevel
+  level: RegionLevel;
 }

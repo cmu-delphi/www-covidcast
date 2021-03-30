@@ -19,7 +19,6 @@ export interface RawAnnotation {
   reference?: string;
 }
 
-
 function parseSignals(signals: string) {
   if (!signals) {
     return new Set<string>();
@@ -36,7 +35,6 @@ function parseSignals(signals: string) {
   );
 }
 
-
 function parseDates(dates: string): [Date, Date] {
   if (!dates) {
     return [new Date(), new Date()];
@@ -51,7 +49,7 @@ function parseDates(dates: string): [Date, Date] {
   return [dateParts[0], timeDay.floor(timeDay.offset(dateParts[1], 1))];
 }
 
-function parseRegions(regions: string): { level: RegionLevel, ids: '*' | Set<string> }[] {
+function parseRegions(regions: string): { level: RegionLevel; ids: '*' | Set<string> }[] {
   if (!regions) {
     return [];
   }
@@ -83,7 +81,7 @@ export class Annotation {
   readonly source: string;
   readonly signals: '*' | Set<string>;
   readonly dates: [Date, Date];
-  readonly regions: { level: RegionLevel, ids: '*' | Set<string> }[];
+  readonly regions: { level: RegionLevel; ids: '*' | Set<string> }[];
   readonly reference?: string;
 
   constructor(raw: RawAnnotation) {
@@ -110,7 +108,7 @@ export class Annotation {
     );
   }
 
-  matchSensor(sensor: { id: string, signal: string }): boolean {
+  matchSensor(sensor: { id: string; signal: string }): boolean {
     return (
       (this.source === '*' || this.source === sensor.id) && (this.signals === '*' || this.signals.has(sensor.signal))
     );
@@ -125,7 +123,6 @@ export class Annotation {
     return !(end < this.dates[0] || start > this.dates[1]);
   }
 }
-
 
 export function fetchAnnotations(): Promise<Annotation[]> {
   return fetch(ANNOTATION_SHEET, fetchOptions)
@@ -159,8 +156,7 @@ function sortByDate(annotationA: Annotation, annotationB: Annotation) {
 }
 
 export class AnnotationManager {
-  constructor(public readonly annotations: Annotation[] = []) {
-  }
+  constructor(public readonly annotations: Annotation[] = []) {}
 
   getRegionAnnotations(region: NameInfo | NameInfo[], date: Date): Annotation[] {
     return this.annotations
@@ -168,7 +164,7 @@ export class AnnotationManager {
       .sort(sortByDate);
   }
 
-  getAnnotations(sensor: { id: string, signal: string }, region: NameInfo | NameInfo[], date: Date): Annotation[] {
+  getAnnotations(sensor: { id: string; signal: string }, region: NameInfo | NameInfo[], date: Date): Annotation[] {
     return this.annotations
       .filter(
         (d) =>
@@ -182,7 +178,12 @@ export class AnnotationManager {
       .sort(sortByDate);
   }
 
-  getWindowAnnotations(sensor: { id: string, signal: string }, region: NameInfo | NameInfo[], dateStart: Date, dateEnd: Date): Annotation[] {
+  getWindowAnnotations(
+    sensor: { id: string; signal: string },
+    region: NameInfo | NameInfo[],
+    dateStart: Date,
+    dateEnd: Date,
+  ): Annotation[] {
     return this.annotations
       .filter(
         (d) =>

@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export function parseScaleSpec(spec: { type: 'sqrt' | 'log' | 'linear', base?: number }) {
+export function parseScaleSpec(spec: { type: 'sqrt' | 'log' | 'linear'; base?: number }) {
   switch (spec.type) {
     case 'sqrt':
       return SqrtScale();

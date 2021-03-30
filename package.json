@@ -146,7 +146,7 @@
     "uikit": "^3.6.18"
   },
   "lint-staged": {
-    "*.{js,svelte}": "eslint --cache --fix",
-    "*.{js,css,md,svelte}": "prettier --write"
+    "*.{ts,js,svelte}": "eslint --cache --fix",
+    "*.{ts,js,css,md,svelte}": "prettier --write"
   }
 }

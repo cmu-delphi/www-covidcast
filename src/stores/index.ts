@@ -38,7 +38,7 @@ import type { NameInfo, RegionLevel } from '../maps/interfaces';
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
  */
 export const times = writable<Map<string, [number, number]>>(null);
-export const stats = writable<Map<string, { max: number, mean: number, std: number }>>(null);
+export const stats = writable<Map<string, { max: number; mean: number; std: number }>>(null);
 
 export const appReady = writable(false);
 
@@ -57,7 +57,10 @@ function deriveFromPath(url: Location) {
   const encoding = urlParams.get('encoding');
   const date = urlParams.get('date');
 
-  const compareIds = (urlParams.get('compare') || '').split(',').map((d) => getInfoByName(d) as NameInfo).filter(Boolean);
+  const compareIds = (urlParams.get('compare') || '')
+    .split(',')
+    .map((d) => getInfoByName(d) as NameInfo)
+    .filter(Boolean);
 
   const modeFromPath = () => {
     const pathName = url.pathname;
@@ -71,8 +74,8 @@ function deriveFromPath(url: Location) {
     sensor && sensorMap.has(sensor)
       ? sensor
       : modeObj === modeByID['survey-results']
-        ? DEFAULT_SURVEY_SENSOR
-        : DEFAULT_SENSOR;
+      ? DEFAULT_SURVEY_SENSOR
+      : DEFAULT_SENSOR;
   return {
     mode: modeObj,
     sensor: resolveSensor,
@@ -87,7 +90,10 @@ function deriveFromPath(url: Location) {
     region: urlParams.get('region') || '',
     compare:
       compareIds.length > 0
-        ? compareIds.map((info, i) => ({ info, displayName: info.displayName, color: selectionColors[i] || 'grey' }) as CompareSelection)
+        ? compareIds.map(
+            (info, i) =>
+              ({ info, displayName: info.displayName, color: selectionColors[i] || 'grey' } as CompareSelection),
+          )
         : null,
   };
 }
@@ -267,7 +273,7 @@ currentMode.subscribe((mode) => {
 
 const isMobileQuery = window.matchMedia
   ? window.matchMedia('only screen and (max-width: 767px)')
-  : ({ matches: false, addEventListener: () => undefined } as unknown as MediaQueryList);
+  : (({ matches: false, addEventListener: () => undefined } as unknown) as MediaQueryList);
 export const isMobileDevice = readable(isMobileQuery.matches, (set) => {
   if (typeof isMobileQuery.addEventListener === 'function') {
     isMobileQuery.addEventListener('change', (evt) => {
@@ -344,7 +350,7 @@ export const currentMultiSelection = derived(
       base.unshift({ info: selection, color: MAP_THEME.selectedRegionOutline, displayName: selection.displayName });
     }
     return base;
-  }
+  },
 );
 
 export interface PersistedState {
@@ -356,7 +362,7 @@ export interface PersistedState {
   date?: string;
   signalC?: boolean;
   signalI?: boolean;
-  encoding?: "color" | "bubble" | "spike";
+  encoding?: 'color' | 'bubble' | 'spike';
   compare?: string;
 }
 
@@ -380,18 +386,18 @@ export const trackedUrlParams = derived(
     const params: Omit<PersistedState, 'mode'> = {
       sensor:
         mode === modeByID.landing ||
-          mode === modeByID.summary ||
-          mode === modeByID.single ||
-          mode === modeByID['survey-results'] ||
-          sensor === DEFAULT_SENSOR
+        mode === modeByID.summary ||
+        mode === modeByID.single ||
+        mode === modeByID['survey-results'] ||
+        sensor === DEFAULT_SENSOR
           ? null
           : sensor,
       sensor2: mode === modeByID.correlation ? sensor2 : null,
       level:
         mode === modeByID.single ||
-          mode === modeByID.export ||
-          mode === modeByID['survey-results'] ||
-          level === DEFAULT_LEVEL
+        mode === modeByID.export ||
+        mode === modeByID['survey-results'] ||
+        level === DEFAULT_LEVEL
           ? null
           : level,
       region: mode === modeByID.export || mode === modeByID.timelapse ? null : region,
@@ -454,7 +460,10 @@ export function loadFromUrlState(state: PersistedState): void {
     });
   }
   if (state.compare) {
-    const compareIds = state.compare.split(',').map((d) => getInfoByName(d) as NameInfo).filter(Boolean);
+    const compareIds = state.compare
+      .split(',')
+      .map((d) => getInfoByName(d) as NameInfo)
+      .filter(Boolean);
     currentCompareSelection.set(
       compareIds.map((info, i) => ({ info, displayName: info.displayName, color: selectionColors[i] || 'grey' })),
     );

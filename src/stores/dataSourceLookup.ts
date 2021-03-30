@@ -16,7 +16,7 @@ const sourceNameLookup: Record<string, string> = {
   'google-symptoms': 'Google Symptoms Searches',
 };
 
-export function getDataSource(sensor: { id: string, signal: string } | Sensor): string {
+export function getDataSource(sensor: { id: string; signal: string } | Sensor): string {
   if (typeof sensor === 'string') {
     return sourceNameLookup[sensor] || sensor;
   }

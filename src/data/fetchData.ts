@@ -86,7 +86,13 @@ function deriveCombineKey(mixinData: Partial<EpiDataRow> = {}) {
   return combineKey;
 }
 
-function parseMultipleTreeData(d: EpiDataResponse<EpiDataRow>, signals: string[], defaultSignalIndex: number, mixinData: Partial<EpiDataRow> = {}, factor = 1): EpiDataRow[] {
+function parseMultipleTreeData(
+  d: EpiDataResponse<EpiDataRow>,
+  signals: string[],
+  defaultSignalIndex: number,
+  mixinData: Partial<EpiDataRow> = {},
+  factor = 1,
+): EpiDataRow[] {
   if (d.result < 0 || d.message.includes('no results')) {
     return [];
   }
@@ -107,7 +113,12 @@ function parseMultipleTreeData(d: EpiDataResponse<EpiDataRow>, signals: string[]
   );
 }
 
-function parseMultipleSeparateData(dataArr: EpiDataResponse<EpiDataRow>[], defaultSignalIndex: number, mixinData: Partial<EpiDataRow> = {}, factor = 1): EpiDataRow[] {
+function parseMultipleSeparateData(
+  dataArr: EpiDataResponse<EpiDataRow>[],
+  defaultSignalIndex: number,
+  mixinData: Partial<EpiDataRow> = {},
+  factor = 1,
+): EpiDataRow[] {
   if (dataArr.length === 0 || dataArr[0].result < 0 || dataArr[0].message.includes('no results')) {
     return [];
   }
@@ -244,7 +255,12 @@ export async function fetchSampleSizesNationSummary(dataSensor: DataSensor): Pro
  * @param {Partial<EpiDataRow>} mixinValues
  * @returns {Promise<EpiDataRow[]>}
  */
-export function fetchRegionSlice(dataSensor: DataSensor, level: string, date: string | Date, mixinValues: Partial<EpiDataRow> = {}): Promise<EpiDataRow[]> {
+export function fetchRegionSlice(
+  dataSensor: DataSensor,
+  level: string,
+  date: string | Date,
+  mixinValues: Partial<EpiDataRow> = {},
+): Promise<EpiDataRow[]> {
   return fetchData(dataSensor, level, '*', date, {
     ...(date instanceof Date ? { time_value: Number.parseInt(formatAPITime(date), 10) } : {}),
     ...mixinValues,
@@ -339,7 +355,10 @@ export function addNameInfos(rows: EpiDataRow[]): (EpiDataRow & NameInfo)[] {
   return rows as (EpiDataRow & NameInfo)[];
 }
 
-function avg(rows: (EpiDataRow & Partial<EpiDataCasesOrDeathValues>)[], field: 'value' | 'stderr' | 'sample_size' | keyof EpiDataCasesOrDeathValues) {
+function avg(
+  rows: (EpiDataRow & Partial<EpiDataCasesOrDeathValues>)[],
+  field: 'value' | 'stderr' | 'sample_size' | keyof EpiDataCasesOrDeathValues,
+) {
   let valid = 0;
   const sum = rows.reduce((acc, v) => {
     const vi = v[field];
@@ -357,7 +376,11 @@ function avg(rows: (EpiDataRow & Partial<EpiDataCasesOrDeathValues>)[], field: '
 /**
  * group by date and averages its values
  */
-export function averageByDate(rows: EpiDataRow[], dataSensor: DataSensor, mixin: Partial<EpiDataRow> = {}): EpiDataRow[] {
+export function averageByDate(
+  rows: EpiDataRow[],
+  dataSensor: DataSensor,
+  mixin: Partial<EpiDataRow> = {},
+): EpiDataRow[] {
   // average by date
   const byDate = new Map<number | string, EpiDataRow[]>();
   for (const row of rows) {

@@ -61,7 +61,6 @@ export function formatDateLocal(date?: Date): string {
   return !date ? '?' : local(date);
 }
 
-
 export function formatPopulation(info: { population?: number }): string {
   if (!info || typeof info.population !== 'number') {
     return 'Unknown';
@@ -73,7 +72,12 @@ const f = format(',.1f');
 const basePercentFormatter = format('.2%');
 const rawFormatter = format(',.2f');
 
-function sign(value: number | null | undefined, formatter: (v: number) => string, enforceSign: boolean, factor = 1): string {
+function sign(
+  value: number | null | undefined,
+  formatter: (v: number) => string,
+  enforceSign: boolean,
+  factor = 1,
+): string {
   if (value == null || Number.isNaN(value)) {
     return 'N/A';
   }

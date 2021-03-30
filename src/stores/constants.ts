@@ -92,7 +92,9 @@ export interface Sensor {
   highlight?: string[];
 }
 
-export function ensureSensorStructure(sensor: Partial<Sensor> & { id: string, signal: string, tooltipText?: any }): Sensor {
+export function ensureSensorStructure(
+  sensor: Partial<Sensor> & { id: string; signal: string; tooltipText?: any },
+): Sensor {
   const key = `${sensor.id}-${sensor.signal}`;
 
   const isInverted = sensor.isInverted || false;
@@ -179,7 +181,6 @@ export const EPIDATA_CASES_OR_DEATH_VALUES: (keyof EpiDataCasesOrDeathValues)[] 
   'countRatioCumulative',
 ];
 
-
 export interface RegularOldSensor {
   isCasesOrDeath: false;
   isCount: boolean; // is count signal
@@ -197,8 +198,8 @@ export interface CasesOrDeathOldSensor {
   default?: boolean; // whether it should be default signal
   casesOrDeathSignals: Record<keyof EpiDataCasesOrDeathValues, string>;
   casesOrDeathSensors: Record<keyof EpiDataCasesOrDeathValues, Sensor>;
-  tooltipText: ((options?: CasesOrDeathOptions) => string);
-  mapTitleText: ((options?: CasesOrDeathOptions) => string);
+  tooltipText: (options?: CasesOrDeathOptions) => string;
+  mapTitleText: (options?: CasesOrDeathOptions) => string;
   plotTitleText: string;
 }
 
@@ -207,7 +208,10 @@ export declare type SensorEntry = Sensor & (RegularOldSensor | CasesOrDeathOldSe
 /**
  * determines the primary value to show or lookup
  */
-export function primaryValue(sensorEntry: { isCasesOrDeath?: boolean }, sensorOptions: CasesOrDeathOptions): 'value' | keyof EpiDataCasesOrDeathValues {
+export function primaryValue(
+  sensorEntry: { isCasesOrDeath?: boolean },
+  sensorOptions: CasesOrDeathOptions,
+): 'value' | keyof EpiDataCasesOrDeathValues {
   if (!sensorEntry.isCasesOrDeath) {
     return 'value';
   }
@@ -220,7 +224,14 @@ export function primaryValue(sensorEntry: { isCasesOrDeath?: boolean }, sensorOp
 /**
  * determines the primary value to show or lookup
  */
-function getType(sensorEntry: { signal: string, isCasesOrDeath?: boolean, casesOrDeathSignals?: Record<keyof EpiDataCasesOrDeathValues, string> }, sensorOptions: CasesOrDeathOptions) {
+function getType(
+  sensorEntry: {
+    signal: string;
+    isCasesOrDeath?: boolean;
+    casesOrDeathSignals?: Record<keyof EpiDataCasesOrDeathValues, string>;
+  },
+  sensorOptions: CasesOrDeathOptions,
+) {
   let signal = sensorEntry.signal;
   if (sensorEntry.isCasesOrDeath) {
     const valueKey = primaryValue(sensorEntry, sensorOptions) as keyof EpiDataCasesOrDeathValues;
@@ -240,11 +251,16 @@ export function extendSensorEntry(sensorEntry: Partial<SensorEntry> & { id: stri
   const isCasesOrDeath = isCasesSignal(key) || isDeathSignal(key);
   const isCount = isCountSignal(key);
 
-  const mapTitle = sensorEntry.mapTitleText as unknown as { incidenceCumulative: string, ratioCumulative: string, incidence: string, ratio: string };
+  const mapTitle = (sensorEntry.mapTitleText as unknown) as {
+    incidenceCumulative: string;
+    ratioCumulative: string;
+    incidence: string;
+    ratio: string;
+  };
 
   const full: Sensor & RegularOldSensor = Object.assign(ensureSensorStructure(sensorEntry), {
     key,
-    tooltipText: sensorEntry.tooltipText || (mapTitle as unknown as string),
+    tooltipText: sensorEntry.tooltipText || ((mapTitle as unknown) as string),
     isCount,
     getType: (options: CasesOrDeathOptions) => getType(sensorEntry, options),
     isCasesOrDeath: false as const,
@@ -257,22 +273,23 @@ export function extendSensorEntry(sensorEntry: Partial<SensorEntry> & { id: stri
   const casesOrDeath = (full as unknown) as Sensor & CasesOrDeathOldSensor;
   casesOrDeath.isCasesOrDeath = true;
   casesOrDeath.casesOrDeathSensors = {} as CasesOrDeathOldSensor['casesOrDeathSensors'];
-  casesOrDeath.mapTitleText = typeof mapTitle === 'function'
-    ? (mapTitle as (options: CasesOrDeathOptions) => string)
-    : (options: CasesOrDeathOptions) => {
-      // generate lookup function
-      if (options && options.cumulative) {
-        if (options.incidence) {
-          return mapTitle.incidenceCumulative;
-        } else {
-          return mapTitle.ratioCumulative;
-        }
-      } else if (options && options.incidence) {
-        return mapTitle.incidence;
-      } else {
-        return mapTitle.ratio;
-      }
-    };
+  casesOrDeath.mapTitleText =
+    typeof mapTitle === 'function'
+      ? (mapTitle as (options: CasesOrDeathOptions) => string)
+      : (options: CasesOrDeathOptions) => {
+          // generate lookup function
+          if (options && options.cumulative) {
+            if (options.incidence) {
+              return mapTitle.incidenceCumulative;
+            } else {
+              return mapTitle.ratioCumulative;
+            }
+          } else if (options && options.incidence) {
+            return mapTitle.incidence;
+          } else {
+            return mapTitle.ratio;
+          }
+        };
 
   const add = (cumulative: boolean, ratio: boolean) => {
     const options = { cumulative, incidence: !ratio };
@@ -311,7 +328,7 @@ export const regularSignalMetaDataGeoTypeCandidates = ['county', 'msa'];
 /**
  * @type {Partial<SensorEntry>[]}
  */
-const defaultSensors = descriptions as unknown as Partial<SensorEntry>[];
+const defaultSensors = (descriptions as unknown) as Partial<SensorEntry>[];
 
 /**
  * @type {SensorEntry[]}
@@ -327,7 +344,6 @@ export const sensorList: SensorEntry[] = (() => {
     return defaultSensors.map(extendSensorEntry);
   }
 })();
-
 
 export const sensorMap = new Map(sensorList.map((s) => [s.key, s]));
 

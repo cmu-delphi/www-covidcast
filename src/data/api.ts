@@ -14,7 +14,16 @@ export interface EpiDataResponse<T = Record<string, unknown>> {
   epidata: T[];
 }
 
-export function callAPIEndPoint<T = Record<string, unknown>>(endpoint: string, id: string, signal: string, level: string, date: Date | [Date, Date] | string, region: string | readonly string[], fields?: readonly string[], format: string | null = null): Promise<EpiDataResponse<T>> {
+export function callAPIEndPoint<T = Record<string, unknown>>(
+  endpoint: string,
+  id: string,
+  signal: string,
+  level: string,
+  date: Date | [Date, Date] | string,
+  region: string | readonly string[],
+  fields?: readonly string[],
+  format: string | null = null,
+): Promise<EpiDataResponse<T>> {
   const url = new URL(endpoint || ENDPOINT);
   url.searchParams.set('endpoint', 'covidcast');
   url.searchParams.set('data_source', id);
@@ -26,8 +35,8 @@ export function callAPIEndPoint<T = Record<string, unknown>>(endpoint: string, i
     date instanceof Date
       ? formatAPITime(date)
       : Array.isArray(date)
-        ? `${formatAPITime(date[0])}-${formatAPITime(date[1])}`
-        : date,
+      ? `${formatAPITime(date[0])}-${formatAPITime(date[1])}`
+      : date,
   );
   url.searchParams.set('time_type', 'day');
   if (Array.isArray(region) || region.includes(',')) {
@@ -52,13 +61,23 @@ export function callAPIEndPoint<T = Record<string, unknown>>(endpoint: string, i
  * @param {Date | string} date
  * @param {string} region
  */
-export function callAPI<T = Record<string, unknown>>(id: string, signal: string, level: string, date: Date | [Date, Date] | string, region: string | readonly string[]): Promise<EpiDataResponse<T>> {
+export function callAPI<T = Record<string, unknown>>(
+  id: string,
+  signal: string,
+  level: string,
+  date: Date | [Date, Date] | string,
+  region: string | readonly string[],
+): Promise<EpiDataResponse<T>> {
   return callAPIEndPoint(ENDPOINT, id, signal, level, date, region);
 }
 
 /**
  */
-export function callMetaAPI<T = Record<string, unknown>>(dataSignals: DataSensor[], fields: string[], filters: Record<string, string>): Promise<EpiDataResponse<T>> {
+export function callMetaAPI<T = Record<string, unknown>>(
+  dataSignals: DataSensor[],
+  fields: string[],
+  filters: Record<string, string>,
+): Promise<EpiDataResponse<T>> {
   const url = new URL(ENDPOINT);
   const urlGet = new URL(ENDPOINT);
   const data = new FormData();
@@ -70,8 +89,8 @@ export function callMetaAPI<T = Record<string, unknown>>(dataSignals: DataSensor
       .map((d) =>
         d.isCasesOrDeath
           ? Object.values(d.casesOrDeathSignals)
-            .map((s) => `${d.id}:${s}`)
-            .join(',')
+              .map((s) => `${d.id}:${s}`)
+              .join(',')
           : `${d.id}:${d.signal}`,
       )
       .join(',');
@@ -91,7 +110,7 @@ export function callMetaAPI<T = Record<string, unknown>>(dataSignals: DataSensor
   if (urlGetS.length < 4096) {
     // use get
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return fetch(urlGetS, fetchOptions).then((d) => d.json());
+    return fetch(urlGetS, fetchOptions).then((d) => d.json());
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return

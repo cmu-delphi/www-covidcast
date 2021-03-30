@@ -8,7 +8,7 @@ const trendThreshold = 0.1;
 /**
  * @returns {[import("../../data").EpiDataRow, import("../../data").EpiDataRow]}
  */
-export function findMinMaxRow(data: readonly EpiDataRow[]): { min: EpiDataRow, max: EpiDataRow } {
+export function findMinMaxRow(data: readonly EpiDataRow[]): { min: EpiDataRow; max: EpiDataRow } {
   let min: EpiDataRow | null = null;
   let max: EpiDataRow | null = null;
   for (const row of data) {
