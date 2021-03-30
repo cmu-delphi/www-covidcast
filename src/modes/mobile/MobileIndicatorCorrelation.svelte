@@ -15,11 +15,17 @@
   import SurveyParameters from '../survey/SurveyParameters.svelte';
   import './common.css';
   import IndicatorDropdown from './IndicatorDropdown.svelte';
+  import IndicatorCorrelationDetails from './IndicatorCorrelationDetails.svelte';
 
   $: sensor = new SensorParam($currentSensorEntry);
   $: sensor2 = new SensorParam($currentSensorEntry2, currentSensor2);
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
   $: region = new RegionParam($currentRegionInfo);
+
+  $: primary = sensor.value;
+  $: primaryData = fetcher.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame);
+  $: secondary = sensor2;
+  $: secondaryData = secondary ? fetcher.fetch1Sensor1RegionNDates(secondary, region, date.windowTimeFrame) : null;
 
   const items = [nationInfo, ...stateInfo, ...countyInfo];
 
@@ -46,6 +52,11 @@
     <IndicatorDropdown sensor={sensor2} />
   </SurveyParameters>
   <div class="uk-container content-grid">
-    <div class="grid-3-11">TODO</div>
+    <div class="grid-3-11">
+      <hr />
+      {#await Promise.all([primaryData, secondaryData]) then data}
+        <IndicatorCorrelationDetails {primary} secondary={sensor2} primaryData={data[0]} secondaryData={data[1]} />
+      {/await}
+    </div>
   </div>
 </div>
