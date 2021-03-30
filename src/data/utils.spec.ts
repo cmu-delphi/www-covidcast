@@ -1,3 +1,4 @@
+/// <reference types="jest" />
 import { formatAPITime, parseAPITime, generateCorrelationMetrics } from './utils';
 import { cliTestData, deathsTestData } from './__test__/testData';
 
