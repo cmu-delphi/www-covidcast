@@ -40,7 +40,7 @@
       <button class="mobile-back inline-svg-icon" on:click={switchMode}>
         {@html chevronLeftIcon}
       </button>
-      <h2>Explore an <span>Indicator</span></h2>
+      <h2>Explore <span>Correlations</span></h2>
     </div>
     <IndicatorDropdown {sensor} />
     <IndicatorDropdown sensor={sensor2} />
