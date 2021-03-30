@@ -88,12 +88,12 @@
               {sensor.name}
             </a>
           </td>
-          <td style="width: 70px; height: 70px">
+          <td style="width: 50px; height: 50px">
             <IndicatorCorrelationChart
               {sensorCorrelationData}
               {primary}
               secondary={sensor}
-              options={{ height: 70, padding: 0, axisTitles: false, showTitle: false, ticks: false, tickLabels: false }}
+              options={{ height: 50, padding: 0, axisTitles: false, showTitle: false, sizeLegend: null, ticks: false, tickLabels: false }}
               on:click={() => (selected = sensor)} />
           </td>
         </tr>

@@ -66,7 +66,7 @@
     const lag = options.lag || 0;
     const width = options.width || 100;
     const height = options.height || 100;
-    const sizeLegend = options.sizeLegend || null;
+
     let spec = {
       width: width,
       height: height,
@@ -279,14 +279,7 @@
                   field: 'date_value',
                   type: 'temporal',
                   scale: { range: [0, 6] },
-                  legend: sizeLegend
-                    ? {
-                        symbolType: 'square',
-                        symbolStrokeWidth: 3,
-                        symbolFillColor: 'gray',
-                        title: 'Date',
-                      }
-                    : null,
+                  legend: options.sizeLegend || null,
                 },
               },
             },
@@ -349,7 +342,7 @@
   function topLevelIndicatorCompareSpec(lag) {
     return {
       $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
-      padding: options.padding != null ? options.padding : { left: 20, right: 50, top: 10, bottom: 10 },
+      padding: options.padding != null ? options.padding : { left: 20, right: 10, top: 10, bottom: 30 },
       data: { name: 'values' },
       ...{
         columns: 1,
