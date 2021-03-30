@@ -1,6 +1,7 @@
 <script>
   import IndicatorCorrelationChart from './IndicatorCorrelationChart.svelte';
   import { isMobileDevice } from '../../stores';
+
   $: sliderLags = $isMobileDevice ? [-28, -14, 0, 14, 28] : [-28, -21, -14, -7, 0, 7, 14, 21, 28];
   $: chartPadding = $isMobileDevice
     ? { left: 20, right: 10, top: 10, bottom: 40 }
@@ -14,6 +15,7 @@
         symbolStrokeWidth: 2,
         title: 'Date',
       };
+
   /**
    * @type {import("../../stores/params").Sensor}
    */
@@ -34,6 +36,7 @@
     { sensor: primary, data: primaryData },
     { sensor: secondary, data: secondaryData },
   ];
+
   $: sensorCorrelationData = mergeSensors();
   // for each time_value, merge data values across sensors.
   function mergeSensors() {
@@ -100,4 +103,19 @@
       </td>
     </tr>
   </table>
+
+  <!-- <SensorCard
+    sensor={primary}
+    date={$currentDateObject}
+    lag={-sensorDetailsLag / 2}
+    selections={$currentMultiSelection}
+    {onHighlight}
+    highlightTimeValue={$highlightTimeValue} />
+  <SensorCard
+    sensor={secondary}
+    date={compareSensorDate}
+    lag={sensorDetailsLag / 2}
+    selections={$currentMultiSelection}
+    {onHighlight}
+    highlightTimeValue={$highlightTimeValue} /> -->
 </div>
