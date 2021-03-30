@@ -19,8 +19,9 @@
   import { afterUpdate } from 'svelte';
   import { scrollIntoView } from '../../util';
   import IndicatorAnnotations from './IndicatorAnnotations.svelte';
+  import IndicatorCorrelation from './IndicatorCorrelation.svelte';
 
-  $: sensor = new SensorParam($currentSensorEntry, $times);
+  $: sensor = new SensorParam($currentSensorEntry);
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
   $: region = new RegionParam($currentRegionInfo);
 
@@ -76,6 +77,10 @@
     <div class="grid-3-11">
       <hr />
       <GeoTable {sensor} {region} {date} {fetcher} />
+    </div>
+    <div class="grid-3-11">
+      <hr />
+      <IndicatorCorrelation {sensor} {region} {date} {fetcher} />
     </div>
   </div>
 </div>

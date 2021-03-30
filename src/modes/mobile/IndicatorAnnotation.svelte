@@ -16,9 +16,14 @@
     </div>
     <div class="date">{formatDateISO(annotation.dates[0])} - {formatDateISO(annotation.dates[1])}</div>
   </h5>
-  <p>
+  <p class="uk-margin-remove-bottom">
     {annotation.explanation}
   </p>
+  <div class="alert-source">
+    {#if annotation.reference}
+      <a href={annotation.reference}>Source</a>
+    {/if}
+  </div>
 </div>
 
 <style>
@@ -42,5 +47,10 @@
       display: block;
       text-align: center;
     }
+  }
+
+  .alert-source {
+    font-size: 0.875rem;
+    text-align: right;
   }
 </style>
