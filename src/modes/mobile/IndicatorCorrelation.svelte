@@ -59,7 +59,7 @@
       });
   }
 
-  $: otherSensors = buildTableData();
+  $: otherSensors = buildTableData(sensor, date, region);
 
   function switchMode(sensor) {
     currentSensor2.set(sensor.key);
