@@ -1,16 +1,16 @@
 import { timeDay } from 'd3-time';
+import type { EpiDataRow } from '../data';
 import { formatFraction } from '../formats';
 import { toTimeValue } from './params';
 
 const trendThreshold = 0.1;
 
 /**
- * @param {import("../../data").EpiDataRow[]} data
  * @returns {[import("../../data").EpiDataRow, import("../../data").EpiDataRow]}
  */
-export function findMinMaxRow(data) {
-  let min = null;
-  let max = null;
+export function findMinMaxRow(data: readonly EpiDataRow[]): { min: EpiDataRow, max: EpiDataRow } {
+  let min: EpiDataRow | null = null;
+  let max: EpiDataRow | null = null;
   for (const row of data) {
     if (row.value == null) {
       continue;
@@ -29,7 +29,7 @@ export function findMinMaxRow(data) {
  * @param {Date} date
  * @param {import("../../data").EpiDataRow[]} data
  */
-export function findDateRow(date, data) {
+export function findDateRow(date: Date, data: readonly EpiDataRow[]): EpiDataRow | undefined {
   const apiDate = toTimeValue(date);
   return data.find((d) => d.time_value === apiDate);
 }
@@ -46,7 +46,7 @@ function toTrend(current, reference, min) {
   return nCur / nRef - 1;
 }
 
-function toTrendText(change) {
+function toTrendText(change: number): ['inc' | 'dec' | 'steady', string, string] {
   if (change >= trendThreshold) {
     return ['inc', 'up', `Increasing (>= ${formatFraction(trendThreshold)})`];
   }
@@ -56,42 +56,53 @@ function toTrendText(change) {
   return ['steady', 'steady', `Steady (${formatFraction(-trendThreshold)} <= v <= ${formatFraction(trendThreshold)})`];
 }
 
-/**
- * @typedef {object} TrendInfo
- * @property {Date} refDate
- * @property {EpiDataRow} ref
- * @property {Date} currentDate
- * @property {EpiDataRow} current
- * @property {string} trend
- * @property {boolean} isIncreasing
- * @property {boolean} isDecreasing
- * @property {boolean} isSteady
- * @property {boolean} isUnknown
- * @property {boolean} isBetter increasing or decreasing based on the inverted state
- * @property {boolean} isWorse increasing or decreasing based on the inverted state
- * @property {string} trendReason
- * @property {number} change normalized change used to compute the trend
- * @property {number} fractionChange non-normalized changed
- * @property {number} delta
- */
+export interface TrendInfo {
+  refDate: Date;
+  ref: EpiDataRow | null;
+  currentDate: Date;
+  current: EpiDataRow | null;
+  trend: string;
+  isIncreasing: boolean;
+  isDecreasing: boolean;
+  isSteady: boolean;
+  isUnknown: boolean;
+  /**
+   * increasing or decreasing based on the inverted state
+   */
+  isBetter: boolean;
+  /**
+   * increasing or decreasing based on the inverted state
+   */
+  isWorse: boolean;
+  trendReason: string;
+  /**
+   * normalized change used to compute the trend
+   */
+  change: number;
+  /**
+   * non-normalized changed
+   */
+  fractionChange: number;
 
-/**
- * @typedef {TrendInfo} Trend
- * @property {EpiDataRow} min
- * @property {Date} minDate
- * @property {EpiDataRow} max
- * @property {Date} maxDate
- * @property {EpiDataRow} worst
- * @property {Date} worstDate
- * @property {EpiDataRow} best
- * @property {Date} bestDate
- * @property {TrendInfo} minTrend
- * @property {TrendInfo} maxTrend
- * @property {TrendInfo} worstTrend
- * @property {TrendInfo} bestTrend
- */
+  delta: number;
+}
 
-function computeTrend(ref, current, min, isInverted) {
+export interface Trend extends TrendInfo {
+  min: EpiDataRow | null;
+  minDate: Date;
+  max: EpiDataRow | null;
+  maxDate: Date;
+  worst: EpiDataRow | null;
+  worstDate: Date;
+  best: EpiDataRow | null;
+  bestDate: Date;
+  minTrend: TrendInfo | null;
+  maxTrend: TrendInfo | null;
+  worstTrend: TrendInfo | null;
+  bestTrend: TrendInfo | null;
+}
+
+function computeTrend(ref: EpiDataRow, current: EpiDataRow, min: EpiDataRow, isInverted: boolean): TrendInfo {
   const change = toTrend(current.value, ref.value, min.value);
   const [type, trendText, trendReason] = toTrendText(change);
   const inc = type === 'inc';
@@ -116,14 +127,19 @@ function computeTrend(ref, current, min, isInverted) {
   };
 }
 
-export const UNKNOWN_TREND = {
+export const UNKNOWN_TREND: Trend = {
   trend: 'Unknown',
   isIncreasing: false,
   isSteady: false,
   isDecreasing: false,
   isUnknown: true,
+  isBetter: false,
+  isWorse: false,
+  current: null,
+  currentDate: new Date(),
   trendReason: 'Unknown',
   change: Number.NaN,
+  fractionChange: Number.NaN,
   delta: Number.NaN,
   refDate: new Date(),
   ref: null,
@@ -135,20 +151,20 @@ export const UNKNOWN_TREND = {
   worstDate: null,
   best: null,
   bestDate: null,
+  minTrend: null,
+  maxTrend: null,
+  bestTrend: null,
+  worstTrend: null,
 };
-/**
- *
- * @param {Date} date
- * @param {import("../../data").EpiDataRow[]} data
- */
-export function determineTrend(date, data, isInverted = false) {
+
+export function determineTrend(date: Date, data: readonly EpiDataRow[], isInverted = false): Trend {
   const { min, max } = findMinMaxRow(data);
   const dateRow = findDateRow(date, data);
   const refDate = timeDay.offset(date, -7);
 
   const worst = isInverted ? min : max;
   const best = isInverted ? max : min;
-  const trend = {
+  const trend: Trend = {
     ...UNKNOWN_TREND,
     refDate,
     min,
