@@ -1,9 +1,10 @@
-export function parseScaleSpec(spec) {
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export function parseScaleSpec(spec: { type: 'sqrt' | 'log' | 'linear', base?: number }) {
   switch (spec.type) {
     case 'sqrt':
       return SqrtScale();
     case 'log':
-      return LogScale().base(spec.base || 10);
+      return LogScale().base(spec.base ?? 10);
     case 'linear':
       return LinearScale();
   }
@@ -13,6 +14,7 @@ export function parseScaleSpec(spec) {
 // Because MapBox does not support applying a custom function to a property,
 // so we cannot use d3.scaleLog().
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function LogScale() {
   let a = 1,
     b = 0,
@@ -35,55 +37,61 @@ export function LogScale() {
     return a * log(Math.min(clamp ? domain[1] : Number.POSITIVE_INFINITY, x));
   }
 
-  scale.domain = function () {
+  scale.domain = function (v?: [number, number]) {
     if (!arguments.length) return domain;
-    domain = arguments[0];
+    domain = v;
     fit();
     return scale;
   };
 
-  scale.range = function () {
+  scale.range = function (v?: [number, number]) {
     if (!arguments.length) return range;
-    range = arguments[0];
+    range = v;
     fit();
     return scale;
   };
 
-  scale.base = function () {
+  scale.base = function (v?: number) {
     if (!arguments.length) return base;
-    base = arguments[0];
+    base = v;
     fit();
     return scale;
   };
 
-  scale.coef = function () {
-    if (!arguments.length) return [a, b];
-    a = arguments[0];
-    b = arguments[1];
-    base = arguments[2];
-
+  scale.coef = function (va?: number | [number, number, number], vb?: number, vbase?: number) {
+    if (!arguments.length) return [a, b, base] as [number, number, number];
+    if (Array.isArray(va)) {
+      a = va[0];
+      b = va[1];
+      base = va[2];
+    } else {
+      a = va;
+      b = vb;
+      base = vbase;
+    }
     return scale;
   };
 
-  scale.expr = function (value) {
+  scale.expr = function (value: number) {
     const baseLog = Math.log10(base);
     const v = clamp ? ['min', value, domain[1]] : value;
     return ['+', ['*', a, ['/', ['log10', v], baseLog]], b];
   };
 
-  scale.clamp = function () {
+  scale.clamp = function (v?: boolean) {
     if (!arguments.length) return clamp;
-    clamp = arguments[0];
+    clamp = v;
     return scale;
   };
 
   scale.clone = function () {
-    return LogScale().coef(scale.coef());
+    return LogScale().coef(scale.coef() as [number, number, number]);
   };
   return scale;
 }
 
 // d3-like Squre Root Scale
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function SqrtScale() {
   let a = 1,
     b = 0,
@@ -105,47 +113,52 @@ export function SqrtScale() {
     return a * sqrt(Math.min(clamp ? domain[1] : Number.POSITIVE_INFINITY, x)) + b;
   }
 
-  scale.domain = function () {
+  scale.domain = function (v?: [number, number]) {
     if (!arguments.length) return domain;
-    domain = arguments[0];
+    domain = v;
     fit();
     return scale;
   };
 
-  scale.range = function () {
+  scale.range = function (v?: [number, number]) {
     if (!arguments.length) return range;
-    range = arguments[0];
+    range = v;
     fit();
     return scale;
   };
 
-  scale.coef = function () {
-    if (!arguments.length) return [a, b];
-    a = arguments[0];
-    b = arguments[1];
-
+  scale.coef = function (va?: number | [number, number], vb?: number) {
+    if (!arguments.length) return [a, b] as [number, number];
+    if (Array.isArray(va)) {
+      a = va[0];
+      b = va[1];
+    } else {
+      a = va;
+      b = vb;
+    }
     return scale;
   };
 
-  scale.clamp = function () {
+  scale.clamp = function (v?: boolean) {
     if (!arguments.length) return clamp;
-    clamp = arguments[0];
+    clamp = v;
     return scale;
   };
 
-  scale.expr = function (value) {
+  scale.expr = function (value: number) {
     const v = clamp ? ['min', value, domain[1]] : value;
     return ['+', ['*', a, ['sqrt', v]], b];
   };
 
   scale.clone = function () {
-    return SqrtScale().coef(scale.coef());
+    return SqrtScale().coef(scale.coef() as [number, number]);
   };
 
   return scale;
 }
 
 // d3-like Linear Scale
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function LinearScale() {
   let a = 1,
     b = 0,
@@ -163,41 +176,45 @@ export function LinearScale() {
     return a * Math.min(clamp ? domain[1] : Number.POSITIVE_INFINITY, x) + b;
   }
 
-  scale.domain = function () {
+  scale.domain = function (v?: [number, number]) {
     if (!arguments.length) return domain;
-    domain = arguments[0];
+    domain = v;
     fit();
     return scale;
   };
 
-  scale.range = function () {
+  scale.range = function (v?: [number, number]) {
     if (!arguments.length) return range;
-    range = arguments[0];
+    range = v;
     fit();
     return scale;
   };
 
-  scale.coef = function () {
-    if (!arguments.length) return [a, b];
-    a = arguments[0];
-    b = arguments[1];
-
+  scale.coef = function (va?: number | [number, number], vb?: number) {
+    if (!arguments.length) return [a, b] as [number, number];
+    if (Array.isArray(va)) {
+      a = va[0];
+      b = va[1];
+    } else {
+      a = va;
+      b = vb;
+    }
     return scale;
   };
 
-  scale.clamp = function () {
+  scale.clamp = function (v?: boolean) {
     if (!arguments.length) return clamp;
-    clamp = arguments[0];
+    clamp = v;
     return scale;
   };
 
-  scale.expr = function (value) {
+  scale.expr = function (value: number) {
     const v = clamp ? ['min', value, domain[1]] : value;
     return ['+', ['*', a, v], b];
   };
 
   scale.clone = function () {
-    return LinearScale().coef(scale.coef());
+    return LinearScale().coef(scale.coef() as [number, number]);
   };
 
   return scale;

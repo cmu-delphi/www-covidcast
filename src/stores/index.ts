@@ -12,6 +12,8 @@ import {
   DEFAULT_ENCODING,
   defaultRegionOnStartup,
   sensorList,
+  CasesOrDeathOptions,
+  SensorEntry,
 } from './constants';
 import modes, { modeByID } from '../modes';
 import { parseAPITime } from '../data/utils';
@@ -30,12 +32,13 @@ export {
 import { timeMonth } from 'd3-time';
 import { MAP_THEME, selectionColors } from '../theme';
 import { AnnotationManager, fetchAnnotations } from '../data';
+import type { NameInfo, RegionLevel } from '../maps/interfaces';
 
 /**
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
  */
-export const times = writable(null);
-export const stats = writable(null);
+export const times = writable<Map<string, [number, number]>>(null);
+export const stats = writable<Map<string, { max: number, mean: number, std: number }>>(null);
 
 export const appReady = writable(false);
 
@@ -44,22 +47,22 @@ export const appReady = writable(false);
  */
 export const MAGIC_START_DATE = '20200701';
 
-function deriveFromPath(url) {
+function deriveFromPath(url: Location) {
   const queryString = url.search;
   const urlParams = new URLSearchParams(queryString);
 
   const sensor = urlParams.get('sensor');
   const sensor2 = urlParams.get('sensor2');
-  const level = urlParams.get('level');
+  const level = (urlParams.get('level') as unknown) as RegionLevel;
   const encoding = urlParams.get('encoding');
   const date = urlParams.get('date');
 
-  const compareIds = (urlParams.get('compare') || '').split(',').map(getInfoByName).filter(Boolean);
+  const compareIds = (urlParams.get('compare') || '').split(',').map((d) => getInfoByName(d) as NameInfo).filter(Boolean);
 
   const modeFromPath = () => {
     const pathName = url.pathname;
     // last path segment, e.g. /test/a -> a, /test/b/ -> b
-    return pathName.split('/').filter(Boolean).reverse(0)[0];
+    return pathName.split('/').filter(Boolean).reverse()[0];
   };
   const mode = urlParams.get('mode') || modeFromPath();
 
@@ -68,8 +71,8 @@ function deriveFromPath(url) {
     sensor && sensorMap.has(sensor)
       ? sensor
       : modeObj === modeByID['survey-results']
-      ? DEFAULT_SURVEY_SENSOR
-      : DEFAULT_SENSOR;
+        ? DEFAULT_SURVEY_SENSOR
+        : DEFAULT_SENSOR;
   return {
     mode: modeObj,
     sensor: resolveSensor,
@@ -78,13 +81,13 @@ function deriveFromPath(url) {
     signalCasesOrDeathOptions: {
       cumulative: urlParams.has('signalC'),
       incidence: urlParams.has('signalI'),
-    },
+    } as CasesOrDeathOptions,
     encoding: encoding === 'color' || encoding === 'bubble' || encoding === 'spike' ? encoding : DEFAULT_ENCODING,
     date: /\d{8}/.test(date) ? date : MAGIC_START_DATE,
     region: urlParams.get('region') || '',
     compare:
       compareIds.length > 0
-        ? compareIds.map((info, i) => ({ info, displayName: info.displayName, color: selectionColors[i] || 'grey' }))
+        ? compareIds.map((info, i) => ({ info, displayName: info.displayName, color: selectionColors[i] || 'grey' }) as CompareSelection)
         : null,
   };
 }
@@ -104,27 +107,17 @@ export const currentSensorEntry = derived([currentSensor], ([$currentSensor]) =>
 export const currentSensor2 = writable(defaultValues.sensor2);
 export const currentSensorEntry2 = derived([currentSensor2], ([$currentSensor]) => sensorMap.get($currentSensor));
 
-/**
- * @type {import('svelte/store').Writable<import('../data').SensorEntry | null>}
- */
-export const currentInfoSensor = writable(null);
+export const currentInfoSensor = writable<SensorEntry | null>(null);
 
-// 'county', 'state', or 'msa'
 export const currentLevel = writable(defaultValues.level);
 
 // in case of a death signal whether to show cumulative data
-/**
- * @type {import('svelte/store').Writable<import('./constants').CasesOrDeathOptions>}
- */
 export const signalCasesOrDeathOptions = writable(defaultValues.signalCasesOrDeathOptions);
 
 export const currentSensorMapTitle = derived([currentSensorEntry, signalCasesOrDeathOptions], ([sensor, options]) =>
   typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText(options) : sensor.mapTitleText,
 );
 
-/**
- * @type {import('svelte/store').Writable<'color' | 'spike' | 'bubble'>}
- */
 export const encoding = writable(defaultValues.encoding);
 
 export const currentDate = writable(defaultValues.date);
@@ -133,7 +126,7 @@ export const currentDate = writable(defaultValues.date);
  */
 export const currentDateObject = derived([currentDate], ([date]) => (!date ? null : parseAPITime(date)));
 
-export const smallMultipleTimeSpan = derived([currentDateObject], ([date]) => {
+export const smallMultipleTimeSpan = derived([currentDateObject], ([date]): [Date, Date] => {
   if (!date) {
     return [timeMonth.offset(yesterdayDate, -4), yesterdayDate];
   }
@@ -148,7 +141,7 @@ export const smallMultipleTimeSpan = derived([currentDateObject], ([date]) => {
 /**
  * For mouseover highlighting across small multiple charts.
  */
-export let highlightTimeValue = writable(null);
+export const highlightTimeValue = writable<null | number>(null);
 
 // Region GEO_ID for filtering the line chart
 // 42003 - Allegheny; 38300 - Pittsburgh; PA - Pennsylvania.
@@ -157,9 +150,9 @@ export const currentRegion = writable(defaultValues.region);
 /**
  * current region info (could also be null)
  */
-export const currentRegionInfo = derived([currentRegion], ([current]) => getInfoByName(current));
+export const currentRegionInfo = derived([currentRegion], ([current]) => getInfoByName(current) as NameInfo | null);
 
-function deriveRecent() {
+function deriveRecent(): NameInfo[] {
   if (!window.localStorage) {
     return [];
   }
@@ -172,9 +165,6 @@ function deriveRecent() {
     .filter(Boolean)
     .map((d) => getInfoByName(d));
 }
-/**
- * @type {import('svelte/store').Writable<import('../maps').NameInfo[]>}
- */
 export const recentRegionInfos = writable(deriveRecent());
 
 // keep track of top 10 recent selections
@@ -199,11 +189,9 @@ currentRegionInfo.subscribe((v) => {
 });
 
 /**
- *
- * @param {import('../maps/nameIdInfo').NameInfo | null} elem
  * @returns {boolean} whether the selection has changed
  */
-export function selectByInfo(elem, reset = false) {
+export function selectByInfo(elem: NameInfo | null, reset = false): boolean {
   if (elem === get(currentRegionInfo)) {
     if (reset) {
       currentRegion.set('');
@@ -219,7 +207,7 @@ export function selectByInfo(elem, reset = false) {
   return true;
 }
 
-export function selectByFeature(feature, reset = false) {
+export function selectByFeature(feature: { properties: { id: string } }, reset = false): boolean {
   return selectByInfo(feature ? getInfoByName(feature.properties.id) : null, reset);
 }
 
@@ -254,10 +242,10 @@ currentSensorEntry.subscribe((sensorEntry) => {
   if (timesMap != null) {
     const [minDate, maxDate] = timesMap.get(sensorEntry.key);
     const current = get(currentDate);
-    if (current < minDate) {
-      currentDate.set(minDate);
-    } else if (current > maxDate) {
-      currentDate.set(maxDate);
+    if (current < String(minDate)) {
+      currentDate.set(String(minDate));
+    } else if (current > String(maxDate)) {
+      currentDate.set(String(maxDate));
     }
   }
 });
@@ -269,7 +257,7 @@ currentMode.subscribe((mode) => {
     const timesMap = get(times);
     if (timesMap != null) {
       const entry = timesMap.get(DEFAULT_SURVEY_SENSOR);
-      currentDate.set(entry[1]); // max
+      currentDate.set(String(entry[1])); // max
     }
   }
 });
@@ -279,7 +267,7 @@ currentMode.subscribe((mode) => {
 
 const isMobileQuery = window.matchMedia
   ? window.matchMedia('only screen and (max-width: 767px)')
-  : { matches: false, addEventListener: () => undefined };
+  : ({ matches: false, addEventListener: () => undefined } as unknown as MediaQueryList);
 export const isMobileDevice = readable(isMobileQuery.matches, (set) => {
   if (typeof isMobileQuery.addEventListener === 'function') {
     isMobileQuery.addEventListener('change', (evt) => {
@@ -303,24 +291,18 @@ export const isMobileDevice = readable(isMobileQuery.matches, (set) => {
 
 // overview compare mode
 
-/**
- * @typedef {object} CompareSelection
- * @property {import('../maps').NameInfo} info
- * @property {string} color
- * @property {string} displayName;
- */
+export interface CompareSelection {
+  info: NameInfo;
+  color: string;
+  displayName: string;
+}
 
-/**
- * null = disable
- * @type {import('svelte/store').Writable<CompareSelection[] | null>}
- * */
 export const currentCompareSelection = writable(defaultValues.compare);
 
 /**
  * add an element to the compare selection
- * @param {import('../maps').NameInfo} info
  */
-export function addCompare(info) {
+export function addCompare(info: NameInfo): void {
   if (!get(currentRegionInfo)) {
     selectByInfo(info);
     return;
@@ -341,7 +323,7 @@ export function addCompare(info) {
  * removes an element from the compare selection
  * @param {import('../maps').NameInfo} info
  */
-export function removeCompare(info) {
+export function removeCompare(info: NameInfo): void {
   const selection = get(currentRegionInfo);
   const bak = (get(currentCompareSelection) || []).slice();
   if (selection && info.id === selection.id) {
@@ -354,19 +336,29 @@ export function removeCompare(info) {
   );
 }
 
-/**
- * @type {import('svelte/store').Readable<CompareSelection[]>}
- */
 export const currentMultiSelection = derived(
   [currentRegionInfo, currentCompareSelection],
-  ([selection, compareSelection]) =>
-    [
-      selection && { info: selection, color: MAP_THEME.selectedRegionOutline, displayName: selection.displayName },
-      compareSelection || [],
-    ]
-      .filter(Boolean)
-      .flat(),
+  ([selection, compareSelection]): CompareSelection[] => {
+    const base = [...(compareSelection || [])];
+    if (selection) {
+      base.unshift({ info: selection, color: MAP_THEME.selectedRegionOutline, displayName: selection.displayName });
+    }
+    return base;
+  }
 );
+
+export interface PersistedState {
+  mode?: string;
+  sensor?: string;
+  sensor2?: string;
+  level?: RegionLevel;
+  region?: string;
+  date?: string;
+  signalC?: boolean;
+  signalI?: boolean;
+  encoding?: "color" | "bubble" | "spike";
+  compare?: string;
+}
 
 export const trackedUrlParams = derived(
   [
@@ -385,21 +377,21 @@ export const trackedUrlParams = derived(
     const inMapMode = mode === modeByID.summary || mode === modeByID.timelapse;
 
     // determine parameters based on default value and current mode
-    const params = {
+    const params: Omit<PersistedState, 'mode'> = {
       sensor:
         mode === modeByID.landing ||
-        mode === modeByID.summary ||
-        mode === modeByID.single ||
-        mode === modeByID['survey-results'] ||
-        sensor === DEFAULT_SENSOR
+          mode === modeByID.summary ||
+          mode === modeByID.single ||
+          mode === modeByID['survey-results'] ||
+          sensor === DEFAULT_SENSOR
           ? null
           : sensor,
       sensor2: mode === modeByID.correlation ? sensor2 : null,
       level:
         mode === modeByID.single ||
-        mode === modeByID.export ||
-        mode === modeByID['survey-results'] ||
-        level === DEFAULT_LEVEL
+          mode === modeByID.export ||
+          mode === modeByID['survey-results'] ||
+          level === DEFAULT_LEVEL
           ? null
           : level,
       region: mode === modeByID.export || mode === modeByID.timelapse ? null : region,
@@ -423,17 +415,17 @@ export const trackedUrlParams = derived(
   },
 );
 
-export function getScrollToAnchor(mode) {
+export function getScrollToAnchor(mode: { anchor?: string }): string | null {
   const anchor = mode.anchor;
   delete mode.anchor;
   return anchor;
 }
-export function switchToMode(mode, anchor) {
+export function switchToMode(mode: { anchor?: string }, anchor: string): void {
   mode.anchor = anchor;
   currentMode.set(mode);
 }
 
-export function loadFromUrlState(state) {
+export function loadFromUrlState(state: PersistedState): void {
   if (state.mode !== get(currentMode).id) {
     currentMode.set(modeByID[state.mode]);
   }
@@ -462,20 +454,17 @@ export function loadFromUrlState(state) {
     });
   }
   if (state.compare) {
-    const compareIds = state.compare.split(',').map(getInfoByName).filter(Boolean);
+    const compareIds = state.compare.split(',').map((d) => getInfoByName(d) as NameInfo).filter(Boolean);
     currentCompareSelection.set(
       compareIds.map((info, i) => ({ info, displayName: info.displayName, color: selectionColors[i] || 'grey' })),
     );
   }
 }
 
-/**
- * @type {import('svelte/store').Writable<import('../data/annotations').AnnotationManager>}
- */
 export const annotationManager = writable(new AnnotationManager());
 
-export function loadAnnotations() {
-  fetchAnnotations().then((annotations) => {
+export function loadAnnotations(): void {
+  void fetchAnnotations().then((annotations) => {
     annotationManager.set(new AnnotationManager(annotations));
   });
 }

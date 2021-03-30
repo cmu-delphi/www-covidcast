@@ -1,9 +1,10 @@
 import { times, currentDate, stats, currentSensor, currentLevel, MAGIC_START_DATE } from '../stores';
-import { sensorList, sensorMap, levels, yesterday, regularSignalMetaDataGeoTypeCandidates } from '../stores/constants';
+import { sensorList, sensorMap, levels, yesterday, regularSignalMetaDataGeoTypeCandidates, SensorEntry, Sensor, EpiDataCasesOrDeathValues } from '../stores/constants';
 import { get } from 'svelte/store';
-import { callMetaAPI } from './api';
+import { callMetaAPI, EpiDataResponse } from './api';
 import { parseAPITime, formatAPITime } from './utils';
 import { timeDay } from 'd3-time';
+import type { RegionLevel } from '../maps/interfaces';
 
 export * from './signals';
 export * from './fetchData';
@@ -14,9 +15,22 @@ function toStatsRegionKey(sensorKey: string, region: string) {
   return sensorKey + '_' + region;
 }
 
-function processMetaData(meta) {
-  const timeMap = new Map();
-  const statsMap = new Map();
+export interface MetaEntry {
+  min_time: number;
+  max_time: number;
+  max_value: number;
+  stdev_value: number;
+  mean_value: number;
+
+  data_source: string;
+  signal: string;
+  time_type?: string;
+  geo_type?: RegionLevel;
+}
+
+function processMetaData(meta: EpiDataResponse<MetaEntry>): { level: RegionLevel, date: string } {
+  const timeMap = new Map<string, [number, number]>();
+  const statsMap = new Map<string, { max: number, mean: number, std: number }>();
 
   sensorList.forEach((sEntry) => {
     // need to change mean / std for counts
@@ -54,25 +68,48 @@ function processMetaData(meta) {
   };
 }
 
-function updateTimeMap(key: string, matchedMeta, timeMap: Map<string, [number, number]>) {
+function updateTimeMap(key: string, matchedMeta: MetaEntry, timeMap: Map<string, [number, number]>) {
   timeMap.set(key, [matchedMeta.min_time, matchedMeta.max_time > yesterday ? yesterday : matchedMeta.max_time]);
 }
-function updateStatsMap(key, matchedMeta, statsMap) {
+function updateStatsMap(key: string, matchedMeta: MetaEntry, statsMap: Map<string, { max: number, mean: number, std: number }>) {
   statsMap.set(key, {
     max: matchedMeta.max_value,
     mean: matchedMeta.mean_value,
     std: matchedMeta.stdev_value,
   });
 }
-/**
- * @param {import('./fetchData').SensorEntry} sEntry
- */
-function loadRegularSignal(sEntry, meta, timeMap, statsMap) {
+
+interface LocalSensorEntry {
+  minTime: number;
+  maxTime: number;
+
+  max: number;
+  mean: number;
+  std: number;
+
+  county_max: number;
+  county_mean: number;
+  county_std: number;
+
+  msa_max: number;
+  msa_mean: number;
+  msa_std: number;
+
+  state_max: number;
+  state_mean: number;
+  state_std: number;
+
+  hrr_max: number;
+  hrr_mean: number;
+  hrr_std: number;
+}
+
+function loadRegularSignal(sEntry: SensorEntry, meta: EpiDataResponse<MetaEntry>, timeMap: Map<string, [number, number]>, statsMap: Map<string, { mean: number, max: number, std: number }>) {
   // find the matching meta data by looping through the candidates and fallback to the first one
-  const baseFilter = (d) =>
+  const baseFilter = (d: MetaEntry) =>
     d.data_source === sEntry.id && d.signal === sEntry.signal && (!d.time_type || d.time_type === 'day');
 
-  const byGeoTypePriority = (a, b) => {
+  const byGeoTypePriority = (a: MetaEntry, b: MetaEntry) => {
     // sort by geo types but consider their importance for the matching
     const aIndex = regularSignalMetaDataGeoTypeCandidates.indexOf(a.geo_type);
     const bIndex = regularSignalMetaDataGeoTypeCandidates.indexOf(b.geo_type);
@@ -97,20 +134,18 @@ function loadRegularSignal(sEntry, meta, timeMap, statsMap) {
     updateStatsMap(sEntry.key, matchedMeta, statsMap);
     return;
   }
+  const localEntry = (sEntry as unknown) as LocalSensorEntry;
   // If no metadata, use information from sensors
   // Used for testing new data
-  timeMap.set(sEntry.key, [sEntry.minTime, sEntry.maxTime]);
+  timeMap.set(sEntry.key, [localEntry.minTime, localEntry.maxTime]);
   statsMap.set(sEntry.key, {
-    max: sEntry.max,
-    mean: sEntry.mean,
-    std: sEntry.std,
+    max: localEntry.max,
+    mean: localEntry.mean,
+    std: localEntry.std,
   });
 }
 
-/**
- * @param {import('./fetchData').SensorEntry} sEntry
- */
-function loadCountSignal(sEntry, meta, timeMap, statsMap) {
+function loadCountSignal(sEntry: SensorEntry, meta: EpiDataResponse<MetaEntry>, timeMap: Map<string, [number, number]>, statsMap: Map<string, { mean: number, max: number, std: number }>) {
   const possibleMetaRows = meta.epidata.filter(
     (d) => d.data_source === sEntry.id && (!d.time_type || d.time_type === 'day'),
   );
@@ -125,32 +160,33 @@ function loadCountSignal(sEntry, meta, timeMap, statsMap) {
       updateStatsMap(statsKey, matchedMeta, statsMap);
       return;
     }
+    const localEntry = (sEntry as unknown) as LocalSensorEntry;
     // If no metadata, use information from sensors
     // Used for testing new data
-    timeMap.set(sEntry.key, [sEntry.minTime, sEntry.maxTime]);
+    timeMap.set(sEntry.key, [localEntry.minTime, localEntry.maxTime]);
     if (region === 'county') {
       statsMap.set(statsKey, {
-        max: sEntry.county_max,
-        mean: sEntry.county_mean,
-        std: sEntry.county_std,
+        max: localEntry.county_max,
+        mean: localEntry.county_mean,
+        std: localEntry.county_std,
       });
     } else if (region === 'msa') {
       statsMap.set(statsKey, {
-        max: sEntry.msa_max,
-        mean: sEntry.msa_mean,
-        std: sEntry.msa_std,
+        max: localEntry.msa_max,
+        mean: localEntry.msa_mean,
+        std: localEntry.msa_std,
       });
     } else if (region === 'hrr') {
       statsMap.set(statsKey, {
-        max: sEntry.hrr_max,
-        mean: sEntry.hrr_mean,
-        std: sEntry.hrr_std,
+        max: localEntry.hrr_max,
+        mean: localEntry.hrr_mean,
+        std: localEntry.hrr_std,
       });
     } else {
       statsMap.set(statsKey, {
-        max: sEntry.state_max,
-        mean: sEntry.state_mean,
-        std: sEntry.state_std,
+        max: localEntry.state_max,
+        mean: localEntry.state_mean,
+        std: localEntry.state_std,
       });
     }
   });
@@ -160,7 +196,7 @@ function loadCountSignal(sEntry, meta, timeMap, statsMap) {
   }
 
   Object.keys(sEntry.casesOrDeathSignals).map((key) => {
-    const signal = sEntry.casesOrDeathSignals[key];
+    const signal = sEntry.casesOrDeathSignals[key as keyof EpiDataCasesOrDeathValues];
 
     const matchedMeta = possibleMetaRows.find((d) => d.signal === signal);
     const statsKey = `${sEntry.key}_${key}`;
@@ -181,30 +217,19 @@ function loadCountSignal(sEntry, meta, timeMap, statsMap) {
   });
 }
 
-/**
- *
- * @param {import('../stores/constants').SensorEntry[]} sensors
- */
-export function loadMetaData(sensors) {
-  const custom = sensors.filter((d) => d.meta).map((d) => d.meta(d.id, d.signal));
-  const remoteSignals = sensors.filter((d) => !d.meta);
-  return Promise.all([
-    callMetaAPI(
-      remoteSignals,
+export function loadMetaData(sensors: SensorEntry[]): Promise<ReturnType<typeof processMetaData>> {
+  return callMetaAPI<MetaEntry>(
+    sensors,
       ['min_time', 'max_time', 'max_value', 'mean_value', 'stdev_value', 'signal', 'geo_type', 'data_source'],
       {
         time_types: 'day',
-        geo_types: [...new Set(levels)],
+        geo_types: [...new Set(levels as string[])].join(','),
       },
-    ),
-    ...custom,
-  ]).then((metas) => {
-    const meta = metas[0];
+  ).then((meta) => {
     if (!Array.isArray(meta.epidata)) {
       // bug in the API
-      meta.epidata = [...Object.values(meta.epidata)];
+      meta.epidata = [...Object.values(meta.epidata)] as MetaEntry[];
     }
-    meta.epidata.push(...metas.slice(1).flat(2));
     return processMetaData(meta);
   });
 }

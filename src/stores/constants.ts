@@ -381,5 +381,5 @@ export const DEFAULT_SENSOR = (sensorList.find((d) => d.highlight && d.highlight
 export const DEFAULT_SURVEY_SENSOR = (
   sensorList.find((d) => d.id === 'fb-survey' && d.signal.includes('cli')) || { key: DEFAULT_SENSOR }
 ).key;
-export const DEFAULT_LEVEL = 'county';
-export const DEFAULT_ENCODING = 'color';
+export const DEFAULT_LEVEL = 'county' as RegionLevel;
+export const DEFAULT_ENCODING = 'color' as 'color' | 'spike' | 'bubble';
