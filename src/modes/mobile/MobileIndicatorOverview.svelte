@@ -21,7 +21,7 @@
   import IndicatorAnnotations from './IndicatorAnnotations.svelte';
   import IndicatorCorrelation from './IndicatorCorrelation.svelte';
 
-  $: sensor = new SensorParam($currentSensorEntry, $times);
+  $: sensor = new SensorParam($currentSensorEntry);
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
   $: region = new RegionParam($currentRegionInfo);
 

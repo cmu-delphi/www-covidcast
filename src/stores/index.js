@@ -11,6 +11,7 @@ import {
   DEFAULT_SURVEY_SENSOR,
   DEFAULT_ENCODING,
   defaultRegionOnStartup,
+  sensorList,
 } from './constants';
 import modes, { modeByID } from '../modes';
 import { parseAPITime } from '../data/utils';
@@ -48,6 +49,7 @@ function deriveFromPath(url) {
   const urlParams = new URLSearchParams(queryString);
 
   const sensor = urlParams.get('sensor');
+  const sensor2 = urlParams.get('sensor2');
   const level = urlParams.get('level');
   const encoding = urlParams.get('encoding');
   const date = urlParams.get('date');
@@ -62,14 +64,16 @@ function deriveFromPath(url) {
   const mode = urlParams.get('mode') || modeFromPath();
 
   const modeObj = modes.find((d) => d.id === mode) || DEFAULT_MODE;
+  const resolveSensor =
+    sensor && sensorMap.has(sensor)
+      ? sensor
+      : modeObj === modeByID['survey-results']
+      ? DEFAULT_SURVEY_SENSOR
+      : DEFAULT_SENSOR;
   return {
     mode: modeObj,
-    sensor:
-      sensor && sensorMap.has(sensor)
-        ? sensor
-        : modeObj === modeByID['survey-results']
-        ? DEFAULT_SURVEY_SENSOR
-        : DEFAULT_SENSOR,
+    sensor: resolveSensor,
+    sensor2: sensor2 && sensorMap.has(sensor2) ? sensor2 : sensorList.filter((d) => d.key !== resolveSensor)[0].key,
     level: levels.includes(level) ? level : DEFAULT_LEVEL,
     signalCasesOrDeathOptions: {
       cumulative: urlParams.has('signalC'),
@@ -96,6 +100,9 @@ export const currentMode = writable(defaultValues.mode);
 
 export const currentSensor = writable(defaultValues.sensor);
 export const currentSensorEntry = derived([currentSensor], ([$currentSensor]) => sensorMap.get($currentSensor));
+
+export const currentSensor2 = writable(defaultValues.sensor2);
+export const currentSensorEntry2 = derived([currentSensor2], ([$currentSensor]) => sensorMap.get($currentSensor));
 
 /**
  * @type {import('svelte/store').Writable<import('../data').SensorEntry | null>}
@@ -365,6 +372,7 @@ export const trackedUrlParams = derived(
   [
     currentMode,
     currentSensor,
+    currentSensor2,
     currentLevel,
     currentRegion,
     currentDate,
@@ -372,7 +380,7 @@ export const trackedUrlParams = derived(
     encoding,
     currentCompareSelection,
   ],
-  ([mode, sensor, level, region, date, signalOptions, encoding, compare]) => {
+  ([mode, sensor, sensor2, level, region, date, signalOptions, encoding, compare]) => {
     const sensorEntry = sensorMap.get(sensor);
     const inMapMode = mode === modeByID.summary || mode === modeByID.timelapse;
 
@@ -386,6 +394,7 @@ export const trackedUrlParams = derived(
         sensor === DEFAULT_SENSOR
           ? null
           : sensor,
+      sensor2: mode === modeByID.correlation ? sensor2 : null,
       level:
         mode === modeByID.single ||
         mode === modeByID.export ||
@@ -430,6 +439,9 @@ export function loadFromUrlState(state) {
   }
   if (state.sensor != null && state.sensor !== get(currentSensor)) {
     currentSensor.set(state.sensor);
+  }
+  if (state.sensor2 != null && state.sensor2 !== get(currentSensor2)) {
+    currentSensor2.set(state.sensor2);
   }
   if (state.level != null && state.level !== get(currentLevel)) {
     currentLevel.set(state.level);
