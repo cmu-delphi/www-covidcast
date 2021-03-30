@@ -1,7 +1,7 @@
 import { callAPIEndPoint, EpiDataResponse } from './api';
 import { timeDay } from 'd3-time';
 import { parseAPITime, formatAPITime, combineSignals } from './utils';
-import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
+import { EpiDataCasesOrDeathValues, EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 import { getInfoByName } from '../maps';
 import type { NameInfo } from '../maps/interfaces';
 
@@ -25,6 +25,8 @@ export interface EpiDataRow {
   value: number;
   signal: string;
 }
+
+export type CasesOrDeathEpiDataRow = EpiDataRow & EpiDataCasesOrDeathValues;
 
 /**
  * @param {Partial<EpiDataRow>} mixinValues
@@ -337,7 +339,7 @@ export function addNameInfos(rows: EpiDataRow[]): (EpiDataRow & NameInfo)[] {
   return rows as (EpiDataRow & NameInfo)[];
 }
 
-function avg(rows: EpiDataRow[], field: 'value' | 'stderr' | 'sample_size') {
+function avg(rows: (EpiDataRow & Partial<EpiDataCasesOrDeathValues>)[], field: 'value' | 'stderr' | 'sample_size' | keyof EpiDataCasesOrDeathValues) {
   let valid = 0;
   const sum = rows.reduce((acc, v) => {
     const vi = v[field];

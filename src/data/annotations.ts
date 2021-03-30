@@ -4,6 +4,8 @@ import { timeDay } from 'd3-time';
 import { fetchOptions } from './api';
 import type { NameInfo, RegionLevel } from '../maps/interfaces';
 
+declare const process: { env: Record<string, string> };
+
 const ANNOTATION_SHEET = process.env.COVIDCAST_ANNOTATION_SHEET;
 const ANNOTATION_DRAFTS = process.env.COVIDCAST_ANNOTATION_DRAFTS === 'true';
 

@@ -2,6 +2,8 @@ import { formatAPITime } from './utils';
 import { levelMegaCounty } from '../stores/constants';
 import type { DataSensor } from './fetchData';
 
+declare const process: { env: Record<string, string> };
+
 const ENDPOINT = process.env.COVIDCAST_ENDPOINT_URL;
 
 export const fetchOptions: RequestInit = process.env.NODE_ENV === 'development' ? { cache: 'force-cache' } : {};
@@ -39,7 +41,8 @@ export function callAPIEndPoint<T = Record<string, unknown>>(endpoint: string, i
   if (format) {
     url.searchParams.set('format', format);
   }
-  return fetch(url.toString(), fetchOptions).then((d) => (d.json() as unknown) as Promise<T>);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return fetch(url.toString(), fetchOptions).then((d) => d.json());
 }
 
 /**
@@ -87,9 +90,11 @@ export function callMetaAPI<T = Record<string, unknown>>(dataSignals: DataSensor
   const urlGetS = urlGet.toString();
   if (urlGetS.length < 4096) {
     // use get
-    return fetch(urlGetS, fetchOptions).then((d) => d.json());
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return fetch(urlGetS, fetchOptions).then((d) => d.json());
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return fetch(url.toString(), {
     ...fetchOptions,
     method: 'POST',
@@ -104,5 +109,6 @@ export function callMetaAPI<T = Record<string, unknown>>(dataSignals: DataSensor
 export function callSignalAPI<T = Record<string, unknown>>(): Promise<EpiDataResponse<T>> {
   const url = new URL(ENDPOINT);
   url.searchParams.set('source', 'signal_dashboard_status');
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return fetch(url.toString(), fetchOptions).then((d) => d.json());
 }

@@ -54,7 +54,7 @@ function processMetaData(meta) {
   };
 }
 
-function updateTimeMap(key, matchedMeta, timeMap) {
+function updateTimeMap(key: string, matchedMeta, timeMap: Map<string, [number, number]>) {
   timeMap.set(key, [matchedMeta.min_time, matchedMeta.max_time > yesterday ? yesterday : matchedMeta.max_time]);
 }
 function updateStatsMap(key, matchedMeta, statsMap) {
