@@ -32,7 +32,7 @@ export function toTimeValue(date) {
   return Number.parseInt(formatAPITime(date), 10);
 }
 
-class TimeFrame {
+export class TimeFrame {
   /**
    * @param {Date} min
    * @param {Date} max

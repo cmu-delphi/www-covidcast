@@ -14,7 +14,7 @@ const ANNOTATION_DRAFTS = process.env.COVIDCAST_ANNOTATION_DRAFTS === 'true';
  * @property {string} signals * or a comma separated list "*"|(ID{\s*";"\s*ID}*)
  * @property {string} dates YYYYMMDD-YYYYMMDD
  * @property {string} regions semicolor separated key value: e.g. GROUP("*"|(ID{","\s*ID}*)){\s*","\s*GROUP("*"|(ID{","\s*ID}*))}
- * @property {string} 'see also'
+ * @property {string} reference
  */
 
 /**
@@ -95,7 +95,7 @@ export class Annotation {
     this.signals = parseSignals(raw.signals);
     this.dates = parseDates(raw.dates);
     this.regions = parseRegions(raw.regions);
-    this.see_also = raw['see also'];
+    this.reference = raw.reference;
   }
 
   /**

@@ -21,6 +21,7 @@
   import DownloadMenu from './components/DownloadMenu.svelte';
   import { formatDateISO } from '../../formats';
   import { annotationManager, isMobileDevice } from '../../stores';
+  import IndicatorAnnotation from './IndicatorAnnotation.svelte';
   import IndicatorAnnotations from './IndicatorAnnotations.svelte';
 
   export let height = 250;
@@ -276,6 +277,9 @@
           {#if r.id !== region.id && r.id !== neighboringInfo.id}
             <a href="?region={r.propertyId}" on:click|preventDefault={() => region.set(r, true)}> {r.displayName} </a>
           {:else}{r.displayName}{/if}
+          {#if regions.length > 1 && r.id !== neighboringInfo.id}
+            <IndicatorAnnotations asHint {sensor} region={r} {date} range="window" />
+          {/if}
         </span>
       </div>
       <div>
@@ -293,7 +297,9 @@
   {/each}
 </div>
 
-<IndicatorAnnotations {sensor} {regions} {date} range="window" />
+{#each annotations as annotation}
+  <IndicatorAnnotation {annotation} />
+{/each}
 
 <style>
   .legend {
