@@ -98,6 +98,27 @@ function zip(a, b) {
     return [x, b[i]];
   });
 }
+/**
+ * Do a pair-wise combination of values by date.  The result contains only an intersection of the values for dates in both sets
+ * @param {EpiDataRow[]} a
+ * @param {EpiDataRow[]} b
+ * @returns {[number, number][]}
+ */
+function zipEpiDataRow(a, b) {
+  const bMap = b.reduce((acc, row) => {
+    return acc.set(row.time_value, row);
+  }, new Map());
+
+  const zippedData = a.reduce((acc, row) => {
+    if (bMap.has(row.time_value)) {
+      acc.push([row.value, bMap.get(row.time_value).value]);
+      return acc;
+    } else {
+      return acc;
+    }
+  }, []);
+  return zippedData;
+}
 
 /**
  * Compute 28-day correlation metrics for a response variable given an explanatory variable.
@@ -107,17 +128,19 @@ function zip(a, b) {
  * @returns {CorrelationMetric}
  */
 export function generateCorrelationMetrics(response, explanatory) {
-  const response_values = response.map((row) => row.value);
-  const explanatory_values = explanatory.map((row) => row.value);
+  const zippedEpiData = zipEpiDataRow(response, explanatory);
+  const responseValues = zippedEpiData.map((row) => row[0]);
+  const explanatoryValues = zippedEpiData.map((row) => row[1]);
 
-  const model = linear(zip(response_values, explanatory_values));
-  const lags = generateLags(response_values, explanatory_values);
+  const lags = generateLags(responseValues, explanatoryValues);
   const max = lags.reduce((acc, i) => {
     return i.r2 > acc.r2 ? i : acc;
   });
 
+  const lagAtZero = lags.filter((l) => l.lag == 0)[0];
+
   return {
-    r2At0: model.r2,
+    r2At0: lagAtZero.r2,
     lagAtMaxR2: max.lag,
     r2AtMaxR2: max.r2,
     lags: lags,
