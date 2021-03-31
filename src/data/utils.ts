@@ -92,7 +92,10 @@ function generateLags(a: readonly number[], b: readonly number[]): Lag[] {
 /**
  * Do a pair-wise intersection of EpiDataRow by date.
  */
-function intersectEpiDataRow(a: readonly EpiDataRow[], b: readonly EpiDataRow[]): [number, number][] {
+function intersectEpiDataRow(
+  a: readonly { time_value: number; value: number }[],
+  b: readonly { time_value: number; value: number }[],
+): [number, number][] {
   const aLength = a.length;
   const bLength = b.length;
   let aIndex = 0;
@@ -119,8 +122,8 @@ function intersectEpiDataRow(a: readonly EpiDataRow[], b: readonly EpiDataRow[])
  *
  */
 export function generateCorrelationMetrics(
-  response: readonly EpiDataRow[],
-  explanatory: readonly EpiDataRow[],
+  response: readonly { time_value: number; value: number }[],
+  explanatory: readonly { time_value: number; value: number }[],
 ): CorrelationMetric {
   const zippedEpiData = intersectEpiDataRow(response, explanatory);
   if (zippedEpiData.length < lag * 2) {

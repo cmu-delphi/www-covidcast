@@ -1,4 +1,4 @@
-export let deathsTestData = [
+export const deathsTestData = [
   {
     geo_value: '42003',
     signal: 'deaths_7dav_incidence_prop',
@@ -1574,7 +1574,7 @@ export let deathsTestData = [
   },
 ];
 
-export let cliTestData = [
+export const cliTestData = [
   {
     geo_value: '42003',
     signal: 'smoothed_hh_cmnty_cli',
@@ -3150,7 +3150,7 @@ export let cliTestData = [
   },
 ];
 
-export let safegraph_full_time_national = [
+export const safegraph_full_time_national = [
   {
     geo_value: 'us',
     signal: 'full_time_work_prop_7dav',
@@ -4429,7 +4429,7 @@ export let safegraph_full_time_national = [
   },
 ];
 
-export let cases_national = [
+export const cases_national = [
   {
     geo_value: 'us',
     signal: 'confirmed_7dav_incidence_prop',
