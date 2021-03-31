@@ -91,6 +91,11 @@
     return Object.values(sensorDateMap);
   }
   $: sensorDetailsLag = 0;
+  // Compute dates for primary and secondary data, adjusted by lag.
+  // But using these isn't adjusting the range of data displayed in each indicator chart.
+  // $: lagMS = sensorDetailsLag * 1000 * 3600 * 24;
+  // $: primarytDate = new DateParam(new Date($currentDateObject.getTime() - lagMS), $currentSensorEntry, $times);
+  // $: secondaryDate = new DateParam(new Date($currentDateObject.getTime() + lagMS), $currentSensorEntry, $times);
 </script>
 
 <div class="mobile-root">

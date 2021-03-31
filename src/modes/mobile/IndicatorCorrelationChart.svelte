@@ -1,8 +1,6 @@
 <script>
   import Vega from '../../components/Vega.svelte';
-  // import { formatAPITime, parseAPITime } from '../../data';
-  // import { smallMultipleTimeSpan } from '../../stores';
-  // import { prepareSensorData } from '../overview/vegaSpec';
+
   /**
    * The "context" sensor, was currentSensorEntry.
    * @type {import("../../stores/constants").SensorEntry}
@@ -22,42 +20,7 @@
    */
   export let lag = 0;
   export let options = {};
-  // /**
-  //  * @type {Date}
-  //  */
-  // export let date;
-  // export let onHighlight;
-  // export let highlightTimeValue;
-  // $: highlightDate = highlightTimeValue != null ? parseAPITime(highlightTimeValue) : null;
-  // // use local variables with manual setting for better value comparison updates
-  // let startDay = $smallMultipleTimeSpan[0];
-  // let endDay = $smallMultipleTimeSpan[1];
-  // $: {
-  //   if (startDay.getTime() !== $smallMultipleTimeSpan[0].getTime()) {
-  //     startDay = $smallMultipleTimeSpan[0];
-  //   }
-  //   if (endDay.getTime() !== $smallMultipleTimeSpan[1].getTime()) {
-  //     endDay = $smallMultipleTimeSpan[1];
-  //   }
-  // }
-  // /**
-  //  * @type {import('../../stores').CompareSelection[]}
-  //  */
-  // export let selections = [];
-  // $: sensorWithData = prepareSensorData(secondary, selections, startDay, endDay);
-  // /**
-  //  * @type {(number | null)[]}
-  //  */
-  // let values = selections.map(() => null);
-  // $: {
-  //   const keyDate = formatAPITime(highlightDate ? highlightDate : date);
-  //   Promise.resolve(sensorWithData.data).then((rows) => {
-  //     values = selections.map((region) => {
-  //       const row = rows.find((d) => String(d.time_value) === keyDate && d.geo_value === region.info.propertyId);
-  //       return row ? row.value : null;
-  //     });
-  //   });
-  // }
+
   function makeIndicatorCompareSpec(xKey, yKey, options = {}) {
     const lag = options.lag || 0;
     const width = options.width || 100;
@@ -160,10 +123,6 @@
                   selection: 'highlight',
                   value: 1,
                 },
-                // {
-                //   test: 'datum.time_value == highlightTimeValue',
-                //   value: 1,
-                // },
               ],
               value: 0.2,
             },
