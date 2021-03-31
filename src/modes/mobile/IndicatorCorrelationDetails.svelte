@@ -104,7 +104,8 @@
     {primary}
     {secondary}
     lag={sensorDetailsLag}
-    options={mainChartOptions} />
+    options={mainChartOptions}
+  />
 
   <table class="mobile-table">
     <tr>
@@ -122,7 +123,8 @@
           on:click={(e) => {
             sensorDetailsLag = e.target.value;
           }}
-          style="width: 100%;" />
+          style="width: 100%;"
+        />
         <table class="mobile-table" style="width: 100%; height: 50px">
           <tr>
             {#each sliderLags as lag}
@@ -133,7 +135,8 @@
                   {secondary}
                   {lag}
                   on:click={() => (sensorDetailsLag = lag)}
-                  options={sliderChartOptions} />
+                  options={sliderChartOptions}
+                />
               </td>
             {/each}
           </tr>
