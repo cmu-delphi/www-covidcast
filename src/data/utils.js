@@ -153,7 +153,7 @@ export function generateCorrelationMetrics(response, explanatory) {
     return i.r2 > acc.r2 ? i : acc;
   });
 
-  const lagAtZero = lags.filter((l) => l.lag == 0)[0];
+  const lagAtZero = lags.find((l) => l.lag == 0);
 
   return {
     r2At0: lagAtZero.r2,
