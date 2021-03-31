@@ -1,43 +1,34 @@
 import { timeDay, timeMonth, timeWeek } from 'd3-time';
-import { addNameInfos, fetchData, formatAPITime, addMissing, fitRange, parseAPITime } from '../data';
+import { addNameInfos, fetchData, formatAPITime, addMissing, fitRange, parseAPITime, EpiDataRow } from '../data';
 import { nationInfo } from '../maps';
 import { currentDate, currentRegion, yesterdayDate, currentSensor, sensorList } from '.';
-import { determineTrend } from './trend';
+import { determineTrend, Trend } from './trend';
 import { determineMinMax } from '../components/MapBox/colors';
 import { formatValue } from '../formats';
 import { scaleSequential } from 'd3-scale';
 import { scrollToTop } from '../util';
-
-/**
- * @typedef {import('./constants').Sensor} Sensor
- */
-/**
- * @typedef {import('../maps').NameInfo} Region
- */
-/**
- * @typedef {import('../data').EpiDataRow} EpiDataRow
- */
-/**
- * @typedef {import('./trend').Trend} Trend
- */
+import type { NameInfo, NameInfo as Region, RegionLevel } from '../maps/interfaces';
+import type { Sensor, SensorEntry } from './constants';
+import type { Writable } from 'svelte/store';
 
 export const WINDOW_SIZE = 4; // months;
 export const SPARKLINE_SIZE = 4; // weeks;
 
-/**
- * @param {Date} date
- * @returns {number}
- */
-export function toTimeValue(date) {
+export function toTimeValue(date: Date): number {
   return Number.parseInt(formatAPITime(date), 10);
 }
 
+export interface RegionEpiDataRow extends EpiDataRow, Region {}
+
 export class TimeFrame {
-  /**
-   * @param {Date} min
-   * @param {Date} max
-   */
-  constructor(min, max) {
+  readonly min: Date;
+  readonly max: Date;
+  readonly difference: number;
+  readonly range: string;
+  readonly domain: [number, number];
+  readonly filter: (row: EpiDataRow) => boolean;
+
+  constructor(min: Date, max: Date) {
     this.min = min;
     this.max = max;
     this.difference = timeDay.count(min, max);
@@ -51,16 +42,16 @@ export class TimeFrame {
     };
   }
 
-  toString() {
+  toString(): string {
     return this.range;
   }
-  /**
-   *
-   * @param {Date} date
-   * @param {(date: Date, value: number) => Date} offset
-   * @param {number} offsetFactor
-   */
-  static compute(date, offset, offsetFactor, maxDate = yesterdayDate) {
+
+  static compute(
+    date: Date,
+    offset: (date: Date, step: number) => Date,
+    offsetFactor: number,
+    maxDate = yesterdayDate,
+  ): TimeFrame {
     let max = offset(date, offsetFactor / 2);
     if (max > maxDate) {
       max = maxDate;
@@ -75,20 +66,16 @@ const ALL_TIME_FRAME = new TimeFrame(parseAPITime('20200101'), yesterdayDate);
 const MAX_DATA_ROWS = 3650;
 
 export class DataFetcher {
-  constructor() {
-    this.cache = new Map();
+  private readonly cache = new Map<
+    string,
+    Promise<RegionEpiDataRow[]> | Promise<EpiDataRow & NameInfo> | Promise<Trend>
+  >();
+  private primarySensorKey = '';
+  private primaryRegionId = '';
+  private primaryTimeValue = 0;
+  private primaryWindowRange = '';
 
-    this.primarySensorKey = '';
-    this.primaryRegionId = '';
-    this.primaryTimeValue = 0;
-    this.primaryWindowRange = '';
-  }
-  /**
-   * @param {Sensor} sensor
-   * @param {{id: string, level: string}} region
-   * @param {DateParam} date
-   */
-  toDateKey(sensor, region, date, suffix = '') {
+  toDateKey(sensor: Sensor, region: { id: string; level: string }, date: DateParam, suffix = ''): string {
     const s = this.primarySensorKey === sensor.key ? 'SENSOR' : sensor.key;
     const r =
       this.primaryRegionId === region.id && region.level !== 'nation' ? 'REGION' : `${region.level}-${region.id}`;
@@ -96,12 +83,7 @@ export class DataFetcher {
     return `${s}@${r}@${d}${suffix ? '@' : ''}${suffix}`;
   }
 
-  /**
-   * @param {Sensor} sensor
-   * @param {{id: string, level: string}} region
-   * @param {TimeFrame} timeFrame
-   */
-  toWindowKey(sensor, region, timeFrame, suffix = '') {
+  toWindowKey(sensor: Sensor, region: { id: string; level: string }, timeFrame: TimeFrame, suffix = ''): string {
     const s = this.primarySensorKey === sensor.key ? 'SENSOR' : sensor.key;
     const r =
       this.primaryRegionId === region.id && region.level !== 'nation' ? 'REGION' : `${region.level}-${region.id}`;
@@ -109,12 +91,7 @@ export class DataFetcher {
     return `${s}@${r}@${d}${suffix ? '@' : ''}${suffix}`;
   }
 
-  /**
-   * @param {SensorParam} sensor
-   * @param {RegionParam} region
-   * @param {DateParam} date
-   */
-  invalidate(sensor, region, date) {
+  invalidate(sensor: SensorParam, region: RegionParam, date: DateParam): void {
     const hasSensorChanged = this.primarySensorKey !== sensor.key;
     this.primarySensorKey = sensor.key;
     const hasRegionChanged = this.primaryRegionId !== region.id;
@@ -147,13 +124,18 @@ export class DataFetcher {
    * @param {Date | DateParam} date
    * @returns {Promise<EpiDataRow[]>}
    */
-  fetch1SensorNRegions1Date(sensor, level, geo, date) {
+  fetch1SensorNRegions1Date(
+    sensor: Sensor | SensorParam,
+    level: RegionLevel,
+    geo: string,
+    date: Date | DateParam,
+  ): Promise<RegionEpiDataRow[]> {
     sensor = sensor instanceof SensorParam ? sensor.value : sensor;
     date = date instanceof DateParam ? date : new DateParam(date);
 
     const key = this.toDateKey(sensor, { id: geo, level }, date);
     if (this.cache.has(key)) {
-      return this.cache.get(key);
+      return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
     }
     const r = fetchData(
       sensor,
@@ -172,18 +154,16 @@ export class DataFetcher {
     return r;
   }
 
-  /**
-   * @param {Sensor|SensorParam} sensor
-   * @param {Region|RegionParam} region
-   * @param {TimeFrame} timeFrame
-   * @return {Promise<EpiDataRow[]>}
-   */
-  fetch1Sensor1RegionNDates(sensor, region, timeFrame) {
-    sensor = sensor instanceof SensorParam ? sensor.value : sensor;
-    region = region instanceof RegionParam ? region.value : region;
-    const key = this.toWindowKey(sensor, region, timeFrame);
+  fetch1Sensor1RegionNDates(
+    sensor: Sensor | SensorParam,
+    region: Region | RegionParam,
+    timeFrame: TimeFrame,
+  ): Promise<RegionEpiDataRow[]> {
+    const lSensor = sensor instanceof SensorParam ? sensor.value : sensor;
+    const lRegion = region instanceof RegionParam ? region.value : region;
+    const key = this.toWindowKey(lSensor, lRegion, timeFrame);
     if (this.cache.has(key)) {
-      return this.cache.get(key);
+      return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
     }
     // if (
     //   timeFrame.range !== ALL_TIME_FRAME.range &&
@@ -197,35 +177,35 @@ export class DataFetcher {
     //   return r;
     // }
     const r = fetchData(
-      sensor,
-      region.level,
-      region.propertyId,
+      lSensor,
+      lRegion.level,
+      lRegion.propertyId,
       timeFrame.range,
       {
-        geo_value: region.propertyId,
+        geo_value: lRegion.propertyId,
       },
       {
         multiValues: false,
-        factor: sensor.format === 'fraction' ? 100 : 1,
+        factor: lSensor.format === 'fraction' ? 100 : 1,
       },
     )
       .then(addNameInfos)
-      .then((rows) => addMissing(rows, sensor));
+      .then((rows) => addMissing(rows, lSensor));
     this.cache.set(key, r);
     return r;
   }
 
-  /**
-   * @param {(Sensor|SensorParam)[]} sensors
-   * @param {Region|RegionParam} region
-   * @param {TimeFrame} timeFrame
-   * @return {Promise<EpiDataRow[]>[]}
-   */
-  fetchNSensor1RegionNDates(sensors, region, timeFrame) {
-    sensors = sensors.map((sensor) => (sensor instanceof SensorParam ? sensor.value : sensor));
-    region = region instanceof RegionParam ? region.value : region;
+  fetchNSensor1RegionNDates(
+    sensors: readonly (Sensor | SensorParam)[],
+    region: Region | RegionParam,
+    timeFrame: TimeFrame,
+  ): Promise<RegionEpiDataRow[]>[] {
+    const lSensors = sensors.map((sensor) => (sensor instanceof SensorParam ? sensor.value : sensor));
+    const lRegion = region instanceof RegionParam ? region.value : region;
 
-    const missingDataSensors = sensors.filter((sensor) => !this.cache.has(this.toWindowKey(sensor, region, timeFrame)));
+    const missingDataSensors = lSensors.filter(
+      (sensor) => !this.cache.has(this.toWindowKey(sensor, lRegion, timeFrame)),
+    );
     // we can only fetch the same data source for now
     const dataSources = new Set(missingDataSensors.map((d) => d.id));
 
@@ -242,8 +222,8 @@ export class DataFetcher {
         };
         const data = fetchData(
           sliceSensor,
-          region.level,
-          region.propertyId,
+          lRegion.level,
+          lRegion.propertyId,
           timeFrame.range,
           {},
           {
@@ -257,30 +237,28 @@ export class DataFetcher {
           const sensorData = data
             .then((rows) => rows.filter((d) => d.signal === s.signal))
             .then((rows) => addMissing(rows, s));
-          this.cache.set(this.toWindowKey(s, region, timeFrame), sensorData);
+          this.cache.set(this.toWindowKey(s, lRegion, timeFrame), sensorData);
         }
       }
     }
 
     // use cached version
-    return sensors.map((sensor) => this.fetch1Sensor1RegionNDates(sensor, region, timeFrame));
+    return lSensors.map((sensor) => this.fetch1Sensor1RegionNDates(sensor, lRegion, timeFrame));
   }
 
-  /**
-   * @param {(Sensor|SensorParam)[]} sensors
-   * @param {Region[]} regions
-   * @param {TimeFrame} timeFrame
-   * @return {Promise<EpiDataRow[]>[]}
-   */
-  fetchNSensorNRegionNDates(sensors, regions, timeFrame) {
+  fetchNSensorNRegionNDates(
+    sensors: readonly (Sensor | SensorParam)[],
+    regions: readonly Region[],
+    timeFrame: TimeFrame,
+  ): Promise<RegionEpiDataRow[]>[] {
     if (regions.length === 0) {
-      return Promise.resolve([]);
+      return [];
     }
-    sensors = sensors.map((sensor) => (sensor instanceof SensorParam ? sensor.value : sensor));
+    const lSensors = sensors.map((sensor) => (sensor instanceof SensorParam ? sensor.value : sensor));
     const level = regions[0].level;
     const geo = regions.map((d) => d.propertyId).join(',');
 
-    const missingDataSensors = sensors.filter(
+    const missingDataSensors = lSensors.filter(
       (sensor) => !this.cache.has(this.toWindowKey(sensor, { level, id: geo }, timeFrame)),
     );
     // we can only fetch the same data source for now
@@ -293,7 +271,7 @@ export class DataFetcher {
       const regionBatchSize = Math.floor(batchSize / missingDataSensors.length);
       if (regionBatchSize > sensorBatchSize) {
         // slice by region and fetch all sensors at once
-        const data = [];
+        const data: Promise<EpiDataRow[]>[] = [];
         const sliceSensor = {
           ...missingDataSensors[0],
           signal: missingDataSensors.map((d) => d.signal).join(','),
@@ -316,7 +294,7 @@ export class DataFetcher {
           );
         }
         const r = Promise.all(data)
-          .then((rows) => rows.flat())
+          .then((rows) => ([] as EpiDataRow[]).concat(...rows))
           .then(addNameInfos);
         // fetch all and then split by sensor
         for (const s of missingDataSensors) {
@@ -356,26 +334,27 @@ export class DataFetcher {
     }
 
     // use cached version
-    return sensors.map((sensor) => this.fetch1SensorNRegionsNDates(sensor, regions, timeFrame));
+    return lSensors.map((sensor) => this.fetch1SensorNRegionsNDates(sensor, regions, timeFrame));
   }
 
   /**
-   * @param {Sensor|SensorParam} sensor
-   * @param {Region[]} regions
-   * @param {TimeFrame} timeFrame
-   * @param {boolean} isAll whether it should load all regions (used for performance)
-   * @return {Promise<EpiDataRow[]>}
+   * @param isAll whether it should load all regions (used for performance)
    */
-  fetch1SensorNRegionsNDates(sensor, regions, timeFrame, isAll = false) {
+  fetch1SensorNRegionsNDates(
+    sensor: Sensor | SensorParam,
+    regions: readonly Region[],
+    timeFrame: TimeFrame,
+    isAll = false,
+  ): Promise<RegionEpiDataRow[]> {
     if (regions.length === 0) {
-      return Promise.resolve([]);
+      return Promise.resolve([] as RegionEpiDataRow[]);
     }
-    sensor = sensor instanceof SensorParam ? sensor.value : sensor;
+    const lSensor = sensor instanceof SensorParam ? sensor.value : sensor;
     const level = regions[0].level;
     const geo = regions.map((d) => d.propertyId).join(',');
-    const key = this.toWindowKey(sensor, { level, id: geo }, timeFrame);
+    const key = this.toWindowKey(lSensor, { level, id: geo }, timeFrame);
     if (this.cache.has(key)) {
-      return this.cache.get(key);
+      return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
     }
     const expectedDays = timeFrame.difference;
 
@@ -383,14 +362,14 @@ export class DataFetcher {
 
     if (batchSize >= regions.length) {
       const r = fetchData(
-        sensor,
+        lSensor,
         level,
         isAll ? '*' : regions.map((d) => d.propertyId).join(','),
         timeFrame.range,
         {},
         {
           multiValues: false,
-          factor: sensor.format === 'fraction' ? 100 : 1,
+          factor: lSensor.format === 'fraction' ? 100 : 1,
         },
       ).then(addNameInfos);
       // no missing
@@ -405,20 +384,20 @@ export class DataFetcher {
       const slice = regions.slice(i, Math.min(regions.length, i + batchSize));
       data.push(
         fetchData(
-          sensor,
+          lSensor,
           level,
           slice.map((d) => d.propertyId).join(','),
           timeFrame.range,
           {},
           {
             multiValues: false,
-            factor: sensor.format === 'fraction' ? 100 : 1,
+            factor: lSensor.format === 'fraction' ? 100 : 1,
           },
         ),
       );
     }
     const r = Promise.all(data)
-      .then((rows) => rows.flat())
+      .then((rows) => ([] as EpiDataRow[]).concat(...rows))
       .then(addNameInfos);
 
     // no missing
@@ -426,40 +405,31 @@ export class DataFetcher {
     return r;
   }
 
-  /**
-   * @param {Sensor|SensorParam} sensor
-   * @param {Region|RegionParam} region
-   * @param {DateParam} date
-   * @return {Promise<EpiDataRow[]>}
-   */
-  fetchSparkLine(sensor, region, date) {
-    sensor = sensor instanceof SensorParam ? sensor.value : sensor;
-    region = region instanceof RegionParam ? region.value : region;
-    date = date instanceof DateParam ? date : new DateParam(date);
-    const key = this.toWindowKey(sensor, region, date.windowTimeFrame, 'sparkline');
+  fetchSparkLine(
+    sensor: Sensor | SensorParam,
+    region: Region | RegionParam,
+    date: DateParam,
+  ): Promise<RegionEpiDataRow[]> {
+    const lSensor = sensor instanceof SensorParam ? sensor.value : sensor;
+    const lRegion = region instanceof RegionParam ? region.value : region;
+    const key = this.toWindowKey(lSensor, lRegion, date.windowTimeFrame, 'sparkline');
     if (this.cache.has(key)) {
-      return this.cache.get(key);
+      return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
     }
-    const rows = this.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame).then((rows) =>
+    const rows = this.fetch1Sensor1RegionNDates(lSensor, lRegion, date.windowTimeFrame).then((rows) =>
       rows.filter(date.sparkLineTimeFrame.filter),
     );
     this.cache.set(key, rows);
     return rows;
   }
 
-  /**
-   * @param {Sensor|SensorParam} sensor
-   * @param {Region|RegionParam} region
-   * @param {DateParam} date
-   * @return {Promise<Trend>}
-   */
-  fetchWindowTrend(sensor, region, date) {
-    sensor = sensor instanceof SensorParam ? sensor.value : sensor;
-    region = region instanceof RegionParam ? region.value : region;
-    date = date instanceof DateParam ? date : new DateParam(date);
-    const key = this.toWindowKey(sensor, region, date.windowTimeFrame, `${date.timeValue}:trend`);
+  fetchWindowTrend(sensor: Sensor | SensorParam, region: Region | RegionParam, date: DateParam): Promise<Trend> {
+    const lSensor = sensor instanceof SensorParam ? sensor.value : sensor;
+    const lRegion = region instanceof RegionParam ? region.value : region;
+    const lDate = date instanceof DateParam ? date : new DateParam(date);
+    const key = this.toWindowKey(lSensor, lRegion, lDate.windowTimeFrame, `${lDate.timeValue}:trend`);
     if (this.cache.has(key)) {
-      return this.cache.get(key);
+      return this.cache.get(key) as Promise<Trend>;
     }
     const trend = this.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame).then((rows) =>
       determineTrend(date.value, rows, sensor.isInverted),
@@ -468,33 +438,31 @@ export class DataFetcher {
     return trend;
   }
 
-  /**
-   * @param {Sensor|SensorParam} sensor
-   * @param {Region|RegionParam} region
-   * @param {Date | DateParam} date
-   * @returns {Promise<EpiDataRow>}
-   */
-  fetch1Sensor1Region1DateDetails(sensor, region, date) {
-    sensor = sensor instanceof SensorParam ? sensor.value : sensor;
-    region = region instanceof RegionParam ? region.value : region;
-    date = date instanceof DateParam ? date : new DateParam(date);
+  fetch1Sensor1Region1DateDetails(
+    sensor: Sensor | SensorParam,
+    region: Region | RegionParam,
+    date: Date | DateParam,
+  ): Promise<RegionEpiDataRow> {
+    const lSensor = sensor instanceof SensorParam ? sensor.value : sensor;
+    const lRegion = region instanceof RegionParam ? region.value : region;
+    const lDate = date instanceof DateParam ? date : new DateParam(date);
 
-    const key = this.toDateKey(sensor, region, date, 'details');
+    const key = this.toDateKey(lSensor, lRegion, lDate, 'details');
     if (this.cache.has(key)) {
-      return this.cache.get(key);
+      return this.cache.get(key) as Promise<RegionEpiDataRow>;
     }
     const r = fetchData(
-      sensor,
-      region.level,
-      region.propertyId,
-      date.value,
+      lSensor,
+      lRegion.level,
+      lRegion.propertyId,
+      lDate.value,
       {
-        time_value: date.timeValue,
+        time_value: lDate.timeValue,
       },
       {
         multiValues: false,
         advanced: true,
-        factor: sensor.format === 'fraction' ? 100 : 1,
+        factor: lSensor.format === 'fraction' ? 100 : 1,
       },
     )
       .then(addNameInfos)
@@ -503,19 +471,18 @@ export class DataFetcher {
     this.cache.set(key, r);
     return r;
   }
-  /**
-   * @param {Sensor|SensorParam} sensor
-   * @param {Region|RegionParam} region
-   * @param {Date | DateParam} date
-   * @returns {Promise<EpiDataRow>[]}
-   */
-  fetchNSensor1Region1DateDetails(sensors, region, date) {
-    sensors = sensors.map((sensor) => (sensor instanceof SensorParam ? sensor.value : sensor));
-    region = region instanceof RegionParam ? region.value : region;
-    date = date instanceof DateParam ? date : new DateParam(date);
 
-    const missingDataSensors = sensors.filter(
-      (sensor) => !this.cache.has(this.toDateKey(sensor, region, date, 'details')),
+  fetchNSensor1Region1DateDetails(
+    sensors: readonly (Sensor | SensorParam)[],
+    region: Region | RegionParam,
+    date: Date | DateParam,
+  ): Promise<RegionEpiDataRow>[] {
+    const lSensors = sensors.map((sensor) => (sensor instanceof SensorParam ? sensor.value : sensor));
+    const lRegion = region instanceof RegionParam ? region.value : region;
+    const lDate = date instanceof DateParam ? date : new DateParam(date);
+
+    const missingDataSensors = lSensors.filter(
+      (sensor) => !this.cache.has(this.toDateKey(sensor, lRegion, lDate, 'details')),
     );
     // we can only fetch the same data source for now
     const dataSources = new Set(missingDataSensors.map((d) => d.id));
@@ -528,9 +495,9 @@ export class DataFetcher {
       };
       const data = fetchData(
         sliceSensor,
-        region.level,
-        region.propertyId,
-        date.value,
+        lRegion.level,
+        lRegion.propertyId,
+        lDate.value,
         {},
         {
           multiValues: false,
@@ -542,12 +509,12 @@ export class DataFetcher {
       for (const s of missingDataSensors) {
         // compute slice per sensor and fill the cache
         const sensorData = data.then((rows) => rows.find((d) => d.signal === s.signal));
-        this.cache.set(this.toDateKey(s, region, date, 'details'), sensorData);
+        this.cache.set(this.toDateKey(s, lRegion, lDate, 'details'), sensorData);
       }
     }
 
     // use cached version
-    return sensors.map((sensor) => this.fetch1Sensor1Region1DateDetails(sensor, region, date));
+    return lSensors.map((sensor) => this.fetch1Sensor1Region1DateDetails(sensor, lRegion, lDate));
   }
 
   // /**
@@ -590,12 +557,14 @@ export class DataFetcher {
 }
 
 export class DateParam {
-  /**
-   * @param {Date} date
-   * @param {Sensor=} sensor
-   * @param {Map<string, [number, number]>=} timeLookup
-   */
-  constructor(date, sensor, timeLookup) {
+  readonly timeValue: number;
+  readonly value: Date;
+  readonly allTimeFrame: TimeFrame;
+  readonly sensorTimeFrame: TimeFrame;
+  readonly sparkLineTimeFrame: TimeFrame;
+  readonly windowTimeFrame: TimeFrame;
+
+  constructor(date: Date, sensor?: Sensor, timeLookup?: Map<string, [number, number]>) {
     this.timeValue = toTimeValue(date);
     this.value = date;
     this.allTimeFrame = ALL_TIME_FRAME;
@@ -604,31 +573,69 @@ export class DateParam {
     if (entry) {
       this.sensorTimeFrame = new TimeFrame(parseAPITime(entry[0]), parseAPITime(entry[1]));
     }
-    this.sparkLineTimeFrame = TimeFrame.compute(date, timeWeek.offset, SPARKLINE_SIZE, this.sensorTimeFrame.max);
-    this.windowTimeFrame = TimeFrame.compute(date, timeMonth.offset, WINDOW_SIZE, this.sensorTimeFrame.max);
+    this.sparkLineTimeFrame = TimeFrame.compute(
+      date,
+      (d, step) => timeWeek.offset(d, step),
+      SPARKLINE_SIZE,
+      this.sensorTimeFrame.max,
+    );
+    this.windowTimeFrame = TimeFrame.compute(
+      date,
+      (d, step) => timeMonth.offset(d, step),
+      WINDOW_SIZE,
+      this.sensorTimeFrame.max,
+    );
   }
 
-  /**
-   * @param {Date} date
-   */
-  set(date) {
+  set(date: Date): void {
     currentDate.set(formatAPITime(date));
   }
 }
 
+function resolveDescription(sensor: Sensor) {
+  const s = sensor as SensorEntry;
+  if (s.mapTitleText == null) {
+    return s.description ?? '';
+  }
+  if (typeof s.mapTitleText === 'function') {
+    return s.mapTitleText();
+  }
+  return s.mapTitleText;
+}
+
 export class SensorParam {
-  /**
-   * @param {Sensor} sensor
-   */
-  constructor(sensor, store = currentSensor) {
+  private readonly writeAbleStore: Writable<string>;
+
+  readonly key: string;
+  readonly name: string;
+  readonly description: string;
+  readonly signalTooltip: string;
+  readonly value: Sensor;
+  readonly rawValue?: Sensor;
+  readonly isCasesOrDeath: boolean;
+
+  readonly factor: number;
+  readonly isPercentage: boolean;
+  readonly isPer100K: boolean;
+  readonly isInverted: boolean;
+  readonly is7DayAverage: boolean;
+  readonly valueUnit: string;
+  readonly formatValue: (v: number | null, enforceSign?: boolean) => string;
+  readonly unit: string;
+  readonly unitShort: string;
+  readonly unitHTML: string;
+  readonly xAxis: string;
+  readonly yAxis: string;
+
+  constructor(sensor: Sensor, store = currentSensor) {
     this.writeAbleStore = store;
     this.key = sensor.key;
     this.name = sensor.name;
-    this.description = typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText({}) : sensor.mapTitleText;
+    this.description = resolveDescription(sensor);
     this.signalTooltip = sensor.signalTooltip;
     this.value = sensor;
     this.rawValue = sensor.rawSensor;
-    this.isCasesOrDeath = sensor.isCasesOrDeath || false;
+    this.isCasesOrDeath = (sensor as SensorEntry).isCasesOrDeath || false;
     // fractions as percentages here
     this.factor = sensor.format === 'fraction' ? 100 : 1;
     this.isPercentage = sensor.format == 'percent' || sensor.format === 'fraction';
@@ -648,10 +655,7 @@ export class SensorParam {
     this.yAxis = sensor.yAxis;
   }
 
-  /**
-   * @param {Sensor} date
-   */
-  set(sensor, scrollTop = false) {
+  set(sensor: Sensor, scrollTop = false): void {
     if (sensor) {
       this.writeAbleStore.set(sensor.key);
     }
@@ -664,9 +668,9 @@ export class SensorParam {
    * @param {Map<string, any>} stats
    * @param {string} level
    */
-  domain(stats, level) {
+  domain(stats: Map<string, { mean: number; max: number; std: number }>, level: RegionLevel): [number, number] {
     const domain = determineMinMax(stats, this.value, level, {}, false);
-    const scaled = [domain[0] * this.factor, domain[1] * this.factor];
+    const scaled: [number, number] = [domain[0] * this.factor, domain[1] * this.factor];
     if (this.isPercentage) {
       scaled[0] = Math.max(0, scaled[0]);
       scaled[1] = Math.min(100, scaled[1]);
@@ -677,26 +681,30 @@ export class SensorParam {
     return scaled;
   }
 
-  /**
-   * @param {Map<string, any>} stats
-   * @param {string} level
-   * @returns {(v: number) => string}
-   */
-  createColorScale(stats, level) {
+  createColorScale(
+    stats: Map<string, { mean: number; max: number; std: number }>,
+    level: RegionLevel,
+  ): (v: number) => string {
     const domain = this.domain(stats, level);
     return scaleSequential(this.value.colorScale).domain(domain);
   }
 }
 
-export const CASES = new SensorParam(sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Cases')));
 export const DEATHS = new SensorParam(sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Deaths')));
 
-export class RegionParam {
-  /**
-   * @param {Region} region
-   */
-  constructor(region) {
-    region = region || nationInfo;
+export class RegionParam implements Region {
+  readonly value: Region;
+
+  readonly name: string;
+  readonly displayName: string;
+  readonly id: string;
+  readonly propertyId: string; // geojson: feature.property.id
+  readonly population?: number;
+  readonly region?: string; // just for state and county
+  readonly state?: string; // just for county
+  readonly level: RegionLevel;
+
+  constructor(region: Region = nationInfo) {
     this.value = region;
     this.id = region.id;
     this.displayName = region.displayName;
@@ -706,10 +714,7 @@ export class RegionParam {
     this.state = region.state;
   }
 
-  /**
-   * @param {Region} region
-   */
-  set(region, scrollTop = false) {
+  set(region: Region, scrollTop = false): void {
     currentRegion.set(region.propertyId);
     if (scrollTop) {
       scrollToTop();
@@ -717,22 +722,12 @@ export class RegionParam {
   }
 }
 
-/**
- * @param {EpiDataRow[]} data
- * @param {TimeFrame} sparkLine
- * @param {Sensor} sensor
- * @returns {EpiDataRow[]}
- */
-export function extractSparkLine(data, sparkLine, sensor) {
+export function extractSparkLine<T extends EpiDataRow>(data: readonly T[], sparkLine: TimeFrame, sensor: Sensor): T[] {
   return fitRange(addMissing(data.filter(sparkLine.filter), sensor), sensor, sparkLine.min, sparkLine.max);
 }
 
-/**
- * @param {(EpiDataRow & {propertyId: string})[]} data
- * @returns {Map<string, EpiDataRow>}
- */
-export function groupByRegion(data) {
-  const map = new Map();
+export function groupByRegion<T extends EpiDataRow & { propertyId: string }>(data: readonly T[]): Map<string, T[]> {
+  const map = new Map<string, T[]>();
   for (const row of data) {
     const geo = map.get(row.propertyId);
     if (geo) {

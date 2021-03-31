@@ -11,10 +11,20 @@ import {
   currentInfoSensor,
 } from '.';
 
-import { debounce } from 'lodash-es';
+import debounce from 'lodash-es/debounce';
+
+interface GoogleAnalyticsLike {
+  (type: 'set', page: string, value: string): void;
+  (type: 'send', sub: 'pageview'): void;
+  (type: 'send', sub: 'event', category: string, action: string, label?: string, value?: string): void;
+}
+
+function hasGA(obj: unknown): obj is { ga: GoogleAnalyticsLike } {
+  return (obj as { ga: GoogleAnalyticsLike }).ga != null;
+}
 
 export const trackUrl = debounce((url) => {
-  if (!window.ga) {
+  if (!hasGA(window)) {
     return;
   }
   // send an event to google analytics
@@ -22,8 +32,8 @@ export const trackUrl = debounce((url) => {
   window.ga('send', 'pageview');
 }, 250);
 
-export function trackEvent(category, action, label, value) {
-  if (!window.ga) {
+export function trackEvent(category: string, action: string, label?: string, value?: string): void {
+  if (!hasGA(window)) {
     return;
   }
   window.ga('send', 'event', category, action, label, value);

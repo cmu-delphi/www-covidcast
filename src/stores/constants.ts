@@ -63,37 +63,37 @@ export interface CasesOrDeathOptions {
 }
 
 export interface Sensor {
-  key: string; // id:signal
-  id: string; // data source
-  signal: string;
-  rawSignal?: string; // raw signal in case of a 7day average
-  rawSensor?: Sensor; // raw signal in case of a 7day average
+  readonly key: string; // id:signal
+  readonly id: string; // data source
+  readonly signal: string;
+  readonly rawSignal?: string; // raw signal in case of a 7day average
+  readonly rawSensor?: Sensor; // raw signal in case of a 7day average
 
-  name: string; // signal name
-  unit: string;
-  dataSourceName: string;
-  type: 'public' | 'early' | 'late';
-  levels: RegionLevel[];
-  description?: string; // HTML long text description
-  signalTooltip: string; // short text description
-  colorScale(v: number): string;
+  readonly name: string; // signal name
+  readonly unit: string;
+  readonly dataSourceName: string;
+  readonly type: 'public' | 'early' | 'late';
+  readonly levels: readonly RegionLevel[];
+  readonly description?: string; // HTML long text description
+  readonly signalTooltip: string; // short text description
+  readonly colorScale: (this: void, v: number) => string;
 
-  links: string[]; // more information links
-  credits?: string; // credit text
+  readonly links: readonly string[]; // more information links
+  readonly credits?: string; // credit text
 
-  format: 'raw' | 'per100k' | 'percent' | 'fraction';
-  xAxis: string; // x axis title
-  yAxis: string; // y axis value unit long
-  isInverted: boolean;
-  is7DayAverage: boolean;
-  hasStdErr: boolean;
+  readonly format: 'raw' | 'per100k' | 'percent' | 'fraction';
+  readonly xAxis: string; // x axis title
+  readonly yAxis: string; // y axis value unit long
+  readonly isInverted: boolean;
+  readonly is7DayAverage: boolean;
+  readonly hasStdErr: boolean;
   formatValue(v: number, enforceSign?: boolean): string;
 
-  highlight?: string[];
+  readonly highlight?: string[];
 }
 
 export function ensureSensorStructure(
-  sensor: Partial<Sensor> & { id: string; signal: string; tooltipText?: any },
+  sensor: Partial<Sensor> & { id: string; signal: string; tooltipText?: unknown },
 ): Sensor {
   const key = `${sensor.id}-${sensor.signal}`;
 
@@ -148,16 +148,18 @@ export function ensureSensorStructure(
 
   if (rawSignal) {
     // create a raw version
-    full.rawSensor = {
-      ...full,
-      key: `${sensor.id}-${rawSignal}`,
-      name: `${full.name.replace('(7-day average)', '')} (Raw)`,
-      description: full.description.replace('(7-day average)', ''),
-      signal: rawSignal,
-      is7DayAverage: false,
-      rawSensor: null,
-      rawSignal: null,
-    };
+    Object.assign(full, {
+      rawSensor: {
+        ...full,
+        key: `${sensor.id}-${rawSignal}`,
+        name: `${full.name.replace('(7-day average)', '')} (Raw)`,
+        description: full.description.replace('(7-day average)', ''),
+        signal: rawSignal,
+        is7DayAverage: false,
+        rawSensor: null,
+        rawSignal: null,
+      },
+    });
   }
 
   return full as Sensor;
@@ -275,8 +277,8 @@ export function extendSensorEntry(sensorEntry: Partial<SensorEntry> & { id: stri
   casesOrDeath.casesOrDeathSensors = {} as CasesOrDeathOldSensor['casesOrDeathSensors'];
   casesOrDeath.mapTitleText =
     typeof mapTitle === 'function'
-      ? (mapTitle as (options: CasesOrDeathOptions) => string)
-      : (options: CasesOrDeathOptions) => {
+      ? (mapTitle as (options?: CasesOrDeathOptions) => string)
+      : (options?: CasesOrDeathOptions) => {
           // generate lookup function
           if (options && options.cumulative) {
             if (options.incidence) {

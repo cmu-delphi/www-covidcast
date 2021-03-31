@@ -189,7 +189,7 @@ export function determineTrend(date: Date, data: readonly EpiDataRow[], isInvert
   let refRow = findDateRow(refDate, data);
   if (!refRow) {
     // try the closest before
-    const apiDate = toTimeValue(refRow);
+    const apiDate = toTimeValue(refRow.date_value);
     refRow = data.reduce((acc, v) => {
       if (v.time_value > apiDate || v.value == null) {
         return acc;

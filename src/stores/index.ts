@@ -365,6 +365,11 @@ export interface PersistedState {
   encoding?: 'color' | 'bubble' | 'spike';
   compare?: string;
 }
+export interface TrackedState {
+  state: PersistedState;
+  path: string;
+  params: Omit<PersistedState, 'mode'>;
+}
 
 export const trackedUrlParams = derived(
   [
@@ -378,7 +383,7 @@ export const trackedUrlParams = derived(
     encoding,
     currentCompareSelection,
   ],
-  ([mode, sensor, sensor2, level, region, date, signalOptions, encoding, compare]) => {
+  ([mode, sensor, sensor2, level, region, date, signalOptions, encoding, compare]): TrackedState => {
     const sensorEntry = sensorMap.get(sensor);
     const inMapMode = mode === modeByID.summary || mode === modeByID.timelapse;
 

@@ -267,7 +267,7 @@ export function fetchRegionSlice(
   });
 }
 
-function createCopy(row: EpiDataRow, date: Date, dataSensor?: DataSensor) {
+function createCopy<T extends EpiDataRow = EpiDataRow>(row: T, date: Date, dataSensor?: DataSensor): T {
   const copy = Object.assign({}, row, {
     date_value: date,
     time_value: Number.parseInt(formatAPITime(date), 10),
@@ -307,7 +307,12 @@ export function fetchTimeSlice(
 /**
  * fit the data to be in the start/end date range
  */
-export function fitRange(rows: EpiDataRow[], dataSensor: DataSensor, startDate: Date, endDate: Date): EpiDataRow[] {
+export function fitRange<T extends EpiDataRow = EpiDataRow>(
+  rows: T[],
+  dataSensor: DataSensor,
+  startDate: Date,
+  endDate: Date,
+): T[] {
   if (rows.length === 0) {
     return rows;
   }
@@ -325,7 +330,7 @@ export function fitRange(rows: EpiDataRow[], dataSensor: DataSensor, startDate: 
 /**
  * add missing rows per date within this given date rows
  */
-export function addMissing(rows: EpiDataRow[], dataSensor: DataSensor): EpiDataRow[] {
+export function addMissing<T extends EpiDataRow = EpiDataRow>(rows: T[], dataSensor: DataSensor): T[] {
   if (rows.length < 2) {
     return rows;
   }

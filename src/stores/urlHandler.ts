@@ -1,26 +1,28 @@
-import { loadFromUrlState, trackedUrlParams } from '.';
+import { loadFromUrlState, PersistedState, TrackedState, trackedUrlParams } from '.';
 import throttle from 'lodash-es/throttle';
 
 // Constantly keep the URL parameters updated with the current state.
-export function updateURIParameters(state) {
+export function updateURIParameters(state: TrackedState): void {
   // just update the current state
   const params = new URLSearchParams(window.location.search);
 
   // update params with state
   Object.keys(state.params).forEach((key) => {
-    const v = state.params[key];
+    const v = state.params[key as keyof TrackedState['params']];
     if (v) {
-      params.set(key, v);
+      params.set(key, String(v));
     } else {
       params.delete(key);
     }
   });
-  const path = `${window.DELPHI_COVIDCAST_PAGE || '/'}${state.path}`;
+  const path = `${((window as unknown) as { DELPHI_COVIDCAST_PAGE: string }).DELPHI_COVIDCAST_PAGE || '/'}${
+    state.path
+  }`;
   const query = params.toString();
   const url = `${path}${query.length > 0 ? '?' : ''}${query}`;
 
   // update only if the state has changed
-  const old = window.history.state || {};
+  const old = (window.history.state || {}) as PersistedState;
   const deltaState = { ...state.state };
   // compute only the new changes
   Object.keys(state.state).forEach((key) => {
@@ -45,7 +47,7 @@ export function updateURIParameters(state) {
 trackedUrlParams.subscribe(throttle(updateURIParameters, 250));
 
 window.addEventListener('popstate', (e) => {
-  if (e.state && e.state.mode) {
+  if (e.state && (e.state as PersistedState).mode) {
     loadFromUrlState(e.state);
   }
 });
