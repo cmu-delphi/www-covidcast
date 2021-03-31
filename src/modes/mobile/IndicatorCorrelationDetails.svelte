@@ -1,6 +1,17 @@
 <script>
   import IndicatorCorrelationChart from './IndicatorCorrelationChart.svelte';
-  import { isMobileDevice } from '../../stores';
+  // import HistoryLineChart from './HistoryLineChart.svelte';
+  import SensorCard from '../single/SensorCard.svelte';
+
+  import {
+    currentRegionInfo,
+    currentSensorEntry,
+    currentDateObject,
+    currentMultiSelection,
+    isMobileDevice,
+    times,
+  } from '../../stores';
+  import { DateParam, RegionParam } from '../../stores/params'; // DataFetcher
 
   $: sliderLags = $isMobileDevice ? [-28, -14, 0, 14, 28] : [-28, -21, -14, -7, 0, 7, 14, 21, 28];
   $: chartPadding = $isMobileDevice
@@ -15,6 +26,32 @@
         symbolStrokeWidth: 2,
         title: 'Date',
       };
+
+  $: mainChartOptions = {
+    title: `${secondary.name} correlated with ${primary.name} lagged by ${sensorDetailsLag} days`,
+    width: 400,
+    height: 400,
+    padding: chartPadding,
+    sizeLegend,
+    showTooltips: true,
+    showRSquared: true,
+  };
+  $: sliderChartOptions = {
+    width: 50,
+    height: 50,
+    padding: { top: 12, left: 0, right: 0 },
+    sizeLegend: null,
+    axisTitles: false,
+    ticks: false,
+    tickLabels: false,
+    showTooltips: false,
+    showRSquared: true,
+  };
+
+  $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
+  $: region = new RegionParam($currentRegionInfo);
+
+  // const fetcher = new DataFetcher();
 
   /**
    * @type {import("../../stores/params").Sensor}
@@ -32,6 +69,7 @@
    * @type {import("../../stores/params").EpiDataRow[]}
    */
   export let secondaryData;
+
   let sensorListData = [
     { sensor: primary, data: primaryData },
     { sensor: secondary, data: secondaryData },
@@ -66,7 +104,7 @@
     {primary}
     {secondary}
     lag={sensorDetailsLag}
-    options={{ title: `${secondary.name} correlated with ${primary.name} lagged by ${sensorDetailsLag} days`, width: 400, height: 400, padding: chartPadding, sizeLegend, showTooltips: true, showRSquared: true }} />
+    options={mainChartOptions} />
 
   <table class="mobile-table">
     <tr>
@@ -95,7 +133,7 @@
                   {secondary}
                   {lag}
                   on:click={() => (sensorDetailsLag = lag)}
-                  options={{ width: 50, height: 50, padding: { top: 12, left: 0, right: 0 }, sizeLegend: null, axisTitles: false, ticks: false, tickLabels: false, showTooltips: false, showRSquared: true }} />
+                  options={sliderChartOptions} />
               </td>
             {/each}
           </tr>
@@ -104,18 +142,14 @@
     </tr>
   </table>
 
-  <!-- <SensorCard
+  <SensorCard
     sensor={primary}
     date={$currentDateObject}
     lag={-sensorDetailsLag / 2}
-    selections={$currentMultiSelection}
-    {onHighlight}
-    highlightTimeValue={$highlightTimeValue} />
+    selections={$currentMultiSelection} />
   <SensorCard
     sensor={secondary}
-    date={compareSensorDate}
-    lag={sensorDetailsLag / 2}
-    selections={$currentMultiSelection}
-    {onHighlight}
-    highlightTimeValue={$highlightTimeValue} /> -->
+    date={$currentDateObject}
+    lag={+sensorDetailsLag / 2}
+    selections={$currentMultiSelection} />
 </div>
