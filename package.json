@@ -1,6 +1,6 @@
 {
   "name": "www-covidcast",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "private": true,
   "license": "MIT",
   "description": "",
@@ -37,7 +37,7 @@
     "test:e2e": "concurrently \"http-server\" \"cypress run\"",
     "cy:open": "cypress open",
     "serve": "http-server",
-    "prepare": "echo 'dummy prepare since prepack has no dev dependencies'",
+    "prepare": "husky install",
     "prepack": "npm run build"
   },
   "devDependencies": {

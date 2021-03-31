@@ -48,6 +48,10 @@
   export let title = undefined;
 
   export let icon = 'search';
+  /**
+   * whether clearing is possible
+   */
+  export let clear = true;
 
   // selected item state
   export let selectedItem = undefined;
@@ -374,14 +378,16 @@
       on:click={onInputClick}
       on:keypress={onKeyPress}
     />
-    <button
-      class="uk-search-icon clear-button"
-      class:hidden={!text}
-      class:modern
-      on:click={onResetItem}
-      title="Clear Search Field"
-      data-uk-icon="icon: close"
-    />
+    {#if clear}
+      <button
+        class="uk-search-icon clear-button"
+        class:hidden={!text}
+        class:modern
+        on:click={onResetItem}
+        title="Clear Search Field"
+        data-uk-icon="icon: close"
+      />
+    {/if}
   {:else}
     <span class="uk-search-icon search-multiple-icon search-icon" data-uk-icon="icon: {icon}" class:modern />
 
