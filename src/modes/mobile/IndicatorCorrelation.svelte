@@ -2,15 +2,65 @@
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
   import { modeByID } from '..';
   import { sensorList, currentMode, currentSensor2 } from '../../stores';
+  import { SensorParam } from '../../stores/params';
   import { scrollToTop } from '../../util';
+  import { generateCorrelationMetrics } from '../../data/utils';
+  import { formatValue } from '../../formats';
   import FancyHeader from './FancyHeader.svelte';
 
+  /**
+   * @typedef {import('../../stores/constants').SensorEntry} SensorEntry
+   */
+
+  /**
+   * @typedef {import("../../src/data/util").CorrelationMetric} CorrelationMetric
+   */
+
+  /**
+   * @type {import("../../stores/params").DateParam}
+   */
+  export let date;
+  /**
+   * @type {import("../../stores/params").RegionParam}
+   */
+  export let region;
   /**
    * @type {import("../../stores/params").SensorParam}
    */
   export let sensor;
+  /**
+   * @type {import("../../stores/params").DataFetcher}
+   */
+  export let fetcher;
 
-  $: otherSensors = sensorList.filter((d) => d.key !== sensor.key);
+  /**
+   * @param {SensorEntry} sensorEntry
+   * @returns {Promise<CorrelationMetric>}
+   */
+  function buildMetrics(sensorEntry) {
+    const contextData = fetcher.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame);
+    const compareData = fetcher.fetch1Sensor1RegionNDates(new SensorParam(sensorEntry), region, date.windowTimeFrame);
+    return Promise.all([contextData, compareData]).then((p) => {
+      const metrics = generateCorrelationMetrics(p[0], p[1]);
+      return metrics;
+    });
+  }
+
+  /**
+   * Starting from a list of sensors, mix in all of the other columns needed for the table.
+   */
+  function buildTableData() {
+    return sensorList
+      .filter((d) => d.key !== sensor.key)
+      .map((sensor) => {
+        return {
+          ...sensor,
+          metrics: buildMetrics(sensor),
+        };
+      });
+  }
+
+  $: otherSensors = buildTableData(sensor, date, region);
 
   function switchMode(sensor) {
     currentSensor2.set(sensor.key);
@@ -25,6 +75,9 @@
   <thead>
     <tr>
       <th class="mobile-th"><span>Indicator</span></th>
+      <th class="mobile-th uk-text-right"><span>R<sup>2</sup></span></th>
+      <th class="mobile-th uk-text-right"><span>Max R<sup>2</sup></span></th>
+      <th class="mobile-th uk-text-right"><span>Lag at Max R<sup>2</sup></span></th>
       <th class="mobile-th" />
     </tr>
   </thead>
@@ -35,15 +88,28 @@
           <a
             href="../correlation/?sensor2={sensor.key}"
             class="uk-link-text"
-            on:click|preventDefault={() => switchMode(sensor)}>
+            on:click|preventDefault={() => switchMode(sensor)}
+          >
             {sensor.name}
           </a>
         </td>
+        {#await sensor.metrics}
+          <td class="uk-text-right">&hellip;</td>
+          <td class="uk-text-right">&hellip;</td>
+          <td class="uk-text-right">&hellip;</td>
+        {:then m}
+          <td class="uk-text-right">{formatValue(m.r2At0)}</td>
+          <td class="uk-text-right">{formatValue(m.r2AtMaxR2)}</td>
+          <td class="uk-text-right">{m.lagAtMaxR2.toLocaleString()}</td>
+        {:catch err}
+          <td colspan="3" class="small">{err.message}</td>
+        {/await}
         <td>
           <a
             href="../correlation/?sensor2={sensor.key}"
-            class="uk-link-text"
-            on:click|preventDefault={() => switchMode(sensor)}>
+            class="uk-link-text details-link"
+            on:click|preventDefault={() => switchMode(sensor)}
+          >
             {@html chevronRightIcon}
           </a>
         </td>
@@ -51,3 +117,15 @@
     {/each}
   </tbody>
 </table>
+
+<style>
+  .details-link {
+    width: 6px;
+    display: inline-block;
+    fill: currentColor;
+  }
+
+  .small {
+    font-size: 0.75rem;
+  }
+</style>

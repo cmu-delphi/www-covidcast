@@ -127,7 +127,8 @@
     {primary}
     {secondary}
     lag={sensorDetailsLag}
-    options={mainChartOptions} />
+    options={mainChartOptions}
+  />
 
   <input
     type="range"
@@ -141,12 +142,12 @@
     on:click={(e) => {
       sensorDetailsLag = e.target.value;
     }}
-    style="width:450px;  margin-left: 35px" />
+    style="width:450px;  margin-left: 35px"
+  />
 
   <div style="width: 100%">
     <Vega data={lagVsR2} spec={lagVsR2Spec} />
   </div>
-
   <br />
 
   <div class="uk-container content-grid">
