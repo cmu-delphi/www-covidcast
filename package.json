@@ -78,7 +78,7 @@
     "d3-time": "^2.0.0",
     "d3-time-format": "^3.0.0",
     "dirty-reprojectors": "0.0.2",
-    "eslint": "^7.22.0",
+    "eslint": "^7.23.0",
     "eslint-plugin-cypress": "^2.11.2",
     "eslint-plugin-svelte3": "^3.1.2",
     "file-loader": "^6.2.0",

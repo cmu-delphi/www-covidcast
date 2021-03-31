@@ -1,17 +1,9 @@
 <script>
   import IndicatorCorrelationChart from './IndicatorCorrelationChart.svelte';
-  // import HistoryLineChart from './HistoryLineChart.svelte';
-  import SensorCard from '../single/SensorCard.svelte';
+  import HistoryLineChart from './HistoryLineChart.svelte';
 
-  import {
-    currentRegionInfo,
-    currentSensorEntry,
-    currentDateObject,
-    currentMultiSelection,
-    isMobileDevice,
-    times,
-  } from '../../stores';
-  import { DateParam, RegionParam } from '../../stores/params'; // DataFetcher
+  import { currentRegionInfo, currentSensorEntry, currentDateObject, isMobileDevice, times } from '../../stores';
+  import { DateParam, RegionParam, DataFetcher } from '../../stores/params'; // DataFetcher
 
   $: sliderLags = $isMobileDevice ? [-28, -14, 0, 14, 28] : [-28, -21, -14, -7, 0, 7, 14, 21, 28];
   $: chartPadding = $isMobileDevice
@@ -51,8 +43,6 @@
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
   $: region = new RegionParam($currentRegionInfo);
 
-  // const fetcher = new DataFetcher();
-
   /**
    * @type {import("../../stores/params").Sensor}
    */
@@ -69,6 +59,12 @@
    * @type {import("../../stores/params").EpiDataRow[]}
    */
   export let secondaryData;
+
+  const fetcher = new DataFetcher();
+  $: {
+    // reactive update
+    fetcher.invalidate(primary, region, date);
+  }
 
   let sensorListData = [
     { sensor: primary, data: primaryData },
@@ -92,7 +88,6 @@
         sensorDateMap[time_value_key][sensorKey] = row.value;
       });
     });
-    // console.info('sensorDateMap', sensorDateMap);
     return Object.values(sensorDateMap);
   }
   $: sensorDetailsLag = 0;
@@ -142,14 +137,10 @@
     </tr>
   </table>
 
-  <SensorCard
-    sensor={primary}
-    date={$currentDateObject}
-    lag={-sensorDetailsLag / 2}
-    selections={$currentMultiSelection} />
-  <SensorCard
-    sensor={secondary}
-    date={$currentDateObject}
-    lag={+sensorDetailsLag / 2}
-    selections={$currentMultiSelection} />
+  <div class="chart-300">
+    <HistoryLineChart sensor={primary} {date} {region} {fetcher} />
+  </div>
+  <div class="chart-300">
+    <HistoryLineChart sensor={secondary} {date} {region} {fetcher} />
+  </div>
 </div>
