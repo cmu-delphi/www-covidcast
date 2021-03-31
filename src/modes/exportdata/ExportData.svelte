@@ -398,10 +398,12 @@
             {#if usesAsOf}<input type="hidden" name="as_of" value={formatDateISO(asOfDate)} />{/if}
           </form>
           <p>Manually fetch data:</p>
-          <pre
-            class="code-block"><code>
-        {`wget --content-disposition "${CSV_SERVER}?signal=${sensor ? `${sensor.id}:${sensor.signal}` : ''}&start_day=${formatDateISO(startDate)}&end_day=${formatDateISO(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${formatDateISO(asOfDate)}` : ''}"`}
-      </code></pre>
+          <div class="code-block-wrapper">
+            <pre
+              class="code-block"><code>
+            {`wget --content-disposition "${CSV_SERVER}?signal=${sensor ? `${sensor.id}:${sensor.signal}` : ''}&start_day=${formatDateISO(startDate)}&end_day=${formatDateISO(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${formatDateISO(asOfDate)}` : ''}"`}
+            </code></pre>
+          </div>
           <p class="description">
             For more details about the API, see the
             <a href="https://cmu-delphi.github.io/delphi-epidata/">API documentation</a>. A description of the returned
@@ -436,7 +438,10 @@ data = covidcast.signal("${sensor ? sensor.id : ''}", "${sensor ? sensor.signal 
           <h3 class="mobile-h3 uk-margin-top">R Package</h3>
           <p>Install <code>covidcast</code> using <a href="https://devtools.r-lib.org/">devtools</a> :</p>
           <pre
-            class="code-block"><code>devtools::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/covidcast")</code></pre>
+            class="code-block"><code>
+              {`devtools::install_github("cmu-delphi/covidcast", ref = "main",
+                         subdir = "R-packages/covidcast")`}
+          </code></pre>
           <p>Fetch data:</p>
           <pre
             class="code-block"><code>
@@ -474,5 +479,17 @@ covidcast_signal(data_source = "${sensor ? sensor.id : ''}", signal = "${sensor 
 
   .code-block {
     max-width: calc(100vw - 80px);
+  }
+  .code-block-wrapper {
+    position: relative;
+    height: 4em;
+  }
+  .code-block-wrapper > .code-block {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
   }
 </style>
