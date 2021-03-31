@@ -3219,4 +3219,7 @@ export default `id;name;population;displayName
 50027;Windsor;55062;
 51001;Accomack;32316;
 51005;Alleghany;14860;
-51007;Amelia;13145;`;
+51007;Amelia;13145;
+78010;St. Croix Island;;
+78030;St. Thomas Island;;
+66010;Guam;;`;

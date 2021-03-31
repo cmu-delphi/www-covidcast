@@ -1,5 +1,5 @@
 <script>
-  import { downloadUrl } from '../../../util';
+  import { downloadUrl, scrollToTop } from '../../../util';
   import { csvFormat } from 'd3-dsv';
   import { formatDateISO } from '../../../formats';
   import { modeByID } from '../../';
@@ -21,6 +21,8 @@
   export let raw = false;
 
   export let absolutePos = false;
+
+  export let advanced = true;
 
   function downloadString(string, mimeType, extension) {
     const blob = new Blob([string], {
@@ -104,10 +106,15 @@
   }
 
   function exportData() {
-    const knownOne = sensorList.find((d) => d.key == sensor.key);
-    sensor.set(knownOne, true);
     // switch to export mode
     currentMode.set(modeByID.export);
+
+    const knownOne = sensor ? sensorList.find((d) => d.key == sensor.key) : null;
+    if (knownOne) {
+      sensor.set(knownOne, true);
+    } else {
+      scrollToTop();
+    }
   }
 </script>
 
@@ -125,10 +132,12 @@
         <li><a href="?" on:click|preventDefault={downloadJSON}>Save as JSON</a></li>
         <li><a href="?" on:click|preventDefault={downloadCSV}>Save as CSV</a></li>
       {/if}
-      <li class="uk-nav-divider" />
-      <li>
-        <a href="../{modeByID.export.id}" on:click|preventDefault={exportData}>Advanced Data Export</a>
-      </li>
+      {#if advanced}
+        <li class="uk-nav-divider" />
+        <li>
+          <a href="../{modeByID.export.id}" on:click|preventDefault={exportData}>Advanced Data Export</a>
+        </li>
+      {/if}
     </ul>
   </div>
 {/if}

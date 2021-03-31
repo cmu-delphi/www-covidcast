@@ -33,10 +33,10 @@ export function resetOnClearHighlighTuple(date) {
   };
 }
 
-export function resolveHighlightedDate(e) {
+export function resolveHighlightedDate(e, dateField = 'date_value') {
   const highlighted = e.detail.value;
-  if (highlighted && Array.isArray(highlighted.date_value) && highlighted.date_value.length > 0) {
-    return new Date(highlighted.date_value[0]);
+  if (highlighted && Array.isArray(highlighted[dateField]) && highlighted[dateField].length > 0) {
+    return new Date(highlighted[dateField][0]);
   }
   return null;
 }
@@ -53,11 +53,12 @@ export const signalPatches = {
 //   };
 // }
 
-const AUTO_ALIGN = {
-  // auto align based on remaining space
-  expr:
-    "(width - scale('x', datum.date_value)) < 40 ? 'right' : (scale('x', datum.date_value)) > 40 ? 'center' : 'left'",
-};
+function autoAlign(dateField = 'date_value') {
+  return {
+    // auto align based on remaining space
+    expr: `(width - scale('x', datum.${dateField})) < 40 ? 'right' : (scale('x', datum.${dateField})) > 40 ? 'center' : 'left'`,
+  };
+}
 
 function genCreditsLayer({ shift = 55 } = {}) {
   /**
@@ -116,6 +117,73 @@ export function genDateHighlight(date, color = 'lightgrey') {
   return layer;
 }
 
+/**
+ *
+ * @param {import('../data/annotations').Annotation[]} annotations
+ * @param {{min: Date, max: Date}} dataDomain
+ * @returns
+ */
+export function genAnnotationLayer(annotations, dataDomain) {
+  /**
+   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
+   */
+  const layer = {
+    data: {
+      values: annotations.map((a, i) => ({
+        index: i,
+        start: a.dates[0] < dataDomain.min ? dataDomain.min : a.dates[0],
+        end: a.dates[1] > dataDomain.max ? dataDomain.max : a.dates[1],
+      })),
+    },
+    layer: [
+      {
+        mark: {
+          type: 'rect',
+          tooltip: false,
+          opacity: 0.1,
+          color: '#D46B08',
+        },
+        encoding: {
+          x: {
+            field: 'start',
+            type: 'temporal',
+          },
+          x2: {
+            field: 'end',
+            type: 'temporal',
+          },
+        },
+      },
+      {
+        mark: {
+          type: 'text',
+          color: '#D46B08',
+          text:
+            annotations.length > 1
+              ? {
+                  expr: `'⚠ (' + (datum.index + 1) + ')'`,
+                }
+              : '⚠',
+          baseline: 'top',
+          align: 'left',
+          dx: 2,
+          dy: 2,
+        },
+        encoding: {
+          x: {
+            field: 'start',
+            type: 'temporal',
+          },
+          y: {
+            value: 0,
+          },
+        },
+      },
+    ],
+  };
+  return layer;
+}
+
 export function generateLineChartSpec({
   width = 800,
   height = 300,
@@ -125,9 +193,18 @@ export function generateLineChartSpec({
   subTitle = null,
   color = COLOR,
   initialDate = null,
+  dateField = 'date_value',
   valueField = 'value',
+  valueFormat = null,
+  valueDomain = null,
   zero = false,
   highlightRegion = false,
+  reactOnMouseMove = true,
+  clearHighlight = true,
+  paddingLeft = 42,
+  tickCount = {
+    interval: 'week',
+  },
 } = {}) {
   // logic to automatically add the year for week 1 and first date
   const labelYear = `datum.label + (week(datum.value) === 1 ${
@@ -147,7 +224,7 @@ export function generateLineChartSpec({
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     width,
     height,
-    padding: { left: 42, top: topOffset, bottom: 55, right: 15 },
+    padding: { left: paddingLeft, top: topOffset, bottom: 55, right: 15 },
     autosize: {
       type: 'none',
       contains: 'padding',
@@ -171,7 +248,7 @@ export function generateLineChartSpec({
         },
         encoding: {
           x: {
-            field: 'date_value',
+            field: dateField,
             type: 'temporal',
             axis: {
               title: xTitle,
@@ -183,9 +260,7 @@ export function generateLineChartSpec({
               labelOverlap: true,
               grid: true,
               gridDash: [4, 4],
-              tickCount: {
-                interval: 'week',
-              },
+              tickCount,
             },
             scale: {
               domain,
@@ -200,11 +275,13 @@ export function generateLineChartSpec({
               domain: false,
               tickCount: 5,
               labelFontSize: 14,
+              format: valueFormat,
             },
             scale: {
               round: true,
               zero,
               domainMin: null,
+              domain: valueDomain,
               // padding: zero ? undefined : smartPadding(valueField),
             },
           },
@@ -225,9 +302,9 @@ export function generateLineChartSpec({
             name: 'highlight',
             select: {
               type: 'point',
-              on: 'click, mousemove, [touchstart, touchend] > touchmove',
+              on: `click${reactOnMouseMove ? ', mousemove' : ''}, [touchstart, touchend] > touchmove`,
               nearest: true,
-              clear: 'view:mouseout',
+              clear: clearHighlight ? 'view:mouseout' : false,
               encodings: ['x'],
             },
             value: initialDate
@@ -245,7 +322,7 @@ export function generateLineChartSpec({
         },
         encoding: {
           x: {
-            field: 'date_value',
+            field: dateField,
             type: 'temporal',
           },
           y: {
@@ -277,7 +354,7 @@ export function generateLineChartSpec({
         ],
         encoding: {
           x: {
-            field: 'date_value',
+            field: dateField,
             type: 'temporal',
           },
         },
@@ -293,7 +370,7 @@ export function generateLineChartSpec({
           {
             mark: {
               type: 'text',
-              align: AUTO_ALIGN,
+              align: autoAlign(dateField),
               color: COLOR,
               baseline: 'bottom',
               fontSize: 16,
@@ -301,7 +378,7 @@ export function generateLineChartSpec({
             },
             encoding: {
               text: {
-                field: 'date_value',
+                field: dateField,
                 type: 'temporal',
                 format: '%a %b %d',
                 formatType: 'cachedTime',
@@ -394,6 +471,7 @@ export function createSignalDateLabelHighlight(topPosition = false) {
 }
 
 export function generateSparkLine({
+  dateField = 'date_value',
   valueField = 'value',
   domain = null,
   color = COLOR,
@@ -401,6 +479,8 @@ export function generateSparkLine({
   highlightStartEnd = true,
   interactive = true,
   height = 30,
+  zero = false,
+  valueDomain = null,
 } = {}) {
   /**
    * @type {import('vega-lite').TopLevelSpec}
@@ -423,7 +503,7 @@ export function generateSparkLine({
     },
     encoding: {
       x: {
-        field: 'date_value',
+        field: dateField,
         type: 'temporal',
         scale: {
           domain,
@@ -444,7 +524,11 @@ export function generateSparkLine({
       },
     },
     layer: [
-      highlightDate ? createSignalDateLabelHighlight(highlightDate === 'top') : CURRENT_DATE_HIGHLIGHT,
+      highlightDate
+        ? createSignalDateLabelHighlight(highlightDate === 'top')
+        : highlightDate === null
+        ? null
+        : CURRENT_DATE_HIGHLIGHT,
       {
         mark: {
           type: 'line',
@@ -457,51 +541,48 @@ export function generateSparkLine({
             field: valueField,
             type: 'quantitative',
             scale: {
-              zero: 0,
+              zero,
+              domain: valueDomain,
             },
             axis: null,
           },
         },
       },
-      ...(interactive
-        ? [
-            {
-              mark: {
-                type: 'point',
-                fill: color,
-                stroke: null,
-                tooltip: true,
-              },
-              encoding: {
-                y: {
-                  field: valueField,
-                  type: 'quantitative',
-                },
-                opacity: {
-                  condition: {
-                    param: 'highlight',
-                    empty: false,
-                    value: 1,
-                  },
-                  value: 0,
-                },
-              },
-              params: [
-                {
-                  name: 'highlight',
-                  select: {
-                    type: 'point',
-                    on: 'click, mousemove, [touchstart, touchend] > touchmove',
-                    nearest: true,
-                    clear: 'view:mouseout',
-                    encodings: ['x'],
-                  },
-                },
-              ],
+      interactive && {
+        mark: {
+          type: 'point',
+          fill: color,
+          stroke: null,
+          tooltip: true,
+        },
+        encoding: {
+          y: {
+            field: valueField,
+            type: 'quantitative',
+          },
+          opacity: {
+            condition: {
+              param: 'highlight',
+              empty: false,
+              value: 1,
             },
-          ]
-        : []),
-    ],
+            value: 0,
+          },
+        },
+        params: [
+          {
+            name: 'highlight',
+            select: {
+              type: 'point',
+              on: 'click, mousemove, [touchstart, touchend] > touchmove',
+              nearest: true,
+              clear: 'view:mouseout',
+              encodings: ['x'],
+            },
+          },
+        ],
+      },
+    ].filter(Boolean),
     config: {
       ...commonConfig,
       legend: {
@@ -514,7 +595,7 @@ export function generateSparkLine({
     if (domain) {
       spec.layer.unshift({
         data: {
-          values: [{ date_value: domain[0] }, { date_value: domain[1] }],
+          values: [{ [dateField]: domain[0] }, { [dateField]: domain[1] }],
         },
 
         mark: {
@@ -524,7 +605,7 @@ export function generateSparkLine({
         },
         encoding: {
           x: {
-            field: 'date_value',
+            field: dateField,
             type: 'temporal',
           },
         },
@@ -536,22 +617,22 @@ export function generateSparkLine({
             aggregate: [
               {
                 op: 'min',
-                field: 'date_value',
+                field: dateField,
                 as: 'date_value_min',
               },
               {
                 op: 'max',
-                field: 'date_value',
+                field: dateField,
                 as: 'date_value_max',
               },
             ],
           },
           {
             calculate: '[datum.date_value_min, datum.date_value_max]',
-            as: 'date_value',
+            as: dateField,
           },
           {
-            flatten: ['date_value'],
+            flatten: [dateField],
           },
         ],
       });

@@ -167,6 +167,9 @@ module.exports = () => {
       }),
       new EnvironmentPlugin({
         COVIDCAST_ENDPOINT_URL: 'https://api.covidcast.cmu.edu/epidata/api.php',
+        COVIDCAST_ANNOTATION_SHEET:
+          'https://docs.google.com/spreadsheets/d/e/2PACX-1vToGcf9x5PNJg-eSrxadoR5b-LM2Cqs9UML97587OGrIX0LiQDcU1HL-L2AA8o5avbU7yod106ih0_n/pub?gid=0&single=true&output=csv',
+        COVIDCAST_ANNOTATION_DRAFTS: 'false',
       }),
       new HtmlWebpackPlugin({
         title: 'COVIDcast',
@@ -216,6 +219,11 @@ module.exports = () => {
         title: 'COVIDcast Survey Results',
         template: './src/index.html',
         filename: 'survey-results/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        title: 'COVIDcast Indicator Status Overview',
+        template: './src/index.html',
+        filename: 'indicator-status/index.html',
       }),
       new HtmlWebpackPlugin({
         title: 'COVIDcast Lab',

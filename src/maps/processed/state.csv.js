@@ -50,4 +50,8 @@ export default `id;postal;name;population
 54;WV;West Virginia;1792147
 55;WI;Wisconsin;5822434
 56;WY;Wyoming;578759
-72;PR;Puerto Rico;3723066`;
+72;PR;Puerto Rico;2933408
+78;VI;Virgin Islands;104405
+66;GU;Guam;159358
+03;AS;American Samoa;55519
+69;MP;Northern Mariana Islands;53883`;

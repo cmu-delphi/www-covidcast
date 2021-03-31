@@ -12,6 +12,7 @@
     resetOnClearHighlighTuple,
     MULTI_COLORS,
     genDateHighlight,
+    genAnnotationLayer,
   } from '../../specs/lineSpec';
   import { toTimeValue } from '../../stores/params';
   import Toggle from './Toggle.svelte';
@@ -19,7 +20,9 @@
   import { combineSignals } from '../../data/utils';
   import DownloadMenu from './components/DownloadMenu.svelte';
   import { formatDateISO } from '../../formats';
-  import { isMobileDevice } from '../../stores';
+  import { annotationManager, isMobileDevice } from '../../stores';
+  import IndicatorAnnotation from './IndicatorAnnotation.svelte';
+  import IndicatorAnnotations from './IndicatorAnnotations.svelte';
 
   export let height = 250;
 
@@ -184,7 +187,10 @@
     )}${suffix}`;
   }
 
-  function injectRanges(spec, date) {
+  function injectRanges(spec, date, annotations) {
+    if (annotations.length > 0) {
+      spec.layer.unshift(genAnnotationLayer(annotations, date.windowTimeFrame));
+    }
     if (starts && starts > date.windowTimeFrame.min) {
       spec.layer.unshift(genDateHighlight(starts > date.windowTimeFrame.max ? date.windowTimeFrame.max : starts));
     }
@@ -197,10 +203,16 @@
   let zoom = false;
   let singleRaw = false;
 
-  $: raw = singleRaw && sensor.rawValue != null;
-  $: spec = injectRanges(genSpec(sensor, region, date, height, !zoom, raw, $isMobileDevice), date);
-  $: data = raw ? loadSingleData(sensor, region, date) : loadData(sensor, region, date);
   $: regions = raw ? [region.value] : resolveRegions(region.value);
+  $: annotations = $annotationManager.getWindowAnnotations(
+    sensor.value,
+    regions,
+    date.windowTimeFrame.min,
+    date.windowTimeFrame.max,
+  );
+  $: raw = singleRaw && sensor.rawValue != null;
+  $: spec = injectRanges(genSpec(sensor, region, date, height, !zoom, raw, $isMobileDevice), date, annotations);
+  $: data = raw ? loadSingleData(sensor, region, date) : loadData(sensor, region, date);
   $: fileName = generateFileName(sensor, regions, date, raw);
 
   function findValue(region, data, date, prop = 'value') {
@@ -218,7 +230,7 @@
   let highlightRegion = null;
 
   function highlight(r) {
-    highlightRegion = r ? r.id : null;
+    highlightRegion = r ? r.id : region.value.id;
   }
 
   $: {
@@ -265,6 +277,9 @@
           {#if r.id !== region.id && r.id !== neighboringInfo.id}
             <a href="?region={r.propertyId}" on:click|preventDefault={() => region.set(r, true)}> {r.displayName} </a>
           {:else}{r.displayName}{/if}
+          {#if regions.length > 1 && r.id !== neighboringInfo.id}
+            <IndicatorAnnotations asHint {sensor} region={r} {date} range="window" />
+          {/if}
         </span>
       </div>
       <div>
@@ -281,6 +296,10 @@
     </div>
   {/each}
 </div>
+
+{#each annotations as annotation}
+  <IndicatorAnnotation {annotation} />
+{/each}
 
 <style>
   .legend {

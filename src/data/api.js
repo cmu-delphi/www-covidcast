@@ -3,7 +3,7 @@ import { levelMegaCounty } from '../stores/constants';
 
 const ENDPOINT = process.env.COVIDCAST_ENDPOINT_URL;
 
-const fetchOptions = process.env.NODE_ENV === 'development' ? { cache: 'force-cache' } : {};
+export const fetchOptions = process.env.NODE_ENV === 'development' ? { cache: 'force-cache' } : {};
 
 /**
  * @param {string | (id: string, signal: string, level: string, date: Date | string, region: string) => any} endpoint
@@ -18,7 +18,7 @@ export function callAPIEndPoint(endpoint, id, signal, level, date, region, field
     return Promise.resolve(endpoint(id, signal, level, date, region, fields));
   }
   const url = new URL(endpoint || ENDPOINT);
-  url.searchParams.set('source', 'covidcast');
+  url.searchParams.set('endpoint', 'covidcast');
   url.searchParams.set('data_source', id);
   url.searchParams.set('signal', signal);
   // mega counties are stored as counties
@@ -67,8 +67,8 @@ export function callMetaAPI(dataSignals, fields, filters) {
   const url = new URL(ENDPOINT);
   const urlGet = new URL(ENDPOINT);
   const data = new FormData();
-  data.set('source', 'covidcast_meta');
-  urlGet.searchParams.set('source', data.get('source'));
+  data.set('endpoint', 'covidcast_meta');
+  urlGet.searchParams.set('endpoint', data.get('endpoint'));
 
   if (dataSignals && dataSignals.length > 0) {
     const signals = dataSignals
@@ -103,4 +103,14 @@ export function callMetaAPI(dataSignals, fields, filters) {
     method: 'POST',
     body: data,
   }).then((d) => d.json());
+}
+
+/**
+ *
+ * @returns
+ */
+export function callSignalAPI() {
+  const url = new URL(ENDPOINT);
+  url.searchParams.set('source', 'signal_dashboard_status');
+  return fetch(url.toString(), fetchOptions).then((d) => d.json());
 }

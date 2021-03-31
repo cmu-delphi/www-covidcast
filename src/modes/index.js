@@ -62,12 +62,20 @@ const modes = [
     label: 'Lab',
     component: () => import(/* webpackChunkName: 'mode-lab' */ './lab/Lab.svelte').then((r) => r.default),
   },
+  {
+    id: 'indicator-status',
+    label: 'Indicator Status Overview',
+    component: () =>
+      import(/* webpackChunkName: 'm-indicator-status' */ './indicator-status/IndicatorStatusOverview.svelte').then(
+        (r) => r.default,
+      ),
+  },
 ];
 
 export default modes;
 
 /**
- * @type {Record<'summary'|'timelapse'|'top10'|'export'|'single'|'survey-results'|'lab'|'classic'|'indicator'|'landing', Mode>}
+ * @type {Record<'summary'|'timelapse'|'top10'|'export'|'single'|'survey-results'|'lab'|'classic'|'indicator'|'landing'|'indicator-status', Mode>}
  */
 export const modeByID = {};
 modes.forEach((mode) => (modeByID[mode.id] = mode));
