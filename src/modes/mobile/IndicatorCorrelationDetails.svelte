@@ -136,6 +136,7 @@
       </td>
     </tr>
   </table>
+  <br />
 
   <div class="uk-container content-grid">
     <div class="chart-300">
