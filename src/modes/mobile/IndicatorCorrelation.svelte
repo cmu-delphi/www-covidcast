@@ -5,22 +5,10 @@
   import { scrollToTop } from '../../util';
   import FancyHeader from './FancyHeader.svelte';
 
-  /*
-   * type {import("../../stores/params").DateParam}
-   */
-  //   let date;
-  /*
-   * type {import("../../stores/params").RegionParam}
-   */
-  // let region;
   /**
    * @type {import("../../stores/params").SensorParam}
    */
   export let sensor;
-  /*
-   * type {import("../../stores/params").DataFetcher}
-   */
-  // let fetcher;
 
   $: otherSensors = sensorList.filter((d) => d.key !== sensor.key);
 
