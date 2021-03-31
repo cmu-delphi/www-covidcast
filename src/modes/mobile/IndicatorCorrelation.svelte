@@ -75,9 +75,9 @@
   <thead>
     <tr>
       <th class="mobile-th"><span>Indicator</span></th>
-      <th class="mobile-th"><span>R<sup>2</sup></span></th>
-      <th class="mobile-th"><span>Max R<sup>2</sup></span></th>
-      <th class="mobile-th"><span>Lag at Max R<sup>2</sup></span></th>
+      <th class="mobile-th uk-text-right"><span>R<sup>2</sup></span></th>
+      <th class="mobile-th uk-text-right"><span>Max R<sup>2</sup></span></th>
+      <th class="mobile-th uk-text-right"><span>Lag at Max R<sup>2</sup></span></th>
       <th class="mobile-th" />
     </tr>
   </thead>
@@ -94,20 +94,20 @@
           </a>
         </td>
         {#await sensor.metrics}
-          <td><p>...</p></td>
-          <td><p>...</p></td>
-          <td><p>...</p></td>
+          <td class="uk-text-right">&hellip;</td>
+          <td class="uk-text-right">&hellip;</td>
+          <td class="uk-text-right">&hellip;</td>
         {:then m}
-          <td><p>{formatValue(m.r2At0)}</p></td>
-          <td><p>{formatValue(m.r2AtMaxR2)}</p></td>
-          <td><p>{formatValue(m.lagAtMaxR2)}</p></td>
+          <td class="uk-text-right">{formatValue(m.r2At0)}</td>
+          <td class="uk-text-right">{formatValue(m.r2AtMaxR2)}</td>
+          <td class="uk-text-right">{m.lagAtMaxR2.toLocaleString()}</td>
         {:catch err}
-          <td colspan="3"><p>{err.message}</p></td>
+          <td colspan="3" class="small">{err.message}</td>
         {/await}
         <td>
           <a
             href="../correlation/?sensor2={sensor.key}"
-            class="uk-link-text"
+            class="uk-link-text details-link"
             on:click|preventDefault={() => switchMode(sensor)}
           >
             {@html chevronRightIcon}
@@ -117,3 +117,15 @@
     {/each}
   </tbody>
 </table>
+
+<style>
+  .details-link {
+    width: 6px;
+    display: inline-block;
+    fill: currentColor;
+  }
+
+  .small {
+    font-size: 0.75rem;
+  }
+</style>
