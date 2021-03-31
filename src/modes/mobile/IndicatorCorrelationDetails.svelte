@@ -93,7 +93,7 @@
   $: sensorDetailsLag = 0;
 </script>
 
-<div>
+<div class="mobile-root">
   <IndicatorCorrelationChart
     {sensorCorrelationData}
     {primary}
@@ -137,10 +137,12 @@
     </tr>
   </table>
 
-  <div class="chart-300">
-    <HistoryLineChart sensor={primary} {date} {region} {fetcher} />
-  </div>
-  <div class="chart-300">
-    <HistoryLineChart sensor={secondary} {date} {region} {fetcher} />
+  <div class="uk-container content-grid">
+    <div class="chart-300">
+      <HistoryLineChart sensor={primary} {date} {region} {fetcher} />
+    </div>
+    <div class="chart-300">
+      <HistoryLineChart sensor={secondary} {date} {region} {fetcher} />
+    </div>
   </div>
 </div>
