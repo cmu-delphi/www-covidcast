@@ -64,7 +64,7 @@ npm run cy:open
 
 ### Release Process
 
-The release consists of multiple stets which can be all done via the GitHub website:
+The release consists of multiple steps which can be all done via the GitHub website:
 
 1. Go to [create_release GitHub Action](https://github.com/cmu-delphi/www-covidcast/actions/workflows/create_release.yml) and click the `Run workflow` button. Enter the next version number or one of the magic keywords (patch, minor, major) and hit the green `Run workflow` button.
 1. The action will prepare a new release and will end up with a new [Pull Request](https://github.com/cmu-delphi/www-covidcast/pulls)
