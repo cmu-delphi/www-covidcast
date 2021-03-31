@@ -116,7 +116,7 @@ jobs:
       - name: Create pull request into dev
         uses: peter-evans/create-pull-request@v3
         with:
-          token: ${{ secrets.CMU_DELPHI_DEPLOY_MACHINE_TOKEN }}
+          token: ${{ secrets.CMU_DELPHI_DEPLOY_MACHINE_PAT }}
           branch: bot/sync-main-dev
           commit-message: 'chore: sync main-dev'
           base: dev
