@@ -5,22 +5,22 @@
   import { scrollToTop } from '../../util';
   import FancyHeader from './FancyHeader.svelte';
 
-  /**
-   * @type {import("../../stores/params").DateParam}
+  /*
+   * type {import("../../stores/params").DateParam}
    */
-  export let date;
-  /**
-   * @type {import("../../stores/params").RegionParam}
+  //   let date;
+  /*
+   * type {import("../../stores/params").RegionParam}
    */
-  export let region;
+  // let region;
   /**
    * @type {import("../../stores/params").SensorParam}
    */
   export let sensor;
-  /**
-   * @type {import("../../stores/params").DataFetcher}
+  /*
+   * type {import("../../stores/params").DataFetcher}
    */
-  export let fetcher;
+  // let fetcher;
 
   $: otherSensors = sensorList.filter((d) => d.key !== sensor.key);
 
@@ -47,8 +47,7 @@
           <a
             href="../correlation/?sensor2={sensor.key}"
             class="uk-link-text"
-            on:click|preventDefault={() => switchMode(sensor)}
-          >
+            on:click|preventDefault={() => switchMode(sensor)}>
             {sensor.name}
           </a>
         </td>
@@ -56,8 +55,7 @@
           <a
             href="../correlation/?sensor2={sensor.key}"
             class="uk-link-text"
-            on:click|preventDefault={() => switchMode(sensor)}
-          >
+            on:click|preventDefault={() => switchMode(sensor)}>
             {@html chevronRightIcon}
           </a>
         </td>
