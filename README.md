@@ -10,51 +10,71 @@ The next `dev` version is deployed at https://dev--cmu-delphi-covidcast.netlify.
 
 ## Figma Mock-Ups
 
-Located at: https://www.figma.com/file/CZ3YwWBL2md9j39qdcBfDs/COVIDCast?node-id=0%3A1
+Located at: [Figma Delphi-Site-Redesign](https://www.figma.com/file/IiYu74VmEi4GVS4bnYaTd6/Delphi-Site-Redesign).
 
 ## Development Environment
+
+One click solution: [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/cmu-delphi/www-covidcast)
 
 `node` and `npm` are required for development.
 
 To begin development, clone this repository and run
 
-`npm install`
+```sh
+npm install
+```
 
 To lint or check for styling, run
 
-`npm run lint`
+```sh
+npm run lint
+```
 
 To run unit test, run
 
-`npm run test`
+```sh
+npm test
+```
 
 To run e2e test, run
 
-`npm run build && npm run test:e2e`
+```sh
+npm run build
+```
 
 To run the development server, run
 
-`npm start`
+```sh
+npm start
+```
 
-the website should open automatically.
+the website is then accessible via: http://localhost:8080/
 
 To run e2e test against the development server, run
 
-`npm start`
+```sh
+npm start
+```
+
 in a separate shell:
 
-`npm run cy:open`
+```sh
+npm run cy:open
+```
 
 ### Release Process
 
-To create a release, run
+The release consists of multiple stets which can be all done via the GitHub website:
 
-1. create a release branch `release-vX.X.X` and push to origin
-1. run `npm run release` and publish the release
-1. create a PR that merges the `release` branch in the `main` branch
-1. create a PR that merges the `main` branch back into the `dev` branch
-
-Then go to the release page and update short description of the changes made.
+1. Go to [create_release GitHub Action](https://github.com/cmu-delphi/www-covidcast/actions/workflows/create_release.yml) and click the `Run workflow` button. Enter the next version number or one of the magic keywords (patch, minor, major) and hit the green `Run workflow` button.
+1. The action will prepare a new release and will end up with a new [Pull Request](https://github.com/cmu-delphi/www-covidcast/pulls)
+1. Let the code owner review the PR and its changes and let the CI check whether everything builds successfully
+1. Once approved and merged, another GitHub action job starts which automatically will
+   1. create a git tag
+   1. create another [Pull Request](https://github.com/cmu-delphi/www-covidcast/pulls) to merge the changes back to the `dev` branch
+   1. create a [GitHub release](https://github.com/cmu-delphi/www-covidcast/releases) with automatically derived release notes
+   1. create a [Pull Request in www-main](https://github.com/cmu-delphi/www-main/pulls) to update the website to the new release
+1. Done
 
 ## License
 
