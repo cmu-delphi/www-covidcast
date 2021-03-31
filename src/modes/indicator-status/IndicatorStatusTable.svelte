@@ -109,9 +109,9 @@
       <th class="mobile-th uk-text-right">Latest Issue</th>
       <th class="mobile-th uk-text-right">Latest Data Available</th>
       <th class="mobile-th uk-text-right">Lag to Today</th>
-      <th class="mobile-th uk-text-right">Latest Coverage</th>
+      <th class="mobile-th uk-text-right">Latest County Coverage</th>
       <th class="mobile-th uk-text-right">
-        <span>Coverage</span>
+        <span>County Coverage</span>
         <div class="mobile-th-range">
           <span> {formatDateShortNumbers(domain.min)} </span>
           <span> {formatDateShortNumbers(domain.max)} </span>
