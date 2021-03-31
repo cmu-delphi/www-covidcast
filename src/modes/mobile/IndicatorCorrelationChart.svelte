@@ -164,7 +164,7 @@
                   as: 'xmean',
                 },
               ],
-              frame: [-6, 0],
+              frame: [0, 0], // To smooth, replace with e.g. [-6, 0]
             },
             {
               window: [
@@ -175,7 +175,7 @@
                   as: 'ymean',
                 },
               ],
-              frame: [-6, 0],
+              frame: [0, 0], // To smooth, replace with e.g. [6, 0]
             },
           ],
           layer: [
