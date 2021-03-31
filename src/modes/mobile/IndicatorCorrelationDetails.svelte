@@ -1,22 +1,24 @@
 <script>
   import IndicatorCorrelationChart from './IndicatorCorrelationChart.svelte';
   import HistoryLineChart from './HistoryLineChart.svelte';
+  import Vega from '../../components/Vega.svelte';
 
   import { currentRegionInfo, currentSensorEntry, currentDateObject, isMobileDevice, times } from '../../stores';
   import { DateParam, RegionParam, DataFetcher } from '../../stores/params'; // DataFetcher
 
-  $: sliderLags = $isMobileDevice ? [-28, -14, 0, 14, 28] : [-28, -21, -14, -7, 0, 7, 14, 21, 28];
+  import { generateCorrelationMetrics } from '../../data/utils.js';
+
   $: chartPadding = $isMobileDevice
     ? { left: 20, right: 10, top: 10, bottom: 40 }
     : { left: 20, right: 50, top: 20, bottom: 15 };
   $: sizeLegend = $isMobileDevice
     ? { orient: 'bottom', direction: 'horizontal', title: '' }
     : {
-        orient: 'right',
-        direction: 'vertical',
+        orient: 'top',
+        direction: 'horizontal',
         symbolType: 'square',
         symbolStrokeWidth: 2,
-        title: 'Date',
+        title: ' ',
       };
 
   $: mainChartOptions = {
@@ -96,6 +98,27 @@
   // $: lagMS = sensorDetailsLag * 1000 * 3600 * 24;
   // $: primarytDate = new DateParam(new Date($currentDateObject.getTime() - lagMS), $currentSensorEntry, $times);
   // $: secondaryDate = new DateParam(new Date($currentDateObject.getTime() + lagMS), $currentSensorEntry, $times);
+  console.info(primaryData, secondaryData);
+  const lagVsR2 = generateCorrelationMetrics(primaryData, secondaryData).lags;
+  const lagVsR2Spec = {
+    $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
+    // autosize: 'fit',
+    padding: { left: 20, bottom: 25, right: 10 },
+    height: 50,
+    width: 420,
+    data: { name: 'values' },
+    mark: 'line',
+    encoding: {
+      x: {
+        field: 'lag',
+        type: 'quantitative',
+      },
+      y: {
+        field: 'r2',
+        type: 'quantitative',
+      },
+    },
+  };
 </script>
 
 <div class="mobile-root">
@@ -106,41 +129,24 @@
     lag={sensorDetailsLag}
     options={mainChartOptions} />
 
-  <table class="mobile-table">
-    <tr>
-      <td>Lag:</td>
-      <td>
-        <input
-          type="range"
-          min="-28"
-          max="28"
-          step="1"
-          value={sensorDetailsLag}
-          on:mousemove={(e) => {
-            sensorDetailsLag = e.target.value;
-          }}
-          on:click={(e) => {
-            sensorDetailsLag = e.target.value;
-          }}
-          style="width: 100%;" />
-        <table class="mobile-table" style="width: 100%; height: 50px">
-          <tr>
-            {#each sliderLags as lag}
-              <td style="width: 50px; height: 50px">
-                <IndicatorCorrelationChart
-                  {sensorCorrelationData}
-                  {primary}
-                  {secondary}
-                  {lag}
-                  on:click={() => (sensorDetailsLag = lag)}
-                  options={sliderChartOptions} />
-              </td>
-            {/each}
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
+  <input
+    type="range"
+    min="-28"
+    max="28"
+    step="1"
+    value={sensorDetailsLag}
+    on:mousemove={(e) => {
+      sensorDetailsLag = e.target.value;
+    }}
+    on:click={(e) => {
+      sensorDetailsLag = e.target.value;
+    }}
+    style="width:450px;  margin-left: 35px" />
+
+  <div style="width: 100%">
+    <Vega data={lagVsR2} spec={lagVsR2Spec} />
+  </div>
+
   <br />
 
   <div class="uk-container content-grid">
