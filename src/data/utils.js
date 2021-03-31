@@ -99,25 +99,31 @@ function zip(a, b) {
   });
 }
 /**
- * Do a pair-wise combination of values by date.  The result contains only an intersection of the values for dates in both sets
+ * Do a pair-wise intersection of EpiDataRow by date.
  * @param {EpiDataRow[]} a
  * @param {EpiDataRow[]} b
  * @returns {[number, number][]}
  */
-function zipEpiDataRow(a, b) {
-  const bMap = b.reduce((acc, row) => {
-    return acc.set(row.time_value, row);
-  }, new Map());
+function intersectEpiDataRow(a, b) {
+  const aLength = a.length;
+  const bLength = b.length;
+  let aIndex = 0;
+  let bIndex = 0;
+  const intersection = [];
 
-  const zippedData = a.reduce((acc, row) => {
-    if (bMap.has(row.time_value)) {
-      acc.push([row.value, bMap.get(row.time_value).value]);
-      return acc;
+  while (aIndex < aLength && bIndex < bLength) {
+    if (a[aIndex].time_value < b[bIndex].time_value) {
+      aIndex++;
+    } else if (a[aIndex].time_value > b[bIndex].time_value) {
+      bIndex++;
     } else {
-      return acc;
+      intersection.push([a[aIndex].value, b[bIndex].value]);
+      aIndex++;
+      bIndex++;
     }
-  }, []);
-  return zippedData;
+  }
+
+  return intersection;
 }
 
 /**
@@ -128,7 +134,7 @@ function zipEpiDataRow(a, b) {
  * @returns {CorrelationMetric}
  */
 export function generateCorrelationMetrics(response, explanatory) {
-  const zippedEpiData = zipEpiDataRow(response, explanatory);
+  const zippedEpiData = intersectEpiDataRow(response, explanatory);
   const responseValues = zippedEpiData.map((row) => row[0]);
   const explanatoryValues = zippedEpiData.map((row) => row[1]);
 
