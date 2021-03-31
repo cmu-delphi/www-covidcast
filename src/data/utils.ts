@@ -56,6 +56,11 @@ export interface CorrelationMetric {
 }
 
 /**
+ * Use this many days of lag to compute correlation metrics
+ */
+const lag = 28;
+
+/**
  * Generates R^2 metrics for lags between -28 and 28 days.
  *
  * For lags between 0 and 28 lag b backwards with respect to a.  For -28 to -1 lag a with
@@ -65,8 +70,7 @@ export interface CorrelationMetric {
  * each lag is the same.
  *
  */
-function generateLags(a: number[], b: number[]): Lag[] {
-  const lag = 28;
+function generateLags(a: readonly number[], b: readonly number[]): Lag[] {
   const lags: Lag[] = [];
   const aWindow = a.slice(lag);
   const bWindow = b.slice(lag);
@@ -86,21 +90,56 @@ function generateLags(a: number[], b: number[]): Lag[] {
 }
 
 /**
+ * Do a pair-wise intersection of EpiDataRow by date.
+ */
+function intersectEpiDataRow(a: readonly EpiDataRow[], b: readonly EpiDataRow[]): [number, number][] {
+  const aLength = a.length;
+  const bLength = b.length;
+  let aIndex = 0;
+  let bIndex = 0;
+  const intersection: [number, number][] = [];
+
+  while (aIndex < aLength && bIndex < bLength) {
+    if (a[aIndex].time_value < b[bIndex].time_value) {
+      aIndex++;
+    } else if (a[aIndex].time_value > b[bIndex].time_value) {
+      bIndex++;
+    } else {
+      intersection.push([a[aIndex].value, b[bIndex].value]);
+      aIndex++;
+      bIndex++;
+    }
+  }
+
+  return intersection;
+}
+
+/**
  * Compute 28-day correlation metrics for a response variable given an explanatory variable.
  *
  */
-export function generateCorrelationMetrics(response: EpiDataRow[], explanatory: EpiDataRow[]): CorrelationMetric {
-  const response_values = response.map((row) => row.value);
-  const explanatory_values = explanatory.map((row) => row.value);
+export function generateCorrelationMetrics(
+  response: readonly EpiDataRow[],
+  explanatory: readonly EpiDataRow[],
+): CorrelationMetric {
+  const zippedEpiData = intersectEpiDataRow(response, explanatory);
+  if (zippedEpiData.length < lag * 2) {
+    throw new Error(
+      `Not enough data: There are only ${zippedEpiData.length} dates in both indicators in this time range.`,
+    );
+  }
+  const responseValues = zippedEpiData.map((row) => row[0]);
+  const explanatoryValues = zippedEpiData.map((row) => row[1]);
 
-  const model = linear(zip(response_values, explanatory_values));
-  const lags = generateLags(response_values, explanatory_values);
+  const lags = generateLags(responseValues, explanatoryValues);
   const max = lags.reduce((acc, i) => {
     return i.r2 > acc.r2 ? i : acc;
   });
 
+  const lagAtZero = lags.filter((l) => l.lag == 0)[0];
+
   return {
-    r2At0: model.r2,
+    r2At0: lagAtZero.r2,
     lagAtMaxR2: max.lag,
     r2AtMaxR2: max.r2,
     lags: lags,
