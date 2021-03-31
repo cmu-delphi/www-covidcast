@@ -49,4 +49,9 @@ describe('correlationMetrics', () => {
     expect(actual_metrics.r2AtMaxR2).toEqual(expected_metrics.r2AtMaxR2);
     expect(actual_metrics.lags.length).toEqual(28 * 2 + 1);
   });
+  test('Signals with not enough overlap should error.', async () => {
+    expect(() => {
+      generateCorrelationMetrics(cases_national, safegraph_full_time_national.slice(-30));
+    }).toThrow();
+  });
 });

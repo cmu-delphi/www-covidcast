@@ -5,6 +5,7 @@
   import { SensorParam } from '../../stores/params';
   import { scrollToTop } from '../../util';
   import { generateCorrelationMetrics } from '../../data/utils';
+  import { formatValue } from '../../formats';
   import FancyHeader from './FancyHeader.svelte';
 
   /**
@@ -97,9 +98,11 @@
           <td><p>...</p></td>
           <td><p>...</p></td>
         {:then m}
-          <td><p>{m.r2At0}</p></td>
-          <td><p>{m.r2AtMaxR2}</p></td>
-          <td><p>{m.lagAtMaxR2}</p></td>
+          <td><p>{formatValue(m.r2At0)}</p></td>
+          <td><p>{formatValue(m.r2AtMaxR2)}</p></td>
+          <td><p>{formatValue(m.lagAtMaxR2)}</p></td>
+        {:catch err}
+          <td colspan="3"><p>{err.message}</p></td>
         {/await}
         <td>
           <a
