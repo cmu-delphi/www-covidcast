@@ -67,8 +67,10 @@
       </button>
       <h2>Explore <span>Correlations</span></h2>
     </div>
-    <IndicatorDropdown sensor={primary} />
-    <IndicatorDropdown sensor={secondary} />
+    <div class="uk-container content-grid uk-margin-remove-vertical">
+      <IndicatorDropdown sensor={primary} className="grid-3-7" />
+      <IndicatorDropdown sensor={secondary} className="grid-7-11" />
+    </div>
   </SurveyParameters>
 
   <div class="uk-container content-grid">

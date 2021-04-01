@@ -53,7 +53,9 @@
       </button>
       <h2>Explore an <span>Indicator</span></h2>
     </div>
-    <IndicatorDropdown {sensor} />
+    <div class="uk-container content-grid uk-margin-remove-vertical">
+      <IndicatorDropdown {sensor} />
+    </div>
   </SurveyParameters>
   <div class="uk-container content-grid">
     <div class="grid-3-11">

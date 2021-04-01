@@ -7,6 +7,8 @@
    */
   export let sensor;
 
+  export let className = 'grid-3-11';
+
   let open = false;
 
   function switchSensor(newSensor) {
@@ -14,36 +16,39 @@
     // debounce
     setTimeout(() => sensor.set(newSensor), 10);
   }
+
+  function stopPropagation(e) {
+    if (open) {
+      e.stopPropagation();
+    }
+  }
 </script>
 
-<div class="uk-container content-grid parameters">
-  <div class="dropdown-container grid-3-11" class:open on:click|stopPropagation={() => undefined}>
-    <button type="button" class="trigger" on:click={() => (open = !open)}>
-      {sensor.value.name}
-      <span class="inline-svg-icon down-icon">
-        {@html caretDownIcon}
-      </span>
-    </button>
-    <ul class="content">
-      {#each groupedSensorList as group}
-        <li>
-          <div class="mobile-h3">{group.label}</div>
-          <ul>
-            {#each group.sensors as sensor}
-              <li>
-                <a
-                  class="uk-text-muted"
-                  href="?sensor={sensor.key}"
-                  on:click|preventDefault={() => switchSensor(sensor)}>{sensor.name}</a
-                >
-              </li>
-            {/each}
-          </ul>
-        </li>
-      {/each}
-    </ul>
-  </div>
+<div class="dropdown-container {className}" class:open on:click={stopPropagation}>
+  <button type="button" class="trigger" on:click={() => (open = !open)}>
+    {sensor.value.name}
+    <span class="inline-svg-icon down-icon">
+      {@html caretDownIcon}
+    </span>
+  </button>
+  <ul class="content">
+    {#each groupedSensorList as group}
+      <li>
+        <div class="mobile-h3">{group.label}</div>
+        <ul>
+          {#each group.sensors as sensor}
+            <li>
+              <a class="uk-text-muted" href="?sensor={sensor.key}" on:click|preventDefault={() => switchSensor(sensor)}
+                >{sensor.name}</a
+              >
+            </li>
+          {/each}
+        </ul>
+      </li>
+    {/each}
+  </ul>
 </div>
+
 <svelte:window
   on:click={() => {
     if (open) {
@@ -53,14 +58,13 @@
 />
 
 <style>
-  .parameters {
+  .dropdown-container {
     margin-top: 6px;
     margin-bottom: 6px;
-  }
-  .dropdown-container {
     margin-top: 0.5rem;
     display: flex;
     flex-direction: column;
+    position: relative;
   }
   .trigger {
     position: relative;
@@ -95,13 +99,20 @@
   }
 
   .content {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    min-width: 100%;
+    box-sizing: border-box;
     display: none;
     border: 1px solid #d3d4d8;
     border-radius: 3px;
     list-style: none;
     background: white;
-    margin: 6px 0;
-    padding-bottom: 0.5em;
+    margin: 1px 0 0 0;
+    /* padding: 6px 0 0.5em; */
+    padding: 0.5em 1em 0.5em 1em;
+    z-index: 1;
   }
 
   .down-icon {
@@ -111,6 +122,7 @@
 
   .content ul {
     list-style: none;
+    padding-left: 1em;
   }
 
   .open > .content {
