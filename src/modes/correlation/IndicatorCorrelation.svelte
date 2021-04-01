@@ -21,6 +21,7 @@
   import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
   import FancyHeader from '../mobile/FancyHeader.svelte';
   import { MULTI_COLORS } from '../../specs/lineSpec';
+  import AboutSection from '../mobile/components/AboutSection.svelte';
 
   $: primary = new SensorParam($currentSensorEntry);
   $: secondary = new SensorParam($currentSensorEntry2, currentSensor2);
@@ -79,13 +80,21 @@
       <LagChart {primary} {secondary} {date} {region} {fetcher} />
       <input type="range" min={-28} max={28} step={1} bind:value={$currentLag} class="range-selector" />
 
+      <hr />
       <FancyHeader invert sub="Chart at Lag {$currentLag} days">Correlation</FancyHeader>
       <IndicatorCorrelationChart {primary} {secondary} {date} {region} {fetcher} lag={$currentLag} />
-
+    </div>
+    <AboutSection>
+      <h3 class="mobile-h3">About Snake</h3>
+      <p>Test</p>
+    </AboutSection>
+    <div class="grid-3-11">
+      <hr />
       <FancyHeader invert sub="Chart">{primary.name}</FancyHeader>
       <div class="chart-300">
         <HistoryLineChart sensor={primary} {date} {region} {fetcher} singleRegionOnly domain={domains.primary} />
       </div>
+      <hr />
       <FancyHeader invert sub="Chart">{secondary.name}</FancyHeader>
       <div class="chart-300">
         <!-- TODO lag based date highlight -->
