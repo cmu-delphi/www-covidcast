@@ -33,12 +33,17 @@ export function resetOnClearHighlighTuple(date) {
   };
 }
 
-export function resolveHighlightedDate(e, dateField = 'date_value') {
+export function resolveHighlightedField(e, field) {
   const highlighted = e.detail.value;
-  if (highlighted && Array.isArray(highlighted[dateField]) && highlighted[dateField].length > 0) {
-    return new Date(highlighted[dateField][0]);
+  if (highlighted && Array.isArray(highlighted[field]) && highlighted[field].length > 0) {
+    return highlighted[field][0];
   }
   return null;
+}
+
+export function resolveHighlightedDate(e, field = 'date_value') {
+  const value = resolveHighlightedField(e, field);
+  return value != null ? new Date(value) : value;
 }
 
 export const signalPatches = {
@@ -53,7 +58,7 @@ export const signalPatches = {
 //   };
 // }
 
-function autoAlign(dateField = 'date_value') {
+export function autoAlign(dateField = 'date_value') {
   return {
     // auto align based on remaining space
     expr: `(width - scale('x', datum.${dateField})) < 40 ? 'right' : (scale('x', datum.${dateField})) > 40 ? 'center' : 'left'`,

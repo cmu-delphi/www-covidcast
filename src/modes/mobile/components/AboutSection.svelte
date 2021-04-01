@@ -1,7 +1,5 @@
-<div class="uk-container content-grid">
-  <div class="grid-3-11 mobile-invert">
-    <slot />
-  </div>
+<div class="grid-3-11 mobile-invert">
+  <slot />
 </div>
 
 <style>

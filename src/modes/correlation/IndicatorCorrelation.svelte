@@ -77,9 +77,23 @@
   <div class="uk-container content-grid">
     <div class="grid-3-11">
       <FancyHeader invert sub="Chart">R<sup>2</sup></FancyHeader>
-      <LagChart {primary} {secondary} {date} {region} {fetcher} />
-      <input type="range" min={-28} max={28} step={1} bind:value={$currentLag} class="range-selector" />
-
+      <LagChart
+        {primary}
+        {secondary}
+        {date}
+        {region}
+        {fetcher}
+        lag={$currentLag}
+        on:highlight={(e) => {
+          const nextLag = e.detail || $currentLag;
+          if (nextLag != $currentLag) {
+            currentLag.set(nextLag);
+          }
+        }}
+      />
+      <p>
+        Click on the R<sup>2</sup> chart to select a different lag
+      </p>
       <hr />
       <FancyHeader invert sub="Chart at Lag {$currentLag} days">Correlation</FancyHeader>
       <IndicatorCorrelationChart {primary} {secondary} {date} {region} {fetcher} lag={$currentLag} />
@@ -97,7 +111,6 @@
       <hr />
       <FancyHeader invert sub="Chart">{secondary.name}</FancyHeader>
       <div class="chart-300">
-        <!-- TODO lag based date highlight -->
         <HistoryLineChart
           sensor={secondary}
           {date}
