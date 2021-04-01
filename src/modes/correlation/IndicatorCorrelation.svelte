@@ -74,6 +74,7 @@
       </div>
       <FancyHeader invert sub="Chart">{secondary.name}</FancyHeader>
       <div class="chart-300">
+        <!-- TODO lag based date highlight -->
         <HistoryLineChart sensor={secondary} {date} {region} {fetcher} singleRegionOnly color={MULTI_COLORS[1]} />
       </div>
     </div>

@@ -1,14 +1,7 @@
 <script>
   import Vega from '../../components/Vega.svelte';
   import { generateCorrelationMetrics } from '../../data/utils';
-
-  /**
-   * @typedef {import('../../stores/constants').SensorEntry} SensorEntry
-   */
-
-  /**
-   * @typedef {import("../../src/data/util").CorrelationMetric} CorrelationMetric
-   */
+  import { genCreditsLayer } from '../../specs/lineSpec';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -44,25 +37,56 @@
 
   $: data = loadData(primary, secondary, region, date);
 
-  const spec = {
-    $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
-    // autosize: 'fit',
-    padding: { left: 20, bottom: 25, right: 10 },
-    height: 50,
-    width: 420,
-    data: { name: 'values' },
-    mark: 'line',
-    encoding: {
-      x: {
-        field: 'lag',
-        type: 'quantitative',
-      },
-      y: {
-        field: 'r2',
-        type: 'quantitative',
-      },
+  $: spec = {
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+    autosize: {
+      type: 'none',
+      contains: 'padding',
+      resize: true,
     },
+    width: 500,
+    height: 100,
+    padding: { top: 42, left: 42, bottom: 55, right: 15 },
+    data: { name: 'values' },
+    title: {
+      text: `R² between ${primary.name} and ${secondary.name} per Lag`,
+      align: 'left',
+      anchor: 'start',
+    },
+    layer: [
+      {
+        mark: 'line',
+        encoding: {
+          x: {
+            field: 'lag',
+            type: 'quantitative',
+            axis: {
+              title: 'Lag',
+              titleFontWeight: 'normal',
+              labelFontSize: 14,
+              labelOverlap: true,
+            },
+          },
+          y: {
+            field: 'r2',
+            type: 'quantitative',
+            axis: {
+              grid: true,
+              title: null,
+              domain: false,
+              tickCount: 5,
+              labelFontSize: 14,
+            },
+          },
+        },
+      },
+      genCreditsLayer(),
+    ],
   };
+
+  // TODO interactive lag selection
 </script>
 
-<Vega {data} {spec} />
+<div class="chart-150">
+  <Vega {data} {spec} />
+</div>

@@ -60,7 +60,7 @@ function autoAlign(dateField = 'date_value') {
   };
 }
 
-function genCreditsLayer({ shift = 55 } = {}) {
+export function genCreditsLayer({ shift = 55 } = {}) {
   /**
    * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
    */
