@@ -10,6 +10,7 @@
     currentSensorEntry,
     currentSensorEntry2,
     times,
+    currentLag,
   } from '../../stores';
   import { DataFetcher, DateParam, RegionParam, SensorParam } from '../../stores/params';
   import SurveyParameters from '../survey/SurveyParameters.svelte';
@@ -38,8 +39,6 @@
     currentMode.set(modeByID.indicator);
   }
 
-  let lag = 0;
-
   /**
    * @param {TimeFrame} timeFrame
    * @param {number} lag
@@ -57,7 +56,7 @@
     };
   }
 
-  $: domains = computeDomains(date.windowTimeFrame, lag);
+  $: domains = computeDomains(date.windowTimeFrame, $currentLag);
 </script>
 
 <div class="mobile-root">
@@ -76,10 +75,10 @@
     <div class="grid-3-11">
       <FancyHeader invert sub="Chart">R<sup>2</sup></FancyHeader>
       <LagChart {primary} {secondary} {date} {region} {fetcher} />
-      <input type="range" min={-28} max={28} step={1} bind:value={lag} class="range-selector" />
+      <input type="range" min={-28} max={28} step={1} bind:value={$currentLag} class="range-selector" />
 
-      <FancyHeader invert sub="Chart at Lag {lag} days">Correlation</FancyHeader>
-      <IndicatorCorrelationChart {primary} {secondary} {date} {region} {fetcher} {lag} />
+      <FancyHeader invert sub="Chart at Lag {$currentLag} days">Correlation</FancyHeader>
+      <IndicatorCorrelationChart {primary} {secondary} {date} {region} {fetcher} lag={$currentLag} />
 
       <FancyHeader invert sub="Chart">{primary.name}</FancyHeader>
       <div class="chart-300">
