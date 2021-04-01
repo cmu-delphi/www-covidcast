@@ -1,9 +1,11 @@
 <script>
   import Vega from '../../components/Vega.svelte';
   import { combineSignals } from '../../data/utils';
-  import { BASE_SPEC } from '../../specs/commonSpec';
+  import { BASE_SPEC, guessTopPadding, joinTitle } from '../../specs/commonSpec';
   import { genCreditsLayer } from '../../specs/lineSpec';
+  import { isMobileDevice } from '../../stores';
   import Toggle from '../mobile/Toggle.svelte';
+  import CorrelationTooltip from './CorrelationTooltip.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -45,7 +47,8 @@
 
   $: data = loadData(primary, secondary, region, date);
 
-  function makeIndicatorCompareSpec(primary, secondary, lag, { zero = true } = {}) {
+  function makeIndicatorCompareSpec(primary, secondary, lag, { zero = true, isMobile } = {}) {
+    const title = joinTitle([`${secondary.name} correlated with`, `${primary.name} lagged by ${lag} days`], isMobile);
     /**
      * @type {import('vega-lite').TopLevelSpec}
      */
@@ -54,58 +57,101 @@
       padding: {
         left: 50,
         right: 10,
-        top: 50,
+        top: guessTopPadding(title, null, 12),
         bottom: 70,
       },
       width: 400,
       height: 400,
-      title: `${secondary.name} correlated with ${primary.name} lagged by ${lag} days`,
+      title: {
+        text: title,
+      },
       transform: [
         {
           window: [
             {
               op: 'lag',
-              param: lag >= 0 ? lag : 0,
+              param: Math.max(lag, 0),
               field: 'date_value',
               as: 'x_date',
             },
             {
               op: 'lag',
-              param: lag >= 0 ? lag : 0,
+              param: Math.max(lag, 0),
               field: primary.key,
               as: 'x',
             },
             {
               op: 'lag',
-              param: lag <= 0 ? -lag : 0,
+              param: -Math.min(lag, 0),
               field: 'date_value',
               as: 'y_date',
             },
             {
               op: 'lag',
-              param: lag <= 0 ? -lag : 0,
+              param: -Math.min(lag, 0),
               field: secondary.key,
               as: 'y',
             },
           ],
         },
-        { as: 'x_title', calculate: `"${primary.name} (" + timeFormat(datum.x_date, "%b %d") + "): " + datum.x` },
-        { as: 'y_title', calculate: `"${secondary.name} (" + timeFormat(datum.y_date, "%b %d") + "): " + datum.y` },
       ],
       layer: [
         {
+          transform: [
+            // snake line
+            {
+              window: [
+                { op: 'lag', param: 1, field: 'x', as: 'nextx' },
+                { op: 'lag', param: 1, field: 'y', as: 'nexty' },
+              ],
+            },
+          ],
           mark: {
-            type: 'point',
+            type: 'rule', // trail doesn't support different colors per segment
+            opacity: 0.7,
+            strokeCap: 'round',
           },
-          // selection: {
-          //   highlight: {
-          //     type: 'single',
-          //     empty: 'none',
-          //     on: 'mouseover',
-          //     nearest: true,
-          //     clear: 'mouseout',
-          //   },
-          // },
+          encoding: {
+            x: { field: 'x', type: 'quantitative' },
+            x2: { field: 'nextx', type: 'quantitative' },
+            y: { field: 'y', type: 'quantitative' },
+            y2: { field: 'nexty', type: 'quantitative' },
+            color: {
+              field: 'x_date',
+              type: 'temporal',
+              scale: {
+                scheme: 'blues',
+              },
+            },
+            size: {
+              field: 'x_date',
+              type: 'temporal',
+              scale: { range: [1, 6] },
+              legend: {
+                orient: 'bottom',
+                direction: 'horizontal',
+                title: false,
+                symbolType: 'square',
+              },
+            },
+          },
+        },
+        {
+          mark: {
+            type: 'circle',
+            tooltip: true,
+          },
+          params: [
+            {
+              name: 'highlight',
+              select: {
+                type: 'point',
+                nearest: true,
+                on: 'mousemove',
+                clear: 'view:mouseout',
+              },
+            },
+          ],
           encoding: {
             x: {
               field: 'x',
@@ -123,35 +169,37 @@
                 zero,
               },
             },
-            tooltip: [
-              {
-                field: 'x_title',
-                title: ' ',
-              },
-              {
-                field: 'y_title',
-                title: '  ', // must be unique?
-              },
-            ],
             opacity: {
-              // condition: [
-              //   {
-              //     selection: 'highlight',
-              //     value: 1,
-              //   },
-              // ],
+              condition: [
+                {
+                  param: 'highlight',
+                  empty: false,
+                  value: 1,
+                },
+              ],
               value: 0.2,
+            },
+            size: {
+              condition: [
+                {
+                  param: 'highlight',
+                  empty: false,
+                  value: 60,
+                },
+              ],
+              value: 30,
             },
           },
         },
         {
+          // regression text
           transform: [
             {
               regression: 'x',
               on: 'y',
               params: true,
             },
-            { calculate: "'R²: '+format(datum.rSquared, '.2f')", as: 'R2' },
+            { calculate: "'R²: ' + format(datum.rSquared, '.2f')", as: 'R2' },
           ],
           mark: {
             type: 'text',
@@ -166,125 +214,29 @@
           },
         },
         {
+          // regression line
           transform: [
-            // {
-            //   window: [
-            //     {
-            //       op: 'mean',
-            //       field: 'x',
-            //       type: 'quantitative',
-            //       as: 'xmean',
-            //     },
-            //   ],
-            //   frame: [0, 0], // To smooth, replace with e.g. [-6, 0]
-            // },
-            // {
-            //   window: [
-            //     {
-            //       op: 'mean',
-            //       field: 'y',
-            //       type: 'quantitative',
-            //       as: 'ymean',
-            //     },
-            //   ],
-            //   frame: [0, 0], // To smooth, replace with e.g. [6, 0]
-            // },
             {
-              calculate: 'datum.x',
-              as: 'xmean',
-            },
-            {
-              calculate: 'datum.y',
-              as: 'ymean',
+              regression: 'x',
+              on: 'y',
             },
           ],
-          layer: [
-            // Draw the "snake" line, a 7-day moving average of the points.
-            {
-              // Get next (or previous?) point along mean, to draw rule.
-              transform: [
-                { window: [{ op: 'lag', param: 1, field: 'xmean', as: 'nextx' }] },
-                { window: [{ op: 'lag', param: 1, field: 'ymean', as: 'nexty' }] },
-              ],
-              mark: {
-                type: 'rule',
-                color: 'gray',
-                opacity: 0.7,
-              },
-              // selection: {
-              //   highlightSnake: {
-              //     type: 'single',
-              //     empty: 'none',
-              //     on: 'mouseover',
-              //     clear: 'mouseout',
-              //   },
-              // },
-              encoding: {
-                x2: { field: 'nextx', type: 'quantitative' },
-                y2: { field: 'nexty', type: 'quantitative' },
-                x: { field: 'xmean', type: 'quantitative' },
-                y: { field: 'ymean', type: 'quantitative' },
-                tooltip: [
-                  {
-                    field: 'x_title',
-                    title: ' ',
-                  },
-                  {
-                    field: 'y_title',
-                    title: '  ', // must be unique?
-                  },
-                ],
-                color: {
-                  field: 'date_value',
-                  type: 'temporal',
-                  scale: {
-                    scheme: 'blues',
-                  },
-                  // condition: [
-                  //   {
-                  //     selection: 'highlightSnake',
-                  //     value: 'black',
-                  //   },
-                  // ],
-                },
-                size: {
-                  field: 'date_value',
-                  type: 'temporal',
-                  scale: { range: [0, 6] },
-                  legend: {
-                    orient: 'bottom',
-                    direction: 'horizontal',
-                    title: '',
-                  },
-                },
-              },
+          // Draw the linear regression line.
+          mark: {
+            type: 'line',
+            strokeWidth: 2,
+            color: 'firebrick',
+          },
+          encoding: {
+            x: {
+              field: 'x',
+              type: 'quantitative',
             },
-            // Draw the linear regression line.
-            {
-              transform: [
-                {
-                  regression: 'x',
-                  on: 'y',
-                },
-              ],
-              mark: {
-                type: 'line',
-                strokeWidth: 2,
-                color: 'firebrick',
-                tooltip: true,
-              },
-              encoding: {
-                x: {
-                  field: 'x',
-                  type: 'quantitative',
-                },
-                y: {
-                  field: 'y',
-                  type: 'quantitative',
-                },
-              },
+            y: {
+              field: 'y',
+              type: 'quantitative',
             },
-          ],
+          },
         },
         genCreditsLayer(),
       ],
@@ -295,11 +247,12 @@
   let scaled = false;
   $: spec = makeIndicatorCompareSpec(primary, secondary, lag, {
     zero: !scaled,
+    isMobile: $isMobileDevice,
   });
 </script>
 
 <div class="chart-correlation">
-  <Vega {data} {spec} />
+  <Vega {data} {spec} tooltip={CorrelationTooltip} tooltipProps={{ primary, secondary, lag }} />
 </div>
 <Toggle bind:checked={scaled}>Rescale X/Y-axis</Toggle>
 
