@@ -13,50 +13,61 @@
   } from '../../stores';
   import { DataFetcher, DateParam, RegionParam, SensorParam } from '../../stores/params';
   import SurveyParameters from '../survey/SurveyParameters.svelte';
-  import './common.css';
-  import IndicatorDropdown from './IndicatorDropdown.svelte';
-  import IndicatorCorrelationDetails from './IndicatorCorrelationDetails.svelte';
+  import '../mobile/common.css';
+  import IndicatorDropdown from '../mobile/IndicatorDropdown.svelte';
+  import IndicatorCorrelationChart from './IndicatorCorrelationChart.svelte';
+  import LagChart from './LagChart.svelte';
+  import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
 
-  $: sensor = new SensorParam($currentSensorEntry);
-  $: sensor2 = new SensorParam($currentSensorEntry2, currentSensor2);
+  $: primary = new SensorParam($currentSensorEntry);
+  $: secondary = new SensorParam($currentSensorEntry2, currentSensor2);
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
   $: region = new RegionParam($currentRegionInfo);
-
-  $: primary = sensor.value;
-  $: primaryData = fetcher.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame);
-  $: secondary = sensor2;
-  $: secondaryData = secondary ? fetcher.fetch1Sensor1RegionNDates(secondary, region, date.windowTimeFrame) : null;
 
   const items = [nationInfo, ...stateInfo, ...countyInfo];
 
   const fetcher = new DataFetcher();
   $: {
     // reactive update
-    fetcher.invalidate(sensor, region, date);
+    fetcher.invalidate(primary, region, date);
   }
 
   function switchMode() {
     currentMode.set(modeByID.indicator);
   }
+
+  let sensorDetailsLag = 0;
 </script>
 
 <div class="mobile-root">
-  <SurveyParameters sensor={sensor.value} {items} defaultItem={nationInfo} placeholder="Search by State or County">
+  <SurveyParameters sensor={primary.value} {items} defaultItem={nationInfo} placeholder="Search by State or County">
     <div class="grid-3-11 mobile-header-line" slot="title">
       <button class="mobile-back inline-svg-icon" on:click={switchMode}>
         {@html chevronLeftIcon}
       </button>
       <h2>Explore <span>Correlations</span></h2>
     </div>
-    <IndicatorDropdown {sensor} />
-    <IndicatorDropdown sensor={sensor2} />
+    <IndicatorDropdown sensor={primary} />
+    <IndicatorDropdown sensor={secondary} />
   </SurveyParameters>
+
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <hr />
-      {#await Promise.all([primaryData, secondaryData]) then data}
-        <IndicatorCorrelationDetails {primary} secondary={sensor2} primaryData={data[0]} secondaryData={data[1]} />
-      {/await}
+      <IndicatorCorrelationChart {primary} {secondary} {date} {region} {fetcher} lag={sensorDetailsLag} />
+
+      <input
+        type="range"
+        min={-28}
+        max={28}
+        step={1}
+        bind:value={sensorDetailsLag}
+        style="width:450px;  margin-left: 35px"
+      />
+
+      <LagChart {primary} {secondary} {date} {region} {fetcher} />
+
+      <HistoryLineChart sensor={primary} {date} {region} {fetcher} />
+      <HistoryLineChart sensor={secondary} {date} {region} {fetcher} />
     </div>
   </div>
 </div>

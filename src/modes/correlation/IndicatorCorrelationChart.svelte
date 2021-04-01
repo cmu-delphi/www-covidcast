@@ -1,25 +1,70 @@
 <script>
+  import { isMobileDevice } from '../../stores';
   import Vega from '../../components/Vega.svelte';
+  import { combineSignals } from '../../data/utils';
 
   /**
-   * The "context" sensor, was currentSensorEntry.
-   * @type {import("../../stores/constants").SensorEntry}
+   * @type {import("../../stores/params").DateParam}
+   */
+  export let date;
+  /**
+   * @type {import("../../stores/params").RegionParam}
+   */
+  export let region;
+
+  /**
+   * @type {import("../../stores/params").SensorParam}
    */
   export let primary;
   /**
-   * The sensor being compared to the primary.
-   * @type {import("../../stores/constants").SensorEntry}
+   * @type {import("../../stores/params").SensorParam}
    */
   export let secondary;
   /**
-   * The data input to the chart.
+   * @type {import("../../stores/params").DataFetcher}
    */
-  export let sensorCorrelationData;
+  export let fetcher;
   /**
    * Days of lag
    */
   export let lag = 0;
-  export let options = {};
+
+  function loadData(primary, secondary, region, date) {
+    if (!secondary) {
+      return Promise.resolve([]);
+    }
+    const primaryData = fetcher.fetch1Sensor1RegionNDates(primary, region, date.windowTimeFrame);
+    const secondaryData = fetcher.fetch1Sensor1RegionNDates(secondary, region, date.windowTimeFrame);
+    return Promise.all([primaryData, secondaryData]).then((r) => {
+      const ref = r[0].map((d) => ({ ...d })); // merge into a copy
+      return combineSignals(r, ref, [primary.key, secondary.key]);
+    });
+  }
+
+  $: data = loadData(primary, secondary, region, date);
+
+  $: chartPadding = $isMobileDevice
+    ? { left: 20, right: 10, top: 10, bottom: 40 }
+    : { left: 20, right: 50, top: 20, bottom: 15 };
+  $: sizeLegend = $isMobileDevice
+    ? { orient: 'bottom', direction: 'horizontal', title: '' }
+    : {
+        orient: 'top',
+        direction: 'horizontal',
+        symbolType: 'square',
+        symbolStrokeWidth: 2,
+        title: ' ',
+      };
+
+  $: options = {
+    title: `${secondary.name} correlated with ${primary.name} lagged by ${lag} days`,
+    width: 400,
+    height: 400,
+    padding: chartPadding,
+    sizeLegend,
+    showTooltips: true,
+    showRSquared: true,
+  };
 
   function makeIndicatorCompareSpec(xKey, yKey, options = {}) {
     const lag = options.lag || 0;
@@ -292,7 +337,6 @@
       ...options,
     });
   }
-  $: indicatorCompareSpec = topLevelIndicatorCompareSpec(lag);
   function topLevelIndicatorCompareSpec(lag) {
     return {
       $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
@@ -304,8 +348,8 @@
       },
     };
   }
+
+  $: indicatorCompareSpec = topLevelIndicatorCompareSpec(lag);
 </script>
 
-<div class="root" on:click>
-  <Vega data={Promise.resolve(sensorCorrelationData)} spec={indicatorCompareSpec} />
-</div>
+<Vega {data} spec={indicatorCompareSpec} />
