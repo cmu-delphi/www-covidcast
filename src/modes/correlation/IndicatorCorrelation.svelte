@@ -55,9 +55,7 @@
 
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <div class="chart-correlation">
-        <IndicatorCorrelationChart {primary} {secondary} {date} {region} {fetcher} lag={sensorDetailsLag} />
-      </div>
+      <IndicatorCorrelationChart {primary} {secondary} {date} {region} {fetcher} lag={sensorDetailsLag} />
 
       <input type="range" min={-28} max={28} step={1} bind:value={sensorDetailsLag} class="range-selector" />
 
@@ -81,19 +79,5 @@
     display: block;
     margin: 1em 0;
     width: 100%;
-  }
-
-  .chart-correlation {
-    position: relative;
-    /** 1:1 + padding for legend **/
-    padding-top: calc(100% + 50px);
-  }
-
-  .chart-correlation > :global(.vega-embed) {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
   }
 </style>

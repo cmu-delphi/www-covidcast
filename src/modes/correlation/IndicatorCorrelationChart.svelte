@@ -3,6 +3,7 @@
   import { combineSignals } from '../../data/utils';
   import { commonConfig } from '../../specs/commonSpec';
   import { genCreditsLayer } from '../../specs/lineSpec';
+  import Toggle from '../mobile/Toggle.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -44,7 +45,7 @@
 
   $: data = loadData(primary, secondary, region, date);
 
-  function makeIndicatorCompareSpec(primary, secondary, lag) {
+  function makeIndicatorCompareSpec(primary, secondary, lag, { zero = true } = {}) {
     /**
      * @type {import('vega-lite').TopLevelSpec}
      */
@@ -118,18 +119,18 @@
           encoding: {
             x: {
               field: 'x',
-              title: primary.name,
+              title: `${primary.name} (${primary.unit})`,
               type: 'quantitative',
               scale: {
-                zero: false,
+                zero,
               },
             },
             y: {
               field: 'y',
-              title: secondary.name,
+              title: `${secondary.name} (${secondary.unit})`,
               type: 'quantitative',
               scale: {
-                zero: false,
+                zero,
               },
             },
             tooltip: [
@@ -220,14 +221,14 @@
                 color: 'gray',
                 opacity: 0.7,
               },
-              selection: {
-                highlightSnake: {
-                  type: 'single',
-                  empty: 'none',
-                  on: 'mouseover',
-                  clear: 'mouseout',
-                },
-              },
+              // selection: {
+              //   highlightSnake: {
+              //     type: 'single',
+              //     empty: 'none',
+              //     on: 'mouseover',
+              //     clear: 'mouseout',
+              //   },
+              // },
               encoding: {
                 x2: { field: 'nextx', type: 'quantitative' },
                 y2: { field: 'nexty', type: 'quantitative' },
@@ -260,7 +261,11 @@
                   field: 'date_value',
                   type: 'temporal',
                   scale: { range: [0, 6] },
-                  legend: { orient: 'bottom', direction: 'horizontal', title: '' },
+                  legend: {
+                    orient: 'bottom',
+                    direction: 'horizontal',
+                    title: '',
+                  },
                 },
               },
             },
@@ -282,18 +287,10 @@
                 x: {
                   field: 'x',
                   type: 'quantitative',
-                  scale: {
-                    domainMin: undefined,
-                    domainMax: undefined,
-                  },
                 },
                 y: {
                   field: 'y',
                   type: 'quantitative',
-                  scale: {
-                    domainMin: undefined,
-                    domainMax: undefined,
-                  },
                 },
               },
             },
@@ -306,7 +303,29 @@
     return spec;
   }
 
-  $: spec = makeIndicatorCompareSpec(primary, secondary, lag);
+  let scaled = false;
+  $: spec = makeIndicatorCompareSpec(primary, secondary, lag, {
+    zero: !scaled,
+  });
 </script>
 
-<Vega {data} {spec} />
+<div class="chart-correlation">
+  <Vega {data} {spec} />
+</div>
+<Toggle bind:checked={scaled}>Rescale Y-axis</Toggle>
+
+<style>
+  .chart-correlation {
+    position: relative;
+    /** 1:1 + padding for legend **/
+    padding-top: calc(100% + 50px);
+  }
+
+  .chart-correlation > :global(.vega-embed) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+</style>
