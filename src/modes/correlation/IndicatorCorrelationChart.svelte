@@ -1,7 +1,8 @@
 <script>
-  import { isMobileDevice } from '../../stores';
   import Vega from '../../components/Vega.svelte';
   import { combineSignals } from '../../data/utils';
+  import { commonConfig } from '../../specs/commonSpec';
+  import { genCreditsLayer } from '../../specs/lineSpec';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -43,38 +44,31 @@
 
   $: data = loadData(primary, secondary, region, date);
 
-  $: chartPadding = $isMobileDevice
-    ? { left: 20, right: 10, top: 10, bottom: 40 }
-    : { left: 20, right: 50, top: 20, bottom: 15 };
-  $: sizeLegend = $isMobileDevice
-    ? { orient: 'bottom', direction: 'horizontal', title: '' }
-    : {
-        orient: 'top',
-        direction: 'horizontal',
-        symbolType: 'square',
-        symbolStrokeWidth: 2,
-        title: ' ',
-      };
-
-  $: options = {
-    title: `${secondary.name} correlated with ${primary.name} lagged by ${lag} days`,
-    width: 400,
-    height: 400,
-    padding: chartPadding,
-    sizeLegend,
-    showTooltips: true,
-    showRSquared: true,
-  };
-
-  function makeIndicatorCompareSpec(xKey, yKey, options = {}) {
-    const lag = options.lag || 0;
-    const width = options.width || 100;
-    const height = options.height || 100;
-    let spec = {
-      width: width,
-      height: height,
-      padding: options.padding != null ? options.padding : null,
-      title: options.title || '',
+  function makeIndicatorCompareSpec(primary, secondary, lag) {
+    /**
+     * @type {import('vega-lite').TopLevelSpec}
+     */
+    const spec = {
+      $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+      padding: {
+        left: 50,
+        right: 10,
+        top: 50,
+        bottom: 70,
+      },
+      autosize: {
+        type: 'none',
+        contains: 'padding',
+        resize: true,
+      },
+      data: { name: 'values' },
+      width: 400,
+      height: 400,
+      title: {
+        text: `${secondary.name} correlated with ${primary.name} lagged by ${lag} days`,
+        align: 'left',
+        anchor: 'start',
+      },
       transform: [
         {
           window: [
@@ -87,7 +81,7 @@
             {
               op: 'lag',
               param: lag >= 0 ? lag : 0,
-              field: xKey,
+              field: primary.key,
               as: 'x',
             },
             {
@@ -99,128 +93,118 @@
             {
               op: 'lag',
               param: lag <= 0 ? -lag : 0,
-              field: yKey,
+              field: secondary.key,
               as: 'y',
             },
           ],
         },
-        { as: 'x_title', calculate: `"${options.xtitle} (" + timeFormat(datum.x_date, "%b %d") + "): " + datum.x` },
-        { as: 'y_title', calculate: `"${options.ytitle} (" + timeFormat(datum.y_date, "%b %d") + "): " + datum.y` },
+        { as: 'x_title', calculate: `"${primary.name} (" + timeFormat(datum.x_date, "%b %d") + "): " + datum.x` },
+        { as: 'y_title', calculate: `"${secondary.name} (" + timeFormat(datum.y_date, "%b %d") + "): " + datum.y` },
       ],
       layer: [
         {
-          width: width,
-          height: height,
-          padding: options.padding != null ? options.padding : null,
           mark: {
             type: 'point',
           },
-          selection: {
-            highlight: {
-              type: 'single',
-              empty: 'none',
-              on: 'mouseover',
-              nearest: true,
-              clear: 'mouseout',
-            },
-          },
+          // selection: {
+          //   highlight: {
+          //     type: 'single',
+          //     empty: 'none',
+          //     on: 'mouseover',
+          //     nearest: true,
+          //     clear: 'mouseout',
+          //   },
+          // },
           encoding: {
             x: {
               field: 'x',
-              title: options.axisTitles ? options.xtitle : '',
+              title: primary.name,
               type: 'quantitative',
               scale: {
                 zero: false,
-                domainMin: null,
-                domainMax: null,
-              },
-              axis: {
-                ticks: options.ticks,
-                labels: options.tickLabels,
               },
             },
             y: {
               field: 'y',
-              title: options.axisTitles ? options.ytitle : '',
+              title: secondary.name,
               type: 'quantitative',
               scale: {
                 zero: false,
-                domainMin: undefined,
-                domainMax: undefined,
               },
-              axis: { ticks: options.ticks, labels: options.tickLabels },
             },
-            tooltip: options.showTooltips
-              ? [
-                  {
-                    field: 'x_title',
-                    title: ' ',
-                  },
-                  {
-                    field: 'y_title',
-                    title: '  ', // must be unique?
-                  },
-                ]
-              : false,
+            tooltip: [
+              {
+                field: 'x_title',
+                title: ' ',
+              },
+              {
+                field: 'y_title',
+                title: '  ', // must be unique?
+              },
+            ],
             opacity: {
-              condition: [
-                {
-                  selection: 'highlight',
-                  value: 1,
-                },
-              ],
+              // condition: [
+              //   {
+              //     selection: 'highlight',
+              //     value: 1,
+              //   },
+              // ],
               value: 0.2,
             },
           },
         },
-        ...(options.showRSquared
-          ? [
-              {
-                transform: [
-                  {
-                    regression: 'x',
-                    on: 'y',
-                    params: true,
-                  },
-                  { calculate: "'R²: '+format(datum.rSquared, '.2f')", as: 'R2' },
-                ],
-                mark: {
-                  type: 'text',
-                  color: 'firebrick',
-                  align: 'right',
-                  x: 'width',
-                  y: -5,
-                  size: 14,
-                },
-                encoding: {
-                  text: { type: 'nominal', field: 'R2' },
-                },
-              },
-            ]
-          : []),
         {
           transform: [
             {
-              window: [
-                {
-                  op: 'mean',
-                  field: 'x',
-                  type: 'quantitative',
-                  as: 'xmean',
-                },
-              ],
-              frame: [0, 0], // To smooth, replace with e.g. [-6, 0]
+              regression: 'x',
+              on: 'y',
+              params: true,
+            },
+            { calculate: "'R²: '+format(datum.rSquared, '.2f')", as: 'R2' },
+          ],
+          mark: {
+            type: 'text',
+            color: 'firebrick',
+            align: 'right',
+            x: 'width',
+            y: -5,
+            size: 14,
+          },
+          encoding: {
+            text: { type: 'nominal', field: 'R2' },
+          },
+        },
+        {
+          transform: [
+            // {
+            //   window: [
+            //     {
+            //       op: 'mean',
+            //       field: 'x',
+            //       type: 'quantitative',
+            //       as: 'xmean',
+            //     },
+            //   ],
+            //   frame: [0, 0], // To smooth, replace with e.g. [-6, 0]
+            // },
+            // {
+            //   window: [
+            //     {
+            //       op: 'mean',
+            //       field: 'y',
+            //       type: 'quantitative',
+            //       as: 'ymean',
+            //     },
+            //   ],
+            //   frame: [0, 0], // To smooth, replace with e.g. [6, 0]
+            // },
+            {
+              calculate: 'datum.x',
+              as: 'xmean',
             },
             {
-              window: [
-                {
-                  op: 'mean',
-                  field: 'y',
-                  type: 'quantitative',
-                  as: 'ymean',
-                },
-              ],
-              frame: [0, 0], // To smooth, replace with e.g. [6, 0]
+              calculate: 'datum.y',
+              as: 'ymean',
             },
           ],
           layer: [
@@ -249,36 +233,34 @@
                 y2: { field: 'nexty', type: 'quantitative' },
                 x: { field: 'xmean', type: 'quantitative' },
                 y: { field: 'ymean', type: 'quantitative' },
-                tooltip: options.showTooltips
-                  ? [
-                      {
-                        field: 'x_title',
-                        title: ' ',
-                      },
-                      {
-                        field: 'y_title',
-                        title: '  ', // must be unique?
-                      },
-                    ]
-                  : false,
+                tooltip: [
+                  {
+                    field: 'x_title',
+                    title: ' ',
+                  },
+                  {
+                    field: 'y_title',
+                    title: '  ', // must be unique?
+                  },
+                ],
                 color: {
                   field: 'date_value',
                   type: 'temporal',
                   scale: {
                     scheme: 'blues',
                   },
-                  condition: [
-                    {
-                      selection: 'highlightSnake',
-                      value: 'black',
-                    },
-                  ],
+                  // condition: [
+                  //   {
+                  //     selection: 'highlightSnake',
+                  //     value: 'black',
+                  //   },
+                  // ],
                 },
                 size: {
                   field: 'date_value',
                   type: 'temporal',
                   scale: { range: [0, 6] },
-                  legend: options.sizeLegend || null,
+                  legend: { orient: 'bottom', direction: 'horizontal', title: '' },
                 },
               },
             },
@@ -317,39 +299,14 @@
             },
           ],
         },
+        genCreditsLayer(),
       ],
+      config: commonConfig,
     };
     return spec;
   }
-  function updateIndicatorCompareSpec(lag = 0) {
-    const xIndicator = secondary;
-    const yIndicator = primary;
-    return makeIndicatorCompareSpec(xIndicator.key, yIndicator.key, {
-      showTitle: true,
-      axisTitles: true,
-      ticks: false,
-      tickLabels: true,
-      xtitle: xIndicator.name,
-      ytitle: yIndicator.name,
-      lag,
-      showTooltips: false,
-      showRSquared: false,
-      ...options,
-    });
-  }
-  function topLevelIndicatorCompareSpec(lag) {
-    return {
-      $schema: 'https://vega.github.io/schema/vega-lite/v4.json',
-      padding: options.padding != null ? options.padding : { left: 20, right: 10, top: 10, bottom: 30 },
-      data: { name: 'values' },
-      ...{
-        columns: 1,
-        concat: [updateIndicatorCompareSpec(lag)],
-      },
-    };
-  }
 
-  $: indicatorCompareSpec = topLevelIndicatorCompareSpec(lag);
+  $: spec = makeIndicatorCompareSpec(primary, secondary, lag);
 </script>
 
-<Vega {data} spec={indicatorCompareSpec} />
+<Vega {data} {spec} />

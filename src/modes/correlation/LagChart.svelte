@@ -1,6 +1,7 @@
 <script>
   import Vega from '../../components/Vega.svelte';
   import { generateCorrelationMetrics } from '../../data/utils';
+  import { commonConfig } from '../../specs/commonSpec';
   import { genCreditsLayer } from '../../specs/lineSpec';
 
   /**
@@ -37,6 +38,9 @@
 
   $: data = loadData(primary, secondary, region, date);
 
+  /**
+   * @type {import('vega-lite').TopLevelSpec}
+   */
   $: spec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     autosize: {
@@ -82,6 +86,7 @@
       },
       genCreditsLayer(),
     ],
+    config: commonConfig,
   };
 
   // TODO interactive lag selection
