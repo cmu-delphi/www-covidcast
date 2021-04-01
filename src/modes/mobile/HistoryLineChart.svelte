@@ -23,6 +23,7 @@
   import { annotationManager, isMobileDevice } from '../../stores';
   import IndicatorAnnotation from './IndicatorAnnotation.svelte';
   import IndicatorAnnotations from './IndicatorAnnotations.svelte';
+  import { joinTitle } from '../../specs/commonSpec';
 
   export let height = 250;
 
@@ -53,9 +54,20 @@
    */
   export let ends = null;
 
+  /**
+   * show only a single region regardless of the level
+   */
   export let singleRegionOnly = false;
-
+  /**
+   * base color for the first region
+   */
   export let color = MULTI_COLORS[0];
+
+  /**
+   * optional domain
+   * @type {null | [number, number]}
+   */
+  export let domain = null;
 
   /**
    * @type {import("../../stores/params").Region}
@@ -75,30 +87,31 @@
    * @param {import('../../stores/params').SensorParam} sensor
    * @param {import('../../stores/params').RegionParam} region
    * @param {import('../../stores/params').DateParam} date
+   * @param {{height: number, zero: boolean, singleRaw: boolean, isMobile: boolean, singleRegionOnly: boolean, domain?: [number, number]}} options
    */
-  function genSpec(sensor, region, date, height, zero, singleRaw, isMobile, singleRegionOnly) {
+  function genSpec(sensor, region, date, { height, zero, singleRaw, isMobile, singleRegionOnly, domain }) {
     const options = {
       initialDate: highlightDate || date.value,
       height,
       color,
-      domain: date.windowTimeFrame.domain,
+      domain: domain || date.windowTimeFrame.domain,
       zero,
       xTitle: sensor.xAxis,
-      title: [sensor.name, `in ${region.displayName}`],
+      title: joinTitle([sensor.name, `in ${region.displayName}`], isMobile),
       subTitle: sensor.unit,
       highlightRegion: true,
     };
-    if (!isMobile || options.title.reduce((acc, v) => acc + v.length, 0) < 35) {
-      options.title = options.title.join(' '); // single title line
-    }
     if (singleRaw) {
       return generateLineAndBarSpec(options);
     }
-    if (region.level === 'state' && !singleRegionOnly) {
+    if (singleRegionOnly) {
+      return generateLineChartSpec(options);
+    }
+    if (region.level === 'state') {
       // state vs nation
       return generateCompareLineSpec([region.displayName, nationInfo.displayName], options);
     }
-    if (region.level === 'county' && !singleRegionOnly) {
+    if (region.level === 'county') {
       // county vs related vs state vs nation
       const state = getInfoByName(region.state);
       return generateCompareLineSpec(
@@ -223,7 +236,14 @@
   );
   $: raw = singleRaw && sensor.rawValue != null;
   $: spec = injectRanges(
-    genSpec(sensor, region, date, height, !zoom, raw, $isMobileDevice, singleRegionOnly),
+    genSpec(sensor, region, date, {
+      height,
+      zero: !zoom,
+      singleRaw: raw,
+      isMobile: $isMobileDevice,
+      singleRegionOnly,
+      domain,
+    }),
     date,
     annotations,
   );

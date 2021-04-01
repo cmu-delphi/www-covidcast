@@ -38,7 +38,26 @@
     currentMode.set(modeByID.indicator);
   }
 
-  let sensorDetailsLag = 0;
+  let lag = 0;
+
+  /**
+   * @param {TimeFrame} timeFrame
+   * @param {number} lag
+   */
+  function computeDomains(timeFrame, lag) {
+    if (lag > 0) {
+      return {
+        primary: timeFrame.shift(-lag, 0).domain,
+        secondary: timeFrame.shift(0, lag).domain,
+      };
+    }
+    return {
+      primary: timeFrame.shift(0, -lag).domain,
+      secondary: timeFrame.shift(lag, 0).domain,
+    };
+  }
+
+  $: domains = computeDomains(date.windowTimeFrame, lag);
 </script>
 
 <div class="mobile-root">
@@ -55,20 +74,29 @@
 
   <div class="uk-container content-grid">
     <div class="grid-3-11">
+      <FancyHeader invert sub="Chart">R<sup>2</sup></FancyHeader>
       <LagChart {primary} {secondary} {date} {region} {fetcher} />
-      <input type="range" min={-28} max={28} step={1} bind:value={sensorDetailsLag} class="range-selector" />
+      <input type="range" min={-28} max={28} step={1} bind:value={lag} class="range-selector" />
 
-      <FancyHeader invert sub="Chart">Correlation</FancyHeader>
-      <IndicatorCorrelationChart {primary} {secondary} {date} {region} {fetcher} lag={sensorDetailsLag} />
+      <FancyHeader invert sub="Chart at Lag {lag} days">Correlation</FancyHeader>
+      <IndicatorCorrelationChart {primary} {secondary} {date} {region} {fetcher} {lag} />
 
       <FancyHeader invert sub="Chart">{primary.name}</FancyHeader>
       <div class="chart-300">
-        <HistoryLineChart sensor={primary} {date} {region} {fetcher} singleRegionOnly />
+        <HistoryLineChart sensor={primary} {date} {region} {fetcher} singleRegionOnly domain={domains.primary} />
       </div>
       <FancyHeader invert sub="Chart">{secondary.name}</FancyHeader>
       <div class="chart-300">
         <!-- TODO lag based date highlight -->
-        <HistoryLineChart sensor={secondary} {date} {region} {fetcher} singleRegionOnly color={MULTI_COLORS[1]} />
+        <HistoryLineChart
+          sensor={secondary}
+          {date}
+          {region}
+          {fetcher}
+          singleRegionOnly
+          color={MULTI_COLORS[1]}
+          domain={domains.secondary}
+        />
       </div>
     </div>
   </div>
