@@ -2,7 +2,6 @@
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
   import { modeByID } from '..';
   import { sensorList, currentMode, currentSensor2 } from '../../stores';
-  import { SensorParam } from '../../stores/params';
   import { scrollToTop } from '../../util';
   import { generateCorrelationMetrics } from '../../data/utils';
   import { formatValue } from '../../formats';
@@ -34,12 +33,15 @@
   export let fetcher;
 
   /**
-   * @param {SensorEntry} sensorEntry
+   * @param {SensorEntry} context
+   * @param {SensorEntry} compare
+   * @param {import("../../stores/params").RegionParam} region
+   * @param {import("../../stores/params").DateParam} date
    * @returns {Promise<CorrelationMetric>}
    */
-  function buildMetrics(sensorEntry) {
-    const contextData = fetcher.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame);
-    const compareData = fetcher.fetch1Sensor1RegionNDates(new SensorParam(sensorEntry), region, date.windowTimeFrame);
+  function buildMetrics(context, compare, region, date) {
+    const contextData = fetcher.fetch1Sensor1RegionNDates(context, region, date.windowTimeFrame);
+    const compareData = fetcher.fetch1Sensor1RegionNDates(compare, region, date.windowTimeFrame);
     return Promise.all([contextData, compareData]).then((p) => {
       const metrics = generateCorrelationMetrics(p[0], p[1]);
       return metrics;
@@ -48,19 +50,22 @@
 
   /**
    * Starting from a list of sensors, mix in all of the other columns needed for the table.
+   * @param {SensorEntry} context
+   * @param {import("../../stores/params").RegionParam} region
+   * @param {import("../../stores/params").DateParam} date
    */
-  function buildTableData() {
+  function buildTableData(context, region, date) {
     return sensorList
-      .filter((d) => d.key !== sensor.key)
+      .filter((d) => d.key !== context.key)
       .map((sensor) => {
         return {
           ...sensor,
-          metrics: buildMetrics(sensor),
+          metrics: buildMetrics(context, sensor, region, date),
         };
       });
   }
 
-  $: otherSensors = buildTableData(sensor, date, region);
+  $: otherSensors = buildTableData(sensor, region, date);
 
   function switchMode(sensor) {
     currentSensor2.set(sensor.key);
@@ -100,7 +105,7 @@
         {:then m}
           <td class="uk-text-right">{formatValue(m.r2At0)}</td>
           <td class="uk-text-right">{formatValue(m.r2AtMaxR2)}</td>
-          <td class="uk-text-right">{m.lagAtMaxR2.toLocaleString()}</td>
+          <td class="uk-text-right">{m.lagAtMaxR2.toLocaleString()} days</td>
         {:catch err}
           <td colspan="3" class="small">{err.message}</td>
         {/await}
