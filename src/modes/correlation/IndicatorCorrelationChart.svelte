@@ -6,6 +6,7 @@
   import { isMobileDevice } from '../../stores';
   import Toggle from '../mobile/Toggle.svelte';
   import CorrelationTooltip from './CorrelationTooltip.svelte';
+  import DownloadMenu from '../mobile/components/DownloadMenu.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -249,12 +250,19 @@
     zero: !scaled,
     isMobile: $isMobileDevice,
   });
+
+  let vegaRef = null;
 </script>
 
 <div class="chart-correlation">
-  <Vega {data} {spec} tooltip={CorrelationTooltip} tooltipProps={{ primary, secondary, lag }} />
+  <Vega bind:this={vegaRef} {data} {spec} tooltip={CorrelationTooltip} tooltipProps={{ primary, secondary, lag }} />
 </div>
-<Toggle bind:checked={scaled}>Rescale X/Y-axis</Toggle>
+
+<div class="buttons">
+  <Toggle bind:checked={scaled}>Rescale X/Y-axis</Toggle>
+  <div class="spacer" />
+  <DownloadMenu fileName="Correlation_{primary.name}_{secondary.name}_Lag_{lag}" {vegaRef} advanced={false} />
+</div>
 
 <style>
   .chart-correlation {
@@ -269,5 +277,14 @@
     left: 0;
     width: 100%;
     height: 100%;
+  }
+
+  .buttons {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .spacer {
+    flex: 1 1 0;
   }
 </style>

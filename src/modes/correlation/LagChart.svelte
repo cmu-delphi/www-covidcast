@@ -6,6 +6,7 @@
   import { isMobileDevice } from '../../stores';
   import Toggle from '../mobile/Toggle.svelte';
   import WarningBanner from '../mobile/components/WarningBanner.svelte';
+  import DownloadMenu from '../mobile/components/DownloadMenu.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -97,6 +98,7 @@
     title: joinTitle([`R² between "${primary.name}" and `, `"${secondary.name}" per Lag`], $isMobileDevice),
   });
   // TODO interactive lag selection
+  let vegaRef = null;
 </script>
 
 {#await data}
@@ -108,11 +110,18 @@
 {/await}
 
 <div class="chart-150">
-  <Vega {data} {spec} />
+  <Vega {data} {spec} bind:this={vegaRef} />
 </div>
 <div class="buttons">
   <Toggle bind:checked={scaled}>Rescale Y-axis</Toggle>
   <div class="spacer" />
+  <DownloadMenu
+    fileName="Correlation_Lag_vs_R2_{primary.name}_{secondary.name}"
+    {vegaRef}
+    {data}
+    prepareRow={(row) => row}
+    advanced={false}
+  />
 </div>
 
 <style>
