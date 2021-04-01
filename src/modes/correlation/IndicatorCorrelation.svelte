@@ -18,6 +18,8 @@
   import IndicatorCorrelationChart from './IndicatorCorrelationChart.svelte';
   import LagChart from './LagChart.svelte';
   import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
+  import FancyHeader from '../mobile/FancyHeader.svelte';
+  import { MULTI_COLORS } from '../../specs/lineSpec';
 
   $: primary = new SensorParam($currentSensorEntry);
   $: secondary = new SensorParam($currentSensorEntry2, currentSensor2);
@@ -66,8 +68,14 @@
 
       <LagChart {primary} {secondary} {date} {region} {fetcher} />
 
-      <HistoryLineChart sensor={primary} {date} {region} {fetcher} />
-      <HistoryLineChart sensor={secondary} {date} {region} {fetcher} />
+      <FancyHeader invert sub="Chart">{primary.name}</FancyHeader>
+      <div class="chart-300">
+        <HistoryLineChart sensor={primary} {date} {region} {fetcher} singleRegionOnly />
+      </div>
+      <FancyHeader invert sub="Chart">{secondary.name}</FancyHeader>
+      <div class="chart-300">
+        <HistoryLineChart sensor={secondary} {date} {region} {fetcher} singleRegionOnly color={MULTI_COLORS[1]} />
+      </div>
     </div>
   </div>
 </div>
