@@ -252,11 +252,9 @@ export function generateLineChartSpec({
             type: 'temporal',
             axis: {
               title: xTitle,
-              titleFontWeight: 'normal',
               format: '%m/%d',
               formatType: 'cachedTime',
               labelExpr: labelYear,
-              labelFontSize: 14,
               labelOverlap: true,
               grid: true,
               gridDash: [4, 4],

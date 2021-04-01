@@ -1,8 +1,10 @@
 <script>
   import Vega from '../../components/Vega.svelte';
   import { generateCorrelationMetrics } from '../../data/utils';
-  import { commonConfig } from '../../specs/commonSpec';
+  import { BASE_SPEC, guessTopPadding, joinTitle } from '../../specs/commonSpec';
   import { genCreditsLayer } from '../../specs/lineSpec';
+  import { isMobileDevice } from '../../stores';
+  import Toggle from '../mobile/Toggle.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -38,60 +40,79 @@
 
   $: data = loadData(primary, secondary, region, date);
 
-  /**
-   * @type {import('vega-lite').TopLevelSpec}
-   */
-  $: spec = {
-    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-    autosize: {
-      type: 'none',
-      contains: 'padding',
-      resize: true,
-    },
-    width: 500,
-    height: 100,
-    padding: { top: 42, left: 42, bottom: 55, right: 15 },
-    data: { name: 'values' },
-    title: {
-      text: `R² between ${primary.name} and ${secondary.name} per Lag`,
-      align: 'left',
-      anchor: 'start',
-    },
-    layer: [
-      {
-        mark: 'line',
-        encoding: {
-          x: {
-            field: 'lag',
-            type: 'quantitative',
-            axis: {
-              title: 'Lag',
-              titleFontWeight: 'normal',
-              labelFontSize: 14,
-              labelOverlap: true,
+  function generateSpec({ title, subTitle, zero } = {}) {
+    /**
+     * @type {import('vega-lite').TopLevelSpec}
+     */
+    const spec = {
+      ...BASE_SPEC,
+      width: 500,
+      height: 100,
+      padding: { top: guessTopPadding(title, subTitle), left: 42, bottom: 45, right: 8 },
+      title: {
+        text: title,
+        subtitle: subTitle,
+      },
+      layer: [
+        {
+          mark: 'line',
+          encoding: {
+            x: {
+              field: 'lag',
+              type: 'quantitative',
+              scale: {
+                nice: false,
+              },
+              axis: {
+                title: 'Lag (days)',
+                labelOverlap: true,
+              },
             },
-          },
-          y: {
-            field: 'r2',
-            type: 'quantitative',
-            axis: {
-              grid: true,
-              title: null,
-              domain: false,
-              tickCount: 5,
-              labelFontSize: 14,
+            y: {
+              field: 'r2',
+              type: 'quantitative',
+              scale: {
+                zero,
+              },
+              axis: {
+                grid: true,
+                title: null,
+                domain: false,
+                tickCount: 5,
+                labelFontSize: 14,
+              },
             },
           },
         },
-      },
-      genCreditsLayer(),
-    ],
-    config: commonConfig,
-  };
+        genCreditsLayer({ shift: 45 }),
+      ],
+    };
+    return spec;
+  }
 
+  let scaled = false;
+  $: spec = generateSpec({
+    zero: !scaled,
+    title: joinTitle([`R² between "${primary.name}" and `, `"${secondary.name}" per Lag`], $isMobileDevice),
+  });
   // TODO interactive lag selection
 </script>
 
 <div class="chart-150">
   <Vega {data} {spec} />
 </div>
+<div class="buttons">
+  <Toggle bind:checked={scaled}>Rescale Y-axis</Toggle>
+  <div class="spacer" />
+</div>
+
+<style>
+  .buttons {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .spacer {
+    flex: 1 1 0;
+  }
+</style>

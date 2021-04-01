@@ -55,11 +55,11 @@
 
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <IndicatorCorrelationChart {primary} {secondary} {date} {region} {fetcher} lag={sensorDetailsLag} />
-
+      <LagChart {primary} {secondary} {date} {region} {fetcher} />
       <input type="range" min={-28} max={28} step={1} bind:value={sensorDetailsLag} class="range-selector" />
 
-      <LagChart {primary} {secondary} {date} {region} {fetcher} />
+      <FancyHeader invert sub="Chart">Correlation</FancyHeader>
+      <IndicatorCorrelationChart {primary} {secondary} {date} {region} {fetcher} lag={sensorDetailsLag} />
 
       <FancyHeader invert sub="Chart">{primary.name}</FancyHeader>
       <div class="chart-300">

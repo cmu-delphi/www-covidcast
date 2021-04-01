@@ -1,7 +1,7 @@
 <script>
   import Vega from '../../components/Vega.svelte';
   import { combineSignals } from '../../data/utils';
-  import { commonConfig } from '../../specs/commonSpec';
+  import { BASE_SPEC } from '../../specs/commonSpec';
   import { genCreditsLayer } from '../../specs/lineSpec';
   import Toggle from '../mobile/Toggle.svelte';
 
@@ -50,26 +50,16 @@
      * @type {import('vega-lite').TopLevelSpec}
      */
     const spec = {
-      $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+      ...BASE_SPEC,
       padding: {
         left: 50,
         right: 10,
         top: 50,
         bottom: 70,
       },
-      autosize: {
-        type: 'none',
-        contains: 'padding',
-        resize: true,
-      },
-      data: { name: 'values' },
       width: 400,
       height: 400,
-      title: {
-        text: `${secondary.name} correlated with ${primary.name} lagged by ${lag} days`,
-        align: 'left',
-        anchor: 'start',
-      },
+      title: `${secondary.name} correlated with ${primary.name} lagged by ${lag} days`,
       transform: [
         {
           window: [
@@ -298,7 +288,6 @@
         },
         genCreditsLayer(),
       ],
-      config: commonConfig,
     };
     return spec;
   }
@@ -312,7 +301,7 @@
 <div class="chart-correlation">
   <Vega {data} {spec} />
 </div>
-<Toggle bind:checked={scaled}>Rescale Y-axis</Toggle>
+<Toggle bind:checked={scaled}>Rescale X/Y-axis</Toggle>
 
 <style>
   .chart-correlation {
