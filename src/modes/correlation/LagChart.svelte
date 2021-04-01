@@ -1,6 +1,6 @@
 <script>
   import Vega from '../../components/Vega.svelte';
-  import { generateCorrelationMetrics } from '../../data/utils';
+  import { generateCorrelationMetrics } from '../../data/correlation';
   import { BASE_SPEC, guessTopPadding, joinTitle } from '../../specs/commonSpec';
   import { autoAlign, COLOR, genCreditsLayer, signalPatches, resolveHighlightedField } from '../../specs/lineSpec';
   import { isMobileDevice } from '../../stores';

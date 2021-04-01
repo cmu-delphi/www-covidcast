@@ -3,7 +3,7 @@
   import { modeByID } from '..';
   import { sensorList, currentMode, currentSensor2 } from '../../stores';
   import { scrollToTop } from '../../util';
-  import { generateCorrelationMetrics } from '../../data/utils';
+  import { generateCorrelationMetrics } from '../../data/correlation';
   import { formatValue } from '../../formats';
   import FancyHeader from './FancyHeader.svelte';
 

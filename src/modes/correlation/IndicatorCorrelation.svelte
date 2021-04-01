@@ -124,11 +124,3 @@
     </div>
   </div>
 </div>
-
-<style>
-  .range-selector {
-    display: block;
-    margin: 1em 0;
-    width: 100%;
-  }
-</style>
