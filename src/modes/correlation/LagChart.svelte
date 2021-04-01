@@ -5,6 +5,7 @@
   import { genCreditsLayer } from '../../specs/lineSpec';
   import { isMobileDevice } from '../../stores';
   import Toggle from '../mobile/Toggle.svelte';
+  import WarningBanner from '../mobile/components/WarningBanner.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -97,6 +98,14 @@
   });
   // TODO interactive lag selection
 </script>
+
+{#await data}
+  <!-- dummy -->
+{:catch error}
+  <WarningBanner>
+    {error.message}
+  </WarningBanner>
+{/await}
 
 <div class="chart-150">
   <Vega {data} {spec} />
