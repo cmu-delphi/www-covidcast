@@ -48,6 +48,104 @@
 
   $: data = loadData(primary, secondary, region, date);
 
+  function computeLagTransform(lag, primary, secondary) {
+    if (lag === 0) {
+      // copy paste values
+      /**
+       * @type {import('vega-lite/build/src/transform').Transform}
+       */
+      const transform = [
+        {
+          calculate: 'datum.date_value',
+          as: 'x_date',
+        },
+        {
+          calculate: `datum['${primary.key}']`,
+          as: 'x',
+        },
+        {
+          calculate: 'datum.date_value',
+          as: 'y_date',
+        },
+        {
+          calculate: `datum['${secondary.key}']`,
+          as: 'y',
+        },
+      ];
+      return transform;
+    }
+    if (lag > 0) {
+      // entry = x = t0 y = t+lag
+      // since in vega lite is previous lag days ->
+      // entry = x = t_i - lag, y = t_i
+      /**
+       * @type {import('vega-lite/build/src/transform').Transform}
+       */
+      const transform = [
+        {
+          window: [
+            {
+              op: 'lag',
+              param: lag,
+              field: 'date_value',
+              as: 'x_date',
+            },
+            {
+              op: 'lag',
+              param: lag,
+              field: primary.key,
+              as: 'x',
+            },
+          ],
+        },
+        {
+          calculate: 'datum.date_value',
+          as: 'y_date',
+        },
+        {
+          calculate: `datum['${secondary.key}']`,
+          as: 'y',
+        },
+      ];
+      return transform;
+    }
+    // lag < 0
+
+    // entry = x = t0 y = t-lag
+    // since in vega lite is previous lag days ->
+    // entry = x = t_i, y = t_i-lag
+    /**
+     * @type {import('vega-lite/build/src/transform').Transform}
+     */
+    const transform = [
+      {
+        calculate: 'datum.date_value',
+        as: 'x_date',
+      },
+      {
+        calculate: `datum['${primary.key}']`,
+        as: 'x',
+      },
+      {
+        window: [
+          {
+            op: 'lag',
+            param: -lag,
+            field: 'date_value',
+            as: 'y_date',
+          },
+          {
+            op: 'lag',
+            param: -lag,
+            field: secondary.key,
+            as: 'y',
+          },
+        ],
+      },
+    ];
+    return transform;
+  }
+
   function makeIndicatorCompareSpec(primary, secondary, lag, { zero = true, isMobile } = {}) {
     const title = joinTitle([`${secondary.name} correlated with`, `${primary.name} lagged by ${lag} days`], isMobile);
     /**
@@ -66,45 +164,20 @@
       title: {
         text: title,
       },
-      transform: [
-        {
-          window: [
-            {
-              op: 'lag',
-              param: Math.max(lag, 0),
-              field: 'date_value',
-              as: 'x_date',
-            },
-            {
-              op: 'lag',
-              param: Math.max(lag, 0),
-              field: primary.key,
-              as: 'x',
-            },
-            {
-              op: 'lag',
-              param: -Math.min(lag, 0),
-              field: 'date_value',
-              as: 'y_date',
-            },
-            {
-              op: 'lag',
-              param: -Math.min(lag, 0),
-              field: secondary.key,
-              as: 'y',
-            },
-          ],
-        },
-      ],
+      transform: computeLagTransform(lag, primary, secondary),
       layer: [
         {
           transform: [
             // snake line
             {
               window: [
-                { op: 'lag', param: 1, field: 'x', as: 'nextx' },
-                { op: 'lag', param: 1, field: 'y', as: 'nexty' },
+                // lag = 1 ... prev
+                { op: 'lag', param: 1, field: 'x', as: 'prevx' },
+                { op: 'lag', param: 1, field: 'y', as: 'prevy' },
               ],
+            },
+            {
+              filter: 'datum.prevx != null && datum.prevy != null',
             },
           ],
           mark: {
@@ -114,9 +187,9 @@
           },
           encoding: {
             x: { field: 'x', type: 'quantitative' },
-            x2: { field: 'nextx', type: 'quantitative' },
+            x2: { field: 'prevx', type: 'quantitative' },
             y: { field: 'y', type: 'quantitative' },
-            y2: { field: 'nexty', type: 'quantitative' },
+            y2: { field: 'prevy', type: 'quantitative' },
             color: {
               field: 'x_date',
               type: 'temporal',
@@ -198,7 +271,7 @@
             {
               regression: 'x',
               on: 'y',
-              params: true,
+              params: true, // return model parameters, like .R2
             },
             { calculate: "'R²: ' + format(datum.rSquared, '.2f')", as: 'R2' },
           ],
@@ -220,6 +293,7 @@
             {
               regression: 'x',
               on: 'y',
+              // no params = return points
             },
           ],
           // Draw the linear regression line.

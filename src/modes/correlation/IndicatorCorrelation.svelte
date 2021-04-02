@@ -106,8 +106,9 @@
         {fetcher}
         lag={$currentLag}
         on:highlight={(e) => {
-          const nextLag = e.detail || $currentLag;
-          if (nextLag != $currentLag) {
+          // don't use || since 0 == false
+          const nextLag = e.detail == null ? $currentLag : e.detail;
+          if (nextLag !== $currentLag) {
             currentLag.set(nextLag);
           }
         }}
