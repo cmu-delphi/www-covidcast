@@ -1,6 +1,5 @@
 <script>
   import Vega from '../../components/Vega.svelte';
-  import { generateCorrelationMetrics } from '../../data/correlation';
   import { BASE_SPEC, guessTopPadding, joinTitle } from '../../specs/commonSpec';
   import { autoAlign, COLOR, genCreditsLayer, signalPatches, resolveHighlightedField } from '../../specs/lineSpec';
   import { isMobileDevice } from '../../stores';
@@ -10,14 +9,6 @@
   import { createEventDispatcher } from 'svelte';
 
   /**
-   * @type {import("../../stores/params").DateParam}
-   */
-  export let date;
-  /**
-   * @type {import("../../stores/params").RegionParam}
-   */
-  export let region;
-  /**
    * @type {import("../../stores/params").SensorParam}
    */
   export let primary;
@@ -25,12 +16,13 @@
    * @type {import("../../stores/params").SensorParam}
    */
   export let secondary;
-  /**
-   * @type {import("../../stores/params").DataFetcher}
-   */
-  export let fetcher;
 
   export let lag = 0;
+
+  /**
+   * @type {import("../../data/correlation").Lag[]}
+   */
+  export let lags;
 
   /**
    * @type {number}
@@ -43,19 +35,6 @@
   }
 
   const dispatch = createEventDispatcher();
-
-  function loadData(primary, secondary, region, date) {
-    if (!secondary) {
-      return Promise.resolve([]);
-    }
-    const primaryData = fetcher.fetch1Sensor1RegionNDates(primary, region, date.windowTimeFrame);
-    const secondaryData = fetcher.fetch1Sensor1RegionNDates(secondary, region, date.windowTimeFrame);
-    return Promise.all([primaryData, secondaryData]).then((r) => {
-      return generateCorrelationMetrics(r[0], r[1]).lags;
-    });
-  }
-
-  $: data = loadData(primary, secondary, region, date);
 
   function generateSpec({ title, subTitle, zero } = {}) {
     /**
@@ -208,9 +187,19 @@
       highlightedLag = lag;
     }
   }
+
+  /**
+   * @param {import("../../data/correlation").Lag} lag
+   */
+  function simplifyLag(lag) {
+    const simple = { ...lag };
+    delete simple.a;
+    delete simple.b;
+    return simple;
+  }
 </script>
 
-{#await data}
+{#await lags}
   <!-- dummy -->
 {:catch error}
   <WarningBanner>
@@ -220,7 +209,7 @@
 
 <div class="chart-150">
   <Vega
-    {data}
+    data={lags}
     {spec}
     bind:this={vegaRef}
     signals={signalPatches}
@@ -234,8 +223,8 @@
   <DownloadMenu
     fileName="Correlation_Lag_vs_R2_{primary.name}_{secondary.name}"
     {vegaRef}
-    {data}
-    prepareRow={(row) => row}
+    data={lags}
+    prepareRow={simplifyLag}
     advanced={false}
   />
 </div>

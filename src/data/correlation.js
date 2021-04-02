@@ -7,7 +7,7 @@ import { zip } from '../util';
  * @property {number} r2
  * @property {number} slope y = slope * x + intercept
  * @property {number} intercept y = slope * x + intercept
- * @property {number} count number of dates used for the regression line
+ * @property {number} samples number of dates used for the regression line
  * @property {import('./fetchData').EpiDataRow[]} a
  * @property {import('./fetchData').EpiDataRow[]} b
  */
@@ -38,7 +38,7 @@ function asLag(lag, model, a, b) {
   return {
     r2: model.r2,
     lag,
-    count: model.points.length,
+    samples: model.points.length,
     slope: model.equation[0],
     intercept: model.equation[1],
     a,

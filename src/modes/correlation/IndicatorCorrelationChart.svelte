@@ -1,22 +1,12 @@
 <script>
   import Vega from '../../components/Vega.svelte';
-  import { combineSignals } from '../../data/utils';
   import { BASE_SPEC, guessTopPadding, joinTitle } from '../../specs/commonSpec';
   import { genCreditsLayer } from '../../specs/lineSpec';
   import { isMobileDevice } from '../../stores';
   import Toggle from '../mobile/Toggle.svelte';
   import CorrelationTooltip from './CorrelationTooltip.svelte';
   import DownloadMenu from '../mobile/components/DownloadMenu.svelte';
-
-  /**
-   * @type {import("../../stores/params").DateParam}
-   */
-  export let date;
-  /**
-   * @type {import("../../stores/params").RegionParam}
-   */
-  export let region;
-
+  import { formatDateISO } from '../../formats';
   /**
    * @type {import("../../stores/params").SensorParam}
    */
@@ -25,125 +15,53 @@
    * @type {import("../../stores/params").SensorParam}
    */
   export let secondary;
-  /**
-   * @type {import("../../stores/params").DataFetcher}
-   */
-  export let fetcher;
-  /**
-   * Days of lag
-   */
-  export let lag = 0;
 
-  function loadData(primary, secondary, region, date) {
-    if (!secondary) {
-      return Promise.resolve([]);
-    }
-    const primaryData = fetcher.fetch1Sensor1RegionNDates(primary, region, date.windowTimeFrame);
-    const secondaryData = fetcher.fetch1Sensor1RegionNDates(secondary, region, date.windowTimeFrame);
-    return Promise.all([primaryData, secondaryData]).then((r) => {
-      const ref = r[0].map((d) => ({ ...d })); // merge into a copy
-      return combineSignals(r, ref, [primary.key, secondary.key]);
+  export let lag = 0;
+  /**
+   * @type {Promise<import("../../data/correlation").Lag>}
+   */
+  export let lagData;
+
+  /**
+   * @param {Promise<import("../../data/correlation").Lag>} lag
+   */
+  function prepareData(lag) {
+    return lag.then((lagObj) => {
+      return lagObj.a.map((xi, i) => {
+        const yi = lagObj.b[i];
+        return {
+          x: xi.value,
+          x_date: xi.date_value,
+          x_entry: xi,
+          y: yi.value,
+          y_date: yi.date_value,
+          y_enty: yi,
+        };
+      });
     });
   }
 
-  $: data = loadData(primary, secondary, region, date);
+  $: data = prepareData(lagData);
 
-  function computeLagTransform(lag, primary, secondary) {
-    if (lag === 0) {
-      // copy paste values
-      /**
-       * @type {import('vega-lite/build/src/transform').Transform}
-       */
-      const transform = [
-        {
-          calculate: 'datum.date_value',
-          as: 'x_date',
-        },
-        {
-          calculate: `datum['${primary.key}']`,
-          as: 'x',
-        },
-        {
-          calculate: 'datum.date_value',
-          as: 'y_date',
-        },
-        {
-          calculate: `datum['${secondary.key}']`,
-          as: 'y',
-        },
-      ];
-      return transform;
-    }
-    if (lag > 0) {
-      // entry = x = t0 y = t+lag
-      // since in vega lite is previous lag days ->
-      // entry = x = t_i - lag, y = t_i
-      /**
-       * @type {import('vega-lite/build/src/transform').Transform}
-       */
-      const transform = [
-        {
-          window: [
-            {
-              op: 'lag',
-              param: lag,
-              field: 'date_value',
-              as: 'x_date',
-            },
-            {
-              op: 'lag',
-              param: lag,
-              field: primary.key,
-              as: 'x',
-            },
-          ],
-        },
-        {
-          calculate: 'datum.date_value',
-          as: 'y_date',
-        },
-        {
-          calculate: `datum['${secondary.key}']`,
-          as: 'y',
-        },
-      ];
-      return transform;
-    }
-    // lag < 0
+  function prepareDownloadRow(row) {
+    const r = {};
+    r.regionId = row.x_entry.propertyId;
+    r.regionLevel = row.x_entry.level;
+    r.regionName = row.x_entry.displayName;
 
-    // entry = x = t0 y = t-lag
-    // since in vega lite is previous lag days ->
-    // entry = x = t_i, y = t_i-lag
-    /**
-     * @type {import('vega-lite/build/src/transform').Transform}
-     */
-    const transform = [
-      {
-        calculate: 'datum.date_value',
-        as: 'x_date',
-      },
-      {
-        calculate: `datum['${primary.key}']`,
-        as: 'x',
-      },
-      {
-        window: [
-          {
-            op: 'lag',
-            param: -lag,
-            field: 'date_value',
-            as: 'y_date',
-          },
-          {
-            op: 'lag',
-            param: -lag,
-            field: secondary.key,
-            as: 'y',
-          },
-        ],
-      },
-    ];
-    return transform;
+    r.x_indicatorDataSource = primary.value.id;
+    r.x_indicatorId = primary.value.signal;
+    r.x_indicatorName = primary.name;
+    r.x = row.x;
+    r.x_date = formatDateISO(row.x_date);
+
+    r.y_indicatorDataSource = secondary.value.id;
+    r.y_indicatorId = secondary.value.signal;
+    r.y_indicatorName = secondary.name;
+    r.y = row.y;
+    r.y_date = formatDateISO(row.y_date);
+
+    return r;
   }
 
   function makeIndicatorCompareSpec(primary, secondary, lag, { zero = true, isMobile } = {}) {
@@ -164,7 +82,6 @@
       title: {
         text: title,
       },
-      transform: computeLagTransform(lag, primary, secondary),
       layer: [
         {
           transform: [
@@ -335,7 +252,13 @@
 <div class="buttons">
   <Toggle bind:checked={scaled}>Rescale X/Y-axis</Toggle>
   <div class="spacer" />
-  <DownloadMenu fileName="Correlation_{primary.name}_{secondary.name}_Lag_{lag}" {vegaRef} advanced={false} />
+  <DownloadMenu
+    fileName="Correlation_{primary.name}_{secondary.name}_Lag_{lag}"
+    {vegaRef}
+    {data}
+    prepareRow={prepareDownloadRow}
+    advanced={false}
+  />
 </div>
 
 <style>

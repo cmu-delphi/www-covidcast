@@ -22,6 +22,7 @@
   import FancyHeader from '../mobile/FancyHeader.svelte';
   import { MULTI_COLORS } from '../../specs/lineSpec';
   import AboutSection from '../mobile/components/AboutSection.svelte';
+  import { generateCorrelationMetrics } from '../../data/correlation';
 
   $: primary = new SensorParam($currentSensorEntry);
   $: secondary = new SensorParam($currentSensorEntry2, currentSensor2);
@@ -58,6 +59,25 @@
   }
 
   $: domains = computeDomains(date.windowTimeFrame, $currentLag);
+
+  function loadData(primary, secondary, region, date) {
+    if (!secondary | !primary) {
+      return Promise.resolve([]);
+    }
+    const primaryData = fetcher.fetch1Sensor1RegionNDates(primary, region, date.windowTimeFrame);
+    const secondaryData = fetcher.fetch1Sensor1RegionNDates(secondary, region, date.windowTimeFrame);
+    return Promise.all([primaryData, secondaryData]).then((r) => {
+      return generateCorrelationMetrics(r[0], r[1]).lags;
+    });
+  }
+
+  $: lags = loadData(primary, secondary, region, date);
+
+  function selectLag(lags, lag) {
+    return lags.then((data) => data.find((d) => d.lag === lag) || []);
+  }
+
+  $: selectedLag = selectLag(lags, $currentLag);
 </script>
 
 <div class="mobile-root">
@@ -101,9 +121,7 @@
       <LagChart
         {primary}
         {secondary}
-        {date}
-        {region}
-        {fetcher}
+        {lags}
         lag={$currentLag}
         on:highlight={(e) => {
           // don't use || since 0 == false
@@ -118,7 +136,7 @@
       </p>
       <hr />
       <FancyHeader invert sub="Chart at Lag {$currentLag} days">Correlation</FancyHeader>
-      <IndicatorCorrelationChart {primary} {secondary} {date} {region} {fetcher} lag={$currentLag} />
+      <IndicatorCorrelationChart {primary} {secondary} lag={$currentLag} lagData={selectedLag} />
     </div>
     <AboutSection>
       <h3 class="mobile-h3">About the SNAKE PLOT</h3>
