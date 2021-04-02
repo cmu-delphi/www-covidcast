@@ -1,9 +1,15 @@
 import { linear } from 'regression';
+import { zip } from '../util';
 
 /**
  * @typedef {object} Lag
  * @property {number} lag
  * @property {number} r2
+ * @property {number} slope y = slope * x + intercept
+ * @property {number} intercept y = slope * x + intercept
+ * @property {number} count number of dates used for the regression line
+ * @property {import('./fetchData').EpiDataRow[]} a
+ * @property {import('./fetchData').EpiDataRow[]} b
  */
 
 /**
@@ -21,6 +27,23 @@ import { linear } from 'regression';
 const lag = 28;
 
 /**
+ *
+ * @param {number} lag
+ * @param {import('regression').Result} model
+ * @return {Lag}
+ */
+function asLag(lag, model, a, b) {
+  return {
+    r2: model.r2,
+    lag,
+    count: model.points.length,
+    slope: model.equation[0],
+    intercept: model.equation[1],
+    a,
+    b,
+  };
+}
+/**
  * Generates R^2 metrics for lags between -28 and 28 days.
  *
  * For lags between 0 and 28 lag b backwards with respect to a.  For -28 to -1 lag a with
@@ -29,51 +52,54 @@ const lag = 28;
  * For each lag, the input is a window of length(a)-28, such that the number of values at
  * each lag is the same.
  *
- * @param {number[]} a
- * @param {number[]} b
+ * @template {{value: number}} T
+ * @param {T[]} a
+ * @param {T[]} b
  * @returns {Lag[]}
  */
 function generateLags(a, b) {
+  /**
+   * @type {Lag[]}
+   */
   const lags = [];
+
+  const aValues = a.map((d) => d.value);
+  const bValues = b.map((d) => d.value);
+
   const aWindow = a.slice(lag);
+  const aWindowValues = aValues.slice(lag);
   const bWindow = b.slice(lag);
+  const bWindowValues = bValues.slice(lag);
 
   for (let i = 0; i <= lag; i++) {
     const bLag = b.slice(lag - i, b.length - i);
-    const model = linear(zip(aWindow, bLag));
-    lags.push({ lag: i, r2: model.r2 });
+    const bValuesLag = bValues.slice(lag - i, b.length - i);
+    const model = linear(zip(aWindowValues, bValuesLag));
+    lags.push(asLag(i, model, aWindow, bLag));
   }
 
   for (let i = 1; i <= lag; i++) {
     const aLag = a.slice(lag - i, b.length - i);
-    const model = linear(zip(aLag, bWindow));
-    lags.push({ lag: -1 * i, r2: model.r2 });
+    const aValuesLag = aValues.slice(lag - i, b.length - i);
+    const model = linear(zip(aValuesLag, bWindowValues));
+    lags.push(asLag(-i, model, aLag, bWindow));
   }
   return lags;
 }
 
 /**
- * Do a pair-wise combination of the elements from a and b arrays.
- * @param {number[]} a
- * @param {number[]} b
- * @returns {[number, number][]}
- */
-function zip(a, b) {
-  return a.map((x, i) => {
-    return [x, b[i]];
-  });
-}
-/**
  * Do a pair-wise intersection of EpiDataRow by date.
- * @param {EpiDataRow[]} a
- * @param {EpiDataRow[]} b
- * @returns {[number, number][]}
+ * @template {{time_value: number}} T
+ * @param {T[]} a
+ * @param {T[]} b
+ * @returns {[T, T][]}
  */
 function intersectEpiDataRow(a, b) {
   const aLength = a.length;
   const bLength = b.length;
   let aIndex = 0;
   let bIndex = 0;
+
   const intersection = [];
 
   while (aIndex < aLength && bIndex < bLength) {
@@ -82,7 +108,7 @@ function intersectEpiDataRow(a, b) {
     } else if (a[aIndex].time_value > b[bIndex].time_value) {
       bIndex++;
     } else {
-      intersection.push([a[aIndex].value, b[bIndex].value]);
+      intersection.push([a[aIndex], b[bIndex]]);
       aIndex++;
       bIndex++;
     }
