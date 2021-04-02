@@ -6,6 +6,7 @@
   import { generateCorrelationMetrics } from '../../data/correlation';
   import { formatValue } from '../../formats';
   import FancyHeader from './FancyHeader.svelte';
+  import SortColumnIndicator from './SortColumnIndicator.svelte';
 
   /**
    * @typedef {import('../../stores/constants').SensorEntry} SensorEntry
@@ -31,6 +32,42 @@
    * @type {import("../../stores/params").DataFetcher}
    */
   export let fetcher;
+
+  let sortCriteria = 'name';
+  let sortDirectionDesc = false;
+
+  function bySortCriteria(sortCriteria, sortDirectionDesc) {
+    const less = sortDirectionDesc ? 1 : -1;
+
+    function clean(a) {
+      // normalize NaN to null
+      return typeof a === 'number' && Number.isNaN(a) ? null : a;
+    }
+    return (a, b) => {
+      const av = clean(a[sortCriteria]);
+      const bv = clean(b[sortCriteria]);
+      if ((av == null) !== (bv == null)) {
+        return av == null ? 1 : -1;
+      }
+      if (av !== bv) {
+        return av < bv ? less : -less;
+      }
+      if (a.name !== b.name) {
+        return a.name < b.name ? less : -less;
+      }
+      return 0;
+    };
+  }
+
+  function sortClick(prop, defaultSortDesc = false) {
+    if (sortCriteria === prop) {
+      sortDirectionDesc = !sortDirectionDesc;
+      return;
+    }
+    sortCriteria = prop;
+    sortDirectionDesc = defaultSortDesc;
+  }
+  $: comparator = bySortCriteria(sortCriteria, sortDirectionDesc);
 
   /**
    * @param {SensorEntry} context
@@ -58,10 +95,16 @@
     return sensorList
       .filter((d) => d.key !== context.key)
       .map((sensor) => {
-        return {
+        const metrics = buildMetrics(context, sensor, region, date);
+        const r = {
           ...sensor,
-          metrics: buildMetrics(context, sensor, region, date),
+          metrics,
         };
+        metrics.then((met) => {
+          // inline for sorting
+          Object.assign(r, met);
+        });
+        return r;
       });
   }
 
@@ -72,6 +115,8 @@
     currentMode.set(modeByID.correlation);
     scrollToTop();
   }
+
+  $: rows = otherSensors.sort(comparator);
 </script>
 
 <FancyHeader sub="Correlation">{sensor.name}</FancyHeader>
@@ -84,10 +129,44 @@
       <th class="mobile-th uk-text-right"><span>Max R<sup>2</sup></span></th>
       <th class="mobile-th uk-text-right"><span>Lag at Max R<sup>2</sup></span></th>
       <th class="mobile-th" />
+    </tr><tr>
+      <th class="sort-indicator uk-text-center">
+        <SortColumnIndicator
+          label="Indicator"
+          on:click={() => sortClick('name')}
+          sorted={sortCriteria === 'name'}
+          desc={sortDirectionDesc}
+        />
+      </th>
+      <th class="sort-indicator">
+        <SortColumnIndicator
+          label="R2"
+          on:click={() => sortClick('r2At0')}
+          sorted={sortCriteria === 'r2At0'}
+          desc={sortDirectionDesc}
+        />
+      </th>
+      <th class="sort-indicator">
+        <SortColumnIndicator
+          label="Max R2"
+          on:click={() => sortClick('r2AtMaxR2')}
+          sorted={sortCriteria === 'r2AtMaxR2'}
+          desc={sortDirectionDesc}
+        />
+      </th>
+      <th class="sort-indicator">
+        <SortColumnIndicator
+          label="Lag at Max R2"
+          on:click={() => sortClick('lagAtMaxR2')}
+          sorted={sortCriteria === 'lagAtMaxR2'}
+          desc={sortDirectionDesc}
+        />
+      </th>
+      <th class="sort-indicator" />
     </tr>
   </thead>
   <tbody>
-    {#each otherSensors as sensor (sensor.key)}
+    {#each rows as sensor (sensor.key)}
       <tr>
         <td>
           <a
