@@ -76,7 +76,28 @@
 
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <FancyHeader invert sub="Chart">R<sup>2</sup></FancyHeader>
+      <AboutSection>
+        <h3 class="mobile-h3">About INDICATOR CORRELATIONS</h3>
+        <p>
+          This illustration of correlation does not imply causation, but correlations can hint at underlying behavior.
+        </p>
+        <p>
+          The <strong>coefficient of determination</strong> (or <strong>R<sup>2</sup></strong>) is a measure of linear
+          correlation that indicates the proportion of the variance in one indicator as explained by variance of
+          another.
+        </p>
+        <p>
+          In other words, how much does the movement in one indicator explain movement in another? For example, a change
+          in new cases is reflected in deaths. <strong>R<sup>2</sup></strong> is defined as between <code>1.0</code>
+          (entirely correlated), to <code>0.0</code> (no correlation at all).
+        </p>
+        <p>
+          <strong>Lag</strong> is the number in days that an indicator can be shifted, with respect to another. For example,
+          if we hypothesize that an increase in new cases results in an increase in hospitalizations three days later, the
+          lag is three.
+        </p>
+      </AboutSection>
+      <FancyHeader invert sub="Chart">R<sup>2</sup> per Lag</FancyHeader>
       <LagChart
         {primary}
         {secondary}
@@ -99,8 +120,15 @@
       <IndicatorCorrelationChart {primary} {secondary} {date} {region} {fetcher} lag={$currentLag} />
     </div>
     <AboutSection>
-      <h3 class="mobile-h3">About Snake</h3>
-      <p>Test</p>
+      <h3 class="mobile-h3">About the SNAKE PLOT</h3>
+      <p>A snake plot is a scatter plot of two indicators by date.</p>
+      <p>Dots indicate the values of each indicator at two dates.</p>
+      <p>You can shift the difference between these dates by adjusting the lag.</p>
+      <p>
+        The line between dots indicates how recent the observation was. The most recent days are thick, while those
+        farthest in time are thin.
+      </p>
+      <p>For reference, each indicator is then separately shown by date.</p>
     </AboutSection>
     <div class="grid-3-11">
       <hr />
