@@ -36,6 +36,7 @@
     <Search
       modern="small"
       placeholder="Search for state or county"
+      title="Region"
       items={[nationInfo, ...stateInfo, ...countyInfo]}
       selectedItem={$currentRegionInfo}
       labelFieldName="displayName"

@@ -135,10 +135,11 @@
   .dropdown-label {
     position: absolute;
     top: -0.7em;
-    font-weight: normal;
+    left: 24px;
     font-size: 0.75rem;
     padding: 2px;
     border-radius: 3px;
     background: white;
+    font-weight: 400;
   }
 </style>
