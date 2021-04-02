@@ -26,6 +26,9 @@
   function switchSurvey() {
     switchToMode(modeByID['survey-results']);
   }
+  function switchCorrelations() {
+    switchToMode(modeByID.correlation);
+  }
 </script>
 
 <div class="uk-container content-grid root mobile-root landing-banner">
@@ -78,17 +81,44 @@
         revisions, and applying additional processing like reducing noise, adjusting temporal focus, or enabling more
         direct comparisons.
       </p>
-      <p>
-        Our most useful indicators are visualized in this site, but for the full set, please <a
-          href="https://cmu-delphi.github.io/delphi-epidata/">visit our API</a
-        >.
-      </p>
 
       <ul class="sensors">
         {#each groupedSensorList as group}
           <SensorGroup {group} />
         {/each}
       </ul>
+      <p>
+        Our most useful indicators are visualized in this site, but for the full set, please <a
+          href="https://cmu-delphi.github.io/delphi-epidata/">visit our API</a
+        >.
+      </p>
+      <div class="button-wrapper">
+        <a class="uk-button uk-button-default uk-button-delphi" href="https://cmu-delphi.github.io/delphi-epidata/">
+          COVIDcast API
+        </a>
+      </div>
+    </div>
+
+    <div class="block">
+      <hr />
+      <FancyHeader sub="Correlations" center>Indicator</FancyHeader>
+      <p>
+        Correlation doesn’t equal causation, but correlations sometimes tell a deeper story than individual indicators
+        by themselves.
+      </p>
+      <p>
+        Explore the relationship between indicators as they move over time. Discover which indicators correlate most
+        strongly with others in a specific location, and see which of those may have some predictive power.
+      </p>
+      <div class="button-wrapper">
+        <a
+          class="uk-button uk-button-default uk-button-delphi uk-text-uppercase"
+          href="./{modeByID.correlation.id}"
+          on:click|preventDefault={switchCorrelations}
+        >
+          Explore Correlations
+        </a>
+      </div>
     </div>
 
     <div class="block">
@@ -103,6 +133,16 @@
           {/each}
         </a>
       </p>
+
+      <div class="button-wrapper">
+        <a
+          class="uk-button uk-button-default uk-button-delphi uk-text-uppercase"
+          href="./{modeByID['survey-results'].id}"
+          on:click|preventDefault={switchSurvey}
+        >
+          View Survey Results
+        </a>
+      </div>
 
       <SurveyStats className="uk-text-center mobile-two-col__highlight" />
     </div>
