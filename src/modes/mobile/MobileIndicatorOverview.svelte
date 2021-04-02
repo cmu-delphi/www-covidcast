@@ -77,10 +77,8 @@
     <div class="grid-3-11">
       <hr />
       <GeoTable {sensor} {region} {date} {fetcher} />
-    </div>
-    <div class="grid-3-11">
       <hr />
-      <IndicatorCorrelation {sensor} {region} {date} {fetcher} />
     </div>
+    <IndicatorCorrelation {sensor} {region} {date} {fetcher} />
   </div>
 </div>

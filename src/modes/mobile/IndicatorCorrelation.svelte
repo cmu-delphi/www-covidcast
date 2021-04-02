@@ -7,6 +7,7 @@
   import { formatRawValue } from '../../formats';
   import FancyHeader from './FancyHeader.svelte';
   import SortColumnIndicator from './SortColumnIndicator.svelte';
+  import AboutSection from './components/AboutSection.svelte';
 
   /**
    * @typedef {import('../../stores/constants').SensorEntry} SensorEntry
@@ -119,88 +120,121 @@
   $: rows = otherSensors.sort(comparator);
 </script>
 
-<FancyHeader sub="Correlation">{sensor.name}</FancyHeader>
-
-<table class="mobile-table">
-  <thead>
-    <tr>
-      <th class="mobile-th"><span>Indicator</span></th>
-      <th class="mobile-th uk-text-right"><span>R<sup>2</sup></span></th>
-      <th class="mobile-th uk-text-right"><span>Max R<sup>2</sup></span></th>
-      <th class="mobile-th uk-text-right"><span>Lag at Max R<sup>2</sup></span></th>
-      <th class="mobile-th" />
-    </tr><tr>
-      <th class="sort-indicator uk-text-center">
-        <SortColumnIndicator
-          label="Indicator"
-          on:click={() => sortClick('name')}
-          sorted={sortCriteria === 'name'}
-          desc={sortDirectionDesc}
-        />
-      </th>
-      <th class="sort-indicator">
-        <SortColumnIndicator
-          label="R2"
-          on:click={() => sortClick('r2At0')}
-          sorted={sortCriteria === 'r2At0'}
-          desc={sortDirectionDesc}
-        />
-      </th>
-      <th class="sort-indicator">
-        <SortColumnIndicator
-          label="Max R2"
-          on:click={() => sortClick('r2AtMaxR2')}
-          sorted={sortCriteria === 'r2AtMaxR2'}
-          desc={sortDirectionDesc}
-        />
-      </th>
-      <th class="sort-indicator">
-        <SortColumnIndicator
-          label="Lag at Max R2"
-          on:click={() => sortClick('lagAtMaxR2')}
-          sorted={sortCriteria === 'lagAtMaxR2'}
-          desc={sortDirectionDesc}
-        />
-      </th>
-      <th class="sort-indicator" />
-    </tr>
-  </thead>
-  <tbody>
-    {#each rows as sensor (sensor.key)}
+<div class="grid-3-11">
+  <FancyHeader sub="Correlation">{sensor.name}</FancyHeader>
+</div>
+<AboutSection>
+  <p>
+    The <strong>coefficient of determination</strong> (or <strong>R<sup>2</sup></strong>) is a measure of linear
+    correlation that indicates the proportion of the variance in one indicator as explained by variance of another.
+  </p>
+  <p>
+    In other words, how much does the movement in one indicator explain movement in another? For example, a change in
+    new cases is reflected in deaths. <strong>R<sup>2</sup></strong> is defined as between <code>1.0</code> (entirely
+    correlated), to <code>0.0</code> (no correlation at all).
+  </p>
+  <p>
+    <strong>Lag</strong> is the number in days that an indicator can be shifted, with respect to another. For example, if
+    we hypothesize that an increase in new cases results in an increase in hospitalizations three days later, the lag is
+    three.
+  </p>
+  <p>This table shows the following metrics between indicators:</p>
+  <ul>
+    <li><strong>R<sup>2</sup> at Lag 0</strong>: The correlation between indicators when there is no lag.</li>
+    <li>
+      <strong>Max R<sup>2</sup></strong>: The maximum correlation between signals between -28 days lagged and 28 days
+      lagged.
+    </li>
+    <li><strong>Lag at Max R<sup>2</sup></strong>: The number of days at which R<sup>2</sup> is maximized.</li>
+  </ul>
+  <p>
+    For example, if <strong>Max R<sup>2</sup></strong> is <code>0.8</code> and <strong>Lag at Max R<sup>2</sup></strong>
+    is <code>14</code>, that would strongly indicate that the movement in the below indicator would be reflected in this
+    indicator 14 days from now.
+  </p>
+</AboutSection>
+<div class="grid-3-11">
+  <table class="mobile-table">
+    <thead>
       <tr>
-        <td>
-          <a
-            href="../correlation/?sensor2={sensor.key}"
-            class="uk-link-text"
-            on:click|preventDefault={() => switchMode(sensor)}
-          >
-            {sensor.name}
-          </a>
-        </td>
-        {#await sensor.metrics}
-          <td class="uk-text-right">&hellip;</td>
-          <td class="uk-text-right">&hellip;</td>
-          <td class="uk-text-right">&hellip;</td>
-        {:then m}
-          <td class="uk-text-right">{formatRawValue(m.r2At0)}</td>
-          <td class="uk-text-right">{formatRawValue(m.r2AtMaxR2)}</td>
-          <td class="uk-text-right">{m.lagAtMaxR2.toLocaleString()} days</td>
-        {:catch err}
-          <td colspan="3" class="small">{err.message}</td>
-        {/await}
-        <td>
-          <a
-            href="../correlation/?sensor2={sensor.key}"
-            class="uk-link-text details-link"
-            on:click|preventDefault={() => switchMode(sensor)}
-          >
-            {@html chevronRightIcon}
-          </a>
-        </td>
+        <th class="mobile-th"><span>Indicator</span></th>
+        <th class="mobile-th uk-text-right"><span>R<sup>2</sup></span></th>
+        <th class="mobile-th uk-text-right"><span>Max R<sup>2</sup></span></th>
+        <th class="mobile-th uk-text-right"><span>Lag at Max R<sup>2</sup></span></th>
+        <th class="mobile-th" />
+      </tr><tr>
+        <th class="sort-indicator uk-text-center">
+          <SortColumnIndicator
+            label="Indicator"
+            on:click={() => sortClick('name')}
+            sorted={sortCriteria === 'name'}
+            desc={sortDirectionDesc}
+          />
+        </th>
+        <th class="sort-indicator">
+          <SortColumnIndicator
+            label="R2"
+            on:click={() => sortClick('r2At0')}
+            sorted={sortCriteria === 'r2At0'}
+            desc={sortDirectionDesc}
+          />
+        </th>
+        <th class="sort-indicator">
+          <SortColumnIndicator
+            label="Max R2"
+            on:click={() => sortClick('r2AtMaxR2')}
+            sorted={sortCriteria === 'r2AtMaxR2'}
+            desc={sortDirectionDesc}
+          />
+        </th>
+        <th class="sort-indicator">
+          <SortColumnIndicator
+            label="Lag at Max R2"
+            on:click={() => sortClick('lagAtMaxR2')}
+            sorted={sortCriteria === 'lagAtMaxR2'}
+            desc={sortDirectionDesc}
+          />
+        </th>
+        <th class="sort-indicator" />
       </tr>
-    {/each}
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      {#each rows as sensor (sensor.key)}
+        <tr>
+          <td>
+            <a
+              href="../correlation/?sensor2={sensor.key}"
+              class="uk-link-text"
+              on:click|preventDefault={() => switchMode(sensor)}
+            >
+              {sensor.name}
+            </a>
+          </td>
+          {#await sensor.metrics}
+            <td class="uk-text-right">&hellip;</td>
+            <td class="uk-text-right">&hellip;</td>
+            <td class="uk-text-right">&hellip;</td>
+          {:then m}
+            <td class="uk-text-right">{formatRawValue(m.r2At0)}</td>
+            <td class="uk-text-right">{formatRawValue(m.r2AtMaxR2)}</td>
+            <td class="uk-text-right">{m.lagAtMaxR2.toLocaleString()} days</td>
+          {:catch err}
+            <td colspan="3" class="small">{err.message}</td>
+          {/await}
+          <td>
+            <a
+              href="../correlation/?sensor2={sensor.key}"
+              class="uk-link-text details-link"
+              on:click|preventDefault={() => switchMode(sensor)}
+            >
+              {@html chevronRightIcon}
+            </a>
+          </td>
+        </tr>
+      {/each}
+    </tbody>
+  </table>
+</div>
 
 <style>
   .details-link {
