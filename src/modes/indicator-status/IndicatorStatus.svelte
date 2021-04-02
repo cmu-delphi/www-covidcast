@@ -51,7 +51,7 @@
   </div>
 
   <hr />
-  <FancyHeader invert sub="Coverage">{signal ? signal.name : '?'}</FancyHeader>
+  <FancyHeader invert sub="County Coverage">{signal ? signal.name : '?'}</FancyHeader>
   <IndicatorCoverageChart
     {signal}
     {domain}
