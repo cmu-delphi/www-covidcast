@@ -99,7 +99,7 @@
                   select: {
                     type: 'point',
                     clear: false,
-                    on: `click, [touchstart, touchend] > touchmove`,
+                    on: `click, mousemove, [touchstart, touchend] > touchmove`,
                     encodings: ['x'],
                     nearest: true,
                   },

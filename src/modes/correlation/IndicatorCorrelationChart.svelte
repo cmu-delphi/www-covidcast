@@ -64,8 +64,21 @@
     return r;
   }
 
-  function makeIndicatorCompareSpec(primary, secondary, lag, { zero = true, isMobile } = {}) {
-    const title = joinTitle([`${secondary.name} correlated with`, `${primary.name} lagged by ${lag} days`], isMobile);
+  function makeExpression(title, variable, signal) {
+    if (Array.isArray(title)) {
+      return `[${title.map((d) => makeExpression(d, variable, signal)).join(',')}]`;
+    }
+    if (!title.includes(variable)) {
+      return `"${title}"`;
+    }
+    return title
+      .split(variable)
+      .map((d) => `"${d}"`)
+      .join(` + ${signal} + `);
+  }
+
+  function makeIndicatorCompareSpec(primary, secondary, { zero = true, isMobile } = {}) {
+    const title = joinTitle([`${secondary.name} correlated with`, `${primary.name} lagged by $lag days`], isMobile);
     /**
      * @type {import('vega-lite').TopLevelSpec}
      */
@@ -80,7 +93,9 @@
       width: 400,
       height: 400,
       title: {
-        text: title,
+        text: {
+          expr: makeExpression(title, '$lag', 'lag'),
+        },
       },
       layer: [
         {
@@ -237,7 +252,7 @@
   }
 
   let scaled = false;
-  $: spec = makeIndicatorCompareSpec(primary, secondary, lag, {
+  $: spec = makeIndicatorCompareSpec(primary, secondary, {
     zero: !scaled,
     isMobile: $isMobileDevice,
   });
@@ -246,7 +261,14 @@
 </script>
 
 <div class="chart-correlation">
-  <Vega bind:this={vegaRef} {data} {spec} tooltip={CorrelationTooltip} tooltipProps={{ primary, secondary, lag }} />
+  <Vega
+    bind:this={vegaRef}
+    {data}
+    {spec}
+    tooltip={CorrelationTooltip}
+    tooltipProps={{ primary, secondary, lag }}
+    signals={{ lag }}
+  />
 </div>
 
 <div class="buttons">
