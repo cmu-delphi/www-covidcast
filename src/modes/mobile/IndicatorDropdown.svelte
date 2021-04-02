@@ -9,6 +9,8 @@
 
   export let className = 'grid-3-11';
 
+  export let label = 'Indicator';
+
   let open = false;
 
   function switchSensor(newSensor) {
@@ -30,6 +32,7 @@
     <span class="inline-svg-icon down-icon">
       {@html caretDownIcon}
     </span>
+    <div class="dropdown-label">{label}</div>
   </button>
   <ul class="content">
     {#each groupedSensorList as group}
@@ -127,5 +130,15 @@
 
   .open > .content {
     display: block;
+  }
+
+  .dropdown-label {
+    position: absolute;
+    top: -0.7em;
+    font-weight: normal;
+    font-size: 0.75rem;
+    padding: 2px;
+    border-radius: 3px;
+    background: white;
   }
 </style>
