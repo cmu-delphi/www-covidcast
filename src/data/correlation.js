@@ -17,6 +17,8 @@ import { zip } from '../util';
  * @property {number} r2At0
  * @property {number} lagAtMaxR2
  * @property {number} r2AtMaxR2
+ * @property {Lag} t0
+ * @property {Lag} tMax
  * @property {Lag[]} lags
  */
 
@@ -145,6 +147,8 @@ export function generateCorrelationMetrics(response, explanatory) {
     r2At0: lagAtZero.r2,
     lagAtMaxR2: max.lag,
     r2AtMaxR2: max.r2,
+    tMax: max,
+    t0: lagAtZero,
     lags: lags,
   };
 }
