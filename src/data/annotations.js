@@ -112,6 +112,10 @@ export class Annotation {
     );
   }
 
+  matchRegionLevel(level) {
+    return this.regions.some((annotatedRegion) => annotatedRegion.level == level);
+  }
+
   /**
    * @param {{id: string, signal: string}} sensor
    */
@@ -226,6 +230,25 @@ export class AnnotationManager {
           d.matchSensor(sensor) &&
           region != null &&
           d.matchRegion(region) &&
+          d.inDateRange(dateStart, dateEnd),
+      )
+      .sort(sortByDate);
+  }
+
+  /**
+   * @param {{id: string, signal: string}} sensor
+   * @param {string} level
+   * @param {Date} dateStart
+   * @param {Date} dateEnd
+   */
+  getWindowLevelAnnotations(sensor, level, dateStart, dateEnd) {
+    return this.annotations
+      .filter(
+        (d) =>
+          sensor != null &&
+          d.matchSensor(sensor) &&
+          level != null &&
+          d.matchRegionLevel(level) &&
           d.inDateRange(dateStart, dateEnd),
       )
       .sort(sortByDate);
