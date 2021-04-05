@@ -425,7 +425,7 @@ export function generateLineAndBarSpec(options = {}) {
   const point = spec.layer[1];
   point.mark = {
     type: 'bar',
-    color: MULTI_COLORS[0],
+    color: options.color || MULTI_COLORS[0],
     width: {
       expr: `floor(width / customCountDays(domain('x')[0], domain('x')[1]))`,
     },
