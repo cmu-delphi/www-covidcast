@@ -1,4 +1,5 @@
 <script>
+  import AnnotationTable from './AnnotationTable.svelte';
   import '../mobile/common.css';
 </script>
 
@@ -9,7 +10,9 @@
     </div>
   </div>
   <div class="uk-container content-grid">
-    <div class="grid-3-11" />
+    <div class="grid-3-11">
+      <AnnotationTable />
+    </div>
   </div>
 </div>
 
