@@ -23,6 +23,7 @@
   import { annotationManager, isMobileDevice } from '../../stores';
   import IndicatorAnnotation from './IndicatorAnnotation.svelte';
   import IndicatorAnnotations from './IndicatorAnnotations.svelte';
+  import { joinTitle } from '../../specs/commonSpec';
 
   export let height = 250;
 
@@ -54,6 +55,21 @@
   export let ends = null;
 
   /**
+   * show only a single region regardless of the level
+   */
+  export let singleRegionOnly = false;
+  /**
+   * base color for the first region
+   */
+  export let color = MULTI_COLORS[0];
+
+  /**
+   * optional domain
+   * @type {null | [number, number]}
+   */
+  export let domain = null;
+
+  /**
    * @type {import("../../stores/params").Region}
    */
   const neighboringInfo = {
@@ -71,24 +87,25 @@
    * @param {import('../../stores/params').SensorParam} sensor
    * @param {import('../../stores/params').RegionParam} region
    * @param {import('../../stores/params').DateParam} date
+   * @param {{height: number, zero: boolean, singleRaw: boolean, isMobile: boolean, singleRegionOnly: boolean, domain?: [number, number]}} options
    */
-  function genSpec(sensor, region, date, height, zero, singleRaw, isMobile) {
+  function genSpec(sensor, region, date, { height, zero, singleRaw, isMobile, singleRegionOnly, domain }) {
     const options = {
       initialDate: highlightDate || date.value,
       height,
-      color: MULTI_COLORS[0],
-      domain: date.windowTimeFrame.domain,
+      color,
+      domain: domain || date.windowTimeFrame.domain,
       zero,
       xTitle: sensor.xAxis,
-      title: [sensor.name, `in ${region.displayName}`],
+      title: joinTitle([sensor.name, `in ${region.displayName}`], isMobile),
       subTitle: sensor.unit,
       highlightRegion: true,
     };
-    if (!isMobile || options.title.reduce((acc, v) => acc + v.length, 0) < 35) {
-      options.title = options.title.join(' '); // single title line
-    }
     if (singleRaw) {
       return generateLineAndBarSpec(options);
+    }
+    if (singleRegionOnly) {
+      return generateLineChartSpec(options);
     }
     if (region.level === 'state') {
       // state vs nation
@@ -111,11 +128,15 @@
    * @param {import("../../stores/params").DateParam} date
    * @param {import("../../stores/params").RegionParam} region
    */
-  function loadData(sensor, region, date) {
+  function loadData(sensor, region, date, singleRegionOnly) {
     if (!region.value || !date.value) {
       return null;
     }
     const selfData = fetcher.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame);
+
+    if (singleRegionOnly) {
+      return selfData;
+    }
 
     const data = [selfData];
 
@@ -159,7 +180,10 @@
     }
   }
 
-  function resolveRegions(region) {
+  function resolveRegions(region, singleRegionOnly) {
+    if (singleRegionOnly) {
+      return [region];
+    }
     if (region.level === 'state') {
       // state vs nation
       return [region, nationInfo];
@@ -203,7 +227,7 @@
   let zoom = false;
   let singleRaw = false;
 
-  $: regions = raw ? [region.value] : resolveRegions(region.value);
+  $: regions = raw ? [region.value] : resolveRegions(region.value, singleRegionOnly);
   $: annotations = $annotationManager.getWindowAnnotations(
     sensor.value,
     regions,
@@ -211,8 +235,19 @@
     date.windowTimeFrame.max,
   );
   $: raw = singleRaw && sensor.rawValue != null;
-  $: spec = injectRanges(genSpec(sensor, region, date, height, !zoom, raw, $isMobileDevice), date, annotations);
-  $: data = raw ? loadSingleData(sensor, region, date) : loadData(sensor, region, date);
+  $: spec = injectRanges(
+    genSpec(sensor, region, date, {
+      height,
+      zero: !zoom,
+      singleRaw: raw,
+      isMobile: $isMobileDevice,
+      singleRegionOnly,
+      domain,
+    }),
+    date,
+    annotations,
+  );
+  $: data = raw ? loadSingleData(sensor, region, date) : loadData(sensor, region, date, singleRegionOnly);
   $: fileName = generateFileName(sensor, regions, date, raw);
 
   function findValue(region, data, date, prop = 'value') {
@@ -266,7 +301,7 @@
   {#each regions as r, i}
     <div
       class="legend-elem"
-      style="--color: {MULTI_COLORS[i].replace(/rgb\((.*)\)/, '$1')}"
+      style="--color: {(i === 0 ? color : MULTI_COLORS[i]).replace(/rgb\((.*)\)/, '$1')}"
       class:selected={highlightRegion === r.id}
       on:mouseenter={() => highlight(r)}
       on:mouseleave={() => highlight(null)}

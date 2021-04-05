@@ -53,6 +53,7 @@ function deriveFromPath(url: Location) {
 
   const sensor = urlParams.get('sensor');
   const sensor2 = urlParams.get('sensor2');
+  const lag = urlParams.get('lag');
   const level = (urlParams.get('level') as unknown) as RegionLevel;
   const encoding = urlParams.get('encoding');
   const date = urlParams.get('date');
@@ -80,6 +81,7 @@ function deriveFromPath(url: Location) {
     mode: modeObj,
     sensor: resolveSensor,
     sensor2: sensor2 && sensorMap.has(sensor2) ? sensor2 : sensorList.filter((d) => d.key !== resolveSensor)[0].key,
+    lag: lag ? Number.parseInt(lag, 10) : 0,
     level: levels.includes(level) ? level : DEFAULT_LEVEL,
     signalCasesOrDeathOptions: {
       cumulative: urlParams.has('signalC'),
@@ -113,6 +115,7 @@ export const currentSensorEntry = derived([currentSensor], ([$currentSensor]) =>
 export const currentSensor2 = writable(defaultValues.sensor2);
 export const currentSensorEntry2 = derived([currentSensor2], ([$currentSensor]) => sensorMap.get($currentSensor));
 
+export const currentLag = writable(defaultValues.lag);
 export const currentInfoSensor = writable<SensorEntry | null>(null);
 
 export const currentLevel = writable(defaultValues.level);
@@ -358,6 +361,7 @@ export interface PersistedState {
   sensor?: string;
   sensor2?: string;
   level?: RegionLevel;
+  lag?: number;
   region?: string;
   date?: string;
   signalC?: boolean;
@@ -376,6 +380,7 @@ export const trackedUrlParams = derived(
     currentMode,
     currentSensor,
     currentSensor2,
+    currentLag,
     currentLevel,
     currentRegion,
     currentDate,
@@ -383,7 +388,7 @@ export const trackedUrlParams = derived(
     encoding,
     currentCompareSelection,
   ],
-  ([mode, sensor, sensor2, level, region, date, signalOptions, encoding, compare]): TrackedState => {
+  ([mode, sensor, sensor2, lag, level, region, date, signalOptions, encoding, compare]): TrackedState => {
     const sensorEntry = sensorMap.get(sensor);
     const inMapMode = mode === modeByID.summary || mode === modeByID.timelapse;
 
@@ -398,6 +403,7 @@ export const trackedUrlParams = derived(
           ? null
           : sensor,
       sensor2: mode === modeByID.correlation ? sensor2 : null,
+      lag: mode === modeByID.correlation ? lag : null,
       level:
         mode === modeByID.single ||
         mode === modeByID.export ||
@@ -445,6 +451,9 @@ export function loadFromUrlState(state: PersistedState): void {
   }
   if (state.sensor2 != null && state.sensor2 !== get(currentSensor2)) {
     currentSensor2.set(state.sensor2);
+  }
+  if (state.lag != null && state.lag !== get(currentLag)) {
+    currentLag.set(state.lag);
   }
   if (state.level != null && state.level !== get(currentLevel)) {
     currentLevel.set(state.level);

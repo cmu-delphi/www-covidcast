@@ -30,7 +30,7 @@ const modes = [
     id: 'correlation',
     label: 'Indicator Correlation',
     component: () =>
-      import(/* webpackChunkName: 'm-correlation' */ './mobile/MobileIndicatorCorrelation.svelte').then(
+      import(/* webpackChunkName: 'm-correlation' */ './correlation/IndicatorCorrelation.svelte').then(
         (r) => r.default,
       ),
   },

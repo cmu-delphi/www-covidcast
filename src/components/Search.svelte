@@ -359,6 +359,9 @@
   class:modern
   on:click={onContainerClick}
 >
+  {#if title && modern}
+    <div class="search-label">{title}</div>
+  {/if}
   {#if !multiple}
     <span class="uk-search-icon search-icon" class:modern data-uk-icon="icon: {icon}" />
     <input
@@ -547,5 +550,17 @@
     padding-left: 50px !important;
     padding-top: 4px;
     padding-bottom: 4px;
+  }
+
+  .search-label {
+    font-size: 0.75rem;
+    line-height: 1;
+    position: absolute;
+    top: -0.6rem;
+    left: 24px;
+    background: white;
+    font-weight: 400;
+    border-radius: 3px;
+    padding: 2px;
   }
 </style>

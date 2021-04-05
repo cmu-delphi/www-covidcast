@@ -2,12 +2,12 @@
   import UIKitHint from '../../components/UIKitHint.svelte';
   import fileIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/file.svg';
   import linkIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/link.svg';
-  import warningIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
   import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
   import IndicatorOverview from '../mobile/IndicatorOverview.svelte';
   import { formatDateYearWeekdayAbbr } from '../../formats';
   import IndicatorStatsLine from '../mobile/IndicatorStatsLine.svelte';
   import IndicatorRevisions from './IndicatorRevisions.svelte';
+  import WarningBanner from '../mobile/components/WarningBanner.svelte';
 
   /**
    * question object
@@ -80,12 +80,7 @@
   </div>
   <div class="uk-card-body question-body">
     {#if noData}
-      <div class="uk-alert no-data">
-        <span class="inline-svg-icon">
-          {@html warningIcon}
-        </span>
-        not enough data available
-      </div>
+      <WarningBanner>not enough data available</WarningBanner>
     {/if}
     <div>
       <p class="question-question">
@@ -144,14 +139,6 @@
     font-style: italic;
     font-size: 2rem;
     line-height: 2.5rem;
-  }
-
-  .no-data {
-    letter-spacing: 0.75px;
-    text-transform: uppercase;
-    color: #ffffff;
-    background: #f2994a;
-    border-radius: 3px;
   }
 
   .anchor {
