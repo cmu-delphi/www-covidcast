@@ -3,10 +3,11 @@
   import SortColumnIndicator from '../mobile/components/SortColumnIndicator.svelte';
   import { SortHelper } from '../mobile/components/tableUtils';
   import ExternalLinkIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/external-link-alt.svg';
-  import { getDataSource } from '../../stores/dataSourceLookup';
+  import { getDataSource, CASES_DEATH_SOURCE } from '../../stores/dataSourceLookup';
   import { formatDateISO } from '../../formats';
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
   import { getInfoByName } from '../../maps';
+  import { isCasesSignal, isDeathSignal } from '../../data';
 
   /**
    *
@@ -17,7 +18,11 @@
       i,
       annotation: d,
       problem: d.problem,
-      source: getDataSource(d.source),
+      // in case just of cases/death replace with custom data source name
+      source:
+        [...d.signals].every((s) => isCasesSignal(s) || isDeathSignal(s)) && d.source === 'indicator-combination'
+          ? getDataSource(CASES_DEATH_SOURCE)
+          : getDataSource(d.source),
       reference: d.reference,
       dateRange: `${formatDateISO(d.dates[0])} - ${formatDateISO(d.dates[1])}`,
     };
