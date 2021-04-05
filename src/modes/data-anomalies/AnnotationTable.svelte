@@ -23,7 +23,7 @@
     };
   }
 
-  const sort = new SortHelper('source', false, 'dateRange');
+  const sort = new SortHelper('dateRange', true, 'dateRange');
   $: data = $annotationManager.annotations.map(simplifyAnnotation);
   $: sortedRows = data.sort($sort.comparator);
 
