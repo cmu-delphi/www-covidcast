@@ -694,6 +694,7 @@ export class SensorParam {
   }
 }
 
+export const CASES = new SensorParam(sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Cases')));
 export const DEATHS = new SensorParam(sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Deaths')));
 
 export class RegionParam implements Region {
@@ -708,14 +709,14 @@ export class RegionParam implements Region {
   readonly state?: string; // just for county
   readonly level: RegionLevel;
 
-  constructor(region: Region = nationInfo) {
-    this.value = region;
-    this.id = region.id;
-    this.displayName = region.displayName;
-    this.level = region.level;
-    this.propertyId = region.propertyId;
-    this.region = region.region;
-    this.state = region.state;
+  constructor(region?: Region) {
+    this.value = region ?? nationInfo;
+    this.id = this.value.id;
+    this.displayName = this.value.displayName;
+    this.level = this.value.level;
+    this.propertyId = this.value.propertyId;
+    this.region = this.value.region;
+    this.state = this.value.state;
   }
 
   set(region: Region, scrollTop = false): void {
