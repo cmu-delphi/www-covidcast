@@ -5,11 +5,11 @@
 <div class="root">
   <div class="mobile-header-line-bg">
     <div class="mobile-header-line">
-      <h2>Data<span>Anomalies</span></h2>
+      <h2>Data <span>Anomalies</span></h2>
     </div>
   </div>
   <div class="uk-container content-grid">
-    <div class="grid-3-11">TEST</div>
+    <div class="grid-3-11" />
   </div>
 </div>
 
