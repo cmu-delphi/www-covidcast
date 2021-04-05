@@ -20,8 +20,8 @@
   let loadedData = [];
 
   function resolveDefaultStatus(rows) {
-    const name = window.location.hash.slice(1); // remove #
-    return name ? rows.find((d) => d.name === name) : null;
+    const id = window.location.hash.slice(1); // remove #
+    return id ? rows.find((d) => d.id === id) : null;
   }
 
   /**
@@ -45,7 +45,7 @@
 
   $: {
     if (loadedData.length > 0) {
-      updateHash(selected ? selected.name : '');
+      updateHash(selected ? selected.id : '');
     }
   }
 </script>
