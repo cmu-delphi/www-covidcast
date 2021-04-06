@@ -41,8 +41,8 @@ module.exports = () => {
 
     output: {
       path: path.resolve(__dirname, 'public'),
-      filename: devMode ? '[name].js' : '[name].[contenthash].js',
-      chunkFilename: devMode ? '[name].js' : '[name].[contenthash].js',
+      filename: devMode ? undefined : '[name].[contenthash].js',
+      chunkFilename: devMode ? undefined : '[name].[contenthash].js',
       publicPath: hmr ? '/' : undefined,
     },
 
@@ -109,7 +109,7 @@ module.exports = () => {
                   dev: devMode,
                 },
                 hotReload: hmr,
-                emitCss: !devMode,
+                emitCss: true, // !devMode,
               },
             },
           ].slice(devMode ? 1 : 0),
