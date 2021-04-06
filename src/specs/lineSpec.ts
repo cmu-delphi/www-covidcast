@@ -38,7 +38,7 @@ export function resetOnClearHighlighTuple(date: Date): (current: Signal) => Sign
     const updateCode = (current.on![0] as { update: Update }).update as string;
     const match = /(unit:.*values: )\[/.exec(updateCode);
     const prefix = match ? match[0] : 'unit: "layer_1", fields: highlight_tuple_fields, values: [';
-    (current.on![0] as { update: Update }).update = `{${prefix}${date.getTime()}]}`;
+    (current.on![1] as { update: Update }).update = `{${prefix}${date.getTime()}]}`;
     return current;
   };
 }
