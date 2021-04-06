@@ -142,7 +142,7 @@ const infoLookup = (() => {
     ['02270', '02158'],
     ['46113', '46102'],
   ]) {
-    infoLookup.set(alias[0], getInfoByName(alias[1])!);
+    infoLookup.set(alias[0], infoLookup.get(alias[1])!);
   }
   return infoLookup;
 })();
