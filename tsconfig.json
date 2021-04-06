@@ -1,6 +1,7 @@
 {
   "extends": "@tsconfig/svelte/tsconfig.json",
   "compilerOptions": {
+    "module": "ES2020",
     "lib": ["ES2019", "DOM"],
     "importsNotUsedAsValues": "error",
     "resolveJsonModule": true

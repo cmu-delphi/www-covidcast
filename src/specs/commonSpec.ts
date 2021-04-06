@@ -1,7 +1,6 @@
-/**
- * @type {import('vega').Config}
- */
-export const commonConfig = {
+import type { Config, TopLevelSpec } from 'vega-lite';
+
+export const commonConfig: Config = {
   customFormatTypes: true,
   font: '"Open Sans", Roboto, Arial, sans-serif',
   title: {
@@ -21,10 +20,7 @@ export const commonConfig = {
 
 export const CREDIT = 'Delphi Group, delphi.cmu.edu/covidcast';
 
-/**
- * @type {Partial<import('vega-lite').TopLevelSpec>}
- */
-export const BASE_SPEC = {
+export const BASE_SPEC: Partial<TopLevelSpec> = {
   $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
   autosize: {
     type: 'none',
@@ -39,11 +35,8 @@ export const BASE_SPEC = {
 
 /**
  * join the title if there is enough space
- * @param {string|string[]} title
- * @param {boolean} isMobile
- * @returns {string|string[]}
  */
-export function joinTitle(title, isMobile) {
+export function joinTitle(title: string | string[], isMobile?: boolean): string | string[] {
   if (Array.isArray(title) && (!isMobile || title.reduce((acc, v) => acc + v.length, 0) < 40)) {
     return title.join(' '); // single title line
   }
@@ -52,12 +45,8 @@ export function joinTitle(title, isMobile) {
 
 /**
  * guesses the top padding based on the title settings
- * @param {string|string[]} title
- * @param {string|null} subTitle
- * @param {number} basePadding
- * @returns number
  */
-export function guessTopPadding(title, subTitle, basePadding = 8) {
+export function guessTopPadding(title: string | string[], subTitle?: string, basePadding = 8): number {
   let topOffset = basePadding;
   if (title) {
     topOffset += 22 * (Array.isArray(title) ? title.length : 1);

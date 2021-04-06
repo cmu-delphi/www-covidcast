@@ -1,5 +1,11 @@
+import type { ExprRef, Signal, SignalRef, Update } from 'vega';
+import type { Axis } from 'vega-lite/build/src/axis';
+import type { Field, PositionFieldDef, PositionValueDef } from 'vega-lite/build/src/channeldef';
+import type { LayerSpec, NormalizedLayerSpec, NormalizedUnitSpec, TopLevelSpec } from 'vega-lite/build/src/spec';
 import { CURRENT_DATE_HIGHLIGHT } from '../components/vegaSpecUtils';
-import { commonConfig, CREDIT } from './commonSpec';
+import type { Annotation } from '../data';
+import type { NameInfo } from '../maps/interfaces';
+import { BASE_SPEC, commonConfig, CREDIT } from './commonSpec';
 
 // dark2
 // has to be the rgb notation to create a pure version out of it for CSS variables manipulation
@@ -15,35 +21,39 @@ export const MULTI_COLORS = [
 
 export const COLOR = '#666666';
 
-export function patchHighlightTuple(current) {
+export function patchHighlightTuple(current: Signal): Signal {
   // patches the highlight signal,
   // see current.on[0].update
-  const updateCode = current.on[0].update;
-  current.on[0].update = `patchPickedItem(event) && item().${updateCode.replace(/ datum/, ' item().datum')}`;
+  const updateCode = (current.on[0] as { update: Update }).update as string;
+  (current.on[0] as { update: Update }).update = `patchPickedItem(event) && item().${updateCode.replace(
+    / datum/,
+    ' item().datum',
+  )}`;
   return current;
 }
 
-export function resetOnClearHighlighTuple(date) {
-  return (current) => {
+export function resetOnClearHighlighTuple(date: Date): (current: Signal) => Signal {
+  return (current: Signal): Signal => {
     patchHighlightTuple(current);
-    const match = /(unit:.*values: )\[/.exec(current.on[0].update);
+    const updateCode = (current.on[0] as { update: Update }).update as string;
+    const match = /(unit:.*values: )\[/.exec(updateCode);
     const prefix = match ? match[0] : 'unit: "layer_1", fields: highlight_tuple_fields, values: [';
-    current.on[1].update = `{${prefix}${date.getTime()}]}`;
+    (current.on[0] as { update: Update }).update = `{${prefix}${date.getTime()}]}`;
     return current;
   };
 }
 
-export function resolveHighlightedField(e, field) {
-  const highlighted = e.detail.value;
+export function resolveHighlightedField<T = number>(e: CustomEvent, field: string): T | null {
+  const highlighted = (e.detail as { value: null | { [key: string]: T[] } }).value;
   if (highlighted && Array.isArray(highlighted[field]) && highlighted[field].length > 0) {
     return highlighted[field][0];
   }
   return null;
 }
 
-export function resolveHighlightedDate(e, field = 'date_value') {
-  const value = resolveHighlightedField(e, field);
-  return value != null ? new Date(value) : value;
+export function resolveHighlightedDate(e: CustomEvent, field = 'date_value'): Date | null {
+  const value = resolveHighlightedField<string | number>(e, field);
+  return value != null ? new Date(value) : null;
 }
 
 export const signalPatches = {
@@ -58,18 +68,15 @@ export const signalPatches = {
 //   };
 // }
 
-export function autoAlign(dateField = 'date_value') {
+export function autoAlign(dateField = 'date_value'): ExprRef {
   return {
     // auto align based on remaining space
     expr: `(width - scale('x', datum.${dateField})) < 40 ? 'right' : (scale('x', datum.${dateField})) > 40 ? 'center' : 'left'`,
   };
 }
 
-export function genCreditsLayer({ shift = 55 } = {}) {
-  /**
-   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
-   */
-  const layer = {
+export function genCreditsLayer({ shift = 55 } = {}): NormalizedUnitSpec {
+  return {
     data: {
       values: [
         {
@@ -90,14 +97,10 @@ export function genCreditsLayer({ shift = 55 } = {}) {
       text: CREDIT,
     },
   };
-  return layer;
 }
 
-export function genDateHighlight(date, color = 'lightgrey') {
-  /**
-   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
-   */
-  const layer = {
+export function genDateHighlight(date: Date, color = 'lightgrey'): NormalizedUnitSpec {
+  return {
     data: {
       values: [
         {
@@ -119,20 +122,13 @@ export function genDateHighlight(date, color = 'lightgrey') {
       },
     },
   };
-  return layer;
 }
 
-/**
- *
- * @param {import('../data/annotations').Annotation[]} annotations
- * @param {{min: Date, max: Date}} dataDomain
- * @returns
- */
-export function genAnnotationLayer(annotations, dataDomain) {
-  /**
-   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
-   */
-  const layer = {
+export function genAnnotationLayer(
+  annotations: Annotation[],
+  dataDomain: { min: Date; max: Date },
+): NormalizedLayerSpec {
+  return {
     data: {
       values: annotations.map((a, i) => ({
         index: i,
@@ -186,7 +182,27 @@ export function genAnnotationLayer(annotations, dataDomain) {
       },
     ],
   };
-  return layer;
+}
+
+export interface LineSpecOptions {
+  width?: number;
+  height?: number;
+  xTitle?: string;
+  domain?: [number, number];
+  title?: string | string[];
+  subTitle?: string;
+  color?: string;
+  initialDate?: Date | null;
+  dateField?: string;
+  valueField?: string;
+  valueFormat?: string;
+  valueDomain?: [number, number];
+  zero?: boolean;
+  highlightRegion?: boolean;
+  reactOnMouseMove?: boolean;
+  clearHighlight?: boolean;
+  paddingLeft?: number;
+  tickCount?: Axis<ExprRef | SignalRef>['tickCount'];
 }
 
 export function generateLineChartSpec({
@@ -208,9 +224,10 @@ export function generateLineChartSpec({
   clearHighlight = true,
   paddingLeft = 42,
   tickCount = {
-    interval: 'week',
+    interval: 'week' as const,
+    step: 1,
   },
-} = {}) {
+}: LineSpecOptions = {}): TopLevelSpec & LayerSpec<Field> {
   // logic to automatically add the year for week 1 and first date
   const labelYear = `datum.label + (week(datum.value) === 1 ${
     domain ? `|| abs(week(datum.value) - week(toDate(${domain[0]}))) <= 1` : ''
@@ -222,27 +239,16 @@ export function generateLineChartSpec({
   if (subTitle) {
     topOffset += 10;
   }
-  /**
-   * @type {import('vega-lite').TopLevelSpec}
-   */
-  const spec = {
-    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+  return {
+    ...BASE_SPEC,
     width,
     height,
     padding: { left: paddingLeft, top: topOffset, bottom: 55, right: 15 },
-    autosize: {
-      type: 'none',
-      contains: 'padding',
-      resize: true,
-    },
     title: {
       text: title,
       subtitle: subTitle,
       align: 'left',
       anchor: 'start',
-    },
-    data: {
-      name: 'values',
     },
     layer: [
       {
@@ -394,12 +400,13 @@ export function generateLineChartSpec({
         ],
       },
     ],
-    config: commonConfig,
   };
-  return spec;
 }
 
-export function generateCompareLineSpec(compare, { compareField = 'displayName', ...options } = {}) {
+export function generateCompareLineSpec(
+  compare: string[],
+  { compareField = 'displayName', ...options }: LineSpecOptions & { compareField?: string } = {},
+): TopLevelSpec {
   const spec = generateLineChartSpec(options);
   spec.layer[0].encoding.color = {
     field: compareField,
@@ -417,12 +424,9 @@ export function generateCompareLineSpec(compare, { compareField = 'displayName',
   return spec;
 }
 
-export function generateLineAndBarSpec(options = {}) {
+export function generateLineAndBarSpec(options: LineSpecOptions = {}): TopLevelSpec {
   const spec = generateLineChartSpec(options);
-  /**
-   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
-   */
-  const point = spec.layer[1];
+  const point = spec.layer[1] as NormalizedUnitSpec;
   point.mark = {
     type: 'bar',
     color: options.color || MULTI_COLORS[0],
@@ -430,47 +434,63 @@ export function generateLineAndBarSpec(options = {}) {
       expr: `floor(width / customCountDays(domain('x')[0], domain('x')[1]))`,
     },
   };
-  point.encoding.y.field = 'raw';
-  point.encoding.opacity.value = 0.2;
+  (point.encoding.y as PositionFieldDef<Field>).field = 'raw';
+  (point.encoding.opacity as PositionValueDef).value = 0.2;
   return spec;
 }
 
-export function createSignalDateLabelHighlight(topPosition = false) {
+export function createSignalDateLabelHighlight(topPosition = false): NormalizedLayerSpec {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const layer = Object.assign({}, CURRENT_DATE_HIGHLIGHT);
-  layer.layer = [
-    {
-      mark: layer.mark,
-      encoding: layer.encoding,
-    },
-    {
-      mark: {
-        type: 'text',
-        baseline: topPosition ? 'bottom' : 'top',
-        align: 'right',
-        dy: topPosition ? -5 : 5,
-        y: topPosition
-          ? 0
-          : {
-              expr: 'height',
-            },
-      },
-      encoding: {
-        x: {
-          field: 'date_value',
-          type: 'temporal',
-        },
-        text: {
-          field: 'date_value',
-          type: 'temporal',
-          format: '%-m/%-d',
-          formatType: 'cachedTime',
-        },
-      },
-    },
-  ];
-  delete layer.mark;
   delete layer.encoding;
-  return layer;
+  delete layer.mark;
+  return {
+    ...layer,
+    layer: [
+      {
+        mark: CURRENT_DATE_HIGHLIGHT.mark,
+        encoding: CURRENT_DATE_HIGHLIGHT.encoding,
+      },
+      {
+        mark: {
+          type: 'text',
+          baseline: topPosition ? 'bottom' : 'top',
+          align: 'right',
+          dy: topPosition ? -5 : 5,
+          y: topPosition
+            ? 0
+            : {
+                expr: 'height',
+              },
+        },
+        encoding: {
+          x: {
+            field: 'date_value',
+            type: 'temporal',
+          },
+          text: {
+            field: 'date_value',
+            type: 'temporal',
+            format: '%-m/%-d',
+            formatType: 'cachedTime',
+          },
+        },
+      },
+    ],
+  };
+}
+
+export interface SparkLineOptions {
+  dateField?: string;
+  valueField?: string;
+  domain?: [number, number];
+  color?: string;
+  highlightDate?: boolean | 'top';
+  highlightStartEnd?: boolean;
+  interactive?: boolean;
+  height?: number;
+  zero?: boolean;
+  valueDomain?: [number, number];
 }
 
 export function generateSparkLine({
@@ -484,13 +504,9 @@ export function generateSparkLine({
   height = 30,
   zero = false,
   valueDomain = null,
-} = {}) {
-  /**
-   * @type {import('vega-lite').TopLevelSpec}
-   */
-  const spec = {
-    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-    data: { name: 'values' },
+}: SparkLineOptions = {}): TopLevelSpec {
+  const spec: TopLevelSpec & LayerSpec<Field> = {
+    ...BASE_SPEC,
     height,
     padding: {
       left: 2,
@@ -499,11 +515,6 @@ export function generateSparkLine({
       right: 2,
     },
     background: null,
-    autosize: {
-      type: 'none',
-      contains: 'padding',
-      resize: true,
-    },
     encoding: {
       x: {
         field: dateField,
@@ -522,19 +533,20 @@ export function generateSparkLine({
           domain: false,
           tickCount: {
             interval: 'week',
+            step: 1,
           },
         },
       },
     },
     layer: [
-      highlightDate
-        ? createSignalDateLabelHighlight(highlightDate === 'top')
+      ...(highlightDate
+        ? [createSignalDateLabelHighlight(highlightDate === 'top')]
         : highlightDate === null
-        ? null
-        : CURRENT_DATE_HIGHLIGHT,
+        ? []
+        : [CURRENT_DATE_HIGHLIGHT]),
       {
         mark: {
-          type: 'line',
+          type: 'line' as const,
           color,
           point: false,
           interpolate: 'linear',
@@ -551,41 +563,45 @@ export function generateSparkLine({
           },
         },
       },
-      interactive && {
-        mark: {
-          type: 'point',
-          fill: color,
-          stroke: null,
-          tooltip: true,
-        },
-        encoding: {
-          y: {
-            field: valueField,
-            type: 'quantitative',
-          },
-          opacity: {
-            condition: {
-              param: 'highlight',
-              empty: false,
-              value: 1,
-            },
-            value: 0,
-          },
-        },
-        params: [
-          {
-            name: 'highlight',
-            select: {
-              type: 'point',
-              on: 'click, mousemove, [touchstart, touchend] > touchmove',
-              nearest: true,
-              clear: 'view:mouseout',
-              encodings: ['x'],
-            },
-          },
-        ],
-      },
-    ].filter(Boolean),
+      ...(interactive
+        ? [
+            {
+              mark: {
+                type: 'point' as const,
+                fill: color,
+                stroke: null,
+                tooltip: true,
+              },
+              encoding: {
+                y: {
+                  field: valueField,
+                  type: 'quantitative',
+                },
+                opacity: {
+                  condition: {
+                    param: 'highlight',
+                    empty: false,
+                    value: 1,
+                  },
+                  value: 0,
+                },
+              },
+              params: [
+                {
+                  name: 'highlight',
+                  select: {
+                    type: 'point',
+                    on: 'click, mousemove, [touchstart, touchend] > touchmove',
+                    nearest: true,
+                    clear: 'view:mouseout',
+                    encodings: ['x'],
+                  },
+                },
+              ],
+            } as NormalizedUnitSpec,
+          ]
+        : []),
+    ],
     config: {
       ...commonConfig,
       legend: {
@@ -600,7 +616,6 @@ export function generateSparkLine({
         data: {
           values: [{ [dateField]: domain[0] }, { [dateField]: domain[1] }],
         },
-
         mark: {
           type: 'rule',
           tooltip: false,
@@ -638,17 +653,24 @@ export function generateSparkLine({
             flatten: [dateField],
           },
         ],
+        mark: {
+          type: 'rule',
+          tooltip: false,
+          color,
+        },
+        encoding: {
+          x: {
+            field: dateField,
+            type: 'temporal',
+          },
+        },
       });
     }
   }
   return spec;
 }
 
-/**
- *
- * @param {import('../maps').NameInfo} state
- */
-export function generateDistributionLineSpec(state, options = {}) {
+export function generateDistributionLineSpec(state: NameInfo, options: LineSpecOptions = {}): TopLevelSpec {
   const spec = generateLineChartSpec(options);
   spec.transform = [
     {
@@ -701,7 +723,7 @@ export function generateDistributionLineSpec(state, options = {}) {
       as: 'value',
     },
   ];
-  spec.padding.bottom = 50;
+  ((spec.padding as unknown) as { bottom: number }).bottom = 50;
   spec.layer[0].encoding.color = {
     field: 'group',
     type: 'nominal',
@@ -804,13 +826,9 @@ export function generateDistributionLineSpec(state, options = {}) {
   return spec;
 }
 
-/**
- *
- * @param {import('../maps').NameInfo} state
- */
-export function generateDistributionLineSpec2(state, options = {}) {
+export function generateDistributionLineSpec2(state: NameInfo, options: LineSpecOptions = {}): TopLevelSpec {
   const spec = generateLineChartSpec(options);
-  spec.padding.bottom = 50;
+  ((spec.padding as unknown) as { bottom: number }).bottom = 50;
   spec.layer[0].encoding.color = {
     condition: {
       test: `datum.geo_value == '${state.propertyId.toLowerCase()}'`,

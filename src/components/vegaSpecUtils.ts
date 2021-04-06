@@ -1,8 +1,7 @@
-export function createSignalDateHighlight(signal, color) {
-  /**
-   * @type {import('vega-lite/build/src/spec').LayerSpec | import('vega-lite/build/src/spec').UnitSpec}
-   */
-  const layer = {
+import type { NormalizedUnitSpec } from 'vega-lite/build/src/spec';
+
+export function createSignalDateHighlight(signal: string, color: string): NormalizedUnitSpec {
+  return {
     description: 'shows the current data injected via a signal',
     data: {
       values: [{ date_value: null }],
@@ -27,14 +26,10 @@ export function createSignalDateHighlight(signal, color) {
       },
     },
   };
-  return layer;
 }
 
-export function createSignalPointHighlight(signal, shape = 'diamond', color = 'black') {
-  /**
-   * @type {import('vega-lite/build/src/spec').LayerSpec | import('vega-lite/build/src/spec').UnitSpec}
-   */
-  const layer = {
+export function createSignalPointHighlight(signal: string, shape = 'diamond', color = 'black'): NormalizedUnitSpec {
+  return {
     description: 'shows the current data injected via a signal',
     data: {
       values: [{ date_value: null }],
@@ -62,7 +57,6 @@ export function createSignalPointHighlight(signal, shape = 'diamond', color = 'b
       },
     },
   };
-  return layer;
 }
 
 export const CURRENT_DATE_HIGHLIGHT = createSignalDateHighlight('currentDate', '#c00');

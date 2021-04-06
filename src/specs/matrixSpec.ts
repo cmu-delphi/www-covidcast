@@ -1,9 +1,11 @@
 import { stateInfo } from '../maps';
 import { ZERO_COLOR } from '../theme';
+import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
+import type { NameInfo } from '../maps/interfaces';
+import type { TopLevelSpec } from 'vega-lite';
+import { BASE_SPEC } from './commonSpec';
 
-const { EPIDATA_CASES_OR_DEATH_VALUES } = require('../stores/constants');
-
-export const state2TileCell = [
+export const state2TileCell: { id: string; x: number; y: number }[] = [
   { id: 'AK', x: 0, y: 0 },
   { id: 'ME', x: 11, y: 0 },
   { id: 'VT', x: 9, y: 1 },
@@ -63,24 +65,25 @@ const EPIDATA_ROW_KEYS = ['geo_value', 'value', 'date_value', 'time_value', 'std
 );
 const NAME_INFO_KEYS = ['propertyId', 'displayName', 'population', 'state'];
 
+export interface MatrixOptions {
+  width?: number;
+  height?: number;
+  legendTitle?: string;
+  domain?: [number, number];
+  scheme?: string;
+}
+
 function genBaseSpec(
-  infos,
-  assignments,
-  { width = 500, height = 300, scheme = 'yellowgreenblue', domain = undefined, legendTitle = null } = {},
+  infos: readonly NameInfo[],
+  assignments: { id: string; x: number; y: number; value?: number }[],
+  { width = 500, height = 300, scheme = 'yellowgreenblue', domain = undefined, legendTitle }: MatrixOptions = {},
 ) {
-  /**
-   * @type {import('vega-lite').TopLevelSpec}
-   */
-  const spec = {
+  const spec: TopLevelSpec = {
+    ...BASE_SPEC,
     width,
     height,
     padding: {
       expr: `paddingSquareCenter(containerSize(), domain('x'), domain('y'), {left: 10, bottom: 10, top: 10, right: 100}, 0.5, 0, 1, 0.8)`,
-    },
-    autosize: {
-      type: 'none',
-      contains: 'padding',
-      resize: true,
     },
     datasets: {
       values: [],
@@ -166,8 +169,8 @@ function genBaseSpec(
             },
             legend: {
               orient: 'right',
-              align: 'center',
-              fontWeight: 'normal',
+              titleAlign: 'center',
+              // : 'normal',
               labelLimit: 30,
               tickMinStep: 0.1,
               titleOrient: 'left',
@@ -192,16 +195,10 @@ function genBaseSpec(
         },
       },
     ],
-    config: {
-      view: {
-        stroke: null,
-      },
-    },
   };
   return spec;
 }
 
-export function generateMatrixStateSpec(options) {
-  const spec = genBaseSpec(stateInfo, state2TileCell, options);
-  return spec;
+export function generateMatrixStateSpec(options: MatrixOptions = {}): TopLevelSpec {
+  return genBaseSpec(stateInfo, state2TileCell, options);
 }

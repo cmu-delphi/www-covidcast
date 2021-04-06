@@ -1,16 +1,28 @@
+import type { Gradient } from 'vega';
+import type { Field } from 'vega-lite/build/src/channeldef';
+import type { MarkDef } from 'vega-lite/build/src/mark';
+import type { LayerSpec, NormalizedLayerSpec, NormalizedUnitSpec, TopLevelSpec } from 'vega-lite/build/src/spec';
+import type { NameInfo, RegionLevel } from '../maps/interfaces';
 import getRelatedCounties from '../maps/related';
-import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
+import { EpiDataCasesOrDeathValues, EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
+import type { RegionEpiDataRow } from '../stores/params';
 import { MAP_THEME, MISSING_COLOR, ZERO_COLOR } from '../theme';
-import { commonConfig, CREDIT } from './commonSpec';
+import { BASE_SPEC, CREDIT } from './commonSpec';
 
-const NAME_INFO_KEYS = ['propertyId', 'displayName', 'population', 'state', 'level'];
-const EPIDATA_ROW_KEYS = ['geo_value', 'value', 'date_value', 'time_value', 'stderr', 'sample_size'].concat(
-  EPIDATA_CASES_OR_DEATH_VALUES,
-  NAME_INFO_KEYS,
-);
+const NAME_INFO_KEYS: (keyof NameInfo)[] = ['propertyId', 'displayName', 'population', 'state', 'level'];
+const EPIDATA_ROW_KEYS: (keyof (RegionEpiDataRow & EpiDataCasesOrDeathValues))[] = [
+  'geo_value',
+  'value',
+  'date_value',
+  'time_value',
+  'stderr',
+  'sample_size',
+  ...EPIDATA_CASES_OR_DEATH_VALUES,
+  ...NAME_INFO_KEYS,
+];
 
 const missingStopCount = 70;
-const missingGradient = {
+const missingGradient: Gradient = {
   // x1: 0,
   // y1: 0,
   // y2: 1,
@@ -21,11 +33,8 @@ const missingGradient = {
     .map((_, i) => ({ offset: i / missingStopCount, color: i % 2 === 0 ? MISSING_COLOR : 'white' })),
 };
 
-function genCreditsLayer({ shift = 55 } = {}) {
-  /**
-   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
-   */
-  const layer = {
+function genCreditsLayer({ shift = 55 } = {}): NormalizedUnitSpec | NormalizedLayerSpec {
+  return {
     data: {
       values: [
         {
@@ -67,14 +76,10 @@ function genCreditsLayer({ shift = 55 } = {}) {
       },
     ],
   };
-  return layer;
 }
 
-function genMissingLayer(missingLevel = 'nation') {
-  /**
-   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
-   */
-  const layer = {
+function genMissingLayer(missingLevel: RegionLevel = 'nation'): NormalizedUnitSpec {
+  return {
     data: {
       name: missingLevel,
       format: {
@@ -88,14 +93,10 @@ function genMissingLayer(missingLevel = 'nation') {
       color: missingGradient,
     },
   };
-  return layer;
 }
 
-function genMegaLayer(withStates = null) {
-  /**
-   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
-   */
-  const layer = {
+function genMegaLayer(withStates: string = null): NormalizedUnitSpec {
+  return {
     data: {
       name: 'state',
       format: {
@@ -134,14 +135,10 @@ function genMegaLayer(withStates = null) {
       },
     },
   };
-  return layer;
 }
 
-function genStateBorderLayer({ strokeWidth = 1.1 } = {}) {
-  /**
-   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
-   */
-  const layer = {
+function genStateBorderLayer({ strokeWidth = 1.1 } = {}): NormalizedUnitSpec {
+  return {
     data: {
       name: 'state',
       format: {
@@ -162,14 +159,10 @@ function genStateBorderLayer({ strokeWidth = 1.1 } = {}) {
       },
     },
   };
-  return layer;
 }
 
-function genMegaHoverLayer(alsoOnCounties = false) {
-  /**
-   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
-   */
-  const layer = {
+function genMegaHoverLayer(alsoOnCounties = false): NormalizedUnitSpec {
+  return {
     data: {
       name: 'state',
       format: {
@@ -213,14 +206,14 @@ function genMegaHoverLayer(alsoOnCounties = false) {
       },
     },
   };
-  return layer;
 }
 
-function genLevelLayer({ strokeWidth = 1, scheme = 'yellowgreenblue', domain = undefined } = {}) {
-  /**
-   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
-   */
-  const layer = {
+function genLevelLayer({
+  strokeWidth = 1,
+  scheme = 'yellowgreenblue',
+  domain = undefined,
+}: { strokeWidth?: number; scheme?: string; domain?: [number, number] } = {}): NormalizedUnitSpec {
+  return {
     mark: {
       type: 'geoshape',
       stroke: '#eaeaea',
@@ -257,7 +250,6 @@ function genLevelLayer({ strokeWidth = 1, scheme = 'yellowgreenblue', domain = u
           legendY: {
             expr: 'height + 12',
           },
-          fontWeight: 'normal',
           titleAnchor: 'end',
           labelLimit: 30,
           tickMinStep: 0.1,
@@ -278,14 +270,10 @@ function genLevelLayer({ strokeWidth = 1, scheme = 'yellowgreenblue', domain = u
       },
     ],
   };
-  return layer;
 }
 
-function genLevelHoverLayer({ strokeWidth = 3 } = {}) {
-  /**
-   * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
-   */
-  const layer = {
+function genLevelHoverLayer({ strokeWidth = 3 } = {}): NormalizedUnitSpec | NormalizedLayerSpec {
+  return {
     mark: {
       type: 'geoshape',
       stroke: MAP_THEME.hoverRegionOutline,
@@ -309,15 +297,15 @@ function genLevelHoverLayer({ strokeWidth = 3 } = {}) {
       },
     },
   };
-  return layer;
 }
 
-function genBaseSpec(level, topoJSON, { height = 300 }) {
-  /**
-   * @type {import('vega-lite').TopLevelSpec}
-   */
-  const spec = {
-    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+function genBaseSpec(
+  level: RegionLevel,
+  topoJSON: Promise<unknown>,
+  { height = 300 },
+): TopLevelSpec & LayerSpec<Field> {
+  return {
+    ...BASE_SPEC,
     height,
     padding: {
       left: 10,
@@ -325,13 +313,8 @@ function genBaseSpec(level, topoJSON, { height = 300 }) {
       top: 10,
       right: 10,
     },
-    autosize: {
-      type: 'none',
-      contains: 'padding',
-      resize: true,
-    },
     projection: {
-      type: 'albersUsaTerritories',
+      type: ('albersUsaTerritories' as unknown) as 'albersUsa', // hack since custom projection
     },
     datasets: {
       values: [],
@@ -355,9 +338,7 @@ function genBaseSpec(level, topoJSON, { height = 300 }) {
       },
     ],
     layer: [],
-    config: commonConfig,
   };
-  return spec;
 }
 
 function countyJSON() {
@@ -394,7 +375,9 @@ function stateJSON() {
 //   return spec;
 // }
 
-export function generateStateSpec(options = {}) {
+export type CommonParams = Parameters<typeof genBaseSpec>['2'] & Parameters<typeof genLevelLayer>['0'];
+
+export function generateStateSpec(options: CommonParams = {}): TopLevelSpec {
   const level = 'state';
   const topoJSON = stateJSON();
 
@@ -423,7 +406,7 @@ export function generateStateSpec(options = {}) {
 //   return spec;
 // }
 
-export function generateNationSpec(options = {}) {
+export function generateNationSpec(options: CommonParams = {}): TopLevelSpec {
   const level = 'nation';
   const topoJSON = nationJSON();
 
@@ -442,7 +425,7 @@ export function generateNationSpec(options = {}) {
 /**
  * generates a map of counties
  */
-export function generateStateMapWithCountyDataSpec(options = {}) {
+export function generateStateMapWithCountyDataSpec(options: CommonParams = {}): TopLevelSpec {
   const level = 'county';
   const topoJSON = countyJSON();
 
@@ -463,7 +446,7 @@ export function generateStateMapWithCountyDataSpec(options = {}) {
 /**
  * generates a map of counties
  */
-export function generateStateMapWithCountyBinaryDataSpec(options = {}) {
+export function generateStateMapWithCountyBinaryDataSpec(options: CommonParams = {}): TopLevelSpec {
   const level = 'county';
   const topoJSON = countyJSON();
 
@@ -471,11 +454,11 @@ export function generateStateMapWithCountyBinaryDataSpec(options = {}) {
 
   spec.datasets.nation = nationJSON();
   const missing = genMissingLayer();
-  missing.mark.color = MISSING_COLOR;
+  (missing.mark as MarkDef<'geoshape'>).color = MISSING_COLOR;
   spec.layer.push(missing);
   spec.datasets.state = stateJSON();
   const counties = genLevelLayer({ ...options, strokeWidth: 0 });
-  counties.mark.tooltip = false;
+  (missing.mark as MarkDef<'geoshape'>).tooltip = false;
   counties.encoding.color = {
     condition: {
       test: 'datum.value != null',
@@ -492,9 +475,11 @@ export function generateStateMapWithCountyBinaryDataSpec(options = {}) {
 
 /**
  * generates a map of counties for a specific state
- * @param {import('../maps').NameInfo} state
  */
-export function generateCountiesOfStateSpec(state, { withStates = false, ...options } = {}) {
+export function generateCountiesOfStateSpec(
+  state: NameInfo,
+  { withStates = false, ...options }: CommonParams & { withStates?: boolean } = {},
+): TopLevelSpec {
   const level = 'county';
   const topoJSON = countyJSON();
 
@@ -520,11 +505,11 @@ export function generateCountiesOfStateSpec(state, { withStates = false, ...opti
 
   if (withStates) {
     spec.projection.fit = {
-      signal: `customInFilter(data('state'), 'id', ["${state.id}"])`,
+      expr: `customInFilter(data('state'), 'id', ["${state.id}"])`,
     };
     spec.projection.extent = {
       // fit to match 60% in the center
-      signal: `[[width * 0.2, height * 0.2], [width* 0.8, height * 0.8]]`,
+      expr: `[[width * 0.2, height * 0.2], [width* 0.8, height * 0.8]]`,
     };
     spec.layer.push(genMegaLayer(state.id));
   } else {
@@ -542,9 +527,8 @@ export function generateCountiesOfStateSpec(state, { withStates = false, ...opti
 
 /**
  * generates a map of the county and its related counties
- * @param {import('../maps').NameInfo} county
  */
-export function generateRelatedCountySpec(county, options = {}) {
+export function generateRelatedCountySpec(county: NameInfo, options: CommonParams = {}): TopLevelSpec {
   const level = 'county';
   const topoJSON = countyJSON();
 
@@ -552,11 +536,11 @@ export function generateRelatedCountySpec(county, options = {}) {
 
   const related = getRelatedCounties(county);
   spec.projection.fit = {
-    signal: `customInFilter(data('county'), 'id', ${JSON.stringify(related.map((d) => d.id))})`,
+    expr: `customInFilter(data('county'), 'id', ${JSON.stringify(related.map((d) => d.id))})`,
   };
   spec.projection.extent = {
     // fit to match 60% in the center
-    signal: `[[width * 0.2, height * 0.2], [width* 0.8, height * 0.8]]`,
+    expr: `[[width * 0.2, height * 0.2], [width* 0.8, height * 0.8]]`,
   };
   // /**
   //  * @type {import('vega-lite/build/src/transform').Transform}
