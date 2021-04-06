@@ -1,14 +1,12 @@
-/**
- * @typedef {object} Mode
- * @property {string} id
- * @property {string} label
- * @property {Promise<any>} component
- */
+export interface Mode {
+  id: string;
+  label: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  component: () => Promise<any>;
+  anchor?: string;
+}
 
-/**
- * @type {Mode[]}
- */
-const modes = [
+const modes: Mode[] = [
   {
     id: 'landing',
     label: 'COVIDcast Overview',
@@ -82,8 +80,22 @@ const modes = [
 
 export default modes;
 
-/**
- * @type {Record<'summary'|'timelapse'|'top10'|'export'|'single'|'survey-results'|'lab'|'classic'|'indicator'|'landing'|'indicator-status'|'correlation', Mode>}
- */
-export const modeByID = {};
-modes.forEach((mode) => (modeByID[mode.id] = mode));
+export type ModeID =
+  | 'summary'
+  | 'timelapse'
+  | 'top10'
+  | 'export'
+  | 'single'
+  | 'survey-results'
+  | 'lab'
+  | 'classic'
+  | 'indicator'
+  | 'landing'
+  | 'indicator-status'
+  | 'correlation';
+
+export const modeByID: Record<ModeID, Mode> = (() => {
+  const r: Record<string, Mode> = {};
+  modes.forEach((mode) => (r[mode.id] = mode));
+  return r;
+})();

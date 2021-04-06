@@ -23,9 +23,9 @@ export function updateURIParameters(state: TrackedState): void {
 
   // update only if the state has changed
   const old = (window.history.state || {}) as PersistedState;
-  const deltaState = { ...state.state };
+  const deltaState: PersistedState = { ...state.state };
   // compute only the new changes
-  Object.keys(state.state).forEach((key) => {
+  (Object.keys(state.state) as (keyof PersistedState)[]).forEach((key) => {
     if (old[key] === deltaState[key]) {
       delete deltaState[key];
     }

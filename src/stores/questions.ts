@@ -23,7 +23,7 @@ export interface Wave {
   previous?: Wave;
 }
 export const waves = descriptions.waves.reduce((waves, wave, i) => {
-  const date = isoParse(wave);
+  const date = isoParse(wave)!;
   const waveObj: Wave = {
     name: `Wave ${i + 1}`,
     wave: i + 1,
@@ -77,7 +77,7 @@ function toAnchor(value: string) {
 function deriveSensor(question: { signal: string }) {
   return ensureSensorStructure({
     id: descriptions.id,
-    rawSignal: descriptions.rawSignal as string | null,
+    rawSignal: descriptions.rawSignal ?? (undefined as string | undefined),
     type: descriptions.type as Sensor['type'],
     levels: descriptions.levels as RegionLevel[],
     xAxis: descriptions.xAxis,
@@ -101,7 +101,7 @@ export const questions: Question[] = descriptions.questions.map((desc) => {
     sensorParam: new SensorParam(sensor),
     anchor: toAnchor(desc.name),
     addedInWave: waves[desc.addedInWave - 1],
-    oldRevisions: null,
+    oldRevisions: undefined,
   };
   if (desc.oldRevisions) {
     // revision are reversed in time so temporary revert the order
@@ -113,7 +113,7 @@ export const questions: Question[] = descriptions.questions.map((desc) => {
           ...sensor,
           key: `${sensor.id}:${rev.signal}`,
           signal: rev.signal,
-          rawSignal: null, // TODO rev rawSignal
+          rawSignal: undefined, // TODO rev rawSignal
         });
         acc.push({
           ...rev,
@@ -154,5 +154,5 @@ export const questionCategories = (() => {
 })();
 
 export const refSensor = questions.some((d) => d.sensor != null)
-  ? questions.find((d) => d.sensor != null).sensor
+  ? questions.find((d) => d.sensor != null)!.sensor
   : sensorList.find((d) => d.id === 'fb-survey');

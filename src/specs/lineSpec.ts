@@ -4,7 +4,7 @@ import type { Field, PositionFieldDef, PositionValueDef } from 'vega-lite/build/
 import type { LayerSpec, NormalizedLayerSpec, NormalizedUnitSpec, TopLevelSpec } from 'vega-lite/build/src/spec';
 import { CURRENT_DATE_HIGHLIGHT } from '../components/vegaSpecUtils';
 import type { Annotation } from '../data';
-import type { NameInfo } from '../maps/interfaces';
+import type { RegionInfo } from '../maps/interfaces';
 import { BASE_SPEC, commonConfig, CREDIT } from './commonSpec';
 
 // dark2
@@ -24,8 +24,8 @@ export const COLOR = '#666666';
 export function patchHighlightTuple(current: Signal): Signal {
   // patches the highlight signal,
   // see current.on[0].update
-  const updateCode = (current.on[0] as { update: Update }).update as string;
-  (current.on[0] as { update: Update }).update = `patchPickedItem(event) && item().${updateCode.replace(
+  const updateCode = (current.on![0] as { update: Update }).update as string;
+  (current.on![0] as { update: Update }).update = `patchPickedItem(event) && item().${updateCode.replace(
     / datum/,
     ' item().datum',
   )}`;
@@ -35,10 +35,10 @@ export function patchHighlightTuple(current: Signal): Signal {
 export function resetOnClearHighlighTuple(date: Date): (current: Signal) => Signal {
   return (current: Signal): Signal => {
     patchHighlightTuple(current);
-    const updateCode = (current.on[0] as { update: Update }).update as string;
+    const updateCode = (current.on![0] as { update: Update }).update as string;
     const match = /(unit:.*values: )\[/.exec(updateCode);
     const prefix = match ? match[0] : 'unit: "layer_1", fields: highlight_tuple_fields, values: [';
-    (current.on[0] as { update: Update }).update = `{${prefix}${date.getTime()}]}`;
+    (current.on![0] as { update: Update }).update = `{${prefix}${date.getTime()}]}`;
     return current;
   };
 }
@@ -208,16 +208,16 @@ export interface LineSpecOptions {
 export function generateLineChartSpec({
   width = 800,
   height = 300,
-  xTitle = null,
+  xTitle,
   domain,
-  title = null,
-  subTitle = null,
+  title,
+  subTitle,
   color = COLOR,
   initialDate = null,
   dateField = 'date_value',
   valueField = 'value',
-  valueFormat = null,
-  valueDomain = null,
+  valueFormat,
+  valueDomain,
   zero = false,
   highlightRegion = false,
   reactOnMouseMove = true,
@@ -244,12 +244,14 @@ export function generateLineChartSpec({
     width,
     height,
     padding: { left: paddingLeft, top: topOffset, bottom: 55, right: 15 },
-    title: {
-      text: title,
-      subtitle: subTitle,
-      align: 'left',
-      anchor: 'start',
-    },
+    title: title
+      ? {
+          text: title,
+          subtitle: subTitle,
+          align: 'left',
+          anchor: 'start',
+        }
+      : undefined,
     layer: [
       {
         mark: {
@@ -289,7 +291,6 @@ export function generateLineChartSpec({
             scale: {
               round: true,
               zero,
-              domainMin: null,
               domain: valueDomain,
               // padding: zero ? undefined : smartPadding(valueField),
             },
@@ -408,7 +409,7 @@ export function generateCompareLineSpec(
   { compareField = 'displayName', ...options }: LineSpecOptions & { compareField?: string } = {},
 ): TopLevelSpec {
   const spec = generateLineChartSpec(options);
-  spec.layer[0].encoding.color = {
+  spec.layer[0].encoding!.color = {
     field: compareField,
     type: 'nominal',
     scale: {
@@ -417,7 +418,7 @@ export function generateCompareLineSpec(
     },
     legend: null,
   };
-  spec.layer[1].encoding.color = {
+  spec.layer[1].encoding!.color = {
     field: compareField,
     type: 'nominal',
   };
@@ -434,8 +435,8 @@ export function generateLineAndBarSpec(options: LineSpecOptions = {}): TopLevelS
       expr: `floor(width / customCountDays(domain('x')[0], domain('x')[1]))`,
     },
   };
-  (point.encoding.y as PositionFieldDef<Field>).field = 'raw';
-  (point.encoding.opacity as PositionValueDef).value = 0.2;
+  (point.encoding!.y as PositionFieldDef<Field>).field = 'raw';
+  (point.encoding!.opacity as PositionValueDef).value = 0.2;
   return spec;
 }
 
@@ -443,7 +444,8 @@ export function createSignalDateLabelHighlight(topPosition = false): NormalizedL
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const layer = Object.assign({}, CURRENT_DATE_HIGHLIGHT);
   delete layer.encoding;
-  delete layer.mark;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+  delete (layer as any).mark;
   return {
     ...layer,
     layer: [
@@ -496,14 +498,14 @@ export interface SparkLineOptions {
 export function generateSparkLine({
   dateField = 'date_value',
   valueField = 'value',
-  domain = null,
+  domain,
   color = COLOR,
   highlightDate = false,
   highlightStartEnd = true,
   interactive = true,
   height = 30,
   zero = false,
-  valueDomain = null,
+  valueDomain,
 }: SparkLineOptions = {}): TopLevelSpec {
   const spec: TopLevelSpec & LayerSpec<Field> = {
     ...BASE_SPEC,
@@ -514,7 +516,7 @@ export function generateSparkLine({
       bottom: highlightDate && highlightDate !== 'top' ? 20 : 2,
       right: 2,
     },
-    background: null,
+    background: undefined,
     encoding: {
       x: {
         field: dateField,
@@ -670,7 +672,7 @@ export function generateSparkLine({
   return spec;
 }
 
-export function generateDistributionLineSpec(state: NameInfo, options: LineSpecOptions = {}): TopLevelSpec {
+export function generateDistributionLineSpec(state: RegionInfo, options: LineSpecOptions = {}): TopLevelSpec {
   const spec = generateLineChartSpec(options);
   spec.transform = [
     {
@@ -724,7 +726,7 @@ export function generateDistributionLineSpec(state: NameInfo, options: LineSpecO
     },
   ];
   ((spec.padding as unknown) as { bottom: number }).bottom = 50;
-  spec.layer[0].encoding.color = {
+  spec.layer[0].encoding!.color = {
     field: 'group',
     type: 'nominal',
     scale: {
@@ -746,7 +748,7 @@ export function generateDistributionLineSpec(state: NameInfo, options: LineSpecO
   //   },
   //   value: 1,
   // };
-  spec.layer[1].encoding.color = {
+  spec.layer[1].encoding!.color = {
     field: 'group',
     type: 'nominal',
   };
@@ -826,41 +828,41 @@ export function generateDistributionLineSpec(state: NameInfo, options: LineSpecO
   return spec;
 }
 
-export function generateDistributionLineSpec2(state: NameInfo, options: LineSpecOptions = {}): TopLevelSpec {
+export function generateDistributionLineSpec2(state: RegionInfo, options: LineSpecOptions = {}): TopLevelSpec {
   const spec = generateLineChartSpec(options);
   ((spec.padding as unknown) as { bottom: number }).bottom = 50;
-  spec.layer[0].encoding.color = {
+  spec.layer[0].encoding!.color = {
     condition: {
       test: `datum.geo_value == '${state.propertyId.toLowerCase()}'`,
       value: MULTI_COLORS[0],
     },
     value: COLOR,
   };
-  spec.layer[0].encoding.detail = {
+  spec.layer[0].encoding!.detail = {
     field: 'geo_value',
   };
-  spec.layer[0].encoding.opacity = {
+  spec.layer[0].encoding!.opacity = {
     condition: {
       test: `datum.geo_value == '${state.propertyId.toLowerCase()}'`,
       value: 1,
     },
     value: 0.1,
   };
-  spec.layer[0].encoding.strokeWidth = {
+  spec.layer[0].encoding!.strokeWidth = {
     condition: {
       test: `datum.geo_value == '${state.propertyId.toLowerCase()}'`,
       value: 3,
     },
     value: 2,
   };
-  spec.layer[1].encoding.color = {
+  spec.layer[1].encoding!.color = {
     condition: {
       test: `datum.geo_value == '${state.propertyId.toLowerCase()}'`,
       value: MULTI_COLORS[0],
     },
     value: COLOR,
   };
-  spec.layer[1].encoding.detail = {
+  spec.layer[1].encoding!.detail = {
     field: 'geo_value',
   };
   return spec;

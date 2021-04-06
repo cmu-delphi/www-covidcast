@@ -9,13 +9,13 @@ const ENDPOINT = process.env.COVIDCAST_ENDPOINT_URL;
 export const fetchOptions: RequestInit = process.env.NODE_ENV === 'development' ? { cache: 'force-cache' } : {};
 
 export interface EpiDataResponse<T = Record<string, unknown>> {
-  result?: number;
+  result: number;
   message: string;
   epidata: T[];
 }
 
 export function callAPIEndPoint<T = Record<string, unknown>>(
-  endpoint: string,
+  endpoint: string | null,
   id: string,
   signal: string,
   level: string,
@@ -88,7 +88,7 @@ export function callMetaAPI<T = Record<string, unknown>>(
     const signals = dataSignals
       .map((d) =>
         d.isCasesOrDeath
-          ? Object.values(d.casesOrDeathSignals)
+          ? Object.values(d.casesOrDeathSignals ?? {})
               .map((s) => `${d.id}:${s}`)
               .join(',')
           : `${d.id}:${d.signal}`,

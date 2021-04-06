@@ -2,7 +2,7 @@ import { parseAPITime } from './utils';
 import { csvParse } from 'd3-dsv';
 import { timeDay } from 'd3-time';
 import { fetchOptions } from './api';
-import type { NameInfo, RegionLevel } from '../maps/interfaces';
+import type { RegionInfo, RegionLevel } from '../maps/interfaces';
 
 declare const process: { env: Record<string, string> };
 
@@ -72,7 +72,7 @@ function parseRegions(regions: string): { level: RegionLevel; ids: '*' | Set<str
       }
       return null;
     })
-    .filter((d) => d != null);
+    .filter((d): d is { level: RegionLevel; ids: '*' | Set<string> } => d != null);
 }
 
 export class Annotation {
@@ -97,7 +97,7 @@ export class Annotation {
   /**
    * @param {import('../maps').NameInfo | import('../maps').NameInfo[]} region
    */
-  matchRegion(region: NameInfo | NameInfo[]): boolean {
+  matchRegion(region: RegionInfo | RegionInfo[]): boolean {
     const regionToMatch = Array.isArray(region) ? region : [region];
     return regionToMatch.some((matchRegion) =>
       this.regions.some(
@@ -158,13 +158,13 @@ function sortByDate(annotationA: Annotation, annotationB: Annotation) {
 export class AnnotationManager {
   constructor(public readonly annotations: Annotation[] = []) {}
 
-  getRegionAnnotations(region: NameInfo | NameInfo[], date: Date): Annotation[] {
+  getRegionAnnotations(region: RegionInfo | RegionInfo[], date: Date): Annotation[] {
     return this.annotations
       .filter((d) => region != null && d.matchRegion(region) && date != null && d.matchDate(date))
       .sort(sortByDate);
   }
 
-  getAnnotations(sensor: { id: string; signal: string }, region: NameInfo | NameInfo[], date: Date): Annotation[] {
+  getAnnotations(sensor: { id: string; signal: string }, region: RegionInfo | RegionInfo[], date: Date): Annotation[] {
     return this.annotations
       .filter(
         (d) =>
@@ -180,7 +180,7 @@ export class AnnotationManager {
 
   getWindowAnnotations(
     sensor: { id: string; signal: string },
-    region: NameInfo | NameInfo[],
+    region: RegionInfo | RegionInfo[],
     dateStart: Date,
     dateEnd: Date,
   ): Annotation[] {

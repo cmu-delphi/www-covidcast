@@ -15,9 +15,9 @@ import {
   CasesOrDeathOptions,
   SensorEntry,
 } from './constants';
-import modes, { modeByID } from '../modes';
+import modes, { Mode, modeByID, ModeID } from '../modes';
 import { parseAPITime } from '../data/utils';
-import { getInfoByName } from '../maps';
+import { getInfoByName } from '../maps/infos';
 export {
   defaultRegionOnStartup,
   getLevelInfo,
@@ -32,13 +32,13 @@ export {
 import { timeMonth } from 'd3-time';
 import { MAP_THEME, selectionColors } from '../theme';
 import { AnnotationManager, fetchAnnotations } from '../data';
-import type { NameInfo, RegionLevel } from '../maps/interfaces';
+import type { RegionInfo, RegionLevel } from '../maps/interfaces';
 
 /**
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
  */
-export const times = writable<Map<string, [number, number]>>(null);
-export const stats = writable<Map<string, { max: number; mean: number; std: number }>>(null);
+export const times = writable<Map<string, [number, number]> | null>(null);
+export const stats = writable<Map<string, { max: number; mean: number; std: number }> | null>(null);
 
 export const appReady = writable(false);
 
@@ -56,12 +56,12 @@ function deriveFromPath(url: Location) {
   const lag = urlParams.get('lag');
   const level = (urlParams.get('level') as unknown) as RegionLevel;
   const encoding = urlParams.get('encoding');
-  const date = urlParams.get('date');
+  const date = urlParams.get('date') ?? '';
 
   const compareIds = (urlParams.get('compare') || '')
     .split(',')
-    .map((d) => getInfoByName(d) as NameInfo)
-    .filter(Boolean);
+    .map((d) => getInfoByName(d))
+    .filter((d): d is RegionInfo => d != null);
 
   const modeFromPath = () => {
     const pathName = url.pathname;
@@ -123,9 +123,12 @@ export const currentLevel = writable(defaultValues.level);
 // in case of a death signal whether to show cumulative data
 export const signalCasesOrDeathOptions = writable(defaultValues.signalCasesOrDeathOptions);
 
-export const currentSensorMapTitle = derived([currentSensorEntry, signalCasesOrDeathOptions], ([sensor, options]) =>
-  typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText(options) : sensor.mapTitleText,
-);
+export const currentSensorMapTitle = derived([currentSensorEntry, signalCasesOrDeathOptions], ([sensor, options]) => {
+  if (!sensor) {
+    return '';
+  }
+  return typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText(options) : sensor.mapTitleText;
+});
 
 export const encoding = writable(defaultValues.encoding);
 
@@ -159,20 +162,21 @@ export const currentRegion = writable(defaultValues.region);
 /**
  * current region info (could also be null)
  */
-export const currentRegionInfo = derived([currentRegion], ([current]) => getInfoByName(current) as NameInfo | null);
+export const currentRegionInfo = derived([currentRegion], ([current]) => getInfoByName(current));
 
-function deriveRecent(): NameInfo[] {
+function deriveRecent(): RegionInfo[] {
   if (!window.localStorage) {
     return [];
   }
   const item = window.localStorage.getItem('recent') || '';
   if (!item) {
-    return [getInfoByName(defaultRegionOnStartup.state), getInfoByName(defaultRegionOnStartup.county)];
+    return [getInfoByName(defaultRegionOnStartup.state)!, getInfoByName(defaultRegionOnStartup.county)!];
   }
   return item
     .split(',')
     .filter(Boolean)
-    .map((d) => getInfoByName(d));
+    .map((d) => getInfoByName(d))
+    .filter((d): d is RegionInfo => d != null);
 }
 export const recentRegionInfos = writable(deriveRecent());
 
@@ -200,7 +204,7 @@ currentRegionInfo.subscribe((v) => {
 /**
  * @returns {boolean} whether the selection has changed
  */
-export function selectByInfo(elem: NameInfo | null, reset = false): boolean {
+export function selectByInfo(elem: RegionInfo | null, reset = false): boolean {
   if (elem === get(currentRegionInfo)) {
     if (reset) {
       currentRegion.set('');
@@ -227,6 +231,9 @@ export const spikeHeightScale = writable(SqrtScale());
 
 // validate if sensor and other parameter matches
 currentSensorEntry.subscribe((sensorEntry) => {
+  if (!sensorEntry) {
+    return;
+  }
   // check level
   const level = get(currentLevel);
 
@@ -247,10 +254,10 @@ currentSensorEntry.subscribe((sensorEntry) => {
   }
 
   // clamp to time span
-  const timesMap = get(times);
-  if (timesMap != null) {
-    const [minDate, maxDate] = timesMap.get(sensorEntry.key);
-    const current = get(currentDate);
+  const entry = get(times)?.get(sensorEntry.key);
+  if (entry != null) {
+    const [minDate, maxDate] = entry;
+    const current = get(currentDate) ?? '';
     if (current < String(minDate)) {
       currentDate.set(String(minDate));
     } else if (current > String(maxDate)) {
@@ -265,7 +272,7 @@ currentMode.subscribe((mode) => {
     currentSensor.set(DEFAULT_SURVEY_SENSOR);
     const timesMap = get(times);
     if (timesMap != null) {
-      const entry = timesMap.get(DEFAULT_SURVEY_SENSOR);
+      const entry = timesMap.get(DEFAULT_SURVEY_SENSOR)!;
       currentDate.set(String(entry[1])); // max
     }
   }
@@ -301,7 +308,7 @@ export const isMobileDevice = readable(isMobileQuery.matches, (set) => {
 // overview compare mode
 
 export interface CompareSelection {
-  info: NameInfo;
+  info: RegionInfo;
   color: string;
   displayName: string;
 }
@@ -311,7 +318,7 @@ export const currentCompareSelection = writable(defaultValues.compare);
 /**
  * add an element to the compare selection
  */
-export function addCompare(info: NameInfo): void {
+export function addCompare(info: RegionInfo): void {
   if (!get(currentRegionInfo)) {
     selectByInfo(info);
     return;
@@ -332,7 +339,7 @@ export function addCompare(info: NameInfo): void {
  * removes an element from the compare selection
  * @param {import('../maps').NameInfo} info
  */
-export function removeCompare(info: NameInfo): void {
+export function removeCompare(info: RegionInfo): void {
   const selection = get(currentRegionInfo);
   const bak = (get(currentCompareSelection) || []).slice();
   if (selection && info.id === selection.id) {
@@ -357,17 +364,17 @@ export const currentMultiSelection = derived(
 );
 
 export interface PersistedState {
-  mode?: string;
-  sensor?: string;
-  sensor2?: string;
-  level?: RegionLevel;
-  lag?: number;
-  region?: string;
-  date?: string;
-  signalC?: boolean;
-  signalI?: boolean;
-  encoding?: 'color' | 'bubble' | 'spike';
-  compare?: string;
+  mode?: string | null;
+  sensor?: string | null;
+  sensor2?: string | null;
+  level?: RegionLevel | null;
+  lag?: number | null;
+  region?: string | null;
+  date?: string | null;
+  signalC?: boolean | null;
+  signalI?: boolean | null;
+  encoding?: 'color' | 'bubble' | 'spike' | null;
+  compare?: string | null;
 }
 export interface TrackedState {
   state: PersistedState;
@@ -432,19 +439,19 @@ export const trackedUrlParams = derived(
   },
 );
 
-export function getScrollToAnchor(mode: { anchor?: string }): string | null {
+export function getScrollToAnchor(mode: Mode): string | undefined {
   const anchor = mode.anchor;
   delete mode.anchor;
   return anchor;
 }
-export function switchToMode(mode: { anchor?: string }, anchor: string): void {
+export function switchToMode(mode: Mode, anchor: string): void {
   mode.anchor = anchor;
   currentMode.set(mode);
 }
 
 export function loadFromUrlState(state: PersistedState): void {
   if (state.mode !== get(currentMode).id) {
-    currentMode.set(modeByID[state.mode]);
+    currentMode.set(modeByID[state.mode as ModeID]);
   }
   if (state.sensor != null && state.sensor !== get(currentSensor)) {
     currentSensor.set(state.sensor);
@@ -476,8 +483,8 @@ export function loadFromUrlState(state: PersistedState): void {
   if (state.compare) {
     const compareIds = state.compare
       .split(',')
-      .map((d) => getInfoByName(d) as NameInfo)
-      .filter(Boolean);
+      .map((d) => getInfoByName(d))
+      .filter((d): d is RegionInfo => d != null);
     currentCompareSelection.set(
       compareIds.map((info, i) => ({ info, displayName: info.displayName, color: selectionColors[i] || 'grey' })),
     );

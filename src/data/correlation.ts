@@ -141,7 +141,7 @@ export function generateCorrelationMetrics<T extends { time_value: number; value
   const lagAtZero = lags.find((l) => l.lag == 0);
 
   return {
-    r2At0: lagAtZero.r2,
+    r2At0: lagAtZero?.r2 ?? 0,
     lagAtMaxR2: max.lag,
     r2AtMaxR2: max.r2,
     tMax: max,

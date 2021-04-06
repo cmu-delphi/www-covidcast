@@ -1,7 +1,7 @@
-import { stateInfo } from '../maps';
+import { stateInfo } from '../maps/infos';
 import { ZERO_COLOR } from '../theme';
 import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
-import type { NameInfo } from '../maps/interfaces';
+import type { RegionInfo } from '../maps/interfaces';
 import type { TopLevelSpec } from 'vega-lite';
 import { BASE_SPEC } from './commonSpec';
 
@@ -74,7 +74,7 @@ export interface MatrixOptions {
 }
 
 function genBaseSpec(
-  infos: readonly NameInfo[],
+  infos: readonly RegionInfo[],
   assignments: { id: string; x: number; y: number; value?: number }[],
   { width = 500, height = 300, scheme = 'yellowgreenblue', domain = undefined, legendTitle }: MatrixOptions = {},
 ) {

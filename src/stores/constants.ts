@@ -152,7 +152,7 @@ export function ensureSensorStructure(
       rawSensor: {
         ...full,
         key: `${sensor.id}-${rawSignal}`,
-        name: `${full.name.replace('(7-day average)', '')} (Raw)`,
+        name: `${full.name!.replace('(7-day average)', '')} (Raw)`,
         description: full.description.replace('(7-day average)', ''),
         signal: rawSignal,
         is7DayAverage: false,
@@ -212,7 +212,7 @@ export declare type SensorEntry = Sensor & (RegularOldSensor | CasesOrDeathOldSe
  */
 export function primaryValue(
   sensorEntry: { isCasesOrDeath?: boolean },
-  sensorOptions: CasesOrDeathOptions,
+  sensorOptions: Partial<CasesOrDeathOptions> = {},
 ): 'value' | keyof EpiDataCasesOrDeathValues {
   if (!sensorEntry.isCasesOrDeath) {
     return 'value';
@@ -226,14 +226,14 @@ export function primaryValue(
 /**
  * determines the primary value to show or lookup
  */
-function getType(
+export function getType(
   sensorEntry: {
     signal: string;
     isCasesOrDeath?: boolean;
     casesOrDeathSignals?: Record<keyof EpiDataCasesOrDeathValues, string>;
   },
-  sensorOptions: CasesOrDeathOptions,
-) {
+  sensorOptions: Partial<CasesOrDeathOptions> = {},
+): 'prop' | 'count' | 'other' {
   let signal = sensorEntry.signal;
   if (sensorEntry.isCasesOrDeath) {
     const valueKey = primaryValue(sensorEntry, sensorOptions) as keyof EpiDataCasesOrDeathValues;
@@ -266,8 +266,8 @@ export function extendSensorEntry(sensorEntry: Partial<SensorEntry> & { id: stri
     isCount,
     getType: (options: CasesOrDeathOptions) => getType(sensorEntry, options),
     isCasesOrDeath: false as const,
-    plotTitleText: sensorEntry.plotTitleText || sensorEntry.name,
-    mapTitleText: sensorEntry.mapTitleText,
+    plotTitleText: sensorEntry.plotTitleText || sensorEntry.name!,
+    mapTitleText: sensorEntry.mapTitleText!,
   });
   if (!isCasesOrDeath) {
     return full;
@@ -327,10 +327,7 @@ export function extendSensorEntry(sensorEntry: Partial<SensorEntry> & { id: stri
  */
 export const regularSignalMetaDataGeoTypeCandidates = ['county', 'msa'];
 
-/**
- * @type {Partial<SensorEntry>[]}
- */
-const defaultSensors = (descriptions as unknown) as Partial<SensorEntry>[];
+const defaultSensors = (descriptions as unknown) as (Partial<SensorEntry> & { id: string; signal: string })[];
 
 /**
  * @type {SensorEntry[]}

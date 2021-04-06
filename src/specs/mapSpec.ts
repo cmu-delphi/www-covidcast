@@ -2,15 +2,15 @@ import type { Gradient } from 'vega';
 import type { Field } from 'vega-lite/build/src/channeldef';
 import type { MarkDef } from 'vega-lite/build/src/mark';
 import type { LayerSpec, NormalizedLayerSpec, NormalizedUnitSpec, TopLevelSpec } from 'vega-lite/build/src/spec';
-import type { NameInfo, RegionLevel } from '../maps/interfaces';
+import type { CountyInfo, RegionInfo, RegionLevel } from '../maps/interfaces';
 import getRelatedCounties from '../maps/related';
 import { EpiDataCasesOrDeathValues, EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 import type { RegionEpiDataRow } from '../stores/params';
 import { MAP_THEME, MISSING_COLOR, ZERO_COLOR } from '../theme';
 import { BASE_SPEC, CREDIT } from './commonSpec';
 
-const NAME_INFO_KEYS: (keyof NameInfo)[] = ['propertyId', 'displayName', 'population', 'state', 'level'];
-const EPIDATA_ROW_KEYS: (keyof (RegionEpiDataRow & EpiDataCasesOrDeathValues))[] = [
+const NAME_INFO_KEYS: (keyof CountyInfo)[] = ['propertyId', 'displayName', 'population', 'state', 'level'];
+const EPIDATA_ROW_KEYS: (keyof (RegionEpiDataRow & CountyInfo & EpiDataCasesOrDeathValues))[] = [
   'geo_value',
   'value',
   'date_value',
@@ -95,7 +95,7 @@ function genMissingLayer(missingLevel: RegionLevel = 'nation'): NormalizedUnitSp
   };
 }
 
-function genMegaLayer(withStates: string = null): NormalizedUnitSpec {
+function genMegaLayer(withStates: string | null = null): NormalizedUnitSpec {
   return {
     data: {
       name: 'state',
@@ -382,7 +382,7 @@ export function generateStateSpec(options: CommonParams = {}): TopLevelSpec {
   const topoJSON = stateJSON();
 
   const spec = genBaseSpec(level, topoJSON, options);
-  spec.datasets.nation = nationJSON();
+  spec.datasets!.nation = nationJSON();
   spec.layer.push(genMissingLayer());
 
   // state, msa
@@ -411,7 +411,7 @@ export function generateNationSpec(options: CommonParams = {}): TopLevelSpec {
   const topoJSON = nationJSON();
 
   const spec = genBaseSpec(level, topoJSON, options);
-  spec.transform.unshift({
+  spec.transform!.unshift({
     calculate: JSON.stringify('us'),
     as: 'id',
   });
@@ -431,9 +431,9 @@ export function generateStateMapWithCountyDataSpec(options: CommonParams = {}): 
 
   const spec = genBaseSpec(level, topoJSON, options);
 
-  spec.datasets.nation = nationJSON();
+  spec.datasets!.nation = nationJSON();
   spec.layer.push(genMissingLayer());
-  spec.datasets.state = stateJSON();
+  spec.datasets!.state = stateJSON();
   spec.layer.push(genMegaLayer());
   spec.layer.push(genLevelLayer({ ...options, strokeWidth: 0 }));
   spec.layer.push(genStateBorderLayer());
@@ -452,14 +452,14 @@ export function generateStateMapWithCountyBinaryDataSpec(options: CommonParams =
 
   const spec = genBaseSpec(level, topoJSON, options);
 
-  spec.datasets.nation = nationJSON();
+  spec.datasets!.nation = nationJSON();
   const missing = genMissingLayer();
   (missing.mark as MarkDef<'geoshape'>).color = MISSING_COLOR;
   spec.layer.push(missing);
-  spec.datasets.state = stateJSON();
+  spec.datasets!.state = stateJSON();
   const counties = genLevelLayer({ ...options, strokeWidth: 0 });
   (missing.mark as MarkDef<'geoshape'>).tooltip = false;
-  counties.encoding.color = {
+  counties.encoding!.color = {
     condition: {
       test: 'datum.value != null',
       value: 'steelblue',
@@ -477,7 +477,7 @@ export function generateStateMapWithCountyBinaryDataSpec(options: CommonParams =
  * generates a map of counties for a specific state
  */
 export function generateCountiesOfStateSpec(
-  state: NameInfo,
+  state: RegionInfo,
   { withStates = false, ...options }: CommonParams & { withStates?: boolean } = {},
 ): TopLevelSpec {
   const level = 'county';
@@ -497,24 +497,24 @@ export function generateCountiesOfStateSpec(
   const isCountyOfState = {
     filter: `slice(lower(datum.id), 0, 2) == '${state.id}'`,
   };
-  spec.transform.unshift(isCountyOfState);
+  spec.transform!.unshift(isCountyOfState);
 
-  spec.datasets.nation = nationJSON();
+  spec.datasets!.nation = nationJSON();
   spec.layer.push(genMissingLayer());
-  spec.datasets.state = stateJSON();
+  spec.datasets!.state = stateJSON();
 
   if (withStates) {
-    spec.projection.fit = {
+    spec.projection!.fit = {
       expr: `customInFilter(data('state'), 'id', ["${state.id}"])`,
     };
-    spec.projection.extent = {
+    spec.projection!.extent = {
       // fit to match 60% in the center
       expr: `[[width * 0.2, height * 0.2], [width* 0.8, height * 0.8]]`,
     };
     spec.layer.push(genMegaLayer(state.id));
   } else {
     spec.layer.push(genMegaLayer());
-    spec.layer[spec.layer.length - 1].transform.unshift(isState);
+    spec.layer[spec.layer.length - 1].transform!.unshift(isState);
   }
   spec.layer.push(genLevelLayer(options));
   if (withStates) {
@@ -528,17 +528,17 @@ export function generateCountiesOfStateSpec(
 /**
  * generates a map of the county and its related counties
  */
-export function generateRelatedCountySpec(county: NameInfo, options: CommonParams = {}): TopLevelSpec {
+export function generateRelatedCountySpec(county: RegionInfo, options: CommonParams = {}): TopLevelSpec {
   const level = 'county';
   const topoJSON = countyJSON();
 
   const spec = genBaseSpec(level, topoJSON, options);
 
   const related = getRelatedCounties(county);
-  spec.projection.fit = {
+  spec.projection!.fit = {
     expr: `customInFilter(data('county'), 'id', ${JSON.stringify(related.map((d) => d.id))})`,
   };
-  spec.projection.extent = {
+  spec.projection!.extent = {
     // fit to match 60% in the center
     expr: `[[width * 0.2, height * 0.2], [width* 0.8, height * 0.8]]`,
   };
@@ -548,16 +548,16 @@ export function generateRelatedCountySpec(county: NameInfo, options: CommonParam
   // const isRelevantCounty = {
   //   filter: [county, ...related].map((d) => `datum.id === '${d.id}'`).join(' || '),
   // };
-  spec.datasets.nation = nationJSON();
+  spec.datasets!.nation = nationJSON();
   spec.layer.push(genMissingLayer());
-  spec.datasets.state = stateJSON();
+  spec.datasets!.state = stateJSON();
   spec.layer.push(genMegaLayer());
   spec.layer.push(genLevelLayer(options));
   spec.layer.push(genStateBorderLayer({ strokeWidth: 2 }));
   spec.layer.push(genMegaHoverLayer());
   spec.layer.push(genLevelHoverLayer());
   // highlight the selected one
-  spec.layer[spec.layer.length - 1].encoding.opacity.condition = {
+  spec.layer[spec.layer.length - 1]!.encoding!.opacity!.condition = {
     test: {
       or: [
         {

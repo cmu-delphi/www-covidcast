@@ -2,8 +2,8 @@ import { callAPIEndPoint, EpiDataResponse } from './api';
 import { timeDay } from 'd3-time';
 import { parseAPITime, formatAPITime, combineSignals } from './utils';
 import { EpiDataCasesOrDeathValues, EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
-import { getInfoByName } from '../maps';
-import type { NameInfo } from '../maps/interfaces';
+import { getInfoByName } from '../maps/infos';
+import type { RegionInfo } from '../maps/interfaces';
 
 export interface DataSensor {
   id: string;
@@ -59,7 +59,8 @@ function parseData(d: EpiDataResponse<EpiDataRow>, mixinData: Partial<EpiDataRow
   for (const row of data) {
     Object.assign(row, mixinData);
     if (row.time_value == null) {
-      row.date_value = null;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+      (row as any).date_value = null;
       continue;
     }
     row.date_value = parseAPITime(row.time_value.toString());
@@ -157,7 +158,7 @@ export function fetchData(
     return Promise.resolve([] as EpiDataRow[]);
   }
   const transferFields = computeTransferFields(mixinValues, advanced, transferSignal);
-  function fetchSeparate(defaultSignalIndex) {
+  function fetchSeparate(defaultSignalIndex: number) {
     const extraDataFields = ['value'];
     // part of key
     if (mixinValues.time_value == null) {
@@ -171,10 +172,10 @@ export function fetchData(
         callAPIEndPoint<EpiDataRow>(
           null,
           dataSensor.id,
-          dataSensor.casesOrDeathSignals[k],
+          dataSensor.casesOrDeathSignals![k]!,
           level,
           date,
-          region,
+          region!,
           i === 0 ? transferFields : extraDataFields,
         ),
       ),
@@ -182,7 +183,7 @@ export function fetchData(
   }
 
   if (dataSensor.isCasesOrDeath && multiValues) {
-    const signals = EPIDATA_CASES_OR_DEATH_VALUES.map((k) => dataSensor.casesOrDeathSignals[k]);
+    const signals = EPIDATA_CASES_OR_DEATH_VALUES.map((k) => dataSensor.casesOrDeathSignals![k]);
     const defaultSignal = dataSensor.signal;
     const defaultSignalIndex = signals.indexOf(defaultSignal);
 
@@ -275,9 +276,13 @@ function createCopy<T extends EpiDataRow = EpiDataRow>(row: T, date: Date, dataS
     stderr: null,
     sample_size: null,
   });
-  if ((dataSensor != null && dataSensor.isCasesOrDeath) || row[EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined) {
+  if (
+    (dataSensor != null && dataSensor.isCasesOrDeath) ||
+    ((row as unknown) as EpiDataCasesOrDeathValues)[EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined
+  ) {
     EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
-      copy[key] = null;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+      (copy as any)[key] = null;
     });
   }
   return copy;
@@ -345,7 +350,7 @@ export function addMissing<T extends EpiDataRow = EpiDataRow>(rows: T[], dataSen
   }
   const imputedRows = range.map((date) => {
     if (base.length > 0 && base[0].date_value.getTime() <= date.getTime()) {
-      return base.shift();
+      return base.shift()!;
     }
     // create an entry
     return createCopy(template, date, dataSensor);
@@ -353,11 +358,11 @@ export function addMissing<T extends EpiDataRow = EpiDataRow>(rows: T[], dataSen
   return imputedRows;
 }
 
-export function addNameInfos(rows: EpiDataRow[]): (EpiDataRow & NameInfo)[] {
+export function addNameInfos(rows: EpiDataRow[]): (EpiDataRow & RegionInfo)[] {
   for (const row of rows) {
     Object.assign(row, getInfoByName(row.geo_value));
   }
-  return rows as (EpiDataRow & NameInfo)[];
+  return rows as (EpiDataRow & RegionInfo)[];
 }
 
 function avg(
@@ -398,19 +403,20 @@ export function averageByDate(
   }
   return Array.from(byDate.values())
     .map((rows) => {
-      const r = {
+      const r: EpiDataRow = {
         ...rows[0],
         ...mixin,
-        value: avg(rows, 'value'),
-        stderr: avg(rows, 'stderr'),
-        sample_size: avg(rows, 'sample_size'),
+        value: avg(rows, 'value')!,
+        stderr: avg(rows, 'stderr')!,
+        sample_size: avg(rows, 'sample_size')!,
       };
       if (
         (dataSensor != null && dataSensor.isCasesOrDeath) ||
-        rows[0][EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined
+        ((rows[0] as unknown) as EpiDataCasesOrDeathValues)[EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined
       ) {
         EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
-          r[key] = avg(rows, key);
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+          (r as any)[key] = avg(rows, key);
         });
       }
       return r;

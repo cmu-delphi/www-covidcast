@@ -91,15 +91,15 @@ function sign(
   return `+${v}`;
 }
 
-export function formatValue(value?: number, enforceSign = false): string {
+export function formatValue(value?: number | null, enforceSign = false): string {
   return sign(value, f, enforceSign);
 }
-export function formatPercentage(value?: number, enforceSign = false): string {
+export function formatPercentage(value?: number | null, enforceSign = false): string {
   return sign(value, basePercentFormatter, enforceSign, 1 / 100);
 }
-export function formatFraction(value?: number, enforceSign = false): string {
+export function formatFraction(value?: number | null, enforceSign = false): string {
   return sign(value, basePercentFormatter, enforceSign);
 }
-export function formatRawValue(value?: number, enforceSign = false): string {
+export function formatRawValue(value?: number | null, enforceSign = false): string {
   return sign(value, rawFormatter, enforceSign);
 }

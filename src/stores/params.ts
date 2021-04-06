@@ -1,13 +1,13 @@
 import { timeDay, timeMonth, timeWeek } from 'd3-time';
 import { addNameInfos, fetchData, formatAPITime, addMissing, fitRange, parseAPITime, EpiDataRow } from '../data';
-import { nationInfo } from '../maps';
+import { nationInfo } from '../maps/infos';
 import { currentDate, currentRegion, yesterdayDate, currentSensor, sensorList } from '.';
 import { determineTrend, Trend } from './trend';
-import { determineMinMax } from '../components/MapBox/colors';
+import { determineMinMax } from './stats';
 import { formatValue } from '../formats';
 import { scaleSequential } from 'd3-scale';
 import { scrollToTop } from '../util';
-import type { NameInfo, NameInfo as Region, RegionLevel } from '../maps/interfaces';
+import type { RegionInfo, RegionInfo as Region, RegionLevel, RegionArea, CountyInfo } from '../maps/interfaces';
 import type { Sensor, SensorEntry } from './constants';
 import type { Writable } from 'svelte/store';
 
@@ -60,7 +60,7 @@ export class TimeFrame {
     return new TimeFrame(min, max);
   }
 
-  shift(minShiftInDays = 0, maxShiftInDays = 0) {
+  shift(minShiftInDays = 0, maxShiftInDays = 0): TimeFrame {
     return new TimeFrame(timeDay.offset(this.min, minShiftInDays), timeDay.offset(this.max, maxShiftInDays));
   }
 }
@@ -72,7 +72,7 @@ const MAX_DATA_ROWS = 3650;
 export class DataFetcher {
   private readonly cache = new Map<
     string,
-    Promise<RegionEpiDataRow[]> | Promise<EpiDataRow & NameInfo> | Promise<Trend>
+    Promise<RegionEpiDataRow[]> | Promise<EpiDataRow & RegionInfo> | Promise<Trend>
   >();
   private primarySensorKey = '';
   private primaryRegionId = '';
@@ -512,7 +512,7 @@ export class DataFetcher {
       ).then(addNameInfos);
       for (const s of missingDataSensors) {
         // compute slice per sensor and fill the cache
-        const sensorData = data.then((rows) => rows.find((d) => d.signal === s.signal));
+        const sensorData = data.then((rows) => rows.find((d) => d.signal === s.signal)!);
         this.cache.set(this.toDateKey(s, lRegion, lDate, 'details'), sensorData);
       }
     }
@@ -624,7 +624,7 @@ export class SensorParam {
   readonly isInverted: boolean;
   readonly is7DayAverage: boolean;
   readonly valueUnit: string;
-  readonly formatValue: (v: number | null, enforceSign?: boolean) => string;
+  readonly formatValue: (v?: number | null, enforceSign?: boolean) => string;
   readonly unit: string;
   readonly unitShort: string;
   readonly unitHTML: string;
@@ -694,8 +694,8 @@ export class SensorParam {
   }
 }
 
-export const CASES = new SensorParam(sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Cases')));
-export const DEATHS = new SensorParam(sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Deaths')));
+export const CASES = new SensorParam(sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Cases'))!);
+export const DEATHS = new SensorParam(sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Deaths'))!);
 
 export class RegionParam implements Region {
   readonly value: Region;
@@ -705,18 +705,19 @@ export class RegionParam implements Region {
   readonly id: string;
   readonly propertyId: string; // geojson: feature.property.id
   readonly population?: number;
-  readonly region?: string; // just for state and county
+  readonly region?: RegionArea; // just for state and county
   readonly state?: string; // just for county
   readonly level: RegionLevel;
 
   constructor(region?: Region) {
     this.value = region ?? nationInfo;
+    this.name = this.value.name;
     this.id = this.value.id;
     this.displayName = this.value.displayName;
     this.level = this.value.level;
     this.propertyId = this.value.propertyId;
-    this.region = this.value.region;
-    this.state = this.value.state;
+    this.region = (this.value as CountyInfo).region;
+    this.state = (this.value as CountyInfo).state;
   }
 
   set(region: Region, scrollTop = false): void {

@@ -6,7 +6,6 @@ import {
   yesterday,
   regularSignalMetaDataGeoTypeCandidates,
   SensorEntry,
-  Sensor,
   EpiDataCasesOrDeathValues,
 } from '../stores/constants';
 import { get } from 'svelte/store';
@@ -33,8 +32,8 @@ export interface MetaEntry {
 
   data_source: string;
   signal: string;
-  time_type?: string;
-  geo_type?: RegionLevel;
+  time_type: string;
+  geo_type: RegionLevel;
 }
 
 function processMetaData(meta: EpiDataResponse<MetaEntry>): { level: RegionLevel; date: string } {
@@ -58,16 +57,18 @@ function processMetaData(meta: EpiDataResponse<MetaEntry>): { level: RegionLevel
 
   let l = get(currentLevel);
   const sensor = get(currentSensor);
-  if (!sensorMap.get(sensor).levels.includes(l)) {
-    l = sensorMap.get(sensor).levels[0];
+  const sensorInfo = sensorMap.get(sensor);
+  if (sensorInfo && !sensorInfo.levels.includes(l)) {
+    l = sensorInfo.levels[0];
     currentLevel.set(l);
   }
 
   let date = get(currentDate);
   // Magic number of default date - if no URL params, use max date
   // available
-  if (date === MAGIC_START_DATE) {
-    date = formatAPITime(timeDay.offset(parseAPITime(timeMap.get(sensor)[1]), -2));
+  const timeEntry = timeMap.get(sensor);
+  if (date === MAGIC_START_DATE && timeEntry != null) {
+    date = formatAPITime(timeDay.offset(parseAPITime(timeEntry[1]), -2));
     currentDate.set(date);
   }
 

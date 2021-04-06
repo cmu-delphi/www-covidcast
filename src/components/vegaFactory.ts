@@ -3,7 +3,7 @@ import { format } from 'd3-format';
 import embed, { EmbedOptions, Result, VisualizationSpec } from 'vega-embed';
 import { Error, expressionFunction, projection } from 'vega';
 import { geoAlbersUsaTerritories } from 'geo-albers-usa-territories';
-import type { GeoProjection } from 'd3-geo';
+import type { ExtendedFeature, GeoProjection } from 'd3-geo';
 import { fitExtent, fitSize, fitWidth, fitHeight } from 'd3-geo/src/projection/fit';
 import { timeDay } from 'd3-time';
 
@@ -11,50 +11,55 @@ function patchedAlbersUsaTerritories(): GeoProjection {
   // see https://github.com/stamen/geo-albers-usa-territories/pull/8/files
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const r: GeoProjection = geoAlbersUsaTerritories();
-  r.fitExtent = function (extent, object) {
-    return fitExtent(r, extent, object);
-  };
-
-  r.fitSize = function (size, object) {
-    return fitSize(r, size, object);
-  };
-
-  r.fitWidth = function (width, object) {
-    return fitWidth(r, width, object);
-  };
-
-  r.fitHeight = function (height, object) {
-    return fitHeight(r, height, object);
-  };
-  return r;
+  return Object.assign(r, {
+    fitExtent(extent: [[number, number], [number, number]], object: ExtendedFeature) {
+      return fitExtent(r, extent, object);
+    },
+    fitSize(size: [number, number], object: ExtendedFeature) {
+      return fitSize(r, size, object);
+    },
+    fitWidth(width: number, object: ExtendedFeature) {
+      return fitWidth(r, width, object);
+    },
+    itHeight(height: number, object: ExtendedFeature) {
+      return fitHeight(r, height, object);
+    },
+  });
 }
 
 projection('albersUsaTerritories', patchedAlbersUsaTerritories);
 
-const cache = new Map<string, (d: Date | number) => string>();
+expressionFunction(
+  'cachedTime',
+  (() => {
+    const cacheTime = new Map<string, (d: Date) => string>();
+    return (datum: Date, params: string): string => {
+      const key = `d:${params}`;
+      if (cacheTime.has(key)) {
+        return cacheTime.get(key)!(datum);
+      }
+      const formatter = timeFormat(params);
+      cacheTime.set(key, formatter);
+      return formatter(datum);
+    };
+  })(),
+);
 
-export function cachedTime(datum: Date, params: string): string {
-  const key = `d:${params}`;
-  if (cache.has(key)) {
-    return cache.get(key)(datum);
-  }
-  const formatter = timeFormat(params);
-  cache.set(key, formatter);
-  return formatter(datum);
-}
-
-export function cachedNumber(datum: number, params: string): string {
-  const key = `n:${params}`;
-  if (cache.has(key)) {
-    return cache.get(key)(datum);
-  }
-  const formatter = format(params);
-  cache.set(key, formatter);
-  return formatter(datum);
-}
-
-expressionFunction('cachedTime', cachedTime);
-expressionFunction('cachedNumber', cachedNumber);
+expressionFunction(
+  'cachedNumber',
+  (() => {
+    const cacheNumber = new Map<string, (d: number) => string>();
+    return (datum: number, params: string): string => {
+      const key = `n:${params}`;
+      if (cacheNumber.has(key)) {
+        return cacheNumber.get(key)!(datum);
+      }
+      const formatter = format(params);
+      cacheNumber.set(key, formatter);
+      return formatter(datum);
+    };
+  })(),
+);
 
 export default function createVega(
   root: string | HTMLElement,
@@ -71,8 +76,8 @@ export default function createVega(
 function customExtent(arr: Record<string, number>[], field: string): { min?: number; max?: number; range: number } {
   if (arr.length === 0) {
     return {
-      min: null,
-      max: null,
+      min: undefined,
+      max: undefined,
       range: 0,
     };
   }
@@ -103,18 +108,18 @@ function customObjChecks(
     return true;
   }
   return conditions.every(([field, op, value]) => {
-    const v = obj != null ? obj[field] : null;
+    const v = obj != null ? (obj[field] as number) : null;
     switch (op) {
       case '==':
         return v == value;
       case '<':
-        return v < value;
+        return v != null && v < value;
       case '>':
-        return v > value;
+        return v != null && v > value;
       case '>=':
-        return v >= value;
+        return v != null && v >= value;
       case '<=':
-        return v <= value;
+        return v != null && v <= value;
       default:
         return v === value;
     }

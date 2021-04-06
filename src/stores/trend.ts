@@ -5,10 +5,7 @@ import { toTimeValue } from './params';
 
 const trendThreshold = 0.1;
 
-/**
- * @returns {[import("../../data").EpiDataRow, import("../../data").EpiDataRow]}
- */
-export function findMinMaxRow(data: readonly EpiDataRow[]): { min: EpiDataRow; max: EpiDataRow } {
+export function findMinMaxRow(data: readonly EpiDataRow[]): { min: EpiDataRow | null; max: EpiDataRow | null } {
   let min: EpiDataRow | null = null;
   let max: EpiDataRow | null = null;
   for (const row of data) {
@@ -34,7 +31,7 @@ export function findDateRow(date: Date, data: readonly EpiDataRow[]): EpiDataRow
   return data.find((d) => d.time_value === apiDate);
 }
 
-function toTrend(current, reference, min) {
+function toTrend(current: number, reference: number, min: number) {
   const nRef = reference - min;
   const nCur = current - min;
   if (nCur === nRef) {
@@ -89,13 +86,13 @@ export interface TrendInfo {
 
 export interface Trend extends TrendInfo {
   min: EpiDataRow | null;
-  minDate: Date;
+  minDate: Date | null;
   max: EpiDataRow | null;
-  maxDate: Date;
+  maxDate: Date | null;
   worst: EpiDataRow | null;
-  worstDate: Date;
+  worstDate: Date | null;
   best: EpiDataRow | null;
-  bestDate: Date;
+  bestDate: Date | null;
   minTrend: TrendInfo | null;
   maxTrend: TrendInfo | null;
   worstTrend: TrendInfo | null;
@@ -177,19 +174,19 @@ export function determineTrend(date: Date, data: readonly EpiDataRow[], isInvert
     bestDate: best ? best.date_value : null,
   };
 
-  if (!dateRow || dateRow.value == null) {
+  if (!dateRow || dateRow.value == null || !min) {
     return trend;
   }
   trend.current = dateRow;
   trend.minTrend = computeTrend(min, dateRow, min, isInverted);
-  trend.maxTrend = computeTrend(max, dateRow, min, isInverted);
+  trend.maxTrend = max ? computeTrend(max, dateRow, min, isInverted) : null;
   trend.worstTrend = isInverted ? trend.minTrend : trend.maxTrend;
   trend.bestTrend = isInverted ? trend.maxTrend : trend.minTrend;
 
   let refRow = findDateRow(refDate, data);
   if (!refRow) {
     // try the closest before
-    const apiDate = toTimeValue(refRow.date_value);
+    const apiDate = toTimeValue(refDate);
     refRow = data.reduce((acc, v) => {
       if (v.time_value > apiDate || v.value == null) {
         return acc;
@@ -198,7 +195,7 @@ export function determineTrend(date: Date, data: readonly EpiDataRow[], isInvert
         return v;
       }
       return acc;
-    }, null);
+    }, undefined as undefined | EpiDataRow);
   }
   if (!refRow) {
     // none found

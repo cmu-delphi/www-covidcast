@@ -1,12 +1,25 @@
-export declare type RegionLevel = 'state' | 'county' | 'msa' | 'hrr' | 'nation' | 'mega-county';
+export type RegionLevel = 'state' | 'county' | 'msa' | 'hrr' | 'nation' | 'mega-county';
+export type RegionArea = 'West' | 'Midwest' | 'Northeast' | 'South';
 
-export interface NameInfo {
+export interface RegionInfo {
   readonly name: string;
   readonly displayName: string;
   readonly id: string;
   readonly propertyId: string; // geojson: feature.property.id
   readonly population?: number;
-  readonly region?: string; // just for state and county
-  readonly state?: string; // just for county
   readonly level: RegionLevel;
+}
+
+export interface StateInfo extends RegionInfo {
+  region: RegionArea;
+  postal: string;
+}
+
+export interface CountyInfo extends RegionInfo {
+  region: RegionArea;
+  state: string;
+}
+
+export interface HRRInfo extends RegionInfo {
+  state: string;
 }

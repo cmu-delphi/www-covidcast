@@ -23,7 +23,7 @@ export function LogScale() {
     range = [0, 0];
   let clamp = false;
 
-  function log(x) {
+  function log(x: number): number {
     return Math.log(x) / Math.log(base);
   }
 
@@ -33,41 +33,41 @@ export function LogScale() {
   }
 
   // y = a log (x) + b
-  function scale(x) {
+  function scale(x: number): number {
     return a * log(Math.min(clamp ? domain[1] : Number.POSITIVE_INFINITY, x));
   }
 
   scale.domain = function (v?: [number, number]) {
-    if (!arguments.length) return domain;
+    if (v == null) return domain;
     domain = v;
     fit();
     return scale;
   };
 
   scale.range = function (v?: [number, number]) {
-    if (!arguments.length) return range;
+    if (v == null) return range;
     range = v;
     fit();
     return scale;
   };
 
   scale.base = function (v?: number) {
-    if (!arguments.length) return base;
+    if (v == null) return base;
     base = v;
     fit();
     return scale;
   };
 
   scale.coef = function (va?: number | [number, number, number], vb?: number, vbase?: number) {
-    if (!arguments.length) return [a, b, base] as [number, number, number];
+    if (va == null) return [a, b, base] as [number, number, number];
     if (Array.isArray(va)) {
       a = va[0];
       b = va[1];
       base = va[2];
     } else {
       a = va;
-      b = vb;
-      base = vbase;
+      b = vb ?? b;
+      base = vbase ?? base;
     }
     return scale;
   };
@@ -79,7 +79,7 @@ export function LogScale() {
   };
 
   scale.clamp = function (v?: boolean) {
-    if (!arguments.length) return clamp;
+    if (v == null) return clamp;
     clamp = v;
     return scale;
   };
@@ -99,7 +99,7 @@ export function SqrtScale() {
     range = [0, 0];
   let clamp = false;
 
-  function sqrt(x) {
+  function sqrt(x: number): number {
     return Math.sqrt(x);
   }
 
@@ -109,38 +109,38 @@ export function SqrtScale() {
   }
 
   // y = a log (x) + b
-  function scale(x) {
+  function scale(x: number): number {
     return a * sqrt(Math.min(clamp ? domain[1] : Number.POSITIVE_INFINITY, x)) + b;
   }
 
   scale.domain = function (v?: [number, number]) {
-    if (!arguments.length) return domain;
+    if (v == null) return domain;
     domain = v;
     fit();
     return scale;
   };
 
   scale.range = function (v?: [number, number]) {
-    if (!arguments.length) return range;
+    if (v == null) return range;
     range = v;
     fit();
     return scale;
   };
 
   scale.coef = function (va?: number | [number, number], vb?: number) {
-    if (!arguments.length) return [a, b] as [number, number];
+    if (va == null) return [a, b] as [number, number];
     if (Array.isArray(va)) {
       a = va[0];
       b = va[1];
     } else {
       a = va;
-      b = vb;
+      b = vb!;
     }
     return scale;
   };
 
   scale.clamp = function (v?: boolean) {
-    if (!arguments.length) return clamp;
+    if (v == null) return clamp;
     clamp = v;
     return scale;
   };
@@ -172,38 +172,38 @@ export function LinearScale() {
   }
 
   // y = a log (x) + b
-  function scale(x) {
+  function scale(x: number): number {
     return a * Math.min(clamp ? domain[1] : Number.POSITIVE_INFINITY, x) + b;
   }
 
   scale.domain = function (v?: [number, number]) {
-    if (!arguments.length) return domain;
+    if (v == null) return domain;
     domain = v;
     fit();
     return scale;
   };
 
   scale.range = function (v?: [number, number]) {
-    if (!arguments.length) return range;
+    if (v == null) return range;
     range = v;
     fit();
     return scale;
   };
 
   scale.coef = function (va?: number | [number, number], vb?: number) {
-    if (!arguments.length) return [a, b] as [number, number];
+    if (va == null) return [a, b] as [number, number];
     if (Array.isArray(va)) {
       a = va[0];
       b = va[1];
     } else {
       a = va;
-      b = vb;
+      b = vb!;
     }
     return scale;
   };
 
   scale.clamp = function (v?: boolean) {
-    if (!arguments.length) return clamp;
+    if (v == null) return clamp;
     clamp = v;
     return scale;
   };
