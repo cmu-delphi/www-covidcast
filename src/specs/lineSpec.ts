@@ -516,7 +516,7 @@ export function generateSparkLine({
       bottom: highlightDate && highlightDate !== 'top' ? 20 : 2,
       right: 2,
     },
-    background: undefined,
+    background: 'transparent',
     encoding: {
       x: {
         field: dateField,
