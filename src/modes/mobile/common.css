@@ -235,6 +235,13 @@
   height: 100%;
 }
 
+.chart-breakout.vega-embed,
+.chart-breakout > .vega-embed {
+  /* breakout the chart up to 80vw */
+  width: max(100%, 80vw);
+  margin-left: min(0px, calc((80vw - 100%) / -2));
+}
+
 .mobile-map > canvas {
   border: 1px solid #f0f1f3;
   border-radius: 3px;
