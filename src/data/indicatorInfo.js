@@ -1,10 +1,8 @@
 // Indicator Info: aka The Signal Dashboard API
 
-import { formatAPITime } from './utils';
+import { formatAPITime, parseAPITime } from './utils';
 import { callSignalAPI } from './api';
 import { fetchData } from './fetchData';
-import { isoParse } from 'd3-time-format';
-import { timeDay } from 'd3-time';
 import { addNameInfos } from '.';
 import { countyInfo } from '../maps';
 
@@ -26,6 +24,10 @@ import { countyInfo } from '../maps';
  * @property {Record<'county', Coverage[]>} coverage
  */
 
+function parseFakeISO(value) {
+  return parseAPITime(value.toString().replace(/-/gm, ''));
+}
+
 /**
  * @returns {Promise<IndicatorStatus[]>}
  */
@@ -37,11 +39,11 @@ export function getIndicatorStatuses() {
     const data = d.epidata || [];
     for (const row of data) {
       row.id = row.name.toLowerCase().replace(/\s/g, '-');
-      row.latest_issue = timeDay(isoParse(row.latest_issue.toString()));
-      row.latest_time_value = timeDay(isoParse(row.latest_time_value.toString()));
+      row.latest_issue = parseFakeISO(row.latest_issue);
+      row.latest_time_value = parseFakeISO(row.latest_time_value);
       Object.values(row.coverage).forEach((level) => {
         for (const row of level) {
-          row.date = timeDay(isoParse(row.date.toString()));
+          row.date = parseFakeISO(row.date);
           row.fraction = row.count / countyInfo.length;
         }
       });
