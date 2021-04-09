@@ -209,7 +209,7 @@
 
   function jumpTo(row) {
     currentMode.set(modeByID.classic);
-    currentRegion.set(row.id);
+    selectByInfo(row);
   }
 
   function showMore() {
