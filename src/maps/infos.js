@@ -3,6 +3,7 @@ import stateRaw from './processed/state.csv.js';
 import msaRaw from './processed/msa.csv.js';
 import countyRaw from './processed/county.csv.js';
 import hrrRaw from './processed/hrr.csv.js';
+import hhsRaw from './processed/hhs.csv.js';
 
 export const levelMegaCountyId = 'mega-county';
 /**
@@ -14,7 +15,7 @@ export const levelMegaCountyId = 'mega-county';
  * @property {number} population
  * @property {string?} region just for state and county
  * @property {string?} state just for county
- * @property {'state' | 'county' | 'msa' | 'hrr' | 'nation'} level
+ * @property {'state' | 'county' | 'msa' | 'hrr' | 'nation' | 'hhs'} level
  */
 
 function parseCSV(csv, level, deriveDisplayName = (d) => d.name, extras = () => undefined) {
@@ -81,6 +82,14 @@ export const countyInfo = parseCSV(
   },
 );
 export const hrrInfo = parseCSV(hrrRaw, 'hrr', (hrr) => `${hrr.state} - ${hrr.name} (HRR)`);
+export const hhsInfo = parseCSV(
+  hhsRaw,
+  'hhs',
+  (hhs) => `HHS Region ${hhs.id.length < 2 ? ' ' : ''}${hhs.id} ${hhs.name}`,
+  (hhs) => {
+    hhs.states = hhs.states.split(',');
+  },
+);
 
 // generate mega counties by copying the states
 /**
@@ -109,10 +118,13 @@ export const infosByLevel = {
   msa: msaInfo.sort(sortByDisplayName),
   county: countyInfo.sort(sortByDisplayName),
   hrr: hrrInfo.sort(sortByDisplayName),
+  hhs: hhsInfo.sort(sortByDisplayName),
   [levelMegaCountyId]: megaCountyInfo.sort(sortByDisplayName),
 };
 
-export const nameInfos = stateInfo.concat(msaInfo, countyInfo, hrrInfo, megaCountyInfo).sort(sortByDisplayName);
+export const nameInfos = stateInfo
+  .concat(msaInfo, countyInfo, hrrInfo, megaCountyInfo, hhsInfo)
+  .sort(sortByDisplayName);
 
 /**
  * helper to resolve a given id to a name info object
@@ -200,4 +212,16 @@ export function getCountiesOfState(state) {
  */
 export function getStateOfCounty(county) {
   return getInfoByName(county.state);
+}
+
+/**
+ * returns the states of a HHS Region
+ * @param {NameInfo} hhs
+ * @returns {NameInfo[]}
+ */
+export function getStatesOfHHS(hhs) {
+  if (hhs.level !== 'hhs') {
+    return [];
+  }
+  return hhs.states.map((d) => getInfoByName(d, 'state'));
 }
