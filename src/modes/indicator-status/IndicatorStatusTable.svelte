@@ -168,7 +168,7 @@
     {#each sortedData as r (r.name)}
       <tr>
         <td>
-          <a href="#{r.name}" on:click|preventDefault={() => dispatch('select', r)}>{r.name}</a>
+          <a href="#{r.id}" on:click|preventDefault={() => dispatch('select', r)}>{r.name}</a>
         </td>
         <td class="uk-text-right">
           {formatDateISO(r.latest_issue)}
@@ -188,7 +188,7 @@
           </div>
         </td>
         <td>
-          <a href="#{r.name}" class="uk-link-text details-link" on:click|preventDefault={() => dispatch('select', r)}>
+          <a href="#{r.id}" class="uk-link-text details-link" on:click|preventDefault={() => dispatch('select', r)}>
             {@html chevronRightIcon}
           </a>
         </td>
