@@ -88,6 +88,7 @@ export const hhsInfo = parseCSV(
   (hhs) => `HHS Region ${hhs.id.length < 2 ? ' ' : ''}${hhs.id} ${hhs.name}`,
   (hhs) => {
     hhs.states = hhs.states.split(',');
+    hhs.population = hhs.states.reduce((acc, v) => acc + stateLookup.get(v.toLowerCase()).population, 0);
   },
 );
 

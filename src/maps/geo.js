@@ -3,6 +3,8 @@ import stateTopoJSON from './processed/state.topojson.json';
 import countyTopoJSON from './processed/county.topojson.json';
 import msaTopoJSON from './processed/msa.topojson.json';
 import hrrTopoJSON from './processed/hrr.topojson.json';
+import hhsTopoJSON from './processed/hhs.topojson.json';
+import nationTopoJSON from './processed/nation.topojson.json';
 import citiesRaw from './processed/cities.csv.js';
 import { generateGeo } from './utils';
 
@@ -44,25 +46,48 @@ function citiesGeo() {
 
 /**
  * loads all geo json sources
+ * @param {import('.').NameInfo} nationInfo
  * @param {import('.').NameInfo[]} stateInfo
  * @param {import('.').NameInfo[]} countyInfo
  * @param {import('.').NameInfo[]} msaInfo
  * @param {import('.').NameInfo[]} hrrInfo
+ * @param {import('.').NameInfo[]} hhsInfo
  * @param {string} megaLevel
  * @param {*} additionalProperties
  */
-export default function load(stateInfo, countyInfo, msaInfo, hrrInfo, megaLevel, additionalProperties = {}) {
+export default function load(
+  nationInfo,
+  stateInfo,
+  countyInfo,
+  msaInfo,
+  hrrInfo,
+  hhsInfo,
+  megaLevel,
+  additionalProperties = {},
+) {
+  const nation = generateGeo(nationTopoJSON, 'nation', [nationInfo], additionalProperties);
   const state = generateGeo(stateTopoJSON, 'state', stateInfo, additionalProperties);
   const county = generateGeo(countyTopoJSON, 'county', countyInfo, additionalProperties);
   const msa = generateGeo(msaTopoJSON, 'msa', msaInfo, additionalProperties);
   const hrr = generateGeo(hrrTopoJSON, 'hrr', hrrInfo, additionalProperties);
-  const mega = deriveMegaGeo(state.border, megaLevel);
   const cities = citiesGeo();
+  const hhs = generateGeo(hhsTopoJSON, 'hhs', hhsInfo, additionalProperties);
+  // inject city information
+  const byCityName = new Map(cities.features.map((d) => [d.properties.name, d.geometry]));
+  hhs.center.features.forEach((f) => {
+    f.geometry = byCityName.get(f.properties.name);
+  });
+  nation.center.features.forEach((f) => {
+    f.geometry = byCityName.get('Washington');
+  });
+  const mega = deriveMegaGeo(state.border, megaLevel);
   return {
     state,
+    nation,
     county,
     msa,
     hrr,
+    hhs,
     mega,
     cities,
   };
