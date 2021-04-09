@@ -38,7 +38,7 @@
    * @param {import('../../data/fetchData').EpiDataRow} row
    */
   function extentData(row) {
-    const info = getInfoByName(row.geo_value);
+    const info = getInfoByName(row.geo_value, row.geo_type);
     if (!info) {
       return null;
     }

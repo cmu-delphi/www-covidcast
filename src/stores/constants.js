@@ -15,8 +15,8 @@ export const levelList = [
   },
   {
     id: 'hhs',
-    label: 'Department of Health & Human Services Regional Office',
-    labelPlural: 'Department of Health & Human Services Regional Offices',
+    label: 'Dep. of Health & Human Services Regions',
+    labelPlural: 'Dep. of Health & Human Services Regions',
   },
   {
     id: 'state',

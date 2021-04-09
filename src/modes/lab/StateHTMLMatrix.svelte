@@ -59,7 +59,7 @@
   $: params = {
     date: $currentDateObject,
     timeValue: toTimeValue($currentDateObject),
-    region: $currentRegionInfo || getInfoByName('ca'),
+    region: $currentRegionInfo || getInfoByName('ca', 'state'),
   };
 </script>
 

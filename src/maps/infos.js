@@ -63,9 +63,9 @@ Object.entries(stateClasses).forEach(([key, value]) => {
 export const nationInfo = {
   level: 'nation',
   name: 'US',
-  id: 'us',
+  id: '0', // has to be an integer
   displayName: 'United States',
-  propertyId: 'us',
+  propertyId: 'US',
   population: stateInfo.reduce((acc, v) => acc + v.population, 0),
 };
 
@@ -87,6 +87,7 @@ export const hhsInfo = parseCSV(
   'hhs',
   (hhs) => `HHS Region ${hhs.id.length < 2 ? ' ' : ''}${hhs.id} ${hhs.name}`,
   (hhs) => {
+    // hhs.propertyId = 'h' + hhs.propertyId; // HACK since HHS and HRR ids are the same
     hhs.states = hhs.states.split(',');
     hhs.population = hhs.states.reduce((acc, v) => acc + stateLookup.get(v.toLowerCase()).population, 0);
   },
@@ -180,7 +181,7 @@ export function computeMegaCountyPopulation(megaCounty, data) {
   if (!megaCounty || !data || megaCounty.level !== levelMegaCountyId) {
     return null;
   }
-  const state = getInfoByName(megaCounty.postal);
+  const state = getInfoByName(megaCounty.postal, 'state');
   if (!state || state.population == null || Number.isNaN(state.population)) {
     return null;
   }
@@ -189,7 +190,7 @@ export function computeMegaCountyPopulation(megaCounty, data) {
     if (!fips.startsWith(state.id) || fips === megaCounty.id) {
       return population;
     }
-    const county = getInfoByName(fips);
+    const county = getInfoByName(fips, 'county');
     if (!county || county.population == null || Number.isNaN(county.population)) {
       // invalid county, so we cannot compute the rest population, keep NaN from now on
       return Number.NaN;
@@ -212,7 +213,7 @@ export function getCountiesOfState(state) {
  * @param {NameInfo} county
  */
 export function getStateOfCounty(county) {
-  return getInfoByName(county.state);
+  return getInfoByName(county.state, 'state');
 }
 
 /**

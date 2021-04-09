@@ -131,7 +131,7 @@
           focusOn = null;
         }
         if (pickMapMode) {
-          const info = getInfoByName(e.detail.feature.properties.id);
+          const info = getInfoByName(e.detail.feature.properties.id, e.detail.feature.properties.level);
           addCompare(info);
           pickMapMode = false;
         } else {

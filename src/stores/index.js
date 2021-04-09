@@ -213,7 +213,7 @@ export function selectByInfo(elem, reset = false) {
 }
 
 export function selectByFeature(feature, reset = false) {
-  return selectByInfo(feature ? getInfoByName(feature.properties.id) : null, reset);
+  return selectByInfo(feature ? getInfoByName(feature.properties.id, feature.properties.level) : null, reset);
 }
 
 export const colorScale = writable(scaleSequentialLog());
