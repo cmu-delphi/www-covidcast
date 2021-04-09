@@ -78,7 +78,7 @@
   }
 
   function makeIndicatorCompareSpec(primary, secondary, { zero = true, isMobile } = {}) {
-    const title = joinTitle([`${secondary.name} correlated with`, `${primary.name} lagged by $lag days`], isMobile);
+    const title = joinTitle([`${primary.name} correlated with`, `${secondary.name} $lag_days_later`], isMobile);
     /**
      * @type {import('vega-lite').TopLevelSpec}
      */
@@ -94,7 +94,11 @@
       height: 400,
       title: {
         text: {
-          expr: makeExpression(title, '$lag', 'lag'),
+          expr: makeExpression(
+            title,
+            '$lag_days_later',
+            `(lag > 0 ? lag + ' days earlier' : (lag < 0 ? (-lag) + ' days later': ''))`,
+          ),
         },
       },
       layer: [
