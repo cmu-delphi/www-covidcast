@@ -15,6 +15,7 @@ import { countyInfo } from '../maps';
 
 /**
  * @typedef {object} IndicatorStatus
+ * @property {string} id
  * @property {string} name
  * @property {string} source
  * @property {string} covidcast_signal
@@ -37,6 +38,7 @@ export function getIndicatorStatuses() {
     }
     const data = d.epidata || [];
     for (const row of data) {
+      row.id = row.name.toLowerCase().replace(/\s/g, '-');
       row.latest_issue = parseFakeISO(row.latest_issue);
       row.latest_time_value = parseFakeISO(row.latest_time_value);
       Object.values(row.coverage).forEach((level) => {

@@ -4,6 +4,7 @@
   import IndicatorStatus from './IndicatorStatus.svelte';
   import { loadData, determineDomain } from './data';
   import Search from '../../components/Search.svelte';
+  import { updateHash } from '../../stores/urlHandler';
 
   const date = new Date();
 
@@ -18,13 +19,9 @@
    */
   let loadedData = [];
 
-  $: {
-    loadedData = [];
-    domain = determineDomain([]);
-    data.then((rows) => {
-      loadedData = rows;
-      domain = determineDomain(rows);
-    });
+  function resolveDefaultStatus(rows) {
+    const id = window.location.hash.slice(1); // remove #
+    return id ? rows.find((d) => d.id === id) : null;
   }
 
   /**
@@ -32,8 +29,24 @@
    */
   let selected = null;
 
+  $: {
+    loadedData = [];
+    domain = determineDomain([]);
+    data.then((rows) => {
+      selected = resolveDefaultStatus(rows);
+      loadedData = rows;
+      domain = determineDomain(rows);
+    });
+  }
+
   function switchToDetails(e) {
     selected = e.detail;
+  }
+
+  $: {
+    if (loadedData.length > 0) {
+      updateHash(selected ? selected.id : '');
+    }
   }
 </script>
 
@@ -47,10 +60,10 @@
     <div class="grid-3-11">
       <ul class="uk-tab uk-child-width-expand">
         <li class:uk-active={selected == null}>
-          <a href="#overview" on:click={() => (selected = null)}>Overview</a>
+          <a href="#overview" on:click|preventDefault={() => (selected = null)}>Overview</a>
         </li>
         <li class:uk-active={selected != null}>
-          <a href="#details" on:click={() => (selected = loadedData[0])}>Single Indicator</a>
+          <a href="#details" on:click|preventDefault={() => (selected = loadedData[0])}>Single Indicator</a>
         </li>
       </ul>
     </div>
