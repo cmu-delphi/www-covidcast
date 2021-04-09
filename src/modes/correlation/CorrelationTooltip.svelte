@@ -5,7 +5,7 @@
   export let hidden = false;
 
   /**
-   * @type {import('../../data').EpiDataRow & import('../../maps').NameInfo}
+   * @type {{x: number, y: number, x_date: Date, y_date: Date, x_entry: import('../../stores').EpiDataRow, y_entry: EpiDataRow}}
    */
   export let item;
 
@@ -39,15 +39,15 @@
       <th colspan="2">
         <h5>
           {secondary.name}
+          {#if lag != 0}
+            ({lag > 0 ? `${lag} days earlier` : `${-lag} days later`})
+          {/if}
         </h5>
       </th>
     </tr>
     <tr>
       <th>
         {formatDateShortWeekdayAbbr(item.y_date)}
-        {#if lag != 0}
-          ({lag > 0 ? '+' : ''}{lag} days)
-        {/if}
       </th>
       <td>
         <SensorValue sensor={secondary} value={item.y} medium />

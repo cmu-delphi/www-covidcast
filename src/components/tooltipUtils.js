@@ -144,7 +144,7 @@ export function createVegaTooltipAdapter(svelteComponent, initialExtraProps = {}
     // hide tooltip for null, undefined, or empty string values,
     // or when the item's datum.value is null.
     const datum = resolveDatum(item);
-    if (value == null || value === '' || datum.value == null) {
+    if (value == null || value === '' || (datum.value == null && datum.x == null && datum.y == null)) {
       if (isClickingTooltip(event)) {
         // ignore
         return;
