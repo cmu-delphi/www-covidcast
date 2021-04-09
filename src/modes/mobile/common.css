@@ -240,7 +240,7 @@
   --max-width: 95vw;
   /* breakout the chart up to 80vw */
   width: max(100%, var(--max-width));
-  margin-left: min(0px, calc(var(--max-width) / -2 + 50%));
+  margin-left: calc(-0.5 * var(--max-width) + 50%);
 }
 
 @media only screen and (min-width: 1600px) {
