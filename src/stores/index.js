@@ -394,7 +394,10 @@ export const trackedUrlParams = derived(
           ? null
           : level,
       region: mode === modeByID.export || mode === modeByID.timelapse ? null : region,
-      date: mode === modeByID.export || mode === modeByID.landing ? null : String(date),
+      date:
+        mode === modeByID.export || mode === modeByID.landing || mode === modeByID['indicator-status']
+          ? null
+          : String(date),
       signalC: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.cumulative,
       signalI: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.incidence,
       encoding: !inMapMode || encoding === DEFAULT_ENCODING ? null : encoding,
