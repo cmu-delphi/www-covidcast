@@ -126,24 +126,26 @@
 <AboutSection>
   <p>
     The <strong>coefficient of determination</strong> (or <strong>R<sup>2</sup></strong>) is a measure of linear
-    correlation that indicates the proportion of the variance in one indicator as explained by variance of another.
+    correlation that indicates the proportion of the variance in one indicator that is explained by the variance of
+    another.
   </p>
   <p>
     In other words, how much does the movement in one indicator explain movement in another? For example, a change in
-    new cases is reflected in deaths. <strong>R<sup>2</sup></strong> is defined as between <code>1.0</code> (entirely
-    correlated), to <code>0.0</code> (no correlation at all).
+    new cases is reflected in a change in community symptoms.
+    <strong>R<sup>2</sup></strong> ranges between <code>1.0</code> (entirely correlated) and <code>0.0</code> (no correlation
+    at all).
   </p>
   <p>
-    <strong>Lag</strong> is the number in days that an indicator can be shifted, with respect to another. For example, if
-    we hypothesize that an increase in new cases results in an increase in hospitalizations three days later, the lag is
-    three.
+    It is sometimes useful to examine signals that move together, but are offset in time. For example, a change in new
+    cases is reflected in a change in deaths about 20 days later.
+    <strong>Lag</strong> is the number of days that an indicator can be shifted, with respect to another. In this example,
+    with respect to deaths, new cases are most highly correlated at a lag of 20 days.
   </p>
   <p>This table shows the following metrics between indicators:</p>
   <ul>
     <li><strong>R<sup>2</sup> at Lag 0</strong>: The correlation between indicators when there is no lag.</li>
     <li>
-      <strong>Max R<sup>2</sup></strong>: The maximum correlation between signals between -28 days lagged and 28 days
-      lagged.
+      <strong>Max R<sup>2</sup></strong>: the maximum correlation when evaluated with a lag between -28 and 28 days.
     </li>
     <li><strong>Lag at Max R<sup>2</sup></strong>: The number of days at which R<sup>2</sup> is maximized.</li>
   </ul>

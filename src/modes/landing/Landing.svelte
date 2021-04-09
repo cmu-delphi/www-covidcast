@@ -103,12 +103,12 @@
       <hr />
       <FancyHeader sub="Correlations" center>Indicator</FancyHeader>
       <p>
-        Correlation doesn’t equal causation, but correlations sometimes tell a deeper story than individual indicators
-        by themselves.
+        Correlation doesn’t equal causation, but understanding how indicators move together can tell a deeper story than
+        individual indicators by themselves.
       </p>
       <p>
-        Explore the relationship between indicators as they move over time. Discover which indicators correlate most
-        strongly with others in a specific location, and see which of those may have some predictive power.
+        Explore the relationship between indicators as their values change over time. Discover which indicators
+        correlate most strongly in a specific location, and see which of those may have some predictive power.
       </p>
       <div class="button-wrapper">
         <a
