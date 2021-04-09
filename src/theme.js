@@ -26,6 +26,8 @@ export const ENCODING_BUBBLE_THEME = {
     msa: 10,
     hrr: 10,
     state: 20,
+    hhs: 20,
+    nation: 20,
   },
   radiusScale: {
     count: {
@@ -50,12 +52,16 @@ export const ENCODING_SPIKE_THEME = {
     msa: 40,
     hrr: 40,
     state: 80,
+    hhs: 80,
+    nation: 80,
   },
   size: {
     county: 4,
     msa: 8,
     hrr: 8,
     state: 16,
+    hhs: 16,
+    nation: 16,
   },
   heightScale: {
     count: {
