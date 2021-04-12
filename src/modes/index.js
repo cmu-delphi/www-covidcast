@@ -70,12 +70,18 @@ const modes = [
         (r) => r.default,
       ),
   },
+  {
+    id: 'data-anomalies',
+    label: 'Data Anomalies',
+    component: () =>
+      import(/* webpackChunkName: 'm-data-anomalies' */ './data-anomalies/DataAnomalies.svelte').then((r) => r.default),
+  },
 ];
 
 export default modes;
 
 /**
- * @type {Record<'summary'|'timelapse'|'top10'|'export'|'single'|'survey-results'|'lab'|'classic'|'indicator'|'landing'|'indicator-status', Mode>}
+ * @type {Record<'summary'|'timelapse'|'top10'|'export'|'single'|'survey-results'|'lab'|'classic'|'indicator'|'landing'|'indicator-status'|'data-anomalies', Mode>}
  */
 export const modeByID = {};
 modes.forEach((mode) => (modeByID[mode.id] = mode));

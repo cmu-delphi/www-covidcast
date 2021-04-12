@@ -1,20 +1,32 @@
 <script>
   import chevronDownIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-down.svg';
   import chevronUpIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-up.svg';
-  import { createEventDispatcher } from 'svelte';
-
-  const dispatch = createEventDispatcher();
 
   export let label;
-  export let sorted = false;
-  export let desc = false;
+  /**
+   * @type {import('./tableUtils').SortHelper}
+   */
+  export let sort;
+  /**
+   * @type {string}
+   */
+  export let prop;
+
+  export let defaultDesc = false;
+
+  $: sorted = $sort.sortCriteria === prop;
+  $: desc = $sort.sortCriteriaDesc;
+
+  function toggleSort() {
+    sort.change(prop, defaultDesc);
+  }
 </script>
 
 <span>
   <button
     class="inline-svg-icon sort-indicator"
     class:active={sorted}
-    on:click={() => dispatch('click')}
+    on:click={toggleSort}
     title="Sort {label} {desc ? 'ascending' : 'descending'}"
   >
     {#if sorted && desc}

@@ -628,6 +628,7 @@ export class SensorParam {
     this.value = sensor;
     this.rawValue = sensor.rawSensor;
     this.isCasesOrDeath = sensor.isCasesOrDeath || false;
+    this.dataSourceName = sensor.dataSourceName;
     // fractions as percentages here
     this.factor = sensor.format === 'fraction' ? 100 : 1;
     this.isPercentage = sensor.format == 'percent' || sensor.format === 'fraction';
