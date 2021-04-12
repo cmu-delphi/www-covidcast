@@ -23,10 +23,51 @@
   export let lagData;
 
   /**
+   * @type {Promise<import("../../data/correlation").Lag[]>}
+   */
+  export let lags;
+
+  /**
+   * @param {Promise<import("../../data/correlation").Lag[]>} lags
+   */
+  function prepareDomain(lagsPromise) {
+    return lagsPromise.then((lags) => {
+      let xMin = Number.POSITIVE_INFINITY;
+      let xMax = Number.NEGATIVE_INFINITY;
+      let yMin = Number.POSITIVE_INFINITY;
+      let yMax = Number.NEGATIVE_INFINITY;
+      for (const lag of lags) {
+        for (const x of lag.a) {
+          if (x.value < xMin) {
+            xMin = x.value;
+          }
+          if (x.value > xMax) {
+            xMax = x.value;
+          }
+        }
+        for (const y of lag.b) {
+          if (y.value < yMin) {
+            yMin = y.value;
+          }
+          if (y.value > yMax) {
+            yMax = y.value;
+          }
+        }
+      }
+      return {
+        x: [xMin, xMax],
+        y: [yMin, yMax],
+      };
+    });
+  }
+  /**
    * @param {Promise<import("../../data/correlation").Lag>} lag
    */
   function prepareData(lag) {
     return lag.then((lagObj) => {
+      if (!lagObj) {
+        return [];
+      }
       return lagObj.a.map((xi, i) => {
         const yi = lagObj.b[i];
         return {
@@ -42,6 +83,13 @@
   }
 
   $: data = prepareData(lagData);
+
+  let domains = { x: [], y: [] };
+  $: {
+    prepareDomain(lags).then((d) => {
+      domains = d;
+    });
+  }
 
   function prepareDownloadRow(row) {
     const r = {};
@@ -77,7 +125,7 @@
       .join(` + ${signal} + `);
   }
 
-  function makeIndicatorCompareSpec(primary, secondary, { zero = true, isMobile } = {}) {
+  function makeIndicatorCompareSpec(primary, secondary, { zero = true, isMobile, xDomain = [], yDomain = [] } = {}) {
     const title = joinTitle([`${primary.name} correlated with`, `${secondary.name} $lag_days_later`], isMobile);
     /**
      * @type {import('vega-lite').TopLevelSpec}
@@ -169,6 +217,8 @@
               type: 'quantitative',
               scale: {
                 zero,
+                domainMin: zero ? undefined : xDomain[0],
+                domainMax: xDomain[1],
               },
             },
             y: {
@@ -177,6 +227,8 @@
               type: 'quantitative',
               scale: {
                 zero,
+                domainMin: zero ? undefined : yDomain[0],
+                domainMax: yDomain[1],
               },
             },
             opacity: {
@@ -259,6 +311,8 @@
   $: spec = makeIndicatorCompareSpec(primary, secondary, {
     zero: !scaled,
     isMobile: $isMobileDevice,
+    xDomain: domains.x,
+    yDoman: domains.y,
   });
 
   let vegaRef = null;

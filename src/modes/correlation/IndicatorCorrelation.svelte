@@ -74,7 +74,7 @@
   $: lags = loadData(primary, secondary, region, date);
 
   function selectLag(lags, lag) {
-    return lags.then((data) => data.find((d) => d.lag === lag) || []);
+    return lags.then((data) => data.find((d) => d.lag === lag) || null);
   }
 
   $: selectedLag = selectLag(lags, $currentLag);
@@ -137,7 +137,7 @@
       </p>
       <hr />
       <FancyHeader invert sub="Chart at Lag {$currentLag} days">Correlation</FancyHeader>
-      <IndicatorCorrelationChart {primary} {secondary} lag={$currentLag} lagData={selectedLag} />
+      <IndicatorCorrelationChart {primary} {secondary} lag={$currentLag} {lags} lagData={selectedLag} />
     </div>
     <AboutSection details>
       <h3 class="mobile-h3" slot="header">About the SNAKE PLOT</h3>
