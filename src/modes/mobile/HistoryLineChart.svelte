@@ -53,6 +53,10 @@
    */
   export let ends = null;
 
+  export let expandableWindow = false;
+
+  let showFull = false;
+
   /**
    * @type {import("../../stores/params").Region}
    */
@@ -66,18 +70,19 @@
   };
 
   $: highlightDate = date.value;
+  $: timeFrame = showFull && expandableWindow ? date.sensorTimeFrame : date.windowTimeFrame;
 
   /**
    * @param {import('../../stores/params').SensorParam} sensor
    * @param {import('../../stores/params').RegionParam} region
    * @param {import('../../stores/params').DateParam} date
    */
-  function genSpec(sensor, region, date, height, zero, singleRaw, isMobile) {
+  function genSpec(sensor, region, date, timeFrame, height, zero, singleRaw, isMobile) {
     const options = {
       initialDate: highlightDate || date.value,
       height,
       color: MULTI_COLORS[0],
-      domain: date.windowTimeFrame.domain,
+      domain: timeFrame.domain,
       zero,
       xTitle: sensor.xAxis,
       title: [sensor.name, `in ${region.displayName}`],
@@ -111,26 +116,26 @@
    * @param {import("../../stores/params").DateParam} date
    * @param {import("../../stores/params").RegionParam} region
    */
-  function loadData(sensor, region, date) {
-    if (!region.value || !date.value) {
+  function loadData(sensor, region, timeFrame) {
+    if (!region.value) {
       return null;
     }
-    const selfData = fetcher.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame);
+    const selfData = fetcher.fetch1Sensor1RegionNDates(sensor, region, timeFrame);
 
     const data = [selfData];
 
     if (region.level === 'county') {
       const state = getStateOfCounty(region);
-      const stateData = fetcher.fetch1Sensor1RegionNDates(sensor, state, date.windowTimeFrame);
+      const stateData = fetcher.fetch1Sensor1RegionNDates(sensor, state, timeFrame);
       const relatedCounties = getRelatedCounties(region.value);
       const relatedData = fetcher
-        .fetch1SensorNRegionsNDates(sensor, relatedCounties, date.windowTimeFrame)
+        .fetch1SensorNRegionsNDates(sensor, relatedCounties, timeFrame)
         .then((r) => averageByDate(r, sensor, neighboringInfo))
         .then((r) => addMissing(r, sensor));
       data.push(relatedData, stateData);
     }
     if (region.level !== 'nation') {
-      data.push(fetcher.fetch1Sensor1RegionNDates(sensor, nationInfo, date.windowTimeFrame));
+      data.push(fetcher.fetch1Sensor1RegionNDates(sensor, nationInfo, timeFrame));
     }
     return Promise.all(data).then((rows) => rows.reverse().flat());
   }
@@ -140,12 +145,12 @@
    * @param {import("../../stores/params").DateParam} date
    * @param {import("../../stores/params").RegionParam} region
    */
-  function loadSingleData(sensor, region, date) {
-    if (!region.value || !date.value) {
+  function loadSingleData(sensor, region, timeFrame) {
+    if (!region.value) {
       return null;
     }
-    const selfData = fetcher.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame);
-    const rawData = fetcher.fetch1Sensor1RegionNDates(sensor.rawValue, region, date.windowTimeFrame);
+    const selfData = fetcher.fetch1Sensor1RegionNDates(sensor, region, timeFrame);
+    const rawData = fetcher.fetch1Sensor1RegionNDates(sensor.rawValue, region, timeFrame);
 
     return Promise.all([selfData, rawData]).then((data) => {
       return combineSignals(data, data[0], ['smoothed', 'raw']);
@@ -174,28 +179,25 @@
   /**
    * @param {import("../../stores/params").SensorParam} sensor
    * @param {import("../../stores/params").Region[]} region
-   * @param {import("../../stores/params").DateParam} date
    */
-  function generateFileName(sensor, regions, date, raw) {
+  function generateFileName(sensor, regions, timeFrame, raw) {
     const regionName = regions.map((region) => `${region.propertyId}-${region.displayName}`).join(',');
     let suffix = '';
     if (raw) {
       suffix = '_RawVsSmoothed';
     }
-    return `${sensor.name}_${regionName}_${formatDateISO(date.windowTimeFrame.min)}-${formatDateISO(
-      date.windowTimeFrame.max,
-    )}${suffix}`;
+    return `${sensor.name}_${regionName}_${formatDateISO(timeFrame.min)}-${formatDateISO(timeFrame.max)}${suffix}`;
   }
 
-  function injectRanges(spec, date, annotations) {
+  function injectRanges(spec, timeFrame, annotations) {
     if (annotations.length > 0) {
-      spec.layer.unshift(genAnnotationLayer(annotations, date.windowTimeFrame));
+      spec.layer.unshift(genAnnotationLayer(annotations, timeFrame));
     }
-    if (starts && starts > date.windowTimeFrame.min) {
-      spec.layer.unshift(genDateHighlight(starts > date.windowTimeFrame.max ? date.windowTimeFrame.max : starts));
+    if (starts && starts > timeFrame.min) {
+      spec.layer.unshift(genDateHighlight(starts > timeFrame.max ? timeFrame.max : starts));
     }
-    if (ends && ends < date.windowTimeFrame.max) {
-      spec.layer.unshift(genDateHighlight(ends < date.windowTimeFrame.min ? date.windowTimeFrame.min : ends));
+    if (ends && ends < timeFrame.max) {
+      spec.layer.unshift(genDateHighlight(ends < timeFrame.min ? timeFrame.min : ends));
     }
     return spec;
   }
@@ -204,16 +206,15 @@
   let singleRaw = false;
 
   $: regions = raw ? [region.value] : resolveRegions(region.value);
-  $: annotations = $annotationManager.getWindowAnnotations(
-    sensor.value,
-    regions,
-    date.windowTimeFrame.min,
-    date.windowTimeFrame.max,
-  );
+  $: annotations = $annotationManager.getWindowAnnotations(sensor.value, regions, timeFrame.min, timeFrame.max);
   $: raw = singleRaw && sensor.rawValue != null;
-  $: spec = injectRanges(genSpec(sensor, region, date, height, !zoom, raw, $isMobileDevice), date, annotations);
-  $: data = raw ? loadSingleData(sensor, region, date) : loadData(sensor, region, date);
-  $: fileName = generateFileName(sensor, regions, date, raw);
+  $: spec = injectRanges(
+    genSpec(sensor, region, date, timeFrame, height, !zoom, raw, $isMobileDevice),
+    timeFrame,
+    annotations,
+  );
+  $: data = raw ? loadSingleData(sensor, region, timeFrame) : loadData(sensor, region, timeFrame);
+  $: fileName = generateFileName(sensor, regions, timeFrame, raw);
 
   function findValue(region, data, date, prop = 'value') {
     if (!date) {
@@ -243,7 +244,7 @@
 
 <Vega
   bind:this={vegaRef}
-  {className}
+  className="{className} {showFull && expandableWindow ? 'chart-breakout' : ''}"
   {spec}
   {data}
   tooltip={HistoryLineTooltip}
@@ -257,6 +258,9 @@
   <Toggle bind:checked={zoom}>Rescale Y-axis</Toggle>
   {#if sensor.rawValue != null}
     <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
+  {/if}
+  {#if expandableWindow}
+    <Toggle bind:checked={showFull}>Show All Dates</Toggle>
   {/if}
   <div class="spacer" />
   <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} />
