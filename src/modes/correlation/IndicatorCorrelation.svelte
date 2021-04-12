@@ -74,7 +74,7 @@
   $: lags = loadData(primary, secondary, region, date);
 
   function selectLag(lags, lag) {
-    return lags.then((data) => data.find((d) => d.lag === lag) || []);
+    return lags.then((data) => data.find((d) => d.lag === lag) || null);
   }
 
   $: selectedLag = selectLag(lags, $currentLag);
@@ -108,8 +108,9 @@
         </p>
         <p>
           In other words, how much does the movement in one indicator explain movement in another? For example, a change
-          in new cases is reflected in deaths. <strong>R<sup>2</sup></strong> is defined as between <code>1.0</code>
-          (entirely correlated), to <code>0.0</code> (no correlation at all).
+          in new cases is reflected in a change in community symptoms.
+          <strong>R<sup>2</sup></strong> ranges between <code>1.0</code> (entirely correlated) and <code>0.0</code> (no correlation
+          at all).
         </p>
         <p>
           <strong>Lag</strong> is the number in days that an indicator can be shifted, with respect to another. For example,
@@ -132,26 +133,33 @@
         }}
       />
       <p>
-        Click on the R<sup>2</sup> chart to select a different lag
+        Click on or Mouse over the R<sup>2</sup> chart to select a different lag.
       </p>
       <hr />
       <FancyHeader invert sub="Chart at Lag {$currentLag} days">Correlation</FancyHeader>
-      <IndicatorCorrelationChart {primary} {secondary} lag={$currentLag} lagData={selectedLag} />
-    </div>
-    <AboutSection>
-      <h3 class="mobile-h3">About the SNAKE PLOT</h3>
-      <p>A snake plot is a scatter plot of two indicators by date.</p>
-      <p>Dots indicate the values of each indicator at two dates.</p>
-      <p>You can shift the difference between these dates by adjusting the lag.</p>
-      <p>
-        The line between dots indicates how recent the observation was. The most recent days are thick, while those
-        farthest in time are thin.
-      </p>
-      <p>For reference, each indicator is then separately shown by date.</p>
-    </AboutSection>
-    <div class="grid-3-11">
+      <AboutSection details>
+        <h3 class="mobile-h3" slot="header">About the SNAKE PLOT</h3>
+        <p>
+          A snake plot is a special kind of scatter plot. Each point plots the value of the first indicator against the
+          value of the second indicator, and the points are connected in chronological order.
+        </p>
+        <p>
+          The line weight indicates how recent the observation was. The most recent days are thick, while those farthest
+          in the past are thin.
+        </p>
+        <p>
+          The line weight key corresponds to the dates used by the first indicator. The dates used by the second
+          indicator are offset from the first by a number of days, as specified by the current lag.
+        </p>
+      </AboutSection>
+      <p />
+      <IndicatorCorrelationChart {primary} {secondary} lag={$currentLag} {lags} lagData={selectedLag} />
       <hr />
       <FancyHeader invert sub="Chart">{primary.name}</FancyHeader>
+      <AboutSection details>
+        <h3 class="mobile-h3" slot="header">About the TIME SERIES</h3>
+        <p>The x-axes in the time series plots below are offset from each other by the selected lag.</p>
+      </AboutSection>
       <div class="chart-300">
         <HistoryLineChart sensor={primary} {date} {region} {fetcher} singleRegionOnly domain={domains.primary} />
       </div>

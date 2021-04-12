@@ -92,7 +92,8 @@
    * @param {import('../../stores/params').SensorParam} sensor
    * @param {import('../../stores/params').RegionParam} region
    * @param {import('../../stores/params').DateParam} date
-   * @param {{height: number, zero: boolean, singleRaw: boolean, isMobile: boolean, singleRegionOnly: boolean, domain?: [number, number]}} options
+   * @param {import('../../stores/params').TimeFrame} timeFrame
+   * @param {{height: number, zero: boolean, singleRaw: boolean, isMobile: boolean, singleRegionOnly: boolean}} options
    */
   function genSpec(sensor, region, date, timeFrame, { height, zero, singleRaw, isMobile, singleRegionOnly, domain }) {
     const options = {
@@ -243,7 +244,7 @@
       singleRegionOnly,
       domain,
     }),
-    date,
+    timeFrame,
     annotations,
   );
   $: data = raw ? loadSingleData(sensor, region, timeFrame) : loadData(sensor, region, timeFrame, singleRegionOnly);

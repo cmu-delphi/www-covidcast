@@ -6,7 +6,8 @@
   import { generateCorrelationMetrics } from '../../data/correlation';
   import { formatRawValue } from '../../formats';
   import FancyHeader from './FancyHeader.svelte';
-  import SortColumnIndicator from './SortColumnIndicator.svelte';
+  import SortColumnIndicator from './components/SortColumnIndicator.svelte';
+  import { SortHelper } from './components/tableUtils';
   import AboutSection from './components/AboutSection.svelte';
 
   /**
@@ -34,41 +35,7 @@
    */
   export let fetcher;
 
-  let sortCriteria = 'name';
-  let sortDirectionDesc = false;
-
-  function bySortCriteria(sortCriteria, sortDirectionDesc) {
-    const less = sortDirectionDesc ? 1 : -1;
-
-    function clean(a) {
-      // normalize NaN to null
-      return typeof a === 'number' && Number.isNaN(a) ? null : a;
-    }
-    return (a, b) => {
-      const av = clean(a[sortCriteria]);
-      const bv = clean(b[sortCriteria]);
-      if ((av == null) !== (bv == null)) {
-        return av == null ? 1 : -1;
-      }
-      if (av !== bv) {
-        return av < bv ? less : -less;
-      }
-      if (a.name !== b.name) {
-        return a.name < b.name ? less : -less;
-      }
-      return 0;
-    };
-  }
-
-  function sortClick(prop, defaultSortDesc = false) {
-    if (sortCriteria === prop) {
-      sortDirectionDesc = !sortDirectionDesc;
-      return;
-    }
-    sortCriteria = prop;
-    sortDirectionDesc = defaultSortDesc;
-  }
-  $: comparator = bySortCriteria(sortCriteria, sortDirectionDesc);
+  const sort = new SortHelper('r2AtMaxR2', true, 'name');
 
   /**
    * @param {SensorEntry} context
@@ -86,6 +53,7 @@
     });
   }
 
+  let loaded = 0;
   /**
    * Starting from a list of sensors, mix in all of the other columns needed for the table.
    * @param {SensorEntry} context
@@ -93,6 +61,7 @@
    * @param {import("../../stores/params").DateParam} date
    */
   function buildTableData(context, region, date) {
+    loaded = 0;
     return sensorList
       .filter((d) => d.key !== context.key)
       .map((sensor) => {
@@ -104,6 +73,7 @@
         metrics.then((met) => {
           // inline for sorting
           Object.assign(r, met);
+          loaded++;
         });
         return r;
       });
@@ -117,38 +87,42 @@
     scrollToTop();
   }
 
-  $: rows = otherSensors.sort(comparator);
+  // loaded
+  $: rows = loaded > 0 ? otherSensors.sort($sort.comparator) : otherSensors;
 </script>
 
 <div class="grid-3-11">
   <FancyHeader sub="Correlation">{sensor.name}</FancyHeader>
 </div>
-<AboutSection>
+<AboutSection details="What are correlations?">
   <p>
     The <strong>coefficient of determination</strong> (or <strong>R<sup>2</sup></strong>) is a measure of linear
-    correlation that indicates the proportion of the variance in one indicator as explained by variance of another.
+    correlation that indicates the proportion of the variance in one indicator that is explained by the variance of
+    another.
   </p>
   <p>
     In other words, how much does the movement in one indicator explain movement in another? For example, a change in
-    new cases is reflected in deaths. <strong>R<sup>2</sup></strong> is defined as between <code>1.0</code> (entirely
-    correlated), to <code>0.0</code> (no correlation at all).
+    new cases is reflected in a change in community symptoms.
+    <strong>R<sup>2</sup></strong> ranges between <code>1.0</code> (entirely correlated) and <code>0.0</code> (no correlation
+    at all).
   </p>
   <p>
-    <strong>Lag</strong> is the number in days that an indicator can be shifted, with respect to another. For example, if
-    we hypothesize that an increase in new cases results in an increase in hospitalizations three days later, the lag is
-    three.
+    It is sometimes useful to examine signals that move together, but are offset in time. For example, a change in new
+    cases is reflected in a change in deaths about 20 days later.
+    <strong>Lag</strong> is the number of days that an indicator can be shifted, with respect to another. In this example,
+    with respect to deaths, new cases are most highly correlated at a lag of 20 days.
   </p>
   <p>This table shows the following metrics between indicators:</p>
   <ul>
     <li><strong>R<sup>2</sup> at Lag 0</strong>: The correlation between indicators when there is no lag.</li>
     <li>
-      <strong>Max R<sup>2</sup></strong>: The maximum correlation between signals between -28 days lagged and 28 days
-      lagged.
+      <strong>Max R<sup>2</sup></strong>: the maximum correlation when evaluated with a lag between -28 and 28 days.
     </li>
     <li><strong>Lag at Max R<sup>2</sup></strong>: The number of days at which R<sup>2</sup> is maximized.</li>
   </ul>
   <p>
-    For example, if <strong>Max R<sup>2</sup></strong> is <code>0.8</code> and <strong>Lag at Max R<sup>2</sup></strong>
+    For example, if <strong>Max R<sup>2</sup></strong> is <code>0.8</code> and
+    <strong>Lag at Max R<sup>2</sup></strong>
     is <code>14</code>, that would strongly indicate that the movement in the below indicator would be reflected in this
     indicator 14 days from now.
   </p>
@@ -164,36 +138,16 @@
         <th class="mobile-th" />
       </tr><tr>
         <th class="sort-indicator uk-text-center">
-          <SortColumnIndicator
-            label="Indicator"
-            on:click={() => sortClick('name')}
-            sorted={sortCriteria === 'name'}
-            desc={sortDirectionDesc}
-          />
+          <SortColumnIndicator label="Indicator" {sort} prop="name" />
         </th>
         <th class="sort-indicator">
-          <SortColumnIndicator
-            label="R2"
-            on:click={() => sortClick('r2At0')}
-            sorted={sortCriteria === 'r2At0'}
-            desc={sortDirectionDesc}
-          />
+          <SortColumnIndicator label="R2" {sort} prop="r2At0" />
         </th>
         <th class="sort-indicator">
-          <SortColumnIndicator
-            label="Max R2"
-            on:click={() => sortClick('r2AtMaxR2')}
-            sorted={sortCriteria === 'r2AtMaxR2'}
-            desc={sortDirectionDesc}
-          />
+          <SortColumnIndicator label="Max R2" {sort} prop="r2AtMaxR2" />
         </th>
         <th class="sort-indicator">
-          <SortColumnIndicator
-            label="Lag at Max R2"
-            on:click={() => sortClick('lagAtMaxR2')}
-            sorted={sortCriteria === 'lagAtMaxR2'}
-            desc={sortDirectionDesc}
-          />
+          <SortColumnIndicator label="Lag at Max R2" {sort} prop="lagAtMaxR2" />
         </th>
         <th class="sort-indicator" />
       </tr>

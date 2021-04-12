@@ -23,10 +23,51 @@
   export let lagData;
 
   /**
+   * @type {Promise<import("../../data/correlation").Lag[]>}
+   */
+  export let lags;
+
+  /**
+   * @param {Promise<import("../../data/correlation").Lag[]>} lags
+   */
+  function prepareDomain(lagsPromise) {
+    return lagsPromise.then((lags) => {
+      let xMin = Number.POSITIVE_INFINITY;
+      let xMax = Number.NEGATIVE_INFINITY;
+      let yMin = Number.POSITIVE_INFINITY;
+      let yMax = Number.NEGATIVE_INFINITY;
+      for (const lag of lags) {
+        for (const x of lag.a) {
+          if (x.value < xMin) {
+            xMin = x.value;
+          }
+          if (x.value > xMax) {
+            xMax = x.value;
+          }
+        }
+        for (const y of lag.b) {
+          if (y.value < yMin) {
+            yMin = y.value;
+          }
+          if (y.value > yMax) {
+            yMax = y.value;
+          }
+        }
+      }
+      return {
+        x: [xMin, xMax],
+        y: [yMin, yMax],
+      };
+    });
+  }
+  /**
    * @param {Promise<import("../../data/correlation").Lag>} lag
    */
   function prepareData(lag) {
     return lag.then((lagObj) => {
+      if (!lagObj) {
+        return [];
+      }
       return lagObj.a.map((xi, i) => {
         const yi = lagObj.b[i];
         return {
@@ -42,6 +83,51 @@
   }
 
   $: data = prepareData(lagData);
+
+  let domains = { x: [], y: [] };
+  $: {
+    prepareDomain(lags).then((d) => {
+      domains = d;
+    });
+  }
+
+  // complex lag obj
+  let lagObj = {
+    lag,
+  };
+
+  function updateLagInfo(lagData) {
+    lagData.then((lagInfo) => {
+      if (!lagInfo) {
+        return;
+      }
+      const x1 = domains.x[0];
+      const x2 = domains.x[1];
+      // update with real information
+      lagObj = {
+        lag,
+        r2: lagInfo.r2,
+        slope: lagInfo.slope,
+        intercept: lagInfo.intercept,
+        samples: lagInfo.samples,
+        x1,
+        x2,
+        y1: lagInfo.slope * x1 + lagInfo.intercept,
+        y2: lagInfo.slope * x2 + lagInfo.intercept,
+      };
+    });
+  }
+
+  $: {
+    lagObj = {
+      lag,
+      x1: domains.x[0],
+      x2: domains.x[1],
+      y1: null,
+      y2: null,
+    };
+    updateLagInfo(lagData);
+  }
 
   function prepareDownloadRow(row) {
     const r = {};
@@ -77,8 +163,8 @@
       .join(` + ${signal} + `);
   }
 
-  function makeIndicatorCompareSpec(primary, secondary, { zero = true, isMobile } = {}) {
-    const title = joinTitle([`${secondary.name} correlated with`, `${primary.name} lagged by $lag days`], isMobile);
+  function makeIndicatorCompareSpec(primary, secondary, { zero = true, isMobile, xDomain = [], yDomain = [] } = {}) {
+    const title = joinTitle([`${primary.name} correlated with`, `${secondary.name} $lag_days_later`], isMobile);
     /**
      * @type {import('vega-lite').TopLevelSpec}
      */
@@ -86,15 +172,19 @@
       ...BASE_SPEC,
       padding: {
         left: 50,
-        right: 10,
+        right: isMobile ? 10 : 120,
         top: guessTopPadding(title, null, 12),
-        bottom: 70,
+        bottom: isMobile ? 70 : 60,
       },
       width: 400,
       height: 400,
       title: {
         text: {
-          expr: makeExpression(title, '$lag', 'lag'),
+          expr: makeExpression(
+            title,
+            '$lag_days_later',
+            `(lag.lag > 0 ? lag.lag + ' days earlier' : (lag.lag < 0 ? (-lag.lag) + ' days later': ''))`,
+          ),
         },
       },
       layer: [
@@ -134,8 +224,8 @@
               type: 'temporal',
               scale: { range: [1, 6] },
               legend: {
-                orient: 'bottom',
-                direction: 'horizontal',
+                orient: isMobile ? 'bottom' : 'right',
+                direction: isMobile ? 'horizontal' : 'vertical',
                 title: false,
                 symbolType: 'square',
               },
@@ -165,6 +255,8 @@
               type: 'quantitative',
               scale: {
                 zero,
+                domainMin: zero ? undefined : xDomain[0],
+                domainMax: xDomain[1],
               },
             },
             y: {
@@ -173,6 +265,8 @@
               type: 'quantitative',
               scale: {
                 zero,
+                domainMin: zero ? undefined : yDomain[0],
+                domainMax: yDomain[1],
               },
             },
             opacity: {
@@ -198,52 +292,60 @@
           },
         },
         {
-          // regression text
+          data: {
+            values: [
+              {
+                lag: {},
+              },
+            ],
+          },
           transform: [
             {
-              regression: 'x',
-              on: 'y',
-              params: true, // return model parameters, like .R2
+              calculate: 'lag',
+              as: 'lag',
             },
-            { calculate: "'R²: ' + format(datum.rSquared, '.2f')", as: 'R2' },
           ],
-          mark: {
-            type: 'text',
-            color: 'firebrick',
-            align: 'right',
-            x: 'width',
-            y: -5,
-            size: 14,
-          },
-          encoding: {
-            text: { type: 'nominal', field: 'R2' },
-          },
-        },
-        {
-          // regression line
-          transform: [
+          layer: [
             {
-              regression: 'x',
-              on: 'y',
-              // no params = return points
+              mark: {
+                type: 'text',
+                color: 'firebrick',
+                align: 'right',
+                x: 'width',
+                y: -5,
+                size: 14,
+                text: {
+                  expr: "'R²: ' + format(lag.r2, '.2f')",
+                },
+              },
+            },
+            {
+              mark: {
+                type: 'rule',
+                strokeWidth: 2,
+                color: 'firebrick',
+                clip: true,
+              },
+              encoding: {
+                x: {
+                  field: 'lag.x1',
+                  type: 'quantitative',
+                },
+                x2: {
+                  field: 'lag.x2',
+                  type: 'quantitative',
+                },
+                y: {
+                  field: 'lag.y1',
+                  type: 'quantitative',
+                },
+                y2: {
+                  field: 'lag.y2',
+                  type: 'quantitative',
+                },
+              },
             },
           ],
-          // Draw the linear regression line.
-          mark: {
-            type: 'line',
-            strokeWidth: 2,
-            color: 'firebrick',
-          },
-          encoding: {
-            x: {
-              field: 'x',
-              type: 'quantitative',
-            },
-            y: {
-              field: 'y',
-              type: 'quantitative',
-            },
-          },
         },
         genCreditsLayer(),
       ],
@@ -255,6 +357,8 @@
   $: spec = makeIndicatorCompareSpec(primary, secondary, {
     zero: !scaled,
     isMobile: $isMobileDevice,
+    xDomain: domains.x,
+    yDoman: domains.y,
   });
 
   let vegaRef = null;
@@ -267,7 +371,7 @@
     {spec}
     tooltip={CorrelationTooltip}
     tooltipProps={{ primary, secondary, lag }}
-    signals={{ lag }}
+    signals={{ lag: lagObj }}
   />
 </div>
 
@@ -288,6 +392,13 @@
     position: relative;
     /** 1:1 + padding for legend **/
     padding-top: calc(100% + 50px);
+  }
+
+  @media only screen and (min-width: 750px) {
+    .chart-correlation {
+      /** 1:1 + padding for legend **/
+      padding-top: calc(100% + 50px - 100px);
+    }
   }
 
   .chart-correlation > :global(.vega-embed) {
