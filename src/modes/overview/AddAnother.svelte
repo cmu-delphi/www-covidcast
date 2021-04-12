@@ -32,7 +32,7 @@
       loading = false;
       top10Data = r
         .map((row) => {
-          const info = getInfoByName(row.geo_value);
+          const info = getInfoByName(row.geo_value, row.geo_type);
           return {
             displayName: info ? info.displayName : row.geo_value,
             info,

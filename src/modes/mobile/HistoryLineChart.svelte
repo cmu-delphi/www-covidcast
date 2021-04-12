@@ -1,7 +1,7 @@
 <script>
   import Vega from '../../components/Vega.svelte';
   import { addMissing, averageByDate } from '../../data';
-  import { getInfoByName, nationInfo } from '../../maps';
+  import { nationInfo, getStateOfCounty } from '../../maps/infos';
   import getRelatedCounties from '../../maps/related';
   import HistoryLineTooltip from './HistoryLineTooltip.svelte';
   import {
@@ -119,7 +119,7 @@
     }
     if (region.level === 'county') {
       // county vs related vs state vs nation
-      const state = getInfoByName(region.state);
+      const state = getStateOfCounty(region);
       return generateCompareLineSpec(
         [region.displayName, neighboringInfo.displayName, state.displayName, nationInfo.displayName],
         options,
@@ -147,7 +147,7 @@
     const data = [selfData];
 
     if (region.level === 'county') {
-      const state = getInfoByName(region.state);
+      const state = getStateOfCounty(region);
       const stateData = fetcher.fetch1Sensor1RegionNDates(sensor, state, timeFrame);
       const relatedCounties = getRelatedCounties(region.value);
       const relatedData = fetcher
@@ -196,7 +196,7 @@
     }
     if (region.level === 'county') {
       // county vs related vs state vs nation
-      const state = getInfoByName(region.state);
+      const state = getStateOfCounty(region);
       return [region, neighboringInfo, state, nationInfo];
     }
     return [region];
