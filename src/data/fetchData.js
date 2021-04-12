@@ -142,6 +142,9 @@ export function fetchData(
   if (!region) {
     return Promise.resolve([]);
   }
+  mixinValues.time_type = 'day'; // inject time_type
+  mixinValues.geo_type = level; // inject geo_type
+
   const transferFields = computeTransferFields(mixinValues, advanced, transferSignal);
   function fetchSeparate(defaultSignalIndex) {
     const extraDataFields = ['value'];
@@ -354,7 +357,7 @@ export function addMissing(rows, dataSensor) {
 
 export function addNameInfos(rows) {
   for (const row of rows) {
-    Object.assign(row, getInfoByName(row.geo_value));
+    Object.assign(row, getInfoByName(row.geo_value, row.geo_type));
   }
   return rows;
 }

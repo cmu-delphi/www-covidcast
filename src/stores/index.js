@@ -150,7 +150,7 @@ export const currentRegion = writable(defaultValues.region);
 /**
  * current region info (could also be null)
  */
-export const currentRegionInfo = derived([currentRegion], ([current]) => getInfoByName(current));
+export const currentRegionInfo = writable(getInfoByName(defaultValues.region));
 
 function deriveRecent() {
   if (!window.localStorage) {
@@ -200,20 +200,24 @@ export function selectByInfo(elem, reset = false) {
   if (elem === get(currentRegionInfo)) {
     if (reset) {
       currentRegion.set('');
+      currentRegionInfo.set(null);
     }
     return reset;
   }
   if (elem) {
     currentRegion.set(elem.propertyId);
+    // re lookup to have a clean info
+    currentRegionInfo.set(getInfoByName(elem.id, elem.level));
     // the info is derived
   } else {
     currentRegion.set('');
+    currentRegionInfo.set(null);
   }
   return true;
 }
 
 export function selectByFeature(feature, reset = false) {
-  return selectByInfo(feature ? getInfoByName(feature.properties.id) : null, reset);
+  return selectByInfo(feature ? getInfoByName(feature.properties.id, feature.properties.level) : null, reset);
 }
 
 export const colorScale = writable(scaleSequentialLog());
@@ -438,7 +442,7 @@ export function loadFromUrlState(state) {
     currentLevel.set(state.level);
   }
   if (state.region != null && state.region !== get(currentRegion)) {
-    currentRegion.set(state.region);
+    selectByInfo(getInfoByName(state.region));
   }
   if (state.date != null && state.date !== get(currentDate)) {
     currentDate.set(state.date);

@@ -1,7 +1,7 @@
 import { timeDay, timeMonth, timeWeek } from 'd3-time';
 import { addNameInfos, fetchData, formatAPITime, addMissing, fitRange, parseAPITime } from '../data';
 import { nationInfo } from '../maps';
-import { currentDate, currentRegion, yesterdayDate, currentSensor, sensorList } from '.';
+import { currentDate, yesterdayDate, currentSensor, sensorList, selectByInfo } from '.';
 import { determineTrend } from './trend';
 import { determineMinMax } from '../components/MapBox/colors';
 import { formatValue } from '../formats';
@@ -709,7 +709,7 @@ export class RegionParam {
    * @param {Region} region
    */
   set(region, scrollTop = false) {
-    currentRegion.set(region.propertyId);
+    selectByInfo(region);
     if (scrollTop) {
       scrollToTop();
     }

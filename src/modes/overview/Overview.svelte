@@ -1,6 +1,6 @@
 <script>
   import { levelList } from '../../stores';
-  import { nameInfos, infosByLevel } from '../../maps';
+  import { nameInfos, infosByLevel, nationInfo } from '../../maps';
   import MapContainer from '../../components/MapContainer.svelte';
   import Options from '../../components/Options.svelte';
   import {
@@ -53,6 +53,8 @@
    * @type {import('../../maps').NameInfo | null}
    */
   let focusOn = null;
+
+  const nameInfosWithUS = [nationInfo, ...nameInfos];
 </script>
 
 <main class="root base-font-size" class:hiddenPanel={!$isMobileDevice && !desktopShowPanel} class:compare={showCompare}>
@@ -62,7 +64,7 @@
     <div class="search-container container-bg container-style">
       <Search
         placeholder="Search for a location..."
-        items={nameInfos}
+        items={nameInfosWithUS}
         selectedItem={$currentRegionInfo}
         labelFieldName="displayName"
         maxItemsToShowInList="5"
@@ -131,7 +133,7 @@
           focusOn = null;
         }
         if (pickMapMode) {
-          const info = getInfoByName(e.detail.feature.properties.id);
+          const info = getInfoByName(e.detail.feature.properties.id, e.detail.feature.properties.level);
           addCompare(info);
           pickMapMode = false;
         } else {
