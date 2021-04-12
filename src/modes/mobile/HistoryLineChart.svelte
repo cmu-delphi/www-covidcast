@@ -68,6 +68,12 @@
   export let color = MULTI_COLORS[0];
 
   /**
+   * optional domain
+   * @type {null | [number, number]}
+   */
+  export let domain = null;
+
+  /**
    * @type {import("../../stores/params").Region}
    */
   const neighboringInfo = {
@@ -89,12 +95,12 @@
    * @param {import('../../stores/params').TimeFrame} timeFrame
    * @param {{height: number, zero: boolean, singleRaw: boolean, isMobile: boolean, singleRegionOnly: boolean}} options
    */
-  function genSpec(sensor, region, date, timeFrame, { height, zero, singleRaw, isMobile, singleRegionOnly }) {
+  function genSpec(sensor, region, date, timeFrame, { height, zero, singleRaw, isMobile, singleRegionOnly, domain }) {
     const options = {
       initialDate: highlightDate || date.value,
       height,
       color,
-      domain: timeFrame.domain,
+      domain: domain || timeFrame.domain,
       zero,
       xTitle: sensor.xAxis,
       title: joinTitle([sensor.name, `in ${region.displayName}`], isMobile),
@@ -234,6 +240,7 @@
       singleRaw: raw,
       isMobile: $isMobileDevice,
       singleRegionOnly,
+      domain,
     }),
     timeFrame,
     annotations,
