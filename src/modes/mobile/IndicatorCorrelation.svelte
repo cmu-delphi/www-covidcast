@@ -6,7 +6,8 @@
   import { generateCorrelationMetrics } from '../../data/correlation';
   import { formatRawValue } from '../../formats';
   import FancyHeader from './FancyHeader.svelte';
-  import SortColumnIndicator from './SortColumnIndicator.svelte';
+  import SortColumnIndicator from './components/SortColumnIndicator.svelte';
+  import { SortHelper } from './components/tableUtils';
   import AboutSection from './components/AboutSection.svelte';
 
   /**
@@ -34,41 +35,7 @@
    */
   export let fetcher;
 
-  let sortCriteria = 'r2AtMaxR2';
-  let sortDirectionDesc = true;
-
-  function bySortCriteria(sortCriteria, sortDirectionDesc) {
-    const less = sortDirectionDesc ? 1 : -1;
-
-    function clean(a) {
-      // normalize NaN to null
-      return typeof a === 'number' && Number.isNaN(a) ? null : a;
-    }
-    return (a, b) => {
-      const av = clean(a[sortCriteria]);
-      const bv = clean(b[sortCriteria]);
-      if ((av == null) !== (bv == null)) {
-        return av == null ? 1 : -1;
-      }
-      if (av !== bv) {
-        return av < bv ? less : -less;
-      }
-      if (a.name !== b.name) {
-        return a.name < b.name ? less : -less;
-      }
-      return 0;
-    };
-  }
-
-  function sortClick(prop, defaultSortDesc = false) {
-    if (sortCriteria === prop) {
-      sortDirectionDesc = !sortDirectionDesc;
-      return;
-    }
-    sortCriteria = prop;
-    sortDirectionDesc = defaultSortDesc;
-  }
-  $: comparator = bySortCriteria(sortCriteria, sortDirectionDesc);
+  const sort = new SortHelper('r2AtMaxR2', true, 'name');
 
   /**
    * @param {SensorEntry} context
@@ -121,7 +88,7 @@
   }
 
   // loaded
-  $: rows = loaded > 0 ? otherSensors.sort(comparator) : otherSensors;
+  $: rows = loaded > 0 ? otherSensors.sort($sort.comparator) : otherSensors;
 </script>
 
 <div class="grid-3-11">
@@ -171,36 +138,16 @@
         <th class="mobile-th" />
       </tr><tr>
         <th class="sort-indicator uk-text-center">
-          <SortColumnIndicator
-            label="Indicator"
-            on:click={() => sortClick('name')}
-            sorted={sortCriteria === 'name'}
-            desc={sortDirectionDesc}
-          />
+          <SortColumnIndicator label="Indicator" {sort} prop="name" />
         </th>
         <th class="sort-indicator">
-          <SortColumnIndicator
-            label="R2"
-            on:click={() => sortClick('r2At0')}
-            sorted={sortCriteria === 'r2At0'}
-            desc={sortDirectionDesc}
-          />
+          <SortColumnIndicator label="R2" {sort} prop="r2At0" />
         </th>
         <th class="sort-indicator">
-          <SortColumnIndicator
-            label="Max R2"
-            on:click={() => sortClick('r2AtMaxR2')}
-            sorted={sortCriteria === 'r2AtMaxR2'}
-            desc={sortDirectionDesc}
-          />
+          <SortColumnIndicator label="Max R2" {sort} prop="r2AtMaxR2" />
         </th>
         <th class="sort-indicator">
-          <SortColumnIndicator
-            label="Lag at Max R2"
-            on:click={() => sortClick('lagAtMaxR2')}
-            sorted={sortCriteria === 'lagAtMaxR2'}
-            desc={sortDirectionDesc}
-          />
+          <SortColumnIndicator label="Lag at Max R2" {sort} prop="lagAtMaxR2" />
         </th>
         <th class="sort-indicator" />
       </tr>
