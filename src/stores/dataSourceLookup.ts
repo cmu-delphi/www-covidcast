@@ -1,7 +1,8 @@
 import { isCasesSignal, isDeathSignal } from '../data/signals';
 import type { Sensor } from './constants';
 
-export const CASES_DEATH_SOURCE = 'cases-deaths';
+export const CASES_SOURCE = 'cases';
+export const DEATH_SOURCE = 'deaths';
 
 const sourceNameLookup: Record<string, string> = {
   chng: 'Change Healthcare',
@@ -9,7 +10,8 @@ const sourceNameLookup: Record<string, string> = {
   'fb-survey': 'Delphi Pandemic Survey via Facebook',
   ght: 'Google Search Trends',
   'hospital-admissions': 'Hospital Admissions',
-  [CASES_DEATH_SOURCE]: 'Public Health Reports',
+  [CASES_SOURCE]: 'COVID Cases',
+  [DEATH_SOURCE]: 'COVID Deaths',
   'indicator-combination': 'COVID Indicator Combination',
   quidel: 'Quidel Antigen Tests',
   safegraph: 'SafeGraph Mobility Data',
@@ -20,8 +22,11 @@ export function getDataSource(sensor: { id: string; signal: string } | Sensor): 
   if (typeof sensor === 'string') {
     return sourceNameLookup[sensor] || sensor;
   }
-  if (isCasesSignal(sensor.signal) || isDeathSignal(sensor.signal)) {
-    return sourceNameLookup[CASES_DEATH_SOURCE];
+  if (isCasesSignal(sensor.signal)) {
+    return sourceNameLookup[CASES_SOURCE];
+  }
+  if (isDeathSignal(sensor.signal)) {
+    return sourceNameLookup[DEATH_SOURCE];
   }
   return sourceNameLookup[sensor.id] || sensor.id;
 }

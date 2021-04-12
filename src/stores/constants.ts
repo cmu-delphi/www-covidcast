@@ -16,6 +16,16 @@ export interface LevelInfo {
 
 export const levelList: LevelInfo[] = [
   {
+    id: 'nation',
+    label: 'United States',
+    labelPlural: 'United States',
+  },
+  {
+    id: 'hhs',
+    label: 'Dep. of Health & Human Services Regions',
+    labelPlural: 'Dep. of Health & Human Services Regions',
+  },
+  {
     id: 'state',
     label: 'State',
     labelPlural: 'States',

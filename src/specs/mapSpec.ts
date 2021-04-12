@@ -347,6 +347,9 @@ function countyJSON() {
 // function hrrJSON() {
 //   return import(/* webpackChunkName: 'shape-hrr' */ './shapefiles/hrr.json').then((r) => r.default);
 // }
+// function hhsJSON() {
+//   return import(/* webpackChunkName: 'shape-hhs' */ './shapefiles/hhs.json').then((r) => r.default);
+// }
 function nationJSON() {
   return import(/* webpackChunkName: 'shape-nation' */ './shapefiles/nation.json').then((r) => r.default);
 }
@@ -376,6 +379,18 @@ function stateJSON() {
 // }
 
 export type CommonParams = Parameters<typeof genBaseSpec>['2'] & Parameters<typeof genLevelLayer>['0'];
+
+// export function generateHHSSpec(options: CommonParams = {}): TopLevelSpec {
+//   const level = 'hhs';
+//   const topoJSON = hhhsJSON();
+//   const spec = genBaseSpec(level, topoJSON, options);
+//   spec.datasets.nation = nationJSON();
+//   spec.layer.push(genMissingLayer());
+
+//   spec.layer.push(genLevelLayer(options));
+//   spec.layer.push(genLevelHoverLayer());
+//   return spec;
+// }
 
 export function generateStateSpec(options: CommonParams = {}): TopLevelSpec {
   const level = 'state';

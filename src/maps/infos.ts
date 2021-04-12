@@ -3,7 +3,8 @@ import stateRaw from './processed/state.csv.js';
 import msaRaw from './processed/msa.csv.js';
 import countyRaw from './processed/county.csv.js';
 import hrrRaw from './processed/hrr.csv.js';
-import type { CountyInfo, HRRInfo, RegionInfo, RegionLevel, StateInfo } from './interfaces';
+import type { CountyInfo, HRRInfo, HHSInfo, RegionInfo, RegionLevel, StateInfo } from './interfaces';
+import hhsRaw from './processed/hhs.csv.js';
 
 export const levelMegaCountyId = 'mega-county';
 
@@ -57,9 +58,9 @@ Object.entries(stateClasses).forEach(([key, value]) => {
 export const nationInfo: RegionInfo = {
   level: 'nation',
   name: 'US',
-  id: 'us',
+  id: '0', // has to be an integer
   displayName: 'United States',
-  propertyId: 'us',
+  propertyId: 'US',
   population: stateInfo.reduce((acc, v) => acc + (v.population ?? 0), 0),
 };
 
@@ -78,6 +79,19 @@ export const countyInfo = parseCSV(
   },
 );
 export const hrrInfo = parseCSV<HRRInfo>(hrrRaw, 'hrr', (hrr) => `${hrr.state!} - ${hrr.name!} (HRR)`);
+export const hhsInfo = parseCSV<HHSInfo>(
+  hhsRaw,
+  'hhs',
+  (hhs) => `HHS Region ${hhs.id!.length < 2 ? ' ' : ''}${hhs.id!} ${hhs.name!}`,
+  (hhs) => {
+    // hhs.propertyId = 'h' + hhs.propertyId; // HACK since HHS and HRR ids are the same
+    hhs.states = hhs.states.toString().split(',');
+    (hhs as { population: number }).population = hhs.states.reduce(
+      (acc, v) => acc + stateLookup.get(v.toLowerCase())!.population!,
+      0,
+    );
+  },
+);
 
 // generate mega counties by copying the states
 export const megaCountyInfo: CountyInfo[] = stateInfo.map((info) => ({
@@ -103,11 +117,12 @@ export const infosByLevel = {
   msa: msaInfo.sort(sortByDisplayName),
   county: countyInfo.sort(sortByDisplayName),
   hrr: hrrInfo.sort(sortByDisplayName),
+  hhs: hhsInfo.sort(sortByDisplayName),
   [levelMegaCountyId]: megaCountyInfo.sort(sortByDisplayName),
 };
 
 export const nameInfos = (stateInfo as RegionInfo[])
-  .concat(msaInfo, countyInfo, hrrInfo, megaCountyInfo)
+  .concat(msaInfo, countyInfo, hrrInfo, megaCountyInfo, hhsInfo)
   .sort(sortByDisplayName);
 
 /**
@@ -166,7 +181,7 @@ export function computeMegaCountyPopulation(megaCounty: CountyInfo, data: Map<st
   if (!megaCounty || !data || megaCounty.level !== levelMegaCountyId) {
     return null;
   }
-  const state = getInfoByName(megaCounty.state);
+  const state = getInfoByName(megaCounty.state, 'state');
   if (!state || state.population == null || Number.isNaN(state.population)) {
     return null;
   }
@@ -175,7 +190,7 @@ export function computeMegaCountyPopulation(megaCounty: CountyInfo, data: Map<st
     if (!fips.startsWith(state.id) || fips === megaCounty.id) {
       return population;
     }
-    const county = getInfoByName(fips);
+    const county = getInfoByName(fips, 'county');
     if (!county || county.population == null || Number.isNaN(county.population)) {
       // invalid county, so we cannot compute the rest population, keep NaN from now on
       return Number.NaN;
@@ -192,10 +207,17 @@ export function computeMegaCountyPopulation(megaCounty: CountyInfo, data: Map<st
 export function getCountiesOfState(state: RegionInfo): RegionInfo[] {
   return countyInfo.filter((d) => d.id.slice(0, 2) === state.id);
 }
+
 /**
  * returns the state of a county
- * @param {CountyInfo} county
  */
 export function getStateOfCounty(county: CountyInfo): RegionInfo {
-  return getInfoByName(county.state)!;
+  return getInfoByName(county.state, 'state')!;
+}
+
+/**
+ * returns the state of a county
+ */
+export function getStatesOfHHS(hhs: HHSInfo): StateInfo[] {
+  return (hhs.states ?? []).map((d) => getInfoByName(d, 'state') as StateInfo);
 }

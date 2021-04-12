@@ -108,6 +108,10 @@ export class Annotation {
     );
   }
 
+  matchRegionLevel(level: RegionLevel): boolean {
+    return this.regions.some((annotatedRegion) => annotatedRegion.level == level);
+  }
+
   matchSensor(sensor: { id: string; signal: string }): boolean {
     return (
       (this.source === '*' || this.source === sensor.id) && (this.signals === '*' || this.signals.has(sensor.signal))
@@ -191,6 +195,25 @@ export class AnnotationManager {
           d.matchSensor(sensor) &&
           region != null &&
           d.matchRegion(region) &&
+          d.inDateRange(dateStart, dateEnd),
+      )
+      .sort(sortByDate);
+  }
+
+  /**
+   * @param {{id: string, signal: string}} sensor
+   * @param {string} level
+   * @param {Date} dateStart
+   * @param {Date} dateEnd
+   */
+  getWindowLevelAnnotations(sensor, level, dateStart, dateEnd) {
+    return this.annotations
+      .filter(
+        (d) =>
+          sensor != null &&
+          d.matchSensor(sensor) &&
+          level != null &&
+          d.matchRegionLevel(level) &&
           d.inDateRange(dateStart, dateEnd),
       )
       .sort(sortByDate);

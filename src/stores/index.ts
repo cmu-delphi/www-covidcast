@@ -162,7 +162,7 @@ export const currentRegion = writable(defaultValues.region);
 /**
  * current region info (could also be null)
  */
-export const currentRegionInfo = derived([currentRegion], ([current]) => getInfoByName(current));
+export const currentRegionInfo = writable(getInfoByName(defaultValues.region));
 
 function deriveRecent(): RegionInfo[] {
   if (!window.localStorage) {
@@ -208,20 +208,24 @@ export function selectByInfo(elem: RegionInfo | null, reset = false): boolean {
   if (elem === get(currentRegionInfo)) {
     if (reset) {
       currentRegion.set('');
+      currentRegionInfo.set(null);
     }
     return reset;
   }
   if (elem) {
     currentRegion.set(elem.propertyId);
+    // re lookup to have a clean info
+    currentRegionInfo.set(getInfoByName(elem.id, elem.level));
     // the info is derived
   } else {
     currentRegion.set('');
+    currentRegionInfo.set(null);
   }
   return true;
 }
 
-export function selectByFeature(feature: { properties: { id: string } }, reset = false): boolean {
-  return selectByInfo(feature ? getInfoByName(feature.properties.id) : null, reset);
+export function selectByFeature(feature: { properties: { id: string; level: RegionLevel } }, reset = false): boolean {
+  return selectByInfo(feature ? getInfoByName(feature.properties.id, feature.properties.level) : null, reset);
 }
 
 export const colorScale = writable(scaleSequentialLog());
@@ -419,7 +423,10 @@ export const trackedUrlParams = derived(
           ? null
           : level,
       region: mode === modeByID.export || mode === modeByID.timelapse ? null : region,
-      date: mode === modeByID.export || mode === modeByID.landing ? null : String(date),
+      date:
+        mode === modeByID.export || mode === modeByID.landing || mode === modeByID['indicator-status']
+          ? null
+          : String(date),
       signalC: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.cumulative,
       signalI: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.incidence,
       encoding: !inMapMode || encoding === DEFAULT_ENCODING ? null : encoding,
@@ -466,7 +473,7 @@ export function loadFromUrlState(state: PersistedState): void {
     currentLevel.set(state.level);
   }
   if (state.region != null && state.region !== get(currentRegion)) {
-    currentRegion.set(state.region);
+    selectByInfo(getInfoByName(state.region));
   }
   if (state.date != null && state.date !== get(currentDate)) {
     currentDate.set(state.date);

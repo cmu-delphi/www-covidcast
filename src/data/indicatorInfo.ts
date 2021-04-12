@@ -1,10 +1,8 @@
 // Indicator Info: aka The Signal Dashboard API
 
-import { formatAPITime } from './utils';
+import { formatAPITime, parseAPITime } from './utils';
 import { callSignalAPI } from './api';
 import { EpiDataRow, fetchData } from './fetchData';
-import { isoParse } from 'd3-time-format';
-import { timeDay } from 'd3-time';
 import { addNameInfos } from '.';
 import { countyInfo } from '../maps/infos';
 import type { RegionInfo } from '../maps/interfaces';
@@ -16,12 +14,17 @@ export interface Coverage {
 }
 
 export interface IndicatorStatus {
+  id: string;
   name: string;
   source: string;
   covidcast_signal: string;
   latest_issue: Date;
   latest_time_value: Date;
   coverage: Record<'county', Coverage[]>;
+}
+
+function parseFakeISO(value: number | string | Date): Date {
+  return parseAPITime(value.toString().replace(/-/gm, ''));
 }
 
 export function getIndicatorStatuses(): Promise<IndicatorStatus[]> {
@@ -31,11 +34,12 @@ export function getIndicatorStatuses(): Promise<IndicatorStatus[]> {
     }
     const data = ((d.epidata ?? []) as unknown) as IndicatorStatus[];
     for (const row of data) {
-      row.latest_issue = timeDay(isoParse(row.latest_issue.toString())!);
-      row.latest_time_value = timeDay(isoParse(row.latest_time_value.toString())!);
+      row.id = row.name.toLowerCase().replace(/\s/g, '-');
+      row.latest_issue = parseFakeISO(row.latest_issue);
+      row.latest_time_value = parseFakeISO(row.latest_time_value);
       Object.values(row.coverage).forEach((level) => {
         for (const row of level) {
-          row.date = timeDay(isoParse(row.date.toString())!);
+          row.date = parseFakeISO(row.date);
           row.fraction = row.count / countyInfo.length;
         }
       });

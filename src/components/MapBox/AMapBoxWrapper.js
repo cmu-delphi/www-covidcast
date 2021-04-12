@@ -133,7 +133,7 @@ export default class AMapBoxWrapper {
   }
 
   _setupReady() {
-    this.zoom.showStateLabels(this.level === 'state');
+    this.zoom.showStateLabels(this.level === 'state' || this.level === 'hhs' || this.level === 'nation');
     this.zoom.ready();
     this.markReady('setup');
   }
@@ -338,7 +338,7 @@ export default class AMapBoxWrapper {
     }
 
     if (oldLevel !== level) {
-      this.zoom.showStateLabels(level === 'state');
+      this.zoom.showStateLabels(level === 'state' || level === 'hhs' || level === 'nation');
     }
 
     const allEncodingLayers = this.getAllEncodingLayers();

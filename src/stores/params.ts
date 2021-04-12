@@ -1,7 +1,7 @@
 import { timeDay, timeMonth, timeWeek } from 'd3-time';
 import { addNameInfos, fetchData, formatAPITime, addMissing, fitRange, parseAPITime, EpiDataRow } from '../data';
 import { nationInfo } from '../maps/infos';
-import { currentDate, currentRegion, yesterdayDate, currentSensor, sensorList } from '.';
+import { currentDate, yesterdayDate, currentSensor, sensorList, selectByInfo } from '.';
 import { determineTrend, Trend } from './trend';
 import { determineMinMax } from './stats';
 import { formatValue } from '../formats';
@@ -617,6 +617,7 @@ export class SensorParam {
   readonly value: Sensor;
   readonly rawValue?: Sensor;
   readonly isCasesOrDeath: boolean;
+  readonly dataSourceName: string;
 
   readonly factor: number;
   readonly isPercentage: boolean;
@@ -640,6 +641,7 @@ export class SensorParam {
     this.value = sensor;
     this.rawValue = sensor.rawSensor;
     this.isCasesOrDeath = (sensor as SensorEntry).isCasesOrDeath || false;
+    this.dataSourceName = sensor.dataSourceName;
     // fractions as percentages here
     this.factor = sensor.format === 'fraction' ? 100 : 1;
     this.isPercentage = sensor.format == 'percent' || sensor.format === 'fraction';
@@ -721,7 +723,7 @@ export class RegionParam implements Region {
   }
 
   set(region: Region, scrollTop = false): void {
-    currentRegion.set(region.propertyId);
+    selectByInfo(region);
     if (scrollTop) {
       scrollToTop();
     }

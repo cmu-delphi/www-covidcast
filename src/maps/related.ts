@@ -24,5 +24,5 @@ export default function getRelatedCounties(info: RegionInfo): RegionInfo[] {
   if (!related) {
     return [];
   }
-  return related.map((d) => getInfoByName(d)).filter((d): d is RegionInfo => d != null);
+  return related.map((d) => getInfoByName(d, info.level)).filter((d): d is RegionInfo => d != null);
 }

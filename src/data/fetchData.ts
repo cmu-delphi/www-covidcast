@@ -157,6 +157,9 @@ export function fetchData(
   if (!region) {
     return Promise.resolve([] as EpiDataRow[]);
   }
+  mixinValues.time_type = 'day'; // inject time_type
+  mixinValues.geo_type = level; // inject geo_type
+
   const transferFields = computeTransferFields(mixinValues, advanced, transferSignal);
   function fetchSeparate(defaultSignalIndex: number) {
     const extraDataFields = ['value'];
@@ -360,7 +363,7 @@ export function addMissing<T extends EpiDataRow = EpiDataRow>(rows: T[], dataSen
 
 export function addNameInfos(rows: EpiDataRow[]): (EpiDataRow & RegionInfo)[] {
   for (const row of rows) {
-    Object.assign(row, getInfoByName(row.geo_value));
+    Object.assign(row, getInfoByName(row.geo_value, row.geo_type));
   }
   return rows as (EpiDataRow & RegionInfo)[];
 }

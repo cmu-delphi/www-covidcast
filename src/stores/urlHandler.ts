@@ -19,7 +19,7 @@ export function updateURIParameters(state: TrackedState): void {
     state.path
   }`;
   const query = params.toString();
-  const url = `${path}${query.length > 0 ? '?' : ''}${query}`;
+  const url = `${path}${query.length > 0 ? '?' : ''}${query}${window.location.hash}`;
 
   // update only if the state has changed
   const old = (window.history.state || {}) as PersistedState;
@@ -42,6 +42,13 @@ export function updateURIParameters(state: TrackedState): void {
   } else {
     window.history.replaceState(state.state, document.title, url);
   }
+}
+
+export function updateHash(hash = ''): void {
+  const url = new URL(window.location.href);
+  url.hash = hash ? `#${hash}` : '';
+  const old = (window.history.state ?? {}) as PersistedState;
+  window.history.replaceState(old, document.title, url.toString());
 }
 
 trackedUrlParams.subscribe(throttle(updateURIParameters, 250));

@@ -1,4 +1,4 @@
-export type RegionLevel = 'state' | 'county' | 'msa' | 'hrr' | 'nation' | 'mega-county';
+export type RegionLevel = 'state' | 'county' | 'msa' | 'hrr' | 'nation' | 'mega-county' | 'hhs';
 export type RegionArea = 'West' | 'Midwest' | 'Northeast' | 'South';
 
 export interface RegionInfo {
@@ -22,4 +22,8 @@ export interface CountyInfo extends RegionInfo {
 
 export interface HRRInfo extends RegionInfo {
   state: string;
+}
+
+export interface HHSInfo extends RegionInfo {
+  states: string[];
 }
