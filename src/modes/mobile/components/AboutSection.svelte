@@ -23,7 +23,7 @@
   }
 
   details > summary > :global(.mobile-h3) {
-    display: inline-block;
+    display: inline;
     margin-bottom: 4px;
   }
 

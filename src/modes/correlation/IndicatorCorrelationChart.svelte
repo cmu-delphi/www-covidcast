@@ -86,9 +86,9 @@
       ...BASE_SPEC,
       padding: {
         left: 50,
-        right: 10,
+        right: isMobile ? 10 : 120,
         top: guessTopPadding(title, null, 12),
-        bottom: 70,
+        bottom: isMobile ? 70 : 60,
       },
       width: 400,
       height: 400,
@@ -138,8 +138,8 @@
               type: 'temporal',
               scale: { range: [1, 6] },
               legend: {
-                orient: 'bottom',
-                direction: 'horizontal',
+                orient: isMobile ? 'bottom' : 'right',
+                direction: isMobile ? 'horizontal' : 'vertical',
                 title: false,
                 symbolType: 'square',
               },
@@ -292,6 +292,13 @@
     position: relative;
     /** 1:1 + padding for legend **/
     padding-top: calc(100% + 50px);
+  }
+
+  @media only screen and (min-width: 750px) {
+    .chart-correlation {
+      /** 1:1 + padding for legend **/
+      padding-top: calc(100% + 50px - 100px);
+    }
   }
 
   .chart-correlation > :global(.vega-embed) {
