@@ -3,17 +3,18 @@
   import Datepicker from '../../components/Calendar/Datepicker.svelte';
   import { getLevelInfo, sensorList } from '../../stores/constants';
   import { parseAPITime } from '../../data';
-  import { currentDateObject, currentSensorEntry } from '../../stores';
+  import { annotationManager, currentDateObject, currentSensorEntry } from '../../stores';
   import { timeMonth } from 'd3-time';
   import { onMount } from 'svelte';
   import { trackEvent } from '../../stores/ga';
   import Search from '../../components/Search.svelte';
-  import { getCountiesOfState, infosByLevel } from '../../maps';
+  import { getCountiesOfState, getInfoByName, infosByLevel } from '../../maps';
   import { formatDateISO } from '../../formats';
   import { questions } from '../../stores/questions';
   import { DateParam } from '../../stores/params';
   import FancyHeader from '../mobile/FancyHeader.svelte';
   import '../mobile/common.css';
+  import IndicatorAnnotation from '../mobile/IndicatorAnnotation.svelte';
 
   const CSV_SERVER = 'https://delphi.cmu.edu/csv';
 
@@ -204,6 +205,16 @@
   }
 
   $: dateRange = sensorGroup || { minTime: timeMonth(new Date(), -1), maxTime: timeMonth(new Date(), 1) };
+
+  // resolve known annotation for the selected combination
+  $: annotations = isAllRegions
+    ? $annotationManager.getWindowLevelAnnotations(sensor, geoType, startDate, endDate)
+    : $annotationManager.getWindowAnnotations(
+        sensor,
+        geoIDs.map((d) => getInfoByName(d, geoType)),
+        startDate,
+        endDate,
+      );
 </script>
 
 <div class="mobile-root">
@@ -373,6 +384,10 @@
             </p>
           </div>
         </div>
+
+        {#each annotations as annotation}
+          <IndicatorAnnotation {annotation} />
+        {/each}
       </section>
 
       <section class="uk-margin-large-top">
