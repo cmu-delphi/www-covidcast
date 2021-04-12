@@ -235,6 +235,21 @@
   height: 100%;
 }
 
+.chart-breakout.vega-embed,
+.chart-breakout > .vega-embed {
+  --max-width: 95vw;
+  /* breakout the chart up to 80vw */
+  width: max(100%, var(--max-width));
+  margin-left: calc(-0.5 * var(--max-width) + 50%);
+}
+
+@media only screen and (min-width: 1600px) {
+  .chart-breakout.vega-embed,
+  .chart-breakout > .vega-embed {
+    --max-width: 80vw;
+  }
+}
+
 .mobile-map > canvas {
   border: 1px solid #f0f1f3;
   border-radius: 3px;
