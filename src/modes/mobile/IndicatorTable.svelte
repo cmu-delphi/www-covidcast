@@ -4,7 +4,6 @@
   import { SensorParam } from '../../stores/params';
   import { formatDateISO, formatDateShortNumbers } from '../../formats';
   import filterIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/filter.svg';
-  import { CASES_DEATH_SOURCE } from '../../stores/dataSourceLookup';
   import { currentMode } from '../../stores';
   import { modeByID } from '..';
   import TrendIndicator from './TrendIndicator.svelte';
@@ -38,7 +37,7 @@
         e.sensors.push(sensor);
       } else {
         map.set(ds, {
-          name: sensor.isCasesOrDeath ? CASES_DEATH_SOURCE : sensor.id,
+          name: ds,
           label: ds,
           sensors: [sensor],
         });
@@ -58,12 +57,7 @@
   }
 
   function matchDataSource(sensor, selected) {
-    return (
-      selected === '' ||
-      selected === 'all' ||
-      (sensor.isCasesOrDeath && selected === CASES_DEATH_SOURCE) ||
-      (!sensor.isCasesOrDeath && sensor.value.id === selected)
-    );
+    return selected === '' || selected === 'all' || sensor.dataSourceName === selected;
   }
   /**
    * @param {import("../../stores/params").SensorParam} sensor
