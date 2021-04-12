@@ -91,6 +91,44 @@
     });
   }
 
+  // complex lag obj
+  let lagObj = {
+    lag,
+  };
+
+  function updateLagInfo(lagData) {
+    lagData.then((lagInfo) => {
+      if (!lagInfo) {
+        return;
+      }
+      const x1 = domains.x[0];
+      const x2 = domains.x[1];
+      // update with real information
+      lagObj = {
+        lag,
+        r2: lagInfo.r2,
+        slope: lagInfo.slope,
+        intercept: lagInfo.intercept,
+        samples: lagInfo.samples,
+        x1,
+        x2,
+        y1: lagInfo.slope * x1 + lagInfo.intercept,
+        y2: lagInfo.slope * x2 + lagInfo.intercept,
+      };
+    });
+  }
+
+  $: {
+    lagObj = {
+      lag,
+      x1: domains.x[0],
+      x2: domains.x[1],
+      y1: null,
+      y2: null,
+    };
+    updateLagInfo(lagData);
+  }
+
   function prepareDownloadRow(row) {
     const r = {};
     r.regionId = row.x_entry.propertyId;
@@ -145,7 +183,7 @@
           expr: makeExpression(
             title,
             '$lag_days_later',
-            `(lag > 0 ? lag + ' days earlier' : (lag < 0 ? (-lag) + ' days later': ''))`,
+            `(lag.lag > 0 ? lag.lag + ' days earlier' : (lag.lag < 0 ? (-lag.lag) + ' days later': ''))`,
           ),
         },
       },
@@ -254,52 +292,60 @@
           },
         },
         {
-          // regression text
+          data: {
+            values: [
+              {
+                lag: {},
+              },
+            ],
+          },
           transform: [
             {
-              regression: 'x',
-              on: 'y',
-              params: true, // return model parameters, like .R2
+              calculate: 'lag',
+              as: 'lag',
             },
-            { calculate: "'R²: ' + format(datum.rSquared, '.2f')", as: 'R2' },
           ],
-          mark: {
-            type: 'text',
-            color: 'firebrick',
-            align: 'right',
-            x: 'width',
-            y: -5,
-            size: 14,
-          },
-          encoding: {
-            text: { type: 'nominal', field: 'R2' },
-          },
-        },
-        {
-          // regression line
-          transform: [
+          layer: [
             {
-              regression: 'x',
-              on: 'y',
-              // no params = return points
+              mark: {
+                type: 'text',
+                color: 'firebrick',
+                align: 'right',
+                x: 'width',
+                y: -5,
+                size: 14,
+                text: {
+                  expr: "'R²: ' + format(lag.r2, '.2f')",
+                },
+              },
+            },
+            {
+              mark: {
+                type: 'rule',
+                strokeWidth: 2,
+                color: 'firebrick',
+                clip: true,
+              },
+              encoding: {
+                x: {
+                  field: 'lag.x1',
+                  type: 'quantitative',
+                },
+                x2: {
+                  field: 'lag.x2',
+                  type: 'quantitative',
+                },
+                y: {
+                  field: 'lag.y1',
+                  type: 'quantitative',
+                },
+                y2: {
+                  field: 'lag.y2',
+                  type: 'quantitative',
+                },
+              },
             },
           ],
-          // Draw the linear regression line.
-          mark: {
-            type: 'line',
-            strokeWidth: 2,
-            color: 'firebrick',
-          },
-          encoding: {
-            x: {
-              field: 'x',
-              type: 'quantitative',
-            },
-            y: {
-              field: 'y',
-              type: 'quantitative',
-            },
-          },
         },
         genCreditsLayer(),
       ],
@@ -325,7 +371,7 @@
     {spec}
     tooltip={CorrelationTooltip}
     tooltipProps={{ primary, secondary, lag }}
-    signals={{ lag }}
+    signals={{ lag: lagObj }}
   />
 </div>
 
