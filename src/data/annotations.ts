@@ -200,13 +200,12 @@ export class AnnotationManager {
       .sort(sortByDate);
   }
 
-  /**
-   * @param {{id: string, signal: string}} sensor
-   * @param {string} level
-   * @param {Date} dateStart
-   * @param {Date} dateEnd
-   */
-  getWindowLevelAnnotations(sensor, level, dateStart, dateEnd) {
+  getWindowLevelAnnotations(
+    sensor: { id: string; signal: string },
+    level: RegionLevel,
+    dateStart: Date,
+    dateEnd: Date,
+  ): Annotation[] {
     return this.annotations
       .filter(
         (d) =>

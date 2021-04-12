@@ -3,7 +3,7 @@ import { timeDay } from 'd3-time';
 import { parseAPITime, formatAPITime, combineSignals } from './utils';
 import { EpiDataCasesOrDeathValues, EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 import { getInfoByName } from '../maps/infos';
-import type { RegionInfo } from '../maps/interfaces';
+import type { RegionInfo, RegionLevel } from '../maps/interfaces';
 
 export interface DataSensor {
   id: string;
@@ -17,9 +17,11 @@ export interface DataSensor {
 // * @property {number | null} sample_size
 
 export interface EpiDataRow {
+  geo_type: RegionLevel;
   geo_value: string;
   stderr?: number;
   sample_size?: number;
+  time_type: 'day' | 'week';
   time_value: number;
   date_value: Date;
   value: number;
@@ -148,7 +150,7 @@ export interface FetchDataOptions {
 
 export function fetchData(
   dataSensor: DataSensor,
-  level: string,
+  level: RegionLevel,
   region: string | null | undefined,
   date: Date | string,
   mixinValues: Partial<EpiDataRow> = {},
@@ -251,17 +253,9 @@ export async function fetchSampleSizesNationSummary(dataSensor: DataSensor): Pro
   };
 }
 
-/**
- *
- * @param {DataSensor} dataSensor
- * @param {string} level
- * @param {string | Date} date
- * @param {Partial<EpiDataRow>} mixinValues
- * @returns {Promise<EpiDataRow[]>}
- */
 export function fetchRegionSlice(
   dataSensor: DataSensor,
-  level: string,
+  level: RegionLevel,
   date: string | Date,
   mixinValues: Partial<EpiDataRow> = {},
 ): Promise<EpiDataRow[]> {
@@ -293,7 +287,7 @@ function createCopy<T extends EpiDataRow = EpiDataRow>(row: T, date: Date, dataS
 
 export function fetchTimeSlice(
   dataSensor: DataSensor,
-  level: string,
+  level: RegionLevel,
   region: string | undefined | null,
   startDate = START_TIME_RANGE,
   endDate = END_TIME_RANGE,
