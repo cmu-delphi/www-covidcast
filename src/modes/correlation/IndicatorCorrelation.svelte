@@ -139,8 +139,8 @@
       <FancyHeader invert sub="Chart at Lag {$currentLag} days">Correlation</FancyHeader>
       <IndicatorCorrelationChart {primary} {secondary} lag={$currentLag} lagData={selectedLag} />
     </div>
-    <AboutSection>
-      <h3 class="mobile-h3">About the SNAKE PLOT</h3>
+    <AboutSection details>
+      <h3 class="mobile-h3" slot="header">About the SNAKE PLOT</h3>
       <p>
         A snake plot is a special kind of scatter plot. Each point plots the value of the first indicator against the
         value of the second indicator, and the points are connected in chronological order.
@@ -174,8 +174,8 @@
         />
       </div>
     </div>
-    <AboutSection>
-      <h3 class="mobile-h3">About the TIME SERIES</h3>
+    <AboutSection details>
+      <h3 class="mobile-h3" slot="header">About the TIME SERIES</h3>
       <p>The x-axes in the time series plots below are offset from each other by the selected lag.</p>
     </AboutSection>
   </div>
