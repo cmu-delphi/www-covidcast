@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { isMobileDevice } from '../../stores';
   import '../mobile/common.css';
 </script>
 
@@ -8,7 +9,11 @@
       <h2>COVIDcast <span>Dashboard</span></h2>
     </div>
   </div>
-  <div class="panel">TODO</div>
+  <div class="panel">
+    {#if $isMobileDevice}
+      <div class="uk-alert uk-alert-warning">This view is optimized for larger screens only</div>
+    {/if}
+  </div>
 </div>
 
 <style>
