@@ -252,6 +252,11 @@ module.exports = () => {
         template: './src/index.html',
         filename: 'data-anomalies/index.html',
       }),
+      new HtmlWebpackPlugin({
+        title: 'COVIDcast Dashboard',
+        template: './src/index.html',
+        filename: 'dashboard/index.html',
+      }),
       // new HtmlWebpackPlugin({
       //   title: 'COVIDcast Lab',
       //   template: './src/index.html',
