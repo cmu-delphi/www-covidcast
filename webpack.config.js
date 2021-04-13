@@ -252,11 +252,11 @@ module.exports = () => {
         template: './src/index.html',
         filename: 'data-anomalies/index.html',
       }),
-      // new HtmlWebpackPlugin({
-      //   title: 'COVIDcast Lab',
-      //   template: './src/index.html',
-      //   filename: 'lab/index.html',
-      // }),
+      new HtmlWebpackPlugin({
+        title: 'COVIDcast Lab',
+        template: './src/index.html',
+        filename: 'lab/index.html',
+      }),
       !devMode &&
         new MiniCssExtractPlugin({
           filename: '[name].[contenthash].css',
