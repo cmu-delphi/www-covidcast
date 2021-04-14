@@ -1,5 +1,5 @@
 import { formatDateISO } from '../../formats';
-import type { Region, Sensor, TimeFrame } from '../../stores/params';
+import { Region, Sensor, TimeFrame } from '../../stores/params';
 
 function isArray<T>(v: T | readonly T[]): v is readonly T[] {
   return Array.isArray(v);
@@ -7,6 +7,23 @@ function isArray<T>(v: T | readonly T[]): v is readonly T[] {
 
 function regionKey(region: Region) {
   return `${region.id}@${region.level}`;
+}
+
+function equalIds<T>(a: Set<T> | null, b: Set<T> | null): boolean {
+  if (a === b) {
+    return true;
+  }
+  if ((a == null) !== (b == null)) {
+    return false;
+  }
+  // cannot happen should be covered by a === b
+  if (a == null || b == null) {
+    return false;
+  }
+  if (a.size !== b.size) {
+    return false;
+  }
+  return [...a].every((d) => b.has(d));
 }
 
 export class WidgetHighlight {
@@ -44,6 +61,28 @@ export class WidgetHighlight {
     }
   }
 
+  equalDate(date: null | Date | TimeFrame): boolean {
+    if (this.date === date) {
+      return true;
+    }
+    if (this.date instanceof Date && date instanceof Date) {
+      return this.date.valueOf() == date.valueOf();
+    }
+    if (this.date instanceof TimeFrame && date instanceof TimeFrame) {
+      return this.date.equals(date);
+    }
+    return false;
+  }
+
+  equals(that: WidgetHighlight | null): boolean {
+    if (that == null) {
+      return false;
+    }
+    return (
+      equalIds(this.sensorIds, that.sensorIds) && equalIds(this.regionIds, that.regionIds) && this.equalDate(that.date)
+    );
+  }
+
   matchSensor(sensor: Sensor): boolean {
     return this.sensorIds == null || this.sensorIds.has(sensor.key);
   }
@@ -73,10 +112,14 @@ export class WidgetHighlight {
     );
   }
 
-  [Symbol.toStringTag](): string {
+  toString(): string {
     const sensor = this.sensorIds == null ? '*' : [...this.sensorIds].join(',');
     const region = this.regionIds == null ? '*' : [...this.regionIds].join(',');
     const date = this.date == null ? '*' : this.date instanceof Date ? formatDateISO(this.date) : this.date.toString();
     return `(sensor=${sensor}, region=${region}, date=${date})`;
+  }
+
+  [Symbol.toStringTag](): string {
+    return this.toString();
   }
 }

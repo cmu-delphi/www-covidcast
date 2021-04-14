@@ -248,11 +248,13 @@
       signalListeners.forEach((signal) => {
         r.view.addSignalListener(signal, (name, value) => {
           dispatch('signal', { name, value, view: r.view, spec: r.spec });
+          dispatch(`signal_${name}`, { name, value, view: r.view, spec: r.spec });
         });
       });
       dataListeners.forEach((data) => {
         r.view.addDataListener(data, (name, value) => {
           dispatch('dataListener', { name, value, view: r.view, spec: r.spec });
+          dispatch(`dataListener_${name}`, { name, value, view: r.view, spec: r.spec });
         });
       });
       eventListeners.forEach((type) => {
