@@ -6,6 +6,7 @@
   import KPIWidget from './widgets/KPIWidget.svelte';
   import './style.css';
   import { WidgetHighlight } from './highlight';
+  import LineChartWidget from './widgets/LineChartWidget.svelte';
 
   $: sensor = new SensorParam($currentSensorEntry);
   $: region = new RegionParam($currentRegionInfo);
@@ -24,8 +25,11 @@
    */
   let highlight = null;
 
-  $: {
+  function initHighlight(sensor, region, date) {
     highlight = new WidgetHighlight(sensor.value, region.value, date.value);
+  }
+  $: {
+    initHighlight(sensor, region, date);
   }
 </script>
 
@@ -40,6 +44,7 @@
       <div class="uk-alert uk-alert-warning">This view is optimized for larger screens only</div>
     {/if}
     <KPIWidget {sensor} {date} {region} bind:highlight />
+    <LineChartWidget {sensor} {date} {region} bind:highlight />
   </div>
 </div>
 
@@ -55,5 +60,7 @@
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(3, 1fr);
+    grid-auto-flow: dense;
+    gap: 0.5em;
   }
 </style>

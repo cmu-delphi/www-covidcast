@@ -45,6 +45,10 @@ export class TimeFrame {
     };
   }
 
+  equals(that: TimeFrame): boolean {
+    return this.range === that.range;
+  }
+
   includes(date: Date): boolean {
     return date >= this.min && date <= this.max;
   }
