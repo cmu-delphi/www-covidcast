@@ -11,6 +11,9 @@ import type { RegionInfo, RegionInfo as Region, RegionLevel, RegionArea, CountyI
 import type { Sensor, SensorEntry } from './constants';
 import type { Writable } from 'svelte/store';
 
+export type { Sensor } from './constants';
+export type { RegionInfo as Region } from '../maps/interfaces';
+
 export const WINDOW_SIZE = 4; // months;
 export const SPARKLINE_SIZE = 4; // weeks;
 
@@ -40,6 +43,15 @@ export class TimeFrame {
     this.filter = (row) => {
       return row.date_value >= this.min && row.date_value <= this.max;
     };
+  }
+
+  includes(date: Date): boolean {
+    return date >= this.min && date <= this.max;
+  }
+
+  overlaps(timeFrame: TimeFrame): boolean {
+    // not outside of the range, so at least a partial overlap
+    return !(timeFrame.max < this.min || timeFrame.min > this.max);
   }
 
   toString(): string {
