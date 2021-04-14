@@ -3,6 +3,9 @@
   import { observeResize, unobserveResize } from '../util';
   import { createVegaTooltipAdapter } from './tooltipUtils';
 
+  /**
+   * @type {Promise<any[]>}
+   */
   export let data = Promise.resolve([]);
 
   const dispatch = createEventDispatcher();
@@ -73,6 +76,9 @@
    * // svelte component
    */
   export let tooltip = undefined;
+  /**
+   * @type {Record<string, unknown>}
+   */
   export let tooltipProps = {};
 
   $: tooltipHandler = createVegaTooltipAdapter(tooltip);
