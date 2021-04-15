@@ -17,6 +17,7 @@
   import { getInfoByName } from '../../../maps';
   import { WidgetHighlight } from '../highlight';
   import isEqual from 'lodash-es/isEqual';
+  import { resolveHighlightedField } from '../../../specs/lineSpec';
 
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -112,16 +113,12 @@
    */
   let vegaRef = null;
 
-  function onClickHandler(evt) {
-    const item = evt.detail.item;
-    if (!item || !item.datum || !item.datum.propertyId) {
-      return; // no click on mobile
+  function onHover(evt) {
+    const value = resolveHighlightedField(evt, 'geo_value');
+    if (!value) {
+      return;
     }
-    const regionHighlight = new WidgetHighlight(
-      sensor.value,
-      getInfoByName(item.datum.propertyId, item.datum.level),
-      date.value,
-    );
+    const regionHighlight = new WidgetHighlight(sensor.value, getInfoByName(value, shownLevel), date.value);
 
     if (!regionHighlight.equals(highlight)) {
       highlight = regionHighlight;
@@ -166,8 +163,8 @@
     {data}
     tooltip={RegionMapTooltip}
     tooltipProps={{ sensor }}
-    on:click={onClickHandler}
-    eventListeners={['click']}
+    on:signal_hover={onHover}
+    signalListeners={['hover']}
   />
   <DownloadMenu {vegaRef} {data} {sensor} absolutePos="right: unset; left: 20px; bottom: 20px;" {fileName} />
 </WidgetCard>
