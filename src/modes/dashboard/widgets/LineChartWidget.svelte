@@ -11,10 +11,9 @@
     resolveHighlightedDate,
     patchHighlightTuple,
   } from '../../../specs/lineSpec';
-  import { annotationManager, isMobileDevice } from '../../../stores';
-  import { joinTitle } from '../../../specs/commonSpec';
+  import { annotationManager } from '../../../stores';
   import { combineSignals } from '../../../data/utils';
-  import { formatDateISO } from '../../../formats';
+  import { formatDateISO, formatDateShortWeekdayAbbr, formatDateYearWeekdayAbbr } from '../../../formats';
   import { WidgetHighlight } from '../highlight';
 
   /**
@@ -42,13 +41,13 @@
   const fetcher = getContext('fetcher');
 
   /**
-   * @param {import('../../stores/params').SensorParam} sensor
-   * @param {import('../../stores/params').RegionParam} region
-   * @param {import('../../stores/params').DateParam} date
-   * @param {import('../../stores/params').TimeFrame} timeFrame
-   * @param {{zero: boolean, raw: boolean, isMobile: boolean}} options
+   * @param {import('../../../stores/params').SensorParam} sensor
+   * @param {import('../../../stores/params').RegionParam} region
+   * @param {import('../../../stores/params').DateParam} date
+   * @param {import('../../../stores/params').TimeFrame} timeFrame
+   * @param {{zero: boolean, raw: boolean}} options
    */
-  function genSpec(sensor, region, date, timeFrame, { zero, raw, isMobile }) {
+  function genSpec(sensor, region, date, timeFrame, { zero, raw }) {
     /**
      * @type {import('../../../specs/lineSpec').LineSpecOptions}
      */
@@ -58,10 +57,17 @@
       domain: timeFrame.domain,
       zero,
       xTitle: sensor.xAxis,
-      title: joinTitle([sensor.name, `in ${region.displayName}`], isMobile),
+      title: [
+        `${sensor.name} in ${region.displayName}`,
+        `between ${formatDateYearWeekdayAbbr(timeFrame.min)} and ${formatDateShortWeekdayAbbr(timeFrame.max)}`,
+      ],
       subTitle: sensor.unit,
       highlightRegion: false,
       clearHighlight: false,
+      autoAlignOffset: 60,
+      infoLabelExpr: raw
+        ? `cachedNumber(datum.value, '.1f') + '(raw: ' + cachedNumber(datum.raw, '.1f') + ') @ ' + cachedTime(datum.date_value, '%a %b %d')`
+        : `cachedNumber(datum.value, '.1f') + ' @ ' + cachedTime(datum.date_value, '%a %b %d')`,
     };
     if (raw) {
       return generateLineAndBarSpec(options);
@@ -122,7 +128,6 @@
     genSpec(sensor, region, date, date.windowTimeFrame, {
       zero: !zoom,
       raw,
-      isMobile: $isMobileDevice,
     }),
     date.windowTimeFrame,
     annotations,

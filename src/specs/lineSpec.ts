@@ -68,10 +68,10 @@ export const signalPatches = {
 //   };
 // }
 
-export function autoAlign(dateField = 'date_value'): ExprRef {
+export function autoAlign(dateField = 'date_value', offset = 40): ExprRef {
   return {
     // auto align based on remaining space
-    expr: `(width - scale('x', datum.${dateField})) < 40 ? 'right' : (scale('x', datum.${dateField})) > 40 ? 'center' : 'left'`,
+    expr: `(width - scale('x', datum.${dateField})) < ${offset} ? 'right' : (scale('x', datum.${dateField})) > ${offset} ? 'center' : 'left'`,
   };
 }
 
@@ -202,6 +202,8 @@ export interface LineSpecOptions {
   reactOnMouseMove?: boolean;
   clearHighlight?: boolean;
   paddingLeft?: number;
+  infoLabelExpr?: string;
+  autoAlignOffset?: number;
   tickCount?: Axis<ExprRef | SignalRef>['tickCount'];
 }
 
@@ -223,6 +225,8 @@ export function generateLineChartSpec({
   reactOnMouseMove = true,
   clearHighlight = true,
   paddingLeft = 42,
+  infoLabelExpr,
+  autoAlignOffset = 40,
   tickCount = {
     interval: 'week' as const,
     step: 1,
@@ -287,6 +291,7 @@ export function generateLineChartSpec({
               tickCount: 5,
               labelFontSize: 14,
               format: valueFormat,
+              // formatType: 'cachedNumber',
             },
             scale: {
               round: true,
@@ -380,19 +385,25 @@ export function generateLineChartSpec({
           {
             mark: {
               type: 'text',
-              align: autoAlign(dateField),
+              align: autoAlign(dateField, autoAlignOffset),
               color: COLOR,
               baseline: 'bottom',
               fontSize: 16,
               dy: -3,
             },
             encoding: {
-              text: {
-                field: dateField,
-                type: 'temporal',
-                format: '%a %b %d',
-                formatType: 'cachedTime',
-              },
+              text: infoLabelExpr
+                ? {
+                    value: {
+                      expr: infoLabelExpr,
+                    },
+                  }
+                : {
+                    field: dateField,
+                    type: 'temporal',
+                    format: '%a %b %d',
+                    formatType: 'cachedTime',
+                  },
               y: {
                 value: 0,
               },
