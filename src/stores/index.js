@@ -11,7 +11,7 @@ import {
   DEFAULT_SURVEY_SENSOR,
   DEFAULT_ENCODING,
   defaultRegionOnStartup,
-  sensorList,
+  DEFAULT_CORRELATION_SENSOR,
 } from './constants';
 import modes, { modeByID } from '../modes';
 import { parseAPITime } from '../data/utils';
@@ -74,7 +74,12 @@ function deriveFromPath(url) {
   return {
     mode: modeObj,
     sensor: resolveSensor,
-    sensor2: sensor2 && sensorMap.has(sensor2) ? sensor2 : sensorList.filter((d) => d.key !== resolveSensor)[0].key,
+    sensor2:
+      sensor2 && sensorMap.has(sensor2)
+        ? sensor2
+        : DEFAULT_CORRELATION_SENSOR === sensor2
+        ? DEFAULT_SENSOR
+        : DEFAULT_CORRELATION_SENSOR,
     lag: lag ? Number.parseInt(lag, 10) : 0,
     level: levels.includes(level) ? level : DEFAULT_LEVEL,
     signalCasesOrDeathOptions: {
