@@ -164,7 +164,7 @@
   }
 
   function makeIndicatorCompareSpec(primary, secondary, { zero = true, isMobile, xDomain = [], yDomain = [] } = {}) {
-    const title = joinTitle([`${primary.name} correlated with`, `${secondary.name} $lag_days_later`], isMobile);
+    const title = joinTitle([`${primary.name} correlated with`, `${secondary.name}$lag_days_later`], isMobile);
     /**
      * @type {import('vega-lite').TopLevelSpec}
      */
