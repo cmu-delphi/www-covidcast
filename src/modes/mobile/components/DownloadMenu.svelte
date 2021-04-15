@@ -119,7 +119,13 @@
 </script>
 
 {#if vegaRef || data}
-  <button class="uk-icon-button" class:absolutePos type="button" uk-icon="download" />
+  <button
+    class="uk-icon-button"
+    class:absolutePos
+    type="button"
+    uk-icon="download"
+    style={typeof absolutePos === 'string' ? absolutePos : null}
+  />
   <div data-uk-dropdown="pos: bottom-right">
     <ul class="uk-nav uk-dropdown-nav">
       {#if vegaRef}

@@ -14,7 +14,6 @@
     generateMSASpec,
     generateStateMapWithCountyDataSpec,
   } from '../../../specs/mapSpec';
-  import { joinTitle } from '../../../specs/commonSpec';
 
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -45,17 +44,15 @@
    * @param {import('../../../stores/params').RegionLevel} level
    * @param {import("../../../stores/params").DateParam} date
    */
-  function generateSpec(sensor, level, date, { isMobile }) {
+  function generateSpec(sensor, level, date) {
     /**
      * @type {import('../../../specs/mapSpec').CommonParams}
      */
     const options = {
       domain: sensor.domain($stats, level),
       scheme: sensor.isInverted ? 'yellowgreenblue' : 'yelloworangered',
-      title: joinTitle(
-        [`${sensor.name} in US ${getLevelInfo(level).labelPlural}`, `on ${formatDateYearWeekdayAbbr(date.value)}`],
-        isMobile,
-      ),
+      title: [`${sensor.name} in US ${getLevelInfo(level).labelPlural}`, `on ${formatDateYearWeekdayAbbr(date.value)}`],
+      subTitle: sensor.unit,
     };
     const byLevel = {
       nation: generateNationSpec,
@@ -88,7 +85,7 @@
   }
 
   $: shownLevel = level === 'nation' ? 'state' : level;
-  $: spec = generateSpec(sensor, shownLevel, date, { isMobile: $isMobileDevice });
+  $: spec = generateSpec(sensor, shownLevel, date);
   $: data = loadData(sensor, shownLevel, date);
   $: fileName = generateFileName(sensor, shownLevel, date);
 
@@ -108,7 +105,7 @@
   // }
 </script>
 
-<WidgetCard width={3} height={2}>
+<WidgetCard width={2} height={2}>
   <Vega
     bind:this={vegaRef}
     {spec}
@@ -118,7 +115,7 @@
     on:click={onClickHandler}
     eventListeners={['click']}
   />
-  <DownloadMenu {vegaRef} {data} {sensor} absolutePos {fileName} />
+  <DownloadMenu {vegaRef} {data} {sensor} absolutePos="right: unset; left: 20px; bottom: 20px;" {fileName} />
 </WidgetCard>
 
 <style>
