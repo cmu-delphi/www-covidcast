@@ -156,9 +156,9 @@
       on:signal_highlight={onHighlightSignal}
     />
     <div class="buttons">
-      <Toggle bind:checked={zoom}>Rescale Y-axis</Toggle>
+      <Toggle bind:checked={zoom} noPadding>Rescale Y-axis</Toggle>
       {#if sensor.rawValue != null}
-        <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
+        <Toggle bind:checked={singleRaw} noPadding>Raw Data</Toggle>
       {/if}
       <div class="spacer" />
       <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} advanced={false} />

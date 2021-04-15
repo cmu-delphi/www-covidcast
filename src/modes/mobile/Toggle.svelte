@@ -4,9 +4,10 @@
   export let className = '';
   export let checked = false;
   export let before = '';
+  export let noPadding = false;
 </script>
 
-<label class="toggle {className}" class:checked>
+<label class="toggle {className}" class:checked class:noPadding>
   {before}
   <input type="checkbox" bind:checked />
   {@html toggleOnIcon}
@@ -18,6 +19,9 @@
     cursor: pointer;
     padding: 1em 0;
     display: inline-block;
+  }
+  .toggle.noPadding {
+    padding: 0;
   }
   input {
     visibility: hidden;
