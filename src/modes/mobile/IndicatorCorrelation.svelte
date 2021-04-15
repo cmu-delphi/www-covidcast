@@ -109,8 +109,8 @@
   <p>
     It is sometimes useful to examine signals that move together, but are offset in time. For example, a change in new
     cases is reflected in a change in deaths about 20 days later.
-    <strong>Lag</strong> is the number of days that an indicator can be shifted, with respect to another. In this example,
-    with respect to deaths, new cases are most highly correlated at a lag of 20 days.
+    <strong>Lag</strong> is the number of days that an indicator is shifted, with respect to another. In this example, new
+    cases are most highly correlated with deaths at a lag of 20 days.
   </p>
   <p>This table shows the following metrics between indicators:</p>
   <ul>
@@ -120,12 +120,6 @@
     </li>
     <li><strong>Lag at Max R<sup>2</sup></strong>: The number of days at which R<sup>2</sup> is maximized.</li>
   </ul>
-  <p>
-    For example, if <strong>Max R<sup>2</sup></strong> is <code>0.8</code> and
-    <strong>Lag at Max R<sup>2</sup></strong>
-    is <code>14</code>, that would strongly indicate that the movement in the below indicator would be reflected in this
-    indicator 14 days from now.
-  </p>
 </AboutSection>
 <div class="grid-3-11">
   <table class="mobile-table">

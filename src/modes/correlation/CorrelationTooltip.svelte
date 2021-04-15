@@ -1,4 +1,6 @@
 <script>
+  import { lagToOffset } from '../../data/correlation';
+
   import { formatDateShortWeekdayAbbr } from '../../formats';
   import SensorValue from '../mobile/SensorValue.svelte';
 
@@ -39,9 +41,7 @@
       <th colspan="2">
         <h5>
           {secondary.name}
-          {#if lag != 0}
-            ({lag > 0 ? `${lag} days earlier` : `${-lag} days later`})
-          {/if}
+          {lagToOffset(lag)}
         </h5>
       </th>
     </tr>

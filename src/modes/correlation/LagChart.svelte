@@ -158,7 +158,7 @@
                 fontSize: 16,
                 dy: -3,
                 text: {
-                  expr: `format(datum.r2, '.2f', 'cachedNumber') + ' (' + datum.lag + ' day' + (datum.lag !== 1 ? 's' : '') + ')'`,
+                  expr: `format(datum.r2, '.2f', 'cachedNumber') + lagToOffset(datum.lag)`,
                 },
                 y: 0,
               },
@@ -173,7 +173,7 @@
   let scaled = false;
   $: spec = generateSpec({
     zero: !scaled,
-    title: joinTitle([`R² between "${primary.name}" and `, `"${secondary.name}" per Lag`], $isMobileDevice),
+    title: joinTitle([`R² between "${primary.name}" and `, `lagged "${secondary.name}"`], $isMobileDevice),
   });
 
   let vegaRef = null;

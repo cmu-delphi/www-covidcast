@@ -403,8 +403,28 @@ export const DEFAULT_SENSOR = (sensorList.find((d) => d.highlight && d.highlight
 /**
  * default sensor in case the initial mode is survey-results
  */
-export const DEFAULT_SURVEY_SENSOR = (
-  sensorList.find((d) => d.id === 'fb-survey' && d.signal.includes('cli')) || { key: DEFAULT_SENSOR }
-).key;
+
+export const DEFAULT_SURVEY_SENSOR = (() => {
+  const highlightBased = sensorList.find((d) => d.highlight && d.highlight.includes('survey'));
+  if (highlightBased) {
+    return highlightBased.key;
+  }
+  const cli = sensorList.find((d) => d.id === 'fb-survey' && d.signal.includes('cli'));
+  if (cli) {
+    return cli.key;
+  }
+  return DEFAULT_SENSOR;
+})();
+export const DEFAULT_CORRELATION_SENSOR = (() => {
+  const highlightBased = sensorList.find((d) => d.highlight && d.highlight.includes('correlation'));
+  if (highlightBased) {
+    return highlightBased.key;
+  }
+  const cases = sensorList.find((d) => d.isCasesOrDeath);
+  if (cases) {
+    return cases.key;
+  }
+  return DEFAULT_SURVEY_SENSOR;
+})();
 export const DEFAULT_LEVEL = 'county' as RegionLevel;
 export const DEFAULT_ENCODING = 'color' as 'color' | 'spike' | 'bubble';
