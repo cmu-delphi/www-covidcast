@@ -118,7 +118,7 @@
           are lagged 3 days.
         </p>
       </AboutSection>
-      <FancyHeader invert sub="Chart">R<sup>2</sup> per Lag</FancyHeader>
+      <FancyHeader invert sub="Correlations">Lagged</FancyHeader>
       <LagChart
         {primary}
         {secondary}
@@ -136,7 +136,7 @@
         Click on or mouse over the R<sup>2</sup> chart to select a different lag.
       </p>
       <hr />
-      <FancyHeader invert sub="Chart at Lag {$currentLag} days">Correlation</FancyHeader>
+      <FancyHeader invert sub="Chart">Correlation</FancyHeader>
       <AboutSection details>
         <h3 class="mobile-h3" slot="header">About the SNAKE PLOT</h3>
         <p>
