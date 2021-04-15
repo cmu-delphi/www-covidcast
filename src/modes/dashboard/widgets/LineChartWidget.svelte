@@ -148,25 +148,34 @@
 </script>
 
 <WidgetCard width={3} height={2}>
-  <Vega
-    bind:this={vegaRef}
-    {spec}
-    {data}
-    signals={{ highlight_tuple: patchHighlightTuple }}
-    signalListeners={['highlight']}
-    on:signal_highlight={onHighlightSignal}
-  />
-  <div class="buttons">
-    <Toggle bind:checked={zoom}>Rescale Y-axis</Toggle>
-    {#if sensor.rawValue != null}
-      <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
-    {/if}
-    <div class="spacer" />
-    <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} advanced={false} />
+  <div class="content">
+    <Vega
+      bind:this={vegaRef}
+      {spec}
+      {data}
+      signals={{ highlight_tuple: patchHighlightTuple }}
+      signalListeners={['highlight']}
+      on:signal_highlight={onHighlightSignal}
+    />
+    <div class="buttons">
+      <Toggle bind:checked={zoom}>Rescale Y-axis</Toggle>
+      {#if sensor.rawValue != null}
+        <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
+      {/if}
+      <div class="spacer" />
+      <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} advanced={false} />
+    </div>
   </div>
 </WidgetCard>
 
 <style>
+  .content {
+    display: flex;
+    flex-direction: column;
+  }
+  .content > :global(.vega-embed) {
+    flex: 1 1 0;
+  }
   .buttons {
     display: flex;
     align-items: center;
