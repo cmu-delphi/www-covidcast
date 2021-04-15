@@ -68,6 +68,10 @@ export class TimeFrame {
     const min = offset(max, -offsetFactor);
     return new TimeFrame(min, max);
   }
+
+  shift(minShiftInDays = 0, maxShiftInDays = 0) {
+    return new TimeFrame(timeDay.offset(this.min, minShiftInDays), timeDay.offset(this.max, maxShiftInDays));
+  }
 }
 
 const ALL_TIME_FRAME = new TimeFrame(parseAPITime('20200101'), yesterdayDate);
@@ -620,7 +624,8 @@ export class SensorParam {
   /**
    * @param {Sensor} sensor
    */
-  constructor(sensor) {
+  constructor(sensor, store = currentSensor) {
+    this.writeAbleStore = store;
     this.key = sensor.key;
     this.name = sensor.name;
     this.description = typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText({}) : sensor.mapTitleText;
@@ -653,7 +658,7 @@ export class SensorParam {
    */
   set(sensor, scrollTop = false) {
     if (sensor) {
-      currentSensor.set(sensor.key);
+      this.writeAbleStore.set(sensor.key);
     }
     if (scrollTop) {
       scrollToTop();

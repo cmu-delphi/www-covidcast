@@ -19,8 +19,9 @@
   import { afterUpdate } from 'svelte';
   import { scrollIntoView } from '../../util';
   import IndicatorAnnotations from './IndicatorAnnotations.svelte';
+  import IndicatorCorrelation from './IndicatorCorrelation.svelte';
 
-  $: sensor = new SensorParam($currentSensorEntry, $times);
+  $: sensor = new SensorParam($currentSensorEntry);
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
   $: region = new RegionParam($currentRegionInfo);
 
@@ -52,7 +53,9 @@
       </button>
       <h2>Explore an <span>Indicator</span></h2>
     </div>
-    <IndicatorDropdown {sensor} />
+    <div class="uk-container content-grid uk-margin-remove-vertical">
+      <IndicatorDropdown {sensor} />
+    </div>
   </SurveyParameters>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
@@ -70,12 +73,12 @@
         <HistoryLineChart {sensor} {date} {region} {fetcher} expandableWindow />
       </div>
     </div>
-  </div>
-  <IndicatorAbout {sensor} />
-  <div class="uk-container content-grid">
+    <IndicatorAbout {sensor} />
     <div class="grid-3-11">
       <hr />
       <GeoTable {sensor} {region} {date} {fetcher} />
+      <hr />
     </div>
+    <IndicatorCorrelation {sensor} {region} {date} {fetcher} />
   </div>
 </div>

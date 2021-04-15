@@ -72,6 +72,7 @@
         className="grid-3-11"
         modern
         placeholder="Select Indicator"
+        title="Indicator"
         items={loadedData}
         icon="search"
         selectedItem={selected}

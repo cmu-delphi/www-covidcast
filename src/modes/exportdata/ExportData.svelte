@@ -344,6 +344,7 @@
                 className="search-container"
                 placeholder={'Search for a region...'}
                 items={geoItems}
+                title="Region"
                 selectedItems={geoValues}
                 labelFieldName="displayName"
                 maxItemsToShowInList="5"

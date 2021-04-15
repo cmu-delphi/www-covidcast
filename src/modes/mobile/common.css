@@ -207,6 +207,7 @@
 }
 
 .chart-300,
+.chart-150,
 .chart-50 {
   position: relative;
 }
@@ -215,7 +216,10 @@
   width: 100%;
   height: 300px;
 }
-
+.chart-150 > .vega-embed {
+  width: 100%;
+  height: 150px;
+}
 .chart-50 > .vega-embed {
   width: 100%;
   height: 50px;

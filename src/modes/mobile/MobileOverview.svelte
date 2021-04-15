@@ -15,7 +15,7 @@
   import { scrollIntoView } from '../../util';
   import { modeByID } from '..';
 
-  $: sensor = new SensorParam($currentSensorEntry, $times);
+  $: sensor = new SensorParam($currentSensorEntry);
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
   $: region = new RegionParam($currentRegionInfo);
 
