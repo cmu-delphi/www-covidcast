@@ -100,7 +100,11 @@ export class WidgetHighlight {
   }
 
   matchLevel(level: RegionLevel): boolean {
-    return this.regionIds === null || this.regionIds.has(levelKey(level));
+    return (
+      this.regionIds === null ||
+      this.regionIds.has(levelKey(level)) ||
+      [...this.regionIds].some((d) => d.endsWith(`@${level}`))
+    );
   }
 
   matchDate(date: Date): boolean {
@@ -116,10 +120,11 @@ export class WidgetHighlight {
     );
   }
 
-  matches(sensor: Sensor, region: Region, date: Date | TimeFrame): boolean {
+  matches(sensor: Sensor, region: Region | RegionLevel, date: Date | TimeFrame): boolean {
     return (
       this.matchSensor(sensor) &&
-      this.matchRegion(region) &&
+      ((typeof region === 'string' && this.matchLevel(region)) ||
+        (typeof region !== 'string' && this.matchRegion(region))) &&
       ((date instanceof Date && this.matchDate(date)) || (!(date instanceof Date) && this.matchTimeFrame(date)))
     );
   }

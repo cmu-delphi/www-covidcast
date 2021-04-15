@@ -30,10 +30,10 @@
   const fetcher = getContext('fetcher');
 
   $: data = fetcher.fetch1Sensor1Region1DateDetails(sensor, region, date);
-  $: highlighted = highlight && highlight.matches(sensor.value, region.value, date.value);
+  $: highlighted = highlight != null && highlight.matches(sensor.value, region.value, date.value);
 </script>
 
-<WidgetCard highlight={highlighted}>
+<WidgetCard {highlighted}>
   <div class="content">
     <div class="kpi">
       <div>

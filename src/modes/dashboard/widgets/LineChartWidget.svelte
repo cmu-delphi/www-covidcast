@@ -140,12 +140,14 @@
     }
   }
 
+  $: highlighted = highlight != null && highlight.matches(sensor.value, region.value, date.windowTimeFrame);
+
   // $: {
   //   updateHighlightedDate(highlight ? highlight)
   // }
 </script>
 
-<WidgetCard width={3} height={2}>
+<WidgetCard width={3} height={2} {highlighted}>
   <div class="content">
     <Vega
       bind:this={vegaRef}
