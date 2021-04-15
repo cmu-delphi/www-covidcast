@@ -12,12 +12,18 @@ function levelKey(region: RegionLevel) {
   return `*@${region}`;
 }
 
-function equalIds<T>(a: Set<T> | null, b: Set<T> | null): boolean {
+function equalIds(a: Set<string> | null | string, b: Set<string> | null | string): boolean {
   if (a === b) {
     return true;
   }
   if ((a == null) !== (b == null)) {
     return false;
+  }
+  if ((typeof a === 'string') !== (typeof b === 'string')) {
+    return false;
+  }
+  if (typeof a === 'string' || typeof b === 'string') {
+    return a === b;
   }
   // cannot happen should be covered by a === b
   if (a == null || b == null) {
@@ -29,39 +35,54 @@ function equalIds<T>(a: Set<T> | null, b: Set<T> | null): boolean {
   return [...a].every((d) => b.has(d));
 }
 
+function toStringIds(s: Set<string> | string | null) {
+  if (s == null) {
+    return '*';
+  }
+  if (typeof s === 'string') {
+    return s;
+  }
+  return [...s].join(',');
+}
+
 export class WidgetHighlight {
-  private readonly sensorIds: Set<string> | null;
-  private readonly regionIds: Set<string> | null;
+  private readonly sensorIds: Set<string> | string | null;
+  private readonly regionIds: Set<string> | string | null;
 
   constructor(
     sensor: null | Sensor | readonly Sensor[],
     region: null | Region | readonly Region[] | RegionLevel,
     public readonly date: null | Date | TimeFrame,
   ) {
-    if (sensor) {
-      this.sensorIds = new Set();
-      if (isArray(sensor)) {
+    if (isArray(sensor)) {
+      if (sensor.length === 1) {
+        this.sensorIds = sensor[0].key;
+      } else {
+        this.sensorIds = new Set();
         for (const s of sensor) {
           this.sensorIds.add(s.key);
         }
-      } else {
-        this.sensorIds.add(sensor.key);
       }
+    } else if (sensor) {
+      this.sensorIds = sensor.key;
     } else {
       this.sensorIds = null;
     }
     if (typeof region === 'string') {
-      this.regionIds = new Set();
-      this.regionIds.add(levelKey(region));
-    } else if (region) {
-      this.regionIds = new Set();
-      if (isArray(region)) {
+      this.regionIds = levelKey(region);
+    }
+
+    if (isArray(region)) {
+      if (region.length === 1) {
+        this.regionIds = regionKey(region[0]);
+      } else {
+        this.regionIds = new Set();
         for (const r of region) {
           this.regionIds.add(regionKey(r));
         }
-      } else {
-        this.regionIds.add(regionKey(region));
       }
+    } else if (region) {
+      this.regionIds = regionKey(region as Region);
     } else {
       this.regionIds = null;
     }
@@ -90,21 +111,36 @@ export class WidgetHighlight {
   }
 
   matchSensor(sensor: Sensor): boolean {
-    return this.sensorIds == null || this.sensorIds.has(sensor.key);
+    if (this.sensorIds == null) {
+      return true;
+    }
+    if (typeof this.sensorIds === 'string') {
+      return this.sensorIds === sensor.key;
+    }
+    return this.sensorIds.has(sensor.key);
   }
 
   matchRegion(region: Region): boolean {
-    return (
-      this.regionIds == null || this.regionIds.has(regionKey(region)) || this.regionIds.has(levelKey(region.level))
-    );
+    if (this.regionIds == null) {
+      return true;
+    }
+    const key = regionKey(region);
+    const level = levelKey(region.level);
+    if (typeof this.regionIds === 'string') {
+      return this.regionIds === key || this.regionIds === level;
+    }
+    return this.regionIds.has(key) || this.regionIds.has(level);
   }
 
   matchLevel(level: RegionLevel): boolean {
-    return (
-      this.regionIds === null ||
-      this.regionIds.has(levelKey(level)) ||
-      [...this.regionIds].some((d) => d.endsWith(`@${level}`))
-    );
+    if (this.regionIds == null) {
+      return true;
+    }
+    const key = levelKey(level);
+    if (typeof this.regionIds === 'string') {
+      return this.regionIds === key || this.regionIds.endsWith(`@${level}`);
+    }
+    return this.regionIds.has(key) || this.regionIds.has(level);
   }
 
   matchDate(date: Date): boolean {
@@ -130,8 +166,8 @@ export class WidgetHighlight {
   }
 
   toString(): string {
-    const sensor = this.sensorIds == null ? '*' : [...this.sensorIds].join(',');
-    const region = this.regionIds == null ? '*' : [...this.regionIds].join(',');
+    const sensor = toStringIds(this.sensorIds);
+    const region = toStringIds(this.regionIds);
     const date = this.date == null ? '*' : this.date instanceof Date ? formatDateISO(this.date) : this.date.toString();
     return `(sensor=${sensor}, region=${region}, date=${date})`;
   }
