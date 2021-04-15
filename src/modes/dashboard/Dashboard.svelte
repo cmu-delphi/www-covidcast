@@ -45,9 +45,9 @@
       {#if $isMobileDevice}
         <div class="uk-alert uk-alert-warning">This view is optimized for larger screens only</div>
       {/if}
-      <KPIWidget {sensor} {date} {region} bind:highlight />
       <LineChartWidget {sensor} {date} {region} bind:highlight />
       <MapChartWidget {sensor} {date} level={region.level} bind:highlight />
+      <KPIWidget {sensor} {date} {region} bind:highlight />
     </div>
   </div>
 </div>
@@ -79,6 +79,7 @@
     grid-template-rows: repeat(var(--nrow), 1fr);
     grid-auto-flow: dense;
     gap: 0.5em;
+    padding: 0.5em;
   }
 
   @media only screen and (min-width: 800px) {

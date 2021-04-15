@@ -103,6 +103,7 @@
   // $: {
   //   updateHighlightedDate(highlight ? highlight)
   // }
+  $: highlighted = highlight != null && highlight.matches(sensor.value, shownLevel, date.windowTimeFrame);
 </script>
 
 <WidgetCard width={2} height={2}>
