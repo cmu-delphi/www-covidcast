@@ -1,9 +1,11 @@
 import { linear } from 'regression';
 import { zip } from '../util';
 
+export * from './correlationUtils';
+
 /**
  * @typedef {object} Lag
- * @property {number} lag
+ * @property {number} lag a_i ~ b_(i+lag) correlate a with b + lag days later
  * @property {number} r2
  * @property {number} slope y = slope * x + intercept
  * @property {number} intercept y = slope * x + intercept
@@ -77,14 +79,14 @@ function generateLags(a, b) {
     const bLag = b.slice(lag - i, b.length - i);
     const bValuesLag = bValues.slice(lag - i, b.length - i);
     const model = linear(zip(aWindowValues, bValuesLag));
-    lags.push(asLag(i, model, aWindow, bLag));
+    lags.push(asLag(-i, model, aWindow, bLag));
   }
 
   for (let i = 1; i <= lag; i++) {
     const aLag = a.slice(lag - i, b.length - i);
     const aValuesLag = aValues.slice(lag - i, b.length - i);
     const model = linear(zip(aValuesLag, bWindowValues));
-    lags.push(asLag(-i, model, aLag, bWindow));
+    lags.push(asLag(i, model, aLag, bWindow));
   }
   return lags;
 }

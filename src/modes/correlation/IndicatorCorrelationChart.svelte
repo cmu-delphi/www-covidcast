@@ -180,11 +180,7 @@
       height: 400,
       title: {
         text: {
-          expr: makeExpression(
-            title,
-            '$lag_days_later',
-            `(lag.lag > 0 ? lag.lag + ' days earlier' : (lag.lag < 0 ? (-lag.lag) + ' days later': ''))`,
-          ),
+          expr: makeExpression(title, '$lag_days_later', `lagToOffset(lag.lag, false)`),
         },
       },
       layer: [

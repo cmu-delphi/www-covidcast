@@ -158,8 +158,7 @@
                 fontSize: 16,
                 dy: -3,
                 text: {
-                  // TODO: earlier later notion
-                  expr: `format(datum.r2, '.2f', 'cachedNumber') + ' (' + datum.lag + ' day' + (datum.lag !== 1 ? 's' : '') + ')'`,
+                  expr: `format(datum.r2, '.2f', 'cachedNumber') + lagToOffset(datum.lag)`,
                 },
                 y: 0,
               },
