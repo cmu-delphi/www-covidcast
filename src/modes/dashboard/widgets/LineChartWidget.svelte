@@ -15,6 +15,7 @@
   import { combineSignals } from '../../../data/utils';
   import { formatDateISO, formatDateShortWeekdayAbbr, formatDateYearWeekdayAbbr } from '../../../formats';
   import { WidgetHighlight } from '../highlight';
+  import isEqual from 'lodash-es/isEqual';
 
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -41,6 +42,13 @@
   const fetcher = getContext('fetcher');
 
   /**
+   * @param {import('../highlight').WidgetHighlight | null} highlight
+   */
+  function highlightToDate(highlight) {
+    return highlight ? highlight.primaryDate : null;
+  }
+
+  /**
    * @param {import('../../../stores/params').SensorParam} sensor
    * @param {import('../../../stores/params').RegionParam} region
    * @param {import('../../../stores/params').DateParam} date
@@ -52,7 +60,7 @@
      * @type {import('../../../specs/lineSpec').LineSpecOptions}
      */
     const options = {
-      initialDate: date.value,
+      initialDate: highlightToDate(highlight) || date.value,
       // color,
       domain: timeFrame.domain,
       zero,
@@ -147,9 +155,34 @@
 
   $: highlighted = highlight != null && highlight.matches(sensor.value, region.value, date.windowTimeFrame);
 
-  // $: {
-  //   updateHighlightedDate(highlight ? highlight)
-  // }
+  function updateVegaHighlight(highlight) {
+    if (!vegaRef) {
+      return;
+    }
+    const view = vegaRef.vegaDirectAccessor();
+    if (!view) {
+      return;
+    }
+    const value = highlightToDate(highlight);
+    const values = value ? [value.getTime()] : null;
+    const newValue = value
+      ? {
+          unit: 'layer_1',
+          fields: view.signal('highlight_tuple_fields'),
+          values,
+        }
+      : null;
+    const currentValues = (view.signal('highlight_tuple') || { values: [] }).values;
+    const newValues = values || [];
+    if (isEqual(currentValues, newValues)) {
+      return;
+    }
+    view.signal('highlight_tuple', newValue);
+    view.runAsync();
+  }
+  $: {
+    updateVegaHighlight(highlight);
+  }
 </script>
 
 <WidgetCard width={3} height={2} {highlighted}>

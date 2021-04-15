@@ -64,7 +64,7 @@ export class WidgetHighlight {
   constructor(
     sensor: null | Sensor | readonly Sensor[],
     region: null | Region | readonly Region[] | RegionLevel,
-    public readonly date: null | Date | TimeFrame,
+    private readonly date: null | Date | TimeFrame,
   ) {
     if (isArray(sensor)) {
       if (sensor.length === 1) {
@@ -98,6 +98,16 @@ export class WidgetHighlight {
     } else {
       this.regionIds = null;
     }
+  }
+
+  get primaryDate(): Date | null {
+    if (this.date == null) {
+      return null;
+    }
+    if (this.date instanceof TimeFrame) {
+      return this.date.min;
+    }
+    return this.date;
   }
 
   get sensors(): '*' | Sensor[] {
