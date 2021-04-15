@@ -23,6 +23,7 @@
   import { MULTI_COLORS } from '../../specs/lineSpec';
   import AboutSection from '../mobile/components/AboutSection.svelte';
   import { generateCorrelationMetrics } from '../../data/correlation';
+  import throttle from 'lodash-es/throttle';
 
   $: primary = new SensorParam($currentSensorEntry);
   $: secondary = new SensorParam($currentSensorEntry2, currentSensor2);
@@ -78,6 +79,10 @@
   }
 
   $: selectedLag = selectLag(lags, $currentLag);
+
+  const throttleLagUpdate = throttle((nextLag) => {
+    currentLag.set(nextLag);
+  }, 10);
 </script>
 
 <div class="mobile-root">
@@ -128,7 +133,7 @@
           // don't use || since 0 == false
           const nextLag = e.detail == null ? $currentLag : e.detail;
           if (nextLag !== $currentLag) {
-            currentLag.set(nextLag);
+            throttleLagUpdate(nextLag);
           }
         }}
       />

@@ -76,7 +76,7 @@
           x_entry: xi,
           y: yi.value,
           y_date: yi.date_value,
-          y_enty: yi,
+          y_entry: yi,
         };
       });
     });
@@ -183,6 +183,12 @@
           expr: makeExpression(title, '$lag_days_later', `lagToOffset(lag.lag, false)`),
         },
       },
+      resolve: {
+        axis: {
+          x: 'shared',
+          y: 'shared',
+        },
+      },
       layer: [
         {
           transform: [
@@ -204,10 +210,26 @@
             strokeCap: 'round',
           },
           encoding: {
-            x: { field: 'x', type: 'quantitative' },
-            x2: { field: 'prevx', type: 'quantitative' },
-            y: { field: 'y', type: 'quantitative' },
-            y2: { field: 'prevy', type: 'quantitative' },
+            x: {
+              field: 'x',
+              type: 'quantitative',
+              title: `${primary.name} (${primary.unit})`,
+              scale: {
+                zero,
+                domainMax: zero ? xDomain[1] : undefined,
+              },
+            },
+            x2: { field: 'prevx' },
+            y: {
+              field: 'y',
+              type: 'quantitative',
+              title: `${secondary.name} (${secondary.unit})`,
+              scale: {
+                zero,
+                domainMax: zero ? yDomain[1] : undefined,
+              },
+            },
+            y2: { field: 'prevy' },
             color: {
               field: 'x_date',
               type: 'temporal',
@@ -247,23 +269,11 @@
           encoding: {
             x: {
               field: 'x',
-              title: `${primary.name} (${primary.unit})`,
               type: 'quantitative',
-              scale: {
-                zero,
-                domainMin: zero ? undefined : xDomain[0],
-                domainMax: xDomain[1],
-              },
             },
             y: {
               field: 'y',
-              title: `${secondary.name} (${secondary.unit})`,
               type: 'quantitative',
-              scale: {
-                zero,
-                domainMin: zero ? undefined : yDomain[0],
-                domainMax: yDomain[1],
-              },
             },
             opacity: {
               condition: [
@@ -324,20 +334,33 @@
               },
               encoding: {
                 x: {
-                  field: 'lag.x1',
-                  type: 'quantitative',
+                  // use expressions to avoid that x1 is part of the x-scale domain
+                  value: {
+                    expr: `scale('x', lag.x1)`,
+                  },
+                  // field: 'lag.x1',
+                  // type: 'quantitative',
                 },
                 x2: {
-                  field: 'lag.x2',
-                  type: 'quantitative',
+                  value: {
+                    expr: `scale('x', lag.x2)`,
+                  },
+                  // field: 'lag.x2',
+                  // type: 'quantitative',
                 },
                 y: {
-                  field: 'lag.y1',
-                  type: 'quantitative',
+                  value: {
+                    expr: `scale('y', lag.y1)`,
+                  },
+                  // field: 'lag.y1',
+                  // type: 'quantitative',
                 },
                 y2: {
-                  field: 'lag.y2',
-                  type: 'quantitative',
+                  value: {
+                    expr: `scale('y', lag.y2)`,
+                  },
+                  // field: 'lag.y2',
+                  // type: 'quantitative',
                 },
               },
             },
@@ -354,7 +377,7 @@
     zero: !scaled,
     isMobile: $isMobileDevice,
     xDomain: domains.x,
-    yDoman: domains.y,
+    yDomain: domains.y,
   });
 
   let vegaRef = null;
