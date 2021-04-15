@@ -3,6 +3,7 @@
   import { formatDateYearWeekdayAbbr } from '../../../formats';
   import SensorUnit from '../../mobile/SensorUnit.svelte';
   import SurveyValue from '../../survey/SurveyValue.svelte';
+  import { WidgetHighlight } from '../highlight';
   import WidgetCard from './WidgetCard.svelte';
 
   /**
@@ -31,10 +32,25 @@
 
   $: data = fetcher.fetch1Sensor1Region1DateDetails(sensor, region, date);
   $: highlighted = highlight != null && highlight.matches(sensor.value, region.value, date.value);
+
+  $: selfHighlight = new WidgetHighlight(sensor.value, region.value, date.value);
+
+  let bakHighlight = null;
+  function onMouseEnter() {
+    bakHighlight = highlight;
+    if (!selfHighlight.equals(highlight)) {
+      highlight = selfHighlight;
+    }
+  }
+  function onMouseLeave() {
+    if (highlight && !highlight.equals(bakHighlight)) {
+      highlight = bakHighlight;
+    }
+  }
 </script>
 
 <WidgetCard {highlighted}>
-  <div class="content">
+  <div class="content" on:mouseenter={onMouseEnter} on:mouseleave={onMouseLeave}>
     <div class="kpi">
       <div>
         {#await data}

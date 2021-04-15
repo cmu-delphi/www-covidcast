@@ -68,10 +68,10 @@
   }
   .panel {
     position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
+    left: 0.5em;
+    top: 0.5em;
+    right: 0.5em;
+    bottom: 0.5em;
     display: grid;
     --ncol: 3;
     --nrow: 4;
@@ -79,7 +79,6 @@
     grid-template-rows: repeat(var(--nrow), 1fr);
     grid-auto-flow: dense;
     gap: 0.5em;
-    padding: 0.5em;
   }
 
   @media only screen and (min-width: 800px) {
