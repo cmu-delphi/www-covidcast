@@ -118,9 +118,9 @@
           at all).
         </p>
         <p>
-          <strong>Lag</strong> is the number in days that an indicator can be shifted, with respect to another. For example,
-          if we hypothesize that an increase in new cases results in an increase in hospitalizations three days later, hospitalizations
-          are lagged 3 days.
+          <strong>Lag</strong> is the number of days that an indicator is shifted backwards with respect to another. For
+          example, if we hypothesize that an increase in new cases results in an increase in hospitalizations three days
+          later, hospitalizations are lagged 3 days. A negative lag would indicate the indicator is shifted forwards.
         </p>
       </AboutSection>
       <FancyHeader invert sub="Correlations">Lagged</FancyHeader>
@@ -165,6 +165,7 @@
         <h3 class="mobile-h3" slot="header">About the TIME SERIES</h3>
         <p>The x-axes in the time series plots below are offset from each other by the selected lag.</p>
       </AboutSection>
+      <p />
       <div class="chart-300">
         <HistoryLineChart sensor={primary} {date} {region} {fetcher} singleRegionOnly domain={domains.primary} />
       </div>

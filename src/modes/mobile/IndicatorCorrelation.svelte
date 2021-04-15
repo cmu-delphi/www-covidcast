@@ -107,10 +107,10 @@
     at all).
   </p>
   <p>
-    It is sometimes useful to examine signals that move together, but are offset in time. For example, a change in new
-    cases is reflected in a change in deaths about 20 days later.
-    <strong>Lag</strong> is the number of days that an indicator is shifted, with respect to another. In this example, new
-    cases are most highly correlated with deaths at a lag of 20 days.
+    It is sometimes useful to examine signals that move together, but are offset in time.
+    <strong>Lag</strong> is the number of days that an indicator is shifted backwards with respect to another. For example,
+    a change in new cases is reflected in a change in deaths about 20 days later. In this example, new cases are most highly
+    correlated with deaths at a lag of 20 days. A negative lag would indicate the indicator is shifted forwards.
   </p>
   <p>This table shows the following metrics between indicators:</p>
   <ul>
