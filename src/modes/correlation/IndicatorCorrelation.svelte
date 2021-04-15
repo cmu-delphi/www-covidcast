@@ -108,14 +108,14 @@
         </p>
         <p>
           In other words, how much does the movement in one indicator explain movement in another? For example, a change
-          in new cases is reflected in a change in community symptoms.
+          in new cases is reflected in deaths.
           <strong>R<sup>2</sup></strong> ranges between <code>1.0</code> (entirely correlated) and <code>0.0</code> (no correlation
           at all).
         </p>
         <p>
           <strong>Lag</strong> is the number in days that an indicator can be shifted, with respect to another. For example,
-          if we hypothesize that an increase in new cases results in an increase in hospitalizations three days later, the
-          lag is three.
+          if we hypothesize that an increase in new cases results in an increase in hospitalizations three days later, hospitalizations
+          are lagged 3 days.
         </p>
       </AboutSection>
       <FancyHeader invert sub="Chart">R<sup>2</sup> per Lag</FancyHeader>
@@ -133,7 +133,7 @@
         }}
       />
       <p>
-        Click on or Mouse over the R<sup>2</sup> chart to select a different lag.
+        Click on or mouse over the R<sup>2</sup> chart to select a different lag.
       </p>
       <hr />
       <FancyHeader invert sub="Chart at Lag {$currentLag} days">Correlation</FancyHeader>
