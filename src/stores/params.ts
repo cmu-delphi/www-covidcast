@@ -576,6 +576,21 @@ export class DataFetcher {
   // }
 }
 
+export function resolveSensorTimeFrame(
+  sensor?: Sensor | TimeFrame,
+  timeLookup?: Map<string, [number, number]>,
+): TimeFrame {
+  if (sensor instanceof TimeFrame) {
+    return sensor;
+  } else {
+    const entry = sensor && timeLookup ? timeLookup.get(sensor.key) : null;
+    if (entry) {
+      return new TimeFrame(parseAPITime(entry[0]), parseAPITime(entry[1]));
+    }
+  }
+  return ALL_TIME_FRAME;
+}
+
 export class DateParam {
   readonly timeValue: number;
   readonly value: Date;
@@ -588,15 +603,7 @@ export class DateParam {
     this.timeValue = toTimeValue(date);
     this.value = date;
     this.allTimeFrame = ALL_TIME_FRAME;
-    this.sensorTimeFrame = ALL_TIME_FRAME;
-    if (sensor instanceof TimeFrame) {
-      this.sensorTimeFrame = sensor;
-    } else {
-      const entry = sensor && timeLookup ? timeLookup.get(sensor.key) : null;
-      if (entry) {
-        this.sensorTimeFrame = new TimeFrame(parseAPITime(entry[0]), parseAPITime(entry[1]));
-      }
-    }
+    this.sensorTimeFrame = resolveSensorTimeFrame(sensor, timeLookup);
     this.sparkLineTimeFrame = TimeFrame.compute(
       date,
       (d, step) => timeWeek.offset(d, step),
@@ -657,7 +664,9 @@ export class SensorParam {
   readonly xAxis: string;
   readonly yAxis: string;
 
-  constructor(sensor: Sensor, store = currentSensor) {
+  readonly timeFrame: TimeFrame;
+
+  constructor(sensor: Sensor, store = currentSensor, timeLookup?: Map<string, [number, number]>) {
     this.writeAbleStore = store;
     this.key = sensor.key;
     this.name = sensor.name;
@@ -684,6 +693,8 @@ export class SensorParam {
       : '';
     this.xAxis = sensor.xAxis;
     this.yAxis = sensor.yAxis;
+
+    this.timeFrame = resolveSensorTimeFrame(sensor, timeLookup);
   }
 
   set(sensor: Sensor, scrollTop = false): void {

@@ -1,6 +1,6 @@
 <script>
   import { setContext } from 'svelte';
-  import { isMobileDevice } from '../../stores';
+  import { currentSensor, currentSensor2, currentSensorEntry2, isMobileDevice } from '../../stores';
   import { currentRegionInfo, currentSensorEntry, currentDateObject, times } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
   import KPIWidget from './widgets/KPIWidget.svelte';
@@ -9,7 +9,8 @@
   import LineChartWidget from './widgets/LineChartWidget.svelte';
   import MapChartWidget from './widgets/MapChartWidget.svelte';
 
-  $: sensor = new SensorParam($currentSensorEntry);
+  $: sensor = new SensorParam($currentSensorEntry, currentSensor, $times);
+  $: sensor2 = new SensorParam($currentSensorEntry2, currentSensor2, $times);
   $: region = new RegionParam($currentRegionInfo);
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
 
@@ -45,8 +46,9 @@
       {#if $isMobileDevice}
         <div class="uk-alert uk-alert-warning">This view is optimized for larger screens only</div>
       {/if}
-      <LineChartWidget {sensor} {date} {region} bind:highlight />
+      <LineChartWidget {sensor} timeFrame={date.windowTimeFrame} {region} bind:highlight />
       <MapChartWidget {sensor} {date} level={region.level} bind:highlight />
+      <LineChartWidget sensor={sensor2} timeFrame={sensor2.timeFrame} wide {region} bind:highlight />
       <KPIWidget {sensor} {date} {region} bind:highlight />
       <KPIWidget {sensor} date={date.shift(1)} {region} bind:highlight />
       <KPIWidget {sensor} date={date.shift(2)} {region} bind:highlight />

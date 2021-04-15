@@ -17,14 +17,15 @@
   import { WidgetHighlight } from '../highlight';
   import isEqual from 'lodash-es/isEqual';
 
+  export let wide = false;
   /**
    * @type {import("../../../stores/params").SensorParam}
    */
   export let sensor;
   /**
-   * @type {import("../../../stores/params").DateParam}
+   * @type {import("../../../stores/params").TimeFrame}
    */
-  export let date;
+  export let timeFrame;
   /**
    * @type {import("../../../stores/params").RegionParam}
    */
@@ -51,16 +52,15 @@
   /**
    * @param {import('../../../stores/params').SensorParam} sensor
    * @param {import('../../../stores/params').RegionParam} region
-   * @param {import('../../../stores/params').DateParam} date
    * @param {import('../../../stores/params').TimeFrame} timeFrame
    * @param {{zero: boolean, raw: boolean}} options
    */
-  function genSpec(sensor, region, date, timeFrame, { zero, raw }) {
+  function genSpec(sensor, region, timeFrame, { zero, raw }) {
     /**
      * @type {import('../../../specs/lineSpec').LineSpecOptions}
      */
     const options = {
-      initialDate: highlightToDate(highlight) || date.value,
+      initialDate: highlightToDate(highlight) || timeFrame.max,
       // color,
       domain: timeFrame.domain,
       zero,
@@ -74,7 +74,7 @@
       clearHighlight: false,
       autoAlignOffset: 60,
       infoLabelExpr: raw
-        ? `cachedNumber(datum.value, '.1f') + '(raw: ' + cachedNumber(datum.raw, '.1f') + ') @ ' + cachedTime(datum.date_value, '%a %b %d')`
+        ? `cachedNumber(datum.value, '.1f') + ' (raw: ' + cachedNumber(datum.raw, '.1f') + ') @ ' + cachedTime(datum.date_value, '%a %b %d')`
         : `cachedNumber(datum.value, '.1f') + ' @ ' + cachedTime(datum.date_value, '%a %b %d')`,
     };
     if (raw) {
@@ -125,23 +125,18 @@
   let zoom = false;
   let singleRaw = false;
 
-  $: annotations = $annotationManager.getWindowAnnotations(
-    sensor.value,
-    region,
-    date.windowTimeFrame.min,
-    date.windowTimeFrame.max,
-  );
+  $: annotations = $annotationManager.getWindowAnnotations(sensor.value, region, timeFrame.min, timeFrame.max);
   $: raw = singleRaw && sensor.rawValue != null;
   $: spec = injectRanges(
-    genSpec(sensor, region, date, date.windowTimeFrame, {
+    genSpec(sensor, region, timeFrame, {
       zero: !zoom,
       raw,
     }),
-    date.windowTimeFrame,
+    timeFrame,
     annotations,
   );
-  $: data = loadData(sensor, region, date.windowTimeFrame, raw);
-  $: fileName = generateFileName(sensor, region, date.windowTimeFrame, raw);
+  $: data = loadData(sensor, region, timeFrame, raw);
+  $: fileName = generateFileName(sensor, region, timeFrame, raw);
 
   let vegaRef = null;
 
@@ -153,7 +148,7 @@
     }
   }
 
-  $: highlighted = highlight != null && highlight.matches(sensor.value, region.value, date.windowTimeFrame);
+  $: highlighted = highlight != null && highlight.matches(sensor.value, region.value, timeFrame);
 
   function updateVegaHighlight(highlight) {
     if (!vegaRef) {
@@ -185,7 +180,7 @@
   }
 </script>
 
-<WidgetCard width={3} height={2} {highlighted}>
+<WidgetCard width={wide ? 5 : 3} height={2} {highlighted}>
   <div class="content">
     <Vega
       bind:this={vegaRef}
