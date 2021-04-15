@@ -3,7 +3,7 @@
   import { modeByID } from '..';
   import { sensorList, currentMode, currentSensor2 } from '../../stores';
   import { scrollToTop } from '../../util';
-  import { generateCorrelationMetrics, lagToOffset } from '../../data/correlation';
+  import { generateCorrelationMetrics } from '../../data/correlation';
   import { formatRawValue } from '../../formats';
   import FancyHeader from './FancyHeader.svelte';
   import SortColumnIndicator from './components/SortColumnIndicator.svelte';
@@ -165,7 +165,7 @@
           {:then m}
             <td class="uk-text-right">{formatRawValue(m.r2At0)}</td>
             <td class="uk-text-right">{formatRawValue(m.r2AtMaxR2)}</td>
-            <td class="uk-text-right">{lagToOffset(m.lagAtMaxR2, 'zero')}</td>
+            <td class="uk-text-right">{m.lagAtMaxR2.toLocaleString()} days</td>
           {:catch err}
             <td colspan="3" class="small">{err.message}</td>
           {/await}
