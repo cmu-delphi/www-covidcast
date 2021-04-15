@@ -39,12 +39,14 @@
       <h2>COVIDcast <span>Dashboard</span></h2>
     </div>
   </div>
-  <div class="panel">
-    {#if $isMobileDevice}
-      <div class="uk-alert uk-alert-warning">This view is optimized for larger screens only</div>
-    {/if}
-    <KPIWidget {sensor} {date} {region} bind:highlight />
-    <LineChartWidget {sensor} {date} {region} bind:highlight />
+  <div class="panel-wrapper">
+    <div class="panel">
+      {#if $isMobileDevice}
+        <div class="uk-alert uk-alert-warning">This view is optimized for larger screens only</div>
+      {/if}
+      <KPIWidget {sensor} {date} {region} bind:highlight />
+      <LineChartWidget {sensor} {date} {region} bind:highlight />
+    </div>
   </div>
 </div>
 
@@ -54,12 +56,23 @@
     flex: 1 1 0;
     font-size: 0.875rem;
     line-height: 1.5rem;
+    display: flex;
+    flex-direction: column;
   }
 
+  .panel-wrapper {
+    flex: 1 1 0;
+    position: relative;
+  }
   .panel {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
     grid-auto-flow: dense;
     gap: 0.5em;
   }

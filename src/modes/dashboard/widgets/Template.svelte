@@ -29,13 +29,15 @@
   $: highlighted = highlight && highlight.matches(sensor.value, region.value, date.value);
 </script>
 
-<WidgetCard flex highlight={highlighted}>
+<WidgetCard highlight={highlighted}>
   <div>
-    {#await data}
-      null
-    {:then d}
-      {d.value}
-    {/await}
+    <div>
+      {#await data}
+        null
+      {:then d}
+        {d.value}
+      {/await}
+    </div>
   </div>
 </WidgetCard>
 
