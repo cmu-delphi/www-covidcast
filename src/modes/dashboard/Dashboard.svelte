@@ -7,6 +7,7 @@
   import './style.css';
   import { WidgetHighlight } from './highlight';
   import LineChartWidget from './widgets/LineChartWidget.svelte';
+  import MapChartWidget from './widgets/MapChartWidget.svelte';
 
   $: sensor = new SensorParam($currentSensorEntry);
   $: region = new RegionParam($currentRegionInfo);
@@ -46,6 +47,7 @@
       {/if}
       <KPIWidget {sensor} {date} {region} bind:highlight />
       <LineChartWidget {sensor} {date} {region} bind:highlight />
+      <MapChartWidget {sensor} {date} level={region.level} bind:highlight />
     </div>
   </div>
 </div>

@@ -41,8 +41,6 @@
    */
   const fetcher = getContext('fetcher');
 
-  $: data = fetcher.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame);
-
   /**
    * @param {import('../../stores/params').SensorParam} sensor
    * @param {import('../../stores/params').RegionParam} region

@@ -1,5 +1,5 @@
 import { formatDateISO } from '../../formats';
-import { Region, Sensor, TimeFrame } from '../../stores/params';
+import { Region, RegionLevel, Sensor, TimeFrame } from '../../stores/params';
 
 function isArray<T>(v: T | readonly T[]): v is readonly T[] {
   return Array.isArray(v);
@@ -7,6 +7,9 @@ function isArray<T>(v: T | readonly T[]): v is readonly T[] {
 
 function regionKey(region: Region) {
   return `${region.id}@${region.level}`;
+}
+function levelKey(region: RegionLevel) {
+  return `*@${region}`;
 }
 
 function equalIds<T>(a: Set<T> | null, b: Set<T> | null): boolean {
@@ -32,7 +35,7 @@ export class WidgetHighlight {
 
   constructor(
     sensor: null | Sensor | readonly Sensor[],
-    region: null | Region | readonly Region[],
+    region: null | Region | readonly Region[] | RegionLevel,
     public readonly date: null | Date | TimeFrame,
   ) {
     if (sensor) {
@@ -47,7 +50,10 @@ export class WidgetHighlight {
     } else {
       this.sensorIds = null;
     }
-    if (region) {
+    if (typeof region === 'string') {
+      this.regionIds = new Set();
+      this.regionIds.add(levelKey(region));
+    } else if (region) {
       this.regionIds = new Set();
       if (isArray(region)) {
         for (const r of region) {
@@ -88,7 +94,13 @@ export class WidgetHighlight {
   }
 
   matchRegion(region: Region): boolean {
-    return this.regionIds == null || this.regionIds.has(regionKey(region));
+    return (
+      this.regionIds == null || this.regionIds.has(regionKey(region)) || this.regionIds.has(levelKey(region.level))
+    );
+  }
+
+  matchLevel(level: RegionLevel): boolean {
+    return this.regionIds === null || this.regionIds.has(levelKey(level));
   }
 
   matchDate(date: Date): boolean {
