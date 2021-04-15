@@ -211,8 +211,14 @@ function genMegaHoverLayer(alsoOnCounties = false): NormalizedUnitSpec {
 function genLevelLayer({
   strokeWidth = 1,
   scheme = 'yellowgreenblue',
-  domain = undefined,
-}: { strokeWidth?: number; scheme?: string; domain?: [number, number] } = {}): NormalizedUnitSpec {
+  domain,
+  initialRegion,
+}: {
+  strokeWidth?: number;
+  scheme?: string;
+  domain?: [number, number];
+  initialRegion?: string;
+} = {}): NormalizedUnitSpec {
   return {
     mark: {
       type: 'geoshape',
@@ -267,6 +273,11 @@ function genLevelLayer({
           on: 'mouseover, click',
           fields: ['geo_value'],
         },
+        value: initialRegion
+          ? {
+              geo_value: Array.isArray(initialRegion) ? initialRegion : [initialRegion],
+            }
+          : null,
       },
     ],
   };

@@ -1,4 +1,6 @@
 import { formatDateISO } from '../../formats';
+import { getInfoByName } from '../../maps/infos';
+import { sensorMap } from '../../stores';
 import { Region, RegionLevel, Sensor, TimeFrame } from '../../stores/params';
 
 function isArray<T>(v: T | readonly T[]): v is readonly T[] {
@@ -8,8 +10,18 @@ function isArray<T>(v: T | readonly T[]): v is readonly T[] {
 function regionKey(region: Region) {
   return `${region.id}@${region.level}`;
 }
+
 function levelKey(region: RegionLevel) {
   return `*@${region}`;
+}
+
+function levelFromKey(key: string): RegionLevel {
+  return key.split('@')[1] as RegionLevel;
+}
+
+function regionFromKey(key: string): Region {
+  const [id, level] = key.split('@');
+  return getInfoByName(id, level as RegionLevel)!;
 }
 
 function equalIds(a: Set<string> | null | string, b: Set<string> | null | string): boolean {
@@ -86,6 +98,31 @@ export class WidgetHighlight {
     } else {
       this.regionIds = null;
     }
+  }
+
+  get sensors(): '*' | Sensor[] {
+    if (this.sensorIds == null) {
+      return '*';
+    }
+    if (typeof this.sensorIds === 'string') {
+      return [sensorMap.get(this.sensorIds)!];
+    }
+    return [...this.sensorIds].map((d) => sensorMap.get(d)!);
+  }
+
+  get regions(): '*' | RegionLevel | Region[] {
+    if (this.regionIds == null) {
+      return '*';
+    }
+    if (typeof this.regionIds === 'string') {
+      return this.regionIds.startsWith('*') ? levelFromKey(this.regionIds) : [regionFromKey(this.regionIds)];
+    }
+    const ids = [...this.regionIds];
+    const level = ids.find((d) => d.startsWith('*'));
+    if (level) {
+      return levelFromKey(level);
+    }
+    return ids.map((d) => regionFromKey(d));
   }
 
   equalDate(date: null | Date | TimeFrame): boolean {

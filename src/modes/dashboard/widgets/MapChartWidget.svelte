@@ -3,7 +3,7 @@
   import WidgetCard from './WidgetCard.svelte';
   import { getContext } from 'svelte';
   import DownloadMenu from '../../mobile/components/DownloadMenu.svelte';
-  import { getLevelInfo, isMobileDevice, stats } from '../../../stores';
+  import { getLevelInfo, stats } from '../../../stores';
   import { formatDateISO, formatDateYearWeekdayAbbr } from '../../../formats';
   import RegionMapTooltip from '../../mobile/RegionMapTooltip.svelte';
   import {
@@ -14,6 +14,9 @@
     generateMSASpec,
     generateStateMapWithCountyDataSpec,
   } from '../../../specs/mapSpec';
+  import { getInfoByName } from '../../../maps';
+  import { WidgetHighlight } from '../highlight';
+  import isEqual from 'lodash-es/isEqual';
 
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -40,6 +43,20 @@
   const fetcher = getContext('fetcher');
 
   /**
+   * @param {import('../../../stores/params').RegionLevel} level
+   * @param {import('../highlight').WidgetHighlight | null} highlight
+   */
+  function highlightToRegions(level, highlight) {
+    if (!highlight || !highlight.matchLevel(level)) {
+      return undefined;
+    }
+    const regions = highlight.regions;
+    if (Array.isArray(regions)) {
+      return regions.filter((d) => d.level === level).map((d) => d.propertyId.toLowerCase());
+    }
+    return undefined;
+  }
+  /**
    * @param {import('../../../stores/params').SensorParam} sensor
    * @param {import('../../../stores/params').RegionLevel} level
    * @param {import("../../../stores/params").DateParam} date
@@ -53,6 +70,7 @@
       scheme: sensor.isInverted ? 'yellowgreenblue' : 'yelloworangered',
       title: [`${sensor.name} in US ${getLevelInfo(level).labelPlural}`, `on ${formatDateYearWeekdayAbbr(date.value)}`],
       subTitle: sensor.unit,
+      initialRegion: highlightToRegions(level, highlight),
     };
     const byLevel = {
       nation: generateNationSpec,
@@ -89,21 +107,56 @@
   $: data = loadData(sensor, shownLevel, date);
   $: fileName = generateFileName(sensor, shownLevel, date);
 
+  /**
+   * @type {Vega }
+   */
   let vegaRef = null;
 
   function onClickHandler(evt) {
     const item = evt.detail.item;
-    if ($isMobileDevice || !item || !item.datum || !item.datum.propertyId) {
+    if (!item || !item.datum || !item.datum.propertyId) {
       return; // no click on mobile
     }
-    // TODO
-    // region.set(item.datum, true);
+    const regionHighlight = new WidgetHighlight(
+      sensor.value,
+      getInfoByName(item.datum.propertyId, item.datum.level),
+      date.value,
+    );
+
+    if (!regionHighlight.equals(highlight)) {
+      highlight = regionHighlight;
+    }
   }
 
-  // $: {
-  //   updateHighlightedDate(highlight ? highlight)
-  // }
-  $: highlighted = highlight != null && highlight.matches(sensor.value, shownLevel, date.windowTimeFrame);
+  $: highlighted = highlight != null && highlight.matches(sensor.value, shownLevel, date.value);
+
+  function updateVegaHighlight(highlight) {
+    if (!vegaRef) {
+      return;
+    }
+    const view = vegaRef.vegaDirectAccessor();
+    if (!view) {
+      return;
+    }
+    const values = highlightToRegions(shownLevel, highlight);
+    const newValue = values
+      ? {
+          unit: 'layer_1',
+          fields: view.signal('hover_tuple_fields'),
+          values,
+        }
+      : null;
+    const currentValues = (view.signal('hover_tuple') || { values: [] }).values;
+    const newValues = values || [];
+    if (isEqual(currentValues, newValues)) {
+      return;
+    }
+    view.signal('hover_tuple', newValue);
+    view.runAsync();
+  }
+  $: {
+    updateVegaHighlight(highlight);
+  }
 </script>
 
 <WidgetCard width={2} height={2}>
