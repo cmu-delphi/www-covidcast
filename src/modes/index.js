@@ -27,6 +27,14 @@ const modes = [
       import(/* webpackChunkName: 'm-indicator' */ './mobile/MobileIndicatorOverview.svelte').then((r) => r.default),
   },
   {
+    id: 'correlation',
+    label: 'Indicator Correlation',
+    component: () =>
+      import(/* webpackChunkName: 'm-correlation' */ './correlation/IndicatorCorrelation.svelte').then(
+        (r) => r.default,
+      ),
+  },
+  {
     id: 'classic',
     label: 'Classic COVIDcast',
     component: () => import(/* webpackChunkName: 'm-old' */ './overview/Overview.svelte').then((r) => r.default),
@@ -70,12 +78,18 @@ const modes = [
         (r) => r.default,
       ),
   },
+  {
+    id: 'data-anomalies',
+    label: 'Data Anomalies',
+    component: () =>
+      import(/* webpackChunkName: 'm-data-anomalies' */ './data-anomalies/DataAnomalies.svelte').then((r) => r.default),
+  },
 ];
 
 export default modes;
 
 /**
- * @type {Record<'summary'|'timelapse'|'top10'|'export'|'single'|'survey-results'|'lab'|'classic'|'indicator'|'landing'|'indicator-status', Mode>}
+ * @type {Record<'summary'|'timelapse'|'top10'|'export'|'single'|'survey-results'|'lab'|'classic'|'indicator'|'landing'|'indicator-status'|'correlation'|'data-anomalies', Mode>}
  */
 export const modeByID = {};
 modes.forEach((mode) => (modeByID[mode.id] = mode));

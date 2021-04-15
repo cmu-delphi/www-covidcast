@@ -11,6 +11,7 @@ import {
   DEFAULT_SURVEY_SENSOR,
   DEFAULT_ENCODING,
   defaultRegionOnStartup,
+  DEFAULT_CORRELATION_SENSOR,
 } from './constants';
 import modes, { modeByID } from '../modes';
 import { parseAPITime } from '../data/utils';
@@ -48,6 +49,8 @@ function deriveFromPath(url) {
   const urlParams = new URLSearchParams(queryString);
 
   const sensor = urlParams.get('sensor');
+  const sensor2 = urlParams.get('sensor2');
+  const lag = urlParams.get('lag');
   const level = urlParams.get('level');
   const encoding = urlParams.get('encoding');
   const date = urlParams.get('date');
@@ -62,14 +65,22 @@ function deriveFromPath(url) {
   const mode = urlParams.get('mode') || modeFromPath();
 
   const modeObj = modes.find((d) => d.id === mode) || DEFAULT_MODE;
+  const resolveSensor =
+    sensor && sensorMap.has(sensor)
+      ? sensor
+      : modeObj === modeByID['survey-results']
+      ? DEFAULT_SURVEY_SENSOR
+      : DEFAULT_SENSOR;
   return {
     mode: modeObj,
-    sensor:
-      sensor && sensorMap.has(sensor)
-        ? sensor
-        : modeObj === modeByID['survey-results']
-        ? DEFAULT_SURVEY_SENSOR
-        : DEFAULT_SENSOR,
+    sensor: resolveSensor,
+    sensor2:
+      sensor2 && sensorMap.has(sensor2)
+        ? sensor2
+        : DEFAULT_CORRELATION_SENSOR === sensor2
+        ? DEFAULT_SENSOR
+        : DEFAULT_CORRELATION_SENSOR,
+    lag: lag ? Number.parseInt(lag, 10) : 0,
     level: levels.includes(level) ? level : DEFAULT_LEVEL,
     signalCasesOrDeathOptions: {
       cumulative: urlParams.has('signalC'),
@@ -97,6 +108,10 @@ export const currentMode = writable(defaultValues.mode);
 export const currentSensor = writable(defaultValues.sensor);
 export const currentSensorEntry = derived([currentSensor], ([$currentSensor]) => sensorMap.get($currentSensor));
 
+export const currentSensor2 = writable(defaultValues.sensor2);
+export const currentSensorEntry2 = derived([currentSensor2], ([$currentSensor]) => sensorMap.get($currentSensor));
+
+export const currentLag = writable(defaultValues.lag);
 /**
  * @type {import('svelte/store').Writable<import('../data').SensorEntry | null>}
  */
@@ -150,7 +165,7 @@ export const currentRegion = writable(defaultValues.region);
 /**
  * current region info (could also be null)
  */
-export const currentRegionInfo = derived([currentRegion], ([current]) => getInfoByName(current));
+export const currentRegionInfo = writable(getInfoByName(defaultValues.region));
 
 function deriveRecent() {
   if (!window.localStorage) {
@@ -200,20 +215,24 @@ export function selectByInfo(elem, reset = false) {
   if (elem === get(currentRegionInfo)) {
     if (reset) {
       currentRegion.set('');
+      currentRegionInfo.set(null);
     }
     return reset;
   }
   if (elem) {
     currentRegion.set(elem.propertyId);
+    // re lookup to have a clean info
+    currentRegionInfo.set(getInfoByName(elem.id, elem.level));
     // the info is derived
   } else {
     currentRegion.set('');
+    currentRegionInfo.set(null);
   }
   return true;
 }
 
 export function selectByFeature(feature, reset = false) {
-  return selectByInfo(feature ? getInfoByName(feature.properties.id) : null, reset);
+  return selectByInfo(feature ? getInfoByName(feature.properties.id, feature.properties.level) : null, reset);
 }
 
 export const colorScale = writable(scaleSequentialLog());
@@ -365,6 +384,8 @@ export const trackedUrlParams = derived(
   [
     currentMode,
     currentSensor,
+    currentSensor2,
+    currentLag,
     currentLevel,
     currentRegion,
     currentDate,
@@ -372,7 +393,7 @@ export const trackedUrlParams = derived(
     encoding,
     currentCompareSelection,
   ],
-  ([mode, sensor, level, region, date, signalOptions, encoding, compare]) => {
+  ([mode, sensor, sensor2, lag, level, region, date, signalOptions, encoding, compare]) => {
     const sensorEntry = sensorMap.get(sensor);
     const inMapMode = mode === modeByID.summary || mode === modeByID.timelapse;
 
@@ -386,6 +407,8 @@ export const trackedUrlParams = derived(
         sensor === DEFAULT_SENSOR
           ? null
           : sensor,
+      sensor2: mode === modeByID.correlation ? sensor2 : null,
+      lag: mode === modeByID.correlation ? lag : null,
       level:
         mode === modeByID.single ||
         mode === modeByID.export ||
@@ -394,7 +417,10 @@ export const trackedUrlParams = derived(
           ? null
           : level,
       region: mode === modeByID.export || mode === modeByID.timelapse ? null : region,
-      date: mode === modeByID.export || mode === modeByID.landing ? null : String(date),
+      date:
+        mode === modeByID.export || mode === modeByID.landing || mode === modeByID['indicator-status']
+          ? null
+          : String(date),
       signalC: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.cumulative,
       signalI: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.incidence,
       encoding: !inMapMode || encoding === DEFAULT_ENCODING ? null : encoding,
@@ -431,11 +457,17 @@ export function loadFromUrlState(state) {
   if (state.sensor != null && state.sensor !== get(currentSensor)) {
     currentSensor.set(state.sensor);
   }
+  if (state.sensor2 != null && state.sensor2 !== get(currentSensor2)) {
+    currentSensor2.set(state.sensor2);
+  }
+  if (state.lag != null && state.lag !== get(currentLag)) {
+    currentLag.set(state.lag);
+  }
   if (state.level != null && state.level !== get(currentLevel)) {
     currentLevel.set(state.level);
   }
   if (state.region != null && state.region !== get(currentRegion)) {
-    currentRegion.set(state.region);
+    selectByInfo(getInfoByName(state.region));
   }
   if (state.date != null && state.date !== get(currentDate)) {
     currentDate.set(state.date);

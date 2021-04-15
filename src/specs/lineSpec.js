@@ -33,12 +33,17 @@ export function resetOnClearHighlighTuple(date) {
   };
 }
 
-export function resolveHighlightedDate(e, dateField = 'date_value') {
+export function resolveHighlightedField(e, field) {
   const highlighted = e.detail.value;
-  if (highlighted && Array.isArray(highlighted[dateField]) && highlighted[dateField].length > 0) {
-    return new Date(highlighted[dateField][0]);
+  if (highlighted && Array.isArray(highlighted[field]) && highlighted[field].length > 0) {
+    return highlighted[field][0];
   }
   return null;
+}
+
+export function resolveHighlightedDate(e, field = 'date_value') {
+  const value = resolveHighlightedField(e, field);
+  return value != null ? new Date(value) : value;
 }
 
 export const signalPatches = {
@@ -53,14 +58,14 @@ export const signalPatches = {
 //   };
 // }
 
-function autoAlign(dateField = 'date_value') {
+export function autoAlign(dateField = 'date_value') {
   return {
     // auto align based on remaining space
     expr: `(width - scale('x', datum.${dateField})) < 40 ? 'right' : (scale('x', datum.${dateField})) > 40 ? 'center' : 'left'`,
   };
 }
 
-function genCreditsLayer({ shift = 55 } = {}) {
+export function genCreditsLayer({ shift = 55 } = {}) {
   /**
    * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
    */
@@ -252,11 +257,9 @@ export function generateLineChartSpec({
             type: 'temporal',
             axis: {
               title: xTitle,
-              titleFontWeight: 'normal',
               format: '%m/%d',
               formatType: 'cachedTime',
               labelExpr: labelYear,
-              labelFontSize: 14,
               labelOverlap: true,
               grid: true,
               gridDash: [4, 4],
@@ -422,7 +425,7 @@ export function generateLineAndBarSpec(options = {}) {
   const point = spec.layer[1];
   point.mark = {
     type: 'bar',
-    color: MULTI_COLORS[0],
+    color: options.color || MULTI_COLORS[0],
     width: {
       expr: `floor(width / customCountDays(domain('x')[0], domain('x')[1]))`,
     },

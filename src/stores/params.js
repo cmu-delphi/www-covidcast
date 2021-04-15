@@ -1,7 +1,7 @@
 import { timeDay, timeMonth, timeWeek } from 'd3-time';
 import { addNameInfos, fetchData, formatAPITime, addMissing, fitRange, parseAPITime } from '../data';
 import { nationInfo } from '../maps';
-import { currentDate, currentRegion, yesterdayDate, currentSensor, sensorList } from '.';
+import { currentDate, yesterdayDate, currentSensor, sensorList, selectByInfo } from '.';
 import { determineTrend } from './trend';
 import { determineMinMax } from '../components/MapBox/colors';
 import { formatValue } from '../formats';
@@ -67,6 +67,10 @@ export class TimeFrame {
     }
     const min = offset(max, -offsetFactor);
     return new TimeFrame(min, max);
+  }
+
+  shift(minShiftInDays = 0, maxShiftInDays = 0) {
+    return new TimeFrame(timeDay.offset(this.min, minShiftInDays), timeDay.offset(this.max, maxShiftInDays));
   }
 }
 
@@ -620,7 +624,8 @@ export class SensorParam {
   /**
    * @param {Sensor} sensor
    */
-  constructor(sensor) {
+  constructor(sensor, store = currentSensor) {
+    this.writeAbleStore = store;
     this.key = sensor.key;
     this.name = sensor.name;
     this.description = typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText({}) : sensor.mapTitleText;
@@ -628,6 +633,7 @@ export class SensorParam {
     this.value = sensor;
     this.rawValue = sensor.rawSensor;
     this.isCasesOrDeath = sensor.isCasesOrDeath || false;
+    this.dataSourceName = sensor.dataSourceName;
     // fractions as percentages here
     this.factor = sensor.format === 'fraction' ? 100 : 1;
     this.isPercentage = sensor.format == 'percent' || sensor.format === 'fraction';
@@ -652,7 +658,7 @@ export class SensorParam {
    */
   set(sensor, scrollTop = false) {
     if (sensor) {
-      currentSensor.set(sensor.key);
+      this.writeAbleStore.set(sensor.key);
     }
     if (scrollTop) {
       scrollToTop();
@@ -709,7 +715,7 @@ export class RegionParam {
    * @param {Region} region
    */
   set(region, scrollTop = false) {
-    currentRegion.set(region.propertyId);
+    selectByInfo(region);
     if (scrollTop) {
       scrollToTop();
     }

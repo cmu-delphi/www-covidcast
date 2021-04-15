@@ -79,3 +79,9 @@
 .grid-8-11 {
   grid-column: 8 / 11;
 }
+.grid-3-7 {
+  grid-column: 3 / 7;
+}
+.grid-7-11 {
+  grid-column: 7 / 11;
+}

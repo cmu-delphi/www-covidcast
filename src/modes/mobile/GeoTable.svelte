@@ -4,7 +4,6 @@
   import { generateSparkLine } from '../../specs/lineSpec';
   import Vega from '../../components/Vega.svelte';
   import SparkLineTooltip from './SparkLineTooltip.svelte';
-  import SortColumnIndicator from './SortColumnIndicator.svelte';
   import FancyHeader from './FancyHeader.svelte';
   import TrendIndicator from './TrendIndicator.svelte';
   import { formatDateISO, formatDateShortNumbers } from '../../formats';
@@ -13,6 +12,8 @@
   import SensorValue from './SensorValue.svelte';
   import DownloadMenu from './components/DownloadMenu.svelte';
   import IndicatorAnnotations from './IndicatorAnnotations.svelte';
+  import SortColumnIndicator from './components/SortColumnIndicator.svelte';
+  import { SortHelper } from './components/tableUtils';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -125,49 +126,16 @@
     return Promise.all([loadSingle(nationInfo, true), loadImpl(stateInfo)]).then((r) => r.flat());
   }
 
-  let sortCriteria = 'displayName';
-  let sortDirectionDesc = false;
-
-  function bySortCriteria(sortCriteria, sortDirectionDesc) {
-    const less = sortDirectionDesc ? 1 : -1;
-
-    function clean(a) {
-      // normalize NaN to null
-      return typeof a === 'number' && Number.isNaN(a) ? null : a;
+  const sort = new SortHelper('displayName', false, 'displayName', (a, b) => {
+    if (a.important && b.important) {
+      // state vs nation
+      return a.level === 'nation' ? -1 : 1;
     }
-    return (a, b) => {
-      if (a.important && b.important) {
-        // state vs nation
-        return a.level === 'nation' ? -1 : 1;
-      }
-      if (a.important !== b.important) {
-        return a.important ? -1 : 1;
-      }
-      const av = clean(a[sortCriteria]);
-      const bv = clean(b[sortCriteria]);
-      if ((av == null) !== (bv == null)) {
-        return av == null ? 1 : -1;
-      }
-      if (av !== bv) {
-        return av < bv ? less : -less;
-      }
-      if (a.displayName !== b.displayName) {
-        return a.displayName < b.displayName ? less : -less;
-      }
-      return 0;
-    };
-  }
-
-  function sortClick(prop, defaultSortDesc = false) {
-    if (sortCriteria === prop) {
-      sortDirectionDesc = !sortDirectionDesc;
-      return;
+    if (a.important !== b.important) {
+      return a.important ? -1 : 1;
     }
-    sortCriteria = prop;
-    sortDirectionDesc = defaultSortDesc;
-  }
-
-  $: comparator = bySortCriteria(sortCriteria, sortDirectionDesc);
+    return 0;
+  });
 
   $: title = determineTitle(region.value);
   $: regions = determineRegions(region.value);
@@ -182,6 +150,7 @@
   $: {
     loading = true;
     sortedRegions = regions.slice(0, showAll ? -1 : 10);
+    const comparator = $sort.comparator;
     loadedData.then((rows) => {
       sortedRegions = rows.sort(comparator).slice(0, showAll ? -1 : 10);
       loading = false;
@@ -226,28 +195,13 @@
     </tr>
     <tr>
       <th class="sort-indicator uk-text-center">
-        <SortColumnIndicator
-          label={title.unit}
-          on:click={() => sortClick('displayName')}
-          sorted={sortCriteria === 'displayName'}
-          desc={sortDirectionDesc}
-        />
+        <SortColumnIndicator label={title.unit} {sort} prop="displayName" />
       </th>
       <th class="sort-indicator">
-        <SortColumnIndicator
-          label="Change Last 7 days"
-          on:click={() => sortClick('delta')}
-          sorted={sortCriteria === 'delta'}
-          desc={sortDirectionDesc}
-        />
+        <SortColumnIndicator label="Change Last 7 days" {sort} prop="delta" />
       </th>
       <th class="sort-indicator">
-        <SortColumnIndicator
-          label="Value"
-          on:click={() => sortClick('value')}
-          sorted={sortCriteria === 'value'}
-          desc={sortDirectionDesc}
-        />
+        <SortColumnIndicator label="Value" {sort} prop="value" />
       </th>
       <th class="sort-indicator" />
     </tr>

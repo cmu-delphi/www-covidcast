@@ -191,6 +191,11 @@ module.exports = () => {
         filename: 'indicator/index.html',
       }),
       new HtmlWebpackPlugin({
+        title: 'COVIDcast Indicator Correlation',
+        template: './src/index.html',
+        filename: 'correlation/index.html',
+      }),
+      new HtmlWebpackPlugin({
         title: 'COVIDcast',
         template: './src/index.html',
         filename: 'classic/index.html',
@@ -224,6 +229,11 @@ module.exports = () => {
         title: 'COVIDcast Indicator Status Overview',
         template: './src/index.html',
         filename: 'indicator-status/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        title: 'COVIDcast Data Anomalies',
+        template: './src/index.html',
+        filename: 'data-anomalies/index.html',
       }),
       // new HtmlWebpackPlugin({
       //   title: 'COVIDcast Lab',

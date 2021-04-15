@@ -16,23 +16,28 @@
    * @type {Date}
    */
   export let date;
+  export let lag = 0; // in days
 
   export let onHighlight;
   export let highlightTimeValue;
 
-  $: highlightDate = highlightTimeValue != null ? parseAPITime(highlightTimeValue) : null;
+  $: lagMS = 1000 * 3600 * 24 * lag;
+  $: highlightDate = highlightTimeValue != null ? new Date(parseAPITime(highlightTimeValue).getTime() + lagMS) : null;
 
   // use local variables with manual setting for better value comparison updates
-  let startDay = $smallMultipleTimeSpan[0];
-  let endDay = $smallMultipleTimeSpan[1];
+  $: startDay = new Date($smallMultipleTimeSpan[0].getTime() + lagMS);
+  $: endDay = new Date($smallMultipleTimeSpan[1].getTime() + lagMS);
+  $: newStartDay = new Date($smallMultipleTimeSpan[0].getTime() + lagMS);
+  $: newEndDay = new Date($smallMultipleTimeSpan[1].getTime() + lagMS);
   $: {
-    if (startDay.getTime() !== $smallMultipleTimeSpan[0].getTime()) {
-      startDay = $smallMultipleTimeSpan[0];
+    if (startDay.getTime() !== newStartDay.getTime()) {
+      startDay = newStartDay;
     }
-    if (endDay.getTime() !== $smallMultipleTimeSpan[1].getTime()) {
-      endDay = $smallMultipleTimeSpan[1];
+    if (endDay.getTime() !== newEndDay.getTime()) {
+      endDay = newEndDay;
     }
   }
+
   /**
    * @type {import('../../stores').CompareSelection[]}
    */

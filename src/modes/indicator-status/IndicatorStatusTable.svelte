@@ -1,5 +1,5 @@
 <script>
-  import SortColumnIndicator from '../mobile/SortColumnIndicator.svelte';
+  import SortColumnIndicator from '../mobile/components/SortColumnIndicator.svelte';
   import FancyHeader from '../mobile/FancyHeader.svelte';
   import { formatDateISO, formatDateShortNumbers, formatFraction } from '../../formats';
   import DownloadMenu from '../mobile/components/DownloadMenu.svelte';
@@ -7,6 +7,7 @@
   import { generateSparkLine } from '../../specs/lineSpec';
   import { createEventDispatcher } from 'svelte';
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
+  import { SortHelper } from '../mobile/components/tableUtils';
 
   const dispatch = createEventDispatcher();
   /**
@@ -14,43 +15,7 @@
    */
   export let date;
 
-  let sortCriteria = 'name';
-  let sortDirectionDesc = false;
-
-  function bySortCriteria(sortCriteria, sortDirectionDesc) {
-    const less = sortDirectionDesc ? 1 : -1;
-
-    function clean(a) {
-      // normalize NaN to null
-      return typeof a === 'number' && Number.isNaN(a) ? null : a;
-    }
-    return (a, b) => {
-      const av = clean(a[sortCriteria]);
-      const bv = clean(b[sortCriteria]);
-      if ((av == null) !== (bv == null)) {
-        return av == null ? 1 : -1;
-      }
-      if (av !== bv) {
-        return av < bv ? less : -less;
-      }
-      if (a.name !== b.name) {
-        return a.name < b.name ? less : -less;
-      }
-      return 0;
-    };
-  }
-
-  function sortClick(prop, defaultSortDesc = false) {
-    if (sortCriteria === prop) {
-      sortDirectionDesc = !sortDirectionDesc;
-      return;
-    }
-    sortCriteria = prop;
-    sortDirectionDesc = defaultSortDesc;
-  }
-
-  $: comparator = bySortCriteria(sortCriteria, sortDirectionDesc);
-
+  const sort = new SortHelper('name', false, 'name');
   /**
    * @type {Promise<import('./data').ExtendedStatus[]>}
    */
@@ -68,6 +33,7 @@
   $: {
     loading = true;
     sortedData = [];
+    const comparator = $sort.comparator;
     data.then((rows) => {
       sortedData = rows.slice().sort(comparator);
       loading = false;
@@ -121,44 +87,19 @@
     </tr>
     <tr>
       <th class="sort-indicator uk-text-center">
-        <SortColumnIndicator
-          label="Name"
-          on:click={() => sortClick('name')}
-          sorted={sortCriteria === 'name'}
-          desc={sortDirectionDesc}
-        />
+        <SortColumnIndicator label="Name" {sort} prop="name" />
       </th>
       <th class="sort-indicator">
-        <SortColumnIndicator
-          label="Latest Issue Date"
-          on:click={() => sortClick('latest_issue')}
-          sorted={sortCriteria === 'latest_issue'}
-          desc={sortDirectionDesc}
-        />
+        <SortColumnIndicator label="Latest Issue Date" {sort} prop="latest_issue" />
       </th>
       <th class="sort-indicator">
-        <SortColumnIndicator
-          label="Latest Data Date"
-          on:click={() => sortClick('latest_time_value')}
-          sorted={sortCriteria === 'latest_time_value'}
-          desc={sortDirectionDesc}
-        />
+        <SortColumnIndicator label="Latest Data Date" {sort} prop="latest_time_value" />
       </th>
       <th class="sort-indicator">
-        <SortColumnIndicator
-          label="Lag"
-          on:click={() => sortClick('latest_lag')}
-          sorted={sortCriteria === 'latest_lag'}
-          desc={sortDirectionDesc}
-        />
+        <SortColumnIndicator label="Lag" {sort} prop="latest_lag" />
       </th>
       <th class="sort-indicator">
-        <SortColumnIndicator
-          label="Latest Coverage"
-          on:click={() => sortClick('latest_coverage')}
-          sorted={sortCriteria === 'latest_coverage'}
-          desc={sortDirectionDesc}
-        />
+        <SortColumnIndicator label="Latest Coverage" {sort} prop="latest_coverage" />
       </th>
       <th class="sort-indicator" />
       <th class="sort-indicator" />
@@ -168,7 +109,7 @@
     {#each sortedData as r (r.name)}
       <tr>
         <td>
-          <a href="#{r.name}" on:click|preventDefault={() => dispatch('select', r)}>{r.name}</a>
+          <a href="#{r.id}" on:click|preventDefault={() => dispatch('select', r)}>{r.name}</a>
         </td>
         <td class="uk-text-right">
           {formatDateISO(r.latest_issue)}
@@ -188,7 +129,7 @@
           </div>
         </td>
         <td>
-          <a href="#{r.name}" class="uk-link-text details-link" on:click|preventDefault={() => dispatch('select', r)}>
+          <a href="#{r.id}" class="uk-link-text details-link" on:click|preventDefault={() => dispatch('select', r)}>
             {@html chevronRightIcon}
           </a>
         </td>

@@ -5,6 +5,7 @@ import { Error, expressionFunction, projection } from 'vega';
 import { geoAlbersUsaTerritories } from 'geo-albers-usa-territories';
 import { fitExtent, fitSize, fitWidth, fitHeight } from 'd3-geo/src/projection/fit.js';
 import { timeDay } from 'd3-time';
+import { lagToOffset } from '../data/correlationUtils';
 
 function patchedAlbersUsaTerritories() {
   // see https://github.com/stamen/geo-albers-usa-territories/pull/8/files
@@ -53,6 +54,8 @@ export function cachedNumber(datum, params) {
 
 expressionFunction('cachedTime', cachedTime);
 expressionFunction('cachedNumber', cachedNumber);
+
+expressionFunction('lagToOffset', lagToOffset);
 
 /**
  * @param {string | HTMLElement} root

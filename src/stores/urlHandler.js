@@ -17,7 +17,7 @@ export function updateURIParameters(state) {
   });
   const path = `${window.DELPHI_COVIDCAST_PAGE || '/'}${state.path}`;
   const query = params.toString();
-  const url = `${path}${query.length > 0 ? '?' : ''}${query}`;
+  const url = `${path}${query.length > 0 ? '?' : ''}${query}${window.location.hash}`;
 
   // update only if the state has changed
   const old = window.history.state || {};
@@ -40,6 +40,13 @@ export function updateURIParameters(state) {
   } else {
     window.history.replaceState(state.state, document.title, url);
   }
+}
+
+export function updateHash(hash = '') {
+  const url = new URL(window.location.href);
+  url.hash = hash ? `#${hash}` : '';
+  const old = window.history.state || {};
+  window.history.replaceState(old, document.title, url.toString());
 }
 
 trackedUrlParams.subscribe(throttle(updateURIParameters, 250));

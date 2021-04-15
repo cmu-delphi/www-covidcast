@@ -207,6 +207,7 @@
 }
 
 .chart-300,
+.chart-150,
 .chart-50 {
   position: relative;
 }
@@ -215,7 +216,10 @@
   width: 100%;
   height: 300px;
 }
-
+.chart-150 > .vega-embed {
+  width: 100%;
+  height: 150px;
+}
 .chart-50 > .vega-embed {
   width: 100%;
   height: 50px;
@@ -233,6 +237,21 @@
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+.chart-breakout.vega-embed,
+.chart-breakout > .vega-embed {
+  --max-width: 95vw;
+  /* breakout the chart up to 80vw */
+  width: max(100%, var(--max-width));
+  margin-left: calc(-0.5 * var(--max-width) + 50%);
+}
+
+@media only screen and (min-width: 1600px) {
+  .chart-breakout.vega-embed,
+  .chart-breakout > .vega-embed {
+    --max-width: 80vw;
+  }
 }
 
 .mobile-map > canvas {

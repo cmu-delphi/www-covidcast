@@ -15,7 +15,7 @@
   import { scrollIntoView } from '../../util';
   import { modeByID } from '..';
 
-  $: sensor = new SensorParam($currentSensorEntry, $times);
+  $: sensor = new SensorParam($currentSensorEntry);
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
   $: region = new RegionParam($currentRegionInfo);
 
@@ -49,7 +49,7 @@
       <hr />
       <FancyHeader invert sub="Chart" anchor="chart">{CASES.name}</FancyHeader>
       <div class="chart-300">
-        <HistoryLineChart sensor={CASES} {date} {region} {fetcher} />
+        <HistoryLineChart sensor={CASES} {date} {region} {fetcher} expandableWindow />
       </div>
       <hr />
       <AllIndicatorOverview {date} {region} {fetcher} />

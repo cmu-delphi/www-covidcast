@@ -39,6 +39,7 @@
       modern
       {placeholder}
       {items}
+      title="Region"
       icon="location"
       selectedItem={$currentRegionInfo || defaultItem}
       labelFieldName="displayName"
