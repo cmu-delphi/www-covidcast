@@ -584,14 +584,18 @@ export class DateParam {
   readonly sparkLineTimeFrame: TimeFrame;
   readonly windowTimeFrame: TimeFrame;
 
-  constructor(date: Date, sensor?: Sensor, timeLookup?: Map<string, [number, number]>) {
+  constructor(date: Date, sensor?: Sensor | TimeFrame, timeLookup?: Map<string, [number, number]>) {
     this.timeValue = toTimeValue(date);
     this.value = date;
     this.allTimeFrame = ALL_TIME_FRAME;
     this.sensorTimeFrame = ALL_TIME_FRAME;
-    const entry = sensor && timeLookup ? timeLookup.get(sensor.key) : null;
-    if (entry) {
-      this.sensorTimeFrame = new TimeFrame(parseAPITime(entry[0]), parseAPITime(entry[1]));
+    if (sensor instanceof TimeFrame) {
+      this.sensorTimeFrame = sensor;
+    } else {
+      const entry = sensor && timeLookup ? timeLookup.get(sensor.key) : null;
+      if (entry) {
+        this.sensorTimeFrame = new TimeFrame(parseAPITime(entry[0]), parseAPITime(entry[1]));
+      }
     }
     this.sparkLineTimeFrame = TimeFrame.compute(
       date,
@@ -605,6 +609,11 @@ export class DateParam {
       WINDOW_SIZE,
       this.sensorTimeFrame.max,
     );
+  }
+
+  shift(days: number): DateParam {
+    const shifted = timeDay.offset(this.value, days);
+    return new DateParam(shifted, this.sensorTimeFrame);
   }
 
   set(date: Date): void {

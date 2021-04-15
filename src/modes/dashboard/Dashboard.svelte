@@ -48,6 +48,8 @@
       <LineChartWidget {sensor} {date} {region} bind:highlight />
       <MapChartWidget {sensor} {date} level={region.level} bind:highlight />
       <KPIWidget {sensor} {date} {region} bind:highlight />
+      <KPIWidget {sensor} date={date.shift(1)} {region} bind:highlight />
+      <KPIWidget {sensor} date={date.shift(2)} {region} bind:highlight />
     </div>
   </div>
 </div>
