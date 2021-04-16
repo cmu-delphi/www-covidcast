@@ -1,6 +1,26 @@
 import { rgb, hsl } from 'd3-color';
 import ResizeObserver from 'resize-observer-polyfill';
 
+export function useWhiteTextColor(bgColor) {
+  const color = rgb(bgColor);
+
+  function normalizeChannel(channel) {
+    const v = channel / 255;
+    if (v < 0.03928) {
+      return v / 12.92;
+    }
+    return Math.pow((v + 0.055) / 1.055, 2.4);
+  }
+  const r = normalizeChannel(color.r);
+  const g = normalizeChannel(color.g);
+  const b = normalizeChannel(color.b);
+  const relLuminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+
+  const blackContrast = (relLuminance + 0.05) / (0.0 + 0.05);
+  const whiteContrast = (1.0 + 0.05) / (relLuminance + 0.05);
+  return blackContrast < whiteContrast;
+}
+
 export function getTextColorBasedOnBackground(bgColor) {
   const color = hsl(bgColor);
   return color.l > 0.32 ? '#000' : '#fff';
