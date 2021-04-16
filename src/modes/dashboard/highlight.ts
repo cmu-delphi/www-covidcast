@@ -223,3 +223,14 @@ export class WidgetHighlight {
     return this.toString();
   }
 }
+
+export function highlightToRegions(level: RegionLevel, highlight: WidgetHighlight | null): Region[] | undefined {
+  if (!highlight || !highlight.matchLevel(level)) {
+    return undefined;
+  }
+  const regions = highlight.regions;
+  if (Array.isArray(regions)) {
+    return regions.filter((d) => d.level === level);
+  }
+  return undefined;
+}

@@ -15,7 +15,7 @@
     generateStateMapWithCountyDataSpec,
   } from '../../../specs/mapSpec';
   import { getInfoByName } from '../../../maps';
-  import { WidgetHighlight } from '../highlight';
+  import { highlightToRegions, WidgetHighlight } from '../highlight';
   import isEqual from 'lodash-es/isEqual';
   import { resolveHighlightedField } from '../../../specs/lineSpec';
 
@@ -47,13 +47,10 @@
    * @param {import('../../../stores/params').RegionLevel} level
    * @param {import('../highlight').WidgetHighlight | null} highlight
    */
-  function highlightToRegions(level, highlight) {
-    if (!highlight || !highlight.matchLevel(level)) {
-      return undefined;
-    }
-    const regions = highlight.regions;
-    if (Array.isArray(regions)) {
-      return regions.filter((d) => d.level === level).map((d) => d.propertyId.toLowerCase());
+  function highlightToRegionsImpl(level, highlight) {
+    const r = highlightToRegions(level, highlight);
+    if (r) {
+      return r.map((d) => d.propertyId.toLowerCase());
     }
     return undefined;
   }
@@ -71,7 +68,7 @@
       scheme: sensor.isInverted ? 'yellowgreenblue' : 'yelloworangered',
       title: [`${sensor.name} in US ${getLevelInfo(level).labelPlural}`, `on ${formatDateYearWeekdayAbbr(date.value)}`],
       subTitle: sensor.unit,
-      initialRegion: highlightToRegions(level, highlight),
+      initialRegion: highlightToRegionsImpl(level, highlight),
     };
     const byLevel = {
       nation: generateNationSpec,
@@ -135,7 +132,7 @@
     if (!view) {
       return;
     }
-    const values = highlightToRegions(shownLevel, highlight);
+    const values = highlightToRegionsImpl(shownLevel, highlight);
     const newValue = values
       ? {
           unit: 'layer_1',

@@ -8,6 +8,7 @@
   import { WidgetHighlight } from './highlight';
   import LineChartWidget from './widgets/LineChartWidget.svelte';
   import MapChartWidget from './widgets/MapChartWidget.svelte';
+  import HexMapChartWidget from './widgets/HexMapChartWidget.svelte';
 
   $: sensor = new SensorParam($currentSensorEntry, currentSensor, $times);
   $: sensor2 = new SensorParam($currentSensorEntry2, currentSensor2, $times);
@@ -52,6 +53,7 @@
       <KPIWidget {sensor} {date} {region} bind:highlight />
       <KPIWidget {sensor} date={date.shift(1)} {region} bind:highlight />
       <KPIWidget {sensor} date={date.shift(2)} {region} bind:highlight />
+      <HexMapChartWidget {sensor} {date} bind:highlight />
     </div>
   </div>
 </div>
