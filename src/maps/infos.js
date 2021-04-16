@@ -150,8 +150,21 @@ function addInfo(d) {
     infoLookup.set(levelPrefix + key, d);
   }
 }
-nameInfos.forEach(addInfo);
+nameInfos.forEach((d) => addInfo(d));
 addInfo(nationInfo);
+
+megaCountyInfo.forEach((d) => {
+  // find mega counties also by county level
+  const levelPrefix = 'county:';
+  const id = String(d.propertyId).toLowerCase();
+  if (!infoLookup.has(levelPrefix + id)) {
+    infoLookup.set(levelPrefix + id, d);
+  }
+  const key = String(d.id).toLowerCase();
+  if (!infoLookup.has(levelPrefix + key)) {
+    infoLookup.set(levelPrefix + key, d);
+  }
+});
 
 for (const alias of [
   ['02270', '02158'],
