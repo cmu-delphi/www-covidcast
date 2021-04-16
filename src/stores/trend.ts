@@ -1,6 +1,7 @@
 import { timeDay } from 'd3-time';
 import type { EpiDataRow } from '../data';
 import { formatFraction } from '../formats';
+import type { Sensor } from './constants';
 import { toTimeValue } from './params';
 
 const trendThreshold = 0.1;
@@ -63,6 +64,10 @@ export interface TrendInfo {
   isDecreasing: boolean;
   isSteady: boolean;
   isUnknown: boolean;
+
+  highValuesAre: Sensor['highValuesAre'];
+
+  isNeutral: boolean;
   /**
    * increasing or decreasing based on the inverted state
    */
@@ -99,7 +104,12 @@ export interface Trend extends TrendInfo {
   bestTrend: TrendInfo | null;
 }
 
-function computeTrend(ref: EpiDataRow, current: EpiDataRow, min: EpiDataRow, isInverted: boolean): TrendInfo {
+function computeTrend(
+  ref: EpiDataRow,
+  current: EpiDataRow,
+  min: EpiDataRow,
+  highValuesAre: Sensor['highValuesAre'],
+): TrendInfo {
   const change = toTrend(current.value, ref.value, min.value);
   const [type, trendText, trendReason] = toTrendText(change);
   const inc = type === 'inc';
@@ -109,8 +119,10 @@ function computeTrend(ref: EpiDataRow, current: EpiDataRow, min: EpiDataRow, isI
     isIncreasing: inc,
     isSteady: type === 'steady',
     isDecreasing: dec,
-    isBetter: (isInverted && inc) || (!isInverted && dec),
-    isWorse: (isInverted && dec) || (!isInverted && inc),
+    highValuesAre,
+    isBetter: (highValuesAre === 'good' && inc) || (highValuesAre === 'bad' && dec),
+    isWorse: (highValuesAre === 'good' && dec) || (highValuesAre === 'bad' && inc),
+    isNeutral: highValuesAre === 'neutral' && type !== 'steady',
     isUnknown: false,
     trendReason,
     change,
@@ -130,6 +142,7 @@ export const UNKNOWN_TREND: Trend = {
   isSteady: false,
   isDecreasing: false,
   isUnknown: true,
+  isNeutral: false,
   isBetter: false,
   isWorse: false,
   current: null,
@@ -144,6 +157,7 @@ export const UNKNOWN_TREND: Trend = {
   max: null,
   minDate: null,
   maxDate: null,
+  highValuesAre: 'bad',
   worst: null,
   worstDate: null,
   best: null,
@@ -154,13 +168,13 @@ export const UNKNOWN_TREND: Trend = {
   worstTrend: null,
 };
 
-export function determineTrend(date: Date, data: readonly EpiDataRow[], isInverted = false): Trend {
+export function determineTrend(date: Date, data: readonly EpiDataRow[], highValuesAre: Sensor['highValuesAre']): Trend {
   const { min, max } = findMinMaxRow(data);
   const dateRow = findDateRow(date, data);
   const refDate = timeDay.offset(date, -7);
 
-  const worst = isInverted ? min : max;
-  const best = isInverted ? max : min;
+  const worst = highValuesAre === 'good' ? min : max;
+  const best = highValuesAre === 'good' ? max : min;
   const trend: Trend = {
     ...UNKNOWN_TREND,
     refDate,
@@ -168,6 +182,7 @@ export function determineTrend(date: Date, data: readonly EpiDataRow[], isInvert
     minDate: min ? min.date_value : null,
     max,
     maxDate: max ? max.date_value : null,
+    highValuesAre,
     worst,
     worstDate: worst ? worst.date_value : null,
     best,
@@ -178,10 +193,10 @@ export function determineTrend(date: Date, data: readonly EpiDataRow[], isInvert
     return trend;
   }
   trend.current = dateRow;
-  trend.minTrend = computeTrend(min, dateRow, min, isInverted);
-  trend.maxTrend = max ? computeTrend(max, dateRow, min, isInverted) : null;
-  trend.worstTrend = isInverted ? trend.minTrend : trend.maxTrend;
-  trend.bestTrend = isInverted ? trend.maxTrend : trend.minTrend;
+  trend.minTrend = computeTrend(min, dateRow, min, highValuesAre);
+  trend.maxTrend = max ? computeTrend(max, dateRow, min, highValuesAre) : null;
+  trend.worstTrend = highValuesAre === 'good' ? trend.minTrend : trend.maxTrend;
+  trend.bestTrend = highValuesAre === 'good' ? trend.maxTrend : trend.minTrend;
 
   let refRow = findDateRow(refDate, data);
   if (!refRow) {
@@ -203,7 +218,7 @@ export function determineTrend(date: Date, data: readonly EpiDataRow[], isInvert
   }
   return {
     ...trend,
-    ...computeTrend(refRow, dateRow, min, isInverted),
+    ...computeTrend(refRow, dateRow, min, highValuesAre),
     ref: refRow,
   };
 }

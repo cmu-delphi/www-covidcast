@@ -3,7 +3,7 @@ import { formatAPITime } from '../data/utils';
 import descriptions from './descriptions.generated.json';
 import { modeByID } from '../modes';
 import { formatRawValue, formatValue, formatPercentage } from '../formats';
-import { interpolateYlGnBu, interpolateYlOrRd } from 'd3-scale-chromatic';
+import { interpolateBuPu, interpolateYlGnBu, interpolateYlOrRd } from 'd3-scale-chromatic';
 import { getDataSource } from './dataSourceLookup';
 import type { RegionLevel } from '../maps/interfaces';
 // import { generateMockSignal, generateMockMeta } from '../data/mock';
@@ -87,6 +87,7 @@ export interface Sensor {
   readonly description?: string; // HTML long text description
   readonly signalTooltip: string; // short text description
   readonly colorScale: (this: void, v: number) => string;
+  readonly vegaColorScale: string;
 
   readonly links: readonly string[]; // more information links
   readonly credits?: string; // credit text
@@ -94,7 +95,7 @@ export interface Sensor {
   readonly format: 'raw' | 'per100k' | 'percent' | 'fraction';
   readonly xAxis: string; // x axis title
   readonly yAxis: string; // y axis value unit long
-  readonly isInverted: boolean;
+  readonly highValuesAre: 'good' | 'bad' | 'neutral';
   readonly is7DayAverage: boolean;
   readonly hasStdErr: boolean;
   formatValue(v: number, enforceSign?: boolean): string;
@@ -102,12 +103,37 @@ export interface Sensor {
   readonly highlight?: string[];
 }
 
+function determineHighValuesAre(sensor: {
+  isInverted?: boolean;
+  highValuesAre?: Sensor['highValuesAre'];
+}): Sensor['highValuesAre'] {
+  if (typeof sensor.isInverted === 'boolean') {
+    return sensor.isInverted ? 'good' : 'bad';
+  }
+  const given = sensor.highValuesAre;
+  if (given === 'bad' || given === 'good' || given === 'neutral') {
+    return given;
+  }
+  return 'bad';
+}
+
+const colorScales = {
+  good: interpolateYlGnBu,
+  bad: interpolateYlOrRd,
+  neutral: interpolateBuPu,
+};
+const vegaColorScales = {
+  good: 'yellowgreenblue',
+  bad: 'yelloworangered',
+  neutral: 'bluepurple',
+};
+
 export function ensureSensorStructure(
-  sensor: Partial<Sensor> & { id: string; signal: string; tooltipText?: unknown },
+  sensor: Partial<Sensor> & { name: string; id: string; signal: string; tooltipText?: unknown },
 ): Sensor {
   const key = `${sensor.id}-${sensor.signal}`;
 
-  const isInverted = sensor.isInverted || false;
+  const highValuesAre = determineHighValuesAre(sensor);
   const format = sensor.format || 'raw';
 
   const formatter = {
@@ -137,7 +163,8 @@ export function ensureSensorStructure(
     levels: ['state'],
     description: sensor.signalTooltip || 'No description available',
     signalTooltip: typeof sensor.tooltipText === 'string' ? sensor.tooltipText : 'No description available',
-    colorScale: isInverted ? interpolateYlGnBu : interpolateYlOrRd,
+    colorScale: colorScales[highValuesAre],
+    vegaColorScale: vegaColorScales[highValuesAre],
 
     links: [],
     credits: 'We are happy for you to use this data in products and publications.',
@@ -146,7 +173,7 @@ export function ensureSensorStructure(
     xAxis: 'Date',
     yAxis: yAxis[format] || yAxis.raw,
     unit: unit[format] || unit.raw,
-    isInverted,
+    highValuesAre,
     is7DayAverage: false,
     hasStdErr: false,
     formatValue: formatter[format] || formatter.raw,
@@ -162,7 +189,7 @@ export function ensureSensorStructure(
       rawSensor: {
         ...full,
         key: `${sensor.id}-${rawSignal}`,
-        name: `${full.name!.replace('(7-day average)', '')} (Raw)`,
+        name: `${full.name.replace('(7-day average)', '')} (Raw)`,
         description: full.description.replace('(7-day average)', ''),
         signal: rawSignal,
         is7DayAverage: false,
@@ -258,7 +285,9 @@ export function getType(
   return 'other';
 }
 
-export function extendSensorEntry(sensorEntry: Partial<SensorEntry> & { id: string; signal: string }): SensorEntry {
+export function extendSensorEntry(
+  sensorEntry: Partial<SensorEntry> & { name: string; id: string; signal: string },
+): SensorEntry {
   const key = `${sensorEntry.id}-${sensorEntry.signal}`;
   const isCasesOrDeath = isCasesSignal(key) || isDeathSignal(key);
   const isCount = isCountSignal(key);
@@ -276,8 +305,8 @@ export function extendSensorEntry(sensorEntry: Partial<SensorEntry> & { id: stri
     isCount,
     getType: (options: CasesOrDeathOptions) => getType(sensorEntry, options),
     isCasesOrDeath: false as const,
-    plotTitleText: sensorEntry.plotTitleText || sensorEntry.name!,
-    mapTitleText: sensorEntry.mapTitleText!,
+    plotTitleText: sensorEntry.plotTitleText || sensorEntry.name,
+    mapTitleText: sensorEntry.mapTitleText as string,
   });
   if (!isCasesOrDeath) {
     return full;
@@ -317,7 +346,7 @@ export function extendSensorEntry(sensorEntry: Partial<SensorEntry> & { id: stri
       xAxis: full.xAxis,
       format: ratio ? 'per100k' : 'raw',
       unit: ratio ? 'per 100,000 people' : 'people',
-      isInverted: false,
+      highValuesAre: 'bad',
       is7DayAverage: true,
       hasStdErr: full.hasStdErr,
       signalTooltip: casesOrDeath.mapTitleText(options),
@@ -337,7 +366,11 @@ export function extendSensorEntry(sensorEntry: Partial<SensorEntry> & { id: stri
  */
 export const regularSignalMetaDataGeoTypeCandidates = ['county', 'msa'];
 
-const defaultSensors = (descriptions as unknown) as (Partial<SensorEntry> & { id: string; signal: string })[];
+const defaultSensors = (descriptions as unknown) as (Partial<SensorEntry> & {
+  name: string;
+  id: string;
+  signal: string;
+})[];
 
 /**
  * @type {SensorEntry[]}
