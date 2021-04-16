@@ -321,15 +321,17 @@ export function generateLineChartSpec({
               // padding: zero ? undefined : smartPadding(valueField),
             },
           },
-          opacity: highlightRegion
+          ...(highlightRegion
             ? {
-                condition: {
-                  test: 'highlightRegion != null && highlightRegion !== datum.id',
-                  value: 0.1,
+                opacity: {
+                  condition: {
+                    test: 'highlightRegion != null && highlightRegion !== datum.id',
+                    value: 0.1,
+                  },
+                  value: 1,
                 },
-                value: 1,
               }
-            : {},
+            : {}),
         },
       },
       {
