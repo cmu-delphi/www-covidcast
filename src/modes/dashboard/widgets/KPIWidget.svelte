@@ -35,17 +35,13 @@
 
   $: selfHighlight = new WidgetHighlight(sensor.value, region.value, date.value);
 
-  let bakHighlight = null;
   function onMouseEnter() {
-    bakHighlight = highlight;
     if (!selfHighlight.equals(highlight)) {
       highlight = selfHighlight;
     }
   }
   function onMouseLeave() {
-    if (highlight && !highlight.equals(bakHighlight)) {
-      highlight = bakHighlight;
-    }
+    highlight = null;
   }
 </script>
 

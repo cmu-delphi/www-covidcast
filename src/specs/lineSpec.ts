@@ -184,6 +184,27 @@ export function genAnnotationLayer(
   };
 }
 
+function genEmptyHighlightLayer(): NormalizedLayerSpec | NormalizedUnitSpec {
+  return {
+    data: {
+      values: [
+        {
+          text: '',
+        },
+      ],
+    },
+    mark: {
+      type: 'text',
+      baseline: 'bottom',
+      fontSize: 16,
+      dy: -3,
+      y: 0,
+      x: 0,
+      text: '',
+    },
+  };
+}
+
 export interface LineSpecOptions {
   width?: number;
   height?: number;
@@ -411,6 +432,7 @@ export function generateLineChartSpec({
           },
         ],
       },
+      genEmptyHighlightLayer(),
     ],
   };
 }
