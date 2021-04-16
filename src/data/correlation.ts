@@ -80,7 +80,7 @@ function generateLags<T extends { value: number }>(a: readonly T[], b: readonly 
     const bLag = b.slice(lag - i, b.length - i);
     const bValuesLag = bValues.slice(lag - i, b.length - i);
     const model = linear(zip(aWindowValues, bValuesLag));
-    lags.push(asLag(-i, model, aWindow, bLag));
+    lags.push(asLag(i === 0 ? 0 : -i, model, aWindow, bLag));
   }
 
   for (let i = 1; i <= lag; i++) {
