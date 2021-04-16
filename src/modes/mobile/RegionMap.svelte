@@ -32,7 +32,7 @@
     const options = {
       domain: sensor.domain(stats, region.level === 'state' || region.level === 'county' ? 'county' : 'state'),
       withStates: true,
-      scheme: sensor.isInverted ? 'yellowgreenblue' : 'yelloworangered',
+      scheme: sensor.vegaColorScale,
     };
     if (region.level === 'state') {
       return generateCountiesOfStateSpec(region.value, options);
