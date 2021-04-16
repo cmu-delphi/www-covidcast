@@ -9,6 +9,7 @@
   import LineChartWidget from './widgets/LineChartWidget.svelte';
   import MapChartWidget from './widgets/MapChartWidget.svelte';
   import HexMapChartWidget from './widgets/HexMapChartWidget.svelte';
+  import KPITrendWidget from './widgets/KPITrendWidget.svelte';
 
   $: sensor = new SensorParam($currentSensorEntry, currentSensor, $times);
   $: sensor2 = new SensorParam($currentSensorEntry2, currentSensor2, $times);
@@ -51,8 +52,7 @@
       <MapChartWidget {sensor} {date} level={region.level} bind:highlight />
       <LineChartWidget sensor={sensor2} timeFrame={sensor2.timeFrame} wide {region} bind:highlight />
       <KPIWidget {sensor} {date} {region} bind:highlight />
-      <KPIWidget {sensor} date={date.shift(1)} {region} bind:highlight />
-      <KPIWidget {sensor} date={date.shift(2)} {region} bind:highlight />
+      <KPITrendWidget {sensor} {date} {region} bind:highlight />
       <HexMapChartWidget {sensor} {date} bind:highlight />
     </div>
   </div>

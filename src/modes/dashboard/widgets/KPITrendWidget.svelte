@@ -1,7 +1,7 @@
 <script>
   import { getContext } from 'svelte';
-  import SensorUnit from '../../mobile/SensorUnit.svelte';
-  import SurveyValue from '../../survey/SurveyValue.svelte';
+  import TrendIndicator from '../../mobile/TrendIndicator.svelte';
+  import TrendTextSummary from '../../mobile/TrendTextSummary.svelte';
   import { WidgetHighlight } from '../highlight';
   import WidgetCard from './WidgetCard.svelte';
   import WidgetTitle from './WidgetTitle.svelte';
@@ -30,7 +30,7 @@
    */
   const fetcher = getContext('fetcher');
 
-  $: data = fetcher.fetch1Sensor1Region1DateDetails(sensor, region, date);
+  $: data = fetcher.fetchWindowTrend(sensor, region, date);
   $: highlighted = highlight != null && highlight.matches(sensor.value, region.value, date.value);
 
   $: selfHighlight = new WidgetHighlight(sensor.value, region.value, date.value);
@@ -47,19 +47,19 @@
 
 <WidgetCard {highlighted}>
   <div class="content" on:mouseenter={onMouseEnter} on:mouseleave={onMouseLeave}>
-    <WidgetTitle {sensor} {date} {region} unit={false} />
+    <WidgetTitle {sensor} {date} {region} unit={false}>
+      {region.displayName}
+    </WidgetTitle>
     <div class="kpi">
       <div>
         {#await data}
-          <SurveyValue value={null} />
+          <TrendIndicator trend={null} long />
         {:then d}
-          <SurveyValue value={d ? d.value : null} />
+          <TrendIndicator trend={d} long />
         {/await}
       </div>
-      <div>
-        <SensorUnit {sensor} long />
-      </div>
     </div>
+    <TrendTextSummary {sensor} {date} trend={data} />
   </div>
 </WidgetCard>
 

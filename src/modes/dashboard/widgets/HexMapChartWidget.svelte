@@ -3,7 +3,7 @@
   import { getContext } from 'svelte';
   import DownloadMenu from '../../mobile/components/DownloadMenu.svelte';
   import { stats } from '../../../stores';
-  import { formatDateISO, formatDateYearWeekdayAbbr } from '../../../formats';
+  import { formatDateISO } from '../../../formats';
   import { useWhiteTextColor } from '../../../util';
   import { getInfoByName } from '../../../maps/infos';
   import { state2TileCell } from '../../../specs/matrixSpec';
@@ -13,6 +13,7 @@
   import { MISSING_COLOR } from '../../../theme';
   import { groupByRegion } from '../../../stores/params';
   import { WidgetHighlight } from '../highlight';
+  import WidgetTitle from './WidgetTitle.svelte';
 
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -104,13 +105,7 @@
 
 <WidgetCard width={2} height={2}>
   <div class="root">
-    <div>
-      <h3>
-        {sensor.name} in US States <br />
-        on {formatDateYearWeekdayAbbr(date.value)}
-      </h3>
-      <h4>{sensor.unit}</h4>
-    </div>
+    <WidgetTitle {sensor} {date} region="US States" />
     <HexGrid columns={maxColumn} style="gap: 2px; margin: 10px 0;">
       {#await tileData then tiles}
         {#each tiles as tile (tile.region.propertyId)}
@@ -138,16 +133,6 @@
   .title {
     font-size: 0.65rem;
     line-height: 1;
-  }
-
-  h3 {
-    margin: 0;
-    font-size: 1rem;
-  }
-
-  h4 {
-    margin: 0;
-    font-size: 0.75rem;
   }
 
   .root {
