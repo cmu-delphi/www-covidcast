@@ -3,7 +3,7 @@ import { formatAPITime } from '../data/utils';
 import descriptions from './descriptions.generated.json';
 import { modeByID } from '../modes';
 import { formatRawValue, formatValue, formatPercentage } from '../formats';
-import { interpolateYlGnBu, interpolateYlOrRd } from 'd3-scale-chromatic';
+import { interpolateBuPu, interpolateYlGnBu, interpolateYlOrRd } from 'd3-scale-chromatic';
 import { getDataSource } from './dataSourceLookup';
 // import { generateMockSignal, generateMockMeta } from '../data/mock';
 
@@ -81,6 +81,7 @@ export function getLevelInfo(level) {
  * @property {string?} description HTML long text description
  * @property {string} signalTooltip short text description
  * @property {(v: number) => string)} colorScale
+ * @property {string} vegaColorScale
  *
  * @property {string[]} links more information links
  * @property {string} credits credit text
@@ -89,11 +90,33 @@ export function getLevelInfo(level) {
  * @property {string} xAxis x axis date title
  * @property {string} yAxis y axis value title
  * @property {string} unit y axis value unit long
- * @property {boolean} isInverted
+ * @property {'bad' | 'good' | 'neutral'} highValuesAre
  * @property {boolean} is7DayAverage
  * @property {boolean} hasStdErr
  * @property {(v: number, enforceSign?: boolean) => string} formatValue
  */
+
+function determineHighValuesAre(sensor) {
+  if (typeof sensor.isInverted === 'boolean') {
+    return sensor.isInverted ? 'good' : 'bad';
+  }
+  const given = sensor.highValuesAre;
+  if (given === 'bad' || given === 'good' || given === 'neutral') {
+    return given;
+  }
+  return 'bad';
+}
+
+const colorScales = {
+  good: interpolateYlGnBu,
+  bad: interpolateYlOrRd,
+  neutral: interpolateBuPu,
+};
+const vegaColorScales = {
+  good: 'yellowgreenblue',
+  bad: 'yelloworangered',
+  neutral: 'bluepurple',
+};
 
 /**
  * @param {Partial<Sensor>} sensor
@@ -102,7 +125,7 @@ export function getLevelInfo(level) {
 export function ensureSensorStructure(sensor) {
   const key = `${sensor.id}-${sensor.signal}`;
 
-  const isInverted = sensor.isInverted || false;
+  const highValuesAre = determineHighValuesAre(sensor);
   const format = sensor.format || 'raw';
 
   const formatter = {
@@ -132,8 +155,8 @@ export function ensureSensorStructure(sensor) {
     levels: ['state'],
     description: sensor.signalTooltip || 'No description available',
     signalTooltip: sensor.tooltipText || 'No description available',
-    colorScale: isInverted ? interpolateYlGnBu : interpolateYlOrRd,
-
+    colorScale: colorScales[highValuesAre],
+    vegaColorScale: vegaColorScales[highValuesAre],
     links: [],
     credits: 'We are happy for you to use this data in products and publications.',
 
@@ -141,7 +164,7 @@ export function ensureSensorStructure(sensor) {
     xAxis: 'Date',
     yAxis: yAxis[format] || yAxis.raw,
     unit: unit[format] || unit.raw,
-    isInverted,
+    highValuesAre,
     is7DayAverage: false,
     hasStdErr: false,
     formatValue: formatter[format] || formatter.raw,
@@ -298,7 +321,7 @@ export function extendSensorEntry(sensorEntry) {
         xAxis: full.xAxis,
         format: ratio ? 'per100k' : 'raw',
         unit: ratio ? 'per 100,000 people' : 'people',
-        isInverted: false,
+        highValuesAre: 'bad',
         is7DayAverage: true,
         hasStdErr: full.hasStdErr,
         signalTooltip: full.mapTitleText(options),

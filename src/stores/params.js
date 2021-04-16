@@ -466,7 +466,7 @@ export class DataFetcher {
       return this.cache.get(key);
     }
     const trend = this.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame).then((rows) =>
-      determineTrend(date.value, rows, sensor.isInverted),
+      determineTrend(date.value, rows, sensor.highValuesAre),
     );
     this.cache.set(key, trend);
     return trend;
@@ -638,7 +638,7 @@ export class SensorParam {
     this.factor = sensor.format === 'fraction' ? 100 : 1;
     this.isPercentage = sensor.format == 'percent' || sensor.format === 'fraction';
     this.isPer100K = sensor.format === 'per100k';
-    this.isInverted = sensor.isInverted;
+    this.highValuesAre = sensor.highValuesAre;
     this.is7DayAverage = sensor.is7DayAverage;
     this.valueUnit = this.is7DayAverage ? '7-day average' : 'value';
     this.formatValue = formatValue;

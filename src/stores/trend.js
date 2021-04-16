@@ -67,8 +67,10 @@ function toTrendText(change) {
  * @property {boolean} isDecreasing
  * @property {boolean} isSteady
  * @property {boolean} isUnknown
+ * @property {'good' | 'bad' | 'neutral'} highValuesAre
  * @property {boolean} isBetter increasing or decreasing based on the inverted state
  * @property {boolean} isWorse increasing or decreasing based on the inverted state
+ * @property {boolean} isNeutral neutral trend
  * @property {string} trendReason
  * @property {number} change normalized change used to compute the trend
  * @property {number} fractionChange non-normalized changed
@@ -91,7 +93,7 @@ function toTrendText(change) {
  * @property {TrendInfo} bestTrend
  */
 
-function computeTrend(ref, current, min, isInverted) {
+function computeTrend(ref, current, min, highValuesAre) {
   const change = toTrend(current.value, ref.value, min.value);
   const [type, trendText, trendReason] = toTrendText(change);
   const inc = type === 'inc';
@@ -101,8 +103,9 @@ function computeTrend(ref, current, min, isInverted) {
     isIncreasing: inc,
     isSteady: type === 'steady',
     isDecreasing: dec,
-    isBetter: (isInverted && inc) || (!isInverted && dec),
-    isWorse: (isInverted && dec) || (!isInverted && inc),
+    isBetter: (highValuesAre === 'good' && inc) || (highValuesAre === 'bad' && dec),
+    isWorse: (highValuesAre === 'good' && dec) || (highValuesAre === 'bad' && inc),
+    isNeutral: highValuesAre === 'neutral' && type !== 'steady',
     isUnknown: false,
     trendReason,
     change,
@@ -131,6 +134,7 @@ export const UNKNOWN_TREND = {
   max: null,
   minDate: null,
   maxDate: null,
+  highValuesAre: 'bad',
   worst: null,
   worstDate: null,
   best: null,
@@ -139,15 +143,16 @@ export const UNKNOWN_TREND = {
 /**
  *
  * @param {Date} date
+ * @param {'bad'|'good'|'neutral'} highValuesAre
  * @param {import("../../data").EpiDataRow[]} data
  */
-export function determineTrend(date, data, isInverted = false) {
+export function determineTrend(date, data, highValuesAre = 'bad') {
   const { min, max } = findMinMaxRow(data);
   const dateRow = findDateRow(date, data);
   const refDate = timeDay.offset(date, -7);
 
-  const worst = isInverted ? min : max;
-  const best = isInverted ? max : min;
+  const worst = highValuesAre === 'good' ? min : max;
+  const best = highValuesAre === 'good' ? max : min;
   const trend = {
     ...UNKNOWN_TREND,
     refDate,
@@ -155,6 +160,7 @@ export function determineTrend(date, data, isInverted = false) {
     minDate: min ? min.date_value : null,
     max,
     maxDate: max ? max.date_value : null,
+    highValuesAre,
     worst,
     worstDate: worst ? worst.date_value : null,
     best,
@@ -165,10 +171,10 @@ export function determineTrend(date, data, isInverted = false) {
     return trend;
   }
   trend.current = dateRow;
-  trend.minTrend = computeTrend(min, dateRow, min, isInverted);
-  trend.maxTrend = computeTrend(max, dateRow, min, isInverted);
-  trend.worstTrend = isInverted ? trend.minTrend : trend.maxTrend;
-  trend.bestTrend = isInverted ? trend.maxTrend : trend.minTrend;
+  trend.minTrend = computeTrend(min, dateRow, min, highValuesAre);
+  trend.maxTrend = computeTrend(max, dateRow, min, highValuesAre);
+  trend.worstTrend = highValuesAre === 'good' ? trend.minTrend : trend.maxTrend;
+  trend.bestTrend = highValuesAre === 'good' ? trend.maxTrend : trend.minTrend;
 
   let refRow = findDateRow(refDate, data);
   if (!refRow) {
@@ -190,7 +196,7 @@ export function determineTrend(date, data, isInverted = false) {
   }
   return {
     ...trend,
-    ...computeTrend(refRow, dateRow, min, isInverted),
+    ...computeTrend(refRow, dateRow, min, highValuesAre),
     ref: refRow,
   };
 }

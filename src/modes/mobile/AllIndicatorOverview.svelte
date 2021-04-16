@@ -28,18 +28,18 @@
     return Promise.all(sensorList.map((sensor) => fetcher.fetchWindowTrend(sensor, region, date))).then((trends) => {
       const positive = [];
       const negative = [];
-      const unknown = [];
+      const unknownOrNeutral = [];
       trends.forEach((trend, i) => {
-        const inv = sensorList[i].isInverted;
-        if (trend.isIncreasing) {
-          (!inv ? negative : positive).push(sensorList[i]);
-        } else if (trend.isDecreasing) {
-          (inv ? negative : positive).push(sensorList[i]);
+        const sensor = sensorList[i];
+        if (trend.isBetter) {
+          positive.push(sensor);
+        } else if (trend.isWorse) {
+          negative.push(sensor);
         } else {
-          unknown.push(sensorList[i]);
+          unknownOrNeutral.push(sensor);
         }
       });
-      return { positive, negative, unknown };
+      return { positive, negative, unknownOrNeutral };
     });
   }
 
@@ -59,10 +59,10 @@
     are
     <strong>getting better.</strong>
     <AllIndicatorsText sensors={d ? d.negative : null} />
-    {#if d && d.unknown.length > 0}
-      <strong>{d ? d.unknown.length : 'N/A'} of {sensorList.length} indicators</strong>
+    {#if d && d.unknownOrNeutral.length > 0}
+      <strong>{d.unknownOrNeutral.length} of {sensorList.length} indicators</strong>
       are
-      <strong>not available</strong>
+      <strong>have changed</strong> or are <strong>not available</strong>
       for
       {formatDateYearWeekdayAbbr(date.value)}.
     {/if}

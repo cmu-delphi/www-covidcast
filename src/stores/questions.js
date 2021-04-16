@@ -135,7 +135,7 @@ function deriveSensor(question) {
     yAxis: descriptions.yAxis,
     format: descriptions.format,
     unit: descriptions.unit,
-    isInverted: descriptions.isInverted,
+    highValuesAre: descriptions.highValuesAre || (descriptions.isInverted === true ? 'good' : 'bad'),
     is7DayAverage: descriptions.is7DayAverage,
     hasStdErr: descriptions.hasStdErr,
     credits: descriptions.credits,

@@ -14,4 +14,7 @@
 {:else if trend.isWorse}
   worse by
   {formatFraction(trend.fractionChange)}
+{:else if trend.isNeutral}
+  changed by
+  {formatFraction(trend.fractionChange)}
 {:else}around the same with {formatFraction(trend.fractionChange)}{/if}
