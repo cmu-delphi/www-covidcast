@@ -85,7 +85,7 @@ function deriveSensor(question: { signal: string; name: string }) {
     format: descriptions.format as Sensor['format'],
     unit: descriptions.unit,
     highValuesAre:
-           (descriptions as {  highValuesAre?: Sensor['highValuesAre']  }).highValuesAre ??
+      (descriptions as { highValuesAre?: Sensor['highValuesAre'] }).highValuesAre ??
       (descriptions.isInverted === true ? 'good' : 'bad'),
     is7DayAverage: descriptions.is7DayAverage,
     hasStdErr: descriptions.hasStdErr,
