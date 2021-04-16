@@ -91,6 +91,7 @@ jobs:
       - name: Create pull request to update COVIDcast
         uses: peter-evans/create-pull-request@v3
         with:
+          token: ${{ secrets.CMU_DELPHI_DEPLOY_MACHINE_PAT }}
           branch: bot/update-covidcast
           commit-message: 'feat: update to COVIDcast ${{ needs.create_release.outputs.tag_name }}'
           title: 'update to COVIDcast ${{ needs.create_release.outputs.tag_name }}'
