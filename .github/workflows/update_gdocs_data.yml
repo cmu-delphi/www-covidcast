@@ -2,7 +2,7 @@ name: Update Google Docs Data
 on:
   workflow_dispatch:
 jobs:
-  create_release:
+  update_gdocs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
