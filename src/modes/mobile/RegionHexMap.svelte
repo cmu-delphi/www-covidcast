@@ -11,9 +11,9 @@
   import SensorValue from './SensorValue.svelte';
   import { MISSING_COLOR } from '../../theme';
   import ColorLegend from './components/ColorLegend.svelte';
-  import { hsl } from 'd3-color';
   import DownloadMenu from './components/DownloadMenu.svelte';
   import { formatDateISO } from '../../formats';
+  import { useWhiteTextColor } from '../../util';
 
   export let className = '';
   /**
@@ -92,12 +92,12 @@
 
   function isInvertedColor(v) {
     const color = v && v.value != null ? colorScale(v.value) : MISSING_COLOR;
-    return hsl(color).l < 0.5;
+    return useWhiteTextColor(color);
   }
 
   function style(v) {
     const color = v && v.value != null ? colorScale(v.value) : MISSING_COLOR;
-    const white = hsl(color).l < 0.5;
+    const white = useWhiteTextColor(color);
     return `background-color: ${color}${white ? '; color: white;' : ''}`;
   }
 </script>

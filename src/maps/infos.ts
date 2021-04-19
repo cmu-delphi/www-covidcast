@@ -151,6 +151,19 @@ const infoLookup = (() => {
 
   nameInfos.forEach(addInfo);
 
+  megaCountyInfo.forEach((d) => {
+    // find mega counties also by county level
+    const levelPrefix = 'county:';
+    const id = String(d.propertyId).toLowerCase();
+    if (!infoLookup.has(levelPrefix + id)) {
+      infoLookup.set(levelPrefix + id, d);
+    }
+    const key = String(d.id).toLowerCase();
+    if (!infoLookup.has(levelPrefix + key)) {
+      infoLookup.set(levelPrefix + key, d);
+    }
+  });
+
   addInfo(nationInfo);
 
   for (const alias of [

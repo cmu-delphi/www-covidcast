@@ -74,17 +74,19 @@ function toAnchor(value: string) {
   return value.toLowerCase().replace(/\s/g, '-');
 }
 
-function deriveSensor(question: { signal: string }) {
+function deriveSensor(question: { signal: string; name: string }) {
   return ensureSensorStructure({
     id: descriptions.id,
-    rawSignal: descriptions.rawSignal ?? (undefined as string | undefined),
+    rawSignal: (descriptions.rawSignal ?? undefined) as string | undefined,
     type: descriptions.type as Sensor['type'],
     levels: descriptions.levels as RegionLevel[],
     xAxis: descriptions.xAxis,
     yAxis: descriptions.yAxis,
     format: descriptions.format as Sensor['format'],
     unit: descriptions.unit,
-    isInverted: descriptions.isInverted,
+    highValuesAre:
+      (descriptions as { highValuesAre?: Sensor['highValuesAre'] }).highValuesAre ??
+      (descriptions.isInverted === true ? 'good' : 'bad'),
     is7DayAverage: descriptions.is7DayAverage,
     hasStdErr: descriptions.hasStdErr,
     credits: descriptions.credits,

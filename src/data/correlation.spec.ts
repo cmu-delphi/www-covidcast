@@ -7,7 +7,7 @@ describe('correlationMetrics', () => {
   test('Deaths vs. CLI correlations should equal what was published in the blog post', () => {
     const expected_metrics = {
       r2At0: 0.5,
-      lagAtMaxR2: 20,
+      lagAtMaxR2: -20,
       r2AtMaxR2: 0.81,
     };
     const actual_metrics = generateCorrelationMetrics(deathsTestData, cliTestData as any);
@@ -19,7 +19,7 @@ describe('correlationMetrics', () => {
   test('Signals with different date ranges should correlate on the union of their dates.', () => {
     const expected_metrics = {
       r2At0: -0.59,
-      lagAtMaxR2: 28,
+      lagAtMaxR2: -28,
       r2AtMaxR2: -0.07,
     };
     const actual_metrics = generateCorrelationMetrics(cases_national, safegraph_full_time_national as any);

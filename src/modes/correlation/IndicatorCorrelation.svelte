@@ -23,6 +23,7 @@
   import { MULTI_COLORS } from '../../specs/lineSpec';
   import AboutSection from '../mobile/components/AboutSection.svelte';
   import { generateCorrelationMetrics } from '../../data/correlation';
+  import throttle from 'lodash-es/throttle';
 
   $: primary = new SensorParam($currentSensorEntry);
   $: secondary = new SensorParam($currentSensorEntry2, currentSensor2);
@@ -78,6 +79,10 @@
   }
 
   $: selectedLag = selectLag(lags, $currentLag);
+
+  const throttleLagUpdate = throttle((nextLag) => {
+    currentLag.set(nextLag);
+  }, 10);
 </script>
 
 <div class="mobile-root">
@@ -108,17 +113,17 @@
         </p>
         <p>
           In other words, how much does the movement in one indicator explain movement in another? For example, a change
-          in new cases is reflected in a change in community symptoms.
+          in new cases is reflected in deaths.
           <strong>R<sup>2</sup></strong> ranges between <code>1.0</code> (entirely correlated) and <code>0.0</code> (no correlation
           at all).
         </p>
         <p>
-          <strong>Lag</strong> is the number in days that an indicator can be shifted, with respect to another. For example,
-          if we hypothesize that an increase in new cases results in an increase in hospitalizations three days later, the
-          lag is three.
+          <strong>Lag</strong> is the number of days that an indicator is shifted backwards with respect to another. For
+          example, if we hypothesize that an increase in new cases results in an increase in hospitalizations three days
+          later, hospitalizations are lagged 3 days. A negative lag would indicate the indicator is shifted forwards.
         </p>
       </AboutSection>
-      <FancyHeader invert sub="Chart">R<sup>2</sup> per Lag</FancyHeader>
+      <FancyHeader invert sub="Correlations">Lagged</FancyHeader>
       <LagChart
         {primary}
         {secondary}
@@ -128,15 +133,15 @@
           // don't use || since 0 == false
           const nextLag = e.detail == null ? $currentLag : e.detail;
           if (nextLag !== $currentLag) {
-            currentLag.set(nextLag);
+            throttleLagUpdate(nextLag);
           }
         }}
       />
       <p>
-        Click on or Mouse over the R<sup>2</sup> chart to select a different lag.
+        Click on or mouse over the R<sup>2</sup> chart to select a different lag.
       </p>
       <hr />
-      <FancyHeader invert sub="Chart at Lag {$currentLag} days">Correlation</FancyHeader>
+      <FancyHeader invert sub="Chart">Correlation</FancyHeader>
       <AboutSection details>
         <h3 class="mobile-h3" slot="header">About the SNAKE PLOT</h3>
         <p>
@@ -160,6 +165,7 @@
         <h3 class="mobile-h3" slot="header">About the TIME SERIES</h3>
         <p>The x-axes in the time series plots below are offset from each other by the selected lag.</p>
       </AboutSection>
+      <p />
       <div class="chart-300">
         <HistoryLineChart sensor={primary} {date} {region} {fetcher} singleRegionOnly domain={domains.primary} />
       </div>

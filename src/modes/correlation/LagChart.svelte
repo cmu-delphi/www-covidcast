@@ -36,7 +36,7 @@
 
   const dispatch = createEventDispatcher();
 
-  function generateSpec({ title, subTitle, zero } = {}) {
+  function generateSpec(secondary, { title, subTitle, zero } = {}) {
     /**
      * @type {import('vega-lite').TopLevelSpec}
      */
@@ -44,7 +44,7 @@
       ...BASE_SPEC,
       width: 500,
       height: 100,
-      padding: { top: guessTopPadding(title, subTitle, 20), left: 42, bottom: 45, right: 8 },
+      padding: { top: guessTopPadding(title, subTitle, 20), left: 42, bottom: 50, right: 8 },
       title: {
         text: title,
         subtitle: subTitle,
@@ -59,7 +59,7 @@
                 nice: false,
               },
               axis: {
-                title: 'Lag (days)',
+                title: `Lag (days) applied to ${secondary.name}`,
                 labelOverlap: true,
               },
             },
@@ -121,7 +121,7 @@
             },
           ],
         },
-        genCreditsLayer({ shift: 45 }),
+        genCreditsLayer({ shift: 50 }),
         {
           transform: [
             {
@@ -158,7 +158,7 @@
                 fontSize: 16,
                 dy: -3,
                 text: {
-                  expr: `format(datum.r2, '.2f', 'cachedNumber') + ' (' + datum.lag + ' day' + (datum.lag !== 1 ? 's' : '') + ')'`,
+                  expr: `format(datum.r2, '.2f', 'cachedNumber') + lagToOffset(datum.lag)`,
                 },
                 y: 0,
               },
@@ -171,9 +171,9 @@
   }
 
   let scaled = false;
-  $: spec = generateSpec({
+  $: spec = generateSpec(secondary, {
     zero: !scaled,
-    title: joinTitle([`R² between "${primary.name}" and `, `"${secondary.name}" per Lag`], $isMobileDevice),
+    title: joinTitle([`R² between "${primary.name}" and`, `lagged "${secondary.name}"`], $isMobileDevice),
   });
 
   let vegaRef = null;
