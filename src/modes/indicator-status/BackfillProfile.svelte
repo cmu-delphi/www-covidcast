@@ -96,8 +96,6 @@
   }
 
   function generateStreamLayer(field, title) {
-    const cont = (v) => `(datum.confidence >= 0.${v} && datum.prevConfidence < 0.${v}) ? 'p${v}'`;
-    const confidenceClassifier = `${cont(90)} : (${cont(75)} : (${cont(50)} : (${cont(25)} : null)))`;
     /**
      * @type {import('vega-lite/build/src/spec').NonNormalizedSpec}
      */
@@ -105,10 +103,6 @@
       width: 'container',
       height: 300,
       transform: [
-        {
-          calculate: confidenceClassifier,
-          as: 'completed',
-        },
         {
           filter: 'datum.completed != null',
         },
@@ -214,7 +208,120 @@
     return spec;
   }
 
+  function generateBoxPlotDayOfMonthLayer(field) {
+    /**
+     * @type {import('vega-lite/build/src/spec').NonNormalizedSpec}
+     */
+    const spec = {
+      width: 1000,
+      height: 200,
+      transform: [
+        {
+          filter: 'datum.completed != null',
+        },
+      ],
+      mark: {
+        type: 'boxplot',
+      },
+      encoding: {
+        row: {
+          field: 'completed',
+          type: 'nominal',
+          title: {
+            signal: `{'p25': '25%', 'p50': '50%', 'p75': '75%', 'p90': '90%'}[datum.label]`,
+          },
+          axis: {
+            title: 'Confidence Reached',
+          },
+        },
+        color: {
+          field: 'completed',
+          type: 'nominal',
+          legend: {
+            labelAngle: 0,
+            labelExpr: `{'p25': '25%', 'p50': '50%', 'p75': '75%', 'p90': '90%'}[datum.label]`,
+          },
+        },
+        x: {
+          field: field,
+          type: 'ordinal',
+          timeUnit: 'date',
+          axis: {
+            title: 'Reference Day of Month',
+            format: '%d',
+            labelAngle: 0,
+          },
+          spacing: 10,
+        },
+        y: {
+          // aggregate: 'max',
+          field: 'lag',
+          type: 'quantitative',
+        },
+      },
+    };
+    return spec;
+  }
+
+  function generateBoxPlotWeekdayLayer(field) {
+    /**
+     * @type {import('vega-lite/build/src/spec').NonNormalizedSpec}
+     */
+    const spec = {
+      width: 220,
+      height: 200,
+      transform: [
+        {
+          filter: 'datum.completed != null',
+        },
+      ],
+      mark: {
+        type: 'boxplot',
+      },
+      encoding: {
+        column: {
+          field: 'completed',
+          type: 'nominal',
+          title: {
+            signal: `{'p25': '25%', 'p50': '50%', 'p75': '75%', 'p90': '90%'}[datum.label]`,
+          },
+          axis: {
+            title: 'Confidence Reached',
+          },
+        },
+        color: {
+          field: 'completed',
+          type: 'nominal',
+          legend: {
+            labelAngle: 0,
+            labelExpr: `{'p25': '25%', 'p50': '50%', 'p75': '75%', 'p90': '90%'}[datum.label]`,
+          },
+        },
+        x: {
+          field: field,
+          type: 'ordinal',
+          timeUnit: 'day',
+          axis: {
+            title: 'Reference Weekday',
+            format: '%a',
+            labelAngle: 0,
+          },
+          spacing: 10,
+        },
+        y: {
+          // aggregate: 'max',
+          field: 'lag',
+          type: 'quantitative',
+        },
+      },
+    };
+    return spec;
+  }
+
   function generateSpec(indicator, maxConfidence = 0.95) {
+    const cont = (v) => `(datum.confidence >= 0.${v} && datum.prevConfidence < 0.${v}) ? 'p${v}'`;
+    const confidenceClassifier = `${cont(90)} : (${cont(75)} : (${cont(50)} : (${cont(25)} : null)))`;
+
     /**
      * @type {import('vega-lite').TopLevelSpec}
      */
@@ -235,9 +342,9 @@
       },
       padding: {
         left: 50,
-        top: 65,
+        top: 100,
         right: 100,
-        bottom: 50,
+        bottom: 70,
       },
       transform: [
         {
@@ -265,6 +372,10 @@
           // keep all < 0.95 and remove all besides the first one over 0.95
           filter: `datum.confidence < ${maxConfidence} || datum.prevConfidence < ${maxConfidence}`,
         },
+        {
+          calculate: confidenceClassifier,
+          as: 'completed',
+        },
       ],
       // resolve: {
       //   axis: {
@@ -276,6 +387,8 @@
         generateLayer('date_value', 'Reference Date', 0, maxConfidence),
         generateStreamLayer('date_value', 'Reference Date'),
         generateLayer('issue_date', 'Issue Date', 2, maxConfidence),
+        generateBoxPlotDayOfMonthLayer('date_value'),
+        generateBoxPlotWeekdayLayer('date_value'),
       ],
     };
     return spec;
