@@ -14,7 +14,7 @@
   export let unit = true;
 </script>
 
-<div>
+<div class="widget-title">
   <h3>
     <slot>
       {sensor.name} in {typeof region === 'string' ? region : region.displayName} <br />
@@ -24,15 +24,20 @@
   {#if unit}
     <h4>{sensor.unit}</h4>
   {/if}
+  <slot name="addons" />
 </div>
 
 <style>
-  h3 {
+  .widget-title {
+    position: relative;
+  }
+
+  .widget-title > h3 {
     margin: 0;
     font-size: 1rem;
   }
 
-  h4 {
+  .widget-title > h4 {
     margin: 0;
     font-size: 0.75rem;
   }

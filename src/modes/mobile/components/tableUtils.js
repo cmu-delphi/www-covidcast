@@ -66,3 +66,14 @@ export class SortHelper {
     });
   }
 }
+
+export function byImportance(a, b) {
+  if (a.important && b.important) {
+    // state vs nation
+    return a.level === 'nation' ? -1 : 1;
+  }
+  if (a.important !== b.important) {
+    return a.important ? -1 : 1;
+  }
+  return 0;
+}
