@@ -103,7 +103,7 @@
   }
 </script>
 
-<WidgetCard width={2} height={2}>
+<WidgetCard grid={{ width: 2, height: 2 }}>
   <div class="root">
     <WidgetTitle {sensor} {date} region="US States" />
     <HexGrid columns={maxColumn} style="gap: 2px; margin: 10px 0;">

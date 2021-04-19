@@ -180,7 +180,7 @@
   }
 </script>
 
-<WidgetCard width={wide ? 5 : 3} height={2} {highlighted}>
+<WidgetCard grid={{ width: wide ? 5 : 3, height: 2 }} {highlighted}>
   <div class="content">
     <Vega
       bind:this={vegaRef}

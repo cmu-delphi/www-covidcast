@@ -1,13 +1,35 @@
 <script>
   export let highlighted = false;
-  export let width = 1;
-  export let height = 1;
+  /**
+   * @type {{width?: number; height?: number; x?: number; y?: number} | null}
+   */
+  export let grid = null;
+
+  function gridToStyle(grid) {
+    if (!grid) {
+      return null;
+    }
+    let style = '';
+    if (grid.x != null) {
+      style += `grid-column-start: ${grid.x}; `;
+    }
+    if (grid.y != null) {
+      style += `grid-row-start: ${grid.y}; `;
+    }
+    if (grid.width != null) {
+      style += `grid-column-end: span ${grid.width}; `;
+    }
+    if (grid.height != null) {
+      style += `grid-row-end: span ${grid.height}; `;
+    }
+    return style;
+  }
 </script>
 
 <div
   class="widget-card uk-card uk-card-small uk-card-default uk-card-body"
   class:highlighted
-  style="grid-column-end: span {width}; grid-row-end: span {height}"
+  style={gridToStyle(grid)}
   on:
 >
   <slot />

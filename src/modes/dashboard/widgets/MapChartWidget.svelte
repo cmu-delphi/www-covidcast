@@ -153,7 +153,7 @@
   }
 </script>
 
-<WidgetCard width={2} height={2}>
+<WidgetCard grid={{ width: 2, height: 2 }}>
   <Vega
     bind:this={vegaRef}
     {spec}
