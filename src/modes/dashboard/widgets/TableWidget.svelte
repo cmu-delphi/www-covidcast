@@ -162,6 +162,16 @@
       loading = false;
     });
   }
+
+  function onMouseEnter(r) {
+    if (!r.highlight.equals(highlight)) {
+      highlight = r.highlight;
+    }
+  }
+
+  function onMouseLeave() {
+    highlight = null;
+  }
 </script>
 
 <WidgetCard grid={{ width: 2, height: 3 }}>
@@ -199,7 +209,12 @@
           </thead>
           <tbody>
             {#each sortedRows as r (r.id)}
-              <tr class:important={r.important} class:highlight={r.highlight.equals(highlight)}>
+              <tr
+                class:important={r.important}
+                class:highlight={r.highlight.equals(highlight)}
+                on:mouseenter={() => onMouseEnter(r)}
+                on:mouseleave={onMouseLeave}
+              >
                 <td>
                   {r.name}
                 </td>
@@ -251,11 +266,14 @@
     width: 100%;
     height: 100%;
   }
-
   .table-scroller .mobile-th {
     background: white;
     position: sticky;
     top: 0;
     z-index: 1;
+  }
+
+  tr.highlight {
+    box-shadow: 0 0 3px 0 #888;
   }
 </style>
