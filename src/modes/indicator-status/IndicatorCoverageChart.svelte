@@ -8,12 +8,12 @@
     MULTI_COLORS,
     genAnnotationLayer,
   } from '../../specs/lineSpec';
-  import Toggle from '../mobile/Toggle.svelte';
+  import Toggle from '../../components/Toggle.svelte';
   import { annotationManager } from '../../stores';
   import { createEventDispatcher } from 'svelte';
-  import IndicatorAnnotation from '../mobile/IndicatorAnnotation.svelte';
+  import IndicatorAnnotation from '../../components/IndicatorAnnotation.svelte';
   import { timeDay } from 'd3-time';
-  import DownloadMenu from '../mobile/components/DownloadMenu.svelte';
+  import DownloadMenu from '../../components/DownloadMenu.svelte';
 
   const dispatch = createEventDispatcher();
   /**

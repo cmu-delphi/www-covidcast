@@ -5,9 +5,8 @@
   import flagUSAIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/flag-usa.svg';
   import { modeByID } from '..';
   import { questionCategories } from '../../stores/questions';
-  import '../mobile/common.css';
-  import FancyHeader from '../mobile/FancyHeader.svelte';
-  import SurveyStats from '../survey/SurveyStats.svelte';
+  import FancyHeader from '../../components/FancyHeader.svelte';
+  import SurveyStats from '../../blocks/SurveyStats.svelte';
   import SensorGroup from './SensorGroup.svelte';
 
   function switchMode(region) {

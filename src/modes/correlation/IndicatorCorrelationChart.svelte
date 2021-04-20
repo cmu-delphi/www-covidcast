@@ -3,9 +3,9 @@
   import { BASE_SPEC, guessTopPadding, joinTitle } from '../../specs/commonSpec';
   import { genCreditsLayer } from '../../specs/lineSpec';
   import { isMobileDevice } from '../../stores';
-  import Toggle from '../mobile/Toggle.svelte';
+  import Toggle from '../../components/Toggle.svelte';
   import CorrelationTooltip from './CorrelationTooltip.svelte';
-  import DownloadMenu from '../mobile/components/DownloadMenu.svelte';
+  import DownloadMenu from '../../components/DownloadMenu.svelte';
   import { formatDateISO } from '../../formats';
   /**
    * @type {import("../../stores/params").SensorParam}
