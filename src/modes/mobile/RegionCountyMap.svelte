@@ -4,7 +4,7 @@
   import { getStateOfCounty } from '../../data/regions';
   import { generateStateMapWithCountyDataSpec } from '../../specs/mapSpec';
   import { isMobileDevice, stats } from '../../stores';
-  import DownloadMenu from './components/DownloadMenu.svelte';
+  import DownloadMenu from '../../components/DownloadMenu.svelte';
   import RegionMapTooltip from './RegionMapTooltip.svelte';
 
   /**

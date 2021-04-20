@@ -1,6 +1,6 @@
 <script>
   import warningIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
-  import { formatDateISO } from '../../formats';
+  import { formatDateISO } from '../formats';
 
   export let className = '';
   export let annotation;

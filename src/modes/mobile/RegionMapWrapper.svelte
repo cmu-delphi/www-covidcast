@@ -2,7 +2,7 @@
   import RegionCountyMap from './RegionCountyMap.svelte';
   import RegionHexMap from './RegionHexMap.svelte';
   import RegionMap from './RegionMap.svelte';
-  import Toggle from './Toggle.svelte';
+  import Toggle from '../../components/Toggle.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}

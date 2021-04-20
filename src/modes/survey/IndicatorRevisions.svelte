@@ -1,5 +1,5 @@
 <script>
-  import FancyHeader from '../mobile/FancyHeader.svelte';
+  import FancyHeader from '../../components/FancyHeader.svelte';
   import IndicatorRevision from './IndicatorRevision.svelte';
 
   /**

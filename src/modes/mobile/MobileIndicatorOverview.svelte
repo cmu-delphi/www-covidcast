@@ -1,8 +1,8 @@
 <script>
-  import FancyHeader from './FancyHeader.svelte';
+  import FancyHeader from '../../components/FancyHeader.svelte';
   import RegionMapWrapper from './RegionMapWrapper.svelte';
   import HistoryLineChart from './HistoryLineChart.svelte';
-  import IndicatorDropdown from './IndicatorDropdown.svelte';
+  import IndicatorDropdown from '../../components/IndicatorPicker.svelte';
   import GeoTable from './GeoTable.svelte';
   import IndicatorOverview from './IndicatorOverview.svelte';
   import chevronLeftIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-left.svg';
@@ -11,13 +11,13 @@
   import IndicatorAbout from './IndicatorAbout.svelte';
   import RegionOverview from './RegionOverview.svelte';
   import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
-  import SurveyParameters from '../survey/SurveyParameters.svelte';
+  import SurveyParameters from '../../components/RegionDatePicker.svelte';
   import { currentRegionInfo, currentSensorEntry, currentDateObject, times } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
   import { formatDateWeekday } from '../../formats';
   import { afterUpdate } from 'svelte';
   import { scrollIntoView } from '../../util';
-  import IndicatorAnnotations from './IndicatorAnnotations.svelte';
+  import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
   import IndicatorCorrelation from './IndicatorCorrelation.svelte';
 
   $: sensor = new SensorParam($currentSensorEntry);

@@ -4,16 +4,16 @@
   import { generateSparkLine } from '../../specs/lineSpec';
   import Vega from '../../components/vega/Vega.svelte';
   import SparkLineTooltip from './SparkLineTooltip.svelte';
-  import FancyHeader from './FancyHeader.svelte';
-  import TrendIndicator from './TrendIndicator.svelte';
+  import FancyHeader from '../../components/FancyHeader.svelte';
+  import TrendIndicator from '../../components/TrendIndicator.svelte';
   import { formatDateISO, formatDateShortNumbers } from '../../formats';
   import { groupByRegion, extractSparkLine } from '../../stores/params';
   import { determineTrend } from '../../stores/trend';
-  import SensorValue from './SensorValue.svelte';
-  import DownloadMenu from './components/DownloadMenu.svelte';
-  import IndicatorAnnotations from './IndicatorAnnotations.svelte';
-  import SortColumnIndicator from './components/SortColumnIndicator.svelte';
-  import { SortHelper } from './components/tableUtils';
+  import SensorValue from '../../components/SensorValue.svelte';
+  import DownloadMenu from '../../components/DownloadMenu.svelte';
+  import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
+  import SortColumnIndicator from '../../components/Table/SortColumnIndicator.svelte';
+  import { SortHelper } from '../../components/Table/tableUtils';
 
   /**
    * @type {import("../../stores/params").DateParam}

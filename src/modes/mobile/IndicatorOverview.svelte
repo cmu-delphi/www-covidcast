@@ -2,12 +2,12 @@
   import Vega from '../../components/vega/Vega.svelte';
   import { formatDateShortNumbers } from '../../formats';
   import { generateSparkLine } from '../../specs/lineSpec';
-  import SurveyValue from '../survey/SurveyValue.svelte';
-  import SensorUnit from './SensorUnit.svelte';
+  import KPIValue from '../../components/KPIValue.svelte';
+  import SensorUnit from '../../components/SensorUnit.svelte';
   import SparkLineTooltip from './SparkLineTooltip.svelte';
 
-  import TrendIndicator from './TrendIndicator.svelte';
-  import TrendTextSummary from './TrendTextSummary.svelte';
+  import TrendIndicator from '../../components/TrendIndicator.svelte';
+  import TrendTextSummary from '../../components/TrendTextSummary.svelte';
 
   /**
    * @type {import('../../stores/constants').SensorEntry}
@@ -40,9 +40,9 @@
   <div class="mobile-kpi">
     <div>
       {#await trend}
-        <SurveyValue value={null} loading />
+        <KPIValue value={null} loading />
       {:then d}
-        <SurveyValue value={d && d.current ? d.current.value : null} digits={sensor.isPercentage ? 2 : 1} />
+        <KPIValue value={d && d.current ? d.current.value : null} digits={sensor.isPercentage ? 2 : 1} />
       {/await}
     </div>
     <div class="sub">

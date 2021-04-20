@@ -1,5 +1,5 @@
 <script>
-  import FancyHeader from './FancyHeader.svelte';
+  import FancyHeader from '../../components/FancyHeader.svelte';
   import { sensorList } from '../../stores';
   import { formatDateYearWeekdayAbbr } from '../../formats';
   import AllIndicatorsText from './AllIndicatorsText.svelte';

@@ -1,9 +1,9 @@
 <script>
-  import { groupedSensorList } from '../../stores';
+  import { groupedSensorList } from '../stores';
   import caretDownIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/caret-down.svg';
 
   /**
-   * @type {import("../../stores/params").SensorParam}
+   * @type {import("../stores/params").SensorParam}
    */
   export let sensor;
 

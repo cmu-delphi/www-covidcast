@@ -1,7 +1,7 @@
 <script>
   import { modeByID } from '..';
   import { currentMode } from '../../stores';
-  import AboutSection from './components/AboutSection.svelte';
+  import AboutSection from '../../components/AboutSection.svelte';
 
   /**
    * @type {import('../../stores/params').SensorParam}

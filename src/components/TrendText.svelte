@@ -1,5 +1,5 @@
 <script>
-  import { formatFraction } from '../../formats';
+  import { formatFraction } from '../formats';
   /**
    * @type {import("../../stores/params").Trend}
    */

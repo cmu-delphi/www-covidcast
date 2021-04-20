@@ -1,20 +1,20 @@
 <script>
-  import { downloadUrl, scrollToTop } from '../../../util';
+  import { downloadUrl, scrollToTop } from '../util';
   import { csvFormat } from 'd3-dsv';
-  import { formatDateISO } from '../../../formats';
-  import { modeByID } from '../../';
-  import { currentMode, sensorList } from '../../../stores';
+  import { formatDateISO } from '../formats';
+  import { modeByID } from '../modes';
+  import { currentMode, sensorList } from '../stores';
 
   export let fileName = 'chart';
   /**
-   * @type {import('../../../components/vega/Vega.svelte').default}
+   * @type {import('./vega/Vega.svelte').default}
    */
   export let vegaRef = null;
 
   export let data = null;
 
   /**
-   * @type {import("../../../stores/params").SensorParam}
+   * @type {import("../stores/params").SensorParam}
    */
   export let sensor = null;
 

@@ -15,14 +15,14 @@
     genAnnotationLayer,
   } from '../../specs/lineSpec';
   import { toTimeValue } from '../../stores/params';
-  import Toggle from './Toggle.svelte';
-  import SensorValue from './SensorValue.svelte';
+  import Toggle from '../../components/Toggle.svelte';
+  import SensorValue from '../../components/SensorValue.svelte';
   import { combineSignals } from '../../data/utils';
-  import DownloadMenu from './components/DownloadMenu.svelte';
+  import DownloadMenu from '../../components/DownloadMenu.svelte';
   import { formatDateISO } from '../../formats';
   import { annotationManager, isMobileDevice } from '../../stores';
-  import IndicatorAnnotation from './IndicatorAnnotation.svelte';
-  import IndicatorAnnotations from './IndicatorAnnotations.svelte';
+  import IndicatorAnnotation from '../../components/IndicatorAnnotation.svelte';
+  import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
   import { joinTitle } from '../../specs/commonSpec';
 
   export let height = 250;

@@ -1,19 +1,19 @@
 <script>
   import { groupedSensorList, sensorList } from '../../stores/constants';
-  import FancyHeader from './FancyHeader.svelte';
+  import FancyHeader from '../../components/FancyHeader.svelte';
   import { SensorParam } from '../../stores/params';
   import { formatDateISO, formatDateShortNumbers } from '../../formats';
   import filterIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/filter.svg';
   import { currentMode } from '../../stores';
   import { modeByID } from '..';
-  import TrendIndicator from './TrendIndicator.svelte';
+  import TrendIndicator from '../../components/TrendIndicator.svelte';
   import Vega from '../../components/vega/Vega.svelte';
   import SparkLineTooltip from './SparkLineTooltip.svelte';
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
   import { generateSparkLine } from '../../specs/lineSpec';
-  import SensorValue from './SensorValue.svelte';
-  import DownloadMenu from './components/DownloadMenu.svelte';
-  import IndicatorAnnotations from './IndicatorAnnotations.svelte';
+  import SensorValue from '../../components/SensorValue.svelte';
+  import DownloadMenu from '../../components//DownloadMenu.svelte';
+  import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}

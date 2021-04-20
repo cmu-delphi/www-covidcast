@@ -1,6 +1,6 @@
 <script>
   /**
-   * @type {import("../../stores/params").SensorParam}
+   * @type {import("../stores/params").SensorParam}
    */
   export let sensor;
   export let long = false;

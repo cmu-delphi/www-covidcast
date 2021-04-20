@@ -12,8 +12,8 @@
   import { formatDateISO } from '../../formats';
   import { questions } from '../../stores/questions';
   import { DateParam } from '../../stores/params';
-  import FancyHeader from '../mobile/FancyHeader.svelte';
-  import IndicatorAnnotation from '../mobile/IndicatorAnnotation.svelte';
+  import FancyHeader from '../../components/FancyHeader.svelte';
+  import IndicatorAnnotation from '../../components/IndicatorAnnotation.svelte';
 
   const CSV_SERVER = 'https://delphi.cmu.edu/csv';
 

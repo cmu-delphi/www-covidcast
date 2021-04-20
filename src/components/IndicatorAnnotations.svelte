@@ -1,24 +1,24 @@
 <script>
-  import { annotationManager } from '../../stores';
-  import { formatDateISO } from '../../formats';
-  import UiKitHint from '../../components/UIKitHint.svelte';
+  import { annotationManager } from '../stores';
+  import { formatDateISO } from '../formats';
+  import UiKitHint from './UIKitHint.svelte';
   import IndicatorAnnotation from './IndicatorAnnotation.svelte';
 
   /**
-   * @type {import('../../stores/constants').SensorEntry}
+   * @type {import('../stores/constants').SensorEntry}
    */
   export let sensor;
 
   /**
-   * @type {import("../../stores/params").DateParam}
+   * @type {import("../stores/params").DateParam}
    */
   export let date;
   /**
-   * @type {import("../../stores/params").Region}
+   * @type {import("../stores/params").Region}
    */
   export let region = null;
   /**
-   * @type {import("../../stores/params").Region[]}
+   * @type {import("../stores/params").Region[]}
    */
   export let regions = [];
 

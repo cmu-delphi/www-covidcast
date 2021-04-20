@@ -1,5 +1,5 @@
 <script>
-  import SurveyValue from '../survey/SurveyValue.svelte';
+  import KPIValue from '../../components/KPIValue.svelte';
 
   /**
    * @type {import("../../stores/params").RegionParam}
@@ -10,7 +10,7 @@
 <div class="mobile-kpi">
   <div>{region.displayName} population</div>
   <div>
-    <SurveyValue value={Math.round(region.value.population / 1000) * 1000} digits={0} />
+    <KPIValue value={Math.round(region.value.population / 1000) * 1000} digits={0} />
   </div>
   <div class="sub">people</div>
 </div>

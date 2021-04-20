@@ -1,11 +1,11 @@
 <script>
-  import Search from '../../components/Search.svelte';
-  import { formatAPITime, parseAPITime } from '../../data';
-  import { currentDate, currentRegionInfo, selectByInfo } from '../../stores';
-  import SensorDatePicker2 from '../../components/SensorDatePicker2.svelte';
+  import Search from './Search.svelte';
+  import { formatAPITime, parseAPITime } from '../data';
+  import { currentDate, currentRegionInfo, selectByInfo } from '../stores';
+  import SensorDatePicker2 from './SensorDatePicker2.svelte';
 
   /**
-   * @type {import('../../components/MapBox/colors').SensorEntry}
+   * @type {import('../stores/params').Sensor}
    */
   export let sensor;
 
@@ -14,7 +14,7 @@
   export let placeholder = 'Search Region';
 
   /**
-   * @type {import('../../data/regions').NameInfo[]}
+   * @type {import('../stores/params').Region[]}
    */
   export let items;
 
@@ -24,7 +24,7 @@
   }
 
   /**
-   * @param {import('../../data/regions').NameInfo} d
+   * @param {import('../stores/params').Region} d
    */
   function combineKeywords(d) {
     return `${d.id} ${d.displayName}`;

@@ -13,14 +13,14 @@
     currentLag,
   } from '../../stores';
   import { DataFetcher, DateParam, RegionParam, SensorParam } from '../../stores/params';
-  import SurveyParameters from '../survey/SurveyParameters.svelte';
-  import IndicatorDropdown from '../mobile/IndicatorDropdown.svelte';
+  import RegionDatePicker from '../../components/RegionDatePicker.svelte';
+  import IndicatorPicker from '../../components/IndicatorPicker.svelte';
   import IndicatorCorrelationChart from './IndicatorCorrelationChart.svelte';
   import LagChart from './LagChart.svelte';
   import HistoryLineChart from '../mobile/HistoryLineChart.svelte';
-  import FancyHeader from '../mobile/FancyHeader.svelte';
+  import FancyHeader from '../../components/FancyHeader.svelte';
   import { MULTI_COLORS } from '../../specs/lineSpec';
-  import AboutSection from '../mobile/components/AboutSection.svelte';
+  import AboutSection from '../../components/AboutSection.svelte';
   import { generateCorrelationMetrics } from '../../data/correlation';
   import throttle from 'lodash-es/throttle';
 
@@ -85,7 +85,7 @@
 </script>
 
 <div class="mobile-root">
-  <SurveyParameters sensor={primary.value} {items} defaultItem={nationInfo} placeholder="Search by State or County">
+  <RegionDatePicker sensor={primary.value} {items} defaultItem={nationInfo} placeholder="Search by State or County">
     <div class="grid-3-11 mobile-header-line" slot="title">
       <button class="mobile-back inline-svg-icon" on:click={switchMode}>
         {@html chevronLeftIcon}
@@ -93,10 +93,10 @@
       <h2>Explore <span>Correlations</span></h2>
     </div>
     <div class="uk-container content-grid uk-margin-remove-vertical">
-      <IndicatorDropdown sensor={primary} className="grid-3-7" label="First Indicator" />
-      <IndicatorDropdown sensor={secondary} className="grid-7-11" label="Second Indicator" />
+      <IndicatorPicker sensor={primary} className="grid-3-7" label="First Indicator" />
+      <IndicatorPicker sensor={secondary} className="grid-7-11" label="Second Indicator" />
     </div>
-  </SurveyParameters>
+  </RegionDatePicker>
 
   <div class="uk-container content-grid">
     <div class="grid-3-11">

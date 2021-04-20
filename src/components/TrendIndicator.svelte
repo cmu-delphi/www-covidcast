@@ -3,11 +3,11 @@
   import Up from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-up.svg';
   import Steady from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-right.svg';
   import Unknown from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
-  import { formatFraction } from '../../formats';
+  import { formatFraction } from '../formats';
 
   export let block = false;
   /**
-   * @type {import("../../stores/trend").TrendInfo}
+   * @type {import("../stores/trend").TrendInfo}
    */
   export let trend;
   export let long = false;

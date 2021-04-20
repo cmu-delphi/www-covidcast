@@ -7,7 +7,7 @@
   import { formatDateYearWeekdayAbbr } from '../../formats';
   import IndicatorStatsLine from '../mobile/IndicatorStatsLine.svelte';
   import IndicatorRevisions from './IndicatorRevisions.svelte';
-  import WarningBanner from '../mobile/components/WarningBanner.svelte';
+  import WarningBanner from '../../components/WarningBanner.svelte';
 
   /**
    * question object

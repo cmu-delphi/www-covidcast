@@ -1,10 +1,10 @@
 <script>
-  import SurveyValue from '../survey/SurveyValue.svelte';
-  import TrendIndicator from './TrendIndicator.svelte';
+  import KPIValue from '../../components/KPIValue.svelte';
+  import TrendIndicator from '../../components/TrendIndicator.svelte';
   import { CASES, DEATHS } from '../../stores/params';
   import { formatDateWeekday } from '../../formats';
-  import SensorUnit from './SensorUnit.svelte';
-  import IndicatorAnnotations from './IndicatorAnnotations.svelte';
+  import SensorUnit from '../../components/SensorUnit.svelte';
+  import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -32,9 +32,9 @@
     <h3>Cases</h3>
     <div>
       {#await casesTrend}
-        <SurveyValue value={null} loading />
+        <KPIValue value={null} loading />
       {:then d}
-        <SurveyValue value={d && d.current ? d.current.value : null} />
+        <KPIValue value={d && d.current ? d.current.value : null} />
       {/await}
     </div>
     <div class="sub">
@@ -45,9 +45,9 @@
     <h3>Deaths</h3>
     <div>
       {#await deathTrend}
-        <SurveyValue value={null} loading />
+        <KPIValue value={null} loading />
       {:then d}
-        <SurveyValue value={d && d.current ? d.current.value : null} />
+        <KPIValue value={d && d.current ? d.current.value : null} />
       {/await}
     </div>
     <div class="sub">

@@ -3,7 +3,7 @@
   import { referenceRawNationSignal, refSensor } from '../../stores/questions';
   import UiKitHint from '../../components/UIKitHint.svelte';
   import { formatDateLocal } from '../../formats';
-  import SurveyValue from './SurveyValue.svelte';
+  import KPIValue from '../../components/KPIValue.svelte';
 
   export let className = '';
 
@@ -29,9 +29,9 @@
   <div class="mobile-kpi">
     <div>
       {#await data}
-        <SurveyValue value={null} loading />
+        <KPIValue value={null} loading />
       {:then d}
-        <SurveyValue value={round(d.averageSampleSize)} />
+        <KPIValue value={round(d.averageSampleSize)} />
       {/await}
     </div>
     <div class="subheader">
@@ -48,9 +48,9 @@
   <div class="mobile-kpi">
     <div>
       {#await data}
-        <SurveyValue value={null} loading />
+        <KPIValue value={null} loading />
       {:then d}
-        <SurveyValue value={round(d.totalSampleSize)} />
+        <KPIValue value={round(d.totalSampleSize)} />
       {/await}
     </div>
     <div class="subheader">

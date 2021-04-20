@@ -5,10 +5,10 @@
   import { scrollToTop } from '../../util';
   import { generateCorrelationMetrics } from '../../data/correlation';
   import { formatRawValue } from '../../formats';
-  import FancyHeader from './FancyHeader.svelte';
-  import SortColumnIndicator from './components/SortColumnIndicator.svelte';
-  import { SortHelper } from './components/tableUtils';
-  import AboutSection from './components/AboutSection.svelte';
+  import FancyHeader from '../../components/FancyHeader.svelte';
+  import SortColumnIndicator from '../../components/Table/SortColumnIndicator.svelte';
+  import { SortHelper } from '../../components/Table/tableUtils';
+  import AboutSection from '../../components/AboutSection.svelte';
 
   /**
    * @typedef {import('../../stores/constants').SensorEntry} SensorEntry

@@ -2,7 +2,7 @@
   import { currentDateObject, currentRegionInfo, times, getScrollToAnchor } from '../../stores';
   import { questionCategories, visibleLevels, refSensor, questions } from '../../stores/questions';
   import SurveyQuestion from './SurveyQuestion.svelte';
-  import SurveyParameters from './SurveyParameters.svelte';
+  import SurveyParameters from '../../components/RegionDatePicker.svelte';
   import Overview from './Overview.svelte';
   import { nationInfo, nameInfos, getStateOfCounty } from '../../data/regions';
   import MobileSurveyToc from './MobileSurveyToc.svelte';

@@ -1,8 +1,8 @@
 <script>
   import { scaleLinear } from 'd3-scale';
-  import { stats } from '../../../stores';
+  import { stats } from '../../stores';
   /**
-   * @type {import('../../../stores/params').SensorParam}
+   * @type {import('../../stores/params').SensorParam}
    */
   export let sensor;
 

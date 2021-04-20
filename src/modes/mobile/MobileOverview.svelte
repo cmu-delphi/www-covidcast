@@ -4,11 +4,11 @@
   import HighlightIndicators from './HighlightIndicators.svelte';
   import AllIndicatorOverview from './AllIndicatorOverview.svelte';
   import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
-  import SurveyParameters from '../survey/SurveyParameters.svelte';
+  import SurveyParameters from '../../components/RegionDatePicker.svelte';
   import { currentRegionInfo, currentSensorEntry, currentDateObject, times, getScrollToAnchor } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher, CASES } from '../../stores/params';
   import RegionMapWrapper from './RegionMapWrapper.svelte';
-  import FancyHeader from './FancyHeader.svelte';
+  import FancyHeader from '../../components/FancyHeader.svelte';
   import HistoryLineChart from './HistoryLineChart.svelte';
   import { afterUpdate } from 'svelte';
   import { scrollIntoView } from '../../util';

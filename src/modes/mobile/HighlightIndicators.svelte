@@ -1,11 +1,11 @@
 <script>
   import { sensorList } from '../../stores';
-  import SurveyValue from '../survey/SurveyValue.svelte';
-  import FancyHeader from './FancyHeader.svelte';
-  import TrendIndicator from './TrendIndicator.svelte';
+  import KPIValue from '../../components/KPIValue.svelte';
+  import FancyHeader from '../../components/FancyHeader.svelte';
+  import TrendIndicator from '../../components/TrendIndicator.svelte';
   import { SensorParam } from '../../stores/params';
   import { formatDateWeekday } from '../../formats';
-  import SensorUnit from './SensorUnit.svelte';
+  import SensorUnit from '../../components/SensorUnit.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -42,9 +42,9 @@
       <h3>{s.sensor.name}</h3>
       <div>
         {#await s.trend}
-          <SurveyValue value={null} loading />
+          <KPIValue value={null} loading />
         {:then d}
-          <SurveyValue value={d && d.current ? d.current.value : null} digits={2} />
+          <KPIValue value={d && d.current ? d.current.value : null} digits={2} />
         {/await}
       </div>
       <div class="sub">

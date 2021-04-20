@@ -1,6 +1,6 @@
 <script>
-  import { formatDateWeekday, formatDateYearWeekdayAbbr } from '../../formats';
-  import { WINDOW_SIZE } from '../../stores/params';
+  import { formatDateWeekday, formatDateYearWeekdayAbbr } from '../formats';
+  import { WINDOW_SIZE } from '../stores/params';
   import SensorValue from './SensorValue.svelte';
   import TrendText from './TrendText.svelte';
 
