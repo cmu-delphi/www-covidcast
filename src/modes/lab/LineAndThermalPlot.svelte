@@ -1,12 +1,11 @@
 <script>
   import { timeDay, timeWeek } from 'd3-time';
-  import Vega from '../../components/Vega.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import { addMissing, addNameInfos, fetchData, fetchTimeSlice, formatAPITime, parseAPITime } from '../../data';
-  import { generateLineChartSpec, signalPatches } from '../../specs/lineSpec';
+  import { generateLineChartSpec, signalPatches, resolveHighlightedDate } from '../../specs/lineSpec';
   import { currentDateObject, currentRegionInfo } from '../../stores';
   import { sensorList } from '../../stores/constants';
   import { toTimeValue } from '../../stores/params';
-  import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
 
   const sensor = sensorList.find((d) => d.signal === 'smoothed_wearing_mask' && d.id === 'fb-survey');
   // const sensor = sensorList.find((d) => d.signal === 'smoothed_cli' && d.id === 'fb-survey');
@@ -376,7 +375,7 @@
 
   function onSignal(event) {
     if (event.detail.name === 'highlight' && !play) {
-      const date = resolveHighlightedTimeValue(event);
+      const date = resolveHighlightedDate(event);
       if (date !== currentDate) {
         currentDate = date;
         t = {

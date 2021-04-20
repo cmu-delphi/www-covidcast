@@ -2,8 +2,8 @@ import type { Gradient } from 'vega';
 import type { Field } from 'vega-lite/build/src/channeldef';
 import type { MarkDef } from 'vega-lite/build/src/mark';
 import type { LayerSpec, NormalizedLayerSpec, NormalizedUnitSpec, TopLevelSpec } from 'vega-lite/build/src/spec';
-import type { CountyInfo, RegionInfo, RegionLevel } from '../maps/interfaces';
-import getRelatedCounties from '../maps/related';
+import type { CountyInfo, RegionInfo, RegionLevel } from '../data/regions';
+import getRelatedCounties from '../data/relatedRegions';
 import { EpiDataCasesOrDeathValues, EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 import type { RegionEpiDataRow } from '../stores/params';
 import { MAP_THEME, MISSING_COLOR, ZERO_COLOR } from '../theme';
@@ -359,12 +359,6 @@ function stateJSON() {
 // function msaJSON() {
 //   return import(/* webpackChunkName: 'shape-msa' */ './shapefiles/msa.json').then((r) => r.default);
 // }
-// function stateTilesJSON() {
-//   return import(/* webpackChunkName: 'tile-state' */ './tilegrams/state.topo.json').then((r) => r.default);
-// }
-// function nationTilesJSON() {
-//   return import(/* webpackChunkName: 'tile-nation' */ './tilegrams/nation.topo.json').then((r) => r.default);
-// }
 
 // export function generateHRRSpec(options = {}) {
 //   const level = 'hrr';
@@ -587,48 +581,3 @@ export function generateRelatedCountySpec(county: RegionInfo, options: CommonPar
   spec.layer.push(genCreditsLayer());
   return spec;
 }
-
-// export function generateStateTileSpec(options = {}) {
-//   const level = 'state';
-//   const topoJSON = stateTilesJSON();
-
-//   const spec = genBaseSpec(level, topoJSON, options);
-//   spec.projection = {
-//     type: 'identity',
-//     reflectY: true,
-//   };
-//   spec.datasets.nation = nationTilesJSON();
-//   spec.layer.push(genMissingLayer());
-//   // state, msa
-//   spec.layer.push(genLevelLayer(options));
-//   spec.layer.push(genLevelHoverLayer());
-//   /**
-//    * @type {import('vega-lite/build/src/spec').NormalizedUnitSpec | import('vega-lite/build/src/spec').NormalizedLayerSpec}
-//    */
-//   const layer = {
-//     mark: {
-//       type: 'text',
-//       align: 'center',
-//       baseline: 'middle',
-//     },
-//     encoding: {
-//       key: {
-//         field: 'id',
-//       },
-//       longitude: {
-//         field: 'properties.lon',
-//         type: 'quantitative',
-//       },
-//       latitude: {
-//         field: 'properties.lat',
-//         type: 'quantitative',
-//       },
-//       text: {
-//         field: 'propertyId',
-//         type: 'nominal',
-//       },
-//     },
-//   };
-//   spec.layer.push(layer);
-//   return spec;
-// }

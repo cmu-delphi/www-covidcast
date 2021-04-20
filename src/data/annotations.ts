@@ -2,7 +2,7 @@ import { parseAPITime } from './utils';
 import { csvParse } from 'd3-dsv';
 import { timeDay } from 'd3-time';
 import { fetchOptions } from './api';
-import type { RegionInfo, RegionLevel } from '../maps/interfaces';
+import type { RegionInfo, RegionLevel } from './regions';
 
 declare const process: { env: Record<string, string> };
 
@@ -95,7 +95,7 @@ export class Annotation {
   }
 
   /**
-   * @param {import('../maps').NameInfo | import('../maps').NameInfo[]} region
+   * @param {import('../data/regions').NameInfo | import('../data/regions').NameInfo[]} region
    */
   matchRegion(region: RegionInfo | RegionInfo[]): boolean {
     const regionToMatch = Array.isArray(region) ? region : [region];

@@ -1,10 +1,10 @@
 <script>
   import { formatDateISO } from '../../formats';
-  import KPI from '../survey/KPI.svelte';
+  import KPI from '../../components/KPI.svelte';
   // import IndicatorCountyMap from './IndicatorCountyMap.svelte';
-  import FancyHeader from '../mobile/FancyHeader.svelte';
+  import FancyHeader from '../../components/FancyHeader.svelte';
   // import { getAvailableCounties } from '../../data/indicatorInfo';
-  import SurveyValue from '../survey/SurveyValue.svelte';
+  import KPIValue from '../../components/KPIValue.svelte';
   // import IndicatorCoverageChart from './IndicatorCoverageChart.svelte';
   import BackfillProfile from './BackfillProfile.svelte';
 
@@ -47,7 +47,7 @@
     </div>
     <div class="mobile-kpi">
       <div>
-        <SurveyValue value={signal.latest_coverage} factor={100} />
+        <KPIValue value={signal.latest_coverage} factor={100} />
       </div>
       <div class="sub">% of Counties Available</div>
     </div>

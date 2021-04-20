@@ -1,7 +1,7 @@
 <script>
-  import Vega from '../../components/Vega.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import { addNameInfos, fetchData, formatAPITime } from '../../data';
-  import { getInfoByName, getCountiesOfState } from '../../maps';
+  import { getInfoByName, getCountiesOfState } from '../../data/regions';
   import { DEFAULT_SURVEY_SENSOR, sensorMap } from '../../stores/constants';
   import { generateCountiesOfStateSpec } from '../../specs/mapSpec';
 

@@ -1,8 +1,8 @@
 <script>
-  import Vega from '../../components/Vega.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import { formatDateISO } from '../../formats';
   import { generateStateMapWithCountyBinaryDataSpec } from '../../specs/mapSpec';
-  import DownloadMenu from '../mobile/components/DownloadMenu.svelte';
+  import DownloadMenu from '../../components/DownloadMenu.svelte';
 
   /**
    * @type {{name: string}}

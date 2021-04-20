@@ -3,9 +3,9 @@
 import { formatAPITime, parseAPITime } from './utils';
 import { callSignalAPI } from './api';
 import { EpiDataRow, fetchData } from './fetchData';
-import { addNameInfos } from '.';
-import { countyInfo } from '../maps/infos';
-import type { RegionInfo } from '../maps/interfaces';
+import { addNameInfos } from './fetchData';
+import { countyInfo } from './regions';
+import type { RegionInfo } from './regions';
 import type { TimeFrame } from '../stores/params';
 import data from './__test__/backfill/chng_sample_ny.json';
 import { timeDay } from 'd3-time';

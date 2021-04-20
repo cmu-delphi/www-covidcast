@@ -1,11 +1,11 @@
 <script>
-  import Vega from '../../components/Vega.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import { addNameInfos, fetchRegionSlice } from '../../data';
   import { currentDateObject, sensorMap, stats } from '../../stores';
   import { combineSignals } from '../../data/utils';
   import { onMount } from 'svelte';
   import Search from '../../components/Search.svelte';
-  import { countyInfo, stateInfo } from '../../maps';
+  import { countyInfo, stateInfo } from '../../data/regions';
   import { resolveStats, resolveStatsKey } from '../../components/MapBox/colors';
 
   const masks = sensorMap.get('fb-survey-smoothed_wearing_mask');
@@ -245,7 +245,7 @@
   }
 
   /**
-   * @param {import('../../maps').NameInfo} d
+   * @param {import('../../data/regions').NameInfo} d
    */
   function combineKeywords(d) {
     return `${d.id} ${d.displayName}`;

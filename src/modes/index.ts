@@ -15,48 +15,30 @@ const modes: Mode[] = [
   {
     id: 'summary',
     label: 'Location Summary',
-    component: () =>
-      import(/* webpackChunkName: 'm-overview' */ './mobile/MobileOverview.svelte').then((r) => r.default),
+    component: () => import(/* webpackChunkName: 'm-overview' */ './summary/Summary.svelte').then((r) => r.default),
   },
   {
     id: 'indicator',
     label: 'Indicator Details',
     component: () =>
-      import(/* webpackChunkName: 'm-indicator' */ './mobile/MobileIndicatorOverview.svelte').then((r) => r.default),
+      import(/* webpackChunkName: 'm-indicator' */ './indicator/Indicator.svelte').then((r) => r.default),
   },
   {
     id: 'correlation',
     label: 'Indicator Correlation',
     component: () =>
-      import(/* webpackChunkName: 'm-correlation' */ './correlation/IndicatorCorrelation.svelte').then(
-        (r) => r.default,
-      ),
+      import(/* webpackChunkName: 'm-correlation' */ './correlation/Correlation.svelte').then((r) => r.default),
   },
   {
     id: 'classic',
     label: 'Classic COVIDcast',
-    component: () => import(/* webpackChunkName: 'm-old' */ './overview/Overview.svelte').then((r) => r.default),
+    component: () => import(/* webpackChunkName: 'm-old' */ './classic/Overview.svelte').then((r) => r.default),
   },
-  // {
-  //   id: 'timelapse',
-  //   label: 'Timelapse',
-  //   component: () =>
-  //     import(/* webpackChunkName: 'm-timelapse' */ './timelapse/TimeLapse.svelte').then((r) => r.default),
-  // },
-  // {
-  //   id: 'top10',
-  //   label: 'Top 10',
-  //   component: () => import(/* webpackChunkName: 'm-top10' */ './top10/Top10.svelte').then((r) => r.default),
-  // },
-  // {
-  //   id: 'single',
-  //   label: 'Region Details',
-  //   component: () => import(/* webpackChunkName: 'm-single' */ './single/SingleLocation.svelte').then((r) => r.default),
-  // },
   {
     id: 'survey-results',
     label: 'Survey Results',
-    component: () => import(/* webpackChunkName: 'm-survey' */ './survey/Survey.svelte').then((r) => r.default),
+    component: () =>
+      import(/* webpackChunkName: 'm-survey' */ './survey-results/SurveyResults.svelte').then((r) => r.default),
   },
   {
     id: 'export',
@@ -88,10 +70,7 @@ export default modes;
 
 export type ModeID =
   | 'summary'
-  | 'timelapse'
-  | 'top10'
   | 'export'
-  | 'single'
   | 'survey-results'
   | 'lab'
   | 'classic'

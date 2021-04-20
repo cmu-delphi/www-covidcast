@@ -1,13 +1,13 @@
 import { timeDay, timeMonth, timeWeek } from 'd3-time';
 import { addNameInfos, fetchData, formatAPITime, addMissing, fitRange, parseAPITime, EpiDataRow } from '../data';
-import { nationInfo } from '../maps/infos';
+import { nationInfo } from '../data/regions';
 import { currentDate, yesterdayDate, currentSensor, sensorList, selectByInfo } from '.';
 import { determineTrend, Trend } from './trend';
 import { determineMinMax } from './stats';
 import { formatValue } from '../formats';
 import { scaleSequential } from 'd3-scale';
 import { scrollToTop } from '../util';
-import type { RegionInfo, RegionInfo as Region, RegionLevel, RegionArea, CountyInfo } from '../maps/interfaces';
+import type { RegionInfo, RegionInfo as Region, RegionLevel, RegionArea, CountyInfo } from '../data/regions';
 import type { Sensor, SensorEntry } from './constants';
 import type { Writable } from 'svelte/store';
 
