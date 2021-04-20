@@ -112,7 +112,6 @@
     "marked": "^2.0.3",
     "mini-css-extract-plugin": "^1.5.0",
     "node-fetch": "^2.6.1",
-    "nouislider": "^14.7.0",
     "prettier": "^2.2.1",
     "prettier-plugin-svelte": "^2.2.0",
     "raw-loader": "^4.0.2",

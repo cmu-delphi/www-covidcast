@@ -406,28 +406,21 @@ export const trackedUrlParams = derived(
   ],
   ([mode, sensor, sensor2, lag, level, region, date, signalOptions, encoding, compare]): TrackedState => {
     const sensorEntry = sensorMap.get(sensor);
-    const inMapMode = mode === modeByID.summary || mode === modeByID.timelapse;
+    const inMapMode = mode === modeByID.summary;
 
     // determine parameters based on default value and current mode
     const params: Omit<PersistedState, 'mode'> = {
       sensor:
         mode === modeByID.landing ||
         mode === modeByID.summary ||
-        mode === modeByID.single ||
         mode === modeByID['survey-results'] ||
         sensor === DEFAULT_SENSOR
           ? null
           : sensor,
       sensor2: mode === modeByID.correlation ? sensor2 : null,
       lag: mode === modeByID.correlation ? lag : null,
-      level:
-        mode === modeByID.single ||
-        mode === modeByID.export ||
-        mode === modeByID['survey-results'] ||
-        level === DEFAULT_LEVEL
-          ? null
-          : level,
-      region: mode === modeByID.export || mode === modeByID.timelapse ? null : region,
+      level: mode === modeByID.export || mode === modeByID['survey-results'] || level === DEFAULT_LEVEL ? null : level,
+      region: mode === modeByID.export ? null : region,
       date:
         mode === modeByID.export || mode === modeByID.landing || mode === modeByID['indicator-status']
           ? null
@@ -435,10 +428,7 @@ export const trackedUrlParams = derived(
       signalC: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.cumulative,
       signalI: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.incidence,
       encoding: !inMapMode || encoding === DEFAULT_ENCODING ? null : encoding,
-      compare:
-        (mode !== modeByID.classic && mode !== modeByID.single) || !compare
-          ? null
-          : compare.map((d) => d.info.propertyId).join(','),
+      compare: mode !== modeByID.classic || !compare ? null : compare.map((d) => d.info.propertyId).join(','),
     };
     return {
       path: mode === DEFAULT_MODE ? `` : `${mode.id}/`,
