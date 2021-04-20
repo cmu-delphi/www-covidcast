@@ -7,7 +7,7 @@
   import { getInfoByName, stateInfo } from '../../maps';
   import { addMissing } from '../../data';
   import { groupByRegion } from '../../stores/params';
-  import Vega from '../../components/Vega.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import SensorValue from './SensorValue.svelte';
   import { MISSING_COLOR } from '../../theme';
   import ColorLegend from './components/ColorLegend.svelte';

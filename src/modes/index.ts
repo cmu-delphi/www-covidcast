@@ -35,7 +35,7 @@ const modes: Mode[] = [
   {
     id: 'classic',
     label: 'Classic COVIDcast',
-    component: () => import(/* webpackChunkName: 'm-old' */ './overview/Overview.svelte').then((r) => r.default),
+    component: () => import(/* webpackChunkName: 'm-old' */ './classic/Overview.svelte').then((r) => r.default),
   },
   {
     id: 'survey-results',

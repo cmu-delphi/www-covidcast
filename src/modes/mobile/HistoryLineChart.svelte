@@ -1,5 +1,5 @@
 <script>
-  import Vega from '../../components/Vega.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import { addMissing, averageByDate } from '../../data';
   import { nationInfo, getStateOfCounty } from '../../maps/infos';
   import getRelatedCounties from '../../maps/related';

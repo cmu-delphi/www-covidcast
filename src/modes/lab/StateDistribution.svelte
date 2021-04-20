@@ -1,5 +1,5 @@
 <script>
-  import Vega from '../../components/Vega.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import { fetchData, formatAPITime } from '../../data';
   import { getInfoByName } from '../../maps';
   import { currentDateObject } from '../../stores';

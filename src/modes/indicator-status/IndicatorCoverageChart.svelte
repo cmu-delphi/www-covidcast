@@ -1,5 +1,5 @@
 <script>
-  import Vega from '../../components/Vega.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import { nationInfo } from '../../maps';
   import {
     generateLineChartSpec,

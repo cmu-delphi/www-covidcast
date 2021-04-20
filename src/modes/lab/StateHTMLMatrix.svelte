@@ -6,7 +6,7 @@
   import { formatDateShortOrdinal } from '../../formats';
   import { generateSparkLine } from '../../specs/lineSpec';
   import { timeWeek } from 'd3-time';
-  import Vega from '../../components/Vega.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import { getInfoByName } from '../../maps';
   import { determineColorScale, determineMinMax } from '../../components/MapBox/colors';
   import HexGrid from '../mobile/components/HexGrid.svelte';

@@ -1,5 +1,5 @@
 <script>
-  import Vega from '../../components/Vega.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import { formatDateShortNumbers } from '../../formats';
   import { generateSparkLine } from '../../specs/lineSpec';
   import SurveyValue from '../survey/SurveyValue.svelte';

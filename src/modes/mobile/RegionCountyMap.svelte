@@ -1,5 +1,5 @@
 <script>
-  import Vega from '../../components/Vega.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import { formatDateISO } from '../../formats';
   import { getStateOfCounty } from '../../maps';
   import { generateStateMapWithCountyDataSpec } from '../../specs/mapSpec';

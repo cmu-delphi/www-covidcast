@@ -1,5 +1,5 @@
 <script>
-  import Vega from '../../components/Vega.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import { addNameInfos, fetchRegionSlice } from '../../data';
   import { currentDateObject, sensorMap, stats } from '../../stores';
   import { combineSignals } from '../../data/utils';

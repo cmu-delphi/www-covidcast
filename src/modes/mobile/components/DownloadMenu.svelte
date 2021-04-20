@@ -7,7 +7,7 @@
 
   export let fileName = 'chart';
   /**
-   * @type {import('../../../components/Vega.svelte').default}
+   * @type {import('../../../components/vega/Vega.svelte').default}
    */
   export let vegaRef = null;
 
