@@ -1,5 +1,5 @@
-import { loadSources } from '../../../../maps';
-import bounds from '../../../../maps/processed/bounds.json';
+import { loadSources } from '../../maps';
+import bounds from '../../maps/processed/bounds.json';
 import { levelMegaCounty, levels } from '../../../../stores/constants';
 import { MAP_THEME, MISSING_COLOR } from '../../../../theme';
 import { ENCODING_BUBBLE_THEME, ENCODING_SPIKE_THEME } from '../../theme';
