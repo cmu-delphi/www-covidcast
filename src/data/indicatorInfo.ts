@@ -7,8 +7,6 @@ import { addNameInfos } from './fetchData';
 import { countyInfo } from './regions';
 import type { RegionInfo } from './regions';
 import type { TimeFrame } from '../stores/params';
-import data from './__test__/backfill/chng_sample_ny.json';
-import { timeDay } from 'd3-time';
 
 export interface Coverage {
   date: Date;
@@ -72,31 +70,22 @@ export interface ProfileEntry {
   date_value: Date;
   issue_date: Date;
   lag: number;
+
   /**
-   * [0..1]
+   * completeness value to the given reference anchor lag
    */
-  confidence: number;
+  completeness: number;
+  /**
+   * relative change to the previous issue
+   */
+  relative_change: number;
   value: number;
 }
 
-export function loadBackFillProfile(indicator: IndicatorStatus, window: TimeFrame): Promise<ProfileEntry[]> {
-  if (indicator.name !== 'Change' || window.min < new Date(2020, 0, 1)) {
-    return Promise.resolve([]);
-  }
-  let latest = data[0];
-  const rows: ProfileEntry[] = data.map((d) => {
-    if (d.time_value !== latest.time_value) {
-      latest = d; // sorted like that the lag desc = max
-    }
-    const date = parseFakeISO(d.time_value);
-    return {
-      date_value: date,
-      time_value: d.time_value,
-      lag: d.lag,
-      issue_date: timeDay.offset(date, d.lag),
-      confidence: d.sample_size / latest.sample_size,
-      value: d.value,
-    };
-  });
-  return Promise.resolve(rows);
+export function loadBackFillProfile(
+  indicator: IndicatorStatus,
+  region: RegionInfo,
+  window: TimeFrame,
+): Promise<ProfileEntry[]> {
+  return Promise.resolve([]);
 }

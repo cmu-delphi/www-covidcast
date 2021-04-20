@@ -6,7 +6,8 @@
   // import { getAvailableCounties } from '../../data/indicatorInfo';
   import KPIValue from '../../components/KPIValue.svelte';
   // import IndicatorCoverageChart from './IndicatorCoverageChart.svelte';
-  import BackfillProfile from './BackfillProfile.svelte';
+  import BackfillTimeProfile from './BackfillTimeProfile.svelte';
+  import { nationInfo } from '../../data/regions';
 
   /**
    * @type {import('../../data/indicatorInfo').IndicatorStatus}
@@ -76,5 +77,5 @@
   <FancyHeader invert sub="Backfill Profile">{signal ? signal.name : '?'}</FancyHeader>
 </div>
 <div class="grid-2-12">
-  <BackfillProfile indicator={signal} date={pickedDate} />
+  <BackfillTimeProfile indicator={signal} date={pickedDate} region={nationInfo} referenceAnchorLag={60} />
 </div>

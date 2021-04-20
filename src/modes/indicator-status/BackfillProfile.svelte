@@ -1,12 +1,12 @@
 <script>
   // import type { TopLevelSpec } from 'vega-lite';
   // import type { NonNormalizedSpec, NormalizedSpec } from 'vega-lite/build/src/spec';
-  import Vega from '../../components/Vega.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import { loadBackFillProfile } from '../../data/indicatorInfo';
   // import type { IndicatorStatus } from ;
   import { commonConfig } from '../../specs/commonSpec';
   import { DateParam } from '../../stores/params';
-  import DownloadMenu from '../mobile/components/DownloadMenu.svelte';
+  import DownloadMenu from '../../components/DownloadMenu.svelte';
 
   /**
    * @type {import('../../data/indicatorInfo').IndicatorStatus}
