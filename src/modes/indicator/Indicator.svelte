@@ -1,10 +1,10 @@
 <script>
   import FancyHeader from '../../components/FancyHeader.svelte';
-  import RegionMapWrapper from './RegionMapWrapper.svelte';
-  import HistoryLineChart from './HistoryLineChart.svelte';
+  import RegionMapWrapper from '../summary/RegionMapWrapper.svelte';
+  import HistoryLineChart from '../summary/HistoryLineChart.svelte';
   import IndicatorDropdown from '../../components/IndicatorPicker.svelte';
-  import GeoTable from './GeoTable.svelte';
-  import IndicatorOverview from './IndicatorOverview.svelte';
+  import GeoTable from '../summary/GeoTable.svelte';
+  import IndicatorOverview from '../summary/IndicatorOverview.svelte';
   import chevronLeftIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-left.svg';
   import { currentMode, getScrollToAnchor } from '../../stores';
   import { modeByID } from '..';

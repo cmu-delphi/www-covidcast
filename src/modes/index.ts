@@ -15,22 +15,19 @@ const modes: Mode[] = [
   {
     id: 'summary',
     label: 'Location Summary',
-    component: () =>
-      import(/* webpackChunkName: 'm-overview' */ './mobile/MobileOverview.svelte').then((r) => r.default),
+    component: () => import(/* webpackChunkName: 'm-overview' */ './summary/Summary.svelte').then((r) => r.default),
   },
   {
     id: 'indicator',
     label: 'Indicator Details',
     component: () =>
-      import(/* webpackChunkName: 'm-indicator' */ './mobile/MobileIndicatorOverview.svelte').then((r) => r.default),
+      import(/* webpackChunkName: 'm-indicator' */ './indicator/Indicator.svelte').then((r) => r.default),
   },
   {
     id: 'correlation',
     label: 'Indicator Correlation',
     component: () =>
-      import(/* webpackChunkName: 'm-correlation' */ './correlation/IndicatorCorrelation.svelte').then(
-        (r) => r.default,
-      ),
+      import(/* webpackChunkName: 'm-correlation' */ './correlation/Correlation.svelte').then((r) => r.default),
   },
   {
     id: 'classic',
@@ -40,7 +37,8 @@ const modes: Mode[] = [
   {
     id: 'survey-results',
     label: 'Survey Results',
-    component: () => import(/* webpackChunkName: 'm-survey' */ './survey/Survey.svelte').then((r) => r.default),
+    component: () =>
+      import(/* webpackChunkName: 'm-survey' */ './survey-results/SurveyResults.svelte').then((r) => r.default),
   },
   {
     id: 'export',
