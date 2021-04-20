@@ -2,8 +2,8 @@ import { callAPIEndPoint, EpiDataResponse } from './api';
 import { timeDay } from 'd3-time';
 import { parseAPITime, formatAPITime, combineSignals } from './utils';
 import { EpiDataCasesOrDeathValues, EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
-import { getInfoByName } from '../maps/infos';
-import type { RegionInfo, RegionLevel } from '../maps/interfaces';
+import { getInfoByName } from './regions';
+import type { RegionInfo, RegionLevel } from './regions';
 
 export interface DataSensor {
   id: string;

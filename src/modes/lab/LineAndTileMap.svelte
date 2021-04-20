@@ -1,14 +1,13 @@
 <script>
-  import Vega from '../../components/Vega.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import { fetchRegionSlice, fetchTimeSlice, addMissing, addNameInfos } from '../../data';
   import { DEFAULT_SURVEY_SENSOR, sensorMap } from '../../stores/constants';
   import { generateStateTileSpec } from '../../specs/mapSpec';
-  import { generateLineChartSpec, signalPatches } from '../../specs/lineSpec';
+  import { generateLineChartSpec, signalPatches, resolveHighlightedDate } from '../../specs/lineSpec';
   import { currentDate, currentDateObject, stats } from '../../stores';
   import { formatDateShortOrdinal } from '../../formats';
   import debounce from 'lodash-es/debounce';
   import { determineMinMax } from '../../components/MapBox/colors';
-  import { resolveHighlightedTimeValue } from '../overview/vegaSpec';
 
   const sensor = sensorMap.get(DEFAULT_SURVEY_SENSOR);
 
@@ -33,7 +32,7 @@
 
   function onSignal(event) {
     if (event.detail.name === 'highlight') {
-      const date = resolveHighlightedTimeValue(event);
+      const date = resolveHighlightedDate(event);
       if (date) {
         lazyUpdate(date);
       }

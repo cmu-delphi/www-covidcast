@@ -1,6 +1,6 @@
 <script>
-  import Vega from '../../components/Vega.svelte';
-  import { nationInfo } from '../../maps';
+  import Vega from '../../components/vega/Vega.svelte';
+  import { nationInfo } from '../../data/regions';
   import {
     generateLineChartSpec,
     resolveHighlightedDate,
@@ -8,12 +8,12 @@
     MULTI_COLORS,
     genAnnotationLayer,
   } from '../../specs/lineSpec';
-  import Toggle from '../mobile/Toggle.svelte';
+  import Toggle from '../../components/Toggle.svelte';
   import { annotationManager } from '../../stores';
   import { createEventDispatcher } from 'svelte';
-  import IndicatorAnnotation from '../mobile/IndicatorAnnotation.svelte';
+  import IndicatorAnnotation from '../../components/IndicatorAnnotation.svelte';
   import { timeDay } from 'd3-time';
-  import DownloadMenu from '../mobile/components/DownloadMenu.svelte';
+  import DownloadMenu from '../../components/DownloadMenu.svelte';
 
   const dispatch = createEventDispatcher();
   /**

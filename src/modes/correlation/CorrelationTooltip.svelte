@@ -2,7 +2,7 @@
   import { lagToOffset } from '../../data/correlation';
 
   import { formatDateShortWeekdayAbbr } from '../../formats';
-  import SensorValue from '../mobile/SensorValue.svelte';
+  import SensorValue from '../../components/SensorValue.svelte';
 
   export let hidden = false;
 

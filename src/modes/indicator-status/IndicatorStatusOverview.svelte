@@ -1,6 +1,5 @@
 <script>
   import IndicatorStatusTable from './IndicatorStatusTable.svelte';
-  import '../mobile/common.css';
   import IndicatorStatus from './IndicatorStatus.svelte';
   import { loadData, determineDomain } from './data';
   import Search from '../../components/Search.svelte';

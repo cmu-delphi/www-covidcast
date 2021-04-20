@@ -1,13 +1,13 @@
 <script>
-  import SortColumnIndicator from '../mobile/components/SortColumnIndicator.svelte';
-  import FancyHeader from '../mobile/FancyHeader.svelte';
+  import SortColumnIndicator from '../../components/Table/SortColumnIndicator.svelte';
+  import FancyHeader from '../../components/FancyHeader.svelte';
   import { formatDateISO, formatDateShortNumbers, formatFraction } from '../../formats';
-  import DownloadMenu from '../mobile/components/DownloadMenu.svelte';
-  import Vega from '../../components/Vega.svelte';
+  import DownloadMenu from '../../components/DownloadMenu.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import { generateSparkLine } from '../../specs/lineSpec';
   import { createEventDispatcher } from 'svelte';
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
-  import { SortHelper } from '../mobile/components/tableUtils';
+  import { SortHelper } from '../../components/Table/tableUtils';
 
   const dispatch = createEventDispatcher();
   /**

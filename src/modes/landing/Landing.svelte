@@ -1,13 +1,12 @@
 <script>
   import Search from '../../components/Search.svelte';
-  import { countyInfo, nationInfo, stateInfo } from '../../maps';
+  import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
   import { currentRegionInfo, groupedSensorList, recentRegionInfos, selectByInfo, switchToMode } from '../../stores';
   import flagUSAIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/flag-usa.svg';
   import { modeByID } from '..';
   import { questionCategories } from '../../stores/questions';
-  import '../mobile/common.css';
-  import FancyHeader from '../mobile/FancyHeader.svelte';
-  import SurveyStats from '../survey/SurveyStats.svelte';
+  import FancyHeader from '../../components/FancyHeader.svelte';
+  import SurveyStats from '../../blocks/SurveyStats.svelte';
   import SensorGroup from './SensorGroup.svelte';
 
   function switchMode(region) {
@@ -17,7 +16,7 @@
     switchToMode(modeByID.summary);
   }
   /**
-   * @param {import('../../maps').NameInfo} d
+   * @param {import('../../data/regions').NameInfo} d
    */
   function combineKeywords(d) {
     return `${d.id} ${d.displayName}`;

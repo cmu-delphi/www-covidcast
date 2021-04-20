@@ -2,7 +2,7 @@ import { ensureSensorStructure, Sensor, sensorList } from './constants';
 import descriptions from './questions.generated.json';
 import { SensorParam } from './params';
 import { isoParse } from 'd3-time-format';
-import type { RegionLevel } from '../maps/interfaces';
+import type { RegionLevel } from '../data/regions';
 
 export const overviewText = descriptions.overview;
 export const surveyFullTextLink = descriptions.fullSurveyLink;
