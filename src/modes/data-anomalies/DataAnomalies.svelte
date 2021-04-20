@@ -1,6 +1,5 @@
 <script>
   import AnnotationTable from './AnnotationTable.svelte';
-  import '../mobile/common.css';
 </script>
 
 <div class="root">

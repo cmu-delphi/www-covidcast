@@ -14,7 +14,6 @@
   } from '../../stores';
   import { DataFetcher, DateParam, RegionParam, SensorParam } from '../../stores/params';
   import SurveyParameters from '../survey/SurveyParameters.svelte';
-  import '../mobile/common.css';
   import IndicatorDropdown from '../mobile/IndicatorDropdown.svelte';
   import IndicatorCorrelationChart from './IndicatorCorrelationChart.svelte';
   import LagChart from './LagChart.svelte';

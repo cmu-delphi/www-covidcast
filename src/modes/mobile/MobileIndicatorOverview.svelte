@@ -14,7 +14,6 @@
   import SurveyParameters from '../survey/SurveyParameters.svelte';
   import { currentRegionInfo, currentSensorEntry, currentDateObject, times } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
-  import './common.css';
   import { formatDateWeekday } from '../../formats';
   import { afterUpdate } from 'svelte';
   import { scrollIntoView } from '../../util';

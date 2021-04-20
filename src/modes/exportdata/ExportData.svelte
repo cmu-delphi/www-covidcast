@@ -13,7 +13,6 @@
   import { questions } from '../../stores/questions';
   import { DateParam } from '../../stores/params';
   import FancyHeader from '../mobile/FancyHeader.svelte';
-  import '../mobile/common.css';
   import IndicatorAnnotation from '../mobile/IndicatorAnnotation.svelte';
 
   const CSV_SERVER = 'https://delphi.cmu.edu/csv';

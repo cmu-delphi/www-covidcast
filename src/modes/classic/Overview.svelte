@@ -24,6 +24,7 @@
   import AddAnother from './AddAnother.svelte';
   import { getInfoByName } from '../../data/regions';
   import InfoDialog from './components/InfoDialog.svelte';
+  import './style.css';
 
   /**
    * @type {import('../../data/fetchData').SensorEntry | null}

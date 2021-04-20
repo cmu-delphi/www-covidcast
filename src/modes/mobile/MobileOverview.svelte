@@ -7,7 +7,6 @@
   import SurveyParameters from '../survey/SurveyParameters.svelte';
   import { currentRegionInfo, currentSensorEntry, currentDateObject, times, getScrollToAnchor } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher, CASES } from '../../stores/params';
-  import './common.css';
   import RegionMapWrapper from './RegionMapWrapper.svelte';
   import FancyHeader from './FancyHeader.svelte';
   import HistoryLineChart from './HistoryLineChart.svelte';

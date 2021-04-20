@@ -8,7 +8,6 @@
   import MobileSurveyToc from './MobileSurveyToc.svelte';
   import { DataFetcher, DateParam, RegionParam, SensorParam } from '../../stores/params';
   import getRelatedCounties from '../../data/relatedRegions';
-  import '../mobile/common.css';
   import { modeByID } from '..';
   import { scrollIntoView } from '../../util';
 
