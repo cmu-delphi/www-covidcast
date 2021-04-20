@@ -82,10 +82,39 @@ export interface ProfileEntry {
   value: number;
 }
 
+function toCountProfileEntries(rows: EpiDataRow[], referenceAnchorLag: number): ProfileEntry[] {
+  // assume sorted by date asc
+  return [];
+}
+
+function loadJHUProfile(region: RegionInfo, window: TimeFrame, referenceAnchorLag = 60): Promise<ProfileEntry[]> {
+  // currently only supported one
+  return fetchData(
+    {
+      id: 'jhu-csse',
+      signal: 'confirmed_incidence_num',
+    },
+    region.level,
+    region.propertyId,
+    window.range,
+    {
+      geo_type: region.level,
+      geo_value: region.propertyId,
+      signal: 'confirmed_incidence_num',
+    },
+  ).then((rows) => {
+    return toCountProfileEntries(rows, referenceAnchorLag);
+  });
+}
+
 export function loadBackFillProfile(
   indicator: IndicatorStatus,
   region: RegionInfo,
   window: TimeFrame,
+  referenceAnchorLag = 60,
 ): Promise<ProfileEntry[]> {
+  if (indicator.source === 'jhu-csse') {
+    return loadJHUProfile(region, window, referenceAnchorLag);
+  }
   return Promise.resolve([]);
 }
