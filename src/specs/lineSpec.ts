@@ -2,9 +2,9 @@ import type { ExprRef, Signal, SignalRef, Update } from 'vega';
 import type { Axis } from 'vega-lite/build/src/axis';
 import type { Field, PositionFieldDef, PositionValueDef } from 'vega-lite/build/src/channeldef';
 import type { LayerSpec, NormalizedLayerSpec, NormalizedUnitSpec, TopLevelSpec } from 'vega-lite/build/src/spec';
-import { CURRENT_DATE_HIGHLIGHT } from '../components/vegaSpecUtils';
+import { CURRENT_DATE_HIGHLIGHT } from '../components/vega/vegaSpecUtils';
 import type { Annotation } from '../data';
-import type { RegionInfo } from '../maps/interfaces';
+import type { RegionInfo } from '../data/regions';
 import { BASE_SPEC, commonConfig, CREDIT } from './commonSpec';
 
 // dark2

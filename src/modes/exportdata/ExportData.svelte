@@ -8,7 +8,7 @@
   import { onMount } from 'svelte';
   import { trackEvent } from '../../stores/ga';
   import Search from '../../components/Search.svelte';
-  import { getCountiesOfState, getInfoByName, infosByLevel } from '../../maps';
+  import { getCountiesOfState, getInfoByName, infosByLevel } from '../../data/regions';
   import { formatDateISO } from '../../formats';
   import { questions } from '../../stores/questions';
   import { DateParam } from '../../stores/params';

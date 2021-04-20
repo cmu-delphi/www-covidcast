@@ -7,7 +7,7 @@
   import { currentMode } from '../../stores';
   import { modeByID } from '..';
   import TrendIndicator from './TrendIndicator.svelte';
-  import Vega from '../../components/Vega.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import SparkLineTooltip from './SparkLineTooltip.svelte';
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
   import { generateSparkLine } from '../../specs/lineSpec';

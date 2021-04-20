@@ -1,5 +1,5 @@
 <script>
-  import Vega from '../../components/Vega.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import { BASE_SPEC, guessTopPadding, joinTitle } from '../../specs/commonSpec';
   import { genCreditsLayer } from '../../specs/lineSpec';
   import { isMobileDevice } from '../../stores';

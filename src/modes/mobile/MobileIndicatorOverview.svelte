@@ -10,7 +10,7 @@
   import { modeByID } from '..';
   import IndicatorAbout from './IndicatorAbout.svelte';
   import RegionOverview from './RegionOverview.svelte';
-  import { countyInfo, nationInfo, stateInfo } from '../../maps';
+  import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
   import SurveyParameters from '../survey/SurveyParameters.svelte';
   import { currentRegionInfo, currentSensorEntry, currentDateObject, times } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';

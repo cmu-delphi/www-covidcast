@@ -1,6 +1,6 @@
 <script>
   import Search from '../../components/Search.svelte';
-  import { countyInfo, nationInfo, stateInfo } from '../../maps';
+  import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
   import { currentRegionInfo, groupedSensorList, recentRegionInfos, selectByInfo, switchToMode } from '../../stores';
   import flagUSAIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/flag-usa.svg';
   import { modeByID } from '..';
@@ -17,7 +17,7 @@
     switchToMode(modeByID.summary);
   }
   /**
-   * @param {import('../../maps').NameInfo} d
+   * @param {import('../../data/regions').NameInfo} d
    */
   function combineKeywords(d) {
     return `${d.id} ${d.displayName}`;

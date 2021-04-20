@@ -4,7 +4,7 @@
 
   export let hidden = false;
   /**
-   * @type {import('../../data').EpiDataRow & import('../../maps').NameInfo}
+   * @type {import('../../data').EpiDataRow & import('../../data/regions').NameInfo}
    */
   export let item;
 

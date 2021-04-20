@@ -1,6 +1,6 @@
 import { timeDay } from 'd3-time';
 import { getIndicatorStatuses } from '../../data/indicatorInfo';
-import { countyInfo } from '../../maps';
+import { countyInfo } from '../../data/regions';
 import { TimeFrame } from '../../stores/params';
 
 /**

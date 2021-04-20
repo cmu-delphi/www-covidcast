@@ -3,7 +3,7 @@
   import FancyHeader from '../mobile/FancyHeader.svelte';
   import { formatDateISO, formatDateShortNumbers, formatFraction } from '../../formats';
   import DownloadMenu from '../mobile/components/DownloadMenu.svelte';
-  import Vega from '../../components/Vega.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import { generateSparkLine } from '../../specs/lineSpec';
   import { createEventDispatcher } from 'svelte';
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';

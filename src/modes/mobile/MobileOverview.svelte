@@ -3,7 +3,7 @@
   import CasesOverview from './CasesOverview.svelte';
   import HighlightIndicators from './HighlightIndicators.svelte';
   import AllIndicatorOverview from './AllIndicatorOverview.svelte';
-  import { countyInfo, nationInfo, stateInfo } from '../../maps';
+  import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
   import SurveyParameters from '../survey/SurveyParameters.svelte';
   import { currentRegionInfo, currentSensorEntry, currentDateObject, times, getScrollToAnchor } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher, CASES } from '../../stores/params';

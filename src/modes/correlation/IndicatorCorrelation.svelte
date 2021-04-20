@@ -1,7 +1,7 @@
 <script>
   import chevronLeftIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-left.svg';
   import { modeByID } from '..';
-  import { countyInfo, nationInfo, stateInfo } from '../../maps';
+  import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
   import {
     currentDateObject,
     currentMode,

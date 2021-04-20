@@ -14,7 +14,7 @@
   export let placeholder = 'Search Region';
 
   /**
-   * @type {import('../../maps').NameInfo[]}
+   * @type {import('../../data/regions').NameInfo[]}
    */
   export let items;
 
@@ -24,7 +24,7 @@
   }
 
   /**
-   * @param {import('../../maps').NameInfo} d
+   * @param {import('../../data/regions').NameInfo} d
    */
   function combineKeywords(d) {
     return `${d.id} ${d.displayName}`;
