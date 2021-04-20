@@ -1,7 +1,7 @@
-import { stateInfo } from '../maps/infos';
+import { stateInfo } from '../maps';
 import { ZERO_COLOR } from '../theme';
 import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
-import type { RegionInfo } from '../maps/interfaces';
+import type { RegionInfo } from '../maps';
 import type { TopLevelSpec } from 'vega-lite';
 import { BASE_SPEC } from './commonSpec';
 

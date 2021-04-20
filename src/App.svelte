@@ -4,7 +4,7 @@
   import './stores/urlHandler';
   import './stores/ga';
   import './stores/websiteInjector';
-  import { loadMetaData } from './data';
+  import { loadMetaData } from './data/meta';
   import Disclaimer from './components/Disclaimer.svelte';
 
   onMount(() => {

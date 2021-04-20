@@ -17,7 +17,7 @@ import {
 } from './constants';
 import modes, { Mode, modeByID, ModeID } from '../modes';
 import { parseAPITime } from '../data/utils';
-import { getInfoByName } from '../maps/infos';
+import { getInfoByName } from '../maps';
 export {
   defaultRegionOnStartup,
   getLevelInfo,
@@ -32,7 +32,7 @@ export {
 import { timeMonth } from 'd3-time';
 import { MAP_THEME, selectionColors } from '../theme';
 import { AnnotationManager, fetchAnnotations } from '../data';
-import type { RegionInfo, RegionLevel } from '../maps/interfaces';
+import type { RegionInfo, RegionLevel } from '../maps';
 
 /**
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow

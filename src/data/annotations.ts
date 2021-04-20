@@ -2,7 +2,7 @@ import { parseAPITime } from './utils';
 import { csvParse } from 'd3-dsv';
 import { timeDay } from 'd3-time';
 import { fetchOptions } from './api';
-import type { RegionInfo, RegionLevel } from '../maps/interfaces';
+import type { RegionInfo, RegionLevel } from '../maps';
 
 declare const process: { env: Record<string, string> };
 

@@ -1,7 +1,7 @@
 <script>
   import Vega from '../../components/vega/Vega.svelte';
   import { addMissing, averageByDate } from '../../data';
-  import { nationInfo, getStateOfCounty } from '../../maps/infos';
+  import { nationInfo, getStateOfCounty } from '../../maps';
   import getRelatedCounties from '../../maps/related';
   import HistoryLineTooltip from './HistoryLineTooltip.svelte';
   import {

@@ -1,4 +1,4 @@
-import { nationInfo, stateInfo, countyInfo, msaInfo, hrrInfo, levelMegaCountyId, hhsInfo } from '../../../maps/infos';
+import { nationInfo, stateInfo, countyInfo, msaInfo, hrrInfo, levelMegaCountyId, hhsInfo } from '../../../maps';
 
 export function loadSources(additionalProperties = {}) {
   // mark to be loaded as fast as possible

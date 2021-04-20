@@ -2,7 +2,7 @@ import type { Gradient } from 'vega';
 import type { Field } from 'vega-lite/build/src/channeldef';
 import type { MarkDef } from 'vega-lite/build/src/mark';
 import type { LayerSpec, NormalizedLayerSpec, NormalizedUnitSpec, TopLevelSpec } from 'vega-lite/build/src/spec';
-import type { CountyInfo, RegionInfo, RegionLevel } from '../maps/interfaces';
+import type { CountyInfo, RegionInfo, RegionLevel } from '../maps';
 import getRelatedCounties from '../maps/related';
 import { EpiDataCasesOrDeathValues, EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 import type { RegionEpiDataRow } from '../stores/params';

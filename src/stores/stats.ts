@@ -1,6 +1,6 @@
 import { primaryValue } from './constants';
 import { CasesOrDeathOptions, getType } from './constants';
-import type { RegionLevel } from '../maps/interfaces';
+import type { RegionLevel } from '../maps';
 
 const MAGIC_MIN_STATS = 0.14;
 
