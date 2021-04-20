@@ -182,7 +182,9 @@
   function onSignal(event) {
     if (event.detail.name === 'highlight') {
       const date = resolveHighlightedDate(event);
-      highlightDate = date;
+      if (highlightDate != date) {
+        highlightDate = date;
+      }
     }
   }
 

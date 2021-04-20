@@ -7,6 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { EnvironmentPlugin, DefinePlugin } = require('webpack');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const pkg = require('./package.json');
+const { preprocess } = require('./svelte.config');
 
 const devMode = process.env.NODE_ENV !== 'production';
 const hmr = devMode;
@@ -40,8 +41,8 @@ module.exports = () => {
 
     output: {
       path: path.resolve(__dirname, 'public'),
-      filename: devMode ? '[name].js' : '[name].[contenthash].js',
-      chunkFilename: devMode ? '[name].js' : '[name].[contenthash].js',
+      filename: devMode ? undefined : '[name].[contenthash].js',
+      chunkFilename: devMode ? undefined : '[name].[contenthash].js',
       publicPath: hmr ? '/' : undefined,
     },
 
@@ -49,7 +50,7 @@ module.exports = () => {
       alias: {
         svelte: path.resolve('node_modules', 'svelte'),
       },
-      extensions: ['.mjs', '.js', '.svelte'],
+      extensions: ['.ts', '.mjs', '.js', '.svelte'],
       mainFields: ['svelte', 'module', 'browser', 'main'],
     },
 
@@ -103,12 +104,28 @@ module.exports = () => {
             {
               loader: 'svelte-loader',
               options: {
+                preprocess,
                 compilerOptions: {
                   dev: devMode,
                 },
                 hotReload: hmr,
-                emitCss: !devMode,
+                emitCss: true, // !devMode,
               },
+            },
+          ].slice(devMode ? 1 : 0),
+        },
+        {
+          test: /\.tsx?$/,
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                cacheDirectory: true,
+                cacheCompression: false,
+              },
+            },
+            {
+              loader: 'ts-loader',
             },
           ].slice(devMode ? 1 : 0),
         },

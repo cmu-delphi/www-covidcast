@@ -32,6 +32,7 @@
   class:short={!long}
   class:isBetter={trend && trend.isBetter}
   class:isWorse={trend && trend.isWorse}
+  class:isNeutral={trend && trend.isNeutral}
   class:isSteady={trend && trend.isSteady}
   class:block
 >
@@ -90,6 +91,10 @@
   }
   .isBetter {
     --color: #27ae60;
+    --text: white;
+  }
+  .isNeutral {
+    --color: #800080;
     --text: white;
   }
   .isWorse {
