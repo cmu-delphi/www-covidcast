@@ -7,7 +7,7 @@
   import { generateSparkLine } from '../../specs/lineSpec';
   import { timeWeek } from 'd3-time';
   import Vega from '../../components/vega/Vega.svelte';
-  import { getInfoByName } from '../../maps';
+  import { getInfoByName } from '../../data/regions';
   import { determineColorScale, determineMinMax } from '../../components/MapBox/colors';
   import HexGrid from '../mobile/components/HexGrid.svelte';
   import HexGridCell from '../mobile/components/HexGridCell.svelte';

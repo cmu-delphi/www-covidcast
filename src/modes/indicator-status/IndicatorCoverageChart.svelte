@@ -1,6 +1,6 @@
 <script>
   import Vega from '../../components/vega/Vega.svelte';
-  import { nationInfo } from '../../maps';
+  import { nationInfo } from '../../data/regions';
   import {
     generateLineChartSpec,
     resolveHighlightedDate,

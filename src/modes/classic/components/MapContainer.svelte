@@ -31,12 +31,12 @@
 
   export let data;
   /**
-   * @type {{info: import('../../maps/nameIdInfo').NameInfo, color: string}[]}
+   * @type {{info: import('../../data/regions/nameIdInfo').NameInfo, color: string}[]}
    */
   export let selections = [];
 
   /**
-   * @type {import('../../maps').NameInfo | null}
+   * @type {import('../../data/regions').NameInfo | null}
    */
   export let focusOn = null;
   export let selectRandomOnReady = false;

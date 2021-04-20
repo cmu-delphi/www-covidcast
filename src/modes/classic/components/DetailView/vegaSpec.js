@@ -64,7 +64,7 @@ const xDateRangeEncoding = {
 };
 
 /**
- * @param {{info: import('../../maps').NameInfo, color: string}[]} selections
+ * @param {{info: import('../../data/regions').NameInfo, color: string}[]} selections
  */
 export function colorEncoding(selections) {
   if (!selections) {
@@ -85,7 +85,7 @@ export function colorEncoding(selections) {
 /**
  * @param {import('../../data').SensorEntry} sensor
  * @param {string} primaryValue
- * @param {{info: import('../../maps').NameInfo, color: string}[]} selections
+ * @param {{info: import('../../data/regions').NameInfo, color: string}[]} selections
  * @param {[Date, Date]} initialSelection
  * @param {Array<string>} title
  */

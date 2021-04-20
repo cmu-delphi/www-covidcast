@@ -114,7 +114,7 @@ const stdErrTransformPercent = [
 
 /**
  * @param {import('../../data').SensorEntry} sensor
- * @param {{info: import('../../maps').NameInfo, color: string}[]} selections
+ * @param {{info: import('../../data/regions').NameInfo, color: string}[]} selections
  * @param {?[Date, Date]} dateRange
  * @param {?{field?: string, domain?: [number, number]}} valuePatch
  */

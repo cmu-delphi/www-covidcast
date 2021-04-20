@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
   import Search from '../../components/Search.svelte';
-  import { getInfoByName } from '../../maps';
+  import { getInfoByName } from '../../data/regions';
   import { currentSensorEntry, recentRegionInfos } from '../../stores';
   import { levelMegaCounty } from '../../stores/constants';
 

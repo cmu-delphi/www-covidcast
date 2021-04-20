@@ -4,8 +4,8 @@ import { formatAPITime, parseAPITime } from './utils';
 import { callSignalAPI } from './api';
 import { EpiDataRow, fetchData } from './fetchData';
 import { addNameInfos } from './fetchData';
-import { countyInfo } from '../maps';
-import type { RegionInfo } from '../maps';
+import { countyInfo } from './regions';
+import type { RegionInfo } from './regions';
 
 export interface Coverage {
   date: Date;

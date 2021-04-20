@@ -6,7 +6,7 @@
   import { currentDate, currentDateObject } from '../../stores';
   import debounce from 'lodash-es/debounce';
   import { combineSignals } from '../../data/utils';
-  import { stateInfo } from '../../maps';
+  import { stateInfo } from '../../data/regions';
 
   const cases = sensorList.find((d) => d.isCasesOrDeath);
   const masks = sensorMap.get(DEFAULT_SURVEY_SENSOR);

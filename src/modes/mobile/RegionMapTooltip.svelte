@@ -1,12 +1,12 @@
 <script>
   import { formatDateShortWeekdayAbbr } from '../../formats';
   import { levelMegaCounty } from '../../stores/constants';
-  import { getStateOfCounty } from '../../maps';
+  import { getStateOfCounty } from '../../data/regions';
   import SensorValue from './SensorValue.svelte';
 
   export let hidden = false;
   /**
-   * @type {import('../../data').EpiDataRow & import('../../maps').NameInfo}
+   * @type {import('../../data').EpiDataRow & import('../../data/regions').NameInfo}
    */
   export let item;
 

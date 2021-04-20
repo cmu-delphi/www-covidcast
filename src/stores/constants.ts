@@ -5,7 +5,7 @@ import { modeByID } from '../modes';
 import { formatRawValue, formatValue, formatPercentage } from '../formats';
 import { interpolateBuPu, interpolateYlGnBu, interpolateYlOrRd } from 'd3-scale-chromatic';
 import { getDataSource } from './dataSourceLookup';
-import type { RegionLevel } from '../maps';
+import type { RegionLevel } from '../data/regions';
 // import { generateMockSignal, generateMockMeta } from '../data/mock';
 
 export interface LevelInfo {

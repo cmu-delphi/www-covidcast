@@ -1,7 +1,6 @@
 import { dsvFormat } from 'd3-dsv';
 import relatedCountiesRaw from './processed/related_counties.csv.js';
-import { getInfoByName } from './infos';
-import type { RegionInfo } from './interfaces.js';
+import { getInfoByName, RegionInfo } from './regions';
 
 const lookup = (() => {
   const lookup = new Map<string, string[]>();

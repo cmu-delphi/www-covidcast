@@ -6,7 +6,7 @@
   import { getDataSource, CASES_SOURCE, DEATH_SOURCE } from '../../stores/dataSourceLookup';
   import { formatDateISO } from '../../formats';
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
-  import { getInfoByName } from '../../maps';
+  import { getInfoByName } from '../../data/regions';
   import { isCasesSignal, isDeathSignal } from '../../data';
 
   /**

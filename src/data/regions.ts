@@ -3,8 +3,37 @@ import stateRaw from './processed/state.csv.js';
 import msaRaw from './processed/msa.csv.js';
 import countyRaw from './processed/county.csv.js';
 import hrrRaw from './processed/hrr.csv.js';
-import type { CountyInfo, HRRInfo, HHSInfo, RegionInfo, RegionLevel, StateInfo } from './interfaces';
 import hhsRaw from './processed/hhs.csv.js';
+
+export type RegionLevel = 'state' | 'county' | 'msa' | 'hrr' | 'nation' | 'mega-county' | 'hhs';
+export type RegionArea = 'West' | 'Midwest' | 'Northeast' | 'South';
+
+export interface RegionInfo {
+  readonly name: string;
+  readonly displayName: string;
+  readonly id: string;
+  readonly propertyId: string; // geojson: feature.property.id
+  readonly population?: number;
+  readonly level: RegionLevel;
+}
+
+export interface StateInfo extends RegionInfo {
+  region: RegionArea;
+  postal: string;
+}
+
+export interface CountyInfo extends RegionInfo {
+  region: RegionArea;
+  state: string;
+}
+
+export interface HRRInfo extends RegionInfo {
+  state: string;
+}
+
+export interface HHSInfo extends RegionInfo {
+  states: string[];
+}
 
 export const levelMegaCountyId = 'mega-county';
 

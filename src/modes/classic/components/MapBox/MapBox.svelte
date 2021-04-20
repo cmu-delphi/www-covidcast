@@ -30,12 +30,12 @@
   export let animationDuration = 0;
   export let title = '';
   /**
-   * @type {{info: import('../../maps/nameIdInfo').NameInfo, color: string}[]}
+   * @type {{info: import('../../data/regions/nameIdInfo').NameInfo, color: string}[]}
    */
   export let selections = [];
 
   /**
-   * @type {import('../../maps').NameInfo | null}
+   * @type {import('../../data/regions').NameInfo | null}
    */
   export let focusOn = null;
 

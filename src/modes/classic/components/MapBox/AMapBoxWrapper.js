@@ -433,7 +433,7 @@ export default class AMapBoxWrapper {
   }
 
   /**
-   * @param {{info: import('../../maps/nameIdInfo').NameInfo, color: string}[]} selections
+   * @param {{info: import('../../data/regions/nameIdInfo').NameInfo, color: string}[]} selections
    */
   selectMulti(selections) {
     if (!this.map || !this.interactive) {
@@ -449,7 +449,7 @@ export default class AMapBoxWrapper {
 
   /**
    *
-   * @param {import('../../maps/nameIdInfo').NameInfo | null} selection
+   * @param {import('../../data/regions/nameIdInfo').NameInfo | null} selection
    */
   select(selection) {
     if (!this.map || !this.interactive) {
@@ -459,7 +459,7 @@ export default class AMapBoxWrapper {
   }
 
   /**
-   * @param {import('../../maps').NameInfo | null} info
+   * @param {import('../../data/regions').NameInfo | null} info
    */
   focusOn(info) {
     if (!info || !this.map) {

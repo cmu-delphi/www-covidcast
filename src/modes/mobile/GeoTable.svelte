@@ -1,6 +1,6 @@
 <script>
-  import { getCountiesOfState, getStateOfCounty, nationInfo, stateInfo } from '../../maps';
-  import getRelatedCounties from '../../maps/related';
+  import { getCountiesOfState, getStateOfCounty, nationInfo, stateInfo } from '../../data/regions';
+  import getRelatedCounties from '../../data/relatedRegions';
   import { generateSparkLine } from '../../specs/lineSpec';
   import Vega from '../../components/vega/Vega.svelte';
   import SparkLineTooltip from './SparkLineTooltip.svelte';

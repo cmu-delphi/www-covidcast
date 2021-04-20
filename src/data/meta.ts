@@ -12,7 +12,7 @@ import { get } from 'svelte/store';
 import { callMetaAPI, EpiDataResponse } from './api';
 import { parseAPITime, formatAPITime } from './utils';
 import { timeDay } from 'd3-time';
-import type { RegionLevel } from '../maps';
+import type { RegionLevel } from './regions';
 
 function toStatsRegionKey(sensorKey: string, region: string) {
   return sensorKey + '_' + region;

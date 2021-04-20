@@ -4,7 +4,7 @@ import { L, toFillLayer, toHoverLayer } from './layers';
 import { toBorderSource } from './sources';
 import Tooltip from './Tooltip.svelte';
 import { MAP_THEME } from '../../../../theme';
-import { computeMegaCountyPopulation } from '../../../../maps';
+import { computeMegaCountyPopulation } from '../../../../data/regions';
 
 export default class InteractiveMap {
   /**
@@ -262,14 +262,14 @@ export default class InteractiveMap {
   }
 
   /**
-   * @param {import('../../maps/nameIdInfo').NameInfo | null} selection
+   * @param {import('../../data/regions/nameIdInfo').NameInfo | null} selection
    */
   select(selection) {
     return this.selectMulti(selection ? [{ info: selection, color: MAP_THEME.selectedRegionOutline }] : [])[0];
   }
 
   /**
-   * @param {{info: import('../../maps/nameIdInfo').NameInfo, color: string}[]} selections
+   * @param {{info: import('../../data/regions/nameIdInfo').NameInfo, color: string}[]} selections
    */
   selectMulti(selections) {
     const bak = this.selection.slice();
@@ -297,7 +297,7 @@ export default class InteractiveMap {
   }
 
   /**
-   * @param {import('../../maps/nameIdInfo').NameInfo | null} selection
+   * @param {import('../../data/regions/nameIdInfo').NameInfo | null} selection
    */
   isHovered(selection) {
     if (!selection) {

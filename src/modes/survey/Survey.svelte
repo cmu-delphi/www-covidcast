@@ -4,10 +4,10 @@
   import SurveyQuestion from './SurveyQuestion.svelte';
   import SurveyParameters from './SurveyParameters.svelte';
   import Overview from './Overview.svelte';
-  import { nationInfo, nameInfos, getStateOfCounty } from '../../maps';
+  import { nationInfo, nameInfos, getStateOfCounty } from '../../data/regions';
   import MobileSurveyToc from './MobileSurveyToc.svelte';
   import { DataFetcher, DateParam, RegionParam, SensorParam } from '../../stores/params';
-  import getRelatedCounties from '../../maps/related';
+  import getRelatedCounties from '../../data/relatedRegions';
   import '../mobile/common.css';
   import { modeByID } from '..';
   import { scrollIntoView } from '../../util';

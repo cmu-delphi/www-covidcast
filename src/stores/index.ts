@@ -17,7 +17,7 @@ import {
 } from './constants';
 import modes, { Mode, modeByID, ModeID } from '../modes';
 import { parseAPITime } from '../data/utils';
-import { getInfoByName } from '../maps';
+import { getInfoByName } from '../data/regions';
 export {
   defaultRegionOnStartup,
   getLevelInfo,
@@ -32,7 +32,7 @@ export {
 import { timeMonth } from 'd3-time';
 import { MAP_THEME, selectionColors } from '../theme';
 import { AnnotationManager, fetchAnnotations } from '../data';
-import type { RegionInfo, RegionLevel } from '../maps';
+import type { RegionInfo, RegionLevel } from '../data/regions';
 
 /**
  * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
@@ -346,7 +346,7 @@ export function addCompare(info: RegionInfo): void {
 
 /**
  * removes an element from the compare selection
- * @param {import('../maps').NameInfo} info
+ * @param {import('../data/regions').NameInfo} info
  */
 export function removeCompare(info: RegionInfo): void {
   const selection = get(currentRegionInfo);

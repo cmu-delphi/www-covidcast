@@ -4,7 +4,7 @@
   import { generateSparkLine } from '../../specs/lineSpec';
   import HexGrid from './components/HexGrid.svelte';
   import HexGridCell from './components/HexGridCell.svelte';
-  import { getInfoByName, stateInfo } from '../../maps';
+  import { getInfoByName, stateInfo } from '../../data/regions';
   import { addMissing } from '../../data';
   import { groupByRegion } from '../../stores/params';
   import Vega from '../../components/vega/Vega.svelte';

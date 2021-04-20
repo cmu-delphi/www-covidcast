@@ -17,7 +17,7 @@
   export let y = -1;
 
   /**
-   * @param {import('../../maps').NameInfo} region
+   * @param {import('../../data/regions').NameInfo} region
    * @param {Date} date
    */
   function genSpec(region, date, height) {

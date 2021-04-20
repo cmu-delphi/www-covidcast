@@ -1,7 +1,7 @@
 <script>
   import Vega from '../../components/vega/Vega.svelte';
   import { fetchData, formatAPITime } from '../../data';
-  import { getInfoByName } from '../../maps';
+  import { getInfoByName } from '../../data/regions';
   import { currentDateObject } from '../../stores';
   import { defaultRegionOnStartup, sensorList } from '../../stores/constants';
   import { generateDistributionLineSpec, generateDistributionLineSpec2, signalPatches } from '../../specs/lineSpec';

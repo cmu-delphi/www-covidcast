@@ -41,7 +41,7 @@
     ).then((rows) => rows.flat());
   }
   /**
-   * @type {{info: import('../../maps').NameInfo, color: string}[]}
+   * @type {{info: import('../../data/regions').NameInfo, color: string}[]}
    */
   export let selections = [];
   $: region = selections.length > 0 ? selections[0].info : null;

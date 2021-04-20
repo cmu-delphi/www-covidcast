@@ -30,7 +30,7 @@
   }
 
   /**
-   * @type {{info: import('../../maps').NameInfo, color: string}[]}
+   * @type {{info: import('../../data/regions').NameInfo, color: string}[]}
    */
   export let selections = [];
 

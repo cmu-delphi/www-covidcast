@@ -4,7 +4,7 @@ import type { Field, PositionFieldDef, PositionValueDef } from 'vega-lite/build/
 import type { LayerSpec, NormalizedLayerSpec, NormalizedUnitSpec, TopLevelSpec } from 'vega-lite/build/src/spec';
 import { CURRENT_DATE_HIGHLIGHT } from '../components/vega/vegaSpecUtils';
 import type { Annotation } from '../data';
-import type { RegionInfo } from '../maps';
+import type { RegionInfo } from '../data/regions';
 import { BASE_SPEC, commonConfig, CREDIT } from './commonSpec';
 
 // dark2

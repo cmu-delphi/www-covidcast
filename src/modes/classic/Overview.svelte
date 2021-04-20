@@ -1,6 +1,6 @@
 <script>
   import { levelList } from '../../stores';
-  import { nameInfos, infosByLevel, nationInfo } from '../../maps';
+  import { nameInfos, infosByLevel, nationInfo } from '../../data/regions';
   import MapContainer from './components/MapContainer.svelte';
   import Options from './components/Options.svelte';
   import {
@@ -22,7 +22,7 @@
   import DetailView from './components/DetailView/DetailView.svelte';
   import { trackEvent } from '../../stores/ga';
   import AddAnother from './AddAnother.svelte';
-  import { getInfoByName } from '../../maps';
+  import { getInfoByName } from '../../data/regions';
   import InfoDialog from './components/InfoDialog.svelte';
 
   /**
@@ -51,7 +51,7 @@
   /**
    * the id to focus the map on
    * only be set when the user searches for something
-   * @type {import('../../maps').NameInfo | null}
+   * @type {import('../../data/regions').NameInfo | null}
    */
   let focusOn = null;
 

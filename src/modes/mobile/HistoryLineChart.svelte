@@ -1,8 +1,8 @@
 <script>
   import Vega from '../../components/vega/Vega.svelte';
   import { addMissing, averageByDate } from '../../data';
-  import { nationInfo, getStateOfCounty } from '../../maps';
-  import getRelatedCounties from '../../maps/related';
+  import { nationInfo, getStateOfCounty } from '../../data/regions';
+  import getRelatedCounties from '../../data/relatedRegions';
   import HistoryLineTooltip from './HistoryLineTooltip.svelte';
   import {
     generateCompareLineSpec,
