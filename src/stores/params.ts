@@ -12,7 +12,7 @@ import type { Sensor, SensorEntry } from './constants';
 import type { Writable } from 'svelte/store';
 
 export type { Sensor } from './constants';
-export type { RegionInfo as Region, RegionLevel } from '../maps/interfaces';
+export type { RegionInfo as Region, RegionLevel } from '../data/regions';
 
 export const WINDOW_SIZE = 4; // months;
 export const SPARKLINE_SIZE = 4; // weeks;

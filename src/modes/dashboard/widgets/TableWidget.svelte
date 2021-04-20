@@ -1,16 +1,16 @@
 <script>
   import WidgetCard from './WidgetCard.svelte';
   import { getContext } from 'svelte';
-  import DownloadMenu from '../../mobile/components/DownloadMenu.svelte';
+  import DownloadMenu from '../../../components/DownloadMenu.svelte';
   import { formatDateISO } from '../../../formats';
   import { WidgetHighlight } from '../highlight';
   // import isEqual from 'lodash-es/isEqual';
-  import SortColumnIndicator from '../../mobile/components/SortColumnIndicator.svelte';
-  import TrendIndicator from '../../mobile/TrendIndicator.svelte';
-  import SensorValue from '../../mobile/SensorValue.svelte';
-  import { byImportance, SortHelper } from '../../mobile/components/tableUtils';
+  import SortColumnIndicator from '../../../components/Table/SortColumnIndicator.svelte';
+  import TrendIndicator from '../../../components/TrendIndicator.svelte';
+  import SensorValue from '../../../components/SensorValue.svelte';
+  import { byImportance, SortHelper } from '../../../components/Table/tableUtils';
   import { determineTrend } from '../../../stores/trend';
-  import { infosByLevel, nationInfo } from '../../../maps';
+  import { infosByLevel, nationInfo } from '../../../data/regions';
   import { groupByRegion } from '../../../stores/params';
   import WidgetTitle from './WidgetTitle.svelte';
   import { getLevelInfo } from '../../../stores';

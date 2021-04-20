@@ -1,7 +1,7 @@
 <script>
   import { getContext } from 'svelte';
-  import TrendIndicator from '../../mobile/TrendIndicator.svelte';
-  import TrendTextSummary from '../../mobile/TrendTextSummary.svelte';
+  import TrendIndicator from '../../../components/TrendIndicator.svelte';
+  import TrendTextSummary from '../../../components/TrendTextSummary.svelte';
   import { WidgetHighlight } from '../highlight';
   import WidgetCard from './WidgetCard.svelte';
   import WidgetTitle from './WidgetTitle.svelte';

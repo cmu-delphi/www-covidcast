@@ -1,5 +1,5 @@
 import { formatDateISO } from '../../formats';
-import { getInfoByName } from '../../maps/infos';
+import { getInfoByName } from '../../data/regions';
 import { sensorMap } from '../../stores';
 import { Region, RegionLevel, Sensor, TimeFrame } from '../../stores/params';
 

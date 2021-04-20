@@ -1,9 +1,9 @@
 <script>
-  import Vega from '../../../components/Vega.svelte';
+  import Vega from '../../../components/vega/Vega.svelte';
   import WidgetCard from './WidgetCard.svelte';
   import { getContext } from 'svelte';
-  import Toggle from '../../mobile/Toggle.svelte';
-  import DownloadMenu from '../../mobile/components/DownloadMenu.svelte';
+  import Toggle from '../../../components/Toggle.svelte';
+  import DownloadMenu from '../../../components/DownloadMenu.svelte';
   import {
     generateLineChartSpec,
     generateLineAndBarSpec,

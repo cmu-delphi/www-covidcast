@@ -1,15 +1,15 @@
 <script>
   import WidgetCard from './WidgetCard.svelte';
   import { getContext } from 'svelte';
-  import DownloadMenu from '../../mobile/components/DownloadMenu.svelte';
+  import DownloadMenu from '../../../components/DownloadMenu.svelte';
   import { stats } from '../../../stores';
   import { formatDateISO } from '../../../formats';
   import { useWhiteTextColor } from '../../../util';
-  import { getInfoByName } from '../../../maps/infos';
+  import { getInfoByName } from '../../../data/regions';
   import { state2TileCell } from '../../../specs/matrixSpec';
-  import HexGrid from '../../mobile/components/HexGrid.svelte';
-  import HexGridCell from '../../mobile/components/HexGridCell.svelte';
-  import ColorLegend from '../../mobile/components/ColorLegend.svelte';
+  import HexGrid from '../../../components/HexGrid/HexGrid.svelte';
+  import HexGridCell from '../../../components/HexGrid/HexGridCell.svelte';
+  import ColorLegend from '../../../components/HexGrid/ColorLegend.svelte';
   import { MISSING_COLOR } from '../../../theme';
   import { groupByRegion } from '../../../stores/params';
   import { WidgetHighlight } from '../highlight';

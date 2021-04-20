@@ -4,7 +4,6 @@
   import { currentRegionInfo, currentSensorEntry, currentDateObject, times } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
   import KPIWidget from './widgets/KPIWidget.svelte';
-  import './style.css';
   import { WidgetHighlight } from './highlight';
   import LineChartWidget from './widgets/LineChartWidget.svelte';
   import MapChartWidget from './widgets/MapChartWidget.svelte';

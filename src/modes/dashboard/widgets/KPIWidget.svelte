@@ -1,7 +1,7 @@
 <script>
   import { getContext } from 'svelte';
-  import SensorUnit from '../../mobile/SensorUnit.svelte';
-  import SurveyValue from '../../survey/SurveyValue.svelte';
+  import SensorUnit from '../../../components/SensorUnit.svelte';
+  import KPIValue from '../../../components/KPIValue.svelte';
   import { WidgetHighlight } from '../highlight';
   import WidgetCard from './WidgetCard.svelte';
   import WidgetTitle from './WidgetTitle.svelte';
@@ -51,9 +51,9 @@
     <div class="kpi">
       <div>
         {#await data}
-          <SurveyValue value={null} />
+          <KPIValue value={null} />
         {:then d}
-          <SurveyValue value={d ? d.value : null} />
+          <KPIValue value={d ? d.value : null} />
         {/await}
       </div>
       <div>

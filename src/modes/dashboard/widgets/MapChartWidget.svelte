@@ -1,11 +1,11 @@
 <script>
-  import Vega from '../../../components/Vega.svelte';
+  import Vega from '../../../components/vega/Vega.svelte';
   import WidgetCard from './WidgetCard.svelte';
   import { getContext } from 'svelte';
-  import DownloadMenu from '../../mobile/components/DownloadMenu.svelte';
+  import DownloadMenu from '../../../components/DownloadMenu.svelte';
   import { getLevelInfo, stats } from '../../../stores';
   import { formatDateISO, formatDateYearWeekdayAbbr } from '../../../formats';
-  import RegionMapTooltip from '../../mobile/RegionMapTooltip.svelte';
+  import RegionMapTooltip from '../../../blocks/RegionMapTooltip.svelte';
   import {
     generateStateSpec,
     generateNationSpec,
@@ -14,7 +14,7 @@
     generateMSASpec,
     generateStateMapWithCountyDataSpec,
   } from '../../../specs/mapSpec';
-  import { getInfoByName } from '../../../maps';
+  import { getInfoByName } from '../../../data/regions';
   import { highlightToRegions, WidgetHighlight } from '../highlight';
   import isEqual from 'lodash-es/isEqual';
   import { resolveHighlightedField } from '../../../specs/lineSpec';

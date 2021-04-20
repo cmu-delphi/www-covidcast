@@ -1,4 +1,5 @@
 import { writable, get, Writable } from 'svelte/store';
+import type { RegionLevel } from '../../data/regions';
 
 function clean(a: unknown): string | Date | number | boolean | null {
   // normalize :NaN to null
@@ -88,4 +89,15 @@ export class SortHelper<T extends Record<string, unknown>> {
       comparator: comparator(prop, defaultSortDesc, this._defaultAttr, this._preSorter),
     });
   }
+}
+
+export function byImportance<T extends { important?: boolean; level?: RegionLevel }>(a: T, b: T): number {
+  if (a.important && b.important) {
+    // state vs nation
+    return a.level === 'nation' ? -1 : 1;
+  }
+  if (a.important !== b.important) {
+    return a.important ? -1 : 1;
+  }
+  return 0;
 }
