@@ -8,7 +8,7 @@
   import { modeByID } from '..';
   import TrendIndicator from '../../components/TrendIndicator.svelte';
   import Vega from '../../components/vega/Vega.svelte';
-  import SparkLineTooltip from './SparkLineTooltip.svelte';
+  import SparkLineTooltip from '../../components/SparkLineTooltip.svelte';
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
   import { generateSparkLine } from '../../specs/lineSpec';
   import SensorValue from '../../components/SensorValue.svelte';

@@ -1,13 +1,13 @@
 <script>
-  import Vega from '../../components/vega/Vega.svelte';
-  import { formatDateShortNumbers } from '../../formats';
-  import { generateSparkLine } from '../../specs/lineSpec';
-  import KPIValue from '../../components/KPIValue.svelte';
-  import SensorUnit from '../../components/SensorUnit.svelte';
-  import SparkLineTooltip from './SparkLineTooltip.svelte';
+  import Vega from '../components/vega/Vega.svelte';
+  import { formatDateShortNumbers } from '../formats';
+  import { generateSparkLine } from '../specs/lineSpec';
+  import KPIValue from '../components/KPIValue.svelte';
+  import SensorUnit from '../components/SensorUnit.svelte';
+  import SparkLineTooltip from '../components/SparkLineTooltip.svelte';
 
-  import TrendIndicator from '../../components/TrendIndicator.svelte';
-  import TrendTextSummary from '../../components/TrendTextSummary.svelte';
+  import TrendIndicator from '../components/TrendIndicator.svelte';
+  import TrendTextSummary from '../components/TrendTextSummary.svelte';
 
   /**
    * @type {import('../../stores/constants').SensorEntry}

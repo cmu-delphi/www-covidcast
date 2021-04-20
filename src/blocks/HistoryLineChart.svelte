@@ -1,8 +1,8 @@
 <script>
-  import Vega from '../../components/vega/Vega.svelte';
-  import { addMissing, averageByDate } from '../../data';
-  import { nationInfo, getStateOfCounty } from '../../data/regions';
-  import getRelatedCounties from '../../data/relatedRegions';
+  import Vega from '../components/vega/Vega.svelte';
+  import { addMissing, averageByDate } from '../data';
+  import { nationInfo, getStateOfCounty } from '../data/regions';
+  import getRelatedCounties from '../data/relatedRegions';
   import HistoryLineTooltip from './HistoryLineTooltip.svelte';
   import {
     generateCompareLineSpec,
@@ -13,17 +13,17 @@
     MULTI_COLORS,
     genDateHighlight,
     genAnnotationLayer,
-  } from '../../specs/lineSpec';
-  import { toTimeValue } from '../../stores/params';
-  import Toggle from '../../components/Toggle.svelte';
-  import SensorValue from '../../components/SensorValue.svelte';
-  import { combineSignals } from '../../data/utils';
-  import DownloadMenu from '../../components/DownloadMenu.svelte';
-  import { formatDateISO } from '../../formats';
-  import { annotationManager, isMobileDevice } from '../../stores';
-  import IndicatorAnnotation from '../../components/IndicatorAnnotation.svelte';
-  import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
-  import { joinTitle } from '../../specs/commonSpec';
+  } from '../specs/lineSpec';
+  import { toTimeValue } from '../stores/params';
+  import Toggle from '../components/Toggle.svelte';
+  import SensorValue from '../components/SensorValue.svelte';
+  import { combineSignals } from '../data/utils';
+  import DownloadMenu from '../components/DownloadMenu.svelte';
+  import { formatDateISO } from '../formats';
+  import { annotationManager, isMobileDevice } from '../stores';
+  import IndicatorAnnotation from '../components/IndicatorAnnotation.svelte';
+  import IndicatorAnnotations from '../components/IndicatorAnnotations.svelte';
+  import { joinTitle } from '../specs/commonSpec';
 
   export let height = 250;
 

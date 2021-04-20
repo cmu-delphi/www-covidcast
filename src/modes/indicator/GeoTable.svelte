@@ -3,7 +3,7 @@
   import getRelatedCounties from '../../data/relatedRegions';
   import { generateSparkLine } from '../../specs/lineSpec';
   import Vega from '../../components/vega/Vega.svelte';
-  import SparkLineTooltip from './SparkLineTooltip.svelte';
+  import SparkLineTooltip from '../../components/SparkLineTooltip.svelte';
   import FancyHeader from '../../components/FancyHeader.svelte';
   import TrendIndicator from '../../components/TrendIndicator.svelte';
   import { formatDateISO, formatDateShortNumbers } from '../../formats';

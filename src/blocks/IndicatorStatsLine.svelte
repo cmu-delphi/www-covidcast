@@ -1,6 +1,6 @@
 <script>
-  import { formatValue, formatDateLocal } from '../../formats';
-  import { parseAPITime } from '../../data';
+  import { formatValue, formatDateLocal } from '../formats';
+  import { parseAPITime } from '../data';
 
   /**
    * @type {import('../../stores/constants').SensorEntry}

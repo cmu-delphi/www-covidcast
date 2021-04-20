@@ -7,9 +7,9 @@
   import SurveyParameters from '../../components/RegionDatePicker.svelte';
   import { currentRegionInfo, currentSensorEntry, currentDateObject, times, getScrollToAnchor } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher, CASES } from '../../stores/params';
-  import RegionMapWrapper from './RegionMapWrapper.svelte';
+  import RegionMapWrapper from '../../blocks/RegionMapWrapper.svelte';
   import FancyHeader from '../../components/FancyHeader.svelte';
-  import HistoryLineChart from './HistoryLineChart.svelte';
+  import HistoryLineChart from '../../blocks/HistoryLineChart.svelte';
   import { afterUpdate } from 'svelte';
   import { scrollIntoView } from '../../util';
   import { modeByID } from '..';

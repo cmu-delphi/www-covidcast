@@ -1,6 +1,6 @@
 <script>
-  import { formatDateShortWeekdayAbbr } from '../../formats';
-  import SensorValue from '../../components/SensorValue.svelte';
+  import { formatDateShortWeekdayAbbr } from '../formats';
+  import SensorValue from './SensorValue.svelte';
 
   export let hidden = false;
   /**

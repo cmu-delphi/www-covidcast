@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { formatDateLocal } from '../../formats';
-  import HistoryLineChart from '../summary/HistoryLineChart.svelte';
+  import HistoryLineChart from '../../blocks/HistoryLineChart.svelte';
   /**
    * @type {import('../../stores/questions').Revision}
    */

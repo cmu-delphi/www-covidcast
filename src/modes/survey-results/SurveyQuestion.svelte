@@ -2,10 +2,10 @@
   import UIKitHint from '../../components/UIKitHint.svelte';
   import fileIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/file.svg';
   import linkIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/link.svg';
-  import HistoryLineChart from '../summary/HistoryLineChart.svelte';
-  import IndicatorOverview from '../summary/IndicatorOverview.svelte';
+  import HistoryLineChart from '../../blocks/HistoryLineChart.svelte';
+  import IndicatorOverview from '../../blocks/IndicatorOverview.svelte';
   import { formatDateYearWeekdayAbbr } from '../../formats';
-  import IndicatorStatsLine from '../summary/IndicatorStatsLine.svelte';
+  import IndicatorStatsLine from '../../blocks/IndicatorStatsLine.svelte';
   import IndicatorRevisions from './IndicatorRevisions.svelte';
   import WarningBanner from '../../components/WarningBanner.svelte';
 

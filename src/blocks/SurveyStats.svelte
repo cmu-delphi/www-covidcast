@@ -1,9 +1,9 @@
 <script>
-  import { fetchSampleSizesNationSummary } from '../../data';
-  import { referenceRawNationSignal, refSensor } from '../../stores/questions';
-  import UiKitHint from '../../components/UIKitHint.svelte';
-  import { formatDateLocal } from '../../formats';
-  import KPIValue from '../../components/KPIValue.svelte';
+  import { fetchSampleSizesNationSummary } from '../data';
+  import { referenceRawNationSignal, refSensor } from '../stores/questions';
+  import UiKitHint from '../components/UIKitHint.svelte';
+  import { formatDateLocal } from '../formats';
+  import KPIValue from '../components/KPIValue.svelte';
 
   export let className = '';
 

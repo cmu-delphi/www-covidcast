@@ -6,7 +6,7 @@
   import { modeByID } from '..';
   import { questionCategories } from '../../stores/questions';
   import FancyHeader from '../../components/FancyHeader.svelte';
-  import SurveyStats from '../survey-results/SurveyStats.svelte';
+  import SurveyStats from '../../blocks/SurveyStats.svelte';
   import SensorGroup from './SensorGroup.svelte';
 
   function switchMode(region) {

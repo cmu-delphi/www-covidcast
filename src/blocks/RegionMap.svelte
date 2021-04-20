@@ -1,10 +1,10 @@
 <script>
-  import Vega from '../../components/vega/Vega.svelte';
-  import { formatDateISO } from '../../formats';
-  import { getCountiesOfState } from '../../data/regions';
-  import { generateCountiesOfStateSpec, generateRelatedCountySpec, generateStateSpec } from '../../specs/mapSpec';
-  import { stats, isMobileDevice } from '../../stores';
-  import DownloadMenu from '../../components/DownloadMenu.svelte';
+  import Vega from '../components/vega/Vega.svelte';
+  import { formatDateISO } from '../formats';
+  import { getCountiesOfState } from '../data/regions';
+  import { generateCountiesOfStateSpec, generateRelatedCountySpec, generateStateSpec } from '../specs/mapSpec';
+  import { stats, isMobileDevice } from '../stores';
+  import DownloadMenu from '../components/DownloadMenu.svelte';
   import RegionMapTooltip from './RegionMapTooltip.svelte';
 
   /**

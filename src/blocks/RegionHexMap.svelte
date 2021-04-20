@@ -1,19 +1,19 @@
 <script>
-  import { isMobileDevice, stats } from '../../stores';
-  import { state2TileCell } from '../../specs/matrixSpec';
-  import { generateSparkLine } from '../../specs/lineSpec';
-  import HexGrid from '../../components/HexGrid/HexGrid.svelte';
-  import HexGridCell from '../../components/HexGrid/HexGridCell.svelte';
-  import { getInfoByName, stateInfo } from '../../data/regions';
-  import { addMissing } from '../../data';
-  import { groupByRegion } from '../../stores/params';
-  import Vega from '../../components/vega/Vega.svelte';
-  import SensorValue from '../../components/SensorValue.svelte';
-  import { MISSING_COLOR } from '../../theme';
-  import ColorLegend from '../../components/HexGrid/ColorLegend.svelte';
-  import DownloadMenu from '../../components/DownloadMenu.svelte';
-  import { formatDateISO } from '../../formats';
-  import { useWhiteTextColor } from '../../util';
+  import { isMobileDevice, stats } from '../stores';
+  import { state2TileCell } from '../specs/matrixSpec';
+  import { generateSparkLine } from '../specs/lineSpec';
+  import HexGrid from '../components/HexGrid/HexGrid.svelte';
+  import HexGridCell from '../components/HexGrid/HexGridCell.svelte';
+  import { getInfoByName, stateInfo } from '../data/regions';
+  import { addMissing } from '../data';
+  import { groupByRegion } from '../stores/params';
+  import Vega from '../components/vega/Vega.svelte';
+  import SensorValue from '../components/SensorValue.svelte';
+  import { MISSING_COLOR } from '../theme';
+  import ColorLegend from '../components/HexGrid/ColorLegend.svelte';
+  import DownloadMenu from '../components/DownloadMenu.svelte';
+  import { formatDateISO } from '../formats';
+  import { useWhiteTextColor } from '../util';
 
   export let className = '';
   /**

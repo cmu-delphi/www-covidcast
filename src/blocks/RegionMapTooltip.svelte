@@ -1,8 +1,8 @@
 <script>
-  import { formatDateShortWeekdayAbbr } from '../../formats';
-  import { levelMegaCounty } from '../../stores/constants';
-  import { getStateOfCounty } from '../../data/regions';
-  import SensorValue from '../../components/SensorValue.svelte';
+  import { formatDateShortWeekdayAbbr } from '../formats';
+  import { levelMegaCounty } from '../stores/constants';
+  import { getStateOfCounty } from '../data/regions';
+  import SensorValue from '../components/SensorValue.svelte';
 
   export let hidden = false;
   /**

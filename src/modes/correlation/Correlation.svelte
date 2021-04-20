@@ -17,7 +17,7 @@
   import IndicatorPicker from '../../components/IndicatorPicker.svelte';
   import IndicatorCorrelationChart from './IndicatorCorrelationChart.svelte';
   import LagChart from './LagChart.svelte';
-  import HistoryLineChart from '../summary/HistoryLineChart.svelte';
+  import HistoryLineChart from '../../blocks/HistoryLineChart.svelte';
   import FancyHeader from '../../components/FancyHeader.svelte';
   import { MULTI_COLORS } from '../../specs/lineSpec';
   import AboutSection from '../../components/AboutSection.svelte';

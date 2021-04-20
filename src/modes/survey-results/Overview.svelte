@@ -1,6 +1,6 @@
 <script>
   import { overviewText, dataAccessLink, surveyFullTextLink } from '../../stores/questions';
-  import SurveyStats from './SurveyStats.svelte';
+  import SurveyStats from '../../blocks/SurveyStats.svelte';
 </script>
 
 <SurveyStats />
