@@ -10,7 +10,6 @@ const pkg = require('./package.json');
 // const { preprocess } = require('./svelte.config');
 
 const devMode = process.env.NODE_ENV !== 'production';
-const hmr = devMode;
 
 // see https://webpack.js.org/plugins/mini-css-extract-plugin/#extracting-all-css-in-a-single-file
 function recursiveIssuer(m, c) {
@@ -39,13 +38,16 @@ module.exports = () => {
       bundle: './src/index.js',
     },
 
-    output: {
-      path: path.resolve(__dirname, 'public'),
-      filename: devMode ? undefined : '[name].[contenthash].js',
-      chunkFilename: devMode ? undefined : '[name].[contenthash].js',
-      publicPath: hmr ? '/' : undefined,
-    },
-
+    output: devMode
+      ? {
+          path: path.resolve(__dirname, 'public'),
+          publicPath: '/',
+        }
+      : {
+          path: path.resolve(__dirname, 'public'),
+          filename: '[name].[contenthash].js',
+          chunkFilename: '[name].[contenthash].js',
+        },
     resolve: {
       alias: {
         svelte: path.resolve('node_modules', 'svelte'),
@@ -108,8 +110,8 @@ module.exports = () => {
                 compilerOptions: {
                   dev: devMode,
                 },
-                hotReload: hmr,
-                emitCss: !devMode,
+                hotReload: devMode,
+                emitCss: true, // !devMode,
               },
             },
           ].slice(devMode ? 1 : 0),
@@ -174,7 +176,7 @@ module.exports = () => {
       contentBasePublicPath: ['/', '/assets'],
       watchContentBase: true,
       host: 'localhost',
-      hot: hmr,
+      hot: devMode,
     },
 
     plugins: [
