@@ -12,8 +12,7 @@
   import SensorValue from '../../components/SensorValue.svelte';
   import DownloadMenu from '../../components/DownloadMenu.svelte';
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
-  import SortColumnIndicator from '../../components/Table/SortColumnIndicator.svelte';
-  import { SortHelper } from '../../components/Table/tableUtils';
+  import SortColumnIndicator, { SortHelper, byImportance } from '../../components/SortColumnIndicator.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -126,16 +125,7 @@
     return Promise.all([loadSingle(nationInfo, true), loadImpl(stateInfo)]).then((r) => r.flat());
   }
 
-  const sort = new SortHelper('displayName', false, 'displayName', (a, b) => {
-    if (a.important && b.important) {
-      // state vs nation
-      return a.level === 'nation' ? -1 : 1;
-    }
-    if (a.important !== b.important) {
-      return a.important ? -1 : 1;
-    }
-    return 0;
-  });
+  const sort = new SortHelper('displayName', false, 'displayName', byImportance);
 
   $: title = determineTitle(region.value);
   $: regions = determineRegions(region.value);

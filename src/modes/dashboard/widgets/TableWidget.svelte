@@ -20,10 +20,9 @@
 <script>
   import WidgetCard from './WidgetCard.svelte';
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
-  import SortColumnIndicator from '../../../components/Table/SortColumnIndicator.svelte';
+  import SortColumnIndicator, { byImportance, SortHelper } from '../../../components/SortColumnIndicator.svelte';
   import TrendIndicator from '../../../components/TrendIndicator.svelte';
   import SensorValue from '../../../components/SensorValue.svelte';
-  import { byImportance, SortHelper } from '../../../components/Table/tableUtils';
   import WidgetTitle from './WidgetTitle.svelte';
   import { formatDateISO } from '../../../formats';
   import { WidgetHighlight } from '../highlight';
