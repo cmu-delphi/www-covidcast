@@ -70,6 +70,11 @@
 </script>
 
 <div class="widget-card uk-card uk-card-small uk-card-default" class:highlighted style={gridToStyle(grid)} on:>
+  <div class="widget-wrapper">
+    <div class="uk-card-body">
+      <slot />
+    </div>
+  </div>
   <div class="uk-card-header widget-title">
     <div class="widget-toolbar">
       <slot name="toolbar" />
@@ -85,11 +90,6 @@
       <h4>{sensor.unit}</h4>
     {/if}
   </div>
-  <div class="widget-wrapper">
-    <div class="uk-card-body">
-      <slot />
-    </div>
-  </div>
 </div>
 
 <style>
@@ -103,6 +103,7 @@
     flex: 1 1 0;
     display: flex;
     position: relative;
+    order: 2;
   }
 
   .uk-card-body {

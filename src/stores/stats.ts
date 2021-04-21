@@ -25,6 +25,28 @@ export function resolveStats(
   return entry;
 }
 
+export function determineStats(
+  statsLookup: Map<string, { max: number; mean: number; std: number }> | null,
+  sensorEntry: { key: string; signal: string; isCasesOrDeath?: boolean },
+  level: RegionLevel,
+  signalOptions: Partial<CasesOrDeathOptions> = {},
+): { max: number; mean: number; std: number } {
+  let key = sensorEntry.key;
+  // Customize min max values for deaths
+  if (getType(sensorEntry, signalOptions) === 'count') {
+    key += `_${level}`;
+    if (sensorEntry.isCasesOrDeath) {
+      key += `_${primaryValue(sensorEntry, signalOptions)}`;
+    }
+    return resolveStats(statsLookup, key);
+  }
+
+  if (sensorEntry.isCasesOrDeath) {
+    key += `_${primaryValue(sensorEntry, signalOptions)}`;
+  }
+  return resolveStats(statsLookup, key);
+}
+
 export function determineMinMax(
   statsLookup: Map<string, { max: number; mean: number; std: number }> | null,
   sensorEntry: { key: string; signal: string; isCasesOrDeath?: boolean },
@@ -33,14 +55,9 @@ export function determineMinMax(
   useMax = false,
   enforceZeroLike = true,
 ): [number, number] {
-  let key = sensorEntry.key;
+  const stats = determineStats(statsLookup, sensorEntry, level, signalOptions);
   // Customize min max values for deaths
   if (getType(sensorEntry, signalOptions) === 'count') {
-    key += `_${level}`;
-    if (sensorEntry.isCasesOrDeath) {
-      key += `_${primaryValue(sensorEntry, signalOptions)}`;
-    }
-    const stats = resolveStats(statsLookup, key);
     if (useMax) {
       return [0, stats.max];
     }
@@ -50,10 +67,6 @@ export function determineMinMax(
     ];
   }
 
-  if (sensorEntry.isCasesOrDeath) {
-    key += `_${primaryValue(sensorEntry, signalOptions)}`;
-  }
-  const stats = resolveStats(statsLookup, key);
   if (useMax) {
     return [0, stats.max];
   }

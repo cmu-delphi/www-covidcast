@@ -26,7 +26,7 @@
     "gen:check": "npm run gen -- --check",
     "gen:local": "npm run gen -- --localOnly",
     "gen:fallback": "npm run gen -- --fallback",
-    "start": "npm run gen:fallback && node --max-old-space-size=4192 node_modules/webpack-cli/bin/cli.js serve --mode development --hot --devtool eval-cheap-module-source-map",
+    "start": "npm run gen:fallback && node --max-old-space-size=6192 node_modules/webpack-cli/bin/cli.js serve --mode development --hot --devtool eval-cheap-module-source-map",
     "prebuild": "npm run clean",
     "build": "npm run gen:fallback && cross-env NODE_ENV=production webpack --mode production",
     "watch": "cross-env NODE_ENV=development webpack --mode development -w",

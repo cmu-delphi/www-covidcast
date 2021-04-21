@@ -92,19 +92,10 @@
     return fetcher.fetch1SensorNRegions1Date(sensor, level, '*', date.value);
   }
 
-  /**
-   * @param {import("../../../stores/params").SensorParam} sensor
-   * @param {import("../../../stores/params").RegionLevel level
-   * @param {import("../../../stores/params").DateParam} date
-   */
-  function generateFileName(sensor, level, date) {
-    return `${sensor.name}_${getLevelInfo(level).labelPlural}_${formatDateISO(date.value)}`;
-  }
-
   $: shownLevel = level === 'nation' ? 'state' : level;
   $: spec = generateSpec(sensor, shownLevel, date);
   $: data = loadData(sensor, shownLevel, date);
-  $: fileName = generateFileName(sensor, shownLevel, date);
+  $: fileName = `${sensor.name}_${getLevelInfo(shownLevel).labelPlural}_${formatDateISO(date.value)}`;
 
   /**
    * @type {Vega }

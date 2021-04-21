@@ -3,7 +3,7 @@ import { addNameInfos, fetchData, formatAPITime, addMissing, fitRange, parseAPIT
 import { nationInfo } from '../data/regions';
 import { currentDate, yesterdayDate, currentSensor, sensorList, selectByInfo } from '.';
 import { determineTrend, Trend } from './trend';
-import { determineMinMax } from './stats';
+import { determineMinMax, determineStats } from './stats';
 import { formatValue } from '../formats';
 import { scaleSequential } from 'd3-scale';
 import { scrollToTop } from '../util';
@@ -721,6 +721,17 @@ export class SensorParam {
       scaled[1] = Math.min(100000, scaled[1]);
     }
     return scaled;
+  }
+
+  /**
+   * @param {Map<string, any>} stats
+   * @param {string} level
+   */
+  stats(
+    stats: Map<string, { mean: number; max: number; std: number }>,
+    level: RegionLevel,
+  ): { max: number; mean: number; std: number } {
+    return determineStats(stats, this.value, level, {});
   }
 
   createColorScale(

@@ -1,14 +1,15 @@
 <script>
   import { setContext } from 'svelte';
-  import { currentSensor, currentSensor2, currentSensorEntry2, isMobileDevice } from '../../stores';
+  import { currentSensor, currentSensor2, currentSensorEntry2, isMobileDevice, sensorList } from '../../stores';
   import { currentRegionInfo, currentSensorEntry, currentDateObject, times } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
   import { WidgetHighlight } from './highlight';
   // import LineChartWidget from './widgets/LineChartWidget.svelte';
-  import KPIWidget from './widgets/KPIWidget.svelte';
-  // import MapChartWidget from './widgets/MapChartWidget.svelte';
+  // import KPIWidget from './widgets/KPIWidget.svelte';
+  import MapChartWidget from './widgets/MapChartWidget.svelte';
   // import HexMapChartWidget from './widgets/HexMapChartWidget.svelte';
-  import KPITrendWidget from './widgets/KPITrendWidget.svelte';
+  // import KPITrendWidget from './widgets/KPITrendWidget.svelte';
+  import ParallelCoordinatesWidget from './widgets/ParallelCoordinatesWidget.svelte';
   // import RegionTableWidget from './widgets/RegionTableWidget.svelte';
   // import DateTableWidget from './widgets/DateTableWidget.svelte';
   // import SensorTableWidget from './widgets/SensorTableWidget.svelte';
@@ -51,14 +52,20 @@
   <div class="panel-wrapper">
     <div class="panel">
       <!-- <LineChartWidget {sensor} timeFrame={date.windowTimeFrame} {region} bind:highlight /> -->
-      <!-- <MapChartWidget {sensor} {date} level={region.level} bind:highlight /> -->
+      <MapChartWidget {sensor} {date} level={region.level} bind:highlight />
       <!-- <LineChartWidget sensor={sensor2} timeFrame={sensor2.timeFrame} wide {region} bind:highlight /> -->
       <!-- <RegionTableWidget {sensor} {date} level={region.level} bind:highlight /> -->
       <!-- <DateTableWidget {sensor} {region} timeFrame={date.windowTimeFrame} bind:highlight /> -->
       <!-- <SensorTableWidget {region} {date} bind:highlight /> -->
-      <KPIWidget {sensor} {date} {region} bind:highlight />
-      <KPITrendWidget {sensor} {date} {region} bind:highlight />
+      <!-- <KPIWidget {sensor} {date} {region} bind:highlight />
+      <KPITrendWidget {sensor} {date} {region} bind:highlight /> -->
       <!-- <HexMapChartWidget {sensor} {date} bind:highlight /> -->
+      <ParallelCoordinatesWidget
+        sensors={sensorList.slice().reverse().slice(0, 3)}
+        level={region.level}
+        {date}
+        bind:highlight
+      />
     </div>
   </div>
 </div>
