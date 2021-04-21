@@ -4,7 +4,6 @@
   import TrendTextSummary from '../../../components/TrendTextSummary.svelte';
   import { WidgetHighlight } from '../highlight';
   import WidgetCard from './WidgetCard.svelte';
-  import WidgetTitle from './WidgetTitle.svelte';
 
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -45,12 +44,9 @@
   }
 </script>
 
-<WidgetCard {highlighted}>
-  <div class="content" on:mouseenter={onMouseEnter} on:mouseleave={onMouseLeave}>
-    <WidgetTitle {sensor} {date} {region} unit={false}>
-      {region.displayName}
-    </WidgetTitle>
-    <div class="kpi">
+<WidgetCard {highlighted} {sensor} {date} {region} titleUnit={false} grid={{ width: 2, height: 2 }}>
+  <div class="content">
+    <div class="kpi" on:mouseenter={onMouseEnter} on:mouseleave={onMouseLeave}>
       <div>
         {#await data}
           <TrendIndicator trend={null} long />

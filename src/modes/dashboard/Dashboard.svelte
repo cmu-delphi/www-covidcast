@@ -3,14 +3,15 @@
   import { currentSensor, currentSensor2, currentSensorEntry2, isMobileDevice } from '../../stores';
   import { currentRegionInfo, currentSensorEntry, currentDateObject, times } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
-  import KPIWidget from './widgets/KPIWidget.svelte';
   import { WidgetHighlight } from './highlight';
-  import LineChartWidget from './widgets/LineChartWidget.svelte';
-  import MapChartWidget from './widgets/MapChartWidget.svelte';
-  import HexMapChartWidget from './widgets/HexMapChartWidget.svelte';
+  // import LineChartWidget from './widgets/LineChartWidget.svelte';
+  import KPIWidget from './widgets/KPIWidget.svelte';
+  // import MapChartWidget from './widgets/MapChartWidget.svelte';
+  // import HexMapChartWidget from './widgets/HexMapChartWidget.svelte';
   import KPITrendWidget from './widgets/KPITrendWidget.svelte';
-  import RegionTableWidget from './widgets/RegionTableWidget.svelte';
-  import DateTableWidget from './widgets/DateTableWidget.svelte';
+  // import RegionTableWidget from './widgets/RegionTableWidget.svelte';
+  // import DateTableWidget from './widgets/DateTableWidget.svelte';
+  // import SensorTableWidget from './widgets/SensorTableWidget.svelte';
 
   $: sensor = new SensorParam($currentSensorEntry, currentSensor, $times);
   $: sensor2 = new SensorParam($currentSensorEntry2, currentSensor2, $times);
@@ -44,19 +45,20 @@
       <h2>COVIDcast <span>Dashboard</span></h2>
     </div>
   </div>
+  {#if $isMobileDevice}
+    <div class="uk-alert uk-alert-warning">This view is optimized for larger screens only</div>
+  {/if}
   <div class="panel-wrapper">
     <div class="panel">
-      {#if $isMobileDevice}
-        <div class="uk-alert uk-alert-warning">This view is optimized for larger screens only</div>
-      {/if}
-      <LineChartWidget {sensor} timeFrame={date.windowTimeFrame} {region} bind:highlight />
-      <MapChartWidget {sensor} {date} level={region.level} bind:highlight />
-      <LineChartWidget sensor={sensor2} timeFrame={sensor2.timeFrame} wide {region} bind:highlight />
-      <RegionTableWidget {sensor} {date} level={region.level} bind:highlight />
-      <DateTableWidget {sensor} {region} timeFrame={date.windowTimeFrame} bind:highlight />
+      <!-- <LineChartWidget {sensor} timeFrame={date.windowTimeFrame} {region} bind:highlight /> -->
+      <!-- <MapChartWidget {sensor} {date} level={region.level} bind:highlight /> -->
+      <!-- <LineChartWidget sensor={sensor2} timeFrame={sensor2.timeFrame} wide {region} bind:highlight /> -->
+      <!-- <RegionTableWidget {sensor} {date} level={region.level} bind:highlight /> -->
+      <!-- <DateTableWidget {sensor} {region} timeFrame={date.windowTimeFrame} bind:highlight /> -->
+      <!-- <SensorTableWidget {region} {date} bind:highlight /> -->
       <KPIWidget {sensor} {date} {region} bind:highlight />
       <KPITrendWidget {sensor} {date} {region} bind:highlight />
-      <HexMapChartWidget {sensor} {date} bind:highlight />
+      <!-- <HexMapChartWidget {sensor} {date} bind:highlight /> -->
     </div>
   </div>
 </div>

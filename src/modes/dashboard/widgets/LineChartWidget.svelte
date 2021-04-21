@@ -73,6 +73,7 @@
       highlightRegion: false,
       clearHighlight: false,
       autoAlignOffset: 60,
+      paddingTop: 80,
       infoLabelExpr: raw
         ? `cachedNumber(datum.value, '.1f') + ' (raw: ' + cachedNumber(datum.raw, '.1f') + ') @ ' + cachedTime(datum.date_value, '%a %b %d')`
         : `cachedNumber(datum.value, '.1f') + ' @ ' + cachedTime(datum.date_value, '%a %b %d')`,
@@ -180,41 +181,21 @@
   }
 </script>
 
-<WidgetCard grid={{ width: wide ? 5 : 3, height: 2 }} {highlighted}>
-  <div class="content">
-    <Vega
-      bind:this={vegaRef}
-      {spec}
-      {data}
-      signals={{ highlight_tuple: patchHighlightTuple }}
-      signalListeners={['highlight']}
-      on:signal_highlight={onHighlightSignal}
-    />
-    <div class="buttons">
-      <Toggle bind:checked={zoom} noPadding>Rescale Y-axis</Toggle>
-      {#if sensor.rawValue != null}
-        <Toggle bind:checked={singleRaw} noPadding>Raw Data</Toggle>
-      {/if}
-      <div class="spacer" />
-      <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} advanced={false} />
-    </div>
-  </div>
+<WidgetCard grid={{ width: wide ? 5 : 3, height: 2 }} {highlighted} {sensor} {region} date={timeFrame}>
+  <Vega
+    bind:this={vegaRef}
+    {spec}
+    {data}
+    style="margin-top: -58px;"
+    signals={{ highlight_tuple: patchHighlightTuple }}
+    signalListeners={['highlight']}
+    on:signal_highlight={onHighlightSignal}
+  />
+  <svelte:fragment slot="toolbar">
+    <Toggle bind:checked={zoom} noPadding>Rescale Y-axis</Toggle>
+    {#if sensor.rawValue != null}
+      <Toggle bind:checked={singleRaw} noPadding>Raw Data</Toggle>
+    {/if}
+    <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} advanced={false} />
+  </svelte:fragment>
 </WidgetCard>
-
-<style>
-  .content {
-    display: flex;
-    flex-direction: column;
-  }
-  .content > :global(.vega-embed) {
-    flex: 1 1 0;
-  }
-  .buttons {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  .spacer {
-    flex: 1 1 0;
-  }
-</style>

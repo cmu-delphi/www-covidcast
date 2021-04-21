@@ -4,7 +4,6 @@
   import KPIValue from '../../../components/KPIValue.svelte';
   import { WidgetHighlight } from '../highlight';
   import WidgetCard from './WidgetCard.svelte';
-  import WidgetTitle from './WidgetTitle.svelte';
 
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -45,31 +44,23 @@
   }
 </script>
 
-<WidgetCard {highlighted}>
-  <div class="content" on:mouseenter={onMouseEnter} on:mouseleave={onMouseLeave}>
-    <WidgetTitle {sensor} {date} {region} unit={false} />
-    <div class="kpi">
-      <div>
-        {#await data}
-          <KPIValue value={null} />
-        {:then d}
-          <KPIValue value={d ? d.value : null} />
-        {/await}
-      </div>
-      <div>
-        <SensorUnit {sensor} long />
-      </div>
+<WidgetCard {highlighted} {sensor} {date} {region} titleUnit={false} grid={{ height: 2 }}>
+  <div class="kpi" on:mouseenter={onMouseEnter} on:mouseleave={onMouseLeave}>
+    <div>
+      {#await data}
+        <KPIValue value={null} />
+      {:then d}
+        <KPIValue value={d ? d.value : null} />
+      {/await}
+    </div>
+    <div>
+      <SensorUnit {sensor} long />
     </div>
   </div>
 </WidgetCard>
 
 <style>
-  .content {
-    display: flex;
-    flex-direction: column;
-  }
   .kpi {
-    flex-grow: 1;
     display: flex;
     flex-direction: column;
     align-items: center;

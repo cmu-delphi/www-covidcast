@@ -11,6 +11,7 @@
   const dispatch = createEventDispatcher();
 
   export let className = '';
+  export let style = undefined;
 
   /**
    * @type {import('vega-embed').VisualizationSpec | Promise<import('vega-embed').VisualizationSpec>}
@@ -57,6 +58,11 @@
    * @type {number}
    */
   export let scrollSpy = -1;
+
+  /**
+   * @type {'canvas' | 'svg'}
+   */
+  export let renderer = 'canvas';
 
   let loading = false;
   let noData = false;
@@ -236,6 +242,7 @@
       });
       return m.default(root, spec, {
         tooltip: tooltipHandler,
+        renderer,
         patch,
       });
     });
@@ -336,6 +343,7 @@
 <div
   bind:this={root}
   class="root vega-embed {className}"
+  {style}
   class:loading-bg={!hasError && loading}
   class:message-overlay={hasError || (noData && !loading)}
   data-message={message}

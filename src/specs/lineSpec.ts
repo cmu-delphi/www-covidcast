@@ -223,6 +223,7 @@ export interface LineSpecOptions {
   reactOnMouseMove?: boolean;
   clearHighlight?: boolean;
   paddingLeft?: number;
+  paddingTop?: number;
   infoLabelExpr?: string;
   autoAlignOffset?: number;
   tickCount?: Axis<ExprRef | SignalRef>['tickCount'];
@@ -246,6 +247,7 @@ export function generateLineChartSpec({
   reactOnMouseMove = true,
   clearHighlight = true,
   paddingLeft = 42,
+  paddingTop,
   infoLabelExpr,
   autoAlignOffset = 40,
   tickCount = {
@@ -268,7 +270,7 @@ export function generateLineChartSpec({
     ...BASE_SPEC,
     width,
     height,
-    padding: { left: paddingLeft, top: topOffset, bottom: 55, right: 15 },
+    padding: { left: paddingLeft, top: paddingTop ?? topOffset, bottom: 55, right: 15 },
     title: title
       ? {
           text: title,

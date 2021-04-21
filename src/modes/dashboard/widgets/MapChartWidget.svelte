@@ -69,6 +69,7 @@
       title: [`${sensor.name} in US ${getLevelInfo(level).labelPlural}`, `on ${formatDateYearWeekdayAbbr(date.value)}`],
       subTitle: sensor.unit,
       initialRegion: highlightToRegionsImpl(level, highlight),
+      paddingTop: 60,
     };
     const byLevel = {
       nation: generateNationSpec,
@@ -153,18 +154,18 @@
   }
 </script>
 
-<WidgetCard grid={{ width: 2, height: 2 }}>
+<WidgetCard grid={{ width: 2, height: 2 }} {sensor} region="US {getLevelInfo(shownLevel).labelPlural}" {date}>
   <Vega
     bind:this={vegaRef}
     {spec}
     {data}
+    style="margin-top: -58px;"
     tooltip={RegionMapTooltip}
     tooltipProps={{ sensor }}
     on:signal_hover={onHover}
     signalListeners={['hover']}
   />
-  <DownloadMenu {vegaRef} {data} {sensor} absolutePos="right: unset; left: 20px; bottom: 20px;" {fileName} />
+  <svelte:fragment slot="toolbar">
+    <DownloadMenu {vegaRef} {data} {sensor} {fileName} advanced={false} />
+  </svelte:fragment>
 </WidgetCard>
-
-<style>
-</style>

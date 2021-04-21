@@ -23,7 +23,6 @@
   import SortColumnIndicator, { byImportance, SortHelper } from '../../../components/SortColumnIndicator.svelte';
   import TrendIndicator from '../../../components/TrendIndicator.svelte';
   import SensorValue from '../../../components/SensorValue.svelte';
-  import WidgetTitle from './WidgetTitle.svelte';
   import { formatDateISO } from '../../../formats';
   import { WidgetHighlight } from '../highlight';
   import { SensorParam } from '../../../stores/params';
@@ -101,100 +100,69 @@
   }
 </script>
 
-<WidgetCard grid={{ width: 2, height: 3 }}>
-  <div class="content">
-    <WidgetTitle {sensor} {region} {date} unit={false}>
-      <template slot="addons">
-        <DownloadMenu
-          {fileName}
-          data={sortedRows}
-          prepareRow={(r) => toDump(r)}
-          absolutePos="bottom: unset; top: 0;"
-          advanced={false}
-        />
-      </template>
-    </WidgetTitle>
-    <div class="table-wrapper">
-      <div class="table-scroller">
-        <table class="mobile-table" class:loading>
-          <thead>
-            <tr>
-              <th class="mobile-th">{rowName}</th>
-              <th class="mobile-th">Change Last 7 days</th>
-              <th class="mobile-th uk-text-right">{typeof sensor === 'string' ? 'Value' : sensor.unitShort}</th>
-            </tr>
-            <tr>
-              <th class="sort-indicator uk-text-center">
-                <SortColumnIndicator label={rowName} {sort} prop="name" />
-              </th>
-              <th class="sort-indicator">
-                <SortColumnIndicator label="Change Last 7 days" {sort} prop="delta" />
-              </th>
-              <th class="sort-indicator">
-                <SortColumnIndicator label="Value" {sort} prop="value" />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each sortedRows as r (r.id)}
-              <tr
-                class:important={r.important}
-                class:highlight={r.highlight.equals(highlight)}
-                on:mouseenter={() => onMouseEnter(r)}
-                on:mouseleave={onMouseLeave}
-              >
-                <td>
-                  {r.name}
-                </td>
-                <td>
-                  <TrendIndicator trend={r.trendObj} block />
-                </td>
-                <td class="uk-text-right table-value">
-                  <SensorValue sensor={new SensorParam(r.sensor)} value={r.value} />
-                </td>
-              </tr>
-            {/each}
-          </tbody>
-          {#if !showAll && totalCount > top}
-            <tfoot>
-              <tr>
-                <td colspan="3" class="uk-text-center">
-                  <button
-                    class="uk-button uk-button-default uk-button-delphi uk-button-delphi__secondary"
-                    on:click={() => (showAll = true)}
-                  >
-                    Show All ({totalCount - top}
-                    remaining)
-                  </button>
-                </td>
-              </tr>
-            </tfoot>
-          {/if}
-        </table>
-      </div>
-    </div>
-  </div>
+<WidgetCard grid={{ width: 2, height: 3 }} {sensor} {region} {date} titleUnit={false}>
+  <svelte:fragment slot="toolbar">
+    <DownloadMenu {fileName} data={sortedRows} prepareRow={(r) => toDump(r)} advanced={false} />
+  </svelte:fragment>
+  <table class="mobile-table" class:loading>
+    <thead>
+      <tr>
+        <th class="mobile-th">{rowName}</th>
+        <th class="mobile-th">Change Last 7 days</th>
+        <th class="mobile-th uk-text-right">{typeof sensor === 'string' ? 'Value' : sensor.unitShort}</th>
+      </tr>
+      <tr>
+        <th class="sort-indicator uk-text-center">
+          <SortColumnIndicator label={rowName} {sort} prop="name" />
+        </th>
+        <th class="sort-indicator">
+          <SortColumnIndicator label="Change Last 7 days" {sort} prop="delta" />
+        </th>
+        <th class="sort-indicator">
+          <SortColumnIndicator label="Value" {sort} prop="value" />
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {#each sortedRows as r (r.id)}
+        <tr
+          class:important={r.important}
+          class:highlight={r.highlight.equals(highlight)}
+          on:mouseenter={() => onMouseEnter(r)}
+          on:mouseleave={onMouseLeave}
+        >
+          <td>
+            {r.name}
+          </td>
+          <td>
+            <TrendIndicator trend={r.trendObj} block />
+          </td>
+          <td class="uk-text-right table-value">
+            <SensorValue sensor={new SensorParam(r.sensor)} value={r.value} />
+          </td>
+        </tr>
+      {/each}
+    </tbody>
+    {#if !showAll && totalCount > top}
+      <tfoot>
+        <tr>
+          <td colspan="3" class="uk-text-center">
+            <button
+              class="uk-button uk-button-default uk-button-delphi uk-button-delphi__secondary"
+              on:click={() => (showAll = true)}
+            >
+              Show All ({totalCount - top}
+              remaining)
+            </button>
+          </td>
+        </tr>
+      </tfoot>
+    {/if}
+  </table>
 </WidgetCard>
 
 <style>
-  .content {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-  }
-  .table-wrapper {
-    position: relative;
-    flex: 1 1 0;
-  }
-  .table-scroller {
-    position: absolute;
-    overflow: auto;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-  }
-  .table-scroller .mobile-th {
+  .mobile-th {
     background: white;
     position: sticky;
     top: 0;

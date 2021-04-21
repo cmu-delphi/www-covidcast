@@ -313,7 +313,12 @@ function genLevelHoverLayer({ strokeWidth = 3 } = {}): NormalizedUnitSpec | Norm
 function genBaseSpec(
   level: RegionLevel,
   topoJSON: Promise<unknown>,
-  { height = 300, title = undefined as string | string[] | undefined, subTitle = undefined as string | undefined },
+  {
+    height = 300,
+    title = undefined as string | string[] | undefined,
+    subTitle = undefined as string | undefined,
+    paddingTop = undefined as number | undefined,
+  },
 ): TopLevelSpec & LayerSpec<Field> {
   let topOffset = 10;
   if (title) {
@@ -336,7 +341,7 @@ function genBaseSpec(
     padding: {
       left: 10,
       bottom: 55,
-      top: topOffset,
+      top: paddingTop ?? topOffset,
       right: 10,
     },
     projection: {

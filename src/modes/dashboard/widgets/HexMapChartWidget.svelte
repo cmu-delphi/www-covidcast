@@ -13,7 +13,6 @@
   import { MISSING_COLOR } from '../../../theme';
   import { groupByRegion } from '../../../stores/params';
   import { WidgetHighlight } from '../highlight';
-  import WidgetTitle from './WidgetTitle.svelte';
 
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -75,6 +74,7 @@
   $: colorScale = sensor.createColorScale($stats, 'state');
 
   const maxColumn = state2TileCell.reduce((acc, v) => Math.max(acc, v.x), 0) + 1;
+  const maxRow = state2TileCell.reduce((acc, v) => Math.max(acc, v.y), 0) + 1;
 
   function style(v) {
     const color = v && v.value != null ? colorScale(v.value) : MISSING_COLOR;
@@ -103,29 +103,32 @@
   }
 </script>
 
-<WidgetCard grid={{ width: 2, height: 2 }}>
+<WidgetCard grid={{ width: 2, height: 2 }} {sensor} region="US States" {date}>
+  <svelte:fragment slot="toolbar">
+    <DownloadMenu {fileName} data={tileData} {sensor} prepareRow={(row) => row.dump} />
+  </svelte:fragment>
   <div class="root">
-    <WidgetTitle {sensor} {date} region="US States" />
-    <HexGrid columns={maxColumn} style="gap: 2px; margin: 10px 0;">
-      {#await tileData then tiles}
-        {#each tiles as tile (tile.region.propertyId)}
-          <HexGridCell
-            x={tile.x}
-            y={tile.y}
-            tooltip={`${sensor.formatValue(tile.value ? tile.value.value : null)} ${sensor.unitHTML}`}
-            classNameOuter="state-cell {isSelected(tile, sensor, date, highlight) ? 'selected' : ''}"
-            style={style(tile.value)}
-            on:mouseenter={() => onMouseEnter(tile)}
-            on:mouseleave={onMouseLeave}
-          >
-            <span class="title">{tile.region.propertyId}</span>
-          </HexGridCell>
-        {/each}
-      {/await}
-    </HexGrid>
-    <ColorLegend {sensor} level="state" gradientLength={280}>
-      <DownloadMenu {fileName} data={tileData} {sensor} absolutePos prepareRow={(row) => row.dump} />
-    </ColorLegend>
+    <div class="hex-map-wrapper">
+      <svg class="hex-map-helper" width={maxColumn} height={maxRow} />
+      <HexGrid columns={maxColumn} style="gap: 2px; margin: 12px;">
+        {#await tileData then tiles}
+          {#each tiles as tile (tile.region.propertyId)}
+            <HexGridCell
+              x={tile.x}
+              y={tile.y}
+              tooltip={`${sensor.formatValue(tile.value ? tile.value.value : null)} ${sensor.unitHTML}`}
+              classNameOuter="state-cell {isSelected(tile, sensor, date, highlight) ? 'selected' : ''}"
+              style={style(tile.value)}
+              on:mouseenter={() => onMouseEnter(tile)}
+              on:mouseleave={onMouseLeave}
+            >
+              <span class="title">{tile.region.propertyId}</span>
+            </HexGridCell>
+          {/each}
+        {/await}
+      </HexGrid>
+    </div>
+    <ColorLegend {sensor} level="state" gradientLength={280} />
   </div>
 </WidgetCard>
 
@@ -154,5 +157,22 @@
   }
   .root :global(.state-cell.selected) {
     filter: drop-shadow(0 0 3px #888);
+  }
+
+  .hex-map-wrapper {
+    position: relative;
+    align-self: center;
+  }
+
+  .hex-map-wrapper > :global(.hexgrid) {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .hex-map-helper {
+    margin: 12px;
   }
 </style>
