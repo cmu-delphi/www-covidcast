@@ -202,4 +202,9 @@
   tr.highlight {
     box-shadow: 0 0 3px 0 #888;
   }
+
+  .table-value {
+    white-space: nowrap;
+    font-weight: 700;
+  }
 </style>
