@@ -58,4 +58,5 @@
   rowName="Indicator"
   bind:highlight
   sortBy="name"
+  top={100}
 />

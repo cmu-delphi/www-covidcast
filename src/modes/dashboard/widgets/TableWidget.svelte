@@ -47,6 +47,8 @@
   export let sortBy = 'name';
   export let sortByDesc = false;
 
+  export let top = 10;
+
   /**
    * two way binding
    * @type {import('../highlight').WidgetHighlight | null}
@@ -66,7 +68,7 @@
     loadedRows.then((rows) => {
       totalCount = rows.length;
       const sorted = rows.slice().sort(comparator);
-      sortedRows = sorted.slice(0, showAll ? -1 : 10);
+      sortedRows = sorted.slice(0, showAll ? -1 : top);
       loading = false;
     });
   }
@@ -153,7 +155,7 @@
               </tr>
             {/each}
           </tbody>
-          {#if !showAll && totalCount > 10}
+          {#if !showAll && totalCount > top}
             <tfoot>
               <tr>
                 <td colspan="3" class="uk-text-center">
@@ -161,7 +163,7 @@
                     class="uk-button uk-button-default uk-button-delphi uk-button-delphi__secondary"
                     on:click={() => (showAll = true)}
                   >
-                    Show All ({totalCount - 10}
+                    Show All ({totalCount - top}
                     remaining)
                   </button>
                 </td>
