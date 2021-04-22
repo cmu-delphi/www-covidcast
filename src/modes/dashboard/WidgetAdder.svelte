@@ -23,14 +23,14 @@
 
   function triggerAdd(event) {
     const formData = new FormData(event.currentTarget);
-    const entries = {};
+    const config = {};
     formData.forEach((value, key) => {
-      if (key.startsWith('_') || value === '') {
+      if (key.startsWith('_') || value === '' || key === 'type') {
         return;
       }
       if (key.includes('.')) {
         const parts = key.split('.');
-        let level = entries;
+        let level = config;
         for (const p of parts.slice(0, -1)) {
           if (p in level) {
             level = level[p];
@@ -41,16 +41,14 @@
         }
         level[parts[parts.length - 1]] = value;
       } else {
-        entries[key] = value;
+        config[key] = value;
       }
     });
-    console.log(entries);
-    const type = entries.type;
-    delete entries.type;
+    const type = formData.get('type');
     dispatch('add', {
       id: `${type}-${nextId}`,
       type,
-      config: {},
+      config,
     });
     value = 'line';
   }

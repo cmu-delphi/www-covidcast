@@ -38,7 +38,6 @@
   let state = initialState;
 
   $: {
-    console.log(state);
     updateState(state);
   }
 
@@ -128,13 +127,15 @@
 <div class="root">
   <div class="mobile-header-line-bg">
     <div class="mobile-header-line">
+      <button class="widget-add-button uk-button uk-button-primary" type="button" uk-toggle="target: #offcanvas-overlay"
+        >Add Widget</button
+      >
       <h2>COVIDcast <span>Dashboard</span></h2>
     </div>
   </div>
   {#if $isMobileDevice}
     <div class="uk-alert uk-alert-warning">This view is optimized for larger screens only</div>
   {/if}
-  <button class="uk-button uk-button-default" type="button" uk-toggle="target: #offcanvas-overlay">Open</button>
   <div id="offcanvas-overlay" uk-offcanvas="overlay: true">
     <div class="uk-light uk-offcanvas-bar">
       <button bind:this={refCloseAdder} class="uk-offcanvas-close" type="button" uk-close />
@@ -158,6 +159,12 @@
     line-height: 1.5rem;
     display: flex;
     flex-direction: column;
+  }
+
+  .widget-add-button {
+    position: absolute;
+    left: 1em;
+    top: -11px;
   }
 
   .panel-wrapper {
