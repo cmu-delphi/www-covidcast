@@ -88,7 +88,7 @@
 
   let reversedSet = initialState.reversed || [];
   let sortedOrder = null;
-  $: domain = initialState.domain || 'auto';
+  let domain = initialState.domain || 'auto';
   let superState = {};
   $: state = {
     ...superState,
@@ -318,7 +318,7 @@
     return spec;
   }
 
-  $: sortedEntries = initialState.sortedOrder ? initialState.sortedOrder.map((i) => entries[i]) : entries;
+  $: sortedEntries = (initialState || {}).sortedOrder ? initialState.sortedOrder.map((i) => entries[i]) : entries;
 
   export let options = {};
 

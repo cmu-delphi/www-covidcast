@@ -1,4 +1,6 @@
 <script>
+  export let name = 'option';
+  export let required = undefined;
   /**
    * @type {string | null}
    */
@@ -15,7 +17,7 @@
 
 <div class="option-picker {className}" {style}>
   <span class="option-picker-label">{label}</span>
-  <select class="option-picker-input" bind:value on:blur>
+  <select {name} class="option-picker-input" bind:value on:blur {required}>
     <slot>
       {#each options as option}
         <option value={option.value}>{option.label}</option>
@@ -32,6 +34,7 @@
   }
 
   .option-picker-input {
+    display: block;
     padding: 8px 0px 8px 6px;
     border: 1px solid #d3d4d8;
     background: white;
