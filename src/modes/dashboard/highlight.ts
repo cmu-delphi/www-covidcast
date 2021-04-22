@@ -1,7 +1,7 @@
 import { formatDateISO } from '../../formats';
 import { getInfoByName } from '../../data/regions';
 import { sensorMap } from '../../stores';
-import { Region, RegionLevel, Sensor, TimeFrame } from '../../stores/params';
+import { DateParam, Region, RegionLevel, RegionParam, Sensor, SensorParam, TimeFrame } from '../../stores/params';
 
 function isArray<T>(v: T | readonly T[]): v is readonly T[] {
   return Array.isArray(v);
@@ -157,7 +157,7 @@ export class WidgetHighlight {
     );
   }
 
-  matchSensor(sensor: Sensor): boolean {
+  matchSensor(sensor: Sensor | SensorParam): boolean {
     if (this.sensorIds == null) {
       return true;
     }
@@ -167,7 +167,7 @@ export class WidgetHighlight {
     return this.sensorIds.has(sensor.key);
   }
 
-  matchRegion(region: Region): boolean {
+  matchRegion(region: Region | RegionParam): boolean {
     if (this.regionIds == null) {
       return true;
     }
@@ -190,10 +190,11 @@ export class WidgetHighlight {
     return this.regionIds.has(key) || this.regionIds.has(level);
   }
 
-  matchDate(date: Date): boolean {
+  matchDate(date: Date | DateParam): boolean {
+    const lDate = DateParam.unbox(date);
     return (
       this.date == null ||
-      (this.date instanceof Date ? this.date.valueOf() == date.valueOf() : this.date.includes(date))
+      (this.date instanceof Date ? this.date.valueOf() == lDate.valueOf() : this.date.includes(lDate))
     );
   }
 
@@ -203,12 +204,17 @@ export class WidgetHighlight {
     );
   }
 
-  matches(sensor: Sensor, region: Region | RegionLevel, date: Date | TimeFrame): boolean {
+  matches(
+    sensor: Sensor | SensorParam,
+    region: Region | RegionParam | RegionLevel,
+    date: Date | DateParam | TimeFrame,
+  ): boolean {
     return (
       this.matchSensor(sensor) &&
       ((typeof region === 'string' && this.matchLevel(region)) ||
         (typeof region !== 'string' && this.matchRegion(region))) &&
-      ((date instanceof Date && this.matchDate(date)) || (!(date instanceof Date) && this.matchTimeFrame(date)))
+      ((!(date instanceof TimeFrame) && this.matchDate(date)) ||
+        (date instanceof TimeFrame && this.matchTimeFrame(date)))
     );
   }
 
