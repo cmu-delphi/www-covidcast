@@ -7,6 +7,7 @@
   import { getLevelInfo } from '../../../stores';
   import ATableWidget, { toRow, DEFAULT_STATE } from './ATableWidget.svelte';
 
+  export let id = undefined;
   /**
    * @type {import("../../../stores/params").SensorParam}
    */
@@ -87,7 +88,9 @@
 </script>
 
 <ATableWidget
+  {id}
   on:state
+  on:close
   {initialState}
   {sensor}
   region="US {getLevelInfo(shownLevel).labelPlural}"

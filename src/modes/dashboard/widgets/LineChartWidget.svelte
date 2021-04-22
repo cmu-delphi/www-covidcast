@@ -16,7 +16,11 @@
   import { formatDateISO, formatDateShortWeekdayAbbr, formatDateYearWeekdayAbbr } from '../../../formats';
   import { WidgetHighlight } from '../highlight';
   import isEqual from 'lodash-es/isEqual';
+  import { createEventDispatcher } from 'svelte';
 
+  const dispatch = createEventDispatcher();
+
+  export let id = undefined;
   export let wide = false;
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -36,6 +40,22 @@
    * @type {import('../highlight').WidgetHighlight | null}
    */
   export let highlight = null;
+
+  export let initialState = {
+    zero: true,
+    raw: false,
+  };
+
+  let zoom = !initialState.zero;
+  let singleRaw = initialState.raw;
+
+  $: state = {
+    zero: !zoom,
+    raw: singleRaw,
+  };
+  $: {
+    dispatch('state', { id, state });
+  }
 
   /**
    * @type {import("../../../stores/params").DataFetcher}
@@ -123,9 +143,6 @@
     return spec;
   }
 
-  let zoom = false;
-  let singleRaw = false;
-
   $: annotations = $annotationManager.getWindowAnnotations(sensor.value, region, timeFrame.min, timeFrame.max);
   $: raw = singleRaw && sensor.rawValue != null;
   $: spec = injectRanges(
@@ -181,7 +198,7 @@
   }
 </script>
 
-<WidgetCard grid={{ width: wide ? 5 : 3, height: 2 }} {highlighted} {sensor} {region} date={timeFrame}>
+<WidgetCard grid={{ width: wide ? 5 : 3, height: 2 }} {highlighted} {sensor} {region} date={timeFrame} {id} on:close>
   <Vega
     bind:this={vegaRef}
     {spec}

@@ -6,6 +6,7 @@
   import { WidgetHighlight } from '../highlight';
   import AParallelCoordinatesWidget, { DEFAULT_STATE, toEntry } from './AParallelCoordinatesWidget.svelte';
 
+  export let id = undefined;
   /**
    * @type {import("../../../stores/params").SensorParam[]}
    */
@@ -72,6 +73,8 @@
 </script>
 
 <AParallelCoordinatesWidget
+  {id}
+  on:close
   {initialState}
   on:state
   {region}

@@ -5,6 +5,7 @@
   import { determineTrend } from '../../../stores/trend';
   import ATableWidget, { DEFAULT_STATE, toRow } from './ATableWidget.svelte';
 
+  export let id = undefined;
   /**
    * @type {import("../../../stores/params").DateParam}
    */
@@ -52,7 +53,9 @@
 </script>
 
 <ATableWidget
+  {id}
   on:state
+  on:close
   {initialState}
   sensor="All Indicators"
   {region}

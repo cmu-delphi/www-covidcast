@@ -46,7 +46,11 @@
 <script>
   import { formatDateLocal, formatDateYearWeekdayAbbr } from '../../../formats';
   import { TimeFrame } from '../../../stores/params';
+  import { createEventDispatcher } from 'svelte';
 
+  const dispatch = createEventDispatcher();
+
+  export let id = undefined;
   /**
    * @type {import("../../../stores/params").SensorParam | string}
    */
@@ -69,7 +73,7 @@
   export let grid = null;
 </script>
 
-<div class="widget-card uk-card uk-card-small uk-card-default" class:highlighted style={gridToStyle(grid)} on:>
+<div class="widget-card uk-card uk-card-small uk-card-default" class:highlighted style={gridToStyle(grid)} data-id={id}>
   <div class="widget-wrapper">
     <div class="uk-card-body">
       <slot />
@@ -78,6 +82,13 @@
   <div class="uk-card-header widget-title">
     <div class="widget-toolbar">
       <slot name="toolbar" />
+      <button
+        class="uk-icon-button widget-close"
+        type="button"
+        uk-icon="close"
+        on:click={() => dispatch('close', id)}
+        title="Remove Widget"
+      />
     </div>
     <h3>
       <slot name="title">
@@ -144,5 +155,10 @@
 
   .widget-toolbar {
     float: right;
+  }
+
+  .widget-toolbar :global(.uk-icon-button) {
+    width: 24px;
+    height: 24px;
   }
 </style>

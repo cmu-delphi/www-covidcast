@@ -40,14 +40,11 @@
     initHighlight(sensor, region, date);
   }
 
-  function trackState(id, state) {
-    console.log(id, state);
+  function trackState(event) {
+    console.log(event.detail.id, event.detail.state);
   }
-
-  function stateTracker(id) {
-    return (event) => {
-      trackState(id, event.detail);
-    };
+  function trackClose(event) {
+    console.log(event.detail.id, event.detail.state);
   }
 </script>
 
@@ -62,7 +59,15 @@
   {/if}
   <div class="panel-wrapper">
     <div class="panel">
-      <LineChartWidget {sensor} timeFrame={date.windowTimeFrame} {region} bind:highlight />
+      <LineChartWidget
+        {sensor}
+        timeFrame={date.windowTimeFrame}
+        {region}
+        bind:highlight
+        id="date-line"
+        on:close={trackClose}
+        on:state={trackState}
+      />
       <!-- <MapChartWidget {sensor} {date} level={region.level} bind:highlight /> -->
       <!-- <LineChartWidget sensor={sensor2} timeFrame={sensor2.timeFrame} wide {region} bind:highlight /> -->
       <!-- <RegionTableWidget {sensor} {date} level={region.level} bind:highlight /> -->
@@ -71,7 +76,9 @@
         {region}
         timeFrame={date.windowTimeFrame}
         bind:highlight
-        on:state={stateTracker('date-table')}
+        id="date-table"
+        on:close={trackClose}
+        on:state={trackState}
       />
       <!-- <SensorTableWidget {region} {date} bind:highlight /> -->
       <!-- <KPIWidget {sensor} {date} {region} bind:highlight />
@@ -82,14 +89,17 @@
         level={region.level}
         {date}
         bind:highlight
-        on:state={stateTracker('region-pcp')}
+        on:close={trackClose}
+        on:state={trackState}
       /> -->
       <DateParallelCoordinatesWidget
         sensors={sensorList.slice().reverse().slice(0, 3)}
         timeFrame={date.windowTimeFrame}
         {region}
         bind:highlight
-        on:state={stateTracker('date-pcp')}
+        id="date-pcp"
+        on:close={trackClose}
+        on:state={trackState}
       />
     </div>
   </div>

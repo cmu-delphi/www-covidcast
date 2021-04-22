@@ -8,6 +8,7 @@
   import { getInfoByName } from '../../../data/regions';
   import AParallelCoordinatesWidget, { DEFAULT_STATE, toEntry } from './AParallelCoordinatesWidget.svelte';
 
+  export let id = undefined;
   /**
    * @type {import("../../../stores/params").SensorParam[]}
    */
@@ -92,7 +93,9 @@
 </script>
 
 <AParallelCoordinatesWidget
+  {id}
   on:state
+  on:close
   {initialState}
   region="US {getLevelInfo(shownLevel).labelPlural}"
   {date}

@@ -34,6 +34,7 @@
   import { createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher();
+  export let id = undefined;
 
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -69,7 +70,7 @@
     sortCriteriaDesc: $sort.sortDirectionDesc,
   };
   $: {
-    dispatch('state', state);
+    dispatch('state', { id, state });
   }
 
   let loading = true;
@@ -116,7 +117,7 @@
   }
 </script>
 
-<WidgetCard grid={{ width: 2, height: 3 }} {sensor} {region} {date} titleUnit={false}>
+<WidgetCard grid={{ width: 2, height: 3 }} {sensor} {region} {date} titleUnit={false} on:close {id}>
   <svelte:fragment slot="toolbar">
     <DownloadMenu {fileName} data={sortedRows} prepareRow={(r) => toDump(r)} advanced={false} />
   </svelte:fragment>

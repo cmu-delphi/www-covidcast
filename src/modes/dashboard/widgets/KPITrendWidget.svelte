@@ -5,6 +5,7 @@
   import { WidgetHighlight } from '../highlight';
   import WidgetCard from './WidgetCard.svelte';
 
+  export let id = undefined;
   /**
    * @type {import("../../../stores/params").SensorParam}
    */
@@ -44,7 +45,7 @@
   }
 </script>
 
-<WidgetCard {highlighted} {sensor} {date} {region} titleUnit={false} grid={{ width: 2, height: 2 }}>
+<WidgetCard {highlighted} {sensor} {date} {region} titleUnit={false} grid={{ width: 2, height: 2 }} on:close {id}>
   <div class="content">
     <div class="kpi" on:mouseenter={onMouseEnter} on:mouseleave={onMouseLeave}>
       <div>

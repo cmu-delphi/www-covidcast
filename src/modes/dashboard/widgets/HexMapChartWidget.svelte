@@ -14,6 +14,7 @@
   import { groupByRegion } from '../../../stores/params';
   import { WidgetHighlight } from '../highlight';
 
+  export let id = undefined;
   /**
    * @type {import("../../../stores/params").SensorParam}
    */
@@ -103,7 +104,7 @@
   }
 </script>
 
-<WidgetCard grid={{ width: 2, height: 2 }} {sensor} region="US States" {date}>
+<WidgetCard grid={{ width: 2, height: 2 }} {sensor} region="US States" {date} {id} on:close>
   <svelte:fragment slot="toolbar">
     <DownloadMenu {fileName} data={tileData} {sensor} prepareRow={(row) => row.dump} />
   </svelte:fragment>

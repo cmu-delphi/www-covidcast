@@ -19,6 +19,7 @@
   import isEqual from 'lodash-es/isEqual';
   import { resolveHighlightedField } from '../../../specs/lineSpec';
 
+  export let id = undefined;
   /**
    * @type {import("../../../stores/params").SensorParam}
    */
@@ -145,7 +146,14 @@
   }
 </script>
 
-<WidgetCard grid={{ width: 2, height: 2 }} {sensor} region="US {getLevelInfo(shownLevel).labelPlural}" {date}>
+<WidgetCard
+  grid={{ width: 2, height: 2 }}
+  {sensor}
+  region="US {getLevelInfo(shownLevel).labelPlural}"
+  {date}
+  {id}
+  on:close
+>
   <Vega
     bind:this={vegaRef}
     {spec}

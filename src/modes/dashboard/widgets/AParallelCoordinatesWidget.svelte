@@ -57,6 +57,8 @@
   import { createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher();
+
+  export let id = undefined;
   /**
    * @type {Entry[]}
    */
@@ -83,7 +85,7 @@
   $: state = { domain, sortedOrder, reversed: reversedSet };
   $: {
     // dispatch state changes
-    dispatch('state', state);
+    dispatch('state', { id, state });
   }
 
   /**
@@ -365,7 +367,7 @@
   }
 </script>
 
-<WidgetCard grid={{ width: 2, height: 3 }} sensor="Indicators" {region} {date}>
+<WidgetCard grid={{ width: 2, height: 3 }} sensor="Indicators" {region} {date} {id} on:close>
   <div class="content">
     <div data-uk-sortable class="c" bind:this={ref}>
       {#each entries as entry, i}
