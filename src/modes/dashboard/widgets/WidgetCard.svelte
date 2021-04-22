@@ -235,14 +235,15 @@
   }
 
   .widget-move-handle {
-    left: 2px;
+    left: 4px;
     cursor: grab;
   }
   .widget-widget-toolbar {
-    right: 2px;
+    right: 4px;
   }
   .widget-widget-toolbar > button {
     cursor: pointer;
+    padding: 0 2px;
     border: none;
     background: none;
   }

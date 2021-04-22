@@ -13,6 +13,8 @@
   import DateParallelCoordinatesWidget from './widgets/DateParallelCoordinatesWidget.svelte';
   // import RegionTableWidget from './widgets/RegionTableWidget.svelte';
   import DateTableWidget from './widgets/DateTableWidget.svelte';
+  import { resolveInitialState, updateState } from './state';
+  import isEqual from 'lodash-es/isEqual';
   // import SensorTableWidget from './widgets/SensorTableWidget.svelte';
 
   $: sensor = new SensorParam($currentSensorEntry, currentSensor, $times);
@@ -40,11 +42,33 @@
     initHighlight(sensor, region, date);
   }
 
-  function trackState(event) {
-    console.log(event.detail.id, event.detail.state);
+  let initialState = resolveInitialState();
+
+  let state = initialState;
+
+  $: {
+    console.log(state);
+    updateState(state);
   }
+
+  function trackState(event) {
+    state = {
+      ...state,
+      states: {
+        ...state.states,
+        [event.detail.id]: event.detail.state,
+      },
+    };
+  }
+
   function trackClose(event) {
-    console.log(event.detail);
+    const id = event.detail;
+    const states = { ...state.states };
+    delete states[id];
+    state = {
+      order: state.order.filter((d) => d !== id),
+      states,
+    };
   }
 
   let panelRef = null;
@@ -52,7 +76,12 @@
   onMount(() => {
     panelRef.addEventListener('moved', () => {
       const widgets = Array.from(panelRef.querySelectorAll('.widget-card'), (d) => d.dataset.id);
-      console.log(widgets);
+      if (!isEqual(widgets, state.order)) {
+        state = {
+          ...state,
+          order: widgets,
+        };
+      }
     });
   });
 </script>
@@ -73,9 +102,10 @@
         timeFrame={date.windowTimeFrame}
         {region}
         bind:highlight
-        id="date-line"
         on:close={trackClose}
         on:state={trackState}
+        id="line-1"
+        initialState={initialState.states['line-1']}
       />
       <!-- <MapChartWidget {sensor} {date} level={region.level} bind:highlight /> -->
       <!-- <LineChartWidget sensor={sensor2} timeFrame={sensor2.timeFrame} wide {region} bind:highlight /> -->
@@ -85,9 +115,10 @@
         {region}
         timeFrame={date.windowTimeFrame}
         bind:highlight
-        id="date-table"
         on:close={trackClose}
         on:state={trackState}
+        id="datetable-1"
+        initialState={initialState.states['datetable-1']}
       />
       <!-- <SensorTableWidget {region} {date} bind:highlight /> -->
       <!-- <KPIWidget {sensor} {date} {region} bind:highlight />
@@ -106,9 +137,10 @@
         timeFrame={date.windowTimeFrame}
         {region}
         bind:highlight
-        id="date-pcp"
         on:close={trackClose}
         on:state={trackState}
+        id="datepcp-1"
+        initialState={initialState.states['datepcp-1']}
       />
     </div>
   </div>

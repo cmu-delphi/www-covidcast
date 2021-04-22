@@ -1,8 +1,30 @@
 import { updateHash } from '../../stores/urlHandler';
-import { compressToEncodedURIComponent } from 'lz-string';
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 
 export interface IState {
-  x: number;
+  order: string[];
+  states: Record<string, Record<string, unknown>>;
+}
+
+const BASE_STATE: IState = {
+  order: [],
+  states: {},
+};
+
+export function resolveInitialState(): IState {
+  if (!location.hash) {
+    return BASE_STATE;
+  }
+  try {
+    const s = (JSON.parse(decompressFromEncodedURIComponent(location.hash.slice(1))!) as unknown) as IState;
+    return {
+      ...BASE_STATE,
+      ...s,
+    };
+  } catch {
+    console.error('invalid state in hash');
+    return BASE_STATE;
+  }
 }
 
 export function updateState(state: IState): void {
