@@ -105,4 +105,5 @@
   isSensorHighlighted={isSensorHighlighted(shownLevel, date)}
   {highlightToSpecId}
   {specIdToHighlight}
+  options={{ opacity: shownLevel === 'state' ? 0.25 : 0.1 }}
 />

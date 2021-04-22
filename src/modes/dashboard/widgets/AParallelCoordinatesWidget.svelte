@@ -85,7 +85,7 @@
    * @param {import('../../../stores/params').RegionLevel} level
    * @param {'auto' | 'mean' | 'full'} domain
    */
-  function generateSpec(entries, domain, reversedSet, { opacity = 0.25 }) {
+  function generateSpec(entries, domain, reversedSet, { opacity = 0.25, colorBy = 'region' }) {
     /**
      * @param {Entry} entry
      * @param {number} i
@@ -165,42 +165,6 @@
             },
           ],
           encoding: {
-            opacity: {
-              condition: {
-                test: {
-                  or: [
-                    {
-                      param: 'highlight',
-                      empty: false,
-                    },
-                    'datum.id === "mean"',
-                  ],
-                },
-                value: 1,
-              },
-              value: opacity,
-            },
-            strokeWidth: {
-              condition: {
-                test: {
-                  or: [
-                    {
-                      param: 'highlight',
-                      empty: false,
-                    },
-                    'datum.id === "mean"',
-                  ],
-                },
-                value: 3,
-              },
-              value: 1,
-              legend: {
-                direction: 'horizontal',
-                orient: 'bottom',
-                title: null,
-                titleFontWeight: 'normal',
-              },
-            },
             x: {
               sort: null,
               field: 'x',
@@ -229,9 +193,20 @@
               axis: null,
             },
             detail: { field: 'id' },
-            color: {
-              field: 'region',
-              type: 'nominal',
+            strokeWidth: {
+              condition: {
+                test: {
+                  or: [
+                    {
+                      param: 'highlight',
+                      empty: false,
+                    },
+                    'datum.id === "mean"',
+                  ],
+                },
+                value: 3,
+              },
+              value: 1,
               legend: {
                 direction: 'horizontal',
                 orient: 'bottom',
@@ -239,6 +214,61 @@
                 titleFontWeight: 'normal',
               },
             },
+            ...(colorBy === 'region'
+              ? {
+                  opacity: {
+                    condition: {
+                      test: {
+                        or: [
+                          {
+                            param: 'highlight',
+                            empty: false,
+                          },
+                          'datum.id === "mean"',
+                        ],
+                      },
+                      value: 1,
+                    },
+                    value: opacity,
+                  },
+                  color: {
+                    field: 'region',
+                    type: 'nominal',
+                    legend: {
+                      direction: 'horizontal',
+                      orient: 'bottom',
+                      title: null,
+                      titleFontWeight: 'normal',
+                    },
+                  },
+                }
+              : {
+                  opacity: {
+                    condition: {
+                      test: {
+                        or: [
+                          {
+                            param: 'highlight',
+                            empty: false,
+                          },
+                          'datum.id === "mean"',
+                        ],
+                      },
+                      value: 1,
+                    },
+                    field: 'date_value',
+                    type: 'temporal',
+                    scale: {
+                      range: [0.05, 0.6],
+                    },
+                    legend: {
+                      direction: 'horizontal',
+                      orient: 'bottom',
+                      title: null,
+                      titleFontWeight: 'normal',
+                    },
+                  },
+                }),
           },
         },
         genCreditsLayer({ shift: 50 }),
