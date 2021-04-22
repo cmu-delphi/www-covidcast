@@ -87,10 +87,15 @@
     const id = event.detail;
     const states = { ...state.states };
     delete states[id];
+    const configs = { ...state.configs };
+    delete configs[id];
     state = {
+      ...state,
       order: state.order.filter((d) => d !== id),
       states,
+      configs,
     };
+    components = deriveComponents(state);
   }
 
   let panelRef = null;
