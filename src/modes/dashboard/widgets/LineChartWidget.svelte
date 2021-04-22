@@ -1,6 +1,6 @@
 <script>
   import Vega from '../../../components/vega/Vega.svelte';
-  import WidgetCard from './WidgetCard.svelte';
+  import WidgetCard, { DEFAULT_WIDGET_STATE } from './WidgetCard.svelte';
   import { getContext } from 'svelte';
   import Toggle from '../../../components/Toggle.svelte';
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
@@ -21,7 +21,6 @@
   const dispatch = createEventDispatcher();
 
   export let id = undefined;
-  export let wide = false;
   /**
    * @type {import("../../../stores/params").SensorParam}
    */
@@ -42,6 +41,9 @@
   export let highlight = null;
 
   export let initialState = {
+    ...DEFAULT_WIDGET_STATE,
+    width: 3,
+    height: 2,
     zero: true,
     raw: false,
   };
@@ -49,12 +51,17 @@
   let zoom = !initialState.zero;
   let singleRaw = initialState.raw;
 
+  let superState = {};
   $: state = {
+    ...superState,
     zero: !zoom,
     raw: singleRaw,
   };
   $: {
     dispatch('state', { id, state });
+  }
+  function mergeState(event) {
+    superState = event.detail;
   }
 
   /**
@@ -198,7 +205,17 @@
   }
 </script>
 
-<WidgetCard grid={{ width: wide ? 5 : 3, height: 2 }} {highlighted} {sensor} {region} date={timeFrame} {id} on:close>
+<WidgetCard
+  {initialState}
+  {highlighted}
+  {sensor}
+  {region}
+  date={timeFrame}
+  {id}
+  on:close
+  on:state={mergeState}
+  resizeMode="x"
+>
   <Vega
     bind:this={vegaRef}
     {spec}

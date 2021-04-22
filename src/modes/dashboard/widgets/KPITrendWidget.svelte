@@ -3,7 +3,7 @@
   import TrendIndicator from '../../../components/TrendIndicator.svelte';
   import TrendTextSummary from '../../../components/TrendTextSummary.svelte';
   import { WidgetHighlight } from '../highlight';
-  import WidgetCard from './WidgetCard.svelte';
+  import WidgetCard, { DEFAULT_WIDGET_STATE } from './WidgetCard.svelte';
 
   export let id = undefined;
   /**
@@ -25,6 +25,12 @@
    */
   export let highlight = null;
 
+  export let initialState = {
+    ...DEFAULT_WIDGET_STATE,
+    width: 2,
+    height: 2,
+  };
+
   /**
    * @type {import("../../../stores/params").DataFetcher}
    */
@@ -45,7 +51,7 @@
   }
 </script>
 
-<WidgetCard {highlighted} {sensor} {date} {region} titleUnit={false} grid={{ width: 2, height: 2 }} on:close {id}>
+<WidgetCard {highlighted} {sensor} {date} {region} titleUnit={false} {initialState} on:state on:close {id}>
   <div class="content">
     <div class="kpi" on:mouseenter={onMouseEnter} on:mouseleave={onMouseLeave}>
       <div>

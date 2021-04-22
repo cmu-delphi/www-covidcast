@@ -17,13 +17,16 @@
   }
 
   export const DEFAULT_STATE = {
+    ...DEFAULT_WIDGET_STATE,
+    width: 2,
+    height: 3,
     sortCriteria: 'name',
     sortCriteriaDesc: false,
   };
 </script>
 
 <script>
-  import WidgetCard from './WidgetCard.svelte';
+  import WidgetCard, { DEFAULT_WIDGET_STATE } from './WidgetCard.svelte';
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
   import SortColumnIndicator, { byImportance, SortHelper } from '../../../components/SortColumnIndicator.svelte';
   import TrendIndicator from '../../../components/TrendIndicator.svelte';
@@ -65,12 +68,18 @@
 
   const sort = new SortHelper(initialState.sortCriteria, initialState.sortCriteriaDesc, 'name', byImportance);
 
+  let superState = {};
   $: state = {
+    ...superState,
     sortCriteria: $sort.sortCriteria,
     sortCriteriaDesc: $sort.sortDirectionDesc,
   };
   $: {
     dispatch('state', { id, state });
+  }
+
+  function mergeState(event) {
+    superState = event.detail;
   }
 
   let loading = true;
@@ -117,7 +126,17 @@
   }
 </script>
 
-<WidgetCard grid={{ width: 2, height: 3 }} {sensor} {region} {date} titleUnit={false} on:close {id}>
+<WidgetCard
+  {initialState}
+  {sensor}
+  {region}
+  {date}
+  titleUnit={false}
+  on:close
+  {id}
+  on:state={mergeState}
+  resizeMode="y"
+>
   <svelte:fragment slot="toolbar">
     <DownloadMenu {fileName} data={sortedRows} prepareRow={(r) => toDump(r)} advanced={false} />
   </svelte:fragment>

@@ -1,6 +1,6 @@
 <script>
   import Vega from '../../../components/vega/Vega.svelte';
-  import WidgetCard from './WidgetCard.svelte';
+  import WidgetCard, { DEFAULT_WIDGET_STATE } from './WidgetCard.svelte';
   import { getContext } from 'svelte';
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
   import { getLevelInfo, stats } from '../../../stores';
@@ -38,6 +38,12 @@
    * @type {import('../highlight').WidgetHighlight | null}
    */
   export let highlight = null;
+
+  export let initialState = {
+    ...DEFAULT_WIDGET_STATE,
+    width: 2,
+    height: 2,
+  };
 
   /**
    * @type {import("../../../stores/params").DataFetcher}
@@ -146,14 +152,7 @@
   }
 </script>
 
-<WidgetCard
-  grid={{ width: 2, height: 2 }}
-  {sensor}
-  region="US {getLevelInfo(shownLevel).labelPlural}"
-  {date}
-  {id}
-  on:close
->
+<WidgetCard {initialState} {sensor} region="US {getLevelInfo(shownLevel).labelPlural}" {date} {id} on:state on:close>
   <Vega
     bind:this={vegaRef}
     {spec}

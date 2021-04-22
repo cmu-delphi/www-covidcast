@@ -1,5 +1,5 @@
 <script>
-  import WidgetCard from './WidgetCard.svelte';
+  import WidgetCard, { DEFAULT_WIDGET_STATE } from './WidgetCard.svelte';
   import { getContext } from 'svelte';
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
   import { stats } from '../../../stores';
@@ -29,6 +29,12 @@
    * @type {import('../highlight').WidgetHighlight | null}
    */
   export let highlight = null;
+
+  export let initialState = {
+    ...DEFAULT_WIDGET_STATE,
+    width: 2,
+    height: 2,
+  };
 
   /**
    * @type {import("../../../stores/params").DataFetcher}
@@ -104,7 +110,7 @@
   }
 </script>
 
-<WidgetCard grid={{ width: 2, height: 2 }} {sensor} region="US States" {date} {id} on:close>
+<WidgetCard {sensor} region="US States" {date} {id} {initialState} on:state on:close>
   <svelte:fragment slot="toolbar">
     <DownloadMenu {fileName} data={tileData} {sensor} prepareRow={(row) => row.dump} />
   </svelte:fragment>

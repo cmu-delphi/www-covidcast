@@ -3,7 +3,7 @@
   import SensorUnit from '../../../components/SensorUnit.svelte';
   import KPIValue from '../../../components/KPIValue.svelte';
   import { WidgetHighlight } from '../highlight';
-  import WidgetCard from './WidgetCard.svelte';
+  import WidgetCard, { DEFAULT_WIDGET_STATE } from './WidgetCard.svelte';
 
   export let id = undefined;
   /**
@@ -25,6 +25,11 @@
    */
   export let highlight = null;
 
+  export let initialState = {
+    ...DEFAULT_WIDGET_STATE,
+    height: 2,
+  };
+
   /**
    * @type {import("../../../stores/params").DataFetcher}
    */
@@ -45,7 +50,7 @@
   }
 </script>
 
-<WidgetCard {highlighted} {sensor} {date} {region} titleUnit={false} grid={{ height: 2 }} on:close {id}>
+<WidgetCard {highlighted} {sensor} {date} {region} titleUnit={false} {initialState} on:close on:state {id}>
   <div class="kpi" on:mouseenter={onMouseEnter} on:mouseleave={onMouseLeave}>
     <div>
       {#await data}

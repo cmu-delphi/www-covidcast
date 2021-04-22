@@ -41,12 +41,19 @@
   /**
    * @type {{domain: 'auto' | 'defined' | 'full', sortedOrder: number[] | null, reversed: string[]}}
    */
-  export const DEFAULT_STATE = { domain: 'auto', sortedOrder: null, reversed: [] };
+  export const DEFAULT_STATE = {
+    ...DEFAULT_WIDGET_STATE,
+    width: 2,
+    height: 3,
+    domain: 'auto',
+    sortedOrder: null,
+    reversed: [],
+  };
 </script>
 
 <script>
   import Vega from '../../../components/vega/Vega.svelte';
-  import WidgetCard from './WidgetCard.svelte';
+  import WidgetCard, { DEFAULT_WIDGET_STATE } from './WidgetCard.svelte';
   import { onMount } from 'svelte';
   import { SensorParam } from '../../../stores/params';
   import { BASE_SPEC, commonConfig } from '../../../specs/commonSpec';
@@ -82,10 +89,20 @@
   let reversedSet = initialState.reversed;
   let sortedOrder = null;
   $: domain = initialState.domain;
-  $: state = { domain, sortedOrder, reversed: reversedSet };
+  let superState = {};
+  $: state = {
+    ...superState,
+    domain,
+    sortedOrder,
+    reversed: reversedSet,
+  };
   $: {
     // dispatch state changes
     dispatch('state', { id, state });
+  }
+
+  function mergeState(event) {
+    superState = event.detail;
   }
 
   /**
@@ -367,7 +384,7 @@
   }
 </script>
 
-<WidgetCard grid={{ width: 2, height: 3 }} sensor="Indicators" {region} {date} {id} on:close>
+<WidgetCard sensor="Indicators" {region} {date} {id} on:close {initialState} on:state={mergeState}>
   <div class="content">
     <div data-uk-sortable class="c" bind:this={ref}>
       {#each entries as entry, i}
