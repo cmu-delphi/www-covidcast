@@ -49,6 +49,7 @@
   import { genCreditsLayer, resolveHighlightedField } from '../../../specs/lineSpec';
   import isEqual from 'lodash-es/isEqual';
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
+  import OptionPicker from '../../../components/OptionPicker.svelte';
 
   /**
    * @type {Entry[]}
@@ -69,7 +70,7 @@
   export let isSensorHighlighted = () => false;
 
   /**
-   * @type {'auto' | 'mean' | 'full'}
+   * @type {'auto' | 'defined' | 'full'}
    */
   export let domain = 'auto';
 
@@ -83,7 +84,7 @@
    * @param {Entry[]} entries
    * @param {import('../../../stores/params').Sensor[]} sensors
    * @param {import('../../../stores/params').RegionLevel} level
-   * @param {'auto' | 'mean' | 'full'} domain
+   * @param {'auto' | 'defined' | 'full'} domain
    */
   function generateSpec(entries, domain, reversedSet, { opacity = 0.25, colorBy = 'region' }) {
     /**
@@ -373,6 +374,11 @@
     />
   </div>
   <svelte:fragment slot="toolbar">
+    <OptionPicker bind:value={domain} label="Domain">
+      <option value="auto">Auto</option>
+      <option value="defined">Mean±3*Std</option>
+      <option vlaue="full">Full Range</option>
+    </OptionPicker>
     <DownloadMenu {fileName} {vegaRef} {data} advanced={false} />
   </svelte:fragment>
 </WidgetCard>

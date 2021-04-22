@@ -20,9 +20,9 @@
   export let region;
 
   /**
-   * @type {'auto' | 'mean' | 'full'}
+   * @type {'auto' | 'defined' | 'full'}
    */
-  export let domain = 'auto';
+  export let domain = 'defined';
 
   /**
    * two way binding

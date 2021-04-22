@@ -22,7 +22,7 @@
   export let level;
 
   /**
-   * @type {'auto' | 'mean' | 'full'}
+   * @type {'auto' | 'defined' | 'full'}
    */
   export let domain = 'auto';
 
