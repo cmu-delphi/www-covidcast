@@ -1,5 +1,5 @@
 <script>
-  import { setContext } from 'svelte';
+  import { onMount, setContext } from 'svelte';
   import { currentSensor, currentSensor2, currentSensorEntry2, isMobileDevice, sensorList } from '../../stores';
   import { currentRegionInfo, currentSensorEntry, currentDateObject, times } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
@@ -44,8 +44,17 @@
     console.log(event.detail.id, event.detail.state);
   }
   function trackClose(event) {
-    console.log(event.detail.id, event.detail.state);
+    console.log(event.detail);
   }
+
+  let panelRef = null;
+
+  onMount(() => {
+    panelRef.addEventListener('moved', () => {
+      const widgets = Array.from(panelRef.querySelectorAll('.widget-card'), (d) => d.dataset.id);
+      console.log(widgets);
+    });
+  });
 </script>
 
 <div class="root">
@@ -58,7 +67,7 @@
     <div class="uk-alert uk-alert-warning">This view is optimized for larger screens only</div>
   {/if}
   <div class="panel-wrapper">
-    <div class="panel">
+    <div bind:this={panelRef} class="panel" data-uk-sortable="handle: .widget-move-handle">
       <LineChartWidget
         {sensor}
         timeFrame={date.windowTimeFrame}

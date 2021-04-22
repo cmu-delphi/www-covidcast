@@ -44,6 +44,8 @@
 </script>
 
 <script>
+  import arrowsAltIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrows-alt.svg';
+  import timesCircleIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/times-circle.svg';
   import { formatDateLocal, formatDateYearWeekdayAbbr } from '../../../formats';
   import { TimeFrame } from '../../../stores/params';
   import { createEventDispatcher } from 'svelte';
@@ -80,15 +82,12 @@
     </div>
   </div>
   <div class="uk-card-header widget-title">
+    <div class="widget-move-handle">{@html arrowsAltIcon}</div>
+    <button class="widget-close" type="button" on:click={() => dispatch('close', id)} title="Remove Widget">
+      {@html timesCircleIcon}
+    </button>
     <div class="widget-toolbar">
       <slot name="toolbar" />
-      <button
-        class="uk-icon-button widget-close"
-        type="button"
-        uk-icon="close"
-        on:click={() => dispatch('close', id)}
-        title="Remove Widget"
-      />
     </div>
     <h3>
       <slot name="title">
@@ -160,5 +159,39 @@
   .widget-toolbar :global(.uk-icon-button) {
     width: 24px;
     height: 24px;
+  }
+
+  .widget-move-handle,
+  .widget-close {
+    line-height: 1;
+    position: absolute;
+    z-index: 1;
+    top: 2px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .widget-card:hover .widget-move-handle,
+  .widget-card:hover .widget-close {
+    opacity: 0.5;
+  }
+  .widget-move-handle:hover,
+  .widget-close:hover {
+    opacity: 1 !important;
+  }
+
+  .widget-move-handle {
+    left: 2px;
+    cursor: grab;
+  }
+  .widget-close {
+    right: 2px;
+    cursor: pointer;
+    border: none;
+    background: none;
+  }
+
+  .widget-move-handle > :global(svg),
+  .widget-close > :global(svg) {
+    width: 10px;
   }
 </style>
