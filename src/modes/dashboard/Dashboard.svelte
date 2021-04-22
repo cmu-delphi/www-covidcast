@@ -12,7 +12,7 @@
   // import RegionParallelCoordinatesWidget from './widgets/RegionParallelCoordinatesWidget.svelte';
   import DateParallelCoordinatesWidget from './widgets/DateParallelCoordinatesWidget.svelte';
   // import RegionTableWidget from './widgets/RegionTableWidget.svelte';
-  // import DateTableWidget from './widgets/DateTableWidget.svelte';
+  import DateTableWidget from './widgets/DateTableWidget.svelte';
   // import SensorTableWidget from './widgets/SensorTableWidget.svelte';
 
   $: sensor = new SensorParam($currentSensorEntry, currentSensor, $times);
@@ -39,6 +39,16 @@
   $: {
     initHighlight(sensor, region, date);
   }
+
+  function trackState(id, state) {
+    console.log(id, state);
+  }
+
+  function stateTracker(id) {
+    return (event) => {
+      trackState(id, event.detail);
+    };
+  }
 </script>
 
 <div class="root">
@@ -56,7 +66,13 @@
       <!-- <MapChartWidget {sensor} {date} level={region.level} bind:highlight /> -->
       <!-- <LineChartWidget sensor={sensor2} timeFrame={sensor2.timeFrame} wide {region} bind:highlight /> -->
       <!-- <RegionTableWidget {sensor} {date} level={region.level} bind:highlight /> -->
-      <!-- <DateTableWidget {sensor} {region} timeFrame={date.windowTimeFrame} bind:highlight /> -->
+      <DateTableWidget
+        {sensor}
+        {region}
+        timeFrame={date.windowTimeFrame}
+        bind:highlight
+        on:state={stateTracker('date-table')}
+      />
       <!-- <SensorTableWidget {region} {date} bind:highlight /> -->
       <!-- <KPIWidget {sensor} {date} {region} bind:highlight />
       <KPITrendWidget {sensor} {date} {region} bind:highlight /> -->
@@ -66,12 +82,14 @@
         level={region.level}
         {date}
         bind:highlight
+        on:state={stateTracker('region-pcp')}
       /> -->
       <DateParallelCoordinatesWidget
         sensors={sensorList.slice().reverse().slice(0, 3)}
         timeFrame={date.windowTimeFrame}
         {region}
         bind:highlight
+        on:state={stateTracker('date-pcp')}
       />
     </div>
   </div>

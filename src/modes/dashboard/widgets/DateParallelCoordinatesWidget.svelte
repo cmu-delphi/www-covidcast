@@ -4,7 +4,7 @@
   import { combineSignals, formatAPITime, parseAPITime } from '../../../data/utils';
   import { formatDateISO } from '../../../formats';
   import { WidgetHighlight } from '../highlight';
-  import AParallelCoordinatesWidget, { toEntry } from './AParallelCoordinatesWidget.svelte';
+  import AParallelCoordinatesWidget, { DEFAULT_STATE, toEntry } from './AParallelCoordinatesWidget.svelte';
 
   /**
    * @type {import("../../../stores/params").SensorParam[]}
@@ -19,10 +19,7 @@
    */
   export let region;
 
-  /**
-   * @type {'auto' | 'defined' | 'full'}
-   */
-  export let domain = 'defined';
+  export let initialState = DEFAULT_STATE;
 
   /**
    * two way binding
@@ -75,7 +72,8 @@
 </script>
 
 <AParallelCoordinatesWidget
-  {domain}
+  {initialState}
+  on:state
   {region}
   date={timeFrame}
   {data}

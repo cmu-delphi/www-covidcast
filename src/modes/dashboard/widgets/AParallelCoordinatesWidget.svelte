@@ -38,6 +38,10 @@
       domain,
     };
   }
+  /**
+   * @type {{domain: 'auto' | 'defined' | 'full', sortedOrder: number[] | null}}
+   */
+  export const DEFAULT_STATE = { domain: 'auto', sortedOrder: null };
 </script>
 
 <script>
@@ -50,7 +54,9 @@
   import isEqual from 'lodash-es/isEqual';
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
   import OptionPicker from '../../../components/OptionPicker.svelte';
+  import { createEventDispatcher } from 'svelte';
 
+  const dispatch = createEventDispatcher();
   /**
    * @type {Entry[]}
    */
@@ -69,10 +75,15 @@
 
   export let isSensorHighlighted = () => false;
 
-  /**
-   * @type {'auto' | 'defined' | 'full'}
-   */
-  export let domain = 'auto';
+  export let initialState = DEFAULT_STATE;
+
+  let sortedOrder = null;
+  $: domain = initialState.domain;
+  $: state = { domain, sortedOrder };
+  $: {
+    // dispatch state changes
+    dispatch('state', state);
+  }
 
   /**
    * two way binding
@@ -288,7 +299,7 @@
   }
 
   let reversedSet = [];
-  $: sortedEntries = entries;
+  $: sortedEntries = initialState.sortedOrder ? initialState.sortedOrder.map((i) => entries[i]) : entries;
 
   export let options = {};
 
@@ -298,7 +309,8 @@
 
   onMount(() => {
     ref.addEventListener('moved', (e) => {
-      const order = Array.from(e.target.querySelectorAll('.s')).map((d) => Number.parseInt(d.dataset.i, 10));
+      const order = Array.from(e.target.querySelectorAll('.axis')).map((d) => Number.parseInt(d.dataset.i, 10));
+      sortedOrder = order;
       sortedEntries = order.map((i) => entries[i]);
     });
   });
@@ -395,6 +407,7 @@
     padding: 5px 0 2px 0;
     display: flex;
     justify-content: space-between;
+    position: relative;
   }
   .axis {
     font-size: 0.75rem;
@@ -408,6 +421,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    background: white;
   }
 
   .axis.highlight,

@@ -3,7 +3,7 @@
   import { formatDateISO } from '../../../formats';
   import { sensorList } from '../../../stores';
   import { determineTrend } from '../../../stores/trend';
-  import ATableWidget, { toRow } from './ATableWidget.svelte';
+  import ATableWidget, { DEFAULT_STATE, toRow } from './ATableWidget.svelte';
 
   /**
    * @type {import("../../../stores/params").DateParam}
@@ -19,6 +19,8 @@
    * @type {import('../highlight').WidgetHighlight | null}
    */
   export let highlight = null;
+
+  export let initialState = DEFAULT_STATE;
 
   /**
    * @type {import("../../../stores/params").DataFetcher}
@@ -50,6 +52,8 @@
 </script>
 
 <ATableWidget
+  on:state
+  {initialState}
   sensor="All Indicators"
   {region}
   {fileName}
@@ -57,6 +61,5 @@
   {loadedRows}
   rowName="Indicator"
   bind:highlight
-  sortBy="name"
   top={100}
 />

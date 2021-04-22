@@ -2,7 +2,7 @@
   import { getContext } from 'svelte';
   import { formatDateISO } from '../../../formats';
   import { determineTrends } from '../../../stores/trend';
-  import ATableWidget, { toRow } from './ATableWidget.svelte';
+  import ATableWidget, { DEFAULT_STATE, toRow } from './ATableWidget.svelte';
 
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -22,6 +22,8 @@
    * @type {import('../highlight').WidgetHighlight | null}
    */
   export let highlight = null;
+
+  export let initialState = { ...DEFAULT_STATE, sortCriteriaDesc: true };
 
   /**
    * @type {import("../../../stores/params").DataFetcher}
@@ -51,6 +53,8 @@
 </script>
 
 <ATableWidget
+  on:state
+  {initialState}
   {sensor}
   {region}
   {fileName}
@@ -58,6 +62,4 @@
   {loadedRows}
   rowName="Date"
   bind:highlight
-  sortBy="name"
-  sortByDesc
 />

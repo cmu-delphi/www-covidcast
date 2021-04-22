@@ -6,7 +6,7 @@
   import { addNameInfos } from '../../../data';
   import { highlightToRegions, WidgetHighlight } from '../highlight';
   import { getInfoByName } from '../../../data/regions';
-  import AParallelCoordinatesWidget, { toEntry } from './AParallelCoordinatesWidget.svelte';
+  import AParallelCoordinatesWidget, { DEFAULT_STATE, toEntry } from './AParallelCoordinatesWidget.svelte';
 
   /**
    * @type {import("../../../stores/params").SensorParam[]}
@@ -21,10 +21,7 @@
    */
   export let level;
 
-  /**
-   * @type {'auto' | 'defined' | 'full'}
-   */
-  export let domain = 'auto';
+  export let initialState = DEFAULT_STATE;
 
   /**
    * two way binding
@@ -95,7 +92,8 @@
 </script>
 
 <AParallelCoordinatesWidget
-  {domain}
+  on:state
+  {initialState}
   region="US {getLevelInfo(shownLevel).labelPlural}"
   {date}
   {data}

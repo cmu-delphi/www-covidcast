@@ -5,7 +5,7 @@
   import { infosByLevel, nationInfo } from '../../../data/regions';
   import { groupByRegion } from '../../../stores/params';
   import { getLevelInfo } from '../../../stores';
-  import ATableWidget, { toRow } from './ATableWidget.svelte';
+  import ATableWidget, { toRow, DEFAULT_STATE } from './ATableWidget.svelte';
 
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -25,6 +25,8 @@
    * @type {import('../highlight').WidgetHighlight | null}
    */
   export let highlight = null;
+
+  export let initialState = DEFAULT_STATE;
 
   /**
    * @type {import("../../../stores/params").DataFetcher}
@@ -85,6 +87,8 @@
 </script>
 
 <ATableWidget
+  on:state
+  {initialState}
   {sensor}
   region="US {getLevelInfo(shownLevel).labelPlural}"
   {fileName}

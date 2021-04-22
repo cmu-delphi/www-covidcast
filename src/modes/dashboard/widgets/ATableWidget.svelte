@@ -15,6 +15,11 @@
       value: trend.current ? trend.current.value : null,
     };
   }
+
+  export const DEFAULT_STATE = {
+    sortCriteria: 'name',
+    sortCriteriaDesc: false,
+  };
 </script>
 
 <script>
@@ -26,6 +31,9 @@
   import { formatDateISO } from '../../../formats';
   import { WidgetHighlight } from '../highlight';
   import { SensorParam } from '../../../stores/params';
+  import { createEventDispatcher } from 'svelte';
+
+  const dispatch = createEventDispatcher();
 
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -43,8 +51,6 @@
   export let fileName;
   export let loadedRows = Promise.resolve([]);
   export let rowName = 'Row';
-  export let sortBy = 'name';
-  export let sortByDesc = false;
 
   export let top = 10;
 
@@ -54,7 +60,17 @@
    */
   export let highlight = null;
 
-  const sort = new SortHelper(sortBy, sortByDesc, 'name', byImportance);
+  export let initialState = DEFAULT_STATE;
+
+  const sort = new SortHelper(initialState.sortCriteria, initialState.sortCriteriaDesc, 'name', byImportance);
+
+  $: state = {
+    sortCriteria: $sort.sortCriteria,
+    sortCriteriaDesc: $sort.sortDirectionDesc,
+  };
+  $: {
+    dispatch('state', state);
+  }
 
   let loading = true;
   let showAll = false;
