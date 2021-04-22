@@ -4,11 +4,13 @@ import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from
 export interface IState {
   order: string[];
   states: Record<string, Record<string, unknown>>;
+  configs: Record<string, Record<string, unknown>>;
 }
 
 const BASE_STATE: IState = {
-  order: [],
+  order: ['line-1', 'datetable-2', 'datepcp-3'],
   states: {},
+  configs: {},
 };
 
 export function resolveInitialState(): IState {

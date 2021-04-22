@@ -10,7 +10,7 @@
 
   export let id = undefined;
   /**
-   * @type {import("../../../stores/params").SensorParam[]}
+   * @type {import("../../../stores/params").Sensor[]}
    */
   export let sensors;
   /**

@@ -86,9 +86,9 @@
 
   export let initialState = DEFAULT_STATE;
 
-  let reversedSet = initialState.reversed;
+  let reversedSet = initialState.reversed || [];
   let sortedOrder = null;
-  $: domain = initialState.domain;
+  $: domain = initialState.domain || 'auto';
   let superState = {};
   $: state = {
     ...superState,
