@@ -2,7 +2,7 @@
   import { getContext } from 'svelte';
   import { formatDateISO } from '../../../formats';
   import { determineTrends } from '../../../stores/trend';
-  import TableWidget, { toRow } from './TableWidget.svelte';
+  import ATableWidget, { toRow } from './ATableWidget.svelte';
 
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -50,7 +50,7 @@
   $: fileName = `${sensor.name}_${region.displayName}_${formatDateISO(timeFrame.min)}_${formatDateISO(timeFrame.max)}`;
 </script>
 
-<TableWidget
+<ATableWidget
   {sensor}
   {region}
   {fileName}

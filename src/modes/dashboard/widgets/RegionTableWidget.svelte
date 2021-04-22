@@ -5,7 +5,7 @@
   import { infosByLevel, nationInfo } from '../../../data/regions';
   import { groupByRegion } from '../../../stores/params';
   import { getLevelInfo } from '../../../stores';
-  import TableWidget, { toRow } from './TableWidget.svelte';
+  import ATableWidget, { toRow } from './ATableWidget.svelte';
 
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -84,7 +84,7 @@
   $: fileName = `${sensor.name}_${getLevelInfo(level).labelPlural}_${formatDateISO(date.value)}`;
 </script>
 
-<TableWidget
+<ATableWidget
   {sensor}
   region="US {getLevelInfo(shownLevel).labelPlural}"
   {fileName}

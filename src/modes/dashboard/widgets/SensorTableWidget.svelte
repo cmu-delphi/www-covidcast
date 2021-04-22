@@ -3,7 +3,7 @@
   import { formatDateISO } from '../../../formats';
   import { sensorList } from '../../../stores';
   import { determineTrend } from '../../../stores/trend';
-  import TableWidget, { toRow } from './TableWidget.svelte';
+  import ATableWidget, { toRow } from './ATableWidget.svelte';
 
   /**
    * @type {import("../../../stores/params").DateParam}
@@ -49,7 +49,7 @@
   $: fileName = `AllIndicators_${region.displayName}_${formatDateISO(date.value)}`;
 </script>
 
-<TableWidget
+<ATableWidget
   sensor="All Indicators"
   {region}
   {fileName}

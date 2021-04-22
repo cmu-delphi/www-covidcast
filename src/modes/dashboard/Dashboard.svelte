@@ -9,7 +9,7 @@
   import MapChartWidget from './widgets/MapChartWidget.svelte';
   // import HexMapChartWidget from './widgets/HexMapChartWidget.svelte';
   // import KPITrendWidget from './widgets/KPITrendWidget.svelte';
-  import ParallelCoordinatesWidget from './widgets/ParallelCoordinatesWidget.svelte';
+  import RegionParallelCoordinatesWidget from './widgets/RegionParallelCoordinatesWidget.svelte';
   // import RegionTableWidget from './widgets/RegionTableWidget.svelte';
   // import DateTableWidget from './widgets/DateTableWidget.svelte';
   // import SensorTableWidget from './widgets/SensorTableWidget.svelte';
@@ -60,7 +60,7 @@
       <!-- <KPIWidget {sensor} {date} {region} bind:highlight />
       <KPITrendWidget {sensor} {date} {region} bind:highlight /> -->
       <!-- <HexMapChartWidget {sensor} {date} bind:highlight /> -->
-      <ParallelCoordinatesWidget
+      <RegionParallelCoordinatesWidget
         sensors={sensorList.slice().reverse().slice(0, 3)}
         level={region.level}
         {date}

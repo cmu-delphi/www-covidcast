@@ -1,31 +1,72 @@
+<script context="module">
+  /**
+   * @typedef {object} Entry
+   * @property {string} id
+   * @property {string} name
+   * @property {import('../../../stores/params').Sensor} sensor
+   * @property {import('../../../stores/params').SensorParam} param
+   * @property {[number, number]} domain
+   * @property {number} mean
+   * @property {number} max
+   * @property {number} std
+   */
+
+  export function deriveDomain(domain, entry) {
+    if (domain == 'defined') {
+      return { domain: entry.domain, zero: false, nice: false, clamp: true };
+    }
+    if (domain === 'auto') {
+      return { zero: false };
+    }
+    if (entry.param.isPercentage) {
+      return { domain: [0, 100] };
+    }
+    return {};
+  }
+
+  export function toEntry(sensor, statsLookup, level) {
+    const param = new SensorParam(sensor);
+    const stats = param.stats(statsLookup, level);
+    const domain = param.domain(statsLookup, level);
+    return {
+      id: sensor.key.replace(/[\s;:\-_()]+/gm, '_'),
+      name: sensor.name,
+      sensor,
+      param,
+      mean: stats.mean,
+      max: stats.max,
+      domain,
+    };
+  }
+</script>
+
 <script>
   import Vega from '../../../components/vega/Vega.svelte';
   import WidgetCard from './WidgetCard.svelte';
-  import { getContext, onMount } from 'svelte';
-  import { getLevelInfo, stats } from '../../../stores';
-  import { combineSignals } from '../../../data/utils';
-  import { formatDateISO } from '../../../formats';
-  import { addNameInfos } from '../../../data';
+  import { onMount } from 'svelte';
   import { SensorParam } from '../../../stores/params';
   import { BASE_SPEC, commonConfig } from '../../../specs/commonSpec';
   import { genCreditsLayer, resolveHighlightedField } from '../../../specs/lineSpec';
-  import { highlightToRegions, WidgetHighlight } from '../highlight';
-  import { getInfoByName } from '../../../data/regions';
   import isEqual from 'lodash-es/isEqual';
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
 
   /**
-   * @type {import("../../../stores/params").SensorParam[]}
+   * @type {Entry[]}
    */
-  export let sensors;
+  export let entries;
   /**
-   * @type {import("../../../stores/params").DateParam}
+   * @type {import("../../../stores/params").DateParam | string}
    */
   export let date;
   /**
-   * @type {import("../../../stores/params").RegionLevel}
+   * @type {import("../../../stores/params").RegionParam | string}
    */
-  export let level;
+  export let region;
+
+  export let data = Promise.resolve([]);
+  export let fileName = '';
+
+  export let isSensorHighlighted = () => false;
 
   /**
    * @type {'auto' | 'mean' | 'full'}
@@ -39,28 +80,12 @@
   export let highlight = null;
 
   /**
-   * @type {import("../../../stores/params").DataFetcher}
-   */
-  const fetcher = getContext('fetcher');
-
-  /**
-   * @typedef {object} Entry
-   * @property {string} id
-   * @property {string} name
-   * @property {import('../../../stores/params').Sensor} sensor
-   * @property {import('../../../stores/params').SensorParam} param
-   * @property {[number, number]} domain
-   * @property {number} mean
-   * @property {number} max
-   * @property {number} std
-   */
-  /**
    * @param {Entry[]} entries
    * @param {import('../../../stores/params').Sensor[]} sensors
    * @param {import('../../../stores/params').RegionLevel} level
    * @param {'auto' | 'mean' | 'full'} domain
    */
-  function generateSpec(entries, level, domain, reversedSet) {
+  function generateSpec(entries, domain, reversedSet, { opacity = 0.25 }) {
     /**
      * @param {Entry} entry
      * @param {number} i
@@ -153,7 +178,7 @@
                 },
                 value: 1,
               },
-              value: level === 'state' ? 0.25 : 0.1,
+              value: opacity,
             },
             strokeWidth: {
               condition: {
@@ -231,73 +256,12 @@
     return spec;
   }
 
-  function deriveDomain(domain, entry) {
-    if (domain == 'defined') {
-      return { domain: entry.domain, zero: false, nice: false, clamp: true };
-    }
-    if (domain === 'auto') {
-      return { zero: false };
-    }
-    if (entry.param.isPercentage) {
-      return { domain: [0, 100] };
-    }
-    return {};
-  }
-
-  function toEntry(sensor, statsLookup, level) {
-    const param = new SensorParam(sensor);
-    const stats = param.stats(statsLookup, level);
-    const domain = param.domain(statsLookup, level);
-    return {
-      id: sensor.key.replace(/[\s;:\-_()]+/gm, '_'),
-      name: sensor.name,
-      sensor,
-      param,
-      mean: stats.mean,
-      max: stats.max,
-      domain,
-    };
-  }
-
-  /**
-   * @param {Entry[]} entries
-   * @param {import("../../stores/params").RegionLevel} level
-   * @param {import("../../stores/params").DateParam} date
-   */
-  function loadData(entries, level, date) {
-    return Promise.all(entries.map((entry) => fetcher.fetch1SensorNRegions1Date(entry.sensor, level, '*', date)))
-      .then((rows) => {
-        return combineSignals(
-          rows,
-          rows[0].map((d) => ({ ...d })), // combine to copy
-          entries.map((d) => d.id),
-        );
-      })
-      .then(addNameInfos)
-      .then((rows) => {
-        // add a mean line
-        const meanEntry = {
-          id: 'mean',
-          region: 'Mean Value',
-          displayName: 'Mean from Metadata',
-        };
-        entries.forEach((entry) => {
-          meanEntry[entry.id] = entry.mean;
-        });
-        rows.push(meanEntry);
-        return rows;
-      });
-  }
-
-  $: shownLevel = level === 'nation' ? 'state' : level;
-  $: entries = sensors.map((sensor) => toEntry(sensor, $stats, shownLevel));
-
   let reversedSet = [];
   $: sortedEntries = entries;
 
-  $: spec = generateSpec(sortedEntries, shownLevel, domain, reversedSet);
-  $: data = loadData(entries, shownLevel, date);
-  $: fileName = `Indicators_${getLevelInfo(shownLevel).labelPlural}_${formatDateISO(date.value)}`;
+  export let options = {};
+
+  $: spec = generateSpec(sortedEntries, domain, reversedSet, options);
 
   let ref = null;
 
@@ -310,10 +274,13 @@
 
   let vegaRef = null;
 
+  export let highlightToSpecId = () => null;
+  export let specIdToHighlight = () => null;
+
   function onHighlightSignal(event) {
     const id = resolveHighlightedField(event, 'id');
-    if (id) {
-      const newHighlight = new WidgetHighlight(sensors, getInfoByName(id, shownLevel), date.value);
+    const newHighlight = id === 'mean' ? null : specIdToHighlight(id);
+    if (newHighlight) {
       if (!newHighlight.equals(highlight)) {
         highlight = newHighlight;
       }
@@ -332,10 +299,10 @@
     if (!view) {
       return;
     }
-    const regions = highlightToRegions(shownLevel, highlight);
-    const values = regions && regions.length > 0 ? [regions[0].id] : null;
+    const value = highlightToSpecId(highlight);
+    const values = value != null ? [value] : null;
     const newValue =
-      regions && regions.length > 0
+      value != null
         ? {
             unit: 'layer_1',
             fields: view.signal('highlight_tuple_fields'),
@@ -353,26 +320,13 @@
   $: {
     updateVegaHighlight(highlight);
   }
-
-  /**
-   * @param {import("../../../stores/params").Sensor} sensor
-   * @param {import('../highlight').WidgetHighlight | null} highlight
-   */
-  function isHighlighted(sensor, shownLevel, date, highlight) {
-    return highlight && highlight.matches(sensor, shownLevel, date);
-  }
 </script>
 
-<WidgetCard
-  grid={{ width: 2, height: 3 }}
-  sensor="Indicators"
-  region="US {getLevelInfo(shownLevel).labelPlural}"
-  {date}
->
+<WidgetCard grid={{ width: 2, height: 3 }} sensor="Indicators" {region} {date}>
   <div class="content">
     <div data-uk-sortable class="c" bind:this={ref}>
       {#each entries as entry, i}
-        <div class="axis" data-i={i} class:highlight={isHighlighted(entry.sensor, shownLevel, date.value, highlight)}>
+        <div class="axis" data-i={i} class:highlight={isSensorHighlighted(entry.sensor, highlight)}>
           <div>{entry.name}</div>
           <div>{entry.param.unitShort}</div>
           <label><input type="checkbox" name="reverse" bind:group={reversedSet} value={entry.id} />Reverse</label>
