@@ -39,9 +39,9 @@
     };
   }
   /**
-   * @type {{domain: 'auto' | 'defined' | 'full', sortedOrder: number[] | null}}
+   * @type {{domain: 'auto' | 'defined' | 'full', sortedOrder: number[] | null, reversed: string[]}}
    */
-  export const DEFAULT_STATE = { domain: 'auto', sortedOrder: null };
+  export const DEFAULT_STATE = { domain: 'auto', sortedOrder: null, reversed: [] };
 </script>
 
 <script>
@@ -77,9 +77,10 @@
 
   export let initialState = DEFAULT_STATE;
 
+  let reversedSet = initialState.reversed;
   let sortedOrder = null;
   $: domain = initialState.domain;
-  $: state = { domain, sortedOrder };
+  $: state = { domain, sortedOrder, reversed: reversedSet };
   $: {
     // dispatch state changes
     dispatch('state', state);
@@ -298,7 +299,6 @@
     return spec;
   }
 
-  let reversedSet = [];
   $: sortedEntries = initialState.sortedOrder ? initialState.sortedOrder.map((i) => entries[i]) : entries;
 
   export let options = {};
