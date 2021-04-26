@@ -133,7 +133,7 @@
   {region}
   {date}
   titleUnit={false}
-  on:close
+  on:action
   {id}
   on:state={mergeState}
   resizeMode="y"

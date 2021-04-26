@@ -388,7 +388,7 @@
   }
 </script>
 
-<WidgetCard sensor="Indicators" {region} {date} {id} on:close {initialState} on:state={mergeState}>
+<WidgetCard sensor="Indicators" {region} {date} {id} on:action {initialState} on:state={mergeState}>
   <div class="content">
     <div data-uk-sortable class="c" bind:this={ref}>
       {#each initialSortedEntries as entry}

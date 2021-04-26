@@ -152,7 +152,7 @@
   }
 </script>
 
-<WidgetCard {initialState} {sensor} region="US {getLevelInfo(shownLevel).labelPlural}" {date} {id} on:state on:close>
+<WidgetCard {initialState} {sensor} region="US {getLevelInfo(shownLevel).labelPlural}" {date} {id} on:state on:action>
   <Vega
     bind:this={vegaRef}
     {spec}

@@ -213,7 +213,7 @@
   {region}
   date={timeFrame}
   {id}
-  on:close
+  on:action
   on:state={mergeState}
   resizeMode="x"
 >

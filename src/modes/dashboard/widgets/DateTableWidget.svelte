@@ -55,7 +55,7 @@
 
 <ATableWidget
   {id}
-  on:close
+  on:action
   on:state
   {initialState}
   {sensor}

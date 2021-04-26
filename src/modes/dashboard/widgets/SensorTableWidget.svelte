@@ -55,7 +55,7 @@
 <ATableWidget
   {id}
   on:state
-  on:close
+  on:action
   {initialState}
   sensor="All Indicators"
   {region}

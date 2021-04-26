@@ -50,7 +50,7 @@
   }
 </script>
 
-<WidgetCard {highlighted} {sensor} {date} {region} titleUnit={false} {initialState} on:close on:state {id}>
+<WidgetCard {highlighted} {sensor} {date} {region} titleUnit={false} {initialState} on:action on:state {id}>
   <div class="kpi" on:mouseenter={onMouseEnter} on:mouseleave={onMouseLeave}>
     <div>
       {#await data}

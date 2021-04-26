@@ -71,8 +71,7 @@
     };
   }
 
-  function trackClose(event) {
-    const id = event.detail;
+  function closeWidget(id) {
     const states = { ...state.states };
     delete states[id];
     const configs = { ...state.configs };
@@ -84,6 +83,21 @@
       configs,
     };
     components = deriveComponents(state);
+  }
+
+  function editWidget(id) {
+    // TODO
+    console.log(id);
+  }
+
+  function trackAction(event) {
+    const type = event.detail.type;
+    const id = event.detail.id;
+    if (type === 'close') {
+      closeWidget(id);
+    } else if (type === 'config') {
+      editWidget(id);
+    }
   }
 
   let refCloseAdder = null;
@@ -146,7 +160,7 @@
   <div class="panel-wrapper">
     <div bind:this={panelRef} class="panel" data-uk-sortable="handle: .widget-move-handle">
       {#each components as c (c.id)}
-        <WidgetFactory {c} bind:highlight {sensor} {region} {date} {trackClose} {trackState} />
+        <WidgetFactory {c} bind:highlight {sensor} {region} {date} {trackAction} {trackState} />
       {/each}
     </div>
   </div>

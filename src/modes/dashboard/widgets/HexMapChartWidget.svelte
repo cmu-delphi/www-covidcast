@@ -110,7 +110,7 @@
   }
 </script>
 
-<WidgetCard {sensor} region="US States" {date} {id} {initialState} on:state on:close>
+<WidgetCard {sensor} region="US States" {date} {id} {initialState} on:state on:action>
   <svelte:fragment slot="toolbar">
     <DownloadMenu {fileName} data={tileData} {sensor} prepareRow={(row) => row.dump} />
   </svelte:fragment>

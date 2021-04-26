@@ -51,7 +51,7 @@
   }
 </script>
 
-<WidgetCard {highlighted} {sensor} {date} {region} titleUnit={false} {initialState} on:state on:close {id}>
+<WidgetCard {highlighted} {sensor} {date} {region} titleUnit={false} {initialState} on:state on:action {id}>
   <div class="content">
     <div class="kpi" on:mouseenter={onMouseEnter} on:mouseleave={onMouseLeave}>
       <div>

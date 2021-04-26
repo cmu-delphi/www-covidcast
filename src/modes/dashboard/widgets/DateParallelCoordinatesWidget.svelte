@@ -74,7 +74,7 @@
 
 <AParallelCoordinatesWidget
   {id}
-  on:close
+  on:action
   {initialState}
   on:state
   {region}

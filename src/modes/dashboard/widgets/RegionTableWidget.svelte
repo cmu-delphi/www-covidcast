@@ -90,7 +90,7 @@
 <ATableWidget
   {id}
   on:state
-  on:close
+  on:action
   {initialState}
   {sensor}
   region="US {getLevelInfo(shownLevel).labelPlural}"

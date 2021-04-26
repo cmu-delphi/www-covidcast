@@ -10,7 +10,11 @@ export interface IState {
 const BASE_STATE: IState = {
   order: ['line_1', 'datetable_2', 'datepcp_3'],
   states: {},
-  configs: {},
+  configs: {
+    line_1: {
+      width: 3,
+    },
+  },
 };
 
 export function resolveInitialState(): IState {

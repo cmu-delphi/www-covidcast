@@ -95,7 +95,7 @@
 <AParallelCoordinatesWidget
   {id}
   on:state
-  on:close
+  on:action
   {initialState}
   region="US {getLevelInfo(shownLevel).labelPlural}"
   {date}

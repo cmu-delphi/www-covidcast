@@ -130,7 +130,7 @@
   <div class="uk-card-header widget-title">
     <div class="widget-move-handle">{@html arrowsAltIcon}</div>
     <div class="widget-widget-toolbar">
-      <button type="button" on:click={() => dispatch('action', { type: 'config', id })} title="Remove Widget">
+      <button type="button" on:click={() => dispatch('action', { type: 'config', id })} title="Edit Widget">
         {@html cogIcon}
       </button>
       <button type="button" on:click={shrink} title="Shrink Widget">
