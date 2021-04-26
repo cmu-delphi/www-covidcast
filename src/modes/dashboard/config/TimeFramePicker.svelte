@@ -11,7 +11,8 @@
    */
   export let sensor;
 
-  let useDefault = 'window';
+  export let value = '';
+  let useDefault = value === '' ? 'window' : typeof value === 'string' ? 'sensor' : '';
 </script>
 
 <div>
@@ -55,11 +56,17 @@
       id="widget-adder-t"
       class="uk-input"
       type="date"
-      value={formatDateISO(date.windowTimeFrame.min)}
+      value={value && value.min ? value.min : formatDateISO(date.windowTimeFrame.min)}
       name="timeFrame.min"
       step="1"
     />
-    <input class="uk-input" type="date" value={formatDateISO(date.windowTimeFrame.max)} name="timeFrame.max" step="1" />
+    <input
+      class="uk-input"
+      type="date"
+      value={value && value.max ? value.max : formatDateISO(date.windowTimeFrame.max)}
+      name="timeFrame.max"
+      step="1"
+    />
   {/if}
 </div>
 

@@ -6,12 +6,15 @@
    */
   export let sensor;
 
-  export let multiple = false;
+  /**
+   * @type {""}
+   */
+  export let config = '';
 </script>
 
 <div>
   <label for="widget-adder-s" class="uk-form-label">Indicator</label>
-  <select id="widget-adder-s" class="uk-select" name="sensor{multiple ? 's' : ''}" {multiple}>
+  <select id="widget-adder-s" class="uk-select" name="sensor" value={config}>
     <option value="">Default ({sensor.name}, Cases, Deaths)</option>
     {#each allSensorsGrouped as group}
       <optgroup label={group.label}>

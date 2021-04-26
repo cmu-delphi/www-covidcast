@@ -48,6 +48,7 @@
 <script>
   import arrowsAltIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrows-alt.svg';
   import timesCircleIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/times-circle.svg';
+  import cogIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/cog.svg';
   import expandAltIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/expand-alt.svg';
   import compressAltIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/compress-alt.svg';
   import { formatDateLocal, formatDateYearWeekdayAbbr } from '../../../formats';
@@ -129,13 +130,16 @@
   <div class="uk-card-header widget-title">
     <div class="widget-move-handle">{@html arrowsAltIcon}</div>
     <div class="widget-widget-toolbar">
+      <button type="button" on:click={() => dispatch('action', { type: 'config', id })} title="Remove Widget">
+        {@html cogIcon}
+      </button>
       <button type="button" on:click={shrink} title="Shrink Widget">
         {@html compressAltIcon}
       </button>
       <button type="button" on:click={enlarge} title="Enlarge Widget">
         {@html expandAltIcon}
       </button>
-      <button type="button" on:click={() => dispatch('close', id)} title="Remove Widget">
+      <button type="button" on:click={() => dispatch('action', { type: 'close', id })} title="Remove Widget">
         {@html timesCircleIcon}
       </button>
     </div>

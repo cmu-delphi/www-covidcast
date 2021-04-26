@@ -1,12 +1,13 @@
 <script>
   import Search from '../../../components/Search.svelte';
-  import { nameInfos, nationInfo } from '../../../data/regions';
+  import { getInfoByName, nameInfos, nationInfo } from '../../../data/regions';
 
   /**
    * @type {import("../../../stores/params").RegionParam}
    */
   export let region;
 
+  export let value = '';
   /**
    * @param {import('../stores/params').Region} d
    */
@@ -14,26 +15,26 @@
     return `${d.id} ${d.displayName}`;
   }
 
-  let value = '';
+  let syncedValue = value || '';
 </script>
 
 <div>
   <label for="widget-adder-r" class="uk-form-label">Geographic Region</label>
-  <input type="hidden" {value} name="region" />
+  <input type="hidden" value={syncedValue} name="region" />
   <Search
     placeholder="Select a Region"
     items={nameInfos}
     icon="location"
-    selectedItem={region}
+    selectedItem={value ? getInfoByName(value) : region.value}
     labelFieldName="displayName"
     keywordFunction={combineKeywords}
     maxItemsToShowInList="5"
     on:change={(e) => {
       const id = e.detail.id || nationInfo.id;
       if (id === region.id) {
-        value = '';
+        syncedValue = '';
       } else {
-        value = id;
+        syncedValue = id;
       }
     }}
   />

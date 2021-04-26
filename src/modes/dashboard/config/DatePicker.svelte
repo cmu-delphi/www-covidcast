@@ -6,7 +6,9 @@
    */
   export let date;
 
-  let useDefault = true;
+  export let value = '';
+
+  let useDefault = value === '';
 </script>
 
 <div>
@@ -17,6 +19,13 @@
   {#if useDefault}
     <input id="widget-adder-d" class="uk-input" type="date" value={formatDateISO(date.value)} disabled readonly />
   {:else}
-    <input id="widget-adder-d" class="uk-input" type="date" value={formatDateISO(date.value)} name="date" step="1" />
+    <input
+      id="widget-adder-d"
+      class="uk-input"
+      type="date"
+      value={value || formatDateISO(date.value)}
+      name="date"
+      step="1"
+    />
   {/if}
 </div>

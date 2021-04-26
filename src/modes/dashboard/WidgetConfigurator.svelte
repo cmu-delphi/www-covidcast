@@ -3,6 +3,7 @@
   import LevelPicker from './config/LevelPicker.svelte';
   import RegionPicker from './config/RegionPicker.svelte';
   import SensorPicker from './config/SensorPicker.svelte';
+  import SensorsPicker from './config/SensorsPicker.svelte';
   import TimeFramePicker from './config/TimeFramePicker.svelte';
 
   export let type;
@@ -18,46 +19,48 @@
    * @type {import("../../../stores/params").RegionParam}
    */
   export let region;
+
+  export let config = {};
 </script>
 
 {#if type === 'line'}
-  <SensorPicker {sensor} />
-  <RegionPicker {region} />
-  <TimeFramePicker {sensor} {date} />
+  <SensorPicker {sensor} value={config.sensor || ''} />
+  <RegionPicker {region} value={config.region || ''} />
+  <TimeFramePicker {sensor} {date} value={config.timeFrame} />
 {:else if type === 'map'}
-  <SensorPicker {sensor} />
-  <LevelPicker {region} />
-  <DatePicker {date} />
+  <SensorPicker {sensor} value={config.sensor || ''} />
+  <LevelPicker {region} value={config.level} />
+  <DatePicker {date} value={config.date} />
 {:else if type === 'regiontable'}
-  <SensorPicker {sensor} />
-  <LevelPicker {region} />
-  <DatePicker {date} />
+  <SensorPicker {sensor} value={config.sensor || ''} />
+  <LevelPicker {region} value={config.level} />
+  <DatePicker {date} value={config.date} />
 {:else if type === 'datetable'}
-  <SensorPicker {sensor} />
-  <RegionPicker {region} />
-  <TimeFramePicker {sensor} {date} />
+  <SensorPicker {sensor} value={config.sensor || ''} />
+  <RegionPicker {region} value={config.region || ''} />
+  <TimeFramePicker {sensor} {date} value={config.timeFrame} />
 {:else if type === 'sensortable'}
-  <RegionPicker {region} />
-  <DatePicker {date} />
+  <RegionPicker {region} value={config.region || ''} />
+  <DatePicker {date} value={config.date} />
 {:else if type === 'kpi'}
-  <SensorPicker {sensor} />
-  <RegionPicker {region} />
-  <DatePicker {date} />
+  <SensorPicker {sensor} value={config.sensor || ''} />
+  <RegionPicker {region} value={config.region || ''} />
+  <DatePicker {date} value={config.date} />
 {:else if type === 'trend'}
-  <SensorPicker {sensor} />
-  <RegionPicker {region} />
-  <TimeFramePicker {sensor} {date} />
+  <SensorPicker {sensor} value={config.sensor || ''} />
+  <RegionPicker {region} value={config.region || ''} />
+  <TimeFramePicker {sensor} {date} value={config.timeFrame} />
 {:else if type === 'hex'}
-  <SensorPicker {sensor} />
+  <SensorPicker {sensor} value={config.sensor || ''} />
   <DatePicker {date} />
 {:else if type === 'regionpcp'}
-  <SensorPicker {sensor} multiple />
-  <LevelPicker {region} />
-  <DatePicker {date} />
+  <SensorsPicker {sensor} value={config.sensors || []} />
+  <LevelPicker {region} value={config.level} />
+  <DatePicker {date} value={config.date} />
 {:else if type === 'datepcp'}
-  <SensorPicker {sensor} multiple />
-  <RegionPicker {region} />
-  <TimeFramePicker {sensor} {date} />
+  <SensorsPicker {sensor} value={config.sensors || []} />
+  <RegionPicker {region} value={config.region || ''} />
+  <TimeFramePicker {sensor} {date} value={config.timeFrame} />
 {:else}
   Please select a widget first
 {/if}
