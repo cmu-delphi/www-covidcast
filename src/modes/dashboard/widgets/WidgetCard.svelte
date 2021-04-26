@@ -79,11 +79,17 @@
    * @type {'both' | 'x' | 'y'}
    */
   export let resizeMode = 'both';
-  export let initialState = DEFAULT_WIDGET_STATE;
+  export let initialState = {};
+  export let defaultState = DEFAULT_WIDGET_STATE;
+
+  let fullState = {
+    ...defaultState,
+    ...initialState,
+  };
 
   let widgetSize = {
-    width: (initialState || {}).width || 1,
-    height: (initialState || {}).height || 1,
+    width: fullState.width,
+    height: fullState.height,
   };
 
   function shrink() {

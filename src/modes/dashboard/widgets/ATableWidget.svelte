@@ -129,6 +129,7 @@
 
 <WidgetCard
   {initialState}
+  defaultState={DEFAULT_STATE}
   {sensor}
   {region}
   {date}

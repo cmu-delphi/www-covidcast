@@ -1,3 +1,13 @@
+<script context="module">
+  const DEFAULT_STATE = {
+    ...DEFAULT_WIDGET_STATE,
+    width: 3,
+    height: 2,
+    zero: true,
+    raw: false,
+  };
+</script>
+
 <script>
   import Vega from '../../../components/vega/Vega.svelte';
   import WidgetCard, { DEFAULT_WIDGET_STATE } from './WidgetCard.svelte';
@@ -40,13 +50,7 @@
    */
   export let highlight = null;
 
-  export let initialState = {
-    ...DEFAULT_WIDGET_STATE,
-    width: 3,
-    height: 2,
-    zero: true,
-    raw: false,
-  };
+  export let initialState = DEFAULT_STATE;
 
   let zoom = !initialState.zero;
   let singleRaw = initialState.raw;
@@ -208,6 +212,7 @@
 
 <WidgetCard
   {initialState}
+  defaultState={DEFAULT_STATE}
   {highlighted}
   {sensor}
   {region}

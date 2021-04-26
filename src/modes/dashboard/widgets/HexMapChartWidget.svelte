@@ -1,3 +1,11 @@
+<script context="module">
+  const DEFAULT_STATE = {
+    ...DEFAULT_WIDGET_STATE,
+    width: 2,
+    height: 2,
+  };
+</script>
+
 <script>
   import WidgetCard, { DEFAULT_WIDGET_STATE } from './WidgetCard.svelte';
   import { getContext } from 'svelte';
@@ -30,11 +38,7 @@
    */
   export let highlight = null;
 
-  export let initialState = {
-    ...DEFAULT_WIDGET_STATE,
-    width: 2,
-    height: 2,
-  };
+  export let initialState = DEFAULT_STATE;
 
   /**
    * @type {import("../../../stores/params").DataFetcher}
@@ -110,7 +114,7 @@
   }
 </script>
 
-<WidgetCard {sensor} region="US States" {date} {id} {initialState} on:state on:action>
+<WidgetCard {sensor} region="US States" {date} {id} {initialState} defaultState={DEFAULT_STATE} on:state on:action>
   <svelte:fragment slot="toolbar">
     <DownloadMenu {fileName} data={tileData} {sensor} prepareRow={(row) => row.dump} />
   </svelte:fragment>

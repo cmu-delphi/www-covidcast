@@ -1,3 +1,11 @@
+<script context="module">
+  const DEFAULT_STATE = {
+    ...DEFAULT_WIDGET_STATE,
+    width: 2,
+    height: 2,
+  };
+</script>
+
 <script>
   import { getContext } from 'svelte';
   import TrendIndicator from '../../../components/TrendIndicator.svelte';
@@ -25,11 +33,7 @@
    */
   export let highlight = null;
 
-  export let initialState = {
-    ...DEFAULT_WIDGET_STATE,
-    width: 2,
-    height: 2,
-  };
+  export let initialState = DEFAULT_STATE;
 
   /**
    * @type {import("../../../stores/params").DataFetcher}
@@ -51,7 +55,18 @@
   }
 </script>
 
-<WidgetCard {highlighted} {sensor} {date} {region} titleUnit={false} {initialState} on:state on:action {id}>
+<WidgetCard
+  {highlighted}
+  {sensor}
+  {date}
+  {region}
+  titleUnit={false}
+  {initialState}
+  defaultState={DEFAULT_STATE}
+  on:state
+  on:action
+  {id}
+>
   <div class="content">
     <div class="kpi" on:mouseenter={onMouseEnter} on:mouseleave={onMouseLeave}>
       <div>
