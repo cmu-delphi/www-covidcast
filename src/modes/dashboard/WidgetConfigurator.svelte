@@ -54,11 +54,11 @@
   <SensorPicker {sensor} value={config.sensor || ''} />
   <DatePicker {date} />
 {:else if type === 'regionpcp'}
-  <SensorsPicker {sensor} value={config.sensors || []} />
+  <SensorsPicker {sensor} value={config.sensors || ''} />
   <LevelPicker {region} value={config.level} />
   <DatePicker {date} value={config.date} />
 {:else if type === 'datepcp'}
-  <SensorsPicker {sensor} value={config.sensors || []} />
+  <SensorsPicker {sensor} value={config.sensors || ''} />
   <RegionPicker {region} value={config.region || ''} />
   <TimeFramePicker {sensor} {date} value={config.timeFrame} />
 {:else}

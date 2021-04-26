@@ -19,29 +19,27 @@
    */
   export let region;
 
-  export let nextId = 0;
+  export let id;
+  export let config = {};
 
-  let value = 'line';
+  $: type = id.split('_')[0];
 
-  function triggerAdd(event) {
+  function triggerEdit(event) {
     const formData = new FormData(event.currentTarget);
     const config = formToConfig(formData);
-    const type = formData.get('type');
-    dispatch('add', {
-      id: `${type}_${nextId}`,
-      type,
+    dispatch('edit', {
+      id,
       config,
     });
-    value = 'line';
   }
 </script>
 
-<form class="widget-adder uk-form-stacked" on:submit|preventDefault={triggerAdd}>
-  <WidgetPicker bind:value />
+<form class="widget-adder uk-form-stacked" on:submit|preventDefault={triggerEdit}>
+  <WidgetPicker value={type} readonly />
   <hr />
-  <WidgetConfigurator {sensor} {region} {date} type={value} />
+  <WidgetConfigurator {sensor} {region} {date} {type} {config} />
   <hr />
-  <button type="submit" class="uk-button uk-button-primary"> Add Widget </button>
+  <button type="submit" class="uk-button uk-button-primary"> Update Widget </button>
 </form>
 
 <style>

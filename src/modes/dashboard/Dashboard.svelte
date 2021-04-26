@@ -7,6 +7,7 @@
   import { resolveInitialState, updateState } from './state';
   import isEqual from 'lodash-es/isEqual';
   import WidgetAdder from './WidgetAdder.svelte';
+  import WidgetEditor from './WidgetEditor.svelte';
   import WidgetFactory from './WidgetFactory.svelte';
 
   $: sensor = new SensorParam($currentSensorEntry, currentSensor, $times);
@@ -85,9 +86,43 @@
     components = deriveComponents(state);
   }
 
+  /**
+   * @type {{id: string, config: Record<string, unknown>}}
+   */
+  let edit = null;
+  let refOpenAdder = null;
+  let refCloseAdder = null;
+
+  function closeSideBar() {
+    edit = null;
+  }
+
   function editWidget(id) {
-    // TODO
-    console.log(id);
+    edit = {
+      id,
+      config: state.configs[id] || {},
+    };
+    if (refOpenAdder) {
+      refOpenAdder.click();
+    }
+  }
+
+  function editedWidget(event) {
+    if (refCloseAdder) {
+      refCloseAdder.click();
+    }
+    const id = event.detail.id;
+    const config = event.detail.config;
+
+    edit = null;
+    state = {
+      ...state,
+      configs: {
+        ...state.configs,
+        [id]: config,
+      },
+    };
+    components = deriveComponents(state);
   }
 
   function trackAction(event) {
@@ -99,8 +134,6 @@
       editWidget(id);
     }
   }
-
-  let refCloseAdder = null;
 
   function addWidget(event) {
     if (refCloseAdder) {
@@ -142,8 +175,11 @@
 <div class="root">
   <div class="mobile-header-line-bg">
     <div class="mobile-header-line">
-      <button class="widget-add-button uk-button uk-button-primary" type="button" uk-toggle="target: #offcanvas-overlay"
-        >Add Widget</button
+      <button
+        bind:this={refOpenAdder}
+        class="widget-add-button uk-button uk-button-primary"
+        type="button"
+        uk-toggle="target: #offcanvas-overlay">Add Widget</button
       >
       <h2>COVIDcast <span>Dashboard</span></h2>
     </div>
@@ -152,9 +188,13 @@
     <div class="uk-alert uk-alert-warning">This view is optimized for larger screens only</div>
   {/if}
   <div id="offcanvas-overlay" uk-offcanvas="overlay: true">
-    <div class="uk-light uk-offcanvas-bar">
-      <button bind:this={refCloseAdder} class="uk-offcanvas-close" type="button" uk-close />
-      <WidgetAdder on:add={addWidget} {sensor} {region} {date} {nextId} />
+    <div class="uk-offcanvas-bar">
+      <button bind:this={refCloseAdder} on:click={closeSideBar} class="uk-offcanvas-close" type="button" uk-close />
+      {#if edit}
+        <WidgetEditor on:edit={editedWidget} {sensor} {region} {date} id={edit.id} config={edit.config} />
+      {:else}
+        <WidgetAdder on:add={addWidget} {sensor} {region} {date} {nextId} />
+      {/if}
     </div>
   </div>
   <div class="panel-wrapper">

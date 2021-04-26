@@ -9,12 +9,12 @@
   /**
    * @type {""}
    */
-  export let config = '';
+  export let value = '';
 </script>
 
 <div>
   <label for="widget-adder-s" class="uk-form-label">Indicator</label>
-  <select id="widget-adder-s" class="uk-select" name="sensor" value={config}>
+  <select id="widget-adder-s" class="uk-select" name="sensor" {value}>
     <option value="">Default ({sensor.name}, Cases, Deaths)</option>
     {#each allSensorsGrouped as group}
       <optgroup label={group.label}>
@@ -25,3 +25,9 @@
     {/each}
   </select>
 </div>
+
+<style>
+  .uk-select optgroup {
+    color: #444;
+  }
+</style>
