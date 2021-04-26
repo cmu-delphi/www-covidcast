@@ -1,5 +1,5 @@
 <script>
-  import { groupedSensorList } from '../../../stores';
+  import { allSensorsGrouped } from '../../../stores/allSensors';
 
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -11,9 +11,9 @@
 
 <div>
   <label for="widget-adder-s" class="uk-form-label">Indicator</label>
-  <select id="widget-adder-s" class="uk-select" name="sensor" {multiple}>
-    <option value="">Default ({sensor.name})</option>
-    {#each groupedSensorList as group}
+  <select id="widget-adder-s" class="uk-select" name="sensor{multiple ? 's' : ''}" {multiple}>
+    <option value="">Default ({sensor.name}, Cases, Deaths)</option>
+    {#each allSensorsGrouped as group}
       <optgroup label={group.label}>
         {#each group.sensors as sensor}
           <option value={sensor.key}>{sensor.name}</option>

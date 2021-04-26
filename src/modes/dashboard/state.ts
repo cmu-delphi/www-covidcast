@@ -8,7 +8,7 @@ export interface IState {
 }
 
 const BASE_STATE: IState = {
-  order: ['line-1', 'datetable-2', 'datepcp-3'],
+  order: ['line_1', 'datetable_2', 'datepcp_3'],
   states: {},
   configs: {},
 };

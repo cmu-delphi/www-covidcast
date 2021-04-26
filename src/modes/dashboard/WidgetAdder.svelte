@@ -23,7 +23,7 @@
 
   function triggerAdd(event) {
     const formData = new FormData(event.currentTarget);
-    const config = {};
+    const config = Object.create(null);
     formData.forEach((value, key) => {
       if (key.startsWith('_') || value === '' || key === 'type') {
         return;
@@ -40,13 +40,21 @@
           }
         }
         level[parts[parts.length - 1]] = value;
+      } else if (key in config) {
+        const v = config[key];
+        if (Array.isArray(v)) {
+          v.push(value);
+        } else {
+          config[key] = [v, value];
+        }
       } else {
         config[key] = value;
       }
     });
+    console.log(config);
     const type = formData.get('type');
     dispatch('add', {
-      id: `${type}-${nextId}`,
+      id: `${type}_${nextId}`,
       type,
       config,
     });

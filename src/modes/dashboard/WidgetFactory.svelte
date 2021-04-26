@@ -9,10 +9,11 @@
   import RegionTableWidget from './widgets/RegionTableWidget.svelte';
   import DateTableWidget from './widgets/DateTableWidget.svelte';
   import SensorTableWidget from './widgets/SensorTableWidget.svelte';
-  import { currentSensor, sensorList, sensorMap, times } from '../../stores';
+  import { currentSensor, times } from '../../stores';
   import { getInfoByName } from '../../data/regions';
-  import { DateParam, RegionParam, SensorParam, TimeFrame } from '../../stores/params';
+  import { CASES, DateParam, DEATHS, RegionParam, SensorParam, TimeFrame } from '../../stores/params';
   import { parseAPITime } from '../../data';
+  import { allSensorsMap } from '../../stores/allSensors';
 
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -41,7 +42,7 @@
     if (!key) {
       return sensor;
     }
-    const s = sensorMap.get(key);
+    const s = allSensorsMap.get(key);
     if (!s) {
       return sensor;
     }
@@ -50,9 +51,9 @@
 
   function resolveSensors(keys) {
     if (!keys) {
-      return sensorList.slice().reverse().slice(0, 3);
+      return [sensor.value, CASES.value, DEATHS.value];
     }
-    return keys.map((k) => sensorMap.get(k)).filter(Boolean);
+    return keys.map((k) => allSensorsMap.get(k)).filter(Boolean);
   }
   function resolveRegion(r) {
     if (!r) {
