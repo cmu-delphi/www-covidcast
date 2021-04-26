@@ -50,7 +50,7 @@
     );
   }
 
-  $: entries = sensors.map((sensor) => toEntry(sensor, $stats, region.level));
+  $: entries = sensors.map((sensor, i) => toEntry(sensor, $stats, region.level, i));
   $: data = loadData(entries, region, timeFrame);
   $: fileName = `Indicators_${region.displayName}}_${formatDateISO(timeFrame.min)}_${formatDateISO(timeFrame.max)}`;
 

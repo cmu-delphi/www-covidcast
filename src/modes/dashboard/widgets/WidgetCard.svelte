@@ -80,7 +80,10 @@
   export let resizeMode = 'both';
   export let initialState = DEFAULT_WIDGET_STATE;
 
-  let widgetSize = initialState;
+  let widgetSize = {
+    width: (initialState || {}).width || 1,
+    height: (initialState || {}).height || 1,
+  };
 
   function shrink() {
     let width = widgetSize.width;

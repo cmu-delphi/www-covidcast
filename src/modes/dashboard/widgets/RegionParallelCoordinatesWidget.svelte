@@ -66,7 +66,7 @@
   }
 
   $: shownLevel = level === 'nation' ? 'state' : level;
-  $: entries = sensors.map((sensor) => toEntry(sensor, $stats, shownLevel));
+  $: entries = sensors.map((sensor, i) => toEntry(sensor, $stats, shownLevel, i));
   $: data = loadData(entries, shownLevel, date);
   $: fileName = `Indicators_${getLevelInfo(shownLevel).labelPlural}_${formatDateISO(date.value)}`;
 

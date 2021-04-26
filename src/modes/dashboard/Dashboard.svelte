@@ -39,13 +39,14 @@
 
   $: {
     updateState(state);
+    console.log(state);
   }
 
   function deriveComponents(state) {
     return state.order.map((id) => {
       return {
         id,
-        type: id.split('-')[0],
+        type: id.split('_')[0],
         config: state.configs[id] || {},
         state: state.states[id],
       };
@@ -56,7 +57,7 @@
 
   $: nextId =
     components.reduce((acc, v) => {
-      const index = Number.parseInt(v.id.split('-')[1], 10);
+      const index = Number.parseInt(v.id.split('_')[1], 10);
       return Math.max(acc, index);
     }, 0) + 1;
 

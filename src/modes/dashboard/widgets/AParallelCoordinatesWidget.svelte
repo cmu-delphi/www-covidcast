@@ -24,11 +24,12 @@
     return {};
   }
 
-  export function toEntry(sensor, statsLookup, level) {
+  export function toEntry(sensor, statsLookup, level, index) {
     const param = new SensorParam(sensor);
     const stats = param.stats(statsLookup, level);
     const domain = param.domain(statsLookup, level);
     return {
+      index,
       id: sensor.key.replace(/[\s;:\-_()]+/gm, '_'),
       name: sensor.name,
       sensor,
@@ -91,6 +92,7 @@
   let domain = initialState.domain || 'auto';
   let superState = {};
   $: state = {
+    ...initialState,
     ...superState,
     domain,
     sortedOrder,
@@ -318,8 +320,10 @@
     return spec;
   }
 
-  $: sortedEntries = (initialState || {}).sortedOrder ? initialState.sortedOrder.map((i) => entries[i]) : entries;
-
+  $: initialSortedEntries = (initialState || {}).sortedOrder
+    ? initialState.sortedOrder.map((i) => entries[i])
+    : entries;
+  $: sortedEntries = initialSortedEntries;
   export let options = {};
 
   $: spec = generateSpec(sortedEntries, domain, reversedSet, options);
@@ -387,8 +391,8 @@
 <WidgetCard sensor="Indicators" {region} {date} {id} on:close {initialState} on:state={mergeState}>
   <div class="content">
     <div data-uk-sortable class="c" bind:this={ref}>
-      {#each entries as entry, i}
-        <div class="axis" data-i={i} class:highlight={isSensorHighlighted(entry.sensor, highlight)}>
+      {#each initialSortedEntries as entry}
+        <div class="axis" data-i={entry.index} class:highlight={isSensorHighlighted(entry.sensor, highlight)}>
           <div>{entry.name}</div>
           <div>{entry.param.unitShort}</div>
           <label><input type="checkbox" name="reverse" bind:group={reversedSet} value={entry.id} />Reverse</label>

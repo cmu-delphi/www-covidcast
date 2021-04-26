@@ -53,6 +53,7 @@
 
   let superState = {};
   $: state = {
+    ...initialState,
     ...superState,
     zero: !zoom,
     raw: singleRaw,

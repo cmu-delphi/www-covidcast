@@ -70,6 +70,7 @@
 
   let superState = {};
   $: state = {
+    ...initialState,
     ...superState,
     sortCriteria: $sort.sortCriteria,
     sortCriteriaDesc: $sort.sortDirectionDesc,
