@@ -72,7 +72,7 @@
      */
     const options = {
       domain: sensor.domain($stats, level),
-      scheme: sensor.isInverted ? 'yellowgreenblue' : 'yelloworangered',
+      scheme: sensor.value.vegaColorScale,
       title: [`${sensor.name} in US ${getLevelInfo(level).labelPlural}`, `on ${formatDateYearWeekdayAbbr(date.value)}`],
       subTitle: sensor.unit,
       initialRegion: highlightToRegionsImpl(level, highlight),
