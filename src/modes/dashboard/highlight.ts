@@ -1,5 +1,14 @@
 import { formatDateISO } from '../../formats';
-import { getInfoByName } from '../../data/regions';
+import {
+  CountyInfo,
+  getHHSRegionOfState,
+  getInfoByName,
+  getStateOfCounty,
+  getStatesOfHHS,
+  HHSInfo,
+  nationInfo,
+  StateInfo,
+} from '../../data/regions';
 import { sensorMap } from '../../stores';
 import { DateParam, Region, RegionLevel, RegionParam, Sensor, SensorParam, TimeFrame } from '../../stores/params';
 
@@ -167,7 +176,7 @@ export class WidgetHighlight {
     return this.sensorIds.has(sensor.key);
   }
 
-  matchRegion(region: Region | RegionParam): boolean {
+  private matchRegionImpl(region: Region | RegionParam): boolean {
     if (this.regionIds == null) {
       return true;
     }
@@ -177,6 +186,30 @@ export class WidgetHighlight {
       return this.regionIds === key || this.regionIds === level;
     }
     return this.regionIds.has(key) || this.regionIds.has(level);
+  }
+
+  matchRegion(region: Region | RegionParam): boolean {
+    if (this.matchRegionImpl(region)) {
+      return true;
+    }
+    if (region.level === 'nation' && this.matchLevel('state')) {
+      // highlight down
+      return true;
+    }
+    const regions = this.regions;
+    if (!Array.isArray(regions)) {
+      return false;
+    }
+    if (region.level === 'state') {
+      // is a county of it selected
+      return regions.some((d) => getStateOfCounty(d as CountyInfo) === region);
+    }
+    if (region.level === 'hhs') {
+      // is a state of it selected
+      const states = new Set(getStatesOfHHS(region as HHSInfo));
+      return regions.some((d) => states.has(d as StateInfo));
+    }
+    return false;
   }
 
   matchLevel(level: RegionLevel): boolean {
@@ -231,12 +264,35 @@ export class WidgetHighlight {
 }
 
 export function highlightToRegions(level: RegionLevel, highlight: WidgetHighlight | null): Region[] | undefined {
-  if (!highlight || !highlight.matchLevel(level)) {
+  if (!highlight) {
     return undefined;
   }
   const regions = highlight.regions;
-  if (Array.isArray(regions)) {
-    return regions.filter((d) => d.level === level);
+  if (!Array.isArray(regions)) {
+    return undefined;
+  }
+  const directHit = regions.filter((d) => d.level === level);
+  if (directHit.length > 0) {
+    return directHit;
+  }
+  if (level === 'nation' && highlight.matchLevel('state')) {
+    return [nationInfo];
+  }
+  if (level === 'state') {
+    const states = new Set(regions.map((d) => getStateOfCounty(d as CountyInfo)));
+    states.delete(null);
+    if (states.size > 0) {
+      return [...states] as Region[];
+    }
+    return undefined;
+  }
+  if (level === 'hhs') {
+    const hhs = new Set(regions.map((d) => getHHSRegionOfState(d as StateInfo)));
+    hhs.delete(null);
+    if (hhs.size > 0) {
+      return [...hhs] as Region[];
+    }
+    return undefined;
   }
   return undefined;
 }
