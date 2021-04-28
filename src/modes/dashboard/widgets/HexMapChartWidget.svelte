@@ -104,6 +104,18 @@
     return highlight.matches(sensor.value, tile.region, date.value);
   }
 
+  function resolveHighligtedValue(highlight, tileData, sensor, date) {
+    return tileData.then((tiles) => {
+      if (!highlight || !highlight.matches(sensor.value, 'state', date.value)) {
+        return null;
+      }
+      const highlightedTile = tiles.find((tile) => isSelected(tile, sensor, date, highlight));
+      return highlightedTile != null && highlightedTile.value != null ? highlightedTile.value.value : null;
+    });
+  }
+
+  $: highlightedValue = resolveHighligtedValue(highlight, tileData, sensor, date);
+
   function onMouseEnter(tile) {
     if (!tile.highlight.equals(highlight)) {
       highlight = tile.highlight;
@@ -136,7 +148,7 @@
         {/each}
       {/await}
     </HexGrid>
-    <ColorLegend {sensor} level="state" gradientLength={280} />
+    <ColorLegend {sensor} level="state" gradientLength={280} value={highlightedValue} />
   </div>
 </WidgetCard>
 
