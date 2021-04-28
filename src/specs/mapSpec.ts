@@ -213,11 +213,13 @@ function genLevelLayer({
   scheme = 'yellowgreenblue',
   domain,
   initialRegion,
+  interactiveHighlight = false,
 }: {
   strokeWidth?: number;
   scheme?: string;
   domain?: [number, number];
   initialRegion?: string;
+  interactiveHighlight?: boolean;
 } = {}): NormalizedUnitSpec {
   return {
     mark: {
@@ -243,13 +245,14 @@ function genLevelLayer({
           // domainMax: 149,
           scheme,
           clamp: true,
+          nice: domain == null,
         },
         legend: {
           title: null,
           orient: 'none',
           direction: 'horizontal',
           fillColor: 'white',
-          padding: 5,
+          padding: interactiveHighlight ? 0 : 5,
           legendX: {
             expr: '(width / 2) - 10 - 140',
           },
@@ -307,6 +310,78 @@ function genLevelHoverLayer({ strokeWidth = 3 } = {}): NormalizedUnitSpec | Norm
         value: 0,
       },
     },
+  };
+}
+
+function genLevelLegendLayer({ domain }: { domain?: [number, number] }): NormalizedUnitSpec | NormalizedLayerSpec {
+  return {
+    transform: [
+      {
+        filter: {
+          param: 'hover',
+          empty: false,
+        },
+      },
+    ],
+    encoding: {
+      x: {
+        field: 'value',
+        type: 'quantitative',
+        scale: {
+          domain: [0, 20],
+          clamp: true,
+          nice: domain == null,
+          range: [
+            {
+              expr: 'width / 2 - 140',
+            },
+            {
+              expr: 'width / 2 + 140',
+            },
+          ],
+        },
+        axis: null,
+      },
+      y: {
+        value: {
+          expr: `height + 8`,
+        },
+      },
+    },
+    layer: [
+      {
+        mark: {
+          type: 'point',
+          shape: 'triangle-down',
+          tooltip: false,
+          stroke: null,
+          size: 30,
+          fill: 'black',
+          // xOffset: {
+          //   expr: 'width / 2',
+          // },
+        },
+      },
+      {
+        mark: {
+          type: 'text',
+          tooltip: false,
+          baseline: 'bottom',
+          dy: -2,
+          // dx: {
+          //   expr: 'width / 2',
+          // },
+        },
+        encoding: {
+          text: {
+            field: 'value',
+            type: 'quantitative',
+            format: '.2f',
+            formatType: 'cachedNumber',
+          },
+        },
+      },
+    ],
   };
 }
 
@@ -393,6 +468,14 @@ function msaJSON() {
 
 export type CommonParams = Parameters<typeof genBaseSpec>['2'] & Parameters<typeof genLevelLayer>['0'];
 
+function addCommonLayers(options: CommonParams, spec: TopLevelSpec & LayerSpec<Field>) {
+  spec.layer.push(genLevelHoverLayer());
+  if (options.interactiveHighlight) {
+    spec.layer.push(genLevelLegendLayer(options));
+  }
+  spec.layer.push(genCreditsLayer());
+}
+
 export function generateHRRSpec(options: CommonParams = {}): TopLevelSpec {
   const level = 'hrr';
   const topoJSON = hrrJSON();
@@ -401,7 +484,7 @@ export function generateHRRSpec(options: CommonParams = {}): TopLevelSpec {
   spec.layer.push(genMissingLayer());
 
   spec.layer.push(genLevelLayer(options));
-  spec.layer.push(genLevelHoverLayer());
+  addCommonLayers(options, spec);
   return spec;
 }
 
@@ -413,7 +496,7 @@ export function generateHHSSpec(options: CommonParams = {}): TopLevelSpec {
   spec.layer.push(genMissingLayer());
 
   spec.layer.push(genLevelLayer(options));
-  spec.layer.push(genLevelHoverLayer());
+  addCommonLayers(options, spec);
   return spec;
 }
 
@@ -427,8 +510,7 @@ export function generateStateSpec(options: CommonParams = {}): TopLevelSpec {
 
   // state, msa
   spec.layer.push(genLevelLayer(options));
-  spec.layer.push(genLevelHoverLayer());
-  spec.layer.push(genCreditsLayer());
+  addCommonLayers(options, spec);
   return spec;
 }
 
@@ -442,7 +524,7 @@ export function generateMSASpec(options: CommonParams = {}): TopLevelSpec {
 
   // state, msa
   spec.layer.push(genLevelLayer(options));
-  spec.layer.push(genLevelHoverLayer());
+  addCommonLayers(options, spec);
   return spec;
 }
 
@@ -457,8 +539,7 @@ export function generateNationSpec(options: CommonParams = {}): TopLevelSpec {
   });
 
   spec.layer.push(genLevelLayer(options));
-  spec.layer.push(genLevelHoverLayer());
-  spec.layer.push(genCreditsLayer());
+  addCommonLayers(options, spec);
   return spec;
 }
 
