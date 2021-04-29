@@ -47,7 +47,11 @@
       maxItemsToShowInList="5"
       on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)}
     />
-    <SensorDatePicker2 className="survey-date grid-8-11" bind:value={selectedDate} {sensor} />
+    <SensorDatePicker2 className="survey-date grid-8-11" bind:value={selectedDate} {sensor}>
+      <svelte:fragment slot="picker-addon">
+        <slot name="picker-addon" />
+      </svelte:fragment>
+    </SensorDatePicker2>
   </div>
   <slot />
 </div>

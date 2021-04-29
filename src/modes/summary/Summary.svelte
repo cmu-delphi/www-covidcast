@@ -4,7 +4,7 @@
   import HighlightIndicators from './HighlightIndicators.svelte';
   import AllIndicatorOverview from './AllIndicatorOverview.svelte';
   import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
-  import SurveyParameters from '../../components/RegionDatePicker.svelte';
+  import RegionDatePicker from '../../components/RegionDatePicker.svelte';
   import { currentRegionInfo, currentSensorEntry, currentDateObject, times, getScrollToAnchor } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher, CASES } from '../../stores/params';
   import RegionMapWrapper from '../../blocks/RegionMapWrapper.svelte';
@@ -32,11 +32,11 @@
 </script>
 
 <div class="mobile-root">
-  <SurveyParameters sensor={sensor.value} {items} defaultItem={nationInfo} placeholder="Search by State or County">
+  <RegionDatePicker sensor={sensor.value} {items} defaultItem={nationInfo} placeholder="Search by State or County">
     <div class="grid-3-11 mobile-header-line" slot="title">
       <h2>Explore a <span>Location</span></h2>
     </div>
-  </SurveyParameters>
+  </RegionDatePicker>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
       <FancyHeader invert>{region.displayName}</FancyHeader>

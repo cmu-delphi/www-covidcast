@@ -59,6 +59,9 @@
         </span>
         <span>{formatDateShortWeekdayAbbr(value)}</span>
       </button>
+      <svelte:fragment slot="footer">
+        <slot name="picker-addon" />
+      </svelte:fragment>
     </Datepicker>
   {:else}
     <button aria-label="selected date" class="selected-date picker-button" disabled>

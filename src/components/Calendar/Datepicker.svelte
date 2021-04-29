@@ -284,6 +284,7 @@
         on:dateSelected={(e) => registerSelection(e.detail)}
       />
     </div>
+    <slot name="footer" {selected} />
   </Popover>
 </div>
 

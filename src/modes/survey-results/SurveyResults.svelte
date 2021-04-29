@@ -2,7 +2,7 @@
   import { currentDateObject, currentRegionInfo, times, getScrollToAnchor } from '../../stores';
   import { questionCategories, visibleLevels, refSensor, questions } from '../../stores/questions';
   import SurveyQuestion from './SurveyQuestion.svelte';
-  import SurveyParameters from '../../components/RegionDatePicker.svelte';
+  import RegionDatePicker from '../../components/RegionDatePicker.svelte';
   import Overview from './Overview.svelte';
   import { nationInfo, nameInfos, getStateOfCounty } from '../../data/regions';
   import MobileSurveyToc from './MobileSurveyToc.svelte';
@@ -48,7 +48,7 @@
 </script>
 
 <div class="root">
-  <SurveyParameters sensor={refSensor} items={filteredInfos} defaultItem={nationInfo}>
+  <RegionDatePicker sensor={refSensor} items={filteredInfos} defaultItem={nationInfo}>
     <div class="grid-3-11 mobile-header-line" slot="title">
       <h2>Delphi Survey <span>Results</span></h2>
     </div>
@@ -59,7 +59,7 @@
         </li>
       {/each}
     </MobileSurveyToc>
-  </SurveyParameters>
+  </RegionDatePicker>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
       <Overview />
