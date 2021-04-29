@@ -18,6 +18,6 @@ describe('getLevelInfo', () => {
   });
   test('invalid', () => {
     expect(getLevelInfo('test').id).toBe('test');
-    expect(getLevelInfo('test').label).toBe('TEST');
+    expect(getLevelInfo('test').label).toBe('Test');
   });
 });
