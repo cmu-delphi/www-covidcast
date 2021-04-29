@@ -19,6 +19,7 @@
   import { scrollIntoView } from '../../util';
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
   import IndicatorCorrelation from './IndicatorCorrelation.svelte';
+  import MaxDateHint from '../../blocks/MaxDateHint.svelte';
 
   $: sensor = new SensorParam($currentSensorEntry);
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
@@ -60,7 +61,11 @@
     <div class="grid-3-11">
       <IndicatorAnnotations {date} {region} {sensor} range="sparkLine" />
       <FancyHeader invert sub="Summary">{sensor.name}</FancyHeader>
-      <p>On {formatDateWeekday(date.value)}, the {sensor.valueUnit} was:</p>
+      <p>
+        On {formatDateWeekday(date.value)}
+        <MaxDateHint sensor={sensor.value} level={region.level} suffix="," />
+        the {sensor.valueUnit} was:
+      </p>
       <IndicatorOverview {sensor} {date} {region} {fetcher} />
       <RegionOverview {region} />
       <hr />

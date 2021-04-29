@@ -4,14 +4,17 @@
   import arrowRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-circle-right.svg';
   import calendarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/calendar.svg';
   import { parseAPITime } from '../data';
-  import { times } from '../stores';
-  import { formatDateShortWeekdayAbbr } from '../formats';
+  import { times, stats } from '../stores';
+  import { formatDateShortWeekdayAbbr, formatDateYearWeekdayAbbr } from '../formats';
   import { timeDay } from 'd3-time';
+  import { determineStatsInfo } from '../stores/stats';
 
   /**
    * @type {import('../stores/constants').SensorEntry}
    */
   export let sensor;
+
+  export let level = 'nation';
 
   /**
    * bi-directional binding
@@ -21,14 +24,19 @@
 
   export let className = '';
 
+  function resolveStartEndDate(timesMap, sensor) {
+    if (!timesMap) {
+      return [];
+    }
+    const dates = timesMap.get(sensor.key);
+    return dates ? dates.map(parseAPITime) : [];
+  }
+
   /**
    * @type {[Date, Date]}
    */
-  $: startEndDates = [];
-  $: if ($times !== null) {
-    const dates = $times.get(sensor.key);
-    startEndDates = dates ? dates.map(parseAPITime) : [];
-  }
+  $: startEndDates = resolveStartEndDate($times, sensor);
+  $: info = determineStatsInfo($stats, sensor, level);
 </script>
 
 <div class="date-picker {className}">
@@ -60,7 +68,18 @@
         <span>{formatDateShortWeekdayAbbr(value)}</span>
       </button>
       <svelte:fragment slot="footer">
-        <slot name="picker-addon" />
+        {#if info}
+          <p class="date-info">
+            Most recent available date is <button
+              type="button"
+              on:click={() => (value = startEndDates[1])}
+              class="uk-link-muted"
+            >
+              {formatDateYearWeekdayAbbr(info.maxTime)}
+            </button>
+            updated on <span class="uk-text-nowrap">{formatDateYearWeekdayAbbr(info.maxIssue)}</span>.
+          </p>
+        {/if}
       </svelte:fragment>
     </Datepicker>
   {:else}
@@ -137,6 +156,27 @@
     width: 14px;
     display: inline-block;
     margin-right: 0.5em;
+  }
+
+  .date-info {
+    margin: 0;
+    padding: 0 0.5em 0.5em 0.5em;
+    text-align: left;
+    font-size: 0.875rem;
+  }
+
+  .date-info > button {
+    white-space: nowrap;
+    display: inline-block;
+    padding: 0;
+    cursor: pointer;
+    border: none;
+    background: none;
+    text-align: left;
+    font: inherit;
+    font-size: inherit;
+    color: inherit;
+    text-decoration: underline;
   }
 
   @media only screen and (max-width: 715px) {

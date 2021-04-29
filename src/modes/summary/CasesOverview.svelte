@@ -5,6 +5,7 @@
   import { formatDateWeekday } from '../../formats';
   import SensorUnit from '../../components/SensorUnit.svelte';
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
+  import MaxDateHint from '../../blocks/MaxDateHint.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -25,7 +26,11 @@
 
 <IndicatorAnnotations {date} {region} sensor={CASES} range="sparkLine" />
 
-<p>On {formatDateWeekday(date.value)}, the {CASES.valueUnit}s were:</p>
+<p>
+  On {formatDateWeekday(date.value)}
+  <MaxDateHint sensor={CASES.value} level={region.level} suffix="," />
+  the {CASES.valueUnit}s were:
+</p>
 
 <div class="mobile-two-col">
   <div class="mobile-kpi">
