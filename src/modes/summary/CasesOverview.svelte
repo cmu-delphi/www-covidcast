@@ -5,6 +5,7 @@
   import { formatDateWeekday } from '../../formats';
   import SensorUnit from '../../components/SensorUnit.svelte';
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
+  import IndicatorWarning from '../../blocks/IndicatorWarning.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -23,6 +24,7 @@
   $: deathTrend = fetcher.fetchWindowTrend(DEATHS, region, date);
 </script>
 
+<IndicatorWarning sensor={CASES} {date} {region} />
 <IndicatorAnnotations {date} {region} sensor={CASES} range="sparkLine" />
 
 <p>On {formatDateWeekday(date.value)}, the {CASES.valueUnit}s were:</p>
