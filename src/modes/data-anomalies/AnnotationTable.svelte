@@ -142,7 +142,7 @@
         <td>{region(r.annotation.regions)}</td>
         <td>
           {#if r.reference}
-            <a href={r.refernce} class="uk-link-text details-link">
+            <a href={r.reference} class="uk-link-text details-link">
               {@html ExternalLinkIcon}
             </a>
           {/if}
