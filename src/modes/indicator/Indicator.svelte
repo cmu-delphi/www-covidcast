@@ -11,7 +11,7 @@
   import IndicatorAbout from './IndicatorAbout.svelte';
   import RegionOverview from './RegionOverview.svelte';
   import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
-  import SurveyParameters from '../../components/RegionDatePicker.svelte';
+  import RegionDatePicker from '../../components/RegionDatePicker.svelte';
   import { currentRegionInfo, currentSensorEntry, currentDateObject, times } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
   import { formatDateWeekday } from '../../formats';
@@ -20,6 +20,7 @@
   import IndicatorWarning from '../../blocks/IndicatorWarning.svelte';
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
   import IndicatorCorrelation from './IndicatorCorrelation.svelte';
+  import MaxDateHint from '../../blocks/MaxDateHint.svelte';
 
   $: sensor = new SensorParam($currentSensorEntry);
   $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
@@ -46,7 +47,7 @@
 </script>
 
 <div class="mobile-root">
-  <SurveyParameters sensor={sensor.value} {items} defaultItem={nationInfo} placeholder="Search by State or County">
+  <RegionDatePicker sensor={sensor.value} {items} defaultItem={nationInfo} placeholder="Search by State or County">
     <div class="grid-3-11 mobile-header-line" slot="title">
       <button class="mobile-back inline-svg-icon" on:click={switchMode}>
         {@html chevronLeftIcon}
@@ -56,15 +57,18 @@
     <div class="uk-container content-grid uk-margin-remove-vertical">
       <IndicatorDropdown {sensor} />
     </div>
-  </SurveyParameters>
+  </RegionDatePicker>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
       <IndicatorAnnotations {date} {region} {sensor} range="sparkLine" />
       <FancyHeader invert sub="Summary">{sensor.name}</FancyHeader>
-
       <IndicatorWarning {sensor} {date} {region} />
 
-      <p>On {formatDateWeekday(date.value)}, the {sensor.valueUnit} was:</p>
+      <p>
+        On {formatDateWeekday(date.value)}
+        <MaxDateHint sensor={sensor.value} level={region.level} suffix="," />
+        the {sensor.valueUnit} was:
+      </p>
       <IndicatorOverview {sensor} {date} {region} {fetcher} />
       <RegionOverview {region} />
       <hr />

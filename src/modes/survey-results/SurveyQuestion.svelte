@@ -8,6 +8,8 @@
   import IndicatorStatsLine from '../../blocks/IndicatorStatsLine.svelte';
   import IndicatorRevisions from './IndicatorRevisions.svelte';
   import WarningBanner from '../../components/WarningBanner.svelte';
+  import MaxDateHint from '../../blocks/MaxDateHint.svelte';
+  import { refSensor } from '../../stores/questions';
 
   /**
    * question object
@@ -91,6 +93,7 @@
     <p>
       On
       {formatDateYearWeekdayAbbr(date.value, true)}
+      <MaxDateHint sensor={refSensor} level={region.level} />
       the 7 day average of
       <strong>{sensor.name}</strong>
       <UIKitHint title={sensor.signalTooltip} inline />
