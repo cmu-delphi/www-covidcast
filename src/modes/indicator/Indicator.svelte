@@ -17,6 +17,7 @@
   import { formatDateWeekday } from '../../formats';
   import { afterUpdate } from 'svelte';
   import { scrollIntoView } from '../../util';
+  import IndicatorWarning from '../../blocks/IndicatorWarning.svelte';
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
   import IndicatorCorrelation from './IndicatorCorrelation.svelte';
   import MaxDateHint from '../../blocks/MaxDateHint.svelte';
@@ -61,6 +62,8 @@
     <div class="grid-3-11">
       <IndicatorAnnotations {date} {region} {sensor} range="sparkLine" />
       <FancyHeader invert sub="Summary">{sensor.name}</FancyHeader>
+      <IndicatorWarning {sensor} {date} {region} />
+
       <p>
         On {formatDateWeekday(date.value)}
         <MaxDateHint sensor={sensor.value} level={region.level} suffix="," />
