@@ -1,7 +1,7 @@
 <script>
   import { onMount, setContext } from 'svelte';
   import { currentSensor, isMobileDevice } from '../../stores';
-  import { currentRegionInfo, currentSensorEntry, currentDateObject, times } from '../../stores';
+  import { currentRegionInfo, currentDateObject, times } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
   import { WidgetHighlight } from './highlight';
   import { resolveInitialState, updateState } from './state';
@@ -9,10 +9,14 @@
   import WidgetAdder from './WidgetAdder.svelte';
   import WidgetEditor from './WidgetEditor.svelte';
   import WidgetFactory from './WidgetFactory.svelte';
+  import DashboardParameters from './DashboardParameters.svelte';
+  import { allSensorsMap } from '../../stores/allSensors';
+  import { DEFAULT_SENSOR } from '../../stores/constants';
 
-  $: sensor = new SensorParam($currentSensorEntry, currentSensor, $times);
+  $: allSensor = allSensorsMap.get($currentSensor) || allSensorsMap.get(DEFAULT_SENSOR);
+  $: sensor = new SensorParam(allSensor, currentSensor, $times);
   $: region = new RegionParam($currentRegionInfo);
-  $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
+  $: date = new DateParam($currentDateObject, allSensor, $times);
 
   const fetcher = new DataFetcher();
   $: {
@@ -170,6 +174,8 @@
       }
     });
   });
+
+  let configureParams = false;
 </script>
 
 <div class="root">
@@ -182,7 +188,16 @@
         uk-toggle="target: #offcanvas-overlay">Add Widget</button
       >
       <h2>COVIDcast <span>Dashboard</span></h2>
+      <button
+        class="widget-edit-button uk-icon-button"
+        type="button"
+        uk-icon="cog"
+        on:click={() => (configureParams = !configureParams)}
+      />
     </div>
+    {#if configureParams}
+      <DashboardParameters {sensor} {region} {date} />
+    {/if}
   </div>
   {#if $isMobileDevice}
     <div class="uk-alert uk-alert-warning">This view is optimized for larger screens only</div>
@@ -219,6 +234,11 @@
   .widget-add-button {
     position: absolute;
     left: 1em;
+    top: -11px;
+  }
+  .widget-edit-button {
+    position: absolute;
+    right: 1em;
     top: -11px;
   }
 

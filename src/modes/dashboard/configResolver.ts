@@ -27,6 +27,9 @@ export function resolveSensor(defaultSensor: SensorParam, key?: string): SensorP
 
 export function resolveSensors(defaultSensor: SensorParam, keys?: readonly string[]): Sensor[] {
   if (!keys) {
+    if (defaultSensor.key === CASES.key || defaultSensor.key === DEATHS.key) {
+      return [CASES.value, DEATHS.value];
+    }
     return [defaultSensor.value, CASES.value, DEATHS.value];
   }
   if (typeof keys === 'string') {

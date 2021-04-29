@@ -9,6 +9,8 @@
 
   export let className = 'grid-3-11';
 
+  export let allSensors = groupedSensorList;
+
   export let label = 'Indicator';
 
   let open = false;
@@ -35,7 +37,7 @@
     <div class="dropdown-label">{label}</div>
   </button>
   <ul class="content">
-    {#each groupedSensorList as group}
+    {#each allSensors as group}
       <li>
         <div class="mobile-h3">{group.label}</div>
         <ul>
@@ -62,7 +64,6 @@
 
 <style>
   .dropdown-container {
-    margin-top: 6px;
     margin-bottom: 6px;
     margin-top: 0.5rem;
     display: flex;
@@ -115,7 +116,7 @@
     margin: 1px 0 0 0;
     /* padding: 6px 0 0.5em; */
     padding: 0.5em 1em 0.5em 1em;
-    z-index: 1;
+    z-index: 1000;
   }
 
   .down-icon {

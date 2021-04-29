@@ -9,7 +9,7 @@ import { scaleSequential } from 'd3-scale';
 import { scrollToTop } from '../util';
 import type { RegionInfo, RegionInfo as Region, RegionLevel, RegionArea, CountyInfo } from '../data/regions';
 import type { Sensor, SensorEntry } from './constants';
-import type { Writable } from 'svelte/store';
+import { get, Writable } from 'svelte/store';
 
 export type { Sensor } from './constants';
 export type { RegionInfo as Region, RegionLevel } from '../data/regions';
@@ -624,7 +624,10 @@ export class DateParam {
   }
 
   set(date: Date): void {
-    currentDate.set(formatAPITime(date));
+    const d = formatAPITime(date);
+    if (get(currentDate) !== d) {
+      currentDate.set(d);
+    }
   }
 
   static box(date: Date | DateParam): DateParam {
