@@ -19,7 +19,7 @@ XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: false
+HighValuesAre: bad # options: good, bad, neutral
 Is7DayAverage: true
 HasStdErr: true
 
@@ -62,7 +62,7 @@ Question: |
   In the past 7 days, did you wear a mask **most or all of the time** in public?
 Signal: smoothed_wearing_mask_7d
 SignalTooltip: Estimated proportion of people who wore a mask for most or all of the time while in public in the past 7 days; those not in public in the past 7 days are not counted.
-IsInverted: true
+HighValuesAre: good
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#behavior-indicators
 AddedInWave: 8
 OldRevisions:
@@ -77,7 +77,7 @@ Question: |
   In the past 7 days, when you were in public places where social distancing is not possible, did **most or all other people** wear masks?
 Signal: smoothed_others_masked
 SignalTooltip: Estimated proportion of respondents who say that most or all other people wear masks when they are in public and social distancing is not possible.
-IsInverted: true
+HighValuesAre: good
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#behavior-indicators
 AddedInWave: 5
 ---
@@ -89,11 +89,22 @@ Question: |
   Have you already received a COVID vaccine, or if a vaccine were offered to you today, would you **definitely** or **probably** choose to get vaccinated?
 Signal: smoothed_covid_vaccinated_or_accept
 SignalTooltip: Estimated proportion of respondents who say that they either have already been vaccinated, or definitely or probably would get vaccinated if a COVID vaccine were offered to them today.
-IsInverted: true
+HighValuesAre: good
 LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#vaccination-indicators
 AddedInWave: 6
 
 
+---
+Name: In-Person Schooling
+Category: Social Distancing
+Question: |
+  Do any children in your household (pre-K–grade 12) go to in-person classes full-time?
+Signal: smoothed_winperson_school_fulltime
+SignalTooltip: Estimated proportion of respondents whose children go to in-person classes full-time, among respondents with children in school
+HighValuesAre: neutral
+LearnMoreLink: https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#schooling-indicators
+AddedInWave: 5
+Unit: per 100 people with school-age children
 ---
 Name: Went to Essential Store
 Category: Social Distancing
