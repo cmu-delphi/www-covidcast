@@ -48,7 +48,15 @@ mapshaper -simplify percentage=10% target=hrr
 
 ## create a nation shape
 ```sh
-mapshaper -dissolve2 name=nation target=state
+mapshaper -dissolve2 name=nation target=state no-replace
+```
+
+## create a hhs shape
+```sh
+mapshaper -each 'hhs_region={"10":"3","11":"3","12":"4","13":"4","15":"9","16":"10","17":"5","18":"5","19":"7","20":"7","21":"4","22":"6","23":"1","24":"3","25":"1","26":"5","27":"5","28":"4","29":"7","30":"8","31":"7","32":"9","33":"1","34":"2","35":"6","36":"2","37":"4","38":"8","39":"5","40":"6","41":"10","42":"3","44":"1","45":"4","46":"8","47":"4","48":"6","49":"8","50":"1","51":"3","53":"10","54":"3","55":"5","56":"8","66":"9","69":"9","72":"2","78":"2","09":"1","01":"4","05":"6","08":"8","04":"9","06":"9","03":"9","02":"10"}[id]'
+mapshaper -dissolve2 fields=hhs_region name=hhs target=state no-replace
+mapshaper -filter-fields fields=id target=state
+mapshaper -rename-fields fields=id=hhs_region target=hhs
 ```
 
 ## export
@@ -58,3 +66,4 @@ mapshaper -o format=topojson id-field=id target=state state.json
 mapshaper -o format=topojson id-field=id target=county county.json
 mapshaper -o format=topojson id-field=id target=msa msa.json
 mapshaper -o format=topojson id-field=id target=hrr hrr.json
+mapshaper -o format=topojson id-field=id target=hhs hhs.json

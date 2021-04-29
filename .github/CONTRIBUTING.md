@@ -25,36 +25,6 @@ The discussion / comments within an issue should restrict to the topic of the is
 
 Issues are assigned to a single user which is responsible for the implementation of the issue eventually leading to a pull request.
 
-## Project Board
-
-The main project board is located at https://github.com/cmu-delphi/www-covidcast/projects/2.
-
-The columns have the following meaning:
-
-- `To Do`
-
-  contains newly created issues that needs still to be evaluated and discussed and not yet ready to be implemented
-
-- `Up Next`
-
-  contains assigned issues that should be implemented next. The top most issue has the highest priority
-
-- `In Progress`
-
-  once a developer starts working on an issue he/she should move the issue from the `Up Next` to the `In Progress` column indicating that it is currently implemented
-
-- `In Review`
-
-  after creating the pull request for an issue the pull request card as well as the corresponding issue card are moved to the `In Review` column indicating that they can be reviewed and tested.
-
-- `Done`
-
-  after merging the pull request, the pull request and issue cards can be moved to the `Done` column
-
-- `Icebox`
-
-  the `Icebox` column contains issues that open for discussion, have no specific plan, or longer future ideas
-
 ## Pull Requests
 
 The purpose of a pull request is to merge the solution to an existing issue into the current `dev` branch.

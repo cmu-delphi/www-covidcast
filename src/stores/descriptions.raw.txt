@@ -31,7 +31,7 @@ Id: safegraph
 Signal: part_time_work_prop_7dav
 RawSignal: part_time_work_prop
 Type: public
-Levels: [county, state, nation]
+Levels: [county, state, hhs, nation]
 XAxis: Date
 YAxis: Fraction of population
 Format: fraction
@@ -58,7 +58,7 @@ Name: Bar Visits
 Id: safegraph
 Signal: bars_visit_prop
 Type: public
-Levels: [county, msa, state, hrr, nation]
+Levels: [county, msa, state, hhs, hrr, nation]
 XAxis: Date
 YAxis: Visits per 100,000 people
 Format: per100k
@@ -81,7 +81,7 @@ Name: Restaurant Visits
 Id: safegraph
 Signal: restaurants_visit_prop
 Type: public
-Levels: [county, msa, state, hrr, nation]
+Levels: [county, msa, state, hhs, hrr, nation]
 XAxis: Date
 YAxis: Visits per 100,000 people
 Format: per100k
@@ -161,15 +161,15 @@ Links:
  - "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#vaccination-indicators)"
 ---
 Name: COVID Symptom Searches on Google 
-Id: google_symptoms
+Id: google-symptoms
 Signal: sum_anosmia_ageusia_smoothed_search
 RawSignal: sum_anosmia_ageusia_raw_search
 Type: public
-Levels: [state, msa, hrr, county]
+Levels: [state, msa, hrr, county, hhs, nation]
 XAxis: Date
 YAxis: Scaled search volume (arbitrary scale)
 Format: raw
-Unit: Scaled search volume
+Unit: scaled search volume
 IsInverted: false
 Is7DayAverage: true
 HasStdErr: false
@@ -189,7 +189,7 @@ Id: doctor-visits
 Signal: smoothed_adj_cli
 RawSignal: null
 Type: early
-Levels: [county, msa, state, hrr]
+Levels: [county, msa, state, hrr, hhs, nation]
 XAxis: Date
 YAxis: Percentage
 Format: percent
@@ -298,12 +298,12 @@ Credits: We are happy for you to use this data in products and publications unde
 Links:
  - "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/quidel.html#covid-19-tests)"
 ---
-Name: COVID Hospital Admissions
+Name: Claims-Based COVID Hospital Admissions
 Id: hospital-admissions
 Signal: smoothed_adj_covid19_from_claims
 RawSignal: null
 Type: late
-Levels: [county, msa, state, hrr, nation]
+Levels: [county, msa, state, hrr, hhs, nation]
 XAxis: Date
 YAxis: Percentage
 Format: percent
@@ -317,7 +317,7 @@ Highlight: [landing]
 MapTitleText: Percentage of daily hospital admissions with COVID-19 associated diagnoses
 
 
-Description: Delphi receives from our health system partners aggregated statistics on COVID-related hospital admissions, derived from ICD codes found in insurance claims.  Using this data, we estimate the percentage of new hospital admissions each day that are related to COVID-19. Note that these estimates are based only on admissions by patients whose data is accessible to our partners,  and address new hospital admissions each day, not all currently hospitalized patients who have COVID-related diagnoses.
+Description: Delphi receives from our health system partners aggregated statistics on COVID-related hospital admissions, derived from ICD codes found in insurance claims.  Using this data, we estimate the percentage of new hospital admissions each day that are related to COVID-19. Note that these estimates are based only on admissions by patients whose data is accessible to our partners, and address new hospital admissions each day, not all currently hospitalized patients who have COVID-related diagnoses.
 
 
 Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
@@ -340,7 +340,7 @@ CasesOrDeathSignals:
 
 
 Type: late
-Levels: [msa, county, state, hrr, nation]
+Levels: [msa, county, state, hrr, hhs, nation]
 XAxis: Reported Date
 YAxis: Cases
 Format: per100k
@@ -383,7 +383,7 @@ CasesOrDeathSignals:
 
 
 Type: late
-Levels: [msa, county, state, hrr, nation]
+Levels: [msa, county, state, hrr, hhs, nation]
 XAxis: Reported Date
 YAxis: Deaths
 Format: per100k

@@ -13,10 +13,10 @@ const isLocalOnlyMode = process.argv.includes('--localOnly');
 
 // has to be publicly viewable
 const DOC_URL =
-  process.env.COVIDCAST_SIGNAL_DOC || 'https://docs.google.com/document/d/1RLy4O-gtACVjLEVD_vxyPqvp9nWVhqEjoWAKi68RKpg';
+  process.env.COVIDCAST_SIGNAL_DOC || 'https://docs.google.com/document/d/1llv6xh8jMlmVv7WpyDSv4VgUpFAZQ6QjFUeRxxOinmk';
 
 const SURVEY_DOC_URL =
-  process.env.COVIDCAST_SURVEY_DOC || 'https://docs.google.com/document/d/148mmPJ6wFYdINA5EGW4Q4Tt7zZKR0qPQKMDdalJ7vlA';
+  process.env.COVIDCAST_SURVEY_DOC || 'https://docs.google.com/document/d/1J36nedP6eufeRE3TbyT_BK-ofE5d18kLif2UmORkYDU';
 
 async function loadDoc(url) {
   /**

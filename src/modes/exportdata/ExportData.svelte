@@ -3,17 +3,17 @@
   import Datepicker from '../../components/Calendar/Datepicker.svelte';
   import { getLevelInfo, sensorList } from '../../stores/constants';
   import { parseAPITime } from '../../data';
-  import { currentDateObject, currentSensorEntry } from '../../stores';
+  import { annotationManager, currentDateObject, currentSensorEntry } from '../../stores';
   import { timeMonth } from 'd3-time';
   import { onMount } from 'svelte';
   import { trackEvent } from '../../stores/ga';
   import Search from '../../components/Search.svelte';
-  import { getCountiesOfState, infosByLevel } from '../../maps';
+  import { getCountiesOfState, getInfoByName, infosByLevel } from '../../data/regions';
   import { formatDateISO } from '../../formats';
   import { questions } from '../../stores/questions';
   import { DateParam } from '../../stores/params';
-  import FancyHeader from '../mobile/FancyHeader.svelte';
-  import '../mobile/common.css';
+  import FancyHeader from '../../components/FancyHeader.svelte';
+  import IndicatorAnnotation from '../../components/IndicatorAnnotation.svelte';
 
   const CSV_SERVER = 'https://delphi.cmu.edu/csv';
 
@@ -204,6 +204,16 @@
   }
 
   $: dateRange = sensorGroup || { minTime: timeMonth(new Date(), -1), maxTime: timeMonth(new Date(), 1) };
+
+  // resolve known annotation for the selected combination
+  $: annotations = isAllRegions
+    ? $annotationManager.getWindowLevelAnnotations(sensor, geoType, startDate, endDate)
+    : $annotationManager.getWindowAnnotations(
+        sensor,
+        geoIDs.map((d) => getInfoByName(d, geoType)),
+        startDate,
+        endDate,
+      );
 </script>
 
 <div class="mobile-root">
@@ -333,6 +343,7 @@
                 className="search-container"
                 placeholder={'Search for a region...'}
                 items={geoItems}
+                title="Region"
                 selectedItems={geoValues}
                 labelFieldName="displayName"
                 maxItemsToShowInList="5"
@@ -372,6 +383,10 @@
             </p>
           </div>
         </div>
+
+        {#each annotations as annotation}
+          <IndicatorAnnotation {annotation} />
+        {/each}
       </section>
 
       <section class="uk-margin-large-top">
@@ -398,10 +413,12 @@
             {#if usesAsOf}<input type="hidden" name="as_of" value={formatDateISO(asOfDate)} />{/if}
           </form>
           <p>Manually fetch data:</p>
-          <pre
-            class="code-block"><code>
-        {`wget --content-disposition "${CSV_SERVER}?signal=${sensor ? `${sensor.id}:${sensor.signal}` : ''}&start_day=${formatDateISO(startDate)}&end_day=${formatDateISO(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${formatDateISO(asOfDate)}` : ''}"`}
-      </code></pre>
+          <div class="code-block-wrapper">
+            <pre
+              class="code-block"><code>
+            {`wget --content-disposition "${CSV_SERVER}?signal=${sensor ? `${sensor.id}:${sensor.signal}` : ''}&start_day=${formatDateISO(startDate)}&end_day=${formatDateISO(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${formatDateISO(asOfDate)}` : ''}"`}
+            </code></pre>
+          </div>
           <p class="description">
             For more details about the API, see the
             <a href="https://cmu-delphi.github.io/delphi-epidata/">API documentation</a>. A description of the returned
@@ -436,7 +453,10 @@ data = covidcast.signal("${sensor ? sensor.id : ''}", "${sensor ? sensor.signal 
           <h3 class="mobile-h3 uk-margin-top">R Package</h3>
           <p>Install <code>covidcast</code> using <a href="https://devtools.r-lib.org/">devtools</a> :</p>
           <pre
-            class="code-block"><code>devtools::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/covidcast")</code></pre>
+            class="code-block"><code>
+              {`devtools::install_github("cmu-delphi/covidcast", ref = "main",
+                         subdir = "R-packages/covidcast")`}
+          </code></pre>
           <p>Fetch data:</p>
           <pre
             class="code-block"><code>
@@ -474,5 +494,17 @@ covidcast_signal(data_source = "${sensor ? sensor.id : ''}", signal = "${sensor 
 
   .code-block {
     max-width: calc(100vw - 80px);
+  }
+  .code-block-wrapper {
+    position: relative;
+    height: 4em;
+  }
+  .code-block-wrapper > .code-block {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
   }
 </style>

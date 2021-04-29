@@ -1,0 +1,22 @@
+{
+  "extends": "@tsconfig/svelte/tsconfig.json",
+  "compilerOptions": {
+    "module": "ES2020",
+    "lib": ["ES2019", "DOM"],
+    "importsNotUsedAsValues": "error",
+    "strict": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*", "types.d.ts"],
+  "exclude": ["node_modules/*", "__sapper__/*", "public/*"]
+}

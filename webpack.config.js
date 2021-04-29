@@ -5,12 +5,30 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { EnvironmentPlugin, DefinePlugin } = require('webpack');
-const TerserPlugin = require('terser-webpack-plugin');
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const pkg = require('./package.json');
+const { preprocess } = require('./svelte.config');
 
 const devMode = process.env.NODE_ENV !== 'production';
-const hmr = devMode;
+
+// see https://webpack.js.org/plugins/mini-css-extract-plugin/#extracting-all-css-in-a-single-file
+function recursiveIssuer(m, c) {
+  const issuer = c.moduleGraph.getIssuer(m);
+  // For webpack@4 issuer = m.issuer
+
+  if (issuer) {
+    return recursiveIssuer(issuer, c);
+  }
+
+  const chunks = c.chunkGraph.getModuleChunks(m);
+  // For webpack@4 chunks = m._chunks
+
+  for (const chunk of chunks) {
+    return chunk.name;
+  }
+
+  return false;
+}
 
 module.exports = () => {
   return {
@@ -20,32 +38,39 @@ module.exports = () => {
       bundle: './src/index.js',
     },
 
-    output: {
-      path: path.resolve(__dirname, 'public'),
-      filename: devMode ? '[name].js' : '[name].[contenthash].js',
-      chunkFilename: devMode ? '[name].js' : '[name].[contenthash].js',
-      publicPath: hmr ? '/' : undefined,
-    },
-
+    output: devMode
+      ? {
+          path: path.resolve(__dirname, 'public'),
+          publicPath: '/',
+        }
+      : {
+          path: path.resolve(__dirname, 'public'),
+          filename: '[name].[contenthash].js',
+          chunkFilename: '[name].[contenthash].js',
+        },
     resolve: {
       alias: {
         svelte: path.resolve('node_modules', 'svelte'),
       },
-      extensions: ['.mjs', '.js', '.svelte'],
+      extensions: ['.ts', '.mjs', '.js', '.svelte'],
       mainFields: ['svelte', 'module', 'browser', 'main'],
     },
 
     optimization: {
-      minimizer: [new OptimizeCSSAssetsPlugin(), new TerserPlugin()],
+      minimizer: [
+        // For webpack@5 you can use the `...` syntax to extend existing minimizers (i.e. `terser-webpack-plugin`), uncomment the next line
+        `...`,
+        new CssMinimizerPlugin(),
+      ],
       splitChunks: {
-        minChunks: 2,
-        maxInitialRequests: 4,
-        maxAsyncRequests: 6,
         cacheGroups: {
-          // no splitting of css files
           styles: {
             name: 'styles',
-            test: /\.css$/,
+            type: 'css/mini-extract',
+            test: (m, c, entry = 'bundle') => m.constructor.name === 'CssModule' && recursiveIssuer(m, c) === entry,
+
+            // For webpack@4
+            // test: /\.css$/,
             chunks: 'all',
             enforce: true,
           },
@@ -81,14 +106,30 @@ module.exports = () => {
             {
               loader: 'svelte-loader',
               options: {
+                preprocess,
                 compilerOptions: {
                   dev: devMode,
                 },
-                hotReload: hmr,
-                emitCss: !devMode,
+                hotReload: devMode,
+                emitCss: true, // !devMode,
               },
             },
-          ].slice(hmr ? 1 : 0),
+          ].slice(devMode ? 1 : 0),
+        },
+        {
+          test: /\.tsx?$/,
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                cacheDirectory: true,
+                cacheCompression: false,
+              },
+            },
+            {
+              loader: 'ts-loader',
+            },
+          ].slice(devMode ? 1 : 0),
         },
         {
           // required to prevent errors from Svelte on Webpack 5+, omit on Webpack 4
@@ -105,7 +146,7 @@ module.exports = () => {
               : {
                   loader: MiniCssExtractPlugin.loader,
                   options: {
-                    esModule: false,
+                    // esModule: false,
                   },
                 },
             'css-loader',
@@ -135,7 +176,7 @@ module.exports = () => {
       contentBasePublicPath: ['/', '/assets'],
       watchContentBase: true,
       host: 'localhost',
-      hot: hmr,
+      hot: devMode,
     },
 
     plugins: [
@@ -145,6 +186,9 @@ module.exports = () => {
       }),
       new EnvironmentPlugin({
         COVIDCAST_ENDPOINT_URL: 'https://api.covidcast.cmu.edu/epidata/api.php',
+        COVIDCAST_ANNOTATION_SHEET:
+          'https://docs.google.com/spreadsheets/d/e/2PACX-1vToGcf9x5PNJg-eSrxadoR5b-LM2Cqs9UML97587OGrIX0LiQDcU1HL-L2AA8o5avbU7yod106ih0_n/pub?gid=0&single=true&output=csv',
+        COVIDCAST_ANNOTATION_DRAFTS: 'false',
       }),
       new HtmlWebpackPlugin({
         title: 'COVIDcast',
@@ -164,6 +208,11 @@ module.exports = () => {
         title: 'COVIDcast Indicator Details',
         template: './src/index.html',
         filename: 'indicator/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        title: 'COVIDcast Indicator Correlation',
+        template: './src/index.html',
+        filename: 'correlation/index.html',
       }),
       new HtmlWebpackPlugin({
         title: 'COVIDcast',
@@ -195,6 +244,16 @@ module.exports = () => {
         template: './src/index.html',
         filename: 'survey-results/index.html',
       }),
+      new HtmlWebpackPlugin({
+        title: 'COVIDcast Indicator Status Overview',
+        template: './src/index.html',
+        filename: 'indicator-status/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        title: 'COVIDcast Data Anomalies',
+        template: './src/index.html',
+        filename: 'data-anomalies/index.html',
+      }),
       // new HtmlWebpackPlugin({
       //   title: 'COVIDcast Lab',
       //   template: './src/index.html',
@@ -202,9 +261,9 @@ module.exports = () => {
       // }),
       !devMode &&
         new MiniCssExtractPlugin({
-          filename: devMode ? '[name].css' : '[name].[contenthash].css',
+          filename: '[name].[contenthash].css',
           ignoreOrder: true,
-          chunkFilename: devMode ? '[name].css' : '[name].[contenthash].css',
+          chunkFilename: '[name].[contenthash].css',
         }),
     ].filter(Boolean),
   };

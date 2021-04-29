@@ -30,7 +30,7 @@
   like
   {#each sensors as sensor, i}
     {i === sensors.length - 1 ? ' and' : i > 0 ? ',' : ''}
-    <a href="?mode={modeByID.indicator.id}&sensor={sensor.key}" on:click|preventDefault={() => showDetails(sensor)}
+    <a href="./{modeByID.indicator.id}?sensor={sensor.key}" on:click|preventDefault={() => showDetails(sensor)}
       >{sensor.name}</a
     >
   {/each}
