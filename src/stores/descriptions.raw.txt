@@ -4,11 +4,11 @@ Id: safegraph
 Signal: full_time_work_prop_7dav
 RawSignal: full_time_work_prop
 Type: public
-Levels: [county, state, nation]
+Levels: [county, state, hhs, nation]
 XAxis: Date
 YAxis: Fraction of population
 Format: fraction
-IsInverted: false
+HighValuesAre: bad # options: bad,good,neutral
 Is7DayAverage: true
 HasStdErr: true
 Highlight: [landing]
@@ -35,7 +35,7 @@ Levels: [county, state, hhs, nation]
 XAxis: Date
 YAxis: Fraction of population
 Format: fraction
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: true
 
@@ -63,7 +63,7 @@ XAxis: Date
 YAxis: Visits per 100,000 people
 Format: per100k
 Unit: per 100,000 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: false
 HasStdErr: false
  
@@ -86,7 +86,7 @@ XAxis: Date
 YAxis: Visits per 100,000 people
 Format: per100k
 Unit: per 100,000 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: false
 HasStdErr: false
  
@@ -110,7 +110,7 @@ XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: true
+HighValuesAre: good
 Is7DayAverage: true
 HasStdErr: true
 Highlight: [landing]
@@ -142,7 +142,7 @@ XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: true
+HighValuesAre: good
 Is7DayAverage: true
 HasStdErr: true
 Highlight: [landing, location]
@@ -170,7 +170,7 @@ XAxis: Date
 YAxis: Scaled search volume (arbitrary scale)
 Format: raw
 Unit: scaled search volume
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: false
  
@@ -194,7 +194,7 @@ XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: false
 Highlight: [landing, default]
@@ -222,7 +222,7 @@ XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: true
 
@@ -250,7 +250,7 @@ XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: true
 Highlight: [landing, location]
@@ -279,7 +279,7 @@ XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: true
 Highlight: [landing]
@@ -308,7 +308,7 @@ XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: false
 Highlight: [landing]
@@ -345,7 +345,7 @@ XAxis: Reported Date
 YAxis: Cases
 Format: per100k
 Unit: per 100,000 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: false
 Highlight: [landing]
@@ -388,7 +388,7 @@ XAxis: Reported Date
 YAxis: Deaths
 Format: per100k
 Unit: per 100,000 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: false
 Highlight: [landing]
