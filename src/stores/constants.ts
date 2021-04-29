@@ -129,7 +129,7 @@ const vegaColorScales = {
 };
 
 export function ensureSensorStructure(
-  sensor: Partial<Sensor> & { name: string; id: string; signal: string; tooltipText?: unknown },
+  sensor: Partial<Sensor> & { name: string; id: string; signal: string; tooltipText?: unknown; mapTitleText?: unknown },
 ): Sensor {
   const key = `${sensor.id}-${sensor.signal}`;
 
@@ -156,13 +156,16 @@ export function ensureSensorStructure(
   };
   const rawSignal = sensor.rawSignal === 'null' || sensor.rawSignal === sensor.signal ? null : sensor.rawSignal;
 
+  const guessHelper = sensor.tooltipText || sensor.mapTitleText;
+  const guessedSignalTooltip = typeof guessHelper === 'string' ? guessHelper : 'No description available';
+
   const full = Object.assign(sensor, {
     key,
     type: 'public',
     dataSourceName: getDataSource(sensor),
     levels: ['state'],
     description: sensor.signalTooltip || 'No description available',
-    signalTooltip: typeof sensor.tooltipText === 'string' ? sensor.tooltipText : 'No description available',
+    signalTooltip: guessedSignalTooltip,
     colorScale: colorScales[highValuesAre],
     vegaColorScale: vegaColorScales[highValuesAre],
 
