@@ -1,17 +1,17 @@
 <script>
-  import { formatDateYearWeekdayAbbr } from '../../formats';
-  import { getLevelInfo } from '../../stores';
+  import { formatDateYearWeekdayAbbr } from '../formats';
+  import { getLevelInfo } from '../stores';
 
   /**
-   * @type {import('../../stores/params').SensorParam}
+   * @type {import('../stores/params').SensorParam}
    */
   export let sensor;
   /**
-   * @type {import("../../stores/params").DateParam}
+   * @type {import("../stores/params").DateParam}
    */
   export let date;
   /**
-   * @type {import("../../stores/params").RegionParam}
+   * @type {import("../stores/params").RegionParam}
    */
   export let region;
 </script>
