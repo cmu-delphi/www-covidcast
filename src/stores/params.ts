@@ -1,7 +1,7 @@
 import { timeDay, timeMonth, timeWeek } from 'd3-time';
 import { addNameInfos, fetchData, formatAPITime, addMissing, fitRange, parseAPITime, EpiDataRow } from '../data';
 import { nationInfo } from '../data/regions';
-import { currentDate, yesterdayDate, currentSensor, sensorList, selectByInfo } from '.';
+import { currentDate, yesterdayDate, currentSensor, sensorList, selectByInfo, IStatsInfo } from '.';
 import { determineTrend, Trend } from './trend';
 import { determineMinMax, determineStats } from './stats';
 import { formatValue } from '../formats';
@@ -721,11 +721,7 @@ export class SensorParam {
     }
   }
 
-  /**
-   * @param {Map<string, any>} stats
-   * @param {string} level
-   */
-  domain(stats: Map<string, { mean: number; max: number; std: number }>, level: RegionLevel): [number, number] {
+  domain(stats: Map<string, IStatsInfo>, level: RegionLevel): [number, number] {
     const domain = determineMinMax(stats, this.value, level, {}, false);
     const scaled: [number, number] = [domain[0] * this.factor, domain[1] * this.factor];
     if (this.isPercentage) {
@@ -738,21 +734,11 @@ export class SensorParam {
     return scaled;
   }
 
-  /**
-   * @param {Map<string, any>} stats
-   * @param {string} level
-   */
-  stats(
-    stats: Map<string, { mean: number; max: number; std: number }>,
-    level: RegionLevel,
-  ): { max: number; mean: number; std: number } {
+  stats(stats: Map<string, IStatsInfo>, level: RegionLevel): { max: number; mean: number; std: number } {
     return determineStats(stats, this.value, level, {});
   }
 
-  createColorScale(
-    stats: Map<string, { mean: number; max: number; std: number }>,
-    level: RegionLevel,
-  ): (v: number) => string {
+  createColorScale(stats: Map<string, IStatsInfo>, level: RegionLevel): (v: number) => string {
     const domain = this.domain(stats, level);
     return scaleSequential(this.value.colorScale).domain(domain);
   }

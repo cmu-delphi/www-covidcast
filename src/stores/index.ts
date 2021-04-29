@@ -34,11 +34,19 @@ import { MAP_THEME, selectionColors } from '../theme';
 import { AnnotationManager, fetchAnnotations } from '../data';
 import type { RegionInfo, RegionLevel } from '../data/regions';
 
-/**
- * @typedef {import('../data/fetchData').EpiDataRow} EpiDataRow
- */
-export const times = writable<Map<string, [number, number]> | null>(null);
-export const stats = writable<Map<string, { max: number; mean: number; std: number }> | null>(null);
+export type ITimeInfo = [number, number];
+
+export const times = writable<Map<string, ITimeInfo> | null>(null);
+
+export interface IStatsInfo {
+  max: number;
+  mean: number;
+  std: number;
+  maxIssue: Date;
+  minTime: Date;
+  maxTime: Date;
+}
+export const stats = writable<Map<string, IStatsInfo> | null>(null);
 
 export const appReady = writable(false);
 

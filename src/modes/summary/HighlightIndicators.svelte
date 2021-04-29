@@ -6,6 +6,7 @@
   import { SensorParam } from '../../stores/params';
   import { formatDateWeekday } from '../../formats';
   import SensorUnit from '../../components/SensorUnit.svelte';
+  import MaxDateHint from '../../blocks/MaxDateHint.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -31,9 +32,13 @@
 <FancyHeader sub="Indicators">Key</FancyHeader>
 
 <p>
-  On {formatDateWeekday(date.value)}, the {highlightSensors.length > 0
-    ? highlightSensors[0].sensor.valueUnit
-    : 'value'}s were:
+  On {formatDateWeekday(date.value)}
+  {#if highlightSensors.length > 0}
+    <MaxDateHint sensor={highlightSensors[0].sensor.value} level={region.level} suffix="," />
+  {:else}
+    {`, `}
+  {/if}
+  the {highlightSensors.length > 0 ? highlightSensors[0].sensor.valueUnit : 'value'}s were:
 </p>
 
 <div class="mobile-two-col">
