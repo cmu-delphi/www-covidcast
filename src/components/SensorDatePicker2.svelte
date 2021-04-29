@@ -48,7 +48,12 @@
       end={startEndDates[1]}
       formattedSelected={formatDateShortWeekdayAbbr(value)}
     >
-      <button aria-label="selected date" class="selected-date picker-button" on:>
+      <button
+        aria-label="selected date"
+        class="selected-date picker-button"
+        on:dblclick={() => (value = startEndDates[1])}
+        on:
+      >
         <span class="selected-date-icon">
           {@html calendarIcon}
         </span>
