@@ -56,7 +56,7 @@
   export let loadedRows = Promise.resolve([]);
   export let rowName = 'Row';
 
-  export let top = 10;
+  export let top = 15;
 
   /**
    * two way binding

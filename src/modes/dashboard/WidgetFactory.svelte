@@ -110,7 +110,7 @@
 {:else if c.type === 'trend'}
   <KPITrendWidget
     sensor={resolveSensor(sensor, c.config.sensor)}
-    timeFrame={resolveDate(date, c.config.date)}
+    date={resolveDate(date, c.config.date)}
     region={resolveRegion(region, c.config.region)}
     bind:highlight
     on:action={trackAction}

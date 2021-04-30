@@ -8,6 +8,8 @@
 
 <script>
   import { getContext } from 'svelte';
+  import KPIValue from '../../../components/KPIValue.svelte';
+  import SensorUnit from '../../../components/SensorUnit.svelte';
   import TrendIndicator from '../../../components/TrendIndicator.svelte';
   import TrendTextSummary from '../../../components/TrendTextSummary.svelte';
   import { WidgetHighlight } from '../highlight';
@@ -69,12 +71,26 @@
 >
   <div class="content">
     <div class="kpi" on:mouseenter={onMouseEnter} on:mouseleave={onMouseLeave}>
-      <div>
-        {#await data}
-          <TrendIndicator trend={null} long />
-        {:then d}
-          <TrendIndicator trend={d} long />
-        {/await}
+      <div class="kpi-two-col">
+        <div>
+          <div>
+            {#await data}
+              <KPIValue value={null} />
+            {:then d}
+              <KPIValue value={d && d.current ? d.current.value : null} />
+            {/await}
+          </div>
+          <div>
+            <SensorUnit {sensor} long />
+          </div>
+        </div>
+        <div>
+          {#await data}
+            <TrendIndicator trend={null} long />
+          {:then d}
+            <TrendIndicator trend={d} long />
+          {/await}
+        </div>
       </div>
     </div>
     <TrendTextSummary {sensor} {date} trend={data} />
@@ -90,7 +106,15 @@
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+  }
+  .kpi-two-col {
+    display: flex;
+    flex-grow: 1;
     align-items: center;
-    justify-content: center;
+    justify-content: space-evenly;
+  }
+  .kpi-two-col > div {
+    flex: 1 1 0;
+    text-align: center;
   }
 </style>

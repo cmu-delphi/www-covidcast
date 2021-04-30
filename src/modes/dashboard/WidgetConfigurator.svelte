@@ -49,7 +49,7 @@
 {:else if type === 'trend'}
   <SensorPicker {sensor} value={config.sensor || ''} />
   <RegionPicker {region} value={config.region || ''} />
-  <TimeFramePicker {sensor} {date} value={config.timeFrame} />
+  <DatePicker {date} value={config.date} />
 {:else if type === 'hex'}
   <SensorPicker {sensor} value={config.sensor || ''} />
   <DatePicker {date} />
