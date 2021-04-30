@@ -175,7 +175,6 @@ export function fetchData(
     return Promise.all(
       EPIDATA_CASES_OR_DEATH_VALUES.map((k, i) =>
         callAPIEndPoint<EpiDataRow>(
-          null,
           dataSensor.id,
           dataSensor.casesOrDeathSignals![k]!,
           level,
@@ -197,7 +196,6 @@ export function fetchData(
       return fetchSeparate(defaultSignalIndex);
     }
     return callAPIEndPoint<EpiDataRow>(
-      null,
       dataSensor.id,
       signals.join(','),
       level,
@@ -214,7 +212,6 @@ export function fetchData(
     });
   } else {
     return callAPIEndPoint<EpiDataRow>(
-      null,
       dataSensor.id,
       dataSensor.signal,
       level,
@@ -234,7 +231,6 @@ export interface NationSummarySamples {
 
 export async function fetchSampleSizesNationSummary(dataSensor: DataSensor): Promise<NationSummarySamples> {
   const data = await callAPIEndPoint<EpiDataRow>(
-    null,
     dataSensor.id,
     dataSensor.signal,
     'nation',

@@ -15,7 +15,6 @@ export interface EpiDataResponse<T = Record<string, unknown>> {
 }
 
 export function callAPIEndPoint<T = Record<string, unknown>>(
-  endpoint: string | null,
   id: string,
   signal: string,
   level: string,
@@ -24,26 +23,23 @@ export function callAPIEndPoint<T = Record<string, unknown>>(
   fields?: readonly string[],
   format: string | null = null,
 ): Promise<EpiDataResponse<T>> {
-  const url = new URL(endpoint || ENDPOINT);
-  url.searchParams.set('endpoint', 'covidcast');
-  url.searchParams.set('data_source', id);
-  url.searchParams.set('signal', signal);
+  const url = new URL(ENDPOINT + '/covidcast/');
+  url.searchParams.set('signal', `${id}:${signal}`);
   // mega counties are stored as counties
-  url.searchParams.set('geo_type', level === levelMegaCounty.id ? 'county' : level);
-  url.searchParams.set(
-    'time_values',
+  const timeRange =
     date instanceof Date
       ? formatAPITime(date)
       : Array.isArray(date)
       ? `${formatAPITime(date[0])}-${formatAPITime(date[1])}`
-      : date,
+      : date;
+  url.searchParams.set('time', `day:${timeRange}`);
+  url.searchParams.set(
+    'geo',
+    `${level === levelMegaCounty.id ? 'county' : level}:${
+      Array.isArray(region) ? region.join(',') : (region as string)
+    }`,
   );
-  url.searchParams.set('time_type', 'day');
-  if (Array.isArray(region) || region.includes(',')) {
-    url.searchParams.set('geo_values', Array.isArray(region) ? region.join(',') : (region as string));
-  } else {
-    url.searchParams.set('geo_value', region as string);
-  }
+
   if (fields) {
     url.searchParams.set('fields', fields.join(','));
   }
@@ -68,7 +64,7 @@ export function callAPI<T = Record<string, unknown>>(
   date: Date | [Date, Date] | string,
   region: string | readonly string[],
 ): Promise<EpiDataResponse<T>> {
-  return callAPIEndPoint(ENDPOINT, id, signal, level, date, region);
+  return callAPIEndPoint(id, signal, level, date, region);
 }
 
 /**
@@ -78,12 +74,9 @@ export function callMetaAPI<T = Record<string, unknown>>(
   fields: string[],
   filters: Record<string, string>,
 ): Promise<EpiDataResponse<T>> {
-  const url = new URL(ENDPOINT);
-  const urlGet = new URL(ENDPOINT);
+  const url = new URL(ENDPOINT + '/covidcast_meta/');
+  const urlGet = new URL(ENDPOINT + '/covidcast_meta/');
   const data = new FormData();
-  data.set('endpoint', 'covidcast_meta');
-  urlGet.searchParams.set('endpoint', data.get('endpoint') as string);
-
   if (dataSignals && dataSignals.length > 0) {
     const signals = dataSignals
       .map((d) =>
