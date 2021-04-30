@@ -176,6 +176,17 @@
   });
 
   let configureParams = false;
+
+  function updateTitle(e) {
+    const title = e.currentTarget.value;
+    if (title === state.title || (!state.title && title === 'Dashboard')) {
+      return;
+    }
+    state = {
+      ...state,
+      title,
+    };
+  }
 </script>
 
 <div class="root">
@@ -185,12 +196,23 @@
         bind:this={refOpenAdder}
         class="widget-add-button uk-button uk-button-primary"
         type="button"
+        title="Add New Widget"
         uk-toggle="target: #offcanvas-overlay">Add Widget</button
       >
-      <h2>COVIDcast <span>Dashboard</span></h2>
+      <h2>
+        COVIDcast
+        <span>
+          {#if configureParams}
+            <input class="title-text" type="text" value={state.title || 'Dashboard'} required on:change={updateTitle} />
+          {:else}
+            {state.title || 'Dashboard'}
+          {/if}
+        </span>
+      </h2>
       <button
         class="widget-edit-button uk-icon-button"
         type="button"
+        title="Edit Configuration"
         uk-icon="cog"
         on:click={() => (configureParams = !configureParams)}
       />
@@ -259,6 +281,14 @@
     grid-template-rows: repeat(var(--nrow), 1fr);
     grid-auto-flow: dense;
     gap: 0.5em;
+  }
+
+  .title-text {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 1.25rem;
+    padding: 0;
+    margin: 0;
   }
 
   @media only screen and (min-width: 800px) {

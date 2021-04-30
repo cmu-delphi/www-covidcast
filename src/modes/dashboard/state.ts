@@ -2,6 +2,7 @@ import { updateHash } from '../../stores/urlHandler';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 
 export interface IState {
+  title?: string;
   order: string[];
   states: Record<string, Record<string, unknown>>;
   configs: Record<string, Record<string, unknown>>;
