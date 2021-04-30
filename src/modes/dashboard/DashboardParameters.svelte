@@ -60,4 +60,8 @@
     margin-bottom: 6px;
     margin-top: 0.5rem;
   }
+
+  .content-grid :global(.grid-1-5 .trigger) {
+    font-weight: 400;
+  }
 </style>

@@ -14,7 +14,7 @@
 <div>
   <label for="widget-adder-d" class="uk-form-label">Date</label>
   <label>
-    <input class="uk-checkbox" type="checkbox" bind:checked={useDefault} /> Use Default Date
+    <input class="uk-checkbox" type="checkbox" bind:checked={useDefault} /> Use Configured Date
   </label>
   {#if useDefault}
     <input id="widget-adder-d" class="uk-input" type="date" value={formatDateISO(date.value)} disabled readonly />

@@ -19,11 +19,11 @@
   <label for="widget-adder-t" class="uk-form-label">Time Range</label>
   <div class="flex">
     <label>
-      <input class="uk-radio" type="radio" bind:group={useDefault} name="_timeFrame" value="window" /> Use Default 4-Month
+      <input class="uk-radio" type="radio" bind:group={useDefault} name="_timeFrame" value="window" /> Use Derived 4-Month
       Range
     </label>
     <label>
-      <input class="uk-radio" type="radio" bind:group={useDefault} name="_timeFrame" value="sensor" /> Use Default Sensor
+      <input class="uk-radio" type="radio" bind:group={useDefault} name="_timeFrame" value="sensor" /> Use Configured Sensor
       Data Range
     </label>
     <label>
@@ -41,7 +41,7 @@
     />
     <input class="uk-input" type="date" value={formatDateISO(date.windowTimeFrame.max)} disabled readonly />
   {:else if useDefault === 'sensor'}
-    <input type="hidden" name="timeFrame" value={sensor.key} />
+    <input type="hidden" name="timeFrame" value="sensor" />
     <input
       id="widget-adder-t"
       class="uk-input"

@@ -80,25 +80,3 @@ export function resolveTimeFrame(
     parseAPITime(d.max.toString().replace(/-/gm, '')),
   );
 }
-
-export function createResolver(
-  sensor: SensorParam,
-  region: RegionParam,
-  date: DateParam,
-): {
-  sensor: (key?: string | undefined) => SensorParam;
-  sensors: (keys?: readonly string[] | undefined) => Sensor[];
-  timeFrame: (d?: string | { min: string; max: string } | undefined) => TimeFrame;
-  date: (d?: string | undefined) => DateParam;
-  regionLevel: (level?: RegionLevel | undefined) => RegionLevel;
-  region: (r?: string | undefined) => RegionParam;
-} {
-  return {
-    sensor: resolveSensor.bind(null, sensor),
-    sensors: resolveSensors.bind(null, sensor),
-    timeFrame: resolveTimeFrame.bind(null, sensor, date),
-    date: resolveDate.bind(null, date),
-    regionLevel: resolveRegionLevel.bind(null, region),
-    region: resolveRegion.bind(null, region),
-  };
-}

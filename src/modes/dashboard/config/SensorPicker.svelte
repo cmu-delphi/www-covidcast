@@ -15,7 +15,7 @@
 <div>
   <label for="widget-adder-s" class="uk-form-label">Indicator</label>
   <select id="widget-adder-s" class="uk-select" name="sensor" {value}>
-    <option value="">Default ({sensor.name}, Cases, Deaths)</option>
+    <option value="">Use Configured ({sensor.name})</option>
     {#each allSensorsGrouped as group}
       <optgroup label={group.label}>
         {#each group.sensors as sensor}
