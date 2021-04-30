@@ -6,8 +6,7 @@
   import { generateCorrelationMetrics } from '../../data/correlation';
   import { formatRawValue } from '../../formats';
   import FancyHeader from '../../components/FancyHeader.svelte';
-  import SortColumnIndicator from '../../components/Table/SortColumnIndicator.svelte';
-  import { SortHelper } from '../../components/Table/tableUtils';
+  import SortColumnIndicator, { SortHelper } from '../../components/SortColumnIndicator.svelte';
   import AboutSection from '../../components/AboutSection.svelte';
 
   /**

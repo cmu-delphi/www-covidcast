@@ -3,11 +3,15 @@
   import { observeResize, unobserveResize } from '../../util';
   import { createVegaTooltipAdapter } from './tooltipUtils';
 
+  /**
+   * @type {Promise<any[]>}
+   */
   export let data = Promise.resolve([]);
 
   const dispatch = createEventDispatcher();
 
   export let className = '';
+  export let style = undefined;
 
   /**
    * @type {import('vega-embed').VisualizationSpec | Promise<import('vega-embed').VisualizationSpec>}
@@ -55,6 +59,11 @@
    */
   export let scrollSpy = -1;
 
+  /**
+   * @type {'canvas' | 'svg'}
+   */
+  export let renderer = 'canvas';
+
   let loading = false;
   let noData = false;
   let hasError = false;
@@ -73,6 +82,9 @@
    * // svelte component
    */
   export let tooltip = undefined;
+  /**
+   * @type {Record<string, unknown>}
+   */
   export let tooltipProps = {};
 
   $: tooltipHandler = createVegaTooltipAdapter(tooltip);
@@ -230,6 +242,7 @@
       });
       return m.default(root, spec, {
         tooltip: tooltipHandler,
+        renderer,
         patch,
       });
     });
@@ -242,11 +255,13 @@
       signalListeners.forEach((signal) => {
         r.view.addSignalListener(signal, (name, value) => {
           dispatch('signal', { name, value, view: r.view, spec: r.spec });
+          dispatch(`signal_${name}`, { name, value, view: r.view, spec: r.spec });
         });
       });
       dataListeners.forEach((data) => {
         r.view.addDataListener(data, (name, value) => {
           dispatch('dataListener', { name, value, view: r.view, spec: r.spec });
+          dispatch(`dataListener_${name}`, { name, value, view: r.view, spec: r.spec });
         });
       });
       eventListeners.forEach((type) => {
@@ -328,6 +343,7 @@
 <div
   bind:this={root}
   class="root vega-embed {className}"
+  {style}
   class:loading-bg={!hasError && loading}
   class:message-overlay={hasError || (noData && !loading)}
   data-message={message}

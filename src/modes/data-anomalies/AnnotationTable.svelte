@@ -1,7 +1,6 @@
 <script>
   import { annotationManager, getLevelInfo } from '../../stores';
-  import SortColumnIndicator from '../../components/Table/SortColumnIndicator.svelte';
-  import { SortHelper } from '../../components/Table/tableUtils';
+  import SortColumnIndicator, { SortHelper } from '../../components/SortColumnIndicator.svelte';
   import ExternalLinkIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/external-link-alt.svg';
   import { getDataSource, CASES_SOURCE, DEATH_SOURCE } from '../../stores/dataSourceLookup';
   import { formatDateISO } from '../../formats';

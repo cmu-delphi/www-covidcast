@@ -23,6 +23,8 @@
     class:hexgrid_cell__border={border !== 0}
     style="--border-size: {border}; {style}"
     on:click
+    on:mouseenter
+    on:mouseleave
   >
     <slot />
   </div>

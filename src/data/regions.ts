@@ -35,7 +35,7 @@ export interface HHSInfo extends RegionInfo {
   states: string[];
 }
 
-export const levelMegaCountyId = 'mega-county';
+export const levelMegaCountyId: RegionLevel = 'mega-county';
 
 function parseCSV<T extends RegionInfo>(
   csv: string,
@@ -253,13 +253,26 @@ export function getCountiesOfState(state: RegionInfo): RegionInfo[] {
 /**
  * returns the state of a county
  */
-export function getStateOfCounty(county: CountyInfo): RegionInfo {
+export function getStateOfCounty(county: CountyInfo): RegionInfo | null {
+  if (county.level !== 'county' || county.level !== levelMegaCountyId) {
+    return null;
+  }
   return getInfoByName(county.state, 'state')!;
+}
+
+export function getHHSRegionOfState(state: StateInfo): HHSInfo | null {
+  if (state.level !== 'state') {
+    return null;
+  }
+  return hhsInfo.find((d) => getStatesOfHHS(d).includes(state)) ?? null;
 }
 
 /**
  * returns the state of a county
  */
 export function getStatesOfHHS(hhs: HHSInfo): StateInfo[] {
+  if (hhs.level !== 'hhs') {
+    return [];
+  }
   return (hhs.states ?? []).map((d) => getInfoByName(d, 'state') as StateInfo);
 }

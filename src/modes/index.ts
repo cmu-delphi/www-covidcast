@@ -64,6 +64,12 @@ const modes: Mode[] = [
     component: () =>
       import(/* webpackChunkName: 'm-data-anomalies' */ './data-anomalies/DataAnomalies.svelte').then((r) => r.default),
   },
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    component: () =>
+      import(/* webpackChunkName: 'm-databoard' */ './dashboard/Dashboard.svelte').then((r) => r.default),
+  },
 ];
 
 export default modes;
@@ -78,7 +84,8 @@ export type ModeID =
   | 'landing'
   | 'indicator-status'
   | 'data-anomalies'
-  | 'correlation';
+  | 'correlation'
+  | 'dashboard';
 
 export const modeByID: Record<ModeID, Mode> = (() => {
   const r: Record<string, Mode> = {};
