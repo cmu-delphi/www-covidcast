@@ -280,6 +280,7 @@
     grid-template-columns: repeat(var(--ncol), 1fr);
     grid-template-rows: repeat(var(--nrow), 1fr);
     grid-auto-flow: dense;
+    grid-auto-rows: 1fr;
     gap: 0.5em;
   }
 
