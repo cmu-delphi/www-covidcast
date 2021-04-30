@@ -25,7 +25,14 @@
     return `${d.id} ${d.displayName}`;
   }
 
-  $: selectedDate = date.value;
+  let selectedDate = date.value;
+
+  function updateDate(value) {
+    selectedDate = value;
+  }
+  $: {
+    updateDate(date.value);
+  }
   $: if (selectedDate !== undefined) {
     date.set(selectedDate);
   }
