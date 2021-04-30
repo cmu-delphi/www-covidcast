@@ -95,6 +95,7 @@
     display: inline-flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
   }
 
   .down-icon > :global(svg) {
@@ -109,12 +110,10 @@
     min-width: 100%;
     box-sizing: border-box;
     display: none;
-    border: 1px solid #d3d4d8;
-    border-radius: 3px;
+    box-shadow: 0 5px 12px rgb(0 0 0 / 15%);
     list-style: none;
     background: white;
     margin: 1px 0 0 0;
-    /* padding: 6px 0 0.5em; */
     padding: 0.5em 1em 0.5em 1em;
     z-index: 1000;
   }
