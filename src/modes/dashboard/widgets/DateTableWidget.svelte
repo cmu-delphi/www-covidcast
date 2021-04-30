@@ -63,6 +63,7 @@
   {fileName}
   date={timeFrame}
   {loadedRows}
+  highlightMatch="date"
   rowName="Date"
   bind:highlight
 />

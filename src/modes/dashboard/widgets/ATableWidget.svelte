@@ -64,6 +64,11 @@
    */
   export let highlight = null;
 
+  /**
+   * @type {'full' | 'date' | 'region' | 'sensor'}
+   */
+  export let highlightMatch = 'full';
+
   export let initialState = DEFAULT_STATE;
 
   const sort = new SortHelper(initialState.sortCriteria, initialState.sortCriteriaDesc, 'name', byImportance);
@@ -125,6 +130,22 @@
       refValue: row.trendObj.ref ? row.trendObj.ref.value : '',
     };
   }
+
+  function matchHighlight(rowHighlight, highlight) {
+    if (!highlight) {
+      return false;
+    }
+    switch (highlightMatch) {
+      case 'region':
+        return highlight.matchRegion(rowHighlight.primaryRegion);
+      case 'sensor':
+        return highlight.matchSensor(rowHighlight.primarySensor);
+      case 'date':
+        return highlight.matchDate(rowHighlight.primaryDate);
+      default:
+        return rowHighlight.equals(highlight);
+    }
+  }
 </script>
 
 <WidgetCard
@@ -165,7 +186,7 @@
       {#each sortedRows as r (r.id)}
         <tr
           class:important={r.important}
-          class:highlight={r.highlight.equals(highlight)}
+          class:highlight={matchHighlight(r.highlight, highlight)}
           on:mouseenter={() => onMouseEnter(r)}
           on:mouseleave={onMouseLeave}
         >

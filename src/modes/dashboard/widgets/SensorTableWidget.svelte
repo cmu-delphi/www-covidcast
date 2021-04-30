@@ -63,6 +63,7 @@
   {date}
   {loadedRows}
   rowName="Indicator"
+  highlightMatch="sensor"
   bind:highlight
   top={100}
 />

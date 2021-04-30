@@ -98,5 +98,6 @@
   {date}
   {loadedRows}
   rowName="Region"
+  highlightMatch="region"
   bind:highlight
 />

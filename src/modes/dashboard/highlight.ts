@@ -129,6 +129,14 @@ export class WidgetHighlight {
     return [...this.sensorIds].map((d) => sensorMap.get(d)!);
   }
 
+  get primarySensor(): Sensor | null {
+    const sensors = this.sensors;
+    if (Array.isArray(sensors) && sensors.length > 0) {
+      return sensors[0];
+    }
+    return null;
+  }
+
   get regions(): '*' | RegionLevel | Region[] {
     if (this.regionIds == null) {
       return '*';
@@ -142,6 +150,14 @@ export class WidgetHighlight {
       return levelFromKey(level);
     }
     return ids.map((d) => regionFromKey(d));
+  }
+
+  get primaryRegion(): Region | null {
+    const regions = this.regions;
+    if (Array.isArray(regions) && regions.length > 0) {
+      return regions[0];
+    }
+    return null;
   }
 
   equalDate(date: null | Date | TimeFrame): boolean {
