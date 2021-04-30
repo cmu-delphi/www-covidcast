@@ -9,11 +9,15 @@ export interface IState {
 }
 
 const BASE_STATE: IState = {
-  order: ['line_1', 'datetable_2', 'datepcp_3'],
-  states: {},
+  order: ['trend_1', 'map_2', 'regiontable_3', 'datetable_4', 'line_5'],
+  states: {
+    line_5: { width: 4, height: 2, zero: true, raw: false },
+    datetable_4: { width: 2, height: 4, sortCriteria: 'name', sortCriteriaDesc: true },
+    regiontable_3: { width: 2, height: 4, sortCriteria: 'name', sortCriteriaDesc: true },
+  },
   configs: {
-    line_1: {
-      width: 3,
+    map_2: {
+      level: 'state',
     },
   },
 };
