@@ -1,6 +1,6 @@
 <script>
   import Search from '../../../components/Search.svelte';
-  import { getInfoByName, nameInfos, nationInfo } from '../../../data/regions';
+  import { countyInfo, getInfoByName, hhsInfo, hrrInfo, msaInfo, nationInfo, stateInfo } from '../../../data/regions';
 
   /**
    * @type {import("../../../stores/params").RegionParam}
@@ -16,6 +16,12 @@
   }
 
   let syncedValue = value || '';
+
+  $: defaultRegion = {
+    id: '',
+    displayName: `Use Configured (${region.displayName})`,
+  };
+  $: allItems = [defaultRegion, nationInfo, ...stateInfo, ...msaInfo, ...countyInfo, ...hrrInfo, ...hhsInfo];
 </script>
 
 <div>
@@ -23,15 +29,15 @@
   <input type="hidden" value={syncedValue} name="region" />
   <Search
     placeholder="Select a Region"
-    items={nameInfos}
+    items={allItems}
     icon="location"
-    selectedItem={value ? getInfoByName(value) : region.value}
+    selectedItem={value ? getInfoByName(value) : defaultRegion}
     labelFieldName="displayName"
     keywordFunction={combineKeywords}
     maxItemsToShowInList="5"
     on:change={(e) => {
-      const id = e.detail.id || nationInfo.id;
-      if (id === region.id) {
+      const id = e.detail.id;
+      if (!id || e.detail === defaultRegion) {
         syncedValue = '';
       } else {
         syncedValue = id;
