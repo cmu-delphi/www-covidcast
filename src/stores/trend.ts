@@ -1,8 +1,8 @@
 import { timeDay } from 'd3-time';
 import type { EpiDataRow } from '../data';
+import { toTimeValue } from '../data/fetchTriple';
 import { formatFraction } from '../formats';
 import type { Sensor } from './constants';
-import { toTimeValue } from './params';
 
 const trendThreshold = 0.1;
 
@@ -112,6 +112,66 @@ export interface Trend extends TrendInfo {
   worstTrend: TrendInfo | null;
   bestTrend: TrendInfo | null;
 }
+
+export interface Trend2Info {
+  date: Date;
+  value: number;
+
+  refDate: Date;
+  refValue: number;
+
+  change: number;
+  delta: number;
+
+  isIncreasing: boolean;
+  isDecreasing: boolean;
+  isSteady: boolean;
+  isUnknown: boolean;
+
+  highValuesAre: Sensor['highValuesAre'];
+
+  isNeutral: boolean;
+  /**
+   * increasing or decreasing based on the inverted state
+   */
+  isBetter: boolean;
+  /**
+   * increasing or decreasing based on the inverted state
+   */
+  isWorse: boolean;
+}
+
+export interface Trend2 extends Trend2Info {
+  min?: Trend2Info;
+  max?: Trend2Info;
+  best?: Trend2Info;
+  worst?: Trend2Info;
+}
+
+// function asTrend2Info(refDate);
+
+// export function asTrend(trend: EpiDataTrendRow | undefined, highValuesAre: Sensor['highValuesAre']): Trend {
+//   const t: Trend = { ...UNKNOWN_TREND };
+//   if (!trend) {
+//     return t;
+//   }
+//   if (trend.basis_date != null) {
+//     t.refDate = parseAPITime(trend.basis_date);
+//     t.re;
+//     // t.
+//     t.isIncreasing = trend.basis_trend === 'increasing';
+//     t.isDecreasing = trend.basis_trend === 'decreasing';
+//     t.isBetter = (highValuesAre === 'good' && t.isIncreasing) || (highValuesAre === 'bad' && t.isDecreasing);
+//     t.isWorse = (highValuesAre === 'good' && t.isDecreasing) || (highValuesAre === 'bad' && t.isIncreasing);
+//     t.isUnknown = trend.basis_trend === 'unknown';
+//     t.isSteady = trend.basis_trend === 'steady';
+//     t.isNeutral = t.isIncreasing || t.isDecreasing;
+//   }
+
+//   // TODO
+
+//   return t;
+// }
 
 function computeTrend(
   ref: EpiDataRow,

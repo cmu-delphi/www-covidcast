@@ -1,6 +1,7 @@
-import { formatAPITime } from './utils';
-import { levelMegaCounty } from '../stores/constants';
+import { formatAPITime, parseAPITime } from './utils';
 import type { DataSensor } from './fetchData';
+import { levelMegaCountyId, RegionLevel } from './regions';
+import type { TimeFrame } from './TimeFrame';
 
 declare const process: { env: Record<string, string> };
 
@@ -8,65 +9,268 @@ const ENDPOINT = process.env.COVIDCAST_ENDPOINT_URL;
 
 export const fetchOptions: RequestInit = process.env.NODE_ENV === 'development' ? { cache: 'force-cache' } : {};
 
+export const START_TIME_RANGE = parseAPITime('20100101');
+export const END_TIME_RANGE = parseAPITime('20500101');
+
 export interface EpiDataResponse<T = Record<string, unknown>> {
   result: number;
   message: string;
   epidata: T[];
 }
 
-export function callAPIEndPoint<T = Record<string, unknown>>(
-  id: string,
-  signal: string,
-  level: string,
-  date: Date | [Date, Date] | string,
-  region: string | readonly string[],
-  fields?: readonly string[],
-  format: string | null = null,
-): Promise<EpiDataResponse<T>> {
+export interface EpiDataTreeResponse<T = Record<string, unknown>> {
+  result: number;
+  message: string;
+  epidata: [Record<string, T[]>?];
+}
+
+export function isArray<T>(v: T | readonly T[]): v is readonly T[] {
+  return Array.isArray(v);
+}
+
+export class SourceSignalPair {
+  constructor(public readonly source: string, public readonly signals: '*' | string | readonly string[]) {}
+
+  toString(): string {
+    return `${this.source}:${isArray(this.signals) ? this.signals.join(',') : this.signals}`;
+  }
+}
+
+export class GeoPair {
+  constructor(public readonly level: RegionLevel, public readonly values: '*' | string | readonly string[]) {}
+
+  toString(): string {
+    return `${this.level === levelMegaCountyId ? 'county' : this.level}:${
+      isArray(this.values) ? this.values.join(',') : this.values
+    }`;
+  }
+}
+
+export class TimePair {
+  constructor(
+    public readonly type: 'day' | 'week',
+    public readonly values: '*' | Date | TimeFrame | readonly (Date | TimeFrame)[],
+  ) {}
+
+  toString(): string {
+    const encodeValues = () => {
+      if (this.values === '*') {
+        return '*';
+      }
+      if (this.values instanceof Date) {
+        return formatAPITime(this.values);
+      }
+      if (isArray(this.values)) {
+        return this.values.map((d) => (d instanceof Date ? formatAPITime(d) : d.range)).join(',');
+      }
+      return this.values.range;
+    };
+    return `${this.type}:${encodeValues()}`;
+  }
+}
+
+function addParam<T extends { toString(): string }>(url: URL, key: string, pairs: T | readonly T[]): void {
+  if (isArray(pairs)) {
+    for (const s of pairs) {
+      url.searchParams.append(key, s.toString());
+    }
+  } else {
+    url.searchParams.set(key, pairs.toString());
+  }
+}
+
+export interface EpiDataJSONRow {
+  source: string;
+  signal: string;
+
+  geo_type: RegionLevel;
+  geo_value: string;
+
+  time_type: 'day' | 'week';
+  time_value: number;
+
+  value: number;
+  stderr?: number;
+  sample_size?: number;
+
+  lag: number;
+  issue: number;
+}
+
+function fetchImpl<T>(url: URL): Promise<T> {
+  const urlGetS = url.toString();
+  if (urlGetS.length < 4096) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return fetch(url.toString(), fetchOptions).then((d) => d.json());
+  }
+
+  url.searchParams;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return fetch(url.pathname, {
+    ...fetchOptions,
+    method: 'POST',
+    body: url.searchParams,
+  }).then((d) => d.json());
+}
+
+export function callAPI(
+  signal: SourceSignalPair | readonly SourceSignalPair[],
+  geo: GeoPair | readonly GeoPair[],
+  time: TimePair | readonly TimePair[],
+  fields?: readonly (keyof EpiDataJSONRow)[],
+): Promise<EpiDataResponse<EpiDataJSONRow>> {
   const url = new URL(ENDPOINT + '/covidcast/');
-  url.searchParams.set('signal', `${id}:${signal}`);
-  // mega counties are stored as counties
-  const timeRange =
-    date instanceof Date
-      ? formatAPITime(date)
-      : Array.isArray(date)
-      ? `${formatAPITime(date[0])}-${formatAPITime(date[1])}`
-      : date;
-  url.searchParams.set('time', `day:${timeRange}`);
-  url.searchParams.set(
-    'geo',
-    `${level === levelMegaCounty.id ? 'county' : level}:${
-      Array.isArray(region) ? region.join(',') : (region as string)
-    }`,
-  );
+  addParam(url, 'signal', signal);
+  addParam(url, 'geo', geo);
+  addParam(url, 'time', time);
 
   if (fields) {
     url.searchParams.set('fields', fields.join(','));
   }
-  if (format) {
-    url.searchParams.set('format', format);
+  return fetchImpl(url);
+}
+
+export function callTreeAPI(
+  signal: SourceSignalPair | readonly SourceSignalPair[],
+  geo: GeoPair | readonly GeoPair[],
+  time: TimePair | readonly TimePair[],
+  fields?: readonly (keyof EpiDataJSONRow)[],
+): Promise<EpiDataTreeResponse<EpiDataJSONRow>> {
+  const url = new URL(ENDPOINT + '/covidcast/');
+  addParam(url, 'signal', signal);
+  addParam(url, 'geo', geo);
+  addParam(url, 'time', time);
+
+  if (fields) {
+    url.searchParams.set('fields', fields.join(','));
   }
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return fetch(url.toString(), fetchOptions).then((d) => d.json());
+  url.searchParams.set('format', 'tree');
+  return fetchImpl(url);
 }
 
-/**
- * @param {string} id
- * @param {string} signal
- * @param {string} level
- * @param {Date | string} date
- * @param {string} region
- */
-export function callAPI<T = Record<string, unknown>>(
-  id: string,
-  signal: string,
-  level: string,
-  date: Date | [Date, Date] | string,
-  region: string | readonly string[],
-): Promise<EpiDataResponse<T>> {
-  return callAPIEndPoint(id, signal, level, date, region);
+export interface EpiDataTrendRow {
+  geo_type: RegionLevel;
+  geo_value: string;
+
+  signal_source: string;
+  signal_signal: string;
+
+  value?: number;
+
+  basis_date?: number;
+  basis_value?: number;
+  basis_trend: 'unknown' | 'increasing' | 'decreasing' | 'steady';
+
+  min_date?: number;
+  min_value?: number;
+  min_trend: 'unknown' | 'increasing' | 'decreasing' | 'steady';
+
+  max_date?: number;
+  max_value?: number;
+  max_trend: 'unknown' | 'increasing' | 'decreasing' | 'steady';
 }
 
+export function callTrendAPI(
+  signal: SourceSignalPair | readonly SourceSignalPair[],
+  geo: GeoPair | readonly GeoPair[],
+  date: Date,
+  window: TimeFrame,
+  fields?: readonly (keyof EpiDataTrendRow)[],
+): Promise<EpiDataResponse<EpiDataTrendRow>> {
+  const url = new URL(ENDPOINT + '/covidcast/trend');
+  addParam(url, 'signal', signal);
+  addParam(url, 'geo', geo);
+  url.searchParams.set('date', formatAPITime(date));
+  url.searchParams.set('window', window.range);
+
+  if (fields) {
+    url.searchParams.set('fields', fields.join(','));
+  }
+  return fetchImpl(url);
+}
+
+export interface EpiDataCorrelationRow {
+  geo_type: RegionLevel;
+  geo_value: string;
+
+  signal_source: string;
+  signal_signal: string;
+
+  lag: number;
+  r2: number;
+
+  /**
+   * y = slope * x + intercept
+   */
+  slope: number;
+  /**
+   * y = slope * x + intercept
+   */
+  intercept: number;
+
+  /**
+   * number of dates used for the regression line
+   */
+  samples: number;
+}
+
+export function callCorrelationAPI(
+  reference: SourceSignalPair,
+  others: SourceSignalPair | readonly SourceSignalPair[],
+  geo: GeoPair | readonly GeoPair[],
+  window: TimeFrame,
+  lag?: number,
+  fields?: readonly (keyof EpiDataCorrelationRow)[],
+): Promise<EpiDataResponse<EpiDataCorrelationRow>> {
+  const url = new URL(ENDPOINT + '/covidcast/correlation');
+  url.searchParams.set('reference', reference.toString());
+  addParam(url, 'others', others);
+  addParam(url, 'geo', geo);
+  url.searchParams.set('window', window.range);
+  if (lag != null) {
+    url.searchParams.set('lag', lag.toString());
+  }
+  if (fields) {
+    url.searchParams.set('fields', fields.join(','));
+  }
+  return fetchImpl(url);
+}
+
+export interface EpiDataBackfillRow {
+  time_value: number;
+  issue: number;
+
+  value: number;
+  sample_size?: number;
+
+  value_rel_change?: number;
+  sample_size_rel_change?: number;
+
+  is_anchor?: boolean;
+  value_completeness?: number;
+  sample_size_completeness?: number;
+}
+
+export function callBackfillAPI(
+  signal: SourceSignalPair,
+  time: TimePair,
+  geo: GeoPair,
+  anchorLag?: number,
+  fields?: readonly (keyof EpiDataBackfillRow)[],
+): Promise<EpiDataResponse<EpiDataBackfillRow>> {
+  const url = new URL(ENDPOINT + '/covidcast/backfill');
+  url.searchParams.set('signal', signal.toString());
+  url.searchParams.set('geo', geo.toString());
+  url.searchParams.set('time', time.toString());
+
+  if (anchorLag != null) {
+    url.searchParams.set('anchor_lag', anchorLag.toString());
+  }
+  if (fields) {
+    url.searchParams.set('fields', fields.join(','));
+  }
+  return fetchImpl(url);
+}
 /**
  */
 export function callMetaAPI<T = Record<string, unknown>>(
@@ -75,7 +279,6 @@ export function callMetaAPI<T = Record<string, unknown>>(
   filters: Record<string, string>,
 ): Promise<EpiDataResponse<T>> {
   const url = new URL(ENDPOINT + '/covidcast_meta/');
-  const urlGet = new URL(ENDPOINT + '/covidcast_meta/');
   const data = new FormData();
   if (dataSignals && dataSignals.length > 0) {
     const signals = dataSignals
@@ -87,40 +290,31 @@ export function callMetaAPI<T = Record<string, unknown>>(
           : `${d.id}:${d.signal}`,
       )
       .join(',');
-    data.set('signals', signals);
-    urlGet.searchParams.set('signals', data.get('signals') as string);
+    url.searchParams.set('signals', signals);
   }
   if (fields && fields.length > 0) {
-    data.set('fields', fields.join(','));
-    urlGet.searchParams.set('fields', data.get('fields') as string);
+    url.searchParams.set('fields', fields.join(','));
   }
   Object.entries(filters || {}).forEach((entry) => {
     data.set(entry[0], entry[1]);
-    urlGet.searchParams.set(entry[0], entry[1]);
+    url.searchParams.set(entry[0], entry[1]);
   });
-
-  const urlGetS = urlGet.toString();
-  if (urlGetS.length < 4096) {
-    // use get
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return fetch(urlGetS, fetchOptions).then((d) => d.json());
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return fetch(url.toString(), {
-    ...fetchOptions,
-    method: 'POST',
-    body: data,
-  }).then((d) => d.json());
+  return fetchImpl(url);
 }
 
+export interface EpiDataSignalStatusRow {
+  name: string;
+  source: string;
+  covidcast_signal: string;
+  latest_issue: string; // iso
+  latest_time_value: string; // iso
+  coverage: Record<RegionLevel, { date: string; /* iso */ count: number }[]>;
+}
 /**
  *
  * @returns
  */
-export function callSignalAPI<T = Record<string, unknown>>(): Promise<EpiDataResponse<T>> {
-  const url = new URL(ENDPOINT);
-  url.searchParams.set('source', 'signal_dashboard_status');
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return fetch(url.toString(), fetchOptions).then((d) => d.json());
+export function callSignalDashboardStatusAPI(): Promise<EpiDataResponse<EpiDataSignalStatusRow>> {
+  const url = new URL(ENDPOINT + '/signal_dashboard_status/');
+  return fetchImpl(url);
 }

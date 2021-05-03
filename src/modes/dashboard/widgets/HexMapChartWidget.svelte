@@ -61,7 +61,7 @@
    */
   function loadData(sensor, date) {
     loading = true;
-    return fetcher.fetch1SensorNRegions1Date(sensor, 'state', '*', date).then((rows) => {
+    return fetcher.fetch1SensorNRegions1Date(sensor, 'state', date).then((rows) => {
       loading = false;
       const lookup = groupByRegion(rows);
       return state2TileCell.map((tile) => {

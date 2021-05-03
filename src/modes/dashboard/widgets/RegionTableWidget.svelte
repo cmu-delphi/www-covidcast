@@ -56,9 +56,10 @@
       const trend = determineTrend(date.value, data, sensor.highValuesAre);
       return toRow(region.propertyId, region.displayName, sensor.value, region, date.value, trend, important);
     }
-    function loadImpl(regions, isAll = false) {
-      return fetcher.fetch1SensorNRegionsNDates(sensor, regions, date.windowTimeFrame, isAll).then((data) => {
+    function loadImpl(level) {
+      return fetcher.fetch1SensorNRegionsNDates(sensor, level, date.windowTimeFrame).then((data) => {
         const groups = groupByRegion(data);
+        const regions = infosByLevel[level];
         return regions.map((region) => {
           const data = groups.get(region.propertyId) || [];
           return toGeoTableRow(region, data);
@@ -78,8 +79,8 @@
     //     loadImpl(getRelatedCounties(region.value)),
     //   ]).then((r) => r.flat());
     // }
-    const regions = infosByLevel[level];
-    return Promise.all([loadSingle(nationInfo, true), loadImpl(regions)]).then((r) => r.flat());
+
+    return Promise.all([loadSingle(nationInfo, true), loadImpl(level)]).then((r) => r.flat());
   }
 
   $: shownLevel = level === 'nation' ? 'state' : level;

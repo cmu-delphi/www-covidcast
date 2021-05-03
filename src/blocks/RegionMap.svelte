@@ -1,7 +1,7 @@
 <script>
   import Vega from '../components/vega/Vega.svelte';
   import { formatDateISO } from '../formats';
-  import { getCountiesOfState } from '../data/regions';
+  import { getCountiesOfState, getInfoByName } from '../data/regions';
   import { generateCountiesOfStateSpec, generateRelatedCountySpec, generateStateSpec } from '../specs/mapSpec';
   import { stats, isMobileDevice } from '../stores';
   import DownloadMenu from '../components/DownloadMenu.svelte';
@@ -54,17 +54,16 @@
       const counties = getCountiesOfState(region.value);
       const countyData = fetcher.fetch1SensorNRegions1Date(
         sensor,
-        'county',
-        `${region.id}000,${counties.map((d) => d.id).join(',')}`,
+        [...counties.map((d) => d.id), getInfoByName(`${region.id}000`)],
         date,
       );
-      const stateData = fetcher.fetch1SensorNRegions1Date(sensor, 'state', '*', date);
+      const stateData = fetcher.fetch1SensorNRegions1Date(sensor, 'state', date);
       return Promise.all([countyData, stateData]).then((r) => r.flat());
     }
     if (region.level === 'county') {
-      return fetcher.fetch1SensorNRegions1Date(sensor, 'county', '*', date);
+      return fetcher.fetch1SensorNRegions1Date(sensor, 'county', date);
     }
-    return fetcher.fetch1SensorNRegions1Date(sensor, 'state', '*', date);
+    return fetcher.fetch1SensorNRegions1Date(sensor, 'state', date);
   }
 
   function generateFileName(sensor, date, region) {

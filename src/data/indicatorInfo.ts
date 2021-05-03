@@ -1,7 +1,7 @@
 // Indicator Info: aka The Signal Dashboard API
 
 import { formatAPITime, parseAPITime } from './utils';
-import { callSignalAPI } from './api';
+import { callSignalDashboardStatusAPI } from './api';
 import { EpiDataRow, fetchData } from './fetchData';
 import { addNameInfos } from './fetchData';
 import { countyInfo } from './regions';
@@ -28,7 +28,7 @@ function parseFakeISO(value: number | string | Date): Date {
 }
 
 export function getIndicatorStatuses(): Promise<IndicatorStatus[]> {
-  return callSignalAPI<Record<keyof IndicatorStatus, string>>().then((d) => {
+  return callSignalDashboardStatusAPI().then((d) => {
     if (d.result == null || d.result < 0 || d.message.includes('no results')) {
       return [];
     }

@@ -1,15 +1,20 @@
 import { timeDay, timeMonth, timeWeek } from 'd3-time';
-import { addNameInfos, fetchData, formatAPITime, addMissing, fitRange, parseAPITime, EpiDataRow } from '../data';
+import { addNameInfos, formatAPITime, addMissing, fitRange, parseAPITime, EpiDataRow } from '../data';
 import { nationInfo } from '../data/regions';
-import { currentDate, yesterdayDate, currentSensor, sensorList, selectByInfo, IStatsInfo } from '.';
+import { currentDate, currentSensor, sensorList, selectByInfo, IStatsInfo } from '.';
 import { determineTrend, Trend } from './trend';
 import { determineMinMax, determineStats } from './stats';
 import { formatValue } from '../formats';
 import { scaleSequential } from 'd3-scale';
 import { scrollToTop } from '../util';
 import type { RegionInfo, RegionInfo as Region, RegionLevel, RegionArea, CountyInfo } from '../data/regions';
-import type { Sensor, SensorEntry } from './constants';
+import { Sensor, SensorEntry, yesterdayDate } from './constants';
 import { get, Writable } from 'svelte/store';
+import { TimeFrame } from '../data/TimeFrame';
+// import { callTrendAPI, GeoPair, SourceSignalPair } from '../data/api';
+import fetchTriple, { toTimeValue } from '../data/fetchTriple';
+
+export { TimeFrame } from '../data/TimeFrame';
 
 export type { Sensor } from './constants';
 export type { RegionInfo as Region, RegionLevel } from '../data/regions';
@@ -17,73 +22,9 @@ export type { RegionInfo as Region, RegionLevel } from '../data/regions';
 export const WINDOW_SIZE = 4; // months;
 export const SPARKLINE_SIZE = 4; // weeks;
 
-export function toTimeValue(date: Date): number {
-  return Number.parseInt(formatAPITime(date), 10);
-}
+export const ALL_TIME_FRAME = new TimeFrame(parseAPITime('20200101'), yesterdayDate);
 
 export interface RegionEpiDataRow extends EpiDataRow, Region {}
-
-export class TimeFrame {
-  readonly min: Date;
-  readonly max: Date;
-  readonly difference: number;
-  readonly range: string;
-  readonly domain: [number, number];
-  readonly filter: (row: EpiDataRow) => boolean;
-
-  constructor(min: Date, max: Date) {
-    this.min = min;
-    this.max = max;
-    this.difference = timeDay.count(min, max);
-    this.range = `${formatAPITime(min)}-${formatAPITime(max)}`;
-    this.domain = [min.getTime(), max.getTime()];
-    /**
-     * @param {EpiDataRow} row
-     */
-    this.filter = (row) => {
-      return row.date_value >= this.min && row.date_value <= this.max;
-    };
-  }
-
-  equals(that: TimeFrame): boolean {
-    return this.range === that.range;
-  }
-
-  includes(date: Date): boolean {
-    return date >= this.min && date <= this.max;
-  }
-
-  overlaps(timeFrame: TimeFrame): boolean {
-    // not outside of the range, so at least a partial overlap
-    return !(timeFrame.max < this.min || timeFrame.min > this.max);
-  }
-
-  toString(): string {
-    return this.range;
-  }
-
-  static compute(
-    date: Date,
-    offset: (date: Date, step: number) => Date,
-    offsetFactor: number,
-    maxDate = yesterdayDate,
-  ): TimeFrame {
-    let max = offset(date, offsetFactor / 2);
-    if (max > maxDate) {
-      max = maxDate;
-    }
-    const min = offset(max, -offsetFactor);
-    return new TimeFrame(min, max);
-  }
-
-  shift(minShiftInDays = 0, maxShiftInDays = 0): TimeFrame {
-    return new TimeFrame(timeDay.offset(this.min, minShiftInDays), timeDay.offset(this.max, maxShiftInDays));
-  }
-}
-
-const ALL_TIME_FRAME = new TimeFrame(parseAPITime('20200101'), yesterdayDate);
-
-const MAX_DATA_ROWS = 3650;
 
 export class DataFetcher {
   private readonly cache = new Map<
@@ -146,30 +87,20 @@ export class DataFetcher {
    */
   fetch1SensorNRegions1Date(
     sensor: Sensor | SensorParam,
-    level: RegionLevel,
-    geo: string,
+    regions: RegionLevel | Region[],
     date: Date | DateParam,
   ): Promise<RegionEpiDataRow[]> {
-    sensor = SensorParam.unbox(sensor);
-    date = DateParam.box(date);
-
-    const key = this.toDateKey(sensor, { id: geo, level }, date);
+    const lSensor = SensorParam.unbox(sensor);
+    const lDate = DateParam.box(date);
+    const geoKey = {
+      level: typeof regions === 'string' ? regions : regions[0].level,
+      id: typeof regions == 'string' ? '*' : regions.map((d) => d.propertyId).join(','),
+    };
+    const key = this.toDateKey(lSensor, geoKey, lDate);
     if (this.cache.has(key)) {
       return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
     }
-    const r = fetchData(
-      sensor,
-      level,
-      geo,
-      date.value,
-      {
-        time_value: date.timeValue,
-      },
-      {
-        multiValues: false,
-        factor: sensor.format === 'fraction' ? 100 : 1,
-      },
-    ).then(addNameInfos);
+    const r = fetchTriple(lSensor, regions, lDate.value).then(addNameInfos);
     this.cache.set(key, r);
     return r;
   }
@@ -185,30 +116,8 @@ export class DataFetcher {
     if (this.cache.has(key)) {
       return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
     }
-    // if (
-    //   timeFrame.range !== ALL_TIME_FRAME.range &&
-    //   region.id === this.primaryRegionId &&
-    //   sensor.key === this.primarySensorKey
-    // ) {
-    //   // fetch all history for the primary one
-    //   const rows = this.fetch1Sensor1RegionNDates(sensor, region, ALL_TIME_FRAME);
-    //   const r = rows.then((rows) => rows.filter(timeFrame.filter));
-    //   this.cache.set(key, r);
-    //   return r;
-    // }
-    const r = fetchData(
-      lSensor,
-      lRegion.level,
-      lRegion.propertyId,
-      timeFrame.range,
-      {
-        geo_value: lRegion.propertyId,
-      },
-      {
-        multiValues: false,
-        factor: lSensor.format === 'fraction' ? 100 : 1,
-      },
-    )
+
+    const r = fetchTriple(lSensor, lRegion, timeFrame)
       .then(addNameInfos)
       .then((rows) => addMissing(rows, lSensor));
     this.cache.set(key, r);
@@ -223,42 +132,16 @@ export class DataFetcher {
     const lSensors = sensors.map((sensor) => SensorParam.unbox(sensor));
     const lRegion = RegionParam.unbox(region);
 
-    const missingDataSensors = lSensors.filter(
-      (sensor) => !this.cache.has(this.toWindowKey(sensor, lRegion, timeFrame)),
-    );
-    // we can only fetch the same data source for now
-    const dataSources = new Set(missingDataSensors.map((d) => d.id));
+    const missingSensors = lSensors.filter((d) => !this.cache.has(this.toWindowKey(d, lRegion, timeFrame)));
 
-    if (dataSources.size === 1 && timeFrame.range !== ALL_TIME_FRAME.range) {
-      // fill up the cache
-      const expectedDays = timeFrame.difference;
-      const batchSize = Math.floor(MAX_DATA_ROWS / expectedDays);
-      // console.log(batchSize);
-      for (let i = 0; i < missingDataSensors.length; i += batchSize) {
-        const slice = missingDataSensors.slice(i, Math.min(missingDataSensors.length, i + batchSize));
-        const sliceSensor = {
-          ...missingDataSensors[0],
-          signal: slice.map((d) => d.signal).join(','),
-        };
-        const data = fetchData(
-          sliceSensor,
-          lRegion.level,
-          lRegion.propertyId,
-          timeFrame.range,
-          {},
-          {
-            multiValues: false,
-            transferSignal: true,
-            factor: sliceSensor.format === 'fraction' ? 100 : 1,
-          },
-        ).then(addNameInfos);
-        for (const s of slice) {
-          // compute slice per sensor and fill the cache
-          const sensorData = data
-            .then((rows) => rows.filter((d) => d.signal === s.signal))
-            .then((rows) => addMissing(rows, s));
-          this.cache.set(this.toWindowKey(s, lRegion, timeFrame), sensorData);
-        }
+    if (missingSensors.length > 0) {
+      const data = fetchTriple(missingSensors, lRegion, timeFrame).then(addNameInfos);
+
+      for (const sensor of missingSensors) {
+        const sensorData = data
+          .then((rows) => rows.filter((d) => d.signal === sensor.signal && d.source === sensor.id))
+          .then((rows) => addMissing(rows, sensor));
+        this.cache.set(this.toWindowKey(sensor, lRegion, timeFrame), sensorData);
       }
     }
 
@@ -275,81 +158,19 @@ export class DataFetcher {
       return [];
     }
     const lSensors = sensors.map((sensor) => SensorParam.unbox(sensor));
-    const level = regions[0].level;
-    const geo = regions.map((d) => d.propertyId).join(',');
+    const geoKey = {
+      level: regions[0].level,
+      id: regions.map((d) => d.propertyId).join(','),
+    };
+    const missingSensors = lSensors.filter((sensor) => !this.cache.has(this.toWindowKey(sensor, geoKey, timeFrame)));
+    if (missingSensors.length > 0) {
+      const data = fetchTriple(missingSensors, regions, timeFrame).then(addNameInfos);
 
-    const missingDataSensors = lSensors.filter(
-      (sensor) => !this.cache.has(this.toWindowKey(sensor, { level, id: geo }, timeFrame)),
-    );
-    // we can only fetch the same data source for now
-    const dataSources = new Set(missingDataSensors.map((d) => d.id));
-
-    if (dataSources.size === 1 && timeFrame.range !== ALL_TIME_FRAME.range) {
-      const expectedDays = timeFrame.difference;
-      const batchSize = Math.floor(MAX_DATA_ROWS / expectedDays);
-      const sensorBatchSize = Math.floor(batchSize / regions.length);
-      const regionBatchSize = Math.floor(batchSize / missingDataSensors.length);
-      if (regionBatchSize > sensorBatchSize) {
-        // slice by region and fetch all sensors at once
-        const data: Promise<EpiDataRow[]>[] = [];
-        const sliceSensor = {
-          ...missingDataSensors[0],
-          signal: missingDataSensors.map((d) => d.signal).join(','),
-        };
-        for (let i = 0; i < regions.length; i += regionBatchSize) {
-          const slice = regions.slice(i, Math.min(regions.length, i + regionBatchSize));
-          data.push(
-            fetchData(
-              sliceSensor,
-              level,
-              slice.map((d) => d.propertyId).join(','),
-              timeFrame.range,
-              {},
-              {
-                multiValues: false,
-                factor: sliceSensor.format === 'fraction' ? 100 : 1,
-                transferSignal: true,
-              },
-            ),
-          );
-        }
-        const r = Promise.all(data)
-          .then((rows) => ([] as EpiDataRow[]).concat(...rows))
-          .then(addNameInfos);
-        // fetch all and then split by sensor
-        for (const s of missingDataSensors) {
-          // compute slice per sensor and fill the cache
-          const sensorData = r.then((rows) => rows.filter((d) => d.signal === s.signal));
-          this.cache.set(this.toWindowKey(s, { level, id: geo }, timeFrame), sensorData);
-        }
-      } else {
-        // slice by sensor and fetch all regions at once
-        for (let i = 0; i < missingDataSensors.length; i += sensorBatchSize) {
-          const slice = missingDataSensors.slice(i, Math.min(missingDataSensors.length, i + sensorBatchSize));
-          const sliceSensor = {
-            ...missingDataSensors[0],
-            signal: slice.map((d) => d.signal).join(','),
-          };
-          const data = fetchData(
-            sliceSensor,
-            level,
-            geo,
-            timeFrame.range,
-            {},
-            {
-              multiValues: false,
-              transferSignal: true,
-              factor: sliceSensor.format === 'fraction' ? 100 : 1,
-            },
-          ).then(addNameInfos);
-          for (const s of slice) {
-            // compute slice per sensor and fill the cache
-            const sensorData = data
-              .then((rows) => rows.filter((d) => d.signal === s.signal))
-              .then((rows) => addMissing(rows, s));
-            this.cache.set(this.toWindowKey(s, { level, id: geo }, timeFrame), sensorData);
-          }
-        }
+      for (const sensor of missingSensors) {
+        const sensorData = data.then((rows) =>
+          rows.filter((d) => d.signal === sensor.signal && d.source === sensor.id),
+        );
+        this.cache.set(this.toWindowKey(sensor, geoKey, timeFrame), sensorData);
       }
     }
 
@@ -357,69 +178,23 @@ export class DataFetcher {
     return lSensors.map((sensor) => this.fetch1SensorNRegionsNDates(sensor, regions, timeFrame));
   }
 
-  /**
-   * @param isAll whether it should load all regions (used for performance)
-   */
   fetch1SensorNRegionsNDates(
     sensor: Sensor | SensorParam,
-    regions: readonly Region[],
+    regions: readonly Region[] | RegionLevel,
     timeFrame: TimeFrame,
-    isAll = false,
   ): Promise<RegionEpiDataRow[]> {
     if (regions.length === 0) {
       return Promise.resolve([] as RegionEpiDataRow[]);
     }
     const lSensor = SensorParam.unbox(sensor);
-    const level = regions[0].level;
-    const geo = regions.map((d) => d.propertyId).join(',');
+    const level = typeof regions === 'string' ? regions : regions[0].level;
+    const geo = typeof regions === 'string' ? '*' : regions.map((d) => d.propertyId).join(',');
     const key = this.toWindowKey(lSensor, { level, id: geo }, timeFrame);
     if (this.cache.has(key)) {
       return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
     }
-    const expectedDays = timeFrame.difference;
 
-    const batchSize = Math.floor(MAX_DATA_ROWS / expectedDays);
-
-    if (batchSize >= regions.length) {
-      const r = fetchData(
-        lSensor,
-        level,
-        isAll ? '*' : regions.map((d) => d.propertyId).join(','),
-        timeFrame.range,
-        {},
-        {
-          multiValues: false,
-          factor: lSensor.format === 'fraction' ? 100 : 1,
-        },
-      ).then(addNameInfos);
-      // no missing
-      this.cache.set(key, r);
-      return r;
-    }
-
-    // load in batches
-    // console.log(batchSize);
-    const data = [];
-    for (let i = 0; i < regions.length; i += batchSize) {
-      const slice = regions.slice(i, Math.min(regions.length, i + batchSize));
-      data.push(
-        fetchData(
-          lSensor,
-          level,
-          slice.map((d) => d.propertyId).join(','),
-          timeFrame.range,
-          {},
-          {
-            multiValues: false,
-            factor: lSensor.format === 'fraction' ? 100 : 1,
-          },
-        ),
-      );
-    }
-    const r = Promise.all(data)
-      .then((rows) => ([] as EpiDataRow[]).concat(...rows))
-      .then(addNameInfos);
-
+    const r = fetchTriple(lSensor, regions, timeFrame).then(addNameInfos);
     // no missing
     this.cache.set(key, r);
     return r;
@@ -436,6 +211,7 @@ export class DataFetcher {
     if (this.cache.has(key)) {
       return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
     }
+    // TODO just load sparkline
     const rows = this.fetch1Sensor1RegionNDates(lSensor, lRegion, date.windowTimeFrame).then((rows) =>
       rows.filter(date.sparkLineTimeFrame.filter),
     );
@@ -446,14 +222,20 @@ export class DataFetcher {
   fetchWindowTrend(sensor: Sensor | SensorParam, region: Region | RegionParam, date: DateParam): Promise<Trend> {
     const lSensor = SensorParam.unbox(sensor);
     const lRegion = RegionParam.unbox(region);
-    const lDate = DateParam.box(date);
+    const lDate = date;
     const key = this.toWindowKey(lSensor, lRegion, lDate.windowTimeFrame, `${lDate.timeValue}:trend`);
     if (this.cache.has(key)) {
       return this.cache.get(key) as Promise<Trend>;
     }
-    const trend = this.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame).then((rows) =>
-      determineTrend(date.value, rows, sensor.highValuesAre),
-    );
+    const trend = this.fetch1Sensor1RegionNDates(lSensor, lRegion, date.windowTimeFrame).then((rows) => {
+      return determineTrend(date.value, rows, lSensor.highValuesAre);
+    });
+    // const trend = callTrendAPI(
+    //   new SourceSignalPair(lSensor.id, lSensor.signal),
+    //   new GeoPair(lRegion.level, lRegion.propertyId),
+    //   lDate.value,
+    //   lDate.windowTimeFrame,
+    // ).then((rows) => asTrend(rows.epidata?.[0], sensor.highValuesAre));
     this.cache.set(key, trend);
     return trend;
   }
@@ -471,22 +253,8 @@ export class DataFetcher {
     if (this.cache.has(key)) {
       return this.cache.get(key) as Promise<RegionEpiDataRow>;
     }
-    const r = fetchData(
-      lSensor,
-      lRegion.level,
-      lRegion.propertyId,
-      lDate.value,
-      {
-        time_value: lDate.timeValue,
-      },
-      {
-        multiValues: false,
-        advanced: true,
-        factor: lSensor.format === 'fraction' ? 100 : 1,
-      },
-    )
+    const r = fetchTriple(lSensor, lRegion, lDate.value, { advanced: true })
       .then(addNameInfos)
-
       .then((rows) => rows[0]);
     this.cache.set(key, r);
     return r;
@@ -501,38 +269,18 @@ export class DataFetcher {
     const lRegion = RegionParam.unbox(region);
     const lDate = DateParam.box(date);
 
-    const missingDataSensors = lSensors.filter(
+    const missingSensors = lSensors.filter(
       (sensor) => !this.cache.has(this.toDateKey(sensor, lRegion, lDate, 'details')),
     );
-    // we can only fetch the same data source for now
-    const dataSources = new Set(missingDataSensors.map((d) => d.id));
 
-    if (dataSources.size === 1) {
-      // fill up the cache
-      const sliceSensor = {
-        ...missingDataSensors[0],
-        signal: missingDataSensors.map((d) => d.signal).join(','),
-      };
-      const data = fetchData(
-        sliceSensor,
-        lRegion.level,
-        lRegion.propertyId,
-        lDate.value,
-        {},
-        {
-          multiValues: false,
-          advanced: true,
-          transferSignal: true,
-          factor: sliceSensor.format === 'fraction' ? 100 : 1,
-        },
-      ).then(addNameInfos);
-      for (const s of missingDataSensors) {
-        // compute slice per sensor and fill the cache
-        const sensorData = data.then((rows) => rows.find((d) => d.signal === s.signal)!);
-        this.cache.set(this.toDateKey(s, lRegion, lDate, 'details'), sensorData);
+    if (missingSensors.length > 0) {
+      const data = fetchTriple(missingSensors, lRegion, lDate.value, { advanced: true }).then(addNameInfos);
+      for (const sensor of missingSensors) {
+        const sensorData = data.then((rows) => rows.find((d) => d.signal === sensor.signal && d.source === sensor.id)!);
+
+        this.cache.set(this.toDateKey(sensor, lRegion, lDate, 'details'), sensorData);
       }
     }
-
     // use cached version
     return lSensors.map((sensor) => this.fetch1Sensor1Region1DateDetails(sensor, lRegion, lDate));
   }

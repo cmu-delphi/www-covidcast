@@ -97,7 +97,7 @@
    * @param {import("../../../stores/params").DateParam} date
    */
   function loadData(sensor, level, date) {
-    return fetcher.fetch1SensorNRegions1Date(sensor, level, '*', date.value);
+    return fetcher.fetch1SensorNRegions1Date(sensor, level, date.value);
   }
 
   $: shownLevel = level === 'nation' ? 'state' : level;
