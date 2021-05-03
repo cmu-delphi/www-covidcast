@@ -1,59 +1,4 @@
 ---
-Name: At Away Location 6hr+ 
-Id: safegraph
-Signal: full_time_work_prop_7dav
-RawSignal: full_time_work_prop
-Type: public
-Levels: [county, state, nation]
-XAxis: Date
-YAxis: Fraction of population
-Format: fraction
-IsInverted: false
-Is7DayAverage: true
-HasStdErr: true
-Highlight: [landing]
-
-
-MapTitleText: 7-day trailing average of fraction of people spending 6 hours or more between 8am-6pm, in one location away from their home, based on SafeGraph mobility data
-
-
-Description: Delphi receives data from [SafeGraph](https://docs.safegraph.com/docs/social-distancing-metrics), which collects anonymized location data from mobile phones. Using this data, we calculate the fraction of mobile devices that spent more than 6 hours in one location other than their home during the daytime, and average it over a 7 day trailing window. This indicator measures how mobile people are, and ought to reflect whether people are traveling to work or school outside their homes. See also our "At Away Location 3-6hr" indicator.
-
-
-Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
-
-
-Links:
- - "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/safegraph.html)"
----
-Name: At Away Location 3-6hr
-Id: safegraph
-Signal: part_time_work_prop_7dav
-RawSignal: part_time_work_prop
-Type: public
-Levels: [county, state, hhs, nation]
-XAxis: Date
-YAxis: Fraction of population
-Format: fraction
-IsInverted: false
-Is7DayAverage: true
-HasStdErr: true
-
-
-MapTitleText: 7-day trailing average of fraction of people spending 3-6 hours between 8am-6pm, in one location away from their home, based on SafeGraph mobility data
-
-
-Description: Delphi receives data from [SafeGraph](https://docs.safegraph.com/docs/social-distancing-metrics), which collects anonymized location data from mobile phones. Using this data, we calculate the fraction of mobile devices that spent between 3 and 6 hours in one location other than their home during the daytime, and average it over a 7 day trailing window. This indicator measures how mobile people are. See also our "At Away Location 6hr+" indicator.
-
-
-Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
-
-
-Links:
- - "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/safegraph.html)"
----
-
-
 Name: Bar Visits
 Id: safegraph
 Signal: bars_visit_prop
@@ -63,7 +8,7 @@ XAxis: Date
 YAxis: Visits per 100,000 people
 Format: per100k
 Unit: per 100,000 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: false
 HasStdErr: false
  
@@ -86,7 +31,7 @@ XAxis: Date
 YAxis: Visits per 100,000 people
 Format: per100k
 Unit: per 100,000 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: false
 HasStdErr: false
  
@@ -110,7 +55,7 @@ XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: true
+HighValuesAre: good
 Is7DayAverage: true
 HasStdErr: true
 Highlight: [landing]
@@ -142,7 +87,7 @@ XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: true
+HighValuesAre: good
 Is7DayAverage: true
 HasStdErr: true
 Highlight: [landing, location]
@@ -170,7 +115,7 @@ XAxis: Date
 YAxis: Scaled search volume (arbitrary scale)
 Format: raw
 Unit: scaled search volume
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: false
  
@@ -194,7 +139,7 @@ XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: false
 Highlight: [landing, default]
@@ -222,7 +167,7 @@ XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: true
 
@@ -250,7 +195,7 @@ XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: true
 Highlight: [landing, location]
@@ -279,7 +224,7 @@ XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: true
 Highlight: [landing]
@@ -308,7 +253,7 @@ XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: false
 Highlight: [landing]
@@ -345,7 +290,7 @@ XAxis: Reported Date
 YAxis: Cases
 Format: per100k
 Unit: per 100,000 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: false
 Highlight: [landing]
@@ -388,7 +333,7 @@ XAxis: Reported Date
 YAxis: Deaths
 Format: per100k
 Unit: per 100,000 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: false
 Highlight: [landing]

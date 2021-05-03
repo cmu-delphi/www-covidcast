@@ -8,13 +8,12 @@
   import { onMount } from 'svelte';
   import { trackEvent } from '../../stores/ga';
   import Search from '../../components/Search.svelte';
-  import { getCountiesOfState, getInfoByName, infosByLevel } from '../../maps';
+  import { getCountiesOfState, getInfoByName, infosByLevel } from '../../data/regions';
   import { formatDateISO } from '../../formats';
   import { questions } from '../../stores/questions';
   import { DateParam } from '../../stores/params';
-  import FancyHeader from '../mobile/FancyHeader.svelte';
-  import '../mobile/common.css';
-  import IndicatorAnnotation from '../mobile/IndicatorAnnotation.svelte';
+  import FancyHeader from '../../components/FancyHeader.svelte';
+  import IndicatorAnnotation from '../../components/IndicatorAnnotation.svelte';
 
   const CSV_SERVER = 'https://delphi.cmu.edu/csv';
 

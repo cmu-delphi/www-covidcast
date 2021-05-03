@@ -1,11 +1,11 @@
 <script>
-  import Vega from '../../components/Vega.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import { BASE_SPEC, guessTopPadding, joinTitle } from '../../specs/commonSpec';
   import { autoAlign, COLOR, genCreditsLayer, signalPatches, resolveHighlightedField } from '../../specs/lineSpec';
   import { isMobileDevice } from '../../stores';
-  import Toggle from '../mobile/Toggle.svelte';
-  import WarningBanner from '../mobile/components/WarningBanner.svelte';
-  import DownloadMenu from '../mobile/components/DownloadMenu.svelte';
+  import Toggle from '../../components/Toggle.svelte';
+  import WarningBanner from '../../components/WarningBanner.svelte';
+  import DownloadMenu from '../../components/DownloadMenu.svelte';
   import { createEventDispatcher } from 'svelte';
 
   /**
