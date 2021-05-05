@@ -271,13 +271,27 @@ export function callBackfillAPI(
   }
   return fetchImpl(url);
 }
+
+export interface EpiDataMetaEntry {
+  min_time: number;
+  max_time: number;
+  max_value: number;
+  stdev_value: number;
+  mean_value: number;
+  max_issue: number;
+
+  data_source: string;
+  signal: string;
+  time_type: string;
+  geo_type: RegionLevel;
+}
 /**
  */
-export function callMetaAPI<T = Record<string, unknown>>(
+export function callMetaAPI(
   dataSignals: DataSensor[],
   fields: string[],
   filters: Record<string, string>,
-): Promise<EpiDataResponse<T>> {
+): Promise<EpiDataResponse<EpiDataMetaEntry>> {
   const url = new URL(ENDPOINT + '/covidcast_meta/');
   const data = new FormData();
   if (dataSignals && dataSignals.length > 0) {
