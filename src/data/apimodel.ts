@@ -1,3 +1,4 @@
+import type { Region } from '../stores/params';
 import type { RegionLevel } from './regions';
 import type { TimeFrame } from './TimeFrame';
 import { formatAPITime, parseAPITime } from './utils';
@@ -9,6 +10,10 @@ export function isArray<T>(v: T | readonly T[]): v is readonly T[] {
 export class SourceSignalPair {
   constructor(public readonly source: string, public readonly signals: '*' | string | readonly string[]) {}
 
+  static from(sensor: { id: string; signal: string }): SourceSignalPair {
+    return new SourceSignalPair(sensor.id, sensor.signal);
+  }
+
   toString(): string {
     return `${this.source}:${isArray(this.signals) ? this.signals.join(',') : this.signals}`;
   }
@@ -16,6 +21,10 @@ export class SourceSignalPair {
 
 export class GeoPair {
   constructor(public readonly level: RegionLevel, public readonly values: '*' | string | readonly string[]) {}
+
+  static from(region: Region): GeoPair {
+    return new GeoPair(region.level, region.propertyId);
+  }
 
   toString(): string {
     return `${fixLevel(this.level)}:${isArray(this.values) ? this.values.join(',') : this.values}`;
@@ -27,6 +36,10 @@ export class TimePair {
     public readonly type: 'day' | 'week',
     public readonly values: '*' | Date | TimeFrame | readonly (Date | TimeFrame)[],
   ) {}
+
+  static from(date: Date | TimeFrame): TimePair {
+    return new TimePair('day', date);
+  }
 
   toString(): string {
     const encodeValues = () => {

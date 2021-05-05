@@ -21,7 +21,7 @@
   import FancyHeader from '../../components/FancyHeader.svelte';
   import { MULTI_COLORS } from '../../specs/lineSpec';
   import AboutSection from '../../components/AboutSection.svelte';
-  import { generateCorrelationMetrics } from '../../data/correlation';
+  import { fetchSingleCorrelations } from '../../data/correlation';
   import throttle from 'lodash-es/throttle';
 
   $: primary = new SensorParam($currentSensorEntry);
@@ -64,11 +64,12 @@
     if (!secondary | !primary) {
       return Promise.resolve([]);
     }
-    const primaryData = fetcher.fetch1Sensor1RegionNDates(primary, region, date.windowTimeFrame);
-    const secondaryData = fetcher.fetch1Sensor1RegionNDates(secondary, region, date.windowTimeFrame);
-    return Promise.all([primaryData, secondaryData]).then((r) => {
-      return generateCorrelationMetrics(r[0], r[1]).lags;
-    });
+    // const primaryData = fetcher.fetch1Sensor1RegionNDates(primary, region, date.windowTimeFrame);
+    // const secondaryData = fetcher.fetch1Sensor1RegionNDates(secondary, region, date.windowTimeFrame);
+    return fetchSingleCorrelations(primary.value, secondary.value, region.value, date.windowTimeFrame);
+    // return Promise.all([primaryData, secondaryData]).then((r) => {
+    //   return generateCorrelationMetrics(r[0], r[1]).lags;
+    // });
   }
 
   $: lags = loadData(primary, secondary, region, date);
@@ -157,7 +158,15 @@
         </p>
       </AboutSection>
       <p />
-      <IndicatorCorrelationChart {primary} {secondary} lag={$currentLag} {lags} lagData={selectedLag} />
+      <IndicatorCorrelationChart
+        {primary}
+        {secondary}
+        {region}
+        {date}
+        lag={$currentLag}
+        {fetcher}
+        lagData={selectedLag}
+      />
       <hr />
       <FancyHeader invert sub="Chart">{primary.name}</FancyHeader>
       <AboutSection details>

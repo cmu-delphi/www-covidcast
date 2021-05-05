@@ -20,7 +20,7 @@
   export let lag = 0;
 
   /**
-   * @type {import("../../data/correlation").Lag[]}
+   * @type {import("../../data/correlation").EpiDataCorrelationRow[]}
    */
   export let lags;
 
@@ -187,16 +187,6 @@
       highlightedLag = lag;
     }
   }
-
-  /**
-   * @param {import("../../data/correlation").Lag} lag
-   */
-  function simplifyLag(lag) {
-    const simple = { ...lag };
-    delete simple.a;
-    delete simple.b;
-    return simple;
-  }
 </script>
 
 {#await lags}
@@ -224,7 +214,7 @@
     fileName="Correlation_Lag_vs_R2_{primary.name}_{secondary.name}"
     {vegaRef}
     data={lags}
-    prepareRow={simplifyLag}
+    prepareRow={(r) => r}
     advanced={false}
   />
 </div>

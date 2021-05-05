@@ -1,7 +1,7 @@
 import { EpiDataRow, parseData } from '.';
 import type { Sensor } from '../stores/constants';
 import { callAPI, EpiDataJSONRow } from './api';
-import { GeoPair, isArray, SourceSignalPair, TimePair, fixLevel, groupByLevel, groupBySource } from './apimodel';
+import { GeoPair, isArray, SourceSignalPair, TimePair, groupByLevel, groupBySource } from './apimodel';
 import type { RegionInfo as Region, RegionLevel } from './regions';
 import type { TimeFrame } from './TimeFrame';
 import { toTimeValue } from './utils';
@@ -20,7 +20,7 @@ function toGeoPair(
   if (!isArray(region)) {
     mixinValues.geo_type = region.level;
     mixinValues.geo_value = region.propertyId;
-    return new GeoPair(fixLevel(region.level), region.propertyId);
+    return GeoPair.from(region);
   }
   const grouped = groupByLevel(region);
   if (grouped.length === 1) {
@@ -47,7 +47,7 @@ function toSourceSignalPair<S extends { id: string; signal: string; format: Sens
     mixinValues.signal = sensor.signal;
     return {
       factor: sensor.format === 'fraction' ? 100 : 1,
-      sourceSignalPairs: new SourceSignalPair(sensor.id, sensor.signal),
+      sourceSignalPairs: SourceSignalPair.from(sensor),
     };
   }
   const grouped = groupBySource(sensor);
@@ -70,7 +70,7 @@ function toSourceSignalPair<S extends { id: string; signal: string; format: Sens
       mixinValues.signal = firstSensor.signal;
       return {
         factor,
-        sourceSignalPairs: new SourceSignalPair(firstSensor.id, firstSensor.signal),
+        sourceSignalPairs: SourceSignalPair.from(firstSensor),
       };
     }
     transfer.push('signal');
