@@ -1,5 +1,5 @@
 <script>
-  import { callMetaAPI } from '../../data/api';
+  import { callMetaAPI, CSV_SERVER_ENDPOINT } from '../../data/api';
   import Datepicker from '../../components/Calendar/Datepicker.svelte';
   import { getLevelInfo, sensorList } from '../../stores/constants';
   import { parseAPITime } from '../../data';
@@ -14,8 +14,6 @@
   import { DateParam } from '../../stores/params';
   import FancyHeader from '../../components/FancyHeader.svelte';
   import IndicatorAnnotation from '../../components/IndicatorAnnotation.svelte';
-
-  const CSV_SERVER = 'https://delphi.cmu.edu/csv';
 
   let loading = true;
   /**
@@ -403,7 +401,7 @@
         <h3 class="mobile-h3 uk-margin-top">CSV File</h3>
         <div>
           <p>Direct link:</p>
-          <form bind:this={form} id="form" method="GET" action={CSV_SERVER} download>
+          <form bind:this={form} id="form" method="GET" action={CSV_SERVER_ENDPOINT} download>
             <button type="submit" class="uk-button uk-button-default">Download CSV File</button>
             <input type="hidden" name="signal" value={sensor ? `${sensor.id}:${sensor.signal}` : ''} />
             <input type="hidden" name="start_day" value={formatDateISO(startDate)} />
@@ -416,7 +414,7 @@
           <div class="code-block-wrapper">
             <pre
               class="code-block"><code>
-            {`wget --content-disposition "${CSV_SERVER}?signal=${sensor ? `${sensor.id}:${sensor.signal}` : ''}&start_day=${formatDateISO(startDate)}&end_day=${formatDateISO(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${formatDateISO(asOfDate)}` : ''}"`}
+            {`wget --content-disposition "${CSV_SERVER_ENDPOINT}?signal=${sensor ? `${sensor.id}:${sensor.signal}` : ''}&start_day=${formatDateISO(startDate)}&end_day=${formatDateISO(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${formatDateISO(asOfDate)}` : ''}"`}
             </code></pre>
           </div>
           <p class="description">

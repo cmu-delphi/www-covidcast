@@ -8,6 +8,8 @@ declare const process: { env: Record<string, string> };
 
 const ENDPOINT = process.env.COVIDCAST_ENDPOINT_URL;
 
+export const CSV_SERVER_ENDPOINT = `${ENDPOINT}/covidcast/csv`;
+
 export const fetchOptions: RequestInit = process.env.NODE_ENV === 'development' ? { cache: 'force-cache' } : {};
 
 export interface EpiDataResponse<T = Record<string, unknown>> {
