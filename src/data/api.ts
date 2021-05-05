@@ -269,6 +269,26 @@ export function callMetaAPI(
   return fetchImpl(url);
 }
 
+export interface EpiDataMetaInfo {
+  name: string;
+  signal: string;
+  source: string;
+  category: 'public' | 'early' | 'late' | 'other';
+  format: 'raw' | 'percent' | 'fraction' | 'per100k';
+  high_values_are: 'good' | 'bad' | 'neutral';
+
+  max_issue: number;
+  max_time: number;
+  min_time: number;
+  geo_types: Record<RegionLevel, { min: number; max: number; mean: number; stdev: number }>;
+}
+
+export function callMetaAPI2(signal: SourceSignalPair | readonly SourceSignalPair[] = []): Promise<EpiDataMetaInfo[]> {
+  const url = new URL(ENDPOINT + '/covidcast/meta');
+  addParam(url, 'signal', signal);
+  return fetchImpl(url);
+}
+
 export interface EpiDataSignalStatusRow {
   name: string;
   source: string;
