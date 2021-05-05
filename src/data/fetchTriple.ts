@@ -37,10 +37,10 @@ function toGeoPair(
   return grouped.map((group) => new GeoPair(group.level, group.regions));
 }
 
-function toSourceSignalPair(
+function toSourceSignalPair<S extends { id: string; signal: string; format: Sensor['format'] }>(
   transfer: (keyof EpiDataJSONRow)[],
   mixinValues: Partial<EpiDataRow>,
-  sensor: Sensor | readonly Sensor[],
+  sensor: S | readonly S[],
 ) {
   if (!isArray(sensor)) {
     mixinValues.source = sensor.id;
@@ -96,13 +96,16 @@ function toSourceSignalPair(
   };
 }
 
-export default function fetchTriple(
-  sensor: Sensor | readonly Sensor[],
+export default function fetchTriple<S extends { id: string; signal: string; format: Sensor['format'] }>(
+  sensor: S | readonly S[],
   region: Region | RegionLevel | readonly Region[],
   date: TimeFrame | Date,
-  { advanced = false } = {},
+  { advanced = false, stderr = true } = {},
 ): Promise<EpiDataRow[]> {
-  const transfer: (keyof EpiDataJSONRow)[] = ['value', 'stderr'];
+  const transfer: (keyof EpiDataJSONRow)[] = ['value'];
+  if (stderr) {
+    transfer.push('stderr');
+  }
   if (advanced) {
     transfer.push('sample_size', 'issue');
   }

@@ -1,11 +1,12 @@
 // Indicator Info: aka The Signal Dashboard API
 
-import { formatAPITime, parseAPITime } from './utils';
+import { parseAPITime } from './utils';
 import { callSignalDashboardStatusAPI } from './api';
-import { EpiDataRow, fetchData } from './fetchData';
+import type { EpiDataRow } from './fetchData';
 import { addNameInfos } from './fetchData';
 import { countyInfo } from './regions';
 import type { RegionInfo } from './regions';
+import fetchTriple from './fetchTriple';
 
 export interface Coverage {
   date: Date;
@@ -29,10 +30,7 @@ function parseFakeISO(value: number | string | Date): Date {
 
 export function getIndicatorStatuses(): Promise<IndicatorStatus[]> {
   return callSignalDashboardStatusAPI().then((d) => {
-    if (d.result == null || d.result < 0 || d.message.includes('no results')) {
-      return [];
-    }
-    const data = ((d.epidata ?? []) as unknown) as IndicatorStatus[];
+    const data = (d as unknown) as IndicatorStatus[];
     for (const row of data) {
       row.id = row.name.toLowerCase().replace(/\s/g, '-');
       row.latest_issue = parseFakeISO(row.latest_issue);
@@ -49,17 +47,16 @@ export function getIndicatorStatuses(): Promise<IndicatorStatus[]> {
 }
 
 export function getAvailableCounties(indicator: IndicatorStatus, date: Date): Promise<(EpiDataRow & RegionInfo)[]> {
-  return fetchData(
+  return fetchTriple(
     {
       id: indicator.source,
       signal: indicator.covidcast_signal,
+      format: 'raw',
     },
     'county',
-    '*',
     date,
-    { time_value: Number.parseInt(formatAPITime(date), 10) },
     {
-      multiValues: false,
+      stderr: false,
     },
-  ).then((rows) => addNameInfos(rows).filter((d) => d.level === 'county'));
+  ).then((rows) => addNameInfos(rows).filter((d) => d.level === 'county')); // no mega-counties
 }

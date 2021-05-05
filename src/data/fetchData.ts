@@ -1,4 +1,4 @@
-import { callAPI, callTreeAPI, EpiDataJSONRow, EpiDataResponse, EpiDataTreeResponse } from './api';
+import { callAPI, callTreeAPI, EpiDataJSONRow, EpiDataTreeResponse } from './api';
 import { timeDay } from 'd3-time';
 import { parseAPITime, formatAPITime, combineSignals } from './utils';
 import { EpiDataCasesOrDeathValues, EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
@@ -44,14 +44,14 @@ function computeTransferFields(mixinValues = {}, advanced = false, transferSigna
  */
 
 export function parseData(
-  d: EpiDataResponse<EpiDataJSONRow>,
+  d: EpiDataJSONRow[],
   mixinData: Partial<EpiDataRow> = {},
   factor: number | ((v: EpiDataRow) => number) = 1,
 ): EpiDataRow[] {
-  if (d.result < 0 || d.message.includes('no results')) {
+  if (!d || d.length === 0) {
     return [];
   }
-  const data = (d.epidata || []) as EpiDataRow[];
+  const data = d as EpiDataRow[];
 
   for (const row of data) {
     Object.assign(row, mixinData);
@@ -96,41 +96,27 @@ function parseMultipleTreeData(
   }
   const tree = (d.epidata || [])[0];
   if (!tree || (Array.isArray(tree) && tree.length === 0)) {
-    return parseData({ ...d, epidata: [] }, mixinData, factor);
+    return parseData([], mixinData, factor);
   }
   const split = signals.map((k) => tree[k] as EpiDataRow[]);
   const ref = split[defaultSignalIndex];
   const combined = combineSignals(split, ref, EPIDATA_CASES_OR_DEATH_VALUES, deriveCombineKey(mixinData), factor);
-  return parseData(
-    {
-      ...d,
-      epidata: combined,
-    },
-    mixinData,
-    factor,
-  );
+  return parseData(combined, mixinData, factor);
 }
 
 function parseMultipleSeparateData(
-  dataArr: EpiDataResponse<EpiDataJSONRow>[],
+  dataArr: EpiDataJSONRow[][],
   defaultSignalIndex: number,
   mixinData: Partial<EpiDataRow> = {},
   factor = 1,
 ): EpiDataRow[] {
-  if (dataArr.length === 0 || dataArr[0].result < 0 || dataArr[0].message.includes('no results')) {
+  if (dataArr.length === 0 || !dataArr[0] || dataArr[0].length === 0) {
     return [];
   }
-  const data = dataArr.map((d) => (d.epidata || []) as EpiDataRow[]);
+  const data = dataArr.map((d) => d as EpiDataRow[]);
   const ref = data[defaultSignalIndex];
   const combined = combineSignals(data, ref, EPIDATA_CASES_OR_DEATH_VALUES, deriveCombineKey(mixinData), factor);
-  return parseData(
-    {
-      ...dataArr[0],
-      epidata: combined,
-    },
-    mixinData,
-    factor,
-  );
+  return parseData(combined, mixinData, factor);
 }
 
 export interface FetchDataOptions {

@@ -71,7 +71,7 @@ export function callAPI(
   geo: GeoPair | readonly GeoPair[],
   time: TimePair | readonly TimePair[],
   fields?: readonly (keyof EpiDataJSONRow)[],
-): Promise<EpiDataResponse<EpiDataJSONRow>> {
+): Promise<EpiDataJSONRow[]> {
   const url = new URL(ENDPOINT + '/covidcast/');
   addParam(url, 'signal', signal);
   addParam(url, 'geo', geo);
@@ -80,7 +80,11 @@ export function callAPI(
   if (fields) {
     url.searchParams.set('fields', fields.join(','));
   }
-  return fetchImpl(url);
+  url.searchParams.set('format', 'json');
+  return fetchImpl<EpiDataJSONRow[]>(url).catch((error) => {
+    console.warn('failed fetching data', error);
+    return [];
+  });
 }
 
 export function callTreeAPI(
@@ -129,7 +133,7 @@ export function callTrendAPI(
   date: Date,
   window: TimeFrame,
   fields?: readonly (keyof EpiDataTrendRow)[],
-): Promise<EpiDataResponse<EpiDataTrendRow>> {
+): Promise<EpiDataTrendRow[]> {
   const url = new URL(ENDPOINT + '/covidcast/trend');
   addParam(url, 'signal', signal);
   addParam(url, 'geo', geo);
@@ -139,7 +143,11 @@ export function callTrendAPI(
   if (fields) {
     url.searchParams.set('fields', fields.join(','));
   }
-  return fetchImpl(url);
+  url.searchParams.set('format', 'json');
+  return fetchImpl<EpiDataTrendRow[]>(url).catch((error) => {
+    console.warn('failed fetching data', error);
+    return [];
+  });
 }
 
 export interface EpiDataCorrelationRow {
@@ -174,7 +182,7 @@ export function callCorrelationAPI(
   window: TimeFrame,
   lag?: number,
   fields?: readonly (keyof EpiDataCorrelationRow)[],
-): Promise<EpiDataResponse<EpiDataCorrelationRow>> {
+): Promise<EpiDataCorrelationRow[]> {
   const url = new URL(ENDPOINT + '/covidcast/correlation');
   url.searchParams.set('reference', reference.toString());
   addParam(url, 'others', others);
@@ -186,7 +194,11 @@ export function callCorrelationAPI(
   if (fields) {
     url.searchParams.set('fields', fields.join(','));
   }
-  return fetchImpl(url);
+  url.searchParams.set('format', 'json');
+  return fetchImpl<EpiDataCorrelationRow[]>(url).catch((error) => {
+    console.warn('failed fetching data', error);
+    return [];
+  });
 }
 
 export interface EpiDataBackfillRow {
@@ -210,7 +222,7 @@ export function callBackfillAPI(
   geo: GeoPair,
   anchorLag?: number,
   fields?: readonly (keyof EpiDataBackfillRow)[],
-): Promise<EpiDataResponse<EpiDataBackfillRow>> {
+): Promise<EpiDataBackfillRow[]> {
   const url = new URL(ENDPOINT + '/covidcast/backfill');
   url.searchParams.set('signal', signal.toString());
   url.searchParams.set('geo', geo.toString());
@@ -222,7 +234,11 @@ export function callBackfillAPI(
   if (fields) {
     url.searchParams.set('fields', fields.join(','));
   }
-  return fetchImpl(url);
+  url.searchParams.set('format', 'json');
+  return fetchImpl<EpiDataBackfillRow[]>(url).catch((error) => {
+    console.warn('failed fetching data', error);
+    return [];
+  });
 }
 
 export interface EpiDataMetaEntry {
@@ -286,7 +302,10 @@ export interface EpiDataMetaInfo {
 export function callMetaAPI2(signal: SourceSignalPair | readonly SourceSignalPair[] = []): Promise<EpiDataMetaInfo[]> {
   const url = new URL(ENDPOINT + '/covidcast/meta');
   addParam(url, 'signal', signal);
-  return fetchImpl(url);
+  return fetchImpl<EpiDataMetaInfo[]>(url).catch((error) => {
+    console.warn('failed fetching data', error);
+    return [];
+  });
 }
 
 export interface EpiDataSignalStatusRow {
@@ -301,7 +320,11 @@ export interface EpiDataSignalStatusRow {
  *
  * @returns
  */
-export function callSignalDashboardStatusAPI(): Promise<EpiDataResponse<EpiDataSignalStatusRow>> {
+export function callSignalDashboardStatusAPI(): Promise<EpiDataSignalStatusRow[]> {
   const url = new URL(ENDPOINT + '/signal_dashboard_status/');
-  return fetchImpl(url);
+  url.searchParams.set('format', 'json');
+  return fetchImpl<EpiDataSignalStatusRow[]>(url).catch((error) => {
+    console.warn('failed fetching data', error);
+    return [];
+  });
 }
