@@ -14,7 +14,7 @@
     genDateHighlight,
     genAnnotationLayer,
   } from '../specs/lineSpec';
-  import { toTimeValue } from '../data/fetchTriple';
+  import { toTimeValue } from '../data/utils';
   import Toggle from '../components/Toggle.svelte';
   import SensorValue from '../components/SensorValue.svelte';
   import { combineSignals } from '../data/utils';

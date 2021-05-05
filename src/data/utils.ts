@@ -40,3 +40,7 @@ export function parseAPITime(v: number | string): Date {
  * @type {(v: Date) => string}
  */
 export const formatAPITime = timeFormat('%Y%m%d');
+
+export function toTimeValue(date: Date): number {
+  return Number.parseInt(formatAPITime(date), 10);
+}

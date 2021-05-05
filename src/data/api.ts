@@ -1,16 +1,14 @@
-import { formatAPITime, parseAPITime } from './utils';
+import { formatAPITime } from './utils';
 import type { DataSensor } from './fetchData';
-import { levelMegaCountyId, RegionLevel } from './regions';
+import type { RegionLevel } from './regions';
 import type { TimeFrame } from './TimeFrame';
+import { GeoPair, isArray, SourceSignalPair, TimePair } from './apimodel';
 
 declare const process: { env: Record<string, string> };
 
 const ENDPOINT = process.env.COVIDCAST_ENDPOINT_URL;
 
 export const fetchOptions: RequestInit = process.env.NODE_ENV === 'development' ? { cache: 'force-cache' } : {};
-
-export const START_TIME_RANGE = parseAPITime('20100101');
-export const END_TIME_RANGE = parseAPITime('20500101');
 
 export interface EpiDataResponse<T = Record<string, unknown>> {
   result: number;
@@ -22,51 +20,6 @@ export interface EpiDataTreeResponse<T = Record<string, unknown>> {
   result: number;
   message: string;
   epidata: [Record<string, T[]>?];
-}
-
-export function isArray<T>(v: T | readonly T[]): v is readonly T[] {
-  return Array.isArray(v);
-}
-
-export class SourceSignalPair {
-  constructor(public readonly source: string, public readonly signals: '*' | string | readonly string[]) {}
-
-  toString(): string {
-    return `${this.source}:${isArray(this.signals) ? this.signals.join(',') : this.signals}`;
-  }
-}
-
-export class GeoPair {
-  constructor(public readonly level: RegionLevel, public readonly values: '*' | string | readonly string[]) {}
-
-  toString(): string {
-    return `${this.level === levelMegaCountyId ? 'county' : this.level}:${
-      isArray(this.values) ? this.values.join(',') : this.values
-    }`;
-  }
-}
-
-export class TimePair {
-  constructor(
-    public readonly type: 'day' | 'week',
-    public readonly values: '*' | Date | TimeFrame | readonly (Date | TimeFrame)[],
-  ) {}
-
-  toString(): string {
-    const encodeValues = () => {
-      if (this.values === '*') {
-        return '*';
-      }
-      if (this.values instanceof Date) {
-        return formatAPITime(this.values);
-      }
-      if (isArray(this.values)) {
-        return this.values.map((d) => (d instanceof Date ? formatAPITime(d) : d.range)).join(',');
-      }
-      return this.values.range;
-    };
-    return `${this.type}:${encodeValues()}`;
-  }
 }
 
 function addParam<T extends { toString(): string }>(url: URL, key: string, pairs: T | readonly T[]): void {

@@ -1,21 +1,11 @@
-import {
-  callAPI,
-  callTreeAPI,
-  END_TIME_RANGE,
-  EpiDataJSONRow,
-  EpiDataResponse,
-  EpiDataTreeResponse,
-  GeoPair,
-  SourceSignalPair,
-  START_TIME_RANGE,
-  TimePair,
-} from './api';
+import { callAPI, callTreeAPI, EpiDataJSONRow, EpiDataResponse, EpiDataTreeResponse } from './api';
 import { timeDay } from 'd3-time';
 import { parseAPITime, formatAPITime, combineSignals } from './utils';
 import { EpiDataCasesOrDeathValues, EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 import { getInfoByName } from './regions';
 import type { RegionInfo, RegionLevel } from './regions';
 import { TimeFrame } from './TimeFrame';
+import { SourceSignalPair, GeoPair, TimePair, START_TIME_RANGE, END_TIME_RANGE } from './apimodel';
 
 export interface DataSensor {
   id: string;

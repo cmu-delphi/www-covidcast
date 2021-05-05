@@ -1,6 +1,6 @@
 import { timeDay } from 'd3-time';
 import type { EpiDataRow } from '../data';
-import { toTimeValue } from '../data/fetchTriple';
+import { toTimeValue } from '../data/utils';
 import { formatFraction } from '../formats';
 import type { Sensor } from './constants';
 

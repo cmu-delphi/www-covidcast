@@ -12,7 +12,8 @@ import { Sensor, SensorEntry, yesterdayDate } from './constants';
 import { get, Writable } from 'svelte/store';
 import { TimeFrame } from '../data/TimeFrame';
 // import { callTrendAPI, GeoPair, SourceSignalPair } from '../data/api';
-import fetchTriple, { toTimeValue } from '../data/fetchTriple';
+import fetchTriple from '../data/fetchTriple';
+import { toTimeValue } from '../data/utils';
 
 export { TimeFrame } from '../data/TimeFrame';
 

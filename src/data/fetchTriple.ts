@@ -1,42 +1,10 @@
 import { EpiDataRow, parseData } from '.';
 import type { Sensor } from '../stores/constants';
-import { callAPI, GeoPair, SourceSignalPair, TimePair, isArray, EpiDataJSONRow } from './api';
-import { levelMegaCountyId, RegionInfo as Region, RegionLevel } from './regions';
+import { callAPI, EpiDataJSONRow } from './api';
+import { GeoPair, isArray, SourceSignalPair, TimePair, fixLevel, groupByLevel, groupBySource } from './apimodel';
+import type { RegionInfo as Region, RegionLevel } from './regions';
 import type { TimeFrame } from './TimeFrame';
-import { formatAPITime } from './utils';
-
-function fixLevel(level: RegionLevel): RegionLevel {
-  if (level === levelMegaCountyId) {
-    // mega-counties are counties in the api
-    return 'county';
-  }
-  return level;
-}
-
-function groupByLevel(regions: readonly Region[]): { level: RegionLevel; regions: string[] }[] {
-  const map = new Map<RegionLevel, string[]>();
-  for (const region of regions) {
-    const entry = map.get(fixLevel(region.level));
-    if (entry) {
-      entry.push(region.propertyId);
-    } else {
-      map.set(fixLevel(region.level), [region.propertyId]);
-    }
-  }
-  return Array.from(map.entries(), (r) => ({ level: r[0], regions: r[1] }));
-}
-function groupBySource(sensors: readonly Sensor[]): { source: string; sensors: Sensor[] }[] {
-  const map = new Map<string, Sensor[]>();
-  for (const source of sensors) {
-    const entry = map.get(source.id);
-    if (entry) {
-      entry.push(source);
-    } else {
-      map.set(source.id, [source]);
-    }
-  }
-  return Array.from(map.entries(), (r) => ({ source: r[0], sensors: r[1] }));
-}
+import { toTimeValue } from './utils';
 
 function toGeoPair(
   transfer: (keyof EpiDataJSONRow)[],
@@ -126,10 +94,6 @@ function toSourceSignalPair(
         ),
     ),
   };
-}
-
-export function toTimeValue(date: Date): number {
-  return Number.parseInt(formatAPITime(date), 10);
 }
 
 export default function fetchTriple(
