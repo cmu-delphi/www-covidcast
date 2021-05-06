@@ -2,7 +2,6 @@ import { timeDay, timeMonth, timeWeek } from 'd3-time';
 import { addNameInfos, formatAPITime, addMissing, fitRange, parseAPITime, EpiDataRow } from '../data';
 import { nationInfo } from '../data/regions';
 import { currentDate, currentSensor, sensorList, selectByInfo, IStatsInfo } from '.';
-import { determineTrend, Trend } from './trend';
 import { determineMinMax, determineStats } from './stats';
 import { formatValue } from '../formats';
 import { scaleSequential } from 'd3-scale';
@@ -11,9 +10,11 @@ import type { RegionInfo, RegionInfo as Region, RegionLevel, RegionArea, CountyI
 import { Sensor, SensorEntry, yesterdayDate } from './constants';
 import { get, Writable } from 'svelte/store';
 import { TimeFrame } from '../data/TimeFrame';
-// import { callTrendAPI, GeoPair, SourceSignalPair } from '../data/api';
 import fetchTriple from '../data/fetchTriple';
 import { toTimeValue } from '../data/utils';
+import { SensorTrend, asSensorTrend } from '../data/trend';
+import { GeoPair, SourceSignalPair } from '../data/apimodel';
+import { callTrendAPI } from '../data/api';
 
 export { TimeFrame } from '../data/TimeFrame';
 
@@ -30,7 +31,7 @@ export interface RegionEpiDataRow extends EpiDataRow, Region {}
 export class DataFetcher {
   private readonly cache = new Map<
     string,
-    Promise<RegionEpiDataRow[]> | Promise<EpiDataRow & RegionInfo> | Promise<Trend>
+    Promise<RegionEpiDataRow[]> | Promise<EpiDataRow & RegionInfo> | Promise<SensorTrend>
   >();
   private primarySensorKey = '';
   private primaryRegionId = '';
@@ -201,42 +202,42 @@ export class DataFetcher {
     return r;
   }
 
-  fetchSparkLine(
+  fetch1Sensor1Region1DateSparkLine(
     sensor: Sensor | SensorParam,
     region: Region | RegionParam,
     date: DateParam,
   ): Promise<RegionEpiDataRow[]> {
     const lSensor = SensorParam.unbox(sensor);
     const lRegion = RegionParam.unbox(region);
-    const key = this.toWindowKey(lSensor, lRegion, date.windowTimeFrame, 'sparkline');
+    const key = this.toWindowKey(lSensor, lRegion, date.sparkLineTimeFrame);
     if (this.cache.has(key)) {
       return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
     }
-    // TODO just load sparkline
-    const rows = this.fetch1Sensor1RegionNDates(lSensor, lRegion, date.windowTimeFrame).then((rows) =>
-      rows.filter(date.sparkLineTimeFrame.filter),
-    );
+    const rows = this.fetch1Sensor1RegionNDates(lSensor, lRegion, date.sparkLineTimeFrame);
     this.cache.set(key, rows);
     return rows;
   }
 
-  fetchWindowTrend(sensor: Sensor | SensorParam, region: Region | RegionParam, date: DateParam): Promise<Trend> {
+  fetch1Sensor1Region1DateTrend(
+    sensor: Sensor | SensorParam,
+    region: Region | RegionParam,
+    date: DateParam,
+  ): Promise<SensorTrend> {
     const lSensor = SensorParam.unbox(sensor);
     const lRegion = RegionParam.unbox(region);
     const lDate = date;
-    const key = this.toWindowKey(lSensor, lRegion, lDate.windowTimeFrame, `${lDate.timeValue}:trend`);
+    const key = this.toDateKey(lSensor, lRegion, lDate, `${lDate.timeValue}:trend`);
     if (this.cache.has(key)) {
-      return this.cache.get(key) as Promise<Trend>;
+      return this.cache.get(key) as Promise<SensorTrend>;
     }
-    const trend = this.fetch1Sensor1RegionNDates(lSensor, lRegion, date.windowTimeFrame).then((rows) => {
-      return determineTrend(date.value, rows, lSensor.highValuesAre);
+    const trend = callTrendAPI(
+      SourceSignalPair.from(lSensor),
+      GeoPair.from(lRegion),
+      lDate.value,
+      lDate.windowTimeFrame,
+    ).then((rows) => {
+      return asSensorTrend(lDate.value, sensor.highValuesAre, rows?.[0]);
     });
-    // const trend = callTrendAPI(
-    //   new SourceSignalPair(lSensor.id, lSensor.signal),
-    //   new GeoPair(lRegion.level, lRegion.propertyId),
-    //   lDate.value,
-    //   lDate.windowTimeFrame,
-    // ).then((rows) => asTrend(rows.epidata?.[0], sensor.highValuesAre));
     this.cache.set(key, trend);
     return trend;
   }

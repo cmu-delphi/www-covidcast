@@ -27,7 +27,7 @@ export class GeoPair {
   }
 
   toString(): string {
-    return `${fixLevel(this.level)}:${isArray(this.values) ? this.values.join(',') : this.values}`;
+    return `${fixLevel(this.level)}:${isArray(this.values) ? this.values.join(',') : this.values}`.toLowerCase();
   }
 }
 

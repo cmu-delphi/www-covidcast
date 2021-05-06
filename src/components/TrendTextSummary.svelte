@@ -5,7 +5,7 @@
   import TrendText from './TrendText.svelte';
 
   /**
-   * @type {Promise<import("../../stores/params").Trend>}
+   * @type {Promise<import("../../data/trend").SensorTrend>}
    */
   export let trend;
   /**
@@ -45,13 +45,13 @@
         <strong>{sensor.value.name}</strong>
         has
         <strong>
-          <TrendText trend={d.minTrend} />
+          <TrendText trend={d.min} />
         </strong>
         compared to the
         <strong
           >{WINDOW_SIZE}
           month minimum value of
-          <SensorValue {sensor} value={d.min ? d.min.value : null} medium /></strong
+          <SensorValue {sensor} value={d.min ? d.min.refValue : null} medium /></strong
         >
         on
         <strong>{formatDateYearWeekdayAbbr(d.minDate, true)}</strong>.
@@ -61,13 +61,13 @@
         <strong>{sensor.value.name}</strong>
         has
         <strong>
-          <TrendText trend={d.maxTrend} />
+          <TrendText trend={d.max} />
         </strong>
         compared to the
         <strong
           >{WINDOW_SIZE}
           month maximum value of
-          <SensorValue {sensor} value={d.max ? d.max.value : null} medium /></strong
+          <SensorValue {sensor} value={d.max ? d.max.refValue : null} medium /></strong
         >
         on
         <strong>{formatDateYearWeekdayAbbr(d.maxDate, true)}</strong>.
@@ -77,13 +77,13 @@
         <strong>{sensor.value.name}</strong>
         has
         <strong>
-          <TrendText trend={d.minTrend} />
+          <TrendText trend={d.min} />
         </strong>
         compared to the
         <strong
           >{WINDOW_SIZE}
           month minimum value of
-          <SensorValue {sensor} value={d.min ? d.min.value : null} medium /></strong
+          <SensorValue {sensor} value={d.min ? d.min.refValue : null} medium /></strong
         >
         on
         <strong>{formatDateYearWeekdayAbbr(d.minDate, true)}</strong>.
@@ -93,13 +93,13 @@
         <strong>{sensor.value.name}</strong>
         has
         <strong>
-          <TrendText trend={d.minTrend} />
+          <TrendText trend={d.min} />
         </strong>
         compared to the
         <strong
           >{WINDOW_SIZE}
           month minimum value of
-          <SensorValue {sensor} value={d.min ? d.min.value : null} medium /></strong
+          <SensorValue {sensor} value={d.min ? d.min.refValue : null} medium /></strong
         >
         on
         <strong>{formatDateYearWeekdayAbbr(d.minDate, true)}</strong>.
@@ -115,7 +115,7 @@
       value compared to
       <strong
         >best value of
-        <SensorValue {sensor} value={d.best ? d.best.value : null} medium /></strong
+        <SensorValue {sensor} value={d.best ? d.best.refValue : null} medium /></strong
       >
       on
       <strong>{formatDateYearWeekdayAbbr(d.bestDate, true)}</strong>.
@@ -125,13 +125,13 @@
       <strong>{sensor.value.name}</strong>
       was
       <strong>
-        <TrendText trend={d.worstTrend} />
+        <TrendText trend={d.worst} />
       </strong>
       compared to the
       <strong
         >{WINDOW_SIZE}
         month worst value of
-        <SensorValue {sensor} value={d.worst ? d.worst.value : null} medium /></strong
+        <SensorValue {sensor} value={d.worst ? d.worst.refValue : null} medium /></strong
       >
       on
       <strong>{formatDateYearWeekdayAbbr(d.worstDate, true)}</strong>.

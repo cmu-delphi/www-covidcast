@@ -25,7 +25,7 @@
 
   $: highlightSensors = highlights.map((h) => ({
     sensor: new SensorParam(h),
-    trend: fetcher.fetchWindowTrend(h, region, date),
+    trend: fetcher.fetch1Sensor1Region1DateTrend(h, region, date),
   }));
 </script>
 
@@ -49,7 +49,7 @@
         {#await s.trend}
           <KPIValue value={null} loading />
         {:then d}
-          <KPIValue value={d && d.current ? d.current.value : null} digits={2} />
+          <KPIValue value={d ? d.value : null} digits={2} />
         {/await}
       </div>
       <div class="sub">

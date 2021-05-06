@@ -42,7 +42,7 @@
    */
   const fetcher = getContext('fetcher');
 
-  $: data = fetcher.fetchWindowTrend(sensor, region, date);
+  $: data = fetcher.fetch1Sensor1Region1DateTrend(sensor, region, date);
   $: highlighted = highlight != null && highlight.matches(sensor.value, region.value, date.value);
 
   $: selfHighlight = new WidgetHighlight(sensor.value, region.value, date.value);
@@ -77,7 +77,7 @@
             {#await data}
               <KPIValue value={null} />
             {:then d}
-              <KPIValue value={d && d.current ? d.current.value : null} />
+              <KPIValue value={d ? d.value : null} />
             {/await}
           </div>
           <div>

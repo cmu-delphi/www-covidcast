@@ -72,8 +72,8 @@
           const sensor = new SensorParam(s);
           return {
             sensor,
-            sparkLine: fetcher.fetchSparkLine(sensor, region, date),
-            trend: fetcher.fetchWindowTrend(sensor, region, date),
+            sparkLine: fetcher.fetch1Sensor1Region1DateSparkLine(sensor, region, date),
+            trend: fetcher.fetch1Sensor1Region1DateTrend(sensor, region, date),
             switchMode: () => {
               sensor.set(s, true);
               currentMode.set(modeByID.indicator);
@@ -97,11 +97,12 @@
           regionLevel: region.level,
           regionName: region.displayName,
           date: formatDateISO(date.value),
-          value: trend.current ? trend.current.value : '',
+          value: trend.value,
           trend: trend.trend,
           delta: trend.delta == null || Number.isNaN(trend.delta) ? '' : trend.delta,
+          change: trend.change == null || Number.isNaN(trend.change) ? '' : trend.change,
           refDate: formatDateISO(trend.refDate),
-          refValue: trend.ref ? trend.ref.value : '',
+          refValue: trend.refValue,
         };
       }),
     );
@@ -194,7 +195,7 @@
                 {#await entry.trend}
                   ?
                 {:then t}
-                  <SensorValue sensor={entry.sensor} value={t && t.current ? t.current.value : null} />
+                  <SensorValue sensor={entry.sensor} value={t ? t.value : null} />
                 {/await}
               </td>
               <td rowspan="2">
