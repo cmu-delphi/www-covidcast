@@ -60,3 +60,32 @@ export function getAvailableCounties(indicator: IndicatorStatus, date: Date): Pr
     },
   ).then((rows) => addNameInfos(rows).filter((d) => d.level === 'county')); // no mega-counties
 }
+
+export interface ProfileEntry {
+  time_value: number;
+  date_value: Date;
+  issue_date: Date;
+  lag: number;
+
+  /**
+   * completeness value to the given reference anchor lag
+   */
+  completeness: number;
+  /**
+   * relative change to the previous issue
+   */
+  relative_change: number;
+  value: number;
+}
+
+// export function loadBackFillProfile(
+//   indicator: IndicatorStatus,
+//   region: RegionInfo,
+//   window: TimeFrame,
+//   referenceAnchorLag = 60,
+// ): Promise<ProfileEntry[]> {
+//   if (indicator.source === 'jhu-csse') {
+//     return loadJHUProfile(region, window, referenceAnchorLag);
+//   }
+//   return Promise.resolve([]);
+// }
