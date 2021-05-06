@@ -25,24 +25,22 @@
     if (!date.value || !region.value) {
       return Promise.resolve(null);
     }
-    return Promise.all(sensorList.map((sensor) => fetcher.fetch1Sensor1Region1DateTrend(sensor, region, date))).then(
-      (trends) => {
-        const positive = [];
-        const negative = [];
-        const unknownOrNeutral = [];
-        trends.forEach((trend, i) => {
-          const sensor = sensorList[i];
-          if (trend.isBetter) {
-            positive.push(sensor);
-          } else if (trend.isWorse) {
-            negative.push(sensor);
-          } else {
-            unknownOrNeutral.push(sensor);
-          }
-        });
-        return { positive, negative, unknownOrNeutral };
-      },
-    );
+    return Promise.all(fetcher.fetchNSensors1Region1DateTrend(sensorList, region, date)).then((trends) => {
+      const positive = [];
+      const negative = [];
+      const unknownOrNeutral = [];
+      trends.forEach((trend, i) => {
+        const sensor = sensorList[i];
+        if (trend.isBetter) {
+          positive.push(sensor);
+        } else if (trend.isWorse) {
+          negative.push(sensor);
+        } else {
+          unknownOrNeutral.push(sensor);
+        }
+      });
+      return { positive, negative, unknownOrNeutral };
+    });
   }
 
   $: trendSummary = generateTrendSummary(date, region);

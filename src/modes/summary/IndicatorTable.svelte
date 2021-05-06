@@ -65,6 +65,9 @@
    * @param {import("../../stores/params").RegionParam} region
    */
   function loadData(region, date) {
+    const flatSensors = groupedSensorList.map((group) => group.sensors).flat();
+    const trends = fetcher.fetchNSensors1Region1DateTrend(flatSensors, region, date);
+    const sparkLines = fetcher.fetchNSensor1RegionNDates(flatSensors, region, date.sparkLineTimeFrame);
     return groupedSensorList.map((group) => {
       return {
         ...group,
@@ -72,8 +75,9 @@
           const sensor = new SensorParam(s);
           return {
             sensor,
-            sparkLine: fetcher.fetch1Sensor1Region1DateSparkLine(sensor, region, date),
-            trend: fetcher.fetch1Sensor1Region1DateTrend(sensor, region, date),
+            // same order ensured
+            sparkLine: sparkLines.shift(),
+            trend: trends.shift(),
             switchMode: () => {
               sensor.set(s, true);
               currentMode.set(modeByID.indicator);

@@ -3,7 +3,7 @@ import type { EpiDataRow } from '.';
 import type { Sensor } from '../stores/constants';
 import type { Region, TimeFrame } from '../stores/params';
 import { callCorrelationAPI, EpiDataCorrelationRow } from './api';
-import { GeoPair, groupBySource, SourceSignalPair } from './apimodel';
+import { GeoPair, SourceSignalPair } from './apimodel';
 import { toTimeValue } from './utils';
 
 export * from './correlationUtils';
@@ -22,16 +22,9 @@ export function fetchCorrelationSummaries(
   region: Region,
   window: TimeFrame,
 ): Promise<Map<string, CorrelationSummary>> {
-  const othersGrouped = groupBySource(others);
   return callCorrelationAPI(
     SourceSignalPair.from(reference),
-    othersGrouped.map(
-      (entry) =>
-        new SourceSignalPair(
-          entry.source,
-          entry.sensors.map((d) => d.signal),
-        ),
-    ),
+    SourceSignalPair.fromArray(others),
     GeoPair.from(region),
     window,
     undefined,
@@ -75,7 +68,7 @@ export function fetchSingleCorrelations(
     GeoPair.from(region),
     window,
     undefined,
-    ['lag', 'r2', 'intercept', 'slope', 'samples'],
+    { exclude: ['geo_type', 'geo_value', 'signal_signal', 'signal_source'] },
   );
 }
 

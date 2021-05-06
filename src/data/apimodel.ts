@@ -14,6 +14,22 @@ export class SourceSignalPair {
     return new SourceSignalPair(sensor.id, sensor.signal);
   }
 
+  static fromArray(sensors: readonly { id: string; signal: string }[]): SourceSignalPair | SourceSignalPair[] {
+    if (sensors.length === 0) {
+      return [];
+    }
+    if (sensors.length === 1) {
+      return SourceSignalPair.from(sensors[0]);
+    }
+    return groupBySource(sensors).map(
+      (s) =>
+        new SourceSignalPair(
+          s.source,
+          s.sensors.map((d) => d.signal),
+        ),
+    );
+  }
+
   toString(): string {
     return `${this.source}:${isArray(this.signals) ? this.signals.join(',') : this.signals}`;
   }
@@ -24,6 +40,16 @@ export class GeoPair {
 
   static from(region: Region): GeoPair {
     return new GeoPair(region.level, region.propertyId);
+  }
+
+  static fromArray(regions: readonly Region[]): GeoPair | GeoPair[] {
+    if (regions.length === 0) {
+      return [];
+    }
+    if (regions.length === 1) {
+      return GeoPair.from(regions[0]);
+    }
+    return groupByLevel(regions).map((s) => new GeoPair(s.level, s.regions));
   }
 
   toString(): string {

@@ -21,8 +21,9 @@
    */
   export let fetcher;
 
-  $: casesTrend = fetcher.fetch1Sensor1Region1DateTrend(CASES, region, date);
-  $: deathTrend = fetcher.fetch1Sensor1Region1DateTrend(DEATHS, region, date);
+  $: trends = fetcher.fetchNSensors1Region1DateTrend([CASES, DEATHS], region, date);
+  $: casesTrend = trends[0];
+  $: deathTrend = trends[1];
 </script>
 
 <IndicatorWarning sensor={CASES} {date} {region} />

@@ -202,22 +202,6 @@ export class DataFetcher {
     return r;
   }
 
-  fetch1Sensor1Region1DateSparkLine(
-    sensor: Sensor | SensorParam,
-    region: Region | RegionParam,
-    date: DateParam,
-  ): Promise<RegionEpiDataRow[]> {
-    const lSensor = SensorParam.unbox(sensor);
-    const lRegion = RegionParam.unbox(region);
-    const key = this.toWindowKey(lSensor, lRegion, date.sparkLineTimeFrame);
-    if (this.cache.has(key)) {
-      return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
-    }
-    const rows = this.fetch1Sensor1RegionNDates(lSensor, lRegion, date.sparkLineTimeFrame);
-    this.cache.set(key, rows);
-    return rows;
-  }
-
   fetch1Sensor1Region1DateTrend(
     sensor: Sensor | SensorParam,
     region: Region | RegionParam,
@@ -226,7 +210,7 @@ export class DataFetcher {
     const lSensor = SensorParam.unbox(sensor);
     const lRegion = RegionParam.unbox(region);
     const lDate = date;
-    const key = this.toDateKey(lSensor, lRegion, lDate, `${lDate.timeValue}:trend`);
+    const key = this.toDateKey(lSensor, lRegion, lDate, `trend`);
     if (this.cache.has(key)) {
       return this.cache.get(key) as Promise<SensorTrend>;
     }
@@ -235,11 +219,47 @@ export class DataFetcher {
       GeoPair.from(lRegion),
       lDate.value,
       lDate.windowTimeFrame,
+      { exclude: ['geo_type', 'geo_value', 'signal_signal', 'signal_source'] },
     ).then((rows) => {
-      return asSensorTrend(lDate.value, sensor.highValuesAre, rows?.[0]);
+      return asSensorTrend(lDate.value, lSensor.highValuesAre, rows?.[0], {
+        factor: lSensor.format === 'fraction' ? 100 : 1,
+      });
     });
     this.cache.set(key, trend);
     return trend;
+  }
+
+  fetchNSensors1Region1DateTrend(
+    sensors: readonly (Sensor | SensorParam)[],
+    region: Region | RegionParam,
+    date: DateParam,
+  ): Promise<SensorTrend>[] {
+    const lSensors = sensors.map((sensor) => SensorParam.unbox(sensor));
+    const lRegion = RegionParam.unbox(region);
+    const lDate = date;
+    const missingSensors = lSensors.filter(
+      (sensor) => !this.cache.has(this.toDateKey(sensor, lRegion, lDate, `trend`)),
+    );
+    if (missingSensors.length > 0) {
+      const trends = callTrendAPI(
+        SourceSignalPair.fromArray(missingSensors),
+        GeoPair.from(lRegion),
+        lDate.value,
+        lDate.windowTimeFrame,
+        { exclude: ['geo_type', 'geo_value'] },
+      );
+      for (const sensor of missingSensors) {
+        const trendData = trends.then((rows) => {
+          const row = rows.find((d) => d.signal_source === sensor.id && d.signal_signal === sensor.signal);
+          return asSensorTrend(lDate.value, sensor.highValuesAre, row, {
+            factor: sensor.format === 'fraction' ? 100 : 1,
+          });
+        });
+        this.cache.set(this.toDateKey(sensor, lRegion, lDate, `trend`), trendData);
+      }
+    }
+    // use cached version
+    return lSensors.map((sensor) => this.fetch1Sensor1Region1DateTrend(sensor, region, date));
   }
 
   fetch1Sensor1Region1DateDetails(

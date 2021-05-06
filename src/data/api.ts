@@ -52,7 +52,17 @@ export interface EpiDataJSONRow {
   issue: number;
 }
 
-function fetchImpl<T>(url: URL): Promise<T> {
+function isExclude<T>(v: unknown): v is { exclude: readonly T[] } {
+  return v != null && Array.isArray((v as { exclude: readonly T[] }).exclude);
+}
+
+function fetchImpl<T>(url: URL, fields?: readonly string[] | { exclude: readonly string[] }): Promise<T> {
+  if (Array.isArray(fields)) {
+    url.searchParams.set('fields', fields.join(','));
+  } else if (isExclude(fields)) {
+    url.searchParams.set('fields', fields.exclude.map((d) => `-${d}`).join(','));
+  }
+
   const urlGetS = url.toString();
   if (urlGetS.length < 4096) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -68,22 +78,21 @@ function fetchImpl<T>(url: URL): Promise<T> {
   }).then((d) => d.json());
 }
 
+export type FieldSpec<T> = readonly (keyof T)[] | { exclude: readonly (keyof T)[] };
+
 export function callAPI(
   signal: SourceSignalPair | readonly SourceSignalPair[],
   geo: GeoPair | readonly GeoPair[],
   time: TimePair | readonly TimePair[],
-  fields?: readonly (keyof EpiDataJSONRow)[],
+  fields?: FieldSpec<EpiDataJSONRow>,
 ): Promise<EpiDataJSONRow[]> {
   const url = new URL(ENDPOINT + '/covidcast/');
   addParam(url, 'signal', signal);
   addParam(url, 'geo', geo);
   addParam(url, 'time', time);
 
-  if (fields) {
-    url.searchParams.set('fields', fields.join(','));
-  }
   url.searchParams.set('format', 'json');
-  return fetchImpl<EpiDataJSONRow[]>(url).catch((error) => {
+  return fetchImpl<EpiDataJSONRow[]>(url, fields).catch((error) => {
     console.warn('failed fetching data', error);
     return [];
   });
@@ -93,18 +102,14 @@ export function callTreeAPI(
   signal: SourceSignalPair | readonly SourceSignalPair[],
   geo: GeoPair | readonly GeoPair[],
   time: TimePair | readonly TimePair[],
-  fields?: readonly (keyof EpiDataJSONRow)[],
+  fields?: FieldSpec<EpiDataJSONRow>,
 ): Promise<EpiDataTreeResponse<EpiDataJSONRow>> {
   const url = new URL(ENDPOINT + '/covidcast/');
   addParam(url, 'signal', signal);
   addParam(url, 'geo', geo);
   addParam(url, 'time', time);
-
-  if (fields) {
-    url.searchParams.set('fields', fields.join(','));
-  }
   url.searchParams.set('format', 'tree');
-  return fetchImpl(url);
+  return fetchImpl(url, fields);
 }
 
 export interface EpiDataTrendRow {
@@ -134,7 +139,7 @@ export function callTrendAPI(
   geo: GeoPair | readonly GeoPair[],
   date: Date,
   window: TimeFrame,
-  fields?: readonly (keyof EpiDataTrendRow)[],
+  fields?: FieldSpec<EpiDataTrendRow>,
 ): Promise<EpiDataTrendRow[]> {
   const url = new URL(ENDPOINT + '/covidcast/trend');
   addParam(url, 'signal', signal);
@@ -142,11 +147,8 @@ export function callTrendAPI(
   url.searchParams.set('date', formatAPITime(date));
   url.searchParams.set('window', window.range);
 
-  if (fields) {
-    url.searchParams.set('fields', fields.join(','));
-  }
   url.searchParams.set('format', 'json');
-  return fetchImpl<EpiDataTrendRow[]>(url).catch((error) => {
+  return fetchImpl<EpiDataTrendRow[]>(url, fields).catch((error) => {
     console.warn('failed fetching data', error);
     return [];
   });
@@ -183,7 +185,7 @@ export function callCorrelationAPI(
   geo: GeoPair | readonly GeoPair[],
   window: TimeFrame,
   lag?: number,
-  fields?: readonly (keyof EpiDataCorrelationRow)[],
+  fields?: FieldSpec<EpiDataCorrelationRow>,
 ): Promise<EpiDataCorrelationRow[]> {
   const url = new URL(ENDPOINT + '/covidcast/correlation');
   url.searchParams.set('reference', reference.toString());
@@ -193,11 +195,8 @@ export function callCorrelationAPI(
   if (lag != null) {
     url.searchParams.set('lag', lag.toString());
   }
-  if (fields) {
-    url.searchParams.set('fields', fields.join(','));
-  }
   url.searchParams.set('format', 'json');
-  return fetchImpl<EpiDataCorrelationRow[]>(url).catch((error) => {
+  return fetchImpl<EpiDataCorrelationRow[]>(url, fields).catch((error) => {
     console.warn('failed fetching data', error);
     return [];
   });
@@ -223,7 +222,7 @@ export function callBackfillAPI(
   time: TimePair,
   geo: GeoPair,
   anchorLag?: number,
-  fields?: readonly (keyof EpiDataBackfillRow)[],
+  fields?: FieldSpec<EpiDataBackfillRow>,
 ): Promise<EpiDataBackfillRow[]> {
   const url = new URL(ENDPOINT + '/covidcast/backfill');
   url.searchParams.set('signal', signal.toString());
@@ -233,11 +232,8 @@ export function callBackfillAPI(
   if (anchorLag != null) {
     url.searchParams.set('anchor_lag', anchorLag.toString());
   }
-  if (fields) {
-    url.searchParams.set('fields', fields.join(','));
-  }
   url.searchParams.set('format', 'json');
-  return fetchImpl<EpiDataBackfillRow[]>(url).catch((error) => {
+  return fetchImpl<EpiDataBackfillRow[]>(url, fields).catch((error) => {
     console.warn('failed fetching data', error);
     return [];
   });

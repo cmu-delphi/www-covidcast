@@ -101,7 +101,22 @@ function asSensorDateTrend(
   };
 }
 
-export function asSensorTrend(date: Date, highValuesAre: Sensor['highValuesAre'], row?: EpiDataTrendRow): SensorTrend {
+function scaled(value: number | undefined, factor = 1) {
+  if (factor === 1) {
+    return value;
+  }
+  if (value == null) {
+    return value;
+  }
+  return value * factor;
+}
+
+export function asSensorTrend(
+  date: Date,
+  highValuesAre: Sensor['highValuesAre'],
+  row?: EpiDataTrendRow,
+  { factor = 1 } = {},
+): SensorTrend {
   let t: SensorTrend = {
     ...UNKNOWN_TREND,
     date,
@@ -109,17 +124,24 @@ export function asSensorTrend(date: Date, highValuesAre: Sensor['highValuesAre']
   if (!row) {
     return t;
   }
-  t.value = row.value;
+  t.value = scaled(row.value, factor);
 
   if (row.basis_date != null) {
-    t = asSensorDateTrend(date, row.value, row.basis_date, row.basis_value, row.basis_trend, highValuesAre);
+    t = asSensorDateTrend(
+      date,
+      t.value,
+      row.basis_date,
+      scaled(row.basis_value, factor),
+      row.basis_trend,
+      highValuesAre,
+    );
   }
   if (row.max_date != null) {
-    t.max = asSensorDateTrend(date, row.value, row.max_date, row.max_value, row.max_trend, highValuesAre);
+    t.max = asSensorDateTrend(date, t.value, row.max_date, scaled(row.max_value, factor), row.max_trend, highValuesAre);
     t.maxDate = t.max.refDate;
   }
   if (row.min_date != null) {
-    t.min = asSensorDateTrend(date, row.value, row.min_date, row.min_value, row.min_trend, highValuesAre);
+    t.min = asSensorDateTrend(date, t.value, row.min_date, scaled(row.min_value, factor), row.min_trend, highValuesAre);
     t.minDate = t.min.refDate;
   }
   t.best = highValuesAre === 'good' ? t.max : t.min;
