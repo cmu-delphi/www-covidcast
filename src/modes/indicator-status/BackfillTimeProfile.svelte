@@ -26,10 +26,7 @@
 
   $: data = loadBackFillProfile(indicator, region, window, referenceAnchorLag);
 
-  function generateSpec(indicator) {
-    const cont = (v) => `(datum.value_completeness >= 0.${v} && datum.prevCompleteness < 0.${v}) ? 'p${v}'`;
-    const completenessClassifier = `${cont(90)} : (${cont(75)} : (${cont(50)} : (${cont(25)} : null)))`;
-
+  function generateIssueSpec(indicator) {
     /**
      * @type {import('vega-lite').TopLevelSpec}
      */
@@ -45,42 +42,14 @@
       data: { name: 'values' },
       config: commonConfig,
       title: {
-        text: `${indicator.name} Backfill Profile`,
+        text: `${indicator.name} Backfill Issue Profile`,
       },
       padding: {
         left: 50,
-        top: 100,
+        top: 30,
         right: 100,
-        bottom: 70,
+        bottom: 40,
       },
-      transform: [
-        {
-          window: [
-            {
-              op: 'lag',
-              field: 'value_completeness',
-              param: 1,
-              as: 'prevCompleteness',
-            },
-          ],
-          groupby: ['time_value'],
-          sort: [
-            {
-              field: 'lag',
-              order: 'ascending',
-            },
-          ],
-        },
-        {
-          calculate: 'datum.prevCompleteness != null ? datum.prevCompleteness : 0',
-          as: 'prevCompleteness',
-        },
-        {
-          calculate: completenessClassifier,
-          as: 'completed',
-        },
-      ],
-
       layer: [
         {
           mark: {
@@ -95,6 +64,7 @@
             tooltip: {
               content: 'data',
             },
+            opacity: 0.5,
           },
           encoding: {
             color: {
@@ -107,7 +77,7 @@
                 scheme: 'viridis',
               },
               legend: {
-                title: 'Completness',
+                title: 'Completeness',
                 titleAlign: 'left',
                 titleOrient: 'left',
                 // gradientLength: 00,
@@ -118,7 +88,7 @@
       ],
       encoding: {
         x: {
-          field: 'date_value',
+          field: 'issue_date',
           type: 'temporal',
           axis: {
             format: '%m/%d',
@@ -132,7 +102,7 @@
             //   condition: { test: { field: 'value', timeUnit: 'month', equal: 1 }, value: 3 },
             //   value: 1,
             // },
-            title: 'Reported Date',
+            title: 'Issue Date',
           },
         },
         y: {
@@ -150,12 +120,77 @@
     return spec;
   }
 
-  $: spec = generateSpec(indicator);
+  function generateReporteDateSpec(indicator) {
+    const spec = generateIssueSpec(indicator);
+    spec.title.text = `${indicator.name} Backfill Profile`;
+    const cont = (v) => `(datum.value_completeness >= 0.${v} && datum.prevCompleteness < 0.${v}) ? 'p${v}'`;
+    const completenessClassifier = `${cont(90)} : (${cont(75)} : (${cont(50)} : (${cont(25)} : null)))`;
+
+    spec.transform = [
+      {
+        window: [
+          {
+            op: 'lag',
+            field: 'value_completeness',
+            param: 1,
+            as: 'prevCompleteness',
+          },
+        ],
+        groupby: ['time_value'],
+        sort: [
+          {
+            field: 'lag',
+            order: 'ascending',
+          },
+        ],
+      },
+      {
+        calculate: 'datum.prevCompleteness != null ? datum.prevCompleteness : 0',
+        as: 'prevCompleteness',
+      },
+      {
+        calculate: completenessClassifier,
+        as: 'completed',
+      },
+    ];
+
+    spec.layer.push({
+      transform: [
+        {
+          filter: `datum.completed == 'p90'`,
+        },
+      ],
+      mark: {
+        type: 'line',
+        stroke: 'red',
+      },
+    });
+
+    spec.encoding.x.field = 'date_value';
+    spec.encoding.x.axis.title = 'Reported Date';
+
+    return spec;
+  }
+
+  $: spec = generateReporteDateSpec(indicator);
+  $: spec2 = generateIssueSpec(indicator);
 
   let vegaRef = undefined;
+  let vegaRef2 = undefined;
 </script>
 
 <div class="chart-300">
   <Vega bind:this={vegaRef} {spec} {data} className="chart-breakout" />
-  <DownloadMenu {vegaRef} absolutePos fileName="{indicator.name}_Backfill_profile" advanced={false} />
+  <DownloadMenu {vegaRef} {data} absolutePos fileName="{indicator.name}_Backfill_profile" advanced={false} />
+</div>
+
+<div class="chart-300">
+  <Vega bind:this={vegaRef2} spec={spec2} {data} className="chart-breakout" />
+  <DownloadMenu
+    vegaRef={vegaRef2}
+    {data}
+    absolutePos
+    fileName="{indicator.name}_Backfill_date_profile"
+    advanced={false}
+  />
 </div>
