@@ -27,7 +27,7 @@
   $: data = loadBackFillProfile(indicator, region, window, referenceAnchorLag);
 
   function generateSpec(indicator) {
-    const cont = (v) => `(datum.completeness >= 0.${v} && datum.prevCompleteness < 0.${v}) ? 'p${v}'`;
+    const cont = (v) => `(datum.value_completeness >= 0.${v} && datum.prevCompleteness < 0.${v}) ? 'p${v}'`;
     const completenessClassifier = `${cont(90)} : (${cont(75)} : (${cont(50)} : (${cont(25)} : null)))`;
 
     /**
@@ -58,7 +58,7 @@
           window: [
             {
               op: 'lag',
-              field: 'completeness',
+              field: 'value_completeness',
               param: 1,
               as: 'prevCompleteness',
             },
@@ -98,13 +98,18 @@
           },
           encoding: {
             color: {
-              field: 'completeness',
+              field: 'value_completeness',
               type: 'quantitative',
               scale: {
+                domain: [0, 1],
+                clamp: true,
                 nice: false,
                 scheme: 'viridis',
               },
               legend: {
+                title: 'Completness',
+                titleAlign: 'left',
+                titleOrient: 'left',
                 // gradientLength: 00,
               },
             },

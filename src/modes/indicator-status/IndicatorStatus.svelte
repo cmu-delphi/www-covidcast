@@ -7,7 +7,9 @@
   import KPIValue from '../../components/KPIValue.svelte';
   // import IndicatorCoverageChart from './IndicatorCoverageChart.svelte';
   import BackfillTimeProfile from './BackfillTimeProfile.svelte';
-  import { nationInfo } from '../../data/regions';
+  import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
+  import { currentRegionInfo, selectByInfo } from '../../stores';
+  import Search from '../../components/Search.svelte';
 
   /**
    * @type {import('../../data/indicatorInfo').IndicatorStatus}
@@ -74,8 +76,25 @@
   <IndicatorCountyMap {signal} date={pickedDate} {data} />
 </div> -->
 <div class="grid-3-11">
+  <hr />
   <FancyHeader invert sub="Backfill Profile">{signal ? signal.name : '?'}</FancyHeader>
+  <Search
+    modern
+    placeholder="Select a region"
+    items={[nationInfo, ...stateInfo, ...countyInfo]}
+    title="Region"
+    icon="location"
+    selectedItem={$currentRegionInfo || nationInfo}
+    labelFieldName="displayName"
+    maxItemsToShowInList="5"
+    on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)}
+  />
 </div>
 <div class="grid-2-12">
-  <BackfillTimeProfile indicator={signal} date={pickedDate} region={nationInfo} referenceAnchorLag={60} />
+  <BackfillTimeProfile
+    indicator={signal}
+    date={pickedDate}
+    region={$currentRegionInfo || nationInfo}
+    referenceAnchorLag={60}
+  />
 </div>

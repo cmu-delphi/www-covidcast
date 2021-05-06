@@ -1,12 +1,15 @@
 // Indicator Info: aka The Signal Dashboard API
 
 import { parseAPITime } from './utils';
-import { callSignalDashboardStatusAPI } from './api';
+import { callBackfillAPI, callSignalDashboardStatusAPI, EpiDataBackfillRow } from './api';
 import type { EpiDataRow } from './fetchData';
 import { addNameInfos } from './fetchData';
 import { countyInfo } from './regions';
 import type { RegionInfo } from './regions';
 import fetchTriple from './fetchTriple';
+import type { TimeFrame } from './TimeFrame';
+import { GeoPair, SourceSignalPair, TimePair } from './apimodel';
+import { timeDay } from 'd3-time';
 
 export interface Coverage {
   date: Date;
@@ -61,31 +64,36 @@ export function getAvailableCounties(indicator: IndicatorStatus, date: Date): Pr
   ).then((rows) => addNameInfos(rows).filter((d) => d.level === 'county')); // no mega-counties
 }
 
-export interface ProfileEntry {
-  time_value: number;
+export interface ProfileEntry extends EpiDataBackfillRow {
   date_value: Date;
   issue_date: Date;
   lag: number;
-
-  /**
-   * completeness value to the given reference anchor lag
-   */
-  completeness: number;
-  /**
-   * relative change to the previous issue
-   */
-  relative_change: number;
-  value: number;
 }
 
-// export function loadBackFillProfile(
-//   indicator: IndicatorStatus,
-//   region: RegionInfo,
-//   window: TimeFrame,
-//   referenceAnchorLag = 60,
-// ): Promise<ProfileEntry[]> {
-//   if (indicator.source === 'jhu-csse') {
-//     return loadJHUProfile(region, window, referenceAnchorLag);
-//   }
-//   return Promise.resolve([]);
-// }
+export function loadBackFillProfile(
+  indicator: IndicatorStatus,
+  region: RegionInfo,
+  window: TimeFrame,
+  referenceAnchorLag = 60,
+): Promise<ProfileEntry[]> {
+  return callBackfillAPI(
+    SourceSignalPair.from({
+      id: indicator.source,
+      signal: indicator.covidcast_signal,
+    }),
+    new TimePair('day', window),
+    GeoPair.from(region),
+    referenceAnchorLag,
+  ).then((rows) => {
+    return rows.map((row) => {
+      const date = parseAPITime(row.time_value);
+      const issue = parseAPITime(row.issue);
+      return {
+        ...row,
+        date_value: date,
+        issue_date: issue,
+        lag: timeDay.count(date, issue),
+      };
+    });
+  });
+}
