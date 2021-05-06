@@ -37,7 +37,7 @@ function toGeoPair(
   return grouped.map((group) => new GeoPair(group.level, group.regions));
 }
 
-function toSourceSignalPair<S extends { id: string; signal: string; format: Sensor['format'] }>(
+function toSourceSignalPair<S extends { id: string; signal: string; valueScaleFactor?: number }>(
   transfer: (keyof EpiDataJSONRow)[],
   mixinValues: Partial<EpiDataRow>,
   sensor: S | readonly S[],
@@ -46,7 +46,7 @@ function toSourceSignalPair<S extends { id: string; signal: string; format: Sens
     mixinValues.source = sensor.id;
     mixinValues.signal = sensor.signal;
     return {
-      factor: sensor.format === 'fraction' ? 100 : 1,
+      factor: sensor.valueScaleFactor ?? 1,
       sourceSignalPairs: SourceSignalPair.from(sensor),
     };
   }
@@ -54,13 +54,12 @@ function toSourceSignalPair<S extends { id: string; signal: string; format: Sens
 
   let factor: number | ((row: EpiDataRow) => number);
 
-  if (sensor.every((d) => d.format === 'fraction')) {
-    factor = 100;
-  } else if (sensor.every((d) => d.format !== 'fraction')) {
-    factor = 1;
+  const valueScaleFactors = [...new Set(sensor.map((s) => s.valueScaleFactor ?? 1))];
+  if (valueScaleFactors.length === 1) {
+    factor = valueScaleFactors[0];
   } else {
     factor = (row: EpiDataRow) =>
-      sensor.find((s) => s.id === row.source && s.signal == row.signal)?.format === 'fraction' ? 100 : 0;
+      sensor.find((s) => s.id === row.source && s.signal == row.signal)?.valueScaleFactor ?? 1;
   }
   if (grouped.length === 1) {
     mixinValues.source = grouped[0].source;

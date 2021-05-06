@@ -222,7 +222,7 @@ export class DataFetcher {
       { exclude: ['geo_type', 'geo_value', 'signal_signal', 'signal_source'] },
     ).then((rows) => {
       return asSensorTrend(lDate.value, lSensor.highValuesAre, rows?.[0], {
-        factor: lSensor.format === 'fraction' ? 100 : 1,
+        factor: lSensor.valueScaleFactor,
       });
     });
     this.cache.set(key, trend);
@@ -252,7 +252,7 @@ export class DataFetcher {
         const trendData = trends.then((rows) => {
           const row = rows.find((d) => d.signal_source === sensor.id && d.signal_signal === sensor.signal);
           return asSensorTrend(lDate.value, sensor.highValuesAre, row, {
-            factor: sensor.format === 'fraction' ? 100 : 1,
+            factor: sensor.valueScaleFactor,
           });
         });
         this.cache.set(this.toDateKey(sensor, lRegion, lDate, `trend`), trendData);
@@ -288,7 +288,7 @@ export class DataFetcher {
               d.geo_type === fixLevel(region.level) && d.geo_value.toLowerCase() === region.propertyId.toLowerCase(),
           );
           return asSensorTrend(lDate.value, lSensor.highValuesAre, row, {
-            factor: lSensor.format === 'fraction' ? 100 : 1,
+            factor: lSensor.valueScaleFactor,
           });
         });
         this.cache.set(this.toDateKey(lSensor, region, lDate, `trend`), trendData);
@@ -315,7 +315,7 @@ export class DataFetcher {
     }).then((trends) => {
       return trends.map((row) =>
         asSensorTrend(parseAPITime(row.date), lSensor.highValuesAre, row, {
-          factor: lSensor.format === 'fraction' ? 100 : 1,
+          factor: lSensor.valueScaleFactor,
         }),
       );
     });
@@ -518,7 +518,6 @@ export class SensorParam {
   readonly isCasesOrDeath: boolean;
   readonly dataSourceName: string;
 
-  readonly factor: number;
   readonly isPercentage: boolean;
   readonly isPer100K: boolean;
   readonly highValuesAre: Sensor['highValuesAre'];
@@ -543,8 +542,6 @@ export class SensorParam {
     this.rawValue = sensor.rawSensor;
     this.isCasesOrDeath = (sensor as SensorEntry).isCasesOrDeath || false;
     this.dataSourceName = sensor.dataSourceName;
-    // fractions as percentages here
-    this.factor = sensor.format === 'fraction' ? 100 : 1;
     this.isPercentage = sensor.format == 'percent' || sensor.format === 'fraction';
     this.isPer100K = sensor.format === 'per100k';
     this.highValuesAre = sensor.highValuesAre;
@@ -575,7 +572,7 @@ export class SensorParam {
 
   domain(stats: Map<string, IStatsInfo>, level: RegionLevel): [number, number] {
     const domain = determineMinMax(stats, this.value, level, {}, false);
-    const scaled: [number, number] = [domain[0] * this.factor, domain[1] * this.factor];
+    const scaled: [number, number] = [domain[0] * this.value.valueScaleFactor, domain[1] * this.value.valueScaleFactor];
     if (this.isPercentage) {
       scaled[0] = Math.max(0, scaled[0]);
       scaled[1] = Math.min(100, scaled[1]);
