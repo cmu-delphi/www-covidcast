@@ -119,6 +119,7 @@ export interface EpiDataTrendRow {
   signal_source: string;
   signal_signal: string;
 
+  date: number;
   value?: number;
 
   basis_date?: number;
@@ -145,6 +146,28 @@ export function callTrendAPI(
   addParam(url, 'signal', signal);
   addParam(url, 'geo', geo);
   url.searchParams.set('date', formatAPITime(date));
+  url.searchParams.set('window', window.range);
+
+  url.searchParams.set('format', 'json');
+  return fetchImpl<EpiDataTrendRow[]>(url, fields).catch((error) => {
+    console.warn('failed fetching data', error);
+    return [];
+  });
+}
+
+export function callTrendSeriesAPI(
+  signal: SourceSignalPair | readonly SourceSignalPair[],
+  geo: GeoPair | readonly GeoPair[],
+  window: TimeFrame,
+  basis?: number,
+  fields?: FieldSpec<EpiDataTrendRow>,
+): Promise<EpiDataTrendRow[]> {
+  const url = new URL(ENDPOINT + '/covidcast/trend');
+  addParam(url, 'signal', signal);
+  addParam(url, 'geo', geo);
+  if (basis != null) {
+    url.searchParams.set('basis', basis.toString());
+  }
   url.searchParams.set('window', window.range);
 
   url.searchParams.set('format', 'json');

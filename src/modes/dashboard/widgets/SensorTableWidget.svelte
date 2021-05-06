@@ -2,7 +2,6 @@
   import { getContext } from 'svelte';
   import { formatDateISO } from '../../../formats';
   import { sensorList } from '../../../stores';
-  import { determineTrend } from '../../../stores/trend';
   import ATableWidget, { DEFAULT_STATE, toRow } from './ATableWidget.svelte';
 
   export let id = undefined;
@@ -37,15 +36,12 @@
     if (!region.value || !date.value) {
       return Promise.resolve([]);
     }
-    return Promise.all(fetcher.fetchNSensor1RegionNDates(sensorList, region, date.windowTimeFrame)).then(
-      (sensorRows) => {
-        return sensorList.map((sensor, i) => {
-          const rows = sensorRows[i];
-          const trend = determineTrend(date.value, rows, sensor.highValuesAre);
-          return toRow(sensor.key, sensor.name, sensor, region.value, date.value, trend);
-        });
-      },
-    );
+    return Promise.all(fetcher.fetchNSensors1Region1DateTrend(sensorList, region, date)).then((trends) => {
+      return sensorList.map((sensor, i) => {
+        const trend = trends[i];
+        return toRow(sensor.key, sensor.name, sensor, region.value, date.value, trend);
+      });
+    });
   }
 
   $: loadedRows = loadData(region, date);

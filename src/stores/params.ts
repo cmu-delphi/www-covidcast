@@ -14,7 +14,7 @@ import fetchTriple from '../data/fetchTriple';
 import { toTimeValue } from '../data/utils';
 import { SensorTrend, asSensorTrend } from '../data/trend';
 import { fixLevel, GeoPair, SourceSignalPair } from '../data/apimodel';
-import { callTrendAPI } from '../data/api';
+import { callTrendAPI, callTrendSeriesAPI } from '../data/api';
 
 export { TimeFrame } from '../data/TimeFrame';
 
@@ -31,7 +31,7 @@ export interface RegionEpiDataRow extends EpiDataRow, Region {}
 export class DataFetcher {
   private readonly cache = new Map<
     string,
-    Promise<RegionEpiDataRow[]> | Promise<EpiDataRow & RegionInfo> | Promise<SensorTrend>
+    Promise<RegionEpiDataRow[]> | Promise<EpiDataRow & RegionInfo> | Promise<SensorTrend> | Promise<SensorTrend[]>
   >();
   private primarySensorKey = '';
   private primaryRegionId = '';
@@ -296,6 +296,31 @@ export class DataFetcher {
     }
     // use cached version
     return lRegions.map((region) => this.fetch1Sensor1Region1DateTrend(lSensor, region, date));
+  }
+
+  fetch1Sensor1RegionNDatesTrend(
+    sensor: Sensor | SensorParam,
+    region: Region | RegionParam,
+    timeFrame: TimeFrame,
+  ): Promise<SensorTrend[]> {
+    const lSensor = SensorParam.unbox(sensor);
+    const lRegion = RegionParam.unbox(region);
+    const key = this.toWindowKey(lSensor, lRegion, timeFrame, 'trends');
+    if (this.cache.has(key)) {
+      return this.cache.get(key) as Promise<SensorTrend[]>;
+    }
+
+    const trends = callTrendSeriesAPI(SourceSignalPair.from(lSensor), GeoPair.from(lRegion), timeFrame, undefined, {
+      exclude: ['signal_signal', 'signal_source', 'geo_type', 'geo_value'],
+    }).then((trends) => {
+      return trends.map((row) =>
+        asSensorTrend(parseAPITime(row.date), lSensor.highValuesAre, row, {
+          factor: lSensor.format === 'fraction' ? 100 : 1,
+        }),
+      );
+    });
+    this.cache.set(key, trends);
+    return trends;
   }
 
   fetch1Sensor1RegionSparkline(

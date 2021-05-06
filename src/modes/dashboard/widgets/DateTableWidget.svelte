@@ -1,7 +1,6 @@
 <script>
   import { getContext } from 'svelte';
   import { formatDateISO } from '../../../formats';
-  import { determineTrends } from '../../../stores/trend';
   import ATableWidget, { DEFAULT_STATE, toRow } from './ATableWidget.svelte';
 
   export let id = undefined;
@@ -41,10 +40,9 @@
     if (!sensor.value || !region.value || !timeFrame) {
       return Promise.resolve([]);
     }
-    return fetcher.fetch1Sensor1RegionNDates(sensor, region, timeFrame).then((rows) => {
-      const trends = determineTrends(rows, sensor.highValuesAre);
+    return fetcher.fetch1Sensor1RegionNDatesTrend(sensor, region, timeFrame).then((trends) => {
       return trends.map((trend, i) => {
-        return toRow(i, formatDateISO(trend.currentDate), sensor.value, region.value, trend.currentDate, trend);
+        return toRow(i, formatDateISO(trend.date), sensor.value, region.value, trend.date, trend);
       });
     });
   }

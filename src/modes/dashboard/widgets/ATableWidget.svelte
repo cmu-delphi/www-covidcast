@@ -12,7 +12,7 @@
 
       delta: trend.delta,
       change: trend.change,
-      value: trend.current ? trend.current.value : null,
+      value: trend.value,
     };
   }
 
@@ -123,11 +123,11 @@
       regionLevel: row.region.level,
       regionName: row.region.displayName,
       date: formatDateISO(row.date.value),
-      value: row.trendObj.current ? row.trendObj.current.value : '',
+      value: row.trendObj.value,
       trend: row.trendObj.trend,
       delta: row.trendObj.delta == null || Number.isNaN(row.trendObj.delta) ? '' : row.trendObj.delta,
       refDate: formatDateISO(row.trendObj.refDate),
-      refValue: row.trendObj.ref ? row.trendObj.ref.value : '',
+      refValue: row.trendObj.refValue,
     };
   }
 
