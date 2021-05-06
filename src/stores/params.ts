@@ -13,7 +13,7 @@ import { TimeFrame } from '../data/TimeFrame';
 import fetchTriple from '../data/fetchTriple';
 import { toTimeValue } from '../data/utils';
 import { SensorTrend, asSensorTrend } from '../data/trend';
-import { GeoPair, SourceSignalPair } from '../data/apimodel';
+import { fixLevel, GeoPair, SourceSignalPair } from '../data/apimodel';
 import { callTrendAPI } from '../data/api';
 
 export { TimeFrame } from '../data/TimeFrame';
@@ -260,6 +260,98 @@ export class DataFetcher {
     }
     // use cached version
     return lSensors.map((sensor) => this.fetch1Sensor1Region1DateTrend(sensor, region, date));
+  }
+
+  fetch1SensorNRegionsDateTrend(
+    sensor: Sensor | SensorParam,
+    regions: readonly (Region | RegionParam)[],
+    date: DateParam,
+  ): Promise<SensorTrend>[] {
+    const lSensor = SensorParam.unbox(sensor);
+    const lRegions = regions.map((region) => RegionParam.unbox(region));
+    const lDate = date;
+    const missingRegions = lRegions.filter(
+      (region) => !this.cache.has(this.toDateKey(lSensor, region, lDate, `trend`)),
+    );
+    if (missingRegions.length > 0) {
+      const trends = callTrendAPI(
+        SourceSignalPair.from(lSensor),
+        GeoPair.fromArray(missingRegions),
+        lDate.value,
+        lDate.windowTimeFrame,
+        { exclude: ['signal_signal', 'signal_source'] },
+      );
+      for (const region of missingRegions) {
+        const trendData = trends.then((rows) => {
+          const row = rows.find(
+            (d) =>
+              d.geo_type === fixLevel(region.level) && d.geo_value.toLowerCase() === region.propertyId.toLowerCase(),
+          );
+          return asSensorTrend(lDate.value, lSensor.highValuesAre, row, {
+            factor: lSensor.format === 'fraction' ? 100 : 1,
+          });
+        });
+        this.cache.set(this.toDateKey(lSensor, region, lDate, `trend`), trendData);
+      }
+    }
+    // use cached version
+    return lRegions.map((region) => this.fetch1Sensor1Region1DateTrend(lSensor, region, date));
+  }
+
+  fetch1Sensor1RegionSparkline(
+    sensor: Sensor | SensorParam,
+    region: Region | RegionParam,
+    date: DateParam,
+  ): Promise<RegionEpiDataRow[]> {
+    const lSensor = SensorParam.unbox(sensor);
+    const lRegion = RegionParam.unbox(region);
+    const key = this.toWindowKey(lSensor, lRegion, date.sparkLineTimeFrame);
+    if (this.cache.has(key)) {
+      return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
+    }
+    // load window since we gonna most likely need it anyhow
+    const r = this.fetch1Sensor1RegionNDates(sensor, region, date.windowTimeFrame).then((rows) =>
+      rows.filter((row) => date.sparkLineTimeFrame.filter(row)),
+    );
+    this.cache.set(key, r);
+    return r;
+  }
+
+  fetchNSensor1RegionSparklines(
+    sensors: readonly (Sensor | SensorParam)[],
+    region: Region | RegionParam,
+    date: DateParam,
+  ): Promise<RegionEpiDataRow[]>[] {
+    return this.fetchNSensor1RegionNDates(sensors, region, date.sparkLineTimeFrame);
+  }
+
+  fetch1SensorNRegionsSparklines(
+    sensor: Sensor | SensorParam,
+    regions: readonly (Region | RegionParam)[],
+    date: DateParam,
+  ): Promise<RegionEpiDataRow[]>[] {
+    if (regions.length === 0) {
+      return [];
+    }
+    const lSensor = SensorParam.unbox(sensor);
+    const lRegions = regions.map((region) => RegionParam.unbox(region));
+    const lDate = date;
+    const missingRegions = lRegions.filter(
+      (region) => !this.cache.has(this.toWindowKey(lSensor, region, lDate.sparkLineTimeFrame)),
+    );
+    if (missingRegions.length > 0) {
+      const lookup = fetchTriple(lSensor, missingRegions, lDate.sparkLineTimeFrame)
+        .then(addNameInfos)
+        .then(groupByRegion);
+      for (const region of missingRegions) {
+        const regionData = lookup.then((l) => {
+          return addMissing(l.get(region.propertyId) ?? [], lSensor);
+        });
+        this.cache.set(this.toWindowKey(lSensor, region, lDate.sparkLineTimeFrame), regionData);
+      }
+    }
+    // use cached version
+    return lRegions.map((region) => this.fetch1Sensor1RegionSparkline(lSensor, region, date));
   }
 
   fetch1Sensor1Region1DateDetails(

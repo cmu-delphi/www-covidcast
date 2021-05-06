@@ -67,7 +67,7 @@
   function loadData(region, date) {
     const flatSensors = groupedSensorList.map((group) => group.sensors).flat();
     const trends = fetcher.fetchNSensors1Region1DateTrend(flatSensors, region, date);
-    const sparkLines = fetcher.fetchNSensor1RegionNDates(flatSensors, region, date.sparkLineTimeFrame);
+    const sparkLines = fetcher.fetchNSensor1RegionSparklines(flatSensors, region, date);
     return groupedSensorList.map((group) => {
       return {
         ...group,

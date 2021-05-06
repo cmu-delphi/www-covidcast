@@ -1,5 +1,5 @@
 import type { Region } from '../stores/params';
-import type { RegionLevel } from './regions';
+import { hhsInfo, hrrInfo, RegionLevel, stateInfo } from './regions';
 import type { TimeFrame } from './TimeFrame';
 import { formatAPITime, parseAPITime } from './utils';
 
@@ -35,8 +35,31 @@ export class SourceSignalPair {
   }
 }
 
+function isAllRegions(level: RegionLevel, regions: readonly unknown[]) {
+  if (level === 'state' && regions.length === stateInfo.length) {
+    return true;
+  }
+  if (level === 'nation' && regions.length === 1) {
+    return true;
+  }
+  if (level === 'hhs' && regions.length === hhsInfo.length) {
+    return true;
+  }
+  if (level === 'hrr' && regions.length === hrrInfo.length) {
+    return true;
+  }
+  return false;
+}
+
 export class GeoPair {
-  constructor(public readonly level: RegionLevel, public readonly values: '*' | string | readonly string[]) {}
+  public readonly values: '*' | string | readonly string[];
+  constructor(public readonly level: RegionLevel, values: '*' | string | readonly string[]) {
+    if (isArray(values) && isAllRegions(level, values)) {
+      this.values = '*';
+    } else {
+      this.values = values;
+    }
+  }
 
   static from(region: Region): GeoPair {
     return new GeoPair(region.level, region.propertyId);

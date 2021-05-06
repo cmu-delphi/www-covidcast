@@ -54,7 +54,7 @@
       const counties = getCountiesOfState(region.value);
       const countyData = fetcher.fetch1SensorNRegions1Date(
         sensor,
-        [...counties.map((d) => d.id), getInfoByName(`${region.id}000`)],
+        [...counties, getInfoByName(`${region.id}000`)],
         date,
       );
       const stateData = fetcher.fetch1SensorNRegions1Date(sensor, 'state', date);

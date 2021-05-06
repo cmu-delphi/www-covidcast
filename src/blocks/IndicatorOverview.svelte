@@ -28,7 +28,7 @@
   export let fetcher;
 
   $: trend = fetcher.fetch1Sensor1Region1DateTrend(sensor, region, date);
-  $: sparkline = fetcher.fetch1Sensor1RegionNDates(sensor, region, date.sparkLineTimeFrame);
+  $: sparkline = fetcher.fetch1Sensor1RegionSparkline(sensor, region, date);
   $: spec = generateSparkLine({
     domain: date.sparkLineTimeFrame.domain,
     highlightDate: 'top',
