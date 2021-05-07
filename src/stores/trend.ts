@@ -27,8 +27,17 @@ export function findMinMaxRow(data: readonly EpiDataRow[]): { min: EpiDataRow | 
  * @param {Date} date
  * @param {import("../../data").EpiDataRow[]} data
  */
-export function findDateRow(date: Date, data: readonly EpiDataRow[]): EpiDataRow | undefined {
+export function findDateRow(date: Date, data: readonly EpiDataRow[], maxIndex = -1): EpiDataRow | undefined {
   const apiDate = toTimeValue(date);
+
+  if (maxIndex >= 0) {
+    for (let i = 0; i < Math.min(maxIndex, data.length); i++) {
+      if (data[i].time_value === apiDate) {
+        return data[i];
+      }
+    }
+    return undefined;
+  }
   return data.find((d) => d.time_value === apiDate);
 }
 
@@ -221,4 +230,33 @@ export function determineTrend(date: Date, data: readonly EpiDataRow[], highValu
     ...computeTrend(refRow, dateRow, min, highValuesAre),
     ref: refRow,
   };
+}
+
+export function determineTrends(data: readonly EpiDataRow[], highValuesAre: Sensor['highValuesAre']): TrendInfo[] {
+  const { min } = findMinMaxRow(data);
+
+  return data.map(
+    (dateRow, i): TrendInfo => {
+      const refDate = timeDay.offset(dateRow.date_value, -7);
+      const trend = {
+        ...UNKNOWN_TREND,
+        currentDate: dateRow.date_value,
+        current: dateRow,
+        refDate,
+      };
+
+      if (!min || dateRow.value == null) {
+        return trend;
+      }
+      const refRow = findDateRow(refDate, data, i);
+      if (!refRow) {
+        return trend;
+      }
+      return {
+        ...trend,
+        ...computeTrend(refRow, dateRow, min, highValuesAre),
+        ref: refRow,
+      };
+    },
+  );
 }

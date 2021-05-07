@@ -7,7 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { EnvironmentPlugin, DefinePlugin } = require('webpack');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const pkg = require('./package.json');
-const { preprocess } = require('./svelte.config');
+// const { preprocess } = require('./svelte.config');
 
 const devMode = process.env.NODE_ENV !== 'production';
 
@@ -106,7 +106,7 @@ module.exports = () => {
             {
               loader: 'svelte-loader',
               options: {
-                preprocess,
+                // preprocess,
                 compilerOptions: {
                   dev: devMode,
                 },
@@ -253,6 +253,11 @@ module.exports = () => {
         title: 'COVIDcast Data Anomalies',
         template: './src/index.html',
         filename: 'data-anomalies/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        title: 'COVIDcast Dashboard',
+        template: './src/index.html',
+        filename: 'dashboard/index.html',
       }),
       // new HtmlWebpackPlugin({
       //   title: 'COVIDcast Lab',

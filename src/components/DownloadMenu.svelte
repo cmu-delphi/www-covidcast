@@ -34,7 +34,7 @@
   }
 
   function downloadSVG() {
-    if (!vegaRef) {
+    if (!vegaRef || !vegaRef.vegaAccessor) {
       return;
     }
     vegaRef
@@ -45,7 +45,7 @@
       });
   }
   function downloadPNG() {
-    if (!vegaRef) {
+    if (!vegaRef || !vegaRef.vegaAccessor) {
       return;
     }
     vegaRef
@@ -118,11 +118,17 @@
   }
 </script>
 
-{#if vegaRef || data}
-  <button class="uk-icon-button" class:absolutePos type="button" uk-icon="download" />
+{#if (vegaRef && vegaRef.vegaAccessor) || data}
+  <button
+    class="uk-icon-button"
+    class:absolutePos
+    type="button"
+    uk-icon="download"
+    style={typeof absolutePos === 'string' ? absolutePos : null}
+  />
   <div data-uk-dropdown="pos: bottom-right">
     <ul class="uk-nav uk-dropdown-nav">
-      {#if vegaRef}
+      {#if vegaRef && vegaRef.vegaAccessor}
         <li class="uk-nav-header">Download Chart</li>
         <li><a href="?" on:click|preventDefault={downloadSVG}>Save as SVG</a></li>
         <li><a href="?" on:click|preventDefault={downloadPNG}>Save as PNG</a></li>

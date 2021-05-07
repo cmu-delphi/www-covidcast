@@ -1,5 +1,5 @@
 <script>
-  import SortColumnIndicator from '../../components/Table/SortColumnIndicator.svelte';
+  import SortColumnIndicator, { SortHelper } from '../../components/SortColumnIndicator.svelte';
   import FancyHeader from '../../components/FancyHeader.svelte';
   import { formatDateISO, formatDateShortNumbers, formatFraction } from '../../formats';
   import DownloadMenu from '../../components/DownloadMenu.svelte';
@@ -7,7 +7,6 @@
   import { generateSparkLine } from '../../specs/lineSpec';
   import { createEventDispatcher } from 'svelte';
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
-  import { SortHelper } from '../../components/Table/tableUtils';
 
   const dispatch = createEventDispatcher();
   /**

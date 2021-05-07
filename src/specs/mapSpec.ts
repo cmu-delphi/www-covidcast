@@ -211,8 +211,16 @@ function genMegaHoverLayer(alsoOnCounties = false): NormalizedUnitSpec {
 function genLevelLayer({
   strokeWidth = 1,
   scheme = 'yellowgreenblue',
-  domain = undefined,
-}: { strokeWidth?: number; scheme?: string; domain?: [number, number] } = {}): NormalizedUnitSpec {
+  domain,
+  initialRegion,
+  interactiveHighlight = false,
+}: {
+  strokeWidth?: number;
+  scheme?: string;
+  domain?: [number, number];
+  initialRegion?: string;
+  interactiveHighlight?: boolean;
+} = {}): NormalizedUnitSpec {
   return {
     mark: {
       type: 'geoshape',
@@ -237,13 +245,14 @@ function genLevelLayer({
           // domainMax: 149,
           scheme,
           clamp: true,
+          nice: domain == null,
         },
         legend: {
           title: null,
           orient: 'none',
           direction: 'horizontal',
           fillColor: 'white',
-          padding: 5,
+          padding: interactiveHighlight ? 0 : 5,
           legendX: {
             expr: '(width / 2) - 10 - 140',
           },
@@ -267,6 +276,11 @@ function genLevelLayer({
           on: 'mouseover, click',
           fields: ['geo_value'],
         },
+        value: initialRegion
+          ? {
+              geo_value: Array.isArray(initialRegion) ? initialRegion : [initialRegion],
+            }
+          : null,
       },
     ],
   };
@@ -299,18 +313,110 @@ function genLevelHoverLayer({ strokeWidth = 3 } = {}): NormalizedUnitSpec | Norm
   };
 }
 
+function genLevelLegendLayer({ domain }: { domain?: [number, number] }): NormalizedUnitSpec | NormalizedLayerSpec {
+  return {
+    transform: [
+      {
+        filter: {
+          param: 'hover',
+          empty: false,
+        },
+      },
+    ],
+    encoding: {
+      x: {
+        field: 'value',
+        type: 'quantitative',
+        scale: {
+          domain: [0, 20],
+          clamp: true,
+          nice: domain == null,
+          range: [
+            {
+              expr: 'width / 2 - 140',
+            },
+            {
+              expr: 'width / 2 + 140',
+            },
+          ],
+        },
+        axis: null,
+      },
+      y: {
+        value: {
+          expr: `height + 8`,
+        },
+      },
+    },
+    layer: [
+      {
+        mark: {
+          type: 'point',
+          shape: 'triangle-down',
+          tooltip: false,
+          stroke: null,
+          size: 30,
+          fill: 'black',
+          // xOffset: {
+          //   expr: 'width / 2',
+          // },
+        },
+      },
+      {
+        mark: {
+          type: 'text',
+          tooltip: false,
+          baseline: 'bottom',
+          dy: -2,
+          // dx: {
+          //   expr: 'width / 2',
+          // },
+        },
+        encoding: {
+          text: {
+            field: 'value',
+            type: 'quantitative',
+            format: '.2f',
+            formatType: 'cachedNumber',
+          },
+        },
+      },
+    ],
+  };
+}
+
 function genBaseSpec(
   level: RegionLevel,
   topoJSON: Promise<unknown>,
-  { height = 300 },
+  {
+    height = 300,
+    title = undefined as string | string[] | undefined,
+    subTitle = undefined as string | undefined,
+    paddingTop = undefined as number | undefined,
+  },
 ): TopLevelSpec & LayerSpec<Field> {
+  let topOffset = 10;
+  if (title) {
+    topOffset += 22 * (Array.isArray(title) ? title.length : 1);
+  }
+  if (subTitle) {
+    topOffset += 10;
+  }
   return {
     ...BASE_SPEC,
     height,
+    title: title
+      ? {
+          text: title,
+          subtitle: subTitle,
+          align: 'left',
+          anchor: 'start',
+        }
+      : undefined,
     padding: {
       left: 10,
       bottom: 55,
-      top: 10,
+      top: paddingTop ?? topOffset,
       right: 10,
     },
     projection: {
@@ -344,47 +450,55 @@ function genBaseSpec(
 function countyJSON() {
   return import(/* webpackChunkName: 'shape-county' */ './shapefiles/county.json').then((r) => r.default);
 }
-// function hrrJSON() {
-//   return import(/* webpackChunkName: 'shape-hrr' */ './shapefiles/hrr.json').then((r) => r.default);
-// }
-// function hhsJSON() {
-//   return import(/* webpackChunkName: 'shape-hhs' */ './shapefiles/hhs.json').then((r) => r.default);
-// }
+function hrrJSON() {
+  return import(/* webpackChunkName: 'shape-hrr' */ './shapefiles/hrr.json').then((r) => r.default);
+}
+function hhsJSON() {
+  return import(/* webpackChunkName: 'shape-hhs' */ './shapefiles/hhs.json').then((r) => r.default);
+}
 function nationJSON() {
   return import(/* webpackChunkName: 'shape-nation' */ './shapefiles/nation.json').then((r) => r.default);
 }
 function stateJSON() {
   return import(/* webpackChunkName: 'shape-state' */ './shapefiles/state.json').then((r) => r.default);
 }
-// function msaJSON() {
-//   return import(/* webpackChunkName: 'shape-msa' */ './shapefiles/msa.json').then((r) => r.default);
-// }
-
-// export function generateHRRSpec(options = {}) {
-//   const level = 'hrr';
-//   const topoJSON = hrrJSON();
-//   const spec = genBaseSpec(level, topoJSON, options);
-//   spec.datasets.nation = nationJSON();
-//   spec.layer.push(genMissingLayer());
-
-//   spec.layer.push(genLevelLayer(options));
-//   spec.layer.push(genLevelHoverLayer());
-//   return spec;
-// }
+function msaJSON() {
+  return import(/* webpackChunkName: 'shape-msa' */ './shapefiles/msa.json').then((r) => r.default);
+}
 
 export type CommonParams = Parameters<typeof genBaseSpec>['2'] & Parameters<typeof genLevelLayer>['0'];
 
-// export function generateHHSSpec(options: CommonParams = {}): TopLevelSpec {
-//   const level = 'hhs';
-//   const topoJSON = hhhsJSON();
-//   const spec = genBaseSpec(level, topoJSON, options);
-//   spec.datasets.nation = nationJSON();
-//   spec.layer.push(genMissingLayer());
+function addCommonLayers(options: CommonParams, spec: TopLevelSpec & LayerSpec<Field>) {
+  spec.layer.push(genLevelHoverLayer());
+  if (options.interactiveHighlight) {
+    spec.layer.push(genLevelLegendLayer(options));
+  }
+  spec.layer.push(genCreditsLayer());
+}
 
-//   spec.layer.push(genLevelLayer(options));
-//   spec.layer.push(genLevelHoverLayer());
-//   return spec;
-// }
+export function generateHRRSpec(options: CommonParams = {}): TopLevelSpec {
+  const level = 'hrr';
+  const topoJSON = hrrJSON();
+  const spec = genBaseSpec(level, topoJSON, options);
+  spec.datasets!.nation = nationJSON();
+  spec.layer.push(genMissingLayer());
+
+  spec.layer.push(genLevelLayer(options));
+  addCommonLayers(options, spec);
+  return spec;
+}
+
+export function generateHHSSpec(options: CommonParams = {}): TopLevelSpec {
+  const level = 'hhs';
+  const topoJSON = hhsJSON();
+  const spec = genBaseSpec(level, topoJSON, options);
+  spec.datasets!.nation = nationJSON();
+  spec.layer.push(genMissingLayer());
+
+  spec.layer.push(genLevelLayer(options));
+  addCommonLayers(options, spec);
+  return spec;
+}
 
 export function generateStateSpec(options: CommonParams = {}): TopLevelSpec {
   const level = 'state';
@@ -396,24 +510,23 @@ export function generateStateSpec(options: CommonParams = {}): TopLevelSpec {
 
   // state, msa
   spec.layer.push(genLevelLayer(options));
-  spec.layer.push(genLevelHoverLayer());
-  spec.layer.push(genCreditsLayer());
+  addCommonLayers(options, spec);
   return spec;
 }
 
-// export function generateMSASpec(options = {}) {
-//   const level = 'msa';
-//   const topoJSON = msaJSON();
+export function generateMSASpec(options: CommonParams = {}): TopLevelSpec {
+  const level = 'msa';
+  const topoJSON = msaJSON();
 
-//   const spec = genBaseSpec(level, topoJSON, options);
-//   spec.datasets.nation = nationJSON();
-//   spec.layer.push(genMissingLayer());
+  const spec = genBaseSpec(level, topoJSON, options);
+  spec.datasets!.nation = nationJSON();
+  spec.layer.push(genMissingLayer());
 
-//   // state, msa
-//   spec.layer.push(genLevelLayer(options));
-//   spec.layer.push(genLevelHoverLayer());
-//   return spec;
-// }
+  // state, msa
+  spec.layer.push(genLevelLayer(options));
+  addCommonLayers(options, spec);
+  return spec;
+}
 
 export function generateNationSpec(options: CommonParams = {}): TopLevelSpec {
   const level = 'nation';
@@ -426,8 +539,7 @@ export function generateNationSpec(options: CommonParams = {}): TopLevelSpec {
   });
 
   spec.layer.push(genLevelLayer(options));
-  spec.layer.push(genLevelHoverLayer());
-  spec.layer.push(genCreditsLayer());
+  addCommonLayers(options, spec);
   return spec;
 }
 

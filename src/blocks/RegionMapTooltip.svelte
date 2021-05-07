@@ -17,7 +17,7 @@
 
   export let regionSetter = null;
 
-  $: state = item.level === 'state' ? item : getStateOfCounty(item);
+  $: state = item != null && (item.level === 'county' || item.level === 'mega-county') ? getStateOfCounty(item) : null;
 
   function changeRegion() {
     if (regionSetter) {
@@ -39,14 +39,18 @@
   on:mousedown|stopPropagation={() => undefined}
 >
   <h5>
-    {#if regionSetter && item.level !== levelMegaCounty.id}
+    {#if item && regionSetter && item.level !== levelMegaCounty.id}
       <a class="uk-link-muted" href="?region={item.propertyId}" on:click|preventDefault={changeRegion}>
         {item.displayName}
       </a>
-    {:else}{item.displayName}{/if}
+    {:else if item}
+      {item.displayName}
+    {:else}
+      N/A
+    {/if}
   </h5>
   <table>
-    {#if item.level !== 'state'}
+    {#if state}
       <tr>
         <th>State</th>
         <td>
