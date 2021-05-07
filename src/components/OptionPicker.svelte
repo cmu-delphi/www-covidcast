@@ -13,11 +13,13 @@
 
   export let className = '';
   export let style = undefined;
+
+  export let modern = false;
 </script>
 
 <div class="option-picker {className}" {style}>
   <span class="option-picker-label">{label}</span>
-  <select {name} class="option-picker-input" bind:value on:blur {required}>
+  <select {name} class="option-picker-input" class:modern bind:value on:blur {required}>
     <slot>
       {#each options as option}
         <option value={option.value}>{option.label}</option>
@@ -42,6 +44,12 @@
     line-height: 1rem;
     border-radius: 4px;
     color: inherit;
+  }
+
+  .option-picker-input.modern {
+    padding: 10px 0 10px 6px;
+    font-size: 0.75rem;
+    height: 50px;
   }
 
   .option-picker-input > :global(option) {

@@ -1,31 +1,28 @@
 import type { TopLevelSpec } from 'vega-lite';
-import type { IndicatorStatus, ProfileEntry } from '../../data/indicatorInfo';
+import type { ProfileEntry } from '../../data/indicatorInfo';
 import { BASE_SPEC } from '../../specs/commonSpec';
 
-export function generateHeatMapSpec(
-  indicator: IndicatorStatus,
-  {
-    valueField = 'value_completeness',
-    valueLabel = 'Completeness',
-    dateField = 'issue_date',
-    dateLabel = 'Issue Date',
-    title = `${indicator.name} Backfill Issue Profile`,
-  }: {
-    valueField?: keyof Pick<
-      ProfileEntry,
-      'sample_size_completeness' | 'sample_size_rel_change' | 'value_completeness' | 'value_rel_change'
-    >;
-    valueLabel?: string;
-    dateField?: keyof Pick<ProfileEntry, 'issue_date' | 'date_value'>;
-    dateLabel?: string;
-    title?: string;
-  },
-): TopLevelSpec {
+export interface BackfillOptions {
+  valueField: keyof Pick<
+    ProfileEntry,
+    'sample_size_completeness' | 'sample_size_rel_change' | 'value_completeness' | 'value_rel_change'
+  >;
+  valueLabel: string;
+  dateField: keyof Pick<ProfileEntry, 'issue_date' | 'date_value'>;
+  dateLabel: string;
+  title: string;
+}
+
+export function generateHeatMapSpec({
+  valueField,
+  valueLabel,
+  dateField,
+  dateLabel,
+  title,
+}: BackfillOptions): TopLevelSpec {
   const spec: TopLevelSpec = {
     ...BASE_SPEC,
-    title: {
-      text: title,
-    },
+    title,
     padding: {
       left: 50,
       top: 30,
@@ -67,7 +64,6 @@ export function generateHeatMapSpec(
                 },
             legend: {
               title: valueLabel,
-              titleAlign: 'left',
               titleOrient: 'left',
               // gradientLength: 00,
             },
@@ -209,3 +205,145 @@ export function injectClassification(spec: TopLevelSpec): void {
 //   });
 //   return spec;
 // }
+
+export function backFillWeekdayDistribution({
+  dateField,
+  dateLabel,
+  title,
+  valueField,
+  valueLabel,
+  anchorLag,
+}: BackfillOptions & { anchorLag: number }): TopLevelSpec {
+  const isRelative = valueField.endsWith('rel_change');
+  const spec: TopLevelSpec = {
+    ...BASE_SPEC,
+    title,
+    padding: {
+      left: 80,
+      top: 30,
+      right: 110,
+      bottom: 40,
+    },
+    transform: [
+      {
+        calculate: `['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day(datum.${dateField})]`,
+        as: 'weekday',
+      },
+      {
+        groupby: ['lag', 'weekday'],
+        aggregate: [
+          {
+            op: 'median',
+            field: valueField,
+            as: valueField,
+          },
+          {
+            op: 'ci0',
+            field: valueField,
+            as: `ci0`,
+          },
+          {
+            op: 'ci1',
+            field: valueField,
+            as: `ci1`,
+          },
+        ],
+      },
+    ],
+
+    layer: [
+      {
+        encoding: {
+          x: {
+            field: 'lag',
+            type: 'quantitative',
+            scale: {
+              zero: true,
+            },
+            axis: {
+              title: 'Lag',
+            },
+          },
+          y: {
+            field: valueField,
+            type: 'quantitative',
+            scale: isRelative
+              ? {
+                  domainMid: 0,
+                  nice: false,
+                  // scheme: valueField.endsWith('rel_change') ?  'viridis',
+                }
+              : {
+                  // domain: [0, 1],
+                  // clamp: true,
+                  nice: false,
+                  zero: false,
+                },
+            axis: {
+              title: valueLabel,
+            },
+          },
+          color: {
+            field: 'weekday',
+            type: 'nominal',
+            scale: {
+              domain: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+            },
+            legend: {
+              title: dateLabel,
+              // titleOrient: 'left',
+              // titleAnchor: 'middle',
+            },
+          },
+        },
+        layer: [
+          // {
+          //   mark: 'errorband',
+          //   encoding: {
+          //     y: {
+          //       field: 'ci1',
+          //       type: 'quantitative',
+          //     },
+          //     y2: { field: 'ci0' },
+          //   },
+          // },
+          {
+            mark: {
+              type: 'line',
+            },
+          },
+        ],
+      },
+      {
+        data: {
+          values: [{}],
+        },
+        layer: [
+          // {
+          //   mark: {
+          //     type: 'rule',
+          //     color: 'red',
+          //   },
+          //   encoding: {
+          //     y: {
+          //       datum: isRelative ? 0 : 0.9,
+          //     },
+          //   },
+          // },
+          {
+            mark: {
+              type: 'rule',
+              color: 'blue',
+            },
+            encoding: {
+              x: {
+                datum: anchorLag,
+              },
+            },
+          },
+        ],
+      },
+    ],
+  };
+  return spec;
+}

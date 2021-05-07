@@ -60,3 +60,10 @@
 .grid-9-13 {
   grid-column: 9 / 13;
 }
+
+.grid-1-7 {
+  grid-column: 1 / 7;
+}
+.grid-7-13 {
+  grid-column: 7 / 13;
+}

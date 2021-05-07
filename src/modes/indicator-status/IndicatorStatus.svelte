@@ -73,4 +73,6 @@
   <IndicatorCountyMap {signal} date={pickedDate} {data} />
 </div> -->
 
-<BackfillTimeProfile indicator={signal} date={pickedDate} referenceAnchorLag={60} />
+{#if signal}
+  <BackfillTimeProfile indicator={signal} date={pickedDate} />
+{/if}
