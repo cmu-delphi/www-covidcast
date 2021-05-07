@@ -26,7 +26,7 @@
 
   $: data = loadBackFillProfile(indicator, region, window, referenceAnchorLag);
 
-  function generateIssueSpec(indicator) {
+  function generateHeatMapSpec(indicator) {
     /**
      * @type {import('vega-lite').TopLevelSpec}
      */
@@ -85,6 +85,29 @@
             },
           },
         },
+        {
+          transform: [
+            {
+              filter: `datum.is_anchor`,
+            },
+          ],
+          mark: {
+            type: 'line',
+          },
+          encoding: {
+            color: {
+              field: 'is_anchor',
+              type: 'ordinal',
+              scale: {
+                range: ['blue'],
+              },
+              legend: {
+                title: false,
+                labelExpr: `'anchor'`,
+              },
+            },
+          },
+        },
       ],
       encoding: {
         x: {
@@ -120,8 +143,26 @@
     return spec;
   }
 
-  function generateReporteDateSpec(indicator) {
-    const spec = generateIssueSpec(indicator);
+  function generateIssueDateSpec(indicator) {
+    const spec = generateHeatMapSpec(indicator);
+
+    spec.layer.push({
+      transform: [
+        {
+          filter: `datum.is_anchor`,
+        },
+      ],
+      mark: {
+        type: 'line',
+        stroke: 'blue',
+      },
+    });
+
+    return spec;
+  }
+
+  function generateReportedDateSpec(indicator) {
+    const spec = generateHeatMapSpec(indicator);
     spec.title.text = `${indicator.name} Backfill Profile`;
     const cont = (v) => `(datum.value_completeness >= 0.${v} && datum.prevCompleteness < 0.${v}) ? 'p${v}'`;
     const completenessClassifier = `${cont(90)} : (${cont(75)} : (${cont(50)} : (${cont(25)} : null)))`;
@@ -154,17 +195,17 @@
       },
     ];
 
-    spec.layer.push({
-      transform: [
-        {
-          filter: `datum.completed == 'p90'`,
-        },
-      ],
-      mark: {
-        type: 'line',
-        stroke: 'red',
-      },
-    });
+    // spec.layer.push({
+    //   transform: [
+    //     {
+    //       filter: `datum.completed == 'p90'`,
+    //     },
+    //   ],
+    //   mark: {
+    //     type: 'line',
+    //     stroke: 'red',
+    //   },
+    // });
 
     spec.encoding.x.field = 'date_value';
     spec.encoding.x.axis.title = 'Reported Date';
@@ -172,8 +213,8 @@
     return spec;
   }
 
-  $: spec = generateReporteDateSpec(indicator);
-  $: spec2 = generateIssueSpec(indicator);
+  $: spec = generateReportedDateSpec(indicator);
+  $: spec2 = generateIssueDateSpec(indicator);
 
   let vegaRef = undefined;
   let vegaRef2 = undefined;
