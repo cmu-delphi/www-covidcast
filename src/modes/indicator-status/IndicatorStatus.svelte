@@ -1,11 +1,11 @@
 <script>
   import { formatDateISO } from '../../formats';
   import KPI from '../../components/KPI.svelte';
-  // import IndicatorCountyMap from './IndicatorCountyMap.svelte';
+  import IndicatorCountyMap from './IndicatorCountyMap.svelte';
   import FancyHeader from '../../components/FancyHeader.svelte';
-  // import { getAvailableCounties } from '../../data/indicatorInfo';
+  import { getAvailableCounties } from '../../data/indicatorInfo';
   import KPIValue from '../../components/KPIValue.svelte';
-  // import IndicatorCoverageChart from './IndicatorCoverageChart.svelte';
+  import IndicatorCoverageChart from './IndicatorCoverageChart.svelte';
   import BackfillTimeProfile from './BackfillTimeProfile.svelte';
 
   /**
@@ -22,7 +22,7 @@
 
   $: pickedDate = signal.latest_time_value;
 
-  // $: data = getAvailableCounties(signal, pickedDate);
+  $: data = getAvailableCounties(signal, pickedDate);
 </script>
 
 <div class="grid-3-11 uk-margin-top">
@@ -55,7 +55,7 @@
 
   <hr />
   <FancyHeader invert sub="County Coverage">{signal ? signal.name : '?'}</FancyHeader>
-  <!-- <IndicatorCoverageChart
+  <IndicatorCoverageChart
     {signal}
     {domain}
     on:highlight={(e) => {
@@ -64,14 +64,14 @@
         pickedDate = nextDate;
       }
     }}
-  /> -->
+  />
 
   <hr />
   <FancyHeader invert sub="Map ({formatDateISO(pickedDate)})">{signal ? signal.name : '?'}</FancyHeader>
 </div>
-<!-- <div class="grid-2-12">
+<div class="grid-2-12">
   <IndicatorCountyMap {signal} date={pickedDate} {data} />
-</div> -->
+</div>
 
 {#if signal}
   <BackfillTimeProfile indicator={signal} date={pickedDate} />
