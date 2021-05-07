@@ -1,19 +1,19 @@
 <script>
   import Vega from '../../components/vega/Vega.svelte';
   import { loadBackFillProfile } from '../../data/indicatorInfo';
-  import { commonConfig } from '../../specs/commonSpec';
   import { DateParam } from '../../stores/params';
+  import { currentRegionInfo, selectByInfo } from '../../stores';
   import DownloadMenu from '../../components/DownloadMenu.svelte';
+  import { generateHeatMapSpec } from './backfillSpec';
+  import FancyHeader from '../../components/FancyHeader.svelte';
+  import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
+  import Search from '../../components/Search.svelte';
+  import OptionPicker from '../../components/OptionPicker.svelte';
 
   /**
    * @type {import('../../data/indicatorInfo').IndicatorStatus}
    */
   export let indicator;
-
-  /**
-   * @type {import('../../data/regions').Region}
-   */
-  export let region;
 
   /**
    * @type {Date}
@@ -22,216 +22,60 @@
 
   export let referenceAnchorLag = 60;
 
+  $: region = $currentRegionInfo || nationInfo;
+
   $: window = new DateParam(date).windowTimeFrame;
 
   $: data = loadBackFillProfile(indicator, region, window, referenceAnchorLag);
 
-  function generateHeatMapSpec(indicator) {
-    /**
-     * @type {import('vega-lite').TopLevelSpec}
-     */
-    const spec = {
-      $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-      autosize: {
-        type: 'none',
-        contains: 'padding',
-        resize: true,
-      },
-      width: 100,
-      height: 100,
-      data: { name: 'values' },
-      config: commonConfig,
-      title: {
-        text: `${indicator.name} Backfill Issue Profile`,
-      },
-      padding: {
-        left: 50,
-        top: 30,
-        right: 100,
-        bottom: 40,
-      },
-      layer: [
-        {
-          mark: {
-            type: 'rect',
-            stroke: null,
-            width: {
-              expr: `width / customCountDays(domain('x')[0], domain('x')[1])`,
-            },
-            height: {
-              expr: `height / (domain('y')[1] - domain('y')[0])`,
-            },
-            tooltip: {
-              content: 'data',
-            },
-            opacity: 0.5,
-          },
-          encoding: {
-            color: {
-              field: 'value_completeness',
-              type: 'quantitative',
-              scale: {
-                domain: [0, 1],
-                clamp: true,
-                nice: false,
-                scheme: 'viridis',
-              },
-              legend: {
-                title: 'Completeness',
-                titleAlign: 'left',
-                titleOrient: 'left',
-                // gradientLength: 00,
-              },
-            },
-          },
-        },
-        {
-          transform: [
-            {
-              filter: `datum.is_anchor`,
-            },
-          ],
-          mark: {
-            type: 'line',
-          },
-          encoding: {
-            color: {
-              field: 'is_anchor',
-              type: 'ordinal',
-              scale: {
-                range: ['blue'],
-              },
-              legend: {
-                title: false,
-                labelExpr: `'anchor'`,
-              },
-            },
-          },
-        },
-      ],
-      encoding: {
-        x: {
-          field: 'issue_date',
-          type: 'temporal',
-          axis: {
-            format: '%m/%d',
-            formatType: 'cachedTime',
-            labelOverlap: true,
-            labelExpr: `datum.label + ((week(datum.value) === 1 || datum.index === 0) ? '/' + year(datum.value) : '')`,
-            grid: true,
-            gridDash: [4, 4],
-            tickCount: 'week',
-            // tickWidth: {
-            //   condition: { test: { field: 'value', timeUnit: 'month', equal: 1 }, value: 3 },
-            //   value: 1,
-            // },
-            title: 'Issue Date',
-          },
-        },
-        y: {
-          field: 'lag',
-          type: 'quantitative',
-          scale: {
-            zero: true,
-          },
-          axis: {
-            title: 'Lag',
-          },
-        },
-      },
-    };
-    return spec;
-  }
-
-  function generateIssueDateSpec(indicator) {
-    const spec = generateHeatMapSpec(indicator);
-
-    spec.layer.push({
-      transform: [
-        {
-          filter: `datum.is_anchor`,
-        },
-      ],
-      mark: {
-        type: 'line',
-        stroke: 'blue',
-      },
-    });
-
-    return spec;
-  }
-
-  function generateReportedDateSpec(indicator) {
-    const spec = generateHeatMapSpec(indicator);
-    spec.title.text = `${indicator.name} Backfill Profile`;
-    const cont = (v) => `(datum.value_completeness >= 0.${v} && datum.prevCompleteness < 0.${v}) ? 'p${v}'`;
-    const completenessClassifier = `${cont(90)} : (${cont(75)} : (${cont(50)} : (${cont(25)} : null)))`;
-
-    spec.transform = [
-      {
-        window: [
-          {
-            op: 'lag',
-            field: 'value_completeness',
-            param: 1,
-            as: 'prevCompleteness',
-          },
-        ],
-        groupby: ['time_value'],
-        sort: [
-          {
-            field: 'lag',
-            order: 'ascending',
-          },
-        ],
-      },
-      {
-        calculate: 'datum.prevCompleteness != null ? datum.prevCompleteness : 0',
-        as: 'prevCompleteness',
-      },
-      {
-        calculate: completenessClassifier,
-        as: 'completed',
-      },
-    ];
-
-    // spec.layer.push({
-    //   transform: [
-    //     {
-    //       filter: `datum.completed == 'p90'`,
-    //     },
-    //   ],
-    //   mark: {
-    //     type: 'line',
-    //     stroke: 'red',
-    //   },
-    // });
-
-    spec.encoding.x.field = 'date_value';
-    spec.encoding.x.axis.title = 'Reported Date';
-
-    return spec;
-  }
-
-  $: spec = generateReportedDateSpec(indicator);
-  $: spec2 = generateIssueDateSpec(indicator);
-
   let vegaRef = undefined;
-  let vegaRef2 = undefined;
+
+  const dateOptions = [
+    { label: 'Reported Date', value: 'date_value' },
+    { label: 'Issue Date', value: 'issue_date' },
+  ];
+  let dateField = 'date_value';
+
+  const valueOptions = [
+    { label: 'Value Completeness', value: 'value_completeness' },
+    { label: 'Relative Value Change', value: 'value_rel_change' },
+    { label: 'Sample Size Completeness', value: 'sample_size_completeness' },
+    { label: 'Relative Sample Size Change', value: 'sample_size_rel_change' },
+  ];
+  let valueField = 'value_completeness';
+
+  $: title = `${indicator.name} Backfill Profile`;
+  $: spec = generateHeatMapSpec(indicator, {
+    title,
+    valueField,
+    valueLabel: valueOptions.find((d) => d.value == valueField).label,
+    dateField,
+    dateLabel: dateOptions.find((d) => d.value == dateField).label,
+  });
 </script>
 
-<div class="chart-300">
-  <Vega bind:this={vegaRef} {spec} {data} className="chart-breakout" />
-  <DownloadMenu {vegaRef} {data} absolutePos fileName="{indicator.name}_Backfill_profile" advanced={false} />
+<div class="grid-3-11">
+  <hr />
+  <FancyHeader invert sub="Backfill Profile">{indicator ? indicator.name : '?'}</FancyHeader>
 </div>
+<Search
+  modern
+  className="grid-3-8"
+  placeholder="Select a region"
+  items={[nationInfo, ...stateInfo, ...countyInfo]}
+  title="Region"
+  icon="location"
+  selectedItem={region}
+  labelFieldName="displayName"
+  maxItemsToShowInList="5"
+  on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)}
+/>
+<OptionPicker className="8-11" label="Color" bind:value={valueField} options={valueOptions} />
+<OptionPicker className="8-11" label="Date" bind:value={dateField} options={dateOptions} />
 
-<div class="chart-300">
-  <Vega bind:this={vegaRef2} spec={spec2} {data} className="chart-breakout" />
-  <DownloadMenu
-    vegaRef={vegaRef2}
-    {data}
-    absolutePos
-    fileName="{indicator.name}_Backfill_date_profile"
-    advanced={false}
-  />
+<div class="grid-3-11">
+  <div class="chart-300">
+    <Vega bind:this={vegaRef} {spec} {data} className="chart-breakout" />
+    <DownloadMenu {vegaRef} {data} absolutePos fileName={title.replace(/\s+/gm, '_')} advanced={false} />
+  </div>
 </div>

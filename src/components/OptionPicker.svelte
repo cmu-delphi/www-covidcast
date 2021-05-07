@@ -7,7 +7,7 @@
   export let value = null;
   export let label = 'Options';
   /**
-   * @type {}
+   * @type {{label: string, value: string}[]}
    */
   export let options = [];
 
