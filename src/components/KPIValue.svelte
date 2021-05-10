@@ -16,7 +16,7 @@
   $: hasFraction = loading || (scaled != null && digits > 0 && Math.floor(scaled) !== scaled);
   $: base = loading ? '00' : scaled == null ? 'N/A' : Math.floor(scaled);
   $: digitsPow = Math.pow(10, digits);
-  $: fraction = !loading && hasFraction ? Math.round(scaled * digitsPow) % digitsPow : 0;
+  $: fraction = !loading && hasFraction ? Math.round(Math.abs(scaled) * digitsPow) % digitsPow : 0;
 </script>
 
 <KPI text={base.toLocaleString()} sub={hasFraction ? `.${fraction}` : null} {loading} />
