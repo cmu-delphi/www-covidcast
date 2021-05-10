@@ -18,7 +18,7 @@ import {
   EpiDataCasesOrDeathValues,
 } from '../stores/constants';
 import { get } from 'svelte/store';
-import { callMetaAPI, EpiDataResponse } from './api';
+import { callMetaAPI, EpiDataMetaEntry, EpiDataResponse } from './api';
 import { parseAPITime, formatAPITime } from './utils';
 import { timeDay } from 'd3-time';
 import type { RegionLevel } from './regions';
@@ -27,21 +27,7 @@ function toStatsRegionKey(sensorKey: string, region: string) {
   return sensorKey + '_' + region;
 }
 
-export interface MetaEntry {
-  min_time: number;
-  max_time: number;
-  max_value: number;
-  stdev_value: number;
-  mean_value: number;
-  max_issue: number;
-
-  data_source: string;
-  signal: string;
-  time_type: string;
-  geo_type: RegionLevel;
-}
-
-function processMetaData(meta: EpiDataResponse<MetaEntry>): { level: RegionLevel; date: string } {
+function processMetaData(meta: EpiDataResponse<EpiDataMetaEntry>): { level: RegionLevel; date: string } {
   const timeMap = new Map<string, ITimeInfo>();
   const statsMap = new Map<string, IStatsInfo>();
 
@@ -83,10 +69,10 @@ function processMetaData(meta: EpiDataResponse<MetaEntry>): { level: RegionLevel
   };
 }
 
-function updateTimeMap(key: string, matchedMeta: MetaEntry, timeMap: Map<string, ITimeInfo>) {
+function updateTimeMap(key: string, matchedMeta: EpiDataMetaEntry, timeMap: Map<string, ITimeInfo>) {
   timeMap.set(key, [matchedMeta.min_time, matchedMeta.max_time > yesterday ? yesterday : matchedMeta.max_time]);
 }
-function updateStatsMap(key: string, matchedMeta: MetaEntry, statsMap: Map<string, IStatsInfo>) {
+function updateStatsMap(key: string, matchedMeta: EpiDataMetaEntry, statsMap: Map<string, IStatsInfo>) {
   statsMap.set(key, {
     max: matchedMeta.max_value,
     mean: matchedMeta.mean_value,
@@ -124,15 +110,15 @@ interface LocalSensorEntry {
 
 function loadRegularSignal(
   sEntry: SensorEntry,
-  meta: EpiDataResponse<MetaEntry>,
+  meta: EpiDataResponse<EpiDataMetaEntry>,
   timeMap: Map<string, ITimeInfo>,
   statsMap: Map<string, IStatsInfo>,
 ) {
   // find the matching meta data by looping through the candidates and fallback to the first one
-  const baseFilter = (d: MetaEntry) =>
+  const baseFilter = (d: EpiDataMetaEntry) =>
     d.data_source === sEntry.id && d.signal === sEntry.signal && (!d.time_type || d.time_type === 'day');
 
-  const byGeoTypePriority = (a: MetaEntry, b: MetaEntry) => {
+  const byGeoTypePriority = (a: EpiDataMetaEntry, b: EpiDataMetaEntry) => {
     // sort by geo types but consider their importance for the matching
     const aIndex = regularSignalMetaDataGeoTypeCandidates.indexOf(a.geo_type);
     const bIndex = regularSignalMetaDataGeoTypeCandidates.indexOf(b.geo_type);
@@ -173,7 +159,7 @@ function loadRegularSignal(
 
 function loadCountSignal(
   sEntry: SensorEntry,
-  meta: EpiDataResponse<MetaEntry>,
+  meta: EpiDataResponse<EpiDataMetaEntry>,
   timeMap: Map<string, ITimeInfo>,
   statsMap: Map<string, IStatsInfo>,
 ) {
@@ -261,7 +247,7 @@ function loadCountSignal(
 }
 
 export function loadMetaData(sensors: SensorEntry[]): Promise<ReturnType<typeof processMetaData>> {
-  return callMetaAPI<MetaEntry>(
+  return callMetaAPI(
     sensors,
     [
       'min_time',
@@ -279,10 +265,6 @@ export function loadMetaData(sensors: SensorEntry[]): Promise<ReturnType<typeof 
       geo_types: [...new Set(levels as string[])].join(','),
     },
   ).then((meta) => {
-    if (!Array.isArray(meta.epidata)) {
-      // bug in the API
-      meta.epidata = [...Object.values(meta.epidata)] as MetaEntry[];
-    }
     return processMetaData(meta);
   });
 }

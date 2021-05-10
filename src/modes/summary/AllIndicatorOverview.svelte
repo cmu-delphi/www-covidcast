@@ -25,7 +25,7 @@
     if (!date.value || !region.value) {
       return Promise.resolve(null);
     }
-    return Promise.all(sensorList.map((sensor) => fetcher.fetchWindowTrend(sensor, region, date))).then((trends) => {
+    return Promise.all(fetcher.fetchNSensors1Region1DateTrend(sensorList, region, date)).then((trends) => {
       const positive = [];
       const negative = [];
       const unknownOrNeutral = [];

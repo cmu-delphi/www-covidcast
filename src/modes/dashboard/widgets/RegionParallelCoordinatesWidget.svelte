@@ -41,7 +41,7 @@
    * @param {import("../../stores/params").DateParam} date
    */
   function loadData(entries, level, date) {
-    return Promise.all(entries.map((entry) => fetcher.fetch1SensorNRegions1Date(entry.sensor, level, '*', date)))
+    return Promise.all(entries.map((entry) => fetcher.fetch1SensorNRegions1Date(entry.sensor, level, date)))
       .then((rows) => {
         return combineSignals(
           rows,

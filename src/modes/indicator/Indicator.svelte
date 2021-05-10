@@ -86,6 +86,6 @@
       <GeoTable {sensor} {region} {date} {fetcher} />
       <hr />
     </div>
-    <IndicatorCorrelation {sensor} {region} {date} {fetcher} />
+    <IndicatorCorrelation {sensor} {region} {date} />
   </div>
 </div>

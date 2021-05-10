@@ -7,7 +7,7 @@
 
   export let block = false;
   /**
-   * @type {import("../stores/trend").TrendInfo}
+   * @type {import("../data/trend").SensorTrend}
    */
   export let trend;
   export let long = false;
@@ -42,9 +42,9 @@
   {#if long}
     <span class="trend-text"> {trend != null ? trend.trend : 'Unknown'} </span>
     {#if trend != null && !trend.isUnknown}
-      <span class="trend-value"> {formatFraction(trend ? trend.fractionChange : null, true)} </span>
+      <span class="trend-value"> {formatFraction(trend ? trend.change : null, true)} </span>
     {/if}
-  {:else}<span class="trend-value"> {formatFraction(trend ? trend.fractionChange : null, true)} </span>{/if}
+  {:else}<span class="trend-value"> {formatFraction(trend ? trend.change : null, true)} </span>{/if}
 </div>
 
 <style>

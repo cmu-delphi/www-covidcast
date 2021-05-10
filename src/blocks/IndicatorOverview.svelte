@@ -27,8 +27,8 @@
    */
   export let fetcher;
 
-  $: trend = fetcher.fetchWindowTrend(sensor, region, date);
-  $: sparkline = fetcher.fetchSparkLine(sensor, region, date);
+  $: trend = fetcher.fetch1Sensor1Region1DateTrend(sensor, region, date);
+  $: sparkline = fetcher.fetch1Sensor1RegionSparkline(sensor, region, date);
   $: spec = generateSparkLine({
     domain: date.sparkLineTimeFrame.domain,
     highlightDate: 'top',
@@ -42,7 +42,7 @@
       {#await trend}
         <KPIValue value={null} loading />
       {:then d}
-        <KPIValue value={d && d.current ? d.current.value : null} digits={sensor.isPercentage ? 2 : 1} />
+        <KPIValue value={d ? d.value : null} digits={sensor.isPercentage ? 2 : 1} />
       {/await}
     </div>
     <div class="sub">

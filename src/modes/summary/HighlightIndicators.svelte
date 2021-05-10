@@ -23,10 +23,14 @@
 
   const highlights = sensorList.filter((d) => d.highlight && d.highlight.includes('location'));
 
-  $: highlightSensors = highlights.map((h) => ({
-    sensor: new SensorParam(h),
-    trend: fetcher.fetchWindowTrend(h, region, date),
-  }));
+  function loadData(sensors, region, date) {
+    return fetcher.fetchNSensors1Region1DateTrend(sensors, region, date).map((trend, i) => ({
+      sensor: new SensorParam(sensors[i]),
+      trend,
+    }));
+  }
+
+  $: highlightSensors = loadData(highlights, region, date);
 </script>
 
 <FancyHeader sub="Indicators">Key</FancyHeader>
@@ -49,7 +53,7 @@
         {#await s.trend}
           <KPIValue value={null} loading />
         {:then d}
-          <KPIValue value={d && d.current ? d.current.value : null} digits={2} />
+          <KPIValue value={d ? d.value : null} digits={2} />
         {/await}
       </div>
       <div class="sub">

@@ -93,6 +93,7 @@ export interface Sensor {
   readonly credits?: string; // credit text
 
   readonly format: 'raw' | 'per100k' | 'percent' | 'fraction';
+  readonly valueScaleFactor: number;
   readonly xAxis: string; // x axis title
   readonly yAxis: string; // y axis value unit long
   readonly highValuesAre: 'good' | 'bad' | 'neutral';
@@ -173,6 +174,7 @@ export function ensureSensorStructure(
     credits: 'We are happy for you to use this data in products and publications.',
 
     format,
+    valueScaleFactor: format === 'fraction' ? 100 : 1,
     xAxis: 'Date',
     yAxis: yAxis[format] || yAxis.raw,
     unit: unit[format] || unit.raw,

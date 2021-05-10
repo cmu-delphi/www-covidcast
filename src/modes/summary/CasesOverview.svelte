@@ -21,8 +21,9 @@
    */
   export let fetcher;
 
-  $: casesTrend = fetcher.fetchWindowTrend(CASES, region, date);
-  $: deathTrend = fetcher.fetchWindowTrend(DEATHS, region, date);
+  $: trends = fetcher.fetchNSensors1Region1DateTrend([CASES, DEATHS], region, date);
+  $: casesTrend = trends[0];
+  $: deathTrend = trends[1];
 </script>
 
 <IndicatorWarning sensor={CASES} {date} {region} />
@@ -41,7 +42,7 @@
       {#await casesTrend}
         <KPIValue value={null} loading />
       {:then d}
-        <KPIValue value={d && d.current ? d.current.value : null} />
+        <KPIValue value={d ? d.value : null} />
       {/await}
     </div>
     <div class="sub">
@@ -54,7 +55,7 @@
       {#await deathTrend}
         <KPIValue value={null} loading />
       {:then d}
-        <KPIValue value={d && d.current ? d.current.value : null} />
+        <KPIValue value={d ? d.value : null} />
       {/await}
     </div>
     <div class="sub">

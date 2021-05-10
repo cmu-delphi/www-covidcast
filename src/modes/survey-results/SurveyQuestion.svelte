@@ -32,7 +32,7 @@
   export let anchor = null;
 
   $: sensor = question.sensorParam;
-  $: trend = fetcher.fetchWindowTrend(sensor, region, date);
+  $: trend = fetcher.fetch1Sensor1Region1DateTrend(sensor, region, date);
 
   let loading = false;
   let noData = false;

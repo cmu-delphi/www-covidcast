@@ -28,7 +28,7 @@
     domain: sensor.domain($stats, 'county'),
     scheme: sensor.value.vegaColorScale,
   });
-  $: data = fetcher.fetch1SensorNRegions1Date(sensor, 'county', '*', date);
+  $: data = fetcher.fetch1SensorNRegions1Date(sensor, 'county', date);
 
   function onClickHandler(evt) {
     const item = evt.detail.item;
