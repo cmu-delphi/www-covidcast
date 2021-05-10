@@ -1,5 +1,6 @@
 import type { TopLevelSpec } from 'vega-lite';
 import type { ProfileEntry } from '../../data/indicatorInfo';
+import { formatFraction } from '../../formats';
 import { BASE_SPEC } from '../../specs/commonSpec';
 
 export interface BackfillOptions {
@@ -22,11 +23,14 @@ export function generateHeatMapSpec({
 }: BackfillOptions): TopLevelSpec {
   const spec: TopLevelSpec = {
     ...BASE_SPEC,
-    title,
+    title: {
+      text: title,
+      subtitle: `${valueLabel} per Lag and ${dateLabel}`,
+    },
     padding: {
-      left: 50,
-      top: 30,
-      right: 100,
+      left: 65,
+      top: 50,
+      right: 80,
       bottom: 40,
     },
     layer: [
@@ -175,52 +179,23 @@ export function injectClassification(spec: TopLevelSpec): void {
   ];
 }
 
-// export function generateReportedDateSpec(indicator: IndicatorStatus): TopLevelSpec {
-//   const spec = generateHeatMapSpec(indicator, {
-//     xField: 'date_value',
-//     xLabel: 'Reported Date',
-//     title: `${indicator.name} Backfill Profile`,
-//   });
-//   // spec.layer.push({
-//   //   transform: [
-//   //     {
-//   //       filter: `datum.completed == 'p90'`,
-//   //     },
-//   //   ],
-//   //   mark: {
-//   //     type: 'line',
-//   //     stroke: 'red',
-//   //   },
-//   // });
-//   return spec;
-// }
-
-// export function generateReportedDateDeltaSpec(indicator: IndicatorStatus): TopLevelSpec {
-//   const spec = generateHeatMapSpec(indicator, {
-//     valueField: 'value_rel_change',
-//     valueLabel: 'Relative Change',
-//     xField: 'date_value',
-//     xLabel: 'Reported Date',
-//     title: `${indicator.name} Backfill Relative Change Profile`,
-//   });
-//   return spec;
-// }
-
 export function backFillWeekdayDistribution({
   dateField,
   dateLabel,
   title,
   valueField,
-  valueLabel,
   anchorLag,
 }: BackfillOptions & { anchorLag: number }): TopLevelSpec {
   const isRelative = valueField.endsWith('rel_change');
   const spec: TopLevelSpec = {
     ...BASE_SPEC,
-    title,
+    title: {
+      text: title,
+      subtitle: `per Lag per weekday`,
+    },
     padding: {
-      left: 80,
-      top: 30,
+      left: 65,
+      top: 45,
       right: 110,
       bottom: 40,
     },
@@ -280,7 +255,7 @@ export function backFillWeekdayDistribution({
                   zero: false,
                 },
             axis: {
-              title: valueLabel,
+              title: null,
             },
           },
           color: {
@@ -337,6 +312,111 @@ export function backFillWeekdayDistribution({
             },
             encoding: {
               x: {
+                datum: anchorLag,
+              },
+            },
+          },
+        ],
+      },
+    ],
+  };
+  return spec;
+}
+
+export function backFillWeekdayFrequency({
+  dateField,
+  dateLabel,
+  title,
+  valueField,
+  anchorLag,
+  completeness,
+}: BackfillOptions & { anchorLag: number; completeness: number }): TopLevelSpec {
+  const spec: TopLevelSpec = {
+    ...BASE_SPEC,
+    title: {
+      text: title,
+      subtitle: `Lag to reach ${formatFraction(completeness)} completeness`,
+    },
+    padding: {
+      left: 40,
+      top: 45,
+      right: 10,
+      bottom: 40,
+    },
+    transform: [
+      {
+        window: [
+          {
+            op: 'lag',
+            field: valueField,
+            param: 1,
+            as: 'prevCompleteness',
+          },
+        ],
+        groupby: ['time_value'],
+        sort: [
+          {
+            field: 'lag',
+            order: 'ascending',
+          },
+        ],
+      },
+      {
+        calculate: 'datum.prevCompleteness != null ? datum.prevCompleteness : 0',
+        as: 'prevCompleteness',
+      },
+      {
+        calculate: `(datum.${valueField} >= ${completeness} && (datum.prevCompleteness == null || datum.prevCompleteness < ${completeness}))`,
+        as: 'completed',
+      },
+      {
+        filter: 'datum.completed',
+      },
+      {
+        calculate: `['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day(datum.${dateField})]`,
+        as: 'weekday',
+      },
+    ],
+
+    layer: [
+      {
+        encoding: {
+          x: {
+            field: 'weekday',
+            type: 'nominal',
+            scale: {
+              type: 'band',
+              domain: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+            },
+            axis: {
+              title: dateLabel,
+              labelAngle: 0,
+            },
+          },
+          y: {
+            field: 'lag',
+            type: 'quantitative',
+            axis: {
+              title: null,
+            },
+          },
+        },
+        mark: {
+          type: 'boxplot',
+        },
+      },
+      {
+        data: {
+          values: [{}],
+        },
+        layer: [
+          {
+            mark: {
+              type: 'rule',
+              color: 'blue',
+            },
+            encoding: {
+              y: {
                 datum: anchorLag,
               },
             },

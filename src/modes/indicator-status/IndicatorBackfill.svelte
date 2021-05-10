@@ -5,7 +5,7 @@
   import { TimeFrame, WINDOW_SIZE } from '../../stores/params';
   import { currentRegionInfo, selectByInfo } from '../../stores';
   import DownloadMenu from '../../components/DownloadMenu.svelte';
-  import { backFillWeekdayDistribution, generateHeatMapSpec } from './backfillSpec';
+  import { backFillWeekdayDistribution, generateHeatMapSpec, backFillWeekdayFrequency } from './backfillSpec';
   import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
   import Search from '../../components/Search.svelte';
   import OptionPicker from '../../components/OptionPicker.svelte';
@@ -19,7 +19,7 @@
   $: region = $currentRegionInfo || nationInfo;
 
   $: date = indicator ? indicator.latest_time_value : new Date();
-  $: window = new TimeFrame(timeMonth.offset(date, WINDOW_SIZE), date);
+  $: window = new TimeFrame(timeMonth.offset(date, -WINDOW_SIZE), date);
 
   const dateOptions = [
     { label: 'Reported Date', value: 'date_value' },
@@ -38,18 +38,13 @@
   $: valueLabel = valueOptions.find((d) => d.value == valueField).label;
 
   let anchorLagStr = '60';
-  const anchorLagOptions = [
-    { label: '60 days', value: '60' },
-    { label: '30 days', value: '30' },
-    { label: '7 days', value: '7' },
-  ];
   $: anchorLag = Number.parseInt(anchorLagStr, 10);
 
   $: title = `${indicator.name} Backfill Profile`;
 
   let vegaRef = undefined;
   $: spec = generateHeatMapSpec({
-    title: `${indicator.name} ${valueLabel} Profile`,
+    title: `${indicator.name}: ${valueLabel} Profile`,
     valueField,
     valueLabel,
     dateField,
@@ -57,8 +52,10 @@
   });
   $: data = loadBackFillProfile(indicator, region, window, anchorLag);
 
+  $: isRelative = valueField.endsWith('_rel_change');
+
   $: weekdaySpec = backFillWeekdayDistribution({
-    title: `${indicator.name} ${valueLabel} per Lag by weekday`,
+    title: `${indicator.name}: ${valueLabel}`,
     valueField,
     valueLabel,
     dateField,
@@ -66,11 +63,21 @@
     anchorLag,
   });
   let vegaRefWeekday = undefined;
+
+  $: weekdayBoxplotSpec = backFillWeekdayFrequency({
+    title: `${indicator.name}: ${valueLabel}`,
+    valueField,
+    dateField,
+    dateLabel,
+    anchorLag,
+    completeness: 0.9,
+  });
+  let vegaRefBoxplot = undefined;
 </script>
 
 <Search
   modern
-  className="grid-3 grid-span-8"
+  className="grid-3 grid-span-8 uk-margin-top"
   placeholder="Select a region"
   items={[nationInfo, ...stateInfo, ...countyInfo]}
   title="Region"
@@ -80,32 +87,67 @@
   maxItemsToShowInList="5"
   on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)}
 />
-<OptionPicker className="grid-3 grid-span-4" label="Color" bind:value={valueField} options={valueOptions} modern />
-<OptionPicker className="grid-7 grid-span-2" label="Date" bind:value={dateField} options={dateOptions} modern />
 <OptionPicker
-  className="grid-9 grid-span-2"
-  label="Anchor Lag"
-  bind:value={anchorLagStr}
-  options={anchorLagOptions}
+  className="grid-3 grid-span-4 uk-margin-top"
+  label="Color"
+  bind:value={valueField}
+  options={valueOptions}
+  modern
+/>
+<OptionPicker
+  className="grid-7 grid-span-2 uk-margin-top"
+  label="Date"
+  bind:value={dateField}
+  options={dateOptions}
+  modern
+/>
+<OptionPicker
+  className="grid-9 grid-span-2 uk-margin-top"
+  type="number"
+  label="Anchor Lag (days)"
+  bind:value={anchorLag}
+  min={1}
+  max={60}
+  step={10}
   modern
 />
 
-<div class="grid-3 grid-span-8">
+<div class="grid-1 grid-span-12">
   <FancyHeader invert sub="Backfill Profile">{indicator.name}</FancyHeader>
   <div class="chart-300">
-    <Vega bind:this={vegaRef} {spec} {data} className="chart-breakout" />
-    <DownloadMenu {vegaRef} {data} absolutePos fileName={title.replace(/\s+/gm, '_')} advanced={false} />
+    <Vega bind:this={vegaRef} {spec} {data} />
+    <DownloadMenu
+      {vegaRef}
+      {data}
+      absolutePos="bottom: -20px"
+      fileName={title.replace(/\s+/gm, '_')}
+      advanced={false}
+    />
   </div>
 </div>
-<div class="grid-3 grid-span-4">
+<div class="grid-1 {isRelative ? 'grid-span-12' : 'grid-span-6'} uk-margin-top">
   <div class="chart-300">
     <Vega bind:this={vegaRefWeekday} spec={weekdaySpec} {data} />
-    <DownloadMenu vegaRef={vegaRefWeekday} {data} absolutePos fileName={title.replace(/\s+/gm, '_')} advanced={false} />
+    <DownloadMenu
+      vegaRef={vegaRefWeekday}
+      {data}
+      absolutePos="bottom: -20px"
+      fileName={title.replace(/\s+/gm, '_')}
+      advanced={false}
+    />
   </div>
 </div>
-<div class="grid-7 grid-span-4">
-  <div class="chart-300">
-    <!-- <Vega bind:this={vegaRef} {spec} {data} className="chart-breakout" />
-    <DownloadMenu {vegaRef} {data} absolutePos fileName={title.replace(/\s+/gm, '_')} advanced={false} /> -->
+{#if !isRelative}
+  <div class="grid-7 grid-span-6 uk-margin-top">
+    <div class="chart-300">
+      <Vega bind:this={vegaRefBoxplot} spec={weekdayBoxplotSpec} {data} />
+      <DownloadMenu
+        vegaRef={vegaRefBoxplot}
+        {data}
+        absolutePos="bottom: -20px"
+        fileName={title.replace(/\s+/gm, '_')}
+        advanced={false}
+      />
+    </div>
   </div>
-</div>
+{/if}

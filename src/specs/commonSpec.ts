@@ -14,6 +14,9 @@ export const commonConfig: Config = {
     labelFontSize: 14,
     titleFontWeight: 'normal',
   },
+  legend: {
+    titleFontWeight: 'normal',
+  },
   view: {
     stroke: null,
   },

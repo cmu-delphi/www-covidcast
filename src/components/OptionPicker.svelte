@@ -11,21 +11,63 @@
    */
   export let options = [];
 
+  /**
+   * @type {'select' | 'text' | 'number' | 'date'}
+   */
+  export let type = 'select';
+
   export let className = '';
   export let style = undefined;
 
   export let modern = false;
+
+  export let step = undefined;
+  export let min = undefined;
+  export let max = undefined;
+  export let placeholder = undefined;
 </script>
 
 <div class="option-picker {className}" {style}>
   <span class="option-picker-label">{label}</span>
-  <select {name} class="option-picker-input" class:modern bind:value on:blur {required}>
-    <slot>
-      {#each options as option}
-        <option value={option.value}>{option.label}</option>
-      {/each}
-    </slot>
-  </select>
+  {#if type === 'select'}
+    <select {name} class="option-picker-input" class:modern bind:value on:blur {required}>
+      <slot>
+        {#each options as option}
+          <option value={option.value}>{option.label}</option>
+        {/each}
+      </slot>
+    </select>
+  {:else if type === 'text'}
+    <input {name} class="option-picker-input" class:modern bind:value on:change {required} {placeholder} />
+  {:else if type === 'number'}
+    <input
+      type="number"
+      {name}
+      class="option-picker-input"
+      class:modern
+      bind:value
+      on:change
+      {required}
+      {step}
+      {min}
+      {max}
+      {placeholder}
+    />
+  {:else if type === 'date'}
+    <input
+      type="date"
+      {name}
+      class="option-picker-input"
+      class:modern
+      bind:value
+      on:change
+      {required}
+      {step}
+      {min}
+      {max}
+      {placeholder}
+    />
+  {/if}
 </div>
 
 <style>
@@ -37,6 +79,7 @@
 
   .option-picker-input {
     display: block;
+    width: 100%;
     padding: 8px 0px 8px 6px;
     border: 1px solid #d3d4d8;
     background: white;
@@ -44,6 +87,7 @@
     line-height: 1rem;
     border-radius: 4px;
     color: inherit;
+    box-sizing: border-box;
   }
 
   .option-picker-input.modern {

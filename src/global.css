@@ -134,3 +134,12 @@
 .grid-span-9 {
   grid-column-end: span 9;
 }
+.grid-span-10 {
+  grid-column-end: span 10;
+}
+.grid-span-11 {
+  grid-column-end: span 11;
+}
+.grid-span-12 {
+  grid-column-end: span 12;
+}
