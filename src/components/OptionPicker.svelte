@@ -28,7 +28,7 @@
 </script>
 
 <div class="option-picker {className}" {style}>
-  <span class="option-picker-label">{label}</span>
+  <span class="option-picker-label" class:modern>{label}</span>
   {#if type === 'select'}
     <select {name} class="option-picker-input" class:modern bind:value on:blur {required}>
       <slot>
@@ -86,12 +86,13 @@
     font-size: 0.875rem;
     line-height: 1rem;
     border-radius: 4px;
-    color: inherit;
     box-sizing: border-box;
+    font-weight: 400;
+    color: #666;
   }
 
   .option-picker-input.modern {
-    padding: 10px 0 10px 6px;
+    padding: 10px 6px;
     font-size: 0.75rem;
     height: 50px;
   }
@@ -108,5 +109,8 @@
     font-size: 0.75rem;
     background: white;
     line-height: 1;
+  }
+  .option-picker-label.modern {
+    left: 24px;
   }
 </style>

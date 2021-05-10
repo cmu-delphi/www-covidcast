@@ -121,7 +121,7 @@
       {#if mode === 'coverage'}
         <IndicatorStatus {domain} signal={selected} />
       {:else if selected}
-        <IndicatorBackfill {domain} indicator={selected} />
+        <IndicatorBackfill indicator={selected} />
       {/if}
     {/if}
   </div>
