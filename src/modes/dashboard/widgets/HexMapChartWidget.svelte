@@ -10,7 +10,6 @@
   import WidgetCard, { DEFAULT_WIDGET_STATE } from './WidgetCard.svelte';
   import { getContext } from 'svelte';
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
-  import { stats } from '../../../stores';
   import { formatDateISO } from '../../../formats';
   import { useWhiteTextColor } from '../../../util';
   import { getInfoByName } from '../../../data/regions';
@@ -82,7 +81,7 @@
   }
 
   $: tileData = loadData(sensor, date);
-  $: colorScale = sensor.createColorScale($stats, 'state');
+  $: colorScale = sensor.createColorScale('state');
 
   const maxColumn = state2TileCell.reduce((acc, v) => Math.max(acc, v.x), 0) + 1;
   // const maxRow = state2TileCell.reduce((acc, v) => Math.max(acc, v.y), 0) + 1;

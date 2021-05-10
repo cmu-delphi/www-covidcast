@@ -1,18 +1,8 @@
-import { get } from 'svelte/store';
 import { parseAPITime } from '../../data';
 import { getInfoByName } from '../../data/regions';
-import { currentSensor, times } from '../../stores';
+import { sensorList } from '../../stores';
 import { allSensorsMap } from '../../stores/allSensors';
-import {
-  CASES,
-  DateParam,
-  DEATHS,
-  RegionLevel,
-  RegionParam,
-  Sensor,
-  SensorParam,
-  TimeFrame,
-} from '../../stores/params';
+import { DateParam, RegionLevel, RegionParam, Sensor, SensorParam, TimeFrame } from '../../stores/params';
 
 export function resolveSensor(defaultSensor: SensorParam, key?: string): SensorParam {
   if (!key) {
@@ -22,10 +12,19 @@ export function resolveSensor(defaultSensor: SensorParam, key?: string): SensorP
   if (!s) {
     return defaultSensor;
   }
-  return new SensorParam(s, currentSensor, get(times)!);
+  return new SensorParam(s, defaultSensor.manager);
 }
 
 export function resolveSensors(defaultSensor: SensorParam, keys?: readonly string[]): Sensor[] {
+  const CASES = new SensorParam(
+    sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Cases'))!,
+    defaultSensor.manager,
+  );
+  const DEATHS = new SensorParam(
+    sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Deaths'))!,
+    defaultSensor.manager,
+  );
+
   if (!keys) {
     if (defaultSensor.key === CASES.key || defaultSensor.key === DEATHS.key) {
       return [CASES.value, DEATHS.value];
@@ -60,7 +59,7 @@ export function resolveDate(defaultDate: DateParam, d?: string): DateParam {
   if (!d) {
     return defaultDate;
   }
-  return new DateParam(parseAPITime(d.toString().replace(/-/gm, '')), defaultDate.sensorTimeFrame);
+  return new DateParam(parseAPITime(d.toString().replace(/-/gm, '')));
 }
 
 export function resolveTimeFrame(

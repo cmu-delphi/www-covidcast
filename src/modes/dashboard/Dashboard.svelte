@@ -1,7 +1,6 @@
 <script>
   import { onMount, setContext } from 'svelte';
-  import { currentSensor, isMobileDevice } from '../../stores';
-  import { currentRegionInfo, currentDateObject, times } from '../../stores';
+  import { currentRegionInfo, currentDateObject, currentSensor, isMobileDevice, metaDataManager } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
   import { WidgetHighlight } from './highlight';
   import { resolveInitialState, updateState } from './state';
@@ -14,9 +13,9 @@
   import { DEFAULT_SENSOR } from '../../stores/constants';
 
   $: allSensor = allSensorsMap.get($currentSensor) || allSensorsMap.get(DEFAULT_SENSOR);
-  $: sensor = new SensorParam(allSensor, currentSensor, $times);
+  $: sensor = new SensorParam(allSensor, $metaDataManager);
   $: region = new RegionParam($currentRegionInfo);
-  $: date = new DateParam($currentDateObject, allSensor, $times);
+  $: date = new DateParam($currentDateObject);
 
   const fetcher = new DataFetcher();
   $: {

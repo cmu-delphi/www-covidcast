@@ -1,5 +1,5 @@
 <script>
-  import { sensorList } from '../../stores';
+  import { metaDataManager, sensorList } from '../../stores';
   import KPIValue from '../../components/KPIValue.svelte';
   import FancyHeader from '../../components/FancyHeader.svelte';
   import TrendIndicator from '../../components/TrendIndicator.svelte';
@@ -25,7 +25,7 @@
 
   function loadData(sensors, region, date) {
     return fetcher.fetchNSensors1Region1DateTrend(sensors, region, date).map((trend, i) => ({
-      sensor: new SensorParam(sensors[i]),
+      sensor: new SensorParam(sensors[i], $metaDataManager),
       trend,
     }));
   }
@@ -38,7 +38,7 @@
 <p>
   On {formatDateWeekday(date.value)}
   {#if highlightSensors.length > 0}
-    <MaxDateHint sensor={highlightSensors[0].sensor.value} level={region.level} suffix="," />
+    <MaxDateHint sensor={highlightSensors[0].sensor.value} suffix="," />
   {:else}
     {`, `}
   {/if}

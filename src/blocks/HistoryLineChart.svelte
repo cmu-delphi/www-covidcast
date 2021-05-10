@@ -86,7 +86,7 @@
   };
 
   $: highlightDate = date.value;
-  $: timeFrame = showFull && expandableWindow ? date.sensorTimeFrame : date.windowTimeFrame;
+  $: timeFrame = showFull && expandableWindow ? sensor.timeFrame : date.windowTimeFrame;
 
   /**
    * @param {import('../../stores/params').SensorParam} sensor

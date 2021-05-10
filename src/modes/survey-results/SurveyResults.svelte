@@ -1,5 +1,5 @@
 <script>
-  import { currentDateObject, currentRegionInfo, times, getScrollToAnchor } from '../../stores';
+  import { currentDateObject, currentRegionInfo, getScrollToAnchor, metaDataManager } from '../../stores';
   import { questionCategories, visibleLevels, refSensor, questions } from '../../stores/questions';
   import SurveyQuestion from './SurveyQuestion.svelte';
   import RegionDatePicker from '../../components/RegionDatePicker.svelte';
@@ -11,8 +11,8 @@
   import { modeByID } from '..';
   import { scrollIntoView } from '../../util';
 
-  $: sensor = new SensorParam(refSensor);
-  $: date = new DateParam($currentDateObject, refSensor, $times);
+  $: sensor = new SensorParam(refSensor, $metaDataManager);
+  $: date = new DateParam($currentDateObject);
   $: region = new RegionParam($currentRegionInfo);
 
   const fetcher = new DataFetcher();
@@ -20,7 +20,7 @@
     // reactive update
     fetcher.invalidate(sensor, region, date);
 
-    const sensors = questions.map((d) => d.sensorParam);
+    const sensors = questions.map((d) => new SensorParam(d.sensor, $metaDataManager));
     // prefetch all data that is likely needed
     // itself
     const loaded = fetcher.fetchNSensor1RegionNDates(sensors, region, date.windowTimeFrame);

@@ -1,20 +1,20 @@
 import { timeDay, timeMonth, timeWeek } from 'd3-time';
 import { addNameInfos, formatAPITime, addMissing, fitRange, parseAPITime, EpiDataRow } from '../data';
 import { nationInfo } from '../data/regions';
-import { currentDate, currentSensor, sensorList, selectByInfo, IStatsInfo } from '.';
-import { determineMinMax, determineStats } from './stats';
+import { currentDate, currentSensor, selectByInfo } from '.';
 import { formatValue } from '../formats';
 import { scaleSequential } from 'd3-scale';
 import { scrollToTop } from '../util';
 import type { RegionInfo, RegionInfo as Region, RegionLevel, RegionArea, CountyInfo } from '../data/regions';
-import { Sensor, SensorEntry, yesterdayDate } from './constants';
+import type { Sensor, SensorEntry } from './constants';
 import { get, Writable } from 'svelte/store';
-import { TimeFrame } from '../data/TimeFrame';
+import { ALL_TIME_FRAME, TimeFrame } from '../data/TimeFrame';
 import fetchTriple from '../data/fetchTriple';
 import { toTimeValue } from '../data/utils';
 import { SensorTrend, asSensorTrend } from '../data/trend';
 import { fixLevel, GeoPair, SourceSignalPair } from '../data/apimodel';
 import { callTrendAPI, callTrendSeriesAPI } from '../data/api';
+import type { MetaDataManager } from '../data/meta';
 
 export { TimeFrame } from '../data/TimeFrame';
 
@@ -23,8 +23,6 @@ export type { RegionInfo as Region, RegionLevel } from '../data/regions';
 
 export const WINDOW_SIZE = 4; // months;
 export const SPARKLINE_SIZE = 4; // weeks;
-
-export const ALL_TIME_FRAME = new TimeFrame(parseAPITime('20200101'), yesterdayDate);
 
 export interface RegionEpiDataRow extends EpiDataRow, Region {}
 
@@ -444,32 +442,20 @@ export class DateParam {
   readonly timeValue: number;
   readonly value: Date;
   readonly allTimeFrame: TimeFrame;
-  readonly sensorTimeFrame: TimeFrame;
   readonly sparkLineTimeFrame: TimeFrame;
   readonly windowTimeFrame: TimeFrame;
 
-  constructor(date: Date, sensor?: Sensor | TimeFrame, timeLookup?: Map<string, [number, number]>) {
+  constructor(date: Date) {
     this.timeValue = toTimeValue(date);
     this.value = date;
     this.allTimeFrame = ALL_TIME_FRAME;
-    this.sensorTimeFrame = resolveSensorTimeFrame(sensor, timeLookup);
-    this.sparkLineTimeFrame = TimeFrame.compute(
-      date,
-      (d, step) => timeWeek.offset(d, step),
-      SPARKLINE_SIZE,
-      this.sensorTimeFrame.max,
-    );
-    this.windowTimeFrame = TimeFrame.compute(
-      date,
-      (d, step) => timeMonth.offset(d, step),
-      WINDOW_SIZE,
-      this.sensorTimeFrame.max,
-    );
+    this.sparkLineTimeFrame = TimeFrame.compute(date, (d, step) => timeWeek.offset(d, step), SPARKLINE_SIZE);
+    this.windowTimeFrame = TimeFrame.compute(date, (d, step) => timeMonth.offset(d, step), WINDOW_SIZE);
   }
 
   shift(days: number): DateParam {
     const shifted = timeDay.offset(this.value, days);
-    return new DateParam(shifted, this.sensorTimeFrame);
+    return new DateParam(shifted);
   }
 
   set(date: Date): void {
@@ -531,9 +517,11 @@ export class SensorParam {
   readonly yAxis: string;
 
   readonly timeFrame: TimeFrame;
+  readonly manager: MetaDataManager;
 
-  constructor(sensor: Sensor, store = currentSensor, timeLookup?: Map<string, [number, number]>) {
+  constructor(sensor: Sensor, metaDataManager: MetaDataManager, store = currentSensor) {
     this.writeAbleStore = store;
+    this.manager = metaDataManager;
     this.key = sensor.key;
     this.name = sensor.name;
     this.description = resolveDescription(sensor);
@@ -558,7 +546,7 @@ export class SensorParam {
     this.xAxis = sensor.xAxis;
     this.yAxis = sensor.yAxis;
 
-    this.timeFrame = resolveSensorTimeFrame(sensor, timeLookup);
+    this.timeFrame = metaDataManager.getTimeFrame(sensor);
   }
 
   set(sensor: Sensor, scrollTop = false): void {
@@ -570,8 +558,8 @@ export class SensorParam {
     }
   }
 
-  domain(stats: Map<string, IStatsInfo>, level: RegionLevel): [number, number] {
-    const domain = determineMinMax(stats, this.value, level, {}, false);
+  domain(level: RegionLevel = 'county'): [number, number] {
+    const domain = this.manager.getValueDomain(this.value, level);
     const scaled: [number, number] = [domain[0] * this.value.valueScaleFactor, domain[1] * this.value.valueScaleFactor];
     if (this.isPercentage) {
       scaled[0] = Math.max(0, scaled[0]);
@@ -583,20 +571,9 @@ export class SensorParam {
     return scaled;
   }
 
-  stats(stats: Map<string, IStatsInfo>, level: RegionLevel): { max: number; mean: number; std: number } {
-    return determineStats(stats, this.value, level, {});
-  }
-
-  createColorScale(stats: Map<string, IStatsInfo>, level: RegionLevel): (v: number) => string {
-    const domain = this.domain(stats, level);
+  createColorScale(level: RegionLevel = 'county'): (v: number) => string {
+    const domain = this.domain(level);
     return scaleSequential(this.value.colorScale).domain(domain);
-  }
-
-  static box(sensor: Sensor | SensorParam): SensorParam {
-    if (sensor instanceof SensorParam) {
-      return sensor;
-    }
-    return new SensorParam(sensor);
   }
 
   static unbox(sensor: Sensor | SensorParam): Sensor {
@@ -606,9 +583,6 @@ export class SensorParam {
     return sensor;
   }
 }
-
-export const CASES = new SensorParam(sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Cases'))!);
-export const DEATHS = new SensorParam(sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Deaths'))!);
 
 export class RegionParam implements Region {
   readonly value: Region;

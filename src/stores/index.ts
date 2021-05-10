@@ -3,7 +3,6 @@ import { LogScale, SqrtScale } from './scales';
 import { scaleSequentialLog } from 'd3-scale';
 import {
   sensorMap,
-  yesterdayDate,
   levels,
   DEFAULT_LEVEL,
   DEFAULT_MODE,
@@ -16,37 +15,24 @@ import {
   SensorEntry,
 } from './constants';
 import modes, { Mode, modeByID, ModeID } from '../modes';
-import { parseAPITime } from '../data/utils';
+import { formatAPITime, parseAPITime } from '../data/utils';
 import { getInfoByName } from '../data/regions';
 export {
   defaultRegionOnStartup,
   getLevelInfo,
   levels,
   levelList,
-  yesterday,
-  yesterdayDate,
   sensorList,
   sensorMap,
   groupedSensorList,
 } from './constants';
-import { timeMonth } from 'd3-time';
+import { timeDay, timeMonth } from 'd3-time';
 import { MAP_THEME, selectionColors } from '../theme';
 import { AnnotationManager, fetchAnnotations } from '../data';
 import type { RegionInfo, RegionLevel } from '../data/regions';
-
-export type ITimeInfo = [number, number];
-
-export const times = writable<Map<string, ITimeInfo> | null>(null);
-
-export interface IStatsInfo {
-  max: number;
-  mean: number;
-  std: number;
-  maxIssue: Date;
-  minTime: Date;
-  maxTime: Date;
-}
-export const stats = writable<Map<string, IStatsInfo> | null>(null);
+import { yesterdayDate } from '../data/TimeFrame';
+import { MetaDataManager } from '../data/meta';
+import { callMetaAPI2 } from '../data/api';
 
 export const appReady = writable(false);
 
@@ -245,55 +231,6 @@ export const colorScale = writable(scaleSequentialLog());
 export const colorStops = writable([]);
 export const bubbleRadiusScale = writable(LogScale());
 export const spikeHeightScale = writable(SqrtScale());
-
-// validate if sensor and other parameter matches
-currentSensorEntry.subscribe((sensorEntry) => {
-  if (!sensorEntry) {
-    return;
-  }
-  // check level
-  const level = get(currentLevel);
-
-  if (!sensorEntry.levels.includes(level)) {
-    currentLevel.set(sensorEntry.levels[0]);
-  }
-
-  if (get(currentInfoSensor)) {
-    // show help, update it
-    currentInfoSensor.set(sensorEntry);
-  }
-
-  if (!sensorEntry.isCasesOrDeath) {
-    signalCasesOrDeathOptions.set({
-      cumulative: false,
-      incidence: false,
-    });
-  }
-
-  // clamp to time span
-  const entry = get(times)?.get(sensorEntry.key);
-  if (entry != null) {
-    const [minDate, maxDate] = entry;
-    const current = get(currentDate) ?? '';
-    if (current < String(minDate)) {
-      currentDate.set(String(minDate));
-    } else if (current > String(maxDate)) {
-      currentDate.set(String(maxDate));
-    }
-  }
-});
-
-currentMode.subscribe((mode) => {
-  if (mode === modeByID['survey-results']) {
-    // change sensor and date to the latest one within the survey
-    currentSensor.set(DEFAULT_SURVEY_SENSOR);
-    const timesMap = get(times);
-    if (timesMap != null) {
-      const entry = timesMap.get(DEFAULT_SURVEY_SENSOR)!;
-      currentDate.set(String(entry[1])); // max
-    }
-  }
-});
 
 // mobile device detection
 // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
@@ -508,3 +445,78 @@ export function loadAnnotations(): void {
     annotationManager.set(new AnnotationManager(annotations));
   });
 }
+
+export const metaDataManager = writable(new MetaDataManager([]));
+
+export function loadMetaData(): Promise<{ level: RegionLevel; date: string }> {
+  return callMetaAPI2().then((meta) => {
+    const m = new MetaDataManager(meta);
+    metaDataManager.set(m);
+
+    // validate level and date data
+    let l = get(currentLevel);
+    const sensor = get(currentSensor);
+    const sensorInfo = sensorMap.get(sensor);
+    if (sensorInfo && !sensorInfo.levels.includes(l)) {
+      l = sensorInfo.levels[0];
+      currentLevel.set(l);
+    }
+
+    let date = get(currentDate);
+    // Magic number of default date - if no URL params, use max date
+    // available
+    const timeEntry = sensorInfo ? m.getTimeFrame(sensorInfo) : null;
+    if (date === MAGIC_START_DATE && timeEntry != null) {
+      date = formatAPITime(timeDay.offset(timeEntry.max, -2));
+      currentDate.set(date);
+    }
+    return {
+      level: l,
+      date,
+    };
+  });
+}
+
+// validate if sensor and other parameter matches
+currentSensorEntry.subscribe((sensorEntry) => {
+  if (!sensorEntry) {
+    return;
+  }
+  // check level
+  const level = get(currentLevel);
+
+  if (!sensorEntry.levels.includes(level)) {
+    currentLevel.set(sensorEntry.levels[0]);
+  }
+
+  if (get(currentInfoSensor)) {
+    // show help, update it
+    currentInfoSensor.set(sensorEntry);
+  }
+
+  if (!sensorEntry.isCasesOrDeath) {
+    signalCasesOrDeathOptions.set({
+      cumulative: false,
+      incidence: false,
+    });
+  }
+
+  // clamp to time span
+  const timeFrame = get(metaDataManager).getTimeFrame(sensorEntry);
+  const current = get(currentDate) ?? '';
+  if (current < String(timeFrame.min_time)) {
+    currentDate.set(String(timeFrame.min_time));
+  } else if (current > String(timeFrame.max_time)) {
+    currentDate.set(String(timeFrame.max_time));
+  }
+});
+
+currentMode.subscribe((mode) => {
+  if (mode === modeByID['survey-results']) {
+    // change sensor and date to the latest one within the survey
+    currentSensor.set(DEFAULT_SURVEY_SENSOR);
+    const sensorEntry = sensorMap.get(DEFAULT_SURVEY_SENSOR)!;
+    const timeFrame = get(metaDataManager).getTimeFrame(sensorEntry);
+    currentDate.set(String(timeFrame.max_time));
+  }
+});

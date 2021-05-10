@@ -24,10 +24,10 @@
     return {};
   }
 
-  export function toEntry(sensor, statsLookup, level, index) {
-    const param = new SensorParam(sensor);
-    const stats = param.stats(statsLookup, level);
-    const domain = param.domain(statsLookup, level);
+  export function toEntry(sensor, manager, level, index) {
+    const param = new SensorParam(sensor, manager);
+    const stats = param.stats(level);
+    const domain = param.domain(level);
     return {
       index,
       id: sensor.key.replace(/[\s;:\-_()]+/gm, '_'),

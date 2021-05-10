@@ -1,5 +1,5 @@
 <script>
-  import { isMobileDevice, stats } from '../stores';
+  import { isMobileDevice } from '../stores';
   import { state2TileCell } from '../specs/matrixSpec';
   import { generateSparkLine } from '../specs/lineSpec';
   import HexGrid from '../components/HexGrid/HexGrid.svelte';
@@ -83,7 +83,7 @@
     interactive: false,
     domain: date.sparkLineTimeFrame.domain,
   });
-  $: colorScale = sensor.createColorScale($stats, region.level);
+  $: colorScale = sensor.createColorScale(region.level);
   $: dumpData = Promise.all(tileData.map((d) => d.dump)).then((rows) => rows.flat());
 
   const maxColumn = state2TileCell.reduce((acc, v) => Math.max(acc, v.x), 0) + 1;

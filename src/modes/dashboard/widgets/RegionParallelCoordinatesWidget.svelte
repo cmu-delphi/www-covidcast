@@ -1,6 +1,6 @@
 <script>
   import { getContext } from 'svelte';
-  import { getLevelInfo, stats } from '../../../stores';
+  import { getLevelInfo, metaDataManager } from '../../../stores';
   import { combineSignals } from '../../../data/utils';
   import { formatDateISO } from '../../../formats';
   import { addNameInfos } from '../../../data';
@@ -66,7 +66,7 @@
   }
 
   $: shownLevel = level === 'nation' ? 'state' : level;
-  $: entries = sensors.map((sensor, i) => toEntry(sensor, $stats, shownLevel, i));
+  $: entries = sensors.map((sensor, i) => toEntry(sensor, $metaDataManager, shownLevel, i));
   $: data = loadData(entries, shownLevel, date);
   $: fileName = `Indicators_${getLevelInfo(shownLevel).labelPlural}_${formatDateISO(date.value)}`;
 

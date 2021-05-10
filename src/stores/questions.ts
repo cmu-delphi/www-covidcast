@@ -1,6 +1,5 @@
 import { ensureSensorStructure, Sensor, sensorList } from './constants';
 import descriptions from './questions.generated.json';
-import { SensorParam } from './params';
 import { isoParse } from 'd3-time-format';
 import type { RegionLevel } from '../data/regions';
 
@@ -47,10 +46,6 @@ export interface Revision {
    * matching sensor
    */
   sensor: Sensor;
-  /**
-   * question as param
-   */
-  sensorParam: SensorParam;
 }
 
 export interface Question {
@@ -67,7 +62,6 @@ export interface Question {
   name: string;
   signal: string;
   sensor: Sensor;
-  sensorParam: SensorParam;
 }
 
 function toAnchor(value: string) {
@@ -100,7 +94,6 @@ export const questions: Question[] = descriptions.questions.map((desc) => {
   const q: Question = {
     ...desc,
     sensor,
-    sensorParam: new SensorParam(sensor),
     anchor: toAnchor(desc.name),
     addedInWave: waves[desc.addedInWave - 1],
     oldRevisions: undefined,
@@ -120,7 +113,6 @@ export const questions: Question[] = descriptions.questions.map((desc) => {
         acc.push({
           ...rev,
           sensor: revSensor,
-          sensorParam: new SensorParam(revSensor),
           changedInWave: acc.length === 0 ? waves[desc.addedInWave - 1] : acc[acc.length - 1].addedInWave,
           addedInWave: waves[rev.addedInWave - 1],
         });

@@ -35,6 +35,7 @@
   import { WidgetHighlight } from '../highlight';
   import { SensorParam } from '../../../stores/params';
   import { createEventDispatcher } from 'svelte';
+  import { metaDataManager } from '../../../stores';
 
   const dispatch = createEventDispatcher();
   export let id = undefined;
@@ -197,7 +198,7 @@
             <TrendIndicator trend={r.trendObj} block />
           </td>
           <td class="uk-text-right table-value">
-            <SensorValue sensor={new SensorParam(r.sensor)} value={r.value} />
+            <SensorValue sensor={new SensorParam(r.sensor, $metaDataManager)} value={r.value} />
           </td>
         </tr>
       {/each}

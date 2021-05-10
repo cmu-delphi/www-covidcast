@@ -1,6 +1,5 @@
 <script>
   import { scaleLinear } from 'd3-scale';
-  import { stats } from '../../stores';
   /**
    * @type {import('../../stores/params').SensorParam}
    */
@@ -13,7 +12,7 @@
 
   export let level = 'state';
 
-  $: scale = sensor.createColorScale($stats, level);
+  $: scale = sensor.createColorScale(level);
 
   $: linearScale = scale.copy().rangeRound([0, 100]);
 

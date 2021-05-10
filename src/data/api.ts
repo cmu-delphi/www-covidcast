@@ -1,5 +1,4 @@
 import { formatAPITime } from './utils';
-import type { DataSensor } from './fetchData';
 import type { RegionLevel } from './regions';
 import type { TimeFrame } from './TimeFrame';
 import { GeoPair, isArray, SourceSignalPair, TimePair } from './apimodel';
@@ -262,48 +261,11 @@ export function callBackfillAPI(
   });
 }
 
-export interface EpiDataMetaEntry {
-  min_time: number;
-  max_time: number;
-  max_value: number;
-  stdev_value: number;
-  mean_value: number;
-  max_issue: number;
-
-  data_source: string;
-  signal: string;
-  time_type: string;
-  geo_type: RegionLevel;
-}
-/**
- */
-export function callMetaAPI(
-  dataSignals: DataSensor[],
-  fields: string[],
-  filters: Record<string, string>,
-): Promise<EpiDataResponse<EpiDataMetaEntry>> {
-  const url = new URL(ENDPOINT + '/covidcast_meta/');
-  const data = new FormData();
-  if (dataSignals && dataSignals.length > 0) {
-    const signals = dataSignals
-      .map((d) =>
-        d.isCasesOrDeath
-          ? Object.values(d.casesOrDeathSignals ?? {})
-              .map((s) => `${d.id}:${s}`)
-              .join(',')
-          : `${d.id}:${d.signal}`,
-      )
-      .join(',');
-    url.searchParams.set('signals', signals);
-  }
-  if (fields && fields.length > 0) {
-    url.searchParams.set('fields', fields.join(','));
-  }
-  Object.entries(filters || {}).forEach((entry) => {
-    data.set(entry[0], entry[1]);
-    url.searchParams.set(entry[0], entry[1]);
-  });
-  return fetchImpl(url);
+export interface EpiDataMetaStatsInfo {
+  min: number;
+  max: number;
+  mean: number;
+  stdev: number;
 }
 
 export interface EpiDataMetaInfo {
@@ -317,7 +279,7 @@ export interface EpiDataMetaInfo {
   max_issue: number;
   max_time: number;
   min_time: number;
-  geo_types: Record<RegionLevel, { min: number; max: number; mean: number; stdev: number }>;
+  geo_types: Record<RegionLevel, EpiDataMetaStatsInfo>;
 }
 
 export function callMetaAPI2(signal: SourceSignalPair | readonly SourceSignalPair[] = []): Promise<EpiDataMetaInfo[]> {

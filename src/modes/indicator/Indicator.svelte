@@ -6,13 +6,13 @@
   import GeoTable from './GeoTable.svelte';
   import IndicatorOverview from '../../blocks/IndicatorOverview.svelte';
   import chevronLeftIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-left.svg';
-  import { currentMode, getScrollToAnchor } from '../../stores';
+  import { currentMode, getScrollToAnchor, metaDataManager } from '../../stores';
   import { modeByID } from '..';
   import IndicatorAbout from './IndicatorAbout.svelte';
   import RegionOverview from './RegionOverview.svelte';
   import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
   import RegionDatePicker from '../../components/RegionDatePicker.svelte';
-  import { currentRegionInfo, currentSensorEntry, currentDateObject, times } from '../../stores';
+  import { currentRegionInfo, currentSensorEntry, currentDateObject } from '../../stores';
   import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
   import { formatDateWeekday } from '../../formats';
   import { afterUpdate } from 'svelte';
@@ -22,8 +22,8 @@
   import IndicatorCorrelation from './IndicatorCorrelation.svelte';
   import MaxDateHint from '../../blocks/MaxDateHint.svelte';
 
-  $: sensor = new SensorParam($currentSensorEntry);
-  $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
+  $: sensor = new SensorParam($currentSensorEntry, $metaDataManager);
+  $: date = new DateParam($currentDateObject);
   $: region = new RegionParam($currentRegionInfo);
 
   const items = [nationInfo, ...stateInfo, ...countyInfo];
@@ -66,7 +66,7 @@
 
       <p>
         On {formatDateWeekday(date.value)}
-        <MaxDateHint sensor={sensor.value} level={region.level} suffix="," />
+        <MaxDateHint sensor={sensor.value} suffix="," />
         the {sensor.valueUnit} was:
       </p>
       <IndicatorOverview {sensor} {date} {region} {fetcher} />

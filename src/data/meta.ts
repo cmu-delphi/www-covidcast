@@ -1,270 +1,165 @@
-import {
-  times,
-  currentDate,
-  stats,
-  currentSensor,
-  currentLevel,
-  MAGIC_START_DATE,
-  ITimeInfo,
-  IStatsInfo,
-} from '../stores';
-import {
-  sensorList,
-  sensorMap,
-  levels,
-  yesterday,
-  regularSignalMetaDataGeoTypeCandidates,
-  SensorEntry,
-  EpiDataCasesOrDeathValues,
-} from '../stores/constants';
-import { get } from 'svelte/store';
-import { callMetaAPI, EpiDataMetaEntry, EpiDataResponse } from './api';
-import { parseAPITime, formatAPITime } from './utils';
-import { timeDay } from 'd3-time';
+import { EpiDataCasesOrDeathValues, primaryValue, CasesOrDeathOptions } from '../stores/constants';
+import type { EpiDataMetaInfo, EpiDataMetaStatsInfo } from './api';
+import { parseAPITime } from './utils';
 import type { RegionLevel } from './regions';
+import { isCountSignal } from './signals';
+import { ALL_TIME_FRAME, TimeFrame } from './TimeFrame';
 
-function toStatsRegionKey(sensorKey: string, region: string) {
-  return sensorKey + '_' + region;
+function toKey(source: string, signal: string) {
+  return `${source}-${signal}`;
 }
 
-function processMetaData(meta: EpiDataResponse<EpiDataMetaEntry>): { level: RegionLevel; date: string } {
-  const timeMap = new Map<string, ITimeInfo>();
-  const statsMap = new Map<string, IStatsInfo>();
+const INVALID_STATS: EpiDataMetaStatsInfo = { min: 0, max: 100, mean: 50, stdev: 10 };
 
-  sensorList.forEach((sEntry) => {
-    // need to change mean / std for counts
-    if (sEntry.isCount || sEntry.isCasesOrDeath) {
-      loadCountSignal(sEntry, meta, timeMap, statsMap);
-    } else {
-      loadRegularSignal(sEntry, meta, timeMap, statsMap);
+const MAGIC_MIN_STATS = 0.14;
+
+function extractStats(signal: string, entry: EpiDataMetaInfo | null, level?: RegionLevel): EpiDataMetaStatsInfo {
+  if (!entry || Object.keys(entry.geo_types).length === 0) {
+    return INVALID_STATS;
+  }
+  const isCount = isCountSignal(signal);
+  if (isCount && level != null) {
+    // use level specific ones
+    const byLevel = entry.geo_types[level];
+    if (byLevel) {
+      return byLevel;
     }
-  });
-
-  // update store once
-  stats.set(statsMap);
-  times.set(timeMap);
-
-  // validate level and date data
-
-  let l = get(currentLevel);
-  const sensor = get(currentSensor);
-  const sensorInfo = sensorMap.get(sensor);
-  if (sensorInfo && !sensorInfo.levels.includes(l)) {
-    l = sensorInfo.levels[0];
-    currentLevel.set(l);
   }
-
-  let date = get(currentDate);
-  // Magic number of default date - if no URL params, use max date
-  // available
-  const timeEntry = timeMap.get(sensor);
-  if (date === MAGIC_START_DATE && timeEntry != null) {
-    date = formatAPITime(timeDay.offset(parseAPITime(timeEntry[1]), -2));
-    currentDate.set(date);
+  const countyLevel = entry.geo_types.county;
+  if (countyLevel) {
+    return countyLevel;
   }
+  const nationLevel = entry.geo_types.nation;
+  if (nationLevel) {
+    return nationLevel;
+  }
+  // take first one
+  return [...Object.values(entry.geo_types)][0]!;
+}
 
+export interface EpiDataMetaParsedInfo extends EpiDataMetaInfo {
+  maxIssue: Date;
+  minTime: Date;
+  maxTime: Date;
+  timeFrame: TimeFrame;
+}
+
+function parse(d: EpiDataMetaInfo): EpiDataMetaParsedInfo {
+  const minTime = parseAPITime(d.min_time);
+  const maxTime = parseAPITime(d.max_time);
   return {
-    level: l,
-    date,
+    ...d,
+    maxIssue: parseAPITime(d.max_issue),
+    minTime,
+    maxTime,
+    timeFrame: new TimeFrame(minTime, maxTime),
   };
 }
 
-function updateTimeMap(key: string, matchedMeta: EpiDataMetaEntry, timeMap: Map<string, ITimeInfo>) {
-  timeMap.set(key, [matchedMeta.min_time, matchedMeta.max_time > yesterday ? yesterday : matchedMeta.max_time]);
-}
-function updateStatsMap(key: string, matchedMeta: EpiDataMetaEntry, statsMap: Map<string, IStatsInfo>) {
-  statsMap.set(key, {
-    max: matchedMeta.max_value,
-    mean: matchedMeta.mean_value,
-    std: matchedMeta.stdev_value,
-    maxIssue: parseAPITime(matchedMeta.max_issue),
-    maxTime: parseAPITime(matchedMeta.max_time),
-    minTime: parseAPITime(matchedMeta.min_time),
-  });
-}
-
-interface LocalSensorEntry {
-  minTime: number;
-  maxTime: number;
-
-  max: number;
-  mean: number;
-  std: number;
-
-  county_max: number;
-  county_mean: number;
-  county_std: number;
-
-  msa_max: number;
-  msa_mean: number;
-  msa_std: number;
-
-  state_max: number;
-  state_mean: number;
-  state_std: number;
-
-  hrr_max: number;
-  hrr_mean: number;
-  hrr_std: number;
-}
-
-function loadRegularSignal(
-  sEntry: SensorEntry,
-  meta: EpiDataResponse<EpiDataMetaEntry>,
-  timeMap: Map<string, ITimeInfo>,
-  statsMap: Map<string, IStatsInfo>,
-) {
-  // find the matching meta data by looping through the candidates and fallback to the first one
-  const baseFilter = (d: EpiDataMetaEntry) =>
-    d.data_source === sEntry.id && d.signal === sEntry.signal && (!d.time_type || d.time_type === 'day');
-
-  const byGeoTypePriority = (a: EpiDataMetaEntry, b: EpiDataMetaEntry) => {
-    // sort by geo types but consider their importance for the matching
-    const aIndex = regularSignalMetaDataGeoTypeCandidates.indexOf(a.geo_type);
-    const bIndex = regularSignalMetaDataGeoTypeCandidates.indexOf(b.geo_type);
-    if (aIndex === bIndex) {
-      return a.geo_type.localeCompare(b.geo_type);
+function toValueDomain(
+  stats: EpiDataMetaStatsInfo,
+  signal: string,
+  useMax: boolean,
+  enforceZeroLike: boolean,
+): [number, number] {
+  // Customize min max values for deaths
+  if (isCountSignal(signal)) {
+    if (useMax) {
+      return [0, stats.max];
     }
-    if (aIndex < 0) {
-      // missing is bigger
-      return 1;
-    }
-    if (bIndex < 0) {
-      return -1;
-    }
-    return aIndex - bIndex;
-  };
-
-  const candidates = meta.epidata.filter(baseFilter).sort(byGeoTypePriority);
-  const matchedMeta = candidates[0];
-
-  if (matchedMeta) {
-    updateTimeMap(sEntry.key, matchedMeta, timeMap);
-    updateStatsMap(sEntry.key, matchedMeta, statsMap);
-    return;
-  }
-  const localEntry = (sEntry as unknown) as LocalSensorEntry;
-  // If no metadata, use information from sensors
-  // Used for testing new data
-  timeMap.set(sEntry.key, [localEntry.minTime, localEntry.maxTime]);
-  statsMap.set(sEntry.key, {
-    max: localEntry.max,
-    mean: localEntry.mean,
-    std: localEntry.std,
-    maxIssue: new Date(),
-    minTime: new Date(),
-    maxTime: new Date(),
-  });
-}
-
-function loadCountSignal(
-  sEntry: SensorEntry,
-  meta: EpiDataResponse<EpiDataMetaEntry>,
-  timeMap: Map<string, ITimeInfo>,
-  statsMap: Map<string, IStatsInfo>,
-) {
-  const possibleMetaRows = meta.epidata.filter(
-    (d) => d.data_source === sEntry.id && (!d.time_type || d.time_type === 'day'),
-  );
-
-  sEntry.levels.forEach((region) => {
-    const statsKey = toStatsRegionKey(sEntry.key, region);
-
-    const matchedMeta = possibleMetaRows.find((d) => d.signal === sEntry.signal && d.geo_type === region);
-
-    if (matchedMeta) {
-      updateTimeMap(sEntry.key, matchedMeta, timeMap);
-      updateStatsMap(statsKey, matchedMeta, statsMap);
-      return;
-    }
-    const localEntry = (sEntry as unknown) as LocalSensorEntry;
-    // If no metadata, use information from sensors
-    // Used for testing new data
-    timeMap.set(sEntry.key, [localEntry.minTime, localEntry.maxTime]);
-    if (region === 'county') {
-      statsMap.set(statsKey, {
-        max: localEntry.county_max,
-        mean: localEntry.county_mean,
-        std: localEntry.county_std,
-        maxIssue: new Date(),
-        minTime: new Date(),
-        maxTime: new Date(),
-      });
-    } else if (region === 'msa') {
-      statsMap.set(statsKey, {
-        max: localEntry.msa_max,
-        mean: localEntry.msa_mean,
-        std: localEntry.msa_std,
-        maxIssue: new Date(),
-        minTime: new Date(),
-        maxTime: new Date(),
-      });
-    } else if (region === 'hrr') {
-      statsMap.set(statsKey, {
-        max: localEntry.hrr_max,
-        mean: localEntry.hrr_mean,
-        std: localEntry.hrr_std,
-        maxIssue: new Date(),
-        minTime: new Date(),
-        maxTime: new Date(),
-      });
-    } else {
-      statsMap.set(statsKey, {
-        max: localEntry.state_max,
-        mean: localEntry.state_mean,
-        std: localEntry.state_std,
-        maxIssue: new Date(),
-        minTime: new Date(),
-        maxTime: new Date(),
-      });
-    }
-  });
-
-  if (!sEntry.isCasesOrDeath) {
-    return;
+    return [
+      Math.max(enforceZeroLike ? MAGIC_MIN_STATS : Number.NEGATIVE_INFINITY, stats.mean - 3 * stats.stdev),
+      stats.mean + 3 * stats.stdev,
+    ];
   }
 
-  Object.keys(sEntry.casesOrDeathSignals).map((key) => {
-    const signal = sEntry.casesOrDeathSignals[key as keyof EpiDataCasesOrDeathValues];
-
-    const matchedMeta = possibleMetaRows.find((d) => d.signal === signal);
-    const statsKey = `${sEntry.key}_${key}`;
-    if (matchedMeta) {
-      updateTimeMap(sEntry.key, matchedMeta, timeMap);
-      updateStatsMap(statsKey, matchedMeta, statsMap);
-    }
-
-    // compute stats for each sub signal also
-    sEntry.levels.forEach((region) => {
-      const statsKey = toStatsRegionKey(sEntry.key, region) + `_${key}`;
-      const matchedMeta = possibleMetaRows.find((d) => d.signal === signal && d.geo_type === region);
-
-      if (matchedMeta) {
-        updateStatsMap(statsKey, matchedMeta, statsMap);
-      }
-    });
-  });
+  if (useMax) {
+    return [0, stats.max];
+  }
+  return [
+    Math.max(enforceZeroLike ? 0 : Number.NEGATIVE_INFINITY, stats.mean - 3 * stats.stdev),
+    stats.mean + 3 * stats.stdev,
+  ];
 }
 
-export function loadMetaData(sensors: SensorEntry[]): Promise<ReturnType<typeof processMetaData>> {
-  return callMetaAPI(
-    sensors,
-    [
-      'min_time',
-      'max_time',
-      'max_value',
-      'mean_value',
-      'stdev_value',
-      'signal',
-      'geo_type',
-      'data_source',
-      'max_issue',
-    ],
-    {
-      time_types: 'day',
-      geo_types: [...new Set(levels as string[])].join(','),
+export class MetaDataManager {
+  private readonly cache: Map<string, EpiDataMetaParsedInfo>;
+  constructor(metadata: EpiDataMetaInfo[]) {
+    this.cache = new Map(metadata.map((d) => [toKey(d.source, d.signal), parse(d)]));
+  }
+
+  getMetaData(sensor: { id: string; signal: string }): EpiDataMetaParsedInfo | null {
+    return this.cache.get(toKey(sensor.id, sensor.signal)) ?? null;
+  }
+
+  getLevels(sensor: { id: string; signal: string }): RegionLevel[] {
+    const entry = this.getMetaData(sensor);
+    return entry ? (Object.keys(entry.geo_types) as RegionLevel[]) : ['county'];
+  }
+
+  getStats(sensor: { id: string; signal: string }, level?: RegionLevel): EpiDataMetaStatsInfo {
+    const entry = this.getMetaData(sensor);
+    return extractStats(sensor.signal, entry, level);
+  }
+
+  getTimeFrame(sensor: { id: string; signal: string }): TimeFrame {
+    const entry = this.getMetaData(sensor);
+    if (!entry) {
+      return ALL_TIME_FRAME;
+    }
+    return entry.timeFrame;
+  }
+
+  getMetaDataCompatibility(
+    sensorEntry: {
+      id: string;
+      signal: string;
+      isCasesOrDeath?: boolean;
+      casesOrDeathSignals?: Record<keyof EpiDataCasesOrDeathValues, string>;
     },
-  ).then((meta) => {
-    return processMetaData(meta);
-  });
+    sensorOptions: Partial<CasesOrDeathOptions> = {},
+  ): EpiDataMetaInfo | null {
+    let signal = sensorEntry.signal;
+    if (sensorEntry.isCasesOrDeath) {
+      const valueKey = primaryValue(sensorEntry, sensorOptions) as keyof EpiDataCasesOrDeathValues;
+      signal = sensorEntry.casesOrDeathSignals?.[valueKey] ?? sensorEntry.signal;
+    }
+    return this.getMetaData({ id: sensorEntry.id, signal });
+  }
+
+  getStatsCompatibility(
+    sensorEntry: {
+      id: string;
+      signal: string;
+      isCasesOrDeath?: boolean;
+    },
+    sensorOptions: Partial<CasesOrDeathOptions> = {},
+    level?: RegionLevel,
+  ): EpiDataMetaStatsInfo {
+    const entry = this.getMetaDataCompatibility(sensorEntry, sensorOptions);
+    return extractStats(entry ? entry.signal : sensorEntry.signal, entry, level);
+  }
+
+  getValueDomain(
+    sensor: { id: string; signal: string },
+    level: RegionLevel,
+    { useMax = false, enforceZeroLike = true }: { useMax?: boolean; enforceZeroLike?: boolean } = {},
+  ): [number, number] {
+    const stats = this.getStats(sensor, level);
+    return toValueDomain(stats, sensor.signal, useMax, enforceZeroLike);
+  }
+
+  getValueDomainCompatibility(
+    sensorEntry: {
+      id: string;
+      signal: string;
+      isCasesOrDeath?: boolean;
+    },
+    level: RegionLevel,
+    signalOptions: Partial<CasesOrDeathOptions> = {},
+    { useMax = false, enforceZeroLike = true }: { useMax?: boolean; enforceZeroLike?: boolean } = {},
+  ): [number, number] {
+    const stats = this.getStatsCompatibility(sensorEntry, signalOptions, level);
+    return toValueDomain(stats, sensorEntry.signal, useMax, enforceZeroLike);
+  }
 }

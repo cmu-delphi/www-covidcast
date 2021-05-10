@@ -1,5 +1,4 @@
 import { isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data/signals';
-import { formatAPITime } from '../data/utils';
 import descriptions from './descriptions.generated.json';
 import { modeByID } from '../modes';
 import { formatRawValue, formatValue, formatPercentage } from '../formats';
@@ -366,31 +365,13 @@ export function extendSensorEntry(
   return casesOrDeath;
 }
 
-/**
- * defines the geo types / levels that are should be used for computing the meta data, the first one has the highest priority and so on
- */
-export const regularSignalMetaDataGeoTypeCandidates = ['county', 'msa'];
-
 const defaultSensors = (descriptions as unknown) as (Partial<SensorEntry> & {
   name: string;
   id: string;
   signal: string;
 })[];
 
-/**
- * @type {SensorEntry[]}
- */
-export const sensorList: SensorEntry[] = (() => {
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
-  const sensorsOption = urlParams.get('sensors');
-  if (sensorsOption) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (JSON.parse(decodeURIComponent(sensorsOption)) as any[]).map((d) => extendSensorEntry(d));
-  } else {
-    return defaultSensors.map(extendSensorEntry);
-  }
-})();
+export const sensorList = defaultSensors.map(extendSensorEntry);
 
 export const sensorMap = new Map(sensorList.map((s) => [s.key, s]));
 
@@ -430,9 +411,6 @@ export const defaultRegionOnStartup = {
   state: 'PA', // Pennsylvania
   hrr: '357', // Pittsburgh
 };
-
-export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
-export const yesterday = Number.parseInt(formatAPITime(yesterdayDate), 10);
 
 export const DEFAULT_MODE = modeByID.landing;
 export const DEFAULT_SENSOR = (sensorList.find((d) => d.highlight && d.highlight.includes('default')) || sensorList[0])

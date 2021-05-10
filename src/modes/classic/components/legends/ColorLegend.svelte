@@ -3,7 +3,6 @@
     colorScale,
     currentLevel,
     currentSensorEntry,
-    stats,
     signalCasesOrDeathOptions,
     isMobileDevice,
   } from '../../../../stores';
@@ -11,7 +10,7 @@
   import { MISSING_COLOR, ZERO_COLOR } from '../../../../theme';
 
   $: r = generateLabels(
-    $stats,
+    $metaDataManager,
     $currentSensorEntry,
     $currentLevel,
     $colorScale,

@@ -3,7 +3,7 @@
   import { formatDateISO } from '../formats';
   import { getCountiesOfState, getInfoByName } from '../data/regions';
   import { generateCountiesOfStateSpec, generateRelatedCountySpec, generateStateSpec } from '../specs/mapSpec';
-  import { stats, isMobileDevice } from '../stores';
+  import { isMobileDevice } from '../stores';
   import DownloadMenu from '../components/DownloadMenu.svelte';
   import RegionMapTooltip from './RegionMapTooltip.svelte';
 
@@ -28,9 +28,9 @@
    * @param {import("../../stores/params").SensorParam} sensor
    * @param {import("../../stores/params").RegionParam} region
    */
-  function genSpec(stats, sensor, region) {
+  function genSpec(sensor, region) {
     const options = {
-      domain: sensor.domain(stats, region.level === 'state' || region.level === 'county' ? 'county' : 'state'),
+      domain: sensor.domain(region.level === 'state' || region.level === 'county' ? 'county' : 'state'),
       withStates: true,
       scheme: sensor.value.vegaColorScale,
     };
@@ -74,7 +74,7 @@
     return `${sensor.name}_${regionName}_${formatDateISO(date.value)}`;
   }
 
-  $: spec = genSpec($stats, sensor, region);
+  $: spec = genSpec(sensor, region);
   $: data = loadData(sensor, date);
 
   $: showsUS = region.level === 'nation';

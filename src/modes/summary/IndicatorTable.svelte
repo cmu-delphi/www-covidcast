@@ -4,7 +4,7 @@
   import { SensorParam } from '../../stores/params';
   import { formatDateISO, formatDateShortNumbers } from '../../formats';
   import filterIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/filter.svg';
-  import { currentMode } from '../../stores';
+  import { currentMode, metaDataManager } from '../../stores';
   import { modeByID } from '..';
   import TrendIndicator from '../../components/TrendIndicator.svelte';
   import Vega from '../../components/vega/Vega.svelte';
@@ -72,7 +72,7 @@
       return {
         ...group,
         sensors: group.sensors.map((s) => {
-          const sensor = new SensorParam(s);
+          const sensor = new SensorParam(s, $metaDataManager);
           return {
             sensor,
             // same order ensured

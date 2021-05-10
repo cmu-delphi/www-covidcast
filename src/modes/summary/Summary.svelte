@@ -5,8 +5,15 @@
   import AllIndicatorOverview from './AllIndicatorOverview.svelte';
   import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
   import RegionDatePicker from '../../components/RegionDatePicker.svelte';
-  import { currentRegionInfo, currentSensorEntry, currentDateObject, times, getScrollToAnchor } from '../../stores';
-  import { SensorParam, DateParam, RegionParam, DataFetcher, CASES } from '../../stores/params';
+  import {
+    currentRegionInfo,
+    currentSensorEntry,
+    currentDateObject,
+    getScrollToAnchor,
+    metaDataManager,
+    sensorList,
+  } from '../../stores';
+  import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
   import RegionMapWrapper from '../../blocks/RegionMapWrapper.svelte';
   import FancyHeader from '../../components/FancyHeader.svelte';
   import HistoryLineChart from '../../blocks/HistoryLineChart.svelte';
@@ -14,9 +21,14 @@
   import { scrollIntoView } from '../../util';
   import { modeByID } from '..';
 
-  $: sensor = new SensorParam($currentSensorEntry);
-  $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
+  $: sensor = new SensorParam($currentSensorEntry, $metaDataManager);
+  $: date = new DateParam($currentDateObject);
   $: region = new RegionParam($currentRegionInfo);
+
+  $: CASES = new SensorParam(
+    sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Cases')),
+    $metaDataManager,
+  );
 
   const items = [nationInfo, ...stateInfo, ...countyInfo];
 

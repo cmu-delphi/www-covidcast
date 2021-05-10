@@ -3,7 +3,7 @@
   import WidgetCard, { DEFAULT_WIDGET_STATE } from './WidgetCard.svelte';
   import { getContext } from 'svelte';
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
-  import { getLevelInfo, stats } from '../../../stores';
+  import { getLevelInfo } from '../../../stores/constants';
   import { formatDateISO, formatDateYearWeekdayAbbr } from '../../../formats';
   import RegionMapTooltip from '../../../blocks/RegionMapTooltip.svelte';
   import {
@@ -71,7 +71,7 @@
      * @type {import('../../../specs/mapSpec').CommonParams}
      */
     const options = {
-      domain: sensor.domain($stats, level),
+      domain: sensor.domain(level),
       scheme: sensor.value.vegaColorScale,
       title: [`${sensor.name} in US ${getLevelInfo(level).labelPlural}`, `on ${formatDateYearWeekdayAbbr(date.value)}`],
       subTitle: sensor.unit,

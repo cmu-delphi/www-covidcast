@@ -20,7 +20,7 @@
   <div data-uk-alert class="uk-alert-warning">
     The indicator "{sensor.name}" does not support the geographic level: {getLevelInfo(region.level).labelPlural}.
   </div>
-{:else if date.sensorTimeFrame.max < date.value}
+{:else if sensor.timeFrame.max < date.value}
   <div data-uk-alert class="uk-alert-warning">
     The indicator "{sensor.name}" is not available for {formatDateYearWeekdayAbbr(date.value)}, yet.
   </div>

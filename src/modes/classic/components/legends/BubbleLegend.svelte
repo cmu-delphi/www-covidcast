@@ -2,13 +2,13 @@
   import { MISSING_COLOR } from '../../../../theme';
   import { ENCODING_BUBBLE_THEME } from '../../theme';
   import {
-    stats,
     currentLevel,
     colorScale,
     bubbleRadiusScale,
     currentSensorEntry,
     signalCasesOrDeathOptions,
     isMobileDevice,
+    metaDataManager,
   } from '../../../../stores';
   import { transparent } from '../../../../util';
   import { generateLabels } from '../MapBox/colors';
@@ -16,7 +16,7 @@
   export let zoom = 1.0;
 
   $: r = generateLabels(
-    $stats,
+    $metaDataManager,
     $currentSensorEntry,
     $currentLevel,
     $colorScale,
