@@ -6,7 +6,6 @@
   import { getAvailableCounties } from '../../data/indicatorInfo';
   import KPIValue from '../../components/KPIValue.svelte';
   import IndicatorCoverageChart from './IndicatorCoverageChart.svelte';
-  import BackfillTimeProfile from './BackfillTimeProfile.svelte';
 
   /**
    * @type {import('../../data/indicatorInfo').IndicatorStatus}
@@ -17,8 +16,6 @@
    * @type {import('../../stores/params').TimeFrame}
    */
   export let domain;
-
-  console.log(domain);
 
   $: pickedDate = signal.latest_time_value;
 
@@ -72,7 +69,3 @@
 <div class="grid-2-12">
   <IndicatorCountyMap {signal} date={pickedDate} {data} />
 </div>
-
-{#if signal}
-  <BackfillTimeProfile indicator={signal} date={pickedDate} />
-{/if}

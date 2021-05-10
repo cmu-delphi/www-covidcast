@@ -1,28 +1,25 @@
 <script>
+  import FancyHeader from '../../components/FancyHeader.svelte';
   import Vega from '../../components/vega/Vega.svelte';
   import { loadBackFillProfile } from '../../data/indicatorInfo';
-  import { DateParam } from '../../stores/params';
+  import { TimeFrame, WINDOW_SIZE } from '../../stores/params';
   import { currentRegionInfo, selectByInfo } from '../../stores';
   import DownloadMenu from '../../components/DownloadMenu.svelte';
   import { backFillWeekdayDistribution, generateHeatMapSpec } from './backfillSpec';
-  import FancyHeader from '../../components/FancyHeader.svelte';
   import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
   import Search from '../../components/Search.svelte';
   import OptionPicker from '../../components/OptionPicker.svelte';
+  import { timeMonth } from 'd3-time';
 
   /**
    * @type {import('../../data/indicatorInfo').IndicatorStatus}
    */
   export let indicator;
 
-  /**
-   * @type {Date}
-   */
-  export let date;
-
   $: region = $currentRegionInfo || nationInfo;
 
-  $: window = new DateParam(date).windowTimeFrame;
+  $: date = indicator ? indicator.latest_time_value : new Date();
+  $: window = new TimeFrame(timeMonth.offset(date, WINDOW_SIZE), date);
 
   const dateOptions = [
     { label: 'Reported Date', value: 'date_value' },
@@ -71,13 +68,9 @@
   let vegaRefWeekday = undefined;
 </script>
 
-<div class="grid-3-11">
-  <hr />
-  <FancyHeader invert sub="Backfill Profile">{indicator.name}</FancyHeader>
-</div>
 <Search
   modern
-  className="grid-1-7"
+  className="grid-3 grid-span-8"
   placeholder="Select a region"
   items={[nationInfo, ...stateInfo, ...countyInfo]}
   title="Region"
@@ -87,26 +80,30 @@
   maxItemsToShowInList="5"
   on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)}
 />
-<div class="grid-7-13">
-  <OptionPicker label="Color" bind:value={valueField} options={valueOptions} modern />
-  <OptionPicker label="Date" bind:value={dateField} options={dateOptions} modern />
-  <OptionPicker label="Anchor Lag" bind:value={anchorLagStr} options={anchorLagOptions} modern />
-</div>
+<OptionPicker className="grid-3 grid-span-4" label="Color" bind:value={valueField} options={valueOptions} modern />
+<OptionPicker className="grid-7 grid-span-2" label="Date" bind:value={dateField} options={dateOptions} modern />
+<OptionPicker
+  className="grid-9 grid-span-2"
+  label="Anchor Lag"
+  bind:value={anchorLagStr}
+  options={anchorLagOptions}
+  modern
+/>
 
-<div class="grid-3-11">
+<div class="grid-3 grid-span-8">
+  <FancyHeader invert sub="Backfill Profile">{indicator.name}</FancyHeader>
   <div class="chart-300">
     <Vega bind:this={vegaRef} {spec} {data} className="chart-breakout" />
     <DownloadMenu {vegaRef} {data} absolutePos fileName={title.replace(/\s+/gm, '_')} advanced={false} />
   </div>
 </div>
-
-<div class="grid-1-7">
+<div class="grid-3 grid-span-4">
   <div class="chart-300">
     <Vega bind:this={vegaRefWeekday} spec={weekdaySpec} {data} />
     <DownloadMenu vegaRef={vegaRefWeekday} {data} absolutePos fileName={title.replace(/\s+/gm, '_')} advanced={false} />
   </div>
 </div>
-<div class="grid-7-13">
+<div class="grid-7 grid-span-4">
   <div class="chart-300">
     <!-- <Vega bind:this={vegaRef} {spec} {data} className="chart-breakout" />
     <DownloadMenu {vegaRef} {data} absolutePos fileName={title.replace(/\s+/gm, '_')} advanced={false} /> -->
