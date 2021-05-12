@@ -13,7 +13,7 @@
     MULTI_COLORS,
     genDateHighlight,
     genAnnotationLayer,
-    generateCumulatedBarSpec,
+    generateCumulativeBarSpec,
   } from '../specs/lineSpec';
   import { toTimeValue } from '../data/utils';
   import Toggle from '../components/Toggle.svelte';
@@ -94,14 +94,14 @@
    * @param {import('../../stores/params').RegionParam} region
    * @param {import('../../stores/params').DateParam} date
    * @param {import('../../stores/params').TimeFrame} timeFrame
-   * @param {{height: number, zero: boolean, raw: boolean, isMobile: boolean, singleRegionOnly: boolean, cumulated: boolean}} options
+   * @param {{height: number, zero: boolean, raw: boolean, isMobile: boolean, singleRegionOnly: boolean, cumulative: boolean}} options
    */
   function genSpec(
     sensor,
     region,
     date,
     timeFrame,
-    { height, zero, raw, isMobile, singleRegionOnly, domain, cumulated },
+    { height, zero, raw, isMobile, singleRegionOnly, domain, cumulative },
   ) {
     const options = {
       initialDate: highlightDate || date.value,
@@ -110,16 +110,16 @@
       domain: domain || timeFrame.domain,
       zero,
       xTitle: sensor.xAxis,
-      title: joinTitle([(cumulated ? 'Cumulated ' : '') + sensor.name, `in ${region.displayName}`], isMobile),
+      title: joinTitle([(cumulative ? 'Cumulative ' : '') + sensor.name, `in ${region.displayName}`], isMobile),
       subTitle: sensor.unit,
       highlightRegion: true,
     };
-    if (cumulated) {
+    if (cumulative) {
       options.paddingLeft = 52; // more space for larger numbers
     }
     if (raw) {
-      if (cumulated) {
-        return generateCumulatedBarSpec(options);
+      if (cumulative) {
+        return generateCumulativeBarSpec(options);
       }
       return generateLineAndBarSpec(options);
     }
@@ -180,7 +180,7 @@
    * @param {import("../../stores/params").DateParam} date
    * @param {import("../../stores/params").RegionParam} region
    */
-  function loadSingleData(sensor, region, timeFrame, { cumulated }) {
+  function loadSingleData(sensor, region, timeFrame, { cumulative }) {
     if (!region.value) {
       return null;
     }
@@ -188,14 +188,14 @@
     const selfData = fetcher.fetch1Sensor1RegionNDates(sensor.value, region, timeFrame);
     const rawData = fetcher.fetch1Sensor1RegionNDates(sensor.rawValue, region, timeFrame);
 
-    if (cumulated) {
-      // raw and cumulated
-      const cumulatedData = fetcher.fetch1Sensor1RegionNDates(sensor.rawCumulatedValue, region, timeFrame);
-      return Promise.all([selfData, rawData, cumulatedData]).then((data) => {
+    if (cumulative) {
+      // raw and cumulative
+      const cumulativeData = fetcher.fetch1Sensor1RegionNDates(sensor.rawCumulativeValue, region, timeFrame);
+      return Promise.all([selfData, rawData, cumulativeData]).then((data) => {
         return combineSignals(
           data,
           data[0].map((d) => ({ ...d })),
-          ['smoothed', 'raw', 'cumulated'],
+          ['smoothed', 'raw', 'cumulative'],
         );
       });
     } else {
@@ -237,14 +237,14 @@
    * @param {import("../../stores/params").SensorParam} sensor
    * @param {import("../../stores/params").Region[]} region
    */
-  function generateFileName(sensor, regions, timeFrame, raw, cumulated) {
+  function generateFileName(sensor, regions, timeFrame, raw, cumulative) {
     const regionName = regions.map((region) => `${region.propertyId}-${region.displayName}`).join(',');
     let suffix = '';
     if (raw) {
       suffix = '_RawVsSmoothed';
     }
-    if (cumulated) {
-      suffix += '_Cumulated';
+    if (cumulative) {
+      suffix += '_Cumulative';
     }
     return `${sensor.name}_${regionName}_${formatDateISO(timeFrame.min)}-${formatDateISO(timeFrame.max)}${suffix}`;
   }
@@ -264,10 +264,10 @@
 
   let zoom = false;
   let singleRaw = false;
-  let singleCumulated = false;
+  let singleCumulative = false;
 
   $: raw = singleRaw && sensor.rawValue != null;
-  $: cumulated = raw && singleCumulated && sensor.rawCumulatedValue != null;
+  $: cumulative = raw && singleCumulative && sensor.rawCumulativeValue != null;
   $: regions = raw ? [region.value] : resolveRegions(region.value, singleRegionOnly);
   $: annotations = $annotationManager.getWindowAnnotations(sensor.value, regions, timeFrame.min, timeFrame.max);
   $: spec = injectRanges(
@@ -278,15 +278,15 @@
       isMobile: $isMobileDevice,
       singleRegionOnly,
       domain,
-      cumulated,
+      cumulative,
     }),
     timeFrame,
     annotations,
   );
   $: data = raw
-    ? loadSingleData(sensor, region, timeFrame, { cumulated })
+    ? loadSingleData(sensor, region, timeFrame, { cumulative })
     : loadData(sensor, region, timeFrame, singleRegionOnly);
-  $: fileName = generateFileName(sensor, regions, timeFrame, raw, cumulated);
+  $: fileName = generateFileName(sensor, regions, timeFrame, raw, cumulative);
 
   function findValue(region, data, date, prop = 'value') {
     if (!date) {
@@ -330,15 +330,15 @@
   <Toggle bind:checked={zoom}>Rescale Y-axis</Toggle>
   {#if sensor.rawValue != null}
     <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
-    {#if raw && sensor.rawCumulatedValue != null}
-      <Toggle bind:checked={singleCumulated}>Cumulated Data</Toggle>
+    {#if raw && sensor.rawCumulativeValue != null}
+      <Toggle bind:checked={singleCumulative}>Cumulative Data</Toggle>
     {/if}
   {/if}
   {#if expandableWindow}
     <Toggle bind:checked={showFull}>Show All Dates</Toggle>
   {/if}
   <div class="spacer" />
-  <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} {cumulated} />
+  <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} {cumulative} />
 </div>
 
 <div class="{!raw && regions.length > 1 ? 'mobile-two-col' : ''} legend">
@@ -367,9 +367,9 @@
             <SensorValue {sensor} value={findValue(r, d, highlightDate)} medium />
             {#if raw}
               (raw:
-              {#if cumulated}
-                <SensorValue {sensor} value={findValue(r, d, highlightDate, 'raw')} medium />, cumulated:
-                <SensorValue {sensor} value={findValue(r, d, highlightDate, 'cumulated')} medium />)
+              {#if cumulative}
+                <SensorValue {sensor} value={findValue(r, d, highlightDate, 'raw')} medium />, cumulative:
+                <SensorValue {sensor} value={findValue(r, d, highlightDate, 'cumulative')} medium />)
               {:else}
                 <SensorValue {sensor} value={findValue(r, d, highlightDate, 'raw')} medium />)
               {/if}

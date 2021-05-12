@@ -1,4 +1,4 @@
-import { isCasesSignal, isDeathSignal, isPropSignal, isCountSignal } from '../data/signals';
+import { isPropSignal, isCountSignal } from '../data/signals';
 import { formatAPITime } from '../data/utils';
 import descriptions from './descriptions.generated.json';
 import { modeByID } from '../modes';
@@ -79,8 +79,8 @@ export interface Sensor {
   readonly rawSignal?: string; // raw signal in case of a 7day average
   readonly rawSensor?: Sensor; // raw signal in case of a 7day average
 
-  readonly rawCumulatedSignal?: string; // raw cumulated version of this signal
-  readonly rawCumulatedSensor?: Sensor; /// raw cumulated version of this signal
+  readonly rawCumulativeSignal?: string; // raw cumulative version of this signal
+  readonly rawCumulativeSensor?: Sensor; /// raw cumulative version of this signal
 
   readonly name: string; // signal name
   readonly unit: string;
@@ -300,7 +300,6 @@ export function extendSensorEntry(
   sensorEntry: Partial<SensorEntry> & { name: string; id: string; signal: string },
 ): SensorEntry {
   const key = `${sensorEntry.id}-${sensorEntry.signal}`;
-  const isCasesOrDeath = isCasesSignal(key) || isDeathSignal(key);
   const isCount = isCountSignal(key);
 
   const mapTitle = (sensorEntry.mapTitleText as unknown) as {
@@ -319,23 +318,25 @@ export function extendSensorEntry(
     plotTitleText: sensorEntry.plotTitleText || sensorEntry.name,
     mapTitleText: sensorEntry.mapTitleText as string,
   });
+  const casesOrDeath = (sensorEntry as unknown) as Sensor & CasesOrDeathOldSensor;
+  const isCasesOrDeath = casesOrDeath.casesOrDeathSignals != null;
+
   if (!isCasesOrDeath) {
     return full;
   }
 
-  const casesOrDeath = (full as unknown) as Sensor & CasesOrDeathOldSensor;
   casesOrDeath.isCasesOrDeath = true;
 
-  // create the cumulated version
-  const rawCumulatedSignal = casesOrDeath.casesOrDeathSignals.countRatioCumulative;
+  // create the cumulative version
+  const rawCumulativeSignal = casesOrDeath.casesOrDeathSignals.countRatioCumulative;
   Object.assign(full, {
-    rawCumulatedSignal,
-    rawCumulatedSensor: {
+    rawCumulativeSignal,
+    rawCumulativeSensor: {
       ...full,
-      key: `${full.id}-${rawCumulatedSignal}`,
+      key: `${full.id}-${rawCumulativeSignal}`,
       name: `Cumulative ${full.name.replace('(7-day average)', '')} (Raw)`,
       description: full.description!.replace('(7-day average)', ''),
-      signal: rawCumulatedSignal,
+      signal: rawCumulativeSignal,
       is7DayAverage: false,
       rawSensor: null,
       rawSignal: null,
