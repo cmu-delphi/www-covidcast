@@ -462,7 +462,7 @@ export function generateCompareLineSpec(
   return spec;
 }
 
-export function generateLineAndBarSpec(options: LineSpecOptions = {}): TopLevelSpec {
+export function generateLineAndBarSpec(options: LineSpecOptions = {}): TopLevelSpec & LayerSpec<Field> {
   const spec = generateLineChartSpec(options);
   const point = spec.layer[1] as NormalizedUnitSpec;
   point.mark = {
@@ -473,7 +473,47 @@ export function generateLineAndBarSpec(options: LineSpecOptions = {}): TopLevelS
     },
   };
   (point.encoding!.y as PositionFieldDef<Field>).field = 'raw';
+  (point.encoding!.y as PositionFieldDef<Field>).stack = null;
   (point.encoding!.opacity as PositionValueDef).value = 0.2;
+  return spec;
+}
+
+export function generateCumulatedBarSpec(options: LineSpecOptions = {}): TopLevelSpec {
+  const spec = generateLineChartSpec(options);
+  // convert line to bar chart
+  const line = spec.layer[0] as NormalizedUnitSpec;
+  line.mark = {
+    type: 'bar',
+    color: options.color || MULTI_COLORS[0],
+    width: {
+      expr: `floor(width / customCountDays(domain('x')[0], domain('x')[1]))`,
+    },
+  };
+  (line.encoding!.y as PositionFieldDef<Field>).field = 'cumulated';
+  (line.encoding!.y as PositionFieldDef<Field>).stack = null;
+  (line.encoding!.opacity as PositionValueDef) = {
+    value: 0.2,
+  };
+  // convert highlight point to shifted bar chart at the top
+  const point = spec.layer[1] as NormalizedUnitSpec;
+  point.transform = [
+    {
+      calculate: `datum.cumulated - datum.raw`,
+      as: 'prevCumulated',
+    },
+  ];
+  point.mark = {
+    type: 'rect',
+    color: options.color || MULTI_COLORS[0],
+    width: {
+      expr: `floor(width / customCountDays(domain('x')[0], domain('x')[1]))`,
+    },
+  };
+  (point.encoding!.y as PositionFieldDef<Field>).field = 'cumulated';
+  (point.encoding!.y as PositionFieldDef<Field>).stack = null;
+  (point.encoding!.y2 as PositionFieldDef<Field>) = { field: 'prevCumulated' };
+  (point.encoding!.opacity as PositionValueDef).value = 1;
+
   return spec;
 }
 

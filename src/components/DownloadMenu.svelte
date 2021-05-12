@@ -19,6 +19,7 @@
   export let sensor = null;
 
   export let raw = false;
+  export let cumulated = false;
 
   export let absolutePos = false;
 
@@ -72,6 +73,9 @@
     r.value = row.value;
     if (raw) {
       r.raw = row.raw;
+    }
+    if (cumulated) {
+      r.cumulated = row.cumulated;
     }
     return r;
   }

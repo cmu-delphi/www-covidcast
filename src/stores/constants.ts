@@ -79,13 +79,19 @@ export interface Sensor {
   readonly rawSignal?: string; // raw signal in case of a 7day average
   readonly rawSensor?: Sensor; // raw signal in case of a 7day average
 
+  readonly rawCumulatedSignal?: string; // raw cumulated version of this signal
+  readonly rawCumulatedSensor?: Sensor; /// raw cumulated version of this signal
+
   readonly name: string; // signal name
   readonly unit: string;
   readonly dataSourceName: string;
   readonly type: 'public' | 'early' | 'late';
   readonly levels: readonly RegionLevel[];
-  readonly description?: string; // HTML long text description
+  readonly description: string; // HTML long text description
   readonly signalTooltip: string; // short text description
+  /**
+   * color scale to convert a *normalized* value (0...1) to a color
+   */
   readonly colorScale: (this: void, v: number) => string;
   readonly vegaColorScale: string;
 
@@ -316,8 +322,26 @@ export function extendSensorEntry(
   if (!isCasesOrDeath) {
     return full;
   }
+
   const casesOrDeath = (full as unknown) as Sensor & CasesOrDeathOldSensor;
   casesOrDeath.isCasesOrDeath = true;
+
+  // create the cumulated version
+  const rawCumulatedSignal = casesOrDeath.casesOrDeathSignals.countRatioCumulative;
+  Object.assign(full, {
+    rawCumulatedSignal,
+    rawCumulatedSensor: {
+      ...full,
+      key: `${full.id}-${rawCumulatedSignal}`,
+      name: `Cumulative ${full.name.replace('(7-day average)', '')} (Raw)`,
+      description: full.description!.replace('(7-day average)', ''),
+      signal: rawCumulatedSignal,
+      is7DayAverage: false,
+      rawSensor: null,
+      rawSignal: null,
+    },
+  });
+
   casesOrDeath.casesOrDeathSensors = {} as CasesOrDeathOldSensor['casesOrDeathSensors'];
   casesOrDeath.mapTitleText =
     typeof mapTitle === 'function'
@@ -363,6 +387,7 @@ export function extendSensorEntry(
   add(false, false);
   add(false, true);
   add(true, false);
+
   return casesOrDeath;
 }
 
