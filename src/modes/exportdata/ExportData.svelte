@@ -1,9 +1,8 @@
 <script>
-  import { callMetaAPI, CSV_SERVER_ENDPOINT } from '../../data/api';
+  import { CSV_SERVER_ENDPOINT } from '../../data/api';
   import Datepicker from '../../components/Calendar/Datepicker.svelte';
-  import { getLevelInfo, sensorList } from '../../stores/constants';
-  import { parseAPITime } from '../../data';
-  import { annotationManager, currentDateObject, currentSensorEntry } from '../../stores';
+  import { sensorList, levelList } from '../../stores/constants';
+  import { annotationManager, currentDateObject, currentSensorEntry, metaDataManager } from '../../stores';
   import { timeMonth } from 'd3-time';
   import { onMount } from 'svelte';
   import { trackEvent } from '../../stores/ga';
@@ -15,7 +14,6 @@
   import FancyHeader from '../../components/FancyHeader.svelte';
   import IndicatorAnnotation from '../../components/IndicatorAnnotation.svelte';
 
-  let loading = true;
   /**
    * @type {{id: string, name: string, levels: Set<string>, minTime: Date, maxTime: Date, sensors: (import('../../stores/constants').Sensor)[]}[]}
    */
@@ -34,7 +32,6 @@
   }
   $: initDate($currentDateObject);
 
-  let levelList = [];
   $: sensorGroup = sensorGroupValue ? sensorGroups.find((d) => d.id === sensorGroupValue) : null;
   $: sensor = sensorValue && sensorGroup ? sensorGroup.sensors.find((d) => d.key === sensorValue) : null;
 
@@ -118,40 +115,29 @@
     }
   });
 
-  callMetaAPI(null, ['min_time', 'max_time', 'signal', 'geo_type', 'data_source'], {
-    time_types: 'day',
-  }).then((r) => {
-    loading = false;
-
+  /**
+   * @param {import('../../../data/meta').MetaDataManager} metaDataManager
+   */
+  function loadData(metaDataManager) {
     const signalGroupMap = new Map();
-    const levels = new Set();
-    r.epidata.forEach((entry) => {
-      const dataSource = entry.data_source;
-      const key = `${dataSource}-${entry.signal}`;
-      const sensor = lookupMap.get(key);
-
-      if (!sensor) {
-        // limit to the one in the map only
-        return;
-      }
+    lookupMap.forEach((sensor) => {
+      const timeFrame = metaDataManager.getTimeFrame(sensor);
       const signalGroup = sensor.dataSourceName;
       if (!signalGroupMap.has(signalGroup)) {
         signalGroupMap.set(signalGroup, {
           id: signalGroup,
           name: signalGroup,
           levels: new Set(),
-          minTime: parseAPITime(entry.min_time),
-          maxTime: parseAPITime(entry.max_time),
+          minTime: timeFrame.min,
+          maxTime: timeFrame.max,
           sensors: [],
         });
       }
       const ds = signalGroupMap.get(signalGroup);
 
-      levels.add(entry.geo_type);
-      ds.levels.add(entry.geo_type);
-
-      if (ds.sensors.every((d) => d.key !== key)) {
-        ds.sensors.push(sensor);
+      ds.sensors.push(sensor);
+      for (const level of metaDataManager.getLevels(sensor)) {
+        ds.levels.add(level);
       }
     });
 
@@ -161,9 +147,12 @@
     }
     sensorGroupValue = $currentSensorEntry.dataSourceName;
     sensorValue = $currentSensorEntry.key;
-    levelList = [...levels].map(getLevelInfo);
     geoType = $currentSensorEntry.levels[0];
-  });
+  }
+
+  $: {
+    loadData($metaDataManager);
+  }
 
   let form = null;
 
@@ -221,7 +210,7 @@
     </div>
   </div>
   <div class="uk-container content-grid">
-    <div class="grid-3-11" class:loading>
+    <div class="grid-3-11">
       <p>
         All signals displayed in COVIDcast are freely available for download here. You can also access the latest daily
         through the
