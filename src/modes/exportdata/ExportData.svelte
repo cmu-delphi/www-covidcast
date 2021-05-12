@@ -449,12 +449,8 @@ data = covidcast.signal("${sensor ? sensor.id : ''}", "${sensor ? sensor.signal 
         </div>
         <div>
           <h3 class="mobile-h3 uk-margin-top">R Package</h3>
-          <p>Install <code>covidcast</code> using <a href="https://devtools.r-lib.org/">devtools</a> :</p>
-          <pre
-            class="code-block"><code>
-              {`devtools::install_github("cmu-delphi/covidcast", ref = "main",
-                         subdir = "R-packages/covidcast")`}
-          </code></pre>
+          <p>Install <code>covidcast</code> via CRAN:</p>
+          <pre class="code-block"><code>install.packages('covidcast')</code></pre>
           <p>Fetch data:</p>
           <pre
             class="code-block"><code>
