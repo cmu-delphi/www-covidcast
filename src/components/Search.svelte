@@ -64,7 +64,7 @@
    * @type {string}
    */
   let text;
-  let minCharsToSearchReached = false;
+  let minCharsToSearchReached = minCharactersToSearch <= 1;
 
   function onSelectedItemChanged() {
     text = labelFunction(selectedItem);
@@ -100,20 +100,22 @@
 
   // UI state
   let opened = false;
-  let highlightIndex = -1;
 
   // view model
-  let filteredListItems = [];
-  let hiddenFilteredListItems = 0;
-
   $: listItems = toSearchItems(items, keywordFunction, labelFunction);
+
+  let matchingItems = [];
+  let highlightMatchingIndex = -1;
+  let matchingStartIndex = 0;
+  $: filteredListItems = limitListItems(matchingItems, matchingStartIndex, maxItemsToShowInList);
+  $: hiddenMatchingItems = matchingItems.length - filteredListItems.length + matchingStartIndex;
+
   $: selectedLabelLookup = new Set((selectedItems || []).map(labelFunction));
 
   function resetItems() {
-    const matchingItems =
+    matchingStartIndex = 0;
+    matchingItems =
       selectedLabelLookup.size > 0 ? listItems.filter((d) => !selectedLabelLookup.has(d.label)) : listItems;
-    filteredListItems = limitListItems(matchingItems, maxItemsToShowInList);
-    hiddenFilteredListItems = matchingItems.length - filteredListItems.length;
   }
 
   let highlighter = String;
@@ -130,32 +132,30 @@
     }
 
     highlighter = createHighlighter(textFiltered);
-
-    const matchingItems = matchItems(listItems, textFiltered, selectedLabelLookup);
-    filteredListItems = limitListItems(matchingItems, maxItemsToShowInList);
-    hiddenFilteredListItems = matchingItems.length - filteredListItems.length;
+    matchingStartIndex = 0;
+    matchingItems = matchItems(listItems, textFiltered, selectedLabelLookup);
   }
 
   // $: text, search();
 
   function selectItem() {
-    const listItem = filteredListItems[highlightIndex];
+    const listItem = matchingItems[highlightMatchingIndex];
     selectedItem = listItem.item;
     close();
   }
 
-  function up() {
+  function changeHighlight(newIndex) {
     open();
-    if (highlightIndex > 0) {
-      highlightIndex--;
+    const clamped = Math.max(Math.min(newIndex, matchingItems.length - 1), 0);
+    if (highlightMatchingIndex === clamped) {
+      return;
     }
-    highlight();
-  }
-
-  function down() {
-    open();
-    if (highlightIndex < filteredListItems.length - 1) {
-      highlightIndex++;
+    highlightMatchingIndex = clamped;
+    const endVisible = matchingStartIndex + filteredListItems.length - 1;
+    if (highlightMatchingIndex < matchingStartIndex) {
+      matchingStartIndex = highlightMatchingIndex;
+    } else if (highlightMatchingIndex > endVisible) {
+      matchingStartIndex = highlightMatchingIndex - filteredListItems.length + 1;
     }
     highlight();
   }
@@ -188,19 +188,35 @@
         if (opened) {
           e.preventDefault();
           if (e.shiftKey) {
-            down();
+            changeHighlight(highlightMatchingIndex + 1);
           } else {
-            up();
+            changeHighlight(highlightMatchingIndex - 1);
           }
         }
         break;
+      case 'Home':
+        e.preventDefault();
+        changeHighlight(0);
+        break;
+      case 'End':
+        e.preventDefault();
+        changeHighlight(matchingItems.length - 1);
+        break;
       case 'ArrowDown':
         e.preventDefault();
-        down();
+        changeHighlight(highlightMatchingIndex + 1);
         break;
       case 'ArrowUp':
         e.preventDefault();
-        up();
+        changeHighlight(highlightMatchingIndex - 1);
+        break;
+      case 'PageUp':
+        e.preventDefault();
+        changeHighlight(highlightMatchingIndex - maxItemsToShowInList);
+        break;
+      case 'PageDown':
+        e.preventDefault();
+        changeHighlight(highlightMatchingIndex + maxItemsToShowInList);
         break;
       case 'Escape':
         e.preventDefault();
@@ -219,7 +235,8 @@
   function onInput(e) {
     text = e.target.value;
     search();
-    highlightIndex = 0;
+    highlightMatchingIndex = 0;
+    matchingStartIndex = 0;
     open();
   }
 
@@ -252,10 +269,10 @@
 
     // find selected item
     if (selectedItem) {
-      for (let i = 0; i < listItems.length; i++) {
-        const listItem = listItems[i];
+      for (let i = 0; i < filteredListItems.length; i++) {
+        const listItem = filteredListItems[i];
         if (selectedItem == listItem.item) {
-          highlightIndex = i;
+          highlightMatchingIndex = i;
           highlight();
           break;
         }
@@ -367,8 +384,8 @@
   <div class="uk-dropdown uk-dropdown-bottom-left search-box-list" class:uk-open={opened} bind:this={listRef}>
     <ul class="uk-nav uk-dropdown-nav">
       {#if filteredListItems && filteredListItems.length > 0}
-        {#each filteredListItems as listItem, i}
-          <li class:uk-active={i === highlightIndex}>
+        {#each filteredListItems as listItem, i (listItem.label)}
+          <li class:uk-active={i + matchingStartIndex === highlightMatchingIndex}>
             <a
               href="?region={listItem.item ? listItem.item.id : ''}"
               on:click|preventDefault={() => onListItemClick(listItem)}
@@ -377,10 +394,9 @@
             </a>
           </li>
         {/each}
-
-        {#if hiddenFilteredListItems > 0}
+        {#if hiddenMatchingItems}
           <li class="uk-nav-divider" />
-          <li class="more-results">&hellip; {hiddenFilteredListItems} results not shown</li>
+          <li class="more-results">&hellip; {hiddenMatchingItems} results not shown</li>
         {/if}
       {:else}
         <li class="uk-nav-header">{noResultsText}</li>

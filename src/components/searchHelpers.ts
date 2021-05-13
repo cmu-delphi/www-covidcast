@@ -19,11 +19,11 @@ export function toSearchItems<T>(
   }));
 }
 
-export function limitListItems<T>(items: T[], maxItemsToShowInList: number): T[] {
-  if (maxItemsToShowInList <= 0 || items.length < maxItemsToShowInList) {
+export function limitListItems<T>(items: T[], start: number, maxLength: number): T[] {
+  if (maxLength <= 0 || items.length < maxLength) {
     return items;
   }
-  return items.slice(0, maxItemsToShowInList);
+  return items.slice(start, Math.min(start + maxLength, items.length - 1));
 }
 
 export function prepareUserEnteredText(userEnteredText: string): string {
