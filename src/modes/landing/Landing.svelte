@@ -43,7 +43,7 @@
       selectedItem={$currentRegionInfo}
       labelFieldName="displayName"
       keywordFunction={combineKeywords}
-      maxItemsToShowInList="5"
+      maxItemsToShowInList={5}
       on:change={(e) => switchMode(e.detail && e.detail.level === 'nation' ? null : e.detail)}
     />
 
