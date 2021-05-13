@@ -1,14 +1,12 @@
 import { parseAPITime } from '../../data';
 import { getInfoByName } from '../../data/regions';
-import { sensorList } from '../../stores';
-import { allSensorsMap } from '../../stores/allSensors';
 import { DateParam, RegionLevel, RegionParam, Sensor, SensorParam, TimeFrame } from '../../stores/params';
 
 export function resolveSensor(defaultSensor: SensorParam, key?: string): SensorParam {
   if (!key) {
     return defaultSensor;
   }
-  const s = allSensorsMap.get(key);
+  const s = defaultSensor.manager.getSensor(key);
   if (!s) {
     return defaultSensor;
   }
@@ -16,14 +14,8 @@ export function resolveSensor(defaultSensor: SensorParam, key?: string): SensorP
 }
 
 export function resolveSensors(defaultSensor: SensorParam, keys?: readonly string[]): Sensor[] {
-  const CASES = new SensorParam(
-    sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Cases'))!,
-    defaultSensor.manager,
-  );
-  const DEATHS = new SensorParam(
-    sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Deaths'))!,
-    defaultSensor.manager,
-  );
+  const CASES = new SensorParam(defaultSensor.manager.getDefaultCasesSignal()!, defaultSensor.manager);
+  const DEATHS = new SensorParam(defaultSensor.manager.getDefaultDeathSignal()!, defaultSensor.manager);
 
   if (!keys) {
     if (defaultSensor.key === CASES.key || defaultSensor.key === DEATHS.key) {
@@ -34,7 +26,7 @@ export function resolveSensors(defaultSensor: SensorParam, keys?: readonly strin
   if (typeof keys === 'string') {
     return [resolveSensor(defaultSensor, keys).value];
   }
-  return keys.map((k) => allSensorsMap.get(k)).filter((d): d is Sensor => d != null);
+  return keys.map((k) => defaultSensor.manager.getSensor(k)).filter((d): d is Sensor => d != null);
 }
 
 export function resolveRegion(defaultRegion: RegionParam, r?: string): RegionParam {

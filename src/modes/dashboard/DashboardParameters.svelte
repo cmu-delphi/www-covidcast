@@ -3,7 +3,8 @@
   import Search from '../../components/Search.svelte';
   import SensorDatePicker2 from '../../components/SensorDatePicker2.svelte';
   import { nameInfos } from '../../data/regions';
-  import { allSensorsGrouped } from '../../stores/allSensors';
+  import { sensorTypes } from '../../data/sensor';
+  import { metaDataManager } from '../../stores';
 
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -36,6 +37,8 @@
   $: if (selectedDate !== undefined) {
     date.set(selectedDate);
   }
+
+  $: allSensorsGrouped = sensorTypes.map((d) => ({ ...d, signals: $metaDataManager.getSensorsOfType(d.id) }));
 </script>
 
 <div class="uk-container content-grid">

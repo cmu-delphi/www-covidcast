@@ -1,5 +1,5 @@
 import { EpiDataCasesOrDeathValues, primaryValue, CasesOrDeathOptions } from './classicSensor';
-import type { EpiDataMetaInfo, EpiDataMetaStatsInfo } from './api';
+import type { EpiDataMetaInfo, EpiDataMetaStatsInfo, SignalCategory } from './api';
 import { parseAPITime } from './utils';
 import type { RegionLevel } from './regions';
 import { isCountSignal } from './signals';
@@ -127,7 +127,7 @@ function deriveMetaSensors(metadata: EpiDataMetaInfo[]): { list: Sensor[]; map: 
     },
   );
 
-  // create raw links
+  // TODO create raw links
 
   return { list: sensors, map: byKey };
 }
@@ -145,12 +145,23 @@ export class MetaDataManager {
     this.metaSensorsByKey = r.map;
   }
 
-  getSensor(sensor: SensorLike): Sensor | null {
-    return this.metaSensorsByKey.get(toKey(sensor.id, sensor.signal)) ?? null;
+  getDefaultCasesSignal(): Sensor | null {
+    return this.getSensor({ id: 'indicator-combination', signal: 'confirmed_7dav_incidence_prop' });
+  }
+  getDefaultDeathSignal(): Sensor | null {
+    return this.getSensor({ id: 'indicator-combination', signal: 'deaths_7dav_incidence_prop' });
   }
 
-  getMetaData(sensor: SensorLike): EpiDataMetaParsedInfo | null {
-    return this.cache.get(toKey(sensor.id, sensor.signal)) ?? null;
+  getSensorsOfType(type: SignalCategory): Sensor[] {
+    return this.metaSensors.filter((d) => d.type === type);
+  }
+
+  getSensor(sensor: SensorLike | string): Sensor | null {
+    return this.metaSensorsByKey.get(typeof sensor === 'string' ? sensor : toKey(sensor.id, sensor.signal)) ?? null;
+  }
+
+  getMetaData(sensor: SensorLike | string): EpiDataMetaParsedInfo | null {
+    return this.cache.get(typeof sensor === 'string' ? sensor : toKey(sensor.id, sensor.signal)) ?? null;
   }
 
   getLevels(sensor: SensorLike): RegionLevel[] {

@@ -1,4 +1,4 @@
-import { isCasesSignal, isCountSignal, isDeathSignal, isPropSignal } from './signals';
+import { isCountSignal, isPropSignal } from './signals';
 import { ensureSensorStructure, Sensor } from './sensor';
 
 export interface CasesOrDeathOptions {

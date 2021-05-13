@@ -16,6 +16,9 @@ const sourceNameLookup: Record<string, string> = {
   quidel: 'Quidel Antigen Tests',
   safegraph: 'SafeGraph Mobility Data',
   'google-symptoms': 'Google Symptoms Searches',
+  'google-survey': 'Google Survey',
+  'usa-facts': 'USAFacts',
+  'jhu-csse': 'Johns Hopkins University',
 };
 
 export function getDataSource(sensor: { id: string; signal: string } | Sensor): string {

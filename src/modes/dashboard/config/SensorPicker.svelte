@@ -1,5 +1,7 @@
 <script>
-  import { allSensorsGrouped } from '../../../stores/allSensors';
+  import { sensorTypes } from '../../../data/sensor';
+
+  import { metaDataManager } from '../../../stores';
 
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -16,9 +18,9 @@
   <label for="widget-adder-s" class="uk-form-label">Indicator</label>
   <select id="widget-adder-s" class="uk-select" name="sensor" {value}>
     <option value="">Use Configured ({sensor.name})</option>
-    {#each allSensorsGrouped as group}
+    {#each sensorTypes as group}
       <optgroup label={group.label}>
-        {#each group.sensors as sensor}
+        {#each $metaDataManager.getSensorsOfType(group.id) as sensor}
           <option value={sensor.key}>{sensor.name}</option>
         {/each}
       </optgroup>

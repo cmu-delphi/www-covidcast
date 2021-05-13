@@ -9,12 +9,12 @@
   import WidgetEditor from './WidgetEditor.svelte';
   import WidgetFactory from './WidgetFactory.svelte';
   import DashboardParameters from './DashboardParameters.svelte';
-  import { allSensorsMap } from '../../stores/allSensors';
+
   import { DEFAULT_SENSOR } from '../../stores/constants';
   import { DataFetcher } from '../../stores/DataFetcher';
 
-  $: allSensor = allSensorsMap.get($currentSensor) || allSensorsMap.get(DEFAULT_SENSOR);
-  $: sensor = new SensorParam(allSensor, $metaDataManager);
+  $: resolvedSensor = $metaDataManager.getSensor($currentSensor) || $metaDataManager.getSensor(DEFAULT_SENSOR);
+  $: sensor = new SensorParam(resolvedSensor, $metaDataManager);
   $: region = new RegionParam($currentRegionInfo);
   $: date = new DateParam($currentDateObject);
 
