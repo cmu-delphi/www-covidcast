@@ -222,7 +222,7 @@
 
   {#if edit || add}
     <div class="overlay-container">
-      <button on:click={closeSideBar} type="button" class="uk-icon uk-close" uk-icon="close" />
+      <button on:click={closeSideBar} type="button" class="uk-icon uk-close" uk-icon="close" title="Close Overlay" />
       {#if edit}
         <WidgetEditor on:edit={editedWidget} {sensor} {region} {date} id={edit.id} config={edit.config} />
       {:else}
@@ -256,6 +256,7 @@
     bottom: 0;
     z-index: 1000;
     background: #fafafc;
+    border-top: 1px solid #d3d4d8;
     border-right: 1px solid #d3d4d8;
     padding: 1em;
   }
