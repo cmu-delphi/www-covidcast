@@ -103,9 +103,15 @@
   let highlightIndex = -1;
 
   // view model
+  /**
+   * @type {{keywords: string, label: string, item: any}[]}
+   */
   let filteredListItems = [];
   let hiddenFilteredListItems = 0;
 
+  /**
+   * @type {{keywords: string, label: string, item: any}[]}
+   */
   $: listItems = items.map((item) => ({
     // keywords representation of the item
     keywords: keywordFunction(item).toLowerCase().trim(),
@@ -440,16 +446,18 @@
       {#if filteredListItems && filteredListItems.length > 0}
         {#each filteredListItems as listItem, i}
           <li class:uk-active={i === highlightIndex}>
-            <a
-              href="?region={listItem.item ? listItem.item.id : ''}"
-              on:click|preventDefault={() => onListItemClick(listItem)}
-            >
-              {#if listItem.highlighted}
-                {@html listItem.highlighted.label}
-              {:else}
-                {@html listItem.label}
-              {/if}
-            </a>
+            <slot name="entry" {listItem} item={listItem.item} onClick={() => onListItemClick(listItem)}>
+              <a
+                href="?region={listItem.item ? listItem.item.id : ''}"
+                on:click|preventDefault={() => onListItemClick(listItem)}
+              >
+                {#if listItem.highlighted}
+                  {@html listItem.highlighted.label}
+                {:else}
+                  {@html listItem.label}
+                {/if}
+              </a>
+            </slot>
           </li>
         {/each}
 

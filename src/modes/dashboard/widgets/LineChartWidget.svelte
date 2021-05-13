@@ -23,7 +23,7 @@
     resolveHighlightedDate,
     patchHighlightTuple,
   } from '../../../specs/lineSpec';
-  import { annotationManager } from '../../../stores';
+  import { annotationManager, getLevelInfo } from '../../../stores';
   import { combineSignals } from '../../../data/utils';
   import { formatDateISO, formatDateShortWeekdayAbbr, formatDateYearWeekdayAbbr } from '../../../formats';
   import { WidgetHighlight } from '../highlight';
@@ -97,7 +97,7 @@
      */
     const options = {
       initialDate: highlightToDate(highlight) || timeFrame.max,
-      // color,
+      color: getLevelInfo(region.level).color,
       domain: timeFrame.domain,
       zero,
       xTitle: sensor.xAxis,

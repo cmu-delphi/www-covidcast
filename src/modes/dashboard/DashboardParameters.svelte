@@ -1,6 +1,6 @@
 <script>
   import IndicatorPicker from '../../components/IndicatorPicker.svelte';
-  import Search from '../../components/Search.svelte';
+  import RegionSearch from '../../components/RegionSearch.svelte';
   import SensorDatePicker2 from '../../components/SensorDatePicker2.svelte';
   import { nameInfos } from '../../data/regions';
   import { sensorTypes } from '../../data/sensor';
@@ -19,13 +19,6 @@
    */
   export let region;
 
-  /**
-   * @param {import('../stores/params').Region} d
-   */
-  function combineKeywords(d) {
-    return `${d.id} ${d.displayName}`;
-  }
-
   let selectedDate = date.value;
 
   function updateDate(value) {
@@ -38,22 +31,16 @@
     date.set(selectedDate);
   }
 
-  $: allSensorsGrouped = sensorTypes.map((d) => ({ ...d, signals: $metaDataManager.getSensorsOfType(d.id) }));
+  $: allSensorsGrouped = sensorTypes.map((d) => ({ ...d, sensors: $metaDataManager.getSensorsOfType(d.id) }));
 </script>
 
 <div class="uk-container content-grid">
   <IndicatorPicker {sensor} className="grid-1-5" allSensors={allSensorsGrouped} />
-  <Search
+  <RegionSearch
     className="grid-5-9"
     modern
-    placeholder="Select Region"
     items={nameInfos}
-    title="Region"
-    icon="location"
     selectedItem={region.value}
-    labelFieldName="displayName"
-    keywordFunction={combineKeywords}
-    maxItemsToShowInList="5"
     on:change={(e) => region.set(e.detail && e.detail.level === 'nation' ? null : e.detail)}
   />
   <SensorDatePicker2 className="grid-9-13" bind:value={selectedDate} {sensor} />
