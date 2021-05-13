@@ -69,6 +69,7 @@ export function formatPopulation(info: { population?: number }): string {
 }
 
 const f = format(',.1f');
+const count = format(',.0f');
 const basePercentFormatter = format('.2%');
 const rawFormatter = format(',.2f');
 
@@ -93,6 +94,9 @@ function sign(
 
 export function formatValue(value?: number | null, enforceSign = false): string {
   return sign(value, f, enforceSign);
+}
+export function formatCount(value?: number | null, enforceSign = false): string {
+  return sign(value, count, enforceSign);
 }
 export function formatPercentage(value?: number | null, enforceSign = false): string {
   return sign(value, basePercentFormatter, enforceSign, 1 / 100);
