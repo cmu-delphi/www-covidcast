@@ -4,6 +4,7 @@ export interface Mode {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   component: () => Promise<any>;
   anchor?: string;
+  waitForReady?: boolean;
 }
 
 const modes: Mode[] = [
@@ -69,6 +70,7 @@ const modes: Mode[] = [
     label: 'Dashboard',
     component: () =>
       import(/* webpackChunkName: 'm-databoard' */ './dashboard/Dashboard.svelte').then((r) => r.default),
+    waitForReady: true,
   },
 ];
 

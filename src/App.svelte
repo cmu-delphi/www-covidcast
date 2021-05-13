@@ -6,14 +6,27 @@
   import './stores/websiteInjector';
   import Disclaimer from './components/Disclaimer.svelte';
 
+  let markReady = () => false;
+  const appReadyPromise = new Promise((resolve) => {
+    markReady = resolve;
+  });
+
   onMount(() => {
     Promise.all([loadMetaData(), loadAnnotations()]).then(() => {
       appReady.set(true);
+      markReady();
       document.body.dataset.ready = 'ready';
     });
   });
 
-  $: currentComponent = $currentMode.component();
+  async function loadComponent(mode) {
+    if (mode.waitForReady) {
+      await appReadyPromise;
+    }
+    return mode.component();
+  }
+
+  $: currentComponent = loadComponent($currentMode);
 </script>
 
 {#await currentComponent}
