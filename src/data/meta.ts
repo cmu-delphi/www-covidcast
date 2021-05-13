@@ -94,10 +94,13 @@ export interface OldSensorLike extends SensorLike {
   casesOrDeathSignals?: Record<keyof EpiDataCasesOrDeathValues, string>;
 }
 
-function deriveMetaSensors(metadata: EpiDataMetaInfo[]): { list: Sensor[]; map: Map<string, Sensor> } {
-  const byKey = new Map<string, Sensor>();
+function deriveMetaSensors(
+  metadata: EpiDataMetaInfo[],
+): { list: Sensor[]; map: Map<string, [EpiDataMetaParsedInfo, Sensor]> } {
+  const byKey = new Map<string, [EpiDataMetaParsedInfo, Sensor]>();
   const sensors = metadata.map(
     (m): Sensor => {
+      const parsed = parse(m);
       const s: Sensor = {
         key: toKey(m.source, m.signal),
         id: m.source,
@@ -122,27 +125,62 @@ function deriveMetaSensors(metadata: EpiDataMetaInfo[]): { list: Sensor[]; map: 
         credits: 'We are happy for you to use this data in products and publications.',
         formatValue: formatter[m.format],
       };
-      byKey.set(s.key, s);
+      byKey.set(s.key, [parsed, s]);
       return s;
     },
   );
 
-  // TODO create raw links
+  byKey.forEach(([meta, sensor]) => {
+    if (!meta.is_smoothed) {
+      return;
+    }
+    const related = meta.related_signals
+      .map((s) => byKey.get(toKey(sensor.id, s)))
+      .filter((s): s is [EpiDataMetaParsedInfo, Sensor] => s != null);
+
+    // find raw version
+    const raw = related.find(
+      // not smoothed
+      ([m]) =>
+        m.is_cumulative == meta.is_cumulative &&
+        m.is_weighted == meta.is_weighted &&
+        !m.is_smoothed &&
+        m.format == meta.format,
+    );
+    if (raw) {
+      Object.assign(sensor, {
+        rawSensor: raw[1],
+        rawSignal: raw[1].signal,
+      });
+    }
+
+    // find raw cumulative version
+    if (!meta.is_cumulative) {
+      const rawCumulative = related.find(
+        ([m]) => m.is_cumulative && m.is_weighted == meta.is_weighted && !m.is_smoothed && m.format == meta.format,
+      );
+      if (rawCumulative) {
+        Object.assign(sensor, {
+          rawCumulativeSensor: rawCumulative[1],
+          rawCumulativeSignal: rawCumulative[1].signal,
+        });
+      }
+    }
+  });
+
+  sensors.sort((a, b) => a.key.localeCompare(b.key));
 
   return { list: sensors, map: byKey };
 }
 
 export class MetaDataManager {
-  private readonly cache: ReadonlyMap<string, EpiDataMetaParsedInfo>;
+  private readonly lookup: ReadonlyMap<string, [EpiDataMetaParsedInfo, Sensor]>;
   public readonly metaSensors: readonly Sensor[];
-  private readonly metaSensorsByKey: ReadonlyMap<string, Sensor>;
 
   constructor(metadata: EpiDataMetaInfo[]) {
-    this.cache = new Map(metadata.map((d) => [toKey(d.source, d.signal), parse(d)]));
-
     const r = deriveMetaSensors(metadata);
     this.metaSensors = r.list;
-    this.metaSensorsByKey = r.map;
+    this.lookup = r.map;
   }
 
   getDefaultCasesSignal(): Sensor | null {
@@ -156,12 +194,17 @@ export class MetaDataManager {
     return this.metaSensors.filter((d) => d.type === type);
   }
 
+  private getEntry(sensor: SensorLike | string): [EpiDataMetaParsedInfo | null, Sensor | null] {
+    const r = this.lookup.get(typeof sensor === 'string' ? sensor : toKey(sensor.id, sensor.signal));
+    return r ?? [null, null];
+  }
+
   getSensor(sensor: SensorLike | string): Sensor | null {
-    return this.metaSensorsByKey.get(typeof sensor === 'string' ? sensor : toKey(sensor.id, sensor.signal)) ?? null;
+    return this.getEntry(sensor)[1];
   }
 
   getMetaData(sensor: SensorLike | string): EpiDataMetaParsedInfo | null {
-    return this.cache.get(typeof sensor === 'string' ? sensor : toKey(sensor.id, sensor.signal)) ?? null;
+    return this.getEntry(sensor)[0];
   }
 
   getLevels(sensor: SensorLike): RegionLevel[] {
