@@ -269,13 +269,17 @@ export interface EpiDataMetaStatsInfo {
   stdev: number;
 }
 
+export type SignalCategory = 'public' | 'early' | 'late' | 'other';
+export type SignalFormat = 'raw' | 'percent' | 'fraction' | 'per100k' | 'raw_count';
+export type SignalHighValuesAre = 'good' | 'bad' | 'neutral';
+
 export interface EpiDataMetaInfo {
   name: string;
   signal: string;
   source: string;
-  category: 'public' | 'early' | 'late' | 'other';
-  format: 'raw' | 'percent' | 'fraction' | 'per100k' | 'raw_count';
-  high_values_are: 'good' | 'bad' | 'neutral';
+  category: SignalCategory;
+  format: SignalFormat;
+  high_values_are: SignalHighValuesAre;
 
   max_issue: number;
   max_time: number;

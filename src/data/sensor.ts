@@ -2,10 +2,9 @@ import { formatRawValue, formatValue, formatPercentage, formatCount } from '../f
 import { interpolateBuPu, interpolateYlGnBu, interpolateYlOrRd } from 'd3-scale-chromatic';
 import { getDataSource } from './dataSourceLookup';
 import type { RegionLevel } from './regions';
+import type { SignalCategory, SignalFormat, SignalHighValuesAre } from './api';
 
-export type SensorType = 'public' | 'early' | 'late' | 'other';
-
-export const sensorTypes: { id: SensorType; label: string }[] = [
+export const sensorTypes: { id: SignalCategory; label: string }[] = [
   {
     id: 'public',
     label: 'Public’s Behavior',
@@ -24,10 +23,6 @@ export const sensorTypes: { id: SensorType; label: string }[] = [
   },
 ];
 
-export type SensorFormat = 'raw' | 'per100k' | 'percent' | 'fraction' | 'raw_count';
-
-export type SensorHighValuesAre = 'good' | 'bad' | 'neutral';
-
 export interface Sensor {
   readonly key: string; // id:signal
   readonly id: string; // data source
@@ -38,7 +33,7 @@ export interface Sensor {
   readonly name: string; // signal name
   readonly unit: string;
   readonly dataSourceName: string;
-  readonly type: SensorType;
+  readonly type: SignalCategory;
   readonly levels: readonly RegionLevel[];
   readonly description?: string; // HTML long text description
   readonly signalTooltip: string; // short text description
@@ -48,11 +43,11 @@ export interface Sensor {
   readonly links: readonly string[]; // more information links
   readonly credits?: string; // credit text
 
-  readonly format: SensorFormat;
+  readonly format: SignalFormat;
   readonly valueScaleFactor: number;
   readonly xAxis: string; // x axis title
   readonly yAxis: string; // y axis value unit long
-  readonly highValuesAre: SensorHighValuesAre;
+  readonly highValuesAre: SignalHighValuesAre;
   readonly is7DayAverage: boolean;
   readonly hasStdErr: boolean;
   formatValue(v: number, enforceSign?: boolean): string;
