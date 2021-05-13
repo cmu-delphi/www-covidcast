@@ -24,6 +24,7 @@
   {items}
   title="Region"
   icon="location"
+  selectOnClick
   {selectedItem}
   {selectedItems}
   labelFieldName="displayName"

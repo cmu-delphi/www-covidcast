@@ -48,6 +48,8 @@
   export let title = undefined;
   export let id = undefined;
 
+  export let selectOnClick = false;
+
   export let icon = 'search';
   /**
    * whether clearing is possible
@@ -272,7 +274,7 @@
   function onInputClick() {
     resetListToAllItemsAndOpen();
 
-    if (modern) {
+    if (modern || selectOnClick) {
       // select the whole field upon click
       input.select();
     }

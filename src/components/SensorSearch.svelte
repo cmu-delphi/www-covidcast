@@ -26,6 +26,7 @@
   icon="database"
   {selectedItem}
   {selectedItems}
+  selectOnClick
   labelFieldName="name"
   keywordFunction={combineKeywords}
   maxItemsToShowInList={11}

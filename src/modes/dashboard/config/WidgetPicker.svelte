@@ -32,6 +32,7 @@
     items={widgets}
     title="Widget"
     icon="tv"
+    selectOnClick
     disabled={readonly}
     selectedItem={widgets.find((d) => d.id === value) || widgets[0]}
     labelFieldName="name"
