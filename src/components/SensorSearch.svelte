@@ -28,7 +28,7 @@
   {selectedItems}
   labelFieldName="name"
   keywordFunction={combineKeywords}
-  maxItemsToShowInList={7}
+  maxItemsToShowInList={11}
   on:change
   on:add
 >
