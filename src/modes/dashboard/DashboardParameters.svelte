@@ -53,7 +53,7 @@
     maxItemsToShowInList="5"
     on:change={(e) => region.set(e.detail && e.detail.level === 'nation' ? null : e.detail)}
   />
-  <SensorDatePicker2 className="grid-9-13" bind:value={selectedDate} {sensor} level={region.value.level} />
+  <SensorDatePicker2 className="grid-9-13" bind:value={selectedDate} {sensor} />
 </div>
 
 <style>
