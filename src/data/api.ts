@@ -161,7 +161,7 @@ export function callTrendSeriesAPI(
   basis?: number,
   fields?: FieldSpec<EpiDataTrendRow>,
 ): Promise<EpiDataTrendRow[]> {
-  const url = new URL(ENDPOINT + '/covidcast/trend');
+  const url = new URL(ENDPOINT + '/covidcast/trendseries');
   addParam(url, 'signal', signal);
   addParam(url, 'geo', geo);
   if (basis != null) {
