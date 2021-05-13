@@ -46,6 +46,7 @@
   export let disabled = false;
   // add the title to the HTML input
   export let title = undefined;
+  export let id = undefined;
 
   export let icon = 'search';
   /**
@@ -371,6 +372,7 @@
   {#if !multiple}
     <span class="uk-search-icon search-icon" class:modern data-uk-icon="icon: {icon}" />
     <input
+      {id}
       class="uk-search-input"
       class:modern
       class:modern__small={modern === 'small'}
