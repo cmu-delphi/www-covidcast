@@ -5,7 +5,7 @@ import { sensorTypes } from '../data/sensor';
 import { extendSensorEntry, SensorEntry } from '../data/classicSensor';
 
 export * from '../data/geoLevel';
-export * from '../data/sensor';
+export type { Sensor } from '../data/sensor';
 export * from '../data/classicSensor';
 
 const defaultSensors = (descriptions as unknown) as (Partial<SensorEntry> & {

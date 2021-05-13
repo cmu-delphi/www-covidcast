@@ -4,6 +4,8 @@ import { parseAPITime } from './utils';
 import type { RegionLevel } from './regions';
 import { isCountSignal } from './signals';
 import { ALL_TIME_FRAME, TimeFrame } from './TimeFrame';
+import { Sensor, units, colorScales, formatter, vegaColorScales, yAxis } from './sensor';
+import { getDataSource } from './dataSourceLookup';
 
 function toKey(source: string, signal: string) {
   return `${source}-${signal}`;
@@ -92,10 +94,59 @@ export interface OldSensorLike extends SensorLike {
   casesOrDeathSignals?: Record<keyof EpiDataCasesOrDeathValues, string>;
 }
 
+function deriveMetaSensors(metadata: EpiDataMetaInfo[]): { list: Sensor[]; map: Map<string, Sensor> } {
+  const byKey = new Map<string, Sensor>();
+  const sensors = metadata.map(
+    (m): Sensor => {
+      const s: Sensor = {
+        key: toKey(m.source, m.signal),
+        id: m.source,
+        signal: m.signal,
+        name: m.name,
+        description: 'No description available',
+        signalTooltip: 'No tooltip available',
+        valueScaleFactor: m.format === 'fraction' ? 100 : 1,
+        format: m.format ?? 'raw',
+        highValuesAre: m.high_values_are ?? 'neutral',
+        hasStdErr: m.has_stderr,
+        is7DayAverage: m.is_smoothed,
+        dataSourceName: getDataSource({ id: m.source, signal: m.signal }),
+        levels: Object.keys(m.geo_types) as RegionLevel[],
+        type: m.category ?? 'other',
+        xAxis: 'Date',
+        yAxis: yAxis[m.format],
+        unit: units[m.format],
+        colorScale: colorScales[m.high_values_are],
+        vegaColorScale: vegaColorScales[m.high_values_are],
+        links: [],
+        credits: 'We are happy for you to use this data in products and publications.',
+        formatValue: formatter[m.format],
+      };
+      byKey.set(s.key, s);
+      return s;
+    },
+  );
+
+  // create raw links
+
+  return { list: sensors, map: byKey };
+}
+
 export class MetaDataManager {
-  private readonly cache: Map<string, EpiDataMetaParsedInfo>;
+  private readonly cache: ReadonlyMap<string, EpiDataMetaParsedInfo>;
+  public readonly metaSensors: readonly Sensor[];
+  private readonly metaSensorsByKey: ReadonlyMap<string, Sensor>;
+
   constructor(metadata: EpiDataMetaInfo[]) {
     this.cache = new Map(metadata.map((d) => [toKey(d.source, d.signal), parse(d)]));
+
+    const r = deriveMetaSensors(metadata);
+    this.metaSensors = r.list;
+    this.metaSensorsByKey = r.map;
+  }
+
+  getSensor(sensor: SensorLike): Sensor | null {
+    return this.metaSensorsByKey.get(toKey(sensor.id, sensor.signal)) ?? null;
   }
 
   getMetaData(sensor: SensorLike): EpiDataMetaParsedInfo | null {

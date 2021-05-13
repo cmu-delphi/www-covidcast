@@ -32,7 +32,7 @@ import { AnnotationManager, fetchAnnotations } from '../data';
 import type { RegionInfo, RegionLevel } from '../data/regions';
 import { yesterdayDate } from '../data/TimeFrame';
 import { MetaDataManager } from '../data/meta';
-import { callMetaAPI2 } from '../data/api';
+import { callMetaAPI } from '../data/api';
 
 export const appReady = writable(false);
 
@@ -449,7 +449,7 @@ export function loadAnnotations(): void {
 export const metaDataManager = writable(new MetaDataManager([]));
 
 export function loadMetaData(): Promise<{ level: RegionLevel; date: string }> {
-  return callMetaAPI2().then((meta) => {
+  return callMetaAPI().then((meta) => {
     const m = new MetaDataManager(meta);
     metaDataManager.set(m);
 

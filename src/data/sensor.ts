@@ -69,15 +69,37 @@ function determineHighValuesAre(sensor: {
   return 'bad';
 }
 
-const colorScales = {
+export const colorScales = {
   good: interpolateYlGnBu,
   bad: interpolateYlOrRd,
   neutral: interpolateBuPu,
 };
-const vegaColorScales = {
+export const vegaColorScales = {
   good: 'yellowgreenblue',
   bad: 'yelloworangered',
   neutral: 'bluepurple',
+};
+
+export const formatter = {
+  raw: formatRawValue,
+  raw_count: formatCount,
+  fraction: formatRawValue,
+  percent: formatPercentage,
+  per100k: formatValue,
+};
+export const yAxis = {
+  raw: 'arbitrary scale',
+  raw_count: 'people',
+  percent: 'Percentage',
+  per100k: 'per 100,000 people',
+  fraction: 'Fraction of population',
+};
+export const units = {
+  raw: 'arbitrary scale',
+  raw_count: 'people',
+  percent: 'per 100 people',
+  per100k: 'per 100,000 people',
+  fraction: 'Fraction of population',
 };
 
 export function ensureSensorStructure(
@@ -88,27 +110,6 @@ export function ensureSensorStructure(
   const highValuesAre = determineHighValuesAre(sensor);
   const format = sensor.format || 'raw';
 
-  const formatter = {
-    raw: formatRawValue,
-    raw_count: formatCount,
-    fraction: formatRawValue,
-    percent: formatPercentage,
-    per100k: formatValue,
-  };
-  const yAxis = {
-    raw: 'arbitrary scale',
-    raw_count: 'people',
-    percent: 'Percentage',
-    per100k: 'per 100,000 people',
-    fraction: 'Fraction of population',
-  };
-  const unit = {
-    raw: 'arbitrary scale',
-    raw_count: 'people',
-    percent: 'per 100 people',
-    per100k: 'per 100,000 people',
-    fraction: 'Fraction of population',
-  };
   const rawSignal = sensor.rawSignal === 'null' || sensor.rawSignal === sensor.signal ? null : sensor.rawSignal;
 
   const guessHelper = sensor.tooltipText || sensor.mapTitleText;
@@ -131,7 +132,7 @@ export function ensureSensorStructure(
     valueScaleFactor: format === 'fraction' ? 100 : 1,
     xAxis: 'Date',
     yAxis: yAxis[format] || yAxis.raw,
-    unit: unit[format] || unit.raw,
+    unit: units[format] || units.raw,
     highValuesAre,
     is7DayAverage: false,
     hasStdErr: false,

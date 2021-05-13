@@ -6,7 +6,6 @@ import { GeoPair, isArray, SourceSignalPair, TimePair } from './apimodel';
 declare const process: { env: Record<string, string> };
 
 const ENDPOINT = process.env.COVIDCAST_ENDPOINT_URL;
-const META_ENDPOINT = process.env.COVIDCAST_META_ENDPOINT_URL || ENDPOINT;
 
 export const CSV_SERVER_ENDPOINT = `${ENDPOINT}/covidcast/csv`;
 
@@ -290,10 +289,16 @@ export interface EpiDataMetaInfo {
   is_smoothed: boolean;
   is_weighted: boolean;
   is_cumulative: boolean;
+  has_stderr: boolean;
+  has_sample_size: boolean;
 }
 
-export function callMetaAPI2(signal: SourceSignalPair | readonly SourceSignalPair[] = []): Promise<EpiDataMetaInfo[]> {
-  const url = new URL(META_ENDPOINT + '/covidcast/meta');
+// export function callMetaAPI2(): Promise<EpiDataMetaInfo[]> {
+//   return import('./meta.json').then((d) => d.default as EpiDataMetaInfo[]);
+// }
+
+export function callMetaAPI(signal: SourceSignalPair | readonly SourceSignalPair[] = []): Promise<EpiDataMetaInfo[]> {
+  const url = new URL(ENDPOINT + '/covidcast/meta');
   addParam(url, 'signal', signal);
   return fetchImpl<EpiDataMetaInfo[]>(url).catch((error) => {
     console.warn('failed fetching data', error);
