@@ -33,20 +33,12 @@
   on:change
   on:add
 >
-  <svelte:fragment slot="entry" let:listItem let:onClick>
-    <a
-      class="sensor-search-elem"
-      href="?signal={listItem.item ? listItem.item.key : ''}"
-      on:click|preventDefault={onClick}
-    >
-      {#if listItem.highlighted}
-        {@html listItem.highlighted.label}
-      {:else}
-        {listItem.label}
-      {/if}
+  <svelte:fragment slot="entry" let:label let:item let:onClick>
+    <a class="sensor-search-elem" href="?signal={item ? item.key : ''}" on:click|preventDefault={onClick}>
+      {@html label}
     </a>
     <div>
-      <SensorBadges sensor={listItem.item} />
+      <SensorBadges sensor={item} />
     </div>
   </svelte:fragment>
 </Search>

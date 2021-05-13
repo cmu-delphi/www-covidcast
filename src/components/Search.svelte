@@ -391,7 +391,13 @@
       {#if filteredListItems && filteredListItems.length > 0}
         {#each filteredListItems as listItem, i (listItem.label)}
           <li class:uk-active={i + matchingStartIndex === highlightMatchingIndex}>
-            <slot name="entry" {listItem} item={listItem.item} onClick={() => onListItemClick(listItem)}>
+            <slot
+              name="entry"
+              label={highlighter(listItem.label)}
+              {listItem}
+              item={listItem.item}
+              onClick={() => onListItemClick(listItem)}
+            >
               <a
                 href="?region={listItem.item ? listItem.item.id : ''}"
                 on:click|preventDefault={() => onListItemClick(listItem)}

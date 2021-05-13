@@ -41,16 +41,12 @@
       value = e.detail.id || widgets[0].id;
     }}
   >
-    <svelte:fragment slot="entry" let:listItem let:onClick>
-      <a href="?signal={listItem.item ? listItem.item.key : ''}" on:click|preventDefault={onClick}>
-        {#if listItem.highlighted}
-          {@html listItem.highlighted.label}
-        {:else}
-          {listItem.label}
-        {/if}
-        {#if listItem.item}
-          <span class="uk-badge widget-type" data-type={listItem.item.type}>{listItem.item.type}</span>
-          {#each listItem.item.focus as f}
+    <svelte:fragment slot="entry" let:item let:label let:onClick>
+      <a href="?signal={item ? item.key : ''}" on:click|preventDefault={onClick}>
+        {@html label}
+        {#if item}
+          <span class="uk-badge widget-type" data-type={item.type}>{item.type}</span>
+          {#each item.focus as f}
             {' '}<span class="uk-badge widget-focus" data-focus={f}>{f}</span>
           {/each}
         {/if}

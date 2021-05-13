@@ -33,14 +33,10 @@
   on:change
   on:add
 >
-  <svelte:fragment slot="entry" let:listItem let:onClick>
-    <a href="?region={listItem.item ? listItem.item.id : ''}" on:click|preventDefault={onClick}>
-      {#if listItem.highlighted}
-        {@html listItem.highlighted.label}
-      {:else}
-        {listItem.label}
-      {/if}
-      <GeoLevelBadge region={listItem.item} />
+  <svelte:fragment slot="entry" let:label let:item let:onClick>
+    <a href="?region={item ? item.id : ''}" on:click|preventDefault={onClick}>
+      {@html label}
+      <GeoLevelBadge region={item} />
     </a>
   </svelte:fragment>
 </Search>
