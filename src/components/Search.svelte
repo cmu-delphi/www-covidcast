@@ -1,35 +1,28 @@
 <script>
   import { createEventDispatcher } from 'svelte';
+  import {
+    prepareUserEnteredText,
+    toSearchItems,
+    createHighlighter,
+    limitListItems,
+    matchItems,
+  } from './searchHelpers';
 
   const dispatch = createEventDispatcher();
 
   // the list of items  the user can select from
   export let items;
 
-  /**
-   * custom filter for visible items
-   * @type {(item) => boolean}
-   */
-  export let filterItem = null;
-
-  /**
-   * custom sorter for items
-   * @type {(itemA, itemB) => number}
-   */
-  export let sortItem = null;
-
   // field of each item that's used for the labels in the list
   export let labelFieldName = undefined;
 
   export let labelFunction = function (item) {
-    if (item === undefined || item === null) {
+    if (!item) {
       return '';
     }
     return labelFieldName ? item[labelFieldName] : item;
   };
   export let keywordFunction = labelFunction;
-  export let colorFieldName = undefined;
-
   export let selectFirstIfEmpty = false;
 
   export let minCharactersToSearch = 1;
@@ -67,8 +60,11 @@
    */
   export let modern = false;
 
+  /**
+   * @type {string}
+   */
   let text;
-  let filteredTextLength = 0;
+  let minCharsToSearchReached = false;
 
   function onSelectedItemChanged() {
     text = labelFunction(selectedItem);
@@ -89,14 +85,18 @@
     dispatch('remove', item);
   }
 
-  $: selectedItem, onSelectedItemChanged();
+  $: {
+    onSelectedItemChanged(selectedItem);
+  }
 
-  // HTML elements
   /**
    * @type HTMLInputElement
    */
-  let input;
-  let list;
+  let inputRef;
+  /**
+   * @type HTMLElement
+   */
+  let listRef;
 
   // UI state
   let opened = false;
@@ -106,119 +106,74 @@
   let filteredListItems = [];
   let hiddenFilteredListItems = 0;
 
-  $: listItems = items.map((item) => ({
-    // keywords representation of the item
-    keywords: keywordFunction(item).toLowerCase().trim(),
-    // item label
-    label: labelFunction(item),
-    // store reference to the origial item
-    item,
-  }));
-  $: selectedLabelLookup = new Set((selectedItems || []).map((s) => labelFunction(s)));
-
-  function limitListItems(items) {
-    if (sortItem) {
-      items = items.slice().sort((a, b) => sortItem(a.item, b.item));
-    }
-    if (maxItemsToShowInList <= 0 || items.length < maxItemsToShowInList) {
-      return items;
-    }
-    return items.slice(0, maxItemsToShowInList);
-  }
-
-  function prepareUserEnteredText(userEnteredText) {
-    if (userEnteredText === undefined || userEnteredText === null) {
-      return '';
-    }
-
-    const textFiltered = userEnteredText.replace(/[&/\\#,+()$~%.'":*?<>{}]/g, ' ').trim();
-
-    filteredTextLength = textFiltered.length;
-
-    if (minCharactersToSearch > 1) {
-      if (filteredTextLength < minCharactersToSearch) {
-        return '';
-      }
-    }
-    return textFiltered.toLowerCase().trim();
-  }
+  $: listItems = toSearchItems(items, keywordFunction, labelFunction);
+  $: selectedLabelLookup = new Set((selectedItems || []).map(labelFunction));
 
   function resetItems() {
     const matchingItems =
-      selectedLabelLookup.size > 0 || filterItem != null
-        ? listItems.filter((d) => !selectedLabelLookup.has(d.label) && (filterItem == null || filterItem(d.item)))
-        : listItems;
-    filteredListItems = limitListItems(matchingItems);
+      selectedLabelLookup.size > 0 ? listItems.filter((d) => !selectedLabelLookup.has(d.label)) : listItems;
+    filteredListItems = limitListItems(matchingItems, maxItemsToShowInList);
     hiddenFilteredListItems = matchingItems.length - filteredListItems.length;
   }
 
+  let highlighter = String;
+
   function search() {
     const textFiltered = prepareUserEnteredText(text);
+    minCharsToSearchReached =
+      textFiltered.length > 0 && (minCharactersToSearch <= 1 || textFiltered.length > minCharactersToSearch);
 
-    if (textFiltered === '') {
+    if (!minCharsToSearchReached) {
       resetItems();
-      closeIfMinCharsToSearchReached();
+      close();
       return;
     }
 
-    const searchWords = textFiltered.split(' ');
-    const hlfilter = highlightFilter(textFiltered, ['label']);
+    highlighter = createHighlighter(textFiltered);
 
-    const matchingItems = listItems.filter((listItem) => {
-      const itemKeywords = listItem.keywords;
-      return (
-        searchWords.every((searchWord) => itemKeywords.includes(searchWord)) &&
-        !selectedLabelLookup.has(listItem.label) &&
-        (filterItem == null || filterItem(listItem.item))
-      );
-    });
-
-    filteredListItems = limitListItems(matchingItems).map(hlfilter);
+    const matchingItems = matchItems(listItems, textFiltered, selectedLabelLookup);
+    filteredListItems = limitListItems(matchingItems, maxItemsToShowInList);
     hiddenFilteredListItems = matchingItems.length - filteredListItems.length;
-    closeIfMinCharsToSearchReached();
   }
 
   // $: text, search();
 
-  function selectListItem(listItem) {
-    selectedItem = listItem.item;
-  }
-
   function selectItem() {
     const listItem = filteredListItems[highlightIndex];
-    selectListItem(listItem);
+    selectedItem = listItem.item;
     close();
   }
 
   function up() {
     open();
-    if (highlightIndex > 0) highlightIndex--;
+    if (highlightIndex > 0) {
+      highlightIndex--;
+    }
     highlight();
   }
 
   function down() {
     open();
-    if (highlightIndex < filteredListItems.length - 1) highlightIndex++;
+    if (highlightIndex < filteredListItems.length - 1) {
+      highlightIndex++;
+    }
     highlight();
   }
 
   function highlight() {
-    const query = '.selected';
-    const el = list.querySelector(query);
-    if (el) {
-      if (typeof el.scrollIntoViewIfNeeded === 'function') {
-        el.scrollIntoViewIfNeeded();
-      }
+    const el = listRef.querySelector('.uk-active');
+    if (el && typeof el.scrollIntoViewIfNeeded === 'function') {
+      el.scrollIntoViewIfNeeded();
     }
   }
 
   function onListItemClick(listItem) {
-    selectListItem(listItem);
+    selectedItem = listItem.item;
     close();
   }
 
   function onResetItem() {
-    selectListItem({ item: undefined });
+    selectedItem = undefined;
     close();
   }
 
@@ -227,24 +182,30 @@
     highlight();
   }
 
-  function onDocumentClick() {
-    close();
-  }
-
   function onKeyDown(e) {
-    let key = e.key;
-    if (key === 'Tab' && e.shiftKey) key = 'ShiftTab';
-    const fnmap = {
-      Tab: opened ? down.bind(this) : null,
-      ShiftTab: opened ? up.bind(this) : null,
-      ArrowDown: down.bind(this),
-      ArrowUp: up.bind(this),
-      Escape: onEsc.bind(this),
-    };
-    const fn = fnmap[key];
-    if (typeof fn === 'function') {
-      e.preventDefault();
-      fn(e);
+    switch (e.key) {
+      case 'Tab':
+        if (opened) {
+          e.preventDefault();
+          if (e.shiftKey) {
+            down();
+          } else {
+            up();
+          }
+        }
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        down();
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        up();
+        break;
+      case 'Escape':
+        e.preventDefault();
+        onEsc();
+        break;
     }
   }
 
@@ -267,7 +228,7 @@
 
     if (modern) {
       // select the whole field upon click
-      input.select();
+      inputRef.select();
     }
   }
 
@@ -275,7 +236,7 @@
     //if (text) return clear();
     e.stopPropagation();
     if (opened) {
-      input.focus();
+      inputRef.focus();
       close();
     }
   }
@@ -304,10 +265,9 @@
 
   function open() {
     // check if the search text has more than the min chars required
-    if (isMinCharsToSearchReached()) {
+    if (!minCharsToSearchReached || opened) {
       return;
     }
-
     opened = true;
   }
 
@@ -318,37 +278,6 @@
       // highlightFilter = 0;
       selectItem();
     }
-  }
-
-  function isMinCharsToSearchReached() {
-    return minCharactersToSearch > 1 && filteredTextLength < minCharactersToSearch;
-  }
-
-  function closeIfMinCharsToSearchReached() {
-    if (isMinCharsToSearchReached()) {
-      close();
-    }
-  }
-
-  // 'item number one'.replace(/(it)(.*)(nu)(.*)(one)/ig, '<b>$1</b>$2 <b>$3</b>$4 <b>$5</b>')
-  function highlightFilter(q, fields) {
-    const qs = '(' + q.trim().replace(/\s/g, ')(.*)(') + ')';
-    const reg = new RegExp(qs, 'ig');
-    let n = 1;
-    const len = qs.split(')(').length + 1;
-    let repl = '';
-    for (; n < len; n++) repl += n % 2 ? `<b>$${n}</b>` : `$${n}`;
-
-    return (i) => {
-      const newI = Object.assign({ highlighted: {} }, i);
-      if (fields) {
-        fields.forEach((f) => {
-          if (!newI[f]) return;
-          newI.highlighted[f] = newI[f].replace(reg, repl);
-        });
-      }
-      return newI;
-    };
   }
 </script>
 
@@ -373,7 +302,7 @@
       {disabled}
       {title}
       aria-label={placeholder}
-      bind:this={input}
+      bind:this={inputRef}
       bind:value={text}
       on:input={onInput}
       on:focus={onFocus}
@@ -395,7 +324,7 @@
     <span class="uk-search-icon search-multiple-icon search-icon" data-uk-icon="icon: {icon}" class:modern />
 
     {#each selectedItems as selectedItem}
-      <div class="search-tag" style="border-color: {colorFieldName ? selectedItem[colorFieldName] : undefined}">
+      <div class="search-tag">
         <span>{labelFunction(selectedItem)}</span>
         <button
           class=""
@@ -416,7 +345,7 @@
         {disabled}
         {title}
         aria-label={placeholder}
-        bind:this={input}
+        bind:this={inputRef}
         bind:value={text}
         on:input={onInput}
         on:focus={onFocus}
@@ -435,7 +364,7 @@
     />
   {/if}
 
-  <div class="uk-dropdown uk-dropdown-bottom-left search-box-list" class:uk-open={opened} bind:this={list}>
+  <div class="uk-dropdown uk-dropdown-bottom-left search-box-list" class:uk-open={opened} bind:this={listRef}>
     <ul class="uk-nav uk-dropdown-nav">
       {#if filteredListItems && filteredListItems.length > 0}
         {#each filteredListItems as listItem, i}
@@ -444,11 +373,7 @@
               href="?region={listItem.item ? listItem.item.id : ''}"
               on:click|preventDefault={() => onListItemClick(listItem)}
             >
-              {#if listItem.highlighted}
-                {@html listItem.highlighted.label}
-              {:else}
-                {@html listItem.label}
-              {/if}
+              {@html highlighter(listItem.label)}
             </a>
           </li>
         {/each}
@@ -457,14 +382,14 @@
           <li class="uk-nav-divider" />
           <li class="more-results">&hellip; {hiddenFilteredListItems} results not shown</li>
         {/if}
-      {:else if noResultsText}
+      {:else}
         <li class="uk-nav-header">{noResultsText}</li>
       {/if}
     </ul>
   </div>
 </div>
 
-<svelte:window on:click={onDocumentClick} />
+<svelte:window on:click={close} />
 
 <style>
   .search-box {
