@@ -94,11 +94,15 @@
    * @type {{id: string, config: Record<string, unknown>}}
    */
   let edit = null;
-  let refOpenAdder = null;
-  let refCloseAdder = null;
+  let add = false;
+
+  function addWidget() {
+    add = true;
+  }
 
   function closeSideBar() {
     edit = null;
+    add = false;
   }
 
   function editWidget(id) {
@@ -106,18 +110,11 @@
       id,
       config: state.configs[id] || {},
     };
-    if (refOpenAdder) {
-      refOpenAdder.click();
-    }
   }
 
   function editedWidget(event) {
-    if (refCloseAdder) {
-      refCloseAdder.click();
-    }
     const id = event.detail.id;
     const config = event.detail.config;
-
     edit = null;
     state = {
       ...state,
@@ -139,12 +136,11 @@
     }
   }
 
-  function addWidget(event) {
-    if (refCloseAdder) {
-      refCloseAdder.click();
-    }
+  function addedWidget(event) {
     const data = event.detail;
     const states = { ...state.states };
+    add = false;
+
     if (data.state) {
       states[data.id] = data.state;
     }
@@ -193,11 +189,10 @@
   <div class="mobile-header-line-bg">
     <div class="mobile-header-line">
       <button
-        bind:this={refOpenAdder}
         class="widget-add-button uk-button uk-button-primary"
         type="button"
         title="Add New Widget"
-        uk-toggle="target: #offcanvas-overlay">Add Widget</button
+        on:click={addWidget}>Add Widget</button
       >
       <h2>
         COVIDcast
@@ -224,16 +219,17 @@
   {#if $isMobileDevice}
     <div class="uk-alert uk-alert-warning">This view is optimized for larger screens only</div>
   {/if}
-  <div id="offcanvas-overlay" uk-offcanvas="overlay: true">
-    <div class="uk-offcanvas-bar">
-      <button bind:this={refCloseAdder} on:click={closeSideBar} class="uk-offcanvas-close" type="button" uk-close />
+
+  {#if edit || add}
+    <div class="overlay-container">
+      <button on:click={closeSideBar} type="button" class="uk-icon uk-close" uk-icon="close" />
       {#if edit}
         <WidgetEditor on:edit={editedWidget} {sensor} {region} {date} id={edit.id} config={edit.config} />
       {:else}
-        <WidgetAdder on:add={addWidget} {sensor} {region} {date} {nextId} />
+        <WidgetAdder on:add={addedWidget} {sensor} {region} {date} {nextId} />
       {/if}
     </div>
-  </div>
+  {/if}
   <div class="panel-wrapper">
     <div bind:this={panelRef} class="panel" data-uk-sortable="handle: .widget-move-handle">
       {#each components as c (c.id)}
@@ -251,6 +247,25 @@
     line-height: 1.5rem;
     display: flex;
     flex-direction: column;
+  }
+
+  .overlay-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1000;
+    background: #fafafc;
+    border-right: 1px solid #d3d4d8;
+    padding: 1em;
+  }
+
+  .overlay-container :global(input[type='text'], input[type='date'], select) {
+    background: white;
+  }
+
+  .overlay-container .uk-close {
+    float: right;
   }
 
   .widget-add-button {

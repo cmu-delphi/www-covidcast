@@ -378,6 +378,7 @@
       {name}
       {disabled}
       {title}
+      type="text"
       aria-label={placeholder}
       bind:this={input}
       bind:value={text}
@@ -482,10 +483,11 @@
 
   .search-multiple {
     display: flex;
-    height: 40px;
+    min-height: 40px;
     background: transparent;
     border: 1px solid #e5e5e5;
     position: relative;
+    flex-wrap: wrap;
   }
 
   .search-multiple-icon {
@@ -527,6 +529,7 @@
     border: 2px solid #999;
     display: flex;
     align-items: center;
+    white-space: nowrap;
   }
 
   /* modern styles for survey dashboard */

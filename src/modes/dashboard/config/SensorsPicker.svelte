@@ -25,7 +25,7 @@
   $: selectedItems = syncedValues.map((d) => (!d ? defaultSensor : $metaDataManager.getSensor(d)));
 </script>
 
-<div>
+<div class="sensors-picker">
   <label for="widget-adder-s" class="uk-form-label">Indicators</label>
   {#each syncedValues as s}
     <input type="hidden" value={s} name="sensors" />
@@ -37,7 +37,18 @@
       syncedValues = e.detail ? [e.detail.key] : [''];
     }}
     on:add={(e) => {
-      syncedValues = [...syncedValues, e.detail.key];
+      if (syncedValues.length === 1 && syncedValues[0] === '') {
+        // replace default
+        syncedValues = [e.detail.key];
+      } else {
+        syncedValues = [...syncedValues, e.detail.key];
+      }
     }}
   />
 </div>
+
+<style>
+  .sensors-picker :global(.serach-multiple) {
+    max-width: 35em;
+  }
+</style>
