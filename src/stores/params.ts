@@ -99,6 +99,8 @@ export class SensorParam {
   readonly signalTooltip: string;
   readonly value: Sensor;
   readonly rawValue?: Sensor;
+  readonly rawCumulativeValue?: Sensor;
+
   readonly isCasesOrDeath: boolean;
   readonly dataSourceName: string;
 
@@ -126,6 +128,8 @@ export class SensorParam {
     this.signalTooltip = sensor.signalTooltip;
     this.value = sensor;
     this.rawValue = sensor.rawSensor;
+    this.rawCumulativeValue = sensor.rawCumulativeSensor;
+
     this.isCasesOrDeath = (sensor as SensorEntry).isCasesOrDeath || false;
     this.dataSourceName = sensor.dataSourceName;
     this.isPercentage = sensor.format == 'percent' || sensor.format === 'fraction';

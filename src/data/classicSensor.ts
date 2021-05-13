@@ -93,7 +93,6 @@ export function extendSensorEntry(
   sensorEntry: Partial<SensorEntry> & { name: string; id: string; signal: string },
 ): SensorEntry {
   const key = `${sensorEntry.id}-${sensorEntry.signal}`;
-  const isCasesOrDeath = isCasesSignal(key) || isDeathSignal(key);
   const isCount = isCountSignal(key);
 
   const mapTitle = (sensorEntry.mapTitleText as unknown) as {
@@ -112,11 +111,31 @@ export function extendSensorEntry(
     plotTitleText: sensorEntry.plotTitleText || sensorEntry.name,
     mapTitleText: sensorEntry.mapTitleText as string,
   });
+  const casesOrDeath = (sensorEntry as unknown) as Sensor & CasesOrDeathOldSensor;
+  const isCasesOrDeath = casesOrDeath.casesOrDeathSignals != null;
+
   if (!isCasesOrDeath) {
     return full;
   }
-  const casesOrDeath = (full as unknown) as Sensor & CasesOrDeathOldSensor;
+
   casesOrDeath.isCasesOrDeath = true;
+
+  // create the cumulative version
+  const rawCumulativeSignal = casesOrDeath.casesOrDeathSignals.countRatioCumulative;
+  Object.assign(full, {
+    rawCumulativeSignal,
+    rawCumulativeSensor: {
+      ...full,
+      key: `${full.id}-${rawCumulativeSignal}`,
+      name: `Cumulative ${full.name.replace('(7-day average)', '')} (Raw)`,
+      description: full.description!.replace('(7-day average)', ''),
+      signal: rawCumulativeSignal,
+      is7DayAverage: false,
+      rawSensor: null,
+      rawSignal: null,
+    },
+  });
+
   casesOrDeath.casesOrDeathSensors = {} as CasesOrDeathOldSensor['casesOrDeathSensors'];
   casesOrDeath.mapTitleText =
     typeof mapTitle === 'function'
@@ -162,5 +181,6 @@ export function extendSensorEntry(
   add(false, false);
   add(false, true);
   add(true, false);
+
   return casesOrDeath;
 }

@@ -30,6 +30,9 @@ export interface Sensor {
   readonly rawSignal?: string; // raw signal in case of a 7day average
   readonly rawSensor?: Sensor; // raw signal in case of a 7day average
 
+  readonly rawCumulativeSignal?: string; // raw cumulative version of this signal
+  readonly rawCumulativeSensor?: Sensor; /// raw cumulative version of this signal
+
   readonly name: string; // signal name
   readonly unit: string;
   readonly dataSourceName: string;

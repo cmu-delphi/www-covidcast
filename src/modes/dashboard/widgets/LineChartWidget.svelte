@@ -5,6 +5,7 @@
     height: 2,
     zero: true,
     raw: false,
+    cumulative: false,
   };
 </script>
 
@@ -16,6 +17,7 @@
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
   import {
     generateLineChartSpec,
+    generateCumulativeBarSpec,
     generateLineAndBarSpec,
     genAnnotationLayer,
     resolveHighlightedDate,
@@ -54,6 +56,7 @@
 
   let zoom = !initialState.zero;
   let singleRaw = initialState.raw;
+  let singleCumulative = initialState.cumulative || false;
 
   let superState = {};
   $: state = {
@@ -61,6 +64,7 @@
     ...superState,
     zero: !zoom,
     raw: singleRaw,
+    cumulative: singleCumulative,
   };
   $: {
     dispatch('state', { id, state });
@@ -85,9 +89,9 @@
    * @param {import('../../../stores/params').SensorParam} sensor
    * @param {import('../../../stores/params').RegionParam} region
    * @param {import('../../../stores/params').TimeFrame} timeFrame
-   * @param {{zero: boolean, raw: boolean}} options
+   * @param {{zero: boolean, raw: boolean, cumulative: boolean}} options
    */
-  function genSpec(sensor, region, timeFrame, { zero, raw }) {
+  function genSpec(sensor, region, timeFrame, { zero, raw, cumulative }) {
     /**
      * @type {import('../../../specs/lineSpec').LineSpecOptions}
      */
@@ -98,7 +102,7 @@
       zero,
       xTitle: sensor.xAxis,
       title: [
-        `${sensor.name} in ${region.displayName}`,
+        `${cumulative ? 'Cumulative ' : ''}${sensor.name} in ${region.displayName}`,
         `between ${formatDateYearWeekdayAbbr(timeFrame.min)} and ${formatDateShortWeekdayAbbr(timeFrame.max)}`,
       ],
       subTitle: sensor.unit,
@@ -106,13 +110,20 @@
       clearHighlight: false,
       autoAlignOffset: 60,
       paddingTop: 80,
-      infoLabelExpr: raw
-        ? `cachedNumber(datum.value, '.1f') + ' (raw: ' + cachedNumber(datum.raw, '.1f') + ') @ ' + cachedTime(datum.date_value, '%a %b %d')`
-        : `cachedNumber(datum.value, '.1f') + ' @ ' + cachedTime(datum.date_value, '%a %b %d')`,
     };
+    const valueTooltip = `cachedNumber(datum.value, '.1f') + `;
+    const dateTooltip = `' @ ' + cachedTime(datum.date_value, '%a %b %d')`;
+    const rawTooltip = `' (raw: ' + cachedNumber(datum.raw, '.1f')`;
     if (raw) {
+      if (cumulative) {
+        options.paddingLeft = 52; // more space for larger numbers
+        options.infoLabelExpr = `${valueTooltip} ${rawTooltip} + ', cum: ' + cachedNumber(datum.cumulative, '.1f') + ')' + ${dateTooltip}`;
+        return generateCumulativeBarSpec(options);
+      }
+      options.infoLabelExpr = `${valueTooltip} ${rawTooltip} + ')' + ${dateTooltip}`;
       return generateLineAndBarSpec(options);
     }
+    options.infoLabelExpr = valueTooltip + dateTooltip;
     return generateLineChartSpec(options);
   }
 
@@ -121,8 +132,9 @@
    * @param {import("../../stores/params").DateParam} date
    * @param {import("../../stores/params").TimeFrame} timeFrame
    * @param {boolean} raw
+   * @param {boolean} cumulative
    */
-  function loadData(sensor, region, timeFrame, raw) {
+  function loadData(sensor, region, timeFrame, raw, cumulative) {
     const selfData = fetcher.fetch1Sensor1RegionNDates(sensor, region, timeFrame);
 
     if (!raw) {
@@ -130,8 +142,24 @@
     }
 
     const rawData = fetcher.fetch1Sensor1RegionNDates(sensor.rawValue, region, timeFrame);
-    return Promise.all([selfData, rawData]).then((data) => {
-      return combineSignals(data, data[0], ['smoothed', 'raw']);
+    if (!cumulative) {
+      return Promise.all([selfData, rawData]).then((data) => {
+        return combineSignals(
+          data,
+          data[0].map((d) => ({ ...d })),
+          ['smoothed', 'raw'],
+        );
+      });
+    }
+
+    // raw and cumulative
+    const cumulativeData = fetcher.fetch1Sensor1RegionNDates(sensor.rawCumulativeValue, region, timeFrame);
+    return Promise.all([selfData, rawData, cumulativeData]).then((data) => {
+      return combineSignals(
+        data,
+        data[0].map((d) => ({ ...d })),
+        ['smoothed', 'raw', 'cumulative'],
+      );
     });
   }
 
@@ -139,11 +167,14 @@
    * @param {import("../../stores/params").SensorParam} sensor
    * @param {import("../../stores/params").Region region
    */
-  function generateFileName(sensor, region, timeFrame, raw) {
+  function generateFileName(sensor, region, timeFrame, raw, cumulative) {
     const regionName = `${region.propertyId}-${region.displayName}`;
     let suffix = '';
     if (raw) {
       suffix = '_RawVsSmoothed';
+    }
+    if (cumulative) {
+      suffix += '_Cumulative';
     }
     return `${sensor.name}_${regionName}_${formatDateISO(timeFrame.min)}-${formatDateISO(timeFrame.max)}${suffix}`;
   }
@@ -155,18 +186,21 @@
     return spec;
   }
 
-  $: annotations = $annotationManager.getWindowAnnotations(sensor.value, region, timeFrame.min, timeFrame.max);
   $: raw = singleRaw && sensor.rawValue != null;
+  $: cumulative = raw && singleCumulative && sensor.rawCumulativeValue != null;
+
+  $: annotations = $annotationManager.getWindowAnnotations(sensor.value, region, timeFrame.min, timeFrame.max);
   $: spec = injectRanges(
     genSpec(sensor, region, timeFrame, {
       zero: !zoom,
       raw,
+      cumulative,
     }),
     timeFrame,
     annotations,
   );
-  $: data = loadData(sensor, region, timeFrame, raw);
-  $: fileName = generateFileName(sensor, region, timeFrame, raw);
+  $: data = loadData(sensor, region, timeFrame, raw, cumulative);
+  $: fileName = generateFileName(sensor, region, timeFrame, raw, cumulative);
 
   let vegaRef = null;
 
@@ -235,7 +269,10 @@
     <Toggle bind:checked={zoom} noPadding>Rescale Y-axis</Toggle>
     {#if sensor.rawValue != null}
       <Toggle bind:checked={singleRaw} noPadding>Raw Data</Toggle>
+      {#if raw && sensor.rawCumulativeValue != null}
+        <Toggle bind:checked={singleCumulative}>Cumulative Data</Toggle>
+      {/if}
     {/if}
-    <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} advanced={false} />
+    <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} {cumulative} advanced={false} />
   </svelte:fragment>
 </WidgetCard>
