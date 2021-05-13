@@ -302,7 +302,7 @@
     selectedItem={level === 'state' ? null : null}
     labelFieldName="displayName"
     keywordFunction={combineKeywords}
-    maxItemsToShowInList="5"
+    maxItemsToShowInList={5}
     on:change={(e) => onHighlight(e.detail)}
   />
 

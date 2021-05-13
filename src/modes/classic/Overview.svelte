@@ -69,7 +69,7 @@
         items={nameInfosWithUS}
         selectedItem={$currentRegionInfo}
         labelFieldName="displayName"
-        maxItemsToShowInList="5"
+        maxItemsToShowInList={5}
         on:change={(e) => {
           if (selectByInfo(e.detail)) {
             focusOn = e.detail || null;

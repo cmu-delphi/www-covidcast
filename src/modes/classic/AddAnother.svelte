@@ -59,7 +59,7 @@
     selectedItem={possibleInfos ? null : null}
     items={possibleInfos}
     labelFieldName="displayName"
-    maxItemsToShowInList="5"
+    maxItemsToShowInList={5}
     on:change={(e) => {
       if (e.detail) {
         dispatch('add', e.detail);

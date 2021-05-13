@@ -34,7 +34,7 @@
     selectedItem={value ? getInfoByName(value) : defaultRegion}
     labelFieldName="displayName"
     keywordFunction={combineKeywords}
-    maxItemsToShowInList="5"
+    maxItemsToShowInList={5}
     on:change={(e) => {
       const id = e.detail.id;
       if (!id || e.detail === defaultRegion) {

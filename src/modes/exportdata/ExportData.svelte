@@ -344,7 +344,7 @@
                 title="Region"
                 selectedItems={geoValues}
                 labelFieldName="displayName"
-                maxItemsToShowInList="5"
+                maxItemsToShowInList={5}
                 on:add={(e) => addRegion(e.detail)}
                 on:remove={(e) => removeRegion(e.detail)}
                 on:change={(e) => setRegion(e.detail)}
