@@ -26,7 +26,7 @@
   export let initialState = { ...DEFAULT_STATE, sortCriteriaDesc: true };
 
   /**
-   * @type {import("../../../stores/params").DataFetcher}
+   * @type {import("../../../stores/DataFetcher").DataFetcher}
    */
   const fetcher = getContext('fetcher');
 

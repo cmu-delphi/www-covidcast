@@ -6,10 +6,11 @@
   import Overview from './Overview.svelte';
   import { nationInfo, nameInfos, getStateOfCounty } from '../../data/regions';
   import MobileSurveyToc from './MobileSurveyToc.svelte';
-  import { DataFetcher, DateParam, RegionParam, SensorParam } from '../../stores/params';
+  import { DateParam, RegionParam, SensorParam } from '../../stores/params';
   import getRelatedCounties from '../../data/relatedRegions';
   import { modeByID } from '..';
   import { scrollIntoView } from '../../util';
+  import { DataFetcher } from '../../stores/DataFetcher';
 
   $: sensor = new SensorParam(refSensor, $metaDataManager);
   $: date = new DateParam($currentDateObject);

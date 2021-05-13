@@ -13,13 +13,14 @@
     metaDataManager,
     sensorList,
   } from '../../stores';
-  import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
+  import { SensorParam, DateParam, RegionParam } from '../../stores/params';
   import RegionMapWrapper from '../../blocks/RegionMapWrapper.svelte';
   import FancyHeader from '../../components/FancyHeader.svelte';
   import HistoryLineChart from '../../blocks/HistoryLineChart.svelte';
   import { afterUpdate } from 'svelte';
   import { scrollIntoView } from '../../util';
   import { modeByID } from '..';
+  import { DataFetcher } from '../../stores/DataFetcher';
 
   $: sensor = new SensorParam($currentSensorEntry, $metaDataManager);
   $: date = new DateParam($currentDateObject);

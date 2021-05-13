@@ -13,7 +13,7 @@
   import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
   import RegionDatePicker from '../../components/RegionDatePicker.svelte';
   import { currentRegionInfo, currentSensorEntry, currentDateObject } from '../../stores';
-  import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
+  import { SensorParam, DateParam, RegionParam } from '../../stores/params';
   import { formatDateWeekday } from '../../formats';
   import { afterUpdate } from 'svelte';
   import { scrollIntoView } from '../../util';
@@ -21,6 +21,7 @@
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
   import IndicatorCorrelation from './IndicatorCorrelation.svelte';
   import MaxDateHint from '../../blocks/MaxDateHint.svelte';
+  import { DataFetcher } from '../../stores/DataFetcher';
 
   $: sensor = new SensorParam($currentSensorEntry, $metaDataManager);
   $: date = new DateParam($currentDateObject);

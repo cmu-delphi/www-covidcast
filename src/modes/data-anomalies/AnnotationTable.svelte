@@ -1,8 +1,9 @@
 <script>
-  import { annotationManager, getLevelInfo } from '../../stores';
+  import { annotationManager } from '../../stores';
   import SortColumnIndicator, { SortHelper } from '../../components/SortColumnIndicator.svelte';
   import ExternalLinkIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/external-link-alt.svg';
-  import { getDataSource, CASES_SOURCE, DEATH_SOURCE } from '../../stores/dataSourceLookup';
+  import { getLevelInfo } from '../../data/geoLevel';
+  import { getDataSource, CASES_SOURCE, DEATH_SOURCE } from '../../data/dataSourceLookup';
   import { formatDateISO } from '../../formats';
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
   import { getInfoByName } from '../../data/regions';

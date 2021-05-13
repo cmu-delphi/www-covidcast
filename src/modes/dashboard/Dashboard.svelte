@@ -1,7 +1,7 @@
 <script>
   import { onMount, setContext } from 'svelte';
   import { currentRegionInfo, currentDateObject, currentSensor, isMobileDevice, metaDataManager } from '../../stores';
-  import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
+  import { SensorParam, DateParam, RegionParam } from '../../stores/params';
   import { WidgetHighlight } from './highlight';
   import { resolveInitialState, updateState } from './state';
   import isEqual from 'lodash-es/isEqual';
@@ -11,6 +11,7 @@
   import DashboardParameters from './DashboardParameters.svelte';
   import { allSensorsMap } from '../../stores/allSensors';
   import { DEFAULT_SENSOR } from '../../stores/constants';
+  import { DataFetcher } from '../../stores/DataFetcher';
 
   $: allSensor = allSensorsMap.get($currentSensor) || allSensorsMap.get(DEFAULT_SENSOR);
   $: sensor = new SensorParam(allSensor, $metaDataManager);

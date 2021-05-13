@@ -31,7 +31,7 @@
   export let highlight = null;
 
   /**
-   * @type {import("../../../stores/params").DataFetcher}
+   * @type {import("../../../stores/DataFetcher").DataFetcher}
    */
   const fetcher = getContext('fetcher');
 
