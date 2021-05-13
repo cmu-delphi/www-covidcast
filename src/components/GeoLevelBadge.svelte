@@ -16,5 +16,6 @@
 <style>
   .uk-badge {
     color: white;
+    font-size: 0.625rem;
   }
 </style>

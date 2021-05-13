@@ -1,6 +1,7 @@
 <script>
   /* eslint-disable no-undef */
   import Search from './Search.svelte';
+  import SensorBadges from './SensorBadges.svelte';
 
   export let modern = false;
   export let items;
@@ -12,7 +13,7 @@
    * @param {import('../stores/params').Sensor} d
    */
   function combineKeywords(d) {
-    return `${d.id} ${d.signal} ${d.name}`;
+    return `${d.id} ${d.type} ${d.format} ${d.signal} ${d.name}`;
   }
 </script>
 
@@ -27,7 +28,7 @@
   {selectedItems}
   labelFieldName="name"
   keywordFunction={combineKeywords}
-  maxItemsToShowInList={15}
+  maxItemsToShowInList={7}
   on:change
   on:add
 >
@@ -39,5 +40,8 @@
         {listItem.label}
       {/if}
     </a>
+    <div>
+      <SensorBadges sensor={listItem.item} />
+    </div>
   </svelte:fragment>
 </Search>
