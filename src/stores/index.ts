@@ -367,7 +367,10 @@ export const trackedUrlParams = derived(
       level: mode === modeByID.export || mode === modeByID['survey-results'] || level === DEFAULT_LEVEL ? null : level,
       region: mode === modeByID.export ? null : region,
       date:
-        mode === modeByID.export || mode === modeByID.landing || mode === modeByID['indicator-status']
+        String(date) === MAGIC_START_DATE ||
+        mode === modeByID.export ||
+        mode === modeByID.landing ||
+        mode === modeByID['indicator-status']
           ? null
           : String(date),
       signalC: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.cumulative,
