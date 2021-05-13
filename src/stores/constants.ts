@@ -1,12 +1,12 @@
 import descriptions from './descriptions.generated.json';
 import { modeByID } from '../modes';
 import type { RegionLevel } from '../data/regions';
-import { sensorTypes } from './sensor';
-import { extendSensorEntry, SensorEntry } from './classicSensor';
+import { sensorTypes } from '../data/sensor';
+import { extendSensorEntry, SensorEntry } from '../data/classicSensor';
 
-export * from './geoLevel';
-export * from './sensor';
-export * from './classicSensor';
+export * from '../data/geoLevel';
+export * from '../data/sensor';
+export * from '../data/classicSensor';
 
 const defaultSensors = (descriptions as unknown) as (Partial<SensorEntry> & {
   name: string;

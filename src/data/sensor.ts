@@ -1,7 +1,7 @@
 import { formatRawValue, formatValue, formatPercentage, formatCount } from '../formats';
 import { interpolateBuPu, interpolateYlGnBu, interpolateYlOrRd } from 'd3-scale-chromatic';
 import { getDataSource } from './dataSourceLookup';
-import type { RegionLevel } from '../data/regions';
+import type { RegionLevel } from './regions';
 
 export type SensorType = 'public' | 'early' | 'late' | 'other';
 

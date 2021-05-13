@@ -1,4 +1,5 @@
-import { ensureSensorStructure, Sensor, sensorList } from './constants';
+import { ensureSensorStructure, Sensor } from '../data/sensor';
+import { sensorList } from './constants';
 import descriptions from './questions.generated.json';
 import { isoParse } from 'd3-time-format';
 import type { RegionLevel } from '../data/regions';

@@ -1,4 +1,4 @@
-import { EpiDataCasesOrDeathValues, primaryValue, CasesOrDeathOptions } from '../stores/constants';
+import { EpiDataCasesOrDeathValues, primaryValue, CasesOrDeathOptions } from './classicSensor';
 import type { EpiDataMetaInfo, EpiDataMetaStatsInfo } from './api';
 import { parseAPITime } from './utils';
 import type { RegionLevel } from './regions';

@@ -1,5 +1,5 @@
-import { isCasesSignal, isDeathSignal } from '../data/signals';
-import type { Sensor } from './constants';
+import { isCasesSignal, isDeathSignal } from './signals';
+import type { Sensor } from './sensor';
 
 export const CASES_SOURCE = 'cases';
 export const DEATH_SOURCE = 'deaths';

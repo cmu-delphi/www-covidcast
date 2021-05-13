@@ -1,4 +1,4 @@
-import type { RegionLevel } from '../data/regions';
+import type { RegionLevel } from './regions';
 
 export interface LevelInfo {
   id: RegionLevel;
