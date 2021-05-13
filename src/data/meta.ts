@@ -82,27 +82,37 @@ function toValueDomain(
   ];
 }
 
+export interface SensorLike {
+  id: string;
+  signal: string;
+}
+
+export interface OldSensorLike extends SensorLike {
+  isCasesOrDeath?: boolean;
+  casesOrDeathSignals?: Record<keyof EpiDataCasesOrDeathValues, string>;
+}
+
 export class MetaDataManager {
   private readonly cache: Map<string, EpiDataMetaParsedInfo>;
   constructor(metadata: EpiDataMetaInfo[]) {
     this.cache = new Map(metadata.map((d) => [toKey(d.source, d.signal), parse(d)]));
   }
 
-  getMetaData(sensor: { id: string; signal: string }): EpiDataMetaParsedInfo | null {
+  getMetaData(sensor: SensorLike): EpiDataMetaParsedInfo | null {
     return this.cache.get(toKey(sensor.id, sensor.signal)) ?? null;
   }
 
-  getLevels(sensor: { id: string; signal: string }): RegionLevel[] {
+  getLevels(sensor: SensorLike): RegionLevel[] {
     const entry = this.getMetaData(sensor);
     return entry ? (Object.keys(entry.geo_types) as RegionLevel[]) : ['county'];
   }
 
-  getStats(sensor: { id: string; signal: string }, level?: RegionLevel): EpiDataMetaStatsInfo {
+  getStats(sensor: SensorLike, level?: RegionLevel): EpiDataMetaStatsInfo {
     const entry = this.getMetaData(sensor);
     return extractStats(sensor.signal, entry, level);
   }
 
-  getTimeFrame(sensor: { id: string; signal: string }): TimeFrame {
+  getTimeFrame(sensor: SensorLike): TimeFrame {
     const entry = this.getMetaData(sensor);
     if (!entry) {
       return ALL_TIME_FRAME;
@@ -111,12 +121,7 @@ export class MetaDataManager {
   }
 
   getMetaDataCompatibility(
-    sensorEntry: {
-      id: string;
-      signal: string;
-      isCasesOrDeath?: boolean;
-      casesOrDeathSignals?: Record<keyof EpiDataCasesOrDeathValues, string>;
-    },
+    sensorEntry: OldSensorLike,
     sensorOptions: Partial<CasesOrDeathOptions> = {},
   ): EpiDataMetaInfo | null {
     let signal = sensorEntry.signal;
@@ -128,11 +133,7 @@ export class MetaDataManager {
   }
 
   getStatsCompatibility(
-    sensorEntry: {
-      id: string;
-      signal: string;
-      isCasesOrDeath?: boolean;
-    },
+    sensorEntry: OldSensorLike,
     sensorOptions: Partial<CasesOrDeathOptions> = {},
     level?: RegionLevel,
   ): EpiDataMetaStatsInfo {
@@ -141,7 +142,7 @@ export class MetaDataManager {
   }
 
   getValueDomain(
-    sensor: { id: string; signal: string },
+    sensor: SensorLike,
     level: RegionLevel,
     { useMax = false, enforceZeroLike = true }: { useMax?: boolean; enforceZeroLike?: boolean } = {},
   ): [number, number] {
@@ -150,16 +151,23 @@ export class MetaDataManager {
   }
 
   getValueDomainCompatibility(
-    sensorEntry: {
-      id: string;
-      signal: string;
-      isCasesOrDeath?: boolean;
-    },
+    sensorEntry: OldSensorLike,
     level: RegionLevel,
     signalOptions: Partial<CasesOrDeathOptions> = {},
     { useMax = false, enforceZeroLike = true }: { useMax?: boolean; enforceZeroLike?: boolean } = {},
   ): [number, number] {
     const stats = this.getStatsCompatibility(sensorEntry, signalOptions, level);
     return toValueDomain(stats, sensorEntry.signal, useMax, enforceZeroLike);
+  }
+
+  /**
+   * returns the ids of related sensors to the given one
+   */
+  getRelatedSignals(sensor: SensorLike): SensorLike[] {
+    const meta = this.getMetaData(sensor);
+    if (!meta) {
+      return [];
+    }
+    return (meta.related_signals ?? []).map((signal) => ({ id: sensor.id, signal }));
   }
 }
