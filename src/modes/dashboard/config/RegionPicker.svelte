@@ -13,7 +13,7 @@
 
   $: defaultRegion = {
     id: '',
-    displayName: `Use Configured (${region.displayName})`,
+    displayName: `Use Configured: ${region.displayName}`,
   };
   $: allItems = [defaultRegion, nationInfo, ...stateInfo, ...msaInfo, ...countyInfo, ...hrrInfo, ...hhsInfo];
 </script>
@@ -24,6 +24,8 @@
   <RegionSearch
     items={allItems}
     selectedItem={value ? getInfoByName(value) : defaultRegion}
-    on:change={(e) => region.set(e.detail && e.detail.level === 'nation' ? null : e.detail)}
+    on:change={(e) => {
+      syncedValue = e.detail.id || '';
+    }}
   />
 </div>

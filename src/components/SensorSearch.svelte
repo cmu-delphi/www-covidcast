@@ -1,6 +1,5 @@
 <script>
   /* eslint-disable no-undef */
-  import GeoLevelBadge from './GeoLevelBadge.svelte';
   import Search from './Search.svelte';
 
   export let modern = false;
@@ -10,36 +9,35 @@
   export let className = '';
 
   /**
-   * @param {import('../stores/params').Region} d
+   * @param {import('../stores/params').Sensor} d
    */
   function combineKeywords(d) {
-    return `${d.id} ${d.displayName}`;
+    return `${d.id} ${d.signal} ${d.name}`;
   }
 </script>
 
 <Search
   {className}
   {modern}
-  placeholder="Select Region"
+  placeholder="Select Indicator"
   {items}
-  title="Region"
-  icon="location"
+  title="Indicator"
+  icon="database"
   {selectedItem}
   {selectedItems}
-  labelFieldName="displayName"
+  labelFieldName="name"
   keywordFunction={combineKeywords}
   maxItemsToShowInList={15}
   on:change
   on:add
 >
   <svelte:fragment slot="entry" let:listItem let:onClick>
-    <a href="?region={listItem.item ? listItem.item.id : ''}" on:click|preventDefault={onClick}>
+    <a href="?signal={listItem.item ? listItem.item.key : ''}" on:click|preventDefault={onClick}>
       {#if listItem.highlighted}
         {@html listItem.highlighted.label}
       {:else}
         {listItem.label}
       {/if}
-      <GeoLevelBadge region={listItem.item} />
     </a>
   </svelte:fragment>
 </Search>

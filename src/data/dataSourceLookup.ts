@@ -19,6 +19,7 @@ const sourceNameLookup: Record<string, string> = {
   'google-survey': 'Google Survey',
   'usa-facts': 'USAFacts',
   'jhu-csse': 'Johns Hopkins University',
+  'covid-act-now': 'Covid Act Now',
 };
 
 export function getDataSource(sensor: { id: string; signal: string } | Sensor): string {

@@ -1,9 +1,8 @@
 <script>
-  import IndicatorPicker from '../../components/IndicatorPicker.svelte';
   import RegionSearch from '../../components/RegionSearch.svelte';
   import SensorDatePicker2 from '../../components/SensorDatePicker2.svelte';
+  import SensorSearch from '../../components/SensorSearch.svelte';
   import { nameInfos } from '../../data/regions';
-  import { sensorTypes } from '../../data/sensor';
   import { metaDataManager } from '../../stores';
 
   /**
@@ -30,12 +29,16 @@
   $: if (selectedDate !== undefined) {
     date.set(selectedDate);
   }
-
-  $: allSensorsGrouped = sensorTypes.map((d) => ({ ...d, sensors: $metaDataManager.getSensorsOfType(d.id) }));
 </script>
 
 <div class="uk-container content-grid">
-  <IndicatorPicker {sensor} className="grid-1-5" allSensors={allSensorsGrouped} />
+  <SensorSearch
+    className="grid-1-5"
+    modern
+    items={$metaDataManager.metaSensors}
+    selectedItem={sensor.value}
+    on:change={(e) => sensor.set(e.detail)}
+  />
   <RegionSearch
     className="grid-5-9"
     modern
