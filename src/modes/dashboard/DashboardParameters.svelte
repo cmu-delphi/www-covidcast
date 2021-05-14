@@ -2,19 +2,21 @@
   import RegionSearch from '../../components/RegionSearch.svelte';
   import SensorDatePicker2 from '../../components/SensorDatePicker2.svelte';
   import SensorSearch from '../../components/SensorSearch.svelte';
+  import { formatAPITime } from '../../data';
   import { nameInfos } from '../../data/regions';
   import { metaDataManager } from '../../stores';
+  import { trackEvent } from '../../stores/ga';
 
   /**
-   * @type {import("../../../stores/params").SensorParam}
+   * @type {import("../../stores/params").SensorParam}
    */
   export let sensor;
   /**
-   * @type {import("../../../stores/params").DateParam}
+   * @type {import("../../stores/params").DateParam}
    */
   export let date;
   /**
-   * @type {import("../../../stores/params").RegionParam}
+   * @type {import("../../stores/params").RegionParam}
    */
   export let region;
 
@@ -27,7 +29,20 @@
     updateDate(date.value);
   }
   $: if (selectedDate !== undefined) {
-    date.set(selectedDate);
+    setDate(selectedDate);
+  }
+
+  function setDate(d) {
+    trackEvent('dashboard', 'set_date', 'global', formatAPITime(d));
+    date.set(d);
+  }
+  function setRegion(d) {
+    trackEvent('dashboard', 'set_region', 'global', !d ? 'us' : d.propertyId);
+    region.set(d);
+  }
+  function setSensor(d) {
+    trackEvent('dashboard', 'set_sensor', 'global', d.key);
+    sensor.set(d);
   }
 </script>
 
@@ -37,14 +52,14 @@
     modern
     items={$metaDataManager.metaSensors}
     selectedItem={sensor.value}
-    on:change={(e) => sensor.set(e.detail)}
+    on:change={(e) => setSensor(e.detail)}
   />
   <RegionSearch
     className="grid-5-9"
     modern
     items={nameInfos}
     selectedItem={region.value}
-    on:change={(e) => region.set(e.detail && e.detail.level === 'nation' ? null : e.detail)}
+    on:change={(e) => setRegion(e.detail && e.detail.level === 'nation' ? null : e.detail)}
   />
   <SensorDatePicker2 className="grid-9-13" bind:value={selectedDate} {sensor} />
 </div>

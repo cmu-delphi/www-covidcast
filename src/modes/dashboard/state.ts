@@ -1,5 +1,6 @@
 import { updateHash } from '../../stores/urlHandler';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
+import { trackEvent } from '../../stores/ga';
 
 export type WidgetType =
   | 'line'
@@ -105,6 +106,10 @@ export const widgets: readonly Widget[] = [
   ]),
 ];
 
+export function deriveType(id: string): WidgetType {
+  return id.split('_')[0] as WidgetType;
+}
+
 export function findWidget(type: WidgetType): Widget {
   return widgets.find((d) => d.id === type) ?? widgets[0];
 }
@@ -114,7 +119,7 @@ export function deriveComponents(state: IState): WidgetComponent[] {
     (id): WidgetComponent => {
       return {
         id,
-        type: id.split('_')[0] as WidgetType,
+        type: deriveType(id),
         config: state.configs[id] || {},
         state: state.states[id],
       };
@@ -122,6 +127,8 @@ export function deriveComponents(state: IState): WidgetComponent[] {
   );
 }
 export function changeWidgetState(state: IState, id: string, newState: WidgetComponent['state']): IState {
+  const info = findWidget(deriveType(id));
+  trackEvent('dashboard', 'change_widget_state', info.name, JSON.stringify(newState));
   return {
     ...state,
     states: {
@@ -131,6 +138,17 @@ export function changeWidgetState(state: IState, id: string, newState: WidgetCom
   };
 }
 export function changeWidgetConfig(state: IState, id: string, newConfig: WidgetComponent['config']): IState {
+  const info = findWidget(deriveType(id));
+  trackEvent('dashboard', 'change_widget_config', info.name, JSON.stringify(newConfig));
+
+  const oldConfig = state.configs[id] || {};
+  info.configOptions.forEach((option) => {
+    const value = newConfig[option];
+    if (value != oldConfig[option]) {
+      trackEvent('dashboard', `use_${option}`, info.name, String(value));
+    }
+  });
+
   return {
     ...state,
     configs: {
@@ -145,6 +163,10 @@ export function removeWidget(state: IState, id: string): IState {
   delete states[id];
   const configs = { ...state.configs };
   delete configs[id];
+
+  const info = findWidget(deriveType(id));
+  trackEvent('dashboard', 'remove_widget', info.name, id);
+
   return {
     ...state,
     order: state.order.filter((d) => d !== id),
@@ -167,6 +189,17 @@ export function addWidget(
   if (newConfig) {
     configs[id] = newConfig;
   }
+  const info = findWidget(deriveType(id));
+  trackEvent('dashboard', 'add_widget', info.name, JSON.stringify(newConfig));
+  if (newConfig) {
+    info.configOptions.forEach((option) => {
+      const value = newConfig[option];
+      if (value) {
+        trackEvent('dashboard', `use_${option}`, info.name, String(value));
+      }
+    });
+  }
+
   return {
     ...state,
     order: [...state.order, id],
@@ -176,6 +209,7 @@ export function addWidget(
 }
 
 export function changeOrder(state: IState, order: string[]): IState {
+  trackEvent('dashboard', 'change_order', order.map((d) => deriveType(d)).join(','));
   return {
     ...state,
     order,
@@ -183,6 +217,7 @@ export function changeOrder(state: IState, order: string[]): IState {
 }
 
 export function changeTitle(state: IState, title: string): IState {
+  trackEvent('dashboard', 'change_title', title);
   return {
     ...state,
     title,
