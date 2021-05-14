@@ -1,11 +1,43 @@
 import { updateHash } from '../../stores/urlHandler';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 
+export type WidgetType =
+  | 'line'
+  | 'map'
+  | 'hex'
+  | 'regiontable'
+  | 'datetable'
+  | 'sensortable'
+  | 'kpi'
+  | 'trend'
+  | 'regionpcp'
+  | 'datepcp';
+
+export type WidgetFocus = 'time' | 'region' | 'indicator';
+export type WidgetCategory = 'chart' | 'table' | 'simple' | 'advanced';
+export type WidgetConfigOption = 'sensor' | 'region' | 'timeFrame' | 'date' | 'level' | 'sensors';
+
+export interface Widget {
+  id: WidgetType;
+  name: string;
+  focus: readonly WidgetFocus[];
+  type: WidgetCategory;
+
+  configOptions: readonly WidgetConfigOption[];
+}
+
+export interface WidgetComponent {
+  id: string;
+  type: WidgetType;
+  config: Record<string, unknown>;
+  state: Record<string, unknown>;
+}
+
 export interface IState {
   title?: string;
   order: string[];
-  states: Record<string, Record<string, unknown>>;
-  configs: Record<string, Record<string, unknown>>;
+  states: Record<string, WidgetComponent['state']>;
+  configs: Record<string, WidgetComponent['config']>;
 }
 
 const BASE_STATE: IState = {
@@ -40,4 +72,119 @@ export function resolveInitialState(): IState {
 
 export function updateState(state: IState): void {
   updateHash(compressToEncodedURIComponent(JSON.stringify(state)));
+}
+
+function asWidget(
+  id: WidgetType,
+  name: string,
+  focus: readonly WidgetFocus[],
+  type: WidgetCategory,
+  configOptions: readonly WidgetConfigOption[],
+): Widget {
+  return { id, name, focus, type, configOptions };
+}
+
+export const widgets: readonly Widget[] = [
+  asWidget('line', 'Time Series', ['time'], 'chart', ['sensor', 'region', 'timeFrame']),
+  asWidget('map', 'Choropleth Map', ['region'], 'chart', ['sensor', 'region', 'date']),
+  asWidget('hex', 'Hexagon Map', ['region'], 'chart', ['sensor', 'date']),
+  asWidget('regiontable', 'Region Table', ['region'], 'table', ['sensor', 'level', 'date']),
+  asWidget('datetable', 'Date Table', ['time'], 'table', ['sensor', 'region', 'timeFrame']),
+  asWidget('sensortable', 'Indicator Table', ['indicator'], 'table', ['region', 'date']),
+  asWidget('kpi', 'Value', [], 'simple', ['sensor', 'region', 'date']),
+  asWidget('trend', 'Trend', [], 'simple', ['sensor', 'region', 'date']),
+  asWidget('regionpcp', 'Region Parallel Coordinate Plot', ['region', 'indicator'], 'advanced', [
+    'sensors',
+    'level',
+    'date',
+  ]),
+  asWidget('datepcp', 'Date Parallel Coordinate Plot', ['time', 'indicator'], 'advanced', [
+    'sensors',
+    'region',
+    'timeFrame',
+  ]),
+];
+
+export function findWidget(type: WidgetType): Widget {
+  return widgets.find((d) => d.id === type) ?? widgets[0];
+}
+
+export function deriveComponents(state: IState): WidgetComponent[] {
+  return state.order.map(
+    (id): WidgetComponent => {
+      return {
+        id,
+        type: id.split('_')[0] as WidgetType,
+        config: state.configs[id] || {},
+        state: state.states[id],
+      };
+    },
+  );
+}
+export function changeWidgetState(state: IState, id: string, newState: WidgetComponent['state']): IState {
+  return {
+    ...state,
+    states: {
+      ...state.states,
+      [id]: newState,
+    },
+  };
+}
+export function changeWidgetConfig(state: IState, id: string, newConfig: WidgetComponent['config']): IState {
+  return {
+    ...state,
+    configs: {
+      ...state.configs,
+      [id]: newConfig,
+    },
+  };
+}
+
+export function removeWidget(state: IState, id: string): IState {
+  const states = { ...state.states };
+  delete states[id];
+  const configs = { ...state.configs };
+  delete configs[id];
+  return {
+    ...state,
+    order: state.order.filter((d) => d !== id),
+    states,
+    configs,
+  };
+}
+
+export function addWidget(
+  state: IState,
+  id: string,
+  newConfig?: WidgetComponent['config'],
+  newState?: WidgetComponent['state'],
+): IState {
+  const states = { ...state.states };
+  if (newState) {
+    states[id] = newState;
+  }
+  const configs = { ...state.configs };
+  if (newConfig) {
+    configs[id] = newConfig;
+  }
+  return {
+    ...state,
+    order: [...state.order, id],
+    states,
+    configs,
+  };
+}
+
+export function changeOrder(state: IState, order: string[]): IState {
+  return {
+    ...state,
+    order,
+  };
+}
+
+export function changeTitle(state: IState, title: string): IState {
+  return {
+    ...state,
+    title,
+  };
 }

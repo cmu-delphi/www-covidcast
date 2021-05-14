@@ -1,25 +1,9 @@
 <script>
   /* eslint-disable no-undef */
   import Search from '../../../components/Search.svelte';
+  import { widgets } from '../state';
   export let value;
   export let readonly = false;
-
-  function asWidget(id, name, focus, type) {
-    return { id, name, focus, type };
-  }
-
-  const widgets = [
-    asWidget('line', 'Time Series', ['time'], 'chart'),
-    asWidget('map', 'Choropleth Map', ['region'], 'chart'),
-    asWidget('hex', 'Hexagon Map', ['region'], 'chart'),
-    asWidget('regiontable', 'Region Table', ['region'], 'table'),
-    asWidget('datetable', 'Date Table', ['time'], 'table'),
-    asWidget('sensortable', 'Indicator Table', ['indicator'], 'table'),
-    asWidget('kpi', 'Value', [], 'simple'),
-    asWidget('trend', 'Trend', [], 'simple'),
-    asWidget('regionpcp', 'Region Parallel Coordinate Plot', ['region', 'indicator'], 'advanced'),
-    asWidget('datepcp', 'Date Parallel Coordinate Plot', ['time', 'indicator'], 'advanced'),
-  ];
 </script>
 
 <div>

@@ -3,7 +3,17 @@
   import { currentRegionInfo, currentDateObject, currentSensor, isMobileDevice, metaDataManager } from '../../stores';
   import { SensorParam, DateParam, RegionParam } from '../../stores/params';
   import { WidgetHighlight } from './highlight';
-  import { resolveInitialState, updateState } from './state';
+  import {
+    addWidget,
+    changeOrder,
+    changeTitle,
+    changeWidgetConfig,
+    changeWidgetState,
+    deriveComponents,
+    removeWidget,
+    resolveInitialState,
+    updateState,
+  } from './state';
   import isEqual from 'lodash-es/isEqual';
   import WidgetAdder from './WidgetAdder.svelte';
   import WidgetEditor from './WidgetEditor.svelte';
@@ -47,17 +57,6 @@
     console.log(state);
   }
 
-  function deriveComponents(state) {
-    return state.order.map((id) => {
-      return {
-        id,
-        type: id.split('_')[0],
-        config: state.configs[id] || {},
-        state: state.states[id],
-      };
-    });
-  }
-
   let components = deriveComponents(initialState);
 
   $: nextId =
@@ -67,26 +66,11 @@
     }, 0) + 1;
 
   function trackState(event) {
-    state = {
-      ...state,
-      states: {
-        ...state.states,
-        [event.detail.id]: event.detail.state,
-      },
-    };
+    state = changeWidgetState(state, event.detail.id, event.detail.state);
   }
 
   function closeWidget(id) {
-    const states = { ...state.states };
-    delete states[id];
-    const configs = { ...state.configs };
-    delete configs[id];
-    state = {
-      ...state,
-      order: state.order.filter((d) => d !== id),
-      states,
-      configs,
-    };
+    state = removeWidget(state, id);
     components = deriveComponents(state);
   }
 
@@ -96,7 +80,7 @@
   let edit = null;
   let add = false;
 
-  function addWidget() {
+  function triggerAddWidget() {
     add = true;
   }
 
@@ -116,13 +100,7 @@
     const id = event.detail.id;
     const config = event.detail.config;
     edit = null;
-    state = {
-      ...state,
-      configs: {
-        ...state.configs,
-        [id]: config,
-      },
-    };
+    state = changeWidgetConfig(state, id, config);
     components = deriveComponents(state);
   }
 
@@ -138,22 +116,8 @@
 
   function addedWidget(event) {
     const data = event.detail;
-    const states = { ...state.states };
     add = false;
-
-    if (data.state) {
-      states[data.id] = data.state;
-    }
-    const configs = { ...state.configs };
-    if (data.config) {
-      configs[data.id] = data.config;
-    }
-    state = {
-      ...state,
-      order: [...state.order, data.id],
-      states,
-      configs,
-    };
+    state = addWidget(state, data.id, data.config, data.state);
     components = deriveComponents(state);
   }
 
@@ -163,10 +127,7 @@
     panelRef.addEventListener('moved', () => {
       const widgets = Array.from(panelRef.querySelectorAll('.widget-card'), (d) => d.dataset.id);
       if (!isEqual(widgets, state.order)) {
-        state = {
-          ...state,
-          order: widgets,
-        };
+        state = changeOrder(state, widgets);
       }
     });
   });
@@ -178,10 +139,7 @@
     if (title === state.title || (!state.title && title === 'Dashboard')) {
       return;
     }
-    state = {
-      ...state,
-      title,
-    };
+    state = changeTitle(state, title);
   }
 </script>
 
@@ -192,7 +150,7 @@
         class="widget-add-button uk-button uk-button-primary"
         type="button"
         title="Add New Widget"
-        on:click={addWidget}>Add Widget</button
+        on:click={triggerAddWidget}>Add Widget</button
       >
       <h2>
         COVIDcast
