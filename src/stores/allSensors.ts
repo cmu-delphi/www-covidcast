@@ -1,7 +1,11 @@
 import { sensorList, Sensor, groupedSensorList } from './constants';
 import { questions } from './questions';
 
-const { map: allSensorsMap, list: allSensorsList, grouped: allSensorsGrouped } = (() => {
+const {
+  map: allSensorsMap,
+  list: allSensorsList,
+  grouped: allSensorsGrouped,
+} = (() => {
   const map = new Map<string, Sensor>();
   for (const s of sensorList) {
     map.set(s.key, s);

@@ -762,7 +762,7 @@ export function generateDistributionLineSpec(state: RegionInfo, options: LineSpe
       as: 'value',
     },
   ];
-  ((spec.padding as unknown) as { bottom: number }).bottom = 50;
+  (spec.padding as unknown as { bottom: number }).bottom = 50;
   spec.layer[0].encoding!.color = {
     field: 'group',
     type: 'nominal',
@@ -867,7 +867,7 @@ export function generateDistributionLineSpec(state: RegionInfo, options: LineSpe
 
 export function generateDistributionLineSpec2(state: RegionInfo, options: LineSpecOptions = {}): TopLevelSpec {
   const spec = generateLineChartSpec(options);
-  ((spec.padding as unknown) as { bottom: number }).bottom = 50;
+  (spec.padding as unknown as { bottom: number }).bottom = 50;
   spec.layer[0].encoding!.color = {
     condition: {
       test: `datum.geo_value == '${state.propertyId.toLowerCase()}'`,

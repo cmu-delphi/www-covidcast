@@ -43,24 +43,21 @@ function parseCSV<T extends RegionInfo>(
   deriveDisplayName = (d: Partial<T>): string => d.name!,
   extras: (d: T) => void = () => undefined,
 ): T[] {
-  const r: T[] = dsvFormat(';').parse(
-    csv,
-    (d): T => {
-      const info = (Object.assign(d, {
-        level,
-        propertyId: d.postal || d.id,
-        population:
-          d.population === 'NaN' || d.population === '' || d.population == null
-            ? null
-            : Number.parseInt(d.population, 10),
-      }) as unknown) as T;
-      if (!d.displayName || d.displayName === 'X') {
-        d.displayName = deriveDisplayName(info);
-      }
-      extras(info);
-      return info;
-    },
-  );
+  const r: T[] = dsvFormat(';').parse(csv, (d): T => {
+    const info = Object.assign(d, {
+      level,
+      propertyId: d.postal || d.id,
+      population:
+        d.population === 'NaN' || d.population === '' || d.population == null
+          ? null
+          : Number.parseInt(d.population, 10),
+    }) as unknown as T;
+    if (!d.displayName || d.displayName === 'X') {
+      d.displayName = deriveDisplayName(info);
+    }
+    extras(info);
+    return info;
+  });
   return r;
 }
 
