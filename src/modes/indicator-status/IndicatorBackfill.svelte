@@ -3,7 +3,18 @@
   import Vega from '../../components/vega/Vega.svelte';
   import { loadBackFillProfile } from '../../data/indicatorInfo';
   import { TimeFrame, WINDOW_SIZE } from '../../stores/params';
-  import { currentRegionInfo, selectByInfo } from '../../stores';
+  import {
+    currentRegionInfo,
+    selectByInfo,
+    valueField,
+    dateField,
+    dateOptions,
+    valueOptions,
+    anchorLag,
+    valueLabel,
+    dateLabel,
+    isRelative,
+  } from './store';
   import DownloadMenu from '../../components/DownloadMenu.svelte';
   import { backFillWeekdayDistribution, generateHeatMapSpec, backFillWeekdayFrequency } from './backfillSpec';
   import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
@@ -15,61 +26,34 @@
    * @type {import('../../data/indicatorInfo').IndicatorStatus}
    */
   export let indicator;
-
-  $: region = $currentRegionInfo || nationInfo;
-
   $: date = indicator ? indicator.latest_time_value : new Date();
   $: window = new TimeFrame(timeMonth.offset(date, -WINDOW_SIZE), date);
-
-  const dateOptions = [
-    { label: 'Reported Date', value: 'date_value' },
-    { label: 'Issue Date', value: 'issue_date' },
-  ];
-  let dateField = 'date_value';
-  $: dateLabel = dateOptions.find((d) => d.value == dateField).label;
-
-  const valueOptions = [
-    { label: 'Value Completeness', value: 'value_completeness' },
-    { label: 'Relative Value Change', value: 'value_rel_change' },
-    { label: 'Sample Size Completeness', value: 'sample_size_completeness' },
-    { label: 'Relative Sample Size Change', value: 'sample_size_rel_change' },
-  ];
-  let valueField = 'value_completeness';
-  $: valueLabel = valueOptions.find((d) => d.value == valueField).label;
-
-  let anchorLagStr = '60';
-  $: anchorLag = Number.parseInt(anchorLagStr, 10);
-
   $: title = `${indicator.name} Backfill Profile`;
+
+  $: options = {
+    valueField: $valueField,
+    valueLabel: $valueLabel,
+    dateField: $dateField,
+    dateLabel: $dateLabel,
+    anchorLag: $anchorLag,
+  };
 
   let vegaRef = undefined;
   $: spec = generateHeatMapSpec({
-    title: `${indicator.name}: ${valueLabel} Profile`,
-    valueField,
-    valueLabel,
-    dateField,
-    dateLabel,
+    title: `${indicator.name}: ${$valueLabel} Profile`,
+    ...options,
   });
-  $: data = loadBackFillProfile(indicator, region, window, anchorLag);
-
-  $: isRelative = valueField.endsWith('_rel_change');
+  $: data = loadBackFillProfile(indicator, $currentRegionInfo || nationInfo, window, $anchorLag);
 
   $: weekdaySpec = backFillWeekdayDistribution({
-    title: `${indicator.name}: ${valueLabel}`,
-    valueField,
-    valueLabel,
-    dateField,
-    dateLabel,
-    anchorLag,
+    title: `${indicator.name}: ${$valueLabel}`,
+    ...options,
   });
   let vegaRefWeekday = undefined;
 
   $: weekdayBoxplotSpec = backFillWeekdayFrequency({
-    title: `${indicator.name}: ${valueLabel}`,
-    valueField,
-    dateField,
-    dateLabel,
-    anchorLag,
+    title: `${indicator.name}: ${$valueLabel}`,
+    ...options,
     completeness: 0.9,
   });
   let vegaRefBoxplot = undefined;
@@ -78,11 +62,11 @@
 <Search
   modern
   className="grid-3 grid-span-8 uk-margin-top"
-  placeholder="Select a region"
+  placeholder="Search for state or country"
   items={[nationInfo, ...stateInfo, ...countyInfo]}
   title="Region"
   icon="location"
-  selectedItem={region}
+  selectedItem={$currentRegionInfo}
   labelFieldName="displayName"
   maxItemsToShowInList="5"
   on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)}
@@ -90,14 +74,14 @@
 <OptionPicker
   className="grid-3 grid-span-4 uk-margin-top"
   label="Color"
-  bind:value={valueField}
+  bind:value={$valueField}
   options={valueOptions}
   modern
 />
 <OptionPicker
   className="grid-7 grid-span-2 uk-margin-top"
   label="Date"
-  bind:value={dateField}
+  bind:value={$dateField}
   options={dateOptions}
   modern
 />
@@ -105,7 +89,7 @@
   className="grid-9 grid-span-2 uk-margin-top"
   type="number"
   label="Anchor Lag (days)"
-  bind:value={anchorLag}
+  bind:value={$anchorLag}
   min={1}
   max={60}
   step={10}
@@ -125,7 +109,7 @@
     />
   </div>
 </div>
-<div class="grid-1 {isRelative ? 'grid-span-12' : 'grid-span-6'} uk-margin-top">
+<div class="grid-1 {$isRelative ? 'grid-span-12' : 'grid-span-6'} uk-margin-top">
   <div class="chart-300">
     <Vega bind:this={vegaRefWeekday} spec={weekdaySpec} {data} />
     <DownloadMenu
@@ -137,7 +121,7 @@
     />
   </div>
 </div>
-{#if !isRelative}
+{#if !$isRelative}
   <div class="grid-7 grid-span-6 uk-margin-top">
     <div class="chart-300">
       <Vega bind:this={vegaRefBoxplot} spec={weekdayBoxplotSpec} {data} />
