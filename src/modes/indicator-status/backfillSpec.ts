@@ -1,6 +1,5 @@
 import type { TopLevelSpec } from 'vega-lite';
 import type { ProfileEntry } from '../../data/indicatorInfo';
-import { formatFraction } from '../../formats';
 import { BASE_SPEC } from '../../specs/commonSpec';
 
 export interface BackfillOptions {
