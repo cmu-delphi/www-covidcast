@@ -139,7 +139,7 @@ export function fetchAnnotations(): Promise<Annotation[]> {
           }
           return ANNOTATION_DRAFTS || d.published === 'TRUE';
         })
-        .map((row) => new Annotation((row as unknown) as RawAnnotation));
+        .map((row) => new Annotation(row as unknown as RawAnnotation));
     })
     .catch((error) => {
       console.error('cannot fetch annotations', error);

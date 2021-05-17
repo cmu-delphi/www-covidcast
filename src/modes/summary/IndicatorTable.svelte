@@ -161,9 +161,7 @@
     </tr>
   </thead>
   {#each loadedData as group (group.label)}
-    {#if !selectedDatasource || selectedDatasource === 'all' || group.sensors.some((d) =>
-        matchDataSource(d.sensor, selectedDatasource),
-      )}
+    {#if !selectedDatasource || selectedDatasource === 'all' || group.sensors.some( (d) => matchDataSource(d.sensor, selectedDatasource), )}
       <tbody>
         <tr class="row-group">
           <th class="mobile-h3" colspan="5">{group.label}</th>

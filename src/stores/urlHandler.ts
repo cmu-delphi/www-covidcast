@@ -15,9 +15,7 @@ export function updateURIParameters(state: TrackedState): void {
       params.delete(key);
     }
   });
-  const path = `${((window as unknown) as { DELPHI_COVIDCAST_PAGE: string }).DELPHI_COVIDCAST_PAGE || '/'}${
-    state.path
-  }`;
+  const path = `${(window as unknown as { DELPHI_COVIDCAST_PAGE: string }).DELPHI_COVIDCAST_PAGE || '/'}${state.path}`;
   const query = params.toString();
   const url = `${path}${query.length > 0 ? '?' : ''}${query}${window.location.hash}`;
 

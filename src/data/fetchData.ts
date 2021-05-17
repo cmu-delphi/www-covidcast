@@ -241,7 +241,7 @@ function createCopy<T extends EpiDataRow = EpiDataRow>(row: T, date: Date, dataS
   });
   if (
     (dataSensor != null && dataSensor.isCasesOrDeath) ||
-    ((row as unknown) as EpiDataCasesOrDeathValues)[EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined
+    (row as unknown as EpiDataCasesOrDeathValues)[EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined
   ) {
     EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
@@ -374,7 +374,7 @@ export function averageByDate(
       };
       if (
         (dataSensor != null && dataSensor.isCasesOrDeath) ||
-        ((rows[0] as unknown) as EpiDataCasesOrDeathValues)[EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined
+        (rows[0] as unknown as EpiDataCasesOrDeathValues)[EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined
       ) {
         EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
