@@ -21,6 +21,7 @@
   import Search from '../../components/Search.svelte';
   import OptionPicker from '../../components/OptionPicker.svelte';
   import { timeMonth } from 'd3-time';
+import AboutSection from '../../components/AboutSection.svelte';
 
   /**
    * @type {import('../../data/indicatorInfo').IndicatorStatus}
@@ -36,6 +37,7 @@
     dateField: $dateField,
     dateLabel: $dateLabel,
     anchorLag: $anchorLag,
+    isRelative: $isRelative,
   };
 
   let vegaRef = undefined;
@@ -47,12 +49,14 @@
 
   $: weekdaySpec = backFillWeekdayDistribution({
     title: `${indicator.name}: ${$valueLabel}`,
+    subTitle: `per Lag (Reporting Date - Reference Date) per weekday`,
     ...options,
   });
   let vegaRefWeekday = undefined;
 
   $: weekdayBoxplotSpec = backFillWeekdayFrequency({
     title: `${indicator.name}: ${$valueLabel}`,
+    subTitle: `Lag Distribution to reach 90%`,
     ...options,
     completeness: 0.9,
   });
@@ -71,22 +75,9 @@
   maxItemsToShowInList="5"
   on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)}
 />
+
 <OptionPicker
-  className="grid-3 grid-span-4 uk-margin-top"
-  label="Color"
-  bind:value={$valueField}
-  options={valueOptions}
-  modern
-/>
-<OptionPicker
-  className="grid-7 grid-span-2 uk-margin-top"
-  label="Date"
-  bind:value={$dateField}
-  options={dateOptions}
-  modern
-/>
-<OptionPicker
-  className="grid-9 grid-span-2 uk-margin-top"
+  className="grid-3 grid-span-2 uk-margin-top"
   type="number"
   label="Anchor Lag (days)"
   bind:value={$anchorLag}
@@ -95,9 +86,26 @@
   step={10}
   modern
 />
+<OptionPicker
+  className="grid-5 grid-span-4 uk-margin-top"
+  label="Tracked Value"
+  bind:value={$valueField}
+  options={$valueOptions}
+  modern
+/>
+<OptionPicker
+  className="grid-9 grid-span-2 uk-margin-top"
+  label="Show By"
+  bind:value={$dateField}
+  options={dateOptions}
+  modern
+/>
 
 <div class="grid-1 grid-span-12">
   <FancyHeader invert sub="Backfill Profile">{indicator.name}</FancyHeader>
+  <AboutSection>
+
+  </AboutSection>
   <div class="chart-300">
     <Vega bind:this={vegaRef} {spec} {data} />
     <DownloadMenu
@@ -135,3 +143,4 @@
     </div>
   </div>
 {/if}
+;

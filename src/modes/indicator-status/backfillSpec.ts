@@ -11,11 +11,13 @@ export interface BackfillOptions {
   valueLabel: string;
   dateField: keyof Pick<ProfileEntry, 'issue_date' | 'date_value'>;
   dateLabel: string;
+  isRelative: boolean;
   title: string;
 }
 
 export function generateHeatMapSpec({
   valueField,
+  isRelative,
   valueLabel,
   dateField,
   dateLabel,
@@ -74,29 +76,6 @@ export function generateHeatMapSpec({
           },
         },
       },
-      {
-        transform: [
-          {
-            filter: `datum.is_anchor`,
-          },
-        ],
-        mark: {
-          type: 'line',
-        },
-        encoding: {
-          color: {
-            field: 'is_anchor',
-            type: 'ordinal',
-            scale: {
-              range: ['blue'],
-            },
-            legend: {
-              title: null,
-              labelExpr: `'anchor'`,
-            },
-          },
-        },
-      },
     ],
     encoding: {
       x: {
@@ -124,11 +103,36 @@ export function generateHeatMapSpec({
           zero: true,
         },
         axis: {
-          title: 'Lag',
+          title: 'Lag (Report Date - Reference Date)',
         },
       },
     },
   };
+  if (!isRelative) {
+    spec.layer.push({
+      transform: [
+        {
+          filter: `datum.is_anchor`,
+        },
+      ],
+      mark: {
+        type: 'line',
+      },
+      encoding: {
+        color: {
+          field: 'is_anchor',
+          type: 'ordinal',
+          scale: {
+            range: ['blue'],
+          },
+          legend: {
+            title: null,
+            labelExpr: `'anchor'`,
+          },
+        },
+      },
+    });
+  }
   return spec;
 }
 
@@ -185,13 +189,14 @@ export function backFillWeekdayDistribution({
   title,
   valueField,
   anchorLag,
-}: BackfillOptions & { anchorLag: number }): TopLevelSpec {
+  subTitle,
+}: BackfillOptions & { anchorLag: number; subTitle: string }): TopLevelSpec {
   const isRelative = valueField.endsWith('rel_change');
   const spec: TopLevelSpec = {
     ...BASE_SPEC,
     title: {
       text: title,
-      subtitle: `per Lag per weekday`,
+      subtitle: subTitle,
     },
     padding: {
       left: 65,
@@ -236,7 +241,7 @@ export function backFillWeekdayDistribution({
               zero: true,
             },
             axis: {
-              title: 'Lag',
+              title: 'Lag (Reporting Date - Reference Date)',
             },
           },
           y: {
@@ -330,12 +335,13 @@ export function backFillWeekdayFrequency({
   valueField,
   anchorLag,
   completeness,
-}: BackfillOptions & { anchorLag: number; completeness: number }): TopLevelSpec {
+  subTitle,
+}: BackfillOptions & { anchorLag: number; completeness: number; subTitle: string }): TopLevelSpec {
   const spec: TopLevelSpec = {
     ...BASE_SPEC,
     title: {
       text: title,
-      subtitle: `Lag to reach ${formatFraction(completeness)} completeness`,
+      subtitle: subTitle,
     },
     padding: {
       left: 40,
