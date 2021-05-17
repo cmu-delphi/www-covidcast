@@ -21,7 +21,7 @@ export const valueOptions = derived([anchorLag], ([lag]) => [
   { label: `As fraction of value at lag ${lag}`, value: 'value_completeness' },
   { label: 'Day-to-day relative change', value: 'value_rel_change' },
   { label: `As fraction of sample size at lag ${lag}`, value: 'sample_size_completeness' },
-  { label: 'Relative Sample Size Change', value: 'sample_size_rel_change' },
+  { label: 'Day-to-day relative sample size change', value: 'sample_size_rel_change' },
 ]);
 export const valueLabel = derived(
   [valueField, valueOptions],

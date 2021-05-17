@@ -21,7 +21,6 @@
   import Search from '../../components/Search.svelte';
   import OptionPicker from '../../components/OptionPicker.svelte';
   import { timeMonth } from 'd3-time';
-import AboutSection from '../../components/AboutSection.svelte';
 
   /**
    * @type {import('../../data/indicatorInfo').IndicatorStatus}
@@ -103,9 +102,6 @@ import AboutSection from '../../components/AboutSection.svelte';
 
 <div class="grid-1 grid-span-12">
   <FancyHeader invert sub="Backfill Profile">{indicator.name}</FancyHeader>
-  <AboutSection>
-
-  </AboutSection>
   <div class="chart-300">
     <Vega bind:this={vegaRef} {spec} {data} />
     <DownloadMenu
