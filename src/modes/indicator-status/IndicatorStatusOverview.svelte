@@ -106,7 +106,7 @@
         icon="search"
         selectedItem={selected}
         labelFieldName="name"
-        maxItemsToShowInList="15"
+        maxItemsToShowInList={15}
         clear={false}
         on:change={(e) => {
           const newIndicator = e.detail ? loadedData.find((d) => d.name === e.detail.name) : null;
