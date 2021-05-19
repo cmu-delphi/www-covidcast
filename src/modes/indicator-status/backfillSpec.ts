@@ -1,4 +1,7 @@
 import type { TopLevelSpec } from 'vega-lite';
+import type { Field } from 'vega-lite/build/src/channeldef';
+import type { LayerSpec } from 'vega-lite/build/src/spec';
+import type { Scale } from 'vega-lite/build/src/scale';
 import type { ProfileEntry } from '../../data/indicatorInfo';
 import { BASE_SPEC } from '../../specs/commonSpec';
 
@@ -14,15 +17,11 @@ export interface BackfillOptions {
   title: string;
 }
 
-export function generateHeatMapSpec({
-  valueField,
-  isRelative,
-  valueLabel,
-  dateField,
-  dateLabel,
-  title,
-}: BackfillOptions): TopLevelSpec {
-  const spec: TopLevelSpec = {
+function commonHeatMapSpec(
+  { valueField, valueLabel, dateField, dateLabel, title }: BackfillOptions,
+  scale: Scale,
+): TopLevelSpec & LayerSpec<Field> {
+  return {
     ...BASE_SPEC,
     title: {
       text: title,
@@ -36,11 +35,19 @@ export function generateHeatMapSpec({
     },
     layer: [
       {
+        params: [
+          {
+            name: 'highlight',
+            select: {
+              type: 'point',
+              on: 'mousemove',
+              fields: ['lag', dateField],
+            },
+          },
+        ],
         mark: {
           type: 'rect',
-          stroke: null,
-          strokeWidth: 0,
-          strokeOpacity: 0,
+          strokeWidth: 2,
           width: {
             expr: `width / customCountDays(domain('x')[0], domain('x')[1])`,
           },
@@ -56,22 +63,20 @@ export function generateHeatMapSpec({
           color: {
             field: valueField,
             type: 'quantitative',
-            scale: valueField.endsWith('rel_change')
-              ? {
-                  domainMid: 0,
-                  nice: false,
-                  // scheme: valueField.endsWith('rel_change') ?  'viridis',
-                }
-              : {
-                  domain: [0, 1],
-                  clamp: true,
-                  nice: false,
-                },
+            scale,
             legend: {
               title: valueLabel,
               titleOrient: 'left',
               // gradientLength: 00,
             },
+          },
+          stroke: {
+            condition: {
+              param: 'highlight',
+              empty: false,
+              value: 'orange',
+            },
+            value: null,
           },
         },
       },
@@ -107,31 +112,49 @@ export function generateHeatMapSpec({
       },
     },
   };
-  if (!isRelative) {
-    spec.layer.push({
-      transform: [
-        {
-          filter: `datum.is_anchor`,
-        },
-      ],
-      mark: {
-        type: 'line',
+}
+
+export function generateValueHeatMapSpec(options: BackfillOptions): TopLevelSpec {
+  const spec = commonHeatMapSpec(options, {
+    domain: [0, 1],
+    clamp: true,
+    nice: false,
+  });
+  spec.layer.push({
+    transform: [
+      {
+        filter: `datum.is_anchor`,
       },
-      encoding: {
-        color: {
-          field: 'is_anchor',
-          type: 'ordinal',
-          scale: {
-            range: ['blue'],
-          },
-          legend: {
-            title: null,
-            labelExpr: `'anchor'`,
-          },
+    ],
+    mark: {
+      type: 'line',
+    },
+    encoding: {
+      color: {
+        field: 'is_anchor',
+        type: 'ordinal',
+        scale: {
+          range: ['blue'],
+        },
+        legend: {
+          title: null,
+          labelExpr: `'anchor'`,
         },
       },
-    });
-  }
+    },
+  });
+  return spec;
+}
+
+export function generateChangeHeatMapSpec(options: BackfillOptions): TopLevelSpec {
+  const spec = commonHeatMapSpec(options, {
+    domainMid: 0,
+    domainMax: 3,
+    domainMin: -0.3,
+    nice: false,
+    clamp: true,
+    // scheme: valueField.endsWith('rel_change') ?  'viridis',
+  });
   return spec;
 }
 

@@ -16,11 +16,17 @@
     isRelative,
   } from './store';
   import DownloadMenu from '../../components/DownloadMenu.svelte';
-  import { backFillWeekdayDistribution, generateHeatMapSpec, backFillWeekdayFrequency } from './backfillSpec';
+  import {
+    backFillWeekdayDistribution,
+    generateChangeHeatMapSpec,
+    generateValueHeatMapSpec,
+    backFillWeekdayFrequency,
+  } from './backfillSpec';
   import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
   import Search from '../../components/Search.svelte';
   import OptionPicker from '../../components/OptionPicker.svelte';
   import { timeMonth } from 'd3-time';
+  import BackfillTooltip from './BackfillTooltip.svelte';
 
   /**
    * @type {import('../../data/indicatorInfo').IndicatorStatus}
@@ -40,10 +46,15 @@
   };
 
   let vegaRef = undefined;
-  $: spec = generateHeatMapSpec({
-    title: `${indicator.name}: ${$valueLabel} Profile`,
-    ...options,
-  });
+  $: spec = $isRelative
+    ? generateChangeHeatMapSpec({
+        title: `${indicator.name}: ${$valueLabel}`,
+        ...options,
+      })
+    : generateValueHeatMapSpec({
+        title: `${indicator.name}: ${$valueLabel}`,
+        ...options,
+      });
   $: data = loadBackFillProfile(indicator, $currentRegionInfo || nationInfo, window, $anchorLag);
 
   $: weekdaySpec = backFillWeekdayDistribution({
@@ -71,7 +82,7 @@
   icon="location"
   selectedItem={$currentRegionInfo}
   labelFieldName="displayName"
-  maxItemsToShowInList="5"
+  maxItemsToShowInList={15}
   on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)}
 />
 
@@ -103,7 +114,7 @@
 <div class="grid-1 grid-span-12">
   <FancyHeader invert sub="Backfill Profile">{indicator.name}</FancyHeader>
   <div class="chart-300">
-    <Vega bind:this={vegaRef} {spec} {data} />
+    <Vega bind:this={vegaRef} {spec} {data} tooltip={BackfillTooltip} tooltipProps={{ options }} />
     <DownloadMenu
       {vegaRef}
       {data}
