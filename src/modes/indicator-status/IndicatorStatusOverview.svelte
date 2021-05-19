@@ -81,13 +81,13 @@
         <li class:uk-active={mode === 'coverage'}>
           <a
             href="#{(loadedData[0] || { id: 'details' }).id}"
-            on:click|preventDefault={() => switchMode('coverage', loadedData[0])}>Coverage Details</a
+            on:click|preventDefault={() => switchMode('coverage', selected || loadedData[0])}>Coverage Details</a
           >
         </li>
         <li class:uk-active={mode === 'backfill'}>
           <a
             href="#{(loadedData[0] || { id: 'details' }).id}_b"
-            on:click|preventDefault={() => switchMode('backfill', loadedData[0])}>Backfill Profile</a
+            on:click|preventDefault={() => switchMode('backfill', selected || loadedData[0])}>Backfill Profile</a
           >
         </li>
       </ul>
