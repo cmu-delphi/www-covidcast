@@ -20,6 +20,7 @@ export interface BackfillOptions {
 function commonHeatMapSpec(
   { valueField, valueLabel, dateField, dateLabel, title }: BackfillOptions,
   scale: Scale,
+  legend = {},
 ): TopLevelSpec & LayerSpec<Field> {
   return {
     ...BASE_SPEC,
@@ -67,6 +68,7 @@ function commonHeatMapSpec(
             legend: {
               title: valueLabel,
               titleOrient: 'left',
+              ...legend,
               // gradientLength: 00,
             },
           },
@@ -147,14 +149,22 @@ export function generateValueHeatMapSpec(options: BackfillOptions): TopLevelSpec
 }
 
 export function generateChangeHeatMapSpec(options: BackfillOptions): TopLevelSpec {
-  const spec = commonHeatMapSpec(options, {
-    domainMid: 0,
-    domainMax: 3,
-    domainMin: -0.3,
-    nice: false,
-    clamp: true,
-    // scheme: valueField.endsWith('rel_change') ?  'viridis',
-  });
+  const spec = commonHeatMapSpec(
+    options,
+    {
+      type: 'symlog',
+      domainMid: 0,
+      domainMax: 3,
+      domainMin: -0.66,
+      nice: false,
+      clamp: true,
+      // scheme: valueField.endsWith('rel_change') ?  'viridis',
+    },
+    {
+      labelExpr: `['*1/3','*1/2','-30%','-20%','-10%',' NC','+10%','+20%','+30%','*2', '*3'][indexof([-0.66, -0.5, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 2, 3], datum.value)]`,
+      values: [-0.66, -0.5, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 2, 3],
+    },
+  );
   return spec;
 }
 
