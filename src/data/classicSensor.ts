@@ -95,7 +95,7 @@ export function extendSensorEntry(
   const key = `${sensorEntry.id}-${sensorEntry.signal}`;
   const isCount = isCountSignal(key);
 
-  const mapTitle = (sensorEntry.mapTitleText as unknown) as {
+  const mapTitle = sensorEntry.mapTitleText as unknown as {
     incidenceCumulative: string;
     ratioCumulative: string;
     incidence: string;
@@ -104,14 +104,14 @@ export function extendSensorEntry(
 
   const full: Sensor & RegularOldSensor = Object.assign(ensureSensorStructure(sensorEntry), {
     key,
-    tooltipText: sensorEntry.tooltipText || ((mapTitle as unknown) as string),
+    tooltipText: sensorEntry.tooltipText || (mapTitle as unknown as string),
     isCount,
     getType: (options: CasesOrDeathOptions) => getType(sensorEntry, options),
     isCasesOrDeath: false as const,
     plotTitleText: sensorEntry.plotTitleText || sensorEntry.name,
     mapTitleText: sensorEntry.mapTitleText as string,
   });
-  const casesOrDeath = (sensorEntry as unknown) as Sensor & CasesOrDeathOldSensor;
+  const casesOrDeath = sensorEntry as unknown as Sensor & CasesOrDeathOldSensor;
   const isCasesOrDeath = casesOrDeath.casesOrDeathSignals != null;
 
   if (!isCasesOrDeath) {

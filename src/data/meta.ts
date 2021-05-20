@@ -94,41 +94,40 @@ export interface OldSensorLike extends SensorLike {
   casesOrDeathSignals?: Record<keyof EpiDataCasesOrDeathValues, string>;
 }
 
-function deriveMetaSensors(
-  metadata: EpiDataMetaInfo[],
-): { list: Sensor[]; map: Map<string, [EpiDataMetaParsedInfo, Sensor]> } {
+function deriveMetaSensors(metadata: EpiDataMetaInfo[]): {
+  list: Sensor[];
+  map: Map<string, [EpiDataMetaParsedInfo, Sensor]>;
+} {
   const byKey = new Map<string, [EpiDataMetaParsedInfo, Sensor]>();
-  const sensors = metadata.map(
-    (m): Sensor => {
-      const parsed = parse(m);
-      const s: Sensor = {
-        key: toKey(m.source, m.signal),
-        id: m.source,
-        signal: m.signal,
-        name: m.name,
-        description: 'No description available',
-        signalTooltip: 'No tooltip available',
-        valueScaleFactor: m.format === 'fraction' ? 100 : 1,
-        format: m.format ?? 'raw',
-        highValuesAre: m.high_values_are ?? 'neutral',
-        hasStdErr: m.has_stderr,
-        is7DayAverage: m.is_smoothed,
-        dataSourceName: getDataSource({ id: m.source, signal: m.signal }),
-        levels: Object.keys(m.geo_types) as RegionLevel[],
-        type: m.category ?? 'other',
-        xAxis: 'Date',
-        yAxis: yAxis[m.format],
-        unit: units[m.format],
-        colorScale: colorScales[m.high_values_are],
-        vegaColorScale: vegaColorScales[m.high_values_are],
-        links: [],
-        credits: 'We are happy for you to use this data in products and publications.',
-        formatValue: formatter[m.format],
-      };
-      byKey.set(s.key, [parsed, s]);
-      return s;
-    },
-  );
+  const sensors = metadata.map((m): Sensor => {
+    const parsed = parse(m);
+    const s: Sensor = {
+      key: toKey(m.source, m.signal),
+      id: m.source,
+      signal: m.signal,
+      name: m.name,
+      description: 'No description available',
+      signalTooltip: 'No tooltip available',
+      valueScaleFactor: m.format === 'fraction' ? 100 : 1,
+      format: m.format ?? 'raw',
+      highValuesAre: m.high_values_are ?? 'neutral',
+      hasStdErr: m.has_stderr,
+      is7DayAverage: m.is_smoothed,
+      dataSourceName: getDataSource({ id: m.source, signal: m.signal }),
+      levels: Object.keys(m.geo_types) as RegionLevel[],
+      type: m.category ?? 'other',
+      xAxis: 'Date',
+      yAxis: yAxis[m.format],
+      unit: units[m.format],
+      colorScale: colorScales[m.high_values_are],
+      vegaColorScale: vegaColorScales[m.high_values_are],
+      links: [],
+      credits: 'We are happy for you to use this data in products and publications.',
+      formatValue: formatter[m.format],
+    };
+    byKey.set(s.key, [parsed, s]);
+    return s;
+  });
 
   byKey.forEach(([meta, sensor]) => {
     if (!meta.is_smoothed) {

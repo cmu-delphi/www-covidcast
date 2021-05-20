@@ -10,6 +10,6 @@
   COVIDCAST_ANNOTATION_DRAFTS = "true"
 
 [context.staging.environment]
-  COVIDCAST_ENDPOINT_URL = "https://api-staging.delphi.cmu.edu/epidata"
-  COVIDCAST_SIGNAL_DOC = "https://docs.google.com/document/d/1llv6xh8jMlmVv7WpyDSv4VgUpFAZQ6QjFUeRxxOinmk,https://docs.google.com/document/d/17GQFgJDHF_ckkn-BE72QaHtyL2Dh09S8-4xk0r6G47w"
+  COVIDCAST_ENDPOINT_URL = "https://staging.delphi.cmu.edu/epidata"
+  # COVIDCAST_SIGNAL_DOC = "https://docs.google.com/document/d/1llv6xh8jMlmVv7WpyDSv4VgUpFAZQ6QjFUeRxxOinmk,https://docs.google.com/document/d/17GQFgJDHF_ckkn-BE72QaHtyL2Dh09S8-4xk0r6G47w"
   COVIDCAST_ANNOTATION_DRAFTS = "true"
