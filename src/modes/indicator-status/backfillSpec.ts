@@ -1,7 +1,6 @@
 import type { TopLevelSpec } from 'vega-lite';
-import type { Field } from 'vega-lite/build/src/channeldef';
+import type { ColorDef, Field } from 'vega-lite/build/src/channeldef';
 import type { LayerSpec } from 'vega-lite/build/src/spec';
-import type { Scale } from 'vega-lite/build/src/scale';
 import type { ProfileEntry } from '../../data/indicatorInfo';
 import { BASE_SPEC } from '../../specs/commonSpec';
 
@@ -19,8 +18,7 @@ export interface BackfillOptions {
 
 function commonHeatMapSpec(
   { valueField, valueLabel, dateField, dateLabel, title }: BackfillOptions,
-  scale: Scale,
-  legend = {},
+  color: ColorDef<Field>,
 ): TopLevelSpec & LayerSpec<Field> {
   return {
     ...BASE_SPEC,
@@ -61,17 +59,18 @@ function commonHeatMapSpec(
           // opacity: 0.5,
         },
         encoding: {
-          color: {
-            field: valueField,
-            type: 'quantitative',
-            scale,
-            legend: {
-              title: valueLabel,
-              titleOrient: 'left',
-              ...legend,
-              // gradientLength: 00,
+          color: Object.assign(
+            {
+              field: valueField,
+              type: 'quantitative',
+              legend: {
+                title: valueLabel,
+                titleOrient: 'left',
+                // gradientLength: 00,
+              },
             },
-          },
+            color,
+          ),
           stroke: {
             condition: {
               param: 'highlight',
@@ -118,9 +117,11 @@ function commonHeatMapSpec(
 
 export function generateValueHeatMapSpec(options: BackfillOptions): TopLevelSpec {
   const spec = commonHeatMapSpec(options, {
-    domain: [0, 1],
-    clamp: true,
-    nice: false,
+    scale: {
+      domain: [0, 1],
+      clamp: true,
+      nice: false,
+    },
   });
   spec.layer.push({
     transform: [
@@ -149,22 +150,29 @@ export function generateValueHeatMapSpec(options: BackfillOptions): TopLevelSpec
 }
 
 export function generateChangeHeatMapSpec(options: BackfillOptions): TopLevelSpec {
-  const spec = commonHeatMapSpec(
-    options,
-    {
+  const spec = commonHeatMapSpec(options, {
+    condition: {
+      test: `datum.${options.valueField} == 0`,
+      value: 'white',
+    },
+    scale: {
       type: 'symlog',
       domainMid: 0,
       domainMax: 3,
       domainMin: -0.66,
       nice: false,
       clamp: true,
+      // https://github.com/d3/d3-scale-chromatic#interpolateRdBu
+      scheme: 'redblue',
       // scheme: valueField.endsWith('rel_change') ?  'viridis',
     },
-    {
-      labelExpr: `['*1/3','*1/2','-30%','-20%','-10%',' NC','+10%','+20%','+30%','*2', '*3'][indexof([-0.66, -0.5, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 2, 3], datum.value)]`,
+    legend: {
+      title: options.valueLabel,
+      titleOrient: 'left',
+      labelExpr: `['≤ *⅓','*½','-30%','-20%','-10%',' NC','+10%','+20%','+30%','*2', '≥ *3'][indexof([-0.66, -0.5, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 2, 3], datum.value)]`,
       values: [-0.66, -0.5, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 2, 3],
     },
-  );
+  });
   return spec;
 }
 
