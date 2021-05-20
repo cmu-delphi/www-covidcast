@@ -3,6 +3,7 @@
   import { formatDateISO } from '../../formats';
   import { generateStateMapWithCountyBinaryDataSpec } from '../../specs/mapSpec';
   import DownloadMenu from '../../components/DownloadMenu.svelte';
+  import IndicatorCountyMapTooltip from './IndicatorCountyMapTooltip.svelte';
 
   /**
    * @type {{name: string}}
@@ -21,7 +22,7 @@
 </script>
 
 <div class="chart-aspect-4-3">
-  <Vega bind:this={vegaRef} {spec} {data} />
+  <Vega bind:this={vegaRef} {spec} {data} tooltip={IndicatorCountyMapTooltip} />
   <DownloadMenu
     {vegaRef}
     {data}

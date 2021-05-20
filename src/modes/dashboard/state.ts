@@ -60,7 +60,7 @@ export function resolveInitialState(): IState {
     return BASE_STATE;
   }
   try {
-    const s = (JSON.parse(decompressFromEncodedURIComponent(location.hash.slice(1))!) as unknown) as IState;
+    const s = JSON.parse(decompressFromEncodedURIComponent(location.hash.slice(1))!) as unknown as IState;
     return {
       ...BASE_STATE,
       ...s,
@@ -115,16 +115,14 @@ export function findWidget(type: WidgetType): Widget {
 }
 
 export function deriveComponents(state: IState): WidgetComponent[] {
-  return state.order.map(
-    (id): WidgetComponent => {
-      return {
-        id,
-        type: deriveType(id),
-        config: state.configs[id] || {},
-        state: state.states[id],
-      };
-    },
-  );
+  return state.order.map((id): WidgetComponent => {
+    return {
+      id,
+      type: deriveType(id),
+      config: state.configs[id] || {},
+      state: state.states[id],
+    };
+  });
 }
 export function changeWidgetState(state: IState, id: string, newState: WidgetComponent['state']): IState {
   const info = findWidget(deriveType(id));

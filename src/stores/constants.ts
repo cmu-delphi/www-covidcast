@@ -8,7 +8,7 @@ export * from '../data/geoLevel';
 export type { Sensor } from '../data/sensor';
 export * from '../data/classicSensor';
 
-const defaultSensors = (descriptions as unknown) as (Partial<SensorEntry> & {
+const defaultSensors = descriptions as unknown as (Partial<SensorEntry> & {
   name: string;
   id: string;
   signal: string;

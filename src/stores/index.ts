@@ -48,7 +48,7 @@ function deriveFromPath(url: Location) {
   const sensor = urlParams.get('sensor');
   const sensor2 = urlParams.get('sensor2');
   const lag = urlParams.get('lag');
-  const level = (urlParams.get('level') as unknown) as RegionLevel;
+  const level = urlParams.get('level') as unknown as RegionLevel;
   const encoding = urlParams.get('encoding');
   const date = urlParams.get('date') ?? '';
 
@@ -237,7 +237,7 @@ export const spikeHeightScale = writable(SqrtScale());
 
 const isMobileQuery = window.matchMedia
   ? window.matchMedia('only screen and (max-width: 767px)')
-  : (({ matches: false, addEventListener: () => undefined } as unknown) as MediaQueryList);
+  : ({ matches: false, addEventListener: () => undefined } as unknown as MediaQueryList);
 export const isMobileDevice = readable(isMobileQuery.matches, (set) => {
   if (typeof isMobileQuery.addEventListener === 'function') {
     isMobileQuery.addEventListener('change', (evt) => {

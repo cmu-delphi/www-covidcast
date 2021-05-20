@@ -1,5 +1,5 @@
 <script>
-  import { levelList } from '../../stores';
+  import { levelList } from '../../stores/constants';
   import { nameInfos, infosByLevel, nationInfo } from '../../data/regions';
   import MapContainer from './components/MapContainer.svelte';
   import Options from './components/Options.svelte';
