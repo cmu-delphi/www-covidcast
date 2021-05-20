@@ -1,69 +1,14 @@
 ---
-Name: At Away Location 6hr+ 
-Id: safegraph
-Signal: full_time_work_prop_7dav
-RawSignal: full_time_work_prop
-Type: public
-Levels: [county, state, nation]
-XAxis: Date
-YAxis: Fraction of population
-Format: fraction
-IsInverted: false
-Is7DayAverage: true
-HasStdErr: true
-Highlight: [landing]
-
-
-MapTitleText: 7-day trailing average of fraction of people spending 6 hours or more between 8am-6pm, in one location away from their home, based on SafeGraph mobility data
-
-
-Description: Delphi receives data from [SafeGraph](https://docs.safegraph.com/docs/social-distancing-metrics), which collects anonymized location data from mobile phones. Using this data, we calculate the fraction of mobile devices that spent more than 6 hours in one location other than their home during the daytime, and average it over a 7 day trailing window. This indicator measures how mobile people are, and ought to reflect whether people are traveling to work or school outside their homes. See also our "At Away Location 3-6hr" indicator.
-
-
-Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
-
-
-Links:
- - "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/safegraph.html)"
----
-Name: At Away Location 3-6hr
-Id: safegraph
-Signal: part_time_work_prop_7dav
-RawSignal: part_time_work_prop
-Type: public
-Levels: [county, state, nation]
-XAxis: Date
-YAxis: Fraction of population
-Format: fraction
-IsInverted: false
-Is7DayAverage: true
-HasStdErr: true
-
-
-MapTitleText: 7-day trailing average of fraction of people spending 3-6 hours between 8am-6pm, in one location away from their home, based on SafeGraph mobility data
-
-
-Description: Delphi receives data from [SafeGraph](https://docs.safegraph.com/docs/social-distancing-metrics), which collects anonymized location data from mobile phones. Using this data, we calculate the fraction of mobile devices that spent between 3 and 6 hours in one location other than their home during the daytime, and average it over a 7 day trailing window. This indicator measures how mobile people are. See also our "At Away Location 6hr+" indicator.
-
-
-Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
-
-
-Links:
- - "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/safegraph.html)"
----
-
-
 Name: Bar Visits
 Id: safegraph
 Signal: bars_visit_prop
 Type: public
-Levels: [county, msa, state, hrr, nation]
+Levels: [county, msa, state, hhs, hrr, nation]
 XAxis: Date
 YAxis: Visits per 100,000 people
 Format: per100k
 Unit: per 100,000 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: false
 HasStdErr: false
  
@@ -81,12 +26,12 @@ Name: Restaurant Visits
 Id: safegraph
 Signal: restaurants_visit_prop
 Type: public
-Levels: [county, msa, state, hrr, nation]
+Levels: [county, msa, state, hhs, hrr, nation]
 XAxis: Date
 YAxis: Visits per 100,000 people
 Format: per100k
 Unit: per 100,000 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: false
 HasStdErr: false
  
@@ -102,7 +47,7 @@ Links:
 ---
 Name: People Wearing Masks
 Id: fb-survey
-Signal: smoothed_wearing_mask_7d
+Signal: smoothed_wwearing_mask_7d
 RawSignal: null
 Type: public
 Levels: [county, msa, state, hrr, nation]
@@ -110,7 +55,7 @@ XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: true
+HighValuesAre: good
 Is7DayAverage: true
 HasStdErr: true
 Highlight: [landing]
@@ -134,7 +79,7 @@ Links:
 ---
 Name: Vaccine Acceptance
 Id: fb-survey
-Signal: smoothed_covid_vaccinated_or_accept
+Signal: smoothed_wcovid_vaccinated_or_accept
 RawSignal: null
 Type: public
 Levels: [county, msa, state, hrr, nation]
@@ -142,7 +87,7 @@ XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: true
+HighValuesAre: good
 Is7DayAverage: true
 HasStdErr: true
 Highlight: [landing, location]
@@ -165,12 +110,12 @@ Id: google-symptoms
 Signal: sum_anosmia_ageusia_smoothed_search
 RawSignal: sum_anosmia_ageusia_raw_search
 Type: public
-Levels: [state, msa, hrr, county]
+Levels: [state, msa, hrr, county, hhs, nation]
 XAxis: Date
 YAxis: Scaled search volume (arbitrary scale)
 Format: raw
 Unit: scaled search volume
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: false
  
@@ -189,12 +134,12 @@ Id: doctor-visits
 Signal: smoothed_adj_cli
 RawSignal: null
 Type: early
-Levels: [county, msa, state, hrr]
+Levels: [county, msa, state, hrr, hhs, nation]
 XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: false
 Highlight: [landing, default]
@@ -214,15 +159,15 @@ Links:
 ---
 Name: COVID-Like Symptoms
 Id: fb-survey
-Signal: smoothed_cli
-RawSignal: raw_cli
+Signal: smoothed_wcli
+RawSignal: raw_wcli
 Type: early
 Levels: [county, msa, state, hrr, nation]
 XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: true
 
@@ -242,15 +187,15 @@ Links:
 ---
 Name: COVID-Like Symptoms in Community
 Id: fb-survey
-Signal: smoothed_hh_cmnty_cli
-RawSignal: raw_hh_cmnty_cli
+Signal: smoothed_whh_cmnty_cli
+RawSignal: raw_whh_cmnty_cli
 Type: early
 Levels: [county, msa, state, hrr, nation]
 XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: true
 Highlight: [landing, location]
@@ -279,7 +224,7 @@ XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: true
 Highlight: [landing]
@@ -303,12 +248,12 @@ Id: hospital-admissions
 Signal: smoothed_adj_covid19_from_claims
 RawSignal: null
 Type: late
-Levels: [county, msa, state, hrr, nation]
+Levels: [county, msa, state, hrr, hhs, nation]
 XAxis: Date
 YAxis: Percentage
 Format: percent
 Unit: per 100 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: false
 Highlight: [landing]
@@ -340,12 +285,12 @@ CasesOrDeathSignals:
 
 
 Type: late
-Levels: [msa, county, state, hrr, nation]
+Levels: [msa, county, state, hrr, hhs, nation]
 XAxis: Reported Date
 YAxis: Cases
 Format: per100k
 Unit: per 100,000 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: false
 Highlight: [landing]
@@ -383,12 +328,12 @@ CasesOrDeathSignals:
 
 
 Type: late
-Levels: [msa, county, state, hrr, nation]
+Levels: [msa, county, state, hrr, hhs, nation]
 XAxis: Reported Date
 YAxis: Deaths
 Format: per100k
 Unit: per 100,000 people
-IsInverted: false
+HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: false
 Highlight: [landing]

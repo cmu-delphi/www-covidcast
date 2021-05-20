@@ -1,8 +1,8 @@
 <script>
-  import Vega from '../../components/Vega.svelte';
+  import Vega from '../../components/vega/Vega.svelte';
   import { addMissing, fetchTimeSlice, averageByDate } from '../../data';
-  import { getInfoByName, nationInfo } from '../../maps';
-  import getRelatedCounties from '../../maps/related';
+  import { getInfoByName, nationInfo, getStateOfCounty } from '../../data/regions';
+  import getRelatedCounties from '../../data/relatedRegions';
   import { currentDateObject } from '../../stores';
   import { defaultRegionOnStartup, DEFAULT_SURVEY_SENSOR, sensorMap } from '../../stores/constants';
   import VegaTooltip from './VegaTooltip.svelte';
@@ -12,7 +12,7 @@
 
   const county = getInfoByName(defaultRegionOnStartup.county);
   const related = getRelatedCounties(county);
-  const state = getInfoByName(county.state);
+  const state = getStateOfCounty(county);
   const nation = nationInfo;
 
   const spec = generateCompareLineSpec(

@@ -1,21 +1,32 @@
 <script>
   import { onMount } from 'svelte';
-  import { currentMode, appReady, sensorList } from './stores';
+  import { currentMode, appReady, loadMetaData, loadAnnotations } from './stores';
   import './stores/urlHandler';
   import './stores/ga';
   import './stores/websiteInjector';
-  import { loadMetaData } from './data';
-  import InfoDialog from './components/InfoDialog.svelte';
   import Disclaimer from './components/Disclaimer.svelte';
 
+  let markReady = () => false;
+  const appReadyPromise = new Promise((resolve) => {
+    markReady = resolve;
+  });
+
   onMount(() => {
-    loadMetaData(sensorList).then(() => {
+    Promise.all([loadMetaData(), loadAnnotations()]).then(() => {
       appReady.set(true);
+      markReady();
       document.body.dataset.ready = 'ready';
     });
   });
 
-  $: currentComponent = $currentMode.component();
+  async function loadComponent(mode) {
+    if (mode.waitForReady) {
+      await appReadyPromise;
+    }
+    return mode.component();
+  }
+
+  $: currentComponent = loadComponent($currentMode);
 </script>
 
 {#await currentComponent}
@@ -29,7 +40,6 @@
   </div>
 {/await}
 <Disclaimer />
-<InfoDialog />
 
 <style>
   .loader {

@@ -1,15 +1,15 @@
 name: ci
 
-on: [push]
+on: push
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: '12.x'
+          node-version: '14.x'
       - name: Cache Node.js modules
         uses: actions/cache@v2
         with:
@@ -41,9 +41,3 @@ jobs:
       #   with:
       #     name: cypress-videos
       #     path: cypress/videos
-      - name: Deploy
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public

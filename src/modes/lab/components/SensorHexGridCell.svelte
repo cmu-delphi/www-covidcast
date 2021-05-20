@@ -1,5 +1,5 @@
 <script>
-  import Vega from '../../../components/Vega.svelte';
+  import Vega from '../../../components/vega/Vega.svelte';
   import { addMissing, fetchTimeSlice } from '../../../data';
   import { generateLineChartSpec } from '../../../specs/lineSpec';
   import HexGridCell from './HexGridCell.svelte';
@@ -17,7 +17,7 @@
   export let y = -1;
 
   /**
-   * @param {import('../../maps').NameInfo} region
+   * @param {import('../../data/regions').NameInfo} region
    * @param {Date} date
    */
   function genSpec(region, date, height) {

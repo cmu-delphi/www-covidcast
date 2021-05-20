@@ -1,35 +1,28 @@
 <script>
   import { createEventDispatcher } from 'svelte';
+  import {
+    prepareUserEnteredText,
+    toSearchItems,
+    createHighlighter,
+    limitListItems,
+    matchItems,
+  } from './searchHelpers';
 
   const dispatch = createEventDispatcher();
 
   // the list of items  the user can select from
   export let items;
 
-  /**
-   * custom filter for visible items
-   * @type {(item) => boolean}
-   */
-  export let filterItem = null;
-
-  /**
-   * custom sorter for items
-   * @type {(itemA, itemB) => number}
-   */
-  export let sortItem = null;
-
   // field of each item that's used for the labels in the list
   export let labelFieldName = undefined;
 
   export let labelFunction = function (item) {
-    if (item === undefined || item === null) {
+    if (!item) {
       return '';
     }
     return labelFieldName ? item[labelFieldName] : item;
   };
   export let keywordFunction = labelFunction;
-  export let colorFieldName = undefined;
-
   export let selectFirstIfEmpty = false;
 
   export let minCharactersToSearch = 1;
@@ -46,8 +39,15 @@
   export let disabled = false;
   // add the title to the HTML input
   export let title = undefined;
+  export let id = undefined;
+
+  export let selectOnClick = false;
 
   export let icon = 'search';
+  /**
+   * whether clearing is possible
+   */
+  export let clear = true;
 
   // selected item state
   export let selectedItem = undefined;
@@ -63,8 +63,11 @@
    */
   export let modern = false;
 
+  /**
+   * @type {string}
+   */
   let text;
-  let filteredTextLength = 0;
+  let minCharsToSearchReached = minCharactersToSearch <= 1;
 
   function onSelectedItemChanged() {
     text = labelFunction(selectedItem);
@@ -85,136 +88,95 @@
     dispatch('remove', item);
   }
 
-  $: selectedItem, onSelectedItemChanged();
+  $: {
+    onSelectedItemChanged(selectedItem);
+  }
 
-  // HTML elements
   /**
    * @type HTMLInputElement
    */
-  let input;
-  let list;
+  let inputRef;
+  /**
+   * @type HTMLElement
+   */
+  let listRef;
 
   // UI state
   let opened = false;
-  let highlightIndex = -1;
 
   // view model
-  let filteredListItems = [];
-  let hiddenFilteredListItems = 0;
+  $: listItems = toSearchItems(items, keywordFunction, labelFunction);
 
-  $: listItems = items.map((item) => ({
-    // keywords representation of the item
-    keywords: keywordFunction(item).toLowerCase().trim(),
-    // item label
-    label: labelFunction(item),
-    // store reference to the origial item
-    item,
-  }));
-  $: selectedLabelLookup = new Set((selectedItems || []).map((s) => labelFunction(s)));
+  let matchingItems = [];
+  let highlightMatchingIndex = -1;
+  let matchingStartIndex = 0;
+  $: filteredListItems = limitListItems(matchingItems, matchingStartIndex, maxItemsToShowInList);
+  $: hiddenMatchingItems = matchingItems.length - filteredListItems.length + matchingStartIndex;
 
-  function limitListItems(items) {
-    if (sortItem) {
-      items = items.slice().sort((a, b) => sortItem(a.item, b.item));
-    }
-    if (maxItemsToShowInList <= 0 || items.length < maxItemsToShowInList) {
-      return items;
-    }
-    return items.slice(0, maxItemsToShowInList);
-  }
-
-  function prepareUserEnteredText(userEnteredText) {
-    if (userEnteredText === undefined || userEnteredText === null) {
-      return '';
-    }
-
-    const textFiltered = userEnteredText.replace(/[&/\\#,+()$~%.'":*?<>{}]/g, ' ').trim();
-
-    filteredTextLength = textFiltered.length;
-
-    if (minCharactersToSearch > 1) {
-      if (filteredTextLength < minCharactersToSearch) {
-        return '';
-      }
-    }
-    return textFiltered.toLowerCase().trim();
-  }
+  $: selectedLabelLookup = new Set((selectedItems || []).map(labelFunction));
 
   function resetItems() {
-    const matchingItems =
-      selectedLabelLookup.size > 0 || filterItem != null
-        ? listItems.filter((d) => !selectedLabelLookup.has(d.label) && (filterItem == null || filterItem(d.item)))
-        : listItems;
-    filteredListItems = limitListItems(matchingItems);
-    hiddenFilteredListItems = matchingItems.length - filteredListItems.length;
+    matchingStartIndex = 0;
+    matchingItems =
+      selectedLabelLookup.size > 0 ? listItems.filter((d) => !selectedLabelLookup.has(d.label)) : listItems;
   }
+
+  let highlighter = String;
 
   function search() {
     const textFiltered = prepareUserEnteredText(text);
+    minCharsToSearchReached =
+      textFiltered.length > 0 && (minCharactersToSearch <= 1 || textFiltered.length > minCharactersToSearch);
 
-    if (textFiltered === '') {
+    if (!minCharsToSearchReached) {
       resetItems();
-      closeIfMinCharsToSearchReached();
+      close();
       return;
     }
 
-    const searchWords = textFiltered.split(' ');
-    const hlfilter = highlightFilter(textFiltered, ['label']);
-
-    const matchingItems = listItems.filter((listItem) => {
-      const itemKeywords = listItem.keywords;
-      return (
-        searchWords.every((searchWord) => itemKeywords.includes(searchWord)) &&
-        !selectedLabelLookup.has(listItem.label) &&
-        (filterItem == null || filterItem(listItem.item))
-      );
-    });
-
-    filteredListItems = limitListItems(matchingItems).map(hlfilter);
-    hiddenFilteredListItems = matchingItems.length - filteredListItems.length;
-    closeIfMinCharsToSearchReached();
+    highlighter = createHighlighter(textFiltered);
+    matchingStartIndex = 0;
+    matchingItems = matchItems(listItems, textFiltered, selectedLabelLookup);
   }
 
   // $: text, search();
 
-  function selectListItem(listItem) {
-    selectedItem = listItem.item;
-  }
-
   function selectItem() {
-    const listItem = filteredListItems[highlightIndex];
-    selectListItem(listItem);
+    const listItem = matchingItems[highlightMatchingIndex];
+    selectedItem = listItem.item;
     close();
   }
 
-  function up() {
+  function changeHighlight(newIndex) {
     open();
-    if (highlightIndex > 0) highlightIndex--;
-    highlight();
-  }
-
-  function down() {
-    open();
-    if (highlightIndex < filteredListItems.length - 1) highlightIndex++;
+    const clamped = Math.max(Math.min(newIndex, matchingItems.length - 1), 0);
+    if (highlightMatchingIndex === clamped) {
+      return;
+    }
+    highlightMatchingIndex = clamped;
+    const endVisible = matchingStartIndex + filteredListItems.length - 1;
+    if (highlightMatchingIndex < matchingStartIndex) {
+      matchingStartIndex = highlightMatchingIndex;
+    } else if (highlightMatchingIndex > endVisible) {
+      matchingStartIndex = highlightMatchingIndex - filteredListItems.length + 1;
+    }
     highlight();
   }
 
   function highlight() {
-    const query = '.selected';
-    const el = list.querySelector(query);
-    if (el) {
-      if (typeof el.scrollIntoViewIfNeeded === 'function') {
-        el.scrollIntoViewIfNeeded();
-      }
+    const el = listRef.querySelector('.uk-active');
+    if (el && typeof el.scrollIntoViewIfNeeded === 'function') {
+      el.scrollIntoViewIfNeeded();
     }
   }
 
   function onListItemClick(listItem) {
-    selectListItem(listItem);
+    selectedItem = listItem.item;
     close();
   }
 
   function onResetItem() {
-    selectListItem({ item: undefined });
+    selectedItem = undefined;
     close();
   }
 
@@ -223,24 +185,46 @@
     highlight();
   }
 
-  function onDocumentClick() {
-    close();
-  }
-
   function onKeyDown(e) {
-    let key = e.key;
-    if (key === 'Tab' && e.shiftKey) key = 'ShiftTab';
-    const fnmap = {
-      Tab: opened ? down.bind(this) : null,
-      ShiftTab: opened ? up.bind(this) : null,
-      ArrowDown: down.bind(this),
-      ArrowUp: up.bind(this),
-      Escape: onEsc.bind(this),
-    };
-    const fn = fnmap[key];
-    if (typeof fn === 'function') {
-      e.preventDefault();
-      fn(e);
+    switch (e.key) {
+      case 'Tab':
+        if (opened) {
+          e.preventDefault();
+          if (e.shiftKey) {
+            changeHighlight(highlightMatchingIndex + 1);
+          } else {
+            changeHighlight(highlightMatchingIndex - 1);
+          }
+        }
+        break;
+      case 'Home':
+        e.preventDefault();
+        changeHighlight(0);
+        break;
+      case 'End':
+        e.preventDefault();
+        changeHighlight(matchingItems.length - 1);
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        changeHighlight(highlightMatchingIndex + 1);
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        changeHighlight(highlightMatchingIndex - 1);
+        break;
+      case 'PageUp':
+        e.preventDefault();
+        changeHighlight(highlightMatchingIndex - maxItemsToShowInList);
+        break;
+      case 'PageDown':
+        e.preventDefault();
+        changeHighlight(highlightMatchingIndex + maxItemsToShowInList);
+        break;
+      case 'Escape':
+        e.preventDefault();
+        onEsc();
+        break;
     }
   }
 
@@ -254,16 +238,17 @@
   function onInput(e) {
     text = e.target.value;
     search();
-    highlightIndex = 0;
+    highlightMatchingIndex = 0;
+    matchingStartIndex = 0;
     open();
   }
 
   function onInputClick() {
     resetListToAllItemsAndOpen();
 
-    if (modern) {
+    if (modern || selectOnClick) {
       // select the whole field upon click
-      input.select();
+      inputRef.select();
     }
   }
 
@@ -271,7 +256,7 @@
     //if (text) return clear();
     e.stopPropagation();
     if (opened) {
-      input.focus();
+      inputRef.focus();
       close();
     }
   }
@@ -287,10 +272,10 @@
 
     // find selected item
     if (selectedItem) {
-      for (let i = 0; i < listItems.length; i++) {
-        const listItem = listItems[i];
+      for (let i = 0; i < filteredListItems.length; i++) {
+        const listItem = filteredListItems[i];
         if (selectedItem == listItem.item) {
-          highlightIndex = i;
+          highlightMatchingIndex = i;
           highlight();
           break;
         }
@@ -300,10 +285,9 @@
 
   function open() {
     // check if the search text has more than the min chars required
-    if (isMinCharsToSearchReached()) {
+    if (!minCharsToSearchReached || opened) {
       return;
     }
-
     opened = true;
   }
 
@@ -315,37 +299,6 @@
       selectItem();
     }
   }
-
-  function isMinCharsToSearchReached() {
-    return minCharactersToSearch > 1 && filteredTextLength < minCharactersToSearch;
-  }
-
-  function closeIfMinCharsToSearchReached() {
-    if (isMinCharsToSearchReached()) {
-      close();
-    }
-  }
-
-  // 'item number one'.replace(/(it)(.*)(nu)(.*)(one)/ig, '<b>$1</b>$2 <b>$3</b>$4 <b>$5</b>')
-  function highlightFilter(q, fields) {
-    const qs = '(' + q.trim().replace(/\s/g, ')(.*)(') + ')';
-    const reg = new RegExp(qs, 'ig');
-    let n = 1;
-    const len = qs.split(')(').length + 1;
-    let repl = '';
-    for (; n < len; n++) repl += n % 2 ? `<b>$${n}</b>` : `$${n}`;
-
-    return (i) => {
-      const newI = Object.assign({ highlighted: {} }, i);
-      if (fields) {
-        fields.forEach((f) => {
-          if (!newI[f]) return;
-          newI.highlighted[f] = newI[f].replace(reg, repl);
-        });
-      }
-      return newI;
-    };
-  }
 </script>
 
 <div
@@ -355,9 +308,13 @@
   class:modern
   on:click={onContainerClick}
 >
+  {#if title && modern}
+    <div class="search-label">{title}</div>
+  {/if}
   {#if !multiple}
     <span class="uk-search-icon search-icon" class:modern data-uk-icon="icon: {icon}" />
     <input
+      {id}
       class="uk-search-input"
       class:modern
       class:modern__small={modern === 'small'}
@@ -365,8 +322,9 @@
       {name}
       {disabled}
       {title}
+      type="text"
       aria-label={placeholder}
-      bind:this={input}
+      bind:this={inputRef}
       bind:value={text}
       on:input={onInput}
       on:focus={onFocus}
@@ -374,19 +332,21 @@
       on:click={onInputClick}
       on:keypress={onKeyPress}
     />
-    <button
-      class="uk-search-icon clear-button"
-      class:hidden={!text}
-      class:modern
-      on:click={onResetItem}
-      title="Clear Search Field"
-      data-uk-icon="icon: close"
-    />
+    {#if clear}
+      <button
+        class="uk-search-icon clear-button"
+        class:hidden={!text}
+        class:modern
+        on:click={onResetItem}
+        title="Clear Search Field"
+        data-uk-icon="icon: close"
+      />
+    {/if}
   {:else}
     <span class="uk-search-icon search-multiple-icon search-icon" data-uk-icon="icon: {icon}" class:modern />
 
     {#each selectedItems as selectedItem}
-      <div class="search-tag" style="border-color: {colorFieldName ? selectedItem[colorFieldName] : undefined}">
+      <div class="search-tag">
         <span>{labelFunction(selectedItem)}</span>
         <button
           class=""
@@ -407,7 +367,7 @@
         {disabled}
         {title}
         aria-label={placeholder}
-        bind:this={input}
+        bind:this={inputRef}
         bind:value={text}
         on:input={onInput}
         on:focus={onFocus}
@@ -426,36 +386,39 @@
     />
   {/if}
 
-  <div class="uk-dropdown uk-dropdown-bottom-left search-box-list" class:uk-open={opened} bind:this={list}>
+  <div class="uk-dropdown uk-dropdown-bottom-left search-box-list" class:uk-open={opened} bind:this={listRef}>
     <ul class="uk-nav uk-dropdown-nav">
       {#if filteredListItems && filteredListItems.length > 0}
-        {#each filteredListItems as listItem, i}
-          <li class:uk-active={i === highlightIndex}>
-            <a
-              href="?region={listItem.item ? listItem.item.id : ''}"
-              on:click|preventDefault={() => onListItemClick(listItem)}
+        {#each filteredListItems as listItem, i (listItem.label)}
+          <li class:uk-active={i + matchingStartIndex === highlightMatchingIndex}>
+            <slot
+              name="entry"
+              label={highlighter(listItem.label)}
+              {listItem}
+              item={listItem.item}
+              onClick={() => onListItemClick(listItem)}
             >
-              {#if listItem.highlighted}
-                {@html listItem.highlighted.label}
-              {:else}
-                {@html listItem.label}
-              {/if}
-            </a>
+              <a
+                href="?region={listItem.item ? listItem.item.id : ''}"
+                on:click|preventDefault={() => onListItemClick(listItem)}
+              >
+                {@html highlighter(listItem.label)}
+              </a>
+            </slot>
           </li>
         {/each}
-
-        {#if hiddenFilteredListItems > 0}
+        {#if hiddenMatchingItems}
           <li class="uk-nav-divider" />
-          <li class="more-results">&hellip; {hiddenFilteredListItems} results not shown</li>
+          <li class="more-results">&hellip; {hiddenMatchingItems} results not shown</li>
         {/if}
-      {:else if noResultsText}
+      {:else}
         <li class="uk-nav-header">{noResultsText}</li>
       {/if}
     </ul>
   </div>
 </div>
 
-<svelte:window on:click={onDocumentClick} />
+<svelte:window on:click={close} />
 
 <style>
   .search-box {
@@ -465,10 +428,11 @@
 
   .search-multiple {
     display: flex;
-    height: 40px;
+    min-height: 40px;
     background: transparent;
     border: 1px solid #e5e5e5;
     position: relative;
+    flex-wrap: wrap;
   }
 
   .search-multiple-icon {
@@ -510,6 +474,7 @@
     border: 2px solid #999;
     display: flex;
     align-items: center;
+    white-space: nowrap;
   }
 
   /* modern styles for survey dashboard */
@@ -541,5 +506,17 @@
     padding-left: 50px !important;
     padding-top: 4px;
     padding-bottom: 4px;
+  }
+
+  .search-label {
+    font-size: 0.75rem;
+    line-height: 1;
+    position: absolute;
+    top: -0.6rem;
+    left: 24px;
+    background: white;
+    font-weight: 400;
+    border-radius: 3px;
+    padding: 2px;
   }
 </style>

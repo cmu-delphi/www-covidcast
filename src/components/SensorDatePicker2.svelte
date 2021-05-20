@@ -3,9 +3,8 @@
   import arrowLeftIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-circle-left.svg';
   import arrowRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-circle-right.svg';
   import calendarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/calendar.svg';
-  import { parseAPITime } from '../data';
-  import { times } from '../stores';
-  import { formatDateShortWeekdayAbbr } from '../formats';
+  import { metaDataManager } from '../stores';
+  import { formatDateShortWeekdayAbbr, formatDateYearWeekdayAbbr } from '../formats';
   import { timeDay } from 'd3-time';
 
   /**
@@ -21,39 +20,52 @@
 
   export let className = '';
 
-  /**
-   * @type {[Date, Date]}
-   */
-  $: startEndDates = [];
-  $: if ($times !== null) {
-    const dates = $times.get(sensor.key);
-    startEndDates = dates ? dates.map(parseAPITime) : [];
-  }
+  $: timeFrame = $metaDataManager.getTimeFrame(sensor);
+  $: info = $metaDataManager.getMetaData(sensor);
 </script>
 
 <div class="date-picker {className}">
   <button
     class="arrow-button picker-button arrow-left"
     title="Go to the previous day"
-    disabled={value == null || startEndDates.length === 0 || value <= startEndDates[0]}
+    disabled={value == null || value <= timeFrame.min}
     on:click={() => (value = timeDay.offset(value, -1))}
   >
     {@html arrowLeftIcon}
   </button>
-  {#if value != null && startEndDates.length !== 0}
+  {#if value != null}
     <Datepicker
       offset={11}
       bind:selected={value}
-      start={startEndDates[0]}
-      end={startEndDates[1]}
+      start={timeFrame.min}
+      end={timeFrame.max}
       formattedSelected={formatDateShortWeekdayAbbr(value)}
     >
-      <button aria-label="selected date" class="selected-date picker-button" on:>
+      <button
+        aria-label="selected date"
+        class="selected-date picker-button"
+        on:dblclick={() => (value = timeFrame.max)}
+        on:
+      >
         <span class="selected-date-icon">
           {@html calendarIcon}
         </span>
         <span>{formatDateShortWeekdayAbbr(value)}</span>
       </button>
+      <svelte:fragment slot="footer">
+        {#if info}
+          <p class="date-info">
+            Most recent available date is <button
+              type="button"
+              on:click={() => (value = info.maxTime)}
+              class="uk-link-muted"
+            >
+              {formatDateYearWeekdayAbbr(info.maxTime)}
+            </button>
+            updated on <span class="uk-text-nowrap">{formatDateYearWeekdayAbbr(info.maxIssue)}</span>.
+          </p>
+        {/if}
+      </svelte:fragment>
     </Datepicker>
   {:else}
     <button aria-label="selected date" class="selected-date picker-button" disabled>
@@ -66,7 +78,7 @@
   <button
     class="arrow-button picker-button arrow-right"
     title="Go to the next day"
-    disabled={value == null || startEndDates.length === 0 || value >= startEndDates[1]}
+    disabled={value == null || value >= timeFrame.max}
     on:click={() => (value = timeDay.offset(value, 1))}
   >
     {@html arrowRightIcon}
@@ -129,6 +141,27 @@
     width: 14px;
     display: inline-block;
     margin-right: 0.5em;
+  }
+
+  .date-info {
+    margin: 0;
+    padding: 0 0.5em 0.5em 0.5em;
+    text-align: left;
+    font-size: 0.875rem;
+  }
+
+  .date-info > button {
+    white-space: nowrap;
+    display: inline-block;
+    padding: 0;
+    cursor: pointer;
+    border: none;
+    background: none;
+    text-align: left;
+    font: inherit;
+    font-size: inherit;
+    color: inherit;
+    text-decoration: underline;
   }
 
   @media only screen and (max-width: 715px) {

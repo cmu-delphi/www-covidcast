@@ -1,23 +1,19 @@
 <script>
-  import { callMetaAPI } from '../../data/api';
+  import { CSV_SERVER_ENDPOINT } from '../../data/api';
   import Datepicker from '../../components/Calendar/Datepicker.svelte';
-  import { getLevelInfo, sensorList } from '../../stores/constants';
-  import { parseAPITime } from '../../data';
-  import { currentDateObject, currentSensorEntry } from '../../stores';
+  import { sensorList, levelList } from '../../stores/constants';
+  import { annotationManager, currentDateObject, currentSensorEntry, metaDataManager } from '../../stores';
   import { timeMonth } from 'd3-time';
   import { onMount } from 'svelte';
   import { trackEvent } from '../../stores/ga';
   import Search from '../../components/Search.svelte';
-  import { getCountiesOfState, infosByLevel } from '../../maps';
+  import { getCountiesOfState, getInfoByName, infosByLevel } from '../../data/regions';
   import { formatDateISO } from '../../formats';
   import { questions } from '../../stores/questions';
   import { DateParam } from '../../stores/params';
-  import FancyHeader from '../mobile/FancyHeader.svelte';
-  import '../mobile/common.css';
+  import FancyHeader from '../../components/FancyHeader.svelte';
+  import IndicatorAnnotation from '../../components/IndicatorAnnotation.svelte';
 
-  const CSV_SERVER = 'https://delphi.cmu.edu/csv';
-
-  let loading = true;
   /**
    * @type {{id: string, name: string, levels: Set<string>, minTime: Date, maxTime: Date, sensors: (import('../../stores/constants').Sensor)[]}[]}
    */
@@ -36,7 +32,6 @@
   }
   $: initDate($currentDateObject);
 
-  let levelList = [];
   $: sensorGroup = sensorGroupValue ? sensorGroups.find((d) => d.id === sensorGroupValue) : null;
   $: sensor = sensorValue && sensorGroup ? sensorGroup.sensors.find((d) => d.key === sensorValue) : null;
 
@@ -120,40 +115,29 @@
     }
   });
 
-  callMetaAPI(null, ['min_time', 'max_time', 'signal', 'geo_type', 'data_source'], {
-    time_types: 'day',
-  }).then((r) => {
-    loading = false;
-
+  /**
+   * @param {import('../../../data/meta').MetaDataManager} metaDataManager
+   */
+  function loadData(metaDataManager) {
     const signalGroupMap = new Map();
-    const levels = new Set();
-    r.epidata.forEach((entry) => {
-      const dataSource = entry.data_source;
-      const key = `${dataSource}-${entry.signal}`;
-      const sensor = lookupMap.get(key);
-
-      if (!sensor) {
-        // limit to the one in the map only
-        return;
-      }
+    lookupMap.forEach((sensor) => {
+      const timeFrame = metaDataManager.getTimeFrame(sensor);
       const signalGroup = sensor.dataSourceName;
       if (!signalGroupMap.has(signalGroup)) {
         signalGroupMap.set(signalGroup, {
           id: signalGroup,
           name: signalGroup,
           levels: new Set(),
-          minTime: parseAPITime(entry.min_time),
-          maxTime: parseAPITime(entry.max_time),
+          minTime: timeFrame.min,
+          maxTime: timeFrame.max,
           sensors: [],
         });
       }
       const ds = signalGroupMap.get(signalGroup);
 
-      levels.add(entry.geo_type);
-      ds.levels.add(entry.geo_type);
-
-      if (ds.sensors.every((d) => d.key !== key)) {
-        ds.sensors.push(sensor);
+      ds.sensors.push(sensor);
+      for (const level of metaDataManager.getLevels(sensor)) {
+        ds.levels.add(level);
       }
     });
 
@@ -163,9 +147,12 @@
     }
     sensorGroupValue = $currentSensorEntry.dataSourceName;
     sensorValue = $currentSensorEntry.key;
-    levelList = [...levels].map(getLevelInfo);
     geoType = $currentSensorEntry.levels[0];
-  });
+  }
+
+  $: {
+    loadData($metaDataManager);
+  }
 
   let form = null;
 
@@ -204,6 +191,16 @@
   }
 
   $: dateRange = sensorGroup || { minTime: timeMonth(new Date(), -1), maxTime: timeMonth(new Date(), 1) };
+
+  // resolve known annotation for the selected combination
+  $: annotations = isAllRegions
+    ? $annotationManager.getWindowLevelAnnotations(sensor, geoType, startDate, endDate)
+    : $annotationManager.getWindowAnnotations(
+        sensor,
+        geoIDs.map((d) => getInfoByName(d, geoType)),
+        startDate,
+        endDate,
+      );
 </script>
 
 <div class="mobile-root">
@@ -213,7 +210,7 @@
     </div>
   </div>
   <div class="uk-container content-grid">
-    <div class="grid-3-11" class:loading>
+    <div class="grid-3-11">
       <p>
         All signals displayed in COVIDcast are freely available for download here. You can also access the latest daily
         through the
@@ -333,9 +330,10 @@
                 className="search-container"
                 placeholder={'Search for a region...'}
                 items={geoItems}
+                title="Region"
                 selectedItems={geoValues}
                 labelFieldName="displayName"
-                maxItemsToShowInList="5"
+                maxItemsToShowInList={5}
                 on:add={(e) => addRegion(e.detail)}
                 on:remove={(e) => removeRegion(e.detail)}
                 on:change={(e) => setRegion(e.detail)}
@@ -372,6 +370,10 @@
             </p>
           </div>
         </div>
+
+        {#each annotations as annotation}
+          <IndicatorAnnotation {annotation} />
+        {/each}
       </section>
 
       <section class="uk-margin-large-top">
@@ -388,7 +390,7 @@
         <h3 class="mobile-h3 uk-margin-top">CSV File</h3>
         <div>
           <p>Direct link:</p>
-          <form bind:this={form} id="form" method="GET" action={CSV_SERVER} download>
+          <form bind:this={form} id="form" method="GET" action={CSV_SERVER_ENDPOINT} download>
             <button type="submit" class="uk-button uk-button-default">Download CSV File</button>
             <input type="hidden" name="signal" value={sensor ? `${sensor.id}:${sensor.signal}` : ''} />
             <input type="hidden" name="start_day" value={formatDateISO(startDate)} />
@@ -398,10 +400,12 @@
             {#if usesAsOf}<input type="hidden" name="as_of" value={formatDateISO(asOfDate)} />{/if}
           </form>
           <p>Manually fetch data:</p>
-          <pre
-            class="code-block"><code>
-        {`wget --content-disposition "${CSV_SERVER}?signal=${sensor ? `${sensor.id}:${sensor.signal}` : ''}&start_day=${formatDateISO(startDate)}&end_day=${formatDateISO(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${formatDateISO(asOfDate)}` : ''}"`}
-      </code></pre>
+          <div class="code-block-wrapper">
+            <pre
+              class="code-block"><code>
+            {`wget --content-disposition "${CSV_SERVER_ENDPOINT}?signal=${sensor ? `${sensor.id}:${sensor.signal}` : ''}&start_day=${formatDateISO(startDate)}&end_day=${formatDateISO(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${formatDateISO(asOfDate)}` : ''}"`}
+            </code></pre>
+          </div>
           <p class="description">
             For more details about the API, see the
             <a href="https://cmu-delphi.github.io/delphi-epidata/">API documentation</a>. A description of the returned
@@ -434,9 +438,8 @@ data = covidcast.signal("${sensor ? sensor.id : ''}", "${sensor ? sensor.signal 
         </div>
         <div>
           <h3 class="mobile-h3 uk-margin-top">R Package</h3>
-          <p>Install <code>covidcast</code> using <a href="https://devtools.r-lib.org/">devtools</a> :</p>
-          <pre
-            class="code-block"><code>devtools::install_github("cmu-delphi/covidcast", ref = "main", subdir = "R-packages/covidcast")</code></pre>
+          <p>Install <code>covidcast</code> via CRAN:</p>
+          <pre class="code-block"><code>install.packages('covidcast')</code></pre>
           <p>Fetch data:</p>
           <pre
             class="code-block"><code>
@@ -474,5 +477,17 @@ covidcast_signal(data_source = "${sensor ? sensor.id : ''}", signal = "${sensor 
 
   .code-block {
     max-width: calc(100vw - 80px);
+  }
+  .code-block-wrapper {
+    position: relative;
+    height: 4em;
+  }
+  .code-block-wrapper > .code-block {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
   }
 </style>

@@ -7,9 +7,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { EnvironmentPlugin, DefinePlugin } = require('webpack');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const pkg = require('./package.json');
+// const { preprocess } = require('./svelte.config');
 
 const devMode = process.env.NODE_ENV !== 'production';
-const hmr = devMode;
 
 // see https://webpack.js.org/plugins/mini-css-extract-plugin/#extracting-all-css-in-a-single-file
 function recursiveIssuer(m, c) {
@@ -38,18 +38,21 @@ module.exports = () => {
       bundle: './src/index.js',
     },
 
-    output: {
-      path: path.resolve(__dirname, 'public'),
-      filename: devMode ? '[name].js' : '[name].[contenthash].js',
-      chunkFilename: devMode ? '[name].js' : '[name].[contenthash].js',
-      publicPath: hmr ? '/' : undefined,
-    },
-
+    output: devMode
+      ? {
+          path: path.resolve(__dirname, 'public'),
+          publicPath: '/',
+        }
+      : {
+          path: path.resolve(__dirname, 'public'),
+          filename: '[name].[contenthash].js',
+          chunkFilename: '[name].[contenthash].js',
+        },
     resolve: {
       alias: {
         svelte: path.resolve('node_modules', 'svelte'),
       },
-      extensions: ['.mjs', '.js', '.svelte'],
+      extensions: ['.ts', '.mjs', '.js', '.svelte'],
       mainFields: ['svelte', 'module', 'browser', 'main'],
     },
 
@@ -103,12 +106,28 @@ module.exports = () => {
             {
               loader: 'svelte-loader',
               options: {
+                // preprocess,
                 compilerOptions: {
                   dev: devMode,
                 },
-                hotReload: hmr,
-                emitCss: !devMode,
+                hotReload: devMode,
+                emitCss: true, // !devMode,
               },
+            },
+          ].slice(devMode ? 1 : 0),
+        },
+        {
+          test: /\.tsx?$/,
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                cacheDirectory: true,
+                cacheCompression: false,
+              },
+            },
+            {
+              loader: 'ts-loader',
             },
           ].slice(devMode ? 1 : 0),
         },
@@ -157,7 +176,7 @@ module.exports = () => {
       contentBasePublicPath: ['/', '/assets'],
       watchContentBase: true,
       host: 'localhost',
-      hot: hmr,
+      hot: devMode,
     },
 
     plugins: [
@@ -166,7 +185,10 @@ module.exports = () => {
         __VERSION__: JSON.stringify(pkg.version),
       }),
       new EnvironmentPlugin({
-        COVIDCAST_ENDPOINT_URL: 'https://api.covidcast.cmu.edu/epidata/api.php',
+        COVIDCAST_ENDPOINT_URL: 'https://api.covidcast.cmu.edu/epidata',
+        COVIDCAST_ANNOTATION_SHEET:
+          'https://docs.google.com/spreadsheets/d/e/2PACX-1vToGcf9x5PNJg-eSrxadoR5b-LM2Cqs9UML97587OGrIX0LiQDcU1HL-L2AA8o5avbU7yod106ih0_n/pub?gid=0&single=true&output=csv',
+        COVIDCAST_ANNOTATION_DRAFTS: 'false',
       }),
       new HtmlWebpackPlugin({
         title: 'COVIDcast',
@@ -186,6 +208,11 @@ module.exports = () => {
         title: 'COVIDcast Indicator Details',
         template: './src/index.html',
         filename: 'indicator/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        title: 'COVIDcast Indicator Correlation',
+        template: './src/index.html',
+        filename: 'correlation/index.html',
       }),
       new HtmlWebpackPlugin({
         title: 'COVIDcast',
@@ -216,6 +243,21 @@ module.exports = () => {
         title: 'COVIDcast Survey Results',
         template: './src/index.html',
         filename: 'survey-results/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        title: 'COVIDcast Indicator Status Overview',
+        template: './src/index.html',
+        filename: 'indicator-status/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        title: 'COVIDcast Data Anomalies',
+        template: './src/index.html',
+        filename: 'data-anomalies/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        title: 'COVIDcast Dashboard',
+        template: './src/index.html',
+        filename: 'dashboard/index.html',
       }),
       // new HtmlWebpackPlugin({
       //   title: 'COVIDcast Lab',
