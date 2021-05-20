@@ -7,7 +7,7 @@ Overview: |
 FullSurveyLink: https://cmu-delphi.github.io/delphi-epidata/symptom-survey/coding.html
 DataAccessLink: https://cmu-delphi.github.io/delphi-epidata/symptom-survey/data-access.html
 ReferenceRawNationSignal: raw_cli
-Waves: [2020-04-06, 2020-04-15, 2020-05-21, 2020-09-08, 2020-11-24, 2020-12-19, 2021-01-12, 2021-02-08, 2021-03-02, 2021-03-02]
+Waves: [2020-04-06, 2020-04-15, 2020-05-21, 2020-09-08, 2020-11-24, 2020-12-19, 2021-01-12, 2021-02-08, 2021-03-02, 2021-03-02, 2021-05-20]
 
 
 # common properties for all questions
