@@ -13,9 +13,10 @@ export const dateLabel = derived([dateField], ([value]) => dateOptions.find((d) 
 
 export const anchorLag = writable(60);
 
-export const valueField = writable<
-  'value_completeness' | 'value_rel_change' | 'sample_size_completeness' | 'sample_size_rel_change'
->('value_completeness');
+export const valueField =
+  writable<'value_completeness' | 'value_rel_change' | 'sample_size_completeness' | 'sample_size_rel_change'>(
+    'value_completeness',
+  );
 
 export const valueOptions = derived([anchorLag], ([lag]) => [
   { label: `As fraction of value at lag ${lag}`, value: 'value_completeness' },
