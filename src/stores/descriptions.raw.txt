@@ -81,7 +81,7 @@ Links:
 Name: Vaccine Acceptance
 Id: fb-survey
 Signal: smoothed_wcovid_vaccinated_or_accept
-LinkFrom: [fb-survey-smoothed_wcovid_vaccinated_or_accept]
+LinkFrom: [fb-survey-smoothed_covid_vaccinated_or_accept]
 RawSignal: null
 Type: public
 Levels: [county, msa, state, hrr, nation]
