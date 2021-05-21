@@ -68,12 +68,13 @@ function fetchImpl<T>(url: URL, fields?: readonly string[] | { exclude: readonly
     return fetch(url.toString(), fetchOptions).then((d) => d.json());
   }
 
-  url.searchParams;
+  const params = new URLSearchParams(url.searchParams);
+  url.searchParams.forEach((d) => url.searchParams.delete(d));
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return fetch(url.pathname, {
+  return fetch(url.toString(), {
     ...fetchOptions,
     method: 'POST',
-    body: url.searchParams,
+    body: params,
   }).then((d) => d.json());
 }
 
