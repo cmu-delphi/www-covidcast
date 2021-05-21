@@ -33,7 +33,7 @@ function parseFakeISO(value: number | string | Date): Date {
 
 export function getIndicatorStatuses(): Promise<IndicatorStatus[]> {
   return callSignalDashboardStatusAPI().then((d) => {
-    const data = (d as unknown) as IndicatorStatus[];
+    const data = d as unknown as IndicatorStatus[];
     for (const row of data) {
       row.id = row.name.toLowerCase().replace(/\s/g, '-');
       row.latest_issue = parseFakeISO(row.latest_issue);

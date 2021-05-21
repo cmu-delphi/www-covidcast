@@ -14,6 +14,7 @@ import {
   DEFAULT_CORRELATION_SENSOR,
   CasesOrDeathOptions,
   SensorEntry,
+  resolveSensorWithAliases,
 } from './constants';
 import modes, { Mode, modeByID, ModeID } from '../modes';
 import { parseAPITime } from '../data/utils';
@@ -62,7 +63,7 @@ function deriveFromPath(url: Location) {
   const sensor = urlParams.get('sensor');
   const sensor2 = urlParams.get('sensor2');
   const lag = urlParams.get('lag');
-  const level = (urlParams.get('level') as unknown) as RegionLevel;
+  const level = urlParams.get('level') as unknown as RegionLevel;
   const encoding = urlParams.get('encoding');
   const date = urlParams.get('date') ?? '';
 
@@ -79,21 +80,17 @@ function deriveFromPath(url: Location) {
   const mode = urlParams.get('mode') || modeFromPath();
 
   const modeObj = modes.find((d) => d.id === mode) || DEFAULT_MODE;
-  const resolveSensor =
-    sensor && sensorMap.has(sensor)
-      ? sensor
-      : modeObj === modeByID['survey-results']
-      ? DEFAULT_SURVEY_SENSOR
-      : DEFAULT_SENSOR;
+  const resolveSensor = resolveSensorWithAliases(
+    sensor,
+    modeObj === modeByID['survey-results'] ? DEFAULT_SURVEY_SENSOR : DEFAULT_SENSOR,
+  );
   return {
     mode: modeObj,
     sensor: resolveSensor,
-    sensor2:
-      sensor2 && sensorMap.has(sensor2)
-        ? sensor2
-        : DEFAULT_CORRELATION_SENSOR === sensor2
-        ? DEFAULT_SENSOR
-        : DEFAULT_CORRELATION_SENSOR,
+    sensor2: resolveSensorWithAliases(
+      sensor2,
+      DEFAULT_CORRELATION_SENSOR === sensor2 ? DEFAULT_SENSOR : DEFAULT_CORRELATION_SENSOR,
+    ),
     lag: lag ? Number.parseInt(lag, 10) : 0,
     level: levels.includes(level) ? level : DEFAULT_LEVEL,
     signalCasesOrDeathOptions: {
@@ -300,7 +297,7 @@ currentMode.subscribe((mode) => {
 
 const isMobileQuery = window.matchMedia
   ? window.matchMedia('only screen and (max-width: 767px)')
-  : (({ matches: false, addEventListener: () => undefined } as unknown) as MediaQueryList);
+  : ({ matches: false, addEventListener: () => undefined } as unknown as MediaQueryList);
 export const isMobileDevice = readable(isMobileQuery.matches, (set) => {
   if (typeof isMobileQuery.addEventListener === 'function') {
     isMobileQuery.addEventListener('change', (evt) => {

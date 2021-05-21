@@ -102,6 +102,10 @@ export interface Sensor {
   formatValue(v: number, enforceSign?: boolean): string;
 
   readonly highlight?: string[];
+  /**
+   * optional list of source:key pairs with sensor that should also be resolved to this one
+   */
+  readonly linkFrom?: string[];
 }
 
 function determineHighValuesAre(sensor: {
@@ -297,7 +301,7 @@ export function extendSensorEntry(
   const isCasesOrDeath = isCasesSignal(key) || isDeathSignal(key);
   const isCount = isCountSignal(key);
 
-  const mapTitle = (sensorEntry.mapTitleText as unknown) as {
+  const mapTitle = sensorEntry.mapTitleText as unknown as {
     incidenceCumulative: string;
     ratioCumulative: string;
     incidence: string;
@@ -306,7 +310,7 @@ export function extendSensorEntry(
 
   const full: Sensor & RegularOldSensor = Object.assign(ensureSensorStructure(sensorEntry), {
     key,
-    tooltipText: sensorEntry.tooltipText || ((mapTitle as unknown) as string),
+    tooltipText: sensorEntry.tooltipText || (mapTitle as unknown as string),
     isCount,
     getType: (options: CasesOrDeathOptions) => getType(sensorEntry, options),
     isCasesOrDeath: false as const,
@@ -316,7 +320,7 @@ export function extendSensorEntry(
   if (!isCasesOrDeath) {
     return full;
   }
-  const casesOrDeath = (full as unknown) as Sensor & CasesOrDeathOldSensor;
+  const casesOrDeath = full as unknown as Sensor & CasesOrDeathOldSensor;
   casesOrDeath.isCasesOrDeath = true;
   casesOrDeath.casesOrDeathSensors = {} as CasesOrDeathOldSensor['casesOrDeathSensors'];
   casesOrDeath.mapTitleText =
@@ -371,7 +375,7 @@ export function extendSensorEntry(
  */
 export const regularSignalMetaDataGeoTypeCandidates = ['county', 'msa'];
 
-const defaultSensors = (descriptions as unknown) as (Partial<SensorEntry> & {
+const defaultSensors = descriptions as unknown as (Partial<SensorEntry> & {
   name: string;
   id: string;
   signal: string;
@@ -393,6 +397,22 @@ export const sensorList: SensorEntry[] = (() => {
 })();
 
 export const sensorMap = new Map(sensorList.map((s) => [s.key, s]));
+
+export function resolveSensorWithAliases(sensor: string | undefined | null, defaultValue: string): string {
+  if (sensor && sensorMap.has(sensor)) {
+    return sensor;
+  }
+  if (!sensor) {
+    return defaultValue;
+  }
+  // check for aliases
+  for (const s of sensorList) {
+    if (s.linkFrom && s.linkFrom.includes(sensor)) {
+      return s.key;
+    }
+  }
+  return defaultValue;
+}
 
 const sensorTypes = [
   {

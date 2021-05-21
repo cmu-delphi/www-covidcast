@@ -143,7 +143,7 @@ function loadRegularSignal(
     updateStatsMap(sEntry.key, matchedMeta, statsMap);
     return;
   }
-  const localEntry = (sEntry as unknown) as LocalSensorEntry;
+  const localEntry = sEntry as unknown as LocalSensorEntry;
   // If no metadata, use information from sensors
   // Used for testing new data
   timeMap.set(sEntry.key, [localEntry.minTime, localEntry.maxTime]);
@@ -177,7 +177,7 @@ function loadCountSignal(
       updateStatsMap(statsKey, matchedMeta, statsMap);
       return;
     }
-    const localEntry = (sEntry as unknown) as LocalSensorEntry;
+    const localEntry = sEntry as unknown as LocalSensorEntry;
     // If no metadata, use information from sensors
     // Used for testing new data
     timeMap.set(sEntry.key, [localEntry.minTime, localEntry.maxTime]);

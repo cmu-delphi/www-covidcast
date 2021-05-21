@@ -27,7 +27,7 @@ export function resolveInitialState(): IState {
     return BASE_STATE;
   }
   try {
-    const s = (JSON.parse(decompressFromEncodedURIComponent(location.hash.slice(1))!) as unknown) as IState;
+    const s = JSON.parse(decompressFromEncodedURIComponent(location.hash.slice(1))!) as unknown as IState;
     return {
       ...BASE_STATE,
       ...s,
