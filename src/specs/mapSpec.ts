@@ -421,6 +421,7 @@ function genBaseSpec(
     },
     projection: {
       type: 'albersUsaTerritories' as unknown as 'albersUsa', // hack since custom projection
+      precision: 0,
     },
     datasets: {
       values: [],
