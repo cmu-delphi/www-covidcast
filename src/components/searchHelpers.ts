@@ -2,6 +2,7 @@ export interface SearchItem<T> {
   keywords: string;
   label: string;
   item: T;
+  key: string;
 }
 
 export function toSearchItems<T>(
@@ -9,13 +10,14 @@ export function toSearchItems<T>(
   keywordFunction: (v: T) => string,
   labelFunction: (v: T) => string,
 ): SearchItem<T>[] {
-  return items.map((item) => ({
+  return items.map((item, i) => ({
     // keywords representation of the item
     keywords: keywordFunction(item).toLowerCase().trim(),
     // item label
     label: labelFunction(item),
     // store reference to the original item
     item,
+    key: `${labelFunction(item)}-${i}`,
   }));
 }
 

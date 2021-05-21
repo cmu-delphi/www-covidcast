@@ -2,7 +2,6 @@ import { timeDay, timeMonth, timeWeek } from 'd3-time';
 import { formatAPITime, addMissing, fitRange, parseAPITime, EpiDataRow } from '../data';
 import { nationInfo } from '../data/regions';
 import { currentDate, currentSensor, selectByInfo } from '.';
-import { formatValue } from '../formats';
 import { scaleSequential } from 'd3-scale';
 import { scrollToTop } from '../util';
 import type { RegionInfo as Region, RegionLevel, RegionArea, CountyInfo } from '../data/regions';
@@ -137,7 +136,7 @@ export class SensorParam {
     this.highValuesAre = sensor.highValuesAre;
     this.is7DayAverage = sensor.is7DayAverage;
     this.valueUnit = this.is7DayAverage ? '7-day average' : 'value';
-    this.formatValue = formatValue;
+    this.formatValue = (v, e) => sensor.formatValue(v, e);
     this.unit = sensor.unit;
     this.unitShort = this.isPer100K ? 'per 100k' : this.isPercentage ? 'per 100' : this.unit;
     this.unitHTML = this.isPer100K

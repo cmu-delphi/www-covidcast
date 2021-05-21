@@ -4,8 +4,9 @@ import { parseAPITime } from './utils';
 import type { RegionLevel } from './regions';
 import { isCountSignal } from './signals';
 import { ALL_TIME_FRAME, TimeFrame } from './TimeFrame';
-import { Sensor, units, colorScales, formatter, vegaColorScales, yAxis } from './sensor';
+import { Sensor, units, colorScales, vegaColorScales, yAxis } from './sensor';
 import { getDataSource } from './dataSourceLookup';
+import { formatSpecifiers, formatter } from '../formats';
 
 function toKey(source: string, signal: string) {
   return `${source}-${signal}`;
@@ -124,6 +125,7 @@ function deriveMetaSensors(metadata: EpiDataMetaInfo[]): {
       links: [],
       credits: 'We are happy for you to use this data in products and publications.',
       formatValue: formatter[m.format],
+      formatSpecifier: formatSpecifiers[m.format],
     };
     byKey.set(s.key, [parsed, s]);
     return s;

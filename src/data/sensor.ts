@@ -1,4 +1,4 @@
-import { formatRawValue, formatValue, formatPercentage, formatCount } from '../formats';
+import { formatter, formatSpecifiers } from '../formats';
 import { interpolateBuPu, interpolateYlGnBu, interpolateYlOrRd } from 'd3-scale-chromatic';
 import { getDataSource } from './dataSourceLookup';
 import type { RegionLevel } from './regions';
@@ -53,7 +53,9 @@ export interface Sensor {
   readonly highValuesAre: SignalHighValuesAre;
   readonly is7DayAverage: boolean;
   readonly hasStdErr: boolean;
-  formatValue(v: number, enforceSign?: boolean): string;
+
+  readonly formatSpecifier: string;
+  formatValue(v?: number | null, enforceSign?: boolean): string;
 
   readonly highlight?: string[];
 }
@@ -83,13 +85,6 @@ export const vegaColorScales = {
   neutral: 'bluepurple',
 };
 
-export const formatter = {
-  raw: formatRawValue,
-  raw_count: formatCount,
-  fraction: formatRawValue,
-  percent: formatPercentage,
-  per100k: formatValue,
-};
 export const yAxis = {
   raw: 'arbitrary scale',
   raw_count: 'people',
@@ -139,6 +134,7 @@ export function ensureSensorStructure(
     highValuesAre,
     is7DayAverage: false,
     hasStdErr: false,
+    formatSpecifier: formatSpecifiers[format] || formatSpecifiers.raw,
     formatValue: formatter[format] || formatter.raw,
 
     // keep the original values

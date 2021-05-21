@@ -100,6 +100,7 @@
       color: getLevelInfo(region.level).color,
       domain: timeFrame.domain,
       zero,
+      valueFormat: sensor.value.formatSpecifier,
       xTitle: sensor.xAxis,
       title: [
         `${cumulative ? 'Cumulative ' : ''}${sensor.name} in ${region.displayName}`,
@@ -111,13 +112,13 @@
       autoAlignOffset: 60,
       paddingTop: 80,
     };
-    const valueTooltip = `cachedNumber(datum.value, '.1f') + `;
+    const valueTooltip = `cachedNumber(datum.value, '${sensor.value.formatSpecifier}') + `;
     const dateTooltip = `' @ ' + cachedTime(datum.date_value, '%a %b %d')`;
-    const rawTooltip = `' (raw: ' + cachedNumber(datum.raw, '.1f')`;
+    const rawTooltip = `' (raw: ' + cachedNumber(datum.raw, '${sensor.value.formatSpecifier}')`;
     if (raw) {
       if (cumulative) {
         options.paddingLeft = 52; // more space for larger numbers
-        options.infoLabelExpr = `${valueTooltip} ${rawTooltip} + ', cum: ' + cachedNumber(datum.cumulative, '.1f') + ')' + ${dateTooltip}`;
+        options.infoLabelExpr = `${valueTooltip} ${rawTooltip} + ', cum: ' + cachedNumber(datum.cumulative, '${sensor.value.formatSpecifier}') + ')' + ${dateTooltip}`;
         return generateCumulativeBarSpec(options);
       }
       options.infoLabelExpr = `${valueTooltip} ${rawTooltip} + ')' + ${dateTooltip}`;
