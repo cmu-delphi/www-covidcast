@@ -251,7 +251,7 @@ export function getCountiesOfState(state: RegionInfo): RegionInfo[] {
  * returns the state of a county
  */
 export function getStateOfCounty(county: CountyInfo): RegionInfo | null {
-  if (county.level !== 'county' || county.level !== levelMegaCountyId) {
+  if (county.level !== 'county' && county.level !== levelMegaCountyId) {
     return null;
   }
   return getInfoByName(county.state, 'state')!;
