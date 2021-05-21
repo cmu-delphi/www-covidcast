@@ -389,7 +389,7 @@
   <div class="uk-dropdown uk-dropdown-bottom-left search-box-list" class:uk-open={opened} bind:this={listRef}>
     <ul class="uk-nav uk-dropdown-nav">
       {#if filteredListItems && filteredListItems.length > 0}
-        {#each filteredListItems as listItem, i (listItem.label)}
+        {#each filteredListItems as listItem, i (listItem.key)}
           <li class:uk-active={i + matchingStartIndex === highlightMatchingIndex}>
             <slot
               name="entry"
