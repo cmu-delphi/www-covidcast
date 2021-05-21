@@ -102,6 +102,10 @@ export interface Sensor {
   formatValue(v: number, enforceSign?: boolean): string;
 
   readonly highlight?: string[];
+  /**
+   * optional list of source:key pairs with sensor that should also be resolved to this one
+   */
+  readonly linkFrom?: string[];
 }
 
 function determineHighValuesAre(sensor: {
@@ -393,6 +397,22 @@ export const sensorList: SensorEntry[] = (() => {
 })();
 
 export const sensorMap = new Map(sensorList.map((s) => [s.key, s]));
+
+export function resolveSensorWithAliases(sensor: string | undefined | null, defaultValue: string): string {
+  if (sensor && sensorMap.has(sensor)) {
+    return sensor;
+  }
+  if (!sensor) {
+    return defaultValue;
+  }
+  // check for aliases
+  for (const s of sensorList) {
+    if (s.linkFrom && s.linkFrom.includes(sensor)) {
+      return s.key;
+    }
+  }
+  return defaultValue;
+}
 
 const sensorTypes = [
   {
