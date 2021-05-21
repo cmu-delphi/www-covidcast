@@ -48,6 +48,7 @@ Links:
 Name: People Wearing Masks
 Id: fb-survey
 Signal: smoothed_wwearing_mask_7d
+LinkFrom: [fb-survey-smoothed_wearing_mask_7d, fb-survey-smoothed_wearing_mask_5d]
 RawSignal: null
 Type: public
 Levels: [county, msa, state, hrr, nation]
@@ -80,6 +81,7 @@ Links:
 Name: Vaccine Acceptance
 Id: fb-survey
 Signal: smoothed_wcovid_vaccinated_or_accept
+LinkFrom: [fb-survey-smoothed_wcovid_vaccinated_or_accept]
 RawSignal: null
 Type: public
 Levels: [county, msa, state, hrr, nation]
