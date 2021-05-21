@@ -214,12 +214,14 @@ function genLevelLayer({
   domain,
   initialRegion,
   interactiveHighlight = false,
+  valueFormat,
 }: {
   strokeWidth?: number;
   scheme?: string;
   domain?: [number, number];
   initialRegion?: string;
   interactiveHighlight?: boolean;
+  valueFormat?: string;
 } = {}): NormalizedUnitSpec {
   return {
     mark: {
@@ -261,6 +263,7 @@ function genLevelLayer({
           },
           titleAnchor: 'end',
           labelLimit: 30,
+          format: valueFormat,
           tickMinStep: 0.1,
           titleFontWeight: 'normal',
           gradientLength: 280,

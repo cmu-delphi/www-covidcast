@@ -26,7 +26,7 @@
 
   export function toEntry(sensor, manager, level, index) {
     const param = new SensorParam(sensor, manager);
-    const stats = param.stats(level);
+    const stats = param.manager.getStats(sensor, level);
     const domain = param.domain(level);
     return {
       index,
@@ -144,6 +144,7 @@
               grid: false,
               title: null,
               orient: i > 0 ? 'right' : 'left',
+              format: entry.sensor.formatSpecifier,
               offset:
                 i > 0 && i < entries.length - 1
                   ? {

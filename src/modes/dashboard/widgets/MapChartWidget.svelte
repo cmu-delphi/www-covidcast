@@ -77,6 +77,7 @@
       subTitle: sensor.unit,
       initialRegion: highlightToRegionsImpl(level, highlight),
       paddingTop: 60,
+      valueFormat: sensor.value.formatSpecifier,
       interactiveHighlight: true,
     };
     const byLevel = {
