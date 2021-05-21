@@ -118,9 +118,14 @@ function commonHeatMapSpec(
 export function generateValueHeatMapSpec(options: BackfillOptions): TopLevelSpec {
   const spec = commonHeatMapSpec(options, {
     scale: {
-      domain: [0, 1],
+      domain: [0, 1.25],
+      domainMid: 1,
       clamp: true,
       nice: false,
+      scheme: 'purpleorange',
+      // scheme: {
+      //   expr: ``
+      // }
     },
   });
   spec.layer.push({
