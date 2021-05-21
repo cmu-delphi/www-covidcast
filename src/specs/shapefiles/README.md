@@ -38,6 +38,12 @@ mapshaper -filter-fields fields=id target=msa
 mapshaper -filter-fields fields=id target=hrr
 ```
 
+## export high res county
+```sh
+mapshaper -o format=topojson id-field=id target=county county_highres.json
+mapshaper -o format=topojson id-field=id target=state state_highres.json
+```
+
 ## simplify
 ```sh
 mapshaper -simplify percentage=10% target=state
