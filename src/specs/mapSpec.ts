@@ -454,6 +454,11 @@ function genBaseSpec(
 function countyJSON() {
   return import(/* webpackChunkName: 'shape-county' */ './shapefiles/county.json').then((r) => r.default);
 }
+function countyHighResJSON() {
+  return import(/* webpackChunkName: 'shape-county-highres' */ './shapefiles/county_highres.json').then(
+    (r) => r.default,
+  );
+}
 function hrrJSON() {
   return import(/* webpackChunkName: 'shape-hrr' */ './shapefiles/hrr.json').then((r) => r.default);
 }
@@ -465,6 +470,9 @@ function nationJSON() {
 }
 function stateJSON() {
   return import(/* webpackChunkName: 'shape-state' */ './shapefiles/state.json').then((r) => r.default);
+}
+function stateHighResJSON() {
+  return import(/* webpackChunkName: 'shape-state-highres' */ './shapefiles/state_highres.json').then((r) => r.default);
 }
 function msaJSON() {
   return import(/* webpackChunkName: 'shape-msa' */ './shapefiles/msa.json').then((r) => r.default);
@@ -606,7 +614,7 @@ export function generateCountiesOfStateSpec(
   { withStates = false, ...options }: CommonParams & { withStates?: boolean } = {},
 ): TopLevelSpec {
   const level = 'county';
-  const topoJSON = countyJSON();
+  const topoJSON = countyHighResJSON();
 
   const spec = genBaseSpec(level, topoJSON, options);
 
@@ -626,7 +634,7 @@ export function generateCountiesOfStateSpec(
 
   spec.datasets!.nation = nationJSON();
   spec.layer.push(genMissingLayer());
-  spec.datasets!.state = stateJSON();
+  spec.datasets!.state = stateHighResJSON();
 
   if (withStates) {
     spec.projection!.fit = {
@@ -655,7 +663,7 @@ export function generateCountiesOfStateSpec(
  */
 export function generateRelatedCountySpec(county: RegionInfo, options: CommonParams = {}): TopLevelSpec {
   const level = 'county';
-  const topoJSON = countyJSON();
+  const topoJSON = countyHighResJSON();
 
   const spec = genBaseSpec(level, topoJSON, options);
 
@@ -675,7 +683,7 @@ export function generateRelatedCountySpec(county: RegionInfo, options: CommonPar
   // };
   spec.datasets!.nation = nationJSON();
   spec.layer.push(genMissingLayer());
-  spec.datasets!.state = stateJSON();
+  spec.datasets!.state = stateHighResJSON();
   spec.layer.push(genMegaLayer());
   spec.layer.push(genLevelLayer(options));
   spec.layer.push(genStateBorderLayer({ strokeWidth: 2 }));

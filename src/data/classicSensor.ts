@@ -32,6 +32,7 @@ export interface RegularOldSensor {
   tooltipText: string | ((options?: CasesOrDeathOptions) => string);
   mapTitleText: string | ((options?: CasesOrDeathOptions) => string);
   plotTitleText: string;
+  linkFrom?: string[];
 }
 
 export interface CasesOrDeathOldSensor {
@@ -44,6 +45,7 @@ export interface CasesOrDeathOldSensor {
   tooltipText: (options?: CasesOrDeathOptions) => string;
   mapTitleText: (options?: CasesOrDeathOptions) => string;
   plotTitleText: string;
+  linkFrom?: string[];
 }
 
 export declare type SensorEntry = Sensor & (RegularOldSensor | CasesOrDeathOldSensor);

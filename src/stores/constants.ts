@@ -18,6 +18,22 @@ export const sensorList = defaultSensors.map(extendSensorEntry);
 
 export const sensorMap = new Map(sensorList.map((s) => [s.key, s]));
 
+export function resolveSensorWithAliases(sensor: string | undefined | null, defaultValue: string): string {
+  if (sensor && sensorMap.has(sensor)) {
+    return sensor;
+  }
+  if (!sensor) {
+    return defaultValue;
+  }
+  // check for aliases
+  for (const s of sensorList) {
+    if (s.linkFrom && s.linkFrom.includes(sensor)) {
+      return s.key;
+    }
+  }
+  return defaultValue;
+}
+
 export const groupedSensorList = sensorTypes
   .map((sensorType) => ({
     ...sensorType,
