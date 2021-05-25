@@ -4,7 +4,7 @@
   import { getContext } from 'svelte';
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
   import { getLevelInfo, stats } from '../../../stores';
-  import { formatDateISO, formatDateYearWeekdayAbbr } from '../../../formats';
+  import { formatDateISO, formatDateYearDayOfWeekAbbr } from '../../../formats';
   import RegionMapTooltip from '../../../blocks/RegionMapTooltip.svelte';
   import {
     generateStateSpec,
@@ -73,7 +73,10 @@
     const options = {
       domain: sensor.domain($stats, level),
       scheme: sensor.value.vegaColorScale,
-      title: [`${sensor.name} in US ${getLevelInfo(level).labelPlural}`, `on ${formatDateYearWeekdayAbbr(date.value)}`],
+      title: [
+        `${sensor.name} in US ${getLevelInfo(level).labelPlural}`,
+        `on ${formatDateYearDayOfWeekAbbr(date.value)}`,
+      ],
       subTitle: sensor.unit,
       initialRegion: highlightToRegionsImpl(level, highlight),
       paddingTop: 60,

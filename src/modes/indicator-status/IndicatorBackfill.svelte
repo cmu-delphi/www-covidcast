@@ -17,10 +17,10 @@
   } from './store';
   import DownloadMenu from '../../components/DownloadMenu.svelte';
   import {
-    backFillWeekdayDistribution,
+    backFillDayOfWeekDistribution,
     generateChangeHeatMapSpec,
     generateValueHeatMapSpec,
-    backFillWeekdayFrequency,
+    backFillDayOfWeekFrequency,
   } from './backfillSpec';
   import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
   import Search from '../../components/Search.svelte';
@@ -58,14 +58,14 @@
       });
   $: data = loadBackFillProfile(indicator, $currentRegionInfo || nationInfo, window, $anchorLag);
 
-  $: weekdaySpec = backFillWeekdayDistribution({
+  $: dayOfWeekSpec = backFillDayOfWeekDistribution({
     title: `${indicator.name}: ${$valueLabel}`,
-    subTitle: `per Lag (Reporting Date - Reference Date) per weekday`,
+    subTitle: `per Lag (Reporting Date - Reference Date) per day of week`,
     ...options,
   });
-  let vegaRefWeekday = undefined;
+  let vegaRefDayOfWeek = undefined;
 
-  $: weekdayBoxplotSpec = backFillWeekdayFrequency({
+  $: dayOfWeekBoxplotSpec = backFillDayOfWeekFrequency({
     title: `${indicator.name}: ${$valueLabel}`,
     subTitle: `Lag Distribution to reach 90%`,
     ...options,
@@ -172,25 +172,26 @@
   </div>
 </div>
 <AboutSection details className="uk-margin-small-top uk-margin-small-bottom">
-  <h3 slot="header" class="mobile-h3">Weekday Distributions</h3>
+  <h3 slot="header" class="mobile-h3">DayOfWeek Distributions</h3>
   <div class="desc">
-    In order to highlight weekday changes within reported values of the selected indicator the following charts are
-    stratified by weekday. The horizontal axis shows the lag while the vertical axis shows the fraction of value or the
-    day-to-day change based on the selection of the. Both values are described before. The line chart shows the median
-    fraction of value at the selected anchor lag. The vertical blue axis is showing the selected anchor date. This chart
-    gives insights on whether there are interesting weekday differences in the indicator.
+    In order to highlight day of week changes within reported values of the selected indicator the following charts are
+    stratified by day of week. The horizontal axis shows the lag while the vertical axis shows the fraction of value or
+    the day-to-day change based on the selection of the. Both values are described before. The line chart shows the
+    median fraction of value at the selected anchor lag. The vertical blue axis is showing the selected anchor date.
+    This chart gives insights on whether there are interesting day of week differences in the indicator.
     {#if !$isRelative}
-      The second chart shows a similar view to highlight on the weekday distribution but focuses on the distribution per
-      weekday when the first reported lag reached 90% of the fraction of the target anchor lag value. This illustrates
-      whether the anchor lag is a fitting choice when the box-plots are clearly below the anchor lag line in blue.
+      The second chart shows a similar view to highlight on the day of week distribution but focuses on the distribution
+      per day of week when the first reported lag reached 90% of the fraction of the target anchor lag value. This
+      illustrates whether the anchor lag is a fitting choice when the box-plots are clearly below the anchor lag line in
+      blue.
     {/if}
   </div>
 </AboutSection>
 <div class="grid-1 {$isRelative ? 'grid-span-12' : 'grid-span-6'} uk-margin-top">
   <div class="chart-300">
-    <Vega bind:this={vegaRefWeekday} spec={weekdaySpec} {data} />
+    <Vega bind:this={vegaRefDayOfWeek} spec={dayOfWeekSpec} {data} />
     <DownloadMenu
-      vegaRef={vegaRefWeekday}
+      vegaRef={vegaRefDayOfWeek}
       {data}
       absolutePos="bottom: -20px"
       fileName={title.replace(/\s+/gm, '_')}
@@ -201,7 +202,7 @@
 {#if !$isRelative}
   <div class="grid-7 grid-span-6 uk-margin-top">
     <div class="chart-300">
-      <Vega bind:this={vegaRefBoxplot} spec={weekdayBoxplotSpec} {data} />
+      <Vega bind:this={vegaRefBoxplot} spec={dayOfWeekBoxplotSpec} {data} />
       <DownloadMenu
         vegaRef={vegaRefBoxplot}
         {data}

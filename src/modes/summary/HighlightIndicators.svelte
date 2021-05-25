@@ -4,7 +4,7 @@
   import FancyHeader from '../../components/FancyHeader.svelte';
   import TrendIndicator from '../../components/TrendIndicator.svelte';
   import { SensorParam } from '../../stores/params';
-  import { formatDateWeekday } from '../../formats';
+  import { formatDateDayOfWeek } from '../../formats';
   import SensorUnit from '../../components/SensorUnit.svelte';
   import MaxDateHint from '../../blocks/MaxDateHint.svelte';
 
@@ -36,7 +36,7 @@
 <FancyHeader sub="Indicators">Key</FancyHeader>
 
 <p>
-  On {formatDateWeekday(date.value)}
+  On {formatDateDayOfWeek(date.value)}
   {#if highlightSensors.length > 0}
     <MaxDateHint sensor={highlightSensors[0].sensor.value} level={region.level} suffix="," />
   {:else}

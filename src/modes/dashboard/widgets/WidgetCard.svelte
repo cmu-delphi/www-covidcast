@@ -19,7 +19,7 @@
       ? date
       : date instanceof TimeFrame
       ? `between ${formatDateLocal(date.min)} and ${formatDateLocal(date.max)}`
-      : `on ${formatDateYearWeekdayAbbr(date.value)}`;
+      : `on ${formatDateYearDayOfWeekAbbr(date.value)}`;
   }
 
   function gridToStyle(grid) {
@@ -51,7 +51,7 @@
   import cogIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/cog.svg';
   import expandAltIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/expand-alt.svg';
   import compressAltIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/compress-alt.svg';
-  import { formatDateLocal, formatDateYearWeekdayAbbr } from '../../../formats';
+  import { formatDateLocal, formatDateYearDayOfWeekAbbr } from '../../../formats';
   import { TimeFrame } from '../../../stores/params';
   import { createEventDispatcher } from 'svelte';
 

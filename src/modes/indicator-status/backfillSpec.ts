@@ -228,7 +228,7 @@ export function injectClassification(spec: TopLevelSpec): void {
   ];
 }
 
-export function backFillWeekdayDistribution({
+export function backFillDayOfWeekDistribution({
   dateField,
   dateLabel,
   title,
@@ -252,10 +252,10 @@ export function backFillWeekdayDistribution({
     transform: [
       {
         calculate: `['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day(datum.${dateField})]`,
-        as: 'weekday',
+        as: 'dayOfWeek',
       },
       {
-        groupby: ['lag', 'weekday'],
+        groupby: ['lag', 'dayOfWeek'],
         aggregate: [
           {
             op: 'median',
@@ -309,7 +309,7 @@ export function backFillWeekdayDistribution({
             },
           },
           color: {
-            field: 'weekday',
+            field: 'dayOfWeek',
             type: 'nominal',
             scale: {
               domain: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
@@ -373,7 +373,7 @@ export function backFillWeekdayDistribution({
   return spec;
 }
 
-export function backFillWeekdayFrequency({
+export function backFillDayOfWeekFrequency({
   dateField,
   dateLabel,
   title,
@@ -425,7 +425,7 @@ export function backFillWeekdayFrequency({
       },
       {
         calculate: `['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day(datum.${dateField})]`,
-        as: 'weekday',
+        as: 'dayOfWeek',
       },
     ],
 
@@ -433,7 +433,7 @@ export function backFillWeekdayFrequency({
       {
         encoding: {
           x: {
-            field: 'weekday',
+            field: 'dayOfWeek',
             type: 'nominal',
             scale: {
               type: 'band',
