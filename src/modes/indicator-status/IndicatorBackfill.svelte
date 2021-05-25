@@ -172,7 +172,7 @@
   </div>
 </div>
 <AboutSection details className="uk-margin-small-top uk-margin-small-bottom">
-  <h3 slot="header" class="mobile-h3">DayOfWeek Distributions</h3>
+  <h3 slot="header" class="mobile-h3">Day of Week Distributions</h3>
   <div class="desc">
     In order to highlight day of week changes within reported values of the selected indicator the following charts are
     stratified by day of week. The horizontal axis shows the lag while the vertical axis shows the fraction of value or
