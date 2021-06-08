@@ -132,7 +132,7 @@
     });
   });
 
-  let configureParams = false;
+  let configureParams = true;
 
   function updateTitle(e) {
     const title = e.currentTarget.value;
@@ -165,7 +165,8 @@
       <button
         class="widget-edit-button uk-icon-button"
         type="button"
-        title="Edit Configuration"
+        class:active-button={configureParams}
+        title="Show/Hide Parameters"
         uk-icon="cog"
         on:click={() => (configureParams = !configureParams)}
       />
@@ -217,6 +218,10 @@
     border-top: 1px solid #d3d4d8;
     border-right: 1px solid #d3d4d8;
     padding: 1em;
+  }
+
+  .active-button {
+    background: #ebebeb;
   }
 
   .overlay-container :global(input[type='text'], input[type='date'], select) {
