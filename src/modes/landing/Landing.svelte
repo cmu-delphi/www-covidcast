@@ -1,4 +1,5 @@
 <script>
+  /*global __VERSION__*/
   import Search from '../../components/Search.svelte';
   import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
   import { currentRegionInfo, groupedSensorList, recentRegionInfos, selectByInfo, switchToMode } from '../../stores';
@@ -28,6 +29,8 @@
   function switchCorrelations() {
     switchToMode(modeByID.correlation);
   }
+
+  const version = __VERSION__;
 </script>
 
 <div class="uk-container content-grid root mobile-root landing-banner">
@@ -146,7 +149,13 @@
       <SurveyStats className="uk-text-center mobile-two-col__highlight" />
     </div>
 
-    <p>In collaboration with Facebook, Google.org, Change Healthcare, and Quidel.</p>
+    <p>
+      <a href="https://github.com/cmu-delphi/www-covidcast/releases/v{version}/">COVIDcast (v{version})</a> &copy; 2021
+      Delphi Group. COVIDcast is an open-source project under the
+      <a href="https://github.com/cmu-delphi/www-covidcast/blob/dev/LICENSE">MIT-license</a>
+      available at <a href="https://github.com/cmu-delphi/www-covidcast">GitHub</a>. Developed by the Delphi Team in
+      collaboration with Facebook, Google.org, Change Healthcare, and Quidel.
+    </p>
   </div>
 </div>
 
