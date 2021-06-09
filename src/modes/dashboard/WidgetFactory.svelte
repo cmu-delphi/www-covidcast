@@ -9,6 +9,7 @@
   import RegionTableWidget from './widgets/RegionTableWidget.svelte';
   import DateTableWidget from './widgets/DateTableWidget.svelte';
   import SensorTableWidget from './widgets/SensorTableWidget.svelte';
+  import AnomaliesWidget from './widgets/AnomaliesWidget.svelte';
   import {
     resolveDate,
     resolveRegion,
@@ -142,6 +143,17 @@
 {:else if c.type === 'datepcp'}
   <DateParallelCoordinatesWidget
     sensors={resolveSensors(sensor, c.config.sensors)}
+    timeFrame={resolveTimeFrame(sensor, date, c.config.timeFrame)}
+    region={resolveRegion(region, c.config.region)}
+    bind:highlight
+    on:action={trackAction}
+    on:state={trackState}
+    id={c.id}
+    initialState={c.state}
+  />
+{:else if c.type === 'anomalies'}
+  <AnomaliesWidget
+    sensor={resolveSensor(sensor, c.config.sensor)}
     timeFrame={resolveTimeFrame(sensor, date, c.config.timeFrame)}
     region={resolveRegion(region, c.config.region)}
     bind:highlight

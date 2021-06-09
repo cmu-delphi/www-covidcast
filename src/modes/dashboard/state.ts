@@ -12,7 +12,8 @@ export type WidgetType =
   | 'kpi'
   | 'trend'
   | 'regionpcp'
-  | 'datepcp';
+  | 'datepcp'
+  | 'anomalies';
 
 export type WidgetFocus = 'time' | 'region' | 'indicator';
 export type WidgetCategory = 'chart' | 'table' | 'simple' | 'advanced';
@@ -104,6 +105,7 @@ export const widgets: readonly Widget[] = [
     'region',
     'timeFrame',
   ]),
+  asWidget('anomalies', 'Data Anomalies', ['time', 'indicator'], 'simple', ['sensor', 'region', 'timeFrame']),
 ];
 
 export function deriveType(id: string): WidgetType {
