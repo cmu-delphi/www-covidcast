@@ -25,7 +25,11 @@
     items={allItems}
     selectedItem={value ? getInfoByName(value) : defaultRegion}
     on:change={(e) => {
-      syncedValue = e.detail.id || '';
+      if (e.detail && e.detail.id) {
+        syncedValue = `${e.detail.id}@${e.detail.level}`;
+      } else {
+        syncedValue = '';
+      }
     }}
   />
 </div>
