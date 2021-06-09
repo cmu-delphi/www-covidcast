@@ -445,10 +445,10 @@ data = covidcast.signal("${sensor ? sensor.id : ''}", "${sensor ? sensor.signal 
             class="code-block"><code>
         {`library(covidcast)
 
-cc_data <- suppressMessages(
-covidcast_signal(data_source = "${sensor ? sensor.id : ''}", signal = "${sensor ? sensor.signal : ''}",
-                 start_day = "${formatDateISO(startDate)}", end_day = "${formatDateISO(endDate)}",
-                 geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`}${usesAsOf ? `, as_of = "${formatDateISO(asOfDate)}"` : ''})
+cc_data <- covidcast_signal(
+  data_source = "${sensor ? sensor.id : ''}", signal = "${sensor ? sensor.signal : ''}",
+  start_day = "${formatDateISO(startDate)}", end_day = "${formatDateISO(endDate)}",
+  geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`}${usesAsOf ? `, as_of = "${formatDateISO(asOfDate)}"` : ''})
 )`}
       </code></pre>
           <p class="description">
