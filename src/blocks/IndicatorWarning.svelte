@@ -1,5 +1,5 @@
 <script>
-  import { formatDateYearWeekdayAbbr } from '../formats';
+  import { formatDateYearDayOfWeekAbbr } from '../formats';
   import { getLevelInfo } from '../stores';
 
   /**
@@ -22,6 +22,6 @@
   </div>
 {:else if sensor.timeFrame.max < date.value}
   <div data-uk-alert class="uk-alert-warning">
-    The indicator "{sensor.name}" is not available for {formatDateYearWeekdayAbbr(date.value)}, yet.
+    The indicator "{sensor.name}" is not available for {formatDateYearDayOfWeekAbbr(date.value)}, yet.
   </div>
 {/if}

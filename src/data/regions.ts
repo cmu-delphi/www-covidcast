@@ -8,7 +8,7 @@ import hhsRaw from './processed/hhs.csv.js';
 export type RegionLevel = 'state' | 'county' | 'msa' | 'hrr' | 'nation' | 'mega-county' | 'hhs';
 export type RegionArea = 'West' | 'Midwest' | 'Northeast' | 'South';
 
-export interface RegionInfo {
+export interface Region {
   readonly name: string;
   readonly displayName: string;
   readonly id: string;
@@ -17,21 +17,23 @@ export interface RegionInfo {
   readonly level: RegionLevel;
 }
 
-export interface StateInfo extends RegionInfo {
+export type RegionInfo = Region;
+
+export interface StateInfo extends Region {
   region: RegionArea;
   postal: string;
 }
 
-export interface CountyInfo extends RegionInfo {
+export interface CountyInfo extends Region {
   region: RegionArea;
   state: string;
 }
 
-export interface HRRInfo extends RegionInfo {
+export interface HRRInfo extends Region {
   state: string;
 }
 
-export interface HHSInfo extends RegionInfo {
+export interface HHSInfo extends Region {
   states: string[];
 }
 

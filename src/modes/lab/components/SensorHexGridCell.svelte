@@ -2,7 +2,7 @@
   import Vega from '../../../components/vega/Vega.svelte';
   import { addMissing, fetchTimeSlice } from '../../../data';
   import { generateLineChartSpec } from '../../../specs/lineSpec';
-  import HexGridCell from './HexGridCell.svelte';
+  import HexGridCell from '../../mobile/components/HexGridCell.svelte';
 
   /**
    * @type {import("../../../stores/constants").SensorEntry}

@@ -2,7 +2,7 @@
   import KPIValue from '../../components/KPIValue.svelte';
   import TrendIndicator from '../../components/TrendIndicator.svelte';
   import { SensorParam } from '../../stores/params';
-  import { formatDateWeekday } from '../../formats';
+  import { formatDateDayOfWeek } from '../../formats';
   import SensorUnit from '../../components/SensorUnit.svelte';
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
   import MaxDateHint from '../../blocks/MaxDateHint.svelte';
@@ -40,7 +40,7 @@
 <IndicatorAnnotations {date} {region} sensor={CASES} range="sparkLine" />
 
 <p>
-  On {formatDateWeekday(date.value)}
+  On {formatDateDayOfWeek(date.value)}
   <MaxDateHint sensor={CASES.value} suffix="," />
   the {CASES.valueUnit}s were:
 </p>

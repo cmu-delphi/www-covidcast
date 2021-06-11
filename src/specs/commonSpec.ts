@@ -1,4 +1,5 @@
 import type { Config, TopLevelSpec } from 'vega-lite';
+import type { DataMixins } from 'vega-lite/build/src/spec/base';
 
 export const commonConfig: Config = {
   customFormatTypes: true,
@@ -13,6 +14,9 @@ export const commonConfig: Config = {
     labelFontSize: 14,
     titleFontWeight: 'normal',
   },
+  legend: {
+    titleFontWeight: 'normal',
+  },
   view: {
     stroke: null,
   },
@@ -20,7 +24,7 @@ export const commonConfig: Config = {
 
 export const CREDIT = 'Delphi Group, delphi.cmu.edu/covidcast';
 
-export const BASE_SPEC: Partial<TopLevelSpec> = {
+export const BASE_SPEC: Partial<TopLevelSpec> & DataMixins = {
   $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
   autosize: {
     type: 'none',

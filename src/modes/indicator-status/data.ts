@@ -1,20 +1,14 @@
 import { timeDay } from 'd3-time';
-import { getIndicatorStatuses } from '../../data/indicatorInfo';
+import { Coverage, getIndicatorStatuses, IndicatorStatus } from '../../data/indicatorInfo';
 import { countyInfo } from '../../data/regions';
 import { TimeFrame } from '../../stores/params';
 
-/**
- * @typedef {import('../../data/indicatorInfo').IndicatorStatus} ExtendedStatus
- * @property {number} latest_lag
- * @property {number} latest_coverage
- */
+export interface ExtendedStatus extends IndicatorStatus {
+  latest_lag: number;
+  latest_coverage: number;
+}
 
-/**
- *
- * @param {Date} latest
- * @param {import('../../data/indicatorInfo').Coverage[]} coverages
- */
-function findLatestCoverage(latest, coverages) {
+function findLatestCoverage(latest: Date, coverages: Coverage[]) {
   if (!coverages) {
     return null;
   }
@@ -25,22 +19,18 @@ function findLatestCoverage(latest, coverages) {
   }
   return latestEntry.count / countyInfo.length;
 }
-/**
- *
- * @param {Date}date
- * @returns {Promise<ExtendedStatus[]>}
- */
-export function loadData(date) {
+
+export function loadData(date: Date): Promise<ExtendedStatus[]> {
   return getIndicatorStatuses().then((rows) =>
     rows.map((r) => ({
       ...r,
       latest_lag: timeDay.count(r.latest_time_value, date),
-      latest_coverage: findLatestCoverage(r.latest_time_value, r.coverage.county),
+      latest_coverage: findLatestCoverage(r.latest_time_value, r.coverage.county)!,
     })),
   );
 }
 
-export function determineDomain(data) {
+export function determineDomain(data: IndicatorStatus[]): TimeFrame {
   let min = Number.POSITIVE_INFINITY;
   let max = Number.NEGATIVE_INFINITY;
   if (data.length === 0) {

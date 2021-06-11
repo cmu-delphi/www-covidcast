@@ -25,7 +25,7 @@
   } from '../../../specs/lineSpec';
   import { annotationManager, getLevelInfo } from '../../../stores';
   import { combineSignals } from '../../../data/utils';
-  import { formatDateISO, formatDateShortWeekdayAbbr, formatDateYearWeekdayAbbr } from '../../../formats';
+  import { formatDateISO, formatDateYearDayOfWeekAbbr } from '../../../formats';
   import { WidgetHighlight } from '../highlight';
   import isEqual from 'lodash-es/isEqual';
   import { createEventDispatcher } from 'svelte';
@@ -104,7 +104,7 @@
       xTitle: sensor.xAxis,
       title: [
         `${cumulative ? 'Cumulative ' : ''}${sensor.name} in ${region.displayName}`,
-        `between ${formatDateYearWeekdayAbbr(timeFrame.min)} and ${formatDateShortWeekdayAbbr(timeFrame.max)}`,
+        `between ${formatDateYearDayOfWeekAbbr(timeFrame.min)} and ${formatDateYearDayOfWeekAbbr(timeFrame.max)}`,
       ],
       subTitle: sensor.unit,
       highlightRegion: false,

@@ -14,7 +14,7 @@
   import RegionDatePicker from '../../components/RegionDatePicker.svelte';
   import { currentRegionInfo, currentSensorEntry, currentDateObject } from '../../stores';
   import { SensorParam, DateParam, RegionParam } from '../../stores/params';
-  import { formatDateWeekday } from '../../formats';
+  import { formatDateDayOfWeek } from '../../formats';
   import { afterUpdate } from 'svelte';
   import { scrollIntoView } from '../../util';
   import IndicatorWarning from '../../blocks/IndicatorWarning.svelte';
@@ -66,7 +66,7 @@
       <IndicatorWarning {sensor} {date} {region} />
 
       <p>
-        On {formatDateWeekday(date.value)}
+        On {formatDateDayOfWeek(date.value)}
         <MaxDateHint sensor={sensor.value} suffix="," />
         the {sensor.valueUnit} was:
       </p>

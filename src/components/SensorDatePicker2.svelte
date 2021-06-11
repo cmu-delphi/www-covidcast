@@ -4,7 +4,7 @@
   import arrowRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-circle-right.svg';
   import calendarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/calendar.svg';
   import { metaDataManager } from '../stores';
-  import { formatDateShortWeekdayAbbr, formatDateYearWeekdayAbbr } from '../formats';
+  import { formatDateShortDayOfWeekAbbr, formatDateYearDayOfWeekAbbr } from '../formats';
   import { timeDay } from 'd3-time';
 
   /**
@@ -39,7 +39,7 @@
       bind:selected={value}
       start={timeFrame.min}
       end={timeFrame.max}
-      formattedSelected={formatDateShortWeekdayAbbr(value)}
+      formattedSelected={formatDateShortDayOfWeekAbbr(value)}
     >
       <button
         aria-label="selected date"
@@ -50,7 +50,7 @@
         <span class="selected-date-icon">
           {@html calendarIcon}
         </span>
-        <span>{formatDateShortWeekdayAbbr(value)}</span>
+        <span>{formatDateShortDayOfWeekAbbr(value)}</span>
       </button>
       <svelte:fragment slot="footer">
         {#if info}
@@ -60,9 +60,9 @@
               on:click={() => (value = info.maxTime)}
               class="uk-link-muted"
             >
-              {formatDateYearWeekdayAbbr(info.maxTime)}
+              {formatDateYearDayOfWeekAbbr(info.maxTime)}
             </button>
-            updated on <span class="uk-text-nowrap">{formatDateYearWeekdayAbbr(info.maxIssue)}</span>.
+            updated on <span class="uk-text-nowrap">{formatDateYearDayOfWeekAbbr(info.maxIssue)}</span>.
           </p>
         {/if}
       </svelte:fragment>
@@ -72,7 +72,7 @@
       <span class="inline-svg-icon">
         {@html calendarIcon}
       </span>
-      <span>{formatDateShortWeekdayAbbr(value)}</span>
+      <span>{formatDateShortDayOfWeekAbbr(value)}</span>
     </button>
   {/if}
   <button

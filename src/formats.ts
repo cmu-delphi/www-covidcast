@@ -7,8 +7,8 @@ const shortNumbers = timeFormat('%-m/%d');
 const iso = timeFormat('%Y-%m-%d');
 const local = timeFormat('%m/%d/%Y');
 const shortAbbrNth = timeFormat('%b %-d');
-const shortWeekdayAbbr = timeFormat('%a, %b %-d');
-const weekday = timeFormat('%A, %B %-d');
+const shortDayOfWeekAbbr = timeFormat('%a, %b %-d');
+const dayOfWeek = timeFormat('%A, %B %-d');
 
 export function formatDateShortNumbers(date?: Date): string {
   return !date ? '?' : shortNumbers(date);
@@ -22,16 +22,16 @@ export function formatDateShortAbbr(date?: Date): string {
   return !date ? '?' : shortAbbr(date);
 }
 
-export function formatDateShortWeekdayAbbr(date?: Date, nthSuffix = false): string {
-  return !date ? '?' : shortWeekdayAbbr(date) + (nthSuffix ? nth(date.getDate()) : '');
+export function formatDateShortDayOfWeekAbbr(date?: Date, nthSuffix = false): string {
+  return !date ? '?' : shortDayOfWeekAbbr(date) + (nthSuffix ? nth(date.getDate()) : '');
 }
 
-export function formatDateWeekday(date?: Date, nthSuffix = false): string {
-  return !date ? '?' : weekday(date) + (nthSuffix ? nth(date.getDate()) : '');
+export function formatDateDayOfWeek(date?: Date, nthSuffix = false): string {
+  return !date ? '?' : dayOfWeek(date) + (nthSuffix ? nth(date.getDate()) : '');
 }
 
-export function formatDateYearWeekdayAbbr(date?: Date, nthSuffix = false): string {
-  return !date ? '?' : formatDateShortWeekdayAbbr(date, nthSuffix) + ` ${date.getFullYear()}`;
+export function formatDateYearDayOfWeekAbbr(date?: Date, nthSuffix = false): string {
+  return !date ? '?' : formatDateShortDayOfWeekAbbr(date, nthSuffix) + ` ${date.getFullYear()}`;
 }
 
 function nth(d: number) {
