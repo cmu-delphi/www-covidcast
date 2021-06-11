@@ -95,11 +95,20 @@ export interface OldSensorLike extends SensorLike {
   casesOrDeathSignals?: Record<keyof EpiDataCasesOrDeathValues, string>;
 }
 
+export interface SensorSource {
+  readonly source: string;
+  readonly name: string;
+  readonly sensors: readonly Sensor[];
+}
+
 function deriveMetaSensors(metadata: EpiDataMetaInfo[]): {
   list: Sensor[];
   map: Map<string, [EpiDataMetaParsedInfo, Sensor]>;
+  sources: SensorSource[];
 } {
   const byKey = new Map<string, [EpiDataMetaParsedInfo, Sensor]>();
+  const bySource = new Map<string, Sensor[]>();
+
   const sensors = metadata.map((m): Sensor => {
     const parsed = parse(m);
     const s: Sensor = {
@@ -128,6 +137,12 @@ function deriveMetaSensors(metadata: EpiDataMetaInfo[]): {
       formatSpecifier: formatSpecifiers[m.format],
     };
     byKey.set(s.key, [parsed, s]);
+    const source = bySource.get(s.id);
+    if (source) {
+      source.push(s);
+    } else {
+      bySource.set(s.id, [s]);
+    }
     return s;
   });
 
@@ -171,16 +186,24 @@ function deriveMetaSensors(metadata: EpiDataMetaInfo[]): {
 
   sensors.sort((a, b) => a.key.localeCompare(b.key));
 
-  return { list: sensors, map: byKey };
+  const sources: SensorSource[] = Array.from(bySource.values(), (v) => ({
+    source: v[0].id,
+    name: v[0].dataSourceName,
+    sensors: v,
+  }));
+
+  return { list: sensors, map: byKey, sources };
 }
 
 export class MetaDataManager {
   private readonly lookup: ReadonlyMap<string, [EpiDataMetaParsedInfo, Sensor]>;
-  public readonly metaSensors: readonly Sensor[];
+  readonly metaSensors: readonly Sensor[];
+  readonly metaSources: readonly SensorSource[];
 
   constructor(metadata: EpiDataMetaInfo[]) {
     const r = deriveMetaSensors(metadata);
     this.metaSensors = r.list;
+    this.metaSources = r.sources;
     this.lookup = r.map;
   }
 
