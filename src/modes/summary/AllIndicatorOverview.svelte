@@ -1,7 +1,7 @@
 <script>
   import FancyHeader from '../../components/FancyHeader.svelte';
   import { sensorList } from '../../stores';
-  import { formatDateYearWeekdayAbbr } from '../../formats';
+  import { formatDateYearDayOfWeekAbbr } from '../../formats';
   import AllIndicatorsText from './AllIndicatorsText.svelte';
 
   /**
@@ -64,7 +64,7 @@
       are
       <strong>have changed</strong> or are <strong>not available</strong>
       for
-      {formatDateYearWeekdayAbbr(date.value)}.
+      {formatDateYearDayOfWeekAbbr(date.value)}.
     {/if}
   {/await}
 </p>

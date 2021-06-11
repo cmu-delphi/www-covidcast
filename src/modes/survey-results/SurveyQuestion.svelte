@@ -4,7 +4,7 @@
   import linkIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/link.svg';
   import HistoryLineChart from '../../blocks/HistoryLineChart.svelte';
   import IndicatorOverview from '../../blocks/IndicatorOverview.svelte';
-  import { formatDateYearWeekdayAbbr } from '../../formats';
+  import { formatDateYearDayOfWeekAbbr } from '../../formats';
   import IndicatorStatsLine from '../../blocks/IndicatorStatsLine.svelte';
   import IndicatorRevisions from './IndicatorRevisions.svelte';
   import WarningBanner from '../../components/WarningBanner.svelte';
@@ -92,7 +92,7 @@
 
     <p>
       On
-      {formatDateYearWeekdayAbbr(date.value, true)}
+      {formatDateYearDayOfWeekAbbr(date.value, true)}
       <MaxDateHint sensor={refSensor} level={region.level} />
       the 7 day average of
       <strong>{sensor.name}</strong>
@@ -102,7 +102,7 @@
     <IndicatorOverview {sensor} {date} {region} {fetcher}>
       The indicator <strong>{sensor.name}</strong> was added in
       <a href={question.addedInWave.link}>{question.addedInWave.name}</a>
-      of the Delphi survey published on {formatDateYearWeekdayAbbr(question.addedInWave.published, true)}.
+      of the Delphi survey published on {formatDateYearDayOfWeekAbbr(question.addedInWave.published, true)}.
     </IndicatorOverview>
 
     <hr />

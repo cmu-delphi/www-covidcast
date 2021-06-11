@@ -1,5 +1,5 @@
 <script>
-  import { formatDateShortWeekdayAbbr } from '../formats';
+  import { formatDateShortDayOfWeekAbbr } from '../formats';
   import SensorValue from '../components/SensorValue.svelte';
 
   export let hidden = false;
@@ -22,7 +22,7 @@
 </script>
 
 <div aria-label="tooltip" class="tooltip" class:hidden>
-  <h5>{formatDateShortWeekdayAbbr(item.date_value)}</h5>
+  <h5>{formatDateShortDayOfWeekAbbr(item.date_value)}</h5>
   <table>
     {#each items as i}
       <tr>
