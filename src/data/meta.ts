@@ -99,6 +99,26 @@ export interface SensorSource {
   readonly source: string;
   readonly name: string;
   readonly sensors: readonly Sensor[];
+
+  readonly reference_signal: string | null;
+}
+
+function guessReferenceSignal(source: string): string | null {
+  const lookup: Record<string, string> = {
+    'fb-survey': 'smoothed_cli',
+    chng: 'smoothed_outpatient_cli',
+    safegraph: 'restaurants_visit_num',
+    quidel: 'covid_ag_smoothed_pct_positive',
+    'google-symptoms': 'anosmia_smoothed_search',
+    'doctor-visits': 'smoothed_cli',
+    'usa-facts': 'confirmed_incidence_num',
+    'jhu-csse': 'confirmed_incidence_num',
+    hhs: 'confirmed_admissions_1d',
+  };
+  if (lookup[source] != null) {
+    return lookup[source];
+  }
+  return null;
 }
 
 function deriveMetaSensors(metadata: EpiDataMetaInfo[]): {
@@ -190,6 +210,7 @@ function deriveMetaSensors(metadata: EpiDataMetaInfo[]): {
     source: v[0].id,
     name: v[0].dataSourceName,
     sensors: v,
+    reference_signal: guessReferenceSignal(v[0].id),
   }));
 
   return { list: sensors, map: byKey, sources };
@@ -225,6 +246,18 @@ export class MetaDataManager {
 
   getSensor(sensor: SensorLike | string): Sensor | null {
     return this.getEntry(sensor)[1];
+  }
+
+  getSensorSource(sensor: SensorLike | string): SensorSource | null {
+    const s = this.getEntry(sensor)[1];
+    if (s) {
+      return this.metaSources.find((d) => d.source === s.id) ?? null;
+    }
+    return null;
+  }
+
+  getReferenceSignal(source: SensorSource): Sensor | null {
+    return source.reference_signal ? this.getSensor({ id: source.source, signal: source.reference_signal }) : null;
   }
 
   getMetaData(sensor: SensorLike | string): EpiDataMetaParsedInfo | null {

@@ -1,32 +1,12 @@
 <script>
   import IndicatorStatusTable from './IndicatorStatusTable.svelte';
-  import { loadData, determineDomain } from './data';
   import AboutSection from '../../components/AboutSection.svelte';
-
-  const date = new Date();
-
-  $: data = loadData(date);
-
-  /**
-   * @type {import('../../stores/params').TimeFrame}
-   */
-  let domain = determineDomain([]);
-  /**
-   * @type {import('./data').ExtendedStatus[]}
-   */
-  let loadedData = [];
-
-  $: {
-    loadedData = [];
-    domain = determineDomain([]);
-    data.then((rows) => {
-      loadedData = rows;
-      domain = determineDomain(rows);
-    });
-  }
+  import { modeByID } from '..';
+  import { currentSensor, switchToMode } from '../../stores';
 
   function switchToDetails(e) {
-    console.log(e.detail);
+    currentSensor.set(`${e.detail.source}-${e.detail.covidcast_signal}`);
+    switchToMode(modeByID['indicator-source']);
   }
 </script>
 
@@ -42,7 +22,7 @@
       <div class="desc">TODO</div>
     </AboutSection>
     <div class="grid-3-11">
-      <IndicatorStatusTable {data} {date} on:select={switchToDetails} {domain} />
+      <IndicatorStatusTable on:select={switchToDetails} />
     </div>
   </div>
 </div>

@@ -21,7 +21,8 @@ export type ModeID =
   | 'indicator'
   | 'landing'
   | 'indicator-status'
-  | 'data-anomalies'
+  | 'indicator-source'
+  | 'indicator-signal'
   | 'correlation'
   | 'dashboard';
 

@@ -334,7 +334,7 @@ export interface CoverageRow {
 
 export function callCoverageAPI(
   signal: SourceSignalPair | readonly SourceSignalPair[],
-  level?: RegionLevel | 'only_county',
+  level?: RegionLevel | 'only-county',
   days?: number,
 ): Promise<CoverageRow[]> {
   const url = new URL(ENDPOINT + '/covidcast/coverage');

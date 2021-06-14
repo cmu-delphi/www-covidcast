@@ -52,6 +52,7 @@ export const modes = [
       import(/* webpackChunkName: 'm-indicator-status' */ './indicator-status/IndicatorStatusOverview.svelte').then(
         (r) => r.default,
       ),
+    waitForReady: true,
   },
   {
     id: 'indicator-source',
@@ -60,6 +61,7 @@ export const modes = [
       import(/* webpackChunkName: 'm-indicator-source' */ './indicator-source/IndicatorSource.svelte').then(
         (r) => r.default,
       ),
+    waitForReady: true,
   },
   {
     id: 'indicator-signal',
@@ -68,6 +70,7 @@ export const modes = [
       import(/* webpackChunkName: 'm-indicator-signal' */ './indicator-signal/IndicatorSignal.svelte').then(
         (r) => r.default,
       ),
+    waitForReady: true,
   },
   // {
   //   id: 'dashboard',
