@@ -1,29 +1,26 @@
 <script>
   import { CSV_SERVER_ENDPOINT } from '../../data/api';
   import Datepicker from '../../components/Calendar/Datepicker.svelte';
-  import { sensorList, levelList } from '../../stores/constants';
-  import { annotationManager, currentDateObject, currentSensorEntry, metaDataManager } from '../../stores';
+  import { levelList } from '../../stores/constants';
+  import { annotationManager, currentDateObject, metaDataManager } from '../../stores';
   import { timeMonth } from 'd3-time';
   import { onMount } from 'svelte';
   import { trackEvent } from '../../stores/ga';
   import Search from '../../components/Search.svelte';
   import { getCountiesOfState, getInfoByName, infosByLevel } from '../../data/regions';
   import { formatDateISO } from '../../formats';
-  import { questions } from '../../stores/questions';
   import { DateParam } from '../../stores/params';
   import FancyHeader from '../../components/FancyHeader.svelte';
   import IndicatorAnnotation from '../../components/IndicatorAnnotation.svelte';
 
-  /**
-   * @type {{id: string, name: string, levels: Set<string>, minTime: Date, maxTime: Date, sensors: (import('../../stores/constants').Sensor)[]}[]}
-   */
-  let sensorGroups = [];
-  let sensorGroupValue = null;
+  let sourceValue = null;
+  $: source = sourceValue ? $metaDataManager.metaSources.find((d) => d.source === sourceValue) : null;
   let sensorValue = null;
+  $: sensor = sensorValue ? $metaDataManager.getSensor(sensorValue) : null;
   let geoType = 'county';
 
-  let endDate = new Date();
   let startDate = new Date();
+  let endDate = new Date();
 
   function initDate(date) {
     const param = new DateParam(date);
@@ -32,19 +29,18 @@
   }
   $: initDate($currentDateObject);
 
-  $: sensorGroup = sensorGroupValue ? sensorGroups.find((d) => d.id === sensorGroupValue) : null;
-  $: sensor = sensorValue && sensorGroup ? sensorGroup.sensors.find((d) => d.key === sensorValue) : null;
-
   $: {
-    if (sensorGroup && !sensorGroup.sensors.find((d) => d.key === sensorValue)) {
-      sensorValue = sensorGroup.sensors[0].key;
+    if (source && !source.sensors.find((d) => d.key === sensorValue)) {
+      sensorValue = source.sensors[0].key;
     }
   }
 
+  $: sensorLevels = sensor ? $metaDataManager.getLevels(sensor) : null;
+
   $: {
-    if (sensorGroup && !sensorGroup.levels.has(geoType)) {
+    if (sensorLevels && !sensorLevels.includes(geoType)) {
       // reset to a valid one
-      geoType = Array.from(sensorGroup.levels)[0];
+      geoType = sensorLevels[0];
     }
   }
 
@@ -61,6 +57,7 @@
       geoValuesMode = guessMode(geoItems.length);
     }
   }
+
   function flatIds(geoValues) {
     if (geoType === 'county') {
       // flatten states to its counties
@@ -85,86 +82,16 @@
   }
   $: usesAsOf = asOfMode !== 'latest' && asOfDate instanceof Date;
 
-  /**
-   * @type {Map<string, import('../../stores/constants').Sensor>}
-   */
-  const lookupMap = new Map();
-  // create a flat list of all that is used
-  sensorList.forEach((sensor) => {
-    if (sensor.isCasesOrDeath) {
-      Object.values(sensor.casesOrDeathSensors).forEach((sensor) => {
-        lookupMap.set(sensor.key, sensor);
-        if (sensor.rawSensor) {
-          lookupMap.set(sensor.rawSensor.key, sensor.rawSensor);
-        }
-      });
-    }
-    lookupMap.set(sensor.key, sensor);
-    if (sensor.rawSensor) {
-      lookupMap.set(sensor.rawSensor.key, sensor.rawSensor);
-    }
-  });
-  // add the survey questions one
-  questions.forEach((question) => {
-    const sensor = question.sensor;
-    if (!lookupMap.has(sensor.key)) {
-      lookupMap.set(sensor.key, sensor);
-    }
-    if (sensor.rawSensor && !lookupMap.has(sensor.rawSensor.key)) {
-      lookupMap.set(sensor.rawSensor.key, sensor.rawSensor);
-    }
-  });
-
-  /**
-   * @param {import('../../../data/meta').MetaDataManager} metaDataManager
-   */
-  function loadData(metaDataManager) {
-    const signalGroupMap = new Map();
-    lookupMap.forEach((sensor) => {
-      const timeFrame = metaDataManager.getTimeFrame(sensor);
-      const signalGroup = sensor.dataSourceName;
-      if (!signalGroupMap.has(signalGroup)) {
-        signalGroupMap.set(signalGroup, {
-          id: signalGroup,
-          name: signalGroup,
-          levels: new Set(),
-          minTime: timeFrame.min,
-          maxTime: timeFrame.max,
-          sensors: [],
-        });
-      }
-      const ds = signalGroupMap.get(signalGroup);
-
-      ds.sensors.push(sensor);
-      for (const level of metaDataManager.getLevels(sensor)) {
-        ds.levels.add(level);
-      }
-    });
-
-    sensorGroups = Array.from(signalGroupMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-    for (const sensorGroup of sensorGroups) {
-      sensorGroup.sensors.sort((a, b) => a.name.localeCompare(b.name));
-    }
-    sensorGroupValue = $currentSensorEntry.dataSourceName;
-    sensorValue = $currentSensorEntry.key;
-    geoType = $currentSensorEntry.levels[0];
-  }
-
-  $: {
-    loadData($metaDataManager);
-  }
-
   let form = null;
 
   onMount(() => {
     if (form) {
+      const date = `start_day=${formatDateISO(startDate)},end_day=${formatDateISO(endDate)}`;
       form.addEventListener('submit', () => {
         trackEvent(
           'export',
           'download',
-          `signal=${sensor ? `${sensor.id}:${sensor.signal}` : ''},start_day=${formatDateISO(
-            startDate,
-          )},end_day=${formatDateISO(endDate)},geo_type=${geoType}`,
+          `signal=${sensor ? `${sensor.id}:${sensor.signal}` : ''},${date},geo_type=${geoType}`,
         );
       });
     }
@@ -190,7 +117,18 @@
     return `date(${date.getFullYear()}, ${date.getMonth() + 1}, ${date.getDate()})`;
   }
 
-  $: dateRange = sensorGroup || { minTime: timeMonth(new Date(), -1), maxTime: timeMonth(new Date(), 1) };
+  function resolveDateRange(sensor) {
+    if (!sensor) {
+      return { minTime: timeMonth(new Date(), -1), maxTime: timeMonth(new Date(), 1) };
+    }
+    const t = $metaDataManager.getTimeFrame(sensor);
+    return {
+      minTime: t.min,
+      maxTime: t.max,
+    };
+  }
+
+  $: dateRange = resolveDateRange(sensor);
 
   // resolve known annotation for the selected combination
   $: annotations = isAllRegions
@@ -225,9 +163,9 @@
           <div class="uk-width-1-2@m uk-width-expand@s">
             <label for="ds" class="uk-form-label">Data Sources</label>
             <div class="uk-form-controls">
-              <select id="ds" bind:value={sensorGroupValue} size="8" class="uk-select">
-                {#each sensorGroups as group}
-                  <option value={group.id}>{group.name}</option>
+              <select id="ds" bind:value={sourceValue} size="8" class="uk-select">
+                {#each $metaDataManager.metaSources as source}
+                  <option value={source.source}>{source.name}</option>
                 {/each}
               </select>
             </div>
@@ -236,8 +174,8 @@
             <label for="s" class="uk-form-label">Signals</label>
             <div class="uk-form-controls">
               <select id="s" bind:value={sensorValue} required size="8" class="uk-select">
-                {#if sensorGroup}
-                  {#each sensorGroup.sensors as sensor}
+                {#if source}
+                  {#each source.sensors as sensor}
                     <option value={sensor.key}>{sensor.name}</option>
                   {/each}
                 {:else}
@@ -247,7 +185,7 @@
             </div>
           </div>
         </div>
-
+        <!--
         {#if sensor}
           <h3 class="mobile-h3 uk-margin-top">{sensor.name}</h3>
           <p>
@@ -261,7 +199,7 @@
               </li>
             {/each}
           </ul>
-        {/if}
+        {/if} -->
       </section>
 
       <section class="uk-form-horizontal uk-margin-large-top">
@@ -294,7 +232,7 @@
           <div class="uk-form-controls">
             <select id="geo" bind:value={geoType} class="uk-select">
               {#each levelList as level}
-                <option value={level.id} disabled={!sensorGroup || !sensorGroup.levels.has(level.id)}>
+                <option value={level.id} disabled={!sensorLevels || !sensorLevels.includes(level.id)}>
                   {level.labelPlural}
                 </option>
               {/each}
@@ -379,7 +317,7 @@
       <section class="uk-margin-large-top">
         <FancyHeader sub="Data" normal>3. Get</FancyHeader>
         <p>
-          {@html sensor && sensor.entry ? sensor.entry.credits : ''}
+          {@html sensor && sensor.credits ? sensor.credits : ''}
         </p>
         <p>
           We provide our data as a direct link to a CSV file or you can use our Python and R packages. Please
