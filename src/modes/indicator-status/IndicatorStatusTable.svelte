@@ -70,7 +70,7 @@
 <table class="mobile-table" class:loading>
   <thead>
     <tr>
-      <th class="mobile-th">Indicator</th>
+      <th class="mobile-th">Data Source</th>
       <th class="mobile-th uk-text-right">Latest Issue</th>
       <th class="mobile-th uk-text-right">Latest Data Available</th>
       <th class="mobile-th uk-text-right">Lag to Today</th>
@@ -110,16 +110,16 @@
         <td>
           <a href="#{r.id}" on:click|preventDefault={() => dispatch('select', r)}>{r.name}</a>
         </td>
-        <td class="uk-text-right">
+        <td class="uk-text-right uk-text-nowrap">
           {formatDateISO(r.latest_issue)}
         </td>
-        <td class="uk-text-right">
+        <td class="uk-text-right uk-text-nowrap">
           {formatDateISO(r.latest_time_value)}
         </td>
-        <td class="uk-text-right">
+        <td class="uk-text-right uk-text-nowrap">
           {r.latest_lag.toLocaleString()} days
         </td>
-        <td class="uk-text-right">
+        <td class="uk-text-right uk-text-nowrap">
           {formatFraction(r.latest_coverage)}
         </td>
         <td>

@@ -250,9 +250,14 @@ module.exports = () => {
         filename: 'indicator-status/index.html',
       }),
       new HtmlWebpackPlugin({
-        title: 'COVIDcast Data Anomalies',
+        title: 'COVIDcast Indicator Source',
         template: './src/index.html',
-        filename: 'data-anomalies/index.html',
+        filename: 'indicator-source/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        title: 'COVIDcast Indicator Signal',
+        template: './src/index.html',
+        filename: 'indicator-signal/index.html',
       }),
       new HtmlWebpackPlugin({
         title: 'COVIDcast Dashboard',
