@@ -315,14 +315,38 @@ export interface EpiDataSignalStatusRow {
   latest_time_value: string; // iso
   coverage: Record<RegionLevel, { date: string; /* iso */ count: number }[]>;
 }
-/**
- *
- * @returns
- */
+
 export function callSignalDashboardStatusAPI(): Promise<EpiDataSignalStatusRow[]> {
   const url = new URL(ENDPOINT + '/signal_dashboard_status/');
   url.searchParams.set('format', 'json');
   return fetchImpl<EpiDataSignalStatusRow[]>(url).catch((error) => {
+    console.warn('failed fetching data', error);
+    return [];
+  });
+}
+
+export interface CoverageRow {
+  source: string;
+  signal: string;
+  time_value: number;
+  count: number;
+}
+
+export function callCoverageAPI(
+  signal: SourceSignalPair | readonly SourceSignalPair[],
+  level?: RegionLevel | 'only_county',
+  days?: number,
+): Promise<CoverageRow[]> {
+  const url = new URL(ENDPOINT + '/covidcast/coverage');
+  addParam(url, 'signal', signal);
+  if (typeof level === 'string') {
+    url.searchParams.set('geo_type', level);
+  }
+  if (typeof days === 'number') {
+    url.searchParams.set('days', days.toString());
+  }
+  url.searchParams.set('format', 'json');
+  return fetchImpl<CoverageRow[]>(url).catch((error) => {
     console.warn('failed fetching data', error);
     return [];
   });
