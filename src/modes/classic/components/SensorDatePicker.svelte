@@ -1,9 +1,8 @@
 <script>
-  import { isMobileDevice, times } from '../../../stores';
+  import { isMobileDevice, metaDataManager } from '../../../stores';
   import { timeFormat } from 'd3-time-format';
   import Datepicker from '../../../components/Calendar/Datepicker.svelte';
   import { timeDay } from 'd3-time';
-  import { parseAPITime } from '../../../data';
 
   $: formatTime = $isMobileDevice ? timeFormat('%x') : timeFormat('%B %-d, %Y');
 
@@ -18,23 +17,16 @@
    */
   export let value = null;
 
-  /**
-   * @type {[Date, Date]}
-   */
-  $: startEndDates = [];
-  $: if ($times !== null) {
-    const dates = $times.get(sensor.key);
-    startEndDates = dates ? dates.map(parseAPITime) : [];
-  }
+  $: startEndDates = $metaDataManager.getTimeFrame(sensor);
 </script>
 
 <div class="uk-form-controls">
-  {#if value != null && startEndDates.length !== 0}
+  {#if value != null}
     <Datepicker
       className="uk-width-1-1"
       bind:selected={value}
-      start={startEndDates[0]}
-      end={startEndDates[1]}
+      start={startEndDates.min}
+      end={startEndDates.max}
       formattedSelected={formatTime(value)}
     >
       <button aria-label="selected date" class="uk-input uk-text-nowrap" on:>{formatTime(value)}</button>
@@ -44,23 +36,23 @@
 <div class="uk-button-group shortcuts">
   <button
     class="uk-button uk-button-default"
-    disabled={value == null || startEndDates.length === 0 || value <= startEndDates[0]}
+    disabled={value == null || startEndDates.length === 0 || value <= startEndDates.min}
     title="Go to the previous day"
     on:click={() => (value = timeDay.offset(value, -1))}
     data-uk-icon="icon: chevron-left"
   />
   <button
     class="uk-button uk-button-default"
-    disabled={value == null || startEndDates.length === 0 || value >= startEndDates[1]}
+    disabled={value == null || startEndDates.length === 0 || value >= startEndDates.max}
     title="Go to the next day"
     on:click={() => (value = timeDay.offset(value, 1))}
     data-uk-icon="icon: chevron-right"
   />
   <button
     class="uk-button uk-button-default"
-    disabled={value == null || startEndDates.length === 0 || value.valueOf() === startEndDates[1].valueOf()}
+    disabled={value == null || startEndDates.length === 0 || value.valueOf() === startEndDates.max.valueOf()}
     title="Go to the latest date for which '{sensor.name}' is available"
-    on:click={() => (value = startEndDates[1])}
+    on:click={() => (value = startEndDates.max)}
     data-uk-icon="icon: chevron-right-end"
   />
 </div>

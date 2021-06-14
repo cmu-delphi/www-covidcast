@@ -1,21 +1,15 @@
 <script>
   import UIKitHint from '../components/UIKitHint.svelte';
   import { formatDateYearDayOfWeekAbbr } from '../formats';
-  import { stats } from '../stores';
-  import { determineStatsInfo } from '../stores/stats';
+  import { metaDataManager } from '../stores';
   /**
    * @type {import('../stores/params').Sensor}
    */
   export let sensor;
 
-  /**
-   * @type {import('../stores/params').RegionLevel}
-   */
-  export let level = 'nation';
-
   export let suffix = '';
 
-  $: info = determineStatsInfo($stats, sensor, level);
+  $: info = $metaDataManager.getMetaData(sensor);
 </script>
 
 {#if info}

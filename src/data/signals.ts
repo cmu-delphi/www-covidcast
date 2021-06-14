@@ -1,9 +1,9 @@
 export function isCountSignal(signal: string): boolean {
-  return /num/.exec(signal) != null;
+  return signal != null && signal.includes('num');
 }
 
 export function isPropSignal(signal: string): boolean {
-  return /prop/.exec(signal) != null;
+  return signal != null && signal.includes('prop');
 }
 
 export function isDeathSignal(signal: string): boolean {

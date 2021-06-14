@@ -5,6 +5,7 @@
   import SensorPicker from './config/SensorPicker.svelte';
   import SensorsPicker from './config/SensorsPicker.svelte';
   import TimeFramePicker from './config/TimeFramePicker.svelte';
+  import { findWidget } from './state';
 
   export let type;
   /**
@@ -21,46 +22,25 @@
   export let region;
 
   export let config = {};
+
+  $: hasConfig = new Set(findWidget(type || 'line').configOptions);
 </script>
 
-{#if type === 'line'}
+{#if hasConfig.has('sensor')}
   <SensorPicker {sensor} value={config.sensor || ''} />
-  <RegionPicker {region} value={config.region || ''} />
-  <TimeFramePicker {sensor} {date} value={config.timeFrame} />
-{:else if type === 'map'}
-  <SensorPicker {sensor} value={config.sensor || ''} />
-  <LevelPicker {region} value={config.level} />
-  <DatePicker {date} value={config.date} />
-{:else if type === 'regiontable'}
-  <SensorPicker {sensor} value={config.sensor || ''} />
-  <LevelPicker {region} value={config.level} />
-  <DatePicker {date} value={config.date} />
-{:else if type === 'datetable'}
-  <SensorPicker {sensor} value={config.sensor || ''} />
-  <RegionPicker {region} value={config.region || ''} />
-  <TimeFramePicker {sensor} {date} value={config.timeFrame} />
-{:else if type === 'sensortable'}
-  <RegionPicker {region} value={config.region || ''} />
-  <DatePicker {date} value={config.date} />
-{:else if type === 'kpi'}
-  <SensorPicker {sensor} value={config.sensor || ''} />
-  <RegionPicker {region} value={config.region || ''} />
-  <DatePicker {date} value={config.date} />
-{:else if type === 'trend'}
-  <SensorPicker {sensor} value={config.sensor || ''} />
-  <RegionPicker {region} value={config.region || ''} />
-  <DatePicker {date} value={config.date} />
-{:else if type === 'hex'}
-  <SensorPicker {sensor} value={config.sensor || ''} />
-  <DatePicker {date} />
-{:else if type === 'regionpcp'}
+{/if}
+{#if hasConfig.has('sensors')}
   <SensorsPicker {sensor} value={config.sensors || ''} />
-  <LevelPicker {region} value={config.level} />
-  <DatePicker {date} value={config.date} />
-{:else if type === 'datepcp'}
-  <SensorsPicker {sensor} value={config.sensors || ''} />
+{/if}
+{#if hasConfig.has('region')}
   <RegionPicker {region} value={config.region || ''} />
+{/if}
+{#if hasConfig.has('level')}
+  <LevelPicker {region} value={config.level} />
+{/if}
+{#if hasConfig.has('date')}
+  <DatePicker {date} value={config.date} />
+{/if}
+{#if hasConfig.has('timeFrame')}
   <TimeFramePicker {sensor} {date} value={config.timeFrame} />
-{:else}
-  Please select a widget first
 {/if}

@@ -24,10 +24,10 @@
     return {};
   }
 
-  export function toEntry(sensor, statsLookup, level, index) {
-    const param = new SensorParam(sensor);
-    const stats = param.stats(statsLookup, level);
-    const domain = param.domain(statsLookup, level);
+  export function toEntry(sensor, manager, level, index) {
+    const param = new SensorParam(sensor, manager);
+    const stats = param.manager.getStats(sensor, level);
+    const domain = param.domain(level);
     return {
       index,
       id: sensor.key.replace(/[\s;:\-_()]+/gm, '_'),
@@ -144,6 +144,7 @@
               grid: false,
               title: null,
               orient: i > 0 ? 'right' : 'left',
+              format: entry.sensor.formatSpecifier,
               offset:
                 i > 0 && i < entries.length - 1
                   ? {

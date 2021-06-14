@@ -3,7 +3,7 @@
   import WidgetCard, { DEFAULT_WIDGET_STATE } from './WidgetCard.svelte';
   import { getContext } from 'svelte';
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
-  import { getLevelInfo, stats } from '../../../stores';
+  import { getLevelInfo } from '../../../stores/constants';
   import { formatDateISO, formatDateYearDayOfWeekAbbr } from '../../../formats';
   import RegionMapTooltip from '../../../blocks/RegionMapTooltip.svelte';
   import {
@@ -46,7 +46,7 @@
   };
 
   /**
-   * @type {import("../../../stores/params").DataFetcher}
+   * @type {import("../../../stores/DataFetcher").DataFetcher}
    */
   const fetcher = getContext('fetcher');
 
@@ -71,7 +71,7 @@
      * @type {import('../../../specs/mapSpec').CommonParams}
      */
     const options = {
-      domain: sensor.domain($stats, level),
+      domain: sensor.domain(level),
       scheme: sensor.value.vegaColorScale,
       title: [
         `${sensor.name} in US ${getLevelInfo(level).labelPlural}`,
@@ -80,6 +80,7 @@
       subTitle: sensor.unit,
       initialRegion: highlightToRegionsImpl(level, highlight),
       paddingTop: 60,
+      valueFormat: sensor.value.formatSpecifier,
       interactiveHighlight: true,
     };
     const byLevel = {

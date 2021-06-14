@@ -1,22 +1,32 @@
 <script>
   import { onMount, setContext } from 'svelte';
-  import { currentSensor, isMobileDevice } from '../../stores';
-  import { currentRegionInfo, currentDateObject, times } from '../../stores';
-  import { SensorParam, DateParam, RegionParam, DataFetcher } from '../../stores/params';
+  import { currentRegionInfo, currentDateObject, currentSensor, isMobileDevice, metaDataManager } from '../../stores';
+  import { SensorParam, DateParam, RegionParam } from '../../stores/params';
   import { WidgetHighlight } from './highlight';
-  import { resolveInitialState, updateState } from './state';
+  import {
+    addWidget,
+    changeOrder,
+    changeTitle,
+    changeWidgetConfig,
+    changeWidgetState,
+    deriveComponents,
+    removeWidget,
+    resolveInitialState,
+    updateState,
+  } from './state';
   import isEqual from 'lodash-es/isEqual';
   import WidgetAdder from './WidgetAdder.svelte';
   import WidgetEditor from './WidgetEditor.svelte';
   import WidgetFactory from './WidgetFactory.svelte';
   import DashboardParameters from './DashboardParameters.svelte';
-  import { allSensorsMap } from '../../stores/allSensors';
-  import { DEFAULT_SENSOR } from '../../stores/constants';
 
-  $: allSensor = allSensorsMap.get($currentSensor) || allSensorsMap.get(DEFAULT_SENSOR);
-  $: sensor = new SensorParam(allSensor, currentSensor, $times);
+  import { DEFAULT_SENSOR } from '../../stores/constants';
+  import { DataFetcher } from '../../stores/DataFetcher';
+
+  $: resolvedSensor = $metaDataManager.getSensor($currentSensor) || $metaDataManager.getSensor(DEFAULT_SENSOR);
+  $: sensor = new SensorParam(resolvedSensor, $metaDataManager);
   $: region = new RegionParam($currentRegionInfo);
-  $: date = new DateParam($currentDateObject, allSensor, $times);
+  $: date = new DateParam($currentDateObject);
 
   const fetcher = new DataFetcher();
   $: {
@@ -47,17 +57,6 @@
     console.log(state);
   }
 
-  function deriveComponents(state) {
-    return state.order.map((id) => {
-      return {
-        id,
-        type: id.split('_')[0],
-        config: state.configs[id] || {},
-        state: state.states[id],
-      };
-    });
-  }
-
   let components = deriveComponents(initialState);
 
   $: nextId =
@@ -67,26 +66,11 @@
     }, 0) + 1;
 
   function trackState(event) {
-    state = {
-      ...state,
-      states: {
-        ...state.states,
-        [event.detail.id]: event.detail.state,
-      },
-    };
+    state = changeWidgetState(state, event.detail.id, event.detail.state);
   }
 
   function closeWidget(id) {
-    const states = { ...state.states };
-    delete states[id];
-    const configs = { ...state.configs };
-    delete configs[id];
-    state = {
-      ...state,
-      order: state.order.filter((d) => d !== id),
-      states,
-      configs,
-    };
+    state = removeWidget(state, id);
     components = deriveComponents(state);
   }
 
@@ -94,11 +78,15 @@
    * @type {{id: string, config: Record<string, unknown>}}
    */
   let edit = null;
-  let refOpenAdder = null;
-  let refCloseAdder = null;
+  let add = false;
+
+  function triggerAddWidget() {
+    add = true;
+  }
 
   function closeSideBar() {
     edit = null;
+    add = false;
   }
 
   function editWidget(id) {
@@ -106,26 +94,13 @@
       id,
       config: state.configs[id] || {},
     };
-    if (refOpenAdder) {
-      refOpenAdder.click();
-    }
   }
 
   function editedWidget(event) {
-    if (refCloseAdder) {
-      refCloseAdder.click();
-    }
     const id = event.detail.id;
     const config = event.detail.config;
-
     edit = null;
-    state = {
-      ...state,
-      configs: {
-        ...state.configs,
-        [id]: config,
-      },
-    };
+    state = changeWidgetConfig(state, id, config);
     components = deriveComponents(state);
   }
 
@@ -139,25 +114,10 @@
     }
   }
 
-  function addWidget(event) {
-    if (refCloseAdder) {
-      refCloseAdder.click();
-    }
+  function addedWidget(event) {
     const data = event.detail;
-    const states = { ...state.states };
-    if (data.state) {
-      states[data.id] = data.state;
-    }
-    const configs = { ...state.configs };
-    if (data.config) {
-      configs[data.id] = data.config;
-    }
-    state = {
-      ...state,
-      order: [...state.order, data.id],
-      states,
-      configs,
-    };
+    add = false;
+    state = addWidget(state, data.id, data.config, data.state);
     components = deriveComponents(state);
   }
 
@@ -167,25 +127,19 @@
     panelRef.addEventListener('moved', () => {
       const widgets = Array.from(panelRef.querySelectorAll('.widget-card'), (d) => d.dataset.id);
       if (!isEqual(widgets, state.order)) {
-        state = {
-          ...state,
-          order: widgets,
-        };
+        state = changeOrder(state, widgets);
       }
     });
   });
 
-  let configureParams = false;
+  let configureParams = true;
 
   function updateTitle(e) {
     const title = e.currentTarget.value;
     if (title === state.title || (!state.title && title === 'Dashboard')) {
       return;
     }
-    state = {
-      ...state,
-      title,
-    };
+    state = changeTitle(state, title);
   }
 </script>
 
@@ -193,11 +147,10 @@
   <div class="mobile-header-line-bg">
     <div class="mobile-header-line">
       <button
-        bind:this={refOpenAdder}
         class="widget-add-button uk-button uk-button-primary"
         type="button"
         title="Add New Widget"
-        uk-toggle="target: #offcanvas-overlay">Add Widget</button
+        on:click={triggerAddWidget}>Add Widget</button
       >
       <h2>
         COVIDcast
@@ -212,7 +165,8 @@
       <button
         class="widget-edit-button uk-icon-button"
         type="button"
-        title="Edit Configuration"
+        class:active-button={configureParams}
+        title="Show/Hide Parameters"
         uk-icon="cog"
         on:click={() => (configureParams = !configureParams)}
       />
@@ -224,16 +178,17 @@
   {#if $isMobileDevice}
     <div class="uk-alert uk-alert-warning">This view is optimized for larger screens only</div>
   {/if}
-  <div id="offcanvas-overlay" uk-offcanvas="overlay: true">
-    <div class="uk-offcanvas-bar">
-      <button bind:this={refCloseAdder} on:click={closeSideBar} class="uk-offcanvas-close" type="button" uk-close />
+
+  {#if edit || add}
+    <div class="overlay-container">
+      <button on:click={closeSideBar} type="button" class="uk-icon uk-close" uk-icon="close" title="Close Overlay" />
       {#if edit}
         <WidgetEditor on:edit={editedWidget} {sensor} {region} {date} id={edit.id} config={edit.config} />
       {:else}
-        <WidgetAdder on:add={addWidget} {sensor} {region} {date} {nextId} />
+        <WidgetAdder on:add={addedWidget} {sensor} {region} {date} {nextId} />
       {/if}
     </div>
-  </div>
+  {/if}
   <div class="panel-wrapper">
     <div bind:this={panelRef} class="panel" data-uk-sortable="handle: .widget-move-handle">
       {#each components as c (c.id)}
@@ -251,6 +206,30 @@
     line-height: 1.5rem;
     display: flex;
     flex-direction: column;
+  }
+
+  .overlay-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1000;
+    background: #fafafc;
+    border-top: 1px solid #d3d4d8;
+    border-right: 1px solid #d3d4d8;
+    padding: 1em;
+  }
+
+  .active-button {
+    background: #ebebeb;
+  }
+
+  .overlay-container :global(input[type='text'], input[type='date'], select) {
+    background: white;
+  }
+
+  .overlay-container .uk-close {
+    float: right;
   }
 
   .widget-add-button {

@@ -1,11 +1,15 @@
 import { timeDay } from 'd3-time';
 import type { EpiDataRow } from '.';
-import { yesterdayDate } from '../stores';
-import { formatAPITime } from './utils';
+import { parseAPITime, toTimeValue } from './utils';
+
+export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
+export const yesterday = toTimeValue(yesterdayDate);
 
 export class TimeFrame {
   readonly min: Date;
+  readonly min_time: number;
   readonly max: Date;
+  readonly max_time: number;
   readonly difference: number;
   readonly range: string;
   readonly domain: [number, number];
@@ -13,9 +17,11 @@ export class TimeFrame {
 
   constructor(min: Date, max: Date) {
     this.min = min;
+    this.min_time = toTimeValue(min);
     this.max = max;
+    this.max_time = toTimeValue(max);
     this.difference = timeDay.count(min, max);
-    this.range = `${formatAPITime(min)}-${formatAPITime(max)}`;
+    this.range = `${this.min_time}-${this.max_time}`;
     this.domain = [min.getTime(), max.getTime()];
     /**
      * @param {EpiDataRow} row
@@ -60,3 +66,5 @@ export class TimeFrame {
     return this.range;
   }
 }
+
+export const ALL_TIME_FRAME = new TimeFrame(parseAPITime('20200101'), yesterdayDate);

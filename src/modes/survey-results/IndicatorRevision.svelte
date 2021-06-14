@@ -2,6 +2,8 @@
   import { onMount } from 'svelte';
   import { formatDateLocal } from '../../formats';
   import HistoryLineChart from '../../blocks/HistoryLineChart.svelte';
+  import { metaDataManager } from '../../stores';
+  import { SensorParam } from '../../stores/params';
   /**
    * @type {import('../../stores/questions').Revision}
    */
@@ -17,11 +19,11 @@
    */
   export let region;
   /**
-   * @type {import("../../stores/params").DataFetcher}
+   * @type {import("../../stores/DataFetcher").DataFetcher}
    */
   export let fetcher;
 
-  $: sensor = revision.sensorParam;
+  $: sensor = new SensorParam(revision.sensor, $metaDataManager);
 
   /**
    * @type {HTMLElement | null}

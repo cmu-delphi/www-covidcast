@@ -10,6 +10,8 @@
   import WarningBanner from '../../components/WarningBanner.svelte';
   import MaxDateHint from '../../blocks/MaxDateHint.svelte';
   import { refSensor } from '../../stores/questions';
+  import { metaDataManager } from '../../stores';
+  import { SensorParam } from '../../stores/params';
 
   /**
    * question object
@@ -25,13 +27,13 @@
    */
   export let region;
   /**
-   * @type {import("../../stores/params").DataFetcher}
+   * @type {import("../../stores/DataFetcher").DataFetcher}
    */
   export let fetcher;
 
   export let anchor = null;
 
-  $: sensor = question.sensorParam;
+  $: sensor = new SensorParam(question.sensor, $metaDataManager);
   $: trend = fetcher.fetch1Sensor1Region1DateTrend(sensor, region, date);
 
   let loading = false;
@@ -93,7 +95,7 @@
     <p>
       On
       {formatDateYearDayOfWeekAbbr(date.value, true)}
-      <MaxDateHint sensor={refSensor} level={region.level} />
+      <MaxDateHint sensor={refSensor} />
       the 7 day average of
       <strong>{sensor.name}</strong>
       <UIKitHint title={sensor.signalTooltip} inline />

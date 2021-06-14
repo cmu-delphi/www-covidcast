@@ -1,5 +1,4 @@
 import { formatAPITime } from './utils';
-import type { DataSensor } from './fetchData';
 import type { RegionLevel } from './regions';
 import type { TimeFrame } from './TimeFrame';
 import { GeoPair, isArray, SourceSignalPair, TimePair } from './apimodel';
@@ -69,12 +68,13 @@ function fetchImpl<T>(url: URL, fields?: readonly string[] | { exclude: readonly
     return fetch(url.toString(), fetchOptions).then((d) => d.json());
   }
 
-  url.searchParams;
+  const params = new URLSearchParams(url.searchParams);
+  url.searchParams.forEach((d) => url.searchParams.delete(d));
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return fetch(url.pathname, {
+  return fetch(url.toString(), {
     ...fetchOptions,
     method: 'POST',
-    body: url.searchParams,
+    body: params,
   }).then((d) => d.json());
 }
 
@@ -162,7 +162,7 @@ export function callTrendSeriesAPI(
   basis?: number,
   fields?: FieldSpec<EpiDataTrendRow>,
 ): Promise<EpiDataTrendRow[]> {
-  const url = new URL(ENDPOINT + '/covidcast/trend');
+  const url = new URL(ENDPOINT + '/covidcast/trendseries');
   addParam(url, 'signal', signal);
   addParam(url, 'geo', geo);
   if (basis != null) {
@@ -262,65 +262,43 @@ export function callBackfillAPI(
   });
 }
 
-export interface EpiDataMetaEntry {
-  min_time: number;
-  max_time: number;
-  max_value: number;
-  stdev_value: number;
-  mean_value: number;
-  max_issue: number;
+export interface EpiDataMetaStatsInfo {
+  min: number;
+  max: number;
+  mean: number;
+  stdev: number;
+}
 
-  data_source: string;
-  signal: string;
-  time_type: string;
-  geo_type: RegionLevel;
-}
-/**
- */
-export function callMetaAPI(
-  dataSignals: DataSensor[],
-  fields: string[],
-  filters: Record<string, string>,
-): Promise<EpiDataResponse<EpiDataMetaEntry>> {
-  const url = new URL(ENDPOINT + '/covidcast_meta/');
-  const data = new FormData();
-  if (dataSignals && dataSignals.length > 0) {
-    const signals = dataSignals
-      .map((d) =>
-        d.isCasesOrDeath
-          ? Object.values(d.casesOrDeathSignals ?? {})
-              .map((s) => `${d.id}:${s}`)
-              .join(',')
-          : `${d.id}:${d.signal}`,
-      )
-      .join(',');
-    url.searchParams.set('signals', signals);
-  }
-  if (fields && fields.length > 0) {
-    url.searchParams.set('fields', fields.join(','));
-  }
-  Object.entries(filters || {}).forEach((entry) => {
-    data.set(entry[0], entry[1]);
-    url.searchParams.set(entry[0], entry[1]);
-  });
-  return fetchImpl(url);
-}
+export type SignalCategory = 'public' | 'early' | 'late' | 'other';
+export type SignalFormat = 'raw' | 'percent' | 'fraction' | 'per100k' | 'raw_count';
+export type SignalHighValuesAre = 'good' | 'bad' | 'neutral';
 
 export interface EpiDataMetaInfo {
   name: string;
   signal: string;
   source: string;
-  category: 'public' | 'early' | 'late' | 'other';
-  format: 'raw' | 'percent' | 'fraction' | 'per100k';
-  high_values_are: 'good' | 'bad' | 'neutral';
+  category: SignalCategory;
+  format: SignalFormat;
+  high_values_are: SignalHighValuesAre;
 
   max_issue: number;
   max_time: number;
   min_time: number;
-  geo_types: Record<RegionLevel, { min: number; max: number; mean: number; stdev: number }>;
+  geo_types: Record<RegionLevel, EpiDataMetaStatsInfo>;
+
+  related_signals: string[];
+  is_smoothed: boolean;
+  is_weighted: boolean;
+  is_cumulative: boolean;
+  has_stderr: boolean;
+  has_sample_size: boolean;
 }
 
-export function callMetaAPI2(signal: SourceSignalPair | readonly SourceSignalPair[] = []): Promise<EpiDataMetaInfo[]> {
+// export function callMetaAPI2(): Promise<EpiDataMetaInfo[]> {
+//   return import('./meta.json').then((d) => d.default as EpiDataMetaInfo[]);
+// }
+
+export function callMetaAPI(signal: SourceSignalPair | readonly SourceSignalPair[] = []): Promise<EpiDataMetaInfo[]> {
   const url = new URL(ENDPOINT + '/covidcast/meta');
   addParam(url, 'signal', signal);
   return fetchImpl<EpiDataMetaInfo[]>(url).catch((error) => {

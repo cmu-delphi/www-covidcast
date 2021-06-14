@@ -1,5 +1,6 @@
 <script>
-  import { allSensorsGrouped } from '../../../stores/allSensors';
+  import SensorSearch from '../../../components/SensorSearch.svelte';
+  import { metaDataManager } from '../../../stores';
 
   /**
    * @type {import("../../../stores/params").SensorParam}
@@ -11,19 +12,43 @@
    */
   export let value;
 
-  $: initialValue = value ? (Array.isArray(value) ? value : [value]) : [''];
+  let syncedValues = value ? (Array.isArray(value) ? value : [value]) : [''];
+
+  $: defaultSensor = {
+    key: '',
+    id: '',
+    signal: '',
+    name: `Use Configured: ${sensor.name}, Cases, Deaths`,
+  };
+  $: allItems = [defaultSensor, ...$metaDataManager.metaSensors];
+
+  $: selectedItems = syncedValues.map((d) => (!d ? defaultSensor : $metaDataManager.getSensor(d)));
 </script>
 
-<div>
+<div class="sensors-picker">
   <label for="widget-adder-s" class="uk-form-label">Indicators</label>
-  <select id="widget-adder-s" class="uk-select" name="sensors" value={initialValue} multiple size={10}>
-    <option value="">Use Configured ({sensor.name}, Cases, Deaths)</option>
-    {#each allSensorsGrouped as group}
-      <optgroup label={group.label}>
-        {#each group.sensors as sensor}
-          <option value={sensor.key}>{sensor.name}</option>
-        {/each}
-      </optgroup>
-    {/each}
-  </select>
+  {#each syncedValues as s}
+    <input type="hidden" value={s} name="sensors" />
+  {/each}
+  <SensorSearch
+    items={allItems}
+    {selectedItems}
+    on:change={(e) => {
+      syncedValues = e.detail ? [e.detail.key] : [''];
+    }}
+    on:add={(e) => {
+      if (syncedValues.length === 1 && syncedValues[0] === '') {
+        // replace default
+        syncedValues = [e.detail.key];
+      } else {
+        syncedValues = [...syncedValues, e.detail.key];
+      }
+    }}
+  />
 </div>
+
+<style>
+  .sensors-picker :global(.serach-multiple) {
+    max-width: 35em;
+  }
+</style>

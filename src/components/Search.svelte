@@ -39,6 +39,9 @@
   export let disabled = false;
   // add the title to the HTML input
   export let title = undefined;
+  export let id = undefined;
+
+  export let selectOnClick = false;
 
   export let icon = 'search';
   /**
@@ -243,7 +246,7 @@
   function onInputClick() {
     resetListToAllItemsAndOpen();
 
-    if (modern) {
+    if (modern || selectOnClick) {
       // select the whole field upon click
       inputRef.select();
     }
@@ -311,6 +314,7 @@
   {#if !multiple}
     <span class="uk-search-icon search-icon" class:modern data-uk-icon="icon: {icon}" />
     <input
+      {id}
       class="uk-search-input"
       class:modern
       class:modern__small={modern === 'small'}
@@ -318,6 +322,7 @@
       {name}
       {disabled}
       {title}
+      type="text"
       aria-label={placeholder}
       bind:this={inputRef}
       bind:value={text}
@@ -384,14 +389,22 @@
   <div class="uk-dropdown uk-dropdown-bottom-left search-box-list" class:uk-open={opened} bind:this={listRef}>
     <ul class="uk-nav uk-dropdown-nav">
       {#if filteredListItems && filteredListItems.length > 0}
-        {#each filteredListItems as listItem, i (listItem.label)}
+        {#each filteredListItems as listItem, i (listItem.key)}
           <li class:uk-active={i + matchingStartIndex === highlightMatchingIndex}>
-            <a
-              href="?region={listItem.item ? listItem.item.id : ''}"
-              on:click|preventDefault={() => onListItemClick(listItem)}
+            <slot
+              name="entry"
+              label={highlighter(listItem.label)}
+              {listItem}
+              item={listItem.item}
+              onClick={() => onListItemClick(listItem)}
             >
-              {@html highlighter(listItem.label)}
-            </a>
+              <a
+                href="?region={listItem.item ? listItem.item.id : ''}"
+                on:click|preventDefault={() => onListItemClick(listItem)}
+              >
+                {@html highlighter(listItem.label)}
+              </a>
+            </slot>
           </li>
         {/each}
         {#if hiddenMatchingItems}
@@ -415,10 +428,11 @@
 
   .search-multiple {
     display: flex;
-    height: 40px;
+    min-height: 40px;
     background: transparent;
     border: 1px solid #e5e5e5;
     position: relative;
+    flex-wrap: wrap;
   }
 
   .search-multiple-icon {
@@ -460,6 +474,7 @@
     border: 2px solid #999;
     display: flex;
     align-items: center;
+    white-space: nowrap;
   }
 
   /* modern styles for survey dashboard */

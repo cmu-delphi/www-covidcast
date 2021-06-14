@@ -207,6 +207,11 @@ export function getInfoByName(name: string, level: RegionLevel | null = null): R
   if (!name) {
     return null;
   }
+  if (name.includes('@')) {
+    const split = name.indexOf('@');
+    level = name.slice(split + 1) as RegionLevel;
+    name = name.slice(0, split);
+  }
   const key = (level != null ? `${level}:` : '') + String(name).toLowerCase();
   const r = infoLookup.get(key) ?? null;
   if (!r) {

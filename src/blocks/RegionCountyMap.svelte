@@ -3,7 +3,7 @@
   import { formatDateISO } from '../formats';
   import { getStateOfCounty } from '../data/regions';
   import { generateStateMapWithCountyDataSpec } from '../specs/mapSpec';
-  import { isMobileDevice, stats } from '../stores';
+  import { isMobileDevice } from '../stores';
   import DownloadMenu from '../components/DownloadMenu.svelte';
   import RegionMapTooltip from './RegionMapTooltip.svelte';
 
@@ -20,12 +20,12 @@
    */
   export let sensor;
   /**
-   * @type {import("../../stores/params").DataFetcher}
+   * @type {import("../../stores/DataFetcher").DataFetcher}
    */
   export let fetcher;
 
   $: spec = generateStateMapWithCountyDataSpec({
-    domain: sensor.domain($stats, 'county'),
+    domain: sensor.domain('county'),
     scheme: sensor.value.vegaColorScale,
   });
   $: data = fetcher.fetch1SensorNRegions1Date(sensor, 'county', date);
