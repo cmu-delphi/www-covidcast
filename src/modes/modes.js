@@ -58,7 +58,7 @@ export const modes = [
     id: 'indicator-source',
     label: 'Indicator Source',
     component: () =>
-      import(/* webpackChunkName: 'm-indicator-source' */ './indicator-source/IndicatorSource.svelte').then(
+      import(/* webpackChunkName: 'm-indicator-source' */ './indicator-status/IndicatorSource.svelte').then(
         (r) => r.default,
       ),
     waitForReady: true,
@@ -67,7 +67,7 @@ export const modes = [
     id: 'indicator-signal',
     label: 'Indicator Signal',
     component: () =>
-      import(/* webpackChunkName: 'm-indicator-signal' */ './indicator-signal/IndicatorSignal.svelte').then(
+      import(/* webpackChunkName: 'm-indicator-signal' */ './indicator-status/IndicatorSignal.svelte').then(
         (r) => r.default,
       ),
     waitForReady: true,

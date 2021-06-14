@@ -7,11 +7,15 @@
    */
   export let sensor = null;
 
+  export let source = true;
+
   $: meta = sensor && sensor.key ? $metaDataManager.getMetaData(sensor.key) : null;
 </script>
 
 {#if meta}
-  <span class="uk-badge source-badge" title={sensor.dataSourceName}>{meta.source}</span>
+  {#if source}
+    <span class="uk-badge source-badge" title={sensor.dataSourceName}>{meta.source}</span>
+  {/if}
   <span
     class="uk-badge category-badge"
     data-cat={meta.category}
