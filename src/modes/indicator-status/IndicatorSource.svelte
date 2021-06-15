@@ -38,7 +38,7 @@
 <div class="mobile-root">
   <div class="mobile-header-line-bg">
     <div class="mobile-header-line">
-      <h2>Indicator Status <span>Source</span></h2>
+      <h2>Indicator Status of <span>{resolvedSource ? resolvedSource.name : 'Data Source'}</span></h2>
     </div>
     <div class="uk-container content-grid">
       <SensorSourceSearch
