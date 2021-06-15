@@ -331,7 +331,7 @@ function genLevelLegendLayer({ domain }: { domain?: [number, number] }): Normali
         field: 'value',
         type: 'quantitative',
         scale: {
-          domain: [0, 20],
+          domain,
           clamp: true,
           nice: domain == null,
           range: [
