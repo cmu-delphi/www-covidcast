@@ -12,6 +12,7 @@
   import { fetchCoverage, getAvailableCounties, findLatestCoverage, toLagToToday } from './data';
   import { TimeFrame } from '../../data/TimeFrame';
   import { timeDay } from 'd3-time';
+  import SensorSourceSearch from '../../components/SensorSourceSearch.svelte';
 
   $: resolvedSource =
     $metaDataManager.getSensorSource($currentSensor) || $metaDataManager.getSensorSource(DEFAULT_SENSOR);
@@ -28,6 +29,10 @@
   $: data = getAvailableCounties(referenceSignal, pickedDate);
 
   const domain = new TimeFrame(timeDay.offset(new Date(), -60), timeDay.floor(new Date()));
+
+  function setSensor(d) {
+    currentSensor.set(`${d.source}-${d.reference_signal}`);
+  }
 </script>
 
 <div class="mobile-root">
@@ -35,7 +40,15 @@
     <div class="mobile-header-line">
       <h2>Indicator Status <span>Source</span></h2>
     </div>
-    Source Picker
+    <div class="uk-container content-grid">
+      <SensorSourceSearch
+        className="grid-3-11"
+        modern
+        items={$metaDataManager.metaSources}
+        selectedItem={resolvedSource}
+        on:change={(e) => setSensor(e.detail)}
+      />
+    </div>
   </div>
   <div class="uk-container content-grid">
     <AboutSection className="uk-margin-small-top uk-margin-small-bottom">

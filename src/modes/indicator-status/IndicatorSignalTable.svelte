@@ -11,7 +11,7 @@
    */
   export let source;
   const sort = new SortHelper('name', false, 'name');
-  let sortedData = source.sensors.slice().sort($sort.comparator);
+  $: sortedData = source.sensors.slice().sort($sort.comparator);
 
   function select(signal) {
     console.log(signal);
@@ -42,14 +42,17 @@
       <tr>
         <td>
           <a href="../indicator-signal?sensor={r.key}" on:click|preventDefault={() => select(r)}>{r.name}</a>
+          {#if source.reference_signal == r.signal}
+            (reference)
+          {/if}
           <div class="source">API: {r.signal}</div>
         </td>
         <td>
-          <SensorBadges sensor={r} />
+          <SensorBadges sensor={r} source={false} />
         </td>
         <td>
           {#each $metaDataManager.getLevels(r) as level}
-            <GeoLevelBadge {level} />
+            <GeoLevelBadge {level} />{' '}
           {/each}
         </td>
         <td>
