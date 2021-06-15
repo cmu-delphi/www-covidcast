@@ -294,10 +294,6 @@ export interface EpiDataMetaInfo {
   has_sample_size: boolean;
 }
 
-// export function callMetaAPI2(): Promise<EpiDataMetaInfo[]> {
-//   return import('./meta.json').then((d) => d.default as EpiDataMetaInfo[]);
-// }
-
 export function callMetaAPI(signal: SourceSignalPair | readonly SourceSignalPair[] = []): Promise<EpiDataMetaInfo[]> {
   const url = new URL(ENDPOINT + '/covidcast/meta');
   addParam(url, 'signal', signal);
