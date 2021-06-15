@@ -104,7 +104,7 @@
     </tr>
   </thead>
   <tbody>
-    {#each sortedData as r (r.source)}
+    {#each sortedData as r}
       <tr>
         <td>
           <a
@@ -127,7 +127,7 @@
         </td>
         <td>
           <div class="mobile-table-chart mobile-table-chart-small">
-            <Vega {spec} data={r.coverages || []} noDataText="N/A" />
+            <Vega {spec} data={r.coverages} noDataText="N/A" />
           </div>
         </td>
         <td>
