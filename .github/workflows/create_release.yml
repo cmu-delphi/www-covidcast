@@ -18,7 +18,7 @@ jobs:
       - name: Reset main branch
         run: |
           git fetch origin dev:dev
-          git reset --hard dev
+          git reset --hard origin/dev
       - name: Change version number
         id: version
         run: |

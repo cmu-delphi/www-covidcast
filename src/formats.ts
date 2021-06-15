@@ -69,6 +69,7 @@ export function formatPopulation(info: { population?: number }): string {
 }
 
 const f = format(',.1f');
+const count = format('~s');
 const basePercentFormatter = format('.2%');
 const rawFormatter = format(',.2f');
 
@@ -94,6 +95,9 @@ function sign(
 export function formatValue(value?: number | null, enforceSign = false): string {
   return sign(value, f, enforceSign);
 }
+export function formatCount(value?: number | null, enforceSign = false): string {
+  return sign(value, count, enforceSign);
+}
 export function formatPercentage(value?: number | null, enforceSign = false): string {
   return sign(value, basePercentFormatter, enforceSign, 1 / 100);
 }
@@ -103,3 +107,18 @@ export function formatFraction(value?: number | null, enforceSign = false): stri
 export function formatRawValue(value?: number | null, enforceSign = false): string {
   return sign(value, rawFormatter, enforceSign);
 }
+
+export const formatter = {
+  raw: formatRawValue,
+  raw_count: formatCount,
+  fraction: formatRawValue,
+  percent: formatPercentage,
+  per100k: formatValue,
+};
+export const formatSpecifiers = {
+  raw: ',.2f',
+  raw_count: '~s',
+  fraction: ',.2f',
+  percent: '.2f',
+  per100k: ',.1f',
+};

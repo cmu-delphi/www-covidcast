@@ -1,31 +1,22 @@
-import { get } from 'svelte/store';
 import { parseAPITime } from '../../data';
 import { getInfoByName } from '../../data/regions';
-import { currentSensor, times } from '../../stores';
-import { allSensorsMap } from '../../stores/allSensors';
-import {
-  CASES,
-  DateParam,
-  DEATHS,
-  RegionLevel,
-  RegionParam,
-  Sensor,
-  SensorParam,
-  TimeFrame,
-} from '../../stores/params';
+import { DateParam, RegionLevel, RegionParam, Sensor, SensorParam, TimeFrame } from '../../stores/params';
 
 export function resolveSensor(defaultSensor: SensorParam, key?: string): SensorParam {
   if (!key) {
     return defaultSensor;
   }
-  const s = allSensorsMap.get(key);
+  const s = defaultSensor.manager.getSensor(key);
   if (!s) {
     return defaultSensor;
   }
-  return new SensorParam(s, currentSensor, get(times)!);
+  return new SensorParam(s, defaultSensor.manager);
 }
 
 export function resolveSensors(defaultSensor: SensorParam, keys?: readonly string[]): Sensor[] {
+  const CASES = new SensorParam(defaultSensor.manager.getDefaultCasesSignal()!, defaultSensor.manager);
+  const DEATHS = new SensorParam(defaultSensor.manager.getDefaultDeathSignal()!, defaultSensor.manager);
+
   if (!keys) {
     if (defaultSensor.key === CASES.key || defaultSensor.key === DEATHS.key) {
       return [CASES.value, DEATHS.value];
@@ -35,7 +26,7 @@ export function resolveSensors(defaultSensor: SensorParam, keys?: readonly strin
   if (typeof keys === 'string') {
     return [resolveSensor(defaultSensor, keys).value];
   }
-  return keys.map((k) => allSensorsMap.get(k)).filter((d): d is Sensor => d != null);
+  return keys.map((k) => defaultSensor.manager.getSensor(k)).filter((d): d is Sensor => d != null);
 }
 
 export function resolveRegion(defaultRegion: RegionParam, r?: string): RegionParam {
@@ -60,7 +51,7 @@ export function resolveDate(defaultDate: DateParam, d?: string): DateParam {
   if (!d) {
     return defaultDate;
   }
-  return new DateParam(parseAPITime(d.toString().replace(/-/gm, '')), defaultDate.sensorTimeFrame);
+  return new DateParam(parseAPITime(d.toString().replace(/-/gm, '')));
 }
 
 export function resolveTimeFrame(

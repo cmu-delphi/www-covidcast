@@ -1,6 +1,6 @@
 <script>
   import { getContext } from 'svelte';
-  import { stats } from '../../../stores';
+  import { metaDataManager } from '../../../stores';
   import { combineSignals, formatAPITime, parseAPITime } from '../../../data/utils';
   import { formatDateISO } from '../../../formats';
   import { WidgetHighlight } from '../highlight';
@@ -29,7 +29,7 @@
   export let highlight = null;
 
   /**
-   * @type {import("../../../stores/params").DataFetcher}
+   * @type {import("../../../stores/DataFetcher").DataFetcher}
    */
   const fetcher = getContext('fetcher');
 
@@ -50,7 +50,7 @@
     );
   }
 
-  $: entries = sensors.map((sensor, i) => toEntry(sensor, $stats, region.level, i));
+  $: entries = sensors.map((sensor, i) => toEntry(sensor, $metaDataManager, region.level, i));
   $: data = loadData(entries, region, timeFrame);
   $: fileName = `Indicators_${region.displayName}}_${formatDateISO(timeFrame.min)}_${formatDateISO(timeFrame.max)}`;
 

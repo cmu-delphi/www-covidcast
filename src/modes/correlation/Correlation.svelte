@@ -9,10 +9,10 @@
     currentSensor2,
     currentSensorEntry,
     currentSensorEntry2,
-    times,
     currentLag,
+    metaDataManager,
   } from '../../stores';
-  import { DataFetcher, DateParam, RegionParam, SensorParam } from '../../stores/params';
+  import { DateParam, RegionParam, SensorParam } from '../../stores/params';
   import RegionDatePicker from '../../components/RegionDatePicker.svelte';
   import IndicatorPicker from '../../components/IndicatorPicker.svelte';
   import IndicatorCorrelationChart from './IndicatorCorrelationChart.svelte';
@@ -23,10 +23,11 @@
   import AboutSection from '../../components/AboutSection.svelte';
   import { fetchSingleCorrelations } from '../../data/correlation';
   import throttle from 'lodash-es/throttle';
+  import { DataFetcher } from '../../stores/DataFetcher';
 
-  $: primary = new SensorParam($currentSensorEntry);
-  $: secondary = new SensorParam($currentSensorEntry2, currentSensor2);
-  $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
+  $: primary = new SensorParam($currentSensorEntry, $metaDataManager);
+  $: secondary = new SensorParam($currentSensorEntry2, $metaDataManager, currentSensor2);
+  $: date = new DateParam($currentDateObject);
   $: region = new RegionParam($currentRegionInfo);
 
   const items = [nationInfo, ...stateInfo, ...countyInfo];

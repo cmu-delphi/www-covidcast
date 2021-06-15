@@ -3,18 +3,14 @@
   import arrowLeftIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-circle-left.svg';
   import arrowRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-circle-right.svg';
   import calendarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/calendar.svg';
-  import { parseAPITime } from '../data';
-  import { times, stats } from '../stores';
+  import { metaDataManager } from '../stores';
   import { formatDateShortDayOfWeekAbbr, formatDateYearDayOfWeekAbbr } from '../formats';
   import { timeDay } from 'd3-time';
-  import { determineStatsInfo } from '../stores/stats';
 
   /**
    * @type {import('../stores/constants').SensorEntry}
    */
   export let sensor;
-
-  export let level = 'nation';
 
   /**
    * bi-directional binding
@@ -24,42 +20,31 @@
 
   export let className = '';
 
-  function resolveStartEndDate(timesMap, sensor) {
-    if (!timesMap) {
-      return [];
-    }
-    const dates = timesMap.get(sensor.key);
-    return dates ? dates.map(parseAPITime) : [];
-  }
-
-  /**
-   * @type {[Date, Date]}
-   */
-  $: startEndDates = resolveStartEndDate($times, sensor);
-  $: info = determineStatsInfo($stats, sensor, level);
+  $: timeFrame = $metaDataManager.getTimeFrame(sensor);
+  $: info = $metaDataManager.getMetaData(sensor);
 </script>
 
 <div class="date-picker {className}">
   <button
     class="arrow-button picker-button arrow-left"
     title="Go to the previous day"
-    disabled={value == null || startEndDates.length === 0 || value <= startEndDates[0]}
+    disabled={value == null || value <= timeFrame.min}
     on:click={() => (value = timeDay.offset(value, -1))}
   >
     {@html arrowLeftIcon}
   </button>
-  {#if value != null && startEndDates.length !== 0}
+  {#if value != null}
     <Datepicker
       offset={11}
       bind:selected={value}
-      start={startEndDates[0]}
-      end={startEndDates[1]}
+      start={timeFrame.min}
+      end={timeFrame.max}
       formattedSelected={formatDateShortDayOfWeekAbbr(value)}
     >
       <button
         aria-label="selected date"
         class="selected-date picker-button"
-        on:dblclick={() => (value = startEndDates[1])}
+        on:dblclick={() => (value = timeFrame.max)}
         on:
       >
         <span class="selected-date-icon">
@@ -72,7 +57,7 @@
           <p class="date-info">
             Most recent available date is <button
               type="button"
-              on:click={() => (value = startEndDates[1])}
+              on:click={() => (value = info.maxTime)}
               class="uk-link-muted"
             >
               {formatDateYearDayOfWeekAbbr(info.maxTime)}
@@ -93,7 +78,7 @@
   <button
     class="arrow-button picker-button arrow-right"
     title="Go to the next day"
-    disabled={value == null || startEndDates.length === 0 || value >= startEndDates[1]}
+    disabled={value == null || value >= timeFrame.max}
     on:click={() => (value = timeDay.offset(value, 1))}
   >
     {@html arrowRightIcon}

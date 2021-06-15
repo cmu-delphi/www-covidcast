@@ -23,7 +23,7 @@
   export let initialState = DEFAULT_STATE;
 
   /**
-   * @type {import("../../../stores/params").DataFetcher}
+   * @type {import("../../../stores/DataFetcher").DataFetcher}
    */
   const fetcher = getContext('fetcher');
 

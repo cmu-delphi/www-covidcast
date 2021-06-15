@@ -7,6 +7,7 @@ export interface Mode {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   component: () => Promise<any>;
   anchor?: string;
+  waitForReady?: boolean;
 }
 
 export default modes;

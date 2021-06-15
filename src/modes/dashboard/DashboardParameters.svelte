@@ -1,29 +1,24 @@
 <script>
-  import IndicatorPicker from '../../components/IndicatorPicker.svelte';
-  import Search from '../../components/Search.svelte';
+  import RegionSearch from '../../components/RegionSearch.svelte';
   import SensorDatePicker2 from '../../components/SensorDatePicker2.svelte';
+  import SensorSearch from '../../components/SensorSearch.svelte';
+  import { formatAPITime } from '../../data';
   import { nameInfos } from '../../data/regions';
-  import { allSensorsGrouped } from '../../stores/allSensors';
+  import { metaDataManager } from '../../stores';
+  import { trackEvent } from '../../stores/ga';
 
   /**
-   * @type {import("../../../stores/params").SensorParam}
+   * @type {import("../../stores/params").SensorParam}
    */
   export let sensor;
   /**
-   * @type {import("../../../stores/params").DateParam}
+   * @type {import("../../stores/params").DateParam}
    */
   export let date;
   /**
-   * @type {import("../../../stores/params").RegionParam}
+   * @type {import("../../stores/params").RegionParam}
    */
   export let region;
-
-  /**
-   * @param {import('../stores/params').Region} d
-   */
-  function combineKeywords(d) {
-    return `${d.id} ${d.displayName}`;
-  }
 
   let selectedDate = date.value;
 
@@ -34,26 +29,39 @@
     updateDate(date.value);
   }
   $: if (selectedDate !== undefined) {
-    date.set(selectedDate);
+    setDate(selectedDate);
+  }
+
+  function setDate(d) {
+    trackEvent('dashboard', 'set_date', 'global', formatAPITime(d));
+    date.set(d);
+  }
+  function setRegion(d) {
+    trackEvent('dashboard', 'set_region', 'global', !d ? 'us' : d.propertyId);
+    region.set(d);
+  }
+  function setSensor(d) {
+    trackEvent('dashboard', 'set_sensor', 'global', d.key);
+    sensor.set(d);
   }
 </script>
 
 <div class="uk-container content-grid">
-  <IndicatorPicker {sensor} className="grid-1-5" allSensors={allSensorsGrouped} />
-  <Search
+  <SensorSearch
+    className="grid-1-5"
+    modern
+    items={$metaDataManager.metaSensors}
+    selectedItem={sensor.value}
+    on:change={(e) => setSensor(e.detail)}
+  />
+  <RegionSearch
     className="grid-5-9"
     modern
-    placeholder="Select Region"
     items={nameInfos}
-    title="Region"
-    icon="location"
     selectedItem={region.value}
-    labelFieldName="displayName"
-    keywordFunction={combineKeywords}
-    maxItemsToShowInList={5}
-    on:change={(e) => region.set(e.detail && e.detail.level === 'nation' ? null : e.detail)}
+    on:change={(e) => setRegion(e.detail && e.detail.level === 'nation' ? null : e.detail)}
   />
-  <SensorDatePicker2 className="grid-9-13" bind:value={selectedDate} {sensor} level={region.value.level} />
+  <SensorDatePicker2 className="grid-9-13" bind:value={selectedDate} {sensor} />
 </div>
 
 <style>

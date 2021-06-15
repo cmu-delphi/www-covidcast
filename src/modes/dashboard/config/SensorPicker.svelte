@@ -1,33 +1,33 @@
 <script>
-  import { allSensorsGrouped } from '../../../stores/allSensors';
+  import SensorSearch from '../../../components/SensorSearch.svelte';
+  import { metaDataManager } from '../../../stores';
 
   /**
    * @type {import("../../../stores/params").SensorParam}
    */
   export let sensor;
 
-  /**
-   * @type {""}
-   */
   export let value = '';
+
+  let syncedValue = value || '';
+
+  $: defaultSensor = {
+    key: '',
+    id: '',
+    signal: '',
+    name: `Use Configured: ${sensor.name}`,
+  };
+  $: allItems = [defaultSensor, ...$metaDataManager.metaSensors];
 </script>
 
 <div>
   <label for="widget-adder-s" class="uk-form-label">Indicator</label>
-  <select id="widget-adder-s" class="uk-select" name="sensor" {value}>
-    <option value="">Use Configured ({sensor.name})</option>
-    {#each allSensorsGrouped as group}
-      <optgroup label={group.label}>
-        {#each group.sensors as sensor}
-          <option value={sensor.key}>{sensor.name}</option>
-        {/each}
-      </optgroup>
-    {/each}
-  </select>
+  <input type="hidden" value={syncedValue} name="sensor" />
+  <SensorSearch
+    items={allItems}
+    selectedItem={value ? $metaDataManager.getSensor(value) : defaultSensor}
+    on:change={(e) => {
+      syncedValue = e.detail.key || '';
+    }}
+  />
 </div>
-
-<style>
-  .uk-select optgroup {
-    color: #444;
-  }
-</style>

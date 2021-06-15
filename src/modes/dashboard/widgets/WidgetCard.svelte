@@ -159,8 +159,11 @@
         {dateToString(date)}
       </slot>
     </h3>
-    {#if titleUnit && typeof sensor !== 'string'}
+    {#if titleUnit === true && typeof sensor !== 'string'}
       <h4>{sensor.unit}</h4>
+    {/if}
+    {#if typeof titleUnit === 'string'}
+      <h4>{titleUnit}</h4>
     {/if}
   </div>
 </div>
