@@ -1,5 +1,4 @@
 <script>
-  import FancyHeader from '../../components/FancyHeader.svelte';
   import Vega from '../../components/vega/Vega.svelte';
   import { loadBackFillProfile } from '../../data/indicatorInfo';
   import { TimeFrame, WINDOW_SIZE } from '../../stores/params';
@@ -28,14 +27,16 @@
   import { timeMonth } from 'd3-time';
   import BackfillTooltip from './BackfillTooltip.svelte';
   import AboutSection from '../../components/AboutSection.svelte';
+  import { metaDataManager } from '../../stores';
 
   /**
-   * @type {import('../../data/indicatorInfo').IndicatorStatus}
+   * @type {import('../../data/sensor').Sensor}
    */
-  export let indicator;
-  $: date = indicator ? indicator.latest_time_value : new Date();
+  export let sensor;
+
+  $: date = $metaDataManager.getTimeFrame(sensor).max;
   $: window = new TimeFrame(timeMonth.offset(date, -WINDOW_SIZE), date);
-  $: title = `${indicator.name} Backfill Profile`;
+  $: title = `${sensor.name} Backfill Profile`;
 
   $: options = {
     valueField: $valueField,
@@ -49,24 +50,24 @@
   let vegaRef = undefined;
   $: spec = $isRelative
     ? generateChangeHeatMapSpec({
-        title: `${indicator.name}: ${$valueLabel}`,
+        title: `${sensor.name}: ${$valueLabel}`,
         ...options,
       })
     : generateValueHeatMapSpec({
-        title: `${indicator.name}: ${$valueLabel}`,
+        title: `${sensor.name}: ${$valueLabel}`,
         ...options,
       });
-  $: data = loadBackFillProfile(indicator, $currentRegionInfo || nationInfo, window, $anchorLag);
+  $: data = loadBackFillProfile(sensor, $currentRegionInfo || nationInfo, window, $anchorLag);
 
   $: dayOfWeekSpec = backFillDayOfWeekDistribution({
-    title: `${indicator.name}: ${$valueLabel}`,
+    title: `${sensor.name}: ${$valueLabel}`,
     subTitle: `per Lag (Reporting Date - Reference Date) per day of week`,
     ...options,
   });
   let vegaRefDayOfWeek = undefined;
 
   $: dayOfWeekBoxplotSpec = backFillDayOfWeekFrequency({
-    title: `${indicator.name}: ${$valueLabel}`,
+    title: `${sensor.name}: ${$valueLabel}`,
     subTitle: `Lag Distribution to reach 90%`,
     ...options,
     completeness: 0.9,
@@ -74,7 +75,7 @@
   let vegaRefBoxplot = undefined;
 </script>
 
-<AboutSection className="uk-margin-medium-top uk-margin-small-bottom">
+<AboutSection className="uk-margin-small-bottom">
   <h3 class="mobile-h3">About Backfill Profiling</h3>
 
   <div class="desc">
@@ -90,10 +91,6 @@
     that the value is not going to change much anymore.
   </div>
 </AboutSection>
-
-<div class="grid-3-11">
-  <FancyHeader invert sub="Backfill Profile">{indicator.name}</FancyHeader>
-</div>
 
 <Search
   modern
