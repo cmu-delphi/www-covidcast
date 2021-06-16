@@ -85,12 +85,15 @@ export function callAPI(
   geo: GeoPair | readonly GeoPair[],
   time: TimePair | readonly TimePair[],
   fields?: FieldSpec<EpiDataJSONRow>,
+  { asOf = null as Date | null } = {},
 ): Promise<EpiDataJSONRow[]> {
   const url = new URL(ENDPOINT + '/covidcast/');
   addParam(url, 'signal', signal);
   addParam(url, 'geo', geo);
   addParam(url, 'time', time);
-
+  if (asOf) {
+    url.searchParams.set('as_of', formatAPITime(asOf));
+  }
   url.searchParams.set('format', 'json');
   return fetchImpl<EpiDataJSONRow[]>(url, fields).catch((error) => {
     console.warn('failed fetching data', error);

@@ -12,9 +12,9 @@
    */
   export let sensor;
   /**
-   * @type {import('../../data/regions').Region | null}
+   * @type {import('../../data/regions').Region}
    */
-  export let region = null;
+  export let region;
 
   /**
    *
@@ -47,7 +47,7 @@
       if (!d.matchSensor(sensor)) {
         return false;
       }
-      if (r.level === 'nation' || d.matchRegion(d)) {
+      if (r.level === 'nation' || d.matchRegion(r)) {
         return true;
       }
       // match also lower levels
