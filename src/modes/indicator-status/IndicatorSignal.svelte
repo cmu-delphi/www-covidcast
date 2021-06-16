@@ -7,6 +7,7 @@
   import FancyHeader from '../../components/FancyHeader.svelte';
   import IndicatorBackfill from './IndicatorBackfill.svelte';
   import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
+  import DataAnomalies from './DataAnomalies.svelte';
 
   $: sensor = $metaDataManager.getSensor($currentSensor) || $metaDataManager.getSensor(DEFAULT_SENSOR);
   function setSensor(d) {
@@ -47,5 +48,10 @@
       <FancyHeader sub="Backfill Profile">{name}</FancyHeader>
     </div>
     <IndicatorBackfill {sensor} region={$currentRegionInfo} />
+    <div class="grid-3-11">
+      <hr />
+      <FancyHeader sub="Data Anomalies">{name}</FancyHeader>
+      <DataAnomalies {sensor} region={$currentRegionInfo} />
+    </div>
   </div>
 </div>
