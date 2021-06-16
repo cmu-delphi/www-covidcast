@@ -4,6 +4,7 @@
   import { loadData, determineDomain } from './data';
   import Search from '../../components/Search.svelte';
   import { updateHash } from '../../stores/urlHandler';
+  import IndicatorBackfill from './IndicatorBackfill.svelte';
 
   const date = new Date();
 
@@ -19,8 +20,11 @@
   let loadedData = [];
 
   function resolveDefaultStatus(rows) {
-    const id = window.location.hash.slice(1); // remove #
-    return id ? rows.find((d) => d.id === id) : null;
+    const fullId = window.location.hash.slice(1); // remove #
+    const targetMode = fullId.endsWith('_b') ? 'backfill' : 'coverage';
+    const id = fullId.endsWith('_b') ? fullId.slice(0, -2) : fullId;
+    const found = rows.find((d) => d.id === id);
+    return { selected: found, mode: found ? targetMode : 'overview' };
   }
 
   /**
@@ -28,11 +32,18 @@
    */
   let selected = null;
 
+  /**
+   * @type {'overview' | 'coverage' | 'backfill'}
+   */
+  let mode = 'overview';
+
   $: {
     loadedData = [];
     domain = determineDomain([]);
     data.then((rows) => {
-      selected = resolveDefaultStatus(rows);
+      const r = resolveDefaultStatus(rows);
+      selected = r.selected;
+      mode = r.mode;
       loadedData = rows;
       domain = determineDomain(rows);
     });
@@ -40,11 +51,17 @@
 
   function switchToDetails(e) {
     selected = e.detail;
+    mode = 'coverage';
+  }
+
+  function switchMode(m, s) {
+    mode = m;
+    selected = s;
   }
 
   $: {
     if (loadedData.length > 0) {
-      updateHash(selected ? selected.id : '');
+      updateHash(selected ? `${selected.id}${mode == 'backfill' ? '_b' : ''}` : '');
     }
   }
 </script>
@@ -58,15 +75,28 @@
   <div class="uk-container content-grid">
     <div class="grid-3-11">
       <ul class="uk-tab uk-child-width-expand">
-        <li class:uk-active={selected == null}>
-          <a href="#overview" on:click|preventDefault={() => (selected = null)}>Overview</a>
+        <li class:uk-active={mode === 'overview'}>
+          <a href="#overview" on:click|preventDefault={() => switchMode('overview', null)}>Overview</a>
         </li>
-        <li class:uk-active={selected != null}>
-          <a href="#details" on:click|preventDefault={() => (selected = loadedData[0])}>Single Indicator</a>
+        <li class:uk-active={mode === 'coverage'}>
+          <a
+            href="#{(loadedData[0] || { id: 'details' }).id}"
+            on:click|preventDefault={() => switchMode('coverage', selected || loadedData[0])}>Coverage Details</a
+          >
+        </li>
+        <li class:uk-active={mode === 'backfill'}>
+          <a
+            href="#{(loadedData[0] || { id: 'details' }).id}_b"
+            on:click|preventDefault={() => switchMode('backfill', selected || loadedData[0])}>Backfill Profile</a
+          >
         </li>
       </ul>
     </div>
-    {#if selected}
+    {#if mode === 'overview'}
+      <div class="grid-3-11">
+        <IndicatorStatusTable {data} {date} on:select={switchToDetails} {domain} />
+      </div>
+    {:else}
       <Search
         className="grid-3-11"
         modern
@@ -76,20 +106,23 @@
         icon="search"
         selectedItem={selected}
         labelFieldName="name"
-        maxItemsToShowInList="5"
+        maxItemsToShowInList={15}
         clear={false}
         on:change={(e) => {
           const newIndicator = e.detail ? loadedData.find((d) => d.name === e.detail.name) : null;
           if (newIndicator !== selected) {
             selected = newIndicator;
+            if (!selected) {
+              mode = 'overview';
+            }
           }
         }}
       />
-      <IndicatorStatus {domain} signal={selected} />
-    {:else}
-      <div class="grid-3-11">
-        <IndicatorStatusTable {data} {date} on:select={switchToDetails} {domain} />
-      </div>
+      {#if mode === 'coverage'}
+        <IndicatorStatus {domain} signal={selected} />
+      {:else if selected}
+        <IndicatorBackfill indicator={selected} />
+      {/if}
     {/if}
   </div>
 </div>

@@ -7,8 +7,8 @@ const shortNumbers = timeFormat('%-m/%d');
 const iso = timeFormat('%Y-%m-%d');
 const local = timeFormat('%m/%d/%Y');
 const shortAbbrNth = timeFormat('%b %-d');
-const shortWeekdayAbbr = timeFormat('%a, %b %-d');
-const weekday = timeFormat('%A, %B %-d');
+const shortDayOfWeekAbbr = timeFormat('%a, %b %-d');
+const dayOfWeek = timeFormat('%A, %B %-d');
 
 export function formatDateShortNumbers(date?: Date): string {
   return !date ? '?' : shortNumbers(date);
@@ -22,16 +22,16 @@ export function formatDateShortAbbr(date?: Date): string {
   return !date ? '?' : shortAbbr(date);
 }
 
-export function formatDateShortWeekdayAbbr(date?: Date, nthSuffix = false): string {
-  return !date ? '?' : shortWeekdayAbbr(date) + (nthSuffix ? nth(date.getDate()) : '');
+export function formatDateShortDayOfWeekAbbr(date?: Date, nthSuffix = false): string {
+  return !date ? '?' : shortDayOfWeekAbbr(date) + (nthSuffix ? nth(date.getDate()) : '');
 }
 
-export function formatDateWeekday(date?: Date, nthSuffix = false): string {
-  return !date ? '?' : weekday(date) + (nthSuffix ? nth(date.getDate()) : '');
+export function formatDateDayOfWeek(date?: Date, nthSuffix = false): string {
+  return !date ? '?' : dayOfWeek(date) + (nthSuffix ? nth(date.getDate()) : '');
 }
 
-export function formatDateYearWeekdayAbbr(date?: Date, nthSuffix = false): string {
-  return !date ? '?' : formatDateShortWeekdayAbbr(date, nthSuffix) + ` ${date.getFullYear()}`;
+export function formatDateYearDayOfWeekAbbr(date?: Date, nthSuffix = false): string {
+  return !date ? '?' : formatDateShortDayOfWeekAbbr(date, nthSuffix) + ` ${date.getFullYear()}`;
 }
 
 function nth(d: number) {
@@ -69,6 +69,7 @@ export function formatPopulation(info: { population?: number }): string {
 }
 
 const f = format(',.1f');
+const count = format('~s');
 const basePercentFormatter = format('.2%');
 const rawFormatter = format(',.2f');
 
@@ -94,6 +95,9 @@ function sign(
 export function formatValue(value?: number | null, enforceSign = false): string {
   return sign(value, f, enforceSign);
 }
+export function formatCount(value?: number | null, enforceSign = false): string {
+  return sign(value, count, enforceSign);
+}
 export function formatPercentage(value?: number | null, enforceSign = false): string {
   return sign(value, basePercentFormatter, enforceSign, 1 / 100);
 }
@@ -103,3 +107,18 @@ export function formatFraction(value?: number | null, enforceSign = false): stri
 export function formatRawValue(value?: number | null, enforceSign = false): string {
   return sign(value, rawFormatter, enforceSign);
 }
+
+export const formatter = {
+  raw: formatRawValue,
+  raw_count: formatCount,
+  fraction: formatRawValue,
+  percent: formatPercentage,
+  per100k: formatValue,
+};
+export const formatSpecifiers = {
+  raw: ',.2f',
+  raw_count: '~s',
+  fraction: ',.2f',
+  percent: '.2f',
+  per100k: ',.1f',
+};

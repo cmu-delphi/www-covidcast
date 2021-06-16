@@ -1,8 +1,9 @@
 <script>
   export let details = '';
+  export let className = '';
 </script>
 
-<div class="grid-3-11 mobile-invert">
+<div class="grid-3-11 mobile-invert {className}">
   {#if details}
     <details>
       <summary>

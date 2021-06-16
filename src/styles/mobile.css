@@ -306,14 +306,13 @@
 
 /* have it here such that it can be used outside of svelte */
 .per100k {
-  display: inline-flex;
-  flex-direction: column;
+  display: inline-block;
+  font-size: 50%;
   text-align: center;
-  transform: translateY(-40%);
+  line-height: 1;
 }
 .per100k > span {
-  font-size: 50%;
-  line-height: 1;
+  display: block;
 }
 .per100 {
   display: inline-block;

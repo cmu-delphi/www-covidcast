@@ -7,13 +7,10 @@
   import FancyHeader from '../../components/FancyHeader.svelte';
   import TrendIndicator from '../../components/TrendIndicator.svelte';
   import { formatDateISO, formatDateShortNumbers } from '../../formats';
-  import { groupByRegion, extractSparkLine } from '../../stores/params';
-  import { determineTrend } from '../../stores/trend';
   import SensorValue from '../../components/SensorValue.svelte';
   import DownloadMenu from '../../components/DownloadMenu.svelte';
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
-  import SortColumnIndicator from '../../components/Table/SortColumnIndicator.svelte';
-  import { SortHelper } from '../../components/Table/tableUtils';
+  import SortColumnIndicator, { SortHelper, byImportance } from '../../components/SortColumnIndicator.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -28,7 +25,7 @@
    */
   export let sensor;
   /**
-   * @type {import("../../stores/params").DataFetcher}
+   * @type {import("../../stores/DataFetcher").DataFetcher}
    */
   export let fetcher;
 
@@ -67,75 +64,65 @@
     if (!sensor.value || !date.value || !region.value) {
       return Promise.resolve([]);
     }
-    function toGeoTableRow(r, data, important = false) {
-      const trend = determineTrend(date.value, data, sensor.highValuesAre);
-      return {
-        ...r,
-        important,
-        trendObj: trend,
-        delta: trend.delta,
-        change: trend.change,
-        value: trend.current ? trend.current.value : null,
-        data: data.length > 0 ? extractSparkLine(data, date.sparkLineTimeFrame, sensor.value) : [],
-        dump: {
-          indicatorDataSource: sensor.value.id,
-          indicatorId: sensor.value.signal,
-          indicatorName: sensor.name,
-          regionId: r.propertyId,
-          regionLevel: r.level,
-          regionName: r.displayName,
-          date: formatDateISO(date.value),
-          value: trend.current ? trend.current.value : '',
-          trend: trend.trend,
-          delta: trend.delta == null || Number.isNaN(trend.delta) ? '' : trend.delta,
-          refDate: formatDateISO(trend.refDate),
-          refValue: trend.ref ? trend.ref.value : '',
-        },
-      };
-    }
-    function loadImpl(regions) {
-      return fetcher.fetch1SensorNRegionsNDates(sensor, regions, date.windowTimeFrame).then((data) => {
-        const groups = groupByRegion(data);
-        return regions.map((region) => {
-          const data = groups.get(region.propertyId) || [];
-          return toGeoTableRow(region, data);
-        });
-      });
-    }
-    function loadSingle(r, important = false) {
-      return fetcher
-        .fetch1Sensor1RegionNDates(sensor, r, date.windowTimeFrame)
-        .then((rows) => toGeoTableRow(r, rows, important));
-    }
+    const regions = [[nationInfo, true]];
 
     if (region.level === 'state') {
-      return Promise.all([
-        loadSingle(nationInfo, true),
-        loadSingle(region.value, true),
-        loadImpl(getCountiesOfState(region.value)),
-      ]).then((r) => r.flat());
+      regions.push([region.value, true]);
+      for (const county of getCountiesOfState(region.value)) {
+        regions.push([county, false]);
+      }
+    } else if (region.level === 'county') {
+      regions.push([getStateOfCounty(region.value), true]);
+      regions.push([region.value, false]);
+      for (const county of getRelatedCounties(region.value)) {
+        regions.push([county, false]);
+      }
+    } else {
+      for (const state of stateInfo) {
+        regions.push([state, false]);
+      }
     }
-    if (region.level === 'county') {
-      return Promise.all([
-        loadSingle(nationInfo, true),
-        loadSingle(getStateOfCounty(region.value), true),
-        loadSingle(region.value),
-        loadImpl(getRelatedCounties(region.value)),
-      ]).then((r) => r.flat());
-    }
-    return Promise.all([loadSingle(nationInfo, true), loadImpl(stateInfo)]).then((r) => r.flat());
+
+    const trends = fetcher.fetch1SensorNRegionsDateTrend(
+      sensor,
+      regions.map((r) => r[0]),
+      date,
+    );
+    const sparklines = fetcher.fetch1SensorNRegionsSparklines(
+      sensor,
+      regions.map((r) => r[0]),
+      date,
+    );
+    return Promise.all(
+      regions.map(([region, important]) => {
+        return Promise.all([trends.shift(), sparklines.shift()]).then(([trendObj, sparklineRows]) => ({
+          ...region,
+          important,
+          trendObj,
+          delta: trendObj.delta,
+          change: trendObj.change,
+          value: trendObj ? trendObj.value : null,
+          data: sparklineRows,
+          dump: {
+            indicatorDataSource: sensor.value.id,
+            indicatorId: sensor.value.signal,
+            indicatorName: sensor.name,
+            regionId: region.propertyId,
+            regionLevel: region.level,
+            regionName: region.displayName,
+            date: formatDateISO(date.value),
+            value: trendObj ? trendObj.value : '',
+            trend: trendObj.trend,
+            delta: trendObj.delta == null || Number.isNaN(trendObj.delta) ? '' : trendObj.delta,
+            refDate: formatDateISO(trendObj.refDate),
+            refValue: trendObj ? trendObj.refValue : '',
+          },
+        }));
+      }),
+    );
   }
 
-  const sort = new SortHelper('displayName', false, 'displayName', (a, b) => {
-    if (a.important && b.important) {
-      // state vs nation
-      return a.level === 'nation' ? -1 : 1;
-    }
-    if (a.important !== b.important) {
-      return a.important ? -1 : 1;
-    }
-    return 0;
-  });
+  const sort = new SortHelper('displayName', false, 'displayName', byImportance);
 
   $: title = determineTitle(region.value);
   $: regions = determineRegions(region.value);

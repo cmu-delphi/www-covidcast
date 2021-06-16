@@ -1,5 +1,5 @@
-import { isCasesSignal, isDeathSignal } from '../data/signals';
-import type { Sensor } from './constants';
+import { isCasesSignal, isDeathSignal } from './signals';
+import type { Sensor } from './sensor';
 
 export const CASES_SOURCE = 'cases';
 export const DEATH_SOURCE = 'deaths';
@@ -16,6 +16,10 @@ const sourceNameLookup: Record<string, string> = {
   quidel: 'Quidel Antigen Tests',
   safegraph: 'SafeGraph Mobility Data',
   'google-symptoms': 'Google Symptoms Searches',
+  'google-survey': 'Google Survey',
+  'usa-facts': 'USAFacts',
+  'jhu-csse': 'Johns Hopkins University',
+  'covid-act-now': 'Covid Act Now',
 };
 
 export function getDataSource(sensor: { id: string; signal: string } | Sensor): string {

@@ -1,156 +1,107 @@
-import { linear, Result } from 'regression';
-import { zip } from '../util';
-import type { EpiDataRow } from './fetchData';
+import { timeDay } from 'd3-time';
+import type { EpiDataRow } from '.';
+import type { Sensor } from '../stores/constants';
+import type { Region, TimeFrame } from '../stores/params';
+import { callCorrelationAPI, EpiDataCorrelationRow } from './api';
+import { GeoPair, SourceSignalPair } from './apimodel';
+import { toTimeValue } from './utils';
 
 export * from './correlationUtils';
 
-export interface Lag<T = EpiDataRow> {
-  /**
-   *  a_i ~ b_(i+lag) correlate a with b + lag days later
-   */
-  lag: number;
-  r2: number;
+export type { EpiDataCorrelationRow } from './api';
 
-  /**
-   * y = slope * x + intercept
-   */
-  slope: number;
-  /**
-   * y = slope * x + intercept
-   */
-  intercept: number;
-
-  /**
-   * number of dates used for the regression line
-   */
-  samples: number;
-
-  a: T[];
-  b: T[];
-}
-
-export interface CorrelationMetric<T = EpiDataRow> {
+export interface CorrelationSummary {
   r2At0: number;
   lagAtMaxR2: number;
   r2AtMaxR2: number;
-  t0?: Lag<T>;
-  tMax?: Lag<T>;
-  lags: Lag<T>[];
 }
 
-/**
- * Use this many days of lag to compute correlation metrics
- */
-const lag = 28;
-
-function asLag<T>(lag: number, model: Result, a: T[], b: T[]): Lag<T> {
-  return {
-    r2: model.r2,
-    lag,
-    samples: model.points.length,
-    slope: model.equation[0],
-    intercept: model.equation[1],
-    a,
-    b,
-  };
+export function fetchCorrelationSummaries(
+  reference: Sensor,
+  others: readonly Sensor[],
+  region: Region,
+  window: TimeFrame,
+): Promise<Map<string, CorrelationSummary>> {
+  return callCorrelationAPI(
+    SourceSignalPair.from(reference),
+    SourceSignalPair.fromArray(others),
+    GeoPair.from(region),
+    window,
+    undefined,
+    ['lag', 'r2', 'signal_signal', 'signal_source'],
+  ).then((output) => {
+    const r = new Map<string, CorrelationSummary>();
+    for (const other of others) {
+      r.set(other.key, {
+        r2At0: 0,
+        lagAtMaxR2: 0,
+        r2AtMaxR2: 0,
+      });
+    }
+    for (const row of output) {
+      const key = `${row.signal_source}-${row.signal_signal}`;
+      const entry = r.get(key);
+      if (!entry) {
+        continue;
+      }
+      if (row.lag === 0) {
+        entry.r2At0 = row.r2;
+      }
+      if (row.r2 > entry.r2AtMaxR2) {
+        entry.lagAtMaxR2 = row.lag;
+        entry.r2AtMaxR2 = row.r2;
+      }
+    }
+    return r;
+  });
 }
 
-/**
- * Generates R^2 metrics for lags between -28 and 28 days.
- *
- * For lags between 0 and 28 lag b backwards with respect to a.  For -28 to -1 lag a with
- * respect to b.
- *
- * For each lag, the input is a window of length(a)-28, such that the number of values at
- * each lag is the same.
- *
- */
-function generateLags<T extends { value: number }>(a: readonly T[], b: readonly T[]): Lag<T>[] {
-  const lags: Lag<T>[] = [];
-
-  const aValues = a.map((d) => d.value);
-  const bValues = b.map((d) => d.value);
-
-  const aWindow = a.slice(lag);
-  const aWindowValues = aValues.slice(lag);
-  const bWindow = b.slice(lag);
-  const bWindowValues = bValues.slice(lag);
-
-  for (let i = 0; i <= lag; i++) {
-    const bLag = b.slice(lag - i, b.length - i);
-    const bValuesLag = bValues.slice(lag - i, b.length - i);
-    const model = linear(zip(aWindowValues, bValuesLag));
-    lags.push(asLag(i === 0 ? 0 : -i, model, aWindow, bLag));
-  }
-
-  for (let i = 1; i <= lag; i++) {
-    const aLag = a.slice(lag - i, b.length - i);
-    const aValuesLag = aValues.slice(lag - i, b.length - i);
-    const model = linear(zip(aValuesLag, bWindowValues));
-    lags.push(asLag(i, model, aLag, bWindow));
-  }
-  return lags;
+export function fetchSingleCorrelations(
+  reference: Sensor,
+  others: Sensor,
+  region: Region,
+  window: TimeFrame,
+): Promise<Omit<EpiDataCorrelationRow, 'signal_source' | 'signal_signal' | 'geo_value' | 'geo_type'>[]> {
+  return callCorrelationAPI(
+    SourceSignalPair.from(reference),
+    SourceSignalPair.from(others),
+    GeoPair.from(region),
+    window,
+    undefined,
+    { exclude: ['geo_type', 'geo_value', 'signal_signal', 'signal_source'] },
+  );
 }
 
-/**
- * Do a pair-wise intersection of EpiDataRow by date.
- */
-function intersectEpiDataRow<T extends { time_value: number; value: number }>(
-  a: readonly T[],
-  b: readonly T[],
-): [T, T][] {
-  const aLength = a.length;
-  const bLength = b.length;
-  let aIndex = 0;
-  let bIndex = 0;
+export interface MergedLaggedRow<T> {
+  x: number;
+  x_date: Date;
+  x_entry: T;
+  y: number;
+  y_date: Date;
+  y_entry: T;
+}
 
-  const intersection: [T, T][] = [];
+function shiftDate(date: Date, lag: number) {
+  const shifted = timeDay.offset(date, -lag);
+  return toTimeValue(shifted);
+}
 
-  while (aIndex < aLength && bIndex < bLength) {
-    if (a[aIndex].time_value < b[bIndex].time_value) {
-      aIndex++;
-    } else if (a[aIndex].time_value > b[bIndex].time_value) {
-      bIndex++;
-    } else {
-      intersection.push([a[aIndex], b[bIndex]]);
-      aIndex++;
-      bIndex++;
+export function mergeLaggedRows<T extends EpiDataRow>(lag: number, reference: T[], other: T[]): MergedLaggedRow<T>[] {
+  const lookup = new Map(other.map((row) => [shiftDate(row.date_value, lag), row]));
+
+  const out: MergedLaggedRow<T>[] = [];
+  for (const x of reference) {
+    const y = lookup.get(x.time_value);
+    if (y) {
+      out.push({
+        x: x.value,
+        x_date: x.date_value,
+        x_entry: x,
+        y: y.value,
+        y_date: y.date_value,
+        y_entry: y,
+      });
     }
   }
-
-  return intersection;
-}
-
-/**
- * Compute 28-day correlation metrics for a response variable given an explanatory variable.
- *
- */
-export function generateCorrelationMetrics<T extends { time_value: number; value: number }>(
-  response: readonly T[],
-  explanatory: readonly T[],
-): CorrelationMetric<T> {
-  const zippedEpiData = intersectEpiDataRow(response, explanatory);
-  if (zippedEpiData.length < lag * 2) {
-    throw new Error(
-      `Not enough data: There are only ${zippedEpiData.length} dates in both indicators in this time range.`,
-    );
-  }
-  const responseValues = zippedEpiData.map((row) => row[0]);
-  const explanatoryValues = zippedEpiData.map((row) => row[1]);
-
-  const lags = generateLags(responseValues, explanatoryValues);
-  const max = lags.reduce((acc, i) => {
-    return i.r2 > acc.r2 ? i : acc;
-  });
-
-  const lagAtZero = lags.find((l) => l.lag == 0);
-
-  return {
-    r2At0: lagAtZero?.r2 ?? 0,
-    lagAtMaxR2: max.lag,
-    r2AtMaxR2: max.r2,
-    tMax: max,
-    t0: lagAtZero,
-    lags: lags,
-  };
+  return out;
 }

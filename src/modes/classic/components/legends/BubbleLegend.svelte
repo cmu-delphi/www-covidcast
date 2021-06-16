@@ -2,13 +2,13 @@
   import { MISSING_COLOR } from '../../../../theme';
   import { ENCODING_BUBBLE_THEME } from '../../theme';
   import {
-    stats,
     currentLevel,
     colorScale,
     bubbleRadiusScale,
     currentSensorEntry,
     signalCasesOrDeathOptions,
     isMobileDevice,
+    metaDataManager,
   } from '../../../../stores';
   import { transparent } from '../../../../util';
   import { generateLabels } from '../MapBox/colors';
@@ -16,7 +16,7 @@
   export let zoom = 1.0;
 
   $: r = generateLabels(
-    $stats,
+    $metaDataManager,
     $currentSensorEntry,
     $currentLevel,
     $colorScale,
@@ -40,10 +40,7 @@
           style="width: {$bubbleRadiusScale(l.value) * 2 * zoom}px; height: {$bubbleRadiusScale(l.value) *
             2 *
             zoom}px;background:
-          {transparent(
-            l.color,
-            ENCODING_BUBBLE_THEME.fillOpacity,
-          )};border-color: {l.color}"
+          {transparent(l.color, ENCODING_BUBBLE_THEME.fillOpacity)};border-color: {l.color}"
         />
       </div>
       <span>{l.label}</span>
@@ -55,10 +52,7 @@
         style="width: {$bubbleRadiusScale(r.highValue) * 2 * zoom}px; height: {$bubbleRadiusScale(r.highValue) *
           2 *
           zoom}px;background:
-        {transparent(
-          r.highColor,
-          ENCODING_BUBBLE_THEME.fillOpacity,
-        )};border-color: {r.highColor}"
+        {transparent(r.highColor, ENCODING_BUBBLE_THEME.fillOpacity)};border-color: {r.highColor}"
         class="bubble"
       />
     </div>

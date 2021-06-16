@@ -3,15 +3,15 @@
     colorScale,
     currentLevel,
     currentSensorEntry,
-    stats,
     signalCasesOrDeathOptions,
     isMobileDevice,
+    metaDataManager,
   } from '../../../../stores';
   import { generateLabels } from '../MapBox/colors';
   import { MISSING_COLOR, ZERO_COLOR } from '../../../../theme';
 
   $: r = generateLabels(
-    $stats,
+    $metaDataManager,
     $currentSensorEntry,
     $currentLevel,
     $colorScale,

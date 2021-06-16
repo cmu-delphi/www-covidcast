@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher, onDestroy, onMount } from 'svelte';
-  import { stats } from '../../../../stores';
+  import { metaDataManager } from '../../../../stores';
   import { determineColorScale, determineMinMax } from './colors';
   import { primaryValue, sensorMap } from '../../../../stores/constants';
 
@@ -52,11 +52,11 @@
     // dummy function to mark a given argument as tracked
   }
 
-  function updateEncoding(level, encoding, sensor, stats, signalOptions) {
+  function updateEncoding(level, encoding, sensor, metaDataManager, signalOptions) {
     // Get the range for the heatmap.
     const sensorEntry = sensorMap.get(sensor);
     const sensorType = sensorEntry.getType(signalOptions);
-    const valueMinMax = determineMinMax(stats, sensorEntry, level, signalOptions);
+    const valueMinMax = determineMinMax(metaDataManager, sensorEntry, level, signalOptions);
     const { stops, scale } = determineColorScale(valueMinMax, sensorEntry, sensorType);
     const drawMega = level === 'county';
     const ret = wrapper.updateOptions(
@@ -84,9 +84,7 @@
   $: {
     dummyTrack(ready);
     // update encodings upon change
-    if ($stats) {
-      updateEncoding(level, encoding, sensor, $stats, signalOptions);
-    }
+    updateEncoding(level, encoding, sensor, $metaDataManager, signalOptions);
   }
   $: {
     dummyTrack(ready);

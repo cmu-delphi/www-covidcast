@@ -9,10 +9,10 @@
     currentSensor2,
     currentSensorEntry,
     currentSensorEntry2,
-    times,
     currentLag,
+    metaDataManager,
   } from '../../stores';
-  import { DataFetcher, DateParam, RegionParam, SensorParam } from '../../stores/params';
+  import { DateParam, RegionParam, SensorParam } from '../../stores/params';
   import RegionDatePicker from '../../components/RegionDatePicker.svelte';
   import IndicatorPicker from '../../components/IndicatorPicker.svelte';
   import IndicatorCorrelationChart from './IndicatorCorrelationChart.svelte';
@@ -21,12 +21,13 @@
   import FancyHeader from '../../components/FancyHeader.svelte';
   import { MULTI_COLORS } from '../../specs/lineSpec';
   import AboutSection from '../../components/AboutSection.svelte';
-  import { generateCorrelationMetrics } from '../../data/correlation';
+  import { fetchSingleCorrelations } from '../../data/correlation';
   import throttle from 'lodash-es/throttle';
+  import { DataFetcher } from '../../stores/DataFetcher';
 
-  $: primary = new SensorParam($currentSensorEntry);
-  $: secondary = new SensorParam($currentSensorEntry2, currentSensor2);
-  $: date = new DateParam($currentDateObject, $currentSensorEntry, $times);
+  $: primary = new SensorParam($currentSensorEntry, $metaDataManager);
+  $: secondary = new SensorParam($currentSensorEntry2, $metaDataManager, currentSensor2);
+  $: date = new DateParam($currentDateObject);
   $: region = new RegionParam($currentRegionInfo);
 
   const items = [nationInfo, ...stateInfo, ...countyInfo];
@@ -64,11 +65,12 @@
     if (!secondary | !primary) {
       return Promise.resolve([]);
     }
-    const primaryData = fetcher.fetch1Sensor1RegionNDates(primary, region, date.windowTimeFrame);
-    const secondaryData = fetcher.fetch1Sensor1RegionNDates(secondary, region, date.windowTimeFrame);
-    return Promise.all([primaryData, secondaryData]).then((r) => {
-      return generateCorrelationMetrics(r[0], r[1]).lags;
-    });
+    // const primaryData = fetcher.fetch1Sensor1RegionNDates(primary, region, date.windowTimeFrame);
+    // const secondaryData = fetcher.fetch1Sensor1RegionNDates(secondary, region, date.windowTimeFrame);
+    return fetchSingleCorrelations(primary.value, secondary.value, region.value, date.windowTimeFrame);
+    // return Promise.all([primaryData, secondaryData]).then((r) => {
+    //   return generateCorrelationMetrics(r[0], r[1]).lags;
+    // });
   }
 
   $: lags = loadData(primary, secondary, region, date);
@@ -157,7 +159,15 @@
         </p>
       </AboutSection>
       <p />
-      <IndicatorCorrelationChart {primary} {secondary} lag={$currentLag} {lags} lagData={selectedLag} />
+      <IndicatorCorrelationChart
+        {primary}
+        {secondary}
+        {region}
+        {date}
+        lag={$currentLag}
+        {fetcher}
+        lagData={selectedLag}
+      />
       <hr />
       <FancyHeader invert sub="Chart">{primary.name}</FancyHeader>
       <AboutSection details>

@@ -1,10 +1,10 @@
 <script>
-  import { isMobileDevice, stats } from '../stores';
+  import { isMobileDevice } from '../stores';
   import { state2TileCell } from '../specs/matrixSpec';
   import { generateSparkLine } from '../specs/lineSpec';
   import HexGrid from '../components/HexGrid/HexGrid.svelte';
   import HexGridCell from '../components/HexGrid/HexGridCell.svelte';
-  import { getInfoByName, stateInfo } from '../data/regions';
+  import { getInfoByName } from '../data/regions';
   import { addMissing } from '../data';
   import { groupByRegion } from '../stores/params';
   import Vega from '../components/vega/Vega.svelte';
@@ -29,7 +29,7 @@
    */
   export let sensor;
   /**
-   * @type {import("../../stores/params").DataFetcher}
+   * @type {import("../../stores/DataFetcher").DataFetcher}
    */
   export let fetcher;
 
@@ -40,11 +40,9 @@
    */
   function loadData(sensor, date, isMobile) {
     loading = true;
-    const dateData = fetcher.fetch1SensorNRegions1Date(sensor, 'state', '*', date).then((rows) => groupByRegion(rows));
+    const dateData = fetcher.fetch1SensorNRegions1Date(sensor, 'state', date).then((rows) => groupByRegion(rows));
     const sparkLines = !isMobile
-      ? fetcher
-          .fetch1SensorNRegionsNDates(sensor, stateInfo, date.sparkLineTimeFrame, true)
-          .then((rows) => groupByRegion(rows))
+      ? fetcher.fetch1SensorNRegionsNDates(sensor, 'state', date.sparkLineTimeFrame).then((rows) => groupByRegion(rows))
       : null;
 
     Promise.all([dateData, sparkLines]).then(() => {
@@ -85,7 +83,7 @@
     interactive: false,
     domain: date.sparkLineTimeFrame.domain,
   });
-  $: colorScale = sensor.createColorScale($stats, region.level);
+  $: colorScale = sensor.createColorScale(region.level);
   $: dumpData = Promise.all(tileData.map((d) => d.dump)).then((rows) => rows.flat());
 
   const maxColumn = state2TileCell.reduce((acc, v) => Math.max(acc, v.x), 0) + 1;

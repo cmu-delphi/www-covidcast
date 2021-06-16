@@ -1,10 +1,10 @@
 <script>
-  import { sensorList } from '../../stores';
+  import { metaDataManager, sensorList } from '../../stores';
   import KPIValue from '../../components/KPIValue.svelte';
   import FancyHeader from '../../components/FancyHeader.svelte';
   import TrendIndicator from '../../components/TrendIndicator.svelte';
   import { SensorParam } from '../../stores/params';
-  import { formatDateWeekday } from '../../formats';
+  import { formatDateDayOfWeek } from '../../formats';
   import SensorUnit from '../../components/SensorUnit.svelte';
   import MaxDateHint from '../../blocks/MaxDateHint.svelte';
 
@@ -17,24 +17,28 @@
    */
   export let region;
   /**
-   * @type {import("../../stores/params").DataFetcher}
+   * @type {import("../../stores/DataFetcher").DataFetcher}
    */
   export let fetcher;
 
   const highlights = sensorList.filter((d) => d.highlight && d.highlight.includes('location'));
 
-  $: highlightSensors = highlights.map((h) => ({
-    sensor: new SensorParam(h),
-    trend: fetcher.fetchWindowTrend(h, region, date),
-  }));
+  function loadData(sensors, region, date) {
+    return fetcher.fetchNSensors1Region1DateTrend(sensors, region, date).map((trend, i) => ({
+      sensor: new SensorParam(sensors[i], $metaDataManager),
+      trend,
+    }));
+  }
+
+  $: highlightSensors = loadData(highlights, region, date);
 </script>
 
 <FancyHeader sub="Indicators">Key</FancyHeader>
 
 <p>
-  On {formatDateWeekday(date.value)}
+  On {formatDateDayOfWeek(date.value)}
   {#if highlightSensors.length > 0}
-    <MaxDateHint sensor={highlightSensors[0].sensor.value} level={region.level} suffix="," />
+    <MaxDateHint sensor={highlightSensors[0].sensor.value} suffix="," />
   {:else}
     {`, `}
   {/if}
@@ -49,7 +53,7 @@
         {#await s.trend}
           <KPIValue value={null} loading />
         {:then d}
-          <KPIValue value={d && d.current ? d.current.value : null} digits={2} />
+          <KPIValue value={d ? d.value : null} digits={2} />
         {/await}
       </div>
       <div class="sub">

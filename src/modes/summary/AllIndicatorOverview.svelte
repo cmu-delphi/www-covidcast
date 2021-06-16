@@ -1,7 +1,7 @@
 <script>
   import FancyHeader from '../../components/FancyHeader.svelte';
   import { sensorList } from '../../stores';
-  import { formatDateYearWeekdayAbbr } from '../../formats';
+  import { formatDateYearDayOfWeekAbbr } from '../../formats';
   import AllIndicatorsText from './AllIndicatorsText.svelte';
 
   /**
@@ -13,7 +13,7 @@
    */
   export let region;
   /**
-   * @type {import("../../stores/params").DataFetcher}
+   * @type {import("../../stores/DataFetcher").DataFetcher}
    */
   export let fetcher;
 
@@ -25,7 +25,7 @@
     if (!date.value || !region.value) {
       return Promise.resolve(null);
     }
-    return Promise.all(sensorList.map((sensor) => fetcher.fetchWindowTrend(sensor, region, date))).then((trends) => {
+    return Promise.all(fetcher.fetchNSensors1Region1DateTrend(sensorList, region, date)).then((trends) => {
       const positive = [];
       const negative = [];
       const unknownOrNeutral = [];
@@ -64,7 +64,7 @@
       are
       <strong>have changed</strong> or are <strong>not available</strong>
       for
-      {formatDateYearWeekdayAbbr(date.value)}.
+      {formatDateYearDayOfWeekAbbr(date.value)}.
     {/if}
   {/await}
 </p>

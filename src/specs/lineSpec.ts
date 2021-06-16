@@ -68,10 +68,10 @@ export const signalPatches = {
 //   };
 // }
 
-export function autoAlign(dateField = 'date_value'): ExprRef {
+export function autoAlign(dateField = 'date_value', offset = 40): ExprRef {
   return {
     // auto align based on remaining space
-    expr: `(width - scale('x', datum.${dateField})) < 40 ? 'right' : (scale('x', datum.${dateField})) > 40 ? 'center' : 'left'`,
+    expr: `(width - scale('x', datum.${dateField})) < ${offset} ? 'right' : (scale('x', datum.${dateField})) > ${offset} ? 'center' : 'left'`,
   };
 }
 
@@ -184,6 +184,27 @@ export function genAnnotationLayer(
   };
 }
 
+function genEmptyHighlightLayer(): NormalizedLayerSpec | NormalizedUnitSpec {
+  return {
+    data: {
+      values: [
+        {
+          text: '',
+        },
+      ],
+    },
+    mark: {
+      type: 'text',
+      baseline: 'bottom',
+      fontSize: 16,
+      dy: -3,
+      y: 0,
+      x: 0,
+      text: '',
+    },
+  };
+}
+
 export interface LineSpecOptions {
   width?: number;
   height?: number;
@@ -202,6 +223,9 @@ export interface LineSpecOptions {
   reactOnMouseMove?: boolean;
   clearHighlight?: boolean;
   paddingLeft?: number;
+  paddingTop?: number;
+  infoLabelExpr?: string;
+  autoAlignOffset?: number;
   tickCount?: Axis<ExprRef | SignalRef>['tickCount'];
 }
 
@@ -223,6 +247,9 @@ export function generateLineChartSpec({
   reactOnMouseMove = true,
   clearHighlight = true,
   paddingLeft = 42,
+  paddingTop,
+  infoLabelExpr,
+  autoAlignOffset = 40,
   tickCount = {
     interval: 'week' as const,
     step: 1,
@@ -243,7 +270,7 @@ export function generateLineChartSpec({
     ...BASE_SPEC,
     width,
     height,
-    padding: { left: paddingLeft, top: topOffset, bottom: 55, right: 15 },
+    padding: { left: paddingLeft, top: paddingTop ?? topOffset, bottom: 55, right: 15 },
     title: title
       ? {
           text: title,
@@ -287,6 +314,7 @@ export function generateLineChartSpec({
               tickCount: 5,
               labelFontSize: 14,
               format: valueFormat,
+              // formatType: 'cachedNumber',
             },
             scale: {
               round: true,
@@ -295,15 +323,17 @@ export function generateLineChartSpec({
               // padding: zero ? undefined : smartPadding(valueField),
             },
           },
-          opacity: highlightRegion
+          ...(highlightRegion
             ? {
-                condition: {
-                  test: 'highlightRegion != null && highlightRegion !== datum.id',
-                  value: 0.1,
+                opacity: {
+                  condition: {
+                    test: 'highlightRegion != null && highlightRegion !== datum.id',
+                    value: 0.1,
+                  },
+                  value: 1,
                 },
-                value: 1,
               }
-            : {},
+            : {}),
         },
       },
       {
@@ -380,19 +410,25 @@ export function generateLineChartSpec({
           {
             mark: {
               type: 'text',
-              align: autoAlign(dateField),
+              align: autoAlign(dateField, autoAlignOffset),
               color: COLOR,
               baseline: 'bottom',
               fontSize: 16,
               dy: -3,
             },
             encoding: {
-              text: {
-                field: dateField,
-                type: 'temporal',
-                format: '%a %b %d',
-                formatType: 'cachedTime',
-              },
+              text: infoLabelExpr
+                ? {
+                    value: {
+                      expr: infoLabelExpr,
+                    },
+                  }
+                : {
+                    field: dateField,
+                    type: 'temporal',
+                    format: '%a %b %d',
+                    formatType: 'cachedTime',
+                  },
               y: {
                 value: 0,
               },
@@ -400,6 +436,7 @@ export function generateLineChartSpec({
           },
         ],
       },
+      genEmptyHighlightLayer(),
     ],
   };
 }
@@ -425,7 +462,7 @@ export function generateCompareLineSpec(
   return spec;
 }
 
-export function generateLineAndBarSpec(options: LineSpecOptions = {}): TopLevelSpec {
+export function generateLineAndBarSpec(options: LineSpecOptions = {}): TopLevelSpec & LayerSpec<Field> {
   const spec = generateLineChartSpec(options);
   const point = spec.layer[1] as NormalizedUnitSpec;
   point.mark = {
@@ -436,7 +473,47 @@ export function generateLineAndBarSpec(options: LineSpecOptions = {}): TopLevelS
     },
   };
   (point.encoding!.y as PositionFieldDef<Field>).field = 'raw';
+  (point.encoding!.y as PositionFieldDef<Field>).stack = null;
   (point.encoding!.opacity as PositionValueDef).value = 0.2;
+  return spec;
+}
+
+export function generateCumulativeBarSpec(options: LineSpecOptions = {}): TopLevelSpec {
+  const spec = generateLineChartSpec(options);
+  // convert line to bar chart
+  const line = spec.layer[0] as NormalizedUnitSpec;
+  line.mark = {
+    type: 'bar',
+    color: options.color || MULTI_COLORS[0],
+    width: {
+      expr: `floor(width / customCountDays(domain('x')[0], domain('x')[1]))`,
+    },
+  };
+  (line.encoding!.y as PositionFieldDef<Field>).field = 'cumulative';
+  (line.encoding!.y as PositionFieldDef<Field>).stack = null;
+  (line.encoding!.opacity as PositionValueDef) = {
+    value: 0.2,
+  };
+  // convert highlight point to shifted bar chart at the top
+  const point = spec.layer[1] as NormalizedUnitSpec;
+  point.transform = [
+    {
+      calculate: `datum.cumulative - datum.raw`,
+      as: 'prevCumulative',
+    },
+  ];
+  point.mark = {
+    type: 'rect',
+    color: options.color || MULTI_COLORS[0],
+    width: {
+      expr: `floor(width / customCountDays(domain('x')[0], domain('x')[1]))`,
+    },
+  };
+  (point.encoding!.y as PositionFieldDef<Field>).field = 'cumulative';
+  (point.encoding!.y as PositionFieldDef<Field>).stack = null;
+  (point.encoding!.y2 as PositionFieldDef<Field>) = { field: 'prevCumulative' };
+  (point.encoding!.opacity as PositionValueDef).value = 1;
+
   return spec;
 }
 
@@ -725,7 +802,7 @@ export function generateDistributionLineSpec(state: RegionInfo, options: LineSpe
       as: 'value',
     },
   ];
-  ((spec.padding as unknown) as { bottom: number }).bottom = 50;
+  (spec.padding as unknown as { bottom: number }).bottom = 50;
   spec.layer[0].encoding!.color = {
     field: 'group',
     type: 'nominal',
@@ -830,7 +907,7 @@ export function generateDistributionLineSpec(state: RegionInfo, options: LineSpe
 
 export function generateDistributionLineSpec2(state: RegionInfo, options: LineSpecOptions = {}): TopLevelSpec {
   const spec = generateLineChartSpec(options);
-  ((spec.padding as unknown) as { bottom: number }).bottom = 50;
+  (spec.padding as unknown as { bottom: number }).bottom = 50;
   spec.layer[0].encoding!.color = {
     condition: {
       test: `datum.geo_value == '${state.propertyId.toLowerCase()}'`,

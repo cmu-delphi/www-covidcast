@@ -22,7 +22,7 @@ export function combineSignals<T extends Record<string, number>>(
     const key = keys[i];
     for (const d of rows || []) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-      const entry = (map.get(toKey(d)) as unknown) as Record<string, number>;
+      const entry = map.get(toKey(d)) as unknown as Record<string, number>;
       if (entry) {
         entry[key as string] = d.value * factor;
       }
@@ -40,3 +40,7 @@ export function parseAPITime(v: number | string): Date {
  * @type {(v: Date) => string}
  */
 export const formatAPITime = timeFormat('%Y%m%d');
+
+export function toTimeValue(date: Date): number {
+  return Number.parseInt(formatAPITime(date), 10);
+}

@@ -1,7 +1,7 @@
 <script>
   import { lagToOffset } from '../../data/correlation';
 
-  import { formatDateShortWeekdayAbbr } from '../../formats';
+  import { formatDateShortDayOfWeekAbbr } from '../../formats';
   import SensorValue from '../../components/SensorValue.svelte';
 
   export let hidden = false;
@@ -32,7 +32,7 @@
       </th>
     </tr>
     <tr>
-      <th>{formatDateShortWeekdayAbbr(item.x_date)}</th>
+      <th>{formatDateShortDayOfWeekAbbr(item.x_date)}</th>
       <td>
         <SensorValue sensor={primary} value={item.x} medium />
       </td>
@@ -47,7 +47,7 @@
     </tr>
     <tr>
       <th>
-        {formatDateShortWeekdayAbbr(item.y_date)}
+        {formatDateShortDayOfWeekAbbr(item.y_date)}
       </th>
       <td>
         <SensorValue sensor={secondary} value={item.y} medium />

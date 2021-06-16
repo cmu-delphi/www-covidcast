@@ -1,6 +1,5 @@
 <script>
   import { scaleLinear } from 'd3-scale';
-  import { stats } from '../../stores';
   /**
    * @type {import('../../stores/params').SensorParam}
    */
@@ -9,9 +8,13 @@
   export let gradientLength = 280;
   export let gradientThickness = 8;
 
+  export let value = null;
+
   export let level = 'state';
 
-  $: scale = sensor.createColorScale($stats, level);
+  $: scale = sensor.createColorScale(level);
+
+  $: linearScale = scale.copy().rangeRound([0, 100]);
 
   function gradient(scale, gradientLength) {
     const samples = Math.floor(gradientLength / 30); // every 30px
@@ -34,6 +37,13 @@
       gradientLength,
     )}; padding-top: {gradientThickness}px; background-size: 100% {gradientThickness}px"
   >
+    {#if value}
+      {#await value then v}
+        {#if v != null}
+          <div class="tick-highlight" style="left: {linearScale(v)}%">{sensor.formatValue(v)}</div>
+        {/if}
+      {/await}
+    {/if}
     {#each scale.ticks(5) as tick}
       <div class="tick" data-tick={sensor.formatValue(tick)} />
     {/each}
@@ -54,6 +64,7 @@
     background-repeat: no-repeat;
     display: flex;
     justify-content: space-between;
+    position: relative;
   }
   .tick {
     position: relative;
@@ -70,5 +81,22 @@
     left: 50%;
     top: 2px;
     transform: translateX(-50%);
+  }
+
+  .tick-highlight {
+    position: absolute;
+    font-size: 0.75rem;
+    transform: translate(-50%, 0);
+    text-align: center;
+    bottom: 100%;
+  }
+
+  .tick-highlight::before {
+    content: '▼';
+    font-size: 0.5rem;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -3px);
   }
 </style>

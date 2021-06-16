@@ -3,12 +3,12 @@
   import { modeByID } from '..';
   import { sensorList, currentMode, currentSensor2 } from '../../stores';
   import { scrollToTop } from '../../util';
-  import { generateCorrelationMetrics } from '../../data/correlation';
+  import { fetchCorrelationSummaries } from '../../data/correlation';
   import { formatRawValue } from '../../formats';
   import FancyHeader from '../../components/FancyHeader.svelte';
-  import SortColumnIndicator from '../../components/Table/SortColumnIndicator.svelte';
-  import { SortHelper } from '../../components/Table/tableUtils';
+  import SortColumnIndicator, { SortHelper } from '../../components/SortColumnIndicator.svelte';
   import AboutSection from '../../components/AboutSection.svelte';
+  import { tick } from 'svelte';
 
   /**
    * @typedef {import('../../stores/constants').SensorEntry} SensorEntry
@@ -30,30 +30,10 @@
    * @type {import("../../stores/params").SensorParam}
    */
   export let sensor;
-  /**
-   * @type {import("../../stores/params").DataFetcher}
-   */
-  export let fetcher;
 
   const sort = new SortHelper('r2AtMaxR2', true, 'name');
 
-  /**
-   * @param {SensorEntry} context
-   * @param {SensorEntry} compare
-   * @param {import("../../stores/params").RegionParam} region
-   * @param {import("../../stores/params").DateParam} date
-   * @returns {Promise<CorrelationMetric>}
-   */
-  function buildMetrics(context, compare, region, date) {
-    const contextData = fetcher.fetch1Sensor1RegionNDates(context, region, date.windowTimeFrame);
-    const compareData = fetcher.fetch1Sensor1RegionNDates(compare, region, date.windowTimeFrame);
-    return Promise.all([contextData, compareData]).then((p) => {
-      const metrics = generateCorrelationMetrics(p[0], p[1]);
-      return metrics;
-    });
-  }
-
-  let loaded = 0;
+  let loading = true;
   /**
    * Starting from a list of sensors, mix in all of the other columns needed for the table.
    * @param {SensorEntry} context
@@ -61,22 +41,26 @@
    * @param {import("../../stores/params").DateParam} date
    */
   function buildTableData(context, region, date) {
-    loaded = 0;
-    return sensorList
-      .filter((d) => d.key !== context.key)
-      .map((sensor) => {
-        const metrics = buildMetrics(context, sensor, region, date);
-        const r = {
-          ...sensor,
-          metrics,
-        };
-        metrics.then((met) => {
-          // inline for sorting
-          Object.assign(r, met);
-          loaded++;
-        });
-        return r;
+    loading = true;
+    const others = sensorList.filter((d) => d.key !== context.key);
+    const metrics = fetchCorrelationSummaries(context.value, others, region.value, date.windowTimeFrame);
+    metrics
+      .then(() => tick())
+      .then(() => {
+        loading = false;
       });
+    return others.map((sensor) => {
+      const m = metrics.then((l) => l.get(sensor.key));
+      const r = {
+        ...sensor,
+        metrics: m,
+      };
+      m.then((met) => {
+        // inline for sorting
+        Object.assign(r, met);
+      });
+      return r;
+    });
   }
 
   $: otherSensors = buildTableData(sensor, region, date);
@@ -88,7 +72,7 @@
   }
 
   // loaded
-  $: rows = loaded > 0 ? otherSensors.sort($sort.comparator) : otherSensors;
+  $: rows = !loading ? otherSensors.sort($sort.comparator) : otherSensors;
 </script>
 
 <div class="grid-3-11">

@@ -1,23 +1,7 @@
 import { parseAPITime } from './utils';
-import { csvParse } from 'd3-dsv';
 import { timeDay } from 'd3-time';
-import { fetchOptions } from './api';
+import { callAnomaliesAPI, EpiDataAnomaliesRow } from './api';
 import type { RegionInfo, RegionLevel } from './regions';
-
-declare const process: { env: Record<string, string> };
-
-const ANNOTATION_SHEET = process.env.COVIDCAST_ANNOTATION_SHEET;
-const ANNOTATION_DRAFTS = process.env.COVIDCAST_ANNOTATION_DRAFTS === 'true';
-
-export interface RawAnnotation {
-  problem: string;
-  explanation: string;
-  source: string;
-  signals: string; // * or a comma separated list "*"|(ID{\s*";"\s*ID}*)
-  dates: string; // YYYYMMDD-YYYYMMDD
-  regions: string; //semicolor separated key value: e.g. GROUP("*"|(ID{","\s*ID}*)){\s*","\s*GROUP("*"|(ID{","\s*ID}*))}
-  reference?: string;
-}
 
 function parseSignals(signals: string) {
   if (!signals) {
@@ -84,7 +68,7 @@ export class Annotation {
   readonly regions: { level: RegionLevel; ids: '*' | Set<string> }[];
   readonly reference?: string;
 
-  constructor(raw: RawAnnotation) {
+  constructor(raw: EpiDataAnomaliesRow) {
     this.problem = raw.problem;
     this.explanation = raw.explanation;
     this.source = raw.source.trim();
@@ -129,22 +113,7 @@ export class Annotation {
 }
 
 export function fetchAnnotations(): Promise<Annotation[]> {
-  return fetch(ANNOTATION_SHEET, fetchOptions)
-    .then((r) => r.text())
-    .then((csv) => {
-      return csvParse(csv)
-        .filter((d) => {
-          if (!d.problem) {
-            return false;
-          }
-          return ANNOTATION_DRAFTS || d.published === 'TRUE';
-        })
-        .map((row) => new Annotation((row as unknown) as RawAnnotation));
-    })
-    .catch((error) => {
-      console.error('cannot fetch annotations', error);
-      return [];
-    });
+  return callAnomaliesAPI().then((rows) => rows.map((r) => new Annotation(r)));
 }
 
 function compareDate(a: Date, b: Date) {

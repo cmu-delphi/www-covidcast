@@ -1,9 +1,9 @@
 <script>
   import Vega from '../components/vega/Vega.svelte';
   import { formatDateISO } from '../formats';
-  import { getCountiesOfState } from '../data/regions';
+  import { getCountiesOfState, getInfoByName } from '../data/regions';
   import { generateCountiesOfStateSpec, generateRelatedCountySpec, generateStateSpec } from '../specs/mapSpec';
-  import { stats, isMobileDevice } from '../stores';
+  import { isMobileDevice } from '../stores';
   import DownloadMenu from '../components/DownloadMenu.svelte';
   import RegionMapTooltip from './RegionMapTooltip.svelte';
 
@@ -20,7 +20,7 @@
    */
   export let sensor;
   /**
-   * @type {import("../../stores/params").DataFetcher}
+   * @type {import("../../stores/DataFetcher").DataFetcher}
    */
   export let fetcher;
 
@@ -28,9 +28,9 @@
    * @param {import("../../stores/params").SensorParam} sensor
    * @param {import("../../stores/params").RegionParam} region
    */
-  function genSpec(stats, sensor, region) {
+  function genSpec(sensor, region) {
     const options = {
-      domain: sensor.domain(stats, region.level === 'state' || region.level === 'county' ? 'county' : 'state'),
+      domain: sensor.domain(region.level === 'state' || region.level === 'county' ? 'county' : 'state'),
       withStates: true,
       scheme: sensor.value.vegaColorScale,
     };
@@ -54,17 +54,16 @@
       const counties = getCountiesOfState(region.value);
       const countyData = fetcher.fetch1SensorNRegions1Date(
         sensor,
-        'county',
-        `${region.id}000,${counties.map((d) => d.id).join(',')}`,
+        [...counties, getInfoByName(`${region.id}000`)],
         date,
       );
-      const stateData = fetcher.fetch1SensorNRegions1Date(sensor, 'state', '*', date);
+      const stateData = fetcher.fetch1SensorNRegions1Date(sensor, 'state', date);
       return Promise.all([countyData, stateData]).then((r) => r.flat());
     }
     if (region.level === 'county') {
-      return fetcher.fetch1SensorNRegions1Date(sensor, 'county', '*', date);
+      return fetcher.fetch1SensorNRegions1Date(sensor, 'county', date);
     }
-    return fetcher.fetch1SensorNRegions1Date(sensor, 'state', '*', date);
+    return fetcher.fetch1SensorNRegions1Date(sensor, 'state', date);
   }
 
   function generateFileName(sensor, date, region) {
@@ -75,7 +74,7 @@
     return `${sensor.name}_${regionName}_${formatDateISO(date.value)}`;
   }
 
-  $: spec = genSpec($stats, sensor, region);
+  $: spec = genSpec(sensor, region);
   $: data = loadData(sensor, date);
 
   $: showsUS = region.level === 'nation';

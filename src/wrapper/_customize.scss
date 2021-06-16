@@ -1,3 +1,5 @@
+@use "sass:math";
+
 // Font
 $global-font-family: 'Open Sans', Roboto, Arial, sans-serif;
 
@@ -27,4 +29,4 @@ $breadcrumb-divider-margin-horizontal: 3px;
 $tab-item-active-border: $menu-active-color;
 $tab-item-border-width: $menu-active-border-width;
 
-$grid-gap: (32/1440) * 100%;
+$grid-gap: math.div(32, 1440) * 100%;

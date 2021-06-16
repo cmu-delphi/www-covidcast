@@ -1,5 +1,5 @@
 <script>
-  import { levelList } from '../../stores';
+  import { levelList } from '../../stores/constants';
   import { nameInfos, infosByLevel, nationInfo } from '../../data/regions';
   import MapContainer from './components/MapContainer.svelte';
   import Options from './components/Options.svelte';
@@ -69,7 +69,7 @@
         items={nameInfosWithUS}
         selectedItem={$currentRegionInfo}
         labelFieldName="displayName"
-        maxItemsToShowInList="5"
+        maxItemsToShowInList={5}
         on:change={(e) => {
           if (selectByInfo(e.detail)) {
             focusOn = e.detail || null;

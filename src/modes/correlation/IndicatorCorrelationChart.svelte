@@ -7,6 +7,8 @@
   import CorrelationTooltip from './CorrelationTooltip.svelte';
   import DownloadMenu from '../../components/DownloadMenu.svelte';
   import { formatDateISO } from '../../formats';
+  import { extent } from 'vega';
+  import { mergeLaggedRows } from '../../data/correlation';
   /**
    * @type {import("../../stores/params").SensorParam}
    */
@@ -18,91 +20,67 @@
 
   export let lag = 0;
   /**
-   * @type {Promise<import("../../data/correlation").Lag>}
+   * @type {Promise<import("../../data/correlation").EpiDataCorrelationRow>}
    */
   export let lagData;
+  /**
+   * @type {import("../../stores/params").DateParam}
+   */
+  export let date;
+  /**
+   * @type {import("../../stores/params").RegionParam}
+   */
+  export let region;
 
   /**
-   * @type {Promise<import("../../data/correlation").Lag[]>}
+   * @type {import("../../stores/DataFetcher").DataFetcher}
    */
-  export let lags;
+  export let fetcher;
 
-  /**
-   * @param {Promise<import("../../data/correlation").Lag[]>} lags
-   */
-  function prepareDomain(lagsPromise) {
-    return lagsPromise.then((lags) => {
-      let xMin = Number.POSITIVE_INFINITY;
-      let xMax = Number.NEGATIVE_INFINITY;
-      let yMin = Number.POSITIVE_INFINITY;
-      let yMax = Number.NEGATIVE_INFINITY;
-      for (const lag of lags) {
-        for (const x of lag.a) {
-          if (x.value < xMin) {
-            xMin = x.value;
-          }
-          if (x.value > xMax) {
-            xMax = x.value;
-          }
-        }
-        for (const y of lag.b) {
-          if (y.value < yMin) {
-            yMin = y.value;
-          }
-          if (y.value > yMax) {
-            yMax = y.value;
-          }
-        }
-      }
-      return {
-        x: [xMin, xMax],
-        y: [yMin, yMax],
-      };
-    });
-  }
-  /**
-   * @param {Promise<import("../../data/correlation").Lag>} lag
-   */
-  function prepareData(lag) {
-    return lag.then((lagObj) => {
-      if (!lagObj) {
-        return [];
-      }
-      return lagObj.a.map((xi, i) => {
-        const yi = lagObj.b[i];
-        return {
-          x: xi.value,
-          x_date: xi.date_value,
-          x_entry: xi,
-          y: yi.value,
-          y_date: yi.date_value,
-          y_entry: yi,
-        };
-      });
-    });
-  }
+  $: primaryData = fetcher.fetch1Sensor1RegionNDates(primary, region, date.windowTimeFrame);
+  $: secondaryData = fetcher.fetch1Sensor1RegionNDates(secondary, region, date.windowTimeFrame);
 
-  $: data = prepareData(lagData);
-
-  let domains = { x: [], y: [] };
+  let xDomain = [];
   $: {
-    prepareDomain(lags).then((d) => {
-      domains = d;
+    primaryData.then((rows) => {
+      xDomain = extent(rows, (v) => v.value);
     });
   }
+  let yDomain = [];
+  $: {
+    secondaryData.then((rows) => {
+      yDomain = extent(rows, (v) => v.value);
+    });
+  }
+  /**
+   * @param {number} lag
+   * @param {Promise<import("../../data/fetchData").EpiDataRow} primary
+   * @param {Promise<import("../../data/fetchData").EpiDataRow} secondary
+   */
+  function prepareData(lag, primary, secondary) {
+    return Promise.all([primary, secondary]).then(([primaryRows, secondaryRows]) => {
+      return mergeLaggedRows(lag, primaryRows, secondaryRows);
+    });
+  }
+
+  $: data = prepareData(lag, primaryData, secondaryData);
 
   // complex lag obj
   let lagObj = {
     lag,
   };
 
+  /**
+   *
+   * @param {Promise<import("../../data/correlation").EpiDataCorrelationRow>} lagData
+   */
   function updateLagInfo(lagData) {
     lagData.then((lagInfo) => {
       if (!lagInfo) {
         return;
       }
-      const x1 = domains.x[0];
-      const x2 = domains.x[1];
+      const x1 = xDomain[0];
+      const x2 = xDomain[1];
       // update with real information
       lagObj = {
         lag,
@@ -121,8 +99,8 @@
   $: {
     lagObj = {
       lag,
-      x1: domains.x[0],
-      x2: domains.x[1],
+      x1: xDomain[0],
+      x2: xDomain[1],
       y1: null,
       y2: null,
     };
@@ -376,8 +354,8 @@
   $: spec = makeIndicatorCompareSpec(primary, secondary, {
     zero: !scaled,
     isMobile: $isMobileDevice,
-    xDomain: domains.x,
-    yDomain: domains.y,
+    xDomain,
+    yDomain,
   });
 
   let vegaRef = null;

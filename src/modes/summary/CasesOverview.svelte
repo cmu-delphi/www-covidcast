@@ -1,12 +1,13 @@
 <script>
   import KPIValue from '../../components/KPIValue.svelte';
   import TrendIndicator from '../../components/TrendIndicator.svelte';
-  import { CASES, DEATHS } from '../../stores/params';
-  import { formatDateWeekday } from '../../formats';
+  import { SensorParam } from '../../stores/params';
+  import { formatDateDayOfWeek } from '../../formats';
   import SensorUnit from '../../components/SensorUnit.svelte';
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
   import MaxDateHint from '../../blocks/MaxDateHint.svelte';
   import IndicatorWarning from '../../blocks/IndicatorWarning.svelte';
+  import { metaDataManager, sensorList } from '../../stores';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -17,20 +18,30 @@
    */
   export let region;
   /**
-   * @type {import("../../stores/params").DataFetcher}
+   * @type {import("../../stores/DataFetcher").DataFetcher}
    */
   export let fetcher;
 
-  $: casesTrend = fetcher.fetchWindowTrend(CASES, region, date);
-  $: deathTrend = fetcher.fetchWindowTrend(DEATHS, region, date);
+  $: CASES = new SensorParam(
+    sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Cases')),
+    $metaDataManager,
+  );
+  $: DEATHS = new SensorParam(
+    sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Deaths')),
+    $metaDataManager,
+  );
+
+  $: trends = fetcher.fetchNSensors1Region1DateTrend([CASES, DEATHS], region, date);
+  $: casesTrend = trends[0];
+  $: deathTrend = trends[1];
 </script>
 
 <IndicatorWarning sensor={CASES} {date} {region} />
 <IndicatorAnnotations {date} {region} sensor={CASES} range="sparkLine" />
 
 <p>
-  On {formatDateWeekday(date.value)}
-  <MaxDateHint sensor={CASES.value} level={region.level} suffix="," />
+  On {formatDateDayOfWeek(date.value)}
+  <MaxDateHint sensor={CASES.value} suffix="," />
   the {CASES.valueUnit}s were:
 </p>
 
@@ -41,7 +52,7 @@
       {#await casesTrend}
         <KPIValue value={null} loading />
       {:then d}
-        <KPIValue value={d && d.current ? d.current.value : null} />
+        <KPIValue value={d ? d.value : null} />
       {/await}
     </div>
     <div class="sub">
@@ -54,7 +65,7 @@
       {#await deathTrend}
         <KPIValue value={null} loading />
       {:then d}
-        <KPIValue value={d && d.current ? d.current.value : null} />
+        <KPIValue value={d ? d.value : null} />
       {/await}
     </div>
     <div class="sub">

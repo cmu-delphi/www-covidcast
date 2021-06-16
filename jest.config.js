@@ -1,4 +1,5 @@
 module.exports = {
+  testEnvironment: 'jsdom',
   // preprocess *.ts test files with ts-jest
   preset: 'ts-jest',
 

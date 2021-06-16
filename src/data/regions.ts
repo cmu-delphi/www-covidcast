@@ -8,7 +8,7 @@ import hhsRaw from './processed/hhs.csv.js';
 export type RegionLevel = 'state' | 'county' | 'msa' | 'hrr' | 'nation' | 'mega-county' | 'hhs';
 export type RegionArea = 'West' | 'Midwest' | 'Northeast' | 'South';
 
-export interface RegionInfo {
+export interface Region {
   readonly name: string;
   readonly displayName: string;
   readonly id: string;
@@ -17,25 +17,27 @@ export interface RegionInfo {
   readonly level: RegionLevel;
 }
 
-export interface StateInfo extends RegionInfo {
+export type RegionInfo = Region;
+
+export interface StateInfo extends Region {
   region: RegionArea;
   postal: string;
 }
 
-export interface CountyInfo extends RegionInfo {
+export interface CountyInfo extends Region {
   region: RegionArea;
   state: string;
 }
 
-export interface HRRInfo extends RegionInfo {
+export interface HRRInfo extends Region {
   state: string;
 }
 
-export interface HHSInfo extends RegionInfo {
+export interface HHSInfo extends Region {
   states: string[];
 }
 
-export const levelMegaCountyId = 'mega-county';
+export const levelMegaCountyId: RegionLevel = 'mega-county';
 
 function parseCSV<T extends RegionInfo>(
   csv: string,
@@ -43,24 +45,21 @@ function parseCSV<T extends RegionInfo>(
   deriveDisplayName = (d: Partial<T>): string => d.name!,
   extras: (d: T) => void = () => undefined,
 ): T[] {
-  const r: T[] = dsvFormat(';').parse(
-    csv,
-    (d): T => {
-      const info = (Object.assign(d, {
-        level,
-        propertyId: d.postal || d.id,
-        population:
-          d.population === 'NaN' || d.population === '' || d.population == null
-            ? null
-            : Number.parseInt(d.population, 10),
-      }) as unknown) as T;
-      if (!d.displayName || d.displayName === 'X') {
-        d.displayName = deriveDisplayName(info);
-      }
-      extras(info);
-      return info;
-    },
-  );
+  const r: T[] = dsvFormat(';').parse(csv, (d): T => {
+    const info = Object.assign(d, {
+      level,
+      propertyId: d.postal || d.id,
+      population:
+        d.population === 'NaN' || d.population === '' || d.population == null
+          ? null
+          : Number.parseInt(d.population, 10),
+    }) as unknown as T;
+    if (!d.displayName || d.displayName === 'X') {
+      d.displayName = deriveDisplayName(info);
+    }
+    extras(info);
+    return info;
+  });
   return r;
 }
 
@@ -208,6 +207,11 @@ export function getInfoByName(name: string, level: RegionLevel | null = null): R
   if (!name) {
     return null;
   }
+  if (name.includes('@')) {
+    const split = name.indexOf('@');
+    level = name.slice(split + 1) as RegionLevel;
+    name = name.slice(0, split);
+  }
   const key = (level != null ? `${level}:` : '') + String(name).toLowerCase();
   const r = infoLookup.get(key) ?? null;
   if (!r) {
@@ -253,13 +257,26 @@ export function getCountiesOfState(state: RegionInfo): RegionInfo[] {
 /**
  * returns the state of a county
  */
-export function getStateOfCounty(county: CountyInfo): RegionInfo {
+export function getStateOfCounty(county: CountyInfo): RegionInfo | null {
+  if (county.level !== 'county' && county.level !== levelMegaCountyId) {
+    return null;
+  }
   return getInfoByName(county.state, 'state')!;
+}
+
+export function getHHSRegionOfState(state: StateInfo): HHSInfo | null {
+  if (state.level !== 'state') {
+    return null;
+  }
+  return hhsInfo.find((d) => getStatesOfHHS(d).includes(state)) ?? null;
 }
 
 /**
  * returns the state of a county
  */
 export function getStatesOfHHS(hhs: HHSInfo): StateInfo[] {
+  if (hhs.level !== 'hhs') {
+    return [];
+  }
   return (hhs.states ?? []).map((d) => getInfoByName(d, 'state') as StateInfo);
 }

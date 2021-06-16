@@ -2,13 +2,13 @@
   import { MISSING_COLOR } from '../../../../theme';
   import { ENCODING_SPIKE_THEME } from '../../theme';
   import {
-    stats,
     currentLevel,
     colorScale,
     spikeHeightScale,
     currentSensorEntry,
     signalCasesOrDeathOptions,
     isMobileDevice,
+    metaDataManager,
   } from '../../../../stores';
   import { transparent } from '../../../../util';
   import { generateLabels } from '../MapBox/colors';
@@ -20,7 +20,7 @@
   $: size = ENCODING_SPIKE_THEME.size[$currentLevel] * zoom;
   $: maxHeight = ENCODING_SPIKE_THEME.maxHeight[$currentLevel] * zoom;
   $: r = generateLabels(
-    $stats,
+    $metaDataManager,
     $currentSensorEntry,
     $currentLevel,
     $colorScale,

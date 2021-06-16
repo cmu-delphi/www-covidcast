@@ -7,7 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { EnvironmentPlugin, DefinePlugin } = require('webpack');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const pkg = require('./package.json');
-const { preprocess } = require('./svelte.config');
+// const { preprocess } = require('./svelte.config');
 
 const devMode = process.env.NODE_ENV !== 'production';
 
@@ -106,7 +106,7 @@ module.exports = () => {
             {
               loader: 'svelte-loader',
               options: {
-                preprocess,
+                // preprocess,
                 compilerOptions: {
                   dev: devMode,
                 },
@@ -185,10 +185,7 @@ module.exports = () => {
         __VERSION__: JSON.stringify(pkg.version),
       }),
       new EnvironmentPlugin({
-        COVIDCAST_ENDPOINT_URL: 'https://api.covidcast.cmu.edu/epidata/api.php',
-        COVIDCAST_ANNOTATION_SHEET:
-          'https://docs.google.com/spreadsheets/d/e/2PACX-1vToGcf9x5PNJg-eSrxadoR5b-LM2Cqs9UML97587OGrIX0LiQDcU1HL-L2AA8o5avbU7yod106ih0_n/pub?gid=0&single=true&output=csv',
-        COVIDCAST_ANNOTATION_DRAFTS: 'false',
+        COVIDCAST_ENDPOINT_URL: 'https://api.covidcast.cmu.edu/epidata',
       }),
       new HtmlWebpackPlugin({
         title: 'COVIDcast',
@@ -253,6 +250,11 @@ module.exports = () => {
         title: 'COVIDcast Data Anomalies',
         template: './src/index.html',
         filename: 'data-anomalies/index.html',
+      }),
+      new HtmlWebpackPlugin({
+        title: 'COVIDcast Dashboard',
+        template: './src/index.html',
+        filename: 'dashboard/index.html',
       }),
       // new HtmlWebpackPlugin({
       //   title: 'COVIDcast Lab',

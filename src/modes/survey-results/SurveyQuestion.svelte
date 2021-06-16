@@ -4,12 +4,14 @@
   import linkIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/link.svg';
   import HistoryLineChart from '../../blocks/HistoryLineChart.svelte';
   import IndicatorOverview from '../../blocks/IndicatorOverview.svelte';
-  import { formatDateYearWeekdayAbbr } from '../../formats';
+  import { formatDateYearDayOfWeekAbbr } from '../../formats';
   import IndicatorStatsLine from '../../blocks/IndicatorStatsLine.svelte';
   import IndicatorRevisions from './IndicatorRevisions.svelte';
   import WarningBanner from '../../components/WarningBanner.svelte';
   import MaxDateHint from '../../blocks/MaxDateHint.svelte';
   import { refSensor } from '../../stores/questions';
+  import { metaDataManager } from '../../stores';
+  import { SensorParam } from '../../stores/params';
 
   /**
    * question object
@@ -25,14 +27,14 @@
    */
   export let region;
   /**
-   * @type {import("../../stores/params").DataFetcher}
+   * @type {import("../../stores/DataFetcher").DataFetcher}
    */
   export let fetcher;
 
   export let anchor = null;
 
-  $: sensor = question.sensorParam;
-  $: trend = fetcher.fetchWindowTrend(sensor, region, date);
+  $: sensor = new SensorParam(question.sensor, $metaDataManager);
+  $: trend = fetcher.fetch1Sensor1Region1DateTrend(sensor, region, date);
 
   let loading = false;
   let noData = false;
@@ -92,8 +94,8 @@
 
     <p>
       On
-      {formatDateYearWeekdayAbbr(date.value, true)}
-      <MaxDateHint sensor={refSensor} level={region.level} />
+      {formatDateYearDayOfWeekAbbr(date.value, true)}
+      <MaxDateHint sensor={refSensor} />
       the 7 day average of
       <strong>{sensor.name}</strong>
       <UIKitHint title={sensor.signalTooltip} inline />
@@ -102,7 +104,7 @@
     <IndicatorOverview {sensor} {date} {region} {fetcher}>
       The indicator <strong>{sensor.name}</strong> was added in
       <a href={question.addedInWave.link}>{question.addedInWave.name}</a>
-      of the Delphi survey published on {formatDateYearWeekdayAbbr(question.addedInWave.published, true)}.
+      of the Delphi survey published on {formatDateYearDayOfWeekAbbr(question.addedInWave.published, true)}.
     </IndicatorOverview>
 
     <hr />

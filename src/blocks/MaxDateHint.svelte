@@ -1,28 +1,22 @@
 <script>
   import UIKitHint from '../components/UIKitHint.svelte';
-  import { formatDateYearWeekdayAbbr } from '../formats';
-  import { stats } from '../stores';
-  import { determineStatsInfo } from '../stores/stats';
+  import { formatDateYearDayOfWeekAbbr } from '../formats';
+  import { metaDataManager } from '../stores';
   /**
    * @type {import('../stores/params').Sensor}
    */
   export let sensor;
 
-  /**
-   * @type {import('../stores/params').RegionLevel}
-   */
-  export let level = 'nation';
-
   export let suffix = '';
 
-  $: info = determineStatsInfo($stats, sensor, level);
+  $: info = $metaDataManager.getMetaData(sensor);
 </script>
 
 {#if info}
   <UIKitHint
-    title="Most recent available date:<br>&nbsp;{formatDateYearWeekdayAbbr(
+    title="Most recent available date:<br>&nbsp;{formatDateYearDayOfWeekAbbr(
       info.maxTime,
-    )}<br>Last update on:<br>&nbsp;{formatDateYearWeekdayAbbr(info.maxIssue)}"
+    )}<br>Last update on:<br>&nbsp;{formatDateYearDayOfWeekAbbr(info.maxIssue)}"
     noMargin={suffix.length > 0}
     inline={suffix.length === 0}
   />

@@ -1,11 +1,15 @@
 // Indicator Info: aka The Signal Dashboard API
 
-import { formatAPITime, parseAPITime } from './utils';
-import { callSignalAPI } from './api';
-import { EpiDataRow, fetchData } from './fetchData';
+import { parseAPITime } from './utils';
+import { callBackfillAPI, callSignalDashboardStatusAPI, EpiDataBackfillRow } from './api';
+import type { EpiDataRow } from './fetchData';
 import { addNameInfos } from './fetchData';
 import { countyInfo } from './regions';
 import type { RegionInfo } from './regions';
+import fetchTriple from './fetchTriple';
+import type { TimeFrame } from './TimeFrame';
+import { GeoPair, SourceSignalPair, TimePair } from './apimodel';
+import { timeDay } from 'd3-time';
 
 export interface Coverage {
   date: Date;
@@ -28,11 +32,8 @@ function parseFakeISO(value: number | string | Date): Date {
 }
 
 export function getIndicatorStatuses(): Promise<IndicatorStatus[]> {
-  return callSignalAPI<Record<keyof IndicatorStatus, string>>().then((d) => {
-    if (d.result == null || d.result < 0 || d.message.includes('no results')) {
-      return [];
-    }
-    const data = ((d.epidata ?? []) as unknown) as IndicatorStatus[];
+  return callSignalDashboardStatusAPI().then((d) => {
+    const data = d as unknown as IndicatorStatus[];
     for (const row of data) {
       row.id = row.name.toLowerCase().replace(/\s/g, '-');
       row.latest_issue = parseFakeISO(row.latest_issue);
@@ -49,17 +50,50 @@ export function getIndicatorStatuses(): Promise<IndicatorStatus[]> {
 }
 
 export function getAvailableCounties(indicator: IndicatorStatus, date: Date): Promise<(EpiDataRow & RegionInfo)[]> {
-  return fetchData(
+  return fetchTriple(
     {
       id: indicator.source,
       signal: indicator.covidcast_signal,
+      format: 'raw',
     },
     'county',
-    '*',
     date,
-    { time_value: Number.parseInt(formatAPITime(date), 10) },
     {
-      multiValues: false,
+      stderr: false,
     },
-  ).then((rows) => addNameInfos(rows).filter((d) => d.level === 'county'));
+  ).then((rows) => addNameInfos(rows).filter((d) => d.level === 'county')); // no mega-counties
+}
+
+export interface ProfileEntry extends EpiDataBackfillRow {
+  date_value: Date;
+  issue_date: Date;
+  lag: number;
+}
+
+export function loadBackFillProfile(
+  indicator: IndicatorStatus,
+  region: RegionInfo,
+  window: TimeFrame,
+  referenceAnchorLag = 60,
+): Promise<ProfileEntry[]> {
+  return callBackfillAPI(
+    SourceSignalPair.from({
+      id: indicator.source,
+      signal: indicator.covidcast_signal,
+    }),
+    new TimePair('day', window),
+    GeoPair.from(region),
+    referenceAnchorLag,
+  ).then((rows) => {
+    return rows.map((row) => {
+      const date = parseAPITime(row.time_value);
+      const issue = parseAPITime(row.issue);
+      return {
+        ...row,
+        date_value: date,
+        issue_date: issue,
+        lag: timeDay.count(date, issue),
+      };
+    });
+  });
 }

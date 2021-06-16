@@ -4,7 +4,7 @@
   import { SensorParam } from '../../stores/params';
   import { formatDateISO, formatDateShortNumbers } from '../../formats';
   import filterIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/filter.svg';
-  import { currentMode } from '../../stores';
+  import { currentMode, metaDataManager } from '../../stores';
   import { modeByID } from '..';
   import TrendIndicator from '../../components/TrendIndicator.svelte';
   import Vega from '../../components/vega/Vega.svelte';
@@ -24,7 +24,7 @@
    */
   export let region;
   /**
-   * @type {import("../../stores/params").DataFetcher}
+   * @type {import("../../stores/DataFetcher").DataFetcher}
    */
   export let fetcher;
 
@@ -65,15 +65,19 @@
    * @param {import("../../stores/params").RegionParam} region
    */
   function loadData(region, date) {
+    const flatSensors = groupedSensorList.map((group) => group.sensors).flat();
+    const trends = fetcher.fetchNSensors1Region1DateTrend(flatSensors, region, date);
+    const sparkLines = fetcher.fetchNSensor1RegionSparklines(flatSensors, region, date);
     return groupedSensorList.map((group) => {
       return {
         ...group,
         sensors: group.sensors.map((s) => {
-          const sensor = new SensorParam(s);
+          const sensor = new SensorParam(s, $metaDataManager);
           return {
             sensor,
-            sparkLine: fetcher.fetchSparkLine(sensor, region, date),
-            trend: fetcher.fetchWindowTrend(sensor, region, date),
+            // same order ensured
+            sparkLine: sparkLines.shift(),
+            trend: trends.shift(),
             switchMode: () => {
               sensor.set(s, true);
               currentMode.set(modeByID.indicator);
@@ -97,11 +101,12 @@
           regionLevel: region.level,
           regionName: region.displayName,
           date: formatDateISO(date.value),
-          value: trend.current ? trend.current.value : '',
+          value: trend.value,
           trend: trend.trend,
           delta: trend.delta == null || Number.isNaN(trend.delta) ? '' : trend.delta,
+          change: trend.change == null || Number.isNaN(trend.change) ? '' : trend.change,
           refDate: formatDateISO(trend.refDate),
-          refValue: trend.ref ? trend.ref.value : '',
+          refValue: trend.refValue,
         };
       }),
     );
@@ -156,9 +161,7 @@
     </tr>
   </thead>
   {#each loadedData as group (group.label)}
-    {#if !selectedDatasource || selectedDatasource === 'all' || group.sensors.some((d) =>
-        matchDataSource(d.sensor, selectedDatasource),
-      )}
+    {#if !selectedDatasource || selectedDatasource === 'all' || group.sensors.some( (d) => matchDataSource(d.sensor, selectedDatasource), )}
       <tbody>
         <tr class="row-group">
           <th class="mobile-h3" colspan="5">{group.label}</th>
@@ -194,7 +197,7 @@
                 {#await entry.trend}
                   ?
                 {:then t}
-                  <SensorValue sensor={entry.sensor} value={t && t.current ? t.current.value : null} />
+                  <SensorValue sensor={entry.sensor} value={t ? t.value : null} />
                 {/await}
               </td>
               <td rowspan="2">
