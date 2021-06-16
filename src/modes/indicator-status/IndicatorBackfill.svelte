@@ -3,8 +3,6 @@
   import { loadBackFillProfile } from '../../data/indicatorInfo';
   import { TimeFrame, WINDOW_SIZE } from '../../stores/params';
   import {
-    currentRegionInfo,
-    selectByInfo,
     valueField,
     dateField,
     dateOptions,
@@ -21,8 +19,7 @@
     generateValueHeatMapSpec,
     backFillDayOfWeekFrequency,
   } from './backfillSpec';
-  import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
-  import Search from '../../components/Search.svelte';
+  import { nationInfo } from '../../data/regions';
   import OptionPicker from '../../components/OptionPicker.svelte';
   import { timeMonth } from 'd3-time';
   import BackfillTooltip from './BackfillTooltip.svelte';
@@ -34,9 +31,11 @@
    */
   export let sensor;
 
+  export let region;
+
   $: date = $metaDataManager.getTimeFrame(sensor).max;
   $: window = new TimeFrame(timeMonth.offset(date, -WINDOW_SIZE), date);
-  $: title = `${sensor.name} Backfill Profile`;
+  $: title = `${sensor.name} Backfill Profile in ${(region || nationInfo).displayName}`;
 
   $: options = {
     valueField: $valueField,
@@ -57,7 +56,7 @@
         title: `${sensor.name}: ${$valueLabel}`,
         ...options,
       });
-  $: data = loadBackFillProfile(sensor, $currentRegionInfo || nationInfo, window, $anchorLag);
+  $: data = loadBackFillProfile(sensor, region || nationInfo, window, $anchorLag);
 
   $: dayOfWeekSpec = backFillDayOfWeekDistribution({
     title: `${sensor.name}: ${$valueLabel}`,
@@ -91,19 +90,6 @@
     that the value is not going to change much anymore.
   </div>
 </AboutSection>
-
-<Search
-  modern
-  className="grid-3 grid-span-8 uk-margin-top"
-  placeholder="Search for state or country"
-  items={[nationInfo, ...stateInfo, ...countyInfo]}
-  title="Region"
-  icon="location"
-  selectedItem={$currentRegionInfo}
-  labelFieldName="displayName"
-  maxItemsToShowInList={15}
-  on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)}
-/>
 
 <OptionPicker
   className="grid-3 grid-span-2 uk-margin-top"

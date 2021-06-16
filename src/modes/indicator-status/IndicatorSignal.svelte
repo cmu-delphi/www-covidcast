@@ -1,10 +1,12 @@
 <script>
-  import { currentSensor, metaDataManager } from '../../stores';
+  import { currentRegionInfo, currentSensor, metaDataManager, selectByInfo } from '../../stores';
   import { DEFAULT_SENSOR } from '../../stores/constants';
   import AboutSection from '../../components/AboutSection.svelte';
   import SensorSearch from '../../components/SensorSearch.svelte';
+  import RegionSearch from '../../components/RegionSearch.svelte';
   import FancyHeader from '../../components/FancyHeader.svelte';
   import IndicatorBackfill from './IndicatorBackfill.svelte';
+  import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
 
   $: sensor = $metaDataManager.getSensor($currentSensor) || $metaDataManager.getSensor(DEFAULT_SENSOR);
   function setSensor(d) {
@@ -20,11 +22,18 @@
     </div>
     <div class="uk-container content-grid">
       <SensorSearch
-        className="grid-3-11"
+        className="grid-3-7"
         modern
         items={$metaDataManager.metaSensors}
         selectedItem={sensor}
         on:change={(e) => setSensor(e.detail)}
+      />
+      <RegionSearch
+        className="grid-7-11"
+        modern
+        items={[nationInfo, ...stateInfo, ...countyInfo]}
+        selectedItem={$currentRegionInfo || nationInfo}
+        on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)}
       />
     </div>
   </div>
@@ -37,6 +46,6 @@
       <hr />
       <FancyHeader sub="Backfill Profile">{name}</FancyHeader>
     </div>
-    <IndicatorBackfill {sensor} />
+    <IndicatorBackfill {sensor} region={$currentRegionInfo} />
   </div>
 </div>
