@@ -5,7 +5,7 @@
   import { currentSensor, switchToMode } from '../../stores';
 
   function switchToDetails(e) {
-    currentSensor.set(`${e.detail.source}-${e.detail.covidcast_signal}`);
+    currentSensor.set(`${e.detail.source}-${e.detail.reference_signal}`);
     switchToMode(modeByID['indicator-source']);
   }
 </script>

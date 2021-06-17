@@ -108,7 +108,7 @@
       <tr>
         <td>
           <a
-            href="../indicator-source?sensor={r.source}-{r.covidcast_signal}"
+            href="../indicator-source?sensor={r.source}-{r.reference_signal}"
             on:click|preventDefault={() => dispatch('select', r)}>{r.name}</a
           >
           <div class="source">API: {r.source}</div>
