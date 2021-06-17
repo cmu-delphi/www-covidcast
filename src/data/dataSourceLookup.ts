@@ -7,20 +7,26 @@ export const DEATH_SOURCE = 'deaths';
 const sourceNameLookup: Record<string, string> = {
   chng: 'Change Healthcare',
   'doctor-visits': 'Doctor Visits',
-  'fb-survey': 'Delphi Pandemic Survey via Facebook',
+  'fb-survey': 'Delphi CTIS',
   ght: 'Google Search Trends',
   'hospital-admissions': 'Hospital Admissions',
   [CASES_SOURCE]: 'COVID Cases',
   [DEATH_SOURCE]: 'COVID Deaths',
   'indicator-combination': 'COVID Indicator Combination',
-  quidel: 'Quidel Antigen Tests',
-  safegraph: 'SafeGraph Mobility Data',
-  'google-symptoms': 'Google Symptoms Searches',
+  quidel: 'Quidel Inc.',
+  safegraph: 'SafeGraph',
+  'google-symptoms': 'Google Symptoms Search Trends',
   'google-survey': 'Google Survey',
+  'youtube-survey': 'YouTube Survey',
   'usa-facts': 'USAFacts',
   'jhu-csse': 'Johns Hopkins University',
-  'covid-act-now': 'Covid Act Now',
+  'covid-act-now': 'Covid Act Now (CAN)',
+  hhs: 'Department of Health & Human Services',
 };
+
+export function getPlainDataSource(sensor: string): string {
+  return sourceNameLookup[sensor] || sensor;
+}
 
 export function getDataSource(sensor: { id: string; signal: string } | Sensor): string {
   if (typeof sensor === 'string') {
