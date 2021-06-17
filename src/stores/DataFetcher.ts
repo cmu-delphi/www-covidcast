@@ -95,6 +95,7 @@ export class DataFetcher {
     sensor: Sensor | SensorParam,
     region: Region | RegionParam,
     timeFrame: TimeFrame,
+    { advanced = false } = {},
   ): Promise<RegionEpiDataRow[]> {
     const lSensor = SensorParam.unbox(sensor);
     const lRegion = RegionParam.unbox(region);
@@ -103,7 +104,7 @@ export class DataFetcher {
       return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
     }
 
-    const r = fetchTriple(lSensor, lRegion, timeFrame, { asOf: this.asOf })
+    const r = fetchTriple(lSensor, lRegion, timeFrame, { asOf: this.asOf, advanced })
       .then(addNameInfos)
       .then((rows) => addMissing(rows, lSensor));
     this.cache.set(key, r);

@@ -53,8 +53,9 @@
       <hr />
       <FancyHeader sub="Data Anomalies">{name}</FancyHeader>
       <DataAnomalies {sensor} region={$currentRegionInfo || nationInfo} />
+      <hr />
       <FancyHeader sub="Data">{name}</FancyHeader>
-      <IndicatorData {sensor} region={$currentRegionInfo || nationInfo} />
     </div>
+    <IndicatorData {sensor} region={$currentRegionInfo || nationInfo} />
   </div>
 </div>
