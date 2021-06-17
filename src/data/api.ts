@@ -306,11 +306,11 @@ export interface EpiDataMetaInfo {
 
 export const KNOWN_LICENSES = {
   'CC BY': {
-    link: 'https://creativecommons.org/licenses/by/2.0/',
+    link: 'https://creativecommons.org/licenses/by/4.0/',
     name: 'Creative Commons Attribution Licence',
   },
   'CC BY-NC': {
-    link: 'https://creativecommons.org/licenses/by-nc/2.0/',
+    link: 'https://creativecommons.org/licenses/by-nc/4.0/',
     name: 'Creative Commons Attribution-NonCommercial License',
   },
   ODBL: { link: 'https://opendatacommons.org/licenses/odbl/', name: 'Creative Commons NonCommercial License' },

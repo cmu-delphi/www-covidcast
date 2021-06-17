@@ -6,6 +6,7 @@ import { isCountSignal } from './signals';
 import { ALL_TIME_FRAME, TimeFrame } from './TimeFrame';
 import { Sensor, units, colorScales, vegaColorScales, yAxis } from './sensor';
 import { formatSpecifiers, formatter } from '../formats';
+import { parse as parseMarkDown, parseInline } from 'marked';
 
 function toKey(source: string, signal: string) {
   return `${source}-${signal}`;
@@ -100,7 +101,7 @@ function generateCredits(license: EpiDataMetaSourceInfo['license']) {
   }
   const known = KNOWN_LICENSES[license as keyof typeof KNOWN_LICENSES];
   if (known) {
-    return `We are happy for you to use this data in products and publications under the terms of the ${known.name}.`;
+    return `We are happy for you to use this data in products and publications under the terms of the <a href="${known.link}">${known.name}</a>.`;
   }
   return license;
 }
@@ -147,6 +148,13 @@ function findRawCumulativeSignal(sensor: SensorSensor, sensors: SensorSensor[]) 
   return cum;
 }
 
+function addDUALink(links: { alt: string; href: string }[], dua?: string | null) {
+  if (dua) {
+    return [...links, { alt: 'DUA', href: dua }];
+  }
+  return links;
+}
+
 function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
   list: SensorSensor[];
   map: Map<string, SensorSensor>;
@@ -161,8 +169,8 @@ function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
         id: m.source,
         signal: m.signal,
         name: m.name,
-        description: m.description,
-        signalTooltip: m.short_description,
+        description: m.description ? parseMarkDown(m.description.trim()) : '',
+        signalTooltip: m.short_description ? parseInline(m.short_description) : '',
         valueScaleFactor: m.format === 'fraction' ? 100 : 1,
         format: m.format ?? 'raw',
         highValuesAre: m.high_values_are ?? 'neutral',
@@ -176,7 +184,7 @@ function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
         unit: units[m.format],
         colorScale: colorScales[m.high_values_are],
         vegaColorScale: vegaColorScales[m.high_values_are],
-        links: sm.link.map((d) => d.href),
+        links: sm.link.map((d) => `<a href="${d.href}">${d.alt}</a>`),
         credits: credits,
         formatValue: formatter[m.format],
         formatSpecifier: formatSpecifiers[m.format],
@@ -205,7 +213,9 @@ function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
 
     return {
       ...sm,
+      link: addDUALink(sm.link, sm.dua),
       sensors,
+      description: sm.description ? parseMarkDown(sm.description.trim()) : '',
       credits,
       referenceSensor: sm.reference_signal ? sensors.find((d) => d.signal === sm.reference_signal) : undefined,
     };
@@ -240,6 +250,11 @@ export class MetaDataManager {
 
   getSensorsOfType(type: SignalCategory): Sensor[] {
     return this.metaSensors.filter((d) => d.type === type);
+  }
+
+  getSource(sensor: SensorLike | string): SensorSource | null {
+    const s = this.getSensor(sensor);
+    return s ? this.metaSources.find((d) => d.source === s.id) ?? null : null;
   }
 
   getSensor(sensor: SensorLike | string): SensorSensor | null {
