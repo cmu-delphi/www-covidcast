@@ -304,17 +304,23 @@ export interface EpiDataMetaInfo {
   link: { alt: string; href: string }[];
 }
 
-const knownLicenses = {
-  'CC BY': '',
-  'CC BY-NC': '',
-  ODBL: '',
+export const KNOWN_LICENSES = {
+  'CC BY': {
+    link: 'https://creativecommons.org/licenses/by/2.0/',
+    name: 'Creative Commons Attribution Licence',
+  },
+  'CC BY-NC': {
+    link: 'https://creativecommons.org/licenses/by-nc/2.0/',
+    name: 'Creative Commons Attribution-NonCommercial License',
+  },
+  ODBL: { link: 'https://opendatacommons.org/licenses/odbl/', name: 'Creative Commons NonCommercial License' },
 };
 
 export interface EpiDataMetaSourceInfo {
   source: string;
   name: string;
   description: string;
-  license: keyof typeof knownLicenses | string;
+  license: keyof typeof KNOWN_LICENSES | string;
 
   dua?: string | null;
   link: { alt: string; href: string }[];
