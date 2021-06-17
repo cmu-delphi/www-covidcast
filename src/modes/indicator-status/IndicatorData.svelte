@@ -16,6 +16,7 @@
   import { toTimeValue } from '../../data/utils';
   import { formatDateISO } from '../../formats';
   import { SensorParam } from '../../stores/params';
+  import { throttle } from 'lodash';
 
   /**
    * @type {import('../../data/sensor').Sensor}
@@ -26,7 +27,15 @@
    */
   export let region = null;
 
+  let asOfValueBounced = null;
   let asOfValue = null;
+
+  const debounceUpdate = throttle((val) => {
+    asOfValue = val;
+  }, 500);
+  $: {
+    debounceUpdate(asOfValueBounced);
+  }
 
   $: sensorParam = new SensorParam(sensor, $metaDataManager);
   $: timeFrame = sensorParam.timeFrame;
@@ -165,7 +174,7 @@
       <div>
         <span>
           {region.displayName} (as of
-          <input type="date" class="option-picker-input" bind:value={asOfValue} on:change />)
+          <input type="date" class="option-picker-input" bind:value={asOfValueBounced} />)
         </span>
       </div>
       <div>
