@@ -14,8 +14,9 @@
 
 {#if meta}
   {#if source}
-    <span class="uk-badge source-badge" title={sensor.dataSourceName}>{meta.source}</span>
+    <span class="uk-badge source-badge" title={sensor.dataSourceName}>source: {meta.source}</span>
   {/if}
+  <span class="uk-badge signal-badge" title={sensor.name}>api: {meta.signal}</span>
   <span
     class="uk-badge category-badge"
     data-cat={meta.category}
@@ -50,6 +51,9 @@
     font-size: 0.625rem;
   }
   .source-badge {
+    color: white;
+  }
+  .signal-badge {
     color: white;
   }
   .category-badge[data-cat='public'] {

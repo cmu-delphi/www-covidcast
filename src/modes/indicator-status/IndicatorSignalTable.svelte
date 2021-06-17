@@ -5,13 +5,24 @@
   import SensorBadges from '../../components/SensorBadges.svelte';
   import { modeByID } from '..';
   import GeoLevelBadge from '../../components/GeoLevelBadge.svelte';
+  import { formatDateISO } from '../../formats';
 
   /**
    * @type {import('../../data/meta').SensorSource}
    */
   export let source;
   const sort = new SortHelper('name', false, 'name');
-  $: sortedData = source.sensors.slice().sort($sort.comparator);
+
+  function fullEntry(sensor) {
+    const meta = $metaDataManager.getTimeFrame(sensor);
+    return {
+      ...sensor,
+      minTime: meta.min,
+      maxTime: meta.max,
+    };
+  }
+
+  $: sortedData = source.sensors.map(fullEntry).sort($sort.comparator);
 
   function select(signal) {
     console.log(signal);
@@ -24,7 +35,8 @@
   <thead>
     <tr>
       <th class="mobile-th">Signal</th>
-      <th class="mobile-th">Tags</th>
+      <th class="mobile-th">First Data</th>
+      <th class="mobile-th">Latest Data</th>
       <th class="mobile-th">Levels</th>
       <th />
     </tr>
@@ -32,7 +44,12 @@
       <th class="sort-indicator uk-text-center">
         <SortColumnIndicator label="Name" {sort} prop="name" />
       </th>
-      <th class="sort-indicator" />
+      <th class="sort-indicator uk-text-center">
+        <SortColumnIndicator label="First Data" {sort} prop="minTime" />
+      </th>
+      <th class="sort-indicator uk-text-center">
+        <SortColumnIndicator label="Latest Data" {sort} prop="maxTime" />
+      </th>
       <th class="sort-indicator" />
       <th class="sort-indicator" />
     </tr>
@@ -45,10 +62,13 @@
           {#if source.reference_signal == r.signal}
             (reference)
           {/if}
-          <div class="source">API: {r.signal}</div>
+          <div><SensorBadges sensor={r} source={false} /></div>
         </td>
         <td>
-          <SensorBadges sensor={r} source={false} />
+          {formatDateISO(r.minTime)}
+        </td>
+        <td>
+          {formatDateISO(r.maxTime)}
         </td>
         <td>
           {#each $metaDataManager.getLevels(r) as level}
