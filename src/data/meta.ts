@@ -5,7 +5,7 @@ import type { RegionLevel } from './regions';
 import { isCountSignal } from './signals';
 import { ALL_TIME_FRAME, TimeFrame } from './TimeFrame';
 import { Sensor, units, colorScales, vegaColorScales, yAxis } from './sensor';
-import { getDataSource } from './dataSourceLookup';
+import { getPlainDataSource } from './dataSourceLookup';
 import { formatSpecifiers, formatter } from '../formats';
 
 function toKey(source: string, signal: string) {
@@ -123,7 +123,7 @@ function deriveMetaSensors(metadata: EpiDataMetaInfo[]): {
       highValuesAre: m.high_values_are ?? 'neutral',
       hasStdErr: m.has_stderr,
       is7DayAverage: m.is_smoothed,
-      dataSourceName: getDataSource({ id: m.source, signal: m.signal }),
+      dataSourceName: getPlainDataSource(m.source),
       levels: Object.keys(m.geo_types) as RegionLevel[],
       type: m.category ?? 'other',
       xAxis: 'Date',
