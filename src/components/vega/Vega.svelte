@@ -221,6 +221,15 @@
         if (!root) {
           return null;
         }
+        if (specDatasetsEntries.length > 0 || loadedData) {
+          // create a shallow copy of spec since we patch it
+          spec = {
+            ...spec,
+            datasets: {
+              ...(spec.datasets || {}),
+            },
+          };
+        }
         // patch in the spec defined datasets with their loaded values
         specDatasetsEntries.forEach((entry, i) => {
           spec.datasets[entry[0]] = ds[i];
@@ -229,7 +238,7 @@
         if (loadedData) {
           // console.log('patch in loaded data');
           patchedInData = loadedData;
-          spec.datasets = { ...(spec.datasets || {}), values: loadedData };
+          spec.datasets.values = loadedData;
         }
         // build vega
         return m.default(root, spec, {
