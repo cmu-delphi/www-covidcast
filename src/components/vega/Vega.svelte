@@ -266,8 +266,6 @@
         if (!root) {
           return r;
         }
-        r.__last = Math.random();
-        console.log(r.__last);
         vega = r;
         root.setAttribute('role', 'figure');
         signalListeners.forEach((signal) => {
