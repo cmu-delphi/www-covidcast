@@ -61,7 +61,7 @@ function computeChangeDelta(v?: number, base?: number) {
   if (v === base) {
     return { change: 0, delta: 0 };
   }
-  if (base == null) {
+  if (base == null || base === 0) {
     return { change: 1, delta: v ?? 0 };
   }
   if (v == null) {
