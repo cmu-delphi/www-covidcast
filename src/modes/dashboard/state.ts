@@ -88,7 +88,7 @@ function asWidget(
 
 export const widgets: readonly Widget[] = [
   asWidget('line', 'Time Series', ['time'], 'chart', ['sensor', 'region', 'timeFrame']),
-  asWidget('map', 'Choropleth Map', ['region'], 'chart', ['sensor', 'region', 'date']),
+  asWidget('map', 'Choropleth Map', ['region'], 'chart', ['sensor', 'region', 'level', 'date']),
   asWidget('hex', 'Hexagon Map', ['region'], 'chart', ['sensor', 'date']),
   asWidget('regiontable', 'Region Table', ['region'], 'table', ['sensor', 'level', 'date']),
   asWidget('datetable', 'Date Table', ['time'], 'table', ['sensor', 'region', 'timeFrame']),
