@@ -92,7 +92,7 @@
       return generateRelatedCountySpec(region, options);
     }
     const byLevel = {
-      hhr: generateHRRSpec,
+      hrr: generateHRRSpec,
       hhs: generateHHSSpec,
       msa: generateMSASpec,
     };
