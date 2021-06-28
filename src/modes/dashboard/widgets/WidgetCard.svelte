@@ -103,7 +103,7 @@
     }
     if (width !== widgetSize.width || height !== widgetSize.height) {
       widgetSize = { width, height };
-      dispatch('state', widgetSize);
+      dispatch('state', { id, state: widgetSize });
     }
   }
   function enlarge() {
@@ -117,7 +117,7 @@
     }
     if (width !== widgetSize.width || height !== widgetSize.height) {
       widgetSize = { width, height };
-      dispatch('state', widgetSize);
+      dispatch('state', { id, state: widgetSize });
     }
   }
 </script>
