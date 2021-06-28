@@ -87,7 +87,7 @@
   };
 
   $: highlightDate = date.value;
-  $: timeFrame = showFull && expandableWindow ? sensor.timeFrame : date.windowTimeFrame;
+  $: timeFrame = showFull && expandableWindow && !$isMobileDevice ? sensor.timeFrame : date.windowTimeFrame;
 
   /**
    * @param {import('../../stores/params').SensorParam} sensor
@@ -316,7 +316,7 @@
 
 <Vega
   bind:this={vegaRef}
-  className="{className} {showFull && expandableWindow ? 'chart-breakout' : ''}"
+  className="{className} {showFull && expandableWindow && !$isMobileDevice ? 'chart-breakout' : ''}"
   {spec}
   {data}
   tooltip={HistoryLineTooltip}
@@ -334,7 +334,7 @@
       <Toggle bind:checked={singleCumulative}>Cumulative Data</Toggle>
     {/if}
   {/if}
-  {#if expandableWindow}
+  {#if expandableWindow && !$isMobileDevice}
     <Toggle bind:checked={showFull}>Show All Dates</Toggle>
   {/if}
   <div class="spacer" />
