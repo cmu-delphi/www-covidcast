@@ -10,6 +10,7 @@
   import DateTableWidget from './widgets/DateTableWidget.svelte';
   import SensorTableWidget from './widgets/SensorTableWidget.svelte';
   import AnomaliesWidget from './widgets/AnomaliesWidget.svelte';
+  import ZoomedMapChartWidget from './widgets/ZoomedMapChartWidget.svelte';
   import {
     resolveDate,
     resolveRegion,
@@ -59,6 +60,17 @@
     sensor={resolveSensor(sensor, c.config.sensor)}
     date={resolveDate(date, c.config.date)}
     level={resolveRegionLevel(region, c.config.level)}
+    bind:highlight
+    on:action={trackAction}
+    on:state={trackState}
+    id={c.id}
+    initialState={c.state}
+  />
+{:else if c.type === 'zoomedmap'}
+  <ZoomedMapChartWidget
+    sensor={resolveSensor(sensor, c.config.sensor)}
+    date={resolveDate(date, c.config.date)}
+    region={resolveRegion(region, c.config.region)}
     bind:highlight
     on:action={trackAction}
     on:state={trackState}

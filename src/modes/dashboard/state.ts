@@ -13,7 +13,8 @@ export type WidgetType =
   | 'trend'
   | 'regionpcp'
   | 'datepcp'
-  | 'anomalies';
+  | 'anomalies'
+  | 'zoomedmap';
 
 export type WidgetFocus = 'time' | 'region' | 'indicator';
 export type WidgetCategory = 'chart' | 'table' | 'simple' | 'advanced';
@@ -89,6 +90,7 @@ function asWidget(
 export const widgets: readonly Widget[] = [
   asWidget('line', 'Time Series', ['time'], 'chart', ['sensor', 'region', 'timeFrame']),
   asWidget('map', 'Choropleth Map', ['region'], 'chart', ['sensor', 'level', 'date']),
+  asWidget('zoomedmap', 'Zoomed Choropleth Map', ['region'], 'chart', ['sensor', 'region', 'date']),
   asWidget('hex', 'Hexagon Map', ['region'], 'chart', ['sensor', 'date']),
   asWidget('regiontable', 'Region Table', ['region'], 'table', ['sensor', 'level', 'date']),
   asWidget('datetable', 'Date Table', ['time'], 'table', ['sensor', 'region', 'timeFrame']),
