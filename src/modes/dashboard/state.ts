@@ -43,11 +43,11 @@ export interface IState {
 }
 
 const BASE_STATE: IState = {
-  order: ['trend_1', 'map_2', 'regiontable_3', 'datetable_4', 'line_5'],
+  order: ['map_2', 'regiontable_3', 'line_5'],
   states: {
-    line_5: { width: 4, height: 2, zero: true, raw: false },
-    datetable_4: { width: 2, height: 4, sortCriteria: 'name', sortCriteriaDesc: true },
-    regiontable_3: { width: 2, height: 4, sortCriteria: 'name', sortCriteriaDesc: true },
+    line_5: { width: 5, height: 2, zero: true, raw: false },
+    regiontable_3: { width: 2, height: 3, sortCriteria: 'name', sortCriteriaDesc: true },
+    map_2: { width: 3, height: 3 },
   },
   configs: {
     map_2: {
