@@ -75,6 +75,8 @@
 
   export let highlighted = false;
 
+  export let hideOverflow = false;
+
   /**
    * @type {'both' | 'x' | 'y'}
    */
@@ -129,7 +131,7 @@
   data-id={id}
 >
   <div class="widget-wrapper">
-    <div class="uk-card-body">
+    <div class="uk-card-body" class:hideOverflow>
       <slot />
     </div>
   </div>
@@ -192,6 +194,10 @@
     overflow: auto;
 
     display: flex;
+  }
+
+  .uk-card-body.hideOverflow {
+    overflow: hidden;
   }
 
   .uk-card-body > :global(*) {
