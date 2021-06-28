@@ -252,15 +252,16 @@
     left: 0.5em;
     top: 0.5em;
     right: 0.5em;
-    bottom: 0.5em;
+    bottom: 0;
     display: grid;
     --ncol: 3;
     --nrow: 4;
     grid-template-columns: repeat(var(--ncol), 1fr);
-    grid-template-rows: repeat(var(--nrow), 1fr);
+    grid-template-rows: repeat(var(--nrow), minmax(10rem, 1fr));
     grid-auto-flow: dense;
-    grid-auto-rows: 1fr;
+    grid-auto-rows: minmax(10rem, 1fr);
     gap: 0.5em;
+    overflow-y: auto;
   }
 
   .title-text {
