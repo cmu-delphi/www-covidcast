@@ -1,6 +1,5 @@
 import descriptions from './descriptions.generated.json';
 import { modeByID } from '../modes';
-import type { RegionLevel } from '../data/regions';
 import { sensorTypes } from '../data/sensor';
 import { extendSensorEntry, SensorEntry } from '../data/classicSensor';
 
@@ -82,5 +81,3 @@ export const DEFAULT_CORRELATION_SENSOR = (() => {
   }
   return DEFAULT_SURVEY_SENSOR;
 })();
-export const DEFAULT_LEVEL = 'county' as RegionLevel;
-export const DEFAULT_ENCODING = 'color' as 'color' | 'spike' | 'bubble';

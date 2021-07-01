@@ -17,7 +17,6 @@ export type ModeID =
   | 'export'
   | 'survey-results'
   | 'lab'
-  | 'classic'
   | 'indicator'
   | 'landing'
   | 'indicator-status'

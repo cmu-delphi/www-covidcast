@@ -25,11 +25,6 @@ export const modes = [
       import(/* webpackChunkName: 'm-correlation' */ './correlation/Correlation.svelte').then((r) => r.default),
   },
   {
-    id: 'classic',
-    label: 'Classic COVIDcast',
-    component: () => import(/* webpackChunkName: 'm-old' */ './classic/Overview.svelte').then((r) => r.default),
-  },
-  {
     id: 'survey-results',
     label: 'Survey Results',
     component: () =>
