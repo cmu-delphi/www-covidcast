@@ -224,7 +224,9 @@
     background: #ebebeb;
   }
 
-  .overlay-container :global(input[type='text'], input[type='date'], select) {
+  .overlay-container :global(input[type='text']),
+  .overlay-container :global([type='date']),
+  .overlay-container :global(select) {
     background: white;
   }
 
