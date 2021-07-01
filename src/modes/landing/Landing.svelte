@@ -125,9 +125,9 @@
 
     <div class="block">
       <hr />
-      <FancyHeader sub="Pandemic Survey via Facebook" center>Delphi</FancyHeader>
+      <FancyHeader sub="Survey" center>COVID Trends and Impact</FancyHeader>
       <p>
-        The U.S. Pandemic Survey offers insights into public sentiment on:
+        The Trends and Impact Survey (CTIS) offers insights into public sentiment on:
         <a href="./{modeByID['survey-results'].id}" on:click|preventDefault={switchSurvey}>
           {#each questionCategories as cat, i}
             {i === questionCategories.length - 1 ? ' and' : i > 0 ? ',' : ''}
@@ -150,7 +150,7 @@
     </div>
 
     <p>
-      <a href="https://github.com/cmu-delphi/www-covidcast/releases/v{version}/">COVIDcast (v{version})</a> &copy; 2021
+      <a href="https://github.com/cmu-delphi/www-covidcast/releases/v{version}/">COVIDcast (v{version})</a> &copy; {new Date().getFullYear()}
       Delphi Group. COVIDcast is an open-source project under the
       <a href="https://github.com/cmu-delphi/www-covidcast/blob/dev/LICENSE">MIT-license</a>
       available at <a href="https://github.com/cmu-delphi/www-covidcast">GitHub</a>. Developed by the Delphi Team in
