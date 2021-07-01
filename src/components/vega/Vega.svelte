@@ -2,6 +2,7 @@
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import { observeResize, unobserveResize } from '../../util';
   import { createVegaTooltipAdapter } from './tooltipUtils';
+  import createVega from './vegaFactory';
 
   /**
    * @type {Promise<any[]>}
@@ -212,12 +213,8 @@
 
     const specDatasetsEntries = Object.entries(spec.datasets || {});
     let patchedInData = null;
-    vegaPromise = Promise.all([
-      import(/* webpackChunkName: 'vegafactory' */ './vegaFactory'),
-      spec,
-      ...specDatasetsEntries.map((d) => d[1]),
-    ])
-      .then(([m, spec, ...ds]) => {
+    vegaPromise = Promise.all([spec, ...specDatasetsEntries.map((d) => d[1])])
+      .then(([spec, ...ds]) => {
         if (!root) {
           return null;
         }
@@ -241,7 +238,7 @@
           spec.datasets.values = loadedData;
         }
         // build vega
-        return m.default(root, spec, {
+        return createVega(root, spec, {
           tooltip: tooltipHandler,
           renderer,
           patch,

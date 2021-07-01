@@ -53,7 +53,7 @@ export const modes = [
     id: 'dashboard',
     label: 'Dashboard Builder',
     component: () =>
-      import(/* webpackChunkName: 'm-databoard' */ './dashboard/Dashboard.svelte').then((r) => r.default),
+      import(/* webpackChunkName: 'm-dashboard' */ './dashboard/Dashboard.svelte').then((r) => r.default),
     waitForReady: true,
   },
 ];
