@@ -15,15 +15,6 @@ export interface EpiDataCasesOrDeathValues {
   countRatioCumulative: number;
 }
 
-export const EPIDATA_CASES_OR_DEATH_VALUES: (keyof EpiDataCasesOrDeathValues)[] = [
-  'avg',
-  'count',
-  'countCumulative',
-  'avgRatio',
-  'countRatio',
-  'countRatioCumulative',
-];
-
 export interface RegularOldSensor {
   isCasesOrDeath: false;
   isCount: boolean; // is count signal
@@ -41,7 +32,6 @@ export interface CasesOrDeathOldSensor {
   getType(options?: CasesOrDeathOptions): 'prop' | 'count' | 'other';
   default?: boolean; // whether it should be default signal
   casesOrDeathSignals: Record<keyof EpiDataCasesOrDeathValues, string>;
-  casesOrDeathSensors: Record<keyof EpiDataCasesOrDeathValues, Sensor>;
   tooltipText: (options?: CasesOrDeathOptions) => string;
   mapTitleText: (options?: CasesOrDeathOptions) => string;
   plotTitleText: string;
@@ -138,7 +128,6 @@ export function extendSensorEntry(
     },
   });
 
-  casesOrDeath.casesOrDeathSensors = {} as CasesOrDeathOldSensor['casesOrDeathSensors'];
   casesOrDeath.mapTitleText =
     typeof mapTitle === 'function'
       ? (mapTitle as (options?: CasesOrDeathOptions) => string)
@@ -156,33 +145,6 @@ export function extendSensorEntry(
             return mapTitle.ratio;
           }
         };
-
-  const add = (cumulative: boolean, ratio: boolean) => {
-    const options = { cumulative, incidence: !ratio };
-    const subKey = primaryValue(full, options) as keyof EpiDataCasesOrDeathValues;
-    const signal = casesOrDeath.casesOrDeathSignals[subKey];
-    const name = `${cumulative ? 'Cumulative ' : ''}${full.name}${ratio ? ' (per 100,000 people)' : ''}`;
-    casesOrDeath.casesOrDeathSensors[subKey] = ensureSensorStructure({
-      name: `${name} ${!cumulative ? '(7-day average)' : ''}`,
-      id: full.id,
-      signal,
-      type: full.type,
-      levels: full.levels,
-      xAxis: full.xAxis,
-      format: ratio ? 'per100k' : 'raw',
-      unit: ratio ? 'per 100,000 people' : 'people',
-      highValuesAre: 'bad',
-      is7DayAverage: true,
-      hasStdErr: full.hasStdErr,
-      signalTooltip: casesOrDeath.mapTitleText(options),
-      description: full.description,
-      links: full.links,
-      credits: full.credits,
-    });
-  };
-  add(false, false);
-  add(false, true);
-  add(true, false);
 
   return casesOrDeath;
 }

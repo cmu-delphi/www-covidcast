@@ -1,15 +1,5 @@
 /// <reference types="jest" />
-import { EPIDATA_CASES_OR_DEATH_VALUES, getLevelInfo, sensorList } from './constants';
-
-describe('sensorList', () => {
-  test.each(sensorList.map((d) => [d]))('has structure %s', (sensor) => {
-    expect(typeof sensor.key).toBe('string');
-    expect(typeof sensor.name).toBe('string');
-    if (sensor.isCasesOrDeath) {
-      expect(Object.keys(sensor.casesOrDeathSignals)).toEqual(EPIDATA_CASES_OR_DEATH_VALUES);
-    }
-  });
-});
+import { getLevelInfo } from './constants';
 
 describe('getLevelInfo', () => {
   test('existing', () => {

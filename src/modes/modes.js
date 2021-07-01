@@ -35,11 +35,6 @@ export const modes = [
     label: 'Export Data',
     component: () => import(/* webpackChunkName: 'm-export' */ './exportdata/ExportData.svelte').then((r) => r.default),
   },
-  // {
-  //   id: 'lab',
-  //   label: 'Lab',
-  //   component: () => import(/* webpackChunkName: 'mode-lab' */ './lab/Lab.svelte').then((r) => r.default),
-  // },
   {
     id: 'indicator-status',
     label: 'Indicator Status Overview',

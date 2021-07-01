@@ -100,7 +100,6 @@ export class SensorParam {
   readonly rawValue?: Sensor;
   readonly rawCumulativeValue?: Sensor;
 
-  readonly isCasesOrDeath: boolean;
   readonly dataSourceName: string;
 
   readonly isPercentage: boolean;
@@ -129,7 +128,6 @@ export class SensorParam {
     this.rawValue = sensor.rawSensor;
     this.rawCumulativeValue = sensor.rawCumulativeSensor;
 
-    this.isCasesOrDeath = (sensor as SensorEntry).isCasesOrDeath || false;
     this.dataSourceName = sensor.dataSourceName;
     this.isPercentage = sensor.format == 'percent' || sensor.format === 'fraction';
     this.isPer100K = sensor.format === 'per100k';
@@ -231,7 +229,7 @@ export class RegionParam implements Region {
 }
 
 export function extractSparkLine<T extends EpiDataRow>(data: readonly T[], sparkLine: TimeFrame, sensor: Sensor): T[] {
-  return fitRange(addMissing(data.filter(sparkLine.filter), sensor), sensor, sparkLine.min, sparkLine.max);
+  return fitRange(addMissing(data.filter(sparkLine.filter)), sparkLine.min, sparkLine.max);
 }
 
 export function groupByRegion<T extends EpiDataRow & { propertyId: string }>(data: readonly T[]): Map<string, T[]> {
