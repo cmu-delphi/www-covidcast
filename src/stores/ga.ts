@@ -1,5 +1,4 @@
-import { currentSensor, currentRegion, currentDate, currentMode, appReady, currentInfoSensor } from '.';
-
+import { currentSensor, currentRegion, currentDate, currentMode, appReady } from '.';
 import debounce from 'lodash-es/debounce';
 
 interface GoogleAnalyticsLike {
@@ -58,16 +57,5 @@ appReady.subscribe((v) => {
     }
     trackEvent('mode', 'set', mode.id);
   });
-  currentInfoSensor.subscribe((r) => {
-    if (initialRun) {
-      return;
-    }
-    if (!r) {
-      trackEvent('help', 'hide-signal');
-    } else {
-      trackEvent('help', 'show-signal', r.key);
-    }
-  });
-
   initialRun = false;
 });

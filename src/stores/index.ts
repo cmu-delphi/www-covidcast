@@ -6,7 +6,6 @@ import {
   DEFAULT_SURVEY_SENSOR,
   defaultRegionOnStartup,
   DEFAULT_CORRELATION_SENSOR,
-  SensorEntry,
   resolveSensorWithAliases,
 } from './constants';
 import modes, { Mode, modeByID, ModeID } from '../modes';
@@ -84,7 +83,6 @@ export const currentSensor2 = writable(defaultValues.sensor2);
 export const currentSensorEntry2 = derived([currentSensor2], ([$currentSensor]) => sensorMap.get($currentSensor));
 
 export const currentLag = writable(defaultValues.lag);
-export const currentInfoSensor = writable<SensorEntry | null>(null);
 
 export const currentDate = writable(defaultValues.date);
 /**
@@ -309,11 +307,6 @@ export function loadMetaData(): Promise<{ date: string }> {
 currentSensorEntry.subscribe((sensorEntry) => {
   if (!sensorEntry) {
     return;
-  }
-
-  if (get(currentInfoSensor)) {
-    // show help, update it
-    currentInfoSensor.set(sensorEntry);
   }
 
   // clamp to time span

@@ -5,7 +5,7 @@ import { currentDate, currentSensor, selectByInfo } from '.';
 import { scaleSequential } from 'd3-scale';
 import { scrollToTop } from '../util';
 import type { RegionInfo as Region, RegionLevel, RegionArea, CountyInfo } from '../data/regions';
-import type { Sensor, SensorEntry } from './constants';
+import type { Sensor } from './constants';
 import { get, Writable } from 'svelte/store';
 import { ALL_TIME_FRAME, TimeFrame } from '../data/TimeFrame';
 import { toTimeValue } from '../data/utils';
@@ -78,17 +78,6 @@ export class DateParam {
   }
 }
 
-function resolveDescription(sensor: Sensor) {
-  const s = sensor as SensorEntry;
-  if (s.mapTitleText == null) {
-    return s.description ?? '';
-  }
-  if (typeof s.mapTitleText === 'function') {
-    return s.mapTitleText();
-  }
-  return s.mapTitleText;
-}
-
 export class SensorParam {
   private readonly writeAbleStore: Writable<string>;
 
@@ -122,7 +111,7 @@ export class SensorParam {
     this.manager = metaDataManager;
     this.key = sensor.key;
     this.name = sensor.name;
-    this.description = resolveDescription(sensor);
+    this.description = sensor.description || 'No description available';
     this.signalTooltip = sensor.signalTooltip;
     this.value = sensor;
     this.rawValue = sensor.rawSensor;
