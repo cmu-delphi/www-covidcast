@@ -31,7 +31,7 @@ export const modes = [
   },
   {
     id: 'survey-results',
-    label: 'Survey Results',
+    label: 'CTIS Survey Results',
     component: () =>
       import(/* webpackChunkName: 'm-survey' */ './survey-results/SurveyResults.svelte').then((r) => r.default),
   },
