@@ -89,7 +89,8 @@
   };
 
   $: highlightDate = date.value;
-  $: timeFrame = showFull && expandableWindow ? sensor.timeFrame : date.windowTimeFrame;
+  $: showAllDates = showFull && expandableWindow && !($isMobileDevice && raw);
+  $: timeFrame = showAllDates ? sensor.timeFrame : date.windowTimeFrame;
 
   /**
    * @param {import('../../stores/params').SensorParam} sensor
@@ -268,7 +269,7 @@
   let singleRaw = false;
   let singleCumulative = false;
 
-  $: raw = singleRaw && sensor.rawValue != null;
+  $: raw = singleRaw && sensor.rawValue != null && !($isMobileDevice && showFull);
   $: cumulative = raw && singleCumulative && sensor.rawCumulativeValue != null;
   $: regions = raw ? [region.value] : resolveRegions(region.value, singleRegionOnly);
   $: annotations = showAnnotations
@@ -320,7 +321,7 @@
 
 <Vega
   bind:this={vegaRef}
-  className="{className} {showFull && expandableWindow ? 'chart-breakout' : ''}"
+  className="{className} {showFull && expandableWindow && !$isMobileDevice ? 'chart-breakout' : ''}"
   {spec}
   {data}
   tooltip={HistoryLineTooltip}
@@ -332,13 +333,13 @@
 
 <div class="buttons">
   <Toggle bind:checked={zoom}>Rescale Y-axis</Toggle>
-  {#if sensor.rawValue != null}
+  {#if sensor.rawValue != null && !($isMobileDevice && showAllDates)}
     <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
     {#if raw && sensor.rawCumulativeValue != null}
       <Toggle bind:checked={singleCumulative}>Cumulative Data</Toggle>
     {/if}
   {/if}
-  {#if expandableWindow === true}
+  {#if expandableWindow === true && !($isMobileDevice && raw)}
     <Toggle bind:checked={showFull}>Show All Dates</Toggle>
   {/if}
   <div class="spacer" />
