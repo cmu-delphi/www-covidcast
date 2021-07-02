@@ -15,12 +15,6 @@
   $: sensors = group.sensors
     .filter((d) => d.highlight && d.highlight.includes('landing'))
     .sort((a, b) => {
-      if (a.isCasesOrDeath) {
-        return b.isCasesOrDeath ? a.name.localeCompare(b.name) : -1;
-      }
-      if (b.isCasesOrDeath) {
-        return 1;
-      }
       return -a.name.localeCompare(b.name);
     });
 </script>

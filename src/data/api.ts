@@ -17,12 +17,6 @@ export interface EpiDataResponse<T = Record<string, unknown>> {
   epidata: T[];
 }
 
-export interface EpiDataTreeResponse<T = Record<string, unknown>> {
-  result: number;
-  message: string;
-  epidata: [Record<string, T[]>?];
-}
-
 function addParam<T extends { toString(): string }>(url: URL, key: string, pairs: T | readonly T[]): void {
   if (isArray(pairs)) {
     for (const s of pairs) {
@@ -96,20 +90,6 @@ export function callAPI(
     console.warn('failed fetching data', error);
     return [];
   });
-}
-
-export function callTreeAPI(
-  signal: SourceSignalPair | readonly SourceSignalPair[],
-  geo: GeoPair | readonly GeoPair[],
-  time: TimePair | readonly TimePair[],
-  fields?: FieldSpec<EpiDataJSONRow>,
-): Promise<EpiDataTreeResponse<EpiDataJSONRow>> {
-  const url = new URL(ENDPOINT + '/covidcast/');
-  addParam(url, 'signal', signal);
-  addParam(url, 'geo', geo);
-  addParam(url, 'time', time);
-  url.searchParams.set('format', 'tree');
-  return fetchImpl(url, fields);
 }
 
 export interface EpiDataTrendRow {
