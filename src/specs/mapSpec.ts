@@ -4,20 +4,21 @@ import type { MarkDef } from 'vega-lite/build/src/mark';
 import type { LayerSpec, NormalizedLayerSpec, NormalizedUnitSpec, TopLevelSpec } from 'vega-lite/build/src/spec';
 import type { CountyInfo, RegionInfo, RegionLevel } from '../data/regions';
 import getRelatedCounties from '../data/relatedRegions';
-import { EpiDataCasesOrDeathValues, EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 import type { RegionEpiDataRow } from '../stores/params';
-import { MAP_THEME, MISSING_COLOR, ZERO_COLOR } from '../theme';
+import { MISSING_COLOR, ZERO_COLOR } from '../theme';
 import { BASE_SPEC, CREDIT } from './commonSpec';
 
+const MAP_HOVER_OUTLINE_COLOR = '#cccccc';
+const MAP_OUTLINE_COLOR = '#ffffff';
+
 const NAME_INFO_KEYS: (keyof CountyInfo)[] = ['propertyId', 'displayName', 'population', 'state', 'level'];
-const EPIDATA_ROW_KEYS: (keyof (RegionEpiDataRow & CountyInfo & EpiDataCasesOrDeathValues))[] = [
+const EPIDATA_ROW_KEYS: (keyof (RegionEpiDataRow & CountyInfo))[] = [
   'geo_value',
   'value',
   'date_value',
   'time_value',
   'stderr',
   'sample_size',
-  ...EPIDATA_CASES_OR_DEATH_VALUES,
   ...NAME_INFO_KEYS,
 ];
 
@@ -149,7 +150,7 @@ function genStateBorderLayer({ strokeWidth = 1.1 } = {}): NormalizedUnitSpec {
     mark: {
       type: 'geoshape',
       fill: null,
-      stroke: MAP_THEME.stateOutline,
+      stroke: MAP_OUTLINE_COLOR,
       strokeWidth,
       tooltip: false,
     },
@@ -173,7 +174,7 @@ function genMegaHoverLayer(alsoOnCounties = false): NormalizedUnitSpec {
     mark: {
       type: 'geoshape',
       fill: null,
-      stroke: MAP_THEME.hoverRegionOutline,
+      stroke: MAP_HOVER_OUTLINE_COLOR,
       strokeWidth: 3,
       opacity: 0,
       tooltip: false,
@@ -293,7 +294,7 @@ function genLevelHoverLayer({ strokeWidth = 3 } = {}): NormalizedUnitSpec | Norm
   return {
     mark: {
       type: 'geoshape',
-      stroke: MAP_THEME.hoverRegionOutline,
+      stroke: MAP_HOVER_OUTLINE_COLOR,
       strokeWidth,
       opacity: 0,
       fill: null,

@@ -11,8 +11,6 @@
 *.csv
 /public
 /src/static
-/src/modes/classic/maps/raw
-/src/modes/classic/maps/processed
 /src/data/processed
 /src/specs/shapefiles
 /src/specs/tilegrams

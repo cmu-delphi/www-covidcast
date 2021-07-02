@@ -58,6 +58,7 @@ export interface Sensor {
   formatValue(v?: number | null, enforceSign?: boolean): string;
 
   readonly highlight?: string[];
+  readonly linkFrom?: string[];
 }
 
 function determineHighValuesAre(sensor: {
@@ -100,26 +101,25 @@ export const units = {
   fraction: 'Fraction of population',
 };
 
-export function ensureSensorStructure(
-  sensor: Partial<Sensor> & { name: string; id: string; signal: string; tooltipText?: unknown; mapTitleText?: unknown },
-): Sensor {
+export function ensureSensorStructure(sensor: Partial<Sensor> & { name: string; id: string; signal: string }): Sensor {
   const key = `${sensor.id}-${sensor.signal}`;
 
   const highValuesAre = determineHighValuesAre(sensor);
   const format = sensor.format || 'raw';
 
   const rawSignal = sensor.rawSignal === 'null' || sensor.rawSignal === sensor.signal ? null : sensor.rawSignal;
-
-  const guessHelper = sensor.tooltipText || sensor.mapTitleText;
-  const guessedSignalTooltip = typeof guessHelper === 'string' ? guessHelper : 'No description available';
+  const rawCumulativeSignal =
+    sensor.rawCumulativeSignal === 'null' || sensor.rawCumulativeSignal === sensor.signal
+      ? null
+      : sensor.rawCumulativeSignal;
 
   const full = Object.assign(sensor, {
     key,
     type: 'public',
     dataSourceName: getDataSource(sensor),
     levels: ['state'],
-    description: sensor.signalTooltip || 'No description available',
-    signalTooltip: guessedSignalTooltip,
+    description: sensor.description || 'No description available',
+    signalTooltip: sensor.signalTooltip || 'No description available',
     colorScale: colorScales[highValuesAre],
     vegaColorScale: vegaColorScales[highValuesAre],
 
@@ -140,6 +140,7 @@ export function ensureSensorStructure(
     // keep the original values
     ...sensor,
     rawSignal,
+    rawCumulativeSignal,
   });
 
   if (rawSignal) {
@@ -154,6 +155,21 @@ export function ensureSensorStructure(
         is7DayAverage: false,
         rawSensor: null,
         rawSignal: null,
+      },
+    });
+  }
+  if (rawCumulativeSignal) {
+    // create a raw cumulative version
+    Object.assign(full, {
+      rawCumulativeSensor: {
+        ...full,
+        key: `${sensor.id}-${rawCumulativeSignal}`,
+        name: `${full.name.replace('(7-day average)', '')} (Raw Cumulative)`,
+        description: full.description.replace('(7-day average)', ''),
+        signal: rawCumulativeSignal,
+        is7DayAverage: false,
+        rawCumulativeSignal: null,
+        rawCumulativeSensor: null,
       },
     });
   }
