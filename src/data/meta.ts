@@ -1,4 +1,4 @@
-import { EpiDataMetaInfo, EpiDataMetaStatsInfo, KNOWN_LICENSES, SignalCategory } from './api';
+import { EpiDataMetaInfo, EpiDataMetaSourceInfo, EpiDataMetaStatsInfo, KNOWN_LICENSES, SignalCategory } from './api';
 import { parseAPITime } from './utils';
 import type { RegionLevel } from './regions';
 import { isCountSignal } from './signals';
@@ -89,7 +89,6 @@ export interface SensorLike {
   signal: string;
 }
 
-
 function generateCredits(license: EpiDataMetaSourceInfo['license']) {
   if (!license) {
     return 'We are happy for you to use this data in products and publications.';
@@ -99,12 +98,6 @@ function generateCredits(license: EpiDataMetaSourceInfo['license']) {
     return `We are happy for you to use this data in products and publications under the terms of the <a href="${known.link}">${known.name}</a>.`;
   }
   return license;
-}
-
-export interface SensorSource {
-  readonly source: string;
-  readonly name: string;
-  readonly sensors: readonly Sensor[];
 }
 
 export interface SensorSensor extends Sensor {
@@ -230,4 +223,68 @@ function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
   return { list: sensors, map: byKey, sources };
 }
 
+export class MetaDataManager {
+  private readonly lookup: ReadonlyMap<string, SensorSensor>;
+  readonly metaSensors: readonly SensorSensor[];
+  readonly metaSources: readonly SensorSource[];
 
+  constructor(metadata: EpiDataMetaSourceInfo[]) {
+    const r = deriveMetaSensors(metadata);
+    this.metaSensors = r.list;
+    this.metaSources = r.sources;
+    this.lookup = r.map;
+  }
+
+  getDefaultCasesSignal(): Sensor | null {
+    return this.getSensor({ id: 'jhu-csse', signal: 'confirmed_7dav_incidence_prop' });
+  }
+  getDefaultDeathSignal(): Sensor | null {
+    return this.getSensor({ id: 'jhu-csse', signal: 'deaths_7dav_incidence_prop' });
+  }
+
+  getSensorsOfType(type: SignalCategory): Sensor[] {
+    return this.metaSensors.filter((d) => d.type === type);
+  }
+
+  getSource(sensor: SensorLike | string): SensorSource | null {
+    const s = this.getSensor(sensor);
+    return s ? this.metaSources.find((d) => d.source === s.id) ?? null : null;
+  }
+
+  getSensor(sensor: SensorLike | string): SensorSensor | null {
+    const r = this.lookup.get(typeof sensor === 'string' ? sensor : toKey(sensor.id, sensor.signal));
+    return r ?? null;
+  }
+
+  getMetaData(sensor: SensorLike | string): EpiDataMetaParsedInfo | null {
+    const r = this.getSensor(sensor);
+    return r?.meta ?? null;
+  }
+
+  getLevels(sensor: SensorLike): RegionLevel[] {
+    const entry = this.getMetaData(sensor);
+    return entry ? (Object.keys(entry.geo_types) as RegionLevel[]) : ['county'];
+  }
+
+  getStats(sensor: SensorLike, level?: RegionLevel): EpiDataMetaStatsInfo {
+    const entry = this.getMetaData(sensor);
+    return extractStats(sensor.signal, entry, level);
+  }
+
+  getTimeFrame(sensor: SensorLike): TimeFrame {
+    const entry = this.getMetaData(sensor);
+    if (!entry) {
+      return ALL_TIME_FRAME;
+    }
+    return entry.timeFrame;
+  }
+
+  getValueDomain(
+    sensor: SensorLike,
+    level: RegionLevel,
+    { useMax = false, enforceZeroLike = true }: { useMax?: boolean; enforceZeroLike?: boolean } = {},
+  ): [number, number] {
+    const stats = this.getStats(sensor, level);
+    return toValueDomain(stats, sensor.signal, useMax, enforceZeroLike);
+  }
+}
