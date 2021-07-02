@@ -189,9 +189,17 @@
         }
       });
       spec.signals.push({
+        name: 'resizeTrigger',
+        init: 0,
+      });
+      spec.signals.push({
         name: 'width',
         init: 'containerSize()[0]',
         on: [
+          {
+            events: { signal: 'resizeTrigger' },
+            update: 'containerSize()[0]',
+          },
           {
             events: { source: 'window', type: 'resize' },
             update: 'containerSize()[0]',
@@ -202,6 +210,10 @@
         name: 'height',
         init: 'containerSize()[1]',
         on: [
+          {
+            events: { signal: 'resizeTrigger' },
+            update: 'containerSize()[1]',
+          },
           {
             events: { source: 'window', type: 'resize' },
             update: 'containerSize()[1]',
@@ -339,8 +351,11 @@
       if (Math.abs(s.width - size.width) > 1 || Math.abs(s.height - size.height) > 1) {
         size = s;
         if (!patchSpec && vega) {
-          // console.log('runAsync - resize');
-          vega.view.resize().runAsync();
+          // console.log('runAsync - resize', size);
+          vega.view.resize();
+          vega.view.signal('resizeTrigger', s.width);
+          vega.view.runAsync();
+          // window.dispatchEvent(new Event('resize'));
         }
       }
     });

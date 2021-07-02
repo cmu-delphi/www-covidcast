@@ -13,7 +13,8 @@ export type WidgetType =
   | 'trend'
   | 'regionpcp'
   | 'datepcp'
-  | 'anomalies';
+  | 'anomalies'
+  | 'zoomedmap';
 
 export type WidgetFocus = 'time' | 'region' | 'indicator';
 export type WidgetCategory = 'chart' | 'table' | 'simple' | 'advanced';
@@ -43,11 +44,11 @@ export interface IState {
 }
 
 const BASE_STATE: IState = {
-  order: ['trend_1', 'map_2', 'regiontable_3', 'datetable_4', 'line_5'],
+  order: ['map_2', 'regiontable_3', 'line_5'],
   states: {
-    line_5: { width: 4, height: 2, zero: true, raw: false },
-    datetable_4: { width: 2, height: 4, sortCriteria: 'name', sortCriteriaDesc: true },
-    regiontable_3: { width: 2, height: 4, sortCriteria: 'name', sortCriteriaDesc: true },
+    line_5: { width: 5, height: 2, zero: true, raw: false },
+    regiontable_3: { width: 2, height: 3, sortCriteria: 'name', sortCriteriaDesc: true },
+    map_2: { width: 3, height: 3 },
   },
   configs: {
     map_2: {
@@ -88,7 +89,8 @@ function asWidget(
 
 export const widgets: readonly Widget[] = [
   asWidget('line', 'Time Series', ['time'], 'chart', ['sensor', 'region', 'timeFrame']),
-  asWidget('map', 'Choropleth Map', ['region'], 'chart', ['sensor', 'region', 'date']),
+  asWidget('map', 'Choropleth Map', ['region'], 'chart', ['sensor', 'level', 'date']),
+  asWidget('zoomedmap', 'Zoomed Choropleth Map', ['region'], 'chart', ['sensor', 'region', 'date']),
   asWidget('hex', 'Hexagon Map', ['region'], 'chart', ['sensor', 'date']),
   asWidget('regiontable', 'Region Table', ['region'], 'table', ['sensor', 'level', 'date']),
   asWidget('datetable', 'Date Table', ['time'], 'table', ['sensor', 'region', 'timeFrame']),

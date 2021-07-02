@@ -8,13 +8,13 @@
   import RegionMapTooltip from '../../../blocks/RegionMapTooltip.svelte';
   import {
     generateStateSpec,
-    generateNationSpec,
     generateHHSSpec,
     generateHRRSpec,
     generateMSASpec,
-    generateStateMapWithCountyDataSpec,
+    generateCountiesOfStateSpec,
+    generateRelatedCountySpec,
   } from '../../../specs/mapSpec';
-  import { getInfoByName } from '../../../data/regions';
+  import { getCountiesOfState, getInfoByName } from '../../../data/regions';
   import { highlightToRegions, WidgetHighlight } from '../highlight';
   import isEqual from 'lodash-es/isEqual';
   import { resolveHighlightedField } from '../../../specs/lineSpec';
@@ -29,9 +29,9 @@
    */
   export let date;
   /**
-   * @type {import("../../../stores/params").RegionLevel}
+   * @type {import("../../../stores/params").Region}
    */
-  export let level;
+  export let region;
 
   /**
    * two way binding
@@ -63,10 +63,10 @@
   }
   /**
    * @param {import('../../../stores/params').SensorParam} sensor
-   * @param {import('../../../stores/params').RegionLevel} level
+   * @param {import('../../../stores/params').Region} region
    * @param {import("../../../stores/params").DateParam} date
    */
-  function generateSpec(sensor, level, date) {
+  function generateSpec(sensor, region, level, date) {
     /**
      * @type {import('../../../specs/mapSpec').CommonParams}
      */
@@ -82,13 +82,18 @@
       paddingTop: 60,
       valueFormat: sensor.value.formatSpecifier,
       interactiveHighlight: true,
+      withStates: true,
     };
+
+    if (region.level === 'state') {
+      return generateCountiesOfStateSpec(region, options);
+    }
+    if (region.level === 'county') {
+      return generateRelatedCountySpec(region, options);
+    }
     const byLevel = {
-      nation: generateNationSpec,
-      state: generateStateSpec,
       hrr: generateHRRSpec,
       hhs: generateHHSSpec,
-      county: generateStateMapWithCountyDataSpec,
       msa: generateMSASpec,
     };
     const generator = byLevel[level] || generateStateSpec;
@@ -100,14 +105,25 @@
    * @param {import("../../../stores/params").RegionLevel} level
    * @param {import("../../../stores/params").DateParam} date
    */
-  function loadData(sensor, level, date) {
-    return fetcher.fetch1SensorNRegions1Date(sensor, level, date.value);
+  function loadData(sensor, region, level, date) {
+    const levelData = fetcher.fetch1SensorNRegions1Date(sensor, level, date.value);
+    if (region.level === 'state') {
+      const counties = getCountiesOfState(region.value);
+      const countyData = fetcher.fetch1SensorNRegions1Date(
+        sensor,
+        [...counties, getInfoByName(`${region.id}000`)],
+        date,
+      );
+      return Promise.all([countyData, levelData]).then((r) => r.flat());
+    }
+    return levelData;
   }
 
-  $: shownLevel = level === 'nation' ? 'state' : level;
-  $: spec = generateSpec(sensor, shownLevel, date);
-  $: data = loadData(sensor, shownLevel, date);
-  $: fileName = `${sensor.name}_${getLevelInfo(shownLevel).labelPlural}_${formatDateISO(date.value)}`;
+  $: level = region.level === 'nation' ? 'state' : region.level;
+  $: highlightLevel = region.level === 'state' ? 'county' : level;
+  $: spec = generateSpec(sensor, region, level, date);
+  $: data = loadData(sensor, region, level, date);
+  $: fileName = `${sensor.name}_${getLevelInfo(level).labelPlural}_${formatDateISO(date.value)}`;
 
   /**
    * @type {Vega }
@@ -119,14 +135,14 @@
     if (!value) {
       return;
     }
-    const regionHighlight = new WidgetHighlight(sensor.value, getInfoByName(value, shownLevel), date.value);
+    const regionHighlight = new WidgetHighlight(sensor.value, getInfoByName(value, highlightLevel), date.value);
 
     if (!regionHighlight.equals(highlight)) {
       highlight = regionHighlight;
     }
   }
 
-  $: highlighted = highlight != null && highlight.matches(sensor.value, shownLevel, date.value);
+  $: highlighted = highlight != null && highlight.matches(sensor.value, highlightLevel, date.value);
 
   function updateVegaHighlight(highlight) {
     if (!vegaRef) {
@@ -136,7 +152,7 @@
     if (!view) {
       return;
     }
-    const values = highlightToRegionsImpl(shownLevel, highlight);
+    const values = highlightToRegionsImpl(highlightLevel, highlight);
     const newValue = values
       ? {
           unit: 'layer_1',
@@ -157,7 +173,7 @@
   }
 </script>
 
-<WidgetCard {initialState} {sensor} region="US {getLevelInfo(shownLevel).labelPlural}" {date} {id} on:state on:action>
+<WidgetCard {initialState} {sensor} region="US {getLevelInfo(level).labelPlural}" {date} {id} on:state on:action>
   <Vega
     bind:this={vegaRef}
     {spec}

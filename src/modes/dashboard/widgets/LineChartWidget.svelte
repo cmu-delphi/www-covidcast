@@ -70,7 +70,7 @@
     dispatch('state', { id, state });
   }
   function mergeState(event) {
-    superState = event.detail;
+    superState = event.detail.state;
   }
 
   /**
