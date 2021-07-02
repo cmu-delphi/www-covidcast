@@ -49,7 +49,7 @@
    * @param {import("../../stores/params").DateParam} date
    * @param {import("../../stores/params").RegionParam} region
    */
-  function loadData(sensor, date) {
+  function loadData(sensor, date, region) {
     if (region.level === 'state') {
       const counties = getCountiesOfState(region.value);
       const countyData = fetcher.fetch1SensorNRegions1Date(
@@ -75,7 +75,7 @@
   }
 
   $: spec = genSpec(sensor, region);
-  $: data = loadData(sensor, date);
+  $: data = loadData(sensor, date, region);
 
   $: showsUS = region.level === 'nation';
 
