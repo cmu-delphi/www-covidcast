@@ -82,7 +82,7 @@ module.exports = () => {
       rules: [
         !devMode && {
           test: /\.m?js$/,
-          exclude: /node_modules[\\/](?!(svelte|mapbox-gl)[\\/])/,
+          exclude: /node_modules[\\/](?!(svelte)[\\/])/,
           use: [
             {
               loader: 'babel-loader',
@@ -211,26 +211,6 @@ module.exports = () => {
         template: './src/index.html',
         filename: 'correlation/index.html',
       }),
-      new HtmlWebpackPlugin({
-        title: 'COVIDcast',
-        template: './src/index.html',
-        filename: 'classic/index.html',
-      }),
-      // new HtmlWebpackPlugin({
-      //   title: 'COVIDcast Timelapse',
-      //   template: './src/index.html',
-      //   filename: 'timelapse/index.html',
-      // }),
-      // new HtmlWebpackPlugin({
-      //   title: 'COVIDcast Top 10',
-      //   template: './src/index.html',
-      //   filename: 'top10/index.html',
-      // }),
-      // new HtmlWebpackPlugin({
-      //   title: 'COVIDcast Region Details',
-      //   template: './src/index.html',
-      //   filename: 'single/index.html',
-      // }),
       new HtmlWebpackPlugin({
         title: 'COVIDcast Export Data',
         template: './src/index.html',

@@ -8,7 +8,7 @@
   import { timeDay } from 'd3-time';
 
   /**
-   * @type {import('../stores/constants').SensorEntry}
+   * @type {import('../stores/constants').Sensor}
    */
   export let sensor;
 

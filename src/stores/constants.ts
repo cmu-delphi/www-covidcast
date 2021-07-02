@@ -1,20 +1,38 @@
 import descriptions from './descriptions.generated.json';
 import { modeByID } from '../modes';
-import type { RegionLevel } from '../data/regions';
-import { sensorTypes } from '../data/sensor';
-import { extendSensorEntry, SensorEntry } from '../data/classicSensor';
+import { ensureSensorStructure, Sensor, sensorTypes } from '../data/sensor';
 
 export * from '../data/geoLevel';
 export type { Sensor } from '../data/sensor';
-export * from '../data/classicSensor';
 
-const defaultSensors = descriptions as unknown as (Partial<SensorEntry> & {
+interface CompatibilitySensor extends Partial<Sensor> {
   name: string;
   id: string;
   signal: string;
-})[];
+  mapTitleText:
+    | string
+    | {
+        incidenceCumulative: string;
+        ratioCumulative: string;
+        incidence: string;
+        ratio: string;
+      };
+  casesOrDeathSignals?: {
+    countRatioCumulative: string;
+  };
+  tooltipText?: string;
+}
 
-export const sensorList = defaultSensors.map(extendSensorEntry);
+export function extendSensorCompatibility(sensorEntry: CompatibilitySensor): Sensor {
+  const baseHelp = sensorEntry.tooltipText || sensorEntry.mapTitleText;
+  Object.assign(sensorEntry, {
+    signalTooltip: typeof baseHelp === 'string' ? baseHelp : baseHelp.ratio,
+    rawCumulativeSignal: sensorEntry.casesOrDeathSignals?.countRatioCumulative,
+  });
+  return ensureSensorStructure(sensorEntry);
+}
+
+export const sensorList = (descriptions as unknown as CompatibilitySensor[]).map(extendSensorCompatibility);
 
 export const sensorMap = new Map(sensorList.map((s) => [s.key, s]));
 
@@ -71,16 +89,23 @@ export const DEFAULT_SURVEY_SENSOR = (() => {
   }
   return DEFAULT_SENSOR;
 })();
+
+export function findCasesSensor(): Sensor {
+  return sensorList.find((d) => d.signal === 'confirmed_7dav_incidence_prop')!;
+}
+
+export function findDeathsSensor(): Sensor {
+  return sensorList.find((d) => d.signal === 'deaths_7dav_incidence_prop')!;
+}
+
 export const DEFAULT_CORRELATION_SENSOR = (() => {
   const highlightBased = sensorList.find((d) => d.highlight && d.highlight.includes('correlation'));
   if (highlightBased) {
     return highlightBased.key;
   }
-  const cases = sensorList.find((d) => d.isCasesOrDeath);
+  const cases = findCasesSensor();
   if (cases) {
     return cases.key;
   }
   return DEFAULT_SURVEY_SENSOR;
 })();
-export const DEFAULT_LEVEL = 'county' as RegionLevel;
-export const DEFAULT_ENCODING = 'color' as 'color' | 'spike' | 'bubble';

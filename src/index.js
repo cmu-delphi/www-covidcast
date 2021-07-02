@@ -3,7 +3,6 @@ import './publicPath';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import './global.css';
-import './customIcons';
 import App from './App.svelte';
 
 const hostElement = document.querySelector('#vizbox') || document.body;

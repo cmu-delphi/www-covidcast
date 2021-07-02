@@ -1,47 +1,14 @@
-import { callAPI, callTreeAPI, EpiDataJSONRow, EpiDataTreeResponse } from './api';
+import { callAPI, EpiDataJSONRow } from './api';
 import { timeDay } from 'd3-time';
-import { parseAPITime, formatAPITime, combineSignals } from './utils';
-import { EpiDataCasesOrDeathValues, EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
+import { parseAPITime, formatAPITime } from './utils';
 import { getInfoByName } from './regions';
-import type { RegionInfo, RegionLevel } from './regions';
+import type { RegionInfo } from './regions';
 import { TimeFrame } from './TimeFrame';
 import { SourceSignalPair, GeoPair, TimePair, START_TIME_RANGE, END_TIME_RANGE } from './apimodel';
-
-export interface DataSensor {
-  id: string;
-  signal: string;
-  isCasesOrDeath?: boolean;
-  casesOrDeathSignals?: Record<string, string>;
-}
-
-// * @property {number} issue
-// * @property {number} lag
-// * @property {number | null} sample_size
 
 export interface EpiDataRow extends EpiDataJSONRow {
   date_value: Date;
 }
-
-export type CasesOrDeathEpiDataRow = EpiDataRow & EpiDataCasesOrDeathValues;
-
-/**
- * @param {Partial<EpiDataRow>} mixinValues
- */
-function computeTransferFields(mixinValues = {}, advanced = false, transferSignal = false): (keyof EpiDataJSONRow)[] {
-  const toRemove = Object.keys(mixinValues);
-  const allFields: (keyof EpiDataJSONRow)[] = ['geo_value', 'stderr', 'time_value', 'value'];
-  if (advanced) {
-    allFields.push('issue', 'sample_size');
-  }
-  if (transferSignal) {
-    allFields.push('signal');
-  }
-  return allFields.filter((d) => !toRemove.includes(d));
-}
-
-/**
- * @typedef {EpiDataRow & EpiDataCasesOrDeathValues} EpiDataCasesOrDeathRow
- */
 
 export function parseData(
   d: EpiDataJSONRow[],
@@ -73,127 +40,6 @@ export function parseData(
   return data;
 }
 
-function deriveCombineKey(mixinData: Partial<EpiDataRow> = {}) {
-  let combineKey = (d: EpiDataRow) => `${d.geo_value}@${d.time_value}`;
-  // part of key
-  if (mixinData.time_value != null) {
-    combineKey = (d: EpiDataRow) => `${d.geo_value}`;
-  } else if (mixinData.geo_value == null) {
-    combineKey = (d: EpiDataRow) => `${d.time_value}`;
-  }
-  return combineKey;
-}
-
-function parseMultipleTreeData(
-  d: EpiDataTreeResponse<EpiDataJSONRow>,
-  signals: string[],
-  defaultSignalIndex: number,
-  mixinData: Partial<EpiDataRow> = {},
-  factor = 1,
-): EpiDataRow[] {
-  if (d.result < 0 || d.message.includes('no results')) {
-    return [];
-  }
-  const tree = (d.epidata || [])[0];
-  if (!tree || (Array.isArray(tree) && tree.length === 0)) {
-    return parseData([], mixinData, factor);
-  }
-  const split = signals.map((k) => tree[k] as EpiDataRow[]);
-  const ref = split[defaultSignalIndex];
-  const combined = combineSignals(split, ref, EPIDATA_CASES_OR_DEATH_VALUES, deriveCombineKey(mixinData), factor);
-  return parseData(combined, mixinData, factor);
-}
-
-function parseMultipleSeparateData(
-  dataArr: EpiDataJSONRow[][],
-  defaultSignalIndex: number,
-  mixinData: Partial<EpiDataRow> = {},
-  factor = 1,
-): EpiDataRow[] {
-  if (dataArr.length === 0 || !dataArr[0] || dataArr[0].length === 0) {
-    return [];
-  }
-  const data = dataArr.map((d) => d as EpiDataRow[]);
-  const ref = data[defaultSignalIndex];
-  const combined = combineSignals(data, ref, EPIDATA_CASES_OR_DEATH_VALUES, deriveCombineKey(mixinData), factor);
-  return parseData(combined, mixinData, factor);
-}
-
-export interface FetchDataOptions {
-  advanced?: boolean;
-  /**
-   * @default true
-   */
-  multiValues?: boolean;
-  transferSignal?: boolean;
-  factor?: number;
-}
-
-export function fetchData(
-  dataSensor: DataSensor,
-  level: RegionLevel,
-  region: '*' | string | null | undefined,
-  date: Date | '*' | TimeFrame,
-  mixinValues: Partial<EpiDataRow> = {},
-  { advanced = false, multiValues = true, transferSignal = false, factor = 1 }: FetchDataOptions = {},
-): Promise<EpiDataRow[]> {
-  if (!region) {
-    return Promise.resolve([] as EpiDataRow[]);
-  }
-  mixinValues.time_type = 'day'; // inject time_type
-  mixinValues.geo_type = level; // inject geo_type
-  mixinValues.source = dataSensor.id;
-
-  const transferFields = computeTransferFields(mixinValues, advanced, transferSignal);
-  function fetchSeparate(defaultSignalIndex: number) {
-    const extraDataFields: (keyof EpiDataJSONRow)[] = ['value'];
-    // part of key
-    if (mixinValues.time_value == null) {
-      extraDataFields.push('time_value');
-    }
-    if (mixinValues.geo_value == null) {
-      extraDataFields.push('geo_value');
-    }
-    return Promise.all(
-      EPIDATA_CASES_OR_DEATH_VALUES.map((k, i) =>
-        callAPI(
-          new SourceSignalPair(dataSensor.id, dataSensor.casesOrDeathSignals![k]!),
-          new GeoPair(level, region!),
-          new TimePair('day', date),
-          i === 0 ? transferFields : extraDataFields,
-        ),
-      ),
-    ).then((d) => parseMultipleSeparateData(d, defaultSignalIndex, mixinValues, factor));
-  }
-
-  if (dataSensor.isCasesOrDeath && multiValues) {
-    const signals = EPIDATA_CASES_OR_DEATH_VALUES.map((k) => dataSensor.casesOrDeathSignals![k]);
-    const defaultSignal = dataSensor.signal;
-    const defaultSignalIndex = signals.indexOf(defaultSignal);
-
-    if (level === 'county' && region === '*') {
-      // around 2k each
-      return fetchSeparate(defaultSignalIndex);
-    }
-    return callTreeAPI(
-      new SourceSignalPair(dataSensor.id, signals),
-      new GeoPair(level, region),
-      new TimePair('day', date),
-      [...transferFields, 'signal'],
-    ).then((d) => {
-      return parseMultipleTreeData(d, signals, defaultSignalIndex, mixinValues, factor);
-    });
-  } else {
-    mixinValues.signal = dataSensor.signal;
-    return callAPI(
-      new SourceSignalPair(dataSensor.id, dataSensor.signal),
-      new GeoPair(level, region),
-      new TimePair('day', date),
-      transferFields,
-    ).then((rows) => parseData(rows, mixinValues, factor));
-  }
-}
-
 export interface NationSummarySamples {
   minDate: Date | null;
   maxDate: Date | null;
@@ -201,7 +47,10 @@ export interface NationSummarySamples {
   averageSampleSize: number;
 }
 
-export async function fetchSampleSizesNationSummary(dataSensor: DataSensor): Promise<NationSummarySamples> {
+export async function fetchSampleSizesNationSummary(dataSensor: {
+  id: string;
+  signal: string;
+}): Promise<NationSummarySamples> {
   const data = await callAPI(
     new SourceSignalPair(dataSensor.id, dataSensor.signal),
     new GeoPair('nation', 'us'),
@@ -219,19 +68,7 @@ export async function fetchSampleSizesNationSummary(dataSensor: DataSensor): Pro
   };
 }
 
-export function fetchRegionSlice(
-  dataSensor: DataSensor,
-  level: RegionLevel,
-  date: '*' | Date,
-  mixinValues: Partial<EpiDataRow> = {},
-): Promise<EpiDataRow[]> {
-  return fetchData(dataSensor, level, '*', date, {
-    ...(date instanceof Date ? { time_value: Number.parseInt(formatAPITime(date), 10) } : {}),
-    ...mixinValues,
-  });
-}
-
-function createCopy<T extends EpiDataRow = EpiDataRow>(row: T, date: Date, dataSensor?: DataSensor): T {
+function createCopy<T extends EpiDataRow = EpiDataRow>(row: T, date: Date): T {
   const copy = Object.assign({}, row, {
     date_value: date,
     time_value: Number.parseInt(formatAPITime(date), 10),
@@ -239,57 +76,23 @@ function createCopy<T extends EpiDataRow = EpiDataRow>(row: T, date: Date, dataS
     stderr: null,
     sample_size: null,
   });
-  if (
-    (dataSensor != null && dataSensor.isCasesOrDeath) ||
-    (row as unknown as EpiDataCasesOrDeathValues)[EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined
-  ) {
-    EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-      (copy as any)[key] = null;
-    });
-  }
   return copy;
-}
-
-export function fetchTimeSlice(
-  dataSensor: DataSensor,
-  level: RegionLevel,
-  region: string | undefined | null,
-  startDate = START_TIME_RANGE,
-  endDate = END_TIME_RANGE,
-  fitDateRange = false,
-  mixinValues: Partial<EpiDataRow> = {},
-  options: FetchDataOptions = {},
-): Promise<EpiDataRow[]> {
-  if (!region) {
-    return Promise.resolve([] as EpiDataRow[]);
-  }
-  const data = fetchData(dataSensor, level, region, new TimeFrame(startDate, endDate), mixinValues, options);
-  if (!fitDateRange) {
-    return data;
-  }
-  return data.then((r) => fitRange(r, dataSensor, startDate, endDate));
 }
 
 /**
  * fit the data to be in the start/end date range
  */
-export function fitRange<T extends EpiDataRow = EpiDataRow>(
-  rows: T[],
-  dataSensor: DataSensor,
-  startDate: Date,
-  endDate: Date,
-): T[] {
+export function fitRange<T extends EpiDataRow = EpiDataRow>(rows: T[], startDate: Date, endDate: Date): T[] {
   if (rows.length === 0) {
     return rows;
   }
   if (rows[0].date_value != null && rows[0].date_value > startDate) {
     // inject a min
-    rows.unshift(createCopy(rows[0], startDate, dataSensor));
+    rows.unshift(createCopy(rows[0], startDate));
   }
   if (rows[rows.length - 1].date_value != null && rows[rows.length - 1].date_value < endDate) {
     // inject a max
-    rows.push(createCopy(rows[rows.length - 1], endDate, dataSensor));
+    rows.push(createCopy(rows[rows.length - 1], endDate));
   }
   return rows;
 }
@@ -297,7 +100,7 @@ export function fitRange<T extends EpiDataRow = EpiDataRow>(
 /**
  * add missing rows per date within this given date rows
  */
-export function addMissing<T extends EpiDataRow = EpiDataRow>(rows: T[], dataSensor: DataSensor): T[] {
+export function addMissing<T extends EpiDataRow = EpiDataRow>(rows: T[]): T[] {
   if (rows.length < 2) {
     return rows;
   }
@@ -315,7 +118,7 @@ export function addMissing<T extends EpiDataRow = EpiDataRow>(rows: T[], dataSen
       return base.shift()!;
     }
     // create an entry
-    return createCopy(template, date, dataSensor);
+    return createCopy(template, date);
   });
   return imputedRows;
 }
@@ -327,10 +130,7 @@ export function addNameInfos(rows: EpiDataRow[]): (EpiDataRow & RegionInfo)[] {
   return rows as (EpiDataRow & RegionInfo)[];
 }
 
-function avg(
-  rows: (EpiDataRow & Partial<EpiDataCasesOrDeathValues>)[],
-  field: 'value' | 'stderr' | 'sample_size' | keyof EpiDataCasesOrDeathValues,
-) {
+function avg(rows: EpiDataRow[], field: 'value' | 'stderr' | 'sample_size') {
   let valid = 0;
   const sum = rows.reduce((acc, v) => {
     const vi = v[field];
@@ -348,11 +148,7 @@ function avg(
 /**
  * group by date and averages its values
  */
-export function averageByDate(
-  rows: EpiDataRow[],
-  dataSensor: DataSensor,
-  mixin: Partial<EpiDataRow> = {},
-): EpiDataRow[] {
+export function averageByDate(rows: EpiDataRow[], mixin: Partial<EpiDataRow> = {}): EpiDataRow[] {
   // average by date
   const byDate = new Map<number | string, EpiDataRow[]>();
   for (const row of rows) {
@@ -372,15 +168,6 @@ export function averageByDate(
         stderr: avg(rows, 'stderr')!,
         sample_size: avg(rows, 'sample_size')!,
       };
-      if (
-        (dataSensor != null && dataSensor.isCasesOrDeath) ||
-        (rows[0] as unknown as EpiDataCasesOrDeathValues)[EPIDATA_CASES_OR_DEATH_VALUES[0]] !== undefined
-      ) {
-        EPIDATA_CASES_OR_DEATH_VALUES.forEach((key) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-          (r as any)[key] = avg(rows, key);
-        });
-      }
       return r;
     })
     .sort((a, b) => a.time_value - b.time_value);

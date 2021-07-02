@@ -146,12 +146,14 @@
 <div class="root">
   <div class="mobile-header-line-bg">
     <div class="mobile-header-line">
-      <button
-        class="widget-add-button uk-button uk-button-primary"
-        type="button"
-        title="Add New Widget"
-        on:click={triggerAddWidget}>Add Widget</button
-      >
+      {#if components.length > 0}
+        <button
+          class="widget-add-button uk-button uk-button-primary"
+          type="button"
+          title="Add New Widget"
+          on:click={triggerAddWidget}>Add Widget</button
+        >
+      {/if}
       <h2>
         COVIDcast
         <span>
@@ -163,13 +165,12 @@
         </span>
       </h2>
       <button
-        class="widget-edit-button uk-icon-button"
+        class="widget-edit-button uk-button uk-button-default"
         type="button"
-        class:active-button={configureParams}
-        title="Show/Hide Parameters"
-        uk-icon="cog"
         on:click={() => (configureParams = !configureParams)}
-      />
+      >
+        {#if configureParams} Hide Parameters {:else} Configure Parameters {/if}
+      </button>
     </div>
     {#if configureParams}
       <DashboardParameters {sensor} {region} {date} />
@@ -195,6 +196,15 @@
         <WidgetFactory {c} bind:highlight {sensor} {region} {date} {trackAction} {trackState} />
       {/each}
     </div>
+    {#if components.length === 0}
+      <div class="panel-intro">
+        <h2>Create a new dashboard</h2>
+        <p>Create custom data visualizations from DELPHI’s libary of COVID-19 datasets updated daily.</p>
+        <button class="uk-button uk-button-primary" type="button" title="Add New Widget" on:click={triggerAddWidget}
+          >Add Widget</button
+        >
+      </div>
+    {/if}
   </div>
 </div>
 
@@ -220,11 +230,9 @@
     padding: 1em;
   }
 
-  .active-button {
-    background: #ebebeb;
-  }
-
-  .overlay-container :global(input[type='text'], input[type='date'], select) {
+  .overlay-container :global(input[type='text']),
+  .overlay-container :global([type='date']),
+  .overlay-container :global(select) {
     background: white;
   }
 
@@ -252,15 +260,34 @@
     left: 0.5em;
     top: 0.5em;
     right: 0.5em;
-    bottom: 0.5em;
+    bottom: 0;
     display: grid;
     --ncol: 3;
     --nrow: 4;
     grid-template-columns: repeat(var(--ncol), 1fr);
-    grid-template-rows: repeat(var(--nrow), 1fr);
+    grid-template-rows: repeat(var(--nrow), minmax(10rem, 1fr));
     grid-auto-flow: dense;
-    grid-auto-rows: 1fr;
+    grid-auto-rows: minmax(10rem, 1fr);
     gap: 0.5em;
+    overflow-y: auto;
+  }
+
+  .panel-intro {
+    position: absolute;
+    left: 0.5em;
+    top: 0.5em;
+    right: 0.5em;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 2rem;
+  }
+
+  .panel-intro > h2 {
+    margin: 0;
   }
 
   .title-text {
