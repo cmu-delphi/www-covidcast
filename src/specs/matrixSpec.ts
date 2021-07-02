@@ -1,6 +1,5 @@
 import { stateInfo } from '../data/regions';
 import { ZERO_COLOR } from '../theme';
-import { EPIDATA_CASES_OR_DEATH_VALUES } from '../stores/constants';
 import type { RegionInfo } from '../data/regions';
 import type { TopLevelSpec } from 'vega-lite';
 import { BASE_SPEC } from './commonSpec';
@@ -60,9 +59,7 @@ export const state2TileCell: { id: string; x: number; y: number }[] = [
   { id: 'PR', x: 10, y: 7 },
 ];
 
-const EPIDATA_ROW_KEYS = ['geo_value', 'value', 'date_value', 'time_value', 'stderr', 'sample_size'].concat(
-  EPIDATA_CASES_OR_DEATH_VALUES,
-);
+const EPIDATA_ROW_KEYS = ['geo_value', 'value', 'date_value', 'time_value', 'stderr', 'sample_size'];
 const NAME_INFO_KEYS = ['propertyId', 'displayName', 'population', 'state'];
 
 export interface MatrixOptions {

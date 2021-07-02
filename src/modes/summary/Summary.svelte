@@ -11,7 +11,6 @@
     currentDateObject,
     getScrollToAnchor,
     metaDataManager,
-    sensorList,
   } from '../../stores';
   import { SensorParam, DateParam, RegionParam } from '../../stores/params';
   import RegionMapWrapper from '../../blocks/RegionMapWrapper.svelte';
@@ -21,15 +20,13 @@
   import { scrollIntoView } from '../../util';
   import { modeByID } from '..';
   import { DataFetcher } from '../../stores/DataFetcher';
+  import { findCasesSensor } from '../../stores/constants';
 
   $: sensor = new SensorParam($currentSensorEntry, $metaDataManager);
   $: date = new DateParam($currentDateObject);
   $: region = new RegionParam($currentRegionInfo);
 
-  $: CASES = new SensorParam(
-    sensorList.find((d) => d.isCasesOrDeath && d.name.includes('Cases')),
-    $metaDataManager,
-  );
+  $: CASES = new SensorParam(findCasesSensor(), $metaDataManager);
 
   const items = [nationInfo, ...stateInfo, ...countyInfo];
 
@@ -56,7 +53,7 @@
       <CasesOverview {date} {region} {fetcher} />
       <hr />
       <h3 class="header">COVID-19 Cases by state</h3>
-      <h4 class="header">{@html CASES.description}</h4>
+      <h4 class="header">{@html CASES.signalTooltip}</h4>
       <RegionMapWrapper {region} {date} sensor={CASES} {fetcher} />
       <hr />
       <FancyHeader invert sub="Chart" anchor="chart">{CASES.name}</FancyHeader>

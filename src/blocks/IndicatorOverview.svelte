@@ -10,7 +10,7 @@
   import TrendTextSummary from '../components/TrendTextSummary.svelte';
 
   /**
-   * @type {import('../../stores/constants').SensorEntry}
+   * @type {import('../../stores/constants').Sensor}
    */
   export let sensor;
 

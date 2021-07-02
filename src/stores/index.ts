@@ -1,18 +1,11 @@
 import { writable, derived, get, readable } from 'svelte/store';
-import { LogScale, SqrtScale } from './scales';
-import { scaleSequentialLog } from 'd3-scale';
 import {
   sensorMap,
-  levels,
-  DEFAULT_LEVEL,
   DEFAULT_MODE,
   DEFAULT_SENSOR,
   DEFAULT_SURVEY_SENSOR,
-  DEFAULT_ENCODING,
   defaultRegionOnStartup,
   DEFAULT_CORRELATION_SENSOR,
-  CasesOrDeathOptions,
-  SensorEntry,
   resolveSensorWithAliases,
 } from './constants';
 import modes, { Mode, modeByID, ModeID } from '../modes';
@@ -27,11 +20,9 @@ export {
   sensorMap,
   groupedSensorList,
 } from './constants';
-import { timeDay, timeMonth } from 'd3-time';
-import { MAP_THEME, selectionColors } from '../theme';
+import { timeDay } from 'd3-time';
 import { AnnotationManager, fetchAnnotations } from '../data';
 import type { RegionInfo, RegionLevel } from '../data/regions';
-import { yesterdayDate } from '../data/TimeFrame';
 import { MetaDataManager } from '../data/meta';
 import { callMetaAPI } from '../data/api';
 
@@ -49,14 +40,7 @@ function deriveFromPath(url: Location) {
   const sensor = urlParams.get('sensor');
   const sensor2 = urlParams.get('sensor2');
   const lag = urlParams.get('lag');
-  const level = urlParams.get('level') as unknown as RegionLevel;
-  const encoding = urlParams.get('encoding');
   const date = urlParams.get('date') ?? '';
-
-  const compareIds = (urlParams.get('compare') || '')
-    .split(',')
-    .map((d) => getInfoByName(d))
-    .filter((d): d is RegionInfo => d != null);
 
   const modeFromPath = () => {
     const pathName = url.pathname;
@@ -78,21 +62,8 @@ function deriveFromPath(url: Location) {
       DEFAULT_CORRELATION_SENSOR === sensor2 ? DEFAULT_SENSOR : DEFAULT_CORRELATION_SENSOR,
     ),
     lag: lag ? Number.parseInt(lag, 10) : 0,
-    level: levels.includes(level) ? level : DEFAULT_LEVEL,
-    signalCasesOrDeathOptions: {
-      cumulative: urlParams.has('signalC'),
-      incidence: urlParams.has('signalI'),
-    } as CasesOrDeathOptions,
-    encoding: encoding === 'color' || encoding === 'bubble' || encoding === 'spike' ? encoding : DEFAULT_ENCODING,
     date: /\d{8}/.test(date) ? date : MAGIC_START_DATE,
     region: urlParams.get('region') || '',
-    compare:
-      compareIds.length > 0
-        ? compareIds.map(
-            (info, i) =>
-              ({ info, displayName: info.displayName, color: selectionColors[i] || 'grey' } as CompareSelection),
-          )
-        : null,
   };
 }
 /**
@@ -112,44 +83,12 @@ export const currentSensor2 = writable(defaultValues.sensor2);
 export const currentSensorEntry2 = derived([currentSensor2], ([$currentSensor]) => sensorMap.get($currentSensor));
 
 export const currentLag = writable(defaultValues.lag);
-export const currentInfoSensor = writable<SensorEntry | null>(null);
-
-export const currentLevel = writable(defaultValues.level);
-
-// in case of a death signal whether to show cumulative data
-export const signalCasesOrDeathOptions = writable(defaultValues.signalCasesOrDeathOptions);
-
-export const currentSensorMapTitle = derived([currentSensorEntry, signalCasesOrDeathOptions], ([sensor, options]) => {
-  if (!sensor) {
-    return '';
-  }
-  return typeof sensor.mapTitleText === 'function' ? sensor.mapTitleText(options) : sensor.mapTitleText;
-});
-
-export const encoding = writable(defaultValues.encoding);
 
 export const currentDate = writable(defaultValues.date);
 /**
  * current date as a Date object
  */
 export const currentDateObject = derived([currentDate], ([date]) => (!date ? null : parseAPITime(date)));
-
-export const smallMultipleTimeSpan = derived([currentDateObject], ([date]): [Date, Date] => {
-  if (!date) {
-    return [timeMonth.offset(yesterdayDate, -4), yesterdayDate];
-  }
-  let max = timeMonth.offset(date, 2);
-  if (max > yesterdayDate) {
-    max = yesterdayDate;
-  }
-  const min = timeMonth.offset(max, -4);
-  return [min, max];
-});
-
-/**
- * For mouseover highlighting across small multiple charts.
- */
-export const highlightTimeValue = writable<null | number>(null);
 
 // Region GEO_ID for filtering the line chart
 // 42003 - Allegheny; 38300 - Pittsburgh; PA - Pennsylvania.
@@ -224,11 +163,6 @@ export function selectByFeature(feature: { properties: { id: string; level: Regi
   return selectByInfo(feature ? getInfoByName(feature.properties.id, feature.properties.level) : null, reset);
 }
 
-export const colorScale = writable(scaleSequentialLog());
-export const colorStops = writable([]);
-export const bubbleRadiusScale = writable(LogScale());
-export const spikeHeightScale = writable(SqrtScale());
-
 // mobile device detection
 // const isDesktop = window.matchMedia('only screen and (min-width: 768px)');
 
@@ -258,74 +192,13 @@ export const isMobileDevice = readable(isMobileQuery.matches, (set) => {
 
 // overview compare mode
 
-export interface CompareSelection {
-  info: RegionInfo;
-  color: string;
-  displayName: string;
-}
-
-export const currentCompareSelection = writable(defaultValues.compare);
-
-/**
- * add an element to the compare selection
- */
-export function addCompare(info: RegionInfo): void {
-  if (!get(currentRegionInfo)) {
-    selectByInfo(info);
-    return;
-  }
-
-  const current = get(currentCompareSelection) || [];
-  currentCompareSelection.set([
-    ...current,
-    {
-      info,
-      displayName: info.displayName,
-      color: selectionColors[current.length] || 'grey',
-    },
-  ]);
-}
-
-/**
- * removes an element from the compare selection
- * @param {import('../data/regions').NameInfo} info
- */
-export function removeCompare(info: RegionInfo): void {
-  const selection = get(currentRegionInfo);
-  const bak = (get(currentCompareSelection) || []).slice();
-  if (selection && info.id === selection.id) {
-    selectByInfo(bak.length === 0 ? null : bak[0].info);
-    currentCompareSelection.set(bak.slice(1).map((old, i) => ({ ...old, color: selectionColors[i] || 'grey' })));
-    return;
-  }
-  currentCompareSelection.set(
-    bak.filter((d) => d.info !== info).map((old, i) => ({ ...old, color: selectionColors[i] || 'grey' })),
-  );
-}
-
-export const currentMultiSelection = derived(
-  [currentRegionInfo, currentCompareSelection],
-  ([selection, compareSelection]): CompareSelection[] => {
-    const base = [...(compareSelection || [])];
-    if (selection) {
-      base.unshift({ info: selection, color: MAP_THEME.selectedRegionOutline, displayName: selection.displayName });
-    }
-    return base;
-  },
-);
-
 export interface PersistedState {
   mode?: string | null;
   sensor?: string | null;
   sensor2?: string | null;
-  level?: RegionLevel | null;
   lag?: number | null;
   region?: string | null;
   date?: string | null;
-  signalC?: boolean | null;
-  signalI?: boolean | null;
-  encoding?: 'color' | 'bubble' | 'spike' | null;
-  compare?: string | null;
 }
 export interface TrackedState {
   state: PersistedState;
@@ -334,22 +207,8 @@ export interface TrackedState {
 }
 
 export const trackedUrlParams = derived(
-  [
-    currentMode,
-    currentSensor,
-    currentSensor2,
-    currentLag,
-    currentLevel,
-    currentRegion,
-    currentDate,
-    signalCasesOrDeathOptions,
-    encoding,
-    currentCompareSelection,
-  ],
-  ([mode, sensor, sensor2, lag, level, region, date, signalOptions, encoding, compare]): TrackedState => {
-    const sensorEntry = sensorMap.get(sensor);
-    const inMapMode = mode === modeByID.summary;
-
+  [currentMode, currentSensor, currentSensor2, currentLag, currentRegion, currentDate],
+  ([mode, sensor, sensor2, lag, region, date]): TrackedState => {
     // determine parameters based on default value and current mode
     const params: Omit<PersistedState, 'mode'> = {
       sensor:
@@ -361,7 +220,6 @@ export const trackedUrlParams = derived(
           : sensor,
       sensor2: mode === modeByID.correlation ? sensor2 : null,
       lag: mode === modeByID.correlation ? lag : null,
-      level: mode === modeByID.export || mode === modeByID['survey-results'] || level === DEFAULT_LEVEL ? null : level,
       region: mode === modeByID.export ? null : region,
       date:
         String(date) === MAGIC_START_DATE ||
@@ -370,10 +228,6 @@ export const trackedUrlParams = derived(
         mode === modeByID['indicator-status']
           ? null
           : String(date),
-      signalC: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.cumulative,
-      signalI: !inMapMode || !sensorEntry || !sensorEntry.isCasesOrDeath ? null : signalOptions.incidence,
-      encoding: !inMapMode || encoding === DEFAULT_ENCODING ? null : encoding,
-      compare: mode !== modeByID.classic || !compare ? null : compare.map((d) => d.info.propertyId).join(','),
     };
     return {
       path: mode === DEFAULT_MODE ? `` : `${mode.id}/`,
@@ -409,32 +263,11 @@ export function loadFromUrlState(state: PersistedState): void {
   if (state.lag != null && state.lag !== get(currentLag)) {
     currentLag.set(state.lag);
   }
-  if (state.level != null && state.level !== get(currentLevel)) {
-    currentLevel.set(state.level);
-  }
   if (state.region != null && state.region !== get(currentRegion)) {
     selectByInfo(getInfoByName(state.region));
   }
   if (state.date != null && state.date !== get(currentDate)) {
     currentDate.set(state.date);
-  }
-  if (state.encoding != null && state.encoding !== get(encoding)) {
-    encoding.set(state.encoding);
-  }
-  if (state.signalC || state.signalI) {
-    signalCasesOrDeathOptions.set({
-      cumulative: state.signalC != null,
-      incidence: state.signalI != null,
-    });
-  }
-  if (state.compare) {
-    const compareIds = state.compare
-      .split(',')
-      .map((d) => getInfoByName(d))
-      .filter((d): d is RegionInfo => d != null);
-    currentCompareSelection.set(
-      compareIds.map((info, i) => ({ info, displayName: info.displayName, color: selectionColors[i] || 'grey' })),
-    );
   }
 }
 
@@ -448,19 +281,13 @@ export function loadAnnotations(): void {
 
 export const metaDataManager = writable(new MetaDataManager([]));
 
-export function loadMetaData(): Promise<{ level: RegionLevel; date: string }> {
+export function loadMetaData(): Promise<{ date: string }> {
   return callMetaAPI().then((meta) => {
     const m = new MetaDataManager(meta);
     metaDataManager.set(m);
 
-    // validate level and date data
-    let l = get(currentLevel);
     const sensor = get(currentSensor);
     const sensorInfo = sensorMap.get(sensor);
-    if (sensorInfo && !sensorInfo.levels.includes(l)) {
-      l = sensorInfo.levels[0];
-      currentLevel.set(l);
-    }
 
     let date = get(currentDate);
     // Magic number of default date - if no URL params, use max date
@@ -471,7 +298,6 @@ export function loadMetaData(): Promise<{ level: RegionLevel; date: string }> {
       currentDate.set(date);
     }
     return {
-      level: l,
       date,
     };
   });
@@ -481,24 +307,6 @@ export function loadMetaData(): Promise<{ level: RegionLevel; date: string }> {
 currentSensorEntry.subscribe((sensorEntry) => {
   if (!sensorEntry) {
     return;
-  }
-  // check level
-  const level = get(currentLevel);
-
-  if (!sensorEntry.levels.includes(level)) {
-    currentLevel.set(sensorEntry.levels[0]);
-  }
-
-  if (get(currentInfoSensor)) {
-    // show help, update it
-    currentInfoSensor.set(sensorEntry);
-  }
-
-  if (!sensorEntry.isCasesOrDeath) {
-    signalCasesOrDeathOptions.set({
-      cumulative: false,
-      incidence: false,
-    });
   }
 
   // clamp to time span

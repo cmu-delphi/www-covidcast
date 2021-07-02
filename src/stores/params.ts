@@ -5,7 +5,7 @@ import { currentDate, currentSensor, selectByInfo } from '.';
 import { scaleSequential } from 'd3-scale';
 import { scrollToTop } from '../util';
 import type { RegionInfo as Region, RegionLevel, RegionArea, CountyInfo } from '../data/regions';
-import type { Sensor, SensorEntry } from './constants';
+import type { Sensor } from './constants';
 import { get, Writable } from 'svelte/store';
 import { ALL_TIME_FRAME, TimeFrame } from '../data/TimeFrame';
 import { toTimeValue } from '../data/utils';
@@ -78,17 +78,6 @@ export class DateParam {
   }
 }
 
-function resolveDescription(sensor: Sensor) {
-  const s = sensor as SensorEntry;
-  if (s.mapTitleText == null) {
-    return s.description ?? '';
-  }
-  if (typeof s.mapTitleText === 'function') {
-    return s.mapTitleText();
-  }
-  return s.mapTitleText;
-}
-
 export class SensorParam {
   private readonly writeAbleStore: Writable<string>;
 
@@ -100,7 +89,6 @@ export class SensorParam {
   readonly rawValue?: Sensor;
   readonly rawCumulativeValue?: Sensor;
 
-  readonly isCasesOrDeath: boolean;
   readonly dataSourceName: string;
 
   readonly isPercentage: boolean;
@@ -123,13 +111,12 @@ export class SensorParam {
     this.manager = metaDataManager;
     this.key = sensor.key;
     this.name = sensor.name;
-    this.description = resolveDescription(sensor);
+    this.description = sensor.description || 'No description available';
     this.signalTooltip = sensor.signalTooltip;
     this.value = sensor;
     this.rawValue = sensor.rawSensor;
     this.rawCumulativeValue = sensor.rawCumulativeSensor;
 
-    this.isCasesOrDeath = (sensor as SensorEntry).isCasesOrDeath || false;
     this.dataSourceName = sensor.dataSourceName;
     this.isPercentage = sensor.format == 'percent' || sensor.format === 'fraction';
     this.isPer100K = sensor.format === 'per100k';
@@ -231,7 +218,7 @@ export class RegionParam implements Region {
 }
 
 export function extractSparkLine<T extends EpiDataRow>(data: readonly T[], sparkLine: TimeFrame, sensor: Sensor): T[] {
-  return fitRange(addMissing(data.filter(sparkLine.filter), sensor), sensor, sparkLine.min, sparkLine.max);
+  return fitRange(addMissing(data.filter(sparkLine.filter)), sparkLine.min, sparkLine.max);
 }
 
 export function groupByRegion<T extends EpiDataRow & { propertyId: string }>(data: readonly T[]): Map<string, T[]> {

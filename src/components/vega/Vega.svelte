@@ -2,6 +2,7 @@
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import { observeResize, unobserveResize } from '../../util';
   import { createVegaTooltipAdapter } from './tooltipUtils';
+  import createVega from './vegaFactory';
 
   /**
    * @type {Promise<any[]>}
@@ -188,9 +189,17 @@
         }
       });
       spec.signals.push({
+        name: 'resizeTrigger',
+        init: 0,
+      });
+      spec.signals.push({
         name: 'width',
         init: 'containerSize()[0]',
         on: [
+          {
+            events: { signal: 'resizeTrigger' },
+            update: 'containerSize()[0]',
+          },
           {
             events: { source: 'window', type: 'resize' },
             update: 'containerSize()[0]',
@@ -202,6 +211,10 @@
         init: 'containerSize()[1]',
         on: [
           {
+            events: { signal: 'resizeTrigger' },
+            update: 'containerSize()[1]',
+          },
+          {
             events: { source: 'window', type: 'resize' },
             update: 'containerSize()[1]',
           },
@@ -212,12 +225,8 @@
 
     const specDatasetsEntries = Object.entries(spec.datasets || {});
     let patchedInData = null;
-    vegaPromise = Promise.all([
-      import(/* webpackChunkName: 'vegafactory' */ './vegaFactory'),
-      spec,
-      ...specDatasetsEntries.map((d) => d[1]),
-    ])
-      .then(([m, spec, ...ds]) => {
+    vegaPromise = Promise.all([spec, ...specDatasetsEntries.map((d) => d[1])])
+      .then(([spec, ...ds]) => {
         if (!root) {
           return null;
         }
@@ -241,7 +250,7 @@
           spec.datasets.values = loadedData;
         }
         // build vega
-        return m.default(root, spec, {
+        return createVega(root, spec, {
           tooltip: tooltipHandler,
           renderer,
           patch,
@@ -342,8 +351,11 @@
       if (Math.abs(s.width - size.width) > 1 || Math.abs(s.height - size.height) > 1) {
         size = s;
         if (!patchSpec && vega) {
-          // console.log('runAsync - resize');
-          vega.view.resize().runAsync();
+          // console.log('runAsync - resize', size);
+          vega.view.resize();
+          vega.view.signal('resizeTrigger', s.width);
+          vega.view.runAsync();
+          // window.dispatchEvent(new Event('resize'));
         }
       }
     });

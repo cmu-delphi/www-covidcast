@@ -125,7 +125,17 @@
   }
 </script>
 
-<WidgetCard {sensor} region="US States" {date} {id} {initialState} defaultState={DEFAULT_STATE} on:state on:action>
+<WidgetCard
+  {sensor}
+  region="US States"
+  {date}
+  {id}
+  {initialState}
+  defaultState={DEFAULT_STATE}
+  on:state
+  on:action
+  hideOverflow
+>
   <svelte:fragment slot="toolbar">
     <DownloadMenu {fileName} data={tileData} {sensor} prepareRow={(row) => row.dump} />
   </svelte:fragment>
