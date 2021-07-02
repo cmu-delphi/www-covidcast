@@ -95,7 +95,4 @@
     display: inline-block;
     fill: currentColor;
   }
-  .source {
-    font-size: 0.75rem;
-  }
 </style>
