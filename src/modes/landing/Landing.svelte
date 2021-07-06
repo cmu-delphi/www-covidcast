@@ -127,7 +127,7 @@
       <hr />
       <FancyHeader sub="Survey" center>COVID Trends and Impact</FancyHeader>
       <p>
-        The Trends and Impact Survey (CTIS) offers insights into public sentiment on:
+        The COVID Trends and Impact Survey (CTIS) offers insights into public sentiment on:
         <a href="./{modeByID['survey-results'].id}" on:click|preventDefault={switchSurvey}>
           {#each questionCategories as cat, i}
             {i === questionCategories.length - 1 ? ' and' : i > 0 ? ',' : ''}
