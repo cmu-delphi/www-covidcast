@@ -51,7 +51,7 @@
 <div class="root">
   <RegionDatePicker sensor={refSensor} items={filteredInfos} defaultItem={nationInfo}>
     <div class="grid-3-11 mobile-header-line" slot="title">
-      <h2>COVID Trends and Impact Survey (CTIS) <span>Results</span></h2>
+      <h2>COVID-19 Trends and Impact Survey (CTIS) <span>Results</span></h2>
     </div>
     <MobileSurveyToc>
       {#each questionCategories as cat, i}
