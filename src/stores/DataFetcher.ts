@@ -103,7 +103,7 @@ export class DataFetcher {
 
     const r = fetchTriple(lSensor, lRegion, timeFrame)
       .then(addNameInfos)
-      .then((rows) => addMissing(rows, lSensor));
+      .then((rows) => addMissing(rows));
     this.cache.set(key, r);
     return r;
   }
@@ -124,7 +124,7 @@ export class DataFetcher {
       for (const sensor of missingSensors) {
         const sensorData = data
           .then((rows) => rows.filter((d) => d.signal === sensor.signal && d.source === sensor.id))
-          .then((rows) => addMissing(rows, sensor));
+          .then((rows) => addMissing(rows));
         this.cache.set(this.toWindowKey(sensor, lRegion, timeFrame), sensorData);
       }
     }
@@ -352,7 +352,7 @@ export class DataFetcher {
         .then(groupByRegion);
       for (const region of missingRegions) {
         const regionData = lookup.then((l) => {
-          return addMissing(l.get(region.propertyId) ?? [], lSensor);
+          return addMissing(l.get(region.propertyId) ?? []);
         });
         this.cache.set(this.toWindowKey(lSensor, region, lDate.sparkLineTimeFrame), regionData);
       }

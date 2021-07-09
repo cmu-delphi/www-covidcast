@@ -1,4 +1,3 @@
-import { EpiDataCasesOrDeathValues, primaryValue, CasesOrDeathOptions } from './classicSensor';
 import type { EpiDataMetaInfo, EpiDataMetaStatsInfo, SignalCategory } from './api';
 import { parseAPITime } from './utils';
 import type { RegionLevel } from './regions';
@@ -88,11 +87,6 @@ function toValueDomain(
 export interface SensorLike {
   id: string;
   signal: string;
-}
-
-export interface OldSensorLike extends SensorLike {
-  isCasesOrDeath?: boolean;
-  casesOrDeathSignals?: Record<keyof EpiDataCasesOrDeathValues, string>;
 }
 
 export interface SensorSource {
@@ -249,27 +243,6 @@ export class MetaDataManager {
     return entry.timeFrame;
   }
 
-  getMetaDataCompatibility(
-    sensorEntry: OldSensorLike,
-    sensorOptions: Partial<CasesOrDeathOptions> = {},
-  ): EpiDataMetaInfo | null {
-    let signal = sensorEntry.signal;
-    if (sensorEntry.isCasesOrDeath) {
-      const valueKey = primaryValue(sensorEntry, sensorOptions) as keyof EpiDataCasesOrDeathValues;
-      signal = sensorEntry.casesOrDeathSignals?.[valueKey] ?? sensorEntry.signal;
-    }
-    return this.getMetaData({ id: sensorEntry.id, signal });
-  }
-
-  getStatsCompatibility(
-    sensorEntry: OldSensorLike,
-    sensorOptions: Partial<CasesOrDeathOptions> = {},
-    level?: RegionLevel,
-  ): EpiDataMetaStatsInfo {
-    const entry = this.getMetaDataCompatibility(sensorEntry, sensorOptions);
-    return extractStats(entry ? entry.signal : sensorEntry.signal, entry, level);
-  }
-
   getValueDomain(
     sensor: SensorLike,
     level: RegionLevel,
@@ -277,16 +250,6 @@ export class MetaDataManager {
   ): [number, number] {
     const stats = this.getStats(sensor, level);
     return toValueDomain(stats, sensor.signal, useMax, enforceZeroLike);
-  }
-
-  getValueDomainCompatibility(
-    sensorEntry: OldSensorLike,
-    level: RegionLevel,
-    signalOptions: Partial<CasesOrDeathOptions> = {},
-    { useMax = false, enforceZeroLike = true }: { useMax?: boolean; enforceZeroLike?: boolean } = {},
-  ): [number, number] {
-    const stats = this.getStatsCompatibility(sensorEntry, signalOptions, level);
-    return toValueDomain(stats, sensorEntry.signal, useMax, enforceZeroLike);
   }
 
   /**

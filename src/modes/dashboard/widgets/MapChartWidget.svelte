@@ -86,7 +86,7 @@
     const byLevel = {
       nation: generateNationSpec,
       state: generateStateSpec,
-      hhr: generateHRRSpec,
+      hrr: generateHRRSpec,
       hhs: generateHHSSpec,
       county: generateStateMapWithCountyDataSpec,
       msa: generateMSASpec,

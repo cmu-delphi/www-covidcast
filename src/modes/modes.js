@@ -25,13 +25,8 @@ export const modes = [
       import(/* webpackChunkName: 'm-correlation' */ './correlation/Correlation.svelte').then((r) => r.default),
   },
   {
-    id: 'classic',
-    label: 'Classic COVIDcast',
-    component: () => import(/* webpackChunkName: 'm-old' */ './classic/Overview.svelte').then((r) => r.default),
-  },
-  {
     id: 'survey-results',
-    label: 'Survey Results',
+    label: 'CTIS Results',
     component: () =>
       import(/* webpackChunkName: 'm-survey' */ './survey-results/SurveyResults.svelte').then((r) => r.default),
   },
@@ -40,11 +35,6 @@ export const modes = [
     label: 'Export Data',
     component: () => import(/* webpackChunkName: 'm-export' */ './exportdata/ExportData.svelte').then((r) => r.default),
   },
-  // {
-  //   id: 'lab',
-  //   label: 'Lab',
-  //   component: () => import(/* webpackChunkName: 'mode-lab' */ './lab/Lab.svelte').then((r) => r.default),
-  // },
   {
     id: 'indicator-status',
     label: 'Indicator Status Overview',
@@ -63,7 +53,7 @@ export const modes = [
     id: 'dashboard',
     label: 'Dashboard Builder',
     component: () =>
-      import(/* webpackChunkName: 'm-databoard' */ './dashboard/Dashboard.svelte').then((r) => r.default),
+      import(/* webpackChunkName: 'm-dashboard' */ './dashboard/Dashboard.svelte').then((r) => r.default),
     waitForReady: true,
   },
 ];

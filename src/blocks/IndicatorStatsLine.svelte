@@ -3,7 +3,7 @@
   import { parseAPITime } from '../data';
 
   /**
-   * @type {import('../../stores/constants').SensorEntry}
+   * @type {import('../../stores/constants').Sensor}
    */
   export let sensor;
   /**
