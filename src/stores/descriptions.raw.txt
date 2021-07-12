@@ -80,7 +80,7 @@ Links:
 ---
 Name: Vaccine Acceptance
 Id: fb-survey
-Signal: smoothed_wcovid_vaccinated_or_accept
+Signal: smoothed_wcovid_vaccinated_appointment_or_accept
 LinkFrom: [fb-survey-smoothed_covid_vaccinated_or_accept]
 RawSignal: null
 Type: public
@@ -95,10 +95,10 @@ HasStdErr: true
 Highlight: [landing, location]
 
 
-MapTitleText: Percentage of people who either have already received a COVID vaccine or would definitely or probably choose to receive one if it were offered to them today, based on surveys of Facebook users
+MapTitleText: Percentage of people who either have already received a COVID vaccine, have an appointment to receive a COVID vaccine, or would definitely or probably choose to receive one if it were offered to them today, based on surveys of Facebook users
 
 
-Description: Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they have received a COVID vaccine or would choose to be vaccinated if they were offered a COVID vaccine today. For this signal, we estimate the percentage of people who either (a) say they have already received a COVID vaccine or (b) would “definitely” or “probably” choose to be vaccinated if a COVID vaccine were offered to them.
+Description: Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they have received a COVID vaccine, have an appointment to do so, or would choose to be vaccinated if they were offered a COVID vaccine today. For this signal, we estimate the percentage of people who either (a) say they have already received a COVID vaccine, (b) have an appointment to receive a COVID vaccine, or (c) would “definitely” or “probably” choose to be vaccinated if a COVID vaccine were offered to them today. The signal changed in [Wave 11](https://cmu-delphi.github.io/delphi-epidata/symptom-survey/coding.html#wave-11) of the survey, asking all non-vaccinated respondents if they have an appointment to be vaccinated and treating those with appointments as vaccine-accepting.
 
 
 Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
@@ -106,6 +106,7 @@ Credits: We are happy for you to use this data in products and publications unde
 
 Links:
  - "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/fb-survey.html#vaccination-indicators)"
+ - "[Wave 11 revision updates](https://cmu-delphi.github.io/delphi-epidata/symptom-survey/coding.html#wave-11)"
 ---
 Name: COVID Symptom Searches on Google 
 Id: google-symptoms
