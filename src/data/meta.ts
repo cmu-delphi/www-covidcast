@@ -1,11 +1,11 @@
-import type { EpiDataMetaInfo, EpiDataMetaStatsInfo, SignalCategory } from './api';
+import { EpiDataMetaInfo, EpiDataMetaSourceInfo, EpiDataMetaStatsInfo, KNOWN_LICENSES, SignalCategory } from './api';
 import { parseAPITime } from './utils';
 import type { RegionLevel } from './regions';
 import { isCountSignal } from './signals';
 import { ALL_TIME_FRAME, TimeFrame } from './TimeFrame';
 import { Sensor, units, colorScales, vegaColorScales, yAxis } from './sensor';
-import { getPlainDataSource } from './dataSourceLookup';
 import { formatSpecifiers, formatter } from '../formats';
+import { parse as parseMarkDown, parseInline } from 'marked';
 
 function toKey(source: string, signal: string) {
   return `${source}-${signal}`;
@@ -89,112 +89,146 @@ export interface SensorLike {
   signal: string;
 }
 
-export interface SensorSource {
-  readonly source: string;
-  readonly name: string;
-  readonly sensors: readonly Sensor[];
+function generateCredits(license: EpiDataMetaSourceInfo['license']) {
+  if (!license) {
+    return 'We are happy for you to use this data in products and publications.';
+  }
+  const known = KNOWN_LICENSES[license as keyof typeof KNOWN_LICENSES];
+  if (known) {
+    return `We are happy for you to use this data in products and publications under the terms of the <a href="${known.link}">${known.name}</a>.`;
+  }
+  return license;
 }
 
-function deriveMetaSensors(metadata: EpiDataMetaInfo[]): {
-  list: Sensor[];
-  map: Map<string, [EpiDataMetaParsedInfo, Sensor]>;
+export interface SensorSensor extends Sensor {
+  meta: EpiDataMetaParsedInfo;
+}
+
+export interface SensorSource
+  extends Readonly<Omit<EpiDataMetaSourceInfo, 'signals' | 'reference_signal' | 'db_source'>> {
+  readonly sensors: readonly SensorSensor[];
+  readonly referenceSensor?: SensorSensor;
+  readonly credits: string;
+}
+
+function findRawSignal(sensor: SensorSensor, sensors: SensorSensor[]) {
+  if (!sensor.meta.is_smoothed) {
+    return undefined;
+  }
+  const meta = sensor.meta;
+  const raw = sensors.find(
+    (o) =>
+      o.meta.signal_basename === meta.signal_basename &&
+      o.meta.is_cumulative == meta.is_cumulative &&
+      o.meta.is_weighted == meta.is_weighted &&
+      !o.meta.is_smoothed &&
+      o.meta.format == meta.format,
+  );
+  return raw;
+}
+function findRawCumulativeSignal(sensor: SensorSensor, sensors: SensorSensor[]) {
+  if (sensor.meta.is_cumulative) {
+    return undefined;
+  }
+  const meta = sensor.meta;
+  const cum = sensors.find(
+    (o) =>
+      o.meta.signal_basename === meta.signal_basename &&
+      o.meta.is_cumulative &&
+      o.meta.is_weighted == meta.is_weighted &&
+      !o.meta.is_smoothed &&
+      o.meta.format == meta.format,
+  );
+  return cum;
+}
+
+function addDUALink(links: { alt: string; href: string }[], dua?: string | null) {
+  if (dua) {
+    return [...links, { alt: 'DUA', href: dua }];
+  }
+  return links;
+}
+
+function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
+  list: SensorSensor[];
+  map: Map<string, SensorSensor>;
   sources: SensorSource[];
 } {
-  const byKey = new Map<string, [EpiDataMetaParsedInfo, Sensor]>();
-  const bySource = new Map<string, Sensor[]>();
+  const sources = metadata.map((sm): SensorSource => {
+    const credits = generateCredits(sm.license);
+    const sensors: SensorSensor[] = sm.signals.map((m) => {
+      const parsed = parse(m);
+      const s: SensorSensor = {
+        key: toKey(m.source, m.signal),
+        id: m.source,
+        signal: m.signal,
+        name: m.name,
+        description: m.description ? parseMarkDown(m.description.trim()) : '',
+        signalTooltip: m.short_description ? parseInline(m.short_description) : '',
+        valueScaleFactor: m.format === 'fraction' ? 100 : 1,
+        format: m.format ?? 'raw',
+        highValuesAre: m.high_values_are ?? 'neutral',
+        hasStdErr: m.has_stderr,
+        is7DayAverage: m.is_smoothed,
+        dataSourceName: sm.name,
+        levels: Object.keys(m.geo_types) as RegionLevel[],
+        type: m.category ?? 'other',
+        xAxis: m.time_label,
+        yAxis: m.value_label || yAxis[m.format],
+        unit: units[m.format],
+        colorScale: colorScales[m.high_values_are],
+        vegaColorScale: vegaColorScales[m.high_values_are],
+        links: sm.link.map((d) => `<a href="${d.href}">${d.alt}</a>`),
+        credits: credits,
+        formatValue: formatter[m.format],
+        formatSpecifier: formatSpecifiers[m.format],
+        meta: parsed,
+      };
+      return s;
+    });
 
-  const sensors = metadata.map((m): Sensor => {
-    const parsed = parse(m);
-    const s: Sensor = {
-      key: toKey(m.source, m.signal),
-      id: m.source,
-      signal: m.signal,
-      name: m.name,
-      description: 'No description available',
-      signalTooltip: 'No tooltip available',
-      valueScaleFactor: m.format === 'fraction' ? 100 : 1,
-      format: m.format ?? 'raw',
-      highValuesAre: m.high_values_are ?? 'neutral',
-      hasStdErr: m.has_stderr,
-      is7DayAverage: m.is_smoothed,
-      dataSourceName: getPlainDataSource(m.source),
-      levels: Object.keys(m.geo_types) as RegionLevel[],
-      type: m.category ?? 'other',
-      xAxis: 'Date',
-      yAxis: yAxis[m.format],
-      unit: units[m.format],
-      colorScale: colorScales[m.high_values_are],
-      vegaColorScale: vegaColorScales[m.high_values_are],
-      links: [],
-      credits: 'We are happy for you to use this data in products and publications.',
-      formatValue: formatter[m.format],
-      formatSpecifier: formatSpecifiers[m.format],
-    };
-    byKey.set(s.key, [parsed, s]);
-    const source = bySource.get(s.id);
-    if (source) {
-      source.push(s);
-    } else {
-      bySource.set(s.id, [s]);
-    }
-    return s;
-  });
-
-  byKey.forEach(([meta, sensor]) => {
-    if (!meta.is_smoothed) {
-      return;
-    }
-    const related = meta.related_signals
-      .map((s) => byKey.get(toKey(sensor.id, s)))
-      .filter((s): s is [EpiDataMetaParsedInfo, Sensor] => s != null);
-
-    // find raw version
-    const raw = related.find(
-      // not smoothed
-      ([m]) =>
-        m.is_cumulative == meta.is_cumulative &&
-        m.is_weighted == meta.is_weighted &&
-        !m.is_smoothed &&
-        m.format == meta.format,
-    );
-    if (raw) {
-      Object.assign(sensor, {
-        rawSensor: raw[1],
-        rawSignal: raw[1].signal,
-      });
-    }
-
-    // find raw cumulative version
-    if (!meta.is_cumulative) {
-      const rawCumulative = related.find(
-        ([m]) => m.is_cumulative && m.is_weighted == meta.is_weighted && !m.is_smoothed && m.format == meta.format,
-      );
-      if (rawCumulative) {
-        Object.assign(sensor, {
-          rawCumulativeSensor: rawCumulative[1],
-          rawCumulativeSignal: rawCumulative[1].signal,
+    // inject raw versions and cumulative versions
+    for (const s of sensors) {
+      const raw = findRawSignal(s, sensors);
+      if (raw) {
+        Object.assign(s, {
+          rawSensor: raw,
+          rawSignal: raw.signal,
+        });
+      }
+      const cum = findRawCumulativeSignal(s, sensors);
+      if (cum) {
+        Object.assign(s, {
+          rawCumulativeSensor: cum,
+          rawCumulativeSignal: cum.signal,
         });
       }
     }
+
+    return {
+      ...sm,
+      link: addDUALink(sm.link, sm.dua),
+      sensors,
+      description: sm.description ? parseMarkDown(sm.description.trim()) : '',
+      credits,
+      referenceSensor: sm.reference_signal ? sensors.find((d) => d.signal === sm.reference_signal) : undefined,
+    };
   });
 
+  const sensors = sources.map((d) => d.sensors).flat();
   sensors.sort((a, b) => a.key.localeCompare(b.key));
 
-  const sources: SensorSource[] = Array.from(bySource.values(), (v) => ({
-    source: v[0].id,
-    name: v[0].dataSourceName,
-    sensors: v,
-  }));
+  const byKey = new Map(sensors.map((s) => [s.key, s]));
 
   return { list: sensors, map: byKey, sources };
 }
 
 export class MetaDataManager {
-  private readonly lookup: ReadonlyMap<string, [EpiDataMetaParsedInfo, Sensor]>;
-  readonly metaSensors: readonly Sensor[];
+  private readonly lookup: ReadonlyMap<string, SensorSensor>;
+  readonly metaSensors: readonly SensorSensor[];
   readonly metaSources: readonly SensorSource[];
 
-  constructor(metadata: EpiDataMetaInfo[]) {
+  constructor(metadata: EpiDataMetaSourceInfo[]) {
     const r = deriveMetaSensors(metadata);
     this.metaSensors = r.list;
     this.metaSources = r.sources;
@@ -202,27 +236,29 @@ export class MetaDataManager {
   }
 
   getDefaultCasesSignal(): Sensor | null {
-    return this.getSensor({ id: 'indicator-combination', signal: 'confirmed_7dav_incidence_prop' });
+    return this.getSensor({ id: 'jhu-csse', signal: 'confirmed_7dav_incidence_prop' });
   }
   getDefaultDeathSignal(): Sensor | null {
-    return this.getSensor({ id: 'indicator-combination', signal: 'deaths_7dav_incidence_prop' });
+    return this.getSensor({ id: 'jhu-csse', signal: 'deaths_7dav_incidence_prop' });
   }
 
   getSensorsOfType(type: SignalCategory): Sensor[] {
     return this.metaSensors.filter((d) => d.type === type);
   }
 
-  private getEntry(sensor: SensorLike | string): [EpiDataMetaParsedInfo | null, Sensor | null] {
-    const r = this.lookup.get(typeof sensor === 'string' ? sensor : toKey(sensor.id, sensor.signal));
-    return r ?? [null, null];
+  getSource(sensor: SensorLike | string): SensorSource | null {
+    const s = this.getSensor(sensor);
+    return s ? this.metaSources.find((d) => d.source === s.id) ?? null : null;
   }
 
-  getSensor(sensor: SensorLike | string): Sensor | null {
-    return this.getEntry(sensor)[1];
+  getSensor(sensor: SensorLike | string): SensorSensor | null {
+    const r = this.lookup.get(typeof sensor === 'string' ? sensor : toKey(sensor.id, sensor.signal));
+    return r ?? null;
   }
 
   getMetaData(sensor: SensorLike | string): EpiDataMetaParsedInfo | null {
-    return this.getEntry(sensor)[0];
+    const r = this.getSensor(sensor);
+    return r?.meta ?? null;
   }
 
   getLevels(sensor: SensorLike): RegionLevel[] {
@@ -250,16 +286,5 @@ export class MetaDataManager {
   ): [number, number] {
     const stats = this.getStats(sensor, level);
     return toValueDomain(stats, sensor.signal, useMax, enforceZeroLike);
-  }
-
-  /**
-   * returns the ids of related sensors to the given one
-   */
-  getRelatedSignals(sensor: SensorLike): SensorLike[] {
-    const meta = this.getMetaData(sensor);
-    if (!meta) {
-      return [];
-    }
-    return (meta.related_signals ?? []).map((signal) => ({ id: sensor.id, signal }));
   }
 }

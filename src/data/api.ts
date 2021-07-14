@@ -254,9 +254,12 @@ export type SignalFormat = 'raw' | 'percent' | 'fraction' | 'per100k' | 'raw_cou
 export type SignalHighValuesAre = 'good' | 'bad' | 'neutral';
 
 export interface EpiDataMetaInfo {
-  name: string;
-  signal: string;
   source: string;
+  signal: string;
+  name: string;
+  short_description: string;
+  description: string;
+
   category: SignalCategory;
   format: SignalFormat;
   high_values_are: SignalHighValuesAre;
@@ -266,18 +269,57 @@ export interface EpiDataMetaInfo {
   min_time: number;
   geo_types: Record<RegionLevel, EpiDataMetaStatsInfo>;
 
-  related_signals: string[];
   is_smoothed: boolean;
   is_weighted: boolean;
   is_cumulative: boolean;
   has_stderr: boolean;
   has_sample_size: boolean;
+
+  based_on_other: boolean;
+  signal_basename: string;
+
+  time_label: string;
+  value_label: string;
+
+  link: { alt: string; href: string }[];
 }
 
-export function callMetaAPI(signal: SourceSignalPair | readonly SourceSignalPair[] = []): Promise<EpiDataMetaInfo[]> {
+export const KNOWN_LICENSES = {
+  'CC BY': {
+    link: 'https://creativecommons.org/licenses/by/4.0/',
+    name: 'Creative Commons Attribution Licence',
+  },
+  'CC BY-NC': {
+    link: 'https://creativecommons.org/licenses/by-nc/4.0/',
+    name: 'Creative Commons Attribution-NonCommercial License',
+  },
+  ODBL: {
+    link: 'https://opendatacommons.org/licenses/odbl/',
+    name: 'Open Data Commons Open Database License',
+  },
+};
+
+export interface EpiDataMetaSourceInfo {
+  source: string;
+  name: string;
+  description: string;
+  license: keyof typeof KNOWN_LICENSES | string;
+
+  dua?: string | null;
+  link: { alt: string; href: string }[];
+
+  db_source: string;
+  reference_signal?: string;
+
+  signals: EpiDataMetaInfo[];
+}
+
+export function callMetaAPI(
+  signal: SourceSignalPair | readonly SourceSignalPair[] = [],
+): Promise<EpiDataMetaSourceInfo[]> {
   const url = new URL(ENDPOINT + '/covidcast/meta');
   addParam(url, 'signal', signal);
-  return fetchImpl<EpiDataMetaInfo[]>(url).catch((error) => {
+  return fetchImpl<EpiDataMetaSourceInfo[]>(url).catch((error) => {
     console.warn('failed fetching data', error);
     return [];
   });
