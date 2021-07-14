@@ -327,7 +327,9 @@ export function generateLineChartSpec({
             ? {
                 opacity: {
                   condition: {
-                    test: 'highlightRegion != null && highlightRegion !== datum.id',
+                    test: `highlightRegion != null && highlightRegion != datum.${
+                      typeof highlightRegion === 'string' ? highlightRegion : 'id'
+                    }`,
                     value: 0.1,
                   },
                   value: 1,

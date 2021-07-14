@@ -79,12 +79,15 @@ export function callAPI(
   geo: GeoPair | readonly GeoPair[],
   time: TimePair | readonly TimePair[],
   fields?: FieldSpec<EpiDataJSONRow>,
+  { asOf = null as Date | null } = {},
 ): Promise<EpiDataJSONRow[]> {
   const url = new URL(ENDPOINT + '/covidcast/');
   addParam(url, 'signal', signal);
   addParam(url, 'geo', geo);
   addParam(url, 'time', time);
-
+  if (asOf) {
+    url.searchParams.set('as_of', formatAPITime(asOf));
+  }
   url.searchParams.set('format', 'json');
   return fetchImpl<EpiDataJSONRow[]>(url, fields).catch((error) => {
     console.warn('failed fetching data', error);
@@ -300,6 +303,7 @@ export const KNOWN_LICENSES = {
 };
 
 export interface EpiDataMetaSourceInfo {
+  active: boolean;
   source: string;
   name: string;
   description: string;
@@ -333,14 +337,38 @@ export interface EpiDataSignalStatusRow {
   latest_time_value: string; // iso
   coverage: Record<RegionLevel, { date: string; /* iso */ count: number }[]>;
 }
-/**
- *
- * @returns
- */
+
 export function callSignalDashboardStatusAPI(): Promise<EpiDataSignalStatusRow[]> {
   const url = new URL(ENDPOINT + '/signal_dashboard_status/');
   url.searchParams.set('format', 'json');
   return fetchImpl<EpiDataSignalStatusRow[]>(url).catch((error) => {
+    console.warn('failed fetching data', error);
+    return [];
+  });
+}
+
+export interface CoverageRow {
+  source: string;
+  signal: string;
+  time_value: number;
+  count: number;
+}
+
+export function callCoverageAPI(
+  signal: SourceSignalPair | readonly SourceSignalPair[],
+  level?: RegionLevel | 'only-county',
+  days?: number,
+): Promise<CoverageRow[]> {
+  const url = new URL(ENDPOINT + '/covidcast/coverage');
+  addParam(url, 'signal', signal);
+  if (typeof level === 'string') {
+    url.searchParams.set('geo_type', level);
+  }
+  if (typeof days === 'number') {
+    url.searchParams.set('days', days.toString());
+  }
+  url.searchParams.set('format', 'json');
+  return fetchImpl<CoverageRow[]>(url).catch((error) => {
     console.warn('failed fetching data', error);
     return [];
   });

@@ -16,15 +16,9 @@
   import DownloadMenu from '../../components/DownloadMenu.svelte';
 
   const dispatch = createEventDispatcher();
-  /**
-   * @type {import('./data').ExtendedStatus}
-   */
   export let signal;
-
-  /**
-   * @type {import('../../stores/params').TimeFrame}
-   */
   export let domain;
+  export let initialDate;
 
   /**
    * @type {Date}
@@ -36,14 +30,10 @@
     highlightDate = signal.latest_time_value;
   }
 
-  /**
-   * @param {import('./data').ExtendedStatus} signal
-   */
-  function genSpec(signal, domain, zero) {
+  function genSpec(signal, zero) {
     const options = {
-      initialDate: highlightDate || signal.latest_time_value,
+      initialDate: highlightDate || initialDate,
       color: MULTI_COLORS[0],
-      domain: domain.domain,
       zero,
       dateField: 'date',
       valueField: 'fraction',
@@ -80,14 +70,10 @@
 
   let zoom = false;
 
-  $: annotations = $annotationManager.getWindowAnnotations(
-    { id: signal.source, signal: signal.covidcast_signal },
-    nationInfo,
-    domain.min,
-    domain.max,
-  );
-  $: spec = injectRanges(genSpec(signal, domain, !zoom), domain, annotations);
-  $: data = signal.coverage.county || [];
+  $: annotations = $annotationManager.getWindowAnnotations(signal, nationInfo, domain.min, domain.max);
+  $: spec = injectRanges(genSpec(signal, !zoom), domain, annotations);
+
+  export let data;
   // $: fileName = `${signal.name}_coverage`;
 
   let vegaRef = null;

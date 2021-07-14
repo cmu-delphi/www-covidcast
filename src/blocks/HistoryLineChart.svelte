@@ -57,7 +57,9 @@
 
   export let expandableWindow = false;
 
-  let showFull = false;
+  export let showAnnotations = true;
+
+  let showFull = expandableWindow === 'full';
 
   /**
    * show only a single region regardless of the level
@@ -270,7 +272,9 @@
   $: raw = singleRaw && sensor.rawValue != null && !($isMobileDevice && showFull);
   $: cumulative = raw && singleCumulative && sensor.rawCumulativeValue != null;
   $: regions = raw ? [region.value] : resolveRegions(region.value, singleRegionOnly);
-  $: annotations = $annotationManager.getWindowAnnotations(sensor.value, regions, timeFrame.min, timeFrame.max);
+  $: annotations = showAnnotations
+    ? $annotationManager.getWindowAnnotations(sensor.value, regions, timeFrame.min, timeFrame.max)
+    : [];
   $: spec = injectRanges(
     genSpec(sensor, region, date, timeFrame, {
       height,
@@ -335,7 +339,7 @@
       <Toggle bind:checked={singleCumulative}>Cumulative Data</Toggle>
     {/if}
   {/if}
-  {#if expandableWindow && !($isMobileDevice && raw)}
+  {#if expandableWindow === true && !($isMobileDevice && raw)}
     <Toggle bind:checked={showFull}>Show All Dates</Toggle>
   {/if}
   <div class="spacer" />

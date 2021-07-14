@@ -10,6 +10,7 @@ import fetchTriple from './fetchTriple';
 import type { TimeFrame } from './TimeFrame';
 import { GeoPair, SourceSignalPair, TimePair } from './apimodel';
 import { timeDay } from 'd3-time';
+import type { SensorLike } from './meta';
 
 export interface Coverage {
   date: Date;
@@ -71,16 +72,13 @@ export interface ProfileEntry extends EpiDataBackfillRow {
 }
 
 export function loadBackFillProfile(
-  indicator: IndicatorStatus,
+  sensor: SensorLike,
   region: RegionInfo,
   window: TimeFrame,
   referenceAnchorLag = 60,
 ): Promise<ProfileEntry[]> {
   return callBackfillAPI(
-    SourceSignalPair.from({
-      id: indicator.source,
-      signal: indicator.covidcast_signal,
-    }),
+    SourceSignalPair.from(sensor),
     new TimePair('day', window),
     GeoPair.from(region),
     referenceAnchorLag,

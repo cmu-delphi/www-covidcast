@@ -7,33 +7,28 @@
   import { generateSparkLine } from '../../specs/lineSpec';
   import { createEventDispatcher } from 'svelte';
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
+  import { metaDataManager } from '../../stores';
+  import { loadData } from './data';
 
   const dispatch = createEventDispatcher();
-  /**
-   * @type {Date}
-   */
-  export let date;
+
+  $: sources = $metaDataManager.metaSources.filter((d) => d.referenceSensor != null && d.active);
+
+  const date = new Date();
 
   const sort = new SortHelper('name', false, 'name');
-  /**
-   * @type {Promise<import('./data').ExtendedStatus[]>}
-   */
-  export let data = Promise.resolve([]);
-  /**
-   * @type {import('../../stores/params').TimeFrame}
-   */
-  export let domain;
 
+  $: loader = loadData(sources, $metaDataManager);
   /**
-   * @type {import('./data').ExtendedStatus[]}
+   * @type {import('./data').SourceData[]}
    */
   let sortedData = [];
   let loading = true;
   $: {
     loading = true;
-    sortedData = [];
+    sortedData = loader.initial;
     const comparator = $sort.comparator;
-    data.then((rows) => {
+    loader.loaded.then((rows) => {
       sortedData = rows.slice().sort(comparator);
       loading = false;
     });
@@ -42,7 +37,7 @@
   $: spec = generateSparkLine({
     dateField: 'date',
     valueField: 'fraction',
-    domain: domain.domain,
+    domain: loader.domain.domain,
     highlightDate: null,
     highlightStartEnd: false,
     // zero: true,
@@ -54,7 +49,7 @@
   <FancyHeader>Summary</FancyHeader>
   <DownloadMenu
     fileName="indicator_status_as_of_{formatDateISO(date)}"
-    {data}
+    data={loader.loaded}
     absolutePos
     prepareRow={(row) => ({
       name: row.name,
@@ -70,7 +65,12 @@
 <table class="mobile-table" class:loading>
   <thead>
     <tr>
-      <th class="mobile-th">Indicator</th>
+      <th class="mobile-th">Data Source</th>
+      <th class="mobile-th uk-text-center" colspan="5">Reference Signal</th>
+      <th rowspan="2" />
+    </tr>
+    <tr>
+      <th />
       <th class="mobile-th uk-text-right">Latest Issue</th>
       <th class="mobile-th uk-text-right">Latest Data Available</th>
       <th class="mobile-th uk-text-right">Lag to Today</th>
@@ -78,11 +78,10 @@
       <th class="mobile-th uk-text-right">
         <span>County Coverage</span>
         <div class="mobile-th-range">
-          <span> {formatDateShortNumbers(domain.min)} </span>
-          <span> {formatDateShortNumbers(domain.max)} </span>
+          <span> {formatDateShortNumbers(loader.domain.min)} </span>
+          <span> {formatDateShortNumbers(loader.domain.max)} </span>
         </div>
       </th>
-      <th />
     </tr>
     <tr>
       <th class="sort-indicator uk-text-center">
@@ -105,30 +104,38 @@
     </tr>
   </thead>
   <tbody>
-    {#each sortedData as r (r.name)}
+    {#each sortedData as r}
       <tr>
         <td>
-          <a href="#{r.id}" on:click|preventDefault={() => dispatch('select', r)}>{r.name}</a>
+          <a
+            href="../indicator-source?sensor={r.source}-{r.reference_signal}"
+            on:click|preventDefault={() => dispatch('select', r)}>{r.name}</a
+          >
+          <div class="source">API: {r.source}</div>
         </td>
-        <td class="uk-text-right">
+        <td class="uk-text-right uk-text-nowrap">
           {formatDateISO(r.latest_issue)}
         </td>
-        <td class="uk-text-right">
-          {formatDateISO(r.latest_time_value)}
+        <td class="uk-text-right uk-text-nowrap">
+          {formatDateISO(r.latest_data)}
         </td>
-        <td class="uk-text-right">
+        <td class="uk-text-right uk-text-nowrap">
           {r.latest_lag.toLocaleString()} days
         </td>
-        <td class="uk-text-right">
+        <td class="uk-text-right uk-text-nowrap">
           {formatFraction(r.latest_coverage)}
         </td>
         <td>
           <div class="mobile-table-chart mobile-table-chart-small">
-            <Vega {spec} data={r.coverage.county || []} noDataText="N/A" />
+            <Vega {spec} data={r.coverages} noDataText="N/A" />
           </div>
         </td>
         <td>
-          <a href="#{r.id}" class="uk-link-text details-link" on:click|preventDefault={() => dispatch('select', r)}>
+          <a
+            href="../indicator-source?sensor={r.source}-{r.covidcast_signal}"
+            class="uk-link-text details-link"
+            on:click|preventDefault={() => dispatch('select', r)}
+          >
             {@html chevronRightIcon}
           </a>
         </td>
@@ -142,5 +149,8 @@
     width: 6px;
     display: inline-block;
     fill: currentColor;
+  }
+  .source {
+    font-size: 0.75rem;
   }
 </style>

@@ -20,6 +20,8 @@ export class DataFetcher {
   private primaryTimeValue = 0;
   private primaryWindowRange = '';
 
+  constructor(public readonly asOf: Date | null = null) {}
+
   toDateKey(sensor: Sensor, region: { id: string; level: string }, date: DateParam, suffix = ''): string {
     const s = this.primarySensorKey === sensor.key ? 'SENSOR' : sensor.key;
     const r =
@@ -84,7 +86,7 @@ export class DataFetcher {
     if (this.cache.has(key)) {
       return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
     }
-    const r = fetchTriple(lSensor, regions, lDate.value).then(addNameInfos);
+    const r = fetchTriple(lSensor, regions, lDate.value, { asOf: this.asOf }).then(addNameInfos);
     this.cache.set(key, r);
     return r;
   }
@@ -93,6 +95,7 @@ export class DataFetcher {
     sensor: Sensor | SensorParam,
     region: Region | RegionParam,
     timeFrame: TimeFrame,
+    { advanced = false } = {},
   ): Promise<RegionEpiDataRow[]> {
     const lSensor = SensorParam.unbox(sensor);
     const lRegion = RegionParam.unbox(region);
@@ -101,7 +104,7 @@ export class DataFetcher {
       return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
     }
 
-    const r = fetchTriple(lSensor, lRegion, timeFrame)
+    const r = fetchTriple(lSensor, lRegion, timeFrame, { asOf: this.asOf, advanced })
       .then(addNameInfos)
       .then((rows) => addMissing(rows));
     this.cache.set(key, r);
@@ -119,7 +122,7 @@ export class DataFetcher {
     const missingSensors = lSensors.filter((d) => !this.cache.has(this.toWindowKey(d, lRegion, timeFrame)));
 
     if (missingSensors.length > 0) {
-      const data = fetchTriple(missingSensors, lRegion, timeFrame).then(addNameInfos);
+      const data = fetchTriple(missingSensors, lRegion, timeFrame, { asOf: this.asOf }).then(addNameInfos);
 
       for (const sensor of missingSensors) {
         const sensorData = data
@@ -148,7 +151,7 @@ export class DataFetcher {
     };
     const missingSensors = lSensors.filter((sensor) => !this.cache.has(this.toWindowKey(sensor, geoKey, timeFrame)));
     if (missingSensors.length > 0) {
-      const data = fetchTriple(missingSensors, regions, timeFrame).then(addNameInfos);
+      const data = fetchTriple(missingSensors, regions, timeFrame, { asOf: this.asOf }).then(addNameInfos);
 
       for (const sensor of missingSensors) {
         const sensorData = data.then((rows) =>
@@ -178,7 +181,7 @@ export class DataFetcher {
       return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
     }
 
-    const r = fetchTriple(lSensor, regions, timeFrame).then(addNameInfos);
+    const r = fetchTriple(lSensor, regions, timeFrame, { asOf: this.asOf }).then(addNameInfos);
     // no missing
     this.cache.set(key, r);
     return r;
@@ -347,7 +350,7 @@ export class DataFetcher {
       (region) => !this.cache.has(this.toWindowKey(lSensor, region, lDate.sparkLineTimeFrame)),
     );
     if (missingRegions.length > 0) {
-      const lookup = fetchTriple(lSensor, missingRegions, lDate.sparkLineTimeFrame)
+      const lookup = fetchTriple(lSensor, missingRegions, lDate.sparkLineTimeFrame, { asOf: this.asOf })
         .then(addNameInfos)
         .then(groupByRegion);
       for (const region of missingRegions) {
@@ -374,7 +377,7 @@ export class DataFetcher {
     if (this.cache.has(key)) {
       return this.cache.get(key) as Promise<RegionEpiDataRow>;
     }
-    const r = fetchTriple(lSensor, lRegion, lDate.value, { advanced: true })
+    const r = fetchTriple(lSensor, lRegion, lDate.value, { advanced: true, asOf: this.asOf })
       .then(addNameInfos)
       .then((rows) => rows[0]);
     this.cache.set(key, r);
@@ -395,7 +398,9 @@ export class DataFetcher {
     );
 
     if (missingSensors.length > 0) {
-      const data = fetchTriple(missingSensors, lRegion, lDate.value, { advanced: true }).then(addNameInfos);
+      const data = fetchTriple(missingSensors, lRegion, lDate.value, { advanced: true, asOf: this.asOf }).then(
+        addNameInfos,
+      );
       for (const sensor of missingSensors) {
         const sensorData = data.then((rows) => rows.find((d) => d.signal === sensor.signal && d.source === sensor.id)!);
 

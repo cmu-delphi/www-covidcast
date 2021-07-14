@@ -8,11 +8,16 @@
    */
   export let sensor = null;
 
+  export let source = true;
+
   $: meta = sensor && sensor.key ? $metaDataManager.getMetaData(sensor.key) : null;
 </script>
 
-<SourceBadges source={sensor ? $metaDataManager.getSource(sensor) : null} />
+{#if source}
+  <SourceBadges source={sensor ? $metaDataManager.getSource(sensor) : null} />
+{/if}
 {#if meta}
+  <span class="uk-badge signal-badge" title={sensor.name}>api: {meta.signal}</span>
   <span
     class="uk-badge category-badge"
     data-cat={meta.category}
@@ -45,6 +50,9 @@
   .uk-badge {
     color: #666;
     font-size: 0.625rem;
+  }
+  .signal-badge {
+    color: white;
   }
   .category-badge[data-cat='public'] {
     background: #fee6ce;

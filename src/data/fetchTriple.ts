@@ -99,7 +99,7 @@ export default function fetchTriple<S extends { id: string; signal: string; form
   sensor: S | readonly S[],
   region: Region | RegionLevel | readonly Region[],
   date: TimeFrame | Date,
-  { advanced = false, stderr = true } = {},
+  { advanced = false, stderr = true, asOf = null as null | Date } = {},
 ): Promise<EpiDataRow[]> {
   const transfer: (keyof EpiDataJSONRow)[] = ['value'];
   if (stderr) {
@@ -121,5 +121,7 @@ export default function fetchTriple<S extends { id: string; signal: string; form
   } else {
     transfer.push('time_value');
   }
-  return callAPI(sourceSignalPairs, geoPairs, timePairs, transfer).then((rows) => parseData(rows, mixinValues, factor));
+  return callAPI(sourceSignalPairs, geoPairs, timePairs, transfer, { asOf }).then((rows) =>
+    parseData(rows, mixinValues, factor),
+  );
 }
