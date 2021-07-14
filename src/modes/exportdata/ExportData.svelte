@@ -210,7 +210,7 @@
 
       <section class="uk-margin-top">
         <FancyHeader sub="Signal" normal>2. Select</FancyHeader>
-        <p>Pick a signal and one of its variants of a data source.</p>
+        <p>Pick a signal and one of its variants from this data source.</p>
         <div data-uk-grid class="uk-form-stacked">
           <div class="uk-width-1-2@m uk-width-expand@s">
             <label for="s" class="uk-form-label">Signals</label>

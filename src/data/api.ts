@@ -296,7 +296,10 @@ export const KNOWN_LICENSES = {
     link: 'https://creativecommons.org/licenses/by-nc/4.0/',
     name: 'Creative Commons Attribution-NonCommercial License',
   },
-  ODBL: { link: 'https://opendatacommons.org/licenses/odbl/', name: 'Creative Commons NonCommercial License' },
+  ODBL: {
+    link: 'https://opendatacommons.org/licenses/odbl/',
+    name: 'Open Data Commons Open Database License',
+  },
 };
 
 export interface EpiDataMetaSourceInfo {
