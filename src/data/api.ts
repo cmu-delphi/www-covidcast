@@ -316,7 +316,6 @@ export function callMetaAPI(
 ): Promise<EpiDataMetaSourceInfo[]> {
   const url = new URL(ENDPOINT + '/covidcast/meta');
   addParam(url, 'signal', signal);
-  url.searchParams.set('flags', 'active');
   return fetchImpl<EpiDataMetaSourceInfo[]>(url).catch((error) => {
     console.warn('failed fetching data', error);
     return [];
