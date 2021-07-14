@@ -12,7 +12,7 @@
 
   const dispatch = createEventDispatcher();
 
-  $: sources = $metaDataManager.metaSources.filter((d) => d.reference_signal != null);
+  $: sources = $metaDataManager.metaSources.filter((d) => d.referenceSensor != null && d.active);
 
   const date = new Date();
 

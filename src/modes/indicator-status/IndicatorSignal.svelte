@@ -14,8 +14,11 @@
   import { toLagToToday } from './data';
   import SensorBadges from '../../components/SensorBadges.svelte';
   import GeoLevelBadge from '../../components/GeoLevelBadge.svelte';
+  import SourceBadges from '../../components/SourceBadges.svelte';
 
   $: sensor = $metaDataManager.getSensor($currentSensor) || $metaDataManager.getSensor(DEFAULT_SENSOR);
+  $: source = sensor ? $metaDataManager.getSource(sensor) : undefined;
+
   function setSensor(d) {
     currentSensor.set(d.key);
   }
@@ -48,11 +51,45 @@
   <div class="uk-container content-grid">
     <AboutSection className="uk-margin-small-top uk-margin-small-bottom">
       <h3 class="mobile-h3">About {name}</h3>
-      <div class="desc">Name, API Name, Description, Link to API Docs</div>
+      {#if sensor}
+        <div>
+          <SensorBadges {sensor} />
+        </div>
+        <p>
+          {@html sensor.description}
+        </p>
+        {#if sensor.meta.link.length > 0}
+          <p>See also:</p>
+          <ul>
+            {#each sensor.meta.link as link}
+              <li>
+                <a href={link.href}>{link.alt}</a>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+      {/if}
     </AboutSection>
     <AboutSection className="uk-margin-small-top uk-margin-small-bottom">
-      <h3 class="mobile-h3">About {sensor ? sensor.dataSourceName : ''}</h3>
-      <div class="desc">Name, API Name, Description, Link to API Docs</div>
+      <h3 class="mobile-h3">About {source ? source.name : ''}</h3>
+      {#if source}
+        <div>
+          <SourceBadges {source} />
+        </div>
+        <div class="desc">
+          {@html source.description}
+        </div>
+        {#if source.link.length > 0}
+          <p>See also:</p>
+          <ul>
+            {#each source.link as link}
+              <li>
+                <a href={link.href}>{link.alt}</a>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+      {/if}
     </AboutSection>
     <div class="grid-3-11">
       <hr />

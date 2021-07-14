@@ -25,7 +25,7 @@ export function toLagToToday(meta?: EpiDataMetaParsedInfo | null): number | null
 
 function toInitialData(sources: SensorSource[], manager: MetaDataManager): SourceData[] {
   return sources.map((source) => {
-    const ref = manager.getReferenceSignal(source)!;
+    const ref = source.referenceSensor!;
     const meta = manager.getMetaData(ref);
     return {
       ...source,
@@ -53,7 +53,7 @@ export function loadData(
   const loaded = callCoverageAPI(SourceSignalPair.fromArray(initial.map((d) => d.ref)), 'only-county', days).then(
     (coverages) => {
       return initial.map((r) => {
-        const sourceCoverages = coverages.filter((d) => d.source == r.source && d.signal == r.reference_signal);
+        const sourceCoverages = coverages.filter((d) => d.source == r.source && d.signal == r.referenceSensor?.signal);
         return {
           ...r,
           latest_coverage: findLatestCoverage(r.latest_data, sourceCoverages),
@@ -110,7 +110,6 @@ export function getAvailableCounties(ref: Sensor | null, date: Date): Promise<(E
 export function fetchCoverage(ref: Sensor): Promise<{ date: Date; fraction: number }[]> {
   return callCoverageAPI(SourceSignalPair.from(ref), 'only-county').then((cov) =>
     cov.map((d) => ({
-      ...d,
       date: parseAPITime(d.time_value),
       fraction: d.count / countyInfo.length,
     })),

@@ -13,11 +13,11 @@
   import { TimeFrame } from '../../data/TimeFrame';
   import { timeDay } from 'd3-time';
   import SensorSourceSearch from '../../components/SensorSourceSearch.svelte';
+  import SourceBadges from '../../components/SourceBadges.svelte';
 
-  $: resolvedSource =
-    $metaDataManager.getSensorSource($currentSensor) || $metaDataManager.getSensorSource(DEFAULT_SENSOR);
+  $: resolvedSource = $metaDataManager.getSource($currentSensor) || $metaDataManager.getSource(DEFAULT_SENSOR);
 
-  $: referenceSignal = $metaDataManager.getReferenceSignal(resolvedSource);
+  $: referenceSignal = resolvedSource.referenceSensor;
   $: referenceMetaData = referenceSignal ? $metaDataManager.getMetaData(referenceSignal) : null;
 
   $: coverage = referenceSignal ? fetchCoverage(referenceSignal) : Promise.resolve([]);
@@ -53,7 +53,24 @@
   <div class="uk-container content-grid">
     <AboutSection className="uk-margin-small-top uk-margin-small-bottom">
       <h3 class="mobile-h3">About {resolvedSource ? resolvedSource.name : '?'}</h3>
-      <div class="desc">Name, API Name, Description, Link to API Docs</div>
+      {#if resolvedSource}
+        <div>
+          <SourceBadges source={resolvedSource} />
+        </div>
+        <div class="desc">
+          {@html resolvedSource.description}
+        </div>
+        {#if resolvedSource.link.length > 0}
+          <p>See also:</p>
+          <ul>
+            {#each resolvedSource.link as link}
+              <li>
+                <a href={link.href}>{link.alt}</a>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+      {/if}
     </AboutSection>
     <div class="grid-3-11">
       <hr />

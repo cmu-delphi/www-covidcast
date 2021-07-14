@@ -300,6 +300,7 @@ export const KNOWN_LICENSES = {
 };
 
 export interface EpiDataMetaSourceInfo {
+  active: boolean;
   source: string;
   name: string;
   description: string;
