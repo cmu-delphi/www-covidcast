@@ -12,11 +12,32 @@
   import { DateParam } from '../../stores/params';
   import FancyHeader from '../../components/FancyHeader.svelte';
   import IndicatorAnnotation from '../../components/IndicatorAnnotation.svelte';
+  import SensorBadges from '../../components/SensorBadges.svelte';
+  import SourceBadges from '../../components/SourceBadges.svelte';
 
   let sourceValue = null;
   $: source = sourceValue ? $metaDataManager.metaSources.find((d) => d.source === sourceValue) : null;
+  $: sensors = source ? source.sensors.filter((d) => d.meta.signal_basename === d.signal) : [];
+  let sensorBaseValue = null;
+  $: sensorBase = sensorBaseValue ? $metaDataManager.getSensor(sensorBaseValue) : null;
+
+  $: {
+    if (source && !sensors.find((d) => d.key === sensorBaseValue)) {
+      sensorBaseValue = sensors[0].key;
+    }
+  }
+  $: sensorVariants =
+    sensorBase && source
+      ? source.sensors.filter((d) => d.meta.signal_basename === sensorBase.meta.signal_basename)
+      : [];
   let sensorValue = null;
-  $: sensor = sensorValue ? $metaDataManager.getSensor(sensorValue) : null;
+  $: sensor = sensorValue ? $metaDataManager.getSensor(sensorValue) : sensorBase;
+  $: {
+    if (sensorBase && !sensorVariants.find((d) => d.key === sensorValue)) {
+      sensorValue = sensorVariants[0].key;
+    }
+  }
+
   let geoType = 'county';
 
   let startDate = new Date();
@@ -28,12 +49,6 @@
     startDate = param.sparkLineTimeFrame.min;
   }
   $: initDate($currentDateObject);
-
-  $: {
-    if (source && !source.sensors.find((d) => d.key === sensorValue)) {
-      sensorValue = source.sensors[0].key;
-    }
-  }
 
   $: sensorLevels = sensor ? $metaDataManager.getLevels(sensor) : null;
 
@@ -156,11 +171,11 @@
         which also includes numerous other signals.
       </p>
       <section class="uk-margin-top">
-        <FancyHeader sub="Signal" normal>1. Select</FancyHeader>
-        <p>Select a data source and a signal to start with.</p>
+        <FancyHeader sub="Data Source" normal>1. Select</FancyHeader>
+        <p>Select a data source to start with.</p>
 
         <div data-uk-grid class="uk-form-stacked">
-          <div class="uk-width-1-2@m uk-width-expand@s">
+          <div class="uk-width-1-1@m uk-width-expand@s">
             <label for="ds" class="uk-form-label">Data Sources</label>
             <div class="uk-form-controls">
               <select id="ds" bind:value={sourceValue} size="8" class="uk-select">
@@ -170,13 +185,40 @@
               </select>
             </div>
           </div>
+        </div>
+
+        {#if source}
+          <h3 class="mobile-h3 uk-margin-top">{source.name}</h3>
+          <div>
+            <SourceBadges {source} />
+          </div>
+          <p>
+            {@html source.description}
+          </p>
+          {#if source.link.length > 0}
+            <p>See also:</p>
+            <ul>
+              {#each source.link as link}
+                <li>
+                  <a href={link.href}>{link.alt}</a>
+                </li>
+              {/each}
+            </ul>
+          {/if}
+        {/if}
+      </section>
+
+      <section class="uk-margin-top">
+        <FancyHeader sub="Signal" normal>2. Select</FancyHeader>
+        <p>Pick a signal and one of its variants of a data source.</p>
+        <div data-uk-grid class="uk-form-stacked">
           <div class="uk-width-1-2@m uk-width-expand@s">
             <label for="s" class="uk-form-label">Signals</label>
             <div class="uk-form-controls">
-              <select id="s" bind:value={sensorValue} required size="8" class="uk-select">
+              <select id="s" bind:value={sensorBaseValue} required size="8" class="uk-select">
                 {#if source}
-                  {#each source.sensors as sensor}
-                    <option value={sensor.key}>{sensor.name}</option>
+                  {#each sensors as s}
+                    <option value={s.key}>{s.name}</option>
                   {/each}
                 {:else}
                   <option value="">Select a Data Source first</option>
@@ -184,26 +226,45 @@
               </select>
             </div>
           </div>
+          <div class="uk-width-1-2@m uk-width-expand@s">
+            <label for="s" class="uk-form-label">Signal Variants</label>
+            <div class="uk-form-controls">
+              <select id="s" bind:value={sensorValue} required size="8" class="uk-select">
+                {#if source && sensorBase}
+                  {#each sensorVariants as s}
+                    <option value={s.key}>{s.signal}</option>
+                  {/each}
+                {:else}
+                  <option value="">Select a Signal first</option>
+                {/if}
+              </select>
+            </div>
+          </div>
         </div>
-        <!--
+
         {#if sensor}
           <h3 class="mobile-h3 uk-margin-top">{sensor.name}</h3>
+          <div>
+            <SensorBadges {sensor} />
+          </div>
           <p>
             {@html sensor.description}
           </p>
-          <p>See also:</p>
-          <ul>
-            {#each sensor.links as link}
-              <li>
-                {@html link}
-              </li>
-            {/each}
-          </ul>
-        {/if} -->
+          {#if sensor.meta.link.length > 0}
+            <p>See also:</p>
+            <ul>
+              {#each sensor.meta.link as link}
+                <li>
+                  <a href={link.href}>{link.alt}</a>
+                </li>
+              {/each}
+            </ul>
+          {/if}
+        {/if}
       </section>
 
       <section class="uk-form-horizontal uk-margin-large-top">
-        <FancyHeader sub="Parameters" normal>2. Specify</FancyHeader>
+        <FancyHeader sub="Parameters" normal>3. Specify</FancyHeader>
         <p>Customize the date range and pick a geographic level to download data for</p>
         <div>
           <span class="uk-form-label">Date range</span>
