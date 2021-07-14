@@ -1,6 +1,7 @@
 <script>
   import { metaDataManager } from '../stores';
   import { sensorTypes } from '../data/sensor';
+  import SourceBadges from './SourceBadges.svelte';
 
   /**
    * @type {import("../stores/params").Sensor | null}
@@ -10,8 +11,8 @@
   $: meta = sensor && sensor.key ? $metaDataManager.getMetaData(sensor.key) : null;
 </script>
 
+<SourceBadges source={sensor ? $metaDataManager.getSource(sensor) : null} />
 {#if meta}
-  <span class="uk-badge source-badge" title={sensor.dataSourceName}>{meta.source}</span>
   <span
     class="uk-badge category-badge"
     data-cat={meta.category}
@@ -44,9 +45,6 @@
   .uk-badge {
     color: #666;
     font-size: 0.625rem;
-  }
-  .source-badge {
-    color: white;
   }
   .category-badge[data-cat='public'] {
     background: #fee6ce;
