@@ -32,7 +32,7 @@ jobs:
           base: main
           title: Release ${{ steps.version.outputs.next_tag }}
           labels: chore
-          reviewers: krivard,sgratzl
-          assignees: sgratzl
+          reviewers: krivard
+          # assignees:
           body: |
             Releasing ${{ steps.version.outputs.next_tag }}.

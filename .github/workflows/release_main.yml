@@ -96,8 +96,8 @@ jobs:
           commit-message: 'feat: update to COVIDcast ${{ needs.create_release.outputs.tag_name }}'
           title: 'update to COVIDcast ${{ needs.create_release.outputs.tag_name }}'
           labels: feat
-          reviewers: krivard,sgratzl
-          assignees: sgratzl
+          reviewers: krivard
+          # assignees:
           body: |
             update to [COVIDcast ${{ needs.create_release.outputs.tag_name }}](https://github.com/cmu-delphi/www-covidcast/releases/${{ needs.create_release.outputs.tag_name }})
 
@@ -123,7 +123,7 @@ jobs:
           base: dev
           title: 'chore: sync main->dev'
           labels: chore
-          reviewers: krivard,sgratzl
-          assignees: sgratzl
+          reviewers: krivard
+          # assignees:
           body: |
             Syncing Main->Dev.
