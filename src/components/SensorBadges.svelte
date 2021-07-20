@@ -79,7 +79,8 @@
     color: white;
   }
   .format-badge[data-format='raw'],
-  .format-badge[data-format='raw_count'] {
+  .format-badge[data-format='raw_count'],
+  .format-badge[data-format='count'] {
     background: #6a51a3;
     color: white;
   }

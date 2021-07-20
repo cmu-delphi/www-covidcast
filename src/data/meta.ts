@@ -97,7 +97,7 @@ function generateCredits(license: EpiDataMetaSourceInfo['license']) {
   if (known) {
     return `We are happy for you to use this data in products and publications under the terms of the <a href="${known.link}">${known.name}</a>.`;
   }
-  return license;
+  return parseInline(license);
 }
 
 export interface SensorSensor extends Sensor {
@@ -174,14 +174,14 @@ function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
         levels: Object.keys(m.geo_types) as RegionLevel[],
         type: m.category ?? 'other',
         xAxis: m.time_label,
-        yAxis: m.value_label || yAxis[m.format],
-        unit: units[m.format],
+        yAxis: m.value_label || yAxis[m.format] || yAxis.raw,
+        unit: units[m.format] || units.raw,
         colorScale: colorScales[m.high_values_are],
         vegaColorScale: vegaColorScales[m.high_values_are],
         links: sm.link.map((d) => `<a href="${d.href}">${d.alt}</a>`),
         credits: credits,
-        formatValue: formatter[m.format],
-        formatSpecifier: formatSpecifiers[m.format],
+        formatValue: formatter[m.format] || formatter.raw,
+        formatSpecifier: formatSpecifiers[m.format] || formatSpecifiers.raw,
         meta: parsed,
       };
       return s;
