@@ -107,9 +107,10 @@ export function getAvailableCounties(ref: Sensor | null, date: Date): Promise<(E
   }).then((rows) => addNameInfos(rows).filter((d) => d.level === 'county')); // no mega-counties
 }
 
-export function fetchCoverage(ref: Sensor): Promise<{ date: Date; fraction: number }[]> {
+export function fetchCoverage(ref: Sensor): Promise<(CoverageRow & { date: Date; fraction: number })[]> {
   return callCoverageAPI(SourceSignalPair.from(ref), 'only-county').then((cov) =>
     cov.map((d) => ({
+      ...d,
       date: parseAPITime(d.time_value),
       fraction: d.count / countyInfo.length,
     })),

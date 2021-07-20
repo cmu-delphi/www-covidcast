@@ -24,8 +24,8 @@
   function findLatest(coverages, date) {
     return coverages.then((c) => findLatestCoverage(date, c));
   }
-  $: latestCoverage = findLatest(coverage, pickedDate);
   $: pickedDate = referenceMetaData ? referenceMetaData.maxTime : new Date();
+  $: latestCoverage = findLatest(coverage, pickedDate);
   $: data = getAvailableCounties(referenceSignal, pickedDate);
 
   const domain = new TimeFrame(timeDay.offset(new Date(), -60), timeDay.floor(new Date()));
