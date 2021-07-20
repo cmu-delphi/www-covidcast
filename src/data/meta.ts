@@ -97,7 +97,7 @@ function generateCredits(license: EpiDataMetaSourceInfo['license']) {
   if (known) {
     return `We are happy for you to use this data in products and publications under the terms of the <a href="${known.link}">${known.name}</a>.`;
   }
-  return license;
+  return parseInline(license);
 }
 
 export interface SensorSensor extends Sensor {
