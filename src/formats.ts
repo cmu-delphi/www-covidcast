@@ -111,6 +111,7 @@ export function formatRawValue(value?: number | null, enforceSign = false): stri
 export const formatter = {
   raw: formatRawValue,
   raw_count: formatCount,
+  count: formatCount,
   fraction: formatRawValue,
   percent: formatPercentage,
   per100k: formatValue,
@@ -118,6 +119,7 @@ export const formatter = {
 export const formatSpecifiers = {
   raw: ',.2f',
   raw_count: '~s',
+  count: '~s',
   fraction: ',.2f',
   percent: '.2f',
   per100k: ',.1f',

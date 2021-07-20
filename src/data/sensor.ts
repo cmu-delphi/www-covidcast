@@ -89,6 +89,7 @@ export const vegaColorScales = {
 export const yAxis = {
   raw: 'arbitrary scale',
   raw_count: 'people',
+  count: 'people',
   percent: 'Percentage',
   per100k: 'per 100,000 people',
   fraction: 'Fraction of population',
@@ -96,6 +97,7 @@ export const yAxis = {
 export const units = {
   raw: 'arbitrary scale',
   raw_count: 'people',
+  count: 'people',
   percent: 'per 100 people',
   per100k: 'per 100,000 people',
   fraction: 'Fraction of population',

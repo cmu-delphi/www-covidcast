@@ -250,7 +250,7 @@ export interface EpiDataMetaStatsInfo {
 }
 
 export type SignalCategory = 'public' | 'early' | 'late' | 'other';
-export type SignalFormat = 'raw' | 'percent' | 'fraction' | 'per100k' | 'raw_count';
+export type SignalFormat = 'raw' | 'percent' | 'fraction' | 'per100k' | 'count';
 export type SignalHighValuesAre = 'good' | 'bad' | 'neutral';
 
 export interface EpiDataMetaInfo {

@@ -337,10 +337,10 @@ function genLevelLegendLayer({ domain }: { domain?: [number, number] }): Normali
           nice: domain == null,
           range: [
             {
-              expr: 'width / 2 - 140',
+              expr: 'width / 2 - 10 - 140',
             },
             {
-              expr: 'width / 2 + 140',
+              expr: 'width / 2 - 10 + 140',
             },
           ],
         },
@@ -364,6 +364,15 @@ function genLevelLegendLayer({ domain }: { domain?: [number, number] }): Normali
           // xOffset: {
           //   expr: 'width / 2',
           // },
+        },
+        encoding: {
+          opacity: {
+            condition: {
+              test: 'datum.value == 0',
+              value: 0,
+            },
+            value: 1,
+          },
         },
       },
       {
