@@ -17,24 +17,12 @@
 
   let sourceValue = null;
   $: source = sourceValue ? $metaDataManager.metaSources.find((d) => d.source === sourceValue) : null;
-  $: sensors = source ? source.sensors.filter((d) => d.meta.signal_basename === d.signal) : [];
-  let sensorBaseValue = null;
-  $: sensorBase = sensorBaseValue ? $metaDataManager.getSensor(sensorBaseValue) : null;
-
-  $: {
-    if (source && !sensors.find((d) => d.key === sensorBaseValue)) {
-      sensorBaseValue = sensors[0].key;
-    }
-  }
-  $: sensorVariants =
-    sensorBase && source
-      ? source.sensors.filter((d) => d.meta.signal_basename === sensorBase.meta.signal_basename)
-      : [];
+  $: sensors = source ? source.sensors : [];
   let sensorValue = null;
-  $: sensor = sensorValue ? $metaDataManager.getSensor(sensorValue) : sensorBase;
+  $: sensor = sensorValue ? $metaDataManager.getSensor(sensorValue) : null;
   $: {
-    if (sensorBase && !sensorVariants.find((d) => d.key === sensorValue)) {
-      sensorValue = sensorVariants[0].key;
+    if (source && !sensors.find((d) => d.key === sensorValue)) {
+      sensorValue = sensors[0].key;
     }
   }
 
@@ -210,35 +198,19 @@
 
       <section class="uk-margin-top">
         <FancyHeader sub="Signal" normal>2. Select</FancyHeader>
-        <p>Pick a signal and one of its variants from this data source.</p>
-        <div data-uk-grid class="uk-form-stacked">
-          <div class="uk-width-1-2@m uk-width-expand@s">
-            <label for="s" class="uk-form-label">Signals</label>
-            <div class="uk-form-controls">
-              <select id="s" bind:value={sensorBaseValue} required size="8" class="uk-select">
-                {#if source}
-                  {#each sensors as s}
-                    <option value={s.key}>{s.name}</option>
-                  {/each}
-                {:else}
-                  <option value="">Select a Data Source first</option>
-                {/if}
-              </select>
-            </div>
-          </div>
-          <div class="uk-width-1-2@m uk-width-expand@s">
-            <label for="s" class="uk-form-label">Signal Variants</label>
-            <div class="uk-form-controls">
-              <select id="s" bind:value={sensorValue} required size="8" class="uk-select">
-                {#if source && sensorBase}
-                  {#each sensorVariants as s}
-                    <option value={s.key}>{s.signal}</option>
-                  {/each}
-                {:else}
-                  <option value="">Select a Signal first</option>
-                {/if}
-              </select>
-            </div>
+        <p>Pick a signal from this data source.</p>
+        <div class="uk-width-1-1@m uk-width-expand@s">
+          <label for="ds" class="uk-form-label">Signals</label>
+          <div class="uk-form-controls">
+            <select id="ds" bind:value={sensorValue} size="8" class="uk-select">
+              {#if source}
+                {#each sensors as s}
+                  <option value={s.key}>{s.name}</option>
+                {/each}
+              {:else}
+                <option value="">Select a Data Source first</option>
+              {/if}
+            </select>
           </div>
         </div>
 
