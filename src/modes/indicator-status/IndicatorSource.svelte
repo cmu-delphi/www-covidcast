@@ -76,10 +76,6 @@
       <hr />
       <FancyHeader invert sub="Information">Coverage</FancyHeader>
     </div>
-    <AboutSection className="uk-margin-small-top uk-margin-small-bottom">
-      <h3 class="mobile-h3">About Coverage Information</h3>
-      <div class="desc">TODO</div>
-    </AboutSection>
     <div class="grid-3-11">
       <div class="mobile-two-col">
         <div>

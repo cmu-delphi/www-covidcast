@@ -145,7 +145,16 @@
       <FancyHeader sub="Data Anomalies">{name}</FancyHeader>
       <AboutSection details className="uk-margin-small-top uk-margin-small-bottom">
         <h3 slot="header" class="mobile-h3">About Data Anomalies</h3>
-        <div class="desc">TODO</div>
+        <div class="desc">
+          One of the most surprising challenges identified during the COVID-19 pandemic is how messy public health data
+          streams are, no matter how hard people try to keep them clean. The best we can do is be transparent about when
+          something has gone wrong, what data is affected and how, and what repairs have been made after the discovery
+          of a data anomaly. This section catalogues all such anomalies we have identified so far. If you encounter a
+          data anomaly not listed here, please report it by <a
+            href="https://github.com/cmu-delphi/covidcast-indicators/issues/new?labels=data+quality&template=data_quality_issue.md&title="
+            >(opening a data quality issue on our GitHub)</a
+          >.
+        </div>
       </AboutSection>
       <DataAnomalies {sensor} region={$currentRegionInfo || nationInfo} />
     </div>
@@ -154,7 +163,10 @@
       <FancyHeader sub="Data">{name}</FancyHeader>
       <AboutSection details className="uk-margin-small-top uk-margin-small-bottom">
         <h3 slot="header" class="mobile-h3">About Data Versioning</h3>
-        <div class="desc">TODO</div>
+        <div class="desc">
+          The data versioning view permits browsing this time series as it appeared at any available date in the past.
+          This provides an alternative perspective on how backfill affects this time series.
+        </div>
       </AboutSection>
     </div>
     <IndicatorData {sensor} region={$currentRegionInfo || nationInfo} />
