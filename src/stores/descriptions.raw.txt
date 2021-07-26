@@ -275,7 +275,7 @@ Links:
  - "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/hospital-admissions.html)"
 ---
 Name: COVID Cases
-Id: indicator-combination
+Id: jhu-csse
 Signal: confirmed_7dav_incidence_prop
 RawSignal: confirmed_incidence_prop
 CasesOrDeathSignals:
@@ -297,7 +297,7 @@ HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: false
 Highlight: [landing]
-TooltipText: Newly reported COVID-19 cases per 100,000 people, based on data from USAFacts and Johns Hopkins University
+TooltipText: Newly reported COVID-19 cases per 100,000 people, based on data from Johns Hopkins University
 PlotTitleText: Newly reported COVID-19 cases per 100,000 people
 
 
@@ -308,17 +308,17 @@ MapTitleText:
  RatioCumulative: Cumulative reported COVID-19 cases per 100,000 people
 
 
-Description: This data shows the number of COVID-19 confirmed cases newly reported each day. It  reflects only cases reported by state and local health authorities. It is based on case counts compiled and made public by [USAFacts](https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/) and by [a team at Johns Hopkins University](https://systems.jhu.edu/research/public-health/ncov/). We use Johns Hopkins data for Puerto Rico and report USAFacts data in all other locations. The signal may not be directly comparable across regions with vastly different testing capacity or reporting criteria. 
+Description: This data shows the number of COVID-19 confirmed cases newly reported each day. It  reflects only cases reported by state and local health authorities. It is based on case counts compiled and made public by [a team at Johns Hopkins University](https://systems.jhu.edu/research/public-health/ncov/). The signal may not be directly comparable across regions with vastly different testing capacity or reporting criteria. 
 
 
 Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
 
 
 Links:
- - "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/indicator-combination.html#compositional-signals-confirmed-cases-and-deaths)"
+ - "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/jhu-csse.html)"
 ---
 Name: COVID Deaths
-Id: indicator-combination
+Id: jhu-csse
 Signal: deaths_7dav_incidence_prop
 RawSignal: deaths_incidence_prop
 CasesOrDeathSignals:
@@ -342,7 +342,7 @@ HasStdErr: false
 Highlight: [landing]
 
 
-TooltipText: Newly reported COVID-19 deaths per 100,000 people, based on data from USAFacts and Johns Hopkins University
+TooltipText: Newly reported COVID-19 deaths per 100,000 people, based on data from Johns Hopkins University
 PlotTitleText: Newly reported COVID-19 deaths per 100,000 people
 
 
@@ -353,11 +353,11 @@ MapTitleText:
  RatioCumulative: Cumulative reported COVID-19 deaths per 100,000 people
 
 
-Description: This data shows the number of COVID-19 related deaths newly reported each day. It reflects official figures reported by state and local health authorities, and may not include excess deaths not confirmed by health authorities to be due to COVID-19 . The signal is based on death counts compiled and made public by [USAFacts](https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/) and by [a team at Johns Hopkins University](https://systems.jhu.edu/research/public-health/ncov/). We use Johns Hopkins data for Puerto Rico and report USAFacts data in all other locations.
+Description: This data shows the number of COVID-19 related deaths newly reported each day. It reflects official figures reported by state and local health authorities, and may not include excess deaths not confirmed by health authorities to be due to COVID-19 . The signal is based on death counts compiled and made public by [a team at Johns Hopkins University](https://systems.jhu.edu/research/public-health/ncov/).
 
 
 Credits: We are happy for you to use this data in products and publications under the terms of the Creative Commons Attribution license.
 
 
 Links:
- - "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/indicator-combination.html#compositional-signals-confirmed-cases-and-deaths)"
+ - "[Technical description](https://cmu-delphi.github.io/delphi-epidata/api/covidcast-signals/jhu-csse.html)"
