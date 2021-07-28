@@ -44,17 +44,17 @@
       <th class="sort-indicator uk-text-center">
         <SortColumnIndicator label="Name" {sort} prop="name" />
       </th>
-      <th class="sort-indicator uk-text-center">
+      <th class="sort-indicator uk-text-center uk-text-nowrap">
         <SortColumnIndicator label="First Data" {sort} prop="minTime" />
       </th>
-      <th class="sort-indicator uk-text-center">
+      <th class="sort-indicator uk-text-center uk-text-nowrap">
         <SortColumnIndicator label="Latest Data" {sort} prop="maxTime" />
       </th>
       <th class="sort-indicator" />
       <th class="sort-indicator" />
     </tr>
   </thead>
-  <tbody>
+  <tbody class="table-body">
     {#each sortedData as r (r.key)}
       <tr>
         <td>
@@ -64,10 +64,10 @@
           {/if}
           <div><SensorBadges sensor={r} source={false} /></div>
         </td>
-        <td>
+        <td class="uk-text-nowrap">
           {formatDateISO(r.minTime)}
         </td>
-        <td>
+        <td class="uk-text-nowrap uk">
           {formatDateISO(r.maxTime)}
         </td>
         <td>
