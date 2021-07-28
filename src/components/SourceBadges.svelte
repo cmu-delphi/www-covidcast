@@ -22,14 +22,14 @@
 
 <style>
   .uk-badge {
-    color: #666;
+    color: #666 !important;
     font-size: 0.625rem;
   }
   .source-badge {
-    color: white;
+    color: white !important;
   }
   .license-badge {
     background: #9e9e9e;
-    color: white;
+    color: white !important;
   }
 </style>

@@ -48,11 +48,11 @@
 
 <style>
   .uk-badge {
-    color: #666;
+    color: #666 !important;
     font-size: 0.625rem;
   }
   .signal-badge {
-    color: white;
+    color: white !important;
   }
   .category-badge[data-cat='public'] {
     background: #fee6ce;
@@ -62,11 +62,11 @@
   }
   .category-badge[data-cat='late'] {
     background: #e6550d;
-    color: white;
+    color: white !important;
   }
   .category-badge[data-cat='other'] {
     background: #bab0ab;
-    color: white;
+    color: white !important;
   }
   .format-badge[data-format='fraction'] {
     background: #f2f0f7;
@@ -76,33 +76,33 @@
   }
   .format-badge[data-format='per100k'] {
     background: #9e9ac8;
-    color: white;
+    color: white !important;
   }
   .format-badge[data-format='raw'],
   .format-badge[data-format='raw_count'],
   .format-badge[data-format='count'] {
     background: #6a51a3;
-    color: white;
+    color: white !important;
   }
 
   .is-smooth {
     background: #e15759;
-    color: white;
+    color: white !important;
   }
   .is-cumulative {
     background: #9c755f;
-    color: white;
+    color: white !important;
   }
   .is-weighted {
     background: #fb8072;
-    color: white;
+    color: white !important;
   }
   .has-stderr {
     background: #bab0ab;
-    color: white;
+    color: white !important;
   }
   .has-sample-size {
     background: #bab0ab;
-    color: white;
+    color: white !important;
   }
 </style>
