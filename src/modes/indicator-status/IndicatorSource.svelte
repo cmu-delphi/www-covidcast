@@ -1,5 +1,5 @@
 <script>
-  import { currentSensor, metaDataManager } from '../../stores';
+  import { currentSensor, metaDataManager, switchToMode } from '../../stores';
   import { DEFAULT_SENSOR } from '../../stores/constants';
   import AboutSection from '../../components/AboutSection.svelte';
   import FancyHeader from '../../components/FancyHeader.svelte';
@@ -14,6 +14,7 @@
   import { timeDay } from 'd3-time';
   import SensorSourceSearch from '../../components/SensorSourceSearch.svelte';
   import SourceBadges from '../../components/SourceBadges.svelte';
+  import { modeByID } from '..';
 
   $: resolvedSource = $metaDataManager.getSource($currentSensor) || $metaDataManager.getSource(DEFAULT_SENSOR);
 
@@ -32,6 +33,11 @@
 
   function setSensor(d) {
     currentSensor.set(`${d.source}-${d.reference_signal}`);
+  }
+
+  function select(signal) {
+    currentSensor.set(signal.key);
+    switchToMode(modeByID['indicator-signal']);
   }
 </script>
 
@@ -75,6 +81,16 @@
     <div class="grid-3-11">
       <hr />
       <FancyHeader invert sub="Information">Coverage</FancyHeader>
+      {#if referenceSignal}
+        <p>
+          Reference Signal: <a
+            href="../indicator-signal?sensor={referenceSignal.key}"
+            on:click|preventDefault={() => select(referenceSignal)}
+          >
+            {referenceSignal.name}</a
+          >
+        </p>
+      {/if}
     </div>
     <div class="grid-3-11">
       <div class="mobile-two-col">

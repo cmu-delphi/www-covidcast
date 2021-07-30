@@ -26,7 +26,6 @@
   $: sortedData = source.sensors.map(fullEntry).sort($sort.comparator);
 
   function select(signal) {
-    console.log(signal);
     currentSensor.set(signal.key);
     switchToMode(modeByID['indicator-signal']);
   }
