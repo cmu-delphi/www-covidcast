@@ -1,6 +1,7 @@
 <script>
   import SortColumnIndicator, { SortHelper } from '../../components/SortColumnIndicator.svelte';
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
+  import StarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/star.svg';
   import { currentSensor, metaDataManager, switchToMode } from '../../stores';
   import SensorBadges from '../../components/SensorBadges.svelte';
   import { modeByID } from '..';
@@ -58,10 +59,14 @@
     {#each sortedData as r (r.key)}
       <tr>
         <td>
-          <a href="../indicator-signal?sensor={r.key}" on:click|preventDefault={() => select(r)}>{r.name}</a>
-          {#if source.reference_signal == r.signal}
-            (reference)
-          {/if}
+          <a href="../indicator-signal?sensor={r.key}" on:click|preventDefault={() => select(r)}>
+            {#if source.reference_signal == r.signal}
+              <span class="inline-svg-icon" title="reference signal for this data source" style="padding: 0"
+                >{@html StarIcon}</span
+              >
+            {/if}
+            {r.name}</a
+          >
           <div><SensorBadges sensor={r} source={false} /></div>
         </td>
         <td class="uk-text-nowrap">
