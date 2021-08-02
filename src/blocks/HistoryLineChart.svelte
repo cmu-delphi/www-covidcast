@@ -91,10 +91,10 @@
   $: timeFrame = showAllDates ? sensor.timeFrame : date.windowTimeFrame;
 
   /**
-   * @param {import('../../stores/params').SensorParam} sensor
-   * @param {import('../../stores/params').RegionParam} region
-   * @param {import('../../stores/params').DateParam} date
-   * @param {import('../../stores/params').TimeFrame} timeFrame
+   * @param {import('../stores/params').SensorParam} sensor
+   * @param {import('..stores/params').RegionParam} region
+   * @param {import('../stores/params').DateParam} date
+   * @param {import('../stores/params').TimeFrame} timeFrame
    * @param {{height: number, zero: boolean, raw: boolean, isMobile: boolean, singleRegionOnly: boolean, cumulative: boolean}} options
    */
   function genSpec(
@@ -127,10 +127,6 @@
     if (singleRegionOnly) {
       return generateLineChartSpec(options);
     }
-    if (region.level === 'state') {
-      // state vs nation
-      return generateCompareLineSpec([region.displayName, nationInfo.displayName], options);
-    }
     if (region.level === 'county') {
       // county vs related vs state vs nation
       const state = getStateOfCounty(region);
@@ -139,7 +135,9 @@
         options,
       );
     }
-    // nation
+    if (region.level !== 'nation') {
+      return generateCompareLineSpec([region.displayName, nationInfo.displayName], options);
+    }
     return generateLineChartSpec(options);
   }
 
@@ -223,14 +221,14 @@
     if (singleRegionOnly) {
       return [region];
     }
-    if (region.level === 'state') {
-      // state vs nation
-      return [region, nationInfo];
-    }
     if (region.level === 'county') {
       // county vs related vs state vs nation
       const state = getStateOfCounty(region);
       return [region, neighboringInfo, state, nationInfo];
+    }
+    if (region.level !== 'nation') {
+      // state vs nation
+      return [region, nationInfo];
     }
     return [region];
   }
