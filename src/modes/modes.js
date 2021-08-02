@@ -42,12 +42,25 @@ export const modes = [
       import(/* webpackChunkName: 'm-indicator-status' */ './indicator-status/IndicatorStatusOverview.svelte').then(
         (r) => r.default,
       ),
+    waitForReady: true,
   },
   {
-    id: 'data-anomalies',
-    label: 'Data Anomalies',
+    id: 'indicator-source',
+    label: 'Indicator Source',
     component: () =>
-      import(/* webpackChunkName: 'm-data-anomalies' */ './data-anomalies/DataAnomalies.svelte').then((r) => r.default),
+      import(/* webpackChunkName: 'm-indicator-source' */ './indicator-status/IndicatorSource.svelte').then(
+        (r) => r.default,
+      ),
+    waitForReady: true,
+  },
+  {
+    id: 'indicator-signal',
+    label: 'Indicator Signal',
+    component: () =>
+      import(/* webpackChunkName: 'm-indicator-signal' */ './indicator-status/IndicatorSignal.svelte').then(
+        (r) => r.default,
+      ),
+    waitForReady: true,
   },
   {
     id: 'dashboard',

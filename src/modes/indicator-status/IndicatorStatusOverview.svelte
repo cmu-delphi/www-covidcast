@@ -1,140 +1,35 @@
 <script>
   import IndicatorStatusTable from './IndicatorStatusTable.svelte';
-  import IndicatorStatus from './IndicatorStatus.svelte';
-  import { loadData, determineDomain } from './data';
-  import Search from '../../components/Search.svelte';
-  import { updateHash } from '../../stores/urlHandler';
-  import IndicatorBackfill from './IndicatorBackfill.svelte';
-
-  const date = new Date();
-
-  $: data = loadData(date);
-
-  /**
-   * @type {import('../../stores/params').TimeFrame}
-   */
-  let domain = determineDomain([]);
-  /**
-   * @type {import('./data').ExtendedStatus[]}
-   */
-  let loadedData = [];
-
-  function resolveDefaultStatus(rows) {
-    const fullId = window.location.hash.slice(1); // remove #
-    const targetMode = fullId.endsWith('_b') ? 'backfill' : 'coverage';
-    const id = fullId.endsWith('_b') ? fullId.slice(0, -2) : fullId;
-    const found = rows.find((d) => d.id === id);
-    return { selected: found, mode: found ? targetMode : 'overview' };
-  }
-
-  /**
-   * @type {import('./data').ExtendedStatus | null}
-   */
-  let selected = null;
-
-  /**
-   * @type {'overview' | 'coverage' | 'backfill'}
-   */
-  let mode = 'overview';
-
-  $: {
-    loadedData = [];
-    domain = determineDomain([]);
-    data.then((rows) => {
-      const r = resolveDefaultStatus(rows);
-      selected = r.selected;
-      mode = r.mode;
-      loadedData = rows;
-      domain = determineDomain(rows);
-    });
-  }
+  import AboutSection from '../../components/AboutSection.svelte';
+  import { modeByID } from '..';
+  import { currentSensor, switchToMode } from '../../stores';
 
   function switchToDetails(e) {
-    selected = e.detail;
-    mode = 'coverage';
-  }
-
-  function switchMode(m, s) {
-    mode = m;
-    selected = s;
-  }
-
-  $: {
-    if (loadedData.length > 0) {
-      updateHash(selected ? `${selected.id}${mode == 'backfill' ? '_b' : ''}` : '');
-    }
+    currentSensor.set(`${e.detail.source}-${e.detail.reference_signal}`);
+    switchToMode(modeByID['indicator-source']);
   }
 </script>
 
-<div class="root">
+<div class="mobile-root">
   <div class="mobile-header-line-bg">
     <div class="mobile-header-line">
       <h2>Indicator Status <span>Overview</span></h2>
     </div>
   </div>
   <div class="uk-container content-grid">
-    <div class="grid-3-11">
-      <ul class="uk-tab uk-child-width-expand">
-        <li class:uk-active={mode === 'overview'}>
-          <a href="#overview" on:click|preventDefault={() => switchMode('overview', null)}>Overview</a>
-        </li>
-        <li class:uk-active={mode === 'coverage'}>
-          <a
-            href="#{(loadedData[0] || { id: 'details' }).id}"
-            on:click|preventDefault={() => switchMode('coverage', selected || loadedData[0])}>Coverage Details</a
-          >
-        </li>
-        <li class:uk-active={mode === 'backfill'}>
-          <a
-            href="#{(loadedData[0] || { id: 'details' }).id}_b"
-            on:click|preventDefault={() => switchMode('backfill', selected || loadedData[0])}>Backfill Profile</a
-          >
-        </li>
-      </ul>
-    </div>
-    {#if mode === 'overview'}
-      <div class="grid-3-11">
-        <IndicatorStatusTable {data} {date} on:select={switchToDetails} {domain} />
+    <AboutSection className="uk-margin-small-top uk-margin-small-bottom">
+      <h3 class="mobile-h3">About</h3>
+      <div class="desc">
+        These pages give information about our data processing system and the statistical behavior of our indicators. If
+        you're looking for information about public health and behavior, try one of our other pages. If you're looking
+        for how <strong>up-to-date</strong> our public health and behavior data is,
+        <strong>how much of the country</strong>
+        is covered by our public health and behavior data, and the <strong>data versioning effects</strong> present in our
+        public health and behavior data, you're in the right place.
       </div>
-    {:else}
-      <Search
-        className="grid-3-11"
-        modern
-        placeholder="Select Indicator"
-        title="Indicator"
-        items={loadedData}
-        icon="search"
-        selectedItem={selected}
-        labelFieldName="name"
-        maxItemsToShowInList={15}
-        clear={false}
-        on:change={(e) => {
-          const newIndicator = e.detail ? loadedData.find((d) => d.name === e.detail.name) : null;
-          if (newIndicator !== selected) {
-            selected = newIndicator;
-            if (!selected) {
-              mode = 'overview';
-            }
-          }
-        }}
-      />
-      {#if mode === 'coverage'}
-        <IndicatorStatus {domain} signal={selected} />
-      {:else if selected}
-        <IndicatorBackfill indicator={selected} />
-      {/if}
-    {/if}
+    </AboutSection>
+    <div class="grid-3-11">
+      <IndicatorStatusTable on:select={switchToDetails} />
+    </div>
   </div>
 </div>
-
-<style>
-  .root {
-    position: relative;
-    flex: 1 1 0;
-    font-size: 0.875rem;
-    line-height: 1.5rem;
-  }
-  .content-grid {
-    grid-row-gap: 0;
-  }
-</style>
