@@ -1,7 +1,7 @@
 import { timeDay } from 'd3-time';
-import { callCoverageAPI, CoverageRow } from '../../data/api';
-import { SourceSignalPair } from '../../data/apimodel';
-import type { EpiDataMetaParsedInfo, MetaDataManager, SensorSource } from '../../data/meta';
+import { callBackfillAPI, callCoverageAPI, CoverageRow, EpiDataBackfillRow } from '../../data/api';
+import { GeoPair, SourceSignalPair, TimePair } from '../../data/apimodel';
+import type { EpiDataMetaParsedInfo, MetaDataManager, SensorLike, SensorSource } from '../../data/meta';
 import { countyInfo } from '../../data/regions';
 import { parseAPITime, toTimeValue } from '../../data/utils';
 import { Sensor, TimeFrame } from '../../stores/params';
@@ -115,4 +115,35 @@ export function fetchCoverage(ref: Sensor): Promise<(CoverageRow & { date: Date;
       fraction: d.count / countyInfo.length,
     })),
   );
+}
+
+export interface ProfileEntry extends EpiDataBackfillRow {
+  date_value: Date;
+  issue_date: Date;
+  lag: number;
+}
+
+export function loadBackFillProfile(
+  sensor: SensorLike,
+  region: RegionInfo,
+  window: TimeFrame,
+  referenceAnchorLag = 60,
+): Promise<ProfileEntry[]> {
+  return callBackfillAPI(
+    SourceSignalPair.from(sensor),
+    new TimePair('day', window),
+    GeoPair.from(region),
+    referenceAnchorLag,
+  ).then((rows) => {
+    return rows.map((row) => {
+      const date = parseAPITime(row.time_value);
+      const issue = parseAPITime(row.issue);
+      return {
+        ...row,
+        date_value: date,
+        issue_date: issue,
+        lag: timeDay.count(date, issue),
+      };
+    });
+  });
 }

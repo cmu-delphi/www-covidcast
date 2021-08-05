@@ -1,6 +1,6 @@
 <script>
   import Vega from '../../components/vega/Vega.svelte';
-  import { loadBackFillProfile } from '../../data/indicatorInfo';
+  import { loadBackFillProfile } from './data';
   import { TimeFrame, WINDOW_SIZE } from '../../stores/params';
   import {
     valueField,

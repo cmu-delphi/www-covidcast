@@ -1,7 +1,7 @@
 import type { TopLevelSpec } from 'vega-lite';
 import type { ColorDef, Field } from 'vega-lite/build/src/channeldef';
 import type { LayerSpec } from 'vega-lite/build/src/spec';
-import type { ProfileEntry } from '../../data/indicatorInfo';
+import type { ProfileEntry } from './data';
 import { BASE_SPEC } from '../../specs/commonSpec';
 
 export interface BackfillOptions {
@@ -180,20 +180,6 @@ export function generateChangeHeatMapSpec(options: BackfillOptions): TopLevelSpe
   });
   return spec;
 }
-
-// export function generateIssueDateSpec(indicator: IndicatorStatus): TopLevelSpec {
-//   const spec = generateHeatMapSpec(indicator, {});
-//   return spec;
-// }
-
-// export function generateIssueDateDeltaSpec(indicator: IndicatorStatus): TopLevelSpec {
-//   const spec = generateHeatMapSpec(indicator, {
-//     valueField: 'value_rel_change',
-//     valueLabel: 'Relative Change',
-//     title: `${indicator.name} Backfill Relative Change Profile`,
-//   });
-//   return spec;
-// }
 
 export function injectClassification(spec: TopLevelSpec): void {
   const cont = (v: number) => `(datum.value_completeness >= 0.${v} && datum.prevCompleteness < 0.${v}) ? 'p${v}'`;

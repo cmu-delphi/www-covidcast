@@ -329,24 +329,6 @@ export function callMetaAPI(
   });
 }
 
-export interface EpiDataSignalStatusRow {
-  name: string;
-  source: string;
-  covidcast_signal: string;
-  latest_issue: string; // iso
-  latest_time_value: string; // iso
-  coverage: Record<RegionLevel, { date: string; /* iso */ count: number }[]>;
-}
-
-export function callSignalDashboardStatusAPI(): Promise<EpiDataSignalStatusRow[]> {
-  const url = new URL(ENDPOINT + '/signal_dashboard_status/');
-  url.searchParams.set('format', 'json');
-  return fetchImpl<EpiDataSignalStatusRow[]>(url).catch((error) => {
-    console.warn('failed fetching data', error);
-    return [];
-  });
-}
-
 export interface CoverageRow {
   source: string;
   signal: string;
