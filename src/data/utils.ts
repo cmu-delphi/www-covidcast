@@ -2,6 +2,7 @@
 
 import { timeDay } from 'd3-time';
 import { timeParse, timeFormat } from 'd3-time-format';
+import { EpiWeek } from './EpiWeek';
 import type { EpiDataRow } from './fetchData';
 
 // json1 value is 7 day average, json2 value is single count
@@ -43,4 +44,11 @@ export const formatAPITime = timeFormat('%Y%m%d');
 
 export function toTimeValue(date: Date): number {
   return Number.parseInt(formatAPITime(date), 10);
+}
+
+export function parseAPIWeekTime(v: number | string): Date {
+  const week_string = String(v).replace('-', '').replace('W', '');
+  const year = Number.parseInt(week_string.slice(0, 4));
+  const week = Number.parseInt(week_string.slice(4, 6));
+  return new EpiWeek(year, week).toDate();
 }
