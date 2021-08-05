@@ -1,11 +1,12 @@
-import { timeDay } from 'd3-time';
+import { timeDay, timeWeek } from 'd3-time';
 import type { EpiDataRow } from '.';
-import { parseAPITime, toTimeValue } from './utils';
+import { parseAPITime, toTimeValue, toTimeWeekValue } from './utils';
 
 export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
 export const yesterday = toTimeValue(yesterdayDate);
 
 export class TimeFrame {
+  readonly type: 'day' | 'week';
   readonly min: Date;
   readonly min_time: number;
   readonly max: Date;
@@ -15,12 +16,13 @@ export class TimeFrame {
   readonly domain: [number, number];
   readonly filter: (row: EpiDataRow) => boolean;
 
-  constructor(min: Date, max: Date) {
+  constructor(min: Date, max: Date, type: 'day' | 'week' = 'day') {
+    this.type = type;
     this.min = min;
-    this.min_time = toTimeValue(min);
+    this.min_time = type === 'day' ? toTimeValue(min) : toTimeWeekValue(min);
     this.max = max;
-    this.max_time = toTimeValue(max);
-    this.difference = timeDay.count(min, max);
+    this.max_time = type == 'day' ? toTimeValue(max) : toTimeWeekValue(max);
+    this.difference = (type === 'day' ? timeDay : timeWeek).count(min, max);
     this.range = `${this.min_time}-${this.max_time}`;
     this.domain = [min.getTime(), max.getTime()];
     /**

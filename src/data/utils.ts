@@ -34,8 +34,17 @@ export function combineSignals<T extends Record<string, number>>(
 
 const parseAPITimeParser = timeParse('%Y%m%d');
 
+export function parseAPIWeekTime(v: number | string): Date {
+  return EpiWeek.parse(v).toDate();
+}
+
 export function parseAPITime(v: number | string): Date {
-  return timeDay(parseAPITimeParser(String(v))!);
+  const vs = String(v);
+  if (vs.length === 6) {
+    // week
+    return parseAPIWeekTime(vs);
+  }
+  return timeDay(parseAPITimeParser(vs)!);
 }
 /**
  * @type {(v: Date) => string}
@@ -46,9 +55,10 @@ export function toTimeValue(date: Date): number {
   return Number.parseInt(formatAPITime(date), 10);
 }
 
-export function parseAPIWeekTime(v: number | string): Date {
-  const week_string = String(v).replace('-', '').replace('W', '');
-  const year = Number.parseInt(week_string.slice(0, 4));
-  const week = Number.parseInt(week_string.slice(4, 6));
-  return new EpiWeek(year, week).toDate();
+export function toTimeWeekValue(date: Date): number {
+  return EpiWeek.fromDate(date).format();
+}
+
+export function formatAPIWeekTime(date: Date): string {
+  return toTimeWeekValue(date).toString();
 }

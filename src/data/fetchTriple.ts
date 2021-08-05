@@ -4,7 +4,7 @@ import { callAPI, EpiDataJSONRow } from './api';
 import { GeoPair, isArray, SourceSignalPair, TimePair, groupByLevel, groupBySource } from './apimodel';
 import type { RegionInfo as Region, RegionLevel } from './regions';
 import type { TimeFrame } from './TimeFrame';
-import { toTimeValue } from './utils';
+import { toTimeValue, toTimeWeekValue } from './utils';
 
 function toGeoPair(
   transfer: (keyof EpiDataJSONRow)[],
@@ -95,7 +95,9 @@ function toSourceSignalPair<S extends { id: string; signal: string; valueScaleFa
   };
 }
 
-export default function fetchTriple<S extends { id: string; signal: string; format: Sensor['format'] }>(
+export default function fetchTriple<
+  S extends { id: string; signal: string; format: Sensor['format']; isWeeklySignal: boolean },
+>(
   sensor: S | readonly S[],
   region: Region | RegionLevel | readonly Region[],
   date: TimeFrame | Date,
@@ -108,16 +110,27 @@ export default function fetchTriple<S extends { id: string; signal: string; form
   if (advanced) {
     transfer.push('sample_size', 'issue');
   }
-  const mixinValues: Partial<EpiDataRow> = {
-    time_type: 'day',
-  };
+  const sensorCount = isArray(sensor) ? sensor.length : 1;
+  const weeklyCount = isArray(sensor)
+    ? sensor.reduce((acc, v) => acc + (v.isWeeklySignal ? 1 : 0), 0)
+    : sensor.isWeeklySignal
+    ? 1
+    : 0;
+  const mixinValues: Partial<EpiDataRow> = {};
+  if (sensorCount === weeklyCount) {
+    // all weekly
+    mixinValues.time_type = 'week';
+  } else if (weeklyCount === 0) {
+    mixinValues.time_type = 'day';
+  }
+  // mix
   const geoPairs = toGeoPair(transfer, mixinValues, region);
   const { sourceSignalPairs, factor } = toSourceSignalPair(transfer, mixinValues, sensor);
 
-  const timePairs = new TimePair('day', date);
-  if (date instanceof Date) {
+  const timePairs = new TimePair(mixinValues.time_type ?? 'day', date);
+  if (date instanceof Date && mixinValues.time_type != null) {
     // single level
-    mixinValues.time_value = toTimeValue(date);
+    mixinValues.time_value = mixinValues.time_type == 'day' ? toTimeValue(date) : toTimeWeekValue(date);
   } else {
     transfer.push('time_value');
   }

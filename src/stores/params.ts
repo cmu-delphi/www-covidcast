@@ -218,7 +218,12 @@ export class RegionParam implements Region {
 }
 
 export function extractSparkLine<T extends EpiDataRow>(data: readonly T[], sparkLine: TimeFrame, sensor: Sensor): T[] {
-  return fitRange(addMissing(data.filter(sparkLine.filter)), sparkLine.min, sparkLine.max);
+  return fitRange(
+    addMissing(data.filter(sparkLine.filter), sensor.isWeeklySignal ? 'week' : 'day'),
+    sparkLine.min,
+    sparkLine.max,
+    sensor.isWeeklySignal ? 'week' : 'day',
+  );
 }
 
 export function groupByRegion<T extends EpiDataRow & { propertyId: string }>(data: readonly T[]): Map<string, T[]> {

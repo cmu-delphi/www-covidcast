@@ -10,11 +10,17 @@ export function startDateOfYear(year: number): Date {
   return timeDay.offset(janOne, diff);
 }
 
+export function epiweekToDate(year: number, week: number): Date {
+  const dayOne = startDateOfYear(year);
+  const diff = 7 * (week - 1);
+  return timeDay.offset(dayOne, diff);
+}
+
 export class EpiWeek {
   constructor(public readonly year: number, public readonly week: number = 1) {}
 
   static parse(value: number | string): EpiWeek {
-    const v = typeof value === 'number' ? value : Number.parseInt(value, 10);
+    const v = typeof value === 'number' ? value : Number.parseInt(value.replace('-', '').replace('W', ''), 10);
     const year = Math.floor(v / 100);
     const week = v % 100;
     return new EpiWeek(year, week);

@@ -182,6 +182,7 @@ function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
         credits: credits,
         formatValue: formatter[m.format] || formatter.raw,
         formatSpecifier: formatSpecifiers[m.format] || formatSpecifiers.raw,
+        isWeeklySignal: parsed.time_type === 'week',
         meta: parsed,
       };
       return s;

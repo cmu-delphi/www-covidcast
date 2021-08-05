@@ -55,6 +55,7 @@ export function getAvailableCounties(indicator: IndicatorStatus, date: Date): Pr
     {
       id: indicator.source,
       signal: indicator.covidcast_signal,
+      isWeeklySignal: false, // TODO is weekly support
       format: 'raw',
     },
     'county',

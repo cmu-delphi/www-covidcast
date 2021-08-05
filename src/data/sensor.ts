@@ -47,6 +47,7 @@ export interface Sensor {
   readonly credits?: string; // credit text
 
   readonly format: SignalFormat;
+  readonly isWeeklySignal: boolean;
   readonly valueScaleFactor: number;
   readonly xAxis: string; // x axis title
   readonly yAxis: string; // y axis value unit long

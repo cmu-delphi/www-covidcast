@@ -282,6 +282,7 @@ export interface EpiDataMetaInfo {
   signal_basename: string;
 
   time_label: string;
+  time_type: 'day' | 'week';
   value_label: string;
 
   link: { alt: string; href: string }[];
