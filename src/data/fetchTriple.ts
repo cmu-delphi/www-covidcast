@@ -2,6 +2,7 @@ import { EpiDataRow, parseData } from '.';
 import type { Sensor } from '../stores/constants';
 import { callAPI, EpiDataJSONRow } from './api';
 import { GeoPair, isArray, SourceSignalPair, TimePair, groupByLevel, groupBySource } from './apimodel';
+import { EpiWeek } from './EpiWeek';
 import type { RegionInfo as Region, RegionLevel } from './regions';
 import type { TimeFrame } from './TimeFrame';
 import { toTimeValue, toTimeWeekValue } from './utils';
@@ -129,8 +130,10 @@ export default function fetchTriple<
 
   const timePairs = new TimePair(mixinValues.time_type ?? 'day', date);
   if (date instanceof Date && mixinValues.time_type != null) {
-    // single level
+    // single level and single date
     mixinValues.time_value = mixinValues.time_type == 'day' ? toTimeValue(date) : toTimeWeekValue(date);
+    mixinValues.date_value = date;
+    mixinValues.week_value = EpiWeek.fromDate(date);
   } else {
     transfer.push('time_value');
   }

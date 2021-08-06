@@ -75,7 +75,7 @@
       scheme: sensor.value.vegaColorScale,
       title: [
         `${sensor.name} in US ${getLevelInfo(level).labelPlural}`,
-        `on ${formatDateYearDayOfWeekAbbr(date.value)}`,
+        `on ${sensor.isWeeklySignal ? date.week.toString() : formatDateYearDayOfWeekAbbr(date.value)}`,
       ],
       subTitle: sensor.unit,
       initialRegion: highlightToRegionsImpl(level, highlight),
@@ -107,7 +107,9 @@
   $: shownLevel = level === 'nation' ? 'state' : level;
   $: spec = generateSpec(sensor, shownLevel, date);
   $: data = loadData(sensor, shownLevel, date);
-  $: fileName = `${sensor.name}_${getLevelInfo(shownLevel).labelPlural}_${formatDateISO(date.value)}`;
+  $: fileName = `${sensor.name}_${getLevelInfo(shownLevel).labelPlural}_${
+    sensor.isWeeklySignal ? date.week.toString() : formatDateISO(date.value)
+  }`;
 
   /**
    * @type {Vega }

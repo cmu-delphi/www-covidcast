@@ -10,6 +10,7 @@ import { get, Writable } from 'svelte/store';
 import { ALL_TIME_FRAME, TimeFrame } from '../data/TimeFrame';
 import { toTimeValue } from '../data/utils';
 import type { MetaDataManager } from '../data/meta';
+import { EpiWeek } from '../data/EpiWeek';
 
 export { TimeFrame } from '../data/TimeFrame';
 export type { RegionEpiDataRow } from './DataFetcher';
@@ -38,6 +39,7 @@ export const SPARKLINE_SIZE = 4; // weeks;
 export class DateParam {
   readonly timeValue: number;
   readonly value: Date;
+  readonly week: EpiWeek;
   readonly allTimeFrame: TimeFrame;
   readonly sparkLineTimeFrame: TimeFrame;
   readonly windowTimeFrame: TimeFrame;
@@ -45,6 +47,7 @@ export class DateParam {
   constructor(date: Date) {
     this.timeValue = toTimeValue(date);
     this.value = date;
+    this.week = EpiWeek.fromDate(date);
     this.allTimeFrame = ALL_TIME_FRAME;
     this.sparkLineTimeFrame = TimeFrame.compute(date, (d, step) => timeWeek.offset(d, step), SPARKLINE_SIZE);
     this.windowTimeFrame = TimeFrame.compute(date, (d, step) => timeMonth.offset(d, step), WINDOW_SIZE);

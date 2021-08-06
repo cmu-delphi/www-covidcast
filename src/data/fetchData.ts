@@ -31,9 +31,13 @@ export function parseData(
       (row as any).week_value = null;
       continue;
     }
-    const [d, w] = parseAPIDateAndWeek(row.time_value);
-    row.date_value = d;
-    row.week_value = w;
+    if (!(row.date_value instanceof Date)) {
+      const [d, w] = parseAPIDateAndWeek(row.time_value);
+      row.date_value = d;
+      row.week_value = w;
+    } else if (!(row.week_value instanceof EpiWeek)) {
+      row.week_value = EpiWeek.fromDate(row.date_value);
+    }
     row.value = row.value * (typeof factor === 'function' ? factor(row) : factor);
   }
   // sort by date

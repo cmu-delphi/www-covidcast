@@ -16,6 +16,7 @@ const EPIDATA_ROW_KEYS: (keyof (RegionEpiDataRow & CountyInfo))[] = [
   'geo_value',
   'value',
   'date_value',
+  'week_value',
   'time_value',
   'stderr',
   'sample_size',

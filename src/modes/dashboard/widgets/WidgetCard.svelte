@@ -15,11 +15,17 @@
     if (!date) {
       return '?';
     }
+    if (typeof date === 'string') {
+      return date;
+    }
+    const isWeekly = typeof sensor !== 'string' && sensor && sensor.isWeeklySignal ? 'week' : 'day';
     if (date instanceof TimeFrame) {
-      const isWeekly = typeof sensor !== 'string' && sensor && sensor.isWeeklySignal ? 'week' : 'day';
       return date.toNiceString(isWeekly);
     }
-    return typeof date === 'string' ? date : `on ${formatDateYearDayOfWeekAbbr(date.value)}`;
+    if (isWeekly) {
+      return `on ${formatWeek(date.week)}`;
+    }
+    return `on ${formatDateYearDayOfWeekAbbr(date.value)}`;
   }
 
   function gridToStyle(grid) {
@@ -51,7 +57,7 @@
   import cogIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/cog.svg';
   import expandAltIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/expand-alt.svg';
   import compressAltIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/compress-alt.svg';
-  import { formatDateYearDayOfWeekAbbr } from '../../../formats';
+  import { formatDateYearDayOfWeekAbbr, formatWeek } from '../../../formats';
   import { TimeFrame } from '../../../stores/params';
   import { createEventDispatcher } from 'svelte';
 
