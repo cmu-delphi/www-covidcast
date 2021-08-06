@@ -7,6 +7,7 @@ import type { ExtendedFeature, GeoProjection } from 'd3-geo';
 import { fitExtent, fitSize, fitWidth, fitHeight } from 'd3-geo/src/projection/fit';
 import { timeDay } from 'd3-time';
 import { lagToOffset } from '../../data/correlationUtils';
+import { EpiWeek } from '../../data/EpiWeek';
 
 function patchedAlbersUsaTerritories(): GeoProjection {
   // see https://github.com/stamen/geo-albers-usa-territories/pull/8/files
@@ -45,6 +46,31 @@ expressionFunction(
     };
   })(),
 );
+
+expressionFunction('epiweek', (datum: Date): EpiWeek | null => {
+  if (!datum) {
+    return null;
+  }
+  return EpiWeek.fromDate(datum);
+});
+
+expressionFunction('epiweekFormatSmart', (datum: Date): string => {
+  if (!datum) {
+    return '';
+  }
+  const w = EpiWeek.fromDate(datum);
+  if (w.week === 1) {
+    return w.toString();
+  }
+  return `W${w.week < 10 ? '0' : ''}${w.week}`;
+});
+
+expressionFunction('epiweekFormat', (datum: Date): string => {
+  if (!datum) {
+    return '';
+  }
+  return EpiWeek.fromDate(datum).toString();
+});
 
 expressionFunction(
   'cachedNumber',

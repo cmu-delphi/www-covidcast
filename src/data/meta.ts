@@ -1,11 +1,12 @@
 import { EpiDataMetaInfo, EpiDataMetaSourceInfo, EpiDataMetaStatsInfo, KNOWN_LICENSES, SignalCategory } from './api';
-import { parseAPITime } from './utils';
+import { parseAPIDateAndWeek } from './utils';
 import type { RegionLevel } from './regions';
 import { isCountSignal } from './signals';
 import { ALL_TIME_FRAME, TimeFrame } from './TimeFrame';
 import { Sensor, units, colorScales, vegaColorScales, yAxis } from './sensor';
 import { formatSpecifiers, formatter } from '../formats';
 import { parse as parseMarkDown, parseInline } from 'marked';
+import type { EpiWeek } from './EpiWeek';
 
 function toKey(source: string, signal: string) {
   return `${source}-${signal}`;
@@ -41,20 +42,27 @@ function extractStats(signal: string, entry: EpiDataMetaInfo | null, level?: Reg
 
 export interface EpiDataMetaParsedInfo extends EpiDataMetaInfo {
   maxIssue: Date;
+  maxIssueWeek: EpiWeek;
   minTime: Date;
+  minWeek: EpiWeek;
   maxTime: Date;
+  maxWeek: EpiWeek;
   timeFrame: TimeFrame;
 }
 
 function parse(d: EpiDataMetaInfo): EpiDataMetaParsedInfo {
-  const minTime = parseAPITime(d.min_time);
-  const maxTime = parseAPITime(d.max_time);
+  const minTime = parseAPIDateAndWeek(d.min_time);
+  const maxTime = parseAPIDateAndWeek(d.max_time);
+  const maxIssue = parseAPIDateAndWeek(d.max_issue);
   return {
     ...d,
-    maxIssue: parseAPITime(d.max_issue),
-    minTime,
-    maxTime,
-    timeFrame: new TimeFrame(minTime, maxTime),
+    maxIssue: maxIssue[0],
+    maxIssueWeek: maxIssue[1],
+    minTime: minTime[0],
+    minWeek: minTime[1],
+    maxTime: maxTime[0],
+    maxWeek: maxTime[1],
+    timeFrame: new TimeFrame(minTime[0], maxTime[0], minTime[1], maxTime[1]),
   };
 }
 

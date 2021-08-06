@@ -25,7 +25,7 @@
   } from '../../../specs/lineSpec';
   import { annotationManager, getLevelInfo } from '../../../stores';
   import { combineSignals } from '../../../data/utils';
-  import { formatDateISO, formatDateYearDayOfWeekAbbr } from '../../../formats';
+  import { formatDateISO } from '../../../formats';
   import { WidgetHighlight } from '../highlight';
   import isEqual from 'lodash-es/isEqual';
   import { createEventDispatcher } from 'svelte';
@@ -92,6 +92,7 @@
    * @param {{zero: boolean, raw: boolean, cumulative: boolean}} options
    */
   function genSpec(sensor, region, timeFrame, { zero, raw, cumulative }) {
+    const isWeekly = sensor.value.isWeeklySignal;
     /**
      * @type {import('../../../specs/lineSpec').LineSpecOptions}
      */
@@ -104,16 +105,19 @@
       xTitle: sensor.xAxis,
       title: [
         `${cumulative ? 'Cumulative ' : ''}${sensor.name} in ${region.displayName}`,
-        `between ${formatDateYearDayOfWeekAbbr(timeFrame.min)} and ${formatDateYearDayOfWeekAbbr(timeFrame.max)}`,
+        timeFrame.toNiceString(isWeekly),
       ],
       subTitle: sensor.unit,
       highlightRegion: false,
       clearHighlight: false,
       autoAlignOffset: 60,
       paddingTop: 80,
+      isWeeklySignal: isWeekly,
     };
     const valueTooltip = `cachedNumber(datum.value, '${sensor.value.formatSpecifier}') + `;
-    const dateTooltip = `' @ ' + cachedTime(datum.date_value, '%a %b %d')`;
+    const dateTooltip = isWeekly
+      ? `' @ ' + toString(datum.week_value)`
+      : `' @ ' + cachedTime(datum.date_value, '%a %b %d')`;
     const rawTooltip = `' (raw: ' + cachedNumber(datum.raw, '${sensor.value.formatSpecifier}')`;
     if (raw) {
       if (cumulative) {

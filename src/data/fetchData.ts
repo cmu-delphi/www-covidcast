@@ -1,6 +1,6 @@
 import { callAPI, EpiDataJSONRow } from './api';
 import { timeDay, timeWeek } from 'd3-time';
-import { parseAPITime, toTimeValue } from './utils';
+import { parseAPIDateAndWeek, toTimeValue } from './utils';
 import { getInfoByName } from './regions';
 import type { RegionInfo } from './regions';
 import { TimeFrame } from './TimeFrame';
@@ -31,8 +31,9 @@ export function parseData(
       (row as any).week_value = null;
       continue;
     }
-    row.date_value = parseAPITime(row.time_value.toString());
-    row.week_value = EpiWeek.fromDate(row.date_value);
+    const [d, w] = parseAPIDateAndWeek(row.time_value);
+    row.date_value = d;
+    row.week_value = w;
     row.value = row.value * (typeof factor === 'function' ? factor(row) : factor);
   }
   // sort by date

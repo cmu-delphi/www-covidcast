@@ -1,30 +1,33 @@
-import { timeDay, timeWeek } from 'd3-time';
+import { timeDay } from 'd3-time';
 import type { EpiDataRow } from '.';
+import { formatDateLocal } from '../formats';
 import { EpiWeek, weekRange } from './EpiWeek';
-import { parseAPITime, toTimeValue, toTimeWeekValue } from './utils';
+import { parseAPITime, toTimeValue } from './utils';
 
 export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
 export const yesterday = toTimeValue(yesterdayDate);
 
 export class TimeFrame {
-  readonly type: 'day' | 'week';
   readonly min: Date;
   readonly min_time: number;
+  readonly min_week: EpiWeek;
   readonly max: Date;
   readonly max_time: number;
-  readonly difference: number;
+  readonly max_week: EpiWeek;
   readonly range: string;
+  readonly week_range: string;
   readonly domain: [number, number];
   readonly filter: (row: EpiDataRow) => boolean;
 
-  constructor(min: Date, max: Date, type: 'day' | 'week' = 'day') {
-    this.type = type;
+  constructor(min: Date, max: Date, minWeek = EpiWeek.fromDate(min), maxWeek = EpiWeek.fromDate(max)) {
     this.min = min;
-    this.min_time = type === 'day' ? toTimeValue(min) : toTimeWeekValue(min);
+    this.min_week = minWeek;
+    this.min_time = toTimeValue(min);
     this.max = max;
-    this.max_time = type == 'day' ? toTimeValue(max) : toTimeWeekValue(max);
-    this.difference = (type === 'day' ? timeDay : timeWeek).count(min, max);
+    this.max_week = maxWeek;
+    this.max_time = toTimeValue(max);
     this.range = `${this.min_time}-${this.max_time}`;
+    this.week_range = `${this.min_week.format()}-${this.max_week.format()}`;
     this.domain = [min.getTime(), max.getTime()];
     /**
      * @param {EpiDataRow} row
@@ -56,7 +59,10 @@ export class TimeFrame {
     return this.range === that.range;
   }
 
-  includes(date: Date): boolean {
+  includes(date: Date | EpiWeek): boolean {
+    if (date instanceof EpiWeek) {
+      return date.compareTo(this.min_week) >= 0 && date.compareTo(this.max_week) <= 0;
+    }
     return date >= this.min && date <= this.max;
   }
 
@@ -69,32 +75,19 @@ export class TimeFrame {
     return this.range;
   }
 
-  asWeekFrame(): TimeFrame {
-    if (this.type === 'week') {
-      return this;
-    }
-    return new TimeFrame(EpiWeek.fromDate(this.min).toDate(), EpiWeek.fromDate(this.max).toDate(), 'week');
+  toNiceString(type: 'day' | 'week' = 'day'): string {
+    const isWeekly = type === 'week';
+    return `between ${isWeekly ? this.min_week.toString() : formatDateLocal(this.min)} and ${
+      isWeekly ? this.max_week.toString() : formatDateLocal(this.max)
+    }`;
   }
 
-  asDayFrame(): TimeFrame {
-    if (this.type === 'day') {
-      return this;
+  asTypeRange(type: 'day' | 'week'): string {
+    if (type == 'day') {
+      return this.range;
     }
-    return new TimeFrame(this.min, this.max, 'day');
-  }
-
-  asType(type: 'day' | 'week'): TimeFrame {
-    return type == 'day' ? this.asDayFrame() : this.asWeekFrame();
-  }
-
-  asListRange(): string {
-    if (this.type === 'day') {
-      return timeDay
-        .range(this.min, timeDay.offset(this.max, 1))
-        .map((d) => toTimeValue(d))
-        .join(',');
-    }
-    return weekRange(EpiWeek.fromDate(this.min), EpiWeek.fromDate(this.max), true)
+    // TODO hack since api has a bug for week ranges
+    return weekRange(this.min_week, this.max_week, true)
       .map((d) => d.format())
       .join(',');
   }

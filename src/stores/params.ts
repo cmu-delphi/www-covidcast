@@ -95,6 +95,7 @@ export class SensorParam {
   readonly isPer100K: boolean;
   readonly highValuesAre: Sensor['highValuesAre'];
   readonly is7DayAverage: boolean;
+  readonly isWeeklySignal: boolean;
   readonly valueUnit: string;
   readonly formatValue: (v?: number | null, enforceSign?: boolean) => string;
   readonly unit: string;
@@ -122,6 +123,7 @@ export class SensorParam {
     this.isPer100K = sensor.format === 'per100k';
     this.highValuesAre = sensor.highValuesAre;
     this.is7DayAverage = sensor.is7DayAverage;
+    this.isWeeklySignal = sensor.isWeeklySignal;
     this.valueUnit = this.is7DayAverage ? '7-day average' : 'value';
     this.formatValue = (v, e) => sensor.formatValue(v, e);
     this.unit = sensor.unit;

@@ -100,13 +100,9 @@ export class TimePair {
         return formatter(this.values);
       }
       if (isArray(this.values)) {
-        return this.values.map((d) => (d instanceof Date ? formatter(d) : d.asType(this.type).range)).join(',');
+        return this.values.map((d) => (d instanceof Date ? formatter(d) : d.asTypeRange(this.type))).join(',');
       }
-      if (this.type === 'week') {
-        // TODO hack for bug in epidata
-        return this.values.asType(this.type).asListRange();
-      }
-      return this.values.asType(this.type).range;
+      return this.values.asTypeRange(this.type);
     };
     return `${this.type}:${encodeValues()}`;
   }

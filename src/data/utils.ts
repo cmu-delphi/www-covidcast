@@ -46,6 +46,17 @@ export function parseAPITime(v: number | string): Date {
   }
   return timeDay(parseAPITimeParser(vs)!);
 }
+
+export function parseAPIDateAndWeek(v: number | string): [Date, EpiWeek] {
+  const vs = String(v);
+  if (vs.length === 6) {
+    // week
+    const week = EpiWeek.parse(vs);
+    return [week.toDate(), week];
+  }
+  const date = timeDay(parseAPITimeParser(vs)!);
+  return [date, EpiWeek.fromDate(date)];
+}
 /**
  * @type {(v: Date) => string}
  */

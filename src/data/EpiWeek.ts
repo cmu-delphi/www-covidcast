@@ -56,6 +56,14 @@ export class EpiWeek {
   format(): number {
     return this.year * 100 + this.week;
   }
+
+  toString(): string {
+    return `${this.year}W${this.week < 0 ? '0' : ''}${this.week}`;
+  }
+
+  compareTo(other: EpiWeek): number {
+    return this.format() - other.format();
+  }
 }
 
 export function weeksInYear(year: number): number {
