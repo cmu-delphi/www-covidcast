@@ -22,7 +22,7 @@
     if (date instanceof TimeFrame) {
       return date.toNiceString(isWeekly);
     }
-    if (isWeekly) {
+    if (isWeekly === 'week') {
       return `on ${formatWeek(date.week)}`;
     }
     return `on ${formatDateYearDayOfWeekAbbr(date.value)}`;

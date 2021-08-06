@@ -25,10 +25,11 @@
   } from '../../../specs/lineSpec';
   import { annotationManager, getLevelInfo } from '../../../stores';
   import { combineSignals } from '../../../data/utils';
-  import { formatDateISO } from '../../../formats';
+  import { formatDateISO, formatWeek } from '../../../formats';
   import { WidgetHighlight } from '../highlight';
   import isEqual from 'lodash-es/isEqual';
   import { createEventDispatcher } from 'svelte';
+  import { EpiWeek } from '../../../data/EpiWeek';
 
   const dispatch = createEventDispatcher();
 
@@ -181,7 +182,9 @@
     if (cumulative) {
       suffix += '_Cumulative';
     }
-    return `${sensor.name}_${regionName}_${formatDateISO(timeFrame.min)}-${formatDateISO(timeFrame.max)}${suffix}`;
+    return `${sensor.name}_${regionName}_${
+      sensor.isWeeklySignal ? formatWeek(timeFrame.min_week) : formatDateISO(timeFrame.min)
+    }-${sensor.isWeeklySignal ? formatWeek(timeFrame.max_week) : formatDateISO(timeFrame.max)}${suffix}`;
   }
 
   function injectRanges(spec, timeFrame, annotations) {
@@ -211,7 +214,11 @@
 
   function onHighlightSignal(event) {
     const date = resolveHighlightedDate(event);
-    const newHighlight = new WidgetHighlight(sensor.value, region.value, date);
+    const newHighlight = new WidgetHighlight(
+      sensor.value,
+      region.value,
+      sensor.isWeeklySignal ? EpiWeek.fromDate(date) : date,
+    );
     if (!newHighlight.equals(highlight)) {
       highlight = newHighlight;
     }

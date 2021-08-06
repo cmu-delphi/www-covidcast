@@ -51,6 +51,11 @@ export class TimeFrame {
     return new TimeFrame(min, max);
   }
 
+  static fromEpiWeek(epiweek: EpiWeek): TimeFrame {
+    const d = epiweek.toDate();
+    return new TimeFrame(d, epiweek.toEndDate(), epiweek, epiweek);
+  }
+
   shift(minShiftInDays = 0, maxShiftInDays = 0): TimeFrame {
     return new TimeFrame(timeDay.offset(this.min, minShiftInDays), timeDay.offset(this.max, maxShiftInDays));
   }

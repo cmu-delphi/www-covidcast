@@ -32,6 +32,10 @@ export class EpiWeek {
     return timeDay.offset(dayOne, diff);
   }
 
+  toEndDate(): Date {
+    return timeDay.offset(this.toDate(), 6);
+  }
+
   /**
    * Set values using given moment date. Defaults to now.
    */

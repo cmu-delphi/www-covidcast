@@ -42,6 +42,7 @@
     }
     return fetcher.fetch1Sensor1RegionNDatesTrend(sensor, region, timeFrame).then((trends) => {
       return trends.map((trend, i) => {
+        // TODO week
         return toRow(i, formatDateISO(trend.date), sensor.value, region.value, trend.date, trend);
       });
     });

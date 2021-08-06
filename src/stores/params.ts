@@ -166,7 +166,7 @@ export class SensorParam {
 
   createColorScale(level: RegionLevel = 'county'): (v: number) => string {
     const domain = this.domain(level);
-    return scaleSequential(this.value.colorScale).domain(domain);
+    return scaleSequential(this.value.colorScale).domain(domain).clamp(true);
   }
 
   static unbox(sensor: Sensor | SensorParam): Sensor {
