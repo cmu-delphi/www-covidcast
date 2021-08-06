@@ -1,20 +1,37 @@
 import { parseAPITime } from './utils';
-import { EpiWeek, startDateOfYear } from './EpiWeek';
+import { EpiWeek, startDateOfYear, weeksInYear } from './EpiWeek';
 
 describe('startDateOfYear', () => {
-  it('should return correct first day of season', () => {
-    // expect(startDateOfYear(2010)).toEqual(parseAPITime('20160103'));
-    // expect(startDateOfYear(2011)).toEqual(parseAPITime('20160103'));
-    // expect(startDateOfYear(2012)).toEqual(parseAPITime('20160103'));
-    // expect(startDateOfYear(2013)).toEqual(parseAPITime('20160103'));
-    // expect(startDateOfYear(2014)).toEqual(parseAPITime('20160103'));
-
+  it('correct dates', () => {
+    // [epiweeks.Year(y).startdate() for y in range(2010, 2021)]
+    expect(startDateOfYear(2010)).toEqual(parseAPITime('20100103'));
+    expect(startDateOfYear(2011)).toEqual(parseAPITime('20110102'));
+    expect(startDateOfYear(2012)).toEqual(parseAPITime('20120101'));
+    expect(startDateOfYear(2013)).toEqual(parseAPITime('20121230'));
+    expect(startDateOfYear(2014)).toEqual(parseAPITime('20131229'));
     expect(startDateOfYear(2015)).toEqual(parseAPITime('20150104'));
     expect(startDateOfYear(2016)).toEqual(parseAPITime('20160103'));
+    expect(startDateOfYear(2017)).toEqual(parseAPITime('20170101'));
+    expect(startDateOfYear(2018)).toEqual(parseAPITime('20171231'));
+    expect(startDateOfYear(2019)).toEqual(parseAPITime('20181230'));
+    expect(startDateOfYear(2020)).toEqual(parseAPITime('20191229'));
+  });
+});
 
-    // expect(startDateOfYear(2017)).toEqual(parseAPITime('20160103'));
-    // expect(startDateOfYear(2018)).toEqual(parseAPITime('20160103'));
-    // expect(startDateOfYear(2019)).toEqual(parseAPITime('20160103'));
+describe('weeksInYear', () => {
+  it('correct dates', () => {
+    // {y: Year(y).totalweeks() for y in range(2010, 2021)}
+    expect(weeksInYear(2010)).toEqual(52);
+    expect(weeksInYear(2011)).toEqual(52);
+    expect(weeksInYear(2012)).toEqual(52);
+    expect(weeksInYear(2013)).toEqual(52);
+    expect(weeksInYear(2014)).toEqual(53);
+    expect(weeksInYear(2015)).toEqual(52);
+    expect(weeksInYear(2016)).toEqual(52);
+    expect(weeksInYear(2017)).toEqual(52);
+    expect(weeksInYear(2018)).toEqual(52);
+    expect(weeksInYear(2019)).toEqual(52);
+    expect(weeksInYear(2020)).toEqual(53);
   });
 });
 

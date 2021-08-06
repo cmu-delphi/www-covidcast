@@ -91,31 +91,24 @@ export class TimePair {
   }
 
   toString(): string {
+    const formatter = this.type === 'day' ? formatAPITime : formatAPIWeekTime;
     const encodeValues = () => {
       if (this.values === '*') {
         return '*';
       }
       if (this.values instanceof Date) {
-        return formatAPITime(this.values);
+        return formatter(this.values);
       }
       if (isArray(this.values)) {
-        return this.values.map((d) => (d instanceof Date ? formatAPITime(d) : d.range)).join(',');
+        return this.values.map((d) => (d instanceof Date ? formatter(d) : d.asType(this.type).range)).join(',');
       }
-      return this.values.range;
+      if (this.type === 'week') {
+        // TODO hack for bug in epidata
+        return this.values.asType(this.type).asListRange();
+      }
+      return this.values.asType(this.type).range;
     };
-    const encodeWeekValues = () => {
-      if (this.values === '*') {
-        return '*';
-      }
-      if (this.values instanceof Date) {
-        return formatAPIWeekTime(this.values);
-      }
-      if (isArray(this.values)) {
-        return this.values.map((d) => (d instanceof Date ? formatAPIWeekTime(d) : d.range)).join(',');
-      }
-      return this.values.range;
-    };
-    return `${this.type}:${this.type === 'day' ? encodeValues() : encodeWeekValues()}`;
+    return `${this.type}:${encodeValues()}`;
   }
 }
 

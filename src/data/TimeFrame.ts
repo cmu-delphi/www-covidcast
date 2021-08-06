@@ -1,5 +1,6 @@
 import { timeDay, timeWeek } from 'd3-time';
 import type { EpiDataRow } from '.';
+import { EpiWeek, weekRange } from './EpiWeek';
 import { parseAPITime, toTimeValue, toTimeWeekValue } from './utils';
 
 export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
@@ -66,6 +67,36 @@ export class TimeFrame {
 
   toString(): string {
     return this.range;
+  }
+
+  asWeekFrame(): TimeFrame {
+    if (this.type === 'week') {
+      return this;
+    }
+    return new TimeFrame(EpiWeek.fromDate(this.min).toDate(), EpiWeek.fromDate(this.max).toDate(), 'week');
+  }
+
+  asDayFrame(): TimeFrame {
+    if (this.type === 'day') {
+      return this;
+    }
+    return new TimeFrame(this.min, this.max, 'day');
+  }
+
+  asType(type: 'day' | 'week'): TimeFrame {
+    return type == 'day' ? this.asDayFrame() : this.asWeekFrame();
+  }
+
+  asListRange(): string {
+    if (this.type === 'day') {
+      return timeDay
+        .range(this.min, timeDay.offset(this.max, 1))
+        .map((d) => toTimeValue(d))
+        .join(',');
+    }
+    return weekRange(EpiWeek.fromDate(this.min), EpiWeek.fromDate(this.max), true)
+      .map((d) => d.format())
+      .join(',');
   }
 }
 

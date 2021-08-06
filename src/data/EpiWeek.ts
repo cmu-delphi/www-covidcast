@@ -57,3 +57,46 @@ export class EpiWeek {
     return this.year * 100 + this.week;
   }
 }
+
+export function weeksInYear(year: number): number {
+  const lastDay = timeDay.offset(startDateOfYear(year + 1), -1);
+  const w = EpiWeek.fromDate(lastDay);
+  return w.week;
+}
+
+export function weekRange(start: EpiWeek, end: EpiWeek, including = true): EpiWeek[] {
+  const r: EpiWeek[] = [];
+  if (start.format() > end.format()) {
+    return [];
+  }
+  if (start.format() === end.format()) {
+    if (including) {
+      r.push(start);
+    }
+    return r;
+  }
+  let weekStart = start.week;
+  if (start.year < end.year) {
+    // rest of start year
+    const startWeeks = weeksInYear(start.year);
+    for (let i = start.week; i <= startWeeks; i++) {
+      r.push(new EpiWeek(start.year, i));
+    }
+    // all years
+    for (let year = start.year + 1; year < end.year; year++) {
+      const total = weeksInYear(year);
+      for (let i = 1; i <= total; i++) {
+        r.push(new EpiWeek(year, i));
+      }
+    }
+    // rest of last year
+    weekStart = 1;
+  }
+  for (let week = weekStart; week < end.week; week++) {
+    r.push(new EpiWeek(end.year, week));
+  }
+  if (including) {
+    r.push(end);
+  }
+  return r;
+}
