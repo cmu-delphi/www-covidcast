@@ -138,7 +138,7 @@
   hideOverflow
 >
   <svelte:fragment slot="toolbar">
-    <DownloadMenu {fileName} data={tileData} {sensor} prepareRow={(row) => row.dump} />
+    <DownloadMenu {fileName} data={tileData} {sensor} prepareRow={(row) => row.dump} advanced={false} />
   </svelte:fragment>
   <div class="root">
     <HexGrid columns={maxColumn} style="gap: 2px; margin: 12px 24px">
