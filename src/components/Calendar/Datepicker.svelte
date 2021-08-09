@@ -24,7 +24,7 @@
 
   export let style = '';
 
-  // export let pickWeek = false;
+  export let pickWeek = false;
 
   // theming variables:
   export let buttonBackgroundColor = '#fff';
@@ -176,13 +176,17 @@
     evt.preventDefault();
     switch (evt.keyCode) {
       case keyCodes.left:
-        incrementDayHighlighted(-1);
+        if (!pickWeek) {
+          incrementDayHighlighted(-1);
+        }
         break;
       case keyCodes.up:
         incrementDayHighlighted(-7);
         break;
       case keyCodes.right:
-        incrementDayHighlighted(1);
+        if (!pickWeek) {
+          incrementDayHighlighted(1);
+        }
         break;
       case keyCodes.down:
         incrementDayHighlighted(7);
@@ -249,6 +253,7 @@
         {highlighted}
         {shouldShakeDate}
         id={visibleMonthId}
+        {pickWeek}
         on:dateSelected={(e) => registerSelection(e.detail)}
       />
     </div>

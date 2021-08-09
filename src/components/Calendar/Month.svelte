@@ -9,6 +9,7 @@
   export let selected;
   export let highlighted;
   export let shouldShakeDate;
+  export let pickWeek = false;
 
   let lastId = id;
   let direction;
@@ -21,7 +22,7 @@
 
 <div class="month-container">
   {#each visibleMonth.weeks as week (week.id)}
-    <Week {week} {selected} {highlighted} {shouldShakeDate} {direction} on:dateSelected />
+    <Week {week} {selected} {highlighted} {shouldShakeDate} {direction} on:dateSelected {pickWeek} />
   {/each}
 </div>
 

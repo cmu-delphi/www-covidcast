@@ -13,52 +13,78 @@
   export let highlighted;
   export let shouldShakeDate;
   export let direction;
+  export let pickWeek = false;
 
   function toWeekString(week) {
     return `W${week.week < 10 ? '0' : ''}${week.week}`;
   }
 </script>
 
-<div class="week" in:fly|local={{ x: direction * 50, duration: 180, delay: 90 }} out:fade|local={{ duration: 180 }}>
-  <button class="day--label week--label disabled" type="button" disabled="disabled">
-    {toWeekString(week.week)}
-  </button>
-  {#each week.days as day}
-    <div
-      class="day"
-      class:outside-month={!day.partOfMonth}
-      class:is-today={day.isToday}
-      class:is-disabled={!day.selectable}
-    >
-      <button
-        class="day--label"
-        class:selected={areDatesEquivalent(day.date, selected)}
-        class:highlighted={areDatesEquivalent(day.date, highlighted)}
-        class:shake-date={shouldShakeDate && areDatesEquivalent(day.date, shouldShakeDate)}
-        class:disabled={!day.selectable}
-        type="button"
-        on:click={() => dispatch('dateSelected', day.date)}
-      >
-        {day.date.getDate()}
-      </button>
+{#if pickWeek}
+  <button
+    class="week week--button click-button"
+    in:fly|local={{ x: direction * 50, duration: 180, delay: 90 }}
+    out:fade|local={{ duration: 180 }}
+    type="button"
+    class:is-today={week.isThisWeek}
+    class:is-disabled={!week.selectable}
+    class:selected={areDatesEquivalent(week.firstDay, selected)}
+    class:highlighted={areDatesEquivalent(week.firstDay, highlighted)}
+    class:shake-date={shouldShakeDate && areDatesEquivalent(week.firstDay, shouldShakeDate)}
+    on:click={() => dispatch('dateSelected', week.firstDay)}
+  >
+    <div class="day--label week--label disabled">
+      {toWeekString(week.week)}
     </div>
-  {/each}
-</div>
+    {#each week.days as day}
+      <div class="day" class:outside-month={!day.partOfMonth}>
+        <div class="day--label disabled">
+          {day.date.getDate()}
+        </div>
+      </div>
+    {/each}
+  </button>
+{:else}
+  <div class="week" in:fly|local={{ x: direction * 50, duration: 180, delay: 90 }} out:fade|local={{ duration: 180 }}>
+    <div class="day--label week--label disabled" type="button">
+      {toWeekString(week.week)}
+    </div>
+    {#each week.days as day}
+      <div
+        class="day"
+        class:outside-month={!day.partOfMonth}
+        class:is-today={day.isToday}
+        class:is-disabled={!day.selectable}
+      >
+        <button
+          class="day--label click-button"
+          class:selected={areDatesEquivalent(day.date, selected)}
+          class:highlighted={areDatesEquivalent(day.date, highlighted)}
+          class:shake-date={shouldShakeDate && areDatesEquivalent(day.date, shouldShakeDate)}
+          class:disabled={!day.selectable}
+          type="button"
+          on:click={() => dispatch('dateSelected', day.date)}
+        >
+          {day.date.getDate()}
+        </button>
+      </div>
+    {/each}
+  </div>
+{/if}
 
 <style>
   .week {
     padding: 0;
     margin: 0;
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
     display: flex;
     flex-flow: row;
     -webkit-flex-flow: row;
     justify-content: space-around;
     -ms-grid-column: 1;
     grid-column: 1;
+    color: var(--day-text-color);
+    font-weight: normal;
+    text-align: center;
   }
   .week:nth-child(6n + 1) {
     -ms-grid-row: 1;
@@ -86,16 +112,13 @@
   }
   .day {
     margin: 2px;
-    color: var(--day-text-color);
-    font-weight: bold;
-    text-align: center;
-    font-size: 16px;
     flex: 1 0 auto;
     height: auto;
     display: flex;
     flex-basis: 0;
   }
   .day.outside-month,
+  .week.is-disabled,
   .day.is-disabled {
     opacity: 0.35;
   }
@@ -104,32 +127,34 @@
     float: left;
     padding-top: 100%;
   }
+  .click-button {
+    border: 1px solid #fff;
+    background: var(--day-background-color);
+    cursor: pointer;
+  }
   .day--label {
-    color: var(--day-text-color);
     display: flex;
     justify-content: center;
     flex-direction: column;
     width: 100%;
     position: relative;
-    border: 1px solid #fff;
     border-radius: 50%;
     margin: 10%;
     padding: 0;
     align-items: center;
-    background: var(--day-background-color);
-    cursor: pointer;
     transition: all 100ms linear;
-    font-weight: normal;
   }
   .week--label {
     width: unset;
     border-radius: 3px;
     margin: 2px;
   }
-  .day--label.disabled {
+  .week:not(.week--button) .day--label.disabled {
     cursor: default;
   }
   @media (min-width: 480px) {
+    .week--button.highlighted,
+    .week--button:not(.disabled):hover,
     .day--label.highlighted,
     .day--label:not(.disabled):hover {
       background: var(--day-highlighted-background-color);
@@ -137,9 +162,20 @@
       color: var(--day-highlighted-text-color);
     }
   }
-  .day--label.shake-date {
+  .shake-date {
     animation: shake 0.4s 1 linear;
   }
+
+  .week--button {
+    transition: all 100ms linear;
+    font-size: unset;
+    align-items: stretch;
+    border-radius: 3px;
+  }
+
+  .week--button.selected:hover,
+  .week--button.selected,
+  .week--button:active:not(.disabled),
   .day--label.selected:hover,
   .day--label.selected,
   .day--label:active:not(.disabled) {
@@ -147,6 +183,9 @@
     border-color: var(--highlight-color);
     color: #fff;
   }
+
+  .week.is-today,
+  .week.is-today:hover,
   .day.is-today .day--label,
   .day.is-today .day--label:hover {
     opacity: 1;
