@@ -2,6 +2,9 @@
   import Week from './Week.svelte';
 
   export let id;
+  /**
+   * @type {import('./lib/helpers').CalendarMonth}
+   */
   export let visibleMonth;
   export let selected;
   export let highlighted;

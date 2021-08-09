@@ -10,4 +10,4 @@ export const keyCodes = {
   tab: 9,
 };
 
-export const keyCodesArray = Object.keys(keyCodes).map((k) => keyCodes[k]);
+export const keyCodesArray: number[] = Object.values(keyCodes);

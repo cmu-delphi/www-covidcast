@@ -5,6 +5,9 @@
 
   const dispatch = createEventDispatcher();
 
+  /**
+   * @type {import('./lib/helpers').CalendarDay[]}
+   */
   export let days;
   export let selected;
   export let highlighted;
