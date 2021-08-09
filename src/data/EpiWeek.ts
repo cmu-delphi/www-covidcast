@@ -36,6 +36,10 @@ export class EpiWeek {
     return timeDay.offset(this.toDate(), 6);
   }
 
+  static thisWeek(): EpiWeek {
+    return EpiWeek.fromDate(new Date());
+  }
+
   /**
    * Set values using given moment date. Defaults to now.
    */
@@ -67,6 +71,10 @@ export class EpiWeek {
 
   compareTo(other: EpiWeek): number {
     return this.format() - other.format();
+  }
+
+  equals(other: EpiWeek): boolean {
+    return this.compareTo(other) === 0;
   }
 }
 

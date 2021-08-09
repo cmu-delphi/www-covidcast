@@ -12,6 +12,8 @@ export interface CalendarWeek {
   id: string;
   week: EpiWeek;
   days: CalendarDay[];
+  isThisWeek: boolean;
+  firstDay: Date;
 }
 
 export interface CalendarMonth {
@@ -32,10 +34,9 @@ function getCalendarPage(
   // ensure days starts on Sunday
   // and end on saturday
   const weeks: CalendarWeek[] = [];
+  const thisWeek = EpiWeek.thisWeek();
   while (date.getMonth() !== nextMonth || date.getDay() !== weekStart || weeks.length !== 6) {
-    if (date.getDay() === weekStart) {
-      weeks.unshift({ days: [], id: `${year}${month}${year}${weeks.length}`, week: EpiWeek.fromDate(date) });
-    }
+    const extraProps = dayProps(date);
     const updated = Object.assign(
       {
         partOfMonth: date.getMonth() === month,
@@ -44,8 +45,20 @@ function getCalendarPage(
         year: date.getFullYear(),
         date: new Date(date),
       },
-      dayProps(date),
+      extraProps,
     );
+
+    if (date.getDay() === weekStart) {
+      const week = EpiWeek.fromDate(date);
+      weeks.unshift({
+        days: [],
+        id: `${year}${month}${year}${weeks.length}`,
+        week,
+        isThisWeek: week.equals(thisWeek),
+        firstDay: date,
+        ...extraProps,
+      });
+    }
     weeks[0].days.push(updated);
     date.setDate(date.getDate() + 1);
   }
