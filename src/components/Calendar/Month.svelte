@@ -21,7 +21,7 @@
 
 <div class="month-container">
   {#each visibleMonth.weeks as week (week.id)}
-    <Week days={week.days} {selected} {highlighted} {shouldShakeDate} {direction} on:dateSelected />
+    <Week {week} {selected} {highlighted} {shouldShakeDate} {direction} on:dateSelected />
   {/each}
 </div>
 

@@ -6,17 +6,24 @@
   const dispatch = createEventDispatcher();
 
   /**
-   * @type {import('./lib/helpers').CalendarDay[]}
+   * @type {import('./lib/helpers').CalendarWeek}
    */
-  export let days;
+  export let week;
   export let selected;
   export let highlighted;
   export let shouldShakeDate;
   export let direction;
+
+  function toWeekString(week) {
+    return `W${week.week < 10 ? '0' : ''}${week.week}`;
+  }
 </script>
 
 <div class="week" in:fly|local={{ x: direction * 50, duration: 180, delay: 90 }} out:fade|local={{ duration: 180 }}>
-  {#each days as day}
+  <button class="day--label week--label disabled" type="button" disabled="disabled">
+    {toWeekString(week.week)}
+  </button>
+  {#each week.days as day}
     <div
       class="day"
       class:outside-month={!day.partOfMonth}
@@ -113,6 +120,11 @@
     cursor: pointer;
     transition: all 100ms linear;
     font-weight: normal;
+  }
+  .week--label {
+    width: unset;
+    border-radius: 3px;
+    margin: 2px;
   }
   .day--label.disabled {
     cursor: default;

@@ -273,6 +273,7 @@
         on:incrementMonth={(e) => incrementMonth(e.detail)}
       />
       <div class="legend">
+        <span />
         {#each sortedDaysOfWeek as day}<span>{day[1]}</span>{/each}
       </div>
       <Month
@@ -328,7 +329,7 @@
 
   @media (min-width: 480px) {
     .calendar {
-      width: 280px;
+      width: 300px;
       max-width: 100%;
     }
   }
@@ -337,10 +338,12 @@
     color: #4a4a4a;
     padding: 10px 0;
     margin-bottom: 5px;
+    display: flex;
+    justify-content: space-around;
   }
 
   .legend span {
-    width: 14.285714%;
+    width: 12.5%;
     display: inline-block;
     text-align: center;
   }
