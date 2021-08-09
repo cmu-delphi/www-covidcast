@@ -55,7 +55,7 @@ function getCalendarPage(
         id: `${year}${month}${year}${weeks.length}`,
         week,
         isThisWeek: week.equals(thisWeek),
-        firstDay: date,
+        firstDay: week.toDate(),
         ...extraProps,
       });
     }

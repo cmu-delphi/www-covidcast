@@ -39,7 +39,7 @@
   <LevelPicker {region} value={config.level} />
 {/if}
 {#if hasConfig.has('date')}
-  <DatePicker {date} value={config.date} />
+  <DatePicker {sensor} {date} value={config.date} />
 {/if}
 {#if hasConfig.has('timeFrame')}
   <TimeFramePicker {sensor} {date} value={config.timeFrame} />

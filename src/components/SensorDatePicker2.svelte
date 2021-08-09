@@ -4,7 +4,7 @@
   import arrowRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-circle-right.svg';
   import calendarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/calendar.svg';
   import { metaDataManager } from '../stores';
-  import { formatDateShortDayOfWeekAbbr, formatDateYearDayOfWeekAbbr } from '../formats';
+  import { formatDateShortDayOfWeekAbbr, formatDateYearDayOfWeekAbbr, formatWeek } from '../formats';
   import { timeDay } from 'd3-time';
 
   /**
@@ -27,9 +27,9 @@
 <div class="date-picker {className}">
   <button
     class="arrow-button picker-button arrow-left"
-    title="Go to the previous day"
+    title="Go to the previous {sensor.isWeeklySignal ? 'week' : 'day'}"
     disabled={value == null || value <= timeFrame.min}
-    on:click={() => (value = timeDay.offset(value, -1))}
+    on:click={() => (value = timeDay.offset(value, sensor.isWeeklySignal ? -7 : -1))}
   >
     {@html arrowLeftIcon}
   </button>
@@ -39,7 +39,8 @@
       bind:selected={value}
       start={timeFrame.min}
       end={timeFrame.max}
-      formattedSelected={formatDateShortDayOfWeekAbbr(value)}
+      pickWeek={sensor.isWeeklySignal}
+      formattedSelected={sensor.isWeeklySignal ? formatWeek(value) : formatDateShortDayOfWeekAbbr(value)}
     >
       <button
         aria-label="selected date"
@@ -50,7 +51,7 @@
         <span class="selected-date-icon">
           {@html calendarIcon}
         </span>
-        <span>{formatDateShortDayOfWeekAbbr(value)}</span>
+        <span>{sensor.isWeeklySignal ? formatWeek(value) : formatDateShortDayOfWeekAbbr(value)}</span>
       </button>
       <svelte:fragment slot="footer">
         {#if info}
@@ -60,9 +61,14 @@
               on:click={() => (value = info.maxTime)}
               class="uk-link-muted"
             >
-              {formatDateYearDayOfWeekAbbr(info.maxTime)}
+              {sensor.isWeeklySignal ? formatWeek(info.maxWeek) : formatDateYearDayOfWeekAbbr(info.maxTime)}
             </button>
-            updated on <span class="uk-text-nowrap">{formatDateYearDayOfWeekAbbr(info.maxIssue)}</span>.
+            updated on
+            <span class="uk-text-nowrap"
+              >{sensor.isWeeklySignal
+                ? formatWeek(info.maxIssueWeek)
+                : formatDateYearDayOfWeekAbbr(info.maxIssue)}</span
+            >.
           </p>
         {/if}
       </svelte:fragment>
@@ -72,14 +78,14 @@
       <span class="inline-svg-icon">
         {@html calendarIcon}
       </span>
-      <span>{formatDateShortDayOfWeekAbbr(value)}</span>
+      <span>{sensor.isWeeklySignal ? formatWeek(value) : formatDateShortDayOfWeekAbbr(value)}</span>
     </button>
   {/if}
   <button
     class="arrow-button picker-button arrow-right"
-    title="Go to the next day"
+    title="Go to the next {sensor.isWeeklySignal ? 'week' : 'day'}"
     disabled={value == null || value >= timeFrame.max}
-    on:click={() => (value = timeDay.offset(value, 1))}
+    on:click={() => (value = timeDay.offset(value, sensor.isWeeklySignal ? 7 : 1))}
   >
     {@html arrowRightIcon}
   </button>

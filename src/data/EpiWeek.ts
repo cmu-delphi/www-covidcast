@@ -66,7 +66,7 @@ export class EpiWeek {
   }
 
   toString(): string {
-    return `${this.year}W${this.week < 0 ? '0' : ''}${this.week}`;
+    return `${this.year}W${this.week < 10 ? '0' : ''}${this.week}`;
   }
 
   compareTo(other: EpiWeek): number {
@@ -75,6 +75,15 @@ export class EpiWeek {
 
   equals(other: EpiWeek): boolean {
     return this.compareTo(other) === 0;
+  }
+
+  includes(date: Date): boolean {
+    if (!date) {
+      return false;
+    }
+    const week = this.toDate();
+    const diff = timeDay.count(week, date);
+    return diff >= 0 && diff < 7;
   }
 }
 

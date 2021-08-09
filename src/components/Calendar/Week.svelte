@@ -28,9 +28,9 @@
     type="button"
     class:is-today={week.isThisWeek}
     class:is-disabled={!week.selectable}
-    class:selected={areDatesEquivalent(week.firstDay, selected)}
-    class:highlighted={areDatesEquivalent(week.firstDay, highlighted)}
-    class:shake-date={shouldShakeDate && areDatesEquivalent(week.firstDay, shouldShakeDate)}
+    class:selected={week.week.includes(selected)}
+    class:highlighted={week.week.includes(highlighted)}
+    class:shake-date={shouldShakeDate && week.week.includes(shouldShakeDate)}
     on:click={() => dispatch('dateSelected', week.firstDay)}
   >
     <div class="day--label week--label disabled">
