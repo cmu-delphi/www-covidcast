@@ -9,7 +9,21 @@
   export let end;
   export let canIncrementMonth;
   export let canDecrementMonth;
-  export let monthsOfYear;
+
+  export let monthsOfYear = [
+    ['January', 'Jan'],
+    ['February', 'Feb'],
+    ['March', 'Mar'],
+    ['April', 'Apr'],
+    ['May', 'May'],
+    ['June', 'Jun'],
+    ['July', 'Jul'],
+    ['August', 'Aug'],
+    ['September', 'Sep'],
+    ['October', 'Oct'],
+    ['November', 'Nov'],
+    ['December', 'Dec'],
+  ];
 
   let monthSelectorOpen = false;
   let availableMonths;
