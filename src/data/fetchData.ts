@@ -32,7 +32,7 @@ export function parseData(
       continue;
     }
     if (!(row.date_value instanceof Date)) {
-      const [d, w] = parseAPIDateAndWeek(row.time_value);
+      const { date: d, week: w } = parseAPIDateAndWeek(row.time_value);
       row.date_value = d;
       row.week_value = w;
     } else if (!(row.week_value instanceof EpiWeek)) {
@@ -62,6 +62,7 @@ export async function fetchSampleSizesNationSummary(dataSensor: {
   signal: string;
 }): Promise<NationSummarySamples> {
   const data = await callAPI(
+    'day',
     new SourceSignalPair(dataSensor.id, dataSensor.signal),
     new GeoPair('nation', 'us'),
     new TimePair('day', new TimeFrame(START_TIME_RANGE, END_TIME_RANGE)),

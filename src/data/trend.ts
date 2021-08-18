@@ -1,5 +1,9 @@
 import type { Sensor } from '../stores/constants';
-import type { EpiDataTrendRow } from './api';
+import { callTrendAPI, EpiDataTrendRow, FieldSpec } from './api';
+import { GeoPair, SourceSignalPair } from './apimodel';
+import type { Region } from './regions';
+import { splitDailyWeekly } from './sensor';
+import type { TimeFrame } from './TimeFrame';
 import { parseAPITime } from './utils';
 
 export interface SensorDateTrend {
@@ -149,4 +153,29 @@ export function asSensorTrend(
   t.worst = highValuesAre === 'good' ? t.min : t.max;
   t.worstDate = highValuesAre === 'good' ? t.minDate : t.maxDate;
   return t;
+}
+
+export function fetchTrend(
+  signal: Sensor | Sensor[],
+  region: Region | Region[],
+  date: Date,
+  window: TimeFrame,
+  fields?: FieldSpec<EpiDataTrendRow>,
+): Promise<EpiDataTrendRow[]> {
+  const geo = Array.isArray(region) ? GeoPair.fromArray(region) : GeoPair.from(region);
+  if (!Array.isArray(signal)) {
+    return callTrendAPI(
+      signal.isWeeklySignal ? 'week' : 'day',
+      SourceSignalPair.from(signal),
+      geo,
+      date,
+      window,
+      fields,
+    );
+  }
+  return Promise.all(
+    splitDailyWeekly(signal).map(({ type, sensors }) =>
+      sensors.length === 0 ? [] : callTrendAPI(type, SourceSignalPair.fromArray(sensors), geo, date, window, fields),
+    ),
+  ).then((r) => ([] as EpiDataTrendRow[]).concat(...r));
 }

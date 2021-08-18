@@ -42,7 +42,7 @@
    */
   function buildTableData(context, region, date) {
     loading = true;
-    const others = sensorList.filter((d) => d.key !== context.key);
+    const others = sensorList.filter((d) => d.key !== context.key && d.isWeeklySignal === context.isWeeklySignal);
     const metrics = fetchCorrelationSummaries(context.value, others, region.value, date.windowTimeFrame);
     metrics
       .then(() => tick())

@@ -1,7 +1,8 @@
-import { formatAPITime } from './utils';
+import { formatAPITime, formatAPIWeekTime } from './utils';
 import type { RegionLevel } from './regions';
 import type { TimeFrame } from './TimeFrame';
 import { GeoPair, isArray, SourceSignalPair, TimePair } from './apimodel';
+import type { EpiWeek } from './EpiWeek';
 
 declare const process: { env: Record<string, string> };
 
@@ -75,6 +76,7 @@ function fetchImpl<T>(url: URL, fields?: readonly string[] | { exclude: readonly
 export type FieldSpec<T> = readonly (keyof T)[] | { exclude: readonly (keyof T)[] };
 
 export function callAPI(
+  type: 'day' | 'week',
   signal: SourceSignalPair | readonly SourceSignalPair[],
   geo: GeoPair | readonly GeoPair[],
   time: TimePair | readonly TimePair[],
@@ -86,7 +88,7 @@ export function callAPI(
   addParam(url, 'geo', geo);
   addParam(url, 'time', time);
   if (asOf) {
-    url.searchParams.set('as_of', formatAPITime(asOf));
+    url.searchParams.set('as_of', type == 'day' ? formatAPITime(asOf) : formatAPIWeekTime(asOf));
   }
   url.searchParams.set('format', 'json');
   return fetchImpl<EpiDataJSONRow[]>(url, fields).catch((error) => {
@@ -119,6 +121,7 @@ export interface EpiDataTrendRow {
 }
 
 export function callTrendAPI(
+  type: 'week' | 'day',
   signal: SourceSignalPair | readonly SourceSignalPair[],
   geo: GeoPair | readonly GeoPair[],
   date: Date,
@@ -128,8 +131,8 @@ export function callTrendAPI(
   const url = new URL(ENDPOINT + '/covidcast/trend');
   addParam(url, 'signal', signal);
   addParam(url, 'geo', geo);
-  url.searchParams.set('date', formatAPITime(date));
-  url.searchParams.set('window', window.range);
+  url.searchParams.set('date', type === 'day' ? formatAPITime(date) : formatAPIWeekTime(date));
+  url.searchParams.set('window', window.asTypeRange(type));
 
   url.searchParams.set('format', 'json');
   return fetchImpl<EpiDataTrendRow[]>(url, fields).catch((error) => {
@@ -139,6 +142,7 @@ export function callTrendAPI(
 }
 
 export function callTrendSeriesAPI(
+  type: 'week' | 'day',
   signal: SourceSignalPair | readonly SourceSignalPair[],
   geo: GeoPair | readonly GeoPair[],
   window: TimeFrame,
@@ -151,7 +155,7 @@ export function callTrendSeriesAPI(
   if (basis != null) {
     url.searchParams.set('basis', basis.toString());
   }
-  url.searchParams.set('window', window.range);
+  url.searchParams.set('window', window.asTypeRange(type));
 
   url.searchParams.set('format', 'json');
   return fetchImpl<EpiDataTrendRow[]>(url, fields).catch((error) => {
@@ -186,6 +190,7 @@ export interface EpiDataCorrelationRow {
 }
 
 export function callCorrelationAPI(
+  type: 'week' | 'day',
   reference: SourceSignalPair,
   others: SourceSignalPair | readonly SourceSignalPair[],
   geo: GeoPair | readonly GeoPair[],
@@ -197,7 +202,7 @@ export function callCorrelationAPI(
   url.searchParams.set('reference', reference.toString());
   addParam(url, 'others', others);
   addParam(url, 'geo', geo);
-  url.searchParams.set('window', window.range);
+  url.searchParams.set('window', window.asTypeRange(type));
   if (lag != null) {
     url.searchParams.set('lag', lag.toString());
   }
@@ -337,7 +342,14 @@ export interface CoverageRow {
   count: number;
 }
 
+export interface ParsedCoverageRow extends CoverageRow {
+  date: Date;
+  week: EpiWeek;
+  fraction: number;
+}
+
 export function callCoverageAPI(
+  type: 'day' | 'week',
   signal: SourceSignalPair | readonly SourceSignalPair[],
   level?: RegionLevel | 'only-county',
   days?: number,
@@ -348,7 +360,7 @@ export function callCoverageAPI(
     url.searchParams.set('geo_type', level);
   }
   if (typeof days === 'number') {
-    url.searchParams.set('days', days.toString());
+    url.searchParams.set(type == 'day' ? 'days' : 'weeks', days.toString());
   }
   url.searchParams.set('format', 'json');
   return fetchImpl<CoverageRow[]>(url).catch((error) => {

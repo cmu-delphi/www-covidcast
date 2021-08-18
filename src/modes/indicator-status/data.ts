@@ -1,13 +1,14 @@
 import { timeDay } from 'd3-time';
-import { callBackfillAPI, callCoverageAPI, CoverageRow, EpiDataBackfillRow } from '../../data/api';
+import { callBackfillAPI, callCoverageAPI, CoverageRow, EpiDataBackfillRow, ParsedCoverageRow } from '../../data/api';
 import { GeoPair, SourceSignalPair, TimePair } from '../../data/apimodel';
 import type { EpiDataMetaParsedInfo, MetaDataManager, SensorLike, SensorSource } from '../../data/meta';
 import { countyInfo } from '../../data/regions';
-import { parseAPITime, toTimeValue } from '../../data/utils';
+import { parseAPIDateAndWeek, parseAPITime, toTimeValue } from '../../data/utils';
 import { Sensor, TimeFrame } from '../../stores/params';
 import { addNameInfos, EpiDataRow } from '../../data';
 import fetchTriple from '../../data/fetchTriple';
 import type { RegionInfo } from '../../data/regions';
+import { splitDailyWeekly } from '../../data/sensor';
 
 export interface SourceData extends SensorSource {
   ref: Sensor;
@@ -15,7 +16,7 @@ export interface SourceData extends SensorSource {
   latest_data?: Date | null;
   latest_lag?: number | null;
   latest_coverage?: number | null;
-  coverages: CoverageRow[];
+  coverages: ParsedCoverageRow[];
 }
 
 export function toLagToToday(meta?: EpiDataMetaParsedInfo | null): number | null {
@@ -50,35 +51,48 @@ export function loadData(
   const initial = toInitialData(sources, manager);
   const days = 20;
   const domain = determineDomain(initial, days);
-  const loaded = callCoverageAPI(SourceSignalPair.fromArray(initial.map((d) => d.ref)), 'only-county', days).then(
-    (coverages) => {
+
+  const sensors = initial.map((d) => d.ref);
+  const [day, week] = splitDailyWeekly(sensors);
+  const loaded = Promise.all([
+    day.sensors.length === 0
+      ? []
+      : callCoverageAPI(day.type, SourceSignalPair.fromArray(day.sensors), 'only-county', days),
+    week.sensors.length === 0
+      ? []
+      : callCoverageAPI(week.type, SourceSignalPair.fromArray(week.sensors), 'only-county', days),
+  ])
+    .then((r) => ([] as CoverageRow[]).concat(...r))
+    .then((coverages) => {
       return initial.map((r) => {
-        const sourceCoverages = coverages.filter((d) => d.source == r.source && d.signal == r.referenceSensor?.signal);
+        const sourceCoverages: ParsedCoverageRow[] = coverages
+          .filter((d) => d.source == r.source && d.signal == r.referenceSensor?.signal)
+          .map((d) => ({
+            ...d,
+            ...parseAPIDateAndWeek(d.time_value),
+            fraction: d.count / countyInfo.length,
+          }));
         return {
           ...r,
           latest_coverage: findLatestCoverage(r.latest_data, sourceCoverages),
-          coverages: sourceCoverages.map((d) => ({
-            ...d,
-            date: parseAPITime(d.time_value),
-            fraction: d.count / countyInfo.length,
-          })),
+          coverages: sourceCoverages,
         };
       });
-    },
-  );
+    });
   return { initial, loaded, domain };
 }
 
-export function findLatestCoverage(latest: Date | null | undefined, coverages: CoverageRow[]): number | null {
+export function findLatestCoverage(latest: Date | null | undefined, coverages: ParsedCoverageRow[]): number | null {
   if (!coverages || !latest) {
     return null;
   }
   const time = toTimeValue(latest);
-  const latestEntry = coverages.find((d) => d.time_value === time);
+  // d.time_value could be a week
+  const latestEntry = coverages.find((d) => toTimeValue(d.date) === time);
   if (!latestEntry) {
     return null;
   }
-  return latestEntry.count / countyInfo.length;
+  return latestEntry.fraction;
 }
 
 function determineDomain(data: SourceData[], days: number): TimeFrame {
@@ -107,11 +121,11 @@ export function getAvailableCounties(ref: Sensor | null, date: Date): Promise<(E
   }).then((rows) => addNameInfos(rows).filter((d) => d.level === 'county')); // no mega-counties
 }
 
-export function fetchCoverage(ref: Sensor): Promise<(CoverageRow & { date: Date; fraction: number })[]> {
-  return callCoverageAPI(SourceSignalPair.from(ref), 'only-county').then((cov) =>
+export function fetchCoverage(ref: Sensor): Promise<ParsedCoverageRow[]> {
+  return callCoverageAPI(ref.isWeeklySignal ? 'week' : 'day', SourceSignalPair.from(ref), 'only-county').then((cov) =>
     cov.map((d) => ({
       ...d,
-      date: parseAPITime(d.time_value),
+      ...parseAPIDateAndWeek(d.time_value),
       fraction: d.count / countyInfo.length,
     })),
   );

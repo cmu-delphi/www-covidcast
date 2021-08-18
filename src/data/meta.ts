@@ -56,13 +56,13 @@ function parse(d: EpiDataMetaInfo): EpiDataMetaParsedInfo {
   const maxIssue = parseAPIDateAndWeek(d.max_issue);
   return {
     ...d,
-    maxIssue: maxIssue[0],
-    maxIssueWeek: maxIssue[1],
-    minTime: minTime[0],
-    minWeek: minTime[1],
-    maxTime: maxTime[0],
-    maxWeek: maxTime[1],
-    timeFrame: new TimeFrame(minTime[0], maxTime[0], minTime[1], maxTime[1]),
+    maxIssue: maxIssue.date,
+    maxIssueWeek: maxIssue.week,
+    minTime: minTime.date,
+    minWeek: minTime.week,
+    maxTime: maxTime.date,
+    maxWeek: maxTime.week,
+    timeFrame: new TimeFrame(minTime.date, maxTime.date, minTime.week, maxTime.week),
   };
 }
 
