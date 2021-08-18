@@ -1,7 +1,7 @@
 import { formatter, formatSpecifiers } from '../formats';
 import { interpolateBuPu, interpolateYlGnBu, interpolateYlOrRd } from 'd3-scale-chromatic';
 import { getDataSource } from './dataSourceLookup';
-import type { RegionLevel } from './regions';
+import { defaultCountyRegion, defaultStateRegion, nationInfo, Region, RegionLevel } from './regions';
 import type { SignalCategory, SignalFormat, SignalHighValuesAre } from './api';
 import { isArray } from './apimodel';
 
@@ -198,4 +198,17 @@ export function splitDailyWeekly<T extends { isWeeklySignal?: boolean }>(
     { type: 'day', sensors: day },
     { type: 'week', sensors: week },
   ];
+}
+
+export function resolveDefaultRegion(sensor: Sensor): Region {
+  if (sensor.levels.includes('nation')) {
+    return nationInfo;
+  }
+  if (sensor.levels.includes('state')) {
+    return defaultStateRegion;
+  }
+  if (sensor.levels.includes('county')) {
+    return defaultCountyRegion;
+  }
+  return nationInfo;
 }

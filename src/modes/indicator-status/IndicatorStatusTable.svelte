@@ -1,7 +1,7 @@
 <script>
   import SortColumnIndicator, { SortHelper } from '../../components/SortColumnIndicator.svelte';
   import FancyHeader from '../../components/FancyHeader.svelte';
-  import { formatDateISO, formatDateShortNumbers, formatFraction } from '../../formats';
+  import { formatDateISO, formatDateShortNumbers, formatFraction, formatWeek } from '../../formats';
   import DownloadMenu from '../../components/DownloadMenu.svelte';
   import Vega from '../../components/vega/Vega.svelte';
   import { generateSparkLine } from '../../specs/lineSpec';
@@ -90,10 +90,10 @@
         <SortColumnIndicator label="Name" {sort} prop="name" />
       </th>
       <th class="sort-indicator">
-        <SortColumnIndicator label="Latest Issue Date" {sort} prop="latest_issue" />
+        <SortColumnIndicator label="Latest Issue" {sort} prop="latest_issue" />
       </th>
       <th class="sort-indicator">
-        <SortColumnIndicator label="Latest Data Date" {sort} prop="latest_time_value" />
+        <SortColumnIndicator label="Latest Data" {sort} prop="latest_time_value" />
       </th>
       <th class="sort-indicator">
         <SortColumnIndicator label="Lag" {sort} prop="latest_lag" />
@@ -116,13 +116,13 @@
           <div class="source">API: {r.source}</div>
         </td>
         <td class="uk-text-right uk-text-nowrap">
-          {formatDateISO(r.latest_issue)}
+          {r.ref.isWeeklySignal ? formatWeek(r.latest_issue_week) : formatDateISO(r.latest_issue)}
         </td>
         <td class="uk-text-right uk-text-nowrap">
-          {formatDateISO(r.latest_data)}
+          {r.ref.isWeeklySignal ? formatWeek(r.latest_data_week) : formatDateISO(r.latest_data)}
         </td>
         <td class="uk-text-right uk-text-nowrap">
-          {r.latest_lag.toLocaleString()} days
+          {r.latest_lag}
         </td>
         <td class="uk-text-right uk-text-nowrap">
           {formatFraction(r.latest_coverage)}

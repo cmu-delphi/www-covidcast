@@ -280,3 +280,6 @@ export function getStatesOfHHS(hhs: HHSInfo): StateInfo[] {
   }
   return (hhs.states ?? []).map((d) => getInfoByName(d, 'state') as StateInfo);
 }
+
+export const defaultStateRegion = getInfoByName('PA', 'state')!;
+export const defaultCountyRegion = getInfoByName('42003', 'county')!;

@@ -1,7 +1,7 @@
 import { timeDay } from 'd3-time';
 import type { EpiDataRow } from '.';
 import { formatDateLocal } from '../formats';
-import { EpiWeek, weekRange } from './EpiWeek';
+import { EpiWeek } from './EpiWeek';
 import { parseAPITime, toTimeValue } from './utils';
 
 export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
@@ -91,10 +91,7 @@ export class TimeFrame {
     if (type == 'day') {
       return this.range;
     }
-    // TODO hack since api has a bug for week ranges
-    return weekRange(this.min_week, this.max_week, true)
-      .map((d) => d.format())
-      .join(',');
+    return this.week_range;
   }
 }
 

@@ -19,12 +19,12 @@
     generateValueHeatMapSpec,
     backFillDayOfWeekFrequency,
   } from './backfillSpec';
-  import { nationInfo } from '../../data/regions';
   import OptionPicker from '../../components/OptionPicker.svelte';
   import { timeMonth } from 'd3-time';
   import BackfillTooltip from './BackfillTooltip.svelte';
   import AboutSection from '../../components/AboutSection.svelte';
   import { metaDataManager } from '../../stores';
+  import { resolveDefaultRegion } from '../../data/sensor';
 
   /**
    * @type {import('../../data/sensor').Sensor}
@@ -34,8 +34,9 @@
   export let region;
 
   $: date = $metaDataManager.getTimeFrame(sensor).max;
+  $: defaultRegion = resolveDefaultRegion(sensor);
   $: window = new TimeFrame(timeMonth.offset(date, -WINDOW_SIZE), date);
-  $: title = `${sensor.name} Backfill Profile in ${(region || nationInfo).displayName}`;
+  $: title = `${sensor.name} Backfill Profile in ${(region || defaultRegion).displayName}`;
 
   $: options = {
     valueField: $valueField,
@@ -56,7 +57,7 @@
         title: `${sensor.name}: ${$valueLabel}`,
         ...options,
       });
-  $: data = loadBackFillProfile(sensor, region || nationInfo, window, $anchorLag);
+  $: data = loadBackFillProfile(sensor, region || defaultRegion, window, $anchorLag);
 
   $: dayOfWeekSpec = backFillDayOfWeekDistribution({
     title: `${sensor.name}: ${$valueLabel}`,

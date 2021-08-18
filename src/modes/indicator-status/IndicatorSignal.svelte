@@ -9,7 +9,7 @@
   import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
   import DataAnomalies from './DataAnomalies.svelte';
   import IndicatorData from './IndicatorData.svelte';
-  import { formatDateISO } from '../../formats';
+  import { formatDateISO, formatWeek } from '../../formats';
   import KPI from '../../components/KPI.svelte';
   import { toLagToToday } from './data';
   import SensorBadges from '../../components/SensorBadges.svelte';
@@ -24,6 +24,10 @@
   }
   $: metaData = $metaDataManager.getMetaData(sensor);
   $: name = sensor ? sensor.name : 'Signal';
+
+  function formatDateOrWeek(sensor, date, week) {
+    return sensor.isWeeklySignal ? formatWeek(week) : formatDateISO(date);
+  }
 </script>
 
 <div class="mobile-root">
@@ -111,25 +115,25 @@
         </div>
         <div>
           <div>
-            <KPI text={formatDateISO(metaData ? metaData.minTime : null)} />
+            <KPI text={metaData ? formatDateOrWeek(sensor, metaData.minTime, metaData.minWeek) : '?'} />
           </div>
           <div class="sub">First Data Available</div>
         </div>
         <div>
           <div>
-            <KPI text={formatDateISO(metaData ? metaData.maxTime : null)} />
+            <KPI text={metaData ? formatDateOrWeek(sensor, metaData.maxTime, metaData.maxWeek) : '?'} />
           </div>
           <div class="sub">Latest Data Available</div>
         </div>
         <div>
           <div>
-            <KPI text="{toLagToToday(metaData)} days" />
+            <KPI text={toLagToToday(metaData)} />
           </div>
           <div class="sub">Lag to Today</div>
         </div>
         <div class="mobile-kpi">
           <div>
-            <KPI text={formatDateISO(metaData ? metaData.maxIssue : null)} />
+            <KPI text={metaData ? formatDateOrWeek(sensor, metaData.maxIssue, metaData.maxIssueWeek) : '?'} />
           </div>
           <div class="sub">Latest Issue</div>
         </div>

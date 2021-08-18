@@ -9,19 +9,35 @@ import { addNameInfos, EpiDataRow } from '../../data';
 import fetchTriple from '../../data/fetchTriple';
 import type { RegionInfo } from '../../data/regions';
 import { splitDailyWeekly } from '../../data/sensor';
+import { EpiWeek, weekRange } from '../../data/EpiWeek';
 
 export interface SourceData extends SensorSource {
   ref: Sensor;
   latest_issue?: Date | null;
+  latest_issue_week?: EpiWeek | null;
   latest_data?: Date | null;
-  latest_lag?: number | null;
+  latest_data_week?: EpiWeek | null;
+  latest_lag: string;
   latest_coverage?: number | null;
   coverages: ParsedCoverageRow[];
 }
 
-export function toLagToToday(meta?: EpiDataMetaParsedInfo | null): number | null {
-  const now = new Date();
-  return meta?.maxTime != null ? timeDay.count(meta.maxTime, now) : null;
+export function toLagToToday(meta?: EpiDataMetaParsedInfo | null): string {
+  if (!meta) {
+    return '?';
+  }
+  if (meta.time_type == 'day') {
+    const now = new Date();
+    const range = timeDay.count(meta.maxTime, now);
+    return meta.maxTime != null ? `${range} day${range !== 1 ? 's' : ''}` : '?';
+  }
+  if (!meta.maxWeek) {
+    return '?';
+  }
+  // week
+  const nowWeek = EpiWeek.thisWeek();
+  const range = weekRange(meta.maxWeek, nowWeek).length;
+  return `${range} week${range !== 1 ? 's' : ''}`;
 }
 
 function toInitialData(sources: SensorSource[], manager: MetaDataManager): SourceData[] {
@@ -32,7 +48,9 @@ function toInitialData(sources: SensorSource[], manager: MetaDataManager): Sourc
       ...source,
       ref,
       latest_issue: meta?.maxIssue,
+      latest_issue_week: meta?.maxIssueWeek,
       latest_data: meta?.maxTime,
+      latest_data_week: meta?.maxWeek,
       latest_lag: toLagToToday(meta),
       latest_coverage: null,
       coverages: [],
@@ -138,14 +156,14 @@ export interface ProfileEntry extends EpiDataBackfillRow {
 }
 
 export function loadBackFillProfile(
-  sensor: SensorLike,
+  sensor: SensorLike & { isWeeklySignal?: boolean },
   region: RegionInfo,
   window: TimeFrame,
   referenceAnchorLag = 60,
 ): Promise<ProfileEntry[]> {
   return callBackfillAPI(
     SourceSignalPair.from(sensor),
-    new TimePair('day', window),
+    new TimePair(sensor.isWeeklySignal ? 'week' : 'day', window),
     GeoPair.from(region),
     referenceAnchorLag,
   ).then((rows) => {

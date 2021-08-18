@@ -3,7 +3,7 @@
   import { DEFAULT_SENSOR } from '../../stores/constants';
   import AboutSection from '../../components/AboutSection.svelte';
   import FancyHeader from '../../components/FancyHeader.svelte';
-  import { formatDateISO } from '../../formats';
+  import { formatDateISO, formatWeek } from '../../formats';
   import KPI from '../../components/KPI.svelte';
   import KPIValue from '../../components/KPIValue.svelte';
   import IndicatorCoverageChart from './IndicatorCoverageChart.svelte';
@@ -19,6 +19,7 @@
   $: resolvedSource = $metaDataManager.getSource($currentSensor) || $metaDataManager.getSource(DEFAULT_SENSOR);
 
   $: referenceSignal = resolvedSource.referenceSensor;
+  $: isRefWeekly = referenceSignal ? referenceSignal.isWeeklySignal : false;
   $: referenceMetaData = referenceSignal ? $metaDataManager.getMetaData(referenceSignal) : null;
 
   $: coverage = referenceSignal ? fetchCoverage(referenceSignal) : Promise.resolve([]);
@@ -96,19 +97,27 @@
       <div class="mobile-two-col">
         <div>
           <div>
-            <KPI text={formatDateISO(referenceMetaData ? referenceMetaData.maxTime : null)} />
+            <KPI
+              text={isRefWeekly
+                ? formatWeek(referenceMetaData ? referenceMetaData.maxWeek : null)
+                : formatDateISO(referenceMetaData ? referenceMetaData.maxTime : null)}
+            />
           </div>
           <div class="sub">Latest Data Available</div>
         </div>
         <div>
           <div>
-            <KPI text="{toLagToToday(referenceMetaData)} days" />
+            <KPI text={toLagToToday(referenceMetaData)} />
           </div>
           <div class="sub">Lag to Today</div>
         </div>
         <div class="mobile-kpi">
           <div>
-            <KPI text={formatDateISO(referenceMetaData ? referenceMetaData.maxIssue : null)} />
+            <KPI
+              text={isRefWeekly
+                ? formatWeek(referenceMetaData ? referenceMetaData.maxIssueWeek : null)
+                : formatDateISO(referenceMetaData ? referenceMetaData.maxIssue : null)}
+            />
           </div>
           <div class="sub">Latest Issue</div>
         </div>
