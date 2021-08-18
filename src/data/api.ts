@@ -257,6 +257,7 @@ export type SignalFormat = 'raw' | 'percent' | 'fraction' | 'per100k' | 'count';
 export type SignalHighValuesAre = 'good' | 'bad' | 'neutral';
 
 export interface EpiDataMetaInfo {
+  active: boolean;
   source: string;
   signal: string;
   name: string;
@@ -304,7 +305,6 @@ export const KNOWN_LICENSES = {
 };
 
 export interface EpiDataMetaSourceInfo {
-  active: boolean;
   source: string;
   name: string;
   description: string;
@@ -326,7 +326,7 @@ export function callMetaAPI(
   addParam(url, 'signal', signal);
   return fetchImpl<EpiDataMetaSourceInfo[]>(url).catch((error) => {
     console.warn('failed fetching data', error);
-    return [];
+    return [] as EpiDataMetaSourceInfo[];
   });
 }
 

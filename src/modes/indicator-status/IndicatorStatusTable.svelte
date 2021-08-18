@@ -12,7 +12,9 @@
 
   const dispatch = createEventDispatcher();
 
-  $: sources = $metaDataManager.metaSources.filter((d) => d.referenceSensor != null && d.active);
+  $: sources = $metaDataManager.metaSources.filter(
+    (d) => d.referenceSensor != null && (d.active || d.sensors.some((s) => s.active)),
+  );
 
   const date = new Date();
 

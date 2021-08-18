@@ -6,7 +6,7 @@
   import SensorBadges from '../../components/SensorBadges.svelte';
   import { modeByID } from '..';
   import GeoLevelBadge from '../../components/GeoLevelBadge.svelte';
-  import { formatDateISO } from '../../formats';
+  import { formatDateISO, formatWeek } from '../../formats';
 
   /**
    * @type {import('../../data/meta').SensorSource}
@@ -20,10 +20,15 @@
       ...sensor,
       minTime: meta.min,
       maxTime: meta.max,
+      minWeek: meta.min_week,
+      maxWeek: meta.max_week,
     };
   }
 
-  $: sortedData = source.sensors.map(fullEntry).sort($sort.comparator);
+  $: sortedData = source.sensors
+    .filter((d) => d.active !== false)
+    .map(fullEntry)
+    .sort($sort.comparator);
 
   function select(signal) {
     currentSensor.set(signal.key);
@@ -69,10 +74,10 @@
           <div><SensorBadges sensor={r} source={false} /></div>
         </td>
         <td class="uk-text-nowrap">
-          {formatDateISO(r.minTime)}
+          {r.isWeeklySignal ? formatWeek(r.minWeek) : formatDateISO(r.minTime)}
         </td>
         <td class="uk-text-nowrap uk">
-          {formatDateISO(r.maxTime)}
+          {r.isWeeklySignal ? formatWeek(r.minWeek) : formatDateISO(r.maxTime)}
         </td>
         <td>
           {#each $metaDataManager.getLevels(r) as level}
