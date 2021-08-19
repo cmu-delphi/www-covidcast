@@ -361,7 +361,7 @@
       </section>
 
       <section class="uk-margin-large-top">
-        <FancyHeader sub="Data" normal>3. Get</FancyHeader>
+        <FancyHeader sub="Data" normal>4. Get</FancyHeader>
         <p>
           {@html sensor && sensor.credits ? sensor.credits : ''}
         </p>
