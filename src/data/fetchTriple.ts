@@ -103,7 +103,7 @@ export default function fetchTriple<
   sensor: S | readonly S[],
   region: Region | RegionLevel | readonly Region[],
   date: TimeFrame | Date,
-  { advanced = false, stderr = true, asOf = null as null | Date } = {},
+  { advanced = false, stderr = true, asOf = null as null | Date | EpiWeek } = {},
 ): Promise<EpiDataRow[]> {
   const transfer: (keyof EpiDataJSONRow)[] = ['value'];
   if (stderr) {
@@ -111,6 +111,13 @@ export default function fetchTriple<
   }
   if (advanced) {
     transfer.push('sample_size', 'issue');
+  }
+
+  function fixAsOf() {
+    if (asOf instanceof EpiWeek) {
+      return asOf.toDate();
+    }
+    return asOf;
   }
 
   function fetchImpl(
@@ -131,7 +138,7 @@ export default function fetchTriple<
       typedTransfer.push('time_value');
     }
     return callAPI(type, sourceSignalPairs, geoPairs, new TimePair(type, date), typedTransfer, {
-      asOf,
+      asOf: fixAsOf(),
     }).then((rows) => parseData(rows, typedMixinValues, factor));
   }
 

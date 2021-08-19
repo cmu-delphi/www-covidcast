@@ -17,6 +17,7 @@
   import { formatDateISO } from '../../formats';
   import { SensorParam } from '../../stores/params';
   import { throttle } from 'lodash';
+  import { EpiWeek } from '../../data/EpiWeek';
 
   /**
    * @type {import('../../data/sensor').Sensor}
@@ -80,7 +81,7 @@
     if (!asOf) {
       return latest;
     }
-    const asOfDate = timeDay.floor(new Date(asOf));
+    const asOfDate = sensor.isWeeklySignal ? EpiWeek.parse(asOf) : timeDay.floor(new Date(asOf));
     const asOfFetcher = new DataFetcher(asOfDate);
 
     const asOfData = asOfFetcher.fetch1Sensor1RegionNDates(sensor, region, timeFrame, { advanced: true }).then((rows) =>
@@ -174,7 +175,14 @@
       <div>
         <span>
           {region.displayName} (as of
-          <input type="date" class="option-picker-input" bind:value={asOfValueBounced} />)
+          {#if sensor.isWeeklySignal}
+            <input
+              class="option-picker-input"
+              bind:value={asOfValueBounced}
+              pattern="\d\d\d\dW?\d\d"
+              placeholder="Epiweek (e.g., 2021W22)"
+            />{:else}
+            <input type="date" class="option-picker-input" bind:value={asOfValueBounced} />{/if})
         </span>
       </div>
       <div>

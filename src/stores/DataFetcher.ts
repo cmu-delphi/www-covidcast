@@ -1,6 +1,7 @@
 import { addMissing, addNameInfos, EpiDataRow, parseAPITime } from '../data';
 import { callTrendSeriesAPI } from '../data/api';
 import { fixLevel, GeoPair, SourceSignalPair } from '../data/apimodel';
+import type { EpiWeek } from '../data/EpiWeek';
 import fetchTriple from '../data/fetchTriple';
 import type { RegionInfo, RegionLevel } from '../data/regions';
 import type { Sensor } from '../data/sensor';
@@ -20,7 +21,7 @@ export class DataFetcher {
   private primaryTimeValue = 0;
   private primaryWindowRange = '';
 
-  constructor(public readonly asOf: Date | null = null) {}
+  constructor(public readonly asOf: Date | EpiWeek | null = null) {}
 
   toDateKey(sensor: Sensor, region: { id: string; level: string }, date: DateParam, suffix = ''): string {
     const s = this.primarySensorKey === sensor.key ? 'SENSOR' : sensor.key;

@@ -39,6 +39,7 @@
         class="uk-input"
         pattern="\d\d\d\dWW?\d\d"
         value={formatWeek(date.windowTimeFrame.min_week)}
+        placeholder="Epiweek (e.g., 2021W22)"
         disabled
         readonly
       />
@@ -46,6 +47,7 @@
         class="uk-input"
         pattern="\d\d\d\dWW?\d\d"
         value={formatWeek(date.windowTimeFrame.max_week)}
+        placeholder="Epiweek (e.g., 2021W22)"
         disabled
         readonly
       />
@@ -55,6 +57,7 @@
         class="uk-input"
         pattern="\d\d\d\dWW?\d\d"
         value={formatDateISO(date.windowTimeFrame.min)}
+        placeholder="Epiweek (e.g., 2021W22)"
         disabled
         readonly
       />
@@ -68,6 +71,7 @@
         class="uk-input"
         pattern="\d\d\d\dWW?\d\d"
         value={formatWeek(sensor.timeFrame.min_week)}
+        placeholder="Epiweek (e.g., 2021W22)"
         disabled
         readonly
       />
@@ -75,6 +79,7 @@
         class="uk-input"
         pattern="\d\d\d\dWW?\d\d"
         value={formatWeek(sensor.timeFrame.max_week)}
+        placeholder="Epiweek (e.g., 2021W22)"
         disabled
         readonly
       />

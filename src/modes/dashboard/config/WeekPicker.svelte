@@ -24,6 +24,7 @@
       class="uk-input"
       value={value || formatWeek(date.week)}
       pattern="\d\d\d\dW?\d\d"
+      placeholder="Epiweek (e.g., 2021W22)"
       name="date"
     />
   {/if}
