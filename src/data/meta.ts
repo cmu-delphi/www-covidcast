@@ -102,6 +102,7 @@ function generateCredits(license: EpiDataMetaSourceInfo['license']) {
 
 export interface SensorSensor extends Sensor {
   meta: EpiDataMetaParsedInfo;
+  active: boolean;
 }
 
 export interface SensorSource
@@ -162,6 +163,7 @@ function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
         key: toKey(m.source, m.signal),
         id: m.source,
         signal: m.signal,
+        active: m.active,
         name: m.name,
         description: m.description ? parseMarkDown(m.description.trim()) : '',
         signalTooltip: m.short_description ? parseInline(m.short_description) : '',
