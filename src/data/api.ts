@@ -283,6 +283,7 @@ export interface EpiDataMetaInfo {
   based_on_other: boolean;
   signal_basename: string;
 
+  time_type: 'week' | 'day';
   time_label: string;
   value_label: string;
 

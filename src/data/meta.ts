@@ -157,37 +157,39 @@ function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
 } {
   const sources = metadata.map((sm): SensorSource => {
     const credits = generateCredits(sm.license);
-    const sensors: SensorSensor[] = sm.signals.map((m) => {
-      const parsed = parse(m);
-      const s: SensorSensor = {
-        key: toKey(m.source, m.signal),
-        id: m.source,
-        signal: m.signal,
-        active: m.active,
-        name: m.name,
-        description: m.description ? parseMarkDown(m.description.trim()) : '',
-        signalTooltip: m.short_description ? parseInline(m.short_description) : '',
-        valueScaleFactor: m.format === 'fraction' ? 100 : 1,
-        format: m.format ?? 'raw',
-        highValuesAre: m.high_values_are ?? 'neutral',
-        hasStdErr: m.has_stderr,
-        is7DayAverage: m.is_smoothed,
-        dataSourceName: sm.name,
-        levels: Object.keys(m.geo_types) as RegionLevel[],
-        type: m.category ?? 'other',
-        xAxis: m.time_label,
-        yAxis: m.value_label || yAxis[m.format] || yAxis.raw,
-        unit: units[m.format] || units.raw,
-        colorScale: colorScales[m.high_values_are],
-        vegaColorScale: vegaColorScales[m.high_values_are],
-        links: sm.link.map((d) => `<a href="${d.href}">${d.alt}</a>`),
-        credits: credits,
-        formatValue: formatter[m.format] || formatter.raw,
-        formatSpecifier: formatSpecifiers[m.format] || formatSpecifiers.raw,
-        meta: parsed,
-      };
-      return s;
-    });
+    const sensors: SensorSensor[] = sm.signals
+      .map((m) => {
+        const parsed = parse(m);
+        const s: SensorSensor = {
+          key: toKey(m.source, m.signal),
+          id: m.source,
+          signal: m.signal,
+          active: m.active,
+          name: m.name,
+          description: m.description ? parseMarkDown(m.description.trim()) : '',
+          signalTooltip: m.short_description ? parseInline(m.short_description) : '',
+          valueScaleFactor: m.format === 'fraction' ? 100 : 1,
+          format: m.format ?? 'raw',
+          highValuesAre: m.high_values_are ?? 'neutral',
+          hasStdErr: m.has_stderr,
+          is7DayAverage: m.is_smoothed,
+          dataSourceName: sm.name,
+          levels: Object.keys(m.geo_types) as RegionLevel[],
+          type: m.category ?? 'other',
+          xAxis: m.time_label,
+          yAxis: m.value_label || yAxis[m.format] || yAxis.raw,
+          unit: units[m.format] || units.raw,
+          colorScale: colorScales[m.high_values_are],
+          vegaColorScale: vegaColorScales[m.high_values_are],
+          links: sm.link.map((d) => `<a href="${d.href}">${d.alt}</a>`),
+          credits: credits,
+          formatValue: formatter[m.format] || formatter.raw,
+          formatSpecifier: formatSpecifiers[m.format] || formatSpecifiers.raw,
+          meta: parsed,
+        };
+        return s;
+      }) // filter out weekly signals for now
+      .filter((s) => s.meta.time_type != 'week');
 
     // inject raw versions and cumulative versions
     for (const s of sensors) {
