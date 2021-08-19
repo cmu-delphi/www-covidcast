@@ -289,7 +289,7 @@ export class DataFetcher {
       SourceSignalPair.from(lSensor),
       GeoPair.from(lRegion),
       timeFrame,
-      undefined,
+      lSensor.isWeeklySignal ? 1 : 7,
       {
         exclude: ['signal_signal', 'signal_source', 'geo_type', 'geo_value'],
       },

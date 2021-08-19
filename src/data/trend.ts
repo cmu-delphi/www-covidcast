@@ -170,12 +170,15 @@ export function fetchTrend(
       geo,
       date,
       window,
+      signal.isWeeklySignal ? 1 : 7,
       fields,
     );
   }
   return Promise.all(
     splitDailyWeekly(signal).map(({ type, sensors }) =>
-      sensors.length === 0 ? [] : callTrendAPI(type, SourceSignalPair.fromArray(sensors), geo, date, window, fields),
+      sensors.length === 0
+        ? []
+        : callTrendAPI(type, SourceSignalPair.fromArray(sensors), geo, date, window, type == 'week' ? 1 : 7, fields),
     ),
   ).then((r) => ([] as EpiDataTrendRow[]).concat(...r));
 }

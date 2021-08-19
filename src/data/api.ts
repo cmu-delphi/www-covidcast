@@ -126,12 +126,14 @@ export function callTrendAPI(
   geo: GeoPair | readonly GeoPair[],
   date: Date,
   window: TimeFrame,
+  basis_shift: number,
   fields?: FieldSpec<EpiDataTrendRow>,
 ): Promise<EpiDataTrendRow[]> {
   const url = new URL(ENDPOINT + '/covidcast/trend');
   addParam(url, 'signal', signal);
   addParam(url, 'geo', geo);
   url.searchParams.set('date', type === 'day' ? formatAPITime(date) : formatAPIWeekTime(date));
+  url.searchParams.set('basis_shift', basis_shift.toString());
   url.searchParams.set('window', window.asTypeRange(type));
 
   url.searchParams.set('format', 'json');
@@ -146,15 +148,13 @@ export function callTrendSeriesAPI(
   signal: SourceSignalPair | readonly SourceSignalPair[],
   geo: GeoPair | readonly GeoPair[],
   window: TimeFrame,
-  basis?: number,
+  basis_shift: number,
   fields?: FieldSpec<EpiDataTrendRow>,
 ): Promise<EpiDataTrendRow[]> {
   const url = new URL(ENDPOINT + '/covidcast/trendseries');
   addParam(url, 'signal', signal);
   addParam(url, 'geo', geo);
-  if (basis != null) {
-    url.searchParams.set('basis', basis.toString());
-  }
+  url.searchParams.set('basis_shift', basis_shift.toString());
   url.searchParams.set('window', window.asTypeRange(type));
 
   url.searchParams.set('format', 'json');
