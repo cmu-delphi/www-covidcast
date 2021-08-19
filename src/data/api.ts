@@ -257,6 +257,8 @@ export type SignalFormat = 'raw' | 'percent' | 'fraction' | 'per100k' | 'count';
 export type SignalHighValuesAre = 'good' | 'bad' | 'neutral';
 
 export interface EpiDataMetaInfo {
+  active: boolean;
+
   source: string;
   signal: string;
   name: string;
@@ -281,6 +283,7 @@ export interface EpiDataMetaInfo {
   based_on_other: boolean;
   signal_basename: string;
 
+  time_type: 'week' | 'day';
   time_label: string;
   value_label: string;
 
@@ -303,7 +306,6 @@ export const KNOWN_LICENSES = {
 };
 
 export interface EpiDataMetaSourceInfo {
-  active: boolean;
   source: string;
   name: string;
   description: string;
