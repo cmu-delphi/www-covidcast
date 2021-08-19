@@ -23,6 +23,9 @@ export function fetchCorrelationSummaries(
   window: TimeFrame,
 ): Promise<Map<string, CorrelationSummary>> {
   const validOthers = others.filter((o) => o.isWeeklySignal == reference.isWeeklySignal);
+  if (validOthers.length === 0) {
+    return Promise.resolve(new Map<string, CorrelationSummary>());
+  }
   return callCorrelationAPI(
     reference.isWeeklySignal ? 'week' : 'day',
     SourceSignalPair.from(reference),

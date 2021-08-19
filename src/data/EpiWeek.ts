@@ -40,10 +40,15 @@ export class EpiWeek {
     return EpiWeek.fromDate(new Date());
   }
 
+  static fromDate(date: Date): EpiWeek;
+  static fromDate(date: Date | null): EpiWeek | null;
   /**
    * Set values using given moment date. Defaults to now.
    */
-  static fromDate(date: Date): EpiWeek {
+  static fromDate(date: Date | null): EpiWeek | null {
+    if (date == null) {
+      return null;
+    }
     const year = date.getFullYear();
     const startDates = [year - 1, year, year + 1].map((y) => startDateOfYear(y));
     const diffs = startDates.map((d) => timeDay.count(d, date));

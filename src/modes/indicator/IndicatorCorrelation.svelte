@@ -40,9 +40,8 @@
    * @param {import("../../stores/params").RegionParam} region
    * @param {import("../../stores/params").DateParam} date
    */
-  function buildTableData(context, region, date) {
+  function buildTableData(context, others, region, date) {
     loading = true;
-    const others = sensorList.filter((d) => d.key !== context.key && d.isWeeklySignal === context.isWeeklySignal);
     const metrics = fetchCorrelationSummaries(context.value, others, region.value, date.windowTimeFrame);
     metrics
       .then(() => tick())
@@ -63,7 +62,8 @@
     });
   }
 
-  $: otherSensors = buildTableData(sensor, region, date);
+  $: compareTo = sensorList.filter((d) => d.key !== sensor.key && d.isWeeklySignal === sensor.isWeeklySignal);
+  $: otherSensors = buildTableData(sensor, compareTo, region, date);
 
   function switchMode(sensor) {
     currentSensor2.set(sensor.key);
