@@ -169,6 +169,10 @@ export class SensorParam {
     return scaleSequential(this.value.colorScale).domain(domain).clamp(true);
   }
 
+  supportsRegion(region: Region): boolean {
+    return this.value != null && region != null && this.value.levels.includes(region.level);
+  }
+
   static unbox(sensor: Sensor | SensorParam): Sensor {
     if (sensor instanceof SensorParam) {
       return sensor.value;
