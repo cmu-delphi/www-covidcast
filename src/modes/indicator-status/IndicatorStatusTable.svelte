@@ -115,8 +115,7 @@
           >
           <div
             class="source"
-            title="Use 'data_source={r.source}' when fetching from the covidcast
-                   endpoint of the Epidata API."
+            title="Use 'data_source={r.source}' when fetching from the covidcast endpoint of the Epidata API."
           >
             API data_source: {r.source}
           </div>
