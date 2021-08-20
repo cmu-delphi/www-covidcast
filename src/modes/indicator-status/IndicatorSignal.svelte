@@ -28,7 +28,7 @@
   $: name = sensor ? sensor.name : 'Signal';
 
   function switchMode() {
-    currentMode.set(modeByID.indicator-source);
+    currentMode.set(modeByID['indicator-source']);
   }
 </script>
 
