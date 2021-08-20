@@ -14,10 +14,11 @@ export interface BackfillOptions {
   dateLabel: string;
   isRelative: boolean;
   title: string;
+  isWeeklySignal: boolean;
 }
 
 function commonHeatMapSpec(
-  { valueField, valueLabel, dateField, dateLabel, title }: BackfillOptions,
+  { valueField, valueLabel, dateField, dateLabel, title, isWeeklySignal }: BackfillOptions,
   color: ColorDef<Field>,
 ): TopLevelSpec & LayerSpec<Field> {
   return {
@@ -48,7 +49,7 @@ function commonHeatMapSpec(
           type: 'rect',
           strokeWidth: 2,
           width: {
-            expr: `width / customCountDays(domain('x')[0], domain('x')[1])`,
+            expr: `width / ${isWeeklySignal ? 'customCountWeeks' : 'customCountDays'}(domain('x')[0], domain('x')[1])`,
           },
           height: {
             expr: `height / (domain('y')[1] - domain('y')[0])`,
@@ -88,9 +89,11 @@ function commonHeatMapSpec(
         type: 'temporal',
         axis: {
           format: '%m/%d',
-          formatType: 'cachedTime',
           labelOverlap: true,
-          labelExpr: `datum.label + ((week(datum.value) === 1 || datum.index === 0) ? '/' + year(datum.value) : '')`,
+          formatType: isWeeklySignal ? 'epiweekFormatSmart' : 'cachedTime',
+          labelExpr: isWeeklySignal
+            ? undefined
+            : `datum.label + ((week(datum.value) === 1 || datum.index === 0) ? '/' + year(datum.value) : '')`,
           grid: true,
           gridDash: [4, 4],
           tickCount: 'week',
@@ -108,7 +111,7 @@ function commonHeatMapSpec(
           zero: true,
         },
         axis: {
-          title: 'Lag (Report Date - Reference Date)',
+          title: isWeeklySignal ? `Lag (Report Week - Reference Week)` : `Lag (Report Date - Reference Date)`,
         },
       },
     },

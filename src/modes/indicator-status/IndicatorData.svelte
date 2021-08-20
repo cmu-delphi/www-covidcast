@@ -14,7 +14,7 @@
   } from '../../specs/lineSpec';
   import { joinTitle } from '../../specs/commonSpec';
   import { toTimeValue } from '../../data/utils';
-  import { formatDateISO } from '../../formats';
+  import { formatDateISO, formatWeek } from '../../formats';
   import { SensorParam } from '../../stores/params';
   import { throttle } from 'lodash';
   import { EpiWeek } from '../../data/EpiWeek';
@@ -32,7 +32,9 @@
   let asOfValue = null;
 
   const debounceUpdate = throttle((val) => {
-    asOfValue = val;
+    if (val && (/\d{4}-\d{2}-\d{2}/.test(val) || /\d{4}W?\d{2}/.test(val))) {
+      asOfValue = val;
+    }
   }, 500);
   $: {
     debounceUpdate(asOfValueBounced);
@@ -58,6 +60,7 @@
       subTitle: sensor.unit,
       highlightRegion: 'issue_mode',
       compareField: 'issue_mode',
+      isWeeklySignal: sensor.isWeeklySignal,
     };
     return generateCompareLineSpec(['latest', 'as_of'], options);
   }
@@ -100,14 +103,16 @@
     isMobile: $isMobileDevice,
   });
   $: data = loadData(sensor, region, timeFrame, asOfValue);
-  $: fileName = `${sensor.name}_${region.displayName}_${formatDateISO(timeFrame.min)}-${formatDateISO(timeFrame.max)}`;
+  $: fileName = `${sensor.name}_${region.displayName}_${
+    sensor.isWeeklySignal ? formatWeek(timeFrame.minWeek) : formatDateISO(timeFrame.min)
+  }-${sensor.isWeeklySignal ? formatWeek(timeFrame.maxWeek) : formatDateISO(timeFrame.max)}`;
 
   function findValue(data, date, mode) {
     if (!date) {
       return null;
     }
     const time = toTimeValue(date);
-    const row = data.find((d) => d.time_value === time && d.issue_mode == mode);
+    const row = data.find((d) => toTimeValue(d.date_value) === time && d.issue_mode == mode);
     if (!row) {
       return null;
     }

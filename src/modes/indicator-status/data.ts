@@ -170,11 +170,12 @@ export function loadBackFillProfile(
     return rows.map((row) => {
       const date = parseAPITime(row.time_value);
       const issue = parseAPITime(row.issue);
+      const diff = timeDay.count(date, issue);
       return {
         ...row,
         date_value: date,
         issue_date: issue,
-        lag: timeDay.count(date, issue),
+        lag: sensor.isWeeklySignal ? Math.floor(diff / 7) : diff,
       };
     });
   });

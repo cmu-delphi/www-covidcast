@@ -221,3 +221,4 @@ expressionFunction('customInFilter', <T>(arr: Record<string, T>[], prop: string,
 );
 
 expressionFunction('customCountDays', (d1: Date, d2: Date) => timeDay.count(d1, d2));
+expressionFunction('customCountWeeks', (d1: Date, d2: Date) => Math.floor(timeDay.count(d1, d2) / 7));
