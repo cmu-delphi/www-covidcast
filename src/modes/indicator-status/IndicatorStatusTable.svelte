@@ -74,9 +74,7 @@
       <th class="mobile-th uk-text-right" title="Date the most recent update was published">Latest Issue</th>
       <th class="mobile-th uk-text-right" title="Most recent date for which data is available">Latest Data</th>
       <th class="mobile-th uk-text-right">Lag to Today</th>
-      <th
-        class="mobile-th uk-text-right"
-        title="Percent of US counties included in latest day of data"
+      <th class="mobile-th uk-text-right" title="Percent of US counties included in latest day of data"
         >Latest County Coverage</th
       >
       <th class="mobile-th uk-text-right">
