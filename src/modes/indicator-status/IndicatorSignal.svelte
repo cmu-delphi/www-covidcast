@@ -79,7 +79,7 @@
       {/if}
     </AboutSection>
     <AboutSection className="uk-margin-small-top uk-margin-small-bottom">
-      <h3 class="mobile-h3">About {source ? source.name : ''}</h3>
+      <h3 class="mobile-h3">Provided by {source ? source.name : ''}</h3>
       {#if source}
         <div>
           <SourceBadges {source} />
@@ -127,7 +127,7 @@
           <div>
             <KPI text={formatDateISO(metaData ? metaData.maxTime : null)} />
           </div>
-          <div class="sub">Latest Data Available</div>
+          <div class="sub" title="Most recent date for which data is available">Latest Data Available</div>
         </div>
         <div>
           <div>
@@ -139,7 +139,7 @@
           <div>
             <KPI text={formatDateISO(metaData ? metaData.maxIssue : null)} />
           </div>
-          <div class="sub">Latest Issue</div>
+          <div class="sub" title="Date the most recent update was published">Latest Issue</div>
         </div>
       </div>
     </div>

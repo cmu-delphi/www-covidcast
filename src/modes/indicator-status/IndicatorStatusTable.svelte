@@ -71,12 +71,12 @@
     </tr>
     <tr>
       <th />
-      <th class="mobile-th uk-text-right">Latest Issue</th>
-      <th class="mobile-th uk-text-right">Latest Data Available</th>
+      <th class="mobile-th uk-text-right" title="Date the most recent update was published">Latest Issue</th>
+      <th class="mobile-th uk-text-right" title="Most recent date for which data is available">Latest Data</th>
       <th class="mobile-th uk-text-right">Lag to Today</th>
-      <th class="mobile-th uk-text-right">Latest County Coverage</th>
+      <th class="mobile-th uk-text-right" title="Percent of US counties included in most recent date for which data is available">Latest County Coverage</th>
       <th class="mobile-th uk-text-right">
-        <span>County Coverage</span>
+        <span title="Percent of US counties included">County Coverage</span>
         <div class="mobile-th-range">
           <span> {formatDateShortNumbers(loader.domain.min)} </span>
           <span> {formatDateShortNumbers(loader.domain.max)} </span>
