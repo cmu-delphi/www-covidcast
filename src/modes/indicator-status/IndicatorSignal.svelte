@@ -1,5 +1,5 @@
 <script>
-  import { currentRegionInfo, currentSensor, metaDataManager, selectByInfo } from '../../stores';
+  import { currentRegionInfo, currentSensor, currentMode, metaDataManager, selectByInfo } from '../../stores';
   import { DEFAULT_SENSOR } from '../../stores/constants';
   import AboutSection from '../../components/AboutSection.svelte';
   import SensorSearch from '../../components/SensorSearch.svelte';
@@ -15,6 +15,7 @@
   import SensorBadges from '../../components/SensorBadges.svelte';
   import GeoLevelBadge from '../../components/GeoLevelBadge.svelte';
   import SourceBadges from '../../components/SourceBadges.svelte';
+  import chevronLeftIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-left.svg';
 
   $: sensor = $metaDataManager.getSensor($currentSensor) || $metaDataManager.getSensor(DEFAULT_SENSOR);
   $: source = sensor ? $metaDataManager.getSource(sensor) : undefined;
@@ -24,11 +25,18 @@
   }
   $: metaData = $metaDataManager.getMetaData(sensor);
   $: name = sensor ? sensor.name : 'Signal';
+
+  function switchMode() {
+    currentMode.set(modeByID.indicator-source);
+  }
 </script>
 
 <div class="mobile-root">
   <div class="mobile-header-line-bg">
     <div class="mobile-header-line">
+      <button class="mobile-back inline-svg-icon" on:click={switchMode}>
+        {@html chevronLeftIcon}
+      </button>
       <h2>Indicator Status of <span>{name}</span></h2>
     </div>
     <div class="uk-container content-grid">
