@@ -16,6 +16,7 @@
   import GeoLevelBadge from '../../components/GeoLevelBadge.svelte';
   import SourceBadges from '../../components/SourceBadges.svelte';
   import chevronLeftIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-left.svg';
+  import { modeByID } from '..';
 
   $: sensor = $metaDataManager.getSensor($currentSensor) || $metaDataManager.getSensor(DEFAULT_SENSOR);
   $: source = sensor ? $metaDataManager.getSource(sensor) : undefined;
