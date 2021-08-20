@@ -1,6 +1,7 @@
 <script>
   import RegionSearch from '../../../components/RegionSearch.svelte';
-  import { countyInfo, getInfoByName, hhsInfo, hrrInfo, msaInfo, nationInfo, stateInfo } from '../../../data/regions';
+  import { getInfoByName } from '../../../data/regions';
+  import { sortedNameInfos } from '../utils';
 
   /**
    * @type {import("../../../stores/params").RegionParam}
@@ -15,7 +16,7 @@
     id: '',
     displayName: `Use Configured: ${region.displayName}`,
   };
-  $: allItems = [defaultRegion, nationInfo, ...stateInfo, ...msaInfo, ...countyInfo, ...hrrInfo, ...hhsInfo];
+  $: allItems = [defaultRegion, ...sortedNameInfos];
 </script>
 
 <div>

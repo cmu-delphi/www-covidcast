@@ -1,3 +1,5 @@
+import { countyInfo, hhsInfo, hrrInfo, msaInfo, nationInfo, stateInfo } from '../../data/regions';
+
 export function formToConfig(formData: FormData): Record<string, unknown> {
   const config: Record<string, unknown> = {};
 
@@ -30,3 +32,5 @@ export function formToConfig(formData: FormData): Record<string, unknown> {
   });
   return config;
 }
+
+export const sortedNameInfos = [nationInfo, ...stateInfo, ...msaInfo, ...countyInfo, ...hrrInfo, ...hhsInfo];
