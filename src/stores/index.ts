@@ -50,16 +50,26 @@ function deriveFromPath(url: Location) {
   const mode = urlParams.get('mode') || modeFromPath();
 
   const modeObj = modes.find((d) => d.id === mode) || DEFAULT_MODE;
+  const isGenericPage = modeObj.isGeneric === true;
+  // if a generic page, try to resolve but fall back to the given one, since it might be a not configured one
   const resolveSensor = resolveSensorWithAliases(
     sensor,
-    modeObj === modeByID['survey-results'] ? DEFAULT_SURVEY_SENSOR : DEFAULT_SENSOR,
+    isGenericPage
+      ? sensor || DEFAULT_SENSOR
+      : modeObj === modeByID['survey-results']
+      ? DEFAULT_SURVEY_SENSOR
+      : DEFAULT_SENSOR,
   );
   return {
     mode: modeObj,
     sensor: resolveSensor,
     sensor2: resolveSensorWithAliases(
       sensor2,
-      DEFAULT_CORRELATION_SENSOR === sensor2 ? DEFAULT_SENSOR : DEFAULT_CORRELATION_SENSOR,
+      isGenericPage
+        ? sensor2 || DEFAULT_CORRELATION_SENSOR
+        : DEFAULT_CORRELATION_SENSOR === sensor2
+        ? DEFAULT_SENSOR
+        : DEFAULT_CORRELATION_SENSOR,
     ),
     lag: lag ? Number.parseInt(lag, 10) : 0,
     date: /\d{8}/.test(date) ? date : MAGIC_START_DATE,
@@ -77,10 +87,28 @@ const defaultValues = deriveFromPath(window.location);
 export const currentMode = writable(defaultValues.mode);
 
 export const currentSensor = writable(defaultValues.sensor);
-export const currentSensorEntry = derived([currentSensor], ([$currentSensor]) => sensorMap.get($currentSensor));
+
+function resolveSensor(sensor: string, defaultKey: string) {
+  if (!sensor) {
+    return null;
+  }
+  const r = sensorMap.get(sensor);
+  if (r) {
+    return r;
+  }
+  return sensorMap.get(defaultKey);
+}
+
+export const currentSensorEntry = derived(
+  [currentSensor],
+  // lookup the value, if not found maybe a generic one, if it is set, then return the default, else return the empty one
+  ([$currentSensor]) => resolveSensor($currentSensor, DEFAULT_SENSOR),
+);
 
 export const currentSensor2 = writable(defaultValues.sensor2);
-export const currentSensorEntry2 = derived([currentSensor2], ([$currentSensor]) => sensorMap.get($currentSensor));
+export const currentSensorEntry2 = derived([currentSensor2], ([$currentSensor]) =>
+  resolveSensor($currentSensor, DEFAULT_CORRELATION_SENSOR),
+);
 
 export const currentLag = writable(defaultValues.lag);
 

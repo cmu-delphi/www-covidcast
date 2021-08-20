@@ -8,6 +8,7 @@ export interface Mode {
   component: () => Promise<any>;
   anchor?: string;
   waitForReady?: boolean;
+  isGeneric?: boolean;
 }
 
 export default modes;
