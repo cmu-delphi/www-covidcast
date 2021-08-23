@@ -140,7 +140,7 @@
           <div>
             <KPI text={formatDateISO(metaData ? metaData.maxIssue : null)} />
           </div>
-          <div class="sub" title="Date the most recent update was published">Latest Issue</div>
+          <div class="sub" title="Date the most recent update was published by Delphi">Latest Issue</div>
         </div>
       </div>
     </div>
