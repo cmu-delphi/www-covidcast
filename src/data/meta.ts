@@ -1,11 +1,12 @@
 import { EpiDataMetaInfo, EpiDataMetaSourceInfo, EpiDataMetaStatsInfo, KNOWN_LICENSES, SignalCategory } from './api';
-import { parseAPITime } from './utils';
+import { parseAPIDateAndWeek } from './utils';
 import type { RegionLevel } from './regions';
 import { isCountSignal } from './signals';
 import { ALL_TIME_FRAME, TimeFrame } from './TimeFrame';
 import { Sensor, units, colorScales, vegaColorScales, yAxis } from './sensor';
 import { formatSpecifiers, formatter } from '../formats';
 import { parse as parseMarkDown, parseInline } from 'marked';
+import type { EpiWeek } from './EpiWeek';
 
 function toKey(source: string, signal: string) {
   return `${source}-${signal}`;
@@ -41,20 +42,27 @@ function extractStats(signal: string, entry: EpiDataMetaInfo | null, level?: Reg
 
 export interface EpiDataMetaParsedInfo extends EpiDataMetaInfo {
   maxIssue: Date;
+  maxIssueWeek: EpiWeek;
   minTime: Date;
+  minWeek: EpiWeek;
   maxTime: Date;
+  maxWeek: EpiWeek;
   timeFrame: TimeFrame;
 }
 
 function parse(d: EpiDataMetaInfo): EpiDataMetaParsedInfo {
-  const minTime = parseAPITime(d.min_time);
-  const maxTime = parseAPITime(d.max_time);
+  const minTime = parseAPIDateAndWeek(d.min_time);
+  const maxTime = parseAPIDateAndWeek(d.max_time);
+  const maxIssue = parseAPIDateAndWeek(d.max_issue);
   return {
     ...d,
-    maxIssue: parseAPITime(d.max_issue),
-    minTime,
-    maxTime,
-    timeFrame: new TimeFrame(minTime, maxTime),
+    maxIssue: maxIssue.date,
+    maxIssueWeek: maxIssue.week,
+    minTime: minTime.date,
+    minWeek: minTime.week,
+    maxTime: maxTime.date,
+    maxWeek: maxTime.week,
+    timeFrame: new TimeFrame(minTime.date, maxTime.date, minTime.week, maxTime.week),
   };
 }
 
@@ -151,39 +159,38 @@ function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
   const sources = metadata
     .map((sm): SensorSource => {
       const credits = generateCredits(sm.license);
-      const sensors: SensorSensor[] = sm.signals
-        .map((m) => {
-          const parsed = parse(m);
-          const s: SensorSensor = {
-            key: toKey(m.source, m.signal),
-            id: m.source,
-            signal: m.signal,
-            active: m.active,
-            name: m.name,
-            description: m.description ? parseMarkDown(m.description.trim()) : '',
-            signalTooltip: m.short_description ? parseInline(m.short_description) : '',
-            valueScaleFactor: m.format === 'fraction' ? 100 : 1,
-            format: m.format ?? 'raw',
-            highValuesAre: m.high_values_are ?? 'neutral',
-            hasStdErr: m.has_stderr,
-            is7DayAverage: m.is_smoothed,
-            dataSourceName: sm.name,
-            levels: Object.keys(m.geo_types) as RegionLevel[],
-            type: m.category ?? 'other',
-            xAxis: m.time_label,
-            yAxis: m.value_label || yAxis[m.format] || yAxis.raw,
-            unit: units[m.format] || units.raw,
-            colorScale: colorScales[m.high_values_are],
-            vegaColorScale: vegaColorScales[m.high_values_are],
-            links: sm.link.map((d) => `<a href="${d.href}">${d.alt}</a>`),
-            credits: credits,
-            formatValue: formatter[m.format] || formatter.raw,
-            formatSpecifier: formatSpecifiers[m.format] || formatSpecifiers.raw,
-            meta: parsed,
-          };
-          return s;
-        }) // filter out weekly signals for now
-        .filter((s) => s.meta.time_type != 'week');
+      const sensors: SensorSensor[] = sm.signals.map((m) => {
+        const parsed = parse(m);
+        const s: SensorSensor = {
+          key: toKey(m.source, m.signal),
+          active: m.active,
+          id: m.source,
+          signal: m.signal,
+          name: m.name,
+          description: m.description ? parseMarkDown(m.description.trim()) : '',
+          signalTooltip: m.short_description ? parseInline(m.short_description) : '',
+          valueScaleFactor: m.format === 'fraction' ? 100 : 1,
+          format: m.format ?? 'raw',
+          highValuesAre: m.high_values_are ?? 'neutral',
+          hasStdErr: m.has_stderr,
+          is7DayAverage: m.is_smoothed,
+          dataSourceName: sm.name,
+          levels: Object.keys(m.geo_types) as RegionLevel[],
+          type: m.category ?? 'other',
+          xAxis: m.time_label,
+          yAxis: m.value_label || yAxis[m.format] || yAxis.raw,
+          unit: units[m.format] || units.raw,
+          colorScale: colorScales[m.high_values_are],
+          vegaColorScale: vegaColorScales[m.high_values_are],
+          links: sm.link.map((d) => `<a href="${d.href}">${d.alt}</a>`),
+          credits: credits,
+          formatValue: formatter[m.format] || formatter.raw,
+          formatSpecifier: formatSpecifiers[m.format] || formatSpecifiers.raw,
+          isWeeklySignal: parsed.time_type === 'week',
+          meta: parsed,
+        };
+        return s;
+      });
 
       // inject raw versions and cumulative versions
       for (const s of sensors) {
@@ -212,7 +219,7 @@ function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
         referenceSensor: sm.reference_signal ? sensors.find((d) => d.signal === sm.reference_signal) : undefined,
       };
     })
-    .filter((source) => source.sensors.length > 0);
+    .sort((a, b) => a.source.localeCompare(b.source));
 
   const sensors = sources.map((d) => d.sensors).flat();
   sensors.sort((a, b) => a.key.localeCompare(b.key));

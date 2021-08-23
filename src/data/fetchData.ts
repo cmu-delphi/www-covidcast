@@ -1,13 +1,15 @@
 import { callAPI, EpiDataJSONRow } from './api';
-import { timeDay } from 'd3-time';
-import { parseAPITime, formatAPITime } from './utils';
+import { timeDay, timeWeek } from 'd3-time';
+import { parseAPIDateAndWeek, toTimeValue } from './utils';
 import { getInfoByName } from './regions';
 import type { RegionInfo } from './regions';
 import { TimeFrame } from './TimeFrame';
 import { SourceSignalPair, GeoPair, TimePair, START_TIME_RANGE, END_TIME_RANGE } from './apimodel';
+import { EpiWeek } from './EpiWeek';
 
 export interface EpiDataRow extends EpiDataJSONRow {
   date_value: Date;
+  week_value: EpiWeek;
 }
 
 export function parseData(
@@ -25,9 +27,17 @@ export function parseData(
     if (row.time_value == null) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
       (row as any).date_value = null;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+      (row as any).week_value = null;
       continue;
     }
-    row.date_value = parseAPITime(row.time_value.toString());
+    if (!(row.date_value instanceof Date)) {
+      const { date: d, week: w } = parseAPIDateAndWeek(row.time_value);
+      row.date_value = d;
+      row.week_value = w;
+    } else if (!(row.week_value instanceof EpiWeek)) {
+      row.week_value = EpiWeek.fromDate(row.date_value);
+    }
     row.value = row.value * (typeof factor === 'function' ? factor(row) : factor);
   }
   // sort by date
@@ -52,11 +62,12 @@ export async function fetchSampleSizesNationSummary(dataSensor: {
   signal: string;
 }): Promise<NationSummarySamples> {
   const data = await callAPI(
+    'day',
     new SourceSignalPair(dataSensor.id, dataSensor.signal),
     new GeoPair('nation', 'us'),
     new TimePair('day', new TimeFrame(START_TIME_RANGE, END_TIME_RANGE)),
     ['time_value', 'sample_size'],
-  ).then((r) => parseData(r, {}));
+  ).then((r) => parseData(r, {}, 1));
 
   const sum = data.reduce((acc, v) => (v.sample_size != null ? acc + v.sample_size : acc), 0);
   return {
@@ -68,10 +79,12 @@ export async function fetchSampleSizesNationSummary(dataSensor: {
   };
 }
 
-function createCopy<T extends EpiDataRow = EpiDataRow>(row: T, date: Date): T {
+function createCopy<T extends EpiDataRow = EpiDataRow>(row: T, date: Date, granularity: 'day' | 'week'): T {
+  const week = EpiWeek.fromDate(date);
   const copy = Object.assign({}, row, {
     date_value: date,
-    time_value: Number.parseInt(formatAPITime(date), 10),
+    week_value: week,
+    time_value: granularity == 'day' ? toTimeValue(date) : week.format(),
     value: null,
     stderr: null,
     sample_size: null,
@@ -82,17 +95,22 @@ function createCopy<T extends EpiDataRow = EpiDataRow>(row: T, date: Date): T {
 /**
  * fit the data to be in the start/end date range
  */
-export function fitRange<T extends EpiDataRow = EpiDataRow>(rows: T[], startDate: Date, endDate: Date): T[] {
+export function fitRange<T extends EpiDataRow = EpiDataRow>(
+  rows: T[],
+  startDate: Date,
+  endDate: Date,
+  granularity: 'day' | 'week',
+): T[] {
   if (rows.length === 0) {
     return rows;
   }
   if (rows[0].date_value != null && rows[0].date_value > startDate) {
     // inject a min
-    rows.unshift(createCopy(rows[0], startDate));
+    rows.unshift(createCopy(rows[0], startDate, granularity));
   }
   if (rows[rows.length - 1].date_value != null && rows[rows.length - 1].date_value < endDate) {
     // inject a max
-    rows.push(createCopy(rows[rows.length - 1], endDate));
+    rows.push(createCopy(rows[rows.length - 1], endDate, granularity));
   }
   return rows;
 }
@@ -100,7 +118,7 @@ export function fitRange<T extends EpiDataRow = EpiDataRow>(rows: T[], startDate
 /**
  * add missing rows per date within this given date rows
  */
-export function addMissing<T extends EpiDataRow = EpiDataRow>(rows: T[]): T[] {
+export function addMissing<T extends EpiDataRow = EpiDataRow>(rows: T[], granularity: 'day' | 'week'): T[] {
   if (rows.length < 2) {
     return rows;
   }
@@ -108,7 +126,8 @@ export function addMissing<T extends EpiDataRow = EpiDataRow>(rows: T[]): T[] {
   const max = rows[rows.length - 1].date_value;
   const template = rows[0];
   const base = rows.slice();
-  const range = timeDay.range(min, timeDay.offset(max, 1), 1);
+  const ranger = granularity == 'day' ? timeDay : timeWeek;
+  const range = ranger.range(min, ranger.offset(max, 1), 1);
   if (range.length === rows.length) {
     // full
     return rows;
@@ -118,7 +137,7 @@ export function addMissing<T extends EpiDataRow = EpiDataRow>(rows: T[]): T[] {
       return base.shift()!;
     }
     // create an entry
-    return createCopy(template, date);
+    return createCopy(template, date, granularity);
   });
   return imputedRows;
 }

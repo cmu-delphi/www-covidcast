@@ -16,6 +16,7 @@ const EPIDATA_ROW_KEYS: (keyof (RegionEpiDataRow & CountyInfo))[] = [
   'geo_value',
   'value',
   'date_value',
+  'week_value',
   'time_value',
   'stderr',
   'sample_size',
@@ -583,6 +584,33 @@ export function generateStateMapWithCountyDataSpec(options: CommonParams = {}): 
   spec.layer.push(genMegaHoverLayer(true));
   spec.layer.push(genLevelHoverLayer({ strokeWidth: 1 }));
   spec.layer.push(genCreditsLayer());
+  return spec;
+}
+
+/**
+ * generates a map of states
+ */
+export function generateStateBinaryDataSpec(options: CommonParams = {}): TopLevelSpec {
+  const level = 'state';
+  const topoJSON = stateJSON();
+
+  const spec = genBaseSpec(level, topoJSON, options);
+
+  spec.datasets!.nation = nationJSON();
+  const missing = genMissingLayer();
+  (missing.mark as MarkDef<'geoshape'>).color = MISSING_COLOR;
+  spec.layer.push(missing);
+  // state, msa
+  const states = genLevelLayer(options);
+  spec.layer.push(states);
+  states.encoding!.color = {
+    condition: {
+      test: 'datum.value != null',
+      value: 'steelblue',
+    },
+    value: null,
+  };
+  addCommonLayers(options, spec);
   return spec;
 }
 

@@ -1,5 +1,5 @@
 <script>
-  import { formatDateISO, formatFraction, formatRawValue, formatValue } from '../../formats';
+  import { formatDateISO, formatFraction, formatRawValue, formatValue, formatWeek } from '../../formats';
 
   export let hidden = false;
   /**
@@ -10,10 +10,19 @@
    * @type {{date_field: string, date_label: string, value_field: string, value_label: string}}
    */
   export let options;
+
+  /**
+   * @type {import('../../stores/params').SensorParam}
+   */
+  export let sensor;
 </script>
 
 <div aria-label="tooltip" class="tooltip" class:hidden>
-  <h5>Lag {item.lag} / {formatDateISO(item[options.dateField])}</h5>
+  <h5>
+    Lag {item.lag} / {sensor && sensor.isWeeklySignal
+      ? formatWeek(item[options.dateField])
+      : formatDateISO(item[options.dateField])}
+  </h5>
   <table>
     <tr>
       <th>Value</th>

@@ -25,10 +25,11 @@
   } from '../../../specs/lineSpec';
   import { annotationManager, getLevelInfo } from '../../../stores';
   import { combineSignals } from '../../../data/utils';
-  import { formatDateISO, formatDateYearDayOfWeekAbbr } from '../../../formats';
+  import { formatDateISO, formatWeek } from '../../../formats';
   import { WidgetHighlight } from '../highlight';
   import isEqual from 'lodash-es/isEqual';
   import { createEventDispatcher } from 'svelte';
+  import { EpiWeek } from '../../../data/EpiWeek';
 
   const dispatch = createEventDispatcher();
 
@@ -92,6 +93,7 @@
    * @param {{zero: boolean, raw: boolean, cumulative: boolean}} options
    */
   function genSpec(sensor, region, timeFrame, { zero, raw, cumulative }) {
+    const isWeekly = sensor.value.isWeeklySignal;
     /**
      * @type {import('../../../specs/lineSpec').LineSpecOptions}
      */
@@ -104,16 +106,19 @@
       xTitle: sensor.xAxis,
       title: [
         `${cumulative ? 'Cumulative ' : ''}${sensor.name} in ${region.displayName}`,
-        `between ${formatDateYearDayOfWeekAbbr(timeFrame.min)} and ${formatDateYearDayOfWeekAbbr(timeFrame.max)}`,
+        timeFrame.toNiceString(isWeekly),
       ],
       subTitle: sensor.unit,
       highlightRegion: false,
       clearHighlight: false,
       autoAlignOffset: 60,
       paddingTop: 80,
+      isWeeklySignal: isWeekly,
     };
     const valueTooltip = `cachedNumber(datum.value, '${sensor.value.formatSpecifier}') + `;
-    const dateTooltip = `' @ ' + cachedTime(datum.date_value, '%a %b %d')`;
+    const dateTooltip = isWeekly
+      ? `' @ ' + toString(datum.week_value)`
+      : `' @ ' + cachedTime(datum.date_value, '%a %b %d')`;
     const rawTooltip = `' (raw: ' + cachedNumber(datum.raw, '${sensor.value.formatSpecifier}')`;
     if (raw) {
       if (cumulative) {
@@ -177,7 +182,9 @@
     if (cumulative) {
       suffix += '_Cumulative';
     }
-    return `${sensor.name}_${regionName}_${formatDateISO(timeFrame.min)}-${formatDateISO(timeFrame.max)}${suffix}`;
+    return `${sensor.name}_${regionName}_${
+      sensor.isWeeklySignal ? formatWeek(timeFrame.min_week) : formatDateISO(timeFrame.min)
+    }-${sensor.isWeeklySignal ? formatWeek(timeFrame.max_week) : formatDateISO(timeFrame.max)}${suffix}`;
   }
 
   function injectRanges(spec, timeFrame, annotations) {
@@ -207,7 +214,11 @@
 
   function onHighlightSignal(event) {
     const date = resolveHighlightedDate(event);
-    const newHighlight = new WidgetHighlight(sensor.value, region.value, date);
+    const newHighlight = new WidgetHighlight(
+      sensor.value,
+      region.value,
+      sensor.isWeeklySignal ? EpiWeek.fromDate(date) : date,
+    );
     if (!newHighlight.equals(highlight)) {
       highlight = newHighlight;
     }

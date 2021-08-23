@@ -1,5 +1,5 @@
 <script>
-  import { formatDateShortDayOfWeekAbbr } from '../formats';
+  import { formatDateShortDayOfWeekAbbr, formatWeek } from '../formats';
   import { levelMegaCounty } from '../stores/constants';
   import { getStateOfCounty } from '../data/regions';
   import SensorValue from '../components/SensorValue.svelte';
@@ -61,7 +61,11 @@
       </tr>
     {/if}
     <tr>
-      <th>{formatDateShortDayOfWeekAbbr(item.date_value)}</th>
+      <th
+        >{sensor && sensor.isWeeklySignal
+          ? formatWeek(item.week_value)
+          : formatDateShortDayOfWeekAbbr(item.date_value)}</th
+      >
       <td>
         <SensorValue {sensor} value={item.value} medium />
       </td>

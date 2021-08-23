@@ -11,15 +11,21 @@
     }
     return typeof region === 'string' ? region : region.displayName;
   }
-  function dateToString(date) {
+  function dateToString(sensor, date) {
     if (!date) {
       return '?';
     }
-    return typeof date === 'string'
-      ? date
-      : date instanceof TimeFrame
-      ? `between ${formatDateLocal(date.min)} and ${formatDateLocal(date.max)}`
-      : `on ${formatDateYearDayOfWeekAbbr(date.value)}`;
+    if (typeof date === 'string') {
+      return date;
+    }
+    const isWeekly = typeof sensor !== 'string' && sensor && sensor.isWeeklySignal ? 'week' : 'day';
+    if (date instanceof TimeFrame) {
+      return date.toNiceString(isWeekly);
+    }
+    if (isWeekly === 'week') {
+      return `on ${formatWeek(date.week)}`;
+    }
+    return `on ${formatDateYearDayOfWeekAbbr(date.value)}`;
   }
 
   function gridToStyle(grid) {
@@ -51,7 +57,7 @@
   import cogIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/cog.svg';
   import expandAltIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/expand-alt.svg';
   import compressAltIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/compress-alt.svg';
-  import { formatDateLocal, formatDateYearDayOfWeekAbbr } from '../../../formats';
+  import { formatDateYearDayOfWeekAbbr, formatWeek } from '../../../formats';
   import { TimeFrame } from '../../../stores/params';
   import { createEventDispatcher } from 'svelte';
 
@@ -158,7 +164,7 @@
       <slot name="title">
         {sensorToString(sensor)} in {regionToString(region)}
         <br />
-        {dateToString(date)}
+        {dateToString(sensor, date)}
       </slot>
     </h3>
     {#if titleUnit === true && typeof sensor !== 'string'}

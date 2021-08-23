@@ -22,9 +22,14 @@ export function fetchCorrelationSummaries(
   region: Region,
   window: TimeFrame,
 ): Promise<Map<string, CorrelationSummary>> {
+  const validOthers = others.filter((o) => o.isWeeklySignal == reference.isWeeklySignal);
+  if (validOthers.length === 0) {
+    return Promise.resolve(new Map<string, CorrelationSummary>());
+  }
   return callCorrelationAPI(
+    reference.isWeeklySignal ? 'week' : 'day',
     SourceSignalPair.from(reference),
-    SourceSignalPair.fromArray(others),
+    SourceSignalPair.fromArray(validOthers),
     GeoPair.from(region),
     window,
     undefined,
@@ -62,7 +67,12 @@ export function fetchSingleCorrelations(
   region: Region,
   window: TimeFrame,
 ): Promise<Omit<EpiDataCorrelationRow, 'signal_source' | 'signal_signal' | 'geo_value' | 'geo_type'>[]> {
+  if (reference.isWeeklySignal !== others.isWeeklySignal) {
+    // cannot compute yet
+    return Promise.resolve([]);
+  }
   return callCorrelationAPI(
+    reference.isWeeklySignal ? 'week' : 'day',
     SourceSignalPair.from(reference),
     SourceSignalPair.from(others),
     GeoPair.from(region),

@@ -20,7 +20,7 @@
   import SensorValue from '../components/SensorValue.svelte';
   import { combineSignals } from '../data/utils';
   import DownloadMenu from '../components/DownloadMenu.svelte';
-  import { formatDateISO } from '../formats';
+  import { formatDateISO, formatWeek } from '../formats';
   import { annotationManager, isMobileDevice } from '../stores';
   import IndicatorAnnotation from '../components/IndicatorAnnotation.svelte';
   import IndicatorAnnotations from '../components/IndicatorAnnotations.svelte';
@@ -30,19 +30,19 @@
 
   export let className = '';
   /**
-   * @type {import("../../stores/params").DateParam}
+   * @type {import("../stores/params").DateParam}
    */
   export let date;
   /**
-   * @type {import("../../stores/params").RegionParam}
+   * @type {import("../stores/params").RegionParam}
    */
   export let region;
   /**
-   * @type {import("../../stores/params").SensorParam}
+   * @type {import("../stores/params").SensorParam}
    */
   export let sensor;
   /**
-   * @type {import("../../stores/DataFetcher").DataFetcher}
+   * @type {import("../stores/DataFetcher").DataFetcher}
    */
   export let fetcher;
 
@@ -77,7 +77,7 @@
   export let domain = null;
 
   /**
-   * @type {import("../../stores/params").Region}
+   * @type {import("../stores/params").Region}
    */
   const neighboringInfo = {
     id: 'neighboring',
@@ -106,6 +106,7 @@
     timeFrame,
     { height, zero, raw, isMobile, singleRegionOnly, domain, cumulative },
   ) {
+    const isWeekly = sensor.value.isWeeklySignal;
     const options = {
       initialDate: highlightDate || date.value,
       height,
@@ -116,6 +117,7 @@
       title: joinTitle([(cumulative ? 'Cumulative ' : '') + sensor.name, `in ${region.displayName}`], isMobile),
       subTitle: sensor.unit,
       highlightRegion: true,
+      isWeeklySignal: isWeekly,
     };
     if (cumulative) {
       options.paddingLeft = 52; // more space for larger numbers
@@ -144,9 +146,9 @@
   }
 
   /**
-   * @param {import("../../stores/params").SensorParam} sensor
-   * @param {import("../../stores/params").DateParam} date
-   * @param {import("../../stores/params").RegionParam} region
+   * @param {import("../stores/params").SensorParam} sensor
+   * @param {import("../stores/params").DateParam} date
+   * @param {import("../stores/params").RegionParam} region
    */
   function loadData(sensor, region, timeFrame, singleRegionOnly) {
     if (!region.value) {
@@ -177,9 +179,9 @@
   }
 
   /**
-   * @param {import("../../stores/params").SensorParam} sensor
-   * @param {import("../../stores/params").DateParam} date
-   * @param {import("../../stores/params").RegionParam} region
+   * @param {import("../stores/params").SensorParam} sensor
+   * @param {import("../stores/params").DateParam} date
+   * @param {import("../stores/params").RegionParam} region
    */
   function loadSingleData(sensor, region, timeFrame, { cumulative }) {
     if (!region.value) {
@@ -235,8 +237,8 @@
     return [region];
   }
   /**
-   * @param {import("../../stores/params").SensorParam} sensor
-   * @param {import("../../stores/params").Region[]} region
+   * @param {import("../stores/params").SensorParam} sensor
+   * @param {import("../stores/params").Region[]} region
    */
   function generateFileName(sensor, regions, timeFrame, raw, cumulative) {
     const regionName = regions.map((region) => `${region.propertyId}-${region.displayName}`).join(',');
@@ -247,7 +249,9 @@
     if (cumulative) {
       suffix += '_Cumulative';
     }
-    return `${sensor.name}_${regionName}_${formatDateISO(timeFrame.min)}-${formatDateISO(timeFrame.max)}${suffix}`;
+    return `${sensor.name}_${regionName}_${
+      sensor.isWeeklySignal ? formatWeek(timeFrame.min_week) : formatDateISO(timeFrame.min)
+    }-${sensor.isWeeklySignal ? formatWeek(timeFrame.max_week) : formatDateISO(timeFrame.max)}${suffix}`;
   }
 
   function injectRanges(spec, timeFrame, annotations) {
@@ -296,7 +300,7 @@
       return null;
     }
     const time = toTimeValue(date);
-    const row = data.find((d) => d.id === region.id && d.time_value === time);
+    const row = data.find((d) => d.id === region.id && toTimeValue(d.date_value) === time);
     if (!row) {
       return null;
     }

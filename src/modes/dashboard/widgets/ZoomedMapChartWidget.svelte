@@ -4,7 +4,7 @@
   import { getContext } from 'svelte';
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
   import { getLevelInfo } from '../../../stores/constants';
-  import { formatDateISO, formatDateYearDayOfWeekAbbr } from '../../../formats';
+  import { formatDateISO, formatDateYearDayOfWeekAbbr, formatWeek } from '../../../formats';
   import RegionMapTooltip from '../../../blocks/RegionMapTooltip.svelte';
   import {
     generateStateSpec,
@@ -75,7 +75,7 @@
       scheme: sensor.value.vegaColorScale,
       title: [
         `${sensor.name} in US ${getLevelInfo(level).labelPlural}`,
-        `on ${formatDateYearDayOfWeekAbbr(date.value)}`,
+        `on ${sensor.isWeeklySignal ? formatWeek(date.week) : formatDateYearDayOfWeekAbbr(date.value)}`,
       ],
       subTitle: sensor.unit,
       initialRegion: highlightToRegionsImpl(level, highlight),
@@ -123,7 +123,9 @@
   $: highlightLevel = region.level === 'state' ? 'county' : level;
   $: spec = generateSpec(sensor, region, level, date);
   $: data = loadData(sensor, region, level, date);
-  $: fileName = `${sensor.name}_${getLevelInfo(level).labelPlural}_${formatDateISO(date.value)}`;
+  $: fileName = `${sensor.name}_${getLevelInfo(level).labelPlural}_${
+    sensor.isWeeklySignal ? formatWeek(date.week) : formatDateISO(date.value)
+  }`;
 
   /**
    * @type {Vega }
@@ -135,14 +137,20 @@
     if (!value) {
       return;
     }
-    const regionHighlight = new WidgetHighlight(sensor.value, getInfoByName(value, highlightLevel), date.value);
+    const regionHighlight = new WidgetHighlight(
+      sensor.value,
+      getInfoByName(value, highlightLevel),
+      sensor.isWeeklySignal ? date.week : date.value,
+    );
 
     if (!regionHighlight.equals(highlight)) {
       highlight = regionHighlight;
     }
   }
 
-  $: highlighted = highlight != null && highlight.matches(sensor.value, highlightLevel, date.value);
+  $: highlighted =
+    highlight != null &&
+    highlight.matches(sensor.value, highlightLevel, sensor.isWeeklySignal ? date.week : date.value);
 
   function updateVegaHighlight(highlight) {
     if (!vegaRef) {

@@ -10,6 +10,7 @@ import { get, Writable } from 'svelte/store';
 import { ALL_TIME_FRAME, TimeFrame } from '../data/TimeFrame';
 import { toTimeValue } from '../data/utils';
 import type { MetaDataManager } from '../data/meta';
+import { EpiWeek } from '../data/EpiWeek';
 
 export { TimeFrame } from '../data/TimeFrame';
 export type { RegionEpiDataRow } from './DataFetcher';
@@ -38,6 +39,7 @@ export const SPARKLINE_SIZE = 4; // weeks;
 export class DateParam {
   readonly timeValue: number;
   readonly value: Date;
+  readonly week: EpiWeek;
   readonly allTimeFrame: TimeFrame;
   readonly sparkLineTimeFrame: TimeFrame;
   readonly windowTimeFrame: TimeFrame;
@@ -45,6 +47,7 @@ export class DateParam {
   constructor(date: Date) {
     this.timeValue = toTimeValue(date);
     this.value = date;
+    this.week = EpiWeek.fromDate(date);
     this.allTimeFrame = ALL_TIME_FRAME;
     this.sparkLineTimeFrame = TimeFrame.compute(date, (d, step) => timeWeek.offset(d, step), SPARKLINE_SIZE);
     this.windowTimeFrame = TimeFrame.compute(date, (d, step) => timeMonth.offset(d, step), WINDOW_SIZE);
@@ -95,6 +98,7 @@ export class SensorParam {
   readonly isPer100K: boolean;
   readonly highValuesAre: Sensor['highValuesAre'];
   readonly is7DayAverage: boolean;
+  readonly isWeeklySignal: boolean;
   readonly valueUnit: string;
   readonly formatValue: (v?: number | null, enforceSign?: boolean) => string;
   readonly unit: string;
@@ -122,6 +126,7 @@ export class SensorParam {
     this.isPer100K = sensor.format === 'per100k';
     this.highValuesAre = sensor.highValuesAre;
     this.is7DayAverage = sensor.is7DayAverage;
+    this.isWeeklySignal = sensor.isWeeklySignal;
     this.valueUnit = this.is7DayAverage ? '7-day average' : 'value';
     this.formatValue = (v, e) => sensor.formatValue(v, e);
     this.unit = sensor.unit;
@@ -161,7 +166,11 @@ export class SensorParam {
 
   createColorScale(level: RegionLevel = 'county'): (v: number) => string {
     const domain = this.domain(level);
-    return scaleSequential(this.value.colorScale).domain(domain);
+    return scaleSequential(this.value.colorScale).domain(domain).clamp(true);
+  }
+
+  supportsRegion(region: Region): boolean {
+    return this.value != null && region != null && this.value.levels.includes(region.level);
   }
 
   static unbox(sensor: Sensor | SensorParam): Sensor {
@@ -218,7 +227,12 @@ export class RegionParam implements Region {
 }
 
 export function extractSparkLine<T extends EpiDataRow>(data: readonly T[], sparkLine: TimeFrame, sensor: Sensor): T[] {
-  return fitRange(addMissing(data.filter(sparkLine.filter)), sparkLine.min, sparkLine.max);
+  return fitRange(
+    addMissing(data.filter(sparkLine.filter), sensor.isWeeklySignal ? 'week' : 'day'),
+    sparkLine.min,
+    sparkLine.max,
+    sensor.isWeeklySignal ? 'week' : 'day',
+  );
 }
 
 export function groupByRegion<T extends EpiDataRow & { propertyId: string }>(data: readonly T[]): Map<string, T[]> {

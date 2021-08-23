@@ -3,9 +3,9 @@
   import SensorDatePicker2 from '../../components/SensorDatePicker2.svelte';
   import SensorSearch from '../../components/SensorSearch.svelte';
   import { formatAPITime } from '../../data';
-  import { nameInfos } from '../../data/regions';
   import { metaDataManager } from '../../stores';
   import { trackEvent } from '../../stores/ga';
+  import { sortedNameInfos } from './utils';
 
   /**
    * @type {import("../../stores/params").SensorParam}
@@ -44,6 +44,8 @@
     trackEvent('dashboard', 'set_sensor', 'global', d.key);
     sensor.set(d);
   }
+
+  $: filteredNameInfos = sortedNameInfos.filter((d) => sensor.supportsRegion(d));
 </script>
 
 <div class="uk-container content-grid">
@@ -57,7 +59,7 @@
   <RegionSearch
     className="grid-5-9"
     modern
-    items={nameInfos}
+    items={filteredNameInfos}
     selectedItem={region.value}
     on:change={(e) => setRegion(e.detail && e.detail.level === 'nation' ? null : e.detail)}
   />

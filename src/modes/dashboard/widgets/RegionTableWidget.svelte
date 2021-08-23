@@ -1,6 +1,6 @@
 <script>
   import { getContext } from 'svelte';
-  import { formatDateISO } from '../../../formats';
+  import { formatDateISO, formatWeek } from '../../../formats';
   import { infosByLevel, nationInfo } from '../../../data/regions';
   import { getLevelInfo } from '../../../stores';
   import ATableWidget, { toRow, DEFAULT_STATE } from './ATableWidget.svelte';
@@ -65,7 +65,9 @@
 
   $: shownLevel = level === 'nation' ? 'state' : level;
   $: loadedRows = loadData(sensor, date, shownLevel);
-  $: fileName = `${sensor.name}_${getLevelInfo(level).labelPlural}_${formatDateISO(date.value)}`;
+  $: fileName = `${sensor.name}_${getLevelInfo(level).labelPlural}_${
+    sensor.isWeeklySignal ? formatWeek(date.week) : formatDateISO(date.value)
+  }`;
 </script>
 
 <ATableWidget

@@ -1,8 +1,9 @@
 import { formatter, formatSpecifiers } from '../formats';
 import { interpolateBuPu, interpolateYlGnBu, interpolateYlOrRd } from 'd3-scale-chromatic';
 import { getDataSource } from './dataSourceLookup';
-import type { RegionLevel } from './regions';
+import { defaultCountyRegion, defaultStateRegion, nationInfo, Region, RegionLevel } from './regions';
 import type { SignalCategory, SignalFormat, SignalHighValuesAre } from './api';
+import { isArray } from './apimodel';
 
 export const sensorTypes: { id: SignalCategory; label: string }[] = [
   {
@@ -47,6 +48,7 @@ export interface Sensor {
   readonly credits?: string; // credit text
 
   readonly format: SignalFormat;
+  readonly isWeeklySignal: boolean;
   readonly valueScaleFactor: number;
   readonly xAxis: string; // x axis title
   readonly yAxis: string; // y axis value unit long
@@ -177,4 +179,36 @@ export function ensureSensorStructure(sensor: Partial<Sensor> & { name: string; 
   }
 
   return full as Sensor;
+}
+
+export function splitDailyWeekly<T extends { isWeeklySignal?: boolean }>(
+  sensors: T | readonly T[],
+): [{ type: 'day'; sensors: T[] }, { type: 'week'; sensors: T[] }] {
+  const arr = isArray(sensors) ? sensors : [sensors];
+  const day: T[] = [];
+  const week: T[] = [];
+  for (const s of arr) {
+    if (s.isWeeklySignal) {
+      week.push(s);
+    } else {
+      day.push(s);
+    }
+  }
+  return [
+    { type: 'day', sensors: day },
+    { type: 'week', sensors: week },
+  ];
+}
+
+export function resolveDefaultRegion(sensor: Sensor): Region {
+  if (sensor.levels.includes('nation')) {
+    return nationInfo;
+  }
+  if (sensor.levels.includes('state')) {
+    return defaultStateRegion;
+  }
+  if (sensor.levels.includes('county')) {
+    return defaultCountyRegion;
+  }
+  return nationInfo;
 }
