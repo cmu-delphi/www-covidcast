@@ -9,7 +9,7 @@
     genAnnotationLayer,
   } from '../../specs/lineSpec';
   import Toggle from '../../components/Toggle.svelte';
-  import { annotationManager } from '../../stores';
+  import { annotationManager, getLevelInfo } from '../../stores';
   import { createEventDispatcher } from 'svelte';
   import IndicatorAnnotation from '../../components/IndicatorAnnotation.svelte';
   import { timeDay } from 'd3-time';
@@ -19,6 +19,7 @@
   export let signal;
   export let domain;
   export let initialDate;
+  export let level;
 
   /**
    * @type {Date}
@@ -30,22 +31,24 @@
     highlightDate = signal.latest_time_value;
   }
 
-  function genSpec(signal, zero) {
+  function genSpec(signal, zero, level) {
+    const info = getLevelInfo(level);
     const options = {
       initialDate: highlightDate || initialDate,
       color: MULTI_COLORS[0],
       zero,
       dateField: 'date',
       valueField: 'fraction',
-      xTitle: 'Date',
-      title: `County Coverage of ${signal.name} Indicator`,
-      subTitle: 'Fraction of Counties',
+      isWeeklySignal: signal.isWeeklySignal,
+      xTitle: signal.isWeeklySignal ? 'week' : 'day',
+      title: `${info.label} Coverage of ${signal.name} Indicator`,
+      subTitle: `Fraction of ${info.labelPlural}`,
       valueFormat: '.1%',
       paddingLeft: 60,
       clearHighlight: false,
       reactOnMouseMove: false,
       tickCount: {
-        interval: 'day',
+        interval: signal.isWeeklySignal ? 'week' : 'day',
       },
     };
     return generateLineChartSpec(options);
@@ -71,7 +74,7 @@
   let zoom = false;
 
   $: annotations = $annotationManager.getWindowAnnotations(signal, nationInfo, domain.min, domain.max);
-  $: spec = injectRanges(genSpec(signal, !zoom), domain, annotations);
+  $: spec = injectRanges(genSpec(signal, !zoom, level), domain, annotations);
 
   export let data;
   // $: fileName = `${signal.name}_coverage`;

@@ -13,3 +13,7 @@
   background: #f0f1f3;
   color: inherit;
 }
+
+.uk-select option[disabled] {
+  color: #aaa !important;
+}

@@ -5,6 +5,7 @@
   import { getMonths } from './lib/helpers';
   import { keyCodes, keyCodesArray } from './lib/keyCodes';
   import { onMount, createEventDispatcher } from 'svelte';
+  import WeekLegend from './WeekLegend.svelte';
 
   const dispatch = createEventDispatcher();
   const today = new Date();
@@ -20,31 +21,10 @@
   export let trigger = null;
   export let selectableCallback = null;
   export let weekStart = 0;
-  export let daysOfWeek = [
-    ['Sunday', 'Sun'],
-    ['Monday', 'Mon'],
-    ['Tuesday', 'Tue'],
-    ['Wednesday', 'Wed'],
-    ['Thursday', 'Thu'],
-    ['Friday', 'Fri'],
-    ['Saturday', 'Sat'],
-  ];
-  export let monthsOfYear = [
-    ['January', 'Jan'],
-    ['February', 'Feb'],
-    ['March', 'Mar'],
-    ['April', 'Apr'],
-    ['May', 'May'],
-    ['June', 'Jun'],
-    ['July', 'Jul'],
-    ['August', 'Aug'],
-    ['September', 'Sep'],
-    ['October', 'Oct'],
-    ['November', 'Nov'],
-    ['December', 'Dec'],
-  ];
 
   export let style = '';
+
+  export let pickWeek = false;
 
   // theming variables:
   export let buttonBackgroundColor = '#fff';
@@ -55,15 +35,6 @@
   export let dayTextColor = '#4a4a4a';
   export let dayHighlightedBackgroundColor = '#efefef';
   export let dayHighlightedTextColor = '#4a4a4a';
-
-  let sortedDaysOfWeek =
-    weekStart === 0
-      ? daysOfWeek
-      : (() => {
-          let dow = daysOfWeek.slice();
-          dow.push(dow.shift());
-          return dow;
-        })();
 
   let highlighted = today;
   let shouldShakeDate = false;
@@ -205,13 +176,17 @@
     evt.preventDefault();
     switch (evt.keyCode) {
       case keyCodes.left:
-        incrementDayHighlighted(-1);
+        if (!pickWeek) {
+          incrementDayHighlighted(-1);
+        }
         break;
       case keyCodes.up:
         incrementDayHighlighted(-7);
         break;
       case keyCodes.right:
-        incrementDayHighlighted(1);
+        if (!pickWeek) {
+          incrementDayHighlighted(1);
+        }
         break;
       case keyCodes.down:
         incrementDayHighlighted(7);
@@ -268,19 +243,17 @@
         {canDecrementMonth}
         {start}
         {end}
-        {monthsOfYear}
         on:monthSelected={(e) => changeMonth(e.detail)}
         on:incrementMonth={(e) => incrementMonth(e.detail)}
       />
-      <div class="legend">
-        {#each sortedDaysOfWeek as day}<span>{day[1]}</span>{/each}
-      </div>
+      <WeekLegend {weekStart} />
       <Month
         {visibleMonth}
         {selected}
         {highlighted}
         {shouldShakeDate}
         id={visibleMonthId}
+        {pickWeek}
         on:dateSelected={(e) => registerSelection(e.detail)}
       />
     </div>
@@ -328,20 +301,8 @@
 
   @media (min-width: 480px) {
     .calendar {
-      width: 280px;
+      width: 300px;
       max-width: 100%;
     }
-  }
-
-  .legend {
-    color: #4a4a4a;
-    padding: 10px 0;
-    margin-bottom: 5px;
-  }
-
-  .legend span {
-    width: 14.285714%;
-    display: inline-block;
-    text-align: center;
   }
 </style>

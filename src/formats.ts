@@ -1,5 +1,6 @@
 import { timeFormat } from 'd3-time-format';
 import { format } from 'd3-format';
+import { EpiWeek } from './data/EpiWeek';
 
 const short = timeFormat('%B %d');
 const shortAbbr = timeFormat('%b %d');
@@ -55,6 +56,10 @@ export function formatDateShortOrdinal(date?: Date, nthSuffix = true): string {
 
 export function formatDateISO(date?: Date): string {
   return !date ? '?' : iso(date);
+}
+
+export function formatWeek(date?: Date | EpiWeek): string {
+  return !date ? '?' : date instanceof Date ? EpiWeek.fromDate(date).toString() : date.toString();
 }
 
 export function formatDateLocal(date?: Date): string {

@@ -1,5 +1,5 @@
 <script>
-  import { isMobileDevice, metaDataManager } from '../../stores';
+  import { getLevelInfo, isMobileDevice, metaDataManager } from '../../stores';
   import { DataFetcher } from '../../stores/DataFetcher';
   import Toggle from '../../components/Toggle.svelte';
   import Vega from '../../components/vega/Vega.svelte';
@@ -14,9 +14,10 @@
   } from '../../specs/lineSpec';
   import { joinTitle } from '../../specs/commonSpec';
   import { toTimeValue } from '../../data/utils';
-  import { formatDateISO } from '../../formats';
+  import { formatDateISO, formatWeek } from '../../formats';
   import { SensorParam } from '../../stores/params';
   import { throttle } from 'lodash';
+  import { EpiWeek } from '../../data/EpiWeek';
 
   /**
    * @type {import('../../data/sensor').Sensor}
@@ -31,7 +32,9 @@
   let asOfValue = null;
 
   const debounceUpdate = throttle((val) => {
-    asOfValue = val;
+    if (val && (/\d{4}-\d{2}-\d{2}/.test(val) || /\d{4}W?\d{2}/.test(val))) {
+      asOfValue = val;
+    }
   }, 500);
   $: {
     debounceUpdate(asOfValueBounced);
@@ -57,6 +60,7 @@
       subTitle: sensor.unit,
       highlightRegion: 'issue_mode',
       compareField: 'issue_mode',
+      isWeeklySignal: sensor.isWeeklySignal,
     };
     return generateCompareLineSpec(['latest', 'as_of'], options);
   }
@@ -80,7 +84,7 @@
     if (!asOf) {
       return latest;
     }
-    const asOfDate = timeDay.floor(new Date(asOf));
+    const asOfDate = sensor.isWeeklySignal ? EpiWeek.parse(asOf) : timeDay.floor(new Date(asOf));
     const asOfFetcher = new DataFetcher(asOfDate);
 
     const asOfData = asOfFetcher.fetch1Sensor1RegionNDates(sensor, region, timeFrame, { advanced: true }).then((rows) =>
@@ -99,14 +103,16 @@
     isMobile: $isMobileDevice,
   });
   $: data = loadData(sensor, region, timeFrame, asOfValue);
-  $: fileName = `${sensor.name}_${region.displayName}_${formatDateISO(timeFrame.min)}-${formatDateISO(timeFrame.max)}`;
+  $: fileName = `${sensor.name}_${region.displayName}_${
+    sensor.isWeeklySignal ? formatWeek(timeFrame.minWeek) : formatDateISO(timeFrame.min)
+  }-${sensor.isWeeklySignal ? formatWeek(timeFrame.maxWeek) : formatDateISO(timeFrame.max)}`;
 
   function findValue(data, date, mode) {
     if (!date) {
       return null;
     }
     const time = toTimeValue(date);
-    const row = data.find((d) => d.time_value === time && d.issue_mode == mode);
+    const row = data.find((d) => toTimeValue(d.date_value) === time && d.issue_mode == mode);
     if (!row) {
       return null;
     }
@@ -130,6 +136,9 @@
       {data}
       signals={{ highlight_tuple: resetOnClearHighlighTuple(timeFrame.max), highlightRegion: highlightAsOf }}
       signalListeners={['highlight']}
+      noDataText={!sensor || !region || sensor.levels.includes(region.level)
+        ? 'No data available'
+        : `${getLevelInfo(region.level).label} level is not supported`}
       on:signal={onSignal}
     />
   </div>
@@ -174,7 +183,14 @@
       <div>
         <span>
           {region.displayName} (as of
-          <input type="date" class="option-picker-input" bind:value={asOfValueBounced} />)
+          {#if sensor.isWeeklySignal}
+            <input
+              class="option-picker-input"
+              bind:value={asOfValueBounced}
+              pattern="\d\d\d\dW?\d\d"
+              placeholder="Epiweek (e.g., 2021W22)"
+            />{:else}
+            <input type="date" class="option-picker-input" bind:value={asOfValueBounced} />{/if})
         </span>
       </div>
       <div>

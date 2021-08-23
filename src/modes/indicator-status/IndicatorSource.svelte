@@ -1,13 +1,14 @@
 <script>
   import { currentSensor, metaDataManager, switchToMode } from '../../stores';
-  import { DEFAULT_SENSOR } from '../../stores/constants';
+  import { DEFAULT_SENSOR, getLevelInfo } from '../../stores/constants';
   import AboutSection from '../../components/AboutSection.svelte';
   import FancyHeader from '../../components/FancyHeader.svelte';
-  import { formatDateISO } from '../../formats';
+  import { formatDateISO, formatWeek } from '../../formats';
   import KPI from '../../components/KPI.svelte';
   import KPIValue from '../../components/KPIValue.svelte';
   import IndicatorCoverageChart from './IndicatorCoverageChart.svelte';
   import IndicatorCountyMap from './IndicatorCountyMap.svelte';
+  import IndicatorStateMap from './IndicatorStateMap.svelte';
   import IndicatorSignalTable from './IndicatorSignalTable.svelte';
   import { fetchCoverage, getAvailableCounties, findLatestCoverage, toLagToToday } from './data';
   import { TimeFrame } from '../../data/TimeFrame';
@@ -19,15 +20,17 @@
   $: resolvedSource = $metaDataManager.getSource($currentSensor) || $metaDataManager.getSource(DEFAULT_SENSOR);
 
   $: referenceSignal = resolvedSource.referenceSensor;
+  $: isRefWeekly = referenceSignal ? referenceSignal.isWeeklySignal : false;
   $: referenceMetaData = referenceSignal ? $metaDataManager.getMetaData(referenceSignal) : null;
+  $: coverageLevel = referenceSignal && referenceSignal.levels.includes('county') ? 'county' : 'state';
 
-  $: coverage = referenceSignal ? fetchCoverage(referenceSignal) : Promise.resolve([]);
+  $: coverage = referenceSignal ? fetchCoverage(referenceSignal, coverageLevel) : Promise.resolve([]);
   function findLatest(coverages, date) {
     return coverages.then((c) => findLatestCoverage(date, c));
   }
   $: pickedDate = referenceMetaData ? referenceMetaData.maxTime : new Date();
   $: latestCoverage = findLatest(coverage, pickedDate);
-  $: data = getAvailableCounties(referenceSignal, pickedDate);
+  $: data = getAvailableCounties(referenceSignal, pickedDate, coverageLevel);
 
   const domain = new TimeFrame(timeDay.offset(new Date(), -60), timeDay.floor(new Date()));
 
@@ -96,19 +99,27 @@
       <div class="mobile-two-col">
         <div>
           <div>
-            <KPI text={formatDateISO(referenceMetaData ? referenceMetaData.maxTime : null)} />
+            <KPI
+              text={isRefWeekly
+                ? formatWeek(referenceMetaData ? referenceMetaData.maxWeek : null)
+                : formatDateISO(referenceMetaData ? referenceMetaData.maxTime : null)}
+            />
           </div>
           <div class="sub">Latest Data Available</div>
         </div>
         <div>
           <div>
-            <KPI text="{toLagToToday(referenceMetaData)} days" />
+            <KPI text={toLagToToday(referenceMetaData)} />
           </div>
           <div class="sub">Lag to Today</div>
         </div>
         <div class="mobile-kpi">
           <div>
-            <KPI text={formatDateISO(referenceMetaData ? referenceMetaData.maxIssue : null)} />
+            <KPI
+              text={isRefWeekly
+                ? formatWeek(referenceMetaData ? referenceMetaData.maxIssueWeek : null)
+                : formatDateISO(referenceMetaData ? referenceMetaData.maxIssue : null)}
+            />
           </div>
           <div class="sub">Latest Issue</div>
         </div>
@@ -118,15 +129,18 @@
               <KPIValue value={d} factor={100} />
             {/await}
           </div>
-          <div class="sub">% of Counties Available</div>
+          <div class="sub">% of {getLevelInfo(coverageLevel).labelPlural} Available</div>
         </div>
       </div>
-      <FancyHeader invert sub="County Coverage">{resolvedSource ? resolvedSource.name : '?'}</FancyHeader>
+      <FancyHeader invert sub="{getLevelInfo(coverageLevel).labelPlural} Coverage"
+        >{resolvedSource ? resolvedSource.name : '?'}</FancyHeader
+      >
       <IndicatorCoverageChart
         signal={referenceSignal}
         initialDate={referenceMetaData.maxTime}
         {domain}
         data={coverage}
+        level={coverageLevel}
         on:highlight={(e) => {
           const nextDate = e.detail || referenceMetaData.maxTime;
           if (nextDate != pickedDate) {
@@ -134,12 +148,18 @@
           }
         }}
       />
-      <FancyHeader invert sub="Map ({formatDateISO(pickedDate)})"
+      <FancyHeader invert sub="Map ({isRefWeekly ? formatWeek(pickedDate) : formatDateISO(pickedDate)})"
         >{resolvedSource ? resolvedSource.name : '?'}</FancyHeader
       >
     </div>
     <div class="grid-2-12">
-      <IndicatorCountyMap signal={referenceSignal} date={pickedDate} {data} />
+      {#if coverageLevel === 'county'}
+        <IndicatorCountyMap signal={referenceSignal} date={pickedDate} {data} />
+      {:else if coverageLevel === 'state'}
+        <IndicatorStateMap signal={referenceSignal} date={pickedDate} {data} />
+      {:else}
+        Not available
+      {/if}
     </div>
     <div class="grid-3-11">
       <FancyHeader invert sub="Signals">Available</FancyHeader>

@@ -1,12 +1,12 @@
 <script>
   import Vega from '../../components/vega/Vega.svelte';
   import { formatDateISO, formatWeek } from '../../formats';
-  import { generateStateMapWithCountyBinaryDataSpec } from '../../specs/mapSpec';
+  import { generateStateBinaryDataSpec } from '../../specs/mapSpec';
   import DownloadMenu from '../../components/DownloadMenu.svelte';
   import IndicatorMapTooltip from './IndicatorMapTooltip.svelte';
 
   /**
-   * @type {{name: string, isWeeklySignal: boolean}}
+   * @type {{name: string}}
    */
   export let signal;
   /**
@@ -16,7 +16,7 @@
 
   export let data;
 
-  const spec = generateStateMapWithCountyBinaryDataSpec();
+  const spec = generateStateBinaryDataSpec();
 
   let vegaRef = null;
 </script>
@@ -27,7 +27,7 @@
     {vegaRef}
     {data}
     absolutePos
-    fileName="{signal.name}_US Counties_{signal.isWeeklySignal ? formatWeek(date.week) : formatDateISO(date.value)}"
+    fileName="{signal.name}_US States_{signal.isWeeklySignal ? formatWeek(date.week) : formatDateISO(date.value)}"
     advanced={false}
   />
 </div>

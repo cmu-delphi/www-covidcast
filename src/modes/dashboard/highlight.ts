@@ -11,6 +11,7 @@ import {
 } from '../../data/regions';
 import { sensorMap } from '../../stores';
 import { DateParam, Region, RegionLevel, RegionParam, Sensor, SensorParam, TimeFrame } from '../../stores/params';
+import { EpiWeek } from '../../data/EpiWeek';
 
 function isArray<T>(v: T | readonly T[]): v is readonly T[] {
   return Array.isArray(v);
@@ -73,7 +74,7 @@ export class WidgetHighlight {
   constructor(
     sensor: null | Sensor | readonly Sensor[],
     region: null | Region | readonly Region[] | RegionLevel,
-    private readonly date: null | Date | TimeFrame,
+    private readonly date: null | Date | TimeFrame | EpiWeek,
   ) {
     if (isArray(sensor)) {
       if (sensor.length === 1) {
@@ -115,6 +116,9 @@ export class WidgetHighlight {
     }
     if (this.date instanceof TimeFrame) {
       return this.date.min;
+    }
+    if (this.date instanceof EpiWeek) {
+      return this.date.toDate();
     }
     return this.date;
   }
@@ -160,7 +164,7 @@ export class WidgetHighlight {
     return null;
   }
 
-  equalDate(date: null | Date | TimeFrame): boolean {
+  equalDate(date: null | Date | TimeFrame | EpiWeek): boolean {
     if (this.date === date) {
       return true;
     }
@@ -169,6 +173,9 @@ export class WidgetHighlight {
     }
     if (this.date instanceof TimeFrame && date instanceof TimeFrame) {
       return this.date.equals(date);
+    }
+    if (this.date instanceof EpiWeek && date instanceof EpiWeek) {
+      return this.date.compareTo(date) == 0;
     }
     return false;
   }
@@ -241,28 +248,65 @@ export class WidgetHighlight {
 
   matchDate(date: Date | DateParam): boolean {
     const lDate = DateParam.unbox(date);
-    return (
-      this.date == null ||
-      (this.date instanceof Date ? this.date.valueOf() == lDate.valueOf() : this.date.includes(lDate))
-    );
+    if (this.date == null) {
+      return true;
+    }
+    if (this.date instanceof Date) {
+      return this.date.valueOf() == lDate.valueOf();
+    }
+    if (this.date instanceof TimeFrame) {
+      return this.date.includes(lDate);
+    }
+    if (this.date instanceof EpiWeek) {
+      return TimeFrame.fromEpiWeek(this.date).includes(lDate);
+    }
+    return false;
+  }
+
+  matchEpiWeek(week: EpiWeek): boolean {
+    if (this.date == null) {
+      return true;
+    }
+    if (this.date instanceof EpiWeek) {
+      return this.date.compareTo(week) == 0;
+    }
+    const tf = TimeFrame.fromEpiWeek(week);
+    if (this.date instanceof Date) {
+      return tf.includes(this.date);
+    }
+    if (this.date instanceof TimeFrame) {
+      return this.date.overlaps(tf);
+    }
+    return false;
   }
 
   matchTimeFrame(timeFrame: TimeFrame): boolean {
-    return (
-      this.date == null || (this.date instanceof Date ? timeFrame.includes(this.date) : this.date.overlaps(timeFrame))
-    );
+    if (this.date == null) {
+      return true;
+    }
+    if (this.date instanceof TimeFrame) {
+      return this.date.overlaps(timeFrame);
+    }
+    if (this.date instanceof Date) {
+      return timeFrame.includes(this.date);
+    }
+    if (this.date instanceof EpiWeek) {
+      return TimeFrame.fromEpiWeek(this.date).overlaps(timeFrame);
+    }
+    return false;
   }
 
   matches(
     sensor: Sensor | SensorParam,
     region: Region | RegionParam | RegionLevel,
-    date: Date | DateParam | TimeFrame,
+    date: Date | DateParam | TimeFrame | EpiWeek,
   ): boolean {
     return (
       this.matchSensor(sensor) &&
       ((typeof region === 'string' && this.matchLevel(region)) ||
         (typeof region !== 'string' && this.matchRegion(region))) &&
-      ((!(date instanceof TimeFrame) && this.matchDate(date)) ||
+      ((date instanceof Date && this.matchDate(date)) ||
+        (date instanceof EpiWeek && this.matchEpiWeek(date)) ||
         (date instanceof TimeFrame && this.matchTimeFrame(date)))
     );
   }

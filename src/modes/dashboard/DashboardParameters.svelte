@@ -44,6 +44,8 @@
     trackEvent('dashboard', 'set_sensor', 'global', d.key);
     sensor.set(d);
   }
+
+  $: filteredNameInfos = sortedNameInfos.filter((d) => sensor.supportsRegion(d));
 </script>
 
 <div class="uk-container content-grid">
@@ -57,7 +59,7 @@
   <RegionSearch
     className="grid-5-9"
     modern
-    items={sortedNameInfos}
+    items={filteredNameInfos}
     selectedItem={region.value}
     on:change={(e) => setRegion(e.detail && e.detail.level === 'nation' ? null : e.detail)}
   />

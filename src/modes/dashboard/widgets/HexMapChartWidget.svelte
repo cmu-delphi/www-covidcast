@@ -10,7 +10,7 @@
   import WidgetCard, { DEFAULT_WIDGET_STATE } from './WidgetCard.svelte';
   import { getContext } from 'svelte';
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
-  import { formatDateISO } from '../../../formats';
+  import { formatDateISO, formatWeek } from '../../../formats';
   import { useWhiteTextColor } from '../../../util';
   import { getInfoByName } from '../../../data/regions';
   import { state2TileCell } from '../../../specs/matrixSpec';
@@ -49,7 +49,7 @@
    * @param {import("../../../stores/params").DateParam} date
    */
   function generateFileName(sensor, date) {
-    return `${sensor.name}_US_States_${formatDateISO(date.value)}`;
+    return `${sensor.name}_US_States_${sensor.isWeeklySignal ? formatWeek(date.week) : formatDateISO(date.value)}`;
   }
 
   let loading = false;
@@ -74,7 +74,7 @@
             ...d,
             ...(value || {}),
           },
-          highlight: new WidgetHighlight(sensor.value, d, date.value),
+          highlight: new WidgetHighlight(sensor.value, d, sensor.isWeeklySignal ? date.week : date.value),
         };
       });
     });
@@ -94,18 +94,19 @@
 
   $: fileName = generateFileName(sensor, date);
 
-  $: highlighted = highlight != null && highlight.matches(sensor.value, 'state', date.value);
+  $: highlighted =
+    highlight != null && highlight.matches(sensor.value, 'state', sensor.isWeeklySignal ? date.week : date.value);
 
   function isSelected(tile, sensor, date, highlight) {
     if (!highlight) {
       return false;
     }
-    return highlight.matches(sensor.value, tile.region, date.value);
+    return highlight.matches(sensor.value, tile.region, sensor.isWeeklySignal ? date.week : date.value);
   }
 
   function resolveHighligtedValue(highlight, tileData, sensor, date) {
     return tileData.then((tiles) => {
-      if (!highlight || !highlight.matches(sensor.value, 'state', date.value)) {
+      if (!highlight || !highlight.matches(sensor.value, 'state', sensor.isWeeklySignal ? date.week : date.value)) {
         return null;
       }
       const highlightedTile = tiles.find((tile) => isSelected(tile, sensor, date, highlight));
@@ -137,7 +138,7 @@
   hideOverflow
 >
   <svelte:fragment slot="toolbar">
-    <DownloadMenu {fileName} data={tileData} {sensor} prepareRow={(row) => row.dump} />
+    <DownloadMenu {fileName} data={tileData} {sensor} prepareRow={(row) => row.dump} advanced={false} />
   </svelte:fragment>
   <div class="root">
     <HexGrid columns={maxColumn} style="gap: 2px; margin: 12px 24px">

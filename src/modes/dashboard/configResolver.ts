@@ -52,7 +52,7 @@ export function resolveDate(defaultDate: DateParam, d?: string): DateParam {
   if (!d) {
     return defaultDate;
   }
-  return new DateParam(parseAPITime(d.toString().replace(/-/gm, '')));
+  return new DateParam(parseAPITime(d.toString().replace(/-/gm, '').replace(/W/gm, '')));
 }
 
 export function resolveTimeFrame(
@@ -68,7 +68,7 @@ export function resolveTimeFrame(
     return sensor.timeFrame;
   }
   return new TimeFrame(
-    parseAPITime(d.min.toString().replace(/-/gm, '')),
-    parseAPITime(d.max.toString().replace(/-/gm, '')),
+    parseAPITime(d.min.toString().replace(/-/gm, '').replace(/W/gm, '')),
+    parseAPITime(d.max.toString().replace(/-/gm, '').replace(/W/gm, '')),
   );
 }
