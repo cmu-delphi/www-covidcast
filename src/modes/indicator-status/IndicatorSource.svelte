@@ -148,7 +148,7 @@
           }
         }}
       />
-      <FancyHeader invert sub="Map ({formatDateISO(pickedDate)})"
+      <FancyHeader invert sub="Map ({isRefWeekly ? formatWeek(pickedDate) : formatDateISO(pickedDate)})"
         >{resolvedSource ? resolvedSource.name : '?'}</FancyHeader
       >
     </div>

@@ -2,7 +2,7 @@ import { timeDay } from 'd3-time';
 import { callBackfillAPI, callCoverageAPI, CoverageRow, EpiDataBackfillRow, ParsedCoverageRow } from '../../data/api';
 import { GeoPair, SourceSignalPair, TimePair } from '../../data/apimodel';
 import type { EpiDataMetaParsedInfo, MetaDataManager, SensorLike, SensorSource } from '../../data/meta';
-import { countyInfo, RegionLevel, stateInfo } from '../../data/regions';
+import { countyInfo, RegionLevel, stateCoreInfo } from '../../data/regions';
 import { parseAPIDateAndWeek, parseAPITime, toTimeValue } from '../../data/utils';
 import { Sensor, TimeFrame } from '../../stores/params';
 import { addNameInfos, EpiDataRow } from '../../data';
@@ -145,7 +145,7 @@ export function getAvailableCounties(
 }
 
 export function fetchCoverage(ref: Sensor, coverageLevel: 'county' | 'state'): Promise<ParsedCoverageRow[]> {
-  const total = coverageLevel === 'county' ? countyInfo.length : stateInfo.length;
+  const total = coverageLevel === 'county' ? countyInfo.length : stateCoreInfo.length;
   return callCoverageAPI(
     ref.isWeeklySignal ? 'week' : 'day',
     SourceSignalPair.from(ref),

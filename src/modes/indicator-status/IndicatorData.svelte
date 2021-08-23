@@ -1,5 +1,5 @@
 <script>
-  import { isMobileDevice, metaDataManager } from '../../stores';
+  import { getLevelInfo, isMobileDevice, metaDataManager } from '../../stores';
   import { DataFetcher } from '../../stores/DataFetcher';
   import Toggle from '../../components/Toggle.svelte';
   import Vega from '../../components/vega/Vega.svelte';
@@ -136,6 +136,9 @@
       {data}
       signals={{ highlight_tuple: resetOnClearHighlighTuple(timeFrame.max), highlightRegion: highlightAsOf }}
       signalListeners={['highlight']}
+      noDataText={!sensor || !region || sensor.levels.includes(region.level)
+        ? 'No data available'
+        : `${getLevelInfo(region.level).label} level is not supported`}
       on:signal={onSignal}
     />
   </div>

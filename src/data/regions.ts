@@ -82,6 +82,10 @@ Object.entries(stateClasses).forEach(([key, value]) => {
     Object.assign(stateLookup.get(v.toLowerCase())!, { region: key });
   }
 });
+/**
+ * core US state without territories
+ */
+export const stateCoreInfo = stateInfo.filter((d) => d.region != null);
 
 export const nationInfo: RegionInfo = {
   level: 'nation',
