@@ -588,6 +588,33 @@ export function generateStateMapWithCountyDataSpec(options: CommonParams = {}): 
 }
 
 /**
+ * generates a map of states
+ */
+export function generateStateBinaryDataSpec(options: CommonParams = {}): TopLevelSpec {
+  const level = 'state';
+  const topoJSON = stateJSON();
+
+  const spec = genBaseSpec(level, topoJSON, options);
+
+  spec.datasets!.nation = nationJSON();
+  const missing = genMissingLayer();
+  (missing.mark as MarkDef<'geoshape'>).color = MISSING_COLOR;
+  spec.layer.push(missing);
+  // state, msa
+  const states = genLevelLayer(options);
+  spec.layer.push(states);
+  states.encoding!.color = {
+    condition: {
+      test: 'datum.value != null',
+      value: 'steelblue',
+    },
+    value: null,
+  };
+  addCommonLayers(options, spec);
+  return spec;
+}
+
+/**
  * generates a map of counties
  */
 export function generateStateMapWithCountyBinaryDataSpec(options: CommonParams = {}): TopLevelSpec {

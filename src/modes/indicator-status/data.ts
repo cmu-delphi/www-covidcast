@@ -2,7 +2,7 @@ import { timeDay } from 'd3-time';
 import { callBackfillAPI, callCoverageAPI, CoverageRow, EpiDataBackfillRow, ParsedCoverageRow } from '../../data/api';
 import { GeoPair, SourceSignalPair, TimePair } from '../../data/apimodel';
 import type { EpiDataMetaParsedInfo, MetaDataManager, SensorLike, SensorSource } from '../../data/meta';
-import { countyInfo } from '../../data/regions';
+import { countyInfo, RegionLevel, stateInfo } from '../../data/regions';
 import { parseAPIDateAndWeek, parseAPITime, toTimeValue } from '../../data/utils';
 import { Sensor, TimeFrame } from '../../stores/params';
 import { addNameInfos, EpiDataRow } from '../../data';
@@ -82,17 +82,18 @@ export function loadData(
   ])
     .then((r) => ([] as CoverageRow[]).concat(...r))
     .then((coverages) => {
-      return initial.map((r) => {
+      return initial.map((sourceData) => {
         const sourceCoverages: ParsedCoverageRow[] = coverages
-          .filter((d) => d.source == r.source && d.signal == r.referenceSensor?.signal)
+          .filter((d) => d.source == sourceData.source && d.signal == sourceData.referenceSensor?.signal)
           .map((d) => ({
             ...d,
             ...parseAPIDateAndWeek(d.time_value),
             fraction: d.count / countyInfo.length,
           }));
         return {
-          ...r,
-          latest_coverage: findLatestCoverage(r.latest_data, sourceCoverages),
+          ...sourceData,
+          supports_county: sourceData.referenceSensor && sourceData.referenceSensor.levels.includes('county'),
+          latest_coverage: findLatestCoverage(sourceData.latest_data, sourceCoverages),
           coverages: sourceCoverages,
         };
       });
@@ -130,21 +131,30 @@ function determineDomain(data: SourceData[], days: number): TimeFrame {
   return new TimeFrame(min, new Date(max));
 }
 
-export function getAvailableCounties(ref: Sensor | null, date: Date): Promise<(EpiDataRow & RegionInfo)[]> {
+export function getAvailableCounties(
+  ref: Sensor | null,
+  date: Date,
+  level: RegionLevel,
+): Promise<(EpiDataRow & RegionInfo)[]> {
   if (!ref) {
     return Promise.resolve([]);
   }
-  return fetchTriple(ref, 'county', date, {
+  return fetchTriple(ref, level, date, {
     stderr: false,
-  }).then((rows) => addNameInfos(rows).filter((d) => d.level === 'county')); // no mega-counties
+  }).then((rows) => addNameInfos(rows).filter((d) => d.level === level)); // no mega-counties
 }
 
-export function fetchCoverage(ref: Sensor): Promise<ParsedCoverageRow[]> {
-  return callCoverageAPI(ref.isWeeklySignal ? 'week' : 'day', SourceSignalPair.from(ref), 'only-county').then((cov) =>
+export function fetchCoverage(ref: Sensor, coverageLevel: 'county' | 'state'): Promise<ParsedCoverageRow[]> {
+  const total = coverageLevel === 'county' ? countyInfo.length : stateInfo.length;
+  return callCoverageAPI(
+    ref.isWeeklySignal ? 'week' : 'day',
+    SourceSignalPair.from(ref),
+    coverageLevel === 'county' ? 'only-county' : 'state',
+  ).then((cov) =>
     cov.map((d) => ({
       ...d,
       ...parseAPIDateAndWeek(d.time_value),
-      fraction: d.count / countyInfo.length,
+      fraction: d.count / total,
     })),
   );
 }

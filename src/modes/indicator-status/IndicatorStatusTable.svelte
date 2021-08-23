@@ -127,7 +127,7 @@
         </td>
         <td>
           <div class="mobile-table-chart mobile-table-chart-small">
-            <Vega {spec} data={r.coverages} noDataText="N/A" />
+            <Vega {spec} data={r.coverages} noDataText={r.supports_county ? 'N/A' : 'Not Supported'} />
           </div>
         </td>
         <td>
