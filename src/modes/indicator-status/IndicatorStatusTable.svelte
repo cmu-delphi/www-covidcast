@@ -71,12 +71,14 @@
     </tr>
     <tr>
       <th />
-      <th class="mobile-th uk-text-right">Latest Issue</th>
-      <th class="mobile-th uk-text-right">Latest Data Available</th>
+      <th class="mobile-th uk-text-right" title="Date the most recent update was published by Delphi">Latest Issue</th>
+      <th class="mobile-th uk-text-right" title="Most recent date for which data is available">Latest Data</th>
       <th class="mobile-th uk-text-right">Lag to Today</th>
-      <th class="mobile-th uk-text-right">Latest County Coverage</th>
+      <th class="mobile-th uk-text-right" title="Percent of US counties included in latest day of data"
+        >Latest County Coverage</th
+      >
       <th class="mobile-th uk-text-right">
-        <span>County Coverage</span>
+        <span title="Percent of US counties included">County Coverage</span>
         <div class="mobile-th-range">
           <span> {formatDateShortNumbers(loader.domain.min)} </span>
           <span> {formatDateShortNumbers(loader.domain.max)} </span>
@@ -111,7 +113,12 @@
             href="../indicator-source?sensor={r.source}-{r.reference_signal}"
             on:click|preventDefault={() => dispatch('select', r)}>{r.name}</a
           >
-          <div class="source">API: {r.source}</div>
+          <div
+            class="source"
+            title="Use 'data_source={r.source}' when fetching from the covidcast endpoint of the Epidata API."
+          >
+            API data_source: {r.source}
+          </div>
         </td>
         <td class="uk-text-right uk-text-nowrap">
           {r.ref.isWeeklySignal ? formatWeek(r.latest_issue_week) : formatDateISO(r.latest_issue)}

@@ -1,5 +1,5 @@
 <script>
-  import { currentRegionInfo, currentSensor, metaDataManager, selectByInfo } from '../../stores';
+  import { currentRegionInfo, currentSensor, currentMode, metaDataManager, selectByInfo } from '../../stores';
   import { DEFAULT_SENSOR } from '../../stores/constants';
   import AboutSection from '../../components/AboutSection.svelte';
   import SensorSearch from '../../components/SensorSearch.svelte';
@@ -15,6 +15,8 @@
   import SensorBadges from '../../components/SensorBadges.svelte';
   import GeoLevelBadge from '../../components/GeoLevelBadge.svelte';
   import SourceBadges from '../../components/SourceBadges.svelte';
+  import chevronLeftIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-left.svg';
+  import { modeByID } from '..';
 
   $: sensor = $metaDataManager.getSensor($currentSensor) || $metaDataManager.getSensor(DEFAULT_SENSOR);
   $: source = sensor ? $metaDataManager.getSource(sensor) : undefined;
@@ -25,6 +27,10 @@
   $: metaData = $metaDataManager.getMetaData(sensor);
   $: name = sensor ? sensor.name : 'Signal';
 
+  function switchMode() {
+    currentMode.set(modeByID['indicator-source']);
+  }
+
   function formatDateOrWeek(sensor, date, week) {
     return sensor.isWeeklySignal ? formatWeek(week) : formatDateISO(date);
   }
@@ -33,6 +39,9 @@
 <div class="mobile-root">
   <div class="mobile-header-line-bg">
     <div class="mobile-header-line">
+      <button class="mobile-back inline-svg-icon" on:click={switchMode}>
+        {@html chevronLeftIcon}
+      </button>
       <h2>Indicator Status of <span>{name}</span></h2>
     </div>
     <div class="uk-container content-grid">
@@ -75,7 +84,7 @@
       {/if}
     </AboutSection>
     <AboutSection className="uk-margin-small-top uk-margin-small-bottom">
-      <h3 class="mobile-h3">About {source ? source.name : ''}</h3>
+      <h3 class="mobile-h3">Provided by {source ? source.name : ''}</h3>
       {#if source}
         <div>
           <SourceBadges {source} />
@@ -123,7 +132,7 @@
           <div>
             <KPI text={metaData ? formatDateOrWeek(sensor, metaData.maxTime, metaData.maxWeek) : '?'} />
           </div>
-          <div class="sub">Latest Data Available</div>
+          <div class="sub" title="Most recent date for which data is available">Latest Data Available</div>
         </div>
         <div>
           <div>
@@ -135,7 +144,7 @@
           <div>
             <KPI text={metaData ? formatDateOrWeek(sensor, metaData.maxIssue, metaData.maxIssueWeek) : '?'} />
           </div>
-          <div class="sub">Latest Issue</div>
+          <div class="sub" title="Date the most recent update was published by Delphi">Latest Issue</div>
         </div>
       </div>
     </div>

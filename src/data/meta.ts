@@ -151,13 +151,6 @@ function findRawCumulativeSignal(sensor: SensorSensor, sensors: SensorSensor[]) 
   return cum;
 }
 
-function addDUALink(links: { alt: string; href: string }[], dua?: string | null) {
-  if (dua) {
-    return [...links, { alt: 'DUA', href: dua }];
-  }
-  return links;
-}
-
 function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
   list: SensorSensor[];
   map: Map<string, SensorSensor>;
@@ -219,7 +212,7 @@ function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
 
       return {
         ...sm,
-        link: addDUALink(sm.link, sm.dua),
+        link: sm.link,
         sensors,
         description: sm.description ? parseMarkDown(sm.description.trim()) : '',
         credits,
