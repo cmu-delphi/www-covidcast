@@ -53,7 +53,9 @@
       const d = getInfoByName(tile.id, 'state');
       const value = dateData.then((lookup) => (lookup.get(d.propertyId) || [])[0]);
       const sparkLine = sparkLines
-        ? sparkLines.then((lookup) => addMissing(lookup.get(d.propertyId) || [], sensor.value))
+        ? sparkLines.then((lookup) =>
+            addMissing(lookup.get(d.propertyId) || [], sensor.isWeeklySignal ? 'week' : 'day'),
+          )
         : null;
       return {
         ...tile,

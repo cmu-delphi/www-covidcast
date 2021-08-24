@@ -126,7 +126,7 @@ export function addMissing<T extends EpiDataRow = EpiDataRow>(rows: T[], granula
   const max = rows[rows.length - 1].date_value;
   const template = rows[0];
   const base = rows.slice();
-  const ranger = granularity == 'day' ? timeDay : timeWeek;
+  const ranger = granularity == 'week' ? timeWeek : timeDay;
   const range = ranger.range(min, ranger.offset(max, 1), 1);
   if (range.length === rows.length) {
     // full
@@ -178,16 +178,14 @@ export function averageByDate(rows: EpiDataRow[], mixin: Partial<EpiDataRow> = {
       byDate.set(key, [row]);
     }
   }
-  return Array.from(byDate.values())
-    .map((rows) => {
-      const r: EpiDataRow = {
-        ...rows[0],
-        ...mixin,
-        value: avg(rows, 'value')!,
-        stderr: avg(rows, 'stderr')!,
-        sample_size: avg(rows, 'sample_size')!,
-      };
-      return r;
-    })
-    .sort((a, b) => a.time_value - b.time_value);
+  return Array.from(byDate.values(), (rows) => {
+    const r: EpiDataRow = {
+      ...rows[0],
+      ...mixin,
+      value: avg(rows, 'value')!,
+      stderr: avg(rows, 'stderr')!,
+      sample_size: avg(rows, 'sample_size')!,
+    };
+    return r;
+  }).sort((a, b) => a.time_value - b.time_value);
 }
