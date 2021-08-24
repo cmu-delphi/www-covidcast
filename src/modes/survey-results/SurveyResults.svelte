@@ -7,7 +7,6 @@
   import { nationInfo, nameInfos, getStateOfCounty } from '../../data/regions';
   import MobileSurveyToc from './MobileSurveyToc.svelte';
   import { DateParam, RegionParam, SensorParam } from '../../stores/params';
-  import getRelatedCounties from '../../data/relatedRegions';
   import { modeByID } from '..';
   import { scrollIntoView } from '../../util';
   import { DataFetcher } from '../../stores/DataFetcher';
@@ -35,8 +34,8 @@
     if (region.level === 'county') {
       // state
       fetcher.fetchNSensor1RegionNDates(sensors, getStateOfCounty(region.value), date.windowTimeFrame);
-      // related regions
-      fetcher.fetchNSensorNRegionNDates(sensors, getRelatedCounties(region.value), date.windowTimeFrame);
+      // // related regions
+      // fetcher.fetchNSensorNRegionNDates(sensors, getRelatedCounties(region.value), date.windowTimeFrame);
     }
 
     Promise.all(loaded).then(() => {
