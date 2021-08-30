@@ -33,25 +33,43 @@ export const modes = [
   {
     id: 'export',
     label: 'Export Data',
+    isGeneric: true,
     component: () => import(/* webpackChunkName: 'm-export' */ './exportdata/ExportData.svelte').then((r) => r.default),
   },
   {
     id: 'indicator-status',
     label: 'Indicator Status Overview',
+    isGeneric: true,
     component: () =>
       import(/* webpackChunkName: 'm-indicator-status' */ './indicator-status/IndicatorStatusOverview.svelte').then(
         (r) => r.default,
       ),
+    waitForReady: true,
   },
   {
-    id: 'data-anomalies',
-    label: 'Data Anomalies',
+    id: 'indicator-source',
+    label: 'Indicator Source',
+    isGeneric: true,
     component: () =>
-      import(/* webpackChunkName: 'm-data-anomalies' */ './data-anomalies/DataAnomalies.svelte').then((r) => r.default),
+      import(/* webpackChunkName: 'm-indicator-source' */ './indicator-status/IndicatorSource.svelte').then(
+        (r) => r.default,
+      ),
+    waitForReady: true,
+  },
+  {
+    id: 'indicator-signal',
+    label: 'Indicator Signal',
+    isGeneric: true,
+    component: () =>
+      import(/* webpackChunkName: 'm-indicator-signal' */ './indicator-status/IndicatorSignal.svelte').then(
+        (r) => r.default,
+      ),
+    waitForReady: true,
   },
   {
     id: 'dashboard',
     label: 'Dashboard Builder',
+    isGeneric: true,
     component: () =>
       import(/* webpackChunkName: 'm-dashboard' */ './dashboard/Dashboard.svelte').then((r) => r.default),
     waitForReady: true,

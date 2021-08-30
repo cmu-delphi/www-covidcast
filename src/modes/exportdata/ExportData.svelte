@@ -8,12 +8,13 @@
   import { trackEvent } from '../../stores/ga';
   import Search from '../../components/Search.svelte';
   import { getCountiesOfState, getInfoByName, infosByLevel } from '../../data/regions';
-  import { formatDateISO } from '../../formats';
+  import { formatDateISO, formatWeek } from '../../formats';
   import { DateParam } from '../../stores/params';
   import FancyHeader from '../../components/FancyHeader.svelte';
   import IndicatorAnnotation from '../../components/IndicatorAnnotation.svelte';
   import SensorBadges from '../../components/SensorBadges.svelte';
   import SourceBadges from '../../components/SourceBadges.svelte';
+  import { EpiWeek } from '../../data/EpiWeek';
 
   let sourceValue = null;
   $: source = sourceValue ? $metaDataManager.metaSources.find((d) => d.source === sourceValue) : null;
@@ -25,6 +26,9 @@
       sensorValue = sensors[0].key;
     }
   }
+
+  $: isWeekly = sensor ? sensor.isWeeklySignal : false;
+  $: formatDate = isWeekly ? (d) => formatWeek(d).replace('W', '') : formatDateISO;
 
   let geoType = 'county';
 
@@ -89,8 +93,8 @@
 
   onMount(() => {
     if (form) {
-      const date = `start_day=${formatDateISO(startDate)},end_day=${formatDateISO(endDate)}`;
       form.addEventListener('submit', () => {
+        const date = `start_day=${formatDate(startDate)},end_day=${formatDate(endDate)}`;
         trackEvent(
           'export',
           'download',
@@ -119,6 +123,12 @@
   function pythonDate(date) {
     return `date(${date.getFullYear()}, ${date.getMonth() + 1}, ${date.getDate()})`;
   }
+  function pythonWeek(date) {
+    const week = EpiWeek.fromDate(date);
+    return `Week(${week.year}, ${week.week})`;
+  }
+
+  $: formatPythonDate = isWeekly ? pythonWeek : pythonDate;
 
   function resolveDateRange(sensor) {
     if (!sensor) {
@@ -237,26 +247,28 @@
 
       <section class="uk-form-horizontal uk-margin-large-top">
         <FancyHeader sub="Parameters" normal>3. Specify</FancyHeader>
-        <p>Customize the date range and pick a geographic level to download data for</p>
+        <p>Customize the {isWeekly ? 'week' : 'date'} range and pick a geographic level to download data for</p>
         <div>
-          <span class="uk-form-label">Date range</span>
+          <span class="uk-form-label">{isWeekly ? 'Week' : 'Date'} range</span>
           <div class="uk-form-controls">
             <Datepicker
               bind:selected={startDate}
               start={dateRange.minTime}
               end={dateRange.maxTime}
-              formattedSelected={formatDateISO(startDate)}
+              pickWeek={isWeekly}
+              formattedSelected={formatDate(startDate)}
             >
-              <button aria-label="selected start date" class="uk-input" on:>{formatDateISO(startDate)}</button>
+              <button aria-label="selected start date" class="uk-input" on:>{formatDate(startDate)}</button>
             </Datepicker>
             -
             <Datepicker
               bind:selected={endDate}
               start={dateRange.minTime}
               end={dateRange.maxTime}
-              formattedSelected={formatDateISO(endDate)}
+              pickWeek={isWeekly}
+              formattedSelected={formatDate(endDate)}
             >
-              <button aria-label="selected end date" class="uk-input" on:>{formatDateISO(endDate)}</button>
+              <button aria-label="selected end date" class="uk-input" on:>{formatDate(endDate)}</button>
             </Datepicker>
           </div>
         </div>
@@ -322,15 +334,16 @@
             </div>
             <div class="region-row">
               <input type="radio" name="as-of" value="single" id="as-of-single" bind:group={asOfMode} />
-              <label for="as-of-single">Specific date: </label>
+              <label for="as-of-single">Specific {isWeekly ? 'week' : 'date'}: </label>
               <Datepicker
                 bind:selected={asOfDate}
-                formattedSelected={asOfDate ? formatDateISO(asOfDate) : 'Select date'}
+                pickWeek={isWeekly}
+                formattedSelected={asOfDate ? formatDate(asOfDate) : 'Select date'}
                 start={asOfStart}
                 end={asOfEnd}
               >
                 <button aria-label="selected as of date" class="uk-input" disabled={asOfMode === 'latest'} on:
-                  >{asOfDate ? formatDateISO(asOfDate) : 'Select date'}</button
+                  >{asOfDate ? formatDate(asOfDate) : 'Select date'}</button
                 >
               </Datepicker>
             </div>
@@ -348,7 +361,7 @@
       </section>
 
       <section class="uk-margin-large-top">
-        <FancyHeader sub="Data" normal>3. Get</FancyHeader>
+        <FancyHeader sub="Data" normal>4. Get</FancyHeader>
         <p>
           {@html sensor && sensor.credits ? sensor.credits : ''}
         </p>
@@ -364,17 +377,17 @@
           <form bind:this={form} id="form" method="GET" action={CSV_SERVER_ENDPOINT} download>
             <button type="submit" class="uk-button uk-button-default">Download CSV File</button>
             <input type="hidden" name="signal" value={sensor ? `${sensor.id}:${sensor.signal}` : ''} />
-            <input type="hidden" name="start_day" value={formatDateISO(startDate)} />
-            <input type="hidden" name="end_day" value={formatDateISO(endDate)} />
+            <input type="hidden" name="start_day" value={formatDate(startDate)} />
+            <input type="hidden" name="end_day" value={formatDate(endDate)} />
             <input type="hidden" name="geo_type" value={geoType} />
             {#if !isAllRegions}<input type="hidden" name="geo_values" value={geoIDs.join(',')} />{/if}
-            {#if usesAsOf}<input type="hidden" name="as_of" value={formatDateISO(asOfDate)} />{/if}
+            {#if usesAsOf}<input type="hidden" name="as_of" value={formatDate(asOfDate)} />{/if}
           </form>
           <p>Manually fetch data:</p>
           <div class="code-block-wrapper">
             <pre
               class="code-block"><code>
-            {`wget --content-disposition "${CSV_SERVER_ENDPOINT}?signal=${sensor ? `${sensor.id}:${sensor.signal}` : ''}&start_day=${formatDateISO(startDate)}&end_day=${formatDateISO(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${formatDateISO(asOfDate)}` : ''}"`}
+            {`wget --content-disposition "${CSV_SERVER_ENDPOINT}?signal=${sensor ? `${sensor.id}:${sensor.signal}` : ''}&start_day=${formatDate(startDate)}&end_day=${formatDate(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${formatDate(asOfDate)}` : ''}"`}
             </code></pre>
           </div>
           <p class="description">
@@ -391,12 +404,12 @@
           <p>Fetch data:</p>
           <pre
             class="code-block"><code>
-        {`from datetime import date
+        {`${isWeekly ? 'from epiweeks import Week' : 'from datetime import date'}
 import covidcast
 
 data = covidcast.signal("${sensor ? sensor.id : ''}", "${sensor ? sensor.signal : ''}",
-                        ${pythonDate(startDate)}, ${pythonDate(endDate)},
-                        "${geoType}"${isAllRegions ? '' : `, ["${geoIDs.join('", "')}"]`}${usesAsOf ? `, as_of = ${pythonDate(asOfDate)}` : ''})`}
+                        ${formatPythonDate(startDate)}, ${formatPythonDate(endDate)},
+                        "${geoType}"${isAllRegions ? '' : `, ["${geoIDs.join('", "')}"]`}${usesAsOf ? `, as_of = ${formatPythonDate(asOfDate)}` : ''})`}
       </code></pre>
           <p class="description">
             For more details and examples, see the
@@ -418,8 +431,8 @@ data = covidcast.signal("${sensor ? sensor.id : ''}", "${sensor ? sensor.signal 
 
 cc_data <- covidcast_signal(
   data_source = "${sensor ? sensor.id : ''}", signal = "${sensor ? sensor.signal : ''}",
-  start_day = "${formatDateISO(startDate)}", end_day = "${formatDateISO(endDate)}",
-  geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`}${usesAsOf ? `, as_of = "${formatDateISO(asOfDate)}"` : ''})
+  start_day = "${formatDate(startDate)}", end_day = "${formatDate(endDate)}",
+  geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`}${usesAsOf ? `, as_of = "${formatDate(asOfDate)}"` : ''})
 )`}
       </code></pre>
           <p class="description">

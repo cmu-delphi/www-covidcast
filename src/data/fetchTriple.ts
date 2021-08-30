@@ -2,9 +2,11 @@ import { EpiDataRow, parseData } from '.';
 import type { Sensor } from '../stores/constants';
 import { callAPI, EpiDataJSONRow } from './api';
 import { GeoPair, isArray, SourceSignalPair, TimePair, groupByLevel, groupBySource } from './apimodel';
+import { EpiWeek } from './EpiWeek';
 import type { RegionInfo as Region, RegionLevel } from './regions';
+import { splitDailyWeekly } from './sensor';
 import type { TimeFrame } from './TimeFrame';
-import { toTimeValue } from './utils';
+import { toTimeValue, toTimeWeekValue } from './utils';
 
 function toGeoPair(
   transfer: (keyof EpiDataJSONRow)[],
@@ -95,11 +97,13 @@ function toSourceSignalPair<S extends { id: string; signal: string; valueScaleFa
   };
 }
 
-export default function fetchTriple<S extends { id: string; signal: string; format: Sensor['format'] }>(
+export default function fetchTriple<
+  S extends { id: string; signal: string; format: Sensor['format']; isWeeklySignal: boolean },
+>(
   sensor: S | readonly S[],
   region: Region | RegionLevel | readonly Region[],
   date: TimeFrame | Date,
-  { advanced = false, stderr = true } = {},
+  { advanced = false, stderr = true, asOf = null as null | Date | EpiWeek } = {},
 ): Promise<EpiDataRow[]> {
   const transfer: (keyof EpiDataJSONRow)[] = ['value'];
   if (stderr) {
@@ -108,18 +112,51 @@ export default function fetchTriple<S extends { id: string; signal: string; form
   if (advanced) {
     transfer.push('sample_size', 'issue');
   }
-  const mixinValues: Partial<EpiDataRow> = {
-    time_type: 'day',
-  };
-  const geoPairs = toGeoPair(transfer, mixinValues, region);
-  const { sourceSignalPairs, factor } = toSourceSignalPair(transfer, mixinValues, sensor);
 
-  const timePairs = new TimePair('day', date);
-  if (date instanceof Date) {
-    // single level
-    mixinValues.time_value = toTimeValue(date);
-  } else {
-    transfer.push('time_value');
+  function fixAsOf() {
+    if (asOf instanceof EpiWeek) {
+      return asOf.toDate();
+    }
+    return asOf;
   }
-  return callAPI(sourceSignalPairs, geoPairs, timePairs, transfer).then((rows) => parseData(rows, mixinValues, factor));
+
+  function fetchImpl(
+    type: 'day' | 'week',
+    geoPairs: GeoPair | GeoPair[],
+    typeSensors: readonly S[],
+    typedTransfer: (keyof EpiDataJSONRow)[],
+    typedMixinValues: Partial<EpiDataRow>,
+  ) {
+    typedMixinValues.time_type = type;
+    const { sourceSignalPairs, factor } = toSourceSignalPair(typedTransfer, typedMixinValues, typeSensors);
+    if (date instanceof Date) {
+      // single level and single date
+      typedMixinValues.time_value = type === 'day' ? toTimeValue(date) : toTimeWeekValue(date);
+      typedMixinValues.date_value = date;
+      typedMixinValues.week_value = EpiWeek.fromDate(date);
+    } else {
+      typedTransfer.push('time_value');
+    }
+    return callAPI(type, sourceSignalPairs, geoPairs, new TimePair(type, date), typedTransfer, {
+      asOf: fixAsOf(),
+    }).then((rows) => parseData(rows, typedMixinValues, factor));
+  }
+
+  const [day, week] = splitDailyWeekly(sensor);
+  const mixinValues: Partial<EpiDataRow> = {};
+  const geoPairs = toGeoPair(transfer, mixinValues, region);
+
+  if (day.sensors.length === 0) {
+    // all weekly
+    return fetchImpl(week.type, geoPairs, week.sensors, transfer, mixinValues);
+  } else if (week.sensors.length === 0) {
+    // all day
+    return fetchImpl(day.type, geoPairs, day.sensors, transfer, mixinValues);
+  }
+  // mix
+  return Promise.all([
+    // work on copies!
+    fetchImpl(day.type, geoPairs, day.sensors, transfer.slice(), { ...mixinValues }),
+    fetchImpl(week.type, geoPairs, week.sensors, transfer.slice(), { ...mixinValues }),
+  ]).then((r) => ([] as EpiDataRow[]).concat(...r));
 }

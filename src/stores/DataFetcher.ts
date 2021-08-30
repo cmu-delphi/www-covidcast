@@ -1,11 +1,12 @@
 import { addMissing, addNameInfos, EpiDataRow, parseAPITime } from '../data';
-import { callTrendAPI, callTrendSeriesAPI } from '../data/api';
+import { callTrendSeriesAPI } from '../data/api';
 import { fixLevel, GeoPair, SourceSignalPair } from '../data/apimodel';
+import type { EpiWeek } from '../data/EpiWeek';
 import fetchTriple from '../data/fetchTriple';
 import type { RegionInfo, RegionLevel } from '../data/regions';
 import type { Sensor } from '../data/sensor';
 import type { TimeFrame } from '../data/TimeFrame';
-import { asSensorTrend, SensorTrend } from '../data/trend';
+import { asSensorTrend, fetchTrend, SensorTrend } from '../data/trend';
 import { DateParam, groupByRegion, Region, RegionParam, SensorParam } from './params';
 
 export interface RegionEpiDataRow extends EpiDataRow, Region {}
@@ -19,6 +20,8 @@ export class DataFetcher {
   private primaryRegionId = '';
   private primaryTimeValue = 0;
   private primaryWindowRange = '';
+
+  constructor(public readonly asOf: Date | EpiWeek | null = null) {}
 
   toDateKey(sensor: Sensor, region: { id: string; level: string }, date: DateParam, suffix = ''): string {
     const s = this.primarySensorKey === sensor.key ? 'SENSOR' : sensor.key;
@@ -84,7 +87,7 @@ export class DataFetcher {
     if (this.cache.has(key)) {
       return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
     }
-    const r = fetchTriple(lSensor, regions, lDate.value).then(addNameInfos);
+    const r = fetchTriple(lSensor, regions, lDate.value, { asOf: this.asOf }).then(addNameInfos);
     this.cache.set(key, r);
     return r;
   }
@@ -93,6 +96,7 @@ export class DataFetcher {
     sensor: Sensor | SensorParam,
     region: Region | RegionParam,
     timeFrame: TimeFrame,
+    { advanced = false } = {},
   ): Promise<RegionEpiDataRow[]> {
     const lSensor = SensorParam.unbox(sensor);
     const lRegion = RegionParam.unbox(region);
@@ -101,9 +105,9 @@ export class DataFetcher {
       return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
     }
 
-    const r = fetchTriple(lSensor, lRegion, timeFrame)
+    const r = fetchTriple(lSensor, lRegion, timeFrame, { asOf: this.asOf, advanced })
       .then(addNameInfos)
-      .then((rows) => addMissing(rows));
+      .then((rows) => addMissing(rows, lSensor.isWeeklySignal ? 'week' : 'day'));
     this.cache.set(key, r);
     return r;
   }
@@ -119,12 +123,12 @@ export class DataFetcher {
     const missingSensors = lSensors.filter((d) => !this.cache.has(this.toWindowKey(d, lRegion, timeFrame)));
 
     if (missingSensors.length > 0) {
-      const data = fetchTriple(missingSensors, lRegion, timeFrame).then(addNameInfos);
+      const data = fetchTriple(missingSensors, lRegion, timeFrame, { asOf: this.asOf }).then(addNameInfos);
 
       for (const sensor of missingSensors) {
         const sensorData = data
           .then((rows) => rows.filter((d) => d.signal === sensor.signal && d.source === sensor.id))
-          .then((rows) => addMissing(rows));
+          .then((rows) => addMissing(rows, sensor.isWeeklySignal ? 'week' : 'day'));
         this.cache.set(this.toWindowKey(sensor, lRegion, timeFrame), sensorData);
       }
     }
@@ -148,7 +152,7 @@ export class DataFetcher {
     };
     const missingSensors = lSensors.filter((sensor) => !this.cache.has(this.toWindowKey(sensor, geoKey, timeFrame)));
     if (missingSensors.length > 0) {
-      const data = fetchTriple(missingSensors, regions, timeFrame).then(addNameInfos);
+      const data = fetchTriple(missingSensors, regions, timeFrame, { asOf: this.asOf }).then(addNameInfos);
 
       for (const sensor of missingSensors) {
         const sensorData = data.then((rows) =>
@@ -178,7 +182,7 @@ export class DataFetcher {
       return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
     }
 
-    const r = fetchTriple(lSensor, regions, timeFrame).then(addNameInfos);
+    const r = fetchTriple(lSensor, regions, timeFrame, { asOf: this.asOf }).then(addNameInfos);
     // no missing
     this.cache.set(key, r);
     return r;
@@ -196,13 +200,9 @@ export class DataFetcher {
     if (this.cache.has(key)) {
       return this.cache.get(key) as Promise<SensorTrend>;
     }
-    const trend = callTrendAPI(
-      SourceSignalPair.from(lSensor),
-      GeoPair.from(lRegion),
-      lDate.value,
-      lDate.windowTimeFrame,
-      { exclude: ['geo_type', 'geo_value', 'signal_signal', 'signal_source'] },
-    ).then((rows) => {
+    const trend = fetchTrend(lSensor, lRegion, lDate.value, lDate.windowTimeFrame, {
+      exclude: ['geo_type', 'geo_value', 'signal_signal', 'signal_source'],
+    }).then((rows) => {
       return asSensorTrend(lDate.value, lSensor.highValuesAre, rows?.[0], {
         factor: lSensor.valueScaleFactor,
       });
@@ -223,13 +223,9 @@ export class DataFetcher {
       (sensor) => !this.cache.has(this.toDateKey(sensor, lRegion, lDate, `trend`)),
     );
     if (missingSensors.length > 0) {
-      const trends = callTrendAPI(
-        SourceSignalPair.fromArray(missingSensors),
-        GeoPair.from(lRegion),
-        lDate.value,
-        lDate.windowTimeFrame,
-        { exclude: ['geo_type', 'geo_value'] },
-      );
+      const trends = fetchTrend(missingSensors, lRegion, lDate.value, lDate.windowTimeFrame, {
+        exclude: ['geo_type', 'geo_value'],
+      });
       for (const sensor of missingSensors) {
         const trendData = trends.then((rows) => {
           const row = rows.find((d) => d.signal_source === sensor.id && d.signal_signal === sensor.signal);
@@ -256,13 +252,9 @@ export class DataFetcher {
       (region) => !this.cache.has(this.toDateKey(lSensor, region, lDate, `trend`)),
     );
     if (missingRegions.length > 0) {
-      const trends = callTrendAPI(
-        SourceSignalPair.from(lSensor),
-        GeoPair.fromArray(missingRegions),
-        lDate.value,
-        lDate.windowTimeFrame,
-        { exclude: ['signal_signal', 'signal_source'] },
-      );
+      const trends = fetchTrend(lSensor, missingRegions, lDate.value, lDate.windowTimeFrame, {
+        exclude: ['signal_signal', 'signal_source'],
+      });
       for (const region of missingRegions) {
         const trendData = trends.then((rows) => {
           const row = rows.find(
@@ -292,9 +284,16 @@ export class DataFetcher {
       return this.cache.get(key) as Promise<SensorTrend[]>;
     }
 
-    const trends = callTrendSeriesAPI(SourceSignalPair.from(lSensor), GeoPair.from(lRegion), timeFrame, undefined, {
-      exclude: ['signal_signal', 'signal_source', 'geo_type', 'geo_value'],
-    }).then((trends) => {
+    const trends = callTrendSeriesAPI(
+      lSensor.isWeeklySignal ? 'week' : 'day',
+      SourceSignalPair.from(lSensor),
+      GeoPair.from(lRegion),
+      timeFrame,
+      lSensor.isWeeklySignal ? 1 : 7,
+      {
+        exclude: ['signal_signal', 'signal_source', 'geo_type', 'geo_value'],
+      },
+    ).then((trends) => {
       return trends.map((row) =>
         asSensorTrend(parseAPITime(row.date), lSensor.highValuesAre, row, {
           factor: lSensor.valueScaleFactor,
@@ -347,12 +346,12 @@ export class DataFetcher {
       (region) => !this.cache.has(this.toWindowKey(lSensor, region, lDate.sparkLineTimeFrame)),
     );
     if (missingRegions.length > 0) {
-      const lookup = fetchTriple(lSensor, missingRegions, lDate.sparkLineTimeFrame)
+      const lookup = fetchTriple(lSensor, missingRegions, lDate.sparkLineTimeFrame, { asOf: this.asOf })
         .then(addNameInfos)
         .then(groupByRegion);
       for (const region of missingRegions) {
         const regionData = lookup.then((l) => {
-          return addMissing(l.get(region.propertyId) ?? []);
+          return addMissing(l.get(region.propertyId) ?? [], lSensor.isWeeklySignal ? 'week' : 'day');
         });
         this.cache.set(this.toWindowKey(lSensor, region, lDate.sparkLineTimeFrame), regionData);
       }
@@ -374,7 +373,7 @@ export class DataFetcher {
     if (this.cache.has(key)) {
       return this.cache.get(key) as Promise<RegionEpiDataRow>;
     }
-    const r = fetchTriple(lSensor, lRegion, lDate.value, { advanced: true })
+    const r = fetchTriple(lSensor, lRegion, lDate.value, { advanced: true, asOf: this.asOf })
       .then(addNameInfos)
       .then((rows) => rows[0]);
     this.cache.set(key, r);
@@ -395,7 +394,9 @@ export class DataFetcher {
     );
 
     if (missingSensors.length > 0) {
-      const data = fetchTriple(missingSensors, lRegion, lDate.value, { advanced: true }).then(addNameInfos);
+      const data = fetchTriple(missingSensors, lRegion, lDate.value, { advanced: true, asOf: this.asOf }).then(
+        addNameInfos,
+      );
       for (const sensor of missingSensors) {
         const sensorData = data.then((rows) => rows.find((d) => d.signal === sensor.signal && d.source === sensor.id)!);
 

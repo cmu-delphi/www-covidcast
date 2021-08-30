@@ -45,7 +45,7 @@
       {/await}
     {/if}
     {#each scale.ticks(5) as tick}
-      <div class="tick" data-tick={sensor.formatValue(tick)} />
+      <div class="tick" data-tick={sensor.formatValue(tick)} style="left: {linearScale(tick)}%" />
     {/each}
   </div>
   <slot />
@@ -65,9 +65,10 @@
     display: flex;
     justify-content: space-between;
     position: relative;
+    height: 1.2em;
   }
   .tick {
-    position: relative;
+    position: absolute;
     overflow: visible;
     width: 1px;
     border-top: 3px solid currentColor;

@@ -43,9 +43,10 @@
   const fetcher = getContext('fetcher');
 
   $: data = fetcher.fetch1Sensor1Region1DateTrend(sensor, region, date);
-  $: highlighted = highlight != null && highlight.matches(sensor.value, region.value, date.value);
+  $: highlighted =
+    highlight != null && highlight.matches(sensor.value, region.value, sensor.isWeeklySignal ? date.week : date.value);
 
-  $: selfHighlight = new WidgetHighlight(sensor.value, region.value, date.value);
+  $: selfHighlight = new WidgetHighlight(sensor.value, region.value, sensor.isWeeklySignal ? date.week : date.value);
 
   function onMouseEnter() {
     if (!selfHighlight.equals(highlight)) {

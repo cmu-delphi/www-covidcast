@@ -227,6 +227,7 @@ export interface LineSpecOptions {
   infoLabelExpr?: string;
   autoAlignOffset?: number;
   tickCount?: Axis<ExprRef | SignalRef>['tickCount'];
+  isWeeklySignal?: boolean;
 }
 
 export function generateLineChartSpec({
@@ -254,9 +255,10 @@ export function generateLineChartSpec({
     interval: 'week' as const,
     step: 1,
   },
+  isWeeklySignal = false,
 }: LineSpecOptions = {}): TopLevelSpec & LayerSpec<Field> {
   // logic to automatically add the year for week 1 and first date
-  const labelYear = `datum.label + (week(datum.value) === 1 ${
+  const labelDateYear = `datum.label + (week(datum.value) === 1 ${
     domain ? `|| abs(week(datum.value) - week(toDate(${domain[0]}))) <= 1` : ''
   } ? '/' + year(datum.value) : '')`;
   let topOffset = 20;
@@ -293,8 +295,8 @@ export function generateLineChartSpec({
             axis: {
               title: xTitle,
               format: '%m/%d',
-              formatType: 'cachedTime',
-              labelExpr: labelYear,
+              formatType: isWeeklySignal ? 'epiweekFormatSmart' : 'cachedTime',
+              labelExpr: isWeeklySignal ? undefined : labelDateYear,
               labelOverlap: true,
               grid: true,
               gridDash: [4, 4],
@@ -327,7 +329,9 @@ export function generateLineChartSpec({
             ? {
                 opacity: {
                   condition: {
-                    test: 'highlightRegion != null && highlightRegion !== datum.id',
+                    test: `highlightRegion != null && highlightRegion != datum.${
+                      typeof highlightRegion === 'string' ? highlightRegion : 'id'
+                    }`,
                     value: 0.1,
                   },
                   value: 1,
@@ -427,7 +431,7 @@ export function generateLineChartSpec({
                     field: dateField,
                     type: 'temporal',
                     format: '%a %b %d',
-                    formatType: 'cachedTime',
+                    formatType: isWeeklySignal ? 'epiweekFormat' : 'cachedTime',
                   },
               y: {
                 value: 0,

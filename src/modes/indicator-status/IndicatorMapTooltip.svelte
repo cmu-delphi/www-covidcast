@@ -1,13 +1,9 @@
 <script>
-  import { getStateOfCounty } from '../../data/regions';
-
   export let hidden = false;
   /**
    * @type {import('../../data').EpiDataRow & import('../../data/regions').NameInfo}
    */
   export let item;
-
-  $: state = item != null && (item.level === 'county' || item.level === 'mega-county') ? getStateOfCounty(item) : null;
 </script>
 
 <div aria-label="tooltip" class="tooltip" class:hidden>

@@ -1,11 +1,8 @@
 <script>
-  import FancyHeader from '../../components/FancyHeader.svelte';
   import Vega from '../../components/vega/Vega.svelte';
-  import { loadBackFillProfile } from '../../data/indicatorInfo';
+  import { loadBackFillProfile } from './data';
   import { TimeFrame, WINDOW_SIZE } from '../../stores/params';
   import {
-    currentRegionInfo,
-    selectByInfo,
     valueField,
     dateField,
     dateOptions,
@@ -22,20 +19,24 @@
     generateValueHeatMapSpec,
     backFillDayOfWeekFrequency,
   } from './backfillSpec';
-  import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
-  import Search from '../../components/Search.svelte';
   import OptionPicker from '../../components/OptionPicker.svelte';
   import { timeMonth } from 'd3-time';
   import BackfillTooltip from './BackfillTooltip.svelte';
   import AboutSection from '../../components/AboutSection.svelte';
+  import { metaDataManager } from '../../stores';
+  import { resolveDefaultRegion } from '../../data/sensor';
 
   /**
-   * @type {import('../../data/indicatorInfo').IndicatorStatus}
+   * @type {import('../../data/sensor').Sensor}
    */
-  export let indicator;
-  $: date = indicator ? indicator.latest_time_value : new Date();
-  $: window = new TimeFrame(timeMonth.offset(date, -WINDOW_SIZE), date);
-  $: title = `${indicator.name} Backfill Profile`;
+  export let sensor;
+
+  export let region;
+
+  $: date = $metaDataManager.getTimeFrame(sensor).max;
+  $: defaultRegion = resolveDefaultRegion(sensor);
+  $: window = new TimeFrame(timeMonth.offset(date, -WINDOW_SIZE * (sensor.isWeeklySignal ? 7 : 1)), date);
+  $: title = `${sensor.name} Backfill Profile in ${(region || defaultRegion).displayName}`;
 
   $: options = {
     valueField: $valueField,
@@ -44,29 +45,30 @@
     dateLabel: $dateLabel,
     anchorLag: $anchorLag,
     isRelative: $isRelative,
+    isWeeklySignal: sensor.isWeeklySignal,
   };
 
   let vegaRef = undefined;
   $: spec = $isRelative
     ? generateChangeHeatMapSpec({
-        title: `${indicator.name}: ${$valueLabel}`,
+        title: `${sensor.name}: ${$valueLabel}`,
         ...options,
       })
     : generateValueHeatMapSpec({
-        title: `${indicator.name}: ${$valueLabel}`,
+        title: `${sensor.name}: ${$valueLabel}`,
         ...options,
       });
-  $: data = loadBackFillProfile(indicator, $currentRegionInfo || nationInfo, window, $anchorLag);
+  $: data = loadBackFillProfile(sensor, region || defaultRegion, window, $anchorLag);
 
   $: dayOfWeekSpec = backFillDayOfWeekDistribution({
-    title: `${indicator.name}: ${$valueLabel}`,
+    title: `${sensor.name}: ${$valueLabel}`,
     subTitle: `per Lag (Reporting Date - Reference Date) per day of week`,
     ...options,
   });
   let vegaRefDayOfWeek = undefined;
 
   $: dayOfWeekBoxplotSpec = backFillDayOfWeekFrequency({
-    title: `${indicator.name}: ${$valueLabel}`,
+    title: `${sensor.name}: ${$valueLabel}`,
     subTitle: `Lag Distribution to reach 90%`,
     ...options,
     completeness: 0.9,
@@ -74,7 +76,7 @@
   let vegaRefBoxplot = undefined;
 </script>
 
-<AboutSection className="uk-margin-medium-top uk-margin-small-bottom">
+<AboutSection className="uk-margin-small-bottom">
   <h3 class="mobile-h3">About Backfill Profiling</h3>
 
   <div class="desc">
@@ -91,27 +93,10 @@
   </div>
 </AboutSection>
 
-<div class="grid-3-11">
-  <FancyHeader invert sub="Backfill Profile">{indicator.name}</FancyHeader>
-</div>
-
-<Search
-  modern
-  className="grid-3 grid-span-8 uk-margin-top"
-  placeholder="Search for state or country"
-  items={[nationInfo, ...stateInfo, ...countyInfo]}
-  title="Region"
-  icon="location"
-  selectedItem={$currentRegionInfo}
-  labelFieldName="displayName"
-  maxItemsToShowInList={15}
-  on:change={(e) => selectByInfo(e.detail && e.detail.level === 'nation' ? null : e.detail)}
-/>
-
 <OptionPicker
   className="grid-3 grid-span-2 uk-margin-top"
   type="number"
-  label="Anchor Lag (days)"
+  label="Anchor Lag ({sensor.isWeeklySignal ? 'weeks' : 'days'})"
   bind:value={$anchorLag}
   min={1}
   max={60}
@@ -161,7 +146,7 @@
 
 <div class="grid-1 grid-span-12">
   <div class="chart-300">
-    <Vega bind:this={vegaRef} {spec} {data} tooltip={BackfillTooltip} tooltipProps={{ options }} />
+    <Vega bind:this={vegaRef} {spec} {data} tooltip={BackfillTooltip} tooltipProps={{ options, sensor }} />
     <DownloadMenu
       {vegaRef}
       {data}
@@ -171,40 +156,28 @@
     />
   </div>
 </div>
-<AboutSection details className="uk-margin-small-top uk-margin-small-bottom">
-  <h3 slot="header" class="mobile-h3">Day of Week Distributions</h3>
-  <div class="desc">
-    In order to highlight day of week changes within reported values of the selected indicator the following charts are
-    stratified by day of week. The horizontal axis shows the lag while the vertical axis shows the fraction of value or
-    the day-to-day change based on the selection of the. Both values are described before. The line chart shows the
-    median fraction of value at the selected anchor lag. The vertical blue axis is showing the selected anchor date.
-    This chart gives insights on whether there are interesting day of week differences in the indicator.
-    {#if !$isRelative}
-      The second chart shows a similar view to highlight on the day of week distribution but focuses on the distribution
-      per day of week when the first reported lag reached 90% of the fraction of the target anchor lag value. This
-      illustrates whether the anchor lag is a fitting choice when the box-plots are clearly below the anchor lag line in
-      blue.
-    {/if}
-  </div>
-</AboutSection>
-<div class="grid-1 {$isRelative ? 'grid-span-12' : 'grid-span-6'} uk-margin-top">
-  <div class="chart-300">
-    <Vega bind:this={vegaRefDayOfWeek} spec={dayOfWeekSpec} {data} />
-    <DownloadMenu
-      vegaRef={vegaRefDayOfWeek}
-      {data}
-      absolutePos="bottom: -20px"
-      fileName={title.replace(/\s+/gm, '_')}
-      advanced={false}
-    />
-  </div>
-</div>
-{#if !$isRelative}
-  <div class="grid-7 grid-span-6 uk-margin-top">
+{#if !sensor.isWeeklySignal}
+  <AboutSection details className="uk-margin-small-top uk-margin-small-bottom">
+    <h3 slot="header" class="mobile-h3">Day of Week Distributions</h3>
+    <div class="desc">
+      In order to highlight day of week changes within reported values of the selected indicator the following charts
+      are stratified by day of week. The horizontal axis shows the lag while the vertical axis shows the fraction of
+      value or the day-to-day change based on the selection of the. Both values are described before. The line chart
+      shows the median fraction of value at the selected anchor lag. The vertical blue axis is showing the selected
+      anchor date. This chart gives insights on whether there are interesting day of week differences in the indicator.
+      {#if !$isRelative}
+        The second chart shows a similar view to highlight on the day of week distribution but focuses on the
+        distribution per day of week when the first reported lag reached 90% of the fraction of the target anchor lag
+        value. This illustrates whether the anchor lag is a fitting choice when the box-plots are clearly below the
+        anchor lag line in blue.
+      {/if}
+    </div>
+  </AboutSection>
+  <div class="grid-1 {$isRelative ? 'grid-span-12' : 'grid-span-6'} uk-margin-top">
     <div class="chart-300">
-      <Vega bind:this={vegaRefBoxplot} spec={dayOfWeekBoxplotSpec} {data} />
+      <Vega bind:this={vegaRefDayOfWeek} spec={dayOfWeekSpec} {data} />
       <DownloadMenu
-        vegaRef={vegaRefBoxplot}
+        vegaRef={vegaRefDayOfWeek}
         {data}
         absolutePos="bottom: -20px"
         fileName={title.replace(/\s+/gm, '_')}
@@ -212,5 +185,18 @@
       />
     </div>
   </div>
+  {#if !$isRelative}
+    <div class="grid-7 grid-span-6 uk-margin-top">
+      <div class="chart-300">
+        <Vega bind:this={vegaRefBoxplot} spec={dayOfWeekBoxplotSpec} {data} />
+        <DownloadMenu
+          vegaRef={vegaRefBoxplot}
+          {data}
+          absolutePos="bottom: -20px"
+          fileName={title.replace(/\s+/gm, '_')}
+          advanced={false}
+        />
+      </div>
+    </div>
+  {/if}
 {/if}
-;

@@ -20,7 +20,7 @@
   import SensorValue from '../components/SensorValue.svelte';
   import { combineSignals } from '../data/utils';
   import DownloadMenu from '../components/DownloadMenu.svelte';
-  import { formatDateISO } from '../formats';
+  import { formatDateISO, formatWeek } from '../formats';
   import { annotationManager, isMobileDevice } from '../stores';
   import IndicatorAnnotation from '../components/IndicatorAnnotation.svelte';
   import IndicatorAnnotations from '../components/IndicatorAnnotations.svelte';
@@ -30,19 +30,19 @@
 
   export let className = '';
   /**
-   * @type {import("../../stores/params").DateParam}
+   * @type {import("../stores/params").DateParam}
    */
   export let date;
   /**
-   * @type {import("../../stores/params").RegionParam}
+   * @type {import("../stores/params").RegionParam}
    */
   export let region;
   /**
-   * @type {import("../../stores/params").SensorParam}
+   * @type {import("../stores/params").SensorParam}
    */
   export let sensor;
   /**
-   * @type {import("../../stores/DataFetcher").DataFetcher}
+   * @type {import("../stores/DataFetcher").DataFetcher}
    */
   export let fetcher;
 
@@ -57,7 +57,11 @@
 
   export let expandableWindow = false;
 
-  let showFull = false;
+  export let showAnnotations = true;
+
+  export let showNeighbors = true;
+
+  let showFull = expandableWindow === 'full';
 
   /**
    * show only a single region regardless of the level
@@ -75,7 +79,7 @@
   export let domain = null;
 
   /**
-   * @type {import("../../stores/params").Region}
+   * @type {import("../stores/params").Region}
    */
   const neighboringInfo = {
     id: 'neighboring',
@@ -102,8 +106,9 @@
     region,
     date,
     timeFrame,
-    { height, zero, raw, isMobile, singleRegionOnly, domain, cumulative },
+    { height, zero, raw, isMobile, singleRegionOnly, domain, cumulative, showNeighbors },
   ) {
+    const isWeekly = sensor.value.isWeeklySignal;
     const options = {
       initialDate: highlightDate || date.value,
       height,
@@ -114,6 +119,7 @@
       title: joinTitle([(cumulative ? 'Cumulative ' : '') + sensor.name, `in ${region.displayName}`], isMobile),
       subTitle: sensor.unit,
       highlightRegion: true,
+      isWeeklySignal: isWeekly,
     };
     if (cumulative) {
       options.paddingLeft = 52; // more space for larger numbers
@@ -130,10 +136,11 @@
     if (region.level === 'county') {
       // county vs related vs state vs nation
       const state = getStateOfCounty(region);
-      return generateCompareLineSpec(
-        [region.displayName, neighboringInfo.displayName, state.displayName, nationInfo.displayName],
-        options,
-      );
+      const regions = [region.displayName, state.displayName, nationInfo.displayName];
+      if (showNeighbors) {
+        regions.splice(1, 0, neighboringInfo.displayName);
+      }
+      return generateCompareLineSpec(regions, options);
     }
     if (region.level !== 'nation') {
       return generateCompareLineSpec([region.displayName, nationInfo.displayName], options);
@@ -142,11 +149,11 @@
   }
 
   /**
-   * @param {import("../../stores/params").SensorParam} sensor
-   * @param {import("../../stores/params").DateParam} date
-   * @param {import("../../stores/params").RegionParam} region
+   * @param {import("../stores/params").SensorParam} sensor
+   * @param {import("../stores/params").DateParam} date
+   * @param {import("../stores/params").RegionParam} region
    */
-  function loadData(sensor, region, timeFrame, singleRegionOnly) {
+  function loadData(sensor, region, timeFrame, singleRegionOnly, showNeighbors) {
     if (!region.value) {
       return null;
     }
@@ -159,25 +166,30 @@
     const data = [selfData];
 
     if (region.level === 'county') {
+      if (showNeighbors) {
+        const relatedCounties = getRelatedCounties(region.value);
+        const relatedData = fetcher
+          .fetch1SensorNRegionsNDates(sensor, relatedCounties, timeFrame)
+          .then((r) => averageByDate(r, neighboringInfo))
+          .then((r) => addMissing(r, sensor.isWeeklySignal ? 'week' : 'day'));
+        data.push(relatedData);
+      }
       const state = getStateOfCounty(region);
       const stateData = fetcher.fetch1Sensor1RegionNDates(sensor, state, timeFrame);
-      const relatedCounties = getRelatedCounties(region.value);
-      const relatedData = fetcher
-        .fetch1SensorNRegionsNDates(sensor, relatedCounties, timeFrame)
-        .then((r) => averageByDate(r, sensor, neighboringInfo))
-        .then((r) => addMissing(r, sensor));
-      data.push(relatedData, stateData);
+      data.push(stateData);
     }
     if (region.level !== 'nation') {
       data.push(fetcher.fetch1Sensor1RegionNDates(sensor, nationInfo, timeFrame));
     }
-    return Promise.all(data).then((rows) => rows.reverse().flat());
+    return Promise.all(data).then((rows) => {
+      return rows.reverse().flat();
+    });
   }
 
   /**
-   * @param {import("../../stores/params").SensorParam} sensor
-   * @param {import("../../stores/params").DateParam} date
-   * @param {import("../../stores/params").RegionParam} region
+   * @param {import("../stores/params").SensorParam} sensor
+   * @param {import("../stores/params").DateParam} date
+   * @param {import("../stores/params").RegionParam} region
    */
   function loadSingleData(sensor, region, timeFrame, { cumulative }) {
     if (!region.value) {
@@ -217,14 +229,18 @@
     }
   }
 
-  function resolveRegions(region, singleRegionOnly) {
+  function resolveRegions(region, singleRegionOnly, showNeighbors) {
     if (singleRegionOnly) {
       return [region];
     }
     if (region.level === 'county') {
       // county vs related vs state vs nation
       const state = getStateOfCounty(region);
-      return [region, neighboringInfo, state, nationInfo];
+      const regions = [region, state, nationInfo];
+      if (showNeighbors) {
+        regions.splice(1, 0, neighboringInfo);
+      }
+      return regions;
     }
     if (region.level !== 'nation') {
       // state vs nation
@@ -233,8 +249,8 @@
     return [region];
   }
   /**
-   * @param {import("../../stores/params").SensorParam} sensor
-   * @param {import("../../stores/params").Region[]} region
+   * @param {import("../stores/params").SensorParam} sensor
+   * @param {import("../stores/params").Region[]} region
    */
   function generateFileName(sensor, regions, timeFrame, raw, cumulative) {
     const regionName = regions.map((region) => `${region.propertyId}-${region.displayName}`).join(',');
@@ -245,7 +261,9 @@
     if (cumulative) {
       suffix += '_Cumulative';
     }
-    return `${sensor.name}_${regionName}_${formatDateISO(timeFrame.min)}-${formatDateISO(timeFrame.max)}${suffix}`;
+    return `${sensor.name}_${regionName}_${
+      sensor.isWeeklySignal ? formatWeek(timeFrame.min_week) : formatDateISO(timeFrame.min)
+    }-${sensor.isWeeklySignal ? formatWeek(timeFrame.max_week) : formatDateISO(timeFrame.max)}${suffix}`;
   }
 
   function injectRanges(spec, timeFrame, annotations) {
@@ -267,8 +285,10 @@
 
   $: raw = singleRaw && sensor.rawValue != null && !($isMobileDevice && showFull);
   $: cumulative = raw && singleCumulative && sensor.rawCumulativeValue != null;
-  $: regions = raw ? [region.value] : resolveRegions(region.value, singleRegionOnly);
-  $: annotations = $annotationManager.getWindowAnnotations(sensor.value, regions, timeFrame.min, timeFrame.max);
+  $: regions = raw ? [region.value] : resolveRegions(region.value, singleRegionOnly, showNeighbors);
+  $: annotations = showAnnotations
+    ? $annotationManager.getWindowAnnotations(sensor.value, regions, timeFrame.min, timeFrame.max)
+    : [];
   $: spec = injectRanges(
     genSpec(sensor, region, date, timeFrame, {
       height,
@@ -278,13 +298,14 @@
       singleRegionOnly,
       domain,
       cumulative,
+      showNeighbors,
     }),
     timeFrame,
     annotations,
   );
   $: data = raw
     ? loadSingleData(sensor, region, timeFrame, { cumulative })
-    : loadData(sensor, region, timeFrame, singleRegionOnly);
+    : loadData(sensor, region, timeFrame, singleRegionOnly, showNeighbors);
   $: fileName = generateFileName(sensor, regions, timeFrame, raw, cumulative);
 
   function findValue(region, data, date, prop = 'value') {
@@ -292,7 +313,7 @@
       return null;
     }
     const time = toTimeValue(date);
-    const row = data.find((d) => d.id === region.id && d.time_value === time);
+    const row = data.find((d) => d.id === region.id && toTimeValue(d.date_value) === time);
     if (!row) {
       return null;
     }
@@ -333,7 +354,7 @@
       <Toggle bind:checked={singleCumulative}>Cumulative Data</Toggle>
     {/if}
   {/if}
-  {#if expandableWindow && !($isMobileDevice && raw)}
+  {#if expandableWindow === true && !($isMobileDevice && raw)}
     <Toggle bind:checked={showFull}>Show All Dates</Toggle>
   {/if}
   <div class="spacer" />

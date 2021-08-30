@@ -109,7 +109,14 @@
 
     <hr />
     <div class="chart-300">
-      <HistoryLineChart {sensor} {date} {region} {fetcher} starts={question.addedInWave.published} />
+      <HistoryLineChart
+        {sensor}
+        {date}
+        {region}
+        {fetcher}
+        starts={question.addedInWave.published}
+        showNeighbors={false}
+      />
     </div>
 
     <IndicatorStatsLine {sensor} {date} {region} {fetcher} />

@@ -1,7 +1,8 @@
-import { formatAPITime } from './utils';
+import { formatAPITime, formatAPIWeekTime } from './utils';
 import type { RegionLevel } from './regions';
 import type { TimeFrame } from './TimeFrame';
 import { GeoPair, isArray, SourceSignalPair, TimePair } from './apimodel';
+import type { EpiWeek } from './EpiWeek';
 
 declare const process: { env: Record<string, string> };
 
@@ -75,16 +76,20 @@ function fetchImpl<T>(url: URL, fields?: readonly string[] | { exclude: readonly
 export type FieldSpec<T> = readonly (keyof T)[] | { exclude: readonly (keyof T)[] };
 
 export function callAPI(
+  type: 'day' | 'week',
   signal: SourceSignalPair | readonly SourceSignalPair[],
   geo: GeoPair | readonly GeoPair[],
   time: TimePair | readonly TimePair[],
   fields?: FieldSpec<EpiDataJSONRow>,
+  { asOf = null as Date | null } = {},
 ): Promise<EpiDataJSONRow[]> {
   const url = new URL(ENDPOINT + '/covidcast/');
   addParam(url, 'signal', signal);
   addParam(url, 'geo', geo);
   addParam(url, 'time', time);
-
+  if (asOf) {
+    url.searchParams.set('as_of', type == 'day' ? formatAPITime(asOf) : formatAPIWeekTime(asOf));
+  }
   url.searchParams.set('format', 'json');
   return fetchImpl<EpiDataJSONRow[]>(url, fields).catch((error) => {
     console.warn('failed fetching data', error);
@@ -116,17 +121,20 @@ export interface EpiDataTrendRow {
 }
 
 export function callTrendAPI(
+  type: 'week' | 'day',
   signal: SourceSignalPair | readonly SourceSignalPair[],
   geo: GeoPair | readonly GeoPair[],
   date: Date,
   window: TimeFrame,
+  basis_shift: number,
   fields?: FieldSpec<EpiDataTrendRow>,
 ): Promise<EpiDataTrendRow[]> {
   const url = new URL(ENDPOINT + '/covidcast/trend');
   addParam(url, 'signal', signal);
   addParam(url, 'geo', geo);
-  url.searchParams.set('date', formatAPITime(date));
-  url.searchParams.set('window', window.range);
+  url.searchParams.set('date', type === 'day' ? formatAPITime(date) : formatAPIWeekTime(date));
+  url.searchParams.set('basis_shift', basis_shift.toString());
+  url.searchParams.set('window', window.asTypeRange(type));
 
   url.searchParams.set('format', 'json');
   return fetchImpl<EpiDataTrendRow[]>(url, fields).catch((error) => {
@@ -136,19 +144,18 @@ export function callTrendAPI(
 }
 
 export function callTrendSeriesAPI(
+  type: 'week' | 'day',
   signal: SourceSignalPair | readonly SourceSignalPair[],
   geo: GeoPair | readonly GeoPair[],
   window: TimeFrame,
-  basis?: number,
+  basis_shift: number,
   fields?: FieldSpec<EpiDataTrendRow>,
 ): Promise<EpiDataTrendRow[]> {
   const url = new URL(ENDPOINT + '/covidcast/trendseries');
   addParam(url, 'signal', signal);
   addParam(url, 'geo', geo);
-  if (basis != null) {
-    url.searchParams.set('basis', basis.toString());
-  }
-  url.searchParams.set('window', window.range);
+  url.searchParams.set('basis_shift', basis_shift.toString());
+  url.searchParams.set('window', window.asTypeRange(type));
 
   url.searchParams.set('format', 'json');
   return fetchImpl<EpiDataTrendRow[]>(url, fields).catch((error) => {
@@ -183,6 +190,7 @@ export interface EpiDataCorrelationRow {
 }
 
 export function callCorrelationAPI(
+  type: 'week' | 'day',
   reference: SourceSignalPair,
   others: SourceSignalPair | readonly SourceSignalPair[],
   geo: GeoPair | readonly GeoPair[],
@@ -194,7 +202,7 @@ export function callCorrelationAPI(
   url.searchParams.set('reference', reference.toString());
   addParam(url, 'others', others);
   addParam(url, 'geo', geo);
-  url.searchParams.set('window', window.range);
+  url.searchParams.set('window', window.asTypeRange(type));
   if (lag != null) {
     url.searchParams.set('lag', lag.toString());
   }
@@ -254,6 +262,7 @@ export type SignalFormat = 'raw' | 'percent' | 'fraction' | 'per100k' | 'count';
 export type SignalHighValuesAre = 'good' | 'bad' | 'neutral';
 
 export interface EpiDataMetaInfo {
+  active: boolean;
   source: string;
   signal: string;
   name: string;
@@ -279,6 +288,7 @@ export interface EpiDataMetaInfo {
   signal_basename: string;
 
   time_label: string;
+  time_type: 'day' | 'week';
   value_label: string;
 
   link: { alt: string; href: string }[];
@@ -321,26 +331,39 @@ export function callMetaAPI(
   addParam(url, 'signal', signal);
   return fetchImpl<EpiDataMetaSourceInfo[]>(url).catch((error) => {
     console.warn('failed fetching data', error);
-    return [];
+    return [] as EpiDataMetaSourceInfo[];
   });
 }
 
-export interface EpiDataSignalStatusRow {
-  name: string;
+export interface CoverageRow {
   source: string;
-  covidcast_signal: string;
-  latest_issue: string; // iso
-  latest_time_value: string; // iso
-  coverage: Record<RegionLevel, { date: string; /* iso */ count: number }[]>;
+  signal: string;
+  time_value: number;
+  count: number;
 }
-/**
- *
- * @returns
- */
-export function callSignalDashboardStatusAPI(): Promise<EpiDataSignalStatusRow[]> {
-  const url = new URL(ENDPOINT + '/signal_dashboard_status/');
+
+export interface ParsedCoverageRow extends CoverageRow {
+  date: Date;
+  week: EpiWeek;
+  fraction: number;
+}
+
+export function callCoverageAPI(
+  type: 'day' | 'week',
+  signal: SourceSignalPair | readonly SourceSignalPair[],
+  level?: RegionLevel | 'only-county',
+  days?: number,
+): Promise<CoverageRow[]> {
+  const url = new URL(ENDPOINT + '/covidcast/coverage');
+  addParam(url, 'signal', signal);
+  if (typeof level === 'string') {
+    url.searchParams.set('geo_type', level);
+  }
+  if (typeof days === 'number') {
+    url.searchParams.set(type == 'day' ? 'days' : 'weeks', days.toString());
+  }
   url.searchParams.set('format', 'json');
-  return fetchImpl<EpiDataSignalStatusRow[]>(url).catch((error) => {
+  return fetchImpl<CoverageRow[]>(url).catch((error) => {
     console.warn('failed fetching data', error);
     return [];
   });

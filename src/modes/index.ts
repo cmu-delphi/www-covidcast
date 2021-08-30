@@ -8,6 +8,7 @@ export interface Mode {
   component: () => Promise<any>;
   anchor?: string;
   waitForReady?: boolean;
+  isGeneric?: boolean;
 }
 
 export default modes;
@@ -19,7 +20,8 @@ export type ModeID =
   | 'indicator'
   | 'landing'
   | 'indicator-status'
-  | 'data-anomalies'
+  | 'indicator-source'
+  | 'indicator-signal'
   | 'correlation'
   | 'dashboard';
 

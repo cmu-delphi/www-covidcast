@@ -1,39 +1,34 @@
 <script>
   import SortColumnIndicator, { SortHelper } from '../../components/SortColumnIndicator.svelte';
   import FancyHeader from '../../components/FancyHeader.svelte';
-  import { formatDateISO, formatDateShortNumbers, formatFraction } from '../../formats';
+  import { formatDateISO, formatDateShortNumbers, formatFraction, formatWeek } from '../../formats';
   import DownloadMenu from '../../components/DownloadMenu.svelte';
   import Vega from '../../components/vega/Vega.svelte';
   import { generateSparkLine } from '../../specs/lineSpec';
   import { createEventDispatcher } from 'svelte';
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
+  import { metaDataManager } from '../../stores';
+  import { loadData } from './data';
 
   const dispatch = createEventDispatcher();
-  /**
-   * @type {Date}
-   */
-  export let date;
+
+  $: sources = $metaDataManager.metaSources.filter((d) => d.referenceSensor != null && d.sensors.some((s) => s.active));
+
+  const date = new Date();
 
   const sort = new SortHelper('name', false, 'name');
-  /**
-   * @type {Promise<import('./data').ExtendedStatus[]>}
-   */
-  export let data = Promise.resolve([]);
-  /**
-   * @type {import('../../stores/params').TimeFrame}
-   */
-  export let domain;
 
+  $: loader = loadData(sources, $metaDataManager);
   /**
-   * @type {import('./data').ExtendedStatus[]}
+   * @type {import('./data').SourceData[]}
    */
   let sortedData = [];
   let loading = true;
   $: {
     loading = true;
-    sortedData = [];
+    sortedData = loader.initial;
     const comparator = $sort.comparator;
-    data.then((rows) => {
+    loader.loaded.then((rows) => {
       sortedData = rows.slice().sort(comparator);
       loading = false;
     });
@@ -42,7 +37,7 @@
   $: spec = generateSparkLine({
     dateField: 'date',
     valueField: 'fraction',
-    domain: domain.domain,
+    domain: loader.domain.domain,
     highlightDate: null,
     highlightStartEnd: false,
     // zero: true,
@@ -54,7 +49,7 @@
   <FancyHeader>Summary</FancyHeader>
   <DownloadMenu
     fileName="indicator_status_as_of_{formatDateISO(date)}"
-    {data}
+    data={loader.loaded}
     absolutePos
     prepareRow={(row) => ({
       name: row.name,
@@ -70,29 +65,35 @@
 <table class="mobile-table" class:loading>
   <thead>
     <tr>
-      <th class="mobile-th">Indicator</th>
-      <th class="mobile-th uk-text-right">Latest Issue</th>
-      <th class="mobile-th uk-text-right">Latest Data Available</th>
+      <th class="mobile-th">Data Source</th>
+      <th class="mobile-th uk-text-center" colspan="5">Reference Signal</th>
+      <th rowspan="2" />
+    </tr>
+    <tr>
+      <th />
+      <th class="mobile-th uk-text-right" title="Date the most recent update was published by Delphi">Latest Issue</th>
+      <th class="mobile-th uk-text-right" title="Most recent date for which data is available">Latest Data</th>
       <th class="mobile-th uk-text-right">Lag to Today</th>
-      <th class="mobile-th uk-text-right">Latest County Coverage</th>
+      <th class="mobile-th uk-text-right" title="Percent of US counties included in latest day of data"
+        >Latest County Coverage</th
+      >
       <th class="mobile-th uk-text-right">
-        <span>County Coverage</span>
+        <span title="Percent of US counties included">County Coverage</span>
         <div class="mobile-th-range">
-          <span> {formatDateShortNumbers(domain.min)} </span>
-          <span> {formatDateShortNumbers(domain.max)} </span>
+          <span> {formatDateShortNumbers(loader.domain.min)} </span>
+          <span> {formatDateShortNumbers(loader.domain.max)} </span>
         </div>
       </th>
-      <th />
     </tr>
     <tr>
       <th class="sort-indicator uk-text-center">
         <SortColumnIndicator label="Name" {sort} prop="name" />
       </th>
       <th class="sort-indicator">
-        <SortColumnIndicator label="Latest Issue Date" {sort} prop="latest_issue" />
+        <SortColumnIndicator label="Latest Issue" {sort} prop="latest_issue" />
       </th>
       <th class="sort-indicator">
-        <SortColumnIndicator label="Latest Data Date" {sort} prop="latest_time_value" />
+        <SortColumnIndicator label="Latest Data" {sort} prop="latest_time_value" />
       </th>
       <th class="sort-indicator">
         <SortColumnIndicator label="Lag" {sort} prop="latest_lag" />
@@ -105,30 +106,43 @@
     </tr>
   </thead>
   <tbody>
-    {#each sortedData as r (r.name)}
+    {#each sortedData as r}
       <tr>
         <td>
-          <a href="#{r.id}" on:click|preventDefault={() => dispatch('select', r)}>{r.name}</a>
+          <a
+            href="../indicator-source?sensor={r.source}-{r.reference_signal}"
+            on:click|preventDefault={() => dispatch('select', r)}>{r.name}</a
+          >
+          <div
+            class="source"
+            title="Use 'data_source={r.source}' when fetching from the covidcast endpoint of the Epidata API."
+          >
+            API data_source: {r.source}
+          </div>
         </td>
-        <td class="uk-text-right">
-          {formatDateISO(r.latest_issue)}
+        <td class="uk-text-right uk-text-nowrap">
+          {r.ref.isWeeklySignal ? formatWeek(r.latest_issue_week) : formatDateISO(r.latest_issue)}
         </td>
-        <td class="uk-text-right">
-          {formatDateISO(r.latest_time_value)}
+        <td class="uk-text-right uk-text-nowrap">
+          {r.ref.isWeeklySignal ? formatWeek(r.latest_data_week) : formatDateISO(r.latest_data)}
         </td>
-        <td class="uk-text-right">
-          {r.latest_lag.toLocaleString()} days
+        <td class="uk-text-right uk-text-nowrap">
+          {r.latest_lag}
         </td>
-        <td class="uk-text-right">
+        <td class="uk-text-right uk-text-nowrap">
           {formatFraction(r.latest_coverage)}
         </td>
         <td>
           <div class="mobile-table-chart mobile-table-chart-small">
-            <Vega {spec} data={r.coverage.county || []} noDataText="N/A" />
+            <Vega {spec} data={r.coverages} noDataText={r.supports_county ? 'N/A' : 'Not Supported'} />
           </div>
         </td>
         <td>
-          <a href="#{r.id}" class="uk-link-text details-link" on:click|preventDefault={() => dispatch('select', r)}>
+          <a
+            href="../indicator-source?sensor={r.source}-{r.covidcast_signal}"
+            class="uk-link-text details-link"
+            on:click|preventDefault={() => dispatch('select', r)}
+          >
             {@html chevronRightIcon}
           </a>
         </td>
@@ -142,5 +156,8 @@
     width: 6px;
     display: inline-block;
     fill: currentColor;
+  }
+  .source {
+    font-size: 0.75rem;
   }
 </style>

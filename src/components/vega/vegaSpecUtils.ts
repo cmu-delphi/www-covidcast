@@ -4,7 +4,7 @@ export function createSignalDateHighlight(signal: string, color: string): Normal
   return {
     description: 'shows the current data injected via a signal',
     data: {
-      values: [{ date_value: null }],
+      values: [{ date_value: null, week_value: null }],
     },
     transform: [
       {

@@ -4,7 +4,7 @@
   import { getContext } from 'svelte';
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
   import { getLevelInfo } from '../../../stores/constants';
-  import { formatDateISO, formatDateYearDayOfWeekAbbr } from '../../../formats';
+  import { formatDateISO, formatDateYearDayOfWeekAbbr, formatWeek } from '../../../formats';
   import RegionMapTooltip from '../../../blocks/RegionMapTooltip.svelte';
   import {
     generateStateSpec,
@@ -75,7 +75,7 @@
       scheme: sensor.value.vegaColorScale,
       title: [
         `${sensor.name} in US ${getLevelInfo(level).labelPlural}`,
-        `on ${formatDateYearDayOfWeekAbbr(date.value)}`,
+        `on ${sensor.isWeeklySignal ? date.week.toString() : formatDateYearDayOfWeekAbbr(date.value)}`,
       ],
       subTitle: sensor.unit,
       initialRegion: highlightToRegionsImpl(level, highlight),
@@ -107,7 +107,9 @@
   $: shownLevel = level === 'nation' ? 'state' : level;
   $: spec = generateSpec(sensor, shownLevel, date);
   $: data = loadData(sensor, shownLevel, date);
-  $: fileName = `${sensor.name}_${getLevelInfo(shownLevel).labelPlural}_${formatDateISO(date.value)}`;
+  $: fileName = `${sensor.name}_${getLevelInfo(shownLevel).labelPlural}_${
+    sensor.isWeeklySignal ? formatWeek(date.week) : formatDateISO(date.value)
+  }`;
 
   /**
    * @type {Vega }
@@ -119,14 +121,19 @@
     if (!value) {
       return;
     }
-    const regionHighlight = new WidgetHighlight(sensor.value, getInfoByName(value, shownLevel), date.value);
+    const regionHighlight = new WidgetHighlight(
+      sensor.value,
+      getInfoByName(value, shownLevel),
+      sensor.isWeeklySignal ? date.week : date.value,
+    );
 
     if (!regionHighlight.equals(highlight)) {
       highlight = regionHighlight;
     }
   }
 
-  $: highlighted = highlight != null && highlight.matches(sensor.value, shownLevel, date.value);
+  $: highlighted =
+    highlight != null && highlight.matches(sensor.value, shownLevel, sensor.isWeeklySignal ? date.week : date.value);
 
   function updateVegaHighlight(highlight) {
     if (!vegaRef) {

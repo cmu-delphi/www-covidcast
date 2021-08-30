@@ -1,7 +1,7 @@
 import type { Region } from '../stores/params';
 import { hhsInfo, hrrInfo, RegionLevel, stateInfo } from './regions';
 import type { TimeFrame } from './TimeFrame';
-import { formatAPITime, parseAPITime } from './utils';
+import { formatAPITime, formatAPIWeekTime, parseAPITime } from './utils';
 
 export function isArray<T>(v: T | readonly T[]): v is readonly T[] {
   return Array.isArray(v);
@@ -91,17 +91,18 @@ export class TimePair {
   }
 
   toString(): string {
+    const formatter = this.type === 'day' ? formatAPITime : formatAPIWeekTime;
     const encodeValues = () => {
       if (this.values === '*') {
         return '*';
       }
       if (this.values instanceof Date) {
-        return formatAPITime(this.values);
+        return formatter(this.values);
       }
       if (isArray(this.values)) {
-        return this.values.map((d) => (d instanceof Date ? formatAPITime(d) : d.range)).join(',');
+        return this.values.map((d) => (d instanceof Date ? formatter(d) : d.asTypeRange(this.type))).join(',');
       }
-      return this.values.range;
+      return this.values.asTypeRange(this.type);
     };
     return `${this.type}:${encodeValues()}`;
   }
