@@ -62,7 +62,7 @@
     {#if d && d.unknownOrNeutral.length > 0}
       <strong>{d.unknownOrNeutral.length} of {sensorList.length} indicators</strong>
       are
-      <strong>have changed</strong> or are <strong>not available</strong>
+      <strong>holding steady</strong> or are <strong>not available</strong>
       for
       {formatDateYearDayOfWeekAbbr(date.value)}.
     {/if}
