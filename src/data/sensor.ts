@@ -100,7 +100,7 @@ export const units = {
   raw: 'arbitrary scale',
   raw_count: 'people',
   count: 'people',
-  percent: '',
+  percent: 'percent',
   per100k: 'per 100,000 people',
   fraction: 'Fraction of population',
 };
