@@ -2,7 +2,7 @@
   import { CSV_SERVER_ENDPOINT } from '../../data/api';
   import Datepicker from '../../components/Calendar/Datepicker.svelte';
   import { levelList } from '../../stores/constants';
-  import { annotationManager, currentDateObject, metaDataManager } from '../../stores';
+  import { annotationManager, currentDateObject, metaDataManager, currentSensor } from '../../stores';
   import { timeMonth } from 'd3-time';
   import { onMount } from 'svelte';
   import { trackEvent } from '../../stores/ga';
@@ -21,6 +21,15 @@
   $: sensors = source ? source.sensors : [];
   let sensorValue = null;
   $: sensor = sensorValue ? $metaDataManager.getSensor(sensorValue) : null;
+  $: {
+    if ($currentSensor) {
+      const currentSensorObject = $metaDataManager.getSensor($currentSensor);
+      if (currentSensorObject) {
+        sensorValue = currentSensorObject.key;
+        sourceValue = currentSensorObject.id;
+      }
+    }
+  }
   $: {
     if (source && !sensors.find((d) => d.key === sensorValue)) {
       sensorValue = sensors[0].key;
