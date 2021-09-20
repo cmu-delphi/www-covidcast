@@ -141,7 +141,7 @@ Levels: [county, msa, state, hrr, hhs, nation]
 XAxis: Date
 YAxis: Percentage
 Format: percent
-Unit: per 100 people
+Unit: per 100 visits
 HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: false
@@ -169,7 +169,7 @@ Levels: [county, msa, state, hrr, nation]
 XAxis: Date
 YAxis: Percentage
 Format: percent
-Unit: per 100 people
+Unit: per 100 respondents
 HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: true
@@ -197,7 +197,7 @@ Levels: [county, msa, state, hrr, nation]
 XAxis: Date
 YAxis: Percentage
 Format: percent
-Unit: per 100 people
+Unit: per 100 respondents
 HighValuesAre: bad
 Is7DayAverage: true
 HasStdErr: true
