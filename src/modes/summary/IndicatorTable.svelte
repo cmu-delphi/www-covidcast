@@ -1,5 +1,5 @@
 <script>
-  import { groupedSensorList, sensorList } from '../../stores/constants';
+  import { groupedSensorList, sensorList } from '../../stores';
   import FancyHeader from '../../components/FancyHeader.svelte';
   import { SensorParam } from '../../stores/params';
   import { formatDateISO, formatDateShortNumbers } from '../../formats';

@@ -1,11 +1,15 @@
 import descriptions from './questions.generated.json';
 import { isoParse } from 'd3-time-format';
 import type { RegionLevel } from '../data/regions';
+import type { SensorLike } from '../data/sensor';
 
 export const overviewText = descriptions.overview;
 export const surveyFullTextLink = descriptions.fullSurveyLink;
 export const dataAccessLink = descriptions.dataAccessLink;
-export const referenceRawNationSignal = descriptions.referenceRawNationSignal;
+export const referenceRawNationSensorLike: SensorLike = {
+  id: descriptions.id,
+  signal: descriptions.referenceRawNationSignal,
+};
 export const visibleLevels = descriptions.levels as RegionLevel[];
 
 export function waveLink(wave: number): string {
@@ -36,15 +40,13 @@ export const waves = descriptions.waves.reduce((waves, wave, i) => {
   return waves;
 }, [] as Wave[]);
 
-export interface Revision {
+export interface Revision extends SensorLike {
   change: string;
   changedInWave: Wave;
   addedInWave: Wave;
-  id: string;
-  signal: string;
 }
 
-export interface Question {
+export interface Question extends SensorLike {
   category: string;
   anchor: string;
   /**
@@ -55,8 +57,7 @@ export interface Question {
   oldRevisions?: Revision[];
 
   name: string;
-  id: string;
-  signal: string;
+  unit?: string;
 }
 
 function toAnchor(value: string) {

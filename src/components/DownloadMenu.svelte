@@ -3,7 +3,7 @@
   import { csvFormat } from 'd3-dsv';
   import { formatDateISO } from '../formats';
   import { modeByID } from '../modes';
-  import { currentMode, sensorList } from '../stores';
+  import { currentMode } from '../stores';
 
   export let fileName = 'chart';
   /**
@@ -112,13 +112,8 @@
   function exportData() {
     // switch to export mode
     currentMode.set(modeByID.export);
-
-    const knownOne = sensor ? $sensorList.find((d) => d.key == sensor.key) : null;
-    if (knownOne) {
-      sensor.set(knownOne, true);
-    } else {
-      scrollToTop();
-    }
+    sensor.set(sensor.value, true);
+    scrollToTop();
   }
 </script>
 

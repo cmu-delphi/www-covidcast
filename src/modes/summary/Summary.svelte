@@ -20,13 +20,12 @@
   import { scrollIntoView } from '../../util';
   import { modeByID } from '..';
   import { DataFetcher } from '../../stores/DataFetcher';
-  import { findCasesSensor } from '../../stores/constants';
 
   $: sensor = new SensorParam($currentSensorEntry, $metaDataManager);
   $: date = new DateParam($currentDateObject);
   $: region = new RegionParam($currentRegionInfo);
 
-  $: CASES = new SensorParam(findCasesSensor(), $metaDataManager);
+  $: CASES = new SensorParam($metaDataManager.getDefaultCasesSignal(), $metaDataManager);
 
   const items = [nationInfo, ...stateInfo, ...countyInfo];
 

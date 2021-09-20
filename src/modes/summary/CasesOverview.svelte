@@ -8,7 +8,6 @@
   import MaxDateHint from '../../blocks/MaxDateHint.svelte';
   import IndicatorWarning from '../../blocks/IndicatorWarning.svelte';
   import { metaDataManager } from '../../stores';
-  import { findCasesSensor, findDeathsSensor } from '../../stores/constants';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -23,8 +22,8 @@
    */
   export let fetcher;
 
-  $: CASES = new SensorParam(findCasesSensor(), $metaDataManager);
-  $: DEATHS = new SensorParam(findDeathsSensor(), $metaDataManager);
+  $: CASES = new SensorParam($metaDataManager.getDefaultCasesSignal(), $metaDataManager);
+  $: DEATHS = new SensorParam($metaDataManager.getDefaultDeathSignal(), $metaDataManager);
 
   $: trends = fetcher.fetchNSensors1Region1DateTrend([CASES, DEATHS], region, date);
   $: casesTrend = trends[0];

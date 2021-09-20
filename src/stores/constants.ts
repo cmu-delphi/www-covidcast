@@ -1,6 +1,5 @@
 import descriptions from './descriptions.generated.json';
 import { modeByID } from '../modes';
-import { ensureSensorStructure, Sensor, sensorTypes } from '../data/sensor';
 
 export * from '../data/geoLevel';
 export type { Sensor } from '../data/sensor';
@@ -19,7 +18,9 @@ export interface SensorConfig {
   readonly linkFrom?: string[];
 }
 
-export const sensorConfig: SensorConfig[] = descriptions.map((d) => Object.assign(d, { key: `${d.id}:${d.signal}` }));
+export const sensorConfig: SensorConfig[] = descriptions.map((d) => Object.assign(d, { key: `${d.id}-${d.signal}` }));
+
+export const sensorConfigMap = new Map(sensorConfig.map((d) => [d.key, d]));
 
 export function resolveSensorWithAliases(sensor: string | undefined | null, defaultValue: string): string {
   if (sensor && sensorConfig.find((d) => d.key === 'sensor')) {
@@ -36,17 +37,6 @@ export function resolveSensorWithAliases(sensor: string | undefined | null, defa
   }
   return defaultValue;
 }
-
-// export const groupedSensorList = sensorTypes
-//   .map((sensorType) => ({
-//     ...sensorType,
-//     sensors: sensorList.filter(
-//       (sensor) =>
-//         // same type or the other catch all type
-//         sensor.type === sensorType.id || (sensorType.id === 'other' && sensorTypes.every((t) => t.id !== sensor.type)),
-//     ),
-//   }))
-//   .filter((d) => d.sensors.length > 0);
 
 export const defaultRegionOnStartup = {
   county: '42003', // Allegheny
@@ -75,14 +65,6 @@ export const DEFAULT_SURVEY_SENSOR = (() => {
   }
   return DEFAULT_SENSOR;
 })();
-
-// export function findCasesSensor(): Sensor {
-//   return sensorList.find((d) => d.signal === 'confirmed_7dav_incidence_prop')!;
-// }
-
-// export function findDeathsSensor(): Sensor {
-//   return sensorList.find((d) => d.signal === 'deaths_7dav_incidence_prop')!;
-// }
 
 function findCasesSensorConfig(): SensorConfig | undefined {
   return sensorConfig.find((d) => d.signal == 'confirmed_7dav_incidence_prop');

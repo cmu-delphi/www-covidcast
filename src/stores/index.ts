@@ -7,6 +7,7 @@ import {
   DEFAULT_CORRELATION_SENSOR,
   resolveSensorWithAliases,
   sensorConfig,
+  sensorConfigMap,
 } from './constants';
 import modes, { Mode, modeByID, ModeID } from '../modes';
 import { formatAPITime, parseAPITime } from '../data/utils';
@@ -81,29 +82,26 @@ export const currentMode = writable(defaultValues.mode);
 
 export const currentSensor = writable(defaultValues.sensor);
 
-function resolveSensor(sensor: string, metaData: MetaDataManager, defaultKey: string) {
+function resolveSensor(sensor: string, sensorList: Sensor[], metaData: MetaDataManager, defaultKey: string) {
   if (!sensor) {
     return null;
+  }
+  const configured = sensorList.find((d) => d.key === sensor);
+  if (configured) {
+    return configured;
   }
   const r = metaData.getSensor(sensor);
   if (r) {
     return r;
   }
+  const configuredDefault = sensorList.find((d) => d.key === sensor);
+  if (configuredDefault) {
+    return configuredDefault;
+  }
   return metaData.getSensor(defaultKey);
 }
 
 export const metaDataManager = writable(new MetaDataManager([]));
-
-export const currentSensorEntry = derived(
-  [currentSensor, metaDataManager],
-  // lookup the value, if not found maybe a generic one, if it is set, then return the default, else return the empty one
-  ([$currentSensor, metaDataManager]) => resolveSensor($currentSensor, metaDataManager, DEFAULT_SENSOR),
-);
-
-export const currentSensor2 = writable(defaultValues.sensor2);
-export const currentSensorEntry2 = derived([currentSensor2, metaDataManager], ([$currentSensor, metaDataManager]) =>
-  resolveSensor($currentSensor, metaDataManager, DEFAULT_CORRELATION_SENSOR),
-);
 
 export const sensorList = derived(metaDataManager, (metaData) => {
   return sensorConfig
@@ -117,6 +115,20 @@ export const sensorList = derived(metaDataManager, (metaData) => {
     })
     .filter((d): d is Sensor => d != null);
 });
+
+export const currentSensorEntry = derived(
+  [currentSensor, sensorList, metaDataManager],
+  // lookup the value, if not found maybe a generic one, if it is set, then return the default, else return the empty one
+  ([$currentSensor, sensorList, metaDataManager]) =>
+    resolveSensor($currentSensor, sensorList, metaDataManager, DEFAULT_SENSOR),
+);
+
+export const currentSensor2 = writable(defaultValues.sensor2);
+export const currentSensorEntry2 = derived(
+  [currentSensor2, sensorList, metaDataManager],
+  ([$currentSensor, sensorList, metaDataManager]) =>
+    resolveSensor($currentSensor, sensorList, metaDataManager, DEFAULT_CORRELATION_SENSOR),
+);
 
 export const groupedSensorList = derived(sensorList, (sensorList) => {
   return sensorTypes

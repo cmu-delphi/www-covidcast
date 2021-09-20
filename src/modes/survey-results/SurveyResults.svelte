@@ -1,6 +1,6 @@
 <script>
   import { currentDateObject, currentRegionInfo, getScrollToAnchor, metaDataManager } from '../../stores';
-  import { questionCategories, visibleLevels, refSensor, questions } from '../../stores/questions';
+  import { questionCategories, visibleLevels, questions } from '../../stores/questions';
   import SurveyQuestion from './SurveyQuestion.svelte';
   import RegionDatePicker from '../../components/RegionDatePicker.svelte';
   import Overview from './Overview.svelte';
@@ -11,7 +11,7 @@
   import { scrollIntoView } from '../../util';
   import { DataFetcher } from '../../stores/DataFetcher';
 
-  $: sensor = new SensorParam(refSensor, $metaDataManager);
+  $: sensor = new SensorParam($metaDataManager.getSensor(questions[0]), $metaDataManager);
   $: date = new DateParam($currentDateObject);
   $: region = new RegionParam($currentRegionInfo);
 
@@ -20,7 +20,7 @@
     // reactive update
     fetcher.invalidate(sensor, region, date);
 
-    const sensors = questions.map((d) => new SensorParam(d.sensor, $metaDataManager));
+    const sensors = questions.map((d) => new SensorParam($metaDataManager.getSensor(d), $metaDataManager));
     // prefetch all data that is likely needed
     // itself
     const loaded = fetcher.fetchNSensor1RegionNDates(sensors, region, date.windowTimeFrame);
@@ -48,7 +48,7 @@
 </script>
 
 <div class="root">
-  <RegionDatePicker sensor={refSensor} items={filteredInfos} defaultItem={nationInfo}>
+  <RegionDatePicker sensor={sensor.value} items={filteredInfos} defaultItem={nationInfo}>
     <div class="grid-3-11 mobile-header-line" slot="title">
       <h2>COVID-19 Trends and Impact Survey (CTIS) <span>Results</span></h2>
     </div>
