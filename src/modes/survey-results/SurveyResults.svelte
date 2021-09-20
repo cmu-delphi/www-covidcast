@@ -1,6 +1,6 @@
 <script>
   import { currentDateObject, currentRegionInfo, getScrollToAnchor, metaDataManager } from '../../stores';
-  import { questionCategories, visibleLevels, questions } from '../../stores/questions';
+  import { visibleLevels, questions, groupByQuestionCategory } from '../../stores/questions';
   import SurveyQuestion from './SurveyQuestion.svelte';
   import RegionDatePicker from '../../components/RegionDatePicker.svelte';
   import Overview from './Overview.svelte';
@@ -11,7 +11,19 @@
   import { scrollIntoView } from '../../util';
   import { DataFetcher } from '../../stores/DataFetcher';
 
-  $: sensor = new SensorParam($metaDataManager.getSensor(questions[0]), $metaDataManager);
+  $: validQuestions = questions.filter((question) => {
+    const s = $metaDataManager.getSensor(question);
+    if (!s) {
+      if ($metaDataManager.metaSensors.length > 0) {
+        console.error('invalid question config', question);
+      }
+      return false;
+    }
+    return true;
+  });
+  $: questionCategories = groupByQuestionCategory(validQuestions);
+
+  $: sensor = new SensorParam($metaDataManager.getSensor(validQuestions[0]), $metaDataManager);
   $: date = new DateParam($currentDateObject);
   $: region = new RegionParam($currentRegionInfo);
 
@@ -20,12 +32,13 @@
     // reactive update
     fetcher.invalidate(sensor, region, date);
 
-    const sensors = questions.map((d) => new SensorParam($metaDataManager.getSensor(d), $metaDataManager));
+    const sensors = validQuestions.map((d) => new SensorParam($metaDataManager.getSensor(d), $metaDataManager));
     // prefetch all data that is likely needed
     // itself
     const loaded = fetcher.fetchNSensor1RegionNDates(sensors, region, date.windowTimeFrame);
     // fetch self details (sample size)
     fetcher.fetchNSensor1Region1DateDetails(sensors, region, date);
+    fetcher.fetchNSensors1Region1DateTrend(sensors, region, date);
 
     if (region.level !== 'nation') {
       // nation

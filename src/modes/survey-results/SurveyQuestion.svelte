@@ -6,11 +6,12 @@
   import IndicatorOverview from '../../blocks/IndicatorOverview.svelte';
   import { formatDateYearDayOfWeekAbbr } from '../../formats';
   import IndicatorStatsLine from '../../blocks/IndicatorStatsLine.svelte';
-  import IndicatorRevisions from './IndicatorRevisions.svelte';
   import WarningBanner from '../../components/WarningBanner.svelte';
   import MaxDateHint from '../../blocks/MaxDateHint.svelte';
   import { metaDataManager } from '../../stores';
   import { SensorParam } from '../../stores/params';
+  import FancyHeader from '../../components/FancyHeader.svelte';
+  import IndicatorRevision from './IndicatorRevision.svelte';
 
   /**
    * question object
@@ -35,6 +36,17 @@
   $: sensor = new SensorParam($metaDataManager.getSensor(question), $metaDataManager);
   $: trend = fetcher.fetch1Sensor1Region1DateTrend(sensor, region, date);
 
+  $: validRevisions = (question.oldRevisions || []).filter((revision) => {
+    const s = $metaDataManager.getSensor(revision);
+    if (!s) {
+      if ($metaDataManager.metaSensors.length > 0) {
+        console.error('invalid question revision config', revision);
+      }
+      return false;
+    }
+    return true;
+  });
+
   let loading = false;
   let noData = false;
   $: {
@@ -55,6 +67,16 @@
     <p>Use the following link to jump directly to this question:</p>
     <a href="${fullUrl}">${t.innerHTML}</a>`);
   }
+
+  function extractFirstLink(links) {
+    if (!links || links.length === 0) {
+      return null;
+    }
+    const m = /href="(.*)"/gm.exec(links[0]);
+    return m ? m[1] : null;
+  }
+
+  $: firstLink = extractFirstLink(sensor.value.links);
 </script>
 
 <article class:loading class="uk-card uk-card-default uk-card-small question-card">
@@ -64,12 +86,13 @@
   <a href="#{question.anchor}" id={question.anchor} class="anchor"><span>Anchor</span></a>
   <div class="uk-card-header">
     <h3 class="uk-card-title">{question.category}</h3>
-    TODO refactor
-    <a href={question.learnMoreLink} class="uk-link-muted uk-text-small" title="Learn More">
-      <span class="inline-svg-icon">
-        {@html fileIcon}
-      </span><span class="header-link-text">Learn More</span></a
-    >
+    {#if firstLink}
+      <a href={firstLink} class="uk-link-muted uk-text-small" title="Learn More">
+        <span class="inline-svg-icon">
+          {@html fileIcon}
+        </span><span class="header-link-text">Learn More</span></a
+      >
+    {/if}
     <a
       href="#{question.anchor}"
       class="uk-link-muted uk-text-small"
@@ -121,8 +144,11 @@
 
     <IndicatorStatsLine {sensor} {date} {region} {fetcher} />
 
-    {#if question.oldRevisions}
-      <IndicatorRevisions {question} {date} {region} {fetcher} />
+    {#if validRevisions.length > 0}
+      <FancyHeader sub="Revisions">Previous</FancyHeader>
+      {#each validRevisions as revision}
+        <IndicatorRevision {revision} {date} {region} {fetcher} />
+      {/each}
     {/if}
   </div>
 </article>

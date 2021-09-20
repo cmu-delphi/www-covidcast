@@ -97,10 +97,7 @@ export interface QuestionCategory {
   questions: Question[];
 }
 
-/**
- * @type ({name: string, anchor: string, questions: Question[]}[])
- */
-export const questionCategories = (() => {
+export function groupByQuestionCategory(questions: readonly Question[]): QuestionCategory[] {
   const cats: QuestionCategory[] = [];
   for (const question of questions) {
     if (cats.length === 0 || cats[cats.length - 1].name !== question.category) {
@@ -113,4 +110,4 @@ export const questionCategories = (() => {
     cats[cats.length - 1].questions.push(question);
   }
   return cats;
-})();
+}

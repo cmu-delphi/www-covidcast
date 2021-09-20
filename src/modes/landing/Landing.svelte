@@ -5,7 +5,7 @@
   import { currentRegionInfo, groupedSensorList, recentRegionInfos, selectByInfo, switchToMode } from '../../stores';
   import flagUSAIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/flag-usa.svg';
   import { modeByID } from '..';
-  import { questionCategories } from '../../stores/questions';
+  import { groupByQuestionCategory, questions } from '../../stores/questions';
   import FancyHeader from '../../components/FancyHeader.svelte';
   import SurveyStats from '../../blocks/SurveyStats.svelte';
   import SensorGroup from './SensorGroup.svelte';
@@ -31,6 +31,8 @@
   }
 
   const version = __VERSION__;
+
+  const groupedQuestions = groupByQuestionCategory(questions);
 </script>
 
 <div class="uk-container content-grid root mobile-root landing-banner">
@@ -129,8 +131,8 @@
       <p>
         The COVID-19 Trends and Impact Survey (CTIS) offers insights into public sentiment on:
         <a href="./{modeByID['survey-results'].id}" on:click|preventDefault={switchSurvey}>
-          {#each questionCategories as cat, i}
-            {i === questionCategories.length - 1 ? ' and' : i > 0 ? ',' : ''}
+          {#each groupedQuestions as cat, i}
+            {i === groupedQuestions.length - 1 ? ' and' : i > 0 ? ',' : ''}
             {cat.name}
           {/each}
         </a>

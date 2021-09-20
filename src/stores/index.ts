@@ -7,7 +7,6 @@ import {
   DEFAULT_CORRELATION_SENSOR,
   resolveSensorWithAliases,
   sensorConfig,
-  sensorConfigMap,
 } from './constants';
 import modes, { Mode, modeByID, ModeID } from '../modes';
 import { formatAPITime, parseAPITime } from '../data/utils';
@@ -108,7 +107,10 @@ export const sensorList = derived(metaDataManager, (metaData) => {
     .map((d) => {
       const s = metaData.getSensor(d);
       if (s == null) {
-        console.error('invalid configured sensor', d);
+        if (metaData.metaSensors.length > 0) {
+          // report only when there are some sensors configured
+          console.error('invalid configured sensor', d);
+        }
         return null;
       }
       return Object.assign({}, s, d) as Sensor;

@@ -20,8 +20,6 @@ export interface SensorConfig {
 
 export const sensorConfig: SensorConfig[] = descriptions.map((d) => Object.assign(d, { key: `${d.id}-${d.signal}` }));
 
-export const sensorConfigMap = new Map(sensorConfig.map((d) => [d.key, d]));
-
 export function resolveSensorWithAliases(sensor: string | undefined | null, defaultValue: string): string {
   if (sensor && sensorConfig.find((d) => d.key === 'sensor')) {
     return sensor;
