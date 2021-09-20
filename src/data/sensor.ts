@@ -2,8 +2,10 @@ import { formatter, formatSpecifiers } from '../formats';
 import { interpolateBuPu, interpolateYlGnBu, interpolateYlOrRd } from 'd3-scale-chromatic';
 import { getDataSource } from './dataSourceLookup';
 import { defaultCountyRegion, defaultStateRegion, nationInfo, Region, RegionLevel } from './regions';
-import type { SignalCategory, SignalFormat, SignalHighValuesAre } from './api';
+import type { EpiDataMetaInfo, SignalCategory, SignalFormat, SignalHighValuesAre } from './api';
 import { isArray } from './apimodel';
+import type { EpiWeek } from './EpiWeek';
+import type { TimeFrame } from './TimeFrame';
 
 export const sensorTypes: { id: SignalCategory; label: string }[] = [
   {
@@ -24,7 +26,25 @@ export const sensorTypes: { id: SignalCategory; label: string }[] = [
   },
 ];
 
+export interface SensorLike {
+  id: string;
+  signal: string;
+}
+
+export interface EpiDataMetaParsedInfo extends EpiDataMetaInfo {
+  maxIssue: Date;
+  maxIssueWeek: EpiWeek;
+  minTime: Date;
+  minWeek: EpiWeek;
+  maxTime: Date;
+  maxWeek: EpiWeek;
+  timeFrame: TimeFrame;
+}
+
 export interface Sensor {
+  meta: EpiDataMetaParsedInfo;
+  active: boolean;
+
   readonly key: string; // id:signal
   readonly id: string; // data source
   readonly signal: string;
@@ -58,9 +78,6 @@ export interface Sensor {
 
   readonly formatSpecifier: string;
   formatValue(v?: number | null, enforceSign?: boolean): string;
-
-  readonly highlight?: string[];
-  readonly linkFrom?: string[];
 }
 
 function determineHighValuesAre(sensor: {

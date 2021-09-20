@@ -28,7 +28,7 @@
    */
   export let fetcher;
 
-  function computeDataSources() {
+  function computeDataSources(sensorList) {
     const map = new Map();
     for (const sensor of sensorList) {
       const ds = sensor.dataSourceName;
@@ -46,7 +46,7 @@
     return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
   }
 
-  const dataSources = computeDataSources();
+  $: dataSources = computeDataSources($sensorList);
 
   let selectedDatasource = '';
 
@@ -64,7 +64,7 @@
    * @param {import("../../stores/params").DateParam} date
    * @param {import("../../stores/params").RegionParam} region
    */
-  function loadData(region, date) {
+  function loadData(groupedSensorList, region, date) {
     const flatSensors = groupedSensorList.map((group) => group.sensors).flat();
     const trends = fetcher.fetchNSensors1Region1DateTrend(flatSensors, region, date);
     const sparkLines = fetcher.fetchNSensor1RegionSparklines(flatSensors, region, date);
@@ -117,7 +117,7 @@
    */
   $: spec = generateSparkLine({ highlightDate: true, domain: date.sparkLineTimeFrame.domain });
 
-  $: loadedData = loadData(region, date);
+  $: loadedData = loadData($groupedSensorList, region, date);
   $: dumpData = generateDumpData(loadedData, date, region);
   $: fileName = `Overview_${region.propertyId}-${region.displayName}_${formatDateISO(date.value)}`;
 </script>
@@ -140,7 +140,7 @@
         <option value={ds.name}>{ds.label} ({ds.sensors.length})</option>
       {/each}
     </optgroup>
-    <option value="all">All Indicators ({sensorList.length})</option>
+    <option value="all">All Indicators ({$sensorList.length})</option>
   </select>
 </div>
 

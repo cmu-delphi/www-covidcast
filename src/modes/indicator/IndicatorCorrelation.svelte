@@ -62,7 +62,7 @@
     });
   }
 
-  $: compareTo = sensorList.filter((d) => d.key !== sensor.key && d.isWeeklySignal === sensor.isWeeklySignal);
+  $: compareTo = $sensorList.filter((d) => d.key !== sensor.key && d.isWeeklySignal === sensor.isWeeklySignal);
   $: otherSensors = buildTableData(sensor, compareTo, region, date);
 
   function switchMode(sensor) {

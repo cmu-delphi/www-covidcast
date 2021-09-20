@@ -44,7 +44,6 @@ export const modes = [
       import(/* webpackChunkName: 'm-indicator-status' */ './indicator-status/IndicatorStatusOverview.svelte').then(
         (r) => r.default,
       ),
-    waitForReady: true,
   },
   {
     id: 'indicator-source',
@@ -54,7 +53,6 @@ export const modes = [
       import(/* webpackChunkName: 'm-indicator-source' */ './indicator-status/IndicatorSource.svelte').then(
         (r) => r.default,
       ),
-    waitForReady: true,
   },
   {
     id: 'indicator-signal',
@@ -64,7 +62,6 @@ export const modes = [
       import(/* webpackChunkName: 'm-indicator-signal' */ './indicator-status/IndicatorSignal.svelte').then(
         (r) => r.default,
       ),
-    waitForReady: true,
   },
   {
     id: 'dashboard',
@@ -72,6 +69,5 @@ export const modes = [
     isGeneric: true,
     component: () =>
       import(/* webpackChunkName: 'm-dashboard' */ './dashboard/Dashboard.svelte').then((r) => r.default),
-    waitForReady: true,
   },
 ];

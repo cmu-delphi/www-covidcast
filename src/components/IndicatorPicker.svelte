@@ -9,7 +9,7 @@
 
   export let className = 'grid-3-11';
 
-  export let allSensors = groupedSensorList;
+  export let allSensors = $groupedSensorList;
 
   export let label = 'Indicator';
 

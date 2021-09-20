@@ -85,7 +85,7 @@
       </p>
 
       <ul class="sensors">
-        {#each groupedSensorList as group}
+        {#each $groupedSensorList as group}
           <SensorGroup {group} />
         {/each}
       </ul>

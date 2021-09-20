@@ -37,8 +37,8 @@
       return Promise.resolve([]);
     }
     // TODO
-    return Promise.all(fetcher.fetchNSensors1Region1DateTrend(sensorList, region, date)).then((trends) => {
-      return sensorList.map((sensor, i) => {
+    return Promise.all(fetcher.fetchNSensors1Region1DateTrend($sensorList, region, date)).then((trends) => {
+      return $sensorList.map((sensor, i) => {
         const trend = trends[i];
         return toRow(sensor.key, sensor.name, sensor, region.value, date.value, trend);
       });

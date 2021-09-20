@@ -113,7 +113,7 @@
     // switch to export mode
     currentMode.set(modeByID.export);
 
-    const knownOne = sensor ? sensorList.find((d) => d.key == sensor.key) : null;
+    const knownOne = sensor ? $sensorList.find((d) => d.key == sensor.key) : null;
     if (knownOne) {
       sensor.set(knownOne, true);
     } else {
