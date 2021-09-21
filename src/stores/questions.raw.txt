@@ -183,9 +183,6 @@ OldRevisions:
  - Change: This version asked about the past 5 days, rather than 7. This was changed in Wave 10 to be consistent with other items on the survey.
    Signal: smoothed_wanxious_5d
    AddedInWave: 4
- 
-
-
 ---
 Name: Felt Depressed
 Category: Mental Health
@@ -213,18 +210,12 @@ OldRevisions:
 
 
 ---
-
-
 Name: Worried About Becoming Sick
 Category: Mental Health
 Question: |
   Do you feel **very or somewhat worried** about becoming seriously ill from COVID-19?
 Signal: smoothed_wworried_become_ill
 AddedInWave: 4
-
-
-
-
 ---
 
 
@@ -234,10 +225,6 @@ Question: |
   Do you feel **very or somewhat worried** about your household’s finances for the next month?
 Signal: smoothed_wworried_finances
 AddedInWave: 4
-
-
-
-
 ---
 
 
@@ -258,11 +245,7 @@ Question: |
   If you were tested for COVID-19 in the past 14 days, was the test positive?
 Signal: smoothed_wtested_positive_14d
 AddedInWave: 4
-
-
 ---
-
-
 Name: Wanted a Test
 Category: Testing
 Question: |

@@ -11,7 +11,8 @@ Description: Delphi receives data from [SafeGraph](https://docs.safegraph.com/do
 Name: Restaurant Visits
 Id: safegraph-weekly
 Signal: restaurants_visit_prop
- 
+
+
 SignalTooltip: Daily number of visits to restaurants per 100,000 people, based on SafeGraph’s Weekly Patterns dataset
  
 Description: Delphi receives data from [SafeGraph](https://docs.safegraph.com/docs/weekly-patterns), which collects weekly insights on Points of Interest (POI) using anonymized location data from mobile phones. We select locations that qualify as "Full-Service Restaurants" from all the [core places]( https://docs.safegraph.com/v4.0/docs/places-manual#section-core-places), then count the number of visits and normalize by population size. Note that these counts only include people whose visits are tracked because they are in SafeGraph’s panel; they do not include all restaurant visits by everyone in the population.
@@ -21,8 +22,6 @@ Id: fb-survey
 Signal: smoothed_wwearing_mask_7d
 LinkFrom: [fb-survey-smoothed_wearing_mask_7d, fb-survey-smoothed_wearing_mask_5d]
 Highlight: [landing]
-
-
 
 
 SignalTooltip: Percentage of people who say they wear a mask most or all of the time while in public, based on surveys of Facebook users
@@ -54,7 +53,7 @@ Description: Using Google Symptoms Searches, Delphi obtains the sum of Google se
 Name: COVID-Related Doctor Visits
 Id: doctor-visits
 Signal: smoothed_adj_cli
-Unit: visits per 100
+Unit: per 100 visits
 Highlight: [landing, default]
 
 
@@ -66,7 +65,7 @@ Description: Delphi receives from our health system partners aggregated statisti
 Name: COVID-Like Symptoms
 Id: fb-survey
 Signal: smoothed_wcli
-Unit: respondents per 100
+Unit: per 100 respondents
 
 
 SignalTooltip: Percentage of people with COVID-like symptoms, based on surveys of Facebook users
@@ -77,7 +76,7 @@ Description: Every day, Delphi surveys tens of thousands of Facebook users, aski
 Name: COVID-Like Symptoms in Community
 Id: fb-survey
 Signal: smoothed_whh_cmnty_cli
-Unit: per 100 people
+Unit: per 100 respondents
 Highlight: [landing, location]
 
 
