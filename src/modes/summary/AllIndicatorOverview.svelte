@@ -21,16 +21,16 @@
    * @param {import("../../stores/params").DateParam} date
    * @param {import("../../stores/params").Region[]} region
    */
-  function generateTrendSummary(date, region) {
+  function generateTrendSummary(date, region, sensors) {
     if (!date.value || !region.value) {
       return Promise.resolve(null);
     }
-    return Promise.all(fetcher.fetchNSensors1Region1DateTrend(sensorList, region, date)).then((trends) => {
+    return Promise.all(fetcher.fetchNSensors1Region1DateTrend(sensors, region, date)).then((trends) => {
       const positive = [];
       const negative = [];
       const unknownOrNeutral = [];
       trends.forEach((trend, i) => {
-        const sensor = sensorList[i];
+        const sensor = sensors[i];
         if (trend.isBetter) {
           positive.push(sensor);
         } else if (trend.isWorse) {
@@ -43,24 +43,24 @@
     });
   }
 
-  $: trendSummary = generateTrendSummary(date, region);
+  $: trendSummary = generateTrendSummary(date, region, $sensorList);
 </script>
 
 <FancyHeader sub="Summary" anchor="indicators">Indicators</FancyHeader>
 
 <p>
   {#await trendSummary}
-    <strong>N/A of {sensorList.length} indicators</strong>
+    <strong>N/A of {$sensorList.length} indicators</strong>
     are
     <strong>getting better.</strong>
     <AllIndicatorsText sensors={null} />
   {:then d}
-    <strong>{d ? d.positive.length : 'N/A'} of {sensorList.length} indicators</strong>
+    <strong>{d ? d.positive.length : 'N/A'} of {$sensorList.length} indicators</strong>
     are
     <strong>getting better.</strong>
     <AllIndicatorsText sensors={d ? d.negative : null} />
     {#if d && d.unknownOrNeutral.length > 0}
-      <strong>{d.unknownOrNeutral.length} of {sensorList.length} indicators</strong>
+      <strong>{d.unknownOrNeutral.length} of {$sensorList.length} indicators</strong>
       are
       <strong>holding steady</strong> or are <strong>not available</strong>
       for

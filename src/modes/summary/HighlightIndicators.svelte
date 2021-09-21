@@ -21,7 +21,7 @@
    */
   export let fetcher;
 
-  const highlights = sensorList.filter((d) => d.highlight && d.highlight.includes('location'));
+  $: highlights = $sensorList.filter((d) => d.highlight && d.highlight.includes('location'));
 
   function loadData(sensors, region, date) {
     return fetcher.fetchNSensors1Region1DateTrend(sensors, region, date).map((trend, i) => ({

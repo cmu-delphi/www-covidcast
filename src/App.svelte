@@ -20,9 +20,7 @@
   });
 
   async function loadComponent(mode) {
-    if (mode.waitForReady) {
-      await appReadyPromise;
-    }
+    await appReadyPromise;
     return mode.component();
   }
 

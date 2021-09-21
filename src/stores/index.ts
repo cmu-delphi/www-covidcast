@@ -1,30 +1,23 @@
 import { writable, derived, get, readable } from 'svelte/store';
 import {
-  sensorMap,
   DEFAULT_MODE,
   DEFAULT_SENSOR,
   DEFAULT_SURVEY_SENSOR,
   defaultRegionOnStartup,
   DEFAULT_CORRELATION_SENSOR,
   resolveSensorWithAliases,
+  sensorConfig,
 } from './constants';
 import modes, { Mode, modeByID, ModeID } from '../modes';
 import { formatAPITime, parseAPITime } from '../data/utils';
 import { getInfoByName } from '../data/regions';
-export {
-  defaultRegionOnStartup,
-  getLevelInfo,
-  levels,
-  levelList,
-  sensorList,
-  sensorMap,
-  groupedSensorList,
-} from './constants';
+export { defaultRegionOnStartup, getLevelInfo, levels, levelList } from './constants';
 import { timeDay } from 'd3-time';
 import { AnnotationManager, fetchAnnotations } from '../data';
 import type { RegionInfo, RegionLevel } from '../data/regions';
 import { MetaDataManager } from '../data/meta';
 import { callMetaAPI } from '../data/api';
+import { Sensor, sensorTypes } from '../data/sensor';
 
 export const appReady = writable(false);
 
@@ -88,27 +81,70 @@ export const currentMode = writable(defaultValues.mode);
 
 export const currentSensor = writable(defaultValues.sensor);
 
-function resolveSensor(sensor: string, defaultKey: string) {
+function resolveSensor(sensor: string, sensorList: Sensor[], metaData: MetaDataManager, defaultKey: string) {
   if (!sensor) {
     return null;
   }
-  const r = sensorMap.get(sensor);
+  const configured = sensorList.find((d) => d.key === sensor);
+  if (configured) {
+    return configured;
+  }
+  const r = metaData.getSensor(sensor);
   if (r) {
     return r;
   }
-  return sensorMap.get(defaultKey);
+  const configuredDefault = sensorList.find((d) => d.key === sensor);
+  if (configuredDefault) {
+    return configuredDefault;
+  }
+  return metaData.getSensor(defaultKey);
 }
 
+export const metaDataManager = writable(new MetaDataManager([]));
+
+export const sensorList = derived(metaDataManager, (metaData) => {
+  return sensorConfig
+    .map((d) => {
+      const s = metaData.getSensor(d);
+      if (s == null) {
+        if (metaData.metaSensors.length > 0) {
+          // report only when there are some sensors configured
+          console.error('invalid configured sensor', d);
+        }
+        return null;
+      }
+      return Object.assign({}, s, d) as Sensor;
+    })
+    .filter((d): d is Sensor => d != null);
+});
+
 export const currentSensorEntry = derived(
-  [currentSensor],
+  [currentSensor, sensorList, metaDataManager],
   // lookup the value, if not found maybe a generic one, if it is set, then return the default, else return the empty one
-  ([$currentSensor]) => resolveSensor($currentSensor, DEFAULT_SENSOR),
+  ([$currentSensor, sensorList, metaDataManager]) =>
+    resolveSensor($currentSensor, sensorList, metaDataManager, DEFAULT_SENSOR),
 );
 
 export const currentSensor2 = writable(defaultValues.sensor2);
-export const currentSensorEntry2 = derived([currentSensor2], ([$currentSensor]) =>
-  resolveSensor($currentSensor, DEFAULT_CORRELATION_SENSOR),
+export const currentSensorEntry2 = derived(
+  [currentSensor2, sensorList, metaDataManager],
+  ([$currentSensor, sensorList, metaDataManager]) =>
+    resolveSensor($currentSensor, sensorList, metaDataManager, DEFAULT_CORRELATION_SENSOR),
 );
+
+export const groupedSensorList = derived(sensorList, (sensorList) => {
+  return sensorTypes
+    .map((sensorType) => ({
+      ...sensorType,
+      sensors: sensorList.filter(
+        (sensor) =>
+          // same type or the other catch all type
+          sensor.type === sensorType.id ||
+          (sensorType.id === 'other' && sensorTypes.every((t) => t.id !== sensor.type)),
+      ),
+    }))
+    .filter((d) => d.sensors.length > 0);
+});
 
 export const currentLag = writable(defaultValues.lag);
 
@@ -307,20 +343,17 @@ export function loadAnnotations(): void {
   });
 }
 
-export const metaDataManager = writable(new MetaDataManager([]));
-
 export function loadMetaData(): Promise<{ date: string }> {
   return callMetaAPI().then((meta) => {
     const m = new MetaDataManager(meta);
     metaDataManager.set(m);
 
     const sensor = get(currentSensor);
-    const sensorInfo = sensorMap.get(sensor);
+    const timeEntry = m.getTimeFrame(sensor);
 
     let date = get(currentDate);
     // Magic number of default date - if no URL params, use max date
     // available
-    const timeEntry = sensorInfo ? m.getTimeFrame(sensorInfo) : null;
     if (date === MAGIC_START_DATE && timeEntry != null) {
       date = formatAPITime(timeDay.offset(timeEntry.max, -2));
       currentDate.set(date);
@@ -351,8 +384,7 @@ currentMode.subscribe((mode) => {
   if (mode === modeByID['survey-results']) {
     // change sensor and date to the latest one within the survey
     currentSensor.set(DEFAULT_SURVEY_SENSOR);
-    const sensorEntry = sensorMap.get(DEFAULT_SURVEY_SENSOR)!;
-    const timeFrame = get(metaDataManager).getTimeFrame(sensorEntry);
+    const timeFrame = get(metaDataManager).getTimeFrame(DEFAULT_SURVEY_SENSOR);
     currentDate.set(String(timeFrame.max_time));
   }
 });
