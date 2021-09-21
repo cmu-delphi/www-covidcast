@@ -83,9 +83,7 @@ export const formatSpecifiers = {
 };
 
 const generic = format(',.1f');
-const count = format(formatSpecifiers.count);
-const percentFormatter = format(formatSpecifiers.percent);
-const fractionFormatter = format(formatSpecifiers.fraction);
+const fractionAsPercentFormatter = format('.2%');
 const rawFormatter = format(',.2f');
 
 function sign(
@@ -110,17 +108,21 @@ function sign(
 export function formatValue(value?: number | null, enforceSign = false): string {
   return sign(value, generic, enforceSign);
 }
-export function formatCount(value?: number | null, enforceSign = false): string {
-  return sign(value, count, enforceSign);
-}
-export function formatPercentage(value?: number | null, enforceSign = false): string {
-  return sign(value, percentFormatter, enforceSign);
-}
 export function formatFraction(value?: number | null, enforceSign = false): string {
-  return sign(value, fractionFormatter, enforceSign);
+  return sign(value, fractionAsPercentFormatter, enforceSign);
 }
 export function formatRawValue(value?: number | null, enforceSign = false): string {
   return sign(value, rawFormatter, enforceSign);
+}
+
+const count = format(formatSpecifiers.count);
+const per100Formatter = format(formatSpecifiers.percent);
+
+function formatCount(value?: number | null, enforceSign = false): string {
+  return sign(value, count, enforceSign);
+}
+function formatPer100(value?: number | null, enforceSign = false): string {
+  return sign(value, per100Formatter, enforceSign);
 }
 
 export const formatter = {
@@ -128,6 +130,6 @@ export const formatter = {
   raw_count: formatCount,
   count: formatCount,
   fraction: formatRawValue,
-  percent: formatPercentage,
+  percent: formatPer100,
   per100k: formatValue,
 };
