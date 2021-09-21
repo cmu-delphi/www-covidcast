@@ -65,7 +65,7 @@ Description: Delphi receives from our health system partners aggregated statisti
 Name: COVID-Like Symptoms
 Id: fb-survey
 Signal: smoothed_wcli
-Unit: per 100 respondents
+Unit: per 100 people
 
 
 SignalTooltip: Percentage of people with COVID-like symptoms, based on surveys of Facebook users
@@ -76,7 +76,7 @@ Description: Every day, Delphi surveys tens of thousands of Facebook users, aski
 Name: COVID-Like Symptoms in Community
 Id: fb-survey
 Signal: smoothed_whh_cmnty_cli
-Unit: per 100 respondents
+Unit: per 100 people
 Highlight: [landing, location]
 
 
@@ -88,7 +88,7 @@ Description: Every day, Delphi surveys tens of thousands of Facebook users, aski
 Name: COVID Antigen Test Positivity (Quidel)
 Id: quidel-covid-ag
 Signal: covid_ag_smoothed_pct_positive
-Unit: per 100 people
+Unit: per 100 tests
 Highlight: [landing]
 
 
@@ -100,7 +100,7 @@ Description: When a patient (whether at a doctor’s office, clinic, or hospital
 Name: Claims-Based COVID Hospital Admissions
 Id: hospital-admissions
 Signal: smoothed_adj_covid19_from_claims
-Unit: per 100 people
+Unit: per 100 admissions
 Highlight: [landing]
 
 
