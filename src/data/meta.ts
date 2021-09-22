@@ -3,10 +3,9 @@ import { parseAPIDateAndWeek } from './utils';
 import type { RegionLevel } from './regions';
 import { isCountSignal } from './signals';
 import { ALL_TIME_FRAME, TimeFrame } from './TimeFrame';
-import { Sensor, units, colorScales, vegaColorScales, yAxis } from './sensor';
+import { Sensor, units, colorScales, vegaColorScales, yAxis, EpiDataMetaParsedInfo, SensorLike } from './sensor';
 import { formatSpecifiers, formatter } from '../formats';
 import { parse as parseMarkDown, parseInline } from 'marked';
-import type { EpiWeek } from './EpiWeek';
 
 function toKey(source: string, signal: string) {
   return `${source}-${signal}`;
@@ -38,16 +37,6 @@ function extractStats(signal: string, entry: EpiDataMetaInfo | null, level?: Reg
   }
   // take first one
   return [...Object.values(entry.geo_types)][0]!;
-}
-
-export interface EpiDataMetaParsedInfo extends EpiDataMetaInfo {
-  maxIssue: Date;
-  maxIssueWeek: EpiWeek;
-  minTime: Date;
-  minWeek: EpiWeek;
-  maxTime: Date;
-  maxWeek: EpiWeek;
-  timeFrame: TimeFrame;
 }
 
 function parse(d: EpiDataMetaInfo): EpiDataMetaParsedInfo {
@@ -92,11 +81,6 @@ function toValueDomain(
   ];
 }
 
-export interface SensorLike {
-  id: string;
-  signal: string;
-}
-
 function generateCredits(license: EpiDataMetaSourceInfo['license']) {
   if (!license) {
     return 'We are happy for you to use this data in products and publications.';
@@ -108,19 +92,14 @@ function generateCredits(license: EpiDataMetaSourceInfo['license']) {
   return parseInline(license);
 }
 
-export interface SensorSensor extends Sensor {
-  meta: EpiDataMetaParsedInfo;
-  active: boolean;
-}
-
 export interface SensorSource
   extends Readonly<Omit<EpiDataMetaSourceInfo, 'signals' | 'reference_signal' | 'db_source'>> {
-  readonly sensors: readonly SensorSensor[];
-  readonly referenceSensor?: SensorSensor;
+  readonly sensors: readonly Sensor[];
+  readonly referenceSensor?: Sensor;
   readonly credits: string;
 }
 
-function findRawSignal(sensor: SensorSensor, sensors: SensorSensor[]) {
+function findRawSignal(sensor: Sensor, sensors: Sensor[]) {
   if (!sensor.meta.is_smoothed) {
     return undefined;
   }
@@ -135,7 +114,7 @@ function findRawSignal(sensor: SensorSensor, sensors: SensorSensor[]) {
   );
   return raw;
 }
-function findRawCumulativeSignal(sensor: SensorSensor, sensors: SensorSensor[]) {
+function findRawCumulativeSignal(sensor: Sensor, sensors: Sensor[]) {
   if (sensor.meta.is_cumulative) {
     return undefined;
   }
@@ -152,16 +131,16 @@ function findRawCumulativeSignal(sensor: SensorSensor, sensors: SensorSensor[]) 
 }
 
 function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
-  list: SensorSensor[];
-  map: Map<string, SensorSensor>;
+  list: Sensor[];
+  map: Map<string, Sensor>;
   sources: SensorSource[];
 } {
   const sources = metadata
     .map((sm): SensorSource => {
       const credits = generateCredits(sm.license);
-      const sensors: SensorSensor[] = sm.signals.map((m) => {
+      const sensors: Sensor[] = sm.signals.map((m) => {
         const parsed = parse(m);
-        const s: SensorSensor = {
+        const s: Sensor = {
           key: toKey(m.source, m.signal),
           active: m.active,
           id: m.source,
@@ -230,8 +209,8 @@ function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
 }
 
 export class MetaDataManager {
-  private readonly lookup: ReadonlyMap<string, SensorSensor>;
-  readonly metaSensors: readonly SensorSensor[];
+  private readonly lookup: ReadonlyMap<string, Sensor>;
+  readonly metaSensors: readonly Sensor[];
   readonly metaSources: readonly SensorSource[];
 
   constructor(metadata: EpiDataMetaSourceInfo[]) {
@@ -257,7 +236,7 @@ export class MetaDataManager {
     return s ? this.metaSources.find((d) => d.source === s.id) ?? null : null;
   }
 
-  getSensor(sensor: SensorLike | string): SensorSensor | null {
+  getSensor(sensor: SensorLike | string): Sensor | null {
     const r = this.lookup.get(typeof sensor === 'string' ? sensor : toKey(sensor.id, sensor.signal));
     return r ?? null;
   }
@@ -277,7 +256,7 @@ export class MetaDataManager {
     return extractStats(sensor.signal, entry, level);
   }
 
-  getTimeFrame(sensor: SensorLike): TimeFrame {
+  getTimeFrame(sensor: string | SensorLike): TimeFrame {
     const entry = this.getMetaData(sensor);
     if (!entry) {
       return ALL_TIME_FRAME;
