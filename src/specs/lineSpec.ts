@@ -228,6 +228,7 @@ export interface LineSpecOptions {
   autoAlignOffset?: number;
   tickCount?: Axis<ExprRef | SignalRef>['tickCount'];
   isWeeklySignal?: boolean;
+  stderr?: boolean;
 }
 
 export function generateLineChartSpec({
@@ -256,6 +257,7 @@ export function generateLineChartSpec({
     step: 1,
   },
   isWeeklySignal = false,
+  stderr = false,
 }: LineSpecOptions = {}): TopLevelSpec & LayerSpec<Field> {
   // logic to automatically add the year for week 1 and first date
   const labelDateYear = `datum.label + (week(datum.value) === 1 ${
@@ -268,7 +270,7 @@ export function generateLineChartSpec({
   if (subTitle) {
     topOffset += 10;
   }
-  return {
+  const spec: TopLevelSpec & LayerSpec<Field> = {
     ...BASE_SPEC,
     width,
     height,
@@ -443,6 +445,42 @@ export function generateLineChartSpec({
       genEmptyHighlightLayer(),
     ],
   };
+
+  if (stderr) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const encoding: any = {
+      ...spec.layer[0].encoding!,
+      yError: {
+        field: 'stderr',
+      },
+    };
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (encoding.opacity) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+      encoding.opacity = {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+        ...encoding.opacity,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+        condition: {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+          ...encoding.opacity.condition,
+          value: 0.02,
+        },
+        value: 0.25,
+      };
+    }
+    spec.layer.unshift({
+      mark: {
+        type: 'errorband',
+        color,
+        opacity: 0.25,
+      },
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-explicit-any
+      encoding: encoding as any,
+    });
+  }
+
+  return spec;
 }
 
 export function generateCompareLineSpec(
@@ -467,7 +505,7 @@ export function generateCompareLineSpec(
 }
 
 export function generateLineAndBarSpec(options: LineSpecOptions = {}): TopLevelSpec & LayerSpec<Field> {
-  const spec = generateLineChartSpec(options);
+  const spec = generateLineChartSpec({ ...options, stderr: false });
   const point = spec.layer[1] as NormalizedUnitSpec;
   point.mark = {
     type: 'bar',

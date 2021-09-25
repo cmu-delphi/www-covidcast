@@ -99,14 +99,14 @@
    * @param {import('..stores/params').RegionParam} region
    * @param {import('../stores/params').DateParam} date
    * @param {import('../stores/params').TimeFrame} timeFrame
-   * @param {{height: number, zero: boolean, raw: boolean, isMobile: boolean, singleRegionOnly: boolean, cumulative: boolean}} options
+   * @param {{height: number, zero: boolean, raw: boolean, isMobile: boolean, singleRegionOnly: boolean, cumulative: boolean, stderr: boolean}} options
    */
   function genSpec(
     sensor,
     region,
     date,
     timeFrame,
-    { height, zero, raw, isMobile, singleRegionOnly, domain, cumulative, showNeighbors },
+    { height, zero, raw, isMobile, singleRegionOnly, domain, cumulative, showNeighbors, stderr },
   ) {
     const isWeekly = sensor.value.isWeeklySignal;
     const options = {
@@ -120,6 +120,7 @@
       subTitle: sensor.unit,
       highlightRegion: true,
       isWeeklySignal: isWeekly,
+      stderr,
     };
     if (cumulative) {
       options.paddingLeft = 52; // more space for larger numbers
@@ -279,7 +280,8 @@
     return spec;
   }
 
-  let zoom = false;
+  export let zoom = false;
+  export let stderr = false;
   let singleRaw = false;
   let singleCumulative = false;
 
@@ -299,6 +301,7 @@
       domain,
       cumulative,
       showNeighbors,
+      stderr,
     }),
     timeFrame,
     annotations,
