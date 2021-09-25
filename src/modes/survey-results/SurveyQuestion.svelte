@@ -137,7 +137,7 @@
         {date}
         {region}
         {fetcher}
-        zoom
+        zero={false}
         stderr={sensor.value.hasStdErr}
         starts={question.addedInWave.published}
         showNeighbors={false}
