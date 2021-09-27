@@ -470,11 +470,12 @@ export function generateLineAndBarSpec(options: LineSpecOptions = {}): TopLevelS
   const spec = generateLineChartSpec(options);
   const point = spec.layer[1] as NormalizedUnitSpec;
   point.mark = {
-    type: 'bar',
+    type: 'rect',
     color: options.color || MULTI_COLORS[0],
     width: {
       expr: `floor(width / customCountDays(domain('x')[0], domain('x')[1]))`,
     },
+    align: 'center',
   };
   (point.encoding!.y as PositionFieldDef<Field>).field = 'raw';
   (point.encoding!.y as PositionFieldDef<Field>).stack = null;
