@@ -361,7 +361,7 @@
     <Toggle bind:checked={showFull}>Show All Dates</Toggle>
   {/if}
   <div class="spacer" />
-  <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} {cumulative} />
+  <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} {cumulative} {stderr} />
 </div>
 
 <div class="{!raw && regions.length > 1 ? 'mobile-two-col' : ''} legend">
