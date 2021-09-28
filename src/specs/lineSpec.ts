@@ -450,8 +450,12 @@ export function generateLineChartSpec({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const encoding: any = {
       ...spec.layer[0].encoding!,
-      yError: {
-        field: 'stderr',
+      y: {
+        field: 'stderr_min',
+        type: 'quantitative',
+      },
+      y2: {
+        field: 'stderr_max',
       },
     };
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -470,8 +474,18 @@ export function generateLineChartSpec({
       };
     }
     spec.layer.unshift({
+      transform: [
+        {
+          calculate: `datum.stderr != null && datum.${valueField} != null ? datum.${valueField} - datum.stderr : null`,
+          as: 'stderr_min',
+        },
+        {
+          calculate: `datum.stderr != null && datum.${valueField} != null ? datum.${valueField} + datum.stderr : null`,
+          as: 'stderr_max',
+        },
+      ],
       mark: {
-        type: 'errorband',
+        type: 'area',
         color,
         opacity: 0.25,
       },
