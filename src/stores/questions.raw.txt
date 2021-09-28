@@ -33,7 +33,7 @@ AddedInWave: 1
 
 
 ---
-Name: Self-Reported Mask Use
+Name: People Wearing Masks
 Category: Mask Use
 Question: |
   In the past 7 days, did you wear a mask **most or all of the time** in public?
@@ -60,7 +60,7 @@ OldRevisions:
 ---
 
 
-Name: COVID Vaccine Acceptance
+Name: Vaccine Acceptance
 Category: Vaccines
 Question: |
   Have you already received a COVID vaccine, do you have an appointment to receive a COVID vaccine, or if a vaccine were offered to you today, would you **definitely** or **probably** choose to get vaccinated?

@@ -33,11 +33,19 @@
 
   export let anchor = null;
 
-  $: sensor = new SensorParam($metaDataManager.getSensor(question), $metaDataManager);
+  function getPatchedSignal(metaDataManager, sensorLike, patchName) {
+    const r = metaDataManager.getSensor(sensorLike);
+    return {
+      ...r,
+      name: patchName.name,
+    };
+  }
+
+  $: sensor = new SensorParam(getPatchedSignal($metaDataManager, question, question), $metaDataManager);
   $: trend = fetcher.fetch1Sensor1Region1DateTrend(sensor, region, date);
 
   $: validRevisions = (question.oldRevisions || []).filter((revision) => {
-    const s = $metaDataManager.getSensor(revision);
+    const s = getPatchedSignal($metaDataManager, revision, question);
     if (!s) {
       if ($metaDataManager.metaSensors.length > 0) {
         console.error('invalid question revision config', revision);
