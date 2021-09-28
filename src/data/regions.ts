@@ -96,7 +96,7 @@ export const nationInfo: RegionInfo = {
   population: stateInfo.reduce((acc, v) => acc + (v.population ?? 0), 0),
 };
 
-export const msaInfo = parseCSV(msaRaw, 'msa');
+export const msaInfo = parseCSV(msaRaw, 'msa', (entry) => `${entry.name!} Metro Area`);
 export const countyInfo = parseCSV(
   countyRaw,
   'county',
