@@ -355,7 +355,7 @@ export function loadMetaData(): Promise<{ date: string }> {
     // Magic number of default date - if no URL params, use max date
     // available
     if (date === MAGIC_START_DATE && timeEntry != null) {
-      date = formatAPITime(timeDay.offset(timeEntry.max, -2));
+      date = formatAPITime(timeDay.offset(timeEntry.max, get(currentMode) === modeByID['survey-results'] ? 0 : -2));
       currentDate.set(date);
     }
     return {
@@ -381,7 +381,7 @@ currentSensorEntry.subscribe((sensorEntry) => {
 });
 
 currentMode.subscribe((mode) => {
-  if (mode === modeByID['survey-results']) {
+  if (mode === modeByID['survey-results'] && get(currentSensor) !== DEFAULT_SURVEY_SENSOR) {
     // change sensor and date to the latest one within the survey
     currentSensor.set(DEFAULT_SURVEY_SENSOR);
     const timeFrame = get(metaDataManager).getTimeFrame(DEFAULT_SURVEY_SENSOR);
