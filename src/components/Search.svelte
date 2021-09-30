@@ -466,7 +466,7 @@
   }
 
   .search-box-link {
-    column-gap: 0;
+    display: inline-block;
   }
 
   .more-results {
