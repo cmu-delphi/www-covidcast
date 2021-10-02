@@ -99,14 +99,14 @@
    * @param {import('..stores/params').RegionParam} region
    * @param {import('../stores/params').DateParam} date
    * @param {import('../stores/params').TimeFrame} timeFrame
-   * @param {{height: number, zero: boolean, raw: boolean, isMobile: boolean, singleRegionOnly: boolean, cumulative: boolean}} options
+   * @param {{height: number, zero: boolean, raw: boolean, isMobile: boolean, singleRegionOnly: boolean, cumulative: boolean, stderr: boolean}} options
    */
   function genSpec(
     sensor,
     region,
     date,
     timeFrame,
-    { height, zero, raw, isMobile, singleRegionOnly, domain, cumulative, showNeighbors },
+    { height, zero, raw, isMobile, singleRegionOnly, domain, cumulative, showNeighbors, stderr },
   ) {
     const isWeekly = sensor.value.isWeeklySignal;
     const options = {
@@ -120,6 +120,7 @@
       subTitle: sensor.unit,
       highlightRegion: true,
       isWeeklySignal: isWeekly,
+      stderr,
     };
     if (cumulative) {
       options.paddingLeft = 52; // more space for larger numbers
@@ -279,7 +280,8 @@
     return spec;
   }
 
-  let zoom = false;
+  export let zero = true;
+  export let stderr = false;
   let singleRaw = false;
   let singleCumulative = false;
 
@@ -292,13 +294,14 @@
   $: spec = injectRanges(
     genSpec(sensor, region, date, timeFrame, {
       height,
-      zero: !zoom,
+      zero,
       raw,
       isMobile: $isMobileDevice,
       singleRegionOnly,
       domain,
       cumulative,
       showNeighbors,
+      stderr,
     }),
     timeFrame,
     annotations,
@@ -347,7 +350,7 @@
 />
 
 <div class="buttons">
-  <Toggle bind:checked={zoom}>Rescale Y-axis</Toggle>
+  <Toggle bind:checked={zero}>Include 0 in Y-axis</Toggle>
   {#if sensor.rawValue != null && !($isMobileDevice && showAllDates)}
     <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
     {#if raw && sensor.rawCumulativeValue != null}
@@ -358,7 +361,7 @@
     <Toggle bind:checked={showFull}>Show All Dates</Toggle>
   {/if}
   <div class="spacer" />
-  <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} {cumulative} />
+  <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} {cumulative} {stderr} />
 </div>
 
 <div class="{!raw && regions.length > 1 ? 'mobile-two-col' : ''} legend">

@@ -18,6 +18,7 @@
   .toggle {
     cursor: pointer;
     padding: 1em 0;
+    margin-right: 1.5em;
     display: inline-block;
   }
   .toggle.noPadding {

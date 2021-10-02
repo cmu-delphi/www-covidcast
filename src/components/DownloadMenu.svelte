@@ -20,6 +20,7 @@
 
   export let raw = false;
   export let cumulative = false;
+  export let stderr = false;
 
   export let absolutePos = false;
 
@@ -71,6 +72,9 @@
     r.regionName = row.displayName;
     r.date = formatDateISO(row.date_value);
     r.value = row.value;
+    if (stderr) {
+      r.stderr = row.stderr;
+    }
     if (raw) {
       r.raw = row.raw;
     }
