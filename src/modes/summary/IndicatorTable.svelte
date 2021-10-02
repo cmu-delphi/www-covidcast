@@ -99,7 +99,7 @@
   <thead>
     <tr>
       <th class="mobile-th"><span>Indicator</span></th>
-      <th class="mobile-th uk-text-right"><span>Change Last 7 days</span></th>
+      <th class="mobile-th uk-text-right"><span>Relative Change Last 7 Days</span></th>
       <th class="mobile-th uk-text-right"><span>Value</span></th>
       <th class="mobile-th uk-text-right">
         <span>historical trend</span>
@@ -150,7 +150,7 @@
               <SensorValue sensor={entry.sensor} value={t ? t.value : null} />
             {/await}
           </td>
-          <td rowspan="2">
+          <td>
             <div class="mobile-table-chart">
               <Vega
                 {spec}
