@@ -54,13 +54,11 @@
    */
   export let ends = null;
 
-  export let expandableWindow = false;
-
   export let showAnnotations = true;
 
   export let showNeighbors = true;
 
-  let showFull = expandableWindow === 'full';
+  let showFull = false;
 
   /**
    * show only a single region regardless of the level
@@ -90,7 +88,7 @@
   };
 
   $: highlightDate = date.value;
-  $: showAllDates = showFull && expandableWindow && !($isMobileDevice && raw);
+  $: showAllDates = showFull && !($isMobileDevice && raw);
   $: timeFrame = showAllDates ? sensor.timeFrame : date.windowTimeFrame;
 
   /**
@@ -313,7 +311,7 @@
 
 <Vega
   bind:this={vegaRef}
-  className="{className} {showFull && expandableWindow && !$isMobileDevice ? 'chart-breakout' : ''}"
+  className="{className} {showFull && !$isMobileDevice ? 'chart-breakout' : ''}"
   {spec}
   {data}
   tooltip={HistoryLineTooltip}
@@ -328,7 +326,7 @@
   {#if sensor.rawValue != null && !($isMobileDevice && showAllDates)}
     <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
   {/if}
-  {#if expandableWindow === true && !($isMobileDevice && raw)}
+  {#if !($isMobileDevice && raw)}
     <Toggle bind:checked={showFull}>Show All Dates</Toggle>
   {/if}
   <div class="spacer" />
