@@ -3,7 +3,6 @@ import {
   DEFAULT_MODE,
   DEFAULT_SENSOR,
   DEFAULT_SURVEY_SENSOR,
-  DEFAULT_CORRELATION_SENSOR,
   resolveSensorWithAliases,
   sensorConfig,
 } from './constants';
@@ -30,8 +29,6 @@ function deriveFromPath(url: Location) {
   const urlParams = new URLSearchParams(queryString);
 
   const sensor = urlParams.get('sensor');
-  const sensor2 = urlParams.get('sensor2');
-  const lag = urlParams.get('lag');
   const date = urlParams.get('date') ?? '';
 
   const modeFromPath = () => {
@@ -55,15 +52,6 @@ function deriveFromPath(url: Location) {
   return {
     mode: modeObj,
     sensor: resolveSensor,
-    sensor2: resolveSensorWithAliases(
-      sensor2,
-      isGenericPage
-        ? sensor2 || DEFAULT_CORRELATION_SENSOR
-        : DEFAULT_CORRELATION_SENSOR === sensor2
-        ? DEFAULT_SENSOR
-        : DEFAULT_CORRELATION_SENSOR,
-    ),
-    lag: lag ? Number.parseInt(lag, 10) : 0,
     date: /\d{8}/.test(date) ? date : MAGIC_START_DATE,
     region: urlParams.get('region') || '',
   };
@@ -124,13 +112,6 @@ export const currentSensorEntry = derived(
     resolveSensor($currentSensor, sensorList, metaDataManager, DEFAULT_SENSOR),
 );
 
-export const currentSensor2 = writable(defaultValues.sensor2);
-export const currentSensorEntry2 = derived(
-  [currentSensor2, sensorList, metaDataManager],
-  ([$currentSensor, sensorList, metaDataManager]) =>
-    resolveSensor($currentSensor, sensorList, metaDataManager, DEFAULT_CORRELATION_SENSOR),
-);
-
 export const groupedSensorList = derived(sensorList, (sensorList) => {
   return sensorTypes
     .map((sensorType) => ({
@@ -144,8 +125,6 @@ export const groupedSensorList = derived(sensorList, (sensorList) => {
     }))
     .filter((d) => d.sensors.length > 0);
 });
-
-export const currentLag = writable(defaultValues.lag);
 
 export const currentDate = writable(defaultValues.date);
 /**
@@ -233,14 +212,12 @@ export interface TrackedState {
 }
 
 export const trackedUrlParams = derived(
-  [currentMode, currentSensor, currentSensor2, currentLag, currentRegion, currentDate],
-  ([mode, sensor, sensor2, lag, region, date]): TrackedState => {
+  [currentMode, currentSensor, currentRegion, currentDate],
+  ([mode, sensor, region, date]): TrackedState => {
     // determine parameters based on default value and current mode
     const params: Omit<PersistedState, 'mode'> = {
       sensor:
         mode === modeByID.summary || mode === modeByID['survey-results'] || sensor === DEFAULT_SENSOR ? null : sensor,
-      sensor2: mode === modeByID.correlation ? sensor2 : null,
-      lag: mode === modeByID.correlation ? lag : null,
       region: mode === modeByID.export ? null : region,
       date:
         String(date) === MAGIC_START_DATE || mode === modeByID.export || mode === modeByID['indicator-status']
@@ -274,12 +251,6 @@ export function loadFromUrlState(state: PersistedState): void {
   }
   if (state.sensor != null && state.sensor !== get(currentSensor)) {
     currentSensor.set(state.sensor);
-  }
-  if (state.sensor2 != null && state.sensor2 !== get(currentSensor2)) {
-    currentSensor2.set(state.sensor2);
-  }
-  if (state.lag != null && state.lag !== get(currentLag)) {
-    currentLag.set(state.lag);
   }
   if (state.region != null && state.region !== get(currentRegion)) {
     selectByInfo(getInfoByName(state.region));

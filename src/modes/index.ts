@@ -20,7 +20,6 @@ export type ModeID =
   | 'indicator-status'
   | 'indicator-source'
   | 'indicator-signal'
-  | 'correlation'
   | 'dashboard';
 
 export const modeByID: Record<ModeID, Mode> = (() => {

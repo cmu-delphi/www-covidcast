@@ -14,12 +14,6 @@ export const modes = [
       import(/* webpackChunkName: 'm-indicator' */ './indicator/Indicator.svelte').then((r) => r.default),
   },
   {
-    id: 'correlation',
-    label: 'Indicator Correlation',
-    component: () =>
-      import(/* webpackChunkName: 'm-correlation' */ './correlation/Correlation.svelte').then((r) => r.default),
-  },
-  {
     id: 'survey-results',
     label: 'CTIS Results',
     component: () =>

@@ -63,19 +63,3 @@ export const DEFAULT_SURVEY_SENSOR = (() => {
   }
   return DEFAULT_SENSOR;
 })();
-
-function findCasesSensorConfig(): SensorConfig | undefined {
-  return sensorConfig.find((d) => d.signal == 'confirmed_7dav_incidence_prop');
-}
-
-export const DEFAULT_CORRELATION_SENSOR = (() => {
-  const highlightBased = sensorConfig.find((d) => d.highlight && d.highlight.includes('correlation'));
-  if (highlightBased) {
-    return highlightBased.key;
-  }
-  const cases = findCasesSensorConfig();
-  if (cases) {
-    return cases.key;
-  }
-  return DEFAULT_SURVEY_SENSOR;
-})();

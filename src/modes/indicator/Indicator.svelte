@@ -19,7 +19,6 @@
   import { scrollIntoView } from '../../util';
   import IndicatorWarning from '../../blocks/IndicatorWarning.svelte';
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
-  import IndicatorCorrelation from './IndicatorCorrelation.svelte';
   import MaxDateHint from '../../blocks/MaxDateHint.svelte';
   import { DataFetcher } from '../../stores/DataFetcher';
 
@@ -87,6 +86,5 @@
       <GeoTable {sensor} {region} {date} {fetcher} />
       <hr />
     </div>
-    <IndicatorCorrelation {sensor} {region} {date} />
   </div>
 </div>
