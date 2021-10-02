@@ -117,7 +117,7 @@
         <th class="mobile-h3" colspan="5">{group.label}</th>
       </tr>
       {#each group.sensors as entry (entry.sensor.key)}
-        <tr class="has-addon">
+        <tr>
           <td>
             <IndicatorAnnotations
               asHint
@@ -134,6 +134,7 @@
             >
               {entry.sensor.name}
             </a>
+            ({entry.sensor.value.dataSourceName})
           </td>
           <td>
             {#await entry.trend}
@@ -161,7 +162,7 @@
               />
             </div>
           </td>
-          <td rowspan="2">
+          <td>
             <a
               href="../indicator?sensor={entry.sensor.key}"
               class="uk-link-text details-link"
@@ -170,9 +171,6 @@
               {@html chevronRightIcon}
             </a>
           </td>
-        </tr>
-        <tr class="addon">
-          <td colspan="3">Source: {entry.sensor.value.dataSourceName}</td>
         </tr>
       {/each}
     </tbody>
