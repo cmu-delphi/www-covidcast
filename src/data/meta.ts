@@ -114,21 +114,6 @@ function findRawSignal(sensor: Sensor, sensors: Sensor[]) {
   );
   return raw;
 }
-function findRawCumulativeSignal(sensor: Sensor, sensors: Sensor[]) {
-  if (sensor.meta.is_cumulative) {
-    return undefined;
-  }
-  const meta = sensor.meta;
-  const cum = sensors.find(
-    (o) =>
-      o.meta.signal_basename === meta.signal_basename &&
-      o.meta.is_cumulative &&
-      o.meta.is_weighted == meta.is_weighted &&
-      !o.meta.is_smoothed &&
-      o.meta.format == meta.format,
-  );
-  return cum;
-}
 
 function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
   list: Sensor[];
@@ -178,13 +163,6 @@ function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
           Object.assign(s, {
             rawSensor: raw,
             rawSignal: raw.signal,
-          });
-        }
-        const cum = findRawCumulativeSignal(s, sensors);
-        if (cum) {
-          Object.assign(s, {
-            rawCumulativeSensor: cum,
-            rawCumulativeSignal: cum.signal,
           });
         }
       }

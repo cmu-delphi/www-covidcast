@@ -535,45 +535,6 @@ export function generateLineAndBarSpec(options: LineSpecOptions = {}): TopLevelS
   return spec;
 }
 
-export function generateCumulativeBarSpec(options: LineSpecOptions = {}): TopLevelSpec {
-  const spec = generateLineChartSpec(options);
-  // convert line to bar chart
-  const line = spec.layer[0] as NormalizedUnitSpec;
-  line.mark = {
-    type: 'bar',
-    color: options.color || MULTI_COLORS[0],
-    width: {
-      expr: `floor(width / customCountDays(domain('x')[0], domain('x')[1]))`,
-    },
-  };
-  (line.encoding!.y as PositionFieldDef<Field>).field = 'cumulative';
-  (line.encoding!.y as PositionFieldDef<Field>).stack = null;
-  (line.encoding!.opacity as PositionValueDef) = {
-    value: 0.2,
-  };
-  // convert highlight point to shifted bar chart at the top
-  const point = spec.layer[1] as NormalizedUnitSpec;
-  point.transform = [
-    {
-      calculate: `datum.cumulative - datum.raw`,
-      as: 'prevCumulative',
-    },
-  ];
-  point.mark = {
-    type: 'rect',
-    color: options.color || MULTI_COLORS[0],
-    width: {
-      expr: `floor(width / customCountDays(domain('x')[0], domain('x')[1]))`,
-    },
-  };
-  (point.encoding!.y as PositionFieldDef<Field>).field = 'cumulative';
-  (point.encoding!.y as PositionFieldDef<Field>).stack = null;
-  (point.encoding!.y2 as PositionFieldDef<Field>) = { field: 'prevCumulative' };
-  (point.encoding!.opacity as PositionValueDef).value = 1;
-
-  return spec;
-}
-
 export function createSignalDateLabelHighlight(topPosition = false): NormalizedLayerSpec {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const layer = Object.assign({}, CURRENT_DATE_HIGHLIGHT);
