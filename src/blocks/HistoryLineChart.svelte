@@ -285,14 +285,14 @@
     : loadData(sensor, region, timeFrame, singleRegionOnly, showNeighbors);
   $: fileName = generateFileName(sensor, regions, timeFrame, raw);
 
-  function findValue(region, data, date, prop = 'value') {
+  function findValue(region, data, date, prop = 'value', defaultValue = null) {
     if (!date) {
-      return null;
+      return defaultValue;
     }
     const time = toTimeValue(date);
     const row = data.find((d) => d.id === region.id && toTimeValue(d.date_value) === time);
     if (!row) {
-      return null;
+      return defaultValue;
     }
     return row[prop];
   }
@@ -349,7 +349,15 @@
         <span>
           {#if r.id !== region.id && r.id !== neighboringInfo.id}
             <a href="?region={r.propertyId}" on:click|preventDefault={() => region.set(r, true)}> {r.displayName} </a>
-          {:else}{r.displayName}{/if}
+          {:else if r.id === neighboringInfo.id}
+            {#await data}
+              {r.displayName}
+            {:then d}
+              Average of {findValue(r, d, highlightDate, 'valid', '0')} {r.displayName}
+            {/await}
+          {:else}
+            {r.displayName}
+          {/if}
           {#if regions.length > 1 && r.id !== neighboringInfo.id}
             <IndicatorAnnotations asHint {sensor} region={r} {date} range="window" />
           {/if}
