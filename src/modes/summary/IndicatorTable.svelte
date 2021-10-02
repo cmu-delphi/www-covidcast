@@ -2,10 +2,9 @@
   import { groupedSensorList } from '../../stores';
   import FancyHeader from '../../components/FancyHeader.svelte';
   import { SensorParam } from '../../stores/params';
-  import { formatDateISO, formatDateShortNumbers } from '../../formats';
+  import { formatDateISO, formatDateShortNumbers, formatFraction } from '../../formats';
   import { currentMode, metaDataManager } from '../../stores';
   import { modeByID } from '..';
-  import TrendIndicator from '../../components/TrendIndicator.svelte';
   import Vega from '../../components/vega/Vega.svelte';
   import SparkLineTooltip from '../../components/SparkLineTooltip.svelte';
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
@@ -137,11 +136,15 @@
             </a>
             ({entry.sensor.value.dataSourceName})
           </td>
-          <td>
+          <td class="uk-text-right table-value">
             {#await entry.trend}
-              <TrendIndicator trend={null} block />
-            {:then d}
-              <TrendIndicator trend={d} block />
+              ?
+            {:then t}
+              {#if t == null || t.value == null || Number.isNaN(t.value) || t.change == null}
+                N/A
+              {:else}
+                {formatFraction(t.change, true)}
+              {/if}
             {/await}
           </td>
           <td class="uk-text-right table-value">
