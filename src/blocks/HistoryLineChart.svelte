@@ -257,7 +257,7 @@
     return spec;
   }
 
-  export let zero = true;
+  let zero = false;
   export let stderr = false;
   let singleRaw = false;
 
