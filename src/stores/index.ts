@@ -3,7 +3,6 @@ import {
   DEFAULT_MODE,
   DEFAULT_SENSOR,
   DEFAULT_SURVEY_SENSOR,
-  defaultRegionOnStartup,
   DEFAULT_CORRELATION_SENSOR,
   resolveSensorWithAliases,
   sensorConfig,
@@ -163,43 +162,6 @@ export const currentRegion = writable(defaultValues.region);
  */
 export const currentRegionInfo = writable(getInfoByName(defaultValues.region));
 
-function deriveRecent(): RegionInfo[] {
-  if (!window.localStorage) {
-    return [];
-  }
-  const item = window.localStorage.getItem('recent') || '';
-  if (!item) {
-    return [getInfoByName(defaultRegionOnStartup.state)!, getInfoByName(defaultRegionOnStartup.county)!];
-  }
-  return item
-    .split(',')
-    .filter(Boolean)
-    .map((d) => getInfoByName(d))
-    .filter((d): d is RegionInfo => d != null);
-}
-export const recentRegionInfos = writable(deriveRecent());
-
-// keep track of top 10 recent selections
-currentRegionInfo.subscribe((v) => {
-  if (!v) {
-    return;
-  }
-  const infos = get(recentRegionInfos).slice();
-  const index = infos.indexOf(v);
-  if (index >= 0) {
-    infos.splice(index, 1);
-  }
-  if (infos.length > 10) {
-    infos.shift();
-  }
-  infos.unshift(v);
-  recentRegionInfos.set(infos);
-
-  if (window.localStorage) {
-    window.localStorage.setItem('recent', infos.map((d) => d.propertyId).join(','));
-  }
-});
-
 /**
  * @returns {boolean} whether the selection has changed
  */
@@ -276,20 +238,12 @@ export const trackedUrlParams = derived(
     // determine parameters based on default value and current mode
     const params: Omit<PersistedState, 'mode'> = {
       sensor:
-        mode === modeByID.landing ||
-        mode === modeByID.summary ||
-        mode === modeByID['survey-results'] ||
-        sensor === DEFAULT_SENSOR
-          ? null
-          : sensor,
+        mode === modeByID.summary || mode === modeByID['survey-results'] || sensor === DEFAULT_SENSOR ? null : sensor,
       sensor2: mode === modeByID.correlation ? sensor2 : null,
       lag: mode === modeByID.correlation ? lag : null,
       region: mode === modeByID.export ? null : region,
       date:
-        String(date) === MAGIC_START_DATE ||
-        mode === modeByID.export ||
-        mode === modeByID.landing ||
-        mode === modeByID['indicator-status']
+        String(date) === MAGIC_START_DATE || mode === modeByID.export || mode === modeByID['indicator-status']
           ? null
           : String(date),
     };

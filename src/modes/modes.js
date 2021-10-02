@@ -3,11 +3,6 @@
  */
 export const modes = [
   {
-    id: 'landing',
-    label: 'COVIDcast Overview',
-    component: () => import(/* webpackChunkName: 'm-landing' */ './landing/Landing.svelte').then((r) => r.default),
-  },
-  {
     id: 'summary',
     label: 'Location Summary',
     component: () => import(/* webpackChunkName: 'm-overview' */ './summary/Summary.svelte').then((r) => r.default),

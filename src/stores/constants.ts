@@ -43,7 +43,7 @@ export const defaultRegionOnStartup = {
   hrr: '357', // Pittsburgh
 };
 
-export const DEFAULT_MODE = modeByID.landing;
+export const DEFAULT_MODE = modeByID.summary;
 export const DEFAULT_SENSOR = (
   sensorConfig.find((d) => d.highlight && d.highlight.includes('default')) || sensorConfig[0]
 ).key;

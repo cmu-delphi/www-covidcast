@@ -194,11 +194,6 @@ module.exports = () => {
       new HtmlWebpackPlugin({
         title: 'COVIDcast',
         template: './src/index.html',
-        filename: 'landing/index.html',
-      }),
-      new HtmlWebpackPlugin({
-        title: 'COVIDcast',
-        template: './src/index.html',
         filename: 'summary/index.html',
       }),
       new HtmlWebpackPlugin({
