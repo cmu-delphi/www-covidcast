@@ -154,7 +154,7 @@
               <SensorValue sensor={entry.sensor} value={t ? t.value : null} />
             {/await}
           </td>
-          <td>
+          <td class="chart-table-cell">
             <div class="mobile-table-chart">
               <Vega
                 {spec}
@@ -195,6 +195,9 @@
 
   .group-label {
     writing-mode: vertical-rl;
-    text-align: center;
+  }
+
+  .chart-table-cell {
+    padding-bottom: 0 !important;
   }
 </style>
