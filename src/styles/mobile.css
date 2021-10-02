@@ -171,17 +171,6 @@
   background: #fafafc;
 }
 
-.mobile-table > tbody > tr.row-group,
-.mobile-table > tbody > tr.has-addon {
-  border-bottom: none;
-}
-.mobile-table > tbody > tr.has-addon > td {
-  padding-bottom: 0.1rem;
-}
-.mobile-table > tbody > tr.addon > td {
-  padding: 0 4px 0.75rem 4px;
-}
-
 .mobile-table-chart {
   margin: 4px;
   position: relative;

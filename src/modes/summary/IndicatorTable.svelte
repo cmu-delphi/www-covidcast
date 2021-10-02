@@ -98,6 +98,7 @@
 <table class="mobile-table">
   <thead>
     <tr>
+      <th class="mobile-th"><span /></th>
       <th class="mobile-th"><span>Indicator</span></th>
       <th class="mobile-th uk-text-right"><span>Relative Change Last 7 Days</span></th>
       <th class="mobile-th uk-text-right"><span>Value</span></th>
@@ -111,13 +112,13 @@
       <th class="mobile-th" />
     </tr>
   </thead>
-  {#each loadedData as group (group.label)}
-    <tbody>
-      <tr class="row-group">
-        <th class="mobile-h3" colspan="5">{group.label}</th>
-      </tr>
-      {#each group.sensors as entry (entry.sensor.key)}
+  <tbody>
+    {#each loadedData as group (group.label)}
+      {#each group.sensors as entry, index (entry.sensor.key)}
         <tr>
+          {#if index === 0}
+            <td rowspan={group.sensors.length} class="group-label">{group.label}</td>
+          {/if}
           <td>
             <IndicatorAnnotations
               asHint
@@ -173,8 +174,8 @@
           </td>
         </tr>
       {/each}
-    </tbody>
-  {/each}
+    {/each}
+  </tbody>
 </table>
 
 <style>
@@ -187,5 +188,10 @@
   .table-value {
     white-space: nowrap;
     font-weight: 700;
+  }
+
+  .group-label {
+    writing-mode: vertical-rl;
+    text-align: center;
   }
 </style>
