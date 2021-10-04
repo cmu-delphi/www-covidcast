@@ -239,7 +239,15 @@
   height: 100%;
 }
 
+.chart-breakout-wrapper {
+  position: relative;
+}
+.chart-breakout-container {
+  position: relative;
+}
+
 .chart-breakout.vega-embed,
+.chart-breakout.chart-breakout-container,
 .chart-breakout > .vega-embed {
   --max-width: 95vw;
   /* breakout the chart up to 80vw */
@@ -249,6 +257,7 @@
 
 @media only screen and (min-width: 1600px) {
   .chart-breakout.vega-embed,
+  .chart-breakout.chart-breakout-container,
   .chart-breakout > .vega-embed {
     --max-width: 80vw;
   }
