@@ -118,6 +118,13 @@ export const sensorList = derived(metaDataManager, (metaData) => {
     .filter((d): d is Sensor => d != null);
 });
 
+export const defaultCasesSensor = derived(sensorList, (sensorList) => {
+  return sensorList.find((d) => d.signal === 'confirmed_7dav_incidence_prop');
+});
+export const defaultDeathSensor = derived(sensorList, (sensorList) => {
+  return sensorList.find((d) => d.signal === 'deaths_7dav_incidence_prop');
+});
+
 export const currentSensorEntry = derived(
   [currentSensor, sensorList, metaDataManager],
   // lookup the value, if not found maybe a generic one, if it is set, then return the default, else return the empty one
