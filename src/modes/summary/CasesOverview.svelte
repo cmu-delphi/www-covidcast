@@ -7,7 +7,7 @@
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
   import MaxDateHint from '../../blocks/MaxDateHint.svelte';
   import IndicatorWarning from '../../blocks/IndicatorWarning.svelte';
-  import { metaDataManager } from '../../stores';
+  import { defaultDeathSensor, defaultCasesSensor, metaDataManager } from '../../stores';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -22,8 +22,8 @@
    */
   export let fetcher;
 
-  $: CASES = new SensorParam($metaDataManager.getDefaultCasesSignal(), $metaDataManager);
-  $: DEATHS = new SensorParam($metaDataManager.getDefaultDeathSignal(), $metaDataManager);
+  $: CASES = new SensorParam($defaultCasesSensor, $metaDataManager);
+  $: DEATHS = new SensorParam($defaultDeathSensor, $metaDataManager);
 
   $: trends = fetcher.fetchNSensors1Region1DateTrend([CASES, DEATHS], region, date);
   $: casesTrend = trends[0];
