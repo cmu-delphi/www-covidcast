@@ -19,7 +19,6 @@
   export let sensor = null;
 
   export let raw = false;
-  export let cumulative = false;
   export let stderr = false;
 
   export let absolutePos = false;
@@ -77,9 +76,6 @@
     }
     if (raw) {
       r.raw = row.raw;
-    }
-    if (cumulative) {
-      r.cumulative = row.cumulative;
     }
     return r;
   }

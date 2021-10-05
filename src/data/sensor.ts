@@ -51,9 +51,6 @@ export interface Sensor {
   readonly rawSignal?: string; // raw signal in case of a 7day average
   readonly rawSensor?: Sensor; // raw signal in case of a 7day average
 
-  readonly rawCumulativeSignal?: string; // raw cumulative version of this signal
-  readonly rawCumulativeSensor?: Sensor; /// raw cumulative version of this signal
-
   readonly name: string; // signal name
   readonly unit: string;
   readonly dataSourceName: string;
@@ -129,10 +126,6 @@ export function ensureSensorStructure(sensor: Partial<Sensor> & { name: string; 
   const format = sensor.format || 'raw';
 
   const rawSignal = sensor.rawSignal === 'null' || sensor.rawSignal === sensor.signal ? null : sensor.rawSignal;
-  const rawCumulativeSignal =
-    sensor.rawCumulativeSignal === 'null' || sensor.rawCumulativeSignal === sensor.signal
-      ? null
-      : sensor.rawCumulativeSignal;
 
   const full = Object.assign(sensor, {
     key,
@@ -161,7 +154,6 @@ export function ensureSensorStructure(sensor: Partial<Sensor> & { name: string; 
     // keep the original values
     ...sensor,
     rawSignal,
-    rawCumulativeSignal,
   });
 
   if (rawSignal) {
@@ -179,22 +171,6 @@ export function ensureSensorStructure(sensor: Partial<Sensor> & { name: string; 
       },
     });
   }
-  if (rawCumulativeSignal) {
-    // create a raw cumulative version
-    Object.assign(full, {
-      rawCumulativeSensor: {
-        ...full,
-        key: `${sensor.id}-${rawCumulativeSignal}`,
-        name: `${full.name.replace('(7-day average)', '')} (Raw Cumulative)`,
-        description: full.description.replace('(7-day average)', ''),
-        signal: rawCumulativeSignal,
-        is7DayAverage: false,
-        rawCumulativeSignal: null,
-        rawCumulativeSensor: null,
-      },
-    });
-  }
-
   return full as Sensor;
 }
 

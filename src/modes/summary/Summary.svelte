@@ -57,7 +57,7 @@
       <hr />
       <FancyHeader invert sub="Chart" anchor="chart">{CASES.name}</FancyHeader>
       <div class="chart-300">
-        <HistoryLineChart sensor={CASES} {date} {region} {fetcher} expandableWindow />
+        <HistoryLineChart sensor={CASES} {date} {region} {fetcher} />
       </div>
       <hr />
       <AllIndicatorOverview {date} {region} {fetcher} />
