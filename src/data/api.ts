@@ -257,7 +257,7 @@ export interface EpiDataMetaStatsInfo {
   stdev: number;
 }
 
-export type SignalCategory = 'public' | 'early' | 'late' | 'other';
+export type SignalCategory = 'public' | 'early' | 'late' | 'other' | 'cases_testing';
 export type SignalFormat = 'raw' | 'percent' | 'fraction' | 'per100k' | 'count';
 export type SignalHighValuesAre = 'good' | 'bad' | 'neutral';
 

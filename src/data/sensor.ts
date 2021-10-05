@@ -10,11 +10,15 @@ import type { TimeFrame } from './TimeFrame';
 export const sensorTypes: { id: SignalCategory; label: string }[] = [
   {
     id: 'public',
-    label: 'Public’s Behavior',
+    label: 'Public Behavior',
   },
   {
     id: 'early',
     label: 'Early Indicators',
+  },
+  {
+    id: 'cases_testing',
+    label: 'Cases and Testing',
   },
   {
     id: 'late',
