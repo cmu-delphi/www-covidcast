@@ -136,7 +136,7 @@
             </a>
             ({entry.sensor.value.dataSourceName})
           </td>
-          <td class="uk-text-right table-value">
+          <td class="uk-text-right bold-value">
             {#await entry.trend}
               ?
             {:then t}
@@ -147,7 +147,7 @@
               {/if}
             {/await}
           </td>
-          <td class="uk-text-right table-value">
+          <td class="uk-text-right bold-value table-value">
             {#await entry.trend}
               ?
             {:then t}
@@ -158,7 +158,7 @@
               {/if}
             {/await}
           </td>
-          <td class="table-unit">
+          <td class="bold-value table-unit">
             {#await entry.trend then t}
               {#if t != null && t.value != null && !Number.isNaN(t.value)}
                 <SensorUnit sensor={entry.sensor} />
@@ -199,15 +199,16 @@
     fill: currentColor;
   }
 
-  .table-value {
+  .bold-value {
     white-space: nowrap;
     font-weight: 700;
+  }
+
+  .table-value {
     padding-right: 0 !important;
   }
 
   .table-unit {
-    white-space: nowrap;
-    font-weight: 700;
     padding-left: 1px !important;
   }
 
