@@ -9,9 +9,9 @@
   import SparkLineTooltip from '../../components/SparkLineTooltip.svelte';
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
   import { generateSparkLine } from '../../specs/lineSpec';
-  import SensorValue from '../../components/SensorValue.svelte';
   import DownloadMenu from '../../components//DownloadMenu.svelte';
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
+  import SensorUnit from '../../components/SensorUnit.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -100,7 +100,7 @@
       <th class="mobile-th"><span /></th>
       <th class="mobile-th"><span>Indicator</span></th>
       <th class="mobile-th uk-text-right"><span>Relative Change Last 7 Days</span></th>
-      <th class="mobile-th uk-text-right"><span>Value</span></th>
+      <th class="mobile-th uk-text-right" colspan="2"><span>Value</span></th>
       <th class="mobile-th uk-text-right">
         <span>historical trend</span>
         <div class="mobile-th-range">
@@ -151,7 +151,18 @@
             {#await entry.trend}
               ?
             {:then t}
-              <SensorValue sensor={entry.sensor} value={t ? t.value : null} />
+              {#if t == null || t.value == null || Number.isNaN(t.value)}
+                N/A
+              {:else}
+                {entry.sensor.formatValue(t.value)}
+              {/if}
+            {/await}
+          </td>
+          <td class="table-unit">
+            {#await entry.trend then t}
+              {#if t != null && t.value != null && !Number.isNaN(t.value)}
+                <SensorUnit sensor={entry.sensor} />
+              {/if}
             {/await}
           </td>
           <td class="chart-table-cell">
@@ -191,6 +202,13 @@
   .table-value {
     white-space: nowrap;
     font-weight: 700;
+    padding-right: 0 !important;
+  }
+
+  .table-unit {
+    white-space: nowrap;
+    font-weight: 700;
+    padding-left: 1px !important;
   }
 
   .group-label {
