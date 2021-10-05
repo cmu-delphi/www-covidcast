@@ -5,9 +5,7 @@
   import KPIValue from '../components/KPIValue.svelte';
   import SensorUnit from '../components/SensorUnit.svelte';
   import SparkLineTooltip from '../components/SparkLineTooltip.svelte';
-
-  import TrendIndicator from '../components/TrendIndicator.svelte';
-  import TrendTextSummary from '../components/TrendTextSummary.svelte';
+  import KPIChange from '../components/KPIChange.svelte';
 
   /**
    * @type {import('../../stores/constants').Sensor}
@@ -36,7 +34,7 @@
   });
 </script>
 
-<div class="mobile-two-col">
+<div class="mobile-three-col">
   <div class="mobile-kpi">
     <div>
       {#await trend}
@@ -48,6 +46,16 @@
     <div class="sub">
       <SensorUnit {sensor} long />
     </div>
+  </div>
+  <div class="mobile-kpi">
+    <div>
+      {#await trend}
+        <KPIChange value={null} loading />
+      {:then d}
+        <KPIChange value={d ? d.change : null} />
+      {/await}
+    </div>
+    <div class="sub">Relative change to 7 days ago</div>
   </div>
   <div>
     <div class="chart-50">
@@ -66,25 +74,7 @@
   </div>
 </div>
 
-<p>Compared to the previous week that means:</p>
-
-<div>
-  {#await trend}
-    <TrendIndicator trend={null} long />
-  {:then d}
-    <TrendIndicator trend={d} long />
-  {/await}
-</div>
-
-<TrendTextSummary {sensor} {date} {trend}>
-  <slot />
-</TrendTextSummary>
-
 <style>
-  p {
-    margin: 1em 0;
-  }
-
   .date-range {
     padding: 0 2px;
     display: flex;
