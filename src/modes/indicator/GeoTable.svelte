@@ -10,6 +10,7 @@
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
   import SortColumnIndicator, { SortHelper, byImportance } from '../../components/SortColumnIndicator.svelte';
   import SensorUnit from '../../components/SensorUnit.svelte';
+  import UiKitHint from '../../components/UIKitHint.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -127,7 +128,7 @@
   $: regions = determineRegions(region.value);
 
   let sortedRegions = [];
-  let missingRegions = 0;
+  let missingRegions = [];
 
   $: loadedData = loadData(sensor, date, region);
 
@@ -138,14 +139,13 @@
   $: {
     loading = true;
     sortedRegions = regions.slice(0, showAll ? -1 : 10);
-    missingRegions = 0;
+    missingRegions = [];
     const comparator = $sort.comparator;
     loadedData.then((rows) => {
       const data = rows.sort(comparator);
-      const filtered = data.filter(
-        (d) => d.important || d.id === region.id || (d.value != null && !Number.isNaN(d.value)),
-      );
-      missingRegions = data.length - filtered.length;
+      const isValid = (d) => d.important || d.id === region.id || (d.value != null && !Number.isNaN(d.value));
+      const filtered = data.filter(isValid);
+      missingRegions = data.filter((d) => !isValid(d));
       sortedRegions = filtered.slice(0, showAll ? -1 : 10);
       loading = false;
     });
@@ -166,6 +166,16 @@
   }
 
   $: fileName = generateFileName(sensor, region, date);
+
+  function missingRegionsText(regions) {
+    if (regions.length > 5) {
+      return `${regions
+        .slice(0, 5)
+        .map((d) => d.displayName)
+        .join(', ')}, and ${regions.length - 5} more`;
+    }
+    return regions.map((d) => d.displayName).join(', ');
+  }
 </script>
 
 <div class="uk-position-relative">
@@ -243,22 +253,24 @@
       </tr>
     {/each}
   </tbody>
-  {#if missingRegions > 0}
+  {#if missingRegions.length > 0}
     <tfoot>
       <tr>
         <td colspan="5" class="uk-text-center">
-          {missingRegions}
-          {missingRegions > 1 ? 'locations' : 'location'} have been omitted because of missing values
+          {missingRegions.length}
+          {missingRegions.length > 1 ? 'locations' : 'location'}
+          <UiKitHint title={missingRegionsText(missingRegions)} inline noMargin />
+          have been omitted because of missing values
         </td>
       </tr>
     </tfoot>
   {/if}
-  {#if !showAll && regions.length - missingRegions > 10}
+  {#if !showAll && regions.length - missingRegions.length > 10}
     <tfoot>
       <tr>
         <td colspan="5" class="uk-text-center">
           <button class="uk-button uk-button-text" on:click={() => (showAll = true)}>
-            Show All ({regions.length - missingRegions - 10}
+            Show All ({regions.length - missingRegions.length - 10}
             remaining)
           </button>
         </td>
