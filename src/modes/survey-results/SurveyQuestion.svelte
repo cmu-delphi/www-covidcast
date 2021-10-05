@@ -124,11 +124,12 @@
       <UIKitHint title={sensor.signalTooltip} inline />
       was:
     </p>
-    <IndicatorOverview {sensor} {date} {region} {fetcher}>
+    <IndicatorOverview {sensor} {date} {region} {fetcher} />
+    <p>
       The indicator <strong>{sensor.name}</strong> was added in
       <a href={question.addedInWave.link}>{question.addedInWave.name}</a>
       of the Delphi survey published on {formatDateYearDayOfWeekAbbr(question.addedInWave.published, true)}.
-    </IndicatorOverview>
+    </p>
 
     <hr />
     <div class="chart-300">
