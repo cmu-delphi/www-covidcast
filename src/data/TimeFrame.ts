@@ -5,7 +5,7 @@ import { EpiWeek } from './EpiWeek';
 import { parseAPITime, toTimeValue } from './utils';
 
 export const yesterdayDate = timeDay.offset(timeDay(new Date()), -1);
-export const yesterday = toTimeValue(yesterdayDate);
+export const yesterday = toTimeValue(yesterdayDate).toString();
 
 export class TimeFrame {
   readonly min: Date;
