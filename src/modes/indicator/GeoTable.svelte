@@ -5,12 +5,11 @@
   import Vega from '../../components/vega/Vega.svelte';
   import SparkLineTooltip from '../../components/SparkLineTooltip.svelte';
   import FancyHeader from '../../components/FancyHeader.svelte';
-  import TrendIndicator from '../../components/TrendIndicator.svelte';
-  import { formatDateISO, formatDateShortNumbers } from '../../formats';
-  import SensorValue from '../../components/SensorValue.svelte';
+  import { formatDateISO, formatDateShortNumbers, formatFraction } from '../../formats';
   import DownloadMenu from '../../components/DownloadMenu.svelte';
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
   import SortColumnIndicator, { SortHelper, byImportance } from '../../components/SortColumnIndicator.svelte';
+  import SensorUnit from '../../components/SensorUnit.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -128,18 +127,26 @@
   $: regions = determineRegions(region.value);
 
   let sortedRegions = [];
+  let missingRegions = 0;
 
   $: loadedData = loadData(sensor, date, region);
 
   let showAll = false;
 
   let loading = true;
+
   $: {
     loading = true;
     sortedRegions = regions.slice(0, showAll ? -1 : 10);
+    missingRegions = 0;
     const comparator = $sort.comparator;
     loadedData.then((rows) => {
-      sortedRegions = rows.sort(comparator).slice(0, showAll ? -1 : 10);
+      const data = rows.sort(comparator);
+      const filtered = data.filter(
+        (d) => d.important || d.id === region.id || (d.value != null && !Number.isNaN(d.value)),
+      );
+      missingRegions = data.length - filtered.length;
+      sortedRegions = filtered.slice(0, showAll ? -1 : 10);
       loading = false;
     });
   }
@@ -170,8 +177,8 @@
   <thead>
     <tr>
       <th class="mobile-th">{title.unit}</th>
-      <th class="mobile-th">Change Last 7 days</th>
-      <th class="mobile-th uk-text-right">{sensor.unitShort}</th>
+      <th class="mobile-th uk-text-right"><span>Relative Change Last 7 Days</span></th>
+      <th class="mobile-th uk-text-right" colspan="2">{sensor.unitShort}</th>
       <th class="mobile-th uk-text-right">
         <span>historical trend</span>
         <div class="mobile-th-range">
@@ -187,7 +194,7 @@
       <th class="sort-indicator">
         <SortColumnIndicator label="Change Last 7 days" {sort} prop="delta" />
       </th>
-      <th class="sort-indicator">
+      <th class="sort-indicator" colspan="2">
         <SortColumnIndicator label="Value" {sort} prop="value" />
       </th>
       <th class="sort-indicator" />
@@ -202,11 +209,24 @@
             >{r.displayName}</a
           >
         </td>
-        <td>
-          <TrendIndicator trend={r.trendObj} block />
+        <td class="uk-text-right bold-value">
+          {#if r.trendObj == null || r.trendObj.value == null || Number.isNaN(r.value) || r.trendObj.change == null}
+            N/A
+          {:else}
+            {formatFraction(r.trendObj.change, true)}
+          {/if}
         </td>
-        <td class="uk-text-right table-value">
-          <SensorValue {sensor} value={r.value} />
+        <td class="uk-text-right bold-value table-value">
+          {#if r.value == null || Number.isNaN(r.value)}
+            N/A
+          {:else}
+            {sensor.formatValue(r.value)}
+          {/if}
+        </td>
+        <td class="bold-value table-unit">
+          {#if r.value != null && !Number.isNaN(r.value)}
+            <SensorUnit {sensor} />
+          {/if}
         </td>
         <td>
           <div class="mobile-table-chart mobile-table-chart-small">
@@ -223,12 +243,22 @@
       </tr>
     {/each}
   </tbody>
-  {#if !showAll && regions.length > 10}
+  {#if missingRegions > 0}
+    <tfoot>
+      <tr>
+        <td colspan="5" class="uk-text-center">
+          {missingRegions}
+          {missingRegions > 1 ? 'locations' : 'location'} have been omitted because of missing values
+        </td>
+      </tr>
+    </tfoot>
+  {/if}
+  {#if !showAll && regions.length - missingRegions > 10}
     <tfoot>
       <tr>
         <td colspan="5" class="uk-text-center">
           <button class="uk-button uk-button-text" on:click={() => (showAll = true)}>
-            Show All ({regions.length - 10}
+            Show All ({regions.length - missingRegions - 10}
             remaining)
           </button>
         </td>
@@ -238,8 +268,16 @@
 </table>
 
 <style>
-  .table-value {
+  .bold-value {
     white-space: nowrap;
     font-weight: 700;
+  }
+
+  .table-value {
+    padding-right: 0 !important;
+  }
+
+  .table-unit {
+    padding-left: 1px !important;
   }
 </style>
