@@ -82,4 +82,22 @@
     line-height: 1;
     font-size: 0.75rem;
   }
+  .date-range > span {
+    position: relative;
+    padding: 0 2px;
+  }
+  .date-range > span::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: -3px;
+    height: 4px;
+    background: black;
+    width: 1px;
+  }
+
+  .date-range > span:last-of-type::before {
+    left: unset;
+    right: 0;
+  }
 </style>

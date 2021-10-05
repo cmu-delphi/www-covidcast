@@ -194,22 +194,12 @@ module.exports = () => {
       new HtmlWebpackPlugin({
         title: 'COVIDcast',
         template: './src/index.html',
-        filename: 'landing/index.html',
-      }),
-      new HtmlWebpackPlugin({
-        title: 'COVIDcast',
-        template: './src/index.html',
         filename: 'summary/index.html',
       }),
       new HtmlWebpackPlugin({
         title: 'COVIDcast Indicator Details',
         template: './src/index.html',
         filename: 'indicator/index.html',
-      }),
-      new HtmlWebpackPlugin({
-        title: 'COVIDcast Indicator Correlation',
-        template: './src/index.html',
-        filename: 'correlation/index.html',
       }),
       new HtmlWebpackPlugin({
         title: 'COVIDcast Export Data',

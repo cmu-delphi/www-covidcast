@@ -3,11 +3,6 @@
  */
 export const modes = [
   {
-    id: 'landing',
-    label: 'COVIDcast Overview',
-    component: () => import(/* webpackChunkName: 'm-landing' */ './landing/Landing.svelte').then((r) => r.default),
-  },
-  {
     id: 'summary',
     label: 'Location Summary',
     component: () => import(/* webpackChunkName: 'm-overview' */ './summary/Summary.svelte').then((r) => r.default),
@@ -17,12 +12,6 @@ export const modes = [
     label: 'Indicator Details',
     component: () =>
       import(/* webpackChunkName: 'm-indicator' */ './indicator/Indicator.svelte').then((r) => r.default),
-  },
-  {
-    id: 'correlation',
-    label: 'Indicator Correlation',
-    component: () =>
-      import(/* webpackChunkName: 'm-correlation' */ './correlation/Correlation.svelte').then((r) => r.default),
   },
   {
     id: 'survey-results',
