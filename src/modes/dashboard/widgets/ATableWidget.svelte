@@ -29,9 +29,8 @@
   import WidgetCard, { DEFAULT_WIDGET_STATE } from './WidgetCard.svelte';
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
   import SortColumnIndicator, { byImportance, SortHelper } from '../../../components/SortColumnIndicator.svelte';
-  import TrendIndicator from '../../../components/TrendIndicator.svelte';
   import SensorValue from '../../../components/SensorValue.svelte';
-  import { formatDateISO } from '../../../formats';
+  import { formatDateISO, formatFraction } from '../../../formats';
   import { WidgetHighlight } from '../highlight';
   import { SensorParam } from '../../../stores/params';
   import { createEventDispatcher } from 'svelte';
@@ -168,7 +167,7 @@
     <thead>
       <tr>
         <th class="mobile-th">{rowName}</th>
-        <th class="mobile-th">Change Last 7 days</th>
+        <th class="mobile-th uk-text-right">Relative change to 7 days ago</th>
         <th class="mobile-th uk-text-right">{typeof sensor === 'string' ? 'Value' : sensor.unitShort}</th>
       </tr>
       <tr>
@@ -194,8 +193,8 @@
           <td>
             {r.name}
           </td>
-          <td>
-            <TrendIndicator trend={r.trendObj} block />
+          <td class="uk-text-right table-value">
+            {formatFraction(r.trendObj.change, true)}
           </td>
           <td class="uk-text-right table-value">
             <SensorValue sensor={new SensorParam(r.sensor, $metaDataManager)} value={r.value} />
