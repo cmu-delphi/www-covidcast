@@ -143,7 +143,8 @@
     const comparator = $sort.comparator;
     loadedData.then((rows) => {
       const data = rows.sort(comparator);
-      const isValid = (d) => d.important || d.id === region.id || (d.value != null && !Number.isNaN(d.value));
+      const isValid = (d) =>
+        d.important || d.id === region.id || d.data.some((v) => v.value != null && !Number.isNaN(v.value));
       const filtered = data.filter(isValid);
       missingRegions = data.filter((d) => !isValid(d));
       sortedRegions = filtered.slice(0, showAll ? -1 : 10);
