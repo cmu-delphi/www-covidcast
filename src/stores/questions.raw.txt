@@ -197,28 +197,12 @@ OldRevisions:
 
 
 ---
-Name: Felt Isolated
+Name: Worried About Getting COVID
 Category: Mental Health
 Question: |
-  In the past 7 days, did you feel isolated **most or all of the time**?
-Signal: smoothed_wfelt_isolated_7d
-AddedInWave: 10
-OldRevisions:
- - Change: This version asked about the past 5 days, rather than 7. This was changed in Wave 10 to be consistent with other items on the survey.
-   Signal: smoothed_wfelt_isolated_5d
-   AddedInWave: 4
-
-
----
-Name: Worried About Becoming Sick
-Category: Mental Health
-Question: |
-  Do you feel **very or somewhat worried** about becoming seriously ill from COVID-19?
-Signal: smoothed_wworried_become_ill
-AddedInWave: 4
----
-
-
+   Do you worry a great deal or a moderate amount about catching COVID-19?
+Signal: smoothed_wworried_catch_covid
+AddedInWave: 11
 Name: Worried About Finances
 Category: Mental Health
 Question: |
@@ -244,12 +228,4 @@ Category: Testing
 Question: |
   If you were tested for COVID-19 in the past 14 days, was the test positive?
 Signal: smoothed_wtested_positive_14d
-AddedInWave: 4
----
-Name: Wanted a Test
-Category: Testing
-Question: |
-  In the past 14 days, did you want a COVID-19 test but not receive one?
-Signal: smoothed_wwanted_test_14d
-Unit: per 100 people who were not tested
 AddedInWave: 4
