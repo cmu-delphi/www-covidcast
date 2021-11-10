@@ -72,17 +72,6 @@ SignalTooltip: Positivity rate of COVID-19 antigen tests, based on data provided
 
 Description: When a patient (whether at a doctor’s office, clinic, or hospital) has COVID-like symptoms, doctors may order an antigen test, which can detect parts of the virus that are present during an active infection. Quidel, a national provider of networked lab testing devices, provides us with data from every COVID antigen test that they conduct. We report the percentage of COVID antigen tests that are positive. Note that this signal only includes Quidel’s antigen tests, not those run by other test providers.
 ---
-Name: COVID Act Now (PCR)
-Id: covid-act-now
-Signal: pcr_specimen_positivity_rate
-Unit: per 100 tests
-
-
-SignalTooltip: Proportion of PCR specimens tested that have a positive result
-
-
-Description: TODO
----
 Name: COVID Cases
 Id: jhu-csse
 Signal: confirmed_7dav_incidence_prop
@@ -99,10 +88,10 @@ Id: hhs
 Signal: confirmed_admissions_covid_1d_prop_7dav
 
 
-SignalTooltip: Newly confirmed COVID-10 Hospital Admissions cases per 100,000 people
+SignalTooltip: Confirmed COVID-19 hospital admissions per 100,000 people
 
 
-Description: TODO
+Description: The US Department of Health & Human Services (HHS) publishes several datasets on patient impact and hospital capacity. This data shows the number of confirmed COVID-19 hospital admissions each day, as reported to the HHS. 
 ---
 Name: COVID Deaths
 Id: jhu-csse
