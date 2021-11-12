@@ -61,7 +61,7 @@ SignalTooltip: Percentage of people who know someone in their local community wi
 
 Description: Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they, or anyone in their household, are currently experiencing COVID-related symptoms. We also ask them if they know anyone in their local community who has COVID-like or flu-like symptoms, defined here as fever along with either sore throat, cough, shortness of breath, or difficulty breathing.  For this indicator, we estimate the percentage of people who know someone, in their household or outside it, who has these symptoms. While many conditions can cause these symptoms, not just COVID, comparing the rates across the country can suggest where COVID is most active.
 ---
-Name: COVID Antigen Test Positivity (Quidel)
+Name: COVID Antigen Test Positivity
 Id: quidel-covid-ag
 Signal: covid_ag_smoothed_pct_positive
 Unit: per 100 tests
