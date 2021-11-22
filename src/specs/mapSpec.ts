@@ -136,17 +136,6 @@ function genMegaLayer(withStates: string | null = null): NormalizedUnitSpec {
         type: 'quantitative',
       },
     },
-    params: [
-      {
-        name: 'hover_mega',
-        select: {
-          type: 'point',
-          on: 'mouseover, click',
-          clear: 'view:mouseout',
-          fields: ['geo_value'],
-        },
-      },
-    ],
   };
 }
 
@@ -202,7 +191,7 @@ function genMegaHoverLayer(alsoOnCounties = false): NormalizedUnitSpec {
               test: {
                 or: [
                   {
-                    param: 'hover_mega',
+                    param: 'hover',
                     empty: false,
                   },
                   'hover && hover.geo_value && hover.geo_value[0] && slice(hover.geo_value[0], 0, 2) === slice(datum.id, 0, 2)',
@@ -211,7 +200,7 @@ function genMegaHoverLayer(alsoOnCounties = false): NormalizedUnitSpec {
               value: 1,
             }
           : {
-              param: 'hover_mega',
+              param: 'hover',
               empty: false,
               value: 1,
             },
@@ -290,7 +279,6 @@ function genLevelLayer({
         select: {
           type: 'point',
           on: 'mouseover, click',
-          clear: 'view:mouseout',
           fields: ['geo_value'],
         },
         value: initialRegion

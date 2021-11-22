@@ -17,7 +17,22 @@ export interface SensorDateTrend {
   delta: number;
 
   trend: EpiDataTrendRow['basis_trend'];
+  isIncreasing: boolean;
+  isDecreasing: boolean;
+  isSteady: boolean;
+  isUnknown: boolean;
+
   highValuesAre: Sensor['highValuesAre'];
+
+  isNeutral: boolean;
+  /**
+   * increasing or decreasing based on the inverted state
+   */
+  isBetter: boolean;
+  /**
+   * increasing or decreasing based on the inverted state
+   */
+  isWorse: boolean;
 }
 
 const UNKNOWN_TREND: Omit<SensorDateTrend, 'date'> = {
@@ -25,7 +40,14 @@ const UNKNOWN_TREND: Omit<SensorDateTrend, 'date'> = {
   delta: Number.NaN,
 
   trend: 'unknown',
+  isUnknown: true,
+  isBetter: false,
+  isIncreasing: false,
+  isDecreasing: false,
   highValuesAre: 'neutral',
+  isNeutral: false,
+  isSteady: false,
+  isWorse: false,
 };
 
 export interface SensorTrend extends SensorDateTrend {
@@ -33,6 +55,10 @@ export interface SensorTrend extends SensorDateTrend {
   min?: SensorDateTrend;
   maxDate?: Date;
   max?: SensorDateTrend;
+  bestDate?: Date;
+  best?: SensorDateTrend;
+  worstDate?: Date;
+  worst?: SensorDateTrend;
 }
 
 function computeChangeDelta(v?: number, base?: number) {
@@ -66,6 +92,15 @@ function asSensorDateTrend(
     refDate: parseAPITime(refDate),
     refValue,
     trend: refTrend,
+    isIncreasing: refTrend === 'increasing',
+    isDecreasing: refTrend === 'decreasing',
+    isBetter:
+      (highValuesAre === 'good' && refTrend === 'increasing') || (highValuesAre === 'bad' && refTrend === 'decreasing'),
+    isWorse:
+      (highValuesAre === 'good' && refTrend === 'decreasing') || (highValuesAre === 'bad' && refTrend === 'increasing'),
+    isUnknown: refTrend === 'unknown',
+    isSteady: refTrend === 'steady',
+    isNeutral: highValuesAre === 'neutral' && (refTrend === 'increasing' || refTrend === 'decreasing'),
     ...computeChangeDelta(value, refValue),
   };
 }
@@ -113,6 +148,10 @@ export function asSensorTrend(
     t.min = asSensorDateTrend(date, t.value, row.min_date, scaled(row.min_value, factor), row.min_trend, highValuesAre);
     t.minDate = t.min.refDate;
   }
+  t.best = highValuesAre === 'good' ? t.max : t.min;
+  t.bestDate = highValuesAre === 'good' ? t.maxDate : t.minDate;
+  t.worst = highValuesAre === 'good' ? t.min : t.max;
+  t.worstDate = highValuesAre === 'good' ? t.minDate : t.maxDate;
   return t;
 }
 
