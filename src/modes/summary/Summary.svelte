@@ -11,6 +11,7 @@
     currentDateObject,
     getScrollToAnchor,
     metaDataManager,
+    sensorList,
   } from '../../stores';
   import { SensorParam, DateParam, RegionParam } from '../../stores/params';
   import RegionMapWrapper from '../../blocks/RegionMapWrapper.svelte';
@@ -34,6 +35,10 @@
   $: {
     // reactive update
     fetcher.invalidate(sensor, region, date);
+
+    // fetch all trends before hand for better performance
+    // and avoid weird jhu-csse index bug
+    fetcher.fetchNSensors1Region1DateTrend(sensorList, region, date);
   }
 
   afterUpdate(() => {
