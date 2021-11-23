@@ -89,7 +89,7 @@
   $: fileName = `Overview_${region.propertyId}-${region.displayName}_${formatDateISO(date.value)}`;
 
   function cleanSource(source) {
-    return source.replace(/\(.*\)/, '');
+    return source.replace(/\(.*\)/, '').trim();
   }
 </script>
 
