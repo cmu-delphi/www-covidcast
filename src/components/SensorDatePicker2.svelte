@@ -46,7 +46,6 @@
         aria-label="selected date"
         class="selected-date picker-button"
         on:dblclick={() => (value = timeFrame.max)}
-        on:
       >
         <span class="selected-date-icon">
           {@html calendarIcon}

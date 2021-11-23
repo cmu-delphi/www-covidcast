@@ -172,9 +172,11 @@ module.exports = () => {
     },
 
     devServer: {
-      contentBase: [path.join(__dirname, 'public'), path.join(__dirname, 'src/assets')],
-      contentBasePublicPath: ['/', '/assets'],
-      watchContentBase: true,
+      static: {
+        directory: path.join(__dirname, 'public'),
+        publicPath: '/',
+        watch: true,
+      },
       host: 'localhost',
       hot: devMode,
     },
