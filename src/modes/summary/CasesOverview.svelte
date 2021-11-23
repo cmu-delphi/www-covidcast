@@ -30,7 +30,7 @@
   $: deathTrend = trends[1];
 </script>
 
-<IndicatorWarning sensor={CASES} {date} {region} />
+<IndicatorWarning sensor={CASES} {date} {region} {fetcher} />
 <IndicatorAnnotations {date} {region} sensor={CASES} range="sparkLine" />
 
 <p>
