@@ -6,7 +6,6 @@ import { geoAlbersUsaTerritories } from 'geo-albers-usa-territories';
 import type { ExtendedFeature, GeoProjection } from 'd3-geo';
 import { fitExtent, fitSize, fitWidth, fitHeight } from 'd3-geo/src/projection/fit';
 import { timeDay } from 'd3-time';
-import { lagToOffset } from '../../data/correlationUtils';
 import { EpiWeek } from '../../data/EpiWeek';
 
 function patchedAlbersUsaTerritories(): GeoProjection {
@@ -87,8 +86,6 @@ expressionFunction(
     };
   })(),
 );
-
-expressionFunction('lagToOffset', lagToOffset);
 
 export default function createVega(
   root: string | HTMLElement,

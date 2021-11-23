@@ -6,6 +6,7 @@
   import { isMobileDevice } from '../stores';
   import DownloadMenu from '../components/DownloadMenu.svelte';
   import RegionMapTooltip from './RegionMapTooltip.svelte';
+  import FullWidthWrapper from '../components/FullWidthWrapper.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -41,21 +42,23 @@
   let vegaRef = null;
 </script>
 
-<div class="chart-aspect-4-3">
-  <Vega
-    bind:this={vegaRef}
-    {spec}
-    {data}
-    tooltip={RegionMapTooltip}
-    tooltipProps={{ sensor, regionSetter: region.set }}
-    on:click={onClickHandler}
-    eventListeners={['click']}
-  />
-  <DownloadMenu
-    {vegaRef}
-    {data}
-    {sensor}
-    absolutePos
-    fileName="{sensor.name}_US Counties_{formatDateISO(date.value)}"
-  />
-</div>
+<FullWidthWrapper>
+  <div class="chart-aspect-4-3">
+    <Vega
+      bind:this={vegaRef}
+      {spec}
+      {data}
+      tooltip={RegionMapTooltip}
+      tooltipProps={{ sensor, regionSetter: region.set }}
+      on:click={onClickHandler}
+      eventListeners={['click']}
+    />
+    <DownloadMenu
+      {vegaRef}
+      {data}
+      {sensor}
+      absolutePos
+      fileName="{sensor.name}_US Counties_{formatDateISO(date.value)}"
+    />
+  </div>
+</FullWidthWrapper>

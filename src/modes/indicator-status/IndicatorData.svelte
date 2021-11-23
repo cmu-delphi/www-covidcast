@@ -48,7 +48,7 @@
   /**
    * @param {import('../../stores/params').SensorParam} sensor
    * @param {import('../../stores/params').Region} region
-   * @param {{height: number, zero: boolean, raw: boolean, isMobile: boolean, singleRegionOnly: boolean, cumulative: boolean}} options
+   * @param {{height: number, zero: boolean, raw: boolean, isMobile: boolean, singleRegionOnly: boolean}} options
    */
   function genSpec(sensor, region, timeFrame, { zero, isMobile }) {
     const options = {

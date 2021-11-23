@@ -19,7 +19,6 @@
   import { scrollIntoView } from '../../util';
   import IndicatorWarning from '../../blocks/IndicatorWarning.svelte';
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
-  import IndicatorCorrelation from './IndicatorCorrelation.svelte';
   import MaxDateHint from '../../blocks/MaxDateHint.svelte';
   import { DataFetcher } from '../../stores/DataFetcher';
 
@@ -78,7 +77,7 @@
       <hr />
       <FancyHeader invert sub="Chart" anchor="chart">{sensor.name}</FancyHeader>
       <div class="chart-300">
-        <HistoryLineChart {sensor} {date} {region} {fetcher} expandableWindow />
+        <HistoryLineChart {sensor} {date} {region} {fetcher} />
       </div>
     </div>
     <IndicatorAbout {sensor} />
@@ -87,6 +86,5 @@
       <GeoTable {sensor} {region} {date} {fetcher} />
       <hr />
     </div>
-    <IndicatorCorrelation {sensor} {region} {date} />
   </div>
 </div>

@@ -1,6 +1,6 @@
 <script>
   import { fetchSampleSizesNationSummary } from '../data';
-  import { referenceRawNationSignal, refSensor } from '../stores/questions';
+  import { referenceRawNationSensorLike } from '../stores/questions';
   import UiKitHint from '../components/UIKitHint.svelte';
   import { formatDateLocal } from '../formats';
   import KPIValue from '../components/KPIValue.svelte';
@@ -8,10 +8,7 @@
   export let className = '';
 
   function fetchOverview() {
-    return fetchSampleSizesNationSummary({
-      id: refSensor.id,
-      signal: referenceRawNationSignal,
-    });
+    return fetchSampleSizesNationSummary(referenceRawNationSensorLike);
   }
 
   const data = fetchOverview();

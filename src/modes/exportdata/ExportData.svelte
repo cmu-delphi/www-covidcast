@@ -432,7 +432,7 @@ data = covidcast.signal("${sensor ? sensor.id : ''}", "${sensor ? sensor.signal 
 cc_data <- covidcast_signal(
   data_source = "${sensor ? sensor.id : ''}", signal = "${sensor ? sensor.signal : ''}",
   start_day = "${formatDate(startDate)}", end_day = "${formatDate(endDate)}",
-  geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`}${usesAsOf ? `, as_of = "${formatDate(asOfDate)}"` : ''})
+  geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`}${usesAsOf ? `, as_of = "${formatDate(asOfDate)}"` : ''}
 )`}
       </code></pre>
           <p class="description">

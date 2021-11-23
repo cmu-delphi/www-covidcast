@@ -3,7 +3,7 @@
   import { csvFormat } from 'd3-dsv';
   import { formatDateISO } from '../formats';
   import { modeByID } from '../modes';
-  import { currentMode, sensorList } from '../stores';
+  import { currentMode } from '../stores';
 
   export let fileName = 'chart';
   /**
@@ -19,7 +19,7 @@
   export let sensor = null;
 
   export let raw = false;
-  export let cumulative = false;
+  export let stderr = false;
 
   export let absolutePos = false;
 
@@ -71,11 +71,11 @@
     r.regionName = row.displayName;
     r.date = formatDateISO(row.date_value);
     r.value = row.value;
+    if (stderr) {
+      r.stderr = row.stderr;
+    }
     if (raw) {
       r.raw = row.raw;
-    }
-    if (cumulative) {
-      r.cumulative = row.cumulative;
     }
     return r;
   }
@@ -112,13 +112,8 @@
   function exportData() {
     // switch to export mode
     currentMode.set(modeByID.export);
-
-    const knownOne = sensor ? sensorList.find((d) => d.key == sensor.key) : null;
-    if (knownOne) {
-      sensor.set(knownOne, true);
-    } else {
-      scrollToTop();
-    }
+    sensor.set(sensor.value, true);
+    scrollToTop();
   }
 </script>
 

@@ -1,5 +1,4 @@
 import { parseAPITime } from '../../data';
-import type { SensorSensor } from '../../data/meta';
 import { getInfoByName } from '../../data/regions';
 import { DateParam, RegionLevel, RegionParam, Sensor, SensorParam, TimeFrame } from '../../stores/params';
 
@@ -27,7 +26,7 @@ export function resolveSensors(defaultSensor: SensorParam, keys?: readonly strin
   if (typeof keys === 'string') {
     return [resolveSensor(defaultSensor, keys).value];
   }
-  return keys.map((k) => defaultSensor.manager.getSensor(k)).filter((d): d is SensorSensor => d != null);
+  return keys.map((k) => defaultSensor.manager.getSensor(k)).filter((d): d is Sensor => d != null);
 }
 
 export function resolveRegion(defaultRegion: RegionParam, r?: string): RegionParam {

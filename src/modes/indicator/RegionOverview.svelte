@@ -14,3 +14,9 @@
   </div>
   <div class="sub">people</div>
 </div>
+
+<style>
+  .mobile-kpi {
+    margin-top: 1em;
+  }
+</style>

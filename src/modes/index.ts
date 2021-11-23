@@ -7,7 +7,6 @@ export interface Mode {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   component: () => Promise<any>;
   anchor?: string;
-  waitForReady?: boolean;
   isGeneric?: boolean;
 }
 
@@ -18,11 +17,9 @@ export type ModeID =
   | 'export'
   | 'survey-results'
   | 'indicator'
-  | 'landing'
   | 'indicator-status'
   | 'indicator-source'
   | 'indicator-signal'
-  | 'correlation'
   | 'dashboard';
 
 export const modeByID: Record<ModeID, Mode> = (() => {

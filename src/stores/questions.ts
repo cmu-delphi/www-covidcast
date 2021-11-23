@@ -1,14 +1,16 @@
-import { ensureSensorStructure, Sensor } from '../data/sensor';
-import { sensorList } from './constants';
 import descriptions from './questions.generated.json';
 import { isoParse } from 'd3-time-format';
 import type { RegionLevel } from '../data/regions';
+import type { SensorLike } from '../data/sensor';
 
 export const overviewText = descriptions.overview;
 export const surveyFullTextLink = descriptions.fullSurveyLink;
 export const dataAccessLink = descriptions.dataAccessLink;
-export const referenceRawNationSignal = descriptions.referenceRawNationSignal;
-export const visibleLevels = descriptions.levels;
+export const referenceRawNationSensorLike: SensorLike = {
+  id: descriptions.id,
+  signal: descriptions.referenceRawNationSignal,
+};
+export const visibleLevels = descriptions.levels as RegionLevel[];
 
 export function waveLink(wave: number): string {
   return `https://cmu-delphi.github.io/delphi-epidata/symptom-survey/coding.html#wave-${wave}`;
@@ -38,63 +40,34 @@ export const waves = descriptions.waves.reduce((waves, wave, i) => {
   return waves;
 }, [] as Wave[]);
 
-export interface Revision {
+export interface Revision extends SensorLike {
   change: string;
   changedInWave: Wave;
   addedInWave: Wave;
-  signal: string;
-  /**
-   * matching sensor
-   */
-  sensor: Sensor;
 }
 
-export interface Question {
+export interface Question extends SensorLike {
   category: string;
   anchor: string;
   /**
    * HTML
    */
   question: string;
-  learnMoreLink: string;
   addedInWave: Wave;
   oldRevisions?: Revision[];
 
   name: string;
-  signal: string;
-  sensor: Sensor;
+  unit?: string;
 }
 
 function toAnchor(value: string) {
   return value.toLowerCase().replace(/\s/g, '-');
 }
 
-function deriveSensor(question: { signal: string; name: string }) {
-  return ensureSensorStructure({
-    id: descriptions.id,
-    rawSignal: (descriptions.rawSignal ?? undefined) as string | undefined,
-    type: descriptions.type as Sensor['type'],
-    levels: descriptions.levels as RegionLevel[],
-    xAxis: descriptions.xAxis,
-    yAxis: descriptions.yAxis,
-    format: descriptions.format as Sensor['format'],
-    unit: descriptions.unit,
-    highValuesAre:
-      (descriptions as { highValuesAre?: Sensor['highValuesAre'] }).highValuesAre ??
-      ((descriptions as { isInverted?: boolean }).isInverted === true ? 'good' : 'bad'),
-    is7DayAverage: descriptions.is7DayAverage,
-    hasStdErr: descriptions.hasStdErr,
-    credits: descriptions.credits,
-    links: [`<a href="https://covidcast.cmu.edu/surveys.html">More information</a>`, ...(descriptions.links || [])],
-    ...question,
-  });
-}
-
 export const questions: Question[] = descriptions.questions.map((desc) => {
-  const sensor = sensorList.find((d) => d.id === descriptions.id && d.signal === desc.signal) ?? deriveSensor(desc);
   const q: Question = {
     ...desc,
-    sensor,
+    id: descriptions.id,
     anchor: toAnchor(desc.name),
     addedInWave: waves[desc.addedInWave - 1],
     oldRevisions: undefined,
@@ -105,15 +78,9 @@ export const questions: Question[] = descriptions.questions.map((desc) => {
       .slice()
       .reverse()
       .reduce((acc, rev) => {
-        const revSensor = ensureSensorStructure({
-          ...sensor,
-          key: `${sensor.id}:${rev.signal}`,
-          signal: rev.signal,
-          rawSignal: undefined, // TODO rev rawSignal
-        });
         acc.push({
           ...rev,
-          sensor: revSensor,
+          id: descriptions.id,
           changedInWave: acc.length === 0 ? waves[desc.addedInWave - 1] : acc[acc.length - 1].addedInWave,
           addedInWave: waves[rev.addedInWave - 1],
         });
@@ -130,10 +97,7 @@ export interface QuestionCategory {
   questions: Question[];
 }
 
-/**
- * @type ({name: string, anchor: string, questions: Question[]}[])
- */
-export const questionCategories = (() => {
+export function groupByQuestionCategory(questions: readonly Question[]): QuestionCategory[] {
   const cats: QuestionCategory[] = [];
   for (const question of questions) {
     if (cats.length === 0 || cats[cats.length - 1].name !== question.category) {
@@ -146,8 +110,4 @@ export const questionCategories = (() => {
     cats[cats.length - 1].questions.push(question);
   }
   return cats;
-})();
-
-export const refSensor = questions.some((d) => d.sensor != null)
-  ? questions.find((d) => d.sensor != null)!.sensor
-  : sensorList.find((d) => d.id === 'fb-survey');
+}

@@ -228,6 +228,7 @@ export interface LineSpecOptions {
   autoAlignOffset?: number;
   tickCount?: Axis<ExprRef | SignalRef>['tickCount'];
   isWeeklySignal?: boolean;
+  stderr?: boolean;
 }
 
 export function generateLineChartSpec({
@@ -256,6 +257,7 @@ export function generateLineChartSpec({
     step: 1,
   },
   isWeeklySignal = false,
+  stderr = false,
 }: LineSpecOptions = {}): TopLevelSpec & LayerSpec<Field> {
   // logic to automatically add the year for week 1 and first date
   const labelDateYear = `datum.label + (week(datum.value) === 1 ${
@@ -268,7 +270,7 @@ export function generateLineChartSpec({
   if (subTitle) {
     topOffset += 10;
   }
-  return {
+  const spec: TopLevelSpec & LayerSpec<Field> = {
     ...BASE_SPEC,
     width,
     height,
@@ -443,6 +445,56 @@ export function generateLineChartSpec({
       genEmptyHighlightLayer(),
     ],
   };
+
+  if (stderr) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const encoding: any = {
+      ...spec.layer[0].encoding!,
+      y: {
+        field: 'stderr_min',
+        type: 'quantitative',
+      },
+      y2: {
+        field: 'stderr_max',
+      },
+    };
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (encoding.opacity) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+      encoding.opacity = {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+        ...encoding.opacity,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+        condition: {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+          ...encoding.opacity.condition,
+          value: 0.02,
+        },
+        value: 0.25,
+      };
+    }
+    spec.layer.unshift({
+      transform: [
+        {
+          calculate: `datum.stderr != null && datum.${valueField} != null ? datum.${valueField} - datum.stderr : null`,
+          as: 'stderr_min',
+        },
+        {
+          calculate: `datum.stderr != null && datum.${valueField} != null ? datum.${valueField} + datum.stderr : null`,
+          as: 'stderr_max',
+        },
+      ],
+      mark: {
+        type: 'area',
+        color,
+        opacity: 0.25,
+      },
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-explicit-any
+      encoding: encoding as any,
+    });
+  }
+
+  return spec;
 }
 
 export function generateCompareLineSpec(
@@ -467,57 +519,19 @@ export function generateCompareLineSpec(
 }
 
 export function generateLineAndBarSpec(options: LineSpecOptions = {}): TopLevelSpec & LayerSpec<Field> {
-  const spec = generateLineChartSpec(options);
+  const spec = generateLineChartSpec({ ...options, stderr: false });
   const point = spec.layer[1] as NormalizedUnitSpec;
-  point.mark = {
-    type: 'bar',
-    color: options.color || MULTI_COLORS[0],
-    width: {
-      expr: `floor(width / customCountDays(domain('x')[0], domain('x')[1]))`,
-    },
-  };
-  (point.encoding!.y as PositionFieldDef<Field>).field = 'raw';
-  (point.encoding!.y as PositionFieldDef<Field>).stack = null;
-  (point.encoding!.opacity as PositionValueDef).value = 0.2;
-  return spec;
-}
-
-export function generateCumulativeBarSpec(options: LineSpecOptions = {}): TopLevelSpec {
-  const spec = generateLineChartSpec(options);
-  // convert line to bar chart
-  const line = spec.layer[0] as NormalizedUnitSpec;
-  line.mark = {
-    type: 'bar',
-    color: options.color || MULTI_COLORS[0],
-    width: {
-      expr: `floor(width / customCountDays(domain('x')[0], domain('x')[1]))`,
-    },
-  };
-  (line.encoding!.y as PositionFieldDef<Field>).field = 'cumulative';
-  (line.encoding!.y as PositionFieldDef<Field>).stack = null;
-  (line.encoding!.opacity as PositionValueDef) = {
-    value: 0.2,
-  };
-  // convert highlight point to shifted bar chart at the top
-  const point = spec.layer[1] as NormalizedUnitSpec;
-  point.transform = [
-    {
-      calculate: `datum.cumulative - datum.raw`,
-      as: 'prevCumulative',
-    },
-  ];
   point.mark = {
     type: 'rect',
     color: options.color || MULTI_COLORS[0],
     width: {
       expr: `floor(width / customCountDays(domain('x')[0], domain('x')[1]))`,
     },
+    align: 'center',
   };
-  (point.encoding!.y as PositionFieldDef<Field>).field = 'cumulative';
+  (point.encoding!.y as PositionFieldDef<Field>).field = 'raw';
   (point.encoding!.y as PositionFieldDef<Field>).stack = null;
-  (point.encoding!.y2 as PositionFieldDef<Field>) = { field: 'prevCumulative' };
-  (point.encoding!.opacity as PositionValueDef).value = 1;
-
+  (point.encoding!.opacity as PositionValueDef).value = 0.2;
   return spec;
 }
 
