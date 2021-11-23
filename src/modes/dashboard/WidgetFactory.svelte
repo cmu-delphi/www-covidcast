@@ -3,7 +3,6 @@
   import KPIWidget from './widgets/KPIWidget.svelte';
   import MapChartWidget from './widgets/MapChartWidget.svelte';
   import HexMapChartWidget from './widgets/HexMapChartWidget.svelte';
-  import KPITrendWidget from './widgets/KPITrendWidget.svelte';
   import RegionParallelCoordinatesWidget from './widgets/RegionParallelCoordinatesWidget.svelte';
   import DateParallelCoordinatesWidget from './widgets/DateParallelCoordinatesWidget.svelte';
   import RegionTableWidget from './widgets/RegionTableWidget.svelte';
@@ -111,17 +110,6 @@
   />
 {:else if c.type === 'kpi'}
   <KPIWidget
-    sensor={resolveSensor(sensor, c.config.sensor)}
-    date={resolveDate(date, c.config.date)}
-    region={resolveRegion(region, c.config.region)}
-    bind:highlight
-    on:action={trackAction}
-    on:state={trackState}
-    id={c.id}
-    initialState={c.state}
-  />
-{:else if c.type === 'trend'}
-  <KPITrendWidget
     sensor={resolveSensor(sensor, c.config.sensor)}
     date={resolveDate(date, c.config.date)}
     region={resolveRegion(region, c.config.region)}

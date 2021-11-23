@@ -43,7 +43,7 @@ export const defaultRegionOnStartup = {
   hrr: '357', // Pittsburgh
 };
 
-export const DEFAULT_MODE = modeByID.landing;
+export const DEFAULT_MODE = modeByID.summary;
 export const DEFAULT_SENSOR = (
   sensorConfig.find((d) => d.highlight && d.highlight.includes('default')) || sensorConfig[0]
 ).key;
@@ -62,20 +62,4 @@ export const DEFAULT_SURVEY_SENSOR = (() => {
     return cli.key;
   }
   return DEFAULT_SENSOR;
-})();
-
-function findCasesSensorConfig(): SensorConfig | undefined {
-  return sensorConfig.find((d) => d.signal == 'confirmed_7dav_incidence_prop');
-}
-
-export const DEFAULT_CORRELATION_SENSOR = (() => {
-  const highlightBased = sensorConfig.find((d) => d.highlight && d.highlight.includes('correlation'));
-  if (highlightBased) {
-    return highlightBased.key;
-  }
-  const cases = findCasesSensorConfig();
-  if (cases) {
-    return cases.key;
-  }
-  return DEFAULT_SURVEY_SENSOR;
 })();

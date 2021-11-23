@@ -5,6 +5,7 @@
   import { generateCountiesOfStateSpec, generateRelatedCountySpec, generateStateSpec } from '../specs/mapSpec';
   import { isMobileDevice } from '../stores';
   import DownloadMenu from '../components/DownloadMenu.svelte';
+  import FullWidthWrapper from '../components/FullWidthWrapper.svelte';
   import RegionMapTooltip from './RegionMapTooltip.svelte';
 
   /**
@@ -92,16 +93,18 @@
   }
 </script>
 
-<div class="chart-aspect-4-3">
-  <Vega
-    bind:this={vegaRef}
-    className={showsUS ? '' : 'mobile-map'}
-    {spec}
-    {data}
-    tooltip={RegionMapTooltip}
-    tooltipProps={{ sensor, regionSetter: region.set }}
-    on:click={onClickHandler}
-    eventListeners={['click']}
-  />
-  <DownloadMenu {vegaRef} {data} {sensor} absolutePos {fileName} />
-</div>
+<FullWidthWrapper>
+  <div class="chart-aspect-4-3">
+    <Vega
+      bind:this={vegaRef}
+      className={showsUS ? '' : 'mobile-map'}
+      {spec}
+      {data}
+      tooltip={RegionMapTooltip}
+      tooltipProps={{ sensor, regionSetter: region.set }}
+      on:click={onClickHandler}
+      eventListeners={['click']}
+    />
+    <DownloadMenu {vegaRef} {data} {sensor} absolutePos {fileName} />
+  </div>
+</FullWidthWrapper>

@@ -3,8 +3,6 @@ import {
   DEFAULT_MODE,
   DEFAULT_SENSOR,
   DEFAULT_SURVEY_SENSOR,
-  defaultRegionOnStartup,
-  DEFAULT_CORRELATION_SENSOR,
   resolveSensorWithAliases,
   sensorConfig,
 } from './constants';
@@ -26,8 +24,6 @@ function deriveFromPath(url: Location) {
   const urlParams = new URLSearchParams(queryString);
 
   const sensor = urlParams.get('sensor');
-  const sensor2 = urlParams.get('sensor2');
-  const lag = urlParams.get('lag');
   const date = urlParams.get('date') ?? '';
 
   const modeFromPath = () => {
@@ -51,15 +47,6 @@ function deriveFromPath(url: Location) {
   return {
     mode: modeObj,
     sensor: resolveSensor,
-    sensor2: resolveSensorWithAliases(
-      sensor2,
-      isGenericPage
-        ? sensor2 || DEFAULT_CORRELATION_SENSOR
-        : DEFAULT_CORRELATION_SENSOR === sensor2
-        ? DEFAULT_SENSOR
-        : DEFAULT_CORRELATION_SENSOR,
-    ),
-    lag: lag ? Number.parseInt(lag, 10) : 0,
     date: /\d{8}/.test(date) ? date : yesterday,
     region: urlParams.get('region') || '',
   };
@@ -113,18 +100,18 @@ export const sensorList = derived(metaDataManager, (metaData) => {
     .filter((d): d is Sensor => d != null);
 });
 
+export const defaultCasesSensor = derived(sensorList, (sensorList) => {
+  return sensorList.find((d) => d.signal === 'confirmed_7dav_incidence_prop');
+});
+export const defaultDeathSensor = derived(sensorList, (sensorList) => {
+  return sensorList.find((d) => d.signal === 'deaths_7dav_incidence_prop');
+});
+
 export const currentSensorEntry = derived(
   [currentSensor, sensorList, metaDataManager],
   // lookup the value, if not found maybe a generic one, if it is set, then return the default, else return the empty one
   ([$currentSensor, sensorList, metaDataManager]) =>
     resolveSensor($currentSensor, sensorList, metaDataManager, DEFAULT_SENSOR),
-);
-
-export const currentSensor2 = writable(defaultValues.sensor2);
-export const currentSensorEntry2 = derived(
-  [currentSensor2, sensorList, metaDataManager],
-  ([$currentSensor, sensorList, metaDataManager]) =>
-    resolveSensor($currentSensor, sensorList, metaDataManager, DEFAULT_CORRELATION_SENSOR),
 );
 
 export const groupedSensorList = derived(sensorList, (sensorList) => {
@@ -141,8 +128,6 @@ export const groupedSensorList = derived(sensorList, (sensorList) => {
     .filter((d) => d.sensors.length > 0);
 });
 
-export const currentLag = writable(defaultValues.lag);
-
 export const currentDate = writable(defaultValues.date);
 /**
  * current date as a Date object
@@ -157,43 +142,6 @@ export const currentRegion = writable(defaultValues.region);
  * current region info (could also be null)
  */
 export const currentRegionInfo = writable(getInfoByName(defaultValues.region));
-
-function deriveRecent(): RegionInfo[] {
-  if (!window.localStorage) {
-    return [];
-  }
-  const item = window.localStorage.getItem('recent') || '';
-  if (!item) {
-    return [getInfoByName(defaultRegionOnStartup.state)!, getInfoByName(defaultRegionOnStartup.county)!];
-  }
-  return item
-    .split(',')
-    .filter(Boolean)
-    .map((d) => getInfoByName(d))
-    .filter((d): d is RegionInfo => d != null);
-}
-export const recentRegionInfos = writable(deriveRecent());
-
-// keep track of top 10 recent selections
-currentRegionInfo.subscribe((v) => {
-  if (!v) {
-    return;
-  }
-  const infos = get(recentRegionInfos).slice();
-  const index = infos.indexOf(v);
-  if (index >= 0) {
-    infos.splice(index, 1);
-  }
-  if (infos.length > 10) {
-    infos.shift();
-  }
-  infos.unshift(v);
-  recentRegionInfos.set(infos);
-
-  if (window.localStorage) {
-    window.localStorage.setItem('recent', infos.map((d) => d.propertyId).join(','));
-  }
-});
 
 /**
  * @returns {boolean} whether the selection has changed
@@ -266,25 +214,15 @@ export interface TrackedState {
 }
 
 export const trackedUrlParams = derived(
-  [currentMode, currentSensor, currentSensor2, currentLag, currentRegion, currentDate],
-  ([mode, sensor, sensor2, lag, region, date]): TrackedState => {
+  [currentMode, currentSensor, currentRegion, currentDate],
+  ([mode, sensor, region, date]): TrackedState => {
     // determine parameters based on default value and current mode
     const params: Omit<PersistedState, 'mode'> = {
       sensor:
-        mode === modeByID.landing ||
-        mode === modeByID.summary ||
-        mode === modeByID['survey-results'] ||
-        sensor === DEFAULT_SENSOR
-          ? null
-          : sensor,
-      sensor2: mode === modeByID.correlation ? sensor2 : null,
-      lag: mode === modeByID.correlation ? lag : null,
+        mode === modeByID.summary || mode === modeByID['survey-results'] || sensor === DEFAULT_SENSOR ? null : sensor,
       region: mode === modeByID.export ? null : region,
       date:
-        String(date) === yesterday ||
-        mode === modeByID.export ||
-        mode === modeByID.landing ||
-        mode === modeByID['indicator-status']
+        String(date) === yesterday || mode === modeByID.export || mode === modeByID['indicator-status']
           ? null
           : String(date),
     };
@@ -315,12 +253,6 @@ export function loadFromUrlState(state: PersistedState): void {
   }
   if (state.sensor != null && state.sensor !== get(currentSensor)) {
     currentSensor.set(state.sensor);
-  }
-  if (state.sensor2 != null && state.sensor2 !== get(currentSensor2)) {
-    currentSensor2.set(state.sensor2);
-  }
-  if (state.lag != null && state.lag !== get(currentLag)) {
-    currentLag.set(state.lag);
   }
   if (state.region != null && state.region !== get(currentRegion)) {
     selectByInfo(getInfoByName(state.region));

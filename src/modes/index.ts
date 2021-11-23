@@ -17,11 +17,9 @@ export type ModeID =
   | 'export'
   | 'survey-results'
   | 'indicator'
-  | 'landing'
   | 'indicator-status'
   | 'indicator-source'
   | 'indicator-signal'
-  | 'correlation'
   | 'dashboard';
 
 export const modeByID: Record<ModeID, Mode> = (() => {

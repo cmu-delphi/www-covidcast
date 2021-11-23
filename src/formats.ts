@@ -86,7 +86,7 @@ const generic = format(',.1f');
 const fractionAsPercentFormatter = format('.2%');
 const rawFormatter = format(',.2f');
 
-function sign(
+export function sign(
   value: number | null | undefined,
   formatter: (v: number) => string,
   enforceSign: boolean,
