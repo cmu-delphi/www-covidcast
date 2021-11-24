@@ -325,7 +325,7 @@ export interface EpiDataAnomaliesRow {
   explanation: string;
   source: string;
   signals: string; // * or a comma separated list "*"|(ID{\s*";"\s*ID}*)
-  dates: string; // YYYYMMDD-YYYYMMDD
+  dates: string; // YYYYMMDD-YYYYMMDD or -99 uncertainty days
   regions: string; //semicolor separated key value: e.g. GROUP("*"|(ID{","\s*ID}*)){\s*","\s*GROUP("*"|(ID{","\s*ID}*))}
   reference?: string;
 }
@@ -333,8 +333,20 @@ export interface EpiDataAnomaliesRow {
 export function callAnomaliesAPI(): Promise<EpiDataAnomaliesRow[]> {
   const url = new URL(ENDPOINT + '/covidcast/anomalies');
   url.searchParams.set('format', 'json');
-  return fetchImpl<EpiDataAnomaliesRow[]>(url).catch((error) => {
+  const data = fetchImpl<EpiDataAnomaliesRow[]>(url).catch((error) => {
     console.warn('failed fetching data', error);
-    return [];
+    return [] as EpiDataAnomaliesRow[];
+  });
+
+  return data.then((rows) => {
+    rows.push({
+      dates: '-10',
+      explanation: 'This is an informative description text what is going on',
+      problem: 'Informative Description',
+      regions: 'nation(*);state(*);county(*);hrr(*)',
+      source: 'doctor-visits',
+      signals: 'smoothed_adj_cli',
+    });
+    return rows;
   });
 }

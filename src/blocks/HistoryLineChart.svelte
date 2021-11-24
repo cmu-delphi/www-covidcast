@@ -9,6 +9,7 @@
     generateLineChartSpec,
     resolveHighlightedDate,
     generateLineAndBarSpec,
+    genUncertaintyLayer,
     resetOnClearHighlighTuple,
     MULTI_COLORS,
     genDateHighlight,
@@ -53,8 +54,6 @@
    * @type {Date|null}
    */
   export let ends = null;
-
-  export let showAnnotations = true;
 
   export let showNeighbors = true;
 
@@ -252,6 +251,10 @@
     if (ends && ends < timeFrame.max) {
       spec.layer.unshift(genDateHighlight(ends < timeFrame.min ? timeFrame.min : ends));
     }
+    const uncertaintyAnnotation = annotations.find((d) => d.uncertainty);
+    if (uncertaintyAnnotation) {
+      spec.layer.push(genUncertaintyLayer(uncertaintyAnnotation, { color }));
+    }
     return spec;
   }
 
@@ -261,9 +264,7 @@
 
   $: raw = singleRaw && sensor.rawValue != null && !($isMobileDevice && showFull);
   $: regions = raw ? [region.value] : resolveRegions(region.value, singleRegionOnly, showNeighbors);
-  $: annotations = showAnnotations
-    ? $annotationManager.getWindowAnnotations(sensor.value, regions, timeFrame.min, timeFrame.max)
-    : [];
+  $: annotations = $annotationManager.getWindowAnnotations(sensor.value, regions, timeFrame.min, timeFrame.max, true);
   $: spec = injectRanges(
     genSpec(sensor, region, date, timeFrame, {
       height,
