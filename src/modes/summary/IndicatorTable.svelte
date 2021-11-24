@@ -12,6 +12,7 @@
   import DownloadMenu from '../../components//DownloadMenu.svelte';
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
   import SensorUnit from '../../components/SensorUnit.svelte';
+  import { computeLatest } from '../../data/trend';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -33,21 +34,27 @@
    */
   function loadData(groupedSensorList, region, date) {
     const flatSensors = groupedSensorList.map((group) => group.sensors).flat();
-    const trends = fetcher.fetchNSensors1Region1DateTrend(flatSensors, region, date);
     const sparkLines = fetcher.fetchNSensor1RegionSparklines(flatSensors, region, date);
     return groupedSensorList.map((group) => {
       return {
         ...group,
         sensors: group.sensors.map((s) => {
           const sensor = new SensorParam(s, $metaDataManager);
+          const sparkLine = sparkLines.shift();
+          const latest = sparkLine.then((sparklineData) => computeLatest(sparklineData, date.value));
           return {
             sensor,
+            latest,
             // same order ensured
-            sparkLine: sparkLines.shift(),
-            trend: trends.shift(),
+            sparkLine,
             switchMode: () => {
-              sensor.set(s, true);
-              currentMode.set(modeByID.indicator);
+              latest.then((data) => {
+                sensor.set(s, true);
+                if (data) {
+                  date.set(data.date);
+                }
+                currentMode.set(modeByID.indicator);
+              });
             },
           };
         }),
@@ -55,10 +62,10 @@
     });
   }
 
-  function generateDumpData(loadedData, date, region) {
+  function generateDumpData(loadedData, region) {
     const sensors = loadedData.map((d) => d.sensors).flat();
-    return Promise.all(sensors.map((d) => d.trend)).then((trends) =>
-      trends.map((trend, i) => {
+    return Promise.all(sensors.map((d) => d.latest)).then((latest) =>
+      latest.map((latestInfo, i) => {
         const sensor = sensors[i].sensor;
         return {
           indicatorDataSource: sensor.value.id,
@@ -67,13 +74,11 @@
           regionId: region.propertyId,
           regionLevel: region.level,
           regionName: region.displayName,
-          date: formatDateISO(date.value),
-          value: trend.value,
-          trend: trend.trend,
-          delta: trend.delta == null || Number.isNaN(trend.delta) ? '' : trend.delta,
-          change: trend.change == null || Number.isNaN(trend.change) ? '' : trend.change,
-          refDate: formatDateISO(trend.refDate),
-          refValue: trend.refValue,
+          date: formatDateISO(latestInfo.date),
+          value: latestInfo.value,
+          change: latestInfo.change == null || Number.isNaN(latestInfo.change) ? '' : latestInfo.change,
+          refDate: formatDateISO(latestInfo.refDate),
+          refValue: latestInfo.refValue,
         };
       }),
     );
@@ -85,7 +90,7 @@
   $: spec = generateSparkLine({ highlightDate: true, domain: date.sparkLineTimeFrame.domain });
 
   $: loadedData = loadData($groupedSensorList, region, date);
-  $: dumpData = generateDumpData(loadedData, date, region);
+  $: dumpData = generateDumpData(loadedData, region);
   $: fileName = `Overview_${region.propertyId}-${region.displayName}_${formatDateISO(date.value)}`;
 </script>
 
@@ -137,7 +142,7 @@
             ({entry.sensor.value.dataSourceName})
           </td>
           <td class="uk-text-right bold-value">
-            {#await entry.trend}
+            {#await entry.latest}
               ?
             {:then t}
               {#if t == null || t.value == null || Number.isNaN(t.value) || t.change == null}
@@ -148,7 +153,7 @@
             {/await}
           </td>
           <td class="uk-text-right bold-value table-value">
-            {#await entry.trend}
+            {#await entry.latest}
               ?
             {:then t}
               {#if t == null || t.value == null || Number.isNaN(t.value)}
@@ -159,7 +164,7 @@
             {/await}
           </td>
           <td class="bold-value table-unit">
-            {#await entry.trend then t}
+            {#await entry.latest then t}
               {#if t != null && t.value != null && !Number.isNaN(t.value)}
                 <SensorUnit sensor={entry.sensor} />
               {/if}
@@ -167,14 +172,16 @@
           </td>
           <td class="chart-table-cell">
             <div class="mobile-table-chart">
-              <Vega
-                {spec}
-                data={entry.sparkLine}
-                tooltip={SparkLineTooltip}
-                tooltipProps={{ sensor: entry.sensor }}
-                signals={{ currentDate: date.value }}
-                noDataText="N/A"
-              />
+              {#await entry.latest then t}
+                <Vega
+                  {spec}
+                  data={entry.sparkLine}
+                  tooltip={SparkLineTooltip}
+                  tooltipProps={{ sensor: entry.sensor }}
+                  signals={{ currentDate: t ? t.date : date.value }}
+                  noDataText="N/A"
+                />
+              {/await}
             </div>
           </td>
           <td>
