@@ -1,10 +1,13 @@
+import type { EpiDataRow } from './fetchData';
 import type { Sensor } from '../stores/constants';
 import { callTrendAPI, EpiDataTrendRow, FieldSpec } from './api';
 import { GeoPair, SourceSignalPair } from './apimodel';
 import type { Region } from './regions';
 import { splitDailyWeekly } from './sensor';
 import type { TimeFrame } from './TimeFrame';
-import { parseAPITime } from './utils';
+import { parseAPITime, toTimeValue } from './utils';
+import { timeDay } from 'd3-time';
+// import { timeDay } from 'd3-time';
 
 export interface SensorDateTrend {
   date: Date;
@@ -181,4 +184,52 @@ export function fetchTrend(
         : callTrendAPI(type, SourceSignalPair.fromArray(sensors), geo, date, window, type == 'week' ? 1 : 7, fields),
     ),
   ).then((r) => ([] as EpiDataTrendRow[]).concat(...r));
+}
+
+export function computeLatest(
+  data: EpiDataRow[],
+  date: Date,
+): {
+  value: undefined | number;
+  change: undefined | number;
+  date: Date;
+  refValue: undefined | number;
+  refDate: undefined | Date;
+} | null {
+  if (data.length === 0) {
+    return null;
+  }
+  const timeValue = toTimeValue(date);
+  let matchedRow: EpiDataRow | null = null;
+  let prevTimeValue = 0;
+  let matchedPreviousRow: EpiDataRow | null = null;
+
+  for (let i = data.length - 1; i >= 0; i--) {
+    const row = data[i];
+    if (row == null || row.value == null || Number.isNaN(row.value)) {
+      continue;
+    }
+    if (matchedRow) {
+      if (row.time_value == prevTimeValue) {
+        matchedPreviousRow = row;
+        break;
+      } else if (row.time_value < prevTimeValue) {
+        break;
+      }
+    } else if (row.time_value <= timeValue) {
+      matchedRow = row;
+      prevTimeValue = toTimeValue(timeDay.offset(row.date_value, -7));
+      continue;
+    }
+  }
+  if (!matchedRow) {
+    return null;
+  }
+  return {
+    value: matchedRow.value,
+    date: matchedRow.date_value,
+    change: computeChangeDelta(matchedRow.value, matchedPreviousRow?.value).change,
+    refDate: matchedPreviousRow?.date_value,
+    refValue: matchedPreviousRow?.value,
+  };
 }
