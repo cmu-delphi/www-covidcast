@@ -1,13 +1,13 @@
 <script>
   import KPIValue from '../../components/KPIValue.svelte';
-  import TrendIndicator from '../../components/TrendIndicator.svelte';
+  import KPIChange from '../../components/KPIChange.svelte';
   import { SensorParam } from '../../stores/params';
   import { formatDateDayOfWeek } from '../../formats';
   import SensorUnit from '../../components/SensorUnit.svelte';
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
   import MaxDateHint from '../../blocks/MaxDateHint.svelte';
   import IndicatorWarning from '../../blocks/IndicatorWarning.svelte';
-  import { defaultDeathSensor, defaultCasesSensor, metaDataManager } from '../../stores';
+  import { defaultDeathSensor, defaultCasesSensor, defaultHospitalSensor, metaDataManager } from '../../stores';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -24,10 +24,12 @@
 
   $: CASES = new SensorParam($defaultCasesSensor, $metaDataManager);
   $: DEATHS = new SensorParam($defaultDeathSensor, $metaDataManager);
+  $: HOSPITAL_ADMISSION = new SensorParam($defaultHospitalSensor, $metaDataManager);
 
-  $: trends = fetcher.fetchNSensors1Region1DateTrend([CASES, DEATHS], region, date);
+  $: trends = fetcher.fetchNSensors1Region1DateTrend([CASES, HOSPITAL_ADMISSION, DEATHS], region, date);
   $: casesTrend = trends[0];
-  $: deathTrend = trends[1];
+  $: hospitalTrend = trends[1];
+  $: deathTrend = trends[2];
 </script>
 
 <IndicatorWarning sensor={CASES} {date} {region} {fetcher} />
@@ -39,7 +41,7 @@
   the {CASES.valueUnit}s were:
 </p>
 
-<div class="mobile-two-col">
+<div class="mobile-three-col">
   <div class="mobile-kpi">
     <h3>Cases</h3>
     <div>
@@ -51,6 +53,19 @@
     </div>
     <div class="sub">
       <SensorUnit sensor={CASES} long />
+    </div>
+  </div>
+  <div class="mobile-kpi">
+    <h3>Hospital Admissions</h3>
+    <div>
+      {#await hospitalTrend}
+        <KPIValue value={null} loading />
+      {:then d}
+        <KPIValue value={d ? d.value : null} />
+      {/await}
+    </div>
+    <div class="sub">
+      <SensorUnit sensor={HOSPITAL_ADMISSION} long />
     </div>
   </div>
   <div class="mobile-kpi">
@@ -70,25 +85,35 @@
 
 <p>Compared to the previous week that means:</p>
 
-<div class="mobile-two-col">
+<div class="mobile-three-col">
   <div class="mobile-kpi">
-    <h3>Cases</h3>
     <div>
       {#await casesTrend}
-        <TrendIndicator trend={null} long />
+        <KPIChange value={null} loading />
       {:then d}
-        <TrendIndicator trend={d} long />
+        <KPIChange value={d ? d.change : null} />
       {/await}
     </div>
+    <div class="sub">Relative change to 7 days ago</div>
   </div>
   <div class="mobile-kpi">
-    <h3>Deaths</h3>
     <div>
-      {#await deathTrend}
-        <TrendIndicator trend={null} long />
+      {#await hospitalTrend}
+        <KPIChange value={null} loading />
       {:then d}
-        <TrendIndicator trend={d} long />
+        <KPIChange value={d ? d.change : null} />
       {/await}
     </div>
+    <div class="sub">Relative change to 7 days ago</div>
+  </div>
+  <div class="mobile-kpi">
+    <div>
+      {#await deathTrend}
+        <KPIChange value={null} loading />
+      {:then d}
+        <KPIChange value={d ? d.change : null} />
+      {/await}
+    </div>
+    <div class="sub">Relative change to 7 days ago</div>
   </div>
 </div>

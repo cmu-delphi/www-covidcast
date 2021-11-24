@@ -92,6 +92,10 @@
   $: loadedData = loadData($groupedSensorList, region, date);
   $: dumpData = generateDumpData(loadedData, region);
   $: fileName = `Overview_${region.propertyId}-${region.displayName}_${formatDateISO(date.value)}`;
+
+  function cleanSource(source) {
+    return source.replace(/\(.*\)/, '').trim();
+  }
 </script>
 
 <div class="uk-position-relative">
@@ -138,8 +142,8 @@
               on:click|preventDefault={entry.switchMode}
             >
               {entry.sensor.name}
+              ({cleanSource(entry.sensor.value.dataSourceName)})
             </a>
-            ({entry.sensor.value.dataSourceName})
           </td>
           <td class="uk-text-right bold-value">
             {#await entry.latest}
