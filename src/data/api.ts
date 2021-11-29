@@ -333,20 +333,8 @@ export interface EpiDataAnomaliesRow {
 export function callAnomaliesAPI(): Promise<EpiDataAnomaliesRow[]> {
   const url = new URL(ENDPOINT + '/covidcast/anomalies');
   url.searchParams.set('format', 'json');
-  const data = fetchImpl<EpiDataAnomaliesRow[]>(url).catch((error) => {
+  return fetchImpl<EpiDataAnomaliesRow[]>(url).catch((error) => {
     console.warn('failed fetching data', error);
     return [] as EpiDataAnomaliesRow[];
-  });
-
-  return data.then((rows) => {
-    rows.push({
-      dates: '-10',
-      explanation: 'This is an informative description text what is going on',
-      problem: 'Informative Description',
-      regions: 'nation(*);state(*);county(*);hrr(*)',
-      source: 'doctor-visits',
-      signals: 'smoothed_adj_cli',
-    });
-    return rows;
   });
 }
