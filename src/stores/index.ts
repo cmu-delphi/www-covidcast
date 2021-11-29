@@ -7,22 +7,17 @@ import {
   sensorConfig,
 } from './constants';
 import modes, { Mode, modeByID, ModeID } from '../modes';
-import { formatAPITime, parseAPITime } from '../data/utils';
+import { parseAPITime } from '../data/utils';
 import { getInfoByName } from '../data/regions';
 export { defaultRegionOnStartup, getLevelInfo, levels, levelList } from './constants';
-import { timeDay } from 'd3-time';
 import { AnnotationManager, fetchAnnotations } from '../data';
 import type { RegionInfo, RegionLevel } from '../data/regions';
 import { MetaDataManager } from '../data/meta';
 import { callMetaAPI } from '../data/api';
 import { Sensor, sensorTypes } from '../data/sensor';
+import { yesterday } from '../data/TimeFrame';
 
 export const appReady = writable(false);
-
-/**
- * magic date that will be replaced by the latest date
- */
-export const MAGIC_START_DATE = '20200701';
 
 function deriveFromPath(url: Location) {
   const queryString = url.search;
@@ -52,7 +47,7 @@ function deriveFromPath(url: Location) {
   return {
     mode: modeObj,
     sensor: resolveSensor,
-    date: /\d{8}/.test(date) ? date : MAGIC_START_DATE,
+    date: /\d{8}/.test(date) ? date : yesterday,
     region: urlParams.get('region') || '',
   };
 }
@@ -107,6 +102,9 @@ export const sensorList = derived(metaDataManager, (metaData) => {
 
 export const defaultCasesSensor = derived(sensorList, (sensorList) => {
   return sensorList.find((d) => d.signal === 'confirmed_7dav_incidence_prop');
+});
+export const defaultHospitalSensor = derived(sensorList, (sensorList) => {
+  return sensorList.find((d) => d.signal === 'confirmed_admissions_covid_1d_prop_7dav');
 });
 export const defaultDeathSensor = derived(sensorList, (sensorList) => {
   return sensorList.find((d) => d.signal === 'deaths_7dav_incidence_prop');
@@ -227,7 +225,7 @@ export const trackedUrlParams = derived(
         mode === modeByID.summary || mode === modeByID['survey-results'] || sensor === DEFAULT_SENSOR ? null : sensor,
       region: mode === modeByID.export ? null : region,
       date:
-        String(date) === MAGIC_START_DATE || mode === modeByID.export || mode === modeByID['indicator-status']
+        String(date) === yesterday || mode === modeByID.export || mode === modeByID['indicator-status']
           ? null
           : String(date),
     };
@@ -275,42 +273,13 @@ export function loadAnnotations(): void {
   });
 }
 
-export function loadMetaData(): Promise<{ date: string }> {
+export function loadMetaData(): Promise<MetaDataManager> {
   return callMetaAPI().then((meta) => {
     const m = new MetaDataManager(meta);
     metaDataManager.set(m);
-
-    const sensor = get(currentSensor);
-    const timeEntry = m.getTimeFrame(sensor);
-
-    let date = get(currentDate);
-    // Magic number of default date - if no URL params, use max date
-    // available
-    if (date === MAGIC_START_DATE && timeEntry != null) {
-      date = formatAPITime(timeDay.offset(timeEntry.max, get(currentMode) === modeByID['survey-results'] ? 0 : -2));
-      currentDate.set(date);
-    }
-    return {
-      date,
-    };
+    return m;
   });
 }
-
-// validate if sensor and other parameter matches
-currentSensorEntry.subscribe((sensorEntry) => {
-  if (!sensorEntry) {
-    return;
-  }
-
-  // clamp to time span
-  const timeFrame = get(metaDataManager).getTimeFrame(sensorEntry);
-  const current = get(currentDate) ?? '';
-  if (current < String(timeFrame.min_time)) {
-    currentDate.set(String(timeFrame.min_time));
-  } else if (current > String(timeFrame.max_time)) {
-    currentDate.set(String(timeFrame.max_time));
-  }
-});
 
 currentMode.subscribe((mode) => {
   if (mode === modeByID['survey-results'] && get(currentSensor) !== DEFAULT_SURVEY_SENSOR) {

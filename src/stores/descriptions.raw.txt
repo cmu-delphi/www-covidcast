@@ -1,27 +1,8 @@
 ---
-Name: Bar Visits
-Id: safegraph-weekly
-Signal: bars_visit_prop
-
-
-SignalTooltip: Daily number of visits to bars per 100,000 people, based on SafeGraph’s Weekly Patterns dataset
- 
-Description: Delphi receives data from [SafeGraph](https://docs.safegraph.com/docs/weekly-patterns), which collects weekly insights on Points of Interest (POI) using anonymized location data from mobile phones. We select locations that qualify as "Drinking Places (alcoholic beverages)" from all the [core places](https://docs.safegraph.com/v4.0/docs/places-manual#section-core-places), then count the number of visits and normalize by population size. Note that these counts only include people whose visits are tracked because they are in SafeGraph’s panel; they do not include all bar visits by everyone in the population.
----
-Name: Restaurant Visits
-Id: safegraph-weekly
-Signal: restaurants_visit_prop
-
-
-SignalTooltip: Daily number of visits to restaurants per 100,000 people, based on SafeGraph’s Weekly Patterns dataset
- 
-Description: Delphi receives data from [SafeGraph](https://docs.safegraph.com/docs/weekly-patterns), which collects weekly insights on Points of Interest (POI) using anonymized location data from mobile phones. We select locations that qualify as "Full-Service Restaurants" from all the [core places]( https://docs.safegraph.com/v4.0/docs/places-manual#section-core-places), then count the number of visits and normalize by population size. Note that these counts only include people whose visits are tracked because they are in SafeGraph’s panel; they do not include all restaurant visits by everyone in the population.
----
 Name: People Wearing Masks
 Id: fb-survey
 Signal: smoothed_wwearing_mask_7d
 LinkFrom: [fb-survey-smoothed_wearing_mask_7d, fb-survey-smoothed_wearing_mask_5d]
-Highlight: [landing]
 
 
 SignalTooltip: Percentage of people who say they wear a mask most or all of the time while in public, based on surveys of Facebook users
@@ -33,9 +14,6 @@ Name: Vaccine Acceptance
 Id: fb-survey
 Signal: smoothed_wcovid_vaccinated_appointment_or_accept
 LinkFrom: [fb-survey-smoothed_covid_vaccinated_or_accept]
-Highlight: [landing, location]
-
-
 SignalTooltip: Percentage of people who either have already received a COVID vaccine, have an appointment to receive a COVID vaccine, or would definitely or probably choose to receive one if it were offered to them today, based on surveys of Facebook users
 
 
@@ -54,7 +32,6 @@ Name: COVID-Related Doctor Visits
 Id: doctor-visits
 Signal: smoothed_adj_cli
 Unit: per 100 visits
-Highlight: [landing, default]
 
 
 SignalTooltip: Percentage of daily doctor visits that are due to COVID-like symptoms
@@ -77,7 +54,6 @@ Name: COVID-Like Symptoms in Community
 Id: fb-survey
 Signal: smoothed_whh_cmnty_cli
 Unit: per 100 people
-Highlight: [landing, location]
 
 
 SignalTooltip: Percentage of people who know someone in their local community with COVID-like symptoms, based on surveys of Facebook users
@@ -85,11 +61,10 @@ SignalTooltip: Percentage of people who know someone in their local community wi
 
 Description: Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they, or anyone in their household, are currently experiencing COVID-related symptoms. We also ask them if they know anyone in their local community who has COVID-like or flu-like symptoms, defined here as fever along with either sore throat, cough, shortness of breath, or difficulty breathing.  For this indicator, we estimate the percentage of people who know someone, in their household or outside it, who has these symptoms. While many conditions can cause these symptoms, not just COVID, comparing the rates across the country can suggest where COVID is most active.
 ---
-Name: COVID Antigen Test Positivity (Quidel)
+Name: COVID Antigen Test Positivity
 Id: quidel-covid-ag
 Signal: covid_ag_smoothed_pct_positive
 Unit: per 100 tests
-Highlight: [landing]
 
 
 SignalTooltip: Positivity rate of COVID-19 antigen tests, based on data provided by Quidel, Inc.
@@ -97,22 +72,10 @@ SignalTooltip: Positivity rate of COVID-19 antigen tests, based on data provided
 
 Description: When a patient (whether at a doctor’s office, clinic, or hospital) has COVID-like symptoms, doctors may order an antigen test, which can detect parts of the virus that are present during an active infection. Quidel, a national provider of networked lab testing devices, provides us with data from every COVID antigen test that they conduct. We report the percentage of COVID antigen tests that are positive. Note that this signal only includes Quidel’s antigen tests, not those run by other test providers.
 ---
-Name: Claims-Based COVID Hospital Admissions
-Id: hospital-admissions
-Signal: smoothed_adj_covid19_from_claims
-Unit: per 100 admissions
-Highlight: [landing]
-
-
-SignalTooltip: Percentage of daily hospital admissions with COVID-19 associated diagnoses
-
-
-Description: Delphi receives from our health system partners aggregated statistics on COVID-related hospital admissions, derived from ICD codes found in insurance claims.  Using this data, we estimate the percentage of new hospital admissions each day that are related to COVID-19. Note that these estimates are based only on admissions by patients whose data is accessible to our partners, and address new hospital admissions each day, not all currently hospitalized patients who have COVID-related diagnoses.
----
 Name: COVID Cases
 Id: jhu-csse
 Signal: confirmed_7dav_incidence_prop
-Highlight: [landing]
+Highlight: [default]
 
 
 SignalTooltip: Newly reported COVID-19 cases per 100,000 people, based on data from Johns Hopkins University
@@ -120,10 +83,19 @@ SignalTooltip: Newly reported COVID-19 cases per 100,000 people, based on data f
 
 Description: This data shows the number of COVID-19 confirmed cases newly reported each day. It  reflects only cases reported by state and local health authorities. It is based on case counts compiled and made public by [a team at Johns Hopkins University](https://systems.jhu.edu/research/public-health/ncov/). The signal may not be directly comparable across regions with vastly different testing capacity or reporting criteria. 
 ---
+Name: COVID-19 Admissions
+Id: hhs
+Signal: confirmed_admissions_covid_1d_prop_7dav
+
+
+SignalTooltip: Confirmed COVID-19 hospital admissions per 100,000 people
+
+
+Description: The US Department of Health & Human Services (HHS) publishes several datasets on patient impact and hospital capacity. This data shows the number of confirmed COVID-19 hospital admissions each day, as reported to the HHS. 
+---
 Name: COVID Deaths
 Id: jhu-csse
 Signal: deaths_7dav_incidence_prop
-Highlight: [landing]
 
 
 SignalTooltip: Newly reported COVID-19 deaths per 100,000 people, based on data from Johns Hopkins University

@@ -11,7 +11,7 @@
   $: scaled = value != null && !Number.isNaN(value) ? value * 100 : null;
 
   $: base = loading ? '00' : scaled == null ? 'N/A' : Math.floor(scaled);
-  $: fraction = !loading ? Math.round(Math.abs(scaled)) % 100 : 0;
+  $: fraction = !loading ? Math.round(Math.abs(scaled) * 100) % 100 : 0;
 </script>
 
 <KPI text={sign(base, (v) => v.toLocaleString(), true)} sub={`.${fraction}%`} {loading} />

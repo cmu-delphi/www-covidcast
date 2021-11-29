@@ -62,7 +62,7 @@
     <div class="grid-3-11">
       <IndicatorAnnotations {date} {region} {sensor} range="sparkLine" />
       <FancyHeader invert sub="Summary">{sensor.name}</FancyHeader>
-      <IndicatorWarning {sensor} {date} {region} />
+      <IndicatorWarning {sensor} {date} {region} {fetcher} />
 
       <p>
         On {formatDateDayOfWeek(date.value)}

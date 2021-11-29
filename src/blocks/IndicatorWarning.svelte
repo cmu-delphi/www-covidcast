@@ -14,6 +14,14 @@
    * @type {import("../stores/params").RegionParam}
    */
   export let region;
+  /**
+   * @type {import("../stores/DataFetcher").DataFetcher}
+   */
+  export let fetcher;
+
+  function checkSensorData(sensor, date, region) {
+    return fetcher.fetch1Sensor1Region1DateDetails(sensor, region, date);
+  }
 </script>
 
 {#if !sensor.value.levels.includes(region.level)}
@@ -21,7 +29,11 @@
     The indicator "{sensor.name}" does not support the geographic level: {getLevelInfo(region.level).labelPlural}.
   </div>
 {:else if sensor.timeFrame.max < date.value}
-  <div data-uk-alert class="uk-alert-warning">
-    The indicator "{sensor.name}" is not available for {formatDateYearDayOfWeekAbbr(date.value)}, yet.
-  </div>
+  {#await checkSensorData(sensor, date, region) then hasData}
+    {#if !hasData}
+      <div data-uk-alert class="uk-alert-warning">
+        The indicator "{sensor.name}" is not available for {formatDateYearDayOfWeekAbbr(date.value)}, yet.
+      </div>
+    {/if}
+  {/await}
 {/if}
