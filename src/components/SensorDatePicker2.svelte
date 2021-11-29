@@ -47,7 +47,6 @@
         aria-label="selected date"
         class="selected-date picker-button"
         on:dblclick={() => (value = yesterdayDate)}
-        on:
       >
         <span class="selected-date-icon">
           {@html calendarIcon}

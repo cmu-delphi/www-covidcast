@@ -5,7 +5,7 @@ import { isCountSignal } from './signals';
 import { ALL_TIME_FRAME, TimeFrame } from './TimeFrame';
 import { Sensor, units, colorScales, vegaColorScales, yAxis, EpiDataMetaParsedInfo, SensorLike } from './sensor';
 import { formatSpecifiers, formatter } from '../formats';
-import { parse as parseMarkDown, parseInline } from 'marked';
+import { marked } from 'marked';
 
 function toKey(source: string, signal: string) {
   return `${source}-${signal}`;
@@ -89,7 +89,7 @@ function generateCredits(license: EpiDataMetaSourceInfo['license']) {
   if (known) {
     return `We are happy for you to use this data in products and publications under the terms of the <a href="${known.link}">${known.name}</a>.`;
   }
-  return parseInline(license);
+  return marked.parseInline(license);
 }
 
 export interface SensorSource
@@ -131,8 +131,8 @@ function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
           id: m.source,
           signal: m.signal,
           name: m.name,
-          description: m.description ? parseMarkDown(m.description.trim()) : '',
-          signalTooltip: m.short_description ? parseInline(m.short_description) : '',
+          description: m.description ? marked.parse(m.description.trim()) : '',
+          signalTooltip: m.short_description ? marked.parseInline(m.short_description) : '',
           valueScaleFactor: m.format === 'fraction' ? 100 : 1,
           format: m.format ?? 'raw',
           highValuesAre: m.high_values_are ?? 'neutral',
@@ -171,7 +171,7 @@ function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
         ...sm,
         link: sm.link,
         sensors,
-        description: sm.description ? parseMarkDown(sm.description.trim()) : '',
+        description: sm.description ? marked.parse(sm.description.trim()) : '',
         credits,
         referenceSensor: sm.reference_signal ? sensors.find((d) => d.signal === sm.reference_signal) : undefined,
       };
