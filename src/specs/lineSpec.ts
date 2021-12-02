@@ -5,6 +5,7 @@ import type { LayerSpec, NormalizedLayerSpec, NormalizedUnitSpec, TopLevelSpec }
 import { CURRENT_DATE_HIGHLIGHT } from '../components/vega/vegaSpecUtils';
 import type { Annotation } from '../data';
 import type { RegionInfo } from '../data/regions';
+import { toTimeValue } from '../data/utils';
 import { BASE_SPEC, commonConfig, CREDIT } from './commonSpec';
 
 // dark2
@@ -132,6 +133,7 @@ export function genAnnotationLayer(
     data: {
       values: annotations.map((a, i) => ({
         index: i,
+        uncertainty: a.uncertainty,
         start: a.dates[0] < dataDomain.min ? dataDomain.min : a.dates[0],
         end: a.dates[1] > dataDomain.max ? dataDomain.max : a.dates[1],
       })),
@@ -142,7 +144,6 @@ export function genAnnotationLayer(
           type: 'rect',
           tooltip: false,
           opacity: 0.1,
-          color: '#D46B08',
         },
         encoding: {
           x: {
@@ -153,18 +154,26 @@ export function genAnnotationLayer(
             field: 'end',
             type: 'temporal',
           },
+          color: {
+            condition: {
+              test: 'datum.uncertainty',
+              value: '#767676',
+            },
+            value: '#D46B08',
+          },
         },
       },
       {
         mark: {
           type: 'text',
-          color: '#D46B08',
           text:
             annotations.length > 1
               ? {
-                  expr: `'⚠ (' + (datum.index + 1) + ')'`,
+                  expr: `(datum.uncertainty ? 'ℹ️' : '⚠') + ' (' + (datum.index + 1) + ')'`,
                 }
-              : '⚠',
+              : {
+                  expr: `datum.uncertainty ? 'ℹ️' : '⚠'`,
+                },
           baseline: 'top',
           align: 'left',
           dx: 2,
@@ -178,9 +187,54 @@ export function genAnnotationLayer(
           y: {
             value: 0,
           },
+          color: {
+            condition: {
+              test: 'datum.uncertainty',
+              value: '#767676',
+            },
+            value: '#D46B08',
+          },
         },
       },
     ],
+  };
+}
+
+export function genUncertaintyLayer(
+  annotation: Annotation,
+  {
+    dateField = 'date_value',
+    valueField = 'value',
+  }: {
+    dateField?: string;
+    valueField?: string;
+  },
+): NormalizedUnitSpec {
+  const start = toTimeValue(annotation.dates[0]);
+  const end = toTimeValue(annotation.dates[1]);
+
+  return {
+    transform: [
+      {
+        filter: `datum.time_value >= ${start} && datum.time_value <= ${end}`,
+      },
+    ],
+    mark: {
+      type: 'line',
+      color: 'white',
+      point: false,
+      strokeDash: [2, 2],
+    },
+    encoding: {
+      x: {
+        field: dateField,
+        type: 'temporal',
+      },
+      y: {
+        field: valueField,
+        type: 'quantitative',
+      },
+    },
   };
 }
 

@@ -325,7 +325,7 @@ export interface EpiDataAnomaliesRow {
   explanation: string;
   source: string;
   signals: string; // * or a comma separated list "*"|(ID{\s*";"\s*ID}*)
-  dates: string; // YYYYMMDD-YYYYMMDD
+  dates: string; // YYYYMMDD-YYYYMMDD or -99 uncertainty days
   regions: string; //semicolor separated key value: e.g. GROUP("*"|(ID{","\s*ID}*)){\s*","\s*GROUP("*"|(ID{","\s*ID}*))}
   reference?: string;
 }
@@ -335,6 +335,6 @@ export function callAnomaliesAPI(): Promise<EpiDataAnomaliesRow[]> {
   url.searchParams.set('format', 'json');
   return fetchImpl<EpiDataAnomaliesRow[]>(url).catch((error) => {
     console.warn('failed fetching data', error);
-    return [];
+    return [] as EpiDataAnomaliesRow[];
   });
 }
