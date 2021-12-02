@@ -169,10 +169,10 @@ export function genAnnotationLayer(
           text:
             annotations.length > 1
               ? {
-                  expr: `(datum.uncertainty ? '🛈' : '⚠') + ' (' + (datum.index + 1) + ')'`,
+                  expr: `(datum.uncertainty ? 'ℹ️' : '⚠') + ' (' + (datum.index + 1) + ')'`,
                 }
               : {
-                  expr: `datum.uncertainty ? '🛈' : '⚠'`,
+                  expr: `datum.uncertainty ? 'ℹ️' : '⚠'`,
                 },
           baseline: 'top',
           align: 'left',
