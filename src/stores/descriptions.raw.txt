@@ -83,7 +83,7 @@ SignalTooltip: Newly reported COVID-19 cases per 100,000 people, based on data f
 
 Description: This data shows the number of COVID-19 confirmed cases newly reported each day. It  reflects only cases reported by state and local health authorities. It is based on case counts compiled and made public by [a team at Johns Hopkins University](https://systems.jhu.edu/research/public-health/ncov/). The signal may not be directly comparable across regions with vastly different testing capacity or reporting criteria. 
 ---
-Name: COVID-19 Admissions
+Name: COVID Hospital Admissions
 Id: hhs
 Signal: confirmed_admissions_covid_1d_prop_7dav
 
