@@ -43,6 +43,9 @@
       return generateRelatedCountySpec(region.value, options);
     }
     // state
+    if (region.level === 'state') {
+      options.initialRegion = [region.propertyId.toLowerCase()];
+    }
     return generateStateSpec(options);
   }
 
