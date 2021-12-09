@@ -1,4 +1,5 @@
 <script>
+  import mousePointerIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/regular/hand-pointer.svg';
   import { groupedSensorList } from '../../stores';
   import FancyHeader from '../../components/FancyHeader.svelte';
   import { SensorParam } from '../../stores/params';
@@ -101,6 +102,12 @@
 <div class="uk-position-relative">
   <FancyHeader sub="Indicators Table">COVID-19</FancyHeader>
   <DownloadMenu {fileName} data={dumpData} absolutePos prepareRow={(row) => row} />
+  <p class="uk-text-center uk-text-italic">
+    <span class="inline-svg-icon">
+      {@html mousePointerIcon}
+    </span>
+    Click on an indicator name to show details
+  </p>
 </div>
 
 <table class="mobile-table">
