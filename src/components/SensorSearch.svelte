@@ -34,7 +34,11 @@
   on:add
 >
   <svelte:fragment slot="entry" let:label let:item let:onClick>
-    <a class="sensor-search-elem" href="?signal={item ? item.key : ''}" on:click|preventDefault={onClick}>
+    <a
+      class="search-box-link sensor-search-elem"
+      href="?signal={item ? item.key : ''}"
+      on:click|preventDefault={onClick}
+    >
       {@html label}
     </a>
     <div>
