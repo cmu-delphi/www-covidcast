@@ -1,5 +1,8 @@
 import descriptions from './descriptions.generated.json';
 import { modeByID } from '../modes';
+import { yesterdayDate } from '../data/TimeFrame';
+import { toTimeValue } from '../data/utils';
+import { timeDay } from 'd3-time';
 
 export * from '../data/geoLevel';
 export type { Sensor } from '../data/sensor';
@@ -63,3 +66,5 @@ export const DEFAULT_SURVEY_SENSOR = (() => {
   }
   return DEFAULT_SENSOR;
 })();
+
+export const DEFAULT_DATE = toTimeValue(timeDay.offset(yesterdayDate, -1)).toString();
