@@ -34,7 +34,7 @@
 >
   <svelte:fragment slot="entry" let:label let:item let:onClick>
     <a
-      class="sensor-search-elem"
+      class="search-box-link sensor-search-elem"
       href="?sensor={item ? `${item.source}-${item.reference_signal}` : ''}"
       on:click|preventDefault={onClick}
     >

@@ -465,7 +465,7 @@
     padding: 0 2px 6px 40px;
   }
 
-  .search-box-link {
+  .search-box-list :global(.search-box-link) {
     display: inline-block;
   }
 
