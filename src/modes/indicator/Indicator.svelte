@@ -26,7 +26,9 @@
   $: date = new DateParam($currentDateObject);
   $: region = new RegionParam($currentRegionInfo);
 
-  const items = [nationInfo, ...stateInfo, ...countyInfo];
+  const stateItems = [nationInfo, ...stateInfo];
+  const countyItems = [...stateItems, ...countyInfo];
+  $: items = sensor.value.levels.includes('county') ? countyItems : stateItems;
 
   const fetcher = new DataFetcher();
   $: {

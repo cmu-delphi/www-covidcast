@@ -30,15 +30,16 @@
    * @param {import("../../stores/params").RegionParam} region
    */
   function genSpec(sensor, region) {
+    const hasCounty = sensor.value.levels.includes('county');
     const options = {
-      domain: sensor.domain(region.level === 'state' || region.level === 'county' ? 'county' : 'state'),
+      domain: sensor.domain((region.level === 'state' || region.level === 'county') && hasCounty ? 'county' : 'state'),
       withStates: true,
       scheme: sensor.value.vegaColorScale,
     };
-    if (region.level === 'state') {
+    if (region.level === 'state' && hasCounty) {
       return generateCountiesOfStateSpec(region.value, options);
     }
-    if (region.level === 'county') {
+    if (region.level === 'county' && hasCounty) {
       return generateRelatedCountySpec(region.value, options);
     }
     // state
@@ -51,7 +52,8 @@
    * @param {import("../../stores/params").RegionParam} region
    */
   function loadData(sensor, date, region) {
-    if (region.level === 'state') {
+    const hasCounty = sensor.value.levels.includes('county');
+    if (region.level === 'state' && hasCounty) {
       const counties = getCountiesOfState(region.value);
       const countyData = fetcher.fetch1SensorNRegions1Date(
         sensor,
@@ -61,15 +63,16 @@
       const stateData = fetcher.fetch1SensorNRegions1Date(sensor, 'state', date);
       return Promise.all([countyData, stateData]).then((r) => r.flat());
     }
-    if (region.level === 'county') {
+    if (region.level === 'county' && hasCounty) {
       return fetcher.fetch1SensorNRegions1Date(sensor, 'county', date);
     }
     return fetcher.fetch1SensorNRegions1Date(sensor, 'state', date);
   }
 
   function generateFileName(sensor, date, region) {
-    let regionName = region.level === 'nation' ? 'US States' : 'US Counties';
-    if (region.level === 'state') {
+    const hasCounty = sensor.value.levels.includes('county');
+    let regionName = region.level === 'nation' || !hasCounty ? 'US States' : 'US Counties';
+    if (region.level === 'state' && hasCounty) {
       regionName = `${region.displayName} Counties`;
     }
     return `${sensor.name}_${regionName}_${formatDateISO(date.value)}`;
