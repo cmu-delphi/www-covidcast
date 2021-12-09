@@ -174,6 +174,7 @@
 .mobile-table-chart {
   position: relative;
   height: 45px;
+  min-width: 6em;
 }
 
 .mobile-table-chart-small {
