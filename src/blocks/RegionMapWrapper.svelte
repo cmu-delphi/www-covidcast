@@ -27,9 +27,7 @@
 {#if region.level === 'nation'}
   <p class="uk-text-center">Click on a state to show this region</p>
   <div class="toggle-center-wrapper">
-    <Toggle bind:checked={showCounties} before="Show US States as Beehive Grid">
-      Show US Counties as Choropleth Map
-    </Toggle>
+    <Toggle bind:checked={showCounties} before="Beehive Grid">Choropleth Map</Toggle>
   </div>
   {#if showCounties}
     <RegionCountyMap {region} {date} {sensor} {fetcher} />
