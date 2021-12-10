@@ -115,8 +115,8 @@
     <tr>
       <th class="mobile-th"><span /></th>
       <th class="mobile-th"><span>Indicator</span></th>
-      <th class="mobile-th uk-text-right"><span>Relative Change Last 7 Days</span></th>
       <th class="mobile-th uk-text-right" colspan="2"><span>Value</span></th>
+      <th class="mobile-th uk-text-right"><span>Relative Change to Previous Week</span></th>
       <th class="mobile-th uk-text-right">
         <span>historical trend</span>
         <div class="mobile-th-range">
@@ -152,17 +152,6 @@
               ({cleanSource(entry.sensor.value.dataSourceName)})
             </a>
           </td>
-          <td class="uk-text-right bold-value">
-            {#await entry.latest}
-              ?
-            {:then t}
-              {#if t == null || t.value == null || Number.isNaN(t.value) || t.change == null}
-                N/A
-              {:else}
-                {formatFraction(t.change, true)}
-              {/if}
-            {/await}
-          </td>
           <td class="uk-text-right bold-value table-value">
             {#await entry.latest}
               ?
@@ -178,6 +167,17 @@
             {#await entry.latest then t}
               {#if t != null && t.value != null && !Number.isNaN(t.value)}
                 <SensorUnit sensor={entry.sensor} />
+              {/if}
+            {/await}
+          </td>
+          <td class="uk-text-right bold-value">
+            {#await entry.latest}
+              ?
+            {:then t}
+              {#if t == null || t.value == null || Number.isNaN(t.value) || t.change == null}
+                N/A
+              {:else}
+                {formatFraction(t.change, true)}
               {/if}
             {/await}
           </td>

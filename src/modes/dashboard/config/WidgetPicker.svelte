@@ -26,7 +26,7 @@
     }}
   >
     <svelte:fragment slot="entry" let:item let:label let:onClick>
-      <a href="?signal={item ? item.key : ''}" on:click|preventDefault={onClick}>
+      <a href="?signal={item ? item.key : ''}" on:click|preventDefault={onClick} class="search-box-link">
         {@html label}
         {#if item}
           <span class="uk-badge widget-type" data-type={item.type}>{item.type}</span>

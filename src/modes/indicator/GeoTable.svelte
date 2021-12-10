@@ -195,8 +195,8 @@
   <thead>
     <tr>
       <th class="mobile-th">{title.unit}</th>
-      <th class="mobile-th uk-text-right"><span>Relative Change Last 7 Days</span></th>
-      <th class="mobile-th uk-text-right" colspan="2">{sensor.unitShort}</th>
+      <th class="mobile-th uk-text-right" colspan="2">Value</th>
+      <th class="mobile-th uk-text-right"><span>Relative Change to Previous Week</span></th>
       <th class="mobile-th uk-text-right">
         <span>historical trend</span>
         <div class="mobile-th-range">
@@ -209,11 +209,11 @@
       <th class="sort-indicator uk-text-center">
         <SortColumnIndicator label={title.unit} {sort} prop="displayName" />
       </th>
-      <th class="sort-indicator">
-        <SortColumnIndicator label="Change Last 7 days" {sort} prop="delta" />
-      </th>
       <th class="sort-indicator" colspan="2">
         <SortColumnIndicator label="Value" {sort} prop="value" />
+      </th>
+      <th class="sort-indicator">
+        <SortColumnIndicator label="Change Last 7 days" {sort} prop="delta" />
       </th>
       <th class="sort-indicator" />
     </tr>
@@ -227,13 +227,6 @@
             >{r.displayName}</a
           >
         </td>
-        <td class="uk-text-right bold-value">
-          {#if r.trendObj == null || r.trendObj.value == null || Number.isNaN(r.value) || r.trendObj.change == null}
-            N/A
-          {:else}
-            {formatFraction(r.trendObj.change, true)}
-          {/if}
-        </td>
         <td class="uk-text-right bold-value table-value">
           {#if r.value == null || Number.isNaN(r.value)}
             N/A
@@ -244,6 +237,13 @@
         <td class="bold-value table-unit">
           {#if r.value != null && !Number.isNaN(r.value)}
             <SensorUnit {sensor} />
+          {/if}
+        </td>
+        <td class="uk-text-right bold-value">
+          {#if r.trendObj == null || r.trendObj.value == null || Number.isNaN(r.value) || r.trendObj.change == null}
+            N/A
+          {:else}
+            {formatFraction(r.trendObj.change, true)}
           {/if}
         </td>
         <td>

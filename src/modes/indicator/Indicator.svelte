@@ -76,9 +76,11 @@
       <IndicatorOverview {sensor} {date} {region} {fetcher} />
       <RegionOverview {region} />
       <hr />
-      <FancyHeader invert sub="Map" anchor="map">{sensor.name}</FancyHeader>
-      <RegionMapWrapper {sensor} {date} {region} {fetcher} />
-      <hr />
+      {#if !sensor.value.noMaps}
+        <FancyHeader invert sub="Map" anchor="map">{sensor.name}</FancyHeader>
+        <RegionMapWrapper {sensor} {date} {region} {fetcher} />
+        <hr />
+      {/if}
       <FancyHeader invert sub="Chart" anchor="chart">{sensor.name}</FancyHeader>
       <div class="chart-300">
         <HistoryLineChart {sensor} {date} {region} {fetcher} />
