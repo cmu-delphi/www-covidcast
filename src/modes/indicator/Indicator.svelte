@@ -53,7 +53,9 @@
         <button class="mobile-back inline-svg-icon" on:click={switchMode} title="Back">
           {@html chevronLeftIcon}
         </button>
-        Explore an <span>Indicator</span>
+        Explore an <span>Indicator</span> (<a class="uk-link-muted" href="?mode=summary" on:click={switchMode}
+          >or <span>Location</span></a
+        >)
       </h2>
     </div>
     <div class="uk-container content-grid uk-margin-remove-vertical">
