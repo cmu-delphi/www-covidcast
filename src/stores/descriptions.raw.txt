@@ -23,10 +23,11 @@ Name: COVID Symptom Searches on Google
 Id: google-symptoms
 Signal: sum_anosmia_ageusia_smoothed_search
 Unit: scaled search volume
+noMaps: true
  
 SignalTooltip: Google search volume of COVID-related symptom searches
  
-Description: Using Google Symptoms Searches, Delphi obtains the sum of Google search volumes for anosmia (loss of smell) related searches and ageusia (loss of taste) related searches in each area, since they emerged as unusual symptoms that are indicative of COVID-19. Note that the sum of two symptom search volumes is not equivalent to the union of anosmia and ageusia related searches. According to Google, the estimates are not comparable across regions since the values are normalized by population and scaled by region-specific maximum popularity at a particular time point.
+Description: Using Google Symptoms Searches, Delphi obtains the sum of Google search volumes for anosmia (loss of smell) related searches and ageusia (loss of taste) related searches in each area, since they emerged as unusual symptoms that are indicative of COVID-19. Note that the sum of two symptom search volumes is not equivalent to the union of anosmia and ageusia related searches. According to Google, the estimates are not comparable across regions since the values are normalized by population and scaled by region-specific maximum popularity (and for this reason, we omit beehive grids of choropleth maps of this signal on the dashboard).
 ---
 Name: COVID-Related Doctor Visits
 Id: doctor-visits
