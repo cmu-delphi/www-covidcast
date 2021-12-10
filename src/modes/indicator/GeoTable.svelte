@@ -187,7 +187,7 @@
     <span class="inline-svg-icon">
       {@html mousePointerIcon}
     </span>
-    Click on a region name to explore furthre
+    Click on a region name to explore further
   </p>
 </div>
 

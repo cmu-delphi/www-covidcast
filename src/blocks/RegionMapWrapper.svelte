@@ -30,7 +30,7 @@
     <span class="inline-svg-icon">
       {@html mousePointerIcon}
     </span>
-    Click on a state to show this region
+    Click on a state to explore further
   </p>
   <div class="toggle-center-wrapper">
     <Toggle bind:checked={showCounties} before="Beehive Grid">Choropleth Map</Toggle>
