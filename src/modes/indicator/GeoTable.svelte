@@ -183,11 +183,11 @@
 <div class="uk-position-relative">
   <FancyHeader anchor="table">{title.title}</FancyHeader>
   <DownloadMenu {fileName} data={loadedData} absolutePos prepareRow={(row) => row.dump} />
-  <p class="uk-text-center uk-text-italic">
+  <p class="uk-text-center uk-text-italic ux-hint">
     <span class="inline-svg-icon">
       {@html mousePointerIcon}
     </span>
-    Click on a region name to show details
+    Click on a region name to explore furthre
   </p>
 </div>
 
@@ -299,5 +299,9 @@
 
   .table-unit {
     padding-left: 1px !important;
+  }
+
+  .ux-hint {
+    font-size: 90%;
   }
 </style>

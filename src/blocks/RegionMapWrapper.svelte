@@ -26,7 +26,7 @@
 </script>
 
 {#if region.level === 'nation'}
-  <p class="uk-text-center uk-text-italic">
+  <p class="uk-text-center uk-text-italic ux-hint">
     <span class="inline-svg-icon">
       {@html mousePointerIcon}
     </span>
@@ -55,5 +55,9 @@
   .toggle-center-wrapper > :global(* > svg) {
     margin-left: -0.4em;
     margin-right: 1.4em;
+  }
+
+  .ux-hint {
+    font-size: 90%;
   }
 </style>

@@ -102,11 +102,11 @@
 <div class="uk-position-relative">
   <FancyHeader sub="Indicators Table">COVID-19</FancyHeader>
   <DownloadMenu {fileName} data={dumpData} absolutePos prepareRow={(row) => row} />
-  <p class="uk-text-center uk-text-italic">
+  <p class="uk-text-center uk-text-italic ux-hint">
     <span class="inline-svg-icon">
       {@html mousePointerIcon}
     </span>
-    Click on an indicator name to show details
+    Click on an indicator name to explore further
   </p>
 </div>
 
@@ -236,5 +236,9 @@
 
   .chart-table-cell {
     padding-bottom: 0 !important;
+  }
+
+  .ux-hint {
+    font-size: 90%;
   }
 </style>
