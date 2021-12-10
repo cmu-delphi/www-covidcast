@@ -17,6 +17,8 @@ export interface SensorConfig {
 
   unit?: string;
 
+  noMaps?: boolean;
+
   readonly highlight?: string[];
   readonly linkFrom?: string[];
 }
