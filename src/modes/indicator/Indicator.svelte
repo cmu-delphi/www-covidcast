@@ -48,11 +48,15 @@
 
 <div class="mobile-root">
   <RegionDatePicker sensor={sensor.value} {items} defaultItem={nationInfo} placeholder="Search by State or County">
-    <div class="grid-3-11 mobile-header-line" slot="title">
-      <button class="mobile-back inline-svg-icon" on:click={switchMode}>
-        {@html chevronLeftIcon}
-      </button>
-      <h2>Explore an <span>Indicator</span></h2>
+    <div class="grid-3-11 mobile-header-line mobile-back-line" slot="title">
+      <h2>
+        <button class="mobile-back inline-svg-icon" on:click={switchMode} title="Back">
+          {@html chevronLeftIcon}
+        </button>
+        Explore an <span>Indicator</span> (<a class="uk-link-muted" href="?mode=summary" on:click={switchMode}
+          >or <span>Location</span></a
+        >)
+      </h2>
     </div>
     <div class="uk-container content-grid uk-margin-remove-vertical">
       <IndicatorDropdown {sensor} />

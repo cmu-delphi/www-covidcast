@@ -1,4 +1,5 @@
 <script>
+  import mousePointerIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/regular/hand-pointer.svg';
   import RegionCountyMap from './RegionCountyMap.svelte';
   import RegionHexMap from './RegionHexMap.svelte';
   import RegionMap from './RegionMap.svelte';
@@ -25,7 +26,12 @@
 </script>
 
 {#if region.level === 'nation'}
-  <p class="uk-text-center">Click on a state to show this region</p>
+  <p class="uk-text-center uk-text-italic ux-hint">
+    <span class="inline-svg-icon">
+      {@html mousePointerIcon}
+    </span>
+    Click on a state to explore further
+  </p>
   <div class="toggle-center-wrapper">
     <Toggle bind:checked={showCounties} before="Beehive Grid">Choropleth Map</Toggle>
   </div>
@@ -49,5 +55,9 @@
   .toggle-center-wrapper > :global(* > svg) {
     margin-left: -0.4em;
     margin-right: 1.4em;
+  }
+
+  .ux-hint {
+    font-size: 90%;
   }
 </style>

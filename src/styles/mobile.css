@@ -69,15 +69,29 @@
   text-transform: uppercase;
 }
 
+.mobile-header-line a.uk-link-muted,
+.mobile-header-line a.uk-link-muted:visited {
+  color: inherit !important;
+}
+
 @media only screen and (min-width: 750px) {
   .mobile-header-line h2 {
     font-size: 1.125rem;
   }
 }
 
+.mobile-back-line {
+  display: flex;
+  justify-content: center;
+}
+
+.mobile-back-line h2 {
+  position: relative;
+}
+
 .mobile-back {
   position: absolute;
-  left: 1em;
+  left: -1.5em;
   top: 0;
   height: 100%;
   width: 0.7em;
@@ -87,6 +101,11 @@
   background: none;
   margin: 0;
   padding: 0;
+  cursor: pointer;
+}
+
+.mobile-back:hover {
+  opacity: 0.5;
 }
 
 .mobile-th {
