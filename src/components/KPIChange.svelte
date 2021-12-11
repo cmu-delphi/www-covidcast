@@ -14,4 +14,8 @@
   $: fraction = !loading ? Math.round(Math.abs(scaled) * 100) % 100 : 0;
 </script>
 
-<KPI text={sign(base, (v) => v.toLocaleString(), true)} sub={`.${fraction}%`} {loading} />
+{#if scaled == null}
+  <KPI text={sign(base, (v) => v.toLocaleString(), true)} {loading} />
+{:else}
+  <KPI text={sign(base, (v) => v.toLocaleString(), true)} sub={`.${fraction}%`} {loading} />
+{/if}
