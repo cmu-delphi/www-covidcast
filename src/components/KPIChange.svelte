@@ -15,7 +15,7 @@
 </script>
 
 {#if scaled == null}
-  <KPI text={sign(base, (v) => v.toLocaleString(), true)} {loading} />
+  <KPI text={base.toString()} {loading} />
 {:else}
   <KPI text={sign(base, (v) => v.toLocaleString(), true)} sub={`.${fraction}%`} {loading} />
 {/if}
