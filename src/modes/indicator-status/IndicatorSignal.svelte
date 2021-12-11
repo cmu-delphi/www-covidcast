@@ -38,11 +38,13 @@
 
 <div class="mobile-root">
   <div class="mobile-header-line-bg">
-    <div class="mobile-header-line">
-      <button class="mobile-back inline-svg-icon" on:click={switchMode}>
-        {@html chevronLeftIcon}
-      </button>
-      <h2>Indicator Status of <span>{name}</span></h2>
+    <div class="mobile-header-line mobile-back-line">
+      <h2>
+        <button class="mobile-back inline-svg-icon" on:click={switchMode}>
+          {@html chevronLeftIcon}
+        </button>
+        Indicator Status of <span>{name}</span>
+      </h2>
     </div>
     <div class="uk-container content-grid">
       <SensorSearch

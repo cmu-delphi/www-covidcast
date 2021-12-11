@@ -323,7 +323,7 @@
 />
 
 <div class="buttons">
-  <Toggle bind:checked={zero}>Include 0 in Y-axis</Toggle>
+  <Toggle bind:checked={zero}>Include 0 in Y Axis</Toggle>
   {#if sensor.rawValue != null && !($isMobileDevice && showAllDates)}
     <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
   {/if}

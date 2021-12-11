@@ -3,6 +3,7 @@ import {
   DEFAULT_MODE,
   DEFAULT_SENSOR,
   DEFAULT_SURVEY_SENSOR,
+  DEFAULT_DATE,
   resolveSensorWithAliases,
   sensorConfig,
 } from './constants';
@@ -15,7 +16,6 @@ import type { RegionInfo, RegionLevel } from '../data/regions';
 import { MetaDataManager } from '../data/meta';
 import { callMetaAPI } from '../data/api';
 import { Sensor, sensorTypes } from '../data/sensor';
-import { yesterday } from '../data/TimeFrame';
 
 export const appReady = writable(false);
 
@@ -47,7 +47,7 @@ function deriveFromPath(url: Location) {
   return {
     mode: modeObj,
     sensor: resolveSensor,
-    date: /\d{8}/.test(date) ? date : yesterday,
+    date: /\d{8}/.test(date) ? date : DEFAULT_DATE,
     region: urlParams.get('region') || '',
   };
 }
@@ -225,7 +225,7 @@ export const trackedUrlParams = derived(
         mode === modeByID.summary || mode === modeByID['survey-results'] || sensor === DEFAULT_SENSOR ? null : sensor,
       region: mode === modeByID.export ? null : region,
       date:
-        String(date) === yesterday || mode === modeByID.export || mode === modeByID['indicator-status']
+        String(date) === DEFAULT_DATE || mode === modeByID.export || mode === modeByID['indicator-status']
           ? null
           : String(date),
     };
