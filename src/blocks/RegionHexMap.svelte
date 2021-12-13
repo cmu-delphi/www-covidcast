@@ -86,7 +86,7 @@
     interactive: false,
     domain: date.sparkLineTimeFrame.domain,
   });
-  $: colorScale = sensor.createColorScale(region.level);
+  $: colorScale = sensor.createColorScale('state');
   $: dumpData = Promise.all(tileData.map((d) => d.dump)).then((rows) => rows.flat());
 
   const maxColumn = state2TileCell.reduce((acc, v) => Math.max(acc, v.x), 0) + 1;

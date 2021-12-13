@@ -91,7 +91,7 @@
       {#await casesTrend}
         <KPIChange value={null} loading />
       {:then d}
-        <KPIChange value={d ? d.change : null} />
+        <KPIChange value={d && d.value != null && !Number.isNaN(d.value) ? d.change : null} />
       {/await}
     </div>
     <div class="sub">Relative change to 7 days ago</div>
@@ -101,7 +101,7 @@
       {#await hospitalTrend}
         <KPIChange value={null} loading />
       {:then d}
-        <KPIChange value={d ? d.change : null} />
+        <KPIChange value={d && d.value != null && !Number.isNaN(d.value) ? d.change : null} />
       {/await}
     </div>
     <div class="sub">Relative change to 7 days ago</div>
@@ -111,7 +111,7 @@
       {#await deathTrend}
         <KPIChange value={null} loading />
       {:then d}
-        <KPIChange value={d ? d.change : null} />
+        <KPIChange value={d && d.value != null && !Number.isNaN(d.value) ? d.change : null} />
       {/await}
     </div>
     <div class="sub">Relative change to 7 days ago</div>

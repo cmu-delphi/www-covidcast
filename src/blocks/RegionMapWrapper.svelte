@@ -22,7 +22,8 @@
    */
   export let fetcher;
 
-  let showCounties = false;
+  $: hasCounties = sensor.value.levels.includes('county');
+  let showChoropleth = false;
 </script>
 
 {#if region.level === 'nation'}
@@ -33,10 +34,14 @@
     Click on a state to explore further
   </p>
   <div class="toggle-center-wrapper">
-    <Toggle bind:checked={showCounties} before="Beehive Grid">Choropleth Map</Toggle>
+    <Toggle bind:checked={showChoropleth} before="Beehive Grid">Choropleth Map</Toggle>
   </div>
-  {#if showCounties}
-    <RegionCountyMap {region} {date} {sensor} {fetcher} />
+  {#if showChoropleth}
+    {#if hasCounties}
+      <RegionCountyMap {region} {date} {sensor} {fetcher} />
+    {:else}
+      <RegionMap {region} {date} {sensor} {fetcher} />
+    {/if}
   {:else}
     <RegionHexMap {region} {date} {sensor} {fetcher} />
   {/if}
