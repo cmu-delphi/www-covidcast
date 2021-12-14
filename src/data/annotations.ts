@@ -23,6 +23,11 @@ function parseDates(dates: string): [Date, Date] {
   if (!dates) {
     return [new Date(), new Date()];
   }
+  if (/-\d+/.test(dates)) {
+    const uncertaintyDays = Number.parseInt(dates);
+    const today = timeDay.floor(new Date());
+    return [timeDay.offset(today, uncertaintyDays), today];
+  }
   const dateParts = dates
     .trim()
     .split('-')
@@ -66,16 +71,18 @@ export class Annotation {
   readonly signals: '*' | Set<string>;
   readonly dates: [Date, Date];
   readonly regions: { level: RegionLevel; ids: '*' | Set<string> }[];
+  readonly uncertainty: boolean;
   readonly reference?: string;
 
   constructor(raw: EpiDataAnomaliesRow) {
+    this.source = raw.source.trim();
     this.problem = raw.problem;
     this.explanation = raw.explanation;
-    this.source = raw.source.trim();
     this.signals = parseSignals(raw.signals);
     this.dates = parseDates(raw.dates);
     this.regions = parseRegions(raw.regions);
     this.reference = raw.reference;
+    this.uncertainty = /-\d+/.test(raw.dates);
   }
 
   /**
@@ -131,13 +138,25 @@ function sortByDate(annotationA: Annotation, annotationB: Annotation) {
 export class AnnotationManager {
   constructor(public readonly annotations: Annotation[] = []) {}
 
-  getRegionAnnotations(region: RegionInfo | RegionInfo[], date: Date): Annotation[] {
+  getRegionAnnotations(region: RegionInfo | RegionInfo[], date: Date, includeUncertainty = false): Annotation[] {
     return this.annotations
-      .filter((d) => region != null && d.matchRegion(region) && date != null && d.matchDate(date))
+      .filter(
+        (d) =>
+          region != null &&
+          d.matchRegion(region) &&
+          date != null &&
+          d.matchDate(date) &&
+          (includeUncertainty || !d.uncertainty),
+      )
       .sort(sortByDate);
   }
 
-  getAnnotations(sensor: { id: string; signal: string }, region: RegionInfo | RegionInfo[], date: Date): Annotation[] {
+  getAnnotations(
+    sensor: { id: string; signal: string },
+    region: RegionInfo | RegionInfo[],
+    date: Date,
+    includeUncertainty = false,
+  ): Annotation[] {
     return this.annotations
       .filter(
         (d) =>
@@ -146,7 +165,8 @@ export class AnnotationManager {
           region != null &&
           d.matchRegion(region) &&
           date != null &&
-          d.matchDate(date),
+          d.matchDate(date) &&
+          (includeUncertainty || !d.uncertainty),
       )
       .sort(sortByDate);
   }
@@ -156,6 +176,7 @@ export class AnnotationManager {
     region: RegionInfo | RegionInfo[],
     dateStart: Date,
     dateEnd: Date,
+    includeUncertainty = false,
   ): Annotation[] {
     return this.annotations
       .filter(
@@ -164,7 +185,8 @@ export class AnnotationManager {
           d.matchSensor(sensor) &&
           region != null &&
           d.matchRegion(region) &&
-          d.inDateRange(dateStart, dateEnd),
+          d.inDateRange(dateStart, dateEnd) &&
+          (includeUncertainty || !d.uncertainty),
       )
       .sort(sortByDate);
   }
@@ -174,6 +196,7 @@ export class AnnotationManager {
     level: RegionLevel,
     dateStart: Date,
     dateEnd: Date,
+    includeUncertainty = false,
   ): Annotation[] {
     return this.annotations
       .filter(
@@ -182,7 +205,8 @@ export class AnnotationManager {
           d.matchSensor(sensor) &&
           level != null &&
           d.matchRegionLevel(level) &&
-          d.inDateRange(dateStart, dateEnd),
+          d.inDateRange(dateStart, dateEnd) &&
+          (includeUncertainty || !d.uncertainty),
       )
       .sort(sortByDate);
   }

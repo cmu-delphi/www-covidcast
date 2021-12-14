@@ -69,15 +69,29 @@
   text-transform: uppercase;
 }
 
+.mobile-header-line a.uk-link-muted,
+.mobile-header-line a.uk-link-muted:visited {
+  color: inherit !important;
+}
+
 @media only screen and (min-width: 750px) {
   .mobile-header-line h2 {
     font-size: 1.125rem;
   }
 }
 
+.mobile-back-line {
+  display: flex;
+  justify-content: center;
+}
+
+.mobile-back-line h2 {
+  position: relative;
+}
+
 .mobile-back {
   position: absolute;
-  left: 1em;
+  left: -1.5em;
   top: 0;
   height: 100%;
   width: 0.7em;
@@ -87,6 +101,11 @@
   background: none;
   margin: 0;
   padding: 0;
+  cursor: pointer;
+}
+
+.mobile-back:hover {
+  opacity: 0.5;
 }
 
 .mobile-th {
@@ -171,21 +190,10 @@
   background: #fafafc;
 }
 
-.mobile-table > tbody > tr.row-group,
-.mobile-table > tbody > tr.has-addon {
-  border-bottom: none;
-}
-.mobile-table > tbody > tr.has-addon > td {
-  padding-bottom: 0.1rem;
-}
-.mobile-table > tbody > tr.addon > td {
-  padding: 0 4px 0.75rem 4px;
-}
-
 .mobile-table-chart {
-  margin: 4px;
   position: relative;
-  height: 4em;
+  height: 45px;
+  min-width: 6em;
 }
 
 .mobile-table-chart-small {
@@ -239,7 +247,15 @@
   height: 100%;
 }
 
+.chart-breakout-wrapper {
+  position: relative;
+}
+.chart-breakout-container {
+  position: relative;
+}
+
 .chart-breakout.vega-embed,
+.chart-breakout.chart-breakout-container,
 .chart-breakout > .vega-embed {
   --max-width: 95vw;
   /* breakout the chart up to 80vw */
@@ -249,6 +265,7 @@
 
 @media only screen and (min-width: 1600px) {
   .chart-breakout.vega-embed,
+  .chart-breakout.chart-breakout-container,
   .chart-breakout > .vega-embed {
     --max-width: 80vw;
   }
@@ -262,6 +279,15 @@
 .mobile-two-col {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-auto-flow: row;
+  column-gap: 1em;
+  row-gap: 0.5em;
+  font-size: 0.75rem;
+}
+
+.mobile-three-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
   grid-auto-flow: row;
   column-gap: 1em;
   row-gap: 0.5em;

@@ -172,9 +172,11 @@ module.exports = () => {
     },
 
     devServer: {
-      contentBase: [path.join(__dirname, 'public'), path.join(__dirname, 'src/assets')],
-      contentBasePublicPath: ['/', '/assets'],
-      watchContentBase: true,
+      static: {
+        directory: path.join(__dirname, 'public'),
+        publicPath: '/',
+        watch: true,
+      },
       host: 'localhost',
       hot: devMode,
     },
@@ -194,22 +196,12 @@ module.exports = () => {
       new HtmlWebpackPlugin({
         title: 'COVIDcast',
         template: './src/index.html',
-        filename: 'landing/index.html',
-      }),
-      new HtmlWebpackPlugin({
-        title: 'COVIDcast',
-        template: './src/index.html',
         filename: 'summary/index.html',
       }),
       new HtmlWebpackPlugin({
         title: 'COVIDcast Indicator Details',
         template: './src/index.html',
         filename: 'indicator/index.html',
-      }),
-      new HtmlWebpackPlugin({
-        title: 'COVIDcast Indicator Correlation',
-        template: './src/index.html',
-        filename: 'correlation/index.html',
       }),
       new HtmlWebpackPlugin({
         title: 'COVIDcast Export Data',

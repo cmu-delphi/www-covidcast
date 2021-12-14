@@ -19,7 +19,6 @@
   import { scrollIntoView } from '../../util';
   import IndicatorWarning from '../../blocks/IndicatorWarning.svelte';
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
-  import IndicatorCorrelation from './IndicatorCorrelation.svelte';
   import MaxDateHint from '../../blocks/MaxDateHint.svelte';
   import { DataFetcher } from '../../stores/DataFetcher';
 
@@ -27,7 +26,9 @@
   $: date = new DateParam($currentDateObject);
   $: region = new RegionParam($currentRegionInfo);
 
-  const items = [nationInfo, ...stateInfo, ...countyInfo];
+  const stateItems = [nationInfo, ...stateInfo];
+  const countyItems = [...stateItems, ...countyInfo];
+  $: items = sensor.value.levels.includes('county') ? countyItems : stateItems;
 
   const fetcher = new DataFetcher();
   $: {
@@ -49,11 +50,15 @@
 
 <div class="mobile-root">
   <RegionDatePicker sensor={sensor.value} {items} defaultItem={nationInfo} placeholder="Search by State or County">
-    <div class="grid-3-11 mobile-header-line" slot="title">
-      <button class="mobile-back inline-svg-icon" on:click={switchMode}>
-        {@html chevronLeftIcon}
-      </button>
-      <h2>Explore an <span>Indicator</span></h2>
+    <div class="grid-3-11 mobile-header-line mobile-back-line" slot="title">
+      <h2>
+        <button class="mobile-back inline-svg-icon" on:click={switchMode} title="Back">
+          {@html chevronLeftIcon}
+        </button>
+        Explore an <span>Indicator</span> (<a class="uk-link-muted" href="?mode=summary" on:click={switchMode}
+          >or <span>Location</span></a
+        >)
+      </h2>
     </div>
     <div class="uk-container content-grid uk-margin-remove-vertical">
       <IndicatorDropdown {sensor} />
@@ -63,7 +68,7 @@
     <div class="grid-3-11">
       <IndicatorAnnotations {date} {region} {sensor} range="sparkLine" />
       <FancyHeader invert sub="Summary">{sensor.name}</FancyHeader>
-      <IndicatorWarning {sensor} {date} {region} />
+      <IndicatorWarning {sensor} {date} {region} {fetcher} />
 
       <p>
         On {formatDateDayOfWeek(date.value)}
@@ -73,12 +78,14 @@
       <IndicatorOverview {sensor} {date} {region} {fetcher} />
       <RegionOverview {region} />
       <hr />
-      <FancyHeader invert sub="Map" anchor="map">{sensor.name}</FancyHeader>
-      <RegionMapWrapper {sensor} {date} {region} {fetcher} />
-      <hr />
+      {#if !sensor.value.noMaps}
+        <FancyHeader invert sub="Map" anchor="map">{sensor.name}</FancyHeader>
+        <RegionMapWrapper {sensor} {date} {region} {fetcher} />
+        <hr />
+      {/if}
       <FancyHeader invert sub="Chart" anchor="chart">{sensor.name}</FancyHeader>
       <div class="chart-300">
-        <HistoryLineChart {sensor} {date} {region} {fetcher} expandableWindow />
+        <HistoryLineChart {sensor} {date} {region} {fetcher} />
       </div>
     </div>
     <IndicatorAbout {sensor} />
@@ -87,6 +94,5 @@
       <GeoTable {sensor} {region} {date} {fetcher} />
       <hr />
     </div>
-    <IndicatorCorrelation {sensor} {region} {date} />
   </div>
 </div>

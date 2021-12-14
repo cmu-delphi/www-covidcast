@@ -1,10 +1,13 @@
+import type { EpiDataRow } from './fetchData';
 import type { Sensor } from '../stores/constants';
 import { callTrendAPI, EpiDataTrendRow, FieldSpec } from './api';
 import { GeoPair, SourceSignalPair } from './apimodel';
 import type { Region } from './regions';
 import { splitDailyWeekly } from './sensor';
 import type { TimeFrame } from './TimeFrame';
-import { parseAPITime } from './utils';
+import { parseAPITime, toTimeValue } from './utils';
+import { timeDay } from 'd3-time';
+// import { timeDay } from 'd3-time';
 
 export interface SensorDateTrend {
   date: Date;
@@ -17,22 +20,7 @@ export interface SensorDateTrend {
   delta: number;
 
   trend: EpiDataTrendRow['basis_trend'];
-  isIncreasing: boolean;
-  isDecreasing: boolean;
-  isSteady: boolean;
-  isUnknown: boolean;
-
   highValuesAre: Sensor['highValuesAre'];
-
-  isNeutral: boolean;
-  /**
-   * increasing or decreasing based on the inverted state
-   */
-  isBetter: boolean;
-  /**
-   * increasing or decreasing based on the inverted state
-   */
-  isWorse: boolean;
 }
 
 const UNKNOWN_TREND: Omit<SensorDateTrend, 'date'> = {
@@ -40,14 +28,7 @@ const UNKNOWN_TREND: Omit<SensorDateTrend, 'date'> = {
   delta: Number.NaN,
 
   trend: 'unknown',
-  isUnknown: true,
-  isBetter: false,
-  isIncreasing: false,
-  isDecreasing: false,
   highValuesAre: 'neutral',
-  isNeutral: false,
-  isSteady: false,
-  isWorse: false,
 };
 
 export interface SensorTrend extends SensorDateTrend {
@@ -55,10 +36,6 @@ export interface SensorTrend extends SensorDateTrend {
   min?: SensorDateTrend;
   maxDate?: Date;
   max?: SensorDateTrend;
-  bestDate?: Date;
-  best?: SensorDateTrend;
-  worstDate?: Date;
-  worst?: SensorDateTrend;
 }
 
 function computeChangeDelta(v?: number, base?: number) {
@@ -92,15 +69,6 @@ function asSensorDateTrend(
     refDate: parseAPITime(refDate),
     refValue,
     trend: refTrend,
-    isIncreasing: refTrend === 'increasing',
-    isDecreasing: refTrend === 'decreasing',
-    isBetter:
-      (highValuesAre === 'good' && refTrend === 'increasing') || (highValuesAre === 'bad' && refTrend === 'decreasing'),
-    isWorse:
-      (highValuesAre === 'good' && refTrend === 'decreasing') || (highValuesAre === 'bad' && refTrend === 'increasing'),
-    isUnknown: refTrend === 'unknown',
-    isSteady: refTrend === 'steady',
-    isNeutral: highValuesAre === 'neutral' && (refTrend === 'increasing' || refTrend === 'decreasing'),
     ...computeChangeDelta(value, refValue),
   };
 }
@@ -148,10 +116,6 @@ export function asSensorTrend(
     t.min = asSensorDateTrend(date, t.value, row.min_date, scaled(row.min_value, factor), row.min_trend, highValuesAre);
     t.minDate = t.min.refDate;
   }
-  t.best = highValuesAre === 'good' ? t.max : t.min;
-  t.bestDate = highValuesAre === 'good' ? t.maxDate : t.minDate;
-  t.worst = highValuesAre === 'good' ? t.min : t.max;
-  t.worstDate = highValuesAre === 'good' ? t.minDate : t.maxDate;
   return t;
 }
 
@@ -181,4 +145,52 @@ export function fetchTrend(
         : callTrendAPI(type, SourceSignalPair.fromArray(sensors), geo, date, window, type == 'week' ? 1 : 7, fields),
     ),
   ).then((r) => ([] as EpiDataTrendRow[]).concat(...r));
+}
+
+export function computeLatest(
+  data: EpiDataRow[],
+  date: Date,
+): {
+  value: undefined | number;
+  change: undefined | number;
+  date: Date;
+  refValue: undefined | number;
+  refDate: undefined | Date;
+} | null {
+  if (data.length === 0) {
+    return null;
+  }
+  const timeValue = toTimeValue(date);
+  let matchedRow: EpiDataRow | null = null;
+  let prevTimeValue = 0;
+  let matchedPreviousRow: EpiDataRow | null = null;
+
+  for (let i = data.length - 1; i >= 0; i--) {
+    const row = data[i];
+    if (row == null || row.value == null || Number.isNaN(row.value)) {
+      continue;
+    }
+    if (matchedRow) {
+      if (row.time_value == prevTimeValue) {
+        matchedPreviousRow = row;
+        break;
+      } else if (row.time_value < prevTimeValue) {
+        break;
+      }
+    } else if (row.time_value <= timeValue) {
+      matchedRow = row;
+      prevTimeValue = toTimeValue(timeDay.offset(row.date_value, -7));
+      continue;
+    }
+  }
+  if (!matchedRow) {
+    return null;
+  }
+  return {
+    value: matchedRow.value,
+    date: matchedRow.date_value,
+    change: computeChangeDelta(matchedRow.value, matchedPreviousRow?.value).change,
+    refDate: matchedPreviousRow?.date_value,
+    refValue: matchedPreviousRow?.value,
+  };
 }

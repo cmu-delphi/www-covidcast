@@ -6,8 +6,6 @@
   export let x = -1;
   export let y = -1;
 
-  export let tooltip = null;
-
   export let border = 0;
 
   $: isDefined = x >= 0 && y >= 0;
@@ -19,7 +17,6 @@
 >
   <div
     class="hexgrid_cell_content {className}"
-    data-uk-tooltip={tooltip ? `title: ${tooltip}; pos: top` : undefined}
     class:hexgrid_cell__border={border !== 0}
     style="--border-size: {border}; {style}"
     on:click
@@ -28,6 +25,8 @@
   >
     <slot />
   </div>
+
+  <slot name="tooltip" />
 </div>
 
 <style>

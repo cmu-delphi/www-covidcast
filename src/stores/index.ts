@@ -1,45 +1,29 @@
 import { writable, derived, get, readable } from 'svelte/store';
 import {
-  sensorMap,
   DEFAULT_MODE,
   DEFAULT_SENSOR,
   DEFAULT_SURVEY_SENSOR,
-  defaultRegionOnStartup,
-  DEFAULT_CORRELATION_SENSOR,
+  DEFAULT_DATE,
   resolveSensorWithAliases,
+  sensorConfig,
 } from './constants';
 import modes, { Mode, modeByID, ModeID } from '../modes';
-import { formatAPITime, parseAPITime } from '../data/utils';
+import { parseAPITime } from '../data/utils';
 import { getInfoByName } from '../data/regions';
-export {
-  defaultRegionOnStartup,
-  getLevelInfo,
-  levels,
-  levelList,
-  sensorList,
-  sensorMap,
-  groupedSensorList,
-} from './constants';
-import { timeDay } from 'd3-time';
+export { defaultRegionOnStartup, getLevelInfo, levels, levelList } from './constants';
 import { AnnotationManager, fetchAnnotations } from '../data';
 import type { RegionInfo, RegionLevel } from '../data/regions';
 import { MetaDataManager } from '../data/meta';
 import { callMetaAPI } from '../data/api';
+import { Sensor, sensorTypes } from '../data/sensor';
 
 export const appReady = writable(false);
-
-/**
- * magic date that will be replaced by the latest date
- */
-export const MAGIC_START_DATE = '20200701';
 
 function deriveFromPath(url: Location) {
   const queryString = url.search;
   const urlParams = new URLSearchParams(queryString);
 
   const sensor = urlParams.get('sensor');
-  const sensor2 = urlParams.get('sensor2');
-  const lag = urlParams.get('lag');
   const date = urlParams.get('date') ?? '';
 
   const modeFromPath = () => {
@@ -63,16 +47,7 @@ function deriveFromPath(url: Location) {
   return {
     mode: modeObj,
     sensor: resolveSensor,
-    sensor2: resolveSensorWithAliases(
-      sensor2,
-      isGenericPage
-        ? sensor2 || DEFAULT_CORRELATION_SENSOR
-        : DEFAULT_CORRELATION_SENSOR === sensor2
-        ? DEFAULT_SENSOR
-        : DEFAULT_CORRELATION_SENSOR,
-    ),
-    lag: lag ? Number.parseInt(lag, 10) : 0,
-    date: /\d{8}/.test(date) ? date : MAGIC_START_DATE,
+    date: /\d{8}/.test(date) ? date : DEFAULT_DATE,
     region: urlParams.get('region') || '',
   };
 }
@@ -88,29 +63,73 @@ export const currentMode = writable(defaultValues.mode);
 
 export const currentSensor = writable(defaultValues.sensor);
 
-function resolveSensor(sensor: string, defaultKey: string) {
+function resolveSensor(sensor: string, sensorList: Sensor[], metaData: MetaDataManager, defaultKey: string) {
   if (!sensor) {
     return null;
   }
-  const r = sensorMap.get(sensor);
+  const configured = sensorList.find((d) => d.key === sensor);
+  if (configured) {
+    return configured;
+  }
+  const r = metaData.getSensor(sensor);
   if (r) {
     return r;
   }
-  return sensorMap.get(defaultKey);
+  const configuredDefault = sensorList.find((d) => d.key === sensor);
+  if (configuredDefault) {
+    return configuredDefault;
+  }
+  return metaData.getSensor(defaultKey);
 }
 
+export const metaDataManager = writable(new MetaDataManager([]));
+
+export const sensorList = derived(metaDataManager, (metaData) => {
+  return sensorConfig
+    .map((d) => {
+      const s = metaData.getSensor(d);
+      if (s == null) {
+        if (metaData.metaSensors.length > 0) {
+          // report only when there are some sensors configured
+          console.error('invalid configured sensor', d);
+        }
+        return null;
+      }
+      return Object.assign({}, s, d) as Sensor;
+    })
+    .filter((d): d is Sensor => d != null);
+});
+
+export const defaultCasesSensor = derived(sensorList, (sensorList) => {
+  return sensorList.find((d) => d.signal === 'confirmed_7dav_incidence_prop');
+});
+export const defaultHospitalSensor = derived(sensorList, (sensorList) => {
+  return sensorList.find((d) => d.signal === 'confirmed_admissions_covid_1d_prop_7dav');
+});
+export const defaultDeathSensor = derived(sensorList, (sensorList) => {
+  return sensorList.find((d) => d.signal === 'deaths_7dav_incidence_prop');
+});
+
 export const currentSensorEntry = derived(
-  [currentSensor],
+  [currentSensor, sensorList, metaDataManager],
   // lookup the value, if not found maybe a generic one, if it is set, then return the default, else return the empty one
-  ([$currentSensor]) => resolveSensor($currentSensor, DEFAULT_SENSOR),
+  ([$currentSensor, sensorList, metaDataManager]) =>
+    resolveSensor($currentSensor, sensorList, metaDataManager, DEFAULT_SENSOR),
 );
 
-export const currentSensor2 = writable(defaultValues.sensor2);
-export const currentSensorEntry2 = derived([currentSensor2], ([$currentSensor]) =>
-  resolveSensor($currentSensor, DEFAULT_CORRELATION_SENSOR),
-);
-
-export const currentLag = writable(defaultValues.lag);
+export const groupedSensorList = derived(sensorList, (sensorList) => {
+  return sensorTypes
+    .map((sensorType) => ({
+      ...sensorType,
+      sensors: sensorList.filter(
+        (sensor) =>
+          // same type or the other catch all type
+          sensor.type === sensorType.id ||
+          (sensorType.id === 'other' && sensorTypes.every((t) => t.id !== sensor.type)),
+      ),
+    }))
+    .filter((d) => d.sensors.length > 0);
+});
 
 export const currentDate = writable(defaultValues.date);
 /**
@@ -126,43 +145,6 @@ export const currentRegion = writable(defaultValues.region);
  * current region info (could also be null)
  */
 export const currentRegionInfo = writable(getInfoByName(defaultValues.region));
-
-function deriveRecent(): RegionInfo[] {
-  if (!window.localStorage) {
-    return [];
-  }
-  const item = window.localStorage.getItem('recent') || '';
-  if (!item) {
-    return [getInfoByName(defaultRegionOnStartup.state)!, getInfoByName(defaultRegionOnStartup.county)!];
-  }
-  return item
-    .split(',')
-    .filter(Boolean)
-    .map((d) => getInfoByName(d))
-    .filter((d): d is RegionInfo => d != null);
-}
-export const recentRegionInfos = writable(deriveRecent());
-
-// keep track of top 10 recent selections
-currentRegionInfo.subscribe((v) => {
-  if (!v) {
-    return;
-  }
-  const infos = get(recentRegionInfos).slice();
-  const index = infos.indexOf(v);
-  if (index >= 0) {
-    infos.splice(index, 1);
-  }
-  if (infos.length > 10) {
-    infos.shift();
-  }
-  infos.unshift(v);
-  recentRegionInfos.set(infos);
-
-  if (window.localStorage) {
-    window.localStorage.setItem('recent', infos.map((d) => d.propertyId).join(','));
-  }
-});
 
 /**
  * @returns {boolean} whether the selection has changed
@@ -235,25 +217,15 @@ export interface TrackedState {
 }
 
 export const trackedUrlParams = derived(
-  [currentMode, currentSensor, currentSensor2, currentLag, currentRegion, currentDate],
-  ([mode, sensor, sensor2, lag, region, date]): TrackedState => {
+  [currentMode, currentSensor, currentRegion, currentDate],
+  ([mode, sensor, region, date]): TrackedState => {
     // determine parameters based on default value and current mode
     const params: Omit<PersistedState, 'mode'> = {
       sensor:
-        mode === modeByID.landing ||
-        mode === modeByID.summary ||
-        mode === modeByID['survey-results'] ||
-        sensor === DEFAULT_SENSOR
-          ? null
-          : sensor,
-      sensor2: mode === modeByID.correlation ? sensor2 : null,
-      lag: mode === modeByID.correlation ? lag : null,
+        mode === modeByID.summary || mode === modeByID['survey-results'] || sensor === DEFAULT_SENSOR ? null : sensor,
       region: mode === modeByID.export ? null : region,
       date:
-        String(date) === MAGIC_START_DATE ||
-        mode === modeByID.export ||
-        mode === modeByID.landing ||
-        mode === modeByID['indicator-status']
+        String(date) === DEFAULT_DATE || mode === modeByID.export || mode === modeByID['indicator-status']
           ? null
           : String(date),
     };
@@ -285,12 +257,6 @@ export function loadFromUrlState(state: PersistedState): void {
   if (state.sensor != null && state.sensor !== get(currentSensor)) {
     currentSensor.set(state.sensor);
   }
-  if (state.sensor2 != null && state.sensor2 !== get(currentSensor2)) {
-    currentSensor2.set(state.sensor2);
-  }
-  if (state.lag != null && state.lag !== get(currentLag)) {
-    currentLag.set(state.lag);
-  }
   if (state.region != null && state.region !== get(currentRegion)) {
     selectByInfo(getInfoByName(state.region));
   }
@@ -307,52 +273,19 @@ export function loadAnnotations(): void {
   });
 }
 
-export const metaDataManager = writable(new MetaDataManager([]));
-
-export function loadMetaData(): Promise<{ date: string }> {
+export function loadMetaData(): Promise<MetaDataManager> {
   return callMetaAPI().then((meta) => {
     const m = new MetaDataManager(meta);
     metaDataManager.set(m);
-
-    const sensor = get(currentSensor);
-    const sensorInfo = sensorMap.get(sensor);
-
-    let date = get(currentDate);
-    // Magic number of default date - if no URL params, use max date
-    // available
-    const timeEntry = sensorInfo ? m.getTimeFrame(sensorInfo) : null;
-    if (date === MAGIC_START_DATE && timeEntry != null) {
-      date = formatAPITime(timeDay.offset(timeEntry.max, -2));
-      currentDate.set(date);
-    }
-    return {
-      date,
-    };
+    return m;
   });
 }
 
-// validate if sensor and other parameter matches
-currentSensorEntry.subscribe((sensorEntry) => {
-  if (!sensorEntry) {
-    return;
-  }
-
-  // clamp to time span
-  const timeFrame = get(metaDataManager).getTimeFrame(sensorEntry);
-  const current = get(currentDate) ?? '';
-  if (current < String(timeFrame.min_time)) {
-    currentDate.set(String(timeFrame.min_time));
-  } else if (current > String(timeFrame.max_time)) {
-    currentDate.set(String(timeFrame.max_time));
-  }
-});
-
 currentMode.subscribe((mode) => {
-  if (mode === modeByID['survey-results']) {
+  if (mode === modeByID['survey-results'] && get(currentSensor) !== DEFAULT_SURVEY_SENSOR) {
     // change sensor and date to the latest one within the survey
     currentSensor.set(DEFAULT_SURVEY_SENSOR);
-    const sensorEntry = sensorMap.get(DEFAULT_SURVEY_SENSOR)!;
-    const timeFrame = get(metaDataManager).getTimeFrame(sensorEntry);
+    const timeFrame = get(metaDataManager).getTimeFrame(DEFAULT_SURVEY_SENSOR);
     currentDate.set(String(timeFrame.max_time));
   }
 });

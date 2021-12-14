@@ -6,6 +6,7 @@
   import { metaDataManager } from '../stores';
   import { formatDateShortDayOfWeekAbbr, formatDateYearDayOfWeekAbbr, formatWeek } from '../formats';
   import { timeDay } from 'd3-time';
+  import { yesterdayDate } from '../data/TimeFrame';
 
   /**
    * @type {import('../stores/constants').Sensor}
@@ -38,15 +39,14 @@
       offset={11}
       bind:selected={value}
       start={timeFrame.min}
-      end={timeFrame.max}
+      end={yesterdayDate}
       pickWeek={sensor.isWeeklySignal}
       formattedSelected={sensor.isWeeklySignal ? formatWeek(value) : formatDateShortDayOfWeekAbbr(value)}
     >
       <button
         aria-label="selected date"
         class="selected-date picker-button"
-        on:dblclick={() => (value = timeFrame.max)}
-        on:
+        on:dblclick={() => (value = yesterdayDate)}
       >
         <span class="selected-date-icon">
           {@html calendarIcon}
@@ -84,7 +84,7 @@
   <button
     class="arrow-button picker-button arrow-right"
     title="Go to the next {sensor.isWeeklySignal ? 'week' : 'day'}"
-    disabled={value == null || value >= timeFrame.max}
+    disabled={value == null || value >= yesterdayDate}
     on:click={() => (value = timeDay.offset(value, sensor.isWeeklySignal ? 7 : 1))}
   >
     {@html arrowRightIcon}

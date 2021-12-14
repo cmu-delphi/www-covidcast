@@ -400,6 +400,7 @@
             >
               <a
                 href="?region={listItem.item ? listItem.item.id : ''}"
+                class="search-box-link"
                 on:click|preventDefault={() => onListItemClick(listItem)}
               >
                 {@html highlighter(listItem.label)}
@@ -462,6 +463,10 @@
     min-width: 100%;
     margin-top: 2px;
     padding: 0 2px 6px 40px;
+  }
+
+  .search-box-list :global(.search-box-link) {
+    display: inline-block;
   }
 
   .more-results {

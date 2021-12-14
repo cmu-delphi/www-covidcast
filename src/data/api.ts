@@ -164,55 +164,6 @@ export function callTrendSeriesAPI(
   });
 }
 
-export interface EpiDataCorrelationRow {
-  geo_type: RegionLevel;
-  geo_value: string;
-
-  signal_source: string;
-  signal_signal: string;
-
-  lag: number;
-  r2: number;
-
-  /**
-   * y = slope * x + intercept
-   */
-  slope: number;
-  /**
-   * y = slope * x + intercept
-   */
-  intercept: number;
-
-  /**
-   * number of dates used for the regression line
-   */
-  samples: number;
-}
-
-export function callCorrelationAPI(
-  type: 'week' | 'day',
-  reference: SourceSignalPair,
-  others: SourceSignalPair | readonly SourceSignalPair[],
-  geo: GeoPair | readonly GeoPair[],
-  window: TimeFrame,
-  lag?: number,
-  fields?: FieldSpec<EpiDataCorrelationRow>,
-): Promise<EpiDataCorrelationRow[]> {
-  const url = new URL(ENDPOINT + '/covidcast/correlation');
-  url.searchParams.set('reference', reference.toString());
-  addParam(url, 'others', others);
-  addParam(url, 'geo', geo);
-  url.searchParams.set('window', window.asTypeRange(type));
-  if (lag != null) {
-    url.searchParams.set('lag', lag.toString());
-  }
-  url.searchParams.set('format', 'json');
-  return fetchImpl<EpiDataCorrelationRow[]>(url, fields).catch((error) => {
-    console.warn('failed fetching data', error);
-    return [];
-  });
-}
-
 export interface EpiDataBackfillRow {
   time_value: number;
   issue: number;
@@ -257,7 +208,7 @@ export interface EpiDataMetaStatsInfo {
   stdev: number;
 }
 
-export type SignalCategory = 'public' | 'early' | 'late' | 'other';
+export type SignalCategory = 'public' | 'early' | 'late' | 'other' | 'cases_testing';
 export type SignalFormat = 'raw' | 'percent' | 'fraction' | 'per100k' | 'count';
 export type SignalHighValuesAre = 'good' | 'bad' | 'neutral';
 
@@ -374,7 +325,7 @@ export interface EpiDataAnomaliesRow {
   explanation: string;
   source: string;
   signals: string; // * or a comma separated list "*"|(ID{\s*";"\s*ID}*)
-  dates: string; // YYYYMMDD-YYYYMMDD
+  dates: string; // YYYYMMDD-YYYYMMDD or -99 uncertainty days
   regions: string; //semicolor separated key value: e.g. GROUP("*"|(ID{","\s*ID}*)){\s*","\s*GROUP("*"|(ID{","\s*ID}*))}
   reference?: string;
 }
@@ -384,6 +335,6 @@ export function callAnomaliesAPI(): Promise<EpiDataAnomaliesRow[]> {
   url.searchParams.set('format', 'json');
   return fetchImpl<EpiDataAnomaliesRow[]>(url).catch((error) => {
     console.warn('failed fetching data', error);
-    return [];
+    return [] as EpiDataAnomaliesRow[];
   });
 }

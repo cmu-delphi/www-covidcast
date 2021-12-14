@@ -160,14 +160,20 @@ function avg(rows: EpiDataRow[], field: 'value' | 'stderr' | 'sample_size') {
     return acc + vi;
   }, 0);
   if (sum == null || Number.isNaN(sum) || valid === 0) {
-    return null;
+    return {
+      avg: null,
+      valid: 0,
+    };
   }
-  return sum / valid;
+  return {
+    avg: sum / valid,
+    valid,
+  };
 }
 /**
  * group by date and averages its values
  */
-export function averageByDate(rows: EpiDataRow[], mixin: Partial<EpiDataRow> = {}): EpiDataRow[] {
+export function averageByDate(rows: EpiDataRow[], mixin: Partial<EpiDataRow> = {}): (EpiDataRow & { valid: number })[] {
   // average by date
   const byDate = new Map<number | string, EpiDataRow[]>();
   for (const row of rows) {
@@ -179,12 +185,14 @@ export function averageByDate(rows: EpiDataRow[], mixin: Partial<EpiDataRow> = {
     }
   }
   return Array.from(byDate.values(), (rows) => {
-    const r: EpiDataRow = {
+    const v = avg(rows, 'value')!;
+    const r: EpiDataRow & { valid: number } = {
       ...rows[0],
       ...mixin,
-      value: avg(rows, 'value')!,
-      stderr: avg(rows, 'stderr')!,
-      sample_size: avg(rows, 'sample_size')!,
+      value: v.avg!,
+      valid: v.valid,
+      stderr: avg(rows, 'stderr').avg!,
+      sample_size: avg(rows, 'sample_size').avg!,
     };
     return r;
   }).sort((a, b) => a.time_value - b.time_value);

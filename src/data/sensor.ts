@@ -2,17 +2,23 @@ import { formatter, formatSpecifiers } from '../formats';
 import { interpolateBuPu, interpolateYlGnBu, interpolateYlOrRd } from 'd3-scale-chromatic';
 import { getDataSource } from './dataSourceLookup';
 import { defaultCountyRegion, defaultStateRegion, nationInfo, Region, RegionLevel } from './regions';
-import type { SignalCategory, SignalFormat, SignalHighValuesAre } from './api';
+import type { EpiDataMetaInfo, SignalCategory, SignalFormat, SignalHighValuesAre } from './api';
 import { isArray } from './apimodel';
+import type { EpiWeek } from './EpiWeek';
+import type { TimeFrame } from './TimeFrame';
 
 export const sensorTypes: { id: SignalCategory; label: string }[] = [
   {
     id: 'public',
-    label: 'Public’s Behavior',
+    label: 'Public Behavior',
   },
   {
     id: 'early',
     label: 'Early Indicators',
+  },
+  {
+    id: 'cases_testing',
+    label: 'Cases and Testing',
   },
   {
     id: 'late',
@@ -24,15 +30,30 @@ export const sensorTypes: { id: SignalCategory; label: string }[] = [
   },
 ];
 
+export interface SensorLike {
+  id: string;
+  signal: string;
+}
+
+export interface EpiDataMetaParsedInfo extends EpiDataMetaInfo {
+  maxIssue: Date;
+  maxIssueWeek: EpiWeek;
+  minTime: Date;
+  minWeek: EpiWeek;
+  maxTime: Date;
+  maxWeek: EpiWeek;
+  timeFrame: TimeFrame;
+}
+
 export interface Sensor {
+  meta: EpiDataMetaParsedInfo;
+  active: boolean;
+
   readonly key: string; // id:signal
   readonly id: string; // data source
   readonly signal: string;
   readonly rawSignal?: string; // raw signal in case of a 7day average
   readonly rawSensor?: Sensor; // raw signal in case of a 7day average
-
-  readonly rawCumulativeSignal?: string; // raw cumulative version of this signal
-  readonly rawCumulativeSensor?: Sensor; /// raw cumulative version of this signal
 
   readonly name: string; // signal name
   readonly unit: string;
@@ -58,9 +79,6 @@ export interface Sensor {
 
   readonly formatSpecifier: string;
   formatValue(v?: number | null, enforceSign?: boolean): string;
-
-  readonly highlight?: string[];
-  readonly linkFrom?: string[];
 }
 
 function determineHighValuesAre(sensor: {
@@ -112,10 +130,6 @@ export function ensureSensorStructure(sensor: Partial<Sensor> & { name: string; 
   const format = sensor.format || 'raw';
 
   const rawSignal = sensor.rawSignal === 'null' || sensor.rawSignal === sensor.signal ? null : sensor.rawSignal;
-  const rawCumulativeSignal =
-    sensor.rawCumulativeSignal === 'null' || sensor.rawCumulativeSignal === sensor.signal
-      ? null
-      : sensor.rawCumulativeSignal;
 
   const full = Object.assign(sensor, {
     key,
@@ -144,7 +158,6 @@ export function ensureSensorStructure(sensor: Partial<Sensor> & { name: string; 
     // keep the original values
     ...sensor,
     rawSignal,
-    rawCumulativeSignal,
   });
 
   if (rawSignal) {
@@ -162,22 +175,6 @@ export function ensureSensorStructure(sensor: Partial<Sensor> & { name: string; 
       },
     });
   }
-  if (rawCumulativeSignal) {
-    // create a raw cumulative version
-    Object.assign(full, {
-      rawCumulativeSensor: {
-        ...full,
-        key: `${sensor.id}-${rawCumulativeSignal}`,
-        name: `${full.name.replace('(7-day average)', '')} (Raw Cumulative)`,
-        description: full.description.replace('(7-day average)', ''),
-        signal: rawCumulativeSignal,
-        is7DayAverage: false,
-        rawCumulativeSignal: null,
-        rawCumulativeSensor: null,
-      },
-    });
-  }
-
   return full as Sensor;
 }
 

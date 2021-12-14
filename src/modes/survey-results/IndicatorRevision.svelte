@@ -23,7 +23,7 @@
    */
   export let fetcher;
 
-  $: sensor = new SensorParam(revision.sensor, $metaDataManager);
+  $: sensor = new SensorParam($metaDataManager.getSensor(revision), $metaDataManager);
 
   /**
    * @type {HTMLElement | null}

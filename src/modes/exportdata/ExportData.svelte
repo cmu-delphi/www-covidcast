@@ -258,7 +258,7 @@
               pickWeek={isWeekly}
               formattedSelected={formatDate(startDate)}
             >
-              <button aria-label="selected start date" class="uk-input" on:>{formatDate(startDate)}</button>
+              <button aria-label="selected start date" class="uk-input" on:click>{formatDate(startDate)}</button>
             </Datepicker>
             -
             <Datepicker
@@ -268,7 +268,7 @@
               pickWeek={isWeekly}
               formattedSelected={formatDate(endDate)}
             >
-              <button aria-label="selected end date" class="uk-input" on:>{formatDate(endDate)}</button>
+              <button aria-label="selected end date" class="uk-input" on:click>{formatDate(endDate)}</button>
             </Datepicker>
           </div>
         </div>
@@ -342,7 +342,7 @@
                 start={asOfStart}
                 end={asOfEnd}
               >
-                <button aria-label="selected as of date" class="uk-input" disabled={asOfMode === 'latest'} on:
+                <button aria-label="selected as of date" class="uk-input" disabled={asOfMode === 'latest'} on:click
                   >{asOfDate ? formatDate(asOfDate) : 'Select date'}</button
                 >
               </Datepicker>
@@ -432,7 +432,7 @@ data = covidcast.signal("${sensor ? sensor.id : ''}", "${sensor ? sensor.signal 
 cc_data <- covidcast_signal(
   data_source = "${sensor ? sensor.id : ''}", signal = "${sensor ? sensor.signal : ''}",
   start_day = "${formatDate(startDate)}", end_day = "${formatDate(endDate)}",
-  geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`}${usesAsOf ? `, as_of = "${formatDate(asOfDate)}"` : ''})
+  geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`}${usesAsOf ? `, as_of = "${formatDate(asOfDate)}"` : ''}
 )`}
       </code></pre>
           <p class="description">

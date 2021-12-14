@@ -81,6 +81,7 @@
   h5 {
     margin: 0;
     padding: 0;
+    color: #999;
   }
 
   th {

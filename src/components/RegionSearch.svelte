@@ -34,7 +34,7 @@
   on:add
 >
   <svelte:fragment slot="entry" let:label let:item let:onClick>
-    <a href="?region={item ? item.id : ''}" on:click|preventDefault={onClick}>
+    <a class="search-box-link" href="?region={item ? item.id : ''}" on:click|preventDefault={onClick}>
       {@html label}
       <GeoLevelBadge region={item} />
     </a>

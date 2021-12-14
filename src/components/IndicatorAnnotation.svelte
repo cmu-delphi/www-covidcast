@@ -1,16 +1,21 @@
 <script>
   import warningIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/exclamation-triangle.svg';
+  import infoIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/info-circle.svg';
   import { formatDateISO } from '../formats';
 
   export let className = '';
   export let annotation;
 </script>
 
-<div class="uk-alert uk-alert-warning {className}">
+<div class="uk-alert uk-alert-{annotation.uncertainty ? 'info' : 'warning'} {className}">
   <h5 class="alert-header">
     <div class="text">
       <span class="inline-svg-icon">
-        {@html warningIcon}
+        {#if annotation.uncertainty}
+          {@html infoIcon}
+        {:else}
+          {@html warningIcon}
+        {/if}
       </span>
       {annotation.problem}
     </div>

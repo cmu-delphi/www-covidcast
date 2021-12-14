@@ -4,8 +4,8 @@ import { formatDateLocal } from '../formats';
 import { EpiWeek } from './EpiWeek';
 import { parseAPITime, toTimeValue } from './utils';
 
-export const yesterdayDate = new Date(new Date().getTime() - 86400 * 1000);
-export const yesterday = toTimeValue(yesterdayDate);
+export const yesterdayDate = timeDay.offset(timeDay(new Date()), -1);
+export const yesterday = toTimeValue(yesterdayDate).toString();
 
 export class TimeFrame {
   readonly min: Date;

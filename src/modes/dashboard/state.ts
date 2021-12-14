@@ -10,7 +10,6 @@ export type WidgetType =
   | 'datetable'
   | 'sensortable'
   | 'kpi'
-  | 'trend'
   | 'regionpcp'
   | 'datepcp'
   | 'anomalies'
@@ -96,7 +95,6 @@ export const widgets: readonly Widget[] = [
   asWidget('datetable', 'Date Table', ['time'], 'table', ['sensor', 'region', 'timeFrame']),
   asWidget('sensortable', 'Indicator Table', ['indicator'], 'table', ['region', 'date']),
   asWidget('kpi', 'Value', [], 'simple', ['sensor', 'region', 'date']),
-  asWidget('trend', 'Trend', [], 'simple', ['sensor', 'region', 'date']),
   asWidget('regionpcp', 'Region Parallel Coordinate Plot', ['region', 'indicator'], 'advanced', [
     'sensors',
     'level',

@@ -1,4 +1,6 @@
-$grid-gap: (32/1440) * 100%;
+@use 'sass:math';
+
+$grid-gap: math.div(32, 1440) * 100%;
 
 .content-grid {
   display: grid;

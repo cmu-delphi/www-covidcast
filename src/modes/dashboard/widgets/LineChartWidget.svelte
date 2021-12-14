@@ -5,7 +5,6 @@
     height: 2,
     zero: true,
     raw: false,
-    cumulative: false,
   };
 </script>
 
@@ -17,7 +16,6 @@
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
   import {
     generateLineChartSpec,
-    generateCumulativeBarSpec,
     generateLineAndBarSpec,
     genAnnotationLayer,
     resolveHighlightedDate,
@@ -57,7 +55,6 @@
 
   let zoom = !initialState.zero;
   let singleRaw = initialState.raw;
-  let singleCumulative = initialState.cumulative || false;
 
   let superState = {};
   $: state = {
@@ -65,7 +62,6 @@
     ...superState,
     zero: !zoom,
     raw: singleRaw,
-    cumulative: singleCumulative,
   };
   $: {
     dispatch('state', { id, state });
@@ -90,9 +86,9 @@
    * @param {import('../../../stores/params').SensorParam} sensor
    * @param {import('../../../stores/params').RegionParam} region
    * @param {import('../../../stores/params').TimeFrame} timeFrame
-   * @param {{zero: boolean, raw: boolean, cumulative: boolean}} options
+   * @param {{zero: boolean, raw: boolean}} options
    */
-  function genSpec(sensor, region, timeFrame, { zero, raw, cumulative }) {
+  function genSpec(sensor, region, timeFrame, { zero, raw }) {
     const isWeekly = sensor.value.isWeeklySignal;
     /**
      * @type {import('../../../specs/lineSpec').LineSpecOptions}
@@ -104,10 +100,7 @@
       zero,
       valueFormat: sensor.value.formatSpecifier,
       xTitle: sensor.xAxis,
-      title: [
-        `${cumulative ? 'Cumulative ' : ''}${sensor.name} in ${region.displayName}`,
-        timeFrame.toNiceString(isWeekly),
-      ],
+      title: [`${sensor.name} in ${region.displayName}`, timeFrame.toNiceString(isWeekly)],
       subTitle: sensor.unit,
       highlightRegion: false,
       clearHighlight: false,
@@ -121,11 +114,6 @@
       : `' @ ' + cachedTime(datum.date_value, '%a %b %d')`;
     const rawTooltip = `' (raw: ' + cachedNumber(datum.raw, '${sensor.value.formatSpecifier}')`;
     if (raw) {
-      if (cumulative) {
-        options.paddingLeft = 52; // more space for larger numbers
-        options.infoLabelExpr = `${valueTooltip} ${rawTooltip} + ', cum: ' + cachedNumber(datum.cumulative, '${sensor.value.formatSpecifier}') + ')' + ${dateTooltip}`;
-        return generateCumulativeBarSpec(options);
-      }
       options.infoLabelExpr = `${valueTooltip} ${rawTooltip} + ')' + ${dateTooltip}`;
       return generateLineAndBarSpec(options);
     }
@@ -138,9 +126,8 @@
    * @param {import("../../stores/params").DateParam} date
    * @param {import("../../stores/params").TimeFrame} timeFrame
    * @param {boolean} raw
-   * @param {boolean} cumulative
    */
-  function loadData(sensor, region, timeFrame, raw, cumulative) {
+  function loadData(sensor, region, timeFrame, raw) {
     const selfData = fetcher.fetch1Sensor1RegionNDates(sensor, region, timeFrame);
 
     if (!raw) {
@@ -148,23 +135,11 @@
     }
 
     const rawData = fetcher.fetch1Sensor1RegionNDates(sensor.rawValue, region, timeFrame);
-    if (!cumulative) {
-      return Promise.all([selfData, rawData]).then((data) => {
-        return combineSignals(
-          data,
-          data[0].map((d) => ({ ...d })),
-          ['smoothed', 'raw'],
-        );
-      });
-    }
-
-    // raw and cumulative
-    const cumulativeData = fetcher.fetch1Sensor1RegionNDates(sensor.rawCumulativeValue, region, timeFrame);
-    return Promise.all([selfData, rawData, cumulativeData]).then((data) => {
+    return Promise.all([selfData, rawData]).then((data) => {
       return combineSignals(
         data,
         data[0].map((d) => ({ ...d })),
-        ['smoothed', 'raw', 'cumulative'],
+        ['smoothed', 'raw'],
       );
     });
   }
@@ -173,14 +148,11 @@
    * @param {import("../../stores/params").SensorParam} sensor
    * @param {import("../../stores/params").Region region
    */
-  function generateFileName(sensor, region, timeFrame, raw, cumulative) {
+  function generateFileName(sensor, region, timeFrame, raw) {
     const regionName = `${region.propertyId}-${region.displayName}`;
     let suffix = '';
     if (raw) {
       suffix = '_RawVsSmoothed';
-    }
-    if (cumulative) {
-      suffix += '_Cumulative';
     }
     return `${sensor.name}_${regionName}_${
       sensor.isWeeklySignal ? formatWeek(timeFrame.min_week) : formatDateISO(timeFrame.min)
@@ -195,20 +167,18 @@
   }
 
   $: raw = singleRaw && sensor.rawValue != null;
-  $: cumulative = raw && singleCumulative && sensor.rawCumulativeValue != null;
 
   $: annotations = $annotationManager.getWindowAnnotations(sensor.value, region, timeFrame.min, timeFrame.max);
   $: spec = injectRanges(
     genSpec(sensor, region, timeFrame, {
       zero: !zoom,
       raw,
-      cumulative,
     }),
     timeFrame,
     annotations,
   );
-  $: data = loadData(sensor, region, timeFrame, raw, cumulative);
-  $: fileName = generateFileName(sensor, region, timeFrame, raw, cumulative);
+  $: data = loadData(sensor, region, timeFrame, raw);
+  $: fileName = generateFileName(sensor, region, timeFrame, raw);
 
   let vegaRef = null;
 
@@ -281,10 +251,7 @@
     <Toggle bind:checked={zoom} noPadding>Rescale Y-axis</Toggle>
     {#if sensor.rawValue != null}
       <Toggle bind:checked={singleRaw} noPadding>Raw Data</Toggle>
-      {#if raw && sensor.rawCumulativeValue != null}
-        <Toggle bind:checked={singleCumulative}>Cumulative Data</Toggle>
-      {/if}
     {/if}
-    <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} {cumulative} advanced={false} />
+    <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} advanced={false} />
   </svelte:fragment>
 </WidgetCard>

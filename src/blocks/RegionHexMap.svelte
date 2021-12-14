@@ -14,6 +14,7 @@
   import DownloadMenu from '../components/DownloadMenu.svelte';
   import { formatDateISO } from '../formats';
   import { useWhiteTextColor } from '../util';
+  import RegionMapTooltip from './RegionMapTooltip.svelte';
 
   export let className = '';
   /**
@@ -85,7 +86,7 @@
     interactive: false,
     domain: date.sparkLineTimeFrame.domain,
   });
-  $: colorScale = sensor.createColorScale(region.level);
+  $: colorScale = sensor.createColorScale('state');
   $: dumpData = Promise.all(tileData.map((d) => d.dump)).then((rows) => rows.flat());
 
   const maxColumn = state2TileCell.reduce((acc, v) => Math.max(acc, v.x), 0) + 1;
@@ -121,7 +122,6 @@
         <HexGridCell
           x={tile.x}
           y={tile.y}
-          tooltip={v && v != null ? `${sensor.formatValue(v.value)} ${sensor.unitHTML}` : 'N/A'}
           classNameOuter="state-cell {region.propertyId === tile.propertyId ? 'selected' : ''}"
           style={style(v)}
           on:click={() => region.set(tile.region, true)}
@@ -138,6 +138,9 @@
             </div>
             <span class="value"><SensorValue {sensor} value={v ? v.value : null} /></span>
           {/if}
+          <div slot="tooltip" class="hex-tooltip viz-tooltip">
+            <RegionMapTooltip {sensor} item={{ ...tile.region, ...v }} />
+          </div>
         </HexGridCell>
       {/await}
     {/each}
@@ -170,5 +173,17 @@
   }
   .root :global(.state-cell.selected) {
     filter: drop-shadow(0 0 3px #888);
+  }
+
+  .root :global(.viz-tooltip) {
+    bottom: 150%;
+    right: 0;
+    position: absolute;
+    display: none;
+    min-width: 10em;
+    white-space: nowrap;
+  }
+  .root :global(.state-cell:hover .viz-tooltip) {
+    display: block;
   }
 </style>

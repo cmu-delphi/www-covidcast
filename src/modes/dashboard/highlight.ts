@@ -9,9 +9,10 @@ import {
   nationInfo,
   StateInfo,
 } from '../../data/regions';
-import { sensorMap } from '../../stores';
 import { DateParam, Region, RegionLevel, RegionParam, Sensor, SensorParam, TimeFrame } from '../../stores/params';
 import { EpiWeek } from '../../data/EpiWeek';
+import { metaDataManager } from '../../stores';
+import { get } from 'svelte/store';
 
 function isArray<T>(v: T | readonly T[]): v is readonly T[] {
   return Array.isArray(v);
@@ -127,10 +128,11 @@ export class WidgetHighlight {
     if (this.sensorIds == null) {
       return '*';
     }
+    const m = get(metaDataManager);
     if (typeof this.sensorIds === 'string') {
-      return [sensorMap.get(this.sensorIds)!];
+      return [m.getSensor(this.sensorIds)!];
     }
-    return [...this.sensorIds].map((d) => sensorMap.get(d)!);
+    return [...this.sensorIds].map((d) => m.getSensor(d)!);
   }
 
   get primarySensor(): Sensor | null {
