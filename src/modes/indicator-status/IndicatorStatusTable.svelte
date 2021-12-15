@@ -56,7 +56,7 @@
       latest_issue: row.latest_issue,
       latest_time_value: row.latest_time_value,
       latest_coverage: row.latest_coverage,
-      latest_lag: row.latest_lag,
+      latest_lag: row.latest_lag_days,
     })}
     advanced={false}
   />
@@ -96,7 +96,7 @@
         <SortColumnIndicator label="Latest Data" {sort} prop="latest_time_value" />
       </th>
       <th class="sort-indicator">
-        <SortColumnIndicator label="Lag" {sort} prop="latest_lag" />
+        <SortColumnIndicator label="Lag" {sort} prop="latest_lag_days" />
       </th>
       <th class="sort-indicator">
         <SortColumnIndicator label="Latest Coverage" {sort} prop="latest_coverage" />
