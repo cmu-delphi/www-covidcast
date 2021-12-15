@@ -23,7 +23,7 @@ function parseDates(dates: string): [Date, Date] {
   if (!dates) {
     return [new Date(), new Date()];
   }
-  if (/-\d+/.test(dates)) {
+  if (/^-\d+$/g.test(dates)) {
     const uncertaintyDays = Number.parseInt(dates);
     const today = timeDay.floor(new Date());
     return [timeDay.offset(today, uncertaintyDays), today];
@@ -82,7 +82,7 @@ export class Annotation {
     this.dates = parseDates(raw.dates);
     this.regions = parseRegions(raw.regions);
     this.reference = raw.reference;
-    this.uncertainty = /-\d+/.test(raw.dates);
+    this.uncertainty = /^-\d+$/g.test(raw.dates);
   }
 
   /**
