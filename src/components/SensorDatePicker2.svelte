@@ -3,7 +3,7 @@
   import arrowLeftIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-circle-left.svg';
   import arrowRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/arrow-circle-right.svg';
   import calendarIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/calendar.svg';
-  import { metaDataManager } from '../stores';
+  import { isMobileDevice, metaDataManager } from '../stores';
   import { formatDateShortDayOfWeekAbbr, formatDateYearDayOfWeekAbbr, formatWeek } from '../formats';
   import { timeDay } from 'd3-time';
   import { yesterdayDate } from '../data/TimeFrame';
@@ -23,6 +23,8 @@
 
   $: timeFrame = $metaDataManager.getTimeFrame(sensor);
   $: info = $metaDataManager.getMetaData(sensor);
+
+  $: formatter = $isMobileDevice ? formatDateShortDayOfWeekAbbr : formatDateYearDayOfWeekAbbr;
 </script>
 
 <div class="date-picker {className}">
@@ -41,7 +43,7 @@
       start={timeFrame.min}
       end={yesterdayDate}
       pickWeek={sensor.isWeeklySignal}
-      formattedSelected={sensor.isWeeklySignal ? formatWeek(value) : formatDateShortDayOfWeekAbbr(value)}
+      formattedSelected={sensor.isWeeklySignal ? formatWeek(value) : formatter(value)}
     >
       <button
         aria-label="selected date"
@@ -51,7 +53,7 @@
         <span class="selected-date-icon">
           {@html calendarIcon}
         </span>
-        <span>{sensor.isWeeklySignal ? formatWeek(value) : formatDateShortDayOfWeekAbbr(value)}</span>
+        <span>{sensor.isWeeklySignal ? formatWeek(value) : formatter(value)}</span>
       </button>
       <svelte:fragment slot="footer">
         {#if info}
@@ -78,7 +80,7 @@
       <span class="inline-svg-icon">
         {@html calendarIcon}
       </span>
-      <span>{sensor.isWeeklySignal ? formatWeek(value) : formatDateShortDayOfWeekAbbr(value)}</span>
+      <span>{sensor.isWeeklySignal ? formatWeek(value) : formatter(value)}</span>
     </button>
   {/if}
   <button
