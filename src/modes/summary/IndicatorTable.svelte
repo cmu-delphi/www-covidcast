@@ -4,7 +4,7 @@
   import FancyHeader from '../../components/FancyHeader.svelte';
   import { SensorParam } from '../../stores/params';
   import { formatDateISO, formatDateShortNumbers, formatFraction } from '../../formats';
-  import { currentMode, metaDataManager } from '../../stores';
+  import { currentMode, metaDataManager, isMobileDevice } from '../../stores';
   import { modeByID } from '..';
   import Vega from '../../components/vega/Vega.svelte';
   import SparkLineTooltip from '../../components/SparkLineTooltip.svelte';
@@ -14,6 +14,7 @@
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
   import SensorUnit from '../../components/SensorUnit.svelte';
   import { computeLatest } from '../../data/trend';
+  import RowHelper from './RowHelper.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -112,9 +113,9 @@
 
 <table class="mobile-table">
   <thead>
-    <tr>
-      <th class="mobile-th"><span /></th>
-      <th class="mobile-th"><span>Indicator</span></th>
+    <RowHelper>
+      <th slot="common" class="mobile-th" rowspan={$isMobileDevice ? 2 : 1}><span /></th>
+      <th slot="header" class="mobile-th" colspan="5"><span>Indicator</span></th>
       <th class="mobile-th uk-text-right" colspan="2"><span>Value</span></th>
       <th class="mobile-th uk-text-right"><span>Relative Change to Previous Week</span></th>
       <th class="mobile-th uk-text-right">
@@ -125,16 +126,18 @@
         </div>
       </th>
       <th class="mobile-th" />
-    </tr>
+    </RowHelper>
   </thead>
   <tbody>
     {#each loadedData as group (group.label)}
       {#each group.sensors as entry, index (entry.sensor.key)}
-        <tr>
-          {#if index === 0}
-            <td rowspan={group.sensors.length} class="group-label">{group.label}</td>
-          {/if}
-          <td>
+        <RowHelper>
+          <svelte:fragment slot="common">
+            {#if index === 0}
+              <td rowspan={group.sensors.length * ($isMobileDevice ? 2 : 1)} class="group-label">{group.label}</td>
+            {/if}
+          </svelte:fragment>
+          <td slot="header" colspan="5">
             <IndicatorAnnotations
               asHint
               sensor={entry.sensor}
@@ -204,7 +207,7 @@
               {@html chevronRightIcon}
             </a>
           </td>
-        </tr>
+        </RowHelper>
       {/each}
     {/each}
   </tbody>
