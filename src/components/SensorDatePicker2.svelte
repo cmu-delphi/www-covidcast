@@ -103,11 +103,11 @@
 
   .selected-date {
     border: none;
-    letter-spacing: 3px;
+    letter-spacing: 1px;
     background: none;
     font-size: 0.875rem;
     font-weight: 600;
-    padding: 13px;
+    padding: 10px;
     line-height: 1;
     white-space: nowrap;
   }
@@ -117,16 +117,10 @@
     box-sizing: content-box;
     background: none;
     border: none;
-    padding: 13px;
+    padding: 10px;
+    margin: 3px 0;
     width: 14px;
     height: 15px;
-  }
-
-  .arrow-left {
-    margin-right: 10px; /* 36 - 13*2 */
-  }
-  .arrow-right {
-    margin-left: 10px; /* 36 - 13*2 */
   }
 
   .picker-button {
