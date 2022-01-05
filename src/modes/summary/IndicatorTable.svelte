@@ -152,7 +152,7 @@
               on:click|preventDefault={entry.switchMode}
             >
               {entry.sensor.name}
-              ({cleanSource(entry.sensor.value.dataSourceName)})
+              <span class="source-name">({cleanSource(entry.sensor.value.dataSourceName)})</span>
             </a>
           </td>
           <td class="uk-text-right bold-value table-value">
@@ -243,5 +243,9 @@
 
   .ux-hint {
     font-size: 90%;
+  }
+
+  .source-name {
+    font-size: 80%;
   }
 </style>
