@@ -16,6 +16,7 @@
   import SourceBadges from '../../components/SourceBadges.svelte';
   import { EpiWeek } from '../../data/EpiWeek';
 
+  let showObsolete = false;
   let sourceValue = null;
   $: source = sourceValue ? $metaDataManager.metaSources.find((d) => d.source === sourceValue) : null;
   $: sensors = source ? source.sensors : [];
@@ -178,10 +179,15 @@
             <div class="uk-form-controls">
               <select id="ds" bind:value={sourceValue} size="8" class="uk-select">
                 {#each $metaDataManager.metaSources as source}
-                  <option value={source.source}>{source.name}</option>
+                  {#if showObsolete || !source.obsolete}
+                    <option value={source.source}>{source.name}</option>
+                  {/if}
                 {/each}
               </select>
             </div>
+            {#if $metaDataManager.metaSources.some((d) => d.obsolete)}
+              <label><input type="checkbox" bind:checked={showObsolete} /> Show Obsolete Data Sources</label>
+            {/if}
           </div>
         </div>
 

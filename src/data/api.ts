@@ -273,6 +273,8 @@ export interface EpiDataMetaSourceInfo {
   reference_signal?: string;
 
   signals: EpiDataMetaInfo[];
+
+  obsolete?: boolean;
 }
 
 export function callMetaAPI(
