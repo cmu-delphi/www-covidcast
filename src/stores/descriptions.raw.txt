@@ -23,6 +23,7 @@ Name: COVID Symptom Searches on Google
 Id: google-symptoms
 Signal: sum_anosmia_ageusia_smoothed_search
 Unit: scaled search volume
+UnitShort: 
 noMaps: true
  
 SignalTooltip: Google search volume of COVID-related symptom searches

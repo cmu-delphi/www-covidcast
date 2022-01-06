@@ -16,6 +16,7 @@ export interface SensorConfig {
   description: string;
 
   unit?: string;
+  unitShort?: string;
 
   noMaps?: boolean;
 
