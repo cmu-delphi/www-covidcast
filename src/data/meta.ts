@@ -144,6 +144,8 @@ function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
           xAxis: m.time_label,
           yAxis: m.value_label || yAxis[m.format] || yAxis.raw,
           unit: units[m.format] || units.raw,
+          unitShort:
+            m.format === 'per100k' ? 'per 100k' : m.format === 'percent' ? 'per 100' : units[m.format] || units.raw,
           colorScale: colorScales[m.high_values_are],
           vegaColorScale: vegaColorScales[m.high_values_are],
           links: sm.link.map((d) => `<a href="${d.href}">${d.alt}</a>`),
