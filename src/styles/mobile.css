@@ -173,9 +173,20 @@
   vertical-align: middle;
 }
 
-.mobile-table > tbody > tr:not(:last-of-type),
+.mobile-table > tbody > tr.mobile-table-first > td {
+  padding-bottom: 0.25rem;
+}
+.mobile-table > tbody > tr.mobile-table-other > td {
+  padding-top: 0.25rem;
+}
+
 .mobile-table > tbody > tr:not(:nth-last-child(2)) td[rowspan] {
   border-bottom: 1px solid #f0f1f3;
+}
+
+.mobile-table > tbody > tr.mobile-table-fist,
+.mobile-table > tbody > tr:last-of-type {
+  border-bottom: none;
 }
 
 .mobile-table .important {
