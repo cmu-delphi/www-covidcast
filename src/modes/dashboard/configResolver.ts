@@ -1,6 +1,13 @@
 import { parseAPITime } from '../../data';
-import { getInfoByName } from '../../data/regions';
-import { DateParam, RegionLevel, RegionParam, Sensor, SensorParam, TimeFrame } from '../../stores/params';
+import {
+  getInfoByName,
+  nationInfo,
+  getHHSRegionOfState,
+  getStateOfCounty,
+  StateInfo,
+  CountyInfo,
+} from '../../data/regions';
+import { DateParam, Region, RegionLevel, RegionParam, Sensor, SensorParam, TimeFrame } from '../../stores/params';
 
 export function resolveSensor(defaultSensor: SensorParam, key?: string): SensorParam {
   if (!key) {
@@ -29,6 +36,25 @@ export function resolveSensors(defaultSensor: SensorParam, keys?: readonly strin
   return keys.map((k) => defaultSensor.manager.getSensor(k)).filter((d): d is Sensor => d != null);
 }
 
+export function resolveSensorParams(defaultSensor: SensorParam, keys?: readonly string[]): SensorParam[] {
+  const CASES = new SensorParam(defaultSensor.manager.getDefaultCasesSignal()!, defaultSensor.manager);
+  const DEATHS = new SensorParam(defaultSensor.manager.getDefaultDeathSignal()!, defaultSensor.manager);
+
+  if (!keys) {
+    if (defaultSensor.key === CASES.key || defaultSensor.key === DEATHS.key) {
+      return [CASES, DEATHS];
+    }
+    return [defaultSensor, CASES, DEATHS];
+  }
+  if (typeof keys === 'string') {
+    return [resolveSensor(defaultSensor, keys)];
+  }
+  return keys
+    .map((k) => defaultSensor.manager.getSensor(k))
+    .filter((d): d is Sensor => d != null)
+    .map((s) => new SensorParam(s, defaultSensor.manager));
+}
+
 export function resolveRegion(defaultRegion: RegionParam, r?: string): RegionParam {
   if (!r) {
     return defaultRegion;
@@ -38,6 +64,39 @@ export function resolveRegion(defaultRegion: RegionParam, r?: string): RegionPar
     return defaultRegion;
   }
   return new RegionParam(rr);
+}
+
+export function resolveRegions(defaultRegion: RegionParam, r?: string): RegionParam[] {
+  const regions: RegionParam[] = [];
+  if (!r) {
+    // derive default
+    regions.push(defaultRegion);
+    if (defaultRegion.level === 'nation') {
+      return regions;
+    }
+    if (defaultRegion.level === 'state') {
+      const hhs = getHHSRegionOfState(defaultRegion.value as StateInfo);
+      if (hhs) {
+        regions.push(new RegionParam(hhs));
+      }
+    }
+    if (defaultRegion.level === 'county') {
+      const state = getStateOfCounty(defaultRegion.value as CountyInfo);
+      if (state) {
+        regions.push(new RegionParam(state));
+      }
+    }
+    regions.push(new RegionParam(nationInfo));
+    return regions;
+  }
+  if (typeof r === 'string') {
+    const rr = getInfoByName(r);
+    return rr ? [new RegionParam(rr)] : [defaultRegion];
+  }
+  return (r as string[])
+    .map((ri) => getInfoByName(ri))
+    .filter((r): r is Region => r != null)
+    .map((r) => new RegionParam(r));
 }
 
 export function resolveRegionLevel(defaultRegion: RegionParam, level?: RegionLevel): RegionLevel {

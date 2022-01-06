@@ -4,6 +4,7 @@
   import RegionPicker from './config/RegionPicker.svelte';
   import SensorPicker from './config/SensorPicker.svelte';
   import SensorsPicker from './config/SensorsPicker.svelte';
+  import RegionsPicker from './config/RegionsPicker.svelte';
   import TimeFramePicker from './config/TimeFramePicker.svelte';
   import { findWidget } from './state';
 
@@ -34,6 +35,9 @@
 {/if}
 {#if hasConfig.has('region')}
   <RegionPicker {region} value={config.region || ''} />
+{/if}
+{#if hasConfig.has('regions')}
+  <RegionsPicker {region} value={config.regions || ''} />
 {/if}
 {#if hasConfig.has('level')}
   <LevelPicker {region} value={config.level} />
