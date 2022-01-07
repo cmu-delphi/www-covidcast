@@ -18,6 +18,7 @@
   import { createEventDispatcher } from 'svelte';
   import { EpiWeek } from '../../../data/EpiWeek';
   import { isComparableAcrossRegions } from '../../../data/sensor';
+  import RegionLineTooltip from './RegionLineTooltip.svelte';
 
   const dispatch = createEventDispatcher();
 
@@ -96,6 +97,7 @@
       isWeeklySignal: isWeekly,
       legend: true,
       compareField: 'displayName',
+      tooltip: true,
     };
     return generateCompareLineSpec(
       regions.map((region) => region.displayName),
@@ -195,6 +197,8 @@
     signals={{ highlight_tuple: patchHighlightTuple }}
     signalListeners={['highlight']}
     on:signal_highlight={onHighlightSignal}
+    tooltip={RegionLineTooltip}
+    tooltipProps={{ sensor }}
   />
   <svelte:fragment slot="toolbar">
     <DownloadMenu {fileName} {vegaRef} {data} {sensor} advanced={false} />

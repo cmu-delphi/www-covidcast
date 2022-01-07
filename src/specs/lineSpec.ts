@@ -283,6 +283,7 @@ export interface LineSpecOptions {
   tickCount?: Axis<ExprRef | SignalRef>['tickCount'];
   isWeeklySignal?: boolean;
   stderr?: boolean;
+  tooltip?: boolean;
 }
 
 export function generateLineChartSpec({
@@ -310,6 +311,7 @@ export function generateLineChartSpec({
     interval: 'week' as const,
     step: 1,
   },
+  tooltip = false,
   isWeeklySignal = false,
   stderr = false,
 }: LineSpecOptions = {}): TopLevelSpec & LayerSpec<Field> {
@@ -418,7 +420,7 @@ export function generateLineChartSpec({
           type: 'point',
           color,
           stroke: null,
-          tooltip: false,
+          tooltip,
         },
         encoding: {
           x: {
