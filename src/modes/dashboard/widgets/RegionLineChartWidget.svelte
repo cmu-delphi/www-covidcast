@@ -11,18 +11,13 @@
   import WidgetCard, { DEFAULT_WIDGET_STATE } from './WidgetCard.svelte';
   import { getContext } from 'svelte';
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
-  import {
-    generateLineChartSpec,
-    genAnnotationLayer,
-    resolveHighlightedDate,
-    patchHighlightTuple,
-  } from '../../../specs/lineSpec';
-  import { annotationManager, getLevelInfo } from '../../../stores';
+  import { generateCompareLineSpec, resolveHighlightedDate, patchHighlightTuple } from '../../../specs/lineSpec';
   import { formatDateISO, formatWeek } from '../../../formats';
   import { WidgetHighlight } from '../highlight';
   import isEqual from 'lodash-es/isEqual';
   import { createEventDispatcher } from 'svelte';
   import { EpiWeek } from '../../../data/EpiWeek';
+  import { isComparableAcrossRegions } from '../../../data/sensor';
 
   const dispatch = createEventDispatcher();
 
@@ -47,6 +42,9 @@
   export let highlight = null;
 
   export let initialState = DEFAULT_STATE;
+
+  $: canCompare = isComparableAcrossRegions(sensor.value);
+  $: visibleRegions = canCompare ? regions : regions.slice(0, Math.min(2, regions.length));
 
   let superState = {};
   $: state = {
@@ -74,69 +72,62 @@
 
   /**
    * @param {import('../../../stores/params').SensorParam} sensor
-   * @param {import('../../../stores/params').RegionParam} region
+   * @param {import('../../../stores/params').RegionParam[]} regions
    * @param {import('../../../stores/params').TimeFrame} timeFrame
    * @param {{zero: boolean, raw: boolean}} options
    */
-  function genSpec(sensor, region, timeFrame) {
+  function genSpec(sensor, regions, timeFrame) {
     const isWeekly = sensor.value.isWeeklySignal;
     /**
      * @type {import('../../../specs/lineSpec').LineSpecOptions}
      */
     const options = {
       initialDate: highlightToDate(highlight) || timeFrame.max,
-      color: getLevelInfo(region.level).color,
       domain: timeFrame.domain,
       zero: false,
       valueFormat: sensor.value.formatSpecifier,
       xTitle: sensor.xAxis,
-      title: [`${sensor.name} in ${region.displayName}`, timeFrame.toNiceString(isWeekly)],
+      title: [`${sensor.name}`, timeFrame.toNiceString(isWeekly)],
       subTitle: sensor.unit,
       highlightRegion: false,
       clearHighlight: false,
       autoAlignOffset: 60,
       paddingTop: 80,
       isWeeklySignal: isWeekly,
+      legend: true,
+      compareField: 'displayName',
     };
-    return generateLineChartSpec(options);
+    return generateCompareLineSpec(
+      regions.map((region) => region.displayName),
+      options,
+    );
   }
 
   /**
-   * @param {import("../../stores/params").SensorParam} sensor
-   * @param {import("../../stores/params").DateParam} date
-   * @param {import("../../stores/params").TimeFrame} timeFrame
+   * @param {import("../../../stores/params").SensorParam} sensor
+   * @param {import("../../../stores/params").RegionParam[]} regions
+   * @param {import("../../../stores/params").TimeFrame} timeFrame
    * @param {boolean} raw
    */
-  function loadData(sensor, region, timeFrame) {
-    const selfData = fetcher.fetch1Sensor1RegionNDates(sensor, region, timeFrame);
-    return selfData;
+  function loadData(sensor, regions, timeFrame) {
+    return fetcher.fetch1SensorNRegionsNDates(sensor, regions, timeFrame);
   }
 
   /**
-   * @param {import("../../stores/params").SensorParam} sensor
-   * @param {import("../../stores/params").Region region
+   * @param {import("../../../stores/params").SensorParam} sensor
+   * @param {import("../../../stores/params").Region region
    */
-  function generateFileName(sensor, region, timeFrame) {
-    const regionName = `${region.propertyId}-${region.displayName}`;
+  function generateFileName(sensor, regions, timeFrame) {
+    const regionName = regions.map((region) => `${region.propertyId}-${region.displayName}`);
     let suffix = '';
     return `${sensor.name}_${regionName}_${
       sensor.isWeeklySignal ? formatWeek(timeFrame.min_week) : formatDateISO(timeFrame.min)
     }-${sensor.isWeeklySignal ? formatWeek(timeFrame.max_week) : formatDateISO(timeFrame.max)}${suffix}`;
   }
 
-  function injectRanges(spec, timeFrame, annotations) {
-    if (annotations.length > 0) {
-      spec.layer.unshift(genAnnotationLayer(annotations, timeFrame));
-    }
-    return spec;
-  }
-
-  $: region = regions[0];
-
-  $: annotations = $annotationManager.getWindowAnnotations(sensor, region, timeFrame.min, timeFrame.max);
-  $: spec = injectRanges(genSpec(sensor, region, timeFrame), timeFrame, annotations);
-  $: data = loadData(sensor, region, timeFrame);
-  $: fileName = generateFileName(sensor, region, timeFrame);
+  $: spec = genSpec(sensor, visibleRegions, timeFrame);
+  $: data = loadData(sensor, visibleRegions, timeFrame);
+  $: fileName = generateFileName(sensor, visibleRegions, timeFrame);
 
   let vegaRef = null;
 
@@ -144,7 +135,7 @@
     const date = resolveHighlightedDate(event);
     const newHighlight = new WidgetHighlight(
       sensor.value,
-      region.value,
+      visibleRegions.map((r) => r.value),
       sensor.isWeeklySignal ? EpiWeek.fromDate(date) : date,
     );
     if (!newHighlight.equals(highlight)) {
@@ -152,7 +143,7 @@
     }
   }
 
-  $: highlighted = highlight != null && highlight.matches(sensor.value, region.value, timeFrame);
+  $: highlighted = highlight != null && highlight.matches(sensor.value, visibleRegions[0], timeFrame);
 
   function updateVegaHighlight(highlight) {
     if (!vegaRef) {
@@ -188,7 +179,7 @@
   {initialState}
   defaultState={DEFAULT_STATE}
   {highlighted}
-  region={regions.length === 1 ? region : 'Regions'}
+  region={visibleRegions.length === 1 ? visibleRegions[0] : 'Regions'}
   {sensor}
   date={timeFrame}
   {id}

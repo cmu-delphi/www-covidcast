@@ -20,16 +20,18 @@
     displayName: `Use Configured: ${region.displayName}`,
   };
   $: allItems = [defaultRegion, ...sortedNameInfos];
+
+  $: selectedItems = syncedValues.map((d) => (!d ? defaultRegion : getInfoByName(d)));
 </script>
 
-<div>
+<div class="regions-picker">
   <label for="widget-adder-r" class="uk-form-label">Geographic Regions</label>
   {#each syncedValues as s}
     <input type="hidden" value={s} name="regions" />
   {/each}
   <RegionSearch
     items={allItems}
-    selectedItems={value ? value.map((v) => getInfoByName(v)) : [defaultRegion]}
+    {selectedItems}
     on:change={(e) => {
       syncedValues = e.detail ? [`${e.detail.id}@${e.detail.level}`] : [''];
     }}
@@ -43,3 +45,9 @@
     }}
   />
 </div>
+
+<style>
+  .regions-picker :global(.search-multiple) {
+    max-width: 35em;
+  }
+</style>

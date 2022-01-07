@@ -553,7 +553,11 @@ export function generateLineChartSpec({
 
 export function generateCompareLineSpec(
   compare: string[],
-  { compareField = 'displayName', ...options }: LineSpecOptions & { compareField?: string } = {},
+  {
+    compareField = 'displayName',
+    legend = false,
+    ...options
+  }: LineSpecOptions & { compareField?: string; legend?: boolean } = {},
 ): TopLevelSpec {
   const spec = generateLineChartSpec(options);
   spec.layer[0].encoding!.color = {
@@ -563,8 +567,18 @@ export function generateCompareLineSpec(
       domain: compare,
       range: MULTI_COLORS,
     },
-    legend: null,
+    legend: legend
+      ? {
+          direction: 'horizontal',
+          orient: 'bottom',
+          title: null,
+          symbolType: 'stroke',
+        }
+      : null,
   };
+  if (legend) {
+    (spec.padding! as { bottom: number }).bottom = 66;
+  }
   spec.layer[1].encoding!.color = {
     field: compareField,
     type: 'nominal',

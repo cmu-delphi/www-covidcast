@@ -48,7 +48,7 @@
 </div>
 
 <style>
-  .sensors-picker :global(.serach-multiple) {
+  .sensors-picker :global(.search-multiple) {
     max-width: 35em;
   }
 </style>
