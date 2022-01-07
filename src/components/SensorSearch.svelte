@@ -26,12 +26,14 @@
   icon="database"
   {selectedItem}
   {selectedItems}
+  clear={selectedItems == null}
   selectOnClick
   labelFieldName="name"
   keywordFunction={combineKeywords}
   maxItemsToShowInList={11}
   on:change
   on:add
+  on:remove
 >
   <svelte:fragment slot="entry" let:label let:item let:onClick>
     <a

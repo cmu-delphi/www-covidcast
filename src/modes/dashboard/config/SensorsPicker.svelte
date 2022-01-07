@@ -44,6 +44,13 @@
         syncedValues = [...syncedValues, e.detail.key];
       }
     }}
+    on:remove={(e) => {
+      if (syncedValues.length === 1) {
+        syncedValues = [''];
+      } else {
+        syncedValues = syncedValues.filter((d) => d !== e.detail.key);
+      }
+    }}
   />
 </div>
 

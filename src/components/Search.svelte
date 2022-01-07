@@ -334,6 +334,7 @@
     />
     {#if clear}
       <button
+        type="button"
         class="uk-search-icon clear-button"
         class:hidden={!text}
         class:modern
@@ -349,6 +350,7 @@
       <div class="search-tag">
         <span>{labelFunction(selectedItem)}</span>
         <button
+          type="button"
           class=""
           data-uk-icon="icon: close"
           on:click={() => removeItem(selectedItem)}
@@ -376,14 +378,18 @@
         on:keypress={onKeyPress}
       />
     {/if}
-    <button
-      class="uk-search-icon clear-button"
-      class:modern
-      class:hidden={selectedItems.length === 0}
-      on:click={onResetItem}
-      title="Clear Search Field"
-      data-uk-icon="icon: close"
-    />
+
+    {#if clear}
+      <button
+        type="button"
+        class="uk-search-icon clear-button"
+        class:modern
+        class:hidden={selectedItems.length === 0}
+        on:click={onResetItem}
+        title="Clear Search Field"
+        data-uk-icon="icon: close"
+      />
+    {/if}
   {/if}
 
   <div class="uk-dropdown uk-dropdown-bottom-left search-box-list" class:uk-open={opened} bind:this={listRef}>

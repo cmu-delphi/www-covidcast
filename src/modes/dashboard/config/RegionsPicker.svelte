@@ -21,6 +21,10 @@
   };
   $: allItems = [defaultRegion, ...sortedNameInfos];
 
+  function toKey(e) {
+    return !e.detail || e.detail.id === '' ? '' : `${e.detail.id}@${e.detail.level}`;
+  }
+
   $: selectedItems = syncedValues.map((d) => (!d ? defaultRegion : getInfoByName(d)));
 </script>
 
@@ -33,14 +37,22 @@
     items={allItems}
     {selectedItems}
     on:change={(e) => {
-      syncedValues = e.detail ? [`${e.detail.id}@${e.detail.level}`] : [''];
+      syncedValues = e.detail ? [toKey(e)] : [''];
     }}
     on:add={(e) => {
       if (syncedValues.length === 1 && syncedValues[0] === '') {
         // replace default
-        syncedValues = [`${e.detail.id}@${e.detail.level}`];
+        syncedValues = [toKey(e)];
       } else {
-        syncedValues = [...syncedValues, `${e.detail.id}@${e.detail.level}`];
+        syncedValues = [...syncedValues, toKey(e)];
+      }
+    }}
+    on:remove={(e) => {
+      if (syncedValues.length === 1) {
+        syncedValues = [''];
+      } else {
+        const key = toKey(e);
+        syncedValues = syncedValues.filter((d) => d !== key);
       }
     }}
   />

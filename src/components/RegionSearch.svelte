@@ -27,11 +27,13 @@
   selectOnClick
   {selectedItem}
   {selectedItems}
+  clear={selectedItems == null}
   labelFieldName="displayName"
   keywordFunction={combineKeywords}
   maxItemsToShowInList={15}
   on:change
   on:add
+  on:remove
 >
   <svelte:fragment slot="entry" let:label let:item let:onClick>
     <a class="search-box-link" href="?region={item ? item.id : ''}" on:click|preventDefault={onClick}>

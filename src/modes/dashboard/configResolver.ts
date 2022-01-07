@@ -40,7 +40,7 @@ export function resolveSensorParams(defaultSensor: SensorParam, keys?: readonly 
   const CASES = new SensorParam(defaultSensor.manager.getDefaultCasesSignal()!, defaultSensor.manager);
   const DEATHS = new SensorParam(defaultSensor.manager.getDefaultDeathSignal()!, defaultSensor.manager);
 
-  if (!keys) {
+  if (!keys || keys.length === 0 || (keys.length === 1 && !keys[0])) {
     if (defaultSensor.key === CASES.key || defaultSensor.key === DEATHS.key) {
       return [CASES, DEATHS];
     }
@@ -50,7 +50,7 @@ export function resolveSensorParams(defaultSensor: SensorParam, keys?: readonly 
     return [resolveSensor(defaultSensor, keys)];
   }
   return keys
-    .map((k) => defaultSensor.manager.getSensor(k))
+    .map((k) => (k ? defaultSensor.manager.getSensor(k) : defaultSensor))
     .filter((d): d is Sensor => d != null)
     .map((s) => new SensorParam(s, defaultSensor.manager));
 }
@@ -66,9 +66,9 @@ export function resolveRegion(defaultRegion: RegionParam, r?: string): RegionPar
   return new RegionParam(rr);
 }
 
-export function resolveRegions(defaultRegion: RegionParam, r?: string): RegionParam[] {
+export function resolveRegions(defaultRegion: RegionParam, keys?: string[] | string): RegionParam[] {
   const regions: RegionParam[] = [];
-  if (!r) {
+  if (!keys || keys.length === 0 || (keys.length === 1 && !keys[0])) {
     // derive default
     regions.push(defaultRegion);
     if (defaultRegion.level === 'nation') {
@@ -89,12 +89,12 @@ export function resolveRegions(defaultRegion: RegionParam, r?: string): RegionPa
     regions.push(new RegionParam(nationInfo));
     return regions;
   }
-  if (typeof r === 'string') {
-    const rr = getInfoByName(r);
+  if (typeof keys === 'string') {
+    const rr = keys ? getInfoByName(keys) : defaultRegion;
     return rr ? [new RegionParam(rr)] : [defaultRegion];
   }
-  return (r as string[])
-    .map((ri) => getInfoByName(ri))
+  return (keys as string[])
+    .map((ri) => (ri ? getInfoByName(ri) : defaultRegion))
     .filter((r): r is Region => r != null)
     .map((r) => new RegionParam(r));
 }
