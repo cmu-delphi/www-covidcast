@@ -57,6 +57,7 @@ export interface Sensor {
 
   readonly name: string; // signal name
   readonly unit: string;
+  readonly unitShort: string;
   readonly dataSourceName: string;
   readonly type: SignalCategory;
   readonly levels: readonly RegionLevel[];
@@ -149,6 +150,7 @@ export function ensureSensorStructure(sensor: Partial<Sensor> & { name: string; 
     xAxis: 'Date',
     yAxis: yAxis[format] || yAxis.raw,
     unit: units[format] || units.raw,
+    unitShort: format === 'per100k' ? 'per 100k' : format === 'percent' ? 'per 100' : units[format] || units.raw,
     highValuesAre,
     is7DayAverage: false,
     hasStdErr: false,

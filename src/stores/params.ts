@@ -128,7 +128,7 @@ export class SensorParam {
     this.valueUnit = this.is7DayAverage ? '7-day average' : 'value';
     this.formatValue = (v, e) => sensor.formatValue(v, e);
     this.unit = sensor.unit;
-    this.unitShort = this.isPer100K ? 'per 100k' : this.isPercentage ? 'per 100' : this.unit;
+    this.unitShort = sensor.unitShort;
     this.unitHTML = this.isPer100K
       ? `<span class="per100k"><span>PER</span><span>100K</span></span>`
       : this.isPercentage
