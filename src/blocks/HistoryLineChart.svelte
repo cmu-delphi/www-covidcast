@@ -26,6 +26,7 @@
   import IndicatorAnnotations from '../components/IndicatorAnnotations.svelte';
   import { joinTitle } from '../specs/commonSpec';
   import { TimeFrame } from '../stores/params';
+  import { timeDay } from 'd3-time';
 
   export let height = 250;
 
@@ -88,7 +89,9 @@
   };
 
   function mixTimeFrame(st, dw) {
-    if (st.max < dw.max) {
+    const diff = timeDay.count(st.max, dw.max);
+    if (diff >= 0 && diff <= 2) {
+      // use the "latest"
       return new TimeFrame(st.min, dw.max, st.min_week, dw.max_week);
     }
     return st;
