@@ -25,6 +25,8 @@
   import IndicatorAnnotation from '../components/IndicatorAnnotation.svelte';
   import IndicatorAnnotations from '../components/IndicatorAnnotations.svelte';
   import { joinTitle } from '../specs/commonSpec';
+  import { TimeFrame } from '../stores/params';
+  import { timeDay } from 'd3-time';
 
   export let height = 250;
 
@@ -86,9 +88,18 @@
     displayName: 'Neighboring Counties',
   };
 
+  function mixTimeFrame(st, dw) {
+    const diff = timeDay.count(st.max, dw.max);
+    if (diff >= 0 && diff <= 2) {
+      // use the "latest"
+      return new TimeFrame(st.min, dw.max, st.min_week, dw.max_week);
+    }
+    return st;
+  }
+
   $: highlightDate = date.value;
   $: showAllDates = showFull && !($isMobileDevice && raw);
-  $: timeFrame = showAllDates ? sensor.timeFrame : date.windowTimeFrame;
+  $: timeFrame = showAllDates ? mixTimeFrame(sensor.timeFrame, date.windowTimeFrame) : date.windowTimeFrame;
 
   /**
    * @param {import('../stores/params').SensorParam} sensor
