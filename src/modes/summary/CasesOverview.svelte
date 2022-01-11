@@ -37,7 +37,7 @@
 
 <p>
   On {formatDateDayOfWeek(date.value)}
-  <MaxDateHint sensor={CASES.value} suffix="," />
+  <MaxDateHint sensor={CASES.value} suffix="," {date} {region} {fetcher} />
   the {CASES.valueUnit}s were:
 </p>
 

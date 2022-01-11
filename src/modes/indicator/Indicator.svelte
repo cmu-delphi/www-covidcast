@@ -72,7 +72,7 @@
 
       <p>
         On {formatDateDayOfWeek(date.value)}
-        <MaxDateHint sensor={sensor.value} suffix="," />
+        <MaxDateHint sensor={sensor.value} suffix="," {date} {region} {fetcher} />
         the {sensor.valueUnit} was:
       </p>
       <IndicatorOverview {sensor} {date} {region} {fetcher} />
