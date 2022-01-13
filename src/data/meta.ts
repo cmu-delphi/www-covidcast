@@ -6,7 +6,7 @@ import { ALL_TIME_FRAME, TimeFrame } from './TimeFrame';
 import { Sensor, units, colorScales, vegaColorScales, yAxis, EpiDataMetaParsedInfo, SensorLike } from './sensor';
 import { formatSpecifiers, formatter } from '../formats';
 import { marked } from 'marked';
-import { isCasesSignal } from '.';
+import { isCasesSignal } from './signals';
 
 function toKey(source: string, signal: string) {
   return `${source}-${signal}`;

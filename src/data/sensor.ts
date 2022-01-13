@@ -6,7 +6,7 @@ import { isArray } from './apimodel';
 import type { EpiWeek } from './EpiWeek';
 import type { TimeFrame } from './TimeFrame';
 import { colorScales, vegaColorScales } from './sensorConstants';
-import { isCasesSignal } from '.';
+import { isCasesSignal } from './signals';
 
 export * from './sensorConstants';
 
