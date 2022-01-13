@@ -1,12 +1,13 @@
 import { timeFormat } from 'd3-time-format';
 import { format } from 'd3-format';
 import embed, { EmbedOptions, Result, VisualizationSpec } from 'vega-embed';
-import { Error, expressionFunction, projection } from 'vega';
+import { Error, expressionFunction, projection, scheme } from 'vega';
 import { geoAlbersUsaTerritories } from 'geo-albers-usa-territories';
 import type { ExtendedFeature, GeoProjection } from 'd3-geo';
 import { fitExtent, fitSize, fitWidth, fitHeight } from 'd3-geo/src/projection/fit';
 import { timeDay } from 'd3-time';
 import { EpiWeek } from '../../data/EpiWeek';
+import { extendedColorScale } from '../../data/sensorConstants';
 
 function patchedAlbersUsaTerritories(): GeoProjection {
   // see https://github.com/stamen/geo-albers-usa-territories/pull/8/files
@@ -219,3 +220,5 @@ expressionFunction('customInFilter', <T>(arr: Record<string, T>[], prop: string,
 
 expressionFunction('customCountDays', (d1: Date, d2: Date) => timeDay.count(d1, d2));
 expressionFunction('customCountWeeks', (d1: Date, d2: Date) => Math.floor(timeDay.count(d1, d2) / 7));
+
+scheme('extendedColorScale', extendedColorScale);

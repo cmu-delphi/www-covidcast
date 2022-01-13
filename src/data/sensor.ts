@@ -1,11 +1,14 @@
 import { formatter, formatSpecifiers } from '../formats';
-import { interpolateBuPu, interpolateYlGnBu, interpolateYlOrRd } from 'd3-scale-chromatic';
 import { getDataSource } from './dataSourceLookup';
 import { defaultCountyRegion, defaultStateRegion, nationInfo, Region, RegionLevel } from './regions';
 import type { EpiDataMetaInfo, SignalCategory, SignalFormat, SignalHighValuesAre } from './api';
 import { isArray } from './apimodel';
 import type { EpiWeek } from './EpiWeek';
 import type { TimeFrame } from './TimeFrame';
+import { colorScales, vegaColorScales } from './sensorConstants';
+import { isCasesSignal } from '.';
+
+export * from './sensorConstants';
 
 export const sensorTypes: { id: SignalCategory; label: string }[] = [
   {
@@ -65,6 +68,7 @@ export interface Sensor {
   readonly signalTooltip: string; // short text description
   readonly colorScale: (this: void, v: number) => string;
   readonly vegaColorScale: string;
+  readonly useExtendedColorScale: boolean;
 
   readonly links: readonly string[]; // more information links
   readonly credits?: string; // credit text
@@ -95,17 +99,6 @@ function determineHighValuesAre(sensor: {
   }
   return 'bad';
 }
-
-export const colorScales = {
-  good: interpolateYlGnBu,
-  bad: interpolateYlOrRd,
-  neutral: interpolateBuPu,
-};
-export const vegaColorScales = {
-  good: 'yellowgreenblue',
-  bad: 'yelloworangered',
-  neutral: 'bluepurple',
-};
 
 export const yAxis = {
   raw: 'arbitrary scale',
@@ -141,6 +134,7 @@ export function ensureSensorStructure(sensor: Partial<Sensor> & { name: string; 
     signalTooltip: sensor.signalTooltip || 'No description available',
     colorScale: colorScales[highValuesAre],
     vegaColorScale: vegaColorScales[highValuesAre],
+    useExtendedColorScale: isCasesSignal(key),
 
     links: [],
     credits: 'We are happy for you to use this data in products and publications.',
