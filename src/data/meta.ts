@@ -63,7 +63,7 @@ function toValueDomain(stats: EpiDataMetaStatsInfo, signal: string, extended: bo
 
   if (extended) {
     // extended option for extra color scale
-    r.push(stats.mean + 4 * stats.stdev);
+    r.push(stats.mean + 6 * stats.stdev);
   }
   return r;
 }
