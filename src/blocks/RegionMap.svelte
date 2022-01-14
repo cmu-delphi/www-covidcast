@@ -32,9 +32,10 @@
   function genSpec(sensor, region) {
     const hasCounty = sensor.value.levels.includes('county');
     const options = {
-      domain: sensor.domain((region.level === 'state' || region.level === 'county') && hasCounty ? 'county' : 'state'),
+      ...sensor.vegaSchemeDomain(
+        (region.level === 'state' || region.level === 'county') && hasCounty ? 'county' : 'state',
+      ),
       withStates: true,
-      scheme: sensor.value.vegaColorScale,
     };
     if (region.level === 'state' && hasCounty) {
       return generateCountiesOfStateSpec(region.value, options);

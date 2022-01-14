@@ -225,13 +225,17 @@ function genLevelLayer({
   strokeWidth = 1,
   scheme = 'yellowgreenblue',
   domain,
+  range,
+  domainMid,
   initialRegion,
   interactiveHighlight = false,
   valueFormat,
 }: {
   strokeWidth?: number;
   scheme?: string;
-  domain?: [number, number];
+  domain?: number[];
+  range?: number[];
+  domainMid?: number;
   initialRegion?: string;
   interactiveHighlight?: boolean;
   valueFormat?: string;
@@ -256,8 +260,10 @@ function genLevelLayer({
         type: 'quantitative',
         scale: {
           domain,
+          domainMid,
           // domainMin: 0,
           // domainMax: 149,
+          range,
           scheme,
           clamp: true,
           nice: domain == null,
@@ -330,7 +336,7 @@ function genLevelHoverLayer({ strokeWidth = 3 } = {}): NormalizedUnitSpec | Norm
   };
 }
 
-function genLevelLegendLayer({ domain }: { domain?: [number, number] }): NormalizedUnitSpec | NormalizedLayerSpec {
+function genLevelLegendLayer({ domain }: { domain?: number[] }): NormalizedUnitSpec | NormalizedLayerSpec {
   return {
     transform: [
       {

@@ -2,7 +2,7 @@ import { timeDay, timeMonth, timeWeek } from 'd3-time';
 import { formatAPITime, addMissing, fitRange, parseAPITime, EpiDataRow } from '../data';
 import { nationInfo } from '../data/regions';
 import { currentDate, currentSensor, selectByInfo } from '.';
-import { scaleSequential } from 'd3-scale';
+import { scaleLinear, scaleSequential } from 'd3-scale';
 import { scrollToTop } from '../util';
 import type { RegionInfo as Region, RegionLevel, RegionArea, CountyInfo } from '../data/regions';
 import type { Sensor } from './constants';
@@ -11,6 +11,7 @@ import { ALL_TIME_FRAME, TimeFrame } from '../data/TimeFrame';
 import { toTimeValue } from '../data/utils';
 import type { MetaDataManager } from '../data/meta';
 import { EpiWeek } from '../data/EpiWeek';
+import { extendedColorScale } from '../data/sensorConstants';
 
 export { TimeFrame } from '../data/TimeFrame';
 export type { RegionEpiDataRow } from './DataFetcher';
@@ -149,22 +150,49 @@ export class SensorParam {
     }
   }
 
-  domain(level: RegionLevel = 'county'): [number, number] {
-    const domain = this.manager.getValueDomain(this.value, level);
-    const scaled: [number, number] = [domain[0] * this.value.valueScaleFactor, domain[1] * this.value.valueScaleFactor];
+  domain(level: RegionLevel = 'county', extended = false): [number, number] {
+    const domain = this.manager.getValueDomain(this.value, level, { extended });
+    const scaled: [number, number] = domain.map((d) => d * this.value.valueScaleFactor) as [number, number];
     if (this.isPercentage) {
       scaled[0] = Math.max(0, scaled[0]);
       scaled[1] = Math.min(100, scaled[1]);
+      scaled[scaled.length - 1] = Math.min(100, scaled[scaled.length - 1]);
     } else if (this.isPer100K) {
       scaled[0] = Math.max(0, scaled[0]);
       scaled[1] = Math.min(100000, scaled[1]);
+      scaled[scaled.length - 1] = Math.min(100000, scaled[scaled.length - 1]);
     }
     return scaled;
   }
 
+  vegaSchemeDomain(level: RegionLevel = 'county'): { domain: [number, number]; scheme: string; domainMid?: number } {
+    if (!this.value.useExtendedColorScale) {
+      return {
+        domain: this.domain(level),
+        scheme: this.value.vegaColorScale,
+      };
+    }
+    const d = this.domain(level, true);
+    return {
+      domain: [d[0], d[d.length - 1]],
+      domainMid: d[1],
+      scheme: 'extendedColorScale',
+    };
+  }
+
+  createValueScale(level: RegionLevel = 'county'): (v: number) => number {
+    const domain = this.domain(level, this.value.useExtendedColorScale);
+    return scaleLinear().domain([domain[0], domain[domain.length - 1]]);
+  }
+
   createColorScale(level: RegionLevel = 'county'): (v: number) => string {
-    const domain = this.domain(level);
-    return scaleSequential(this.value.colorScale).domain(domain).clamp(true);
+    const extended = this.value.useExtendedColorScale;
+    const domain = this.domain(level, extended);
+    if (!extended) {
+      return scaleSequential(this.value.colorScale).domain(domain).clamp(true);
+    }
+    const wrapper = scaleLinear().domain(domain).range([0, 0.5, 1]).clamp(true);
+    return (v) => extendedColorScale(wrapper(v));
   }
 
   supportsRegion(region: Region): boolean {
