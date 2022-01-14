@@ -1,3 +1,4 @@
+import { scaleLinear } from 'd3-scale';
 import { interpolateBuPu, interpolateYlGnBu, interpolateYlOrRd } from 'd3-scale-chromatic';
 
 export const colorScales = {
@@ -11,11 +12,11 @@ export const vegaColorScales = {
   bad: 'yelloworangered',
   neutral: 'bluepurple',
 };
+const extended = scaleLinear(['#7c187d', '#4d014a']).domain([0, 1]);
 
 export function extendedColorScale(v: number): string {
   if (v <= 0.5) {
     return colorScales.bad(v * 2);
   }
-  // only 2nd half
-  return colorScales.neutral(v);
+  return extended((v - 0.5) * 2);
 }
