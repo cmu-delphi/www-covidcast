@@ -136,7 +136,7 @@ function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
             m.format === 'per100k' ? 'per 100k' : m.format === 'percent' ? 'per 100' : units[m.format] || units.raw,
           colorScale: colorScales[m.high_values_are],
           vegaColorScale: vegaColorScales[m.high_values_are],
-          useExtendedColorScale: isCasesSignal(key),
+          extendedColorScale: isCasesSignal(key),
           links: sm.link.map((d) => `<a href="${d.href}">${d.alt}</a>`),
           credits: credits,
           formatValue: formatter[m.format] || formatter.raw,
