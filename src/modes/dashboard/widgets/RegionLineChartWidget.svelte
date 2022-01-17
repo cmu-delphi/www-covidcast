@@ -175,13 +175,27 @@
   $: {
     updateVegaHighlight(highlight);
   }
+
+  function joinLabels(regions) {
+    if (regions.length === 0) {
+      return 'Regions';
+    }
+    if (regions.length === 1) {
+      return regions[0].displayName;
+    }
+    const r = regions
+      .slice(0, regions.length - 1)
+      .map((d) => d.displayName)
+      .join(', ');
+    return `${r} and ${regions[regions.length - 1].displayName}`;
+  }
 </script>
 
 <WidgetCard
   {initialState}
   defaultState={DEFAULT_STATE}
   {highlighted}
-  region={visibleRegions.length === 1 ? visibleRegions[0] : 'Regions'}
+  region={visibleRegions.length === 1 ? visibleRegions[0] : joinLabels(visibleRegions)}
   {sensor}
   date={timeFrame}
   {id}
