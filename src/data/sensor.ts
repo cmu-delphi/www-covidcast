@@ -68,7 +68,7 @@ export interface Sensor {
   readonly signalTooltip: string; // short text description
   readonly colorScale: (this: void, v: number) => string;
   readonly vegaColorScale: string;
-  readonly useExtendedColorScale: boolean;
+  readonly extendedColorScale: boolean;
 
   readonly links: readonly string[]; // more information links
   readonly credits?: string; // credit text
@@ -134,7 +134,7 @@ export function ensureSensorStructure(sensor: Partial<Sensor> & { name: string; 
     signalTooltip: sensor.signalTooltip || 'No description available',
     colorScale: colorScales[highValuesAre],
     vegaColorScale: vegaColorScales[highValuesAre],
-    useExtendedColorScale: isCasesSignal(key),
+    extendedColorScale: isCasesSignal(key),
 
     links: [],
     credits: 'We are happy for you to use this data in products and publications.',

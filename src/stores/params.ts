@@ -166,7 +166,7 @@ export class SensorParam {
   }
 
   vegaSchemeDomain(level: RegionLevel = 'county'): { domain: [number, number]; scheme: string; domainMid?: number } {
-    if (!this.value.useExtendedColorScale) {
+    if (!this.value.extendedColorScale) {
       return {
         domain: this.domain(level),
         scheme: this.value.vegaColorScale,
@@ -181,12 +181,12 @@ export class SensorParam {
   }
 
   createValueScale(level: RegionLevel = 'county'): (v: number) => number {
-    const domain = this.domain(level, this.value.useExtendedColorScale);
+    const domain = this.domain(level, this.value.extendedColorScale);
     return scaleLinear().domain([domain[0], domain[domain.length - 1]]);
   }
 
   createColorScale(level: RegionLevel = 'county'): (v: number) => string {
-    const extended = this.value.useExtendedColorScale;
+    const extended = this.value.extendedColorScale;
     const domain = this.domain(level, extended);
     if (!extended) {
       return scaleSequential(this.value.colorScale).domain(domain).clamp(true);

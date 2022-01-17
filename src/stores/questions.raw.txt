@@ -29,7 +29,7 @@ Category: Symptoms
 Question: |
   Do you personally know someone in your local community who has COVID-like symptoms?
 Signal: smoothed_whh_cmnty_cli
-AddedInWave: 1
+AddedInWave: 2
 
 
 ---
