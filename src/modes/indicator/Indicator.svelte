@@ -52,11 +52,13 @@
   <RegionDatePicker sensor={sensor.value} {items} defaultItem={nationInfo} placeholder="Search by State or County">
     <div class="grid-3-11 mobile-header-line mobile-back-line" slot="title">
       <h2>
-        <button class="mobile-back inline-svg-icon" on:click={switchMode} title="Back">
+        <button class="mobile-back inline-svg-icon" on:click|preventDefault={switchMode} title="Back">
           {@html chevronLeftIcon}
         </button>
-        Explore an <span>Indicator</span> (<a class="uk-link-muted" href="?mode=summary" on:click={switchMode}
-          >or <span>Location</span></a
+        Explore an <span>Indicator</span> (<a
+          class="uk-link-muted"
+          href="?mode=summary"
+          on:click|preventDefault={switchMode}>or <span>Location</span></a
         >)
       </h2>
     </div>
@@ -72,7 +74,7 @@
 
       <p>
         On {formatDateDayOfWeek(date.value)}
-        <MaxDateHint sensor={sensor.value} suffix="," />
+        <MaxDateHint sensor={sensor.value} suffix="," {date} {region} {fetcher} />
         the {sensor.valueUnit} was:
       </p>
       <IndicatorOverview {sensor} {date} {region} {fetcher} />

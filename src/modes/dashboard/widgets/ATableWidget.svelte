@@ -175,7 +175,7 @@
           <SortColumnIndicator label={rowName} {sort} prop="name" />
         </th>
         <th class="sort-indicator">
-          <SortColumnIndicator label="Change Last 7 days" {sort} prop="delta" />
+          <SortColumnIndicator label="Change Last 7 days" {sort} prop="change" />
         </th>
         <th class="sort-indicator">
           <SortColumnIndicator label="Value" {sort} prop="value" />

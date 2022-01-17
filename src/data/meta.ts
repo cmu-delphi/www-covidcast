@@ -6,6 +6,7 @@ import { ALL_TIME_FRAME, TimeFrame } from './TimeFrame';
 import { Sensor, units, colorScales, vegaColorScales, yAxis, EpiDataMetaParsedInfo, SensorLike } from './sensor';
 import { formatSpecifiers, formatter } from '../formats';
 import { marked } from 'marked';
+import { isCasesSignal } from './signals';
 
 function toKey(source: string, signal: string) {
   return `${source}-${signal}`;
@@ -55,30 +56,16 @@ function parse(d: EpiDataMetaInfo): EpiDataMetaParsedInfo {
   };
 }
 
-function toValueDomain(
-  stats: EpiDataMetaStatsInfo,
-  signal: string,
-  useMax: boolean,
-  enforceZeroLike: boolean,
-): [number, number] {
+function toValueDomain(stats: EpiDataMetaStatsInfo, signal: string, extended: boolean): number[] {
   // Customize min max values for deaths
-  if (isCountSignal(signal)) {
-    if (useMax) {
-      return [0, stats.max];
-    }
-    return [
-      Math.max(enforceZeroLike ? MAGIC_MIN_STATS : Number.NEGATIVE_INFINITY, stats.mean - 3 * stats.stdev),
-      stats.mean + 3 * stats.stdev,
-    ];
-  }
+  const min = isCountSignal(signal) ? MAGIC_MIN_STATS : 0;
+  const r = [Math.max(min, stats.mean - 3 * stats.stdev), stats.mean + 3 * stats.stdev];
 
-  if (useMax) {
-    return [0, stats.max];
+  if (extended) {
+    // extended option for extra color scale
+    r.push(stats.mean + 6 * stats.stdev);
   }
-  return [
-    Math.max(enforceZeroLike ? 0 : Number.NEGATIVE_INFINITY, stats.mean - 3 * stats.stdev),
-    stats.mean + 3 * stats.stdev,
-  ];
+  return r;
 }
 
 function generateCredits(license: EpiDataMetaSourceInfo['license']) {
@@ -125,8 +112,9 @@ function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
       const credits = generateCredits(sm.license);
       const sensors: Sensor[] = sm.signals.map((m) => {
         const parsed = parse(m);
+        const key = toKey(m.source, m.signal);
         const s: Sensor = {
-          key: toKey(m.source, m.signal),
+          key,
           active: m.active,
           id: m.source,
           signal: m.signal,
@@ -148,6 +136,7 @@ function deriveMetaSensors(metadata: EpiDataMetaSourceInfo[]): {
             m.format === 'per100k' ? 'per 100k' : m.format === 'percent' ? 'per 100' : units[m.format] || units.raw,
           colorScale: colorScales[m.high_values_are],
           vegaColorScale: vegaColorScales[m.high_values_are],
+          extendedColorScale: isCasesSignal(key),
           links: sm.link.map((d) => `<a href="${d.href}">${d.alt}</a>`),
           credits: credits,
           formatValue: formatter[m.format] || formatter.raw,
@@ -244,12 +233,8 @@ export class MetaDataManager {
     return entry.timeFrame;
   }
 
-  getValueDomain(
-    sensor: SensorLike,
-    level: RegionLevel,
-    { useMax = false, enforceZeroLike = true }: { useMax?: boolean; enforceZeroLike?: boolean } = {},
-  ): [number, number] {
+  getValueDomain(sensor: SensorLike, level: RegionLevel, { extended = false }: { extended?: boolean } = {}): number[] {
     const stats = this.getStats(sensor, level);
-    return toValueDomain(stats, sensor.signal, useMax, enforceZeroLike);
+    return toValueDomain(stats, sensor.signal, extended);
   }
 }

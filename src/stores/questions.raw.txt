@@ -29,7 +29,7 @@ Category: Symptoms
 Question: |
   Do you personally know someone in your local community who has COVID-like symptoms?
 Signal: smoothed_whh_cmnty_cli
-AddedInWave: 1
+AddedInWave: 2
 
 
 ---
@@ -76,10 +76,14 @@ OldRevisions:
 Name: In-Person Schooling
 Category: Social Distancing
 Question: |
-  Do any children in your household (pre-K–grade 12) go to in-person classes full-time?
-Signal: smoothed_winperson_school_fulltime
-AddedInWave: 5
+  Does the oldest child in your household (pre-K–grade 12) go to in-person classes full-time?
+Signal: smoothed_winperson_school_fulltime_oldest
+AddedInWave: 12
 Unit: per 100 people with school-age children
+OldRevisions:
+ - Change: This version asked if any children in the household attended in-person classes. Wave 12 changed this item to ask only about the oldest child.
+   Signal: smoothed_winperson_school_fulltime
+   AddedInWave: 5
 ---
 Name: Went to Essential Store
 Category: Social Distancing

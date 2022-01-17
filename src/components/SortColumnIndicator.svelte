@@ -97,7 +97,7 @@
   export let defaultDesc = false;
 
   $: sorted = $sort.sortCriteria === prop;
-  $: desc = $sort.sortCriteriaDesc;
+  $: desc = $sort.sortDirectionDesc;
 
   function toggleSort() {
     sort.change(prop, defaultDesc);

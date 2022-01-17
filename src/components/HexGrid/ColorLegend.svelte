@@ -14,17 +14,19 @@
 
   $: scale = sensor.createColorScale(level);
 
-  $: linearScale = scale.copy().rangeRound([0, 100]);
+  $: linearScale = sensor.createValueScale(level).copy().rangeRound([0, 100]);
 
   function gradient(scale, gradientLength) {
     const samples = Math.floor(gradientLength / 30); // every 30px
-    const color = scale.copy().domain([0, samples - 1]);
+    const steps = [];
     const toPercent = scaleLinear()
       .domain([0, samples - 1])
       .rangeRound([0, 100]);
-    const steps = Array(samples)
-      .fill(0)
-      .map((_, i) => `${color(i)} ${toPercent(i)}%`);
+    for (let i = 0; i < samples; i++) {
+      const p = toPercent(i);
+      const color = scale(linearScale.invert(p));
+      steps.push(`${color} ${p}%`);
+    }
     return `linear-gradient(to right, ${steps.join(', ')})`;
   }
 </script>
@@ -44,7 +46,7 @@
         {/if}
       {/await}
     {/if}
-    {#each scale.ticks(5) as tick}
+    {#each linearScale.ticks(5) as tick}
       <div class="tick" data-tick={sensor.formatValue(tick)} style="left: {linearScale(tick)}%" />
     {/each}
   </div>

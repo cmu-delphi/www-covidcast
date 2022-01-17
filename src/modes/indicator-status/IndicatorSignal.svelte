@@ -40,7 +40,7 @@
   <div class="mobile-header-line-bg">
     <div class="mobile-header-line mobile-back-line">
       <h2>
-        <button class="mobile-back inline-svg-icon" on:click={switchMode}>
+        <button class="mobile-back inline-svg-icon" on:click|preventDefault={switchMode}>
           {@html chevronLeftIcon}
         </button>
         Indicator Status of <span>{name}</span>

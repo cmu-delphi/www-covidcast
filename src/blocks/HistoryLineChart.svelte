@@ -25,6 +25,8 @@
   import IndicatorAnnotation from '../components/IndicatorAnnotation.svelte';
   import IndicatorAnnotations from '../components/IndicatorAnnotations.svelte';
   import { joinTitle } from '../specs/commonSpec';
+  import { TimeFrame } from '../stores/params';
+  import { timeDay } from 'd3-time';
 
   export let height = 250;
 
@@ -86,23 +88,32 @@
     displayName: 'Neighboring Counties',
   };
 
+  function mixTimeFrame(st, dw) {
+    const diff = timeDay.count(st.max, dw.max);
+    if (diff >= 0 && diff <= 2) {
+      // use the "latest"
+      return new TimeFrame(st.min, dw.max, st.min_week, dw.max_week);
+    }
+    return st;
+  }
+
   $: highlightDate = date.value;
   $: showAllDates = showFull && !($isMobileDevice && raw);
-  $: timeFrame = showAllDates ? sensor.timeFrame : date.windowTimeFrame;
+  $: timeFrame = showAllDates ? mixTimeFrame(sensor.timeFrame, date.windowTimeFrame) : date.windowTimeFrame;
 
   /**
    * @param {import('../stores/params').SensorParam} sensor
    * @param {import('..stores/params').RegionParam} region
    * @param {import('../stores/params').DateParam} date
    * @param {import('../stores/params').TimeFrame} timeFrame
-   * @param {{height: number, zero: boolean, raw: boolean, isMobile: boolean, singleRegionOnly: boolean, stderr: boolean}} options
+   * @param {{height: number, raw: boolean, isMobile: boolean, singleRegionOnly: boolean, stderr: boolean}} options
    */
   function genSpec(
     sensor,
     region,
     date,
     timeFrame,
-    { height, zero, raw, isMobile, singleRegionOnly, domain, showNeighbors, stderr },
+    { height, raw, isMobile, singleRegionOnly, domain, showNeighbors, stderr },
   ) {
     const isWeekly = sensor.value.isWeeklySignal;
     const options = {
@@ -110,7 +121,7 @@
       height,
       color,
       domain: domain || timeFrame.domain,
-      zero,
+      zero: false,
       xTitle: sensor.xAxis,
       title: joinTitle([sensor.name, `in ${region.displayName}`], isMobile),
       subTitle: sensor.unit,
@@ -258,7 +269,6 @@
     return spec;
   }
 
-  let zero = false;
   export let stderr = false;
   let singleRaw = false;
 
@@ -268,7 +278,6 @@
   $: spec = injectRanges(
     genSpec(sensor, region, date, timeFrame, {
       height,
-      zero,
       raw,
       isMobile: $isMobileDevice,
       singleRegionOnly,
@@ -323,7 +332,6 @@
 />
 
 <div class="buttons">
-  <Toggle bind:checked={zero}>Include 0 in Y Axis</Toggle>
   {#if sensor.rawValue != null && !($isMobileDevice && showAllDates)}
     <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
   {/if}

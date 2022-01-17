@@ -26,8 +26,7 @@
   export let fetcher;
 
   $: spec = generateStateMapWithCountyDataSpec({
-    domain: sensor.domain('county'),
-    scheme: sensor.value.vegaColorScale,
+    ...sensor.vegaSchemeDomain('county'),
   });
   $: data = fetcher.fetch1SensorNRegions1Date(sensor, 'county', date);
 
