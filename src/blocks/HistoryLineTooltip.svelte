@@ -18,6 +18,8 @@
    */
   export let sensor;
 
+  export let prop = 'displayName';
+
   $: items = item && view ? view.data('values').filter((d) => d.time_value === item.time_value) : [];
 </script>
 
@@ -26,7 +28,7 @@
   <table>
     {#each items as i}
       <tr>
-        <th>{i.displayName}</th>
+        <th>{i[prop]}</th>
         <td>
           <SensorValue {sensor} value={i.value} medium />
         </td>

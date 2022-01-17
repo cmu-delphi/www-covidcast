@@ -18,7 +18,7 @@
   import { createEventDispatcher } from 'svelte';
   import { EpiWeek } from '../../../data/EpiWeek';
   import { isComparableAcrossRegions } from '../../../data/sensor';
-  import RegionLineTooltip from './RegionLineTooltip.svelte';
+  import HistoryLineTooltip from '../../../blocks/HistoryLineTooltip.svelte';
 
   const dispatch = createEventDispatcher();
 
@@ -197,7 +197,7 @@
     signals={{ highlight_tuple: patchHighlightTuple }}
     signalListeners={['highlight']}
     on:signal_highlight={onHighlightSignal}
-    tooltip={RegionLineTooltip}
+    tooltip={HistoryLineTooltip}
     tooltipProps={{ sensor }}
   />
   <svelte:fragment slot="toolbar">
