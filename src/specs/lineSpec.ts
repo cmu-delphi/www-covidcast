@@ -588,6 +588,60 @@ export function generateCompareLineSpec(
   return spec;
 }
 
+export function generateDualAxisSpec(
+  leftAxis: string[],
+  rightAxis: string[],
+  { compareField = 'displayName', ...options }: LineSpecOptions & { compareField?: string; legend?: boolean } = {},
+): TopLevelSpec {
+  const spec = generateLineChartSpec(options);
+  (spec.padding! as { bottom: number }).bottom = 66;
+  (spec.padding! as { right: number }).right = (spec.padding! as { left: number }).left;
+
+  const leftLayer = spec.layer.splice(0, 2);
+  leftLayer[0].encoding!.color = {
+    field: compareField,
+    type: 'nominal',
+    scale: {
+      domain: [...leftAxis, ...rightAxis],
+    },
+    legend: {
+      direction: 'horizontal',
+      orient: 'bottom',
+      title: null,
+      symbolType: 'stroke',
+    },
+  };
+  leftLayer[1].encoding!.color = {
+    field: compareField,
+    type: 'nominal',
+    scale: {
+      domain: [...leftAxis, ...rightAxis],
+    },
+  };
+  spec.layer.unshift(
+    {
+      transform: [
+        {
+          filter: `indexof(${JSON.stringify(leftAxis)}, datum.${compareField}) >= 0`,
+        },
+      ],
+      layer: leftLayer,
+    },
+    {
+      transform: [
+        {
+          filter: `indexof(${JSON.stringify(rightAxis)}, datum.${compareField}) >= 0`,
+        },
+      ],
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      layer: [JSON.parse(JSON.stringify(leftLayer[0]))],
+    },
+  );
+  spec.resolve = { scale: { y: 'independent' } };
+
+  return spec;
+}
+
 export function generateLineAndBarSpec(options: LineSpecOptions = {}): TopLevelSpec & LayerSpec<Field> {
   const spec = generateLineChartSpec({ ...options, stderr: false });
   const point = spec.layer[1] as NormalizedUnitSpec;

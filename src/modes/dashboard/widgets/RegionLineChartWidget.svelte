@@ -3,6 +3,7 @@
     ...DEFAULT_WIDGET_STATE,
     width: 3,
     height: 2,
+    zero: true,
   };
 </script>
 
@@ -11,7 +12,12 @@
   import WidgetCard, { DEFAULT_WIDGET_STATE } from './WidgetCard.svelte';
   import { getContext } from 'svelte';
   import DownloadMenu from '../../../components/DownloadMenu.svelte';
-  import { generateCompareLineSpec, resolveHighlightedDate, patchHighlightTuple } from '../../../specs/lineSpec';
+  import {
+    generateCompareLineSpec,
+    resolveHighlightedDate,
+    patchHighlightTuple,
+    generateDualAxisSpec,
+  } from '../../../specs/lineSpec';
   import { formatDateISO, formatWeek } from '../../../formats';
   import { WidgetHighlight } from '../highlight';
   import isEqual from 'lodash-es/isEqual';
@@ -19,6 +25,7 @@
   import { EpiWeek } from '../../../data/EpiWeek';
   import { isComparableAcrossRegions } from '../../../data/sensor';
   import HistoryLineTooltip from '../../../blocks/HistoryLineTooltip.svelte';
+  import Toggle from '../../../components/Toggle.svelte';
 
   const dispatch = createEventDispatcher();
 
@@ -43,6 +50,7 @@
   export let highlight = null;
 
   export let initialState = DEFAULT_STATE;
+  let zoom = !initialState.zero;
 
   $: canCompare = isComparableAcrossRegions(sensor.value);
   $: visibleRegions = canCompare ? regions : regions.slice(0, Math.min(2, regions.length));
@@ -51,6 +59,7 @@
   $: state = {
     ...initialState,
     ...superState,
+    zero: !zoom,
   };
   $: {
     dispatch('state', { id, state });
@@ -75,9 +84,9 @@
    * @param {import('../../../stores/params').SensorParam} sensor
    * @param {import('../../../stores/params').RegionParam[]} regions
    * @param {import('../../../stores/params').TimeFrame} timeFrame
-   * @param {{zero: boolean, raw: boolean}} options
+   * @param {{zero: boolean, canCompare: boolean}} options
    */
-  function genSpec(sensor, regions, timeFrame) {
+  function genSpec(sensor, regions, timeFrame, { canCompare, zero }) {
     const isWeekly = sensor.value.isWeeklySignal;
     /**
      * @type {import('../../../specs/lineSpec').LineSpecOptions}
@@ -85,7 +94,7 @@
     const options = {
       initialDate: highlightToDate(highlight) || timeFrame.max,
       domain: timeFrame.domain,
-      zero: false,
+      zero,
       valueFormat: sensor.value.formatSpecifier,
       xTitle: sensor.xAxis,
       title: [`${sensor.name}`, timeFrame.toNiceString(isWeekly)],
@@ -95,14 +104,14 @@
       autoAlignOffset: 60,
       paddingTop: 80,
       isWeeklySignal: isWeekly,
-      legend: true,
       compareField: 'displayName',
       tooltip: true,
     };
-    return generateCompareLineSpec(
-      regions.map((region) => region.displayName),
-      options,
-    );
+    const names = regions.map((region) => region.displayName);
+    if (canCompare) {
+      return generateCompareLineSpec(names, options);
+    }
+    return generateDualAxisSpec(names.slice(0, 1), names.slice(1), options);
   }
 
   /**
@@ -127,7 +136,7 @@
     }-${sensor.isWeeklySignal ? formatWeek(timeFrame.max_week) : formatDateISO(timeFrame.max)}${suffix}`;
   }
 
-  $: spec = genSpec(sensor, visibleRegions, timeFrame);
+  $: spec = genSpec(sensor, visibleRegions, timeFrame, { canCompare, zero: !zoom });
   $: data = loadData(sensor, visibleRegions, timeFrame);
   $: fileName = generateFileName(sensor, visibleRegions, timeFrame);
 
@@ -215,6 +224,7 @@
     tooltipProps={{ sensor }}
   />
   <svelte:fragment slot="toolbar">
+    <Toggle bind:checked={zoom} noPadding>Rescale Y-axis</Toggle>
     <DownloadMenu {fileName} {vegaRef} {data} {sensor} advanced={false} />
   </svelte:fragment>
 </WidgetCard>
