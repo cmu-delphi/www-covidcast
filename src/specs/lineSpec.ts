@@ -574,6 +574,7 @@ export function generateCompareLineSpec(
           direction: 'horizontal',
           orient: 'bottom',
           title: null,
+          labelLimit: 200,
           symbolType: 'stroke',
         }
       : null,
@@ -595,7 +596,7 @@ export function generateDualAxisSpec(
 ): TopLevelSpec {
   const spec = generateLineChartSpec(options);
   (spec.padding! as { bottom: number }).bottom = 66;
-  (spec.padding! as { right: number }).right = (spec.padding! as { left: number }).left;
+  (spec.padding! as { right: number }).right = (spec.padding! as { left: number }).left + 15;
 
   const leftLayer = spec.layer.splice(0, 2);
   leftLayer[0].encoding!.color = {
@@ -608,6 +609,7 @@ export function generateDualAxisSpec(
       direction: 'horizontal',
       orient: 'bottom',
       title: null,
+      labelLimit: 200,
       symbolType: 'stroke',
     },
   };

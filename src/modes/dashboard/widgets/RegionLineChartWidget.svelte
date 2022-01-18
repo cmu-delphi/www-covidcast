@@ -20,12 +20,12 @@
   } from '../../../specs/lineSpec';
   import { formatDateISO, formatWeek } from '../../../formats';
   import { WidgetHighlight } from '../highlight';
-  import isEqual from 'lodash-es/isEqual';
   import { createEventDispatcher } from 'svelte';
   import { EpiWeek } from '../../../data/EpiWeek';
   import { isComparableAcrossRegions } from '../../../data/sensor';
   import HistoryLineTooltip from '../../../blocks/HistoryLineTooltip.svelte';
   import Toggle from '../../../components/Toggle.svelte';
+  import { highlightToDate, joinLabels, updateVegaHighlight } from './utils';
 
   const dispatch = createEventDispatcher();
 
@@ -74,13 +74,6 @@
   const fetcher = getContext('fetcher');
 
   /**
-   * @param {import('../highlight').WidgetHighlight | null} highlight
-   */
-  function highlightToDate(highlight) {
-    return highlight ? highlight.primaryDate : null;
-  }
-
-  /**
    * @param {import('../../../stores/params').SensorParam} sensor
    * @param {import('../../../stores/params').RegionParam[]} regions
    * @param {import('../../../stores/params').TimeFrame} timeFrame
@@ -105,6 +98,7 @@
       paddingTop: 80,
       isWeeklySignal: isWeekly,
       compareField: 'displayName',
+      legend: true,
       tooltip: true,
     };
     const names = regions.map((region) => region.displayName);
@@ -156,47 +150,11 @@
 
   $: highlighted = highlight != null && highlight.matches(sensor.value, visibleRegions[0], timeFrame);
 
-  function updateVegaHighlight(highlight) {
-    if (!vegaRef) {
-      return;
-    }
-    const view = vegaRef.vegaDirectAccessor();
-    if (!view) {
-      return;
-    }
-    const value = highlightToDate(highlight);
-    const values = value ? [value.getTime()] : null;
-    const newValue = value
-      ? {
-          unit: 'layer_1',
-          fields: view.signal('highlight_tuple_fields'),
-          values,
-        }
-      : null;
-    const currentValues = (view.signal('highlight_tuple') || { values: [] }).values;
-    const newValues = values || [];
-    if (isEqual(currentValues, newValues)) {
-      return;
-    }
-    view.signal('highlight_tuple', newValue);
-    view.runAsync();
+  function updateVegaHighlightImpl(highlight) {
+    updateVegaHighlight(vegaRef, highlight);
   }
   $: {
-    updateVegaHighlight(highlight);
-  }
-
-  function joinLabels(regions) {
-    if (regions.length === 0) {
-      return 'Regions';
-    }
-    if (regions.length === 1) {
-      return regions[0].displayName;
-    }
-    const r = regions
-      .slice(0, regions.length - 1)
-      .map((d) => d.displayName)
-      .join(', ');
-    return `${r} and ${regions[regions.length - 1].displayName}`;
+    updateVegaHighlightImpl(highlight);
   }
 </script>
 
@@ -204,7 +162,7 @@
   {initialState}
   defaultState={DEFAULT_STATE}
   {highlighted}
-  region={visibleRegions.length === 1 ? visibleRegions[0] : joinLabels(visibleRegions)}
+  region={visibleRegions.length === 1 ? visibleRegions[0] : joinLabels(visibleRegions.map((d) => d.displayName))}
   {sensor}
   date={timeFrame}
   {id}
