@@ -19,9 +19,11 @@ function parseSignals(signals: string) {
   );
 }
 
+const ALL_TIME_MIN = new Date(2019, 0, 1);
+
 function parseDates(dates: string): [Date, Date] {
   if (!dates) {
-    return [new Date(), new Date()];
+    return [ALL_TIME_MIN, new Date()];
   }
   if (/^-\d+$/g.test(dates)) {
     const uncertaintyDays = Number.parseInt(dates);
@@ -73,6 +75,7 @@ export class Annotation {
   readonly regions: { level: RegionLevel; ids: '*' | Set<string> }[];
   readonly uncertainty: boolean;
   readonly reference?: string;
+  readonly isAllTime: boolean;
 
   constructor(raw: EpiDataAnomaliesRow) {
     this.source = raw.source.trim();
@@ -83,6 +86,7 @@ export class Annotation {
     this.regions = parseRegions(raw.regions);
     this.reference = raw.reference;
     this.uncertainty = /^-\d+$/g.test(raw.dates);
+    this.isAllTime = !raw.dates;
   }
 
   /**
@@ -183,6 +187,25 @@ export class AnnotationManager {
         (d) =>
           sensor != null &&
           d.matchSensor(sensor) &&
+          region != null &&
+          d.matchRegion(region) &&
+          d.inDateRange(dateStart, dateEnd) &&
+          (includeUncertainty || !d.uncertainty),
+      )
+      .sort(sortByDate);
+  }
+
+  getMultiWindowAnnotations(
+    sensors: { id: string; signal: string }[],
+    region: RegionInfo | RegionInfo[],
+    dateStart: Date,
+    dateEnd: Date,
+    includeUncertainty = false,
+  ): Annotation[] {
+    return this.annotations
+      .filter(
+        (d) =>
+          sensors.some((s) => d.matchSensor(s)) &&
           region != null &&
           d.matchRegion(region) &&
           d.inDateRange(dateStart, dateEnd) &&
