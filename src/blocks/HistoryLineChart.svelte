@@ -336,7 +336,7 @@
     <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
   {/if}
   {#if !($isMobileDevice && raw)}
-    <Toggle bind:checked={showFull}>Show All Dates</Toggle>
+    <Toggle bind:checked={showFull}>All Dates</Toggle>
   {/if}
   <div class="spacer" />
   <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} {stderr} />
