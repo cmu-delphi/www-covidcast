@@ -34,7 +34,7 @@
     Click on a state to explore further
   </p>
   <div class="toggle-center-wrapper">
-    <Toggle bind:checked={showChoropleth} before="Beehive Grid">Choropleth Map</Toggle>
+    <Toggle bind:checked={showChoropleth} before="Beehive Grid"><span>Choropleth Map</span></Toggle>
   </div>
   {#if showChoropleth}
     {#if hasCounties}
@@ -51,15 +51,20 @@
 
 <style>
   .toggle-center-wrapper > :global(*) {
-    display: flex;
+    display: flex !important;
     padding-top: 0;
     text-align: center;
     align-items: center;
     justify-content: center;
+    margin-right: 0;
   }
   .toggle-center-wrapper > :global(* > svg) {
     margin-left: -0.4em;
     margin-right: 1.4em;
+  }
+
+  .toggle-center-wrapper :global(span) {
+    width: 8em;
   }
 
   .ux-hint {

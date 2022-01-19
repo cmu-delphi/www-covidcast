@@ -44,6 +44,8 @@
 
   $: sensorLevels = sensor ? $metaDataManager.getLevels(sensor) : null;
 
+  $: showInActive = false;
+
   $: {
     if (sensorLevels && !sensorLevels.includes(geoType)) {
       // reset to a valid one
@@ -178,10 +180,13 @@
             <div class="uk-form-controls">
               <select id="ds" bind:value={sourceValue} size="8" class="uk-select">
                 {#each $metaDataManager.metaSources as source}
-                  <option value={source.source}>{source.name}</option>
+                  {#if showInActive || source.signals.some((d) => d.active)}
+                    <option value={source.source}>{source.name}</option>
+                  {/if}
                 {/each}
               </select>
             </div>
+            <label><input type="checkbox" bind:checked={showInActive} />Show Inactive Signals</label>
           </div>
         </div>
 

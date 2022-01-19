@@ -64,6 +64,10 @@
     background: #e6550d;
     color: white !important;
   }
+  .category-badge[data-cat='cases_testing'] {
+    background: #e6550d;
+    color: white !important;
+  }
   .category-badge[data-cat='other'] {
     background: #bab0ab;
     color: white !important;

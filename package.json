@@ -1,6 +1,6 @@
 {
   "name": "www-covidcast",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "private": true,
   "license": "MIT",
   "description": "",
@@ -92,7 +92,7 @@
     "js-yaml": "^4.1.0",
     "lint-staged": "^12.1.2",
     "lodash-es": "^4.17.21",
-    "marked": "^4.0.4",
+    "marked": "^4.0.10",
     "mini-css-extract-plugin": "^2.4.5",
     "node-fetch": "^2.6.1",
     "prettier": "^2.4.1",

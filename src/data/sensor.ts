@@ -1,11 +1,14 @@
 import { formatter, formatSpecifiers } from '../formats';
-import { interpolateBuPu, interpolateYlGnBu, interpolateYlOrRd } from 'd3-scale-chromatic';
 import { getDataSource } from './dataSourceLookup';
 import { defaultCountyRegion, defaultStateRegion, nationInfo, Region, RegionLevel } from './regions';
 import type { EpiDataMetaInfo, SignalCategory, SignalFormat, SignalHighValuesAre } from './api';
 import { isArray } from './apimodel';
 import type { EpiWeek } from './EpiWeek';
 import type { TimeFrame } from './TimeFrame';
+import { colorScales, vegaColorScales } from './sensorConstants';
+import { isCasesSignal } from './signals';
+
+export * from './sensorConstants';
 
 export const sensorTypes: { id: SignalCategory; label: string }[] = [
   {
@@ -57,6 +60,7 @@ export interface Sensor {
 
   readonly name: string; // signal name
   readonly unit: string;
+  readonly unitShort: string;
   readonly dataSourceName: string;
   readonly type: SignalCategory;
   readonly levels: readonly RegionLevel[];
@@ -64,6 +68,7 @@ export interface Sensor {
   readonly signalTooltip: string; // short text description
   readonly colorScale: (this: void, v: number) => string;
   readonly vegaColorScale: string;
+  readonly extendedColorScale: boolean;
 
   readonly links: readonly string[]; // more information links
   readonly credits?: string; // credit text
@@ -94,17 +99,6 @@ function determineHighValuesAre(sensor: {
   }
   return 'bad';
 }
-
-export const colorScales = {
-  good: interpolateYlGnBu,
-  bad: interpolateYlOrRd,
-  neutral: interpolateBuPu,
-};
-export const vegaColorScales = {
-  good: 'yellowgreenblue',
-  bad: 'yelloworangered',
-  neutral: 'bluepurple',
-};
 
 export const yAxis = {
   raw: 'arbitrary scale',
@@ -140,6 +134,7 @@ export function ensureSensorStructure(sensor: Partial<Sensor> & { name: string; 
     signalTooltip: sensor.signalTooltip || 'No description available',
     colorScale: colorScales[highValuesAre],
     vegaColorScale: vegaColorScales[highValuesAre],
+    extendedColorScale: isCasesSignal(key),
 
     links: [],
     credits: 'We are happy for you to use this data in products and publications.',
@@ -149,6 +144,7 @@ export function ensureSensorStructure(sensor: Partial<Sensor> & { name: string; 
     xAxis: 'Date',
     yAxis: yAxis[format] || yAxis.raw,
     unit: units[format] || units.raw,
+    unitShort: format === 'per100k' ? 'per 100k' : format === 'percent' ? 'per 100' : units[format] || units.raw,
     highValuesAre,
     is7DayAverage: false,
     hasStdErr: false,

@@ -53,8 +53,10 @@
   <RegionDatePicker sensor={sensor.value} {items} defaultItem={nationInfo} placeholder="Search by State or County">
     <div class="grid-3-11 mobile-header-line" slot="title">
       <h2>
-        Explore a <span>Location</span> (<a href="?mode=indicator" class="uk-link-muted" on:click={switchMode}
-          >or <span>Indicator</span></a
+        Explore a <span>Location</span> (<a
+          href="?mode=indicator"
+          class="uk-link-muted"
+          on:click|preventDefault={switchMode}>or <span>Indicator</span></a
         >)
       </h2>
     </div>

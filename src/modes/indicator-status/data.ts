@@ -40,6 +40,24 @@ export function toLagToToday(meta?: EpiDataMetaParsedInfo | null): string {
   return `${range} week${range !== 1 ? 's' : ''}`;
 }
 
+export function toLagToTodayDays(meta?: EpiDataMetaParsedInfo | null): number {
+  if (!meta) {
+    return Number.NaN;
+  }
+  if (meta.time_type == 'day') {
+    const now = new Date();
+    const range = timeDay.count(meta.maxTime, now);
+    return meta.maxTime != null ? range : Number.NaN;
+  }
+  if (!meta.maxWeek) {
+    return Number.NaN;
+  }
+  // week
+  const nowWeek = EpiWeek.thisWeek();
+  const range = weekRange(meta.maxWeek, nowWeek).length;
+  return range * 7;
+}
+
 function toInitialData(sources: SensorSource[], manager: MetaDataManager): SourceData[] {
   return sources.map((source) => {
     const ref = source.referenceSensor!;
@@ -52,6 +70,7 @@ function toInitialData(sources: SensorSource[], manager: MetaDataManager): Sourc
       latest_data: meta?.maxTime,
       latest_data_week: meta?.maxWeek,
       latest_lag: toLagToToday(meta),
+      latest_lag_days: toLagToTodayDays(meta),
       latest_coverage: null,
       coverages: [],
     };

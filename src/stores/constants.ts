@@ -14,8 +14,10 @@ export interface SensorConfig {
   signal: string;
   signalTooltip: string;
   description: string;
+  extendedColorScale?: boolean;
 
   unit?: string;
+  unitShort?: string;
 
   noMaps?: boolean;
 

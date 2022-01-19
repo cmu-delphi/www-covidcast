@@ -8,7 +8,9 @@
 </script>
 
 <label class="toggle {className}" class:checked class:noPadding>
-  {before}
+  {#if before}
+    <span>{before}</span>
+  {/if}
   <input type="checkbox" bind:checked />
   {@html toggleOnIcon}
   <slot />

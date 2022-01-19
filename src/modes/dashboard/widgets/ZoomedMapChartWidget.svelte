@@ -71,8 +71,7 @@
      * @type {import('../../../specs/mapSpec').CommonParams}
      */
     const options = {
-      domain: sensor.domain(level),
-      scheme: sensor.value.vegaColorScale,
+      ...sensor.vegaSchemeDomain(level),
       title: [
         `${sensor.name} in US ${getLevelInfo(level).labelPlural}`,
         `on ${sensor.isWeeklySignal ? formatWeek(date.week) : formatDateYearDayOfWeekAbbr(date.value)}`,
