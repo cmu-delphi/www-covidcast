@@ -274,7 +274,15 @@
 
   $: raw = singleRaw && sensor.rawValue != null && !($isMobileDevice && showFull);
   $: regions = raw ? [region.value] : resolveRegions(region.value, singleRegionOnly, showNeighbors);
-  $: annotations = $annotationManager.getWindowAnnotations(sensor.value, regions, timeFrame.min, timeFrame.max, true);
+  $: annotations = raw
+    ? $annotationManager.getMultiWindowAnnotations(
+        [sensor.value, sensor.rawValue],
+        regions,
+        timeFrame.min,
+        timeFrame.max,
+        true,
+      )
+    : $annotationManager.getWindowAnnotations(sensor.value, regions, timeFrame.min, timeFrame.max, true);
   $: spec = injectRanges(
     genSpec(sensor, region, date, timeFrame, {
       height,
@@ -286,7 +294,7 @@
       stderr,
     }),
     timeFrame,
-    annotations,
+    annotations.filter((d) => !d.isAllTime),
   );
   $: data = raw
     ? loadSingleData(sensor, region, timeFrame)
@@ -336,7 +344,7 @@
     <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
   {/if}
   {#if !($isMobileDevice && raw)}
-    <Toggle bind:checked={showFull}>Show All Dates</Toggle>
+    <Toggle bind:checked={showFull}>All Dates</Toggle>
   {/if}
   <div class="spacer" />
   <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} {stderr} />
