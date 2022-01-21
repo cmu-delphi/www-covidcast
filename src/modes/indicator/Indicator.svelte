@@ -49,7 +49,13 @@
 </script>
 
 <div class="mobile-root">
-  <RegionDatePicker sensor={sensor.value} {items} defaultItem={nationInfo} placeholder="Search by State or County">
+  <RegionDatePicker
+    sensor={sensor.value}
+    {items}
+    defaultItem={nationInfo}
+    placeholder="Search by State or County"
+    {fetcher}
+  >
     <div class="grid-3-11 mobile-header-line mobile-back-line" slot="title">
       <h2>
         <button class="mobile-back inline-svg-icon" on:click|preventDefault={switchMode} title="Back">
@@ -74,7 +80,7 @@
 
       <p>
         On {formatDateDayOfWeek(date.value)}
-        <MaxDateHint sensor={sensor.value} suffix="," {date} {region} {fetcher} />
+        <MaxDateHint sensor={sensor.value} suffix="," {fetcher} />
         the {sensor.valueUnit} was:
       </p>
       <IndicatorOverview {sensor} {date} {region} {fetcher} />

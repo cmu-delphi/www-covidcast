@@ -118,7 +118,7 @@
     <p>
       On
       {formatDateYearDayOfWeekAbbr(date.value, true)}
-      <MaxDateHint sensor={sensor.value} {date} {region} {fetcher} />
+      <MaxDateHint sensor={sensor.value} {fetcher} />
       the 7 day average of
       <strong>{sensor.name}</strong>
       <UIKitHint title={sensor.signalTooltip} inline />

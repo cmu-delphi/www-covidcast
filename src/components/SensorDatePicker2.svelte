@@ -20,9 +20,19 @@
   export let value = null;
 
   export let className = '';
+  /**
+   * @type {import("../../stores/DataFetcher").DataFetcher | null}
+   */
+  export let fetcher = null;
+
+  $: info = $metaDataManager.getMetaData(sensor);
+  $: maxTimeAndIssue = fetcher
+    ? fetcher.fetch1SensorMaxDateAndIssue(sensor, $metaDataManager)
+    : info
+    ? Promise.resolve(info)
+    : null;
 
   $: timeFrame = $metaDataManager.getTimeFrame(sensor);
-  $: info = $metaDataManager.getMetaData(sensor);
 
   $: formatter = $isMobileDevice ? formatDateShortDayOfWeekAbbr : formatDateYearDayOfWeekAbbr;
 </script>
@@ -57,21 +67,21 @@
       </button>
       <svelte:fragment slot="footer">
         {#if info}
-          <p class="date-info">
-            Most recent available date is <button
-              type="button"
-              on:click={() => (value = info.maxTime)}
-              class="uk-link-muted"
-            >
-              {sensor.isWeeklySignal ? formatWeek(info.maxWeek) : formatDateYearDayOfWeekAbbr(info.maxTime)}
-            </button>
-            updated on
-            <span class="uk-text-nowrap"
-              >{sensor.isWeeklySignal
-                ? formatWeek(info.maxIssueWeek)
-                : formatDateYearDayOfWeekAbbr(info.maxIssue)}</span
-            >.
-          </p>
+          {#await maxTimeAndIssue then t}
+            <p class="date-info">
+              Data is available for dates up through <button
+                type="button"
+                on:click={() => (value = t.maxTime)}
+                class="uk-link-muted"
+              >
+                {sensor.isWeeklySignal ? formatWeek(t.maxTime) : formatDateYearDayOfWeekAbbr(t.maxTime)}
+              </button>
+              (last updated on
+              <span class="uk-text-nowrap"
+                >{sensor.isWeeklySignal ? formatWeek(t.maxIssue) : formatDateYearDayOfWeekAbbr(t.maxIssue)}</span
+              >).
+            </p>
+          {/await}
         {/if}
       </svelte:fragment>
     </Datepicker>

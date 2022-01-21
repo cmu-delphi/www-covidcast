@@ -50,7 +50,13 @@
 </script>
 
 <div class="mobile-root">
-  <RegionDatePicker sensor={sensor.value} {items} defaultItem={nationInfo} placeholder="Search by State or County">
+  <RegionDatePicker
+    sensor={sensor.value}
+    {items}
+    defaultItem={nationInfo}
+    placeholder="Search by State or County"
+    {fetcher}
+  >
     <div class="grid-3-11 mobile-header-line" slot="title">
       <h2>
         Explore a <span>Location</span> (<a
