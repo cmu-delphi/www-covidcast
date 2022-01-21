@@ -71,7 +71,6 @@ The release consists of multiple steps which can be all done via the GitHub webs
 1. Let the code owner review the PR and its changes and let the CI check whether everything builds successfully
 1. Once approved and merged, another GitHub action job starts which automatically will
    1. create a git tag
-   1. create another [Pull Request](https://github.com/cmu-delphi/www-covidcast/pulls) to merge the changes back to the `dev` branch
    1. create a [GitHub release](https://github.com/cmu-delphi/www-covidcast/releases) with automatically derived release notes
    1. create a [Pull Request in www-main](https://github.com/cmu-delphi/www-main/pulls) to update the website to the new release
 1. Done
