@@ -38,6 +38,7 @@
     const loaded = fetcher.fetchNSensor1RegionNDates(sensors, region, date.windowTimeFrame);
     // fetch self details (sample size)
     fetcher.fetchNSensor1Region1DateDetails(sensors, region, date);
+    fetcher.prefetchNSensorMaxDateAndIssue(sensors, $metaDataManager);
     fetcher.fetchNSensors1Region1DateTrend(sensors, region, date);
 
     if (region.level !== 'nation') {
@@ -61,7 +62,7 @@
 </script>
 
 <div class="root">
-  <RegionDatePicker sensor={sensor.value} items={filteredInfos} defaultItem={nationInfo}>
+  <RegionDatePicker sensor={sensor.value} items={filteredInfos} defaultItem={nationInfo} {fetcher}>
     <div class="grid-3-11 mobile-header-line" slot="title">
       <h2>COVID-19 Trends and Impact Survey (CTIS) <span>Results</span></h2>
     </div>

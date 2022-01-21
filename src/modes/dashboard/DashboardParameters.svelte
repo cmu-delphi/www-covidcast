@@ -19,6 +19,10 @@
    * @type {import("../../stores/params").RegionParam}
    */
   export let region;
+  /**
+   * @type {import("../../stores/DataFetcher").DataFetcher | null}
+   */
+  export let fetcher = null;
 
   let selectedDate = date.value;
 
@@ -63,7 +67,7 @@
     selectedItem={region.value}
     on:change={(e) => setRegion(e.detail && e.detail.level === 'nation' ? null : e.detail)}
   />
-  <SensorDatePicker2 className="grid-9-13" bind:value={selectedDate} {sensor} />
+  <SensorDatePicker2 className="grid-9-13" bind:value={selectedDate} {sensor} {fetcher} />
 </div>
 
 <style>

@@ -1,11 +1,13 @@
+import { timeDay } from 'd3-time';
 import { addMissing, addNameInfos, EpiDataRow, parseAPITime } from '../data';
 import { callTrendSeriesAPI } from '../data/api';
 import { fixLevel, GeoPair, SourceSignalPair } from '../data/apimodel';
 import type { EpiWeek } from '../data/EpiWeek';
 import fetchTriple from '../data/fetchTriple';
-import type { RegionInfo, RegionLevel } from '../data/regions';
+import type { MetaDataManager } from '../data/meta';
+import { getInfoByName, nationInfo, RegionInfo, RegionLevel } from '../data/regions';
 import type { Sensor } from '../data/sensor';
-import type { TimeFrame } from '../data/TimeFrame';
+import { TimeFrame } from '../data/TimeFrame';
 import { asSensorTrend, fetchTrend, SensorTrend } from '../data/trend';
 import { DateParam, groupByRegion, Region, RegionParam, SensorParam } from './params';
 
@@ -100,7 +102,7 @@ export class DataFetcher {
   ): Promise<RegionEpiDataRow[]> {
     const lSensor = SensorParam.unbox(sensor);
     const lRegion = RegionParam.unbox(region);
-    const key = this.toWindowKey(lSensor, lRegion, timeFrame);
+    const key = this.toWindowKey(lSensor, lRegion, timeFrame, advanced ? 'advanced' : '');
     if (this.cache.has(key)) {
       return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
     }
@@ -116,25 +118,31 @@ export class DataFetcher {
     sensors: readonly (Sensor | SensorParam)[],
     region: Region | RegionParam,
     timeFrame: TimeFrame,
+    { advanced = false } = {},
   ): Promise<RegionEpiDataRow[]>[] {
     const lSensors = sensors.map((sensor) => SensorParam.unbox(sensor));
     const lRegion = RegionParam.unbox(region);
 
-    const missingSensors = lSensors.filter((d) => !this.cache.has(this.toWindowKey(d, lRegion, timeFrame)));
+    const missingSensors = lSensors.filter(
+      (d) => !this.cache.has(this.toWindowKey(d, lRegion, timeFrame, advanced ? 'advanced' : '')),
+    );
 
     if (missingSensors.length > 0) {
-      const data = fetchTriple(missingSensors, lRegion, timeFrame, { asOf: this.asOf }).then(addNameInfos);
+      const data = fetchTriple(missingSensors, lRegion, timeFrame, { asOf: this.asOf, advanced }).then(addNameInfos);
 
       for (const sensor of missingSensors) {
         const sensorData = data
           .then((rows) => rows.filter((d) => d.signal === sensor.signal && d.source === sensor.id))
           .then((rows) => addMissing(rows, sensor.isWeeklySignal ? 'week' : 'day'));
         this.cache.set(this.toWindowKey(sensor, lRegion, timeFrame), sensorData);
+        if (advanced) {
+          this.cache.set(this.toWindowKey(sensor, lRegion, timeFrame, 'advanced'), sensorData);
+        }
       }
     }
 
     // use cached version
-    return lSensors.map((sensor) => this.fetch1Sensor1RegionNDates(sensor, lRegion, timeFrame));
+    return lSensors.map((sensor) => this.fetch1Sensor1RegionNDates(sensor, lRegion, timeFrame, { advanced }));
   }
 
   fetchNSensorNRegionNDates(
@@ -405,5 +413,83 @@ export class DataFetcher {
     }
     // use cached version
     return lSensors.map((sensor) => this.fetch1Sensor1Region1DateDetails(sensor, lRegion, lDate));
+  }
+
+  fetch1SensorMaxDateAndIssue(
+    sensor: Sensor | SensorParam,
+    manager: MetaDataManager,
+  ): Promise<{ maxTime: Date; maxIssue: Date }> {
+    const s = SensorParam.unbox(sensor);
+    const meta = manager.getMetaData(s);
+    const today = timeDay.floor(new Date());
+    if (!meta) {
+      return Promise.resolve({ maxTime: today, maxIssue: today });
+    }
+    if (timeDay.count(meta.maxIssue, today) > 4) {
+      // more than 4 days lag, assume it is correct
+      return Promise.resolve(meta);
+    }
+    let region: Region;
+    if (s.levels.includes('nation')) {
+      region = nationInfo;
+    } else if (s.levels.includes('state')) {
+      region = getInfoByName('PA')!;
+    } else if (s.levels.includes('county')) {
+      region = getInfoByName('42003')!;
+    } else {
+      region = nationInfo;
+    }
+    const data = this.fetch1Sensor1RegionNDates(
+      sensor,
+      region,
+      new TimeFrame(timeDay.offset(meta.maxTime, -1), today),
+      {
+        advanced: true,
+      },
+    );
+    return data.then((rows) => {
+      return rows.reduce(
+        (acc, v) => {
+          if (v.date_value >= acc.maxTime && v != null && !Number.isNaN(v.value)) {
+            return {
+              maxTime: v.date_value,
+              maxIssue: parseAPITime(v.issue),
+            };
+          }
+          return acc;
+        },
+        { maxTime: meta!.maxTime, maxIssue: meta!.maxIssue },
+      );
+    });
+  }
+
+  prefetchNSensorMaxDateAndIssue(sensors: (Sensor | SensorParam)[], manager: MetaDataManager) {
+    if (sensors.length === 0) {
+      return;
+    }
+    const s = SensorParam.unbox(sensors[0]);
+    const meta = manager.getMetaData(s);
+    const today = timeDay.floor(new Date());
+    if (!meta) {
+      // no meta data at all?
+      return;
+    }
+    if (timeDay.count(meta.maxIssue, today) > 4) {
+      // more than 4 days lag, assume it is correct
+      return;
+    }
+    let region: Region;
+    if (s.levels.includes('nation')) {
+      region = nationInfo;
+    } else if (s.levels.includes('state')) {
+      region = getInfoByName('PA')!;
+    } else if (s.levels.includes('county')) {
+      region = getInfoByName('42003')!;
+    } else {
+      region = nationInfo;
+    }
+    void this.fetchNSensor1RegionNDates(sensors, region, new TimeFrame(timeDay.offset(meta.maxTime, -1), today), {
+      advanced: true,
+    });
   }
 }

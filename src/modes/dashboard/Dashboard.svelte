@@ -173,7 +173,7 @@
       </button>
     </div>
     {#if configureParams}
-      <DashboardParameters {sensor} {region} {date} />
+      <DashboardParameters {sensor} {region} {date} {fetcher} />
     {/if}
   </div>
   {#if $isMobileDevice}
