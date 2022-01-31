@@ -252,7 +252,7 @@
     }-${sensor.isWeeklySignal ? formatWeek(timeFrame.max_week) : formatDateISO(timeFrame.max)}${suffix}`;
   }
 
-  function injectRanges(spec, timeFrame, annotations) {
+  function injectRanges(spec, timeFrame, annotations, multipleRegions) {
     if (annotations.length > 0) {
       spec.layer.unshift(genAnnotationLayer(annotations, timeFrame));
     }
@@ -264,7 +264,7 @@
     }
     const uncertaintyAnnotation = annotations.find((d) => d.uncertainty);
     if (uncertaintyAnnotation) {
-      spec.layer.push(genUncertaintyLayer(uncertaintyAnnotation, { color }));
+      spec.layer.push(genUncertaintyLayer(uncertaintyAnnotation, { color, multipleRegions }));
     }
     return spec;
   }
@@ -295,6 +295,7 @@
     }),
     timeFrame,
     annotations.filter((d) => !d.isAllTime),
+    regions.length > 1,
   );
   $: data = raw
     ? loadSingleData(sensor, region, timeFrame)

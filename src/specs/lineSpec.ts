@@ -205,9 +205,13 @@ export function genUncertaintyLayer(
   {
     dateField = 'date_value',
     valueField = 'value',
+    compareField = 'displayName',
+    multipleRegions,
   }: {
     dateField?: string;
     valueField?: string;
+    compareField?: string;
+    multipleRegions?: boolean;
   },
 ): NormalizedUnitSpec {
   const start = toTimeValue(annotation.dates[0]);
@@ -234,6 +238,12 @@ export function genUncertaintyLayer(
         field: valueField,
         type: 'quantitative',
       },
+      detail: multipleRegions
+        ? {
+            field: compareField,
+            type: 'nominal',
+          }
+        : undefined,
     },
   };
 }
