@@ -7,7 +7,7 @@
   export let annotation;
 </script>
 
-<div class="uk-alert uk-alert-{annotation.uncertainty ? 'info' : 'warning'} {className}">
+<div class="uk-alert uk-alert-{annotation.uncertainty || annotation.isAllTime ? 'info' : 'warning'} {className}">
   <h5 class="alert-header">
     <div class="text">
       <span class="inline-svg-icon">
@@ -19,7 +19,9 @@
       </span>
       {annotation.problem}
     </div>
-    <div class="date">{formatDateISO(annotation.dates[0])} - {formatDateISO(annotation.dates[1])}</div>
+    {#if !annotation.isAllTime}
+      <div class="date">{formatDateISO(annotation.dates[0])} - {formatDateISO(annotation.dates[1])}</div>
+    {/if}
   </h5>
   <p class="uk-margin-remove-bottom">
     {annotation.explanation}
