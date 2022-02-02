@@ -190,7 +190,17 @@ export class DataFetcher {
       return this.cache.get(key) as Promise<RegionEpiDataRow[]>;
     }
 
-    const r = fetchTriple(lSensor, regions, timeFrame, { asOf: this.asOf }).then(addNameInfos);
+    let r: Promise<(EpiDataRow & Region)[]>;
+
+    if (typeof regions === 'string') {
+      r = fetchTriple(lSensor, regions, timeFrame, { asOf: this.asOf }).then(addNameInfos);
+    } else {
+      // fetch individually for better db performance
+      r = Promise.all(regions.map((region) => this.fetch1Sensor1RegionNDates(lSensor, region, timeFrame))).then(
+        (rows) => rows.flat(),
+      );
+    }
+
     // no missing
     this.cache.set(key, r);
     return r;
