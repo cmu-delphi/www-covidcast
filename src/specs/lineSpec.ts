@@ -293,6 +293,7 @@ export interface LineSpecOptions {
   tickCount?: Axis<ExprRef | SignalRef>['tickCount'];
   isWeeklySignal?: boolean;
   stderr?: boolean;
+  tooltip?: boolean;
 }
 
 export function generateLineChartSpec({
@@ -320,6 +321,7 @@ export function generateLineChartSpec({
     interval: 'week' as const,
     step: 1,
   },
+  tooltip = false,
   isWeeklySignal = false,
   stderr = false,
 }: LineSpecOptions = {}): TopLevelSpec & LayerSpec<Field> {
@@ -428,7 +430,7 @@ export function generateLineChartSpec({
           type: 'point',
           color,
           stroke: null,
-          tooltip: false,
+          tooltip,
         },
         encoding: {
           x: {
@@ -563,7 +565,11 @@ export function generateLineChartSpec({
 
 export function generateCompareLineSpec(
   compare: string[],
-  { compareField = 'displayName', ...options }: LineSpecOptions & { compareField?: string } = {},
+  {
+    compareField = 'displayName',
+    legend = false,
+    ...options
+  }: LineSpecOptions & { compareField?: string; legend?: boolean } = {},
 ): TopLevelSpec {
   const spec = generateLineChartSpec(options);
   spec.layer[0].encoding!.color = {
@@ -573,12 +579,78 @@ export function generateCompareLineSpec(
       domain: compare,
       range: MULTI_COLORS,
     },
-    legend: null,
+    legend: legend
+      ? {
+          direction: 'horizontal',
+          orient: 'bottom',
+          title: null,
+          labelLimit: 200,
+          symbolType: 'stroke',
+        }
+      : null,
   };
+  if (legend) {
+    (spec.padding! as { bottom: number }).bottom = 66;
+  }
   spec.layer[1].encoding!.color = {
     field: compareField,
     type: 'nominal',
   };
+  return spec;
+}
+
+export function generateDualAxisSpec(
+  leftAxis: string[],
+  rightAxis: string[],
+  { compareField = 'displayName', ...options }: LineSpecOptions & { compareField?: string; legend?: boolean } = {},
+): TopLevelSpec {
+  const spec = generateLineChartSpec(options);
+  (spec.padding! as { bottom: number }).bottom = 66;
+  (spec.padding! as { right: number }).right = (spec.padding! as { left: number }).left + 15;
+
+  const leftLayer = spec.layer.splice(0, 2);
+  leftLayer[0].encoding!.color = {
+    field: compareField,
+    type: 'nominal',
+    scale: {
+      domain: [...leftAxis, ...rightAxis],
+    },
+    legend: {
+      direction: 'horizontal',
+      orient: 'bottom',
+      title: null,
+      labelLimit: 200,
+      symbolType: 'stroke',
+    },
+  };
+  leftLayer[1].encoding!.color = {
+    field: compareField,
+    type: 'nominal',
+    scale: {
+      domain: [...leftAxis, ...rightAxis],
+    },
+  };
+  spec.layer.unshift(
+    {
+      transform: [
+        {
+          filter: `indexof(${JSON.stringify(leftAxis)}, datum.${compareField}) >= 0`,
+        },
+      ],
+      layer: leftLayer,
+    },
+    {
+      transform: [
+        {
+          filter: `indexof(${JSON.stringify(rightAxis)}, datum.${compareField}) >= 0`,
+        },
+      ],
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      layer: [JSON.parse(JSON.stringify(leftLayer[0]))],
+    },
+  );
+  spec.resolve = { scale: { y: 'independent' } };
+
   return spec;
 }
 

@@ -13,11 +13,13 @@ export type WidgetType =
   | 'regionpcp'
   | 'datepcp'
   | 'anomalies'
-  | 'zoomedmap';
+  | 'zoomedmap'
+  | 'sensorsline'
+  | 'regionsline';
 
 export type WidgetFocus = 'time' | 'region' | 'indicator';
 export type WidgetCategory = 'chart' | 'table' | 'simple' | 'advanced';
-export type WidgetConfigOption = 'sensor' | 'region' | 'timeFrame' | 'date' | 'level' | 'sensors';
+export type WidgetConfigOption = 'sensor' | 'region' | 'timeFrame' | 'date' | 'level' | 'sensors' | 'regions';
 
 export interface Widget {
   id: WidgetType;
@@ -88,6 +90,8 @@ function asWidget(
 
 export const widgets: readonly Widget[] = [
   asWidget('line', 'Time Series', ['time'], 'chart', ['sensor', 'region', 'timeFrame']),
+  asWidget('sensorsline', 'Multi Indicator Time Series', ['time'], 'chart', ['sensors', 'region', 'timeFrame']),
+  asWidget('regionsline', 'Multi Region Time Series', ['time'], 'chart', ['sensor', 'regions', 'timeFrame']),
   asWidget('map', 'Choropleth Map', ['region'], 'chart', ['sensor', 'level', 'date']),
   asWidget('zoomedmap', 'Zoomed Choropleth Map', ['region'], 'chart', ['sensor', 'region', 'date']),
   asWidget('hex', 'Hexagon Map', ['region'], 'chart', ['sensor', 'date']),

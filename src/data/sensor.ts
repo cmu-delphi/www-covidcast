@@ -205,3 +205,40 @@ export function resolveDefaultRegion(sensor: Sensor): Region {
   }
   return nationInfo;
 }
+
+/**
+ * checks whether multiple regions of the same sensor can be shown on a single axis without harm
+ * @param sensor
+ * @returns
+ */
+export function isComparableAcrossRegions(sensor: Sensor): boolean {
+  return sensor.format === 'fraction' || sensor.format === 'per100k' || sensor.format === 'percent';
+}
+
+/**
+ * groups sensor by their compatibility, i.e. can be shown on the same axis
+ */
+export function toSignalCompatibilityGroups(sensors: readonly Sensor[]): Sensor[][] {
+  if (sensors.length === 1) {
+    return [sensors.slice()];
+  }
+  const byFormat = new Map<string, Sensor[]>();
+  const byFormatList: Sensor[][] = [];
+  for (const sensor of sensors) {
+    if (isComparableAcrossRegions(sensor)) {
+      // can combine with others of same format
+      const entry = byFormat.get(sensor.format);
+      if (entry) {
+        entry.push(sensor);
+      } else {
+        const list = [sensor];
+        byFormatList.push(list);
+        byFormat.set(sensor.format, list);
+      }
+    } else {
+      // need to be alone
+      byFormatList.push([sensor]);
+    }
+  }
+  return byFormatList;
+}

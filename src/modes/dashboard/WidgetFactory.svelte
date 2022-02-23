@@ -10,12 +10,16 @@
   import SensorTableWidget from './widgets/SensorTableWidget.svelte';
   import AnomaliesWidget from './widgets/AnomaliesWidget.svelte';
   import ZoomedMapChartWidget from './widgets/ZoomedMapChartWidget.svelte';
+  import SensorLineChartWidget from './widgets/SensorLineChartWidget.svelte';
+  import RegionLineChartWidget from './widgets/RegionLineChartWidget.svelte';
   import {
     resolveDate,
     resolveRegion,
     resolveRegionLevel,
+    resolveRegions,
     resolveSensor,
     resolveSensors,
+    resolveSensorParams,
     resolveTimeFrame,
   } from './configResolver';
 
@@ -48,6 +52,28 @@
     sensor={resolveSensor(sensor, c.config.sensor)}
     timeFrame={resolveTimeFrame(sensor, date, c.config.timeFrame)}
     region={resolveRegion(region, c.config.region)}
+    bind:highlight
+    on:action={trackAction}
+    on:state={trackState}
+    id={c.id}
+    initialState={c.state}
+  />
+{:else if c.type === 'sensorsline'}
+  <SensorLineChartWidget
+    sensors={resolveSensorParams(sensor, c.config.sensors)}
+    timeFrame={resolveTimeFrame(sensor, date, c.config.timeFrame)}
+    region={resolveRegion(region, c.config.region)}
+    bind:highlight
+    on:action={trackAction}
+    on:state={trackState}
+    id={c.id}
+    initialState={c.state}
+  />
+{:else if c.type === 'regionsline'}
+  <RegionLineChartWidget
+    sensor={resolveSensor(sensor, c.config.sensor)}
+    timeFrame={resolveTimeFrame(sensor, date, c.config.timeFrame)}
+    regions={resolveRegions(region, c.config.regions)}
     bind:highlight
     on:action={trackAction}
     on:state={trackState}

@@ -14,11 +14,11 @@
   export let view;
 
   /**
-   * @type {import('../../stores/params').SensorParam}
+   * @type {import('../../stores/params').Sensor[]}
    */
-  export let sensor;
+  export let sensors;
 
-  export let prop = 'displayName';
+  export let prop = 'sensorName';
 
   $: items = item && view ? view.data('values').filter((d) => d.time_value === item.time_value) : [];
 </script>
@@ -26,11 +26,11 @@
 <div aria-label="tooltip" class="tooltip" class:hidden>
   <h5>{formatDateShortDayOfWeekAbbr(item.date_value)}</h5>
   <table>
-    {#each items as i}
+    {#each items as i, index}
       <tr>
         <th>{i[prop]}</th>
         <td>
-          <SensorValue {sensor} value={i.value} medium />
+          <SensorValue sensor={sensors[index]} value={i.value} medium />
         </td>
       </tr>
     {/each}
@@ -49,8 +49,10 @@
 
   th {
     text-align: left;
+    max-width: 15em;
   }
   td {
     text-align: right;
+    vertical-align: top;
   }
 </style>
