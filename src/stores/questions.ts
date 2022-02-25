@@ -40,6 +40,27 @@ export const waves = descriptions.waves.reduce((waves, wave, i) => {
   return waves;
 }, [] as Wave[]);
 
+function getWave(wave: number): Wave {
+  if (wave >= waves.length) {
+    // create dummy waves
+    for (let i = waves.length; i <= wave; i++) {
+      console.warn(`faking wave ${i + 1}, please update the google doc`);
+      const waveObj: Wave = {
+        name: `Wave ${i + 1}`,
+        wave: i + 1,
+        published: new Date(),
+        previous: waves[i - 1],
+        link: waveLink(i + 1),
+      };
+      if (waveObj.previous) {
+        waveObj.previous.next = waveObj;
+      }
+      waves.push(waveObj);
+    }
+  }
+  return wave < 0 ? waves[0] : waves[wave];
+}
+
 export interface Revision extends SensorLike {
   change: string;
   changedInWave: Wave;
@@ -69,7 +90,7 @@ export const questions: Question[] = descriptions.questions.map((desc) => {
     ...desc,
     id: descriptions.id,
     anchor: toAnchor(desc.name),
-    addedInWave: waves[desc.addedInWave - 1],
+    addedInWave: getWave(desc.addedInWave - 1),
     oldRevisions: undefined,
   };
   if (desc.oldRevisions) {
@@ -81,8 +102,8 @@ export const questions: Question[] = descriptions.questions.map((desc) => {
         acc.push({
           ...rev,
           id: descriptions.id,
-          changedInWave: acc.length === 0 ? waves[desc.addedInWave - 1] : acc[acc.length - 1].addedInWave,
-          addedInWave: waves[rev.addedInWave - 1],
+          changedInWave: acc.length === 0 ? getWave(desc.addedInWave - 1) : acc[acc.length - 1].addedInWave,
+          addedInWave: getWave(rev.addedInWave - 1),
         });
         return acc;
       }, [] as Revision[])
