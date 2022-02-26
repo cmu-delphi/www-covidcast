@@ -3,6 +3,7 @@ import { modeByID } from '../modes';
 import { yesterdayDate } from '../data/TimeFrame';
 import { toTimeValue } from '../data/utils';
 import { timeDay } from 'd3-time';
+import type { Sensor } from '../data/sensor';
 
 export * from '../data/geoLevel';
 export type { Sensor } from '../data/sensor';
@@ -23,6 +24,8 @@ export interface SensorConfig {
 
   readonly highlight?: string[];
   readonly linkFrom?: string[];
+
+  overrides?: Sensor['overrides'];
 }
 
 export const sensorConfig: SensorConfig[] = descriptions.map((d) => Object.assign(d, { key: `${d.id}-${d.signal}` }));

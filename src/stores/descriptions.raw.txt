@@ -101,6 +101,14 @@ Name: COVID Hospital Admissions
 Id: hhs
 Signal: confirmed_admissions_covid_1d_prop_7dav
 ExtendedColorScale: true
+# override with additional county
+Levels: [nation, state, county]
+Overrides:
+  County:
+    Id: dsew-cpr
+    Signal: confirmed_admissions_covid_1d_prop_7dav
+
+
 
 
 SignalTooltip: Confirmed COVID-19 hospital admissions per 100,000 people

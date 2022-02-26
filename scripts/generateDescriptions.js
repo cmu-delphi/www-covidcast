@@ -114,6 +114,14 @@ function convertDescriptions(code) {
       casesOrDeathSignals: parseNestedOrString,
       mapTitleText: parseNestedOrString,
       unitShort: (v) => v || '',
+      overrides: (v) =>
+        parseObject(v, {
+          county: parseObject,
+          state: parseObject,
+          nation: parseObject,
+          hhs: parseObject,
+          msa: parseObject,
+        }),
     });
   });
   fs.writeFileSync('./src/stores/descriptions.generated.json', JSON.stringify(entries, null, 2));
