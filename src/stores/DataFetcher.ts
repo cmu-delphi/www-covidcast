@@ -25,7 +25,7 @@ export class DataFetcher {
 
   constructor(public readonly asOf: Date | EpiWeek | null = null) {}
 
-  toDateKey(sensor: Sensor, region: { id: string; level: string }, date: DateParam, suffix = ''): string {
+  toDateKey(sensor: { key: string }, region: { id: string; level: string }, date: DateParam, suffix = ''): string {
     const s = this.primarySensorKey === sensor.key ? 'SENSOR' : sensor.key;
     const r =
       this.primaryRegionId === region.id && region.level !== 'nation' ? 'REGION' : `${region.level}-${region.id}`;
@@ -33,7 +33,12 @@ export class DataFetcher {
     return `${s}@${r}@${d}${suffix ? '@' : ''}${suffix}`;
   }
 
-  toWindowKey(sensor: Sensor, region: { id: string; level: string }, timeFrame: TimeFrame, suffix = ''): string {
+  toWindowKey(
+    sensor: { key: string },
+    region: { id: string; level: string },
+    timeFrame: TimeFrame,
+    suffix = '',
+  ): string {
     const s = this.primarySensorKey === sensor.key ? 'SENSOR' : sensor.key;
     const r =
       this.primaryRegionId === region.id && region.level !== 'nation' ? 'REGION' : `${region.level}-${region.id}`;
