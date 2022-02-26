@@ -218,6 +218,16 @@
     }
   }
 
+  function onDblclick(event) {
+    let item = event.detail.item;
+    while (item && item.datum) {
+      item = item.datum;
+    }
+    if (item != null && item.date_value != null) {
+      date.set(item.date_value);
+    }
+  }
+
   function resolveRegions(region, singleRegionOnly, showNeighbors) {
     if (singleRegionOnly) {
       return [region];
@@ -338,6 +348,8 @@
   signals={{ highlight_tuple: resetOnClearHighlighTuple(date.value), highlightRegion }}
   signalListeners={['highlight']}
   on:signal={onSignal}
+  eventListeners={['dblclick']}
+  on:dblclick={onDblclick}
 />
 
 <div class="buttons">
