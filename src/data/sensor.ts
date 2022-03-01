@@ -33,6 +33,10 @@ export const sensorTypes: { id: SignalCategory; label: string }[] = [
   },
 ];
 
+export function toKey(source: string, signal: string): string {
+  return `${source}-${signal}`;
+}
+
 export interface SensorLike {
   id: string;
   signal: string;
@@ -118,7 +122,7 @@ export const units = {
 };
 
 export function ensureSensorStructure(sensor: Partial<Sensor> & { name: string; id: string; signal: string }): Sensor {
-  const key = `${sensor.id}-${sensor.signal}`;
+  const key = toKey(sensor.id, sensor.signal);
 
   const highValuesAre = determineHighValuesAre(sensor);
   const format = sensor.format || 'raw';
@@ -161,7 +165,7 @@ export function ensureSensorStructure(sensor: Partial<Sensor> & { name: string; 
     Object.assign(full, {
       rawSensor: {
         ...full,
-        key: `${sensor.id}-${rawSignal}`,
+        key: toKey(sensor.id, rawSignal),
         name: `${full.name.replace('(7-day average)', '')} (Raw)`,
         description: full.description.replace('(7-day average)', ''),
         signal: rawSignal,
