@@ -283,7 +283,7 @@ export interface LineSpecOptions {
   valueFormat?: string;
   valueDomain?: [number, number];
   zero?: boolean;
-  highlightRegion?: boolean;
+  highlightRegion?: boolean | string;
   reactOnMouseMove?: boolean;
   clearHighlight?: boolean;
   paddingLeft?: number;

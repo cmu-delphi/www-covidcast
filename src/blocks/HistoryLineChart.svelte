@@ -21,12 +21,13 @@
   import { combineSignals } from '../data/utils';
   import DownloadMenu from '../components/DownloadMenu.svelte';
   import { formatDateISO, formatWeek } from '../formats';
-  import { annotationManager, isMobileDevice } from '../stores';
+  import { annotationManager, isMobileDevice, metaDataManager } from '../stores';
   import IndicatorAnnotation from '../components/IndicatorAnnotation.svelte';
   import IndicatorAnnotations from '../components/IndicatorAnnotations.svelte';
   import { joinTitle } from '../specs/commonSpec';
   import { TimeFrame } from '../stores/params';
   import { timeDay } from 'd3-time';
+  import { resolveAgeStratifications } from '../stores/constants';
 
   export let height = 250;
 
@@ -76,6 +77,8 @@
    */
   export let domain = null;
 
+  $: ageStratifictions = resolveAgeStratifications(sensor.value, $metaDataManager);
+
   /**
    * @type {import("../stores/params").Region}
    */
@@ -113,7 +116,7 @@
     region,
     date,
     timeFrame,
-    { height, raw, isMobile, singleRegionOnly, domain, showNeighbors, stderr },
+    { height, raw, isMobile, singleRegionOnly, domain, showNeighbors, stderr, showAge },
   ) {
     const isWeekly = sensor.value.isWeeklySignal;
     const options = {
@@ -125,7 +128,7 @@
       xTitle: sensor.xAxis,
       title: joinTitle([sensor.name, `in ${region.displayName}`], isMobile),
       subTitle: sensor.unit,
-      highlightRegion: true,
+      highlightRegion: showAge ? 'signal' : true,
       isWeeklySignal: isWeekly,
       stderr,
     };
@@ -134,6 +137,13 @@
     }
     if (singleRegionOnly) {
       return generateLineChartSpec(options);
+    }
+    if (showAge) {
+      const ageStratifications = showAge.map((d) => d.signal);
+      return generateCompareLineSpec([sensor.value.signal, ...ageStratifications], {
+        ...options,
+        compareField: 'signal',
+      });
     }
     if (region.level === 'county') {
       // county vs related vs state vs nation
@@ -155,7 +165,7 @@
    * @param {import("../stores/params").DateParam} date
    * @param {import("../stores/params").RegionParam} region
    */
-  function loadData(sensor, region, timeFrame, singleRegionOnly, showNeighbors) {
+  function loadData(sensor, region, timeFrame, singleRegionOnly, showNeighbors, showAge) {
     if (!region.value) {
       return null;
     }
@@ -167,21 +177,31 @@
 
     const data = [selfData];
 
-    if (region.level === 'county') {
-      if (showNeighbors) {
-        const relatedCounties = getRelatedCounties(region.value);
-        const relatedData = fetcher
-          .fetch1SensorNRegionsNDates(sensor, relatedCounties, timeFrame)
-          .then((r) => averageByDate(r, neighboringInfo))
-          .then((r) => addMissing(r, sensor.isWeeklySignal ? 'week' : 'day'));
-        data.push(relatedData);
+    if (showAge) {
+      data.push(
+        ...fetcher.fetchNSensor1RegionNDates(
+          showAge.map((d) => d.sensor),
+          region,
+          timeFrame,
+        ),
+      );
+    } else {
+      if (region.level === 'county') {
+        if (showNeighbors) {
+          const relatedCounties = getRelatedCounties(region.value);
+          const relatedData = fetcher
+            .fetch1SensorNRegionsNDates(sensor, relatedCounties, timeFrame)
+            .then((r) => averageByDate(r, neighboringInfo))
+            .then((r) => addMissing(r, sensor.isWeeklySignal ? 'week' : 'day'));
+          data.push(relatedData);
+        }
+        const state = getStateOfCounty(region);
+        const stateData = fetcher.fetch1Sensor1RegionNDates(sensor, state, timeFrame);
+        data.push(stateData);
       }
-      const state = getStateOfCounty(region);
-      const stateData = fetcher.fetch1Sensor1RegionNDates(sensor, state, timeFrame);
-      data.push(stateData);
-    }
-    if (region.level !== 'nation') {
-      data.push(fetcher.fetch1Sensor1RegionNDates(sensor, nationInfo, timeFrame));
+      if (region.level !== 'nation') {
+        data.push(fetcher.fetch1Sensor1RegionNDates(sensor, nationInfo, timeFrame));
+      }
     }
     return Promise.all(data).then((rows) => {
       return rows.reverse().flat();
@@ -281,9 +301,11 @@
 
   export let stderr = false;
   let singleRaw = false;
+  let showAgeStratifications = false;
 
   $: raw = singleRaw && sensor.rawValue != null && !($isMobileDevice && showFull);
-  $: regions = raw ? [region.value] : resolveRegions(region.value, singleRegionOnly, showNeighbors);
+  $: regions =
+    raw || showAgeStratifications ? [region.value] : resolveRegions(region.value, singleRegionOnly, showNeighbors);
   $: annotations = raw
     ? $annotationManager.getMultiWindowAnnotations(
         [sensor.value, sensor.rawValue],
@@ -302,22 +324,30 @@
       domain,
       showNeighbors,
       stderr,
+      showAge: showAgeStratifications ? ageStratifictions : false,
     }),
     timeFrame,
     annotations.filter((d) => !d.isAllTime),
-    regions.length > 1,
+    regions.length > 1 || showAgeStratifications,
   );
   $: data = raw
     ? loadSingleData(sensor, region, timeFrame)
-    : loadData(sensor, region, timeFrame, singleRegionOnly, showNeighbors);
+    : loadData(
+        sensor,
+        region,
+        timeFrame,
+        singleRegionOnly,
+        showNeighbors,
+        showAgeStratifications ? ageStratifictions : false,
+      );
   $: fileName = generateFileName(sensor, regions, timeFrame, raw);
 
-  function findValue(region, data, date, prop = 'value', defaultValue = null) {
+  function findValue(signal, region, data, date, prop = 'value', defaultValue = null) {
     if (!date) {
       return defaultValue;
     }
     const time = toTimeValue(date);
-    const row = data.find((d) => d.id === region.id && toTimeValue(d.date_value) === time);
+    const row = data.find((d) => d.id === region.id && d.signal == signal && toTimeValue(d.date_value) === time);
     if (!row) {
       return defaultValue;
     }
@@ -335,6 +365,19 @@
     highlightRegion = region.value.id;
   }
 
+  let highlightSignal = null;
+
+  function highlightNewSignal(r) {
+    highlightSignal = r ? r.signal : sensor.value.signal;
+  }
+
+  $: {
+    // auto update
+    highlightSignal = sensor.value.signal;
+  }
+
+  $: toHighlight = showAgeStratifications ? highlightSignal : highlightRegion;
+
   let vegaRef = null;
 </script>
 
@@ -345,7 +388,7 @@
   {data}
   tooltip={HistoryLineTooltip}
   tooltipProps={{ sensor }}
-  signals={{ highlight_tuple: resetOnClearHighlighTuple(date.value), highlightRegion }}
+  signals={{ highlight_tuple: resetOnClearHighlighTuple(date.value), highlightRegion: toHighlight }}
   signalListeners={['highlight']}
   on:signal={onSignal}
   eventListeners={['dblclick']}
@@ -353,57 +396,110 @@
 />
 
 <div class="buttons">
-  {#if sensor.rawValue != null && !($isMobileDevice && showAllDates)}
-    <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
-  {/if}
   {#if !($isMobileDevice && raw)}
     <Toggle bind:checked={showFull}>All Dates</Toggle>
+  {/if}
+  {#if !$isMobileDevice && ageStratifictions != null}
+    <Toggle bind:checked={showAgeStratifications}>Age Groups</Toggle>
+  {/if}
+  {#if sensor.rawValue != null && !($isMobileDevice && showAllDates) && !showAgeStratifications}
+    <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
   {/if}
   <div class="spacer" />
   <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} {stderr} />
 </div>
 
-<div class="{!raw && regions.length > 1 ? 'mobile-two-col' : ''} legend">
-  {#each regions as r, i}
+<div class="{!raw && (regions.length > 1 || showAgeStratifications) ? 'mobile-two-col' : ''} legend">
+  {#if showAgeStratifications}
     <div
       class="legend-elem"
-      style="--color: {(i === 0 ? color : MULTI_COLORS[i]).replace(/rgb\((.*)\)/, '$1')}"
-      class:selected={highlightRegion === r.id}
-      on:mouseenter={() => highlight(r)}
-      on:mouseleave={() => highlight(null)}
+      style="--color: {color.replace(/rgb\((.*)\)/, '$1')}"
+      class:selected={highlightSignal === sensor.value.signal}
+      on:mouseenter={() => highlightNewSignal(sensor.value)}
+      on:mouseleave={() => highlightNewSignal(null)}
     >
       <span class="legend-symbol">●</span>
       <div>
         <span>
-          {#if r.id !== region.id && r.id !== neighboringInfo.id}
-            <a href="?region={r.propertyId}" on:click|preventDefault={() => region.set(r, true)}> {r.displayName} </a>
-          {:else if r.id === neighboringInfo.id}
-            {#await data}
-              {r.displayName}
-            {:then d}
-              Average of {findValue(r, d, highlightDate, 'valid', '0')} {r.displayName}
-            {/await}
-          {:else}
-            {r.displayName}
-          {/if}
-          {#if regions.length > 1 && r.id !== neighboringInfo.id}
-            <IndicatorAnnotations asHint {sensor} region={r} {date} range="window" />
-          {/if}
+          {region.displayName} (All Ages)
         </span>
       </div>
       <div>
         {#await data then d}
           <span class="legend-value">
-            <SensorValue {sensor} value={findValue(r, d, highlightDate)} medium />
-            {#if raw}
-              (raw:
-              <SensorValue {sensor} value={findValue(r, d, highlightDate, 'raw')} medium />)
-            {/if}
+            <SensorValue {sensor} value={findValue(sensor.value.signal, region, d, highlightDate)} medium />
           </span>
         {/await}
       </div>
     </div>
-  {/each}
+    {#each ageStratifictions as r, i}
+      <div
+        class="legend-elem"
+        style="--color: {MULTI_COLORS[i + 1].replace(/rgb\((.*)\)/, '$1')}"
+        class:selected={highlightSignal === r.signal}
+        on:mouseenter={() => highlightNewSignal(r)}
+        on:mouseleave={() => highlightNewSignal(null)}
+      >
+        <span class="legend-symbol">●</span>
+        <div>
+          <span>
+            {region.displayName} ({r.name})
+          </span>
+        </div>
+        <div>
+          {#await data then d}
+            <span class="legend-value">
+              <SensorValue {sensor} value={findValue(r.signal, region, d, highlightDate)} medium />
+            </span>
+          {/await}
+        </div>
+      </div>
+    {/each}
+  {:else}
+    {#each regions as r, i}
+      <div
+        class="legend-elem"
+        style="--color: {(i === 0 ? color : MULTI_COLORS[i]).replace(/rgb\((.*)\)/, '$1')}"
+        class:selected={highlightRegion === r.id}
+        on:mouseenter={() => highlight(r)}
+        on:mouseleave={() => highlight(null)}
+      >
+        <span class="legend-symbol">●</span>
+        <div>
+          <span>
+            {#if r.id !== region.id && r.id !== neighboringInfo.id}
+              <a href="?region={r.propertyId}" on:click|preventDefault={() => region.set(r, true)}> {r.displayName} </a>
+            {:else if r.id === neighboringInfo.id}
+              {#await data}
+                {r.displayName}
+              {:then d}
+                Average of {findValue(sensor.value.signal, r, d, highlightDate, 'valid', '0')} {r.displayName}
+              {/await}
+            {:else}
+              {r.displayName}
+              {#if showAgeStratifications}
+                (All Ages)
+              {/if}
+            {/if}
+            {#if regions.length > 1 && r.id !== neighboringInfo.id}
+              <IndicatorAnnotations asHint {sensor} region={r} {date} range="window" />
+            {/if}
+          </span>
+        </div>
+        <div>
+          {#await data then d}
+            <span class="legend-value">
+              <SensorValue {sensor} value={findValue(sensor.value.signal, r, d, highlightDate)} medium />
+              {#if raw}
+                (raw:
+                <SensorValue {sensor} value={findValue(sensor.value.signal, r, d, highlightDate, 'raw')} medium />)
+              {/if}
+            </span>
+          {/await}
+        </div>
+      </div>
+    {/each}
+  {/if}
 </div>
 
 {#each annotations as annotation}
