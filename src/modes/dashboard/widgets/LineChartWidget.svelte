@@ -102,7 +102,7 @@
       xTitle: sensor.xAxis,
       title: [`${sensor.name} in ${region.displayName}`, timeFrame.toNiceString(isWeekly)],
       subTitle: sensor.unit,
-      highlightRegion: false,
+      highlightLine: false,
       clearHighlight: false,
       autoAlignOffset: 60,
       paddingTop: 80,

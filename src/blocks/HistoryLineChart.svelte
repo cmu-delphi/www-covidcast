@@ -28,6 +28,7 @@
   import { TimeFrame } from '../stores/params';
   import { timeDay } from 'd3-time';
   import { resolveAgeStratifications } from '../stores/constants';
+  import SensorUnit from '../components/SensorUnit.svelte';
 
   export let height = 250;
 
@@ -128,7 +129,8 @@
       xTitle: sensor.xAxis,
       title: joinTitle([sensor.name, `in ${region.displayName}`], isMobile),
       subTitle: sensor.unit,
-      highlightRegion: showAge ? 'signal' : true,
+      highlightLine: !showAge,
+      filterLine: showAge ? 'signal' : false,
       isWeeklySignal: isWeekly,
       stderr,
     };
@@ -354,29 +356,36 @@
     return row[prop];
   }
 
-  let highlightRegion = null;
+  let highlightLine = null;
 
-  function highlight(r) {
-    highlightRegion = r ? r.id : region.value.id;
+  function setHighlightLine(r) {
+    highlightLine = r ? r.id : region.value.id;
   }
 
   $: {
     // auto update
-    highlightRegion = region.value.id;
+    highlightLine = region.value.id;
   }
 
-  let highlightSignal = null;
-
-  function highlightNewSignal(r) {
-    highlightSignal = r ? r.signal : sensor.value.signal;
+  let filterLine = null;
+  let filterLineManaged = [];
+  function initLineManaged(ageStratifictions) {
+    filterLineManaged = Array(1 + (ageStratifictions ? ageStratifictions.length : 0)).fill(true);
   }
-
   $: {
-    // auto update
-    highlightSignal = sensor.value.signal;
+    initLineManaged(ageStratifictions);
   }
-
-  $: toHighlight = showAgeStratifications ? highlightSignal : highlightRegion;
+  function updateFilteredLine(sensor, ageStratifications, filterLineManaged) {
+    if (!ageStratifications) {
+      return;
+    }
+    const signals = [sensor.value.signal].concat(ageStratifictions.map((d) => d.signal));
+    filterLine = signals.filter((_, i) => filterLineManaged[i]);
+  }
+  $: {
+    console.log(filterLineManaged);
+    updateFilteredLine(sensor, ageStratifictions, filterLineManaged);
+  }
 
   let vegaRef = null;
 </script>
@@ -388,7 +397,11 @@
   {data}
   tooltip={HistoryLineTooltip}
   tooltipProps={{ sensor }}
-  signals={{ highlight_tuple: resetOnClearHighlighTuple(date.value), highlightRegion: toHighlight }}
+  signals={{
+    highlight_tuple: resetOnClearHighlighTuple(date.value),
+    highlightLine: showAgeStratifications ? highlightLine : null,
+    filterLine: showAgeStratifications ? filterLine : null,
+  }}
   signalListeners={['highlight']}
   on:signal={onSignal}
   eventListeners={['dblclick']}
@@ -409,60 +422,72 @@
   <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} {stderr} />
 </div>
 
-<div class="{!raw && (regions.length > 1 || showAgeStratifications) ? 'mobile-two-col' : ''} legend">
-  {#if showAgeStratifications}
-    <div
-      class="legend-elem"
-      style="--color: {color.replace(/rgb\((.*)\)/, '$1')}"
-      class:selected={highlightSignal === sensor.value.signal}
-      on:mouseenter={() => highlightNewSignal(sensor.value)}
-      on:mouseleave={() => highlightNewSignal(null)}
-    >
+{#if showAgeStratifications}
+  <div class="legend">
+    <div class="legend-elem" style="--color: {color.replace(/rgb\((.*)\)/, '$1')}">
       <span class="legend-symbol">●</span>
       <div>
         <span>
-          {region.displayName} (All Ages)
+          {region.displayName}
         </span>
       </div>
+      <div />
+      <div />
       <div>
-        {#await data then d}
-          <span class="legend-value">
-            <SensorValue {sensor} value={findValue(sensor.value.signal, region, d, highlightDate)} medium />
-          </span>
-        {/await}
+        <table class="age-legend">
+          <thead>
+            <tr>
+              <th class="age-legend-elem" style="--toggle-color: {color}">
+                <Toggle
+                  bind:checked={filterLineManaged[0]}
+                  name="filteredLine"
+                  value={sensor.value.signal}
+                  noPadding
+                  className="togglew">All Ages</Toggle
+                >
+              </th>
+              {#each ageStratifictions as r, i}
+                <th class="age-legend-elem" style="--toggle-color: {MULTI_COLORS[i + 1]}">
+                  <Toggle
+                    bind:checked={filterLineManaged[i + 1]}
+                    name="filteredLine"
+                    value={r.signal}
+                    noPadding
+                    className="togglew">{r.name}</Toggle
+                  >
+                </th>
+              {/each}
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              {#await data then d}
+                <td>
+                  {sensor.formatValue(findValue(sensor.value.signal, region, d, highlightDate))}
+                </td>
+                {#each ageStratifictions as r, i}
+                  <td>
+                    {sensor.formatValue(findValue(r.signal, region, d, highlightDate))}
+                  </td>
+                {/each}
+                <td><SensorUnit {sensor} medium /></td>
+              {/await}
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-    {#each ageStratifictions as r, i}
-      <div
-        class="legend-elem"
-        style="--color: {MULTI_COLORS[i + 1].replace(/rgb\((.*)\)/, '$1')}"
-        class:selected={highlightSignal === r.signal}
-        on:mouseenter={() => highlightNewSignal(r)}
-        on:mouseleave={() => highlightNewSignal(null)}
-      >
-        <span class="legend-symbol">●</span>
-        <div>
-          <span>
-            {region.displayName} ({r.name})
-          </span>
-        </div>
-        <div>
-          {#await data then d}
-            <span class="legend-value">
-              <SensorValue {sensor} value={findValue(r.signal, region, d, highlightDate)} medium />
-            </span>
-          {/await}
-        </div>
-      </div>
-    {/each}
-  {:else}
+  </div>
+{:else}
+  <div class="{!raw && regions.length > 1 ? 'mobile-two-col' : ''} legend">
     {#each regions as r, i}
       <div
         class="legend-elem"
         style="--color: {(i === 0 ? color : MULTI_COLORS[i]).replace(/rgb\((.*)\)/, '$1')}"
-        class:selected={highlightRegion === r.id}
-        on:mouseenter={() => highlight(r)}
-        on:mouseleave={() => highlight(null)}
+        class:selected={highlightLine === r.id}
+        on:mouseenter={() => setHighlightLine(r)}
+        on:mouseleave={() => setHighlightLine(null)}
       >
         <span class="legend-symbol">●</span>
         <div>
@@ -499,8 +524,8 @@
         </div>
       </div>
     {/each}
-  {/if}
-</div>
+  </div>
+{/if}
 
 {#each annotations as annotation}
   <IndicatorAnnotation {annotation} />
@@ -531,6 +556,35 @@
   }
   .legend-value {
     font-weight: 600;
+  }
+  .age-legend {
+    border-collapse: collapse;
+  }
+  .age-legend thead th {
+    border-bottom: 1px solid rgb(var(--color));
+  }
+  .age-legend-elem {
+    width: 7em;
+  }
+  .age-legend > tbody td {
+    text-align: right;
+  }
+  .age-legend th,
+  .age-legend td {
+    border-right: 1px solid rgb(var(--color));
+    padding: 2px 4px 2px 2px;
+  }
+  .age-legend th:last-of-type,
+  .age-legend td:last-of-type {
+    border-right: none;
+  }
+  .age-legend :global(.togglew) {
+    white-space: nowrap;
+    margin-right: 0;
+  }
+  .age-legend :global(.togglew > svg) {
+    width: 1.5em;
+    margin-top: -2px;
   }
 
   .buttons {
