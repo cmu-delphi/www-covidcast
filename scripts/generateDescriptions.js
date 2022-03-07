@@ -114,6 +114,7 @@ function convertDescriptions(code) {
       casesOrDeathSignals: parseNestedOrString,
       mapTitleText: parseNestedOrString,
       unitShort: (v) => v || '',
+      ageStratifications: parseArray,
     });
   });
   fs.writeFileSync('./src/stores/descriptions.generated.json', JSON.stringify(entries, null, 2));
