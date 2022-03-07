@@ -32,6 +32,16 @@
     highlightDate: 'top',
     highlightStartEnd: false,
   });
+
+  function onDblclick(event) {
+    let item = event.detail.item;
+    while (item && item.datum) {
+      item = item.datum;
+    }
+    if (item != null && item.date_value != null) {
+      date.set(item.date_value);
+    }
+  }
 </script>
 
 <div class="mobile-three-col">
@@ -65,6 +75,8 @@
         tooltip={SparkLineTooltip}
         tooltipProps={{ sensor: sensor }}
         signals={{ currentDate: date.value }}
+        eventListeners={['dblclick']}
+        on:dblclick={onDblclick}
       />
     </div>
     <div class="date-range">
