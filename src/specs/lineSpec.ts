@@ -283,7 +283,8 @@ export interface LineSpecOptions {
   valueFormat?: string;
   valueDomain?: [number, number];
   zero?: boolean;
-  highlightRegion?: boolean;
+  filterLine?: boolean | string;
+  highlightLine?: boolean | string;
   reactOnMouseMove?: boolean;
   clearHighlight?: boolean;
   paddingLeft?: number;
@@ -309,7 +310,8 @@ export function generateLineChartSpec({
   valueFormat,
   valueDomain,
   zero = false,
-  highlightRegion = false,
+  filterLine = false,
+  highlightLine = false,
   reactOnMouseMove = true,
   clearHighlight = true,
   paddingLeft = 42,
@@ -391,14 +393,27 @@ export function generateLineChartSpec({
               // padding: zero ? undefined : smartPadding(valueField),
             },
           },
-          ...(highlightRegion
+          ...(highlightLine
             ? {
                 opacity: {
                   condition: {
-                    test: `highlightRegion != null && highlightRegion != datum.${
-                      typeof highlightRegion === 'string' ? highlightRegion : 'id'
+                    test: `highlightLine != null && highlightLine != datum.${
+                      typeof highlightLine === 'string' ? highlightLine : 'id'
                     }`,
                     value: 0.1,
+                  },
+                  value: 1,
+                },
+              }
+            : {}),
+          ...(filterLine
+            ? {
+                opacity: {
+                  condition: {
+                    test: `filterLine != null && indexof(filterLine, datum.${
+                      typeof filterLine === 'string' ? filterLine : 'id'
+                    }) < 0`,
+                    value: 0,
                   },
                   value: 1,
                 },

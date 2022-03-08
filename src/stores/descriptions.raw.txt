@@ -19,16 +19,27 @@ SignalTooltip: Percentage of people who either have already received a COVID vac
 
 Description: Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they have received a COVID vaccine, have an appointment to do so, or would choose to be vaccinated if they were offered a COVID vaccine today. For this signal, we estimate the percentage of people who either (a) say they have already received a COVID vaccine, (b) have an appointment to receive a COVID vaccine, or (c) would “definitely” or “probably” choose to be vaccinated if a COVID vaccine were offered to them today. The signal changed in [Wave 11](https://cmu-delphi.github.io/delphi-epidata/symptom-survey/coding.html#wave-11) of the survey, asking all non-vaccinated respondents if they have an appointment to be vaccinated and treating those with appointments as vaccine-accepting.
 ---
-Name: COVID Symptom Searches on Google 
+Name: Symptom Searches (Smell and Taste) on Google 
 Id: google-symptoms
-Signal: sum_anosmia_ageusia_smoothed_search
+Signal: s05_smoothed_search
 Unit: scaled search volume
 UnitShort: 
 noMaps: true
  
-SignalTooltip: Google search volume of COVID-related symptom searches
+SignalTooltip: Google search volume of COVID-related symptom searches about smell and taste
  
-Description: Using Google Symptoms Searches, Delphi obtains the sum of Google search volumes for anosmia (loss of smell) related searches and ageusia (loss of taste) related searches in each area, since they emerged as unusual symptoms that are indicative of COVID-19. Note that the sum of two symptom search volumes is not equivalent to the union of anosmia and ageusia related searches. According to Google, the estimates are not comparable across regions since the values are normalized by population and scaled by region-specific maximum popularity (and for this reason, we omit beehive grids of choropleth maps of this signal on the dashboard).
+Description: Using Google Symptoms Searches, Delphi obtains the average of Google search volumes for searches related to anosmia (loss of smell), ageusia (loss of taste), and dysgeusia (altered or impaired taste) in each area, since they emerged as unusual symptoms that can be indicative of COVID-19. Note that the average of the three symptom search volumes is not equivalent to the search volume of their union. According to Google, the estimates are not comparable across regions since the values are normalized by population and scaled by region-specific maximum popularity (and for this reason, we omit beehive grids and choropleth maps of this signal on the dashboard).
+---
+Name: Symptom Searches (Common Cold) on Google 
+Id: google-symptoms
+Signal: s02_smoothed_search
+Unit: scaled search volume
+UnitShort: 
+noMaps: true
+ 
+SignalTooltip: Google search volume of COVID-related symptom searches about common cold
+ 
+Description: Using Google Symptoms Searches, Delphi obtains the average of Google search volumes for searches related to nasal congestion, post nasal drip, rhinorrhea, sinusitis, rhinitis, and common cold in each area. These symptoms have showed positive correlation with reported COVID cases, especially since Omicron was declared a variant of concern by the World Health Organization. Note that the average search volume of these symptoms is not equivalent to the search volume of their union. According to Google, the estimates are not comparable across regions since the values are normalized by population and scaled by region-specific maximum popularity (and for this reason, we omit beehive grids and choropleth maps of this signal on the dashboard).
 ---
 Name: COVID-Like Symptoms
 Id: fb-survey
@@ -73,6 +84,21 @@ SignalTooltip: Positivity rate of COVID-19 antigen tests, based on data provided
 
 
 Description: When a patient (whether at a doctor’s office, clinic, or hospital) has COVID-like symptoms, doctors may order an antigen test, which can detect parts of the virus that are present during an active infection. Quidel, a national provider of networked lab testing devices, provides us with data from every COVID antigen test that they conduct. We report the percentage of COVID antigen tests that are positive. Note that this signal only includes Quidel’s antigen tests, not those run by other test providers.
+
+
+AgeStratifications:
+ - Name: 0-4
+   Signal: covid_ag_smoothed_pct_positive_age_0_4
+ - Name: 5-17
+   Signal: covid_ag_smoothed_pct_positive_age_5_17
+ - Name: 18-49
+   Signal: covid_ag_smoothed_pct_positive_age_18_49
+ - Name: 50-64
+   Signal: covid_ag_smoothed_pct_positive_age_50_64
+ - Name: 65+
+   Signal: covid_ag_smoothed_pct_positive_age_65plus
+
+
 ---
 Name: COVID Cases
 Id: jhu-csse
@@ -90,6 +116,14 @@ Name: COVID Hospital Admissions
 Id: hhs
 Signal: confirmed_admissions_covid_1d_prop_7dav
 ExtendedColorScale: true
+# override with additional county
+Levels: [nation, state, county]
+Overrides:
+  County:
+    Id: dsew-cpr
+    Signal: confirmed_admissions_covid_1d_prop_7dav
+
+
 
 
 SignalTooltip: Confirmed COVID-19 hospital admissions per 100,000 people
