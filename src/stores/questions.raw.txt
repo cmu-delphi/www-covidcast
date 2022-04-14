@@ -14,6 +14,14 @@ Levels: [county, msa, state]  # levels which the survey should be pickable
 # common properties for all questions
 Id: fb-survey
 Unit: per 100 people
+
+
+EndOfSurveyWarning: |
+  The US COVID-19 Trends and Impact Survey will stop inviting new respondents to complete the survey on June 25, 2022. More details can be found at [here](https://cmu-delphi.github.io/delphi-epidata/symptom-survey/end-of-survey.html).
+EndOfSurveyNotice: |
+  The US COVID-19 Trends and Impact Survey has stopped inviting new respondents to complete the survey on June 25, 2022. More details can be found at [here](https://cmu-delphi.github.io/delphi-epidata/symptom-survey/end-of-survey.html).
+
+
 ---
 Name: COVID-Like Symptoms
 Category: Symptoms
