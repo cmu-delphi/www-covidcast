@@ -136,6 +136,8 @@ function convertSurveyDescriptions(code) {
     return parseObject(doc, {
       overview: parseMarkdown,
       description: parseMarkdownInline,
+      endOfSurveyWarning: parseMarkdownInline,
+      endOfSurveyNotice: parseMarkdownInline,
       question: parseMarkdownInline,
       oldRevisions: parseArray,
       change: parseMarkdownInline,

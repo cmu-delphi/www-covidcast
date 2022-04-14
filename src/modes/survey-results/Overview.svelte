@@ -1,7 +1,14 @@
 <script>
-  import { overviewText, dataAccessLink, surveyFullTextLink } from '../../stores/questions';
+  import { overviewText, dataAccessLink, surveyFullTextLink, ctisWarning } from '../../stores/questions';
   import SurveyStats from '../../blocks/SurveyStats.svelte';
 </script>
+
+<div class="uk-alert-primary" uk-alert>
+  <!-- svelte-ignore a11y-missing-attribute -->
+  <!-- svelte-ignore a11y-missing-content -->
+  <a class="uk-alert-close" uk-close />
+  <p>{@html ctisWarning}</p>
+</div>
 
 <SurveyStats />
 
