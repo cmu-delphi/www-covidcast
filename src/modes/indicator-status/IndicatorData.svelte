@@ -58,7 +58,7 @@
       xTitle: sensor.xAxis,
       title: joinTitle([sensor.name, `in ${region.displayName}`], isMobile),
       subTitle: sensor.unit,
-      highlightRegion: 'issue_mode',
+      highlightLine: 'issue_mode',
       compareField: 'issue_mode',
       isWeeklySignal: sensor.isWeeklySignal,
     };
@@ -134,7 +134,7 @@
       bind:this={vegaRef}
       {spec}
       {data}
-      signals={{ highlight_tuple: resetOnClearHighlighTuple(timeFrame.max), highlightRegion: highlightAsOf }}
+      signals={{ highlight_tuple: resetOnClearHighlighTuple(timeFrame.max), highlightLine: highlightAsOf }}
       signalListeners={['highlight']}
       noDataText={!sensor || !region || sensor.levels.includes(region.level)
         ? 'No data available'

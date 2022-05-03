@@ -122,6 +122,7 @@ function convertDescriptions(code) {
           hhs: parseObject,
           msa: parseObject,
         }),
+      ageStratifications: parseArray,
     });
   });
   fs.writeFileSync('./src/stores/descriptions.generated.json', JSON.stringify(entries, null, 2));
@@ -143,6 +144,8 @@ function convertSurveyDescriptions(code) {
     return parseObject(doc, {
       overview: parseMarkdown,
       description: parseMarkdownInline,
+      endOfSurveyWarning: parseMarkdownInline,
+      endOfSurveyNotice: parseMarkdownInline,
       question: parseMarkdownInline,
       oldRevisions: parseArray,
       change: parseMarkdownInline,

@@ -3,6 +3,8 @@ import { modeByID } from '../modes';
 import { yesterdayDate } from '../data/TimeFrame';
 import { toTimeValue } from '../data/utils';
 import { timeDay } from 'd3-time';
+import { toKey } from '../data/sensor';
+import type { MetaDataManager } from '../data/meta';
 import type { Sensor } from '../data/sensor';
 
 export * from '../data/geoLevel';
@@ -26,9 +28,27 @@ export interface SensorConfig {
   readonly linkFrom?: string[];
 
   overrides?: Sensor['overrides'];
+  ageStratifications?: { name: string; signal: string }[];
 }
 
-export const sensorConfig: SensorConfig[] = descriptions.map((d) => Object.assign(d, { key: `${d.id}-${d.signal}` }));
+export const sensorConfig: SensorConfig[] = descriptions.map((d) =>
+  Object.assign(d, {
+    key: toKey(d.id, d.signal),
+  }),
+);
+
+export function resolveAgeStratifications(
+  sensor: SensorConfig,
+  manager: MetaDataManager,
+): null | { name: string; sensor: Sensor }[] {
+  if (!sensor.ageStratifications) {
+    return null;
+  }
+  return sensor.ageStratifications.map((d) => ({
+    ...d,
+    sensor: manager.getSensor({ id: sensor.id, signal: d.signal })!,
+  }));
+}
 
 export function resolveSensorWithAliases(sensor: string | undefined | null, defaultValue: string): string {
   if (sensor && sensorConfig.find((d) => d.key === sensor)) {

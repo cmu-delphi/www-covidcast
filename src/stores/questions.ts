@@ -2,8 +2,12 @@ import descriptions from './questions.generated.json';
 import { isoParse } from 'd3-time-format';
 import type { RegionLevel } from '../data/regions';
 import type { SensorLike } from '../data/sensor';
+import { toTimeValue } from '../data/utils';
 
+export const SURVEY_EMD = 20220625;
 export const overviewText = descriptions.overview;
+export const ctisWarning =
+  toTimeValue(new Date()) > SURVEY_EMD ? descriptions.endOfSurveyNotice : descriptions.endOfSurveyWarning;
 export const surveyFullTextLink = descriptions.fullSurveyLink;
 export const dataAccessLink = descriptions.dataAccessLink;
 export const referenceRawNationSensorLike: SensorLike = {

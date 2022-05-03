@@ -1,17 +1,26 @@
 <script>
+  /** eslint-disable a11y-label-has-associated-control */
   import toggleOnIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/toggle-on.svg';
 
   export let className = '';
-  export let checked = false;
+  export let checked = undefined;
+  export let group = undefined;
   export let before = '';
   export let noPadding = false;
+  export let name = undefined;
+  export let value = undefined;
 </script>
 
+<!-- svelte-ignore a11y-label-has-associated-control -->
 <label class="toggle {className}" class:checked class:noPadding>
   {#if before}
     <span>{before}</span>
   {/if}
-  <input type="checkbox" bind:checked />
+  {#if group != null}
+    <input type="checkbox" bind:group {value} {name} />
+  {:else}
+    <input type="checkbox" bind:checked {value} {name} />
+  {/if}
   {@html toggleOnIcon}
   <slot />
 </label>
@@ -39,7 +48,7 @@
     transition: color 0.25s ease;
   }
   input:checked + :global(svg) {
-    fill: #1890ff;
+    fill: var(--toggle-color, #1890ff);
     transform: scale(1, 1);
   }
 
