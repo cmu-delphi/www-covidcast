@@ -5,7 +5,7 @@ import { currentDate, currentSensor, selectByInfo } from '.';
 import { scaleLinear, scaleSequential } from 'd3-scale';
 import { scrollToTop } from '../util';
 import type { RegionInfo as Region, RegionLevel, RegionArea, CountyInfo } from '../data/regions';
-import type { Sensor } from './constants';
+import type { Sensor, SensorConfig } from './constants';
 import { get, Writable } from 'svelte/store';
 import { ALL_TIME_FRAME, TimeFrame } from '../data/TimeFrame';
 import { toTimeValue } from '../data/utils';
@@ -110,6 +110,8 @@ export class SensorParam {
   readonly timeFrame: TimeFrame;
   readonly manager: MetaDataManager;
 
+  readonly overrides: SensorConfig['overrides'];
+
   constructor(sensor: Sensor, metaDataManager: MetaDataManager, store = currentSensor) {
     this.writeAbleStore = store;
     this.manager = metaDataManager;
@@ -119,6 +121,7 @@ export class SensorParam {
     this.signalTooltip = sensor.signalTooltip;
     this.value = sensor;
     this.rawValue = sensor.rawSensor;
+    this.overrides = sensor.overrides;
 
     this.dataSourceName = sensor.dataSourceName;
     this.isPercentage = sensor.format == 'percent' || sensor.format === 'fraction';

@@ -2,7 +2,7 @@ import type { EpiDataRow } from './fetchData';
 import type { Sensor } from '../stores/constants';
 import { callTrendAPI, EpiDataTrendRow, FieldSpec } from './api';
 import { GeoPair, SourceSignalPair } from './apimodel';
-import type { Region } from './regions';
+import type { Region, RegionLevel } from './regions';
 import { splitDailyWeekly } from './sensor';
 import type { TimeFrame } from './TimeFrame';
 import { parseAPITime, toTimeValue } from './utils';
@@ -119,32 +119,131 @@ export function asSensorTrend(
   return t;
 }
 
-export function fetchTrend(
-  signal: Sensor | Sensor[],
-  region: Region | Region[],
+export function fetchTrendSR(
+  signal: Sensor,
+  region: Region,
   date: Date,
   window: TimeFrame,
-  fields?: FieldSpec<EpiDataTrendRow>,
 ): Promise<EpiDataTrendRow[]> {
-  const geo = Array.isArray(region) ? GeoPair.fromArray(region) : GeoPair.from(region);
-  if (!Array.isArray(signal)) {
+  const geo = GeoPair.from(region);
+  let source = SourceSignalPair.from(signal);
+  if (signal.overrides && signal.overrides[region.level]) {
+    // need to map but no need to unmap since not transferred
+    source = SourceSignalPair.from(signal.overrides[region.level]!);
+  }
+  return callTrendAPI(
+    signal.isWeeklySignal ? 'week' : 'day',
+    source,
+    geo,
+    date,
+    window,
+    signal.isWeeklySignal ? 1 : 7,
+    { exclude: ['geo_type', 'geo_value', 'signal_signal', 'signal_source'] },
+  );
+}
+
+export function fetchTrendR(
+  signal: Sensor,
+  regions: Region[],
+  date: Date,
+  window: TimeFrame,
+): Promise<EpiDataTrendRow[]> {
+  const calls: Promise<EpiDataTrendRow[]>[] = [];
+  // for each mapped level
+  for (const level of Object.keys(signal.overrides || {})) {
+    const levelRegions = regions.filter((d) => d.level === level);
+    if (levelRegions.length === 0) {
+      continue;
+    }
+    calls.push(
+      callTrendAPI(
+        signal.isWeeklySignal ? 'week' : 'day',
+        SourceSignalPair.from(signal.overrides![level as RegionLevel]!),
+        GeoPair.fromArray(levelRegions),
+        date,
+        window,
+        signal.isWeeklySignal ? 1 : 7,
+        {
+          exclude: ['signal_signal', 'signal_source'],
+        },
+      ),
+    );
+  }
+  // all not mapped ones
+  const rest = regions.filter((d) => !signal.overrides || signal.overrides[d.level] == null);
+  if (rest.length > 0) {
+    calls.push(
+      callTrendAPI(
+        signal.isWeeklySignal ? 'week' : 'day',
+        SourceSignalPair.from(signal),
+        GeoPair.fromArray(rest),
+        date,
+        window,
+        signal.isWeeklySignal ? 1 : 7,
+        {
+          exclude: ['signal_signal', 'signal_source'],
+        },
+      ),
+    );
+  }
+
+  if (calls.length === 1) {
+    return calls[0];
+  }
+  return Promise.all(calls).then((r) => ([] as EpiDataTrendRow[]).concat(...r));
+}
+
+export function fetchTrendS(
+  signal: Sensor[],
+  region: Region,
+  date: Date,
+  window: TimeFrame,
+): Promise<EpiDataTrendRow[]> {
+  const geo = GeoPair.from(region);
+  const fields: FieldSpec<EpiDataTrendRow> = { exclude: ['geo_type', 'geo_value'] };
+
+  function fetchMultiSignals(type: 'day' | 'week', sensors: Sensor[]) {
+    if (sensors.length === 0) {
+      return [];
+    }
+    const lookup = new Map<string, Sensor>();
+    const mapped = sensors.map((s) => {
+      const override = s.overrides?.[region.level];
+      if (override) {
+        lookup.set(`${override.id}@${override.signal}`, s);
+        // map forward
+        return override;
+      }
+      return s;
+    });
     return callTrendAPI(
-      signal.isWeeklySignal ? 'week' : 'day',
-      SourceSignalPair.from(signal),
+      type,
+      SourceSignalPair.fromArray(mapped),
       geo,
       date,
       window,
-      signal.isWeeklySignal ? 1 : 7,
+      type == 'week' ? 1 : 7,
       fields,
-    );
+    ).then((rows) => {
+      if (lookup.size === 0) {
+        return rows;
+      }
+      // map back
+      for (const row of rows) {
+        const key = `${row.signal_source}@${row.signal_signal}`;
+        const base = lookup.get(key);
+        if (base) {
+          row.signal_source = base.id;
+          row.signal_signal = base.signal;
+        }
+      }
+      return rows;
+    });
   }
-  return Promise.all(
-    splitDailyWeekly(signal).map(({ type, sensors }) =>
-      sensors.length === 0
-        ? []
-        : callTrendAPI(type, SourceSignalPair.fromArray(sensors), geo, date, window, type == 'week' ? 1 : 7, fields),
-    ),
-  ).then((r) => ([] as EpiDataTrendRow[]).concat(...r));
+
+  return Promise.all(splitDailyWeekly(signal).map(({ type, sensors }) => fetchMultiSignals(type, sensors))).then((r) =>
+    ([] as EpiDataTrendRow[]).concat(...r),
+  );
 }
 
 export function computeLatest(

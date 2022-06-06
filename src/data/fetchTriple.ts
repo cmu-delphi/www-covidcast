@@ -42,16 +42,8 @@ function toGeoPair(
 function toSourceSignalPair<S extends { id: string; signal: string; valueScaleFactor?: number }>(
   transfer: (keyof EpiDataJSONRow)[],
   mixinValues: Partial<EpiDataRow>,
-  sensor: S | readonly S[],
+  sensor: readonly S[],
 ) {
-  if (!isArray(sensor)) {
-    mixinValues.source = sensor.id;
-    mixinValues.signal = sensor.signal;
-    return {
-      factor: sensor.valueScaleFactor ?? 1,
-      sourceSignalPairs: SourceSignalPair.from(sensor),
-    };
-  }
   const grouped = groupBySource(sensor);
 
   let factor: number | ((row: EpiDataRow) => number);
@@ -97,8 +89,58 @@ function toSourceSignalPair<S extends { id: string; signal: string; valueScaleFa
   };
 }
 
+function resolveBackwardOverrides(
+  rows: EpiDataRow[],
+  overrides: { level: RegionLevel; fromId: string; fromSignal: string; toId: string; toSignal: string }[],
+): EpiDataRow[] {
+  if (overrides.length === 0) {
+    return rows;
+  }
+  function toKey(id: string, signal: string, level: RegionLevel) {
+    return `${id}@${signal}@${level}`;
+  }
+  const over = new Map(overrides.map((o) => [toKey(o.toId, o.toSignal, o.level), o]));
+  for (const row of rows) {
+    const key = toKey(row.source, row.signal, row.geo_type);
+    const signalOverride = over.get(key);
+    if (signalOverride) {
+      row.source = signalOverride.fromId;
+      row.signal = signalOverride.fromSignal;
+    }
+  }
+  return rows;
+}
+
+function mapOverrides(
+  overrides: { level: RegionLevel; fromId: string; fromSignal: string; toId: string; toSignal: string }[],
+  typeSensors: readonly { id: string; signal: string; valueScaleFactor?: number }[],
+) {
+  if (overrides.length === 0) {
+    return typeSensors;
+  }
+  return typeSensors.map((d) => {
+    for (const o of overrides) {
+      if (o.fromId === d.id && o.fromSignal === d.signal) {
+        return {
+          id: o.toId,
+          signal: o.toSignal,
+          valueScaleFactor: d.valueScaleFactor,
+        };
+      }
+    }
+    return d;
+  });
+}
+
 export default function fetchTriple<
-  S extends { id: string; signal: string; format: Sensor['format']; isWeeklySignal: boolean },
+  S extends {
+    id: string;
+    signal: string;
+    format: Sensor['format'];
+    isWeeklySignal: boolean;
+    overrides?: Sensor['overrides'];
+    valueScaleFactor?: number;
+  },
 >(
   sensor: S | readonly S[],
   region: Region | RegionLevel | readonly Region[],
@@ -120,6 +162,31 @@ export default function fetchTriple<
     return asOf;
   }
 
+  function resolveForwardOverrides(geoPairs: GeoPair | GeoPair[], typeSensors: readonly S[]) {
+    const levels = Array.from(
+      new Set<RegionLevel>(Array.isArray(geoPairs) ? geoPairs.map((d) => d.level) : [geoPairs.level]),
+    );
+    const overrides: { level: RegionLevel; fromId: string; fromSignal: string; toId: string; toSignal: string }[] = [];
+    for (const sensor of typeSensors) {
+      if (!sensor.overrides) {
+        continue;
+      }
+      for (const level of levels) {
+        if (sensor.overrides[level] != null) {
+          // override
+          overrides.push({
+            level,
+            fromId: sensor.id,
+            fromSignal: sensor.signal,
+            toId: sensor.overrides[level]!.id,
+            toSignal: sensor.overrides[level]!.signal,
+          });
+        }
+      }
+    }
+    return { overrides, levels };
+  }
+
   function fetchImpl(
     type: 'day' | 'week',
     geoPairs: GeoPair | GeoPair[],
@@ -128,7 +195,6 @@ export default function fetchTriple<
     typedMixinValues: Partial<EpiDataRow>,
   ) {
     typedMixinValues.time_type = type;
-    const { sourceSignalPairs, factor } = toSourceSignalPair(typedTransfer, typedMixinValues, typeSensors);
     if (date instanceof Date) {
       // single level and single date
       typedMixinValues.time_value = type === 'day' ? toTimeValue(date) : toTimeWeekValue(date);
@@ -137,9 +203,52 @@ export default function fetchTriple<
     } else {
       typedTransfer.push('time_value');
     }
-    return callAPI(type, sourceSignalPairs, geoPairs, new TimePair(type, date), typedTransfer, {
-      asOf: fixAsOf(),
-    }).then((rows) => parseData(rows, typedMixinValues, factor));
+    const timePair = new TimePair(type, date);
+
+    const { overrides, levels } = resolveForwardOverrides(geoPairs, typeSensors);
+
+    if (overrides.length === 0 || levels.length === 1) {
+      // simple case: none or direct replacement
+      const mappedSensors = mapOverrides(overrides, typeSensors);
+      const { sourceSignalPairs, factor } = toSourceSignalPair(typedTransfer, typedMixinValues, mappedSensors);
+      return callAPI(type, sourceSignalPairs, geoPairs, timePair, typedTransfer, {
+        asOf: fixAsOf(),
+      }).then((rows) => resolveBackwardOverrides(parseData(rows, typedMixinValues, factor), overrides));
+    }
+
+    // multiple calls one for each mapped level
+    const mappedLevels = Array.from(new Set(overrides.map((d) => d.level)));
+    const calls: Promise<EpiDataRow[]>[] = [];
+    const geo = Array.isArray(geoPairs) ? geoPairs : [geoPairs];
+    for (const mappedLevel of mappedLevels) {
+      // compute subset of what needs to be mapped and can be transferred at once
+      const levelOverrides = overrides.filter((d) => d.level === mappedLevel);
+      const levelGeo = geo.filter((d) => d.level === mappedLevel);
+
+      const mappedSensors = mapOverrides(levelOverrides, typeSensors);
+      const levelTransfer = typedTransfer.slice();
+      const levelMixins = { ...typedMixinValues };
+      const { sourceSignalPairs, factor } = toSourceSignalPair(levelTransfer, levelMixins, mappedSensors);
+      calls.push(
+        callAPI(type, sourceSignalPairs, levelGeo, timePair, levelTransfer, {
+          asOf: fixAsOf(),
+        }).then((rows) => resolveBackwardOverrides(parseData(rows, levelMixins, factor), levelOverrides)),
+      );
+    }
+    const unmappedLevels = levels.filter((d) => !mappedLevels.includes(d));
+    if (unmappedLevels.length > 0) {
+      // compute subset of what needs to be mapped and can be transferred at once
+      const levelGeo = geo.filter((d) => unmappedLevels.includes(d.level));
+      const levelTransfer = typedTransfer.slice();
+      const levelMixins = { ...typedMixinValues };
+      const { sourceSignalPairs, factor } = toSourceSignalPair(levelTransfer, levelMixins, typeSensors);
+      calls.push(
+        callAPI(type, sourceSignalPairs, levelGeo, timePair, levelTransfer, {
+          asOf: fixAsOf(),
+        }).then((rows) => parseData(rows, levelMixins, factor)),
+      );
+    }
+    return Promise.all(calls).then((r) => ([] as EpiDataRow[]).concat(...r));
   }
 
   const [day, week] = splitDailyWeekly(sensor);

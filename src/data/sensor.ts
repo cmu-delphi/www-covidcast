@@ -88,6 +88,8 @@ export interface Sensor {
 
   readonly formatSpecifier: string;
   formatValue(v?: number | null, enforceSign?: boolean): string;
+
+  readonly overrides?: Partial<Record<RegionLevel, { id: string; signal: string }>>;
 }
 
 function determineHighValuesAre(sensor: {
