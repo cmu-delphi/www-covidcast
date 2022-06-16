@@ -39,7 +39,7 @@ noMaps: true
  
 SignalTooltip: Google search volume of COVID-related symptom searches about common cold
  
-Description: Using Google Symptoms Searches, Delphi obtains the average of Google search volumes for searches related to nasal congestion, post nasal drip, rhinorrhea, sinusitis, rhinitis, and common cold in each area. These symptoms have showed positive correlation with reported COVID cases, especially since Omicron was declared a variant of concern by the World Health Organization. Note that the average search volume of these symptoms is not equivalent to the search volume of their union. According to Google, the estimates are not comparable across regions since the values are normalized by population and scaled by region-specific maximum popularity (and for this reason, we omit beehive grids and choropleth maps of this signal on the dashboard).
+Description: Using Google Symptoms Searches, Delphi obtains the average of Google search volumes for searches related to nasal congestion, post nasal drip, rhinorrhea, sinusitis, rhinitis, and common cold in each area. These symptoms have shown positive correlation with reported COVID cases, especially since Omicron was declared a variant of concern by the World Health Organization. Note that the average search volume of these symptoms is not equivalent to the search volume of their union. According to Google, the estimates are not comparable across regions since the values are normalized by population and scaled by region-specific maximum popularity (and for this reason, we omit beehive grids and choropleth maps of this signal on the dashboard).
 ---
 Name: COVID-Like Symptoms
 Id: fb-survey
@@ -50,7 +50,7 @@ Unit: per 100 people
 SignalTooltip: Percentage of people with COVID-like symptoms, based on surveys of Facebook users
 
 
-Description: Every day, Delphi surveys tens of thousands of Facebook users, asking a broad set of COVID-related questions, including whether they, or anyone in their household, are currently experiencing COVID-related symptoms. We also ask questions about well-being and various mitigation measures, including mask wearing. For this signal, we estimate the percentage of people self-reporting COVID-like symptoms, defined here as fever along with either cough, shortness of breath, or difficulty breathing. While many other conditions can cause these symptoms, comparing the rates of COVID-like symptoms across the country can suggest where COVID is most active.
+Description: Every day, Delphi surveys tens of thousands of Facebook users, asking a broad set of COVID-related questions, including whether they, or anyone in their household, are currently experiencing COVID-related symptoms. We also ask questions about well-being and various mitigation measures, including mask wearing. For this signal, we estimate the percentage of people self-reporting COVID-like symptoms, defined here as fever along with either cough, shortness of breath, or difficulty breathing. 
 ---
 Name: COVID-Like Symptoms in Community
 Id: fb-survey
@@ -61,7 +61,7 @@ Unit: per 100 people
 SignalTooltip: Percentage of people who know someone in their local community with COVID-like symptoms, based on surveys of Facebook users
 
 
-Description: Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they, or anyone in their household, are currently experiencing COVID-related symptoms. We also ask them if they know anyone in their local community who has COVID-like or flu-like symptoms, defined here as fever along with either sore throat, cough, shortness of breath, or difficulty breathing.  For this indicator, we estimate the percentage of people who know someone, in their household or outside it, who has these symptoms. While many conditions can cause these symptoms, not just COVID, comparing the rates across the country can suggest where COVID is most active.
+Description: Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they, or anyone in their household, are currently experiencing COVID-related symptoms. We also ask them if they know anyone in their local community who has COVID-like or flu-like symptoms, defined here as fever along with either sore throat, cough, shortness of breath, or difficulty breathing.  For this indicator, we estimate the percentage of people who know someone, in their household or outside it, who has these symptoms. 
 ---
 Name: COVID-Related Doctor Visits
 Id: doctor-visits
@@ -72,7 +72,7 @@ Unit: per 100 visits
 SignalTooltip: Percentage of daily doctor visits that are due to COVID-like symptoms
 
 
-Description: Delphi receives from our health system partners aggregated statistics on COVID-related outpatient doctor visits, derived from ICD codes found in insurance claims. Using this data Delphi estimates the percentage of daily doctor’s visits in each area that are due to COVID-like illness. Note that these estimates are based only on visits by patients whose data is accessible to our partners.
+Description: Delphi receives aggregated statistics from health system partners on COVID-related outpatient doctor visits, derived from ICD codes found in insurance claims. Using this data, we estimate the percentage of daily doctor’s visits in each area that are due to COVID-like illness. Note that these estimates are based only on visits by patients whose data is accessible to our partners.
 ---
 Name: COVID Antigen Test Positivity
 Id: quidel-covid-ag
@@ -83,7 +83,7 @@ Unit: per 100 tests
 SignalTooltip: Positivity rate of COVID-19 antigen tests, based on data provided by Quidel, Inc.
 
 
-Description: When a patient (whether at a doctor’s office, clinic, or hospital) has COVID-like symptoms, doctors may order an antigen test, which can detect parts of the virus that are present during an active infection. Quidel, a national provider of networked lab testing devices, provides us with data from every COVID antigen test that they conduct. We report the percentage of COVID antigen tests that are positive. Note that this signal only includes Quidel’s antigen tests, not those run by other test providers.
+Description: Delphi receives data from COVID-19 antigen tests conducted by Quidel, a national provider of networked lab testing devices (covering doctors' offices, clinics, and hospitals). Antigen tests can detect parts of the virus that are present during an active infection. We report the percentage of COVID antigen tests that are positive. Note that this signal only includes Quidel’s antigen tests, not those run by other test providers.
 
 
 AgeStratifications:
@@ -110,7 +110,7 @@ ExtendedColorScale: true
 SignalTooltip: Newly reported COVID-19 cases per 100,000 people, based on data from Johns Hopkins University
 
 
-Description: This data shows the number of COVID-19 confirmed cases newly reported each day. It  reflects only cases reported by state and local health authorities. It is based on case counts compiled and made public by [a team at Johns Hopkins University](https://systems.jhu.edu/research/public-health/ncov/). The signal may not be directly comparable across regions with vastly different testing capacity or reporting criteria. 
+Description: This data shows the number of COVID-19 confirmed cases newly reported each day. It reflects only cases reported by state and local health authorities. It is based on case counts compiled and made public by [a team at Johns Hopkins University](https://systems.jhu.edu/research/public-health/ncov/). The signal may not be directly comparable across regions with vastly different testing capacity or reporting criteria. 
 ---
 Name: COVID Hospital Admissions
 Id: hhs
@@ -129,7 +129,7 @@ Overrides:
 SignalTooltip: Confirmed COVID-19 hospital admissions per 100,000 people
 
 
-Description: The US Department of Health & Human Services (HHS) publishes several datasets on patient impact and hospital capacity. This data shows the number of confirmed COVID-19 hospital admissions each day, as reported to the HHS. 
+Description: This data shows the number of confirmed COVID-19 hospital admissions each day. At the state level and above, we show data from the Report on Patient Impact and Hospital Capacity published by the US Department of Health & Human Services (HHS). At the county and metro level, we show data from the Community Profile Report published by the Data Strategy Execution Workgroup. 
 ---
 Name: COVID Deaths
 Id: jhu-csse
@@ -139,4 +139,4 @@ Signal: deaths_7dav_incidence_prop
 SignalTooltip: Newly reported COVID-19 deaths per 100,000 people, based on data from Johns Hopkins University
 
 
-Description: This data shows the number of COVID-19 related deaths newly reported each day. It reflects official figures reported by state and local health authorities, and may not include excess deaths not confirmed by health authorities to be due to COVID-19 . The signal is based on death counts compiled and made public by [a team at Johns Hopkins University](https://systems.jhu.edu/research/public-health/ncov/).
+Description: This data shows the number of COVID-19 related deaths newly reported each day. It reflects official figures reported by state and local health authorities, and may not include excess deaths not confirmed by health authorities to be due to COVID-19. The signal is based on death counts compiled and made public by [a team at Johns Hopkins University](https://systems.jhu.edu/research/public-health/ncov/).
