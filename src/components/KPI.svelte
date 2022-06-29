@@ -9,10 +9,13 @@
   export let sub = null;
 
   export let loading = false;
+
+  export let asterisk = false;
 </script>
 
 <span class="text" class:loading>{text || 'N/A'}</span>
 {#if sub}<span class="fraction">{sub}</span>{/if}
+{#if asterisk}<span class="text">*</span>{/if}
 
 <style>
   .text {
