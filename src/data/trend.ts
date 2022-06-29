@@ -1,6 +1,7 @@
 import type { EpiDataRow } from './fetchData';
 import type { Sensor } from '../stores/constants';
-import { callTrendAPI, EpiDataTrendRow, FieldSpec } from './api';
+import { callTrendAPI } from './api';
+import type { EpiDataTrendRow, FieldSpec } from './api';
 import { GeoPair, SourceSignalPair } from './apimodel';
 import type { Region, RegionLevel } from './regions';
 import { splitDailyWeekly } from './sensor';

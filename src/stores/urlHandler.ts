@@ -1,4 +1,5 @@
-import { loadFromUrlState, PersistedState, TrackedState, trackedUrlParams } from '.';
+import { loadFromUrlState, trackedUrlParams } from '.';
+import type { PersistedState, TrackedState } from '.';
 import throttle from 'lodash-es/throttle';
 
 // Constantly keep the URL parameters updated with the current state.
@@ -53,6 +54,6 @@ trackedUrlParams.subscribe(throttle(updateURIParameters, 250));
 
 window.addEventListener('popstate', (e) => {
   if (e.state && (e.state as PersistedState).mode) {
-    loadFromUrlState(e.state);
+    loadFromUrlState(e.state as PersistedState);
   }
 });

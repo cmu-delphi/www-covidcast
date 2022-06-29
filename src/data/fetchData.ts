@@ -1,4 +1,5 @@
-import { callAPI, EpiDataJSONRow } from './api';
+import { callAPI } from './api';
+import type { EpiDataJSONRow } from './api';
 import { timeDay, timeWeek } from 'd3-time';
 import { parseAPIDateAndWeek, toTimeValue } from './utils';
 import { getInfoByName } from './regions';

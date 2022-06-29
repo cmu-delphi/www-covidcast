@@ -7,7 +7,8 @@ import {
   resolveSensorWithAliases,
   sensorConfig,
 } from './constants';
-import modes, { Mode, modeByID, ModeID } from '../modes';
+import modes, { modeByID } from '../modes';
+import type { Mode, ModeID } from '../modes';
 import { parseAPITime } from '../data/utils';
 import { getInfoByName } from '../data/regions';
 export { defaultRegionOnStartup, getLevelInfo, levels, levelList } from './constants';
@@ -15,7 +16,8 @@ import { AnnotationManager, fetchAnnotations } from '../data';
 import type { RegionInfo, RegionLevel } from '../data/regions';
 import { MetaDataManager } from '../data/meta';
 import { callMetaAPI } from '../data/api';
-import { Sensor, sensorTypes } from '../data/sensor';
+import { sensorTypes } from '../data/sensor';
+import type { Sensor } from '../data/sensor';
 import { SURVEY_EMD } from './questions';
 
 export const appReady = writable(false);
