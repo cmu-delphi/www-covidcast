@@ -1,4 +1,5 @@
 <script>
+  import { formatAPITime } from '../data';
   import { formatDateYearDayOfWeekAbbr } from '../formats';
   import { getLevelInfo } from '../stores';
 
@@ -22,6 +23,9 @@
   function checkSensorData(sensor, date, region) {
     return fetcher.fetch1Sensor1Region1DateDetails(sensor, region, date);
   }
+  function switchDate() {
+    date.set(sensor.timeFrame.max);
+  }
 </script>
 
 {#if !sensor.value.levels.includes(region.level)}
@@ -32,7 +36,11 @@
   {#await checkSensorData(sensor, date, region) then hasData}
     {#if !hasData}
       <div data-uk-alert class="uk-alert-warning">
-        The indicator "{sensor.name}" is not available for {formatDateYearDayOfWeekAbbr(date.value)}, yet.
+        The indicator "{sensor.name}" is not available for {formatDateYearDayOfWeekAbbr(date.value)}, yet. The latest
+        known data is available on
+        <a href="?date={formatAPITime(sensor.timeFrame.max)}" on:click={switchDate}
+          >{formatDateYearDayOfWeekAbbr(sensor.timeFrame.max)}</a
+        >.
       </div>
     {/if}
   {/await}
