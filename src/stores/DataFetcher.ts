@@ -108,16 +108,18 @@ export class DataFetcher {
    */
   fetch1SensorNRegions1DateWithFallback(
     sensor: SensorParam,
-    regions: RegionLevel,
+    regions: RegionLevel | Region[],
     date: Date | DateParam,
   ): Promise<RegionEpiDataRow[]> {
     const data = this.fetch1SensorNRegions1Date(sensor, regions, date);
+
+    const level = Array.isArray(regions) ? regions[0].level : regions;
 
     return data.then((rows) => {
       if (rows.length > 0) {
         return rows;
       }
-      return this.fetch1SensorNRegions1Date(sensor, regions, sensor.getLevelTimeFrame(regions).max);
+      return this.fetch1SensorNRegions1Date(sensor, regions, sensor.getLevelTimeFrame(level).max);
     });
   }
 

@@ -25,6 +25,8 @@
    */
   export let suffix = '';
 
+  export let prefix = '*';
+
   $: showWarning = trend.then((d) => {
     if (
       (d != null && (d.value == null || (d.date != null && d.date < date))) ||
@@ -41,9 +43,8 @@
 {#await showWarning then d}
   {#if d != null}
     <p>
-      * the indicator "{sensor.name}" is not available for {formatDateYearDayOfWeekAbbr(date)} on the geographic level "{getLevelInfo(
-        level,
-      ).label}", yet. The data from {formatDateYearDayOfWeekAbbr(d.date ?? d.date_value)} is shown instead.
+      {prefix} the indicator "{sensor.name}" is not available for {formatDateYearDayOfWeekAbbr(date)} on the geographic level
+      "{getLevelInfo(level).label}", yet. The data from {formatDateYearDayOfWeekAbbr(d.date ?? d.date_value)} is shown instead.
     </p>
   {/if}
 {/await}
