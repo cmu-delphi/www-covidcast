@@ -2,12 +2,13 @@
   import KPIValue from '../../components/KPIValue.svelte';
   import KPIChange from '../../components/KPIChange.svelte';
   import { DateParam, SensorParam } from '../../stores/params';
-  import { formatDateDayOfWeek, formatDateYearDayOfWeekAbbr } from '../../formats';
+  import { formatDateDayOfWeek } from '../../formats';
   import SensorUnit from '../../components/SensorUnit.svelte';
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
   import MaxDateHint from '../../blocks/MaxDateHint.svelte';
   import IndicatorWarning from '../../blocks/IndicatorWarning.svelte';
   import { defaultDeathSensor, defaultCasesSensor, defaultHospitalSensor, metaDataManager } from '../../stores';
+  import IndicatorFallbackWarning from '../../blocks/IndicatorFallbackWarning.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -130,11 +131,4 @@
   </div>
 </div>
 
-{#await hospitalTrend then d}
-  {#if d != null && (d.value == null || d.date < date.value)}
-    <p>
-      * the indicator "{HOSPITAL_ADMISSION.name}" is not available for {formatDateYearDayOfWeekAbbr(date.value)}, yet.
-      The data from {formatDateYearDayOfWeekAbbr(d.date)} is shown instead.
-    </p>
-  {/if}
-{/await}
+<IndicatorFallbackWarning trend={hospitalTrend} date={date.value} level={region.level} sensor={HOSPITAL_ADMISSION} />
