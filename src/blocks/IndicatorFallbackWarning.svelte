@@ -43,8 +43,9 @@
 {#await showWarning then d}
   {#if d != null}
     <p>
-      {prefix} the indicator "{sensor.name}" is not available for {formatDateYearDayOfWeekAbbr(date)} on the geographic level
-      "{getLevelInfo(level).label}", yet. The data from {formatDateYearDayOfWeekAbbr(d.date ?? d.date_value)} is shown instead.
+      {prefix} The indicator "{sensor.name}" is not available for {formatDateYearDayOfWeekAbbr(date)} at the geographic level
+      "{getLevelInfo(level).label}", yet. The data from {formatDateYearDayOfWeekAbbr(d.date ?? d.date_value)} is displayed
+      instead.
     </p>
   {/if}
 {/await}
