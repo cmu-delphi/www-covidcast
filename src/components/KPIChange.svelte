@@ -7,6 +7,7 @@
    */
   export let value = null;
   export let loading = false;
+  export let asterisk = false;
 
   $: scaled = value != null && !Number.isNaN(value) ? value * 100 : null;
 
@@ -17,5 +18,5 @@
 {#if scaled == null}
   <KPI text={base.toString()} {loading} />
 {:else}
-  <KPI text={sign(base, (v) => v.toLocaleString(), true)} sub={`.${fraction}%`} {loading} />
+  <KPI text={sign(base, (v) => v.toLocaleString(), true)} sub={`.${fraction}%`} {loading} {asterisk} />
 {/if}

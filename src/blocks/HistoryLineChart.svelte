@@ -383,7 +383,6 @@
     filterLine = signals.filter((_, i) => filterLineManaged[i]);
   }
   $: {
-    console.log(filterLineManaged);
     updateFilteredLine(sensor, ageStratifictions, filterLineManaged);
   }
 

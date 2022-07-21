@@ -108,6 +108,7 @@ export class SensorParam {
   readonly yAxis: string;
 
   readonly timeFrame: TimeFrame;
+  readonly levelTimeFrames: Partial<Record<RegionLevel, TimeFrame>>;
   readonly manager: MetaDataManager;
 
   readonly overrides: SensorConfig['overrides'];
@@ -142,6 +143,14 @@ export class SensorParam {
     this.yAxis = sensor.yAxis;
 
     this.timeFrame = metaDataManager.getTimeFrame(sensor);
+    this.levelTimeFrames = {};
+    for (const key of Object.keys(this.overrides ?? {}) as RegionLevel[]) {
+      this.levelTimeFrames[key] = metaDataManager.getTimeFrame(this.overrides![key]!);
+    }
+  }
+
+  getLevelTimeFrame(level: RegionLevel): TimeFrame {
+    return this.levelTimeFrames[level] ?? this.timeFrame;
   }
 
   set(sensor: Sensor, scrollTop = false): void {
