@@ -1,6 +1,7 @@
 import { parseAPITime } from '../../data';
 import { getInfoByName } from '../../data/regions';
-import { DateParam, RegionLevel, RegionParam, Sensor, SensorParam, TimeFrame } from '../../stores/params';
+import { DateParam, RegionParam, SensorParam, TimeFrame } from '../../stores/params';
+import type { RegionLevel, Sensor } from '../../stores/params';
 
 export function resolveSensor(defaultSensor: SensorParam, key?: string): SensorParam {
   if (!key) {

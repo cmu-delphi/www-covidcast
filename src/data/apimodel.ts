@@ -1,5 +1,6 @@
 import type { Region } from '../stores/params';
-import { hhsInfo, hrrInfo, RegionLevel, stateInfo } from './regions';
+import { hhsInfo, hrrInfo, stateInfo } from './regions';
+import type { RegionLevel } from './regions';
 import type { TimeFrame } from './TimeFrame';
 import { formatAPITime, formatAPIWeekTime, parseAPITime } from './utils';
 

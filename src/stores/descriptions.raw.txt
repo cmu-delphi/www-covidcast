@@ -83,7 +83,7 @@ Unit: per 100 tests
 SignalTooltip: Positivity rate of COVID-19 antigen tests, based on data provided by Quidel, Inc.
 
 
-Description: Delphi receives data from COVID-19 antigen tests conducted by Quidel, a national provider of networked lab testing devices (covering doctors' offices, clinics, and hospitals). Antigen tests can detect parts of the virus that are present during an active infection. We report the percentage of COVID antigen tests that are positive. Note that this signal only includes Quidel’s antigen tests, not those run by other test providers.
+Description: Delphi receives data from COVID-19 antigen tests conducted by Quidel, a national provider of networked lab testing devices (covering doctors' offices, clinics, and hospitals). Antigen tests can detect parts of the virus that are present during an active infection.We report the percentage of COVID antigen tests that are positive. Note that this signal only includes Quidel’s antigen tests, not those run by other test providers.
 
 
 AgeStratifications:

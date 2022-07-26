@@ -390,9 +390,12 @@
           </form>
           <p>Manually fetch data:</p>
           <div class="code-block-wrapper">
-            <pre
-              class="code-block"><code>
-            {`wget --content-disposition "${CSV_SERVER_ENDPOINT}?signal=${sensor ? `${sensor.id}:${sensor.signal}` : ''}&start_day=${formatDate(startDate)}&end_day=${formatDate(endDate)}&geo_type=${geoType}${isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`}${usesAsOf ? `&as_of=${formatDate(asOfDate)}` : ''}"`}
+            <pre class="code-block"><code>
+            {`wget --content-disposition "${CSV_SERVER_ENDPOINT}?signal=${
+                  sensor ? `${sensor.id}:${sensor.signal}` : ''
+                }&start_day=${formatDate(startDate)}&end_day=${formatDate(endDate)}&geo_type=${geoType}${
+                  isAllRegions ? '' : `&geo_values=${geoIDs.join(',')}`
+                }${usesAsOf ? `&as_of=${formatDate(asOfDate)}` : ''}"`}
             </code></pre>
           </div>
           <p class="description">
@@ -407,14 +410,15 @@
           <p>Install <code>covidcast</code> via pip:</p>
           <pre class="code-block"><code>pip install covidcast</code></pre>
           <p>Fetch data:</p>
-          <pre
-            class="code-block"><code>
+          <pre class="code-block"><code>
         {`${isWeekly ? 'from epiweeks import Week' : 'from datetime import date'}
 import covidcast
 
 data = covidcast.signal("${sensor ? sensor.id : ''}", "${sensor ? sensor.signal : ''}",
                         ${formatPythonDate(startDate)}, ${formatPythonDate(endDate)},
-                        "${geoType}"${isAllRegions ? '' : `, ["${geoIDs.join('", "')}"]`}${usesAsOf ? `, as_of = ${formatPythonDate(asOfDate)}` : ''})`}
+                        "${geoType}"${isAllRegions ? '' : `, ["${geoIDs.join('", "')}"]`}${
+                usesAsOf ? `, as_of = ${formatPythonDate(asOfDate)}` : ''
+              })`}
       </code></pre>
           <p class="description">
             For more details and examples, see the
@@ -430,14 +434,15 @@ data = covidcast.signal("${sensor ? sensor.id : ''}", "${sensor ? sensor.signal 
           <p>Install <code>covidcast</code> via CRAN:</p>
           <pre class="code-block"><code>install.packages('covidcast')</code></pre>
           <p>Fetch data:</p>
-          <pre
-            class="code-block"><code>
+          <pre class="code-block"><code>
         {`library(covidcast)
 
 cc_data <- covidcast_signal(
   data_source = "${sensor ? sensor.id : ''}", signal = "${sensor ? sensor.signal : ''}",
   start_day = "${formatDate(startDate)}", end_day = "${formatDate(endDate)}",
-  geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`}${usesAsOf ? `, as_of = "${formatDate(asOfDate)}"` : ''}
+  geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`}${
+                usesAsOf ? `, as_of = "${formatDate(asOfDate)}"` : ''
+              }
 )`}
       </code></pre>
           <p class="description">

@@ -1,14 +1,19 @@
 import { timeDay } from 'd3-time';
-import { callBackfillAPI, callCoverageAPI, CoverageRow, EpiDataBackfillRow, ParsedCoverageRow } from '../../data/api';
+import { callBackfillAPI, callCoverageAPI } from '../../data/api';
+import type { CoverageRow, EpiDataBackfillRow, ParsedCoverageRow } from '../../data/api';
 import { GeoPair, SourceSignalPair, TimePair } from '../../data/apimodel';
 import type { MetaDataManager, SensorSource } from '../../data/meta';
-import { countyInfo, RegionLevel, stateCoreInfo } from '../../data/regions';
+import { countyInfo, stateCoreInfo } from '../../data/regions';
+import type { RegionLevel } from '../../data/regions';
 import { parseAPIDateAndWeek, parseAPITime, toTimeValue } from '../../data/utils';
-import { Sensor, TimeFrame } from '../../stores/params';
-import { addNameInfos, EpiDataRow } from '../../data';
+import { TimeFrame } from '../../stores/params';
+import type { Sensor } from '../../stores/params';
+import { addNameInfos } from '../../data';
+import type { EpiDataRow } from '../../data';
 import fetchTriple from '../../data/fetchTriple';
 import type { RegionInfo } from '../../data/regions';
-import { EpiDataMetaParsedInfo, SensorLike, splitDailyWeekly } from '../../data/sensor';
+import { splitDailyWeekly } from '../../data/sensor';
+import type { EpiDataMetaParsedInfo, SensorLike } from '../../data/sensor';
 import { EpiWeek, weekRange } from '../../data/EpiWeek';
 
 export interface SourceData extends SensorSource {

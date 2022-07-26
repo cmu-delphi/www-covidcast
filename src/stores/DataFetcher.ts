@@ -1,15 +1,19 @@
 import { timeDay } from 'd3-time';
-import { addMissing, addNameInfos, EpiDataRow, parseAPITime } from '../data';
+import { addMissing, addNameInfos, parseAPITime } from '../data';
+import type { EpiDataRow } from '../data';
 import { callTrendSeriesAPI } from '../data/api';
 import { fixLevel, GeoPair, SourceSignalPair } from '../data/apimodel';
 import type { EpiWeek } from '../data/EpiWeek';
 import fetchTriple from '../data/fetchTriple';
 import type { MetaDataManager } from '../data/meta';
-import { getInfoByName, nationInfo, RegionInfo, RegionLevel } from '../data/regions';
+import { getInfoByName, nationInfo } from '../data/regions';
+import type { RegionInfo, RegionLevel } from '../data/regions';
 import type { Sensor } from '../data/sensor';
 import { TimeFrame } from '../data/TimeFrame';
-import { asSensorTrend, fetchTrendR, fetchTrendS, fetchTrendSR, SensorTrend } from '../data/trend';
-import { DateParam, groupByRegion, Region, RegionParam, SensorParam } from './params';
+import { asSensorTrend, fetchTrendR, fetchTrendS, fetchTrendSR } from '../data/trend';
+import type { SensorTrend } from '../data/trend';
+import { DateParam, groupByRegion, RegionParam, SensorParam } from './params';
+import type { Region } from './params';
 
 export interface RegionEpiDataRow extends EpiDataRow, Region {}
 

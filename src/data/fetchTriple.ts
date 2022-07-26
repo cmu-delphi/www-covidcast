@@ -1,6 +1,8 @@
-import { EpiDataRow, parseData } from '.';
+import { parseData } from '.';
+import type { EpiDataRow } from '.';
 import type { Sensor } from '../stores/constants';
-import { callAPI, EpiDataJSONRow } from './api';
+import { callAPI } from './api';
+import type { EpiDataJSONRow } from './api';
 import { GeoPair, isArray, SourceSignalPair, TimePair, groupByLevel, groupBySource } from './apimodel';
 import { EpiWeek } from './EpiWeek';
 import type { RegionInfo as Region, RegionLevel } from './regions';
