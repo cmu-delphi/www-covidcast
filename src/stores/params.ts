@@ -1,12 +1,14 @@
 import { timeDay, timeMonth, timeWeek } from 'd3-time';
-import { formatAPITime, addMissing, fitRange, parseAPITime, EpiDataRow } from '../data';
+import { formatAPITime, addMissing, fitRange, parseAPITime } from '../data';
+import type { EpiDataRow } from '../data';
 import { nationInfo } from '../data/regions';
 import { currentDate, currentSensor, selectByInfo } from '.';
 import { scaleLinear, scaleSequential } from 'd3-scale';
 import { scrollToTop } from '../util';
 import type { RegionInfo as Region, RegionLevel, RegionArea, CountyInfo } from '../data/regions';
-import type { Sensor } from './constants';
-import { get, Writable } from 'svelte/store';
+import type { Sensor, SensorConfig } from './constants';
+import { get } from 'svelte/store';
+import type { Writable } from 'svelte/store';
 import { ALL_TIME_FRAME, TimeFrame } from '../data/TimeFrame';
 import { toTimeValue } from '../data/utils';
 import type { MetaDataManager } from '../data/meta';
@@ -108,7 +110,10 @@ export class SensorParam {
   readonly yAxis: string;
 
   readonly timeFrame: TimeFrame;
+  readonly levelTimeFrames: Partial<Record<RegionLevel, TimeFrame>>;
   readonly manager: MetaDataManager;
+
+  readonly overrides: SensorConfig['overrides'];
 
   constructor(sensor: Sensor, metaDataManager: MetaDataManager, store = currentSensor) {
     this.writeAbleStore = store;
@@ -119,6 +124,7 @@ export class SensorParam {
     this.signalTooltip = sensor.signalTooltip;
     this.value = sensor;
     this.rawValue = sensor.rawSensor;
+    this.overrides = sensor.overrides;
 
     this.dataSourceName = sensor.dataSourceName;
     this.isPercentage = sensor.format == 'percent' || sensor.format === 'fraction';
@@ -139,6 +145,14 @@ export class SensorParam {
     this.yAxis = sensor.yAxis;
 
     this.timeFrame = metaDataManager.getTimeFrame(sensor);
+    this.levelTimeFrames = {};
+    for (const key of Object.keys(this.overrides ?? {}) as RegionLevel[]) {
+      this.levelTimeFrames[key] = metaDataManager.getTimeFrame(this.overrides![key]!);
+    }
+  }
+
+  getLevelTimeFrame(level: RegionLevel): TimeFrame {
+    return this.levelTimeFrames[level] ?? this.timeFrame;
   }
 
   set(sensor: Sensor, scrollTop = false): void {

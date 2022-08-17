@@ -27,6 +27,7 @@ export interface SensorConfig {
   readonly highlight?: string[];
   readonly linkFrom?: string[];
 
+  overrides?: Sensor['overrides'];
   ageStratifications?: { name: string; signal: string }[];
 }
 

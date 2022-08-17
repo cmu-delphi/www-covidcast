@@ -1,15 +1,19 @@
 import { timeDay } from 'd3-time';
-import { addMissing, addNameInfos, EpiDataRow, parseAPITime } from '../data';
+import { addMissing, addNameInfos, parseAPITime } from '../data';
+import type { EpiDataRow } from '../data';
 import { callTrendSeriesAPI } from '../data/api';
 import { fixLevel, GeoPair, SourceSignalPair } from '../data/apimodel';
 import type { EpiWeek } from '../data/EpiWeek';
 import fetchTriple from '../data/fetchTriple';
 import type { MetaDataManager } from '../data/meta';
-import { getInfoByName, nationInfo, RegionInfo, RegionLevel } from '../data/regions';
+import { getInfoByName, nationInfo } from '../data/regions';
+import type { RegionInfo, RegionLevel } from '../data/regions';
 import type { Sensor } from '../data/sensor';
 import { TimeFrame } from '../data/TimeFrame';
-import { asSensorTrend, fetchTrend, SensorTrend } from '../data/trend';
-import { DateParam, groupByRegion, Region, RegionParam, SensorParam } from './params';
+import { asSensorTrend, fetchTrendR, fetchTrendS, fetchTrendSR } from '../data/trend';
+import type { SensorTrend } from '../data/trend';
+import { DateParam, groupByRegion, RegionParam, SensorParam } from './params';
+import type { Region } from './params';
 
 export interface RegionEpiDataRow extends EpiDataRow, Region {}
 
@@ -25,7 +29,7 @@ export class DataFetcher {
 
   constructor(public readonly asOf: Date | EpiWeek | null = null) {}
 
-  toDateKey(sensor: Sensor, region: { id: string; level: string }, date: DateParam, suffix = ''): string {
+  toDateKey(sensor: { key: string }, region: { id: string; level: string }, date: DateParam, suffix = ''): string {
     const s = this.primarySensorKey === sensor.key ? 'SENSOR' : sensor.key;
     const r =
       this.primaryRegionId === region.id && region.level !== 'nation' ? 'REGION' : `${region.level}-${region.id}`;
@@ -33,7 +37,12 @@ export class DataFetcher {
     return `${s}@${r}@${d}${suffix ? '@' : ''}${suffix}`;
   }
 
-  toWindowKey(sensor: Sensor, region: { id: string; level: string }, timeFrame: TimeFrame, suffix = ''): string {
+  toWindowKey(
+    sensor: { key: string },
+    region: { id: string; level: string },
+    timeFrame: TimeFrame,
+    suffix = '',
+  ): string {
     const s = this.primarySensorKey === sensor.key ? 'SENSOR' : sensor.key;
     const r =
       this.primaryRegionId === region.id && region.level !== 'nation' ? 'REGION' : `${region.level}-${region.id}`;
@@ -92,6 +101,30 @@ export class DataFetcher {
     const r = fetchTriple(lSensor, regions, lDate.value, { asOf: this.asOf }).then(addNameInfos);
     this.cache.set(key, r);
     return r;
+  }
+
+  /**
+   * @param {Sensor|SensorParam} sensor
+   * @param {string} level
+   * @param {string} geo
+   * @param {Date | DateParam} date
+   * @returns {Promise<EpiDataRow[]>}
+   */
+  fetch1SensorNRegions1DateWithFallback(
+    sensor: SensorParam,
+    regions: RegionLevel | Region[],
+    date: Date | DateParam,
+  ): Promise<RegionEpiDataRow[]> {
+    const data = this.fetch1SensorNRegions1Date(sensor, regions, date);
+
+    const level = Array.isArray(regions) ? regions[0].level : regions;
+
+    return data.then((rows) => {
+      if (rows.length > 0) {
+        return rows;
+      }
+      return this.fetch1SensorNRegions1Date(sensor, regions, sensor.getLevelTimeFrame(level).max);
+    });
   }
 
   fetch1Sensor1RegionNDates(
@@ -218,9 +251,7 @@ export class DataFetcher {
     if (this.cache.has(key)) {
       return this.cache.get(key) as Promise<SensorTrend>;
     }
-    const trend = fetchTrend(lSensor, lRegion, lDate.value, lDate.windowTimeFrame, {
-      exclude: ['geo_type', 'geo_value', 'signal_signal', 'signal_source'],
-    }).then((rows) => {
+    const trend = fetchTrendSR(lSensor, lRegion, lDate.value, lDate.windowTimeFrame).then((rows) => {
       return asSensorTrend(lDate.value, lSensor.highValuesAre, rows?.[0], {
         factor: lSensor.valueScaleFactor,
       });
@@ -241,9 +272,7 @@ export class DataFetcher {
       (sensor) => !this.cache.has(this.toDateKey(sensor, lRegion, lDate, `trend`)),
     );
     if (missingSensors.length > 0) {
-      const trends = fetchTrend(missingSensors, lRegion, lDate.value, lDate.windowTimeFrame, {
-        exclude: ['geo_type', 'geo_value'],
-      });
+      const trends = fetchTrendS(missingSensors, lRegion, lDate.value, lDate.windowTimeFrame);
       for (const sensor of missingSensors) {
         const trendData = trends.then((rows) => {
           const row = rows.find((d) => d.signal_source === sensor.id && d.signal_signal === sensor.signal);
@@ -270,9 +299,7 @@ export class DataFetcher {
       (region) => !this.cache.has(this.toDateKey(lSensor, region, lDate, `trend`)),
     );
     if (missingRegions.length > 0) {
-      const trends = fetchTrend(lSensor, missingRegions, lDate.value, lDate.windowTimeFrame, {
-        exclude: ['signal_signal', 'signal_source'],
-      });
+      const trends = fetchTrendR(lSensor, missingRegions, lDate.value, lDate.windowTimeFrame);
       for (const region of missingRegions) {
         const trendData = trends.then((rows) => {
           const row = rows.find(

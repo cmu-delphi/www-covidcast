@@ -1,6 +1,7 @@
 import { formatter, formatSpecifiers } from '../formats';
 import { getDataSource } from './dataSourceLookup';
-import { defaultCountyRegion, defaultStateRegion, nationInfo, Region, RegionLevel } from './regions';
+import { defaultCountyRegion, defaultStateRegion, nationInfo } from './regions';
+import type { Region, RegionLevel } from './regions';
 import type { EpiDataMetaInfo, SignalCategory, SignalFormat, SignalHighValuesAre } from './api';
 import { isArray } from './apimodel';
 import type { EpiWeek } from './EpiWeek';
@@ -88,6 +89,8 @@ export interface Sensor {
 
   readonly formatSpecifier: string;
   formatValue(v?: number | null, enforceSign?: boolean): string;
+
+  readonly overrides?: Partial<Record<RegionLevel, { id: string; signal: string }>>;
 }
 
 function determineHighValuesAre(sensor: {

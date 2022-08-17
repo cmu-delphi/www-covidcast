@@ -114,6 +114,14 @@ function convertDescriptions(code) {
       casesOrDeathSignals: parseNestedOrString,
       mapTitleText: parseNestedOrString,
       unitShort: (v) => v || '',
+      overrides: (v) =>
+        parseObject(v, {
+          county: parseObject,
+          state: parseObject,
+          nation: parseObject,
+          hhs: parseObject,
+          msa: parseObject,
+        }),
       ageStratifications: parseArray,
     });
   });
@@ -136,6 +144,8 @@ function convertSurveyDescriptions(code) {
     return parseObject(doc, {
       overview: parseMarkdown,
       description: parseMarkdownInline,
+      endOfSurveyWarning: parseMarkdownInline,
+      endOfSurveyNotice: parseMarkdownInline,
       question: parseMarkdownInline,
       oldRevisions: parseArray,
       change: parseMarkdownInline,

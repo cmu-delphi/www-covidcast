@@ -1,15 +1,8 @@
 import { formatDateISO } from '../../formats';
-import {
-  CountyInfo,
-  getHHSRegionOfState,
-  getInfoByName,
-  getStateOfCounty,
-  getStatesOfHHS,
-  HHSInfo,
-  nationInfo,
-  StateInfo,
-} from '../../data/regions';
-import { DateParam, Region, RegionLevel, RegionParam, Sensor, SensorParam, TimeFrame } from '../../stores/params';
+import { getHHSRegionOfState, getInfoByName, getStateOfCounty, getStatesOfHHS, nationInfo } from '../../data/regions';
+import type { CountyInfo, HHSInfo, StateInfo } from '../../data/regions';
+import { DateParam, RegionParam, SensorParam, TimeFrame } from '../../stores/params';
+import type { Region, RegionLevel, Sensor } from '../../stores/params';
 import { EpiWeek } from '../../data/EpiWeek';
 import { metaDataManager } from '../../stores';
 import { get } from 'svelte/store';

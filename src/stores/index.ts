@@ -7,7 +7,8 @@ import {
   resolveSensorWithAliases,
   sensorConfig,
 } from './constants';
-import modes, { Mode, modeByID, ModeID } from '../modes';
+import modes, { modeByID } from '../modes';
+import type { Mode, ModeID } from '../modes';
 import { parseAPITime } from '../data/utils';
 import { getInfoByName } from '../data/regions';
 export { defaultRegionOnStartup, getLevelInfo, levels, levelList } from './constants';
@@ -15,7 +16,9 @@ import { AnnotationManager, fetchAnnotations } from '../data';
 import type { RegionInfo, RegionLevel } from '../data/regions';
 import { MetaDataManager } from '../data/meta';
 import { callMetaAPI } from '../data/api';
-import { Sensor, sensorTypes } from '../data/sensor';
+import { sensorTypes } from '../data/sensor';
+import type { Sensor } from '../data/sensor';
+import { SURVEY_EMD } from './questions';
 
 export const appReady = writable(false);
 
@@ -24,7 +27,6 @@ function deriveFromPath(url: Location) {
   const urlParams = new URLSearchParams(queryString);
 
   const sensor = urlParams.get('sensor');
-  const date = urlParams.get('date') ?? '';
 
   const modeFromPath = () => {
     const pathName = url.pathname;
@@ -32,6 +34,7 @@ function deriveFromPath(url: Location) {
     return pathName.split('/').filter(Boolean).reverse()[0];
   };
   const mode = urlParams.get('mode') || modeFromPath();
+  const date = urlParams.get('date') ?? '';
 
   const modeObj = modes.find((d) => d.id === mode) || DEFAULT_MODE;
   const isGenericPage = modeObj.isGeneric === true;
@@ -47,7 +50,12 @@ function deriveFromPath(url: Location) {
   return {
     mode: modeObj,
     sensor: resolveSensor,
-    date: /\d{8}/.test(date) ? date : DEFAULT_DATE,
+    date: /\d{8}/.test(date)
+      ? date
+      : modeObj === modeByID['survey-results']
+      ? // min between default and survey end
+        String(Math.min(SURVEY_EMD, Number.parseInt(DEFAULT_DATE)))
+      : DEFAULT_DATE,
     region: urlParams.get('region') || '',
   };
 }
@@ -286,6 +294,6 @@ currentMode.subscribe((mode) => {
     // change sensor and date to the latest one within the survey
     currentSensor.set(DEFAULT_SURVEY_SENSOR);
     const timeFrame = get(metaDataManager).getTimeFrame(DEFAULT_SURVEY_SENSOR);
-    currentDate.set(String(timeFrame.max_time));
+    currentDate.set(String(Math.min(SURVEY_EMD, timeFrame.max_time)));
   }
 });

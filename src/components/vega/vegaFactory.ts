@@ -1,6 +1,7 @@
 import { timeFormat } from 'd3-time-format';
 import { format } from 'd3-format';
-import embed, { EmbedOptions, Result, VisualizationSpec } from 'vega-embed';
+import embed from 'vega-embed';
+import type { EmbedOptions, Result, VisualizationSpec } from 'vega-embed';
 import { Error, expressionFunction, projection, scheme } from 'vega';
 import { geoAlbersUsaTerritories } from 'geo-albers-usa-territories';
 import type { ExtendedFeature, GeoProjection } from 'd3-geo';
