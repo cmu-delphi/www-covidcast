@@ -7,6 +7,7 @@
   import DownloadMenu from '../components/DownloadMenu.svelte';
   import RegionMapTooltip from './RegionMapTooltip.svelte';
   import FullWidthWrapper from '../components/FullWidthWrapper.svelte';
+  import IndicatorFallbackWarning from './IndicatorFallbackWarning.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -25,10 +26,15 @@
    */
   export let fetcher;
 
+  /**
+   * two way binding
+   */
+  export let suffix = '';
+
   $: spec = generateStateMapWithCountyDataSpec({
     ...sensor.vegaSchemeDomain('county'),
   });
-  $: data = fetcher.fetch1SensorNRegions1Date(sensor, 'county', date);
+  $: data = fetcher.fetch1SensorNRegions1DateWithFallback(sensor, 'county', date);
 
   function onClickHandler(evt) {
     const item = evt.detail.item;
@@ -61,3 +67,11 @@
     />
   </div>
 </FullWidthWrapper>
+
+<IndicatorFallbackWarning
+  sensor={sensor.value}
+  level="county"
+  date={date.value}
+  trend={data.then((rows) => rows[0])}
+  bind:suffix
+/>

@@ -1,6 +1,7 @@
 import { parseAPITime } from './utils';
 import { timeDay } from 'd3-time';
-import { callAnomaliesAPI, EpiDataAnomaliesRow } from './api';
+import { callAnomaliesAPI } from './api';
+import type { EpiDataAnomaliesRow } from './api';
 import type { RegionInfo, RegionLevel } from './regions';
 
 function parseSignals(signals: string) {
@@ -63,7 +64,7 @@ function parseRegions(regions: string): { level: RegionLevel; ids: '*' | Set<str
       }
       return null;
     })
-    .filter((d): d is { level: RegionLevel; ids: '*' | Set<string> } => d != null);
+    .filter((d): d is { level: RegionLevel; ids: Set<string> } => d != null);
 }
 
 export class Annotation {

@@ -77,7 +77,6 @@ export function scrollIntoView(id: string, tries = 8, timeout = 500): void {
     const elem = document.querySelector(`#${id}`);
     if (elem && elem.getBoundingClientRect().y > 0) {
       elem.scrollIntoView();
-      console.log('scroll');
     } else if (remainingTries > 0) {
       setTimeout(scrollImpl, timeout, remainingTries - 1);
     }

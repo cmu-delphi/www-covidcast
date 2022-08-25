@@ -22,6 +22,8 @@
    */
   export let fetcher;
 
+  let suffix = '';
+
   $: hasCounties = sensor.value.levels.includes('county');
   let showChoropleth = false;
 </script>
@@ -34,11 +36,16 @@
     Click on a state to explore further
   </p>
   <div class="toggle-center-wrapper">
-    <Toggle bind:checked={showChoropleth} before="Beehive Grid"><span>Choropleth Map</span></Toggle>
+    <Toggle bind:checked={showChoropleth} before="Beehive Grid"
+      ><span>
+        Choropleth Map
+        {#if showChoropleth && hasCounties}{suffix}{/if}</span
+      ></Toggle
+    >
   </div>
   {#if showChoropleth}
     {#if hasCounties}
-      <RegionCountyMap {region} {date} {sensor} {fetcher} />
+      <RegionCountyMap {region} {date} {sensor} {fetcher} bind:suffix />
     {:else}
       <RegionMap {region} {date} {sensor} {fetcher} />
     {/if}
@@ -64,7 +71,7 @@
   }
 
   .toggle-center-wrapper :global(span) {
-    width: 8em;
+    width: 9em;
   }
 
   .ux-hint {

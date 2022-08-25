@@ -11,6 +11,8 @@
 
   export let loading = false;
 
+  export let asterisk = false;
+
   $: scaled = value != null && !Number.isNaN(value) ? value * factor : null;
   $: digitsPow = Math.pow(10, digits);
   $: roundedValue = Math.round(Math.abs(scaled) * digitsPow);
@@ -20,4 +22,4 @@
   $: fraction = !loading && hasFraction ? roundedValue % digitsPow : 0;
 </script>
 
-<KPI text={base.toLocaleString()} sub={hasFraction ? `.${fraction}` : null} {loading} />
+<KPI text={base.toLocaleString()} sub={hasFraction ? `.${fraction}` : null} {loading} {asterisk} />
