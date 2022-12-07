@@ -1,24 +1,4 @@
 ---
-Name: People Wearing Masks
-Id: fb-survey
-Signal: smoothed_wwearing_mask_7d
-LinkFrom: [fb-survey-smoothed_wearing_mask_7d, fb-survey-smoothed_wearing_mask_5d]
-
-
-SignalTooltip: Percentage of people who say they wear a mask most or all of the time while in public, based on surveys of Facebook users
-
-
-Description: Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they, or anyone in their household, are currently experiencing COVID-related symptoms. We also ask them if they wear a mask when they are in public. For this signal, we estimate the percentage of people who say they wear a mask most or all of the time when they are in public. The signal changed in [Wave 10](https://cmu-delphi.github.io/delphi-epidata/symptom-survey/coding.html#wave-10) of the survey, unifying the timespan to 7 days from previously 5 days.
----
-Name: Vaccine Acceptance
-Id: fb-survey
-Signal: smoothed_wcovid_vaccinated_appointment_or_accept
-LinkFrom: [fb-survey-smoothed_covid_vaccinated_or_accept]
-SignalTooltip: Percentage of people who either have already received a COVID vaccine, have an appointment to receive a COVID vaccine, or would definitely or probably choose to receive one if it were offered to them today, based on surveys of Facebook users
-
-
-Description: Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they have received a COVID vaccine, have an appointment to do so, or would choose to be vaccinated if they were offered a COVID vaccine today. For this signal, we estimate the percentage of people who either (a) say they have already received a COVID vaccine, (b) have an appointment to receive a COVID vaccine, or (c) would “definitely” or “probably” choose to be vaccinated if a COVID vaccine were offered to them today. The signal changed in [Wave 11](https://cmu-delphi.github.io/delphi-epidata/symptom-survey/coding.html#wave-11) of the survey, asking all non-vaccinated respondents if they have an appointment to be vaccinated and treating those with appointments as vaccine-accepting.
----
 Name: Symptom Searches (Smell and Taste) on Google 
 Id: google-symptoms
 Signal: s05_smoothed_search
@@ -40,28 +20,6 @@ noMaps: true
 SignalTooltip: Google search volume of COVID-related symptom searches about common cold
  
 Description: Using Google Symptoms Searches, Delphi obtains the average of Google search volumes for searches related to nasal congestion, post nasal drip, rhinorrhea, sinusitis, rhinitis, and common cold in each area. These symptoms have shown positive correlation with reported COVID cases, especially since Omicron was declared a variant of concern by the World Health Organization. Note that the average search volume of these symptoms is not equivalent to the search volume of their union. According to Google, the estimates are not comparable across regions since the values are normalized by population and scaled by region-specific maximum popularity (and for this reason, we omit beehive grids and choropleth maps of this signal on the dashboard).
----
-Name: COVID-Like Symptoms
-Id: fb-survey
-Signal: smoothed_wcli
-Unit: per 100 people
-
-
-SignalTooltip: Percentage of people with COVID-like symptoms, based on surveys of Facebook users
-
-
-Description: Every day, Delphi surveys tens of thousands of Facebook users, asking a broad set of COVID-related questions, including whether they, or anyone in their household, are currently experiencing COVID-related symptoms. We also ask questions about well-being and various mitigation measures, including mask wearing. For this signal, we estimate the percentage of people self-reporting COVID-like symptoms, defined here as fever along with either cough, shortness of breath, or difficulty breathing. 
----
-Name: COVID-Like Symptoms in Community
-Id: fb-survey
-Signal: smoothed_whh_cmnty_cli
-Unit: per 100 people
-
-
-SignalTooltip: Percentage of people who know someone in their local community with COVID-like symptoms, based on surveys of Facebook users
-
-
-Description: Every day, Delphi surveys tens of thousands of Facebook users, asking them a broad set of COVID-related questions, including whether they, or anyone in their household, are currently experiencing COVID-related symptoms. We also ask them if they know anyone in their local community who has COVID-like or flu-like symptoms, defined here as fever along with either sore throat, cough, shortness of breath, or difficulty breathing.  For this indicator, we estimate the percentage of people who know someone, in their household or outside it, who has these symptoms. 
 ---
 Name: COVID-Related Doctor Visits
 Id: doctor-visits
@@ -139,4 +97,4 @@ Signal: deaths_7dav_incidence_prop
 SignalTooltip: Newly reported COVID-19 deaths per 100,000 people, based on data from Johns Hopkins University
 
 
-Description: This data shows the number of COVID-19 related deaths newly reported each day. It reflects official figures reported by state and local health authorities, and may not include excess deaths not confirmed by health authorities to be due to COVID-19. The signal is based on death counts compiled and made public by [a team at Johns Hopkins University](https://systems.jhu.edu/research/public-health/ncov/).
+Description: This data shows the number of COVID-19 deaths newly reported each day. The signal is based on COVID-19 death counts compiled and made public by [a team at Johns Hopkins University](https://systems.jhu.edu/research/public-health/ncov/).
