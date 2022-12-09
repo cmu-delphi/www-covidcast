@@ -1,6 +1,6 @@
 <script>
   import IndicatorTable from './IndicatorTable.svelte';
-  import CasesOverview from './CasesOverview.svelte';
+  import Overview from './Overview.svelte';
   import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
   import RegionDatePicker from '../../components/RegionDatePicker.svelte';
   import {
@@ -10,7 +10,7 @@
     getScrollToAnchor,
     metaDataManager,
     sensorList,
-    defaultCasesSensor,
+    defaultHospitalSensor,
     currentMode,
   } from '../../stores';
   import { SensorParam, DateParam, RegionParam } from '../../stores/params';
@@ -26,7 +26,7 @@
   $: date = new DateParam($currentDateObject);
   $: region = new RegionParam($currentRegionInfo);
 
-  $: CASES = new SensorParam($defaultCasesSensor, $metaDataManager);
+  $: HOSPITAL_ADMISSION = new SensorParam($defaultHospitalSensor, $metaDataManager);
 
   const items = [nationInfo, ...stateInfo, ...countyInfo];
 
@@ -70,15 +70,15 @@
   <div class="uk-container content-grid">
     <div class="grid-3-11">
       <FancyHeader invert>{region.displayName}</FancyHeader>
-      <CasesOverview {date} {region} {fetcher} />
+      <Overview {date} {region} {fetcher} />
       <hr />
-      <FancyHeader invert sub="Map" anchor="map">{CASES.name}</FancyHeader>
-      <p>{@html CASES.signalTooltip}</p>
-      <RegionMapWrapper {region} {date} sensor={CASES} {fetcher} />
+      <FancyHeader invert sub="Map" anchor="map">{HOSPITAL_ADMISSION.name}</FancyHeader>
+      <p>{@html HOSPITAL_ADMISSION.signalTooltip}</p>
+      <RegionMapWrapper {region} {date} sensor={HOSPITAL_ADMISSION} {fetcher} />
       <hr />
-      <FancyHeader invert sub="Chart" anchor="chart">{CASES.name}</FancyHeader>
+      <FancyHeader invert sub="Chart" anchor="chart">{HOSPITAL_ADMISSION.name}</FancyHeader>
       <div class="chart-300">
-        <HistoryLineChart sensor={CASES} {date} {region} {fetcher} />
+        <HistoryLineChart sensor={HOSPITAL_ADMISSION} {date} {region} {fetcher} />
       </div>
       <hr />
       <IndicatorTable {date} {region} {fetcher} />
