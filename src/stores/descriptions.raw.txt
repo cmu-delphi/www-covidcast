@@ -32,6 +32,17 @@ SignalTooltip: Percentage of daily doctor visits that are due to COVID-like symp
 
 Description: Delphi receives aggregated statistics from health system partners on COVID-related outpatient doctor visits, derived from ICD codes found in insurance claims. Using this data, we estimate the percentage of daily doctor’s visits in each area that are due to COVID-like illness. Note that these estimates are based only on visits by patients whose data is accessible to our partners.
 ---
+Name: Lab-Confirmed Flu in Doctor Visits
+Id: chng
+Signal: smoothed_adj_outpatient_flu
+Unit: per 100 visits
+
+
+SignalTooltip: Percentage of daily doctor visits that are due to lab-confirmed influenza
+
+
+Description: Delphi receives aggregated statistics from Change Healthcare, Inc. on lab-confirmed influenza outpatient doctor visits, derived from ICD codes found in insurance claims. Using this data, we estimate the percentage of daily doctor’s visits in each area that resulted in a diagnosis of influenza. Note that these estimates are based only on visits by patients whose insurance claims are accessible to Change Healthcare.
+---
 Name: COVID Antigen Test Positivity
 Id: quidel-covid-ag
 Signal: covid_ag_smoothed_pct_positive
@@ -87,7 +98,21 @@ Overrides:
 SignalTooltip: Confirmed COVID-19 hospital admissions per 100,000 people
 
 
-Description: This data shows the number of confirmed COVID-19 hospital admissions each day. At the state level and above, we show data from the Report on Patient Impact and Hospital Capacity published by the US Department of Health & Human Services (HHS). At the county and metro level, we show data from the Community Profile Report published by the Data Strategy Execution Workgroup. 
+Description: This data shows the number of hospital admissions with lab-confirmed COVID-19 each day. At the state level and above, we show data from the Report on Patient Impact and Hospital Capacity published by the US Department of Health & Human Services (HHS). At the county and metro level, we show data from the Community Profile Report published by the Data Strategy Execution Workgroup. 
+---
+Name: Flu Hospital Admissions
+Id: hhs
+Signal: confirmed_admissions_influenza_1d_prop_7dav
+ExtendedColorScale: true
+Levels: [nation, state]
+
+
+
+
+SignalTooltip: Confirmed influenza hospital admissions per 100,000 people
+
+
+Description: This data shows the number of hospital admissions with lab-confirmed influenza each day. We source this data from the Report on Patient Impact and Hospital Capacity published by the US Department of Health & Human Services (HHS). 
 ---
 Name: COVID Deaths
 Id: jhu-csse
