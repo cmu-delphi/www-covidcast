@@ -1,4 +1,4 @@
-import { timeDay, timeMonth, timeWeek } from 'd3-time';
+import { timeDay, timeMonth } from 'd3-time';
 import { formatAPITime, addMissing, fitRange, parseAPITime } from '../data';
 import type { EpiDataRow } from '../data';
 import { nationInfo } from '../data/regions';
@@ -36,8 +36,8 @@ export function resolveSensorTimeFrame(
   return ALL_TIME_FRAME;
 }
 
-export const WINDOW_SIZE = 4; // months;
-export const SPARKLINE_SIZE = 4; // weeks;
+export const WINDOW_SIZE = 9; // months;
+export const SPARKLINE_SIZE = 3; // months;
 
 export class DateParam {
   readonly timeValue: number;
@@ -52,7 +52,7 @@ export class DateParam {
     this.value = date;
     this.week = EpiWeek.fromDate(date);
     this.allTimeFrame = ALL_TIME_FRAME;
-    this.sparkLineTimeFrame = TimeFrame.compute(date, (d, step) => timeWeek.offset(d, step), SPARKLINE_SIZE);
+    this.sparkLineTimeFrame = TimeFrame.compute(date, (d, step) => timeMonth.offset(d, step), SPARKLINE_SIZE);
     this.windowTimeFrame = TimeFrame.compute(date, (d, step) => timeMonth.offset(d, step), WINDOW_SIZE);
   }
 
