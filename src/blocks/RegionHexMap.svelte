@@ -145,12 +145,27 @@
       {/await}
     {/each}
   </HexGrid>
+  <div class="bottom-bar">
+    <div style="display:{$isMobileDevice ? 'none' : 'auto'}">Dashed vertical lines: month boundaries</div>
+    <div style="display:{$isMobileDevice ? 'none' : 'auto'}; margin-bottom: 0.5em">
+      Red vertical line: selected date
+    </div>
+    <div>Hex fill color: value at selected date</div>
+  </div>
   <ColorLegend {sensor} level="state" gradientLength={$isMobileDevice ? 250 : 280}>
     <DownloadMenu fileName="{sensor.name}_US_States_{formatDateISO(date.value)}" data={dumpData} absolutePos {sensor} />
   </ColorLegend>
 </div>
 
 <style>
+  .bottom-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0.5em;
+    position: relative;
+  }
+
   .title,
   .value {
     font-size: 0.65rem;
