@@ -71,7 +71,7 @@
     "core-js": "^3.23.3",
     "cross-env": "^7.0.3",
     "css-loader": "^6.7.1",
-    "css-minimizer-webpack-plugin": "^4.0.0",
+    "css-minimizer-webpack-plugin": "^5.0.0",
     "d3-color": "^3.1.0",
     "d3-dsv": "^3.0.1",
     "d3-format": "^3.1.0",
