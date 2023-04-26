@@ -493,6 +493,14 @@
   .clear-button.modern {
     right: 0;
   }
+  .uk-dropdown {
+    position: absolute;
+    display: none;
+    z-index: 1020;
+  }
+  .uk-dropdown.uk-open {
+    display: block;
+  }
   .uk-search-input.modern {
     background: white;
     font-weight: 400;
