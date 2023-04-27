@@ -45,8 +45,8 @@ jobs:
       - name: Copy files
         run: |
           ls -al
-          cp src/stores/descriptions.raw.txt delphi-epidata/src/server/endpoints/covidcast_utils/descriptions.raw.txt
-          cp src/stores/questions.raw.txt delphi-epidata/src/server/endpoints/covidcast_utils/questions.raw.txt
+          cp src/stores/descriptions.raw.txt src/stores/questions.raw.txt \
+             delphi-epidata/src/server/endpoints/covidcast_utils/
       - name: Create pull request into epidata
         uses: peter-evans/create-pull-request@v5
         with:
