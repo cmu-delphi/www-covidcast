@@ -36,3 +36,26 @@ jobs:
           # assignees:
           body: |
             Releasing ${{ steps.version.outputs.next_tag }}.
+      - name: Check out delphi epidata 
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.CMU_DELPHI_DEPLOY_MACHINE_PAT }}
+          repository: cmu-delphi/delphi-epidata
+          path: delphi-epidata
+      - name: Copy files
+        run: |
+          cp src/stores/descriptions.raw.txt src/stores/questions.raw.txt \
+             delphi-epidata/src/server/endpoints/covidcast_utils/
+      - name: Create pull request into epidata
+        uses: peter-evans/create-pull-request@v5
+        with:
+          path: delphi-epidata
+          token: ${{ secrets.CMU_DELPHI_DEPLOY_MACHINE_PAT }}
+          branch: www-covidcast-release/${{ steps.version.outputs.next_tag }}
+          commit-message: 'chore: sync to www-covidcast release ${{ steps.version.outputs.next_tag }}'
+          base: dev
+          title: Sync to www-covidcast release ${{ steps.version.outputs.next_tag }}
+          labels: chore
+          reviewers: krivard
+          body: |
+            Syncing covidcast_utils files to www-covidcast release ${{ steps.version.outputs.next_tag }}.
