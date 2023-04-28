@@ -39,7 +39,7 @@ jobs:
       - name: Check out delphi epidata 
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.EPIDATA_PAT }}
+          token: ${{ secrets.CMU_DELPHI_DEPLOY_MACHINE_PAT }}
           repository: cmu-delphi/delphi-epidata
           path: delphi-epidata
       - name: Copy files
@@ -50,7 +50,7 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           path: delphi-epidata
-          token: ${{ secrets.EPIDATA_PAT }}
+          token: ${{ secrets.CMU_DELPHI_DEPLOY_MACHINE_PAT }}
           branch: www-covidcast-release/${{ steps.version.outputs.next_tag }}
           commit-message: 'chore: sync to www-covidcast release ${{ steps.version.outputs.next_tag }}'
           base: dev
