@@ -29,7 +29,6 @@ jobs:
           commit-message: 'chore: update docs'
           title: Update Google Docs Meta Data
           labels: chore
-          reviewers: krivard
-          assignees: krivard
+          assignees: melange396
           body: |
             Updating Google Docs Meta Data
