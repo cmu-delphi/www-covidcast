@@ -96,8 +96,8 @@ jobs:
           commit-message: 'feat: update to COVIDcast ${{ needs.create_release.outputs.tag_name }}'
           title: 'update to COVIDcast ${{ needs.create_release.outputs.tag_name }}'
           labels: feat
-          reviewers: krivard
-          # assignees:
+          # reviewers: 
+          assignees: melange396
           body: |
             update to [COVIDcast ${{ needs.create_release.outputs.tag_name }}](https://github.com/cmu-delphi/www-covidcast/releases/${{ needs.create_release.outputs.tag_name }})
 
