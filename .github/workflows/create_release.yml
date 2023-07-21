@@ -32,7 +32,7 @@ jobs:
           base: main
           title: Release ${{ steps.version.outputs.next_tag }}
           labels: chore
-          # reviewers: 
+          # reviewers:
           assignees: melange396
           body: |
             Releasing ${{ steps.version.outputs.next_tag }}.
