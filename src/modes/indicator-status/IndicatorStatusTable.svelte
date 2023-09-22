@@ -9,6 +9,7 @@
   import chevronRightIcon from '!raw-loader!@fortawesome/fontawesome-free/svgs/solid/chevron-right.svg';
   import { metaDataManager } from '../../stores';
   import { loadData } from './data';
+  import { INACTIVE_DATA_SOURCES } from './store';
 
   const dispatch = createEventDispatcher();
 
@@ -29,6 +30,7 @@
     sortedData = loader.initial;
     const comparator = $sort.comparator;
     loader.loaded.then((rows) => {
+      rows = rows.filter((r) => !INACTIVE_DATA_SOURCES.includes(r.source));
       sortedData = rows.slice().sort(comparator);
       loading = false;
     });
