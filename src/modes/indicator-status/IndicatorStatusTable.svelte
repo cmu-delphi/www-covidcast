@@ -29,6 +29,7 @@
     sortedData = loader.initial;
     const comparator = $sort.comparator;
     loader.loaded.then((rows) => {
+      // do not display signals that are "active" but more than 6 months out of date
       rows = rows.filter((r) => r.latest_lag_days <= 180);
       sortedData = rows.slice().sort(comparator);
       loading = false;
