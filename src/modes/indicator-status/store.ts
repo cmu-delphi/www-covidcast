@@ -28,5 +28,3 @@ export const valueLabel = derived(
   ([value, options]) => options.find((d) => d.value == value)!.label,
 );
 export const isRelative = derived([valueField], ([v]) => v.endsWith('_rel_change'));
-
-export const INACTIVE_DATA_SOURCES = ['dsew-cpr', 'fb-survey', 'jhu-csse', 'safegraph-weekly', 'usa-facts'];
