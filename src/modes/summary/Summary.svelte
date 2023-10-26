@@ -1,6 +1,5 @@
 <script>
   import IndicatorTable from './IndicatorTable.svelte';
-  import Overview from './Overview.svelte';
   import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
   import RegionDatePicker from '../../components/RegionDatePicker.svelte';
   import {
@@ -69,17 +68,14 @@
   </RegionDatePicker>
   <div class="uk-container content-grid">
     <div class="grid-3-11">
-      <FancyHeader invert>{region.displayName}</FancyHeader>
-      <Overview {date} {region} {fetcher} />
-      <hr />
-      <FancyHeader invert sub="Map" anchor="map">{HOSPITAL_ADMISSION.name}</FancyHeader>
-      <p>{@html HOSPITAL_ADMISSION.signalTooltip}</p>
-      <RegionMapWrapper {region} {date} sensor={HOSPITAL_ADMISSION} {fetcher} />
-      <hr />
       <FancyHeader invert sub="Chart" anchor="chart">{HOSPITAL_ADMISSION.name}</FancyHeader>
       <div class="chart-300">
         <HistoryLineChart sensor={HOSPITAL_ADMISSION} {date} {region} {fetcher} />
       </div>
+      <hr />
+      <FancyHeader invert sub="Map" anchor="map">{HOSPITAL_ADMISSION.name}</FancyHeader>
+      <p>{@html HOSPITAL_ADMISSION.signalTooltip}</p>
+      <RegionMapWrapper {region} {date} sensor={HOSPITAL_ADMISSION} {fetcher} />
       <hr />
       <IndicatorTable {date} {region} {fetcher} />
     </div>
