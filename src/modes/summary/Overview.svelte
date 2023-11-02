@@ -53,7 +53,7 @@
 
 <div class="mobile-three-col">
   <div class="mobile-kpi">
-    <h3>Cases</h3>
+    <h3>Doctor Visits</h3>
     <div>
       {#await casesTrend}
         <KPIValue value={null} loading />
