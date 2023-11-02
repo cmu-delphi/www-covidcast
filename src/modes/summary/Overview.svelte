@@ -88,7 +88,7 @@
       {/await}
     </div>
     <div class="sub">
-      <SensorUnit sensor={CASES} long />
+      <SensorUnit sensor={DEATHS} long />
     </div>
   </div>
 </div>
