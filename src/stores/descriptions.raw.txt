@@ -51,8 +51,8 @@ ExtendedColorScale: true
 Levels: [nation, state, county]
 Overrides:
   County:
-    Id: dsew-cpr
-    Signal: confirmed_admissions_covid_1d_prop_7dav
+    Id: hospital-admissions
+    Signal: smoothed_adj_covid19_from_claims
 
 
 
