@@ -192,10 +192,10 @@ export class MetaDataManager {
   }
 
   getDefaultCasesSignal(): Sensor | null {
-    return this.getSensor({ id: 'jhu-csse', signal: 'confirmed_7dav_incidence_prop' });
+    return this.getSensor({ id: 'doctor-visits', signal: 'smoothed_adj_cli' });
   }
   getDefaultDeathSignal(): Sensor | null {
-    return this.getSensor({ id: 'jhu-csse', signal: 'deaths_7dav_incidence_prop' });
+    return this.getSensor({ id: 'nchs-mortality', signal: 'deaths_covid_incidence_prop' });
   }
 
   getSensorsOfType(type: SignalCategory): Sensor[] {

@@ -109,13 +109,13 @@ export const sensorList = derived(metaDataManager, (metaData) => {
 });
 
 export const defaultCasesSensor = derived(sensorList, (sensorList) => {
-  return sensorList.find((d) => d.signal === 'confirmed_7dav_incidence_prop');
+  return sensorList.find((d) => d.signal === 'smoothed_adj_cli');
 });
 export const defaultHospitalSensor = derived(sensorList, (sensorList) => {
   return sensorList.find((d) => d.signal === 'confirmed_admissions_covid_1d_prop_7dav');
 });
 export const defaultDeathSensor = derived(sensorList, (sensorList) => {
-  return sensorList.find((d) => d.signal === 'deaths_7dav_incidence_prop');
+  return sensorList.find((d) => d.signal === 'deaths_covid_incidence_prop');
 });
 
 export const currentSensorEntry = derived(
