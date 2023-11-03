@@ -70,7 +70,9 @@
   <div class="uk-container content-grid">
     <div class="grid-3-11">
       <FancyHeader invert>{region.displayName}</FancyHeader>
+      <!-- TEMPORARY DISABLING OF THIS OVERVIEW WIDGET UNTIL SIGNALS ARE FIXED
       <Overview {date} {region} {fetcher} />
+      -->
       <hr />
       <FancyHeader invert sub="Map" anchor="map">{HOSPITAL_ADMISSION.name}</FancyHeader>
       <p>{@html HOSPITAL_ADMISSION.signalTooltip}</p>
