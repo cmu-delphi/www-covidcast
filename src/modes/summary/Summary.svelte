@@ -1,6 +1,7 @@
 <script>
   import IndicatorTable from './IndicatorTable.svelte';
-  import Overview from './Overview.svelte';
+  // TEMPORARY DISABLING OF THIS OVERVIEW WIDGET UNTIL SIGNALS ARE FIXED:
+  // import Overview from './Overview.svelte';
   import { countyInfo, nationInfo, stateInfo } from '../../data/regions';
   import RegionDatePicker from '../../components/RegionDatePicker.svelte';
   import {
