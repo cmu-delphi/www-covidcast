@@ -4,6 +4,7 @@
   import RegionHexMap from './RegionHexMap.svelte';
   import RegionMap from './RegionMap.svelte';
   import Toggle from '../components/Toggle.svelte';
+  import OldDateIndicatorWarning from './OldDateIndicatorWarning.svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -26,8 +27,13 @@
 
   $: hasCounties = sensor.value.levels.includes('county');
   let showChoropleth = false;
+
+  $: if (sensor.timeFrame.max < date.value) {
+    date.set(sensor.timeFrame.max);
+  }
 </script>
 
+<OldDateIndicatorWarning {sensor} {date} />
 {#if region.level === 'nation'}
   <p class="uk-text-center uk-text-italic ux-hint">
     <span class="inline-svg-icon">
