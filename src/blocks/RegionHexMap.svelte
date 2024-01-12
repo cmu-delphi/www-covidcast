@@ -33,6 +33,10 @@
    * @type {import("../../stores/DataFetcher").DataFetcher}
    */
   export let fetcher;
+  /**
+   * @type {import("../../stores/params").DateParam}
+   */
+  export let hospitalAdmissionMaxDate;
 
   let loading = false;
   /**
@@ -74,18 +78,51 @@
     });
   }
 
-  $: tileData = loadData(sensor, date, $isMobileDevice);
-  $: spec = generateSparkLine({
-    highlightDate: false,
-    interactive: false,
-    domain: date.sparkLineTimeFrame.domain,
-  });
-  $: invertedSpec = generateSparkLine({
-    color: 'white',
-    highlightDate: false,
-    interactive: false,
-    domain: date.sparkLineTimeFrame.domain,
-  });
+  function getTileData(sensor, date, hospitalAdmissionMaxDate, isMobile) {
+    if (date.value > hospitalAdmissionMaxDate.value) {
+      return loadData(sensor, hospitalAdmissionMaxDate, isMobile);
+    } else {
+      return loadData(sensor, date, isMobile);
+    }
+  }
+
+  function getSpec(date, hospitalAdmissionMaxDate) {
+    if (date.value > hospitalAdmissionMaxDate.value) {
+      return generateSparkLine({
+        highlightDate: false,
+        interactive: false,
+        domain: hospitalAdmissionMaxDate.sparkLineTimeFrame.domain,
+      });
+    } else {
+      return generateSparkLine({
+        highlightDate: false,
+        interactive: false,
+        domain: date.sparkLineTimeFrame.domain,
+      });
+    }
+  }
+
+  function getInvertedSpec(date, hospitalAdmissionMaxDate) {
+    if (date.value > hospitalAdmissionMaxDate.value) {
+      return generateSparkLine({
+        color: 'white',
+        highlightDate: false,
+        interactive: false,
+        domain: hospitalAdmissionMaxDate.sparkLineTimeFrame.domain,
+      });
+    } else {
+      return generateSparkLine({
+        color: 'white',
+        highlightDate: false,
+        interactive: false,
+        domain: date.sparkLineTimeFrame.domain,
+      });
+    }
+  }
+
+  $: tileData = getTileData(sensor, date, hospitalAdmissionMaxDate, $isMobileDevice);
+  $: spec = getSpec(date, hospitalAdmissionMaxDate);
+  $: invertedSpec = getInvertedSpec(date, hospitalAdmissionMaxDate);
   $: colorScale = sensor.createColorScale('state');
   $: dumpData = Promise.all(tileData.map((d) => d.dump)).then((rows) => rows.flat());
 
@@ -129,12 +166,21 @@
           <span class="title">{tile.propertyId}</span>
           {#if !$isMobileDevice}
             <div class="vega-wrapper">
-              <Vega
-                spec={isInvertedColor(v) ? invertedSpec : spec}
-                data={tile.sparkLine}
-                signals={{ currentDate: date.value }}
-                noDataText="N/A"
-              />
+              {#if date.value > hospitalAdmissionMaxDate.value}
+                <Vega
+                  spec={isInvertedColor(v) ? invertedSpec : spec}
+                  data={tile.sparkLine}
+                  signals={{ currentDate: hospitalAdmissionMaxDate.value }}
+                  noDataText="N/A"
+                />
+              {:else}
+                <Vega
+                  spec={isInvertedColor(v) ? invertedSpec : spec}
+                  data={tile.sparkLine}
+                  signals={{ currentDate: date.value }}
+                  noDataText="N/A"
+                />
+              {/if}
             </div>
             <span class="value"><SensorValue {sensor} value={v ? v.value : null} /></span>
           {/if}
@@ -153,7 +199,21 @@
     <div>Hex fill color: value at selected date</div>
   </div>
   <ColorLegend {sensor} level="state" gradientLength={$isMobileDevice ? 250 : 280}>
-    <DownloadMenu fileName="{sensor.name}_US_States_{formatDateISO(date.value)}" data={dumpData} absolutePos {sensor} />
+    {#if date.value > hospitalAdmissionMaxDate.value}
+      <DownloadMenu
+        fileName="{sensor.name}_US_States_{formatDateISO(hospitalAdmissionMaxDate.value)}"
+        data={dumpData}
+        absolutePos
+        {sensor}
+      />
+    {:else}
+      <DownloadMenu
+        fileName="{sensor.name}_US_States_{formatDateISO(date.value)}"
+        data={dumpData}
+        absolutePos
+        {sensor}
+      />
+    {/if}
   </ColorLegend>
 </div>
 

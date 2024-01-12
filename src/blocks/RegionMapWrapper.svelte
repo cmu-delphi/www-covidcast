@@ -4,7 +4,9 @@
   import RegionHexMap from './RegionHexMap.svelte';
   import RegionMap from './RegionMap.svelte';
   import Toggle from '../components/Toggle.svelte';
-  import OldDateIndicatorWarning from './OldDateIndicatorWarning.svelte';
+  import IndicatorWarning from './IndicatorWarning.svelte';
+  import { currentDateObject } from '../stores';
+  import { DateParam } from '../stores/params';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -28,12 +30,13 @@
   $: hasCounties = sensor.value.levels.includes('county');
   let showChoropleth = false;
 
-  $: if (sensor.timeFrame.max < date.value) {
-    date.set(sensor.timeFrame.max);
+  $: hospitalAdmissionMaxDate = sensor.timeFrame.max;
+  $: if (hospitalAdmissionMaxDate < date.value) {
+    hospitalAdmissionMaxDate = new DateParam($currentDateObject);
+    hospitalAdmissionMaxDate.set(sensor.timeFrame.max);
   }
 </script>
 
-<OldDateIndicatorWarning {sensor} {date} />
 {#if region.level === 'nation'}
   <p class="uk-text-center uk-text-italic ux-hint">
     <span class="inline-svg-icon">
@@ -41,6 +44,7 @@
     </span>
     Click on a state to explore further
   </p>
+  <IndicatorWarning {date} {region} {sensor} {fetcher} />
   <div class="toggle-center-wrapper">
     <Toggle bind:checked={showChoropleth} before="Beehive Grid"
       ><span>
@@ -56,7 +60,7 @@
       <RegionMap {region} {date} {sensor} {fetcher} />
     {/if}
   {:else}
-    <RegionHexMap {region} {date} {sensor} {fetcher} />
+    <RegionHexMap {region} {date} {sensor} {fetcher} {hospitalAdmissionMaxDate} />
   {/if}
 {:else}
   <RegionMap {region} {date} {sensor} {fetcher} />
