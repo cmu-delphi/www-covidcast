@@ -4,7 +4,7 @@
   import RegionHexMap from './RegionHexMap.svelte';
   import RegionMap from './RegionMap.svelte';
   import Toggle from '../components/Toggle.svelte';
-  import IndicatorWarning from './IndicatorWarning.svelte';
+  import HospitalAdmissionsIndicatorWarning from './HospitalAdmissionsIndicatorWarning.svelte';
   import { currentDateObject } from '../stores';
   import { DateParam } from '../stores/params';
 
@@ -44,7 +44,7 @@
     </span>
     Click on a state to explore further
   </p>
-  <IndicatorWarning {date} {region} {sensor} {fetcher} />
+  <HospitalAdmissionsIndicatorWarning {date} {region} {sensor} {fetcher} />
   <div class="toggle-center-wrapper">
     <Toggle bind:checked={showChoropleth} before="Beehive Grid"
       ><span>
