@@ -44,7 +44,7 @@
     </span>
     Click on a state to explore further
   </p>
-  <HospitalAdmissionsIndicatorWarning {date} {region} {sensor} {fetcher} />
+
   <div class="toggle-center-wrapper">
     <Toggle bind:checked={showChoropleth} before="Beehive Grid"
       ><span>
@@ -60,6 +60,7 @@
       <RegionMap {region} {date} {sensor} {fetcher} />
     {/if}
   {:else}
+    <HospitalAdmissionsIndicatorWarning {date} {region} {sensor} {fetcher} />
     <RegionHexMap {region} {date} {sensor} {fetcher} {hospitalAdmissionMaxDate} />
   {/if}
 {:else}
