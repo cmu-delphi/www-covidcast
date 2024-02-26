@@ -2,13 +2,14 @@
   import KPIValue from '../../components/KPIValue.svelte';
   import KPIChange from '../../components/KPIChange.svelte';
   import { DateParam, SensorParam } from '../../stores/params';
-  import { formatDateDayOfWeek } from '../../formats';
   import SensorUnit from '../../components/SensorUnit.svelte';
   import IndicatorAnnotations from '../../components/IndicatorAnnotations.svelte';
   import MaxDateHint from '../../blocks/MaxDateHint.svelte';
   import IndicatorWarning from '../../blocks/IndicatorWarning.svelte';
+  import NoRecentDataWarning from '../../blocks/NoRecentDataWarning.svelte';
   import { defaultDeathSensor, defaultCasesSensor, defaultHospitalSensor, metaDataManager } from '../../stores';
   import IndicatorFallbackWarning from '../../blocks/IndicatorFallbackWarning.svelte';
+  import { onMount, afterUpdate, beforeUpdate } from 'svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -40,20 +41,60 @@
   $: casesTrend = trends[0];
   $: hospitalTrend = fetchFallback(fetcher, HOSPITAL_ADMISSION, region, trends[1]);
   $: deathTrend = trends[2];
+
+  let minMaxDate = new Date();
+  let showWarning = false;
+
+  onMount(() => {
+    [CASES, DEATHS, HOSPITAL_ADMISSION].map((s) => {
+      if (s.timeFrame.max < minMaxDate) {
+        minMaxDate = s.timeFrame.max;
+      }
+    });
+    let urlSeachParams = new URLSearchParams(window.location.search);
+    if (!urlSeachParams.has('date')) {
+      date.set(minMaxDate);
+    }
+  });
+
+  beforeUpdate(() => {
+    if (minMaxDate.toString() === date.value.toString()) {
+      showWarning = true;
+    }
+  });
+
+  afterUpdate(() => {
+    if (minMaxDate.toString() != date.value.toString()) {
+      showWarning = false;
+    }
+  });
 </script>
 
 <IndicatorWarning sensor={CASES} {date} {region} {fetcher} />
 <IndicatorAnnotations {date} {region} sensor={CASES} range="sparkLine" />
 
-<p>
+{#if showWarning}
+  <NoRecentDataWarning
+    casesSensor={CASES}
+    deathSensor={DEATHS}
+    hospitalAdmissionSensor={HOSPITAL_ADMISSION}
+    {date}
+    {minMaxDate}
+  />
+{/if}
+
+<!-- <p>
   On {formatDateDayOfWeek(date.value)}
   <MaxDateHint sensor={CASES.value} suffix="," {fetcher} />
   the {CASES.valueUnit}s were:
-</p>
+</p> -->
 
 <div class="mobile-three-col">
   <div class="mobile-kpi">
-    <h3>Doctor Visits</h3>
+    <h3>
+      Doctor Visits
+      <MaxDateHint sensor={CASES.value} {fetcher} />
+    </h3>
     <div>
       {#await casesTrend}
         <KPIValue value={null} loading />
@@ -66,7 +107,10 @@
     </div>
   </div>
   <div class="mobile-kpi">
-    <h3>Hospital Admissions</h3>
+    <h3>
+      Hospital Admissions
+      <MaxDateHint sensor={HOSPITAL_ADMISSION.value} {fetcher} />
+    </h3>
     <div>
       {#await hospitalTrend}
         <KPIValue value={null} loading />
@@ -79,7 +123,10 @@
     </div>
   </div>
   <div class="mobile-kpi">
-    <h3>Deaths</h3>
+    <h3>
+      Deaths
+      <MaxDateHint sensor={DEATHS.value} {fetcher} />
+    </h3>
     <div>
       {#await deathTrend}
         <KPIValue value={null} loading />
