@@ -38,8 +38,9 @@
       <div data-uk-alert class="uk-alert-warning">
         The indicator "{sensor.name}" is not available for {formatDateYearDayOfWeekAbbr(date.value)}, yet. The latest
         known data is available on
-        <a href="?date={formatAPITime(sensor.timeFrame.max)}" on:click={switchDate}
-          >{formatDateYearDayOfWeekAbbr(sensor.timeFrame.max)}</a
+        <a
+          href="?date={formatAPITime(sensor.timeFrame.max)}&{window.location.search.split('&').slice(1).join('&')}"
+          on:click={switchDate}>{formatDateYearDayOfWeekAbbr(sensor.timeFrame.max)}</a
         >.
       </div>
     {/if}
