@@ -1,5 +1,4 @@
 <script>
-  import { formatAPITime } from '../data';
   import { formatDateYearDayOfWeekAbbr } from '../formats';
   /**
    * @type {import("../stores/params").DateParam}
@@ -35,11 +34,10 @@
 {#if casesMaxDate.toString() != date.value.toString() || deathSensorMaxDate.toString() != date.value.toString() || hospitalAdmissionMaxDate.toString() != date.value.toString()}
   <div data-uk-alert class="uk-alert-warning">
     <p>
-      The data for the {formatDateYearDayOfWeekAbbr(todaysDate)} is not available yet. The latest known data for all indicators
-      is available on
-      <a href="?date={formatAPITime(minMaxDate.value)}&{window.location.search.split('&').slice(1).join('&')}"
-        >{formatDateYearDayOfWeekAbbr(minMaxDate)}</a
-      >.
+      The data for the {formatDateYearDayOfWeekAbbr(todaysDate)} is not yet available. The date is set to the most recent
+      date we have data for all 3 indicators which is {formatDateYearDayOfWeekAbbr(minMaxDate)}. <br /> You can check the
+      hints to see the latest available date for each indicator. Note that the latest available date may be different for
+      each indicator.
     </p>
   </div>
 {/if}
