@@ -27,6 +27,8 @@
     }
   }
 
+  // Pre-fill the form from URL parameters.
+  // Supported parameters: source, sensor, start, end, geo_type, geo_id
   const urlParams = new URLSearchParams(window.location.search);
 
   // Overwrite default source & sensor if these are present in the URL
@@ -41,7 +43,7 @@
   $: isWeekly = sensor ? sensor.isWeeklySignal : false;
   $: formatDate = isWeekly ? (d) => formatWeek(d).replace('W', '') : formatDateISO;
 
-  let geoType = urlParams.has('geo') ? urlParams.get('geo') : 'county';
+  let geoType = urlParams.has('geo_type') ? urlParams.get('geo_type') : 'county';
 
   let startDate = new Date();
   let endDate = new Date();
@@ -72,11 +74,19 @@
 
   let geoValuesMode = 'all';
   let geoValues = [];
+  let geoURLSet = false;
   $: geoItems = [...(infosByLevel[geoType] || []), ...(geoType === 'county' ? infosByLevel.state : [])];
   $: {
     if (geoItems != null) {
       geoValues = [];
       geoValuesMode = guessMode(geoItems.length);
+    }
+
+    // Populate region based on URL params... but let the user override this later
+    if (urlParams.has('geo_id') && !geoURLSet) {
+      let infos = infosByLevel[geoType].filter((d) => d.propertyId == urlParams.get('geo_id'));
+      addRegion(infos[0]);
+      geoURLSet = true;
     }
   }
 
