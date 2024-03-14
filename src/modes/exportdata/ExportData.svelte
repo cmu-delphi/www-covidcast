@@ -27,18 +27,31 @@
     }
   }
 
+  const urlParams = new URLSearchParams(window.location.search);
+
+  // Overwrite default source & sensor if these are present in the URL
+  if (urlParams.has('source')) {
+    sourceValue = urlParams.get('source');
+
+    if (urlParams.has('sensor')) {
+      sensorValue = urlParams.get('sensor');
+    }
+  }
+
   $: isWeekly = sensor ? sensor.isWeeklySignal : false;
   $: formatDate = isWeekly ? (d) => formatWeek(d).replace('W', '') : formatDateISO;
 
-  let geoType = 'county';
+  let geoType = urlParams.has('geo') ? urlParams.get('geo') : 'county';
 
   let startDate = new Date();
   let endDate = new Date();
 
   function initDate(date) {
     const param = new DateParam(date);
-    endDate = param.sparkLineTimeFrame.max;
-    startDate = param.sparkLineTimeFrame.min;
+
+    // Populate date based on URL params or, if absent, the current date
+    startDate = urlParams.has('start') ? new Date(urlParams.get('start')) : param.sparkLineTimeFrame.min;
+    endDate = urlParams.has('end') ? new Date(urlParams.get('end')) : param.sparkLineTimeFrame.max;
   }
   $: initDate($currentDateObject);
 
