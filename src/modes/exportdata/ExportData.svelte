@@ -27,18 +27,37 @@
     }
   }
 
+  // Pre-fill the form from URL parameters.
+  // Supported parameters: data_source, signal, start_day, end_day, geo_type, geo_value, as_of
+  const urlParams = new URLSearchParams(window.location.search);
+
+  // Overwrite default source & sensor if these are present in the URL
+  if (urlParams.has('data_source')) {
+    sourceValue = urlParams.get('data_source');
+
+    if (urlParams.has('signal')) {
+      sensorValue = urlParams.get('signal');
+    }
+  }
+
   $: isWeekly = sensor ? sensor.isWeeklySignal : false;
   $: formatDate = isWeekly ? (d) => formatWeek(d).replace('W', '') : formatDateISO;
 
-  let geoType = 'county';
+  let geoType = urlParams.has('geo_type') ? urlParams.get('geo_type') : 'county';
 
   let startDate = new Date();
   let endDate = new Date();
 
   function initDate(date) {
     const param = new DateParam(date);
-    endDate = param.sparkLineTimeFrame.max;
-    startDate = param.sparkLineTimeFrame.min;
+
+    // Populate date based on URL params or, if absent, the current date
+    startDate = urlParams.has('start_day') ? new Date(urlParams.get('start_day')) : param.sparkLineTimeFrame.min;
+    endDate = urlParams.has('end_day') ? new Date(urlParams.get('end_day')) : param.sparkLineTimeFrame.max;
+
+    // Also normalize the dates to the current timezone
+    startDate = new Date(startDate.getTime() - startDate.getTimezoneOffset() * -60000);
+    endDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * -60000);
   }
   $: initDate($currentDateObject);
 
@@ -59,11 +78,19 @@
 
   let geoValuesMode = 'all';
   let geoValues = [];
+  let geoURLSet = false;
   $: geoItems = [...(infosByLevel[geoType] || []), ...(geoType === 'county' ? infosByLevel.state : [])];
   $: {
     if (geoItems != null) {
       geoValues = [];
       geoValuesMode = guessMode(geoItems.length);
+    }
+
+    // Populate region based on URL params... but let the user override this later
+    if (urlParams.has('geo_value') && !geoURLSet) {
+      let infos = infosByLevel[geoType].filter((d) => d.propertyId == urlParams.get('geo_value'));
+      addRegion(infos[0]);
+      geoURLSet = true;
     }
   }
 
@@ -90,6 +117,13 @@
     }
   }
   $: usesAsOf = asOfMode !== 'latest' && asOfDate instanceof Date;
+  // set as_of based on URL params, if it's a valid date
+  if (urlParams.has('as_of') && !isNaN(new Date(urlParams.get('as_of')))) {
+    asOfMode = 'single';
+    asOfDate = new Date(urlParams.get('as_of'));
+    // Also normalize the dates to the current timezone
+    asOfDate = new Date(asOfDate.getTime() - asOfDate.getTimezoneOffset() * -60000);
+  }
 
   let form = null;
 
@@ -103,6 +137,14 @@
           `signal=${sensor ? `${sensor.id}:${sensor.signal}` : ''},${date},geo_type=${geoType}`,
         );
       });
+    }
+    // Fix up the UI if we got an inactive sensor from the URL parameters.
+    if (sensor && !sensor.active) {
+      showInActive = true;
+      // Force an update to sourceValue to set related reactive statements correctly.
+      let temp = sourceValue;
+      sourceValue = '';
+      sourceValue = temp;
     }
   });
 
