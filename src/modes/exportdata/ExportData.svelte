@@ -56,8 +56,8 @@
     endDate = urlParams.has('end_day') ? new Date(urlParams.get('end_day')) : param.sparkLineTimeFrame.max;
 
     // Also normalize the dates to the current timezone
-    startDate = new Date(startDate.getTime() + Math.abs(startDate.getTimezoneOffset() * 60000));
-    endDate = new Date(endDate.getTime() + Math.abs(endDate.getTimezoneOffset() * 60000));
+    startDate = new Date(startDate.getTime() - startDate.getTimezoneOffset() * -60000);
+    endDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * -60000);
   }
   $: initDate($currentDateObject);
 
@@ -122,7 +122,7 @@
     asOfMode = 'single';
     asOfDate = new Date(urlParams.get('as_of'));
     // Also normalize the dates to the current timezone
-    asOfDate = new Date(asOfDate.getTime() + Math.abs(asOfDate.getTimezoneOffset() * 60000));
+    asOfDate = new Date(asOfDate.getTime() - asOfDate.getTimezoneOffset() * -60000);
   }
 
   let form = null;
