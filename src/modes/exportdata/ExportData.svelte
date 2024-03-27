@@ -28,7 +28,7 @@
   }
 
   // Pre-fill the form from URL parameters.
-  // Supported parameters: source, sensor, start, end, geo_type, geo_id
+  // Supported parameters: data_source, signal, start_day, end_day, geo_type, geo_value, as_of
   const urlParams = new URLSearchParams(window.location.search);
 
   // Overwrite default source & sensor if these are present in the URL
@@ -52,30 +52,8 @@
     const param = new DateParam(date);
 
     // Populate date based on URL params or, if absent, the current date
-    if (sensor && !sensor.active) {
-      // If the sensor is inactive, set the start and end dates to its historical range rather than current date
-      if (
-        urlParams.has('start_day') &&
-        new Date(urlParams.get('start_day')) >= sensor.meta.minTime &&
-        new Date(urlParams.get('start_day')) <= sensor.meta.maxTime
-      ) {
-        startDate = new Date(urlParams.get('start_day'));
-      } else {
-        startDate = sensor.meta.minTime;
-      }
-      if (
-        urlParams.has('end_day') &&
-        new Date(urlParams.get('end_day')) <= sensor.meta.minTime &&
-        new Date(urlParams.get('end_day')) <= sensor.meta.maxTime
-      ) {
-        endDate = new Date(urlParams.get('end_day'));
-      } else {
-        endDate = sensor.meta.maxTime;
-      }
-    } else {
-      startDate = urlParams.has('start_day') ? new Date(urlParams.get('start_day')) : param.sparkLineTimeFrame.min;
-      endDate = urlParams.has('end_day') ? new Date(urlParams.get('end_day')) : param.sparkLineTimeFrame.max;
-    }
+    startDate = urlParams.has('start_day') ? new Date(urlParams.get('start_day')) : param.sparkLineTimeFrame.min;
+    endDate = urlParams.has('end_day') ? new Date(urlParams.get('end_day')) : param.sparkLineTimeFrame.max;
   }
   $: initDate($currentDateObject);
 
