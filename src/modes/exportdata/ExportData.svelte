@@ -32,11 +32,11 @@
   const urlParams = new URLSearchParams(window.location.search);
 
   // Overwrite default source & sensor if these are present in the URL
-  if (urlParams.has('source')) {
-    sourceValue = urlParams.get('source');
+  if (urlParams.has('data_source')) {
+    sourceValue = urlParams.get('data_source');
 
-    if (urlParams.has('sensor')) {
-      sensorValue = urlParams.get('sensor');
+    if (urlParams.has('signal')) {
+      sensorValue = urlParams.get('signal');
     }
   }
 
@@ -52,8 +52,14 @@
     const param = new DateParam(date);
 
     // Populate date based on URL params or, if absent, the current date
-    startDate = urlParams.has('start') ? new Date(urlParams.get('start')) : param.sparkLineTimeFrame.min;
-    endDate = urlParams.has('end') ? new Date(urlParams.get('end')) : param.sparkLineTimeFrame.max;
+    if (sensor && !sensor.active) {
+      // If the sensor is inactive, set the start and end dates to its historical range rather than current date
+      startDate = urlParams.has('start_day') ? new Date(urlParams.get('start_day')) : sensor.meta.minTime;
+      endDate = urlParams.has('end_day') ? new Date(urlParams.get('end_day')) : sensor.meta.maxTime;
+    } else {
+      startDate = urlParams.has('start_day') ? new Date(urlParams.get('start_day')) : param.sparkLineTimeFrame.min;
+      endDate = urlParams.has('end_day') ? new Date(urlParams.get('end_day')) : param.sparkLineTimeFrame.max;
+    }
   }
   $: initDate($currentDateObject);
 
@@ -83,8 +89,8 @@
     }
 
     // Populate region based on URL params... but let the user override this later
-    if (urlParams.has('geo_id') && !geoURLSet) {
-      let infos = infosByLevel[geoType].filter((d) => d.propertyId == urlParams.get('geo_id'));
+    if (urlParams.has('geo_value') && !geoURLSet) {
+      let infos = infosByLevel[geoType].filter((d) => d.propertyId == urlParams.get('geo_value'));
       addRegion(infos[0]);
       geoURLSet = true;
     }
@@ -113,6 +119,11 @@
     }
   }
   $: usesAsOf = asOfMode !== 'latest' && asOfDate instanceof Date;
+  // set as_of based on URL params, if it's a valid date
+  if (urlParams.has('as_of') && !isNaN(new Date(urlParams.get('as_of')))) {
+    asOfMode = 'single';
+    asOfDate = new Date(urlParams.get('as_of'));
+  }
 
   let form = null;
 
@@ -126,6 +137,14 @@
           `signal=${sensor ? `${sensor.id}:${sensor.signal}` : ''},${date},geo_type=${geoType}`,
         );
       });
+    }
+    // Fix up the UI if we got an inactive sensor from the URL parameters.
+    if (sensor && !sensor.active) {
+      showInActive = true;
+      // Force an update to sourceValue to set related reactive statements correctly.
+      let temp = sourceValue;
+      sourceValue = '';
+      sourceValue = temp;
     }
   });
 
