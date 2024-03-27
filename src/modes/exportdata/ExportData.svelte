@@ -54,6 +54,10 @@
     // Populate date based on URL params or, if absent, the current date
     startDate = urlParams.has('start_day') ? new Date(urlParams.get('start_day')) : param.sparkLineTimeFrame.min;
     endDate = urlParams.has('end_day') ? new Date(urlParams.get('end_day')) : param.sparkLineTimeFrame.max;
+
+    // Also normalize the dates to the current timezone
+    startDate = new Date(startDate.getTime() + Math.abs(startDate.getTimezoneOffset() * 60000));
+    endDate = new Date(endDate.getTime() + Math.abs(endDate.getTimezoneOffset() * 60000));
   }
   $: initDate($currentDateObject);
 
@@ -117,6 +121,8 @@
   if (urlParams.has('as_of') && !isNaN(new Date(urlParams.get('as_of')))) {
     asOfMode = 'single';
     asOfDate = new Date(urlParams.get('as_of'));
+    // Also normalize the dates to the current timezone
+    asOfDate = new Date(asOfDate.getTime() + Math.abs(asOfDate.getTimezoneOffset() * 60000));
   }
 
   let form = null;
