@@ -41,6 +41,7 @@
     });
     let urlSeachParams = new URLSearchParams(window.location.search);
     if (!urlSeachParams.has('date')) {
+      // if no date is specified in the URL, default to the latest day before today with data from all 3 highlighted indicators
       date.set(minMaxDate);
     }
   });
