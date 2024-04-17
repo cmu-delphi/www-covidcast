@@ -34,10 +34,12 @@
 {#if casesMaxDate.toString() != date.value.toString() || deathSensorMaxDate.toString() != date.value.toString() || hospitalAdmissionMaxDate.toString() != date.value.toString()}
   <div data-uk-alert class="uk-alert-warning">
     <p>
-      The data for the {formatDateYearDayOfWeekAbbr(todaysDate)} is not yet available. The date is set to the most recent
-      date we have data for all 3 indicators which is {formatDateYearDayOfWeekAbbr(minMaxDate)}. <br /> You can check the
-      hints to see the latest available date for each indicator. Note that the latest available date may be different for
-      each indicator.
+      Data for today, {formatDateYearDayOfWeekAbbr(todaysDate)} is not yet available.
+      The date has been set to {formatDateYearDayOfWeekAbbr(minMaxDate)}, which
+      is the most recent that has data for all three of the highlighted indicators. 
+      You can mouse over the tooltips just below this message to see the latest 
+      available date for each indicator. Note that the latest available date may be 
+      different for each indicator.
     </p>
   </div>
 {/if}
