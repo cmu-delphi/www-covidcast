@@ -64,7 +64,6 @@
     } else {
       warningType = 1;
     }
-    console.log(warningType);
   });
 </script>
 
