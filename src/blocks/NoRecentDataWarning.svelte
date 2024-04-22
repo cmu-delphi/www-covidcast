@@ -32,6 +32,10 @@
     <p>
       This date {formatDateYearDayOfWeekAbbr(date.value)} does not yet have data for all of the highlighted indicators.
       <br />
+      <!-- 
+        window.location.search.split('&').slice(1).join('&') is used to keep the query parameters except the date parameter.
+        So we are getting query params from url, splitting them by & and removing the first element which is date parameter.
+      -->
       <a
         href="?date={formatAPITime(minMaxDate)}&{window.location.search.split('&').slice(1).join('&')}"
         on:click={switchDate}>{formatDateYearDayOfWeekAbbr(minMaxDate)}</a
