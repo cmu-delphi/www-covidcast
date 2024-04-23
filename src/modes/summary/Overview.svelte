@@ -6,7 +6,7 @@
   import MaxDateHint from '../../blocks/MaxDateHint.svelte';
   import NoRecentDataWarning from '../../blocks/NoRecentDataWarning.svelte';
   import { defaultDeathSensor, defaultCasesSensor, defaultHospitalSensor, metaDataManager } from '../../stores';
-  import { onMount, beforeUpdate } from 'svelte';
+  import { onMount } from 'svelte';
 
   /**
    * @type {import("../../stores/params").DateParam}
@@ -30,44 +30,18 @@
   $: hospitalTrend = trends[1];
   $: deathTrend = trends[2];
 
-  let minMaxDate = new Date();
+  $: minMaxDate = new Date(Math.min(...[CASES, HOSPITAL_ADMISSION].map((s) => s.timeFrame.max)));
 
   onMount(() => {
-    [CASES, HOSPITAL_ADMISSION].map((s) => {
-      if (s.timeFrame.max < minMaxDate) {
-        minMaxDate = s.timeFrame.max;
-      }
-    });
     let urlSearchParams = new URLSearchParams(window.location.search);
     if (!urlSearchParams.has('date')) {
       // if no date is specified in the URL, default to the latest day before today with data from all 3 highlighted indicators
       date.set(minMaxDate);
     }
   });
-
-  // warningType is indicator of which exact warning message should be shown.
-  // By default, when user opens page with no specified date, the date will be set to the latest date we have data for all 3 indicators.
-  // In this case, warningType should be set to 1.
-  // In case selected date is set to future date (date > minMaxDate, where we don't have recent data for all 3 indicators), the warningType will be set to 2
-  // which has different warning message.
-  // In case selected date is set to some date which is < minMaxDate, the warningType will be set to 0 which means that we will not show
-  // any warning message.
-
-  // warningType should be set in beforeUpdate() method, to guess correct warningType.
-
-  let warningType = 1;
-  beforeUpdate(() => {
-    if (date.value > minMaxDate) {
-      warningType = 2;
-    } else if (date.value < minMaxDate) {
-      warningType = 0;
-    } else {
-      warningType = 1;
-    }
-  });
 </script>
 
-<NoRecentDataWarning {minMaxDate} {date} {warningType} />
+<NoRecentDataWarning {minMaxDate} {date} />
 
 <div class="mobile-three-col">
   <div class="mobile-kpi">
