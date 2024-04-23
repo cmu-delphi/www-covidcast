@@ -30,7 +30,7 @@
 {#if warningType === 2}
   <div data-uk-alert class="uk-alert-warning">
     <p>
-      This date {formatDateYearDayOfWeekAbbr(date.value)} does not yet have data for all of the highlighted indicators.
+      This date ({formatDateYearDayOfWeekAbbr(date.value)}) does not yet have data for all of the highlighted indicators.
       <br />
       <!-- 
         window.location.search.split('&').slice(1).join('&') is used to keep the query parameters except the date parameter.
