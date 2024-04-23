@@ -20,7 +20,7 @@
 {#if warningType === 1}
   <div data-uk-alert class="uk-alert-warning">
     <p>
-      This date {formatDateYearDayOfWeekAbbr(minMaxDate)} is the most recent that has data for all three of the highlighted
+      This date, {formatDateYearDayOfWeekAbbr(minMaxDate)}, is the most recent that has data for all three of the highlighted
       indicators. You can mouse over the tooltips just below this message to see the latest available date for each indicator.
       Note that the latest available date may be different for each indicator.
     </p>
