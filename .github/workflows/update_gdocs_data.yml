@@ -6,14 +6,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ssh-key: ${{ secrets.CMU_DELPHI_DEPLOY_MACHINE_SSH }}
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 18
       - name: Cache Node.js modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4.0.1
         with:
           path: ~/.npm # npm cache files are stored in `~/.npm` on Linux/macOS
           key: ${{ runner.OS }}-node2-${{ hashFiles('**/package-lock.json') }}
@@ -23,7 +23,7 @@ jobs:
       - name: Update Docs
         run: npm run gen
       - name: Create pull request into main
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v4
         with:
           branch: bot/update-docs
           commit-message: 'chore: update docs'
