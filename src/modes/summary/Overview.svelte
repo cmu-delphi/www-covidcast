@@ -30,12 +30,15 @@
   $: hospitalTrend = trends[1];
   $: deathTrend = trends[2];
 
+  // Get the latest date that has data for 2 indicators(CASES and HOSPITAL_ADMISSION).
+  // We are not considering DEATHS indicator, because it is weekly based, when other 2 indicators are daily based.
+  // So, we are getting the min date from the max dates of CASES and HOSPITAL_ADMISSION to be sure that we have recent data.
   $: minMaxDate = new Date(Math.min(...[CASES, HOSPITAL_ADMISSION].map((s) => s.timeFrame.max)));
 
   onMount(() => {
     let urlSearchParams = new URLSearchParams(window.location.search);
     if (!urlSearchParams.has('date')) {
-      // if no date is specified in the URL, default to the latest day before today with data from all 3 highlighted indicators
+      // if no date is specified in the URL, default to the latest day with data from 2 highlighted indicators (CASES and HOSPITAL_ADMISSION).
       date.set(minMaxDate);
     }
   });
