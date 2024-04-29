@@ -26,7 +26,7 @@
   </div>
 {/if}
 
-<!-- If the choosen date is less than the most recent date that has data for all three indicators, show this message. -->
+<!-- If the chosen date is greater than the most recent date that has data for all three indicators, show this message. -->
 {#if minMaxDate.getTime() < date.value.getTime()}
   <div data-uk-alert class="uk-alert-warning">
     <p>
