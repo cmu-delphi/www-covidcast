@@ -15,6 +15,8 @@
   }
 </script>
 
+<!-- We are not going to show any king of warning message in case the choosen date is less than the most recent date that has data for all three indicators. -->
+
 <!-- If the choosen date is the same as the most recent date that has data for all three indicators, show this message. -->
 {#if minMaxDate.getTime() === date.value.getTime()}
   <div data-uk-alert class="uk-alert-warning">
