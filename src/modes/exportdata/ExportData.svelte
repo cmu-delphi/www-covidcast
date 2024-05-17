@@ -89,7 +89,12 @@
 
     // Populate region based on URL params... but let the user override this later
     if (urlParams.has('geo_value') && !geoURLSet) {
-      let infos = infosByLevel[geoType].filter((d) => d.propertyId == urlParams.get('geo_value').toUpperCase());
+      let geo_value = urlParams.get('geo_value');
+      // Allow for lowercase state names e.g. 'ca' -> 'CA'
+      if (geoType == 'state') {
+        geo_value = geo_value.toUpperCase();
+      }
+      let infos = infosByLevel[geoType].filter((d) => d.propertyId == geo_value);
       addRegion(infos[0]);
       geoURLSet = true;
     }
