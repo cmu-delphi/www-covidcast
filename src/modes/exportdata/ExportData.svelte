@@ -55,7 +55,8 @@
     startDate = urlParams.has('start_day') ? new Date(urlParams.get('start_day')) : param.sparkLineTimeFrame.min;
     endDate = urlParams.has('end_day') ? new Date(urlParams.get('end_day')) : param.sparkLineTimeFrame.max;
 
-    // Also normalize the dates to the current timezone
+    // Normalize the datest to the current timezone by *subtracting* the timezone
+    // offset (to account for negative timezones), multiplied by 60000 (minutes -> ms)
     startDate = new Date(startDate.getTime() - startDate.getTimezoneOffset() * -60000);
     endDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * -60000);
   }
@@ -88,7 +89,7 @@
 
     // Populate region based on URL params... but let the user override this later
     if (urlParams.has('geo_value') && !geoURLSet) {
-      let infos = infosByLevel[geoType].filter((d) => d.propertyId == urlParams.get('geo_value'));
+      let infos = infosByLevel[geoType].filter((d) => d.propertyId == urlParams.get('geo_value').toUpperCase());
       addRegion(infos[0]);
       geoURLSet = true;
     }

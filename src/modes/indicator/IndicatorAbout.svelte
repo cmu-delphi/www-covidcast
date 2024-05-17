@@ -1,10 +1,19 @@
 <script>
   import { modeByID } from '..';
+  import { formatDateISO } from '../../formats';
   import { currentMode } from '../../stores';
   import AboutSection from '../../components/AboutSection.svelte';
 
   /**
-   * @type {import('../../stores/params').SensorParam}
+   * @type {import("../stores/params").DateParam}
+   */
+  export let date;
+  /**
+   * @type {import("../stores/params").RegionParam}
+   */
+  export let region;
+  /**
+   * @type {import("../stores/params").SensorParam}
    */
   export let sensor;
 
@@ -12,6 +21,24 @@
     sensor.set(sensor.value);
     // switch to export mode
     currentMode.set(modeByID.export);
+  }
+
+  function buildExportURL() {
+    let exportURL = '';
+    if (sensor.key.split('-').length >= 2) {
+      // account for dashes in the sensor
+      let [first, ...rest] = sensor.key.split('-');
+      rest = rest.join('-');
+      exportURL += `data_source=${first}&signal=${rest}`;
+    }
+    if (region) {
+      exportURL += `&geo_type=${region.level}&geo_value=${region.propertyId}`;
+    }
+    if (date) {
+      console.log(date);
+      exportURL += `&start_day=${formatDateISO(date.value)}&end_day=${formatDateISO(date.value)}`;
+    }
+    return exportURL;
   }
 </script>
 
@@ -33,7 +60,7 @@
             </li>
           {/each}
           <li>
-            <a href={`../${modeByID.export.id}?sensor=${sensor.key}`} on:click|preventDefault={exportData}
+            <a href={`../${modeByID.export.id}/?${buildExportURL()}`} on:click|preventDefault={exportData}
               >Export Data</a
             >
           </li>

@@ -96,7 +96,7 @@
         <HistoryLineChart {sensor} {date} {region} {fetcher} />
       </div>
     </div>
-    <IndicatorAbout {sensor} />
+    <IndicatorAbout {sensor} {region} {date} />
     <div class="grid-3-11">
       <hr />
       <GeoTable {sensor} {region} {date} {fetcher} />
