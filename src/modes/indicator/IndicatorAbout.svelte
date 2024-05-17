@@ -17,15 +17,14 @@
    */
   export let sensor;
 
-  function exportData() {
-    sensor.set(sensor.value);
+  function setExportMode() {
     // switch to export mode
     currentMode.set(modeByID.export);
   }
 
   function buildExportURL() {
     let exportURL = '';
-    if (sensor.key.split('-').length >= 2) {
+    if (sensor && sensor.key.split('-').length >= 2) {
       // account for dashes in the sensor
       let [first, ...rest] = sensor.key.split('-');
       rest = rest.join('-');
@@ -35,7 +34,6 @@
       exportURL += `&geo_type=${region.level}&geo_value=${region.propertyId}`;
     }
     if (date) {
-      console.log(date);
       exportURL += `&start_day=${formatDateISO(date.value)}&end_day=${formatDateISO(date.value)}`;
     }
     return exportURL;
@@ -60,9 +58,7 @@
             </li>
           {/each}
           <li>
-            <a href={`../${modeByID.export.id}/?${buildExportURL()}`} on:click|preventDefault={exportData}
-              >Export Data</a
-            >
+            <a href={`../export/?${buildExportURL()}`} on:click={setExportMode}>Export Data</a>
           </li>
         </ul>
       {/if}
