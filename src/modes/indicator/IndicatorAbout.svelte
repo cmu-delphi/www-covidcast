@@ -26,16 +26,17 @@
   $: {
     exportURL = '';
     if (sensor && sensor.key.split('-').length >= 2) {
-      // account for dashes in the sensor
+      // Given a sensor key formatted "sensor-name-here-signal_name_here", split on the last dash
       let [last, ...rest] = sensor.key.split('-').reverse();
       rest = rest.reverse().join('-');
       exportURL += `data_source=${rest}&signal=${last}`;
-    }
-    if (region) {
-      exportURL += `&geo_type=${region.level}&geo_value=${region.propertyId}`;
-    }
-    if (date) {
-      exportURL += `&start_day=${formatDateISO(date.value)}&end_day=${formatDateISO(date.value)}`;
+
+      if (region) {
+        exportURL += `&geo_type=${region.level}&geo_value=${region.propertyId}`;
+      }
+      if (date) {
+        exportURL += `&start_day=${formatDateISO(date.value)}&end_day=${formatDateISO(date.value)}`;
+      }
     }
   }
 </script>
