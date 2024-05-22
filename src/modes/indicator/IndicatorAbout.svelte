@@ -22,13 +22,14 @@
     currentMode.set(modeByID.export);
   }
 
-  function buildExportURL() {
-    let exportURL = '';
+  let exportURL = '';
+  $: {
+    exportURL = '';
     if (sensor && sensor.key.split('-').length >= 2) {
       // account for dashes in the sensor
-      let [first, ...rest] = sensor.key.split('-');
-      rest = rest.join('-');
-      exportURL += `data_source=${first}&signal=${rest}`;
+      let [last, ...rest] = sensor.key.split('-').reverse();
+      rest = rest.reverse().join('-');
+      exportURL += `data_source=${rest}&signal=${last}`;
     }
     if (region) {
       exportURL += `&geo_type=${region.level}&geo_value=${region.propertyId}`;
@@ -36,7 +37,6 @@
     if (date) {
       exportURL += `&start_day=${formatDateISO(date.value)}&end_day=${formatDateISO(date.value)}`;
     }
-    return exportURL;
   }
 </script>
 
@@ -58,7 +58,7 @@
             </li>
           {/each}
           <li>
-            <a href={`../export/?${buildExportURL()}`} on:click={setExportMode}>Export Data</a>
+            <a href={`../export/?${exportURL}`} on:click={setExportMode}>Export Data</a>
           </li>
         </ul>
       {/if}
