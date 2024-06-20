@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ref: main
           ssh-key: ${{ secrets.CMU_DELPHI_DEPLOY_MACHINE_SSH }}
@@ -25,7 +25,7 @@ jobs:
           echo -n "::set-output name=next_tag::"
           npm version --no-git-tag-version ${{ github.event.inputs.versionName }}
       - name: Create pull request into main
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v4
         with:
           branch: release/${{ steps.version.outputs.next_tag }}
           commit-message: 'chore: release ${{ steps.version.outputs.next_tag }}'
@@ -37,7 +37,7 @@ jobs:
           body: |
             Releasing ${{ steps.version.outputs.next_tag }}.
       - name: Check out delphi epidata
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.CMU_DELPHI_DEPLOY_MACHINE_PAT }}
           repository: cmu-delphi/delphi-epidata
