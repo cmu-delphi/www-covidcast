@@ -5,15 +5,15 @@
   import AboutSection from '../../components/AboutSection.svelte';
 
   /**
-   * @type {import("../stores/params").DateParam}
+   * @type {import("../../stores/params").DateParam}
    */
   export let date;
   /**
-   * @type {import("../stores/params").RegionParam}
+   * @type {import("../../stores/params").RegionParam}
    */
   export let region;
   /**
-   * @type {import("../stores/params").SensorParam}
+   * @type {import("../../stores/params").SensorParam}
    */
   export let sensor;
 
