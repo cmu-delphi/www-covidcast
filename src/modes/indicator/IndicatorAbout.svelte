@@ -1,4 +1,6 @@
 <script>
+  import { modeByID } from '..';
+  import { currentMode } from '../../stores';
   import { formatDateISO } from '../../formats';
   import AboutSection from '../../components/AboutSection.svelte';
 
@@ -14,6 +16,11 @@
    * @type {import("../../stores/params").SensorParam}
    */
   export let sensor;
+
+  function exportData() {
+    // switch to export mode
+    currentMode.set(modeByID.export);
+  }
 
   let exportURL = '';
   $: {
@@ -52,7 +59,7 @@
             </li>
           {/each}
           <li>
-            <a href={`../export/?${exportURL}`}>Export Data</a>
+            <a href={`../${modeByID.export.id}/?${exportURL}`} on:click={exportData}>Export Data</a>
           </li>
         </ul>
       {/if}

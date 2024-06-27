@@ -61,6 +61,8 @@
     <DownloadMenu
       {vegaRef}
       {data}
+      {date}
+      {region}
       {sensor}
       absolutePos
       fileName="{sensor.name}_US Counties_{formatDateISO(date.value)}"

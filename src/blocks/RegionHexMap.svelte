@@ -153,7 +153,14 @@
     <div>Hex fill color: value at selected date</div>
   </div>
   <ColorLegend {sensor} level="state" gradientLength={$isMobileDevice ? 250 : 280}>
-    <DownloadMenu fileName="{sensor.name}_US_States_{formatDateISO(date.value)}" data={dumpData} absolutePos {sensor} />
+    <DownloadMenu
+      fileName="{sensor.name}_US_States_{formatDateISO(date.value)}"
+      data={dumpData}
+      absolutePos
+      {date}
+      {region}
+      {sensor}
+    />
   </ColorLegend>
 </div>
 
