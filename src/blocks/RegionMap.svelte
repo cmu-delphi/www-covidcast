@@ -118,7 +118,7 @@
       on:click={onClickHandler}
       eventListeners={['click']}
     />
-    <DownloadMenu {vegaRef} {data} {sensor} absolutePos {fileName} />
+    <DownloadMenu {vegaRef} {data} {date} {region} {sensor} absolutePos {fileName} />
   </div>
 </FullWidthWrapper>
 
