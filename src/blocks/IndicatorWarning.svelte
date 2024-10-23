@@ -26,6 +26,18 @@
   function switchDate() {
     date.set(sensor.timeFrame.max);
   }
+  function preserveUrlParams() {
+    let params = window.location.search;
+    console.log(sensor);
+    let result = new URLSearchParams();
+    result.append('date', formatAPITime(sensor.timeFrame.max));
+    result.append('sensor', sensor.key);
+    let regionParam = new URLSearchParams(params).get('region');
+    if (regionParam) {
+      result.append('region', regionParam);
+    }
+    return result.toString();
+  }
 </script>
 
 {#if !sensor.value.levels.includes(region.level)}
@@ -38,14 +50,7 @@
       <div data-uk-alert class="uk-alert-warning">
         The indicator "{sensor.name}" is not available for {formatDateYearDayOfWeekAbbr(date.value)}, yet. The latest
         known data is available on
-        <!-- 
-        window.location.search.split('&').slice(1).join('&') is used to keep the query parameters except the date parameter.
-        So we are getting query params from url, splitting them by & and removing the first element which is date parameter.
-         -->
-        <a
-          href="?date={formatAPITime(sensor.timeFrame.max)}&{window.location.search.split('&').slice(1).join('&')}"
-          on:click={switchDate}>{formatDateYearDayOfWeekAbbr(sensor.timeFrame.max)}</a
-        >.
+        <a href="?{preserveUrlParams()}" on:click={switchDate}>{formatDateYearDayOfWeekAbbr(sensor.timeFrame.max)}</a>.
       </div>
     {/if}
   {/await}
