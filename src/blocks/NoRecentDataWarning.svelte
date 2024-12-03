@@ -10,14 +10,15 @@
    */
   export let date;
 
-  export let warningType;
-
   function switchDate() {
     date.set(minMaxDate);
   }
 </script>
 
-{#if warningType === 1}
+<!-- We are not going to show any king of warning message in case the choosen date is less than the most recent date that has data for all three indicators. -->
+
+<!-- If the choosen date is the same as the most recent date that has data for all three indicators, show this message. -->
+{#if minMaxDate.getTime() === date.value.getTime()}
   <div data-uk-alert class="uk-alert-warning">
     <p>
       This date, {formatDateYearDayOfWeekAbbr(minMaxDate)}, is the most recent that has data for all three of the
@@ -27,7 +28,8 @@
   </div>
 {/if}
 
-{#if warningType === 2}
+<!-- If the chosen date is greater than the most recent date that has data for all three indicators, show this message. -->
+{#if minMaxDate.getTime() < date.value.getTime()}
   <div data-uk-alert class="uk-alert-warning">
     <p>
       This date ({formatDateYearDayOfWeekAbbr(date.value)}) does not yet have data for all of the highlighted
