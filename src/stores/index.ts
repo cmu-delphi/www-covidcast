@@ -112,7 +112,7 @@ export const defaultCasesSensor = derived(sensorList, (sensorList) => {
   return sensorList.find((d) => d.signal === 'smoothed_adj_cli');
 });
 export const defaultHospitalSensor = derived(sensorList, (sensorList) => {
-  return sensorList.find((d) => d.signal === 'confirmed_admissions_covid_1d_prop_7dav');
+  return sensorList.find((d) => d.signal === 'smoothed_adj_covid19_from_claims');
 });
 export const defaultDeathSensor = derived(sensorList, (sensorList) => {
   return sensorList.find((d) => d.signal === 'deaths_covid_incidence_prop');
