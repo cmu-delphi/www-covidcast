@@ -418,7 +418,7 @@
     <Toggle bind:checked={singleRaw}>Raw Data</Toggle>
   {/if}
   <div class="spacer" />
-  <DownloadMenu {fileName} {vegaRef} {data} {sensor} {raw} {stderr} />
+  <DownloadMenu {fileName} {vegaRef} {data} {date} {region} {sensor} {raw} {stderr} />
 </div>
 
 {#if showAgeStratifications}
