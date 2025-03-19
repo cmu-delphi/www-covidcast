@@ -146,7 +146,11 @@
               range="sparkLine"
               className="mobile-row-annotation"
             />
-            <a href="../indicator?sensor={entry.sensor.key}" class="uk-link-text">
+            <a
+              href="../indicator?sensor={entry.sensor.key}"
+              class="uk-link-text"
+              on:click|preventDefault={entry.switchMode}
+            >
               {entry.sensor.name}
               <span class="source-name">({cleanSource(entry.sensor.value.dataSourceName)})</span>
             </a>
@@ -195,7 +199,11 @@
             </div>
           </td>
           <td>
-            <a href="../indicator?sensor={entry.sensor.key}" class="uk-link-text details-link">
+            <a
+              href="../indicator?sensor={entry.sensor.key}"
+              class="uk-link-text details-link"
+              on:click|preventDefault={entry.switchMode}
+            >
               {@html chevronRightIcon}
             </a>
           </td>
