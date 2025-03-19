@@ -26,7 +26,7 @@
   function switchDate() {
     date.set(sensor.timeFrame.max);
   }
-  function preserveUrlParams() {
+  function getUrlWithParams() {
     let params = window.location.search;
     let result = new URLSearchParams();
     result.append('date', formatAPITime(sensor.timeFrame.max));
@@ -49,7 +49,7 @@
       <div data-uk-alert class="uk-alert-warning">
         The indicator "{sensor.name}" is not available for {formatDateYearDayOfWeekAbbr(date.value)}, yet. The latest
         known data is available on
-        <a href="?{preserveUrlParams()}" on:click={switchDate}>{formatDateYearDayOfWeekAbbr(sensor.timeFrame.max)}</a>.
+        <a href="?{getUrlWithParams()}" on:click={switchDate}>{formatDateYearDayOfWeekAbbr(sensor.timeFrame.max)}</a>.
       </div>
     {/if}
   {/await}
