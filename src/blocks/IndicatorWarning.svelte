@@ -28,7 +28,6 @@
   }
   function preserveUrlParams() {
     let params = window.location.search;
-    console.log(sensor);
     let result = new URLSearchParams();
     result.append('date', formatAPITime(sensor.timeFrame.max));
     result.append('sensor', sensor.key);
