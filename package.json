@@ -1,6 +1,6 @@
 {
   "name": "www-covidcast",
-  "version": "3.2.11",
+  "version": "3.2.12",
   "private": true,
   "license": "MIT",
   "description": "",
@@ -118,7 +118,7 @@
     "vega": "^5.23.0",
     "vega-embed": "6.21.0",
     "vega-lite": "^5.2.0",
-    "webpack": "^5.76.0",
+    "webpack": "^5.97.1",
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.9.2"
   },
