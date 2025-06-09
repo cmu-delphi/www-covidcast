@@ -448,52 +448,52 @@
           </p>
         </div>
         <div>
-          <h3 class="mobile-h3 uk-margin-top">Python Package</h3>
-          <p>Install <code>covidcast</code> via pip:</p>
-          <pre class="code-block"><code>pip install covidcast</code></pre>
+          <h3 class="mobile-h3 uk-margin-top">Python Package: Epidatpy</h3>
+          <p>Install <code>epidatpy</code> via pip:</p>
+          <pre class="code-block"><code>pip install -e "git+https://github.com/cmu-delphi/epidatpy.git#egg=epidatpy"</code></pre>
           <p>Fetch data:</p>
           <pre class="code-block"><code>
-        {`${isWeekly ? 'from epiweeks import Week' : 'from datetime import date'}
-import covidcast
+        {`${isWeekly ? from epiweeks import Week' : 'from datetime import date'}
+        from epidatpy import CovidcastEpidata, EpiDataContext, EpiRange
 
-data = covidcast.signal("${sensor ? sensor.id : ''}", "${sensor ? sensor.signal : ''}",
-                        ${formatPythonDate(startDate)}, ${formatPythonDate(endDate)},
-                        "${geoType}"${isAllRegions ? '' : `, ["${geoIDs.join('", "')}"]`}${
-                usesAsOf ? `, as_of = ${formatPythonDate(asOfDate)}` : ''
-              })`}
+        epidata = EpiDataContext(use_cache=True, cache_max_age_days=7)
+
+        apicall = epidata.pub_covidcast(
+            data_source="${sensor ? sensor.id : ''}",
+            signals="${sensor ? sensor.signal : ''}",
+            geo_type="${geoType}"${isAllRegions ? '' : `, "${geoIDs.join(', ')}"`},
+            time_type="week",
+            time_values=EpiRange(${formatDate(startDate)}, ${formatDate(endDate)}),${usesAsOf ? `
+, as_of = ${asOfDate}` : ''}
+        )
+        print(apicall)
+        apicall.df()`}
       </code></pre>
           <p class="description">
             For more details and examples, see the
-            <a href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/">package documentation</a>. A description
-            of the returned data structure can be found at:
-            <a href="https://cmu-delphi.github.io/covidcast/covidcast-py/html/signals.html#covidcast.signal"
-              >covidcast.signal</a
-            >.
+            <a href="https://cmu-delphi.github.io/epidatpy/">package documentation</a>.
           </p>
         </div>
         <div>
-          <h3 class="mobile-h3 uk-margin-top">R Package</h3>
-          <p>Install <code>covidcast</code> via CRAN:</p>
-          <pre class="code-block"><code>install.packages('covidcast')</code></pre>
+          <h3 class="mobile-h3 uk-margin-top">R Package: Epidatr</h3>
+          <p>Install <code>epidatr</code> via CRAN:</p>
+          <pre class="code-block"><code>install.packages('epidatr')</code></pre>
           <p>Fetch data:</p>
           <pre class="code-block"><code>
-        {`library(covidcast)
+        {`library(epidatr)
 
-cc_data <- covidcast_signal(
-  data_source = "${sensor ? sensor.id : ''}", signal = "${sensor ? sensor.signal : ''}",
-  start_day = "${formatDate(startDate)}", end_day = "${formatDate(endDate)}",
-  geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`}${
-                usesAsOf ? `, as_of = "${formatDate(asOfDate)}"` : ''
+cc_data <- pub_covidcast(
+        source = "${sensor ? sensor.id : ''}",
+        signal = "${sensor ? sensor.signal : ''}",
+        time_values = epirange(${formatDate(startDate)}, ${formatDate(endDate)}),
+        geo_type = "${geoType}"${isAllRegions ? '' : `, geo_values = c("${geoIDs.join('", "')}")`}${
+                usesAsOf ? `, as_of = "${asOfDate}"` : ''
               }
 )`}
       </code></pre>
           <p class="description">
             For more details and examples, see the
-            <a href="https://cmu-delphi.github.io/covidcast/covidcastR/">package documentation</a>. A description of the
-            returned data structure can be found at:
-            <a href="https://cmu-delphi.github.io/covidcast/covidcastR/reference/covidcast_signal.html#value"
-              >covidcast_signal</a
-            >.
+            <a href="https://cmu-delphi.github.io/epidatr/">package documentation</a>.
           </p>
         </div>
       </section>
