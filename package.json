@@ -120,7 +120,7 @@
     "vega-lite": "^5.2.0",
     "webpack": "^5.97.1",
     "webpack-cli": "^4.10.0",
-    "webpack-dev-server": "^4.9.2"
+    "webpack-dev-server": "^5.2.1"
   },
   "dependencies": {
     "uikit": "^3.16.13"
