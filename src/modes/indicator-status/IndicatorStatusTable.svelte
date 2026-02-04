@@ -43,6 +43,10 @@
     // zero: true,
     // valueDomain: [0, 1]
   });
+
+  $: {
+    console.log('sortedData', sortedData);
+  }
 </script>
 
 <div class="uk-position-relative">
@@ -54,9 +58,11 @@
     prepareRow={(row) => ({
       name: row.name,
       latest_issue: row.latest_issue,
+      typical_reporting_cadence: row.time_type == 'day' ? 1 : 7,
       latest_time_value: row.latest_time_value,
       latest_coverage: row.latest_coverage,
       latest_lag: row.latest_lag_days,
+      latest_report_delay: row.latest_report_delay,
     })}
     advanced={false}
   />
@@ -66,15 +72,19 @@
   <thead>
     <tr>
       <th class="mobile-th">Data Source</th>
-      <th class="mobile-th uk-text-center" colspan="5">Reference Signal</th>
+      <th class="mobile-th uk-text-center" colspan="7">Reference Signal</th>
       <th rowspan="2" />
     </tr>
     <tr>
       <th />
       <th class="mobile-th uk-text-right" title="Date the most recent update was published by Delphi">Latest Issue</th>
+      <th class="mobile-th uk-text-right" title="Date the most recent update was published by Delphi"
+        >Typical Reporting Cadence</th
+      >
       <th class="mobile-th uk-text-right" title="Most recent date for which data is available">Latest Data</th>
-      <th class="mobile-th uk-text-right">Lag to Today</th>
-      <th class="mobile-th uk-text-right" title="Percent of US counties included in latest day of data"
+      <th class="mobile-th uk-text-right" title="Typical Reporting Lag">Typical Reporting Lag</th>
+      <th class="mobile-th uk-text-right" title="Lag to Today">Lag to Today</th>
+      <th class="mobile-th uk-text-center" title="Percent of US counties included in latest day of data"
         >Latest County Coverage</th
       >
       <th class="mobile-th uk-text-right">
@@ -93,10 +103,16 @@
         <SortColumnIndicator label="Latest Issue" {sort} prop="latest_issue" />
       </th>
       <th class="sort-indicator">
+        <SortColumnIndicator label="Typical Reporting Cadence" {sort} prop="typical_reporting_cadence" />
+      </th>
+      <th class="sort-indicator">
         <SortColumnIndicator label="Latest Data" {sort} prop="latest_time_value" />
       </th>
       <th class="sort-indicator">
         <SortColumnIndicator label="Lag" {sort} prop="latest_lag_days" />
+      </th>
+      <th class="sort-indicator">
+        <SortColumnIndicator label="Reporting Delay" {sort} prop="latest_report_delay" />
       </th>
       <th class="sort-indicator">
         <SortColumnIndicator label="Latest Coverage" {sort} prop="latest_coverage" />
@@ -123,11 +139,17 @@
         <td class="uk-text-right uk-text-nowrap">
           {r.ref.isWeeklySignal ? formatWeek(r.latest_issue_week) : formatDateISO(r.latest_issue)}
         </td>
+        <td class="uk-text-center uk-text-nowrap">
+          {r.time_type == 'day' ? 1 : 7}
+        </td>
         <td class="uk-text-right uk-text-nowrap">
           {r.ref.isWeeklySignal ? formatWeek(r.latest_data_week) : formatDateISO(r.latest_data)}
         </td>
         <td class="uk-text-right uk-text-nowrap">
           {r.latest_lag}
+        </td>
+        <td class="uk-text-right uk-text-nowrap">
+          {r.latest_report_delay}
         </td>
         <td class="uk-text-right uk-text-nowrap">
           {formatFraction(r.latest_coverage)}

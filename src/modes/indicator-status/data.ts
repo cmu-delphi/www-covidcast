@@ -23,6 +23,7 @@ export interface SourceData extends SensorSource {
   latest_data?: Date | null;
   latest_data_week?: EpiWeek | null;
   latest_lag: string;
+  latest_report_delay: string;
   latest_coverage?: number | null;
   coverages: ParsedCoverageRow[];
 }
@@ -43,6 +44,15 @@ export function toLagToToday(meta?: EpiDataMetaParsedInfo | null): string {
   const nowWeek = EpiWeek.thisWeek();
   const range = weekRange(meta.maxWeek, nowWeek).length;
   return `${range} week${range !== 1 ? 's' : ''}`;
+}
+
+export function toReportDelay(meta?: EpiDataMetaParsedInfo | null): string {
+  if (!meta || !meta.maxIssue) {
+    return '?';
+  }
+  const now = new Date();
+  const range = timeDay.count(meta.maxIssue, now);
+  return `${range} day${range !== 1 ? 's' : ''}`;
 }
 
 export function toLagToTodayDays(meta?: EpiDataMetaParsedInfo | null): number {
@@ -76,6 +86,8 @@ function toInitialData(sources: SensorSource[], manager: MetaDataManager): Sourc
       latest_data_week: meta?.maxWeek,
       latest_lag: toLagToToday(meta),
       latest_lag_days: toLagToTodayDays(meta),
+      latest_report_delay: toReportDelay(meta),
+      time_type: meta?.time_type,
       latest_coverage: null,
       coverages: [],
     };
