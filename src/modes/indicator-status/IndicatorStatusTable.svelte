@@ -1,7 +1,7 @@
 <script>
   import SortColumnIndicator, { SortHelper } from '../../components/SortColumnIndicator.svelte';
   import FancyHeader from '../../components/FancyHeader.svelte';
-  import { formatDateISO, formatDateShortNumbers, formatFraction, formatWeek } from '../../formats';
+  import { formatDateISO, formatDateShortNumbers, formatFraction, formatWeek, formatValue } from '../../formats';
   import DownloadMenu from '../../components/DownloadMenu.svelte';
   import Vega from '../../components/vega/Vega.svelte';
   import { generateSparkLine } from '../../specs/lineSpec';
@@ -63,6 +63,8 @@
       latest_coverage: row.latest_coverage,
       latest_lag: row.latest_lag_days,
       latest_report_delay: row.latest_report_delay,
+      reporting_delay_index: row.reporting_delay_index,
+      data_staleness_index: row.data_staleness_index,
     })}
     advanced={false}
   />
@@ -72,7 +74,7 @@
   <thead>
     <tr>
       <th class="mobile-th">Data Source</th>
-      <th class="mobile-th uk-text-center" colspan="7">Reference Signal</th>
+      <th class="mobile-th uk-text-center" colspan="9">Reference Signal</th>
       <th rowspan="2" />
     </tr>
     <tr>
@@ -84,6 +86,8 @@
       <th class="mobile-th uk-text-right" title="Most recent date for which data is available">Latest Data</th>
       <th class="mobile-th uk-text-right" title="Typical Reporting Lag">Typical Reporting Lag</th>
       <th class="mobile-th uk-text-right" title="Lag to Today">Lag to Today</th>
+      <th class="mobile-th uk-text-right" title="Reporting Delay Index">Reporting Delay Index</th>
+      <th class="mobile-th uk-text-right" title="Data Staleness Index">Data Staleness Index</th>
       <th class="mobile-th uk-text-center" title="Percent of US counties included in latest day of data"
         >Latest County Coverage</th
       >
@@ -113,6 +117,12 @@
       </th>
       <th class="sort-indicator">
         <SortColumnIndicator label="Reporting Delay" {sort} prop="latest_report_delay" />
+      </th>
+      <th class="sort-indicator">
+        <SortColumnIndicator label="Delay Index" {sort} prop="reporting_delay_index" />
+      </th>
+      <th class="sort-indicator">
+        <SortColumnIndicator label="Staleness Index" {sort} prop="data_staleness_index" />
       </th>
       <th class="sort-indicator">
         <SortColumnIndicator label="Latest Coverage" {sort} prop="latest_coverage" />
@@ -150,6 +160,12 @@
         </td>
         <td class="uk-text-right uk-text-nowrap">
           {r.latest_report_delay}
+        </td>
+        <td class="uk-text-right uk-text-nowrap">
+          {formatValue(r.reporting_delay_index)}
+        </td>
+        <td class="uk-text-center uk-text-nowrap">
+          {formatValue(r.data_staleness_index)}
         </td>
         <td class="uk-text-right uk-text-nowrap">
           {formatFraction(r.latest_coverage)}

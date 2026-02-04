@@ -24,6 +24,8 @@ export interface SourceData extends SensorSource {
   latest_data_week?: EpiWeek | null;
   latest_lag: string;
   latest_report_delay: string;
+  reporting_delay_index: number;
+  data_staleness_index: number;
   latest_coverage?: number | null;
   coverages: ParsedCoverageRow[];
 }
@@ -53,6 +55,28 @@ export function toReportDelay(meta?: EpiDataMetaParsedInfo | null): string {
   const now = new Date();
   const range = timeDay.count(meta.maxIssue, now);
   return `${range} day${range !== 1 ? 's' : ''}`;
+}
+
+export function toReportingDelayIndex(meta?: EpiDataMetaParsedInfo | null): number {
+  if (!meta || !meta.maxIssue) {
+    return Number.NaN;
+  }
+  const now = new Date();
+  const range = timeDay.count(meta.maxIssue, now);
+  const cadence = meta.time_type === 'day' ? 1 : 7;
+  return range / cadence;
+}
+
+export function toDataStalenessIndex(meta?: EpiDataMetaParsedInfo | null): number {
+  if (!meta || !meta.maxIssue || !meta.maxTime) {
+    return Number.NaN;
+  }
+  const now = new Date();
+  const daysSinceLatestData = timeDay.count(meta.maxTime, now);
+  // Estimate typical reporting lag as the difference between the latest issue and the latest data
+  const typicalReportingLag = Math.max(1, timeDay.count(meta.maxTime, meta.maxIssue));
+
+  return daysSinceLatestData / typicalReportingLag;
 }
 
 export function toLagToTodayDays(meta?: EpiDataMetaParsedInfo | null): number {
@@ -87,6 +111,8 @@ function toInitialData(sources: SensorSource[], manager: MetaDataManager): Sourc
       latest_lag: toLagToToday(meta),
       latest_lag_days: toLagToTodayDays(meta),
       latest_report_delay: toReportDelay(meta),
+      reporting_delay_index: toReportingDelayIndex(meta),
+      data_staleness_index: toDataStalenessIndex(meta),
       time_type: meta?.time_type,
       latest_coverage: null,
       coverages: [],
