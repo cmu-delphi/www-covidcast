@@ -80,14 +80,14 @@
     <tr>
       <th />
       <th class="mobile-th uk-text-right" title="Date the most recent update was published by Delphi">Latest Issue</th>
-      <th class="mobile-th uk-text-right" title="Date the most recent update was published by Delphi"
+      <th class="mobile-th uk-text-center" title="Date the most recent update was published by Delphi"
         >Typical Reporting Cadence</th
       >
       <th class="mobile-th uk-text-right" title="Most recent date for which data is available">Latest Data</th>
-      <th class="mobile-th uk-text-right" title="Typical Reporting Lag">Typical Reporting Lag</th>
-      <th class="mobile-th uk-text-right" title="Lag to Today">Lag to Today</th>
-      <th class="mobile-th uk-text-right" title="Reporting Delay Index">Reporting Delay Index</th>
-      <th class="mobile-th uk-text-right" title="Data Staleness Index">Data Staleness Index</th>
+      <th class="mobile-th uk-text-center" title="Typical Reporting Lag">Typical Reporting Lag</th>
+      <th class="mobile-th uk-text-center" title="Lag to Today">Lag to Today</th>
+      <th class="mobile-th uk-text-center" title="Reporting Delay Index">Reporting Delay Index</th>
+      <th class="mobile-th uk-text-center" title="Data Staleness Index">Data Staleness Index</th>
       <th class="mobile-th uk-text-center" title="Percent of US counties included in latest day of data"
         >Latest County Coverage</th
       >
@@ -161,7 +161,7 @@
         <td class="uk-text-right uk-text-nowrap">
           {r.latest_report_delay}
         </td>
-        <td class="uk-text-right uk-text-nowrap">
+        <td class="uk-text-center uk-text-nowrap">
           {formatValue(r.reporting_delay_index)}
         </td>
         <td class="uk-text-center uk-text-nowrap">
