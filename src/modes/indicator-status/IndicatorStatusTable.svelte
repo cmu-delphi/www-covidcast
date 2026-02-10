@@ -74,7 +74,7 @@
   <thead>
     <tr>
       <th class="mobile-th">Data Source</th>
-      <th class="mobile-th uk-text-center" colspan="9">Reference Signal</th>
+      <th class="mobile-th uk-text-center" colspan="9">Reference Indicator</th>
       <th rowspan="2" />
     </tr>
     <tr>
