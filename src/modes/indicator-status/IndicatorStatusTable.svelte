@@ -56,7 +56,8 @@
     data={loader.loaded}
     absolutePos
     prepareRow={(row) => ({
-      name: row.name,
+      original_data_provider: row.original_data_provider,
+      reference_indicator_name: row.reference_indicator_name,
       latest_issue: row.latest_issue,
       typical_reporting_cadence: row.time_type == 'day' ? 1 : 7,
       latest_time_value: row.latest_time_value,
@@ -73,11 +74,13 @@
 <table class="mobile-table" class:loading>
   <thead>
     <tr>
-      <th class="mobile-th">Data Source</th>
-      <th class="mobile-th uk-text-center" colspan="9">Reference Indicator</th>
+      <th class="mobile-th">Original Data Provider</th>
+      <th class="mobile-th">Reference Indicator</th>
+      <th class="mobile-th uk-text-center" colspan="8">Status</th>
       <th rowspan="2" />
     </tr>
     <tr>
+      <th />
       <th />
       <th class="mobile-th uk-text-right" title="Date the most recent update was published by Delphi">Latest Issue</th>
       <th class="mobile-th uk-text-center" title="Date the most recent update was published by Delphi"
@@ -101,7 +104,10 @@
     </tr>
     <tr>
       <th class="sort-indicator uk-text-center">
-        <SortColumnIndicator label="Name" {sort} prop="name" />
+        <SortColumnIndicator label="Original Data Provider" {sort} prop="original_data_provider" />
+      </th>
+      <th class="sort-indicator">
+        <SortColumnIndicator label="Reference Indicator" {sort} prop="reference_indicator_name" />
       </th>
       <th class="sort-indicator">
         <SortColumnIndicator label="Latest Issue" {sort} prop="latest_issue" />
@@ -137,7 +143,7 @@
         <td>
           <a
             href="../indicator-source?sensor={r.source}-{r.reference_signal}"
-            on:click|preventDefault={() => dispatch('select', r)}>{r.name}</a
+            on:click|preventDefault={() => dispatch('select', r)}>{r.original_data_provider}</a
           >
           <div
             class="source"
@@ -145,6 +151,12 @@
           >
             API data_source: {r.source}
           </div>
+        </td>
+        <td>
+          <a
+            href="../indicator-signal?sensor={r.ref.key}"
+            on:click|preventDefault={() => dispatch('selectSignal', r.ref)}>{r.ref.name}</a
+          >
         </td>
         <td class="uk-text-right uk-text-nowrap">
           {r.ref.isWeeklySignal ? formatWeek(r.latest_issue_week) : formatDateISO(r.latest_issue)}

@@ -8,6 +8,11 @@
     currentSensor.set(`${e.detail.source}-${e.detail.reference_signal}`);
     switchToMode(modeByID['indicator-source']);
   }
+
+  function switchToSignal(e) {
+    currentSensor.set(e.detail.key);
+    switchToMode(modeByID['indicator-signal']);
+  }
 </script>
 
 <div class="mobile-root">
@@ -28,8 +33,8 @@
         public health and behavior data, you're in the right place.
       </div>
     </AboutSection>
-    <div class="grid-3-11">
-      <IndicatorStatusTable on:select={switchToDetails} />
+    <div class="grid-2-12">
+      <IndicatorStatusTable on:select={switchToDetails} on:selectSignal={switchToSignal} />
     </div>
   </div>
 </div>

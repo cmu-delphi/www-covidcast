@@ -18,6 +18,7 @@ import { EpiWeek, weekRange } from '../../data/EpiWeek';
 
 export interface SourceData extends SensorSource {
   ref: Sensor;
+  reference_indicator_name: string;
   latest_issue?: Date | null;
   latest_issue_week?: EpiWeek | null;
   latest_data?: Date | null;
@@ -104,6 +105,7 @@ function toInitialData(sources: SensorSource[], manager: MetaDataManager): Sourc
     return {
       ...source,
       ref,
+      reference_indicator_name: ref.name,
       latest_issue: meta?.maxIssue,
       latest_issue_week: meta?.maxIssueWeek,
       latest_data: meta?.maxTime,
