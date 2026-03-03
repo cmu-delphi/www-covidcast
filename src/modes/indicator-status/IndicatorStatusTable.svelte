@@ -43,10 +43,6 @@
     // zero: true,
     // valueDomain: [0, 1]
   });
-
-  $: {
-    console.log('sortedData', sortedData);
-  }
 </script>
 
 <div class="uk-position-relative">
