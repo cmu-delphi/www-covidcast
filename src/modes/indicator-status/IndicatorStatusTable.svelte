@@ -83,7 +83,7 @@
       <th />
       <th />
       <th class="mobile-th uk-text-right" title="Date the most recent update was published by Delphi">Latest Issue</th>
-      <th class="mobile-th uk-text-center" title="Date the most recent update was published by Delphi"
+      <th class="mobile-th uk-text-center" title="How often updates are published by Delphi"
         >Typical Reporting Cadence</th
       >
       <th class="mobile-th uk-text-right" title="Most recent date for which data is available">Latest Data</th>
