@@ -30,6 +30,6 @@ jobs:
           title: Update Google Docs Meta Data
           labels: chore
           # reviewers:
-          assignees: melange396
+          assignees: dmytrotsko
           body: |
             Updating Google Docs Meta Data
