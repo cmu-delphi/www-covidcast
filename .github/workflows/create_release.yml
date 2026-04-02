@@ -33,7 +33,7 @@ jobs:
           title: Release ${{ steps.version.outputs.next_tag }}
           labels: chore
           # reviewers:
-          assignees: melange396
+          assignees: dmytrotsko
           body: |
             Releasing ${{ steps.version.outputs.next_tag }}.
       - name: Check out delphi epidata
@@ -57,6 +57,6 @@ jobs:
           title: Sync to www-covidcast release ${{ steps.version.outputs.next_tag }}
           labels: chore
           # reviewers:
-          assignees: melange396
+          assignees: dmytrotsko
           body: |
             Syncing covidcast_utils files to www-covidcast release ${{ steps.version.outputs.next_tag }}.

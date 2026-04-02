@@ -97,7 +97,7 @@ jobs:
           title: 'update to COVIDcast ${{ needs.create_release.outputs.tag_name }}'
           labels: feat
           # reviewers:
-          assignees: melange396
+          assignees: dmytrotsko
           body: |
             update to [COVIDcast ${{ needs.create_release.outputs.tag_name }}](https://github.com/cmu-delphi/www-covidcast/releases/${{ needs.create_release.outputs.tag_name }})
 
