@@ -73,7 +73,7 @@
   let details = -1;
 
   function signals(signals) {
-    return signals === '*' ? 'All Signals' : [...signals].join(', ');
+    return signals === '*' ? 'All Indicators' : [...signals].join(', ');
   }
   function regionName(regions) {
     const mapped = regions
@@ -183,7 +183,7 @@
               <p>
                 {r.annotation.explanation}
               </p>
-              <p><strong>Affected Signals:</strong> {signals(r.annotation.signals)}</p>
+              <p><strong>Affected Indicators:</strong> {signals(r.annotation.signals)}</p>
               <p><strong>Affected Regions:</strong> {regionLong(r.annotation.regions)}</p>
             </td>
           </tr>

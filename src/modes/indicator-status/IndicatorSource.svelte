@@ -86,7 +86,7 @@
       <FancyHeader invert sub="Information">Coverage</FancyHeader>
       {#if referenceSignal}
         <p>
-          Reference Signal: <a
+          Reference Indicator: <a
             href="../indicator-signal?sensor={referenceSignal.key}"
             on:click|preventDefault={() => select(referenceSignal)}
           >

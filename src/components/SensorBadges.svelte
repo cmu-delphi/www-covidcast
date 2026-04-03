@@ -33,10 +33,10 @@
     <span class="uk-badge is-smooth" title="uses a trailing average">smoothed</span>
   {/if}
   {#if meta.is_cumulative}
-    <span class="uk-badge is-cumulative" title="is a cumulative signal">cumulative</span>
+    <span class="uk-badge is-cumulative" title="is a cumulative indicator">cumulative</span>
   {/if}
   {#if meta.is_weighted}
-    <span class="uk-badge is-weighted" title="is a weighted signal">weighted</span>
+    <span class="uk-badge is-weighted" title="is a weighted indicator">weighted</span>
   {/if}
   {#if meta.has_stderr}
     <span class="uk-badge has-stderr" title="includes standard error information">stderr</span>

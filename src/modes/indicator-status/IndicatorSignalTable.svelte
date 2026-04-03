@@ -65,7 +65,7 @@
         <td>
           <a href="../indicator-signal?sensor={r.key}" on:click|preventDefault={() => select(r)}>
             {#if source.reference_signal == r.signal}
-              <span class="inline-svg-icon" title="reference signal for this data source" style="padding: 0"
+              <span class="inline-svg-icon" title="reference indicator for this data source" style="padding: 0"
                 >{@html StarIcon}</span
               >
             {/if}

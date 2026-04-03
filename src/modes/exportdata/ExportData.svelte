@@ -207,10 +207,10 @@
   <div class="uk-container content-grid">
     <div class="grid-3-11">
       <p>
-        All signals displayed in COVIDcast are freely available for download here. You can also access the latest daily
-        through the
+        All indicators displayed in COVIDcast are freely available for download here. You can also access the latest
+        daily through the
         <a href="https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html">COVIDcast API</a>
-        which also includes numerous other signals.
+        which also includes numerous other indicators.
       </p>
       <section class="uk-margin-top">
         <FancyHeader sub="Data Source" normal>1. Select</FancyHeader>
@@ -228,7 +228,7 @@
                 {/each}
               </select>
             </div>
-            <label><input type="checkbox" bind:checked={showInActive} />Show Inactive Signals</label>
+            <label><input type="checkbox" bind:checked={showInActive} />Show Inactive Indicators</label>
           </div>
         </div>
 
@@ -254,10 +254,10 @@
       </section>
 
       <section class="uk-margin-top">
-        <FancyHeader sub="Signal" normal>2. Select</FancyHeader>
+        <FancyHeader sub="Indicator" normal>2. Select</FancyHeader>
         <p>Pick a signal from this data source.</p>
         <div class="uk-width-1-1@m uk-width-expand@s">
-          <label for="ds" class="uk-form-label">Signals</label>
+          <label for="ds" class="uk-form-label">Indicators</label>
           <div class="uk-form-controls">
             <select id="ds" bind:value={sensorValue} size="8" class="uk-select">
               {#if source}
