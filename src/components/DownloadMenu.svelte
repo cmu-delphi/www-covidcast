@@ -1,5 +1,5 @@
 <script>
-  import { downloadUrl, scrollToTop } from '../util';
+  import { downloadUrl } from '../util';
   import { csvFormat } from 'd3-dsv';
   import { formatDateISO } from '../formats';
   import { modeByID } from '../modes';
@@ -13,6 +13,14 @@
 
   export let data = null;
 
+  /**
+   * @type {import("../stores/params").DateParam}
+   */
+  export let date = null;
+  /**
+   * @type {import("../stores/params").RegionParam}
+   */
+  export let region = null;
   /**
    * @type {import("../stores/params").SensorParam}
    */
@@ -112,8 +120,24 @@
   function exportData() {
     // switch to export mode
     currentMode.set(modeByID.export);
-    sensor.set(sensor.value, true);
-    scrollToTop();
+  }
+
+  let exportURL = '';
+  $: {
+    exportURL = '';
+    if (sensor && sensor.key.split('-').length >= 2) {
+      // Given a sensor key formatted "sensor-name-here-signal_name_here", split on the last dash
+      let [last, ...rest] = sensor.key.split('-').reverse();
+      rest = rest.reverse().join('-');
+      exportURL += `data_source=${rest}&signal=${last}`;
+
+      if (region) {
+        exportURL += `&geo_type=${region.level}&geo_value=${region.propertyId}`;
+      }
+      if (date) {
+        exportURL += `&start_day=${formatDateISO(date.value)}&end_day=${formatDateISO(date.value)}`;
+      }
+    }
   }
 </script>
 
@@ -140,7 +164,7 @@
       {#if advanced}
         <li class="uk-nav-divider" />
         <li>
-          <a href="../{modeByID.export.id}" on:click|preventDefault={exportData}>Advanced Data Export</a>
+          <a href={`../${modeByID.export.id}/?${exportURL}`} on:click={exportData}>Advanced Data Export</a>
         </li>
       {/if}
     </ul>

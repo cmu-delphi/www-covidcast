@@ -182,7 +182,7 @@
 
 <div class="uk-position-relative">
   <FancyHeader anchor="table">{title.title}</FancyHeader>
-  <DownloadMenu {fileName} data={loadedData} absolutePos prepareRow={(row) => row.dump} />
+  <DownloadMenu {fileName} data={loadedData} absolutePos prepareRow={(row) => row.dump} {date} {region} {sensor} />
   <p class="uk-text-center uk-text-italic ux-hint">
     <span class="inline-svg-icon">
       {@html mousePointerIcon}
